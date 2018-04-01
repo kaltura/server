@@ -21,12 +21,19 @@ class KalturaClipDescription extends KalturaObject
 	 * @var int
 	 */
 	public $duration;
+
+	/**
+	 *
+	 * @var int
+	 */
+	public $offsetInDestination;
 	
 	private static $map_between_objects = array
 	(
 		"sourceEntryId" ,
 		"startTime" ,
 		"duration" ,
+		"offsetInDestination"
 	);
 
 

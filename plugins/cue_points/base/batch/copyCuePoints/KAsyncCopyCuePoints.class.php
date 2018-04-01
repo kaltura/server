@@ -52,7 +52,6 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 	private function copyCuePoint(KalturaBatchJob $job, KalturaCopyCuePointsJobData $data)
 	{
 		self::impersonate($job->partnerId);
-		$currentDuration = 0;
 		$totalCuePointNumber = 0;
 		/** @var KalturaCopyCuePointsJobData $data */
 		/** @var KalturaClipDescription $clipDescription */
@@ -60,6 +59,7 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 		{
 			$sourceEntryId = $clipDescription->sourceEntryId;
 			$clipStartTime = $clipDescription->startTime;
+			$offsetInDestination = $clipDescription->offsetInDestination;
 			$clipEndTime = $clipStartTime + $clipDescription->duration;
 			$cuePointList = $this->getCuePointListForEntry($sourceEntryId,$clipStartTime,$clipEndTime);
 			$count = count($cuePointList);
@@ -68,13 +68,11 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 			{
 				KalturaLog::info("clip ID: "."$clipDescription->sourceEntryId " . "has no cue point between 
 								 $clipStartTime and $clipEndTime");
-				$currentDuration = $currentDuration + $clipDescription->duration;
 				continue;
 			}
 			KalturaLog::info("Total count of cue-point to copy: " .$count);
 
-			$this->copyToDestEntry($data->destinationEntryId, $clipStartTime, $currentDuration, $cuePointList);
-			$currentDuration = $currentDuration + $clipDescription->duration;
+			$this->copyToDestEntry($data->destinationEntryId, $clipStartTime, $offsetInDestination, $cuePointList);
 		}
 		self::unimpersonate();
 		return $this->closeJob($job, null, null,
@@ -114,15 +112,15 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 	/**
 	 * @param $destinationEntryId
 	 * @param $clipStartTime
-	 * @param $currentDuration
+	 * @param $offsetInDestination
 	 * @param $cuePointList
 	 */
-	private function copyToDestEntry($destinationEntryId, $clipStartTime, $currentDuration, $cuePointList)
+	private function copyToDestEntry($destinationEntryId, $clipStartTime, $offsetInDestination, $cuePointList)
 	{
 		/** @var KalturaCuePoint $cuePoint */
 		foreach ($cuePointList as $cuePoint)
 		{
-			$cuePointDestStartTime = $cuePoint->startTime - $clipStartTime + $currentDuration;
+			$cuePointDestStartTime = $cuePoint->startTime - $clipStartTime + $offsetInDestination;
 			/** @noinspection PhpUndefinedFieldInspection */
 			$clonedCuePoint = KBatchBase::$kClient->cuePoint->cloneAction($cuePoint->id, $destinationEntryId);
 			if (KBatchBase::$kClient->isError($clonedCuePoint))

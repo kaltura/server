@@ -23,6 +23,12 @@ class kClipDescription
 	 */
 	private $duration;
 
+	/**
+	 *
+	 * @var int
+	 */
+	private $offsetInDestination;
+
 
 	/**
 	 * @param string $sourceEntryId
@@ -72,5 +78,21 @@ class kClipDescription
 	public function getDuration()
 	{
 		return $this->duration;
+	}
+
+	/**
+	 * @param int $offsetInDestination
+	 */
+	public function setOffsetInDestination($offsetInDestination)
+	{
+		$this->offsetInDestination = $offsetInDestination;
+	}
+
+	/**
+	 * @return int $offsetInDestination
+	 */
+	public function getOffsetInDestination()
+	{
+		return $this->offsetInDestination;
 	}
 }

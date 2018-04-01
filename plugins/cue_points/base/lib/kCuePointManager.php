@@ -109,19 +109,24 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		/** @var kClipDescription[] $kClipDescriptionArray */
 		$kClipDescriptionArray = array();
 		KalturaLog::debug("Cue Point Destination Entry ID: " . $data->getDestEntryId());
-
+		$globalOffset = 0;
+		/** @var kClipAttributes $operationAttribute */
 		foreach ($data->getOperationAttributes() as $operationAttribute)
 		{
 			$kClipDescription = new kClipDescription();
 			if (!$data->getSourceEntryId())
 			{
-				//if no source entry we will not copy the entry ID.
+				//if no source entry we will not copy the entry ID. add clip offset to global offset and continue
+				$globalOffset = $globalOffset + $operationAttribute->getDuration();
 				continue;
 			}
 			$kClipDescription->setSourceEntryId($data->getSourceEntryId());
 			$kClipDescription->setStartTime($operationAttribute->getOffset());
 			$kClipDescription->setDuration($operationAttribute->getDuration());
+			self::setCuePointGlobalOffset($operationAttribute, $globalOffset,$kClipDescription);
 			$kClipDescriptionArray[] = $kClipDescription;
+			//add clip offset to global offset
+			$globalOffset = $globalOffset + $operationAttribute->getDuration();
 		}
 		$jobData = new kCopyCuePointsJobData();
 		$jobData->setClipsDescriptionArray($kClipDescriptionArray);
@@ -130,6 +135,20 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$batchJob->setEntryId($data->getDestEntryId());
 		$batchJob->setPartnerId($data->getPartnerId());
 		kJobsManager::addJob($batchJob, $jobData, BatchJobType::COPY_CUE_POINTS);
+	}
+
+	/**
+	 * @param kClipAttributes $operationAttribute
+	 * @param int $globalOffset
+	 * @param kClipDescription $kClipDescription
+	 */
+	private static function setCuePointGlobalOffset($operationAttribute, $globalOffset, &$kClipDescription)
+	{
+		if ($operationAttribute->getGlobalOffsetInDestination() || $operationAttribute->getGlobalOffsetInDestination() === 0) {
+			$kClipDescription->setOffsetInDestination($operationAttribute->getGlobalOffsetInDestination());
+		} else {
+			$kClipDescription->setOffsetInDestination($globalOffset);
+		}
 	}
 
 	private function handleExtractMediaFinished(BatchJob $dbBatchJob, kExtractMediaJobData $data)
