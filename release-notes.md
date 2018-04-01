@@ -17,7 +17,7 @@
 
 ### Deployment scripts ###
 
-	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_03_28_cuePoint_update_start_time.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_03_28_cuePoint_update_cue_point_times.php
 	
 ## Remove use of partner 0 in sphinx queries ##
 - Issue Type: Task

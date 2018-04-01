@@ -359,13 +359,14 @@ class CuePointService extends KalturaBaseService
 
 	/**
 	 *
-	 * @action updateStartTime
+	 * @action updateCuePointsTimes
 	 * @param string $id
 	 * @param int $startTime
+	 * @param int $endTime
 	 * @return KalturaCuePoint
 	 * @throws KalturaCuePointErrors::INVALID_CUE_POINT_ID
 	 */
-	function updateStartTimeAction($id, $startTime)
+	function updateCuePointsTimesAction($id, $startTime,$endTime= null)
 	{
 		$dbCuePoint = CuePointPeer::retrieveByPK($id);
 
@@ -378,6 +379,10 @@ class CuePointService extends KalturaBaseService
 		$this->validateUserLog($dbCuePoint);
 
 		$dbCuePoint->setStartTime($startTime);
+		if ($endTime)
+		{
+			$dbCuePoint->setEndTime($endTime);
+		}
 		$dbCuePoint->save();
 		$cuePoint = KalturaCuePoint::getInstance($dbCuePoint, $this->getResponseProfile());
 		return $cuePoint;

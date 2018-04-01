@@ -72,7 +72,7 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 			}
 			KalturaLog::info("Total count of cue-point to copy: " .$count);
 
-			$this->copyToDestEntry($data->destinationEntryId, $clipStartTime, $offsetInDestination, $cuePointList);
+			$this->copyToDestEntry($data->destinationEntryId, $clipStartTime, $offsetInDestination, $cuePointList,$clipEndTime);
 		}
 		self::unimpersonate();
 		return $this->closeJob($job, null, null,
@@ -113,14 +113,22 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 	 * @param $destinationEntryId
 	 * @param $clipStartTime
 	 * @param $offsetInDestination
+	 * @param $clipEndTime
 	 * @param $cuePointList
 	 */
-	private function copyToDestEntry($destinationEntryId, $clipStartTime, $offsetInDestination, $cuePointList)
+	private function copyToDestEntry($destinationEntryId, $clipStartTime, $offsetInDestination, $cuePointList, $clipEndTime)
 	{
 		/** @var KalturaCuePoint $cuePoint */
 		foreach ($cuePointList as $cuePoint)
 		{
 			$cuePointDestStartTime = $cuePoint->startTime - $clipStartTime + $offsetInDestination;
+			$cuePointDestEndTime = null;
+			/** @noinspection PhpUndefinedFieldInspection */
+			if (!is_null($cuePoint->endTime))
+			{
+				/** @noinspection PhpUndefinedFieldInspection */
+				$cuePointDestEndTime = min($cuePoint->endTime - $clipStartTime + $offsetInDestination, $clipEndTime - $clipStartTime + $offsetInDestination);
+			}
 			/** @noinspection PhpUndefinedFieldInspection */
 			$clonedCuePoint = KBatchBase::$kClient->cuePoint->cloneAction($cuePoint->id, $destinationEntryId);
 			if (KBatchBase::$kClient->isError($clonedCuePoint))
@@ -129,7 +137,7 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 			}
 			if ($clonedCuePoint) {
 				/** @noinspection PhpUndefinedFieldInspection */
-				$res = $this->updateStartTime($clonedCuePoint, $cuePointDestStartTime);
+				$res = $this->updateCuePointTimes($clonedCuePoint, $cuePointDestStartTime,$cuePointDestEndTime);
 				if (KBatchBase::$kClient->isError($res))
 				{
 					KalturaLog::alert("Error during copy , of cuePoint $clonedCuePoint->id");
@@ -143,12 +151,13 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 	/**
 	 * @param $clonedCuePoint
 	 * @param $cuePointDestStartTime
+	 * @param $cuePointDestEndTime
 	 * @return mixed
 	 */
-	private function updateStartTime($clonedCuePoint, $cuePointDestStartTime)
+	private function updateCuePointTimes($clonedCuePoint, $cuePointDestStartTime, $cuePointDestEndTime)
 	{
 		/** @noinspection PhpUndefinedFieldInspection */
-		$res = KBatchBase::$kClient->cuePoint->updateStartTime($clonedCuePoint->id, $cuePointDestStartTime);
+		$res = KBatchBase::$kClient->cuePoint->updateCuePointsTimes($clonedCuePoint->id, $cuePointDestStartTime,$cuePointDestEndTime);
 		return $res;
 	}
 
