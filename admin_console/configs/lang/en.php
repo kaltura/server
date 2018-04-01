@@ -1431,7 +1431,7 @@ return array(
 	'Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE' => "TRUE",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::SRT' => "SRT",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::DFXP' => "DFXP",
-	'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DISABLED' => "Disabled",
+	'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DEPRECATED' => "Deprecated",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED' => "Deleted",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::ACTIVE' => "Enabled",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_MINUTE' => "Price Per Minute",

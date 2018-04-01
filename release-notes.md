@@ -8,6 +8,8 @@
 	- copy "index kaltura_entry_vendor_task:kaltura_base" section from /opt/kaltura/app/configurations/sphinx/kaltura.conf.template to /opt/kaltura/app/configurations/sphinx/kaltura.conf modifiy path to appropriate directory.
 	- restart sphinx service
 	- Add the following to plugins.ini: Reach, EntryVendorTaskSphinx
+	- In generator.ini add reach services (to public and batch section).
+	- Add missing info to admin.ini, workers.ini, batch.ini. 
 
 ### Deployment scripts ###
 	
@@ -79,10 +81,6 @@
 		KALTURA_ENTRY_VENDOR_TASKS_CSV_MAIL = 134;
 		134 = "Your REACH requests Csv is ready for download"
 		134 = "Hello %s,<BR><BR>Following is the download link to your REACH requests csv: %s<BR>Please notice that the link will be available only for 24 hours. <BR><BR> Kaltura Customer Service"
-
-		
-		
-	
 			    
 	
 #### Known Issues & Limitations ####

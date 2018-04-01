@@ -128,7 +128,7 @@ class VendorCatalogItemService extends KalturaBaseService
 		if($status == KalturaVendorCatalogItemStatus::ACTIVE)
 		{
 			//Check uniqueness of new object's system name
-			$systemNameTemplates = VendorCatalogItemPeer::retrieveBySystemName($dbVendorCatalogItem->getSystemName());
+			$systemNameTemplates = VendorCatalogItemPeer::retrieveBySystemName($dbVendorCatalogItem->getSystemName(), $id);
 			if (count($systemNameTemplates))
 				throw new KalturaAPIException(KalturaReachErrors::VENDOR_CATALOG_ITEM_DUPLICATE_SYSTEM_NAME, $dbVendorCatalogItem->getSystemName());
 		}
