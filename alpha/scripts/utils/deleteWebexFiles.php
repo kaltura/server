@@ -10,27 +10,27 @@ class scriptLogger
 	}
 }
 
-if($argc < 7){
-	scriptLogger::logScript("Usage: [webex username] [webex password] [webex site id] [webex partner id] [start date timestamp] [end date timestamp]");
+if($argc < 8){
+	scriptLogger::logScript("Usage: [webex service URL] [webex username] [webex password] [webex site id] [webex partner id] [start date timestamp] [end date timestamp]");
 	die("Not enough parameters" . "\n");
 }
 
-$webexUserName = $argv[1];
-$webexPass = $argv[2];
-$webexSiteId = $argv[3];
-$webexPartnerId = $argv[4];
-$startTime = $argv[5];
-$endTime = $argv[6];
+$webexServiceUrl = $argv[1];
+$webexUserName = $argv[2];
+$webexPass = $argv[3];
+$webexSiteId = $argv[4];
+$webexPartnerId = $argv[5];
+$startTime = $argv[6];
+$endTime = $argv[7];
 scriptLogger::logScript('Init webexWrapper');
 $securityContext = new WebexXmlSecurityContext();
 $securityContext->setUid($webexUserName); // webex username
 $securityContext->setPwd($webexPass); // webex password
 $securityContext->setSid($webexSiteId); // webex site id
 $securityContext->setPid($webexPartnerId); // webex partner id
-$webexWrapper = new webexWrapper('https://roche.webex.com/WBXService/XMLService', $securityContext, array("scriptLogger", "logScript"), array("scriptLogger", "logScript"));
+$webexWrapper = new webexWrapper($webexServiceUrl, $securityContext, array("scriptLogger", "logScript"), array("scriptLogger", "logScript"));
 $createTimeStart = date('m/j/Y H:i:s', $startTime);
 $createTimeEnd  = date('m/j/Y H:i:s', $endTime);
 scriptLogger::logScript('Starting to delete webex files.');
 $serviceTypes = webexWrapper::stringServicesTypesToWebexXmlArray(array(WebexXmlComServiceTypeType::_MEETINGCENTER));
 $webexWrapper->deleteRecordingsByDates($serviceTypes, $createTimeStart, $createTimeEnd);
-
