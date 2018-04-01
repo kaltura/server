@@ -7,8 +7,6 @@
 class kClipManager implements kBatchJobStatusEventConsumer
 {
 
-	//Todo: create parent job for the concat and pass it to children
-
 	const CLIP_NUMBER = 'clipNumber';
 
 	/***
@@ -138,7 +136,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 */
 	private function cloneFlavorParam($sourceFlavorParamId)
 	{
-		//flavorParamsObj = getByPk($sourceFlavorParamId);
 		$flavorParamsObj = assetParamsPeer::retrieveByPK($sourceFlavorParamId);
 		// unset flavorParamsObj ID
 		$flavorParamsObj->setId(null);
@@ -161,7 +158,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		//set Dummy Ready we will update it later
 		$flavorAsset->setStatus(flavorAsset::ASSET_STATUS_READY);
-		//$flavorAsset->setFlavorParamsId(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
 		$flavorAsset->save();
 		return $flavorAsset;
 	}
@@ -387,7 +383,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$flavorAsset->setEntryId($tempEntry->getId());
 		$flavorAsset->setStatus(asset::ASSET_STATUS_QUEUED);
 		$flavorAsset->setFlavorParamsId(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
-		//$flavorAsset->setFromAssetParams($flavorParams);
 		$flavorAsset->setIsOriginal(false);
 		$flavorAsset->save();
 		return $flavorAsset;
