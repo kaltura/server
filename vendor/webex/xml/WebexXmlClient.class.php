@@ -58,7 +58,6 @@ class WebexXmlClient
 	 */
 	public function send(WebexXmlRequestBodyContent $requestBodyContent)
 	{
-		$this->validateNoBackup();
 		$request = new WebexXmlRequest($this->securityContext, $requestBodyContent);
 		$response = $this->doSend($request);
 		
@@ -85,6 +84,7 @@ class WebexXmlClient
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		curl_setopt($ch,CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_VERBOSE, $this->verbose);
 		
 		$response = curl_exec($ch);

@@ -54,22 +54,21 @@ class webexWrapper
 	// <editor-fold defaultstate="collapsed" desc="private methods">
 
 	/**
-	 * @param $stringServiceTypes
+	 * @param WebexXmlArray $serviceTypes
 	 * @param $pageSize
 	 * @param $startTime
 	 * @param $endTime
 	 * @param $startFrom
 	 * @return WebexXmlListRecordingRequest
 	 */
-	private function initListRecordingRequest($stringServiceTypes, $pageSize, $startTime, $endTime, $startFrom)
+	private function initListRecordingRequest($serviceTypes, $pageSize, $startTime, $endTime, $startFrom)
 	{
 		$listRecordingRequest = new WebexXmlListRecordingRequest();
 		$listControl = new WebexXmlEpListControlType();
 		$listControl->setStartFrom($startFrom);
 		$listControl->setMaximumNum($pageSize);
 		$listRecordingRequest->setListControl($listControl);
-		$servicesTypes = $this->stringServicesTypesToWebexXmlComServiceTypeType($stringServiceTypes);
-		$listRecordingRequest->setServiceTypes($servicesTypes);
+		$listRecordingRequest->setServiceTypes($serviceTypes);
 
 		if ($startTime && $endTime)
 		{

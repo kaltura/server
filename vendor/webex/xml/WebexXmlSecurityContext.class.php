@@ -14,6 +14,7 @@ class WebexXmlSecurityContext
 		$xml .= "<password>$this->pwd</password>";
 		$xml .= "<siteID>$this->sid</siteID>";
 		$xml .= "<partnerID>$this->pid</partnerID>";
+		$xml .= "<returnAdditionalInfo>TRUE</returnAdditionalInfo>";
 		$xml .= "</securityContext>";
 		
 		return $xml;
