@@ -90,8 +90,8 @@ abstract class KalturaEntryServerNodeBaseFilter extends KalturaFilter
 	public $serverTypeEqual;
 
 	/**
-	* @dynamicType KalturaEntryServerNodeType
-	* @var string
-	*/
+	 * @dynamicType KalturaEntryServerNodeType
+	 * @var string
+	 */
 	public $serverTypeIn;
 }

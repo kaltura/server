@@ -13,7 +13,7 @@ class BaseEntryService extends KalturaEntryService
      */
     public function initService($serviceId, $serviceName, $actionName)
     {
-        parent::initService($serviceId, $serviceName, $actionName);
+	    parent::initService($serviceId, $serviceName, $actionName);
         $partner = PartnerPeer::retrieveByPK($this->getPartnerId());
         if ($actionName == "anonymousRank" && $partner->getEnabledService(KalturaPermissionName::FEATURE_LIKE))
         {
@@ -21,20 +21,6 @@ class BaseEntryService extends KalturaEntryService
         }
     }
     
-	/* (non-PHPdoc)
-	 * @see KalturaBaseService::globalPartnerAllowed()
-	 */
-	protected function globalPartnerAllowed($actionName)
-	{
-		if($actionName == 'getContextData')
-			return true;
-
-		if($actionName == 'getPlaybackContext')
-			return true;
-		
-		return parent::globalPartnerAllowed($actionName);
-	}
-	
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::kalturaNetworkAllowed()
 	 */
