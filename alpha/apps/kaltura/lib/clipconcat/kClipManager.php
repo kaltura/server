@@ -41,6 +41,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	public function createParentBatchJob($sourceEntryId,$clipEntry, $destEntry, $partnerId, array $operationAttributes, $priority = 0)
 	{
 		$parentJob = new BatchJob();
+		$parentJob->setPartnerId($partnerId);
 		$this->setDummyOriginalFlavorAssetReady($clipEntry->getId());
 		$jobData = new kClipConcatJobData();
 		$jobData->setDestEntryId($destEntry->getEntryId());
