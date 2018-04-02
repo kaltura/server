@@ -37,15 +37,7 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		try
-		{
-			return $this->copyCuePoint($job, $job->data);
-		}
-		catch (Exception $ex)
-		{
-			self::unimpersonate();
-			$this->closeJobOnError($job,KalturaBatchJobErrorTypes::KALTURA_CLIENT, $ex, KalturaBatchJobStatus::RETRY);
-		}
+		return $this->copyCuePoint($job, $job->data);
 	}
 	
 	/**
@@ -136,8 +128,24 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 		$filter = self::getCuePointFilter($entryId, $currentSegmentEndTime, $lastCuePointSyncTime);
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = self::MAX_CUE_POINTS_TO_COPY_TO_VOD;
-		$result = KBatchBase::$kClient->cuePoint->listAction($filter, $pager);
-		return $result->objects;
+		$maxRetries = 3;
+		$exception = null;
+		do
+		{
+			try
+			{
+				$result = KBatchBase::$kClient->cuePoint->listAction($filter, $pager);
+				return $result->objects;
+			}
+			catch (Exception $ex)
+			{
+				$maxRetries--;
+				$exception = $ex;
+			}
+		}
+		while($maxRetries);
+
+		throw $exception;
 	}
 
 	private static function getSegmentStartTime($amfArray)
