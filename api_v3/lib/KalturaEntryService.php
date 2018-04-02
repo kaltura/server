@@ -661,7 +661,7 @@ class KalturaEntryService extends KalturaBaseService
 
 		$errDescription = '';
 		$operationAttributes = $resource->getOperationAttributes();
-		if (kClipManager::isClipServiceRequired($operationAttributes))
+		if (kClipManager::isMultipleClipOperation($operationAttributes))
 		{
 			$clipManager = new kClipManager();
 			$this->handleMultiClipRequest($resource,$dbEntry, $clipManager, $operationAttributes);

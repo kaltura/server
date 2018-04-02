@@ -13,7 +13,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param array $dynamicAttributes
 	 * @return bool is clip attribute exist in dynamic attribute
 	 */
-	public static function isClipServiceRequired(array $dynamicAttributes)
+	public static function isMultipleClipOperation(array $dynamicAttributes)
 	{
 		if (count($dynamicAttributes) <= 1)
 		{
@@ -106,7 +106,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 		elseif ($batchJob->getRootJob() && $batchJob->getRootJob()->getJobType() == BatchJobType::CLIP_CONCAT)
 		{
-			return $this->handleClipChildJob($batchJob);
+			return $this->areAllClipJobsDone($batchJob);
 		}
 
 		return false;
@@ -188,9 +188,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$flavorAsset->setFlavorParamsId($flavorParamId);
 		$flavorAsset->setPartnerId($partnerId);
 		$flavorAsset->setEntryId($entryId);
-		$flavorAsset->save();
 		$flavorAsset->putInCustomData(self::CLIP_NUMBER,$order);
-
+		$flavorAsset->save();
 		return $flavorAsset;
 	}
 
@@ -219,7 +218,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$jobData = $batchJob->getData();
 
 		$tempEntry = entryPeer::retrieveByPK($jobData->getTempEntryId());
-		$assets = assetPeer::retrieveByEntryId($jobData->getTempEntryId());
+		$assets = assetPeer::retrieveByEntryId($jobData->getTempEntryId(), array(assetType::FLAVOR));
 		usort($assets, array("kClipManager","cmpByOrder"));
 
 		$files = $this->getFilesPath($assets);
@@ -312,7 +311,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param BatchJob $batchJob
 	 * @return bool are all clip batch done
 	 */
-	private function handleClipChildJob($batchJob)
+	private function areAllClipJobsDone($batchJob)
 	{
 
 		$childJobs = $batchJob->getRootJob()->getChildJobs();

@@ -12,6 +12,8 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 	 * (non-PHPdoc)
 	 *  @see KBatchBase::getJobType();
 	 */
+	const ATTEMPT_ALLOWED = 3;
+
 	public static function getType()
 	{
 		return KalturaBatchJobType::COPY_CUE_POINTS;
@@ -94,7 +96,10 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = self::MAX_CUE_POINTS_TO_COPY_TO_VOD;
 		/** @noinspection PhpUndefinedFieldInspection */
-		$result = KBatchBase::$kClient->cuePoint->listAction($filter, $pager);
+		$result = null;
+		$result = $this->getCuePointList($filter, $pager);
+
+		/** @noinspection PhpUndefinedFieldInspection */
 		return $result->objects;
 	}
 
@@ -129,8 +134,7 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 				/** @noinspection PhpUndefinedFieldInspection */
 				$cuePointDestEndTime = min($cuePoint->endTime - $clipStartTime + $offsetInDestination, $clipEndTime - $clipStartTime + $offsetInDestination);
 			}
-			/** @noinspection PhpUndefinedFieldInspection */
-			$clonedCuePoint = KBatchBase::$kClient->cuePoint->cloneAction($cuePoint->id, $destinationEntryId);
+			$clonedCuePoint = $this->cloneCuePoint($destinationEntryId, $cuePoint);
 			if (KBatchBase::$kClient->isError($clonedCuePoint))
 			{
 				KalturaLog::alert("Error during copy , of cuePoint $clonedCuePoint->id");
@@ -156,9 +160,83 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 	 */
 	private function updateCuePointTimes($clonedCuePoint, $cuePointDestStartTime, $cuePointDestEndTime)
 	{
+		$attempts = 0;
+		$res = null;
+		do {
+
+			try {
+				/** @noinspection PhpUndefinedFieldInspection */
+				$res = KBatchBase::$kClient->cuePoint->updateCuePointsTimes($clonedCuePoint->id, $cuePointDestStartTime,$cuePointDestEndTime);
+				break;
+			} catch (Exception $ex) {
+				$attempts++;
+				KalturaLog::alert("API Call failed number of retires " . $attempts);
+				KalturaLog::err($ex);
+				continue;
+			}
+
+			break;
+
+		} while ($attempts < self::ATTEMPT_ALLOWED);
 		/** @noinspection PhpUndefinedFieldInspection */
-		$res = KBatchBase::$kClient->cuePoint->updateCuePointsTimes($clonedCuePoint->id, $cuePointDestStartTime,$cuePointDestEndTime);
+
 		return $res;
+	}
+
+	/**
+	 * @param $filter
+	 * @param $pager
+	 * @return array
+	 */
+	private function getCuePointList($filter, $pager)
+	{
+		$attempts = 0;
+		$result = null;
+		do {
+
+			try {
+				/** @noinspection PhpUndefinedFieldInspection */
+				$result = KBatchBase::$kClient->cuePoint->listAction($filter, $pager);
+				break;
+			} catch (Exception $ex) {
+				$attempts++;
+				KalturaLog::alert("API Call failed number of retires " . $attempts);
+				KalturaLog::err($ex);
+				continue;
+			}
+
+			break;
+
+		} while ($attempts < self::ATTEMPT_ALLOWED);
+		return $result;
+	}
+
+	/**
+	 * @param $destinationEntryId
+	 * @param $cuePoint
+	 * @return mixed
+	 */
+	private function cloneCuePoint($destinationEntryId, $cuePoint)
+	{
+		$attempts = 0;
+		$clonedCuePoint = null;
+		do {
+
+			try {
+				/** @noinspection PhpUndefinedFieldInspection */
+				$clonedCuePoint = KBatchBase::$kClient->cuePoint->cloneAction($cuePoint->id, $destinationEntryId);
+				break;
+			} catch (Exception $ex) {
+				$attempts++;
+				KalturaLog::alert("API Call failed number of retires " . $attempts);
+				KalturaLog::err($ex);
+				continue;
+			}
+
+			break;
+
+		} while ($attempts < self::ATTEMPT_ALLOWED);
+		return $clonedCuePoint;
 	}
 
 
