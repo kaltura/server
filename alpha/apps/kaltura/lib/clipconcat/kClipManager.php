@@ -344,7 +344,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @throws kCoreException
 	 * @throws Exception
 	 */
-	private function getFilesPath($assets): array
+	private function getFilesPath($assets)
 	{
 		$files = array();
 		foreach ($assets as $asset) {
@@ -375,7 +375,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @return flavorAsset
 	 * @throws kCoreException
 	 */
-	private function addNewAssetToTargetEntry($tempEntry): flavorAsset
+	private function addNewAssetToTargetEntry($tempEntry)
 	{
 
 		/** @var flavorAsset $flavorAsset */
@@ -475,7 +475,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param $dbAsset
 	 * @throws PropelException
 	 */
-	private function updateMediaFlowOnAsset($dbAsset): void
+	private function updateMediaFlowOnAsset($dbAsset)
 	{
 		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($dbAsset->getId());
 		if ($mediaInfo) {
@@ -489,7 +489,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param $dbAsset
 	 * @param $dbEntry
 	 */
-	private function syncFlavorParamToAsset($dbAsset, $dbEntry): void
+	private function syncFlavorParamToAsset($dbAsset, $dbEntry)
 	{
 		if ($dbAsset->getStatus() == asset::ASSET_STATUS_READY) {
 			$dbEntry->syncFlavorParamsIds();
@@ -501,7 +501,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param $entryId
 	 * @param $dbEntry
 	 */
-	private function updateAssetFailedToConvert($entryId, $dbEntry): void
+	private function updateAssetFailedToConvert($entryId, $dbEntry)
 	{
 		KalturaLog::err("Flavor asset not created for entry [" . $entryId . "]");
 
