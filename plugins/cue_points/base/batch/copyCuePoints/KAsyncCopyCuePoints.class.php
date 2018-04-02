@@ -170,12 +170,9 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 				break;
 			} catch (Exception $ex) {
 				$attempts++;
-				KalturaLog::alert("API Call failed number of retires " . $attempts);
+				KalturaLog::warning("API Call failed number of retires " . $attempts);
 				KalturaLog::err($ex);
-				continue;
 			}
-
-			break;
 
 		} while ($attempts < self::ATTEMPT_ALLOWED);
 		/** @noinspection PhpUndefinedFieldInspection */
@@ -200,12 +197,9 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 				break;
 			} catch (Exception $ex) {
 				$attempts++;
-				KalturaLog::alert("API Call failed number of retires " . $attempts);
+				KalturaLog::warning("API Call failed number of retires " . $attempts);
 				KalturaLog::err($ex);
-				continue;
 			}
-
-			break;
 
 		} while ($attempts < self::ATTEMPT_ALLOWED);
 		return $result;
@@ -228,12 +222,9 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 				break;
 			} catch (Exception $ex) {
 				$attempts++;
-				KalturaLog::alert("API Call failed number of retires " . $attempts);
+				KalturaLog::warning("API Call failed number of retires " . $attempts);
 				KalturaLog::err($ex);
-				continue;
 			}
-
-			break;
 
 		} while ($attempts < self::ATTEMPT_ALLOWED);
 		return $clonedCuePoint;

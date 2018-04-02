@@ -223,7 +223,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 		$files = $this->getFilesPath($assets);
 
-		$flavorAsset = $this->getNewAssetFromEntry($tempEntry);
+		$flavorAsset = $this->addNewAssetToTargetEntry($tempEntry);
 
 		kJobsManager::addConcatJob($batchJob, $flavorAsset, $files,false);
 
@@ -275,7 +275,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	}
 
 	/**
-	 * @param BatchJob $parentJob  clipConcat job
+	 * @param BatchJob $parentJob clipConcat job
 	 * @param $entryId
 	 * @param $errDescription
 	 * @param $partnerId
@@ -298,8 +298,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$batchJob =	kBusinessPreConvertDL::decideAddEntryFlavor($parentJob, $entryId,
 					$clonedID, $errDescription,$flavorAsst->getId()
 					, array($singleAttribute) , $priority);
-			if(!$batchJob) //todo error;
-					return null;
+			if(!$batchJob)
+			{
+				throw new APIException(APIErrors::CANNOT_CONVERT_FLAVOR, $parentJob->getJobType(), $parentJob->getId());
+			}
+
 			$batchArray[] = $batchJob;
 			$order++;
 		}
@@ -372,7 +375,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @return flavorAsset
 	 * @throws kCoreException
 	 */
-	private function getNewAssetFromEntry($tempEntry): flavorAsset
+	private function addNewAssetToTargetEntry($tempEntry): flavorAsset
 	{
 
 		/** @var flavorAsset $flavorAsset */
@@ -427,37 +430,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 		if(!$dbAsset)
 		{
-			KalturaLog::err("Flavor asset not created for entry [" . $entryId . "]");
-
-			if($dbEntry->getStatus() == entryStatus::NO_CONTENT)
-			{
-				$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
-				$dbEntry->save();
-			}
-
+			$this->updateAssetFailedToConvert($entryId, $dbEntry);
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED);
 		}
 
-		$newSyncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $concatSyncKey);
-
-		if($isNewAsset)
-			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
-		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
-
-		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($dbAsset->getId());
-		if($mediaInfo)
-		{
-			$newMediaInfo = $mediaInfo->copy();
-			$newMediaInfo->setFlavorAssetId($dbAsset->getId());
-			$newMediaInfo->save();
-		}
-
-		if ($dbAsset->getStatus() == asset::ASSET_STATUS_READY)
-		{
-			$dbEntry->syncFlavorParamsIds();
-			$dbEntry->save();
-		}
+		$this->updateAssetState($concatSyncKey, $dbAsset, $isNewAsset, $dbEntry);
 	}
 
 	/**
@@ -492,16 +469,67 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		myEntryUtils::deleteEntry($entryToDelete);
+	}
 
-		try
-		{
-			$wrapper = objectWrapperBase::getWrapperClass($entryToDelete);
-			$wrapper->removeFromCache("entry", $entryToDelete->getId());
+	/**
+	 * @param $dbAsset
+	 * @throws PropelException
+	 */
+	private function updateMediaFlowOnAsset($dbAsset): void
+	{
+		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($dbAsset->getId());
+		if ($mediaInfo) {
+			$newMediaInfo = $mediaInfo->copy();
+			$newMediaInfo->setFlavorAssetId($dbAsset->getId());
+			$newMediaInfo->save();
 		}
-		catch(Exception $e)
-		{
-			KalturaLog::err($e);
+	}
+
+	/**
+	 * @param $dbAsset
+	 * @param $dbEntry
+	 */
+	private function syncFlavorParamToAsset($dbAsset, $dbEntry): void
+	{
+		if ($dbAsset->getStatus() == asset::ASSET_STATUS_READY) {
+			$dbEntry->syncFlavorParamsIds();
+			$dbEntry->save();
 		}
+	}
+
+	/**
+	 * @param $entryId
+	 * @param $dbEntry
+	 */
+	private function updateAssetFailedToConvert($entryId, $dbEntry): void
+	{
+		KalturaLog::err("Flavor asset not created for entry [" . $entryId . "]");
+
+		if ($dbEntry->getStatus() == entryStatus::NO_CONTENT) {
+			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
+			$dbEntry->save();
+		}
+	}
+
+	/**
+	 * @param $concatSyncKey
+	 * @param $dbAsset
+	 * @param $isNewAsset
+	 * @param $dbEntry
+	 * @throws PropelException
+	 */
+	private function updateAssetState($concatSyncKey, $dbAsset, $isNewAsset, $dbEntry): void
+	{
+		$newSyncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $concatSyncKey);
+
+		if ($isNewAsset)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
+
+		$this->updateMediaFlowOnAsset($dbAsset);
+
+		$this->syncFlavorParamToAsset($dbAsset, $dbEntry);
 	}
 
 
