@@ -300,7 +300,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 					, array($singleAttribute) , $priority);
 			if(!$batchJob)
 			{
-				throw new APIException(APIErrors::CANNOT_CONVERT_FLAVOR, $parentJob->getJobType(), $parentJob->getId());
+				throw new APIException(APIErrors::CANNOT_CREATE_CLIP_FLAVOR_JOB, $parentJob->getJobType(), $parentJob->getId());
 			}
 
 			$batchArray[] = $batchJob;
@@ -518,7 +518,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param $dbEntry
 	 * @throws PropelException
 	 */
-	private function updateAssetState($concatSyncKey, $dbAsset, $isNewAsset, $dbEntry): void
+	private function updateAssetState($concatSyncKey, $dbAsset, $isNewAsset, $dbEntry)
 	{
 		$newSyncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $concatSyncKey);
