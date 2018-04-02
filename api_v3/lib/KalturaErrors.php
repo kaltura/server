@@ -693,4 +693,12 @@ class KalturaErrors extends APIErrors
 	 * OTP error
 	 */
 	const INVALID_OTP = 'INVALID_OTP;;OTP provided failed to validate';
+
+
+	/*
+	 * clip concat Error
+	 */
+
+	const CANNOT_CREATE_CLIP_FLAVOR_JOB = "CANNOT_CREATE_CLIP_FLAVOR_JOB;;cannot create clip, flavor convert batch job returned as null";
 }
+

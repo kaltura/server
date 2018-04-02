@@ -442,5 +442,4 @@ class APIErrors
 
 	const FILE_CREATION_FAILED = "FILE_CREATION_FAILED;MESSAGE;Failed to create file on specified location with message: \"@MESSAGE@\"";
 
-	const CANNOT_CREATE_CLIP_FLAVOR_JOB = "CANNOT CREATE CLIP, FLAVOR CONVERT BATCH JOB RETURNED AS NULL ";
 }
