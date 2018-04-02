@@ -515,7 +515,7 @@
 					/*
 					 * Timing repositioning should be split into two steps 
 					 * - input step to 'start-5 sec'
-					 * - output step to 1sec forward
+					 * - output step to 5 sec forward
 					 * This is required to overcome some sources that does not reposition correctly. Better solution would be to reposition to the nearest KF, 
 					 * but this will require long source query.
 					 */
