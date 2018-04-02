@@ -87,7 +87,7 @@ class KAsyncConcat extends KJobHandlerWorker
 			$srcFiles[] = $srcFile->value;
 		}
 		
-		$result = $this->concatFiles($ffmpegBin, $ffprobeBin, $srcFiles, $localTempFilePath, $data->offset, $data->duration);
+		$result = $this->concatFiles($ffmpegBin, $ffprobeBin, $srcFiles, $localTempFilePath, $data->offset, $data->duration,$data->shouldSort);
 		if(! $result)
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, null, "Failed to concat files", KalturaBatchJobStatus::FAILED);
 
@@ -128,18 +128,19 @@ class KAsyncConcat extends KJobHandlerWorker
 		$data->destFilePath = $sharedTempFilePath;
 		return $this->closeJob($job, null, null, 'Succesfully moved file', KalturaBatchJobStatus::FINISHED, $data);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param unknown_type $ffmpegBin
 	 * @param unknown_type $ffprobeBin
 	 * @param array $filesArr
 	 * @param unknown_type $outFilename
 	 * @param unknown_type $clipStart
 	 * @param unknown_type $clipDuration
+	 * @param bool $shouldSort
 	 * @return boolean
 	 */
-	protected static function concatFiles($ffmpegBin, $ffprobeBin, array $filesArr, $outFilename, $clipStart = null, $clipDuration = null)
+	protected static function concatFiles($ffmpegBin, $ffprobeBin, array $filesArr, $outFilename, $clipStart = null, $clipDuration = null, $shouldSort = true)
 	{
 		$fixLargeDeltaFlag = null;
 		$chunkBr = null;
@@ -153,8 +154,10 @@ class KAsyncConcat extends KJobHandlerWorker
 			$clipStr = "-ss $clipStart";
 		if(isset($clipDuration))
 			$clipStr.= " -t $clipDuration";
-	
-		sort($filesArr);
+		if ($shouldSort)
+		{
+			sort($filesArr);
+		}
 		$filesArrCnt = count($filesArr);
 		$i=0;
 		$mi = null;

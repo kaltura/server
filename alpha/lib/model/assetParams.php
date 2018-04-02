@@ -64,6 +64,7 @@ class assetParams extends BaseassetParams implements IBaseObject
 	const TAG_AUDIO_ONLY = 'audio_only';
 	const TAG_ALT_AUDIO = 'alt_audio';
 	const TAG_OPTIONAL_FLAVOR = 'optional_flavor';
+	const TAG_TEMP_CLIP = 'temp_clip';
 
 	public static $COLLECTION_TAGS = array(flavorParams::TAG_ISM); 
 	

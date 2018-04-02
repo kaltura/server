@@ -441,4 +441,6 @@ class APIErrors
 	const USER_EMAIL_NOT_FOUND = "USER_EMAIL_NOT_FOUND;USER_ID;Email address for user [@USER_ID@] was not found";
 
 	const FILE_CREATION_FAILED = "FILE_CREATION_FAILED;MESSAGE;Failed to create file on specified location with message: \"@MESSAGE@\"";
+
+	const CANNOT_CREATE_CLIP_FLAVOR_JOB = "CANNOT CREATE CLIP, FLAVOR CONVERT BATCH JOB RETURNED AS NULL ";
 }

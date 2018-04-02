@@ -1,5 +1,24 @@
 # Mercury 13.17.0 #
 
+## Add new batch job for Copy Cue Points ##
+ - Issue Type: Story
+ - Issue ID: PLAT-8651
+ 
+ ### Configuration ###
+
+	Requires adding a new worker to batch.ini:
+	- enabledWorkers.KAsyncCopyCuePoints = 1
+
+	- [KAsyncCopyCuePoints : JobHandlerWorker]
+      id                                                  = 700
+      friendlyName                                        = Copy Cue Point
+      type                                                = KAsyncCopyCuePoints
+      scriptPath                                          = ../plugins/cue_points/base/batch/copyCuePoints/KAsyncCopyCuePointsExe.php
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_03_28_cuePoint_update_cue_point_times.php
+	
 ## Remove use of partner 0 in sphinx queries ##
 - Issue Type: Task
 - Issue ID: PLAT-8311
