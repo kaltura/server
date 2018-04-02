@@ -300,7 +300,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 					, array($singleAttribute) , $priority);
 			if(!$batchJob)
 			{
-				throw new APIException(APIErrors::CANNOT_CREATE_CLIP_FLAVOR_JOB, $parentJob->getJobType(), $parentJob->getId());
+				throw new APIException(KalturaErrors::CANNOT_CREATE_CLIP_FLAVOR_JOB, $parentJob->getJobType(), $parentJob->getId());
 			}
 
 			$batchArray[] = $batchJob;
