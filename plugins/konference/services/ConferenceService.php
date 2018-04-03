@@ -134,7 +134,7 @@ class ConferenceService extends KalturaBaseService {
 	protected function canReach(ConferenceServerNode $serverNode)
 	{
 		//TODO: make sure that HTTP protocol is available for RTC servers.
-		$aliveUrl = "https://" . $serverNode->getHostName() . ":" . $serverNode->getExternalPort() . "/alive";
+		$aliveUrl = $serverNode->getServiceUrl() . "/alive";
 		$content = KCurlWrapper::getContent($aliveUrl);
 		if (strtolower($content) === self::CAN_REACH_EXPECTED_VALUE)
 			return true;
