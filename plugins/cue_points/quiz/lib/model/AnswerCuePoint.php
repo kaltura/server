@@ -98,6 +98,14 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 		return parent::preSave($con);
 	}
 
+	public function postUpdate(PropelPDO $con = null)
+	{
+		if ($this->isCustomDataModified(AnswerCuePoint::CUSTOM_DATA_ANSWER_KEY))
+			kQueryCache::invalidateQueryCache($this);
+
+		return parent::postUpdate($con); 
+	}
+
 	public function getMetadataObjectType()
 	{
 		return QuizPlugin::getCoreValue('MetadataObjectType', QuizCuePointMetadataObjectType::ANSWER_CUE_POINT);
