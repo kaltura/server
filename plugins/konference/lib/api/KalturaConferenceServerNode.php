@@ -6,13 +6,13 @@
 class KalturaConferenceServerNode extends KalturaServerNode
 {
 	/**
-	 * @var int
+	 * @var string
 	 */
-	public $externalPort;
+	public $serviceUrl;
 
 	private static $map_between_objects = array
 	(
-		"externalPort",
+		"serviceUrl",
 	);
 
 	/* (non-PHPdoc)

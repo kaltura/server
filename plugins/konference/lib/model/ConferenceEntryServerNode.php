@@ -40,11 +40,7 @@ class ConferenceEntryServerNode extends EntryServerNode
 		{
 			throw new kCoreException(KalturaKonferenceErrors::ROOM_NOT_READY, $this->getId());
 		}
-
-		$hostname = $conferenceServerNode->getHostName();
-		$manager = kBroadcastUrlManager::getInstance($partnerId);
-		$url = $manager->getRTCBroadcastingUrl('https', $hostname, $conferenceServerNode->getExternalPort());
-		return $url;
+		return $conferenceServerNode->getServiceUrl();
 	}
 
 	public function getRegistered()
