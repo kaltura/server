@@ -1,5 +1,13 @@
 # Mercury 13.17.0 #
 
+## Add base user permissions to fileAsset service ##
+ - Issue Type: Task
+ - Issue ID: PLAT-8708
+ 
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_04_03_update_file_asset_permission.php
+	
 ## Add new batch job for Copy Cue Points ##
  - Issue Type: Story
  - Issue ID: PLAT-8651
