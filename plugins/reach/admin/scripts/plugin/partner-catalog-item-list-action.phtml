@@ -36,8 +36,8 @@
 				<td><input type="checkbox" name="catalogItemsCheckBoxItems[]" id="$catalogItemsCheckBox-<?php echo $catalogItem->id; ?>" value="<?php echo $catalogItem->id; ?>" <?php echo in_array($catalogItem->id, $values) ? 'checked="checked"':''; ?>/></td>
 				<td><?php echo $catalogItem->id; ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemStatus', $catalogItem->status); ?></td>
-				<td><?php echo $catalogItem->name; ?></td>
 				<td><?php echo $catalogItem->systemName; ?></td>
+				<td><?php echo $this->partnerId != null ? $this->partnerId : ' '; ?></td>
 				<td><?php echo $catalogItem->vendorPartnerId; ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceFeature', $catalogItem->serviceFeature); ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceType', $catalogItem->serviceType); ?></td>

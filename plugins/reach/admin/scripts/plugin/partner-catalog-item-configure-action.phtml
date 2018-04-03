@@ -24,7 +24,6 @@
 				<th><?php echo $this->translate('ID'); ?></th>
 				<th><?php echo $this->translate('Status'); ?></th>
 				<th><?php echo $this->translate('System Name'); ?></th>
-				<th><?php echo $this->translate('Publisher ID'); ?></th>
 				<th><?php echo $this->translate('Vendor Partner ID'); ?></th>
 				<th><?php echo $this->translate('Feature'); ?></th>
 				<th><?php echo $this->translate('Type'); ?></th>
@@ -45,7 +44,6 @@
 				<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
 					<td><input type="checkbox" name="catalogItemsCheckBoxes[]" id="$catalogItemsCheckBoxes-<?php echo $catalogItem->id; ?>" value="<?php echo $catalogItem->id; ?>" <?php echo in_array($catalogItem->id, $values) ? 'checked="checked"':''; ?>/></td>
 					<td><?php echo $catalogItem->id; ?></td>
-					<td><?php echo $catalogItem->name; ?></td>
 					<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemStatus', $catalogItem->status); ?></td>
 					<td><?php echo $catalogItem->systemName; ?></td>
 					<td><?php echo $catalogItem->vendorPartnerId; ?></td>

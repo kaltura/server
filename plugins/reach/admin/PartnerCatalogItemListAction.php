@@ -76,6 +76,7 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin implements I
 		$createProfileForm->setAction($actionUrl);
 
 		$action->view->newPartnerCatalogItemFolderForm = $createProfileForm;
+		$action->view->partnerId = $partnerId;
 	}
 
 	protected function getCatalogItemFilter($serviceFeature)
