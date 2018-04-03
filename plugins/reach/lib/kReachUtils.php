@@ -72,6 +72,18 @@ class kReachUtils
 		
 		return $remainingCredit >= 0 ? true : false;
 	}
+
+	/**
+	 * @param $entry
+	 * @param $catalogItem
+	 * @param $reachProfile
+	 * @return bool
+	 */
+	public static function hasCreditExpired(ReachProfile $reachProfile)
+	{
+		$credit = $reachProfile->getCredit();
+		return $credit->isActive();
+	}
 	
 	/**
 	 * @param EntryVendorTask $entryVendorTask

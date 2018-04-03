@@ -44,7 +44,9 @@ class KalturaReachErrors implements kReachErrors
 	const ENTRY_VENDOR_TASK_DUPLICATION = "ENTRY_VENDOR_TASK_DUPLICATION;ENTRY_ID,CATALOG_ITEM_ID,VERSION;entry vendor task already exists for entry [@ENTRY_ID@] and catalog item [@CATALOG_ITEM_ID@] and version [@VERSION@]";
 	
 	const EXCEEDED_MAX_CREDIT_ALLOWED = "EXCEEDED_MAX_CREDIT_ALLOWED;ENTRY_ID,CATALOG_ITEM_ID;Exceeded max credit allowed, Task could not be added for entry [@ENTRY_ID@] and catalog item [@CATALOG_ITEM_ID@]";
-	
+
+	const CREDIT_EXPIRED = "CREDIT_EXPIRED;ENTRY_ID,CATALOG_ITEM_ID;Credit cycle has expired, Task could not be added for entry [@ENTRY_ID@] and catalog item [@CATALOG_ITEM_ID@]";
+
 	const CANNOT_APPROVE_NOT_MODERATED_TASK = "CANNOT_APPROVE_NOT_MODERATED_TASK;;Cannot approve task which is not pending moderation";
 	
 	const CANNOT_REJECT_NOT_MODERATED_TASK = "CANNOT_REJECT_NOT_MODERATED_TASK;;Cannot reject task which is not pending moderation";
