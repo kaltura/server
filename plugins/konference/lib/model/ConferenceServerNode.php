@@ -26,7 +26,7 @@ class ConferenceServerNode extends ServerNode {
 		}
 	}
 
-	public function getServiceUrl()
+	public function getServiceBaseUrl()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_SERVICE_URL, null, '');
 	}

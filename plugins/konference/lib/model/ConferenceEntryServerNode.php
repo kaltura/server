@@ -40,7 +40,7 @@ class ConferenceEntryServerNode extends EntryServerNode
 		{
 			throw new kCoreException(KalturaKonferenceErrors::ROOM_NOT_READY, $this->getId());
 		}
-		return $conferenceServerNode->getServiceUrl();
+		return $conferenceServerNode->getServiceBaseUrl();
 	}
 
 	public function getRegistered()
