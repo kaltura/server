@@ -8,11 +8,11 @@ class KalturaConferenceServerNode extends KalturaServerNode
 	/**
 	 * @var string
 	 */
-	public $serviceUrl;
+	public $serviceBaseUrl;
 
 	private static $map_between_objects = array
 	(
-		"serviceUrl",
+		"serviceBaseUrl",
 	);
 
 	/* (non-PHPdoc)
