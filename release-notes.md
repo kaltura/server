@@ -35,7 +35,7 @@
 - Issue ID: WEBC-1075
 
 ### Configuration ###
-None. 
+add "Konference" to plugins.ini 
 
 ### Deployment scripts ###
       php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
