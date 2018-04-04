@@ -38,7 +38,10 @@ class KalturaReoccurringVendorCredit extends KalturaTimeRangeVendorCredit
 		
 		return parent::toObject($dbObject, $propsToSkip);
 	}
-	
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */	 
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyNotNull(array("reOccurrenceCount", "frequency"));

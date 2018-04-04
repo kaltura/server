@@ -198,6 +198,8 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 			$this->validatePropertyNotNull("credit");
 		}
 
+		$this->credit->validateForInsert();
+
 		//validating dictionary duplications
 		$languages = array();
 		foreach($this->dictionaries as $dictionary)
