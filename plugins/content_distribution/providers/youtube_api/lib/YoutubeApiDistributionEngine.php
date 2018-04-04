@@ -473,18 +473,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 
 		$media = new Google_Http_MediaFileUpload($youtube->getClient(), $captionUpdateRequest, '*/*', null, true, self::DEFAULT_CHUNK_SIZE_BYTE);
 		$tempPath = $this->getAssetFile($captionInfo->assetId, $this->tempDirectory);
-		try
-		{
-			$media->setFileSize(filesize($tempPath));
-			self::uploadInChunks($media, $tempPath, self::DEFAULT_CHUNK_SIZE_BYTE);
-		}
-		catch (Exception $e)
-		{
-			unlink($tempPath);
-			throw $e;
-		}
-
-		unlink($tempPath);
+		$this->uploadAndCleanCaption($media, $tempPath);
 		$youtube->getClient()->setDefer(false);
 		
 		foreach ($mediaFiles as $remoteMediaFile)
@@ -515,18 +504,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$insertRequest = $youtube->captions->insert('snippet', $caption);
 	
 		$media = new Google_Http_MediaFileUpload($youtube->getClient(), $insertRequest, '*/*', null, true, self::DEFAULT_CHUNK_SIZE_BYTE);
-		try
-		{
-			$media->setFileSize(filesize($tempPath));
-			$ingestedCaption = self::uploadInChunks($media, $tempPath, self::DEFAULT_CHUNK_SIZE_BYTE);
-		}
-		catch (Exception $e)
-		{
-			unlink($tempPath);
-			throw $e;
-		}
-
-		unlink($tempPath);
+		$ingestedCaption = $this->uploadAndCleanCaption($media, $tempPath);
 		$youtube->getClient()->setDefer(false);
 		$remoteMediaFile = new KalturaDistributionRemoteMediaFile ();
 		$remoteMediaFile->remoteId = $ingestedCaption['id'];
@@ -534,7 +512,25 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$remoteMediaFile->assetId = $captionInfo->assetId;
 		return $remoteMediaFile;
 	}
-	
+
+	private function uploadAndCleanCaption($media, $tempPath)
+	{
+		try
+		{
+			$media->setFileSize(filesize($tempPath));
+			$ingestedCaption = self::uploadInChunks($media, $tempPath, self::DEFAULT_CHUNK_SIZE_BYTE);
+			unlink($tempPath);
+		}
+		catch (Exception $e)
+		{
+			if($tempPath)
+				unlink($tempPath);
+
+			throw $e;
+		}
+
+		return $ingestedCaption;
+	}
 	protected function syncPlaylistIds(Google_Service_YouTube $youtube, $remoteId, array $playlistIds)
 	{
 		$playlistsResponseList = $youtube->playlists->listPlaylists('id,snippet', array('mine' => true));
