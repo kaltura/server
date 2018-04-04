@@ -5,47 +5,24 @@
  */
 class kCopyCaptionsJobData extends kJobData
 {
-	/** source entry Id
-	* @var string
-	*/
-	private $sourceEntryId;
 
 	/** entry Id
 	* @var string
 	*/
 	private $entryId;
 
-	/** clip offset
-	* @var int
-	*/
-	private $offset;
+	/**
+	 * the sources start time and duration
+	 * @var array
+	 */
+	private $clipsDescriptionArray;
 
-	/** clip duration
-	* @var int
-	*/
-	private $duration;
 
 	/**
 	 * @var bool
 	 */
 	private $fullCopy;
 
-
-	/**
-	* @return string
-	*/
-	public function getSourceEntryId()
-	{
-		return $this->sourceEntryId;
-	}
-
-	/**
-	* @param string $sourceEntryId
-	*/
-	public function setSourceEntryId($sourceEntryId)
-	{
-		$this->sourceEntryId = $sourceEntryId;
-	}
 
 	/**
 	* @return string
@@ -64,35 +41,19 @@ class kCopyCaptionsJobData extends kJobData
 	}
 
 	/**
-	* @return int
-	*/
-	public function getOffset()
+	 * @return array
+	 */
+	public function getClipsDescriptionArray()
 	{
-		return $this->offset;
+		return $this->clipsDescriptionArray;
 	}
 
 	/**
-	* @param int $offset
-	*/
-	public function setOffset($offset)
+	 * @param array $clipsDescriptionArray
+	 */
+	public function setClipsDescriptionArray($clipsDescriptionArray)
 	{
-		$this->offset = $offset;
-	}
-
-	/**
-	* @return int
-	*/
-	public function getDuration()
-	{
-		return $this->duration;
-	}
-
-	/**
-	* @param int $duration
-	*/
-	public function setDuration($duration)
-	{
-		$this->duration = $duration;
+		$this->clipsDescriptionArray = $clipsDescriptionArray;
 	}
 
     /**

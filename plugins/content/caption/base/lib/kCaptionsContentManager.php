@@ -73,17 +73,19 @@ abstract class kCaptionsContentManager
 	 * @param string $content
 	 * @param int $clipStartTime
 	 * @param int $clipEndTime
+	 * @param int $globalOffset
 	 * @return array
 	 */
-	public abstract function buildFile($content, $clipStartTime, $clipEndTime);
+	public abstract function buildFile($content, $clipStartTime, $clipEndTime, $globalOffset = 0);
 
 	/**
 	 * @param array $matches
 	 * @param int $clipStartTime
 	 * @param int $clipEndTime
+	 * @param int $globalOffset
 	 * @return string
 	 */
-	protected abstract function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime);
+	protected abstract function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime, $globalOffset);
 
 
 
@@ -171,20 +173,20 @@ abstract class kCaptionsContentManager
 	}
 
 
-	public static function getAdjustedStartTime($captionStartTime, $clipStartTime)
+	public static function getAdjustedStartTime($captionStartTime, $clipStartTime, $globalOffSet)
 	{
-		$adjustedStartTime = $captionStartTime - $clipStartTime;
-		if ($adjustedStartTime < 0)
-			$adjustedStartTime = 0;
+		$adjustedStartTime = $captionStartTime - $clipStartTime + $globalOffSet;
+		if ($adjustedStartTime < $globalOffSet)
+			$adjustedStartTime = $globalOffSet;
 		return $adjustedStartTime;
 	}
 
 
-	public static function getAdjustedEndTime($clipStartTime, $clipEndTime, $captionEndTime)
+	public static function getAdjustedEndTime($clipStartTime, $clipEndTime, $captionEndTime, $globalOffSet)
 	{
-		$adjustedEndTime = $captionEndTime - $clipStartTime;
-		if ($adjustedEndTime > $clipEndTime)
-			$adjustedEndTime = $clipEndTime;
+		$adjustedEndTime = $captionEndTime - $clipStartTime + $globalOffSet;
+		if ($adjustedEndTime > $clipEndTime - $clipStartTime + $globalOffSet)
+			$adjustedEndTime = $clipEndTime - $clipStartTime + $globalOffSet;
 		return $adjustedEndTime;
 	}
 
@@ -241,7 +243,7 @@ abstract class kCaptionsContentManager
 	}
 
 
-	public function createCaptionsFile($content, $clipStartTime, $clipEndTime, $timeCode)
+	public function createCaptionsFile($content, $clipStartTime, $clipEndTime, $timeCode, $globalOffset)
 	{
 		$newFileContent = '';
 		$originalFileContentArray = kCaptionsContentManager::getFileContentAsArray($content);
@@ -255,7 +257,7 @@ abstract class kCaptionsContentManager
 				$timecode_match = preg_match($timeCode, $line, $matches);
 				if ($timecode_match)
 				{
-					$adjustedTimeLine = $this->createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime);
+					$adjustedTimeLine = $this->createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime, $globalOffset);
 					if($adjustedTimeLine)
 						$currentBlock .=$adjustedTimeLine;
 					else
