@@ -183,4 +183,19 @@ class kVendorCredit
 		
 		return $credit;
 	}
+
+	/***
+	 * @param $time
+	 * @return bool
+	 */
+	public function isActive($time = null)
+	{
+		$now = $time != null ? $time : time();
+		if ( $now < $this->fromDate)
+		{
+			KalturaLog::debug("Current date [$now] is not in credit time Range [ from - $this->fromDate ] ");
+			return false;
+		}
+		return true;
+	}
 }

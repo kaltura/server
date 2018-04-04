@@ -59,7 +59,11 @@ class EntryVendorTaskService extends KalturaBaseService
 		
 		if(kReachUtils::isDuplicateTask($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), $sourceFlavorVersion))
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, $sourceFlavorVersion);
-		
+
+		//check if credit has expired
+		if(!kReachUtils::hasCreditExpired($dbReachProfile))
+			throw new KalturaAPIException(KalturaReachErrors::CREDIT_EXPIRED, $entryVendorTask->entryId, $entryVendorTask->catalogItemId);
+
 		if(!kReachUtils::isEnoughCreditLeft($dbEntry, $dbVendorCatalogItem, $dbReachProfile))
 			throw new KalturaAPIException(KalturaReachErrors::EXCEEDED_MAX_CREDIT_ALLOWED,  $entryVendorTask->entryId, $entryVendorTask->catalogItemId);
 		
@@ -275,7 +279,7 @@ class EntryVendorTaskService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbEntryVendorTask->getEntryId());
 		
 		/* @var EntryVendorTask $dbEntryVendorTask*/
-		if($dbEntryVendorTask->getStatus() !== EntryVendorTaskStatus::PENDING_MODERATION)
+		if($dbEntryVendorTask->getStatus() != EntryVendorTaskStatus::PENDING_MODERATION)
 			throw new KalturaAPIException(KalturaReachErrors::CANNOT_ABORT_NOT_MODERATED_TASK, $id);
 		
 		if (!kCurrentContext::$is_admin_session && kCurrentContext::$ks_uid != $dbEntryVendorTask->getUserId() )

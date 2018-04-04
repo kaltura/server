@@ -56,4 +56,21 @@ class kTimeRangeVendorCredit extends kVendorCredit
 		return $credit;
 	}
 
+	/***
+	 * @return bool
+	 */
+	public function isActive()
+	{
+		$now = time();
+		if (!parent::isActive($now))
+			return false;
+
+		if ( $now > $this->toDate)
+		{
+			KalturaLog::debug("Current date [$now] is not in credit time Range [ from - $this->fromDate ] ");
+			return false;
+		}
+		return true;
+	}
+
 }
