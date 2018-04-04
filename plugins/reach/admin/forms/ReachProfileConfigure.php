@@ -242,6 +242,7 @@ class Form_ReachProfileConfigure extends ConfigureForm
 		$object = parent::getObject($objectType, $properties, $add_underscore,$include_empty_fields);
 
 		$rules = $properties['ReachProfileRules'];
+		$rulesArray = array();
 		foreach (json_decode($rules) as $rule)
 		{
 			switch(array_search($rule->ruleType, self::$rulesMap))
@@ -259,7 +260,7 @@ class Form_ReachProfileConfigure extends ConfigureForm
 		$object->rules = $rulesArray;
 		$dictionaries = $properties['ReachProfileDictionaries'];
 		$dictionariesArray = array();
-		foreach (json_decode($dictionaries) as $dictionary)
+		foreach ((array)json_decode($dictionaries) as $dictionary)
 		{
 			$dictionaryItem = new Kaltura_Client_Reach_Type_Dictionary();
 			$dictionaryItem->language = $dictionary->language;

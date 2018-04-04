@@ -33,6 +33,8 @@ class KalturaReachErrors implements kReachErrors
 
 	const MAX_DICTIONARY_LENGTH_EXCEEDED = "MAX_DICTIONARY_LENGTH_EXCEEDED;LANGUAGE,LENGTH; Vendor profile configuration error - Dictionary for language [@LANGUAGE@] exceeded maximum length of  [@LENGTH@] characters";
 
+	const INVALID_CREDIT_DATES = "INVALID_CREDIT_DATES;FROM,TO; Vendor profile configuration error - Invalid credit Dates - from:[@FROM@] to:[@TO@]";
+
 	/* Entry Vendor Task */
 
 	const ENTRY_VENDOR_TASK_SERVICE_GET_JOB_NOT_ALLOWED = "VENDOR_TASK_SERVICE__GET_JOB_NOT_ALLOWED;ID;Vendor Task Service 'Get Job' action Not allowed. Vendor partner Type is not enabled on partner [@ID@]";

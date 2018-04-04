@@ -39,4 +39,12 @@ abstract class KalturaBaseVendorCredit extends KalturaObject implements IApiObje
 
 		return $credit;
 	}
+
+		/* (non-PHPdoc)
+		* @see KalturaObject::validateForInsert()
+		*/
+	  public function validateForInsert($propertiesToSkip = array())
+  	{
+			parent::validateForInsert($propertiesToSkip);
+		}
 }

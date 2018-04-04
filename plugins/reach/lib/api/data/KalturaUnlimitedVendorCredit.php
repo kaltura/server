@@ -26,6 +26,9 @@ class KalturaUnlimitedVendorCredit extends KalturaBaseVendorCredit
 		'fromDate','credit',
 	);
 
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	*/
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyNotNull(array("credit", "fromDate"));

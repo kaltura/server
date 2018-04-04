@@ -78,7 +78,11 @@ class ReachProfileConfigureAction extends KalturaApplicationPlugin
 	{
 		$request = $action->getRequest();
 		$formData = $request->getPost();
-		$creditHandlerClass = $this->_getParam('creditHandlerClass') != 'Null' ? $this->_getParam('creditHandlerClass') : $formData['reachProfileCredit']['objectType'];
+		$defaultCreditObj = null;
+		if (isset($formData['reachProfileCredit']))
+			$defaultCreditObj = $formData['reachProfileCredit']['objectType'];
+			
+		$creditHandlerClass = $this->_getParam('creditHandlerClass') != 'Null' ? $this->_getParam('creditHandlerClass') : $defaultCreditObj;
 		$form = $this->initForm($action, $partnerId, null, $creditHandlerClass);
 		$form->populate($formData);
 		if ($request->isPost() && $form->isValid($formData))
@@ -192,6 +196,7 @@ class ReachProfileConfigureAction extends KalturaApplicationPlugin
 			'action' => 'ReachProfileConfigureAction',
 		);
 
+		$blockFields = null;
 		if ($reachProfileId)
 		{
 			$blockFields = true;

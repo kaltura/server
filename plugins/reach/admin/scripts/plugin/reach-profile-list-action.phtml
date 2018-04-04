@@ -33,7 +33,7 @@
 				<td><?php echo $reachProfile->partnerId; ?></td>
 				<td><?php echo (is_null($reachProfile->credit) ? "-" : $this->translate(get_class($reachProfile->credit))); ?></td>
 				<td><?php echo date($this->translate('time format'), $reachProfile->createdAt); ?></td>
-				<td><?php echo date($this->translate('time format'), $catalogItem->updatedAt); ?></td>
+				<td><?php echo date($this->translate('time format'), $reachProfile->updatedAt); ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $reachProfile->id;?>, <?php echo $reachProfile->partnerId; ?>, <?php if(is_null($reachProfile->credit)) echo "'Null'"; else echo "'" . get_class($reachProfile->credit) . "'"; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
