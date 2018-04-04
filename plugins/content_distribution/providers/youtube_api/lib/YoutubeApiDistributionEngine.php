@@ -272,19 +272,10 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 				unlink($videoPath);
 			}
 		}
-		
+
+		$this->waitForVideoBeReady($youtube, $data->remoteId);
 		if (!empty($data->providerData->captionsInfo))
 		{
-			$startCheckingReadyTime = time();
-			while (!$this->isVideoReady($youtube, $data->remoteId))
-			{
-				sleep(self::TIME_TO_WAIT_FOR_YOUTUBE_TRANSCODING);
-				if ( (time() - $startCheckingReadyTime) > $this->processedTimeout )
-				{
-					throw new kTemporaryException("Video transcoding on youtube has timed out");
-				}
-			}
-			
 			foreach ($data->providerData->captionsInfo as $captionInfo)
 			{
 				/* @var $captionInfo KalturaYouTubeApiCaptionDistributionInfo */
@@ -294,6 +285,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 				}
 			}
 		}
+
 		$playlistIds = explode(',', $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_PLAYLIST_IDS));
 		$this->syncPlaylistIds($youtube, $data->remoteId, $playlistIds); 
 		
@@ -463,6 +455,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	
 	protected function deleteCaption(Google_Service_YouTube $youtube, KalturaYouTubeApiCaptionDistributionInfo $captionInfo)
 	{
+		KalturaLog::info("Deleting caption with remote id: {$captionInfo->remoteId} and language {$captionInfo->language}");
 		$youtube->captions->delete($captionInfo->remoteId);
 	}
 	
@@ -479,16 +472,26 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$captionUpdateRequest = $youtube->captions->update('snippet', $caption);
 
 		$media = new Google_Http_MediaFileUpload($youtube->getClient(), $captionUpdateRequest, '*/*', null, true, self::DEFAULT_CHUNK_SIZE_BYTE);
-		$media->setFileSize(filesize($captionInfo->filePath));
-		self::uploadInChunks($media, $captionInfo->filePath, self::DEFAULT_CHUNK_SIZE_BYTE);
+		$tempPath = $this->getAssetFile($captionInfo->assetId, $this->tempDirectory);
+		try
+		{
+			$media->setFileSize(filesize($tempPath));
+			self::uploadInChunks($media, $tempPath, self::DEFAULT_CHUNK_SIZE_BYTE);
+		}
+		catch (Exception $e)
+		{
+			unlink($tempPath);
+			throw $e;
+		}
 
+		unlink($tempPath);
 		$youtube->getClient()->setDefer(false);
 		
 		foreach ($mediaFiles as $remoteMediaFile)
 		{
-			if ($mediaFiles->assetId == $captionInfo->assetId)
+			if ($remoteMediaFile->assetId == $captionInfo->assetId)
 			{
-				$mediaFiles->version = $captionInfo->version;
+				$remoteMediaFile->version = $captionInfo->version;
 				break;
 			}			
 		}
@@ -496,14 +499,15 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	
 	protected function submitCaption(Google_Service_YouTube $youtube, KalturaYouTubeApiCaptionDistributionInfo $captionInfo, $remoteId)
 	{
-		if (!file_exists($captionInfo->filePath ))
-			throw new KalturaDistributionException("The caption file [$captionInfo->filePath] was not found (probably not synced yet), the job will retry");
+		$tempPath = $this->getAssetFile($captionInfo->assetId, $this->tempDirectory);
+		if (!file_exists($tempPath))
+			throw new KalturaDistributionException("The caption file [$tempPath] was not found (probably not synced yet), the job will retry");
 			
 		$captionSnippet = new Google_Service_YouTube_CaptionSnippet();
 		$captionSnippet->setVideoId($remoteId);
 		$captionSnippet->setLanguage($captionInfo->language);
 		$captionSnippet->setName($captionInfo->label);
-	
+
 		$caption = new Google_Service_YouTube_Caption();
 		$caption->setSnippet($captionSnippet);
 
@@ -511,23 +515,19 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$insertRequest = $youtube->captions->insert('snippet', $caption);
 	
 		$media = new Google_Http_MediaFileUpload($youtube->getClient(), $insertRequest, '*/*', null, true, self::DEFAULT_CHUNK_SIZE_BYTE);
-
-		if ($captionInfo->encryptionKey)
+		try
 		{
-			$tempPath = KBatchBase::createTempClearFile($captionInfo->filePath, $captionInfo->encryptionKey);
 			$media->setFileSize(filesize($tempPath));
 			$ingestedCaption = self::uploadInChunks($media, $tempPath, self::DEFAULT_CHUNK_SIZE_BYTE);
-			unlink($tempPath);
 		}
-			else
+		catch (Exception $e)
 		{
-			$media->setFileSize(filesize($captionInfo->filePath));
-			$ingestedCaption = self::uploadInChunks($media, $captionInfo->filePath, self::DEFAULT_CHUNK_SIZE_BYTE);
+			unlink($tempPath);
+			throw $e;
 		}
 
-
+		unlink($tempPath);
 		$youtube->getClient()->setDefer(false);
-		
 		$remoteMediaFile = new KalturaDistributionRemoteMediaFile ();
 		$remoteMediaFile->remoteId = $ingestedCaption['id'];
 		$remoteMediaFile->version = $captionInfo->version;
@@ -581,33 +581,64 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		}
 	}
 
-	protected function isVideoReady($youtube, $remoteId)
+	private function isVideoReady($videoStatus)
 	{
-		$listResponse = $youtube->videos->listVideos("status",	array('id' => $remoteId));
-		if (empty($listResponse)) 
-			throw new Exception("Video with remotedId ".$remoteId." not found at google");
-		else 
+		KalturaLog::debug("video upload status is {$videoStatus['uploadStatus']}");
+		switch($videoStatus['uploadStatus'])
 		{
-			// Since the request specified a video ID, the response only contains one video resource.
-			$video = $listResponse[0];
-			$videoStatus = $video['status'];
-			switch($videoStatus['uploadStatus'])
-			{
-				case "processed":
+			case "processed":
+				return true;
+			case "rejected":
+				if ($videoStatus['rejectionReason'] == 'duplicate')
 					return true;
 
-				case "rejected":
-					if ($videoStatus['rejectionReason'] == 'duplicate')
-						return true;
-					else
-						throw new Exception("Video was rejected by youtube, reason [" . $videoStatus['rejectionReason'] . "]");
+				throw new Exception("Video was rejected by youtube, reason [" . $videoStatus['rejectionReason'] . "]");
+			case "failed":
+				throw new Exception("Video has failed on youtube, reason [" . $videoStatus['failureReason'] . "]");
+			default:
+				return false;
+		}
+	}
 
-				case "failed":
-					throw new Exception("Video has failed on youtube, reason [".$videoStatus['failureReason']."]");
+	private function waitForVideoBeReady($youtube, $remoteId)
+	{
+		$previousPartsProcessed = -1;
+		$startCheckingReadyTime = time();
+		$shouldCheckForTimeout = false;
+		while($listResponse = $youtube->videos->listVideos("processingDetails, status", array('id' => $remoteId)))
+		{
+			if (empty($listResponse))
+				throw new Exception("Video with remote Id ".$remoteId." not found at google");
 
-				default: 
-					return false;
+			$video = $listResponse[0];
+			$videoStatus = $video["status"];
+			if ($this->isVideoReady($videoStatus))
+				break;
+
+			if($video["processingDetails"]["processingProgress"])
+			{
+				$partsProcessed = $video["processingDetails"]["processingProgress"]["partsProcessed"];
+				if (!$shouldCheckForTimeout && $previousPartsProcessed >= $partsProcessed)
+				{
+					$shouldCheckForTimeout = true;
+					$startCheckingReadyTime = time();
+				}
+				else if($shouldCheckForTimeout && (time() - $startCheckingReadyTime) > $this->processedTimeout )
+				{
+					throw new kTemporaryException("Video transcoding on youtube has been stuck on {$previousPartsProcessed} out of {$video["processingDetails"]["processingProgress"]["partsTotal"]}");
+				}
+
+				$previousPartsProcessed = $partsProcessed;
 			}
+			else
+			{
+				if ( (time() - $startCheckingReadyTime) > $this->processedTimeout )
+				{
+					throw new kTemporaryException("Video transcoding on youtube has timed out");
+				}
+			}
+
+			sleep(self::TIME_TO_WAIT_FOR_YOUTUBE_TRANSCODING);
 		}
 	}
 
