@@ -22,20 +22,6 @@ class BaseEntryService extends KalturaEntryService
     }
 
 	/* (non-PHPdoc)
-	 * @see KalturaBaseService::globalPartnerAllowed()
-	 */
-	protected function globalPartnerAllowed($actionName)
-	{
-		if($actionName == 'getContextData')
-			return true;
-
-		if($actionName == 'getPlaybackContext')
-			return true;
-
-		return parent::globalPartnerAllowed($actionName);
-	}
-
-	/* (non-PHPdoc)
 	 * @see KalturaBaseService::kalturaNetworkAllowed()
 	 */
 	protected function kalturaNetworkAllowed($actionName)
