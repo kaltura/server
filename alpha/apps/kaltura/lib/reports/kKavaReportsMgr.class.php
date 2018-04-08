@@ -569,21 +569,6 @@ class kKavaReportsMgr extends kKavaBase
 					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedEntriesGraphs',
 				),
 			),
-			self::REPORT_GRAPH_MAP => array(
-				'added_entries' => self::METRIC_ENTRIES_ADDED,
-				'deleted_entries' => self::METRIC_ENTRIES_DELETED,
-				'peak_entries' => self::METRIC_PEAK_ENTRIES,
-			),
-			self::REPORT_TOTAL_MAP => array(
-				'added_entries' => self::METRIC_ENTRIES_ADDED,
-				'deleted_entries' => self::METRIC_ENTRIES_DELETED,
-				'peak_entries' => self::METRIC_PEAK_ENTRIES,
-			),
-			self::REPORT_TABLE_MAP => array(
-				'added_entries' => self::METRIC_ENTRIES_ADDED,
-				'deleted_entries' => self::METRIC_ENTRIES_DELETED,
-				'peak_entries' => self::METRIC_PEAK_ENTRIES,
-			),
 			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData'
 		),
 
