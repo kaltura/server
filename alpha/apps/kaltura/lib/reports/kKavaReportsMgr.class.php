@@ -51,6 +51,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_BANDWIDTH_STORAGE_MB = 'combined_bandwidth_storage';
 	const METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB = 'aggregated_monthly_avg_storage';
 	const METRIC_BANDWIDTH_STORAGE_AGGR_MONTHLY_MB = 'combined_bandwidth_aggregated_storage';
+	const METRIC_PEAK_ENTRIES = 'peak_entries';
 	
 	/// report settings
 	// report settings - common
@@ -544,7 +545,49 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
 			self::REPORT_GRAPH_FINALIZE_FUNC => 'self::addCombinedUsageGraph',
 		),
-			
+
+		myReportsMgr::REPORT_TYPE_ENTRY_USAGE => array(
+			self::REPORT_JOIN_REPORTS => array(
+				// entries added / deleted
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_FILTER => array(
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED),
+				),
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_FILTER => array(
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_TOTAL),
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedEntriesGraphs',
+				),
+			),
+			self::REPORT_GRAPH_MAP => array(
+				'added_entries' => self::METRIC_ENTRIES_ADDED,
+				'deleted_entries' => self::METRIC_ENTRIES_DELETED,
+				'peak_entries' => self::METRIC_PEAK_ENTRIES,
+			),
+			self::REPORT_TOTAL_MAP => array(
+				'added_entries' => self::METRIC_ENTRIES_ADDED,
+				'deleted_entries' => self::METRIC_ENTRIES_DELETED,
+				'peak_entries' => self::METRIC_PEAK_ENTRIES,
+			),
+			self::REPORT_TABLE_MAP => array(
+				'added_entries' => self::METRIC_ENTRIES_ADDED,
+				'deleted_entries' => self::METRIC_ENTRIES_DELETED,
+				'peak_entries' => self::METRIC_PEAK_ENTRIES,
+			),
+			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData'
+		),
+
 		myReportsMgr::REPORT_TYPE_ADMIN_CONSOLE => array(
 			self::REPORT_SKIP_PARTNER_FILTER => true,
 			self::REPORT_DIMENSION => self::DIMENSION_PARTNER_ID,
@@ -2386,6 +2429,17 @@ class kKavaReportsMgr extends kKavaBase
 			$cur_storage -= $storage[self::METRIC_STORAGE_DELETED_MB][$date];
 		}
 	}
+
+	protected static function addAggregatedEntriesGraphs(&$entries, $base_count, $dates)
+	{
+		$cur_peak = $base_count;
+		foreach ($dates as $date)
+		{
+			$cur_peak += $entries[self::METRIC_ENTRIES_ADDED][$date];
+			$entries[self::METRIC_PEAK_ENTRIES][$date] = $cur_peak;
+			$cur_peak -= $entries[self::METRIC_ENTRIES_DELETED][$date];
+		}
+	}
 	
 	protected static function getAverageAggregatedMonthly($graph)
 	{
@@ -2421,7 +2475,8 @@ class kKavaReportsMgr extends kKavaBase
 				case self::METRIC_AVERAGE_STORAGE_MB:
 					$value = $values ? array_sum($values) / count($values) : 0;
 					break;
-		
+
+				case self::METRIC_PEAK_ENTRIES:
 				case self::METRIC_PEAK_STORAGE_MB:
 					$value = $values ? max($values) : 0;
 					break;
@@ -3511,7 +3566,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		
 		return array($headers, $data, $total_count);
-	}		
+	}
 
 	protected static function getTableImpl($partner_id, $report_type, $report_def, 
 		reportsInputFilter $input_filter,
