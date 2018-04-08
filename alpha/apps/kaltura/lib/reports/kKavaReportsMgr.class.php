@@ -548,7 +548,6 @@ class kKavaReportsMgr extends kKavaBase
 
 		myReportsMgr::REPORT_TYPE_ENTRY_USAGE => array(
 			self::REPORT_JOIN_REPORTS => array(
-				// entries added / deleted
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
 					self::REPORT_FILTER => array(
