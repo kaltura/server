@@ -63,6 +63,7 @@ class kApiCache extends kApiCacheBase
 	protected $_responseMetadata = null;
 	protected $_cacheId = null;							// the cache id ensures that the conditions are in sync with the response buffer
 	protected $_cacheModes = null;
+	protected $_monitorEvents = array();				// holds monitor events that happen before monitorApiStart is called
 	protected static $_cacheWarmupInitiated = false;
 	protected static $_cacheHeaderCount = 0;
 	
@@ -501,14 +502,34 @@ class kApiCache extends kApiCacheBase
 			if (!isset($dataSources[$configKey]['connection']['dsn']))
 				return false;
 			
+			$dsn = $dataSources[$configKey]['connection']['dsn'];
+
+			$connStart = microtime(true);
 			try
 			{
-				$pdo = new PDO(
-					$dataSources[$configKey]['connection']['dsn'], null, null, array(PDO::ATTR_TIMEOUT => 1));
+				$pdo = new PDO($dsn, null, null, array(PDO::ATTR_TIMEOUT => 1));
 			}
 			catch(PDOException $e)
 			{
 				return false;
+			}
+			$connTook = microtime(true) - $connStart;
+
+			$this->_monitorEvents[] = array(array('KalturaMonitorClient', 'monitorConnTook'), array($dsn, $connTook));
+
+			// get the host name from the dsn
+			list($mysql, $connection) = explode(':', $dsn);
+			$arguments = explode(';', $connection);
+
+			$hostName = null;
+			foreach($arguments as $argument)
+			{
+				list($argumentName, $argumentValue) = explode('=', $argument);
+				if(strtolower($argumentName) == 'host')
+				{
+					$hostName = $argumentValue;
+					break;
+				}
 			}
 		
 			foreach ($queries as $query)
@@ -519,12 +540,16 @@ class kApiCache extends kApiCacheBase
 				$comment .= "[{$this->_cacheKey}]";
 				$sql = str_replace(self::KALTURA_COMMENT_MARKER, $comment, $sql);
 				
+				$sqlStart = microtime(true);
 				$stmt = $pdo->query($sql);
 				if(!$stmt)
 				{
 					return false;
 				}
-		
+				$sqlTook = microtime(true) - $sqlStart;
+
+				$this->_monitorEvents[] = array(array('KalturaMonitorClient', 'monitorDatabaseAccess'), array($sql, $sqlTook, $hostName));
+
 				if ($query['fetchStyle'] == PDO::FETCH_COLUMN)
 					$result = $stmt->fetchAll($query['fetchStyle'], $query['columnIndex']);
 				else
@@ -745,6 +770,18 @@ class kApiCache extends kApiCacheBase
 				$action = $this->_params['service'] . '.' . $this->_params['action'];
 		
 			KalturaMonitorClient::monitorApiStart($result !== false, $action, $this->_partnerId, $this->getCurrentSessionType(), $this->clientTag, $isInMultiRequest);
+
+			foreach ($this->_monitorEvents as $event)
+			{
+				list($func, $params) = $event;
+
+				call_user_func_array($func, $params);
+			}
+
+			if ($result !== false)
+			{
+				KalturaMonitorClient::flushPacket();
+			}
 		}
 		
 		return $result;

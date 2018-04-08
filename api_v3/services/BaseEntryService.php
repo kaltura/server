@@ -20,7 +20,21 @@ class BaseEntryService extends KalturaEntryService
             throw new KalturaAPIException(KalturaErrors::ACTION_FORBIDDEN, "anonymousRank");
         }
     }
-    
+
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::globalPartnerAllowed()
+	 */
+	protected function globalPartnerAllowed($actionName)
+	{
+		if($actionName == 'getContextData')
+			return true;
+
+		if($actionName == 'getPlaybackContext')
+			return true;
+
+		return parent::globalPartnerAllowed($actionName);
+	}
+
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::kalturaNetworkAllowed()
 	 */

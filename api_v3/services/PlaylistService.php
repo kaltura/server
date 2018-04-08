@@ -26,7 +26,13 @@ class PlaylistService extends KalturaEntryService
 		}
 		return parent::kalturaNetworkAllowed($actionName);
 	}
-	
+
+	protected function globalPartnerAllowed($actionName)
+	{
+		if ($this->actionName == 'execute')
+			return true;
+	}
+
 	protected function partnerRequired($actionName)
 	{
 		if ($actionName === 'executeFromContent') {
@@ -291,10 +297,7 @@ class PlaylistService extends KalturaEntryService
 	{
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
-		if (in_array($id, kConf::get('partner_0_static_playlists', 'local', array())))
-			$playlist = entryPeer::retrieveByPKNoFilter($id);
-		else
-			$playlist = entryPeer::retrieveByPK($id);
+		$playlist = entryPeer::retrieveByPK($id);
 
 		if (!$playlist)
 			throw new KalturaAPIException ( APIErrors::INVALID_ENTRY_ID , "Playlist" , $id  );

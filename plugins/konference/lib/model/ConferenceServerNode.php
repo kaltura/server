@@ -1,7 +1,7 @@
 <?php
 
 class ConferenceServerNode extends ServerNode {
-	const CUSTOM_DATA_EXTERNAL_PORT = 'external_port';
+	const CUSTOM_DATA_SERVICE_URL = 'service_url';
 
 	/**
 	 * Applies default values to this object.
@@ -26,14 +26,14 @@ class ConferenceServerNode extends ServerNode {
 		}
 	}
 
-	public function getExternalPort()
+	public function getServiceBaseUrl()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_EXTERNAL_PORT, null, 443);
+		return $this->getFromCustomData(self::CUSTOM_DATA_SERVICE_URL, null, '');
 	}
 
-	public function setExternalPort($v)
+	public function setServiceBaseUrl($v)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_EXTERNAL_PORT, $v);
+		$this->putInCustomData(self::CUSTOM_DATA_SERVICE_URL, $v);
 	}
 
 	public function removeAttachedEntryServerNodes()
