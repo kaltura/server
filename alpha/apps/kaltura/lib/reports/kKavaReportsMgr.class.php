@@ -80,10 +80,6 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_TABLE_MAP = 'report_table_map';
 	const REPORT_TABLE_FINALIZE_FUNC = 'report_table_finalize_func';
 	
-	const REPORT_LEGACY = 'report_legacy';
-	const REPORT_LEGACY_MAPPING = 'legacy_mapping';
-	const REPORT_LEGACY_JOIN_FIELD = 'join_field';
-	
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
 	const REPORT_GRAPH_TYPE = 'report_graph_type';
@@ -300,12 +296,83 @@ class kKavaReportsMgr extends kKavaBase
 		),
 
 		myReportsMgr::REPORT_TYPE_VPAAS_USAGE => array(
-			self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_MONTH,
-			self::REPORT_DIMENSION => self::DIMENSION_PARTNER_ID,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
-			self::REPORT_LEGACY => array(
-				self::REPORT_LEGACY_MAPPING => array('total_plays' => 'count_plays'),
-				self::REPORT_LEGACY_JOIN_FIELD => 'month_id'),
+			self::REPORT_JOIN_REPORTS => array(
+				// bandwidth
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
+				),
+
+				// transcoding
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_TRANSCODING_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
+				),
+
+				// storage
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
+				),
+
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+				),
+
+				// media entries
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_FILTER => array(
+						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
+						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_FLASH)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED),
+				),
+
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_FILTER => array(
+						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
+						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_FLASH)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_TOTAL),
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedEntriesGraphs',
+					),
+
+				// plays
+				array(
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY),
+				),
+					
+				// TODO: add total users
+			),
+			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+			self::REPORT_TABLE_MAP => array(
+				'total_plays' => 'count_plays',
+				'bandwidth_consumption' => self::METRIC_BANDWIDTH_SIZE_MB,
+				'average_storage' => self::METRIC_AVERAGE_STORAGE_MB,
+				'transcoding_consumption' => self::METRIC_TRANSCODING_SIZE_MB,
+				'total_media_entries' => self::METRIC_PEAK_ENTRIES,
+			),
 		),
 
 		myReportsMgr::REPORT_TYPE_TOP_CONTRIBUTORS => array(
@@ -3021,8 +3088,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $total_count;
 	}
 
-	// TODO: remove the report_type param once legacy reports are removed
-	protected static function getSimpleTableImpl($partner_id, $report_type, $report_def, 
+	protected static function getSimpleTableImpl($partner_id, $report_def, 
 		reportsInputFilter $input_filter,
 		$page_size, $page_index, $order_by, $object_ids = null, $flags = 0)
 	{
@@ -3034,23 +3100,6 @@ class kKavaReportsMgr extends kKavaBase
 		$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, $object_ids);
 		$dimension = self::getDimension($report_def, $object_ids);
 		$metrics = self::getMetrics($report_def);
-
-		if (array_key_exists(self::REPORT_LEGACY, $report_def))
-		{
-			//get the report from the legacy dwh
-			list($headers, $data, $total_count) = myReportsMgr::getTable($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids, null);
-
-			switch ($report_type)
-			{
-				case myReportsMgr::REPORT_TYPE_VPAAS_USAGE:
-					if ($object_ids)
-						throw new Exception('objectIds filter is not supported for this report');
-
-					$data = self::getVpaasUsageReport($report_def, $data, $headers, $partner_id, $intervals, $metrics, $druid_filter, $input_filter->timeZoneOffset);
-					break;
-			}
-			return array($headers, $data, $total_count);
-		}
 
 		if (!$metrics)
 		{
@@ -3393,7 +3442,7 @@ class kKavaReportsMgr extends kKavaBase
 		return array($headers, $data, $total_count);
 	}
 
-	protected static function getJoinTableImpl($partner_id, $report_type, $report_def,
+	protected static function getJoinTableImpl($partner_id, $report_def,
 			reportsInputFilter $input_filter,
 			$page_size, $page_index, $order_by, $object_ids = null, $flags = 0)
 	{
@@ -3429,7 +3478,7 @@ class kKavaReportsMgr extends kKavaBase
 		$cur_report_def[self::REPORT_DIMENSION] = $report_def[self::REPORT_DIMENSION];
 		$cur_report_def[self::REPORT_DIMENSION_HEADERS] = array('dimension');
 		
-		$result = self::getTableImpl($partner_id, $report_type, $cur_report_def, $input_filter,
+		$result = self::getTableImpl($partner_id, $cur_report_def, $input_filter,
 			$page_size * $page_index, 1, $order_by, $object_ids, $flags);
 		
 		$headers = array_merge(
@@ -3465,7 +3514,7 @@ class kKavaReportsMgr extends kKavaBase
 			if (count($rows) < $page_size)
 			{				
 				// using a single topN - the metrics of this query are not used
-				$result = self::getTableImpl($partner_id, $report_type, $cur_report_def, $input_filter,
+				$result = self::getTableImpl($partner_id, $cur_report_def, $input_filter,
 					$page_size * $page_index, 1, $order_by, $object_ids, $flags | self::GET_TABLE_FLAG_IDS_ONLY);
 								
 				foreach ($result[1] as $row)
@@ -3519,7 +3568,7 @@ class kKavaReportsMgr extends kKavaBase
 				$cur_report_def[self::REPORT_FILTER_DIMENSION] = $report_def[self::REPORT_DIMENSION];;
 				$cur_report_def[self::REPORT_DIMENSION_HEADERS] = array('dimension');
 				
-				$result = self::getTableImpl($partner_id, $report_type, $cur_report_def, $input_filter,
+				$result = self::getTableImpl($partner_id, $cur_report_def, $input_filter,
 					count($ids_to_get), 1, null, implode(',', array_keys($ids_to_get)), $flags);
 				
 				foreach ($result[1] as $row)
@@ -3552,7 +3601,7 @@ class kKavaReportsMgr extends kKavaBase
 		return array($headers, $data, $total_count);
 	}
 
-	protected static function getTableImpl($partner_id, $report_type, $report_def, 
+	protected static function getTableImpl($partner_id, $report_def, 
 		reportsInputFilter $input_filter,
 		$page_size, $page_index, $order_by, $object_ids = null, $flags = 0)
 	{
@@ -3568,12 +3617,12 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		else if (isset($report_def[self::REPORT_JOIN_REPORTS]))
 		{
-			$result = self::getJoinTableImpl($partner_id, $report_type, $report_def, $input_filter, 
+			$result = self::getJoinTableImpl($partner_id, $report_def, $input_filter, 
 				$page_size, $page_index, $order_by, $object_ids, $flags);
 		}
 		else 
 		{
-			$result = self::getSimpleTableImpl($partner_id, $report_type, $report_def, $input_filter,
+			$result = self::getSimpleTableImpl($partner_id, $report_def, $input_filter,
 				$page_size, $page_index, $order_by, $object_ids, $flags);
 		}
 		
@@ -3668,7 +3717,7 @@ class kKavaReportsMgr extends kKavaBase
 		
 		$flags = $isCsv ? self::GET_TABLE_FLAG_IS_CSV : 0;
 		
-		$result = self::getTableImpl($partner_id, $report_type, $report_def, $input_filter,
+		$result = self::getTableImpl($partner_id, $report_def, $input_filter,
 			$page_size, $page_index, $order_by, $object_ids, $flags);
 	
 		// reorder
@@ -3810,7 +3859,7 @@ class kKavaReportsMgr extends kKavaBase
 		if (isset($report_def[self::REPORT_TOTAL_FROM_TABLE_FUNC]))
 		{
 			$input_filter->interval = self::INTERVAL_ALL;
-			$table = self::getTableImpl($partner_id, 0, $report_def, $input_filter, self::MAX_RESULT_SIZE, 1, null, $object_ids);
+			$table = self::getTableImpl($partner_id, $report_def, $input_filter, self::MAX_RESULT_SIZE, 1, null, $object_ids);
 			$result = call_user_func($report_def[self::REPORT_TOTAL_FROM_TABLE_FUNC], $table);
 		}
 		else if (!isset($report_def[self::REPORT_DIMENSION]) || isset($report_def[self::REPORT_JOIN_GRAPHS]))
@@ -3963,34 +4012,6 @@ class kKavaReportsMgr extends kKavaBase
 		return array($header, $data);
 	}
 
-	protected static function getVpaasUsageReport($report_def, $data, $headers, $partner_id, $intervals, $metrics, $druid_filter, $timezone_offset)
-	{
-		$granularity = $report_def[self::REPORT_GRANULARITY];
-		$granularity_def = self::getGranularityDef($granularity, $timezone_offset);
-		$query = self::getTimeSeriesReport(null, $partner_id, $intervals, $granularity_def, $metrics, $druid_filter);
-		$result = self::runQuery($query);
-		$report_metrics_to_headers = array();
-		foreach ($metrics as $column)
-		{
-			$report_metrics_to_headers[$column] = self::$metrics_to_headers[$column];
-		}
-		$druid_result = self::getGraphsByDateId($result, $report_metrics_to_headers, $timezone_offset, self::$transform_time_dimensions[$granularity]);
-		$mapping = $report_def[self::REPORT_LEGACY][self::REPORT_LEGACY_MAPPING];
-		$druid_field = reset($mapping);
-		$legacy_field = key($mapping);
-		$legacy_field_index = array_search($legacy_field, $headers);
-
-		$key_index = array_search($report_def[self::REPORT_LEGACY][self::REPORT_LEGACY_JOIN_FIELD], $headers);
-		if (false !== $legacy_field_index)
-		{
-			foreach ($data as &$row)
-			{
-				$row[$legacy_field_index] = isset($druid_result[$druid_field][$row[$key_index]]) ? $druid_result[$druid_field][$row[$key_index]] : 0;
-			}
-		}
-		return $data;
-	}
-	
 	/// csv functions
 	protected static function getCsvData(
 		$partner_id,
