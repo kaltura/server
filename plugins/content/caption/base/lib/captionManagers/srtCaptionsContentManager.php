@@ -87,21 +87,21 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 		return new srtCaptionsContentManager();
 	}
 
-	public function buildFile($content, $clipStartTime, $clipEndTime)
+	public function buildFile($content, $clipStartTime, $clipEndTime, $globalOffset = 0)
 	{
-		$newFileContent = $this->createCaptionsFile($content, $clipStartTime, $clipEndTime, self::SRT_TIMECODE_PATTERN);
+		$newFileContent = $this->createCaptionsFile($content, $clipStartTime, $clipEndTime, self::SRT_TIMECODE_PATTERN, $globalOffset);
 		return $newFileContent;
 	}
 
 
-	protected function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime)
+	protected function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime, $globalOffset)
 	{
 		$startCaption = self::parseCaptionTime($matches[1]);
 		$endCaption = self::parseCaptionTime($matches[2]);
 		if (!kCaptionsContentManager::onTimeRange($startCaption, $endCaption, $clipStartTime, $clipEndTime))
 			return null;
-		$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($startCaption, $clipStartTime);
-		$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $endCaption);
+		$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($startCaption, $clipStartTime, $globalOffset);
+		$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $endCaption, $globalOffset);
 		$timeLine = $this->formatSrtTimeStamp($adjustedStartTime) . ' --> ' . $this->formatSrtTimeStamp($adjustedEndTime). kCaptionsContentManager::UNIX_LINE_ENDING;
 		return $timeLine;
 	}
