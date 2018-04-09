@@ -1839,7 +1839,6 @@ class KalturaEntryService extends KalturaBaseService
 		$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId());
 		$dbAsset = $this->attachResource($resource->getResource(), $clipEntry, $clipDummySourceAsset);
 		$clipManager->startBatchJob($resource, $dbEntry,$operationAttributes, $clipEntry);
-		$dbEntry->setStatus(entryStatus::PENDING);
 		return $dbAsset;
 	}
 

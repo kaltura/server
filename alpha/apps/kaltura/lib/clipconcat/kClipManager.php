@@ -543,6 +543,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 		$destEntry->setSourceEntryId($sourceEntryId);
 		$destEntry->setOperationAttributes($operationAttributes);
+		$destEntry->setStatus(entryStatus::PENDING);
 		$destEntry->save();
 	}
 
