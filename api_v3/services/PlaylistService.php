@@ -26,13 +26,13 @@ class PlaylistService extends KalturaEntryService
 		}
 		return parent::kalturaNetworkAllowed($actionName);
 	}
-	
+
 	protected function globalPartnerAllowed($actionName)
 	{
 		if ($this->actionName == 'execute')
 			return true;
 	}
-	
+
 	protected function partnerRequired($actionName)
 	{
 		if ($actionName === 'executeFromContent') {
@@ -298,6 +298,7 @@ class PlaylistService extends KalturaEntryService
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
 		$playlist = entryPeer::retrieveByPK($id);
+
 		if (!$playlist)
 			throw new KalturaAPIException ( APIErrors::INVALID_ENTRY_ID , "Playlist" , $id  );
 
@@ -395,7 +396,7 @@ class PlaylistService extends KalturaEntryService
 	
 	/**
 	 * Retrieve playlist statistics
-	 *
+	 * @deprecated
 	 * @action getStatsFromContent
 	 * @param KalturaPlaylistType $playlistType
 	 * @param string $playlistContent
@@ -403,6 +404,8 @@ class PlaylistService extends KalturaEntryService
 	 */
 	function getStatsFromContentAction( $playlistType , $playlistContent )
 	{
+		die;
+
 	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 	    
 		$dbPlaylist = new entry();

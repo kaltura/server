@@ -20,7 +20,14 @@ class kClipAttributes extends kOperationAttributes
 	 * @var int
 	 */
 	private $duration;
-	
+
+	/**
+	 * global Offset In Destination in milliseconds
+	 * @var int
+	 */
+	private $globalOffsetInDestination;
+
+
 	/* (non-PHPdoc)
 	 * @see kOperationAttributes::toArray()
 	 */
@@ -29,6 +36,7 @@ class kClipAttributes extends kOperationAttributes
 		return array(
 			'ClipOffset' => $this->offset,
 			'ClipDuration' => $this->duration,
+			'globalOffsetInDestination' => $this->globalOffsetInDestination,
 		);
 	}
 	
@@ -57,7 +65,7 @@ class kClipAttributes extends kOperationAttributes
 	}
 
 	/**
-	 * @return the $offset
+	 * @return int $offset
 	 */
 	public function getOffset()
 	{
@@ -65,7 +73,7 @@ class kClipAttributes extends kOperationAttributes
 	}
 
 	/**
-	 * @return the $duration
+	 * @return int $duration
 	 */
 	public function getDuration()
 	{
@@ -87,4 +95,21 @@ class kClipAttributes extends kOperationAttributes
 	{
 		$this->duration = $duration;
 	}
+
+	/**
+	 * @return int $globalOffsetInDestination
+	 */
+	public function getGlobalOffsetInDestination()
+	{
+		return $this->globalOffsetInDestination;
+	}
+
+	/**
+	 * @param int $globalOffsetInDestination
+	 */
+	public function setGlobalOffsetInDestination($globalOffsetInDestination)
+	{
+		$this->globalOffsetInDestination = $globalOffsetInDestination;
+	}
+
 }

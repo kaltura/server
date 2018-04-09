@@ -11,7 +11,7 @@ class KalturaEntryService extends KalturaBaseService
 	
 	  //amount of time for holding kLock
 	  const KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT = 7;
-	
+
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::globalPartnerAllowed()
 	 */
@@ -19,7 +19,7 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		if($actionName == 'get')
 			return true;
-		
+
 		return parent::globalPartnerAllowed($actionName);
 	}
 	
@@ -669,54 +669,65 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function attachOperationResource(kOperationResource $resource, entry $dbEntry, asset $dbAsset = null)
 	{
-		$isNewAsset = false;
-		$isSource = false;
-		if($dbAsset)
+
+		$errDescription = '';
+		$operationAttributes = $resource->getOperationAttributes();
+		if (kClipManager::isMultipleClipOperation($operationAttributes))
 		{
-			if($dbAsset instanceof flavorAsset)
-				$isSource = $dbAsset->getIsOriginal();
+			$clipManager = new kClipManager();
+			$this->handleMultiClipRequest($resource,$dbEntry, $clipManager, $operationAttributes);
+			return $dbAsset;
+
 		}
 		else
 		{
-			$isNewAsset = true;
-			$isSource = true;
-			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
+			$isNewAsset = false;
+			$isSource = false;
+			if($dbAsset)
+			{
+				if($dbAsset instanceof flavorAsset)
+					$isSource = $dbAsset->getIsOriginal();
+			}
+			else
+			{
+				$isNewAsset = true;
+				$isSource = true;
+				$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
+			}
+
+			if(!$dbAsset && $dbEntry->getStatus() == entryStatus::NO_CONTENT)
+			{
+				$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
+				$dbEntry->save();
+			}
+
+			$operationAttributes = $resource->getOperationAttributes();
+			$internalResource = $resource->getResource();
+			if($internalResource instanceof kLiveEntryResource)
+			{
+				$dbEntry->setOperationAttributes($operationAttributes);
+				$dbEntry->save();
+
+				return $this->attachLiveEntryResource($internalResource, $dbEntry, $dbAsset, $operationAttributes);
+			}
+
+			$dbAsset = $this->attachResource($internalResource, $dbEntry, $dbAsset);
+
+			$sourceType = $resource->getSourceType();
+			if($sourceType)
+			{
+				$dbEntry->setSource($sourceType);
+				$dbEntry->save();
+			}
+			$batchJob = kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $resource->getAssetParamsId(), $errDescription, $dbAsset->getId(), $operationAttributes);
+			$isImportNeeded = false;
+			if ($batchJob && $batchJob->getJobType() == BatchJobType::IMPORT)
+				$isImportNeeded = true;
+			if($isNewAsset && !$isImportNeeded)
+				kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
+			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
+
 		}
-	
-		if(!$dbAsset && $dbEntry->getStatus() == entryStatus::NO_CONTENT)
-		{
-			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
-			$dbEntry->save();
-		}
-		
-		$operationAttributes = $resource->getOperationAttributes();
-		$internalResource = $resource->getResource();
-		if($internalResource instanceof kLiveEntryResource)
-		{
-			$dbEntry->setOperationAttributes($operationAttributes);
-			$dbEntry->save();
-			
-			return $this->attachLiveEntryResource($internalResource, $dbEntry, $dbAsset, $operationAttributes);
-		}
-		
-		$dbAsset = $this->attachResource($internalResource, $dbEntry, $dbAsset);
-		
-		$sourceType = $resource->getSourceType();
-		if($sourceType)
-		{
-			$dbEntry->setSource($sourceType);
-			$dbEntry->save();
-		}
-		
-		$errDescription = '';
-		$batchJob = kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $resource->getAssetParamsId(), $errDescription, $dbAsset->getId(), $operationAttributes);
-		$isImportNeeded = false;
-		if ($batchJob && $batchJob->getJobType() == BatchJobType::IMPORT)
-			$isImportNeeded = true;
-		if($isNewAsset && !$isImportNeeded)
-			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
-		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
-			
 		if($isSource && $internalResource instanceof kFileSyncResource)
 		{
 			$srcEntryId = $internalResource->getEntryId();
@@ -728,7 +739,7 @@ class KalturaEntryService extends KalturaBaseService
 					$dbEntry->setRootEntryId($srcEntry->getRootEntryId(true));
 				}
 			}
-			
+
 			$dbEntry->setOperationAttributes($operationAttributes);
 			$dbEntry->save();
 		}
@@ -1811,7 +1822,27 @@ class KalturaEntryService extends KalturaBaseService
 		$kvote->setRank($rank);
 		$kvote->save();
 	}
-	
+
+	/**
+	 * @param kOperationResource $resource
+	 * @param entry $dbEntry
+	 * @param kClipManager $clipManager
+	 * @param $operationAttributes
+	 * @return asset
+	 * @throws Exception
+	 * @throws KalturaErrors
+	 */
+	protected function handleMultiClipRequest($resource, entry $dbEntry, $clipManager, $operationAttributes)
+	{
+		KalturaLog::info("clipping service detected start to create sub flavors;");
+		$clipEntry = $clipManager->createTempEntryForClip($this->getPartnerId());
+		$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId());
+		$dbAsset = $this->attachResource($resource->getResource(), $clipEntry, $clipDummySourceAsset);
+		$clipManager->startBatchJob($resource, $dbEntry,$operationAttributes, $clipEntry);
+		return $dbAsset;
+	}
+
+
 	/**
 	 * Set the default status to ready if other status filters are not specified
 	 * 

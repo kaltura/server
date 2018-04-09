@@ -1,3 +1,55 @@
+# Mercury 13.17.0 #
+
+## Add base user permissions to fileAsset service ##
+ - Issue Type: Task
+ - Issue ID: PLAT-8708
+ 
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_04_03_update_file_asset_permission.php
+	
+## Add new batch job for Copy Cue Points ##
+ - Issue Type: Story
+ - Issue ID: PLAT-8651
+ 
+ ### Configuration ###
+
+	Requires adding a new worker to batch.ini:
+	- enabledWorkers.KAsyncCopyCuePoints = 1
+
+	- [KAsyncCopyCuePoints : JobHandlerWorker]
+      id                                                  = 700
+      friendlyName                                        = Copy Cue Point
+      type                                                = KAsyncCopyCuePoints
+      scriptPath                                          = ../plugins/cue_points/base/batch/copyCuePoints/KAsyncCopyCuePointsExe.php
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_03_28_cuePoint_update_cue_point_times.php
+	
+## Remove use of partner 0 in sphinx queries ##
+- Issue Type: Task
+- Issue ID: PLAT-8311
+
+### Configuration ###
+-Added the following to local.ini in server-saas-config:
+[partner_0_static_playlists]
+0 = @PARTNER_0_STATIC_PLAYLIST1@
+1 = @PARTNER_0_STATIC_PLAYLIST2@
+
+## Add new Konference plugin ##
+
+- Issue Type: New Feature
+- Issue ID: WEBC-1075
+
+### Configuration ###
+add "Konference" to plugins.ini 
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+      php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_30_01_add_conference_service.php
+
+
 # Mercury 13.16.0 #
 
 ## Youtube api distribution timeout ##

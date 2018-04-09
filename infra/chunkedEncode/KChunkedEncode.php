@@ -514,16 +514,16 @@
 				$cmdLine = $this->cmdLine." -t $chunkWithOverlap";
 					/*
 					 * Timing repositioning should be split into two steps 
-					 * - input step to 'start-1sec'
-					 * - output step to 1sec forward
+					 * - input step to 'start-5 sec'
+					 * - output step to 5 sec forward
 					 * This is required to overcome some sources that does not reposition correctly. Better solution would be to reposition to the nearest KF, 
 					 * but this will require long source query.
 					 */
-				if($start<1) {
+				if($start<5) {
 					$cmdLine = " -ss $start -i ".$cmdLine;
 				}
 				else {
-					$cmdLine = " -ss ".($start-1)." -i ".$cmdLine." -ss 1";
+					$cmdLine = " -ss ".($start-5)." -i ".$cmdLine." -ss 5";
 				}
 			
 				$cmdLine = " -threads ".$this->params->threadsDec.$cmdLine;

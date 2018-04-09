@@ -98,13 +98,13 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 				$query = $this->getCuePointPartialQuery($queryAttributes);
 				break;
 			case ESearchItemType::STARTS_WITH:
-				$query = $this->getCuePointPrefixQuery($this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$query = $this->getCuePointPrefixQuery($allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::EXISTS:
-				$query = $this->getCuePointExistsQuery($this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$query = $this->getCuePointExistsQuery($allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::RANGE:
-				$query = $this->getCuePointRangeQuery($this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$query = $this->getCuePointRangeQuery($allowedSearchTypes, $queryAttributes);
 				break;
 			default:
 				KalturaLog::log("Undefined item type[".$this->getItemType()."]");

@@ -5,16 +5,26 @@
  */
 class KalturaESearchCategoryResult extends KalturaESearchResult
 {
-    private static $map_between_objects = array();
+	/**
+	 * @var KalturaCategory
+	 */
+	public $object;
 
-    protected function getMapBetweenObjects()
-    {
-        return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
-    }
+	private static $map_between_objects = array(
+		'object',
+	);
 
-	public function getAPIObject($srcObj)
+	protected function getMapBetweenObjects()
 	{
-		return new KalturaCategory();
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+
+	protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$object = new KalturaCategory();
+		$object->fromObject($srcObj->getObject());
+		$this->object = $object;
+		return parent::doFromObject($srcObj, $responseProfile);
 	}
 
 }
