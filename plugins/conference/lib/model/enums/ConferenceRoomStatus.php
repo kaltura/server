@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package plugins.konference
+ * @package plugins.conference
  * @subpackage model.enum
  */
 interface ConferenceRoomStatus extends BaseEnum

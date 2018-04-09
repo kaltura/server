@@ -3,7 +3,7 @@
 /**
  *
  * @service conference
- * @package plugins.konference
+ * @package plugins.conference
  * @subpackage api.services
  */
 class ConferenceService extends KalturaBaseService {
@@ -70,9 +70,10 @@ class ConferenceService extends KalturaBaseService {
 		$confEntryServerNode = new ConferenceEntryServerNode();
 		$confEntryServerNode->setEntryId($entryId);
 		$confEntryServerNode->setServerNodeId($serverNode->getId());
-		$confEntryServerNode->setServerType(KonferencePlugin::getCoreValue('EntryServerNodeType', ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER ));
+		$confEntryServerNode->setServerType(ConferencePlugin::getCoreValue('EntryServerNodeType', ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER ));
 		$confEntryServerNode->setConfRoomStatus(ConferenceRoomStatus::READY);
 		$confEntryServerNode->setLastAllocationTime(time());
+		$confEntryServerNode->setStatus(EntryServerNodeStatus::PLAYABLE);
 		$confEntryServerNode->save();
 
 		$outObj = $this->getRoomDetails($entryId, $confEntryServerNode);
@@ -82,7 +83,7 @@ class ConferenceService extends KalturaBaseService {
 
 	protected function findExistingConferenceRoom($entryId)
 	{
-		$existingConfRoom = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, KonferencePlugin::getCoreValue('EntryServerNodeType', ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER ));
+		$existingConfRoom = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, ConferencePlugin::getCoreValue('EntryServerNodeType', ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER ));
 		if ($existingConfRoom)
 		{
 			/**
@@ -108,7 +109,7 @@ class ConferenceService extends KalturaBaseService {
 
 	protected function findFreeServerNode()
 	{
-		$serverNodes = ServerNodePeer::retrieveActiveUnoccupiedServerNodesByType(KonferencePlugin::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER));
+		$serverNodes = ServerNodePeer::retrieveActiveUnoccupiedServerNodesByType(ConferencePlugin::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER));
 		if (!$serverNodes)
 		{
 			KalturaLog::debug("Could not find avaialable conference server node in pool");
@@ -116,7 +117,7 @@ class ConferenceService extends KalturaBaseService {
 			{
 				throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 			}
-			throw new KalturaAPIException(KalturaKonferenceErrors::CONFERENCE_ROOMS_UNAVAILABLE);
+			throw new KalturaAPIException(KalturaConferenceErrors::CONFERENCE_ROOMS_UNAVAILABLE);
 		}
 		foreach ($serverNodes as $serverNode)
 		{
@@ -128,7 +129,7 @@ class ConferenceService extends KalturaBaseService {
 			$serverNode->setStatus(ServerNodeStatus::NOT_REGISTERED);
 			$serverNode->save();
 		}
-		throw new KalturaAPIException(KalturaKonferenceErrors::CONFERENCE_ROOMS_UNREACHABLE);
+		throw new KalturaAPIException(KalturaConferenceErrors::CONFERENCE_ROOMS_UNREACHABLE);
 	}
 
 	protected function canReach(ConferenceServerNode $serverNode)
@@ -153,10 +154,10 @@ class ConferenceService extends KalturaBaseService {
 	 */
 	public function finishConfAction($entryId)
 	{
-		$confEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, KonferencePlugin::getCoreValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER));
+		$confEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, ConferencePlugin::getCoreValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER));
 		if (!$confEntryServerNode)
 		{
-			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND,$entryId, KonferencePlugin::getCoreValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER));
+			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND,$entryId, ConferencePlugin::getCoreValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER));
 		}
 		/** @var ConferenceEntryServerNode $confEntryServerNode */
 		if ($confEntryServerNode->getLastAllocationTime() < (time() - kConf::get('conf_not_finished_timeout', 'local', 0)))
@@ -170,7 +171,7 @@ class ConferenceService extends KalturaBaseService {
 			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND_WITH_ID, $confEntryServerNode->getServerNodeId());
 		}
 		$confEntryServerNode->delete();
-		$otherEntryServerNodes = EntryServerNodePeer::retrieveByServerNodeIdAndType($serverNode->getId(), KonferencePlugin::getCoreValue('serverNodeType', ConferenceServerNodeType::CONFERENCE_SERVER));
+		$otherEntryServerNodes = EntryServerNodePeer::retrieveByServerNodeIdAndType($serverNode->getId(), ConferencePlugin::getCoreValue('serverNodeType', ConferenceServerNodeType::CONFERENCE_SERVER));
 		if (!count($otherEntryServerNodes))
 		{
 			KalutraLog::debgu('No entry server nodes left, marking server node as not registered');
@@ -193,10 +194,10 @@ class ConferenceService extends KalturaBaseService {
 	 */
 	public function registerConfAction($entryId)
 	{
-		$confEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, KonferencePlugin::getCoreValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER));
+		$confEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, ConferencePlugin::getCoreValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER));
 		if (!$confEntryServerNode)
 		{
-			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND,$entryId, KonferencePlugin::getCoreValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER));
+			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND,$entryId, ConferencePlugin::getCoreValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER));
 		}
 		/** @var ConferenceEntryServerNode $confEntryServerNode */
 		$confEntryServerNode->incRegistered();

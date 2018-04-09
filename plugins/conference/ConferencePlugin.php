@@ -1,11 +1,11 @@
 <?php
 /**
  * Enable Conference servers
- * @package plugins.konference
+ * @package plugins.conference
  */
-class KonferencePlugin extends KalturaPlugin implements IKalturaObjectLoader, IKalturaEnumerator, IKalturaServices
+class ConferencePlugin extends KalturaPlugin implements IKalturaObjectLoader, IKalturaEnumerator, IKalturaServices
 {
-	const PLUGIN_NAME = 'konference';
+	const PLUGIN_NAME = 'conference';
 
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
