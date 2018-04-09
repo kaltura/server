@@ -46,12 +46,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$jobData = new kClipConcatJobData();
 		$jobData->setDestEntryId($destEntry->getEntryId());
 		$jobData->setTempEntryId($clipEntry->getEntryId());
-		//if it is replace(Trim flow) active the copy to destenation consumers
-		if ($destEntry->getIsTemporary())
-		{
-			$destEntry->putInCustomData('clipConcatFlow','true');
-			$destEntry->save();
-		}
+		//if it is replace(Trim flow) active the copy to destination consumers
+		$this->fillDestEntry($destEntry,$sourceEntryId, $operationAttributes);
 		$jobData->setSourceEntryId($sourceEntryId);
 		$jobData->setPartnerId($partnerId);
 		$jobData->setPriority($priority);
@@ -531,6 +527,23 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$this->updateMediaFlowOnAsset($dbAsset);
 
 		$this->syncFlavorParamToAsset($dbAsset, $dbEntry);
+	}
+
+	/**
+	 * @param entry $destEntry
+	 * @param $sourceEntryId
+	 * @param array $operationAttributes
+	 */
+	private function fillDestEntry($destEntry, $sourceEntryId, array $operationAttributes)
+	{
+		if ($destEntry->getIsTemporary()) {
+			$destEntry->putInCustomData('clipConcatTrimFlow', 'true');
+		} else {
+			$destEntry->putInCustomData('clipConcatTrimFlow', 'false');
+		}
+		$destEntry->setSourceEntryId($sourceEntryId);
+		$destEntry->setOperationAttributes($operationAttributes);
+		$destEntry->save();
 	}
 
 

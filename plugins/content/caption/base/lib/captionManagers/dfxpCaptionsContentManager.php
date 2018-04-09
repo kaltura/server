@@ -200,11 +200,11 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 		return new dfxpCaptionsContentManager();
 	}
 
-	protected function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime)
+	protected function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime, $globalOffset)
 	{
 	}
 
-	public function buildFile($content, $clipStartTime, $clipEndTime)
+	public function buildFile($content, $clipStartTime, $clipEndTime, $globalOffset = 0)
 	{
 		$xml = new KDOMDocument();
 		try
@@ -217,13 +217,13 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 			KalturaLog::err($e->getMessage());
 			return '';
 		}
-		$xmlUpdatedContent = $this->editBody($xml, $clipStartTime, $clipEndTime);
+		$xmlUpdatedContent = $this->editBody($xml, $clipStartTime, $clipEndTime, $globalOffset);
 		$xmlUpdatedContent = trim($xmlUpdatedContent, " \r\n\t");
 		$xmlUpdatedContent = str_replace("      \n", "", $xmlUpdatedContent);
 		return $xmlUpdatedContent;
 	}
 
-	private function editBody(DOMNode $curNode, $clipStartTime, $clipEndTime)
+	private function editBody(DOMNode $curNode, $clipStartTime, $clipEndTime, $globalOffset)
 	{
 		for ($i = 0; $i < $curNode->childNodes->length; $i++)
 		{
@@ -233,7 +233,7 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 
 			if (strtolower($childNode->nodeName) != 'p')
 			{
-				$this->editBody($childNode, $clipStartTime, $clipEndTime);
+				$this->editBody($childNode, $clipStartTime, $clipEndTime, $globalOffset);
 				continue;
 			}
 
@@ -252,8 +252,8 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 				$curNode->removeChild($childNode);
 			else
 				{
-				$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($captionStartTime, $clipStartTime);
-				$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $captionEndTime);
+				$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($captionStartTime, $clipStartTime, $globalOffset);
+				$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $captionEndTime, $globalOffset);
 
 				$childNode->setAttribute('begin',kXml::integerToTime($adjustedStartTime));
 				if($childNode->hasAttribute('end'))
