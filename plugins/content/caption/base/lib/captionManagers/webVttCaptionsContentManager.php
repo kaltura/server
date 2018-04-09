@@ -9,6 +9,7 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 	const WEBVTT_TIMECODE_PATTERN = '#^((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}\.[0-9]{3}) --> ((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}\.[0-9]{3})( .*)?$#';
 
 	const BOM_CODE =  "\xEF\xBB\xBF";
+	const WEBVTT_PATTERN = '#^WEBVTT#';
 	/**
 	 * @var array
 	 */
@@ -204,4 +205,30 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 		return $timeLine;
 	}
 
+	/**
+	 * @param string $content
+	 * @param string $toAppend
+	 * @return string
+	 */
+	public function merge($content, $toAppend)
+	{
+		if (!$toAppend)
+			return $content;
+
+		$originalFileContentArray = kCaptionsContentManager::getFileContentAsArray($toAppend);
+		while (($line = kCaptionsContentManager::getNextValueFromArray($originalFileContentArray)) !== false)
+		{
+			$currentBlock = '';
+			$shouldAddLine = true;
+			if (preg_match(self::WEBVTT_PATTERN, $line) === 1 || !trim($line))
+			{
+				$shouldAddLine= false;
+			}
+			$currentBlock = $currentBlock . $line;
+
+			if($shouldAddLine)
+				$content .= $currentBlock . kCaptionsContentManager::UNIX_LINE_ENDING;
+		}
+		return $content;
+	}
 }

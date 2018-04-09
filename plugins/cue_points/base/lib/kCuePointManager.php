@@ -547,7 +547,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	 */
 	protected static function isClipConcatTrimFlow(BaseObject $object ) {
 		if ( $object instanceof entry ) {
-			if ($object->getFromCustomData('clipConcatTrimFlow')){
+			if ($object->getClipConcatTrimFlow()){
 				return true;
 			}
 		}
@@ -1009,7 +1009,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	public static function copyCuePointsToClipEntry( entry $clipEntry ) {
 		$clipAtts =  self::getClipAttributesFromEntry( $clipEntry );
 		//if clipConcat flow let batch job copy cue point
-		if ( !is_null($clipAtts) &&  is_null($clipEntry->getFromCustomData('clipConcatTrimFlow')) ) {
+		if ( !is_null($clipAtts) &&  is_null($clipEntry->getClipConcatTrimFlow()) ) {
 			$sourceEntry = entryPeer::retrieveByPK( $clipEntry->getSourceEntryId() );
 			if ( is_null($sourceEntry) ) {
 				KalturaLog::info("Didn't copy cuePoints for entry [{$clipEntry->getId()}] because source entry [" . $clipEntry->getSourceEntryId() . "] wasn't found");

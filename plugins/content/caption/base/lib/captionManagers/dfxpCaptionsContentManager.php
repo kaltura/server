@@ -268,4 +268,60 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 		return $content;
 	}
 
+	/**
+	 * @param string $content
+	 * @param string $toAppend
+	 * @return string
+	 */
+	public function merge($content, $toAppend)
+	{
+		$contentXML = new KDOMDocument();
+		$toAppendXML = new KDOMDocument();
+		try
+		{
+			$contentXML->loadXML($content);
+			$toAppendXML->loadXML($toAppend);
+			$contentBody = $contentXML->getElementsByTagName('body')->item(0);
+			$divToAppend = $toAppendXML->getElementsByTagName('div');
+			/** @var DOMElement $candidate*/
+			for ($i = 0; $i < $divToAppend ->length; $i ++)
+			{
+				$shouldAddDiv = true;
+				$candidate = $divToAppend->item($i);
+				/** @var DOMElement $existingLanguage */
+				foreach ($contentBody->getElementsByTagName('div') as $existingLanguage)
+				{
+					if ($existingLanguage->getAttribute('xml:lang')  === $candidate->getAttribute('xml:lang'))
+					{
+						$shouldAddDiv = false;
+						foreach ($candidate->childNodes as $line)
+						{
+							// Import the line, and all its children, to the $contentXML doc
+							$line = $contentXML->importNode($line,true);
+							// append imported line to existing language
+							$existingLanguage->appendChild($line);
+						}
+						break;
+					}
+				}
+				if ($shouldAddDiv)
+				{
+					// Import the language, and all its children, to the $contentXML doc
+					$candidate = $contentXML->importNode($candidate,true);
+					// append imported language to body
+					$contentBody->appendChild($candidate);
+				}
+			}
+
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+			return $content;
+		}
+		$content = $contentXML->saveXML();
+		$content = trim($content, " \r\n\t");
+		$content = str_replace("    \n", "", $content);
+		return $content;
+	}
 }
