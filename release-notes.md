@@ -12,6 +12,7 @@
 ### Deployment scripts ###
 
 	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_30_01_add_conference_service.php
 
 # Mercury 13.17.0 #
 
