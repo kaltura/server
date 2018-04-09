@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.konference
+ * @package plugins.conference
  * @subpackage api.objects
  */
 class KalturaConferenceEntryServerNode extends KalturaEntryServerNode

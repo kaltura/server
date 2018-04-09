@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.konference
+ * @package plugins.conference
  * @subpackage api.filters
  */
 class KalturaConferenceServerNodeFilter extends KalturaConferenceServerNodeBaseFilter
@@ -8,7 +8,7 @@ class KalturaConferenceServerNodeFilter extends KalturaConferenceServerNodeBaseF
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
 		if(!$type)
-			$type = KonferencePlugin::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER);
+			$type = ConferencePlugin::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER);
 	
 		return parent::getTypeListResponse($pager, $responseProfile, $type);
 	}

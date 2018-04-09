@@ -11,7 +11,7 @@ class ConferenceServerNode extends ServerNode {
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
-		$this->setType(KonferencePlugin::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER));
+		$this->setType(ConferencePlugin::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER));
 	}
 
 
@@ -38,7 +38,7 @@ class ConferenceServerNode extends ServerNode {
 
 	public function removeAttachedEntryServerNodes()
 	{
-		$confEntryServerNodes = EntryServerNodePeer::retrieveByServerNodeIdAndType($this->getId(), KonferencePlugin::getCoreValue('serverNodeType', ConferenceServerNodeType::CONFERENCE_SERVER));
+		$confEntryServerNodes = EntryServerNodePeer::retrieveByServerNodeIdAndType($this->getId(), ConferencePlugin::getCoreValue('serverNodeType', ConferenceServerNodeType::CONFERENCE_SERVER));
 		foreach ($confEntryServerNodes as $confEntryServerNode)
 		{
 			$confEntryServerNode->delete();

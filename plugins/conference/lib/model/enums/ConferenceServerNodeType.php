@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.konference
+ * @package plugins.conference
  * @subpackage lib.enum
  */
 class ConferenceServerNodeType implements IKalturaPluginEnum, serverNodeType
