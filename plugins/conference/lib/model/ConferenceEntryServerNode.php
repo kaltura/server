@@ -38,7 +38,7 @@ class ConferenceEntryServerNode extends EntryServerNode
 		 */
 		if ($this->getConfRoomStatus() != ConferenceRoomStatus::READY)
 		{
-			throw new kCoreException(KalturaKonferenceErrors::ROOM_NOT_READY, $this->getId());
+			throw new kCoreException(KalturaConferenceErrors::ROOM_NOT_READY, $this->getId());
 		}
 		return $conferenceServerNode->getServiceBaseUrl();
 	}

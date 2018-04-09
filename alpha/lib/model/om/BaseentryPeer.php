@@ -677,21 +677,18 @@ abstract class BaseentryPeer {
 				// add the partner_id to the partner_group
 				if (!in_array(strval($partnerId), $partners))
 					$partners[] = strval($partnerId);
-				
+
 				if(count($partners) == 1 && reset($partners) == $partnerId)
-				{
-					$criteria->addAnd(self::PARTNER_ID, $partnerId);
-				}
-				else 
-				{
+					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partnerId);
+				else
 					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
-					if($kalturaNetwork)
-					{
-						$criterionNetwork = $criteria->getNewCriterion(self::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK);
-						$criterion->addOr($criterionNetwork);
-					}
-					$criteria->addAnd($criterion);
+
+				if($kalturaNetwork)
+				{
+					$criterionNetwork = $criteria->getNewCriterion(self::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK);
+					$criterion->addOr($criterionNetwork);
 				}
+				$criteria->addAnd($criterion);
 			}
 		}
 			
