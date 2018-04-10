@@ -286,31 +286,7 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 			/** @var DOMElement $candidate*/
 			for ($i = 0; $i < $divToAppend ->length; $i ++)
 			{
-				$shouldAddDiv = true;
-				$candidate = $divToAppend->item($i);
-				/** @var DOMElement $existingLanguage */
-				foreach ($contentBody->getElementsByTagName('div') as $existingLanguage)
-				{
-					if ($existingLanguage->getAttribute('xml:lang')  === $candidate->getAttribute('xml:lang'))
-					{
-						$shouldAddDiv = false;
-						foreach ($candidate->childNodes as $line)
-						{
-							// Import the line, and all its children, to the $contentXML doc
-							$line = $contentXML->importNode($line,true);
-							// append imported line to existing language
-							$existingLanguage->appendChild($line);
-						}
-						break;
-					}
-				}
-				if ($shouldAddDiv)
-				{
-					// Import the language, and all its children, to the $contentXML doc
-					$candidate = $contentXML->importNode($candidate,true);
-					// append imported language to body
-					$contentBody->appendChild($candidate);
-				}
+				$this->appendToDestination($divToAppend->item($i), $contentBody, $contentXML);
 			}
 
 		}
@@ -323,5 +299,38 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 		$content = trim($content, " \r\n\t");
 		$content = str_replace("    \n", "", $content);
 		return $content;
+	}
+
+	/**
+	 * @param DOMElement $candidate
+	 * @param DOMElement $contentBody
+	 * @param DOMDocument $contentXML
+	 */
+	private function appendToDestination($candidate, $contentBody, $contentXML)
+	{
+		$shouldAddDiv = true;
+		/** @var DOMElement $existingLanguage */
+		foreach ($contentBody->getElementsByTagName('div') as $existingLanguage)
+		{
+			if ($existingLanguage->getAttribute('xml:lang') === $candidate->getAttribute('xml:lang'))
+			{
+				$shouldAddDiv = false;
+				foreach ($candidate->childNodes as $line)
+				{
+					// Import the line, and all its children, to the $contentXML doc
+					$line = $contentXML->importNode($line, true);
+					// append imported line to existing language
+					$existingLanguage->appendChild($line);
+				}
+				break;
+			}
+		}
+		if ($shouldAddDiv)
+		{
+			// Import the language, and all its children, to the $contentXML doc
+			$candidate = $contentXML->importNode($candidate, true);
+			// append imported language to body
+			$contentBody->appendChild($candidate);
+		}
 	}
 }

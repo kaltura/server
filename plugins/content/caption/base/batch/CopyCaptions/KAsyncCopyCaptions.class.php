@@ -237,7 +237,6 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 				continue;
 			}
 		}
-		return $errorMsg;
 	}
 
 }
