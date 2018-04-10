@@ -197,6 +197,8 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 			$originalCaptionAssets = $this->retrieveCaptionAssetsOnlyFromSupportedTypes($originalCaptionAssets);
 		foreach ($originalCaptionAssets as $originalCaptionAsset)
 		{
+			if ($originalCaptionAsset->status != KalturaCaptionAssetStatus::READY)
+				continue;
 			$newCaptionAsset = $this->cloneCaption($data->entryId, $originalCaptionAsset);
 			$newCaptionAssetResource = new KalturaStringResource();
 			$this->clipAndConcatSub($data, $clipDescriptionArray, $originalCaptionAsset, $newCaptionAsset, $newCaptionAssetResource,$errorMsg);
@@ -219,22 +221,20 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 	 */
 	private function clipAndConcatSub(KalturaCopyCaptionsJobData $data, $clipDescriptionArray, $originalCaptionAsset, $newCaptionAsset, $newCaptionAssetResource, &$errorMsg)
 	{
-		foreach ($clipDescriptionArray as $clipDescription) {
-			if ($originalCaptionAsset->status != KalturaCaptionAssetStatus::READY)
-				continue;
+		foreach ($clipDescriptionArray as $clipDescription)
+		{
 			$toAppend = $this->createNewCaptionsFile($originalCaptionAsset->id, $clipDescription->startTime, $clipDescription->duration,
 				$newCaptionAsset->format, $data->fullCopy, $clipDescription->offsetInDestination);
-			if ($toAppend && $newCaptionAssetResource->content) {
+			if ($toAppend && $newCaptionAssetResource->content)
+			{
 				$captionsContentManager = kCaptionsContentManager::getCoreContentManager($newCaptionAsset->format);
 				$newCaptionAssetResource->content = $captionsContentManager->merge($newCaptionAssetResource->content, $toAppend);
 			}
 			elseif(!$newCaptionAssetResource->content)
-			{
 				$newCaptionAssetResource->content = $toAppend;
-			}
-			if (is_null($toAppend)) {
+			if (is_null($toAppend))
+			{
 				$errorMsg = "Couldn't create new captions file for captionAssetId: [$originalCaptionAsset->id] and format: [$newCaptionAsset->format]";
-				continue;
 			}
 		}
 	}

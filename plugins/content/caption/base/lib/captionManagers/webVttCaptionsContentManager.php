@@ -218,16 +218,10 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 		$originalFileContentArray = kCaptionsContentManager::getFileContentAsArray($toAppend);
 		while (($line = kCaptionsContentManager::getNextValueFromArray($originalFileContentArray)) !== false)
 		{
-			$currentBlock = '';
-			$shouldAddLine = true;
-			if (preg_match(self::WEBVTT_PATTERN, $line) === 1 || !trim($line))
+			if (preg_match(self::WEBVTT_PATTERN, $line) === 0 && trim($line))
 			{
-				$shouldAddLine= false;
+				$content .= $line . kCaptionsContentManager::UNIX_LINE_ENDING;
 			}
-			$currentBlock = $currentBlock . $line;
-
-			if($shouldAddLine)
-				$content .= $currentBlock . kCaptionsContentManager::UNIX_LINE_ENDING;
 		}
 		return $content;
 	}
