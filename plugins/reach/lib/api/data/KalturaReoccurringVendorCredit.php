@@ -38,7 +38,7 @@ class KalturaReoccurringVendorCredit extends KalturaTimeRangeVendorCredit
 	 */	 
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull("frequency"));
+		$this->validatePropertyNotNull("frequency");
 		
 		parent::validateForInsert($propertiesToSkip);
 	}
