@@ -1,3 +1,22 @@
+
+# Mercury 13.16.0 #
+
+## Add Delete to Entry-Server-Node ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7833
+
+### configuration ###
+None
+
+#### Known Issues & Limitations ####
+
+None.
+
+### Deployment scripts ###
+	php deployment/updates/scripts/add_permissions/2018_03_01_entry_server_enable_delete_and_update.php
+	
+
 # Mercury 13.15.0 #
 
 ## Entry added to category Firebase notification template ##

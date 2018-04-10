@@ -284,7 +284,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		return $dbAsset;
 	}
-	
+
 	/**
 	 * @param kLiveEntryResource $resource
 	 * @param entry $dbEntry
@@ -297,12 +297,12 @@ class KalturaEntryService extends KalturaBaseService
 		$dbEntry->setRootEntryId($resource->getEntry()->getId());
 		$dbEntry->setSource(EntrySourceType::RECORDED_LIVE);
 		$dbEntry->save();
-	
+
 		if(!$dbAsset)
 		{
 			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		}
-		
+
 		$offset = null;
 		$duration = null;
 		$requiredDuration = null;
@@ -314,7 +314,7 @@ class KalturaEntryService extends KalturaBaseService
 				if($operationAttributesItem instanceof kClipAttributes)
 				{
 					$clipAttributes = $operationAttributesItem;
-					
+
 					// convert milliseconds to seconds
 					$offset = $operationAttributesItem->getOffset();
 					$duration = $operationAttributesItem->getDuration();
@@ -322,16 +322,16 @@ class KalturaEntryService extends KalturaBaseService
 				}
 			}
 		}
-		
+
 		$dbLiveEntry = $resource->getEntry();
 		$dbRecordedEntry = entryPeer::retrieveByPK($dbLiveEntry->getRecordedEntryId());
-		
+
 		if(!$dbRecordedEntry || ($requiredDuration && $requiredDuration > $dbRecordedEntry->getLengthInMsecs()))
 		{
 			$mediaServer = $dbLiveEntry->getMediaServer(true);
 			if(!$mediaServer)
 				throw new KalturaAPIException(KalturaErrors::NO_MEDIA_SERVER_FOUND, $dbLiveEntry->getId());
-				
+
 			$mediaServerLiveService = $mediaServer->getWebService($mediaServer->getLiveWebServiceName());
 			if($mediaServerLiveService && $mediaServerLiveService instanceof KalturaMediaServerLiveService)
 			{
@@ -339,13 +339,13 @@ class KalturaEntryService extends KalturaBaseService
 				$dbLiveEntry->attachPendingMediaEntry($dbEntry, $requiredDuration, $offset, $duration);
 				$dbLiveEntry->save();
 			}
-			else 
+			else
 			{
 				throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_SERVICE_NOT_FOUND, $mediaServer->getId(), $mediaServer->getLiveWebServiceName());
 			}
 			return $dbAsset;
 		}
-		
+
 		$dbRecordedAsset = assetPeer::retrieveOriginalReadyByEntryId($dbRecordedEntry->getId());
 		if(!$dbRecordedAsset)
 		{
@@ -353,32 +353,32 @@ class KalturaEntryService extends KalturaBaseService
 			$dbRecordedAsset = array_pop($dbRecordedAssets);
 		}
 		/* @var $dbRecordedAsset flavorAsset */
-		
+
 		$isNewAsset = false;
 		if(!$dbAsset)
 		{
 			$isNewAsset = true;
 			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		}
-		
+
 		if(!$dbAsset && $dbEntry->getStatus() == entryStatus::NO_CONTENT)
 		{
 			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
 			$dbEntry->save();
 		}
-		
+
 		$sourceSyncKey = $dbRecordedAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		
+
 		$dbAsset->setFileExt($dbRecordedAsset->getFileExt());
 		$dbAsset->save();
-		
+
 		$syncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		
+
 		try {
 			kFileSyncUtils::createSyncFileLinkForKey($syncKey, $sourceSyncKey);
 		}
 		catch (Exception $e) {
-			
+
 			if($dbEntry->getStatus() == entryStatus::NO_CONTENT)
 			{
 				$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
@@ -386,15 +386,15 @@ class KalturaEntryService extends KalturaBaseService
 			}
 
 			$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
-			$dbAsset->save();												
+			$dbAsset->save();
 			throw $e;
 		}
-		
+
 
 		if($requiredDuration)
 		{
 			$errDescription = '';
- 			kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $clipAttributes->getAssetParamsId(), $errDescription, $dbAsset->getId(), array($clipAttributes));
+			kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $clipAttributes->getAssetParamsId(), $errDescription, $dbAsset->getId(), array($clipAttributes));
 		}
 		else
 		{
@@ -402,10 +402,10 @@ class KalturaEntryService extends KalturaBaseService
 				kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 		}
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
-			
+
 		return $dbAsset;
 	}
-	
+
 	/**
 	 * @param kLocalFileResource $resource
 	 * @param entry $dbEntry
@@ -660,7 +660,7 @@ class KalturaEntryService extends KalturaBaseService
 			
 		return $dbAsset;
 	}
-	
+
 	/**
 	 * @param kOperationResource $resource
 	 * @param entry $dbEntry
@@ -682,32 +682,38 @@ class KalturaEntryService extends KalturaBaseService
 			$isSource = true;
 			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		}
-	
+
 		if(!$dbAsset && $dbEntry->getStatus() == entryStatus::NO_CONTENT)
 		{
 			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
 			$dbEntry->save();
 		}
-		
+
 		$operationAttributes = $resource->getOperationAttributes();
 		$internalResource = $resource->getResource();
 		if($internalResource instanceof kLiveEntryResource)
 		{
 			$dbEntry->setOperationAttributes($operationAttributes);
 			$dbEntry->save();
-			
+
 			return $this->attachLiveEntryResource($internalResource, $dbEntry, $dbAsset, $operationAttributes);
 		}
-		
+
+		if ($dbEntry->getIsRecordedEntry() && myEntryUtils::shouldServeVodFromLive($dbEntry))
+		{
+			$this->createRecordedClippingTask($resource, $dbEntry, $operationAttributes);
+			return $dbAsset;
+		}
+
 		$dbAsset = $this->attachResource($internalResource, $dbEntry, $dbAsset);
-		
+
 		$sourceType = $resource->getSourceType();
 		if($sourceType)
 		{
 			$dbEntry->setSource($sourceType);
 			$dbEntry->save();
 		}
-		
+
 		$errDescription = '';
 		$batchJob = kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $resource->getAssetParamsId(), $errDescription, $dbAsset->getId(), $operationAttributes);
 		$isImportNeeded = false;
@@ -716,7 +722,7 @@ class KalturaEntryService extends KalturaBaseService
 		if($isNewAsset && !$isImportNeeded)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
-			
+
 		if($isSource && $internalResource instanceof kFileSyncResource)
 		{
 			$srcEntryId = $internalResource->getEntryId();
@@ -728,11 +734,11 @@ class KalturaEntryService extends KalturaBaseService
 					$dbEntry->setRootEntryId($srcEntry->getRootEntryId(true));
 				}
 			}
-			
+
 			$dbEntry->setOperationAttributes($operationAttributes);
 			$dbEntry->save();
 		}
-		
+
 		return $dbAsset;
 	}
 	
@@ -1811,7 +1817,29 @@ class KalturaEntryService extends KalturaBaseService
 		$kvote->setRank($rank);
 		$kvote->save();
 	}
-	
+
+	/**
+	 * @param kOperationResource $resource
+	 * @param entry $dbEntry
+	 * @param $operationAttributes
+	 * @throws Exception
+	 * @throws KalturaAPIException
+	 * @throws PropelException
+	 */
+	protected function createRecordedClippingTask(kOperationResource $resource, entry $dbEntry, $operationAttributes)
+	{
+		$clipAttributes = $this->getClipAttributesFromOperationAtrributes($operationAttributes);
+		$clippingTask = new ClippingTaskEntryServerNode();
+		$clippingTask->setEntryId($resource->getEntry()->getId());
+		$clippingTask->setClippedEntryId($dbEntry->getId());
+		$clippingTask->setPartnerId($resource->getEntry()->getPartnerId());
+		$clippingTask->setServerType(EntryServerNodeType::LIVE_CLIPPING_TASK);
+		$serverNodeId = $this->getServerNodeIdByEntryId($resource->getEntry()->getId());
+		$clippingTask->setServerNodeId($serverNodeId);
+		$clippingTask->setClipAttributes($clipAttributes);
+		$clippingTask->save();
+	}
+
 	/**
 	 * Set the default status to ready if other status filters are not specified
 	 * 
@@ -1878,5 +1906,39 @@ class KalturaEntryService extends KalturaBaseService
 		if(isset($_REQUEST["conversionquality"]))
 			return $_REQUEST["conversionquality"];
 		return null;
+	}
+
+	protected function getServerNodeIdByEntryId($liveEntryId)
+	{
+		$entryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndServerTypes($liveEntryId, array(EntryServerNodeType::LIVE_BACKUP, EntryServerNodeType::LIVE_PRIMARY));
+		if (!$entryServerNodes)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $liveEntryId);
+		foreach ($entryServerNodes as $entryServerNode)
+		{
+			/** @var LiveEntryServerNode $entryServerNode */
+			if ($entryServerNode->getDc() == kDataCenterMgr::getCurrentDcId())
+				return $entryServerNode->getServerNodeId();
+		}
+		throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $liveEntryId);
+	}
+
+	/**
+	 * @param $operationAttributes
+	 * @return kClipAttributes|null
+	 */
+	private function getClipAttributesFromOperationAtrributes($operationAttributes)
+	{
+		$clipAttributes = null;
+		if (is_array($operationAttributes))
+		{
+			foreach ($operationAttributes as $operationAttributesItem)
+			{
+				if ($operationAttributesItem instanceof kClipAttributes)
+				{
+					$clipAttributes = $operationAttributesItem;
+				}
+			}
+		}
+		return $clipAttributes;
 	}
 }

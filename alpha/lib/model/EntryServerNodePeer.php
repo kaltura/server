@@ -19,6 +19,7 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 	protected static $class_types_cache = array(
 		EntryServerNodeType::LIVE_PRIMARY => LiveEntryServerNode::OM_CLASS,
 		EntryServerNodeType::LIVE_BACKUP => LiveEntryServerNode::OM_CLASS,
+		EntryServerNodeType::LIVE_CLIPPING_TASK => ClippingTaskEntryServerNode::OM_CLASS,
 	);
 	
 	public static $connectedServerNodeStatuses = array(
@@ -133,4 +134,14 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 		
 		return EntryServerNodePeer::doSelect($c);
 	}
+
+	public static function retrieveByEntryIdAndServerTypes($entryId, $serverTypes)
+	{
+		$criteria = new Criteria();
+		$criteria->add(EntryServerNodePeer::ENTRY_ID, $entryId);
+		$criteria->add(EntryServerNodePeer::SERVER_TYPE, $serverTypes, Criteria::IN);
+
+		return EntryServerNodePeer::doSelect($criteria);
+	}
+
 } // EntryServerNodePeer
