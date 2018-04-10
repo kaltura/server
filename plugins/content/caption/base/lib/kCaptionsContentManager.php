@@ -88,6 +88,14 @@ abstract class kCaptionsContentManager
 	protected abstract function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime, $globalOffset);
 
 
+	/**
+	 * @param string $content
+	 * @param string $toAppend
+	 * @return string
+	 */
+	public abstract function merge($content, $toAppend);
+
+
 
 	/**
 	 * @param CaptionType $type
@@ -272,5 +280,6 @@ abstract class kCaptionsContentManager
 		}
 		return $newFileContent;
 	}
+
 
 }

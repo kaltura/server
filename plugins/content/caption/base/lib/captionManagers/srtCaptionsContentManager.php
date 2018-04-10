@@ -130,4 +130,13 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 		return $captionTime;
 	}
 
+	/**
+	 * @param string $content
+	 * @param string $toAppend
+	 * @return string
+	 */
+	public function merge($content, $toAppend)
+	{
+		return $content . $toAppend;
+	}
 }
