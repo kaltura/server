@@ -30,7 +30,6 @@ class ReachProfileService extends KalturaBaseService
 	 */
 	public function addAction(KalturaReachProfile $reachProfile)
 	{
-		KalturaLog::debug("EREZ1");
 		$dbReachProfile = $reachProfile->toInsertableObject();
 
 		/* @var $dbReachProfile ReachProfile */
