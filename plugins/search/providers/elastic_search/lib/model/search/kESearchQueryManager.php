@@ -169,6 +169,7 @@ class kESearchQueryManager
 		$nestedQuery->setHighlight($highlight->getFinalQuery());
 		$nestedQuery->setQuery($query);
 		$nestedQuery->setInnerHitsName($queryAttributes->getNestedQueryName());
+		$nestedQuery->setSort($queryAttributes->getNestedQuerySortOrder());
 
 		return $nestedQuery;
 	}

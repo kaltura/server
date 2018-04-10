@@ -13,7 +13,7 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 	/**
 	 * @var string
 	 */
-	public $thumbAssetFilePath;
+	public $thumbAssetId;
 
 	/**
 	 * @var KalturaFacebookCaptionDistributionInfoArray
@@ -38,13 +38,9 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 		}
 
 
-		$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
-		if(count($thumbAssets))
-		{
-			$syncKey = reset($thumbAssets)->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-			if(kFileSyncUtils::fileSync_exists($syncKey))
-				$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
-		}
+		$thumbAssetIds = explode(',', $distributionJobData->entryDistribution->thumbAssetIds);
+		if(count($thumbAssetIds))
+			$this->thumbAssetId = reset($thumbAssetIds);
 
 		$this->addCaptionsData($distributionJobData);
 	}
@@ -52,7 +48,7 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 	private static $map_between_objects = array
 	(
 		"videoAssetFilePath",
-		"thumbAssetFilePath",
+		"thumbAssetId",
 		"captionsInfo"
 	);
 

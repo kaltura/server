@@ -24,6 +24,8 @@ class SearchService extends KalturaBaseService
 	 */
 	public function searchAction( KalturaSearch $search , KalturaFilterPager $pager = null )
 	{
+		die;
+		
 		$partnerId = $this->getPartnerId();
 			
 		if (!$search->searchSource)

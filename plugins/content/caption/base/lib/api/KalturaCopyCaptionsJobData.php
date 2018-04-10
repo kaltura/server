@@ -6,25 +6,16 @@
 class KalturaCopyCaptionsJobData extends KalturaJobData
 {
 
-	/** source entry Id
-	 * @var string
-	 */
-	public $sourceEntryId = null;
-
 	/** entry Id
 	 * @var string
 	 */
 	public $entryId = null;
 
-	/** clip offset
-	 * @var int
+	/**
+	 *  an array of source start time and duration
+	 * @var KalturaClipDescriptionArray
 	 */
-	public $offset;
-
-	/** clip duration
-	 * @var int
-	 */
-	public $duration;
+	public $clipsDescriptionArray;
 
 	/**
 	 * @var bool
@@ -34,9 +25,7 @@ class KalturaCopyCaptionsJobData extends KalturaJobData
 	private static $map_between_objects = array
 	(
 		'entryId',
-		'sourceEntryId',
-		'offset',
-		'duration',
+		'clipsDescriptionArray',
 		'fullCopy',
 	);
 

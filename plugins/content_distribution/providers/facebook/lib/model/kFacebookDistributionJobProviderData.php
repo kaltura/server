@@ -13,7 +13,7 @@ class kFacebookDistributionJobProviderData extends kConfigurableDistributionJobP
 	/**
 	 * @var string
 	 */
-	private $thumbAssetFilePath;
+	private $thumbAssetId;
 	
 	/**
 	 * @var KalturaFacebookCaptionDistributionInfoArray
@@ -60,17 +60,17 @@ class kFacebookDistributionJobProviderData extends kConfigurableDistributionJobP
 	/**
 	 * @return string $thumbAssetFilePath
 	 */
-	public function getThumbAssetFilePath()
+	public function getThumbAssetId()
 	{
-		return $this->thumbAssetFilePath;
+		return $this->thumbAssetId;
 	}
 
 	/**
-	 * @param string $thumbAssetFilePath
+	 * @param string $thumbAssetId
 	 */
-	public function setThumbAssetFilePath($thumbAssetFilePath)
+	public function setThumbAssetId($thumbAssetId)
 	{
-		$this->thumbAssetFilePath = $thumbAssetFilePath;
+		$this->thumbAssetId = $thumbAssetId;
 	}	
 	
 	/**

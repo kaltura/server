@@ -1,3 +1,118 @@
+# Mercury 13.18.0 #
+
+## Add conference plugin abilities ##
+	- Issue Type: New Feature
+	- Issue ID: WEBC-1075
+ 
+ ### Configuration ###
+
+	In plugins.ini file if you have konference then change to conference
+	 if not add "conference" to plugins.ini
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_30_01_add_conference_service.php
+
+# Mercury 13.17.0 #
+
+## Add base user permissions to fileAsset service ##
+ - Issue Type: Task
+ - Issue ID: PLAT-8708
+ 
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_04_03_update_file_asset_permission.php
+	
+## Add new batch job for Copy Cue Points ##
+ - Issue Type: Story
+ - Issue ID: PLAT-8651
+ 
+ ### Configuration ###
+
+	Requires adding a new worker to batch.ini:
+	- enabledWorkers.KAsyncCopyCuePoints = 1
+
+	- [KAsyncCopyCuePoints : JobHandlerWorker]
+      id                                                  = 700
+      friendlyName                                        = Copy Cue Point
+      type                                                = KAsyncCopyCuePoints
+      scriptPath                                          = ../plugins/cue_points/base/batch/copyCuePoints/KAsyncCopyCuePointsExe.php
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_03_28_cuePoint_update_cue_point_times.php
+	
+## Remove use of partner 0 in sphinx queries ##
+- Issue Type: Task
+- Issue ID: PLAT-8311
+
+### Configuration ###
+-Added the following to local.ini in server-saas-config:
+[partner_0_static_playlists]
+0 = @PARTNER_0_STATIC_PLAYLIST1@
+1 = @PARTNER_0_STATIC_PLAYLIST2@
+
+## Add new Konference plugin ##
+
+- Issue Type: New Feature
+- Issue ID: WEBC-1075
+
+### Configuration ###
+add "Konference" to plugins.ini 
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+      php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_30_01_add_conference_service.php
+
+
+# Mercury 13.16.0 #
+
+## Youtube api distribution timeout ##
+- Issue Type: Bug
+- Issue ID: supp-13294
+
+### Configuration ###
+Update batch.ini/workers.ini:
+- add "params.youtubeApi.processedTimeout	= 600" to [KAsyncDistributeSubmit : KAsyncDistribute]
+- add "params.youtubeApi.processedTimeout	= 600" to [KAsyncDistributeUpdate : KAsyncDistribute]
+
+## Media repurposing dry run improvements ##
+- Issue Type: Bug
+- Issue ID: PLAT-8691
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_03_22_add_adminConsole_scheduleTask_permission
+
+## Add ability to set default audio language in live streams ##
+- Issue Type: New Feature
+- Issue ID: SUP-13373
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_03_12_allow_media_server_to_get_conversionprofile.php
+
+## Workers allocation for full-scale Chunked Encoding deployment ##
+- Issue Type: Configuration update 
+- Issue ID: NONE
+
+### Configuration ###
+- server-saas-config/configurations/batch/workers.ini
+- server-saas-config/configurations/batch/encoder.ini
+- https://github.com/kaltura/server-saas-config/compare/Mercury-13.16.0-CE-resources-allocation
+
+## Handle chunks split edge conditions ##
+- Issue Type: Support
+- Issue ID: SUP-13904
+
+### Configuration ###
+None.
+
 # Mercury 13.15.0 #
 
 ## Entry added to category Firebase notification template ##

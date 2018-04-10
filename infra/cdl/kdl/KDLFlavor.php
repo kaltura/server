@@ -72,7 +72,6 @@ class KDLFlavor extends KDLMediaDataSet {
 		parent::__construct();
 	}
 	public function __destruct() {
-		unset($this);
 	}
 	public function __clone() {
 		if(!is_null($this->_container)) $this->_container = clone $this->_container;
@@ -1363,7 +1362,7 @@ $plannedDur = 0;
 				$target->_frameRate=24;
 			}
 			// For webrtc recordings - if FR==0, set FR=30
-			else if($target->_frameRate==0 && $source->IsFormatOf(array("vp8","v_vp8","vp9","v_vp9")) ){
+			else if($target->_frameRate==0 && $source->IsFormatOf(array("vp8","v_vp8","vp9","v_vp9","avc","avc1")) ){
 				$target->_frameRate=30;
 			}
 			

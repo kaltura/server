@@ -21,10 +21,17 @@ class KalturaClipAttributes extends KalturaOperationAttributes
 	 */
 	public $duration;
 
+	/**
+	 * global Offset In Destination in milliseconds
+	 * @var int
+	 */
+	public $globalOffsetInDestination;
+
 	private static $map_between_objects = array
 	(
 	 	"offset" , 
-	 	"duration" 
+	 	"duration",
+		"globalOffsetInDestination"
 	);
 
 	public function getMapBetweenObjects ( )

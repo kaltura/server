@@ -1037,20 +1037,24 @@ class kJobsManager
 		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
 		return self::addJob($batchJob, $jobData, BatchJobType::CONVERT_LIVE_SEGMENT);
 	}
-	
+
 	/**
 	 * @param BatchJob $parentJob
 	 * @param flavorAsset $asset
 	 * @param array $files
+	 * @param bool $shouldSort
+	 * @param null $offset
+	 * @param null $duration
 	 * @return BatchJob
 	 */
-	public static function addConcatJob(BatchJob $parentJob = null, flavorAsset $asset, array $files, $offset = null, $duration = null)
+	public static function addConcatJob(BatchJob $parentJob = null, flavorAsset $asset, array $files, $shouldSort = true , $offset = null, $duration = null)
 	{
 		$jobData = new kConcatJobData();
  		$jobData->setSrcFiles($files);
 		$jobData->setFlavorAssetId($asset->getId());
 		$jobData->setOffset($offset);
 		$jobData->setDuration($duration);
+		$jobData->setShouldSort($shouldSort);
 
  		$entry = $asset->getentry();
  		if($entry && $entry->getStatus() != entryStatus::READY)

@@ -10,6 +10,9 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_REALTIME = 'player-events-realtime';
 	const DATASOURCE_HISTORICAL = 'player-events-historical';
 	const DATASOURCE_ENTRY_LIFECYCLE = 'entry-lifecycle';
+	const DATASOURCE_BANDWIDTH_USAGE = 'bandwidth-usage';
+	const DATASOURCE_STORAGE_USAGE = 'storage-usage';
+	const DATASOURCE_TRANSCODING_USAGE = 'transcoding-usage';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
@@ -43,7 +46,7 @@ class kKavaBase extends kDruidBase
 	const PLAYBACK_TYPE_LIVE = 'live';
 	const PLAYBACK_TYPE_DVR = 'dvr';
 
-	// event types
+	// event types - player events
 	const EVENT_TYPE_PLAYER_IMPRESSION = 'playerImpression';
 	const EVENT_TYPE_PLAY_REQUESTED = 'playRequested';
 	const EVENT_TYPE_PLAY = 'play';
@@ -72,6 +75,13 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_SPEED = 'speed';
 	const EVENT_TYPE_VIEW = 'view';
 
+	// event types - storage / entry lifecycle
+	const EVENT_TYPE_STATUS = 'status';
+	const EVENT_TYPE_PHYSICAL_ADD = 'physicalAdd';
+	const EVENT_TYPE_PHYSICAL_DELETE = 'physicalDelete';
+	const EVENT_TYPE_LOGICAL_ADD = 'logicalAdd'; 
+	const EVENT_TYPE_LOGICAL_DELETE = 'logicalDelete';
+
 	// view events
 	const VIEW_EVENT_INTERVAL = 10;
 	const VIEW_EVENT_PERIOD = 'PT10S';	
@@ -85,6 +95,7 @@ class kKavaBase extends kDruidBase
 	const MEDIA_TYPE_AUDIO = 'Audio';
 	const MEDIA_TYPE_IMAGE = 'Image';
 	const MEDIA_TYPE_SHOW = 'Show';		// mix
+	const MEDIA_TYPE_FLASH = 'Flash';	// live stream
 
 	public static function isPartnerAllowed($partnerId, $serviceType) {
 	    if (kConf::hasParam(self::DRUID_URL)) {

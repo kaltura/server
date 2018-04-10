@@ -78,6 +78,8 @@ class kDruidBase
 	
 	const DRUID_URL = "druid_url";
 	
+	protected static $curl_handle = null;
+	
 	protected static function getIntervals($fromTime, $toTime)
 	{
 		$fromTime = gmdate('Y-m-d\\TH:i:s\\Z', $fromTime);
@@ -258,15 +260,25 @@ class kDruidBase
 		KalturaLog::log($post);
 			
 		$url = kConf::get(self::DRUID_URL);
-			
-		$ch = curl_init($url);
-		curl_setopt($ch, CURLOPT_HEADER, false);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_POST, true);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-		curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
+
+		if (!self::$curl_handle)
+		{
+			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_HEADER, false);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_POST, true);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+			curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
+			curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
+			self::$curl_handle = $ch;
+		}
+		else
+		{
+			$ch = self::$curl_handle;
+		}
+
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-			
+		
 		$startTime = microtime(true);
 		$response = curl_exec($ch);
 			
@@ -278,7 +290,7 @@ class kDruidBase
 			throw new Exception('Error while trying to connect to:'. $url .' error=' . curl_error($ch));
 		}
 			
-		curl_close($ch);
+		// Note: not closing the curl handle so that the connection can be reused
 			
 		$result = json_decode($response, true);
 	

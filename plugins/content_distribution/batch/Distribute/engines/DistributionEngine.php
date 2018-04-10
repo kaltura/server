@@ -103,26 +103,16 @@ abstract class DistributionEngine implements IDistributionEngine
 	}
 
 	/**
-	 * @param string $thumbAssetId
+	 * @param string $assetId
 	 * @return string url
 	 */
-	protected function getThumbAssetUrl($thumbAssetId)
+	protected function getAssetUrl($assetId)
 	{
 		$contentDistributionPlugin = KalturaContentDistributionClientPlugin::get(KBatchBase::$kClient);
-		return $contentDistributionPlugin->contentDistributionBatch->getAssetUrl($thumbAssetId);
+		return $contentDistributionPlugin->contentDistributionBatch->getAssetUrl($assetId);
 	
 //		$domain = $this->kalturaClient->getConfig()->serviceUrl;
 //		return "$domain/api_v3/service/thumbAsset/action/serve/thumbAssetId/$thumbAssetId";
-	}
-
-	/**
-	 * @param string $flavorAssetId
-	 * @return string url
-	 */
-	protected function getFlavorAssetUrl($flavorAssetId)
-	{
-		$contentDistributionPlugin = KalturaContentDistributionClientPlugin::get(KBatchBase::$kClient);
-		return $contentDistributionPlugin->contentDistributionBatch->getAssetUrl($flavorAssetId);
 	}
 
 	/**
@@ -199,5 +189,23 @@ abstract class DistributionEngine implements IDistributionEngine
 		{
 			KalturaLog::info("Can't serve caption asset id [$captionAssetId] " . $e->getMessage());
 		}
+	}
+
+	protected function getAssetFile($assetId, $directory)
+	{
+		KalturaLog::info("Retrieve asset content for assetId: [$assetId]");
+		try
+		{
+			$filePath = $directory . '/asset_'. $assetId;
+			$assetContentUrl = self::getAssetUrl($assetId);
+			$res = KCurlWrapper::getDataFromFile($assetContentUrl, $filePath);
+			if ($res)
+				return $filePath;
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::info("Can't serve asset id [$assetId] " . $e->getMessage());
+		}
+		return null;
 	}
 }

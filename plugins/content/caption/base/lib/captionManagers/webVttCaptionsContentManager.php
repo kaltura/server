@@ -185,20 +185,20 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 		return $itemsData;
 	}
 
-	public function buildFile($content, $clipStartTime, $clipEndTime)
+	public function buildFile($content, $clipStartTime, $clipEndTime, $globalOffset = 0)
 	{
-		$newFileContent = $this->createCaptionsFile($content, $clipStartTime, $clipEndTime, self::WEBVTT_TIMECODE_PATTERN);
+		$newFileContent = $this->createCaptionsFile($content, $clipStartTime, $clipEndTime, self::WEBVTT_TIMECODE_PATTERN, $globalOffset);
 		return $newFileContent;
 	}
 
-	protected function createAdjustedTimeLine($matches,  $clipStartTime, $clipEndTime)
+	protected function createAdjustedTimeLine($matches,  $clipStartTime, $clipEndTime, $globalOffset)
 	{
 		$startCaption = $this->parseWebvttStrTTTime($matches[1]);
 		$endCaption = $this->parseWebvttStrTTTime($matches[2]);
 		if (!kCaptionsContentManager::onTimeRange($startCaption, $endCaption, $clipStartTime, $clipEndTime))
 			return null;
-		$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($startCaption, $clipStartTime);
-		$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $endCaption);
+		$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($startCaption, $clipStartTime, $globalOffset);
+		$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $endCaption, $globalOffset);
 		$settings = isset($matches[3]) ? trim($matches[3]) : '';
 		$timeLine = kWebVTTGenerator::formatWebVTTTimeStamp($adjustedStartTime) . ' --> ' . kWebVTTGenerator::formatWebVTTTimeStamp($adjustedEndTime). $settings . kCaptionsContentManager::UNIX_LINE_ENDING;
 		return $timeLine;

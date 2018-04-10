@@ -105,6 +105,8 @@ for fileName in fileNames:
 			params.append('-H')
 		if options.matchAny:
 			params.append('--match-any')
+		if options.ignoreCase:
+			params.append('-i')
 		params.append(pattern)
 		params = ' '.join(map(shellQuote, params))
 		cmdLine = "gzip -cd %s | python %s" % (shellQuote(fileName), params)

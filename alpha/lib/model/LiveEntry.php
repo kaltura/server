@@ -329,7 +329,7 @@ abstract class LiveEntry extends entry
 	
 	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null, $currentDcOnly = false, array $flavorParamsIds = array())
 	{
-		$configurations = $this->getLiveStreamConfigurations($protocol, $tag, $currentDcOnly, $flavorParamsIds);
+		$configurations = $this->getLiveStreamConfigurations($protocol, $tag, $currentDcOnly, $flavorParamsIds, $format);
 		foreach($configurations as $configuration)
 		{
 			/* @var $configuration kLiveStreamConfiguration */
@@ -340,7 +340,7 @@ abstract class LiveEntry extends entry
 		return null;
 	}
 	
-	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false, array $flavorParamsIds = array())
+	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false, array $flavorParamsIds = array(), $format = null)
 	{
 		$configurations = array();
 		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes))
@@ -454,7 +454,8 @@ abstract class LiveEntry extends entry
 		$userIsOwner = kCurrentContext::getCurrentKsKuserId() == $this->getKuserId();
 		$isUserAllowedPreview = $this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
 		$isMediaServerPartner = (kCurrentContext::$ks_partner_id == Partner::MEDIA_SERVER_PARTNER_ID);
-		if (!$isAdmin && !$userIsOwner && !$isUserAllowedPreview && !$isMediaServerPartner)
+		$cannotViewExplicit = kCurrentContext::$ks_object ? kCurrentContext::$ks_object->verifyPrivileges(ks::PRIVILEGE_RESTRICT_EXPLICIT_LIVE_VIEW, ks::PRIVILEGE_WILDCARD): false;		
+		if (!$isAdmin && ((!$userIsOwner && !$isUserAllowedPreview && !$isMediaServerPartner)||$cannotViewExplicit))
 			return false;
 		return true;
 	}
@@ -559,7 +560,7 @@ abstract class LiveEntry extends entry
 		
 		if($liveEntryStatus === EntryServerNodeStatus::PLAYABLE)
 		{
-			if(is_null($this->getFirstBroadcast()) && $mediaServerIndex === EntryServerNodeType::LIVE_PRIMARY)
+			if(is_null($this->getFirstBroadcast()) && $mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY)
 				$this->setFirstBroadcast(kApiCache::getTime());
 			
 			$key = $this->getEntryServerNodeCacheKey($dbLiveEntryServerNode);

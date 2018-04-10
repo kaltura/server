@@ -26,6 +26,10 @@ class ReportService extends KalturaBaseService
 		KalturaReportType::VPAAS_USAGE,
 	);
 
+	static $forceKavaReports = array(
+		KalturaReportType::ENTRY_USAGE,
+	);
+
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -138,10 +142,14 @@ class ReportService extends KalturaBaseService
 	 */
 	public function getBaseTotalAction( $reportType , KalturaReportInputFilter $reportInputFilter , $objectIds = null )
 	{
-		$reportSubTotals =  KalturaReportBaseTotalArray::fromReportDataArray( myReportsMgr::getBaseTotal( $this->getPartnerId() , 
-			$reportType , 
-			$reportInputFilter->toReportsInputFilter() ,
-			$objectIds));
+		$reportsMgrClass = $this->getReportsManagerClass($reportType);
+		
+		$reportSubTotals =  KalturaReportBaseTotalArray::fromReportDataArray(  
+			call_user_func(array($reportsMgrClass, "getBaseTotal"), 
+				$this->getPartnerId() , 
+				$reportType , 
+				$reportInputFilter->toReportsInputFilter() ,
+				$objectIds));
 
 		return $reportSubTotals;
 	}
@@ -384,7 +392,7 @@ class ReportService extends KalturaBaseService
 	protected function getReportsManagerClass($reportType) 
 	{
 	    $reportsMgrClass = "myReportsMgr";
-	    if (in_array($reportType, self::$kavaReports) && kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::VOD_ALLOWED_PARTNERS))
+	    if (in_array($reportType, self::$forceKavaReports) || (in_array($reportType, self::$kavaReports) && kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::VOD_ALLOWED_PARTNERS)))
 	    {
 	        $reportsMgrClass = "kKavaReportsMgr";
 	    }

@@ -57,7 +57,8 @@ class KalturaDocCommentParser
     const DOCCOMMENT_KS_OPTIONAL = "/\\@ksOptional/i";
     
     const DOCCOMMENT_KS_IGNORED = "/\\@ksIgnored/i";
-    
+
+    const DOCCOMMENT_BETA = "/\\@beta/i";
 
     const MIN_LENGTH_CONSTRAINT = "minLength";
     const MAX_LENGTH_CONSTRAINT = "maxLength";
@@ -227,7 +228,12 @@ class KalturaDocCommentParser
      * @var bool
      */
     public $ksNeeded = true;
-    
+
+    /**
+     * @var bool
+     */
+    public $beta = false;
+
     /**
      * Parse a docComment
      *
@@ -244,6 +250,7 @@ class KalturaDocCommentParser
         $this->abstract = preg_match( self::DOCCOMMENT_ABSTRACT, $comment);
         $this->deprecated = preg_match( self::DOCCOMMENT_DEPRECATED, $comment);
         $this->serverOnly = preg_match( self::DOCCOMMENT_SERVER_ONLY, $comment);
+        $this->beta = preg_match( self::DOCCOMMENT_BETA, $comment);
 
         if(preg_match( self::DOCCOMMENT_KS_IGNORED, $comment))
         {

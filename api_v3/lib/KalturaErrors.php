@@ -679,6 +679,7 @@ class KalturaErrors extends APIErrors
 	const SERVER_NODE_NOT_FOUND = "SERVER_NODE_NOT_FOUND;HOST_NAME;server node with host name [@HOST_NAME@] not found";
 	const SERVER_NODE_PROVIDED_AS_PARENT_NOT_FOUND = "SERVER_NODE_PROVIDED_AS_PARENT_NOT_FOUND;NODE_IDS;The following parentIds where not found [@NODE_IDS@]";
 	const SERVER_NODE_PARENT_LOOP_DETECTED = "SERVER_NODE_PARENT_LOOP_DETECTED;ROUTE;ParentId loop detected on route [@ROUTE@], validate parentId tree definition";
+	const SERVER_NODE_NOT_FOUND_WITH_ID = "SERVER_NODE_NOT_FOUND;SERVER_NODE_ID;server node with id [@SERVER_NODE_ID@] not found";
 
 	/*
 	 * EntryServerNode service
@@ -692,4 +693,12 @@ class KalturaErrors extends APIErrors
 	 * OTP error
 	 */
 	const INVALID_OTP = 'INVALID_OTP;;OTP provided failed to validate';
+
+
+	/*
+	 * clip concat Error
+	 */
+
+	const CANNOT_CREATE_CLIP_FLAVOR_JOB = "CANNOT_CREATE_CLIP_FLAVOR_JOB;;cannot create clip, flavor convert batch job returned as null";
 }
+

@@ -133,4 +133,12 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 		
 		return EntryServerNodePeer::doSelect($c);
 	}
+
+	public static function retrieveByServerNodeIdAndType($serverNodeId, $type)
+	{
+		$c = KalturaCriteria::create(EntryServerNodePeer::OM_CLASS);
+		$c->add(EntryServerNodePeer::SERVER_NODE_ID, $serverNodeId);
+		$c->add(EntryServerNodePeer::SERVER_TYPE, $type);
+		return EntryServerNodePeer::doSelect($c);
+	}
 } // EntryServerNodePeer

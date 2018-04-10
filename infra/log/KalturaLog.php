@@ -111,7 +111,13 @@ class KalturaLog
 
 	static function analytics(array $data)
 	{
-		self::logByType(implode(',', $data), self::LOG_TYPE_ANALYTICS, self::NOTICE);
+		$message = '';
+		foreach ($data as $value)
+		{
+			$message .= strtr($value, ',', ' ') . ',';
+		}
+		$message = substr($message, 0, -1);
+		self::logByType($message, self::LOG_TYPE_ANALYTICS, self::NOTICE);
 	}
 
 	static function stderr($message, $priority = self::ERR)
