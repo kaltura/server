@@ -7,17 +7,11 @@
 class KalturaReoccurringVendorCredit extends KalturaTimeRangeVendorCredit
 {
 	/**
-	 * @var int
-	 */
-	public $reOccurrenceCount;
-	
-	/**
 	 * @var KalturaVendorCreditRecurrenceFrequency
 	 */
 	public $frequency;
 
 	private static $map_between_objects = array (
-		'reOccurrenceCount',
 		'frequency',
 	);
 	
@@ -44,7 +38,7 @@ class KalturaReoccurringVendorCredit extends KalturaTimeRangeVendorCredit
 	 */	 
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array("reOccurrenceCount", "frequency"));
+		$this->validatePropertyNotNull("frequency");
 		
 		parent::validateForInsert($propertiesToSkip);
 	}
