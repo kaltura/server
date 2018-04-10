@@ -95,6 +95,7 @@ class kKavaBase extends kDruidBase
 	const MEDIA_TYPE_AUDIO = 'Audio';
 	const MEDIA_TYPE_IMAGE = 'Image';
 	const MEDIA_TYPE_SHOW = 'Show';		// mix
+	const MEDIA_TYPE_FLASH = 'Flash';	// live stream
 
 	public static function isPartnerAllowed($partnerId, $serviceType) {
 	    if (kConf::hasParam(self::DRUID_URL)) {
