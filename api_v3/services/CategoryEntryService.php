@@ -394,7 +394,7 @@ class CategoryEntryService extends KalturaBaseService
 		$dbCategoryEntry->setStatus(CategoryEntryStatus::REJECTED);
 		$dbCategoryEntry->save();
 
-        $this->rejectChildren($entry,$categoryId);
+		$this->rejectChildren($entry,$categoryId);
     }
 	
 	/**
