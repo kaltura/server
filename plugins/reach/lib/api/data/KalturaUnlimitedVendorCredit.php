@@ -31,8 +31,8 @@ class KalturaUnlimitedVendorCredit extends KalturaBaseVendorCredit
 	*/
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array("credit", "fromDate"));
-		parent::validateForInsert($propertiesToSkip);
+		$this->validatePropertyNotNull("fromDate");
+		parent::validateForInsert(array("credit"));
 
 	}
 
