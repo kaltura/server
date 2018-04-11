@@ -80,6 +80,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_FORCE_TOTAL_COUNT = 'report_force_total_count';
 	const REPORT_TABLE_MAP = 'report_table_map';
 	const REPORT_TABLE_FINALIZE_FUNC = 'report_table_finalize_func';
+	const REPORT_EDIT_FILTER_FUNC = 'report_edit_filter_func';
 	
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -855,6 +856,7 @@ class kKavaReportsMgr extends kKavaBase
 			
 		// Note: historically this report returns the bandwidth in kb in table, and in mb in graph
 		myReportsMgr::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE => array(
+			self::REPORT_EDIT_FILTER_FUNC => 'self::partnerUsageEditFilter',
 			self::REPORT_JOIN_REPORTS => array(
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
@@ -881,6 +883,7 @@ class kKavaReportsMgr extends kKavaBase
 					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
 				),
 			),
+			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
 			self::REPORT_GRAPH_MAP => array(
 				'bandwidth' => self::METRIC_BANDWIDTH_SIZE_MB,
 			),
@@ -888,7 +891,43 @@ class kKavaReportsMgr extends kKavaBase
 				'avg_continuous_aggr_storage_mb' => self::METRIC_AVERAGE_STORAGE_MB,
 				'sum_partner_bandwidth_kb' => self::METRIC_BANDWIDTH_SIZE_KB,
 			),
+			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addRollupRow',
+		),
+
+		myReportsMgr::REPORT_TYPE_PARTNER_USAGE_DASHBOARD => array(
+			self::REPORT_EDIT_FILTER_FUNC => 'self::partnerUsageEditFilter',
+			self::REPORT_JOIN_REPORTS => array(
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_KB),
+				),
+				
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
+				),
+				
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+				),
+			),
 			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+			self::REPORT_TABLE_MAP => array(
+				'avg_continuous_aggr_storage_mb' => self::METRIC_AVERAGE_STORAGE_MB,
+				'sum_partner_bandwidth_kb' => self::METRIC_BANDWIDTH_SIZE_KB,
+			),
+			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addRollupRow',
 		),
 	);
 	
@@ -3697,6 +3736,11 @@ class kKavaReportsMgr extends kKavaBase
 		reportsInputFilter $input_filter,
 		$page_size, $page_index, $order_by, $object_ids = null, $flags = 0)
 	{
+		if (isset($report_def[self::REPORT_EDIT_FILTER_FUNC]))
+		{
+			call_user_func($report_def[self::REPORT_EDIT_FILTER_FUNC], $input_filter);
+		}
+				
 		if (!isset($report_def[self::REPORT_DIMENSION]))
 		{
 			$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
@@ -3798,11 +3842,6 @@ class kKavaReportsMgr extends kKavaBase
 		
 		self::init();		
 
-		if ($report_type == myReportsMgr::REPORT_TYPE_PARTNER_USAGE_DASHBOARD)
-		{
-			return self::getPartnerUsageDashboardTable($partner_id, $input_filter);
-		}
-		
 		// pager
 		if (!$page_size || $page_size < 0)
 			$page_size = 10;
@@ -3843,9 +3882,8 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 	
-	protected static function getPartnerUsageDashboardTable($partner_id, reportsInputFilter $input_filter)
+	protected static function partnerUsageEditFilter($input_filter)
 	{
-		// update the input filter
 		$current_date_id = date('Ymd');
 		$from_day = min($input_filter->from_day, $current_date_id);
 		
@@ -3855,44 +3893,10 @@ class kKavaReportsMgr extends kKavaBase
 		$date->modify('-1 day');
 		$month_end = min($date->format('Ymd'), $current_date_id);
 		
-		$is_free_package = $input_filter->extra_map[myPartnerUtils::IS_FREE_PACKAGE_PLACE_HOLDER];
+		$is_free_package = $input_filter->extra_map[myPartnerUtils::IS_FREE_PACKAGE_PLACE_HOLDER] == 'TRUE';
 		$input_filter->from_day = $is_free_package ? str_replace('-', '', self::BASE_DATE_ID) : $month_start;
 		$input_filter->to_day = $month_end;
-		$input_filter->intervals = reportInterval::MONTHS;
-		
-		// run the bandwidth usage report
-		$result = self::getTable(
-			$partner_id, 
-			myReportsMgr::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE, 
-			$input_filter,
-			self::MAX_RESULT_SIZE, 
-			1, 
-			null);
-		
-		if (!$is_free_package || !$result[1])
-		{
-			return $result;
-		}
-		
-		// in free package sum up the storage + bandwidth of all months
-		list($headers, $data, $total_count) = $result;
-		
-		$row = reset($data);
-		for (;;)
-		{
-			$cur_row = next($data);
-			if (!$cur_row)
-			{
-				break;
-			}
-			
-			for ($i = 1; $i < count($row); $i++)		// starting from 1 to skip the date id
-			{
-				$row[$i] += $cur_row[$i];
-			}
-		}
-		
-		return array($headers, array($row), 1);
+		$input_filter->interval = reportInterval::MONTHS;
 	}
 	
 	protected static function addCombinedUsageColumn(&$result)
@@ -3911,7 +3915,36 @@ class kKavaReportsMgr extends kKavaBase
 			$row[] = $row[$bandwidth] + $row[$storage]; 
 		}
 	}
+
+	protected static function getRollupRow($data)
+	{
+		$row = reset($data);
+		for (;;)
+		{
+			$cur_row = next($data);
+			if (!$cur_row)
+			{
+				break;
+			}
+			
+			for ($i = 1; $i < count($row); $i++)		// starting from 1 to skip the date id
+			{
+				$row[$i] += $cur_row[$i];
+			}
+		}
 		
+		return $row;
+	}
+	
+	protected static function addRollupRow(&$result)
+	{
+		list($headers, $data, $total_count) = $result;
+		
+		$data[] = self::getRollupRow($data);
+		
+		$result = array($headers, $data, $total_count);
+	}
+
 	/// total functions
 	protected static function getTotalPeakStorageFromTable($table)
 	{
