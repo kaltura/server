@@ -3945,15 +3945,6 @@ class kKavaReportsMgr extends kKavaBase
 		$result = array($headers, $data, $total_count);
 	}
 
-	protected static function replaceWithRollupRow(&$result)
-	{
-		list($headers, $data, $total_count) = $result;
-		
-		$data = array(self::getRollupRow($data));
-		
-		$result = array($headers, $data, $total_count);
-	}
-	
 	/// total functions
 	protected static function getTotalPeakStorageFromTable($table)
 	{
