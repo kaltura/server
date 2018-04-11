@@ -403,8 +403,10 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$tempEntry->setStatus(entryStatus::NO_CONTENT);
 		$tempEntry->setDisplayInSearch(EntryDisplayInSearchType::SYSTEM);
 		$tempEntry->setSourceType(EntrySourceType::CLIP);
+		$tempEntry->setKuserId(kCurrentContext::getCurrentKsKuserId());
 		$tempEntry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($partnerId)->getId());
 		$tempEntry->save();
+		KalturaLog::info('Temp ClipConcat Entry Created, Entry ID:  ' . $tempEntry->getId());
 		return $tempEntry;
 	}
 
