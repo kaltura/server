@@ -365,7 +365,7 @@ class kApiCache extends kApiCacheBase
 				return null;
 			foreach($refValue as $curRefValue)
 			{
-				if (kIpAddressUtils::isIpInRange($fieldValue, $curRefValue))
+				if (kIpAddressUtils::isIpInRanges($fieldValue, $curRefValue))
 					return true;
 			}
 			return false;
