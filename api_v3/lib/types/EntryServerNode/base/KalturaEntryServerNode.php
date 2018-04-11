@@ -125,6 +125,10 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 				$object = new KalturaLiveEntryServerNode();
 				break;
 
+			case KalturaEntryServerNodeType::LIVE_CLIPPING_TASK:
+				$object = new KalturaClippingTaskEntryServerNode();
+				break;
+
 			default:
 				$object = KalturaPluginManager::loadObject('KalturaEntryServerNode', $type);
 				if(!$object)

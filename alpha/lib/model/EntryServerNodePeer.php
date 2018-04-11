@@ -19,6 +19,7 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 	protected static $class_types_cache = array(
 		EntryServerNodeType::LIVE_PRIMARY => LiveEntryServerNode::OM_CLASS,
 		EntryServerNodeType::LIVE_BACKUP => LiveEntryServerNode::OM_CLASS,
+		EntryServerNodeType::LIVE_CLIPPING_TASK => ClippingTaskEntryServerNode::OM_CLASS,
 	);
 	
 	public static $connectedServerNodeStatuses = array(
@@ -54,7 +55,7 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 	 * @param      string $entryId .
 	 * @param      EntryServerNodeType $serverType .
 	 * @param      PropelPDO $con the connection to use
-	 * @return 	   array Array of matching EntryServerNodes
+	 * @return 	   EntryServerNode as of matching EntryServerNode
 	 * @throws     kCoreException
 	 */
 	public static function retrieveByEntryIdAndServerType($entryId, $serverType, PropelPDO $con = null)

@@ -700,6 +700,12 @@ class KalturaEntryService extends KalturaBaseService
 				return $this->attachLiveEntryResource($internalResource, $dbEntry, $dbAsset, $operationAttributes);
 			}
 
+			if (myEntryUtils::isLiveClippingEntry($dbEntry))
+			{
+				$this->createRecordedClippingTask($resource, $dbEntry);
+				return $dbAsset;
+			}
+
 			$dbAsset = $this->attachResource($internalResource, $dbEntry, $dbAsset);
 
 			$sourceType = $resource->getSourceType();
@@ -735,7 +741,56 @@ class KalturaEntryService extends KalturaBaseService
 		
 		return $dbAsset;
 	}
-	
+
+	protected function createRecordedClippingTask(kOperationResource $resource, entry $targetEntry)
+	{
+		$clippingTask = new ClippingTaskEntryServerNode();
+		$clippingTask->setClippedEntryId($targetEntry->getId());
+		$clippingTask->setClipAttributes(self::getResourceKClipAttributes($resource));
+		$clippingTask->setServerType(EntryServerNodeType::LIVE_CLIPPING_TASK);
+
+		$entry = self::getEntryFromContentResource($resource->getResource());
+		$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entry->getId(), EntryServerNodeType::LIVE_PRIMARY);
+		if (!$entry || ! $entryServerNode)
+		{
+			KalturaLog::err("Can't create clipping task for Resource: ". print_r($resource) . " with entry:" . print_r($entry) . " and [$entryServerNode]");
+			return null;
+		}
+
+		$clippingTask->setEntryId($entry->getId());
+		$clippingTask->setPartnerId($entry->getPartnerId());
+		$clippingTask->setServerNodeId($entryServerNode->getServerNodeId());
+		$clippingTask->save();
+		return $clippingTask;
+	}
+
+	/**
+	 * @param kContentResource $internalResource
+	 * @return entry|null
+	 */
+	private static function getEntryFromContentResource($internalResource)
+	{
+		if ($internalResource && $internalResource instanceof kFileSyncResource)
+		{
+			$entryId = $internalResource->getOriginEntryId();
+			if ($entryId)
+				return entryPeer::retrieveByPK($entryId);
+		}
+		return null;
+	}
+
+	/**
+	 * @param $kResource kOperationResource
+	 * @return kClipAttributes
+	 */
+	protected static function getResourceKClipAttributes($kResource)
+	{
+		foreach ($kResource->getOperationAttributes() as $opAttribute)
+			if ($opAttribute instanceof kClipAttributes)
+				return $opAttribute;
+		return null;
+	}
+
 	/**
 	 * @param IRemoteStorageResource $resource
 	 * @param entry $dbEntry

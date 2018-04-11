@@ -31,4 +31,9 @@ abstract class EntryServerNode extends BaseEntryServerNode {
 	
 		TrackEntry::addTrackEntry($te);
 	}
+
+	public function deleteOrMarkForDeletion()
+	{
+		return $this->delete();
+	}
 } // EntryServerNode
