@@ -658,11 +658,15 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function attachOperationResource(kOperationResource $resource, entry $dbEntry, asset $dbAsset = null)
 	{
-
 		$errDescription = '';
 		$operationAttributes = $resource->getOperationAttributes();
+		$srcEntry = self::getEntryFromContentResource($resource->getResource());
+		$isLiveClippingFlow = $srcEntry && myEntryUtils::isLiveClippingEntry($srcEntry);
+
 		if (kClipManager::isMultipleClipOperation($operationAttributes))
 		{
+			if ($isLiveClippingFlow)
+				throw KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_PARAMS);
 			$clipManager = new kClipManager();
 			$this->handleMultiClipRequest($resource,$dbEntry, $clipManager, $operationAttributes);
 			return $dbAsset;
@@ -690,7 +694,6 @@ class KalturaEntryService extends KalturaBaseService
 				$dbEntry->save();
 			}
 
-			$operationAttributes = $resource->getOperationAttributes();
 			$internalResource = $resource->getResource();
 			if($internalResource instanceof kLiveEntryResource)
 			{
@@ -700,9 +703,10 @@ class KalturaEntryService extends KalturaBaseService
 				return $this->attachLiveEntryResource($internalResource, $dbEntry, $dbAsset, $operationAttributes);
 			}
 
-			$srcEntry = self::getEntryFromContentResource($internalResource);
-			if ($srcEntry && myEntryUtils::isLiveClippingEntry($srcEntry))
+			if ($isLiveClippingFlow)
 			{
+				if ($srcEntry->getId() == $dbEntry->getId())
+					throw KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_PARAMS);
 				$this->createRecordedClippingTask($srcEntry, $dbEntry, $operationAttributes);
 				return $dbAsset;
 			}

@@ -232,7 +232,7 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 					return 'LiveStreamEntry';
 
 				case EventNotificationEventObjectType::ENTRY_SERVER_NODE:
-					return 'KalturaEntryServerNode';
+					return 'EntryServerNode';
 
 				case EventNotificationEventObjectType::SERVER_NODE:
 					return 'ServerNode';

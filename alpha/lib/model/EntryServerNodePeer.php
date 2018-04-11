@@ -55,7 +55,7 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 	 * @param      string $entryId .
 	 * @param      EntryServerNodeType $serverType .
 	 * @param      PropelPDO $con the connection to use
-	 * @return 	   EntryServerNode as of matching EntryServerNode
+	 * @return 	   EntryServerNode of matching EntryServerNode
 	 * @throws     kCoreException
 	 */
 	public static function retrieveByEntryIdAndServerType($entryId, $serverType, PropelPDO $con = null)
