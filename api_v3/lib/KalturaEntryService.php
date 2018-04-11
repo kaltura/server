@@ -702,7 +702,7 @@ class KalturaEntryService extends KalturaBaseService
 
 				return $this->attachLiveEntryResource($internalResource, $dbEntry, $dbAsset, $operationAttributes);
 			}
-
+			
 			if ($isLiveClippingFlow)
 			{
 				if ($srcEntry->getId() == $dbEntry->getId())
