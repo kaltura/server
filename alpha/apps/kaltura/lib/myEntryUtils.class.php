@@ -1884,7 +1884,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 	public static function isLiveClippingEntry(entry $entry, $validateStatus = true)
 	{
-		return $entry->getIsRecordedEntry() && self::shouldServeVodFromLive($entry, $validateStatus);
+		return $entry && $entry->getIsRecordedEntry() && self::shouldServeVodFromLive($entry, $validateStatus);
 	}
 
 	public static function isEntryReady($entryId)

@@ -700,9 +700,10 @@ class KalturaEntryService extends KalturaBaseService
 				return $this->attachLiveEntryResource($internalResource, $dbEntry, $dbAsset, $operationAttributes);
 			}
 
-			if (myEntryUtils::isLiveClippingEntry($dbEntry))
+			$srcEntry = self::getEntryFromContentResource($internalResource);
+			if ($srcEntry && myEntryUtils::isLiveClippingEntry($srcEntry))
 			{
-				$this->createRecordedClippingTask($resource, $dbEntry);
+				$this->createRecordedClippingTask($srcEntry, $dbEntry, $operationAttributes);
 				return $dbAsset;
 			}
 
@@ -742,23 +743,22 @@ class KalturaEntryService extends KalturaBaseService
 		return $dbAsset;
 	}
 
-	protected function createRecordedClippingTask(kOperationResource $resource, entry $targetEntry)
+	protected function createRecordedClippingTask(entry $srcEntry, entry $targetEntry, $operationAttributes)
 	{
 		$clippingTask = new ClippingTaskEntryServerNode();
 		$clippingTask->setClippedEntryId($targetEntry->getId());
-		$clippingTask->setClipAttributes(self::getResourceKClipAttributes($resource));
+		$clippingTask->setClipAttributes(self::getKClipAttributes($operationAttributes));
 		$clippingTask->setServerType(EntryServerNodeType::LIVE_CLIPPING_TASK);
 
-		$entry = self::getEntryFromContentResource($resource->getResource());
-		$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entry->getId(), EntryServerNodeType::LIVE_PRIMARY);
-		if (!$entry || ! $entryServerNode)
+		$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($srcEntry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
+		if (!$entryServerNode)
 		{
-			KalturaLog::err("Can't create clipping task for Resource: ". print_r($resource) . " with entry:" . print_r($entry) . " and [$entryServerNode]");
+			KalturaLog::err("Can't create clipping task for SrcEntry: ". $srcEntry->getId() . " to entry:" . $targetEntry->getId() . " with: " . print_r($operationAttributes ,true));
 			return null;
 		}
 
-		$clippingTask->setEntryId($entry->getId());
-		$clippingTask->setPartnerId($entry->getPartnerId());
+		$clippingTask->setEntryId($srcEntry->getId());
+		$clippingTask->setPartnerId($srcEntry->getPartnerId());
 		$clippingTask->setServerNodeId($entryServerNode->getServerNodeId());
 		$clippingTask->save();
 		return $clippingTask;
@@ -780,12 +780,11 @@ class KalturaEntryService extends KalturaBaseService
 	}
 
 	/**
-	 * @param $kResource kOperationResource
 	 * @return kClipAttributes
 	 */
-	protected static function getResourceKClipAttributes($kResource)
+	protected static function getKClipAttributes($operationAttributes)
 	{
-		foreach ($kResource->getOperationAttributes() as $opAttribute)
+		foreach ($operationAttributes as $opAttribute)
 			if ($opAttribute instanceof kClipAttributes)
 				return $opAttribute;
 		return null;
