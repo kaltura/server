@@ -134,22 +134,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 */
 	private function cloneFlavorParam($sourceFlavorParamId,$entryId)
 	{
-		$mediaInfo = mediaInfoPeer::retrieveOriginalByEntryId($entryId);
 		$flavorParamsObj = assetParamsPeer::retrieveByPK($sourceFlavorParamId);
 		// unset flavorParamsObj ID
 		$flavorParamsObj->setId(null);
 		$flavorParamsObj->setNew(true);
 		$flavorParamsObj->setFormat(flavorParams::CONTAINER_FORMAT_MPEGTS);
-		$conversionEngines = explode(',', $flavorParamsObj->getConversionEngines());
-		if (is_null($flavorParamsObj->getConversionEnginesExtraParams()))
-			$newExtraConversionParams = $this->editConversionEngineExtraParam(array(), $conversionEngines, $mediaInfo);
-		else
-		{
-			$conversionExtraParams = explode('|', $flavorParamsObj->getConversionEnginesExtraParams());
-			$newExtraConversionParams =
-				$this->editConversionEngineExtraParam($conversionExtraParams ,$conversionEngines, $mediaInfo);
-		}
-		$flavorParamsObj->setConversionEnginesExtraParams($newExtraConversionParams);
+		$this->fixConversionParam($flavorParamsObj, $entryId);
 		//save the object
 		$flavorParamsObj->save();
 		//return the object ID
@@ -576,11 +566,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			if($i < count($conversionExtraParamsArray))
 				$ep = $conversionExtraParamsArray[$i];
 
-			if ($conversionEngines[$i] == 2 || $conversionEngines[$i] == 99)
+			if ($conversionEngines[$i] == conversionEngineType::FFMPEG || $conversionEngines[$i] == conversionEngineType::FFMPEG_AUX)
 			{
-				if (strpos($ep, '-map a') === false && $this->isMapAudio($mediaInfo))
+				if (strpos($ep, '-map a') === false && $mediaInfo && $mediaInfo->isContainAudio())
 					$ep .= ' -map a';
-				if (strpos($ep, '-map v') === false && $this->isMapVideo($mediaInfo))
+				if (strpos($ep, '-map v') === false && $mediaInfo && $mediaInfo->isContainVideo())
 					$ep .= ' -map v';
 			}
 			$newConversionExtraParams[] = $ep;
@@ -589,27 +579,22 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	}
 
 	/**
-	 * @param mediaInfo $mediaInfo
-	 * @return bool
+	 * @param assetParams $flavorParamsObj
+	 * @param string $entryId
 	 */
-	private function isMapVideo($mediaInfo)
+	private function fixConversionParam($flavorParamsObj, $entryId)
 	{
-		if ($mediaInfo && ($mediaInfo->getVideoFormat() || $mediaInfo->getVideoCodecId() || $mediaInfo->getVideoDuration()
-						|| $mediaInfo->getVideoBitRate()))
-			return true;
-		return false;
+		$mediaInfo = mediaInfoPeer::retrieveOriginalByEntryId($entryId);
+		$conversionEngines = explode(',', $flavorParamsObj->getConversionEngines());
+		if (is_null($flavorParamsObj->getConversionEnginesExtraParams()))
+			$newExtraConversionParams = $this->editConversionEngineExtraParam(array(), $conversionEngines, $mediaInfo);
+		else {
+			$conversionExtraParams = explode('|', $flavorParamsObj->getConversionEnginesExtraParams());
+			$newExtraConversionParams =
+				$this->editConversionEngineExtraParam($conversionExtraParams, $conversionEngines, $mediaInfo);
+		}
+		$flavorParamsObj->setConversionEnginesExtraParams($newExtraConversionParams);
 	}
 
-	/**
-	 * @param mediaInfo $mediaInfo
-	 * @return bool
-	 */
-	private function isMapAudio($mediaInfo)
-	{
-		if ($mediaInfo && ($mediaInfo->getAudioFormat() || $mediaInfo->getAudioCodecId() || $mediaInfo->getAudioDuration()
-						|| $mediaInfo->getAudioBitRate()))
-			return true;
-		return false;
-	}
 
 }

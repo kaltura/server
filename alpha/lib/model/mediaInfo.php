@@ -89,4 +89,26 @@ class mediaInfo extends BasemediaInfo
 		
 		return $rawDataXml->saveXML();
 	}
+
+	/**
+	 * @return bool
+	 */
+	public function isContainVideo()
+	{
+		if ($this->getVideoFormat() || $this->getVideoCodecId() || $this->getVideoDuration()
+				|| $this->getVideoBitRate())
+			return true;
+		return false;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isContainAudio()
+	{
+		if ($this->getAudioFormat() || $this->getAudioCodecId() || $this->getAudioDuration()
+				|| $this->getAudioBitRate())
+			return true;
+		return false;
+	}
 }
