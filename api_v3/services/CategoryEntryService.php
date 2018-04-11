@@ -279,12 +279,21 @@ class CategoryEntryService extends KalturaBaseService
 				
 	}
 
-
-	private function activateChildren($dbEntry, $categoryId)
+	private static function updateStatusChildern($dbEntry, $categoryId, $status)
 	{
 		$relatedEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($dbEntry->getId(), $dbEntry->getPartnerId());
 		foreach ($relatedEntries as $relatedEntry)
-			$this->activateAction($relatedEntry->getId(), $categoryId);
+		{
+			$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryIdNotRejected($categoryId, $relatedEntry->getId());
+			if(!$dbCategoryEntry)
+				throw new KalturaAPIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
+
+			if($dbCategoryEntry->getStatus() != CategoryEntryStatus::PENDING)
+				throw new KalturaAPIException(KalturaErrors::CANNOT_ACTIVATE_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING);
+
+			$dbCategoryEntry->setStatus($status);
+			$dbCategoryEntry->save();
+		}
 	}
 
 	/**
@@ -335,20 +344,12 @@ class CategoryEntryService extends KalturaBaseService
 		$dbCategoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
 		$dbCategoryEntry->save();
 
-		$this->activateChildren($entry,$categoryId);
-	}
-
-
-	private function rejectChildren($dbEntry,$categoryId)
-	{
-		$relatedEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($dbEntry->getId(), $dbEntry->getPartnerId());
-		foreach ($relatedEntries as $relatedEntry)
-			$this->rejectAction($relatedEntry->getId(), $categoryId);
+		self::updateStatusChildern($entry, $categoryId, CategoryEntryStatus::ACTIVE);
 	}
 
 	/**
 	 * activate CategoryEntry when it is pending moderation
-	 * 
+	 *
 	 * @action reject
 	 * @param string $entryId
 	 * @param int $categoryId
@@ -394,8 +395,8 @@ class CategoryEntryService extends KalturaBaseService
 		$dbCategoryEntry->setStatus(CategoryEntryStatus::REJECTED);
 		$dbCategoryEntry->save();
 
-		$this->rejectChildren($entry,$categoryId);
-    }
+		self::updateStatusChildern($entry, $categoryId, CategoryEntryStatus::REJECTED);
+	}
 	
 	/**
 	 * update privacy context from the category
