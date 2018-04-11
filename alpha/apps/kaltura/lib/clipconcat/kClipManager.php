@@ -128,16 +128,26 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	/***
 	 * @param $sourceFlavorParamId
+	 * @param $entryId
 	 * @return int
 	 * @throws PropelException
 	 */
-	private function cloneFlavorParam($sourceFlavorParamId)
+	private function cloneFlavorParam($sourceFlavorParamId,$entryId)
 	{
+		$mediaInfo = mediaInfoPeer::retrieveOriginalByEntryId($entryId);
 		$flavorParamsObj = assetParamsPeer::retrieveByPK($sourceFlavorParamId);
 		// unset flavorParamsObj ID
 		$flavorParamsObj->setId(null);
 		$flavorParamsObj->setNew(true);
 		$flavorParamsObj->setFormat(flavorParams::CONTAINER_FORMAT_MPEGTS);
+		$conversionExtraParams = $flavorParamsObj->getConversionEnginesExtraParams();
+		if (strpos($conversionExtraParams, '-map a') === false && $mediaInfo)
+			$conversionExtraParams .= ' -map a ';
+
+		if (strpos($conversionExtraParams, '-map v') === false && $mediaInfo)
+			$conversionExtraParams .= ' -map v ';
+
+		$flavorParamsObj->setConversionEnginesExtraParams($conversionExtraParams);
 		//save the object
 		$flavorParamsObj->save();
 		//return the object ID
@@ -290,7 +300,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		foreach($operationAttributes as $singleAttribute)
 		{
 			KalturaLog::info("Going To create Flavor for clip: " . print_r($singleAttribute));
-			$clonedID =	$this->cloneFlavorParam($singleAttribute->getAssetParamsId());
+			$clonedID =	$this->cloneFlavorParam($singleAttribute->getAssetParamsId(),$entryId);
 			$flavorAsst = $this->createTempClipFlavorAsset($partnerId,$entryId,$clonedID,$order);
 			$batchJob =	kBusinessPreConvertDL::decideAddEntryFlavor($parentJob, $entryId,
 					$clonedID, $errDescription,$flavorAsst->getId()
@@ -471,7 +481,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	}
 
 	/**
-	 * @param $dbAsset
+	 * @param asset $dbAsset
 	 * @throws PropelException
 	 */
 	private function updateMediaFlowOnAsset($dbAsset)
@@ -485,8 +495,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	}
 
 	/**
-	 * @param $dbAsset
-	 * @param $dbEntry
+	 * @param asset $dbAsset
+	 * @param entry $dbEntry
 	 */
 	private function syncFlavorParamToAsset($dbAsset, $dbEntry)
 	{
@@ -497,8 +507,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	}
 
 	/**
-	 * @param $entryId
-	 * @param $dbEntry
+	 * @param string $entryId
+	 * @param entry $dbEntry
 	 */
 	private function updateAssetFailedToConvert($entryId, $dbEntry)
 	{
@@ -512,7 +522,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	/**
 	 * @param $concatSyncKey
-	 * @param $dbAsset
+	 * @param asset $dbAsset
 	 * @param $isNewAsset
 	 * @param $dbEntry
 	 * @throws PropelException
@@ -548,6 +558,5 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$destEntry->setStatus(entryStatus::PENDING);
 		$destEntry->save();
 	}
-
 
 }
