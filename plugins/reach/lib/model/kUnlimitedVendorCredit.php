@@ -20,7 +20,7 @@ class kUnlimitedVendorCredit extends kVendorCredit
 	 * @param $date
 	 * @return int
 	 */
-	public function getCurrentCredit()
+	public function getCurrentCredit($includeOverages = true)
 	{
 		$now = time();
 		if ( $now < $this->fromDate)
