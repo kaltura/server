@@ -971,9 +971,11 @@ class myPartnerUtils
 
 		$reportFilter = new reportsInputFilter();
 		$reportFilter->from_day = str_replace('-','',$report_date);
-		$reportFilter->to_day = date('Ymd');
-		$reportFilter->interval = reportInterval::MONTHS;
 
+		$reportFilter->extra_map[self::IS_FREE_PACKAGE_PLACE_HOLDER] = "FALSE";
+		if ($partnerPackage['id'] == 1) // free package
+			$reportFilter->extra_map[self::IS_FREE_PACKAGE_PLACE_HOLDER] = "TRUE";
+		
 		list($header, $data) = kKavaReportsMgr::getTable( $partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE ,
 		 $reportFilter, 10000 , 1 , "", null);
 
