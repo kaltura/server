@@ -67,7 +67,7 @@ class kReachUtils
 
 		$entryTaskPrice = self::calculateTaskPrice($entry, $catalogItem);
 		
-		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$$creditUsed] entryTaskPrice [$$entryTaskPrice]");
+		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$creditUsed] entryTaskPrice [$entryTaskPrice]");
 		$remainingCredit = $allowedCredit - ($creditUsed  + $entryTaskPrice);
 		
 		return $remainingCredit >= 0 ? true : false;
@@ -100,7 +100,7 @@ class kReachUtils
 		$creditUsed = $reachProfile->getUsedCredit();
 		$entryTaskPrice = $entryVendorTask->getPrice();
 		
-		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$$creditUsed] entryTaskPrice [$$entryTaskPrice]");
+		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$creditUsed] entryTaskPrice [$entryTaskPrice]");
 		$remainingCredit = $allowedCredit - ($creditUsed  + $entryTaskPrice);
 		
 		return $remainingCredit >= 0 ? true : false;
@@ -116,7 +116,7 @@ class kReachUtils
 
 		$creditUsed = $reachProfile->getUsedCredit();
 
-		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$$creditUsed] taskPriceDiff [$taskPriceDiff]");
+		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$creditUsed] taskPriceDiff [$taskPriceDiff]");
 		$remainingCredit = $allowedCredit - ($creditUsed  + $taskPriceDiff);
 		return $remainingCredit >= 0 ? true : false;
 	}
