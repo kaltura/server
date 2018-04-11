@@ -10,15 +10,20 @@ class kIpAddressUtils
 	const IP_ADDRESS_TYPE_MASK_ADDRESS = 2; // example: 192.168.1.1/255.255.0.0
 	const IP_ADDRESS_TYPE_MASK_CIDR    = 3; // example: 192.168.1.1/24
 	const IP_ADDRESS_TYPE_RANGE        = 4; // example: 192.168.1.0-192.168.1.240
-	
+	const IP_ADDRESS_TYPE_MULTIPLE_IPS = 5; // example: 192.168.1.0,192.168.1.240/24
+
 	const IP_ADDRESS_RANGE_CHAR    = '-';
 	const IP_ADDRESS_MASK_CHAR     = '/';
 	const IP_ADDRESS_PARTS_DELIMETER = '.';
+	const IP_ADDRESS_MULTIPLE_IPS_CHAR = ',';
 	
 	static protected $isInternalIp = array();
 	
 	private static function getAddressType($ip)
 	{
+		$multipleIps = strpos($ip, self::IP_ADDRESS_MULTIPLE_IPS_CHAR);
+		if ($multipleIps)
+			return self::IP_ADDRESS_TYPE_MULTIPLE_IPS;
 		$mask     = strpos($ip, self::IP_ADDRESS_MASK_CHAR);
 		$range    = strpos($ip, self::IP_ADDRESS_RANGE_CHAR);
 		
@@ -89,6 +94,8 @@ class kIpAddressUtils
        			$ipBinaryStr = sprintf("%032b",ip2long($ip)); 
        			$netBinaryStr = sprintf("%032b",ip2long($rangeIp)); 
         		return (substr_compare($ipBinaryStr,$netBinaryStr,0,$rangeMask) === 0);
+			case self::IP_ADDRESS_TYPE_MULTIPLE_IPS:
+				return self::isIpInRanges($ip, $range);
 		}
 		
 		if (class_exists('KalturaLog'))
