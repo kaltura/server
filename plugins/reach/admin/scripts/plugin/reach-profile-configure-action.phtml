@@ -78,23 +78,18 @@
 	}
 
 	function populateDates() {
-		var f = jQuery('#frmReachProfileConfigure');
-		f.find( "input[innertype=DateElement]").each(function(idx) {
-			var val = parseInt($(this).val());
-			if (isNaN(val))
-				return;
+   	    var f = jQuery('#frmReachProfileConfigure');
+    	    f.find( "input[innertype=DateElement]").each(function(idx) {
+      		var val = parseInt($(this).val());
+      		if (isNaN(val))
+        		return;
 
-			if ( val > 315360000) {// 10 Year in second (max relative time)
-				var d = new Date(0);
-				d.setUTCSeconds(val);
-				$(this).val(d.toISOString().slice(0,10).replace(/-/g,"."));
-				return;
-			}
-
-			var id = this.id; //set months instead of seconds
-			if (epocToMonthsField.some(function(v) { return id.indexOf(v) >= 0;}))
-				$(this).val(val / 2592000); // 60*60*24*30 - one month in seconds
-		});
-
+        	var d = new Date(0);
+        	d.setUTCSeconds(val);
+        	var formattedDate = ("0"+(d.getMonth()+1)).slice(-2) + "." + ("0" + d.getDate()).slice(-2) + "." +
+              	d.getFullYear();
+        	$(this).val(formattedDate);
+    		});
 	}
+
 </script>

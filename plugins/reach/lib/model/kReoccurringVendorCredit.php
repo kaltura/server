@@ -11,11 +11,6 @@
 class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 {
 	/**
-	 *  @var int
-	 */
-	protected $reOccurrenceCount;
-	
-	/**
 	 *  @var VendorCreditRecurrenceFrequency
 	 */
 	protected $frequency;
@@ -44,27 +39,11 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 	}
 
 	/**
-	 * @return the $reOccurrenceCount
-	 */
-	public function getReOccurrenceCount()
-	{
-		return $this->reOccurrenceCount;
-	}
-	
-	/**
 	 * @return string $frequency
 	 */
 	public function getFrequency()
 	{
 		return $this->frequency;
-	}
-	
-	/**
-	 * @param int $reOccurrenceCount
-	 */
-	public function setReOccurrenceCount($reOccurrenceCount)
-	{
-		$this->reOccurrenceCount = $reOccurrenceCount;
 	}
 	
 	/**

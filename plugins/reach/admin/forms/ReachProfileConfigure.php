@@ -48,7 +48,7 @@ class Form_ReachProfileConfigure extends ConfigureForm
 
 		$defaultSourceLanguageView = new Kaltura_Form_Element_EnumSelect('defaultSourceLanguage', array('enum' => 'Kaltura_Client_Reach_Enum_CatalogItemLanguage'));
 		$defaultSourceLanguageView->setLabel('Default Source Language:');
-		$defaultSourceLanguageView->setValue(Kaltura_Client_Enum_Language::AA);
+		$defaultSourceLanguageView->setValue(Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN);
 		$this->addElement($defaultSourceLanguageView);
 
 		$defaultOutputFormatView = new Kaltura_Form_Element_EnumSelect('defaultOutputFormat', array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat'));
@@ -242,6 +242,7 @@ class Form_ReachProfileConfigure extends ConfigureForm
 		$object = parent::getObject($objectType, $properties, $add_underscore,$include_empty_fields);
 
 		$rules = $properties['ReachProfileRules'];
+		$rulesArray = array();
 		foreach (json_decode($rules) as $rule)
 		{
 			switch(array_search($rule->ruleType, self::$rulesMap))
@@ -259,7 +260,7 @@ class Form_ReachProfileConfigure extends ConfigureForm
 		$object->rules = $rulesArray;
 		$dictionaries = $properties['ReachProfileDictionaries'];
 		$dictionariesArray = array();
-		foreach (json_decode($dictionaries) as $dictionary)
+		foreach ((array)json_decode($dictionaries) as $dictionary)
 		{
 			$dictionaryItem = new Kaltura_Client_Reach_Type_Dictionary();
 			$dictionaryItem->language = $dictionary->language;

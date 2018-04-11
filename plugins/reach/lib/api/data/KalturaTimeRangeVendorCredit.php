@@ -33,10 +33,16 @@ class KalturaTimeRangeVendorCredit extends KalturaVendorCredit
 		return parent::toObject($dbObject, $propsToSkip);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyNotNull("toDate");
 		
 		parent::validateForInsert($propertiesToSkip);
+
+		if ($this->fromDate > $this->toDate)
+			throw new KalturaAPIException(KalturaReachErrors::INVALID_CREDIT_DATES , $this->fromDate, $this->toDate);
 	}
 }
