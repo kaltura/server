@@ -123,10 +123,10 @@ class kReachUtils
 	
 	public static function isDuplicateTask($entryId, $catalogItemId, $partnerId, $version)
 	{
-		$existingTask = EntryVendorTaskPeer::retrieveEntryIdAndCatalogItemIdAndEntryVersion($entryId, $catalogItemId, $partnerId, $version);
-		if(!$existingTask || in_array($existingTask->getStatus(), array(EntryVendorTaskStatus::ABORTED, EntryVendorTaskStatus::ERROR, EntryVendorTaskStatus::REJECTED)))
-			return false;
+		$activeTask = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $catalogItemId, $partnerId, $version);
+		if($activeTask)
+			return true;
 		
-		return true;
+		return false;
 	}
 }

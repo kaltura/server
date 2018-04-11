@@ -22,6 +22,22 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 		$c->add(EntryVendorTaskPeer::CATALOG_ITEM_ID, $catalogItemId);
 		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
 		$c->add(EntryVendorTaskPeer::VERSION, $version);
+		return EntryVendorTaskPeer::doSelect($c);
+	}
+	
+	public function retrieveActiveTasks($entryId, $catalogItemId, $partnerId, $version)
+	{
+		$c = new Criteria();
+		$c->add(EntryVendorTaskPeer::ENTRY_ID, $entryId);
+		$c->add(EntryVendorTaskPeer::CATALOG_ITEM_ID, $catalogItemId);
+		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
+		$c->add(EntryVendorTaskPeer::VERSION, $version);
+		$c->add(EntryVendorTaskPeer::STATUS, 
+			array(EntryVendorTaskStatus::PROCESSING, 
+				EntryVendorTaskStatus::READY, 
+				EntryVendorTaskStatus::PENDING, 
+				EntryVendorTaskStatus::PENDING_MODERATION
+			), Criteria::IN);
 		return EntryVendorTaskPeer::doSelectOne($c);
 	}
 	
