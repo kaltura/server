@@ -48,7 +48,7 @@ class Form_ReachProfileConfigure extends ConfigureForm
 
 		$defaultSourceLanguageView = new Kaltura_Form_Element_EnumSelect('defaultSourceLanguage', array('enum' => 'Kaltura_Client_Reach_Enum_CatalogItemLanguage'));
 		$defaultSourceLanguageView->setLabel('Default Source Language:');
-		$defaultSourceLanguageView->setValue(Kaltura_Client_Enum_Language::AA);
+		$defaultSourceLanguageView->setValue(Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN);
 		$this->addElement($defaultSourceLanguageView);
 
 		$defaultOutputFormatView = new Kaltura_Form_Element_EnumSelect('defaultOutputFormat', array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat'));
