@@ -45,7 +45,7 @@ class viewPartnerTypesAction extends kalturaSystemAction
 		$input_filter->from_date = strtotime( $this->from_date );
 		$input_filter->to_date = strtotime( $this->to_date );
 
-		list ( $header , $data , $totalCount ) = myReportsMgr::getTable( 
+		list ( $header , $data , $totalCount ) = kKavaReportsMgr::getTable( 
 			null , 
 			myReportsMgr::REPORT_TYPE_SYSTEM_GENERIC_PARTNER_TYPE , 
 			$input_filter ,

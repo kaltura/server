@@ -74,7 +74,7 @@ class viewPartnersAAction extends kalturaSystemAction
 		$this->go = $this->getP ( "go" );
 		if ( $this->go )
 		{		
-			list ( $header , $data , $totalCount ) = myReportsMgr::getTable( 
+			list ( $header , $data , $totalCount ) = kKavaReportsMgr::getTable( 
 				null , 
 				myReportsMgr::REPORT_TYPE_SYSTEM_GENERIC_PARTNER , 
 				$input_filter ,
