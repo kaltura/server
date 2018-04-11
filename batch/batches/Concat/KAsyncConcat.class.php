@@ -251,7 +251,7 @@ class KAsyncConcat extends KJobHandlerWorker
 		else
 			$videoParamStr = "-c:v copy";
 		
-		if (isset($mi->videoFormat) || isset($mi->videoCodecId) || isset($mi->videoDuration))
+		if (isset($mi->videoFormat) || isset($mi->videoCodecId) || isset($mi->videoDuration) || isset($mi->videoBitRate))
 			$videoParamStr.= " -map v ";
 
 			/*
@@ -260,7 +260,7 @@ class KAsyncConcat extends KJobHandlerWorker
 			 * otherwise - convert to AAC
 			 */
 		$audioParamStr = null;
-		if(isset($mi->audioFormat) || isset($mi->audioCodecId) || isset($mi->audioDuration)) {
+		if(isset($mi->audioFormat) || isset($mi->audioCodecId) || isset($mi->audioDuration) || isset($mi->audioBitRate)) {
 			if(isset($mi->audioFormat) && $mi->audioFormat=="aac")
 				$audioParamStr = "-c:a copy";
 			else

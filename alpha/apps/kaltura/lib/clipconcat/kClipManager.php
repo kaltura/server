@@ -140,14 +140,16 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$flavorParamsObj->setId(null);
 		$flavorParamsObj->setNew(true);
 		$flavorParamsObj->setFormat(flavorParams::CONTAINER_FORMAT_MPEGTS);
-		$conversionExtraParams = $flavorParamsObj->getConversionEnginesExtraParams();
-		if (strpos($conversionExtraParams, '-map a') === false && $mediaInfo)
-			$conversionExtraParams .= ' -map a ';
-
-		if (strpos($conversionExtraParams, '-map v') === false && $mediaInfo)
-			$conversionExtraParams .= ' -map v ';
-
-		$flavorParamsObj->setConversionEnginesExtraParams($conversionExtraParams);
+		$conversionEngines = explode(',', $flavorParamsObj->getConversionEngines());
+		if (is_null($flavorParamsObj->getConversionEnginesExtraParams()))
+			$newExtraConversionParams = $this->editConversionEngineExtraParam(array(), $conversionEngines, $mediaInfo);
+		else
+		{
+			$conversionExtraParams = explode('|', $flavorParamsObj->getConversionEnginesExtraParams());
+			$newExtraConversionParams =
+				$this->editConversionEngineExtraParam($conversionExtraParams ,$conversionEngines, $mediaInfo);
+		}
+		$flavorParamsObj->setConversionEnginesExtraParams($newExtraConversionParams);
 		//save the object
 		$flavorParamsObj->save();
 		//return the object ID
@@ -557,6 +559,57 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$destEntry->setOperationAttributes($operationAttributes);
 		$destEntry->setStatus(entryStatus::PENDING);
 		$destEntry->save();
+	}
+
+	/**
+	 * @param array $conversionExtraParamsArray
+	 * @param array $conversionEngines
+	 * @param mediaInfo $mediaInfo
+	 * @return string
+	 */
+	private function editConversionEngineExtraParam($conversionExtraParamsArray, $conversionEngines, $mediaInfo)
+	{
+		$newConversionExtraParams = array();
+		for ($i = 0; $i < count($conversionEngines) ; $i++)
+		{
+			$ep = '';
+			if($i < count($conversionExtraParamsArray))
+				$ep = $conversionExtraParamsArray[$i];
+
+			if ($conversionEngines[$i] == 2 || $conversionEngines[$i] == 99)
+			{
+				if (strpos($ep, '-map a') === false && $this->isMapAudio($mediaInfo))
+					$ep .= ' -map a';
+				if (strpos($ep, '-map v') === false && $this->isMapVideo($mediaInfo))
+					$ep .= ' -map v';
+			}
+			$newConversionExtraParams[] = $ep;
+		}
+		return implode(' | ',$newConversionExtraParams);
+	}
+
+	/**
+	 * @param mediaInfo $mediaInfo
+	 * @return bool
+	 */
+	private function isMapVideo($mediaInfo)
+	{
+		if ($mediaInfo && ($mediaInfo->getVideoFormat() || $mediaInfo->getVideoCodecId() || $mediaInfo->getVideoDuration()
+						|| $mediaInfo->getVideoBitRate()))
+			return true;
+		return false;
+	}
+
+	/**
+	 * @param mediaInfo $mediaInfo
+	 * @return bool
+	 */
+	private function isMapAudio($mediaInfo)
+	{
+		if ($mediaInfo && ($mediaInfo->getAudioFormat() || $mediaInfo->getAudioCodecId() || $mediaInfo->getAudioDuration()
+						|| $mediaInfo->getAudioBitRate()))
+			return true;
+		return false;
 	}
 
 }
