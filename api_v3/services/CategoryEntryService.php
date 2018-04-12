@@ -285,12 +285,6 @@ class CategoryEntryService extends KalturaBaseService
 		foreach ($relatedEntries as $relatedEntry)
 		{
 			$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryIdNotRejected($categoryId, $relatedEntry->getId());
-			if(!$dbCategoryEntry)
-				throw new KalturaAPIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
-
-			if($dbCategoryEntry->getStatus() != CategoryEntryStatus::PENDING)
-				throw new KalturaAPIException(KalturaErrors::CANNOT_ACTIVATE_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING);
-
 			$dbCategoryEntry->setStatus($status);
 			$dbCategoryEntry->save();
 		}
