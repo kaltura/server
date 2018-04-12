@@ -107,7 +107,7 @@ class webexWrapper
 
 	/**
 	 * @param string[] $stringServiceTypes
-	 * @return WebexXmlArray
+	 * @return WebexXmlComServiceTypeType[]
 	 */
 	public static function stringServicesTypesToWebexXmlArray($stringServiceTypes)
 	{
