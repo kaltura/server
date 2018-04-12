@@ -144,6 +144,7 @@ class webexWrapper
 				throw $e;
 			}
 
+			$this->logDebug("No records found between {$startTime} and {$endTime}");
 			return null;
 		}
 

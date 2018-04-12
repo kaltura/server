@@ -35,4 +35,4 @@ $webexWrapper = new webexWrapper($webexServiceUrl, $securityContext, array("scri
 $createTimeStart = date('m/j/Y H:i:s', $startTime);
 $createTimeEnd  = date('m/j/Y H:i:s', $endTime);
 $serviceTypes = webexWrapper::stringServicesTypesToWebexXmlArray(array(WebexXmlComServiceTypeType::_MEETINGCENTER));
-$webexWrapper->deleteRecordingsByDates($serviceTypes, $createTimeStart, $createTimeEnd);
+$result = $webexWrapper->listRecordings($serviceTypes, $createTimeStart, $createTimeEnd);
