@@ -316,7 +316,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	private function areAllClipJobsDone($batchJob)
 	{
 
-		$childJobs = $batchJob->getRootJob()->getChildJobs();
+		$c = new Criteria();
+		$c->add(BatchJobPeer::JOB_TYPE,BatchJobType::CONVERT);
+		$childJobs = $batchJob->getRootJob()->getChildJobs($c);
 		/**
 		 * check if all child jobs are finished(all clip jobs and then a single concat job)
 		 * @var BatchJob $job */
