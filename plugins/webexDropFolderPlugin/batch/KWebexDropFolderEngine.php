@@ -82,7 +82,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			$physicalFileName = $physicalFile->getName() . '_' . $physicalFile->getRecordingID();
 			if(!array_key_exists($physicalFileName, $dropFolderFilesMap))
 			{
-				$this->handleFileAdded ($physicalFile);
+				$this->handleFileAdded($physicalFile);
 				$maxTime = max(strtotime($physicalFile->getCreateTime()), $maxTime);
 				KalturaLog::info("Added new file with name [$physicalFileName]. maxTime updated: $maxTime");
 			}
@@ -141,8 +141,10 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		$securityContext = new WebexXmlSecurityContext();
 		$securityContext->setUid($this->dropFolder->webexUserId); // webex username
 		$securityContext->setPwd($this->dropFolder->webexPassword); // webex password
+		$securityContext->setSiteName($this->dropFolder->webexSiteName); // webex partner id
 		$securityContext->setSid($this->dropFolder->webexSiteId); // webex site id
 		$securityContext->setPid($this->dropFolder->webexPartnerId); // webex partner id
+
 		return $securityContext;
 	}
 	
