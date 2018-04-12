@@ -23,11 +23,17 @@
 				<eventObjectType>40</eventObjectType><!-- EventNotificationEventObjectType::ENTRY_SERVER_NODE -->
 
 				<eventConditions objectType="array">
-					<item objectType="KalturaEventObjectChangedCondition">
-						<description>Entry Server Node of clipping task status change</description>
+					<item objectType="KalturaEventFieldCondition">
+						<description>status_field_modified</description>
 						<modifiedColumns>status</modifiedColumns>
 						<field objectType="KalturaEvalBooleanField">
-							<code>$scope->getObject()->getServerType()</code>
+							<code>in_array(EntryServerNodePeer::STATUS, $scope->getEvent()->getModifiedColumns())</code>
+						</field>
+					</item>
+					<item objectType="KalturaFieldMatchCondition">
+						<description>serverType_Live_Clipping</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>($scope->getObject()->getServerType()==2)</code><!-- EntryServerNodeType::LIVE_CLIPPING_TASK -->
 						</field>
 					</item>
 				</eventConditions>
