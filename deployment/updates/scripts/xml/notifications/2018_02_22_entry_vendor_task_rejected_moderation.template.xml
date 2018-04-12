@@ -25,7 +25,7 @@
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
 						<field objectType="KalturaEvalBooleanField">
-							<code>$scope->getObject() instanceof EntryVendorTask &amp;&amp; in_array(EntryVendorTaskStatus::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getStatus() == EntryVendorTaskStatus::REJECTED</code>
+							<code>$scope->getObject() instanceof EntryVendorTask &amp;&amp; in_array(EntryVendorTaskPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getStatus() == EntryVendorTaskStatus::REJECTED</code>
 						</field>
 					</item>
 				</eventConditions>
