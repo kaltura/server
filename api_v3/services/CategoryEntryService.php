@@ -279,7 +279,7 @@ class CategoryEntryService extends KalturaBaseService
 				
 	}
 
-	private static function updateStatusChildern($dbEntry, $categoryId, $status)
+	private static function applyStatusOnChildren($dbEntry, $categoryId, $status)
 	{
 		$relatedEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($dbEntry->getId(), $dbEntry->getPartnerId());
 		foreach ($relatedEntries as $relatedEntry)
@@ -338,7 +338,7 @@ class CategoryEntryService extends KalturaBaseService
 		$dbCategoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
 		$dbCategoryEntry->save();
 
-		self::updateStatusChildern($entry, $categoryId, CategoryEntryStatus::ACTIVE);
+		self::applyStatusOnChildren($entry, $categoryId, CategoryEntryStatus::ACTIVE);
 	}
 
 	/**
@@ -389,7 +389,7 @@ class CategoryEntryService extends KalturaBaseService
 		$dbCategoryEntry->setStatus(CategoryEntryStatus::REJECTED);
 		$dbCategoryEntry->save();
 
-		self::updateStatusChildern($entry, $categoryId, CategoryEntryStatus::REJECTED);
+		self::applyStatusOnChildren($entry, $categoryId, CategoryEntryStatus::REJECTED);
 	}
 	
 	/**
