@@ -13,5 +13,6 @@ interface EntryServerNodeStatus extends BaseEnum
 
 	const LIVE_CLIPPING_TASK_CREATED = 5;
 	const LIVE_CLIPPING_TASK_QUEUED = 6;
-	const LIVE_CLIPPING_TASK_PROCESSED = 7;
+	const LIVE_CLIPPING_TASK_PROCESSING = 7;
+	const LIVE_CLIPPING_TASK_UPLOADING = 8;
 }
