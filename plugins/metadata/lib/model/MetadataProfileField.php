@@ -32,15 +32,9 @@ class MetadataProfileField extends BaseMetadataProfileField implements IBaseObje
 	public function getTrimChars()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_TRIM_CHARS);}
 	public function getExplodeChars()	{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_EXPLODE_CHARS);}
 	
-	public function setMatchType($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_MATCH_TYPE, $v);}
-	public function setTrimChars($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_TRIM_CHARS, $v);}
-	public function setExplodeChars($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_EXPLODE_CHARS, $v);}
-	
-	public function getTrimCharsArray()
-	{
-		$trimChars = $this->getTrimChars();
-		return explode(",", $trimChars);
-	}
+	public function setMatchType($v)	{ $this->putInCustomData(self::CUSTOM_DATA_FIELD_MATCH_TYPE, $v);}
+	public function setTrimChars($v)	{ $this->putInCustomData(self::CUSTOM_DATA_FIELD_TRIM_CHARS, $v);}
+	public function setExplodeChars($v)	{ $this->putInCustomData(self::CUSTOM_DATA_FIELD_EXPLODE_CHARS, $v);}
 	
 	public function getExplodeCharsArray()
 	{
