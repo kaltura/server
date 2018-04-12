@@ -6,14 +6,21 @@ class WebexXmlSecurityContext
 	protected $pwd; // WebEx password
 	protected $sid; // Site SiteID
 	protected $pid; // Site PartnerID
-	
+	protected $siteName; // Site Name
+
 	public function __toString()
 	{
 		$xml = "<securityContext>";
 		$xml .= "<webExID>$this->uid</webExID>";
 		$xml .= "<password>$this->pwd</password>";
-		$xml .= "<siteID>$this->sid</siteID>";
-		$xml .= "<partnerID>$this->pid</partnerID>";
+		if(empty($this->siteName))
+		{
+			$xml .= "<siteID>$this->sid</siteID>";
+			$xml .= "<partnerID>$this->pid</partnerID>";
+		}
+		else
+			$xml .= "<siteName>$this->siteName</siteName>";
+
 		$xml .= "</securityContext>";
 		
 		return $xml;
@@ -49,5 +56,13 @@ class WebexXmlSecurityContext
 	public function setPid($pid)
 	{
 		$this->pid = $pid;
+	}
+
+	/**
+	 * @param field_type $siteName
+	 */
+	public function setSiteName($siteName)
+	{
+		$this->siteName = $siteName;
 	}
 }

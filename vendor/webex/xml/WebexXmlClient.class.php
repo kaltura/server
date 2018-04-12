@@ -31,7 +31,7 @@ class WebexXmlClient
 
 	protected function isRunningOnBackupSite()
 	{
-		$url = "{$this->url}/webex/gsbstatus.php";
+		$url = substr($this->url, 0, strpos($this->url, "com")+3)."/webex/gsbstatus.php";
 		return (trim(@file_get_contents($url)) == 'TRUE');
 	}
 
@@ -58,7 +58,6 @@ class WebexXmlClient
 	 */
 	public function send(WebexXmlRequestBodyContent $requestBodyContent)
 	{
-		$this->validateNoBackup();
 		$request = new WebexXmlRequest($this->securityContext, $requestBodyContent);
 		$response = $this->doSend($request);
 		
@@ -85,6 +84,7 @@ class WebexXmlClient
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		curl_setopt($ch,CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_VERBOSE, $this->verbose);
 		
 		$response = curl_exec($ch);
