@@ -278,7 +278,18 @@ class CategoryEntryService extends KalturaBaseService
 		return $dbCategoryEntry->getId();
 				
 	}
-	
+
+	private static function applyStatusOnChildren($dbEntry, $categoryId, $status)
+	{
+		$relatedEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($dbEntry->getId(), $dbEntry->getPartnerId());
+		foreach ($relatedEntries as $relatedEntry)
+		{
+			$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryIdNotRejected($categoryId, $relatedEntry->getId());
+			$dbCategoryEntry->setStatus($status);
+			$dbCategoryEntry->save();
+		}
+	}
+
 	/**
 	 * activate CategoryEntry when it is pending moderation
 	 * 
@@ -320,17 +331,19 @@ class CategoryEntryService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::CANNOT_ACTIVATE_CATEGORY_ENTRY);
 		}
-			
+
 		if($dbCategoryEntry->getStatus() != CategoryEntryStatus::PENDING)
 			throw new KalturaAPIException(KalturaErrors::CANNOT_ACTIVATE_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING);
 			
 		$dbCategoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
 		$dbCategoryEntry->save();
+
+		self::applyStatusOnChildren($entry, $categoryId, CategoryEntryStatus::ACTIVE);
 	}
-	
+
 	/**
 	 * activate CategoryEntry when it is pending moderation
-	 * 
+	 *
 	 * @action reject
 	 * @param string $entryId
 	 * @param int $categoryId
@@ -369,12 +382,14 @@ class CategoryEntryService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::CANNOT_REJECT_CATEGORY_ENTRY);
 		}
-		
+
 		if($dbCategoryEntry->getStatus() != CategoryEntryStatus::PENDING)
 			throw new KalturaAPIException(KalturaErrors::CANNOT_REJECT_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING);
 			
 		$dbCategoryEntry->setStatus(CategoryEntryStatus::REJECTED);
 		$dbCategoryEntry->save();
+
+		self::applyStatusOnChildren($entry, $categoryId, CategoryEntryStatus::REJECTED);
 	}
 	
 	/**
