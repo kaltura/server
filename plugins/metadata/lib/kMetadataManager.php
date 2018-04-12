@@ -217,6 +217,16 @@ class kMetadataManager
 				$profileField->setKey($xPathData['name']);
 			if(isset($xPathData['label']))
 				$profileField->setLabel($xPathData['label']);
+			if(isset($xPathData['trimChars']))
+				$profileField->setTrimChars($xPathData['trimChars']);
+			if(isset($xPathData['explodeChars']))
+				$profileField->setExplodeChars($xPathData['explodeChars']);
+			
+			if(isset($xPathData['matchType']))
+				$profileField->setMatchType($xPathData['matchType']);
+			else
+				$profileField->setMatchType(MetadataProfileFieldMatchType::TEXT);
+			
 			if(isset($xPathData['type']))
 			{
 				$profileField->setType($xPathData['type']);
@@ -389,6 +399,26 @@ class kMetadataManager
 						continue;
 						
 					$searchItems[$profileField->getId()][] = $searchItemValue;
+					if($profileField->getMatchType() == MetadataProfileFieldMatchType::EXACT)
+					{
+						$trimChars = $profileField->getTrimChars();
+						$searchItemValue = strtr($searchItemValue, $trimChars, str_repeat("_", strlen($trimChars)));
+						
+						if($profileField->getExplodeChars())
+						{
+							$explodeChars = $profileField->getExplodeCharsArray();
+							$explodePattern = implode("|", $explodeChars);
+							$searchItemValues = preg_split( "/($explodePattern)/", $searchItemValue );
+							foreach ($searchItemValues as $searchItemValue)
+							{
+								$searchItems[$profileField->getId()][] =  MetadataPlugin::PLUGIN_NAME . '_' . $profileField->getId() . '_' . $searchItemValue;
+							}
+						}
+						else
+						{
+							$searchItems[$profileField->getId()][] =  MetadataPlugin::PLUGIN_NAME . '_' . $profileField->getId() . '_' . $searchItemValue;
+						}
+					}
 				}
 
 				if ($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT &&

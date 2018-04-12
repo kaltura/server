@@ -167,6 +167,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 						$value = $item->getValue();
 						$value = SphinxUtils::escapeString($value);
 						$fieldId = $xPaths[$field]->getId();
+						$matchType = $xPaths[$field]->getMatchType();
 						
 						// any value in the field
 						if(trim($value) == '*')
@@ -189,7 +190,38 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 							if ($item instanceof AdvancedSearchFilterMatchCondition && $item->not)
 								$dataCondition = "!\"{$pluginName}_{$fieldId} $value " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}\"";
 							else
-								$dataCondition = "{$pluginName}_{$fieldId} << ( \"$value\" ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}";
+							{
+								if($matchType == MetadataProfileFieldMatchType::EXACT)
+								{
+									$trimChars = $xPaths[$field]->getTrimChars();
+									$value = strtr($value, $trimChars, str_repeat("_", strlen($trimChars)));
+									
+									if($xPaths[$field]->getExplodeChars())
+									{
+										$explodeChars = $xPaths[$field]->getExplodeCharsArray();
+										$explodePattern = implode("|", $explodeChars);
+										$values = preg_split( "/($explodePattern)/", $value );
+										
+										$dataCondition = "";
+										foreach ($values as $value)
+										{
+											if(trim($value))
+											{
+												$dataCondition .= "{$pluginName}_{$fieldId}_$value ";
+											}
+										}
+									}
+									else
+									{
+										$dataCondition = "{$pluginName}_{$fieldId}_$value";
+									}
+								}
+								else
+								{
+									$dataCondition = "{$pluginName}_{$fieldId} << ( \"$value\" ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}";
+								}
+							}
+								
 						}
 
 						KalturaLog::debug("add $dataCondition");
