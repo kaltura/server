@@ -25,7 +25,7 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 		return EntryVendorTaskPeer::doSelect($c);
 	}
 	
-	public function retrieveActiveTasks($entryId, $catalogItemId, $partnerId, $version)
+	public static function retrieveActiveTasks($entryId, $catalogItemId, $partnerId, $version)
 	{
 		$c = new Criteria();
 		$c->add(EntryVendorTaskPeer::ENTRY_ID, $entryId);
