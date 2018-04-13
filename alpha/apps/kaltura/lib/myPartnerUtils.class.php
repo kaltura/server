@@ -12,9 +12,6 @@ class myPartnerUtils
 	const ALL_PARTNERS_WILD_CHAR = "*";
 	
 	const BLOCKING_DAYS_GRACE = 7;
-
-	const FREE_TRIAL_END_DAY = 30;
-	const FREE_TRIAL_PARTNER_DELETION_DAY = 60;
 	
 	private static $s_current_partner_id = null;
 	private static $s_set_partner_id_policy  = self::PARTNER_SET_POLICY_NONE;
@@ -1854,33 +1851,50 @@ class myPartnerUtils
 	 */
 	public static function handleDayInFreeTrial(Partner $partner)
 	{
+		$packages = new PartnerPackages();
+		$partnerPackageInfo = $packages->getPackageDetails($partner->getPartnerPackage());
+
+		$endDate = $partnerPackageInfo['trial_num_days'];
+		$deletionDate = $partnerPackageInfo['trial_num_days_until_deletion'];
+		$freeTrialUpdatesDays = explode(',', $partnerPackageInfo['notification_days']);
+
 		$dayInFreeTrial = dateUtils::diffInDays($partner->getCreatedAt(), dateUtils::today());
 		KalturaLog::debug("partner [{$partner->getId()}] is currently at the [$dayInFreeTrial] day of free trial");
 
-		if (($dayInFreeTrial >= self::FREE_TRIAL_END_DAY) && ($dayInFreeTrial < self::FREE_TRIAL_PARTNER_DELETION_DAY))
+		$partner = self::changeFreeTrialPartnerStatus($partner, $dayInFreeTrial, $endDate, $deletionDate);
+		if($freeTrialUpdatesDays)
+			$partner = self::checkForNotificationDay($partner, $dayInFreeTrial, $freeTrialUpdatesDays);
+
+		$partner->save();
+	}
+
+
+	public static function changeFreeTrialPartnerStatus($partner, $dayInFreeTrial, $endDate, $deletionDate)
+	{
+		if (($dayInFreeTrial >= $endDate) && ($dayInFreeTrial < $deletionDate))
 		{
 			KalturaLog::debug('Partner ['.$partner->getId().'] reached to end of free trial day. Blocking content.');
 			$partner->setStatus(Partner::PARTNER_STATUS_CONTENT_BLOCK);
 		}
 
-		if ($dayInFreeTrial >= self::FREE_TRIAL_PARTNER_DELETION_DAY)
+		if ($dayInFreeTrial >= $deletionDate)
 		{
 			KalturaLog::debug('Partner ['.$partner->getId().'] reached to free trial deletion day. Deleting partner.');
 			$partner->setStatus(Partner::PARTNER_STATUS_DELETED);
 		}
+		return $partner;
+	}
 
-		if(kConf::hasParam('free_trial_updates_days'))
+	public static function checkForNotificationDay($partner, $dayInFreeTrial, $freeTrialUpdatesDays)
+	{
+		$closestUpdatesDay = self::getClosestDay($dayInFreeTrial, $freeTrialUpdatesDays);
+		KalturaLog::debug('closest notification day comparing today [' . $closestUpdatesDay . ']');
+		if ($closestUpdatesDay > $partner->getLastFreeTrialNotificationDay())
 		{
-			$freeTrialUpdatesDays = kConf::get('free_trial_updates_days');
-			$closestUpdatesDay = self::getClosestDay($dayInFreeTrial, $freeTrialUpdatesDays);
-			KalturaLog::debug('closest day comparing today [' . $closestUpdatesDay . ']');
-			if ($closestUpdatesDay > $partner->getLastFreeTrialNotificationDay())
-			{
-				KalturaLog::debug('Partner [' . $partner->getId() . '] reached to one of the Marketo lead sync days.');
-				$partner->setLastFreeTrialNotificationDay($dayInFreeTrial);
-			}
+			KalturaLog::debug('Partner [' . $partner->getId() . '] reached to one of the Marketo lead sync days.');
+			$partner->setLastFreeTrialNotificationDay($dayInFreeTrial);
 		}
-		$partner->save();
+		return $partner;
 	}
 
 	/**
@@ -2053,8 +2067,9 @@ class myPartnerUtils
 	 */
 	public static function increaseEntriesChangedNum($entry)
 	{
+		$freeTrialTypes = array(PartnerPackages::PARTNER_PACKAGE_FREE, PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL);
 		$partner = PartnerPeer::retrieveByPK($entry->getPartnerId());
-		if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_FREE)
+		if(in_array($partner->getPartnerPackage(), $freeTrialTypes))
 		{
 			$entriesNum = $partner->getEntriesChangedByPartnerNum() + 1;
 			$partner->setEntriesChangedByPartnerNum($entriesNum);
@@ -2072,7 +2087,10 @@ class myPartnerUtils
 	 */
 	public static function isPartnerCreatedAsMonitoredFreeTrial($partner, $useCurrentTime = false)
 	{
-		$freeTrialStartDate = kConf::get('new_free_trial_start_date','local', null);
+		if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL)
+			$freeTrialStartDate = kConf::get('new_developer_free_trial_start_date','local', null);
+		else
+			$freeTrialStartDate = kConf::get('new_free_trial_start_date','local', null);
 		if(!$freeTrialStartDate)
 			return false;
 		$createTime = $partner->getCreatedAt();
