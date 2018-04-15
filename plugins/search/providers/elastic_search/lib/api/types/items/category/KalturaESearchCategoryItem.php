@@ -22,7 +22,6 @@ class KalturaESearchCategoryItem extends KalturaESearchAbstractCategoryItem
 		KalturaESearchCategoryFieldName::PRIVACY => ESearchCategoryFieldName::PRIVACY,
 		KalturaESearchCategoryFieldName::PRIVACY_CONTEXT => ESearchCategoryFieldName::PRIVACY_CONTEXT,
 		KalturaESearchCategoryFieldName::PRIVACY_CONTEXTS => ESearchCategoryFieldName::PRIVACY_CONTEXTS,
-		KalturaESearchCategoryFieldName::USER_IDS => ESearchCategoryFieldName::KUSER_IDS,
 		KalturaESearchCategoryFieldName::PARENT_ID => ESearchCategoryFieldName::PARENT_ID,
 		KalturaESearchCategoryFieldName::DEPTH => ESearchCategoryFieldName::DEPTH,
 		KalturaESearchCategoryFieldName::NAME => ESearchCategoryFieldName::NAME,

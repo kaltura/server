@@ -98,6 +98,44 @@ class elasticSearchUtils
 		return sprintf("ces%s", $status);
 	}
 
+	public static function formatCategoryUserPermissionLevel($userId, $permissionLevel)
+	{
+		return sprintf("uid%spl%s", $userId, $permissionLevel);
+	}
+
+	public static function formatCategoryUserPermissionName($userId, $permissionName)
+	{
+		return sprintf("uid%spn%s", $userId, $permissionName);
+	}
+
+	public static function getCategoryUserAllPermissionLevels($userId)
+	{
+		$formatPermissions = array();
+		$permissionLevelReflection = new ReflectionClass('CategoryKuserPermissionLevel');
+		$permissionLevels = $permissionLevelReflection->getConstants();
+		foreach ($permissionLevels as $permissionLevel)
+			$formatPermissions[] = elasticSearchUtils::formatCategoryUserPermissionLevel($userId, $permissionLevel);
+
+		return $formatPermissions;
+	}
+
+	public static function getCategoryUserAllPermissionNames($userId)
+	{
+		$formatPermissions = array();
+		$permissionNames = array(
+			PermissionName::CATEGORY_SUBSCRIBE,
+			PermissionName::CATEGORY_CONTRIBUTE,
+			PermissionName::CATEGORY_MODERATE,
+			PermissionName::CATEGORY_EDIT,
+			PermissionName::CATEGORY_VIEW,
+		);
+
+		foreach ($permissionNames as $permissionName)
+			$formatPermissions[] = elasticSearchUtils::formatCategoryUserPermissionName($userId, $permissionName);
+
+		return $formatPermissions;
+	}
+
 	public static function formatSearchTerm($searchTerm)
 	{
 		//remove extra spaces

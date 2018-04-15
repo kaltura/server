@@ -454,9 +454,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 			'script' => array(
 				'inline' => $this->getInlineScript(),
 				'lang' => 'painless',
-				'params' => array(
-					'kuser_id' => $this->getKuserId(),
-				)
+				'params' => $this->getScriptParams(),
 			),
 			'upsert' => new stdClass(),
 			'retry_on_conflict' => 10
@@ -464,16 +462,42 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 		return $body;
 	}
 
+	private function getScriptParams()
+	{
+		$removeValues = array($this->getKuserId());
+		$permissionLevels = elasticSearchUtils::getCategoryUserAllPermissionLevels($this->getKuserId());
+		$removeValues = array_merge($removeValues, $permissionLevels);
+		$permissionNames = elasticSearchUtils::getCategoryUserAllPermissionNames($this->getKuserId());
+		$removeValues = array_merge($removeValues, $permissionNames);
+
+		$params = array(
+			'usersToRemove' => $removeValues
+		);
+
+		if($this->getStatus() == CategoryKuserStatus::ACTIVE)
+		{
+			$addValues = array($this->getKuserId());
+			$addValues[] = elasticSearchUtils::formatCategoryUserPermissionLevel($this->getKuserId(), $this->getPermissionLevel());
+			$permissionNames = $this->getPermissionNames();
+			$permissionNames = explode(',', $permissionNames);
+			foreach ($permissionNames as $permissionName)
+				$addValues[] = elasticSearchUtils::formatCategoryUserPermissionName($this->getKuserId(), $permissionName);
+
+			$params['usersToAdd'] = $addValues;
+		}
+		return $params;
+	}
+
 	private function getInlineScript()
 	{
-		if($this->getStatus() == CategoryKuserStatus::DELETED)
+		if($this->getStatus() == CategoryKuserStatus::ACTIVE)
 		{
-			$script = "if(ctx._source.kuser_ids == null) {ctx.op = 'none'} else {int idx = ctx._source.kuser_ids.indexOf(params.kuser_id); if(idx != -1) {ctx._source.kuser_ids.remove(idx);}}";
+			$script = 'if(ctx._source.kuser_ids == null) {ctx._source.kuser_ids = new ArrayList(); for(p in params.usersToAdd){ctx._source.kuser_ids.add(p);}}';
+			$script .= 'else {ctx._source.kuser_ids.removeIf(item-> params.usersToRemove.contains(item)); for(p in params.usersToAdd){ctx._source.kuser_ids.add(p);}}';
 		}
 		else
 		{
-			$script = 'if(ctx._source.kuser_ids == null) {ctx._source.kuser_ids = new ArrayList(); ctx._source.kuser_ids.add(params.kuser_id);}';
-			$script .= 'else if(!ctx._source.kuser_ids.contains(params.kuser_id)) {ctx._source.kuser_ids.add(params.kuser_id);}';
+			$script = "if(ctx._source.kuser_ids == null) {ctx.op = 'none'} else {ctx._source.kuser_ids.removeIf(item-> params.usersToRemove.contains(item));}";
 		}
 
 		return $script;
