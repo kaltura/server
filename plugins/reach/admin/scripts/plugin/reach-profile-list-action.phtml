@@ -336,7 +336,12 @@
 	}
 
 	function isDatesFormat(val) {
-		return (val.split('.').length == 3 || val.split('/').length == 3);
+		var dateParts = val.split('.');
+		if (dateParts.length != 3 )
+			return false;
+		if (dateParts[0].length != 2 || dateParts[1].length != 2 || dateParts[2].length != 4)
+			return false;
+		return true;
 	}
 
 	function getEpochTime(val) {
@@ -352,8 +357,6 @@
 				alert("Not a valid Date!");
 			return;
 		}
-		if (isNaN(val))
-			alert("Please enter a valid Date!");
 	}
 
 
