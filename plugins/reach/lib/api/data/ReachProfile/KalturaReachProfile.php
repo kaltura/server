@@ -196,9 +196,17 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 		{
 			$this->validatePropertyNotNull("profileType");
 			$this->validatePropertyNotNull("credit");
-		}
-
-		$this->credit->validateForInsert();
+			$this->credit->validateForInsert();
+		}else // in case of update
+                {
+                       //if we are trying to update the credit object we must reset the used credit before.
+                       if ($this->credit != null )
+                       {
+                               $this->credit->validateForInsert();
+                               if ($sourceObject->getUsedCredit() > 0)
+                                       throw new KalturaAPIException(KalturaReachErrors::UPDATE_CREDIT_ERROR_USED_CREDIT_EXISTS, $this->id);
+                       }
+                }
 
 		//validating dictionary duplications
 		$languages = array();

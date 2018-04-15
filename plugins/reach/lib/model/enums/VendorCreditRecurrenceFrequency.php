@@ -5,8 +5,8 @@
  */ 
 interface VendorCreditRecurrenceFrequency extends BaseEnum
 {
-	const DAILY = DatesGenerator::DAILY;
-	const WEEKLY = DatesGenerator::WEEKLY;
-	const MONTHLY = DatesGenerator::MONTHLY;
-	const YEARLY = DatesGenerator::YEARLY;
+	const DAILY = "day";
+	const WEEKLY = "week";
+	const MONTHLY = "month";
+	const YEARLY = "year";
 }
