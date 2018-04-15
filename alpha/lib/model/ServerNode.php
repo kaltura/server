@@ -34,5 +34,17 @@ class ServerNode extends BaseServerNode {
 	
 		return $parentIds;
 	}
-	
+
+	public function preUpdate(PropelPDO $con = null)
+	{
+		$before = $this->getUpdatedAt();
+		$ret = parent::preUpdate($con);
+		if ($this->isColumnModified(ServerNodePeer::HEARTBEAT_TIME))
+		{
+			$this->setUpdatedAt($before);
+		}
+		return $ret;
+	}
+
+
 } // ServerNode
