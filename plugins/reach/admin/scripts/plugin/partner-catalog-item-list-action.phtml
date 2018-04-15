@@ -31,7 +31,8 @@
 		</tr>
 		</tfoot>
 		<tbody>
-		<?php foreach($this->paginator as /* Kaltura_Client_Reach_Type_VendorCatalogItem */ $catalogItem): ?>
+		<?php if ($this->paginator)
+			foreach($this->paginator as /* Kaltura_Client_Reach_Type_VendorCatalogItem */ $catalogItem): ?>
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
 				<td><input type="checkbox" name="catalogItemsCheckBoxItems[]" id="$catalogItemsCheckBox-<?php echo $catalogItem->id; ?>" value="<?php echo $catalogItem->id; ?>" <?php echo in_array($catalogItem->id, $values) ? 'checked="checked"':''; ?>/></td>
 				<td><?php echo $catalogItem->id; ?></td>
