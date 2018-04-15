@@ -32,9 +32,9 @@ class KalturaEntryResource extends KalturaContentResource
 		if (!$srcEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
 			
-		if($srcEntry->getMediaType() == KalturaMediaType::IMAGE || $srcEntry->getMediaType() == KalturaMediaType::LIVE_STREAM_FLASH)
-			return;
-		if (myEntryUtils::isLiveClippingEntry($srcEntry))
+		if($srcEntry->getMediaType() == KalturaMediaType::IMAGE || 
+			$srcEntry->getMediaType() == KalturaMediaType::LIVE_STREAM_FLASH ||
+				myEntryUtils::isLiveClippingEntry($srcEntry))
 			return;
 		
 		$srcFlavorAsset = null;

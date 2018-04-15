@@ -6,25 +6,25 @@
  */
 class ClippingTaskEntryServerNode extends TaskEntryServerNode
 {
-    const OM_CLASS = 'ClippingTaskEntryServerNode';
+	const OM_CLASS = 'ClippingTaskEntryServerNode';
 
-    const CUSTOM_DATA_CLIP_ATTRIBUTES = "clip_attributes";
-    const CUSTOM_DATA_CLIPPED_ENTRY_ID = "clipped_entry_id";
+	const CUSTOM_DATA_CLIP_ATTRIBUTES = "clip_attributes";
+	const CUSTOM_DATA_CLIPPED_ENTRY_ID = "clipped_entry_id";
 
-    public function getClipAttributes()
+	public function getClipAttributes()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_CLIP_ATTRIBUTES);
 	}
 
-    public function setClipAttributes($v)
+	public function setClipAttributes($v)
 	{
 		return $this->putInCustomData(self::CUSTOM_DATA_CLIP_ATTRIBUTES, $v);
 	}
 
 	public function getClippedEntryId()
 	{
-        return $this->getFromCustomData(self::CUSTOM_DATA_CLIPPED_ENTRY_ID);
-    }
+		return $this->getFromCustomData(self::CUSTOM_DATA_CLIPPED_ENTRY_ID);
+	}
 
 	public function setClippedEntryId($v)
 	{
@@ -36,9 +36,4 @@ class ClippingTaskEntryServerNode extends TaskEntryServerNode
    		return;
 	}
 
-    public function preInsert(PropelPDO $con = null)
-    {
-        $this->setStatus(EntryServerNodeStatus::LIVE_CLIPPING_TASK_CREATED);
-        return parent::preInsert($con);
-    }
 }

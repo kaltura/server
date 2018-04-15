@@ -19,19 +19,12 @@
 				<systemName>LIVE_CLIPPING_PUSH_NOTIFICATIONS</systemName>
 				<description>Push notification template used by the live clipping feature</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
-				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
 				<eventObjectType>40</eventObjectType><!-- EventNotificationEventObjectType::ENTRY_SERVER_NODE -->
 
 				<eventConditions objectType="array">
-					<item objectType="KalturaEventFieldCondition">
-						<description>status_field_modified</description>
-						<modifiedColumns>status</modifiedColumns>
-						<field objectType="KalturaEvalBooleanField">
-							<code>in_array(EntryServerNodePeer::STATUS, $scope->getEvent()->getModifiedColumns())</code>
-						</field>
-					</item>
 					<item objectType="KalturaFieldMatchCondition">
-						<description>serverType_Live_Clipping</description>
+						<description>entryServerNodeType_Live_Clipping</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>($scope->getObject()->getServerType()==2)</code><!-- EntryServerNodeType::LIVE_CLIPPING_TASK -->
 						</field>

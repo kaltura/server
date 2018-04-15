@@ -666,7 +666,7 @@ class KalturaEntryService extends KalturaBaseService
 		if (kClipManager::isMultipleClipOperation($operationAttributes))
 		{
 			if ($isLiveClippingFlow)
-				throw KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_PARAMS);
+				throw new KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_OPERATION, "MultiClip");
 			$clipManager = new kClipManager();
 			$this->handleMultiClipRequest($resource,$dbEntry, $clipManager, $operationAttributes);
 			return $dbAsset;
@@ -706,7 +706,7 @@ class KalturaEntryService extends KalturaBaseService
 			if ($isLiveClippingFlow)
 			{
 				if ($srcEntry->getId() == $dbEntry->getId())
-					throw KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_PARAMS);
+					throw new KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_OPERATION, "Trimming");
 				$this->createRecordedClippingTask($srcEntry, $dbEntry, $operationAttributes);
 				return $dbAsset;
 			}
@@ -749,18 +749,17 @@ class KalturaEntryService extends KalturaBaseService
 
 	protected function createRecordedClippingTask(entry $srcEntry, entry $targetEntry, $operationAttributes)
 	{
+		$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($srcEntry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
+		if (!$entryServerNode)
+		{
+			KalturaLog::debug("Can't create clipping task for SrcEntry: ". $srcEntry->getId() . " to entry:" . $targetEntry->getId() . " with: " . print_r($operationAttributes ,true));
+			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $srcEntry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
+		}
 		$clippingTask = new ClippingTaskEntryServerNode();
 		$clippingTask->setClippedEntryId($targetEntry->getId());
 		$clippingTask->setClipAttributes(self::getKClipAttributes($operationAttributes));
 		$clippingTask->setServerType(EntryServerNodeType::LIVE_CLIPPING_TASK);
-
-		$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($srcEntry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
-		if (!$entryServerNode)
-		{
-			KalturaLog::err("Can't create clipping task for SrcEntry: ". $srcEntry->getId() . " to entry:" . $targetEntry->getId() . " with: " . print_r($operationAttributes ,true));
-			return null;
-		}
-
+		$clippingTask->setStatus(EntryServerNodeStatus::LIVE_CLIPPING_TASK_CREATED);
 		$clippingTask->setEntryId($srcEntry->getId());
 		$clippingTask->setPartnerId($srcEntry->getPartnerId());
 		$clippingTask->setServerNodeId($entryServerNode->getServerNodeId());
