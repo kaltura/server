@@ -760,7 +760,7 @@ class KalturaEntryService extends KalturaBaseService
 		$clippingTask->setClipAttributes(self::getKClipAttributes($operationAttributes));
 		$clippingTask->setServerType(EntryServerNodeType::LIVE_CLIPPING_TASK);
 		$clippingTask->setStatus(EntryServerNodeStatus::LIVE_CLIPPING_TASK_CREATED);
-		$clippingTask->setEntryId($srcEntry->getId());
+		$clippingTask->setEntryId($srcEntry->getId()); //recorded entry
 		$clippingTask->setPartnerId($srcEntry->getPartnerId());
 		$clippingTask->setServerNodeId($entryServerNode->getServerNodeId());
 		$clippingTask->save();

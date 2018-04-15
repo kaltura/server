@@ -23,10 +23,10 @@
 				<eventObjectType>40</eventObjectType><!-- EventNotificationEventObjectType::ENTRY_SERVER_NODE -->
 
 				<eventConditions objectType="array">
-					<item objectType="KalturaFieldMatchCondition">
+					<item objectType="KalturaEventFieldCondition">
 						<description>entryServerNodeType_Live_Clipping</description>
 						<field objectType="KalturaEvalBooleanField">
-							<code>($scope->getObject()->getServerType()==2)</code><!-- EntryServerNodeType::LIVE_CLIPPING_TASK -->
+							<code>$scope->getObject()->getServerType()==2</code><!-- EntryServerNodeType::LIVE_CLIPPING_TASK -->
 						</field>
 					</item>
 				</eventConditions>
