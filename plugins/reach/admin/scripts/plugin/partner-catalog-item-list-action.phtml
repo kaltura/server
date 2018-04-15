@@ -31,9 +31,11 @@
 		</tr>
 		</tfoot>
 		<tbody>
-		<?php foreach($this->paginator as /* Kaltura_Client_Reach_Type_VendorCatalogItem */ $catalogItem): ?>
+		<?php 
+				if ($this->paginator)
+				foreach($this->paginator as /* Kaltura_Client_Reach_Type_VendorCatalogItem */ $catalogItem): ?>
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
-				<td><input type="checkbox" name="catalogItemsCheckBoxItems[]" id="$catalogItemsCheckBox-<?php echo $catalogItem->id; ?>" value="<?php echo $catalogItem->id; ?>" <?php echo in_array($catalogItem->id, $values) ? 'checked="checked"':''; ?>/></td>
+				<td><input type="checkbox" name="catalogItemsCheckBoxItems[]" id="$catalogItemsCheckBox-<?php echo $catalogItem->id; ?>" value="<?php echo $catalogItem->id; ?>" /></td>
 				<td><?php echo $catalogItem->id; ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemStatus', $catalogItem->status); ?></td>
 				<td><?php echo $catalogItem->systemName; ?></td>
@@ -43,7 +45,10 @@
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceType', $catalogItem->serviceType); ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $catalogItem->turnAroundTime); ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->sourceLanguage); ?></td>
-				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->targetLanguage); ?></td>
+				<td><?php if (isset($catalogItem->targetLanguage))
+										echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->targetLanguage);
+						  else
+										echo null;?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat', $catalogItem->outputFormat); ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $catalogItem->id;?>, <?php echo $this->filterForm->getElement('filter_input')->getValue(); ?>)">
