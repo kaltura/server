@@ -464,7 +464,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 
 	private function getScriptParams()
 	{
-		$removeValues = array($this->getKuserId());
+		$removeValues = array(strval($this->getKuserId()));
 		$permissionLevels = elasticSearchUtils::getCategoryUserAllPermissionLevels($this->getKuserId());
 		$removeValues = array_merge($removeValues, $permissionLevels);
 		$permissionNames = elasticSearchUtils::getCategoryUserAllPermissionNames($this->getKuserId());
@@ -476,7 +476,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 
 		if($this->getStatus() == CategoryKuserStatus::ACTIVE)
 		{
-			$addValues = array($this->getKuserId());
+			$addValues = array(strval($this->getKuserId()));
 			$addValues[] = elasticSearchUtils::formatCategoryUserPermissionLevel($this->getKuserId(), $this->getPermissionLevel());
 			$permissionNames = $this->getPermissionNames();
 			$permissionNames = explode(',', $permissionNames);
