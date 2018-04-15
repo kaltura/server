@@ -315,21 +315,19 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 */
 	private function areAllClipJobsDone($batchJob)
 	{
-
 		$c = new Criteria();
-		$c->add(BatchJobPeer::JOB_TYPE,BatchJobType::CONVERT);
+		$c->add(BatchJobPeer::JOB_TYPE,array(BatchJobType::CONVERT,BatchJobType::CONCAT),Criteria::IN);
+		$c->add(BatchJobPeer::STATUS,array(BatchJob::BATCHJOB_STATUS_FINISHED),Criteria::NOT_IN);
 		$childJobs = $batchJob->getRootJob()->getChildJobs($c);
-		/**
-		 * check if all child jobs are finished(all clip jobs and then a single concat job)
-		 * @var BatchJob $job */
-		foreach ($childJobs as $job)
+		if (count($childJobs) != 0)
 		{
-			if ($job->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED )
+			/** @var BatchJob $job */
+			foreach ($childJobs as $job)
 			{
 				KalturaLog::info("number of children:   ". count($childJobs));
 				KalturaLog::info('Child job id [' . $job->getId() . '] status [' . $job->getStatus() . ']');
-				return false;
 			}
+			return false;
 		}
 		if ($batchJob->getJobType() == BatchJobType::POSTCONVERT  &&
 			$batchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
