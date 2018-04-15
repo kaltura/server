@@ -464,26 +464,26 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 
 	private function getScriptParams()
 	{
-		$removeArr = array($this->getKuserId());
+		$removeValues = array($this->getKuserId());
 		$permissionLevels = elasticSearchUtils::getCategoryUserAllPermissionLevels($this->getKuserId());
-		$removeArr = array_merge($removeArr, $permissionLevels);
+		$removeValues = array_merge($removeValues, $permissionLevels);
 		$permissionNames = elasticSearchUtils::getCategoryUserAllPermissionNames($this->getKuserId());
-		$removeArr = array_merge($removeArr, $permissionNames);
+		$removeValues = array_merge($removeValues, $permissionNames);
 
 		$params = array(
-			'usersToRemove' => $removeArr
+			'usersToRemove' => $removeValues
 		);
 
 		if($this->getStatus() == CategoryKuserStatus::ACTIVE)
 		{
-			$add = array($this->getKuserId());
-			$add[] = elasticSearchUtils::formatCategoryUserPermissionLevel($this->getKuserId(), $this->getPermissionLevel());
+			$addValues = array($this->getKuserId());
+			$addValues[] = elasticSearchUtils::formatCategoryUserPermissionLevel($this->getKuserId(), $this->getPermissionLevel());
 			$permissionNames = $this->getPermissionNames();
 			$permissionNames = explode(',', $permissionNames);
 			foreach ($permissionNames as $permissionName)
-				$add[] = elasticSearchUtils::formatCategoryUserPermissionName($this->getKuserId(), $permissionName);
+				$addValues[] = elasticSearchUtils::formatCategoryUserPermissionName($this->getKuserId(), $permissionName);
 
-			$params['usersToAdd'] = $add;
+			$params['usersToAdd'] = $addValues;
 		}
 		return $params;
 	}

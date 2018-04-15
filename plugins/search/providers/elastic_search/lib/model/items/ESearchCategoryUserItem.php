@@ -5,8 +5,6 @@
  */
 class ESearchCategoryUserItem extends ESearchItem
 {
-	
-	const MAPPING_FIELD_KUSER_IDS = 'kuser_ids';
 
 	/**
 	 * @var ESearchCategoryUserFieldName
