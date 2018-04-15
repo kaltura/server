@@ -53,7 +53,8 @@ class KalturaVendorCredit extends KalturaBaseVendorCredit
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array("credit",'fromDate'));
+		$this->validatePropertyNotNull("fromDate");
+		$this->validatePropertyNotNull("credit");
 
 		if(!$this->allowOverage && $this->overageCredit && $this->overageCredit > 0)
 			throw new KalturaAPIException(KalturaReachErrors::CANNOT_SET_ALLOW_OVERAGE_CREDIT);

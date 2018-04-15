@@ -35,6 +35,10 @@ class ReachProfileService extends KalturaBaseService
 		/* @var $dbReachProfile ReachProfile */
 		$dbReachProfile->setPartnerId(kCurrentContext::getCurrentPartnerId());
 		$dbReachProfile->setStatus(KalturaReachProfileStatus::ACTIVE);
+
+		if ($dbReachProfile->getCredit() instanceof kReoccurringVendorCredit)
+			$dbReachProfile->getCredit()->setPeriodDates();
+
 		$dbReachProfile->save();
 
 		// return the saved object
@@ -99,6 +103,11 @@ class ReachProfileService extends KalturaBaseService
 
 		// save the object
 		$dbReachProfile = $reachProfile->toUpdatableObject($dbReachProfile);
+		/* @var $dbReachProfile ReachProfile */
+
+		if ($dbReachProfile->getCredit() instanceof kReoccurringVendorCredit)
+			$dbReachProfile->getCredit()->setPeriodDates();
+
 		$dbReachProfile->save();
 
 		// return the saved object
@@ -124,6 +133,9 @@ class ReachProfileService extends KalturaBaseService
 		if (!$dbReachProfile)
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
 
+		if ($status == KalturaReachProfileStatus::ACTIVE && $dbReachProfile->getCredit() instanceof kReoccurringVendorCredit)
+			$dbReachProfile->getCredit()->setPeriodDates();
+
 		// save the object
 		$dbReachProfile->setStatus($status);
 		$dbReachProfile->save();
@@ -132,6 +144,7 @@ class ReachProfileService extends KalturaBaseService
 		// return the saved object
 		$reachProfile = new KalturaReachProfile();
 		$reachProfile->fromObject($dbReachProfile, $this->getResponseProfile());
+
 		return $reachProfile;
 	}
 
