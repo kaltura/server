@@ -18,6 +18,7 @@ class KalturaESearchCategoryItem extends KalturaESearchAbstractCategoryItem
 	private static $map_dynamic_enum = array();
 
 	private static $map_field_enum = array(
+		KalturaESearchCategoryFieldName::ID => ESearchCategoryFieldName::ID,
 		KalturaESearchCategoryFieldName::PRIVACY => ESearchCategoryFieldName::PRIVACY,
 		KalturaESearchCategoryFieldName::PRIVACY_CONTEXT => ESearchCategoryFieldName::PRIVACY_CONTEXT,
 		KalturaESearchCategoryFieldName::PRIVACY_CONTEXTS => ESearchCategoryFieldName::PRIVACY_CONTEXTS,

@@ -120,7 +120,7 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 		
 		$flavorAssetIds = explode(',', $entryDistribution->flavorAssetIds);
 		$flavorAssetId = reset($flavorAssetIds);
-		$downloadURL = $this->getFlavorAssetUrl($flavorAssetId);
+		$downloadURL = $this->getAssetUrl($flavorAssetId);
 		
 		$xml = new SimpleXMLElement('<APIIngestRequest/>');
 		$xml->addChild('UserName', $distributionProfile->username);
@@ -149,7 +149,7 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 				$captionXml->addChild('ForeignKey', $caption->id);
 				
 				$ingestInfoXml = $captionXml->addChild('IngestInfo');
-				$ingestInfoXml->addChild('DownloadURL', $this->getFlavorAssetUrl($caption->id));
+				$ingestInfoXml->addChild('DownloadURL', $this->getAssetUrl($caption->id));
 				
 				$captionXml->addChild('Language', $caption->languageCode);
 			}

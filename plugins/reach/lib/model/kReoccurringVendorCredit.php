@@ -18,16 +18,28 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 	/**
 	 *  @var string
 	 */
-	protected $finalEndDate;
+	protected $periodStartDate;
 
+	/**
+	 *  @var string
+	 */
+	protected $periodEndDate;
+
+	/**
+	 * @param string $toDate
+	 */
+	public function setFromDate($toDate)
+	{
+		$this->periodStartDate = $toDate;
+		parent::setFromDate($toDate);
+	}
 
 	/**
 	 * @param string $toDate
 	 */
 	public function setToDate($toDate)
 	{
-		$this->finalEndDate = $toDate;
-		parent::setToDate($this->calculateNextPeriodEndDate());
+		$this->toDate = $toDate;
 	}
 
 	/**
@@ -35,7 +47,7 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 	 */
 	public function getToDate()
 	{
-		return $this->finalEndDate;
+		return $this->toDate;
 	}
 
 	/**
@@ -57,18 +69,67 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 	public function syncCredit($reachProfileId)
 	{
 		$syncedCredit = parent::syncCredit($reachProfileId);
-		if ( $this->getLastSyncTime() > $this->getToDate() )
+		if ( $this->getLastSyncTime() > $this->periodEndDate )
 		{
-			$this->calculateNextPeriodEndDate();
+			$this->calculateNextPeriodDates( $this->periodEndDate, $this->getLastSyncTime());
 			$this->setSyncedCredit(0);
 		}
 		return $syncedCredit;
 	}
 
-	private function calculateNextPeriodEndDate()
+	public function calculateNextPeriodDates($startTime,$currentDate)
 	{
-		$newTime = strtotime('+'.$this->getFrequency(), strtotime($this->getToDate()));
-		parent::setToDate(min ($newTime , $this->finalEndDate));
+		$endTime = strtotime('+1 '.$this->getFrequency(),$startTime);
+		while ($endTime < $currentDate )
+		{
+			$startTime = $endTime;
+			$endTime= strtotime('+1 '.$this->getFrequency(), $endTime);
+		}
+		$this->periodStartDate = $startTime;
+		$this->periodEndDate = min ($endTime, $this->getToDate());
 	}
 
+	public function setPeriodDates()
+	{
+		$this->periodStartDate = $this->getFromDate();
+		$this->periodEndDate = $this->getFromDate();
+		$this->calculateNextPeriodDates( $this->periodEndDate, time());
+	}
+
+
+	/***
+	 * @param $date
+	 * @return int
+	 */
+	public function getCurrentCredit($includeOverages = true)
+	{
+		$now = time();
+		if ( $now < $this->periodStartDate || $now > $this->periodEndDate )
+		{
+			KalturaLog::debug("Current date [$now] is not in credit time range  [from - $this->periodStartDate , to - $this->periodEndDate] ");
+			return 0;
+		}
+
+		$credit = $this->credit;
+		if($this->allowOverage)
+			$credit += $this->overageCredit;
+
+		return $credit;
+	}
+
+	/***
+	 * @return bool
+	 */
+	public function isActive($time = null)
+	{
+		$now = $time != null ? $time : time();
+		if (!parent::isActive($now))
+			return false;
+		if ( $now < $this->periodStartDate || $now > $this->periodEndDate )
+		{
+			KalturaLog::debug("Current date [$now] is not in frequency credit time Range cycle [from - $this->periodStartDate to - $this->periodEndDate] ");
+			return false;
+		}
+		return true;
+	}
 }

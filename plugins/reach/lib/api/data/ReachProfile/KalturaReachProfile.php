@@ -190,15 +190,23 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 		return strlen($data) <= self::MAX_DICTIONARY_LENGTH ? true : false;
 	}
 
-	private function validate(ReachProfile $sourceObject = null)
+	private function validate(ReachPkarofile $sourceObject = null)
 	{
 		if (!$sourceObject) //Source object will be null on insert
 		{
 			$this->validatePropertyNotNull("profileType");
 			$this->validatePropertyNotNull("credit");
+			$this->credit->validateForInsert();
+		}else // in case of update
+		{
+			//if we are trying to update the credit object we must reset the used credit before.
+			if ($this->credit != null )
+			{
+				$this->credit->validateForInsert();
+				if ($sourceObject->getUsedCredit() > 0)
+					throw new KalturaAPIException(KalturaReachErrors::UPDATE_CREDIT_ERROR_USED_CREDIT_EXISTS, $this->id);
+			}
 		}
-
-		$this->credit->validateForInsert();
 
 		//validating dictionary duplications
 		$languages = array();
@@ -213,6 +221,7 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 
 			$languages[] = $dictionary->language;
 		}
+
 
 		return;
 	}

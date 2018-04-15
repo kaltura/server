@@ -638,8 +638,12 @@ class UserService extends KalturaBaseUserService
 	 * @param int $metadataProfileId
 	 * @param KalturaCsvAdditionalFieldInfoArray $additionalFields
 	 * @return string
+	 *
+	 * @throws APIErrors::USER_EMAIL_NOT_FOUND
+	 * @throws MetadataErrors::INVALID_METADATA_PROFILE
+	 * @throws MetadataErrors::METADATA_PROFILE_NOT_SPECIFIED
 	 */
-	function exportToCsvAction(KalturaUserFilter $filter, $metadataProfileId = null, $additionalFields = null)
+	function exportToCsvAction(KalturaUserFilter $filter = null, $metadataProfileId = null, $additionalFields = null)
 	{
 		if($metadataProfileId)
 		{

@@ -328,6 +328,8 @@ class flavorAsset extends exportableAsset
 	protected function setLanguageFromFlavorParams()
 	{
 		$flavorParams = $this->getFlavorParams();
+		if (!$flavorParams)
+			return null;
 		$multiStream = $flavorParams->getMultiStream();
 		if (isset($multiStream))
 		{
@@ -346,7 +348,6 @@ class flavorAsset extends exportableAsset
 	{
 		if ($this->isColumnModified(assetPeer::FLAVOR_PARAMS_ID))
 		{
-//			$this->setLanguageAndDefault();
 			$flavorLang = $this->setLanguageFromFlavorParams();
 			if ($flavorLang)
 			{
