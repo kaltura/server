@@ -194,7 +194,7 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 				$partnerCatalogItems[] = $partnerCatalogItem->id;
 			}
 			$pager->pageIndex++;
-			$totalCount = $totalCount - $pager - pageSize;
+			$totalCount = $totalCount - $pager->pageSize;
 			$result = $reachPluginClient->vendorCatalogItem->listAction($catalogItemProfileFilter, $pager);
 		}
 		return $partnerCatalogItems;

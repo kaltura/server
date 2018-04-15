@@ -33,8 +33,8 @@
         </tr>
         </tfoot>
         <tbody>
-		<?php foreach ($this->paginator as /* Kaltura_Client_Reach_Type_VendorCatalogItem */
-					   $catalogItem): ?>
+				<?php if($this->paginator)
+						foreach ($this->paginator as /* Kaltura_Client_Reach_Type_VendorCatalogItem */  $catalogItem): ?>
             <tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
                 <td><?php echo $catalogItem->id; ?></td>
                 <td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemStatus', $catalogItem->status); ?></td>
@@ -45,8 +45,11 @@
                 <td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceType', $catalogItem->serviceType); ?></td>
                 <td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $catalogItem->turnAroundTime); ?></td>
                 <td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->sourceLanguage); ?></td>
-                <td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->targetLanguage); ?></td>
-                <td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat', $catalogItem->outputFormat); ?></td>
+								<td><?php if (isset($catalogItem->targetLanguage))
+								echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->targetLanguage);
+								else
+									echo null;?></td>
+								<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat', $catalogItem->outputFormat); ?></td>
                 <td><?php echo date($this->translate('time format'), $catalogItem->createdAt); ?></td>
                 <td><?php echo date($this->translate('time format'), $catalogItem->updatedAt); ?></td>
                 <td>
