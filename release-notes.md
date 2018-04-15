@@ -1,5 +1,15 @@
 # Mercury 13.18.0 #
 
+## Webex drop folder site name ##
+    - Issue Type: New Feature
+    - Issue ID: PLAT-8732
+    
+ ### Configuration ###
+    
+    In Drop Folder Profiles you can configure site name
+    You can usally figure it out from Webex service url
+    The serivce url is usally in the form of https://SITENAME.webex.com
+    
 ## Add conference plugin abilities ##
 	- Issue Type: New Feature
 	- Issue ID: WEBC-1075
