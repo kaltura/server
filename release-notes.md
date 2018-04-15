@@ -1,5 +1,17 @@
 # Mercury 13.18.0 #
 
+## Webex drop folder site name ##
+    - Issue Type: New Feature
+    - Issue ID: PLAT-8732
+    
+ ### Configuration ###
+    
+    A new property was added to drop folder profile - site name.
+    This property can be used for authentication with remote webex site.
+    New defined webex sites, can only work with this parameter rather than site-id and partner-id.
+    FYI - In most cases it can be extracted from Webex service url.
+    Example - https://SITENAME.webex.com
+    
 ## Add conference plugin abilities ##
 	- Issue Type: New Feature
 	- Issue ID: WEBC-1075
