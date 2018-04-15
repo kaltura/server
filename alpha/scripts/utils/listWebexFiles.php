@@ -35,4 +35,10 @@ $webexWrapper = new webexWrapper($webexServiceUrl, $securityContext, array("scri
 $createTimeStart = date('m/j/Y H:i:s', $startTime);
 $createTimeEnd  = date('m/j/Y H:i:s', $endTime);
 $serviceTypes = webexWrapper::stringServicesTypesToWebexXmlArray(array(WebexXmlComServiceTypeType::_MEETINGCENTER));
-$result = $webexWrapper->listRecordings($serviceTypes, $createTimeStart, $createTimeEnd);
+$result = $webexWrapper->listAllRecordings($serviceTypes, $createTimeStart, $createTimeEnd);
+if($result)
+{
+	foreach ($result as $recording) {
+		print($recording->getName() . PHP_EOL);
+	}
+}

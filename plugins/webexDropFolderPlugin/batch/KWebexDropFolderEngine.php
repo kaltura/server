@@ -40,8 +40,8 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			$endTime = (date('m/j/Y H:i:s', time()+86400));
 		}
 
-		$result = $this->listRecordings($startTime, $endTime);
-		if ($result->getMatchingRecords()->getTotal())
+		$result = $this->listAllRecordings($startTime, $endTime);
+		if (!empty($result))
 		{
 			$physicalFiles = $result->getRecording();
 			$this->HandleNewFiles($physicalFiles);
@@ -133,6 +133,17 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		$result = $this->webexWrapper->listRecordings($serviceTypes, $startTime, $endTime, $startFrom);
 		$recording = $result->getRecording();
 		KalturaLog::info('Recordings fetched: '.print_r($recording, true) );
+		return $result;
+	}
+
+	protected function listAllRecordings ($startTime = null, $endTime = null)
+	{
+		$dropFolderServiceTypes = $this->dropFolder->webexServiceType ? explode(',', $this->dropFolder->webexServiceType) :
+			array(WebexXmlComServiceTypeType::_MEETINGCENTER);
+		KalturaLog::info("Fetching list of all recordings from Webex, startTime [$startTime], endTime [$endTime] of types ".print_r($dropFolderServiceTypes));
+		$serviceTypes = webexWrapper::stringServicesTypesToWebexXmlArray($dropFolderServiceTypes);
+		$result = $this->webexWrapper->listAllRecordings($serviceTypes, $startTime, $endTime);
+		KalturaLog::info('Recordings fetched: '.print_r($result, true) );
 		return $result;
 	}
 
