@@ -339,12 +339,18 @@
 		var dateParts = val.split('.');
 		if (dateParts.length != 3 )
 			return false;
+		if (dateParts[0].length > 2 || dateParts[1].length > 2 || dateParts[2].length > 4)
+		{
+			alert("Not a valid Date");
+			return false;
+		}
 		if (dateParts[0].length != 2 || dateParts[1].length != 2 || dateParts[2].length != 4)
 			return false;
 		return true;
 	}
 
 	function getEpochTime(val) {
+		val = val.replace(/\./g, "/");
 		var epoch = new Date(val).getTime() / 1000 + 3600*4; // + 4 hour for not slide a day backward in for time zones
 		if (epoch)
 			return epoch;
@@ -353,7 +359,8 @@
 	}
 	function checkNumValid(val) {
 		if (isDatesFormat(val)) {
-			if(isNaN(new Date(val).getTime()))
+			val = val.replace(/\./g, "/");
+			if(isNaN((new Date(val)).getTime()))
 				alert("Not a valid Date!");
 			return;
 		}
