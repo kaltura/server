@@ -6,9 +6,9 @@
     
  ### Configuration ###
     
-    A new propery was added to drop folder profile - site name.
-    This propery can be used for authentication with remote webex site.
-    New defiend webex sites can only work with this parameter rather than site-id and partner-id.
+    A new property was added to drop folder profile - site name.
+    This property can be used for authentication with remote webex site.
+    New defined webex sites, can only work with this parameter rather than site-id and partner-id.
     FYI - In most cases it can be extracted from Webex service url.
     Example - https://SITENAME.webex.com
     
