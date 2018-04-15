@@ -30,6 +30,7 @@ class webexWrapper
 	const START_INDEX_OFFSET = 1;
 	const NO_RECORDS_FOUND_ERROR_CODE = 15;
 	const NO_RECORDS_FOUND_ERROR_MSG = 'Status: FAILURE, Reason: Sorry, no record found';
+	const MAX_PAGE_SIZE = 500;
 
 	// <editor-fold defaultstate="collapsed" desc="private members">
 
@@ -150,6 +151,44 @@ class webexWrapper
 
 		$this->logDebug("Found {$listRecordingResponse->getMatchingRecords()->getTotal()} matching records");
 		return $listRecordingResponse;
+	}
+
+	/**
+	 * @param WebexXmlArray $serviceTypes
+	 * @param long $startTime
+	 * @param long $endTime
+	 * @return array
+	 * @throws Exception
+	 */
+	public function listAllRecordings ($serviceTypes, $startTime = null, $endTime = null)
+	{
+		$startFrom = 1;
+		$fileList = array();
+		do
+		{
+			$listRecordingRequest = $this->initListRecordingRequest($serviceTypes, self::MAX_PAGE_SIZE, $startTime, $endTime, $startFrom);
+			try
+			{
+				$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
+			}
+			catch (Exception $e)
+			{
+				if ($e->getCode() != webexWrapper::NO_RECORDS_FOUND_ERROR_CODE && $e->getMessage() != webexWrapper::NO_RECORDS_FOUND_ERROR_MSG)
+				{
+					$this->logError("Error occurred while fetching records from webex: " . print_r($e, true));
+					throw $e;
+				}
+
+				$this->logDebug("No records found between {$startTime} and {$endTime}");
+				return $fileList;
+			}
+
+			$fileList = array_merge($fileList, $listRecordingResponse->getRecording());
+			$startFrom = $listRecordingResponse->getMatchingRecords()->getStartFrom() + $listRecordingResponse->getMatchingRecords()->getReturned();
+		}while (count ($fileList) < $listRecordingResponse->getMatchingRecords()->getTotal());
+
+		$this->logDebug("Found {$listRecordingResponse->getMatchingRecords()->getTotal()} matching records");
+		return $fileList;
 	}
 
 	/**
