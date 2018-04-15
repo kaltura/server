@@ -6,9 +6,11 @@
     
  ### Configuration ###
     
-    In Drop Folder Profiles you can configure site name
-    You can usally figure it out from Webex service url
-    The serivce url is usally in the form of https://SITENAME.webex.com
+    A new propery was added to drop folder profile - site name.
+    This propery can be used for authentication with remote webex site.
+    New defiend webex sites can only work with this parameter rather than site-id and partner-id.
+    FYI - In most cases it can be extracted from Webex service url.
+    Example - https://SITENAME.webex.com
     
 ## Add conference plugin abilities ##
 	- Issue Type: New Feature
