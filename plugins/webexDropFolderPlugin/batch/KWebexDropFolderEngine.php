@@ -30,7 +30,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	{
 		/* @var $dropFolder KalturaWebexDropFolder */
 		$this->dropFolder = $dropFolder;
-		$this->webexWrapper = new webexWrapper($this->dropFolder->webexServiceUrl . '/' . $this->dropFolder->path, $this->initWebexClientSecurityContext(),
+		$this->webexWrapper = new webexWrapper($this->dropFolder->webexServiceUrl . '/' . $this->dropFolder->path, $this->getWebexClientSecurityContext($this->dropFolder),
 			array('KalturaLog', 'err'), array('KalturaLog', 'debug'));
 
 		KalturaLog::info('Watching folder ['.$this->dropFolder->id.']');
@@ -154,14 +154,14 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		return $result;
 	}
 
-	protected function initWebexClientSecurityContext ()
+	public static function getWebexClientSecurityContext($dropFolder)
 	{
 		$securityContext = new WebexXmlSecurityContext();
-		$securityContext->setUid($this->dropFolder->webexUserId); // webex username
-		$securityContext->setPwd($this->dropFolder->webexPassword); // webex password
-		$securityContext->setSiteName($this->dropFolder->webexSiteName); // webex partner id
-		$securityContext->setSid($this->dropFolder->webexSiteId); // webex site id
-		$securityContext->setPid($this->dropFolder->webexPartnerId); // webex partner id
+		$securityContext->setUid($dropFolder->webexUserId); // webex username
+		$securityContext->setPwd($dropFolder->webexPassword); // webex password
+		$securityContext->setSiteName($dropFolder->webexSiteName); // webex partner id
+		$securityContext->setSid($dropFolder->webexSiteId); // webex site id
+		$securityContext->setPid($dropFolder->webexPartnerId); // webex partner id
 
 		return $securityContext;
 	}
