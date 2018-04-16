@@ -705,7 +705,7 @@ class KalturaEntryService extends KalturaBaseService
 			
 			if ($isLiveClippingFlow)
 			{
-				if ($srcEntry->getId() == $dbEntry->getId())
+				if (($srcEntry->getId() == $dbEntry->getId()) || ($srcEntry->getId() == $dbEntry->getReplacedEntryId()))
 					throw new KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_OPERATION, "Trimming");
 				$this->createRecordedClippingTask($srcEntry, $dbEntry, $operationAttributes);
 				return $dbAsset;
