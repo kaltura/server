@@ -37,7 +37,11 @@ class ReachProfileService extends KalturaBaseService
 		$dbReachProfile->setStatus(KalturaReachProfileStatus::ACTIVE);
 		
 		if ($dbReachProfile->getCredit() instanceof kReoccurringVendorCredit)
-                	$dbReachProfile->getCredit()->setPeriodDates();
+		{
+			$credit = $dbReachProfile->getCredit();
+			$credit->setPeriodDates();
+			$dbReachProfile->setCredit($credit);
+		}
 
 		$dbReachProfile->save();
 
@@ -104,7 +108,11 @@ class ReachProfileService extends KalturaBaseService
 		// save the object
 		$dbReachProfile = $reachProfile->toUpdatableObject($dbReachProfile);
 		if ($dbReachProfile->getCredit() instanceof kReoccurringVendorCredit)
-			$dbReachProfile->getCredit()->setPeriodDates();
+		{
+			$credit = $dbReachProfile->getCredit();
+			$credit->setPeriodDates();
+			$dbReachProfile->setCredit($credit);
+		}
 		
 		$dbReachProfile->save();
 
@@ -134,7 +142,11 @@ class ReachProfileService extends KalturaBaseService
 		$dbReachProfile->setStatus($status);
 		
 		if ($status == KalturaReachProfileStatus::ACTIVE && $dbReachProfile->getCredit() instanceof kReoccurringVendorCredit)
-                       $dbReachProfile->getCredit()->setPeriodDates();
+                {
+			$credit = $dbReachProfile->getCredit();
+			$credit->setPeriodDates();
+			$dbReachProfile->setCredit($credit);
+		}
 		
 		// save the object
 		$dbReachProfile->save();
