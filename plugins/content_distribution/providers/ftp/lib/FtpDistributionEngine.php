@@ -168,12 +168,21 @@ class FtpDistributionEngine extends PublicPrivateKeysDistributionEngine implemen
 	{
 		$remoteFilePath = $this->cleanPath($distributionProfile->basePath . '/' . $file->filename);
 
-		$tempFilePath = $this->getAssetFile($file->assetId, $this->tempDirectory);
+		if ($file->contents)
+		{
+			$filename = uniqid(null, true) . '.' . pathinfo($file->filename, PATHINFO_EXTENSION);
+			$tempFilePath = $this->tempFilePath . '/' . $filename;
+			file_put_contents($tempFilePath, $file->contents);
+			KalturaLog::info('Sending contents, using temp path [' . $tempFilePath . ']');
+		}
+		else
+		{
+			$tempFilePath = $this->getAssetFile($file->assetId, $this->tempDirectory);
+			if (!$tempFilePath)
+				return null;
+			KalturaLog::info('Sending local file [' . $tempFilePath . ']');
+		}
 
-		if (!$tempFilePath)
-			return null;
-
-		KalturaLog::info('Sending local file [' . $tempFilePath . ']');
 		$fileManager->putFile($remoteFilePath, $tempFilePath);
 		unlink($tempFilePath);
 
