@@ -356,11 +356,14 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	protected static function getDefaultDelivery(Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false, $isLive = false)
 	{
 		$c = new Criteria();
-		$c->add(DeliveryProfilePeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partner->getId()), Criteria::IN);
 
-		if (!count($deliveryAttributes->getDeliveryProfileIds()))
-		{
+		if (!count($deliveryAttributes->getDeliveryProfileIds()) && !count($deliveryAttributes->getIsDeliveryProfilesBlockedList())) {
 			$c->add(DeliveryProfilePeer::IS_DEFAULT, true);
+			$c->add(DeliveryProfilePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
+		}
+		else
+		{
+			$c->add(DeliveryProfilePeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partner->getId()), Criteria::IN);
 		}
 
 		$c->add(DeliveryProfilePeer::STREAMER_TYPE, $streamerType);
