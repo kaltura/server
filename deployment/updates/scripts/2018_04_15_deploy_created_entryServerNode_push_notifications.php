@@ -9,19 +9,19 @@ function deployExplicitLivePushNotifications()
 {
 	$script = realpath(dirname(__FILE__) . "/../../../tests/standAloneClient/exec.php");
 
-	$liveClipping = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/notifications/live_clipping_notification.xml");
+	$entryServerNodeCreationTemplate = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/notifications/entryServerNode_created_notification.xml");
 
-	if (!file_exists($liveClipping))
+	if (!file_exists($entryServerNodeCreationTemplate))
 	{
 		KalturaLog::err("Missing notification file for deployign notifications");
 		return;
 	}
 
-	passthru("php $script $liveClipping");
+	passthru("php $script $entryServerNodeCreationTemplate");
 }
 
 /**
- * Check if all plugins needed for live clipping to work are installed
+ * Check if all plugins needed for entryServerNode created to work are installed
  * @return bool If all required plugins are installed
  */
 function checkMandatoryPluginsEnabled()

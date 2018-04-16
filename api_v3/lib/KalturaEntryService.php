@@ -755,14 +755,16 @@ class KalturaEntryService extends KalturaBaseService
 			KalturaLog::debug("Can't create clipping task for SrcEntry: ". $srcEntry->getId() . " to entry:" . $targetEntry->getId() . " with: " . print_r($operationAttributes ,true));
 			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $srcEntry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
 		}
+		$serverNode = ServerNodePeer::retrieveByPK($entryServerNode->getServerNodeId());
+
 		$clippingTask = new ClippingTaskEntryServerNode();
 		$clippingTask->setClippedEntryId($targetEntry->getId());
 		$clippingTask->setClipAttributes(self::getKClipAttributes($operationAttributes));
 		$clippingTask->setServerType(EntryServerNodeType::LIVE_CLIPPING_TASK);
 		$clippingTask->setStatus(EntryServerNodeStatus::LIVE_CLIPPING_TASK_CREATED);
 		$clippingTask->setEntryId($srcEntry->getId()); //recorded entry
-		$clippingTask->setPartnerId($srcEntry->getPartnerId());
-		$clippingTask->setServerNodeId($entryServerNode->getServerNodeId());
+		$clippingTask->setPartnerId($serverNode->getPartnerId()); //in case on eCDN it will get the local partner (not -5)
+		$clippingTask->setServerNodeId($serverNode->getId());
 		$clippingTask->save();
 		return $clippingTask;
 	}
