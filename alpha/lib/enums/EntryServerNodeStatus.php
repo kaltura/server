@@ -11,8 +11,8 @@ interface EntryServerNodeStatus extends BaseEnum
 	const AUTHENTICATED = 3;
 	const MARKED_FOR_DELETION = 4;
 
-	const LIVE_CLIPPING_TASK_CREATED = 5;
-	const LIVE_CLIPPING_TASK_QUEUED = 6;
-	const LIVE_CLIPPING_TASK_PROCESSING = 7;
-	const LIVE_CLIPPING_TASK_UPLOADING = 8;
+	const TASK_CREATED = 5;
+	const TASK_QUEUED = 6;
+	const TASK_PROCESSING = 7;
+	const TASK_UPLOADING = 8;
 }

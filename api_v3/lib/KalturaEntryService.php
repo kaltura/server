@@ -761,7 +761,7 @@ class KalturaEntryService extends KalturaBaseService
 		$clippingTask->setClippedEntryId($targetEntry->getId());
 		$clippingTask->setClipAttributes(self::getKClipAttributes($operationAttributes));
 		$clippingTask->setServerType(EntryServerNodeType::LIVE_CLIPPING_TASK);
-		$clippingTask->setStatus(EntryServerNodeStatus::LIVE_CLIPPING_TASK_CREATED);
+		$clippingTask->setStatus(EntryServerNodeStatus::TASK_CREATED);
 		$clippingTask->setEntryId($srcEntry->getId()); //recorded entry
 		$clippingTask->setPartnerId($serverNode->getPartnerId()); //in case on eCDN it will get the local partner (not -5)
 		$clippingTask->setServerNodeId($serverNode->getId());
