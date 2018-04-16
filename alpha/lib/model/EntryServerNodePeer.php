@@ -108,7 +108,7 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 		foreach ( $entryServerNodes as $entryServerNode)
 		{
 			/* @var EntryServerNode $entryServerNode */
-			if ($entryServerNode->getStatus() == EntryServerNodeStatus::PLAYABLE)
+			if ($entryServerNode->getStatus() == EntryServerNodeStatus::PLAYABLE && in_array($entryServerNode->getServerType(),array(EntryServerNodeType::LIVE_BACKUP, EntryServerNodeType::LIVE_PRIMARY)))
 				$playableEntryServerNodes[] = $entryServerNode;
 		}
 		return $playableEntryServerNodes;
