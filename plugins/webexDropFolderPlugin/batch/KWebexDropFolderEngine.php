@@ -19,6 +19,13 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	 */
 	private $webexWrapper;
 
+	public static function withDropFolder($dropFolder)
+	{
+		$instance = new self();
+		$instance->dropFolder = $dropFolder;
+		return $instance;
+	}
+
 	public function watchFolder (KalturaDropFolder $dropFolder)
 	{
 		/* @var $dropFolder KalturaWebexDropFolder */
@@ -66,7 +73,8 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 
 		return $this->dropFolderFilesMap;
 	}
-	private function HandleNewFiles($physicalFiles)
+
+	public function HandleNewFiles($physicalFiles)
 	{
 		$dropFolderFilesMap = $this->getDropFolderFilesMap();
 		$maxTime = $this->dropFolder->lastFileTimestamp;
