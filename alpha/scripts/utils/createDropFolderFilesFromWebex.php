@@ -21,14 +21,14 @@ $client = new KalturaClient($config);
 $client->setKs($ks);
 $dropFolderPlugin = KalturaDropFolderClientPlugin::get($client);
 KBatchBase::$kClient = $client;
+KBatchBase::impersonate($dropFolder->partnerId);
 $dropFolder = $dropFolderPlugin->dropFolder->get($dropFolderId);
 $webexEngine = KWebexDropFolderEngine::withDropFolder($dropFolder);
 $securityContext = $webexEngine::getWebexClientSecurityContext($dropFolder);
 $dropFolderServiceTypes = $dropFolder->webexServiceType ? explode(',', $dropFolder->webexServiceType) :
 	array(WebexXmlComServiceTypeType::_MEETINGCENTER);
 $serviceTypes = webexWrapper::stringServicesTypesToWebexXmlArray($dropFolderServiceTypes);
-$webexWrapper = new webexWrapper($dropFolder->webexServiceUrl . '/' . $dropFolder->path, $securityContext,
-	array('KalturaLog', 'err'), array('KalturaLog', 'debug'));
+$webexWrapper = new webexWrapper($dropFolder->webexServiceUrl . '/' . $dropFolder->path, $securityContext, array('KalturaLog', 'err'), array('KalturaLog', 'debug'));
 for($i = $startDate; $i+WEEK_IN_SECONDS <= time(); $i=$i+WEEK_IN_SECONDS)
 {
 	$startTime = date('m/j/Y H:i:s', $i);
@@ -38,7 +38,7 @@ for($i = $startDate; $i+WEEK_IN_SECONDS <= time(); $i=$i+WEEK_IN_SECONDS)
 	{
 		$numOfFiles = count($result);
 		KalturaLog::debug("Found {$numOfFiles} of files for {$startTime}-{$endTime}.");
-		$webexEngine->HandleNewFiles(null);
+		$webexEngine->HandleNewFiles($result);
 	}
 	else
 	{

@@ -89,9 +89,11 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			$physicalFileName = $physicalFile->getName() . '_' . $physicalFile->getRecordingID();
 			if(!array_key_exists($physicalFileName, $dropFolderFilesMap))
 			{
-				$this->handleFileAdded($physicalFile);
-				$maxTime = max(strtotime($physicalFile->getCreateTime()), $maxTime);
-				KalturaLog::info("Added new file with name [$physicalFileName]. maxTime updated: $maxTime");
+				if($this->handleFileAdded($physicalFile))
+				{
+					$maxTime = max(strtotime($physicalFile->getCreateTime()), $maxTime);
+					KalturaLog::info("Added new file with name [$physicalFileName]. maxTime updated: $maxTime");
+				}
 			}
 			else //drop folder file entry found
 			{
@@ -289,7 +291,6 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			$newDropFolderFile->recordingId = $webexFile->getRecordingID();
 			$newDropFolderFile->webexHostId = $webexFile->getHostWebExID();
 			$newDropFolderFile->contentUrl = $webexFile->getFileURL();
-
 			KalturaLog::debug("Adding new WebexDropFolderFile: " . print_r($newDropFolderFile, true));
 			$dropFolderFile = $this->dropFolderFileService->add($newDropFolderFile);
 			
