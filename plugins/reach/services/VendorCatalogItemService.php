@@ -158,6 +158,11 @@ class VendorCatalogItemService extends KalturaBaseService
 		if (!$dbVendorCatalogItem)
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
 		
+		// Check if partnerCatalogItem exists, in this case you should not be able to delete the vendorCatalogItem prior to deleting the partner assignment first 
+		$partnerCatalogItem = PartnerCatalogItemPeer::retrieveByCatalogItemId($id);
+		if($partnerCatalogItem)
+			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_CANNOT_BE_DELETED, $id);
+		
 		// set the object status to deleted
 		$dbVendorCatalogItem->setStatus(KalturaVendorCatalogItemStatus::DELETED);
 		$dbVendorCatalogItem->save();

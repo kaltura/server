@@ -5,15 +5,13 @@
  */
 class Form_CatalogItemConfigure extends ConfigureForm
 {
-	protected $newPartnerId;
 	protected $catalogItemType;
 	protected $disableAttributes;
 	protected $catalogItemServiceType;
 	protected $catalogItemTurnAroundTime;
 
-	public function __construct($partnerId, $type = null ,$catalogItemServiceType = null, $catalogItemTurnAroundTime = null,  $disableAttributes = null)
+	public function __construct($type = null ,$catalogItemServiceType = null, $catalogItemTurnAroundTime = null,  $disableAttributes = null)
 	{
-		$this->newPartnerId = $partnerId;
 		$this->catalogItemType = $type;
 		$this->catalogItemServiceType = $catalogItemServiceType;
 		$this->catalogItemTurnAroundTime = $catalogItemTurnAroundTime;

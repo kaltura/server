@@ -26,11 +26,12 @@ class PartnerCatalogItemPeer extends BasePartnerCatalogItemPeer {
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
-	public static function retrieveByCatalogItemId($catalogItemId, $partnerId)
+	public static function retrieveByCatalogItemId($catalogItemId, $partnerId = null)
 	{
 		$criteria = new Criteria ( PartnerCatalogItemPeer::DATABASE_NAME );
 		$criteria->add(PartnerCatalogItemPeer::CATALOG_ITEM_ID, $catalogItemId);
-		$criteria->add(PartnerCatalogItemPeer::PARTNER_ID, $partnerId);
+		if($partnerId)
+			$criteria->add(PartnerCatalogItemPeer::PARTNER_ID, $partnerId);
 		return PartnerCatalogItemPeer::doSelectOne($criteria);
 	}
 	
