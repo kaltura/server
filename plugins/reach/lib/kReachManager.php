@@ -197,6 +197,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		}
 		
 		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $sourceFlavorVersion, $context);
+		$entryVendorTask->save();
 		return $entryVendorTask;
 	}
 	
@@ -234,8 +235,6 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$entryVendorTask->setDictionary($dictionary->getData());
 
 		$entryVendorTask->setStatus($status);
-		$entryVendorTask->save();
-		
 		return $entryVendorTask;
 	}
 	
