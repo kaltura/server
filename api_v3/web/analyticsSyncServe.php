@@ -71,6 +71,45 @@ function getPartnerUpdates($updatedAt)
 	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
 }
 
+function getUserUpdates($updatedAt)
+{
+	$c = new Criteria();
+	$c->addSelectColumn(kuserPeer::ID);
+	$c->addSelectColumn(kuserPeer::STATUS);
+	$c->addSelectColumn(kuserPeer::PUSER_ID);
+	$c->addSelectColumn(kuserPeer::PARTNER_ID);
+	$c->addSelectColumn(kuserPeer::UPDATED_AT);
+	$c->add(kuserPeer::UPDATED_AT, $updatedAt, Criteria::GREATER_EQUAL);
+	$c->addAscendingOrderByColumn(kuserPeer::UPDATED_AT);
+	$c->setLimit(MAX_ITEMS);
+	kuserPeer::setUseCriteriaFilter(false);
+	$stmt = kuserPeer::doSelectStmt($c);
+	kuserPeer::setUseCriteriaFilter(true);
+	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	
+	$maxUpdatedAt = 0;
+	$result = array();
+	foreach ($rows as $row)
+	{
+		$status = $row['STATUS'];
+		if ($status != KuserStatus::ACTIVE)
+		{
+			continue;
+		}
+		
+		$id = $row['ID'];
+		$puserId = $row['PUSER_ID'];
+		$partnerId = $row['PARTNER_ID'];
+		
+		$key = md5($partnerId . '_' . strtolower($puserId));
+		$result[$key] = $id;
+		$updatedAt = new DateTime($row['UPDATED_AT']);
+		$maxUpdatedAt = max($maxUpdatedAt, (int)$updatedAt->format('U'));
+	}
+	
+	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
+}
+
 function getLiveUpdates($updatedAt)
 {
 	// must query sphinx, can be too heavy for the db when the interval is large
@@ -205,6 +244,7 @@ DbManager::initialize();
 
 $requestHandlers = array(
 	'partner' => 'getPartnerUpdates',
+	'user' => 'getUserUpdates',
 	'live' => 'getLiveUpdates',
 	'duration' => 'getDurationUpdates',
 	'categoryEntry' => 'getCategoryEntryUpdates',
