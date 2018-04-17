@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package plugins.reach
  */
@@ -11,7 +12,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	 */
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
-		if($object instanceof categoryEntry)
+		if ($object instanceof categoryEntry)
 			return true;
 	}
 	
@@ -20,7 +21,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	 */
 	public function shouldConsumeCreatedEvent(BaseObject $object)
 	{
-		if($object instanceof EntryVendorTask && $object->getStatus() == EntryVendorTaskStatus::PENDING)
+		if ($object instanceof EntryVendorTask && $object->getStatus() == EntryVendorTaskStatus::PENDING)
 			return true;
 		
 		return false;
@@ -31,28 +32,28 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	*/
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
-		if($object instanceof EntryVendorTask 
-			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns) 
-			&& $object->getStatus() == EntryVendorTaskStatus::PENDING 
+		if ($object instanceof EntryVendorTask
+			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
+			&& $object->getStatus() == EntryVendorTaskStatus::PENDING
 			&& $object->getColumnsOldValue(EntryVendorTaskPeer::STATUS) == EntryVendorTaskStatus::PENDING_MODERATION
 		)
 			return true;
 		
-		if($object instanceof EntryVendorTask
+		if ($object instanceof EntryVendorTask
 			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
 			&& $object->getStatus() == EntryVendorTaskStatus::ERROR
 		)
 			return true;
 		
-		if($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP &&
+		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP &&
 			in_array(entryPeer::LENGTH_IN_MSECS, $modifiedColumns)
 		)
 			return true;
 		
-		if($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
+		if ($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
 			return true;
 		
-		if($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP &&
+		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP &&
 			in_array(entryPeer::STATUS, $modifiedColumns) && in_array($object->getStatus(), array(entryStatus::READY, entryStatus::DELETED))
 		)
 			return true;
@@ -67,7 +68,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
+		if ($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
 			$this->checkAutomaticRules($object);
 		
 		return true;
@@ -84,36 +85,35 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::objectChanged()
-	 */ 
+	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		if($object instanceof EntryVendorTask && in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
+		if ($object instanceof EntryVendorTask && in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
 			&& $object->getStatus() == EntryVendorTaskStatus::PENDING
-			&& $object->getColumnsOldValue(EntryVendorTaskPeer::STATUS) != EntryVendorTaskStatus::PENDING_MODERATION
+			&& $object->getColumnsOldValue(EntryVendorTaskPeer::STATUS) == EntryVendorTaskStatus::PENDING_MODERATION
 		)
 			return $this->updateReachProfileCreditUsage($object);
 		
-		if($object instanceof EntryVendorTask
+		if ($object instanceof EntryVendorTask
 			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
 			&& $object->getStatus() == EntryVendorTaskStatus::ERROR
 			&& in_array($object->getColumnsOldValue(EntryVendorTaskPeer::STATUS), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING))
 		)
 			return $this->handleErrorTask($object);
-
-		if($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP &&
+		
+		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP &&
 			in_array(entryPeer::LENGTH_IN_MSECS, $modifiedColumns)
 		)
 			return $this->handleEntryDurationChanged($object);
 		
-		if($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
+		if ($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
 			return $this->checkAutomaticRules($object);
 		
-		if($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP && in_array(entryPeer::STATUS, $modifiedColumns))
-		{
-			if($object->getStatus() == entryStatus::READY)
+		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP && in_array(entryPeer::STATUS, $modifiedColumns)) {
+			if ($object->getStatus() == entryStatus::READY)
 				return $this->checkAutomaticRules($object, true);
 			
-			if($object->getStatus() == entryStatus::DELETED)
+			if ($object->getStatus() == entryStatus::DELETED)
 				return $this->handleEntryDeleted($object);
 		}
 		
@@ -129,29 +129,25 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	{
 		ReachProfilePeer::updateUsedCredit($entryVendorTask->getReachProfileId(), -$entryVendorTask->getPrice());
 	}
-
+	
 	private function handleEntryDurationChanged(entry $entry)
 	{
 		$pendingEntryVendorTasks = EntryVendorTaskPeer::retrievePendingByEntryId($entry->getId(), $entry->getPartnerId());
 		$addedCostByProfileId = array();
-		foreach ($pendingEntryVendorTasks as $pendingEntryVendorTask)
-		{
+		foreach ($pendingEntryVendorTasks as $pendingEntryVendorTask) {
 			/* @var $pendingEntryVendorTask EntryVendorTask */
 			$oldPrice = $pendingEntryVendorTask->getPrice();
 			$newPrice = kReachUtils::calculateTaskPrice($entry, $pendingEntryVendorTask->getCatalogItem());
 			$priceDiff = $newPrice - $oldPrice;
 			$pendingEntryVendorTask->setPrice($newPrice);
 			
-			if(!isset($addedCostByProfileId[$pendingEntryVendorTask->getReachProfileId()]))
+			if (!isset($addedCostByProfileId[$pendingEntryVendorTask->getReachProfileId()]))
 				$addedCostByProfileId[$pendingEntryVendorTask->getReachProfileId()] = 0;
 			
-			if(kReachUtils::checkPriceAddon($pendingEntryVendorTask, $priceDiff))
-			{
+			if (kReachUtils::checkPriceAddon($pendingEntryVendorTask, $priceDiff)) {
 				$pendingEntryVendorTask->save();
 				$addedCostByProfileId[$pendingEntryVendorTask->getReachProfileId()] += $priceDiff;
-			}
-			else
-			{
+			} else {
 				$pendingEntryVendorTask->setStatus(EntryVendorTaskStatus::ABORTED);
 				$pendingEntryVendorTask->setPrice($newPrice);
 				$pendingEntryVendorTask->setErrDescription("Current task price exceeded credit allowed, task was aborted");
@@ -160,8 +156,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 		}
 		
-		foreach($addedCostByProfileId as $reachProfileId => $addedCost)
-		{
+		foreach ($addedCostByProfileId as $reachProfileId => $addedCost) {
 			ReachProfilePeer::updateUsedCredit($reachProfileId, $addedCost);
 		}
 		
@@ -173,25 +168,22 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entry = entryPeer::retrieveByPK($entryId);
 		$reachProfile = ReachProfilePeer::retrieveByPK($reachProfileId);
 		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($vendorCatalogItemId);
-
+		
 		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
 		$sourceFlavorVersion = $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
-
-		if(kReachUtils::isDuplicateTask($entryId, $vendorCatalogItemId, $entry->getPartnerId(), $sourceFlavorVersion))
-		{
+		
+		if (kReachUtils::isDuplicateTask($entryId, $vendorCatalogItemId, $entry->getPartnerId(), $sourceFlavorVersion)) {
 			KalturaLog::err("Trying to insert a duplicate entry vendor task for entry [$entryId], catalog item [$vendorCatalogItemId] and entry version [$sourceFlavorVersion]");
 			return true;
 		}
 		
 		//check if credit has expired
-		if(kReachUtils::hasCreditExpired($reachProfile))
-		{
+		if (kReachUtils::hasCreditExpired($reachProfile)) {
 			KalturaLog::err("Credit cycle has expired, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
 			return true;
 		}
-
-		if(!kReachUtils::isEnoughCreditLeft($entry, $vendorCatalogItem, $reachProfile))
-		{
+		
+		if (!kReachUtils::isEnoughCreditLeft($entry, $vendorCatalogItem, $reachProfile)) {
 			KalturaLog::err("Exceeded max credit allowed, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
 			return true;
 		}
@@ -223,17 +215,17 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($entryVendorTask->getEntryId(), $shouldModerateOutput));
 		$entryVendorTask->setPrice(kReachUtils::calculateTaskPrice($entry, $vendorCatalogItem));
 		
-		if($context)
+		if ($context)
 			$entryVendorTask->setContext($context);
 		
 		$status = EntryVendorTaskStatus::PENDING;
-		if($validateModeration && $reachProfile->shouldModerate($vendorCatalogItem->getServiceType()))
+		if ($validateModeration && $reachProfile->shouldModerate($vendorCatalogItem->getServiceType()))
 			$status = EntryVendorTaskStatus::PENDING_MODERATION;
-
+		
 		$dictionary = $reachProfile->getDictionaryByLanguage($vendorCatalogItem->getSourceLanguage());
 		if ($dictionary)
 			$entryVendorTask->setDictionary($dictionary->getData());
-
+		
 		$entryVendorTask->setStatus($status);
 		return $entryVendorTask;
 	}
@@ -244,15 +236,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryId = $object->getEntryId();
 		$scope->setEntryId($entryId);
 		$reachProfiles = ReachProfilePeer::retrieveByPartnerId($object->getPartnerId());
-		foreach ($reachProfiles as $profile)
-		{
+		foreach ($reachProfiles as $profile) {
 			/* @var $profile ReachProfile */
 			$fullFieldCatalogItemIds = $profile->fulfillsRules($scope, $checkEmptyRulesOnly);
 			$existingCatalogItemIds = EntryVendorTaskPeer::retrieveExistingTasksCatalogItemIds($entryId, $fullFieldCatalogItemIds);
 			$catalogItemIdsToAdd = array_unique(array_diff($fullFieldCatalogItemIds, $existingCatalogItemIds));
 			
-			foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
-			{
+			foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd) {
 				//Pass the object Id as the context of the task
 				self::addEntryVendorTaskByObjectIds($entryId, $catalogItemIdToAdd, $profile->getId(), $this->getContextByObjectType($object));
 			}
@@ -265,8 +255,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	{
 		//Delete all pending moderation tasks
 		$pendingModerationTasks = EntryVendorTaskPeer::retrievePendingByEntryId($entry->getId(), $entry->getPartnerId(), array(EntryVendorTaskStatus::PENDING_MODERATION));
-		foreach ($pendingModerationTasks as $pendingModerationTask)
-		{
+		foreach ($pendingModerationTasks as $pendingModerationTask) {
 			/* @var $pendingModerationTask EntryVendorTask */
 			$pendingModerationTask->setStatus(EntryVendorTaskStatus::ABORTED);
 			$pendingModerationTask->setErrDescription("Task was aborted by server, associated entry [{$entry->getId()}] was deleted");
@@ -276,7 +265,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	
 	private function getContextByObjectType($object)
 	{
-		if($object instanceof categoryEntry)
+		if ($object instanceof categoryEntry)
 			return $object->getCategoryId();
 		
 		return null;
