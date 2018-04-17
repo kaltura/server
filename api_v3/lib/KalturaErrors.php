@@ -458,6 +458,8 @@ class KalturaErrors extends APIErrors
 
 	const SYNDICATION_FEED_KALTURA_DC_ONLY = "SYNDICATION_FEED_KALTURA_DC_ONLY;;Partner configured to use Kaltura data centers only";
 
+	const ENFORCE_ITUNES_FEED_AUTHOR = "ENFORCE_ITUNES_FEED_AUTHOR;;Missing feedAuthor param [Mandatory when enforcing feedAuthor]";
+
 	/*
 	 * file sync
 	 */
