@@ -193,27 +193,10 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 							{
 								if($matchType == MetadataProfileFieldMatchType::EXACT)
 								{
-									$trimChars = $xPaths[$field]->getTrimChars();
-									$value = strtr($value, $trimChars, str_repeat("_", strlen($trimChars)));
-									
-									if($xPaths[$field]->getExplodeChars())
+									$parsedFieldsValues = $xPaths[$field]->getParsedFieldValue($value);
+									foreach ($parsedFieldsValues as $parsedFieldsValue)
 									{
-										$explodeChars = $xPaths[$field]->getExplodeCharsArray();
-										$explodePattern = implode("|", $explodeChars);
-										$values = preg_split( "/($explodePattern)/", $value );
-										
-										$dataCondition = "";
-										foreach ($values as $value)
-										{
-											if(trim($value))
-											{
-												$dataCondition .= "{$pluginName}_{$fieldId}_$value ";
-											}
-										}
-									}
-									else
-									{
-										$dataCondition = "{$pluginName}_{$fieldId}_$value";
+										$dataCondition .= "$parsedFieldsValue ";
 									}
 								}
 								else

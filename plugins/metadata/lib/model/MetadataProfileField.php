@@ -42,4 +42,30 @@ class MetadataProfileField extends BaseMetadataProfileField implements IBaseObje
 		return explode(",", $explodeChars);
 	}
 	
+	public function getParsedFieldValue($value)
+	{
+		$parsedFieldValues = array();
+		$trimChars = $this->getTrimChars();
+		$value = $trimChars ? strtr($value, $trimChars, str_repeat("_", strlen($trimChars))) : $value;
+		
+		if($this->getExplodeChars())
+		{
+			$explodeChars = $this->getExplodeCharsArray();
+			$explodePattern = implode("|", $explodeChars);
+			$values = preg_split( "/($explodePattern)/", $value );
+			
+			foreach ($values as $value) 
+			{
+				if(trim($value))
+					$parsedFieldValues[] = MetadataPlugin::PLUGIN_NAME . '_' . $this->getId() . '_' . $value;
+			}
+		}
+		else
+		{
+			$parsedFieldValues[] = MetadataPlugin::PLUGIN_NAME . '_' . $this->getId() . '_' . $value;
+		}
+		
+		return $parsedFieldValues;
+	}
+	
 } // MetadataProfileField
