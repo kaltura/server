@@ -129,6 +129,10 @@ class EntryVendorTaskService extends KalturaBaseService
 		if (!$dbEntryVendorTask)
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
 		
+		$dbEntry = entryPeer::retrieveByPK($dbEntryVendorTask->getEntryId());
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbEntryVendorTask->getEntryId());
+		
 		$dbEntryVendorTask = $entryVendorTask->toUpdatableObject($dbEntryVendorTask);
 		$dbEntryVendorTask->save();
 
