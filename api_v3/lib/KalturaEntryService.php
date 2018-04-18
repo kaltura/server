@@ -708,6 +708,9 @@ class KalturaEntryService extends KalturaBaseService
 				if (($srcEntry->getId() == $dbEntry->getId()) || ($srcEntry->getId() == $dbEntry->getReplacedEntryId()))
 					throw new KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_OPERATION, "Trimming");
 				$this->createRecordedClippingTask($srcEntry, $dbEntry, $operationAttributes);
+				$dbEntry->setSource(EntrySourceType::KALTURA_RECORDED_LIVE);
+				$dbEntry->setRootEntryId($srcEntry->getRootEntryId());
+				$dbEntry->save();
 				return $dbAsset;
 			}
 
