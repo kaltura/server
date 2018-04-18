@@ -373,6 +373,9 @@ class ReachProfile extends BaseReachProfile
 	
 	public function syncCreditPercentageUsage()
 	{
+		//We updated the credit usage while using a custom query so we need to reload the object from the DB
+		$this->reload();
+		
 		$currentCredit = $this->getCredit()->getCurrentCredit(false);
 		$creditUsagePercentage = ($currentCredit == ReachProfileCreditValues::UNLIMITED_CREDIT) ? 0 : 100;
 		

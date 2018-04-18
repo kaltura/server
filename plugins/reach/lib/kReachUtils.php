@@ -49,7 +49,9 @@ class kReachUtils
 	
 	public static function calculateTaskPrice(entry $entry, VendorCatalogItem $vendorCatalogItem)
 	{
-		return call_user_func($vendorCatalogItem->getPricing()->getPriceFunction(), $entry, $vendorCatalogItem->getPricing()->getPricePerUnit());
+		$taskPrice = call_user_func($vendorCatalogItem->getPricing()->getPriceFunction(), $entry, $vendorCatalogItem->getPricing()->getPricePerUnit());
+		$taskPrice += $vendorCatalogItem->getFixedPriceAddons();
+		return $taskPrice;
 	}
 	
 	/**
