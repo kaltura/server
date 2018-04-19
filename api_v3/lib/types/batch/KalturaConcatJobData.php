@@ -55,7 +55,7 @@ class KalturaConcatJobData extends KalturaJobData
 		'offset',
 		'duration',
 		'concatenatedDuration',
-		'sortNotNeeded',
+		'shouldSort',
 	);
 
 	/* (non-PHPdoc)
