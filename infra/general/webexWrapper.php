@@ -297,6 +297,38 @@ class webexWrapper
 	}
 
 	/**
+	 * @param string $recordName
+	 * @param WebexXmlArray $serviceTypes
+	 * @return WebexXmlListRecording
+	 * @throws Exception
+	 */
+	public function getRecordByName($recordName, $serviceTypes)
+	{
+		$listRecordingRequest = new WebexXmlListRecordingRequest();
+		$listRecordingRequest->setRecordName($recordName);
+		$listRecordingRequest->setServiceTypes($serviceTypes);
+		try
+		{
+			$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
+		}
+		catch (Exception $e)
+		{
+			if ($e->getCode() != webexWrapper::NO_RECORDS_FOUND_ERROR_CODE && $e->getMessage() != webexWrapper::NO_RECORDS_FOUND_ERROR_MSG)
+			{
+				$this->logError("Error occurred while fetching records from webex: " . print_r($e, true));
+				throw $e;
+			}
+			else
+			{
+				$this->logDebug("No Record found for name {$recordName}.");
+				return null;
+			}
+		}
+
+		return $listRecordingResponse;
+	}
+
+	/**
 	 * @param WebexXmlArray $serviceTypes
 	 * @param long $startTime
 	 * @param long $endTime

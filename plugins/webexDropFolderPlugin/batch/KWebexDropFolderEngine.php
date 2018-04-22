@@ -5,10 +5,11 @@
 class KWebexDropFolderEngine extends KDropFolderEngine
 {
 	const ZERO_DATE = '12/31/1971 00:00:01';
-	
 	const ARF_FORMAT = 'ARF';
-	
 	const MAX_QUERY_DATE_RANGE_DAYS = 25; //Maximum querying date range is 28 days we define it as less than that
+	const FILE_ADDED_TO_DROP_FOLDER = 'fileAddedToDropFolder';
+	const FILE_NOT_HANDLED = 'fileNotHandled';
+	const FILE_HANDLED = 'fileHandled';
 
 	private static $unsupported_file_formats = array('WARF');
 
@@ -73,34 +74,56 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		return $this->dropFolderFilesMap;
 	}
 
+	private function initHandleNewFileResultArray()
+	{
+		$result = array();
+		$result[self::FILE_ADDED_TO_DROP_FOLDER] = array();
+		$result[self::FILE_HANDLED] = array();
+		$result[self::FILE_NOT_HANDLED] = array();
+		return $result;
+	}
+
 	public function HandleNewFiles($physicalFiles)
 	{
+		$result = $this->initHandleNewFileResultArray();
+
 		$dropFolderFilesMap = $this->getDropFolderFilesMap();
 		$maxTime = $this->dropFolder->lastFileTimestamp;
 		foreach ($physicalFiles as $physicalFile)
 		{
 			/* @var $physicalFile WebexXmlEpRecordingType */
+			$physicalFileName = $physicalFile->getName() . '_' . $physicalFile->getRecordingID();
 			if (in_array($physicalFile->getFormat(),self::$unsupported_file_formats))
 			{
 				KalturaLog::info('Recording with id [' . $physicalFile->getRecordingID() . '] format [' . $physicalFile->getFormat() . '] is incompatible with the Kaltura conversion processes. Ignoring.');
+				$result[self::FILE_NOT_HANDLED][] = $physicalFileName;
 				continue;
 			}
 
-			$physicalFileName = $physicalFile->getName() . '_' . $physicalFile->getRecordingID();
 			if(!array_key_exists($physicalFileName, $dropFolderFilesMap))
 			{
 				if($this->handleFileAdded($physicalFile))
 				{
 					$maxTime = max(strtotime($physicalFile->getCreateTime()), $maxTime);
 					KalturaLog::info("Added new file with name [$physicalFileName]. maxTime updated: $maxTime");
+					$result[self::FILE_ADDED_TO_DROP_FOLDER][] = $physicalFileName;
 				}
+				else
+					$result[self::FILE_NOT_HANDLED][] = $physicalFileName;
 			}
 			else //drop folder file entry found
 			{
 				$dropFolderFile = $dropFolderFilesMap[$physicalFileName];
 				unset($dropFolderFilesMap[$physicalFileName]);
 				if ($dropFolderFile->status == KalturaDropFolderFileStatus::UPLOADING)
-					$this->handleExistingDropFolderFile($dropFolderFile);
+				{
+					if($this->handleExistingDropFolderFile($dropFolderFile))
+						$result[self::FILE_HANDLED][] = $physicalFileName;
+					else
+						$result[self::FILE_NOT_HANDLED][] = $physicalFileName;
+				}
+				else
+					$result[self::FILE_NOT_HANDLED][] = $physicalFileName;
 			}
 		}
 
@@ -110,6 +133,8 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			$updateDropFolder->lastFileTimestamp = $maxTime;
 			$this->dropFolderPlugin->dropFolder->update($this->dropFolder->id, $updateDropFolder);
 		}
+
+		return $result;
 	}
 
 	public function processFolder (KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
@@ -140,8 +165,12 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		KalturaLog::info("Fetching list of recordings from Webex, startTime [$startTime], endTime [$endTime] of types ".print_r($dropFolderServiceTypes));
 		$serviceTypes = webexWrapper::stringServicesTypesToWebexXmlArray($dropFolderServiceTypes);
 		$result = $this->webexWrapper->listRecordings($serviceTypes, $startTime, $endTime, $startFrom);
-		$recording = $result->getRecording();
-		KalturaLog::info('Recordings fetched: '.print_r($recording, true) );
+		if($result)
+		{
+			$recording = $result->getRecording();
+			KalturaLog::info('Recordings fetched: ' . print_r($recording, true));
+		}
+
 		return $result;
 	}
 

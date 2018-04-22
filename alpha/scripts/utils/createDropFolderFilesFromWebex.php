@@ -5,10 +5,10 @@ require_once('/opt/kaltura/web/content/clientlibs/batchClient/KalturaPlugins/Kal
 require_once('/opt/kaltura/app/batch/batches/KBatchBase.class.php');
 
 const WEEK_IN_SECONDS = 604800;
-if($argc < 6)
+if($argc < 7)
 {
 	echo "Missing arguments.\n";
-	echo "php simulateDryRun.php {dropFolderId} {admin ks} {serviceUrl} {start date} {end date}.\n";
+	echo "php simulateDryRun.php {dropFolderId} {admin ks} {serviceUrl} {start date} {end date} {result filename}.\n";
 	die;
 }
 
@@ -17,13 +17,13 @@ $ks =  $argv[2];
 $url = $argv[3];
 $startDate = $argv[4];
 $endDate = $argv[5];
+$fileName = $argv[6];
 $config = new KalturaConfiguration(-2);
 $config->serviceUrl = $url;
 $client = new KalturaClient($config);
 $client->setKs($ks);
 $dropFolderPlugin = KalturaDropFolderClientPlugin::get($client);
 KBatchBase::$kClient = $client;
-//KBatchBase::$taskConfig = new KSchedularTaskConfig();
 $dropFolder = $dropFolderPlugin->dropFolder->get($dropFolderId);
 KBatchBase::impersonate($dropFolder->partnerId);
 $webexEngine = KWebexDropFolderEngine::withDropFolder($dropFolder);
@@ -40,8 +40,12 @@ for($i = $startDate; $i+WEEK_IN_SECONDS <= $endDate; $i=$i+WEEK_IN_SECONDS)
 	if($result)
 	{
 		$numOfFiles = count($result);
-		KalturaLog::debug("Found {$numOfFiles} of files for {$startTime}-{$endTime}.");
-		$webexEngine->HandleNewFiles($result);
+		$text = "Found {$numOfFiles} of files for {$startTime}-{$endTime}.";
+		file_put_contents($fileName, $text, FILE_APPEND );
+		KalturaLog::debug($text);
+		$handleResult = $webexEngine->HandleNewFiles($result->getRecording());
+		$string_data = serialize($handleResult);
+		file_put_contents($fileName, $string_data, FILE_APPEND );
 	}
 	else
 	{

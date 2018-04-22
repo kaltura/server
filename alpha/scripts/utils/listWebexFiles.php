@@ -41,10 +41,6 @@ if($result)
 	foreach ($result as $recording)
 	{
 		$text = $recording->getName();
-		if($recording->getPasswordReq())
-			$text = $text. "; password required";
-		else
-			$text = $text. "; no password required";
 		print($text. PHP_EOL);
 	}
 }
