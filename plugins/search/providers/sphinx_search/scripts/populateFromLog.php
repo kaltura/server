@@ -129,7 +129,7 @@ while(true)
                         	$sql = $sphinxLog->getSql();
                         	
                         	// sql update commands are created only via an external script for updating entries plays count
-                        	// by default these won't be updated by this scripts  
+                        	// by default these won't be updated by this script
                         	if ($processSqlUpdates || substr($sql, 0, 6) != "update")
                         	{
 	                        	$affected = $sphinxCon->exec($sql);
