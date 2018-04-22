@@ -14,7 +14,7 @@ class kUrlResource extends kContentResource
 	private $url;
 	
 	/**
-	 * Force Import Job 
+	 * Force the URL download as an asynchronous batch job (false will execute the download imidiately upon attaching the resource to an entry or asset).
 	 * @var bool
 	 */
 	private $forceAsyncDownload = false;
