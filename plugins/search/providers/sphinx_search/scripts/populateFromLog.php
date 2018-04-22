@@ -39,6 +39,7 @@ if(!file_exists($configFile))
 $config = parse_ini_file($configFile);
 $sphinxServer = $config['sphinxServer'];
 $sphinxPort = (isset($config['sphinxPort']) ? $config['sphinxPort'] : 9312);
+$processSqlUpdates = (isset($config['processSqlUpdates']) ? $config['processSqlUpdates'] : false);
 $systemSettings = kConf::getMap('system');
 if(!$systemSettings || !$systemSettings['LOG_DIR'])
 {
@@ -126,10 +127,16 @@ while(true)
                        else
                        {
                         	$sql = $sphinxLog->getSql();
-                        	$affected = $sphinxCon->exec($sql);
+                        	
+                        	// sql update commands are created only via an external script for updating entries plays count
+                        	// by default these won't be updated by this scripts  
+                        	if ($processSqlUpdates || substr($sql, 0, 6) != "update")
+                        	{
+	                        	$affected = $sphinxCon->exec($sql);
 
-                        	if(!$affected)
-                              		$errorInfo = $sphinxCon->errorInfo();
+	                        	if(!$affected)
+	                              		$errorInfo = $sphinxCon->errorInfo();
+                        	}
                        }
 
 			// If the record is an historical record, don't take back the last log id
