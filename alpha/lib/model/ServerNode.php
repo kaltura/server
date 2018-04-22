@@ -39,7 +39,7 @@ class ServerNode extends BaseServerNode {
 	{
 		$before = $this->getUpdatedAt();
 		$ret = parent::preUpdate($con);
-		if ($this->isColumnModified(ServerNodePeer::HEARTBEAT_TIME))
+		if (count($this->modifiedColumns) == 2 && $this->isColumnModified(ServerNodePeer::HEARTBEAT_TIME))
 		{
 			$this->setUpdatedAt($before);
 		}
