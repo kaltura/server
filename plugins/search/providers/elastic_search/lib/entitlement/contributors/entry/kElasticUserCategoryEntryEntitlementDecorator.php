@@ -66,14 +66,14 @@ class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEn
 
 		$conditionsBoolQuery = new kESearchBoolQuery();
 
-		$userGroupsQuery = new kESearchTermsQuery('kuser_ids',array(
+		$userGroupsQuery = new kESearchTermsQuery(ESearchCategoryFieldName::KUSER_IDS,array(
 			'index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,
 			'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
 			'id' => $kuserId,
 			'path' => 'group_ids'
 		));
 		$conditionsBoolQuery->addToShould($userGroupsQuery);
-		$userQuery = new kESearchTermQuery('kuser_ids', $kuserId);
+		$userQuery = new kESearchTermQuery(ESearchCategoryFieldName::KUSER_IDS, $kuserId);
 		$conditionsBoolQuery->addToShould($userQuery);
 
 		if(kEntryElasticEntitlement::$entryInSomeCategoryNoPC)

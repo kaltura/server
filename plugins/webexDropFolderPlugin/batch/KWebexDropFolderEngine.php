@@ -43,8 +43,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		$result = $this->listAllRecordings($startTime, $endTime);
 		if (!empty($result))
 		{
-			$physicalFiles = $result->getRecording();
-			$this->HandleNewFiles($physicalFiles);
+			$this->HandleNewFiles($result);
 		}
 		else
 		{
