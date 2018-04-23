@@ -763,7 +763,7 @@ class KalturaEntryService extends KalturaBaseService
 		$clippingTask = new ClippingTaskEntryServerNode();
 		$clippingTask->setClippedEntryId($targetEntry->getId());
 		$clippingTask->setLiveEntryId($liveEntryId);
-		$clippingTask->setClipAttributes(self::getKClipAttributes($operationAttributes));
+		$clippingTask->setClipAttributes(self::getKClipAttributesForLiveClippingTask($operationAttributes));
 		$clippingTask->setServerType(EntryServerNodeType::LIVE_CLIPPING_TASK);
 		$clippingTask->setStatus(EntryServerNodeStatus::TASK_PENDING);
 		$clippingTask->setEntryId($srcEntry->getId()); //recorded entry
@@ -791,12 +791,11 @@ class KalturaEntryService extends KalturaBaseService
 	/**
 	 * @return kClipAttributes
 	 */
-	protected static function getKClipAttributes($operationAttributes)
+	protected static function getKClipAttributesForLiveClippingTask($operationAttributes)
 	{
-		foreach ($operationAttributes as $opAttribute)
-			if ($opAttribute instanceof kClipAttributes)
-				return $opAttribute;
-		return null;
+		if ($operationAttributes && count($operationAttributes) == 1 && $operationAttributes[0] instanceof kClipAttributes)
+			return $operationAttributes[0];
+		throw new KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_OPERATION, "Concat");
 	}
 
 	/**

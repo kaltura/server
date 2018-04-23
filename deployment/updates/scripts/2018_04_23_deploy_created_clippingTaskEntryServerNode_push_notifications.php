@@ -3,21 +3,21 @@
 require_once(__DIR__ . "/../../../alpha/scripts/bootstrap.php");
 
 checkMandatoryPluginsEnabled();
-deployExplicitLivePushNotifications();
+deployLiveClippingPushNotifications();
 
-function deployExplicitLivePushNotifications()
+function deployLiveClippingPushNotifications()
 {
 	$script = realpath(dirname(__FILE__) . "/../../../tests/standAloneClient/exec.php");
 
-	$entryServerNodeCreationTemplate = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/notifications/entryServerNode_created_notification.xml");
+	$clippingTaskEntryServerNodeCreationTemplate = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/notifications/clippingTaskEntryServerNode_created_notification.xml");
 
-	if (!file_exists($entryServerNodeCreationTemplate))
+	if (!file_exists($clippingTaskEntryServerNodeCreationTemplate))
 	{
 		KalturaLog::err("Missing notification file for deployign notifications");
 		return;
 	}
 
-	passthru("php $script $entryServerNodeCreationTemplate");
+	passthru("php $script $clippingTaskEntryServerNodeCreationTemplate");
 }
 
 /**
