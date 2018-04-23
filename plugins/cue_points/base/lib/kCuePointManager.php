@@ -468,9 +468,9 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			return true;
 		}
 		$clipAttributes = self::getClipAttributesFromEntry( $replacingObject );
-		$isClipConcatFlow = self::isClipConcatFlow( $replacingObject );
+		$isClipConcatTrimFlow = self::isClipConcatTrimFlow( $replacingObject );
 		//replacement as a result of trimming
-		if ( !is_null($clipAttributes) || $isClipConcatFlow ) {
+		if ( !is_null($clipAttributes) || $isClipConcatTrimFlow ) {
 			kEventsManager::setForceDeferredEvents( true );
 			$this->deleteCuePoints($c);
 			//copy cuepoints from replacement entry
@@ -545,9 +545,9 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	 * @param BaseObject $object
 	 * @return bool
 	 */
-	protected static function isClipConcatFlow(BaseObject $object ) {
+	protected static function isClipConcatTrimFlow(BaseObject $object ) {
 		if ( $object instanceof entry ) {
-			if ($object->getFromCustomData('clipConcatFlow')){
+			if ($object->getClipConcatTrimFlow()){
 				return true;
 			}
 		}
@@ -1008,7 +1008,8 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	 */
 	public static function copyCuePointsToClipEntry( entry $clipEntry ) {
 		$clipAtts =  self::getClipAttributesFromEntry( $clipEntry );
-		if ( !is_null($clipAtts) ) {
+		//if clipConcat flow let batch job copy cue point
+		if ( !is_null($clipAtts) &&  is_null($clipEntry->getClipConcatTrimFlow()) ) {
 			$sourceEntry = entryPeer::retrieveByPK( $clipEntry->getSourceEntryId() );
 			if ( is_null($sourceEntry) ) {
 				KalturaLog::info("Didn't copy cuePoints for entry [{$clipEntry->getId()}] because source entry [" . $clipEntry->getSourceEntryId() . "] wasn't found");

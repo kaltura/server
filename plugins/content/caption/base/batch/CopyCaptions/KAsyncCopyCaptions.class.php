@@ -53,35 +53,15 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 
 	/**
 	 * copy captions on specific time frame
+	 * @throws kApplicativeException
 	 */
 	private function copyCaptions(KalturaBatchJob $job, KalturaCopyCaptionsJobData $data)
 	{
-		$errorMsg = '';
-		$this->updateJob($job, "Start copying captions from [$data->sourceEntryId] to [$data->entryId]", KalturaBatchJobStatus::PROCESSING);
+		$firstClip = $data->clipsDescriptionArray[0];
+		$this->updateJob($job, "Start copying captions from [$firstClip->sourceEntryId] to [$data->entryId]", KalturaBatchJobStatus::PROCESSING);
 		self::impersonate($job->partnerId);
-		$originalCaptionAssets = $this->getAllCaptionAsset($data->sourceEntryId);
-		if(!$data->fullCopy)
-			$originalCaptionAssets = $this->retrieveCaptionAssetsOnlyFromSupportedTypes($originalCaptionAssets);
-		foreach ($originalCaptionAssets as $originalCaptionAsset)
-		{
-			if ($originalCaptionAsset->status != KalturaCaptionAssetStatus::READY)
-				continue;
-			$newCaptionAsset = $this->cloneCaption($data->entryId, $originalCaptionAsset);
-			$newCaptionAssetResource = $this->createNewCaptionsFile($originalCaptionAsset->id, $data->offset, $data->duration, $newCaptionAsset->format, $data->fullCopy);
-			if (!$newCaptionAssetResource)
-			{
-				$errorMsg = "Couldn't create new captions file for captionAssetId: [$originalCaptionAsset->id] and format: [$newCaptionAsset->format]";
-				continue;
-			}
-			$updatedCaption = $this->loadNewCaptionAssetFile($newCaptionAsset->id, $newCaptionAssetResource);
-			if (!$updatedCaption)
-				$errorMsg = "Created caption asset with id: [$newCaptionAsset->id], but couldn't load the new captions file to it";
-		}
+		$this->copyFromClipToDestination($data, $data->clipsDescriptionArray);
 		self::unimpersonate();
-
-		if($errorMsg)
-			throw new kApplicativeException(KalturaBatchJobAppErrors::MISSING_ASSETS, $errorMsg);
-
 		$this->closeJob($job, null, null, 'Finished copying captions', KalturaBatchJobStatus::FINISHED);
 		return $job;
 	}
@@ -157,7 +137,7 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 	}
 
 
-	private function createNewCaptionsFile($captionAssetId, $offset, $duration , $format, $fullCopy){
+	private function createNewCaptionsFile($captionAssetId, $offset, $duration , $format, $fullCopy, $globalOffset){
 		KalturaLog::info("Create new caption file based on captionAssetId:[$captionAssetId] in format: [$format] with offset: [$offset] and duration: [$duration]");
 		$captionContent = "";
 
@@ -177,15 +157,13 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 			{
 				$captionContent = $this->getCaptionContent($captionAssetId);
 				$captionsContentManager = kCaptionsContentManager::getCoreContentManager($format);
-				$captionContent = $captionsContentManager->buildFile($captionContent, $offset, $endTime);
+				$captionContent = $captionsContentManager->buildFile($captionContent, $offset, $endTime, $globalOffset);
 			}
 			else
 				KalturaLog::info("copying captions for format: [$format] is not supported");
 		}
 
-		$contentResource = new KalturaStringResource();
-		$contentResource->content = $captionContent;
-		return $contentResource;
+		return $captionContent;
 	}
 
 
@@ -203,6 +181,62 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 			KalturaLog::info("Can't serve caption asset id [$captionAssetId] " . $e->getMessage());
 		}
 		return $captionAssetContent;
+	}
+
+	/**
+	 * @param KalturaCopyCaptionsJobData $data
+	 * @param KalturaClipDescriptionArray $clipDescriptionArray
+	 * @throws kApplicativeException
+	 */
+	private function copyFromClipToDestination(KalturaCopyCaptionsJobData $data, $clipDescriptionArray)
+	{
+		$errorMsg = '';
+		//currently only one source
+		$originalCaptionAssets = $this->getAllCaptionAsset($clipDescriptionArray[0]->sourceEntryId);
+		if (!$data->fullCopy)
+			$originalCaptionAssets = $this->retrieveCaptionAssetsOnlyFromSupportedTypes($originalCaptionAssets);
+		foreach ($originalCaptionAssets as $originalCaptionAsset)
+		{
+			if ($originalCaptionAsset->status != KalturaCaptionAssetStatus::READY)
+				continue;
+			$newCaptionAsset = $this->cloneCaption($data->entryId, $originalCaptionAsset);
+			$newCaptionAssetResource = new KalturaStringResource();
+			$this->clipAndConcatSub($data, $clipDescriptionArray, $originalCaptionAsset, $newCaptionAsset, $newCaptionAssetResource,$errorMsg);
+			$updatedCaption = $this->loadNewCaptionAssetFile($newCaptionAsset->id, $newCaptionAssetResource);
+			if (!$updatedCaption)
+				throw new kApplicativeException(KalturaBatchJobAppErrors::MISSING_ASSETS, "Created caption asset with id: [$newCaptionAsset->id], but couldn't load the new captions file to it");
+		}
+		if ($errorMsg)
+			throw new kApplicativeException(KalturaBatchJobAppErrors::MISSING_ASSETS, $errorMsg);
+	}
+
+	/**
+	 * @param KalturaCopyCaptionsJobData $data
+	 * @param $clipDescriptionArray
+	 * @param $originalCaptionAsset
+	 * @param $newCaptionAsset
+	 * @param $newCaptionAssetResource
+	 * @param string $errorMsg
+	 * @return string
+	 */
+	private function clipAndConcatSub(KalturaCopyCaptionsJobData $data, $clipDescriptionArray, $originalCaptionAsset, $newCaptionAsset, $newCaptionAssetResource, &$errorMsg)
+	{
+		foreach ($clipDescriptionArray as $clipDescription)
+		{
+			$toAppend = $this->createNewCaptionsFile($originalCaptionAsset->id, $clipDescription->startTime, $clipDescription->duration,
+				$newCaptionAsset->format, $data->fullCopy, $clipDescription->offsetInDestination);
+			if ($toAppend && $newCaptionAssetResource->content)
+			{
+				$captionsContentManager = kCaptionsContentManager::getCoreContentManager($newCaptionAsset->format);
+				$newCaptionAssetResource->content = $captionsContentManager->merge($newCaptionAssetResource->content, $toAppend);
+			}
+			elseif(!$newCaptionAssetResource->content)
+				$newCaptionAssetResource->content = $toAppend;
+			if (is_null($toAppend))
+			{
+				$errorMsg = "Couldn't create new captions file for captionAssetId: [$originalCaptionAsset->id] and format: [$newCaptionAsset->format]";
+			}
+		}
 	}
 
 }

@@ -1,3 +1,31 @@
+# Mercury 13.18.0 #
+
+## Webex drop folder site name ##
+    - Issue Type: New Feature
+    - Issue ID: PLAT-8732
+    
+ ### Configuration ###
+    
+    A new property was added to drop folder profile - site name.
+    This property can be used for authentication with remote webex site.
+    New defined webex sites, can only work with this parameter rather than site-id and partner-id.
+    FYI - In most cases it can be extracted from Webex service url.
+    Example - https://SITENAME.webex.com
+    
+## Add conference plugin abilities ##
+	- Issue Type: New Feature
+	- Issue ID: WEBC-1075
+ 
+ ### Configuration ###
+
+	In plugins.ini file if you have konference then change to conference
+	 if not add "conference" to plugins.ini
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_30_01_add_conference_service.php
+
 # Mercury 13.17.0 #
 
 ## Add base user permissions to fileAsset service ##

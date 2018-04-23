@@ -138,7 +138,7 @@ class kConcatJobData extends kJobData
 	}
 
 	/**
-	 * @return bool $sortNeeded
+	 * @return bool $shouldSort
 	 */
 	public function getShouldSort()
 	{

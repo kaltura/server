@@ -46,12 +46,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$jobData = new kClipConcatJobData();
 		$jobData->setDestEntryId($destEntry->getEntryId());
 		$jobData->setTempEntryId($clipEntry->getEntryId());
-		//if it is replace(Trim flow) active the copy to destenation consumers
-		if ($destEntry->getIsTemporary())
-		{
-			$destEntry->putInCustomData('clipConcatFlow','true');
-			$destEntry->save();
-		}
+		//if it is replace(Trim flow) active the copy to destination consumers
+		$this->fillDestEntry($destEntry,$sourceEntryId, $operationAttributes);
 		$jobData->setSourceEntryId($sourceEntryId);
 		$jobData->setPartnerId($partnerId);
 		$jobData->setPriority($priority);
@@ -132,16 +128,18 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	/***
 	 * @param $sourceFlavorParamId
+	 * @param $entryId
 	 * @return int
 	 * @throws PropelException
 	 */
-	private function cloneFlavorParam($sourceFlavorParamId)
+	private function cloneFlavorParam($sourceFlavorParamId,$entryId)
 	{
 		$flavorParamsObj = assetParamsPeer::retrieveByPK($sourceFlavorParamId);
 		// unset flavorParamsObj ID
 		$flavorParamsObj->setId(null);
 		$flavorParamsObj->setNew(true);
 		$flavorParamsObj->setFormat(flavorParams::CONTAINER_FORMAT_MPEGTS);
+		$this->fixConversionParam($flavorParamsObj, $entryId);
 		//save the object
 		$flavorParamsObj->save();
 		//return the object ID
@@ -294,7 +292,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		foreach($operationAttributes as $singleAttribute)
 		{
 			KalturaLog::info("Going To create Flavor for clip: " . print_r($singleAttribute));
-			$clonedID =	$this->cloneFlavorParam($singleAttribute->getAssetParamsId());
+			$clonedID =	$this->cloneFlavorParam($singleAttribute->getAssetParamsId(),$entryId);
 			$flavorAsst = $this->createTempClipFlavorAsset($partnerId,$entryId,$clonedID,$order);
 			$batchJob =	kBusinessPreConvertDL::decideAddEntryFlavor($parentJob, $entryId,
 					$clonedID, $errDescription,$flavorAsst->getId()
@@ -317,19 +315,19 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 */
 	private function areAllClipJobsDone($batchJob)
 	{
-
-		$childJobs = $batchJob->getRootJob()->getChildJobs();
-		/**
-		 * check if all child jobs are finished(all clip jobs and then a single concat job)
-		 * @var BatchJob $job */
-		foreach ($childJobs as $job)
+		$c = new Criteria();
+		$c->add(BatchJobPeer::JOB_TYPE,array(BatchJobType::CONVERT,BatchJobType::CONCAT),Criteria::IN);
+		$c->add(BatchJobPeer::STATUS,array(BatchJob::BATCHJOB_STATUS_FINISHED),Criteria::NOT_IN);
+		$childJobs = $batchJob->getRootJob()->getChildJobs($c);
+		if (count($childJobs) != 0)
 		{
-			if ($job->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED )
+			/** @var BatchJob $job */
+			foreach ($childJobs as $job)
 			{
 				KalturaLog::info("number of children:   ". count($childJobs));
 				KalturaLog::info('Child job id [' . $job->getId() . '] status [' . $job->getStatus() . ']');
-				return false;
 			}
+			return false;
 		}
 		if ($batchJob->getJobType() == BatchJobType::POSTCONVERT  &&
 			$batchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
@@ -407,8 +405,10 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$tempEntry->setStatus(entryStatus::NO_CONTENT);
 		$tempEntry->setDisplayInSearch(EntryDisplayInSearchType::SYSTEM);
 		$tempEntry->setSourceType(EntrySourceType::CLIP);
+		$tempEntry->setKuserId(kCurrentContext::getCurrentKsKuserId());
 		$tempEntry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($partnerId)->getId());
 		$tempEntry->save();
+		KalturaLog::info('Temp ClipConcat Entry Created, Entry ID:  ' . $tempEntry->getId());
 		return $tempEntry;
 	}
 
@@ -473,7 +473,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	}
 
 	/**
-	 * @param $dbAsset
+	 * @param asset $dbAsset
 	 * @throws PropelException
 	 */
 	private function updateMediaFlowOnAsset($dbAsset)
@@ -487,8 +487,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	}
 
 	/**
-	 * @param $dbAsset
-	 * @param $dbEntry
+	 * @param asset $dbAsset
+	 * @param entry $dbEntry
 	 */
 	private function syncFlavorParamToAsset($dbAsset, $dbEntry)
 	{
@@ -499,8 +499,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	}
 
 	/**
-	 * @param $entryId
-	 * @param $dbEntry
+	 * @param string $entryId
+	 * @param entry $dbEntry
 	 */
 	private function updateAssetFailedToConvert($entryId, $dbEntry)
 	{
@@ -514,7 +514,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	/**
 	 * @param $concatSyncKey
-	 * @param $dbAsset
+	 * @param asset $dbAsset
 	 * @param $isNewAsset
 	 * @param $dbEntry
 	 * @throws PropelException
@@ -531,6 +531,69 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$this->updateMediaFlowOnAsset($dbAsset);
 
 		$this->syncFlavorParamToAsset($dbAsset, $dbEntry);
+	}
+
+	/**
+	 * @param entry $destEntry
+	 * @param $sourceEntryId
+	 * @param array $operationAttributes
+	 */
+	private function fillDestEntry($destEntry, $sourceEntryId, array $operationAttributes)
+	{
+		if ($destEntry->getIsTemporary()) {
+			$destEntry->setClipConcatTrimFlow(true);
+		} else {
+			$destEntry->setClipConcatTrimFlow(false);
+		}
+		$destEntry->setSourceEntryId($sourceEntryId);
+		$destEntry->setOperationAttributes($operationAttributes);
+		$destEntry->setStatus(entryStatus::PENDING);
+		$destEntry->save();
+	}
+
+	/**
+	 * @param array $conversionExtraParamsArray
+	 * @param array $conversionEngines
+	 * @param mediaInfo $mediaInfo
+	 * @return string
+	 */
+	private function editConversionEngineExtraParam($conversionExtraParamsArray, $conversionEngines, $mediaInfo)
+	{
+		$newConversionExtraParams = array();
+		for ($i = 0; $i < count($conversionEngines) ; $i++)
+		{
+			$ep = '';
+			if($i < count($conversionExtraParamsArray))
+				$ep = $conversionExtraParamsArray[$i];
+
+			if ($conversionEngines[$i] == conversionEngineType::FFMPEG || $conversionEngines[$i] == conversionEngineType::FFMPEG_AUX)
+			{
+				if (strpos($ep, '-map a') === false && $mediaInfo && $mediaInfo->isContainAudio())
+					$ep .= ' -map a';
+				if (strpos($ep, '-map v') === false && $mediaInfo && $mediaInfo->isContainVideo())
+					$ep .= ' -map v';
+			}
+			$newConversionExtraParams[] = $ep;
+		}
+		return implode(' | ',$newConversionExtraParams);
+	}
+
+	/**
+	 * @param assetParams $flavorParamsObj
+	 * @param string $entryId
+	 */
+	private function fixConversionParam($flavorParamsObj, $entryId)
+	{
+		$mediaInfo = mediaInfoPeer::retrieveOriginalByEntryId($entryId);
+		$conversionEngines = explode(',', $flavorParamsObj->getConversionEngines());
+		if (is_null($flavorParamsObj->getConversionEnginesExtraParams()))
+			$newExtraConversionParams = $this->editConversionEngineExtraParam(array(), $conversionEngines, $mediaInfo);
+		else {
+			$conversionExtraParams = explode('|', $flavorParamsObj->getConversionEnginesExtraParams());
+			$newExtraConversionParams =
+				$this->editConversionEngineExtraParam($conversionExtraParams, $conversionEngines, $mediaInfo);
+		}
+		$flavorParamsObj->setConversionEnginesExtraParams($newExtraConversionParams);
 	}
 
 

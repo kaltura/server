@@ -26,7 +26,12 @@ class Form_WebexDropFolderConfigureExtend_SubForm extends Form_DropFolderConfigu
 			'label'			=> 'Password:',
 			'filters'		=> array('StringTrim'),
 		));
-		
+
+		$this->addElement('text', 'webexSiteName', array(
+			'label'			=> 'Site Name:',
+			'filters'		=> array('StringTrim'),
+		));
+
 		$this->addElement('text', 'webexSiteId', array(
 			'label'			=> 'Site ID:',
 			'filters'		=> array('StringTrim'),

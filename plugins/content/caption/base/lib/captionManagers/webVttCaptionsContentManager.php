@@ -9,6 +9,7 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 	const WEBVTT_TIMECODE_PATTERN = '#^((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}\.[0-9]{3}) --> ((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}\.[0-9]{3})( .*)?$#';
 
 	const BOM_CODE =  "\xEF\xBB\xBF";
+	const WEBVTT_PATTERN = '#^WEBVTT#';
 	/**
 	 * @var array
 	 */
@@ -185,23 +186,43 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 		return $itemsData;
 	}
 
-	public function buildFile($content, $clipStartTime, $clipEndTime)
+	public function buildFile($content, $clipStartTime, $clipEndTime, $globalOffset = 0)
 	{
-		$newFileContent = $this->createCaptionsFile($content, $clipStartTime, $clipEndTime, self::WEBVTT_TIMECODE_PATTERN);
+		$newFileContent = $this->createCaptionsFile($content, $clipStartTime, $clipEndTime, self::WEBVTT_TIMECODE_PATTERN, $globalOffset);
 		return $newFileContent;
 	}
 
-	protected function createAdjustedTimeLine($matches,  $clipStartTime, $clipEndTime)
+	protected function createAdjustedTimeLine($matches,  $clipStartTime, $clipEndTime, $globalOffset)
 	{
 		$startCaption = $this->parseWebvttStrTTTime($matches[1]);
 		$endCaption = $this->parseWebvttStrTTTime($matches[2]);
 		if (!kCaptionsContentManager::onTimeRange($startCaption, $endCaption, $clipStartTime, $clipEndTime))
 			return null;
-		$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($startCaption, $clipStartTime);
-		$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $endCaption);
+		$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($startCaption, $clipStartTime, $globalOffset);
+		$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $endCaption, $globalOffset);
 		$settings = isset($matches[3]) ? trim($matches[3]) : '';
 		$timeLine = kWebVTTGenerator::formatWebVTTTimeStamp($adjustedStartTime) . ' --> ' . kWebVTTGenerator::formatWebVTTTimeStamp($adjustedEndTime). $settings . kCaptionsContentManager::UNIX_LINE_ENDING;
 		return $timeLine;
 	}
 
+	/**
+	 * @param string $content
+	 * @param string $toAppend
+	 * @return string
+	 */
+	public function merge($content, $toAppend)
+	{
+		if (!$toAppend)
+			return $content;
+
+		$originalFileContentArray = kCaptionsContentManager::getFileContentAsArray($toAppend);
+		while (($line = kCaptionsContentManager::getNextValueFromArray($originalFileContentArray)) !== false)
+		{
+			if (preg_match(self::WEBVTT_PATTERN, $line) === 0 && trim($line))
+			{
+				$content .= $line . kCaptionsContentManager::UNIX_LINE_ENDING;
+			}
+		}
+		return $content;
+	}
 }
