@@ -62,7 +62,7 @@ class EntryVendorTaskService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, $sourceFlavorVersion);
 		
 		//check if credit has expired
-		if (!kReachUtils::hasCreditExpired($dbReachProfile))
+		if (kReachUtils::hasCreditExpired($dbReachProfile))
 			throw new KalturaAPIException(KalturaReachErrors::CREDIT_EXPIRED, $entryVendorTask->entryId, $entryVendorTask->catalogItemId);
 		
 		if (!kReachUtils::isEnoughCreditLeft($dbEntry, $dbVendorCatalogItem, $dbReachProfile))

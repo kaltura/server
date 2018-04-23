@@ -398,7 +398,7 @@ class ReachProfile extends BaseReachProfile
 	{
 		$fullFilledCatalogItemIds = array();
 		if(!is_array($this->getRulesArray()) || !count($this->getRulesArray()))
-			return true;
+			return $fullFilledCatalogItemIds;
 		
 		$context = new kContextDataResult();
 		foreach ($this->getRulesArray() as $rule)
