@@ -10,6 +10,7 @@ class ClippingTaskEntryServerNode extends TaskEntryServerNode
 
 	const CUSTOM_DATA_CLIP_ATTRIBUTES = "clip_attributes";
 	const CUSTOM_DATA_CLIPPED_ENTRY_ID = "clipped_entry_id";
+	const CUSTOM_DATA_LIVE_ENTRY_ID = "live_entry_id";
 
 	public function getClipAttributes()
 	{
@@ -29,6 +30,16 @@ class ClippingTaskEntryServerNode extends TaskEntryServerNode
 	public function setClippedEntryId($v)
 	{
    		return $this->putInCustomData(self::CUSTOM_DATA_CLIPPED_ENTRY_ID, $v);
+	}
+
+	public function getLiveEntryId()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_LIVE_ENTRY_ID);
+	}
+
+	public function setLiveEntryId($v)
+	{
+		return $this->putInCustomData(self::CUSTOM_DATA_LIVE_ENTRY_ID, $v);
 	}
 
 	public function validateEntryServerNode()

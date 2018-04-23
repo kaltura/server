@@ -16,10 +16,16 @@ class KalturaClippingTaskEntryServerNode extends KalturaTaskEntryServerNode
 	 */
 	public $clippedEntryId;
 
+	/**
+	 * @var string
+	 */
+	public $liveEntryId;
+
 	private static $map_between_objects = array
     (
 		"clipAttributes",
 		"clippedEntryId",
+		"liveEntryId",
 	);
 
 	public function getMapBetweenObjects ( )

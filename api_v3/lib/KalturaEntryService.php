@@ -751,16 +751,18 @@ class KalturaEntryService extends KalturaBaseService
 
 	protected function createRecordedClippingTask(entry $srcEntry, entry $targetEntry, $operationAttributes)
 	{
-		$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($srcEntry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
+		$liveEntryId = $srcEntry->getRootEntryId();
+		$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($liveEntryId, EntryServerNodeType::LIVE_PRIMARY);
 		if (!$entryServerNode)
 		{
 			KalturaLog::debug("Can't create clipping task for SrcEntry: ". $srcEntry->getId() . " to entry:" . $targetEntry->getId() . " with: " . print_r($operationAttributes ,true));
-			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $srcEntry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
+			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $liveEntryId, EntryServerNodeType::LIVE_PRIMARY);
 		}
 		$serverNode = ServerNodePeer::retrieveByPK($entryServerNode->getServerNodeId());
 
 		$clippingTask = new ClippingTaskEntryServerNode();
 		$clippingTask->setClippedEntryId($targetEntry->getId());
+		$clippingTask->setLiveEntryId($liveEntryId);
 		$clippingTask->setClipAttributes(self::getKClipAttributes($operationAttributes));
 		$clippingTask->setServerType(EntryServerNodeType::LIVE_CLIPPING_TASK);
 		$clippingTask->setStatus(EntryServerNodeStatus::TASK_PENDING);
