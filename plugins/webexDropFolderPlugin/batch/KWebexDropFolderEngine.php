@@ -207,48 +207,38 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		if ($this->dropFolder->deleteFromTimestamp && $this->dropFolder->deleteFromTimestamp > (time() - self::MAX_QUERY_DATE_RANGE_DAYS * 86400))
 			$createTimeStart = date('m/j/Y H:i:s', $this->dropFolder->deleteFromTimestamp);
 
-		$result = $this->listRecordings($createTimeStart, $createTimeEnd);
+		$result = $this->listAllRecordings($createTimeStart, $createTimeEnd);
 		if($result)
 		{
-			KalturaLog::info("Files to delete: " . $result->getMatchingRecords()->getTotal());
-			$faultCounter = 0;
+			KalturaLog::info("Files to delete: " . count($result));
 			$dropFolderFilesMap = $this->getDropFolderFilesMap();
 		}
 
-		while ($result)
+		foreach ($result as $file)
 		{
-			$fileList = $result->getRecording();
-			foreach ($fileList as $file)
+			$physicalFileName = $file->getName() . '_' . $file->getRecordingID();
+			if (!$this->shouldPurgeFile($dropFolderFilesMap, $physicalFileName))
+				continue;
+
+			try
 			{
-				$physicalFileName = $file->getName() . '_' . $file->getRecordingID();
-				if (!$this->shouldPurgeFile($dropFolderFilesMap, $physicalFileName))
-					continue;
-
-				try
-				{
-					$this->webexWrapper->deleteRecordById($file->getRecordingID());
-				}
-				catch (Exception $e)
-				{
-					KalturaLog::err('Error occurred: ' . print_r($e, true));
-					if (++$faultCounter >= webexWrapper::MAX_DELETE_FAILURES)
-						throw new Exception("Failed to delete more then " . webexWrapper::MAX_FAILURES . " times", 0, $e);
-
-					continue;
-				}
-
-				if ($this->dropFolder->deleteFromRecycleBin)
-				{
-					$this->deleteFileFromRecycleBin($physicalFileName, $dropFolderFilesMap[$physicalFileName]->id, $file->getCreateTime());
-				}
-				else
-				{
-					KalturaLog::info("File [$physicalFileName] successfully purged. Purging drop folder file");
-					$this->dropFolderFileService->updateStatus($dropFolderFilesMap[$physicalFileName]->id, KalturaDropFolderFileStatus::PURGED);
-				}
+				$this->webexWrapper->deleteRecordById($file->getRecordingID());
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::err('Error occurred: ' . print_r($e, true));
+				continue;
 			}
 
-			$result = $this->listRecordings($createTimeStart, $createTimeEnd, $faultCounter + webexWrapper::START_INDEX_OFFSET);
+			if ($this->dropFolder->deleteFromRecycleBin)
+			{
+				$this->deleteFileFromRecycleBin($physicalFileName, $dropFolderFilesMap[$physicalFileName]->id, $file->getCreateTime());
+			}
+			else
+			{
+				KalturaLog::info("File [$physicalFileName] successfully purged. Purging drop folder file");
+				$this->dropFolderFileService->updateStatus($dropFolderFilesMap[$physicalFileName]->id, KalturaDropFolderFileStatus::PURGED);
+			}
 		}
 	}
 

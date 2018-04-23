@@ -32,10 +32,11 @@ $dropFolderServiceTypes = $dropFolder->webexServiceType ? explode(',', $dropFold
 	array(WebexXmlComServiceTypeType::_MEETINGCENTER);
 $serviceTypes = webexWrapper::stringServicesTypesToWebexXmlArray($dropFolderServiceTypes);
 $webexWrapper = new webexWrapper($dropFolder->webexServiceUrl . '/' . $dropFolder->path, $securityContext, array('KalturaLog', 'err'), array('KalturaLog', 'debug'));
-for($i = $startDate; $i+WEEK_IN_SECONDS <= $endDate; $i=$i+WEEK_IN_SECONDS)
+for($i = $startDate; $i < $endDate; $i=$i+WEEK_IN_SECONDS)
 {
 	$startTime = date('m/j/Y H:i:s', $i);
-	$endTime = (date('m/j/Y H:i:s', $i+WEEK_IN_SECONDS));
+	$endTimeEpoch = min($i+WEEK_IN_SECONDS, $endDate);
+	$endTime = date('m/j/Y H:i:s', $endTimeEpoch);
 	$result = $webexWrapper->listAllRecordings($serviceTypes, $startTime, $endTime);
 	if($result)
 	{
@@ -43,7 +44,7 @@ for($i = $startDate; $i+WEEK_IN_SECONDS <= $endDate; $i=$i+WEEK_IN_SECONDS)
 		$text = "Found {$numOfFiles} of files for {$startTime}-{$endTime}.";
 		file_put_contents($fileName, $text, FILE_APPEND );
 		KalturaLog::debug($text);
-		$handleResult = $webexEngine->HandleNewFiles($result->getRecording());
+		$handleResult = $webexEngine->HandleNewFiles($result);
 		$string_data = serialize($handleResult);
 		file_put_contents($fileName, $string_data, FILE_APPEND );
 	}
