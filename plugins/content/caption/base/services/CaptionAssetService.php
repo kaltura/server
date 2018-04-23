@@ -739,7 +739,7 @@ class CaptionAssetService extends KalturaAssetService
 
 	private function setStatus($captionAsset)
 	{
-		if ($this - $this->getKs()->getPrivilegeByName(KSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION))
+		if ($this && $this->getKs()->getPrivilegeByName(KSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION))
 			$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_PENDING_REVIEW);
 		else
 			$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_READY);
