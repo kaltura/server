@@ -13,8 +13,7 @@ class KalturaEffectsArray extends KalturaTypedArray
 
 		foreach($arr as $obj)
 		{
-			$class = $obj->getApiType();
-			$nObj = new $class();
+			$nObj = new KalturaEffect();
 			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
