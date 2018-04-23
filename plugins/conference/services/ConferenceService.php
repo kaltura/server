@@ -160,8 +160,9 @@ class ConferenceService extends KalturaBaseService {
 			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND,$entryId, ConferencePlugin::getCoreValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER));
 		}
 		/** @var ConferenceEntryServerNode $confEntryServerNode */
-		if ($confEntryServerNode->getLastAllocationTime() < (time() - kConf::get('conf_not_finished_timeout', 'local', 0)))
+		if (!$confEntryServerNode->isValid())
 		{
+			KalturaLog::debug("conf still has grace period, not finishing");
 			return false;
 		}
 		$serverNode = ServerNodePeer::retrieveByPK($confEntryServerNode->getServerNodeId());
@@ -174,7 +175,7 @@ class ConferenceService extends KalturaBaseService {
 		$otherEntryServerNodes = EntryServerNodePeer::retrieveByServerNodeIdAndType($serverNode->getId(), ConferencePlugin::getCoreValue('serverNodeType', ConferenceServerNodeType::CONFERENCE_SERVER));
 		if (!count($otherEntryServerNodes))
 		{
-			KalutraLog::debgu('No entry server nodes left, marking server node as not registered');
+			KalturaLog::debug('No entry server nodes left, marking server node as not registered');
 			$serverNode->setStatus(ServerNodeStatus::NOT_REGISTERED);
 			$serverNode->save();
 		}

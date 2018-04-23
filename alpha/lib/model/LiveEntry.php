@@ -679,11 +679,13 @@ abstract class LiveEntry extends entry
 	public function getLiveStatus()
 	{
 		$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($this->getId());
-		
+
 		$status = EntryServerNodeStatus::STOPPED;
 		foreach ($entryServerNodes as $entryServerNode)
 		{
 			/* @var $entryServerNode EntryServerNode */
+			if (!in_array($entryServerNode->getServerType(), array(EntryServerNodeType::LIVE_PRIMARY,EntryServerNodeType::LIVE_BACKUP)))
+				continue;
 			$status = self::maxLiveEntryStatus($status, $entryServerNode->getStatus());
 		}
 		
