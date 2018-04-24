@@ -72,7 +72,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	}
 
 	/**
-	 * @param $physicalFiles WebexXmlEpRecordingType
+	 * @param $physicalFiles array
 	 * @return kWebexHandleFilesResult
 	 */
 	public function HandleNewFiles($physicalFiles)
@@ -82,6 +82,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		$maxTime = $this->dropFolder->lastFileTimestamp;
 		foreach ($physicalFiles as $physicalFile)
 		{
+			/* @var $physicalFile WebexXmlEpRecordingType */
 			$physicalFileName = $physicalFile->getName() . '_' . $physicalFile->getRecordingID();
 			if (in_array($physicalFile->getFormat(),self::$unsupported_file_formats))
 			{

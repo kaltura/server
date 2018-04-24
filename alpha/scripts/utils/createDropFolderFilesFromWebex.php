@@ -13,6 +13,14 @@ if($argc < 7)
 	die;
 }
 
+/**
+ * @param $startDate
+ * @param $endDate
+ * @param webexWrapper $webexWrapper
+ * @param $serviceTypes
+ * @param $logFileName
+ * @return array
+ */
 function getRecordingsFile($startDate, $endDate, $webexWrapper, $serviceTypes, $logFileName)
 {
 	$startTime = date('m/j/Y H:i:s', $startDate);
@@ -34,6 +42,11 @@ function getRecordingsFile($startDate, $endDate, $webexWrapper, $serviceTypes, $
 	return $result;
 }
 
+/**
+ * @param $files
+ * @param $logFileName
+ * @param KWebexDropFolderEngine $webexEngine
+ */
 function handleFiles($files, $logFileName, $webexEngine)
 {
 	$handleResult = $webexEngine->HandleNewFiles($files);
@@ -60,15 +73,14 @@ $securityContext = $webexEngine->getWebexClientSecurityContext($dropFolder);
 $dropFolderServiceTypes = $dropFolder->webexServiceType ? explode(',', $dropFolder->webexServiceType) :
 	array(WebexXmlComServiceTypeType::_MEETINGCENTER);
 $serviceTypes = webexWrapper::stringServicesTypesToWebexXmlArray($dropFolderServiceTypes);
-$webexWrapper = new webexWrapper($dropFolder->webexServiceUrl . '/' . $dropFolder->path, $securityContext, array('KalturaLog', 'err'), array('KalturaLog', 'debug'));
+$webexWrapper = new webexWrapper($dropFolder->webexServiceUrl . '/' . $dropFolder->path, $securityContext, array('KalturaLog', 'err'),
+	array('KalturaLog', 'debug'), false);
 for($i = $startDate; $i < $endDate; $i=$i+WEEK_IN_SECONDS)
 {
 	$files = getRecordingsFile($i, $endDate, $webexWrapper, $serviceTypes, $logFileName);
 	if($files)
 	{
-		file_put_contents($logFileName, "First round:".PHP_EOL, FILE_APPEND );
-		handleFiles($files, $logFileName);
-		file_put_contents($logFileName, "Second round:".PHP_EOL, FILE_APPEND );
-		handleFiles($files, $logFileName);
+		file_put_contents($logFileName, "Starting to handle files:".PHP_EOL, FILE_APPEND );
+		handleFiles($files, $logFileName,$webexEngine);
 	}
 }

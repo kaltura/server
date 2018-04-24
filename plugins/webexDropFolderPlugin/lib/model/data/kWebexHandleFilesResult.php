@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.dropFolder
+ * @subpackage model
+ */
 class kWebexHandleFilesResult
 {
 	const FILE_ADDED_TO_DROP_FOLDER = 'fileAddedToDropFolder';

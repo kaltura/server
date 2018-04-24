@@ -18,10 +18,11 @@ class webexWrapper
 	 * @var WebexXmlSecurityContext $securityContext
 	 * @var callable $errorLogger
 	 * @var callable $debugLogger
+	 * @var bool $validateNoBackup
 	 */
-	public function __construct($url, WebexXmlSecurityContext $securityContext, $errorLogger = null, $debugLogger = null)
+	public function __construct($url, WebexXmlSecurityContext $securityContext, $errorLogger = null, $debugLogger = null, $validateNoBackup = true)
 	{
-		$this->webexClient = new WebexXmlClient($url, $securityContext);
+		$this->webexClient = new WebexXmlClient($url, $securityContext, $validateNoBackup);
 		$this->errorLogger = $errorLogger;
 		$this->debugLogger = $debugLogger;
 	}
