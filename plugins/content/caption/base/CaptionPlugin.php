@@ -578,22 +578,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 					$languageCode= self::getLanguageCode($captionAsset->getLanguage(),$useThreeCodeLang);
 					if($languageCode)
 						$captionAssetObj['language'] = $languageCode;
-/*
-					if (isset(self::$captionsFormatMap[$captionAsset->getLanguage()]))
-					{
-						$threeCodeLang = self::$captionsFormatMap[$captionAsset->getLanguage()];
-						if ($useThreeCodeLang)
-							$captionAssetObj['language'] = $threeCodeLang;
-						else
-						{
-							$twoCodeLang =  languageCodeManager::getTwoCodeLowerFromThreeCode($threeCodeLang);
-							if($twoCodeLang)
-								$captionAssetObj['language'] = $twoCodeLang;
-							else
-								$captionAssetObj['language'] = self::$captionsFormatMap[$captionAsset->getLanguage()];
-						}
-					}
-*/
+
 					KalturaLog::info("Object passed into editor: " . print_r($captionAssetObj, true));
 					$contributor->captions[] = $captionAssetObj;
 				}
