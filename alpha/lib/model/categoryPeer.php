@@ -384,9 +384,7 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 		$c->addAnd($privacyContextCrit);
 
 		//set privacy by ks and type
-		$crit = $c->getNewCriterion ( self::PRIVACY, kEntitlementUtils::getPrivacyForKs($partnerId), Criteria::IN);
-		$crit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-		
+
 		//user is entitled to view all cantent that belong to categoires he is a membr of
 		$kuser = null;
 		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
@@ -401,11 +399,9 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 			$kgroupIds[] = $kuser->getId();
 			$membersCrit = $c->getNewCriterion ( self::MEMBERS , $kgroupIds, KalturaCriteria::IN_LIKE);
 			$membersCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-   			$crit->addOr($membersCrit);
+			$c->addAnd($membersCrit);
 		}
 				
-		$c->addAnd ( $crit );
-		
 		$c->applyFilters();
 			
 		$categoryIds = $c->getFetchedIds();
