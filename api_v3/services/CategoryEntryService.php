@@ -289,8 +289,14 @@ class CategoryEntryService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
 
 			if($dbCategoryEntry->getStatus() != CategoryEntryStatus::PENDING)
-				throw new KalturaAPIException(KalturaErrors::CANNOT_ACTIVATE_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING);
+			{
+				if ($status == CategoryEntryStatus::ACTIVE)
+					throw new KalturaAPIException(KalturaErrors::CANNOT_ACTIVATE_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING);
 
+				if ($status == CategoryEntryStatus::REJECTED)
+					throw new KalturaAPIException(KalturaErrors::CANNOT_REJECT_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING);
+			}
+            
 			$dbCategoryEntry->setStatus($status);
 			$dbCategoryEntry->save();
 		}
