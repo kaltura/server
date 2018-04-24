@@ -5,16 +5,11 @@
  */
 abstract class TaskEntryServerNode extends EntryServerNode
 {
-    public function addTrackEntryForStatusChange($description = '')
+    protected function addTrackEntryInfo($trackEventType, $description, $entryId = null)
     {
-        $desc = 'TaskId='.$this->getId().' New Status='.$this->getStatus().' ServerNodeId='.$this->getServerNodeId() . $description;
-        $type = TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_ENTRY_SERVER_NODE_TASK;
-        $this->addTrackEntryInfo($type, $desc);
+        $desc = 'TaskId='.$this->getId().':Status='.$this->getStatus().':ServerNodeId='.$this->getServerNodeId().':'.$description;
+        $trackEventType = $trackEventType ? $trackEventType : TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_ENTRY_SERVER_NODE_TASK
+        parent::addTrackEntryInfo($trackEventType, $desc, $entryId);
     }
-
-    public function postInsert(PropelPDO $con = null)
-    {
-        $this->addTrackEntryForStatusChange("Creating");
-        parent::postInsert($con);
-    }
+    
 }
