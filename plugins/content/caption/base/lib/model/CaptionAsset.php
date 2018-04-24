@@ -30,7 +30,7 @@ class CaptionAsset extends asset
 	public function getLabel()			    {return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LABEL);}
 	public function getParentId()           {return $this->getFromCustomData(self::CUSTOM_DATA_PARENT_ID);}
 	public function getAccuracy()           {return $this->getFromCustomData(self::CUSTOM_DATA_ACCURACY);}
-	public function getDisplayOnPlayer()    {return $this->getFromCustomData(self::CUSTOM_DATA_DISPLAY_ON_PLAYER);}
+	public function getDisplayOnPlayer()    {return $this->getFromCustomData(self::CUSTOM_DATA_DISPLAY_ON_PLAYER, null, true);}
 
 	public function setLanguage($v)		    {$this->putInCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE, $v);}
 	public function setDefault($v)		    {$this->putInCustomData(self::CUSTOM_DATA_FIELD_DEFAULT, (bool)$v);}
