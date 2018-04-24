@@ -173,11 +173,11 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	public function getWebexClientSecurityContext()
 	{
 		$securityContext = new WebexXmlSecurityContext();
-		$securityContext->setUid($this->webexUserId); // webex username
-		$securityContext->setPwd($this->webexPassword); // webex password
-		$securityContext->setSiteName($this->webexSiteName); // webex partner id
-		$securityContext->setSid($this->webexSiteId); // webex site id
-		$securityContext->setPid($this->webexPartnerId); // webex partner id
+		$securityContext->setUid($this->dropFolder->webexUserId); // webex username
+		$securityContext->setPwd($this->dropFolder->webexPassword); // webex password
+		$securityContext->setSiteName($this->dropFolder->webexSiteName); // webex partner id
+		$securityContext->setSid($this->dropFolder->webexSiteId); // webex site id
+		$securityContext->setPid($this->dropFolder->webexPartnerId); // webex partner id
 
 		return $securityContext;
 	}
