@@ -72,7 +72,10 @@ class CaptionAssetService extends KalturaAssetService
 
 		$dbCaptionAsset = new CaptionAsset();
 		$dbCaptionAsset = $captionAsset->toInsertableObject($dbCaptionAsset);
-
+		
+		if($this->getKs() && $this->getKs()->getPrivilegeByName(KSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION))
+			$captionAsset->setDisplayOnPlayer(false);
+				
 		$dbCaptionAsset->setEntryId($entryId);
 		$dbCaptionAsset->setPartnerId($dbEntry->getPartnerId());
 		$dbCaptionAsset->setStatus(CaptionAsset::ASSET_STATUS_QUEUED);
@@ -121,7 +124,6 @@ class CaptionAssetService extends KalturaAssetService
 			CaptionAsset::ASSET_STATUS_READY,
 			CaptionAsset::ASSET_STATUS_VALIDATING,
 			CaptionAsset::ASSET_STATUS_TEMP,
-			CaptionAsset::ASSET_STATUS_PENDING_REVIEW,
 		);
 
 		if ($previousStatus == CaptionAsset::ASSET_STATUS_QUEUED && in_array($dbCaptionAsset->getStatus(), $newStatuses))
@@ -212,8 +214,7 @@ class CaptionAssetService extends KalturaAssetService
 		$captionAsset->setWidth($width);
 		$captionAsset->setHeight($height);
 		$captionAsset->setSize($fileSync->getFileSize());
-
-		$this->setStatus($captionAsset);
+		$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_READY);
 		$captionAsset->save();
 	}
 
@@ -280,8 +281,8 @@ class CaptionAssetService extends KalturaAssetService
 		$captionAsset->setWidth($width);
 		$captionAsset->setHeight($height);
 		$captionAsset->setSize(filesize($finalPath));
-
-		$this->setStatus($captionAsset);
+		
+		$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_READY);
 		$captionAsset->save();
 	}
 
@@ -308,7 +309,7 @@ class CaptionAssetService extends KalturaAssetService
 
 		$captionAsset->setFileExt($contentResource->getFileExt());
 		$captionAsset->incrementVersion();
-		$this->setStatus($captionAsset);
+		$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_READY);
 		$captionAsset->save();
 
 		$syncKey = $captionAsset->getSyncKey(CaptionAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
@@ -714,34 +715,5 @@ class CaptionAssetService extends KalturaAssetService
 		$captionAssetDb->setStatus(CaptionAsset::ASSET_STATUS_DELETED);
 		$captionAssetDb->setDeletedAt(time());
 		$captionAssetDb->save();
-	}
-
-	/**
-	 * @action approve
-	 * @param string $captionAssetId
-	 *
-	 * @throws KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND
-	 * @validateUser asset::entry captionAssetId edit
-	 */
-	public function approveAction($captionAssetId)
-	{
-		$captionAssetDb = assetPeer::retrieveById($captionAssetId);
-		if (!$captionAssetDb || !($captionAssetDb instanceof CaptionAsset))
-			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
-
-		$captionAssetDb->setStatus(CaptionAsset::ASSET_STATUS_READY);
-		$captionAssetDb->save();
-
-		$captionAsset = new KalturaCaptionAsset();
-		$captionAsset->fromObject($captionAssetDb, $this->getResponseProfile());
-		return $captionAsset;
-	}
-
-	private function setStatus($captionAsset)
-	{
-		if ($this && $this->getKs()->getPrivilegeByName(KSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION))
-			$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_PENDING_REVIEW);
-		else
-			$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_READY);
 	}
 }

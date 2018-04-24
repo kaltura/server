@@ -90,7 +90,7 @@ class kCategoryEntryCondition extends kCondition
 	 */
 	protected function internalFulfilled(kScope $scope)
 	{
-		KalturaLog::debug("Validate if category added is one of the ids defined in the rule [$this->getCategoryId()]");
+		KalturaLog::debug("Validate if category added is one of the ids defined in the rule [{$this->getCategoryId()}]");
 		
 		$matchingCategoryEntry = null;
 		$dbCategoryEntries = categoryEntryPeer::retrieveActiveByEntryId($scope->getEntryId());

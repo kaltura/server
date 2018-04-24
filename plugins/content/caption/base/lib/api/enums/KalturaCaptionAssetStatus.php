@@ -5,5 +5,4 @@
  */
 class KalturaCaptionAssetStatus extends KalturaAssetStatus
 {
-	const PENDING_REVIEW = 10;
 }
