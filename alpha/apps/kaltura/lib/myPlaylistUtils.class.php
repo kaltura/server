@@ -1172,7 +1172,7 @@ HTML;
 			/** @var CaptionAsset $captionAsset */
 			if (!in_array($captionAsset->getLanguage(), $captionLangsArr))
 				continue;
-			if($captionAsset->getStatus() == KalturaCaptionAssetStatus::PENDING_REVIEW)
+			if(!$captionAsset->getDisplayOnPlayer())
 				continue;
 
 			$filePath = self::getCaptionFilePath($captionAsset);
