@@ -74,7 +74,7 @@ class CaptionAssetService extends KalturaAssetService
 		$dbCaptionAsset = $captionAsset->toInsertableObject($dbCaptionAsset);
 		
 		if($this->getKs() && $this->getKs()->getPrivilegeByName(KSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION))
-			$captionAsset->setDisplayOnPlayer(false);
+			$dbCaptionAsset->setDisplayOnPlayer(false);
 				
 		$dbCaptionAsset->setEntryId($entryId);
 		$dbCaptionAsset->setPartnerId($dbEntry->getPartnerId());
