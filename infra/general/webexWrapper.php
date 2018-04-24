@@ -279,31 +279,15 @@ class webexWrapper
 	 */
     public function deleteRecordByName($recordName, $serviceTypes)
 	{
-		$listRecordingRequest = new WebexXmlListRecordingRequest();
-		$listRecordingRequest->setRecordName($recordName);
-		$listRecordingRequest->setServiceTypes($serviceTypes);
-		try
-		{
-			$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
-		}
-		catch (Exception $e)
-		{
-			if ($e->getCode() != webexWrapper::NO_RECORDS_FOUND_ERROR_CODE && $e->getMessage() != webexWrapper::NO_RECORDS_FOUND_ERROR_MSG)
-			{
-				$this->logError("Error occurred while fetching records from webex: " . print_r($e, true));
-				throw $e;
-			}
-			else
-			{
-				$this->logDebug("No Record found for name {$recordName}.");
-				return null;
-			}
-		}
+		$listRecordingResponse = $this->getRecordByName($recordName, $serviceTypes);
+		if(!$this->listAllRecordings())
+			return false;
 
 		$records = $listRecordingResponse->getRecording();
 		$id = $records[0]->getRecordingID();
 		$this->deleteRecordById($id);
 		$this->logDebug("Deleted record {$recordName} with id {$id}.");
+		return true;
 	}
 
 	/**
@@ -357,12 +341,12 @@ class webexWrapper
 		{
 			if ($e->getCode() != webexWrapper::NO_RECORDS_FOUND_ERROR_CODE && $e->getMessage() != webexWrapper::NO_RECORDS_FOUND_ERROR_MSG)
 			{
-				$this->logError("Error occurred while fetching records from webex: " . print_r($e, true));
+				$this->logError("Error occurred while fetching records from webex recycleBin: " . print_r($e, true));
 				throw $e;
 			}
 			else
 			{
-				$this->logDebug("No Record found for name {$recordName}.");
+				$this->logDebug("No Record found for name {$recordName} in the recycleBin.");
 				return null;
 			}
 		}
