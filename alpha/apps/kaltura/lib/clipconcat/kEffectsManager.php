@@ -15,16 +15,16 @@ class kEffectsManager
 	 */
 	public function getFFMPEGEffects($singleAttribute)
 	{
-		$effects = " -filter_complex \"";
+		$effects = " -filter_complex '";
 		$aEffects = $this->addAudioEffects($singleAttribute);
 		$vEffects = $this->addVideoEffects($singleAttribute);
 		if (!empty($aEffects) && !empty($vEffects))
-			return $effects . $vEffects .'; ' . $aEffects . "\"";
+			return $effects . $vEffects ."'".$effects . $aEffects . "'" ;
 		elseif(!empty($aEffects))
-			return $effects . $aEffects . "\"";
+			return $effects . $aEffects . "'";
 		elseif(!empty($vEffects))
-			return $effects . $vEffects . "\"";
-		return "";
+			return $effects . $vEffects . "'";
+		return '';
 	}
 
 	/**

@@ -131,19 +131,15 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param string $entryId
 	 * @param string $originalConversionEnginesExtraParams
 	 * @return int
+	 * @throws kCoreException
 	 * @throws PropelException
 	 */
 	private function cloneFlavorParam($singleAttribute,$entryId,$originalConversionEnginesExtraParams)
 	{
-		$flavorParamsObj = assetParamsPeer::retrieveByPK($singleAttribute->getAssetParamsId());
-		// unset flavorParamsObj ID
-		$flavorParamsObj->setId(null);
-		$flavorParamsObj->setNew(true);
+		$flavorParamsObj = assetParamsPeer::getTempAssetParamByPk($singleAttribute->getAssetParamsId());
 		$flavorParamsObj->setFormat(flavorParams::CONTAINER_FORMAT_MPEGTS);
 		$this->fixConversionParam($flavorParamsObj, $entryId, $singleAttribute,$originalConversionEnginesExtraParams);
-		//save the object
-		$flavorParamsObj->save();
-		//return the object ID
+		assetParamsPeer::addInstanceToPool($flavorParamsObj);
 		return $flavorParamsObj->getId();
 	}
 
@@ -254,7 +250,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	/***
 	 * @param BatchJob $batchJob
 	 * @throws APIException
-	 * @throws PropelException
+	 * @throws kCoreException
 	 */
 	private function handleClipConcatParentJob($batchJob)
 	{
@@ -283,7 +279,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param int $priority
 	 * @return BatchJob[]
 	 * @throws APIException
-	 * @throws PropelException
+	 * @throws kCoreException
 	 */
 	private function addClipJobs($parentJob , $entryId, &$errDescription, $partnerId,
 	                             array $operationAttributes, $priority = 0)
@@ -570,13 +566,13 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			if($i < count($conversionExtraParamsArray))
 				$ep = $conversionExtraParamsArray[$i];
 
-			if ($conversionEngines[$i] == conversionEngineType::FFMPEG || $conversionEngines[$i] == conversionEngineType::FFMPEG_AUX)
-			{
-				if (strpos($ep, '-map a') === false && $mediaInfo && $mediaInfo->isContainAudio())
-					$ep .= ' -map a';
-				if (strpos($ep, '-map v') === false && $mediaInfo && $mediaInfo->isContainVideo())
-					$ep .= ' -map v';
-			}
+//			if ($conversionEngines[$i] == conversionEngineType::FFMPEG || $conversionEngines[$i] == conversionEngineType::FFMPEG_AUX)
+//			{
+//				if (strpos($ep, '-map a') === false && $mediaInfo && $mediaInfo->isContainAudio())
+//					$ep .= ' -map a';
+//				if (strpos($ep, '-map v') === false && $mediaInfo && $mediaInfo->isContainVideo())
+//					$ep .= ' -map v';
+//			}
 
 			$ep .= $this->addEffects($singleAttribute);
 			$newConversionExtraParams[] = $ep;

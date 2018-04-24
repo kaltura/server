@@ -17,6 +17,7 @@ class assetParamsPeer extends BaseassetParamsPeer
 	static protected $filterPartner = null;
 	
 	static protected $isDefaultInDefaultCriteria = true;
+	const TEMP_FLAVOR_PARAM_ID = -2;
 
 	/**
 	 * Define if is_default needed in the default criteria for partner zero
@@ -316,4 +317,45 @@ class assetParamsPeer extends BaseassetParamsPeer
 		return $flavorTypes;
 		
 	}
+
+	/**
+	 * Following function will create a temp Asset with id = -2 , currently it is for clip concat flow only
+	 * note: you cannot save the temp asset to the DB! an kCoreException will be thrown if you do,
+	 * this is a temporary flavor param that exist only during current api session to create the clip parameters with
+	 * the appropriate effects
+	 *
+	 * you will need to add this object to the cache via assetParamsPeer::addInstanceToPool($flavorParamsObj);
+	 * after you made all the necessary changes
+	 * @param  int $pk the primary key.
+	 * @param  PropelPDO $con the connection to use
+	 * @return assetParams the temporary object
+	 * @throws kCoreException
+	 * @throws PropelException
+	 */
+	public static function getTempAssetParamByPk($pk, PropelPDO $con = null)
+	{
+		$asset = null;
+		if (null !== ($obj = assetParamsPeer::getInstanceFromPool((string) $pk))) {
+			$asset = $obj;
+		}
+		else
+		{
+			$criteria = new Criteria(assetParamsPeer::DATABASE_NAME);
+			$criteria->add(assetParamsPeer::ID, $pk);
+
+			$v = assetParamsPeer::doSelect($criteria, $con);
+			if(empty($v) )
+				return $asset;
+			/** @var assetParams $asset */
+			$asset = $v[0];
+		}
+
+		$asset->setNew(true);
+		$asset->setId(self::TEMP_FLAVOR_PARAM_ID);
+		if (!Propel::isInstancePoolingEnabled())
+			throw new kCoreException("Instance Pooling is not enabled, Cannot create temp flavor param");
+		return $asset;
+	}
+
+
 }

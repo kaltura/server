@@ -246,4 +246,21 @@ class assetParams extends BaseassetParams implements IBaseObject
 		assetPeer::addSelectColumns($criteria);
 		return assetPeer::doSelect($criteria, $con);
 	}
+
+	/**
+	 * override the basic baseAssetParam save function,
+	 * first we check that user does not try and save the -2 ID flavor param, as it is being used as temp flavor param
+	 * '-2' flavor param  exist only during the current process and should never be saved to the DB!!!
+	 * @param PropelPDO|null $con
+	 * @return int|void
+	 * @throws PropelException
+	 * @throws kCoreException
+	 */
+	public function save(PropelPDO $con = null)
+	{
+		if ($this->getId() === assetParamsPeer::TEMP_FLAVOR_PARAM_ID)
+			throw new kCoreException("Cannot Save the Temp '-2' flavor parameter, it is for temporary use only");
+		parent::save($con);
+	}
+
 }
