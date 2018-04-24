@@ -7,10 +7,6 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	const ZERO_DATE = '12/31/1971 00:00:01';
 	const ARF_FORMAT = 'ARF';
 	const MAX_QUERY_DATE_RANGE_DAYS = 25; //Maximum querying date range is 28 days we define it as less than that
-	const FILE_ADDED_TO_DROP_FOLDER = 'fileAddedToDropFolder';
-	const FILE_NOT_HANDLED = 'fileNotHandled';
-	const FILE_HANDLED = 'fileHandled';
-
 	private static $unsupported_file_formats = array('WARF');
 
 	private $dropFolderFilesMap = null;
@@ -20,18 +16,19 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	 */
 	private $webexWrapper;
 
-	public static function withDropFolder($dropFolder)
+	/**
+	 * @param $dropFolder KalturaWebexDropFolder
+	 */
+	public function setDropFolder($dropFolder)
 	{
-		$instance = new self();
-		$instance->dropFolder = $dropFolder;
-		return $instance;
+		$this->dropFolder = $dropFolder;
 	}
 
 	public function watchFolder (KalturaDropFolder $dropFolder)
 	{
 		/* @var $dropFolder KalturaWebexDropFolder */
 		$this->dropFolder = $dropFolder;
-		$this->webexWrapper = new webexWrapper($this->dropFolder->webexServiceUrl . '/' . $this->dropFolder->path, $this->getWebexClientSecurityContext($this->dropFolder),
+		$this->webexWrapper = new webexWrapper($this->dropFolder->webexServiceUrl . '/' . $this->dropFolder->path, $this->getWebexClientSecurityContext(),
 			array('KalturaLog', 'err'), array('KalturaLog', 'debug'));
 
 		KalturaLog::info('Watching folder ['.$this->dropFolder->id.']');
@@ -74,29 +71,22 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		return $this->dropFolderFilesMap;
 	}
 
-	private function initHandleNewFileResultArray()
-	{
-		$result = array();
-		$result[self::FILE_ADDED_TO_DROP_FOLDER] = array();
-		$result[self::FILE_HANDLED] = array();
-		$result[self::FILE_NOT_HANDLED] = array();
-		return $result;
-	}
-
+	/**
+	 * @param $physicalFiles WebexXmlEpRecordingType
+	 * @return kWebexHandleFilesResult
+	 */
 	public function HandleNewFiles($physicalFiles)
 	{
-		$result = $this->initHandleNewFileResultArray();
-
+		$result = new kWebexHandleFilesResult();
 		$dropFolderFilesMap = $this->getDropFolderFilesMap();
 		$maxTime = $this->dropFolder->lastFileTimestamp;
 		foreach ($physicalFiles as $physicalFile)
 		{
-			/* @var $physicalFile WebexXmlEpRecordingType */
 			$physicalFileName = $physicalFile->getName() . '_' . $physicalFile->getRecordingID();
 			if (in_array($physicalFile->getFormat(),self::$unsupported_file_formats))
 			{
 				KalturaLog::info('Recording with id [' . $physicalFile->getRecordingID() . '] format [' . $physicalFile->getFormat() . '] is incompatible with the Kaltura conversion processes. Ignoring.');
-				$result[self::FILE_NOT_HANDLED][] = $physicalFileName;
+				$result->addFileName(kWebexHandleFilesResult::FILE_NOT_HANDLED, $physicalFileName);
 				continue;
 			}
 
@@ -106,24 +96,19 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 				{
 					$maxTime = max(strtotime($physicalFile->getCreateTime()), $maxTime);
 					KalturaLog::info("Added new file with name [$physicalFileName]. maxTime updated: $maxTime");
-					$result[self::FILE_ADDED_TO_DROP_FOLDER][] = $physicalFileName;
+					$result->addFileName(kWebexHandleFilesResult::FILE_ADDED_TO_DROP_FOLDER, $physicalFileName);
 				}
 				else
-					$result[self::FILE_NOT_HANDLED][] = $physicalFileName;
+					$result->addFileName(kWebexHandleFilesResult::FILE_NOT_HANDLED, $physicalFileName);
 			}
 			else //drop folder file entry found
 			{
 				$dropFolderFile = $dropFolderFilesMap[$physicalFileName];
 				unset($dropFolderFilesMap[$physicalFileName]);
-				if ($dropFolderFile->status == KalturaDropFolderFileStatus::UPLOADING)
-				{
-					if($this->handleExistingDropFolderFile($dropFolderFile))
-						$result[self::FILE_HANDLED][] = $physicalFileName;
-					else
-						$result[self::FILE_NOT_HANDLED][] = $physicalFileName;
-				}
+				if ($dropFolderFile->status == KalturaDropFolderFileStatus::UPLOADING && $this->handleExistingDropFolderFile($dropFolderFile))
+					$result->addFileName(kWebexHandleFilesResult::FILE_HANDLED, $physicalFileName);
 				else
-					$result[self::FILE_NOT_HANDLED][] = $physicalFileName;
+					$result->addFileName(kWebexHandleFilesResult::FILE_NOT_HANDLED, $physicalFileName);
 			}
 		}
 
@@ -185,14 +170,14 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		return $result;
 	}
 
-	public static function getWebexClientSecurityContext($dropFolder)
+	public function getWebexClientSecurityContext()
 	{
 		$securityContext = new WebexXmlSecurityContext();
-		$securityContext->setUid($dropFolder->webexUserId); // webex username
-		$securityContext->setPwd($dropFolder->webexPassword); // webex password
-		$securityContext->setSiteName($dropFolder->webexSiteName); // webex partner id
-		$securityContext->setSid($dropFolder->webexSiteId); // webex site id
-		$securityContext->setPid($dropFolder->webexPartnerId); // webex partner id
+		$securityContext->setUid($this->webexUserId); // webex username
+		$securityContext->setPwd($this->webexPassword); // webex password
+		$securityContext->setSiteName($this->webexSiteName); // webex partner id
+		$securityContext->setSid($this->webexSiteId); // webex site id
+		$securityContext->setPid($this->webexPartnerId); // webex partner id
 
 		return $securityContext;
 	}
@@ -230,39 +215,28 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 				continue;
 			}
 
-			if ($this->dropFolder->deleteFromRecycleBin)
+			if ($this->dropFolder->deleteFromRecycleBin && !$this->deleteFileFromRecycleBin($file->getCreateTime()))
 			{
-				$this->deleteFileFromRecycleBin($physicalFileName, $dropFolderFilesMap[$physicalFileName]->id, $file->getCreateTime());
+				KalturaLog::err("File [$physicalFileName] could not be removed from recycle bin. Purge manually");
+				continue;
 			}
-			else
-			{
-				KalturaLog::info("File [$physicalFileName] successfully purged. Purging drop folder file");
-				$this->dropFolderFileService->updateStatus($dropFolderFilesMap[$physicalFileName]->id, KalturaDropFolderFileStatus::PURGED);
-			}
+
+			KalturaLog::info("File [$physicalFileName] successfully purged. Purging drop folder file");
+			$this->dropFolderFileService->updateStatus($dropFolderFilesMap[$physicalFileName]->id, KalturaDropFolderFileStatus::PURGED);
 		}
 	}
 
 	/**
-	 * @param string $physicalFileName
-	 * @param string $dropFolderFileId
 	 * @param string $fileCreateTime
 	 * @throws Exception
 	 */
-	private function deleteFileFromRecycleBin($physicalFileName, $dropFolderFileId, $fileCreateTime)
+	private function deleteFileFromRecycleBin($fileCreateTime)
 	{
 		$recordingArr = $this->webexWrapper->getRecordingsFromRecycleBinByCreationTime($fileCreateTime);
 		$recordingId = $recordingArr[0]->getRecordingID();
 		KalturaLog::info("Permanently deleting recording with webex ID: [$recordingId], recording: " . print_r($recordingArr[0], true));
 		$response = $this->webexWrapper->deleteRecordFromRecycleBinById($recordingId);
-		if($response->getSuccessfulRecordingsCount())
-		{
-			KalturaLog::info("File [$physicalFileName] successfully purged. Purging drop folder file");
-			$this->dropFolderFileService->updateStatus($dropFolderFileId, KalturaDropFolderFileStatus::PURGED);
-		}
-		else
-		{
-			KalturaLog::err("File [$physicalFileName] could not be removed from recycle bin. Purge manually");
-		}
+		return $response->getSuccessfulRecordingsCount();
 	}
 
 	/**
