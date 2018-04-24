@@ -22,10 +22,12 @@ class WebexXmlClient
 	 */
 	protected $securityContext;
 	
-	public function __construct($url, WebexXmlSecurityContext $securityContext)
+	public function __construct($url, WebexXmlSecurityContext $securityContext, $validateNoBackup = true)
 	{
 		$this->url = $url;
-		$this->validateNoBackup();
+		if($validateNoBackup)
+			$this->validateNoBackup();
+		
 		$this->securityContext = $securityContext;
 	}
 

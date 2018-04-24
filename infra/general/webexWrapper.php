@@ -18,10 +18,11 @@ class webexWrapper
 	 * @var WebexXmlSecurityContext $securityContext
 	 * @var callable $errorLogger
 	 * @var callable $debugLogger
+	 * @var bool $validateNoBackup
 	 */
-	public function __construct($url, WebexXmlSecurityContext $securityContext, $errorLogger = null, $debugLogger = null)
+	public function __construct($url, WebexXmlSecurityContext $securityContext, $errorLogger = null, $debugLogger = null, $validateNoBackup = true)
 	{
-		$this->webexClient = new WebexXmlClient($url, $securityContext);
+		$this->webexClient = new WebexXmlClient($url, $securityContext, $validateNoBackup);
 		$this->errorLogger = $errorLogger;
 		$this->debugLogger = $debugLogger;
 	}
@@ -230,7 +231,7 @@ class webexWrapper
 		}
 		catch (Exception $e)
 		{
-			$this->logError("Error occurred while trying to delete file with id: {$recordingId} from webex recyclebin: " . print_r($e, true));
+			$this->logError("Error occurred while trying to delete file with id: {$recordingId} from webex recycleBin: " . print_r($e, true));
 			throw $e;
 		}
 	}
@@ -255,8 +256,17 @@ class webexWrapper
 		}
 		catch (Exception $e)
 		{
-			$this->logError("Error occurred while trying to get file with creation time: {$createTime} from webex recyclebin: " . print_r($e, true));
-			throw $e;
+			if ($e->getCode() != webexWrapper::NO_RECORDS_FOUND_ERROR_CODE && $e->getMessage() != webexWrapper::NO_RECORDS_FOUND_ERROR_MSG)
+			{
+				$this->logError("Error occurred while trying to get file with creation time: {$createTime} from webex recycleBin: " . print_r($e, true));
+				throw $e;
+			}
+			else
+			{
+				$this->logDebug("No Record found for name {$createTime} in the webex recycleBin.");
+				return null;
+			}
+
 		}
 
 		return $listRecordingResponse->getRecording();
@@ -265,9 +275,29 @@ class webexWrapper
 	/**
 	 * @param string $recordName
 	 * @param WebexXmlArray $serviceTypes
+	 * @return WebexXmlResponseBodyContent
 	 * @throws Exception
 	 */
     public function deleteRecordByName($recordName, $serviceTypes)
+	{
+		$listRecordingResponse = $this->getRecordByName($recordName, $serviceTypes);
+		if(!$this->listAllRecordings())
+			return false;
+
+		$records = $listRecordingResponse->getRecording();
+		$id = $records[0]->getRecordingID();
+		$this->deleteRecordById($id);
+		$this->logDebug("Deleted record {$recordName} with id {$id}.");
+		return true;
+	}
+
+	/**
+	 * @param string $recordName
+	 * @param WebexXmlArray $serviceTypes
+	 * @return WebexXmlListRecording
+	 * @throws Exception
+	 */
+	public function getRecordByName($recordName, $serviceTypes)
 	{
 		$listRecordingRequest = new WebexXmlListRecordingRequest();
 		$listRecordingRequest->setRecordName($recordName);
@@ -286,14 +316,43 @@ class webexWrapper
 			else
 			{
 				$this->logDebug("No Record found for name {$recordName}.");
-				return;
+				return null;
 			}
 		}
 
-		$records = $listRecordingResponse->getRecording();
-		$id = $records[0]->getRecordingID();
-		$this->deleteRecordById($id);
-		$this->logDebug("Deleted record {$recordName} with id {$id}.");
+		return $listRecordingResponse;
+	}
+
+	/**
+	 * @param string $recordName
+	 * @param WebexXmlArray $serviceTypes
+	 * @return WebexXmlListRecording
+	 * @throws Exception
+	 */
+	public function getRecordByNameFromRecycleBin($recordName, $serviceTypes)
+	{
+		$listRecordingRequest = new WebexXmlListRecordingInRecycleBinRequest();
+		$listRecordingRequest->setRecordName($recordName);
+		$listRecordingRequest->setServiceTypes($serviceTypes);
+		try
+		{
+			$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
+		}
+		catch (Exception $e)
+		{
+			if ($e->getCode() != webexWrapper::NO_RECORDS_FOUND_ERROR_CODE && $e->getMessage() != webexWrapper::NO_RECORDS_FOUND_ERROR_MSG)
+			{
+				$this->logError("Error occurred while fetching records from webex recycleBin: " . print_r($e, true));
+				throw $e;
+			}
+			else
+			{
+				$this->logDebug("No Record found for name {$recordName} in the recycleBin.");
+				return null;
+			}
+		}
+
+		return $listRecordingResponse;
 	}
 
 	/**
