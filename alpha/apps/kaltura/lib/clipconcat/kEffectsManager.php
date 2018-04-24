@@ -16,45 +16,15 @@ class kEffectsManager
 	public function getFFMPEGEffects($singleAttribute)
 	{
 		$effects = " -filter_complex '";
-		$aEffects = $this->addAudioEffects($singleAttribute);
+		//$aEffects = $this->addAudioEffects($singleAttribute);
 		$vEffects = $this->addVideoEffects($singleAttribute);
-		if (!empty($aEffects) && !empty($vEffects))
-			return $effects . $vEffects ."'".$effects . $aEffects . "'" ;
-		elseif(!empty($aEffects))
-			return $effects . $aEffects . "'";
-		elseif(!empty($vEffects))
+		//if (!empty($aEffects) && !empty($vEffects))
+		//	return $effects . $vEffects ."'".$effects . $aEffects . "'" ;
+		//elseif(!empty($aEffects))
+		//	return $effects . $aEffects . "'";
+		if(!empty($vEffects))
 			return $effects . $vEffects . "'";
 		return '';
-	}
-
-	/**
-	 * @param kClipAttributes $singleAttribute
-	 * @return string
-	 */
-	private function addAudioEffects($singleAttribute)
-	{
-		$aFadeIn = "";
-		$aFadeOut = "";
-		foreach ($singleAttribute->getEffectArray() as $effect)
-		{
-			switch ($effect->getEffectType()) {
-				case kEffectType::AUDIO_FADE_IN:
-					$d = min(intval($effect->getValue()) / self::MILLISECONDS_TO_SECONDS, $singleAttribute->getDuration() / self::MILLISECONDS_TO_SECONDS);
-					$aFadeIn = "afade=t=in:ss=0:d=$d";
-					break;
-				case kEffectType::AUDIO_FADE_OUT:
-					$d = min(intval($effect->getValue()) / self::MILLISECONDS_TO_SECONDS, $singleAttribute->getDuration() / self::MILLISECONDS_TO_SECONDS);
-					$st = $singleAttribute->getDuration() / self::MILLISECONDS_TO_SECONDS - intval($effect->getValue()) / self::MILLISECONDS_TO_SECONDS;
-					if ($st  > 0)
-						$aFadeOut = "afade=t=out:st=$st:d=$d";
-					break;
-				default:
-					break;
-			}
-		}
-		if ($aFadeIn && $aFadeOut)
-			return $aFadeIn .','.$aFadeOut;
-		return $aFadeIn . $aFadeOut;
 	}
 
 	/**
@@ -86,5 +56,35 @@ class kEffectsManager
 			return $fadeIn .','.$fadeOut;
 		return $fadeIn . $fadeOut;
 	}
+
+	/*
+
+	private function addAudioEffects($singleAttribute)
+	{
+		$aFadeIn = "";
+		$aFadeOut = "";
+		foreach ($singleAttribute->getEffectArray() as $effect)
+		{
+			switch ($effect->getEffectType()) {
+				case kEffectType::AUDIO_FADE_IN:
+					$d = min(intval($effect->getValue()) / self::MILLISECONDS_TO_SECONDS, $singleAttribute->getDuration() / self::MILLISECONDS_TO_SECONDS);
+					$aFadeIn = "afade=t=in:ss=0:d=$d";
+					break;
+				case kEffectType::AUDIO_FADE_OUT:
+					$d = min(intval($effect->getValue()) / self::MILLISECONDS_TO_SECONDS, $singleAttribute->getDuration() / self::MILLISECONDS_TO_SECONDS);
+					$st = $singleAttribute->getDuration() / self::MILLISECONDS_TO_SECONDS - intval($effect->getValue()) / self::MILLISECONDS_TO_SECONDS;
+					if ($st  > 0)
+						$aFadeOut = "afade=t=out:st=$st:d=$d";
+					break;
+				default:
+					break;
+			}
+		}
+		if ($aFadeIn && $aFadeOut)
+			return $aFadeIn .','.$aFadeOut;
+		return $aFadeIn . $aFadeOut;
+	}*/
+
+
 
 }
