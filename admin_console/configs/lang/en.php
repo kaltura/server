@@ -1449,6 +1449,11 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorCreditRecurrenceFrequency::DAILY' => "DAILY",
 	'Kaltura_Client_Reach_Enum_VendorCreditRecurrenceFrequency::WEEKLY' => "WEEKLY",
 	'Kaltura_Client_Reach_Enum_VendorCreditRecurrenceFrequency::YEARLY' => "YEARLY",
+	'Kaltura_Client_Reach_Enum_ReachProfileContentDeletionPolicy::DO_NOTHING' => "DO_NOTHING",
+	'Kaltura_Client_Reach_Enum_ReachProfileContentDeletionPolicy::DELETE_ONCE_PROCESSED' => "DELETE_ONCE_PROCESSED",
+	'Kaltura_Client_Reach_Enum_ReachProfileContentDeletionPolicy::DELETE_AFTER_WEEK' => "DELETE_AFTER_WEEK",
+	'Kaltura_Client_Reach_Enum_ReachProfileContentDeletionPolicy::DELETE_AFTER_MONTH' => "DELETE_AFTER_MONTH",
+	'Kaltura_Client_Reach_Enum_ReachProfileContentDeletionPolicy::DELETE_AFTER_THREE_MONTHS' => "DELETE_AFTER_THREE_MONTHS",
 
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN' => "English",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN_US' => "English (American)",
