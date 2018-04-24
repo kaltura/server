@@ -39,8 +39,5 @@ $result = $webexWrapper->listAllRecordings($serviceTypes, $createTimeStart, $cre
 if($result)
 {
 	foreach ($result as $recording)
-	{
-		$text = $recording->getName();
-		print($text. PHP_EOL);
-	}
+		print($recording->getName() . PHP_EOL);
 }
