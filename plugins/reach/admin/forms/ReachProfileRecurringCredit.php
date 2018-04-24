@@ -11,7 +11,7 @@ class Form_ReachProfileRecurringCredit extends Form_ReachProfileTimeFramedCredit
 		$frequency = new Kaltura_Form_Element_EnumSelect('frequency', array('enum' => 'Kaltura_Client_Reach_Enum_VendorCreditRecurrenceFrequency'));
 		$frequency->setRequired(true);
 		$frequency->setLabel("Frequency:");
-		$frequency->setValue(Kaltura_Client_Reach_Enum_VendorCreditRecurrenceFrequency::MONTHLY);
+		$frequency->setValue(Kaltura_Client_Reach_Enum_VendorCreditRecurrenceFrequency::YEARLY);
 		$this->addElement($frequency);
 	}
 

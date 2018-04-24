@@ -111,6 +111,11 @@ class Form_ReachProfileConfigure extends ConfigureForm
 		$enableProfanityRemoval->setRequired(true);
 		$enableProfanityRemoval->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
 		$this->addElement($enableProfanityRemoval);
+		
+		$contentDeletionPolicy = new Kaltura_Form_Element_EnumSelect('contentDeletionPolicy', array('enum' => 'Kaltura_Client_Reach_Enum_ReachProfileContentDeletionPolicy'));
+		$contentDeletionPolicy->setLabel('Content Deletion Policy:');
+		$contentDeletionPolicy->setValue(Kaltura_Client_Reach_Enum_ReachProfileContentDeletionPolicy::DO_NOTHING);
+		$this->addElement($contentDeletionPolicy);
 
 		$this->addElement('text', 'maxCharactersPerCaptionLine', array(
 			'label' 		=> 'Max Characters Per Caption Line:',
