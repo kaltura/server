@@ -2987,6 +2987,7 @@ class kFlowHelper
 			default:
 				break;
 		}
+		$task->addTrackEntryForStatusChange();
 	}
 
 }

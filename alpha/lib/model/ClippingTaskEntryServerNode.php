@@ -47,4 +47,10 @@ class ClippingTaskEntryServerNode extends TaskEntryServerNode
    		return;
 	}
 
+	public function addTrackEntryForStatusChange($description = '')
+	{
+		$description .= ' Clipped EntryId:' . $this->getClippedEntryId();
+		parent::addTrackEntryForStatusChange($description);
+	}
+
 }
