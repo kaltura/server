@@ -285,8 +285,11 @@ class CategoryEntryService extends KalturaBaseService
 		foreach ($relatedEntries as $relatedEntry)
 		{
 			$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryIdNotRejected($categoryId, $relatedEntry->getId());
-			$dbCategoryEntry->setStatus($status);
-			$dbCategoryEntry->save();
+			if($dbCategoryEntry)
+			{
+				$dbCategoryEntry->setStatus($status);
+				$dbCategoryEntry->save();
+			}
 		}
 	}
 

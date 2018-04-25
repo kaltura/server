@@ -13,14 +13,59 @@
  * @package plugins.metadata
  * @subpackage model
  */
-class MetadataProfileField extends BaseMetadataProfileField implements IBaseObject {
-
+class MetadataProfileField extends BaseMetadataProfileField implements IBaseObject 
+{
 	const STATUS_ACTIVE = 1;
 	const STATUS_DEPRECATED = 2;
 	const STATUS_NONE_SEARCHABLE = 3;
+	
+	const CUSTOM_DATA_FIELD_MATCH_TYPE = 'matchType';
+	const CUSTOM_DATA_FIELD_TRIM_CHARS = 'trimChars';
+	const CUSTOM_DATA_FIELD_EXPLODE_CHARS = 'explodeChars';
 	
 	public function getCacheInvalidationKeys()
 	{
 		return array("metadataProfileField:metadataProfileId=".strtolower($this->getMetadataProfileId()));
 	}
+	
+	public function getMatchType()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_MATCH_TYPE);}
+	public function getTrimChars()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_TRIM_CHARS);}
+	public function getExplodeChars()	{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_EXPLODE_CHARS);}
+	
+	public function setMatchType($v)	{ $this->putInCustomData(self::CUSTOM_DATA_FIELD_MATCH_TYPE, $v);}
+	public function setTrimChars($v)	{ $this->putInCustomData(self::CUSTOM_DATA_FIELD_TRIM_CHARS, $v);}
+	public function setExplodeChars($v)	{ $this->putInCustomData(self::CUSTOM_DATA_FIELD_EXPLODE_CHARS, $v);}
+	
+	public function getExplodeCharsArray()
+	{
+		$explodeChars = $this->getExplodeChars();
+		return explode(",", $explodeChars);
+	}
+	
+	public function getParsedFieldValue($value)
+	{
+		$parsedFieldValues = array();
+		$trimChars = $this->getTrimChars();
+		$value = $trimChars ? strtr($value, $trimChars, str_repeat("_", strlen($trimChars))) : $value;
+		
+		if($this->getExplodeChars())
+		{
+			$explodeChars = $this->getExplodeCharsArray();
+			$explodePattern = implode("|", $explodeChars);
+			$values = preg_split( "/($explodePattern)/", $value );
+			
+			foreach ($values as $value) 
+			{
+				if(trim($value))
+					$parsedFieldValues[] = MetadataPlugin::PLUGIN_NAME . '_' . $this->getId() . '_' . $value;
+			}
+		}
+		else
+		{
+			$parsedFieldValues[] = MetadataPlugin::PLUGIN_NAME . '_' . $this->getId() . '_' . $value;
+		}
+		
+		return $parsedFieldValues;
+	}
+	
 } // MetadataProfileField
