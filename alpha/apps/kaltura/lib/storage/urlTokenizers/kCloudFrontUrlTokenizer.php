@@ -69,17 +69,6 @@ class kCloudFrontUrlTokenizer extends kUrlTokenizer
 		return $acl;
 	}
 	
-	protected static function getRemoteAddress()
-	{
-		$remoteAddr = infraRequestUtils::getIpFromHttpHeader('HTTP_X_FORWARDED_FOR', false);	
-		if (!$remoteAddr) 
-		{
-			$remoteAddr = $_SERVER['REMOTE_ADDR'];
-		}
-	
-		return $remoteAddr;
-	}
-	
 	protected function generateToken($acl)
 	{
 		$DateLessThan = time() + $this->window;
