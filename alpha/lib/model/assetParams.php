@@ -259,7 +259,7 @@ class assetParams extends BaseassetParams implements IBaseObject
 	public function save(PropelPDO $con = null)
 	{
 		if ($this->getId() === assetParamsPeer::TEMP_FLAVOR_PARAM_ID)
-			throw new kCoreException("Cannot Save the Temp '-2' flavor parameter, it is for temporary use only");
+			throw new kCoreException('Cannot Save the Temp ID: ' . assetParamsPeer::TEMP_FLAVOR_PARAM_ID . ' flavor parameter to DB, it is for temporary use only');
 		parent::save($con);
 	}
 

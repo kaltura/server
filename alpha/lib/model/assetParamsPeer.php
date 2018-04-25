@@ -330,30 +330,17 @@ class assetParamsPeer extends BaseassetParamsPeer
 	 * @param  PropelPDO $con the connection to use
 	 * @return assetParams the temporary object
 	 * @throws kCoreException
-	 * @throws PropelException
 	 */
 	public static function getTempAssetParamByPk($pk, PropelPDO $con = null)
 	{
-		$asset = null;
-		if (null !== ($obj = assetParamsPeer::getInstanceFromPool((string) $pk))) {
-			$asset = $obj;
-		}
-		else
-		{
-			$criteria = new Criteria(assetParamsPeer::DATABASE_NAME);
-			$criteria->add(assetParamsPeer::ID, $pk);
-
-			$v = assetParamsPeer::doSelect($criteria, $con);
-			if(empty($v) )
-				return $asset;
-			/** @var assetParams $asset */
-			$asset = $v[0];
-		}
-
-		$asset->setNew(true);
-		$asset->setId(self::TEMP_FLAVOR_PARAM_ID);
 		if (!Propel::isInstancePoolingEnabled())
 			throw new kCoreException("Instance Pooling is not enabled, Cannot create temp flavor param");
+		$asset = self::retrieveByPK($pk,$con);
+		if (isset($asset))
+		{
+			$asset->setNew(true);
+			$asset->setId(self::TEMP_FLAVOR_PARAM_ID);
+		}
 		return $asset;
 	}
 

@@ -535,14 +535,15 @@ Disabled 'amix', for better stereo by 'amerge'
 		$keys = array_keys($cmdValsArr, "-filter_complex");
 		$videoFilterKeys = array();
 		$count = 0;
-		foreach ($keys as $key){
+		foreach ($keys as $key)
+		{
 			$filter = trim($cmdValsArr[$key+1]);
-				if(strpos($filter,'yadif') !== false || strstr($filter,'crop') !=false  ||
-					(strpos($filter,'fade') !== false && strpos($filter,'afade') === false))
-				{
-					$videoFilterKeys[] = $key+1;
-					$count = $count + ceil (substr_count($filter,'vflt') / 2);
-				}
+			if(strpos($filter,'yadif') !== false || strstr($filter,'crop') !=false  ||
+				(strpos($filter,'fade') !== false && strpos($filter,'afade') === false))
+			{
+				$videoFilterKeys[] = $key+1;
+				$count = $count + ceil (substr_count($filter,'vflt') / 2);
+			}
 		}
 		if (count($videoFilterKeys) > 1)
 			self::mergeVideoFilterLines($cmdValsArr, $videoFilterKeys, $count);
@@ -557,7 +558,8 @@ Disabled 'amix', for better stereo by 'amerge'
 	private static function mergeVideoFilterLines(array &$cmdValsArr, $videoFilterKeys, $count)
 	{
 		$mergedVideoFilter = substr($cmdValsArr[$videoFilterKeys[0]], 0, -1);
-		for ($i = 1; $i < count($videoFilterKeys); $i++) {
+		for ($i = 1; $i < count($videoFilterKeys); $i++)
+		{
 			$toMerge = substr($cmdValsArr[$videoFilterKeys[$i]], 1, -1);
 			$count = $count + 1;
 			$mergedVideoFilter .= "[vflt$count]" . ';' . "[vflt$count]" . $toMerge;
@@ -566,7 +568,8 @@ Disabled 'amix', for better stereo by 'amerge'
 		$mergedVideoFilter .= "'";
 
 		$cmdValsArr[$videoFilterKeys[0]] = $mergedVideoFilter;
-		for ($i = 1; $i < count($videoFilterKeys); $i++) {
+		for ($i = 1; $i < count($videoFilterKeys); $i++)
+		{
 			unset($cmdValsArr[$videoFilterKeys[$i]]);
 			unset($cmdValsArr[$videoFilterKeys[$i] - 1]);
 		}
