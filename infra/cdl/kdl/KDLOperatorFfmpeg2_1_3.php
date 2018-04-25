@@ -521,7 +521,8 @@ Disabled 'amix', for better stereo by 'amerge'
 	}
 
 	/**
-	 *
+	 * the following function merges video filters(filter complex) into one filter  as ffmpeg does not support multiple filters
+	 * NOTE!!!! for mxf file types the fade effect will cause the screen to get black this is a known issue
 	 * @param $target
 	 * @param array $cmdValsArr
 	 * @return bool
