@@ -87,7 +87,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			if (in_array($physicalFile->getFormat(),self::$unsupported_file_formats))
 			{
 				KalturaLog::info('Recording with id [' . $physicalFile->getRecordingID() . '] format [' . $physicalFile->getFormat() . '] is incompatible with the Kaltura conversion processes. Ignoring.');
-				$result->addFileName(kWebexHandleFilesResult::FILE_NOT_HANDLED, $physicalFileName);
+				$result->addFileName(kWebexHandleFilesResult::FILE_NOT_ADDED_TO_DROP_FOLDER, $physicalFileName);
 				continue;
 			}
 
@@ -100,7 +100,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 					$result->addFileName(kWebexHandleFilesResult::FILE_ADDED_TO_DROP_FOLDER, $physicalFileName);
 				}
 				else
-					$result->addFileName(kWebexHandleFilesResult::FILE_NOT_HANDLED, $physicalFileName);
+					$result->addFileName(kWebexHandleFilesResult::FILE_NOT_ADDED_TO_DROP_FOLDER, $physicalFileName);
 			}
 			else //drop folder file entry found
 			{
@@ -299,7 +299,16 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 
 	protected function handleExistingDropFolderFile (KalturaWebexDropFolderFile $dropFolderFile)
 	{
-		$updatedFileSize = WebexPlugin::getSizeFromWebexContentUrl($dropFolderFile->contentUrl);
+		try
+		{
+			$updatedFileSize = WebexPlugin::getSizeFromWebexContentUrl($dropFolderFile->contentUrl);
+		}
+		catch (Exception $e)
+		{
+			$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE,
+					DropFolderPlugin::ERROR_READING_FILE_MESSAGE, $e);
+			return null;
+		}
 
 		if (!$dropFolderFile->fileSize)
 		{
