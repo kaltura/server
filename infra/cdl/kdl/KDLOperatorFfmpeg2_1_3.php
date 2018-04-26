@@ -538,6 +538,11 @@ Disabled 'amix', for better stereo by 'amerge'
 		foreach ($keys as $key)
 		{
 			$filter = trim($cmdValsArr[$key+1]);
+			/**
+			 * Note we are looking for a fade substing -> video filter , however, afade -> audio filter contains fade,
+			 * as such we are checking that afade does not exist in the filter, but fade exist
+			 * we are under the assumption that filter complex element does not contains both audio and video filter!
+			 */
 			if(strpos($filter,'yadif') !== false || strstr($filter,'crop') !=false  ||
 				(strpos($filter,'fade') !== false && strpos($filter,'afade') === false))
 			{
