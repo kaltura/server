@@ -553,7 +553,8 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 						if (reset($fs) === null)
 							continue;
 
-						$cdnHost = myPartnerUtils::getCdnHost($captionAsset->getPartnerId());
+						$protocol = infraRequestUtils::getProtocol();
+						$host = $protocol . '://' . $config->deliveryProfile->getHostName();
 
 						$versionStr = '';
 						if ($captionAsset->getVersion() > 1)
@@ -565,7 +566,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 							$ksStr = '/ks/' . self::generateKsForCaptionServe($captionAsset);
 						}
 
-						$captionAssetObj['url'] = $cdnHost . self::SERVE_WEBVTT_URL_PREFIX .
+						$captionAssetObj['url'] = $host . self::SERVE_WEBVTT_URL_PREFIX .
 							'/captionAssetId/' . $captionAsset->getId() . $ksStr . $versionStr . '/a.m3u8';
 					}
 					$label = $captionAsset->getLabel();
