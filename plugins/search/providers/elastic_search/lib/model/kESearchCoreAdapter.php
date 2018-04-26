@@ -172,6 +172,8 @@ class kESearchCoreAdapter
 			{
 				$resultType = new ESearchHighlight();
 				$resultType->setFieldName($key);
+				if(self::shouldRemoveRedundantTags($key))
+					self::removeRedundantTags($value);
 				$resultType->setHits($value);
 				$result[] = $resultType;
 			}
@@ -181,4 +183,17 @@ class kESearchCoreAdapter
 
 		return null;
 	}
+
+	private static function shouldRemoveRedundantTags($fieldName)
+	{
+		$suffix = elasticSearchUtils::DOT_FIELD_DELIMITER . kESearchQueryManager::NGRAMS_FIELD_SUFFIX;
+		return (strpos($fieldName ,$suffix) !== false);
+	}
+
+	private static function removeRedundantTags(&$values)
+	{
+		foreach ($values as &$value)
+			$value = str_replace ("</em><em>", "" ,$value);
+	}
+
 }
