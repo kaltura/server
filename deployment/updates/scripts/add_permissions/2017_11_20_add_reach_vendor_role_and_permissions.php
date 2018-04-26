@@ -16,12 +16,3 @@ passthru("php $addPermissionsAndItemsScript $config");
 
 $config = realpath(dirname(__FILE__)) . '/03.UserRole.ini';
 passthru("php $insertDefaultsScript $config");
-
-$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.baseentry.ini';
-passthru("php $addPermissionsAndItemsScript $config");
-
-$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.caption.captionasset.ini';
-passthru("php $addPermissionsAndItemsScript $config");
-
-$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.cuepoint.cuepoint.ini';
-passthru("php $addPermissionsAndItemsScript $config");
