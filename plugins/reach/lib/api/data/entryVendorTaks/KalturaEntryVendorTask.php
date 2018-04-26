@@ -227,6 +227,17 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
+		$closedStatuses = array(
+			EntryVendorTaskStatus::ABORTED,
+			EntryVendorTaskStatus::READY,
+			EntryVendorTaskStatus::REJECTED,
+			EntryVendorTaskStatus::ERROR,
+		);
+		
+		/* @var $sourceObject EntryVendorTask */
+		if($this->status && $this->status != $sourceObject->getStatus() && in_array($sourceObject->getStatus(), $closedStatuses))
+			throw new KalturaAPIException(KalturaReachErrors::CANNOT_UPDATE_STATUS_OF_TASK_WHICH_IS_IN_FINAL_STATE, $sourceObject->getId(), $sourceObject->getStatus(), $this->status);
+		
 		if($this->partnerData && !$this->checkIsValidJson($this->partnerData))
 			throw new KalturaAPIException(KalturaReachErrors::PARTNER_DATA_NOT_VALID_JSON_STRING);
 		
