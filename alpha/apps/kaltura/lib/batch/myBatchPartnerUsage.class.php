@@ -41,13 +41,19 @@ class myBatchPartnerUsage extends myBatchBase
 				{
 					if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_FREE)
 					{
-						myPartnerUtils::doPartnerUsage($partner, true);
+						myPartnerUtils::doPartnerUsage($partner);
 						if(myPartnerUtils::isPartnerCreatedAsMonitoredFreeTrial($partner))
 							myPartnerUtils::handleDayInFreeTrial($partner);
 					}
-					else if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_DEVELOPER)
+					else if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL)
 					{
-						myPartnerUtils::doMonthlyPartnerUsage($partner);
+						if(myPartnerUtils::isPartnerCreatedAsMonitoredFreeTrial($partner))
+						{
+							myPartnerUtils::doPartnerUsage($partner);
+							myPartnerUtils::handleDayInFreeTrial($partner);
+						}
+						else
+							myPartnerUtils::doMonthlyPartnerUsage($partner);
 					}
 				}
 			}
