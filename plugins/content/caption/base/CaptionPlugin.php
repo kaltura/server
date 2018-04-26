@@ -553,7 +553,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 						if (reset($fs) === null)
 							continue;
 
-						$protocol = infraRequestUtils::getProtocol();
+						$protocol = $config->deliveryProfile->getDynamicAttributes()->getMediaProtocol();
 						$host = $protocol . '://' . $config->deliveryProfile->getHostName();
 
 						$versionStr = '';
