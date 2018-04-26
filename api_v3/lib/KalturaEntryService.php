@@ -709,6 +709,7 @@ class KalturaEntryService extends KalturaBaseService
 				$this->createRecordedClippingTask($srcEntry, $dbEntry, $operationAttributes);
 				$dbEntry->setSource(EntrySourceType::KALTURA_RECORDED_LIVE);
 				$dbEntry->setRootEntryId($srcEntry->getRootEntryId());
+				$dbEntry->setIsRecordedEntry(true);
 				$dbEntry->save();
 				return $dbAsset;
 			}
