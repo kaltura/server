@@ -16,4 +16,5 @@ interface EntryServerNodeStatus extends BaseEnum
 	const TASK_QUEUED = 6;
 	const TASK_PROCESSING = 7;
 	const TASK_UPLOADING = 8;
+	const TASK_FINISHED = 8;
 }
