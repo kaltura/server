@@ -401,10 +401,9 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 			$membersCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 			$c->addAnd($membersCrit);
 		}
-		else{
+		else
 			return array();
-		}
-
+		
 		$c->applyFilters();
 		$categoryIds = $c->getFetchedIds();
 					
