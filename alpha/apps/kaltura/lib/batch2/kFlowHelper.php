@@ -2957,5 +2957,20 @@ class kFlowHelper
 		return $url;
 	}
 
+	/**
+	 * @param ClippingTaskEntryServerNode $task
+	 */
+	public static function handleClippingTaskStatusUpdate($task)
+	{
+		if ($task->getStatus() == EntryServerNodeStatus::TASK_QUEUED)
+		{
+			$clippedEntryId = $task->getClippedEntryId();
+			KalturaLpg::debug("EntryServerNodeClippingTask is QUEUED: Entry [$clippedEntryId] set to ready ");
+			// QUEUE means the Live Controller got the task and the entry can be played from LIVE
+			$entry = entryPeer::retrieveByPK($clippedEntryId);
+			$entry->setStatus(KalturaEntryStatus::READY);
+			$entry->save();
+		}
+	}
 
 }

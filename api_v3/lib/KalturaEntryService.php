@@ -702,7 +702,6 @@ class KalturaEntryService extends KalturaBaseService
 
 				return $this->attachLiveEntryResource($internalResource, $dbEntry, $dbAsset, $operationAttributes);
 			}
-			
 			if ($isLiveClippingFlow)
 			{
 				if (($srcEntry->getId() == $dbEntry->getId()) || ($srcEntry->getId() == $dbEntry->getReplacedEntryId()))
@@ -764,7 +763,7 @@ class KalturaEntryService extends KalturaBaseService
 		$clippingTask->setClippedEntryId($targetEntry->getId());
 		$clippingTask->setClipAttributes(self::getKClipAttributes($operationAttributes));
 		$clippingTask->setServerType(EntryServerNodeType::LIVE_CLIPPING_TASK);
-		$clippingTask->setStatus(EntryServerNodeStatus::TASK_CREATED);
+		$clippingTask->setStatus(EntryServerNodeStatus::TASK_PENDING);
 		$clippingTask->setEntryId($srcEntry->getId()); //recorded entry
 		$clippingTask->setPartnerId($serverNode->getPartnerId()); //in case on eCDN it will get the local partner (not -5)
 		$clippingTask->setServerNodeId($serverNode->getId());

@@ -36,19 +36,4 @@ class ClippingTaskEntryServerNode extends TaskEntryServerNode
    		return;
 	}
 
-	protected function setQueued()
-	{
-		// QUEUE means the Live Controller got the task and the entry can be played from LIVE
-		$entry = entryPeer::retrieveByPK($this->getClippedEntryId());
-		$entry->setStatus(KalturaEntryStatus::READY);
-		$entry->save();
-	}
-
-	public function setStatus($v)
-	{
-		if ($v == EntryServerNodeStatus::TASK_QUEUED)
-			$this->setQueued();
-		return parent::setStatus($v);
-	}
-
 }

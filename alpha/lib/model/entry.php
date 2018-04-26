@@ -3965,6 +3965,17 @@ public function copyTemplate($copyPartnerId = false, $template)
 
 		return array($categoryIdsSearchData, $categoryNamesSearchData);
 	}
+	
+	private function isLiveDefaultThumb()
+	{
+		// in case of a recorded entry from live that doesn't have flavors yet nor thumbs we will use the live default thumb.
+		if (($this->getSourceType() == EntrySourceType::RECORDED_LIVE || $this->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE) && !assetPeer::countByEntryId($this->getId(), array(assetType::FLAVOR, assetType::THUMBNAIL)))
+			return true;
+		//in case live clipping which is KALTURA_RECORDED_LIVE but have flavor
+		if (myEntryUtils::shouldServeVodFromLive($this))
+			return true;
+		return false;
+	}
 
 	/**
 	 * @param $type
@@ -3972,8 +3983,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 	 */
 	protected function getDefaultThumbPath()
 	{
-		// in case of a recorded entry from live that doesn't have flavors yet nor thumbs we will use the live default thumb.
-		if (($this->getSourceType() == EntrySourceType::RECORDED_LIVE || $this->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE) && !assetPeer::countByEntryId($this->getId(), array(assetType::FLAVOR, assetType::THUMBNAIL)))
+		if ($this->isLiveDefaultThumb())
 			return myContentStorage::getFSContentRootPath() . self::LIVE_THUMB_PATH;
 		return null;
 	}
