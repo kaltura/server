@@ -127,22 +127,17 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	}
 
 	/***
-	 * @param $sourceFlavorParamId
-	 * @param $entryId
+	 * @param kClipAttributes $singleAttribute
+	 * @param string $originalConversionEnginesExtraParams
 	 * @return int
-	 * @throws PropelException
+	 * @throws kCoreException
 	 */
-	private function cloneFlavorParam($sourceFlavorParamId,$entryId)
+	private function cloneFlavorParam($singleAttribute, $originalConversionEnginesExtraParams)
 	{
-		$flavorParamsObj = assetParamsPeer::retrieveByPK($sourceFlavorParamId);
-		// unset flavorParamsObj ID
-		$flavorParamsObj->setId(null);
-		$flavorParamsObj->setNew(true);
+		$flavorParamsObj = assetParamsPeer::getTempAssetParamByPk(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
 		$flavorParamsObj->setFormat(flavorParams::CONTAINER_FORMAT_MPEGTS);
-		$this->fixConversionParam($flavorParamsObj, $entryId);
-		//save the object
-		$flavorParamsObj->save();
-		//return the object ID
+		$this->fixConversionParam($flavorParamsObj, $singleAttribute, $originalConversionEnginesExtraParams);
+		assetParamsPeer::addInstanceToPool($flavorParamsObj);
 		return $flavorParamsObj->getId();
 	}
 
@@ -253,7 +248,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	/***
 	 * @param BatchJob $batchJob
 	 * @throws APIException
-	 * @throws PropelException
+	 * @throws kCoreException
 	 */
 	private function handleClipConcatParentJob($batchJob)
 	{
@@ -282,17 +277,19 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param int $priority
 	 * @return BatchJob[]
 	 * @throws APIException
-	 * @throws PropelException
+	 * @throws kCoreException
 	 */
 	private function addClipJobs($parentJob , $entryId, &$errDescription, $partnerId,
 	                             array $operationAttributes, $priority = 0)
 	{
 		$batchArray = array();
 		$order = 0;
+		$originalConversionEnginesExtraParams =
+			assetParamsPeer::retrieveByPK(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID)->getConversionEnginesExtraParams();
 		foreach($operationAttributes as $singleAttribute)
 		{
 			KalturaLog::info("Going To create Flavor for clip: " . print_r($singleAttribute));
-			$clonedID =	$this->cloneFlavorParam($singleAttribute->getAssetParamsId(),$entryId);
+			$clonedID =	$this->cloneFlavorParam($singleAttribute, $originalConversionEnginesExtraParams);
 			$flavorAsst = $this->createTempClipFlavorAsset($partnerId,$entryId,$clonedID,$order);
 			$batchJob =	kBusinessPreConvertDL::decideAddEntryFlavor($parentJob, $entryId,
 					$clonedID, $errDescription,$flavorAsst->getId()
@@ -554,46 +551,50 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	/**
 	 * @param array $conversionExtraParamsArray
 	 * @param array $conversionEngines
-	 * @param mediaInfo $mediaInfo
+	 * @param kClipAttributes $singleAttribute
 	 * @return string
 	 */
-	private function editConversionEngineExtraParam($conversionExtraParamsArray, $conversionEngines, $mediaInfo)
+	private function editConversionEngineExtraParam($conversionEngines, $singleAttribute, $conversionExtraParamsArray = array())
 	{
 		$newConversionExtraParams = array();
 		for ($i = 0; $i < count($conversionEngines) ; $i++)
 		{
-			$ep = '';
+			$extraParams = '';
 			if($i < count($conversionExtraParamsArray))
-				$ep = $conversionExtraParamsArray[$i];
-
+				$extraParams = $conversionExtraParamsArray[$i];
 			if ($conversionEngines[$i] == conversionEngineType::FFMPEG || $conversionEngines[$i] == conversionEngineType::FFMPEG_AUX)
-			{
-				if (strpos($ep, '-map a') === false && $mediaInfo && $mediaInfo->isContainAudio())
-					$ep .= ' -map a';
-				if (strpos($ep, '-map v') === false && $mediaInfo && $mediaInfo->isContainVideo())
-					$ep .= ' -map v';
-			}
-			$newConversionExtraParams[] = $ep;
+					$extraParams .= $this->addEffects($singleAttribute);
+			$newConversionExtraParams[] = $extraParams;
 		}
 		return implode(' | ',$newConversionExtraParams);
 	}
 
 	/**
 	 * @param assetParams $flavorParamsObj
-	 * @param string $entryId
+	 * @param kClipAttributes $singleAttribute
+	 * @param string $originalConversionEnginesExtraParams
 	 */
-	private function fixConversionParam($flavorParamsObj, $entryId)
+	private function fixConversionParam($flavorParamsObj, $singleAttribute, $originalConversionEnginesExtraParams)
 	{
-		$mediaInfo = mediaInfoPeer::retrieveOriginalByEntryId($entryId);
 		$conversionEngines = explode(',', $flavorParamsObj->getConversionEngines());
-		if (is_null($flavorParamsObj->getConversionEnginesExtraParams()))
-			$newExtraConversionParams = $this->editConversionEngineExtraParam(array(), $conversionEngines, $mediaInfo);
+		if (is_null($originalConversionEnginesExtraParams))
+			$newExtraConversionParams = $this->editConversionEngineExtraParam($conversionEngines, $singleAttribute);
 		else {
-			$conversionExtraParams = explode('|', $flavorParamsObj->getConversionEnginesExtraParams());
+			$conversionExtraParams = explode('|', $originalConversionEnginesExtraParams);
 			$newExtraConversionParams =
-				$this->editConversionEngineExtraParam($conversionExtraParams, $conversionEngines, $mediaInfo);
+				$this->editConversionEngineExtraParam($conversionEngines, $singleAttribute,$conversionExtraParams);
 		}
 		$flavorParamsObj->setConversionEnginesExtraParams($newExtraConversionParams);
+	}
+
+	/**
+	 * @param kClipAttributes $singleAttribute
+	 * @return string
+	 */
+	private function addEffects($singleAttribute)
+	{
+		$effects = new kEffectsManager();
+		return $effects->getFFMPEGEffects($singleAttribute);
 	}
 
 
