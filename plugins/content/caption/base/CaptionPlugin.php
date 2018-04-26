@@ -565,8 +565,15 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 							$ksStr = '/ks/' . self::generateKsForCaptionServe($captionAsset);
 						}
 
+						$segmentDurationStr = '';
+						if(kConf::hasParam('webvtt_segment_duration'))
+						{
+							$duration = kConf::get('webvtt_segment_duration');
+							$segmentDurationStr = '/segmentDuration/' . $duration;
+						}
+
 						$captionAssetObj['url'] = $cdnHost . self::SERVE_WEBVTT_URL_PREFIX .
-							'/captionAssetId/' . $captionAsset->getId() . $ksStr . $versionStr . '/a.m3u8';
+							'/captionAssetId/' . $captionAsset->getId() . $segmentDurationStr . $ksStr . $versionStr . '/a.m3u8';
 					}
 					$label = $captionAsset->getLabel();
 					if (!$label)
