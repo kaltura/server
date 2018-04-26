@@ -9,6 +9,7 @@ None.
     
 ### Deployment scripts ###
 Disable current "EntryCategory added FireBase" event notification template
+
 php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/entryAddedToCategoryFireBaseHttpNotification.xml    
  
     
