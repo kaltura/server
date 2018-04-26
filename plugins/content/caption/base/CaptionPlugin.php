@@ -575,20 +575,9 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 						$label = 'Track' . (count($contributor->captions) + 1);
 					$captionAssetObj['label'] = $label;
 					$captionAssetObj['default'] = $captionAsset->getDefault() ? "YES" : "NO";
-					if (isset(self::$captionsFormatMap[$captionAsset->getLanguage()]))
-					{
-						$threeCodeLang = self::$captionsFormatMap[$captionAsset->getLanguage()];
-						if ($useThreeCodeLang)
-							$captionAssetObj['language'] = $threeCodeLang;
-						else
-						{
-							$twoCodeLang =  languageCodeManager::getTwoCodeLowerFromThreeCode($threeCodeLang);
-							if($twoCodeLang)
-								$captionAssetObj['language'] = $twoCodeLang;
-							else
-								$captionAssetObj['language'] = self::$captionsFormatMap[$captionAsset->getLanguage()];
-						}
-					}
+					$languageCode= self::getLanguageCode($captionAsset->getLanguage(),$useThreeCodeLang);
+					if($languageCode)
+						$captionAssetObj['language'] = $languageCode;
 
 					KalturaLog::info("Object passed into editor: " . print_r($captionAssetObj, true));
 					$contributor->captions[] = $captionAssetObj;
@@ -602,4 +591,22 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 		return $contributors;
 	}
+	private static function getLanguageCode($captionAssetLanguage,$useThreeCodeLang)
+	{
+		$languageCode = null;
+		$languageObject = languageCodeManager::getObjectFromKalturaName($captionAssetLanguage);
+		if($useThreeCodeLang)
+			$languageCode = $languageObject[languageCodeManager::ISO639_B];
+		else
+		{
+			if($languageObject[languageCodeManager::ISO639])
+				$languageCode = $languageObject[languageCodeManager::ISO639];
+			else
+				$languageCode = $languageObject[languageCodeManager::ISO639_B];
+		}
+
+		return $languageCode;
+	}
 }
+
+
