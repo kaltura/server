@@ -75,12 +75,13 @@ $dropFolderServiceTypes = $dropFolder->webexServiceType ? explode(',', $dropFold
 $serviceTypes = webexWrapper::stringServicesTypesToWebexXmlArray($dropFolderServiceTypes);
 $webexWrapper = new webexWrapper($dropFolder->webexServiceUrl . '/' . $dropFolder->path, $securityContext, array('KalturaLog', 'err'),
 	array('KalturaLog', 'debug'), false);
-for($i = $startDate; $i < $endDate; $i=$i+WEEK_IN_SECONDS)
+for ($i = $startDate; $i < $endDate; $i = $i + WEEK_IN_SECONDS)
 {
 	$files = getRecordingsFile($i, $endDate, $webexWrapper, $serviceTypes, $logFileName);
-	if($files)
+	if ($files)
 	{
-		file_put_contents($logFileName, "Starting to handle files:".PHP_EOL, FILE_APPEND );
-		handleFiles($files, $logFileName,$webexEngine);
+		file_put_contents($logFileName, "Starting to handle files:" . PHP_EOL, FILE_APPEND);
+		handleFiles($files, $logFileName, $webexEngine);
 	}
 }
+

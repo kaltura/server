@@ -184,7 +184,8 @@ class KDLWrap
 			// in case we need to handle multiple audio streams we need to remove the "-map_metadata -1" command
 			// and replace it with the language mapping for the correct audio streams
 			// if only audio streams exist without video we ignore the video mapping
-			if (($cdlFlvrOut->getFlavorParamsId() == kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID) && !is_null($cdlMediaInfo))
+			if (($cdlFlvrOut->getFlavorParamsId() == kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID || $cdlFlvrOut->getFlavorParamsId() === assetParamsPeer::TEMP_FLAVOR_PARAM_ID)
+				&& !is_null($cdlMediaInfo))
 			{
 				$contentStreams = json_decode($cdlMediaInfo->getContentStreams(), true);
 				$command = null;
@@ -205,7 +206,23 @@ class KDLWrap
 				foreach ($cmdLines as $key => $cmdLine)
 				{
 					if (($key == conversionEngineType::FFMPEG || $key == conversionEngineType::FFMPEG_AUX) && $command != null)
-						$cmdLines[$key] = str_replace('-map_metadata -1', $command, $cmdLine);
+					{
+						/***
+						 * assetParamsPeer::TEMP_FLAVOR_PARAM_ID (-2 ) is a temporary flvor param id of type mpegts
+						 * we created it for clip \ concat flow only and we do not save it to the DB
+						 * in this flavor we do not have the -map_metadata -1(as it is added in KDLOperatorFfmpeg2_1_3)
+						 *  but we still want to add the map section to the ffmpeg engine so we will not loose multi audio
+						 * as such we concat to the '-f mpegts' the audio\video mapping
+						 */
+						if ($cdlFlvrOut->getFlavorParamsId() === assetParamsPeer::TEMP_FLAVOR_PARAM_ID)
+						{
+							$cmdLines[$key] = str_replace('-f mpegts', $command . ' -f mpegts', $cmdLine);
+						}
+						else
+						{
+							$cmdLines[$key] = str_replace('-map_metadata -1', $command, $cmdLine);
+						}
+					}
 				}
 				$cdlFlvrOut->setCommandLines($cmdLines);
 			}
