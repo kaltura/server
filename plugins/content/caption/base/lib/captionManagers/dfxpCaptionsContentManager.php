@@ -200,11 +200,11 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 		return new dfxpCaptionsContentManager();
 	}
 
-	protected function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime)
+	protected function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime, $globalOffset)
 	{
 	}
 
-	public function buildFile($content, $clipStartTime, $clipEndTime)
+	public function buildFile($content, $clipStartTime, $clipEndTime, $globalOffset = 0)
 	{
 		$xml = new KDOMDocument();
 		try
@@ -217,13 +217,13 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 			KalturaLog::err($e->getMessage());
 			return '';
 		}
-		$xmlUpdatedContent = $this->editBody($xml, $clipStartTime, $clipEndTime);
+		$xmlUpdatedContent = $this->editBody($xml, $clipStartTime, $clipEndTime, $globalOffset);
 		$xmlUpdatedContent = trim($xmlUpdatedContent, " \r\n\t");
 		$xmlUpdatedContent = str_replace("      \n", "", $xmlUpdatedContent);
 		return $xmlUpdatedContent;
 	}
 
-	private function editBody(DOMNode $curNode, $clipStartTime, $clipEndTime)
+	private function editBody(DOMNode $curNode, $clipStartTime, $clipEndTime, $globalOffset)
 	{
 		for ($i = 0; $i < $curNode->childNodes->length; $i++)
 		{
@@ -233,7 +233,7 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 
 			if (strtolower($childNode->nodeName) != 'p')
 			{
-				$this->editBody($childNode, $clipStartTime, $clipEndTime);
+				$this->editBody($childNode, $clipStartTime, $clipEndTime, $globalOffset);
 				continue;
 			}
 
@@ -252,8 +252,8 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 				$curNode->removeChild($childNode);
 			else
 				{
-				$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($captionStartTime, $clipStartTime);
-				$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $captionEndTime);
+				$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($captionStartTime, $clipStartTime, $globalOffset);
+				$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $captionEndTime, $globalOffset);
 
 				$childNode->setAttribute('begin',kXml::integerToTime($adjustedStartTime));
 				if($childNode->hasAttribute('end'))
@@ -268,4 +268,69 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 		return $content;
 	}
 
+	/**
+	 * @param string $content
+	 * @param string $toAppend
+	 * @return string
+	 */
+	public function merge($content, $toAppend)
+	{
+		$contentXML = new KDOMDocument();
+		$toAppendXML = new KDOMDocument();
+		try
+		{
+			$contentXML->loadXML($content);
+			$toAppendXML->loadXML($toAppend);
+			$contentBody = $contentXML->getElementsByTagName('body')->item(0);
+			$divToAppend = $toAppendXML->getElementsByTagName('div');
+			/** @var DOMElement $candidate*/
+			for ($i = 0; $i < $divToAppend ->length; $i ++)
+			{
+				$this->appendToDestination($divToAppend->item($i), $contentBody, $contentXML);
+			}
+
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+			return $content;
+		}
+		$content = $contentXML->saveXML();
+		$content = trim($content, " \r\n\t");
+		$content = str_replace("    \n", "", $content);
+		return $content;
+	}
+
+	/**
+	 * @param DOMElement $candidate
+	 * @param DOMElement $contentBody
+	 * @param DOMDocument $contentXML
+	 */
+	private function appendToDestination($candidate, $contentBody, $contentXML)
+	{
+		$shouldAddDiv = true;
+		/** @var DOMElement $existingLanguage */
+		foreach ($contentBody->getElementsByTagName('div') as $existingLanguage)
+		{
+			if ($existingLanguage->getAttribute('xml:lang') === $candidate->getAttribute('xml:lang'))
+			{
+				$shouldAddDiv = false;
+				foreach ($candidate->childNodes as $line)
+				{
+					// Import the line, and all its children, to the $contentXML doc
+					$line = $contentXML->importNode($line, true);
+					// append imported line to existing language
+					$existingLanguage->appendChild($line);
+				}
+				break;
+			}
+		}
+		if ($shouldAddDiv)
+		{
+			// Import the language, and all its children, to the $contentXML doc
+			$candidate = $contentXML->importNode($candidate, true);
+			// append imported language to body
+			$contentBody->appendChild($candidate);
+		}
+	}
 }

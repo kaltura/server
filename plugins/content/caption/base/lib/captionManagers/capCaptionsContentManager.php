@@ -171,12 +171,20 @@ class capCaptionsContentManager extends kCaptionsContentManager
 		return new capCaptionsContentManager();
 	}
 
-	public function buildFile($content, $clipStartTime, $clipEndTime)
+	public function buildFile($content, $clipStartTime, $clipEndTime, $globalOffset = 0)
 	{
 	}
 
-	protected function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime)
+	protected function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime, $globalOffset)
 	{
 	}
 
+	/**
+	 * @param string $content
+	 * @param string $toAppend
+	 * @return string
+	 */
+	public function merge($content, $toAppend)
+	{
+	}
 }

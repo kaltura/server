@@ -322,12 +322,14 @@ class flavorAsset extends exportableAsset
 	public function shouldEncrypt()
 	{
 		$entry = $this->getentry();
-		return ($entry->getType() == entryType::DOCUMENT);
+		return ($entry && ($entry->getType() == entryType::DOCUMENT));
 	}
 
 	protected function setLanguageFromFlavorParams()
 	{
 		$flavorParams = $this->getFlavorParams();
+		if (!$flavorParams)
+			return null;
 		$multiStream = $flavorParams->getMultiStream();
 		if (isset($multiStream))
 		{
@@ -346,7 +348,6 @@ class flavorAsset extends exportableAsset
 	{
 		if ($this->isColumnModified(assetPeer::FLAVOR_PARAMS_ID))
 		{
-//			$this->setLanguageAndDefault();
 			$flavorLang = $this->setLanguageFromFlavorParams();
 			if ($flavorLang)
 			{

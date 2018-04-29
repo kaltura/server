@@ -42,8 +42,9 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 	*/
 	public function objectReplaced(BaseObject $object, BaseObject $replacingObject, BatchJob $raisedJob = null) {
 		$clipAttributes = self::getClipAttributesFromEntry($replacingObject);
+		$clipConcatTrimFlow = self::isClipConcatTrimFlow($replacingObject);
 		//replacement as a result of trimming
-		if (!is_null($clipAttributes))
+		if (!is_null($clipAttributes) || $clipConcatTrimFlow)
 		{
 			kEventsManager::setForceDeferredEvents(true);
 			$c = new Criteria();
@@ -135,15 +136,19 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 				KalturaLog::debug("No captions found on source entry [" . $sourceEntryId . "], no need to run copy captions job");
 				return;
 			}
-			
-			$jobData->setOffset(0);
-			$jobData->setDuration($sourceEntry->getLengthInMsecs());
+			$kClipDescriptionArray = array();
+			$kClipDescription = new kClipDescription();
+			$kClipDescription->setSourceEntryId($sourceEntryId);
+			$kClipDescription->setStartTime(0);
+			$kClipDescription->setDuration($sourceEntry->getLengthInMsecs());
+			$kClipDescriptionArray[] = $kClipDescription;
 			$jobData->setFullCopy(true);
 		}
 		else { //trim or clip
 			$clipAttributes = self::getClipAttributesFromEntry($destEntry);
 			if (!is_null($clipAttributes))
 			{
+				$operationAttributes  = $destEntry->getOperationAttributes();
 				$sourceEntry = entryPeer::retrieveByPK($destEntry->getSourceEntryId());
 				if (is_null($sourceEntry))
 				{
@@ -158,16 +163,30 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 					KalturaLog::debug("No captions found on source entry [" . $sourceEntryId . "], no need to run copy captions job");
 					return;
 				}
-
-				$offset = $clipAttributes->getOffset() ? $clipAttributes->getOffset() : 0;
-				$jobData->setOffset($offset);
-				$duration = $clipAttributes->getDuration() ? $clipAttributes->getDuration() : $sourceEntry->getLengthInMsecs();
-				$jobData->setDuration($duration);
+				$globalOffset = 0;
+				$kClipDescriptionArray = array();
+				/** @var kClipAttributes $operationAttribute */
+				foreach ($operationAttributes as $operationAttribute)
+				{
+					$kClipDescription = new kClipDescription();
+					if (!$sourceEntryId)
+					{
+						//if no source entry we will not copy the entry ID. add clip offset to global offset and continue
+						$globalOffset = $globalOffset + $operationAttribute->getDuration();
+						continue;
+					}
+					$kClipDescription->setSourceEntryId($sourceEntryId);
+					$kClipDescription->setStartTime($operationAttribute->getOffset() ? $operationAttribute->getOffset() : 0);
+					$kClipDescription->setDuration($operationAttribute->getDuration() ? $operationAttribute->getDuration() : $sourceEntry->getLengthInMsecs());
+					self::setCaptionGlobalOffset($operationAttribute, $globalOffset, $kClipDescription);
+					$kClipDescriptionArray[] = $kClipDescription;
+					//add clip offset to global offset
+					$globalOffset = $globalOffset + $operationAttribute->getDuration();
+				}
+				$jobData->setClipsDescriptionArray($kClipDescriptionArray);
 				$jobData->setFullCopy(false);
 			}
 		}
-
-		$jobData->setSourceEntryId($sourceEntry->getId());
 
 		$batchJob = new BatchJob();
 		$batchJob->setEntryId($destEntry->getId());
@@ -194,4 +213,34 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 		}
 		return null;
 	}
+
+	/**
+	 * @param BaseObject $object
+	 * @return bool
+	 */
+	protected static function isClipConcatTrimFlow(BaseObject $object ) {
+		if ( $object instanceof entry ) {
+			if ($object->getClipConcatTrimFlow()){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * @param kClipAttributes $operationAttribute
+	 * @param int $globalOffset
+	 * @param kClipDescription $kClipDescription
+	 */
+	private static function setCaptionGlobalOffset($operationAttribute, $globalOffset, $kClipDescription)
+	{
+		if ($operationAttribute->getGlobalOffsetInDestination() || $operationAttribute->getGlobalOffsetInDestination() === 0) {
+			$kClipDescription->setOffsetInDestination($operationAttribute->getGlobalOffsetInDestination());
+		} else {
+			$kClipDescription->setOffsetInDestination($globalOffset);
+		}
+	}
+
 }
+
+

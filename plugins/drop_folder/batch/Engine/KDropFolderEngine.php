@@ -57,7 +57,6 @@ abstract class KDropFolderEngine implements IKalturaLogger
 
 	/**
 	 * Load all the files from the database that their status is not PURGED, PARSED or DETECTED
-	 * @param KalturaDropFolder $folder
 	 * @return array
 	 */
 	protected function loadDropFolderFiles()
@@ -72,8 +71,9 @@ abstract class KDropFolderEngine implements IKalturaLogger
 
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
-		if(KBatchBase::$taskConfig->params->pageSize)
+		if(KBatchBase::$taskConfig && KBatchBase::$taskConfig->params->pageSize)
 			$pager->pageSize = KBatchBase::$taskConfig->params->pageSize;
+
 		$totalCount = 0;
 		do
 		{

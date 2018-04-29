@@ -67,6 +67,7 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::CLEAR_BEACONS' => 'Clear Beacons',
 	'Kaltura_Client_Enum_BatchJobType::COPY_CAPTIONS' => 'Copy Caption Assets',
 	'Kaltura_Client_Enum_BatchJobType::USERS_CSV' => 'Users Csv',
+	'Kaltura_Client_Enum_BatchJobType::COPY_CUE_POINTS' => 'Copy cue Points',
 
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_AUX' => 'Convert - FFMpeg Aux',

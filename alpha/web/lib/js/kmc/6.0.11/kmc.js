@@ -1,4 +1,4 @@
-/*! KMC - v6.0.11 - 2018-02-14
+/*! KMC - v6.0.11 - 2018-03-26
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2018 Amir Chervinsky; Licensed GNU */
 /**
@@ -532,7 +532,7 @@ angular.module('pascalprecht.translate').factory('$translateStaticFilesLoader', 
     };
   }
 ]);
-/*! Kaltura Embed Code Generator - v1.1.0 - 2018-02-14
+/*! Kaltura Embed Code Generator - v1.2.0 - 2018-03-25
 * https://github.com/kaltura/EmbedCodeGenerator
 * Copyright (c) 2018 Ran Yefet; Licensed MIT */
 // lib/handlebars/base.js
@@ -1044,7 +1044,7 @@ this["Handlebars"]["templates"]["templates/iframe.hbs"] = Handlebars.template(fu
     if (stack2 = helpers.height) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
     else { stack2 = depth0.height; stack2 = typeof stack2 === functionType ? stack2.apply(depth0) : stack2; }
     buffer += escapeExpression(stack2)
-        + "\" allowfullscreen webkitallowfullscreen mozAllowFullScreen frameborder=\"0\"";
+        + "\" allowfullscreen webkitallowfullscreen mozAllowFullScreen allow=\"autoplay; fullscreen; encrypted-media\" frameborder=\"0\"";
     options = {hash:{},data:data};
     stack2 = ((stack1 = helpers.elAttributes),stack1 ? stack1.call(depth0, depth0.attributes, options) : helperMissing.call(depth0, "elAttributes", depth0.attributes, options));
     if(stack2 || stack2 === 0) { buffer += stack2; }

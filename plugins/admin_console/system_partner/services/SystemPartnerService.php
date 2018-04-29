@@ -100,9 +100,8 @@ class SystemPartnerService extends KalturaBaseService
 		
 			$inputFilter->timeZoneOffset = $usageFilter->timezoneOffset;
 	
-			$reportsMgrClass = kKavaBase::isPartnerAllowed(Partner::ADMIN_CONSOLE_PARTNER_ID, kKavaBase::VOD_ALLOWED_PARTNERS) ? "kKavaReportsMgr" : "myReportsMgr";
-			
-			list ( $reportHeader, $reportData, $totalCountNoNeeded) = call_user_func(array($reportsMgrClass, "getTable"), null ,
+			list ( $reportHeader, $reportData, $totalCountNoNeeded) = kKavaReportsMgr::getTable(
+			    null ,
 			    myReportsMgr::REPORT_TYPE_ADMIN_CONSOLE ,
 			    $inputFilter ,
 			    $pager->pageSize , 0 ,

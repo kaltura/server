@@ -118,6 +118,9 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 		{
 			/* @var $transcriptAsset TranscriptAsset */
 
+			if($transcriptAsset->getContainerFormat() != AttachmentType::TEXT)
+				continue;
+			
 			$syncKey = $transcriptAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			$content = kFileSyncUtils::file_get_contents($syncKey, true, false);
 			if(!$content)

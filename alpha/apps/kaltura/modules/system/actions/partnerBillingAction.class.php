@@ -43,7 +43,7 @@ class partnerBillingAction extends kalturaSystemAction
 			$input_filter->from_date = strtotime( $this->from_date );
 			$input_filter->to_date = strtotime( $this->to_date );
 	
-			list ( $header , $data , $totalCount ) = myReportsMgr::getTable( 
+			list ( $header , $data , $totalCount ) = kKavaReportsMgr::getTable( 
 				null , 
 				"system/system_generic_partner_billing" , 
 				$input_filter ,

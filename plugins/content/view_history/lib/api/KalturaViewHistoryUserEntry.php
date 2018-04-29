@@ -58,7 +58,7 @@ class KalturaViewHistoryUserEntry extends KalturaUserEntry
 		$object_to_fill = parent::toInsertableObject($object_to_fill, $props_to_skip);
 		if (kCurrentContext::getCurrentSessionType() == SessionType::USER)
 		{
-			if ($this->userId && (!kCurrentContext::getCurrentKsKuser() || kCurrentContext::getCurrentKsKuser()->getPuserId() != strtolower($this->userId)))
+			if ($this->userId && (!kCurrentContext::getCurrentKsKuser() ||strtolower(kCurrentContext::getCurrentKsKuser()->getPuserId()) != strtolower($this->userId)))
 			{
 				throw new KalturaAPIException (KalturaErrors::INVALID_USER_ID);	
 			}

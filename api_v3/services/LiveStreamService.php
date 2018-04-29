@@ -550,6 +550,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 * 
 	 * @action regenerateStreamToken
 	 * @param string $entryId Live stream entry id to regenerate secure token for
+	 * @return KalturaLiveEntry The regenerate token entry 
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @validateUser entry entryId edit

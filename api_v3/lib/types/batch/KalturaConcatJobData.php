@@ -41,6 +41,12 @@ class KalturaConcatJobData extends KalturaJobData
 	 */
 	public $concatenatedDuration;
 
+	/**
+	 * Should Sort the clip parts
+	 * @var bool
+	 */
+	public $shouldSort;
+
 	private static $map_between_objects = array
 	(
 		'srcFiles',
@@ -49,6 +55,7 @@ class KalturaConcatJobData extends KalturaJobData
 		'offset',
 		'duration',
 		'concatenatedDuration',
+		'shouldSort',
 	);
 
 	/* (non-PHPdoc)

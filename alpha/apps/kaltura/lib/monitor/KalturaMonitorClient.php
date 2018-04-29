@@ -77,7 +77,7 @@ class KalturaMonitorClient
 		return false;
 	}
 	
-	protected static function flushPacket()
+	public static function flushPacket()
 	{
 		if (!self::$bufferedPacket || !self::$stream)
 			return;
@@ -182,7 +182,7 @@ class KalturaMonitorClient
 			return;
 		
 		// strip the comment
-		if (kString::beginsWith($sql, '/*'))
+		if (substr($sql, 0, 2) == '/*')
 		{
 			$eventType = self::EVENT_DATABASE;
 			$commentEndPos = strpos($sql, '*/') + 2;
@@ -199,7 +199,7 @@ class KalturaMonitorClient
 		$queryType = null;
 		foreach (self::$queryTypes as $prefix => $curQueryType)
 		{
-			if (kString::beginsWith($sql, $prefix))
+			if (substr($sql, 0, strlen($prefix)) == $prefix)
 			{
 				$sql = substr($sql, strlen($prefix));
 				$queryType = $curQueryType;

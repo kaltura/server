@@ -152,7 +152,8 @@ class FtpDistributionEngine extends PublicPrivateKeysDistributionEngine implemen
 				}
 			}
 			$remoteFile = $this->distributeFile($fileManager, $file, $distributionProfile);
-			$remoteFiles[] = $remoteFile;
+			if ($remoteFile)
+				$remoteFiles[] = $remoteFile;
 		}
 	}
 	
@@ -166,21 +167,25 @@ class FtpDistributionEngine extends PublicPrivateKeysDistributionEngine implemen
 	protected function distributeFile(kFileTransferMgr $fileManager, KalturaFtpDistributionFile $file, KalturaFtpDistributionProfile $distributionProfile)
 	{
 		$remoteFilePath = $this->cleanPath($distributionProfile->basePath . '/' . $file->filename);
+
 		if ($file->contents)
 		{
 			$filename = uniqid(null, true) . '.' . pathinfo($file->filename, PATHINFO_EXTENSION);
-			$localTempFilePath = $this->tempFilePath . '/' . $filename;
-			KalturaLog::info('Sending contents, using temp path ['.$localTempFilePath.']');
-			file_put_contents($localTempFilePath, $file->contents);
-			$fileManager->putFile($remoteFilePath, $localTempFilePath);
-			unlink($localTempFilePath);
+			$tempFilePath = $this->tempFilePath . '/' . $filename;
+			file_put_contents($tempFilePath, $file->contents);
+			KalturaLog::info('Sending contents, using temp path [' . $tempFilePath . ']');
 		}
 		else
 		{
-			KalturaLog::info('Sending local file ['.$file->localFilePath.']');
-			$fileManager->putFile($remoteFilePath, $file->localFilePath);
+			$tempFilePath = $this->getAssetFile($file->assetId, $this->tempDirectory);
+			if (!$tempFilePath)
+				return null;
+			KalturaLog::info('Sending local file [' . $tempFilePath . ']');
 		}
-		
+
+		$fileManager->putFile($remoteFilePath, $tempFilePath);
+		unlink($tempFilePath);
+
 		$remoteFile = new KalturaDistributionRemoteMediaFile();
 		if ($file->hash)
 			$remoteFile->version = $file->version . '_' . $file->hash;
@@ -190,7 +195,6 @@ class FtpDistributionEngine extends PublicPrivateKeysDistributionEngine implemen
 		$remoteFile->remoteId = $remoteFilePath; // remote id is the file path, later it will be used to delete the distributed files
 		return $remoteFile;
 	}
-
 
 	protected function cleanPath($path)
 	{

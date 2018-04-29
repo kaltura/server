@@ -197,7 +197,7 @@ class ExampleDistributionEngine extends DistributionEngine implements
 		$thumbAssetId = reset($thumbAssetIds);
 		$thumbElements = $feed->getElementsByTagName('thumb');
 		$thumbElement = reset($thumbElements);
-		$thumbElement->textContent = $this->getThumbAssetUrl($thumbAssetId);
+		$thumbElement->textContent = $this->getAssetUrl($thumbAssetId);
 			
 		$videosElements = $feed->getElementsByTagName('videos');
 		$videosElement = reset($videosElements);
@@ -206,7 +206,7 @@ class ExampleDistributionEngine extends DistributionEngine implements
 		KBatchBase::impersonate($partnerId);
 		foreach($flavorAssets as $flavorAsset)
 		{
-			$url = $this->getFlavorAssetUrl($flavorAsset->id);
+			$url = $this->getAssetUrl($flavorAsset->id);
 			
 			$videoElement = $feed->createElement('video');
 			$videoElement->textContent = $url;

@@ -19,6 +19,7 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 	protected static $class_types_cache = array(
 		EntryServerNodeType::LIVE_PRIMARY => LiveEntryServerNode::OM_CLASS,
 		EntryServerNodeType::LIVE_BACKUP => LiveEntryServerNode::OM_CLASS,
+		EntryServerNodeType::LIVE_CLIPPING_TASK => ClippingTaskEntryServerNode::OM_CLASS,
 	);
 	
 	public static $connectedServerNodeStatuses = array(
@@ -54,7 +55,7 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 	 * @param      string $entryId .
 	 * @param      EntryServerNodeType $serverType .
 	 * @param      PropelPDO $con the connection to use
-	 * @return 	   array Array of matching EntryServerNodes
+	 * @return 	   EntryServerNode of matching EntryServerNode
 	 * @throws     kCoreException
 	 */
 	public static function retrieveByEntryIdAndServerType($entryId, $serverType, PropelPDO $con = null)
@@ -108,7 +109,7 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 		foreach ( $entryServerNodes as $entryServerNode)
 		{
 			/* @var EntryServerNode $entryServerNode */
-			if ($entryServerNode->getStatus() == EntryServerNodeStatus::PLAYABLE)
+			if ($entryServerNode->getStatus() == EntryServerNodeStatus::PLAYABLE && in_array($entryServerNode->getServerType(),array(EntryServerNodeType::LIVE_BACKUP, EntryServerNodeType::LIVE_PRIMARY)))
 				$playableEntryServerNodes[] = $entryServerNode;
 		}
 		return $playableEntryServerNodes;
@@ -131,6 +132,14 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 		$c->add(EntryServerNodePeer::STATUS, self::$connectedServerNodeStatuses, Criteria::IN);
 		$c->addGroupByColumn(EntryServerNodePeer::ENTRY_ID);
 		
+		return EntryServerNodePeer::doSelect($c);
+	}
+
+	public static function retrieveByServerNodeIdAndType($serverNodeId, $type)
+	{
+		$c = KalturaCriteria::create(EntryServerNodePeer::OM_CLASS);
+		$c->add(EntryServerNodePeer::SERVER_NODE_ID, $serverNodeId);
+		$c->add(EntryServerNodePeer::SERVER_TYPE, $type);
 		return EntryServerNodePeer::doSelect($c);
 	}
 } // EntryServerNodePeer

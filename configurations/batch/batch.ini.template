@@ -66,6 +66,7 @@ enabledWorkers.KAsyncClearCuePoints					= 1
 enabledWorkers.KAsyncConvertThumbAssetsGenerator	= 1
 enabledWorkers.KAsyncLiveToVod      				= 1
 enabledWorkers.KAsyncCopyCaptions					= 1
+enabledWorkers.KAsyncCopyCuePoints                   = 1
 
 [mainTemplate : template]
 enabledWorkers.DirectoryCleanupShared				= 1
@@ -805,19 +806,24 @@ params.sharedTempPath                                   = @WEB_DIR@/tmp/userscsv
 scriptPath											= batches/UsersCsv/kAsyncUsersCsvExe.php
 maximumExecutionTime			                    = 3600
 
-[KSyncReachCreditTaskRunner : PeriodicWorker]
-id													= 700
-type												= KSyncReachCreditTaskRunner
-maximumExecutionTime								= 3600
-scriptPath											= ../plugins/reach/batch/KSyncReachCreditTaskRunner/KSyncReachCreditTaskRunnerExe.php
-sleepBetweenStopStart								= 60
+[KAsyncCopyCuePoints : JobHandlerWorker]
+id                                                  = 700
+friendlyName                                        = Copy Cue Point
+type                                                = KAsyncCopyCuePoints
+scriptPath                                          = ../plugins/cue_points/base/batch/copyCuePoints/KAsyncCopyCuePointsExe.php
 
 [KAsyncEntryVendorTasksCsv : JobHandlerWorker]
-id													= 710
-friendlyName										= Entry Vendor Tasks Csv
-type												= KAsyncEntryVendorTasksCsv
+id                                                  = 710
+friendlyName                                        = Entry Vendor Tasks Csv
+type                                                = KAsyncEntryVendorTasksCsv
 params.localTempPath                                = @TMP_DIR@/entryVendorTasksCsv
 params.sharedTempPath                               = @WEB_DIR@/tmp/entryVendorTasksCsv
-scriptPath											= ../plugins/reach/batch/EntryVendorTasksCsv/kAsyncEntryVendorTasksCsvExe.php
-maximumExecutionTime			                    = 3600
+scriptPath                                          = ../plugins/reach/batch/EntryVendorTasksCsv/kAsyncEntryVendorTasksCsvExe.php
+maximumExecutionTime                                = 3600
 
+[KSyncReachCreditTaskRunner : PeriodicWorker]
+id                                                  = 720
+type                                                = KSyncReachCreditTaskRunner
+maximumExecutionTime                                = 3600
+scriptPath                                          = ../plugins/reach/batch/KSyncReachCreditTaskRunner/KSyncReachCreditTaskRunnerExe.php
+sleepBetweenStopStart                               = 60

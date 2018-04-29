@@ -921,7 +921,7 @@ class myPartnerUtils
 		if ($partnerPackage['id'] == 1) // free package
 			$reportFilter->extra_map[self::IS_FREE_PACKAGE_PLACE_HOLDER] = "TRUE";
 		
-		list($header, $data) = myReportsMgr::getTable( $partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_USAGE_DASHBOARD ,
+		list($header, $data) = kKavaReportsMgr::getTable( $partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_USAGE_DASHBOARD ,
 		 $reportFilter, 10000 , 1 , "", null);
 
 		$avg_continuous_aggr_storage_mb_key = array_search('avg_continuous_aggr_storage_mb', $header);
@@ -947,7 +947,7 @@ class myPartnerUtils
 		$reportFilter = new reportsInputFilter();
 		$reportFilter->from_day = str_replace('-','',$fromDate);
 		$reportFilter->to_day = str_replace('-','',$report_date);		
-		list($header, $data) = myReportsMgr::getTotal($partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_USAGE, $reportFilter, $partner->getId());
+		list($header, $data) = kKavaReportsMgr::getTotal($partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_USAGE, $reportFilter, $partner->getId());
 
 		$bandwidth_consumption = array_search('bandwidth_consumption', $header);
 		$deleted_storage = array_search('deleted_storage', $header);
@@ -972,7 +972,11 @@ class myPartnerUtils
 		$reportFilter = new reportsInputFilter();
 		$reportFilter->from_day = str_replace('-','',$report_date);
 
-		list($header, $data) = myReportsMgr::getTable( $partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE ,
+		$reportFilter->extra_map[self::IS_FREE_PACKAGE_PLACE_HOLDER] = "FALSE";
+		if ($partnerPackage['id'] == 1) // free package
+			$reportFilter->extra_map[self::IS_FREE_PACKAGE_PLACE_HOLDER] = "TRUE";
+		
+		list($header, $data) = kKavaReportsMgr::getTable( $partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE ,
 		 $reportFilter, 10000 , 1 , "", null);
 
 		$avg_continuous_aggr_storage_mb_key = array_search('avg_continuous_aggr_storage_mb', $header);
@@ -1339,20 +1343,6 @@ class myPartnerUtils
 		}
 	}
 	
-	public static function getParnerWidgetStatisticsFromDWH($partnerId, $startDate, $endDate) {
-		$reportFilter = new reportsInputFilter();
-		
-		// use gmmktime to avoid server timezone offset - this is for backward compatibility while the KMC is not sending TZ info
-		list($year, $month, $day) = explode('-', $startDate);
-		$reportFilter->from_date = gmmktime(0, 0, 0, $month, $day, $year);
-		$reportFilter->from_day = str_replace('-','',$startDate);
-		list($year, $month, $day) = explode('-', $endDate);
-		$reportFilter->to_date = gmmktime(0, 0, 0, $month, $day, $year);
-		$reportFilter->to_day = str_replace('-','',$endDate);
-		$res = myReportsMgr::getGraph ( $partnerId , myReportsMgr::REPORT_TYPE_WIDGETS_STATS , $reportFilter , null , null );
-		return $res;
-	}
-	
 	/**
 	 * @param int $startDate
 	 * @param int $endDate
@@ -1382,7 +1372,7 @@ class myPartnerUtils
 			$reportFilter->to_date = $reportFilter->to_date + $tzOffsetSec;
 		}
 		
-		$data = myReportsMgr::getGraph($partner->getId(), $reportType, $reportFilter, null, null);
+		$data = kKavaReportsMgr::getGraph($partner->getId(), $reportType, $reportFilter, null, null);
 		
 		$graphPointsLine = array();
 		if($resolution == reportInterval::MONTHS)

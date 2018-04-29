@@ -75,17 +75,13 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_SPEED = 'speed';
 	const EVENT_TYPE_VIEW = 'view';
 
-	// event types - storage
+	// event types - storage / entry lifecycle
 	const EVENT_TYPE_STATUS = 'status';
 	const EVENT_TYPE_PHYSICAL_ADD = 'physicalAdd';
 	const EVENT_TYPE_PHYSICAL_DELETE = 'physicalDelete';
 	const EVENT_TYPE_LOGICAL_ADD = 'logicalAdd'; 
 	const EVENT_TYPE_LOGICAL_DELETE = 'logicalDelete';
 
-	// event types - entry lifecycle
-	const EVENT_TYPE_ENTRY_CREATED = 'entryCreated';
-	const EVENT_TYPE_ENTRY_DELETED = 'entryDeleted';
-	
 	// view events
 	const VIEW_EVENT_INTERVAL = 10;
 	const VIEW_EVENT_PERIOD = 'PT10S';	
@@ -99,6 +95,7 @@ class kKavaBase extends kDruidBase
 	const MEDIA_TYPE_AUDIO = 'Audio';
 	const MEDIA_TYPE_IMAGE = 'Image';
 	const MEDIA_TYPE_SHOW = 'Show';		// mix
+	const MEDIA_TYPE_FLASH = 'Flash';	// live stream
 
 	public static function isPartnerAllowed($partnerId, $serviceType) {
 	    if (kConf::hasParam(self::DRUID_URL)) {

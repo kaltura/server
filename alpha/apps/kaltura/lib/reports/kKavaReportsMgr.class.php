@@ -25,6 +25,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_COUNT_TOTAL = 'count_total';
 	const METRIC_COUNT_TOTAL_ALL_TIME = 'count_total_all_time';
 	const METRIC_BANDWIDTH_SIZE_MB = 'bandwidth_consumption';
+	const METRIC_BANDWIDTH_SIZE_KB = 'bandwidth_consumption_kb';
 	const METRIC_TRANSCODING_SIZE_MB = 'transcoding_consumption';
 	const METRIC_STORAGE_ADDED_MB = 'added_storage';
 	const METRIC_STORAGE_DELETED_MB = 'deleted_storage';
@@ -46,9 +47,12 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_STORAGE_SIZE_BYTES = 'total_storage';
 	
 	// non druid metrics
-	const METRIC_AVERAGE_STORAGE_MB = 'average_storage';
 	const METRIC_PEAK_STORAGE_MB = 'peak_storage';
+	const METRIC_AVERAGE_STORAGE_MB = 'average_storage';
 	const METRIC_BANDWIDTH_STORAGE_MB = 'combined_bandwidth_storage';
+	const METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB = 'aggregated_monthly_avg_storage';
+	const METRIC_BANDWIDTH_STORAGE_AGGR_MONTHLY_MB = 'combined_bandwidth_aggregated_storage';
+	const METRIC_PEAK_ENTRIES = 'peak_entries';
 	
 	/// report settings
 	// report settings - common
@@ -76,10 +80,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_FORCE_TOTAL_COUNT = 'report_force_total_count';
 	const REPORT_TABLE_MAP = 'report_table_map';
 	const REPORT_TABLE_FINALIZE_FUNC = 'report_table_finalize_func';
-	
-	const REPORT_LEGACY = 'report_legacy';
-	const REPORT_LEGACY_MAPPING = 'legacy_mapping';
-	const REPORT_LEGACY_JOIN_FIELD = 'join_field';
+	const REPORT_EDIT_FILTER_FUNC = 'report_edit_filter_func';
 	
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -95,6 +96,7 @@ class kKavaReportsMgr extends kKavaBase
 	// report settings - total
 	const REPORT_TOTAL_METRICS = 'report_total_metrics';
 	const REPORT_TOTAL_MAP = 'report_total_map';
+	const REPORT_TOTAL_FROM_TABLE_FUNC = 'report_total_from_table_func';
 			
 	// graph types
 	const GRAPH_BY_DATE_ID = 'by_date_id';
@@ -115,7 +117,7 @@ class kKavaReportsMgr extends kKavaBase
 		
 	const DAY_START_TIME = 'T00:00:00';
 	const DAY_END_TIME = 'T23:59:59';
-	const BASE_DATE_ID = '2017-01-01';	// the date from which to start aggragating usage data
+	const BASE_DATE_ID = '2013-12-01';	// the date from which to start aggragating usage data
 	
 	// limits
 	const MAX_RESULT_SIZE = 12000;
@@ -131,6 +133,30 @@ class kKavaReportsMgr extends kKavaBase
 	
 	const COLUMN_FORMAT_QUOTE = 'quote';
 	const COLUMN_FORMAT_UNIXTIME = 'unixtime';
+	
+	protected static $kava_enabled_reports = array(
+		myReportsMgr::REPORT_TYPE_TOP_CONTENT,
+		myReportsMgr::REPORT_TYPE_CONTENT_DROPOFF,
+		myReportsMgr::REPORT_TYPE_CONTENT_INTERACTIONS,
+		myReportsMgr::REPORT_TYPE_MAP_OVERLAY,
+		myReportsMgr::REPORT_TYPE_TOP_SYNDICATION,
+		myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT,
+		myReportsMgr::REPORT_TYPE_SPECIFIC_USER_ENGAGEMENT,
+		myReportsMgr::REPORT_TYPE_USER_TOP_CONTENT,
+		myReportsMgr::REPORT_TYPE_USER_CONTENT_DROPOFF,
+		myReportsMgr::REPORT_TYPE_USER_CONTENT_INTERACTIONS,
+		myReportsMgr::REPORT_TYPE_APPLICATIONS,
+		myReportsMgr::REPORT_TYPE_PLATFORMS,
+		myReportsMgr::REPORT_TYPE_OPERATING_SYSTEM,
+		myReportsMgr::REPORT_TYPE_BROWSERS,
+		myReportsMgr::REPORT_TYPE_LIVE,
+		myReportsMgr::REPORT_TYPE_TOP_PLAYBACK_CONTEXT,
+		myReportsMgr::REPORT_TYPE_VPAAS_USAGE,
+	);
+		
+	protected static $kava_forced_reports = array(
+		myReportsMgr::REPORT_TYPE_ENTRY_USAGE,
+	);
 	
 	protected static $reports_def = array(
 		myReportsMgr::REPORT_TYPE_TOP_CONTENT => array(
@@ -296,12 +322,83 @@ class kKavaReportsMgr extends kKavaBase
 		),
 
 		myReportsMgr::REPORT_TYPE_VPAAS_USAGE => array(
-			self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_MONTH,
-			self::REPORT_DIMENSION => self::DIMENSION_PARTNER_ID,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
-			self::REPORT_LEGACY => array(
-				self::REPORT_LEGACY_MAPPING => array('total_plays' => 'count_plays'),
-				self::REPORT_LEGACY_JOIN_FIELD => 'month_id'),
+			self::REPORT_JOIN_REPORTS => array(
+				// bandwidth
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
+				),
+
+				// transcoding
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_TRANSCODING_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
+				),
+
+				// storage
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
+				),
+
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+				),
+
+				// media entries
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_FILTER => array(
+						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
+						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_FLASH)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED),
+				),
+
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_FILTER => array(
+						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
+						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_FLASH)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_TOTAL),
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedEntriesGraphs',
+					),
+
+				// plays
+				array(
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY),
+				),
+					
+				// TODO: add total users
+			),
+			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+			self::REPORT_TABLE_MAP => array(
+				'total_plays' => 'count_plays',
+				'bandwidth_consumption' => self::METRIC_BANDWIDTH_SIZE_MB,
+				'average_storage' => self::METRIC_AVERAGE_STORAGE_MB,
+				'transcoding_consumption' => self::METRIC_TRANSCODING_SIZE_MB,
+				'total_media_entries' => self::METRIC_PEAK_ENTRIES,
+			),
 		),
 
 		myReportsMgr::REPORT_TYPE_TOP_CONTRIBUTORS => array(
@@ -313,7 +410,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_TOTAL_METRICS => array(self::METRIC_COUNT_TOTAL, self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_SHOW, self::METRIC_COUNT_UGC, self::METRIC_COUNT_ADMIN),
 			self::REPORT_FILTER => array(
 				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-				self::DRUID_VALUES => array('entryCreated')),
+				self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD)),
 		),
 			
 		myReportsMgr::REPORT_TYPE_CONTENT_CONTRIBUTIONS => array(
@@ -324,7 +421,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_GRAPH_METRICS => array(self::METRIC_COUNT_TOTAL, self::METRIC_COUNT_UGC, self::METRIC_COUNT_ADMIN, self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_SHOW),
 			self::REPORT_FILTER => array(
 				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-				self::DRUID_VALUES => array('entryCreated')),
+				self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD)),
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_SOURCE_TYPE,
 		),
 			
@@ -345,7 +442,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_TOTAL_METRICS => array(self::METRIC_COUNT_TOTAL, self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_SHOW, self::METRIC_COUNT_UGC, self::METRIC_COUNT_ADMIN),
 			self::REPORT_FILTER => array(
 				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-				self::DRUID_VALUES => array('entryCreated')),
+				self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD)),
 		),
 		
 		myReportsMgr::REPORT_TYPE_USER_USAGE => array(
@@ -443,7 +540,6 @@ class kKavaReportsMgr extends kKavaBase
 			),
 				
 			self::REPORT_TABLE_MAP => array(
-				'date_id' => 'date_id',
 				'added_entries' => self::METRIC_ENTRIES_ADDED,
 				'deleted_entries' => self::METRIC_ENTRIES_DELETED,
 				'added_storage_mb' => self::METRIC_STORAGE_ADDED_MB,
@@ -506,7 +602,7 @@ class kKavaReportsMgr extends kKavaBase
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
 					),
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
-					self::REPORT_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
 					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
 				),
 			),
@@ -527,9 +623,10 @@ class kKavaReportsMgr extends kKavaBase
 				'deleted_storage' => self::METRIC_STORAGE_DELETED_MB,
 				'combined_bandwidth_storage' => self::METRIC_BANDWIDTH_STORAGE_MB,
 				'transcoding_consumption' => self::METRIC_TRANSCODING_SIZE_MB,
+				'aggregated_monthly_avg_storage' => self::METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB, 
+				'combined_bandwidth_aggregated_storage' => self::METRIC_BANDWIDTH_STORAGE_AGGR_MONTHLY_MB,
 			),
 			self::REPORT_TABLE_MAP => array(
-				'date_id' => 'date_id',
 				'bandwidth_consumption' => self::METRIC_BANDWIDTH_SIZE_MB,
 				'average_storage' => self::METRIC_AVERAGE_STORAGE_MB,
 				'peak_storage' => self::METRIC_PEAK_STORAGE_MB,
@@ -541,7 +638,33 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
 			self::REPORT_GRAPH_FINALIZE_FUNC => 'self::addCombinedUsageGraph',
 		),
-			
+
+		myReportsMgr::REPORT_TYPE_ENTRY_USAGE => array(
+			self::REPORT_JOIN_REPORTS => array(
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_FILTER => array(
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED),
+				),
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_FILTER => array(
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_TOTAL),
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedEntriesGraphs',
+				),
+			),
+			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData'
+		),
+
 		myReportsMgr::REPORT_TYPE_ADMIN_CONSOLE => array(
 			self::REPORT_SKIP_PARTNER_FILTER => true,
 			self::REPORT_DIMENSION => self::DIMENSION_PARTNER_ID,
@@ -628,6 +751,184 @@ class kKavaReportsMgr extends kKavaBase
 				'transcoding mb' => self::METRIC_TRANSCODING_SIZE_MB,
 			),
 		),
+
+		myReportsMgr::REPORT_TYPE_VAR_USAGE => array(
+			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
+			self::REPORT_DIMENSION => self::DIMENSION_PARTNER_ID,
+			self::REPORT_DIMENSION_HEADERS => array('status', 'partner_name', 'partner_id', 'created_at'),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_FIELD => array('status', 'partner_name', 'created_at'),
+				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+				self::REPORT_ENRICH_CONTEXT => array(
+					'peer' => 'PartnerPeer',
+					'columns' => array('STATUS', 'PARTNER_NAME', '@CREATED_AT'),
+				)),
+			self::REPORT_JOIN_GRAPHS => array(
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_TRANSCODING_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
+				),
+
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
+				),
+
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
+				),
+
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+				),
+			),
+			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addCombinedUsageColumn',
+			self::REPORT_GRAPH_FINALIZE_FUNC => 'self::addCombinedUsageGraph',
+			self::REPORT_TABLE_MAP => array(
+				'bandwidth_consumption' => self::METRIC_BANDWIDTH_SIZE_MB,
+				'average_storage' => self::METRIC_AVERAGE_STORAGE_MB,
+				'peak_storage' => self::METRIC_PEAK_STORAGE_MB,
+				'added_storage' => self::METRIC_STORAGE_ADDED_MB,
+				'deleted_storage' => self::METRIC_STORAGE_DELETED_MB,
+				'combined_bandwidth_storage' => self::METRIC_BANDWIDTH_STORAGE_MB,
+				'transcoding_usage' => self::METRIC_TRANSCODING_SIZE_MB,
+			),
+			self::REPORT_TOTAL_MAP => array(
+				'bandwidth_consumption' => self::METRIC_BANDWIDTH_SIZE_MB,
+				'average_storage' => self::METRIC_AVERAGE_STORAGE_MB,
+				'peak_storage' => self::METRIC_PEAK_STORAGE_MB,
+				'added_storage' => self::METRIC_STORAGE_ADDED_MB,
+				'deleted_storage' => self::METRIC_STORAGE_DELETED_MB,
+				'combined_bandwidth_storage' => self::METRIC_BANDWIDTH_STORAGE_MB,
+				'transcoding_consumption' => self::METRIC_TRANSCODING_SIZE_MB,
+				'aggregated_monthly_avg_storage' => self::METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB, 
+				'combined_bandwidth_aggregated_storage' => self::METRIC_BANDWIDTH_STORAGE_AGGR_MONTHLY_MB,
+			),
+		),
+
+		myReportsMgr::REPORT_TYPE_PEAK_STORAGE => array(
+			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
+			self::REPORT_DIMENSION => self::DIMENSION_PARTNER_ID,
+			self::REPORT_DIMENSION_HEADERS => array('partner_id'),
+			self::REPORT_JOIN_GRAPHS => array(
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
+				),
+
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+				),
+			),
+			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+			self::REPORT_TOTAL_FROM_TABLE_FUNC => 'self::getTotalPeakStorageFromTable',
+		),
+			
+		// Note: historically this report returns the bandwidth in kb in table, and in mb in graph
+		myReportsMgr::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE => array(
+			self::REPORT_EDIT_FILTER_FUNC => 'self::partnerUsageEditFilter',
+			self::REPORT_JOIN_REPORTS => array(
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB, self::METRIC_BANDWIDTH_SIZE_KB),
+				),
+				
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
+				),
+				
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+				),
+			),
+			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+			self::REPORT_GRAPH_MAP => array(
+				'bandwidth' => self::METRIC_BANDWIDTH_SIZE_MB,
+			),
+			self::REPORT_TABLE_MAP => array(
+				'avg_continuous_aggr_storage_mb' => self::METRIC_AVERAGE_STORAGE_MB,
+				'sum_partner_bandwidth_kb' => self::METRIC_BANDWIDTH_SIZE_KB,
+			),
+			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addRollupRow',
+		),
+
+		myReportsMgr::REPORT_TYPE_PARTNER_USAGE_DASHBOARD => array(
+			self::REPORT_EDIT_FILTER_FUNC => 'self::partnerUsageEditFilter',
+			self::REPORT_JOIN_REPORTS => array(
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_KB),
+				),
+				
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
+				),
+				
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+				),
+			),
+			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+			self::REPORT_TABLE_MAP => array(
+				'avg_continuous_aggr_storage_mb' => self::METRIC_AVERAGE_STORAGE_MB,
+				'sum_partner_bandwidth_kb' => self::METRIC_BANDWIDTH_SIZE_KB,
+			),
+			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addRollupRow',
+		),
 	);
 	
 	protected static $event_type_count_aggrs = array(
@@ -694,6 +995,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_COUNT_ADMIN => self::METRIC_COUNT_ADMIN,
 		self::METRIC_STORAGE_TOTAL_MB => self::METRIC_STORAGE_TOTAL_MB,
 		self::METRIC_BANDWIDTH_SIZE_MB => self::METRIC_BANDWIDTH_SIZE_MB,
+		self::METRIC_BANDWIDTH_SIZE_KB => self::METRIC_BANDWIDTH_SIZE_KB,
 		self::METRIC_TRANSCODING_SIZE_MB => self::METRIC_TRANSCODING_SIZE_MB,
 		self::METRIC_STORAGE_ADDED_MB => self::METRIC_STORAGE_ADDED_MB,
 		self::METRIC_STORAGE_DELETED_MB => self::METRIC_STORAGE_DELETED_MB,
@@ -878,8 +1180,12 @@ class kKavaReportsMgr extends kKavaBase
 		
 		self::$aggregations_def[self::METRIC_ENTRIES_TOTAL] = self::getFilteredAggregator(
 			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
-				self::EVENT_TYPE_ENTRY_CREATED, 
-				self::EVENT_TYPE_ENTRY_DELETED)),
+				self::EVENT_TYPE_STATUS, 
+				self::EVENT_TYPE_PHYSICAL_ADD,
+				self::EVENT_TYPE_PHYSICAL_DELETE,
+				self::EVENT_TYPE_LOGICAL_ADD,
+				self::EVENT_TYPE_LOGICAL_DELETE,
+			)),
 			self::getLongSumAggregator(self::METRIC_ENTRIES_TOTAL, self::METRIC_DELTA));
 		
 		self::$aggregations_def[self::METRIC_PLAYTHROUGH] = self::getFilteredAggregator(
@@ -941,8 +1247,12 @@ class kKavaReportsMgr extends kKavaBase
 		
 		self::$aggregations_def[self::METRIC_DURATION_SEC] = self::getFilteredAggregator(
 			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
-				self::EVENT_TYPE_ENTRY_CREATED, 
-				self::EVENT_TYPE_ENTRY_DELETED)),
+				self::EVENT_TYPE_STATUS, 
+				self::EVENT_TYPE_PHYSICAL_ADD,
+				self::EVENT_TYPE_PHYSICAL_DELETE,
+				self::EVENT_TYPE_LOGICAL_ADD,
+				self::EVENT_TYPE_LOGICAL_DELETE,
+			)),
 			self::getLongSumAggregator(self::METRIC_DURATION_SEC, self::METRIC_DURATION_SEC));
 		
 		self::$aggregations_def[self::METRIC_SIZE_ADDED_BYTES] = self::getFilteredAggregator(
@@ -961,19 +1271,33 @@ class kKavaReportsMgr extends kKavaBase
 			self::getLongSumAggregator(self::METRIC_SIZE_DELETED_BYTES, self::METRIC_SIZE_BYTES));
 		
 		self::$aggregations_def[self::METRIC_DURATION_ADDED_SEC] = self::getFilteredAggregator(
-			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_ENTRY_CREATED),
+			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
+				self::EVENT_TYPE_STATUS, 
+				self::EVENT_TYPE_PHYSICAL_ADD,
+				self::EVENT_TYPE_LOGICAL_ADD
+			)),
 			self::getLongSumAggregator(self::METRIC_DURATION_ADDED_SEC, self::METRIC_DURATION_SEC));
 		
 		self::$aggregations_def[self::METRIC_DURATION_DELETED_SEC] = self::getFilteredAggregator(
-			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_ENTRY_DELETED),
+			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
+				self::EVENT_TYPE_PHYSICAL_DELETE,
+				self::EVENT_TYPE_LOGICAL_DELETE
+			)),
 			self::getLongSumAggregator(self::METRIC_DURATION_DELETED_SEC, self::METRIC_DURATION_SEC));
 		
 		self::$aggregations_def[self::METRIC_ENTRIES_ADDED] = self::getFilteredAggregator(
-			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_ENTRY_CREATED),
+			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
+				self::EVENT_TYPE_STATUS, 
+				self::EVENT_TYPE_PHYSICAL_ADD,
+				self::EVENT_TYPE_LOGICAL_ADD
+			)),
 			self::getLongSumAggregator(self::METRIC_ENTRIES_ADDED, self::METRIC_COUNT));
 
 		self::$aggregations_def[self::METRIC_ENTRIES_DELETED] = self::getFilteredAggregator(
-			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_ENTRY_DELETED),
+			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
+				self::EVENT_TYPE_PHYSICAL_DELETE,
+				self::EVENT_TYPE_LOGICAL_DELETE
+			)),
 			self::getLongSumAggregator(self::METRIC_ENTRIES_DELETED, self::METRIC_COUNT));
 				
 		// Note: metrics that have post aggregations are defined below, any metric that
@@ -994,6 +1318,11 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_AGGR => array(self::METRIC_BANDWIDTH_SIZE_BYTES),
 			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
 				self::METRIC_BANDWIDTH_SIZE_MB, self::METRIC_BANDWIDTH_SIZE_BYTES, '1048576'));
+
+		self::$metrics_def[self::METRIC_BANDWIDTH_SIZE_KB] = array(
+			self::DRUID_AGGR => array(self::METRIC_BANDWIDTH_SIZE_BYTES),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_BANDWIDTH_SIZE_KB, self::METRIC_BANDWIDTH_SIZE_BYTES, '1024'));
 		
 		self::$metrics_def[self::METRIC_TRANSCODING_SIZE_MB] = array(
 			self::DRUID_AGGR => array(self::METRIC_FLAVOR_SIZE_BYTES),
@@ -1178,7 +1507,7 @@ class kKavaReportsMgr extends kKavaBase
 		for (;;)
 		{
 			$cur = $date->format('Ymd');
-			if (strcmp($cur, $to_day) > 0 || count($result) >= 1000)
+			if (strcmp($cur, $to_day) > 0 || count($result) >= 5000)
 			{
 				break;
 			}
@@ -1191,6 +1520,24 @@ class kKavaReportsMgr extends kKavaBase
 	}
 	
 	/// common query functions
+	protected static function shouldUseKava($partner_id, $report_type) 
+	{
+	    if ($report_type < 0 ||		// kava custom reports
+	    	in_array($report_type, self::$kava_forced_reports))
+	    {
+	    	return true;
+	    }
+	    
+	    if (in_array($report_type, self::$kava_enabled_reports) && 
+	    	kKavaBase::isPartnerAllowed($partner_id, kKavaBase::VOD_ALLOWED_PARTNERS))
+	    {
+	        return true;
+	    }
+	    
+	    KalturaLog::debug("Not using kava - partner id [$partner_id] report type [$report_type]");
+	    return false;
+	}
+		
 	protected static function toSafeId($name)
 	{
 		$name = strtoupper($name);
@@ -2015,8 +2362,10 @@ class kKavaReportsMgr extends kKavaBase
 		self::init();
 		
 		$start = microtime(true);
-		
-		$report_defs = $report_def[self::REPORT_JOIN_REPORTS];
+
+		$report_defs = isset($report_def[self::REPORT_JOIN_REPORTS]) ? 
+			$report_def[self::REPORT_JOIN_REPORTS] : 
+			$report_def[self::REPORT_JOIN_GRAPHS];
 		
 		// get the graphs
 		$result = array();
@@ -2049,15 +2398,17 @@ class kKavaReportsMgr extends kKavaBase
 				continue;
 			}
 				
-			$base_value = self::getSimpleTotalImpl(
-					$partner_id,
-					$cur_report_def,
-					$input_filter,
-					$object_ids);
+			$cur_report_def[self::REPORT_GRAPH_TYPE] = self::GRAPH_BY_NAME;
+			$cur_report_def[self::REPORT_GRAPH_NAME] = 0;
+			$cur_report_def[self::REPORT_GRANULARITY] = self::DRUID_GRANULARITY_ALL;
+			$base_value = self::getSimpleGraphImpl(
+				$partner_id,
+				$cur_report_def,
+				$input_filter,
+				$object_ids);
+			$base_value = reset($base_value[0]);
 			KalturaLog::debug('Base - ' . print_r($base_value, true));
 			
-			$base_value = isset($base_value[1][0]) ? $base_value[1][0] : 0;
-				
 			call_user_func_array($cur_report_def[self::REPORT_GRAPH_ACCUMULATE_FUNC], 
 				array(&$result, $base_value, $dates));
 		}
@@ -2193,7 +2544,8 @@ class kKavaReportsMgr extends kKavaBase
 	
 	protected static function getGraphImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids = null)
 	{
-		if (isset($report_def[self::REPORT_JOIN_REPORTS]))
+		if (isset($report_def[self::REPORT_JOIN_REPORTS]) || 
+			isset($report_def[self::REPORT_JOIN_GRAPHS]))
 		{
 			$result = self::getJoinGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
 		}
@@ -2221,6 +2573,11 @@ class kKavaReportsMgr extends kKavaBase
 		
 	public static function getGraph($partner_id, $report_type, reportsInputFilter $input_filter, $dimension = null, $object_ids = null)
 	{
+		if (!self::shouldUseKava($partner_id, $report_type))
+		{
+			return myReportsMgr::getGraph($partner_id, $report_type, $input_filter, $dimension, $object_ids);
+		}
+		
 		self::init();
 		
 		$report_def = self::getReportDef($report_type);
@@ -2254,6 +2611,41 @@ class kKavaReportsMgr extends kKavaBase
 			$cur_storage -= $storage[self::METRIC_STORAGE_DELETED_MB][$date];
 		}
 	}
+
+	protected static function addAggregatedEntriesGraphs(&$entries, $base_count, $dates)
+	{
+		$cur_peak = $base_count;
+		foreach ($dates as $date)
+		{
+			$cur_peak += $entries[self::METRIC_ENTRIES_ADDED][$date];
+			$entries[self::METRIC_PEAK_ENTRIES][$date] = $cur_peak;
+			$cur_peak -= $entries[self::METRIC_ENTRIES_DELETED][$date];
+		}
+	}
+	
+	protected static function getAverageAggregatedMonthly($graph)
+	{
+		// group by month
+		$grouped = array();
+		foreach ($graph as $date => $value)
+		{
+			$month = substr($date, 0, 6);
+			if (!isset($grouped[$month]))
+			{
+				$grouped[$month] = array();
+			}
+			$grouped[$month][] = $value;
+		}
+			
+		// sum the average of each month
+		$value = 0;
+		foreach ($grouped as $values)
+		{
+			$value += array_sum($values) / count($values);
+		}
+		
+		return $value;
+	}
 		
 	protected static function aggregateUsageDataAll($graphs)
 	{
@@ -2265,7 +2657,8 @@ class kKavaReportsMgr extends kKavaBase
 				case self::METRIC_AVERAGE_STORAGE_MB:
 					$value = $values ? array_sum($values) / count($values) : 0;
 					break;
-		
+
+				case self::METRIC_PEAK_ENTRIES:
 				case self::METRIC_PEAK_STORAGE_MB:
 					$value = $values ? max($values) : 0;
 					break;
@@ -2322,7 +2715,15 @@ class kKavaReportsMgr extends kKavaBase
 					
 			case self::INTERVAL_ALL:
 				$dates = null;
-				return self::aggregateUsageDataAll($graphs);
+				$result = self::aggregateUsageDataAll($graphs);
+				if (isset($graphs[self::METRIC_AVERAGE_STORAGE_MB]))
+				{
+					// add average storage aggregated monthly
+					$result[self::METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB] = 
+						self::getAverageAggregatedMonthly($graphs[self::METRIC_AVERAGE_STORAGE_MB]);
+				}
+				
+				return $result;
 				
 			// Note: no need to do anything for 'days', input data is already per day
 		}
@@ -2337,6 +2738,10 @@ class kKavaReportsMgr extends kKavaBase
 			$result[self::METRIC_BANDWIDTH_STORAGE_MB] =
 				$result[self::METRIC_BANDWIDTH_SIZE_MB] +
 				$result[self::METRIC_AVERAGE_STORAGE_MB];
+			
+			$result[self::METRIC_BANDWIDTH_STORAGE_AGGR_MONTHLY_MB] =
+				$result[self::METRIC_BANDWIDTH_SIZE_MB] +
+				$result[self::METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB];
 			return;
 		}
 		
@@ -2574,6 +2979,9 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function enrichData($report_def, $headers, $partner_id, &$data)
 	{
 		// get the enrichment specification
+		$dim_header = reset($report_def[self::REPORT_DIMENSION_HEADERS]);
+		$dim_index = array_search($dim_header, $headers);
+
 		$enrich_specs = array();
 		$enrich_defs = self::getEnrichDefs($report_def);
 		foreach ($enrich_defs as $enrich_def)
@@ -2601,23 +3009,25 @@ class kKavaReportsMgr extends kKavaBase
 		$start = 0;
 		while ($start < $rows_count)
 		{
+			// get the dimension values for the current chunk
 			$limit = min($start + self::ENRICH_CHUNK_SIZE, $rows_count);
-			$dimension_ids = array_map('reset', array_slice($data, $start, $limit - $start));
-		
+			$dimension_ids = array();
+			for ($current_row = $start; $current_row < $limit; $current_row++) 
+			{
+				$key = $data[$current_row][$dim_index];
+				$dimension_ids[$key] = true;
+			}
+			
+			// run the enrichment functions
 			foreach ($enrich_specs as $enrich_spec)
 			{
 				list($enrich_func, $enrich_context, $enriched_indexes) = $enrich_spec;
-					
-				if (is_array($report_def[self::REPORT_DIMENSION]))
-				{
-					$dimension_ids = array_unique($dimension_ids);
-				}
 
-				$entities = call_user_func($enrich_func, $dimension_ids, $partner_id, $enrich_context);
+				$entities = call_user_func($enrich_func, array_keys($dimension_ids), $partner_id, $enrich_context);
 		
 				for ($current_row = $start; $current_row < $limit; $current_row++) 
 				{
-					$key = reset($data[$current_row]);
+					$key = $data[$current_row][$dim_index];
 					$entity = isset($entities[$key]) ? $entities[$key] : null;
 					foreach ($enriched_indexes as $index => $enrich_field) 
 					{
@@ -2631,6 +3041,21 @@ class kKavaReportsMgr extends kKavaBase
 	}
 
 	/// table functions
+	protected static function getDateColumnName($interval)
+	{
+		switch ($interval)
+		{
+			case self::INTERVAL_MONTHS:
+				return 'month_id';
+
+			case self::INTERVAL_ALL:
+				return 'all';
+
+			default:
+				return 'date_id';
+		}
+	}
+	
 	protected static function getMetricFromOrderBy($report_def, $order_by)
 	{
 		if (!$order_by)
@@ -2694,10 +3119,10 @@ class kKavaReportsMgr extends kKavaBase
 		return array(array_merge(array($date_column_name), $header), $data, count($data));
 	}
 
-	protected static function getTableFromKeyedGraphs($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids)
+	protected static function getTableFromKeyedGraphs($partner_id, $report_def, reportsInputFilter $input_filter, 
+		$page_size, $page_index, $object_ids)
 	{
 		// calculate the graphs
-		$input_filter->interval = self::INTERVAL_ALL;
 		$result = self::getKeyedJoinGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
 		if (!$result)
 		{
@@ -2705,25 +3130,54 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		
 		// convert the result to a table
-		$metric_headers = array_keys(reset($result));
+		$metric_headers = isset($report_def[self::REPORT_METRICS]) ? 
+			$report_def[self::REPORT_METRICS] : array_keys(reset($result));
+		$date_headers = $input_filter->interval != self::INTERVAL_ALL ? 
+			array(self::getDateColumnName($input_filter->interval)) : 
+			array();
 		$headers = array_merge(
+			$date_headers,
 			$report_def[self::REPORT_DIMENSION_HEADERS], 
 			$metric_headers);
 		 
 		$dim_header_count = count($report_def[self::REPORT_DIMENSION_HEADERS]);
-		
+				
 		$data = array();
-		foreach ($result as $dim => $graphs)
+		if ($input_filter->interval != self::INTERVAL_ALL)
 		{
-			$row = array_fill(0, $dim_header_count, $dim);
-			foreach ($metric_headers as $header)
+			$first_graph = reset($result);
+			$dates = array_keys(reset($first_graph));
+
+			foreach ($dates as $date)
 			{
-				$row[] = isset($graphs[$header]) ? $graphs[$header] : 0;
+				foreach ($result as $dim => $graphs)
+				{
+					$row = array_merge(array($date), array_fill(0, $dim_header_count, $dim));
+					foreach ($metric_headers as $header)
+					{
+						$row[] = isset($graphs[$header][$date]) ? $graphs[$header][$date] : 0;
+					}
+					$data[] = $row;
+				}
 			}
-			$data[] = $row;
+		}
+		else
+		{
+			foreach ($result as $dim => $graphs)
+			{
+				$row = array_fill(0, $dim_header_count, $dim);
+				foreach ($metric_headers as $header)
+				{
+					$row[] = isset($graphs[$header]) ? $graphs[$header] : 0;
+				}
+				$data[] = $row;
+			}
 		}
 		
-		return array($headers, $data, count($data));
+		return array(
+			$headers, 
+			array_slice($data, ($page_index - 1) * $page_size, $page_size), 
+			count($data));
 	}
 
 	protected static function getTotalTableCount($partner_id, $report_def, reportsInputFilter $input_filter, $intervals, $druid_filter, $dimension, $object_ids = null)
@@ -2765,8 +3219,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $total_count;
 	}
 
-	// TODO: remove the report_type param once legacy reports are removed
-	protected static function getSimpleTableImpl($partner_id, $report_type, $report_def, 
+	protected static function getSimpleTableImpl($partner_id, $report_def, 
 		reportsInputFilter $input_filter,
 		$page_size, $page_index, $order_by, $object_ids = null, $flags = 0)
 	{
@@ -2778,23 +3231,6 @@ class kKavaReportsMgr extends kKavaBase
 		$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, $object_ids);
 		$dimension = self::getDimension($report_def, $object_ids);
 		$metrics = self::getMetrics($report_def);
-
-		if (array_key_exists(self::REPORT_LEGACY, $report_def))
-		{
-			//get the report from the legacy dwh
-			list($headers, $data, $total_count) = myReportsMgr::getTable($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids, null);
-
-			switch ($report_type)
-			{
-				case myReportsMgr::REPORT_TYPE_VPAAS_USAGE:
-					if ($object_ids)
-						throw new Exception('objectIds filter is not supported for this report');
-
-					$data = self::getVpaasUsageReport($report_def, $data, $headers, $partner_id, $intervals, $metrics, $druid_filter, $input_filter->timeZoneOffset);
-					break;
-			}
-			return array($headers, $data, $total_count);
-		}
 
 		if (!$metrics)
 		{
@@ -3137,10 +3573,13 @@ class kKavaReportsMgr extends kKavaBase
 		return array($headers, $data, $total_count);
 	}
 
-	protected static function getJoinTableImpl($partner_id, $report_type, $report_def,
+	protected static function getJoinTableImpl($partner_id, $report_def,
 			reportsInputFilter $input_filter,
 			$page_size, $page_index, $order_by, $object_ids = null, $flags = 0)
 	{
+		// use interval=all, only relevant if the join includes graphs
+		$input_filter->interval = self::INTERVAL_ALL;
+		
 		$report_defs = $report_def[self::REPORT_JOIN_REPORTS];
 	
 		// decide which report to run first, according to the order by
@@ -3170,7 +3609,7 @@ class kKavaReportsMgr extends kKavaBase
 		$cur_report_def[self::REPORT_DIMENSION] = $report_def[self::REPORT_DIMENSION];
 		$cur_report_def[self::REPORT_DIMENSION_HEADERS] = array('dimension');
 		
-		$result = self::getTableImpl($partner_id, $report_type, $cur_report_def, $input_filter,
+		$result = self::getTableImpl($partner_id, $cur_report_def, $input_filter,
 			$page_size * $page_index, 1, $order_by, $object_ids, $flags);
 		
 		$headers = array_merge(
@@ -3206,7 +3645,7 @@ class kKavaReportsMgr extends kKavaBase
 			if (count($rows) < $page_size)
 			{				
 				// using a single topN - the metrics of this query are not used
-				$result = self::getTableImpl($partner_id, $report_type, $cur_report_def, $input_filter,
+				$result = self::getTableImpl($partner_id, $cur_report_def, $input_filter,
 					$page_size * $page_index, 1, $order_by, $object_ids, $flags | self::GET_TABLE_FLAG_IDS_ONLY);
 								
 				foreach ($result[1] as $row)
@@ -3260,7 +3699,7 @@ class kKavaReportsMgr extends kKavaBase
 				$cur_report_def[self::REPORT_FILTER_DIMENSION] = $report_def[self::REPORT_DIMENSION];;
 				$cur_report_def[self::REPORT_DIMENSION_HEADERS] = array('dimension');
 				
-				$result = self::getTableImpl($partner_id, $report_type, $cur_report_def, $input_filter,
+				$result = self::getTableImpl($partner_id, $cur_report_def, $input_filter,
 					count($ids_to_get), 1, null, implode(',', array_keys($ids_to_get)), $flags);
 				
 				foreach ($result[1] as $row)
@@ -3291,29 +3730,47 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		
 		return array($headers, $data, $total_count);
-	}		
+	}
 
-	protected static function getTableImpl($partner_id, $report_type, $report_def, 
+	protected static function getTableImpl($partner_id, $report_def, 
 		reportsInputFilter $input_filter,
 		$page_size, $page_index, $order_by, $object_ids = null, $flags = 0)
 	{
+		if (isset($report_def[self::REPORT_EDIT_FILTER_FUNC]))
+		{
+			call_user_func($report_def[self::REPORT_EDIT_FILTER_FUNC], $input_filter);
+		}
+				
 		if (!isset($report_def[self::REPORT_DIMENSION]))
 		{
 			$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
-			$result = self::getTableFromGraphs($result, true, $input_filter->interval == self::INTERVAL_MONTHS ? 'month_id' : 'date_id');
+			$result = self::getTableFromGraphs($result, true, self::getDateColumnName($input_filter->interval));
 		}
 		else if (isset($report_def[self::REPORT_JOIN_GRAPHS]))
 		{
-			$result = self::getTableFromKeyedGraphs($partner_id, $report_def, $input_filter, $object_ids);
+			$result = self::getTableFromKeyedGraphs($partner_id, $report_def, $input_filter, 
+				$page_size, $page_index, $object_ids);
 		}
 		else if (isset($report_def[self::REPORT_JOIN_REPORTS]))
 		{
-			$result = self::getJoinTableImpl($partner_id, $report_type, $report_def, $input_filter, $page_size, $page_index, $order_by, $object_ids, $flags);
+			$result = self::getJoinTableImpl($partner_id, $report_def, $input_filter, 
+				$page_size, $page_index, $order_by, $object_ids, $flags);
 		}
 		else 
 		{
-			$result = self::getSimpleTableImpl($partner_id, $report_type, $report_def, $input_filter,
+			$result = self::getSimpleTableImpl($partner_id, $report_def, $input_filter,
 				$page_size, $page_index, $order_by, $object_ids, $flags);
+		}
+		
+		// finalize / enrich
+		if (isset($report_def[self::REPORT_TABLE_FINALIZE_FUNC]))
+		{
+			call_user_func_array($report_def[self::REPORT_TABLE_FINALIZE_FUNC], array(&$result));
+		}
+		
+		if (isset($report_def[self::REPORT_ENRICH_DEF]))
+		{
+			self::enrichData($report_def, $result[0], $partner_id, $result[1]);
 		}
 		
 		return $result;
@@ -3375,8 +3832,14 @@ class kKavaReportsMgr extends kKavaBase
 	}
 	
 	public static function getTable($partner_id, $report_type, reportsInputFilter $input_filter,
-		$page_size, $page_index, $order_by, $object_ids = null, $isCsv = false)
+		$page_size, $page_index, $order_by, $object_ids = null, $offset = null, $isCsv = false)
 	{
+		if (!self::shouldUseKava($partner_id, $report_type))
+		{
+			return myReportsMgr::getTable($partner_id, $report_type, $input_filter,
+				$page_size, $page_index, $order_by, $object_ids, $offset);
+		}
+		
 		self::init();		
 
 		// pager
@@ -3396,31 +3859,44 @@ class kKavaReportsMgr extends kKavaBase
 		
 		$flags = $isCsv ? self::GET_TABLE_FLAG_IS_CSV : 0;
 		
-		$result = self::getTableImpl($partner_id, $report_type, $report_def, $input_filter,
+		$result = self::getTableImpl($partner_id, $report_def, $input_filter,
 			$page_size, $page_index, $order_by, $object_ids, $flags);
 	
-		// finalize / enrich
-		if (isset($report_def[self::REPORT_TABLE_FINALIZE_FUNC]))
-		{
-			call_user_func_array($report_def[self::REPORT_TABLE_FINALIZE_FUNC], array(&$result));
-		}
-		
-		if (isset($report_def[self::REPORT_ENRICH_DEF]))
-		{
-			self::enrichData($report_def, $result[0], $partner_id, $result[1]);
-		}
-		
 		// reorder
 		if (isset($report_def[self::REPORT_TABLE_MAP]))
 		{
+			$dim_header_count = isset($report_def[self::REPORT_DIMENSION_HEADERS]) ?
+				count($report_def[self::REPORT_DIMENSION_HEADERS]) : 0;
+			if (in_array(reset($result[0]), array('date_id', 'month_id')))
+			{
+				$dim_header_count++;	// the date header
+			}
+
 			self::reorderTableColumns(
-				count($report_def[self::REPORT_DIMENSION_HEADERS]), 
+				$dim_header_count, 
 				$report_def[self::REPORT_TABLE_MAP], 
 				true,
 				$result);
 		}
 		
 		return $result;
+	}
+	
+	protected static function partnerUsageEditFilter($input_filter)
+	{
+		$current_date_id = date('Ymd');
+		$from_day = min($input_filter->from_day, $current_date_id);
+		
+		$month_start = substr($from_day, 0, 6) . '01';
+		$date = self::dateIdToDateTime($month_start);
+		$date->modify('+1 month');
+		$date->modify('-1 day');
+		$month_end = min($date->format('Ymd'), $current_date_id);
+		
+		$is_free_package = $input_filter->extra_map[myPartnerUtils::IS_FREE_PACKAGE_PLACE_HOLDER] == 'TRUE';
+		$input_filter->from_day = $is_free_package ? str_replace('-', '', self::BASE_DATE_ID) : $month_start;
+		$input_filter->to_day = $month_end;
+		$input_filter->interval = reportInterval::MONTHS;
 	}
 	
 	protected static function addCombinedUsageColumn(&$result)
@@ -3439,8 +3915,51 @@ class kKavaReportsMgr extends kKavaBase
 			$row[] = $row[$bandwidth] + $row[$storage]; 
 		}
 	}
+
+	protected static function getRollupRow($data)
+	{
+		$row = reset($data);
+		for (;;)
+		{
+			$cur_row = next($data);
+			if (!$cur_row)
+			{
+				break;
+			}
+			
+			for ($i = 1; $i < count($row); $i++)		// starting from 1 to skip the date id
+			{
+				$row[$i] += $cur_row[$i];
+			}
+		}
 		
+		return $row;
+	}
+	
+	protected static function addRollupRow(&$result)
+	{
+		list($headers, $data, $total_count) = $result;
+		
+		$data[] = self::getRollupRow($data);
+		
+		$result = array($headers, $data, $total_count);
+	}
+
 	/// total functions
+	protected static function getTotalPeakStorageFromTable($table)
+	{
+		$header = self::METRIC_PEAK_STORAGE_MB;
+		$column_index = array_search($header, $table[0]);
+		
+		$value = 0;
+		foreach ($table[1] as $row)
+		{
+			$value += $row[$column_index];
+		}
+		
+		return array(array("SUM($header)"), array($value)); 
+	}
+	
 	protected static function getSimpleTotalImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids = null)
 	{
 		$start = microtime(true);
@@ -3475,7 +3994,12 @@ class kKavaReportsMgr extends kKavaBase
 			foreach ($metrics as $column)
 			{
 				$headers[] = self::$metrics_to_headers[$column];
-				$data[] = $row_data[$column];
+				$value = $row_data[$column];
+				if ($value == '-0')
+				{
+					$value = 0;
+				}
+				$data[] = $value;
 			}
 
 			foreach (self::$transform_metrics as $metric => $func)
@@ -3520,7 +4044,13 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function getTotalImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids = null)
 	{
-		if (!isset($report_def[self::REPORT_DIMENSION]))
+		if (isset($report_def[self::REPORT_TOTAL_FROM_TABLE_FUNC]))
+		{
+			$input_filter->interval = self::INTERVAL_ALL;
+			$table = self::getTableImpl($partner_id, $report_def, $input_filter, self::MAX_RESULT_SIZE, 1, null, $object_ids);
+			$result = call_user_func($report_def[self::REPORT_TOTAL_FROM_TABLE_FUNC], $table);
+		}
+		else if (!isset($report_def[self::REPORT_DIMENSION]) || isset($report_def[self::REPORT_JOIN_GRAPHS]))
 		{
 			$input_filter->interval = self::INTERVAL_ALL;
 			$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
@@ -3540,6 +4070,11 @@ class kKavaReportsMgr extends kKavaBase
 	
 	public static function getTotal($partner_id, $report_type, reportsInputFilter $input_filter, $object_ids = null)
 	{
+		if (!self::shouldUseKava($partner_id, $report_type))
+		{
+			return myReportsMgr::getTotal($partner_id, $report_type, $input_filter, $object_ids);
+		}
+		
 		self::init();
 
 		$report_def = self::getReportDef($report_type);
@@ -3561,6 +4096,49 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
+	public static function getBaseTotal($partner_id, $report_type, reportsInputFilter $input_filter, $object_ids = null )
+	{
+		if (!self::shouldUseKava($partner_id, $report_type))
+		{
+			return myReportsMgr::getBaseTotal($partner_id, $report_type, $input_filter, $object_ids);
+		}
+		
+		switch ($report_type)
+		{
+			case myReportsMgr::REPORT_TYPE_USER_USAGE:
+			case myReportsMgr::REPORT_TYPE_SPECIFIC_USER_USAGE:
+				break;		// handled outside the switch
+			
+			default:
+				throw new Exception("request for invalid report $report_type");
+		}
+		
+		self::init();
+		
+		$report_def = array(
+			self::REPORT_DIMENSION => self::DIMENSION_USER_ID, 
+			self::REPORT_JOIN_REPORTS => array(
+				// storage total
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
+				),
+				
+				// entries total
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_METRICS => array(self::METRIC_ENTRIES_TOTAL, self::METRIC_DURATION_TOTAL_MSEC),
+				),
+			),
+		);
+		
+		list($headers, $data) = self::getTotalImpl($partner_id, $report_def, $input_filter, $object_ids);
+		
+		return array_combine($headers, $data);
+	}
+	
 	/// custom report functions
 	public static function customReport($id, $params)
 	{
@@ -3612,6 +4190,7 @@ class kKavaReportsMgr extends kKavaBase
 				1,
 				$report_def['order_by'],
 				$object_ids,
+				null,
 				true);
 		}
 		else
@@ -3632,34 +4211,6 @@ class kKavaReportsMgr extends kKavaBase
 		return array($header, $data);
 	}
 
-	protected static function getVpaasUsageReport($report_def, $data, $headers, $partner_id, $intervals, $metrics, $druid_filter, $timezone_offset)
-	{
-		$granularity = $report_def[self::REPORT_GRANULARITY];
-		$granularity_def = self::getGranularityDef($granularity, $timezone_offset);
-		$query = self::getTimeSeriesReport(null, $partner_id, $intervals, $granularity_def, $metrics, $druid_filter);
-		$result = self::runQuery($query);
-		$report_metrics_to_headers = array();
-		foreach ($metrics as $column)
-		{
-			$report_metrics_to_headers[$column] = self::$metrics_to_headers[$column];
-		}
-		$druid_result = self::getGraphsByDateId($result, $report_metrics_to_headers, $timezone_offset, self::$transform_time_dimensions[$granularity]);
-		$mapping = $report_def[self::REPORT_LEGACY][self::REPORT_LEGACY_MAPPING];
-		$druid_field = reset($mapping);
-		$legacy_field = key($mapping);
-		$legacy_field_index = array_search($legacy_field, $headers);
-
-		$key_index = array_search($report_def[self::REPORT_LEGACY][self::REPORT_LEGACY_JOIN_FIELD], $headers);
-		if (false !== $legacy_field_index)
-		{
-			foreach ($data as &$row)
-			{
-				$row[$legacy_field_index] = isset($druid_result[$druid_field][$row[$key_index]]) ? $druid_result[$druid_field][$row[$key_index]] : 0;
-			}
-		}
-		return $data;
-	}
-	
 	/// csv functions
 	protected static function getCsvData(
 		$partner_id,
@@ -3702,8 +4253,12 @@ class kKavaReportsMgr extends kKavaBase
 				$partner_id,
 				$report_type,
 				$input_filter,
-				$page_size, $page_index,
-				$order_by, $object_ids, true);
+				$page_size, 
+				$page_index,
+				$order_by, 
+				$object_ids, 
+				null, 
+				true);
 		}
 
 		$csv = myCsvReport::createReport($report_title, $report_text, $headers,
@@ -3738,6 +4293,18 @@ class kKavaReportsMgr extends kKavaBase
 		$object_ids = null,
 		$page_size =10, $page_index =0, $order_by)
 	{
+		if (!self::shouldUseKava($partner_id, $report_type))
+		{
+			return myReportsMgr::getUrlForReportAsCsv(
+				$partner_id, 
+				$report_title, $report_text, $headers, 
+				$report_type, 
+				$input_filter, 
+				$dimension, 
+				$object_ids,
+				$page_size, $page_index, $order_by);					
+		}
+		
 		list($file_path, $file_name) = myReportsMgr::createFileName($partner_id, $report_type, $input_filter, $dimension, $object_ids, $page_size, $page_index, $order_by);
 
 		$data = self::getCsvData($partner_id,

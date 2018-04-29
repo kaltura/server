@@ -497,7 +497,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			{
 				if ($entry->getType() == entryType::MEDIA_CLIP)
 				{
-					if ($entry->getOperationAttributes() && $object->getIsOriginal())
+					if ($entry->getOperationAttributes() && $object->getIsOriginal() && is_null($entry->getClipConcatTrimFlow()))
 						kBusinessPreConvertDL::convertSource($object, null, null, $raisedJob);
 					else
 					{
@@ -558,6 +558,14 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		)
 			return true;
 
+
+		if(
+			$object instanceof ClippingTaskEntryServerNode
+			&&	in_array(EntryServerNodePeer::STATUS, $modifiedColumns)
+		)
+			return true;
+
+
 		if(
 			$object instanceof flavorAsset
 			&&	in_array(assetPeer::STATUS, $modifiedColumns)
@@ -606,6 +614,16 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		)
 		{
 			kFlowHelper::handleUploadFinished($object);
+			return true;
+		}
+		
+		if(
+			$object instanceof ClippingTaskEntryServerNode
+			&&	in_array(EntryServerNodePeer::STATUS, $modifiedColumns)
+		)
+		{
+			if ($object->getServerType() == EntryServerNodeType::LIVE_CLIPPING_TASK)
+				kFlowHelper::handleClippingTaskStatusUpdate($object);
 			return true;
 		}
 

@@ -8,7 +8,8 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 	/* ---------------------------
 	 * generateSinglePassCommandLine
 	 */
-    public function generateSinglePassCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null)
+
+	public function generateSinglePassCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null)
 	{
 		/*
 		 * Disable any multistream processing if 'extra' setting contains
@@ -46,6 +47,7 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 		 * 'async 2' causes aud-br distortion ==> set to 'async 1'
 		 */
 		self::rearrngeAudioFilters($target, $cmdValsArr);
+		self::rearrngeVideoFilters($target, $cmdValsArr);
 		
 		$cmdStr = implode(" ", $cmdValsArr);
 
@@ -516,6 +518,66 @@ Disabled 'amix', for better stereo by 'amerge'
 			$cmdValsArr[$keyAudFilters] = "'$str'";
 		}
 		return true;
+	}
+
+	/**
+	 * the following function merges video filters(filter complex) into one filter  as ffmpeg does not support multiple filters
+	 * NOTE!!!! for mxf file types the fade effect will cause the screen to get black this is a known issue
+	 * @param $target
+	 * @param array $cmdValsArr
+	 * @return bool
+	 */
+	private static function rearrngeVideoFilters($target, array &$cmdValsArr)
+	{
+		if(!isset($target->_video))
+			return false;
+
+		$keys = array_keys($cmdValsArr, "-filter_complex");
+		$videoFilterKeys = array();
+		$count = 0;
+		foreach ($keys as $key)
+		{
+			$filter = trim($cmdValsArr[$key+1]);
+			/**
+			 * Note we are looking for a fade substing -> video filter , however, afade -> audio filter contains fade,
+			 * as such we are checking that afade does not exist in the filter, but fade exist
+			 * we are under the assumption that filter complex element does not contains both audio and video filter!
+			 */
+			if(strpos($filter,'yadif') !== false || strstr($filter,'crop') !=false  ||
+				(strpos($filter,'fade') !== false && strpos($filter,'afade') === false))
+			{
+				$videoFilterKeys[] = $key+1;
+				$count = $count + ceil (substr_count($filter,'vflt') / 2);
+			}
+		}
+		if (count($videoFilterKeys) > 1)
+			self::mergeVideoFilterLines($cmdValsArr, $videoFilterKeys, $count);
+		return true;
+	}
+
+	/**
+	 * @param array $cmdValsArr
+	 * @param $videoFilterKeys
+	 * @param $count
+	 */
+	private static function mergeVideoFilterLines(array &$cmdValsArr, $videoFilterKeys, $count)
+	{
+		$mergedVideoFilter = substr($cmdValsArr[$videoFilterKeys[0]], 0, -1);
+		for ($i = 1; $i < count($videoFilterKeys); $i++)
+		{
+			$toMerge = substr($cmdValsArr[$videoFilterKeys[$i]], 1, -1);
+			$count = $count + 1;
+			$mergedVideoFilter .= "[vflt$count]" . ';' . "[vflt$count]" . $toMerge;
+
+		}
+		$mergedVideoFilter .= "'";
+
+		$cmdValsArr[$videoFilterKeys[0]] = $mergedVideoFilter;
+		for ($i = 1; $i < count($videoFilterKeys); $i++)
+		{
+			unset($cmdValsArr[$videoFilterKeys[$i]]);
+			unset($cmdValsArr[$videoFilterKeys[$i] - 1]);
+		}
 	}
 
 	/**

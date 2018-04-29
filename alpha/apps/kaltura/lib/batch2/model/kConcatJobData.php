@@ -19,16 +19,21 @@ class kConcatJobData extends kJobData
 	 * @var string
 	 */
 	private $flavorAssetId;
-	
+
 	/**
 	 * @var float
 	 */
 	private $offset;
-	
+
 	/**
 	 * @var float
 	 */
 	private $duration;
+
+	/**
+	 * @var bool
+	 */
+	private $shouldSort;
 
 	/**
 	 * duration of the concated video
@@ -130,5 +135,21 @@ class kConcatJobData extends kJobData
 	public function setConcatenatedDuration($concatenatedDuration)
 	{
 		$this->concatenatedDuration = $concatenatedDuration;
+	}
+
+	/**
+	 * @return bool $shouldSort
+	 */
+	public function getShouldSort()
+	{
+		return $this->shouldSort;
+	}
+
+	/**
+	 * @param bool $shouldSort
+	 */
+	public function setShouldSort($shouldSort)
+	{
+		$this->shouldSort = $shouldSort;
 	}
 }

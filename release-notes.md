@@ -1,4 +1,5 @@
-	
+# Mercury 13.19.0 #
+
 # Reach In-House Support #
 - Issue Type: Feature
 - Issue ID: PLAT-7596
@@ -85,7 +86,113 @@
 #### Known Issues & Limitations ####
 
 	None.
+
+## Live Clipping ##
+- Issue Type: live clipping
+- Issue ID: PLAT-7832
+
+### Configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+/opt/kaltura/app/deployment/updates/scripts/xml/notifications/clippingTaskEntryServerNode_created_notification.template.xml
+
+### Deployment scripts ###
+Add permission to new updateStatus action in entryServerNode service and add the push notification template:
+
+ php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_04_12_add_action_entryservernode_service.php
+ php /opt/kaltura/app/deployment/updates/scripts/2018_04_23_deploy_created_clippingTaskEntryServerNode_push_notifications.php
+
+## KMS GO: Push Notification specific Message ##
+- Issue Type: new template
+- Issue ID: PLAT-8792
+
+### Configuration ###
+None.
+    
+### Deployment scripts ###
+Disable current "EntryCategory added FireBase" event notification template
+
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/entryAddedToCategoryFireBaseHttpNotification.xml    
+ 
+    
+# Mercury 13.18.0 #
+
+## Webex drop folder site name ##
+    - Issue Type: New Feature
+    - Issue ID: PLAT-8732
+    
+ ### Configuration ###
+    
+    A new property was added to drop folder profile - site name.
+    This property can be used for authentication with remote webex site.
+    New defined webex sites, can only work with this parameter rather than site-id and partner-id.
+    FYI - In most cases it can be extracted from Webex service url.
+    Example - https://SITENAME.webex.com
+    
+## Add conference plugin abilities ##
+	- Issue Type: New Feature
+	- Issue ID: WEBC-1075
+ 
+ ### Configuration ###
+
+	In plugins.ini file if you have konference then change to conference
+	 if not add "conference" to plugins.ini
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_30_01_add_conference_service.php
+
+# Mercury 13.17.0 #
+
+## Add base user permissions to fileAsset service ##
+ - Issue Type: Task
+ - Issue ID: PLAT-8708
+ 
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_04_03_update_file_asset_permission.php
 	
+## Add new batch job for Copy Cue Points ##
+ - Issue Type: Story
+ - Issue ID: PLAT-8651
+ 
+ ### Configuration ###
+
+	Requires adding a new worker to batch.ini:
+	- enabledWorkers.KAsyncCopyCuePoints = 1
+
+	- [KAsyncCopyCuePoints : JobHandlerWorker]
+      id                                                  = 700
+      friendlyName                                        = Copy Cue Point
+      type                                                = KAsyncCopyCuePoints
+      scriptPath                                          = ../plugins/cue_points/base/batch/copyCuePoints/KAsyncCopyCuePointsExe.php
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_03_28_cuePoint_update_cue_point_times.php
+	
+## Remove use of partner 0 in sphinx queries ##
+- Issue Type: Task
+- Issue ID: PLAT-8311
+
+### Configuration ###
+-Added the following to local.ini in server-saas-config:
+[partner_0_static_playlists]
+0 = @PARTNER_0_STATIC_PLAYLIST1@
+1 = @PARTNER_0_STATIC_PLAYLIST2@
+
+## Add new Konference plugin ##
+
+- Issue Type: New Feature
+- Issue ID: WEBC-1075
+
+### Configuration ###
+add "Konference" to plugins.ini 
+
+### Deployment scripts ###
+      php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+      php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_30_01_add_conference_service.php
+
 # Mercury 13.16.0 #
 
 ## Youtube api distribution timeout ##

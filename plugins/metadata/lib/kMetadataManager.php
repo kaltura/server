@@ -217,6 +217,16 @@ class kMetadataManager
 				$profileField->setKey($xPathData['name']);
 			if(isset($xPathData['label']))
 				$profileField->setLabel($xPathData['label']);
+			if(isset($xPathData['trimChars']))
+				$profileField->setTrimChars($xPathData['trimChars']);
+			if(isset($xPathData['explodeChars']))
+				$profileField->setExplodeChars($xPathData['explodeChars']);
+			
+			if(isset($xPathData['matchType']))
+				$profileField->setMatchType($xPathData['matchType']);
+			else
+				$profileField->setMatchType(MetadataProfileFieldMatchType::TEXT);
+			
 			if(isset($xPathData['type']))
 			{
 				$profileField->setType($xPathData['type']);
@@ -389,6 +399,14 @@ class kMetadataManager
 						continue;
 						
 					$searchItems[$profileField->getId()][] = $searchItemValue;
+					if($profileField->getMatchType() == MetadataProfileFieldMatchType::EXACT)
+					{
+						$parsedFieldValues = $profileField->getParsedFieldValue($searchItemValue);
+						foreach ($parsedFieldValues as $parsedFieldValue)
+						{
+							$searchItems[$profileField->getId()][] = $parsedFieldValue;
+						}
+					}
 				}
 
 				if ($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT &&
