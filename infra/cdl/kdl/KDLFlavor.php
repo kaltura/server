@@ -1667,7 +1667,13 @@ WM HGT related
 			}
 		}
 		elseif ($target->_container->_id==KDLContainerTarget::MP3) {
-			$targetAud->_id=KDLAudioTarget::MP3;
+			switch($targetAud->_id) {
+				case KDLVideoTarget::COPY:
+					break;
+				default:
+					$targetAud->_id=KDLAudioTarget::MP3;
+					break;
+			}
 		}
 
 			/*

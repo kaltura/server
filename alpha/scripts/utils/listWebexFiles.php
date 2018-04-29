@@ -31,14 +31,13 @@ $securityContext->setPwd($webexPass); // webex password
 $securityContext->setSid($webexSiteId); // webex site id
 $securityContext->setPid($webexPartnerId); // webex partner id
 $securityContext->setSiteName($webexSiteName); //webex site name
-$webexWrapper = new webexWrapper($webexServiceUrl, $securityContext, array("scriptLogger", "logScript"), array("scriptLogger", "logScript"));
+$webexWrapper = new webexWrapper($webexServiceUrl, $securityContext, array("scriptLogger", "logScript"), array("scriptLogger", "logScript"), false);
 $createTimeStart = date('m/j/Y H:i:s', $startTime);
 $createTimeEnd  = date('m/j/Y H:i:s', $endTime);
 $serviceTypes = webexWrapper::stringServicesTypesToWebexXmlArray(array(WebexXmlComServiceTypeType::_MEETINGCENTER));
 $result = $webexWrapper->listAllRecordings($serviceTypes, $createTimeStart, $createTimeEnd);
 if($result)
 {
-	foreach ($result as $recording) {
+	foreach ($result as $recording)
 		print($recording->getName() . PHP_EOL);
-	}
 }

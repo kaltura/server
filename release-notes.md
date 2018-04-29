@@ -1,3 +1,18 @@
+# Mercury 13.19.0 #
+
+## KMS GO: Push Notification specific Message ##
+- Issue Type: new template
+- Issue ID: PLAT-8792
+
+### Configuration ###
+None.
+    
+### Deployment scripts ###
+Disable current "EntryCategory added FireBase" event notification template
+
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/entryAddedToCategoryFireBaseHttpNotification.xml    
+ 
+    
 # Mercury 13.18.0 #
 
 ## Webex drop folder site name ##

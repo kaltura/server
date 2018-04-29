@@ -128,7 +128,7 @@ class ITunesFeedRenderer extends SyndicationFeedRenderer {
 		$res .= $this->writeFullXmlNode('enclosure', '', 3, $enclosure_attr);
 		
 		$kuser = $entry->getkuser();
-		if($kuser && $kuser->getScreenName())
+		if(!$this->syndicationFeed->enforceFeedAuthor && $kuser && $kuser->getScreenName())
 			$res .= $this->writeFullXmlNode('itunes:author', $this->stringToSafeXml($kuser->getScreenName()), 3);
 			
 		if($this->enforceOrder)

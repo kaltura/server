@@ -27,6 +27,12 @@ class kClipAttributes extends kOperationAttributes
 	 */
 	private $globalOffsetInDestination;
 
+	/**
+	 * effectsAttributes
+	 * @var array kEffect
+	 */
+	private $effectArray;
+
 
 	/* (non-PHPdoc)
 	 * @see kOperationAttributes::toArray()
@@ -37,6 +43,7 @@ class kClipAttributes extends kOperationAttributes
 			'ClipOffset' => $this->offset,
 			'ClipDuration' => $this->duration,
 			'globalOffsetInDestination' => $this->globalOffsetInDestination,
+			'effectArray' => $this->effectArray,
 		);
 	}
 	
@@ -111,5 +118,22 @@ class kClipAttributes extends kOperationAttributes
 	{
 		$this->globalOffsetInDestination = $globalOffsetInDestination;
 	}
+
+	/**
+	 * @return kEffect[]
+	 */
+	public function getEffectArray()
+	{
+		return $this->effectArray;
+	}
+
+	/**
+	 * @param array $effectArray
+	 */
+	public function setEffectArray($effectArray)
+	{
+		$this->effectArray = $effectArray;
+	}
+
 
 }
