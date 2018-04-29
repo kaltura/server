@@ -28,29 +28,37 @@ class MetadataProfileField extends BaseMetadataProfileField implements IBaseObje
 		return array("metadataProfileField:metadataProfileId=".strtolower($this->getMetadataProfileId()));
 	}
 	
-	public function getMatchType()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_MATCH_TYPE);}
-	public function getTrimChars()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_TRIM_CHARS);}
+	public function getMatchType()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_MATCH_TYPE, null, MetadataProfileFieldMatchType::TEXT);}
+	public function getTrimChars()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_TRIM_CHARS, null, " .:");}
 	public function getExplodeChars()	{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_EXPLODE_CHARS);}
 	
 	public function setMatchType($v)	{ $this->putInCustomData(self::CUSTOM_DATA_FIELD_MATCH_TYPE, $v);}
 	public function setTrimChars($v)	{ $this->putInCustomData(self::CUSTOM_DATA_FIELD_TRIM_CHARS, $v);}
 	public function setExplodeChars($v)	{ $this->putInCustomData(self::CUSTOM_DATA_FIELD_EXPLODE_CHARS, $v);}
 	
-	public function getExplodeCharsArray()
+	private function getTrimUniqueChars()
 	{
 		$explodeChars = $this->getExplodeChars();
-		return explode(",", $explodeChars);
+		if(!$explodeChars)
+			return $this->getTrimChars();
+		
+		
+		$trimCharsArray = str_split($this->getTrimChars());
+		$explodeCharsArray = str_split($this->getExplodeChars());
+		$uniqueTrimChars = array_unique(array_diff($trimCharsArray, $explodeCharsArray));
+		
+		return implode($uniqueTrimChars);
 	}
 	
 	public function getParsedFieldValue($value)
 	{
 		$parsedFieldValues = array();
-		$trimChars = $this->getTrimChars();
+		$trimChars = $this->getTrimUniqueChars();
 		$value = $trimChars ? strtr($value, $trimChars, str_repeat("_", strlen($trimChars))) : $value;
 		
 		if($this->getExplodeChars())
 		{
-			$explodeChars = $this->getExplodeCharsArray();
+			$explodeChars = str_split($this->getExplodeChars());
 			$explodePattern = implode("|", $explodeChars);
 			$values = preg_split( "/($explodePattern)/", $value );
 			
