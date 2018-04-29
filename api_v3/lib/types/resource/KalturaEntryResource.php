@@ -32,9 +32,7 @@ class KalturaEntryResource extends KalturaContentResource
 		if (!$srcEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
 			
-		if($srcEntry->getMediaType() == KalturaMediaType::IMAGE || 
-			$srcEntry->getMediaType() == KalturaMediaType::LIVE_STREAM_FLASH ||
-				myEntryUtils::isLiveClippingEntry($srcEntry))
+		if($srcEntry->getMediaType() == KalturaMediaType::IMAGE || $srcEntry->getMediaType() == KalturaMediaType::LIVE_STREAM_FLASH)
 			return;
 		
 		$srcFlavorAsset = null;
@@ -121,12 +119,6 @@ class KalturaEntryResource extends KalturaContentResource
     	
 		if(!$object_to_fill)
 			$object_to_fill = new kFileSyncResource();
-
-		if (myEntryUtils::isLiveClippingEntry($srcEntry))
-		{
-			$object_to_fill->setOriginEntryId($this->entryId);
-			return $object_to_fill;
-		}
 			
     	if($srcEntry->getMediaType() == KalturaMediaType::IMAGE)
     	{

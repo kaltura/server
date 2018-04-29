@@ -2957,36 +2957,5 @@ class kFlowHelper
 		return $url;
 	}
 
-	/**
-	 * @param ClippingTaskEntryServerNode $task
-	 */
-	public static function handleClippingTaskStatusUpdate($task)
-	{
-		switch($task->getStatus())
-		{
-			case EntryServerNodeStatus::TASK_QUEUED: // QUEUE means the Live Controller got the task and the entry can be played from LIVE
-				$clippedEntryId = $task->getClippedEntryId();
-				KalturaLog::debug("EntryServerNodeClippingTask is QUEUED: Entry [$clippedEntryId] set to ready ");
-				$entry = entryPeer::retrieveByPK($clippedEntryId);
-				if (!$entry)
-				{
-					KalturaLog::err(KalturaErrors::ENTRY_ID_NOT_FOUND);
-					return;
-				}
-				$entry->setStatus(KalturaEntryStatus::READY);
-				$clipAttr = $task->getClipAttributes();
-				if ($clipAttr)
-					$entry->setLengthInMsecs($clipAttr->getDuration());
-				$entry->save();
-				break;
-			case EntryServerNodeStatus::ERROR:
-				KalturaLog::err("ClippingTask with ID [" . $task->getId(). "] got Error");
-			case EntryServerNodeStatus::TASK_FINISHED:
-				$task->deleteOrMarkForDeletion();
-				break;
-			default:
-				break;
-		}
-	}
 
 }

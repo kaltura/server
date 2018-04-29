@@ -558,14 +558,6 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		)
 			return true;
 
-
-		if(
-			$object instanceof ClippingTaskEntryServerNode
-			&&	in_array(EntryServerNodePeer::STATUS, $modifiedColumns)
-		)
-			return true;
-
-
 		if(
 			$object instanceof flavorAsset
 			&&	in_array(assetPeer::STATUS, $modifiedColumns)
@@ -614,16 +606,6 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		)
 		{
 			kFlowHelper::handleUploadFinished($object);
-			return true;
-		}
-		
-		if(
-			$object instanceof ClippingTaskEntryServerNode
-			&&	in_array(EntryServerNodePeer::STATUS, $modifiedColumns)
-		)
-		{
-			if ($object->getServerType() == EntryServerNodeType::LIVE_CLIPPING_TASK)
-				kFlowHelper::handleClippingTaskStatusUpdate($object);
 			return true;
 		}
 
