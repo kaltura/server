@@ -59,8 +59,9 @@ class MetadataProfileField extends BaseMetadataProfileField implements IBaseObje
 		if($this->getExplodeChars())
 		{
 			$explodeChars = str_split($this->getExplodeChars());
-			$explodePattern = implode("|", $explodeChars);
-			$values = preg_split( "/($explodePattern)/", $value );
+			foreach($explodeChars as $explodeChar)
+				$value = str_replace($explodeChar, "__SEP__", $value);
+			$values = explode("__SEP__", $value);
 			
 			foreach ($values as $value) 
 			{
