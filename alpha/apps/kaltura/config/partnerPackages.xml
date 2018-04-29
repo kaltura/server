@@ -71,5 +71,6 @@
 		<trial_num_days>180</trial_num_days>
 		<trial_num_days_until_deletion>210</trial_num_days_until_deletion>
 		<notification_days>1,30,90,150,173,180</notification_days>
+		<cycle_bw_for_monitored_trial>500</cycle_bw_for_monitored_trial>
 	</package>
 </packages>

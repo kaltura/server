@@ -1083,10 +1083,16 @@ class myPartnerUtils
 		
 		$packages = new PartnerPackages();
 		$partnerPackage = $packages->getPackageDetails($partner->getPartnerPackage());
+		$divisionFactor = $partnerPackage['cycle_bw'];
 
 		$monitoredFreeTrial = false;
 		if(myPartnerUtils::isPartnerCreatedAsMonitoredFreeTrial($partner))
+		{
 			$monitoredFreeTrial = true;
+			if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL)
+				$divisionFactor = $partnerPackage['cycle_bw_for_monitored_trial'];
+		}
+
 
 		$report_date = date('Y-m').'-01';
         // We are now working with the DWH and a stored-procedure, and not with record type 6 on partner_activity.
@@ -1094,7 +1100,7 @@ class myPartnerUtils
 
 		list ( $totalStorage , $totalUsage , $totalTraffic ) = myPartnerUtils::collectPartnerStatisticsFromDWH($partner, $partnerPackage, $report_date);
 		$totalUsageGB = $totalUsage/1024/1024; // from KB to GB
-		$percent = round( ($totalUsageGB / $partnerPackage['cycle_bw'])*100, 2);
+		$percent = round( ($totalUsageGB / $divisionFactor)*100, 2);
 		$partner->setPartnerUsagePercent($percent);
 
 		KalturaLog::debug("percent (".$partner->getId().") is: $percent");
