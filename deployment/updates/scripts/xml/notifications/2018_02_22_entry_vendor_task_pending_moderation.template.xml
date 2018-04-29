@@ -31,7 +31,7 @@
 				</eventConditions>
 				<format>1</format>
 				<subject>[AppTitle] - New entry vendor task is awaiting approval</subject>
-				<body>New task is pendign approval for entry name {entry_name}, entry id {entry_id}. Task was requested on {request_date} by {creator_name}({creator_email}). In order to approve please go to the caption requests page in [AppEntryUrl]/{entry_id}</body>
+				<body>New task is pending approval for entry name {entry_name}, entry id {entry_id}. Task was requested on {request_date} by {creator_name}({creator_email}). In order to approve please go to the caption requests page in [AppTasksUrl]</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
 				<to objectType="KalturaEmailNotificationGroupRecipientProvider">

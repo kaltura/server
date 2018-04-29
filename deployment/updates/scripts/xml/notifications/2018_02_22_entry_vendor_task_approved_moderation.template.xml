@@ -31,7 +31,7 @@
 				</eventConditions>
 				<format>1</format>
 				<subject>[AppTitle] - Your entry vendor task is approved for execution</subject>
-				<body>Your caption request: For entry {entry_name} with {entry_id} requested on {request_date} Was approved. Captions will be automatically uploaded to your video upon completion. To view progress go to [AppEntryUrl]/{task_id}</body>
+				<body>Your caption request: For entry {entry_name} with {entry_id} requested on {request_date} Was approved. Captions will be automatically uploaded to your video upon completion. To view progress go to [AppEntryUrl]{entry_id}</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
 				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
