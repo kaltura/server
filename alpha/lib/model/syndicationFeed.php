@@ -164,7 +164,7 @@ class syndicationFeed extends BasesyndicationFeed implements IBaseObject
 	 */
 	public function getEnforceFeedAuthor()
 	{
-		$this->getFromCustomData(self::CUSTOM_DATA_ENFORCE_AUTHOR);
+		return $this->getFromCustomData(self::CUSTOM_DATA_ENFORCE_AUTHOR);
 	}
 
 
