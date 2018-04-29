@@ -85,7 +85,7 @@ class KAsyncNotifier extends KJobHandlerWorker
 				$this->updateMultiNotificationStatus($multi_notifications_per_partner, $http_code, $res);
 			}
 			
-			// see if can reduce number of notifications 
+			// see if can reduce number of notifications
 			// if an object was deleted - all previous notifications are not relevant
 			foreach($single_notifications as $not)
 			{
@@ -231,8 +231,8 @@ class KAsyncNotifier extends KJobHandlerWorker
 	private function updateNotificationStatus(KalturaBatchJob $not, $http_code, $res)
 	{
 		$not->data->notificationResult = $res;
-		
-		if($http_code == 200 && $res !== false)
+
+		if(!KCurlHeaderResponse::isError($http_code) && $res !== false)
 		{
 			// final state - update on server
 			$not->status = KalturaBatchJobStatus::FINISHED;
@@ -241,7 +241,7 @@ class KAsyncNotifier extends KJobHandlerWorker
 		{
 			$not->status = KalturaBatchJobStatus::RETRY;
 		}
-		
+
 		$updateData = new KalturaNotificationJobData();
 		//Instead of writing the notification result to th DB, write it to the log only
 		KalturaLog::info("Notification result: [" . $not->data->notificationResult ."]");
