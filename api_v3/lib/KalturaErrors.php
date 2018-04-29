@@ -595,6 +595,8 @@ class KalturaErrors extends APIErrors
 	
 	const RECORDING_DISABLED = "RECORDING_DISABLED;;Record status attribute cannot be set, account has recording feature disabled";
 	
+	const LIVE_CLIPPING_UNSUPPORTED_OPERATION = "LIVE_CLIPPING_UNSUPPORTED_OPERATION;OPERATION; Unsupported operation for live clipping: @OPERATION@";
+	
 	/*
 	 * BaseEntry Service
 	 */
