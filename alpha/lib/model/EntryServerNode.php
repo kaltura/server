@@ -22,19 +22,13 @@ abstract class EntryServerNode extends BaseEntryServerNode {
 		return array("entryServerNode:id=".strtolower($this->getId()), "entryServerNode:entryId".strtolower($this->getEntryId()));
 	}
 	
-	protected function addTrackEntryInfo($trackEventType, $description, $entryId = null)
+	protected function addTrackEntryInfo($trackEventType, $description)
 	{
 		$te = new TrackEntry();
-		$entryId = $entryId ? $entryId : $this->getEntryId();
-		$te->setEntryId($entryId);
+		$te->setEntryId($this->getEntryId());
 		$te->setTrackEventTypeId($trackEventType);
 		$te->setDescription($description);
 	
 		TrackEntry::addTrackEntry($te);
-	}
-
-	public function deleteOrMarkForDeletion()
-	{
-		return $this->delete();
 	}
 } // EntryServerNode

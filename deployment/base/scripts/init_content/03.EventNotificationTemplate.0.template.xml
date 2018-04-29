@@ -2080,38 +2080,4 @@
 		</request>
 	</multirequest>
 
-	<multirequest>
-		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
-			<template objectType="KalturaPushNotificationTemplate">
-				<name>CLIPPING_TASK_ENTRY_SERVER_NODE_CREATED_NOTIFICATIONS</name>
-				<systemName>CLIPPING_TASK_ENTRY_SERVER_NODE_CREATED_NOTIFICATIONS</systemName>
-				<description>Push notification template used by the live clipping feature</description>
-				<automaticDispatchEnabled>1</automaticDispatchEnabled>
-				<eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
-				<eventObjectType>40</eventObjectType><!-- EventNotificationEventObjectType::ENTRY_SERVER_NODE -->
-				<eventConditions objectType="array">
-					<item objectType="KalturaEventFieldCondition">
-						<field objectType="KalturaEvalBooleanField">
-							<code>$scope->getObject() instanceof ClippingTaskEntryServerNode</code>
-						</field>
-					</item>
-				</eventConditions>
-				<queueNameParameters objectType="array">
-					<item objectType="KalturaPushEventNotificationParameter">
-						<key>serverNodeId</key>
-						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getServerNodeId()</code>
-						</value>
-					</item>
-				</queueNameParameters>
-				<apiObjectType>KalturaClippingTaskEntryServerNode</apiObjectType>
-				<objectFormat>1</objectFormat> <!-- KalturaResponseType::RESPONSE_TYPE_JSON -->
-			</template>
-		</request>
-		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
-			<id>{1:result:id}</id>
-			<status>2</status><!-- EventNotificationTemplateStatus::ACTIVE -->
-		</request>
-	</multirequest>
-
 </xml>

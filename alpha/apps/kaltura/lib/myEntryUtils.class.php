@@ -1882,11 +1882,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return false;
 	}
 
-	public static function isLiveClippingEntry(entry $entry, $validateStatus = true)
-	{
-		return $entry && $entry->getIsRecordedEntry() && self::shouldServeVodFromLive($entry, $validateStatus);
-	}
-
 	public static function isEntryReady($entryId)
 	{
 		$entry = entryPeer::retrieveByPk($entryId);
