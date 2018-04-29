@@ -658,11 +658,15 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function attachOperationResource(kOperationResource $resource, entry $dbEntry, asset $dbAsset = null)
 	{
-
 		$errDescription = '';
 		$operationAttributes = $resource->getOperationAttributes();
+		$srcEntry = self::getEntryFromContentResource($resource->getResource());
+		$isLiveClippingFlow = $srcEntry && myEntryUtils::isLiveClippingEntry($srcEntry);
+
 		if (kClipManager::isMultipleClipOperation($operationAttributes))
 		{
+			if ($isLiveClippingFlow)
+				throw new KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_OPERATION, "MultiClip");
 			$clipManager = new kClipManager();
 			$this->handleMultiClipRequest($resource,$dbEntry, $clipManager, $operationAttributes);
 			return $dbAsset;
@@ -690,7 +694,6 @@ class KalturaEntryService extends KalturaBaseService
 				$dbEntry->save();
 			}
 
-			$operationAttributes = $resource->getOperationAttributes();
 			$internalResource = $resource->getResource();
 			if($internalResource instanceof kLiveEntryResource)
 			{
@@ -698,6 +701,17 @@ class KalturaEntryService extends KalturaBaseService
 				$dbEntry->save();
 
 				return $this->attachLiveEntryResource($internalResource, $dbEntry, $dbAsset, $operationAttributes);
+			}
+			if ($isLiveClippingFlow)
+			{
+				if (($srcEntry->getId() == $dbEntry->getId()) || ($srcEntry->getId() == $dbEntry->getReplacedEntryId()))
+					throw new KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_OPERATION, "Trimming");
+				$this->createRecordedClippingTask($srcEntry, $dbEntry, $operationAttributes);
+				$dbEntry->setSource(EntrySourceType::KALTURA_RECORDED_LIVE);
+				$dbEntry->setRootEntryId($srcEntry->getRootEntryId());
+				$dbEntry->setIsRecordedEntry(true);
+				$dbEntry->save();
+				return $dbAsset;
 			}
 
 			$dbAsset = $this->attachResource($internalResource, $dbEntry, $dbAsset);
@@ -735,7 +749,56 @@ class KalturaEntryService extends KalturaBaseService
 		
 		return $dbAsset;
 	}
-	
+
+	protected function createRecordedClippingTask(entry $srcEntry, entry $targetEntry, $operationAttributes)
+	{
+		$liveEntryId = $srcEntry->getRootEntryId();
+		$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($liveEntryId, EntryServerNodeType::LIVE_PRIMARY);
+		if (!$entryServerNode)
+		{
+			KalturaLog::debug("Can't create clipping task for SrcEntry: ". $srcEntry->getId() . " to entry:" . $targetEntry->getId() . " with: " . print_r($operationAttributes ,true));
+			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $liveEntryId, EntryServerNodeType::LIVE_PRIMARY);
+		}
+		$serverNode = ServerNodePeer::retrieveByPK($entryServerNode->getServerNodeId());
+
+		$clippingTask = new ClippingTaskEntryServerNode();
+		$clippingTask->setClippedEntryId($targetEntry->getId());
+		$clippingTask->setLiveEntryId($liveEntryId);
+		$clippingTask->setClipAttributes(self::getKClipAttributesForLiveClippingTask($operationAttributes));
+		$clippingTask->setServerType(EntryServerNodeType::LIVE_CLIPPING_TASK);
+		$clippingTask->setStatus(EntryServerNodeStatus::TASK_PENDING);
+		$clippingTask->setEntryId($srcEntry->getId()); //recorded entry
+		$clippingTask->setPartnerId($serverNode->getPartnerId()); //in case on eCDN it will get the local partner (not -5)
+		$clippingTask->setServerNodeId($serverNode->getId());
+		$clippingTask->save();
+		return $clippingTask;
+	}
+
+	/**
+	 * @param kContentResource $internalResource
+	 * @return entry|null
+	 */
+	private static function getEntryFromContentResource($internalResource)
+	{
+		if ($internalResource && $internalResource instanceof kFileSyncResource)
+		{
+			$entryId = $internalResource->getOriginEntryId();
+			if ($entryId)
+				return entryPeer::retrieveByPK($entryId);
+		}
+		return null;
+	}
+
+	/**
+	 * @return kClipAttributes
+	 */
+	protected static function getKClipAttributesForLiveClippingTask($operationAttributes)
+	{
+		if ($operationAttributes && count($operationAttributes) == 1 && $operationAttributes[0] instanceof kClipAttributes)
+			return $operationAttributes[0];
+		throw new KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_OPERATION, "Concat");
+	}
+
 	/**
 	 * @param IRemoteStorageResource $resource
 	 * @param entry $dbEntry
