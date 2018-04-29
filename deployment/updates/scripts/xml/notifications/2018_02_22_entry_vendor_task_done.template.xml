@@ -31,7 +31,7 @@
 				</eventConditions>
 				<format>1</format>
 				<subject>[AppTitle] - Your entry vendor task has finished processing.</subject>
-				<body>Your caption request [#{task_id}]: For entry name {entry_name} and entry ID {entry_id} requested on {request_date} finished processing. To view task go to [AppEntryUrl]/{task_id}</body>
+				<body>Your caption request [#{task_id}]: For entry name {entry_name} and entry ID {entry_id} requested on {request_date} finished processing. To view task go to [AppEntryUrl]{entry_id}</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
 				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
