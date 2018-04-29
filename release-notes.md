@@ -1,5 +1,19 @@
 # Mercury 13.19.0 #
 
+## Live Clipping ##
+- Issue Type: live clipping
+- Issue ID: PLAT-7832
+
+### Configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+/opt/kaltura/app/deployment/updates/scripts/xml/notifications/clippingTaskEntryServerNode_created_notification.template.xml
+
+### Deployment scripts ###
+Add permission to new updateStatus action in entryServerNode service and add the push notification template:
+
+ php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_04_12_add_action_entryservernode_service.php
+ php /opt/kaltura/app/deployment/updates/scripts/2018_04_23_deploy_created_clippingTaskEntryServerNode_push_notifications.php
+
 ## KMS GO: Push Notification specific Message ##
 - Issue Type: new template
 - Issue ID: PLAT-8792
