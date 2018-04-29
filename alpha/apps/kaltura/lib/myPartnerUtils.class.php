@@ -1092,6 +1092,7 @@ class myPartnerUtils
 			if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL)
 				$divisionFactor = $partnerPackage['cycle_bw_for_monitored_trial'];
 		}
+		$divisionFactor = ($divisionFactor !=0 ? $divisionFactor : 1);
 
 
 		$report_date = date('Y-m').'-01';
@@ -1850,14 +1851,14 @@ class myPartnerUtils
 		$packages = new PartnerPackages();
 		$partnerPackageInfo = $packages->getPackageDetails($partner->getPartnerPackage());
 
-		$endDate = $partnerPackageInfo['trial_num_days'];
-		$deletionDate = $partnerPackageInfo['trial_num_days_until_deletion'];
+		$endDay = $partnerPackageInfo['trial_num_days'];
+		$deletionDay = $partnerPackageInfo['trial_num_days_until_deletion'];
 		$freeTrialUpdatesDays = explode(',', $partnerPackageInfo['notification_days']);
 
 		$dayInFreeTrial = dateUtils::diffInDays($partner->getCreatedAt(), dateUtils::today());
 		KalturaLog::debug("partner [{$partner->getId()}] is currently at the [$dayInFreeTrial] day of free trial");
 
-		$partner = self::changeFreeTrialPartnerStatus($partner, $dayInFreeTrial, $endDate, $deletionDate);
+		$partner = self::checkIfPartnerStatusChangeRequired($partner, $dayInFreeTrial, $endDay, $deletionDay);
 		if($freeTrialUpdatesDays)
 			$partner = self::checkForNotificationDay($partner, $dayInFreeTrial, $freeTrialUpdatesDays);
 
@@ -1865,15 +1866,15 @@ class myPartnerUtils
 	}
 
 
-	public static function changeFreeTrialPartnerStatus($partner, $dayInFreeTrial, $endDate, $deletionDate)
+	public static function checkIfPartnerStatusChangeRequired($partner, $dayInFreeTrial, $endDay, $deletionDay)
 	{
-		if (($dayInFreeTrial >= $endDate) && ($dayInFreeTrial < $deletionDate))
+		if (($dayInFreeTrial >= $endDay) && ($dayInFreeTrial < $deletionDay))
 		{
 			KalturaLog::debug('Partner ['.$partner->getId().'] reached to end of free trial day. Blocking content.');
 			$partner->setStatus(Partner::PARTNER_STATUS_CONTENT_BLOCK);
 		}
 
-		if ($dayInFreeTrial >= $deletionDate)
+		if ($dayInFreeTrial >= $deletionDay)
 		{
 			KalturaLog::debug('Partner ['.$partner->getId().'] reached to free trial deletion day. Deleting partner.');
 			$partner->setStatus(Partner::PARTNER_STATUS_DELETED);
@@ -2083,10 +2084,7 @@ class myPartnerUtils
 	 */
 	public static function isPartnerCreatedAsMonitoredFreeTrial($partner, $useCurrentTime = false)
 	{
-		if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL)
-			$freeTrialStartDate = kConf::get('new_developer_free_trial_start_date','local', null);
-		else
-			$freeTrialStartDate = kConf::get('new_free_trial_start_date','local', null);
+		$freeTrialStartDate = myPartnerUtils::getFreeTrialStartDate($partner);
 		if(!$freeTrialStartDate)
 			return false;
 		$createTime = $partner->getCreatedAt();
@@ -2096,6 +2094,17 @@ class myPartnerUtils
 			return true;
 		return false;
 	}
+
+
+	public static function getFreeTrialStartDate($partner)
+	{
+		if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL)
+			$freeTrialStartDate = kConf::get('new_developer_free_trial_start_date','local', null);
+		else
+			$freeTrialStartDate = kConf::get('new_free_trial_start_date','local', null);
+		return $freeTrialStartDate;
+	}
+
 
 	/**
 	 *  retrieve all the partners in status active with specific admin email and package type

@@ -29,6 +29,8 @@ class myBatchPartnerUsage extends myBatchBase
 			$c->addAscendingOrderByColumn(PartnerPeer::ID);
 			$c->setLimit($bulk_size);
 			$partners = PartnerPeer::doSelect($c);
+			$freeTrialTypes = array(PartnerPackages::PARTNER_PACKAGE_FREE, PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL);
+
 			if (!$partners)
 			{
 				KalturaLog::debug( "No more partners." );
@@ -39,22 +41,15 @@ class myBatchPartnerUsage extends myBatchBase
 				KalturaLog::debug( "Looping ". count($partners) ." partners" );
 				foreach($partners as $partner)
 				{
-					if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_FREE)
+					if(in_array($partnerPackage, $freeTrialTypes) && myPartnerUtils::isPartnerCreatedAsMonitoredFreeTrial($partner))
 					{
 						myPartnerUtils::doPartnerUsage($partner);
-						if(myPartnerUtils::isPartnerCreatedAsMonitoredFreeTrial($partner))
-							myPartnerUtils::handleDayInFreeTrial($partner);
+						myPartnerUtils::handleDayInFreeTrial($partner);
 					}
-					else if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL)
-					{
-						if(myPartnerUtils::isPartnerCreatedAsMonitoredFreeTrial($partner))
-						{
-							myPartnerUtils::doPartnerUsage($partner);
-							myPartnerUtils::handleDayInFreeTrial($partner);
-						}
-						else
-							myPartnerUtils::doMonthlyPartnerUsage($partner);
-					}
+					else if ($partnerPackage == PartnerPackages::PARTNER_PACKAGE_FREE)
+						myPartnerUtils::doPartnerUsage($partner);
+					else if ($partnerPackage == PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL)
+						myPartnerUtils::doMonthlyPartnerUsage($partner);
 				}
 			}
 			$partner = end($partners);
