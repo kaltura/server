@@ -116,7 +116,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	
 	public function getCatalogItem()
 	{
-		return VendorCatalogItemPeer::retrieveByPK($this->getCatalogItemId());
+		return VendorCatalogItemPeer::retrieveByPKNoFilter($this->getCatalogItemId());
 	}
 	
 	public function getAccuracy()

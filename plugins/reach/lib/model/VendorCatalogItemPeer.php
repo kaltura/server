@@ -75,5 +75,13 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 		
 		return VendorCatalogItemPeer::doSelectOne($criteria);
 	}
+	
+	public static function retrieveByPKNoFilter ($pk, $con = null)
+	{
+		self::setUseCriteriaFilter ( false );
+		$res = parent::retrieveByPK( $pk , $con );
+		self::setUseCriteriaFilter ( true );
+		return $res;
+	}
 
 } // VendorCatalogItemPeer
