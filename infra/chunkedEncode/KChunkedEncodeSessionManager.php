@@ -122,14 +122,8 @@
 		/* ---------------------------
 		 * detectErrors
 		 */
-		public function detectErrors($manager, $maxExecutionTime)
+		public function detectErrors($manager, $maxExecutionTime, $chunkedEncodeReadIdx)
 		{
-			$writeIndex = $readIndex = null;
-			if($manager->fetchReadWriteIndexes($writeIndex, $readIndex)===false){
-				KalturaLog::log("ERROR: Missing write or read index ");
-				return false;
-			}
-			
 			$this->sumJobsStates();
 
 			foreach($this->jobs as $idx=>$job) {
@@ -140,8 +134,8 @@
 						 * Check for 'job skip' condition
 						 * when scheduler skips over a valid job in the queue
 						 */
-					if($job->keyIdx<$readIndex-1) {
-						KalturaLog::log("Potential 'job skip' case - jobId:$job->id,state: $job->state,jobKeyIdx:$job->keyIdx,rdIdx:$readIndex");
+					if($job->keyIdx<$chunkedEncodeReadIdx-1) {
+						KalturaLog::log("Potential 'job skip' case - jobId:$job->id,state: $job->state,jobKeyIdx:$job->keyIdx,rdIdx:$chunkedEncodeReadIdx");
 
 						/*
 						 * Try 10 attempts to re-fetch the 'skipped' job -
@@ -161,14 +155,14 @@
 						 */
 						if($job===false) {
 							$job = $this->jobs[$idx];
-							KalturaLog::log("Retry chunk ($job->id) - failed to fetch job (jobKeyIdx:$job->keyIdx,state: $job->state,rdIdx:$readIndex)");
+							KalturaLog::log("Retry chunk ($job->id) - failed to fetch job (jobKeyIdx:$job->keyIdx,state: $job->state,rdIdx:$chunkedEncodeReadIdx)");
 							$this->retryJob($manager, $this->jobs[$idx]);
 						}
 						/*
 						 * if the job still 'skipped' - push the job into the jobs queue
 						 */
 						else if($try==$maxTry) {
-							KalturaLog::log("Retry chunk ($job->id) - skipped by the chunk job scheduler (jobKeyIdx:$job->keyIdx,state: $job->state,rdIdx:$readIndex)");
+							KalturaLog::log("Retry chunk ($job->id) - skipped by the chunk job scheduler (jobKeyIdx:$job->keyIdx,state: $job->state,rdIdx:$chunkedEncodeReadIdx)");
 							$this->retryJob($manager, $job);
 						}
 					}
@@ -344,11 +338,11 @@
 		/* ---------------------------
 		 * detectErrors
 		 */
-		protected function detectErrors()
+		protected function detectErrors($chunkedEncodeReadIdx)
 		{		
-			if($this->videoJobs->detectErrors($this->storeManager, $this->maxExecutionTime)!=true)
+			if($this->videoJobs->detectErrors($this->storeManager, $this->maxExecutionTime, $chunkedEncodeReadIdx)!=true)
 				return false;
-			return $this->audioJobs->detectErrors($this->storeManager, $this->maxExecutionTime);
+			return $this->audioJobs->detectErrors($this->storeManager, $this->maxExecutionTime, $chunkedEncodeReadIdx);
 		}
 
 		/* ---------------------------
@@ -401,7 +395,16 @@
 				$this->returnStatus = KChunkedEncodeReturnStatus::GenerateVideoError;
 				return false;			
 			}
-			if($this->detectErrors()===false){
+			
+			$writeIndex = $readIndex = null;
+			if($this->storeManager->fetchReadWriteIndexes($writeIndex, $readIndex)===false){
+				KalturaLog::log($msgStr="Session($this->name) - Result:FAILED could not get RD/WR indexes!");
+				$this->returnMessages[] = $msgStr;
+				$this->returnStatus = KChunkedEncodeReturnStatus::GenerateVideoError;
+				return false;
+			}
+			
+			if($this->detectErrors($readIndex)===false){
 				KalturaLog::log($msgStr="Session($this->name) - Result:FAILED could not get RD/WR indexes!");
 				$this->returnMessages[] = $msgStr;
 				$this->returnStatus = KChunkedEncodeReturnStatus::GenerateVideoError;
@@ -450,9 +453,25 @@
 				$this->returnStatus = KChunkedEncodeReturnStatus::GenerateVideoError;
 				return false;			
 			}
+
+			/*
+			 * Adjust dynamically the new concurrency level to the current chunk Q status/backlog
+			 */
+			{
+				$globalChunkQueueSize = $writeIndex-$readIndex;
+				if($globalChunkQueueSize<100)
+					$newConcurrency = $this->chunker->setup->concurrent;
+				else if($globalChunkQueueSize<500)
+					$newConcurrency = min(10,$this->chunker->setup->concurrent);
+				else if($globalChunkQueueSize<1000)
+					$newConcurrency = min(5,$this->chunker->setup->concurrent);
+				else 
+					$newConcurrency = min(2,$this->chunker->setup->concurrent);
+				KalturaLog::log("Session($this->name)-chkQu: Q:$globalChunkQueueSize,maxConcurr:".$this->chunker->setup->concurrent.",newConcurr:$newConcurrency, rdIdx:$readIndex, wrIdx:$writeIndex");
+			}
 			
 			while($loaded<count($this->videoCmdLines)) {
-				$cnt = $this->addVideoJobs($concurrent);
+				$cnt = $this->addVideoJobs($concurrent,$newConcurrency);
 				if($cnt===false) {
 					KalturaLog::log($msgStr="Session($this->name) - Result:FAILED to add jobs");
 					$this->returnMessages[] = $msgStr;
@@ -471,9 +490,9 @@
 		/* ---------------------------
 		 * addVideoJobs
 		 */
-		protected function addVideoJobs($concurrent=0)
+		protected function addVideoJobs($concurrent,$newConcurrency)
 		{
-			KalturaLog::log("Session($this->name) - concurrent($concurrent)");
+			KalturaLog::log("Session($this->name) - concurrent:$concurrent, newConcurrency:$newConcurrency");
 			
 			$startChunk = count($this->videoJobs->jobs);
 			$chunksToProcess = count($this->videoCmdLines)-$startChunk;
@@ -487,14 +506,13 @@
 			 * Evaluate concurrency  
 			 */
 			{
-				$maxConcurrent = $this->chunker->setup->concurrent;
-				if(($concurrent+$chunksToProcess)>$maxConcurrent) {
-					if($maxConcurrent-$concurrent<1){
-						KalturaLog::log("Session($this->name) - Reached max concurrent jobs per session($maxConcurrent), toProcess:$chunksToProcess,concurrent:$concurrent");
+				if(($concurrent+$chunksToProcess)>$newConcurrency) {
+					if($newConcurrency-$concurrent<1){
+						KalturaLog::log("Session($this->name) - Reached max concurrent jobs per session($newConcurrency), toProcess:$chunksToProcess,concurrent:$concurrent");
 						return 0;
 					}
 					else
-						$chunksToProcess = $maxConcurrent-$concurrent;
+						$chunksToProcess = $newConcurrency-$concurrent;
 				}
 			}
 			
@@ -539,7 +557,7 @@
 			$logTail = self::getLogTail($logFilename);
 			if(isset($logTail))
 				KalturaLog::log("Log dump:\n".$logTail);
-
+			
 			if(isset($job->attempt) && $job->attempt>$this->maxRetries){
 				KalturaLog::log("FAILED - job id($job->id) exeeded retry limit ($job->attempt, max:$this->maxRetries)");
 				return false;
