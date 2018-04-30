@@ -81,6 +81,32 @@ class webexWrapper
 		return $listRecordingRequest;
 	}
 
+	/**
+	 * @param WebexXmlArray $serviceTypes
+	 * @param $pageSize
+	 * @param $startTime
+	 * @param $endTime
+	 * @param $startFrom
+	 * @return WebexXmlListRecordingInRecycleBinRequest
+	 */
+	private function initListRecycleBinRecordingRequest($serviceTypes, $pageSize, $startTime, $endTime, $startFrom)
+	{
+		$listRecordingRequest = new WebexXmlListRecordingInRecycleBinRequest();
+		$listControl = new WebexXmlEpListControlType();
+		$listControl->setStartFrom($startFrom);
+		$listControl->setMaximumNum($pageSize);
+		$listRecordingRequest->setListControl($listControl);
+		$listRecordingRequest->setServiceTypes($serviceTypes);
+
+		if ($startTime && $endTime)
+		{
+			$createTimeScope = $this->getTimeScope($startTime, $endTime);
+			$listRecordingRequest->setCreateTimeScope($createTimeScope);
+		}
+
+		return $listRecordingRequest;
+	}
+
 	private function log($logger, $str)
 	{
 		if ($logger)
@@ -104,6 +130,114 @@ class webexWrapper
 		$createTimeScope->setCreateTimeEnd($endTime);
 		return $createTimeScope;
 	}
+
+	/**
+	 * @param callable $initRequestMethod
+	 * @param WebexXmlArray $serviceTypes
+	 * @param long $startTime
+	 * @param long $endTime
+	 * @return array
+	 * @throws Exception
+	 */
+	private function listAllRecordingsLogic($initRequestMethod, $serviceTypes, $startTime = null, $endTime = null)
+	{
+		$startFrom = 1;
+		$fileList = array();
+		do
+		{
+			$listRecordingRequest = call_user_func_array(array($this, $initRequestMethod), array($serviceTypes, self::MAX_PAGE_SIZE, $startTime, $endTime, $startFrom));
+			try
+			{
+				$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
+			}
+			catch (Exception $e)
+			{
+				if ($e->getCode() != webexWrapper::NO_RECORDS_FOUND_ERROR_CODE && $e->getMessage() != webexWrapper::NO_RECORDS_FOUND_ERROR_MSG)
+				{
+					$this->logError("Error occurred while fetching records from webex: " . print_r($e, true));
+					throw $e;
+				}
+
+				$this->logDebug("No records found between {$startTime} and {$endTime}");
+				return $fileList;
+			}
+
+			$fileList = array_merge($fileList, $listRecordingResponse->getRecording());
+			$startFrom = $listRecordingResponse->getMatchingRecords()->getStartFrom() + $listRecordingResponse->getMatchingRecords()->getReturned();
+		}while (count ($fileList) < $listRecordingResponse->getMatchingRecords()->getTotal());
+
+		$this->logDebug("Found {$listRecordingResponse->getMatchingRecords()->getTotal()} matching records");
+		return $fileList;
+	}
+
+	/**
+	 * @param WebexXmlArray $serviceTypes
+	 * @param callable $initRequestMethod
+	 * @param long $startTime
+	 * @param long $endTime
+	 * @param int $startFrom
+	 * @param int $pageSize
+	 * @return WebexXmlListRecording
+	 * @throws Exception
+	 */
+	private function listRecordingsLogic($initRequestMethod, $serviceTypes, $startTime = null, $endTime = null, $startFrom = 1, $pageSize = 500)
+	{
+		$listRecordingRequest = call_user_func_array(array($this, $initRequestMethod), array($serviceTypes, $pageSize, $startTime, $endTime, $startFrom));
+		try
+		{
+			$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
+		}
+		catch (Exception $e)
+		{
+			if ($e->getCode() != webexWrapper::NO_RECORDS_FOUND_ERROR_CODE && $e->getMessage() != webexWrapper::NO_RECORDS_FOUND_ERROR_MSG)
+			{
+				$this->logError("Error occurred while fetching records from webex: " . print_r($e, true));
+				throw $e;
+			}
+
+			$this->logDebug("No records found between {$startTime} and {$endTime}");
+			return null;
+		}
+
+		$this->logDebug("Found {$listRecordingResponse->getMatchingRecords()->getTotal()} matching records");
+		return $listRecordingResponse;
+	}
+
+	/**
+	 * @param callable $listRecordingMethod
+	 * @param callable $deleteRecordingByIdMethod
+	 * @param WebexXmlArray $serviceTypes
+	 * @param long $startTime
+	 * @param long $endTime
+	 * @throws Exception
+	 */
+	public function deleteRecordingsByDatesLogic($listRecordingMethod, $deleteRecordingByIdMethod, $serviceTypes, $startTime = null, $endTime = null)
+	{
+		$result = call_user_func_array(array($this, $listRecordingMethod), array($serviceTypes, $startTime, $endTime));
+		$count = 0;
+		$faultCounter = 0;
+		while($result)
+		{
+			$records = $result->getRecording();
+			foreach ($records as $record)
+			{
+				try
+				{
+					call_user_func(array($this, $deleteRecordingByIdMethod), $record->getRecordingID());
+					$this->logDebug('deleted ' . ++$count . ' records so far');
+				}
+				catch (Exception $e)
+				{
+					$this->logError("Failed to delete record {$record->getRecordingID()} ".print_r($e, true));
+					if(++$faultCounter >= webexWrapper::MAX_DELETE_FAILURES)
+						throw new Exception("Failed to delete more then ".webexWrapper::MAX_FAILURES." times", 0, $e);
+				}
+			}
+
+			$result = call_user_func_array(array($this, $listRecordingMethod), array($serviceTypes, $startTime, $endTime, $faultCounter+webexWrapper::START_INDEX_OFFSET));
+		}
+	}
+
 
 	// </editor-fold>
 
@@ -131,27 +265,24 @@ class webexWrapper
 	 * @return WebexXmlListRecording
 	 * @throws Exception
 	 */
-	public function listRecordings ($serviceTypes, $startTime = null, $endTime = null, $startFrom = 1, $pageSize = 500)
+	public function listRecordings($serviceTypes, $startTime = null, $endTime = null, $startFrom = 1, $pageSize = 500)
 	{
-		$listRecordingRequest = $this->initListRecordingRequest($serviceTypes, $pageSize, $startTime, $endTime, $startFrom);
-		try
-		{
-			$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
-		}
-		catch (Exception $e)
-		{
-			if ($e->getCode() != webexWrapper::NO_RECORDS_FOUND_ERROR_CODE && $e->getMessage() != webexWrapper::NO_RECORDS_FOUND_ERROR_MSG)
-			{
-				$this->logError("Error occurred while fetching records from webex: " . print_r($e, true));
-				throw $e;
-			}
+		return  $this->listRecordingsLogic("initListRecordingRequest", $serviceTypes, $startTime, $endTime, $startFrom, $pageSize);
+	}
 
-			$this->logDebug("No records found between {$startTime} and {$endTime}");
-			return null;
-		}
-
-		$this->logDebug("Found {$listRecordingResponse->getMatchingRecords()->getTotal()} matching records");
-		return $listRecordingResponse;
+	/**
+	 * @param WebexXmlArray $serviceTypes
+	 * @param long $startTime
+	 * @param long $endTime
+	 * @param int $startFrom
+	 * @param int $pageSize
+	 * @return WebexXmlListRecording
+	 * @throws Exception
+	 */
+	public function listRecordingsInRecycleBin($serviceTypes, $startTime = null, $endTime = null, $startFrom = 1, $pageSize = 500)
+	{
+		$this->logDebug("Searching the recycleBin.");
+		return  $this->listRecordingsLogic("initListRecycleBinRecordingRequest", $serviceTypes, $startTime, $endTime, $startFrom, $pageSize);
 	}
 
 	/**
@@ -161,35 +292,22 @@ class webexWrapper
 	 * @return array
 	 * @throws Exception
 	 */
-	public function listAllRecordings ($serviceTypes, $startTime = null, $endTime = null)
+	public function listAllRecordings($serviceTypes, $startTime = null, $endTime = null)
 	{
-		$startFrom = 1;
-		$fileList = array();
-		do
-		{
-			$listRecordingRequest = $this->initListRecordingRequest($serviceTypes, self::MAX_PAGE_SIZE, $startTime, $endTime, $startFrom);
-			try
-			{
-				$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
-			}
-			catch (Exception $e)
-			{
-				if ($e->getCode() != webexWrapper::NO_RECORDS_FOUND_ERROR_CODE && $e->getMessage() != webexWrapper::NO_RECORDS_FOUND_ERROR_MSG)
-				{
-					$this->logError("Error occurred while fetching records from webex: " . print_r($e, true));
-					throw $e;
-				}
+		return $this->listAllRecordingsLogic("initListRecordingRequest", $serviceTypes, $startTime, $endTime);
+	}
 
-				$this->logDebug("No records found between {$startTime} and {$endTime}");
-				return $fileList;
-			}
-
-			$fileList = array_merge($fileList, $listRecordingResponse->getRecording());
-			$startFrom = $listRecordingResponse->getMatchingRecords()->getStartFrom() + $listRecordingResponse->getMatchingRecords()->getReturned();
-		}while (count ($fileList) < $listRecordingResponse->getMatchingRecords()->getTotal());
-
-		$this->logDebug("Found {$listRecordingResponse->getMatchingRecords()->getTotal()} matching records");
-		return $fileList;
+	/**
+	 * @param WebexXmlArray $serviceTypes
+	 * @param long $startTime
+	 * @param long $endTime
+	 * @return array
+	 * @throws Exception
+	 */
+	public function listAllRecycleBinRecordings($serviceTypes, $startTime = null, $endTime = null)
+	{
+		$this->logDebug("Searching the recycleBin.");
+		return $this->listAllRecordingsLogic("initListRecycleBinRecordingRequest", $serviceTypes, $startTime, $endTime);
 	}
 
 	/**
@@ -234,42 +352,6 @@ class webexWrapper
 			$this->logError("Error occurred while trying to delete file with id: {$recordingId} from webex recycleBin: " . print_r($e, true));
 			throw $e;
 		}
-	}
-
-	/**
-	 * Locate recording in recycle bin according to the creation time
-	 * @param string $createTime
-	 * @return WebexXmlResponseBodyContent
-	 * @throws Exception
-	 */
-	public function getRecordingsFromRecycleBinByCreationTime($createTime)
-	{
-		$listControl = new WebexXmlEpListControlType();
-		$listControl->setStartFrom(1);
-		$createTimeScope = $this->getTimeScope($createTime, $createTime);
-		$listRecordingRequest = new WebexXmlListRecordingInRecycleBinRequest();
-		$listRecordingRequest->setCreateTimeScope($createTimeScope);
-		$listRecordingRequest->setListControl($listControl);
-		try
-		{
-			$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
-		}
-		catch (Exception $e)
-		{
-			if ($e->getCode() != webexWrapper::NO_RECORDS_FOUND_ERROR_CODE && $e->getMessage() != webexWrapper::NO_RECORDS_FOUND_ERROR_MSG)
-			{
-				$this->logError("Error occurred while trying to get file with creation time: {$createTime} from webex recycleBin: " . print_r($e, true));
-				throw $e;
-			}
-			else
-			{
-				$this->logDebug("No Record found for name {$createTime} in the webex recycleBin.");
-				return null;
-			}
-
-		}
-
-		return $listRecordingResponse->getRecording();
 	}
 
 	/**
@@ -363,28 +445,17 @@ class webexWrapper
 	 */
 	public function deleteRecordingsByDates($serviceTypes, $startTime = null, $endTime = null)
 	{
-		$result = $this->listRecordings($serviceTypes, $startTime, $endTime);
-		$count = 0;
-		$faultCounter = 0;
-		while($result)
-		{
-			$records = $result->getRecording();
-			foreach ($records as $record)
-			{
-				try
-				{
-					$this->deleteRecordById($record->getRecordingID());
-					$this->logDebug('deleted ' . ++$count . ' records so far');
-				}
-				catch (Exception $e)
-				{
-					$this->logError("Failed to delete record {$record->getRecordingID()} ".print_r($e, true));
-					if(++$faultCounter >= webexWrapper::MAX_DELETE_FAILURES)
-						throw new Exception("Failed to delete more then ".webexWrapper::MAX_FAILURES." times", 0, $e);
-				}
-			}
+		$this->deleteRecordingsByDatesLogic("listRecordings","deleteRecordById", $serviceTypes, $startTime, $endTime);
+	}
 
-			$result = $this->listRecordings($serviceTypes, $startTime, $endTime, $faultCounter+webexWrapper::START_INDEX_OFFSET);
-		}
+	/**
+	 * @param WebexXmlArray $serviceTypes
+	 * @param long $startTime
+	 * @param long $endTime
+	 * @throws Exception
+	 */
+	public function deleteRecordingsByDatesInRecycleBin($serviceTypes, $startTime = null, $endTime = null)
+	{
+		$this->deleteRecordingsByDatesLogic("listRecordingsInRecycleBin", "deleteRecordFromRecycleBinById", $serviceTypes, $startTime, $endTime);
 	}
 }
