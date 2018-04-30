@@ -1,4 +1,4 @@
-/*! KMC - v6.0.11 - 2018-03-26
+/*! KMC - v6.0.11 - 2018-04-30
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2018 Amir Chervinsky; Licensed GNU */
 /**
