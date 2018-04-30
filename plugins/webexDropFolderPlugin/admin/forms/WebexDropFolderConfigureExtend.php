@@ -26,7 +26,12 @@ class Form_WebexDropFolderConfigureExtend_SubForm extends Form_DropFolderConfigu
 			'label'			=> 'Password:',
 			'filters'		=> array('StringTrim'),
 		));
-		
+
+		$this->addElement('text', 'webexSiteName', array(
+			'label'			=> 'Site Name:',
+			'filters'		=> array('StringTrim'),
+		));
+
 		$this->addElement('text', 'webexSiteId', array(
 			'label'			=> 'Site ID:',
 			'filters'		=> array('StringTrim'),
@@ -39,6 +44,7 @@ class Form_WebexDropFolderConfigureExtend_SubForm extends Form_DropFolderConfigu
 		
 		$this->addElement('text', 'webexServiceType', array(
 			'label'			=> 'Service Type (Default - MeetingCenter):',
+			'value'			=> 'MeetingCenter',
 			'filters'		=> array('StringTrim'),
 		));
 		
@@ -51,6 +57,13 @@ class Form_WebexDropFolderConfigureExtend_SubForm extends Form_DropFolderConfigu
 		$this->addElement('checkbox', 'deleteFromRecycleBin', array(
 			'label'	  => 'Delete From Recycle Bin',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'div', 'class' => 'rememeber')))
+		));
+		
+		$this->addElement('text', 'deleteFromTimestamp', array(
+			'label'			=> 'Delete only files newer than:',
+			'value'			=> time(),
+			'required'		=> true,
+			'filters'		=> array('StringTrim'),
 		));
 		
 	}

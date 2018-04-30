@@ -43,15 +43,114 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return $file_sync;
 	}
 
+	private function generateKey()
+	{
+		return implode("_", array($this->getObjectId(), $this->getObjectType(), $this->getObjectSubType()));
+	}
+
+	public function encrypt()
+	{
+		if (!$this->shouldEncryptFile())
+			return;
+
+		$this->setEncryptionKey($this->generateKey());
+		$this->save();
+
+		$key = $this->getEncryptionKey();
+		$realPath = realpath($this->getFullPath());
+		KalturaLog::debug("Encrypting content of fileSync " . $this->id . ". key is: [$key] in path [$realPath]");
+		kEncryptFileUtils::encrypt($realPath, $key, $this->getIv());
+	}
+
+	public function decrypt()
+	{
+		$realPath = realpath($this->getFullPath());
+		$fileData = kFileBase::getFileContent( $realPath);
+		if (!$this->isEncrypted()) 
+		{
+			KalturaLog::info("File of fileSyncId [$this->id] in path $realPath is not encrypted");
+			return $fileData;
+		}
+
+		$key = $this->getEncryptionKey();
+		KalturaLog::debug("Decrypting content of fileSync " . $this->id . ". key is: [$key]");
+		$plainData = kEncryptFileUtils::decryptData($fileData, $key, $this->getIv());
+		return $plainData;
+	}
+
+	public function shouldEncryptFile()
+	{
+
+		//check for partner configuration
+		if(!$this->getPartnerId() || !PermissionPeer::isValidForPartner(PermissionName::FEATURE_CONTENT_ENCRYPTION, $this->getPartnerId()))
+			return false;
+
+		//check fileSync type
+		$excludeObjectTypes = array(FileSyncObjectType::BATCHJOB);
+		if (in_array($this->object_type, $excludeObjectTypes))
+			return false;
+
+		$fileTypeNotToEncrypt = array('log');
+		if (in_array($this->getFileExt(), $fileTypeNotToEncrypt))
+			return false;
+
+		if ($this->object_type == FileSyncObjectType::ASSET)
+		{
+			/** @var  Asset $asset */
+			$asset = assetPeer::retrieveById($this->object_id);
+			$shouldEncrypt = $asset->shouldEncrypt();
+			KalturaLog::debug("Asset id [$this->object_id] of type [" . $asset->getType() . "] should be encrypt: [$shouldEncrypt]");
+			if (!$shouldEncrypt)
+				return false;
+		}
+
+		if ($this->getEncryptionKey())
+		{
+			KalturaLog::info("File of fileSyncId [$this->id] already has key and should not be encrypt again");
+			return false;
+		}
+		return true;
+	}
+	
+
 	public function setFileSizeFromPath ($filePath)
 	{
-		$this->setFileSize(kFile::fileSize($filePath));
+		$fileSize = kEncryptFileUtils::fileSize($filePath, $this->getEncryptionKey(), $this->getIv());
+		$this->setFileSize($fileSize);
+	}
+
+	private function getClearTempPath()
+	{
+		$type = pathinfo($this->getFilePath(), PATHINFO_EXTENSION);
+		return sys_get_temp_dir(). "/". $this->getEncryptionKey() . $this->getVersion() . ".$type";
 	}
 	
 	public function getFullPath ()
 	{
 		return $this->getFileRoot() . $this->getFilePath();
 	}
+
+	/**
+	 * Its the caller responsibility to remove the file after usage
+	 * @return string path to a temporary decrypted file
+	 */
+	public function createTempClear()
+	{
+		$realPath = realpath($this->getFullPath());
+		$tempPath = $this->getClearTempPath();
+		KalturaLog::info("Creating new file for syncId [$this->id] on [$tempPath]");
+		if (!file_exists($tempPath))
+			kEncryptFileUtils::decryptFile($realPath, $this->getEncryptionKey(), $this->getIv(), $tempPath);
+		return $tempPath;
+	}
+
+	public function deleteTempClear()
+	{
+		$tempPath = $this->getClearTempPath();
+		if (file_exists($tempPath))
+			unlink($tempPath);
+	}
+
 	
 	public function getFileExt()
 	{
@@ -155,7 +254,13 @@ class FileSync extends BaseFileSync implements IBaseObject
 	
 	public function getContentMd5 () { return $this->getFromCustomData("contentMd5"); }
 	public function setContentMd5 ($v) { $this->putInCustomData("contentMd5", $v);  }
-	
+
+	public function getEncryptionKey () { return $this->getFromCustomData("encryptionKey"); }
+	public function setEncryptionKey ($v) { $this->putInCustomData("encryptionKey", $v);  }
+	public function isEncrypted () { return ($this->getFromCustomData("encryptionKey"))? true : false ; }
+	public function getIv() {return kConf::get("encryption_iv");}
+
+
 }
 
 

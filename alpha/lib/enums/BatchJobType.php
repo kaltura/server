@@ -44,4 +44,10 @@ interface BatchJobType extends BaseEnum
 	const LIVE_REPORT_EXPORT = 40;
 	const RECALCULATE_CACHE = 41;
 	const LIVE_TO_VOD = 42;
+	const COPY_CAPTIONS = 43;
+	const CHUNKED_ENCODE_JOB_SCHEDULER  = 44;
+	const SERVER_NODE_MONITOR  = 45;
+	const USERS_CSV  = 46;
+	const CLIP_CONCAT = 47;
+	const COPY_CUE_POINTS = 48;
 }

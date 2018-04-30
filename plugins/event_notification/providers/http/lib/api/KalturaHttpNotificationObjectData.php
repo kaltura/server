@@ -30,7 +30,13 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 	 * @var string
 	 */
 	public $code;
-	
+
+	/**
+	 * An array of pattern-replacement pairs used for data string regex replacements
+	 * @var KalturaKeyValueArray
+	 */
+	public $dataStringReplacements;
+
 	/**
 	 * Serialized object, protected on purpose, used by getData
 	 * @see KalturaHttpNotificationObjectData::getData()
@@ -44,6 +50,7 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 		'format',
 		'ignoreNull',
 		'code',
+		'dataStringReplacements',
 	);
 
 	/* (non-PHPdoc)
@@ -84,6 +91,7 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 	public function getData(kHttpNotificationDispatchJobData $jobData = null)
 	{
 		$coreObject = unserialize($this->coreObject);
+
 		$apiObject = new $this->apiObjectType;
 		/* @var $apiObject KalturaObject */
 		$apiObject->fromObject($coreObject);
@@ -97,7 +105,7 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 		$notification->templateId = $httpNotificationTemplate->getId();
 		$notification->templateName = $httpNotificationTemplate->getName();
 		$notification->templateSystemName = $httpNotificationTemplate->getSystemName();
-		$notification->eventType = $httpNotificationTemplate->getEventType();;
+		$notification->eventType = $httpNotificationTemplate->getEventType();
 
 		$data = '';
 		switch ($this->format)
@@ -115,6 +123,21 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 			case KalturaResponseType::RESPONSE_TYPE_JSON:
 				$serializer = new KalturaJsonSerializer($this->ignoreNull);				
 				$data = $serializer->serialize($notification);
+
+				if($this->dataStringReplacements)
+				{
+					KalturaLog::info("replacing data string");
+					$patterns = array();
+					$replacements = array();
+					foreach($this->dataStringReplacements->toArray() as $dataStringReplacement)
+					{
+						$patterns[] = "/" . $dataStringReplacement->key . "/";
+						$replacements[] = $dataStringReplacement->value;
+					}
+
+					if(!empty($patterns))
+						$data = preg_replace($patterns, $replacements, $data);
+				}
 				if (!$httpNotificationTemplate->getUrlEncode())
 					return $data;
 				

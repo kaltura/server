@@ -10,6 +10,7 @@ class kMetadataManager
 	const APP_INFO_LABEL = 'label';
 	
 	const SEARCH_TEXT_SUFFIX = 'mdend';
+	const ELASTIC_DATA_FIELD_NAME = 'metadata';
 	
 	protected static $objectTypeNames = array(
 		MetadataObjectType::ENTRY => 'entry',
@@ -162,9 +163,8 @@ class kMetadataManager
 	public static function parseProfileSearchFields($partnerId, MetadataProfile $metadataProfile)
 	{
 		$key = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
-		$xsdPath = kFileSyncUtils::getLocalFilePathForKey($key);
-		
-		$xPaths = kXsd::findXpathsByAppInfo($xsdPath, self::APP_INFO_SEARCH, 'true');
+		$xmlString = kFileSyncUtils::file_get_contents($key);
+		$xPaths = kXsd::findXpathsByAppInfo($xmlString, self::APP_INFO_SEARCH, 'true', false);
 		
 		MetadataProfileFieldPeer::setUseCriteriaFilter(false);
 		$profileFields = MetadataProfileFieldPeer::retrieveByMetadataProfileId($metadataProfile->getId());
@@ -217,6 +217,16 @@ class kMetadataManager
 				$profileField->setKey($xPathData['name']);
 			if(isset($xPathData['label']))
 				$profileField->setLabel($xPathData['label']);
+			if(isset($xPathData['trimChars']))
+				$profileField->setTrimChars($xPathData['trimChars']);
+			if(isset($xPathData['explodeChars']))
+				$profileField->setExplodeChars($xPathData['explodeChars']);
+			
+			if(isset($xPathData['matchType']))
+				$profileField->setMatchType($xPathData['matchType']);
+			else
+				$profileField->setMatchType(MetadataProfileFieldMatchType::TEXT);
+			
 			if(isset($xPathData['type']))
 			{
 				$profileField->setType($xPathData['type']);
@@ -226,7 +236,7 @@ class kMetadataManager
 		}
 	
 		// set none searchable existing fields
-		$xPaths = kXsd::findXpathsByAppInfo($xsdPath, self::APP_INFO_SEARCH, 'false');
+		$xPaths = kXsd::findXpathsByAppInfo($xmlString, self::APP_INFO_SEARCH, 'false', false);
 		foreach($profileFields as $profileField)
 		{
 			$xPath = $profileField->getXpath();
@@ -334,16 +344,16 @@ class kMetadataManager
 		}
 		
 		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-		$xmlPath = kFileSyncUtils::getLocalFilePathForKey($key);
+		$xmlString = kFileSyncUtils::file_get_contents($key);
 		
 		try{
 			$xml = new KDOMDocument();
-			$xml->load($xmlPath);
+			$xml->loadXML($xmlString);
 			$xPath = new DOMXPath($xml);
 		}
 		catch (Exception $ex)
 		{
-			KalturaLog::err('Could not load metadata xml [' . $xmlPath . '] - ' . $ex->getMessage());
+			KalturaLog::err('Could not load metadata xml [' . kFileSyncUtils::getLocalFilePathForKey($key) . '] - ' . $ex->getMessage());
 			return '';
 		}
 					
@@ -389,6 +399,14 @@ class kMetadataManager
 						continue;
 						
 					$searchItems[$profileField->getId()][] = $searchItemValue;
+					if($profileField->getMatchType() == MetadataProfileFieldMatchType::EXACT)
+					{
+						$parsedFieldValues = $profileField->getParsedFieldValue($searchItemValue);
+						foreach ($parsedFieldValues as $parsedFieldValue)
+						{
+							$searchItems[$profileField->getId()][] = $parsedFieldValue;
+						}
+					}
 				}
 
 				if ($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT &&
@@ -690,9 +708,7 @@ class kMetadataManager
 			$job->save();
 			$key = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_CONFIG);
 			kFileSyncUtils::file_put_contents($key, $xsl);
-			
-			$xslPath = kFileSyncUtils::getLocalFilePathForKey($key);
-			$data->setSrcXslPath($xslPath);
+			$data->setSrcXsl(kJobsManager::getFileContainer($key));
 		}
 		
 		$data->setMetadataProfileId($metadataProfileId);
@@ -727,5 +743,148 @@ class kMetadataManager
 		return $diff;
 		
 	}
-	
+
+	/**
+	 * Return search texts per object id
+	 *
+	 * @param int $objectType
+	 * @param string $objectId
+	 *
+	 * @return array
+	 */
+	public static function getElasticSearchValuesByObject($objectType, $objectId)
+	{
+		$metadatas = MetadataPeer::retrieveAllByObject($objectType, $objectId);
+		KalturaLog::info("Found " . count($metadatas) . " metadata object");
+
+		return self::getElasticMetadataValuesByMetadataObjects($metadatas, $objectType);
+	}
+
+	public static function getElasticMetadataValuesByMetadataObjects(array $metadatas, $objectType)
+	{
+		$metaDataSearchValues = array();
+		$searchValues = null;
+		foreach($metadatas as $metadata)
+		{
+			self::getDataElasticSearchValues($metadata, $metaDataSearchValues);//pass $metaDataSearchValues by reference
+		}
+		if(count($metaDataSearchValues))
+			$searchValues[self::ELASTIC_DATA_FIELD_NAME] = $metaDataSearchValues;
+		else
+		{
+			if($objectType == MetadataObjectType::CATEGORY)
+				$searchValues[self::ELASTIC_DATA_FIELD_NAME] = null;
+			else
+				$searchValues = null;
+		}
+
+		return $searchValues; //return an array(metadata => array(...)) or null if no values
+	}
+
+	/**
+	 * Parse the XML and update the array of elasticsearch values
+	 *
+	 * @param Metadata $metadata
+	 * @param array $metaDataSearchValues
+	 */
+	public static function getDataElasticSearchValues(Metadata $metadata, array &$metaDataSearchValues)
+	{
+		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+		$xmlPath = kFileSyncUtils::getLocalFilePathForKey($key);
+
+		try{
+			$xml = new KDOMDocument();
+			$xml->load($xmlPath);
+			$xPath = new DOMXPath($xml);
+		}
+		catch (Exception $ex)
+		{
+			KalturaLog::err('Could not load metadata xml [' . $xmlPath . '] - ' . $ex->getMessage());
+			return;
+		}
+
+		$profileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadata->getMetadataProfileId());
+		$metadataId = $metadata->getId();
+
+		foreach($profileFields as $profileField)
+		{
+			$profileFieldData = array();
+			/* @var  $profileField MetadataProfileField */
+			$profileFieldData['metadata_id'] = $metadataId;
+			$profileId = $profileField->getMetadataProfileId();
+			$profileFieldData['metadata_profile_id'] = $profileId;
+			$metadataProfile = MetadataProfilePeer::retrieveByPK($profileId);
+			if($metadataProfile)
+				$systemName = $metadataProfile->getSystemName();
+
+			if($systemName)
+				$profileFieldData['system_name'] = $systemName;
+
+			$xpath = $profileField->getXpath();
+			$profileFieldData['xpath'] = $xpath;
+			$profileFieldData['metadata_field_id'] = $profileField->getId();
+
+			$nodes = $xPath->query($profileField->getXpath());
+			if(!$nodes->length)
+				continue;
+
+			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE ||
+				$profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT){
+				$node = $nodes->item(0);
+				$profileFieldData['value_int'] = intval($node->nodeValue);
+				$metaDataSearchValues[] = $profileFieldData;
+				continue;
+			}
+
+			$searchItemValues = array();
+			foreach($nodes as $node)
+				$searchItemValues[] = $node->nodeValue;
+
+			if(!count($searchItemValues))
+				continue;
+
+			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_TEXT ||
+				$profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT)
+			{
+				$profileFieldData['value_text'] = array();
+				foreach ($searchItemValues as $searchItemValue)
+				{
+					if(strlen($searchItemValue) > kElasticSearchManager::METADATA_MAX_LENGTH)
+						$searchItemValue = substr($searchItemValue, 0, kElasticSearchManager::METADATA_MAX_LENGTH);
+
+					$profileFieldData['value_text'][] = $searchItemValue;
+				}
+				if ($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT &&
+					$profileField->getRelatedMetadataProfileId())
+				{
+					$subMetadataProfileId = $profileField->getRelatedMetadataProfileId();
+					$subMetadataProfile = MetadataProfilePeer::retrieveByPK($subMetadataProfileId);
+					if (!$subMetadataProfile)
+					{
+						KalturaLog::err('Sub metadata profile '.$subMetadataProfileId .' was not found');
+						continue;
+					}
+					$subMetadataObjects = MetadataPeer::retrieveByObjects($subMetadataProfileId, $subMetadataProfile->getObjectType(), $searchItemValues);
+					foreach($subMetadataObjects as $subMetadataObject)
+					{
+						/** @var Metadata $subMetadataObject */
+						KalturaLog::info("Found metadata object for profile $subMetadataProfileId and id {$subMetadataObject->getObjectId()}, extracting elasticsearch data");
+						self::getDataElasticSearchValues($subMetadataObject, $metaDataSearchValues);
+					}
+				}
+			}
+			else
+			{
+				foreach ($searchItemValues as &$searchItemValue)
+				{
+					if(strlen($searchItemValue) > kElasticSearchManager::METADATA_MAX_LENGTH)
+						$searchItemValue = substr($searchItemValue, 0, kElasticSearchManager::METADATA_MAX_LENGTH);
+				}
+				$profileFieldData['value_text'] = $searchItemValues;
+			}
+
+			$metaDataSearchValues[] = $profileFieldData;
+		}
+	}
+
 }

@@ -193,7 +193,7 @@ class kDataCenterMgr
 			KalturaLog::log("Already exists in temp folder [{$local_file_path}]");
 		}
 
-		return file_get_contents( $local_file_path );
+		return kFile::getFileContent($local_file_path);
 	}
 
 	/*
@@ -258,7 +258,7 @@ class kDataCenterMgr
 		else
 		{
 			KalturaLog::log("Serving file from [".$resolvedPath."]");
-			kFileUtils::dumpFile( $resolvedPath );
+			kFileUtils::dumpFile( $resolvedPath , null, null, 0 ,$file_sync_resolved->getEncryptionKey(), $file_sync_resolved->getIv(), $file_sync_resolved->getFileSize());
 		}
 		
 	}

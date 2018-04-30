@@ -5,7 +5,7 @@
  */
 class thumbnailAction extends sfAction
 {
-	
+	const DEFAULT_DIMENSION = -1;
 	static private $extensions = array(
 		'jpg',
 		'gif',
@@ -63,13 +63,12 @@ class thumbnailAction extends sfAction
 		$type = $this->getIntRequestParameter("type", 1, 1, 5);
 		//Hack: if KMS sends thumbnail request containing "!" char, the type should be treated as 5.
 		
-		$width = $this->getRequestParameter("width", -1);
-		$height = $this->getRequestParameter("height", -1);
+		$width = $this->getRequestParameter("width", self::DEFAULT_DIMENSION);
+		$height = $this->getRequestParameter("height", self::DEFAULT_DIMENSION);
 		if(strpos($width, "!") || strpos($height, "!"))
 			$type = 5;
-		
-		$width = $this->getFloatRequestParameter("width", -1, -1, 10000);
-		$height = $this->getFloatRequestParameter("height", -1, -1, 10000);
+
+		list($width, $height) = $this->getDimensions();
 		
 		$nearest_aspect_ratio = $this->getIntRequestParameter("nearest_aspect_ratio", 0, 0, 1);
 		$imageFilePath = null;
@@ -97,7 +96,7 @@ class thumbnailAction extends sfAction
 		$def_width = $this->getFloatRequestParameter("def_width", -1, -1, 10000);
 		$def_height = $this->getFloatRequestParameter("def_height", -1, -1, 10000);
 		
-		if ($width == -1 && $height == -1) // for sake of backward compatibility if no dimensions where specified create 120x90 thumbnail
+		if ($width == self::DEFAULT_DIMENSION && $height == self::DEFAULT_DIMENSION) // for sake of backward compatibility if no dimensions where specified create 120x90 thumbnail
 		{
 			if ( $def_width == -1 )
 				$width = 120;
@@ -109,11 +108,11 @@ class thumbnailAction extends sfAction
 			else
 				$height = $def_height;
 		}
-		else if ($width == -1) // if only either width or height is missing reset them to zero, and convertImage will handle them
+		else if ($width == self::DEFAULT_DIMENSION) // if only either width or height is missing reset them to zero, and convertImage will handle them
 		{
 				$width = 0;
 		}
-		else if ($height == -1)
+		else if ($height == self::DEFAULT_DIMENSION)
 		{
 				$height = 0;
 		}
@@ -479,8 +478,10 @@ class thumbnailAction extends sfAction
 
 		$lastModifiedFlavor = assetPeer::retrieveLastModifiedFlavorByEntryId($entry->getId());
 		$lastModified = $lastModifiedFlavor ? $lastModifiedFlavor->getUpdatedAt(null) : null;
-
-		$renderer = kFileUtils::getDumpFileRenderer($tempThumbPath, null, $cacheAge, 0, $lastModified);
+		
+		$entryKey = kFileUtils::isFileEncrypt($tempThumbPath) ? $entry->getGeneralEncryptionKey() : null;
+		$entryIv = $entryKey ? $entry->getEncryptionIv() : null;
+		$renderer = kFileUtils::getDumpFileRenderer($tempThumbPath, null, $cacheAge, 0, $lastModified, $entryKey, $entryIv);
 		$renderer->partnerId = $entry->getPartnerId();
 		
 		if ($cache)
@@ -498,5 +499,23 @@ class thumbnailAction extends sfAction
 		
 		// TODO - can delete from disk assuming we caneasily recreate it and it will anyway be cached in the CDN
 		// however dumpfile dies at the end so we cant just write it here (maybe register a shutdown callback)
+	}
+
+	private function getDimensions()
+	{
+		$width = $this->getFloatRequestParameter("width", self::DEFAULT_DIMENSION, -1, 10000);
+		$height = $this->getFloatRequestParameter("height", self::DEFAULT_DIMENSION, -1, 10000);
+		if ($width != self::DEFAULT_DIMENSION || $height != self::DEFAULT_DIMENSION)
+			return array($width, $height);
+
+		$flavorParamsId = $this->getRequestParameter("flavor_params_id");
+		$flavorPrams = assetParamsPeer::retrieveByPK($flavorParamsId);
+
+		if ($flavorPrams)
+		{
+			$width = $flavorPrams->getWidth();
+			$height = $flavorPrams->getHeight();
+		}
+		return array($width, $height);
 	}
 }

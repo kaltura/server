@@ -20,7 +20,7 @@ class KalturaYouTubeApiCaptionDistributionInfo extends KalturaObject{
 	 * @var string
 	 */
 	public $filePath;
-	
+
 	/**
 	 * @var string
 	 */

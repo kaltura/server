@@ -327,15 +327,15 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 		$url .= "?partnerId=".$this->getPartnerId();
 		return $url;
 	}
-
-	public function getOptionalAssetDistributionRules()
+    
+	public function postInsert(PropelPDO $con = null)
 	{
+		parent::postInsert($con);
 		$ret = parent::getOptionalAssetDistributionRules();
 		if(!class_exists('CaptionPlugin') || !CaptionPlugin::isAllowedPartner($this->getPartnerId()))
 		{
 			return $ret;
 		}
-
 		$isCaptionCondition = new kAssetDistributionPropertyCondition();
 		$isCaptionCondition->setPropertyName(assetPeer::translateFieldName(assetPeer::TYPE, BasePeer::TYPE_COLNAME, BasePeer::TYPE_PHPNAME));
 		$isCaptionCondition->setPropertyValue(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
@@ -343,8 +343,7 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 		$captionDistributionRule = new kAssetDistributionRule();
 		$captionDistributionRule->setAssetDistributionConditions(array($isCaptionCondition));
 		$ret[] = $captionDistributionRule;
-
-		return $ret;
+		$this->setOptionalAssetDistributionRules($ret);
+		$this->save();
 	}
-	
 }

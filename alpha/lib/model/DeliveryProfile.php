@@ -29,16 +29,25 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	public function serve()
 	{
 		$flavors = $this->buildServeFlavors();
-		
 		if(!$flavors)
 			return null;
 		
+		$this->removeInternalUseFlavorAttr($flavors);
 		if($this->params->getEdgeServerIds() && count($this->getDynamicAttributes()->getEdgeServerIds()))
 			$this->applyFlavorsDomainPrefix($flavors);
 		
 		$renderer = $this->getRenderer($flavors);
 		
 		return $renderer;
+	}
+	
+	private function removeInternalUseFlavorAttr(&$flavors)
+	{
+		foreach ($flavors as &$currFlavor)
+		{
+			unset($currFlavor['index']);
+			unset($currFlavor['type']);
+		}
 	}
 	
 	/**
@@ -279,6 +288,15 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		return $renderer;
 	}
 	
+	protected function getAudioCodec($flavor)
+	{
+		$mediaInfoObj = $flavor->getMediaInfo();
+		if(!$mediaInfoObj)
+			return null;
+		
+		return $mediaInfoObj->getAudioCodecId();
+	}
+	
 	protected function getAudioLanguage($flavor) 
 	{
 		$lang = $flavor->getLanguage();
@@ -286,8 +304,13 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$audioLanguage = null;
 		$audioLanguageName = null;
 
+		$useTwoCodeLang = true;
+		if (kConf::hasParam('three_code_language_partners') &&
+			in_array($flavor->getPartnerId(), kConf::get('three_code_language_partners')))
+			$useTwoCodeLang = false;
+
 		if(!isset($lang)) { //for backward compatibility
-			$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavor->getId());
+			$mediaInfoObj = $flavor->getMediaInfo();
 			if (!$mediaInfoObj)
 				return null;
 
@@ -301,10 +324,14 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 
 			$audioLanguage = $parsedJson['audio'][0]['audioLanguage'];
 			$obj = languageCodeManager::getObjectFromThreeCode(strtolower($audioLanguage));
+			if($useTwoCodeLang)
+				$audioLanguage = !is_null($obj)? $obj[languageCodeManager::ISO639]: $audioLanguage;
 		}
 		else {
 			$obj = languageCodeManager::getObjectFromKalturaName($lang);
 			$audioLanguage = !is_null($obj)? $obj[languageCodeManager::ISO639_T]: $lang;
+			if($useTwoCodeLang)
+				$audioLanguage = !is_null($obj)? $obj[languageCodeManager::ISO639]: $lang;
 		}
 
 		$audioLanguageName = $this->getAudioLanguageName($obj, $audioLanguage);
@@ -332,22 +359,49 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$audioLanguage = null;
 		$audioLanguageName = null;
 		$audioLabel = null;
-		if ($flavor) {
-			if (is_callable(array($flavor, 'getFileExt'))) {
+		$audioCodec = null;
+		$isDefaultAudio = false;
+		$type = null;
+		if ($flavor) 
+		{
+			$type = $flavor->getType();
+			
+			if (is_callable(array($flavor, 'getFileExt'))) 
+			{
 				$ext = $flavor->getFileExt();
 			}
+			
 			//Extract the audio language code from flavor
-			if ($flavor->hasTag(assetParams::TAG_AUDIO_ONLY)) {
-				if(is_callable(array($flavor, 'getLabel'))) {
+			if ($flavor->hasTag(assetParams::TAG_AUDIO_ONLY)) 
+			{
+				if(is_callable(array($flavor, 'getLabel'))) 
+				{
 					$audioLabel = $flavor->getLabel();
 				}
+				
 				$audioLanguageData = $this->getAudioLanguage($flavor);
-				if (!$audioLanguageData) {
+				
+				if (!$audioLanguageData) 
+				{
 					$audioLanguage = 'und';
 					$audioLanguageName = 'Undefined';
 				}
-				else {
+				else 
+				{
 					list($audioLanguage, $audioLanguageName) = $audioLanguageData;
+				}
+				
+				$audioCodec = $this->getAudioCodec($flavor);
+				if(!$audioCodec)
+					$audioCodec = "und";
+				
+				if($this->params->getDefaultAudioLanguage())
+				{
+					$isDefaultAudio = $this->isDefaultAudio($audioLanguage, $audioLanguageName, $audioLabel);
+				}
+				elseif(is_callable(array($flavor, 'getDefault')))
+				{
+					$isDefaultAudio = $flavor->getDefault();
 				}
 			}
 		}
@@ -360,6 +414,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		}
 	
 		$bitrate = ($flavor && is_callable(array($flavor, 'getVideoBitrate')) ? $flavor->getVideoBitrate() : 0);
+		$frameRate = ($flavor && is_callable(array($flavor, 'getFrameRate')) ? $flavor->getFrameRate() : 0);
 		$width =   ($flavor ? $flavor->getWidth()   : 0);
 		$height =  ($flavor ? $flavor->getHeight()  : 0);
 
@@ -373,7 +428,23 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				'audioLanguage' => $audioLanguage,
 				'audioLanguageName' => $audioLanguageName,
 				'audioLabel' => $audioLabel,
+				'audioCodec' => $audioCodec,
+				'defaultAudio' => $isDefaultAudio,
+				'type' => $type,
+				'frameRate' => $frameRate,
 			);
+	}
+	
+	protected function isDefaultAudio($audioLanguage = null, $audioLanguageName = null, $audioLabel = null)
+	{
+		$isDefaultAudio = false;
+		
+		if(	($audioLanguage && $audioLanguage != 'und' && $audioLanguage == $this->params->getDefaultAudioLanguage()) ||
+			($audioLanguageName && $audioLanguageName != 'Undefined' && $audioLanguageName == $this->params->getDefaultAudioLanguage()) ||
+			$audioLabel && $audioLabel == $this->params->getDefaultAudioLanguage() )
+			$isDefaultAudio = true;
+		
+		return $isDefaultAudio;
 	}
 	
 	public function getCacheInvalidationKeys()
@@ -406,7 +477,10 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			KalturaLog::debug("No active delivery nodes found among the requested edge list: " . print_r($deliveryNodeIds, true));
 			return null;
 		}
-		
+	
+	        /* Shuffle the array to randomize the assigned KES, if more than one in the same rule */
+		shuffle($deliveryNodes);
+	
 		$deliveryNode = null;
 		foreach ($deliveryNodes as $node)
 		{

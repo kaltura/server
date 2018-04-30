@@ -1,7 +1,5 @@
 <?php
 /*
- * Copyright 2010 Google Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -51,6 +49,7 @@ class Google_Service_Autoscaler extends Google_Service
   public function __construct(Google_Client $client)
   {
     parent::__construct($client);
+    $this->rootUrl = 'https://www.googleapis.com/';
     $this->servicePath = 'autoscaler/v1beta2/';
     $this->version = 'v1beta2';
     $this->serviceName = 'autoscaler';
@@ -134,13 +133,13 @@ class Google_Service_Autoscaler extends Google_Service
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),'patch' => array(
@@ -251,13 +250,13 @@ class Google_Service_Autoscaler extends Google_Service
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),
@@ -283,13 +282,13 @@ class Google_Service_Autoscaler extends Google_Service
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxResults' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),
@@ -367,8 +366,8 @@ class Google_Service_Autoscaler_Autoscalers_Resource extends Google_Service_Reso
    * @param array $optParams Optional parameters.
    *
    * @opt_param string filter
-   * @opt_param string pageToken
    * @opt_param string maxResults
+   * @opt_param string pageToken
    * @return Google_Service_Autoscaler_AutoscalerListResponse
    */
   public function listAutoscalers($project, $zone, $optParams = array())
@@ -467,8 +466,8 @@ class Google_Service_Autoscaler_ZoneOperations_Resource extends Google_Service_R
    * @param array $optParams Optional parameters.
    *
    * @opt_param string filter
-   * @opt_param string pageToken
    * @opt_param string maxResults
+   * @opt_param string pageToken
    * @return Google_Service_Autoscaler_OperationList
    */
   public function listZoneOperations($project, $zone, $optParams = array())
@@ -497,8 +496,8 @@ class Google_Service_Autoscaler_Zones_Resource extends Google_Service_Resource
    * @param array $optParams Optional parameters.
    *
    * @opt_param string filter
-   * @opt_param string pageToken
    * @opt_param string maxResults
+   * @opt_param string pageToken
    * @return Google_Service_Autoscaler_ZoneList
    */
   public function listZones($project, $optParams = array())

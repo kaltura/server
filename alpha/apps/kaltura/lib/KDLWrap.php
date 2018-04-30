@@ -24,6 +24,8 @@ class KDLWrap
 		conversionEngineType::EXPRESSION_ENCODER3=>KDLTranscoders::EE3,
 			
 		"quickTimeTools.QuickTimeTools"=>KDLTranscoders::QUICK_TIME_PLAYER_TOOLS,
+		//CHUNKED_FFMPEG is a special case, it is not porcessed (yet) by the KDL
+		conversionEngineType::CHUNKED_FFMPEG=>conversionEngineType::CHUNKED_FFMPEG,
 	);
 	
 	/* ------------------------------
@@ -91,6 +93,7 @@ class KDLWrap
 	 */
 	private function generateTargetFlavors(mediaInfo $cdlMediaInfo=null, $cdlFlavorList)
 	{
+
 		$mediaSet = new KDLMediaDataSet();
 		if($cdlMediaInfo!=null) {
 			self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $mediaSet);
@@ -103,6 +106,7 @@ class KDLWrap
 			 */
 		$isForWideVine = false;
 		foreach($cdlFlavorList as $cdlFlavor) {
+
 			$kdlFlavor = self::ConvertFlavorCdl2Kdl($cdlFlavor);
 			if ($kdlFlavor->_errors)
 			{
@@ -136,35 +140,96 @@ class KDLWrap
 			else
 				$this->_rv = true;
 		}
+
+		foreach ($trgList as $trg)
+		{
+			KalturaLog::log("...T-->" . $trg->ToString());
 			/*
-			 * For 'passthrough' quick&dirty
-			 
-		if(isset($mediaSet->_container) && $mediaSet->_container->_id=="arf")
-			$isArf = true;
-		else
-			$isArf = false;
-			*/
-		foreach ($trgList as $trg){
-			KalturaLog::log("...T-->".$trg->ToString());
-				/*
-				 *  NOT COMMITED, to check with KDLFalvor
-				 *
-			if($trg->IsValid()==false && ($trg->_flags & KDLFlavor::MissingContentNonComplyFlagBit)) {
-				continue;
+			 *  NOT COMMITED, to check with KDLFalvor
+			 *
+		if($trg->IsValid()==false && ($trg->_flags & KDLFlavor::MissingContentNonComplyFlagBit)) {
+			continue;
+		}
+		*/
+			/*
+			 * Handle Chunked-Encode cases
+			 */
+			if ($trg->_cdlObject->getChunkedEncodeMode() == 1) {
+				$tmpTrans = clone $trg->_transcoders[0];
+				if($tmpTrans->_id==KDLTranscoders::FFMPEG) {
+					/*
+					 * Check compliance to Chunked Encoding requirements
+					 */
+					$vcodec = isset($trg->_video->_id)? $trg->_video->_id: null;
+					$acodec = isset($trg->_audio->_id)? $trg->_audio->_id: null;
+					$format = isset($trg->_container->_id)? $trg->_container->_id: null;
+					$fps 	= isset($trg->_video->_frameRate)? $trg->_video->_frameRate: null;
+					$gop 	= isset($trg->_video->_gop)? $trg->_video->_gop: null;
+					$duration = isset($trg->_container->_duration)? round($trg->_container->_duration/1000): null;;
+					$height = isset($trg->_video->_height)? $trg->_video->_height: null;
+					$msgStr = null;
+					$rv=KChunkedEncode::verifySupport($vcodec,$acodec,$format,$fps,$gop,$duration,$height,$msgStr);
+					if($rv===true){
+						$tmpTrans->_id=conversionEngineType::CHUNKED_FFMPEG;
+						array_unshift($trg->_transcoders,$tmpTrans);
+					}
+					else {
+						KalturaLog::log($msgStr);
+					}
+				}
 			}
-			*/
+
 			$cdlFlvrOut = self::ConvertFlavorKdl2Cdl($trg);
-			
-			/*
-			 * 'passthrough' temporal, quick&dirty implementation to support imitation of 
-			 * 'auto-inter-src' for webex/arf.
-			 
-			if($isArf==false && isset($trg->_transcoders)
-			&& $trg->_transcoders[0]->_id=="webexNbrplayer.WebexNbrplayer"){
-				$cdlFlvrOut->_passthrough=true;
-			}*/
+			// Handle audio streams for ffmpeg command in case we are handling trimming a source with flavor_params -1
+			// in case we need to handle multiple audio streams we need to remove the "-map_metadata -1" command
+			// and replace it with the language mapping for the correct audio streams
+			// if only audio streams exist without video we ignore the video mapping
+			if (($cdlFlvrOut->getFlavorParamsId() == kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID || $cdlFlvrOut->getFlavorParamsId() === assetParamsPeer::TEMP_FLAVOR_PARAM_ID)
+				&& !is_null($cdlMediaInfo))
+			{
+				$contentStreams = json_decode($cdlMediaInfo->getContentStreams(), true);
+				$command = null;
+				if ($contentStreams != null && isset($contentStreams['audio']) && count($contentStreams['audio']) > 1)
+				{
+					if (isset($contentStreams['video']))
+						$command .= '-map v ';
+
+					$command .= '-map a ';
+					foreach ($contentStreams['audio'] as $audioStream)
+					{
+						if (isset($audioStream['id']) && isset($audioStream['audioLanguage']))
+							$command .= "-metadata:s:0:{$audioStream['id']} language={$audioStream['audioLanguage']} ";
+					}
+				}
+				
+				$cmdLines = $cdlFlvrOut->getCommandLines();
+				foreach ($cmdLines as $key => $cmdLine)
+				{
+					if (($key == conversionEngineType::FFMPEG || $key == conversionEngineType::FFMPEG_AUX) && $command != null)
+					{
+						/***
+						 * assetParamsPeer::TEMP_FLAVOR_PARAM_ID (-2 ) is a temporary flvor param id of type mpegts
+						 * we created it for clip \ concat flow only and we do not save it to the DB
+						 * in this flavor we do not have the -map_metadata -1(as it is added in KDLOperatorFfmpeg2_1_3)
+						 *  but we still want to add the map section to the ffmpeg engine so we will not loose multi audio
+						 * as such we concat to the '-f mpegts' the audio\video mapping
+						 */
+						if ($cdlFlvrOut->getFlavorParamsId() === assetParamsPeer::TEMP_FLAVOR_PARAM_ID)
+						{
+							$cmdLines[$key] = str_replace('-f mpegts', $command . ' -f mpegts', $cmdLine);
+						}
+						else
+						{
+							$cmdLines[$key] = str_replace('-map_metadata -1', $command, $cmdLine);
+						}
+					}
+				}
+				$cdlFlvrOut->setCommandLines($cmdLines);
+			}
 			$this->_targetList[] = $cdlFlvrOut;
 		}
+
+
 		return $this;
 	}
 

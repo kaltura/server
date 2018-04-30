@@ -352,8 +352,14 @@ class entryPeer extends BaseentryPeer
 		$filter->setPartnerSearchScope($partnerId);
 		$filter->setDisplayInSearchEquel(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$filter->attachToCriteria($c);
-		
-		return self::doSelect($c);
+
+		$parentEntry = entryPeer::retrieveByPK($parentId);
+		if($parentEntry)
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+		$res = self::doSelect($c);
+		if($parentEntry)
+			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+		return $res;
 	}
 
 	public static function setFilterdCategoriesIds($filteredCategoriesIds)
@@ -425,6 +431,10 @@ class entryPeer extends BaseentryPeer
 			$critEntitled->addTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		}
 
+		//we need to set the filter before getDisableEntitlementForEntry since otherwise the partner criteria will not be added to $c,
+		//it will be added to some other criteria object which will get disposed once setFilter is called
+		self::$s_criteria_filter->setFilter($c);
+
 		if($ks && count($ks->getDisableEntitlementForEntry()))
 		{
 			$entryCrit = $c->getNewCriterion(entryPeer::ENTRY_ID, $ks->getDisableEntitlementForEntry(), Criteria::IN);
@@ -443,7 +453,6 @@ class entryPeer extends BaseentryPeer
 		if($critEntitled)
 			$c->addAnd ($critEntitled);
 
-		self::$s_criteria_filter->setFilter($c);
 	}
 
 	public static function getDefaultCriteriaFilter()

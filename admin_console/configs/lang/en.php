@@ -64,10 +64,15 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::RECALCULATE_CACHE' => 'Recalculate Cache',
 	'Kaltura_Client_Enum_BatchJobType::PARSE_MULTI_LANGUAGE_CAPTION_ASSET' => 'Parse Multi Language Caption Asset',
 	'Kaltura_Client_Enum_BatchJobType::LIVE_TO_VOD' => 'Live To Vod',
+	'Kaltura_Client_Enum_BatchJobType::CLEAR_BEACONS' => 'Clear Beacons',
+	'Kaltura_Client_Enum_BatchJobType::COPY_CAPTIONS' => 'Copy Caption Assets',
+	'Kaltura_Client_Enum_BatchJobType::USERS_CSV' => 'Users Csv',
+	'Kaltura_Client_Enum_BatchJobType::COPY_CUE_POINTS' => 'Copy cue Points',
 
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_AUX' => 'Convert - FFMpeg Aux',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_VP8' => 'Convert - FFMpeg Vp8',
+	'Kaltura_Client_Enum_ConversionEngineType::CHUNKED_FFMPEG' => 'Convert - Chunked FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::ON2' => 'Convert - On2',
 	'Kaltura_Client_Enum_ConversionEngineType::MENCODER' => 'Convert - MEncoder',
 	'Kaltura_Client_Enum_ConversionEngineType::ENCODING_COM' => 'Convert - Encoding.com',
@@ -94,6 +99,7 @@ return array(
 	'Kaltura_Client_Enum_ConversionEngineType::VLC' => 'Convert - VLC',
 	'Kaltura_Client_Enum_ConversionEngineType::WEBEX_NBRPLAYER' => 'Convert - Webex',
 	'Kaltura_Client_Enum_ConversionEngineType::WIDEVINE' => 'Convert - Widevine',
+	'Kaltura_Client_Enum_ConversionEngineType::THUMB_ASSETS' => 'Convert - Thumbnail Assets',
 
 	'Kaltura_Client_Enum_BatchJobStatus::PENDING' => 'Pending',
 	'Kaltura_Client_Enum_BatchJobStatus::QUEUED' => 'Started',
@@ -450,7 +456,7 @@ return array(
 	'entry-investigate info entry created label' => 'Created At',
 	'entry-investigate info entry modified label' => 'Modified At',
 	'entry-investigate info entry updated label' => 'Updated At',
-	'entry-investigate info entry actions label' => 'Reconvert',
+	'entry-investigate info entry actions label' => 'Action',
 	'entry-investigate info entry boost label' => 'Boost Jobs',
 
 	'entry-investigate info entry ip1 label' => 'IP 1',
@@ -475,6 +481,7 @@ return array(
 	'entry-investigate info entry big-red-button label' => 'Big-Red-Button',
 
 	'entry-investigate entry reconvert' => 'Reconvert',
+	'entry-investigate entry restore' => 'Restore',
 	'entry-investigate entry boostJobs' => 'Boost Jobs',
 
 	'entry-investigate entry upload support' => 'Investigate File',
@@ -618,6 +625,7 @@ return array(
 	'entry-investigate history data th' => 'Data',
 	'entry-investigate history status th' => 'Status (failure reason)',
 	'entry-investigate history status tooltip' => 'The status of this task. The task status is one of the following: Waiting, In Process, completed, Failed',
+	'entry-investigate history object th' => 'Object',
 	'entry-investigate history abort th' => 'Aborted',
 	'entry-investigate history recheck th' => 'Check Again',
 	'entry-investigate history msg th' => 'Message',
@@ -1044,7 +1052,12 @@ return array(
 	'Kaltura_Client_ContentDistribution_Enum_DistributionFieldRequiredStatus::REQUIRED_BY_PARTNER' => 'Required By Partner',
 	'Kaltura_Client_ContentDistribution_Enum_DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER' => 'Required By Provider',
 	'Kaltura_Client_ContentDistribution_Enum_DistributionFieldRequiredStatus::REQUIRED_FOR_AUTOMATIC_DISTRIBUTION' => 'Required for Automatic Distribution',
-	
+
+	'Kaltura_Client_ContentDistribution_Enum_DistributionFieldType::STRING' => 'String',
+	'Kaltura_Client_ContentDistribution_Enum_DistributionFieldType::INT' => 'Int',
+	'Kaltura_Client_ContentDistribution_Enum_DistributionFieldType::LONG' => 'Long',
+	'Kaltura_Client_ContentDistribution_Enum_DistributionFieldType::TIMESTAMP' => 'Timestamp',
+
 	'Kaltura_Client_AdminConsole_Enum_TrackEntryEventType::UPLOADED_FILE' => 'Uploaded File',
 	'Kaltura_Client_AdminConsole_Enum_TrackEntryEventType::WEBCAM_COMPLETED' => 'Webcam Completed',
 	'Kaltura_Client_AdminConsole_Enum_TrackEntryEventType::IMPORT_STARTED' => 'Import Started',
@@ -1072,11 +1085,11 @@ return array(
 	// Distibution
 	'provider-list intro text'	=>	'Here you can define and manage generic distribution settings to be used in several Distribution Profiles. To have these settings available for all publisher accounts, define the setting to publisher ID: 0',
 	'distribution-profiles intro text' =>	'Here you can manage the Distribution profiles on your Kaltura video platform deployment',
-    'are you sure delete the profile?' => 'Are you sure you want to delete this profile?',   
+    'are you sure delete the profile?' => 'Are you sure you want to delete this profile?',
     'distribution-profile was removed' => 'Distribution profile was removed.' ,
     'distribution-profile was disabled' => 'Distribution profile disabled.',
     'distribution-profile was enabled' => 'Distribution profile enabled.',
-	
+
 	//Media Repurposing
 	'Media Repurposing list intro text' => 'Here you can manage the Media Repurposing profiles on your Kaltura video platform deployment',
 
@@ -1117,7 +1130,7 @@ return array(
 	// Virus Scan
 	'Kaltura_Client_VirusScan_Enum_VirusScanProfileStatus::DISABLED' => 'Disabled',
 	'Kaltura_Client_VirusScan_Enum_VirusScanProfileStatus::ENABLED' => 'Enabled',
-	
+
 	'Kaltura_Client_VirusScan_Enum_VirusFoundAction::NONE' => 'None',
 	'Kaltura_Client_VirusScan_Enum_VirusFoundAction::DELETE' => 'Delete',
 	'Kaltura_Client_VirusScan_Enum_VirusFoundAction::CLEAN_NONE' => 'Clean none',
@@ -1151,8 +1164,8 @@ return array(
 	'Kaltura_Client_Enum_UserRoleStatus::ACTIVE' => 'active',
 	'Kaltura_Client_Enum_UserRoleStatus::BLOCKED' => 'blocked',
 	'Kaltura_Client_Enum_UserRoleStatus::DELETED' => 'deleted',
-	
-	
+
+
 	// event notifications config
 	'event notification templates intro text' => 'Here you can manage the event notification templates on your Kaltura video platform deployment',
 	'event notification templates configure intro text' => 'Here you can manage the event notification template',
@@ -1222,8 +1235,10 @@ return array(
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::SCHEDULE_EVENT' => 'ScheduleEvent',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::SCHEDULE_RESOURCE' => 'ScheduleResource',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::SCHEDULE_EVENT_RESOURCE' => 'ScheduleEventResource',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::LIVE_STREAM' => 'Live Stream',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::SERVER_NODE' => 'Server Node',
 
-	
+
 	'Kaltura_Client_EmailNotification_Enum_EmailNotificationFormat::HTML' => 'HTML',
 	'Kaltura_Client_EmailNotification_Enum_EmailNotificationFormat::TEXT' => 'Text',
 
@@ -1237,7 +1252,7 @@ return array(
 	'Kaltura_Client_Drm_Enum_DrmProviderType::PLAY_READY' => 'Play Ready',
 	'Kaltura_Client_Drm_Enum_DrmProviderType::CENC' => 'CENC',
 	'Kaltura_Client_Drm_Enum_DrmProviderType::FAIRPLAY' => 'Fairplay',
-		
+
 	// Delivery profiles
 	'delivery-profiles-configuration intro text' => "Here you can configure your delivery profiles",
 	'delivery-profiles-configuration results count' => "Results",
@@ -1292,13 +1307,14 @@ return array(
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_DASH" => "VOD_PACKAGER_DASH",
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HDS" => "VOD_PACKAGER_HDS",
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HLS" => "VOD_PACKAGER_HLS",
+	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_HLS_MANIFEST" => "VOD_PACKAGER_HLS_MANIFEST",
 	"Kaltura_Client_Enum_DeliveryProfileType::VOD_PACKAGER_MSS" => "VOD_PACKAGER_MSS",
-	
+
 	"Kaltura_Client_Enum_DeliveryStatus::ACTIVE" => "Active",
 	"Kaltura_Client_Enum_DeliveryStatus::DELETED" => "Deleted",
 	"Kaltura_Client_Enum_DeliveryStatus::STAGING_IN" => "Staging-in",
 	"Kaltura_Client_Enum_DeliveryStatus::STAGING_OUT" => "Staging-out",
-	
+
 	"Kaltura_Client_Enum_PlaybackProtocol::APPLE_HTTP" => "APPLE_HTTP",
 	"Kaltura_Client_Enum_PlaybackProtocol::APPLE_HTTP_TO_MC" => "APPLE_HTTP_TO_MC",
 	"Kaltura_Client_Enum_PlaybackProtocol::AUTO" => "auto",
@@ -1312,7 +1328,7 @@ return array(
 	"Kaltura_Client_Enum_PlaybackProtocol::RTMP" => "RTMP",
 	"Kaltura_Client_Enum_PlaybackProtocol::RTSP" => "RTSP",
 	"Kaltura_Client_Enum_PlaybackProtocol::SILVER_LIGHT" => "SILVER_LIGHT",
-	
+
 	"Kaltura_Client_Type_UrlTokenizerAkamaiSecureHd" => "Akamai Secure HD",
 	'Kaltura_Client_Type_UrlTokenizer'	=> 'Default tokenizer',
 	'Kaltura_Client_Type_UrlTokenizerAkamaiHttp'	=> 'Akamai Http Tokenizer',
@@ -1327,9 +1343,9 @@ return array(
 	'Kaltura_Client_Type_UrlTokenizerVnpt'        => 'Vnpt Tokenizer',
 	'Kaltura_Client_Type_UrlTokenizerCht'		=> 'CHT Tokenizer',
 	'Kaltura_Client_Type_UrlTokenizerChinaCache'		=> 'ChinaCache Tokenizer',
-	
+
 	'Kaltura_Client_Type_UrlRecognizer' => "default recognizer",
-    
+
     'Kaltura_Client_Enum_VideoCodec::NONE'=>'NONE',
     'Kaltura_Client_Enum_VideoCodec::APCH'=>'APCH',
     'Kaltura_Client_Enum_VideoCodec::APCN'=>'APCN',

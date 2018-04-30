@@ -55,6 +55,10 @@ class QuizUserEntry extends UserEntry{
 		$numOfCorrectAnswers = 0;
 		foreach ($questions as $question)
 		{
+			/* @var QuestionCuePoint $question*/
+			if ($question->getExcludeFromScore())
+				continue;
+
 			$optionalAnswers = $question->getOptionalAnswers();
 			$answers = array();
 			if (isset($answerIds[$question->getId()]))
@@ -101,6 +105,11 @@ class QuizUserEntry extends UserEntry{
 			}
 		}
 		return array($totalPoints, $userPoints);
+	}
+
+	public function checkAlreadyExists()
+	{
+		return false;
 	}
 
 }

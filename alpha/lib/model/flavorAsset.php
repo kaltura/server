@@ -15,6 +15,7 @@ class flavorAsset extends exportableAsset
 	const KALTURA_TOKEN_PARAM_NAME = '/kt/';
 	const CUSTOM_DATA_FIELD_LANGUAGE = "language";
 	const CUSTOM_DATA_FIELD_LABEL = "label";
+	const CUSTOM_DATA_FIELD_DEFAULT = "default";
 	
 	/**
 	 * Applies default values to this object.
@@ -163,6 +164,8 @@ class flavorAsset extends exportableAsset
 		$this->setBitrate($fromAsset->getBitrate());
 		$this->setFrameRate($fromAsset->getFrameRate());
 		$this->setVideoCodecId($fromAsset->getVideoCodecId());
+		$this->setLabel($fromAsset->getLabel());
+		$this->setLanguage($fromAsset->getLanguage());
 	}
 	
 	public function getInterFlowCount() { return $this->getFromCustomData("interFlowCount"); }
@@ -183,6 +186,9 @@ class flavorAsset extends exportableAsset
 
 	public function getLabel()  {return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LABEL); }
 	public function setLabel($v){$this->putInCustomData(self::CUSTOM_DATA_FIELD_LABEL, $v);}
+	
+	public function getDefault()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DEFAULT, null, false);}
+	public function setDefault($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_DEFAULT, (bool)$v);}
 
 	/**
 	 * @param int $type
@@ -312,4 +318,53 @@ class flavorAsset extends exportableAsset
 		$copyObj->setLanguage($this->getLanguage());
 		$copyObj->setLabel($this->getLabel());
 	}
+
+	public function shouldEncrypt()
+	{
+		$entry = $this->getentry();
+		return ($entry && ($entry->getType() == entryType::DOCUMENT));
+	}
+
+	protected function setLanguageFromFlavorParams()
+	{
+		$flavorParams = $this->getFlavorParams();
+		if (!$flavorParams)
+			return null;
+		$multiStream = $flavorParams->getMultiStream();
+		if (isset($multiStream))
+		{
+			$multiStreamObj = json_decode($multiStream);
+			if (isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages) > 0)
+			{
+				$flavorLang = $multiStreamObj->audio->languages[0];
+				$this->setLanguage($flavorLang);
+				return $flavorLang;
+			}
+		}
+		return null;
+	}
+
+	public function preSave(PropelPDO $con = null)
+	{
+		if ($this->isColumnModified(assetPeer::FLAVOR_PARAMS_ID))
+		{
+			$flavorLang = $this->setLanguageFromFlavorParams();
+			if ($flavorLang)
+			{
+				$entry = $this->getentry();
+				if (!$entry)
+					throw new kCoreException("Invalid entry id [" . $this->getEntryId() . "]", APIErrors::INVALID_ENTRY_ID);
+				$conversionProfile = $entry->getconversionProfile2();
+				if ($conversionProfile->getDefaultAudioLang() == $flavorLang)
+				{
+					$this->setDefault(true);
+				}
+
+			}
+
+		}
+		return parent::preSave($con);
+	}
+
+
 }

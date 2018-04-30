@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `access_control` (
   `prv_restrict_length` int(11) DEFAULT NULL,
   `kdir_restrict_type` tinyint(4) DEFAULT NULL,
   `custom_data` text,
-  `rules` text,
+  `rules` mediumtext,
   PRIMARY KEY (`id`),
   KEY `partner_id` (`partner_id`,`deleted_at`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -315,8 +315,7 @@ CREATE TABLE IF NOT EXISTS `caption_asset_item` (
   `start_time` int(11) DEFAULT NULL,
   `end_time` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `caption_asset` (`caption_asset_id`),
-  KEY `partner_caption_asset` (`partner_id`,`caption_asset_id`)
+  KEY `caption_asset` (`caption_asset_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `category` */
@@ -780,10 +779,7 @@ CREATE TABLE IF NOT EXISTS `entry` (
   `available_from` datetime DEFAULT NULL,
   `last_played_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `kshow_created_index` (`kshow_id`,`created_at`),
   KEY `int_id_index` (`int_id`),
-  KEY `entry_FI_2` (`kuser_id`),
-  KEY `status_created_index` (`status`,`created_at`),
   KEY `partner_status_index` (`partner_id`,`status`),
   KEY `updated_at_index` (`updated_at`),
   KEY `partner_created_at` (`partner_id`,`created_at`)
@@ -887,7 +883,7 @@ CREATE TABLE IF NOT EXISTS `file_sync` (
   `partner_id` int(11) DEFAULT NULL,
   `object_type` int(4) DEFAULT NULL,
   `object_id` varchar(20) DEFAULT NULL,
-  `version` varchar(20) DEFAULT NULL,
+  `version` int(11) DEFAULT NULL,
   `object_sub_type` tinyint(4) DEFAULT NULL,
   `dc` int(11) DEFAULT NULL,
   `original` tinyint(4) DEFAULT NULL,
@@ -1134,7 +1130,7 @@ CREATE TABLE IF NOT EXISTS `generic_distribution_provider_action` (
 /*Table structure for table `invalid_session` */
 
 CREATE TABLE IF NOT EXISTS `invalid_session` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `ks` varchar(300) DEFAULT NULL,
   `ks_valid_until` datetime DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
@@ -2451,8 +2447,10 @@ CREATE TABLE app_token
 	session_privileges TEXT,
 	token TEXT,
 	custom_data TEXT,
+  kuser_id INTEGER,
 	PRIMARY KEY (id),
-	KEY int_id_index (int_id)
+  KEY int_id_index (int_id),
+  KEY kuser_id (kuser_id)
 )ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE entry_server_node

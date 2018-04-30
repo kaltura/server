@@ -38,7 +38,7 @@ class KAsyncParseMultiLanguageCaptionAsset extends KJobHandlerWorker
 		$entryId = $data->entryId;
 		$fileLoc = $data->fileLocation;
 
-		$xmlString = file_get_contents($fileLoc);
+		$xmlString = kEncryptFileUtils::getEncryptedFileContent($fileLoc, $data->fileEncryptionKey,kConf::get("encryption_iv"));
 		if (!$xmlString)
 		{
 			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, 'UNABLE_TO_GET_FILE' , "Error: " . 'UNABLE_TO_GET_FILE', KalturaBatchJobStatus::FAILED, $data);

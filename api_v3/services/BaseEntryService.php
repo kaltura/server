@@ -13,28 +13,14 @@ class BaseEntryService extends KalturaEntryService
      */
     public function initService($serviceId, $serviceName, $actionName)
     {
-        parent::initService($serviceId, $serviceName, $actionName);
+	    parent::initService($serviceId, $serviceName, $actionName);
         $partner = PartnerPeer::retrieveByPK($this->getPartnerId());
         if ($actionName == "anonymousRank" && $partner->getEnabledService(KalturaPermissionName::FEATURE_LIKE))
         {
             throw new KalturaAPIException(KalturaErrors::ACTION_FORBIDDEN, "anonymousRank");
         }
     }
-    
-	/* (non-PHPdoc)
-	 * @see KalturaBaseService::globalPartnerAllowed()
-	 */
-	protected function globalPartnerAllowed($actionName)
-	{
-		if($actionName == 'getContextData')
-			return true;
 
-		if($actionName == 'getPlaybackContext')
-			return true;
-		
-		return parent::globalPartnerAllowed($actionName);
-	}
-	
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::kalturaNetworkAllowed()
 	 */
@@ -421,7 +407,15 @@ class BaseEntryService extends KalturaEntryService
 			case entryType::MEDIA_CLIP:
 				$service = new MediaService();
     			$service->initService('media', 'media', $this->actionName);
-				$service->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
+				try
+				{
+					$service->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
+				}
+				catch (kCoreException $e)
+				{
+					if ($e->getCode()==kCoreException::SOURCE_FILE_NOT_FOUND)
+						throw new KalturaAPIException(APIErrors::SOURCE_FILE_NOT_FOUND);
+				}
 		    	$baseEntry->fromObject($dbEntry, $this->getResponseProfile());
     			return $baseEntry;
 			case entryType::MIX:
@@ -891,11 +885,13 @@ class BaseEntryService extends KalturaEntryService
 	 * @return KalturaBaseEntry The cloned entry
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	public function cloneAction( $entryId, $cloneOptions=null)
+	public function cloneAction( $entryId, $cloneOptions=null )
 	{
-		// Reset criteria filters such that it will be
-		entryPeer::setUseCriteriaFilter(false);
-		categoryEntryPeer::setUseCriteriaFilter(false);
+		if(kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
+		{
+			entryPeer::setUseCriteriaFilter(false);
+			categoryEntryPeer::setUseCriteriaFilter(false);
+		}
 
 		// Get the entry
 		$coreEntry = entryPeer::retrieveByPK( $entryId );
@@ -913,6 +909,7 @@ class BaseEntryService extends KalturaEntryService
 
 		// Copy the entry into a new one based on the given partner data.
 		$clonedEntry = myEntryUtils::copyEntry($coreEntry, $this->getPartner(), $coreClonedOptionsArray);
+
 		return $this->getEntry($clonedEntry->getId());
 	}
 

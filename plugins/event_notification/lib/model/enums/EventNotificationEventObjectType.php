@@ -38,4 +38,7 @@ interface EventNotificationEventObjectType extends BaseEnum
 	const USERROLE = 35;
 	const WIDGET = 36;
 	const CATEGORYENTRY = 37;
+	const LIVE_STREAM = 38;
+	const SERVER_NODE = 39;
+	const ENTRY_SERVER_NODE = 40;
 }

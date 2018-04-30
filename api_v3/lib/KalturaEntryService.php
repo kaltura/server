@@ -11,18 +11,7 @@ class KalturaEntryService extends KalturaBaseService
 	
 	  //amount of time for holding kLock
 	  const KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT = 7;
-	
-	/* (non-PHPdoc)
-	 * @see KalturaBaseService::globalPartnerAllowed()
-	 */
-	protected function globalPartnerAllowed($actionName)
-	{
-		if($actionName == 'get')
-			return true;
-		
-		return parent::globalPartnerAllowed($actionName);
-	}
-	
+
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		$ks = kCurrentContext::$ks_object ? kCurrentContext::$ks_object : null;
@@ -144,7 +133,11 @@ class KalturaEntryService extends KalturaBaseService
 		$tempDbEntry->setIsTemporary(true);
 		$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$tempDbEntry->setReplacedEntryId($dbEntry->getId());
-		
+
+		$kResource = $resource->toObject();
+		if ($kResource->getType() == 'kOperationResource')
+			$tempDbEntry->setTempTrimEntry(true);
+
 		$tempDbEntry = $this->prepareEntryForInsert($tempMediaEntry, $tempDbEntry);
 		$tempDbEntry->setPartnerId($dbEntry->getPartnerId());
 		$tempDbEntry->save();
@@ -154,8 +147,7 @@ class KalturaEntryService extends KalturaBaseService
 		if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL) || $dbEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 			$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
 		$dbEntry->save();
-		
-		$kResource = $resource->toObject();
+
 		$this->attachResource($kResource, $tempDbEntry);
 	}
 	
@@ -424,12 +416,26 @@ class KalturaEntryService extends KalturaBaseService
 			entryStatus::NO_CONTENT,
 		);
 		
+		$entryUpdated = false;
 		if(in_array($dbEntry->getStatus(), $lowerStatuses))
 		{
 			$dbEntry->setStatus(entryStatus::IMPORT);
-			$dbEntry->save();
+			$entryUpdated = true;
 		}
-			
+		
+		if($dbEntry->getMediaType() == null && $dbEntry->getType() == entryType::MEDIA_CLIP)
+		{
+			$mediaType = $resource->getMediaType();
+			if($mediaType)
+			{
+				$dbEntry->setMediaType($mediaType);
+				$entryUpdated = true;
+			}
+		}
+		
+		if($entryUpdated)
+			$dbEntry->save();
+		
 		// TODO - move image handling to media service
 		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
@@ -652,54 +658,79 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function attachOperationResource(kOperationResource $resource, entry $dbEntry, asset $dbAsset = null)
 	{
-		$isNewAsset = false;
-		$isSource = false;
-		if($dbAsset)
+		$errDescription = '';
+		$operationAttributes = $resource->getOperationAttributes();
+		$srcEntry = self::getEntryFromContentResource($resource->getResource());
+		$isLiveClippingFlow = $srcEntry && myEntryUtils::isLiveClippingEntry($srcEntry);
+
+		if (kClipManager::isMultipleClipOperation($operationAttributes))
 		{
-			if($dbAsset instanceof flavorAsset)
-				$isSource = $dbAsset->getIsOriginal();
+			if ($isLiveClippingFlow)
+				throw new KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_OPERATION, "MultiClip");
+			$clipManager = new kClipManager();
+			$this->handleMultiClipRequest($resource,$dbEntry, $clipManager, $operationAttributes);
+			return $dbAsset;
+
 		}
 		else
 		{
-			$isNewAsset = true;
-			$isSource = true;
-			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
+			$isNewAsset = false;
+			$isSource = false;
+			if($dbAsset)
+			{
+				if($dbAsset instanceof flavorAsset)
+					$isSource = $dbAsset->getIsOriginal();
+			}
+			else
+			{
+				$isNewAsset = true;
+				$isSource = true;
+				$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
+			}
+
+			if(!$dbAsset && $dbEntry->getStatus() == entryStatus::NO_CONTENT)
+			{
+				$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
+				$dbEntry->save();
+			}
+
+			$internalResource = $resource->getResource();
+			if($internalResource instanceof kLiveEntryResource)
+			{
+				$dbEntry->setOperationAttributes($operationAttributes);
+				$dbEntry->save();
+
+				return $this->attachLiveEntryResource($internalResource, $dbEntry, $dbAsset, $operationAttributes);
+			}
+			if ($isLiveClippingFlow)
+			{
+				if (($srcEntry->getId() == $dbEntry->getId()) || ($srcEntry->getId() == $dbEntry->getReplacedEntryId()))
+					throw new KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_OPERATION, "Trimming");
+				$this->createRecordedClippingTask($srcEntry, $dbEntry, $operationAttributes);
+				$dbEntry->setSource(EntrySourceType::KALTURA_RECORDED_LIVE);
+				$dbEntry->setRootEntryId($srcEntry->getRootEntryId());
+				$dbEntry->setIsRecordedEntry(true);
+				$dbEntry->save();
+				return $dbAsset;
+			}
+
+			$dbAsset = $this->attachResource($internalResource, $dbEntry, $dbAsset);
+
+			$sourceType = $resource->getSourceType();
+			if($sourceType)
+			{
+				$dbEntry->setSource($sourceType);
+				$dbEntry->save();
+			}
+			$batchJob = kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $resource->getAssetParamsId(), $errDescription, $dbAsset->getId(), $operationAttributes);
+			$isImportNeeded = false;
+			if ($batchJob && $batchJob->getJobType() == BatchJobType::IMPORT)
+				$isImportNeeded = true;
+			if($isNewAsset && !$isImportNeeded)
+				kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
+			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
+
 		}
-	
-		if(!$dbAsset && $dbEntry->getStatus() == entryStatus::NO_CONTENT)
-		{
-			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
-			$dbEntry->save();
-		}
-		
-		$operationAttributes = $resource->getOperationAttributes();
-		$internalResource = $resource->getResource();
-		if($internalResource instanceof kLiveEntryResource)
-		{
-			$dbEntry->setOperationAttributes($operationAttributes);
-			$dbEntry->save();
-			
-			return $this->attachLiveEntryResource($internalResource, $dbEntry, $dbAsset, $operationAttributes);
-		}
-		
-		$dbAsset = $this->attachResource($internalResource, $dbEntry, $dbAsset);
-		
-		$sourceType = $resource->getSourceType();
-		if($sourceType)
-		{
-			$dbEntry->setSource($sourceType);
-			$dbEntry->save();
-		}
-		
-		$errDescription = '';
-		$batchJob = kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $resource->getAssetParamsId(), $errDescription, $dbAsset->getId(), $operationAttributes);
-		$isImportNeeded = false;
-		if ($batchJob && $batchJob->getJobType() == BatchJobType::IMPORT)
-			$isImportNeeded = true;
-		if($isNewAsset && !$isImportNeeded)
-			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
-		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
-			
 		if($isSource && $internalResource instanceof kFileSyncResource)
 		{
 			$srcEntryId = $internalResource->getEntryId();
@@ -711,14 +742,63 @@ class KalturaEntryService extends KalturaBaseService
 					$dbEntry->setRootEntryId($srcEntry->getRootEntryId(true));
 				}
 			}
-			
+
 			$dbEntry->setOperationAttributes($operationAttributes);
 			$dbEntry->save();
 		}
 		
 		return $dbAsset;
 	}
-	
+
+	protected function createRecordedClippingTask(entry $srcEntry, entry $targetEntry, $operationAttributes)
+	{
+		$liveEntryId = $srcEntry->getRootEntryId();
+		$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($liveEntryId, EntryServerNodeType::LIVE_PRIMARY);
+		if (!$entryServerNode)
+		{
+			KalturaLog::debug("Can't create clipping task for SrcEntry: ". $srcEntry->getId() . " to entry:" . $targetEntry->getId() . " with: " . print_r($operationAttributes ,true));
+			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND, $liveEntryId, EntryServerNodeType::LIVE_PRIMARY);
+		}
+		$serverNode = ServerNodePeer::retrieveByPK($entryServerNode->getServerNodeId());
+
+		$clippingTask = new ClippingTaskEntryServerNode();
+		$clippingTask->setClippedEntryId($targetEntry->getId());
+		$clippingTask->setLiveEntryId($liveEntryId);
+		$clippingTask->setClipAttributes(self::getKClipAttributesForLiveClippingTask($operationAttributes));
+		$clippingTask->setServerType(EntryServerNodeType::LIVE_CLIPPING_TASK);
+		$clippingTask->setStatus(EntryServerNodeStatus::TASK_PENDING);
+		$clippingTask->setEntryId($srcEntry->getId()); //recorded entry
+		$clippingTask->setPartnerId($serverNode->getPartnerId()); //in case on eCDN it will get the local partner (not -5)
+		$clippingTask->setServerNodeId($serverNode->getId());
+		$clippingTask->save();
+		return $clippingTask;
+	}
+
+	/**
+	 * @param kContentResource $internalResource
+	 * @return entry|null
+	 */
+	private static function getEntryFromContentResource($internalResource)
+	{
+		if ($internalResource && $internalResource instanceof kFileSyncResource)
+		{
+			$entryId = $internalResource->getOriginEntryId();
+			if ($entryId)
+				return entryPeer::retrieveByPK($entryId);
+		}
+		return null;
+	}
+
+	/**
+	 * @return kClipAttributes
+	 */
+	protected static function getKClipAttributesForLiveClippingTask($operationAttributes)
+	{
+		if ($operationAttributes && count($operationAttributes) == 1 && $operationAttributes[0] instanceof kClipAttributes)
+			return $operationAttributes[0];
+		throw new KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_OPERATION, "Concat");
+	}
+
 	/**
 	 * @param IRemoteStorageResource $resource
 	 * @param entry $dbEntry
@@ -1087,9 +1167,7 @@ class KalturaEntryService extends KalturaBaseService
 			}
 		}
 		
-		$srcFilePath = kFileSyncUtils::getLocalFilePathForKey($srcSyncKey);
-		
-		$job = kJobsManager::addConvertProfileJob(null, $entry, $srcFlavorAsset->getId(), $srcFilePath);
+		$job = kJobsManager::addConvertProfileJob(null, $entry, $srcFlavorAsset->getId(), $fileSync);
 		if(!$job)
 			return null;
 			
@@ -1381,8 +1459,12 @@ class KalturaEntryService extends KalturaBaseService
 	protected function checkAdminOnlyUpdateProperties(KalturaBaseEntry $entry)
 	{
 		if ($entry->adminTags !== null)
-			$this->validateAdminSession("adminTags");
-			
+		{
+			$ks = $this->getKs();
+			if (!$ks || !$ks->verifyPrivileges(ks::PRIVILEGE_EDIT_ADMIN_TAGS, ks::PRIVILEGE_WILDCARD ))
+				$this->validateAdminSession("adminTags");
+		}
+
 		if ($entry->categories !== null)
 		{
 			$cats = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->categories);
@@ -1408,8 +1490,12 @@ class KalturaEntryService extends KalturaBaseService
 	protected function checkAdminOnlyInsertProperties(KalturaBaseEntry $entry)
 	{
 		if ($entry->adminTags !== null)
-			$this->validateAdminSession("adminTags");
-			
+		{
+			$ks = $this->getKs();
+			if (!$ks || !$ks->verifyPrivileges(ks::PRIVILEGE_EDIT_ADMIN_TAGS, ks::PRIVILEGE_WILDCARD ))
+				$this->validateAdminSession("adminTags");
+		}
+
 		if ($entry->categories !== null)
 		{
 			$cats = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->categories);
@@ -1533,7 +1619,10 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		
 		if ($updatedOccurred)
+		{
 			myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $dbEntry);
+			myPartnerUtils::increaseEntriesChangedNum($dbEntry);
+		}
 		
 		return $entry;
 	}
@@ -1785,7 +1874,27 @@ class KalturaEntryService extends KalturaBaseService
 		$kvote->setRank($rank);
 		$kvote->save();
 	}
-	
+
+	/**
+	 * @param kOperationResource $resource
+	 * @param entry $dbEntry
+	 * @param kClipManager $clipManager
+	 * @param $operationAttributes
+	 * @return asset
+	 * @throws Exception
+	 * @throws KalturaErrors
+	 */
+	protected function handleMultiClipRequest($resource, entry $dbEntry, $clipManager, $operationAttributes)
+	{
+		KalturaLog::info("clipping service detected start to create sub flavors;");
+		$clipEntry = $clipManager->createTempEntryForClip($this->getPartnerId());
+		$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId());
+		$dbAsset = $this->attachResource($resource->getResource(), $clipEntry, $clipDummySourceAsset);
+		$clipManager->startBatchJob($resource, $dbEntry,$operationAttributes, $clipEntry);
+		return $dbAsset;
+	}
+
+
 	/**
 	 * Set the default status to ready if other status filters are not specified
 	 * 

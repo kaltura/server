@@ -14,9 +14,22 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 	 */
 	public $streams;
 
+	/**
+	 * @var KalturaLiveEntryServerNodeRecordingInfoArray
+	 */
+	public $recordingInfo;
+
+	/**
+	 * @var bool
+	 * @requiresPermission read,insert,update
+	 */
+	public $isPlayableUser;
+
 	private static $map_between_objects = array
 	(
-		"streams"
+		"streams",
+		"recordingInfo",
+		"isPlayableUser",
 	);
 
 	/* (non-PHPdoc)
@@ -42,7 +55,7 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		$dbStreamsInfo = $sourceObject ? $sourceObject->getStreams() : array();
-		$inputStreamsInfo = isset($this->streams) ? $this->streams : array();
+		$inputStreamsInfo = isset($this->streams) ? $this->streams : new KalturaLiveStreamParamsArray();
 		
 		if(count($dbStreamsInfo) === count($inputStreamsInfo))
 		{

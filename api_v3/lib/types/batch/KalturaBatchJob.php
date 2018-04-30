@@ -412,7 +412,23 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$this->data = new KalturaLiveToVodJobData();
 				break;
 
-			default:			
+			case 'kCopyCaptionsJobData':
+				$this->data = new KalturaCopyCaptionsJobData();
+				break;
+
+			case 'kUsersCsvJobData':
+				$this->data = new KalturaUsersCsvJobData();
+				break;
+
+			case 'kClipConcatJobData':
+				$this->data = new KalturaClipConcatJobData();
+				break;
+
+			case 'kCopyCuePointsJobData':
+				$this->data = new KalturaCopyCuePointsJobData();
+				break;
+
+			default:
 				if($dbData instanceof kBulkUploadJobData)
 				{
 					$this->data = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', $dbBatchJob->getJobSubType());
@@ -641,7 +657,32 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				if(is_null($this->data))
 					$this->data = new KalturaLiveToVodJobData();
  				break;
-				
+
+
+			case KalturaBatchJobType::CLIP_CONCAT:
+				$dbData = new kClipConcatJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaClipConcatJobData();
+				break;
+
+			case KalturaBatchJobType::COPY_CUE_POINTS:
+				$dbData = new kCopyCuePointsJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaCopyCuePointsJobData();
+				break;
+
+			case KalturaBatchJobType::COPY_CAPTIONS:
+				$dbData = new kCopyCaptionsJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaCopyCaptionsJobData();
+				break;
+
+			case KalturaBatchJobType::USERS_CSV:
+				$dbData = new kUsersCsvJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaUsersCsvJobData();
+				break;
+
 			default:
 				$dbData = KalturaPluginManager::loadObject('kJobData', $dbBatchJob->getJobType());
 				if(is_null($this->data)) {

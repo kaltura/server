@@ -57,7 +57,9 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
               	self::$kClient->metadata->invalidate($transformObjectIds[$index]);
         	}
         }
-        $resultsOfInvalidating = self::$kClient->doMultiRequest();	
+        $resultsOfInvalidating = self::$kClient->doMultiRequest();
+		if (!$resultsOfInvalidating)
+			return;
 		foreach($resultsOfInvalidating as $index => $resultOfInvalidating){
         	if(is_array($resultOfInvalidating) && isset($resultOfInvalidating['code']) && isset($resultOfInvalidating['message'])){
               	KalturaLog::err('error while invalidating object id['.$transformObjectIds[$index] .'] with code: '. $resultOfInvalidating['code']."\n".$resultOfInvalidating['message']);        	
@@ -104,7 +106,8 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 		foreach($transformList->objects as $object)
 		{
 			/* @var $object KalturaMetadata */
-			$xml = kXsd::transformXmlData($object->xml, $data->destXsdPath, $data->srcXslPath);
+			$xslStr = kEncryptFileUtils::getEncryptedFileContent($data->srcXsl->filePath, $data->srcXsl->encryptionKey, self::getIV());
+			$xml = kXsd::transformXmlData($object->xml, $data->destXsd, $xslStr);
 			if($xml)
 			{
 				self::$kClient->metadata->update($object->id, $xml, $object->version);

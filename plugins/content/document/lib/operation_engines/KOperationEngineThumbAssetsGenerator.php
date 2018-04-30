@@ -25,7 +25,9 @@ class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 
 	private function parseImagesListXML(){
 		$imagesList = array();
-		$imagesXml = new SimpleXMLElement(file_get_contents($this->realInFilePath . DIRECTORY_SEPARATOR . self::IMAGES_LIST_XML_NAME));
+		$xmlPath = $this->realInFilePath . DIRECTORY_SEPARATOR . self::IMAGES_LIST_XML_NAME;
+		$str = kEncryptFileUtils::getEncryptedFileContent($xmlPath, $this->encryptionKey, KBatchBase::getIV());
+		$imagesXml = new SimpleXMLElement($str);
 		foreach ($imagesXml->item as $item) {
 			$imagesList[] = (string)$item->name;
 		}
@@ -76,12 +78,42 @@ class KOperationEngineThumbAssetsGenerator extends KOperationEngineDocument
 			$thumbAsset->cuePointId = "{" . $index . ":result:id}";
 			KBatchBase::$kClient->thumbAsset->add( $cpEntryId, $thumbAsset) ;
 			$index++;
-
-			$resource = new KalturaServerFileResource();
-			$resource->localFilePath = $this->realInFilePath . DIRECTORY_SEPARATOR . $image;
+			
+			$resource = $this->getServerFileResource($this->realInFilePath . DIRECTORY_SEPARATOR . $image, $this->encryptionKey);
 			KBatchBase::$kClient->thumbAsset->setContent("{" . $index . ":result:id}", $resource);
 			$index++;
 		}
 		KBatchBase::$kClient->doMultiRequest();
+	}
+
+	private static function getServerFileResource($path, $key)
+	{
+		$resource = new KalturaServerFileResource();
+		if (!$key)
+			$resource->localFilePath = $path;
+		else
+		{
+			$resource->localFilePath = self::createClearCopyOnCurrentFolder($path, $key);
+			$resource->keepOriginalFile = false;
+		}
+		return $resource;
+	}
+	
+	private static function createClearCopyOnCurrentFolder($path, $key)
+	{
+		$tempPath = KBatchBase::createTempClearFile($path, $key);
+		$clearPath = self::getClearPath($path);
+		kFile::moveFile($tempPath, $clearPath);
+		//maintain original group and owner to clear file
+		kFile::copyFileMetadata($path, $clearPath);
+		return $clearPath;
+	}
+
+	private static function getClearPath($path)
+	{
+		$typeLen = strlen(pathinfo($path, PATHINFO_EXTENSION)) + 1;
+		$pos = strlen($path) - $typeLen;
+		return substr($path, 0, $pos) . '_TEMP_CLEAR' . substr($path, $pos);
+
 	}
 }

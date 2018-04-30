@@ -3,7 +3,7 @@
  * Enable annotation cue point objects management on entry objects
  * @package plugins.annotation
  */
-class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKalturaCuePoint, IKalturaCuePointXmlParser
+class AnnotationPlugin extends BaseCuePointPlugin implements IKalturaServices, IKalturaCuePoint, IKalturaCuePointXmlParser
 {
 	const PLUGIN_NAME = 'annotation';
 	const CUE_POINT_VERSION_MAJOR = 1;
@@ -376,6 +376,11 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	public static function shouldCloneByProperty(entry $entry)
 	{
 		return $entry->shouldCloneByProperty(self::getBaseEntryCloneOptionsCoreValue( BaseEntryAnnotationCuePointCloneOptions::ANNOTATION_CUE_POINTS), false);
+	}
+
+	public static function getTypesToElasticIndexOnEntry()
+	{
+		return array(self::getCuePointTypeCoreValue(AnnotationCuePointType::ANNOTATION));
 	}
 
 }

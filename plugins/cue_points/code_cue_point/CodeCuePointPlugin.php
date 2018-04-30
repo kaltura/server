@@ -3,7 +3,7 @@
  * Enable code cue point objects management on entry objects
  * @package plugins.codeCuePoint
  */
-class CodeCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaCuePointXmlParser
+class CodeCuePointPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKalturaCuePointXmlParser
 {
 	const PLUGIN_NAME = 'codeCuePoint';
 	const CUE_POINT_VERSION_MAJOR = 1;
@@ -248,5 +248,10 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKal
 	public static function shouldCloneByProperty(entry $entry)
 	{
 		return $entry->shouldCloneByProperty(self::getBaseEntryCloneOptionsCoreValue( BaseEntryCodeCuePointCloneOptions::CODE_CUE_POINTS), false);
+	}
+
+	public static function getTypesToElasticIndexOnEntry()
+	{
+		return array(self::getCuePointTypeCoreValue(CodeCuePointType::CODE));
 	}
 }

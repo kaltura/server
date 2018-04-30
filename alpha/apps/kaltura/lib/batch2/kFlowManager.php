@@ -418,7 +418,11 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				case BatchJobType::LIVE_REPORT_EXPORT:
 					$dbBatchJob=$this->updatedLiveReportExport($dbBatchJob, $dbBatchJob->getData());
 					break;
-					
+
+				case BatchJobType::USERS_CSV:
+					$dbBatchJob=$this->updatedUsersCsv($dbBatchJob, $dbBatchJob->getData());
+					break;
+
 				default:
 					break;
 			}
@@ -493,7 +497,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			{
 				if ($entry->getType() == entryType::MEDIA_CLIP)
 				{
-					if ($entry->getOperationAttributes() && $object->getIsOriginal())
+					if ($entry->getOperationAttributes() && $object->getIsOriginal() && is_null($entry->getClipConcatTrimFlow()))
 						kBusinessPreConvertDL::convertSource($object, null, null, $raisedJob);
 					else
 					{
@@ -501,19 +505,8 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 
 						if (kFileSyncUtils::fileSync_exists($syncKey))
 						{
-							// Get the asset fileSync.
-							// For URL typed sync - assume remote and use the relative file path.
-							// For the other types - use the ordinary kFileSyncUtils::getLocalFilePathForKey.
-							$fsArr = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
-							$fs = $fsArr[0];
-							if ($fs && $fs->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
-							{
-								$path = $fs->getFilePath();
-							} else
-							{
-								$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-							}
-							kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
+							list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+							kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $fileSync);
 						}
 					}
 
@@ -565,6 +558,14 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		)
 			return true;
 
+
+		if(
+			$object instanceof ClippingTaskEntryServerNode
+			&&	in_array(EntryServerNodePeer::STATUS, $modifiedColumns)
+		)
+			return true;
+
+
 		if(
 			$object instanceof flavorAsset
 			&&	in_array(assetPeer::STATUS, $modifiedColumns)
@@ -586,13 +587,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			{
 				return true;
 			}
-			
-		if($object instanceof FileSync
-			&& in_array(FileSyncPeer::STATUS, $modifiedColumns)
-			&& $object->getStatus() == FileSync::FILE_SYNC_STATUS_DELETED)
-			{
-				return true;
-			}
+
 		return false;
 	}
 
@@ -621,6 +616,16 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			kFlowHelper::handleUploadFinished($object);
 			return true;
 		}
+		
+		if(
+			$object instanceof ClippingTaskEntryServerNode
+			&&	in_array(EntryServerNodePeer::STATUS, $modifiedColumns)
+		)
+		{
+			if ($object->getServerType() == EntryServerNodeType::LIVE_CLIPPING_TASK)
+				kFlowHelper::handleClippingTaskStatusUpdate($object);
+			return true;
+		}
 
 		if(
 			$object instanceof BatchJob
@@ -645,23 +650,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			kJobsManager::addIndexJob($object->getPartnerId(), IndexObjectType::USER, $filter, false);
 			return true;
 		}
-		
-		if($object instanceof FileSync)
-		{
-			$c = new Criteria();
-			$c->add ( BatchJobLockPeer::OBJECT_ID , $object->getId() );
-			$c->add ( BatchJobLockPeer::OBJECT_TYPE , BatchJobObjectType::FILE_SYNC );
-			$c->add ( BatchJobLockPeer::JOB_TYPE , BatchJobType::FILESYNC_IMPORT );
-			$c->add (BatchJobLockPeer::STATUS, array(BatchJob::BATCHJOB_STATUS_RETRY, BatchJob::BATCHJOB_STATUS_PENDING), Criteria::IN);		
-			$fileSyncImportJobs = BatchJobLockPeer::doSelect( $c );
 
-			foreach ($fileSyncImportJobs as $fileSyncImportJob) 
-			{
-				kJobsManager::abortDbBatchJob(BatchJobPeer::retrieveByPK($fileSyncImportJob->getId()));
-			}
-			return true;
-		}
-		
 		if(
 			!($object instanceof flavorAsset)
 			||	!in_array(assetPeer::STATUS, $modifiedColumns)
@@ -684,10 +673,9 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey, false);
 			if(!$fileSync)
 				return true;
-
-			$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-			if($srcFileSyncLocalPath)
-				kJobsManager::addPostConvertJob(null, $postConvertAssetType, $srcFileSyncLocalPath, $object->getId(), null, $entry->getCreateThumb(), $offset);
+			
+			if(kFileSyncUtils::getLocalFilePathForKey($syncKey))
+				kJobsManager::addPostConvertJob(null, $postConvertAssetType, $syncKey, $object->getId(), null, $entry->getCreateThumb(), $offset);
 		}
 		elseif ($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 		{
@@ -698,7 +686,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				$entry->save();
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -785,4 +773,16 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 		return true;
 	}
+
+	protected function updatedUsersCsv(BatchJob $dbBatchJob, kUsersCsvJobData $data)
+	{
+		switch($dbBatchJob->getStatus())
+		{
+			case BatchJob::BATCHJOB_STATUS_FINISHED:
+				return kFlowHelper::handleUsersCsvFinished($dbBatchJob, $data);
+			default:
+				return $dbBatchJob;
+		}
+	}
+
 }

@@ -1,0 +1,243 @@
+{
+  "settings" : {
+	"number_of_shards" : 6,
+	"number_of_replicas" : 0,
+	"analysis": {
+	  "char_filter": {
+		"kaltura_whitespace_filter": {
+		  "type": "pattern_replace",
+		  "pattern": "(\\s+)",
+		  "replacement": " "
+		},
+		"kaltura_apostrophe_filter": {
+		  "type": "mapping",
+		  "mappings": [
+			"'=>",
+			"`=>",
+			"‘=>"
+		  ]
+		},
+		"kaltura_special_chars_filter": {
+		  "type": "mapping",
+		  "mappings": [
+			"!=>__exclamationmark__",
+			"@=>__at__",
+			"#=>__number__",
+			"$=>__dollar__",
+			"%=>__percent__",
+			"^=>__caret__",
+			"&=>__ampersand__",
+			"*=>__asterisk__",
+			"(=>__openbracket__",
+			")=>__closebracket__",
+			"-=>__hyphen__",
+			"==>__equals__",
+			"+=>__plus__",
+			"?=>__questionmark__",
+			"/=>__slash__",
+			"\\\\=>__backslash__",
+			"[=>__openbracket1__",
+			"]=>__closebracket1__",
+			"{=>__openbracket2__",
+			"}=>__closebracket2__",
+			";=>__semicolon__",
+			"|=>__verticalbar__",
+			"<=>__lessthan__",
+			">=>__greaterthan__",
+			"~=>__tilde__"
+		  ]
+		}
+	  },
+	  "tokenizer": {
+		"kaltura_ngram_tokenizer": {
+		  "type": "ngram",
+		  "min_gram": 3,
+		  "max_gram": 3,
+		  "token_chars": [
+			"letter",
+			"digit"
+		  ]
+		}
+	  },
+	  "normalizer": {
+		"kaltura_keyword_normalizer": {
+		  "type": "custom",
+		  "char_filter": [
+			"kaltura_whitespace_filter"
+		  ],
+		  "filter": [
+			"lowercase",
+			"icu_folding"
+		  ]
+		}
+	  },
+	  "analyzer": {
+		"kaltura_ngrams": {
+		  "type": "custom",
+		  "tokenizer": "kaltura_ngram_tokenizer",
+		  "char_filter": [
+			"kaltura_apostrophe_filter"
+		  ],
+		  "filter": [
+			"lowercase",
+			"icu_folding"
+		  ]
+		},
+		"kaltura_text" : {
+		  "type": "custom",
+		  "tokenizer" : "standard",
+		  "char_filter": [
+			"kaltura_apostrophe_filter",
+			"kaltura_special_chars_filter"
+		  ],
+		  "filter" : [
+			"standard",
+			"lowercase",
+			"icu_folding"
+		  ]
+		},
+		"kaltura_text_partial_search" : {
+		  "type": "custom",
+		  "tokenizer": "standard",
+		  "char_filter": [
+			"kaltura_apostrophe_filter"
+		  ],
+		  "filter": [
+			"standard",
+			"lowercase",
+			"icu_folding"
+		  ]
+		}
+	  }
+	}
+  },
+  "mappings" : {
+	"kuser" : {
+	  "_source" : {
+		"enabled" : true
+	  },
+	  "_all": {
+		"enabled": false
+	  },
+	  "properties" : {
+		"group_ids" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"screen_name" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_text",
+		  "fields": {
+			"ngrams" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_ngrams"
+			},
+			"raw" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			}
+		  }
+		},
+		"kuser_type" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"email" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"tags" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_text",
+		  "fields": {
+			"ngrams" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_ngrams"
+			},
+			"raw" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			}
+		  }
+		},
+		"status" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"partner_id" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"partner_status":{
+		  "type" : "keyword"
+		},
+		"created_at" : {
+		  "type" : "date",
+		  "format": "epoch_second"
+		},
+		"updated_at" : {
+		  "type" : "date",
+		  "format": "epoch_second"
+		},
+		"first_name" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"last_name" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"role_ids" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"permission_names" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"metadata" :{
+		  "type"  : "nested",
+		  "properties"  : {
+			"metadata_id" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"system_name" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"xpath" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"metadata_profile_id" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"metadata_field_id" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"value_int": {
+			  "type": "long"
+			},
+			"value_text": {
+			  "type" : "text",
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
+				}
+			  }
+			}
+		  }
+		}
+	  }
+	}
+  }
+}

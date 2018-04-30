@@ -3,7 +3,7 @@
  * Enable ad cue point objects management on entry objects
  * @package plugins.adCuePoint
  */
-class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaCuePointXmlParser
+class AdCuePointPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKalturaCuePointXmlParser
 {
 	const PLUGIN_NAME = 'adCuePoint';
 	const CUE_POINT_VERSION_MAJOR = 1;
@@ -271,5 +271,10 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKaltu
 	public static function shouldCloneByProperty(entry $entry)
 	{
 		return $entry->shouldCloneByProperty(self::getBaseEntryCloneOptionsCoreValue( BaseEntryAdCuePointCloneOptions::AD_CUE_POINTS), false);
+	}
+
+	public static function getTypesToElasticIndexOnEntry()
+	{
+		return array();
 	}
 }

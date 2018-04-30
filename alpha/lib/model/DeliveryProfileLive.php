@@ -1,7 +1,9 @@
 <?php
 
 abstract class DeliveryProfileLive extends DeliveryProfile {
-	
+	const USER_TYPE_ADMIN = 'admin';
+	const USER_TYPE_USER = 'user';
+
 	/**
 	 * @var kLiveStreamConfiguration
 	 */
@@ -120,8 +122,13 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
 			if($serverNode)
 			{
-				KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
-				if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
+				//Order by current DC first
+				//KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
+				//if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
+				
+				//Order by primary DC first
+				KalturaLog::debug("liveEntryServerNode->getServerType [" . $liveEntryServerNode->getServerType() . "]");
+				if($liveEntryServerNode->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
 				{
 					$this->liveStreamConfig->setUrl($this->getHttpUrl($serverNode));
 					$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
@@ -318,9 +325,17 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		}
 		
 		$livePackagerUrl = "$livePackagerUrl/p/$partnerID/e/$entryId/sd/$segmentDuration/";
+		$entry = $this->getDynamicAttributes()->getEntry();
+		if ($entry->getExplicitLive())
+		{
+			$userType = self::USER_TYPE_ADMIN;
+		 	if (!$entry->canViewExplicitLive())
+				$userType = self::USER_TYPE_USER;
+			$livePackagerUrl .= "type/$userType/";
+		}
 		$secureToken = $this->generateLiveSecuredPackagerToken($livePackagerUrl);
-		$livePackagerUrl .= "t/$secureToken/"; 
-		
+		$livePackagerUrl .= "t/$secureToken/";
+
 		KalturaLog::debug("Live Packager base stream Url [$livePackagerUrl]");
 		return $livePackagerUrl;
 	}

@@ -1,7 +1,5 @@
 <?php
 /*
- * Copyright 2010 Google Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -45,6 +43,7 @@ class Google_Service_Cloudlatencytest extends Google_Service
   public function __construct(Google_Client $client)
   {
     parent::__construct($client);
+    $this->rootUrl = 'https://cloudlatencytest-pa.googleapis.com/';
     $this->servicePath = 'v2/statscollection/';
     $this->version = 'v2';
     $this->serviceName = 'cloudlatencytest';

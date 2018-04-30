@@ -9,6 +9,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	const KS_PRIVILEGE_CAPTION = 'caption';
 
 	const MULTI_CAPTION_FLOW_MANAGER_CLASS = 'kMultiCaptionFlowManager';
+	const COPY_CAPTIONS_FLOW_MANAGER_CLASS = 'kCopyCaptionsFlowManager';
 
        const SERVE_WEBVTT_URL_PREFIX = '/api_v3/index.php/service/caption_captionasset/action/serveWebVTT';
 
@@ -193,6 +194,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	{
 		return array(
 			self::MULTI_CAPTION_FLOW_MANAGER_CLASS,
+			self::COPY_CAPTIONS_FLOW_MANAGER_CLASS,
 		);
 	}
 
@@ -232,7 +234,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 		if($baseClass == 'KalturaJobData' && $enumValue == self::getApiValue(ParseMultiLanguageCaptionAssetBatchType::PARSE_MULTI_LANGUAGE_CAPTION_ASSET))
 			return new KalturaParseMultiLanguageCaptionAssetJobData();
-	
+
 		return null;
 	}
 
@@ -475,6 +477,9 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	 */
 	public static function getManifestEditors ($config)
 	{
+		if($config->disableCaptions)
+			return array();
+
 		$contributors = array();
 
 		switch ($config->format)
@@ -488,20 +493,43 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 				$contributor = new WebVttCaptionsManifestEditor();
 				$contributor->captions = array();
-				//retrieve the current working partner's captions according to the entryId
+
+				//retrieve the current working partner's captions according to the entryId,
+				//if the entry type is playlist return all the captions for the inner entries
+				$entry = entryPeer::retrieveByPK($config->entryId);
 				$c = new Criteria();
-				$c->addAnd(assetPeer::ENTRY_ID, $config->entryId);
+				if ($entry->getType() == entryType::PLAYLIST)
+				{
+					$entryIds = array();
+					$entries = myPlaylistUtils::retrieveStitchedPlaylistEntries($entry);
+					foreach ($entries as $playlistEntry)
+						$entryIds[] = $playlistEntry->getId();
+					$c->addAnd(assetPeer::ENTRY_ID, $entryIds, Criteria::IN);
+				}
+				else
+					$c->addAnd(assetPeer::ENTRY_ID, $config->entryId);
 				$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
 				$captionAssets = assetPeer::doSelect($c);
+
 				if (!count($captionAssets))
 					return array();
+				$captionLanguages = array();
+
+				$useThreeCodeLang = false;
+				if (kConf::hasParam('three_code_language_partners') &&
+					in_array($entry->getPartnerId(), kConf::get('three_code_language_partners')))
+					$useThreeCodeLang = true;
 
 				foreach ($captionAssets as $captionAsset)
 				{
+					if (($entry->getType() == entryType::PLAYLIST) && (in_array($captionAsset->getLanguage(), $captionLanguages)))
+						continue;
+					$captionLanguages[] = $captionAsset->getLanguage();
+
 					/* @var $captionAsset CaptionAsset */
 					$captionAssetObj = array();
 
-					if (($captionAsset->getContainerFormat() == CaptionType::WEBVTT) || $config->hasSequence)
+					if (($captionAsset->getContainerFormat() == CaptionType::WEBVTT) || $config->hasSequence || ($entry->getType() == entryType::PLAYLIST))
 					{
 						// pass null as storageId in order to support any storage profile and not the one selected by the current video flavors
 						$url = $captionAsset->getExternalUrl(null);
@@ -547,8 +575,9 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 						$label = 'Track' . (count($contributor->captions) + 1);
 					$captionAssetObj['label'] = $label;
 					$captionAssetObj['default'] = $captionAsset->getDefault() ? "YES" : "NO";
-					if (isset(self::$captionsFormatMap[$captionAsset->getLanguage()]))
-						$captionAssetObj['language'] = self::$captionsFormatMap[$captionAsset->getLanguage()];
+					$languageCode= self::getLanguageCode($captionAsset->getLanguage(),$useThreeCodeLang);
+					if($languageCode)
+						$captionAssetObj['language'] = $languageCode;
 
 					KalturaLog::info("Object passed into editor: " . print_r($captionAssetObj, true));
 					$contributor->captions[] = $captionAssetObj;
@@ -562,4 +591,22 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 		return $contributors;
 	}
+	private static function getLanguageCode($captionAssetLanguage,$useThreeCodeLang)
+	{
+		$languageCode = null;
+		$languageObject = languageCodeManager::getObjectFromKalturaName($captionAssetLanguage);
+		if($useThreeCodeLang)
+			$languageCode = $languageObject[languageCodeManager::ISO639_B];
+		else
+		{
+			if($languageObject[languageCodeManager::ISO639])
+				$languageCode = $languageObject[languageCodeManager::ISO639];
+			else
+				$languageCode = $languageObject[languageCodeManager::ISO639_B];
+		}
+
+		return $languageCode;
+	}
 }
+
+

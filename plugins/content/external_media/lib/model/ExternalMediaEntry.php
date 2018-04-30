@@ -72,5 +72,16 @@ class ExternalMediaEntry extends entry
 		return parent::copyTemplate($copyPartnerId, $template);
 
 	}
-	
+
+	public function getObjectParams($params = null)
+	{
+		$body = array(
+			'external_source_type' => $this->getExternalSourceType(),
+		);
+
+		elasticSearchUtils::cleanEmptyValues($body);
+
+		return array_merge(parent::getObjectParams($params), $body);
+	}
+
 }

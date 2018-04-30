@@ -120,6 +120,8 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		foreach (self::$stringFields as $string)
 		{
 			$event->$string = $this->getField($string);
+			if ( $string == 'duration')
+			  $event->$string = $this->formatDuration($event->$string);
 		}
 
 		foreach (self::$dateFields as $date => $field)
@@ -292,6 +294,37 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			}
 		}
 
+		if ($event->getScheduleEventType() == ScheduleEventType::LIVE_STREAM)
+		{
+			$entry = entryPeer::retrieveByPK($event->templateEntryId);
+			if ( $entry && $entry->getType() == entryType::LIVE_STREAM)
+			{
+				/* @var $event LiveStreamEntry */
+				$object->setField('x-kaltura-primary-rtmp-endpoint', $entry->getPrimaryBroadcastingUrl());
+				$object->setField('x-kaltura-secondary-rtmp-endpoint', $entry->getSecondaryBroadcastingUrl());
+				$object->setField('x-kaltura-primary-rtsp-endpoint', $entry->getPrimaryRtspBroadcastingUrl());
+				$object->setField('x-kaltura-secondary-rtsp-endpoint', $entry->getSecondaryRtspBroadcastingUrl());
+				$object->setField('x-kaltura-live-stream-name', $entry->getStreamName());
+				$object->setField('x-kaltura-live-stream-username', $entry->getStreamUsername());
+				$object->setField('x-kaltura-live-stream-password', $entry->getStreamPassword());
+			}
+
+		}
+
 		return $object;
+	}
+
+	/**
+	 * @param $duration
+	 */
+	private function formatDuration($duration)
+	{
+		if ($duration && ( $duration != '0' && intval($duration) == 0))
+		{
+			$datetime = new DateTime('@0');
+			$datetime->add(new DateInterval($duration));
+			$duration = $datetime->format('U');
+		}
+		return $duration;
 	}
 }

@@ -149,10 +149,10 @@ class DeliveryProfileDynamicAttributes {
 	protected $sessionId;
 
 	/**
-	 * request a specific delivery profile id
-	 * @var int
+	 * request a specific delivery profile ids
+	 * @var array
 	 */
-	protected $deliveryProfileId = null;
+	protected $requestedDeliveryProfileIds = null;
 	
 	/**
 	 * List of flavor params ids swhich should be enfroced due to an access control action
@@ -175,6 +175,11 @@ class DeliveryProfileDynamicAttributes {
 	 * @var bool
 	 */
 	protected  $hasValidSequence = false;
+	
+	/**
+	 * @var string
+	 */
+	protected  $defaultAudioLanguage = null;
 
 	/**
 	 * @return the $addThumbnailExtension
@@ -304,17 +309,17 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
-	 * @return int $deliveryProfileId
+	 * @return array requestedDeliveryProfileIds
 	 */
-	public function getDeliveryProfileId() {
-		return $this->deliveryProfileId;
+	public function getRequestedDeliveryProfileIds() {
+		return $this->requestedDeliveryProfileIds;
 	}
 
 	/**
-	 * @param $deliveryProfileId
+	 * @param $requestedDeliveryProfileIds
 	 */
-	public function setDeliveryProfileId($deliveryProfileId) {
-		$this->deliveryProfileId = $deliveryProfileId;
+	public function setRequestedDeliveryProfileIds($requestedDeliveryProfileIds) {
+		$this->requestedDeliveryProfileIds = $requestedDeliveryProfileIds;
 	}
 
 	/**
@@ -488,7 +493,29 @@ class DeliveryProfileDynamicAttributes {
 	 */
 	public function setPlayerConfig($playerConfig)
 	{
+		if($this->usePlayServer && !$this->isPlayerConfigValid($playerConfig))
+			return;
+		
 		$this->playerConfig = $playerConfig;
+	}
+	
+	private function isPlayerConfigValid($playerConfig)
+	{
+		$playConfigJson = json_decode($playerConfig);
+		
+		if(json_last_error() != JSON_ERROR_NONE)
+		{
+			KalturaLog::debug("playerConfig provided is not a json object, data will not be forward to playServer [$playerConfig]");
+			return false;
+		}
+		
+		if(isset($playConfigJson->sessionId) && is_int($playConfigJson->sessionId))
+		{
+			KalturaLog::debug("Integer sessionId value provided in player config, data will not be forward to playServer [$playerConfig]");
+			return false;
+		}
+		
+		return true;
 	}
 	
 	/**
@@ -658,6 +685,22 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getDefaultAudioLanguage()
+	{
+		return $this->defaultAudioLanguage;
+	}
+
+	/**
+	 * @param string $defaultAudioLanguage
+	 */
+	public function setDefaultAudioLanguage($defaultAudioLanguage)
+	{
+		$this->defaultAudioLanguage = $defaultAudioLanguage;
+	}
+
+	/**
 	 * 
 	 * @param int $storageId
 	 * @param string $entryId
@@ -702,12 +745,13 @@ class DeliveryProfileDynamicAttributes {
 		$this->serveVodFromLive = $newObj->getServeVodFromLive();
 		$this->serveLiveAsVodEntryId = $newObj->getServeLiveAsVodEntryId();
 		$this->urlParams = $newObj->getUrlParams();
-		$this->deliveryProfileId = $newObj->getDeliveryProfileId();
+		$this->requestedDeliveryProfileIds = $newObj->getRequestedDeliveryProfileIds();
 		$this->sessionId = $newObj->getSessionId();
 		$this->aclFlavorParamsIds = $newObj->getAclFlavorParamsIds();
 		$this->isAclFlavorParamsIdsBlockedList = $newObj->getIsAclFlavorParamsIdsBlockedList();
 		$this->sequence = $newObj->getSequence();
 		$this->hasValidSequence = $newObj->getHasValidSequence();
+		$this->defaultAudioLanguage = $newObj->getDefaultAudioLanguage();
 	}
 }
 

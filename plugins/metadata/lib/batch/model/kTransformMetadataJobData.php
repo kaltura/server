@@ -6,9 +6,9 @@
 class kTransformMetadataJobData extends kJobData
 {
 	/**
-	 * @var string
+	 * @var FileContainer
 	 */
-	private $srcXslPath;
+	private $srcXsl;
 	
 	/**
 	 * @var int
@@ -21,9 +21,9 @@ class kTransformMetadataJobData extends kJobData
 	private $destVersion;
 	
 	/**
-	 * @var string
+	 * @var FileContainer
 	 */
-	private $destXsdPath;
+	private $destXsd;
 	
 	/**
 	 * @var int
@@ -32,11 +32,11 @@ class kTransformMetadataJobData extends kJobData
 	
 	
 	/**
-	 * @return the $srcXslPath
+	 * @return FileContainer $srcXsl
 	 */
-	public function getSrcXslPath()
+	public function getSrcXsl()
 	{
-		return $this->srcXslPath;
+		return $this->srcXsl;
 	}
 
 	/**
@@ -64,11 +64,11 @@ class kTransformMetadataJobData extends kJobData
 	}
 
 	/**
-	 * @param $srcXslPath the $srcXslPath to set
+	 * @param FileContainer $srcXsl
 	 */
-	public function setSrcXslPath($srcXslPath)
+	public function setSrcXsl($srcXsl)
 	{
-		$this->srcXslPath = $srcXslPath;
+		$this->srcXsl = $srcXsl;
 	}
 
 	/**
@@ -96,18 +96,18 @@ class kTransformMetadataJobData extends kJobData
 	}
 	
 	/**
-	 * @return the $destXsdPath
+	 * @return FileContainer $destXsd
 	 */
-	public function getDestXsdPath()
+	public function getDestXsd()
 	{
-		return $this->destXsdPath;
+		return $this->destXsd;
 	}
 
 	/**
-	 * @param $destXsdPath the $destXsdPath to set
+	 * @param $destXsd FileContainer
 	 */
-	public function setDestXsdPath($destXsdPath)
+	public function setDestXsd($destXsd)
 	{
-		$this->destXsdPath = $destXsdPath;
+		$this->destXsd = $destXsd;
 	}
 }

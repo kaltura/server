@@ -133,7 +133,7 @@ class VarConsoleService extends KalturaBaseService
 		{
 		    $totalCount = 0;
 		    $orderBy = ($inputFilter->interval == reportInterval::MONTHS ? "+month_id" : "+date_id") . ",+partner_id";
-		    list ( $reportHeader , $reportData , $totalCount ) = myReportsMgr::getTable( 
+		    list ( $reportHeader , $reportData , $totalCount ) = kKavaReportsMgr::getTable(  
     				null , 
     				myReportsMgr::REPORT_TYPE_VAR_USAGE , 
     				$inputFilter ,
@@ -151,7 +151,7 @@ class VarConsoleService extends KalturaBaseService
     			}
 			}
 			
-			list ( $reportHeader , $reportData) = myReportsMgr::getTotal( 
+			list ( $reportHeader , $reportData) = kKavaReportsMgr::getTotal( 
     				null , 
     				myReportsMgr::REPORT_TYPE_PARTNER_USAGE , 
     				$inputFilter ,
@@ -160,7 +160,7 @@ class VarConsoleService extends KalturaBaseService
     		$total = new KalturaVarPartnerUsageTotalItem();
     		$total->fromString($reportHeader, $reportData);
 
-			list ( $peakStoragereportHeader , $peakStoragereportData) = myReportsMgr::getTotal(
+			list ( $peakStoragereportHeader , $peakStoragereportData) = kKavaReportsMgr::getTotal(
 					null ,
 					myReportsMgr::REPORT_TYPE_PEAK_STORAGE ,
 					$inputFilter ,

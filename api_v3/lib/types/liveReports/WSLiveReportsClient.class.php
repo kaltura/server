@@ -81,6 +81,7 @@ class WSLiveReportsClient extends nusoap_client
 		$soapAction = '';
 		$headers = array();
 		$headers["KALTURA_SESSION_ID"] = (string)(new UniqueId());
+		$this->setDebugLevel(0);
 		
 		$result = $this->call($operation, $params, $namespace, $soapAction, $headers);
 		$this->throwError($result);

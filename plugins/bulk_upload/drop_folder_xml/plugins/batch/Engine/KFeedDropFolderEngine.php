@@ -350,11 +350,18 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		}
 		curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
+		if (isset(KBatchBase::$taskConfig->params->mrss->curlTimeout))
+		{
+			curl_setopt($ch, CURLOPT_TIMEOUT, KBatchBase::$taskConfig->params->mrss->curlTimeout);
+		}
 		
 		$res = curl_exec($ch);
 		curl_close ($ch);
 		
-		KalturaLog::info("For URL [$url], the curl result is: " . print_r($res, true));
+		if(is_string($res))
+		{
+			KalturaLog::info("For URL [$url], the curl result is: " . substr($res, 0, 1000));
+		}
 		return $res;
 	}
 

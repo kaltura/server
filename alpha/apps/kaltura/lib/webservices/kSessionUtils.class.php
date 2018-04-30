@@ -557,24 +557,21 @@ class ks extends kSessionBase
 	
 	public function getDisableEntitlementForEntry()
 	{
-		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
-		// edit privilege (edit:XX,edit:YYY,...)
-		$allPrivileges = explode(',', $this->privileges);
-		
 		$entries = array();
 		
-		// foreach pair - check privileges on playlist
-		foreach($allPrivileges as $priv)
+		// foreach privileges group
+		foreach( $this->parsedPrivileges as $privilegeType => $privileges)
 		{
-			$exPrivileges = explode(':', $priv);
-			if ($exPrivileges[0] == self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY)
+			if ($privilegeType == self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY)
 			{
-				$entries[] =  $exPrivileges[1];
-				
-				$entry = entryPeer::retrieveByPKNoFilter($exPrivileges[1], null, false);
-				if($entry && $entry->getParentEntryId())
+				foreach($privileges as $privilege)
 				{
-					$entries[] = $entry->getParentEntryId();
+					$entries[] = $privilege;
+					$entry = entryPeer::retrieveByPKNoFilter($privilege, null, false);
+					if ($entry && $entry->getParentEntryId())
+					{
+						$entries[] = $entry->getParentEntryId();
+					}
 				}
 			}
 		}
@@ -627,14 +624,17 @@ class ks extends kSessionBase
 		// foreach pair - check privileges on playlist
 		foreach($allPrivileges as $priv)
 		{
-			// extract playlist ID from pair
+			// extract RoleID from pair
 			$exPrivileges = explode(':', $priv);
 			if ($exPrivileges[0] == self::PRIVILEGE_SET_ROLE)
 			{
-				if ((is_numeric($exPrivileges[1])) && ($exPrivileges[1] < 0)){
+				$roleId = isset($exPrivileges[1]) ? $exPrivileges[1] : null; 
+				if ($roleId && (is_numeric($roleId)) && ($roleId < 0))
+				{
 					throw new kCoreException(kCoreException::INTERNAL_SERVER_ERROR, APIErrors::INVALID_SET_ROLE);
 				}
-				return $exPrivileges[1];
+				
+				return $roleId;
 			}
 		}
 		

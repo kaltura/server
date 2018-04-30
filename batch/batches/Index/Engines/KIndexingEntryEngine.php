@@ -44,4 +44,12 @@ class KIndexingEntryEngine extends KIndexingEngine
 		
 		return count($results);
 	}
+	
+	public function initAdvancedFilter($data, $advancedFilter = null)
+	{
+		if(!$advancedFilter)
+			$advancedFilter = new KalturaEntryIndexAdvancedFilter();
+		
+		return parent::initAdvancedFilter($data, $advancedFilter);
+	}
 }

@@ -26,6 +26,6 @@ class DeliveryProfileAppleHttp extends DeliveryProfileVod {
 		
 		return $flavors;
 	}
-	
+
 }
 

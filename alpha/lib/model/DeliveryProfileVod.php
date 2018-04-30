@@ -10,6 +10,11 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 */
 	protected $preferredFlavor = null;
 	
+	/**
+	 * @var bool
+	 */
+	protected $isMultiAudio = false;
+	
 	/** -------------------
 	 * Functionality 
 	 * --------------------*/
@@ -47,21 +52,28 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$url .= $this->getDynamicAttributes()->getUsePlayServer() ? $this->getPlayServerUrl() : '';
 		$url .= $this->getDynamicAttributes()->getHasValidSequence() ? '/sequence/'.$this->getDynamicAttributes()->getSequence() : '';
 
-		if ($entry->getType() == entryType::PLAYLIST || $this->getDynamicAttributes()->getHasValidSequence() && $flavorAsset->getType() == assetType::FLAVOR)
+		if ($entry->getType() == entryType::PLAYLIST || ($this->getDynamicAttributes()->getHasValidSequence() && $flavorAsset->getType() == assetType::FLAVOR))
 		{
 			$partner = $entry->getPartner();
 			$entryVersion = $entry->getVersion();
 			$partnerFlavorVersion = $partner->getCacheFlavorVersion();
-			
+			$entryFlavorVersion = $entry->getCacheFlavorVersion();
+
 			$url .= ($entryVersion ? "/v/$entryVersion" : '') .
-				($partnerFlavorVersion ? "/pv/$partnerFlavorVersion" : '');
-			$url .= '/flavorParamIds/' . $flavorAsset->getFlavorParamsId();
+				($partnerFlavorVersion ? "/pv/$partnerFlavorVersion" : '').
+				($entryFlavorVersion ? "/ev/$entryFlavorVersion" : '');
+
+			if(!($flavorAsset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)))
+				$url .= '/flavorParamIds/' . $flavorAsset->getFlavorParamsId();
 		}
 		else
 		{
 			$url .= $this->getFlavorVersionString($flavorAsset);
 			$url .= '/flavorId/' . $flavorAsset->getId();
 		}
+
+		if (($entry->getType() == entryType::PLAYLIST) && ($flavorAsset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)))
+			$url .= '/captions/' . $flavorAsset->getLanguage();
 
 		$url .= $this->params->getUrlParams();
 		return $url;
@@ -341,7 +353,28 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 */
 	protected function flavorCmpFunction ($flavor1, $flavor2)
 	{
-		// move the audio flavors to the end
+		// move the caption flavors to the end
+		$isFlavor1Caption = $flavor1['type'] == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION);
+		$isFlavor2Caption = $flavor2['type'] == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION);
+		
+		if($isFlavor1Caption != $isFlavor2Caption)
+		{
+			if ($isFlavor1Caption)
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		
+		if($isFlavor1Caption)
+		{
+			return $flavor1['index'] - $flavor2['index'];
+		}
+		
+		// move the audio flavors to the end unless we have multi audio stream which in this case they should be at the beginning
 		$isAudio1 = $flavor1['height'] == 0 && $flavor1['width'] == 0;
 		$isAudio2 = $flavor2['height'] == 0 && $flavor2['width'] == 0;
 		
@@ -349,12 +382,18 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		{
 			if ($isAudio1)
 			{
-				return 1;
+				return $this->isMultiAudio ? -1 : 1;
 			}
 			else 
 			{
-				return -1;
+				return $this->isMultiAudio ? 1 : -1;
 			}
+		}
+		
+		//Move all Dolby audio flavors to the beginning of the audio flavors list
+		if($isAudio1 == true)
+		{
+			return $this->compareAudio($flavor1, $flavor2);
 		}
 	
 		// if a preferred bitrate was defined place it first
@@ -378,12 +417,60 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return -1; 
 	}
 	
+	private function compareAudio($flavor1, $flavor2)
+	{
+		$audioCodec1 = $flavor1['audioCodec'];
+		$audioCodec2 = $flavor2['audioCodec'];
+		
+		$isDefault1 = $flavor1['defaultAudio'];
+		$isDefault2 = $flavor2['defaultAudio'];
+		
+		$dolbyAudioCodecList = array('ec-3','ac-3');
+		$audioPriority = array('ec-3' => 2, 'ac-3' => 1);
+		
+		if($isDefault1 != $isDefault2)
+		{
+			if($isDefault1 && !in_array($audioCodec1, $dolbyAudioCodecList) && in_array($audioCodec2, $dolbyAudioCodecList)) 
+			{
+				return 1;
+			}
+			
+			if($isDefault2 && !in_array($audioCodec2, $dolbyAudioCodecList) && in_array($audioCodec1, $dolbyAudioCodecList))
+			{
+				return -1;
+			}
+			
+			return $isDefault1 ? -1 : 1;
+		}
+		
+		//If both audio codec's are dolby prioritize them based on the audioPriority array
+		if(in_array($audioCodec1, $dolbyAudioCodecList) && in_array($audioCodec2, $dolbyAudioCodecList) && ($audioPriority[$audioCodec2] != $audioPriority[$audioCodec1]))
+		{
+			return $audioPriority[$audioCodec2] - $audioPriority[$audioCodec1];
+		}
+		
+		if(in_array($audioCodec1, $dolbyAudioCodecList))
+			return -1;
+		
+		if(in_array($audioCodec2, $dolbyAudioCodecList))
+			return 1;
+		
+		return -1;
+	}
+	
 	/**
 	 * @param array $flavors
 	 * @return array
 	 */
 	protected function sortFlavors($flavors)
 	{
+		$i = 0;
+		foreach ($flavors as &$currFlavor)
+		{
+			$currFlavor['index'] = $i;
+			$i++;
+		}
+		
 		$this->preferredFlavor = null;
 		$minBitrateDiff = PHP_INT_MAX;
 	

@@ -227,6 +227,11 @@ class KalturaFlavorParams extends KalturaAssetParams
 	public $contentAwareness;
 	
 	/**
+	* @var int
+	*/
+	public $chunkedEncodeMode;
+
+	/**
 	 * @var int
 	 */
 	public $clipOffset;
@@ -275,6 +280,7 @@ class KalturaFlavorParams extends KalturaAssetParams
 		"subtitlesData",
 		"isEncrypted",
 		"contentAwareness",
+		"chunkedEncodeMode",
 		"clipOffset",
 		"clipDuration",
 	);

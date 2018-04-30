@@ -131,12 +131,13 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 			/* @var $captionAssetItem CaptionAssetItem */
 			$captionAssetItem->delete();
 		}
-		
+
 		// updates entry on order to trigger reindexing
 		$entry = $object->getentry();
 		$entry->setUpdatedAt(time());
 		$entry->save();
 		$entry->indexToSearchIndex();
+		return true;
 	}
 
 	/* (non-PHPdoc)

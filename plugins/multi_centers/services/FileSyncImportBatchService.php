@@ -13,64 +13,6 @@ class FileSyncImportBatchService extends KalturaBatchService
 	const MAX_FILESYNCS_PER_CHUNK = 100;
 	const MAX_FILESYNC_QUERIES_PER_CALL = 100;
 	
-	/**
-	 * Contain all object types and sub types that shouldn't be synced
-	 * @var array
-	 */
-	static protected $excludedSyncFileObjectTypes = null;	
-	
-	/**
-	 * Check if specific file sync that belong to object type and sub type should be synced
-	 *
-	 * @param int $objectType
-	 * @param int $objectSubType
-	 * @return bool
-	 */
-	public static function shouldSyncFileObjectType($fileSync)
-	{
-		if(is_null(self::$excludedSyncFileObjectTypes))
-		{
-			self::$excludedSyncFileObjectTypes = array();
-			$dcConfig = kConf::getMap("dc_config");
-			if(isset($dcConfig['sync_exclude_types']))
-			{
-				foreach($dcConfig['sync_exclude_types'] as $syncExcludeType)
-				{
-					$configObjectType = $syncExcludeType;
-					$configObjectSubType = null;
-						
-					if(strpos($syncExcludeType, ':') > 0)
-						list($configObjectType, $configObjectSubType) = explode(':', $syncExcludeType, 2);
-	
-					// translate api dynamic enum, such as contentDistribution.EntryDistribution - {plugin name}.{object name}
-					if(!is_numeric($configObjectType))
-						$configObjectType = kPluginableEnumsManager::apiToCore('FileSyncObjectType', $configObjectType);
-						
-					// translate api dynamic enum, including the enum type, such as conversionEngineType.mp4box.Mp4box - {enum class name}.{plugin name}.{object name}
-					if(!is_null($configObjectSubType) && !is_numeric($configObjectSubType))
-					{
-						list($enumType, $configObjectSubType) = explode('.', $configObjectSubType);
-						$configObjectSubType = kPluginableEnumsManager::apiToCore($enumType, $configObjectSubType);
-					}
-						
-					if(!isset(self::$excludedSyncFileObjectTypes[$configObjectType]))
-						self::$excludedSyncFileObjectTypes[$configObjectType] = array();
-	
-					if(!is_null($configObjectSubType))
-						self::$excludedSyncFileObjectTypes[$configObjectType][] = $configObjectSubType;
-				}
-			}
-		}
-	
-		if(!isset(self::$excludedSyncFileObjectTypes[$fileSync->getObjectType()]))
-			return true;
-			
-		if(count(self::$excludedSyncFileObjectTypes[$fileSync->getObjectType()]) && 
-			!in_array($fileSync->getObjectSubType(), self::$excludedSyncFileObjectTypes[$fileSync->getObjectType()]))
-			return true;
-			
-		return false;
-	}
 	
 	protected static function getOriginalFileSync($fileSync)
 	{
@@ -213,7 +155,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 			}
 
 			// filter by object type / sub type
-			$fileSyncs = array_filter($fileSyncs, array('FileSyncImportBatchService', 'shouldSyncFileObjectType'));
+			$fileSyncs = array_filter($fileSyncs, array('kFileSyncUtils', 'shouldSyncFileObjectType'));
 			if (!$fileSyncs)
 			{
 				continue;

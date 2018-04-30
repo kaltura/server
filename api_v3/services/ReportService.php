@@ -7,7 +7,6 @@
  */
 class ReportService extends KalturaBaseService
 {
-
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -50,6 +49,9 @@ class ReportService extends KalturaBaseService
 		
 		$stmt = PartnerPeer::doSelectStmt($c);
 		$partnerIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		if (!$partnerIds)
+			return Partner::PARTNER_THAT_DOWS_NOT_EXIST;
+
 		return implode(',', $partnerIds); 
 	}
 		
@@ -67,12 +69,13 @@ class ReportService extends KalturaBaseService
 	{
 		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
-		
-		$reportGraphs =  KalturaReportGraphArray::fromReportDataArray ( myReportsMgr::getGraph( $this->getPartnerId() , 
-			$reportType , 
-			$reportInputFilter->toReportsInputFilter() ,
-			$dimension , 
-			$objectIds ) );
+	
+		$reportGraphs =  KalturaReportGraphArray::fromReportDataArray(kKavaReportsMgr::getGraph(
+		    $this->getPartnerId(),
+		    $reportType,
+		    $reportInputFilter->toReportsInputFilter(),
+		    $dimension,
+		    $objectIds));
 
 		return $reportGraphs;
 	}
@@ -93,9 +96,11 @@ class ReportService extends KalturaBaseService
 		
 		$reportTotal = new KalturaReportTotal();
 		
-		list ( $header , $data ) = myReportsMgr::getTotal( $this->getPartnerId() , 
-			$reportType , 
-			$reportInputFilter->toReportsInputFilter() , $objectIds );
+		list ( $header , $data ) = kKavaReportsMgr::getTotal(
+		    $this->getPartnerId() ,
+		    $reportType ,
+		    $reportInputFilter->toReportsInputFilter() , $objectIds);
+		
 		$reportTotal->fromReportTotal ( $header , $data );
 			
 		return $reportTotal;
@@ -112,10 +117,12 @@ class ReportService extends KalturaBaseService
 	 */
 	public function getBaseTotalAction( $reportType , KalturaReportInputFilter $reportInputFilter , $objectIds = null )
 	{
-		$reportSubTotals =  KalturaReportBaseTotalArray::fromReportDataArray( myReportsMgr::getBaseTotal( $this->getPartnerId() , 
-			$reportType , 
-			$reportInputFilter->toReportsInputFilter() ,
-			$objectIds));
+		$reportSubTotals =  KalturaReportBaseTotalArray::fromReportDataArray(  
+			kKavaReportsMgr::getBaseTotal( 
+				$this->getPartnerId() , 
+				$reportType , 
+				$reportInputFilter->toReportsInputFilter() ,
+				$objectIds));
 
 		return $reportSubTotals;
 	}
@@ -139,11 +146,12 @@ class ReportService extends KalturaBaseService
 		
 		$reportTable = new KalturaReportTable();
 		
-		list ( $header , $data , $totalCount ) = myReportsMgr::getTable( $this->getPartnerId() , 
-			$reportType , 
-			$reportInputFilter->toReportsInputFilter() ,
-			$pager->pageSize , $pager->pageIndex ,
-			$order ,  $objectIds);
+		list ( $header , $data , $totalCount ) = kKavaReportsMgr::getTable(
+		    $this->getPartnerId() ,
+		    $reportType ,
+		    $reportInputFilter->toReportsInputFilter() ,
+		    $pager->pageSize , $pager->pageIndex ,
+		    $order ,  $objectIds);
 
 		$reportTable->fromReportTable ( $header , $data , $totalCount );
 			
@@ -172,22 +180,30 @@ class ReportService extends KalturaBaseService
 		KalturaFilterPager $pager = null , 
 		$order = null , $objectIds = null )
 	{
+		ini_set( "memory_limit","512M" );
 
 		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
 		
 		try {
-			$report = myReportsMgr::getUrlForReportAsCsv( $this->getPartnerId() ,  $reportTitle , $reportText , $headers , $reportType ,
-			$reportInputFilter->toReportsInputFilter() ,
-			$dimension ,
-			$objectIds ,
-			$pager->pageSize , $pager->pageIndex , $order );
+			$report = kKavaReportsMgr::getUrlForReportAsCsv(
+				$this->getPartnerId(),
+				$reportTitle,
+				$reportText,
+				$headers,
+				$reportType,
+				$reportInputFilter->toReportsInputFilter(),
+				$dimension,
+				$objectIds,
+				$pager->pageSize,
+				$pager->pageIndex,
+				$order);
 		}
 		catch(Exception $e){
 			$code = $e->getCode();
 			if ($code == kCoreException::SEARCH_TOO_GENERAL)
 					throw new KalturaAPIException(KalturaErrors::SEARCH_TOO_GENERAL);
-			}
+		}
 
 		if ((infraRequestUtils::getProtocol() == infraRequestUtils::PROTOCOL_HTTPS))
 			$report = str_replace("http://","https://",$report);
@@ -234,8 +250,6 @@ class ReportService extends KalturaBaseService
 		if (is_null($dbReport))
 			throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
 			
-		$query = $dbReport->getQuery();
-		
 		$this->addPartnerIdToParams($params);
 		
 		$execParams = KalturaReportHelper::getValidateExecutionParameters($dbReport, $params);
@@ -256,20 +270,29 @@ class ReportService extends KalturaBaseService
 	 */
 	public function getCsvAction($id, KalturaKeyValueArray $params = null)
 	{
-		$dbReport = ReportPeer::retrieveByPK($id);
-		if (is_null($dbReport))
-			throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
-			
-		$query = $dbReport->getQuery();
-		
 		$this->addPartnerIdToParams($params);
 		
-		$execParams = KalturaReportHelper::getValidateExecutionParameters($dbReport, $params);
-		
 		ini_set( "memory_limit","512M" );
-
-		$kReportsManager = new kReportManager($dbReport);
-		list($columns, $rows) = $kReportsManager->execute($execParams);
+		
+		if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::VOD_ALLOWED_PARTNERS))
+		{
+			$customReports = kConf::getMap('custom_reports');
+			if (!isset($customReports[$id]))
+				throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
+			
+			list($columns, $rows) = kKavaReportsMgr::customReport($id, $params->toObjectsArray());
+		}
+		else 
+		{
+			$dbReport = ReportPeer::retrieveByPK($id);
+			if (is_null($dbReport))
+				throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
+				
+			$execParams = KalturaReportHelper::getValidateExecutionParameters($dbReport, $params);
+			
+			$kReportsManager = new kReportManager($dbReport);
+			list($columns, $rows) = $kReportsManager->execute($execParams);
+		}
 		
 		$fileName = array('Report', $id, $this->getPartnerId());
 		foreach($params as $param)

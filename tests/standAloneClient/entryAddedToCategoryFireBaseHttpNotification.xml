@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>http://{prompt:Host name:}/</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <!-- script will ask for username / password interactively -->
+    </session>
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaHttpNotificationTemplate">
+                <name>EntryCategory added Firebase</name>
+                <systemName>ENTRYCATEGORY_ADDED_FIREBASE</systemName>
+                <description>HTTP notification template to be sent to firebase when a new entry is created</description>
+                <eventType>2</eventType> <!-- EventNotificationEventType::OBJECT_ADDED -->
+                <eventObjectType>37</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getEntryId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>partner_id</key>
+                        <description>Partner ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getPartnerId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_id</key>
+                        <description>Category ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getCategoryId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry Name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null($entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $entry->getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_name</key>
+                        <description>Category Name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null($category = categoryPeer::retrieveByPK($scope->getObject()->getCategoryId())) ? $category->getName() : ''</code>
+                        </value>
+                    </item>
+                </contentParameters>
+                <data objectType = "KalturaHttpNotificationDataText">
+                    <content objectType = "KalturaStringValue">
+                        <description>The notification content</description>
+                        <value>
+                            {
+                                "notification": {
+                                    "title": "New Media was added",
+                                    "body": "{entry_name} was added to {category_name}",
+                                    "badge": 1
+                                },
+                                "data": {
+                                    "entry_id": "{entry_id}",
+                                    "category_id": "{category_id}",
+                                    "partner_id": "{partner_id}"
+                                },
+                                "condition": "'{partner_id}' in topics || '{partner_id}_{category_id}' in topics"
+                            }
+                        </value>
+                    </content>
+                </data>
+                <method>2</method> <!-- KalturaHttpNotificationMethod::POST -->
+                <url>https://fcm.googleapis.com/fcm/send</url>
+                <customHeaders objectType="array">
+                    <item objectType="KalturaKeyValue">
+                        <key>Content-Type</key>>
+                        <value>application/json</value>
+                    </item>
+                    <item objectType="KalturaKeyValue">
+                        <key>Authorization</key>>
+                        <value>key=AAAAqX04KSI:APA91bHLJ3dOMmLM5hwvRvpjkY26TeVcxn3oWHLM_koKw-PL56VYdUd5KIpMXWAI9uk-Ctups0saUxYTl8EbRiaQ7vMfW_EoFmQWR_PgTe5ANeQyt1wLj03LQhirkmqLn7hVFAAZISlx</value>
+                    </item>
+                </customHeaders>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+</xml>

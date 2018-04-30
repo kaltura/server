@@ -3,8 +3,12 @@
  * @package infra
  * @subpackage Storage
  */
+
 class kFileUtils extends kFile
 {
+
+	const ENCRYPT = '_ENCRYPT_V2';
+
 	public static function pollFileExists($file_name)
 	{
 		$nfs_file_tries = 0;
@@ -45,7 +49,7 @@ class kFileUtils extends kFile
 		return false;
 	}
 
-	public static function getDumpFileRenderer($filePath, $mimeType, $maxAge = null, $limitFileSize = 0, $lastModified = null)
+	public static function getDumpFileRenderer($filePath, $mimeType, $maxAge = null, $limitFileSize = 0, $lastModified = null, $key = null, $iv = null, $fileSize = null)
 	{
 		self::closeDbConnections();
 		
@@ -55,12 +59,12 @@ class kFileUtils extends kFile
 		if(! file_exists($filePath))
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 		
-		return new kRendererDumpFile($filePath, $mimeType, self::xSendFileAllowed($filePath), $maxAge, $limitFileSize, $lastModified);
+		return new kRendererDumpFile($filePath, $mimeType, self::xSendFileAllowed($filePath), $maxAge, $limitFileSize, $lastModified, $key, $iv, $fileSize);
 	}
 	
-	public static function dumpFile($file_name, $mime_type = null, $max_age = null, $limit_file_size = 0)
+	public static function dumpFile($file_name, $mime_type = null, $max_age = null, $limit_file_size = 0, $key = null, $iv = null, $fileSize = null)
 	{
-		$renderer = self::getDumpFileRenderer($file_name, $mime_type, $max_age, $limit_file_size);
+		$renderer = self::getDumpFileRenderer($file_name, $mime_type, $max_age, $limit_file_size, null, $key, $iv, $fileSize);
 		
 		$renderer->output();
 		
@@ -250,4 +254,20 @@ class kFileUtils extends kFile
 		
 		KExternalErrors::dieGracefully();
 	}
+
+	static public function addEncryptToFileName($fileName)
+	{
+		$typeLen = strlen(pathinfo($fileName, PATHINFO_EXTENSION)) + 1;
+		$pos = strlen($fileName) - $typeLen;
+		return substr($fileName, 0, $pos) . self::ENCRYPT . substr($fileName, $pos);
+	}
+
+	static public function isFileEncrypt($fileName)
+	{
+		$pos = strpos($fileName, self::ENCRYPT);
+		$PrefixLen = strlen(pathinfo($fileName, PATHINFO_EXTENSION)) + 1 + strlen(self::ENCRYPT);
+		return (($pos+$PrefixLen) == strlen($fileName));
+	}
+
+
 }

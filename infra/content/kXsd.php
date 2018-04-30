@@ -457,17 +457,17 @@ class kXsd
 	
 	/**
 	 * @param string $xml
-	 * @param string $xsdPath
-	 * @param string $xslPath
+	 * @param KalturaFileContainer $xsdFile
+	 * @param string $xslStr
 	 * @return bool:string false if failed, xml text if succeed
 	 */
-	public static function transformXmlData($xml, $xsdPath, $xslPath)
+	public static function transformXmlData($xml, $xsdFile, $xslStr)
 	{
 		$from = new KDOMDocument();
 		$from->loadXML($xml);
 		
 		$xsl = new KDOMDocument();
-		$xsl->load($xslPath);
+		$xsl->loadXML($xslStr);
 		
 		$proc = new XSLTProcessor;
 		$proc->importStyleSheet($xsl);
@@ -476,7 +476,7 @@ class kXsd
 		
 		$to = new KDOMDocument();
 		$to->loadXML($output);
-		if(!$to->schemaValidate($xsdPath))
+		if(!$to->schemaValidate($xsdFile->filePath, $xsdFile->encryptionKey, KBatchBase::getIV()))
 			return false;
 		
 		return $output;

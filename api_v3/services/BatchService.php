@@ -49,15 +49,17 @@ class BatchService extends KalturaBatchService
 		{
 			$dbBulkUploadResult->handleRelatedObjects();
 
-			$jobs = BatchJobPeer::retrieveByEntryId($bulkUploadResult->objectId);
+			$c = new Criteria();
+			$c->add(BatchJobPeer::ENTRY_ID, $bulkUploadResult->objectId);
+			$c->add(BatchJobPeer::PARENT_JOB_ID, null, Criteria::ISNULL);
+			$c->add(BatchJobPeer::BULK_JOB_ID, null, Criteria::ISNULL);
+			$jobs = BatchJobPeer::doSelect($c);
+
 			foreach($jobs as $job)
 			{
-				if(!$job->getParentJobId())
-				{
-					$job->setRootJobId($bulkUploadResult->bulkUploadJobId);
-					$job->setBulkJobId($bulkUploadResult->bulkUploadJobId);
-					$job->save();
-				}
+				$job->setRootJobId($bulkUploadResult->bulkUploadJobId);
+				$job->setBulkJobId($bulkUploadResult->bulkUploadJobId);
+				$job->save();
 			}
 
 			if($dbBulkUploadResult->getObject() && $pluginDataArray && $pluginDataArray->count)

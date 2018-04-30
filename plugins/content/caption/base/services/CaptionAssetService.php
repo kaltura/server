@@ -127,7 +127,7 @@ class CaptionAssetService extends KalturaAssetService
    			kEventsManager::raiseEvent(new kObjectAddedEvent($dbCaptionAsset));
    		else
    			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbCaptionAsset));
-   		
+
 		$captionAsset = new KalturaCaptionAsset();
 		$captionAsset->fromObject($dbCaptionAsset, $this->getResponseProfile());
 		return $captionAsset;
@@ -173,7 +173,8 @@ class CaptionAssetService extends KalturaAssetService
 	protected function attachFile(CaptionAsset $captionAsset, $fullPath, $copyOnly = false)
 	{
 		$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
-		
+		list($width, $height, $type, $attr) = getimagesize($fullPath);
+
 		$captionAsset->incrementVersion();
 		if($ext && $ext != kUploadTokenMgr::NO_EXTENSION_IDENTIFIER)
 			$captionAsset->setFileExt($ext);
@@ -197,17 +198,18 @@ class CaptionAssetService extends KalturaAssetService
 			throw $e;
 		}
 
-		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-		list($width, $height, $type, $attr) = getimagesize($finalPath);
+
+		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey);
+		$finalPath = $fileSync->getFullPath();
 
 		if ($captionAsset->getLanguage() == KalturaLanguage::MU)
 		{
-			kCaptionsContentManager::addParseMultiLanguageCaptionAssetJob($captionAsset, $finalPath);
+			kCaptionsContentManager::addParseMultiLanguageCaptionAssetJob($captionAsset, $finalPath, $fileSync->getEncryptionKey());
 		}
 
 		$captionAsset->setWidth($width);
 		$captionAsset->setHeight($height);
-		$captionAsset->setSize(filesize($finalPath));
+		$captionAsset->setSize($fileSync->getFileSize());
 		
 		$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_READY);
 		$captionAsset->save();

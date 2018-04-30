@@ -5,13 +5,33 @@ require_once(__DIR__ . '/../bootstrap.php');
 
 define('MAX_ITEMS', 2000);
 
+define('PARTNER_SECRET', 'secret');
+define('PARTNER_CRM_ID', 'crmId');
+define('PARTNER_VERTICAL', 'vertical');
+
+function getPartnerVertical($customData)
+{
+	if (isset($customData['internalUse']) && $customData['internalUse'])
+	{
+		return -1;
+	}
+	else if (isset($customData['verticalClasiffication']) && $customData['verticalClasiffication'] > 0)
+	{
+		return $customData['verticalClasiffication'];
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 function getPartnerUpdates($updatedAt)
 {
-	// get the partners
 	$c = new Criteria();
 	$c->addSelectColumn(PartnerPeer::ID);
 	$c->addSelectColumn(PartnerPeer::STATUS);
 	$c->addSelectColumn(PartnerPeer::ADMIN_SECRET);
+	$c->addSelectColumn(PartnerPeer::CUSTOM_DATA);
 	$c->addSelectColumn(PartnerPeer::UPDATED_AT);
 	$c->add(PartnerPeer::UPDATED_AT, $updatedAt, Criteria::GREATER_EQUAL);
 	$c->addAscendingOrderByColumn(PartnerPeer::UPDATED_AT);
@@ -25,10 +45,133 @@ function getPartnerUpdates($updatedAt)
 	$result = array();
 	foreach ($rows as $row)
 	{
-		$partnerId = $row['ID'];
+		$id = $row['ID'];
 		$status = $row['STATUS'];
-		$secret = $status == Partner::PARTNER_STATUS_ACTIVE ? $row['ADMIN_SECRET'] : '';
-		$result[$partnerId] = $secret;
+		if ($status == Partner::PARTNER_STATUS_ACTIVE)
+		{
+			$customData = unserialize($row['CUSTOM_DATA']);
+			
+			$info = array(
+				PARTNER_SECRET => $row['ADMIN_SECRET'],
+				PARTNER_CRM_ID => isset($customData['crmId']) ? $customData['crmId'] : '',
+				PARTNER_VERTICAL => getPartnerVertical($customData),
+			);
+			$info = json_encode($info);
+		}
+		else
+		{
+			$info = '';
+		}
+		
+		$result[$id] = $info;
+		$updatedAt = new DateTime($row['UPDATED_AT']);
+		$maxUpdatedAt = max($maxUpdatedAt, (int)$updatedAt->format('U'));
+	}
+	
+	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
+}
+
+function getUserUpdates($updatedAt)
+{
+	$c = new Criteria();
+	$c->addSelectColumn(kuserPeer::ID);
+	$c->addSelectColumn(kuserPeer::STATUS);
+	$c->addSelectColumn(kuserPeer::PUSER_ID);
+	$c->addSelectColumn(kuserPeer::PARTNER_ID);
+	$c->addSelectColumn(kuserPeer::UPDATED_AT);
+	$c->add(kuserPeer::UPDATED_AT, $updatedAt, Criteria::GREATER_EQUAL);
+	$c->addAscendingOrderByColumn(kuserPeer::UPDATED_AT);
+	$c->setLimit(MAX_ITEMS);
+	kuserPeer::setUseCriteriaFilter(false);
+	$stmt = kuserPeer::doSelectStmt($c);
+	kuserPeer::setUseCriteriaFilter(true);
+	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	
+	$maxUpdatedAt = 0;
+	$result = array();
+	foreach ($rows as $row)
+	{
+		$status = $row['STATUS'];
+		if ($status != KuserStatus::ACTIVE)
+		{
+			continue;
+		}
+		
+		$id = $row['ID'];
+		$puserId = $row['PUSER_ID'];
+		$partnerId = $row['PARTNER_ID'];
+		
+		$key = md5($partnerId . '_' . strtolower($puserId));
+		$result[$key] = $id;
+		$updatedAt = new DateTime($row['UPDATED_AT']);
+		$maxUpdatedAt = max($maxUpdatedAt, (int)$updatedAt->format('U'));
+	}
+	
+	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
+}
+
+function getLiveUpdates($updatedAt)
+{
+	// must query sphinx, can be too heavy for the db when the interval is large
+	$filter = new entryFilter();
+	$filter->setTypeEquel(entryType::LIVE_STREAM);
+	$filter->set('_gte_updated_at', $updatedAt);
+	$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
+	
+	$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+	$c->addSelectColumn(entryPeer::ID);
+	$c->addSelectColumn(entryPeer::STATUS);
+	$c->addSelectColumn(entryPeer::UPDATED_AT);
+	$c->addAscendingOrderByColumn(entryPeer::UPDATED_AT);
+	$c->setLimit(MAX_ITEMS);
+	$c->setMaxRecords(MAX_ITEMS);
+	
+	$filter->attachToCriteria($c);
+	
+	entryPeer::setUseCriteriaFilter(false);
+	$c->applyFilters();
+	$stmt = entryPeer::doSelectStmt($c);
+	entryPeer::setUseCriteriaFilter(true);
+	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+	$maxUpdatedAt = 0;
+	$result = array();
+	foreach ($rows as $row)
+	{
+		$id = $row['ID'];
+		$status = $row['STATUS'];
+		$result[$id] = $status != entryStatus::DELETED ? '1' : '';
+		$updatedAt = new DateTime($row['UPDATED_AT']);
+		$maxUpdatedAt = max($maxUpdatedAt, (int)$updatedAt->format('U'));
+	}
+
+	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
+}
+
+function getDurationUpdates($updatedAt)
+{
+	$c = new Criteria();
+	$c->addSelectColumn(entryPeer::ID);
+	$c->addSelectColumn(entryPeer::STATUS);
+	$c->addSelectColumn(entryPeer::LENGTH_IN_MSECS);
+	$c->addSelectColumn(entryPeer::UPDATED_AT);
+	$c->add(entryPeer::UPDATED_AT, $updatedAt, Criteria::GREATER_EQUAL);
+	$c->addAscendingOrderByColumn(entryPeer::UPDATED_AT);
+	$c->setLimit(MAX_ITEMS);
+	entryPeer::setUseCriteriaFilter(false);
+	$stmt = entryPeer::doSelectStmt($c);
+	entryPeer::setUseCriteriaFilter(true);
+	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	
+	$maxUpdatedAt = 0;
+	$result = array();
+	foreach ($rows as $row)
+	{
+		$id = $row['ID'];
+		$status = $row['STATUS'];
+		$duration = intval($row['LENGTH_IN_MSECS'] / 1000);
+		$duration = ($status == entryStatus::READY && $duration > 0) ? strval($duration) : '';
+		$result[$id] = $duration;
 		$updatedAt = new DateTime($row['UPDATED_AT']);
 		$maxUpdatedAt = max($maxUpdatedAt, (int)$updatedAt->format('U'));
 	}
@@ -67,6 +210,7 @@ function getCategoryEntryUpdates($updatedAt)
 	$c->addSelectColumn($categoryIdsCol);
 	$c->addGroupByColumn(categoryEntryPeer::ENTRY_ID);
 	$c->add(categoryEntryPeer::ENTRY_ID, array_keys($result), Criteria::IN);
+	$c->add(categoryEntryPeer::STATUS, CategoryEntryStatus::ACTIVE);
 	$stmt = categoryEntryPeer::doSelectStmt($c);
 	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	
@@ -98,17 +242,20 @@ if (!kConf::hasParam('analytics_sync_secret') ||
 DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
 
-switch ($requestType)
+$requestHandlers = array(
+	'partner' => 'getPartnerUpdates',
+	'user' => 'getUserUpdates',
+	'live' => 'getLiveUpdates',
+	'duration' => 'getDurationUpdates',
+	'categoryEntry' => 'getCategoryEntryUpdates',
+);
+
+if (isset($requestHandlers[$requestType]))
 {
-case 'partner':
-	$result = getPartnerUpdates($updatedAt);
-	break;
-	
-case 'categoryEntry':
-	$result = getCategoryEntryUpdates($updatedAt);
-	break;
-	
-default:
+	$result = call_user_func($requestHandlers[$requestType], $updatedAt);
+}
+else
+{
 	$result = array('error' => 'bad request');
 }
 

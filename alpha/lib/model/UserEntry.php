@@ -30,4 +30,18 @@ abstract class UserEntry extends BaseUserEntry {
 		$this->setStatus(UserEntryStatus::ACTIVE);
 	}
 
+	public function checkAlreadyExists()
+	{
+		$userEntryCriteria = new Criteria();
+		$userEntryCriteria->add(UserEntryPeer::ENTRY_ID, $this->getEntryId());
+		$userEntryCriteria->add(UserEntryPeer::KUSER_ID, $this->getKuserId());
+		$userEntryCriteria->add(UserEntryPeer::TYPE, $this->getType());
+		
+		return UserEntryPeer::doSelectOne($userEntryCriteria);
+	}
+
+	public function getCacheInvalidationKeys()
+	{
+		return array("userEntry:kuserId=".strtolower($this->getKuserId()));
+	}
 } // UserEntry

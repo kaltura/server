@@ -71,6 +71,11 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IRela
 	public $contentAwareness;
 	
 	/**
+	 * @var int
+	 */
+	public $chunkedEncodeMode;
+
+	/**
 	 * @var KalturaNullableBoolean
 	 */
 	public $twoPass;
@@ -91,6 +96,7 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IRela
 		'deletePolicy',
 		'isEncrypted',
 		'contentAwareness',
+		'chunkedEncodeMode',
 		'twoPass',
 		'tags',
 	);

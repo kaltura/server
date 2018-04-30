@@ -110,6 +110,28 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 */
 	public $segmentDuration;
 
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $explicitLive;
+
+	/**
+	 * @var KalturaViewMode
+	 */
+	public $viewMode;
+
+	/**
+	 * @var KalturaRecordingStatus
+	 */
+	public $recordingStatus;
+
+	/**
+	 * The time the last broadcast finished.
+	 * @var int
+	 * @readonly
+	 */
+	public $lastBroadcastEndTime;
+
 	private static $map_between_objects = array
 	(
 		"offlineMessage",
@@ -126,7 +148,11 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		"currentBroadcastStartTime",
 		"recordingOptions",
 		"liveStatus",
-		"segmentDuration"
+		"segmentDuration",
+		"explicitLive",
+		"viewMode",
+		"recordingStatus",
+		"lastBroadcastEndTime",
 	);
 	
 	/* (non-PHPdoc)
@@ -163,7 +189,6 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 			$this->recordingOptions->shouldCopyEntitlement = true;
 		}
 
-
 		return parent::toInsertableObject($sourceObject, $propsToSkip);
 	}
 	
@@ -181,6 +206,17 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		{
 			$this->recordingOptions = new KalturaLiveEntryRecordingOptions();
 			$this->recordingOptions->fromObject($dbObject->getRecordingOptions());
+		}
+
+		if ($dbObject->getExplicitLive())
+		{
+			if ($dbObject->getViewMode() == ViewMode::ALLOW_ALL && in_array($dbObject->getLiveStatus(), array(KalturaEntryServerNodeStatus::PLAYABLE, KalturaEntryServerNodeStatus::BROADCASTING)))
+			{
+				$this->redirectEntryId = null;
+			} else
+			{
+				$this->redirectEntryId = $this->recordedEntryId;
+			}
 		}
 	}
 
@@ -217,6 +253,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 				"recordStatus" => array("validatePropertyChanged","validateRecordedEntryId"), 
 				"conversionProfileId" => array("validatePropertyChanged","validateRecordedEntryId"),
 				"segmentDuration" => array("validatePropertyChanged", "validateSegmentDurationValue"),
+				"explicitLive" => array("validatePropertyChanged"),
 		);
 		
 		foreach ($updateValidateAttributes as $attr => $validateFucntions)

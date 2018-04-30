@@ -3,7 +3,7 @@
  * Enable event cue point objects management on entry objects
  * @package plugins.EventCuePoint
  */
-class EventCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaEventConsumers
+class EventCuePointPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'eventCuePoint';
 	const CUE_POINT_VERSION_MAJOR = 1;
@@ -115,5 +115,10 @@ class EventCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 	public static function shouldCloneByProperty(entry $entry)
 	{
 		return false;
+	}
+
+	public static function getTypesToElasticIndexOnEntry()
+	{
+		return array();
 	}
 }

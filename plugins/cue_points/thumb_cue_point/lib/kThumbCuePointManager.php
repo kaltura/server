@@ -125,7 +125,8 @@ class kThumbCuePointManager implements kObjectDeletedEventConsumer, kObjectChang
 	{
 		$dbCuePoint = CuePointPeer::retrieveByPK($thumbAsset->getCuePointID());
 		
-		if($dbCuePoint)
+		//Clear only if the current associated assetId is the one getting deleted
+		if($dbCuePoint && $dbCuePoint->getAssetId() == $thumbAsset->getId())
 		{
 			/* @var $dbCuePoint ThumbCuePoint */
 			$dbCuePoint->setAssetId(null);

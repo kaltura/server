@@ -7,6 +7,8 @@ abstract class kManifestRenderer
 	const PLAY_STREAM_TYPE_DVR = 'dvr';
 	const PLAY_STREAM_TYPE_ANY = 'any';
 
+	const AUDIO_CODECS_BITRATE_THRESHOLD = 66960; // as 64KB * 188 \184
+
 	/**
 	 * @var string
 	 */
@@ -140,6 +142,103 @@ abstract class kManifestRenderer
 	{
 		$this->deliveryCode = $deliveryCode ? $deliveryCode : $this->defaultDeliveryCode;
 	}
+
+	protected function sendAnalyticsBeacon($host, $port)
+	{
+		// build the uri
+		$output = array(
+			'eventType' => '100',
+			'service' => 'analytics',
+			'action' => 'trackEvent',
+			'entryId' => $this->entryId,
+			'partnerId' => $this->partnerId,
+			'playbackType' => $this->entryType,
+		);
+
+		$params = infraRequestUtils::getRequestParams();
+		$mapping = array(
+			'ks' => 'ks',
+			'format' => 'deliveryType',
+			'uiConfId' => 'uiConfId',
+			'playSessionId' => 'sessionId',
+			'clientTag' => 'clientTag', 
+			'playbackType' => 'playbackType',
+		);
+		foreach ($mapping as $src => $dest)
+		{
+			if (!isset($params[$src]))
+			{
+				continue;
+			}
+
+			$output[$dest] = $params[$src];
+		}
+
+		if (isset($params['clientTag']))
+		{
+			$clientVer = $params['clientTag'];
+
+			// strip version prefixes
+			$prefixes = array(
+				'kdp:v',
+				'html5:v',
+				'kwidget:v',
+			);
+			foreach ($prefixes as $prefix)
+			{
+				if (substr($clientVer, 0, strlen($prefix)) == $prefix)
+				{
+					$clientVer = substr($clientVer, strlen($prefix));
+				}
+			}
+
+			$clientVer = preg_replace('/,cache_st:\d+/', '', $clientVer);
+			$clientVer = explode('__', $clientVer);
+
+			$output['clientVer'] = $clientVer[0];
+		}
+
+		if (isset($params['referrer']))
+		{
+			$base64Referrer = $params['referrer'];
+			$referrer = base64_decode(str_replace(array('-', '_', ' '), array('+', '/', '+'), $base64Referrer));
+			if ($referrer)
+			{
+				$output['referrer'] = $referrer;
+			}
+		}
+
+		$uri = '/api_v3/index.php?' . http_build_query($output, '', '&');
+
+		// build the request
+		$headers = array(
+			'Host' => $host,
+			'X-Forwarded-For' => infraRequestUtils::getRemoteAddress(),
+		);
+		if (isset($_SERVER['HTTP_USER_AGENT']))
+		{
+			$headers['User-Agent'] = $_SERVER['HTTP_USER_AGENT'];
+		}
+
+		$out = "GET {$uri} HTTP/1.1\r\n";
+
+		foreach($headers as $header => $value)
+		{
+			$out .= "$header: $value\r\n";
+		}
+
+		$out .= "\r\n";
+
+		// send the request
+		$fp = fsockopen($host, $port, $errno, $errstr, 1);
+		if ($fp === false)
+		{
+			return;
+		}
+
+		fwrite($fp, $out);
+		fclose($fp);
+	}
 	
 	final public function output()
 	{
@@ -191,6 +290,14 @@ abstract class kManifestRenderer
 		
 		echo $content;
 		
+		if (kConf::hasParam('internal_analytics_host'))
+		{
+			$statsHost = explode(':', kConf::get('internal_analytics_host'));
+			$this->sendAnalyticsBeacon(
+				$statsHost[0], 
+				isset($statsHost[1]) ? $statsHost[1] : 80);
+		}
+
 		die;
 	}
 	
@@ -790,12 +897,8 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 				$audioFlavorsArr[] = $content;
 			}
 			else {
-				$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1024;
+				$bitrate = $this->calculateBitRate($flavor);
 				$codecs = "";
-				// in case of Akamai HDN1.0 increase the reported bitrate due to mpeg2-ts overhead
-				if (strpos($flavor['url'], "index_0_av.m3u8"))
-					$bitrate += 40 * 1024;
-
 				$resolution = '';
 				if(isset($flavor['width']) && isset($flavor['height']) &&
 					(($flavor['width'] > 0) || ($flavor['height'] > 0)))
@@ -805,7 +908,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 					if ($width && $height)
 						$resolution = ",RESOLUTION={$width}x{$height}";
 				}
-				else if ($bitrate && $bitrate <= 65536)
+				else if ($bitrate && $bitrate <= self::AUDIO_CODECS_BITRATE_THRESHOLD)
 					$codecs = ',CODECS="mp4a.40.2"';
 				$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}{$audio}\n";
 				$content .= $flavor['url'];
@@ -816,6 +919,15 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 			return array_merge($audioFlavorsArr, array(''), $flavorsArr);
 		}		
 		return $flavorsArr;
+	}
+
+	private function calculateBitRate($flavor)
+	{
+		$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1024;
+		$frameRate = (isset($flavor['frameRate']) ? $flavor['frameRate'] : 0);
+		// to match the bitrate calculation function from the NGINX
+		$bitrate = ($bitrate * 188 / 184) + ($frameRate * 188 * 4);
+		return floor($bitrate);
 	}
 	
 	/* (non-PHPdoc)

@@ -171,4 +171,7 @@ class flavorParams extends assetParams
 
 	public function setForcedKeyFramesMode($v){ $this->putInCustomData('ForcedKeyFramesMode', $v);}
 	public function getForcedKeyFramesMode(){return $this->getFromCustomData('ForcedKeyFramesMode', null, 1);}
+
+	public function setChunkedEncodeMode($v){ $this->putInCustomData('ChunkedEncodeMode', $v);}
+	public function getChunkedEncodeMode(){return $this->getFromCustomData('ChunkedEncodeMode', null, 0);}
 }

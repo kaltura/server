@@ -2,7 +2,7 @@
 /**
  * @package plugins.thumbCuePoint
  */
-class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaTypeExtender, IKalturaEventConsumers, IKalturaCuePointXmlParser
+class ThumbCuePointPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKalturaTypeExtender, IKalturaEventConsumers, IKalturaCuePointXmlParser
 {
 	const PLUGIN_NAME = 'thumbCuePoint';
 	const CUE_POINT_VERSION_MAJOR = 1;
@@ -273,5 +273,21 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 	public static function shouldCloneByProperty(entry $entry)
 	{
 		return $entry->shouldCloneByProperty(self::getBaseEntryCloneOptionsCoreValue( BaseEntryThumbCuePointCloneOptions::THUMB_CUE_POINTS), false);
+	}
+
+	public static function getTypesToElasticIndexOnEntry()
+	{
+		return array(self::getCuePointTypeCoreValue(ThumbCuePointType::THUMB));
+	}
+
+	public static function getSubTypes()
+	{
+		$refClass = new ReflectionClass('ThumbCuePointSubType');
+		return $refClass->getConstants();
+	}
+
+	public static function getSubTypeValue($subType)
+	{
+		return constant("ThumbCuePointSubType::".$subType);
 	}
 }

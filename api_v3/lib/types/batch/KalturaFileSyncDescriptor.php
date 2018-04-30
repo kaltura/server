@@ -9,7 +9,12 @@ class KalturaFileSyncDescriptor extends KalturaObject
 	 * @var string
 	 */
 	public $fileSyncLocalPath;
-	
+
+	/**
+	 * @var string
+	 */
+	public $fileEncryptionKey;
+
 	/**
 	 * The translated path as used by the scheduler
 	 * @var string
@@ -26,6 +31,7 @@ class KalturaFileSyncDescriptor extends KalturaObject
 		"fileSyncLocalPath" ,
 		"fileSyncRemoteUrl" ,
 		"fileSyncObjectSubType" ,
+		"fileEncryptionKey",
 	);
 
 

@@ -91,11 +91,11 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 				continue;
 			}
 			
-			$startTime = $this->parseStrTTTime($childNode->getAttribute('begin'));
+			$startTime = $this->parseDfxpStrTTTime($childNode->getAttribute('begin'));
 			$endTime = $startTime;
 			if($childNode->hasAttribute('end'))
 			{
-				$endTime = $this->parseStrTTTime($childNode->getAttribute('end'));
+				$endTime = $this->parseDfxpStrTTTime($childNode->getAttribute('end'));
 			}
 			elseif($childNode->hasAttribute('dur'))
 			{
@@ -161,7 +161,7 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 		return $itemsData;
 	}
 	
-	private function parseStrTTTime($timeStr)
+	private function parseDfxpStrTTTime($timeStr)
 	{
 		$matches = null;
 		if(preg_match('/(\d+)s/', $timeStr))
@@ -198,5 +198,139 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 	public static function get()
 	{
 		return new dfxpCaptionsContentManager();
+	}
+
+	protected function createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime, $globalOffset)
+	{
+	}
+
+	public function buildFile($content, $clipStartTime, $clipEndTime, $globalOffset = 0)
+	{
+		$xml = new KDOMDocument();
+		try
+		{
+			$content = trim($content, " \r\n\t");
+			$xml->loadXML($content);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+			return '';
+		}
+		$xmlUpdatedContent = $this->editBody($xml, $clipStartTime, $clipEndTime, $globalOffset);
+		$xmlUpdatedContent = trim($xmlUpdatedContent, " \r\n\t");
+		$xmlUpdatedContent = str_replace("      \n", "", $xmlUpdatedContent);
+		return $xmlUpdatedContent;
+	}
+
+	private function editBody(DOMNode $curNode, $clipStartTime, $clipEndTime, $globalOffset)
+	{
+		for ($i = 0; $i < $curNode->childNodes->length; $i++)
+		{
+			$childNode = $curNode->childNodes->item($i);
+			if ($childNode->nodeType != XML_ELEMENT_NODE)
+				continue;
+
+			if (strtolower($childNode->nodeName) != 'p')
+			{
+				$this->editBody($childNode, $clipStartTime, $clipEndTime, $globalOffset);
+				continue;
+			}
+
+			$captionStartTime = $this->parseDfxpStrTTTime($childNode->getAttribute('begin'));
+			$captionEndTime = $captionStartTime;
+			if($childNode->hasAttribute('end'))
+			{
+				$captionEndTime = $this->parseDfxpStrTTTime($childNode->getAttribute('end'));
+			}
+			elseif($childNode->hasAttribute('dur'))
+			{
+				$duration = floatval($childNode->getAttribute('dur')) * 1000;
+				$captionEndTime = $captionStartTime + $duration;
+			}
+			if(!kCaptionsContentManager::onTimeRange($captionStartTime, $captionEndTime, $clipStartTime, $clipEndTime))
+				$curNode->removeChild($childNode);
+			else
+				{
+				$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($captionStartTime, $clipStartTime, $globalOffset);
+				$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $captionEndTime, $globalOffset);
+
+				$childNode->setAttribute('begin',kXml::integerToTime($adjustedStartTime));
+				if($childNode->hasAttribute('end'))
+					$childNode->setAttribute('end',kXml::integerToTime($adjustedEndTime));
+			}
+		}
+		$content = "";
+		if(!$curNode instanceof DOMElement)
+		{
+			$content = $curNode->saveXML();
+		}
+		return $content;
+	}
+
+	/**
+	 * @param string $content
+	 * @param string $toAppend
+	 * @return string
+	 */
+	public function merge($content, $toAppend)
+	{
+		$contentXML = new KDOMDocument();
+		$toAppendXML = new KDOMDocument();
+		try
+		{
+			$contentXML->loadXML($content);
+			$toAppendXML->loadXML($toAppend);
+			$contentBody = $contentXML->getElementsByTagName('body')->item(0);
+			$divToAppend = $toAppendXML->getElementsByTagName('div');
+			/** @var DOMElement $candidate*/
+			for ($i = 0; $i < $divToAppend ->length; $i ++)
+			{
+				$this->appendToDestination($divToAppend->item($i), $contentBody, $contentXML);
+			}
+
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+			return $content;
+		}
+		$content = $contentXML->saveXML();
+		$content = trim($content, " \r\n\t");
+		$content = str_replace("    \n", "", $content);
+		return $content;
+	}
+
+	/**
+	 * @param DOMElement $candidate
+	 * @param DOMElement $contentBody
+	 * @param DOMDocument $contentXML
+	 */
+	private function appendToDestination($candidate, $contentBody, $contentXML)
+	{
+		$shouldAddDiv = true;
+		/** @var DOMElement $existingLanguage */
+		foreach ($contentBody->getElementsByTagName('div') as $existingLanguage)
+		{
+			if ($existingLanguage->getAttribute('xml:lang') === $candidate->getAttribute('xml:lang'))
+			{
+				$shouldAddDiv = false;
+				foreach ($candidate->childNodes as $line)
+				{
+					// Import the line, and all its children, to the $contentXML doc
+					$line = $contentXML->importNode($line, true);
+					// append imported line to existing language
+					$existingLanguage->appendChild($line);
+				}
+				break;
+			}
+		}
+		if ($shouldAddDiv)
+		{
+			// Import the language, and all its children, to the $contentXML doc
+			$candidate = $contentXML->importNode($candidate, true);
+			// append imported language to body
+			$contentBody->appendChild($candidate);
+		}
 	}
 }

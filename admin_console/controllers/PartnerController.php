@@ -245,6 +245,18 @@ class PartnerController extends Zend_Controller_Action
 		$this->getResponse()->setRedirect($url);
 	}
 	
+	public function kavaRedirectAction()
+	{
+		$settings = Zend_Registry::get('config')->settings;
+		$sessionExpiry = $settings->sessionExpiry;
+		$kavaDashboardUrl = $settings->kavaDashboard->partnerUrl;
+		$jwtKey = $settings->kavaDashboard->partnerJwtKey;
+		$partnerId = $this->_getParam('partner_id');
+		
+		$partnerkavaDashboardUrl = Form_KavaHelper::generateSignedKavaDashboardUrl($kavaDashboardUrl, $jwtKey, $partnerId, $sessionExpiry);
+		$this->getResponse()->setRedirect($partnerkavaDashboardUrl);
+	}
+	
 	public function configureStorageAction()
 	{
 		$this->_helper->layout->disableLayout();

@@ -1383,7 +1383,7 @@ CREATE TABLE `access_control`
 	`prv_restrict_length` INTEGER,
 	`kdir_restrict_type` TINYINT,
 	`custom_data` TEXT,
-	`rules` TEXT,
+	`rules` MEDIUMTEXT,
 	PRIMARY KEY (`id`)
 )Type=InnoDB;
 
@@ -2449,7 +2449,10 @@ CREATE TABLE `app_token`
 	`session_privileges` TEXT,
 	`token` TEXT,
 	`custom_data` TEXT,
-	PRIMARY KEY (`id`)
+	`kuser_id` INTEGER,
+	PRIMARY KEY (`id`),
+	KEY `int_id`(`int_id`),
+	KEY `kuser_id`(`kuser_id`)
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------

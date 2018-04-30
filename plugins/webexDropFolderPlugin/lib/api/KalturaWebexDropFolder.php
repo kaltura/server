@@ -49,6 +49,16 @@ class KalturaWebexDropFolder extends KalturaDropFolder
 	 * @var string
 	 */
 	public $webexServiceType;
+
+	/**
+	 * @var string
+	 */
+	public $webexSiteName;
+
+	/**
+	 * @var time
+	 */
+	public $deleteFromTimestamp;
 	
 	
 	/*
@@ -63,6 +73,8 @@ class KalturaWebexDropFolder extends KalturaDropFolder
 		'webexHostIdMetadataFieldName',
 		'deleteFromRecycleBin',
 		'webexServiceType',
+		'deleteFromTimestamp',
+		'webexSiteName',
 	 );
 		 
 	public function getMapBetweenObjects()

@@ -305,11 +305,14 @@ abstract class KalturaBaseService
 	}
 	
 	/**
-	 * @param string $file_name
-	 * @param string $mime_type
+	 * @param string $filePath
+	 * @param string $mimeType
+	 * @param string $key
+	 * @param string $iv
+	 * @param int $fileSize
 	 * @return kRendererDumpFile
 	 */
-	protected function dumpFile($filePath, $mimeType)
+	protected function dumpFile($filePath, $mimeType, $key = null, $iv = null, $fileSize = null)
 	{
 		$maxAge = null;
 		if ($this->ks)
@@ -317,7 +320,7 @@ abstract class KalturaBaseService
 			$maxAge = min(max($this->ks->valid_until - time(), 1), 8640000);
 		}
 
-		return kFileUtils::getDumpFileRenderer($filePath, $mimeType, $maxAge);
+		return kFileUtils::getDumpFileRenderer($filePath, $mimeType, $maxAge, 0, null, $key, $iv, $fileSize);
 	}
 	
 	/**
@@ -338,8 +341,10 @@ abstract class KalturaBaseService
 		if($local)
 		{
 			$filePath = $fileSync->getFullPath();
-			$mimeType = kFile::mimeType($filePath);			
-			return $this->dumpFile($filePath, $mimeType);
+			$mimeType = kFile::mimeType($filePath);
+			$key = $fileSync->isEncrypted() ?  $fileSync->getEncryptionKey() : null;
+			$iv = $key ? $fileSync->getIv() : null;
+			return $this->dumpFile($filePath, $mimeType, $key, $iv);
 		}
 		else if ( in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()) )
 		{

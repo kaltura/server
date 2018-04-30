@@ -8,7 +8,17 @@ class kScheduledTaskJobData extends kJobData
 	/**
 	 * @var int
 	 */
+	private $_totalCount;
+
+	/**
+	 * @var int
+	 */
 	private $_maxResults;
+
+	/**
+	 * @var DryRunType
+	 */
+	private $_fileFormat;
 
 	/**
 	 * @var string
@@ -19,6 +29,15 @@ class kScheduledTaskJobData extends kJobData
 	 * @var int
 	 */
 	private $_referenceTime;
+
+	/**
+	 * kScheduledTaskJobData constructor.
+	 */
+	public function __construct()
+	{
+		$this->_fileFormat = DryRunFileType::LIST_RESPONSE;
+		$this->_maxResults = 0;
+	}
 
 	/**
 	 * @param int $maxResults
@@ -66,5 +85,37 @@ class kScheduledTaskJobData extends kJobData
 	public function getReferenceTime()
 	{
 		return $this->_referenceTime;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getFileFormat()
+	{
+		return $this->_fileFormat;
+	}
+
+	/**
+	 * @param DryRunFileType $fileFormat
+	 */
+	public function setFileFormat($fileFormat)
+	{
+		$this->_fileFormat = $fileFormat;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getTotalCount()
+	{
+		return $this->_totalCount;
+	}
+
+	/**
+	 * @param int $count
+	 */
+	public function setTotalCount($count)
+	{
+		$this->_totalCount = $count;
 	}
 }

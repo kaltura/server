@@ -7,6 +7,7 @@
  */
 require_once(dirname(__FILE__) . '/infraRequestUtils.class.php');
 require_once(dirname(__FILE__) . '/../cache/kCacheManager.php');
+require_once(dirname(__FILE__) . '/../../../../../infra/general/KCryptoWrapper.class.php');
 
 /** 
  * @package server-infra
@@ -49,6 +50,8 @@ class kSessionBase
 	const PRIVILEGES_DELIMITER = "/";
 	const PRIVILEGE_DISABLE_PARTNER_CHANGE_ACCOUNT = "disablechangeaccount";
 	const PRIVILEGE_EDIT_USER = "edituser";
+	const PRIVILEGE_EDIT_ADMIN_TAGS = 'editadmintags';
+	const PRIVILEGE_RESTRICT_EXPLICIT_LIVE_VIEW = "restrictexplicitliveview";
 
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
 	
@@ -484,29 +487,20 @@ class kSessionBase
 
 		return $encoded_str;
 	}
-
 	// KS V2 functions
 	protected static function aesEncrypt($key, $message)
 	{
-		return mcrypt_encrypt(
-			MCRYPT_RIJNDAEL_128,
-			substr(sha1($key, true), 0, 16),
-			$message,
-			MCRYPT_MODE_CBC, 
-			self::AES_IV
-		);
+		
+		$key = substr(sha1($key, true), 0, 16);
+		return KCryptoWrapper::encrypt_aes($message, $key, self::AES_IV);
 	}
 
 	protected static function aesDecrypt($key, $message)
 	{
-		return mcrypt_decrypt(
-			MCRYPT_RIJNDAEL_128,
-			substr(sha1($key, true), 0, 16),
-			$message,
-			MCRYPT_MODE_CBC, 
-			self::AES_IV
-		);
+		$key = substr(sha1($key, true), 0, 16);
+		return KCryptoWrapper::decrypt_aes($message, $key, self::AES_IV);
 	}
+
 
 	public static function generateKsV2($adminSecret, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData)
 	{

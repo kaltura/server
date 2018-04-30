@@ -177,8 +177,8 @@ class myPartnerRegistration
 	 */
 	private function createNewPartner( $partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $newPartner = null, $templatePartnerId = null )
 	{
-		$secret = md5(mcrypt_create_iv(16,MCRYPT_DEV_URANDOM));
-		$admin_secret = md5(mcrypt_create_iv(16,MCRYPT_DEV_URANDOM));
+		$secret = md5(KCryptoWrapper::random_pseudo_bytes(16));
+		$admin_secret = md5(KCryptoWrapper::random_pseudo_bytes(16));
 
 		if (!$newPartner)
 			$newPartner = new Partner();
@@ -341,8 +341,31 @@ class myPartnerRegistration
 			{
 				throw new SignupException("Invalid password for user with email [$email].", SignupException::EMAIL_ALREADY_EXISTS );
 			}
+
+			if(myPartnerUtils::isPartnerCreatedAsMonitoredFreeTrial($partner, true))
+			{
+				$partnerPackage = $partner->getPartnerPackage();
+				if ($this->partnerParentId)
+				{
+					$parentPartner = PartnerPeer::retrieveByPK($this->partnerParentId);
+					$partnerPackage = $parentPartner->getPartnerPackage();
+				}
+
+				if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_FREE)
+				{
+					$result = myPartnerUtils::retrieveNotDeletedPartnerByEmailAndPackage ($partner, PartnerPackages::PARTNER_PACKAGE_FREE);
+					if($result)
+					{
+						$result->setSubPartnerRequestCampaign(1);
+						$result->save();
+						throw new SignupException("Free Trial user with email [$email] already exists in system.", SignupException::EMAIL_ALREADY_EXISTS);
+					}
+
+				}
+			}
 		}
-			
+
+
 			
 		// TODO: log request
 		$newPartner = NULL;

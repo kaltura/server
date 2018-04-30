@@ -99,8 +99,13 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	public static function createKuserForPartner($partner_id, $puser_id, $is_admin = false)
 	{
 		$puser_id = self::getValidPuserStr($puser_id);
-		$lockKey = "user_add_" . $partner_id . $puser_id;
-		return kLock::runLocked($lockKey, array('kuserPeer','createUniqueKuserForPartner'), array($partner_id, $puser_id, $is_admin));
+		$kuser = kuserPeer::getKuserForPartner($partner_id, $puser_id);
+		if(!$kuser)
+		{
+			$lockKey = "user_add_" . $partner_id . $puser_id;
+			$kuser = kLock::runLocked($lockKey, array('kuserPeer', 'createUniqueKuserForPartner'), array($partner_id, $puser_id, $is_admin));
+		}
+		return $kuser;
 	}
 
 	public static function createUniqueKuserForPartner($partner_id, $puser_id, $is_admin = false)
@@ -635,7 +640,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("kuser:id=%s", self::ID), array("kuser:partnerId=%s,puserid=%s", self::PARTNER_ID, self::PUSER_ID));		
+		return array(array("kuser:id=%s", self::ID), array("kuser:partnerId=%s,puserid=%s", self::PARTNER_ID, self::PUSER_ID), array("kuser:loginDataId=%s", self::LOGIN_DATA_ID));		
 	}
 	
 	public static function retrieveByPKNoFilter($pk, PropelPDO $con = null)

@@ -36,8 +36,11 @@ class KalturaErrors extends APIErrors
 	const ACTION_NOT_SPECIFIED = "ACTION_NOT_SPECIFIED;;Action name was not specified, please specify one";
 
 	// ACTION_NAME - action name, SERVICE_NAME - service name
+	const ACTION_BLOCKED = "ACTION_BLOCKED;ACTION_NAME,SERVICE_NAME;Action \"@ACTION_NAME@\" in service \"@SERVICE_NAME@\" is blocked";
+	
+	// ACTION_NAME - action name, SERVICE_NAME - service name
 	const ACTION_DOES_NOT_EXISTS = "ACTION_DOES_NOT_EXISTS;ACTION_NAME,SERVICE_NAME;Action \"@ACTION_NAME@\" does not exists for service \"@SERVICE_NAME@\"";
-
+	
 	// ACTION_NAME - action name
 	const ACTION_FORBIDDEN = "ACTION_FORBIDDEN;ACTION_NAME;Action \"@ACTION_NAME@\" is forbidden for use";
 
@@ -81,6 +84,8 @@ class KalturaErrors extends APIErrors
 	const PROPERTY_VALIDATION_ENTRY_STATUS =  "PROPERTY_VALIDATION_ENTRY_STATUS;PROP_NAME,STATUS;The property \"@PROP_NAME@\" cannot be set for entry status \"@STATUS@\"";
 
 	const INVALID_USER_ID = "INVALID_USER_ID;;Invalid user id";
+
+	const INVALID_METADATA_PROFILE_ID = "INVALID_USER_ID;;Invalid user id";
 
 	const DATA_CENTER_ID_NOT_FOUND = "DATA_CENTER_ID_NOT_FOUND;DCID;There is no data center with id [@DCID@]";
 
@@ -160,6 +165,8 @@ class KalturaErrors extends APIErrors
 	const ENTRY_CANNOT_BE_TRIMMED = "ENTRY_CANNOT_BE_TRIMMED;;Entry cannot be trimmed";
 
 	const DYNAMIC_SEGMENT_DURATION_DISABLED = "DYNAMIC_SEGMENT_DURATION_DISABLED;;Cannot edit segment duration. Dynamic segment duration feature is disabled";
+
+	const VOLUME_MAP_NOT_CONFIGURED = "VOLUME_MAP_NOT_CONFIGURED;;Need to add volume map support to configuration";
 
 	/**
 	 * Notification Service
@@ -393,6 +400,8 @@ class KalturaErrors extends APIErrors
 	const UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE = "UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE;;Failed to match expected file size";
 
 	const UPLOAD_TOKEN_FILE_TYPE_RESTRICTED_FOR_UPLOAD = "UPLOAD_TOKEN_FILE_TYPE_RESTRICTED_FOR_UPLOAD;;Upload token is restricted due to the file type";
+	
+	const UPLOAD_TOKEN_MISSING_FILE_SIZE = "UPLOAD_TOKEN_MISSING_FILE_SIZE;;FileSize is mandatory when enabling autoFinalize";
 
 	/*
 	 * Partenrs service
@@ -449,6 +458,8 @@ class KalturaErrors extends APIErrors
 
 	const SYNDICATION_FEED_KALTURA_DC_ONLY = "SYNDICATION_FEED_KALTURA_DC_ONLY;;Partner configured to use Kaltura data centers only";
 
+	const ENFORCE_ITUNES_FEED_AUTHOR = "ENFORCE_ITUNES_FEED_AUTHOR;;Missing feedAuthor param [Mandatory when enforcing feedAuthor]";
+
 	/*
 	 * file sync
 	 */
@@ -461,6 +472,8 @@ class KalturaErrors extends APIErrors
 	const STORAGE_PROFILE_RULES_NOT_FULFILLED = "STORAGE_PROFILE_RULES_NOT_FULFILLED;ID;Storage profile rules for profile id @ID@ are not fulfilled";
 	
 	const FILE_PENDING = "FILE_PENDING;;File is pending";
+
+	const FILE_TYPE_NOT_SUPPORTED = "FILE_TYPE_NOT_SUPPORTED;TYPE;File type @TYPE@ is not supported";
 	
 	/*
 	 * resetUserPassword
@@ -477,6 +490,12 @@ class KalturaErrors extends APIErrors
 	const REPORT_PARAMETER_MISSING = "REPORT_PARAMETER_MISSING;PARAM;Parameter \"@PARAM@\" is missing";
 
 	const SEARCH_TOO_GENERAL = "SEARCH_TOO_GENERAL;;Unable to create report. Query produced too many results";
+
+
+	/**
+	 * user service
+	 */
+	const INVALID_ID = "INVALID_ID;ID;Id \"@ID@\" contains invalid chars";
 
 	/**
 	 * categoryUser service
@@ -578,6 +597,8 @@ class KalturaErrors extends APIErrors
 	
 	const RECORDING_DISABLED = "RECORDING_DISABLED;;Record status attribute cannot be set, account has recording feature disabled";
 	
+	const LIVE_CLIPPING_UNSUPPORTED_OPERATION = "LIVE_CLIPPING_UNSUPPORTED_OPERATION;OPERATION; Unsupported operation for live clipping: @OPERATION@";
+	
 	/*
 	 * BaseEntry Service
 	 */
@@ -652,12 +673,17 @@ class KalturaErrors extends APIErrors
 	const USER_ENTRY_OBJECT_TYPE_ERROR = 'USER_ENTRY_OBJECT_TYPE_ERROR;OBJ_TYPE,USER_ENTRY_ID;There is an error in the DB, object type [@OBJ_TYPE@] of UserEntry id [@USER_ENTRY_ID@] is unknown';
 	const MUST_FILTER_ON_ENTRY_OR_USER = 'MUST_FILTER_ON_ENTRY_OR_USER;;Must filter on entry ID or user ID';
 	const USER_ENTRY_FILTER_FORBIDDEN_FIELDS_USED = 'USER_ENTRY_FILTER_FORBIDDEN_FIELDS_USED;;UserEntry filter object forbidden fields used';
+	const USER_ENTRY_ALREADY_EXISTS = 'USER_ENTRY_ALREADY_EXISTS;;UserEntry for this type already exists';
+	const USER_ID_NOT_PROVIDED_OR_EMPTY = 'USER_ID_NOT_PROVIDED_OR_EMPTY;;User ID not found neither on the object or KS';
 	
 	/*
 	 * serverNode service
 	 */
 	const HOST_NAME_ALREADY_EXISTS = "HOST_NAME_ALREADY_EXISTS;HOST_NAME;Host Name [@HOST_NAME@] already exists";
 	const SERVER_NODE_NOT_FOUND = "SERVER_NODE_NOT_FOUND;HOST_NAME;server node with host name [@HOST_NAME@] not found";
+	const SERVER_NODE_PROVIDED_AS_PARENT_NOT_FOUND = "SERVER_NODE_PROVIDED_AS_PARENT_NOT_FOUND;NODE_IDS;The following parentIds where not found [@NODE_IDS@]";
+	const SERVER_NODE_PARENT_LOOP_DETECTED = "SERVER_NODE_PARENT_LOOP_DETECTED;ROUTE;ParentId loop detected on route [@ROUTE@], validate parentId tree definition";
+	const SERVER_NODE_NOT_FOUND_WITH_ID = "SERVER_NODE_NOT_FOUND;SERVER_NODE_ID;server node with id [@SERVER_NODE_ID@] not found";
 
 	/*
 	 * EntryServerNode service
@@ -671,4 +697,12 @@ class KalturaErrors extends APIErrors
 	 * OTP error
 	 */
 	const INVALID_OTP = 'INVALID_OTP;;OTP provided failed to validate';
+
+
+	/*
+	 * clip concat Error
+	 */
+
+	const CANNOT_CREATE_CLIP_FLAVOR_JOB = "CANNOT_CREATE_CLIP_FLAVOR_JOB;;cannot create clip, flavor convert batch job returned as null";
 }
+

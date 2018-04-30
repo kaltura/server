@@ -32,15 +32,15 @@ You can contribute meaningfully to the project from day one:
 + By creating [documentation](https://github.com/kaltura/platform-install-packages/tree/master/doc), demos and examples.
 + By translating Kaltura and the documentation.
 
-To make a contribution, follow the [See our CONTRIBUTERS doc](https://github.com/kaltura/platform-install-packages/blob/IX-9.19.0/doc/CONTRIBUTERS.md)
+To make a contribution, follow the [See our CONTRIBUTERS doc](https://github.com/kaltura/platform-install-packages/blob/master/doc/CONTRIBUTERS.md)
 
 Contact the authors or email community@kaltura.org if you have other ideas.
 
 ## Documentation and Guides
 
 * [**Frequently Asked Questions**](https://github.com/kaltura/platform-install-packages/blob/master/doc/kaltura-packages-faq.md)
-* [API Client libraries introduction] (http://knowledge.kaltura.com/introduction-kaltura-client-libraries)
-* [API Client libraries download] (http://www.kaltura.com/api_v3/testme/client-libs.php)
+* [API Client libraries introduction](http://knowledge.kaltura.com/introduction-kaltura-client-libraries)
+* [API Client libraries download](http://www.kaltura.com/api_v3/testme/client-libs.php)
 * [Single-server All-In-One RedHat based Linux distros Installation (including FC, RHEL and CentOS)](https://github.com/kaltura/platform-install-packages/blob/master/doc/install-kaltura-redhat-based.md).
 * [Single-server All-In-One deb based Linux distros Installation (Debian, Ubuntu)](https://github.com/kaltura/platform-install-packages/blob/master/doc/install-kaltura-deb-based.md).
 * [Deploying Kaltura Clusters (RPM)](https://github.com/kaltura/platform-install-packages/blob/master/doc/rpm-cluster-deployment-instructions.md)

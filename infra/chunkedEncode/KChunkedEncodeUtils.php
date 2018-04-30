@@ -1,12 +1,24 @@
 <?php
-/*****************************
-	Change log:
-*/
 
  /*****************************
- * Includes & Globals
- */
+  * Includes & Globals
+  */
 
+	/********************
+	 * Session exit statuses
+	 */
+	class KChunkedEncodeReturnStatus {
+		const OK = 0;
+		const InitializeError = 1000;
+		const GenerateVideoError = 1001;
+		const GenerateAudioError = 1002;
+		const FixDriftError = 1003;
+		const AnalyzeError = 1004;
+		const MergeError = 1005;
+		const MergeAttemptsError = 1006;
+		const MergeThreshError = 1007;
+	}
+	
 	/********************
 	 * Session setup values
 	 */
@@ -72,8 +84,10 @@
 			if(!isset($this->chunkDuration)) {
 				if($params->height>480)
 					$this->chunkDuration = self::DefaultChunkDuration;
-				else
+				else if($params->height>360)
 					$this->chunkDuration = 2*self::DefaultChunkDuration;
+				else
+					$this->chunkDuration = 3*self::DefaultChunkDuration;
 			}
 
 			if($this->concurrentMin>$this->concurrent)
@@ -202,11 +216,144 @@
 			$jsonStr = json_encode($framesStat);
 			KalturaLog::log("$jsonStr");
 			return $framesStat;
-// ffmpeg -i $chunkFileName -c copy -f mp4 -v quiet -y $chunkFileName.mp4;ffprobe -show_streams -select_streams v -v quiet -show_entries stream=nb_frames -print_format csv $chunkFileName.mp4
-// ffprobe -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type -print_format csv -v quiet $chunkFileName| (head -n1) ; ffmpeg -threads 1 -ss 58 -i $chunkFileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | ffprobe -f mpegts -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type -print_format csv -v quiet - | tail
 		}
 		
 
 	}
 	
-	
+	/********************
+	 * Process stat data
+	 */
+	class KProcessExecutionData {
+		public $process = null;	// ...
+		public $exitCode = null;// ...
+		public $startedAt = null;
+		
+		public $user = null;
+		public $system = null;
+		public $elapsed = null;
+		public $cpu = null;
+		
+		/********************
+		 *
+		 */
+		public function __construct($process = null, $logFileName = null)
+		{
+			if(isset($process)){
+				$this->process = $process;
+			}
+			if(isset($logFileName)){
+				$this->parseLogFile($logFileName);
+			}
+		}
+		
+		/********************
+		 *
+		 */
+		public static function executeCmdline($cmdLine)
+		{
+			$cmdLine = "$cmdLine & echo $! ";
+			$started = date_create();
+			KalturaLog::log("cmdLine:\n$cmdLine\n");
+
+			$rv = 0;
+			$op = null;
+			
+			exec($cmdLine,$op,$rv);
+			if($rv!=0) {
+				return false;
+			}
+			$pid = implode("\n",$op);
+			KalturaLog::log("pid($pid), rv($rv)");
+			return $pid;
+		}
+		
+		/********************
+		 *
+		 */
+		public static function waitForCompletion($process, $sleepTime=2)
+		{
+			KalturaLog::log("process($process), sleepTime($sleepTime)");
+			while(1) {
+				if(self::isProcessRunning($process)==false){
+					break;
+				}
+				sleep($sleepTime);
+			}
+			KalturaLog::log("process($process)==>finished");
+		}
+
+		/********************
+		 *
+		 */
+		public static function isProcessRunning($process)
+		{
+			if(file_exists( "/proc/$process" )){
+				return true;
+			}
+			return false;
+		}
+		
+		/********************
+		 *
+		 */
+		public function parseLogFile($logFileName)
+		{
+			if(!file_exists($logFileName))
+				return;
+			$fp = fopen($logFileName, 'r');
+			if($fp==null)
+				return;
+			$line = fgets($fp);
+			$logLines = null;
+			$logLines = self::readLastLines($fp, 300);							
+			$logLines[] = $line;
+			fclose($fp);
+			foreach($logLines as $line){
+				if(strstr($line, "elapsed")!==false) {
+					$tmpArr = explode(" ",$line);
+					foreach($tmpArr as $tmpStr){
+						if(($pos=strpos($tmpStr, "user"))!==false) {
+							$this->user = substr($tmpStr,0,$pos);
+						}
+						else if(($pos=strpos($tmpStr, "system"))!==false) {
+							$this->system = substr($tmpStr,0,$pos);
+						}
+						else if(($pos=strpos($tmpStr, "elapsed"))!==false) {
+							$elapsed = substr($tmpStr,0,$pos);
+							$tmpTmArr = array_reverse(explode(":",$elapsed));
+							$this->elapsed = 0;
+							foreach($tmpTmArr as $i=>$tm){
+								$this->elapsed+= $tm*pow(60,$i);
+							}
+						}
+						else if(($pos=strpos($tmpStr, "%CPU"))!==false) {
+							$this->cpu = substr($tmpStr,0,$pos);
+						}
+					}
+				}
+				else if(strstr($line, "Started:")!==false){
+					$this->startedAt = trim(substr($line,strlen("started:2017-03-15 ")));
+				}
+				else if(strstr($line, "exit_code:")!==false){
+					$this->exitCode = trim(substr($line,strlen("exit_code:")));
+				}
+			}
+		}
+		
+		/********************
+		 *
+		 */
+		private static function readLastLines($fp, $length)
+		{
+			fseek($fp, -$length, SEEK_END);
+			$lines=array();
+			while(!feof($fp)){
+				$line = fgets($fp);
+				$lines[] = $line;
+			}
+			return $lines;
+		}
+	}
+
+

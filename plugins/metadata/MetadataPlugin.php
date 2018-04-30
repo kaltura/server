@@ -3,7 +3,7 @@
  * Enable adding custom metadata objects that releate to core objects
  * @package plugins.metadata
  */
-class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor, IKalturaSchemaContributor, IKalturaSphinxConfiguration, IKalturaEnumerator, IKalturaObjectValidator
+class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor, IKalturaSchemaContributor, IKalturaSphinxConfiguration, IKalturaEnumerator, IKalturaObjectValidator, IKalturaElasticSearchDataContributor
 {
 
 	const SPHINX_DEFAULT_NUMBER_OF_DATE_FIELDS = 10;
@@ -255,7 +255,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			if ($enumValue == 'kMetadataResponseProfileMapping')
 				return new KalturaMetadataResponseProfileMapping();
 		}
-		
+
 		return null;
 	}
 	
@@ -974,5 +974,33 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
     	    }
 	    }
 	}
-	
+
+	/**
+	 * Return search data to be associated with the object
+	 *
+	 * @param BaseObject $object
+	 * @return ArrayObject
+	 */
+	public static function getElasticSearchData(BaseObject $object)
+	{
+		if($object instanceof entry)
+		{
+			if(self::isAllowedPartner($object->getPartnerId()))
+				return kMetadataManager::getElasticSearchValuesByObject(MetadataObjectType::ENTRY, $object->getId());
+		}
+
+		if($object instanceof category)
+		{
+			if(self::isAllowedPartner($object->getPartnerId()))
+				return kMetadataManager::getElasticSearchValuesByObject(MetadataObjectType::CATEGORY, $object->getId());
+		}
+
+		if($object instanceof kuser)
+		{
+			if(self::isAllowedPartner($object->getPartnerId()))
+				return kMetadataManager::getElasticSearchValuesByObject(MetadataObjectType::USER, $object->getId());
+		}
+
+		return null;
+	}
 }

@@ -80,7 +80,7 @@ class kIpAddressCondition extends kMatchCondition
 	 */
 	protected function matches($field, $value)
 	{
-		return kIpAddressUtils::isIpInRange($field, $value);
+		return kIpAddressUtils::isIpInRanges($field, $value);
 	}
 
 	/**

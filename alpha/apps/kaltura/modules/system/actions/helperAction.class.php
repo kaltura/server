@@ -18,17 +18,13 @@ class helperAction extends kalturaSystemAction
 		$this->forceSystemAuthentication();
 		$secret = "";
 		$str = $this->getP ( "str" );
-		$algo = $this->getP ( "algo" , "wiki_decode" );
+		$algo = $this->getP ( "algo" , "wiki_decode_no_serialize" );
 		$res = "";
 		$key = null;
 		
 		if ( $algo == "wiki_encode" )
 		{
 			$res = str_replace ( array ( "|" , "/") , array ( "|01" , "|02" ) , base64_encode ( serialize ( $str ) ) ) ; 
-		}
-		elseif ( $algo == "wiki_decode" )
-		{
-			$res = @unserialize ( base64_decode (str_replace ( array ( "|02" , "|01" ) , array ( "/" , "|" ) , $str ) ) ) ;
 		}
 		elseif ( $algo == "wiki_decode_no_serialize" )
 		{
@@ -45,35 +41,18 @@ class helperAction extends kalturaSystemAction
 		elseif ( $algo == "base64_3des_encode" )
 		{
 			$key = $this->getP ( "des_key" );
-			echo "[$key]";
-			$input = $str ;
-			$td = mcrypt_module_open('tripledes', '', 'ecb', '');
-	    	$iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-	    	$key = substr($key, 0, mcrypt_enc_get_key_size($td));
-	    	
-	    	mcrypt_generic_init($td, $key, $iv);
-	    	$encrypted_data = mcrypt_generic($td, $input);
-	    	mcrypt_generic_deinit($td);
-	    	mcrypt_module_close($td);
+			$encrypted_data = KCryptoWrapper::encrypt_3des($str, $key);
 	    
-			$res = base64_encode($encrypted_data )		;
+			$res = base64_encode($encrypted_data)		;
 			$this->des_key = $key;
 		}
 		elseif ( $algo == "base64_3des_decode" )
 		{
 			$key = $this->getP ( "des_key" );
-			echo "[$key]";
 			$input = base64_decode ( $str );
-			$td = mcrypt_module_open('tripledes', '', 'ecb', '');
-	    	$iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-	    	$key = substr($key, 0, mcrypt_enc_get_key_size($td));
-	    	
-	    	mcrypt_generic_init($td, $key, $iv);
-	    	$encrypted_data = mdecrypt_generic($td, $input);
-	    	mcrypt_generic_deinit($td);
-	    	mcrypt_module_close($td);
+			$decrypted_data = KCryptoWrapper::decrypt_3des($input, $key);
 	    
-			$res = ($encrypted_data )		;
+			$res = ($decrypted_data )		;
 			$this->des_key = $key;
 		}
 		elseif ( $algo == "ks" )

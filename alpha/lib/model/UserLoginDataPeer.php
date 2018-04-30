@@ -16,6 +16,7 @@
 class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectPeer
 {
 	const KALTURAS_CMS_PASSWORD_RESET = 51;
+	const LAST_LOGIN_TIME_UPDATE_INTERVAL = 600; // 10 Minutes
 	
 	public static function generateNewPassword()
 	{
@@ -498,7 +499,11 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 		$loginData->save();
 		
-		$kuser->setLastLoginTime(time());
+		$currentTime = time();
+		$dbLastLoginTime = $kuser->getLastLoginTime();
+		if(!$dbLastLoginTime || $dbLastLoginTime < $currentTime - self::LAST_LOGIN_TIME_UPDATE_INTERVAL)
+			$kuser->setLastLoginTime($currentTime);
+		
 		$kuser->save();
 		
 		return $kuser;
@@ -696,5 +701,9 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	public function isReferenced(IRelatedObject $object)
 	{
 		return true;
+	}
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("userLoginData:id=%s", self::ID), array("userLoginData:loginEmail=%s", self::LOGIN_EMAIL));		
 	}
 } // UserLoginDataPeer

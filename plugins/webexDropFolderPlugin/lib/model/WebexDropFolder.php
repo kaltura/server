@@ -10,6 +10,8 @@ class WebexDropFolder extends RemoteDropFolder
 	const WEBEX_PASSWORD = 'webex_password';
 	
 	const WEBEX_SITE_ID = 'webex_site_id';
+
+	const WEBEX_SITE_NAME = 'webex_site_name';
 	
 	const WEBEX_PARTNER_ID = 'webex_partner_id';
 	
@@ -20,6 +22,8 @@ class WebexDropFolder extends RemoteDropFolder
 	const WEBEX_DELETE_FROM_RECYCLE_BIN = 'deleteFromRecycleBin';
 	
 	const WEBEX_SERVICE_TYPE = 'webexServiceType';
+	
+	const WEBEX_DELETE_FROM_TIMESTAMP = 'deleteFromTimestamp';
 
 	
 	/**
@@ -51,6 +55,11 @@ class WebexDropFolder extends RemoteDropFolder
 	 * @var string
 	 */
 	protected $webexHostIdMetadataFieldName;
+
+	/**
+	 * @var string
+	 */
+	protected $webexSiteName;
 	
 	/**
 	 * return string
@@ -59,7 +68,24 @@ class WebexDropFolder extends RemoteDropFolder
 	{
 		return $this->getFromCustomData(self::WEBEX_USER_ID);
 	}
-	
+
+	/**
+	 * return string
+	 */
+	public function getWebexSiteName ()
+	{
+		return $this->getFromCustomData(self::WEBEX_SITE_NAME);
+	}
+
+	/**
+	 * @param string $v
+	 */
+	public function setWebexSiteName ($v)
+	{
+		$this->putInCustomData(self::WEBEX_SITE_NAME, $v);
+	}
+
+
 	/**
 	 * @param string $v
 	 */
@@ -178,6 +204,16 @@ class WebexDropFolder extends RemoteDropFolder
 	public function setWebexServiceType ($v)
 	{
 		$this->putInCustomData(self::WEBEX_SERVICE_TYPE, $v);
+	}
+	
+	public function setDeleteFromTimestamp ($v)
+	{
+		$this->putInCustomData(self::WEBEX_DELETE_FROM_TIMESTAMP, $v);
+	}
+	
+	public function getDeleteFromTimestamp()
+	{
+		return $this->getFromCustomData(self::WEBEX_DELETE_FROM_TIMESTAMP);
 	}
 	
 	public function getImportJobData()

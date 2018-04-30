@@ -48,5 +48,18 @@ class IndexController extends Zend_Controller_Action
     {
     	
     }
-    
+	
+	public function kavaAction()
+	{
+		$settings = Zend_Registry::get('config')->settings;
+		$sessionExpiry = $settings->sessionExpiry;
+		$kavaDashboardUrl = $settings->kavaDashboard->url;
+		$jwtKey = $settings->kavaDashboard->jwtKey;
+		$partnerId = $settings->partnerId;
+		
+		if(!$kavaDashboardUrl || !$jwtKey)
+			$this->view->kavaDashboardUrl = null;
+		else
+			$this->view->kavaDashboardUrl = Form_KavaHelper::generateSignedKavaDashboardUrl($kavaDashboardUrl, $jwtKey, $partnerId, $sessionExpiry);
+	}
 }

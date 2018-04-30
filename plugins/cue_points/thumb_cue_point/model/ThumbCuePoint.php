@@ -116,4 +116,25 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 	}
 	
 	public function getIsPublic()	              {return true;}
+
+	public function contributeElasticData()
+	{
+		$data = null;
+		if($this->getText())
+			$data['cue_point_text'] = $this->getText();
+
+		if($this->getName())
+			$data['cue_point_name'] = $this->getName();
+
+		if($this->getTags())
+			$data['cue_point_tags'] =  explode(',', $this->getTags());
+
+		if($this->getSubType())
+			$data['cue_point_sub_type'] = $this->getSubType();
+
+		if($this->getAssetId())
+			$data['cue_point_asset_id'] = $this->getAssetId();
+
+		return $data;
+	}
 }

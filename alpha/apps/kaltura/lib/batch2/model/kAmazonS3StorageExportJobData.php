@@ -35,9 +35,9 @@ class kAmazonS3StorageExportJobData extends kStorageExportJobData
 	*/
 	private $endPoint;
     
-	public function setStorageExportJobData(StorageProfile $externalStorage, FileSync $fileSync, $srcFileSyncLocalPath, $force = false)
+	public function setStorageExportJobData(StorageProfile $externalStorage, FileSync $fileSync, $srcFileSync, $force = false)
 	{
-		parent::setStorageExportJobData($externalStorage, $fileSync, $srcFileSyncLocalPath);
+		parent::setStorageExportJobData($externalStorage, $fileSync, $srcFileSync);
 		$this->setFilesPermissionInS3($externalStorage->getFilesPermissionInS3());
 		$this->setS3Region($externalStorage->getS3Region());
 		$this->setSseType($externalStorage->getSseType());

@@ -1,7 +1,7 @@
 <script type="text/javascript">
 
 function generateKeySeed() {
-	var keySeedGen = '<?php echo bin2hex(mcrypt_create_iv(30, MCRYPT_DEV_URANDOM)); ?>';
+	var keySeedGen = '<?php echo bin2hex(KCryptoWrapper::random_pseudo_bytes(30)) ?>';
 	jQuery('#extensionSubForm-keySeed').val(keySeedGen);
 }
 

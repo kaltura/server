@@ -62,6 +62,7 @@ class DrmProfileListAction extends KalturaApplicationPlugin implements IKalturaA
 			$createProfileForm->getElement("newPartnerId")->setValue($drmProfileFilter->partnerIdEqual);
 			
 		$action->view->newProfileForm = $createProfileForm;
+		$action->view->adminApiForm = new Form_AdminApi();
 	}
 	
 	

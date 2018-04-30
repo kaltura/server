@@ -20,10 +20,10 @@ class BulkUploadSchedulePlugin extends KalturaPlugin implements IKalturaBulkUplo
 	 */
 	public static function dependsOn()
 	{
-		$bulkUploadDependency = new KalturaDependency(BulkUploadPlugin::PLUGIN_NAME);
+		$bulkUploadCsvDependency = new KalturaDependency(BulkUploadCsvPlugin::PLUGIN_NAME);
 		$scheduleDependency = new KalturaDependency(SchedulePlugin::PLUGIN_NAME);
 		
-		return array($bulkUploadDependency, $scheduleDependency);
+		return array($bulkUploadCsvDependency, $scheduleDependency);
 	}
 	
 	/**

@@ -204,7 +204,7 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 	
 	public function getCacheInvalidationKeys()
 	{
-		return array("categoryEntry:entryId=".strtolower($this->getEntryId()));
+		return array("categoryEntry:entryId=".strtolower($this->getEntryId()), "categoryEntry:categoryId=".strtolower($this->getCategoryId()));
 	}
 	
 	public function setBulkUploadId ( $bulkUploadId )	{		$this->putInCustomData ( "bulk_upload_id" , $bulkUploadId );	}

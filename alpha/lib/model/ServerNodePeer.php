@@ -33,7 +33,7 @@ class ServerNodePeer extends BaseServerNodePeer {
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
-	private static function buildCriteriaByHostAndPartnerId($hostName = null, $partnerId = null)
+	private static function buildCriteriaByHostAndPartnerId($hostName = null, $partnerId = null, $type = null)
 	{
 		$c = new Criteria();
 		
@@ -42,15 +42,18 @@ class ServerNodePeer extends BaseServerNodePeer {
 		
 		if($partnerId)
 			$c->add(ServerNodePeer::PARTNER_ID, $partnerId);
+
+		if($type)
+			$c->add(ServerNodePeer::TYPE, $type);
 		
 		$c->add(ServerNodePeer::STATUS, ServerNodeStatus::DISABLED, Criteria::NOT_EQUAL);
 		
 		return $c;
 	}
 	
-	public static function retrieveActiveServerNode($hostName = null, $partnerId = null)
+	public static function retrieveActiveServerNode($hostName = null, $partnerId = null, $type = null)
 	{
-		$c = ServerNodePeer::buildCriteriaByHostAndPartnerId($hostName, $partnerId);
+		$c = ServerNodePeer::buildCriteriaByHostAndPartnerId($hostName, $partnerId, $type);
 		
 		return ServerNodePeer::doSelectOne($c);
 	}
@@ -61,11 +64,13 @@ class ServerNodePeer extends BaseServerNodePeer {
 		if ($serverNodeIndex)
 			$c->add(ServerNodePeer::ID, $serverNodeIndex);
 		
-		$node = ServerNodePeer::doSelectOne($c);
-		
-		if($node instanceof MediaServerNode)
-			return $node;
-		
+		$nodes = ServerNodePeer::doSelect($c);
+
+		foreach ($nodes as $node)
+		{
+			if ($node instanceof MediaServerNode)
+				return $node;
+		}
 		return null;
 	}
 	
@@ -126,6 +131,22 @@ class ServerNodePeer extends BaseServerNodePeer {
 	
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("serverNode:id%s", self::ID));		
+		return array(array("serverNode:id%s", self::ID), array("serverNode:hostName=%s", self::HOST_NAME));		
 	}
+
+	public static function retrieveActiveUnoccupiedServerNodesByType($type, PropelPDO $con = null)
+	{
+		$c = new Criteria();
+		$c->add(ServerNodePeer::STATUS, ServerNodeStatus::ACTIVE);
+		$c->add(ServerNodePeer::TYPE, $type);
+		$c->add(ServerNodePeer::HEARTBEAT_TIME, time() - ServerNode::SERVER_NODE_TTL_TIME, Criteria::GREATER_EQUAL);
+		$c->addOr(ServerNodePeer::HEARTBEAT_TIME, null);
+		$c->add(EntryServerNodePeer::SERVER_NODE_ID, null);
+		$c->addJoin(ServerNodePeer::ID, EntryServerNodePeer::SERVER_NODE_ID, Criteria::LEFT_JOIN);
+		$c->setLimit(3);
+		$objs = ServerNodePeer::doSelect($c, $con);
+
+		return $objs;
+	}
+
 } // ServerNodePeer

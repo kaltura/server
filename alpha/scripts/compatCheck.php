@@ -31,7 +31,8 @@ $PS2_TESTED_XML_ACTIONS = array(
 		'partnerservices2.listentries',
 		'partnerservices2.listkshows',
 		'partnerservices2.listplaylists',
-		'extwidget.embedIframeJs',
+		'extwidget.embediframejs',
+		'extwidget.embedplaykitjs'
 		);
 
 $PS2_TESTED_BIN_ACTIONS = array(
@@ -898,7 +899,7 @@ function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParam
 			$actionName = $fullActionName;
 		}
 
-		print "\tError: ($actionName) $error\n";
+		print "\t#Error: ($actionName) $error\n";
 	}
 
 	if ($compareMode == CM_XML && (count($errors) != 1 || !beginsWith(reset($errors), 'Different order ')))

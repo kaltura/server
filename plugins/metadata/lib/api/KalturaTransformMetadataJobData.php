@@ -6,9 +6,9 @@
 class KalturaTransformMetadataJobData extends KalturaJobData
 {
 	/**
-	 * @var string
+	 * @var KalturaFileContainer
 	 */
-	public $srcXslPath;
+	public $srcXsl;
 	
 	/**
 	 * @var int
@@ -21,9 +21,9 @@ class KalturaTransformMetadataJobData extends KalturaJobData
 	public $destVersion;
 	
 	/**
-	 * @var string
+	 * @var KalturaFileContainer
 	 */
-	public $destXsdPath;
+	public $destXsd;
 	
 	/**
 	 * @var int
@@ -32,11 +32,11 @@ class KalturaTransformMetadataJobData extends KalturaJobData
     
 	private static $map_between_objects = array
 	(
-		"srcXslPath" ,
+		"srcXsl" ,
 		"srcVersion" ,
 		"destVersion" ,
 		"metadataProfileId" ,
-		"destXsdPath" ,
+		"destXsd" ,
 	);
 
 	public function getMapBetweenObjects ( )

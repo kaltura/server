@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `sphinx_log` (
   `dc` int(11) DEFAULT NULL,
   `sql` longtext,
   `created_at` datetime DEFAULT NULL,
+  `type` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `entry_id` (`entry_id`),
   KEY `creatd_at` (`created_at`),

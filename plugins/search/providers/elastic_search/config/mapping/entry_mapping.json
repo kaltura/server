@@ -1,0 +1,959 @@
+{
+  "settings" : {
+	"number_of_shards" : 12,
+	"number_of_replicas" : 0,
+	"analysis": {
+	  "filter":{
+		"english_stop": {
+		  "type":       "stop",
+		  "stopwords":  "_english_"
+		},
+		"english_stemmer": {
+		  "type":       "stemmer",
+		  "language":   "english"
+		},
+		"english_possessive_stemmer": {
+		  "type":       "stemmer",
+		  "language":   "possessive_english"
+		},
+		"kaltura_english_synonym_filter": {
+		  "type": "synonym",
+		  "synonyms_path": "analysis/kaltura_synonyms.txt"
+		},
+		"kaltura_unique_token_filter": {
+		  "type": "unique",
+		  "only_on_same_position": true
+		}
+	  },
+	  "char_filter": {
+		"kaltura_whitespace_filter": {
+		  "type": "pattern_replace",
+		  "pattern": "(\\s+)",
+		  "replacement": " "
+		},
+		"kaltura_apostrophe_filter": {
+		  "type": "mapping",
+		  "mappings": [
+			"'=>",
+			"`=>",
+			"‘=>"
+		  ]
+		},
+		"kaltura_special_chars_filter": {
+		  "type": "mapping",
+		  "mappings": [
+			"!=>__exclamationmark__",
+			"@=>__at__",
+			"#=>__number__",
+			"$=>__dollar__",
+			"%=>__percent__",
+			"^=>__caret__",
+			"&=>__ampersand__",
+			"*=>__asterisk__",
+			"(=>__openbracket__",
+			")=>__closebracket__",
+			"-=>__hyphen__",
+			"==>__equals__",
+			"+=>__plus__",
+			"?=>__questionmark__",
+			"/=>__slash__",
+			"\\\\=>__backslash__",
+			"[=>__openbracket1__",
+			"]=>__closebracket1__",
+			"{=>__openbracket2__",
+			"}=>__closebracket2__",
+			";=>__semicolon__",
+			"|=>__verticalbar__",
+			"<=>__lessthan__",
+			">=>__greaterthan__",
+			"~=>__tilde__"
+		  ]
+		},
+		"kaltura_remove_special_chars_filter": {
+		  "type": "mapping",
+		  "mappings": [
+			"'=>",
+			"`=>",
+			"‘=>",
+			"!=>",
+			"@=>",
+			"#=>",
+			"$=>",
+			"%=>",
+			"^=>",
+			"&=>",
+			"*=>",
+			"(=>",
+			")=>",
+			"-=>",
+			"==>",
+			"+=>",
+			"?=>",
+			"/=>",
+			"\\\\=>",
+			"[=>",
+			"]=>",
+			"{=>",
+			"}=>",
+			";=>",
+			"|=>",
+			"<=>",
+			">=>",
+			"~=>"
+		  ]
+		}
+	  },
+	  "tokenizer": {
+		"kaltura_ngram_tokenizer": {
+		  "type": "ngram",
+		  "min_gram": 3,
+		  "max_gram": 3,
+		  "token_chars": [
+			"letter",
+			"digit"
+		  ]
+		}
+	  },
+	  "normalizer": {
+		"kaltura_keyword_normalizer": {
+		  "type": "custom",
+		  "char_filter": [
+			"kaltura_whitespace_filter"
+		  ],
+		  "filter": [
+			"lowercase",
+			"icu_folding"
+		  ]
+		}
+	  },
+	  "analyzer": {
+		"kaltura_ngrams": {
+		  "type": "custom",
+		  "tokenizer": "kaltura_ngram_tokenizer",
+		  "char_filter": [
+			"kaltura_apostrophe_filter"
+		  ],
+		  "filter": [
+			"lowercase",
+			"icu_folding"
+		  ]
+		},
+		"kaltura_text" : {
+		  "type": "custom",
+		  "tokenizer": "standard",
+		  "char_filter": [
+			"kaltura_apostrophe_filter",
+			"kaltura_special_chars_filter"
+		  ],
+		  "filter": [
+			"standard",
+			"lowercase",
+			"icu_folding"
+		  ]
+		},
+		"kaltura_text_partial_search" : {
+		  "type": "custom",
+		  "tokenizer": "standard",
+		  "char_filter": [
+			"kaltura_apostrophe_filter"
+		  ],
+		  "filter": [
+			"standard",
+			"lowercase",
+			"icu_folding"
+		  ]
+		},
+		"kaltura_english_synonym": {
+		  "tokenizer":  "whitespace",
+		  "filter": [
+			"lowercase",
+			"english_stop",
+			"kaltura_english_synonym_filter",
+			"kaltura_unique_token_filter"
+		  ]
+		},
+		"kaltura_english_synonym_search": {
+		  "tokenizer":  "whitespace",
+		  "char_filter": [
+			"kaltura_remove_special_chars_filter"
+		  ],
+		  "filter": [
+			"lowercase",
+			"english_stop"
+		  ]
+		}
+	  }
+	}
+  },
+  "mappings" : {
+	"entry" : {
+	  "_source" : {
+		"enabled" : true
+	  },
+	  "_all": {
+		"enabled": false
+	  },
+	  "properties" : {
+		"name" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_text",
+		  "fields": {
+			"ngrams" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_ngrams"
+			},
+			"raw" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"english" : {
+			  "type" : "text",
+			  "analyzer": "english",
+			  "fields": {
+				"synonym": {
+				  "type": "text",
+				  "analyzer": "kaltura_english_synonym",
+				  "search_analyzer": "kaltura_english_synonym_search"
+				}
+			  }
+			},
+			"arabic" : {
+			  "type" : "text",
+			  "analyzer": "arabic"
+			},
+			"brazilian" : {
+			  "type" : "text",
+			  "analyzer" : "brazilian"
+			},
+			"cjk" : {
+			  "type" : "text",
+			  "analyzer" : "cjk"
+			},
+			"danish" : {
+			  "type" : "text",
+			  "analyzer" : "danish"
+			},
+			"dutch" : {
+			  "type" : "text",
+			  "analyzer" : "dutch"
+			},
+			"finnish" : {
+			  "type" : "text",
+			  "analyzer" : "finnish"
+			},
+			"french" : {
+			  "type" : "text",
+			  "analyzer" : "french"
+			},
+			"german" : {
+			  "type" : "text",
+			  "analyzer" : "german"
+			},
+			"greek" : {
+			  "type" : "text",
+			  "analyzer" : "greek"
+			},
+			"hindi" : {
+			  "type" : "text",
+			  "analyzer" : "hindi"
+			},
+			"indonesian" : {
+			  "type" : "text",
+			  "analyzer" : "indonesian"
+			},
+			"italian" : {
+			  "type" : "text",
+			  "analyzer" : "italian"
+			},
+			"norwegian" : {
+			  "type" : "text",
+			  "analyzer" : "norwegian"
+			},
+			"portuguese" : {
+			  "type" : "text",
+			  "analyzer" : "portuguese"
+			},
+			"russian" : {
+			  "type" : "text",
+			  "analyzer" : "russian"
+			},
+			"spanish" : {
+			  "type" : "text",
+			  "analyzer" : "spanish"
+			},
+			"swedish" : {
+			  "type" : "text",
+			  "analyzer" : "swedish"
+			},
+			"turkish" : {
+			  "type" : "text",
+			  "analyzer" : "turkish"
+			},
+			"thai" : {
+			  "type" : "text",
+			  "analyzer" : "thai"
+			}
+		  }
+		},
+		"description" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_text",
+		  "fields": {
+			"ngrams" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_ngrams"
+			},
+			"raw" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"english" : {
+			  "type" : "text",
+			  "analyzer": "english",
+			  "fields": {
+				"synonym": {
+				  "type": "text",
+				  "analyzer": "kaltura_english_synonym",
+				  "search_analyzer": "kaltura_english_synonym_search"
+				}
+			  }
+			},
+			"arabic" : {
+			  "type" : "text",
+			  "analyzer": "arabic"
+			},
+			"brazilian" : {
+			  "type" : "text",
+			  "analyzer" : "brazilian"
+			},
+			"cjk" : {
+			  "type" : "text",
+			  "analyzer" : "cjk"
+			},
+			"danish" : {
+			  "type" : "text",
+			  "analyzer" : "danish"
+			},
+			"dutch" : {
+			  "type" : "text",
+			  "analyzer" : "dutch"
+			},
+			"finnish" : {
+			  "type" : "text",
+			  "analyzer" : "finnish"
+			},
+			"french" : {
+			  "type" : "text",
+			  "analyzer" : "french"
+			},
+			"german" : {
+			  "type" : "text",
+			  "analyzer" : "german"
+			},
+			"greek" : {
+			  "type" : "text",
+			  "analyzer" : "greek"
+			},
+			"hindi" : {
+			  "type" : "text",
+			  "analyzer" : "hindi"
+			},
+			"indonesian" : {
+			  "type" : "text",
+			  "analyzer" : "indonesian"
+			},
+			"italian" : {
+			  "type" : "text",
+			  "analyzer" : "italian"
+			},
+			"norwegian" : {
+			  "type" : "text",
+			  "analyzer" : "norwegian"
+			},
+			"portuguese" : {
+			  "type" : "text",
+			  "analyzer" : "portuguese"
+			},
+			"russian" : {
+			  "type" : "text",
+			  "analyzer" : "russian"
+			},
+			"spanish" : {
+			  "type" : "text",
+			  "analyzer" : "spanish"
+			},
+			"swedish" : {
+			  "type" : "text",
+			  "analyzer" : "swedish"
+			},
+			"turkish" : {
+			  "type" : "text",
+			  "analyzer" : "turkish"
+			},
+			"thai" : {
+			  "type" : "text",
+			  "analyzer" : "thai"
+			}
+		  }
+		},
+		"partner_id" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"partner_status" : {
+		  "type" : "keyword"
+		},
+		"parent_id" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"status" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"entitled_kusers_edit" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"entitled_kusers_publish" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"kuser_id" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"creator_kuser_id" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"categories_ids" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"categories_names" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"tags" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_text",
+		  "fields": {
+			"ngrams" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_ngrams"
+			},
+			"raw" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			}
+		  }
+		},
+		"user_names" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_text",
+		  "fields": {
+		  	"ngrams" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_ngrams"
+			},
+			"raw" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			}
+		  }
+		},
+		"reference_id": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"conversion_profile_id": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"template_entry_id": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"display_in_search": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"media_type": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"source_type": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"external_source_type": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"length_in_msecs": {
+		  "type" : "long"
+		},
+		"views": {
+		  "type" : "long"
+		},
+		"plays": {
+		  "type" : "long"
+		},
+		"votes": {
+		  "type" : "long"
+		},
+		"last_played_at": {
+		  "type" : "date",
+		  "format": "epoch_second"
+		},
+		"recorded_entry_id": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"credit": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"start_date": {
+		  "type" : "date",
+		  "format": "epoch_second"
+		},
+		"end_date": {
+		  "type" : "date",
+		  "format": "epoch_second"
+		},
+		"site_url": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"admin_tags": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"push_publish": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"is_live": {
+		  "type" : "boolean"
+		},
+		"entry_type": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"moderation_status": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"created_at" : {
+		  "type" : "date",
+		  "format": "epoch_second"
+		},
+		"updated_at" : {
+		  "type" : "date",
+		  "format": "epoch_second"
+		},
+		"modified_at" : {
+		  "type" : "date",
+		  "format": "epoch_second"
+		},
+		"total_rank": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"access_control_id": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"group_id": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"partner_sort_value": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"redirect_entry_id": {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"is_quiz": {
+		  "type" : "boolean"
+		},
+		"root_id" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
+		"parent_entry" : {
+		  "properties" : {
+			"entry_id" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"status" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"partner_status" :{
+			  "type" : "keyword"
+			},
+			"entitled_kusers_edit" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"entitled_kusers_publish" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"kuser_id" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"creator_kuser_id" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"categories_ids" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			}
+		  }
+		},
+		"caption_assets": {
+		  "type"  : "nested",
+		  "properties"  : {
+			"content" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
+				}
+			  }
+			},
+			"content_english" : {
+			  "type" : "text",
+			  "analyzer": "english",
+			  "fields":{
+				"synonym" : {
+				  "type" : "text",
+				  "analyzer": "kaltura_english_synonym",
+				  "search_analyzer": "kaltura_english_synonym_search"
+				}
+			  }
+			},
+			"content_arabic" : {
+			  "type" : "text",
+			  "analyzer": "arabic"
+			},
+			"content_brazilian" : {
+			  "type" : "text",
+			  "analyzer" : "brazilian"
+			},
+			"content_cjk" : {
+			  "type" : "text",
+			  "analyzer" : "cjk"
+			},
+			"content_danish" : {
+			  "type" : "text",
+			  "analyzer" : "danish"
+			},
+			"content_dutch" : {
+			  "type" : "text",
+			  "analyzer" : "dutch"
+			},
+			"content_finnish" : {
+			  "type" : "text",
+			  "analyzer" : "finnish"
+			},
+			"content_french" : {
+			  "type" : "text",
+			  "analyzer" : "french"
+			},
+			"content_german" : {
+			  "type" : "text",
+			  "analyzer" : "german"
+			},
+			"content_greek" : {
+			  "type" : "text",
+			  "analyzer" : "greek"
+			},
+			"content_hindi" : {
+			  "type" : "text",
+			  "analyzer" : "hindi"
+			},
+			"content_indonesian" : {
+			  "type" : "text",
+			  "analyzer" : "indonesian"
+			},
+			"content_italian" : {
+			  "type" : "text",
+			  "analyzer" : "italian"
+			},
+			"content_norwegian" : {
+			  "type" : "text",
+			  "analyzer" : "norwegian"
+			},
+			"content_portuguese" : {
+			  "type" : "text",
+			  "analyzer" : "portuguese"
+			},
+			"content_russian" : {
+			  "type" : "text",
+			  "analyzer" : "russian"
+			},
+			"content_spanish" : {
+			  "type" : "text",
+			  "analyzer" : "spanish"
+			},
+			"content_swedish" : {
+			  "type" : "text",
+			  "analyzer" : "swedish"
+			},
+			"content_turkish" : {
+			  "type" : "text",
+			  "analyzer" : "turkish"
+			},
+			"content_thai" : {
+			  "type" : "text",
+			  "analyzer" : "thai"
+			},
+			"start_time"  : {
+			  "type" : "long"
+			},
+			"end_time"  : {
+			  "type" : "long"
+			},
+			"caption_asset_id": {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"language" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"label" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			}
+		  }
+		},
+		"metadata" :{
+		  "type"  : "nested",
+		  "properties"  : {
+			"metadata_id" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"system_name" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"xpath" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"metadata_profile_id" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"metadata_field_id" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"value_int": {
+			  "type": "long"
+			},
+			"value_text": {
+			  "type" : "text",
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
+				}
+			  }
+			}
+		  }
+		},
+		"cue_points" : {
+		  "type" : "nested",
+		  "properties"  : {
+			"cue_point_type" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"cue_point_id": {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"cue_point_name" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
+				}
+			  }
+			},
+			"cue_point_text" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
+				}
+			  }
+			},
+			"cue_point_tags" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
+				}
+			  }
+			},
+			"cue_point_start_time" : {
+			  "type" : "long"
+			},
+			"cue_point_end_time" : {
+			  "type" : "long"
+			},
+			"cue_point_sub_type" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			},
+			"cue_point_question" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
+				}
+			  }
+			},
+			"cue_point_answers" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
+				}
+			  }
+			},
+			"cue_point_hint" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
+				}
+			  }
+			},
+			"cue_point_explanation" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_text",
+			  "fields": {
+				"ngrams" : {
+				  "type" : "text",
+				  "analyzer" : "kaltura_ngrams"
+				},
+				"raw" : {
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
+				}
+			  }
+			},
+			"cue_point_metadata" :{
+			  "type"  : "nested",
+			  "properties"  : {
+				"metadata_id" : {
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
+				},
+				"system_name" : {
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
+				},
+				"xpath" : {
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
+				},
+				"metadata_profile_id" : {
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
+				},
+				"metadata_field_id" : {
+				  "type" : "keyword",
+				  "normalizer" : "kaltura_keyword_normalizer"
+				},
+				"value_int": {
+				  "type": "long"
+				},
+				"value_text": {
+				  "type" : "text",
+				  "analyzer" : "kaltura_text",
+				  "fields": {
+					"ngrams" : {
+					  "type" : "text",
+					  "analyzer" : "kaltura_ngrams"
+					},
+					"raw" : {
+					  "type" : "keyword",
+					  "normalizer" : "kaltura_keyword_normalizer"
+					}
+				  }
+				}
+			  }
+			},
+			"cue_point_asset_id": {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+            }
+		  }
+		}
+	  }
+	}
+  }
+}

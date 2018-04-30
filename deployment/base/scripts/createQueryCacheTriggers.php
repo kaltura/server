@@ -5,7 +5,7 @@ $dryRun = true;
 // Invalidation keys table
 $INVALIDATION_KEYS = array(
 	array('table' => "flavor_asset", 					'keys' => array(array("'flavorAsset:id='", '@OBJ@.id'), array("'flavorAsset:entryId='", '@OBJ@.entry_id')), 							'class' => 'asset'),
-	array('table' => "kuser", 							'keys' => array(array("'kuser:id='", '@OBJ@.id'), array("'kuser:partnerId='", '@OBJ@.partner_id', "',puserid='", '@OBJ@.puser_id'))),
+	array('table' => "kuser", 							'keys' => array(array("'kuser:id='", '@OBJ@.id'), array("'kuser:partnerId='", '@OBJ@.partner_id', "',puserid='", '@OBJ@.puser_id'), array("'kuser:loginDataId='", '@OBJ@.login_data_id'))),
 	array('table' => "entry", 							'keys' => array(array("'entry:id='", '@OBJ@.id'), array("'entry:partnerId='", '@OBJ@.partner_id'))),
 	array('table' => "access_control", 					'keys' => array(array("'accessControl:id='", '@OBJ@.id'))),
 	array('table' => "permission", 						'keys' => array(array("'permission:partnerId='", '@OBJ@.partner_id'))),
@@ -29,19 +29,28 @@ $INVALIDATION_KEYS = array(
 	array('table' => "user_role", 						'keys' => array(array("'userRole:id='", '@OBJ@.id'), array("'userRole:systemName='", '@OBJ@.system_name'))),
 	array('table' => "invalid_session", 				'keys' => array(array("'invalidSession:ks='", '@OBJ@.ks'))),
 	array('table' => "upload_token", 					'keys' => array(array("'uploadToken:id='", '@OBJ@.id'))),
-	array('table' => "conversion_profile_2", 			'keys' => array(array("'conversionProfile2:partnerId='", '@OBJ@.partner_id'))),
+	array('table' => "conversion_profile_2", 			'keys' => array(array("'conversionProfile2:id='", '@OBJ@.id'), array("'conversionProfile2:partnerId='", '@OBJ@.partner_id'))),
 	array('table' => "distribution_profile", 			'keys' => array(array("'distributionProfile:id='", '@OBJ@.id')),																		'plugin' => 'content_distribution'),
 	array('table' => "drop_folder", 					'keys' => array(array("'dropFolder:id='", '@OBJ@.id'), array("'dropFolder:dc='", '@OBJ@.dc')),											'plugin' => 'drop_folder'),
-	array('table' => "category_entry", 					'keys' => array(array("'categoryEntry:entryId='", '@OBJ@.entry_id'))),
+	array('table' => "category_entry", 					'keys' => array(array("'categoryEntry:entryId='", '@OBJ@.entry_id'), array("'categoryEntry:categoryId='", '@OBJ@.category_id'))),
 	array('table' => "permission_to_permission_item", 	'keys' => array(array("'permissionToPermissionItem:permissionId='", '@OBJ@.permission_id'))),
 	array('table' => "delivery_profile", 				'keys' => array(array("'deliveryProfile:id='", '@OBJ@.id'), array("'deliveryProfile:partnerId='", '@OBJ@.partner_id'))),
-	array('table' => "event_notification_template", 	'keys' => array(array("'eventNotificationTemplate:partnerId='", '@OBJ@.partner_id')),													'plugin' => 'event_notification'),
-	array('table' => "category_kuser", 					'keys' => array(array("'categoryKuser:categoryId='", '@OBJ@.category_id'))),
+	array('table' => "event_notification_template", 	'keys' => array(array("'eventNotificationTemplate:id='", '@OBJ@.id'), array("'eventNotificationTemplate:partnerId='", '@OBJ@.partner_id')), 'plugin' => 'event_notification'),
+	array('table' => "category_kuser", 					'keys' => array(array("'categoryKuser:id='", '@OBJ@.id'), array("'categoryKuser:categoryId='", '@OBJ@.category_id'))),
 	array('table' => "kuser_kgroup", 					'keys' => array(array("'kuserKgroup:kuserId='", '@OBJ@.kuser_id'))),
 	array('table' => "response_profile", 				'keys' => array(array("'responseProfile:systemName='", '@OBJ@.system_name'))),
-	array('table' => "entry_server_node", 				'keys' => array(array("'entryServerNode:entryId'", '@OBJ@.entry_id'))),
-	array('table' => "server_node", 					'keys' => array(array("'serverNode:id'", '@OBJ@.id'))),
+	array('table' => "entry_server_node", 				'keys' => array(array("'entryServerNode:id='", '@OBJ@.id'), array("'entryServerNode:entryId'", '@OBJ@.entry_id'))),
+	array('table' => "server_node", 					'keys' => array(array("'serverNode:id'", '@OBJ@.id'), array("'serverNode:hostName='", '@OBJ@.host_name'))),
 	array('table' => "schedule_event",                  'keys' => array(array("'scheduleEvent:id'", '@OBJ@.id')),                                                                               'plugin' => 'schedule/base'),
+	array('table' => "schedule_resource",               'keys' => array(array("'scheduleResource:id='", '@OBJ@.id')),                                                                           'plugin' => 'schedule/base'),
+	array('table' => "schedule_event_resource",         'keys' => array(array("'scheduleEventResource:eventId='", '@OBJ@.event_id')),                                                           'plugin' => 'schedule/base'),
+	array('table' => "user_login_data", 				'keys' => array(array("'userLoginData:id='", '@OBJ@.id'), array("'userLoginData:loginEmail='", '@OBJ@.login_email'))),
+	array('table' => "drm_profile", 					'keys' => array(array("'drmProfile:partnerId='", '@OBJ@.partner_id'))),
+	array('table' => "scheduler", 						'keys' => array(array("'scheduler:configuredId='", '@OBJ@.configured_id'))),
+	array('table' => "syndication_feed", 				'keys' => array(array("'syndicationFeed:id='", '@OBJ@.id'))),
+	array('table' => "app_token", 						'keys' => array(array("'appToken:id='", '@OBJ@.id'))),
+	array('table' => "user_entry", 						'keys' => array(array("'userEntry:kuserId='", '@OBJ@.kuser_id'))),
+	
 	);
 
 $TRIGGER_TYPES = array('INSERT', 'UPDATE', 'DELETE');

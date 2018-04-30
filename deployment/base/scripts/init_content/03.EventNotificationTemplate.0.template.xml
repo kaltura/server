@@ -225,7 +225,7 @@
 		<!-- New Item Pending Moderation -->
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
-				<name>New Item Pending Moderation</name>
+				<name>Existing Item Pending Moderation</name>
 				<systemName>New_Item_Pending_Moderation_2</systemName>
 				<description>Email notification template to be sent when a new item is pending moderation in a specific category (channel).</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
@@ -239,7 +239,7 @@
 					</item>
 				</eventConditions>
 				<format>1</format>
-				<subject>[AppTitle] - New Item Pending Moderation</subject>
+				<subject>[AppTitle] - Existing Item Pending Moderation</subject>
 				<body>A new item is pending your approval: [ChannelSettingsPendingURLPrefix]{category_name_encoded}/{category_id}[ChannelSettingsPendingURLSuffix]</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
@@ -2020,5 +2020,98 @@
 			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
 		</request>
 	</multirequest>
-	
+
+	<multirequest>
+		<!-- Server-Node is Status Changed -->
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaEmailNotificationTemplate">
+				<name>Server Node Status Changed</name>
+				<systemName>SERVER_NODE_STATUS_CHANGE</systemName>
+				<description>Email notification template to be sent when a server node status is changed.</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>39</eventObjectType> <!-- EventNotificationEventObjectType::SERVER_NODE -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventObjectChangedCondition">
+						<description>Server Node status changed </description>
+						<modifiedColumns>server_node.STATUS</modifiedColumns>
+					</item>
+				</eventConditions>
+				<format>1</format>
+				<subject>Server Node ID: {server_node_hostname} Status Changed </subject>
+				<body><![CDATA[Hello,<p>Server node {server_node_hostname} status has changed to {server_node_status}.</p>]]></body>
+				<fromEmail>{from_email}</fromEmail>
+				<fromName>{from_name}</fromName>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>from_email</key>
+						<description>Sender email</description>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get("partner_notification_email")</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>from_name</key>
+						<description>Sender name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get("partner_notification_name")</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>server_node_hostname</key>
+						<description>Server-Node hostname</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getHostName()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>server_node_status</key>
+						<description>Server-Node status</description>
+						<value objectType="KalturaEvalStringField">
+							<code>($scope->getObject()->getStatus() == ServerNodeStatus::ACTIVE) ? 'Active' : (($scope->getObject()->getStatus() == ServerNodeStatus::DISABLED)?'Disabled' : (($scope->getObject()->getStatus() == ServerNodeStatus::NOT_REGISTERED)?'Not Registered': 'Deleted'))</code>
+						</value>
+					</item>
+				</contentParameters>
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+
+	<multirequest>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaPushNotificationTemplate">
+				<name>CLIPPING_TASK_ENTRY_SERVER_NODE_CREATED_NOTIFICATIONS</name>
+				<systemName>CLIPPING_TASK_ENTRY_SERVER_NODE_CREATED_NOTIFICATIONS</systemName>
+				<description>Push notification template used by the live clipping feature</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
+				<eventObjectType>40</eventObjectType><!-- EventNotificationEventObjectType::ENTRY_SERVER_NODE -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<field objectType="KalturaEvalBooleanField">
+							<code>$scope->getObject() instanceof ClippingTaskEntryServerNode</code>
+						</field>
+					</item>
+				</eventConditions>
+				<queueNameParameters objectType="array">
+					<item objectType="KalturaPushEventNotificationParameter">
+						<key>serverNodeId</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getServerNodeId()</code>
+						</value>
+					</item>
+				</queueNameParameters>
+				<apiObjectType>KalturaClippingTaskEntryServerNode</apiObjectType>
+				<objectFormat>1</objectFormat> <!-- KalturaResponseType::RESPONSE_TYPE_JSON -->
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>2</status><!-- EventNotificationTemplateStatus::ACTIVE -->
+		</request>
+	</multirequest>
+
 </xml>

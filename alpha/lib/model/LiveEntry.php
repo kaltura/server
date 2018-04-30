@@ -12,12 +12,16 @@ abstract class LiveEntry extends entry
 	const RECORDED_ENTRY_ID = 'recorded_entry_id';
 
 	const DEFAULT_CACHE_EXPIRY = 120;
-	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 10000;
+	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 6000;
 	
 	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
 	const CUSTOM_DATA_RECORD_STATUS = 'record_status';
 	const CUSTOM_DATA_RECORD_OPTIONS = 'recording_options';
 	const CUSTOM_DATA_SEGMENT_DURATION = 'segmentDuration';
+	const CUSTOM_DATA_EXPLICIT_LIVE = "explicit_live";
+	const CUSTOM_DATA_VIEW_MODE = "view_mode";
+	const CUSTOM_DATA_RECORDING_STATUS = "recording_status";
+
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
 	protected $decidingLiveProfile = false;
@@ -140,7 +144,6 @@ abstract class LiveEntry extends entry
 			$this->setRedirectEntryId(null);
 			$this->setCustomDataObj();
 		}
-		
 		return parent::preUpdate($con);
 	}
 	
@@ -295,7 +298,7 @@ abstract class LiveEntry extends entry
 	
 	public function getPushPublishEnabled()
 	{
-		return $this->getFromCustomData("push_publish_enabled", null, false);
+		return $this->getFromCustomData("push_publish_enabled");
 	}
 	
 	public function setPushPublishEnabled($v)
@@ -326,7 +329,7 @@ abstract class LiveEntry extends entry
 	
 	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null, $currentDcOnly = false, array $flavorParamsIds = array())
 	{
-		$configurations = $this->getLiveStreamConfigurations($protocol, $tag, $currentDcOnly, $flavorParamsIds);
+		$configurations = $this->getLiveStreamConfigurations($protocol, $tag, $currentDcOnly, $flavorParamsIds, $format);
 		foreach($configurations as $configuration)
 		{
 			/* @var $configuration kLiveStreamConfiguration */
@@ -337,7 +340,7 @@ abstract class LiveEntry extends entry
 		return null;
 	}
 	
-	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false, array $flavorParamsIds = array())
+	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false, array $flavorParamsIds = array(), $format = null)
 	{
 		$configurations = array();
 		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes))
@@ -345,7 +348,7 @@ abstract class LiveEntry extends entry
 			$configurations = $this->getFromCustomData('live_stream_configurations', null, array());
 			if($configurations && $this->getPushPublishEnabled())
 			{
-				$pushPublishConfigurations = $this->getPushPublishConfigurations();
+				$pushPublishConfigurations = $this->getPushPublishPlaybackConfigurations();
 				$configurations = array_merge($configurations, $pushPublishConfigurations);
 			}
 			
@@ -444,12 +447,30 @@ abstract class LiveEntry extends entry
 		KalturaLog::info("media servers hostnames: " . print_r($hostnames,true));
 		return $hostnames;
 	}
-	
+
+	public function canViewExplicitLive()
+	{
+		$isAdmin = kCurrentContext::$ks_object && kCurrentContext::$ks_object->isAdmin();
+		$userIsOwner = kCurrentContext::getCurrentKsKuserId() == $this->getKuserId();
+		$isUserAllowedPreview = $this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
+		$isMediaServerPartner = (kCurrentContext::$ks_partner_id == Partner::MEDIA_SERVER_PARTNER_ID);
+		$cannotViewExplicit = kCurrentContext::$ks_object ? kCurrentContext::$ks_object->verifyPrivileges(ks::PRIVILEGE_RESTRICT_EXPLICIT_LIVE_VIEW, ks::PRIVILEGE_WILDCARD): false;		
+		if (!$isAdmin && ((!$userIsOwner && !$isUserAllowedPreview && !$isMediaServerPartner)||$cannotViewExplicit))
+			return false;
+		return true;
+	}
+
 	/**
 	 * @return boolean
 	 */
-	public function hasMediaServer($currentDcOnly = false)
+	public function isCurrentlyLive($currentDcOnly = false)
 	{
+		if ($this->getViewMode() == ViewMode::PREVIEW)
+		{
+			if (!$this->canViewExplicitLive())
+				return false;
+		}
+
 		$liveEntryServerNodes = $this->getPlayableEntryServerNodes();
 		if(!count($liveEntryServerNodes))
 			return false;
@@ -460,7 +481,11 @@ abstract class LiveEntry extends entry
 			/* @var WowzaMediaServerNode $serverNode*/
 			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
 			if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
+			{
+				if ($this->getExplicitLive() && !$this->canViewExplicitLive() && !$liveEntryServerNode->getIsPlayableUser())
+					return false;
 				return true;
+			}
 		}
 		
 		return !$currentDcOnly;
@@ -535,7 +560,7 @@ abstract class LiveEntry extends entry
 		
 		if($liveEntryStatus === EntryServerNodeStatus::PLAYABLE)
 		{
-			if(is_null($this->getFirstBroadcast()))
+			if(is_null($this->getFirstBroadcast()) && $mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY)
 				$this->setFirstBroadcast(kApiCache::getTime());
 			
 			$key = $this->getEntryServerNodeCacheKey($dbLiveEntryServerNode);
@@ -610,6 +635,12 @@ abstract class LiveEntry extends entry
 		{
 			$this->setCurrentBroadcastStartTime( 0 );
 		}
+
+		if ($this->getExplicitLive())
+		{
+			$this->setViewMode(ViewMode::PREVIEW);
+			$this->setRecordingStatus(RecordingStatus::STOPPED);
+		}
 	}
 
 
@@ -648,11 +679,13 @@ abstract class LiveEntry extends entry
 	public function getLiveStatus()
 	{
 		$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($this->getId());
-		
+
 		$status = EntryServerNodeStatus::STOPPED;
 		foreach ($entryServerNodes as $entryServerNode)
 		{
 			/* @var $entryServerNode EntryServerNode */
+			if (!in_array($entryServerNode->getServerType(), array(EntryServerNodeType::LIVE_PRIMARY,EntryServerNodeType::LIVE_BACKUP)))
+				continue;
 			$status = self::maxLiveEntryStatus($status, $entryServerNode->getStatus());
 		}
 		
@@ -671,9 +704,15 @@ abstract class LiveEntry extends entry
 
 	public function getSegmentDuration()
 	{
-		$segmentDuration = $this->getFromCustomData(LiveEntry::CUSTOM_DATA_SEGMENT_DURATION, null, null);
-		
 		$partner = $this->getPartner();
+
+		if ($partner && !PermissionPeer::isValidForPartner(PermissionName::FEATURE_DYNAMIC_SEGMENT_DURATION, $this->getPartnerId()))
+		{
+			return LiveEntry::DEFAULT_SEGMENT_DURATION_MILLISECONDS;
+		}
+
+		$segmentDuration = $this->getFromCustomData(LiveEntry::CUSTOM_DATA_SEGMENT_DURATION, null, null);
+
 		if($partner && !$segmentDuration)
 			$segmentDuration = $partner->getDefaultLiveStreamSegmentDuration();
 		
@@ -697,7 +736,7 @@ abstract class LiveEntry extends entry
 	public function getDynamicAttributes()
 	{
 		$dynamicAttributes = array(
-				LiveEntry::IS_LIVE => intval($this->hasMediaServer()),
+				LiveEntry::IS_LIVE => intval($this->isCurrentlyLive()),
 				LiveEntry::FIRST_BROADCAST => $this->getFirstBroadcast(),
 				LiveEntry::RECORDED_ENTRY_ID => $this->getRecordedEntryId(),
 
@@ -901,4 +940,58 @@ abstract class LiveEntry extends entry
 		
 		return $currentDuration;
 	}
+
+	public function getObjectParams($params = null)
+	{
+		$body = array(
+			'recorded_entry_id' => $this->getRecordedEntryId(),
+			'push_publish' => $this->getPushPublishEnabled(),
+			'is_live' => $this->isCurrentlyLive(),
+		);
+		elasticSearchUtils::cleanEmptyValues($body);
+
+		return array_merge(parent::getObjectParams($params), $body);
+	}
+
+	public function getExplicitLive()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_EXPLICIT_LIVE, null, false);
+	}
+
+	public function setExplicitLive($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_EXPLICIT_LIVE, $v);
+	}
+
+	public function getViewMode()
+	{
+		if ($this->getExplicitLive())
+			return $this->getFromCustomData(self::CUSTOM_DATA_VIEW_MODE, null, ViewMode::PREVIEW);
+		else
+			return ViewMode::ALLOW_ALL;
+	}
+
+	public function setViewMode($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_VIEW_MODE, $v);
+	}
+
+	public function getRecordingStatus()
+	{
+		if ($this->getExplicitLive())
+			return $this->getFromCustomData(self::CUSTOM_DATA_RECORDING_STATUS, null, RecordingStatus::STOPPED);
+		else
+		{
+			if ($this->getRecordStatus() == RecordStatus::DISABLED)
+				return RecordingStatus::DISABLED;
+			else
+				return RecordingStatus::ACTIVE;
+		}
+	}
+
+	public function setRecordingStatus($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_RECORDING_STATUS, $v);
+	}
+
 }

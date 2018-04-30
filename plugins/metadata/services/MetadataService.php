@@ -366,53 +366,28 @@ class MetadataService extends KalturaBaseService
 	function listAction(KalturaMetadataFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
-			$filter = new KalturaMetadataFilter;
+			$filter = new KalturaMetadataFilter();
 			
 		if (! $pager)
-			$pager = new KalturaFilterPager ();
-			
+			$pager = new KalturaFilterPager();
+		
 		$applyPartnerFilter = true;
-		if ($filter->metadataObjectTypeEqual == MetadataObjectType::ENTRY)
+		if($filter->metadataObjectTypeEqual == MetadataObjectType::ENTRY)
 		{
-			$entryIds = null;
-			if ($filter->objectIdEqual)
+			$objectIds = $filter->getObjectIdsFiltered();
+			if(!empty($objectIds))
 			{
-				$entryIds = array($filter->objectIdEqual);
-			}
-			else if ($filter->objectIdIn)
-			{
-				$entryIds = explode(',', $filter->objectIdIn);
-			}
-			
-			if (!$entryIds && kConf::hasParam('metadata_list_without_object_filtering_partners') && 
-				!in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('metadata_list_without_object_filtering_partners')) &&
-				kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
-				throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
-			
-			if($entryIds)
-			{
-				$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($entryIds, kCurrentContext::getCurrentPartnerId());
-				if(!count($entryIds))
-				{
-					$response = new KalturaMetadataListResponse();
-					$response->objects = new KalturaMetadataArray();
-					$response->totalCount = 0;
-					return $response;
-				}
-				
-				$filter->objectIdEqual = null;
-				$filter->objectIdIn = implode(',', $entryIds);
-				$applyPartnerFilter = false;
+				$objectIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($objectIds, kCurrentContext::getCurrentPartnerId());
+				if(count($objectIds))
+					$applyPartnerFilter = false;
 			}
 		}
-		if ($applyPartnerFilter)
+		
+		if($applyPartnerFilter)
 			$this->applyPartnerFilterForClass('Metadata');
-	
+		
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
-	
-
-	
 	
 	/**
 	 * @param Metadata $metadata
@@ -460,6 +435,7 @@ class MetadataService extends KalturaBaseService
 		
 		$dbMetadata->setStatus(KalturaMetadataStatus::DELETED);
 		$dbMetadata->save();
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));
 	}
 
 	

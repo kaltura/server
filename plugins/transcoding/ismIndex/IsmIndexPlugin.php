@@ -142,7 +142,7 @@ class IsmIndexPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKal
 		if($fileSync)
 		{
 			$ismDescriptor = new kSourceFileSyncDescriptor();
-			$ismDescriptor->setFileSyncLocalPath($fileSync->getFullPath());							
+			$ismDescriptor->setPathAndKeyByFileSync($fileSync);
 			$ismDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($flavorAsset->getEntryId()));
 			$ismDescriptor->setAssetId($key->getObjectId());
 			$ismDescriptor->setAssetParamsId($flavorAssetDesc->getAssetParamsId());

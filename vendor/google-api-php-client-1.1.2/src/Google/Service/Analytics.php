@@ -1,7 +1,5 @@
 <?php
 /*
- * Copyright 2010 Google Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -82,6 +80,7 @@ class Google_Service_Analytics extends Google_Service
   public function __construct(Google_Client $client)
   {
     parent::__construct($client);
+    $this->rootUrl = 'https://www.googleapis.com/';
     $this->servicePath = 'analytics/v3/';
     $this->version = 'v3';
     $this->serviceName = 'analytics';
@@ -116,27 +115,7 @@ class Google_Service_Analytics extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'max-results' => array(
-                  'location' => 'query',
-                  'type' => 'integer',
-                ),
-                'sort' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'dimensions' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
-                'start-index' => array(
-                  'location' => 'query',
-                  'type' => 'integer',
-                ),
-                'segment' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
-                'samplingLevel' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
@@ -144,9 +123,33 @@ class Google_Service_Analytics extends Google_Service
                   'location' => 'query',
                   'type' => 'string',
                 ),
+                'include-empty-rows' => array(
+                  'location' => 'query',
+                  'type' => 'boolean',
+                ),
+                'max-results' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
+                ),
                 'output' => array(
                   'location' => 'query',
                   'type' => 'string',
+                ),
+                'samplingLevel' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'segment' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'sort' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'start-index' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
                 ),
               ),
             ),
@@ -183,19 +186,15 @@ class Google_Service_Analytics extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'max-results' => array(
-                  'location' => 'query',
-                  'type' => 'integer',
-                ),
-                'sort' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'dimensions' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'start-index' => array(
+                'filters' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'max-results' => array(
                   'location' => 'query',
                   'type' => 'integer',
                 ),
@@ -203,9 +202,13 @@ class Google_Service_Analytics extends Google_Service
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'filters' => array(
+                'sort' => array(
                   'location' => 'query',
                   'type' => 'string',
+                ),
+                'start-index' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
                 ),
               ),
             ),
@@ -232,19 +235,19 @@ class Google_Service_Analytics extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'max-results' => array(
-                  'location' => 'query',
-                  'type' => 'integer',
-                ),
-                'sort' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'dimensions' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
                 'filters' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'max-results' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
+                ),
+                'sort' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
@@ -1444,7 +1447,32 @@ class Google_Service_Analytics extends Google_Service
         'unsampledReports',
         array(
           'methods' => array(
-            'get' => array(
+            'delete' => array(
+              'path' => 'management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/unsampledReports/{unsampledReportId}',
+              'httpMethod' => 'DELETE',
+              'parameters' => array(
+                'accountId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'webPropertyId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'profileId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'unsampledReportId' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'get' => array(
               'path' => 'management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/unsampledReports/{unsampledReportId}',
               'httpMethod' => 'GET',
               'parameters' => array(
@@ -1999,20 +2027,22 @@ class Google_Service_Analytics_DataGa_Resource extends Google_Service_Resource
    * 'ga:sessions,ga:pageviews'. At least one metric must be specified.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param int max-results The maximum number of entries to include in this
-   * feed.
-   * @opt_param string sort A comma-separated list of dimensions or metrics that
-   * determine the sort order for Analytics data.
    * @opt_param string dimensions A comma-separated list of Analytics dimensions.
    * E.g., 'ga:browser,ga:city'.
-   * @opt_param int start-index An index of the first entity to retrieve. Use this
-   * parameter as a pagination mechanism along with the max-results parameter.
-   * @opt_param string segment An Analytics segment to be applied to data.
-   * @opt_param string samplingLevel The desired sampling level.
    * @opt_param string filters A comma-separated list of dimension or metric
    * filters to be applied to Analytics data.
+   * @opt_param bool include-empty-rows The response will include empty rows if
+   * this parameter is set to true, the default is true
+   * @opt_param int max-results The maximum number of entries to include in this
+   * feed.
    * @opt_param string output The selected format for the response. Default format
    * is JSON.
+   * @opt_param string samplingLevel The desired sampling level.
+   * @opt_param string segment An Analytics segment to be applied to data.
+   * @opt_param string sort A comma-separated list of dimensions or metrics that
+   * determine the sort order for Analytics data.
+   * @opt_param int start-index An index of the first entity to retrieve. Use this
+   * parameter as a pagination mechanism along with the max-results parameter.
    * @return Google_Service_Analytics_GaData
    */
   public function get($ids, $startDate, $endDate, $metrics, $optParams = array())
@@ -2049,17 +2079,17 @@ class Google_Service_Analytics_DataMcf_Resource extends Google_Service_Resource
    * metric must be specified.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param int max-results The maximum number of entries to include in this
-   * feed.
-   * @opt_param string sort A comma-separated list of dimensions or metrics that
-   * determine the sort order for the Analytics data.
    * @opt_param string dimensions A comma-separated list of Multi-Channel Funnels
    * dimensions. E.g., 'mcf:source,mcf:medium'.
-   * @opt_param int start-index An index of the first entity to retrieve. Use this
-   * parameter as a pagination mechanism along with the max-results parameter.
-   * @opt_param string samplingLevel The desired sampling level.
    * @opt_param string filters A comma-separated list of dimension or metric
    * filters to be applied to the Analytics data.
+   * @opt_param int max-results The maximum number of entries to include in this
+   * feed.
+   * @opt_param string samplingLevel The desired sampling level.
+   * @opt_param string sort A comma-separated list of dimensions or metrics that
+   * determine the sort order for the Analytics data.
+   * @opt_param int start-index An index of the first entity to retrieve. Use this
+   * parameter as a pagination mechanism along with the max-results parameter.
    * @return Google_Service_Analytics_McfData
    */
   public function get($ids, $startDate, $endDate, $metrics, $optParams = array())
@@ -2089,14 +2119,14 @@ class Google_Service_Analytics_DataRealtime_Resource extends Google_Service_Reso
    * 'rt:activeUsers'. At least one metric must be specified.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param int max-results The maximum number of entries to include in this
-   * feed.
-   * @opt_param string sort A comma-separated list of dimensions or metrics that
-   * determine the sort order for real time data.
    * @opt_param string dimensions A comma-separated list of real time dimensions.
    * E.g., 'rt:medium,rt:city'.
    * @opt_param string filters A comma-separated list of dimension or metric
    * filters to be applied to real time data.
+   * @opt_param int max-results The maximum number of entries to include in this
+   * feed.
+   * @opt_param string sort A comma-separated list of dimensions or metrics that
+   * determine the sort order for real time data.
    * @return Google_Service_Analytics_RealtimeData
    */
   public function get($ids, $metrics, $optParams = array())
@@ -3242,6 +3272,24 @@ class Google_Service_Analytics_ManagementUnsampledReports_Resource extends Googl
 {
 
   /**
+   * Deletes an unsampled report. (unsampledReports.delete)
+   *
+   * @param string $accountId Account ID to delete the unsampled report for.
+   * @param string $webPropertyId Web property ID to delete the unsampled reports
+   * for.
+   * @param string $profileId View (Profile) ID to delete the unsampled report
+   * for.
+   * @param string $unsampledReportId ID of the unsampled report to be deleted.
+   * @param array $optParams Optional parameters.
+   */
+  public function delete($accountId, $webPropertyId, $profileId, $unsampledReportId, $optParams = array())
+  {
+    $params = array('accountId' => $accountId, 'webPropertyId' => $webPropertyId, 'profileId' => $profileId, 'unsampledReportId' => $unsampledReportId);
+    $params = array_merge($params, $optParams);
+    return $this->call('delete', array($params));
+  }
+
+  /**
    * Returns a single unsampled report. (unsampledReports.get)
    *
    * @param string $accountId Account ID to retrieve unsampled report for.
@@ -4301,10 +4349,6 @@ class Google_Service_Analytics_Column extends Google_Model
   {
     return $this->kind;
   }
-}
-
-class Google_Service_Analytics_ColumnAttributes extends Google_Model
-{
 }
 
 class Google_Service_Analytics_Columns extends Google_Collection
@@ -6071,11 +6115,14 @@ class Google_Service_Analytics_FilterAdvancedDetails extends Google_Model
   public $extractA;
   public $extractB;
   public $fieldA;
+  public $fieldAIndex;
   public $fieldARequired;
   public $fieldB;
+  public $fieldBIndex;
   public $fieldBRequired;
   public $outputConstructor;
   public $outputToField;
+  public $outputToFieldIndex;
   public $overrideOutputField;
 
 
@@ -6111,6 +6158,14 @@ class Google_Service_Analytics_FilterAdvancedDetails extends Google_Model
   {
     return $this->fieldA;
   }
+  public function setFieldAIndex($fieldAIndex)
+  {
+    $this->fieldAIndex = $fieldAIndex;
+  }
+  public function getFieldAIndex()
+  {
+    return $this->fieldAIndex;
+  }
   public function setFieldARequired($fieldARequired)
   {
     $this->fieldARequired = $fieldARequired;
@@ -6126,6 +6181,14 @@ class Google_Service_Analytics_FilterAdvancedDetails extends Google_Model
   public function getFieldB()
   {
     return $this->fieldB;
+  }
+  public function setFieldBIndex($fieldBIndex)
+  {
+    $this->fieldBIndex = $fieldBIndex;
+  }
+  public function getFieldBIndex()
+  {
+    return $this->fieldBIndex;
   }
   public function setFieldBRequired($fieldBRequired)
   {
@@ -6151,6 +6214,14 @@ class Google_Service_Analytics_FilterAdvancedDetails extends Google_Model
   {
     return $this->outputToField;
   }
+  public function setOutputToFieldIndex($outputToFieldIndex)
+  {
+    $this->outputToFieldIndex = $outputToFieldIndex;
+  }
+  public function getOutputToFieldIndex()
+  {
+    return $this->outputToFieldIndex;
+  }
   public function setOverrideOutputField($overrideOutputField)
   {
     $this->overrideOutputField = $overrideOutputField;
@@ -6168,6 +6239,7 @@ class Google_Service_Analytics_FilterExpression extends Google_Model
   public $caseSensitive;
   public $expressionValue;
   public $field;
+  public $fieldIndex;
   public $kind;
   public $matchType;
 
@@ -6196,6 +6268,14 @@ class Google_Service_Analytics_FilterExpression extends Google_Model
   {
     return $this->field;
   }
+  public function setFieldIndex($fieldIndex)
+  {
+    $this->fieldIndex = $fieldIndex;
+  }
+  public function getFieldIndex()
+  {
+    return $this->fieldIndex;
+  }
   public function setKind($kind)
   {
     $this->kind = $kind;
@@ -6219,6 +6299,7 @@ class Google_Service_Analytics_FilterLowercaseDetails extends Google_Model
   protected $internal_gapi_mappings = array(
   );
   public $field;
+  public $fieldIndex;
 
 
   public function setField($field)
@@ -6228,6 +6309,14 @@ class Google_Service_Analytics_FilterLowercaseDetails extends Google_Model
   public function getField()
   {
     return $this->field;
+  }
+  public function setFieldIndex($fieldIndex)
+  {
+    $this->fieldIndex = $fieldIndex;
+  }
+  public function getFieldIndex()
+  {
+    return $this->fieldIndex;
   }
 }
 
@@ -6316,6 +6405,7 @@ class Google_Service_Analytics_FilterSearchAndReplaceDetails extends Google_Mode
   );
   public $caseSensitive;
   public $field;
+  public $fieldIndex;
   public $replaceString;
   public $searchString;
 
@@ -6335,6 +6425,14 @@ class Google_Service_Analytics_FilterSearchAndReplaceDetails extends Google_Mode
   public function getField()
   {
     return $this->field;
+  }
+  public function setFieldIndex($fieldIndex)
+  {
+    $this->fieldIndex = $fieldIndex;
+  }
+  public function getFieldIndex()
+  {
+    return $this->fieldIndex;
   }
   public function setReplaceString($replaceString)
   {
@@ -6359,6 +6457,7 @@ class Google_Service_Analytics_FilterUppercaseDetails extends Google_Model
   protected $internal_gapi_mappings = array(
   );
   public $field;
+  public $fieldIndex;
 
 
   public function setField($field)
@@ -6368,6 +6467,14 @@ class Google_Service_Analytics_FilterUppercaseDetails extends Google_Model
   public function getField()
   {
     return $this->field;
+  }
+  public function setFieldIndex($fieldIndex)
+  {
+    $this->fieldIndex = $fieldIndex;
+  }
+  public function getFieldIndex()
+  {
+    return $this->fieldIndex;
   }
 }
 
@@ -6917,10 +7024,6 @@ class Google_Service_Analytics_GaDataQuery extends Google_Collection
   {
     return $this->startIndex;
   }
-}
-
-class Google_Service_Analytics_GaDataTotalsForAllResults extends Google_Model
-{
 }
 
 class Google_Service_Analytics_Goal extends Google_Model
@@ -7840,15 +7943,12 @@ class Google_Service_Analytics_McfDataRowsConversionPathValue extends Google_Mod
   }
 }
 
-class Google_Service_Analytics_McfDataTotalsForAllResults extends Google_Model
-{
-}
-
 class Google_Service_Analytics_Profile extends Google_Model
 {
   protected $internal_gapi_mappings = array(
   );
   public $accountId;
+  public $botFilteringEnabled;
   protected $childLinkType = 'Google_Service_Analytics_ProfileChildLink';
   protected $childLinkDataType = '';
   public $created;
@@ -7884,6 +7984,14 @@ class Google_Service_Analytics_Profile extends Google_Model
   public function getAccountId()
   {
     return $this->accountId;
+  }
+  public function setBotFilteringEnabled($botFilteringEnabled)
+  {
+    $this->botFilteringEnabled = $botFilteringEnabled;
+  }
+  public function getBotFilteringEnabled()
+  {
+    return $this->botFilteringEnabled;
   }
   public function setChildLink(Google_Service_Analytics_ProfileChildLink $childLink)
   {
@@ -8736,10 +8844,6 @@ class Google_Service_Analytics_RealtimeDataQuery extends Google_Collection
   {
     return $this->sort;
   }
-}
-
-class Google_Service_Analytics_RealtimeDataTotalsForAllResults extends Google_Model
-{
 }
 
 class Google_Service_Analytics_Segment extends Google_Model

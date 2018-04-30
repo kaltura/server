@@ -26,7 +26,7 @@
                 <eventConditions objectType="array">
                     <item objectType="KalturaEventFieldCondition">
                         <field objectType="KalturaEvalBooleanField">
-                            <code>$scope->getObject() instanceof entry &amp;&amp; !(in_array($scope->getObject()->getType(), array(entryType::DATA, entryType::DOCUMENT))) &amp;&amp; in_array(entryPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getStatus() == entryStatus::READY</code>
+                            <code>$scope->getObject() instanceof entry &amp;&amp; !(in_array($scope->getObject()->getType(), array(entryType::DATA, entryType::DOCUMENT))) &amp;&amp; in_array(entryPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getStatus() == entryStatus::READY </code>
                         </field>
                     </item>
                     <item objectType="KalturaOrCondition">
@@ -38,7 +38,7 @@
                             </item>
                             <item objectType="KalturaEventFieldCondition">
                                 <field objectType="KalturaEvalBooleanField">
-                                    <code>$scope->getObject()->getReplacedEntryId() &amp;&amp; entryPeer::retrieveByPK($scope->getObject()->getReplacedEntryId())->getSourceType()!= EntrySourceType::RECORDED_LIVE</code>
+                                    <code> $scope->getObject()->getReplacedEntryId() &amp;&amp; !in_array( entryPeer::retrieveByPK($scope->getObject()->getReplacedEntryId())->getSourceType() , array(EntrySourceType::RECORDED_LIVE, EntrySourceType::KALTURA_RECORDED_LIVE , EntrySourceType::LECTURE_CAPTURE)) </code>
                                 </field>
                             </item>
                         </conditions>

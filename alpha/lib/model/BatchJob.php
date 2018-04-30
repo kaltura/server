@@ -14,6 +14,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	const BATCHJOB_SUB_TYPE_PHOTOBUCKET = 2;
 	const BATCHJOB_SUB_TYPE_JAMENDO = 3;
 	const BATCHJOB_SUB_TYPE_CCMIXTER = 4;
+	const BATCHJOB_SUB_TYPE_CLIP = 5;
 	
 	const POSTCONVERT_ASSET_TYPE_FLAVOR = 0;
 	const POSTCONVERT_ASSET_TYPE_SOURCE = 1;
@@ -88,6 +89,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		BatchJobType::COPY => 'Copy',
 		BatchJobType::MOVE_CATEGORY_ENTRIES => 'Move Category Entries',
 		BatchJobType::LIVE_TO_VOD => "Live To Vod",
+		BatchJobType::CLIP_CONCAT => "Clip Concat",
 	);
 	
 	private static $BATCHJOB_STATUS_NAMES = array(
@@ -436,7 +438,14 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		BatchJobPeer::setUseCriteriaFilter(true);
 		return array_merge($result1, $result2);
 	}
-	
+
+	public function getOpenStatusChildJobs(Criteria $c = null)
+	{
+		$c = $c ? $c : new Criteria();
+		$c->addAnd($c->getNewCriterion(BatchJobPeer::STATUS, BatchJobPeer::getClosedStatusList(), Criteria::NOT_IN));
+		return $this->getChildJobs($c);
+	}
+
 	public function getDirectChildJobs()
 	{
 		$c = new Criteria();

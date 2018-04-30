@@ -9,6 +9,8 @@ abstract class KDropFolderEngine implements IKalturaLogger
 	protected $dropFolderPlugin;
 	
 	protected $dropFolderFileService;
+
+	private $maximumExecutionTime = null;
 	
 	public function __construct ()
 	{
@@ -55,7 +57,6 @@ abstract class KDropFolderEngine implements IKalturaLogger
 
 	/**
 	 * Load all the files from the database that their status is not PURGED, PARSED or DETECTED
-	 * @param KalturaDropFolder $folder
 	 * @return array
 	 */
 	protected function loadDropFolderFiles()
@@ -70,8 +71,9 @@ abstract class KDropFolderEngine implements IKalturaLogger
 
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
-		if(KBatchBase::$taskConfig->params->pageSize)
+		if(KBatchBase::$taskConfig && KBatchBase::$taskConfig->params->pageSize)
 			$pager->pageSize = KBatchBase::$taskConfig->params->pageSize;
+
 		$totalCount = 0;
 		do
 		{
@@ -278,5 +280,16 @@ abstract class KDropFolderEngine implements IKalturaLogger
 	function log($message)
 	{
 		KalturaLog::log($message);
+	}
+	
+	public function setMaximumExecutionTime($maximumExecutionTime = null)
+	{
+		if (is_null($this->maximumExecutionTime))
+			$this->maximumExecutionTime = $maximumExecutionTime;
+	}
+
+	public function getMaximumExecutionTime()
+	{
+		return $this->maximumExecutionTime;
 	}
 }

@@ -58,7 +58,7 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 		return array($bulkUploadXmlDependency, $contentDistributionDependency);
 	}
 	
-	public function getDistributionProfileId($systemName, $providerName)
+	public function getDistributionProfileId($name, $providerName)
 	{
 		if(is_null($this->distributionProfilesNames))
 		{
@@ -72,19 +72,20 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 			
 			foreach($distributionProfileListResponse->objects as $distributionProfile)
 			{
-				if(!is_null($distributionProfile->systemName))
-					$this->distributionProfilesNames[$distributionProfile->systemName] = $distributionProfile->id;
+				if(!is_null($distributionProfile->name))
+					$this->distributionProfilesNames[$distributionProfile->name] = $distributionProfile->id;
 					
 				if(!is_null($distributionProfile->providerType))
 					$this->distributionProfilesProviders[$distributionProfile->providerType] = $distributionProfile->id;
 			}
 		}
-		
-		if(!empty($systemName) && isset($this->distributionProfilesNames[$systemName]))
-			return $this->distributionProfilesNames[$systemName];
-		
-		if(!empty($providerName) && isset($this->distributionProfilesProviders[$providerName]))
-			return $this->distributionProfilesProviders[$providerName];
+		$distributionProfileName = (string)$name;
+		if(!empty($distributionProfileName) && isset($this->distributionProfilesNames[$distributionProfileName]))
+			return $this->distributionProfilesNames[$distributionProfileName];
+
+		$distributionProviderName = (string)$providerName;
+		if(!empty($distributionProviderName) && isset($this->distributionProfilesProviders[$distributionProviderName]))
+			return $this->distributionProfilesProviders[$distributionProviderName];
 			
 		return null;
 	}

@@ -33,7 +33,7 @@ class kStorageExportJobData extends kStorageJobData
 		return $data;
 	}
 	
-	public function setStorageExportJobData(StorageProfile $externalStorage, FileSync $fileSync, $srcFileSyncLocalPath, $force = false)
+	public function setStorageExportJobData(StorageProfile $externalStorage, FileSync $fileSync, FileSync $srcFileSync, $force = false)
 	{
 		$this->setServerUrl($externalStorage->getStorageUrl()); 
 	    $this->setServerUsername($externalStorage->getStorageUsername()); 
@@ -42,7 +42,8 @@ class kStorageExportJobData extends kStorageJobData
 	    $this->setServerPublicKey($externalStorage->getPublicKey());
 	    $this->setServerPassPhrase($externalStorage->getPassPhrase());
 	    $this->setFtpPassiveMode($externalStorage->getStorageFtpPassiveMode());
-	    $this->setSrcFileSyncLocalPath($srcFileSyncLocalPath);
+	    $this->setSrcFileSyncLocalPath($srcFileSync->getFullPath());
+		$this->setSrcFileEncryptionKey($srcFileSync->getEncryptionKey());
 		$this->setSrcFileSyncId($fileSync->getId());
 		$this->setForce($force);
 		$this->setDestFileSyncStoredPath($externalStorage->getStorageBaseDir() . '/' . $fileSync->getFilePath());

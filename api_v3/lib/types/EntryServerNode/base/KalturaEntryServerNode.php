@@ -57,7 +57,7 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 	/**
 	 * @var KalturaEntryServerNodeType
 	 * @readonly
-	 * @filter eq
+	 * @filter eq,in
 	 */
 	public $serverType;
 
@@ -125,8 +125,14 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedF
 				$object = new KalturaLiveEntryServerNode();
 				break;
 
+			case KalturaEntryServerNodeType::LIVE_CLIPPING_TASK:
+				$object = new KalturaClippingTaskEntryServerNode();
+				break;
+
 			default:
-				KalturaLog::err("Did not expect source object to be of type ".$type);
+				$object = KalturaPluginManager::loadObject('KalturaEntryServerNode', $type);
+				if(!$object)
+					KalturaLog::err("Did not expect source object to be of type ".$type);
 		}
 
 		if (!$object)

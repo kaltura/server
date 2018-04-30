@@ -10,7 +10,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
-		if($object instanceof entry && $object->wasObjectSaved() && $object->getType() !== entryType::LIVE_STREAM)
+		if($object instanceof entry && $object->wasObjectSaved())
 			return true;
 		
 		if($object instanceof asset && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && in_array(assetPeer::STATUS, $modifiedColumns) || in_array(assetPeer::VERSION, $modifiedColumns))
@@ -27,7 +27,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		if($object instanceof entry && $object->getStatus() != entryStatus::DELETED && $object->getType() !== entryType::LIVE_STREAM)
+		if($object instanceof entry && $object->getStatus() != entryStatus::DELETED)
 		{
 			if(in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == entryStatus::READY)
 				return self::onEntryReady($object);
@@ -1263,35 +1263,41 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			KalturaLog::info("Entry [".$entryId."] not found");
 			return true;
 		}
-		if($entry->getType() == entryType::LIVE_STREAM)
-			return true;
+	
+		$distributionProfiles = array();
+		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entryId);
+		$entryType = $entry->getType();
+		if($entryType == entryType::LIVE_STREAM)
+		{
+			$distributionProfiles = self::getDistProfilesByEntryDistributions($entryDistributions, $distributionProfiles);
+			if(!self::checkShouldDistributeByProfiles($distributionProfiles, $entryId, $entryType))
+				return true;
+		}
 
 		KalturaLog::log("Metadata [" . $metadata->getId() . "] for entry [" . $metadata->getObjectId() . "] changed");
 		
 		$syncKey = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-		$xmlPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-		if(!$xmlPath)
+		$xmlString = kFileSyncUtils::file_get_contents($syncKey);
+		if(!$xmlString)
 		{
 			KalturaLog::err("Entry metadata xml not found");
 			return true;
 		}
 		$xml = new KDOMDocument();
-		$xml->load($xmlPath);
+		$xml->loadXML($xmlString);
 		
 		$previousXml = null;
 		if($previousVersion)
 		{
 			$syncKey = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA, $previousVersion);
-			$xmlPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-			if($xmlPath)
+			$xmlString = kFileSyncUtils::file_get_contents($syncKey);
+			if($xmlString)
 			{
 				$previousXml = new KDOMDocument();
-				$previousXml->load($xmlPath);
+				$previousXml->loadXML($xmlString);
 			}
 		}
-		
-		
-		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($metadata->getObjectId());
+
 		foreach($entryDistributions as $entryDistribution)
 		{
 			/**
@@ -1308,12 +1314,22 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			}
 
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
-			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+			if(isset($distributionProfiles[$entryDistribution->getId()]))
+			{
+				$distributionProfile = $distributionProfiles[$entryDistribution->getId()];
+			}
+			else
+			{
+				$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+			}
 			if(!$distributionProfile)
 			{
 				KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
 				continue;
 			}
+
+			if(!$distributionProfile->shouldDistributeByType($entryId, $entryType))
+				continue;
 			
 			$distributionProvider = $distributionProfile->getProvider();
 			if(!$distributionProvider)
@@ -1321,7 +1337,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProfile->getProviderType() . "] not found");
 				continue;
 			}
-			
 			if($entryDistribution->getStatus() == EntryDistributionStatus::PENDING || $entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
 			{
 				self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
@@ -1333,7 +1348,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				}
 				continue;
 			}
-		
 			if($entryDistribution->getStatus() == EntryDistributionStatus::READY)
 			{
 				if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED)
@@ -1517,8 +1531,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	{
 		if(!ContentDistributionPlugin::isAllowedPartner($entry->getPartnerId()))
 			return true;
-			
-		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entry->getId());
+		$entryId = $entry->getId();
+		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entryId);
+		$entryType = $entry->getType();
 		foreach($entryDistributions as $entryDistribution)
 		{
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
@@ -1528,7 +1543,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
 				continue;
 			}
-			
+
+			if(!$distributionProfile->shouldDistributeByType($entryId, $entryType))
+				continue;
+
 			if (in_array(entryPeer::START_DATE, $modifiedColumns) || in_array(entryPeer::END_DATE, $modifiedColumns))
 			{
 				$entryDistribution->setUpdatedAt(time());
@@ -1762,8 +1780,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			return true;
 
 		$distributionProfiles = DistributionProfilePeer::retrieveByPartnerId($entry->getPartnerId());
+		$entryType = $entry->getType();
 		foreach($distributionProfiles as $distributionProfile)
 		{
+			if(!$distributionProfile->shouldAddDistributeByType($entryType))
+				continue;
+
 			$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $distributionProfile->getId());
 			if($entryDistribution)
 			{
@@ -1917,6 +1939,39 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		return true;
 	}
 	
+	/**
+	 * @param array $distributionProfiles
+	 * @param string $entryId
+	 * @param int $entryType
+	 */
+	public static function checkShouldDistributeByProfiles(array $distributionProfiles, $entryId, $entryType)
+	{
+		foreach($distributionProfiles as $distributionProfile)
+		{
+			if($distributionProfile->shouldDistributeByType($entryId, $entryType))
+				return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * @param array $entryDistributions
+	 * @param array $distributionProfiles
+	 */
+	public static function getDistProfilesByEntryDistributions(array $entryDistributions, array $distributionProfiles)
+	{
+		foreach($entryDistributions as $entryDistributionObject)
+		{
+			$distributionProfileId = $entryDistributionObject->getDistributionProfileId();
+			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+			if($distributionProfile)
+			{
+				$distributionProfiles[$entryDistributionObject->getId()] = $distributionProfile;
+			}
+		}
+		return $distributionProfiles;
+	}
+
 	protected static function assignAssetsAndValidateForSubmission(EntryDistribution $entryDistribution, entry $entry, DistributionProfile $distributionProfile, $action){
 		$listChanged = kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
 		$listChanged = ($listChanged | kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile));

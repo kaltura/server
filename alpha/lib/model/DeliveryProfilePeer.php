@@ -69,6 +69,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			DeliveryProfileType::LIMELIGHT_RTMP => 'DeliveryProfileLimeLightRtmp',
 			
 			DeliveryProfileType::VOD_PACKAGER_HLS => 'DeliveryProfileVodPackagerHls',
+			DeliveryProfileType::VOD_PACKAGER_HLS_MANIFEST => 'DeliveryProfileVodPackagerHlsManifest',
 			DeliveryProfileType::VOD_PACKAGER_DASH => 'DeliveryProfileVodPackagerDash',
 			DeliveryProfileType::VOD_PACKAGER_HDS => 'DeliveryProfileVodPackagerHds',
 			DeliveryProfileType::VOD_PACKAGER_MSS => 'DeliveryProfileVodPackagerMss',
@@ -143,20 +144,26 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	public static function getDeliveryProfile($entryId, $streamerType = PlaybackProtocol::HTTP) 
 	{
+		$delivery = null;
 		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $entryId, $streamerType);
 		
 		if ($streamerType == PlaybackProtocol::HTTP)
 		{
 			$deliveryAttributes->setMediaProtocol(infraRequestUtils::getProtocol());
-		
 			$delivery = self::getLocalDeliveryByPartner($entryId, $streamerType, $deliveryAttributes, null, false);
-			if ($delivery)
-				return $delivery;
 			
-			// if a delivery profile wasn't found try again without forcing the request protocol  
-			$deliveryAttributes->setMediaProtocol(infraRequestUtils::getProtocol() == 'http' ? 'https' : 'http');
+			// if a delivery profile wasn't found try again without forcing the request protocol
+			if(!$delivery)
+				$deliveryAttributes->setMediaProtocol(infraRequestUtils::getProtocol() == 'http' ? 'https' : 'http');
 		}
-		return self::getLocalDeliveryByPartner($entryId, $streamerType, $deliveryAttributes, null, false);	
+		
+		if(!$delivery)
+			$delivery = self::getLocalDeliveryByPartner($entryId, $streamerType, $deliveryAttributes, null, false);
+		
+		if($delivery)
+			$delivery->setDynamicAttributes($deliveryAttributes);
+		
+		return $delivery;
 	}
 	
 	/**
@@ -209,11 +216,10 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	public static function getDeliveryByPartner(entry $entry, Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false, $isLive = false)
 	{
-		if($deliveryAttributes->getDeliveryProfileId())
-			$deliveryIds = array($deliveryAttributes->getDeliveryProfileId());
+		if($deliveryAttributes->getRequestedDeliveryProfileIds())
+			$deliveryIds = $deliveryAttributes->getRequestedDeliveryProfileIds();
 		else
 			$deliveryIds = self::getCustomDeliveryIds($entry, $partner, $streamerType, $isLive, $deliveryAttributes);
-
 		// if the partner has an override for the required format on the partner object - use that
 		if(count($deliveryIds))
 		{
@@ -326,7 +332,22 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$deliveries = DeliveryProfilePeer::doSelect($c);
 
 		$cmp = new DeliveryProfileComparator($isSecured, $cdnHost);
-		array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $deliveryIds);
+
+		if($isLive)
+		{
+			$partnersDeliveryProfileIdsByUserOrder = $partner->getLiveDeliveryProfileIds();
+		}
+		else
+		{
+			$partnersDeliveryProfileIdsByUserOrder = $partner->getDeliveryProfileIds();
+		}
+
+		if(isset( $partnersDeliveryProfileIdsByUserOrder[$deliveryAttributes->getFormat()]))
+		{
+			$partnersDeliveryProfileIdsByUserOrder = $partnersDeliveryProfileIdsByUserOrder[$deliveryAttributes->getFormat()];
+		}
+
+		array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $partnersDeliveryProfileIdsByUserOrder);
 		uasort($deliveries, array($cmp, "compare"));
 
 		return $deliveries;
@@ -335,21 +356,38 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	protected static function getDefaultDelivery(Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false, $isLive = false)
 	{
 		$c = new Criteria();
-		$c->add(DeliveryProfilePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
-		$c->add(DeliveryProfilePeer::IS_DEFAULT, true);
+
+		if (!count($deliveryAttributes->getDeliveryProfileIds()) && !$deliveryAttributes->getIsDeliveryProfilesBlockedList())
+		{
+			$c->add(DeliveryProfilePeer::IS_DEFAULT, true);
+			$c->add(DeliveryProfilePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
+		}
+		else
+		{
+			$c->add(DeliveryProfilePeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partner->getId()), Criteria::IN);
+		}
+
 		$c->add(DeliveryProfilePeer::STREAMER_TYPE, $streamerType);
 
 		$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::HOST_NAME . ' is not null)');
 
 		if($isLive)
+		{
 			$c->add(DeliveryProfilePeer::TYPE, self::getAllLiveDeliveryProfileTypes(), Criteria::IN);
+		}
 		else
+		{
 			$c->add(DeliveryProfilePeer::TYPE, self::getAllLiveDeliveryProfileTypes(), Criteria::NOT_IN);
+		}
 
 		if($isSecured)
+		{
 			$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is not null)');
+		}
 		else
+		{
 			$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is null)');
+		}
 
 		self::filterDeliveryProfilesCriteria($c, $deliveryAttributes);
 
@@ -397,21 +435,22 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			return null;
 		}
 
-		$deliveryProfileId = $deliveryAttributes->getDeliveryProfileId();
-		if($deliveryProfileId)
+		$deliveryIds = $deliveryIds[$streamerType];
+		$requestedDeliveryProfileIds = $deliveryAttributes->getRequestedDeliveryProfileIds();
+		if($requestedDeliveryProfileIds)
 		{
-			if(in_array($deliveryProfileId, $deliveryIds[$streamerType]))
-				$deliveryIds = array($streamerType => array($deliveryProfileId));
+			$intersectDeliveryProfileIds = array_intersect($deliveryIds, $requestedDeliveryProfileIds);
+			if(count($intersectDeliveryProfileIds))
+				$deliveryIds = $intersectDeliveryProfileIds;
 			else
 			{
-				KalturaLog::err('Requested delivery profile id ['. $deliveryProfileId."], can't be determined for storageId [$storageId] ,PartnerId [".$storageProfile->getPartnerId()."] and streamer type [$streamerType]");
+				KalturaLog::err('Requested delivery profile ids ['. implode("|", $intersectDeliveryProfileIds)."], can't be determined for storageId [$storageId] ,PartnerId [".$storageProfile->getPartnerId()."] and streamer type [$streamerType]");
 				return null;
 			}
 		}
 
 		self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
-		
-		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds[$streamerType]);
+		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds);
 		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
 		if($delivery) {
 			KalturaLog::info("Delivery ID for storageId [$storageId] ( PartnerId [" . $storageProfile->getPartnerId() . "] ) and streamer type [$streamerType] is " . $delivery->getId());

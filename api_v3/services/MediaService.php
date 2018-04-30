@@ -129,7 +129,7 @@ class MediaService extends KalturaEntryService
      */
     protected function replaceResource(KalturaResource $resource, entry $dbEntry, $conversionProfileId = null, $advancedOptions = null)
     {
-    	if($advancedOptions)
+	    if($advancedOptions)
     	{
     		$dbEntry->setReplacementOptions($advancedOptions->toObject());
     		$dbEntry->save();
@@ -150,21 +150,11 @@ class MediaService extends KalturaEntryService
 		else
 		{
 			$kResource = $resource->toObject();
-			if ( ($kResource instanceof kOperationResource ) && ($this->isResourceKClip($kResource)) ) {
-				$internalResource = $kResource->getResource();
-				if ($dbEntry->getIsTrimDisabled()
-					&& $internalResource instanceof kFileSyncResource
-					&& $dbEntry->getId() == $internalResource->getOriginEntryId()
-				)
-				{
-					throw new KalturaAPIException(KalturaErrors::ENTRY_CANNOT_BE_TRIMMED);
-				}
-			}
-
 			$tempMediaEntry = new KalturaMediaEntry();
 			$tempMediaEntry->type = $dbEntry->getType();
 			$tempMediaEntry->mediaType = $dbEntry->getMediaType();
 			$tempMediaEntry->sourceType = $dbEntry->getSourceType();
+			$tempMediaEntry->streams = $dbEntry->getStreams();
 
 			if ( !$conversionProfileId ) {
 				$originalConversionProfileId = $dbEntry->getConversionQuality();
@@ -181,6 +171,20 @@ class MediaService extends KalturaEntryService
 			}
 			if($conversionProfileId)
 				$tempMediaEntry->conversionProfileId = $conversionProfileId;
+			
+			if ($conversionProfileId && !$advancedOptions)
+			{
+				$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
+				if($conversionProfile)
+				{
+					$defaultReplacementOptions = $conversionProfile->getDefaultReplacementOptions(); 
+					if ($defaultReplacementOptions) 
+					{
+						$dbEntry->setReplacementOptions($defaultReplacementOptions);
+						$dbEntry->save();
+					}
+				}
+			}
 
 			$this->replaceResourceByEntry($dbEntry, $resource, $tempMediaEntry);
 		}
@@ -693,7 +697,11 @@ class MediaService extends KalturaEntryService
 	 */
 	function getAction($entryId, $version = -1)
 	{
-		return $this->getEntry($entryId, $version, KalturaEntryType::MEDIA_CLIP);
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry || !(KalturaEntryFactory::getInstanceByType($dbEntry->getType()) instanceof KalturaMediaEntry))
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		return $this->getEntry($entryId, $version);
 	}
 
     /**
@@ -777,16 +785,25 @@ class MediaService extends KalturaEntryService
 		//calling replaceResource only if no lock or we grabbed it
 		$lock = kLock::create("media_updateContent_{$entryId}");
 		
-	    if ($lock && !$lock->lock(self::KLOCK_MEDIA_UPDATECONTENT_GRAB_TIMEOUT , self::KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT))
-     	    throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
-     	try{
-       		$this->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
+		if ($lock && !$lock->lock(self::KLOCK_MEDIA_UPDATECONTENT_GRAB_TIMEOUT , self::KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT))
+			throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
+		
+		try{
+			$this->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
+			if ($this->shouldUpdateRelatedEntry($resource))
+				$this->updateContentInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions);
 		}
 		catch(Exception $e){
 			if($lock){
 				$lock->unlock();
 			}
-       		throw $e;
+			if (($e->getCode() == kCoreException::SOURCE_FILE_NOT_FOUND) && (kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId())))
+			{
+				$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
+				KalturaLog::info("Source file wasn't found on current DC. dumping the request to DC id [$remoteDc]");
+				kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc));
+			}
+	       		throw $e;
 		}
 		if($lock){
 			$lock->unlock();
@@ -851,11 +868,9 @@ class MediaService extends KalturaEntryService
 	{
 	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
-
 	    if (!$filter)
 			$filter = new KalturaMediaEntryFilter();
-
-	    $filter->typeEqual = KalturaEntryType::MEDIA_CLIP;
+	
 	    list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
 
 	    $newList = KalturaMediaEntryArray::fromDbArray($list, $this->getResponseProfile());
@@ -1147,6 +1162,69 @@ class MediaService extends KalturaEntryService
 			}
 		}
 		return false;
+	}
+	
+	private static function getRelatedResourceEntryId($originalResourceEntryId,$dbEntry,$relatedEntry)
+	{
+		if($originalResourceEntryId == $dbEntry->getSourceEntryId() &&  $relatedEntry->getSourceEntryId() )
+		{
+			return $relatedEntry->getSourceEntryId();
+		}
+		if($originalResourceEntryId == $dbEntry->getRootEntryId())
+		{
+			return $relatedEntry->getRootEntryId();
+		}
+		
+		return $relatedEntry->getId();
+	}
+	
+	
+	private function updateContentInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions)
+	{
+		$originalResourceEntryId = $resource->resource->entryId;
+		$relatedEntries = myEntryUtils::getRelatedEntries($dbEntry);
+		
+		foreach ($relatedEntries as $relatedEntry)
+		{
+			if ($relatedEntry->getType() == entryType::DOCUMENT)
+				continue;
+			$resource->resource->entryId = self::getRelatedResourceEntryId($originalResourceEntryId, $dbEntry, $relatedEntry);
+			KalturaLog::debug("Replacing entry [" . $relatedEntry->getId() . "] as related entry with resource entry id : [" . $resource->resource->entryId . "]");
+			$this->replaceResource($resource, $relatedEntry, $conversionProfileId, $advancedOptions);
+		}
+	}
+	
+	private function shouldUpdateRelatedEntry($resource)
+	{
+		return $this->isClipTrimFlow($resource);
+	}
+
+	private function isClipTrimFlow($resource)
+	{
+		return ($resource instanceof KalturaOperationResource && $resource->resource instanceof KalturaEntryResource
+			&& $resource->operationAttributes[0] instanceof KalturaClipAttributes);
+	}
+
+	/**
+	 * Get volume map by entry id
+	 *
+	 * @action getVolumeMap
+	 * @param string $entryId Entry id
+	 * @return file
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function getVolumeMapAction($entryId)
+	{
+		$dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
+		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		$flavorAsset = myEntryUtils::getFlavorSupportedByPackagerForVolumeMap($entryId);
+		if (!$flavorAsset)
+			throw new KalturaAPIException(KalturaErrors::GIVEN_ID_NOT_SUPPORTED);
+
+		$content = myEntryUtils::getVolumeMapContent($flavorAsset);
+		return $content;
 	}
 
 }
