@@ -2192,14 +2192,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return $this->getFromCustomData("operationAttributes", null, array());
 	}
 
-	public function setClipConcatTrimFlow($v)
+	public function setFlowType($v)
 	{
-		$this->putInCustomData('clipConcatTrimFlow', $v);
+		$this->putInCustomData('flowType', $v);
 	}
 
-	public function getClipConcatTrimFlow()
+	public function getFlowType()
 	{
-		return $this->getFromCustomData('clipConcatTrimFlow');
+		return $this->getFromCustomData('flowType');
 	}
 	
 	public function getDynamicFlavorAttributes()

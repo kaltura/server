@@ -710,6 +710,7 @@ class KalturaEntryService extends KalturaBaseService
 				$dbEntry->setSource(EntrySourceType::KALTURA_RECORDED_LIVE);
 				$dbEntry->setRootEntryId($srcEntry->getRootEntryId());
 				$dbEntry->setIsRecordedEntry(true);
+				$dbEntry->setFlowType(EntryFlowType::LIVE_CLIPPING);
 				$dbEntry->save();
 				return $dbAsset;
 			}

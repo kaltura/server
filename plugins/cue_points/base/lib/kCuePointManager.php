@@ -163,6 +163,12 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $data->getDestDataFilePath())
 		{
 			$replacedEntry = $entry->getReplacedEntryId() ? entryPeer::retrieveByPK($entry->getReplacedEntryId()) : null;
+			if ($replacedEntry && $replacedEntry->getFlowType() == EntryFlowType::LIVE_CLIPPING)
+			{
+				KalturaLog::debug("Entry [" . $replacedEntry->getId() . "] is from live clip flow - Cue point will not be copied");
+				return $dbBatchJob;
+			}
+
 			$liveEntryId = $replacedEntry ? $replacedEntry->getRootEntryId() : $entry->getRootEntryId();
 			$vodEntryId = $replacedEntry ? $replacedEntry->getId() : $entry->getId();
 			$lastSegmentDuration = $replacedEntry ? $entry->getLengthInMsecs() - $replacedEntry->getLengthInMsecs() : $entry->getLengthInMsecs();
@@ -547,9 +553,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	 */
 	protected static function isClipConcatTrimFlow(BaseObject $object ) {
 		if ( $object instanceof entry ) {
-			if ($object->getClipConcatTrimFlow()){
-				return true;
-			}
+			return ($object->getFlowType() == EntryFlowType::CLIP_CONCAT_TRIM);
 		}
 		return false;
 	}
@@ -1009,7 +1013,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	public static function copyCuePointsToClipEntry( entry $clipEntry ) {
 		$clipAtts =  self::getClipAttributesFromEntry( $clipEntry );
 		//if clipConcat flow let batch job copy cue point
-		if ( !is_null($clipAtts) &&  is_null($clipEntry->getClipConcatTrimFlow()) ) {
+		if ( !is_null($clipAtts) &&  ($clipEntry->getFlowType() != EntryFlowType::CLIP_CONCAT_TRIM) ) {
 			$sourceEntry = entryPeer::retrieveByPK( $clipEntry->getSourceEntryId() );
 			if ( is_null($sourceEntry) ) {
 				KalturaLog::info("Didn't copy cuePoints for entry [{$clipEntry->getId()}] because source entry [" . $clipEntry->getSourceEntryId() . "] wasn't found");
