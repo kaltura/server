@@ -219,9 +219,8 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 	 * @return bool
 	 */
 	protected static function isClipConcatTrimFlow(BaseObject $object ) {
-		if ( $object instanceof entry ) {
+		if ( $object instanceof entry )
 			return ($object->getFlowType() == EntryFlowType::TRIM_CONCAT);
-		}
 		return false;
 	}
 
