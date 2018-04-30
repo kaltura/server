@@ -6,7 +6,7 @@
 class PartnerController extends Zend_Controller_Action
 {
 	const PARTNER_PACKAGE_FREE = 1;
-	const PARTNER_PACKAGE_DEVELOPER_TRIAL = 100;
+	const PARTNER_PACKAGE_DEVELOPER = 100;
 	
 	public function indexAction()
 	{
@@ -38,7 +38,7 @@ class PartnerController extends Zend_Controller_Action
 		if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-packages-service-paid')))
 		{
 			foreach($packages as $index => $package)
-				if(intval($package->id) != PartnerController::PARTNER_PACKAGE_FREE && intval($package->id) != PartnerController::PARTNER_PACKAGE_DEVELOPER_TRIAL)
+				if(intval($package->id) != PartnerController::PARTNER_PACKAGE_FREE && intval($package->id) != PartnerController::PARTNER_PACKAGE_DEVELOPER)
 					unset($packages[$index]);
 		}
 		
@@ -141,7 +141,7 @@ class PartnerController extends Zend_Controller_Action
 		}
 		else {
 			$this->view->commercialFiltered = true;
-			$partnerFilter->partnerPackageIn = self::PARTNER_PACKAGE_FREE.','.self::PARTNER_PACKAGE_DEVELOPER_TRIAL;
+			$partnerFilter->partnerPackageIn = self::PARTNER_PACKAGE_FREE.','.self::PARTNER_PACKAGE_DEVELOPER;
 		}
 							
 		
