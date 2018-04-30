@@ -5,8 +5,8 @@
  */
 interface EntryFlowType extends BaseEnum
 {
-    
-    const CLIP_CONCAT_TRIM = 1;
-    const LIVE_CLIPPING = 2;
+    const CLIP_CONCAT = 1;
+    const TRIM_CONCAT = 2;
+    const LIVE_CLIPPING = 3;
 
 }
