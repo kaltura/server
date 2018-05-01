@@ -29,6 +29,8 @@ if($argc > 9)
 {
 	$recycleBin = $argv[9];
 }
+else
+	$recycleBin = false;
 
 scriptLogger::logScript('Init webexWrapper');
 $securityContext = new WebexXmlSecurityContext();
@@ -41,7 +43,4 @@ $webexWrapper = new webexWrapper($webexServiceUrl, $securityContext, array("scri
 $createTimeStart = date('m/j/Y H:i:s', $startTime);
 $createTimeEnd  = date('m/j/Y H:i:s', $endTime);
 $serviceTypes = webexWrapper::stringServicesTypesToWebexXmlArray(array(WebexXmlComServiceTypeType::_MEETINGCENTER));
-if($recycleBin)
-	$webexWrapper->deleteRecordingsByDatesInRecycleBin($serviceTypes, $createTimeStart, $createTimeEnd);
-else
-	$webexWrapper->deleteRecordingsByDates($serviceTypes, $createTimeStart, $createTimeEnd);
+$webexWrapper->deleteRecordingsByDates($serviceTypes, $createTimeStart, $createTimeEnd, $recycleBin);

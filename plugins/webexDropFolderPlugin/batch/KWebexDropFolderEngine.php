@@ -248,12 +248,12 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	private function deleteFileFromRecycleBin($fileName)
 	{
 		KalturaLog::info("Looking for: [$fileName] in the Webex recycleBin.");
-		$recordingArr = $this->webexWrapper->getRecordByNameFromRecycleBin($fileName, $this->getServiceTypes());
+		$recordingArr = $this->webexWrapper->getRecordByName($fileName, $this->getServiceTypes(), true);
 		if($recordingArr)
 		{
 			$recordingId = $recordingArr[0]->getRecordingID();
 			KalturaLog::info("Permanently deleting recording with webex ID: [$recordingId], recording: " . print_r($recordingArr[0], true));
-			$response = $this->webexWrapper->deleteRecordFromRecycleBinById($recordingId);
+			$response = $this->webexWrapper->deleteRecordById($recordingId, true);
 		}
 		else
 		{
