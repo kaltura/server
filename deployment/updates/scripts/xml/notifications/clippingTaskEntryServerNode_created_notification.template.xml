@@ -40,9 +40,5 @@
 				<objectFormat>1</objectFormat> <!-- KalturaResponseType::RESPONSE_TYPE_JSON -->
 			</template>
 		</request>
-		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
-			<id>{1:result:id}</id>
-			<status>2</status><!-- EventNotificationTemplateStatus::ACTIVE -->
-		</request>
 	</multirequest>
 </xml>

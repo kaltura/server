@@ -2081,6 +2081,7 @@
 	</multirequest>
 
 	<multirequest>
+		<!-- Entry-Server-Node of type Clipping-task created -->
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaPushNotificationTemplate">
 				<name>CLIPPING_TASK_ENTRY_SERVER_NODE_CREATED_NOTIFICATIONS</name>
@@ -2108,9 +2109,39 @@
 				<objectFormat>1</objectFormat> <!-- KalturaResponseType::RESPONSE_TYPE_JSON -->
 			</template>
 		</request>
-		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
-			<id>{1:result:id}</id>
-			<status>2</status><!-- EventNotificationTemplateStatus::ACTIVE -->
+	</multirequest>
+
+	<multirequest>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaPushNotificationTemplate">
+				<name>EXPLICIT_LIVE_PUSH_NOTIFICATIONS</name>
+				<systemName>EXPLICIT_LIVE_PUSH_NOTIFICATIONS</systemName>
+				<description>Push notification template used by the explicit live feature</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>38</eventObjectType><!-- EventNotificationEventObjectType::LIVE_STREAM -->
+
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventObjectChangedCondition">
+						<description>Entry view mode or recording status changes</description>
+						<modifiedColumns>view_mode,recording_status</modifiedColumns>
+						<field objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getType()</code>
+						</field>
+					</item>
+				</eventConditions>
+				<queueNameParameters objectType="array">
+					<item objectType="KalturaPushEventNotificationParameter">
+						<key>entryId</key>
+						<description></description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getId()</code>
+						</value>
+					</item>
+				</queueNameParameters>
+				<apiObjectType>KalturaLiveStreamEntry</apiObjectType>
+				<objectFormat>1</objectFormat> <!-- KalturaResponseType::RESPONSE_TYPE_JSON -->
+			</template>
 		</request>
 	</multirequest>
 
