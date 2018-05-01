@@ -202,33 +202,17 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 		}
 		else // in case of update
 		{
-			$this->credit->validateForUpdate();
-			
 			//if we are trying to update the credit object we must reset the used credit before.
 			if ($this->credit != null)
 			{
+				$this->credit->validateForUpdate();
 				if ($sourceObject->getUsedCredit() > 0)
 					throw new KalturaAPIException(KalturaReachErrors::UPDATE_CREDIT_ERROR_USED_CREDIT_EXISTS, $this->id);
 			}
 		}
 		
 		//validating dictionary duplications
-		$languages = array();
-		if(!$this->dictionaries)
-			return;
-			
-		foreach ($this->dictionaries as $dictionary)
-		{
-			/* @var KalturaDictionary $dictionary */
-			if (in_array($dictionary->language, $languages))
-				throw new KalturaAPIException(KalturaReachErrors::DICTIONARY_LANGUAGE_DUPLICATION, $dictionary->language);
-			
-			if (!$this->validateDictionaryLength($dictionary->data))
-				throw new KalturaAPIException(KalturaReachErrors::MAX_DICTIONARY_LENGTH_EXCEEDED, $dictionary->language, self::MAX_DICTIONARY_LENGTH);
-			
-			$languages[] = $dictionary->language;
-		}
-		
+		$this->validateDictionary();
 		return;
 	}
 	
@@ -254,6 +238,25 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 		if ($this->shouldGet('credit', $responseProfile) && !is_null($dbObject->getCredit()))
 		{
 			$this->credit = KalturaBaseVendorCredit::getInstance($dbObject->getCredit(), $responseProfile);
+		}
+	}
+	
+	private function validateDictionary()
+	{
+		if(!$this->dictionaries)
+			return;
+		
+		$languages = array();
+		foreach ($this->dictionaries as $dictionary)
+		{
+			/* @var KalturaDictionary $dictionary */
+			if (in_array($dictionary->language, $languages))
+				throw new KalturaAPIException(KalturaReachErrors::DICTIONARY_LANGUAGE_DUPLICATION, $dictionary->language);
+			
+			if (!$this->validateDictionaryLength($dictionary->data))
+				throw new KalturaAPIException(KalturaReachErrors::MAX_DICTIONARY_LENGTH_EXCEEDED, $dictionary->language, self::MAX_DICTIONARY_LENGTH);
+			
+			$languages[] = $dictionary->language;
 		}
 	}
 }
