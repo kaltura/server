@@ -2081,6 +2081,7 @@
 	</multirequest>
 
 	<multirequest>
+		<!-- Entry-Server-Node of type Clipping-task created -->
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaPushNotificationTemplate">
 				<name>CLIPPING_TASK_ENTRY_SERVER_NODE_CREATED_NOTIFICATIONS</name>
@@ -2107,10 +2108,6 @@
 				<apiObjectType>KalturaClippingTaskEntryServerNode</apiObjectType>
 				<objectFormat>1</objectFormat> <!-- KalturaResponseType::RESPONSE_TYPE_JSON -->
 			</template>
-		</request>
-		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
-			<id>{1:result:id}</id>
-			<status>2</status><!-- EventNotificationTemplateStatus::ACTIVE -->
 		</request>
 	</multirequest>
 
