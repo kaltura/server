@@ -11,9 +11,9 @@ class scriptLogger
 }
 
 if($argc < 9){
-	scriptLogger::logScript("Usage: [webex service URL] [webex username] [webex password] [webex site id] [webex partner id] [webex siteName] [start date timestamp] [end date timestamp] [recycleBin]");
-	scriptLogger::logScript("Usage: [webex siteName] can be '' in case its not relevant.");
-	scriptLogger::logScript("Usage: [recycleBin] is optional and should be true/1 in case you want to list the recycleBin.");
+	echo "Usage: php $argv[0] [webex service URL] [webex username] [webex password] [webex site id] [webex partner id] [webex siteName] [start date timestamp] [end date timestamp] <recycleBin>.".PHP_EOL;
+	echo "Usage: [webex siteName] can be '' in case its not relevant.".PHP_EOL;
+	echo "Usage: <recycleBin> is optional and should be true/1 in case you want to list the recycleBin.".PHP_EOL;
 	die("Not enough parameters" . "\n");
 }
 
