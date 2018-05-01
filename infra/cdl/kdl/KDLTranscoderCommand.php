@@ -64,13 +64,11 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 		}
 	
 		/*
-		 * Remove encoding.com for DAR<>PAR
+		 * Remove encoding.com - it is no longer supported
 		 */
-		if($this->_id==KDLTranscoders::ENCODING_COM
-		&& $source->_video && $source->_video->_dar
-		&& abs($source->_video->GetPAR()-$source->_video->_dar)>0.01) {
-			$warnings[KDLConstants::VideoIndex][] = //"The transcoder (".$key.") can not process the (".$sourcePart->_id."/".$sourcePart->_format. ").";
-				KDLWarnings::ToString(KDLWarnings::TranscoderFormat, $this->_id, "non square pixels");
+		if($this->_id==KDLTranscoders::ENCODING_COM){
+			$warnings[KDLConstants::ContainerIndex][] =
+				KDLWarnings::ToString(KDLWarnings::TranscoderLimitation, $this->_id)."(unsupported transcoder)";
 			return true;
 		}
 		

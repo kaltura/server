@@ -2192,14 +2192,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return $this->getFromCustomData("operationAttributes", null, array());
 	}
 
-	public function setClipConcatTrimFlow($v)
+	public function setFlowType($v)
 	{
-		$this->putInCustomData('clipConcatTrimFlow', $v);
+		$this->putInCustomData('flowType', $v);
 	}
 
-	public function getClipConcatTrimFlow()
+	public function getFlowType()
 	{
-		return $this->getFromCustomData('clipConcatTrimFlow');
+		return $this->getFromCustomData('flowType');
 	}
 	
 	public function getDynamicFlavorAttributes()
@@ -3972,8 +3972,9 @@ public function copyTemplate($copyPartnerId = false, $template)
 	 */
 	protected function getDefaultThumbPath()
 	{
-		// in case of a recorded entry from live that doesn't have flavors yet nor thumbs we will use the live default thumb.
-		if (($this->getSourceType() == EntrySourceType::RECORDED_LIVE || $this->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE) && !assetPeer::countByEntryId($this->getId(), array(assetType::FLAVOR, assetType::THUMBNAIL)))
+		//// in case of a recorded entry from live that doesn't have flavors yet nor thumbs we will use the live default thumb.
+		if ((($this->getSourceType() == EntrySourceType::RECORDED_LIVE || $this->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE) && !assetPeer::countByEntryId($this->getId(), array(assetType::FLAVOR, assetType::THUMBNAIL)))
+				|| (myEntryUtils::shouldServeVodFromLive($this)))
 			return myContentStorage::getFSContentRootPath() . self::LIVE_THUMB_PATH;
 		return null;
 	}

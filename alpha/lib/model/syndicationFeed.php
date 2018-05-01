@@ -18,6 +18,7 @@ class syndicationFeed extends BasesyndicationFeed implements IBaseObject
 	const CUSTOM_DATA_USE_CATEGORY_ENTRIES = 'use_category_entries';
 	const CUSTOM_DATA_PLAYER_TYPE = 'player_type';
 	const CUSTOM_DATA_FEED_CONTENT_TYPE_HEADER = 'feed_content_type_header';
+	const CUSTOM_DATA_ENFORCE_AUTHOR = 'enforce_feed_author';
 
 	// copied from KalturaSyndicationFeedStatus
 	const SYNDICATION_DELETED = -1;
@@ -149,7 +150,24 @@ class syndicationFeed extends BasesyndicationFeed implements IBaseObject
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_ENFORCE_ORDER, $enforceOrder);
 	}
-	
+
+	/**
+	 * @param boolean $enforceFeedAuthor
+	 */
+	public function setEnforceFeedAuthor($enforceFeedAuthor)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_ENFORCE_AUTHOR, $enforceFeedAuthor);
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getEnforceFeedAuthor()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_ENFORCE_AUTHOR);
+	}
+
+
 	/**
 	 * @return boolean
 	 */

@@ -41,16 +41,37 @@
                             <code>$scope->getObject()->getCategoryId()</code>
                         </value>
                     </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry Name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null($entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $entry->getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_name</key>
+                        <description>Category Name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null($category = categoryPeer::retrieveByPK($scope->getObject()->getCategoryId())) ? $category->getName() : ''</code>
+                        </value>
+                    </item>
                 </contentParameters>
                 <data objectType = "KalturaHttpNotificationDataText">
                     <content objectType = "KalturaStringValue">
-
                         <description>The notification content</description>
                         <value>
                             {
-                                "content_available":true,
-                                "data": { "entry_id": "{entry_id}", "category_id": "{category_id}", "partner_id" : "{partner_id}"},
-                                "to" : "/topics/{partner_id}"
+                                "notification": {
+                                    "title": "New Media was added",
+                                    "body": "{entry_name} was added to {category_name}",
+                                    "badge": 1
+                                },
+                                "data": {
+                                    "entry_id": "{entry_id}",
+                                    "category_id": "{category_id}",
+                                    "partner_id": "{partner_id}"
+                                },
+                                "condition": "'{partner_id}' in topics || '{partner_id}_{category_id}' in topics"
                             }
                         </value>
                     </content>

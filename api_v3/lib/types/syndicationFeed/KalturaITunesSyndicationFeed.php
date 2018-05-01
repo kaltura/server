@@ -66,16 +66,16 @@ class KalturaITunesSyndicationFeed extends KalturaBaseSyndicationFeed
          */
         public $feedAuthor;
 
-		/**
-		 * @var bool
-		 */
-		public $enforceFeedAuthor;
+	/**
+	 * @var bool
+	 */
+	public $enforceFeedAuthor;
 
         /**
-		 * true in case you want to enfore the palylist order on the 
-		 * @var KalturaNullableBoolean
-		 */
-		public $enforceOrder;
+	 * true in case you want to enfore the palylist order on the 
+	 * @var KalturaNullableBoolean
+	 */
+	public $enforceOrder;
         
         
 	function __construct()
@@ -93,8 +93,8 @@ class KalturaITunesSyndicationFeed extends KalturaBaseSyndicationFeed
                 "feedImageUrl",
                 "adultContent",
                 "feedAuthor",
-				"enforceOrder",
-				"enforceFeedAuthor",
+		"enforceOrder",
+		"enforceFeedAuthor",
 	);
 	
 	public function getMapBetweenObjects()
