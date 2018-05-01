@@ -227,7 +227,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			{
 				try
 				{
-					$this->deleteFileFromRecycleBin($file->getName());
+					$this->webexWrapper->deleteRecordByName($file->getName(), $this->getServiceTypes(), ture);
 				}
 				catch (Exception $e)
 				{
@@ -239,28 +239,6 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			KalturaLog::info("File [$physicalFileName] successfully purged. Purging drop folder file");
 			$this->dropFolderFileService->updateStatus($dropFolderFilesMap[$physicalFileName]->id, KalturaDropFolderFileStatus::PURGED);
 		}
-	}
-
-	/**
-	 * @param string $fileName
-	 * @throws Exception
-	 */
-	private function deleteFileFromRecycleBin($fileName)
-	{
-		KalturaLog::info("Looking for: [$fileName] in the Webex recycleBin.");
-		$recordingArr = $this->webexWrapper->getRecordByName($fileName, $this->getServiceTypes(), true);
-		if($recordingArr)
-		{
-			$recordingId = $recordingArr[0]->getRecordingID();
-			KalturaLog::info("Permanently deleting recording with webex ID: [$recordingId], recording: " . print_r($recordingArr[0], true));
-			$response = $this->webexWrapper->deleteRecordById($recordingId, true);
-		}
-		else
-		{
-			throw new Exception("Failed to locate record {$fileName} in the recycleBin");
-		}
-
-		return $response->getSuccessfulRecordingsCount();
 	}
 
 	/**
