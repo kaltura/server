@@ -22,7 +22,7 @@ class KalturaAddEntryVendorTaskAction extends KalturaRuleAction
 	 */
 	public function __construct() 
 	{
-		$this->type = ReachRuleActionType::ADD_ENTRY_VENDOR_TASK;
+		$this->type = ReachPlugin::getApiValue(ReachRuleActionType::ADD_ENTRY_VENDOR_TASK);
 	}
 	
 	public function getMapBetweenObjects()

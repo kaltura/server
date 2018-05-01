@@ -12,7 +12,7 @@ class kAddEntryVendorTaskAction extends kRuleAction
 	
 	public function __construct() 
 	{
-		parent::__construct(ReachRuleActionType::ADD_ENTRY_VENDOR_TASK);
+		parent::__construct(ReachPlugin::getRuleActionTypeCoreValue(ReachRuleActionType::ADD_ENTRY_VENDOR_TASK));
 	}
 	
 	/**
