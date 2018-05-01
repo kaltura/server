@@ -1,9 +1,10 @@
 <?php
+
 /**
  * Enable time based cue point objects management on entry objects
  * @package plugins.reach
  */
-class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaVersion,IKalturaAdminConsolePages, IKalturaPending, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaSearchDataContributor
+class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaVersion, IKalturaAdminConsolePages, IKalturaPending, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaSearchDataContributor
 {
 	const PLUGIN_NAME = 'reach';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -24,50 +25,51 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	 * return field name as appears in index schema
 	 * @param string $fieldName
 	 */
-	public static function getSearchFieldName($fieldName){
+	public static function getSearchFieldName($fieldName)
+	{
 		if ($fieldName == self::SEARCH_FIELD_CATALOG_ITEM_DATA)
-			return  'catalog_item_data';
+			return 'catalog_item_data';
 		
 		return CuePointPlugin::getPluginName() . '_' . $fieldName;
 	}
-
+	
 	/*
 	 * (non-PHPdoc)
 	 * @see IKalturaObjectLoader::getObjectClass()
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($baseClass == 'BaseVendorCatalogItem' && $enumValue == KalturaVendorCatalogItemType::CAPTIONS)
+		if ($baseClass == 'BaseVendorCatalogItem' && $enumValue == KalturaVendorCatalogItemType::CAPTIONS)
 			return 'KalturaVendorCaptionsCatalogItem';
-
-		if($baseClass == 'BaseVendorCatalogItem' && $enumValue == KalturaVendorCatalogItemType::TRANSLATION)
+		
+		if ($baseClass == 'BaseVendorCatalogItem' && $enumValue == KalturaVendorCatalogItemType::TRANSLATION)
 			return 'KalturaVendorTranslationCatalogItem';
 		
-		if($baseClass == 'KalturaCondition' && $enumValue == ReachPlugin::getConditionTypeCoreValue(ReachConditionType::EVENT_CATEGORY_ENTRY))
+		if ($baseClass == 'KalturaCondition' && $enumValue == ReachPlugin::getConditionTypeCoreValue(ReachConditionType::EVENT_CATEGORY_ENTRY))
 			return 'KalturaCategoryEntryCondition';
 		
-		if($baseClass == 'kRuleAction' && $enumValue == ReachRuleActionType::ADD_ENTRY_VENDOR_TASK)
+		if ($baseClass == 'kRuleAction' && $enumValue == ReachPlugin::getRuleActionTypeCoreValue(ReachRuleActionType::ADD_ENTRY_VENDOR_TASK))
 			return 'kAddEntryVendorTaskAction';
 		
-		if($baseClass == 'KalturaRuleAction' && ReachRuleActionType::ADD_ENTRY_VENDOR_TASK)
+		if ($baseClass == 'KalturaRuleAction' && ReachPlugin::getRuleActionTypeCoreValue(ReachRuleActionType::ADD_ENTRY_VENDOR_TASK))
 			return 'KalturaAddEntryVendorTaskAction';
-
-		if($baseClass == 'kJobData')
+		
+		if ($baseClass == 'kJobData')
 		{
-			if($enumValue == self::getBatchJobTypeCoreValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV))
+			if ($enumValue == self::getBatchJobTypeCoreValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV))
 			{
 				return 'kEntryVendorTaskCsvJobData';
 			}
 		}
-
-		if($baseClass == 'KalturaJobData')
+		
+		if ($baseClass == 'KalturaJobData')
 		{
-			if($enumValue == self::getApiValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV))
+			if ($enumValue == self::getApiValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV))
 			{
 				return 'KalturaEntryVendorTaskCsvJobData';
 			}
 		}
-
+		
 		return null;
 	}
 	
@@ -76,18 +78,21 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	 */
 	public static function getEnums($baseEnumName = null)
 	{
-		if(is_null($baseEnumName))
-			return array('SyncReachCreditTaskBatchType', 'ReachConditionType', 'ReachEntryVendorTasksCsvBatchType');
-
-		if($baseEnumName == 'BatchJobType')
+		if (is_null($baseEnumName))
+			return array('SyncReachCreditTaskBatchType', 'ReachConditionType', 'ReachEntryVendorTasksCsvBatchType', 'ReachRuleActionType');
+		
+		if ($baseEnumName == 'BatchJobType')
 			return array('SyncReachCreditTaskBatchType', 'ReachEntryVendorTasksCsvBatchType');
 		
-		if($baseEnumName == 'ConditionType')
+		if ($baseEnumName == 'ConditionType')
 			return array('ReachConditionType');
-
+		
+		if ($baseEnumName == 'RuleActionType')
+			return array('ReachRuleActionType');
+		
 		return array();
 	}
-
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
 	 */
@@ -107,29 +112,29 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 			self::PLUGIN_VERSION_BUILD
 		);
 	}
-
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaPermissions::isAllowedPartner()
 	 */
 	public static function isAllowedPartner($partnerId)
 	{
-		if(in_array($partnerId, array(Partner::ADMIN_CONSOLE_PARTNER_ID, Partner::BATCH_PARTNER_ID, PartnerPeer::GLOBAL_PARTNER)))
+		if (in_array($partnerId, array(Partner::ADMIN_CONSOLE_PARTNER_ID, Partner::BATCH_PARTNER_ID, PartnerPeer::GLOBAL_PARTNER)))
 			return true;
 		
-		if(PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, $partnerId))
+		if (PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, $partnerId))
 			return true;
 		
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		return $partner->getPluginEnabled(self::PLUGIN_NAME);
 	}
-
-
+	
+	
 	public static function isAllowAdminApi($actionApi = null)
 	{
 		$currentPermissions = Infra_AclHelper::getCurrentPermissions();
 		return ($currentPermissions && in_array(Kaltura_Client_Enum_PermissionName::SYSTEM_ADMIN_CATALOG_ITEM_MODIFY, $currentPermissions));
 	}
-
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaServices::getServicesMap()
 	 */
@@ -143,13 +148,13 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		);
 		return $map;
 	}
-
- 	/*
- 	 * @see IKalturaAdminConsolePages::getApplicationPages()
- 	 */
+	
+	/*
+	 * @see IKalturaAdminConsolePages::getApplicationPages()
+	 */
 	public static function getApplicationPages()
 	{
- 		$pages = array();
+		$pages = array();
 		$pages[] = new PartnerCatalogItemListAction();
 		$pages[] = new PartnerCatalogItemConfigureAction();
 		$pages[] = new PartnerCatalogItemSetStatusAction();
@@ -182,7 +187,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 			self::REACH_MANAGER
 		);
 	}
-
+	
 	/**
 	 * @return int id of dynamic enum in the DB.
 	 */
@@ -190,6 +195,15 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	{
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('ConditionType', $value);
+	}
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getRuleActionTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('RuleActionType', $value);
 	}
 	
 	/**
@@ -205,35 +219,36 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if($baseClass == 'KalturaCondition' && $enumValue == ReachPlugin::getConditionTypeCoreValue(ReachConditionType::EVENT_CATEGORY_ENTRY))
+		if ($baseClass == 'KalturaCondition' && $enumValue == ReachPlugin::getConditionTypeCoreValue(ReachConditionType::EVENT_CATEGORY_ENTRY))
 			return new KalturaCategoryEntryCondition();
 		
-		if($baseClass == 'kRuleAction' && $enumValue == ReachRuleActionType::ADD_ENTRY_VENDOR_TASK)
+		if ($baseClass == 'kRuleAction' && $enumValue == ReachPlugin::getRuleActionTypeCoreValue(ReachRuleActionType::ADD_ENTRY_VENDOR_TASK))
 			return new kAddEntryVendroTaskAction();
 		
-		if($baseClass == 'KalturaRuleAction' && $enumValue == ReachRuleActionType::ADD_ENTRY_VENDOR_TASK)
+		if ($baseClass == 'KalturaRuleAction' && $enumValue ==  ReachPlugin::getRuleActionTypeCoreValue(ReachRuleActionType::ADD_ENTRY_VENDOR_TASK))
 			return new KalturaAddEntryVendorTaskAction();
-
-		if($baseClass == 'kJobData')
+		
+		if ($baseClass == 'kJobData')
 		{
-			if($enumValue == self::getBatchJobTypeCoreValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV))
+			if ($enumValue == self::getBatchJobTypeCoreValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV))
 			{
 				return new kEntryVendorTaskCsvJobData();
 			}
 		}
-
-		if($baseClass == 'KalturaJobData')
+		
+		if ($baseClass == 'KalturaJobData')
 		{
-			if($enumValue == self::getApiValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV) ||
-				$enumValue == self::getBatchJobTypeCoreValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV))
+			if ($enumValue == self::getApiValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV) ||
+				$enumValue == self::getBatchJobTypeCoreValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV)
+			)
 			{
 				return new KalturaEntryVendorTaskCsvJobData();
 			}
 		}
 		return null;
 	}
-
-  /**
+	
+	/**
 	 * @return int id of dynamic enum in the DB.
 	 */
 	public static function getBatchJobTypeCoreValue($valueName)
@@ -247,7 +262,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	 */
 	public static function getSearchData(BaseObject $object)
 	{
-		if($object instanceof EntryVendorTask && self::isAllowedPartner($object->getPartnerId()))
+		if ($object instanceof EntryVendorTask && self::isAllowedPartner($object->getPartnerId()))
 			return self::getEntryVendorTaskSearchData($object);
 		
 		return null;
@@ -256,7 +271,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	public static function getEntryVendorTaskSearchData(EntryVendorTask $entryVendorTask)
 	{
 		$catalogItem = $entryVendorTask->getCatalogItem();
-		$catalogItemSearchField  = ReachPlugin::getSearchFieldName(ReachPlugin::SEARCH_FIELD_CATALOG_ITEM_DATA);
+		$catalogItemSearchField = ReachPlugin::getSearchFieldName(ReachPlugin::SEARCH_FIELD_CATALOG_ITEM_DATA);
 		
 		$contributedData = self::buildDataOnTask($catalogItem, $entryVendorTask->getPartnerId());
 		
@@ -269,7 +284,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	
 	public static function buildDataOnTask(VendorCatalogItem $catalogItem, $partnerId)
 	{
-		$data = self::CATALOG_ITEM_INDEX_PREFIX. $partnerId;
+		$data = self::CATALOG_ITEM_INDEX_PREFIX . $partnerId;
 		
 		$data .= " " . self::CATALOG_ITEM_INDEX_SERVICE_TYPE . $catalogItem->getServiceType();
 		$data .= " " . self::CATALOG_ITEM_INDEX_SERVICE_FEATURE . $catalogItem->getServiceFeature();
