@@ -227,7 +227,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			{
 				try
 				{
-					$this->webexWrapper->deleteRecordByName($file->getName(), $this->getServiceTypes(), ture);
+					$this->webexWrapper->deleteRecordByName($file->getName(), $this->getServiceTypes(), true);
 				}
 				catch (Exception $e)
 				{
