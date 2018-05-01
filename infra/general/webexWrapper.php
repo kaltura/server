@@ -61,12 +61,12 @@ class webexWrapper
 	 * @param $startTime
 	 * @param $endTime
 	 * @param $startFrom
-	 * @param $isRecycleBin
+	 * @param $fromRecycleBin
 	 * @return WebexXmlListRecordingRequest
 	 */
-	private function initListRecordingRequest($serviceTypes, $pageSize, $startTime, $endTime, $startFrom, $isRecycleBin = false)
+	private function initListRecordingRequest($serviceTypes, $pageSize, $startTime, $endTime, $startFrom, $fromRecycleBin = false)
 	{
-		if($isRecycleBin)
+		if($fromRecycleBin)
 		{
 			$this->logDebug("Searching the recycleBin.");
 			$listRecordingRequest = new WebexXmlListRecordingInRecycleBinRequest();
@@ -115,14 +115,14 @@ class webexWrapper
 
 	/**
 	 * @param WebexXmlArray $serviceTypes
-	 * @param long $startTime
-	 * @param long $endTime
-	 * @param bool $isRecycleBin
+	 * @param string $startTime
+	 * @param string $endTime
+	 * @param bool $fromRecycleBin
 	 * @throws Exception
 	 */
-	public function deleteRecordingsByDates($serviceTypes, $startTime = null, $endTime = null, $isRecycleBin = false)
+	public function deleteRecordingsByDates($serviceTypes, $startTime = null, $endTime = null, $fromRecycleBin = false)
 	{
-		$result = $this->listRecordings($serviceTypes, $startTime, $endTime, self::START_INDEX_OFFSET, self::MAX_PAGE_SIZE, $isRecycleBin);
+		$result = $this->listRecordings($serviceTypes, $startTime, $endTime, self::START_INDEX_OFFSET, self::MAX_PAGE_SIZE, $fromRecycleBin);
 		$count = 0;
 		$faultCounter = 0;
 		while($result)
@@ -132,18 +132,18 @@ class webexWrapper
 			{
 				try
 				{
-					$this->deleteRecordById($record->getRecordingID(), $isRecycleBin);
+					$this->deleteRecordById($record->getRecordingID(), $fromRecycleBin);
 					$this->logDebug('deleted ' . ++$count . ' records so far');
 				}
 				catch (Exception $e)
 				{
 					$this->logError("Failed to delete record {$record->getRecordingID()} ".print_r($e, true));
 					if(++$faultCounter >= webexWrapper::MAX_DELETE_FAILURES)
-						throw new Exception("Failed to delete more then ".webexWrapper::MAX_FAILURES." times", 0, $e);
+						throw new Exception("Failed to delete more then ".webexWrapper::MAX_DELETE_FAILURES." times", 0, $e);
 				}
 			}
 
-			$result = $this->listRecordings($serviceTypes, $startTime, $endTime, $faultCounter+webexWrapper::START_INDEX_OFFSET,self::MAX_PAGE_SIZE, $isRecycleBin);
+			$result = $this->listRecordings($serviceTypes, $startTime, $endTime, $faultCounter+webexWrapper::START_INDEX_OFFSET,self::MAX_PAGE_SIZE, $fromRecycleBin);
 		}
 	}
 
@@ -166,17 +166,17 @@ class webexWrapper
 
 	/**
 	 * @param WebexXmlArray $serviceTypes
-	 * @param long $startTime
-	 * @param long $endTime
+	 * @param string $startTime
+	 * @param string $endTime
 	 * @param int $startFrom
 	 * @param int $pageSize
-	 * @param bool $isRecycleBin
+	 * @param bool $fromRecycleBin
 	 * @return WebexXmlListRecording
 	 * @throws Exception
 	 */
-	public function listRecordings($serviceTypes, $startTime = null, $endTime = null, $startFrom = 1, $pageSize = 500, $isRecycleBin = false)
+	public function listRecordings($serviceTypes, $startTime = null, $endTime = null, $startFrom = 1, $pageSize = 500, $fromRecycleBin = false)
 	{
-		$listRecordingRequest = $this->initListRecordingRequest($serviceTypes, $pageSize, $startTime, $endTime, $startFrom, $isRecycleBin);
+		$listRecordingRequest = $this->initListRecordingRequest($serviceTypes, $pageSize, $startTime, $endTime, $startFrom, $fromRecycleBin);
 		try
 		{
 			$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
@@ -199,19 +199,19 @@ class webexWrapper
 
 	/**
 	 * @param WebexXmlArray $serviceTypes
-	 * @param long $startTime
-	 * @param long $endTime
-	 * @param bool $isRecycleBin
+	 * @param string $startTime
+	 * @param string $endTime
+	 * @param bool $fromRecycleBin
 	 * @return array
 	 * @throws Exception
 	 */
-	public function listAllRecordings($serviceTypes, $startTime = null, $endTime = null, $isRecycleBin = false)
+	public function listAllRecordings($serviceTypes, $startTime = null, $endTime = null, $fromRecycleBin = false)
 	{
 		$startFrom = 1;
 		$fileList = array();
 		do
 		{
-			$listRecordingRequest = $this->initListRecordingRequest($serviceTypes, self::MAX_PAGE_SIZE, $startTime, $endTime, $startFrom, $isRecycleBin);
+			$listRecordingRequest = $this->initListRecordingRequest($serviceTypes, self::MAX_PAGE_SIZE, $startTime, $endTime, $startFrom, $fromRecycleBin);
 			try
 			{
 				$listRecordingResponse = $this->webexClient->send($listRecordingRequest);
@@ -237,20 +237,20 @@ class webexWrapper
 
 	/**
 	 * @param int $recordingId
-	 * @param bool $isRecycleBin
+	 * @param bool $fromRecycleBin
 	 * @return WebexXmlResponseBodyContent
 	 * @throws Exception
 	 */
-	public function deleteRecordById($recordingId, $isRecycleBin = false)
+	public function deleteRecordById($recordingId, $fromRecycleBin = false)
 	{
-		if($isRecycleBin)
+		if($fromRecycleBin)
 		{
-			$deleteRecordingRequest = new WebexXmlDelRecordingRequest();
-			$deleteRecordingRequest->setIsServiceRecording(1);
+			$deleteRecordingRequest = new WebexXmlDelRecordingFromRecycleBinRequest();
 		}
 		else
 		{
-			$deleteRecordingRequest = new WebexXmlDelRecordingFromRecycleBinRequest();
+			$deleteRecordingRequest = new WebexXmlDelRecordingRequest();
+			$deleteRecordingRequest->setIsServiceRecording(1);
 		}
 
 		$deleteRecordingRequest->setRecordingID($recordingId);
@@ -270,21 +270,21 @@ class webexWrapper
 	/**
 	 * @param string $recordName
 	 * @param WebexXmlArray $serviceTypes
-	 * @param bool $isRecycleBin
-	 * @return WebexXmlResponseBodyContent
+	 * @param bool $fromRecycleBin
+	 * @return bool
 	 * @throws Exception
 	 */
-    public function deleteRecordByName($recordName, $serviceTypes, $isRecycleBin = false)
+    public function deleteRecordByName($recordName, $serviceTypes, $fromRecycleBin = false)
 	{
-		$listRecordingResponse = $this->getRecordByName($recordName, $serviceTypes, $isRecycleBin);
+		$listRecordingResponse = $this->getRecordByName($recordName, $serviceTypes, $fromRecycleBin);
 		if(!$listRecordingResponse)
 			return false;
 
 		$records = $listRecordingResponse->getRecording();
 		$id = $records[0]->getRecordingID();
-		$this->deleteRecordById($id, $isRecycleBin);
+		$this->deleteRecordById($id, $fromRecycleBin);
 		$logMsg = "Deleted record {$recordName} with id {$id}";
-		if($isRecycleBin)
+		if($fromRecycleBin)
 			$logMsg = $logMsg." from recycle bin.";
 
 		$this->logDebug($logMsg);
@@ -294,13 +294,13 @@ class webexWrapper
 	/**
 	 * @param string $recordName
 	 * @param WebexXmlArray $serviceTypes
-	 * @param bool $isRecycleBin
+	 * @param bool $fromRecycleBin
 	 * @return WebexXmlListRecording
 	 * @throws Exception
 	 */
-	public function getRecordByName($recordName, $serviceTypes, $isRecycleBin = false)
+	public function getRecordByName($recordName, $serviceTypes, $fromRecycleBin = false)
 	{
-		if($isRecycleBin)
+		if($fromRecycleBin)
 			$listRecordingRequest = new WebexXmlListRecordingInRecycleBinRequest();
 		else
 			$listRecordingRequest = new WebexXmlListRecordingRequest();
