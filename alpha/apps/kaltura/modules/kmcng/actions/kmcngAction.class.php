@@ -7,7 +7,7 @@ class kmcngAction extends kalturaAction
 {
 	const SYSTEM_DEFAULT_PARTNER = 0;
 	
-	public function execute ( ) 
+	public function execute ( )
 	{
 		$kmcngParams = kConf::get('kmcng');
 
@@ -18,7 +18,7 @@ class kmcngAction extends kalturaAction
 		}
 
 		// Check for forced HTTPS
-		if( (!$kmcngParams["kmcng_debug_mode"]) )
+		if ((!$kmcngParams["kmcng_debug_mode"]))
 		{
 			if ((!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on'))
 			{
@@ -33,34 +33,34 @@ class kmcngAction extends kalturaAction
 		header("Cache-Control: post-check=0, pre-check=0", false);
 		header("Pragma: no-cache");
 
-		if ( !$kmcngParams["kmcng_version"])
+		if (!$kmcngParams["kmcng_version"])
 		{
 			KalturaLog::warning("kmcng_version doesn't exist in configuration.");
 			return sfView::ERROR;
 		}
 
-			$kmcngVersion = $kmcngParams["kmcng_version"];
-			$baseDir = $kmcngParams["base_dir"];
-			$basePath = $baseDir . "/apps/kmcng/$kmcngVersion/";
-			$deployUrl = "/apps/kmcng/$kmcngVersion/";
+		$kmcngVersion = $kmcngParams["kmcng_version"];
+		$baseDir = $kmcngParams["base_dir"];
+		$basePath = $baseDir . "/apps/kmcng/$kmcngVersion/";
+		$deployUrl = "/apps/kmcng/$kmcngVersion/";
 
-			$path = $basePath . "index.html";
-			$content = file_get_contents($path);
-			if ($content === false)
-			{
-				KalturaLog::warning("Couldn't locate Kmcng path: $path");
-				return sfView::ERROR;
-			}
+		$path = $basePath . "index.html";
+		$content = file_get_contents($path);
+		if ($content === false)
+		{
+			KalturaLog::warning("Couldn't locate Kmcng path: $path");
+			return sfView::ERROR;
+		}
 
-			$config = $this->initConfig($deployUrl, $kmcngParams);
-			$config = json_encode($config);
-			$config = str_replace("\\/", '/', $config);
+		$config = $this->initConfig($deployUrl, $kmcngParams);
+		$config = json_encode($config);
+		$config = str_replace("\\/", '/', $config);
 
-			$content = str_replace("<base href=\"/\">", "<base href=\"/index.php/kmcng/\">", $content);
-			$content = str_replace("href=\"favicon.ico", "href=\"{$deployUrl}favicon.ico", $content);
+		$content = str_replace("<base href=\"/\">", "<base href=\"/index.php/kmcng/\">", $content);
+		$content = str_replace("href=\"favicon.ico", "href=\"{$deployUrl}favicon.ico", $content);
 
-			$content = str_replace("var kmcConfig = null", "var kmcConfig = " . $config, $content);
-			echo $content;
+		$content = str_replace("var kmcConfig = null", "var kmcConfig = " . $config, $content);
+		echo $content;
 	}
 
 	private function initConfig($deployUrl, $kmcngParams)
