@@ -9,8 +9,6 @@ class kmcngAction extends kalturaAction
 	
 	public function execute ( ) 
 	{
-		sfView::SUCCESS;
-
 		$kmcngParams = kConf::get('kmcng');
 
 		if (!$kmcngParams)
@@ -41,8 +39,6 @@ class kmcngAction extends kalturaAction
 			return sfView::ERROR;
 		}
 
-		try
-		{
 			$kmcngVersion = $kmcngParams["kmcng_version"];
 			$baseDir = $kmcngParams["base_dir"];
 			$basePath = $baseDir . "/apps/kmcng/$kmcngVersion/";
@@ -52,7 +48,7 @@ class kmcngAction extends kalturaAction
 			$content = file_get_contents($path);
 			if ($content === false)
 			{
-				KalturaLog::err("Couldn't locate Kmcng path: $path");
+				KalturaLog::warning("Couldn't locate Kmcng path: $path");
 				return sfView::ERROR;
 			}
 
@@ -65,11 +61,6 @@ class kmcngAction extends kalturaAction
 
 			$content = str_replace("var kmcConfig = null", "var kmcConfig = " . $config, $content);
 			echo $content;
-		}catch(Exception $e)
-		{
-			KalturaLog::warning("Error building kmcng index." . $e->getMessage());
-			return sfView::ERROR;
-		}
 	}
 
 	private function initConfig($deployUrl, $kmcngParams)
