@@ -57,7 +57,9 @@ class kmcngAction extends kalturaAction
 		$config = str_replace("\\/", '/', $config);
 
 		$content = str_replace("<base href=\"/\">", "<base href=\"/index.php/kmcng/\">", $content);
-		$content = str_replace("href=\"favicon.ico", "href=\"{$deployUrl}favicon.ico", $content);
+
+		$content = preg_replace("/src=\"(?!(http:)|(https:)|\/)/i", "src=\"{$deployUrl}", $content);
+		$content = preg_replace("/href=\"(?!(http:)|(https:)|\/)/i", "href=\"{$deployUrl}", $content);
 
 		$content = str_replace("var kmcConfig = null", "var kmcConfig = " . $config, $content);
 		echo $content;
