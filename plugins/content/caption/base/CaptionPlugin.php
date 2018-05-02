@@ -11,7 +11,12 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	const MULTI_CAPTION_FLOW_MANAGER_CLASS = 'kMultiCaptionFlowManager';
 	const COPY_CAPTIONS_FLOW_MANAGER_CLASS = 'kCopyCaptionsFlowManager';
 
-       const SERVE_WEBVTT_URL_PREFIX = '/api_v3/index.php/service/caption_captionasset/action/serveWebVTT';
+	const SERVE_WEBVTT_URL_PREFIX = '/api_v3/index.php/service/caption_captionasset/action/serveWebVTT';
+
+	private static $getHostFromDeliveryProfile = array(
+		DeliveryProfileType::VOD_PACKAGER_HLS,
+		DeliveryProfileType::VOD_PACKAGER_HLS_MANIFEST
+	);
 
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -553,8 +558,13 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 						if (reset($fs) === null)
 							continue;
 
-						$protocol = $config->deliveryProfile->getDynamicAttributes()->getMediaProtocol();
-						$host = $protocol . '://' . $config->deliveryProfile->getHostName();
+						if(in_array($config->deliveryProfile->getType(), self::$getHostFromDeliveryProfile) && !$config->storageId)
+						{
+							$protocol = $config->deliveryProfile->getDynamicAttributes()->getMediaProtocol();
+							$host = $protocol . '://' . $config->deliveryProfile->getHostName();
+						}
+						else
+							$host = myPartnerUtils::getCdnHost($captionAsset->getPartnerId());
 
 						$versionStr = '';
 						if ($captionAsset->getVersion() > 1)
