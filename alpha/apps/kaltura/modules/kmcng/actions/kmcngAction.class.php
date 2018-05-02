@@ -40,7 +40,7 @@ class kmcngAction extends kalturaAction
 		}
 
 		$kmcngVersion = $kmcngParams["kmcng_version"];
-		$baseDir = $kmcngParams["base_dir"];
+		$baseDir =kConf::get("BASE_DIR", 'system');
 		$basePath = $baseDir . "/apps/kmcng/$kmcngVersion/";
 		$deployUrl = "/apps/kmcng/$kmcngVersion/";
 
