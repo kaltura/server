@@ -200,26 +200,6 @@ class kmcngAction extends kalturaAction
 			);
 		}
 
-		$previewAndEmbed = array();
-		foreach ($kmcngParams['previewAndEmbed'] as $key => $value)
-			$previewAndEmbed["$key"] = $value;
-
-		$kaltura = array();
-		foreach ($kmcngParams['kaltura'] as $key => $value)
-			$kaltura["$key"] = $value;
-
-		$entitlements = array();
-		foreach ($kmcngParams['entitlements'] as $key => $value)
-			$entitlements["$key"] = $value;
-
-		$uploads = array();
-		foreach ($kmcngParams['uploads'] as $key => $value)
-			$uploads["$key"] = $value;
-
-		$live = array();
-		foreach ($kmcngParams['live'] as $key => $value)
-			$live["$key"] = $value;
-
 		$config = array(
 			'kalturaServer' => array(
 				'uri' => kConf::get("www_host"),
@@ -252,11 +232,11 @@ class kmcngAction extends kalturaAction
 				"advertisements" => $advertisements
 			),
 			"externalLinks" => array(
-				"previewAndEmbed" => $previewAndEmbed,
-				"kaltura" => $kaltura,
-				"entitlements" => $entitlements,
-				"uploads" => $uploads,
-				"live" => $live
+				"previewAndEmbed" => $kmcngParams['previewAndEmbed'],
+				"kaltura" => $kmcngParams['kaltura'],
+				"entitlements" => $kmcngParams['entitlements'],
+				"uploads" => $kmcngParams['uploads'],
+				"live" => $kmcngParams['live']
 			)
 		);
 
