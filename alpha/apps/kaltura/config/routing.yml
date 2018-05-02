@@ -156,6 +156,18 @@ kmc:
   url:   /kmc
   param: { module: kmc , action: kmc }
 
+kmcng:
+  url:   /kmcng
+  param: { module: kmcng , action: kmcng }
+
+kmcng_get_partner:
+    url:   /kmcng/getpartner
+    param: { module: kmcng , action: getpartner }
+
+kmcng_default:
+  url:   /kmcng/*
+  param: { module: kmcng , action: kmcng }
+
 default_index:
   url:   /:module
   param: { action: index }
