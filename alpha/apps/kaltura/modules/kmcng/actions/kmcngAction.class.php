@@ -120,7 +120,7 @@ class kmcngAction extends kalturaAction
 			$liveAnalytics = array(
 				"enabled" => true,
 				"uri" => '/apps/liveanalytics/' . kConf::get("liveanalytics_version") . "/index.html",
-				"uiConfId" => $this->contentUiconfLivea
+				"uiConfId" => $this->contentUiconfLivea->getId()
 			);
 		}
 		else
@@ -182,7 +182,7 @@ class kmcngAction extends kalturaAction
 			$usageDashboard = array(
 				"enabled" => true,
 				"uri" => '/apps/usage-dashboard/' . kConf::get("usagedashboard_version") . "/index.html",
-				"uiConfId" => $this->contentUiconfLivea,
+				"uiConfId" => $this->contentUiconfLivea->getId(),
 				"map_urls" => array_map(function ($s)
 				{
 					return "$s/content/static/maps/v1";
