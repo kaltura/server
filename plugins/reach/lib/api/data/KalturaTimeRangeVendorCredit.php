@@ -53,7 +53,7 @@ class KalturaTimeRangeVendorCredit extends KalturaVendorCredit
 		
 		/* @var $sourceObject kTimeRangeVendorCredit */
 		if($this->toDate && $this->toDate != $sourceObject->getToDate())
-			true;
+			return true;
 		
 		return false;
 	}

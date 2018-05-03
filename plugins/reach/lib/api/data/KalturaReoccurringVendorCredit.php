@@ -50,7 +50,7 @@ class KalturaReoccurringVendorCredit extends KalturaTimeRangeVendorCredit
 		
 		/* @var $sourceObject kReoccurringVendorCredit */
 		if($this->frequency && $this->frequency != $sourceObject->getFrequency())
-			true;
+			return true;
 		
 		return false;
 	}
