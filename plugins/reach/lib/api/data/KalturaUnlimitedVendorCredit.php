@@ -58,7 +58,7 @@ class KalturaUnlimitedVendorCredit extends KalturaBaseVendorCredit
 		if( ($this->credit && $this->credit != $sourceObject->getCredit())
 			|| ($this->fromDate && $this->fromDate != $sourceObject->getFromDate())
 		)
-			true;
+			return true;
 		
 		return false;
 	}

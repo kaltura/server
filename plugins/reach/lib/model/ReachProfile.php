@@ -315,7 +315,7 @@ class ReachProfile extends BaseReachProfile
 		return $this->getFromCustomData(self::CUSTOM_DATA_CREDIT_USAGE_PERCENTAGE, null, 0);
 	}
 	
-	public function getContentDeletionPolicy($v)
+	public function getContentDeletionPolicy()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_CONTENT_DELETION_POLICY, null, ReachProfileContentDeletionPolicy::DO_NOTHING);
 	}

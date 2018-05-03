@@ -72,7 +72,7 @@ class KalturaVendorCredit extends KalturaBaseVendorCredit
 			|| ($this->fromDate && $this->fromDate != $sourceObject->getFromDate())
 			|| ($this->overageCredit && $this->overageCredit != $sourceObject->getOverageCredit())
 		)
-			true;
+			return true;
 		
 		return false;
 	}
