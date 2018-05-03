@@ -176,44 +176,35 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validate();
+		$this->validatePropertyNotNull("profileType");
+		$this->validatePropertyNotNull("credit");
+		$this->credit->validateForInsert();
+		
+		//validating dictionary duplications
+		$this->validateDictionary();
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
 	
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		$this->validate($sourceObject);
+		/* @var $sourceObject ReachProfile */
+		//if we are trying to update the credit object we must reset the used credit before.
+		if ($this->credit != null)
+		{
+			if ($this->credit->hasObjectChanged($sourceObject->getCredit()) && $sourceObject->getUsedCredit() > 0)
+				throw new KalturaAPIException(KalturaReachErrors::UPDATE_CREDIT_ERROR_USED_CREDIT_EXISTS, $this->id);
+		}
+		
+		//validating dictionary duplications
+		$this->validateDictionary();
+		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 	
 	private function validateDictionaryLength($data)
 	{
 		return strlen($data) <= self::MAX_DICTIONARY_LENGTH ? true : false;
-	}
-	
-	private function validate(ReachProfile $sourceObject = null)
-	{
-		if (!$sourceObject) //Source object will be null on insert
-		{
-			$this->validatePropertyNotNull("profileType");
-			$this->validatePropertyNotNull("credit");
-			$this->credit->validateForInsert();
-		}
-		else // in case of update
-		{
-			//if we are trying to update the credit object we must reset the used credit before.
-			if ($this->credit != null)
-			{
-				$this->credit->validateForUpdate();
-				if ($sourceObject->getUsedCredit() > 0)
-					throw new KalturaAPIException(KalturaReachErrors::UPDATE_CREDIT_ERROR_USED_CREDIT_EXISTS, $this->id);
-			}
-		}
-		
-		//validating dictionary duplications
-		$this->validateDictionary();
-		return;
 	}
 	
 	public function getExtraFilters()

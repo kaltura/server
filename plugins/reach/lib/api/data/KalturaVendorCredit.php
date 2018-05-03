@@ -61,4 +61,19 @@ class KalturaVendorCredit extends KalturaBaseVendorCredit
 
 		parent::validateForInsert($propertiesToSkip);
 	}
+	
+	public function hasObjectChanged($sourceObject)
+	{
+		if(parent::hasObjectChanged($sourceObject))
+			return true;
+		
+		/* @var $sourceObject kVendorCredit */
+		if( ($this->credit && $this->credit != $sourceObject->getCredit())
+			|| ($this->fromDate && $this->fromDate != $sourceObject->getFromDate())
+			|| ($this->overageCredit && $this->overageCredit != $sourceObject->getOverageCredit())
+		)
+			true;
+		
+		return false;
+	}
 }

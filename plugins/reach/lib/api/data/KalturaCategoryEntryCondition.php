@@ -39,7 +39,7 @@ class KalturaCategoryEntryCondition extends KalturaCondition
 	 */
 	public function __construct()
 	{
-		$this->type = ReachPlugin::getConditionTypeCoreValue(ReachConditionType::EVENT_CATEGORY_ENTRY);
+		$this->type = ReachPlugin::getApiValue(ReachConditionType::EVENT_CATEGORY_ENTRY);
 	}
 	
 	public function getMapBetweenObjects()

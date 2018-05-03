@@ -35,7 +35,7 @@ class KalturaUnlimitedVendorCredit extends KalturaBaseVendorCredit
 		parent::validateForInsert(array("credit"));
 
 	}
-
+	
 	/* (non-PHPdoc)
  	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
  	 */
@@ -47,5 +47,19 @@ class KalturaUnlimitedVendorCredit extends KalturaBaseVendorCredit
 		}
 
 		return parent::toObject($dbObject, $propsToSkip);
+	}
+	
+	public function hasObjectChanged($sourceObject)
+	{
+		if(parent::hasObjectChanged($sourceObject))
+			return true;
+		
+		/* @var $sourceObject kUnlimitedVendorCredit */
+		if( ($this->credit && $this->credit != $sourceObject->getCredit())
+			|| ($this->fromDate && $this->fromDate != $sourceObject->getFromDate())
+		)
+			true;
+		
+		return false;
 	}
 }
