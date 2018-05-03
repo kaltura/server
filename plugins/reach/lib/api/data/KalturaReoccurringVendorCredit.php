@@ -42,4 +42,16 @@ class KalturaReoccurringVendorCredit extends KalturaTimeRangeVendorCredit
 		
 		parent::validateForInsert($propertiesToSkip);
 	}
+	
+	public function hasObjectChanged($sourceObject)
+	{
+		if(parent::hasObjectChanged($sourceObject))
+			return true;
+		
+		/* @var $sourceObject kReoccurringVendorCredit */
+		if($this->frequency && $this->frequency != $sourceObject->getFrequency())
+			true;
+		
+		return false;
+	}
 }
