@@ -13,11 +13,6 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 	const SERVE_WEBVTT_URL_PREFIX = '/api_v3/index.php/service/caption_captionasset/action/serveWebVTT';
 
-	private static $getHostFromDeliveryProfile = array(
-		DeliveryProfileType::VOD_PACKAGER_HLS,
-		DeliveryProfileType::VOD_PACKAGER_HLS_MANIFEST
-	);
-
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
 	 */
@@ -558,7 +553,8 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 						if (reset($fs) === null)
 							continue;
 
-						if(in_array($config->deliveryProfile->getType(), self::$getHostFromDeliveryProfile) && !$config->storageId)
+						$getHostFromDeliveryProfile = array(DeliveryProfileType::VOD_PACKAGER_HLS, DeliveryProfileType::VOD_PACKAGER_HLS_MANIFEST);
+						if(in_array($config->deliveryProfile->getType(), $getHostFromDeliveryProfile) && !$config->storageId)
 						{
 							$protocol = $config->deliveryProfile->getDynamicAttributes()->getMediaProtocol();
 							$host = $protocol . '://' . $config->deliveryProfile->getHostName();
