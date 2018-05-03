@@ -101,11 +101,6 @@ abstract class kManifestRenderer
 		return "\n";
 	}
 
-	// allow to replace {deliveryCode} place holder with the deliveryCode parameter passed to the action
-	// a publisher with a rtmpUrl set to {deliveryCode}.example.com/ondemand will be able to use different
-	// cdn configuration for different sub publishers by passing a different deliveryCode to the KDP
-	abstract protected function replaceDeliveryCode();
-	
 	abstract protected function tokenizeUrls();
 	
 	abstract protected function applyDomainPrefix();
@@ -244,9 +239,6 @@ abstract class kManifestRenderer
 	{
 		$this->prepareFlavors();
 		
-		if ($this->deliveryCode)
-			$this->replaceDeliveryCode();
-
 		$this->replacePlayServerSessionId();
 		
 		$this->tokenizeUrls();
@@ -285,7 +277,10 @@ abstract class kManifestRenderer
 		}
 		$content .= implode($separator, $flavors);
 		$content .= $separator . $footer;
-		
+
+		if($this->deliveryCode)
+			$content = str_replace("{deliveryCode}", $this->deliveryCode, $content);
+
 		header('Content-Length: ' . strlen($content));		// avoid chunked encoding
 		
 		echo $content;
@@ -372,13 +367,7 @@ class kSingleUrlManifestRenderer extends kManifestRenderer
 		$this->flavor = reset($flavors);	
 		$this->entryId = $entryId;
 	}
-	
-	protected function replaceDeliveryCode()
-	{
-		$this->flavor['url'] = str_replace("{deliveryCode}", $this->deliveryCode, $this->flavor['url']);
-		$this->flavor['urlPrefix'] = str_replace("{deliveryCode}", $this->deliveryCode, $this->flavor['urlPrefix']);
- 	}
-	
+
 	protected function tokenizeUrls()
 	{
 		self::normalizeUrlPrefix($this->flavor);
@@ -435,19 +424,7 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 		$this->entryId = $entryId;
 		$this->baseUrl = $baseUrl;
 	}
-	
-	protected function replaceDeliveryCode()
-	{
-		$this->baseUrl = str_replace("{deliveryCode}", $this->deliveryCode, $this->baseUrl);
-		
-		foreach ($this->flavors as &$flavor)
-		{
-			$flavor['url'] = str_replace("{deliveryCode}", $this->deliveryCode, $flavor['url']);
-			if (isset($flavor['urlPrefix']))
-				$flavor['urlPrefix'] = str_replace("{deliveryCode}", $this->deliveryCode, $flavor['urlPrefix']);
-		}
-	}
-	
+
 	protected function tokenizeUrls()
 	{
 		if ($this->baseUrl)
