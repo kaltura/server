@@ -418,7 +418,7 @@ class ReachProfile extends BaseReachProfile
 				foreach ($context->getActions() as $action)
 				{
 					/* @var $action kRuleAction */
-					if($action->getType() == ReachRuleActionType::ADD_ENTRY_VENDOR_TASK)
+					if($action->getType() == ReachPlugin::getRuleActionTypeCoreValue(ReachRuleActionType::ADD_ENTRY_VENDOR_TASK))
 					{
 						/* $var $action kAddEntryVendorTaskAction */
 						$fullFilledCatalogItemIds = array_merge($fullFilledCatalogItemIds, explode(",", $action->getCatalogItemIds()));
