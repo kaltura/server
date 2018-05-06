@@ -8,7 +8,7 @@ const WEEK_IN_SECONDS = 604800;
 if($argc < 7)
 {
 	echo "Missing arguments.\n";
-	echo "php simulateDryRun.php {dropFolderId} {admin ks} {serviceUrl} {start date} {end date} {log filename}.\n";
+	echo "php $argv[0] {dropFolderId} {admin ks} {serviceUrl} {start date} {end date} {log filename}.\n";
 	echo "{start date} and {end date} are in seconds.\n";
 	die;
 }
