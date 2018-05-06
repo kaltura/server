@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>http://{prompt:Host name:}/</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <!-- script will ask for username / password interactively -->
+    </session>
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaHttpNotificationTemplate">
+                <name>Partner Added MediaSpace</name>
+                <systemName>PARTNER_ADDED_MEDIASPACE</systemName>
+                <description>HTTP notification template to be sent to mediaSpace and partner will be created</description>
+                <eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
+                <eventObjectType>20</eventObjectType> <!-- EventNotificationEventObjectType::PARTNER -->
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventConditions objectType="array">
+                    <item objectType="KalturaFieldMatchCondition">
+                        <description>freeTrialAccountType is KMS</description>
+                        <field objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getAdditionalParams()['freeTrialAccountType']</code>
+                        </field>
+                        <values objectType="array">
+                            <item objectType="KalturaStringValue">
+                                <value>KMS</value>
+                            </item>
+                        </values>
+                    </item>
+                </eventConditions>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>alternative_url</key>
+                        <description>alternative url will override the url with the correct LB from local.ini</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>(kConf::hasParam('MediaSpace_Partner_Registration') ? 'http://' . kConf::get('MediaSpace_Partner_Registration')['internal_kms_hostname'] . '/latest/public/create_instance.php' : '')</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>ts</key>
+                        <description>current Time plus 10 sec</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>time() + 10</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>hn</key>
+                        <description>new partner media space hostname</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>(kConf::hasParam('MediaSpace_Partner_Registration') ? $scope->getObject()->getId()
+                                . '.' . kConf::get('MediaSpace_Partner_Registration')['mediaSpace_url']  : '')</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>sig</key>
+                        <description>Signature</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>(kConf::hasParam('MediaSpace_Partner_Registration') ?  kConf::get('MediaSpace_Partner_Registration')['sig']  : '')</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>pid</key>
+                        <description>Partner ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>host</key>
+                        <description>Kaltura Host</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>requestUtils::getHost()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>adminSecret</key>
+                        <description>Admin Secret</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getSecret()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>instanceId</key>
+                        <description>instance ID</description>
+                        <value objectType="KalturaStringValue">
+                            <value>mediaspace</value>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>privacyContext</key>
+                        <description>privacy Context</description>
+                        <value objectType="KalturaStringValue">
+                            <value>MediaSpace</value>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>applicationProfile</key>
+                        <description>application Profile</description>
+                        <value objectType="KalturaStringValue">
+                            <value>mediaspace</value>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>forceInstance</key>
+                        <description>force Instance</description>
+                        <value objectType="KalturaStringValue">
+                            <value>1</value>
+                        </value>
+                    </item>
+                </contentParameters>
+                <data objectType="KalturaHttpNotificationDataFields"/>
+                <method>2</method> <!-- KalturaHttpNotificationMethod::POST -->
+            </template>
+        </request>
+    </multirequest>
+</xml>

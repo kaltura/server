@@ -1,3 +1,11 @@
+# Mercury 13.20.0 #
+
+### Deployment scripts ###
+-Add kms registration http request on partner creation:
+
+     php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/partnerAddedMediaSpaceHttpNotification.xml    
+ 
+   
 # Mercury 13.19.0 #
 
 ## Live Clipping ##

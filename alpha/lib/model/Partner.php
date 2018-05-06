@@ -1913,4 +1913,10 @@ class Partner extends BasePartner
 	{
 		$this->putInCustomData( "enable_self_serve", $v );
 	}
+
+	public function getPartnerId()
+	{
+		return $this->id;
+	}
+
 }
