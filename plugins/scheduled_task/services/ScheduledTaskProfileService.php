@@ -203,6 +203,10 @@ class ScheduledTaskProfileService extends KalturaBaseService
 	 */
 	public function serveDryRunResultsAction($requestId)
 	{
+		$ks = $this->getKs();
+		if(!$ks || !($ks->isAdmin() || $ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $requestId)))
+			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+
 		$batchJob = $this->getScheduledTaskBatchJob($requestId);
 		return $this->serveFile($batchJob, BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
 	}
@@ -216,15 +220,33 @@ class ScheduledTaskProfileService extends KalturaBaseService
 	{
 		$finalPath ='/api_v3/service/scheduledtask_scheduledtaskprofile/action/serveDryRunResults/requestId/';
 		$finalPath .="$requestId";
-		$ksObj = $this->getKs();
-		$ksStr = ($ksObj) ? $ksObj->getOriginalString() : null;
-		$finalPath .= "/ks/".$ksStr;
 		$partnerId = $this->getPartnerId();
+		$ksStr = $this->getPartnerKs($partnerId, $requestId);
+		$finalPath .= "/ks/".$ksStr;
 		$downloadUrl = myPartnerUtils::getCdnHost($partnerId) . $finalPath;
 
 		return $downloadUrl;
 	}
-	
+
+	private function getPartnerKs($partnerId, $requestId)
+	{
+		$ksStr = "";
+		$partner = PartnerPeer::retrieveByPK ( $partnerId );
+		$secret = $partner->getSecret ();
+		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $requestId;
+
+		$maxExpiry = 86400;
+		$expiry = $partner->getKsMaxExpiryInSeconds();
+		if(!$expiry || ($expiry > $maxExpiry))
+			$expiry = $maxExpiry;
+
+		$result = kSessionUtils::startKSession ( $partnerId, $secret, null, $ksStr, $expiry, false, "", $privilege );
+
+		if ($result < 0)
+			throw new Exception ( "Failed to generate session for asset [" . $this->getId () . "] of type " . $this->getType () );
+
+		return $ksStr;
+	}
 	/**
 	 * @action getDryRunResults
 	 * @param int $requestId
