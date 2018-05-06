@@ -44,7 +44,7 @@
                         <key>ts</key>
                         <description>current Time plus 10 sec</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>time() + 10</code>
+                            <code>(intval($GLOBALS['start']) + 10)</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
@@ -59,7 +59,7 @@
                         <key>sig</key>
                         <description>Signature</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>(kConf::hasParam('MediaSpace_Partner_Registration') ?  kConf::get('MediaSpace_Partner_Registration')['sig']  : '')</code>
+                            <code>(kConf::hasParam('MediaSpace_Partner_Registration') ?  md5(kConf::get('MediaSpace_Partner_Registration')['sig'] . kConf::get('MediaSpace_Partner_Registration')['mediaSpace_url'] . (intval($GLOBALS['start']) + 10)): '')</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
