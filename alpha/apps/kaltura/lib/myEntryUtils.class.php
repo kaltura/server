@@ -775,7 +775,7 @@ class myEntryUtils
 			$vid_slice = 0;
 		
 		$cacheLockKey = "thumb-processing-resize".$finalThumbPath;
-		// creating the thumbnail is a very heavy operation prevent calling it in parallel for the same thubmnail for 5 minutes
+		// creating the thumbnail is a very heavy operation prevent calling it in parallel for the same thumbnail for 5 minutes
 		if ($cache && !$cache->add($cacheLockKey, true, 5 * 60))
 			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
@@ -790,6 +790,9 @@ class myEntryUtils
 		if ($entry->getType() == entryType::PLAYLIST)
 			myPlaylistUtils::updatePlaylistStatistics($entry->getPartnerId(), $entry);
 
+		$serveingVODfromLive = myEntryUtils::shouldServeVodFromLive($entry);
+		if ($serveingVODfromLive)
+			$orig_image_path = null;
 
 		while($count--)
 		{
@@ -809,7 +812,7 @@ class myEntryUtils
 
 				if ($vid_sec != -1) // a specific second was requested
 				{
-					$calc_vid_sec = min($vid_sec, floor($entry->getLengthInMsecs() / 1000));
+					$calc_vid_sec = $serveingVODfromLive ? $vid_sec : min($vid_sec, floor($entry->getLengthInMsecs() / 1000));
 				}
 				else if ($vid_slices != -1) // need to create a thumbnail at a specific slice
 				{
@@ -840,7 +843,7 @@ class myEntryUtils
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
 					$success = false;
-					if($multi && $packagerRetries)
+					if(($multi || $serveingVODfromLive) && $packagerRetries)
 					{
 						list($picWidth, $picHeight) = $shouldResizeByPackager ? array($width, $height) : array(null, null);
 						$destPath = $shouldResizeByPackager ? $capturedThumbPath . uniqid() : $capturedThumbPath;
@@ -932,7 +935,7 @@ class myEntryUtils
 				++$vid_slice;
 			}
 
-			if ($thumbCaptureByPackager && $shouldResizeByPackager)
+			if ($thumbCaptureByPackager && $shouldResizeByPackager && !$serveingVODfromLive)
 				unlink($packagerResizeFullPath);
 
 			if ($isEncryptionNeeded)
@@ -990,6 +993,9 @@ class myEntryUtils
 
 	public static function captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width = null, $height = null)
 	{
+		if (myEntryUtils::shouldServeVodFromLive($entry))
+			return self::captureLiveThumbUsingPackager($entry, 'recording', $capturedThumbPath, $calc_vid_sec, $width, $height);
+		
 		$mappedThumbEntryTypes = array(entryType::PLAYLIST);
 		if(in_array($entry->getType(), $mappedThumbEntryTypes))
 			return self::captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
@@ -997,6 +1003,21 @@ class myEntryUtils
 		return self::captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
 	}
 
+	private static function captureLiveThumbUsingPackager($entry, $liveType, $destThumbPath, $calc_vid_sec, $width = null, $height = null)
+	{
+		$packagerCaptureUrl = kConf::get('packager_local_live_thumb_capture_url', 'local', null);
+		if (!$packagerCaptureUrl)
+			return false;
+
+		$url = 'p/' . $entry->getPartnerId() . '/e/' . $entry->getId();
+		$packagerCaptureUrl = str_replace(
+			array ( "{dc}", "{liveType}"),
+			array ( kDataCenterMgr::getCurrentDcId(), $liveType) ,
+			$packagerCaptureUrl );
+
+		KalturaLog::debug("Serving Live Thumb with URL: " . $packagerCaptureUrl);
+		return self::curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $destThumbPath, $width, $height);
+	}
 
 	private static function captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width, $height)
 	{
