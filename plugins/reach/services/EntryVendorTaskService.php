@@ -19,7 +19,7 @@ class EntryVendorTaskService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
 		
 		$this->applyPartnerFilterForClass('reachProfile');
-		if (!in_array($actionName, array('getJobs', 'updateJob')))
+		if (!in_array($actionName, array('getJobs', 'updateJob', 'list')))
 			$this->applyPartnerFilterForClass('entryVendorTask');
 	}
 	
@@ -111,6 +111,11 @@ class EntryVendorTaskService extends KalturaBaseService
 		
 		if (!$pager)
 			$pager = new KalturaFilterPager();
+		
+		if (!PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, kCurrentContext::getCurrentPartnerId()))
+			$this->applyPartnerFilterForClass('entryVendorTask');
+		else
+			$filter->vendorPartnerIdEqual = kCurrentContext::getCurrentPartnerId();
 		
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
