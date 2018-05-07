@@ -43,16 +43,3 @@ Alias /apps/kea "@BASE_DIR@/apps/kea"
     Allow from all
     AllowOverride all
 </Directory>
-
-Alias /apps/kmcng "@BASE_DIR@/apps/kmcng"
-<Directory "@BASE_DIR@/apps/kmcng">
-	<FilesMatch "\.(js|json|ico|jpg|gif|png|css|ttf|woff|svg|woff2")$">
-		ExpiresActive On
-		ExpiresDefault "access plus 3 month"
-		Header append Cache-Control "public"
-		SetEnv force-no-vary
-		Header unset ETag
-		FileETag None
-	</FilesMatch>
-	DirectoryIndex index.html
-</Directory>
