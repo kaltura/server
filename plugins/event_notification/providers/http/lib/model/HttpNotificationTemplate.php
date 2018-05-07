@@ -27,8 +27,6 @@ class HttpNotificationTemplate extends BatchEventNotificationTemplate implements
 	
 	const FILE_SYNC_POST = 1;
 
-	const ALTERNATIVE_URL = 'alternative_url';
-
 	public function __construct()
 	{
 		$this->setType(HttpNotificationPlugin::getHttpNotificationTemplateTypeCoreValue(HttpNotificationTemplateType::HTTP));
@@ -78,13 +76,13 @@ class HttpNotificationTemplate extends BatchEventNotificationTemplate implements
 			$scope->addDynamicValue($key, $value);
 		}
 
-		$url = $this->retrieveUrlFromData($this->getUrl(),$scope);
 		$data = $this->getData();
 		if($data)
 			$data->setScope($scope);
 		
 		$jobData = new kHttpNotificationDispatchJobData();
 		$jobData->setTemplateId($this->getId());
+		$url = $this->processURL($this->getUrl());
 		$jobData->setUrl($url);
 		$jobData->setDataObject($data);
 		$jobData->setMethod($this->getMethod());
@@ -319,23 +317,10 @@ class HttpNotificationTemplate extends BatchEventNotificationTemplate implements
 	public function setSslKeyPassword($v)						{return $this->putInCustomData(self::CUSTOM_DATA_SSL_KEY_PASSWORD, $v);}
 	public function setCustomHeaders(array $v)					{return $this->putInCustomData(self::CUSTOM_DATA_CUSTOM_HEADERS, $v);}
 
-
-	/**
-	 * @param string $url
-	 * @param kScope $scope
-	 * @return string
-	 * get the url from the content Params using the key ALTERNATIVE_URL and remove it from the array of additional params.
-	 * Key ALTERNATIVE_URL cannot be used as a context parameter as it will be removed from scope
-	 */
-	private function retrieveUrlFromData($url, &$scope)
+	private function processURL($getURL)
 	{
-		$dynamicValue = $scope->getDynamicValues();
-		if (!$url && $dynamicValue && $dynamicValue[self::ALTERNATIVE_URL])
-		{
-			$alternativeUrl = $dynamicValue[self::ALTERNATIVE_URL];
-			if ($scope->removeDynamicValue(self::ALTERNATIVE_URL))
-				return $alternativeUrl;
-		}
-		return $url;
+		return str_replace('{DC}', 'dc-'.kDataCenterMgr::getCurrentDcUrl(), $getURL);
 	}
+
+
 }

@@ -31,13 +31,6 @@
                 </eventConditions>
                 <contentParameters objectType="array">
                     <item objectType="KalturaEventNotificationParameter">
-                        <key>alternative_url</key>
-                        <description>alternative url will override the url with the correct LB from local.ini</description>
-                        <value objectType="KalturaEvalStringField">
-                            <code>(kConf::hasParam('MediaSpace_Partner_Registration') ? 'http://' . kConf::get('MediaSpace_Partner_Registration')['internal_kms_hostname'] . '/latest/public/create_instance.php' : '')</code>
-                        </value>
-                    </item>
-                    <item objectType="KalturaEventNotificationParameter">
                         <key>ts</key>
                         <description>current Time plus 10 sec</description>
                         <value objectType="KalturaEvalStringField">
@@ -111,6 +104,7 @@
                 </contentParameters>
                 <data objectType="KalturaHttpNotificationDataFields"/>
                 <method>2</method> <!-- KalturaHttpNotificationMethod::POST -->
+                <url>http://{DC}-/latest/public/create_instance.php</url>
             </template>
         </request>
     </multirequest>
