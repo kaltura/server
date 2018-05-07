@@ -458,6 +458,8 @@ class KalturaErrors extends APIErrors
 
 	const SYNDICATION_FEED_KALTURA_DC_ONLY = "SYNDICATION_FEED_KALTURA_DC_ONLY;;Partner configured to use Kaltura data centers only";
 
+	const ENFORCE_ITUNES_FEED_AUTHOR = "ENFORCE_ITUNES_FEED_AUTHOR;;Missing feedAuthor param [Mandatory when enforcing feedAuthor]";
+
 	/*
 	 * file sync
 	 */
@@ -594,6 +596,8 @@ class KalturaErrors extends APIErrors
 	const KALTURA_RECORDING_DISABLED = "KALTURA_RECORDING_DISABLED;PARTNER_ID;Kaltura recording is disabled for partner [@PARTNER_ID@] use liveStream->appendRecording to set the live recorded content";
 	
 	const RECORDING_DISABLED = "RECORDING_DISABLED;;Record status attribute cannot be set, account has recording feature disabled";
+	
+	const LIVE_CLIPPING_UNSUPPORTED_OPERATION = "LIVE_CLIPPING_UNSUPPORTED_OPERATION;OPERATION; Unsupported operation for live clipping: @OPERATION@";
 	
 	/*
 	 * BaseEntry Service

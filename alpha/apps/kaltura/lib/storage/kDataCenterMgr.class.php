@@ -258,7 +258,9 @@ class kDataCenterMgr
 		else
 		{
 			KalturaLog::log("Serving file from [".$resolvedPath."]");
-			kFileUtils::dumpFile( $resolvedPath , null, null, 0 ,$file_sync_resolved->getEncryptionKey(), $file_sync_resolved->getIv(), $file_sync_resolved->getFileSize());
+			//This case handles file sync that links to file but its type is directory
+			$fileSize = $file_sync_resolved->getIsDir() ? null : $file_sync_resolved->getFileSize();
+			kFileUtils::dumpFile( $resolvedPath , null, null, 0 ,$file_sync_resolved->getEncryptionKey(), $file_sync_resolved->getIv(),$fileSize);
 		}
 		
 	}

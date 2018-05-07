@@ -15,11 +15,18 @@ class ITunesFeedRenderer extends SyndicationFeedRenderer {
    	 * @var bool
    	 */
   	private $enforceOrder = false;
+
+	/**
+	 * True if feed author is needed
+	 * @var bool
+	 */
+	private $enforceFeedAuthor = false;
   
   	public function init($syndicationFeed, $syndicationFeedDB, $mimeType) {
     	parent::init($syndicationFeed, $syndicationFeedDB, $mimeType);
     
     	$this->enforceOrder = $syndicationFeed->enforceOrder;
+       $this->enforceFeedAuthor = $syndicationFeed->enforceFeedAuthor;
   	}
 
 	public function handleHeader() {
@@ -128,7 +135,7 @@ class ITunesFeedRenderer extends SyndicationFeedRenderer {
 		$res .= $this->writeFullXmlNode('enclosure', '', 3, $enclosure_attr);
 		
 		$kuser = $entry->getkuser();
-		if($kuser && $kuser->getScreenName())
+		if(!$this->enforceFeedAuthor && $kuser && $kuser->getScreenName())
 			$res .= $this->writeFullXmlNode('itunes:author', $this->stringToSafeXml($kuser->getScreenName()), 3);
 			
 		if($this->enforceOrder)

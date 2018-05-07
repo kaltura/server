@@ -11,7 +11,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	const MULTI_CAPTION_FLOW_MANAGER_CLASS = 'kMultiCaptionFlowManager';
 	const COPY_CAPTIONS_FLOW_MANAGER_CLASS = 'kCopyCaptionsFlowManager';
 
-       const SERVE_WEBVTT_URL_PREFIX = '/api_v3/index.php/service/caption_captionasset/action/serveWebVTT';
+	const SERVE_WEBVTT_URL_PREFIX = '/api_v3/index.php/service/caption_captionasset/action/serveWebVTT';
 
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -553,7 +553,14 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 						if (reset($fs) === null)
 							continue;
 
-						$cdnHost = myPartnerUtils::getCdnHost($captionAsset->getPartnerId());
+						$getHostFromDeliveryProfile = array(DeliveryProfileType::VOD_PACKAGER_HLS, DeliveryProfileType::VOD_PACKAGER_HLS_MANIFEST);
+						if(in_array($config->deliveryProfile->getType(), $getHostFromDeliveryProfile) && !$config->storageId)
+						{
+							$protocol = $config->deliveryProfile->getDynamicAttributes()->getMediaProtocol();
+							$host = $protocol . '://' . $config->deliveryProfile->getHostName();
+						}
+						else
+							$host = myPartnerUtils::getCdnHost($captionAsset->getPartnerId());
 
 						$versionStr = '';
 						if ($captionAsset->getVersion() > 1)
@@ -565,8 +572,16 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 							$ksStr = '/ks/' . self::generateKsForCaptionServe($captionAsset);
 						}
 
-						$captionAssetObj['url'] = $cdnHost . self::SERVE_WEBVTT_URL_PREFIX .
-							'/captionAssetId/' . $captionAsset->getId() . $ksStr . $versionStr . '/a.m3u8';
+						$segmentDurationStr = '';
+						if(kConf::hasParam('webvtt_segment_duration'))
+						{
+							$duration = kConf::get('webvtt_segment_duration');
+							$segmentDurationStr = '/segmentDuration/' . $duration;
+						}
+
+						$captionAssetObj['url'] = $host . self::SERVE_WEBVTT_URL_PREFIX .
+							'/captionAssetId/' . $captionAsset->getId() . $segmentDurationStr. $ksStr . $versionStr . '/a.m3u8';
+
 					}
 					$label = $captionAsset->getLabel();
 					if (!$label)
@@ -575,20 +590,9 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 						$label = 'Track' . (count($contributor->captions) + 1);
 					$captionAssetObj['label'] = $label;
 					$captionAssetObj['default'] = $captionAsset->getDefault() ? "YES" : "NO";
-					if (isset(self::$captionsFormatMap[$captionAsset->getLanguage()]))
-					{
-						$threeCodeLang = self::$captionsFormatMap[$captionAsset->getLanguage()];
-						if ($useThreeCodeLang)
-							$captionAssetObj['language'] = $threeCodeLang;
-						else
-						{
-							$twoCodeLang =  languageCodeManager::getTwoCodeLowerFromThreeCode($threeCodeLang);
-							if($twoCodeLang)
-								$captionAssetObj['language'] = $twoCodeLang;
-							else
-								$captionAssetObj['language'] = self::$captionsFormatMap[$captionAsset->getLanguage()];
-						}
-					}
+					$languageCode= self::getLanguageCode($captionAsset->getLanguage(),$useThreeCodeLang);
+					if($languageCode)
+						$captionAssetObj['language'] = $languageCode;
 
 					KalturaLog::info("Object passed into editor: " . print_r($captionAssetObj, true));
 					$contributor->captions[] = $captionAssetObj;
@@ -602,4 +606,22 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 		return $contributors;
 	}
+	private static function getLanguageCode($captionAssetLanguage,$useThreeCodeLang)
+	{
+		$languageCode = null;
+		$languageObject = languageCodeManager::getObjectFromKalturaName($captionAssetLanguage);
+		if($useThreeCodeLang)
+			$languageCode = $languageObject[languageCodeManager::ISO639_B];
+		else
+		{
+			if($languageObject[languageCodeManager::ISO639])
+				$languageCode = $languageObject[languageCodeManager::ISO639];
+			else
+				$languageCode = $languageObject[languageCodeManager::ISO639_B];
+		}
+
+		return $languageCode;
+	}
 }
+
+

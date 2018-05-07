@@ -23,5 +23,14 @@ class Form_Delivery_UrlTokenizerAkamaiSecureHd extends Form_Delivery_DeliveryPro
 				'label'			=> 'Custom Postfixes:',
 				'filters'		=> array('StringTrim'),
 		));
+
+		$this->addElement('text', 'rootDir', array(
+			'label'			=> 'Root directory:',
+			'filters'		=> array('StringTrim'),
+		));
+
+		$this->addElement('checkbox', 'limitIpAddress', array(
+			'label'			=> 'Limit IP Address:',
+		));
 	}
 }

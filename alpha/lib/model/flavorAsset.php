@@ -322,7 +322,7 @@ class flavorAsset extends exportableAsset
 	public function shouldEncrypt()
 	{
 		$entry = $this->getentry();
-		return ($entry->getType() == entryType::DOCUMENT);
+		return ($entry && ($entry->getType() == entryType::DOCUMENT));
 	}
 
 	protected function setLanguageFromFlavorParams()

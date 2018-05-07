@@ -158,14 +158,9 @@ class KWidevineOperationEngine extends KOperationEngine
 		KBatchBase::unimpersonate();
 		$errorMessage = '';
 		$errorMessage = KWidevineBatchHelper::getEncryptPackageErrorMessage($returnValue);
-		$logMessage = 'Package encryption failed, asset name: '.$this->packageName.' error: '.$errorMessage;
+		$logMessage = 'Package encryption failed, asset name: '.$this->packageName.' error: '.$errorMessage . ' error code: ' .$returnValue;
 		KalturaLog::err($logMessage);
-					
-		// in some cases this specific Widevine error needs a simple job retry in order to convert successfully  
-		if ($returnValue == KWidevineBatchHelper::SYNC_FRAME_OFFSET_MATCH_ERROR)
-			throw new kTemporaryException ($logMessage);
-			
-		throw new KOperationEngineException($logMessage);		
+		throw new kTemporaryException ($logMessage);
 	}
 	
 	private function getAssetIdsWithRedundantBitrates()

@@ -293,6 +293,10 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 		$c->set_window($this->window);
 		$c->set_start_time(time());		# The time from which the token will start
 		$c->set_key($this->key);
+		if ($this->getLimitIpAddress())
+		{
+			$c->set_ip(self::getRemoteAddress());
+		}
 		
 		$g = new Akamai_EdgeAuth_Generate();
 		return $g->generate_token($c);

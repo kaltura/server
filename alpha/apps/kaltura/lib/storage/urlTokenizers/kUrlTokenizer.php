@@ -138,4 +138,15 @@ abstract class kUrlTokenizer
 	public function setPartnerId($partnerId) {
 		$this->partnerId = $partnerId;
 	}
+
+	protected static function getRemoteAddress()
+	{
+		$remoteAddr = infraRequestUtils::getIpFromHttpHeader('HTTP_X_FORWARDED_FOR', false);
+		if (!$remoteAddr)
+		{
+			$remoteAddr = $_SERVER['REMOTE_ADDR'];
+		}
+
+		return $remoteAddr;
+	}
 }
