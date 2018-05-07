@@ -21,7 +21,7 @@
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
                 <eventConditions objectType="array">
                     <item objectType="KalturaEventFieldCondition">
-                        <description>freeTrialAccountType is KMS</description>
+                        <description>Send post to KMS for new Partner , freeTrialAccountType match local.ini</description>
                         <field objectType="KalturaEvalBooleanField">
                             <code>in_array($scope->getObject()->getAdditionalParams()['freeTrialAccountType'] ,
                                 (kConf::hasParam('MediaSpace_Partner_Registration') ?
