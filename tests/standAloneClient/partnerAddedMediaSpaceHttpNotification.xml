@@ -20,16 +20,13 @@
                 <eventObjectType>20</eventObjectType> <!-- EventNotificationEventObjectType::PARTNER -->
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
                 <eventConditions objectType="array">
-                    <item objectType="KalturaFieldMatchCondition">
+                    <item objectType="KalturaEventFieldCondition">
                         <description>freeTrialAccountType is KMS</description>
-                        <field objectType="KalturaEvalStringField">
-                            <code>$scope->getObject()->getAdditionalParams()['freeTrialAccountType']</code>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>in_array($scope->getObject()->getAdditionalParams()['freeTrialAccountType'] ,
+                                (kConf::hasParam('MediaSpace_Partner_Registration') ?
+                                explode(",", kConf::get('MediaSpace_Partner_Registration')['free_Trial_Account_Types']) : array()))</code>
                         </field>
-                        <values objectType="array">
-                            <item objectType="KalturaStringValue">
-                                <value>KMS</value>
-                            </item>
-                        </values>
                     </item>
                 </eventConditions>
                 <contentParameters objectType="array">
