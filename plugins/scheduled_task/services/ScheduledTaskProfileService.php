@@ -187,7 +187,8 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		$syncKey = $batchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
 		if($jobData->getFileFormat() == DryRunFileType::CSV)
 		{
-			throw new KalturaAPIException(KalturaScheduledTaskErrors::DRY_RUN_RESULT_IS_TOO_BIG.$this->getDryRunResultUrl($requestId));
+			throw new KalturaAPIException(KalturaScheduledTaskErrors::DRY_RUN_RESULT_IS_TOO_BIG.
+				$this->getDryRunResultUrl($batchJob->getPartnerId(), $requestId));
 		}
 
 		$data = kFileSyncUtils::file_get_contents($syncKey, true);
@@ -216,11 +217,10 @@ class ScheduledTaskProfileService extends KalturaBaseService
 	 * @param int $requestId
 	 * @return string
 	 */
-	private function getDryRunResultUrl($requestId)
+	private function getDryRunResultUrl($partnerId, $requestId)
 	{
 		$finalPath ='/api_v3/service/scheduledtask_scheduledtaskprofile/action/serveDryRunResults/requestId/';
 		$finalPath .="$requestId";
-		$partnerId = $this->getPartnerId();
 		$ksStr = $this->getPartnerKs($partnerId, $requestId);
 		$finalPath .= "/ks/".$ksStr;
 		$downloadUrl = myPartnerUtils::getCdnHost($partnerId) . $finalPath;
@@ -232,21 +232,18 @@ class ScheduledTaskProfileService extends KalturaBaseService
 	{
 		$ksStr = "";
 		$partner = PartnerPeer::retrieveByPK ( $partnerId );
-		$secret = $partner->getSecret ();
 		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $requestId;
-
 		$maxExpiry = 86400;
 		$expiry = $partner->getKsMaxExpiryInSeconds();
-		if(!$expiry || ($expiry > $maxExpiry))
-			$expiry = $maxExpiry;
-
-		$result = kSessionUtils::startKSession ( $partnerId, $secret, null, $ksStr, $expiry, false, "", $privilege );
+		$expiry = $expiry > $maxExpiry ? $maxExpiry : $expiry ?? $maxExpiry;
+		$result = kSessionUtils::startKSession ( $partnerId, $partner->getSecret (), null, $ksStr, $expiry, false, "", $privilege );
 
 		if ($result < 0)
 			throw new Exception ( "Failed to generate session for asset [" . $this->getId () . "] of type " . $this->getType () );
 
 		return $ksStr;
 	}
+
 	/**
 	 * @action getDryRunResults
 	 * @param int $requestId
