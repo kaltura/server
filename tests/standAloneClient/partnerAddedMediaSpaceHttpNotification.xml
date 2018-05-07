@@ -4,7 +4,7 @@
         <serviceUrl>http://{prompt:Host name:}/</serviceUrl>
         <partnerId>-2</partnerId>
         <clientTag>Stand alone php 1.0.0</clientTag>
-        <curlTimeout>30</curlTimeout>
+        <curlTimeout>300</curlTimeout>
         <userAgent>Stand alone php 1.0.0</userAgent>
     </config>
     <session>
@@ -80,7 +80,7 @@
                         <key>adminSecret</key>
                         <description>Admin Secret</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>$scope->getObject()->getSecret()</code>
+                            <code>$scope->getObject()->getAdminSecret()</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
