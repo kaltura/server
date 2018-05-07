@@ -43,4 +43,3 @@ Alias /apps/kea "@BASE_DIR@/apps/kea"
     Allow from all
     AllowOverride all
 </Directory>
-
