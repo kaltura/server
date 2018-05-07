@@ -1,5 +1,12 @@
 # Mercury 13.19.0 #
 
+## KMC-NG ##
+- Issue Type: KMC-NG deployment configuration
+- Issue ID: PLAT-8844
+
+### Configuration ###
+copy all [kmcng] section from base.ini to your local.ini and replace tokens with all relevant info (urls, etc);
+ 
 ## Live Clipping ##
 - Issue Type: live clipping
 - Issue ID: PLAT-7832
