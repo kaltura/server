@@ -235,7 +235,9 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $requestId;
 		$maxExpiry = 86400;
 		$expiry = $partner->getKsMaxExpiryInSeconds();
-		$expiry = $expiry > $maxExpiry ? $maxExpiry : $expiry ?? $maxExpiry;
+		if(!$expiry || $expiry > $maxExpiry)
+			$expiry = $maxExpiry;
+
 		$result = kSessionUtils::startKSession ( $partnerId, $partner->getSecret (), null, $ksStr, $expiry, false, "", $privilege );
 
 		if ($result < 0)
