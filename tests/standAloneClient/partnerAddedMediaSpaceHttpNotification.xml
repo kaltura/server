@@ -25,7 +25,7 @@
                         <field objectType="KalturaEvalBooleanField">
                             <code>in_array($scope->getObject()->getAdditionalParams()['freeTrialAccountType'] ,
                                 (kConf::hasParam('MediaSpace_Partner_Registration') ?
-                                explode(",", kConf::get('MediaSpace_Partner_Registration')['free_Trial_Account_Types']) : array()))</code>
+                                explode(",", kConf::get('MediaSpace_Partner_Registration')['free_trial_account_types']) : array()))</code>
                         </field>
                     </item>
                 </eventConditions>
