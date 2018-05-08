@@ -1015,17 +1015,17 @@ class myEntryUtils
 			return false;
 
 		$url = 'p/' . $entry->getPartnerId() . '/e/' . $entry->getId();
-		
-		//get the PRIMARY DC for that entry
-		$entryId = ($liveType == 'recording') ? $entry->getRootEntryId() : $entry->getId();
-		$dc = self::getLiveEntryDcId($entryId, EntryServerNodeType::LIVE_PRIMARY));
+		$dc = self::getLiveEntryDcId($entry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY));
 		if (is_null($dc))
 			return false;
-		
 		$packagerCaptureUrl = str_replace(array ( "{dc}", "{liveType}"), array ( $dc, $liveType) , $packagerCaptureUrl );
-		//currently live thumbnail with nginx support only offset from the end
-		$offset = $calc_vid_sec - floor($entry->getRecordedLengthInMsecs() / 1000);
-		KalturaLog::debug("Serving Live Thumb with URL: " . $packagerCaptureUrl);
+
+		//TEMP CODE: currently live thumbnail with nginx support only offset from the end
+		$lenInSec = floor($entry->getRecordedLengthInMsecs() / 1000);
+		$offset = $calc_vid_sec - $lenInSec;
+		if ($offset >= 0)
+			return false;
+
 		return self::curlThumbUrlWithOffset($url, $offset, $packagerCaptureUrl, $destThumbPath, $width, $height);
 	}
 	
