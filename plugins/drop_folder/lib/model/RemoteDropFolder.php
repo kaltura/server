@@ -31,14 +31,22 @@ abstract class RemoteDropFolder extends DropFolder
 	 */
 	abstract public function getFolderUrl();
 	
-	public function getLocalFilePath($fileName, $fileId, kFileTransferMgr $fileTransferMgr)
+	public function getLocalFilePath($fileName, $fileId, kFileTransferMgr $fileTransferMgr, $fileSizeRemoteFile)
 	{
+		$getFileRetries = 0 ;
 		$dropFolderFilePath = $this->getPath().'/'.$fileName;
 		$tempDirectory = sys_get_temp_dir();
 		if (is_dir($tempDirectory)) 
 		{
 			$tempFilePath = tempnam($tempDirectory, 'parse_dropFolderFileId_'.$fileId.'_');		
-			$fileTransferMgr->getFile($dropFolderFilePath, $tempFilePath);
+
+			do
+			{
+				$fileTransferResult = $fileTransferMgr->getFile($dropFolderFilePath, $tempFilePath, $fileSizeRemoteFile);
+				$getFileRetries++;
+
+			} while ( ($fileTransferResult == kFileTransferMgr::FILETRANSFERMGR_RES_ERR) && ($getFileRetries < 3) );
+
 			return $tempFilePath;
 		}
 		else

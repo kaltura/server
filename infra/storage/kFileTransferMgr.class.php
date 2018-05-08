@@ -428,7 +428,7 @@ abstract class kFileTransferMgr
 	 *
 	 * @return FILETRANSFERMGR_RES_OK / FILETRANSFERMGR_RES_ERR
 	 */
-	public function getFile ( $remote_file, $local_file = null)
+	public function getFile ( $remote_file, $local_file = null, $fileSizeRemoteFile = null)
 	{
 		KalturaLog::debug("Gets file [$remote_file] to local [$local_file]");
 		
@@ -442,13 +442,16 @@ abstract class kFileTransferMgr
 		// try to download file
 		$res = @($this->doGetFile($remote_file, $local_file));
 
+		if ($fileSizeRemoteFile != filesize($local_file))
+			return self::FILETRANSFERMGR_RES_ERR;
+
 		$this->results = $res;
 		
 		// check response
-		if ( ! $res ) {
+		if ( ! $res )
+		{
 			$last_error = error_get_last();
 			throw new kFileTransferMgrException("Can't get file [$remote_file] - " . $last_error['message'], kFileTransferMgrException::otherError);
-			return self::FILETRANSFERMGR_RES_ERR;
 		}
 		else
 		{

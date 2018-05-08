@@ -53,7 +53,7 @@ class asperaMgr extends kFileTransferMgr
 	}
 		
 	// upload a file to the server ising Aspera connection (ftp_mode is irrelevant)
-	public function getFile($remote_file, $local_file = null)
+	public function getFile($remote_file, $local_file = null, $fileSizeRemoteFile = null)
 	{	
 		$remote_file = ltrim($remote_file,'/');
 		
