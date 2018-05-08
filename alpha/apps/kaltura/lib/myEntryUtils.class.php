@@ -701,9 +701,13 @@ class myEntryUtils
 		$contentPath = myContentStorage::getFSContentRootPath();
 			
 		$entry_status = $entry->getStatus();
+
+		$serveingVODfromLive = myEntryUtils::shouldServeVodFromLive($entry);
 		$entryLengthInMsec = $serveingVODfromLive ? $entry->getRecordedLengthInMsecs() : $entry->getLengthInMsecs();
 		 
 		$thumbName = $entry->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
+		if ($serveingVODfromLive && $vid_slices > 0)
+			$thumbName .= "_duration:$entryLengthInMsec";
 
 		if ($orig_image_path)
 			$thumbName.= '_oip_'.basename($orig_image_path);
@@ -741,10 +745,8 @@ class myEntryUtils
 			$finalThumbPath = kFile::replaceExt($finalThumbPath, $format);
 			$processingThumbPath = kFile::replaceExt($processingThumbPath, $format);
 		}
-
-		$serveingVODfromLive = myEntryUtils::shouldServeVodFromLive($entry);
 		
-		if (!$serveingVODfromLive && file_exists($finalThumbPath) && @filesize($finalThumbPath))
+		if (file_exists($finalThumbPath) && @filesize($finalThumbPath))
 		{
 			header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
 			return $finalThumbPath;
@@ -936,7 +938,7 @@ class myEntryUtils
 				++$vid_slice;
 			}
 
-			if ($thumbCaptureByPackager && $shouldResizeByPackager && !$serveingVODfromLive)
+			if ($thumbCaptureByPackager && $shouldResizeByPackager && ($serveingVODfromLive && !$multi))
 				unlink($packagerResizeFullPath);
 
 			if ($isEncryptionNeeded)
@@ -954,7 +956,7 @@ class myEntryUtils
 		}
 		
 		kFile::fullMkdir($finalThumbPath);
-		kFile::moveFile($processingThumbPath, $finalThumbPath, $serveingVODfromLive);
+		kFile::moveFile($processingThumbPath, $finalThumbPath);
 		
 		if ($cache)
 			$cache->delete($cacheLockKey);
