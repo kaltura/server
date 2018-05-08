@@ -701,6 +701,7 @@ class myEntryUtils
 		$contentPath = myContentStorage::getFSContentRootPath();
 			
 		$entry_status = $entry->getStatus();
+		$entryLengthInMsec = $serveingVODfromLive ? $entry->getRecordedLengthInMsecs() : $entry->getLengthInMsecs();
 		 
 		$thumbName = $entry->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
 
@@ -740,8 +741,10 @@ class myEntryUtils
 			$finalThumbPath = kFile::replaceExt($finalThumbPath, $format);
 			$processingThumbPath = kFile::replaceExt($processingThumbPath, $format);
 		}
+
+		$serveingVODfromLive = myEntryUtils::shouldServeVodFromLive($entry);
 		
-		if (file_exists($finalThumbPath) && @filesize($finalThumbPath))
+		if (!$serveingVODfromLive && file_exists($finalThumbPath) && @filesize($finalThumbPath))
 		{
 			header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
 			return $finalThumbPath;
@@ -790,7 +793,6 @@ class myEntryUtils
 		if ($entry->getType() == entryType::PLAYLIST)
 			myPlaylistUtils::updatePlaylistStatistics($entry->getPartnerId(), $entry);
 
-		$serveingVODfromLive = myEntryUtils::shouldServeVodFromLive($entry);
 		if ($serveingVODfromLive)
 			$orig_image_path = null;
 
@@ -809,15 +811,13 @@ class myEntryUtils
 				(!file_exists($orig_image_path))
 				)
 			{
-
-				$lengthInMsec = $serveingVODfromLive ? $entry->getRecordedLengthInMsecs() : $entry->getLengthInMsecs();
 				if ($vid_sec != -1) // a specific second was requested
 				{
-					$calc_vid_sec = min($vid_sec, floor($lengthInMsec / 1000));
+					$calc_vid_sec = min($vid_sec, floor($entryLengthInMsec / 1000));
 				}
 				else if ($vid_slices != -1) // need to create a thumbnail at a specific slice
 				{
-					$calc_vid_sec = floor($lengthInMsec / $vid_slices * min($vid_slice, $vid_slices) / 1000);
+					$calc_vid_sec = floor($entryLengthInMsec / $vid_slices * min($vid_slice, $vid_slices) / 1000);
 				}
 				else if ($entry->getStatus() != entryStatus::READY && $entry->getLengthInMsecs() == 0) // when entry is not ready and we don't know its duration
 				{
@@ -954,7 +954,7 @@ class myEntryUtils
 		}
 		
 		kFile::fullMkdir($finalThumbPath);
-		kFile::moveFile($processingThumbPath, $finalThumbPath);
+		kFile::moveFile($processingThumbPath, $finalThumbPath, $serveingVODfromLive);
 		
 		if ($cache)
 			$cache->delete($cacheLockKey);
