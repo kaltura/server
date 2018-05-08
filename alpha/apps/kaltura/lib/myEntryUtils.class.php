@@ -1015,9 +1015,10 @@ class myEntryUtils
 			array ( "{dc}", "{liveType}"),
 			array ( kDataCenterMgr::getCurrentDcId(), $liveType) ,
 			$packagerCaptureUrl );
-
+		//currently live thumbnail with nginx support only offst from the end
+		$offset = $calc_vid_sec - floor($entry->getRecordedLengthInMsecs() / 1000);
 		KalturaLog::debug("Serving Live Thumb with URL: " . $packagerCaptureUrl);
-		return self::curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $destThumbPath, $width, $height);
+		return self::curlThumbUrlWithOffset($url, $offset, $packagerCaptureUrl, $destThumbPath, $width, $height);
 	}
 
 	private static function captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width, $height)
