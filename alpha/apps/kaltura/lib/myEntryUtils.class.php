@@ -707,7 +707,7 @@ class myEntryUtils
 		 
 		$thumbName = $entry->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
 		if ($serveingVODfromLive && $vid_slices > 0)
-			$thumbName .= "_duration:$entryLengthInMsec";
+			$thumbName .= "_duration_" . $entryLengthInMsec;
 
 		if ($orig_image_path)
 			$thumbName.= '_oip_'.basename($orig_image_path);
@@ -938,7 +938,7 @@ class myEntryUtils
 				++$vid_slice;
 			}
 
-			if ($thumbCaptureByPackager && $shouldResizeByPackager && ($serveingVODfromLive && !$multi))
+			if ($thumbCaptureByPackager && $shouldResizeByPackager && $multi))
 				unlink($packagerResizeFullPath);
 
 			if ($isEncryptionNeeded)
