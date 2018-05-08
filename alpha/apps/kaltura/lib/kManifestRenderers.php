@@ -287,6 +287,11 @@ abstract class kManifestRenderer
 
 		if($this->deliveryCode)
 			$content = str_replace("{deliveryCode}", $this->deliveryCode, $content);
+		
+		if($this->playbackContext)
+			$content = str_replace("{playbackContext}", "/playbackContext/".urlencode($this->playbackContext), $content);
+		else
+			$content = str_replace("{playbackContext}", "", $content);
 
 		header('Content-Length: ' . strlen($content));		// avoid chunked encoding
 		
