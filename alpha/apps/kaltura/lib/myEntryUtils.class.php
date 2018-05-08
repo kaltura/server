@@ -810,13 +810,14 @@ class myEntryUtils
 				)
 			{
 
+				$lengthInMsec = $serveingVODfromLive ? $entry->getRecordedLengthInMsecs() : $entry->getLengthInMsecs();
 				if ($vid_sec != -1) // a specific second was requested
 				{
-					$calc_vid_sec = $serveingVODfromLive ? $vid_sec : min($vid_sec, floor($entry->getLengthInMsecs() / 1000));
+					$calc_vid_sec = min($vid_sec, floor($lengthInMsec / 1000));
 				}
 				else if ($vid_slices != -1) // need to create a thumbnail at a specific slice
 				{
-					$calc_vid_sec = floor($entry->getLengthInMsecs() / $vid_slices * min($vid_slice, $vid_slices) / 1000);
+					$calc_vid_sec = floor($lengthInMsec / $vid_slices * min($vid_slice, $vid_slices) / 1000);
 				}
 				else if ($entry->getStatus() != entryStatus::READY && $entry->getLengthInMsecs() == 0) // when entry is not ready and we don't know its duration
 				{
