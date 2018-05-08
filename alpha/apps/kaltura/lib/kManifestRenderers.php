@@ -144,6 +144,16 @@ abstract class kManifestRenderer
 	{
 		$this->deliveryCode = $deliveryCode ? $deliveryCode : $this->defaultDeliveryCode;
 	}
+	
+	protected function replacePlaybackContext($str)
+	{
+		if($this->playbackContext)
+			$str = str_replace("{playbackContext}", "/playbackContext/".urlencode($this->playbackContext), $str);
+		else
+			$str = str_replace("{playbackContext}", "", $str);
+		
+		return $str;
+	}
 
 	protected function sendAnalyticsBeacon($host, $port)
 	{
@@ -288,10 +298,7 @@ abstract class kManifestRenderer
 		if($this->deliveryCode)
 			$content = str_replace("{deliveryCode}", $this->deliveryCode, $content);
 		
-		if($this->playbackContext)
-			$content = str_replace("{playbackContext}", "/playbackContext/".urlencode($this->playbackContext), $content);
-		else
-			$content = str_replace("{playbackContext}", "", $content);
+		$content = $this->replacePlaybackContext($content);
 
 		header('Content-Length: ' . strlen($content));		// avoid chunked encoding
 		
@@ -1006,12 +1013,7 @@ class kRedirectManifestRenderer extends kSingleUrlManifestRenderer
 	protected function getHeaders()
 	{
 		$url = str_replace(" ", "%20", $this->flavor['url']);
-		
-		if($this->playbackContext)
-			$url = str_replace("{playbackContext}", "/playbackContext/".urlencode($this->playbackContext), $url);
-		else
-			$url = str_replace("{playbackContext}", "", $url);
-		
+		$url = $this->replacePlaybackContext($url);
 		return array("location:{$url}");
 	}
 }
