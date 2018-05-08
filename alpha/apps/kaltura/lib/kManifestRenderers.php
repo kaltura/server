@@ -60,6 +60,11 @@ abstract class kManifestRenderer
 	 */
 	public $contributors;
 	
+	/**
+	 * @var string
+	 */
+	public $playbackContext = null;
+	
 	protected function prepareFlavors()
 	{
 	}
@@ -128,6 +133,8 @@ abstract class kManifestRenderer
 		{
 			$this->tokenizer->setPlaybackContext($playbackContext);
 		}
+		
+		$this->playbackContext = $playbackContext;
 	}
 	
 	/**
@@ -994,6 +1001,12 @@ class kRedirectManifestRenderer extends kSingleUrlManifestRenderer
 	protected function getHeaders()
 	{
 		$url = str_replace(" ", "%20", $this->flavor['url']);
+		
+		if($this->playbackContext)
+			$url = str_replace("/playbackContext/{playbackContext}", "/playbackContext/".urlencode($this->playbackContext), $url);
+		else
+			$url = str_replace("/playbackContext/{playbackContext}", "", $url);
+		
 		return array("location:{$url}");
 	}
 }
