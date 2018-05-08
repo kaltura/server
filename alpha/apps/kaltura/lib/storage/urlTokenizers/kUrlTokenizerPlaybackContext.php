@@ -9,8 +9,21 @@ class kUrlTokenizerPlaybackContext extends kUrlTokenizer
 	 */
 	public function tokenizeSingleUrl($url, $urlPrefix = null)
 	{
-		if($this->getPlaybackContext())
-			$url = kDeliveryUtils::addQueryParameter($url, "playbackContext=".$this->getPlaybackContext());
+		$playbackContext = $this->getPlaybackContext();
+		if(!$playbackContext)
+			return $url;
+		
+		$playbackContext = http_build_query(array("playbackContext" => $this->getPlaybackContext()));
+		$url = $this->appendPlaybackContext($url, $playbackContext);
 		return $url;
+	}
+	
+	protected function appendPlaybackContext($url, $playbackContext)
+	{
+		if (strpos($url, '?') === false)
+			$url .= '?';
+		else
+			$url .= '&';
+		return $url . $playbackContext;
 	}
 }
