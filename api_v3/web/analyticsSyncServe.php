@@ -5,9 +5,23 @@ require_once(__DIR__ . '/../bootstrap.php');
 
 define('MAX_ITEMS', 2000);
 
-define('PARTNER_SECRET', 'secret');
-define('PARTNER_CRM_ID', 'crmId');
-define('PARTNER_VERTICAL', 'vertical');
+define('PARTNER_SECRET', 's');
+define('PARTNER_CRM_ID', 'ci');
+define('PARTNER_VERTICAL', 'v');
+
+define('ENTRY_KUSER_ID', 'ku');
+define('ENTRY_TYPE', 't');
+define('ENTRY_MEDIA_TYPE', 'mt');
+define('ENTRY_SOURCE_TYPE', 'st');
+define('ENTRY_DURATION', 'd');
+
+define('SOURCE_CLASSROOM', -10);
+define('SOURCE_CAPTURE', -11);
+
+$sourceFromAdminTag = array(
+	'kalturaclassroom' => SOURCE_CLASSROOM,
+	'kalturacapture' => SOURCE_CAPTURE,
+);
 
 function getPartnerVertical($customData)
 {
@@ -23,6 +37,25 @@ function getPartnerVertical($customData)
 	{
 		return 0;
 	}
+}
+
+function getEntrySourceTypeInt($sourceType, $adminTags)
+{
+	global $sourceFromAdminTag;
+
+	// check for specific admin tags
+	$adminTags = explode(',', strtolower($adminTags));
+	foreach ($adminTags as $adminTag)
+	{
+		$adminTag = trim($adminTag);
+		if (isset($sourceFromAdminTag[$adminTag]))
+		{
+			return $sourceFromAdminTag[$adminTag];
+		}
+	}
+
+	// use the source type
+	return $sourceType;
 }
 
 function getPartnerUpdates($updatedAt)
@@ -110,50 +143,17 @@ function getUserUpdates($updatedAt)
 	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
 }
 
-function getLiveUpdates($updatedAt)
-{
-	// must query sphinx, can be too heavy for the db when the interval is large
-	$filter = new entryFilter();
-	$filter->setTypeEquel(entryType::LIVE_STREAM);
-	$filter->set('_gte_updated_at', $updatedAt);
-	$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
-	
-	$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-	$c->addSelectColumn(entryPeer::ID);
-	$c->addSelectColumn(entryPeer::STATUS);
-	$c->addSelectColumn(entryPeer::UPDATED_AT);
-	$c->addAscendingOrderByColumn(entryPeer::UPDATED_AT);
-	$c->setLimit(MAX_ITEMS);
-	$c->setMaxRecords(MAX_ITEMS);
-	
-	$filter->attachToCriteria($c);
-	
-	entryPeer::setUseCriteriaFilter(false);
-	$c->applyFilters();
-	$stmt = entryPeer::doSelectStmt($c);
-	entryPeer::setUseCriteriaFilter(true);
-	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-	$maxUpdatedAt = 0;
-	$result = array();
-	foreach ($rows as $row)
-	{
-		$id = $row['ID'];
-		$status = $row['STATUS'];
-		$result[$id] = $status != entryStatus::DELETED ? '1' : '';
-		$updatedAt = new DateTime($row['UPDATED_AT']);
-		$maxUpdatedAt = max($maxUpdatedAt, (int)$updatedAt->format('U'));
-	}
-
-	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
-}
-
-function getDurationUpdates($updatedAt)
+function getEntryUpdates($updatedAt)
 {
 	$c = new Criteria();
 	$c->addSelectColumn(entryPeer::ID);
 	$c->addSelectColumn(entryPeer::STATUS);
 	$c->addSelectColumn(entryPeer::LENGTH_IN_MSECS);
+	$c->addSelectColumn(entryPeer::KUSER_ID);
+	$c->addSelectColumn(entryPeer::TYPE);
+	$c->addSelectColumn(entryPeer::MEDIA_TYPE);
+	$c->addSelectColumn(entryPeer::SOURCE);
+	$c->addSelectColumn(entryPeer::ADMIN_TAGS);
 	$c->addSelectColumn(entryPeer::UPDATED_AT);
 	$c->add(entryPeer::UPDATED_AT, $updatedAt, Criteria::GREATER_EQUAL);
 	$c->addAscendingOrderByColumn(entryPeer::UPDATED_AT);
@@ -169,9 +169,27 @@ function getDurationUpdates($updatedAt)
 	{
 		$id = $row['ID'];
 		$status = $row['STATUS'];
-		$duration = intval($row['LENGTH_IN_MSECS'] / 1000);
-		$duration = ($status == entryStatus::READY && $duration > 0) ? strval($duration) : '';
-		$result[$id] = $duration;
+		if ($status == entryStatus::READY)
+		{
+			$info = array(
+				ENTRY_KUSER_ID => $row['KUSER_ID'],
+				ENTRY_TYPE => $row['TYPE'],
+				ENTRY_MEDIA_TYPE => $row['MEDIA_TYPE'],
+				ENTRY_SOURCE_TYPE => getEntrySourceTypeInt($row['SOURCE'], $row['ADMIN_TAGS']),
+			);
+			$duration = intval($row['LENGTH_IN_MSECS'] / 1000);
+			if ($duration > 0)
+			{
+				$info[ENTRY_DURATION] = $duration;
+			}
+			$info = json_encode($info);
+		}
+		else
+		{
+			$info = '';
+		}
+
+		$result[$id] = $info;		
 		$updatedAt = new DateTime($row['UPDATED_AT']);
 		$maxUpdatedAt = max($maxUpdatedAt, (int)$updatedAt->format('U'));
 	}
@@ -245,8 +263,7 @@ DbManager::initialize();
 $requestHandlers = array(
 	'partner' => 'getPartnerUpdates',
 	'user' => 'getUserUpdates',
-	'live' => 'getLiveUpdates',
-	'duration' => 'getDurationUpdates',
+	'entry' => 'getEntryUpdates',
 	'categoryEntry' => 'getCategoryEntryUpdates',
 );
 
