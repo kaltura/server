@@ -104,6 +104,7 @@ class Form_PushNotificationTemplateConfiguration extends Form_EventNotificationT
                 'KalturaLiveEntryScheduleResource' => 'Schedule Live-Entry Resource',
                 'KalturaCameraScheduleResource' => 'Schedule Camera Resource',
                 'KalturaScheduleEventResource' => 'Schedule Event-Resource',
+				'KalturaClippingTaskEntryServerNode' => 'Clipping Task Entry-Server-Node',
             ),
         ));
     
