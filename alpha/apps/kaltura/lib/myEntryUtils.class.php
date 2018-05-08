@@ -918,6 +918,8 @@ class myEntryUtils
 
 					$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
 				}
+				if ($thumbCaptureByPackager && file_exists($packagerResizeFullPath))
+					unlink($packagerResizeFullPath);
 			}
 
 
@@ -938,7 +940,7 @@ class myEntryUtils
 				++$vid_slice;
 			}
 
-			if ($thumbCaptureByPackager && $shouldResizeByPackager && $multi)
+			if ($thumbCaptureByPackager && $shouldResizeByPackager && $multi && file_exists($packagerResizeFullPath))
 				unlink($packagerResizeFullPath);
 
 			if ($isEncryptionNeeded)
@@ -1006,24 +1008,33 @@ class myEntryUtils
 		return self::captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
 	}
 
-	private static function captureLiveThumbUsingPackager($entry, $liveType, $destThumbPath, $calc_vid_sec, $width = null, $height = null)
+	private static function captureLiveThumbUsingPackager(entry $entry, $liveType, $destThumbPath, $calc_vid_sec, $width = null, $height = null)
 	{
 		$packagerCaptureUrl = kConf::get('packager_local_live_thumb_capture_url', 'local', null);
 		if (!$packagerCaptureUrl)
 			return false;
 
 		$url = 'p/' . $entry->getPartnerId() . '/e/' . $entry->getId();
+		
 		//get the PRIMARY DC for that entry
-		//$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entry->getId(), EntryServerNodeType::LIVE_PRIMARY);
-		$dc = kDataCenterMgr::getCurrentDcId();
-		$packagerCaptureUrl = str_replace(
-			array ( "{dc}", "{liveType}"),
-			array ( $dc, $liveType) ,
-			$packagerCaptureUrl );
-		//currently live thumbnail with nginx support only offst from the end
+		$entryId = ($liveType == 'recording') ? $entry->getRootEntryId() : $entry->getId();
+		$dc = self::getLiveEntryDcId($entryId, EntryServerNodeType::LIVE_PRIMARY));
+		if (is_null($dc))
+			return false;
+		
+		$packagerCaptureUrl = str_replace(array ( "{dc}", "{liveType}"), array ( $dc, $liveType) , $packagerCaptureUrl );
+		//currently live thumbnail with nginx support only offset from the end
 		$offset = $calc_vid_sec - floor($entry->getRecordedLengthInMsecs() / 1000);
 		KalturaLog::debug("Serving Live Thumb with URL: " . $packagerCaptureUrl);
 		return self::curlThumbUrlWithOffset($url, $offset, $packagerCaptureUrl, $destThumbPath, $width, $height);
+	}
+	
+	private static function getLiveEntryDcId($entryId, $type)
+	{
+		$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, $type);
+		if (!$entryServerNode)
+			return null;
+		return $entryServerNode->getDCId();
 	}
 
 	private static function captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width, $height)
