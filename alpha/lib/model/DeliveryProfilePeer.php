@@ -357,6 +357,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	{
 		$c = new Criteria();
 
+		// If delivery profile ids were provided and it's a whitelist don't filter by IS_DEFAULT
 		if (count($deliveryAttributes->getDeliveryProfileIds()) && !$deliveryAttributes->getIsDeliveryProfilesBlockedList())
 		{
 			$c->add(DeliveryProfilePeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partner->getId()), Criteria::IN);
