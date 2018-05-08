@@ -357,14 +357,14 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	{
 		$c = new Criteria();
 
-		if (!count($deliveryAttributes->getDeliveryProfileIds()))
+		if (count($deliveryAttributes->getDeliveryProfileIds()) && !$deliveryAttributes->getIsDeliveryProfilesBlockedList())
 		{
-			$c->add(DeliveryProfilePeer::IS_DEFAULT, true);
-			$c->add(DeliveryProfilePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
+			$c->add(DeliveryProfilePeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partner->getId()), Criteria::IN);
 		}
 		else
 		{
-			$c->add(DeliveryProfilePeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partner->getId()), Criteria::IN);
+			$c->add(DeliveryProfilePeer::IS_DEFAULT, true);
+			$c->add(DeliveryProfilePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
 		}
 
 		$c->add(DeliveryProfilePeer::STREAMER_TYPE, $streamerType);
