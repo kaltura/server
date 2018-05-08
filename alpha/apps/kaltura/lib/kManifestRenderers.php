@@ -1003,9 +1003,9 @@ class kRedirectManifestRenderer extends kSingleUrlManifestRenderer
 		$url = str_replace(" ", "%20", $this->flavor['url']);
 		
 		if($this->playbackContext)
-			$url = str_replace("/playbackContext/{playbackContext}", "/playbackContext/".urlencode($this->playbackContext), $url);
+			$url = str_replace("{playbackContext}", "/playbackContext/".urlencode($this->playbackContext), $url);
 		else
-			$url = str_replace("/playbackContext/{playbackContext}", "", $url);
+			$url = str_replace("{playbackContext}", "", $url);
 		
 		return array("location:{$url}");
 	}
