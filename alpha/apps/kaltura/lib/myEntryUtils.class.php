@@ -702,7 +702,7 @@ class myEntryUtils
 			
 		$entry_status = $entry->getStatus();
 
-		$serveingVODfromLive = myEntryUtils::shouldServeVodFromLive($entry);
+		$serveingVODfromLive = self::shouldServeVodFromLive($entry);
 		$entryLengthInMsec = $serveingVODfromLive ? $entry->getRecordedLengthInMsecs() : $entry->getLengthInMsecs();
 		 
 		$thumbName = $entry->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
@@ -938,7 +938,7 @@ class myEntryUtils
 				++$vid_slice;
 			}
 
-			if ($thumbCaptureByPackager && $shouldResizeByPackager && $multi))
+			if ($thumbCaptureByPackager && $shouldResizeByPackager && $multi)
 				unlink($packagerResizeFullPath);
 
 			if ($isEncryptionNeeded)
@@ -1013,9 +1013,12 @@ class myEntryUtils
 			return false;
 
 		$url = 'p/' . $entry->getPartnerId() . '/e/' . $entry->getId();
+		//get the PRIMARY DC for that entry
+		//$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entry->getId(), EntryServerNodeType::LIVE_PRIMARY);
+		$dc = kDataCenterMgr::getCurrentDcId();
 		$packagerCaptureUrl = str_replace(
 			array ( "{dc}", "{liveType}"),
-			array ( kDataCenterMgr::getCurrentDcId(), $liveType) ,
+			array ( $dc, $liveType) ,
 			$packagerCaptureUrl );
 		//currently live thumbnail with nginx support only offst from the end
 		$offset = $calc_vid_sec - floor($entry->getRecordedLengthInMsecs() / 1000);
