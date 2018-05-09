@@ -7,7 +7,7 @@ require_once(__DIR__ . '/../bootstrap.php');
 /**
  * $argv[1] - path to files configuration folder
  * example: /opt/kaltura/app/configurations/batch
- * $argv[2] - name of candidates example workers.ini 
+ * $argv[2] - name of candidates example workers.ini
  */
 $files = glob($argv[1]."/*$argv[2]");
 $answers = array();
@@ -47,17 +47,15 @@ foreach($files as $file)
 				 *  we will wait for two hours before printing it as error
 				 * minimum is 5 minutes so if job should run every 60 sec will will only inform the error after 5 minutes
 				 */
-				if ($lastExecutionTime + max($sleepBetweenStopStart , 300 ) < time() - $worker['sleepBetweenStopStart'])
-					$answers[] = "Scheduler ID: " . $schedulerWorker->getSchedulerId(). " - Worker ID: " . $schedulerWorker->getConfiguredId() .
-						" - Worker Name : " . $schedulerWorker->getName().
-						" " . " - Last Execution Time: " . date('Y-m-d H:i:s', $lastExecutionTime) . " Not Working correctly ".
-						"More than $sleepBetweenStopStart second had past from Last execution " . PHP_EOL;
+				if ($lastExecutionTime + max($sleepBetweenStopStart , intval($argv[3]) ) < time() - $sleepBetweenStopStart)
+					$answers[] =  $schedulerWorker->getSchedulerId() . ',' . $schedulerWorker->getConfiguredId() . ',' .
+						$schedulerWorker->getName() . ',' . date('Y-m-d H:i:s', $lastExecutionTime) . ',' . $sleepBetweenStopStart . ',' . 'BAD' . PHP_EOL;
+					//$answers[] = prettyPrintNotRun($schedulerWorker,$lastExecutionTime,$sleepBetweenStopStart);
 				else
-					$answers[] = "Scheduler ID: " . $schedulerWorker->getSchedulerId(). " - Worker ID: " . $schedulerWorker->getConfiguredId() .
-						" - Worker Name : " . $schedulerWorker->getName() .
-						" " . " - Last Execution Time: " . date('Y-m-d H:i:s', $lastExecutionTime) . " Working correctly" . PHP_EOL;
-				echo PHP_EOL;
-				echo PHP_EOL;
+					$answers[] =  $schedulerWorker->getSchedulerId() . ',' . $schedulerWorker->getConfiguredId() . ',' .
+						$schedulerWorker->getName() . ',' . date('Y-m-d H:i:s', $lastExecutionTime) . ',' . $sleepBetweenStopStart . ',' . 'GOOD' . PHP_EOL;
+					//$answers[] = prettyPrintRun($schedulerWorker,$lastExecutionTime);
+
 			}
 		}
 	}
@@ -81,3 +79,29 @@ function getPeriodicWorkers($configArray)
 	return $periodicWorkers;
 }
 
+
+/**
+ * @param SchedulerWorker $schedulerWorker
+ * @param int $lastExecutionTime
+ * @param int $sleepBetweenStopStart
+ * @return string
+ */
+function prettyPrintNotRun($schedulerWorker, $lastExecutionTime, $sleepBetweenStopStart)
+{
+	return  "Scheduler ID: " . $schedulerWorker->getSchedulerId(). " - Worker ID: " . $schedulerWorker->getConfiguredId() .
+			" - Worker Name : " . $schedulerWorker->getName().
+			" " . " - Last Execution Time: " . date('Y-m-d H:i:s', $lastExecutionTime) . " Not Working correctly ".
+			"More than $sleepBetweenStopStart second had past from Last execution " . PHP_EOL;
+}
+
+/**
+ * @param SchedulerWorker $schedulerWorker
+ * @param int $lastExecutionTime
+ * @return string
+ */
+function prettyPrintRun($schedulerWorker, $lastExecutionTime)
+{
+	return  "Scheduler ID: " . $schedulerWorker->getSchedulerId(). " - Worker ID: " . $schedulerWorker->getConfiguredId() .
+			" - Worker Name : " . $schedulerWorker->getName() .
+			" " . " - Last Execution Time: " . date('Y-m-d H:i:s', $lastExecutionTime) . " Working correctly" . PHP_EOL;
+}
