@@ -304,7 +304,12 @@ class KGenericScheduler
 			}
 		
 			if($this->shouldExecute($taskConfig))
+			{
 				$this->spawn($taskConfig);
+				if($taskConfig->sleepBetweenStopStart)
+					$statuses[] = $this->createStatus($taskConfig, KalturaSchedulerStatusType::RUNNING_BATCHES_LAST_EXECUTION_TIME,  $this->lastRunTime[$taskConfig->name]);
+			}
+
 		}
 		
 		if($sendSchedulerStatus)
