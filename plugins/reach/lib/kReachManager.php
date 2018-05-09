@@ -188,12 +188,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 		
-		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $sourceFlavorVersion, $context);
+		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $sourceFlavorVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC);
 		$entryVendorTask->save();
 		return $entryVendorTask;
 	}
 	
-	public static function addEntryVendorTask(entry $entry, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null)
+	public static function addEntryVendorTask(entry $entry, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = null)
 	{
 		//Create new entry vendor task object
 		$entryVendorTask = new EntryVendorTask();
@@ -217,6 +217,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		
 		if ($context)
 			$entryVendorTask->setContext($context);
+		
+		if($creationMode)
+			$entryVendorTask->setCreationMode($creationMode);
 		
 		$status = EntryVendorTaskStatus::PENDING;
 		if ($validateModeration && $reachProfile->shouldModerate($vendorCatalogItem->getServiceType()))
