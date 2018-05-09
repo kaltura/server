@@ -38,12 +38,13 @@ class ReachProfileTableMap extends TableMap {
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 256, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
 		$this->addColumn('TYPE', 'Type', 'TINYINT', true, null, null);
 		$this->addColumn('STATUS', 'Status', 'TINYINT', true, null, null);
-		$this->addColumn('USED_CREDIT', 'UsedCredit', 'INTEGER', false, null, null);
+		$this->addColumn('USED_CREDIT', 'UsedCredit', 'INTEGER', false, null, 0);
 		$this->addColumn('RULES', 'Rules', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('DICTIONARY', 'Dictionary', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
