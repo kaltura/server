@@ -32,6 +32,13 @@ class Form_ReachProfileConfigure extends ConfigureForm
 			'readonly'		=> true,
 			'disabled'		=> 'disabled',
 		));
+		
+		$this->addElement('text', 'name', array(
+			'label' 		=> 'Name:',
+			'required'		=> true,
+			'filters' 		=> array('StringTrim'),
+			'placement' => 'prepend',
+		));
 
 		$this->addElement('text', 'partnerId', array(
 			'label' 		=> 'Related Publisher ID:',

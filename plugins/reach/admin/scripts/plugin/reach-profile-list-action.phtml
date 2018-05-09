@@ -7,6 +7,7 @@
 		<thead>
 		<tr>
 			<th><?php echo $this->translate('ID'); ?></th>
+            <th><?php echo $this->translate('Name'); ?></th>
 			<th><?php echo $this->translate('Status'); ?></th>
 			<th><?php echo $this->translate('Profile Type'); ?></th>
 			<th><?php echo $this->translate('Publisher ID'); ?></th>
@@ -28,6 +29,7 @@
 		<?php foreach($this->paginator as /* Kaltura_Client_Reach_Type_ReachProfile */ $reachProfile): ?>
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
 				<td><?php echo $reachProfile->id; ?></td>
+                <td><?php echo $reachProfile->name; ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_ReachProfileStatus', $reachProfile->status); ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_ReachProfileType', $reachProfile->profileType); ?></td>
 				<td><?php echo $reachProfile->partnerId; ?></td>
