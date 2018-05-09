@@ -155,7 +155,7 @@ class KalturaAnnotation extends KalturaCuePoint
     public function validateParentId($cuePointId = null)
     {
 
-        if (!$this)
+        if ($this->parentId)
         {
             $dbParentCuePoint = CuePointPeer::retrieveByPK($this->parentId);
             if (!$dbParentCuePoint)
