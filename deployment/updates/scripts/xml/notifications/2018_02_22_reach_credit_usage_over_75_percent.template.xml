@@ -25,7 +25,12 @@
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
 						<field objectType="KalturaEvalBooleanField">
-							<code>$scope->getObject() instanceof ReachProfile &amp;&amp; $scope->getEvent()->isCustomDataModified('credit_usage_percentage') &amp;&amp; ceil($scope->getObject()->getCreditUsagePercentage()) &gt;= 75 &amp;&amp; ceil($scope->getEvent()->getCustomDataOldValue('credit_usage_percentage')) &lt;= 75</code>
+							<code>$scope->getObject() instanceof ReachProfile &amp;&amp; $scope->getEvent()->isCustomDataModified('credit_usage_percentage')</code>
+						</field>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<field objectType="KalturaEvalBooleanField">
+							<code>ceil($scope->getObject()->getCreditUsagePercentage()) &gt;= 75 &amp;&amp; ceil($scope->getEvent()->getCustomDataOldValue('credit_usage_percentage')) &lt;= 75 &amp;&amp; ceil($scope->getObject()->getCreditUsagePercentage()) &lt; 90</code>
 						</field>
 					</item>
 				</eventConditions>

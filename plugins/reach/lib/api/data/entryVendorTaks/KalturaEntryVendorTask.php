@@ -166,6 +166,13 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	 */
 	public $partnerData;
 	
+	/**
+	 * Task creation mode
+	 * @var KalturaEntryVendorTaskCreationMode
+	 * @readonly
+	 */
+	public $creationMode;
+	
 	private static $map_between_objects = array
 	(
 		'id',
@@ -191,6 +198,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'outputObjectId',
 		'dictionary',
 		'partnerData',
+		'creationMode',
 	);
 	
 	/* (non-PHPdoc)
