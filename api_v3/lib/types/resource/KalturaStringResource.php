@@ -7,6 +7,8 @@
  */
 class KalturaStringResource extends KalturaContentResource
 {
+	const TXT_EXT = ".txt";
+
 	/**
 	 * Textual content
 	 * @var string
@@ -31,7 +33,7 @@ class KalturaStringResource extends KalturaContentResource
 		if(!$object_to_fill)
 			$object_to_fill = new kLocalFileResource();
 		
-		kFileBase::setFileContent($fname = tempnam(myContentStorage::getFSUploadsPath(), "KFR"), $this->content);
+		kFileBase::setFileContent($fname = tempnam(myContentStorage::getFSUploadsPath(), "KFR") . self::TXT_EXT, $this->content);
 		$object_to_fill->setLocalFilePath($fname);
 		$object_to_fill->setSourceType(entry::ENTRY_MEDIA_SOURCE_TEXT);
 		
