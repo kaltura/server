@@ -464,13 +464,16 @@ abstract class kFileTransferMgr
 
 	private function validateFileSize( $expectedSize ,$localFile)
 	{
-		clearstatcache();
-		$actualFileSize = kFile::fileSize($localFile);
-		if($expectedSize && $actualFileSize < $expectedSize)
+		if($expectedSize)
 		{
-			$percent = floor($actualFileSize * 100 / $expectedSize );
-			$e = new kTemporaryException("Downloaded size: $actualFileSize($percent%)");
-			throw $e;
+			clearstatcache();
+			$actualFileSize = kFile::fileSize($localFile);
+			if ($actualFileSize < $expectedSize) 
+			{
+				$percent = floor($actualFileSize * 100 / $expectedSize);
+				$e = new kTemporaryException("Downloaded size: $actualFileSize($percent%)");
+				throw $e;
+			}
 		}
 	}
 
