@@ -335,6 +335,8 @@ class categoryIndex extends BaseIndexObject
 	{
 		return array(
 			array("%s","category.ID"),
+			array("PARENT%s","category.PARENT_ID"),
+			array("PID%s","category.PARTNER_ID"),
 		);
 	}
 
@@ -342,6 +344,8 @@ class categoryIndex extends BaseIndexObject
 	{
 		return array(
 			array("%s","getId"),
+			array("PARENT%s","getParentId"),
+			array("PID%s","getPartnerId"),
 		);
 	}
 

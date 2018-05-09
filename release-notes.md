@@ -1,3 +1,26 @@
+# Mercury 13.20.0 #
+
+## Update Playlist::update permissions ##
+Issue Type: Behaviour chnage
+Issue ID: PLAT-8885
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_05_08_playlist_update.php
+
+
+## Media repurposing serve dry run ## 
+Issue Type: Bug
+Issue ID: PLAT-8881
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_05_06_add_scheduleTask_permission.php
+
 # Mercury 13.19.0 #
 
 ## Update Playlist::update permissions ##

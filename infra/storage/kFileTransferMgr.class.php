@@ -445,18 +445,35 @@ abstract class kFileTransferMgr
 		$this->results = $res;
 		
 		// check response
-		if ( ! $res ) {
+		if ( ! $res )
+		{
 			$last_error = error_get_last();
 			throw new kFileTransferMgrException("Can't get file [$remote_file] - " . $last_error['message'], kFileTransferMgrException::otherError);
-			return self::FILETRANSFERMGR_RES_ERR;
 		}
 		else
 		{
 			KalturaLog::debug("File retrieved successfully");
 			if(is_null($local_file))
 				return $res;
+
+			$this->validateFileSize(strlen($res), $local_file);
 				
 			return self::FILETRANSFERMGR_RES_OK;
+		}
+	}
+
+	private function validateFileSize( $expectedSize ,$localFile)
+	{
+		if($expectedSize)
+		{
+			clearstatcache();
+			$actualFileSize = kFile::fileSize($localFile);
+			if ($actualFileSize < $expectedSize) 
+			{
+				$percent = floor($actualFileSize * 100 / $expectedSize);
+				$e = new kTemporaryException("Downloaded size: $actualFileSize($percent%)");
+				throw $e;
+			}
 		}
 	}
 
