@@ -876,7 +876,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	{
 		$audioFlavorsArr = array(); 
 		$audio = null;
-		$firstAudioFlavor = null;
+		$firstAudioStream = null;
 		if ($this->hasAudioFlavors) {
 			$audio = ",AUDIO=\"audio\"";
 		}
@@ -886,9 +886,13 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		{
 			// Sperate audio flavors from video flavors
 			if ( isset($flavor['audioLanguage']) || isset($flavor['audioLabel']) ) {
-				$isFirstAudioStream = (count($audioFlavorsArr) == 0) ? "YES" : "NO";
-				if(count($audioFlavorsArr) == 0)
-					$firstAudioFlavor = $flavor;
+				if(count($audioFlavorsArr) == 0) {
+					$isFirstAudioStream = "YES";
+					$firstAudioStream = $flavor;
+				}
+				else
+					$isFirstAudioStream = "NO";
+
 				$language = (isset($flavor['audioLanguage'])) ? $flavor['audioLanguage'] : 'und';
 				$languageName = (isset($flavor['audioLabel'])) ? $flavor['audioLabel'] : $flavor['audioLanguageName'];
 				$content = "#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"audio\",LANGUAGE=\"{$language}\",NAME=\"{$languageName}\"" . 
@@ -900,8 +904,8 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 			}
 		}
 
-		if ((count($flavorsArr) == 0) && (count($audioFlavorsArr) > 0) && isset($firstAudioFlavor))
-			$flavorsArr[] = $this->addExtXStreamInf($firstAudioFlavor, $audio);
+		if ((count($flavorsArr) == 0) && isset($firstAudioStream))
+			$flavorsArr[] = $this->addExtXStreamInf($firstAudioStream, $audio);
 
 		if (count($audioFlavorsArr) > 0) {
 			return array_merge($audioFlavorsArr, array(''), $flavorsArr);
