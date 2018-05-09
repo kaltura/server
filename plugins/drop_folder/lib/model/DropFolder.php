@@ -293,7 +293,7 @@ class DropFolder extends BaseDropFolder implements IBaseObject
 	 * @param int $fileId
 	 * @param kFileTransferMgr $fileTransferMgr
 	 */
-	public function getLocalFilePath($fileName, $fileId, kFileTransferMgr $fileTransferMgr, $fileSizeRemoteFile)
+	public function getLocalFilePath($fileName, $fileId, kFileTransferMgr $fileTransferMgr)
 	{
 		$dropFolderFilePath = $this->getPath().'/'.$fileName;
 		return realpath($dropFolderFilePath);

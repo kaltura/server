@@ -428,7 +428,7 @@ abstract class kFileTransferMgr
 	 *
 	 * @return FILETRANSFERMGR_RES_OK / FILETRANSFERMGR_RES_ERR
 	 */
-	public function getFile ( $remote_file, $local_file = null, $fileSizeRemoteFile = null)
+	public function getFile ( $remote_file, $local_file = null)
 	{
 		KalturaLog::debug("Gets file [$remote_file] to local [$local_file]");
 		
@@ -441,9 +441,6 @@ abstract class kFileTransferMgr
 
 		// try to download file
 		$res = @($this->doGetFile($remote_file, $local_file));
-
-		if ($fileSizeRemoteFile != filesize($local_file))
-			return self::FILETRANSFERMGR_RES_ERR;
 
 		$this->results = $res;
 		
@@ -458,8 +455,22 @@ abstract class kFileTransferMgr
 			KalturaLog::debug("File retrieved successfully");
 			if(is_null($local_file))
 				return $res;
+
+			$this->validateFileSize(strlen($res), $local_file);
 				
 			return self::FILETRANSFERMGR_RES_OK;
+		}
+	}
+
+	private function validateFileSize( $expectedSize ,$localFile)
+	{
+		clearstatcache();
+		$actualFileSize = kFile::fileSize($localFile);
+		if($expectedSize && $actualFileSize < $expectedSize)
+		{
+			$percent = floor($actualFileSize * 100 / $expectedSize );
+			$e = new kTemporaryException("Downloaded size: $actualFileSize($percent%)");
+			throw $e;
 		}
 	}
 
