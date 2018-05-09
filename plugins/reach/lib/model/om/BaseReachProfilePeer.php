@@ -26,13 +26,16 @@ abstract class BaseReachProfilePeer {
 	const TM_CLASS = 'ReachProfileTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 10;
+	const NUM_COLUMNS = 11;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
 	/** the column name for the ID field */
 	const ID = 'reach_profile.ID';
+
+	/** the column name for the NAME field */
+	const NAME = 'reach_profile.NAME';
 
 	/** the column name for the CREATED_AT field */
 	const CREATED_AT = 'reach_profile.CREATED_AT';
@@ -77,11 +80,11 @@ abstract class BaseReachProfilePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'Type', 'Status', 'UsedCredit', 'Rules', 'Dictionary', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'partnerId', 'type', 'status', 'usedCredit', 'rules', 'dictionary', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::TYPE, self::STATUS, self::USED_CREDIT, self::RULES, self::DICTIONARY, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'partner_id', 'type', 'status', 'used_credit', 'rules', 'dictionary', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'Type', 'Status', 'UsedCredit', 'Rules', 'Dictionary', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'createdAt', 'updatedAt', 'partnerId', 'type', 'status', 'usedCredit', 'rules', 'dictionary', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::NAME, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::TYPE, self::STATUS, self::USED_CREDIT, self::RULES, self::DICTIONARY, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'created_at', 'updated_at', 'partner_id', 'type', 'status', 'used_credit', 'rules', 'dictionary', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
 	);
 
 	/**
@@ -91,11 +94,11 @@ abstract class BaseReachProfilePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'PartnerId' => 3, 'Type' => 4, 'Status' => 5, 'UsedCredit' => 6, 'Rules' => 7, 'Dictionary' => 8, 'CustomData' => 9, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'partnerId' => 3, 'type' => 4, 'status' => 5, 'usedCredit' => 6, 'rules' => 7, 'dictionary' => 8, 'customData' => 9, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::PARTNER_ID => 3, self::TYPE => 4, self::STATUS => 5, self::USED_CREDIT => 6, self::RULES => 7, self::DICTIONARY => 8, self::CUSTOM_DATA => 9, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'partner_id' => 3, 'type' => 4, 'status' => 5, 'used_credit' => 6, 'rules' => 7, 'dictionary' => 8, 'custom_data' => 9, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, 'PartnerId' => 4, 'Type' => 5, 'Status' => 6, 'UsedCredit' => 7, 'Rules' => 8, 'Dictionary' => 9, 'CustomData' => 10, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'createdAt' => 2, 'updatedAt' => 3, 'partnerId' => 4, 'type' => 5, 'status' => 6, 'usedCredit' => 7, 'rules' => 8, 'dictionary' => 9, 'customData' => 10, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::NAME => 1, self::CREATED_AT => 2, self::UPDATED_AT => 3, self::PARTNER_ID => 4, self::TYPE => 5, self::STATUS => 6, self::USED_CREDIT => 7, self::RULES => 8, self::DICTIONARY => 9, self::CUSTOM_DATA => 10, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'created_at' => 2, 'updated_at' => 3, 'partner_id' => 4, 'type' => 5, 'status' => 6, 'used_credit' => 7, 'rules' => 8, 'dictionary' => 9, 'custom_data' => 10, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
 	);
 
 	/**
@@ -166,6 +169,7 @@ abstract class BaseReachProfilePeer {
 	public static function addSelectColumns(Criteria $criteria)
 	{
 		$criteria->addSelectColumn(ReachProfilePeer::ID);
+		$criteria->addSelectColumn(ReachProfilePeer::NAME);
 		$criteria->addSelectColumn(ReachProfilePeer::CREATED_AT);
 		$criteria->addSelectColumn(ReachProfilePeer::UPDATED_AT);
 		$criteria->addSelectColumn(ReachProfilePeer::PARTNER_ID);

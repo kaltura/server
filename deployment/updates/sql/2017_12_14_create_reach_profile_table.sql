@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS `reach_profile`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(256),
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`partner_id` INTEGER  NOT NULL,

@@ -61,12 +61,13 @@ DROP TABLE IF EXISTS `reach_profile`;
 CREATE TABLE `reach_profile`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(256),
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`partner_id` INTEGER  NOT NULL,
 	`type` TINYINT  NOT NULL,
 	`status` TINYINT  NOT NULL,
-	`used_credit` INTEGER default 0 NOT NULL,
+	`used_credit` INTEGER default 0,
 	`rules` TEXT,
 	`dictionary` TEXT,
 	`custom_data` TEXT,

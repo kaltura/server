@@ -7,12 +7,19 @@
 class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 {
 	const MAX_DICTIONARY_LENGTH = 1000;
+	
 	/**
 	 * @var int
 	 * @readonly
 	 * @filter eq,in,order
 	 */
 	public $id;
+	
+	/**
+	 * The name of the profile
+	 * @var string
+	 */
+	public $name;
 	
 	/**
 	 * @var int
@@ -132,6 +139,7 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 	private static $map_between_objects = array
 	(
 		'id',
+		'name',
 		'partnerId',
 		'createdAt',
 		'updatedAt',
