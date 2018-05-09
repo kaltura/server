@@ -82,6 +82,18 @@ class kRule
 	protected $scope;
 	
 	/**
+	 * Rule creation date as Unix timestamp (In seconds)
+	 * @var int
+	 */
+	protected $ruleCreationTime;
+	
+	/**
+	 * The ID of the user who created the rule
+	 * @var string
+	 */
+	protected $ruleCreator;
+	
+	/**
 	 * @param kScope $scope
 	 */
 	public function __construct(kScope $scope = null)
@@ -332,6 +344,38 @@ class kRule
 			return $this->forceAdminValidation;
 		
 		return false;
+	}
+	
+	/**
+	 * @param int $ruleCreationTime
+	 */
+	public function setRuleCreationTime($ruleCreationTime)
+	{
+		$this->ruleCreationTime = $ruleCreationTime;
+	}
+	
+	/**
+	 * @return int rule creation time in unix timeStamp
+	 */
+	public function getRuleCreationTime()
+	{
+		return $this->ruleCreationTime;
+	}
+	
+	/**
+	 * @param string $ruleCreator
+	 */
+	public function setRuleCreator($ruleCreator)
+	{
+		$this->ruleCreator = $ruleCreator;
+	}
+	
+	/**
+	 * @return string the rule creator user id
+	 */
+	public function getRuleCreator()
+	{
+		return $this->ruleCreator;
 	}
 	
 	/**
