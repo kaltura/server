@@ -148,15 +148,14 @@ class KalturaAnnotation extends KalturaCuePoint
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
-    /*
- * @param string $cuePointId
- * @throw KalturaAPIException - when parent annotation doesn't belong to the same entry, or parent annotation
- * doesn't belong to the same entry
- */
+	/*
+     * @param string $cuePointId
+     * @throw KalturaAPIException - when parent annotation doesn't belong to the same entry
+     */
     public function validateParentId($cuePointId = null)
     {
 
-        if (!$this->parentId)
+        if (!$this)
         {
             $dbParentCuePoint = CuePointPeer::retrieveByPK($this->parentId);
             if (!$dbParentCuePoint)
