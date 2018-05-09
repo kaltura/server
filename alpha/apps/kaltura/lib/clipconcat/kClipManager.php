@@ -537,11 +537,10 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 */
 	private function fillDestEntry($destEntry, $sourceEntryId, array $operationAttributes)
 	{
-		if ($destEntry->getIsTemporary()) {
-			$destEntry->setClipConcatTrimFlow(true);
-		} else {
-			$destEntry->setClipConcatTrimFlow(false);
-		}
+		if ($destEntry->getIsTemporary())
+			$destEntry->setFlowType(EntryFlowType::TRIM_CONCAT);
+		else 
+			$destEntry->setFlowType(EntryFlowType::CLIP_CONCAT);
 		$destEntry->setSourceEntryId($sourceEntryId);
 		$destEntry->setOperationAttributes($operationAttributes);
 		$destEntry->setStatus(entryStatus::PENDING);

@@ -1,4 +1,4 @@
-# Mercury 13.19.0 #
+# Mercury 13.20.0 #
 
 # Reach In-House Support #
 - Issue Type: Feature
@@ -127,6 +127,36 @@
 
 	None.
 
+## Update Playlist::update permissions ##
+Issue Type: Behaviour chnage
+Issue ID: PLAT-8885
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_05_08_playlist_update.php
+
+
+## Media repurposing serve dry run ## 
+Issue Type: Bug
+Issue ID: PLAT-8881
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_05_06_add_scheduleTask_permission.php
+
+# Mercury 13.19.0 #
+
+## KMC-NG ##
+- Issue Type: KMC-NG deployment configuration
+- Issue ID: PLAT-8844
+
+### Configuration ###
+copy all [kmcng] section from base.ini to your local.ini and replace tokens with all relevant info (urls, etc);
+ 
 ## Live Clipping ##
 - Issue Type: live clipping
 - Issue ID: PLAT-7832

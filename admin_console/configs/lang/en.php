@@ -1239,7 +1239,7 @@ return array(
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::SERVER_NODE' => 'Server Node',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::ENTRY_VENDOR_TASK' => 'Entry Vendor Task',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::REACH_PROFILE' => 'Reach Profile',
-
+  'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::ENTRY_SERVER_NODE' => 'Entry Server Node',
 
 	'Kaltura_Client_EmailNotification_Enum_EmailNotificationFormat::HTML' => 'HTML',
 	'Kaltura_Client_EmailNotification_Enum_EmailNotificationFormat::TEXT' => 'Text',
