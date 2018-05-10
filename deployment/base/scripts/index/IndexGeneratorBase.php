@@ -93,7 +93,10 @@ class IndexGeneratorBase
 
 		if(isset($fieldAttribtues["nullable"]))
 			$field->setNullable($fieldAttribtues["nullable"] == "yes");
-		
+
+		if(isset($fieldAttribtues["enrichable"]))
+			$field->setNullable($fieldAttribtues["enrichable"] == "yes");
+
 		if(isset($fieldAttribtues["orderable"]))
 			$field->setOrderable($fieldAttribtues["orderable"] == "yes");
 		

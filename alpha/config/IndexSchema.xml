@@ -62,7 +62,7 @@
 	<field name="id" indexName="int_entry_id" getter="indexedId" type="int" skipField="yes" />
 	<field name="name" indexName="@name" apiName="@name" type="string" orderable="yes" matchable="yes" sphinxStringAttribute="both" />
 	<field name="tags" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
-	<field name="categories_ids" indexName="categories" apiName="@name" getter="categoriesEntryIds" type="string" nullable="yes" matchable="yes" />
+	<field name="categories_ids" indexName="categories" apiName="@name" getter="categoriesEntryIds" type="string" nullable="yes" matchable="yes" enrichable="yes"/>
 	<field name="flavor_params_ids" indexName="flavor_params" apiName="@name" getter="flavorParamsIds" type="string" nullable="yes" matchable="yes" />
 	<field name="kshow_id" indexName="@name" type="string" nullable="yes" />
 	<field name="group_id" indexName="@name" apiName="@name" type="string" nullable="yes" />

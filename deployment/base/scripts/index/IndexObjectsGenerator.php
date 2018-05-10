@@ -40,6 +40,7 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 		$this->generateMapping("getIndexFieldsMap", $fp, $key,"fieldsMap");
 		$this->generateMapping("getIndexFieldTypesMap", $fp, $key, "typesMap");
 		$this->generateMapping("getIndexNullableList", $fp, $key, "nullableFields");
+		$this->generateMapping("getIndexEnrichableList", $fp, $key, "enrichableFields");
 		$this->generateMapping("getIndexSearchableFieldsMap", $fp, $key, "searchableFieldsMap");
 		$this->generateMapping("getSearchFieldsEscapeTypeList", $fp, $key, "searchEscapeTypes");
 		$this->generateMapping("getIndexFieldsEscapeTypeList", $fp, $key, "indexEscapeTypes");
@@ -169,6 +170,11 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 	
 	private function getIndexNullableList($fp, IndexableObject $object, $key, IndexableField $value) {
 		if($value->nullable)
+			$this->printToFile($fp, "'" . $value->indexName . "',",4);
+	}
+
+	private function getIndexEnrichableList($fp, IndexableObject $object, $key, IndexableField $value) {
+		if($value->enrichable)
 			$this->printToFile($fp, "'" . $value->indexName . "',",4);
 	}
 	

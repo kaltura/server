@@ -213,7 +213,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			$getter = "get" . $getterName;
 			$fieldType =  $objectIndexClass::getFieldType($field);
 			$nullable = $objectIndexClass::isNullableField($field);
-			
+			$enrichable = $objectIndexClass::isEnrichableField($field);
+
 			switch($fieldType)
 			{
 				case IIndexable::FIELD_TYPE_STRING:
@@ -221,13 +222,25 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 					if($nullable)
 					{
 						if(is_null($value) || $value === '')
-							$value = self::HAS_NO_VALUE . $object->getPartnerId();
+						{
+							$suffix = ' '.self::HAS_NO_VALUE.$object->getPartnerId();
+						}
 						else
-							$value .= ' ' . self::HAS_VALUE . $object->getPartnerId();
+						{
+							$suffix = ' '.self::HAS_VALUE.$object->getPartnerId();
+						}
+
+						if($enrichable)
+						{
+							$enricher = "enrich" . $getterName;
+							$value = $object->$enricher($value);
+						}
+
+						$value.=$suffix;
 					}
+
 					$dataStrings[$field] = $value;
 					break;
-					
 				case IIndexable::FIELD_TYPE_INTEGER:
 					$dataInts[$field] = $object->$getter();
 					break;

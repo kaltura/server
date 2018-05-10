@@ -21,7 +21,10 @@ class IndexableField {
 	
 	/**  Whether the property can be filtered by 'is null' condition */
 	public $nullable = false;
-	
+
+	/**  Whether the property can be enchriched by 'enrich getter'*/
+	public $enrichable = false;
+
 	/**  Whether the query can be ordered by this field */
 	public $orderable = false;
 	
@@ -92,6 +95,13 @@ class IndexableField {
 	}
 
 	/**
+	 * @return the $enrichable
+	 */
+	public function getEnrichable() {
+		return $this->enrichable;
+	}
+
+	/**
 	 * @return the $searchOnly
 	 */
 	public function getSearchOnly() {
@@ -138,6 +148,13 @@ class IndexableField {
 	 */
 	public function setNullable($nullable) {
 		$this->nullable = $nullable;
+	}
+
+	/**
+	 * @param field_type $enrichable
+	 */
+	public function setEnrichable($enrichable) {
+		$this->enrichable = $enrichable;
 	}
 
 	/**

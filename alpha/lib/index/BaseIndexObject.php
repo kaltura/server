@@ -32,7 +32,12 @@ abstract class BaseIndexObject
 	 * last name should appear in this list.
 	 */
 	// protected static $nullableFields;
-	
+
+	/**
+	 * List of fields we have enricher for them.
+	 */
+	// protected static $enrichableFields;
+
 	/**
 	 * Mapping between property name to escape type for indexing purposes.
 	 * The possible values are taken from SearchIndexFieldEscapeType. 
@@ -94,6 +99,15 @@ abstract class BaseIndexObject
 	public static function isNullableField($fieldName) {
 		$nullableFields = static::getIndexNullableList();
 		return in_array($fieldName, $nullableFields);
+	}
+
+	/**
+	 * Returns whether a given field is enrichable
+	 * @param string $fieldName
+	 */
+	public static function isEnrichableField($fieldName) {
+		$encrichableFields = static::getIndexEnrichableList();
+		return in_array($fieldName, $encrichableFields);
 	}
 	
 	/**
