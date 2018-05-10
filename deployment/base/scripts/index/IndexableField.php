@@ -22,9 +22,6 @@ class IndexableField {
 	/**  Whether the property can be filtered by 'is null' condition */
 	public $nullable = false;
 
-	/**  Whether the property can be enchriched by 'enrich getter'*/
-	public $enrichable = false;
-
 	/**  Whether the query can be ordered by this field */
 	public $orderable = false;
 	
@@ -52,6 +49,12 @@ class IndexableField {
 
 	/** Api name for this field */
 	public $apiName = null;
+
+	/**  Whether the property can be enchriched by 'enrich getter'*/
+	public $enrichable = false;
+
+	/**  Whether the property is a cache invalidate key*/
+	public $cacheInvalidationKey = false;
 
 	public function __construct($name, $index, $type) {
 		$this->name = $name;
@@ -95,13 +98,6 @@ class IndexableField {
 	}
 
 	/**
-	 * @return the $enrichable
-	 */
-	public function getEnrichable() {
-		return $this->enrichable;
-	}
-
-	/**
 	 * @return the $searchOnly
 	 */
 	public function getSearchOnly() {
@@ -120,6 +116,20 @@ class IndexableField {
 	 */
 	public function getMatchable() {
 		return $this->matchable;
+	}
+
+	/**
+	 * @return the $enrichable
+	 */
+	public function getEnrichable() {
+		return $this->enrichable;
+	}
+
+	/**
+	 * @return the $cacheInvalidationKey
+	 */
+	public function getCacheInvalidationKey() {
+		return $this->cacheInvalidationKey;
 	}
 
 	/**
@@ -151,13 +161,6 @@ class IndexableField {
 	}
 
 	/**
-	 * @param field_type $enrichable
-	 */
-	public function setEnrichable($enrichable) {
-		$this->enrichable = $enrichable;
-	}
-
-	/**
 	 * @param field_type $orederable
 	 */
 	public function setOrderable($orderable) {
@@ -184,7 +187,21 @@ class IndexableField {
 	public function setMatchable($matchable) {
 		$this->matchable = $matchable;
 	}
-	
+
+	/**
+	 * @param field_type $enrichable
+	 */
+	public function setEnrichable($enrichable) {
+		$this->enrichable = $enrichable;
+	}
+
+	/**
+	 * @return field_type $cacheInvalidationKey
+	 */
+	public function setCacheInvalidationKey($cacheInvalidationKey) {
+		$this->cacheInvalidationKey = $cacheInvalidationKey;
+	}
+
 	/**
 	 * @return the $indexEscapeType
 	 */

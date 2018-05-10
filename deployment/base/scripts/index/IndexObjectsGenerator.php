@@ -36,6 +36,7 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 		$this->generateSimpleFunction("getPropelIdField", $fp, $this->searchableObjects[$key]);
 		$this->generateSimpleFunction("getIdField", $fp, $this->searchableObjects[$key]);
 		$this->generateSimpleFunction("getDefaultCriteriaFilter", $fp, $this->searchableObjects[$key]);
+		$this->generateSimpleFunction("getCacheInvalidationKeys", $fp, $this->searchableObjects[$key]);
 		
 		$this->generateMapping("getIndexFieldsMap", $fp, $key,"fieldsMap");
 		$this->generateMapping("getIndexFieldTypesMap", $fp, $key, "typesMap");
@@ -53,9 +54,11 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 		
 		$this->generateIndexMapping("getSphinxOptimizationMap", $fp, $key, "name");
 		$this->generateIndexMapping("getSphinxOptimizationValues", $fp, $key, "getter");
-		
+
 		$this->getDoCount($fp, $this->searchableObjects[$key]->peerName);
-		
+
+		$this->generateCacheInvalidationKeys($fp, $key);
+
 		$this->createFileFooter($fp, $key);
 		
 		fclose($fp);
@@ -113,7 +116,19 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 		$this->printToFile($fp, "}",1);
 		$this->printToFile($fp, "");
 	}
-	
+
+	private function generateCacheInvalidationKeys($fp, IndexableObject $object)
+	{
+		$this->printToFile($fp, "public static function getCacheInvalidationKeys(\$object = null)",1);
+		$this->printToFile($fp, "{",1);
+		$this->printToFile($fp, "if (is_null(\$object))",2);
+		$this->printToFile($fp, "return array(array(\"entry:id=%s\", entryPeer::ID), array(\"entry:partnerId=%s\", entryPeer::PARTNER_ID));",3);
+		$this->printToFile($fp, "else",2);
+		$this->printToFile($fp, "return array(\"entry:id=\".strtolower($object->getId()), \"entry:partnerId=\".strtolower($object->getPartnerId()));",3);
+		$this->printToFile($fp, "}",1);
+		$this->printToFile($fp, "");
+	}
+
 	private function getObjectName($fp, IndexableObject $object) {
 		$indexName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $object->name));
 		$this->printToFile($fp, "return '$indexName';",2);

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <schema>
 <object name="category">
-	<field name="id" indexName="category_id" getter="id" type="int" orderable="yes" skipField="yes" />
+	<field name="id" indexName="category_id" getter="id" type="int" orderable="yes" skipField="yes" cacheInvalidationKey="yes" />
 	<field name="category_id" indexName="str_category_id" getter="id" type="string" />
 	<field name="parent_id" indexName="parent_id" type="int" />
-	<field name="partner_id" indexName="partner_id" type="bint" orderable="yes" keepCondition="yes" />
+	<field name="partner_id" indexName="partner_id" type="bint" orderable="yes" keepCondition="yes" cacheInvalidationKey="yes" />
 	<field name="name" indexName="name" type="string" orderable="yes" matchable="yes" sphinxStringAttribute="both" />
 	<field name="full_name" indexName="full_name" getter="searchIndexfullName" type="string" orderable="yes" searchEscapeType="3" matchable="yes" skipField="yes" sphinxStringAttribute="both" />
 	<field name="full_ids" indexName="full_ids" getter="searchIndexfullIds" type="string" indexEscapeType="2" searchEscapeType="3" matchable="yes" />
@@ -65,7 +65,7 @@
 <object name="entry" indexId="str_entry_id" id="ID" apiName="KalturaBaseEntry" >
 	<field name="entry_id" indexName="@name" apiName="@getter" getter="id" type="string" />
 	<field name="str_entry_id" indexName="@name" getter="id" type="string" sphinxStringAttribute="string" />
-	<field name="id" indexName="int_entry_id" getter="indexedId" type="int" skipField="yes" />
+	<field name="id" indexName="int_entry_id" getter="indexedId" type="int" skipField="yes" cacheInvalidationKey="yes" />
 	<field name="name" indexName="@name" apiName="@name" type="string" orderable="yes" matchable="yes" sphinxStringAttribute="both" />
 	<field name="tags" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
 	<field name="categories_ids" indexName="categories" apiName="@name" getter="categoriesEntryIds" type="string" nullable="yes" matchable="yes" enrichable="yes"/>
@@ -85,7 +85,7 @@
 	<field name="type" indexName="@name" apiName="@name" type="int" orderable="yes" />
 	<field name="media_type" indexName="@name" apiName="@name" type="int" orderable="yes" />
 	<field name="views" indexName="@name" apiName="@name" type="int" orderable="yes" />
-	<field name="partner_id" indexName="@name" apiName="@name" type="bint" orderable="yes" keepCondition="yes" />
+	<field name="partner_id" indexName="@name" apiName="@name" type="bint" orderable="yes" keepCondition="yes" cacheInvalidationKey="yes" />
 	<field name="moderation_status" indexName="@name" apiName="@name" type="int" orderable="yes" />
 	<field name="display_in_search" indexName="@name" type="bint" orderable="yes" />
 	<field name="length_in_msecs" indexName="@name" apiName="msDuration" type="int" orderable="yes" />
@@ -108,6 +108,7 @@
 	<field name="entitled_kusers_publish" indexName="@name" type="string" nullable="yes" matchable="yes" />
 	<field name="entitled_kusers_edit" indexName="@name" type="string" nullable="yes" matchable="yes" />
 	<field name="entitled_kusers" indexName="@name" type="string" nullable="yes" />
+	<field name="entitled_kusers_view" indexName="@name" type="string" nullable="yes"  matchable="yes" />
 	<field name="privacy_by_contexts" indexName="@name" type="string" nullable="yes" />
 	<field name="creator_kuser_id" indexName="@name" type="string" />
 	<field name="creator_puser_id" indexName="@name" apiName="creatorId" type="string" />
@@ -143,7 +144,7 @@
 	<field name="status" indexName="kuser_status" getter="status" type="int" />
 	<field name="created_at" indexName="created_at" type="datetime" orderable="yes" />
 	<field name="updated_at" indexName="updated_at" type="datetime" orderable="yes" />
-	<field name="partner_id" indexName="partner_id" type="bint" />
+	<field name="partner_id" indexName="partner_id" type="bint" cacheInvalidationKey="yes" />
 	<field name="display_in_search" indexName="display_in_search" type="bint" orderable="yes" />
 	<field name="partner_data" indexName="partner_data" type="string" matchable="yes" />
 	<field name="puser_id" indexName="puser_id" type="string" matchable="yes" nullable="yes"/>

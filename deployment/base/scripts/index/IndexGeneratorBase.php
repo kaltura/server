@@ -94,9 +94,6 @@ class IndexGeneratorBase
 		if(isset($fieldAttribtues["nullable"]))
 			$field->setNullable($fieldAttribtues["nullable"] == "yes");
 
-		if(isset($fieldAttribtues["enrichable"]))
-			$field->setNullable($fieldAttribtues["enrichable"] == "yes");
-
 		if(isset($fieldAttribtues["orderable"]))
 			$field->setOrderable($fieldAttribtues["orderable"] == "yes");
 		
@@ -122,7 +119,13 @@ class IndexGeneratorBase
 			$sphinxType = $fieldAttribtues["sphinxStringAttribute"];
 			$field->setSphinxStringAttribute("$sphinxType");
 		}
-		
+
+		if(isset($fieldAttribtues["enrichable"]))
+			$field->setEnrichable($fieldAttribtues["enrichable"] == "yes");
+
+		if(isset($fieldAttribtues["cacheInvalidationKey"]))
+			$field->setCacheInvalidationKey($fieldAttribtues["cacheInvalidationKey"] == "yes");
+
 		$this->searchableFields[$objName]["$name"] = $field;
 	}
 	
