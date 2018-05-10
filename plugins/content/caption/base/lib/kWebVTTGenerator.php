@@ -72,8 +72,10 @@ class kWebVTTGenerator
 
 		foreach ($parsedCaption as $curCaption)
 		{
-			if ($segmentIndex != -1 && ($curCaption["startTime"] < $segmentStartTime || $curCaption["startTime"] >= $segmentEndTime) &&
-				($curCaption["endTime"] < $segmentStartTime || $curCaption["endTime"] >= $segmentEndTime)
+			if ($segmentIndex	!=	-1	&&
+			(	$curCaption["startTime"]	<	$segmentStartTime	||	$curCaption["startTime"]	>=	$segmentEndTime)	&&
+			(	$curCaption["endTime"]		<	$segmentStartTime	||	$curCaption["endTime"]		>=	$segmentEndTime		||
+				$curCaption["startTime"]	>=	$curCaption["endTime"]	)
 			)
 				continue;
 
