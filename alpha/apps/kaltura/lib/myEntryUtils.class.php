@@ -1015,7 +1015,7 @@ class myEntryUtils
 			return false;
 
 		$url = 'p/' . $entry->getPartnerId() . '/e/' . $entry->getId();
-		$dc = self::getLiveEntryDcId($entry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY));
+		$dc = self::getLiveEntryDcId($entry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
 		if (is_null($dc))
 			return false;
 		$packagerCaptureUrl = str_replace(array ( "{dc}", "{liveType}"), array ( $dc, $liveType) , $packagerCaptureUrl );
