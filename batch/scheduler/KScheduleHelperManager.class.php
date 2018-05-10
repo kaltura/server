@@ -346,29 +346,12 @@ class KScheduleHelperManager
 	public static function saveStatuses(array $statuses)
 	{
 		$filePath = self::getStatusFilePath();
-		//Open the File Stream
 		$data = null;
 		$statusesFromFile = array();
 		if (file_exists($filePath))
 			$data = file_get_contents($filePath);
 		if($data)
 			$statusesFromFile = unserialize(base64_decode($data));
-
-		//Lock File, error if unable to lock
-//		if(flock($handle, LOCK_EX)) {
-//			$data = fread($handle, filesize($filePath));   //get data from file
-//			/** @var array $currentStatuses */
-//			if(!$data)
-//				$currentStatuses = array();
-//			else
-//				$currentStatuses =  unserialize(base64_decode($data));  //get current array
-//			ftruncate($handle, 0);    //Truncate the file to 0
-//			rewind($handle);           //Set write pointer to beginning of file
-//			fwrite($handle,  base64_encode(serialize(array_merge($currentStatuses,$statuses))));    //Write the new Hit Count
-//			flock($handle, LOCK_UN);    //Unlock File
-//		} else {
-//			KalturaLog::err("Could not Lock File! statuses will not be registered") ;
-//		}
 		file_put_contents($filePath, base64_encode(serialize(array_merge($statusesFromFile,$statuses))), LOCK_EX);
 	}
 
