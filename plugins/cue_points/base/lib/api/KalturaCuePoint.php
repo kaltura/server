@@ -179,40 +179,7 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 		}
 	}
 	
-	/*
-	 * @param string $cuePointId
-	 * @throw KalturaAPIException - when parent annotation doesn't belong to the same entry, or parent annotation
-	 * doesn't belong to the same entry
-	 */
-	public function validateParentId($cuePointId = null)
-	{
-		if ($this->isNull('parentId'))
-			$this->parentId = 0;
-			
-		if ($this->parentId !== 0)
-		{
-			$dbParentCuePoint = CuePointPeer::retrieveByPK($this->parentId);
-			if (!$dbParentCuePoint)
-				throw new KalturaAPIException(KalturaCuePointErrors::PARENT_ANNOTATION_NOT_FOUND, $this->parentId);
-			
-			if($cuePointId !== null){ // update
-				$dbCuePoint = CuePointPeer::retrieveByPK($cuePointId);
-				if(!$dbCuePoint)
-					throw new KalturaAPIException(KalturaCuePointErrors::INVALID_OBJECT_ID, $cuePointId);
-				 
-				if($dbCuePoint->isDescendant($this->parentId))
-					throw new KalturaAPIException(KalturaCuePointErrors::PARENT_ANNOTATION_IS_DESCENDANT, $this->parentId, $dbCuePoint->getId());
-					
-				if ($dbParentCuePoint->getEntryId() != $dbCuePoint->getEntryId())
-					throw new KalturaAPIException(KalturaCuePointErrors::PARENT_ANNOTATION_DO_NOT_BELONG_TO_THE_SAME_ENTRY);
-			}
-			else
-			{
-				if ($dbParentCuePoint->getEntryId() != $this->entryId)
-					throw new KalturaAPIException(KalturaCuePointErrors::PARENT_ANNOTATION_DO_NOT_BELONG_TO_THE_SAME_ENTRY);
-			}
-		}
-	}
+
 	
 	/*
 	 * @param CuePoint $cuePoint
