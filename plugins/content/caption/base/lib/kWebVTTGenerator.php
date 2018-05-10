@@ -77,7 +77,7 @@ class kWebVTTGenerator
 			)
 				continue;
 
-			if	($curCaption["startTime"]>=$curCaption["endTime"])
+			if ($curCaption["startTime"]>=$curCaption["endTime"])
 				continue;
 
 			// calculate line-level styling
