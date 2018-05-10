@@ -68,7 +68,7 @@ class KEMailNotificationGroupRecipientEngine extends  KEmailNotificationRecipien
 		foreach ($groupUserList->objects as $user)
 		{
 			$groupUserIds .= $user->userId;
-			if(next($groupUserList) == true)
+			if(next($groupUserList->objects) == true)
 				$groupUserIds .= ",";
 		}
 		

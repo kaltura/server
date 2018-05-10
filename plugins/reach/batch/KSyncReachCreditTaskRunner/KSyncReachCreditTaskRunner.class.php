@@ -33,9 +33,9 @@ class KSyncReachCreditTaskRunner extends KPeriodicWorker
 		$pager->pageIndex = 1;
 		$pager->pageSize = 500;
 		
-		$result = $reachClient->reachProfile->listAction($filter, $pager);
+		
 		do {
-			
+			$result = $reachClient->reachProfile->listAction($filter, $pager);
 			foreach ($result->objects as $reachProfile)
 			{
 				try
@@ -49,8 +49,6 @@ class KSyncReachCreditTaskRunner extends KPeriodicWorker
 			}
 			
 			$pager->pageIndex++;
-			$result = $reachClient->reachProfile->listAction($filter, $pager);
-			
 		}  while(count($result->objects) == $pager->pageSize);
 	}
 
