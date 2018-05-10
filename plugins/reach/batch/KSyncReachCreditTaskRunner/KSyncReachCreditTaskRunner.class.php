@@ -32,23 +32,24 @@ class KSyncReachCreditTaskRunner extends KPeriodicWorker
 		$pager = new KalturaFilterPager();
 		$pager->pageIndex = 1;
 		$pager->pageSize = 500;
-
-		$result = $reachClient->reachProfile->listAction($filter, $pager);
-		while ($result->totalCount > 0)
-		{
+		
+		
+		do {
+			$result = $reachClient->reachProfile->listAction($filter, $pager);
 			foreach ($result->objects as $reachProfile)
 			{
 				try
 				{
 					$this->syncReachProfileCredit($reachProfile);
-				} catch (Exception $ex)
+				}
+				catch (Exception $ex)
 				{
 					KalturaLog::err($ex);
 				}
 			}
+			
 			$pager->pageIndex++;
-			$result = $reachClient->reachProfile->listAction($filter, $pager);
-		}
+		}  while(count($result->objects) == $pager->pageSize);
 	}
 
 	/**
@@ -62,7 +63,8 @@ class KSyncReachCreditTaskRunner extends KPeriodicWorker
 		{
 			$result = $reachClient->reachProfile->syncCredit($reachProfile->id);
 			$this->unimpersonate();
-		} catch (Exception $ex)
+		}
+		catch (Exception $ex)
 		{
 			$this->unimpersonate();
 			throw $ex;
