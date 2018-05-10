@@ -33,6 +33,14 @@ abstract class EntryServerNode extends BaseEntryServerNode {
 		TrackEntry::addTrackEntry($te);
 	}
 
+	public function getDCId()
+	{
+		$serverNode = ServerNodePeer::retrieveRegisteredServerNodeByPk($this->getServerNodeId());
+		if ($serverNode)
+			return $serverNode->getDc();
+		return null;
+	}
+
 	public function deleteOrMarkForDeletion()
 	{
 		return $this->delete();
