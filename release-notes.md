@@ -1,5 +1,16 @@
 # Mercury 13.20.0 #
 
+## Live thumbnails ##
+Issue Type: Enable live thumb
+Issue ID: PLAT-8867
+
+### Configuration ###
+Add to local.ini after replacing the pacth-holders of VOD_PACKAGER_HOST and VOD_PACKAGER_PORT:
+packager_local_live_thumb_capture_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/dc-{dc}/{liveType}/thumb/{url}/thumb-{offset}.jpg
+
+### Deployment scripts ###
+None.
+
 ## Update Playlist::update permissions ##
 Issue Type: Behaviour chnage
 Issue ID: PLAT-8885
