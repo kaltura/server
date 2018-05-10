@@ -170,7 +170,7 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 				if ($res)
 					return;
 			}
-			throw new kTemporaryException("Failed on writing syncPoint array to disk in path {$localTempSyncPointsFilePath}");
+			throw new kTemporaryException("Failed on moving syncPointArray to server. temp path: {$localTempSyncPointsFilePath}");
 		}
 		catch(kTemporaryException $ktex)
 		{
