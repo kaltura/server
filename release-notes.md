@@ -1,5 +1,15 @@
 # Mercury 13.20.0 #
 
+## Add bulk groupUser sync ##
+Issue Type:  New Feature
+Issue ID: PLAT-8564
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_05_07_add_bulk_sync_group_users_permissions.php
+
 ## Live thumbnails ##
 Issue Type: Enable live thumb
 Issue ID: PLAT-8867
