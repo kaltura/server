@@ -162,9 +162,16 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 			$localTempSyncPointsFilePath = self::$taskConfig->params->localTempPath . DIRECTORY_SEPARATOR . $outputFileName;
 			$sharedTempSyncPointFilePath = self::$taskConfig->params->sharedTempPath . DIRECTORY_SEPARATOR . $outputFileName;
 			
-			file_put_contents($localTempSyncPointsFilePath, serialize($syncPointArray));
-			
-			$this->moveDataFile($data, $localTempSyncPointsFilePath, $sharedTempSyncPointFilePath);
+			if (!kFile::setFileContent($localTempSyncPointsFilePath, serialize($syncPointArray)))
+				throw new kTemporaryException("Failed on writing syncPoint array to disk in path {$localTempSyncPointsFilePath}");
+
+			if (!$this->moveDataFile($data, $localTempSyncPointsFilePath, $sharedTempSyncPointFilePath))
+				throw new kTemporaryException("Failed To move file from local to share");
+		}
+		catch(kTemporaryException $ktex)
+		{
+			$this->unimpersonate();
+			throw $ktex;
 		}
 		catch(Exception $ex) 
 		{
@@ -179,14 +186,20 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 		KalturaLog::debug("moving file from [$localTempSyncPointsFilePath] to [$sharedTempSyncPointFilePath]");
 		$fileSize = kFile::fileSize($localTempSyncPointsFilePath);
 		
-		kFile::moveFile($localTempSyncPointsFilePath, $sharedTempSyncPointFilePath, true);
+		$res = kFile::moveFile($localTempSyncPointsFilePath, $sharedTempSyncPointFilePath, true);
+		if (!$res)
+			return false;
 		clearstatcache();
 		
 		$this->setFilePermissions($sharedTempSyncPointFilePath);
 		if(!$this->checkFileExists($sharedTempSyncPointFilePath, $fileSize))
+		{
 			KalturaLog::warning("Failed to move file to [$sharedTempSyncPointFilePath]");
+			return false;
+		}
 		else
 			$data->destDataFilePath = $sharedTempSyncPointFilePath;
+		return true;
 	}
 
 	/*

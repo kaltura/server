@@ -260,7 +260,7 @@ class kFile extends kFileBase
 				return false;
 			}
 		} else {
-			self::copySingleFile($src, $dest, $deleteSrc);
+			return self::copySingleFile($src, $dest, $deleteSrc);
 		}
 		return true;
 	}
