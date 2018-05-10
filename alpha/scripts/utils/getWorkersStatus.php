@@ -40,6 +40,7 @@ foreach($files as $file)
 		{
 			$lastExecutionTime = $schedulerWorker->getStatuses()[SchedulerStatus::RUNNING_BATCHES_LAST_EXECUTION_TIME];
 			$sleepBetweenStopStart = $worker['sleepBetweenStopStart'];
+			$maximumExecutionTime = $worker['maximumExecutionTime'];
 			if ($lastExecutionTime)
 			{
 				/** $lastExecutionTime + max($sleepBetweenStopStart , 300 )  we are letting a margin of twice the execution time meaning
@@ -47,7 +48,7 @@ foreach($files as $file)
 				 *  we will wait for two hours before printing it as error
 				 * minimum is 5 minutes so if job should run every 60 sec will will only inform the error after 5 minutes
 				 */
-				if ($lastExecutionTime + max($sleepBetweenStopStart , intval($argv[3]) ) < time() - $sleepBetweenStopStart)
+				if ($lastExecutionTime + max($sleepBetweenStopStart + $maximumExecutionTime , intval($argv[3]) ) < time() - $sleepBetweenStopStart)
 					$answers[] =  $schedulerWorker->getSchedulerId() . ',' . $schedulerWorker->getConfiguredId() . ',' .
 						$schedulerWorker->getName() . ',' . date('Y-m-d H:i:s', $lastExecutionTime) . ',' . $sleepBetweenStopStart . ',' . 'BAD' . PHP_EOL;
 					//$answers[] = prettyPrintNotRun($schedulerWorker,$lastExecutionTime,$sleepBetweenStopStart);

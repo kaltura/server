@@ -95,7 +95,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		$c->add(self::PUSER_ID, $puser_id);
 		return self::doSelectOne($c);			
 	}
-	
+
 	public static function createKuserForPartner($partner_id, $puser_id, $is_admin = false)
 	{
 		$puser_id = self::getValidPuserStr($puser_id);

@@ -221,7 +221,12 @@ class KalturaUser extends KalturaObject implements IRelatedFilterable
 	 * @var string
 	 */
 	public $allowedPartnerPackages;
-	
+
+	/**
+	 * @var KalturaUserMode
+	 */
+	public $userMode;
+
 	private static $map_between_objects = array
 	(
 		"id" => "puserId", 
@@ -255,6 +260,7 @@ class KalturaUser extends KalturaObject implements IRelatedFilterable
 		"allowedPartnerIds" => "allowedPartners",
 		"allowedPartnerPackages",
 		"statusUpdatedAt",
+		"userMode",
 	);
 
 	public function getMapBetweenObjects ( )

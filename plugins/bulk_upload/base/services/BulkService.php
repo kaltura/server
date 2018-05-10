@@ -416,7 +416,34 @@ class BulkService extends KalturaBaseService
     	
     	return $ret;
 	}
-	
 
+	/**
+	 * sync by userId and groupIds
+	 *
+	 * @action syncGroupUsers
+	 * @actionAlias groupUser.sync
+	 * @param string $userId
+	 * @param string $groupIds
+	 * @return KalturaBulkUpload|null
+	 * @throws KalturaAPIException
+	 */
+	public function syncGroupUsersAction($userId, $groupIds)
+	{
+		$kuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
+		if (!$kuser || $kuser->getType() != KuserType::USER)
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
+
+		if(!$groupIds)
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'groupIds');
+
+		$bulkGroupUserSyncCsv = new kBulkGroupUserSyncCsv($kuser, $groupIds);
+		$fileData = $bulkGroupUserSyncCsv->getSyncGroupUsersCsvFile();
+		if(!$fileData)
+			return null;
+
+		$this->initService('bulkupload_bulk', 'bulk', 'addUsers');
+		$bulkUpload = $this->addUsersAction($fileData);
+		return $bulkUpload;
+	}
 
 }

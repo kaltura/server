@@ -400,6 +400,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 				$groupUser = new KalturaGroupUser();
 				$groupUser->userId = $userResult->userId;
 				$groupUser->groupId = $userResult->group;
+				$groupUser->creationMode = KalturaGroupUserCreationMode::AUTOMATIC;
 				
 				$groupUserAssoc = KBatchBase::$kClient->groupUser->add($groupUser);
 			}
