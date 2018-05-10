@@ -76,7 +76,7 @@ class kReachFlowManager implements kBatchJobStatusEventConsumer
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return kReachFlowManager::handleEntryVendorTasksCsvFinished($dbBatchJob, $data);
+				return self::handleEntryVendorTasksCsvFinished($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
@@ -88,7 +88,7 @@ class kReachFlowManager implements kBatchJobStatusEventConsumer
 		$fileName =  basename($data->getOutputPath());
 		$directory =  myContentStorage::getFSContentRootPath() . "/content/entryVendorTasksCsv/" . $dbBatchJob->getPartnerId() ;
 		if(!file_exists($directory))
-			mkdir($directory);
+			kFile::fullMkfileDir($directory);
 		$filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
 
 		if(!$data->getOutputPath())
