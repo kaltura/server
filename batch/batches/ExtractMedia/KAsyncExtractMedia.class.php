@@ -161,12 +161,16 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 			$outputFileName = pathinfo($filePath, PATHINFO_FILENAME) . ".data";
 			$localTempSyncPointsFilePath = self::$taskConfig->params->localTempPath . DIRECTORY_SEPARATOR . $outputFileName;
 			$sharedTempSyncPointFilePath = self::$taskConfig->params->sharedTempPath . DIRECTORY_SEPARATOR . $outputFileName;
-			
-			if (!kFile::setFileContent($localTempSyncPointsFilePath, serialize($syncPointArray)))
-				throw new kTemporaryException("Failed on writing syncPoint array to disk in path {$localTempSyncPointsFilePath}");
 
-			if (!$this->moveDataFile($data, $localTempSyncPointsFilePath, $sharedTempSyncPointFilePath))
-				throw new kTemporaryException("Failed To move file from local to share");
+			$retries = 3;
+			while ($retries-- > 0)
+			{
+				$res = kFile::setFileContent($localTempSyncPointsFilePath, serialize($syncPointArray));
+				$res = $res && $this->moveDataFile($data, $localTempSyncPointsFilePath, $sharedTempSyncPointFilePath);
+				if ($res)
+					return;
+			}
+			throw new kTemporaryException("Failed on writing syncPoint array to disk in path {$localTempSyncPointsFilePath}");
 		}
 		catch(kTemporaryException $ktex)
 		{
