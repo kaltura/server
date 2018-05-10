@@ -14,6 +14,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	{
 		if ($object instanceof categoryEntry)
 			return true;
+		
+		return false;
 	}
 	
 	/* (non-PHPdoc)
