@@ -42,6 +42,12 @@
 	<index format="%s">
 		<value field="id" />
 	</index>
+	<index format="PARENT%s">
+		<value field="parent_id" />
+	</index>
+	<index format="PID%s">
+		<value field="partner_id" />
+	</index>
 </object>
 <object name="categoryKuser">
 	<field name="category_id" indexName="category_id" type="string" matchable="yes" />
