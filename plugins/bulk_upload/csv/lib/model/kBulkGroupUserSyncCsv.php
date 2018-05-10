@@ -58,7 +58,7 @@ class kBulkGroupUserSyncCsv
 		$requestGroupIds = explode(',', $this->groupIds);
 		$requestGroupIds = array_map('trim', $requestGroupIds);
 		$partnerId = $this->kuser->getPartnerId();
-		$currentUserGroups = KuserKgroupPeer::retrieveByKuserIdAndPartnerId($this->kuser->getId(), $partnerId);
+		$currentUserGroups = KuserKgroupPeer::retrieveByKuserIds(array($this->kuser->getId()));
 		$currentKgroupsIds = array();
 		$currentPgroupsIds = array();
 		foreach ($currentUserGroups as $currentUserGroup)
@@ -68,7 +68,7 @@ class kBulkGroupUserSyncCsv
 		}
 
 		$groupsPuserIds = array_merge($currentPgroupsIds, $requestGroupIds);
-		$users = kuserPeer::getActiveKusersByPartnerAndUids($partnerId, $groupsPuserIds);
+		$users = kuserPeer::getKuserByPartnerAndUids($partnerId, $groupsPuserIds);
 
 		$this->buildUserMap($users);
 		$groupsToRemove = array();
