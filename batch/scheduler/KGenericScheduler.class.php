@@ -295,7 +295,11 @@ class KGenericScheduler
 				continue;
 		
 			if(!$this->isInitialized($taskConfig))
+			{
 				$this->initSingleWorker($taskConfig);
+				$statuses[] = $this->createStatus($taskConfig, KalturaSchedulerStatusType::RUNNING_BATCHES_LAST_EXECUTION_TIME,  $this->lastRunTime[$taskConfig->name]);
+			}
+
 		
 			$runningTasksCount = $this->numberOfRunningTasks($taskConfig->name);
 			if($fullCycle) {
