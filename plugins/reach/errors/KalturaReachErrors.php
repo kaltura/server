@@ -29,27 +29,27 @@ class KalturaReachErrors implements kReachErrors
 
 	const REACH_PROFILE_NOT_FOUND = "REACH_PROFILE_NOT_FOUND;ID;Reach profile with id provided not found [@ID@]";
 
-	const DICTIONARY_LANGUAGE_DUPLICATION = "DICTIONARY_LANGUAGE_DUPLICATION;LANGUAGE; Vendor profile configuration error - not allowed duplicate dictionaries for language [@LANGUAGE@] ";
+	const DICTIONARY_LANGUAGE_DUPLICATION = "DICTIONARY_LANGUAGE_DUPLICATION;LANGUAGE;Vendor profile configuration error - not allowed duplicate dictionaries for language [@LANGUAGE@] ";
 
-	const MAX_DICTIONARY_LENGTH_EXCEEDED = "MAX_DICTIONARY_LENGTH_EXCEEDED;LANGUAGE,LENGTH; Vendor profile configuration error - Dictionary for language [@LANGUAGE@] exceeded maximum length of  [@LENGTH@] characters";
+	const MAX_DICTIONARY_LENGTH_EXCEEDED = "MAX_DICTIONARY_LENGTH_EXCEEDED;LANGUAGE,LENGTH;Vendor profile configuration error - Dictionary for language [@LANGUAGE@] exceeded maximum length of  [@LENGTH@] characters";
 
-	const INVALID_CREDIT_DATES = "INVALID_CREDIT_DATES;FROM,TO; Vendor profile configuration error - Invalid credit Dates - from:[@FROM@] to:[@TO@]";
+	const INVALID_CREDIT_DATES = "INVALID_CREDIT_DATES;FROM,TO;Vendor profile configuration error - Invalid credit Dates - from:[@FROM@] to:[@TO@]";
 	
-	const UPDATE_CREDIT_ERROR_USED_CREDIT_EXISTS = "UPDATE_CREDIT_ERROR_USED_CREDIT_EXISTS;ID;Can't update profile [@ID@]. Trying to update Credit but usedCredit exists. please reset used credit before updating credit.";
+	const UPDATE_CREDIT_ERROR_USED_CREDIT_EXISTS = "UPDATE_CREDIT_ERROR_USED_CREDIT_EXISTS;ID;Can't update profile [@ID@]. Trying to update credit but usedCredit exists. Please reset used credit before updating credit.";
 
 	/* Entry Vendor Task */
 
-	const ENTRY_VENDOR_TASK_SERVICE_GET_JOB_NOT_ALLOWED = "VENDOR_TASK_SERVICE__GET_JOB_NOT_ALLOWED;ID;Vendor Task Service 'Get Job' action Not allowed. Vendor partner Type is not enabled on partner [@ID@]";
+	const ENTRY_VENDOR_TASK_SERVICE_GET_JOB_NOT_ALLOWED = "VENDOR_TASK_SERVICE__GET_JOB_NOT_ALLOWED;ID;Vendor task service 'Get Job' action not allowed. Vendor partner Type is not enabled on partner [@ID@]";
 
-	const ENTRY_VENDOR_TASK_NOT_FOUND = "ENTRY_VENDOR_TASK_NOT_FOUND;ID;entry vendor task item with id provided not found [@ID@]";
+	const ENTRY_VENDOR_TASK_NOT_FOUND = "ENTRY_VENDOR_TASK_NOT_FOUND;ID;Entry vendor task item with id provided not found [@ID@]";
 
-	const ENTRY_VENDOR_TASK_ACTION_NOT_ALLOWED = "ENTRY_VENDOR_TASK_ACTION_NOT_ALLOWED;ID,USER_ID;user id [@USER_ID@] is not allowed to do actions on entryVendorTask [@ID@]";
+	const ENTRY_VENDOR_TASK_ACTION_NOT_ALLOWED = "ENTRY_VENDOR_TASK_ACTION_NOT_ALLOWED;ID,USER_ID;User id [@USER_ID@] is not allowed to do actions on entryVendorTask [@ID@]";
 	
-	const ENTRY_VENDOR_TASK_DUPLICATION = "ENTRY_VENDOR_TASK_DUPLICATION;ENTRY_ID,CATALOG_ITEM_ID,VERSION;entry vendor task already exists for entry [@ENTRY_ID@] and catalog item [@CATALOG_ITEM_ID@] and version [@VERSION@]";
+	const ENTRY_VENDOR_TASK_DUPLICATION = "ENTRY_VENDOR_TASK_DUPLICATION;ENTRY_ID,CATALOG_ITEM_ID,VERSION;Entry vendor task already exists for entry [@ENTRY_ID@] and catalog item [@CATALOG_ITEM_ID@] and version [@VERSION@]";
 	
-	const EXCEEDED_MAX_CREDIT_ALLOWED = "EXCEEDED_MAX_CREDIT_ALLOWED;ENTRY_ID,CATALOG_ITEM_ID;Exceeded max credit allowed, Task could not be added for entry [@ENTRY_ID@] and catalog item [@CATALOG_ITEM_ID@]";
+	const EXCEEDED_MAX_CREDIT_ALLOWED = "EXCEEDED_MAX_CREDIT_ALLOWED;ENTRY_ID,CATALOG_ITEM_ID;Exceeded max credit allowed, task could not be added for entry [@ENTRY_ID@] and catalog item [@CATALOG_ITEM_ID@]";
 
-	const CREDIT_EXPIRED = "CREDIT_EXPIRED;ENTRY_ID,CATALOG_ITEM_ID;Credit cycle has expired, Task could not be added for entry [@ENTRY_ID@] and catalog item [@CATALOG_ITEM_ID@]";
+	const CREDIT_EXPIRED = "CREDIT_EXPIRED;ENTRY_ID,CATALOG_ITEM_ID;Credit cycle has expired, task could not be added for entry [@ENTRY_ID@] and catalog item [@CATALOG_ITEM_ID@]";
 
 	const CANNOT_APPROVE_NOT_MODERATED_TASK = "CANNOT_APPROVE_NOT_MODERATED_TASK;;Cannot approve task which is not pending moderation";
 	

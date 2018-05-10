@@ -186,6 +186,10 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 				break;
 				
 		}
+		
+		if (!$object)
+			return null;
+		
 		/* @var $object KalturaVendorCatalogItem */
 		$object->fromObject($sourceObject, $responseProfile);
 		return $object;
