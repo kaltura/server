@@ -46,7 +46,7 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin implements I
 			$vendorCatalogItemFilter->sourceLanguageEqual = $sourceLanguage;
 			$vendorCatalogItemFilter->vendorPartnerIdEqual = $vendorPartnerId;
 
-			if($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+			if ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
 				$vendorCatalogItemFilter->targetLanguageEqual = $targetLanguage;
 
 			$client = Infra_ClientHelper::getClient();
@@ -107,7 +107,8 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin implements I
 		try
 		{
 			$result = $client->permission->listAction($filter, null);
-		} catch (Exception $e)
+		}
+		catch (Exception $e)
 		{
 			$client->setPartnerId(self::ADMIN_CONSOLE_PARTNER);
 			return false;
@@ -127,17 +128,18 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin implements I
 		$options[] = array(0 => 'Reach', 1 => 'listPartnerCatalogItems');
 		return $options;
 	}
-	
+
 	/**
 	 * @return string javascript code to add to publisher list view
 	 */
 	public function getPublisherAdminActionJavascript()
 	{
-		$functionStr = 'function listPartnerCatalogItems(partnerId) {
+		$functionStr = 'function listPartnerCatalogItems(partnerId)
+		    {
 					var url = pluginControllerUrl + \'/' . get_class($this) . '/filter_type/partnerIdEqual/filter_input/\' + partnerId;
 	                document.location = url;
 	        }';
-		
+
 		return $functionStr;
 	}
 }

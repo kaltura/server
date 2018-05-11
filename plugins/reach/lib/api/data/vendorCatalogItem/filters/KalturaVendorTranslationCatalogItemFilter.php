@@ -5,11 +5,8 @@
  */
 class KalturaVendorTranslationCatalogItemFilter extends KalturaVendorTranslationCatalogItemBaseFilter
 {
-	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
+	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = KalturaVendorServiceFeature::TRANSLATION)
 	{
-		if(!$type)
-			$type = KalturaVendorServiceFeature::TRANSLATION;
-		
 		return parent::getTypeListResponse($pager, $responseProfile, $type);
 	}
 }

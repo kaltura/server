@@ -7,17 +7,15 @@
 
 <script type="text/javascript">
 
-	try{
-		jQuery(function() {
-		<?php if ($this->formValid): ?>
-		dialogDiv.dialog('close');
-		jQuery('#frmCatalogItemConfigure').submit();
-		<?php endif; ?>
-	});
+	try {
+		jQuery(function () {
+			<?php if ($this->formValid): ?>
+			dialogDiv.dialog('close');
+			jQuery('#frmCatalogItemConfigure').submit();
+			<?php endif; ?>
+		});
 	}
-	catch (e)
-	{
-
+	catch (e) {
 	}
 
 </script>

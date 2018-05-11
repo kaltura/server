@@ -31,9 +31,6 @@ class Form_DictionariesSubForm extends ConfigureSubForm
 
 	public function isValid($data)
 	{
-		if (!$data['ReachProfileDictionaries'] || !empty(json_decode($data['ReachProfileDictionaries'], true)))
-			return true;
-		else
-			return false;
+		return (!$data['ReachProfileDictionaries'] || !empty(json_decode($data['ReachProfileDictionaries'], true)));
 	}
 }

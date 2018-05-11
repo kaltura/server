@@ -7,55 +7,56 @@ class Form_ReachProfileCredit extends Zend_Form_SubForm
 {
 	public function init()
 	{
- 		$this->setLegend("Credit Configuration");
- 		$this->setName("reachProfileCredit");
- 		$this->addElement('select', 'objectType', array(
-		'label'			=> 'Credit type: (Mandatory) ',
-		'filters'		=> array('StringTrim'),
-		'multiOptions'  => array(),
-	));
-		
+		$this->setLegend("Credit Configuration");
+		$this->setName("reachProfileCredit");
+		$this->addElement('select', 'objectType', array(
+			'label' => 'Credit type: (Mandatory) ',
+			'filters' => array('StringTrim'),
+			'multiOptions' => array(),
+		));
+
 		$this->addElement('text', 'credit', array(
-			'label'			=> 'Credit:',
-			'required'      => true,
-			'filters'		=> array('StringTrim'),
-			'validators'	=> array('Int'),
+			'label' => 'Credit:',
+			'required' => true,
+			'filters' => array('StringTrim'),
+			'validators' => array('Int'),
 		));
 
 		$this->addElement('text', 'overageCredit', array(
-			'label'			=> 'Overage Credit:',
-			'filters'		=> array('StringTrim'),
+			'label' => 'Overage Credit:',
+			'filters' => array('StringTrim'),
 			'validators' => array(),
 		));
 
 		$this->addElement('text', 'fromDate', array(
-				'label'			=> 'From Date: (MM.DD.YYYY)',
-				'innerType'     => 'DateElement',
-				'required'      => true,
-				'filters'	=> array('StringTrim'),
-				'oninput'	=> 'checkNumValid(this.value)',
-				'validators' => array('Int'),
+			'label' => 'From Date: (MM.DD.YYYY)',
+			'innerType' => 'DateElement',
+			'required' => true,
+			'filters' => array('StringTrim'),
+			'oninput' => 'checkNumValid(this.value)',
+			'validators' => array('Int'),
 		));
-		$this->setDefault('fromDate',  "Enter Date");
+		$this->setDefault('fromDate', "Enter Date");
 	}
 
-	public function updateCreditOptions(array $options) {
+	public function updateCreditOptions(array $options)
+	{
 		$this->getElement("objectType")->setAttrib('options', $options);
 	}
-	
-	
+
+
 	public function populateFromObject($creditObject, $add_underscore = false)
 	{
 		$this->getElement("objectType")->setValue(get_class($creditObject));
-		
-		if(is_null($creditObject))
+
+		if (is_null($creditObject))
 			return;
-		
+
 		$props = $creditObject;
-		if(is_object($creditObject))
+		if (is_object($creditObject))
 			$props = get_object_vars($creditObject);
-		
-		foreach($props as $prop => $value)
+
+		foreach ($props as $prop => $value)
 		{
 			if ($value)
 			{
@@ -70,24 +71,26 @@ class Form_ReachProfileCredit extends Zend_Form_SubForm
 		}
 
 	}
-	
-	public function getObject($properties) {
+
+	public function getObject($properties)
+	{
 		$objectClass = $properties["objectType"];
-		if($objectClass == "Null")
+		if ($objectClass == "Null")
 			return new Kaltura_Client_Type_UrlTokenizer();
 
 		$object = new $objectClass();
-		$object->allowOverage=false;
+		$object->allowOverage = false;
 
- 		foreach($properties as $prop => $value) {
-			if($prop == "objectType")
+		foreach ($properties as $prop => $value)
+		{
+			if ($prop == "objectType")
 				continue;
 			$object->$prop = $value;
 		}
 
 		if (!empty($properties['overageCredit']))
-			$object->allowOverage=true;
-		
+			$object->allowOverage = true;
+
 		return $object;
 	}
 }

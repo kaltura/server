@@ -40,10 +40,7 @@ class Form_RulesSubForm extends ConfigureSubForm
 
 	public function isValid($data)
 	{
-		if ($data['ReachProfileRules'])
-			return true;
-		else
-			return false;
+		return ($data['ReachProfileRules']);
 	}
 
 }

@@ -18,8 +18,8 @@ class ReachProfileCreditConfigureAction extends ReachProfileConfigureAction
 		$action->getHelper('layout')->disableLayout();
 		$type = $action->getRequest()->getParam('creditHandlerClass');
 		$form = $this->getCreditHandlerForm($type);
-		if(is_null($form))
-			throw new Exception("Can't instantiate reach profile credit form of type $form");
+		if (is_null($form))
+			throw new Exception("Can't instantiate reach profile credit form of type $type");
 
 		$action->view->form = $form;
 		$action->view->form->updateCreditOptions($this->getReachProfileCreditClasses($action));

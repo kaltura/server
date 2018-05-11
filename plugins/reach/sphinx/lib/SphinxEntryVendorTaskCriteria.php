@@ -2,20 +2,21 @@
 
 class SphinxEntryVendorTaskCriteria extends SphinxCriteria
 {
-	public function getIndexObjectName() {
+	public function getIndexObjectName()
+	{
 		return "EntryVendorTaskIndex";
 	}
-	
+
 	public function hasPeerFieldName($fieldName)
 	{
-		if(strpos($fieldName, '.') === false)
+		if (strpos($fieldName, '.') === false)
 		{
 			$fieldName = strtoupper($fieldName);
 			$fieldName = "entry_vendor_task.$fieldName";
 		}
-		
+
 		$entryVendorTaskFields = EntryVendorTaskPeer::getFieldNames(BasePeer::TYPE_COLNAME);
-		
+
 		return in_array($fieldName, $entryVendorTaskFields);
 	}
 
@@ -25,15 +26,15 @@ class SphinxEntryVendorTaskCriteria extends SphinxCriteria
 	protected function applyFilterFields(baseObjectFilter $filter)
 	{
 		/* @var $filter EntryVendorTaskFilter */
-		
-		if($filter->get('_free_text'))
+
+		if ($filter->get('_free_text'))
 		{
 			$this->sphinxSkipped = false;
 			$freeTexts = $filter->get('_free_text');
 			$this->addFreeTextToMatchClauseByMatchFields($freeTexts, EntryVendorTaskFilter::FREE_TEXT_FIELDS);
 		}
 		$filter->unsetByName('_free_text');
-		
+
 		return parent::applyFilterFields($filter);
 	}
 

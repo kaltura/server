@@ -8,12 +8,12 @@ class kReachFlowManager implements kBatchJobStatusEventConsumer
 	 */
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
 	{
-		if($dbBatchJob->getJobType() == ReachPlugin::getBatchJobTypeCoreValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV))
+		if ($dbBatchJob->getJobType() == ReachPlugin::getBatchJobTypeCoreValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV))
 			return true;
-				
+
 		return false;
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
@@ -22,30 +22,32 @@ class kReachFlowManager implements kBatchJobStatusEventConsumer
 		$dbBatchJobLock = $dbBatchJob->getBatchJobLock();
 		try
 		{
-			if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED || $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FATAL)	{
+			if ($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED || $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FATAL)
+			{
 				kJobsManager::abortChildJobs($dbBatchJob);
 			}
 
 			$jobType = $dbBatchJob->getJobType();
-			switch($jobType)
+			switch ($jobType)
 			{
 				case ReachPlugin::getBatchJobTypeCoreValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV):
-					$dbBatchJob=$this->updatedEntryVendorTasksCsv($dbBatchJob, $dbBatchJob->getData());
+					$dbBatchJob = $this->updatedEntryVendorTasksCsv($dbBatchJob, $dbBatchJob->getData());
 					break;
 				default:
 					break;
 			}
 
-			if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_RETRY) {
-				if($dbBatchJobLock && $dbBatchJobLock->getExecutionAttempts() >= BatchJobLockPeer::getMaxExecutionAttempts($jobType))
+			if ($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_RETRY)
+			{
+				if ($dbBatchJobLock && $dbBatchJobLock->getExecutionAttempts() >= BatchJobLockPeer::getMaxExecutionAttempts($jobType))
 					$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FAILED);
 			}
 
 		}
-		catch ( Exception $ex )
+		catch (Exception $ex)
 		{
 			self::alert($dbBatchJob, $ex);
-			KalturaLog::err( "Error:" . $ex->getMessage() );
+			KalturaLog::err("Error:" . $ex->getMessage());
 		}
 
 		return true;
@@ -55,25 +57,25 @@ class kReachFlowManager implements kBatchJobStatusEventConsumer
 	protected static function alert(BatchJob $dbBatchJob, Exception $exception)
 	{
 		$jobData = new kMailJobData();
-		$jobData->setMailPriority( kMailJobData::MAIL_PRIORITY_HIGH);
+		$jobData->setMailPriority(kMailJobData::MAIL_PRIORITY_HIGH);
 		$jobData->setStatus(kMailJobData::MAIL_STATUS_PENDING);
 
-		KalturaLog::alert("Error in job [{$dbBatchJob->getId()}]\n".$exception);
+		KalturaLog::alert("Error in job [{$dbBatchJob->getId()}]\n" . $exception);
 
-		$jobData->setMailType(90); // is the email template
+		$jobData->setMailType(ReachMailType::MAIL_TYPE_ENTRY_VENDOR_TASKS_CSV); // is the email template
 		$jobData->setBodyParamsArray(array($dbBatchJob->getId(), $exception->getFile(), $exception->getLine(), $exception->getMessage(), $exception->getTraceAsString()));
 
 		$jobData->setFromEmail(kConf::get("batch_alert_email"));
 		$jobData->setFromName(kConf::get("batch_alert_name"));
 		$jobData->setRecipientEmail(kConf::get("batch_alert_email"));
-		$jobData->setSubjectParamsArray( array() );
+		$jobData->setSubjectParamsArray(array());
 
 		kJobsManager::addJob($dbBatchJob->createChild(BatchJobType::MAIL, $jobData->getMailType()), $jobData, BatchJobType::MAIL, $jobData->getMailType());
 	}
 
 	protected function updatedEntryVendorTasksCsv(BatchJob $dbBatchJob, kEntryVendorTaskCsvJobData $data)
 	{
-		switch($dbBatchJob->getStatus())
+		switch ($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
 				return self::handleEntryVendorTasksCsvFinished($dbBatchJob, $data);
@@ -85,13 +87,13 @@ class kReachFlowManager implements kBatchJobStatusEventConsumer
 	public static function handleEntryVendorTasksCsvFinished(BatchJob $dbBatchJob, kEntryVendorTaskCsvJobData $data)
 	{
 		// Move file from shared temp to it's final location
-		$fileName =  basename($data->getOutputPath());
-		$directory =  myContentStorage::getFSContentRootPath() . "/content/entryVendorTasksCsv/" . $dbBatchJob->getPartnerId() ;
-		if(!file_exists($directory))
+		$fileName = basename($data->getOutputPath());
+		$directory = myContentStorage::getFSContentRootPath() . "/content/entryVendorTasksCsv/" . $dbBatchJob->getPartnerId();
+		if (!file_exists($directory))
 			kFile::fullMkfileDir($directory);
 		$filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
 
-		if(!$data->getOutputPath())
+		if (!$data->getOutputPath())
 			throw new APIException(APIErrors::FILE_CREATION_FAILED, "file path not found");
 
 		KalturaLog::info("Trying to move entry vendor tasks csv file from: " . $data->getOutputPath() . " to: " . $filePath);
@@ -130,11 +132,11 @@ class kReachFlowManager implements kBatchJobStatusEventConsumer
 	}
 
 
-	protected static function createEntryVendorTasksCsvDownloadUrl ($partner_id, $file_name)
+	protected static function createEntryVendorTasksCsvDownloadUrl($partner_id, $file_name)
 	{
 		$ksStr = "";
-		$partner = PartnerPeer::retrieveByPK ($partner_id);
-		$secret = $partner->getSecret ();
+		$partner = PartnerPeer::retrieveByPK($partner_id);
+		$secret = $partner->getSecret();
 		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
 		//ks will expire after 24 hours
 		$expiry = 86400;
@@ -144,7 +146,7 @@ class kReachFlowManager implements kBatchJobStatusEventConsumer
 			throw new APIException(APIErrors::START_SESSION_ERROR, $partner);
 
 		//url is built with DC url in order to be directed to the same DC of the saved file
-		$url = kDataCenterMgr::getCurrentDcUrl() . self::SERVE_CSV_PARTIAL_URL ."$ksStr/id/$file_name";
+		$url = kDataCenterMgr::getCurrentDcUrl() . self::SERVE_CSV_PARTIAL_URL . "$ksStr/id/$file_name";
 
 		return $url;
 	}

@@ -21,6 +21,7 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 	{
 		return KalturaBatchJobType::ENTRY_VENDOR_TASK_CSV;
 	}
+
 	/**
 	 * (non-PHPdoc)
 	 * @see KBatchBase::getJobType()
@@ -49,18 +50,18 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		// Create local path for csv generation
 		$directory = self::$taskConfig->params->localTempPath . DIRECTORY_SEPARATOR . $job->partnerId;
 		KBatchBase::createDir($directory);
-		$filePath = $directory . DIRECTORY_SEPARATOR . 'reachTasks_' .date("Ymd"). '.csv';
+		$filePath = $directory . DIRECTORY_SEPARATOR . 'reachTasks_' . date("Ymd") . '.csv';
 		$data->outputPath = $filePath;
 		KalturaLog::info("Temp file path: [$filePath]");
 
 		//fill the csv with users data
-		$csvFile = fopen($filePath,"w");
+		$csvFile = fopen($filePath, "w");
 		$this->fillEntryVendorTasksCsv($csvFile, $data);
 		fclose($csvFile);
 		$this->setFilePermissions($filePath);
 		self::unimpersonate();
 
-		if($this->apiError)
+		if ($this->apiError)
 		{
 			$e = $this->apiError;
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $e->getCode(), $e->getMessage(), KalturaBatchJobStatus::RETRY);
@@ -75,8 +76,9 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 	/**
 	 * the function move the file to the shared location
 	 */
-	protected function moveFile(KalturaBatchJob $job, KalturaEntryVendorTaskCsvJobData $data, $partnerId) {
-		$fileName =  basename($data->outputPath);
+	protected function moveFile(KalturaBatchJob $job, KalturaEntryVendorTaskCsvJobData $data, $partnerId)
+	{
+		$fileName = basename($data->outputPath);
 		$directory = self::$taskConfig->params->sharedTempPath . DIRECTORY_SEPARATOR . $partnerId . DIRECTORY_SEPARATOR;
 		KBatchBase::createDir($directory);
 		$sharedLocation = $directory . $fileName;
@@ -86,7 +88,7 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		$data->outputPath = $sharedLocation;
 
 		$this->setFilePermissions($sharedLocation);
-		if(!$this->checkFileExists($sharedLocation, $fileSize))
+		if (!$this->checkFileExists($sharedLocation, $fileSize))
 		{
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'Failed to move users csv file', KalturaBatchJobStatus::RETRY);
 		}
@@ -97,7 +99,7 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 	/**
 	 * The function fills the csv file with the users data
 	 */
-	private function fillEntryVendorTasksCsv(&$csvFile,&$data)
+	private function fillEntryVendorTasksCsv(&$csvFile, &$data)
 	{
 		$filter = clone $data->filter;
 		$pager = new KalturaFilterPager();
@@ -105,12 +107,12 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		$pager->pageIndex = 1;
 
 		$this->addHeaderRowToCsv($csvFile);
-		$lastCreatedAt=0;
-		$totalCount=0;
+		$lastCreatedAt = 0;
+		$totalCount = 0;
 		$filter->orderBy = KalturaEntryVendorTaskOrderBy::CREATED_AT_ASC;
 		do
 		{
-			if($lastCreatedAt)
+			if ($lastCreatedAt)
 			{
 				$filter->createdAtGreaterThanOrEqual = $lastCreatedAt;
 			}
@@ -119,7 +121,7 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 				$entryVendorTaskList = KBatchBase::$kClient->entryVendorTask->listAction($filter, $pager);
 				$returnedSize = count($entryVendorTaskList->objects);
 			}
-			catch(Exception $e)
+			catch (Exception $e)
 			{
 				KalturaLog::info("Couldn't list entry Vendor Tasks on page: [$pager->pageIndex]" . $e->getMessage());
 				$this->apiError = $e;
@@ -128,13 +130,12 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 
 			$this->addEntryVendorTasksToCsv($entryVendorTaskList->objects, $csvFile);
 			$tasksCount = count($entryVendorTaskList->objects);
-			$totalCount+=$tasksCount;
-			KalturaLog::debug("Adding More - $tasksCount totalCount - ". $totalCount);
+			$totalCount += $tasksCount;
+			KalturaLog::debug("Adding More - $tasksCount totalCount - " . $totalCount);
 			unset($entryVendorTaskList);
-			if(function_exists('gc_collect_cycles')) // php 5.3 and above
+			if (function_exists('gc_collect_cycles')) // php 5.3 and above
 				gc_collect_cycles();
-		}
-		while ($pager->pageSize == $returnedSize);
+		} while ($pager->pageSize == $returnedSize);
 	}
 
 
@@ -154,8 +155,8 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 	 */
 	private function addEntryVendorTasksToCsv(&$entryVendorTasks, &$csvFile)
 	{
-		if(!$entryVendorTasks)
-			return ;
+		if (!$entryVendorTasks)
+			return;
 
 		$entryVendorTasksIds = array();
 		$entryVendorTaskIdToRow = array();
@@ -166,7 +167,7 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 			$entryVendorTaskIdToRow = $this->initializeCsvRowValues($entryVendorTask, $entryVendorTaskIdToRow);
 		}
 
-		foreach ($entryVendorTaskIdToRow as $key=>$val)
+		foreach ($entryVendorTaskIdToRow as $key => $val)
 			fputcsv($csvFile, $val);
 	}
 

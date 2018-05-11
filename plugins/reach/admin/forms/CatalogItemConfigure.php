@@ -10,7 +10,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 	protected $catalogItemServiceType;
 	protected $catalogItemTurnAroundTime;
 
-	public function __construct($type = null ,$catalogItemServiceType = null, $catalogItemTurnAroundTime = null,  $disableAttributes = null)
+	public function __construct($type = null, $catalogItemServiceType = null, $catalogItemTurnAroundTime = null, $disableAttributes = null)
 	{
 		$this->catalogItemType = $type;
 		$this->catalogItemServiceType = $catalogItemServiceType;
@@ -27,38 +27,38 @@ class Form_CatalogItemConfigure extends ConfigureForm
 
 		$titleElement = new Zend_Form_Element_Hidden('generalTitle');
 		$titleElement->setLabel('General');
-		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
+		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag', array('tag' => 'b'))));
 		$this->addElement($titleElement);
 
 		$this->addElement('text', 'id', array(
-			'label'			=> 'ID:',
-			'filters'		=> array('StringTrim'),
-			'readonly'		=> true,
-			'disabled'		=> 'disabled',
+			'label' => 'ID:',
+			'filters' => array('StringTrim'),
+			'readonly' => true,
+			'disabled' => 'disabled',
 		));
 
 		$this->addElement('text', 'vendorPartnerId', array(
-			'label' 		=> 'Vendor Partner ID:',
-			'required'		=> true,
-			'filters'		=> array('StringTrim'),
+			'label' => 'Vendor Partner ID:',
+			'required' => true,
+			'filters' => array('StringTrim'),
 			'placement' => 'prepend',
-			'readonly'		=> $this->disableAttributes,
+			'readonly' => $this->disableAttributes,
 		));
 
 		$this->addElement('text', 'name', array(
-			'label' 		=> 'Name:',
-			'required'		=> true,
-			'filters'		=> array('StringTrim'),
+			'label' => 'Name:',
+			'required' => true,
+			'filters' => array('StringTrim'),
 			'placement' => 'prepend',
-			'readonly'		=> $this->disableAttributes,
+			'readonly' => $this->disableAttributes,
 		));
 
 		$this->addElement('text', 'systemName', array(
-			'label' 		=> 'System Name:',
-			'required'		=> true,
-			'filters'		=> array('StringTrim'),
+			'label' => 'System Name:',
+			'required' => true,
+			'filters' => array('StringTrim'),
 			'placement' => 'prepend',
-			'readonly'		=> $this->disableAttributes,
+			'readonly' => $this->disableAttributes,
 		));
 
 		$catalogItemForView = new Kaltura_Form_Element_EnumSelect('serviceFeature', array('enum' => 'Kaltura_Client_Reach_Enum_VendorServiceFeature'));
@@ -67,7 +67,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			$catalogItemForView->setValue($this->catalogItemType);
 		else
 			$catalogItemForView->setValue(Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS);
-		$catalogItemForView->setAttrib('disabled','disabled');
+		$catalogItemForView->setAttrib('disabled', 'disabled');
 		$this->addElement($catalogItemForView);
 
 		$serviceTypeForView = new Kaltura_Form_Element_EnumSelect('serviceType', array('enum' => 'Kaltura_Client_Reach_Enum_VendorServiceType'));
@@ -78,7 +78,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		else
 			$serviceTypeForView->setValue(Kaltura_Client_Reach_Enum_VendorServiceType::HUMAN);
 
-		$this->addElement($serviceTypeForView );
+		$this->addElement($serviceTypeForView);
 
 		$turnAroundTimeForView = new Kaltura_Form_Element_EnumSelect('turnAroundTime', array('enum' => 'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime'));
 		$turnAroundTimeForView->setLabel('Turn Around Time:');
@@ -87,13 +87,13 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			$turnAroundTimeForView->setValue($this->catalogItemTurnAroundTime);
 		else
 			$turnAroundTimeForView->setValue(Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::BEST_EFFORT);
-		$this->addElement($turnAroundTimeForView );
+		$this->addElement($turnAroundTimeForView);
 
 		$sourceLanguage = new Kaltura_Form_Element_EnumSelect('sourceLanguage', array('enum' => 'Kaltura_Client_Reach_Enum_CatalogItemLanguage'));
 		$sourceLanguage->setLabel('Source Language:');
 		$sourceLanguage->setRequired(true);
 		$sourceLanguage->setValue(Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN);
-		$this->addElement($sourceLanguage );
+		$this->addElement($sourceLanguage);
 
 		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
 		{
@@ -108,9 +108,9 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$outputFormat->setLabel('Output Format:');
 		$outputFormat->setRequired(true);
 		$outputFormat->setValue(Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::SRT);
-		$this->addElement($outputFormat );
+		$this->addElement($outputFormat);
 
-		$enableSpeakerId = new Kaltura_Form_Element_EnumSelect('enableSpeakerId', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 	'excludes' => array (
+		$enableSpeakerId = new Kaltura_Form_Element_EnumSelect('enableSpeakerId', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 'excludes' => array(
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
 		$enableSpeakerId->setLabel('Enable Speaker ID:');
 		$enableSpeakerId->setRequired(true);
@@ -121,23 +121,23 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$this->addTitle('Pricing:');
 
 		$this->addElement('text', 'fixedPriceAddons', array(
-			'label' 		=> 'Fixed Price Addons:',
-			'filters' 		=> array('StringTrim'),
+			'label' => 'Fixed Price Addons:',
+			'filters' => array('StringTrim'),
 			'placement' => 'prepend',
-			'readonly'		=> $this->disableAttributes,
+			'readonly' => $this->disableAttributes,
 		));
 
 		$pricingSubForm = new Form_VendorCatalogItemPricing(array('DisableLoadDefaultDecorators' => true));
 		if ($this->disableAttributes)
-			$pricingSubForm->setAttrib('disabled',$this->disableAttributes);
+			$pricingSubForm->setAttrib('disabled', $this->disableAttributes);
 
 		$this->addSubForm($pricingSubForm, "pricing");
 		$this->getSubForm("pricing")->removeDecorator("DtDdWrapper");
 
 		$this->addElement('hidden', 'type', array(
-			'filters' 		=> array('StringTrim'),
-			'decorators'    => array('ViewHelper'),
-			'value'			=> $this->catalogItemType,
+			'filters' => array('StringTrim'),
+			'decorators' => array('ViewHelper'),
+			'value' => $this->catalogItemType,
 		));
 	}
 
@@ -146,7 +146,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		parent::populateFromObject($object, $add_underscore);
 
 		$props = $object;
-		if(is_object($object))
+		if (is_object($object))
 			$props = get_object_vars($object);
 
 		$allElements = $this->getElements();
@@ -155,8 +155,9 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			if ($element instanceof Kaltura_Form_Element_EnumSelect)
 			{
 				$elementName = $element->getName();
-				if (isset($props[$elementName])) {
-				    $element->setValue(array($props[$elementName]));
+				if (isset($props[$elementName]))
+				{
+					$element->setValue(array($props[$elementName]));
 				}
 			}
 		}
@@ -180,20 +181,8 @@ class Form_CatalogItemConfigure extends ConfigureForm
 
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
-		$object = parent::getObject($objectType, $properties, $add_underscore,$include_empty_fields);
-		
-		if ($properties['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
-		{
-//			$languages = $properties['TargetLanguages'];
-//			$languagesArray = array();
-//			foreach (json_decode($languages) as $language)
-//			{
-//				$languageItem = new Kaltura_Client_Reach_Type_LanguageItem();
-//				$languageItem->language = $language->language;
-//				$languagesArray[] = $languageItem;
-//			}
-//			$object->targetLanguages = $languagesArray;
-		}
+		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
+
 		return $object;
 	}
 }

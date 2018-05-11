@@ -30,7 +30,8 @@ class ReachProfileConfigureAction extends KalturaApplicationPlugin
 				$form = $this->handleExistingReachProfile($action, $reachProfileId, $partnerId);
 			else
 				$form = $this->handleNewReachProfile($action, $partnerId);
-		} catch (Exception $e)
+		}
+		catch (Exception $e)
 		{
 			KalturaLog::err($e->getMessage() . "\n" . $e->getTraceAsString());
 			$action->view->errMessage = $e->getMessage();
@@ -81,7 +82,7 @@ class ReachProfileConfigureAction extends KalturaApplicationPlugin
 		$defaultCreditObj = null;
 		if (isset($formData['reachProfileCredit']))
 			$defaultCreditObj = $formData['reachProfileCredit']['objectType'];
-			
+
 		$creditHandlerClass = $this->_getParam('creditHandlerClass') != 'Null' ? $this->_getParam('creditHandlerClass') : $defaultCreditObj;
 		$form = $this->initForm($action, $partnerId, null, $creditHandlerClass);
 		$form->populate($formData);
@@ -182,6 +183,7 @@ class ReachProfileConfigureAction extends KalturaApplicationPlugin
 
 		$reachProfile->rules = $filteredRules;
 	}
+
 	/**
 	 * @param Zend_Controller_Action $action
 	 * @param $partnerId
@@ -207,15 +209,17 @@ class ReachProfileConfigureAction extends KalturaApplicationPlugin
 
 		$creditHandlerForm = $this->getCreditHandlerForm($creditHandlerClass);
 
-		if(is_null($creditHandlerForm))
+		if (is_null($creditHandlerForm))
 			throw new Exception("Can't instantiate reach profile credit form of type $creditHandlerClass");
 		$creditHandlerForm->updateCreditOptions($this->getReachProfileCreditClasses($action));
 		$form->addSubForm($creditHandlerForm, "reachProfileCredit");
 		return $form;
 	}
 
-	protected function getCreditHandlerForm($type) {
-		switch($type) {
+	protected function getCreditHandlerForm($type)
+	{
+		switch ($type)
+		{
 			case 'Null':
 				return new Form_ReachProfileNullCredit();
 			case 'Kaltura_Client_Reach_Type_VendorCredit':
@@ -236,15 +240,16 @@ class ReachProfileConfigureAction extends KalturaApplicationPlugin
 		$action->getHelper('layout')->disableLayout();
 		$type = $action->getRequest()->getParam('creditHandlerClass');
 		$form = $this->getCreditHandlerForm($type);
-		if(is_null($form))
-			throw new Exception("Can't instantiate reach profile credit form of type $form");
+		if (is_null($form))
+			throw new Exception("Can't instantiate reach profile credit form of type $type");
 
 		$action->view->form = $form;
 		$action->view->form->updateCreditOptions($this->getReachProfileCreditClasses($action));
 		$action->view->form->getElement("objectType")->setValue($type);
 	}
 
-	protected function getReachProfileCreditClasses($action) {
+	protected function getReachProfileCreditClasses($action)
+	{
 		$credits = array();
 		$credits['Null'] = $action->view->translate('Choose Credit Type');
 		$credits['Kaltura_Client_Reach_Type_VendorCredit'] = $action->view->translate('Kaltura_Client_Reach_Type_VendorCredit');

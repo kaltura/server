@@ -46,12 +46,13 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 
 	private function addDateToFilter($profile)
 	{
-		if (self::startsWith($profile->name, 'MR_')) { //as sub task of MR profile
+		if (self::startsWith($profile->name, 'MR_'))
+		{ //as sub task of MR profile
 			//first item on advancedSearch is for the MRP
 			//in the MRP filter: first item is for entry status, second is for MR status
 			$value = self::getMrAdvancedSearchFilter($profile)->items[1]->value;
 			$updatedDay = self::getUpdateDay($profile->description);
-			$profile->objectFilter->advancedSearch->items[0]->items[1]->value = $value. "," . $updatedDay;
+			$profile->objectFilter->advancedSearch->items[0]->items[1]->value = $value . "," . $updatedDay;
 		}
 	}
 
@@ -64,7 +65,7 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 	{
 		foreach ($tasksCompleted as $task)
 		{
-			if(in_array($task, self::$dontUpdateMetaDataTaskTypes))
+			if (in_array($task, self::$dontUpdateMetaDataTaskTypes))
 				return false;
 		}
 
@@ -80,18 +81,19 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 		$xml = ($metadata && $metadata->xml) ? $metadata->xml : null;
 		if ($profile->systemName == "MRP") //as the first schedule task running in this MRP
 			$xml = $this->addMetadataXmlField($profile->id, $xml, $error);
-		elseif (self::startsWith($profile->name, 'MR_')) { //sub task of MRP
+		elseif (self::startsWith($profile->name, 'MR_'))
+		{ //sub task of MRP
 			$arr = explode(",", self::getMrAdvancedSearchFilter($profile)->items[1]->value);
 			$xml = $this->updateMetadataXmlField($arr[0], $arr[1] + 1, $xml, $error);
 		}
 
 		try
 		{
-			$xml = $xml ? $xml->asXML(): null;
+			$xml = $xml ? $xml->asXML() : null;
 			if ($metadata && $metadata->id)
 				$result = $metadataPlugin->metadata->update($metadata->id, $xml);
 			else
-				$result = $metadataPlugin->metadata->add($metadataProfileId, KalturaMetadataObjectType::ENTRY,$object->id, $xml);
+				$result = $metadataPlugin->metadata->add($metadataProfileId, KalturaMetadataObjectType::ENTRY, $object->id, $xml);
 
 		}
 		catch (Exception $e)
@@ -99,7 +101,7 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 			if (self::getMediaRepurposingProfileTaskType($profile) == ObjectTaskType::DELETE_ENTRY)
 				return null; //delete entry should get exception when update metadata for deleted entry
 
-			throw new KalturaException("Error in metadata for entry [$object->id] with ". $e->getMessage(),
+			throw new KalturaException("Error in metadata for entry [$object->id] with " . $e->getMessage(),
 				KalturaBatchJobAppErrors::MEDIA_REPURPOSING_FAILED, null);
 		}
 
@@ -112,7 +114,7 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 		$filter->metadataProfileIdEqual = $metadataProfileId;
 		$filter->objectIdEqual = $objectId;
 		$metadataPlugin = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
-		$result =  $metadataPlugin->metadata->listAction($filter, null);
+		$result = $metadataPlugin->metadata->listAction($filter, null);
 		if ($result->totalCount > 0)
 			return $result->objects[0];
 		return null;
@@ -137,9 +139,9 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 		if (!$xml || !$xml->MRPData)
 			return $this->createFirstMr($mrId, $xml, $error);
 
-		$newVal = "$mrId,1," .self::getUpdateDay();
+		$newVal = "$mrId,1," . self::getUpdateDay();
 		if ($error)
-			$newVal = "$mrId,Error,1," .self::getUpdateDay();
+			$newVal = "$mrId,Error,1," . self::getUpdateDay();
 
 		$xml->MRPData[] = $newVal;
 		$target_dom = dom_import_simplexml(current($xml->xpath('//MRPsOnEntry[last()]')));
@@ -156,9 +158,9 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 			$xml->addChild('Status', 'Enabled');
 		$xml->addChild('MRPsOnEntry', "MR_$mrId");
 		if ($error)
-			$xml->addChild('MRPData', "$mrId,Error,1," .self::getUpdateDay());
+			$xml->addChild('MRPData', "$mrId,Error,1," . self::getUpdateDay());
 		else
-			$xml->addChild('MRPData', "$mrId,1," .self::getUpdateDay());
+			$xml->addChild('MRPData', "$mrId,1," . self::getUpdateDay());
 		return $xml;
 	}
 
@@ -175,7 +177,7 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 		{
 			$mprsData = $xml->xpath('/metadata/MRPData');
 			for ($i = 0; $i < count($mprsData); $i++)
-				if (self::startsWith($mprsData[$i], $mrId.","))
+				if (self::startsWith($mprsData[$i], $mrId . ","))
 					$mprsData[$i][0] = $newVal;
 		}
 
@@ -187,27 +189,4 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 		return $profile->objectTasks[0]->type;
 	}
 
-	//Redundant - check if should be deleted
-//	private function getMrProfileId(KalturaScheduledTaskProfile $profile)
-//	{
-//		if ($profile->systemName == "MRP")
-//			return $profile->id;
-//		if (self::startsWith($profile->name, 'MR_')) {
-//			$arr = explode(",", self::getMrAdvancedSearchFilter($profile)->items[1]->value);
-//			return $arr[0];
-//		}
-//		return null;
-//	}
-
-	//Redundant - check if should be deleted
-//	private function getMediaRepurposingProfileName(KalturaScheduledTaskProfile $profile)
-//	{
-//		if ($profile->systemName == "MRP")
-//			return $profile->name;
-//		if (self::startsWith($profile->name, 'MR_')) {
-//			$arr = explode("_", $profile->name);
-//			return $arr[1];
-//		}
-//		return null;
-//	}
 }
