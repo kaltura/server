@@ -59,7 +59,7 @@
 	</package>
 	<package>
 		<id>100</id>
-		<name>Kaltura Developer Trail</name>
+		<name>Kaltura Developer Trial</name>
 		<cycle_type>1</cycle_type>
 		<cycle_bw>25</cycle_bw>
 		<cycle_storage>5</cycle_storage>
