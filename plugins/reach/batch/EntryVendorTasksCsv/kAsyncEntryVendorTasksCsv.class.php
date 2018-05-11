@@ -84,7 +84,7 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		$sharedLocation = $directory . $fileName;
 
 		$fileSize = kFile::fileSize($data->outputPath);
-		rename($data->outputPath, $sharedLocation);
+		kFile::moveFile($data->outputPath, $sharedLocation);
 		$data->outputPath = $sharedLocation;
 
 		$this->setFilePermissions($sharedLocation);

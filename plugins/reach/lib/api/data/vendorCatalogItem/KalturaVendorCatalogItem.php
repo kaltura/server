@@ -188,6 +188,10 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 			default:
 				$object = new KalturaVendorCaptionsCatalogItem();
 		}
+		
+		if (!$object)
+			return null;
+		
 		/* @var $object KalturaVendorCatalogItem */
 		$object->fromObject($sourceObject, $responseProfile);
 		return $object;
