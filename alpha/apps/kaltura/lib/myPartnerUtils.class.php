@@ -2069,7 +2069,6 @@ class myPartnerUtils
 		if(in_array($partner->getPartnerPackage(), $freeTrialTypes))
 		{
 			$entriesNum = $partner->getEntriesChangedByPartnerNum() + 1;
-			$partner->setEntriesChangedByPartnerNum($entriesNum);
 			$partner->save();
 		}
 
