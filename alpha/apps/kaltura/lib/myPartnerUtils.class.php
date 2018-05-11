@@ -1946,13 +1946,14 @@ class myPartnerUtils
 	public static function getCategoriesNumForPartner($partnerId, $onlyActive = true)
 	{
 		categoryPeer::setUseCriteriaFilter(false);
-		$c = new Criteria();
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 		$c->addAnd(categoryPeer::PARTNER_ID, $partnerId);
 		if($onlyActive)
 			$c->addAnd(categoryPeer::STATUS, CategoryStatus::ACTIVE);
-		$categoriesNum = categoryPeer::doCount($c);
+		$c->applyFilters();
+		$totalCount = $c->getRecordsCount();
 		categoryPeer::setUseCriteriaFilter(true);
-		return $categoriesNum;
+		return $totalCount;
 	}
 
 	/**
@@ -1965,13 +1966,14 @@ class myPartnerUtils
 	public static function getEntriesNumForPartner($partnerId, $onlyReady = true)
 	{
 		entryPeer::setUseCriteriaFilter(false);
-		$c = new Criteria();
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$c->addAnd(entryPeer::PARTNER_ID, $partnerId);
 		if($onlyReady)
 			$c->addAnd(entryPeer::STATUS, entryStatus::READY);
-		$entriesNum = entryPeer::doCount($c);
+		$c->applyFilters();
+		$totalCount = $c->getRecordsCount();
 		entryPeer::setUseCriteriaFilter(true);
-		return $entriesNum;
+		return $totalCount;
 	}
 
 	/**
@@ -1984,13 +1986,15 @@ class myPartnerUtils
 	public static function getMetadataObjectsNumForPartner($partnerId, $onlyValid = true)
 	{
 		MetadataPeer::setUseCriteriaFilter(false);
-		$c = new Criteria();
-		$c->addAnd(metadataPeer::PARTNER_ID, $partnerId);
+		$c = KalturaCriteria::create(MetadataPeer::OM_CLASS);
+		$c->addAnd(MetadataPeer::PARTNER_ID, $partnerId);
 		if($onlyValid)
 			$c->addAnd(MetadataPeer::STATUS, Metadata::STATUS_VALID);
-		$metadataNum = MetadataPeer::doCount($c);
+		$c->setGroupByColumn('created_at');
+		$c->applyFilters();
+		$totalCount = $c->getRecordsCount();
 		MetadataPeer::setUseCriteriaFilter(true);
-		return $metadataNum;
+		return $totalCount;
 	}
 
 	/**

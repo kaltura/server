@@ -41,8 +41,6 @@ class myBatchPartnerUsage extends myBatchBase
 				KalturaLog::debug( "Looping ". count($partners) ." partners" );
 				foreach($partners as $partner)
 				{
-					myPartnerUtils::getNumOfCategoriesCreatedByPartner($partner);
-					myPartnerUtils::getNumOfEntriesCreatedByPartner($partner);
 					if(in_array($partnerPackage, $freeTrialTypes) && myPartnerUtils::isPartnerCreatedAsMonitoredFreeTrial($partner))
 					{
 						myPartnerUtils::doPartnerUsage($partner);
