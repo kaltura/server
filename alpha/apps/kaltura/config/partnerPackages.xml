@@ -59,7 +59,7 @@
 	</package>
 	<package>
 		<id>100</id>
-		<name>Kaltura Developer</name>
+		<name>Kaltura Developer Trail</name>
 		<cycle_type>1</cycle_type>
 		<cycle_bw>25</cycle_bw>
 		<cycle_storage>5</cycle_storage>
@@ -72,5 +72,25 @@
 		<trial_num_days_until_deletion>210</trial_num_days_until_deletion>
 		<notification_days>1,30,90,150,173,180</notification_days>
 		<cycle_bw_for_monitored_trial>500</cycle_bw_for_monitored_trial>
+	</package>
+
+	<package>
+		<id>101</id>
+		<name>Kaltura Developer PAYG</name>
+		<cycle_type>1</cycle_type>
+		<cycle_bw>20</cycle_bw>
+		<cycle_fee>50</cycle_fee>
+		<overage_fee>2.5</overage_fee>
+		<support_types>2</support_types>
+	</package>
+
+	<package>
+		<id>102</id>
+		<name>Kaltura Developer Commit</name>
+		<cycle_type>1</cycle_type>
+		<cycle_bw>20</cycle_bw>
+		<cycle_fee>50</cycle_fee>
+		<overage_fee>2.5</overage_fee>
+		<support_types>2</support_types>
 	</package>
 </packages>
