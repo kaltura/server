@@ -244,8 +244,8 @@ class categoryKuserIndex extends BaseIndexObject
         public static function getCacheInvalidationKeys($object = null)
         {
                 if (is_null($object))
-                        return array(array("category_kuser:id=%s", categoryKuserPeer::ID), array("category_kuser:partnerId=%s", categoryKuserPeer::PARTNER_ID));
+                        return array(array("category_kuser:partnerId=%s", categoryKuserPeer::PARTNER_ID));
                 else
-                        return array("category_kuser:id=" . strtolower($object->getId()), "category_kuser:partnerId=" . strtolower($object->getPartnerId()));
+                        return array("category_kuser:partnerId=" . strtolower($object->getPartnerId()));
         }
 }
