@@ -125,7 +125,10 @@ class DeliveryProfileService extends KalturaBaseService
 		DeliveryProfilePeer::setUseCriteriaFilter(false);
 		
 		$c = new Criteria();
-		$c->add(DeliveryProfilePeer::PARTNER_ID, array(0, kCurrentContext::getCurrentPartnerId()), Criteria::IN);
+		if (($filter->idEqual || $filter->idIn) && !($filter->partnerIdEqual || $filter->idIn))
+		{
+			$c->add(DeliveryProfilePeer::PARTNER_ID, array(0, kCurrentContext::getCurrentPartnerId()), Criteria::IN);
+		}
 		$delivery->attachToCriteria($c);
 		
 		$totalCount = DeliveryProfilePeer::doCount($c);
