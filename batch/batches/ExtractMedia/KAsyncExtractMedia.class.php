@@ -161,10 +161,23 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 			$outputFileName = pathinfo($filePath, PATHINFO_FILENAME) . ".data";
 			$localTempSyncPointsFilePath = self::$taskConfig->params->localTempPath . DIRECTORY_SEPARATOR . $outputFileName;
 			$sharedTempSyncPointFilePath = self::$taskConfig->params->sharedTempPath . DIRECTORY_SEPARATOR . $outputFileName;
-			
-			file_put_contents($localTempSyncPointsFilePath, serialize($syncPointArray));
-			
-			$this->moveDataFile($data, $localTempSyncPointsFilePath, $sharedTempSyncPointFilePath);
+
+			$retries = 3;
+			$interval = (self::$taskConfig->fileSystemCommandInterval ? self::$taskConfig->fileSystemCommandInterval : self::DEFAULT_SLEEP_INTERVAL);
+			while ($retries-- > 0)
+			{
+				if (kFile::setFileContent($localTempSyncPointsFilePath, serialize($syncPointArray)) &&
+					$this->moveDataFile($data, $localTempSyncPointsFilePath, $sharedTempSyncPointFilePath))
+						return true;
+				KalturaLog::log("Failed on moving syncPointArray to server, waiting $interval seconds");
+				sleep($interval);
+			}
+			throw new kTemporaryException("Failed on moving syncPointArray to server. temp path: {$localTempSyncPointsFilePath}");
+		}
+		catch(kTemporaryException $ktex)
+		{
+			$this->unimpersonate();
+			throw $ktex;
 		}
 		catch(Exception $ex) 
 		{
@@ -179,14 +192,20 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 		KalturaLog::debug("moving file from [$localTempSyncPointsFilePath] to [$sharedTempSyncPointFilePath]");
 		$fileSize = kFile::fileSize($localTempSyncPointsFilePath);
 		
-		kFile::moveFile($localTempSyncPointsFilePath, $sharedTempSyncPointFilePath, true);
+		$res = kFile::moveFile($localTempSyncPointsFilePath, $sharedTempSyncPointFilePath, true);
+		if (!$res)
+			return false;
 		clearstatcache();
 		
 		$this->setFilePermissions($sharedTempSyncPointFilePath);
 		if(!$this->checkFileExists($sharedTempSyncPointFilePath, $fileSize))
+		{
 			KalturaLog::warning("Failed to move file to [$sharedTempSyncPointFilePath]");
+			return false;
+		}
 		else
 			$data->destDataFilePath = $sharedTempSyncPointFilePath;
+		return true;
 	}
 
 	/*
