@@ -22,7 +22,7 @@ class KalturaESearchUserResult extends KalturaESearchResult
 	protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$object = new KalturaUser();
-		$object->fromObject($srcObj->getObject());
+		$object->fromObject($srcObj->getObject(), $responseProfile);
 		$this->object = $object;
 		return parent::doFromObject($srcObj, $responseProfile);
 	}
