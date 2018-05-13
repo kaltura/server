@@ -876,6 +876,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	{
 		$audioFlavorsArr = array(); 
 		$audio = null;
+		$firstAudioStream = null;
 		if ($this->hasAudioFlavors) {
 			$audio = ",AUDIO=\"audio\"";
 		}
@@ -885,7 +886,13 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		{
 			// Sperate audio flavors from video flavors
 			if ( isset($flavor['audioLanguage']) || isset($flavor['audioLabel']) ) {
-				$isFirstAudioStream = (count($audioFlavorsArr) == 0) ? "YES" : "NO";
+				if(count($audioFlavorsArr) == 0) {
+					$isFirstAudioStream = "YES";
+					$firstAudioStream = $flavor;
+				}
+				else
+					$isFirstAudioStream = "NO";
+
 				$language = (isset($flavor['audioLanguage'])) ? $flavor['audioLanguage'] : 'und';
 				$languageName = (isset($flavor['audioLabel'])) ? $flavor['audioLabel'] : $flavor['audioLanguageName'];
 				$content = "#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"audio\",LANGUAGE=\"{$language}\",NAME=\"{$languageName}\"" . 
@@ -893,29 +900,40 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 				$audioFlavorsArr[] = $content;
 			}
 			else {
-				$bitrate = $this->calculateBitRate($flavor);
-				$codecs = "";
-				$resolution = '';
-				if(isset($flavor['width']) && isset($flavor['height']) &&
-					(($flavor['width'] > 0) || ($flavor['height'] > 0)))
-				{
-					$width = $flavor['width'];
-					$height = $flavor['height'];
-					if ($width && $height)
-						$resolution = ",RESOLUTION={$width}x{$height}";
-				}
-				else if ($bitrate && $bitrate <= self::AUDIO_CODECS_BITRATE_THRESHOLD)
-					$codecs = ',CODECS="mp4a.40.2"';
-				$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}{$audio}\n";
-				$content .= $flavor['url'];
-				$flavorsArr[] = $content;
+				$flavorsArr[] = $this->addExtXStreamInf($flavor, $audio);
 			}
 		}
+
+		if ((count($flavorsArr) == 0) && isset($firstAudioStream))
+			$flavorsArr[] = $this->addExtXStreamInf($firstAudioStream, $audio);
+
 		if (count($audioFlavorsArr) > 0) {
 			return array_merge($audioFlavorsArr, array(''), $flavorsArr);
 		}		
 		return $flavorsArr;
 	}
+
+
+	private function addExtXStreamInf($flavor, $audio)
+	{
+		$bitrate = $this->calculateBitRate($flavor);
+		$codecs = "";
+		$resolution = '';
+		if(isset($flavor['width']) && isset($flavor['height']) &&
+			(($flavor['width'] > 0) || ($flavor['height'] > 0)))
+		{
+			$width = $flavor['width'];
+			$height = $flavor['height'];
+			if ($width && $height)
+				$resolution = ",RESOLUTION={$width}x{$height}";
+		}
+		else if ($bitrate && $bitrate <= self::AUDIO_CODECS_BITRATE_THRESHOLD)
+			$codecs = ',CODECS="mp4a.40.2"';
+		$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}{$audio}\n";
+		$content .= $flavor['url'];
+		return $content;
+	}
+
 
 	private function calculateBitRate($flavor)
 	{
