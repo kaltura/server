@@ -163,12 +163,14 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 			$sharedTempSyncPointFilePath = self::$taskConfig->params->sharedTempPath . DIRECTORY_SEPARATOR . $outputFileName;
 
 			$retries = 3;
+			$interval = (self::$taskConfig->fileSystemCommandInterval ? self::$taskConfig->fileSystemCommandInterval : self::DEFAULT_SLEEP_INTERVAL);
 			while ($retries-- > 0)
 			{
-				$res = kFile::setFileContent($localTempSyncPointsFilePath, serialize($syncPointArray));
-				$res = $res && $this->moveDataFile($data, $localTempSyncPointsFilePath, $sharedTempSyncPointFilePath);
-				if ($res)
-					return;
+				if (kFile::setFileContent($localTempSyncPointsFilePath, serialize($syncPointArray)) &&
+					$this->moveDataFile($data, $localTempSyncPointsFilePath, $sharedTempSyncPointFilePath))
+						return true;
+				KalturaLog::log("Failed on moving syncPointArray to server, waiting $interval seconds");
+				sleep($interval);
 			}
 			throw new kTemporaryException("Failed on moving syncPointArray to server. temp path: {$localTempSyncPointsFilePath}");
 		}

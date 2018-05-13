@@ -7,6 +7,7 @@
 abstract class KBatchBase implements IKalturaLogger
 {
 	const PRIVILEGE_BATCH_JOB_TYPE = "jobtype";
+	const DEFAULT_SLEEP_INTERVAL = 5;
 	
 	/**
 	 * @var KSchedularTaskConfig
@@ -618,7 +619,7 @@ abstract class KBatchBase implements IKalturaLogger
 	public static function pollingFileExists($fileName)
 	{
 		$retries = (self::$taskConfig->inputFileExistRetries ? self::$taskConfig->inputFileExistRetries : 10);
-		$interval = (self::$taskConfig->inputFileExistInterval ? self::$taskConfig->inputFileExistInterval : 5);
+		$interval = (self::$taskConfig->inputFileExistInterval ? self::$taskConfig->inputFileExistInterval : self::DEFAULT_SLEEP_INTERVAL);
 
 		for ($retry = 0; $retry < $retries; $retry++)
 		{
