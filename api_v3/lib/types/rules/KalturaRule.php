@@ -67,18 +67,6 @@ class KalturaRule extends KalturaObject
 	 * @var KalturaNullableBoolean
 	 */
 	public $forceAdminValidation;
-	
-	/**
-	 * Rule creation date as Unix timestamp (In seconds)
-	 * @var time
-	 */
-	public $ruleCreationTime;
-	
-	/**
-	 * The ID of the user who created the rule
-	 * @var string
-	 */
-	public $ruleCreator;
 
 	private static $mapBetweenObjects = array
 	(
@@ -91,8 +79,6 @@ class KalturaRule extends KalturaObject
 		'contexts',
 		'stopProcessing',
 		'forceAdminValidation',
-		'ruleCreationTime',
-		'ruleCreator',
 	);
 	
 	public function getMapBetweenObjects()
