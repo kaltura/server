@@ -297,11 +297,12 @@ class KImageMagickCropper extends KBaseCropper
 			}
 		}
 
-		if ($bgcolor != DEFAULT_BGCOLOR){
+		if ($bgcolor != DEFAULT_BGCOLOR	)
+		{
 			$bgcolor = sprintf('%06x', $bgcolor);
 			KalturaLog::debug('bgcolor is ' + $bgcolor);
 			$attributes[] = "-fill \"#{$bgcolor}\" -opaque none";
-        }
+       		}
 		if(!count($attributes))
 			return null;
 
