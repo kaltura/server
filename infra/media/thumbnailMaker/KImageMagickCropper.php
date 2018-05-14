@@ -302,7 +302,7 @@ class KImageMagickCropper extends KBaseCropper
 			$bgcolor = sprintf('%06x', $bgcolor);
 			KalturaLog::debug('bgcolor is ' + $bgcolor);
 			$attributes[] = "-fill \"#{$bgcolor}\" -opaque none";
-       		}
+		}
 		if(!count($attributes))
 			return null;
 
