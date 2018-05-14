@@ -20,6 +20,10 @@ class KImageMagickCropper extends KBaseCropper
 	 * 
 	 */
 	const CROP_AFTER_RESIZE = 6;
+
+        const DEFAULT_BGCOLOR = '0xffffff';
+
+
 	
 	protected $cmdPath;
 	protected $srcWidth;
@@ -45,9 +49,11 @@ class KImageMagickCropper extends KBaseCropper
 		parent::__construct($srcPath, $targetPath);
 	}
 	
-	protected function getCommand($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 1, $scaleHeight = 1, $bgcolor = 0xffffff, $density = 0, $forceRotation = null, $strip = false)
+	protected function getCommand($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 1, $scaleHeight = 1, $bgcolor = DEFAULT_BGCOLOR , $density = 0, $forceRotation = null, $strip = false)
 	{
-		$attributes = array();
+
+        KalturaLog::debug("I'm in getCommand right now!");
+        $attributes = array();
 
 		$exifData = @exif_read_data($this->srcPath);
 		$orientation = isset($exifData["Orientation"]) ? $exifData["Orientation"] : 1;
@@ -291,12 +297,19 @@ class KImageMagickCropper extends KBaseCropper
 				    break;
 			}
 		}
-		
+
+		if ($bgcolor != DEFAULT_BGCOLOR){
+			$bgcolor = sprintf('%06x', $bgcolor);
+			KalturaLog::debug('bgcolor is ' + $bgcolor);
+			$attributes[] = "-fill \"#{$bgcolor}\" -opaque none";
+        }
 		if(!count($attributes))
 			return null;
 
-		$options = implode(' ', $attributes);
 
+
+		$options = implode(' ', $attributes);
+        KalturaLog::debug($options);
 		$targetFileExtension = pathinfo($this->targetPath, PATHINFO_EXTENSION);
 		if ($targetFileExtension === 'gif')
 		{
