@@ -59,6 +59,11 @@ abstract class kManifestRenderer
 	 * @var array
 	 */
 	public $contributors;
+
+	/**
+	 * @var string
+	 */
+	public $playbackContext = null;
 	
 	protected function prepareFlavors()
 	{
@@ -128,6 +133,8 @@ abstract class kManifestRenderer
 		{
 			$this->tokenizer->setPlaybackContext($playbackContext);
 		}
+		
+		$this->playbackContext = $playbackContext;
 	}
 	
 	/**
@@ -136,6 +143,16 @@ abstract class kManifestRenderer
 	public function setDeliveryCode($deliveryCode)
 	{
 		$this->deliveryCode = $deliveryCode ? $deliveryCode : $this->defaultDeliveryCode;
+	}
+
+	protected function replacePlaybackContext($str)
+	{
+		if($this->playbackContext)
+			$str = str_replace("{playbackContext}", "/playbackContext/".urlencode($this->playbackContext), $str);
+		else
+			$str = str_replace("{playbackContext}", "", $str);
+		
+		return $str;
 	}
 
 	protected function sendAnalyticsBeacon($host, $port)
@@ -280,6 +297,8 @@ abstract class kManifestRenderer
 
 		if($this->deliveryCode)
 			$content = str_replace("{deliveryCode}", $this->deliveryCode, $content);
+		
+		$content = $this->replacePlaybackContext($content);
 
 		header('Content-Length: ' . strlen($content));		// avoid chunked encoding
 		
@@ -994,6 +1013,7 @@ class kRedirectManifestRenderer extends kSingleUrlManifestRenderer
 	protected function getHeaders()
 	{
 		$url = str_replace(" ", "%20", $this->flavor['url']);
+		$url = $this->replacePlaybackContext($url);
 		return array("location:{$url}");
 	}
 }
