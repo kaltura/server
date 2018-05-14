@@ -52,7 +52,7 @@ class KImageMagickCropper extends KBaseCropper
 	protected function getCommand($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 1, $scaleHeight = 1, $bgcolor = DEFAULT_BGCOLOR , $density = 0, $forceRotation = null, $strip = false)
 	{
 
-        $attributes = array();
+		$attributes = array();
 
 		$exifData = @exif_read_data($this->srcPath);
 		$orientation = isset($exifData["Orientation"]) ? $exifData["Orientation"] : 1;
