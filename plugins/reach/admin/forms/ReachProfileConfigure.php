@@ -107,7 +107,7 @@ class Form_ReachProfileConfigure extends ConfigureForm
 
 		$enableAudioTags = new Kaltura_Form_Element_EnumSelect('enableAudioTags', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 'excludes' => array(
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
-		$enableAudioTags->setLabel('Enable Audion Tags:');
+		$enableAudioTags->setLabel('Enable Audio Tags:');
 		$enableAudioTags->setRequired(true);
 		$enableAudioTags->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
 		$this->addElement($enableAudioTags);
