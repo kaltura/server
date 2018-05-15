@@ -15,50 +15,44 @@ class TimeOffsetUtils
 	/**
 	 * @param int $elementStartTime
 	 * @param int $elementEndTime
-	 * @param int $assetStartTime
-	 * @param int $assetEndTime
+	 * @param int $timeLineStart
+	 * @param int $timeLineEnd
 	 * @return bool
 	 */
-	public static function onTimeRange($elementStartTime, $elementEndTime, $assetStartTime, $assetEndTime)
+	public static function onTimeRange($elementStartTime, $elementEndTime, $timeLineStart, $timeLineEnd)
 	{
-		//caption asset items which started before clip start time but ended after the clip started
-		if(($elementEndTime >= $assetStartTime) && ($elementStartTime <= $assetStartTime))
-			return true;
-
-		//caption asset items which started during clip time range
-		if (($elementStartTime >= $assetStartTime) && ($elementStartTime <= $assetEndTime))
-			return true;
-
-		return false;
+		if ($elementEndTime < $timeLineStart || $elementStartTime > $timeLineEnd)
+			return false;
+		return true;
 	}
 
 
 	/**
 	 * @param int $elementStartTime
-	 * @param int $assetStartTime
-	 * @param int $globalOffSet
+	 * @param int $timeLineStart
+	 * @param int $timeLineEnd
 	 * @return int
 	 */
-	public static function getAdjustedStartTime($elementStartTime, $assetStartTime, $globalOffSet)
+	public static function getAdjustedStartTime($elementStartTime, $timeLineStart, $timeLineEnd)
 	{
-		$adjustedStartTime = $elementStartTime - $assetStartTime + $globalOffSet;
-		if ($adjustedStartTime < $globalOffSet)
-			$adjustedStartTime = $globalOffSet;
+		$adjustedStartTime = $elementStartTime - $timeLineStart + $timeLineEnd;
+		if ($adjustedStartTime < $timeLineEnd)
+			$adjustedStartTime = $timeLineEnd;
 		return $adjustedStartTime;
 	}
 
 
 	/**
 	 * @param int $elementEndTime
-	 * @param int $assetStartTime
-	 * @param int $assetEndTime
+	 * @param int $timeLineStart
+	 * @param int $timeLineEnd
 	 * @param int $globalOffSet
 	 * @return int
 	 */
-	public static function getAdjustedEndTime($elementEndTime,$assetStartTime, $assetEndTime, $globalOffSet)
+	public static function getAdjustedEndTime($elementEndTime, $timeLineStart, $timeLineEnd, $globalOffSet)
 	{
-		$adjustedEndTime = $elementEndTime - $assetStartTime + $globalOffSet;
-		$maxAllowedEndTime = $assetEndTime - $assetStartTime + $globalOffSet;
+		$adjustedEndTime = $elementEndTime - $timeLineStart + $globalOffSet;
+		$maxAllowedEndTime = $timeLineEnd - $timeLineStart + $globalOffSet;
 		if ($adjustedEndTime > $maxAllowedEndTime)
 			$adjustedEndTime = $maxAllowedEndTime;
 		return $adjustedEndTime;
