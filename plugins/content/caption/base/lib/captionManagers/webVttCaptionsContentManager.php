@@ -196,10 +196,10 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 	{
 		$startCaption = $this->parseWebvttStrTTTime($matches[1]);
 		$endCaption = $this->parseWebvttStrTTTime($matches[2]);
-		if (!kCaptionsContentManager::onTimeRange($startCaption, $endCaption, $clipStartTime, $clipEndTime))
+		if (!TimeOffsetUtils::onTimeRange($startCaption, $endCaption, $clipStartTime, $clipEndTime))
 			return null;
-		$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($startCaption, $clipStartTime, $globalOffset);
-		$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $endCaption, $globalOffset);
+		$adjustedStartTime = TimeOffsetUtils::getAdjustedStartTime($startCaption, $clipStartTime, $globalOffset);
+		$adjustedEndTime = TimeOffsetUtils::getAdjustedEndTime($endCaption, $clipStartTime, $clipEndTime, $globalOffset);
 		$settings = isset($matches[3]) ? trim($matches[3]) : '';
 		$timeLine = kWebVTTGenerator::formatWebVTTTimeStamp($adjustedStartTime) . ' --> ' . kWebVTTGenerator::formatWebVTTTimeStamp($adjustedEndTime). $settings . kCaptionsContentManager::UNIX_LINE_ENDING;
 		return $timeLine;
