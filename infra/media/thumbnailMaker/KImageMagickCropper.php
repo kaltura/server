@@ -21,7 +21,7 @@ class KImageMagickCropper extends KBaseCropper
 	 */
 	const CROP_AFTER_RESIZE = 6;
 
-        const DEFAULT_BGCOLOR = '0xffffff';
+	const DEFAULT_BGCOLOR = '0xffffff';
 
 
 	
@@ -49,7 +49,7 @@ class KImageMagickCropper extends KBaseCropper
 		parent::__construct($srcPath, $targetPath);
 	}
 	
-	protected function getCommand($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 1, $scaleHeight = 1, $bgcolor = DEFAULT_BGCOLOR , $density = 0, $forceRotation = null, $strip = false)
+	protected function getCommand($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 1, $scaleHeight = 1, $bgcolor = self::DEFAULT_BGCOLOR , $density = 0, $forceRotation = null, $strip = false)
 	{
 
 		$attributes = array();
@@ -297,7 +297,7 @@ class KImageMagickCropper extends KBaseCropper
 			}
 		}
 
-		if ($bgcolor != DEFAULT_BGCOLOR	)
+		if ($bgcolor != self::DEFAULT_BGCOLOR)
 		{
 			$bgcolor = sprintf('%06x', $bgcolor);
 			KalturaLog::debug('bgcolor is ' + $bgcolor);
