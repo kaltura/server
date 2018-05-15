@@ -31,7 +31,7 @@ class MetadataDynamicObjectPeer extends MetadataPeer implements IMetadataPeer
 		return null;
 	}
 	
-	public static function validateMetadataObjectAccess(metadata $dbMetadata)
+	public static function validateMetadataObjectAccess($objectId, $objectType)
 	{
 		return true;
 	}
