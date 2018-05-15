@@ -1,5 +1,15 @@
 # Mercury 13.20.0 #
 
+## Allow KMC user change account functionality ##
+Issue Type:  New Feature
+Issue ID: KMCNG-1683
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_15_05_add_partner_permission.php
+
 ## Add bulk groupUser sync ##
 Issue Type:  New Feature
 Issue ID: PLAT-8564
