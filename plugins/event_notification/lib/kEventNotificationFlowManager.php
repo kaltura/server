@@ -96,10 +96,10 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	 * @param KalturaEvent $event
 	 * @return bool is new Partner Object
 	 */
-	protected function isExcludedFromPartnerScopeEvents($event)
+	protected function isExcludedFromPartnerCheckFireEvents($event, $partnerId)
 	{
 		/** event kObjectCreatedEvent with partner object -> create new partner  */
-		if($event instanceof kObjectCreatedEvent && $event->getObject() instanceof Partner)
+		if($event instanceof kObjectCreatedEvent && $event->getObject() instanceof Partner &&  $partnerId > 0)
 			return true;
 
 		return false;
@@ -150,12 +150,14 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		$partnerId = $scope->getPartnerId();
 		$ksPartnerId = kCurrentContext::$ks_partner_id;
 
-		$excludedFromPartnerScopeEvents = $this->isExcludedFromPartnerScopeEvents($event);
-		if ( (($ksPartnerId && $ksPartnerId == Partner::MEDIA_SERVER_PARTNER_ID) || $partnerId <= 0 ||
-				(!EventNotificationPlugin::isAllowedPartner($partnerId) && !$excludedFromPartnerScopeEvents))
+		$excludedFromPartnerScopeEvents = $this->isExcludedFromPartnerCheckFireEvents($event, $partnerId);
+		if (!$excludedFromPartnerScopeEvents)
+		{
+			if ( (($ksPartnerId && $ksPartnerId == Partner::MEDIA_SERVER_PARTNER_ID) || $partnerId <= 0 ||
+					!EventNotificationPlugin::isAllowedPartner($partnerId))
 				&& !in_array($partnerId, kConf::get('media_server_allowed_notifications','local', array()) ) )
-			return false;
-			
+				return false;
+		}
 		$eventType = self::getEventType($event);
 		$eventObjectClassName = self::getEventObjectType($event);
 		

@@ -82,7 +82,7 @@ class HttpNotificationTemplate extends BatchEventNotificationTemplate implements
 		
 		$jobData = new kHttpNotificationDispatchJobData();
 		$jobData->setTemplateId($this->getId());
-		$url = $this->processURL($this->getUrl());
+		$url = str_replace('{DC}',kDataCenterMgr::getCurrentDcName(), $this->getUrl());
 		$jobData->setUrl($url);
 		$jobData->setDataObject($data);
 		$jobData->setMethod($this->getMethod());
@@ -316,16 +316,5 @@ class HttpNotificationTemplate extends BatchEventNotificationTemplate implements
 	public function setSslKey($v)								{return $this->putInCustomData(self::CUSTOM_DATA_SSL_KEY, $v);}
 	public function setSslKeyPassword($v)						{return $this->putInCustomData(self::CUSTOM_DATA_SSL_KEY_PASSWORD, $v);}
 	public function setCustomHeaders(array $v)					{return $this->putInCustomData(self::CUSTOM_DATA_CUSTOM_HEADERS, $v);}
-
-	private function processURL($getURL)
-	{
-		if(kDataCenterMgr::getCurrentDcId() == 1)
-			return str_replace('{DC}','ny' , $getURL);
-
-		return str_replace('{DC}','pa' , $getURL);
-
-
-	}
-
 
 }
