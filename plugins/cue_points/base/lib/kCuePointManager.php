@@ -128,13 +128,13 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			//add clip offset to global offset
 			$globalOffset = $globalOffset + $operationAttribute->getDuration();
 		}
-		$jobData = new kCopyCuePointsJobData();
+		$jobData = new kMultiSourceCopyCuePointsJobData();
 		$jobData->setClipsDescriptionArray($kClipDescriptionArray);
 		$jobData->setDestinationEntryId($data->getDestEntryId());
 		$batchJob = new BatchJob();
 		$batchJob->setEntryId($data->getDestEntryId());
 		$batchJob->setPartnerId($data->getPartnerId());
-		kJobsManager::addJob($batchJob, $jobData, BatchJobType::COPY_CUE_POINTS);
+		kJobsManager::addJob($batchJob, $jobData, BatchJobType::COPY_CUE_POINTS, CopyCuePointJobType::MULTI_SOURCES);
 	}
 
 	/**
