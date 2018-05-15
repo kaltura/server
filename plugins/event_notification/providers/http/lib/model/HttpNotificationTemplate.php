@@ -319,7 +319,12 @@ class HttpNotificationTemplate extends BatchEventNotificationTemplate implements
 
 	private function processURL($getURL)
 	{
-		return str_replace('{DC}', 'dc-'.kDataCenterMgr::getCurrentDcUrl(), $getURL);
+		if(kDataCenterMgr::getCurrentDcId() == 1)
+			return str_replace('{DC}','ny' , $getURL);
+
+		return str_replace('{DC}','pa' , $getURL);
+
+
 	}
 
 

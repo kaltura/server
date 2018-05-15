@@ -104,7 +104,7 @@
                 </contentParameters>
                 <data objectType="KalturaHttpNotificationDataFields"/>
                 <method>2</method> <!-- KalturaHttpNotificationMethod::POST -->
-                <url>http://{DC}-/latest/public/create_instance.php</url>
+                <url>https://{DC}-kms-int.kaltura.com/latest/public/create_instance.php</url>
             </template>
         </request>
     </multirequest>

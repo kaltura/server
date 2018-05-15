@@ -1,10 +1,55 @@
 # Mercury 13.20.0 #
 
+## Send http registration request to KMS when registering partner##
+PLAT-7514 
+
 ### Deployment scripts ###
 -Add kms registration http request on partner creation:
 
      php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/partnerAddedMediaSpaceHttpNotification.xml    
  
+## Allow KMC user change account functionality ##
+Issue Type:  New Feature
+Issue ID: KMCNG-1683
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_15_05_add_partner_permission.php
+
+## Add bulk groupUser sync ##
+Issue Type:  New Feature
+Issue ID: PLAT-8564
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_05_07_add_bulk_sync_group_users_permissions.php
+
+## Live thumbnails ##
+Issue Type: Enable live thumb
+Issue ID: PLAT-8867
+
+### Configuration ###
+Add to local.ini after replacing the pacth-holders of VOD_PACKAGER_HOST and VOD_PACKAGER_PORT:
+packager_local_live_thumb_capture_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/dc-{dc}/{liveType}/thumb/{url}/thumb-{offset}.jpg
+
+### Deployment scripts ###
+None.
+
+## Update Playlist::update permissions ##
+Issue Type: Behaviour chnage
+Issue ID: PLAT-8885
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_05_08_playlist_update.php
+
+
 ## Media repurposing serve dry run ## 
 Issue Type: Bug
 Issue ID: PLAT-8881
@@ -16,6 +61,16 @@ None.
 php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_05_06_add_scheduleTask_permission.php
 
 # Mercury 13.19.0 #
+
+## Update Playlist::update permissions ##
+Issue Type: Behaviour chnage
+Issue ID: PLAT-8885
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_05_08_playlist_update.php
 
 ## KMC-NG ##
 - Issue Type: KMC-NG deployment configuration
