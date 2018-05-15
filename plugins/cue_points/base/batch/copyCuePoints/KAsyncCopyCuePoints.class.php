@@ -6,7 +6,7 @@
 
 class KAsyncCopyCuePoints extends KJobHandlerWorker
 {
-	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
+	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 500;
 
 	/*
 	 * (non-PHPdoc)
@@ -54,6 +54,7 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 	private function copyCuePoint(KalturaBatchJob $job, KalturaCopyCuePointsJobData $data)
 	{
 		self::impersonate($job->partnerId);
+		KalturaLog::info('Copy Cue Point Job Started');
 		$totalCuePointNumber = 0;
 		/** @var KalturaCopyCuePointsJobData $data */
 		/** @var KalturaClipDescription $clipDescription */
@@ -63,7 +64,7 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 			$clipStartTime = $clipDescription->startTime;
 			$offsetInDestination = $clipDescription->offsetInDestination;
 			$clipEndTime = $clipStartTime + $clipDescription->duration;
-			$cuePointList = $this->getCuePointListForEntry($sourceEntryId,$clipStartTime,$clipEndTime);
+			$cuePointList = $this->getCuePointListForEntry($sourceEntryId, $clipEndTime);
 			$count = count($cuePointList);
 			$totalCuePointNumber += $count;
 			if (!$count)
@@ -85,13 +86,12 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 
 	/**
 	 * @param $entryId
-	 * @param $startTime
 	 * @param $endTime
 	 * @return KalturaCuePoint[]
 	 */
-	private function getCuePointListForEntry($entryId, $startTime, $endTime)
+	private function getCuePointListForEntry($entryId, $endTime)
 	{
-		$filter = self::getCuePointFilter($entryId, $startTime, $endTime);
+		$filter = $this->getCuePointFilter($entryId, $endTime);
 		/** @noinspection PhpUndefinedClassInspection */
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = self::MAX_CUE_POINTS_TO_COPY_TO_VOD;
@@ -104,12 +104,11 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 	}
 
 
-	private function getCuePointFilter($entryId, $currentClipStartTime ,$currentClipEndTime)
+	private function getCuePointFilter($entryId, $currentClipEndTime)
 	{
 		$filter = new KalturaCuePointFilter();
 		$filter->entryIdEqual = $entryId;
 		$filter->statusIn = CuePointStatus::READY;
-		$filter->startTimeGreaterThanOrEqual = $currentClipStartTime;
 		$filter->startTimeLessThanOrEqual = $currentClipEndTime;
 		return $filter;
 	}
@@ -126,14 +125,15 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 		/** @var KalturaCuePoint $cuePoint */
 		foreach ($cuePointList as $cuePoint)
 		{
-			$cuePointDestStartTime = $cuePoint->startTime - $clipStartTime + $offsetInDestination;
+			/** @noinspection PhpUndefinedFieldInspection */
+			if (!is_null($cuePoint->endTime) && !TimeOffsetUtils::onTimeRange($cuePoint->startTime,$cuePoint->endTime,$clipStartTime, $clipEndTime))
+				continue;
+			$cuePointDestStartTime = TimeOffsetUtils::getAdjustedStartTime($cuePoint->startTime, $clipStartTime, $offsetInDestination);
 			$cuePointDestEndTime = null;
 			/** @noinspection PhpUndefinedFieldInspection */
 			if (!is_null($cuePoint->endTime))
-			{
 				/** @noinspection PhpUndefinedFieldInspection */
-				$cuePointDestEndTime = min($cuePoint->endTime - $clipStartTime + $offsetInDestination, $clipEndTime - $clipStartTime + $offsetInDestination);
-			}
+				$cuePointDestEndTime = TimeOffsetUtils::getAdjustedEndTime($cuePoint->endTime, $clipStartTime ,$clipEndTime ,$offsetInDestination);
 			$clonedCuePoint = $this->cloneCuePoint($destinationEntryId, $cuePoint);
 			if (KBatchBase::$kClient->isError($clonedCuePoint))
 			{
@@ -143,9 +143,7 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 				/** @noinspection PhpUndefinedFieldInspection */
 				$res = $this->updateCuePointTimes($clonedCuePoint, $cuePointDestStartTime,$cuePointDestEndTime);
 				if (KBatchBase::$kClient->isError($res))
-				{
 					KalturaLog::alert("Error during copy , of cuePoint $clonedCuePoint->id");
-				}
 
 			}
 
