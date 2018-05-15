@@ -167,7 +167,7 @@ class kmc4Action extends kalturaAction
 		$this->content_uiconfs_studio_v3 = isset($this->studioV3UiConf) ? array_values($this->studioV3UiConf) : null;
 		$this->content_uiconf_studio_v3 = (is_array($this->content_uiconfs_studio_v3) && reset($this->content_uiconfs_studio_v3)) ? reset($this->content_uiconfs_studio_v3) : null;
 
-		$this->playerV3VersionsUiConf = kmcUtils::getPartnersUiconfs(0, self::PLAYER_V3_VERSIONS_TAG);
+		$this->playerV3VersionsUiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG);
 		$this->content_uiconfs_player_v3_versions = isset($this->playerV3VersionsUiConf) ? array_values($this->playerV3VersionsUiConf) : null;
 		$this->content_uiconf_player_v3_versions = (is_array($this->content_uiconfs_player_v3_versions) && reset($this->content_uiconfs_player_v3_versions)) ? reset($this->content_uiconfs_player_v3_versions) : null;
 
