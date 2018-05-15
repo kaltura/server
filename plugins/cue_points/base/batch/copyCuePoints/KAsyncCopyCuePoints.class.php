@@ -35,15 +35,18 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		/** @var KalturaCopyCuePointsJobData $data */
-		$data = $job->data;
-		if (!$data->clipsDescriptionArray)
-		{
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP,
-				KalturaBatchJobAppErrors::MISSING_PARAMETERS,
-				'Job Has No ArrayData', KalturaBatchJobStatus::FAILED);
-		}
-		return $this->copyCuePoint($job, $data);
+		$engine = KCopyCuePointEngine::getEngine($job->jobSubType, $job->data, $job->partnerId);
+		if (!$engine)
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND,
+							"Cannot find copy engine [{$job->jobSubType}]", KalturaBatchJobStatus::FAILED);
+		if (!$engine->validateJobData())
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::MISSING_PARAMETERS,
+				"Job subType [{$job->jobSubType}] has missing job data", KalturaBatchJobStatus::FAILED);
+		if (!$engine->copyCuePoints())
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, null,
+				"Job has failed in copy the cue points", KalturaBatchJobStatus::FAILED);
+
+		return $this->closeJob($job, null, null, "All Cue Point Copied ", KalturaBatchJobStatus::FINISHED);
 	}
 
 	/**
