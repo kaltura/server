@@ -1,5 +1,13 @@
 # Mercury 13.20.0 #
 
+## Send http registration request to KMS when registering partner##
+PLAT-7514 
+
+### Deployment scripts ###
+-Add kms registration http request on partner creation:
+
+     php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/partnerAddedMediaSpaceHttpNotification.xml    
+ 
 ## Allow KMC user change account functionality ##
 Issue Type:  New Feature
 Issue ID: KMCNG-1683
