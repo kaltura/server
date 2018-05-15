@@ -2123,4 +2123,16 @@ class myPartnerUtils
 		return $result;
 	}
 
+
+	public static function initialPasswordSetForFreeTrial($loginData)
+	{
+		$partner = PartnerPeer::retrieveByPK($loginData->getConfigPartnerId());
+		$freeTrialTypes = array(PartnerPackages::PARTNER_PACKAGE_FREE, PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL);
+		if(in_array($partner->getPartnerPackage(), $freeTrialTypes) && myPartnerUtils::isPartnerCreatedAsMonitoredFreeTrial($partner))
+		{
+			$partner->setInitialPasswordSet(true);
+			$partner->save();
+		}
+	}
+
 }
