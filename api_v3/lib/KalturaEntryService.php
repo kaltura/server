@@ -708,6 +708,7 @@ class KalturaEntryService extends KalturaBaseService
 					throw new KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_OPERATION, "Trimming");
 				$this->createRecordedClippingTask($srcEntry, $dbEntry, $operationAttributes);
 				$dbEntry->setSource(EntrySourceType::KALTURA_RECORDED_LIVE);
+				$dbEntry->setConversionProfileId($srcEntry->getConversionProfileId());
 				$dbEntry->setRootEntryId($srcEntry->getRootEntryId());
 				$dbEntry->setIsRecordedEntry(true);
 				$dbEntry->setFlowType(EntryFlowType::LIVE_CLIPPING);
