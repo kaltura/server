@@ -79,7 +79,7 @@ abstract class KCopyCuePointEngine
         return $engine;
     }
 
-    private static function getEngine($copyCuePointJobType, $data, $partnerId) {
+    private static function getEngine($copyCuePointJobType) {
         switch($copyCuePointJobType)
         {
             case CopyCuePointJobType::MULTI_SOURCES:
