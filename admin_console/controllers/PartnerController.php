@@ -214,6 +214,17 @@ class PartnerController extends Zend_Controller_Action
 	
 	public function kmcRedirectAction()
 	{
+		$this->kmcRedirection();
+	}
+
+	public function kmcNewRedirectAction()
+	{
+		$this->kmcRedirection(true);
+	}
+
+
+	private function kmcRedirection($kmcNew = false)
+	{
 		$partnerId = $this->_getParam('partner_id');
 		$userId = $this->_getParam('user_id');
 		$client = Infra_ClientHelper::getClient();
@@ -230,6 +241,20 @@ class PartnerController extends Zend_Controller_Action
 		}
 
 		$url = null;
+		if($kmcNew)
+		{
+			$url = Infra_ClientHelper::getServiceUrl();
+			$url .= '/index.php/kmcng/actions/login-by-ks/'.$ks;
+		}
+		else
+			$url = $this->createKmcRedirectionUrl($ks, $partnerId);
+
+		$this->getResponse()->setRedirect($url);
+	}
+
+
+	private function createKmcRedirectionUrl($ks, $partnerId)
+	{
 		$settings = Zend_Registry::get('config')->settings;
 		if($settings->kmcUrl)
 		{
@@ -237,14 +262,15 @@ class PartnerController extends Zend_Controller_Action
 		}
 		else
 		{
-			$url = Infra_ClientHelper::getServiceUrl();	
+			$url = Infra_ClientHelper::getServiceUrl();
 			$url .= '/index.php/kmc/extlogin';
 		}
-		
+
 		$url .= '?ks='.$ks.'&partner_id='.$partnerId;
-		$this->getResponse()->setRedirect($url);
+		return $url;
 	}
-	
+
+
 	public function kavaRedirectAction()
 	{
 		$settings = Zend_Registry::get('config')->settings;
