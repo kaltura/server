@@ -9,18 +9,19 @@ class KMultiSourceCopyCuePointEngine extends KCopyCuePointEngine
 
     public function copyCuePoints()
     {
+        $res = true;
         foreach ($this->data->clipsDescriptionArray as $clipDescription) {
             $this->currentClip = $clipDescription;
-            $res = $this->copyCuePointsToEntry($clipDescription->sourceEntryId, $this->data->destinationEntryId);
+            $res &= $this->copyCuePointsToEntry($clipDescription->sourceEntryId, $this->data->destinationEntryId);
         }
-        return true;
+        return $res;
     }
 
     public function shouldCopyCuePoint($cuePoint)
     {
         $clipStartTime = $this->currentClip->startTime;
         $clipEndTime = $clipStartTime + $this->currentClip->duration;
-        return !is_null($cuePoint->endTime) && !TimeOffsetUtils::onTimeRange($cuePoint->startTime,$cuePoint->endTime,$clipStartTime, $clipEndTime);
+        return is_null($cuePoint->endTime) || TimeOffsetUtils::onTimeRange($cuePoint->startTime,$cuePoint->endTime,$clipStartTime, $clipEndTime);
     }
 
     public function getCuePointFilter($entryId, $status = CuePointStatus::READY)
@@ -32,10 +33,9 @@ class KMultiSourceCopyCuePointEngine extends KCopyCuePointEngine
 
     public function calculateCuePointTimes($cuePoint)
     {
-
-        $clipStartTime = $this->clipDescription->startTime;
-        $offsetInDestination = $this->clipDescription->offsetInDestination;
-        $clipEndTime = $clipStartTime + $this->clipDescription->duration;
+        $clipStartTime = $this->currentClip->startTime;
+        $offsetInDestination = $this->currentClip->offsetInDestination;
+        $clipEndTime = $clipStartTime + $this->currentClip->duration;
         $cuePointDestStartTime = TimeOffsetUtils::getAdjustedStartTime($cuePoint->startTime, $clipStartTime, $offsetInDestination);
         $cuePointDestEndTime = null;
         if ($cuePoint->endTime)
@@ -45,7 +45,9 @@ class KMultiSourceCopyCuePointEngine extends KCopyCuePointEngine
 
     public function validateJobData() 
     {
-        if (!$this->data || !$this->data->clipsDescriptionArray)
+        if (!$this->data || !($this->data instanceof KalturaMultiSourceCopyCuePointsJobData))
+            return false;
+        if (!$this->data->clipsDescriptionArray)
             return false;
         return parent::validateJobData();
     }

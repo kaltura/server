@@ -30,7 +30,7 @@ abstract class KCopyCuePointEngine
         do 
         {
             KalturaLog::debug("Getting list of cue point for entry [$srcEntryId] with pager index: " . $pager->pageIndex);
-            $res = self::executeAPICall('listAction', array($filter, $pager));
+            $res = self::executeAPICall('cuePointList', array($filter, $pager));
             if (!$res)
                 return false;
             foreach ($res->objects as $cuePoint)
