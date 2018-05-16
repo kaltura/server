@@ -214,16 +214,27 @@ class PartnerController extends Zend_Controller_Action
 	
 	public function kmcRedirectAction()
 	{
-		$this->kmcRedirection();
+		$partnerId = $this->_getParam('partner_id');
+		$ks = $this->generateAdminKs();
+		if(!$ks)
+			return;
+
+		$url = $this->createKmcRedirectionUrl($ks, $partnerId);
+		$this->getResponse()->setRedirect($url);
 	}
 
 	public function kmcNewRedirectAction()
 	{
-		$this->kmcRedirection(true);
+		$ks = $this->generateAdminKs();
+		if(!$ks)
+			return;
+
+		$url = Infra_ClientHelper::getServiceUrl();
+		$url .= '/index.php/kmcng/actions/login-by-ks/'.$ks;
+		$this->getResponse()->setRedirect($url);
 	}
 
-
-	private function kmcRedirection($kmcNew = false)
+	private function generateAdminKs()
 	{
 		$partnerId = $this->_getParam('partner_id');
 		$userId = $this->_getParam('user_id');
@@ -237,21 +248,11 @@ class PartnerController extends Zend_Controller_Action
 		{
 			$this->view->partnerId = $partnerId;
 			$this->view->errorMessage = $e->getMessage();
-			return;
+			return null;
 		}
 
-		$url = null;
-		if($kmcNew)
-		{
-			$url = Infra_ClientHelper::getServiceUrl();
-			$url .= '/index.php/kmcng/actions/login-by-ks/'.$ks;
-		}
-		else
-			$url = $this->createKmcRedirectionUrl($ks, $partnerId);
-
-		$this->getResponse()->setRedirect($url);
+		return $ks;
 	}
-
 
 	private function createKmcRedirectionUrl($ks, $partnerId)
 	{
