@@ -84,13 +84,10 @@ abstract class KCopyCuePointEngine
         {
             case CopyCuePointJobType::MULTI_SOURCES:
                return new KMultiSourceCopyCuePointEngine();
-                break;
             case CopyCuePointJobType::LIVE:
                 return new KLiveToVodCopyCuePointEngine();
-                break;
             case CopyCuePointJobType::LIVE_CLIPPING:
                 return new KLiveClippingCopyCuePointEngine();
-                break;
             default:
                 return null;
         }
