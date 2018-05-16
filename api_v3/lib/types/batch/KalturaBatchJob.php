@@ -676,6 +676,11 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 						if(is_null($this->data))
 							$this->data = new KalturaCopyCuePointsJobData();
 						break;
+					case CopyCuePointJobType::LIVE_CLIPPING:
+						$dbData = new kLiveToVodJobData();
+						if(is_null($this->data))
+							$this->data = new KalturaLiveToVodJobData();
+						break;
 					default:
 						$dbData = new kCopyCuePointsJobData();
 						if(is_null($this->data))
