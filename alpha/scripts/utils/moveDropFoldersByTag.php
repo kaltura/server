@@ -3,7 +3,6 @@
 if($argc < 3)
 	die("Usage $argv[0] <Tag> <DC from> <DC to>\r\n");
 
-//params
 $tag = $argv[1];
 $dcFrom = $argv[2];
 $dcTo = $argv[3];
@@ -16,12 +15,12 @@ ob_start();
 chdir(dirname(__FILE__));
 require_once(dirname(__FILE__) . '/../bootstrap.php');
 
-$isCurrentDc = (kDataCenterMgr::getCurrentDcId() == $dcFrom);
-
 //list all drop folder by tag + dc
+$isCurrentDc = (kDataCenterMgr::getCurrentDcId() == $dcFrom);
 $dropFolders = DropFolderPeer::retrieveByTag($tag,$isCurrentDc);
 if(!count($dropFolders))
 	die("\r\nNOTICE: Could  not find any drop folder with tag - {$tag} under dc {$dcFrom}\r\n");
+
 foreach ($dropFolders as $dropFolder)
 {
 	ob_end_clean();
@@ -30,11 +29,13 @@ foreach ($dropFolders as $dropFolder)
 	$dropFolder->setDc($dcTo);
 	$dropFolder->save();
 }
+
 ob_end_clean();
 
 $cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_BATCH_JOBS);
 if(!$cache)
 	die("\r\nERROR: Cache layer [" . kCacheManager::CACHE_TYPE_BATCH_JOBS . "] not found, drop folder will not be allocated\r\n");
+
 $tagKey = "drop_folder_list_key_".$tag;
 
 if($isCurrentDc)
