@@ -12,7 +12,8 @@ abstract class KalturaESearchItemImpl
 	{
 		if(strlen($eSearchItem->searchTerm) > self::MAX_SEARCH_TERM_LENGTH)
 		{
-			$eSearchItem->searchTerm = substr($eSearchItem->searchTerm, 0, self::MAX_SEARCH_TERM_LENGTH);
+			$searchTerm = substr($eSearchItem->searchTerm, 0, self::MAX_SEARCH_TERM_LENGTH);
+			$eSearchItem->searchTerm = kString::stripUtf8InvalidChars($searchTerm);
 			KalturaLog::log("Search term exceeded maximum allowed length, setting search term to [$eSearchItem->searchTerm]");
 		}
 
