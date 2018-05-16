@@ -35,7 +35,7 @@ class KAsyncCopyCuePoints extends KJobHandlerWorker
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		$engine = KCopyCuePointEngine::getEngine($job->jobSubType, $job->data, $job->partnerId);
+		$engine = KCopyCuePointEngine::initEngine($job->jobSubType, $job->data, $job->partnerId);
 		if (!$engine)
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND,
 							"Cannot find copy engine [{$job->jobSubType}]", KalturaBatchJobStatus::FAILED);

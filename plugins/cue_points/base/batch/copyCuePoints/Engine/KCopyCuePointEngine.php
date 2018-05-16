@@ -28,7 +28,7 @@ abstract class KCopyCuePointEngine
         do 
         {
             KalturaLog::debug("Getting list of cue point for entry [$srcEntryId] with pager index: " . $pager->pageIndex);
-            $listResponse = self::executeAPICall('cuePointList', array($filter, $pager));
+            $listResponse = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine','cuePointList'), array($filter, $pager));
             if (!$listResponse)
                 return false;
             foreach ($listResponse->objects as $cuePoint)
@@ -49,11 +49,11 @@ abstract class KCopyCuePointEngine
 
     protected function copySingleCuePoint($cuePoint, $destEntryId)
     {
-        $clonedCuePoint = self::executeAPICall('cuePointClone', array($cuePoint->id, $destEntryId));
+        $clonedCuePoint = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine','cuePointClone'), array($cuePoint->id, $destEntryId));
         if ($clonedCuePoint)
         {
             list($startTime, $endTime) = $this->calculateCuePointTimes($cuePoint);
-            $res = self::executeAPICall('updateCuePointTimes', array($clonedCuePoint->id, $startTime, $endTime));
+            $res = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine','updateCuePointTimes'), array($clonedCuePoint->id, $startTime, $endTime));
             if ($res)
                 return $cuePoint->id;
             else
@@ -64,30 +64,36 @@ abstract class KCopyCuePointEngine
     }
 
 
-    public function initEngine($data, $partnerId) 
+    public function setData($data, $partnerId) 
     {
         $this->data = $data;
         $this->partnerId = $partnerId;
     }
+    
+    public static function initEngine($copyCuePointJobType, $data, $partnerId)
+    {
+        $engine = self::getEngine($copyCuePointJobType);
+        if (!$engine)
+            return null;
+        $engine->setData($data, $partnerId);
+        return $engine;
+    }
 
-    public static function getEngine($copyCuePointJobType, $data, $partnerId) {
-        $engine = null;
+    private static function getEngine($copyCuePointJobType, $data, $partnerId) {
         switch($copyCuePointJobType)
         {
             case CopyCuePointJobType::MULTI_SOURCES:
-               $engine = new KMultiSourceCopyCuePointEngine();
+               return new KMultiSourceCopyCuePointEngine();
                 break;
             case CopyCuePointJobType::LIVE:
-                $engine = new KLiveToVodCopyCuePointEngine();
+                return new KLiveToVodCopyCuePointEngine();
                 break;
             case CopyCuePointJobType::LIVE_CLIPPING:
-                $engine = new KLiveClippingCopyCuePointEngine();
+                return new KLiveClippingCopyCuePointEngine();
                 break;
+            default:
+                return null;
         }
-        if (!$engine)
-            return null;
-        $engine->initEngine($data, $partnerId);
-        return $engine;
     }
 
     protected function getCuePointFilter($entryId, $status = CuePointStatus::READY)
@@ -105,12 +111,6 @@ abstract class KCopyCuePointEngine
         $pager->pageIndex = 0;
         $pager->pageSize = self::MAX_CUE_POINT_CHUNKS;
         return $pager;
-    }
-
-    protected static function executeAPICall($functionName, $params)
-    {
-        $res = KBatchBase::tryExecuteAPICall('KCopyCuePointEngine', $functionName, $params);
-        return $res;
     }
 
     public static function updateCuePointTimes($cuePointId, $startTime, $endTime = null)

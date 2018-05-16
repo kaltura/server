@@ -659,18 +659,19 @@ abstract class KBatchBase implements IKalturaLogger
 		return kConf::get("encryption_iv");
 	}
 
-	public static function tryExecuteAPICall($className, $functionName, $params, $numOfRetries = self::DEFUALT_API_RETRIES_ATTEMPS, $apiIntervalInSec = self::DEFAULT_SLEEP_INTERVAL)
+	public static function tryExecuteApiCall($callback, $params, $numOfRetries = self::DEFUALT_API_RETRIES_ATTEMPS, $apiIntervalInSec = self::DEFAULT_SLEEP_INTERVAL)
 	{
 		while ($numOfRetries-- > 0)
 		{
-			try {
-				$res = call_user_func_array(array($className, $functionName), $params);
+			try 
+			{
+				$res = call_user_func_array($callback, $params);
 				if (KBatchBase::$kClient->isError($res))
 					throw new APIException($res);
 				return $res;
 			}
 			catch  (Exception $ex) {
-				KalturaLog::warning("API Call for [$functionName] failed number of retires " . $numOfRetries);
+				KalturaLog::warning("API Call for " . print_r($callback, true) . " failed number of retires $numOfRetries");
 				KalturaLog::err($ex->getMessage());
 				sleep($apiIntervalInSec);
 			}

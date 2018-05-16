@@ -16,7 +16,7 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
         return $this->copyCuePointsToEntry($this->data->liveEntryId, $this->data->vodEntryId);
     }
 
-    public function initEngine($data, $partnerId)
+    public function setData($data, $partnerId)
     {
         parent::initEngine($data, $partnerId);
         $amfArray = json_decode($data->amfArray);
@@ -60,7 +60,7 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
     {
         KBatchBase::$kClient->startMultiRequest();
         foreach ($copiedCuePointIds as $copiedLiveCuePointId)
-            parent::executeAPICall('cuePointUpdateStatus', array($copiedLiveCuePointId, KalturaCuePointStatus::HANDLED));
+            KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine','cuePointUpdateStatus'), array($copiedLiveCuePointId, KalturaCuePointStatus::HANDLED));
         KBatchBase::$kClient->doMultiRequest();
     }
 
