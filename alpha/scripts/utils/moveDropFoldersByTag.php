@@ -11,13 +11,10 @@ $dcTo = $argv[3];
 if($dcFrom == $dcTo)
 	die("<DC from> and <DC to> must contain different values\r\n");
 
+ob_start();
 
 chdir(dirname(__FILE__));
 require_once(dirname(__FILE__) . '/../bootstrap.php');
-
-ob_start();
-// Report simple running errors only(no notice!!)
-//error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 $isCurrentDc = (kDataCenterMgr::getCurrentDcId() == $dcFrom);
 
