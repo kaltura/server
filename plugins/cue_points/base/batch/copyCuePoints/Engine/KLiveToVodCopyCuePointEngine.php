@@ -6,14 +6,14 @@
 class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
 {
     const MAX_CHUNK_DURATION_IN_SEC = 12;
-    
-    private $currentSegmentStartTime = null;
-    private $currentSegmentEndTime = null;
-    private $amfData = null;
+
+    protected $currentSegmentStartTime = null;
+    protected $currentSegmentEndTime = null;
+    protected $amfData = null;
     
     public function copyCuePoints()
     {
-
+        return $this->copyCuePointsToEntry($this->data->liveEntryId, $this->data->vodEntryId);
     }
 
     public function initEngine($data, $partnerId)
@@ -29,6 +29,13 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
     public function shouldCopyCuePoint($cuePoint)
     {
         return true;
+    }
+
+    public function validateJobData()
+    {
+        if (!$this->data || !($this->data instanceof KalturaLiveToVodJobData))
+            return false;
+        return parent::validateJobData();
     }
 
     public function getCuePointFilter($entryId, $status = CuePointStatus::READY)
@@ -57,7 +64,7 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
         KBatchBase::$kClient->doMultiRequest();
     }
 
-    private static function getSegmentStartTime($amfArray)
+    protected static function getSegmentStartTime($amfArray)
     {
         if (count($amfArray) == 0)
         {
@@ -67,18 +74,18 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
         return ($amfArray[0]->ts - $amfArray[0]->pts) / 1000;
     }
 
-    private static function getSegmentEndTime($amfArray, $segmentDuration)
+    protected static function getSegmentEndTime($amfArray, $segmentDuration)
     {
         return ceil(((self::getSegmentStartTime($amfArray) * 1000) + $segmentDuration) / 1000);
     }
     // change the PTS of every amf to be relative to the beginning of the recording, and not to the beginning of the segment
-    private static function normalizeAMFTimes(&$amfArray, $totalVodDuration, $currentSegmentDuration)
+    protected static function normalizeAMFTimes(&$amfArray, $totalVodDuration, $currentSegmentDuration)
     {
         foreach($amfArray as $key=>$amf)
             $amfArray[$key]->pts = $amfArray[$key]->pts  + $totalVodDuration - $currentSegmentDuration;
     }
 
-    private static function getOffsetForTimestamp($timestamp, $amfArray)
+    protected static function getOffsetForTimestamp($timestamp, $amfArray)
     {
         $minDistanceAmf = self::getClosestAMF($timestamp, $amfArray);
         $ret = 0;
@@ -94,7 +101,7 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
         return $ret;
     }
 
-    private static function getClosestAMF($timestamp, $amfArray)
+    protected static function getClosestAMF($timestamp, $amfArray)
     {
         $len = count($amfArray);
         $ret = null;

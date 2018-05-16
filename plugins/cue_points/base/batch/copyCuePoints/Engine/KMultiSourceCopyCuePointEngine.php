@@ -37,9 +37,7 @@ class KMultiSourceCopyCuePointEngine extends KCopyCuePointEngine
         $offsetInDestination = $this->currentClip->offsetInDestination;
         $clipEndTime = $clipStartTime + $this->currentClip->duration;
         $cuePointDestStartTime = TimeOffsetUtils::getAdjustedStartTime($cuePoint->startTime, $clipStartTime, $offsetInDestination);
-        $cuePointDestEndTime = null;
-        if ($cuePoint->endTime)
-            $cuePointDestEndTime = TimeOffsetUtils::getAdjustedEndTime($cuePoint->endTime, $clipStartTime ,$clipEndTime ,$offsetInDestination);
+        $cuePointDestEndTime = TimeOffsetUtils::getAdjustedEndTime($cuePoint->endTime, $clipStartTime ,$clipEndTime ,$offsetInDestination);
         return array($cuePointDestStartTime, $cuePointDestEndTime);
     }
 

@@ -5,8 +5,6 @@
  */
 abstract class KCopyCuePointEngine
 {
-    const API_CALL_ATTEMPTS = 3;
-    const API_INTERVAL = 5;
     const MAX_CUE_POINT_CHUNKS = 500;
     
     protected $data = null;
@@ -30,31 +28,41 @@ abstract class KCopyCuePointEngine
         do 
         {
             KalturaLog::debug("Getting list of cue point for entry [$srcEntryId] with pager index: " . $pager->pageIndex);
-            $res = self::executeAPICall('cuePointList', array($filter, $pager));
-            if (!$res)
+            $listResponse = self::executeAPICall('cuePointList', array($filter, $pager));
+            if (!$listResponse)
                 return false;
-            foreach ($res->objects as $cuePoint)
+            foreach ($listResponse->objects as $cuePoint)
             {
-                if (!$this->shouldCopyCuePoint($cuePoint))
-                    continue;
-                $clonedCuePoint = self::executeAPICall('cuePointClone', array($cuePoint->id, $destEntryId));
-                if ($clonedCuePoint)
+                if ($this->shouldCopyCuePoint($cuePoint))
                 {
-                    list($startTime, $endTime) = $this->calculateCuePointTimes($cuePoint);
-                    $res = self::executeAPICall('updateCuePointTimes', array($clonedCuePoint->id, $startTime, $endTime));
-                    if ($res)
-                        $clonedCuePointIds[] = $cuePoint->id;
-                    else
-                        KalturaLog::info("Update time for [{$cuePoint->id}] of [$startTime, $endTime] - Failed");
-                } else
-                    KalturaLog::info("Could not copy [{$cuePoint->id}] - moving to next");
+                    $clonedCuePointId = $this->copySingleCuePoint($cuePoint, $destEntryId);
+                    if ($clonedCuePointId)
+                        $clonedCuePointIds[] = $clonedCuePointId;
+                }
             }
             $pager->pageIndex++;
             
-        } while ($res && count($res->objects));
+        } while (count($listResponse->objects) == self::MAX_CUE_POINT_CHUNKS);
         $this->postProcessCuePoints($clonedCuePointIds);
         return true;
     }
+
+    protected function copySingleCuePoint($cuePoint, $destEntryId)
+    {
+        $clonedCuePoint = self::executeAPICall('cuePointClone', array($cuePoint->id, $destEntryId));
+        if ($clonedCuePoint)
+        {
+            list($startTime, $endTime) = $this->calculateCuePointTimes($cuePoint);
+            $res = self::executeAPICall('updateCuePointTimes', array($clonedCuePoint->id, $startTime, $endTime));
+            if ($res)
+                return $cuePoint->id;
+            else
+                KalturaLog::info("Update time for [{$cuePoint->id}] of [$startTime, $endTime] - Failed");
+        } else
+            KalturaLog::info("Could not copy [{$cuePoint->id}] - moving to next");
+        return null;
+    }
+
 
     public function initEngine($data, $partnerId) 
     {
@@ -71,6 +79,9 @@ abstract class KCopyCuePointEngine
                 break;
             case CopyCuePointJobType::LIVE:
                 $engine = new KLiveToVodCopyCuePointEngine();
+                break;
+            case CopyCuePointJobType::LIVE_CLIPPING:
+                $engine = new KLiveClippingCopyCuePointEngine();
                 break;
         }
         if (!$engine)
@@ -98,40 +109,26 @@ abstract class KCopyCuePointEngine
 
     protected static function executeAPICall($functionName, $params)
     {
-        $attempts = self::API_CALL_ATTEMPTS;
-        while ($attempts-- > 0)
-        {
-            try {
-                $res = call_user_func_array("self::$functionName", $params);
-                if (KBatchBase::$kClient->isError($res))
-                    throw new APIException($res);
-                return $res;
-            }
-            catch  (Exception $ex) {
-                KalturaLog::warning("API Call for [$functionName] failed number of retires " . $attempts);
-                KalturaLog::err($ex->getMessage());
-                sleep(self::API_INTERVAL);
-            }
-        }
-        return false;
+        $res = KBatchBase::tryExecuteAPICall('KCopyCuePointEngine', $functionName, $params);
+        return $res;
     }
 
-    private static function updateCuePointTimes($cuePointId, $startTime, $endTime = null)
+    public static function updateCuePointTimes($cuePointId, $startTime, $endTime = null)
     {
         return KBatchBase::$kClient->cuePoint->updateCuePointsTimes($cuePointId, $startTime,$endTime);
     }
-    
-    private function cuePointList($filter, $pager)
+
+    public function cuePointList($filter, $pager)
     {
         return KBatchBase::$kClient->cuePoint->listAction($filter, $pager);
     }
 
-    private function cuePointClone($cuePointId, $destinationEntryId)
+    public function cuePointClone($cuePointId, $destinationEntryId)
     {
         return KBatchBase::$kClient->cuePoint->cloneAction($cuePointId, $destinationEntryId);
     }
 
-    private function cuePointUpdateStatus($cuePointId, $newStatus)
+    public function cuePointUpdateStatus($cuePointId, $newStatus)
     {
         return KBatchBase::$kClient->cuePoint->updateStatus($cuePointId, $newStatus);
     }

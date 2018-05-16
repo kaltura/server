@@ -163,11 +163,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $data->getDestDataFilePath())
 		{
 			$replacedEntry = $entry->getReplacedEntryId() ? entryPeer::retrieveByPK($entry->getReplacedEntryId()) : null;
-			if ($replacedEntry && $replacedEntry->getFlowType() == EntryFlowType::LIVE_CLIPPING)
-			{
-				KalturaLog::debug("Entry [" . $replacedEntry->getId() . "] is from live clip flow - Cue point will not be copied");
-				return $dbBatchJob;
-			}
+			$liveClipping = ($replacedEntry && $replacedEntry->getFlowType() == EntryFlowType::LIVE_CLIPPING);
 
 			$liveEntryId = $replacedEntry ? $replacedEntry->getRootEntryId() : $entry->getRootEntryId();
 			$vodEntryId = $replacedEntry ? $replacedEntry->getId() : $entry->getId();
@@ -223,6 +219,9 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			$liveToVodBatchJob = new BatchJob();
 			$liveToVodBatchJob->setEntryId($entry->getId());
 			$liveToVodBatchJob->setPartnerId($entry->getPartnerId());
+
+			if ($liveClipping)
+				return kJobsManager::addJob($liveToVodBatchJob, $liveToVodJobData, BatchJobType::COPY_CUE_POINTS, CopyCuePointJobType::LIVE_CLIPPING);
 			
 			kJobsManager::addJob($liveToVodBatchJob, $liveToVodJobData, BatchJobType::LIVE_TO_VOD);
 		}
