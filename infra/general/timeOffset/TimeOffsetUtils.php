@@ -51,6 +51,8 @@ class TimeOffsetUtils
 	 */
 	public static function getAdjustedEndTime($elementEndTime, $timeLineStart, $timeLineEnd, $globalOffSet)
 	{
+		if (is_null($elementEndTime))
+			$elementEndTime = $timeLineEnd;
 		$adjustedEndTime = $elementEndTime - $timeLineStart + $globalOffSet;
 		$maxAllowedEndTime = $timeLineEnd - $timeLineStart + $globalOffSet;
 		if ($adjustedEndTime > $maxAllowedEndTime)

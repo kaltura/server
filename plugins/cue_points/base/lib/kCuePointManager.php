@@ -128,13 +128,13 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			//add clip offset to global offset
 			$globalOffset = $globalOffset + $operationAttribute->getDuration();
 		}
-		$jobData = new kCopyCuePointsJobData();
+		$jobData = new kMultiSourceCopyCuePointsJobData();
 		$jobData->setClipsDescriptionArray($kClipDescriptionArray);
 		$jobData->setDestinationEntryId($data->getDestEntryId());
 		$batchJob = new BatchJob();
 		$batchJob->setEntryId($data->getDestEntryId());
 		$batchJob->setPartnerId($data->getPartnerId());
-		kJobsManager::addJob($batchJob, $jobData, BatchJobType::COPY_CUE_POINTS);
+		kJobsManager::addJob($batchJob, $jobData, BatchJobType::COPY_CUE_POINTS, CopyCuePointJobType::MULTI_SOURCES);
 	}
 
 	/**
@@ -163,11 +163,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $data->getDestDataFilePath())
 		{
 			$replacedEntry = $entry->getReplacedEntryId() ? entryPeer::retrieveByPK($entry->getReplacedEntryId()) : null;
-			if ($replacedEntry && $replacedEntry->getFlowType() == EntryFlowType::LIVE_CLIPPING)
-			{
-				KalturaLog::debug("Entry [" . $replacedEntry->getId() . "] is from live clip flow - Cue point will not be copied");
-				return $dbBatchJob;
-			}
+			$liveClipping = ($replacedEntry && $replacedEntry->getFlowType() == EntryFlowType::LIVE_CLIPPING);
 
 			$liveEntryId = $replacedEntry ? $replacedEntry->getRootEntryId() : $entry->getRootEntryId();
 			$vodEntryId = $replacedEntry ? $replacedEntry->getId() : $entry->getId();
@@ -223,6 +219,9 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			$liveToVodBatchJob = new BatchJob();
 			$liveToVodBatchJob->setEntryId($entry->getId());
 			$liveToVodBatchJob->setPartnerId($entry->getPartnerId());
+
+			if ($liveClipping)
+				return kJobsManager::addJob($liveToVodBatchJob, $liveToVodJobData, BatchJobType::COPY_CUE_POINTS, CopyCuePointJobType::LIVE_CLIPPING);
 			
 			kJobsManager::addJob($liveToVodBatchJob, $liveToVodJobData, BatchJobType::LIVE_TO_VOD);
 		}
