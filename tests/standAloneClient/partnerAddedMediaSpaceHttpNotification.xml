@@ -32,9 +32,9 @@
                 <contentParameters objectType="array">
                     <item objectType="KalturaEventNotificationParameter">
                         <key>ts</key>
-                        <description>current Time plus 10 sec</description>
+                        <description>current Time plus 10 minutes</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>(intval($GLOBALS['start']) + 10)</code>
+                            <code>(intval($GLOBALS['start']) + 600)</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
@@ -49,7 +49,8 @@
                         <key>sig</key>
                         <description>Signature</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>(kConf::hasParam('MediaSpace_Partner_Registration') ?  md5(kConf::get('MediaSpace_Partner_Registration')['sig'] . kConf::get('MediaSpace_Partner_Registration')['mediaSpace_url'] . (intval($GLOBALS['start']) + 10)): '')</code>
+                            <code>(kConf::hasParam('MediaSpace_Partner_Registration') ?  md5(kConf::get('MediaSpace_Partner_Registration')['sig'] . $scope->getObject()->getId()
+                                . '.' . kConf::get('MediaSpace_Partner_Registration')['mediaSpace_url'] . (intval($GLOBALS['start']) + 600)): '')</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
