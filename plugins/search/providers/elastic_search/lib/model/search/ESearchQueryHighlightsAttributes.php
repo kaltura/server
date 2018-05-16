@@ -106,21 +106,24 @@ class ESearchQueryHighlightsAttributes
 
 	private function getFieldTypePriority($fieldName)
 	{
-		$highlightsPriorityConfig = kConf::get('highlights_priority', 'elastic');
+		$highlightsPriorityConfig = kConf::get('highlights_priority', 'elastic', array());
 		$priority = isset($highlightsPriorityConfig[self::DEFAULT_PRIORITY_KEY]) ? $highlightsPriorityConfig[self::DEFAULT_PRIORITY_KEY] : self::HIGHLIGHT_DEFAULT_PRIORITY;
-		if(preg_match('/\.[^\.]+$/', $fieldName, $suffix))
+
+		foreach ($highlightsPriorityConfig as $key => $priority)
 		{
-			$suffix = substr($suffix[0], 1);
-			if(isset($highlightsPriorityConfig[$suffix]))
-			{
-				$priority = $highlightsPriorityConfig[$suffix];
-			}
-		}
-		else if(($this->baseFieldNameMapping[$fieldName] == $fieldName) && isset($highlightsPriorityConfig[self::FIELDNAME_PRIORITY_KEY]))
-		{
-			$priority = $highlightsPriorityConfig[self::FIELDNAME_PRIORITY_KEY];
+			if($key == self::DEFAULT_PRIORITY_KEY)
+				continue;
+
+			if($this->isFieldPrioritySet($fieldName, $key))
+				return $priority;
 		}
 
 		return $priority;
 	}
+
+	private function isFieldPrioritySet($fieldName, $key)
+	{
+		return kString::endsWith($fieldName, $key) || ($this->baseFieldNameMapping[$fieldName] == $fieldName && $key == self::FIELDNAME_PRIORITY_KEY);
+	}
+
 }
