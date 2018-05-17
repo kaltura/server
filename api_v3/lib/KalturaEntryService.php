@@ -681,7 +681,7 @@ class KalturaEntryService extends KalturaBaseService
 				if($dbAsset instanceof flavorAsset)
 					$isSource = $dbAsset->getIsOriginal();
 			}
-			else
+			else if (!$isLiveClippingFlow)
 			{
 				$isNewAsset = true;
 				$isSource = true;
