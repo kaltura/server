@@ -18,7 +18,7 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
 
     public function setData($data, $partnerId)
     {
-        parent::initEngine($data, $partnerId);
+        parent::setData($data, $partnerId);
         $amfArray = json_decode($data->amfArray);
         $this->currentSegmentStartTime = self::getSegmentStartTime($amfArray);
         $this->currentSegmentEndTime = self::getSegmentEndTime($amfArray, $data->lastSegmentDuration + $data->lastSegmentDrift) + self::MAX_CHUNK_DURATION_IN_SEC;
