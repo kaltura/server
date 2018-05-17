@@ -512,6 +512,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	{
 		$className = get_class($object);
 		$objectId = $object->getId();
+		$entryId = $object->getEntryId();
 
 		// track repetitive udpates of the same object (e.g. adding many annotations which cause updates of the entry)
 		// once hitting a threshold, we will avoid more than one update per minute
@@ -520,7 +521,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
 		if ($cache)
 		{
-			$cacheKey = "SPHSave:$className:$objectId";
+			$cacheKey = "SPHSave:$className:" . ($entryId ? $entryId : $objectId);
 			$cache->add($cacheKey, 0, 60);
 			$saveCounter = $cache->increment($cacheKey);
 		}
@@ -533,7 +534,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		
 		$skipSave = isset($skipSphinxRepetitiveUpdates[$updatesKey]) && $saveCounter > $skipSphinxRepetitiveUpdates[$updatesKey];
 		
-		KalturaLog::debug("Updating sphinx for object [$className] [$objectId] count [ $saveCounter  ] " . kCurrentContext::$service . ' ' . kCurrentContext::$action . " [$skipSave]");
+		KalturaLog::debug("Updating sphinx for object [$className] [$entryId] [$objectId] count [$saveCounter] " . kCurrentContext::$service . ' ' . kCurrentContext::$action . " [$skipSave]");
 
 		if ($skipSave)
 			return true;
