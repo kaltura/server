@@ -524,9 +524,13 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			$cache->add($cacheKey, 0, 60);
 			$saveCounter = $cache->increment($cacheKey);
 		}
-
-		$updatesKey = strtolower($className."_".kCurrentContext::$service."_".kCurrentContext::$action);
+		
 		$skipSphinxRepetitiveUpdates = kConf::get('skip_sphinx_repetitive_updates', 'local', array());
+		
+		$updatesKey = strtolower(kCurrentContext::getCurrentPartnerId()."_".$className."_".kCurrentContext::$service."_".kCurrentContext::$action);
+		if(!isset($skipSphinxRepetitiveUpdates[$updatesKey]))
+			$updatesKey = strtolower($className."_".kCurrentContext::$service."_".kCurrentContext::$action);
+		
 		$skipSave = isset($skipSphinxRepetitiveUpdates[$updatesKey]) && $saveCounter > $skipSphinxRepetitiveUpdates[$updatesKey];
 		
 		KalturaLog::debug("Updating sphinx for object [$className] [$objectId] count [ $saveCounter  ] " . kCurrentContext::$service . ' ' . kCurrentContext::$action . " [$skipSave]");
