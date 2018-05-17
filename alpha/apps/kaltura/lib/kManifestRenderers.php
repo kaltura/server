@@ -148,7 +148,7 @@ abstract class kManifestRenderer
 	protected function replacePlaybackContext($str)
 	{
 		if($this->playbackContext)
-			$str = str_replace("{playbackContext}", "/playbackContext/".rawurldecode($this->playbackContext), $str);
+			$str = str_replace("{playbackContext}", "/playbackContext/".rawurlencode($this->playbackContext), $str);
 		else
 			$str = str_replace("{playbackContext}", "", $str);
 		
