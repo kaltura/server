@@ -82,8 +82,8 @@ abstract class KCopyCuePointEngine
     private static function getEngine($copyCuePointJobType) {
         switch($copyCuePointJobType)
         {
-            case CopyCuePointJobType::MULTI_SOURCES:
-               return new KMultiSourceCopyCuePointEngine();
+            case CopyCuePointJobType::MULTI_CLIP:
+               return new KMultiClipCopyCuePointEngine();
             case CopyCuePointJobType::LIVE:
                 return new KLiveToVodCopyCuePointEngine();
             case CopyCuePointJobType::LIVE_CLIPPING:

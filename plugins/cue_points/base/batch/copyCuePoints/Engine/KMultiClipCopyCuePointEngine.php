@@ -3,7 +3,7 @@
  * @package plugins.cuePoints
  * @subpackage Scheduler
  */
-class KMultiSourceCopyCuePointEngine extends KCopyCuePointEngine
+class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 {
     private $currentClip = null;
 
@@ -43,7 +43,7 @@ class KMultiSourceCopyCuePointEngine extends KCopyCuePointEngine
 
     public function validateJobData() 
     {
-        if (!$this->data || !($this->data instanceof KalturaMultiSourceCopyCuePointsJobData))
+        if (!$this->data || !($this->data instanceof KalturaMultiClipCopyCuePointsJobData))
             return false;
         if (!$this->data->clipsDescriptionArray)
             return false;
