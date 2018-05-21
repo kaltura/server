@@ -21,7 +21,8 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
     {
         $clipStartTime = $this->currentClip->startTime;
         $clipEndTime = $clipStartTime + $this->currentClip->duration;
-        return is_null($cuePoint->endTime) || TimeOffsetUtils::onTimeRange($cuePoint->startTime,$cuePoint->endTime,$clipStartTime, $clipEndTime);
+        $calculatedEndTime = $cuePoint->calculatedEndTime;
+        return is_null($calculatedEndTime) || TimeOffsetUtils::onTimeRange($cuePoint->startTime,$calculatedEndTime,$clipStartTime, $clipEndTime);
     }
 
     public function getCuePointFilter($entryId, $status = CuePointStatus::READY)

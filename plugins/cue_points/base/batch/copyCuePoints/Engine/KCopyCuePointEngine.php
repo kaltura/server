@@ -9,6 +9,7 @@ abstract class KCopyCuePointEngine
     
     protected $data = null;
     protected $partnerId = null;
+    private $lastCuePointPerType = null;
 
     abstract public function copyCuePoints();
 
@@ -22,9 +23,9 @@ abstract class KCopyCuePointEngine
 
     protected static function postProcessCuePoints($copiedCuePointIds) {}
 
-    protected function preProcessCuePoints(&$liveCuePoints)
+    protected function preProcessCuePoints(&$cuePoints)
     {
-        $this->setEndTimeOnCuePoints($liveCuePoints);
+        $this->setCalculatedEndTimeOnCuePoints($cuePoints);
     }
 
     //protected function preProcessCuePoints(&$cuePoints) {}
@@ -43,7 +44,7 @@ abstract class KCopyCuePointEngine
             $cuePoints = $listResponse->objects;
             $this->preProcessCuePoints($cuePoints);
             KalturaLog::debug("Return " . count($cuePoints) . " cue-points from list");
-            foreach ($cuePoints as $cuePoint)
+            foreach ($cuePoints as &$cuePoint)
             {
                 if ($this->shouldCopyCuePoint($cuePoint))
                 {
@@ -80,6 +81,7 @@ abstract class KCopyCuePointEngine
     {
         $this->data = $data;
         $this->partnerId = $partnerId;
+        $this->lastCuePointPerType = array();
     }
     
     public static function initEngine($copyCuePointJobType, $data, $partnerId)
@@ -143,33 +145,27 @@ abstract class KCopyCuePointEngine
     }
 
 
-
-
-
-    private $lastCuePointPerType = array();
-    protected function setEndTimeOnCuePoints(&$liveCuePoints)
+    protected function setCalculatedEndTimeOnCuePoints(&$cuePoints)
     {
         $orderField = $this->getOrderByField();
-        foreach ($liveCuePoints as &$liveCuePoint)
+        foreach ($cuePoints as &$cuePoint)
         {
-            $type = self::getType($liveCuePoint);
-            if ($type)
+            $type = self::getTypeName($cuePoint);
+            $cuePoint->calculatedEndTime = null;
+            if (array_key_exists($type, $this->lastCuePointPerType))
             {
-                if ($this->lastCuePointPerType[$type] && is_null($this->lastCuePointPerType[$type]->endTime))
-                    $this->lastCuePointPerType[$type]->endTime = $liveCuePoint->$orderField;
-                $this->lastCuePointPerType[$type] = &$liveCuePoint;
+                $calculatedEndTime = $this->lastCuePointPerType[$type]->endTime;
+                $this->lastCuePointPerType[$type]->calculatedEndTime = $calculatedEndTime ? $calculatedEndTime : $cuePoint->$orderField;
             }
+            $this->lastCuePointPerType[$type] = &$cuePoint;
         }
     }
 
-    private static function getType($liveCuePoint) {
-        KalturaLog::debug($liveCuePoint->cuePointType);
-        if ($liveCuePoint->cuePointType == 'thumbCuePoint.Thumb')
-            return 'Thumb';
-        if ($liveCuePoint->cuePointType  == 'codeCuePoint.Code')
-            if ($liveCuePoint->tags == 'change-view-mode')
-                return 'changeViewMode';
-        return null;
+    private static function getTypeName($cuePoint) {
+        $name = $cuePoint->cuePointType;
+        if ($name == 'codeCuePoint.Code' && $cuePoint->tags == 'change-view-mode')
+            $name .= '_changeViewMode';
+        return $name;
     }
     
 }
