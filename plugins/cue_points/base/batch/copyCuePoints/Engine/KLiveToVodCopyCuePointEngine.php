@@ -10,7 +10,6 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
     protected $currentSegmentStartTime = null;
     protected $currentSegmentEndTime = null;
     protected $amfData = null;
-    private $lastCuePointPerType = null;
     
     public function copyCuePoints()
     {
@@ -25,7 +24,6 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
         $this->currentSegmentEndTime = self::getSegmentEndTime($amfArray, $data->lastSegmentDuration + $data->lastSegmentDrift) + self::MAX_CHUNK_DURATION_IN_SEC;
         self::normalizeAMFTimes($amfArray, $data->totalVodDuration, $data->lastSegmentDuration);
         $this->amfData = $amfArray;
-        $this->lastCuePointPerType = array();
     }
 
     public function shouldCopyCuePoint($cuePoint)

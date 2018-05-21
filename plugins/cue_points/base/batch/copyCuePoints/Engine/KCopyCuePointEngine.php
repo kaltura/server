@@ -166,8 +166,6 @@ abstract class KCopyCuePointEngine
         KalturaLog::debug($liveCuePoint->cuePointType);
         if ($liveCuePoint->cuePointType == 'thumbCuePoint.Thumb')
             return 'Thumb';
-        if ($liveCuePoint->cuePointType == 'annotation.Annotation')
-            return 'Annotation';
         if ($liveCuePoint->cuePointType  == 'codeCuePoint.Code')
             if ($liveCuePoint->tags == 'change-view-mode')
                 return 'changeViewMode';
