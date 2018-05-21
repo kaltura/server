@@ -150,6 +150,9 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 
 	private function generateCacheInvalidationKeys($fp, $class)
 	{
+		if(!isset($this->searchableCacheInvalidationKeys[$class]))
+			return;
+
 		$this->printToFile($fp, "public static function getCacheInvalidationKeys(\$object = null)",1);
 		$this->printToFile($fp, "{",1);
 		$this->printToFile($fp, "if (is_null(\$object))",2);
