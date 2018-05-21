@@ -1980,21 +1980,47 @@ class myPartnerUtils
 	 * calculate the number of custome metadata objects using partner and status
 	 *
 	 * @param string $partnerId
-	 * @param bool $onlyValid
 	 * @return int $metadataNum
 	 */
-	public static function getMetadataObjectsNumForPartner($partnerId, $onlyValid = true)
+	public static function getMetadataObjectsNumForPartner($partnerId)
 	{
-		MetadataPeer::setUseCriteriaFilter(false);
-		$c = KalturaCriteria::create(MetadataPeer::OM_CLASS);
-		$c->addAnd(MetadataPeer::PARTNER_ID, $partnerId);
-		if($onlyValid)
-			$c->addAnd(MetadataPeer::STATUS, Metadata::STATUS_VALID);
-		$c->setGroupByColumn('created_at');
-		$c->applyFilters();
-		$totalCount = $c->getRecordsCount();
-		MetadataPeer::setUseCriteriaFilter(true);
-		return $totalCount;
+		kCurrentContext::$partner_id = $partnerId;
+
+		$entrySearch = new kEntrySearch();
+		$categorySearch = new kCategorySearch();
+		$userSearch = new kUserSearch();
+		$objectStatuses = array();
+
+		$totalCustomMetadadaCount = 0;
+		$totalCustomMetadadaCount += self::getMetadataSearchParameters($entrySearch, $objectStatuses);
+		kBaseElasticEntitlement::$isInitialized = false;
+		$totalCustomMetadadaCount += self::getMetadataSearchParameters($categorySearch, $objectStatuses);
+		kBaseElasticEntitlement::$isInitialized = false;
+		$totalCustomMetadadaCount += self::getMetadataSearchParameters($userSearch, $objectStatuses);
+		return $totalCustomMetadadaCount;
+	}
+
+	protected static function getMetadataSearchParameters($baseSearch, $objectStatuses)
+	{
+		$mdItem = new ESearchMetadataItem();
+		$mdItem->setItemType(ESearchItemType::EXISTS);
+		$searchItems = array($mdItem);
+		$operator = new ESearchOperator();
+		$operator->setOperator(ESearchOperatorType::AND_OP);
+		$operator->setSearchItems($searchItems);
+		$pager = new kPager();
+		$pager->setPageSize(0);
+
+		try
+		{
+			$results = $baseSearch->doSearch($operator, $objectStatuses, null, $pager, null);
+		}
+		catch(Exception $e)
+		{
+			return 0;
+		}
+
+		return $results[kESearchCoreAdapter::HITS_KEY][kESearchCoreAdapter::TOTAL_KEY];
 	}
 
 	/**
@@ -2037,7 +2063,7 @@ class myPartnerUtils
 	public static function getNumOfMetadataObjectsCreatedByPartner ($partner)
 	{
 		$partnerId = $partner->getId();
-		$MetadataObjects = self::getMetadataObjectsNumForPartner($partnerId, false);
+		$MetadataObjects = self::getMetadataObjectsNumForPartner($partnerId);
 		$partnerMetadata = $MetadataObjects - $partner->getTemplateCustomMetadataNum();
 		return $partnerMetadata;
 	}
