@@ -34,7 +34,7 @@ class IndexGeneratorBase
 					case "index":
 						$this->parseIndex("$objName", $searchableField);
 						break;
-					case "":
+					case "cacheInvalidationKey":
 						$this->parseCacheInvalidationKey("$objName", $searchableField);
 						break;
 				}
