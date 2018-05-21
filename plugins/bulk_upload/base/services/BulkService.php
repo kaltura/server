@@ -424,10 +424,12 @@ class BulkService extends KalturaBaseService
 	 * @actionAlias groupUser.sync
 	 * @param string $userId
 	 * @param string $groupIds
+	 * @param bool $removeFromExistingGroups
+	 * @param bool $createNewGroups
 	 * @return KalturaBulkUpload|null
 	 * @throws KalturaAPIException
 	 */
-	public function syncGroupUsersAction($userId, $groupIds)
+	public function syncGroupUsersAction($userId, $groupIds, $removeFromExistingGroups = true, $createNewGroups = true)
 	{
 		$kuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
 		if (!$kuser || $kuser->getType() != KuserType::USER)
@@ -437,7 +439,7 @@ class BulkService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'groupIds');
 
 		$bulkGroupUserSyncCsv = new kBulkGroupUserSyncCsv($kuser, $groupIds);
-		$fileData = $bulkGroupUserSyncCsv->getSyncGroupUsersCsvFile();
+		$fileData = $bulkGroupUserSyncCsv->getSyncGroupUsersCsvFile($removeFromExistingGroups, $createNewGroups);
 		if(!$fileData)
 			return null;
 
