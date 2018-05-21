@@ -153,9 +153,6 @@ class IndexGeneratorBase
 	protected function parseCacheInvalidationKey($objName, $indexComplex)
 	{
 		$index = array();
-		$fieldAttribtues = $indexComplex->attributes();
-		$format = $fieldAttribtues["format"];
-		$index[] = "\"$format\"";
 		foreach($indexComplex->children() as $indexValue)
 		{
 			$idxValueAttr = $indexValue->attributes();
