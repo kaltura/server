@@ -107,23 +107,22 @@ class ESearchQueryHighlightsAttributes
 	private function getFieldTypePriority($fieldName)
 	{
 		$highlightsPriorityConfig = kConf::get('highlights_priority', 'elastic', array());
-		$priority = isset($highlightsPriorityConfig[self::DEFAULT_PRIORITY_KEY]) ? $highlightsPriorityConfig[self::DEFAULT_PRIORITY_KEY] : self::HIGHLIGHT_DEFAULT_PRIORITY;
 
-		foreach ($highlightsPriorityConfig as $key => $priority)
+		foreach ($this->getSuffixPriorityConfig($highlightsPriorityConfig) as $key => $priority)
 		{
-			if($key == self::DEFAULT_PRIORITY_KEY)
-				continue;
-
-			if($this->isFieldPrioritySet($fieldName, $key))
+			if(kString::endsWith($fieldName, $key))
 				return $priority;
 		}
 
-		return $priority;
+		if($this->baseFieldNameMapping[$fieldName] == $fieldName && isset($highlightsPriorityConfig[self::FIELDNAME_PRIORITY_KEY]))
+			return $highlightsPriorityConfig[self::FIELDNAME_PRIORITY_KEY];
+
+		return isset($highlightsPriorityConfig[self::DEFAULT_PRIORITY_KEY]) ? $highlightsPriorityConfig[self::DEFAULT_PRIORITY_KEY] : self::HIGHLIGHT_DEFAULT_PRIORITY;
 	}
 
-	private function isFieldPrioritySet($fieldName, $key)
+	private function getSuffixPriorityConfig($highlightsPriorityConfig)
 	{
-		return kString::endsWith($fieldName, $key) || ($this->baseFieldNameMapping[$fieldName] == $fieldName && $key == self::FIELDNAME_PRIORITY_KEY);
+		return array_diff($highlightsPriorityConfig, array(self::DEFAULT_PRIORITY_KEY, self::FIELDNAME_PRIORITY_KEY));
 	}
 
 }
