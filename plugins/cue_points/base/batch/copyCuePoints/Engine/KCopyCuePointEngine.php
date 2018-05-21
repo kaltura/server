@@ -24,7 +24,7 @@ abstract class KCopyCuePointEngine
 
     protected function preProcessCuePoints(&$liveCuePoints)
     {
-        $this->setEndTime($liveCuePoints);
+        $this->setEndTimeOnCuePoints($liveCuePoints);
     }
 
     //protected function preProcessCuePoints(&$cuePoints) {}
@@ -42,7 +42,7 @@ abstract class KCopyCuePointEngine
                 return false;
             $cuePoints = $listResponse->objects;
             $this->preProcessCuePoints($cuePoints);
-            KalturaLog::debug("asdf: " . print_r($cuePoints, true));
+            KalturaLog::debug("Return " . count($cuePoints) . " cue-points from list");
             foreach ($cuePoints as $cuePoint)
             {
                 if ($this->shouldCopyCuePoint($cuePoint))
@@ -147,7 +147,7 @@ abstract class KCopyCuePointEngine
 
 
     private $lastCuePointPerType = array();
-    protected function setEndTime(&$liveCuePoints)
+    protected function setEndTimeOnCuePoints(&$liveCuePoints)
     {
         $orderField = $this->getOrderByField();
         foreach ($liveCuePoints as &$liveCuePoint)
