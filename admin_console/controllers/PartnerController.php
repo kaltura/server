@@ -229,8 +229,7 @@ class PartnerController extends Zend_Controller_Action
 		if(!$ks)
 			return;
 
-		$url = Infra_ClientHelper::getServiceUrl();
-		$url .= '/index.php/kmcng/actions/login-by-ks/'.$ks;
+		$url = $this->createNewKmcRedirectionUrl($ks);
 		$this->getResponse()->setRedirect($url);
 	}
 
@@ -268,6 +267,24 @@ class PartnerController extends Zend_Controller_Action
 		}
 
 		$url .= '?ks='.$ks.'&partner_id='.$partnerId;
+		return $url;
+	}
+
+	private function createNewKmcRedirectionUrl($ks)
+	{
+		$settings = Zend_Registry::get('config')->settings;
+		if($settings->newKmcUrl)
+		{
+			$url = $settings->newKmcUrl;
+			$url .= '/'.$ks;
+		}
+		else
+		{
+			$url = Infra_ClientHelper::getServiceUrl();
+			if(substr($url, -1) == '/')
+				$url = substr($url,0,-1);
+			$url .= '/index.php/kmcng/actions/login-by-ks/'.$ks;
+		}
 		return $url;
 	}
 
