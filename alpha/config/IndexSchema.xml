@@ -1,161 +1,197 @@
 <?xml version="1.0" encoding="utf-8"?>
 <schema>
-<object name="category">
-	<field name="id" indexName="category_id" getter="id" type="int" orderable="yes" skipField="yes" cacheInvalidationKey="yes" />
-	<field name="category_id" indexName="str_category_id" getter="id" type="string" />
-	<field name="parent_id" indexName="parent_id" type="int" />
-	<field name="partner_id" indexName="partner_id" type="bint" orderable="yes" keepCondition="yes" cacheInvalidationKey="yes" />
-	<field name="name" indexName="name" type="string" orderable="yes" matchable="yes" sphinxStringAttribute="both" />
-	<field name="full_name" indexName="full_name" getter="searchIndexfullName" type="string" orderable="yes" searchEscapeType="3" matchable="yes" skipField="yes" sphinxStringAttribute="both" />
-	<field name="full_ids" indexName="full_ids" getter="searchIndexfullIds" type="string" indexEscapeType="2" searchEscapeType="3" matchable="yes" />
-	<field name="description" indexName="description" type="string" nullable="yes" matchable="yes" />
-	<field name="tags" indexName="tags" type="string" nullable="yes" matchable="yes" />
-	<field name="status" indexName="category_status" getter="status" type="int" orderable="yes"/>
-	<field name="kuser_id" indexName="kuser_id" type="int" orderable="yes"/>
-	<field name="display_in_search" indexName="display_in_search" getter="optimizedDisplayInSearchIndex" type="string" orderable="yes" />
-	<field name="free_text" indexName="(str_category_id,name,tags,description,reference_id)" type="null" searchableonly="yes" matchable="yes" />
-	<field name="name_reference_id" indexName="(name,reference_id)" type="null" searchableonly="yes" />
-	<field name="members" indexName="members" getter="membersByPermissionLevel" type="string" nullable="yes" matchable="yes" />
-	<field name="plugins_data" indexName="plugins_data" type="string" searchableonly="yes" />
-	<field name="depth" indexName="depth" type="int" orderable="yes" />
-	<field name="reference_id" indexName="reference_id" type="string" nullable="yes" />
-	<field name="privacy_context" indexName="privacy_context" getter="searchIndexprivacyContext" type="string" matchable="yes" />
-	<field name="privacy_contexts" indexName="privacy_contexts" getter="searchIndexPrivacyContexts" type="string" nullable="yes" />
-	<field name="members_count" indexName="members_count" type="int" orderable="yes" />
-	<field name="pending_members_count" indexName="pending_members_count" type="int" orderable="yes" />
-	<field name="entries_count" indexName="entries_count" type="int" orderable="yes" />
-	<field name="direct_entries_count" indexName="direct_entries_count" type="int" orderable="yes" />
-	<field name="direct_sub_categories_count" indexName="direct_sub_categories_count" type="int" orderable="yes" />
-	<field name="privacy" indexName="privacy" getter="privacyPartnerIdx" type="string" />
-	<field name="inheritance_type" indexName="inheritance_type" type="int" />
-	<field name="user_join_policy" indexName="user_join_policy" type="int" />
-	<field name="default_permission_level" indexName="default_permission_level" type="int" />
-	<field name="contribution_policy" indexName="contribution_policy" type="int" />
-	<field name="inherited_parent_id" indexName="inherited_parent_id" type="int" />
-	<field name="created_at" indexName="created_at" type="datetime" orderable="yes" />
-	<field name="updated_at" indexName="updated_at" type="datetime" orderable="yes" />
-	<field name="deleted_at" indexName="deleted_at" type="datetime" />
-	<field name="partner_sort_value" indexName="partner_sort_value" type="bint" orderable="yes" />
-	<field name="dynamic_attributes" indexName="dynamic_attributes" type="json" searchableonly="yes" />
-	<field name="sphinx_match_optimizations" indexName="sphinx_match_optimizations" type="string" />
-	<field name="aggregation_categories" indexName="aggregation_categories" getter="aggregationCategoriesIndexEngine" type="string" matchable="yes"/>
-	<index format="%s">
-		<value field="id" />
-	</index>
-	<index format="PARENT%s">
-		<value field="parent_id" />
-	</index>
-	<index format="PID%s">
-		<value field="partner_id" />
-	</index>
-</object>
-<object name="categoryKuser">
-	<field name="category_id" indexName="category_id" type="string" matchable="yes" />
-	<field name="kuser_id" indexName="kuser_id" type="string" matchable="yes" />
-	<field name="category_full_ids" indexName="category_full_ids" getter="searchIndexCategoryFullIds" type="string" indexEscapeType="2" searchEscapeType="3" matchable="yes" />
-	<field name="permission_names" indexName="permission_names" getter="searchIndexPermissionNames" type="string" matchable="yes" />
-	<field name="puser_id" indexName="puser_id" type="string" matchable="yes" />
-	<field name="screen_name" indexName="screen_name" type="string" matchable="yes" />
-	<field name="status" indexName="category_kuser_status" getter="searchIndexStatus" type="string" matchable="yes" />
-	<field name="partner_id" indexName="partner_id" type="string" />
-	<field name="update_method" indexName="update_method" getter="searchIndexUpdateMethod" type="string" matchable="yes" />
-	<field name="created_at" indexName="created_at" type="datetime" orderable="yes"/>
-	<field name="updated_at" indexName="updated_at" type="datetime" orderable="yes"/>
-</object>
-<object name="entry" indexId="str_entry_id" id="ID" apiName="KalturaBaseEntry" >
-	<field name="entry_id" indexName="@name" apiName="@getter" getter="id" type="string" />
-	<field name="str_entry_id" indexName="@name" getter="id" type="string" sphinxStringAttribute="string" />
-	<field name="id" indexName="int_entry_id" getter="indexedId" type="int" skipField="yes" cacheInvalidationKey="yes" />
-	<field name="name" indexName="@name" apiName="@name" type="string" orderable="yes" matchable="yes" sphinxStringAttribute="both" />
-	<field name="tags" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
-	<field name="categories_ids" indexName="categories" apiName="@name" getter="categoriesEntryIds" type="string" nullable="yes" matchable="yes" enrichable="yes"/>
-	<field name="flavor_params_ids" indexName="flavor_params" apiName="@name" getter="flavorParamsIds" type="string" nullable="yes" matchable="yes" />
-	<field name="kshow_id" indexName="@name" type="string" nullable="yes" />
-	<field name="group_id" indexName="@name" apiName="@name" type="string" nullable="yes" />
-	<field name="description" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
-	<field name="admin_tags" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
-	<field name="duration_type" indexName="@name" apiName="@name" type="string" matchable="yes" />
-	<field name="reference_id" indexName="@name" apiName="@name" type="string" getter="referenceIdWithMd5" nullable="yes" matchable="yes" />
-	<field name="replacing_entry_id" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
-	<field name="replaced_entry_id" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
-	<field name="roots" indexName="@name" type="string" nullable="yes" matchable="yes" />
-	<field name="kuser_id" indexName="@name" type="string" orderable="yes" />
-	<field name="puser_id" indexName="@name" apiName="userId" type="string" />
-	<field name="status" indexName="entry_status" apiName="@name" getter="status" type="bint" orderable="yes" />
-	<field name="type" indexName="@name" apiName="@name" type="int" orderable="yes" />
-	<field name="media_type" indexName="@name" apiName="@name" type="int" orderable="yes" />
-	<field name="views" indexName="@name" apiName="@name" type="int" orderable="yes" />
-	<field name="partner_id" indexName="@name" apiName="@name" type="bint" orderable="yes" keepCondition="yes" cacheInvalidationKey="yes" />
-	<field name="moderation_status" indexName="@name" apiName="@name" type="int" orderable="yes" />
-	<field name="display_in_search" indexName="@name" type="bint" orderable="yes" />
-	<field name="length_in_msecs" indexName="@name" apiName="msDuration" type="int" orderable="yes" />
-	<field name="access_control_id" indexName="@name" apiName="@name" type="int" orderable="yes" />
-	<field name="moderation_count" indexName="@name" apiName="@name" type="int" orderable="yes" />
-	<field name="rank" indexName="@name" apiName="@name" type="int" orderable="yes" />
-	<field name="total_rank" indexName="@name" apiName="@name" type="int" orderable="yes" />
-	<field name="plays" indexName="@name" apiName="@name" type="int" orderable="yes" />
-	<field name="partner_sort_value" indexName="@name" apiName="@name" type="bint" orderable="yes" />
-	<field name="replacement_status" indexName="@name" apiName="@name" type="int" />
-	<field name="sphinx_match_optimizations" indexName="@name" type="string" />
-	<field name="created_at" indexName="@name" apiName="@name" type="datetime" orderable="yes" />
-	<field name="updated_at" indexName="@name" apiName="@name" type="datetime" orderable="yes" />
-	<field name="modified_at" indexName="@name" type="datetime" orderable="yes" />
-	<field name="media_date" indexName="@name" apiName="@name" type="datetime" orderable="yes" />
-	<field name="start_date" indexName="@name" apiName="@name" type="datetime" orderable="yes" />
-	<field name="end_date" indexName="@name" apiName="@name" type="datetime" orderable="yes" />
-	<field name="available_from" indexName="@name" type="datetime" orderable="yes" />
-	<field name="last_played_at" indexName="@name" apiName="@name" type="datetime" orderable="yes" />
-	<field name="entitled_kusers_publish" indexName="@name" type="string" nullable="yes" matchable="yes" />
-	<field name="entitled_kusers_edit" indexName="@name" type="string" nullable="yes" matchable="yes" />
-	<field name="entitled_kusers" indexName="@name" type="string" nullable="yes" />
-	<field name="entitled_kusers_view" indexName="@name" type="string" nullable="yes"  matchable="yes" />
-	<field name="privacy_by_contexts" indexName="@name" type="string" nullable="yes" />
-	<field name="creator_kuser_id" indexName="@name" type="string" />
-	<field name="creator_puser_id" indexName="@name" apiName="creatorId" type="string" />
-	<field name="dynamic_attributes" indexName="@name" type="json" matchable="yes" />
-	<field name="first_broadcast" indexName="dynamic_attributes.first_broadcast" type="null" searchableonly="yes" orderable="yes" />
-	<field name="user_names" indexName="@name" type="string"/>
-	<field name="source" indexName="@name" type="int"/>
-	<field name="plugins_data" indexName="@name" type="string" searchableonly="yes" matchable="yes" />
-	<field name="search_text" indexName="(name,tags,description,entry_id,reference_id,roots,puser_id)" apiName="@name" type="null" searchableonly="yes" matchable="yes" />
-	<index format="P%sST%s">
-		<value field="partner_id" />
-		<value field="status" />
-	</index>
-	<index format="%s">
-		<value field="id" />
-	</index>
-	<index format="isLive%s">
-		<value field="dynamic_attributes.isLive"/>
-	</index>
-</object>
-<object name="kuser">
-	<field name="login_data_id" indexName="login_data_id" type="int" orderable="yes" />
-	<field name="is_admin" indexName="is_admin" type="int" orderable="yes" />
-	<field name="screen_name" indexName="screen_name" type="string" matchable="yes" />
-	<field name="full_name" indexName="full_name" type="string" matchable="yes" />
-	<field name="first_name" indexName="first_name" type="string" matchable="yes" />
-	<field name="last_name" indexName="last_name" type="string" matchable="yes" />
-	<field name="email" indexName="email" type="string" matchable="yes" />
-	<field name="about_me" indexName="about_me" type="string" matchable="yes" />
-	<field name="tags" indexName="tags" type="string" matchable="yes" />
-	<field name="entries" indexName="entries" type="int" />
-	<field name="storage_size" indexName="storage_size" type="int" />
-	<field name="status" indexName="kuser_status" getter="status" type="int" />
-	<field name="created_at" indexName="created_at" type="datetime" orderable="yes" />
-	<field name="updated_at" indexName="updated_at" type="datetime" orderable="yes" />
-	<field name="partner_id" indexName="partner_id" type="bint" cacheInvalidationKey="yes" />
-	<field name="display_in_search" indexName="display_in_search" type="bint" orderable="yes" />
-	<field name="partner_data" indexName="partner_data" type="string" matchable="yes" />
-	<field name="puser_id" indexName="puser_id" type="string" matchable="yes" nullable="yes"/>
-	<field name="indexed_partner_data_int" indexName="indexed_partner_data_int" type="bint" orderable="yes" />
-	<field name="indexed_partner_data_string" indexName="indexed_partner_data_string" type="string" matchable="yes" />
-	<field name="permission_names" indexName="permission_names" getter="indexedPermissionNames" type="string" matchable="yes" />
-	<field name="role_ids" indexName="role_ids" getter="indexedRoleIds" type="string" matchable="yes" />
-	<field name="dynamic_attributes" indexName="dynamic_attributes" type="json" searchableonly="yes" />
-	<field name="first_name_or_last_name" indexName="(full_name,last_name)" type="null" searchableonly="yes" />
-	<field name="puser_id_or_screen_name" indexName="(puser_id,screen_name)" type="null" searchableonly="yes" />
-	<field name="plugins_data" indexName="plugins_data" type="string" searchableonly="yes" />
-	<field name="type" indexName="type" getter="type" type="int" />
-</object>
+    <object name="category">
+        <field name="id" indexName="category_id" getter="id" type="int" orderable="yes" skipField="yes"/>
+        <field name="category_id" indexName="str_category_id" getter="id" type="string"/>
+        <field name="parent_id" indexName="parent_id" type="int"/>
+        <field name="partner_id" indexName="partner_id" type="bint" orderable="yes" keepCondition="yes"/>
+        <field name="name" indexName="name" type="string" orderable="yes" matchable="yes" sphinxStringAttribute="both"/>
+        <field name="full_name" indexName="full_name" getter="searchIndexfullName" type="string" orderable="yes"
+               searchEscapeType="3" matchable="yes" skipField="yes" sphinxStringAttribute="both"/>
+        <field name="full_ids" indexName="full_ids" getter="searchIndexfullIds" type="string" indexEscapeType="2"
+               searchEscapeType="3" matchable="yes"/>
+        <field name="description" indexName="description" type="string" nullable="yes" matchable="yes"/>
+        <field name="tags" indexName="tags" type="string" nullable="yes" matchable="yes"/>
+        <field name="status" indexName="category_status" getter="status" type="int" orderable="yes"/>
+        <field name="kuser_id" indexName="kuser_id" type="int" orderable="yes"/>
+        <field name="display_in_search" indexName="display_in_search" getter="optimizedDisplayInSearchIndex"
+               type="string" orderable="yes"/>
+        <field name="free_text" indexName="(str_category_id,name,tags,description,reference_id)" type="null"
+               searchableonly="yes" matchable="yes"/>
+        <field name="name_reference_id" indexName="(name,reference_id)" type="null" searchableonly="yes"/>
+        <field name="members" indexName="members" getter="membersByPermissionLevel" type="string" nullable="yes"
+               matchable="yes"/>
+        <field name="plugins_data" indexName="plugins_data" type="string" searchableonly="yes"/>
+        <field name="depth" indexName="depth" type="int" orderable="yes"/>
+        <field name="reference_id" indexName="reference_id" type="string" nullable="yes"/>
+        <field name="privacy_context" indexName="privacy_context" getter="searchIndexprivacyContext" type="string"
+               matchable="yes"/>
+        <field name="privacy_contexts" indexName="privacy_contexts" getter="searchIndexPrivacyContexts" type="string"
+               nullable="yes"/>
+        <field name="members_count" indexName="members_count" type="int" orderable="yes"/>
+        <field name="pending_members_count" indexName="pending_members_count" type="int" orderable="yes"/>
+        <field name="entries_count" indexName="entries_count" type="int" orderable="yes"/>
+        <field name="direct_entries_count" indexName="direct_entries_count" type="int" orderable="yes"/>
+        <field name="direct_sub_categories_count" indexName="direct_sub_categories_count" type="int" orderable="yes"/>
+        <field name="privacy" indexName="privacy" getter="privacyPartnerIdx" type="string"/>
+        <field name="inheritance_type" indexName="inheritance_type" type="int"/>
+        <field name="user_join_policy" indexName="user_join_policy" type="int"/>
+        <field name="default_permission_level" indexName="default_permission_level" type="int"/>
+        <field name="contribution_policy" indexName="contribution_policy" type="int"/>
+        <field name="inherited_parent_id" indexName="inherited_parent_id" type="int"/>
+        <field name="created_at" indexName="created_at" type="datetime" orderable="yes"/>
+        <field name="updated_at" indexName="updated_at" type="datetime" orderable="yes"/>
+        <field name="deleted_at" indexName="deleted_at" type="datetime"/>
+        <field name="partner_sort_value" indexName="partner_sort_value" type="bint" orderable="yes"/>
+        <field name="dynamic_attributes" indexName="dynamic_attributes" type="json" searchableonly="yes"/>
+        <field name="sphinx_match_optimizations" indexName="sphinx_match_optimizations" type="string"/>
+        <field name="aggregation_categories" indexName="aggregation_categories"
+               getter="aggregationCategoriesIndexEngine" type="string" matchable="yes"/>
+        <index format="%s">
+            <value field="id"/>
+        </index>
+        <index format="PARENT%s">
+            <value field="parent_id"/>
+        </index>
+        <index format="PID%s">
+            <value field="partner_id"/>
+        </index>
+        <cacheInvalidationKey>
+            <value field="id"/>
+            <value field="partner_id"/>
+        </cacheInvalidationKey>
+    </object>
+    <object name="categoryKuser">
+        <field name="category_id" indexName="category_id" type="string" matchable="yes"/>
+        <field name="kuser_id" indexName="kuser_id" type="string" matchable="yes"/>
+        <field name="category_full_ids" indexName="category_full_ids" getter="searchIndexCategoryFullIds" type="string"
+               indexEscapeType="2" searchEscapeType="3" matchable="yes"/>
+        <field name="permission_names" indexName="permission_names" getter="searchIndexPermissionNames" type="string"
+               matchable="yes"/>
+        <field name="puser_id" indexName="puser_id" type="string" matchable="yes"/>
+        <field name="screen_name" indexName="screen_name" type="string" matchable="yes"/>
+        <field name="status" indexName="category_kuser_status" getter="searchIndexStatus" type="string"
+               matchable="yes"/>
+        <field name="partner_id" indexName="partner_id" type="string"/>
+        <field name="update_method" indexName="update_method" getter="searchIndexUpdateMethod" type="string"
+               matchable="yes"/>
+        <field name="created_at" indexName="created_at" type="datetime" orderable="yes"/>
+        <field name="updated_at" indexName="updated_at" type="datetime" orderable="yes"/>
+        <cacheInvalidationKey>
+            <value field="partner_id"/>
+        </cacheInvalidationKey>
+    </object>
+    <object name="entry" indexId="str_entry_id" id="ID" apiName="KalturaBaseEntry">
+        <field name="entry_id" indexName="@name" apiName="@getter" getter="id" type="string"/>
+        <field name="str_entry_id" indexName="@name" getter="id" type="string" sphinxStringAttribute="string"/>
+        <field name="id" indexName="int_entry_id" getter="indexedId" type="int" skipField="yes"/>
+        <field name="name" indexName="@name" apiName="@name" type="string" orderable="yes" matchable="yes"
+               sphinxStringAttribute="both"/>
+        <field name="tags" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes"/>
+        <field name="categories_ids" indexName="categories" apiName="@name" getter="categoriesEntryIds" type="string"
+               nullable="yes" matchable="yes" enrichable="yes"/>
+        <field name="flavor_params_ids" indexName="flavor_params" apiName="@name" getter="flavorParamsIds" type="string"
+               nullable="yes" matchable="yes"/>
+        <field name="kshow_id" indexName="@name" type="string" nullable="yes"/>
+        <field name="group_id" indexName="@name" apiName="@name" type="string" nullable="yes"/>
+        <field name="description" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes"/>
+        <field name="admin_tags" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes"/>
+        <field name="duration_type" indexName="@name" apiName="@name" type="string" matchable="yes"/>
+        <field name="reference_id" indexName="@name" apiName="@name" type="string" getter="referenceIdWithMd5"
+               nullable="yes" matchable="yes"/>
+        <field name="replacing_entry_id" indexName="@name" apiName="@name" type="string" nullable="yes"
+               matchable="yes"/>
+        <field name="replaced_entry_id" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes"/>
+        <field name="roots" indexName="@name" type="string" nullable="yes" matchable="yes"/>
+        <field name="kuser_id" indexName="@name" type="string" orderable="yes"/>
+        <field name="puser_id" indexName="@name" apiName="userId" type="string"/>
+        <field name="status" indexName="entry_status" apiName="@name" getter="status" type="bint" orderable="yes"/>
+        <field name="type" indexName="@name" apiName="@name" type="int" orderable="yes"/>
+        <field name="media_type" indexName="@name" apiName="@name" type="int" orderable="yes"/>
+        <field name="views" indexName="@name" apiName="@name" type="int" orderable="yes"/>
+        <field name="partner_id" indexName="@name" apiName="@name" type="bint" orderable="yes" keepCondition="yes"/>
+        <field name="moderation_status" indexName="@name" apiName="@name" type="int" orderable="yes"/>
+        <field name="display_in_search" indexName="@name" type="bint" orderable="yes"/>
+        <field name="length_in_msecs" indexName="@name" apiName="msDuration" type="int" orderable="yes"/>
+        <field name="access_control_id" indexName="@name" apiName="@name" type="int" orderable="yes"/>
+        <field name="moderation_count" indexName="@name" apiName="@name" type="int" orderable="yes"/>
+        <field name="rank" indexName="@name" apiName="@name" type="int" orderable="yes"/>
+        <field name="total_rank" indexName="@name" apiName="@name" type="int" orderable="yes"/>
+        <field name="plays" indexName="@name" apiName="@name" type="int" orderable="yes"/>
+        <field name="partner_sort_value" indexName="@name" apiName="@name" type="bint" orderable="yes"/>
+        <field name="replacement_status" indexName="@name" apiName="@name" type="int"/>
+        <field name="sphinx_match_optimizations" indexName="@name" type="string"/>
+        <field name="created_at" indexName="@name" apiName="@name" type="datetime" orderable="yes"/>
+        <field name="updated_at" indexName="@name" apiName="@name" type="datetime" orderable="yes"/>
+        <field name="modified_at" indexName="@name" type="datetime" orderable="yes"/>
+        <field name="media_date" indexName="@name" apiName="@name" type="datetime" orderable="yes"/>
+        <field name="start_date" indexName="@name" apiName="@name" type="datetime" orderable="yes"/>
+        <field name="end_date" indexName="@name" apiName="@name" type="datetime" orderable="yes"/>
+        <field name="available_from" indexName="@name" type="datetime" orderable="yes"/>
+        <field name="last_played_at" indexName="@name" apiName="@name" type="datetime" orderable="yes"/>
+        <field name="entitled_kusers_publish" indexName="@name" type="string" nullable="yes" matchable="yes"/>
+        <field name="entitled_kusers_edit" indexName="@name" type="string" nullable="yes" matchable="yes"/>
+        <field name="entitled_kusers" indexName="@name" type="string" nullable="yes"/>
+        <field name="entitled_kusers_view" indexName="@name" type="string" nullable="yes" matchable="yes"/>
+        <field name="privacy_by_contexts" indexName="@name" type="string" nullable="yes"/>
+        <field name="creator_kuser_id" indexName="@name" type="string"/>
+        <field name="creator_puser_id" indexName="@name" apiName="creatorId" type="string"/>
+        <field name="dynamic_attributes" indexName="@name" type="json" matchable="yes"/>
+        <field name="first_broadcast" indexName="dynamic_attributes.first_broadcast" type="null" searchableonly="yes"
+               orderable="yes"/>
+        <field name="user_names" indexName="@name" type="string"/>
+        <field name="source" indexName="@name" type="int"/>
+        <field name="plugins_data" indexName="@name" type="string" searchableonly="yes" matchable="yes"/>
+        <field name="search_text" indexName="(name,tags,description,entry_id,reference_id,roots,puser_id)"
+               apiName="@name" type="null" searchableonly="yes" matchable="yes"/>
+        <index format="P%sST%s">
+            <value field="partner_id"/>
+            <value field="status"/>
+        </index>
+        <index format="%s">
+            <value field="id"/>
+        </index>
+        <index format="isLive%s">
+            <value field="dynamic_attributes.isLive"/>
+        </index>
+        <cacheInvalidationKey>
+            <value field="id"/>
+            <value field="partner_id"/>
+        </cacheInvalidationKey>
+    </object>
+    <object name="kuser">
+        <field name="login_data_id" indexName="login_data_id" type="int" orderable="yes"/>
+        <field name="is_admin" indexName="is_admin" type="int" orderable="yes"/>
+        <field name="screen_name" indexName="screen_name" type="string" matchable="yes"/>
+        <field name="full_name" indexName="full_name" type="string" matchable="yes"/>
+        <field name="first_name" indexName="first_name" type="string" matchable="yes"/>
+        <field name="last_name" indexName="last_name" type="string" matchable="yes"/>
+        <field name="email" indexName="email" type="string" matchable="yes"/>
+        <field name="about_me" indexName="about_me" type="string" matchable="yes"/>
+        <field name="tags" indexName="tags" type="string" matchable="yes"/>
+        <field name="entries" indexName="entries" type="int"/>
+        <field name="storage_size" indexName="storage_size" type="int"/>
+        <field name="status" indexName="kuser_status" getter="status" type="int"/>
+        <field name="created_at" indexName="created_at" type="datetime" orderable="yes"/>
+        <field name="updated_at" indexName="updated_at" type="datetime" orderable="yes"/>
+        <field name="partner_id" indexName="partner_id" type="bint" />
+        <field name="display_in_search" indexName="display_in_search" type="bint" orderable="yes"/>
+        <field name="partner_data" indexName="partner_data" type="string" matchable="yes"/>
+        <field name="puser_id" indexName="puser_id" type="string" matchable="yes" nullable="yes"/>
+        <field name="indexed_partner_data_int" indexName="indexed_partner_data_int" type="bint" orderable="yes"/>
+        <field name="indexed_partner_data_string" indexName="indexed_partner_data_string" type="string"
+               matchable="yes"/>
+        <field name="permission_names" indexName="permission_names" getter="indexedPermissionNames" type="string"
+               matchable="yes"/>
+        <field name="role_ids" indexName="role_ids" getter="indexedRoleIds" type="string" matchable="yes"/>
+        <field name="dynamic_attributes" indexName="dynamic_attributes" type="json" searchableonly="yes"/>
+        <field name="first_name_or_last_name" indexName="(full_name,last_name)" type="null" searchableonly="yes"/>
+        <field name="puser_id_or_screen_name" indexName="(puser_id,screen_name)" type="null" searchableonly="yes"/>
+        <field name="plugins_data" indexName="plugins_data" type="string" searchableonly="yes"/>
+        <field name="type" indexName="type" getter="type" type="int"/>
+        <cacheInvalidationKey>
+            <value field="id"/>
+            <value field="partner_id"/>
+        </cacheInvalidationKey>
+    </object>
 </schema>

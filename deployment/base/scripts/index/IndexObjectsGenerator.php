@@ -36,7 +36,6 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 		$this->generateSimpleFunction("getPropelIdField", $fp, $this->searchableObjects[$key]);
 		$this->generateSimpleFunction("getIdField", $fp, $this->searchableObjects[$key]);
 		$this->generateSimpleFunction("getDefaultCriteriaFilter", $fp, $this->searchableObjects[$key]);
-		$this->generateSimpleFunction("getCacheInvalidationKeys", $fp, $this->searchableObjects[$key]);
 		
 		$this->generateMapping("getIndexFieldsMap", $fp, $key,"fieldsMap");
 		$this->generateMapping("getIndexFieldTypesMap", $fp, $key, "typesMap");
@@ -117,14 +116,45 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 		$this->printToFile($fp, "");
 	}
 
-	private function generateCacheInvalidationKeys($fp, IndexableObject $object)
+	private function getCacheInvalidationKeyFirstLine($class)
+	{
+		$firstLine = "return array(";
+		$keysArray = array();
+		/* @var $cacheInvalidationKey IndexableCacheInvalidationKey */
+		foreach($this->searchableCacheInvalidationKeys[$class] as $cacheInvalidationKey)
+		{
+			$keysArray[]="array(\"{$class}:{$cacheInvalidationKey->getApiName()}=%s\", 
+			{$cacheInvalidationKey->getPeerName()}::{$cacheInvalidationKey->getName()})";
+		}
+
+		$firstLine.=implode(", ", $keysArray).");";
+
+		return $firstLine;
+	}
+
+	private function getCacheInvalidationKeySecondLine($class)
+	{
+		$secondLine = "return array(";
+		$keysArray = array();
+		/* @var $cacheInvalidationKey IndexableCacheInvalidationKey */
+		foreach($this->searchableCacheInvalidationKeys[$class] as $cacheInvalidationKey)
+		{
+			$keysArray[] = "\"{$class}:{$cacheInvalidationKey->getApiName()}=\".strtolower(\$object->{$cacheInvalidationKey->getGetter()}())";
+		}
+
+		$secondLine.=implode(", ", $keysArray).");";
+
+		return $secondLine;
+	}
+
+	private function generateCacheInvalidationKeys($fp, $class)
 	{
 		$this->printToFile($fp, "public static function getCacheInvalidationKeys(\$object = null)",1);
 		$this->printToFile($fp, "{",1);
 		$this->printToFile($fp, "if (is_null(\$object))",2);
-		$this->printToFile($fp, "return array(array(\"entry:id=%s\", entryPeer::ID), array(\"entry:partnerId=%s\", entryPeer::PARTNER_ID));",3);
+		$this->printToFile($fp, $this->getCacheInvalidationKeyFirstLine($class),3);
 		$this->printToFile($fp, "else",2);
-		$this->printToFile($fp, "return array(\"entry:id=\".strtolower($object->getId()), \"entry:partnerId=\".strtolower($object->getPartnerId()));",3);
+		$this->printToFile($fp, $this->getCacheInvalidationKeySecondLine($class),3);
 		$this->printToFile($fp, "}",1);
 		$this->printToFile($fp, "");
 	}

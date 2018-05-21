@@ -5,6 +5,7 @@ class IndexGeneratorBase
 	protected $searchableObjects = array();
 	protected $searchableFields = array();
 	protected $searchableIndices = array();
+	protected $searchableCacheInvalidationKeys = array();
 	protected $indexFiles = array();
 	
 	public function load($inputFile)
@@ -32,6 +33,9 @@ class IndexGeneratorBase
 						break;
 					case "index":
 						$this->parseIndex("$objName", $searchableField);
+						break;
+					case "":
+						$this->parseCacheInvalidationKey("$objName", $searchableField);
 						break;
 				}
 			}
@@ -73,58 +77,55 @@ class IndexGeneratorBase
 	
 	protected function parseField($objName, SimpleXMLElement $searchableField)
 	{
-		$fieldAttribtues = $searchableField->attributes();
-		$name = $this->tryXpath($searchableField, $fieldAttribtues["name"]);
-		$index = $this->tryXpath($searchableField, $fieldAttribtues["indexName"]);
-		$type = $this->tryXpath($searchableField, $fieldAttribtues["type"]);
+		$fieldAttributes = $searchableField->attributes();
+		$name = $this->tryXpath($searchableField, $fieldAttributes["name"]);
+		$index = $this->tryXpath($searchableField, $fieldAttributes["indexName"]);
+		$type = $this->tryXpath($searchableField, $fieldAttributes["type"]);
 		$field = new IndexableField("$name", "$index", "$type");
 		
-		$field->setGetter(isset($fieldAttribtues["getter"]) ? $fieldAttribtues["getter"] :
+		$field->setGetter(isset($fieldAttributes["getter"]) ? $fieldAttributes["getter"] :
 				preg_replace('/_(.?)/e',"strtoupper('$1')","$name"));
 
-		if (!isset($fieldAttribtues["getter"]))
-			$fieldAttribtues->addAttribute('getter', $field->getter); // so we could use the getter in xpath even if it was not explicitly defined
+		if (!isset($fieldAttributes["getter"]))
+			$fieldAttributes->addAttribute('getter', $field->getter); // so we could use the getter in xpath even if it was not explicitly defined
 
-		if(isset($fieldAttribtues["apiName"])) {
-			$apiName = $this->tryXpath($searchableField, (string)$fieldAttribtues["apiName"]);
+		if(isset($fieldAttributes["apiName"])) {
+			$apiName = $this->tryXpath($searchableField, (string)$fieldAttributes["apiName"]);
 			$apiName = preg_replace('/_(.?)/e',"strtoupper('$1')", $apiName);
 			$field->setApiName($apiName);
 		}
 
-		if(isset($fieldAttribtues["nullable"]))
-			$field->setNullable($fieldAttribtues["nullable"] == "yes");
+		if(isset($fieldAttributes["nullable"]))
+			$field->setNullable($fieldAttributes["nullable"] == "yes");
 
-		if(isset($fieldAttribtues["orderable"]))
-			$field->setOrderable($fieldAttribtues["orderable"] == "yes");
+		if(isset($fieldAttributes["orderable"]))
+			$field->setOrderable($fieldAttributes["orderable"] == "yes");
 		
-		if(isset($fieldAttribtues["searchableonly"]))
-			$field->setSearchOnly($fieldAttribtues["searchableonly"] == "yes");
+		if(isset($fieldAttributes["searchableonly"]))
+			$field->setSearchOnly($fieldAttributes["searchableonly"] == "yes");
 		
-		if(isset($fieldAttribtues["skipField"]))
-			$field->setSkipField($fieldAttribtues["skipField"] == "yes");
+		if(isset($fieldAttributes["skipField"]))
+			$field->setSkipField($fieldAttributes["skipField"] == "yes");
 		
-		if(isset($fieldAttribtues["matchable"]))
-			$field->setMatchable($fieldAttribtues["matchable"] == "yes");
+		if(isset($fieldAttributes["matchable"]))
+			$field->setMatchable($fieldAttributes["matchable"] == "yes");
 		
-		if(isset($fieldAttribtues["indexEscapeType"]))
-			$field->setIndexEscapeType($fieldAttribtues["indexEscapeType"]);
+		if(isset($fieldAttributes["indexEscapeType"]))
+			$field->setIndexEscapeType($fieldAttributes["indexEscapeType"]);
 		
-		if(isset($fieldAttribtues["searchEscapeType"]))
-			$field->setSearchEscapeType($fieldAttribtues["searchEscapeType"]);
+		if(isset($fieldAttributes["searchEscapeType"]))
+			$field->setSearchEscapeType($fieldAttributes["searchEscapeType"]);
 		
-		if(isset($fieldAttribtues["keepCondition"]))
-			$field->setKeepCondition($fieldAttribtues["keepCondition"] == "yes");
+		if(isset($fieldAttributes["keepCondition"]))
+			$field->setKeepCondition($fieldAttributes["keepCondition"] == "yes");
 		
-		if(isset($fieldAttribtues["sphinxStringAttribute"])) {
-			$sphinxType = $fieldAttribtues["sphinxStringAttribute"];
+		if(isset($fieldAttributes["sphinxStringAttribute"])) {
+			$sphinxType = $fieldAttributes["sphinxStringAttribute"];
 			$field->setSphinxStringAttribute("$sphinxType");
 		}
 
-		if(isset($fieldAttribtues["enrichable"]))
-			$field->setEnrichable($fieldAttribtues["enrichable"] == "yes");
-
-		if(isset($fieldAttribtues["cacheInvalidationKey"]))
-			$field->setCacheInvalidationKey($fieldAttribtues["cacheInvalidationKey"] == "yes");
+		if(isset($fieldAttributes["enrichable"]))
+			$field->setEnrichable($fieldAttributes["enrichable"] == "yes");
 
 		$this->searchableFields[$objName]["$name"] = $field;
 	}
@@ -147,6 +148,24 @@ class IndexGeneratorBase
 		}
 		
 		$this->searchableIndices[$objName][] = $index;
+	}
+
+	protected function parseCacheInvalidationKey($objName, $indexComplex)
+	{
+		$index = array();
+		$fieldAttribtues = $indexComplex->attributes();
+		$format = $fieldAttribtues["format"];
+		$index[] = "\"$format\"";
+		foreach($indexComplex->children() as $indexValue)
+		{
+			$idxValueAttr = $indexValue->attributes();
+			$fieldName = $idxValueAttr["field"];
+			$getter = "get" . ucwords(preg_replace('/_(.?)/e', "strtoupper('$1')", $fieldName));
+			$apiName = lcfirst(ucwords(preg_replace('/_(.?)/e', "strtoupper('$1')", $fieldName)));
+			$index[] = new IndexableCacheInvalidationKey(strtoupper($fieldName), $getter, $objName . "Peer", $apiName);
+		}
+
+		$this->searchableCacheInvalidationKeys[$objName] = $index;
 	}
 
 	protected function tryXpath(SimpleXMLElement $element, $maybeXpath)
