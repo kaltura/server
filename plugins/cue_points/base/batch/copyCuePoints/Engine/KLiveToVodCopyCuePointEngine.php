@@ -26,11 +26,6 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
         $this->amfData = $amfArray;
     }
 
-    public function shouldCopyCuePoint($cuePoint)
-    {
-        return true;
-    }
-
     protected function getOrderByField() {return 'createdAt';}
 
     public function validateJobData()

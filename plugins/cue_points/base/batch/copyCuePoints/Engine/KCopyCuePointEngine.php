@@ -13,7 +13,7 @@ abstract class KCopyCuePointEngine
 
     abstract public function copyCuePoints();
 
-    abstract public function shouldCopyCuePoint($cuePoint);
+    protected function shouldCopyCuePoint($cuePoint) {return true;}
 
     protected function calculateCuePointTimes($cuePoint) {return array($cuePoint->startTime, $cuePoint->endTime);}
 
@@ -145,9 +145,11 @@ abstract class KCopyCuePointEngine
 
     protected function setCalculatedEndTimeOnCuePoints(&$cuePoints)
     {
+        //setting calculatedEndTime on cue points in order to decide in shouldCopyCuePoint method
         $orderField = $this->getOrderByField();
         foreach ($cuePoints as &$cuePoint)
         {
+            // set on calculatedEndTime the end time if existed or the next cue point start time
             $type = self::getTypeName($cuePoint);
             $cuePoint->calculatedEndTime = null;
             if (array_key_exists($type, $this->lastCuePointPerType))
