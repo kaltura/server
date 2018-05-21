@@ -28,8 +28,6 @@ abstract class KCopyCuePointEngine
         $this->setCalculatedEndTimeOnCuePoints($cuePoints);
     }
 
-    //protected function preProcessCuePoints(&$cuePoints) {}
-
     protected function copyCuePointsToEntry($srcEntryId, $destEntryId)
     {
         $filter = $this->getCuePointFilter($srcEntryId);
