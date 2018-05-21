@@ -10,6 +10,7 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
     protected $currentSegmentStartTime = null;
     protected $currentSegmentEndTime = null;
     protected $amfData = null;
+    private $lastCuePointPerType = null;
     
     public function copyCuePoints()
     {
@@ -24,12 +25,15 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
         $this->currentSegmentEndTime = self::getSegmentEndTime($amfArray, $data->lastSegmentDuration + $data->lastSegmentDrift) + self::MAX_CHUNK_DURATION_IN_SEC;
         self::normalizeAMFTimes($amfArray, $data->totalVodDuration, $data->lastSegmentDuration);
         $this->amfData = $amfArray;
+        $this->lastCuePointPerType = array();
     }
 
     public function shouldCopyCuePoint($cuePoint)
     {
         return true;
     }
+
+    protected function getOrderByField() {return 'createdAt';}
 
     public function validateJobData()
     {
@@ -53,7 +57,11 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
         // if the cp was before the segment start time - move it to the beginning of the segment.
         $cuePointCreationTime = max($cuePoint->createdAt * 1000, $this->currentSegmentStartTime * 1000);
         $cuePointDestStartTime = self::getOffsetForTimestamp($cuePointCreationTime, $this->amfData);
-        return array($cuePointDestStartTime, null);
+
+        $cuePointDestEndTime = null;
+        if ($cuePoint->endTime)
+            $cuePointDestEndTime = self::getOffsetForTimestamp($cuePoint->endTime * 1000, $this->amfData);
+        return array($cuePointDestStartTime, $cuePointDestEndTime);
     }
     
     protected static function postProcessCuePoints($copiedCuePointIds)

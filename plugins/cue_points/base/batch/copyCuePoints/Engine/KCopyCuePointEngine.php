@@ -14,11 +14,20 @@ abstract class KCopyCuePointEngine
 
     abstract public function shouldCopyCuePoint($cuePoint);
 
-    abstract public function calculateCuePointTimes($cuePoint);
+    protected function calculateCuePointTimes($cuePoint) {return array($cuePoint->startTime, $cuePoint->endTime);}
 
     protected function validateJobData() {return true;}
 
+    protected function getOrderByField() {return 'startTime';}
+
     protected static function postProcessCuePoints($copiedCuePointIds) {}
+
+    protected function preProcessCuePoints(&$liveCuePoints)
+    {
+        $this->setEndTime($liveCuePoints);
+    }
+
+    //protected function preProcessCuePoints(&$cuePoints) {}
 
     protected function copyCuePointsToEntry($srcEntryId, $destEntryId)
     {
@@ -31,7 +40,10 @@ abstract class KCopyCuePointEngine
             $listResponse = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine','cuePointList'), array($filter, $pager));
             if (!$listResponse)
                 return false;
-            foreach ($listResponse->objects as $cuePoint)
+            $cuePoints = $listResponse->objects;
+            $this->preProcessCuePoints($cuePoints);
+            KalturaLog::debug("asdf: " . print_r($cuePoints, true));
+            foreach ($cuePoints as $cuePoint)
             {
                 if ($this->shouldCopyCuePoint($cuePoint))
                 {
@@ -42,7 +54,7 @@ abstract class KCopyCuePointEngine
             }
             $pager->pageIndex++;
             
-        } while (count($listResponse->objects) == self::MAX_CUE_POINT_CHUNKS);
+        } while (count($cuePoints) == self::MAX_CUE_POINT_CHUNKS);
         $this->postProcessCuePoints($clonedCuePointIds);
         return true;
     }
@@ -98,7 +110,7 @@ abstract class KCopyCuePointEngine
         $filter = new KalturaCuePointFilter();
         $filter->entryIdEqual = $entryId;
         $filter->statusIn = $status;
-        $filter->orderBy = '+createdAt';
+        $filter->orderBy = '+' . $this->getOrderByField();
         return $filter;
     }
 
@@ -129,4 +141,37 @@ abstract class KCopyCuePointEngine
     {
         return KBatchBase::$kClient->cuePoint->updateStatus($cuePointId, $newStatus);
     }
+
+
+
+
+
+    private $lastCuePointPerType = array();
+    protected function setEndTime(&$liveCuePoints)
+    {
+        $orderField = $this->getOrderByField();
+        foreach ($liveCuePoints as &$liveCuePoint)
+        {
+            $type = self::getType($liveCuePoint);
+            if ($type)
+            {
+                if ($this->lastCuePointPerType[$type] && is_null($this->lastCuePointPerType[$type]->endTime))
+                    $this->lastCuePointPerType[$type]->endTime = $liveCuePoint->$orderField;
+                $this->lastCuePointPerType[$type] = &$liveCuePoint;
+            }
+        }
+    }
+
+    private static function getType($liveCuePoint) {
+        KalturaLog::debug($liveCuePoint->cuePointType);
+        if ($liveCuePoint->cuePointType == 'thumbCuePoint.Thumb')
+            return 'Thumb';
+        if ($liveCuePoint->cuePointType == 'annotation.Annotation')
+            return 'Annotation';
+        if ($liveCuePoint->cuePointType  == 'codeCuePoint.Code')
+            if ($liveCuePoint->tags == 'change-view-mode')
+                return 'changeViewMode';
+        return null;
+    }
+    
 }
