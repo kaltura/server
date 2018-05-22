@@ -21,7 +21,7 @@ class KalturaAPIException extends Exception
 		$this->message = $errorData['message'];
 		$this->code = $errorData['code'];
 		$this->args = $errorData['args'];
-		$this->codeStr = $errorData['code'];;
+		$this->codeStr = $errorData['code'];
 	}
 	
 	/**
@@ -40,6 +40,8 @@ class KalturaAPIException extends Exception
 	
 	public function __wakeup()
 	{
+		//When running on PHP7 the code string does not get un-serialized
+		//(This is probably due to the fact that the Exception base class has a code attribute which is of type int)
 		if($this->codeStr)
 		{
 			$this->code = $this->codeStr;
