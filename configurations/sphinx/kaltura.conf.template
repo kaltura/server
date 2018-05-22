@@ -419,6 +419,7 @@ index kaltura_schedule_event:kaltura_base
 	rt_field = parent_id
 	rt_attr_bigint = partner_id
 	rt_field = summary
+	rt_attr_string = summary
 	rt_field = description
 	rt_attr_uint = schedule_event_type
 	rt_attr_uint = schedule_event_status

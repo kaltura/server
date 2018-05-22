@@ -4,7 +4,7 @@
 	        <field name="id" indexName="int_id" type="int" skipField="yes" />
 	        <field name="parent_id" indexName="parent_id" type="string" matchable="yes" />
 	        <field name="partner_id" indexName="partner_id" type="bint" />
-	        <field name="summary" indexName="summary" type="string" matchable="yes" orderable="yes"/>
+	        <field name="summary" indexName="summary" type="string" matchable="yes" orderable="yes" sphinxStringAttribute="both"/>
 	        <field name="description" indexName="description" type="string" matchable="yes" />
 	        <field name="type" indexName="schedule_event_type" getter="type" type="int" />
 	        <field name="status" indexName="schedule_event_status" getter="status" type="int" />
