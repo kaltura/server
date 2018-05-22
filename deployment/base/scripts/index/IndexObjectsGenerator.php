@@ -119,12 +119,13 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 
 	private function getCacheInvalidationKeyFirstLine($class)
 	{
+		$indexName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $class));
 		$firstLine = "return array(";
 		$keysArray = array();
 		/* @var $cacheInvalidationKey IndexableCacheInvalidationKey */
 		foreach($this->searchableCacheInvalidationKeys[$class] as $cacheInvalidationKey)
 		{
-			$keysArray[]="array(\"{$class}:{$cacheInvalidationKey->getApiName()}=%s\", {$cacheInvalidationKey->getPeerName()}::{$cacheInvalidationKey->getName()})";
+			$keysArray[]="array(\"{$indexName}:{$cacheInvalidationKey->getApiName()}=%s\", {$cacheInvalidationKey->getPeerName()}::{$cacheInvalidationKey->getName()})";
 		}
 
 		$firstLine.=implode(", ", $keysArray).");";
@@ -134,12 +135,13 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 
 	private function getCacheInvalidationKeySecondLine($class)
 	{
+		$indexName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $class));
 		$secondLine = "return array(";
 		$keysArray = array();
 		/* @var $cacheInvalidationKey IndexableCacheInvalidationKey */
 		foreach($this->searchableCacheInvalidationKeys[$class] as $cacheInvalidationKey)
 		{
-			$keysArray[] = "\"{$class}:{$cacheInvalidationKey->getApiName()}=\".strtolower(\$object->{$cacheInvalidationKey->getGetter()}())";
+			$keysArray[] = "\"{$indexName}:{$cacheInvalidationKey->getApiName()}=\".strtolower(\$object->{$cacheInvalidationKey->getGetter()}())";
 		}
 
 		$secondLine.=implode(", ", $keysArray).");";
