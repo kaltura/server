@@ -105,36 +105,10 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	 */
 	private static function handleConcatAfterClipJobFinished($dbBatchJob, $data)
 	{
-
 		/** @var kClipDescription[] $kClipDescriptionArray */
-		$kClipDescriptionArray = array();
-		KalturaLog::debug("Cue Point Destination Entry ID: " . $data->getDestEntryId());
-		$globalOffset = 0;
-		/** @var kClipAttributes $operationAttribute */
-		foreach ($data->getOperationAttributes() as $operationAttribute)
-		{
-			$kClipDescription = new kClipDescription();
-			if (!$data->getSourceEntryId())
-			{
-				//if no source entry we will not copy the entry ID. add clip offset to global offset and continue
-				$globalOffset = $globalOffset + $operationAttribute->getDuration();
-				continue;
-			}
-			$kClipDescription->setSourceEntryId($data->getSourceEntryId());
-			$kClipDescription->setStartTime($operationAttribute->getOffset());
-			$kClipDescription->setDuration($operationAttribute->getDuration());
-			self::setCuePointGlobalOffset($operationAttribute, $globalOffset,$kClipDescription);
-			$kClipDescriptionArray[] = $kClipDescription;
-			//add clip offset to global offset
-			$globalOffset = $globalOffset + $operationAttribute->getDuration();
-		}
-		$jobData = new kCopyCuePointsJobData();
-		$jobData->setClipsDescriptionArray($kClipDescriptionArray);
-		$jobData->setDestinationEntryId($data->getDestEntryId());
-		$batchJob = new BatchJob();
-		$batchJob->setEntryId($data->getDestEntryId());
-		$batchJob->setPartnerId($data->getPartnerId());
-		kJobsManager::addJob($batchJob, $jobData, BatchJobType::COPY_CUE_POINTS);
+		$kClipDescriptionArray = self::getClipDescriptionFromOperationAttribute($data->getOperationAttributes(), $data->getSourceEntryId());
+		KalturaLog::debug("Cue Point Destination Entry ID: [{$data->getDestEntryId()}] and source entry ID: [{$data->getSourceEntryId()}]");
+		kJobsManager::addMultiClipCopyCuePointsJob($data->getDestEntryId(), $data->getPartnerId(), $kClipDescriptionArray);
 	}
 
 	/**
@@ -163,11 +137,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $data->getDestDataFilePath())
 		{
 			$replacedEntry = $entry->getReplacedEntryId() ? entryPeer::retrieveByPK($entry->getReplacedEntryId()) : null;
-			if ($replacedEntry && $replacedEntry->getFlowType() == EntryFlowType::LIVE_CLIPPING)
-			{
-				KalturaLog::debug("Entry [" . $replacedEntry->getId() . "] is from live clip flow - Cue point will not be copied");
-				return $dbBatchJob;
-			}
+			$liveClipping = ($replacedEntry && $replacedEntry->getFlowType() == EntryFlowType::LIVE_CLIPPING);
 
 			$liveEntryId = $replacedEntry ? $replacedEntry->getRootEntryId() : $entry->getRootEntryId();
 			$vodEntryId = $replacedEntry ? $replacedEntry->getId() : $entry->getId();
@@ -223,6 +193,9 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			$liveToVodBatchJob = new BatchJob();
 			$liveToVodBatchJob->setEntryId($entry->getId());
 			$liveToVodBatchJob->setPartnerId($entry->getPartnerId());
+
+			if ($liveClipping)
+				return kJobsManager::addJob($liveToVodBatchJob, $liveToVodJobData, BatchJobType::COPY_CUE_POINTS, CopyCuePointJobType::LIVE_CLIPPING);
 			
 			kJobsManager::addJob($liveToVodBatchJob, $liveToVodJobData, BatchJobType::LIVE_TO_VOD);
 		}
@@ -1019,32 +992,11 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 				KalturaLog::info("Didn't copy cuePoints for entry [{$clipEntry->getId()}] because source entry [" . $clipEntry->getSourceEntryId() . "] wasn't found");
 				return;
 			}
-			$sourceEntryDuration = $sourceEntry->getLengthInMsecs();
-			$clipStartTime = $clipAtts->getOffset();
-			if ( is_null($clipStartTime) )
-				$clipStartTime = 0;
-			$clipDuration = $clipAtts->getDuration();
-			if ( is_null($clipDuration) )
-				$clipDuration = $sourceEntryDuration;
-			$c = new KalturaCriteria();
-			$c->add( CuePointPeer::ENTRY_ID, $clipEntry->getSourceEntryId() );
-			if ( $clipDuration < $sourceEntryDuration ) {
-				$c->addAnd( CuePointPeer::START_TIME, $clipStartTime + $clipDuration, KalturaCriteria::LESS_EQUAL );
-			}
-			if ( $clipStartTime > 0 ) {
-				$c->addAnd( CuePointPeer::START_TIME, $clipStartTime, KalturaCriteria::GREATER_EQUAL );
-				$c->addOr( CuePointPeer::START_TIME, 0, KalturaCriteria::EQUAL );
-			}
-			$c->addAscendingOrderByColumn(CuePointPeer::CREATED_AT);
-			$rootEntryCuePointsToCopy = CuePointPeer::doSelect($c);
-			if ( count( $rootEntryCuePointsToCopy ) <= self::MAX_CUE_POINTS_TO_COPY )
-			{
-				foreach( $rootEntryCuePointsToCopy as $cuePoint ) {
-					$cuePoint->copyToClipEntry( $clipEntry, $clipStartTime, $clipDuration );
-				}
-			} else {
-				KalturaLog::alert("Can't copy cuePoints for entry [{$clipEntry->getId()}] because cuePoints count exceeded max limit of [" . self::MAX_CUE_POINTS_TO_COPY . "]");
-			}
+			$sourceEntryId = $sourceEntry->getID();
+			$destEntryId = $clipEntry->getID();
+			$kClipDescriptionArray = self::getClipDescriptionFromOperationAttribute(array($clipAtts), $sourceEntryId);
+			KalturaLog::debug("Execute Cue-Point copy for clip. From [$sourceEntryId] to [$destEntryId] with operation of " . print_r($kClipDescriptionArray, true));
+			return kJobsManager::addMultiClipCopyCuePointsJob($destEntryId, $clipEntry->getPartnerId(), $kClipDescriptionArray);
 		}
 	}
 
@@ -1054,5 +1006,30 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$shouldReIndexToElastic = $cuePoint->shouldReIndexEntryToElastic($modifiedColumns);
 		if($shouldReIndexToSphinx || $shouldReIndexToElastic)
 			$this->reIndexCuePointEntry($cuePoint, $shouldReIndexToSphinx, $shouldReIndexToElastic);
+	}
+
+	private static function getClipDescriptionFromOperationAttribute($operationAttributes, $sourceEntryId)
+	{
+		$kClipDescriptionArray = array();
+		$globalOffset = 0;
+		/** @var kClipAttributes $operationAttribute */
+		foreach ($operationAttributes as $operationAttribute)
+		{
+			$kClipDescription = new kClipDescription();
+			if (!$sourceEntryId)
+			{
+				//if no source entry id we will not copy the entry. add clip offset to global offset and continue
+				$globalOffset = $globalOffset + $operationAttribute->getDuration();
+				continue;
+			}
+			$kClipDescription->setSourceEntryId($sourceEntryId);
+			$kClipDescription->setStartTime($operationAttribute->getOffset());
+			$kClipDescription->setDuration($operationAttribute->getDuration());
+			self::setCuePointGlobalOffset($operationAttribute, $globalOffset,$kClipDescription);
+			$kClipDescriptionArray[] = $kClipDescription;
+			//add clip offset to global offset
+			$globalOffset += $operationAttribute->getDuration();
+		}
+		return $kClipDescriptionArray;
 	}
 }

@@ -8,6 +8,7 @@ class kmc4Action extends kalturaAction
 	const CURRENT_KMC_VERSION = 4;
     const HTML5_STUDIO_TAG = 'HTML5Studio';
     const STUDIO_V3_TAG = 'HTML5StudioV3';
+    const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
 	const LIVE_ANALYTICS_UICONF_TAG = 'livea_player';
 	const LIVE_DASHBOARD_UICONF_TAG = 'lived_player';
 	
@@ -166,6 +167,10 @@ class kmc4Action extends kalturaAction
 		$this->content_uiconfs_studio_v3 = isset($this->studioV3UiConf) ? array_values($this->studioV3UiConf) : null;
 		$this->content_uiconf_studio_v3 = (is_array($this->content_uiconfs_studio_v3) && reset($this->content_uiconfs_studio_v3)) ? reset($this->content_uiconfs_studio_v3) : null;
 
+		$this->playerV3VersionsUiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, "");
+		$this->content_uiconfs_player_v3_versions = isset($this->playerV3VersionsUiConf) ? array_values($this->playerV3VersionsUiConf) : null;
+		$this->content_uiconf_player_v3_versions = (is_array($this->content_uiconfs_player_v3_versions) && reset($this->content_uiconfs_player_v3_versions)) ? reset($this->content_uiconfs_player_v3_versions) : null;
+
 		$this->liveAUiConf = uiConfPeer::getUiconfByTagAndVersion(self::LIVE_ANALYTICS_UICONF_TAG, kConf::get("liveanalytics_version"));
 		$this->content_uiconfs_livea = isset($this->liveAUiConf) ? array_values($this->liveAUiConf) : null;
 		$this->content_uiconf_livea = (is_array($this->content_uiconfs_livea) && reset($this->content_uiconfs_livea)) ? reset($this->content_uiconfs_livea) : null;
@@ -227,6 +232,7 @@ class kmc4Action extends kalturaAction
                 'version'				=> kConf::get("studio_v3_version"),
                 'uiConfID'				=> isset($this->content_uiconf_studio_v3) ? $this->content_uiconf_studio_v3->getId() : '',
                 'config'				=> isset($this->content_uiconf_studio_v3) ? $this->content_uiconf_studio_v3->getConfig() : '',
+                'playerVersionsMap'		=> isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfig() : '',
                 'showFlashStudio'		=> $showFlashStudio,
                 'showHTMLStudio'		=> $showHTMLStudio,
                 'showStudioV3'		    => $showStudioV3,

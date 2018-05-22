@@ -18,3 +18,11 @@ elasticPort = @BEACONS_ELASTIC_PORT@
 [highlights]
 globalMaxNumberOfFragments = 7
 cuepointMaxNumberOfFragments = 8
+
+[highlights_priority]
+fieldname = 10
+default = 50
+raw = 1
+ngrams = 100
+synonym = 100
+thai = 150

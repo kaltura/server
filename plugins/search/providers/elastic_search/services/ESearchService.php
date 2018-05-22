@@ -18,7 +18,7 @@ class ESearchService extends KalturaBaseService
 		$entrySearch = new kEntrySearch();
 		list($coreResults, $objectCount) = $this->initAndSearch($entrySearch, $searchParams, $pager);
 		$response = new KalturaESearchEntryResponse();
-		$response->objects = KalturaESearchEntryResultArray::fromDbArray($coreResults);
+		$response->objects = KalturaESearchEntryResultArray::fromDbArray($coreResults, $this->getResponseProfile());
 		$response->totalCount = $objectCount;
 		return $response;
 	}
@@ -35,7 +35,7 @@ class ESearchService extends KalturaBaseService
 		$categorySearch = new kCategorySearch();
 		list($coreResults, $objectCount) = $this->initAndSearch($categorySearch, $searchParams, $pager);
 		$response = new KalturaESearchCategoryResponse();
-		$response->objects = KalturaESearchCategoryResultArray::fromDbArray($coreResults);
+		$response->objects = KalturaESearchCategoryResultArray::fromDbArray($coreResults, $this->getResponseProfile());
 		$response->totalCount = $objectCount;
 		return $response;
 	}
@@ -52,7 +52,7 @@ class ESearchService extends KalturaBaseService
 		$userSearch = new kUserSearch();
 		list($coreResults, $objectCount) = $this->initAndSearch($userSearch, $searchParams, $pager);
 		$response = new KalturaESearchUserResponse();
-		$response->objects = KalturaESearchUserResultArray::fromDbArray($coreResults);
+		$response->objects = KalturaESearchUserResultArray::fromDbArray($coreResults, $this->getResponseProfile());
 		$response->totalCount = $objectCount;
 		return $response;
 	}

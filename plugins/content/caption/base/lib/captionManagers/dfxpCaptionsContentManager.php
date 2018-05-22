@@ -248,12 +248,12 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 				$duration = floatval($childNode->getAttribute('dur')) * 1000;
 				$captionEndTime = $captionStartTime + $duration;
 			}
-			if(!kCaptionsContentManager::onTimeRange($captionStartTime, $captionEndTime, $clipStartTime, $clipEndTime))
+			if(!TimeOffsetUtils::onTimeRange($captionStartTime, $captionEndTime, $clipStartTime, $clipEndTime))
 				$curNode->removeChild($childNode);
 			else
 				{
-				$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($captionStartTime, $clipStartTime, $globalOffset);
-				$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $captionEndTime, $globalOffset);
+				$adjustedStartTime = TimeOffsetUtils::getAdjustedStartTime($captionStartTime, $clipStartTime, $globalOffset);
+				$adjustedEndTime = TimeOffsetUtils::getAdjustedEndTime($captionEndTime, $clipStartTime, $clipEndTime, $globalOffset);
 
 				$childNode->setAttribute('begin',kXml::integerToTime($adjustedStartTime));
 				if($childNode->hasAttribute('end'))

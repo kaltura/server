@@ -131,7 +131,7 @@ class ServerNodePeer extends BaseServerNodePeer {
 	
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("serverNode:id%s", self::ID), array("serverNode:hostName=%s", self::HOST_NAME));		
+		return array(array("serverNode:id%s", self::ID), array("serverNode:hostName=%s", self::HOST_NAME), array("serverNode:status=%s", self::STATUS));
 	}
 
 	public static function retrieveActiveUnoccupiedServerNodesByType($type, PropelPDO $con = null)

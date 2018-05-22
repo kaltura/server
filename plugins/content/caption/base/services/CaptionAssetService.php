@@ -119,17 +119,21 @@ class CaptionAssetService extends KalturaAssetService
 		$kContentResource = $contentResource->toObject();
 		$this->attachContentResource($dbCaptionAsset, $kContentResource);
 		$contentResource->entryHandled($dbCaptionAsset->getentry());
-
-		$newStatuses = array(
-			CaptionAsset::ASSET_STATUS_READY,
-			CaptionAsset::ASSET_STATUS_VALIDATING,
-			CaptionAsset::ASSET_STATUS_TEMP,
-		);
-
-		if ($previousStatus == CaptionAsset::ASSET_STATUS_QUEUED && in_array($dbCaptionAsset->getStatus(), $newStatuses))
-			kEventsManager::raiseEvent(new kObjectAddedEvent($dbCaptionAsset));
-		else
-			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbCaptionAsset));
+		
+    	$newStatuses = array(
+    		CaptionAsset::ASSET_STATUS_READY,
+    		CaptionAsset::ASSET_STATUS_VALIDATING,
+    		CaptionAsset::ASSET_STATUS_TEMP,
+    	);
+    	
+    	if($previousStatus == CaptionAsset::ASSET_STATUS_QUEUED && in_array($dbCaptionAsset->getStatus(), $newStatuses))
+   			kEventsManager::raiseEvent(new kObjectAddedEvent($dbCaptionAsset));
+   		else
+	    {
+		    kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbCaptionAsset));
+		    $dbEntry->setCacheFlavorVersion($dbEntry->getCacheFlavorVersion() + 1);
+		    $dbEntry->save();
+	    }
 
 		$captionAsset = new KalturaCaptionAsset();
 		$captionAsset->fromObject($dbCaptionAsset, $this->getResponseProfile());

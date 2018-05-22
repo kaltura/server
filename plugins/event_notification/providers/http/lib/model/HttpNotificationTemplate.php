@@ -26,7 +26,7 @@ class HttpNotificationTemplate extends BatchEventNotificationTemplate implements
 	const CUSTOM_DATA_POST_FILE_VERSION = 'postFileVersion';
 	
 	const FILE_SYNC_POST = 1;
-	
+
 	public function __construct()
 	{
 		$this->setType(HttpNotificationPlugin::getHttpNotificationTemplateTypeCoreValue(HttpNotificationTemplateType::HTTP));
@@ -75,14 +75,15 @@ class HttpNotificationTemplate extends BatchEventNotificationTemplate implements
 			$contentParametersValues[$key] = $value->getValue();
 			$scope->addDynamicValue($key, $value);
 		}
-	
+
 		$data = $this->getData();
 		if($data)
 			$data->setScope($scope);
 		
 		$jobData = new kHttpNotificationDispatchJobData();
 		$jobData->setTemplateId($this->getId());
-		$jobData->setUrl($this->getUrl());
+		$url = str_replace('{DC}',kDataCenterMgr::getCurrentDcName(), $this->getUrl());
+		$jobData->setUrl($url);
 		$jobData->setDataObject($data);
 		$jobData->setMethod($this->getMethod());
 		$jobData->setTimeout($this->getTimeout());
@@ -315,4 +316,5 @@ class HttpNotificationTemplate extends BatchEventNotificationTemplate implements
 	public function setSslKey($v)								{return $this->putInCustomData(self::CUSTOM_DATA_SSL_KEY, $v);}
 	public function setSslKeyPassword($v)						{return $this->putInCustomData(self::CUSTOM_DATA_SSL_KEY_PASSWORD, $v);}
 	public function setCustomHeaders(array $v)					{return $this->putInCustomData(self::CUSTOM_DATA_CUSTOM_HEADERS, $v);}
+
 }

@@ -24,7 +24,7 @@ class KalturaAssetResource extends KalturaContentResource
 		
 		$srcFlavorAsset = assetPeer::retrieveById($this->assetId);
 		if(!$srcFlavorAsset)
-			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $resource->assetId);
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $this->assetId);
 		
 		$key = $srcFlavorAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$c = FileSyncPeer::getCriteriaForFileSyncKey($key);
@@ -52,7 +52,7 @@ class KalturaAssetResource extends KalturaContentResource
 		
 		$srcFlavorAsset = assetPeer::retrieveById($this->assetId);
 		if(!$srcFlavorAsset)
-			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $resource->assetId);
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $this->assetId);
 		
 		$object_to_fill->setFileSyncObjectType(FileSyncObjectType::FLAVOR_ASSET);
 		$object_to_fill->setObjectSubType(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
