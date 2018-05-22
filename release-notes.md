@@ -1,5 +1,14 @@
 # Mercury 13.20.0 #
 
+## Media Repurposing private content bug ##
+- Issue Type: Task
+- Issue ID: PLAT-8770
+
+### Configuration ###
+	None.
+### Deployment scripts ###
+	Index category and entry tables to sphinx
+
 ## eSearch - move highlight priority to config ##
 - Issue Type: Task
 - Issue ID: PLAT-8891
