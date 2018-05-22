@@ -5,7 +5,7 @@
  */
 class KalturaAPIException extends Exception 
 {
-	protected $code;
+	protected $codeStr;
 	protected $args = array ();
 	
 	/**
@@ -21,6 +21,7 @@ class KalturaAPIException extends Exception
 		$this->message = $errorData['message'];
 		$this->code = $errorData['code'];
 		$this->args = $errorData['args'];
+		$this->codeStr = $errorData['code'];;
 	}
 	
 	/**
@@ -34,6 +35,14 @@ class KalturaAPIException extends Exception
 	
 	public function __sleep()
 	{
-		return array('code', 'message', 'args');
+		return array('code', 'message', 'args', 'codeStr');
+	}
+	
+	public function __wakeup()
+	{
+		if($this->codeStr)
+		{
+			$this->code = $this->codeStr;
+		}
 	}
 }

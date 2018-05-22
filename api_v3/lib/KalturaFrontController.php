@@ -316,6 +316,12 @@ class KalturaFrontController
 					$errorCode = $ex->getCode();
 					$currentResult = $this->getExceptionObject($ex, $currentService, $currentAction);
 				}
+				catch (Error $ex)
+				{
+					$success = false;
+					$errorCode = $ex->getCode();
+					$currentResult = $this->getExceptionObject($ex, $currentService, $currentAction);
+				}
 				$cache->storeCache($currentResult, array(), true);
 			}
 			$this->onRequestEnd($success, $errorCode, kCurrentContext::$multiRequest_index);
