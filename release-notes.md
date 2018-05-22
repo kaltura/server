@@ -1,5 +1,132 @@
 # Mercury 13.20.0 #
 
+# Reach In-House Support #
+- Issue Type: Feature
+- Issue ID: PLAT-7596
+
+### Configuration ###
+	- copy "index kaltura_entry_vendor_task:kaltura_base" section from /opt/kaltura/app/configurations/sphinx/kaltura.conf.template to /opt/kaltura/app/configurations/sphinx/kaltura.conf modifiy path to appropriate directory.
+	- restart sphinx service
+	- Add the following to plugins.ini: Reach, EntryVendorTaskSphinx
+	- In generator.ini add reach services (to public and batch section).
+	
+	- Add the following to Admin.ini:
+		moduls.Reach.enabled = true
+		moduls.Reach.permissionType = 3
+		moduls.Reach.label = "Reach"
+		moduls.Reach.permissionName = REACH_PLUGIN_PERMISSION
+		moduls.Reach.group = GROUP_ENABLE_DISABLE_FEATURES
+			
+		moduls.ReachVendorProfile.enabled = true
+		moduls.ReachVendorProfile.permissionType = 2
+		moduls.ReachVendorProfile.label = "Reach - Vendor Partner"
+		moduls.ReachVendorProfile.permissionName = REACH_VENDOR_PARTNER_PERMISSION
+		moduls.ReachVendorProfile.group = GROUP_ENABLE_DISABLE_FEATURES 
+		
+	- Add the following to emails_en.ini:
+		KALTURA_ENTRY_VENDOR_TASKS_CSV_MAIL = 134;
+		134 = "Your REACH requests Csv is ready for download"
+		134 = "Hello %s,<BR><BR>Following is the download link to your REACH requests csv: %s<BR>Please notice that the link will be available only for 24 hours. <BR><BR> Kaltura Customer Service"\
+	
+	- Add the following to batch & workers.ini:
+		enabledWorkers.KAsyncUsersCsv = 1
+		enabledWorkers.KSyncReachCreditTaskRunner = 1
+		
+		[KAsyncEntryVendorTasksCsv : JobHandlerWorker]
+		id								= XXXXX
+		friendlyName  				= Entry Vendor Tasks Csv
+		type							= KAsyncEntryVendorTasksCsv
+		params.localTempPath		= @TMP_DIR@/entryVendorTasksCsv
+		params.sharedTempPath		= @WEB_DIR@/tmp/entryVendorTasksCsv
+		scriptPath					= ../plugins/reach/batch/EntryVendorTasksCsv/kAsyncEntryVendorTasksCsvExe.php
+		maximumExecutionTime		= 3600
+		
+		[KSyncReachCreditTaskRunner : PeriodicWorker]
+		id  = 							XXXXX
+		type  = 						KSyncReachCreditTaskRunner
+		maximumExecutionTime  = 	3600
+		scriptPath  = 				../plugins/reach/batch/KSyncReachCreditTaskRunner/KSyncReachCreditTaskRunnerExe.php
+		sleepBetweenStopStart = 	21600
+
+		
+	- Add missing info to, workers.ini, batch.ini.
+
+### Deployment scripts ###
+	
+	Mysql deployment scripts:
+		1. mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_11_21_create_vendor_catalog_item_table.sql
+		2. mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_11_21_create_partner_catalog_item_table.sql
+		3. mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_12_14_create_entry_vendor_task_table.sql
+		4. mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2017_12_14_create_reach_profile_table.sql
+		
+	Run Permissions scripts script:
+		1. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_11_20_add_reach_vendor_role_and_permissions.php
+		2. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_11_20_add_reach_permissions.php
+		3. php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionToRole.php -2 "@DESIRED_ROLE@" REACH_ADMIN_PERMISSION realrun/dryrun
+
+		
+	Response profiles:
+		First replace all tokens in the XML file below and remove ".template" from the fle name:
+			/opt/kaltur/app/deployment/updates/scripts/xml/responseProfiles/reach_vendor_response_profiles.template.xml
+		
+		Run deployment script:
+			php /opt/kaltura/app/deployment/updates/scripts/2018_01_29_deploy_reach_vendor_related_response_profiles.php
+			
+	Email notifications:
+		First replace all tokens from the XML files below and remove ".template" from the fle 
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_02_22_entry_vendor_task_approved_moderation.template.xml
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_02_22_entry_vendor_task_done.template.xml
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_02_22_entry_vendor_task_pending_moderation.template.xml
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_02_22_entry_vendor_task_rejected_moderation.template.xml
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_02_22_reach_credit_usage_over_75_percent.template.xml
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_02_22_reach_credit_usage_over_90_percent.template.xml
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_02_22_reach_credit_usage_over_100_percent.template.xml
+		
+		Run deployment script:
+			php /opt/kaltura/app/deployment/updates/scripts/2018_01_29_deploy_reach_notifications.php
+	Add in Admin.ini:
+		moduls.Reach.enabled = true
+		moduls.Reach.permissionType = 3
+		moduls.Reach.label = "Reach"
+		moduls.Reach.permissionName = REACH_PLUGIN_PERMISSION
+		moduls.Reach.group = GROUP_ENABLE_DISABLE_FEATURES
+
+		moduls.ReachVendorProfile.enabled = true
+		moduls.ReachVendorProfile.permissionType = 2
+		moduls.ReachVendorProfile.label = "Reach - Vendor Partner"
+		moduls.ReachVendorProfile.permissionName = REACH_VENDOR_PARTNER_PERMISSION
+		moduls.ReachVendorProfile.group = GROUP_ENABLE_DISABLE_FEATURES
+		
+	Add in Batch.ini:
+		enabledWorkers.KSyncReachCreditTaskRunner           = 1
+		enabledWorkers.KAsyncEntryVendorTasksCsv            = 1
+		
+		KSyncReachCreditTaskRunner : PeriodicWorker]
+		id	= 780
+		type	= KSyncReachCreditTaskRunner
+		maximumExecutionTime	= 3600
+		scriptPath	= ../plugins/reach/batch/KSyncReachCreditTaskRunner/KSyncReachCreditTaskRunnerExe.php
+		sleepBetweenStopStart	= 21600
+
+		[KAsyncEntryVendorTasksCsv : JobHandlerWorker]
+		id 	= 790
+		friendlyName	= Entry Vendor Tasks Csv
+		type	= KAsyncEntryVendorTasksCsv
+		params.localTempPath	= /opt/kaltura/temp/entryVendorTasksCsv
+		params.sharedTempPath	= /opt/kaltura/web/tmp/entryVendorTasksCsv
+		scriptPath	= ../plugins/reach/batch/EntryVendorTasksCsv/kAsyncEntryVendorTasksCsvExe.php
+		maximumExecutionTime	= 3600
+		
+	Add in emails_en.ini:
+		KALTURA_ENTRY_VENDOR_TASKS_CSV_MAIL = 134;
+		134 = "Your REACH requests Csv is ready for download"
+		134 = "Hello %s,<BR><BR>Following is the download link to your REACH requests csv: %s<BR>Please notice that the link will be available only for 24 hours. <BR><BR> Kaltura Customer Service"
+			    
+	
+#### Known Issues & Limitations ####
+
+	None.
+	
 ## eSearch - move highlight priority to config ##
 - Issue Type: Task
 - Issue ID: PLAT-8891
@@ -199,7 +326,6 @@ add "Konference" to plugins.ini
 ### Deployment scripts ###
       php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
       php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_30_01_add_conference_service.php
-
 
 # Mercury 13.16.0 #
 

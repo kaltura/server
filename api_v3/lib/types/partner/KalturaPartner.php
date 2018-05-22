@@ -313,16 +313,10 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $timeAlignedRenditions;
-
+	 
 	/**
-	 * @var KalturaESearchLanguageArray
-	 */
-	public $eSearchLanguages;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
+	* @readonly
+	*/
 	public $publisherEnvironmentType;
 
 	/**
@@ -337,6 +331,10 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public $ottEnvironmentUrl;
 
+	/**
+	 * @var KalturaESearchLanguageArray
+	 */
+	public $eSearchLanguages;
 
 	private static $map_between_objects = array
 	(
@@ -346,8 +344,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'maxUploadSize' , 'partnerPackage' , 'secret' , 'adminSecret' , 'allowMultiNotification', 'adminLoginUsersQuota', 'adminUserId',
 		'firstName' , 'lastName' , 'country' , 'state' , 'publishersQuota', 'partnerGroupType', 'defaultEntitlementEnforcement', 
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks',
-		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages',
-		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl',
+		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages','publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl',
 	);
 	
 	public function getMapBetweenObjects ( )

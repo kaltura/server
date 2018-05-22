@@ -18,5 +18,5 @@ class KalturaSystemPartnerLimitType extends KalturaStringEnum
 	const END_USERS = 'END_USERS';
 	const ACCESS_CONTROLS = 'ACCESS_CONTROLS';
 	const LIVE_STREAM_INPUTS = 'LIVE_STREAM_INPUTS';
-	const LIVE_STREAM_OUTPUTS = 'LIVE_STREAM_OUTPUTS';	
+	const LIVE_STREAM_OUTPUTS = 'LIVE_STREAM_OUTPUTS';
 }

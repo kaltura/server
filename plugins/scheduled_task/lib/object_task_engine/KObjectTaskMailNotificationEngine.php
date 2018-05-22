@@ -66,7 +66,7 @@ class KObjectTaskMailNotificationEngine
 	 * @param string $mediaRepurposingId
 	 * @param string $partnerId
 	 */
-	public static function sendMailNotification($mailTask, $userObjectsDataMap, $mediaRepurposingId, $partnerId)
+	public static function sendMailNotification($mailTask, $userObjectsDataMap, $mediaRepurposingId, $partnerId, $client = null )
 	{
 		$subject = $mailTask->subject;
 		$sender = $mailTask->sender;

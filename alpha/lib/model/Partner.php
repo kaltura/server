@@ -929,7 +929,6 @@ class Partner extends BasePartner
 		$this->putInCustomData('max_login_attempts', $maxAttempts, null);
 	}
 	
-	
 	public function getLoginBlockPeriod()
 	{
 		$blockPeriod = $this->getFromCustomData('login_blocked_period', null, null);
