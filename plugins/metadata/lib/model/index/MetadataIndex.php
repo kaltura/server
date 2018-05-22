@@ -2,7 +2,7 @@
 
 /**
  * Auto-generated index class for Metadata
-*/
+ */
 class MetadataIndex extends BaseIndexObject
 {
 	const PLUGINS_DATA = "plugins_data";
@@ -92,6 +92,18 @@ class MetadataIndex extends BaseIndexObject
 			);
 		}
 		return self::$nullableFields;
+	}
+
+	protected static $enrichableFields;
+
+	public static function getIndexEnrichableList()
+	{
+		if (!self::$enrichableFields)
+		{
+			self::$enrichableFields = array(
+			);
+		}
+		return self::$enrichableFields;
 	}
 
 	protected static $searchableFieldsMap;

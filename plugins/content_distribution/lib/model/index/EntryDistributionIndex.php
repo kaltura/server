@@ -2,7 +2,7 @@
 
 /**
  * Auto-generated index class for EntryDistribution
-*/
+ */
 class EntryDistributionIndex extends BaseIndexObject
 {
 	const NEXT_REPORT = "next_report";
@@ -120,6 +120,18 @@ class EntryDistributionIndex extends BaseIndexObject
 			);
 		}
 		return self::$nullableFields;
+	}
+
+	protected static $enrichableFields;
+
+	public static function getIndexEnrichableList()
+	{
+		if (!self::$enrichableFields)
+		{
+			self::$enrichableFields = array(
+			);
+		}
+		return self::$enrichableFields;
 	}
 
 	protected static $searchableFieldsMap;

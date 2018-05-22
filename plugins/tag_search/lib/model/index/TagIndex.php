@@ -2,7 +2,7 @@
 
 /**
  * Auto-generated index class for Tag
-*/
+ */
 class TagIndex extends BaseIndexObject
 {
 	public static function getObjectName()
@@ -83,6 +83,18 @@ class TagIndex extends BaseIndexObject
 			);
 		}
 		return self::$nullableFields;
+	}
+
+	protected static $enrichableFields;
+
+	public static function getIndexEnrichableList()
+	{
+		if (!self::$enrichableFields)
+		{
+			self::$enrichableFields = array(
+			);
+		}
+		return self::$enrichableFields;
 	}
 
 	protected static $searchableFieldsMap;

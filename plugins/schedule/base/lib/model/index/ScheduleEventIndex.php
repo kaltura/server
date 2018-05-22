@@ -2,7 +2,7 @@
 
 /**
  * Auto-generated index class for ScheduleEvent
-*/
+ */
 class ScheduleEventIndex extends BaseIndexObject
 {
 	const PLUGINS_DATA = "plugins_data";
@@ -134,6 +134,18 @@ class ScheduleEventIndex extends BaseIndexObject
 		return self::$nullableFields;
 	}
 
+	protected static $enrichableFields;
+
+	public static function getIndexEnrichableList()
+	{
+		if (!self::$enrichableFields)
+		{
+			self::$enrichableFields = array(
+			);
+		}
+		return self::$enrichableFields;
+	}
+
 	protected static $searchableFieldsMap;
 
 	public static function getIndexSearchableFieldsMap()
@@ -234,6 +246,7 @@ class ScheduleEventIndex extends BaseIndexObject
 		if (!self::$orderFields)
 		{
 			self::$orderFields = array(
+				'schedule_event.SUMMARY' => 'summary',
 				'schedule_event.ORIGINAL_START_DATE' => 'original_start_date',
 				'schedule_event.START_DATE' => 'start_date',
 				'schedule_event.END_DATE' => 'end_date',
@@ -245,7 +258,6 @@ class ScheduleEventIndex extends BaseIndexObject
 				'schedule_event.DURATION' => 'duration',
 				'schedule_event.CREATED_AT' => 'created_at',
 				'schedule_event.UPDATED_AT' => 'updated_at',
-				'schedule_event.SUMMARY' => 'summary',
 			);
 		}
 		return self::$orderFields;

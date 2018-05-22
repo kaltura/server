@@ -2,7 +2,7 @@
 
 /**
  * Auto-generated index class for CaptionAssetItem
-*/
+ */
 class CaptionAssetItemIndex extends BaseIndexObject
 {
 	public static function getObjectName()
@@ -107,6 +107,18 @@ class CaptionAssetItemIndex extends BaseIndexObject
 			);
 		}
 		return self::$nullableFields;
+	}
+
+	protected static $enrichableFields;
+
+	public static function getIndexEnrichableList()
+	{
+		if (!self::$enrichableFields)
+		{
+			self::$enrichableFields = array(
+			);
+		}
+		return self::$enrichableFields;
 	}
 
 	protected static $searchableFieldsMap;
