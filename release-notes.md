@@ -1,5 +1,20 @@
 # Mercury 13.20.0 #
 
+## eSearch - move highlight priority to config ##
+- Issue Type: Task
+- Issue ID: PLAT-8891
+
+### Configuration ###
+	- Add the following to your elastic.ini file in highlights_priority section:
+        fieldname = 10
+        default = 50
+        raw = 1
+        ngrams = 100
+        synonym = 100
+        thai = 150
+### Deployment scripts ###
+	None
+
 ## Send http registration request to KMS when registering partner##
 PLAT-7514 
 
