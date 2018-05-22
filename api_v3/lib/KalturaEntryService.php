@@ -1623,7 +1623,6 @@ class KalturaEntryService extends KalturaBaseService
 		if ($updatedOccurred)
 		{
 			myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $dbEntry);
-			myPartnerUtils::increaseEntriesChangedNum($dbEntry);
 		}
 		
 		return $entry;

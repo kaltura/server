@@ -2086,24 +2086,6 @@ class myPartnerUtils
 		return $percent;
 	}
 
-
-	/**
-	 *  calculate the number of entries that were changed after creation
-	 *
-	 * @param entry $entry
-	 */
-	public static function increaseEntriesChangedNum($entry)
-	{
-		$freeTrialTypes = array(PartnerPackages::PARTNER_PACKAGE_FREE, PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL);
-		$partner = PartnerPeer::retrieveByPK($entry->getPartnerId());
-		if(in_array($partner->getPartnerPackage(), $freeTrialTypes))
-		{
-			$entriesNum = $partner->getEntriesChangedByPartnerNum() + 1;
-			$partner->save();
-		}
-
-	}
-
 	/**
 	 *  check if partner was created after we started the new free trial flow
 	 *
