@@ -124,8 +124,7 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 		/* @var $cacheInvalidationKey IndexableCacheInvalidationKey */
 		foreach($this->searchableCacheInvalidationKeys[$class] as $cacheInvalidationKey)
 		{
-			$keysArray[]="array(\"{$class}:{$cacheInvalidationKey->getApiName()}=%s\", 
-			{$cacheInvalidationKey->getPeerName()}::{$cacheInvalidationKey->getName()})";
+			$keysArray[]="array(\"{$class}:{$cacheInvalidationKey->getApiName()}=%s\", {$cacheInvalidationKey->getPeerName()}::{$cacheInvalidationKey->getName()})";
 		}
 
 		$firstLine.=implode(", ", $keysArray).");";
