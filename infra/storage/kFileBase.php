@@ -170,6 +170,7 @@ class kFileBase
     
     static public function setFileContent($file_name, $content)
     {
+        $res = null;
         $file_name = self::fixPath($file_name);
 
         // TODO - this code should be written in fullMkdir
@@ -179,13 +180,14 @@ class kFileBase
         $fh = fopen($file_name, 'w');
         try
         {
-            fwrite($fh, $content);
+            $res = fwrite($fh, $content);
         }
         catch(Exception $ex)
         {
-            // whatever happens - don't forget to cloes $fh
+            // whatever happens - don't forget to close $fh
         }
         fclose($fh);
+        return $res;
     }
     
     static public function getFileContent($file_name, $from_byte = 0, $to_byte = -1, $mode = 'r')
