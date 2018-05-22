@@ -329,7 +329,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		else
 		{
 			//In case filterDeliveryProfilesArray filtered out all delivery profiles defined on the partner we need to
-			//fetch only once defined with default
+			//fetch only ones defined with default
 			$c->add(DeliveryProfilePeer::IS_DEFAULT, true);
 		}
 
