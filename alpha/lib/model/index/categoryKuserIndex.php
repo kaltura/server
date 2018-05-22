@@ -2,7 +2,7 @@
 
 /**
  * Auto-generated index class for categoryKuser
-*/
+ */
 class categoryKuserIndex extends BaseIndexObject
 {
 	public static function getObjectName()
@@ -91,6 +91,18 @@ class categoryKuserIndex extends BaseIndexObject
 			);
 		}
 		return self::$nullableFields;
+	}
+
+	protected static $enrichableFields;
+
+	public static function getIndexEnrichableList()
+	{
+		if (!self::$enrichableFields)
+		{
+			self::$enrichableFields = array(
+			);
+		}
+		return self::$enrichableFields;
 	}
 
 	protected static $searchableFieldsMap;
@@ -239,6 +251,14 @@ class categoryKuserIndex extends BaseIndexObject
 	public static function doCountOnPeer(Criteria $c)
 	{
 		return categoryKuserPeer::doCount($c);
+	}
+
+	public static function getCacheInvalidationKeys($object = null)
+	{
+		if (is_null($object))
+			return array(array("category_kuser:partnerId=%s", categoryKuserPeer::PARTNER_ID));
+		else
+			return array("category_kuser:partnerId=".strtolower($object->getPartnerId()));
 	}
 
 }

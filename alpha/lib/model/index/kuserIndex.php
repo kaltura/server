@@ -2,7 +2,7 @@
 
 /**
  * Auto-generated index class for kuser
-*/
+ */
 class kuserIndex extends BaseIndexObject
 {
 	const DYNAMIC_ATTRIBUTES = "dynamic_attributes";
@@ -126,6 +126,18 @@ class kuserIndex extends BaseIndexObject
 			);
 		}
 		return self::$nullableFields;
+	}
+
+	protected static $enrichableFields;
+
+	public static function getIndexEnrichableList()
+	{
+		if (!self::$enrichableFields)
+		{
+			self::$enrichableFields = array(
+			);
+		}
+		return self::$enrichableFields;
 	}
 
 	protected static $searchableFieldsMap;
@@ -303,7 +315,8 @@ class kuserIndex extends BaseIndexObject
 		if (is_null($object))
 			return array(array("kuser:id=%s", kuserPeer::ID), array("kuser:partnerId=%s", kuserPeer::PARTNER_ID));
 		else
-			return array("kuser:id=" . strtolower($object->getId()), "kuser:partnerId=" . strtolower($object->getPartnerId()));
+			return array("kuser:id=".strtolower($object->getId()), "kuser:partnerId=".strtolower($object->getPartnerId()));
 	}
+
 }
 

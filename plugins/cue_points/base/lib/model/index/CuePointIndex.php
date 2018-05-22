@@ -2,7 +2,7 @@
 
 /**
  * Auto-generated index class for CuePoint
-*/
+ */
 class CuePointIndex extends BaseIndexObject
 {
 	const PLUGINS_DATA = "plugins_data";
@@ -126,6 +126,18 @@ class CuePointIndex extends BaseIndexObject
 			);
 		}
 		return self::$nullableFields;
+	}
+
+	protected static $enrichableFields;
+
+	public static function getIndexEnrichableList()
+	{
+		if (!self::$enrichableFields)
+		{
+			self::$enrichableFields = array(
+			);
+		}
+		return self::$enrichableFields;
 	}
 
 	protected static $searchableFieldsMap;
@@ -304,7 +316,7 @@ class CuePointIndex extends BaseIndexObject
 		if (is_null($object))
 			return array(array("cue_point:id=%s", CuePointPeer::ID), array("cue_point:entryId=%s", CuePointPeer::ENTRY_ID), array("cue_point:partnerId=%s", CuePointPeer::PARTNER_ID));
 		else
-			return array("cue_point:id=" . strtolower($object->getId()), "cue_point:entryId=" . strtolower($object->getEntryId()), "cue_point:partnerId=" . strtolower($object->getPartnerId()));
+			return array("cue_point:id=".strtolower($object->getId()), "cue_point:entryId=".strtolower($object->getEntryId()), "cue_point:partnerId=".strtolower($object->getPartnerId()));
 	}
 
 }
