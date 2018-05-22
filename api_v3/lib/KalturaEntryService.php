@@ -688,7 +688,7 @@ class KalturaEntryService extends KalturaBaseService
 				$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 			}
 
-			if(!$dbAsset && $dbEntry->getStatus() == entryStatus::NO_CONTENT)
+			if(!$dbAsset && $dbEntry->getStatus() == entryStatus::NO_CONTENT && !$isLiveClippingFlow)
 			{
 				$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
 				$dbEntry->save();

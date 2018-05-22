@@ -1916,6 +1916,13 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$readyAssets = assetPeer::retrieveFlavorsByEntryIdAndStatusIn($entry->getId(), array(asset::ASSET_STATUS_READY));
 			if(!count($readyAssets))
 				return true;
+
+			$liveEntryId = $entry->getRootEntryId();
+			if (EntryServerNodePeer::retrieveByEntryIdAndServerType($liveEntryId, EntryServerNodeType::LIVE_PRIMARY))
+			{
+				$liveEntry = entryPeer::retrieveByPK($liveEntryId);
+				return ($liveEntry && $liveEntry->getRecordedEntryId() == $entry->getId());
+			}
 		}
 		
 		return false;
