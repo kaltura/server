@@ -1946,13 +1946,14 @@ class myPartnerUtils
 	public static function getCategoriesNumForPartner($partnerId, $onlyActive = true)
 	{
 		categoryPeer::setUseCriteriaFilter(false);
-		$c = new Criteria();
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 		$c->addAnd(categoryPeer::PARTNER_ID, $partnerId);
 		if($onlyActive)
 			$c->addAnd(categoryPeer::STATUS, CategoryStatus::ACTIVE);
-		$categoriesNum = categoryPeer::doCount($c);
+		$c->applyFilters();
+		$totalCount = $c->getRecordsCount();
 		categoryPeer::setUseCriteriaFilter(true);
-		return $categoriesNum;
+		return $totalCount;
 	}
 
 	/**
@@ -1965,32 +1966,61 @@ class myPartnerUtils
 	public static function getEntriesNumForPartner($partnerId, $onlyReady = true)
 	{
 		entryPeer::setUseCriteriaFilter(false);
-		$c = new Criteria();
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$c->addAnd(entryPeer::PARTNER_ID, $partnerId);
 		if($onlyReady)
 			$c->addAnd(entryPeer::STATUS, entryStatus::READY);
-		$entriesNum = entryPeer::doCount($c);
+		$c->applyFilters();
+		$totalCount = $c->getRecordsCount();
 		entryPeer::setUseCriteriaFilter(true);
-		return $entriesNum;
+		return $totalCount;
 	}
 
 	/**
 	 * calculate the number of custome metadata objects using partner and status
 	 *
 	 * @param string $partnerId
-	 * @param bool $onlyValid
 	 * @return int $metadataNum
 	 */
-	public static function getMetadataObjectsNumForPartner($partnerId, $onlyValid = true)
+	public static function getMetadataObjectsNumForPartner($partnerId)
 	{
-		MetadataPeer::setUseCriteriaFilter(false);
-		$c = new Criteria();
-		$c->addAnd(metadataPeer::PARTNER_ID, $partnerId);
-		if($onlyValid)
-			$c->addAnd(MetadataPeer::STATUS, Metadata::STATUS_VALID);
-		$metadataNum = MetadataPeer::doCount($c);
-		MetadataPeer::setUseCriteriaFilter(true);
-		return $metadataNum;
+		kCurrentContext::$partner_id = $partnerId;
+
+		$entrySearch = new kEntrySearch();
+		$categorySearch = new kCategorySearch();
+		$userSearch = new kUserSearch();
+		$objectStatuses = array();
+
+		$totalCustomMetadadaCount = 0;
+		$totalCustomMetadadaCount += self::getMetadataSearchParameters($entrySearch, $objectStatuses);
+		kBaseElasticEntitlement::$isInitialized = false;
+		$totalCustomMetadadaCount += self::getMetadataSearchParameters($categorySearch, $objectStatuses);
+		kBaseElasticEntitlement::$isInitialized = false;
+		$totalCustomMetadadaCount += self::getMetadataSearchParameters($userSearch, $objectStatuses);
+		return $totalCustomMetadadaCount;
+	}
+
+	protected static function getMetadataSearchParameters($baseSearch, $objectStatuses)
+	{
+		$mdItem = new ESearchMetadataItem();
+		$mdItem->setItemType(ESearchItemType::EXISTS);
+		$searchItems = array($mdItem);
+		$operator = new ESearchOperator();
+		$operator->setOperator(ESearchOperatorType::AND_OP);
+		$operator->setSearchItems($searchItems);
+		$pager = new kPager();
+		$pager->setPageSize(0);
+
+		try
+		{
+			$results = $baseSearch->doSearch($operator, $objectStatuses, null, $pager, null);
+		}
+		catch(Exception $e)
+		{
+			return 0;
+		}
+
+		return $results[kESearchCoreAdapter::HITS_KEY][kESearchCoreAdapter::TOTAL_KEY];
 	}
 
 	/**
@@ -2033,7 +2063,7 @@ class myPartnerUtils
 	public static function getNumOfMetadataObjectsCreatedByPartner ($partner)
 	{
 		$partnerId = $partner->getId();
-		$MetadataObjects = self::getMetadataObjectsNumForPartner($partnerId, false);
+		$MetadataObjects = self::getMetadataObjectsNumForPartner($partnerId);
 		$partnerMetadata = $MetadataObjects - $partner->getTemplateCustomMetadataNum();
 		return $partnerMetadata;
 	}
@@ -2069,7 +2099,6 @@ class myPartnerUtils
 		if(in_array($partner->getPartnerPackage(), $freeTrialTypes))
 		{
 			$entriesNum = $partner->getEntriesChangedByPartnerNum() + 1;
-			$partner->setEntriesChangedByPartnerNum($entriesNum);
 			$partner->save();
 		}
 

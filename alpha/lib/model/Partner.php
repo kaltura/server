@@ -1020,7 +1020,6 @@ class Partner extends BasePartner
 	public function setTemplateEntriesNum($v)			{$this->putInCustomData('template_entries_num', $v);}
 	public function setTemplateCategoriesNum($v)		{$this->putInCustomData('template_categories_num', $v);}
 	public function setTemplateCustomMetadataNum($v)	{$this->putInCustomData('template_custom_metadata_num', $v);}
-	public function setEntriesChangedByPartnerNum($v)	{$this->putInCustomData('entries_changed_by_partner_num', $v);}
 	public function setSubPartnerRequestCampaign($v)	{$this->putInCustomData('sub_partner_request_campaign', $v);}
 	public function setInitialPasswordSet($v)			{$this->putInCustomData('initial_password_set', $v);}
 
@@ -1071,7 +1070,6 @@ class Partner extends BasePartner
 	public function getTemplateEntriesNum()				{return $this->getFromCustomData('template_entries_num', null, 0);}
 	public function getTemplateCategoriesNum()			{return $this->getFromCustomData('template_categories_num', null, 0);}
 	public function getTemplateCustomMetadataNum()		{return $this->getFromCustomData('template_custom_metadata_num', null, 0);}
-	public function getEntriesChangedByPartnerNum()		{return $this->getFromCustomData('entries_changed_by_partner_num', null, 0);}
 	public function getSubPartnerRequestCampaign()		{return $this->getFromCustomData('sub_partner_request_campaign', null, 0);}
 	public function getInitialPasswordSet()				{return $this->getFromCustomData('initial_password_set', null, 0);}
 
