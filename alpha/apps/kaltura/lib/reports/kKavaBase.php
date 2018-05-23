@@ -22,7 +22,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_LOCATION_CITY = 'location.city';
 	const DIMENSION_DOMAIN = 'urlParts.domain';
 	const DIMENSION_URL = 'urlParts.canonicalUrl';
-	const DIMENSION_USER_ID = 'userId';
+	const DIMENSION_KUSER_ID = 'kuserId';
 	const DIMENSION_USER_IS_ADMIN = 'userIsAdmin';
 	const DIMENSION_APPLICATION = 'application';
 	const DIMENSION_DEVICE = 'userAgent.device';
@@ -35,6 +35,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_HAS_BITRATE = 'hasBitrate';
 	const DIMENSION_MEDIA_TYPE = 'mediaType';
 	const DIMENSION_SOURCE_TYPE = 'sourceType';
+	const DIMENSION_STATUS = 'status';
 
 	// metrics
 	const METRIC_COUNT = 'count';
