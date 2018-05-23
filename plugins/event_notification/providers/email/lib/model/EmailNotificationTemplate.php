@@ -74,6 +74,17 @@ class EmailNotificationTemplate extends BatchEventNotificationTemplate implement
 			$contentParametersValues[$contentParameter->getKey()] = $value->getValue();
 		}
 		
+		$userParameters = $this->getUserParameters();
+		foreach($userParameters as $userParameter)
+		{
+			/* @var $userParameter kEventNotificationParameter */
+			$value = $userParameter->getValue();
+			if($scope && $value instanceof kStringField)
+				$value->setScope($scope);
+			
+			$contentParametersValues[$userParameter->getKey()] = $value->getValue();
+		}
+		
 		
 		KalturaLog::info("Sweeping Email Notification Template with id {$this->getId()} for metadata tokens.");
 		

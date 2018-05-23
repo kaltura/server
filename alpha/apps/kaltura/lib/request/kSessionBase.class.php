@@ -50,6 +50,7 @@ class kSessionBase
 	const PRIVILEGES_DELIMITER = "/";
 	const PRIVILEGE_DISABLE_PARTNER_CHANGE_ACCOUNT = "disablechangeaccount";
 	const PRIVILEGE_EDIT_USER = "edituser";
+	const PRIVILEGE_ENABLE_CAPTION_MODERATION = "enablecaptionmoderation";
 	const PRIVILEGE_EDIT_ADMIN_TAGS = 'editadmintags';
 	const PRIVILEGE_RESTRICT_EXPLICIT_LIVE_VIEW = "restrictexplicitliveview";
 

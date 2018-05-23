@@ -68,7 +68,15 @@ class IndexGeneratorBase
 
 		if(isset($objectAttribtues["apiName"])) {
 			$apiName = (string)$objectAttribtues["apiName"];
-			$apiName = preg_replace('/_(.?)/e',"strtoupper('$1')", $apiName);
+			$apiName = preg_replace_callback("/_(.?)/",
+				function($matches)
+				{
+					foreach($matches as $match){
+						return strtoupper(ltrim($match, "_"));
+					}
+				},
+				$apiName
+			);
 			$object->setApiName($apiName);
 		}
 		
@@ -84,14 +92,29 @@ class IndexGeneratorBase
 		$field = new IndexableField("$name", "$index", "$type");
 		
 		$field->setGetter(isset($fieldAttributes["getter"]) ? $fieldAttributes["getter"] :
-				preg_replace('/_(.?)/e',"strtoupper('$1')","$name"));
+				preg_replace_callback("/_(.?)/",
+					function($matches)
+					{
+						foreach($matches as $match){
+							return strtoupper(ltrim($match, "_"));
+						}
+					}, $name)
+				);
 
 		if (!isset($fieldAttributes["getter"]))
 			$fieldAttributes->addAttribute('getter', $field->getter); // so we could use the getter in xpath even if it was not explicitly defined
 
 		if(isset($fieldAttributes["apiName"])) {
 			$apiName = $this->tryXpath($searchableField, (string)$fieldAttributes["apiName"]);
-			$apiName = preg_replace('/_(.?)/e',"strtoupper('$1')", $apiName);
+			$apiName = preg_replace_callback("/_(.?)/",
+				function($matches)
+				{
+					foreach($matches as $match){
+						return strtoupper(ltrim($match, "_"));
+					}
+				},
+				$apiName
+			);
 			$field->setApiName($apiName);
 		}
 
@@ -140,7 +163,15 @@ class IndexGeneratorBase
 			$idxValueAttr = $indexValue->attributes();
 			$fieldName = $idxValueAttr["field"];
 			$getter = array_key_exists("getter", $idxValueAttr) ? $idxValueAttr["getter"] :
-				"get" . ucwords(preg_replace('/_(.?)/e',"strtoupper('$1')", $fieldName));
+				"get" . ucwords(preg_replace_callback("/_(.?)/",
+					function($matches)
+					{
+						foreach($matches as $match)
+						{
+							return strtoupper(ltrim($match, "_"));
+						}
+					},
+					$fieldName));
 			if(strpos($fieldName, ".") === FALSE)
 				$fieldName = $this->toPeerName($this->searchableObjects[$objName], $fieldName);
 			
@@ -164,7 +195,6 @@ class IndexGeneratorBase
 
 		$this->searchableCacheInvalidationKeys[$objName] = $index;
 	}
-
 	protected function tryXpath(SimpleXMLElement $element, $maybeXpath)
 	{
 		$xpathResults = @$element->xpath($maybeXpath);

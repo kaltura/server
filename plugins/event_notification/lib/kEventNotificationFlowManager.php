@@ -31,7 +31,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	 * @param KalturaEvent $event
 	 * @return int
 	 */
-	protected function getEventType(KalturaEvent $event) 
+	protected function getEventType(KalturaEvent $event)
 	{
 		$matches = null;
 		if(!preg_match('/k(\w+)Event/', get_class($event), $matches))
@@ -78,7 +78,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	 * @param KalturaEvent $event
 	 * @return string class name
 	 */
-	protected function getEventObjectType(KalturaEvent $event) 
+	protected function getEventObjectType(KalturaEvent $event)
 	{
 		if($event instanceof kBatchJobStatusEvent)
 			return 'BatchJob';

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<config>
+		<serviceUrl>@SERVICE_URL@</serviceUrl>
+		<partnerId>-2</partnerId>
+		<clientTag>Stand alone php 1.0.0</clientTag>
+		<curlTimeout>30</curlTimeout>
+		<userAgent>Stand alone php 1.0.0</userAgent>
+	</config>
+	<session>
+		<partnerId>-2</partnerId>
+		<secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+		<sessionType>2</sessionType>
+	</session>
+	<multirequest>
+		<!-- Entry Vendor Task Approved -->
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaEmailNotificationTemplate">
+				<name>Reach - Account credit usage is over 90%</name>
+				<systemName>Reach_Account_Credit_Over_90_percent</systemName>
+				<description>Email notification template to be sent when reach credit usage is over 90%</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>41</eventObjectType> <!-- EventNotificationEventObjectType::REACH_PROFILE -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<field objectType="KalturaEvalBooleanField">
+							<code>$scope->getObject() instanceof ReachProfile &amp;&amp; $scope->getEvent()->isCustomDataModified('credit_usage_percentage')</code>
+						</field>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<field objectType="KalturaEvalBooleanField">
+							<code>ceil($scope->getObject()->getCreditUsagePercentage()) &gt;= 90 &amp;&amp; ceil($scope->getEvent()->getCustomDataOldValue('credit_usage_percentage')) &lt;= 90 &amp;&amp; ceil($scope->getObject()->getCreditUsagePercentage()) &lt; 100</code>
+						</field>
+					</item>
+				</eventConditions>
+				<format>1</format>
+				<subject>[AppTitle] - Reach Credit usage has passed 90%</subject>
+				<body>Your reach credit usage has passed 90%, please contact you Kaltura contact if you wish to increase your credit</body>
+				<fromEmail>{from_email}</fromEmail>
+				<fromName>{from_name}</fromName>
+				<to objectType="KalturaEmailNotificationGroupRecipientProvider">
+					<groupId>{group_id_equal}</groupId>
+				</to>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>from_email</key>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get("partner_notification_email")</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>from_name</key>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get("partner_notification_name")</code>
+						</value>
+					</item>
+				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>group_id_equal</key>
+						<description>The group id to send to</description>
+						<value objectType="KalturaStringValue">
+							<value></value>
+						</value>
+					</item>
+				</userParameters>
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+</xml>
