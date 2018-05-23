@@ -200,7 +200,7 @@ class IndexGeneratorBase
 				function ($matches)
 				{
 					foreach($matches as $match)
-						return strtoupper($match);
+						return strtoupper(ltrim($match, "_"));
 				},
 				$fieldName)));
 
