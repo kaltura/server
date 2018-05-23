@@ -106,6 +106,18 @@ class EntryVendorTaskIndex extends BaseIndexObject
 		return self::$nullableFields;
 	}
 
+	protected static $enrichableFields;
+
+	public static function getIndexEnrichableList()
+	{
+		if (!self::$enrichableFields)
+		{
+			self::$enrichableFields = array(
+			);
+		}
+		return self::$enrichableFields;
+	}
+
 	protected static $searchableFieldsMap;
 
 	public static function getIndexSearchableFieldsMap()
