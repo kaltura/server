@@ -213,7 +213,6 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			$getter = "get" . $getterName;
 			$fieldType =  $objectIndexClass::getFieldType($field);
 			$nullable = $objectIndexClass::isNullableField($field);
-			$enrichable = $objectIndexClass::isEnrichableField($field);
 
 			switch($fieldType)
 			{
@@ -230,9 +229,9 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 							$suffix = ' '.self::HAS_VALUE.$object->getPartnerId();
 						}
 
-						if($enrichable)
+						$enricher = "enrich" . $getterName;
+						if(is_callable(array($object, $enricher)))
 						{
-							$enricher = "enrich" . $getterName;
 							$value = $object->$enricher($value);
 						}
 

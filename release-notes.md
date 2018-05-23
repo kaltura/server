@@ -7,7 +7,9 @@
 ### Configuration ###
 	None.
 ### Deployment scripts ###
-	Index category and entry tables to sphinx
+	Reindex category and entry tables to sphinx
+    php /opt/kaltura/app/deployment/base/scripts/populateSphinxCategories.php
+    php /opt/kaltura/app/deployment/base/scripts/populateSphinxEntries.php
 
 # Reach In-House Support #
 - Issue Type: Feature

@@ -2,7 +2,7 @@
 
 /**
  * Auto-generated index class for Metadata
- */
+*/
 class MetadataIndex extends BaseIndexObject
 {
 	const PLUGINS_DATA = "plugins_data";
@@ -92,18 +92,6 @@ class MetadataIndex extends BaseIndexObject
 			);
 		}
 		return self::$nullableFields;
-	}
-
-	protected static $enrichableFields;
-
-	public static function getIndexEnrichableList()
-	{
-		if (!self::$enrichableFields)
-		{
-			self::$enrichableFields = array(
-			);
-		}
-		return self::$enrichableFields;
 	}
 
 	protected static $searchableFieldsMap;
@@ -240,6 +228,7 @@ class MetadataIndex extends BaseIndexObject
 		return self::$apiMatchAttributesMap;
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationMap()
 	{
 		return array(
@@ -247,6 +236,7 @@ class MetadataIndex extends BaseIndexObject
 		);
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationValues()
 	{
 		return array(

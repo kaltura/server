@@ -50,9 +50,6 @@ class IndexableField {
 	/** Api name for this field */
 	public $apiName = null;
 
-	/**  Whether the property can be enchriched by 'enrich getter'*/
-	public $enrichable = false;
-
 	public function __construct($name, $index, $type) {
 		$this->name = $name;
 		$this->indexName = $index;
@@ -116,13 +113,6 @@ class IndexableField {
 	}
 
 	/**
-	 * @return $enrichable
-	 */
-	public function getEnrichable() {
-		return $this->enrichable;
-	}
-
-	/**
 	 * @param $name
 	 */
 	public function setName($name) {
@@ -176,13 +166,6 @@ class IndexableField {
 	 */
 	public function setMatchable($matchable) {
 		$this->matchable = $matchable;
-	}
-
-	/**
-	 * @param $enrichable
-	 */
-	public function setEnrichable($enrichable) {
-		$this->enrichable = $enrichable;
 	}
 
 	/**

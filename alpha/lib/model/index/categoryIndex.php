@@ -2,7 +2,7 @@
 
 /**
  * Auto-generated index class for category
- */
+*/
 class categoryIndex extends BaseIndexObject
 {
 	const FREE_TEXT = "free_text";
@@ -152,18 +152,6 @@ class categoryIndex extends BaseIndexObject
 			);
 		}
 		return self::$nullableFields;
-	}
-
-	protected static $enrichableFields;
-
-	public static function getIndexEnrichableList()
-	{
-		if (!self::$enrichableFields)
-		{
-			self::$enrichableFields = array(
-			);
-		}
-		return self::$enrichableFields;
 	}
 
 	protected static $searchableFieldsMap;
@@ -343,6 +331,7 @@ class categoryIndex extends BaseIndexObject
 		return self::$apiMatchAttributesMap;
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationMap()
 	{
 		return array(
@@ -352,6 +341,7 @@ class categoryIndex extends BaseIndexObject
 		);
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationValues()
 	{
 		return array(
@@ -366,6 +356,7 @@ class categoryIndex extends BaseIndexObject
 		return categoryPeer::doCount($c);
 	}
 
+	//This function is generated based on cacheInvalidationKey elements in the relevant IndexSchema.xml
 	public static function getCacheInvalidationKeys($object = null)
 	{
 		if (is_null($object))

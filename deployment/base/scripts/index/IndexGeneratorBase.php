@@ -68,15 +68,7 @@ class IndexGeneratorBase
 
 		if(isset($objectAttribtues["apiName"])) {
 			$apiName = (string)$objectAttribtues["apiName"];
-			$apiName = preg_replace_callback("/_(.?)/",
-				function($matches)
-				{
-					foreach($matches as $match){
-						return strtoupper(ltrim($match, "_"));
-					}
-				},
-				$apiName
-			);
+			$apiName = preg_replace_callback("/_(.?)/", array($this, 'lTrimUnderscoreAndStrToUpper'), $apiName);
 			$object->setApiName($apiName);
 		}
 		
@@ -92,29 +84,14 @@ class IndexGeneratorBase
 		$field = new IndexableField("$name", "$index", "$type");
 		
 		$field->setGetter(isset($fieldAttributes["getter"]) ? $fieldAttributes["getter"] :
-				preg_replace_callback("/_(.?)/",
-					function($matches)
-					{
-						foreach($matches as $match){
-							return strtoupper(ltrim($match, "_"));
-						}
-					}, $name)
-				);
+			preg_replace_callback("/_(.?)/", array($this, 'lTrimUnderscoreAndStrToUpper'), $name));
 
 		if (!isset($fieldAttributes["getter"]))
 			$fieldAttributes->addAttribute('getter', $field->getter); // so we could use the getter in xpath even if it was not explicitly defined
 
 		if(isset($fieldAttributes["apiName"])) {
 			$apiName = $this->tryXpath($searchableField, (string)$fieldAttributes["apiName"]);
-			$apiName = preg_replace_callback("/_(.?)/",
-				function($matches)
-				{
-					foreach($matches as $match){
-						return strtoupper(ltrim($match, "_"));
-					}
-				},
-				$apiName
-			);
+			$apiName = preg_replace_callback("/_(.?)/",  array($this, 'lTrimUnderscoreAndStrToUpper'), $apiName);
 			$field->setApiName($apiName);
 		}
 
@@ -147,9 +124,6 @@ class IndexGeneratorBase
 			$field->setSphinxStringAttribute("$sphinxType");
 		}
 
-		if(isset($fieldAttributes["enrichable"]))
-			$field->setEnrichable($fieldAttributes["enrichable"] == "yes");
-
 		$this->searchableFields[$objName]["$name"] = $field;
 	}
 	
@@ -163,15 +137,7 @@ class IndexGeneratorBase
 			$idxValueAttr = $indexValue->attributes();
 			$fieldName = $idxValueAttr["field"];
 			$getter = array_key_exists("getter", $idxValueAttr) ? $idxValueAttr["getter"] :
-				"get" . ucwords(preg_replace_callback("/_(.?)/",
-					function($matches)
-					{
-						foreach($matches as $match)
-						{
-							return strtoupper(ltrim($match, "_"));
-						}
-					},
-					$fieldName));
+				"get" . ucwords(preg_replace_callback("/_(.?)/",  array($this, 'lTrimUnderscoreAndStrToUpper'), $fieldName));
 			if(strpos($fieldName, ".") === FALSE)
 				$fieldName = $this->toPeerName($this->searchableObjects[$objName], $fieldName);
 			
@@ -188,22 +154,9 @@ class IndexGeneratorBase
 		{
 			$idxValueAttr = $indexValue->attributes();
 			$fieldName = $idxValueAttr["field"];
-			$getter = "get" . ucwords(preg_replace_callback("/_(.?)/",
-					function($matches)
-					{
-						foreach($matches as $match)
-							return strtoupper(ltrim($match, "_"));
-					},
-					$fieldName));
-
-			$apiName = lcfirst(ucwords(preg_replace_callback('/_(.?)/',
-				function ($matches)
-				{
-					foreach($matches as $match)
-						return strtoupper(ltrim($match, "_"));
-				},
-				$fieldName)));
-
+			$modifiedFieldName = ucwords(preg_replace_callback("/_(.?)/",  array($this, 'lTrimUnderscoreAndStrToUpper'), $fieldName));
+			$getter = "get".$modifiedFieldName;
+			$apiName = lcfirst($modifiedFieldName);
 			$index[] = new IndexableCacheInvalidationKey(strtoupper($fieldName), $getter, $objName . "Peer", $apiName);
 		}
 
@@ -223,5 +176,11 @@ class IndexGeneratorBase
 	
 	protected function printToFile($fp, $string, $tabs = 0) {
 		fwrite($fp, str_repeat("\t",$tabs) . $string . "\n");
+	}
+
+	private function lTrimUnderscoreAndStrToUpper($matches)
+	{
+		foreach($matches as $match)
+			return strtoupper(ltrim($match, "_"));
 	}
 }

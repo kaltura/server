@@ -16,7 +16,7 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 			$this->handleSingleFile($key, $dirname);
 		}
 	}
-	
+
 	private function handleSingleFile($key, $path) {
 		$path = $path . "//{$key}Index.php";
 		
@@ -41,7 +41,6 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 		$this->generateMapping("getIndexFieldsMap", $fp, $key,"fieldsMap");
 		$this->generateMapping("getIndexFieldTypesMap", $fp, $key, "typesMap");
 		$this->generateMapping("getIndexNullableList", $fp, $key, "nullableFields");
-		$this->generateMapping("getIndexEnrichableList", $fp, $key, "enrichableFields");
 		$this->generateMapping("getIndexSearchableFieldsMap", $fp, $key, "searchableFieldsMap");
 		$this->generateMapping("getSearchFieldsEscapeTypeList", $fp, $key, "searchEscapeTypes");
 		$this->generateMapping("getIndexFieldsEscapeTypeList", $fp, $key, "indexEscapeTypes");
@@ -117,10 +116,15 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 		$this->printToFile($fp, "");
 	}
 
-	private function getCacheInvalidationKeyFirstLine($class)
+	private function getPeerCacheInvalidationKeysLine($keysArray)
 	{
-		$indexName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $class));
-		$firstLine = "return array(";
+		$line = "return array(";
+		$line.=implode(", ", $keysArray).");";
+		return $line;
+	}
+
+	private function getPeerCacheInvalidationKeys($class, $indexName)
+	{
 		$keysArray = array();
 		/* @var $cacheInvalidationKey IndexableCacheInvalidationKey */
 		foreach($this->searchableCacheInvalidationKeys[$class] as $cacheInvalidationKey)
@@ -128,15 +132,11 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 			$keysArray[]="array(\"{$indexName}:{$cacheInvalidationKey->getApiName()}=%s\", {$cacheInvalidationKey->getPeerName()}::{$cacheInvalidationKey->getName()})";
 		}
 
-		$firstLine.=implode(", ", $keysArray).");";
-
-		return $firstLine;
+		return $keysArray;
 	}
 
-	private function getCacheInvalidationKeySecondLine($class)
+	private function getObjectCacheInvalidationKeys($class, $indexName)
 	{
-		$indexName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $class));
-		$secondLine = "return array(";
 		$keysArray = array();
 		/* @var $cacheInvalidationKey IndexableCacheInvalidationKey */
 		foreach($this->searchableCacheInvalidationKeys[$class] as $cacheInvalidationKey)
@@ -144,9 +144,7 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 			$keysArray[] = "\"{$indexName}:{$cacheInvalidationKey->getApiName()}=\".strtolower(\$object->{$cacheInvalidationKey->getGetter()}())";
 		}
 
-		$secondLine.=implode(", ", $keysArray).");";
-
-		return $secondLine;
+		return $keysArray;
 	}
 
 	private function generateCacheInvalidationKeys($fp, $class)
@@ -154,12 +152,15 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 		if(!isset($this->searchableCacheInvalidationKeys[$class]))
 			return;
 
+		$indexName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $class));
+
+		$this->printToFile($fp, "//This function is generated based on cacheInvalidationKey elements in the relevant IndexSchema.xml",1);
 		$this->printToFile($fp, "public static function getCacheInvalidationKeys(\$object = null)",1);
 		$this->printToFile($fp, "{",1);
 		$this->printToFile($fp, "if (is_null(\$object))",2);
-		$this->printToFile($fp, $this->getCacheInvalidationKeyFirstLine($class),3);
+		$this->printToFile($fp, $this->getPeerCacheInvalidationKeysLine($this->getPeerCacheInvalidationKeys($class, $indexName)),3);
 		$this->printToFile($fp, "else",2);
-		$this->printToFile($fp, $this->getCacheInvalidationKeySecondLine($class),3);
+		$this->printToFile($fp, $this->getPeerCacheInvalidationKeysLine($this->getObjectCacheInvalidationKeys($class, $indexName)),3);
 		$this->printToFile($fp, "}",1);
 		$this->printToFile($fp, "");
 	}
@@ -223,11 +224,6 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 			$this->printToFile($fp, "'" . $value->indexName . "',",4);
 	}
 
-	private function getIndexEnrichableList($fp, IndexableObject $object, $key, IndexableField $value) {
-		if($value->enrichable)
-			$this->printToFile($fp, "'" . $value->indexName . "',",4);
-	}
-	
 	private function getIndexMatchableList($fp, IndexableObject $object, $key, IndexableField $value) {
 		if($value->matchable)
 			$this->printToFile($fp, "\"" . $key . "\",",4);
@@ -335,6 +331,7 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 	}
 
 	private function generateIndexMapping($function, $fp, $key, $field) {
+		$this->printToFile($fp, "//This function is generated based on index elements in the relevant IndexSchema.xml",1);
 		$this->printToFile($fp, "public static function $function()",1);
 		$this->printToFile($fp, "{",1);
 		$this->printToFile($fp, "return array(",2);

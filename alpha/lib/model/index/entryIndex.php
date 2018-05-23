@@ -2,7 +2,7 @@
 
 /**
  * Auto-generated index class for entry
- */
+*/
 class entryIndex extends BaseIndexObject
 {
 	const DYNAMIC_ATTRIBUTES = "dynamic_attributes";
@@ -198,19 +198,6 @@ class entryIndex extends BaseIndexObject
 			);
 		}
 		return self::$nullableFields;
-	}
-
-	protected static $enrichableFields;
-
-	public static function getIndexEnrichableList()
-	{
-		if (!self::$enrichableFields)
-		{
-			self::$enrichableFields = array(
-				'categories',
-			);
-		}
-		return self::$enrichableFields;
 	}
 
 	protected static $searchableFieldsMap;
@@ -455,6 +442,7 @@ class entryIndex extends BaseIndexObject
 		return self::$apiMatchAttributesMap;
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationMap()
 	{
 		return array(
@@ -464,6 +452,7 @@ class entryIndex extends BaseIndexObject
 		);
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationValues()
 	{
 		return array(
@@ -478,6 +467,7 @@ class entryIndex extends BaseIndexObject
 		return entryPeer::doCount($c);
 	}
 
+	//This function is generated based on cacheInvalidationKey elements in the relevant IndexSchema.xml
 	public static function getCacheInvalidationKeys($object = null)
 	{
 		if (is_null($object))

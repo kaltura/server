@@ -34,11 +34,6 @@ abstract class BaseIndexObject
 	// protected static $nullableFields;
 
 	/**
-	 * List of fields we have enricher for them.
-	 */
-	// protected static $enrichableFields;
-
-	/**
 	 * Mapping between property name to escape type for indexing purposes.
 	 * The possible values are taken from SearchIndexFieldEscapeType. 
 	 * For example, if when indexing category names we'd like to md5 them, then the
@@ -101,15 +96,6 @@ abstract class BaseIndexObject
 		return in_array($fieldName, $nullableFields);
 	}
 
-	/**
-	 * Returns whether a given field is enrichable
-	 * @param string $fieldName
-	 */
-	public static function isEnrichableField($fieldName) {
-		$encrichableFields = static::getIndexEnrichableList();
-		return in_array($fieldName, $encrichableFields);
-	}
-	
 	/**
 	 * Returns the matching field escape type for indexing purposes.
 	 * @param string $fieldName
