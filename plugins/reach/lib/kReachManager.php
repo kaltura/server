@@ -255,10 +255,17 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$fullFieldCatalogItemIds = $profile->fulfillsRules($scope, $checkEmptyRulesOnly);
 			if (!count($fullFieldCatalogItemIds))
 				continue;
-
-			$existingCatalogItemIds = EntryVendorTaskPeer::retrieveExistingTasksCatalogItemIds($entryId, $fullFieldCatalogItemIds);
-			$catalogItemIdsToAdd = array_unique(array_diff($fullFieldCatalogItemIds, $existingCatalogItemIds));
-
+			
+			$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($fullFieldCatalogItemIds, $object->getPartnerId());
+			if(!count($allowedCatalogItemIds))
+			{
+				KalturaLog::debug("None of the fullfield catalog item ids are active on partner, [" . implode(",", $fullFieldCatalogItemIds) . "]");
+				continue;
+			}
+			
+			$existingCatalogItemIds = EntryVendorTaskPeer::retrieveExistingTasksCatalogItemIds($entryId, $allowedCatalogItemIds);
+			$catalogItemIdsToAdd = array_unique(array_diff($allowedCatalogItemIds, $existingCatalogItemIds));
+			
 			foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
 			{
 				//Pass the object Id as the context of the task

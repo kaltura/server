@@ -47,5 +47,17 @@ class PartnerCatalogItemPeer extends BasePartnerCatalogItemPeer {
 		
 		return $result;
 	}
+	
+	public static function retrieveActiveCatalogItemIds($catalogItemIds, $partnerId)
+	{
+		$c = new Criteria(PartnerCatalogItemPeer::DATABASE_NAME);
+		$c->add(PartnerCatalogItemPeer::CATALOG_ITEM_ID, $catalogItemIds, Criteria::IN);
+		$c->add(PartnerCatalogItemPeer::PARTNER_ID, $partnerId);
+		$c->add(PartnerCatalogItemPeer::STATUS, VendorCatalogItemStatus::ACTIVE);
+		$c->addSelectColumn(PartnerCatalogItemPeer::CATALOG_ITEM_ID);
+		
+		$stmt = PartnerCatalogItemPeer::doSelectStmt($c, null);
+		return $stmt->fetchAll(PDO::FETCH_COLUMN);
+	}
 
 } // PartnerCatalogItemPeer
