@@ -24,6 +24,6 @@
 	        <field name="last_report" indexName="last_report" type="datetime" orderable="yes" />
 	        <field name="next_report" indexName="next_report" type="datetime" searchableonly="yes" />
 	        <field name="str_entry_id" indexName="str_entry_id" type="string" searchableonly="yes" sphinxStringAttribute="string" />
-	        <field name="int_entry_id" indexName="int_entry_id" type="int" searchableonly="yes" />
+	        <field name="int_entry_id" indexName="int_entry_id" type="int" searchableonly="yes" sphinxStringAttribute="both"/>
 	</object>
 </schema>

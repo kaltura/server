@@ -224,12 +224,14 @@ class categoryKuserIndex extends BaseIndexObject
 		return self::$apiMatchAttributesMap;
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationMap()
 	{
 		return array(
 		);
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationValues()
 	{
 		return array(
@@ -240,12 +242,15 @@ class categoryKuserIndex extends BaseIndexObject
 	{
 		return categoryKuserPeer::doCount($c);
 	}
-	
-        public static function getCacheInvalidationKeys($object = null)
-        {
-                if (is_null($object))
-                        return array(array("category_kuser:partnerId=%s", categoryKuserPeer::PARTNER_ID));
-                else
-                        return array("category_kuser:partnerId=" . strtolower($object->getPartnerId()));
-        }
+
+	//This function is generated based on cacheInvalidationKey elements in the relevant IndexSchema.xml
+	public static function getCacheInvalidationKeys($object = null)
+	{
+		if (is_null($object))
+			return array(array("category_kuser:partnerId=%s", categoryKuserPeer::PARTNER_ID));
+		else
+			return array("category_kuser:partnerId=".strtolower($object->getPartnerId()));
+	}
+
 }
+

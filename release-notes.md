@@ -1,5 +1,16 @@
 # Mercury 13.20.0 #
 
+## Media Repurposing private content bug ##
+- Issue Type: Task
+- Issue ID: PLAT-8770
+
+### Configuration ###
+	None.
+### Deployment scripts ###
+	Reindex category and entry tables to sphinx
+    php /opt/kaltura/app/deployment/base/scripts/populateSphinxCategories.php
+    php /opt/kaltura/app/deployment/base/scripts/populateSphinxEntries.php
+
 # Reach In-House Support #
 - Issue Type: Feature
 - Issue ID: PLAT-7596

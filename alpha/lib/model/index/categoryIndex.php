@@ -331,6 +331,7 @@ class categoryIndex extends BaseIndexObject
 		return self::$apiMatchAttributesMap;
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationMap()
 	{
 		return array(
@@ -340,6 +341,7 @@ class categoryIndex extends BaseIndexObject
 		);
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationValues()
 	{
 		return array(
@@ -354,12 +356,14 @@ class categoryIndex extends BaseIndexObject
 		return categoryPeer::doCount($c);
 	}
 
+	//This function is generated based on cacheInvalidationKey elements in the relevant IndexSchema.xml
 	public static function getCacheInvalidationKeys($object = null)
 	{
 		if (is_null($object))
 			return array(array("category:id=%s", categoryPeer::ID), array("category:partnerId=%s", categoryPeer::PARTNER_ID));
 		else
-			return array("category:id=" . strtolower($object->getId()), "category:partnerId=" . strtolower($object->getPartnerId()));
+			return array("category:id=".strtolower($object->getId()), "category:partnerId=".strtolower($object->getPartnerId()));
 	}
+
 }
 
