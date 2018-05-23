@@ -18,7 +18,7 @@
 		},
 		"kaltura_english_synonym_filter": {
 		  "type": "synonym",
-		  "synonyms_path": "analysis/kaltura_synonyms.txt"
+		  "synonyms_path": "analysis/kaltura_synonyms_contraction.txt"
 		},
 		"kaltura_unique_token_filter": {
 		  "type": "unique",
@@ -179,7 +179,8 @@
 		  ],
 		  "filter": [
 			"lowercase",
-			"english_stop"
+			"english_stop",
+			"kaltura_english_synonym_filter"
 		  ]
 		}
 	  }
