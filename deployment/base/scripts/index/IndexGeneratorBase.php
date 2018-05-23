@@ -188,13 +188,28 @@ class IndexGeneratorBase
 		{
 			$idxValueAttr = $indexValue->attributes();
 			$fieldName = $idxValueAttr["field"];
-			$getter = "get" . ucwords(preg_replace('/_(.?)/e', "strtoupper('$1')", $fieldName));
-			$apiName = lcfirst(ucwords(preg_replace('/_(.?)/e', "strtoupper('$1')", $fieldName)));
+			$getter = "get" . ucwords(preg_replace_callback("/_(.?)/",
+					function($matches)
+					{
+						foreach($matches as $match)
+							return strtoupper(ltrim($match, "_"));
+					},
+					$fieldName));
+
+			$apiName = lcfirst(ucwords(preg_replace_callback('/_(.?)/',
+				function ($matches)
+				{
+					foreach($matches as $match)
+						return strtoupper($match);
+				},
+				$fieldName)));
+
 			$index[] = new IndexableCacheInvalidationKey(strtoupper($fieldName), $getter, $objName . "Peer", $apiName);
 		}
 
 		$this->searchableCacheInvalidationKeys[$objName] = $index;
 	}
+
 	protected function tryXpath(SimpleXMLElement $element, $maybeXpath)
 	{
 		$xpathResults = @$element->xpath($maybeXpath);
