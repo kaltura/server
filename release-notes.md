@@ -1,5 +1,14 @@
 # Mercury 13.20.0 #
 
+## Media Repurposing private content bug ##
+- Issue Type: Task
+- Issue ID: PLAT-8770
+
+### Configuration ###
+	None.
+### Deployment scripts ###
+	Index category and entry tables to sphinx
+
 # Reach In-House Support #
 - Issue Type: Feature
 - Issue ID: PLAT-7596
