@@ -74,6 +74,7 @@ class ConferenceService extends KalturaBaseService {
 		$confEntryServerNode->setConfRoomStatus(ConferenceRoomStatus::READY);
 		$confEntryServerNode->setLastAllocationTime(time());
 		$confEntryServerNode->setStatus(EntryServerNodeStatus::PLAYABLE);
+		$confEntryServerNode->setPartnerId($this->getPartnerId());
 		$confEntryServerNode->save();
 
 		$outObj = $this->getRoomDetails($entryId, $confEntryServerNode);
@@ -148,36 +149,42 @@ class ConferenceService extends KalturaBaseService {
 	 * @action finishConf
 	 * @actionAlias liveStream.finishConf
 	 * @param string $entryId
+	 * @param int $serverNodeId
 	 * @return bool
 	 * @throws KalturaAPIException
 	 * @beta
 	 */
-	public function finishConfAction($entryId)
+	public function finishConfAction($entryId, $serverNodeId = null)
 	{
 		$confEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, ConferencePlugin::getCoreValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER));
-		if (!$confEntryServerNode)
+		if ($confEntryServerNode)
 		{
-			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND,$entryId, ConferencePlugin::getCoreValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER));
+			if (!$confEntryServerNode->isValid())
+			{
+				KalturaLog::debug("conf still has grace period, not finishing");
+				return false;
+			}
+			$confEntryServerNode->delete();
+			$serverNodeId = $confEntryServerNode->getServerNodeId();
 		}
-		/** @var ConferenceEntryServerNode $confEntryServerNode */
-		if (!$confEntryServerNode->isValid())
+
+		if ($serverNodeId)
 		{
-			KalturaLog::debug("conf still has grace period, not finishing");
-			return false;
-		}
-		$serverNode = ServerNodePeer::retrieveByPK($confEntryServerNode->getServerNodeId());
-		if (!$serverNode)
-		{
-			KalturaLog::info("Could not find server node with id [" . $confEntryServerNode->getServerNodeId() . "]");
-			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND_WITH_ID, $confEntryServerNode->getServerNodeId());
-		}
-		$confEntryServerNode->delete();
-		$otherEntryServerNodes = EntryServerNodePeer::retrieveByServerNodeIdAndType($serverNode->getId(), ConferencePlugin::getCoreValue('serverNodeType', ConferenceServerNodeType::CONFERENCE_SERVER));
-		if (!count($otherEntryServerNodes))
-		{
-			KalturaLog::debug('No entry server nodes left, marking server node as not registered');
-			$serverNode->setStatus(ServerNodeStatus::NOT_REGISTERED);
-			$serverNode->save();
+			$serverNode = ServerNodePeer::retrieveByPK($confEntryServerNode->getServerNodeId());
+			/** @var ConferenceEntryServerNode $confEntryServerNode */
+			if (!$serverNode)
+			{
+				KalturaLog::info("Could not find server node with id [" . $confEntryServerNode->getServerNodeId() . "]");
+				throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND_WITH_ID, $confEntryServerNode->getServerNodeId());
+			}
+
+			$otherEntryServerNodes = EntryServerNodePeer::retrieveByServerNodeIdAndType($serverNode->getId(), ConferencePlugin::getCoreValue('serverNodeType', ConferenceServerNodeType::CONFERENCE_SERVER));
+			if (!count($otherEntryServerNodes))
+			{
+				KalturaLog::debug('No entry server nodes left, marking server node as not registered');
+				$serverNode->setStatus(ServerNodeStatus::NOT_REGISTERED);
+				$serverNode->save();
+			}
 		}
 		return true;
 	}
