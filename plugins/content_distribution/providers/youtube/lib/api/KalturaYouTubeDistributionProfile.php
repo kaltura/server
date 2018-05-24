@@ -207,9 +207,39 @@ class KalturaYouTubeDistributionProfile extends KalturaConfigurableDistributionP
 	 */
 	public $apiAuthorizeUrl;
 
+	/**
+	 * @var string
+	 */
+	public $privacyStatus;
+
+	/**
+	 * @var string
+	 */
+	public $enableContentId;
+
+	/**
+	 * @var string
+	 */
+	public $thirdPartyAds;
+
+	/**
+	 * @var string
+	 */
+	public $productListingAds;
+
+	/**
+	 * @var string
+	 */
+	public $domainWhitelist;
+
+	/**
+	 * @var string
+	 */
+	public $notifySubscribers;
+
 	/*
-		 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)
-		 */
+	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)
+	 */
 	private static $map_between_objects = array 
 	(
 		'feedSpecVersion',
@@ -250,6 +280,12 @@ class KalturaYouTubeDistributionProfile extends KalturaConfigurableDistributionP
 		'deleteReference',
 		'releaseClaims',
 		'apiAuthorizeUrl',
+		'privacyStatus',
+		'enableContentId',
+		'productListingAds',
+		'thirdPartyAds',
+		'domainWhitelist',
+		'notifySubscribers'
 	 );
 		 
 	public function getMapBetweenObjects()

@@ -70,6 +70,26 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 	 */
 	public $googleTokenData;
 
+	/**
+	 * @var string
+	 */
+	public $captionsCsvMap;
+
+	/**
+	 * @var string
+	 */
+	public $submitCsvMap;
+
+	/**
+	 * @var string
+	 */
+	public $updateCsvMap;
+
+	/**
+	 * @var string
+	 */
+	public $deleteVideoIds;
+
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
 	    parent::__construct($distributionJobData);
@@ -110,7 +130,7 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 		else
 			KalturaLog::err('Entry distribution ['.$distributionJobData->entryDistributionId.'] not found');  
 
-		if ($distributionJobData->distributionProfile->feedSpecVersion != YouTubeDistributionFeedSpecVersion::VERSION_2)
+		if ($distributionJobData->distributionProfile->feedSpecVersion == YouTubeDistributionFeedSpecVersion::VERSION_1)
 			return;
 			
 		if (is_null($this->fieldValues))
@@ -126,20 +146,47 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 		$fieldValues = unserialize($this->fieldValues);
 		if ($distributionJobData instanceof KalturaDistributionSubmitJobData)
 		{
-			$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultSubmitFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $captionAssetIds);
-			$this->submitXml = $feed->getXml();
+			if ($distributionJobData->distributionProfile->feedSpecVersion == YouTubeDistributionFeedSpecVersion::VERSION_2)
+			{
+				$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultSubmitFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $captionAssetIds);
+				$this->submitXml = $feed->getXml();
+			}
+			else
+			{
+				$feed = YouTubeDistributionCsvFeedHelper::initializeDefaultSubmitFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $captionAssetIds);
+				$this->submitCsvMap = $feed->getCsvMap();
+				$this->captionsCsvMap = $feed->getCaptionsCsvMap();
+			}
+
 		}
 		elseif ($distributionJobData instanceof KalturaDistributionUpdateJobData)
 		{
 			$remoteIdHandler = YouTubeDistributionRemoteIdHandler::initialize($distributionJobData->remoteId);
-			$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultUpdateFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $remoteIdHandler);
-			$this->updateXml = $feed->getXml();
+			if ($distributionJobData->distributionProfile->feedSpecVersion == YouTubeDistributionFeedSpecVersion::VERSION_2)
+			{
+				$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultUpdateFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $remoteIdHandler);
+				$this->updateXml = $feed->getXml();
+			}
+			else
+			{
+				$feed = YouTubeDistributionCsvFeedHelper::initializeDefaultUpdateFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $remoteIdHandler);
+				$this->updateCsvMap = $feed->getCsvMap();
+			}
+
 		}
 		elseif ($distributionJobData instanceof KalturaDistributionDeleteJobData)
 		{
 			$remoteIdHandler = YouTubeDistributionRemoteIdHandler::initialize($distributionJobData->remoteId);
-			$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultDeleteFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $remoteIdHandler);
-			$this->deleteXml = $feed->getXml();
+			if ($distributionJobData->distributionProfile->feedSpecVersion == YouTubeDistributionFeedSpecVersion::VERSION_2)
+			{
+				$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultDeleteFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $remoteIdHandler);
+				$this->deleteXml = $feed->getXml();
+			}
+			else
+			{
+				$feed = YouTubeDistributionCsvFeedHelper::initializeDefaultDeleteFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $remoteIdHandler);
+				$this->deleteVideoIds = $feed->getDeleteVideoIds();
+			}
 		}
 
 		$this->newPlaylists = isset($fieldValues[KalturaYouTubeDistributionField::PLAYLISTS]) ? $fieldValues[KalturaYouTubeDistributionField::PLAYLISTS] : null;

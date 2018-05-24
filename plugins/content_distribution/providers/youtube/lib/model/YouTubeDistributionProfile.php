@@ -37,12 +37,18 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_ALLOW_MID_ROLL_ADS = 'allowMidRollAds';
 	const CUSTOM_DATA_INSTREAM_STANDARD = 'instreamStandard';
 	const CUSTOM_DATA_INSTREAM_TRUEVIEW = 'instreamTrueview';
+	const CUSTOM_DATA_THIRD_PARTY_ADS = 'thirdPartyAds';
+	const CUSTOM_DATA_PRODUCT_LISTING_ADS = 'productListingAds';
 	const CUSTOM_DATA_CLAIM_TYPE = 'claimType';
 	const CUSTOM_DATA_BLOCK_OUTSIDE_OWNERSHIP = 'blockOutsideOwnership';
 	const CUSTOM_DATA_CAPTION_AUTOSYNC = 'captionAutosync';
 	const CUSTOM_DATA_DELETE_REFERENCE = 'deleteReference';
 	const CUSTOM_DATA_RELEASE_CLAIMS = 'releaseClaims';
-	
+	const CUSTOM_DATA_PRIVACY_STATUS = 'privacyStatus';
+	const CUSTOM_DATA_ENABLE_CONTENT_ID = 'enableContentId';
+	const CUSTOM_DATA_DOMAIN_WHITELIST = 'domainWhitlist';
+	const CUSTOM_DATA_NOTIFY_SUBSCRIBERS = "notifySubscribers";
+
 	// validations
 	const MEDIA_TITLE_MAXIMUM_LENGTH = 100;
 	const MEDIA_DESCRIPTION_MAXIMUM_LENGTH = 5000;
@@ -69,6 +75,8 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	const URGENT_REFERENCE_FILE_VALUES = 'yes,no';
 	const KEEP_FINGERPRINT_VALUES = 'yes,no';
 
+	const METADATA_FIELD_PRIVACY_STATUS = 'YoutubePrivacyStatus';
+
 	protected $specV1OnlyFields = array(
 		YouTubeDistributionField::OWNER_NAME,
 		YouTubeDistributionField::TARGET,
@@ -89,9 +97,11 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		YouTubeDistributionField::TV_METADATA_NOTES,
 		YouTubeDistributionField::TV_METADATA_SEASON,
 		YouTubeDistributionField::TV_METADATA_TMS_ID,
+		YouTubeDistributionField::ALLOW_EMBEDDING,
 	);
 
 	protected $specV2OnlyFields = array(
+
 		YouTubeDistributionField::ADVERTISING_ALLOW_MID_ROLL_ADS,
 		YouTubeDistributionField::ASSET_TYPE,
 		YouTubeDistributionField::ASSET_OVERRIDE_MANUAL_EDITS,
@@ -137,6 +147,86 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		YouTubeDistributionField::CLAIM_BLOCK_OUTSIDE_OWNERSHIP,
 		YouTubeDistributionField::ADVERTISING_INSTREAM_STANDARD,
 		YouTubeDistributionField::DISABLE_FINGERPRINTING,
+		YouTubeDistributionField::ALLOW_EMBEDDING,
+	);
+
+	protected $specV3NonRelevantFields = array(
+
+		YouTubeDistributionField::MOVIE_METADATA_NOTES,
+		YouTubeDistributionField::DATE_RECORDED,
+		YouTubeDistributionField::URGENT_REFERENCE_FILE,
+		YouTubeDistributionField::ALLOW_COMMENTS,
+		YouTubeDistributionField::ALLOW_RATINGS,
+		YouTubeDistributionField::ALLOW_RESPONSES,
+		YouTubeDistributionField::THIRD_PARTY_AD_SERVER_PARTNER_ID,
+		YouTubeDistributionField::THIRD_PARTY_AD_SERVER_AD_TYPE,
+		YouTubeDistributionField::ADVERTISING_ALLOW_PRE_ROLL_ADS,
+		YouTubeDistributionField::ADVERTISING_ALLOW_POST_ROLL_ADS,
+		YouTubeDistributionField::OWNER_NAME,
+		YouTubeDistributionField::TARGET,
+		YouTubeDistributionField::LANGUAGE,
+		YouTubeDistributionField::KEEP_FINGERPRINT,
+		YouTubeDistributionField::ACCOUNT_USERNAME,
+		YouTubeDistributionField::ACCOUNT_PASSWORD,
+		YouTubeDistributionField::WEB_METADATA_CUSTOM_ID,
+		YouTubeDistributionField::WEB_METADATA_NOTES,
+		YouTubeDistributionField::MOVIE_METADATA_CUSTOM_ID,
+		YouTubeDistributionField::MOVIE_METADATA_DIRECTOR,
+		YouTubeDistributionField::MOVIE_METADATA_TITLE,
+		YouTubeDistributionField::MOVIE_METADATA_TMS_ID,
+		YouTubeDistributionField::TV_METADATA_CUSTOM_ID,
+		YouTubeDistributionField::TV_METADATA_SHOW_TITLE,
+		YouTubeDistributionField::TV_METADATA_EPISODE,
+		YouTubeDistributionField::TV_METADATA_EPISODE_TITLE,
+		YouTubeDistributionField::TV_METADATA_NOTES,
+		YouTubeDistributionField::TV_METADATA_SEASON,
+		YouTubeDistributionField::TV_METADATA_TMS_ID,
+		YouTubeDistributionField::ALLOW_EMBEDDING,
+		YouTubeDistributionField::ADVERTISING_ALLOW_MID_ROLL_ADS,
+		YouTubeDistributionField::ASSET_TYPE,
+		YouTubeDistributionField::ASSET_OVERRIDE_MANUAL_EDITS,
+		YouTubeDistributionField::ASSET_ACTOR,
+		YouTubeDistributionField::ASSET_BROADCASTER,
+		YouTubeDistributionField::ASSET_CONTENT_TYPE,
+		YouTubeDistributionField::ASSET_DESCRIPTION,
+		YouTubeDistributionField::ASSET_DIRECTOR,
+		YouTubeDistributionField::ASSET_EIDR,
+		YouTubeDistributionField::ASSET_END_YEAR,
+		YouTubeDistributionField::ASSET_EPISODE,
+		YouTubeDistributionField::ASSET_GENRE,
+		YouTubeDistributionField::ASSET_GRID,
+		YouTubeDistributionField::ASSET_ISAN,
+		YouTubeDistributionField::ASSET_KEYWORDS,
+		YouTubeDistributionField::ASSET_NOTES,
+		YouTubeDistributionField::ASSET_ORIGINAL_RELEASE_DATE,
+		YouTubeDistributionField::ASSET_ORIGINAL_RELEASE_MEDIUM,
+		YouTubeDistributionField::ASSET_PRODUCER,
+		YouTubeDistributionField::ASSET_RATING_SYSTEM,
+		YouTubeDistributionField::ASSET_RATING_VALUE,
+		YouTubeDistributionField::ASSET_SEASON,
+		YouTubeDistributionField::ASSET_SHOW_AND_MOVIE_PROGRAMMING,
+		YouTubeDistributionField::ASSET_SHOW_TITLE,
+		YouTubeDistributionField::ASSET_START_YEAR,
+		YouTubeDistributionField::ASSET_SUBTITLED_LANGUAGE,
+		YouTubeDistributionField::ASSET_TMS_ID,
+		YouTubeDistributionField::ASSET_UPC,
+		YouTubeDistributionField::ASSET_URL,
+		YouTubeDistributionField::ASSET_WRITER,
+		YouTubeDistributionField::VIDEO_ALLOW_COMMENT_RATINGS,
+		YouTubeDistributionField::VIDEO_ALLOW_SYNDICATION,
+		YouTubeDistributionField::VIDEO_HIDE_VIEW_COUNT,
+		YouTubeDistributionField::VIDEO_DOMAIN_BLACK_LIST,
+		YouTubeDistributionField::VIDEO_PUBLIC,
+		YouTubeDistributionField::CLAIM_TYPE,
+		YouTubeDistributionField::DISABLE_FINGERPRINTING,
+		YouTubeDistributionField::ALLOW_EMBEDDING,
+		YouTubeDistributionField::MEDIA_RATING,
+		YouTubeDistributionField::MEDIA_TITLE,
+		YouTubeDistributionField::LOCATION_COUNTRY,
+		YouTubeDistributionField::LOCATION_LOCATION_TEXT,
+		YouTubeDistributionField::LOCATION_ZIP_CODE,
+		YouTubeDistributionField::DISTRIBUTION_RESTRICTION_DISTRIBUTION_RULE,
+
 	);
 
 	/* (non-PHPdoc)
@@ -235,7 +325,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		}
 		
 		//TODO: check if MEDIA_CATEGORY is a valid YouTube category according to YouTube's XML.
-								
+
 		return $validationErrors;
 	}
 
@@ -276,6 +366,12 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	public function getCaptionAutosync()		{return $this->getFromCustomData(self::CUSTOM_DATA_CAPTION_AUTOSYNC);}
 	public function getDeleteReference()		{return $this->getFromCustomData(self::CUSTOM_DATA_DELETE_REFERENCE);}
 	public function getReleaseClaims()			{return $this->getFromCustomData(self::CUSTOM_DATA_RELEASE_CLAIMS);}
+	public function getPrivacyStatus()			{return $this->getFromCustomData(self::CUSTOM_DATA_PRIVACY_STATUS, null, 'public');}
+	public function getEnableContentId()		{return $this->getFromCustomData(self::CUSTOM_DATA_ENABLE_CONTENT_ID);}
+	public function getThirdPartyAds()		    {return $this->getFromCustomData(self::CUSTOM_DATA_THIRD_PARTY_ADS);}
+	public function getProductListingAds()		{return $this->getFromCustomData(self::CUSTOM_DATA_PRODUCT_LISTING_ADS);}
+	public function getDomainWhitelist($v)		{return $this->getFromCustomData(self::CUSTOM_DATA_DOMAIN_WHITELIST);}
+	public function getNotifySubscribers($v)	{return $this->getFromCustomData(self::CUSTOM_DATA_NOTIFY_SUBSCRIBERS);}
 
 	public function setFeedSpecVersion($v)		{$this->putInCustomData(self::CUSTOM_DATA_FEED_SPEC_VERSION, $v);}
 	public function setUsername($v)				{$this->putInCustomData(self::CUSTOM_DATA_USERNAME, $v);}
@@ -314,8 +410,13 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	public function setCaptionAutosync($v)		{$this->putInCustomData(self::CUSTOM_DATA_CAPTION_AUTOSYNC, $v);}
 	public function setDeleteReference($v)		{$this->putInCustomData(self::CUSTOM_DATA_DELETE_REFERENCE, $v);}
 	public function setReleaseClaims($v)		{$this->putInCustomData(self::CUSTOM_DATA_RELEASE_CLAIMS, $v);}
-    
-	
+	public function setPrivacyStatus($v)		{$this->putInCustomData(self::CUSTOM_DATA_PRIVACY_STATUS, $v);}
+	public function setEnableContentId($v)		{$this->putInCustomData(self::CUSTOM_DATA_ENABLE_CONTENT_ID, $v);}
+	public function setProductListingAds($v)	{$this->putInCustomData(self::CUSTOM_DATA_PRODUCT_LISTING_ADS, $v);}
+	public function setThirdPartyAds($v)		{$this->putInCustomData(self::CUSTOM_DATA_THIRD_PARTY_ADS, $v);}
+	public function setDomainWhitelist($v)		{$this->putInCustomData(self::CUSTOM_DATA_DOMAIN_WHITELIST, $v);}
+	public function setNotifySubscribers($v)	{$this->putInCustomData(self::CUSTOM_DATA_NOTIFY_SUBSCRIBERS, $v);}
+
 	protected function getDefaultFieldConfigArray()
 	{
 	    $fieldConfigArray = parent::getDefaultFieldConfigArray();
@@ -689,15 +790,55 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::DISABLE_FINGERPRINTING, 'Disable fingerprinting/claiming', '<xsl:text></xsl:text>');
 
-		if ($this->getFeedSpecVersion() == YouTubeDistributionFeedSpecVersion::VERSION_2)
-			$this->removeDistributionFieldConfigs($fieldConfigArray, $this->specV1OnlyFields);
-		else
-			$this->removeDistributionFieldConfigs($fieldConfigArray, $this->specV2OnlyFields);
-
-
+		switch ($this->getFeedSpecVersion())
+		{
+			case YouTubeDistributionFeedSpecVersion::VERSION_1:
+			{
+				$this->removeDistributionFieldConfigs($fieldConfigArray, $this->specV2OnlyFields);
+				break;
+			}
+			case YouTubeDistributionFeedSpecVersion::VERSION_2:
+			{
+				$this->removeDistributionFieldConfigs($fieldConfigArray, $this->specV1OnlyFields);
+				break;
+			}
+			case YouTubeDistributionFeedSpecVersion::VERSION_3:
+			{
+				$this->addV3RelevantFields($fieldConfigArray);
+				$this->removeDistributionFieldConfigs($fieldConfigArray, $this->specV3NonRelevantFields);
+				break;
+			}
+			default:
+			{
+				$this->removeDistributionFieldConfigs($fieldConfigArray, $this->specV2OnlyFields);
+				break;
+			}
+		}
 	    return $fieldConfigArray;
 	}
-	
+
+	protected function addV3RelevantFields(array &$fieldConfigArray)
+	{
+		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_LABLES, 'Asset lables', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::REQUIRE_PAID_SUBSCRIPTION_TO_VIEW, 'Require paid subscription to view', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/require_paid_subscription_to_view');
+		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ENTRY_PRIVACY_STATUS, 'Entry Privacy Status', '<xsl:choose>
+                    	<xsl:when test="customData/metadata/'.self::METADATA_FIELD_PRIVACY_STATUS.' != \'\'">
+                    		<xsl:value-of select="customData/metadata/'.self::METADATA_FIELD_PRIVACY_STATUS.'" />
+                    	</xsl:when>
+                    	<xsl:otherwise>
+                    		<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/privacy_status" />
+                    	</xsl:otherwise>
+                    </xsl:choose>');
+
+		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::THIRD_PARTY_ADS, 'Third party ads', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/third_party_ads" />');
+		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::PRODUCT_LISTING_ADS, 'Product listing ads', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/product_listing_ads" />');
+		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ADVERTISING_INSTREAM_TRUEVIEW, 'Product listing ads', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/instream_trueview" />');
+		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ADVERTISING_ALLOW_INVIDEO, 'Product listing ads', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/allow_invideo" />');
+		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ADVERTISING_ALLOW_ADSENSE_FOR_VIDEO, 'Product listing ads', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/allow_adsense_for_video" />');
+
+
+	}
+
 	protected function addDistributionFieldConfig(array &$array, $name, $friendlyName, $xslt, $required = DistributionFieldRequiredStatus::NOT_REQUIRED, $updateOnChange = false, $updateOnParams = array())
 	{
 		$fieldConfig = new DistributionFieldConfig();
