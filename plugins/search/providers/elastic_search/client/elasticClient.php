@@ -14,6 +14,8 @@ class elasticClient
 	const ELASTIC_ID_KEY = 'id';
 	const ELASTIC_BODY_KEY = 'body';
 	const ELASTIC_RETRY_ON_CONFLICT_KEY = 'retry_on_conflict';
+	const ELASTIC_PREFERENCE_KEY = 'preference';
+	const ELASTIC_STICKY_SESSION_PREFIX = 'ELStickySessionIndex_';
 	
 	const GET = 'GET';
 	const POST = 'POST';
@@ -63,6 +65,16 @@ class elasticClient
 	{
 		curl_close($this->ch);
 	}
+
+	protected function getPreferenceStickySessionKey()
+	{
+		$ksObject = kCurrentContext::$ks_object;
+
+		if($ksObject && $ksObject->hasPrivilege(kSessionBase::PRIVILEGE_SESSION_KEY))
+			return self::ELASTIC_STICKY_SESSION_PREFIX . kCurrentContext::getCurrentPartnerId() . "_" . $ksObject->getPrivilegeValue(kSessionBase::PRIVILEGE_SESSION_KEY);
+
+		return self::ELASTIC_STICKY_SESSION_PREFIX . infraRequestUtils::getRemoteAddress();
+	}
 	
 	/**
 	 * @param int $seconds
@@ -78,11 +90,17 @@ class elasticClient
 		$val = '';
 		$queryParams = array();
 		
-		if (isset($params[self::ELASTIC_BODY_KEY][self::ELASTIC_RETRY_ON_CONFLICT_KEY])) {
+		if (isset($params[self::ELASTIC_BODY_KEY][self::ELASTIC_RETRY_ON_CONFLICT_KEY]))
+		{
 			$queryParams[self::ELASTIC_RETRY_ON_CONFLICT_KEY] = $params[self::ELASTIC_BODY_KEY][self::ELASTIC_RETRY_ON_CONFLICT_KEY];
 			unset($params[self::ELASTIC_BODY_KEY][self::ELASTIC_RETRY_ON_CONFLICT_KEY]);
 		}
-		
+
+		if (isset($params[self::ELASTIC_PREFERENCE_KEY]))
+		{
+			$queryParams[self::ELASTIC_PREFERENCE_KEY] = $params[self::ELASTIC_PREFERENCE_KEY];
+			unset($params[self::ELASTIC_PREFERENCE_KEY]);
+		}
 		
 		if (count($queryParams) > 0) {
 			$val .= '?';
@@ -167,7 +185,10 @@ class elasticClient
 	public function search(array $params, $logQuery = false)
 	{
 		kApiCache::disableConditionalCache();
-		$cmd = $this->buildElasticCommandUrl($params, '', self::ELASTIC_ACTION_SEARCH);
+		//add preference so that requests from the same session will hit the same shards
+		$params[self::ELASTIC_PREFERENCE_KEY] = $this->getPreferenceStickySessionKey();
+		$queryParams = $this->getQueryParams($params);
+		$cmd = $this->buildElasticCommandUrl($params, $queryParams, self::ELASTIC_ACTION_SEARCH);
 		
 		if (isset($params[self::ELASTIC_SIZE_KEY]))
 			$params[self::ELASTIC_BODY_KEY][self::ELASTIC_SIZE_KEY] = $params[self::ELASTIC_SIZE_KEY];
