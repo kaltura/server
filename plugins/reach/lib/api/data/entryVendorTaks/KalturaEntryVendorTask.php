@@ -62,7 +62,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	
 	/**
 	 * @var KalturaEntryVendorTaskStatus
-	 * @filter eq,in
+	 * @filter eq,in, order
 	 * @requiresPermission insert, update
 	 */
 	public $status;
