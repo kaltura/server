@@ -1019,14 +1019,8 @@ class myEntryUtils
 		if (is_null($dc))
 			return false;
 		$packagerCaptureUrl = str_replace(array ( "{dc}", "{liveType}"), array ( $dc, $liveType) , $packagerCaptureUrl );
-
-		//TEMP CODE: currently live thumbnail with nginx support only offset from the end
-		$lenInSec = floor($entry->getRecordedLengthInMsecs() / 1000);
-		$offset = $calc_vid_sec - $lenInSec;
-		if ($offset >= 0)
-			return false;
-
-		return self::curlThumbUrlWithOffset($url, $offset, $packagerCaptureUrl, $destThumbPath, $width, $height);
+		
+		return self::curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $destThumbPath, $width, $height, '+');
 	}
 	
 	private static function getLiveEntryDcId($entryId, $type)
@@ -1058,15 +1052,11 @@ class myEntryUtils
 
 		$flavorUrl = myPlaylistUtils::buildPlaylistThumbPath($entry, $flavorAsset);
 
-		$success = self::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
-		if(!$success)
-			return false;
-
-		return true;
+		return self::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
 	}
 
 
-	private static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null)
+	private static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null, $offsetPrefix = '')
 	{
 		$offset = floor($calc_vid_sec*1000);
 		if ($width)
@@ -1076,7 +1066,7 @@ class myEntryUtils
 
 		$packagerThumbCapture = str_replace(
 		array ( "{url}", "{offset}" ),
-		array ( $url , $offset  ) ,
+		array ( $url , $offsetPrefix . $offset ) ,
 		$packagerCaptureUrl );
 
 		$tempThumbPath = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
@@ -1161,11 +1151,7 @@ class myEntryUtils
 
 		if (!$entry_data_path)
 			return false;
-		$success = self::curlThumbUrlWithOffset($entry_data_path, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
-		if(!$success)
-			return false;
-
-		return true;
+		return self::curlThumbUrlWithOffset($entry_data_path, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
 	}
 
 
