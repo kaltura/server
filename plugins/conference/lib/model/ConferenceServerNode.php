@@ -20,6 +20,7 @@ class ConferenceServerNode extends ServerNode {
  	*/
 	public function postUpdate(PropelPDO $con = null)
 	{
+		parent::postUpdate();
 		if($this->isColumnModified(ServerNodePeer::STATUS) && $this->getStatus() === ServerNodeStatus::NOT_REGISTERED)
 		{
 			$this->removeAttachedEntryServerNodes();
