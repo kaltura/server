@@ -10,7 +10,7 @@
 		<support_types>1</support_types>
 		<trial_num_days>30</trial_num_days>
 		<trial_num_days_until_deletion>60</trial_num_days_until_deletion>
-		<notification_days>1,3,18,30</notification_days>
+		<notification_days>2,10,22,30</notification_days>
 	</package>
 	<package>
 		<id>2</id>
@@ -70,7 +70,7 @@
 		<support_types>1</support_types>
 		<trial_num_days>180</trial_num_days>
 		<trial_num_days_until_deletion>210</trial_num_days_until_deletion>
-		<notification_days>1,30,90,150,173,180</notification_days>
+		<notification_days>30,90,150,173,180</notification_days>
 		<cycle_bw_for_monitored_trial>500</cycle_bw_for_monitored_trial>
 	</package>
 
