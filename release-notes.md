@@ -4,15 +4,21 @@
 - Issue Type: New Feature
 - Issue ID: FEV-186
 
-### Configuration ###
-	None.
-
 ### Deployment scripts ###
-	   First replcae all tokens from the XML files below and remove ".template" from the fle name:
-	   /opt/kaltura/app/deployment/updates/scripts/xml/notifications/thumb_cue_point_notification.template.xml
+	First replcae all tokens from the XML files below and remove ".template" from the fle name:
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/thumb_cue_point_notification.template.xml
 	   
-	   Run deployment script:
+	Run deployment script:
 		php /opt/kaltura/app/deployment/updates/scripts/2018_05_24_deploy_thumb_cue_point_ready_notification.php
+		
+### Configuration ###
+	- Get the dynamic enum value for thumb cue point object by runing the following query:
+	  select id from dynamic_enum where enum_name = "CuePointType" and value_name = "Thumb"
+	- In the admin console edit the push notification added by the deployment script and update the following values:
+	  trigger_cuepoint 	= value retieved from DB.
+	  Object Type 		= Thumb Cue-Point
+	  Format 				= JSON
+	  Response Profile 	= None 
 		
 #### Known Issues & Limitations ####
 	None.
