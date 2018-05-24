@@ -24,6 +24,7 @@ class ConferenceServerNode extends ServerNode {
 		{
 			$this->removeAttachedEntryServerNodes();
 		}
+		parent::postUpdate();
 	}
 
 	public function getServiceBaseUrl()
