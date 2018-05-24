@@ -1,5 +1,22 @@
 # Mercury 13.20.0 #
 
+## Support push notifications for thumb cuePoint ready ##
+- Issue Type: New Feature
+- Issue ID: FEV-186
+
+### Configuration ###
+	None.
+
+### Deployment scripts ###
+	   First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	   /opt/kaltura/app/deployment/updates/scripts/xml/notifications/thumb_cue_point_notification.template.xml
+	   
+	   Run deployment script:
+		php /opt/kaltura/app/deployment/updates/scripts/2018_05_24_deploy_thumb_cue_point_ready_notification.php
+		
+#### Known Issues & Limitations ####
+	None.
+
 ## Media Repurposing private content bug ##
 - Issue Type: Task
 - Issue ID: PLAT-8770

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<config>
+		<serviceUrl>@SERVICE_URL@</serviceUrl>
+		<partnerId>-2</partnerId>
+		<clientTag>Stand alone php 1.0.0</clientTag>
+		<curlTimeout>30</curlTimeout>
+		<userAgent>Stand alone php 1.0.0</userAgent>
+	</config>
+	<session>
+		<partnerId>-2</partnerId>
+		<secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+		<sessionType>2</sessionType>
+	</session>
+	<multirequest>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaPushNotificationTemplate">
+				<name>THUMB_CUE_POINT_READY_NOTIFICATION</name>
+				<systemName>THUMB_CUE_POINT_READY_NOTIFICATION</systemName>
+				<description>Push notification template when thumb cue points changes it status to ready</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>cuePointEventNotifications.CuePoint</eventObjectType>
+				<eventConditions objectType="array">
+					<item objectType="KalturaFieldMatchCondition">
+						<description>Cue-point type equals</description>
+						<field objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getType()</code>
+						</field>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{trigger_cuepoint}</value>
+							</item>
+						</values>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array(CuePointPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getStatus() == CuePointStatus::READY</code>
+						</field>
+					</item>
+				</eventConditions>
+				<queueNameParameters objectType="array">
+					<item objectType="KalturaPushEventNotificationParameter">
+						<key>entryId</key>
+						<description></description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getEntryId()</code>
+						</value>
+					</item>
+				</queueNameParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>trigger_cuepoint</key>
+						<description>Cue-point type that triggers the event (Code type only), See:KalturaCuePointType:/api_v3/testmeDoc/enums/KalturaCuePointType.html</description>
+						<value objectType="KalturaStringValue">
+							<value></value>
+						</value>
+					</item>
+				</userParameters>
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+</xml>
