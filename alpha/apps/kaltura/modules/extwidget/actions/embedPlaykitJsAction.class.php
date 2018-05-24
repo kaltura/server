@@ -404,6 +404,12 @@ class embedPlaykitJsAction extends sfAction
 		$last_uiconf_config = isset($last_uiconf_content) ? $last_uiconf_content->getConfig() : '';
 		return $last_uiconf_config;
 	}
+
+	private function getConfigByVersion($version){
+		$versionUiConfs = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, $version);
+		$versionConfig = $this->getLastConfig($versionUiConfs);
+		return json_decode($versionConfig, true);
+	}
 	
 	private function setLatestOrBetaVersionNumber()
 	{
@@ -413,13 +419,8 @@ class embedPlaykitJsAction extends sfAction
 
 		if ($isLatestVersionRequired || $isBetaVersionRequired) {
 
-			$latestUiConfs = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, "latest");
-			$latestConfig = $this->getLastConfig($latestUiConfs);
-			$latestVersionMap = json_decode($latestConfig, true);
-
-			$betaUiConfs = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, "beta");
-			$betaConfig = $this->getLastConfig($betaUiConfs);
-			$betaVersionMap = json_decode($betaConfig, true);
+			$latestVersionMap = $this->getConfigByVersion("latest");
+			$betaVersionMap = $this->getConfigByVersion("beta");
 
 			foreach ($this->bundleConfig as $key => $val)
 			{
