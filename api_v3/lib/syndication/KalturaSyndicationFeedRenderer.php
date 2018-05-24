@@ -143,6 +143,8 @@ class KalturaSyndicationFeedRenderer
 		
 		myPartnerUtils::resetPartnerFilter('entry');
 
+		entryPeer::onlyReadyCriteriaFilter();
+
 		if($this->shouldAddNextLink())
 		{
 			$this->addLinkForNextIteration = true;
