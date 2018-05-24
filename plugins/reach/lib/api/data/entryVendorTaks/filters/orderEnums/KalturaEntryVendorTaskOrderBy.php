@@ -9,6 +9,8 @@ class KalturaEntryVendorTaskOrderBy extends KalturaStringEnum
 	const ID_DESC = "-id";
 	const PRICE_ASC = "+price";
 	const PRICE_DESC = "-price";
+	const STATUS_ASC = "+status";
+	const STATUS_DESC = "-status";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
 	const UPDATED_AT_ASC = "+updatedAt";

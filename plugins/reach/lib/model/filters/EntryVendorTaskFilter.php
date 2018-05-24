@@ -46,6 +46,7 @@ class EntryVendorTaskFilter extends baseObjectFilter
 			"queued_at",
 			"finished_at",
 			"price",
+			"status",
 		);
 		
 		$this->aliases = array (
