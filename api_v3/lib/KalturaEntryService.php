@@ -285,6 +285,8 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		$dbEntry->setRootEntryId($resource->getEntry()->getId());
 		$dbEntry->setSource(EntrySourceType::RECORDED_LIVE);
+		if ($operationAttributes)
+			$dbEntry->setOperationAttributes($operationAttributes);
 		$dbEntry->save();
 	
 		if(!$dbAsset)
@@ -660,6 +662,7 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		$errDescription = '';
 		$operationAttributes = $resource->getOperationAttributes();
+		$internalResource = $resource->getResource();
 		$srcEntry = self::getEntryFromContentResource($resource->getResource());
 		$isLiveClippingFlow = $srcEntry && myEntryUtils::isLiveClippingEntry($srcEntry);
 		$isMultiClipFlow = kClipManager::isMultipleClipOperation($operationAttributes);
@@ -675,10 +678,12 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		if ($isLiveClippingFlow)
 		{
-			if (($srcEntry->getId() == $dbEntry->getId()) || ($srcEntry->getId() == $dbEntry->getReplacedEntryId()))
-				throw new KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_OPERATION, "Trimming");
 			$this->handleLiveClippingFlow($srcEntry, $dbEntry, $operationAttributes);
 			return $dbAsset;
+		}
+		if($internalResource instanceof kLiveEntryResource)
+		{
+			return $this->attachLiveEntryResource($internalResource, $dbEntry, $dbAsset, $operationAttributes);
 		}
 
 		$isNewAsset = false;
@@ -699,15 +704,6 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
 			$dbEntry->save();
-		}
-
-		$internalResource = $resource->getResource();
-		if($internalResource instanceof kLiveEntryResource)
-		{
-			$dbEntry->setOperationAttributes($operationAttributes);
-			$dbEntry->save();
-
-			return $this->attachLiveEntryResource($internalResource, $dbEntry, $dbAsset, $operationAttributes);
 		}
 
 		$dbAsset = $this->attachResource($internalResource, $dbEntry, $dbAsset);
@@ -748,6 +744,8 @@ class KalturaEntryService extends KalturaBaseService
 
 	protected function handleLiveClippingFlow($recordedEntry, $clippedEntry, $operationAttributes)
 	{
+		if (($recordedEntry->getId() == $clippedEntry->getId()) || ($recordedEntry->getId() == $clippedEntry->getReplacedEntryId()))
+			throw new KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_OPERATION, "Trimming");
 		$clippedTask = $this->createRecordedClippingTask($recordedEntry, $clippedEntry, $operationAttributes);
 		$clippedEntry->setSource(EntrySourceType::KALTURA_RECORDED_LIVE);
 		$clippedEntry->setConversionProfileId($recordedEntry->getConversionProfileId());
