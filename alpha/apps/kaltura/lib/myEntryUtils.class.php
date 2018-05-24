@@ -1917,6 +1917,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			if(!count($readyAssets))
 				return true;
 
+			//check if entry is in append mode and currently streaming
 			$liveEntryId = $entry->getRootEntryId();
 			if (EntryServerNodePeer::retrieveByEntryIdAndServerType($liveEntryId, EntryServerNodeType::LIVE_PRIMARY))
 			{
