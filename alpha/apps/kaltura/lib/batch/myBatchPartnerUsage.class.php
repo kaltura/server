@@ -48,8 +48,8 @@ class myBatchPartnerUsage extends myBatchBase
 					}
 					else if ($partnerPackage == PartnerPackages::PARTNER_PACKAGE_FREE)
 						myPartnerUtils::doPartnerUsage($partner);
-					else if ($partnerPackage == PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL)
-						myPartnerUtils::doMonthlyPartnerUsage($partner);
+					//else if ($partnerPackage == PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL)
+					//	myPartnerUtils::doMonthlyPartnerUsage($partner);
 				}
 			}
 			$partner = end($partners);
