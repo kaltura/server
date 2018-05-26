@@ -266,6 +266,10 @@ abstract class kManifestRenderer
 		$headers[] = "Access-Control-Expose-Headers: Server,range,Content-Length,Content-Range";
 		foreach ($headers as $header)
 		{
+			if ($this->deliveryCode)
+            		{
+                		$header = str_replace("{deliveryCode}", $this->deliveryCode, $header);
+            		}
 			header($header);
 		}
 		
