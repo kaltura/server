@@ -14,4 +14,16 @@ class MetadataPartnerPeer extends PartnerPeer implements IMetadataPeer
     {
         return null;
     }
+    
+    public static function validateMetadataObjectAccess($objectId)
+    {
+    	$partner = self::retrieveByPK($objectId);
+    	if(!$partner)
+    	{
+    		KalturaLog::debug("Metadata object id with id [$objectId] not found");
+    		return false;
+    	}
+    
+    	return true;
+    }
 }
