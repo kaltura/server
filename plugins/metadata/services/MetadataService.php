@@ -599,7 +599,7 @@ class MetadataService extends KalturaBaseService
 		$metadataObjectClassName = kMetadataManager::getObjectTypeName($objectType);
 		$this->applyPartnerFilterForClass($metadataObjectClassName);
 		$objectPeer = kMetadataManager::getObjectPeer($objectType);
-		if(!$objectPeer::validateMetadataObjectAccess($objectId, $objectType))
+		if(!$objectPeer::validateMetadataObjectAccess($objectId))
 		{
 			KalturaLog::debug("Failed to validate metadata object access for object id [$objectId] using peer [" .get_class($objectPeer) . "]");
 			//throw new KalturaAPIException(MetadataErrors::METADATA_OBJECT_ID_NOT_FOUND, $objectId);
