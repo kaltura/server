@@ -9,7 +9,7 @@
 		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_05_27_player_slide_module_notifications.template.xml
 
 	Run deployment script:
-		php /opt/kaltura/app/deployment/updates/scripts/2018_05_24_deploy_player_slides_module_notifications.xml
+		php /opt/kaltura/app/deployment/updates/scripts/2018_05_24_deploy_player_slides_module_notifications.php
 		
 ### Configuration ###
 	- Get the dynamic enum value for thumb cue point object by runing the following query:
