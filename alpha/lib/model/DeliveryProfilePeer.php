@@ -318,21 +318,16 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	protected static function getDeliveryByIds($deliveryIds, Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false, $isLive = false)
 	{
 		self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
-
+		
+		
+		//If all the delivery profiles ids available where filtered out return an empty array to block playback
+		if ((empty($deliveryIds)))
+			return array();
+		
 		$c = new Criteria();
 		$c->add(DeliveryProfilePeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partner->getId()), Criteria::IN);
+		$c->add(DeliveryProfilePeer::ID, $deliveryIds, Criteria::IN);
 		
-		if (!(empty($deliveryIds)))
-		{
-			$c->add(DeliveryProfilePeer::ID, $deliveryIds, Criteria::IN);
-		}
-		else
-		{
-			//In case filterDeliveryProfilesArray filtered out all delivery profiles defined on the partner we need to
-			//fetch only ones defined with default
-			$c->add(DeliveryProfilePeer::IS_DEFAULT, true);
-		}
-
 		if($isLive)
 			$c->add(DeliveryProfilePeer::TYPE, self::getAllLiveDeliveryProfileTypes(), Criteria::IN);
 		else
