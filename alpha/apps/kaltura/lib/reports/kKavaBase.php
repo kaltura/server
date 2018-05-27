@@ -10,6 +10,7 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_REALTIME = 'player-events-realtime';
 	const DATASOURCE_HISTORICAL = 'player-events-historical';
 	const DATASOURCE_ENTRY_LIFECYCLE = 'entry-lifecycle';
+	const DATASOURCE_USER_LIFECYCLE = 'user-lifecycle';
 	const DATASOURCE_BANDWIDTH_USAGE = 'bandwidth-usage';
 	const DATASOURCE_STORAGE_USAGE = 'storage-usage';
 	const DATASOURCE_TRANSCODING_USAGE = 'transcoding-usage';
