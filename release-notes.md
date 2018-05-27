@@ -161,7 +161,7 @@ Issue ID: KMCNG-1683
 None.
 
 ### Deployment scripts ###
-php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_15_05_add_partner_permission.php
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_15_05_add_change_account_required_permissions.php
 
 ## Add bulk groupUser sync ##
 Issue Type:  New Feature
