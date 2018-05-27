@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOGDIR=/web/logs/investigate/`/bin/date +%Y/%m/%d`
+LOGDIR=/web/logs/investigate/`/bin/date +%Y/%m/%d`/partnerusage
 WHEN=$(date -d "yesterday" +%Y-%m-%d)
 
 mkdir -p $LOGDIR
