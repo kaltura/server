@@ -45,24 +45,16 @@ function deployTemplate($script, $config)
  */
 function checkMandatoryPluginsEnabled()
 {
-	$requiredPlugins = array("Reach");
 	$pluginsFilePath = realpath(dirname(__FILE__) . "/../../../configurations/plugins.ini");
 	KalturaLog::debug("Loading Plugins config from [$pluginsFilePath]");
 
-	$pluginsData = file_get_contents($pluginsFilePath);
-	foreach ($requiredPlugins as $requiredPlugin)
-	{
-		//check if plugin exists in file but is disabled
-		if(strpos($pluginsData, ";".$requiredPlugin) !== false)
-		{
-			KalturaLog::debug("[$requiredPlugin] is disabled, aborting execution");
-			exit(-2);
-		}
 
-		if(strpos($pluginsData, $requiredPlugin) === false)
-		{
-			KalturaLog::debug("[$requiredPlugin] not found in plugins data, aborting execution");
-			exit(-2);
-		}
+	$pluginsData = file($pluginsFilePath);
+	foreach ($pluginsData as $item)
+	{
+		if (trim($item) == "Reach")
+			return;
 	}
+	KalturaLog::debug("[Reach] plugin is disabled or not configured, aborting execution");
+	exit(-2);
 }
