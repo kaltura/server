@@ -33,6 +33,9 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_ENTRIES_ADDED = 'added_entries';
 	const METRIC_ENTRIES_DELETED = 'deleted_entries';
 	const METRIC_ENTRIES_TOTAL = 'total_entries';
+	const METRIC_USERS_ADDED = 'added_users';
+	const METRIC_USERS_DELETED = 'deleted_users';
+	const METRIC_USERS_TOTAL = 'total_users';
 	const METRIC_DURATION_ADDED_MSEC = 'added_msecs';
 	const METRIC_DURATION_DELETED_MSEC = 'deleted_msecs';
 	const METRIC_DURATION_TOTAL_MSEC = 'total_msecs';
@@ -53,6 +56,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB = 'aggregated_monthly_avg_storage';
 	const METRIC_BANDWIDTH_STORAGE_AGGR_MONTHLY_MB = 'combined_bandwidth_aggregated_storage';
 	const METRIC_PEAK_ENTRIES = 'peak_entries';
+	const METRIC_PEAK_USERS = 'peak_users';
 	
 	/// report settings
 	// report settings - common
@@ -397,13 +401,34 @@ class kKavaReportsMgr extends kKavaBase
 					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedEntriesGraphs',
 					),
 
+				// named users
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_USER_LIFECYCLE,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_USERS_ADDED, self::METRIC_USERS_DELETED),
+				),
+
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_USER_LIFECYCLE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_USERS_TOTAL),
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedUsersGraphs',
+					),
+
 				// plays
 				array(
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY),
 				),
-					
-				// TODO: add total users
 			),
 			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
 			self::REPORT_TABLE_MAP => array(
@@ -412,6 +437,7 @@ class kKavaReportsMgr extends kKavaBase
 				'average_storage' => self::METRIC_AVERAGE_STORAGE_MB,
 				'transcoding_consumption' => self::METRIC_TRANSCODING_SIZE_MB,
 				'total_media_entries' => self::METRIC_PEAK_ENTRIES,
+				'total_end_users' => self::METRIC_PEAK_USERS,
 			),
 		),
 
@@ -1027,10 +1053,13 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_PEAK_STORAGE_MB => self::METRIC_PEAK_STORAGE_MB,
 		self::METRIC_ENTRIES_ADDED => self::METRIC_ENTRIES_ADDED,
 		self::METRIC_ENTRIES_DELETED => self::METRIC_ENTRIES_DELETED,
+		self::METRIC_ENTRIES_TOTAL => self::METRIC_ENTRIES_TOTAL,
 		self::METRIC_DURATION_ADDED_MSEC => self::METRIC_DURATION_ADDED_MSEC,
 		self::METRIC_DURATION_DELETED_MSEC => self::METRIC_DURATION_DELETED_MSEC,
-		self::METRIC_ENTRIES_TOTAL => self::METRIC_ENTRIES_TOTAL,
 		self::METRIC_DURATION_TOTAL_MSEC => self::METRIC_DURATION_TOTAL_MSEC,
+		self::METRIC_USERS_ADDED => self::METRIC_USERS_ADDED,
+		self::METRIC_USERS_DELETED => self::METRIC_USERS_DELETED,
+		self::METRIC_USERS_TOTAL => self::METRIC_USERS_TOTAL,
 	);
 	
 	protected static $transform_metrics = array(
@@ -1206,17 +1235,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		self::$aggregations_def[self::METRIC_COUNT_TOTAL_ALL_TIME] = 
 			self::getLongSumAggregator(self::METRIC_COUNT_TOTAL_ALL_TIME, self::METRIC_COUNT);
-		
-		self::$aggregations_def[self::METRIC_ENTRIES_TOTAL] = self::getFilteredAggregator(
-			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
-				self::EVENT_TYPE_STATUS, 
-				self::EVENT_TYPE_PHYSICAL_ADD,
-				self::EVENT_TYPE_PHYSICAL_DELETE,
-				self::EVENT_TYPE_LOGICAL_ADD,
-				self::EVENT_TYPE_LOGICAL_DELETE,
-			)),
-			self::getLongSumAggregator(self::METRIC_ENTRIES_TOTAL, self::METRIC_DELTA));
-		
+
 		self::$aggregations_def[self::METRIC_PLAYTHROUGH] = self::getFilteredAggregator(
 			self::getInFilter(self::DIMENSION_EVENT_TYPE, self::$playthrough_event_types),
 			self::getLongSumAggregator(self::METRIC_PLAYTHROUGH, self::METRIC_COUNT));
@@ -1245,6 +1264,46 @@ class kKavaReportsMgr extends kKavaBase
 				self::getLongSumAggregator($metric, self::METRIC_COUNT));
 		}
 		
+		// delta aggregations
+		$delta_metrics = array(
+			array(self::METRIC_SIZE_BYTES, 	self::METRIC_STORAGE_SIZE_BYTES, 	self::METRIC_SIZE_ADDED_BYTES, 		self::METRIC_SIZE_DELETED_BYTES		),
+			array(self::METRIC_DURATION_SEC,self::METRIC_DURATION_SEC, 			self::METRIC_DURATION_ADDED_SEC, 	self::METRIC_DURATION_DELETED_SEC	),
+			array(self::METRIC_COUNT, 		self::METRIC_ENTRIES_TOTAL, 		self::METRIC_ENTRIES_ADDED, 		self::METRIC_ENTRIES_DELETED		),
+			array(self::METRIC_COUNT, 		self::METRIC_USERS_TOTAL, 			self::METRIC_USERS_ADDED, 			self::METRIC_USERS_DELETED			),
+		);
+
+		foreach ($delta_metrics as $metrics)
+		{
+			list($base_metric, $total_metric, $added_metric, $deleted_metric) = $metrics;
+
+			self::$aggregations_def[$total_metric] = self::getFilteredAggregator(
+				self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
+					self::EVENT_TYPE_STATUS, 
+					self::EVENT_TYPE_PHYSICAL_ADD,
+					self::EVENT_TYPE_PHYSICAL_DELETE,
+					self::EVENT_TYPE_LOGICAL_ADD,
+					self::EVENT_TYPE_LOGICAL_DELETE,
+				)),
+				self::getLongSumAggregator(
+					$total_metric, 
+					$base_metric == self::METRIC_COUNT ? self::METRIC_DELTA : $base_metric));
+
+			self::$aggregations_def[$added_metric] = self::getFilteredAggregator(
+				self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
+					self::EVENT_TYPE_STATUS, 
+					self::EVENT_TYPE_PHYSICAL_ADD,
+					self::EVENT_TYPE_LOGICAL_ADD
+				)),
+				self::getLongSumAggregator($added_metric, $base_metric));
+
+			self::$aggregations_def[$deleted_metric] = self::getFilteredAggregator(
+				self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
+					self::EVENT_TYPE_PHYSICAL_DELETE,
+					self::EVENT_TYPE_LOGICAL_DELETE
+				)),
+				self::getLongSumAggregator($deleted_metric, $base_metric));
+		}
+
 		// other aggregators
 		self::$aggregations_def[self::METRIC_TOTAL_PLAY_TIME_SEC] = self::getFilteredAggregator(
 			self::getInFilter(self::DIMENSION_EVENT_TYPE, self::$playthrough_event_types), 
@@ -1261,75 +1320,10 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_BANDWIDTH_SIZE_BYTES] = self::getLongSumAggregator(
 			self::METRIC_BANDWIDTH_SIZE_BYTES, self::METRIC_SIZE_BYTES);
 		
-		self::$aggregations_def[self::METRIC_STORAGE_SIZE_BYTES] = self::getFilteredAggregator(
-			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
-				self::EVENT_TYPE_STATUS, 
-				self::EVENT_TYPE_PHYSICAL_ADD,
-				self::EVENT_TYPE_PHYSICAL_DELETE,
-				self::EVENT_TYPE_LOGICAL_ADD,
-				self::EVENT_TYPE_LOGICAL_DELETE,
-			)),
-			self::getLongSumAggregator(self::METRIC_STORAGE_SIZE_BYTES, self::METRIC_SIZE_BYTES));
-
 		self::$aggregations_def[self::METRIC_FLAVOR_SIZE_BYTES] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_STATUS, 'Success'),
 			self::getLongSumAggregator(
 				self::METRIC_FLAVOR_SIZE_BYTES, self::METRIC_FLAVOR_SIZE_BYTES));
-		
-		self::$aggregations_def[self::METRIC_DURATION_SEC] = self::getFilteredAggregator(
-			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
-				self::EVENT_TYPE_STATUS, 
-				self::EVENT_TYPE_PHYSICAL_ADD,
-				self::EVENT_TYPE_PHYSICAL_DELETE,
-				self::EVENT_TYPE_LOGICAL_ADD,
-				self::EVENT_TYPE_LOGICAL_DELETE,
-			)),
-			self::getLongSumAggregator(self::METRIC_DURATION_SEC, self::METRIC_DURATION_SEC));
-		
-		self::$aggregations_def[self::METRIC_SIZE_ADDED_BYTES] = self::getFilteredAggregator(
-			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
-				self::EVENT_TYPE_STATUS, 
-				self::EVENT_TYPE_PHYSICAL_ADD,
-				self::EVENT_TYPE_LOGICAL_ADD
-			)),
-			self::getLongSumAggregator(self::METRIC_SIZE_ADDED_BYTES, self::METRIC_SIZE_BYTES));
-
-		self::$aggregations_def[self::METRIC_SIZE_DELETED_BYTES] = self::getFilteredAggregator(
-			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
-				self::EVENT_TYPE_PHYSICAL_DELETE,
-				self::EVENT_TYPE_LOGICAL_DELETE
-			)),
-			self::getLongSumAggregator(self::METRIC_SIZE_DELETED_BYTES, self::METRIC_SIZE_BYTES));
-		
-		self::$aggregations_def[self::METRIC_DURATION_ADDED_SEC] = self::getFilteredAggregator(
-			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
-				self::EVENT_TYPE_STATUS, 
-				self::EVENT_TYPE_PHYSICAL_ADD,
-				self::EVENT_TYPE_LOGICAL_ADD
-			)),
-			self::getLongSumAggregator(self::METRIC_DURATION_ADDED_SEC, self::METRIC_DURATION_SEC));
-		
-		self::$aggregations_def[self::METRIC_DURATION_DELETED_SEC] = self::getFilteredAggregator(
-			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
-				self::EVENT_TYPE_PHYSICAL_DELETE,
-				self::EVENT_TYPE_LOGICAL_DELETE
-			)),
-			self::getLongSumAggregator(self::METRIC_DURATION_DELETED_SEC, self::METRIC_DURATION_SEC));
-		
-		self::$aggregations_def[self::METRIC_ENTRIES_ADDED] = self::getFilteredAggregator(
-			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
-				self::EVENT_TYPE_STATUS, 
-				self::EVENT_TYPE_PHYSICAL_ADD,
-				self::EVENT_TYPE_LOGICAL_ADD
-			)),
-			self::getLongSumAggregator(self::METRIC_ENTRIES_ADDED, self::METRIC_COUNT));
-
-		self::$aggregations_def[self::METRIC_ENTRIES_DELETED] = self::getFilteredAggregator(
-			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
-				self::EVENT_TYPE_PHYSICAL_DELETE,
-				self::EVENT_TYPE_LOGICAL_DELETE
-			)),
-			self::getLongSumAggregator(self::METRIC_ENTRIES_DELETED, self::METRIC_COUNT));
 				
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
@@ -2708,26 +2702,37 @@ class kKavaReportsMgr extends kKavaBase
 	}
 		
 	/// usage graph functions
-	protected static function addAggregatedStorageGraphs(&$storage, $base_storage, $dates)
+	protected static function addAggregatedStorageGraphs(&$graphs, $base_storage, $dates)
 	{
-		$cur_storage = $base_storage;
+		$cur_value = $base_storage;
 		foreach ($dates as $date)
 		{
-			$cur_storage += $storage[self::METRIC_STORAGE_ADDED_MB][$date];
-			$storage[self::METRIC_AVERAGE_STORAGE_MB][$date] = $cur_storage;
-			$storage[self::METRIC_PEAK_STORAGE_MB][$date] = $cur_storage;
-			$cur_storage -= $storage[self::METRIC_STORAGE_DELETED_MB][$date];
+			$cur_value += $graphs[self::METRIC_STORAGE_ADDED_MB][$date];
+			$graphs[self::METRIC_AVERAGE_STORAGE_MB][$date] = $cur_value;
+			$graphs[self::METRIC_PEAK_STORAGE_MB][$date] = $cur_value;
+			$cur_value -= $graphs[self::METRIC_STORAGE_DELETED_MB][$date];
 		}
 	}
 
-	protected static function addAggregatedEntriesGraphs(&$entries, $base_count, $dates)
+	protected static function addAggregatedEntriesGraphs(&$graphs, $base_count, $dates)
 	{
-		$cur_peak = $base_count;
+		$cur_value = $base_count;
 		foreach ($dates as $date)
 		{
-			$cur_peak += $entries[self::METRIC_ENTRIES_ADDED][$date];
-			$entries[self::METRIC_PEAK_ENTRIES][$date] = $cur_peak;
-			$cur_peak -= $entries[self::METRIC_ENTRIES_DELETED][$date];
+			$cur_value += $graphs[self::METRIC_ENTRIES_ADDED][$date];
+			$graphs[self::METRIC_PEAK_ENTRIES][$date] = $cur_value;
+			$cur_value -= $graphs[self::METRIC_ENTRIES_DELETED][$date];
+		}
+	}
+
+	protected static function addAggregatedUsersGraphs(&$graphs, $base_count, $dates)
+	{
+		$cur_value = $base_count;
+		foreach ($dates as $date)
+		{
+			$cur_value += $graphs[self::METRIC_USERS_ADDED][$date];
+			$graphs[self::METRIC_PEAK_USERS][$date] = $cur_value;
+			$cur_value -= $graphs[self::METRIC_USERS_DELETED][$date];
 		}
 	}
 	
@@ -2766,6 +2771,7 @@ class kKavaReportsMgr extends kKavaBase
 					$value = $values ? array_sum($values) / count($values) : 0;
 					break;
 
+				case self::METRIC_PEAK_USERS:
 				case self::METRIC_PEAK_ENTRIES:
 				case self::METRIC_PEAK_STORAGE_MB:
 					$value = $values ? max($values) : 0;
