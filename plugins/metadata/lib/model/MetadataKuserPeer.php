@@ -26,16 +26,9 @@ class MetadataKuserPeer extends kuserPeer implements IMetadataPeer
         return null;
     }
     
-    public static function validateMetadataObjectAccess($objectId, $objectType)
+    public static function validateMetadataObjectAccess($objectId)
     {
-    	$objectPeer = kMetadataManager::getObjectPeer($objectType);
-    	if (!$objectPeer)
-    	{
-    		KalturaLog::debug("objectPeer not found for object object type [$objectType]");
-    		return false;
-    	}
-    
-    	$kuser = $objectPeer::retrieveByPK($objectId);
+    	$kuser = self::retrieveByPK($objectId);
     	if(!$kuser)
     	{
     		KalturaLog::debug("Metadata object id with id [$objectId] not found");

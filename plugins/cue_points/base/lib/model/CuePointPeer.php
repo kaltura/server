@@ -347,16 +347,9 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 		return false;
 	}
 	
-	public static function validateMetadataObjectAccess($objectId, $objectType)
+	public static function validateMetadataObjectAccess($objectId)
 	{
-		$objectPeer = kMetadataManager::getObjectPeer($objectType);
-		if (!$objectPeer)
-		{
-			KalturaLog::debug("objectPeer not found for object object type [$objectType]");
-			return false;
-		}
-	
-		$cuePointDb = $objectPeer::retrieveByPK($objectId);
+		$cuePointDb = self::retrieveByPK($objectId);
 		if(!$cuePointDb)
 		{
 			KalturaLog::debug("Metadata object id with id [$objectId] not found");
