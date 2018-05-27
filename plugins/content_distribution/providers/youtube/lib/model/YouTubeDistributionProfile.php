@@ -820,7 +820,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	protected function addV3RelevantFields(array &$fieldConfigArray)
 	{
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_LABLES, 'Asset lables', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::REQUIRE_PAID_SUBSCRIPTION_TO_VIEW, 'Require paid subscription to view', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/require_paid_subscription_to_view');
+		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::REQUIRE_PAID_SUBSCRIPTION_TO_VIEW, 'Require paid subscription to view', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/require_paid_subscription_to_view"/>');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ENTRY_PRIVACY_STATUS, 'Entry Privacy Status', '<xsl:choose>
                     	<xsl:when test="customData/metadata/'.self::METADATA_FIELD_PRIVACY_STATUS.' != \'\'">
                     		<xsl:value-of select="customData/metadata/'.self::METADATA_FIELD_PRIVACY_STATUS.'" />

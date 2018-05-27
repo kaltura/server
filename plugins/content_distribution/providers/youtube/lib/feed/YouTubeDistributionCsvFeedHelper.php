@@ -25,7 +25,7 @@ class YouTubeDistributionCsvFeedHelper
 		if ($distributionProfile->sftpBaseDir)
 			$this->_directoryName = '/' . trim($distributionProfile->sftpBaseDir, '/') . $this->_directoryName;
 
-		$this->_metadataTempFileName = 'youtube_xml20_' . $timestampName . '.xml';
+		$this->_metadataTempFileName = 'youtube_csv20_' . $timestampName . '.csv';
 	}
 
 	public static function initializeDefaultSubmitFeed(KalturaYouTubeDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $captionAssetIds)

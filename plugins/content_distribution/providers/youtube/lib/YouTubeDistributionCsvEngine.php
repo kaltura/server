@@ -26,7 +26,15 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		$videoCsv .= implode(',' ,array_values($csvMap)) .'\n';
 
 		$sftpManager = $this->getSFTPManager($distributionProfile);
-		$sftpManager->filePutContents($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $videoCsv );
+		// create CSV file
+		$fp = tempnam(sys_get_temp_dir(), 'temp.').".csv";
+		$file = fopen($fp, 'w');
+		fputcsv($file, array_keys($csvMap));
+		fputcsv($file, array_values($csvMap));
+		fclose($file);
+
+//		$sftpManager->filePutContents($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $videoCsv );
+		$sftpManager->putFile($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $fp);
 
 		$data->sentData = $videoCsv;
 		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
@@ -90,7 +98,14 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 				$row = $videoId ."," . $captionItem['language'] ."," . $captionItem['language'] ."\n" ;
 				$captionsContent .= $row ."\n";
 			}
-			$sftpManager->filePutContents( $data->providerData->sftpDirectory . '/' .  $data->providerData->sftpMetadataFilename, $captionsContent);
+			// create CSV file
+			$fp = tempnam(sys_get_temp_dir(), 'temp.').".csv";
+			$file = fopen($fp, 'w');
+			fputcsv($file, $captionsContent);
+			fclose($file);
+
+//			$sftpManager->filePutContents( $data->providerData->sftpDirectory . '/' .  $data->providerData->sftpMetadataFilename, $captionsContent);
+			$sftpManager->putFile($data->providerData->sftpDirectory.'/'.$data->providerData->sftpMetadataFilename, $fp);
 
 			$this->setDeliveryComplete($sftpManager,  $data->providerData->sftpDirectory);
 		}
@@ -122,7 +137,15 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		$videoCsv .= implode(',' ,array_values($updateCsvMap)) .'\n';
 
 		$sftpManager = $this->getSFTPManager($distributionProfile);
-		$sftpManager->filePutContents($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $videoCsv );
+
+		$fp = tempnam(sys_get_temp_dir(), 'temp.').".csv";
+		$file = fopen($fp, 'w');
+		fputcsv($file, $videoCsv);
+		fclose($file);
+
+//		$sftpManager->filePutContents($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $videoCsv );
+		$sftpManager->putFile($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $fp);
+
 		$data->sentData = $videoCsv;
 		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
 
@@ -167,7 +190,13 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 				$row = $videoId ."," . $captionItem['language'] ."," . $captionItem['language'] ."\n" ;
 				$captionsContent .= $row ."\n";
 			}
-			$sftpManager->filePutContents( $data->providerData->sftpDirectory . '/' .  $data->providerData->sftpMetadataFilename, $captionsContent);
+			$fp = tempnam(sys_get_temp_dir(), 'temp.').".csv";
+			$file = fopen($fp, 'w');
+			fputcsv($file, $captionsContent);
+			fclose($file);
+
+//			$sftpManager->filePutContents( $data->providerData->sftpDirectory . '/' .  $data->providerData->sftpMetadataFilename, $captionsContent);
+			$sftpManager->putFile($data->providerData->sftpDirectory.'/'.$data->providerData->sftpMetadataFilename, $fp);
 
 			$this->setDeliveryComplete($sftpManager,  $data->providerData->sftpDirectory);
 		}

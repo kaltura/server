@@ -202,9 +202,6 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 		
 	private static $map_between_objects = array
 	(
-		"videoAssetFilePath",
-		"thumbAssetFilePath",
-		"captionAssetIds",
 		"sftpDirectory",
 		"sftpMetadataFilename",
 		"currentPlaylists",
