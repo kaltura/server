@@ -6,17 +6,25 @@
 
 ### Deployment scripts ###
 	First replcae all tokens from the XML files below and remove ".template" from the fle name:
-		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/thumb_cue_point_notification.template.xml
-	   
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_05_27_player_slide_module_notifications.template.xml
+
 	Run deployment script:
-		php /opt/kaltura/app/deployment/updates/scripts/2018_05_24_deploy_thumb_cue_point_ready_notification.php
+		php /opt/kaltura/app/deployment/updates/scripts/2018_05_24_deploy_player_slides_module_notifications.xml
 		
 ### Configuration ###
 	- Get the dynamic enum value for thumb cue point object by runing the following query:
-	  select id from dynamic_enum where enum_name = "CuePointType" and value_name = "Thumb"
+	  select id from dynamic_enum where enum_name = "CuePointType" and value_name = "Thumb";
+	  select id from dynamic_enum where enum_name = "CuePointType" and value_name = "Code";
 	- In the admin console edit the push notification added by the deployment script and update the following values:
+	  THUMB_CUE_POINT_READY_NOTIFICATION:
 	  trigger_cuepoint 	= value retieved from DB.
 	  Object Type 		= Thumb Cue-Point
+	  Format 				= JSON
+	  Response Profile 	= None 
+	  
+	  SLIDE_VIEW_CHANGE_CODE_CUE_POINT:
+	  trigger_cuepoint 	= value retieved from DB.
+	  Object Type 		= Code Cue-Point
 	  Format 				= JSON
 	  Response Profile 	= None 
 		
