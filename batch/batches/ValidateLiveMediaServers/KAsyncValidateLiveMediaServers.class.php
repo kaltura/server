@@ -34,11 +34,9 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		$entryServerNodeFilter = new KalturaEntryServerNodeFilter();
 		$entryServerNodeFilter->orderBy = KalturaEntryServerNodeOrderBy::CREATED_AT_ASC;
 		$entryServerNodeFilter->createdAtLessThanOrEqual = time() - $entryServerNodeMinCreationTime;
-		
-		$entryServerNodeFilter->statusIn = KalturaEntryServerNodeStatus::PLAYABLE . ',' . 
-				KalturaEntryServerNodeStatus::BROADCASTING . ',' .
-				KalturaEntryServerNodeStatus::AUTHENTICATED . ',' .
-				KalturaEntryServerNodeStatus::MARKED_FOR_DELETION;
+
+		$statusArray = self::getAllEnumValues('KalturaEntryServerNodeStatus', array('STOPPED'));
+		$entryServerNodeFilter->statusIn = implode(',', $statusArray);
 		
 		$entryServerNodePager = new KalturaFilterPager();
 		$entryServerNodePager->pageSize = 500;
@@ -66,5 +64,15 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 			$entryServerNodePager->pageIndex++;
 			$entryServerNodes = self::$kClient->entryServerNode->listAction($entryServerNodeFilter, $entryServerNodePager);
 		}
+	}
+
+	private static function getAllEnumValues($enumName, $excludeEnums = array())
+	{
+		$consts = (new ReflectionClass($enumName))->getConstants();
+		$arr = array();
+		foreach ($consts as $constName => $constValue)
+			if (!in_array($constName, $excludeEnums))
+				$arr[] = $constValue;
+		return $arr;
 	}
 }

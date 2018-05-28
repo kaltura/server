@@ -1893,25 +1893,24 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	 */
 	public static function shouldServeVodFromLive(entry $entry, $validateStatus = true)
 	{
-		$shouldServeVodFromLive = $entry->getType() == entryType::MEDIA_CLIP && $entry->getSource() == EntrySourceType::KALTURA_RECORDED_LIVE;
-		if($validateStatus)
-			$shouldServeVodFromLive = $shouldServeVodFromLive && $entry->getStatus() == entryStatus::READY;
-				
-		if($shouldServeVodFromLive)
-		{
-			$readyAssets = assetPeer::retrieveFlavorsByEntryIdAndStatusIn($entry->getId(), array(asset::ASSET_STATUS_READY));
-			if(!count($readyAssets))
-				return true;
+		if ($entry->getType() != entryType::MEDIA_CLIP || $entry->getSource() != EntrySourceType::KALTURA_RECORDED_LIVE)
+			return false;
 
-			//check if entry is in append mode and currently streaming
-			$liveEntryId = $entry->getRootEntryId();
-			if (EntryServerNodePeer::retrieveByEntryIdAndServerType($liveEntryId, EntryServerNodeType::LIVE_PRIMARY))
-			{
-				$liveEntry = entryPeer::retrieveByPK($liveEntryId);
-				return ($liveEntry && $liveEntry->getRecordedEntryId() == $entry->getId());
-			}
+		if($validateStatus && $entry->getStatus() != entryStatus::READY)
+			return false;
+
+		$readyAssets = assetPeer::retrieveFlavorsByEntryIdAndStatusIn($entry->getId(), array(asset::ASSET_STATUS_READY));
+		if(!count($readyAssets))
+			return true;
+
+		//check if entry is in append mode and currently streaming
+		$liveEntryId = $entry->getRootEntryId();
+		if ($validateStatus && EntryServerNodePeer::retrieveByEntryIdAndServerType($liveEntryId, EntryServerNodeType::LIVE_PRIMARY))
+		{
+			$liveEntry = entryPeer::retrieveByPK($liveEntryId);
+			return ($liveEntry && $liveEntry->getRecordedEntryId() == $entry->getId());
 		}
-		
+
 		return false;
 	}
 
