@@ -72,164 +72,85 @@ class kmcngAction extends kalturaAction
 		$this->contentUiconfsPreview = isset($this->previewUIConf) ? array_values($this->previewUIConf) : null;
 		$this->contentUiconfPreview = (is_array($this->contentUiconfsPreview) && reset($this->contentUiconfsPreview)) ? reset($this->contentUiconfsPreview) : null;
 
-		$secureServerUri = "https://" . kConf::get("cdn_api_host_https");
+		$secureCDNServerUri = "https://" . kConf::get("cdn_api_host_https");
 		if (isset($kmcngParams["kmcng_debug_mode"]))
-			$secureServerUri = "http://" . kConf::get("cdn_api_host");
+			$secureCDNServerUri = "http://" . kConf::get("cdn_api_host");
 
+		$serverAPIUri = kConf::get("www_host");
+		if (isset($kmcngParams["kmcng_custom_uri"]))
+			$serverAPIUri = $kmcngParams["kmcng_custom_uri"];
+
+		$studio = null;
 		if (kConf::hasParam("studio_version") && kConf::hasParam("html5_version"))
 		{
 			$studio = array(
-				"enabled" => true,
 				"uri" => '/apps/studio/' . kConf::get("studio_version") . "/index.html",
 				"html5_version" => kConf::get("html5_version"),
-				"html5lib" => $secureServerUri . "/html5/html5lib/" . kConf::get("html5_version") . "/mwEmbedLoader.php"
-			);
-		}
-		else
-		{
-			$studio = array(
-				"enabled" => false,
-				"uri" => "",
-				"html5_version" => "",
-				"html5lib" => ""
+				"html5lib" => $secureCDNServerUri . "/html5/html5lib/" . kConf::get("html5_version") . "/mwEmbedLoader.php"
 			);
 		}
 
+		$studioV3 = null;
 		if (kConf::hasParam("studio_v3_version") && kConf::hasParam("html5_version"))
 		{
 			$studioV3 = array(
-				"enabled" => true,
 				"uri" => '/apps/studioV3/' . kConf::get("studio_v3_version") . "/index.html",
 				"html5_version" => kConf::get("html5_version"),
-				"html5lib" => $secureServerUri . "/html5/html5lib/" . kConf::get("html5_version") . "/mwEmbedLoader.php"
-			);
-		}
-		else
-		{
-			$studioV3 = array(
-				"enabled" => false,
-				"uri" => "",
-				"html5_version" => "",
-				"html5lib" => ""
+				"html5lib" => $secureCDNServerUri . "/html5/html5lib/" . kConf::get("html5_version") . "/mwEmbedLoader.php"
 			);
 		}
 
 		// TODO Future use - remove the false flag
+		$liveAnalytics = null;
 		if (false && kConf::hasParam("liveanalytics_version") && isset($this->contentUiconfLivea))
 		{
 			$liveAnalytics = array(
-				"enabled" => true,
 				"uri" => '/apps/liveanalytics/' . kConf::get("liveanalytics_version") . "/index.html",
 				"uiConfId" => $this->contentUiconfLivea->getId()
 			);
 		}
-		else
-		{
-			$liveAnalytics = array(
-				"enabled" => false,
-				"uri" => "",
-				"uiConfId" => 0
-			);
-		}
 
+		$liveDashboard = null;
 		if (kConf::hasParam("live_dashboard_version"))
 		{
 			$liveDashboard = array(
-				"enabled" => true,
 				"uri" => '/apps/liveDashboard/' . kConf::get("live_dashboard_version") . "/index.html"
 			);
 		}
-		else
-		{
-			$liveDashboard = array(
-				"enabled" => false,
-				"uri" => ""
-			);
-		}
 
+		$editor = null;
 		if ($kmcngParams["kmcng_kea_version"])
 		{
-			$clipAndTrim = array(
-				"enabled" => true,
+			$editor = array(
 				"uri" => '/apps/kea/' . $kmcngParams["kmcng_kea_version"] . "/index.html"
 			);
 		}
-		else
-		{
-			$clipAndTrim = array(
-				"enabled" => false,
-				"uri" => ""
-			);
-		}
 
-		if ($kmcngParams["kmcng_kea_version"])
-		{
-			$advertisements = array(
-				"enabled" => true,
-				"uri" => '/apps/kea/' . $kmcngParams["kmcng_kea_version"] . "/index.html"
-			);
-		}
-		else
-		{
-			$advertisements = array(
-				"enabled" => false,
-				"uri" => ""
-			);
-		}
-
-		if (kConf::get("usagedashboard_version") && kConf::hasParam("map_zoom_levels") && kConf::hasParam("cdn_static_hosts") && isset($this->contentUiconfLivea))
+		$usageDashboard = null;
+		if (kConf::get("usagedashboard_version"))
 		{
 			$usageDashboard = array(
-				"enabled" => true,
-				"uri" => '/apps/usage-dashboard/' . kConf::get("usagedashboard_version") . "/index.html",
-				"uiConfId" => $this->contentUiconfLivea->getId(),
-				"map_urls" => array_map(function ($s)
-				{
-					return "$s/content/static/maps/v1";
-				}, kConf::get("cdn_static_hosts")),
-				"map_zoom_levels" => kConf::get("map_zoom_levels")
-			);
-		} else
-		{
-			$usageDashboard = array(
-				"enabled" => false,
-				"uri" => "",
-				"uiConfId" => 0,
-				"map_urls" => array(),
-				"map_zoom_levels" => ""
+				"uri" => '/apps/usage-dashboard/' . kConf::get("usagedashboard_version") . "/index.html"
 			);
 		}
 
 		$config = array(
 			'kalturaServer' => array(
-				'uri' => kConf::get("www_host"),
+				'uri' => $serverAPIUri,
 				'deployUrl' => $deployUrl,
 				'previewUIConf' => $this->contentUiconfPreview->getId(),
-				'freeTrialExpiration' => array(
-					'enabled' => false,
-					'trialPeriodInDays' => 30
 				),
-				'login' => array(
-					'limitAccess' => array(
-						'enabled' => false,
-						'verifyBetaServiceUrl' => ""
-					))),
 			'cdnServers' => array(
 				'serverUri' => "http://" . kConf::get("cdn_api_host"),
-				'securedServerUri' => $secureServerUri
+				'securedServerUri' => $secureCDNServerUri
 			),
 			"externalApps" => array(
 				"studio" => $studio,
 				"studioV3" => $studioV3,
 				"liveAnalytics" => $liveAnalytics,
 				"liveDashboard" => $liveDashboard,
-				"kava" => array(
-					"enabled" => false,
-					"uri" => ""
-				),
 				"usageDashboard" => $usageDashboard,
-				"clipAndTrim" => $clipAndTrim,
-				"advertisements" => $advertisements
+				"editor" => $editor
 			),
 			"externalLinks" => array(
 				"previewAndEmbed" => $kmcngParams['previewAndEmbed'],
