@@ -183,4 +183,5 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 			throw new KalturaAPIException(KalturaQuizErrors::ANSWER_UPDATE_IS_NOT_ALLOWED, $sourceObject->getEntryId());
 		}
 	}
+
 }

@@ -5,23 +5,32 @@
  */
 class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 {
+	/** @var KalturaClipDescription $currentClip */
     private $currentClip = null;
 
     public function copyCuePoints()
     {
         $res = true;
-        foreach ($this->data->clipsDescriptionArray as $clipDescription) {
+        /** @var KalturaClipDescription $clipDescription */
+	    foreach ($this->data->clipsDescriptionArray as $clipDescription)
+	    {
             $this->currentClip = $clipDescription;
             $res &= $this->copyCuePointsToEntry($clipDescription->sourceEntryId, $this->data->destinationEntryId);
         }
         return $res;
     }
 
-    public function shouldCopyCuePoint($cuePoint)
+	/**
+	 * @param KalturaCuePoint $cuePoint
+	 * @return bool
+	 */
+	public function shouldCopyCuePoint($cuePoint)
     {
-        $clipStartTime = $this->currentClip->startTime;
-        $clipEndTime = $clipStartTime + $this->currentClip->duration;
-        $calculatedEndTime = $cuePoint->calculatedEndTime;
+	    $clipStartTime = $this->currentClip->startTime;
+	    $clipEndTime = $clipStartTime + $this->currentClip->duration;
+	    $calculatedEndTime = $cuePoint->calculatedEndTime;
+        if (is_null($cuePoint->calculatedEndTime) && $cuePoint->isMomentary)
+	        $calculatedEndTime = $cuePoint->startTime;
         return is_null($calculatedEndTime) || TimeOffsetUtils::onTimeRange($cuePoint->startTime,$calculatedEndTime,$clipStartTime, $clipEndTime);
     }
 
@@ -32,7 +41,11 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
         return $filter;
     }
 
-    public function calculateCuePointTimes($cuePoint)
+	/**
+	 * @param $cuePoint
+	 * @return array
+	 */
+	public function calculateCuePointTimes($cuePoint)
     {
         $clipStartTime = $this->currentClip->startTime;
         $offsetInDestination = $this->currentClip->offsetInDestination;
