@@ -21,7 +21,7 @@
 				<description>Email notification template to be sent when entry vendor task is approved for execution.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
-				<eventObjectType>40</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY_VENDOR_TASK -->
+				<eventObjectType>42</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY_VENDOR_TASK -->
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
 						<field objectType="KalturaEvalBooleanField">

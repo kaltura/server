@@ -21,7 +21,7 @@
 				<description>Email notification template to be sent when entry vendor task is pending moderation.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
-				<eventObjectType>40</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY_VENDOR_TASK -->
+				<eventObjectType>42</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY_VENDOR_TASK -->
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
 						<field objectType="KalturaEvalBooleanField">
