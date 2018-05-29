@@ -530,6 +530,13 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 		return false;
 	}
 
-	public function setIsMomentary($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_IS_MOMENTARY, $v);}
+	/**
+	 * @param $v
+	 * @throws Exception
+	 */
+	public function setIsMomentary($v)
+	{
+		throw new KalturaAPIException('Cannot set isMomentary property, it is derived per type');
+	}
 
 } // CuePoint
