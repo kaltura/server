@@ -33,7 +33,6 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		fputcsv($file, array_values($csvMap));
 		fclose($file);
 
-//		$sftpManager->filePutContents($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $videoCsv );
 		$sftpManager->putFile($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $fp);
 
 		$data->sentData = $videoCsv;
@@ -59,7 +58,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 	 */
 	public function closeSubmit(KalturaDistributionSubmitJobData $data)
 	{
-		$statusXml = $this->fetchStatusXml($data, $data->distributionProfile, $data->providerData);
+		$statusXml = $this->fetchStatusXml($data, $data->distributionProfile, $data->providerData, "xml");
 
 		if ($statusXml === false) // no status yet
 		{
@@ -104,9 +103,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 			fputcsv($file, $captionsContent);
 			fclose($file);
 
-//			$sftpManager->filePutContents( $data->providerData->sftpDirectory . '/' .  $data->providerData->sftpMetadataFilename, $captionsContent);
 			$sftpManager->putFile($data->providerData->sftpDirectory.'/'.$data->providerData->sftpMetadataFilename, $fp);
-
 			$this->setDeliveryComplete($sftpManager,  $data->providerData->sftpDirectory);
 		}
 
@@ -143,7 +140,6 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		fputcsv($file, $videoCsv);
 		fclose($file);
 
-//		$sftpManager->filePutContents($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $videoCsv );
 		$sftpManager->putFile($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $fp);
 
 		$data->sentData = $videoCsv;
@@ -164,7 +160,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 	 */
 	public function closeUpdate(KalturaDistributionUpdateJobData $data)
 	{
-		$statusXml = $this->fetchStatusXml($data, $data->distributionProfile, $data->providerData);
+		$statusXml = $this->fetchStatusXml($data, $data->distributionProfile, $data->providerData, "xml");
 
 		if ($statusXml === false) // no status yet
 			return false;
@@ -195,7 +191,6 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 			fputcsv($file, $captionsContent);
 			fclose($file);
 
-//			$sftpManager->filePutContents( $data->providerData->sftpDirectory . '/' .  $data->providerData->sftpMetadataFilename, $captionsContent);
 			$sftpManager->putFile($data->providerData->sftpDirectory.'/'.$data->providerData->sftpMetadataFilename, $fp);
 
 			$this->setDeliveryComplete($sftpManager,  $data->providerData->sftpDirectory);
