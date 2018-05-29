@@ -19,6 +19,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	const CUSTOM_DATA_FIELD_ROOT_PARENT_ID = 'rootParentId';
 	const CUSTOM_DATA_FIELD_TRIGGERED_AT = 'triggeredAt';
 	const CUSTOM_DATA_FIELD_IS_PUBLIC = 'isPublic';
+	const CUSTOM_DATA_FIELD_IS_MOMENTARY = 'isMomentary';
 
 	const INDEXED_FIELD_PREFIX = 'pid';
 
@@ -523,4 +524,19 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	{
 		return null;
 	}
+
+	public function getIsMomentary()
+	{
+		return false;
+	}
+
+	/**
+	 * @param $v
+	 * @throws Exception
+	 */
+	public function setIsMomentary($v)
+	{
+		throw new KalturaAPIException('Cannot set isMomentary property, it is derived per type');
+	}
+
 } // CuePoint

@@ -108,6 +108,11 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 	 * @filter eq,in
 	 */
 	public $systemName;
+
+	/**
+	 * @var bool
+	 */
+	public $isMomentary;
 	
 	private static $map_between_objects = array
 	(
@@ -126,6 +131,7 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 		"thumbOffset",
 		"systemName",
 		"triggeredAt",
+		"isMomentary"
 	);
 	
 	public function getMapBetweenObjects()
@@ -304,4 +310,5 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 		$object->fromObject($sourceObject, $responseProfile);		 
 		return $object;
 	}
+
 }
