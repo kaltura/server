@@ -150,9 +150,13 @@ PLAT-7514
 
 ### Deployment scripts ###
 -Add kms registration http request on partner creation:
-
-     php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/partnerAddedMediaSpaceHttpNotification.xml    
- 
+        
+        	First replcae all tokens from the XML files below and remove ".template" from the fle name:
+        		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_05_29_partner_Added_Media_Space_Http_Notification.template.xml
+        
+        	Run deployment script:
+        		php /opt/kaltura/app/deployment/updates/scripts/2018_05_29_partner_Added_Media_Space.php
+        		
 ## Allow KMC user change account functionality ##
 Issue Type:  New Feature
 Issue ID: KMCNG-1683
