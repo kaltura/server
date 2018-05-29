@@ -1903,13 +1903,13 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		if(!count($readyAssets))
 			return true;
 
+		if (!$validateStatus)
+			return false;
+
 		//check if entry is in append mode and currently streaming
-		$liveEntryId = $entry->getRootEntryId();
-		if ($validateStatus && EntryServerNodePeer::retrieveByEntryIdAndServerType($liveEntryId, EntryServerNodeType::LIVE_PRIMARY))
-		{
-			$liveEntry = entryPeer::retrieveByPK($liveEntryId);
-			return ($liveEntry && $liveEntry->getRecordedEntryId() == $entry->getId());
-		}
+		$liveEntry = entryPeer::retrieveByPK($entry->getRootEntryId());
+		if ($liveEntry && $liveEntry->getRecordStatus() == RecordStatus::APPENDED && $liveEntry->getRecordedEntryId() == $entry->getId())
+			return !is_null(EntryServerNodePeer::retrieveByEntryIdAndServerType($liveEntry->getId(), EntryServerNodeType::LIVE_PRIMARY));
 
 		return false;
 	}
