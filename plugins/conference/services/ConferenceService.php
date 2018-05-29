@@ -58,7 +58,14 @@ class ConferenceService extends KalturaBaseService {
 		$existingConfRoom = $this->findExistingConferenceRoom($entryId);
 		if ($existingConfRoom)
 			return $existingConfRoom;
-
+		
+		$partner = $this->getPartner();
+		$numOfConcurrentRtcStreams = EntryServerNodePeer::retrieveByPartnerIdAndServerType($this->getPartnerId(), ConferencePlugin::getCoreValue('EntryServerNodeType', ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER ));
+		if ($numOfConcurrentRtcStreams >= $partner->getMaxLiveRtcStreamInputs())
+		{
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_RTC_STREAMS, $this->getPartnerId());
+		}
+		
 		$liveStreamEntry = entryPeer::retrieveByPK($entryId);
 		/** @var LiveStreamEntry $liveStreamEntry */
 		if (!$liveStreamEntry)

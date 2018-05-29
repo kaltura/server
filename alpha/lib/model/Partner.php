@@ -985,6 +985,7 @@ class Partner extends BasePartner
 	public function setAccessControls($v)				{$this->putInCustomData('access_controls', $v);}
 	public function setMaxLiveStreamInputs($v)			{$this->putInCustomData('live_stream_inputs', $v);}
 	public function setMaxLiveStreamOutputs($v)			{$this->putInCustomData('live_stream_outputs', $v);}
+	public function setMaxLiveRtcStreamInputs($v)		{$this->putInCustomData('live_rtc_stream_inputs', $v);}
 	
 	public function setLoginUsersOveragePrice($v)		{$this->putInCustomData('login_users_overage_price', $v);}
 	public function setAdminLoginUsersOveragePrice($v)	{$this->putInCustomData('admin_login_users_overage_price', $v);}
@@ -1035,6 +1036,7 @@ class Partner extends BasePartner
 	public function getAccessControls()					{return $this->getFromCustomData('access_controls', null, self::MAX_ACCESS_CONTROLS);}
 	public function getMaxLiveStreamInputs()			{return $this->getFromCustomData('live_stream_inputs');}
 	public function getMaxLiveStreamOutputs()			{return $this->getFromCustomData('live_stream_outputs');}
+	public function getMaxLiveRtcStreamInputs()			{return $this->getFromCustomData('live_rtc_stream_inputs');}
 	
 	public function getLoginUsersOveragePrice()			{return $this->getFromCustomData('login_users_overage_price');}
 	public function getAdminLoginUsersOveragePrice()	{return $this->getFromCustomData('admin_login_users_overage_price');}
