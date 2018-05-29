@@ -70,44 +70,5 @@
 			</responseProfile>
 		</request>
 	</multirequest>
-
-	<multirequest>
-		<request service="responseProfile" action="add" partnerId="0">
-			<responseProfile objectType="KalturaResponseProfile">
-				<type>1</type>
-				<name>reach_vendor</name>
-				<systemName>reach_vendor</systemName>
-				<fields>id,partnerId,vendorPartnerId,createdAt,entryId,status,reachProfileId,catalogItemId,accessKey,notes,dictionary</fields>
-				<relatedProfiles objectType="array">
-					<item objectType="KalturaDetachedResponseProfile">
-						<name>reach_vendor_catalog_item</name>
-						<type>2</type>
-						<fields>id,partnerId,createdAt,updatedAt,status,profileType,rules,credit,usedCredit,dictionaries</fields>
-						<filter objectType="KalturaVendorCatalogItemFilter">
-						</filter>
-						<mappings objectType="array">
-							<item objectType="KalturaResponseProfileMapping">
-								<parentProperty>catalogItemId</parentProperty>
-								<filterProperty>idEqual</filterProperty>
-							</item>
-						</mappings>
-					</item>
-					<item objectType="KalturaDetachedResponseProfile">
-						<name>reach_vendor_profile</name>
-						<type>2</type>
-						<fields>id,partnerId,createdAt,updatedAt,status,profileType,rules,credit,usedCredit,dictionaries</fields>
-						<filter objectType="KalturaReachProfileFilter">
-						</filter>
-						<mappings objectType="array">
-							<item objectType="KalturaResponseProfileMapping">
-								<parentProperty>reachProfileId</parentProperty>
-								<filterProperty>idEqual</filterProperty>
-							</item>
-						</mappings>
-					</item>
-				</relatedProfiles>
-			</responseProfile>
-		</request>
-	</multirequest>
 	
 </xml>
