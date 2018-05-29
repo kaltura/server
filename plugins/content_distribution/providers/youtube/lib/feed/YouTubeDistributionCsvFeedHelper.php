@@ -100,7 +100,6 @@ class YouTubeDistributionCsvFeedHelper
 		$this->setPrivacyStatus($fieldValues,$distributionProfile);
 		$this->setDefaultCategory($fieldValues,$distributionProfile);
 
-		$this->setCsvFieldValueIfHasValue('notification_email', $fieldValues, KalturaYouTubeDistributionField::NOTIFICATION_EMAIL);
 		$this->setCsvFieldValueIfHasValue('custom_id', $fieldValues, KalturaYouTubeDistributionField::ASSET_CUSTOM_ID);
 		$this->setCsvFieldValueIfHasValue('title', $fieldValues, KalturaYouTubeDistributionField::ASSET_TITLE);
 		$this->setCsvFieldValueIfHasValue('spoken_language', $fieldValues, KalturaYouTubeDistributionField::ASSET_SPOKEN_LANGUAGE);
@@ -119,7 +118,7 @@ class YouTubeDistributionCsvFeedHelper
 
 	public function setVideoToDelete($videoId)
 	{
-		$this->_csvMap['videoId'] = $videoId;
+		$this->_csvMap['video_id'] = $videoId;
 	}
 
 	public function getValueForField(array $fieldValues ,$key)
@@ -250,7 +249,8 @@ class YouTubeDistributionCsvFeedHelper
 	{
 		$valuesStr = $this->getValueForField($fieldValues, $fieldName);
 		$values = str_replace(',' ,$delimiter, $valuesStr );
-		$this->_csvMap["$csvFieldKey"] = $values ;
+		if($values)
+			$this->_csvMap["$csvFieldKey"] = $values ;
 	}
 
 	public function setAdParamsByFieldValues(array $fieldValues, KalturaYouTubeDistributionProfile $distributionProfile)
@@ -259,15 +259,15 @@ class YouTubeDistributionCsvFeedHelper
 		$delimiter = '|';
 		$adValue = $this->getAdvertisingValue($fieldValues,KalturaYouTubeDistributionField::ADVERTISING_INSTREAM_STANDARD,$distributionProfile->instreamStandard);
 		if ($this->isAllowedValue($adValue))
-			$adTypes = "instreamStandard";
+			$adTypes = "instream_standard";
 		elseif($this->isNotAllowedValue($adValue))
-			$adTypes = "!instreamStandard";
+			$adTypes = "!instream_standard";
 
 		$adValue = $this->getAdvertisingValue($fieldValues,KalturaYouTubeDistributionField::ADVERTISING_INSTREAM_TRUEVIEW,$distributionProfile->instreamTrueview);
 		if ($this->isAllowedValue($adValue))
-			$adTypes .= $delimiter."instreamTrueview";
+			$adTypes .= $delimiter."instream_trueview";
 		elseif($this->isNotAllowedValue($adValue))
-			$adTypes .= $delimiter."!instreamTrueview";
+			$adTypes .= $delimiter."!instream_trueview";
 
 		$adValue = $this->getAdvertisingValue($fieldValues,KalturaYouTubeDistributionField::ADVERTISING_ALLOW_INVIDEO,$distributionProfile->allowInvideo);
 		if ($this->isAllowedValue($adValue))
@@ -296,7 +296,7 @@ class YouTubeDistributionCsvFeedHelper
 		elseif($this->isNotAllowedValue($adValue))
 			$adTypes .= $delimiter."!third_party_ads";
 
-		$this->setCsvFieldValue('adTypes', $adTypes);
+		$this->setCsvFieldValue('ad_types', $adTypes);
 	}
 
 	public function appendRightsAdminByFieldValues(array $fieldValues, KalturaYouTubeDistributionProfile $distributionProfile)

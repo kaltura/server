@@ -548,13 +548,32 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 		$this->addGeneralElements($order);
 		$this->addV3Elements($order);
 
+		$this->removeElement('ugc_policy');
+		$this->removeElement('commercial_policy');
+
 		// modify the names of the elements to better fit the new spec
 		$this->getElement('username')->setLabel('Channel:');
 		$this->getElement('owner_name')->setLabel('Content Owner:');
-		$this->getElement('ugc_policy')->setLabel('Match Policy:');
-		$this->getElement('commercial_policy')->setLabel('Usage Policy:');
-		$this->getElement('instream_trueview')->setLabel('Skippable video ads:');
+		$this->addElement('select', 'ugc_policy', array(
+			'label' => 'Match Policy:',
+			'multioptions' => array(
+				'' => 'Default',
+				'Monetize in all countries' => 'Monetize',
+				'Track in all countries' => 'Track',
+				'Block in all countries' => 'Block',
+			)));
 
+		$this->addElement('select', 'commercial_policy', array(
+			'label' => 'Usage Policy:',
+			'multioptions' => array(
+				'' => 'Default',
+				'Monetize in all countries' => 'Monetize',
+				'Track in all countries' => 'Track',
+				'Block in all countries' => 'Block',
+			)));
+
+
+		$this->getElement('instream_trueview')->setLabel('Skippable video ads:');
 		$this->getElement('instream_standard')->setLabel('Non-skippable video ads:');
 		$this->getElement('instream_standard')->setOptions( array(
 			'multioptions' => array(
