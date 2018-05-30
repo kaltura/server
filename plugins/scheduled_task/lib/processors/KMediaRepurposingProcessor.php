@@ -6,6 +6,8 @@
  */
 class KMediaRepurposingProcessor extends KGenericProcessor
 {
+	private static $dontUpdateMetaDataTaskTypes = array (KalturaObjectTaskType::DELETE_ENTRY);
+
 	/**
 	 * @param KalturaScheduledTaskProfile $profile
 	 */

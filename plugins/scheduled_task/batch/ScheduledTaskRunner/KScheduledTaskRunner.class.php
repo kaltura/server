@@ -5,8 +5,6 @@
  */
 class KScheduledTaskRunner extends KPeriodicWorker
 {
-
-	private static $dontUpdateMetaDataTaskTypes = array (KalturaObjectTaskType::DELETE_ENTRY);
 	/**
 	 * @var array
 	 */
