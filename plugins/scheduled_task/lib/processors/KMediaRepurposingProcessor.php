@@ -75,7 +75,7 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 	private function updateMetadataStatusForMediaRepurposing(KalturaScheduledTaskProfile $profile, $object, $error)
 	{
 		$metadataProfileId = self::getMrAdvancedSearchFilter($profile)->metadataProfileId;
-		$metadataPlugin = KalturaMetadataClientPlugin::get(self::$kClient);
+		$metadataPlugin = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
 		$metadata = $this->getMetadataOnObject($object->id, $metadataProfileId);
 
 		$xml = ($metadata && $metadata->xml) ? $metadata->xml : null;
