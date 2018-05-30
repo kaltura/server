@@ -63,7 +63,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 	private function isMediaRepurposingProfile(KalturaScheduledTaskProfile $profile)
 	{
-		return ($profile->systemName == "MRP") || (kstring::beginsWith($profile->name, 'MR_'));
+		return ($profile->systemName == "MRP") || (kString::beginsWith($profile->name, 'MR_'));
 	}
 
 	private function isReachProfile(KalturaScheduledTaskProfile $profile)
