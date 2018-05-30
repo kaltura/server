@@ -9,21 +9,25 @@ class YouTubeDistributionCsvParser
 	 * @var array
 	 */
 	protected $rows;
-	
+
 	/**
-	 * @param string $csv
+	 * YouTubeDistributionCsvParser constructor.
+	 * @param $csvStr
 	 */
-	public function __construct($csvPath)
+	public function __construct($csvStr)
 	{
 		$all_rows = array();
-		$f = fopen($csvPath,'r');
-		$header = fgetcsv($f);
-		while ($row = fgetcsv($f))
+		$csvArray = explode("\n", $csvStr);
+		$header = explode(",", array_shift($csvArray));
+		foreach ($csvArray as $row)
 		{
-			$all_rows[] = array_combine($header, $row);
+			$rowArray = explode(",", $row);
+			$all_rows[] = array_combine($header, $rowArray);
 		}
 
 		$this->rows = $all_rows;
+		KalturaLog::debug("Parsed Csv Result:" . print_r($this->rows, true));
+
 	}
 
 	/**

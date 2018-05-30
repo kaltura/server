@@ -33,6 +33,7 @@ class YouTubeDistributionCsvFeedHelper
 		$feed = new YouTubeDistributionCsvFeedHelper($distributionProfile);
 		$feed->genericHandling($distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath);
 		$feed->handleCaptions($captionAssetIds);
+
 		return $feed;
 	}
 
@@ -63,15 +64,11 @@ class YouTubeDistributionCsvFeedHelper
 
 	public function genericHandling(KalturaYouTubeDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $videoId = null)
 	{
-		// video file
-		if (file_exists($videoFilePath))
-			$this->setCsvFieldValue("filename", pathinfo($videoFilePath, PATHINFO_BASENAME));
-
 		// thumbnail file
 		if (file_exists($thumbnailFilePath))
 			$this->setCsvFieldValue('custom_thumbnail', pathinfo($thumbnailFilePath, PATHINFO_BASENAME));
 
-		$this->setDataByFieldValues($fieldValues, $distributionProfile, $videoId);
+		$this->setDataByFieldValues($fieldValues, $distributionProfile, $videoId, $videoFilePath);
 
 		$this->setAdParamsByFieldValues($fieldValues, $distributionProfile);
 
@@ -86,10 +83,12 @@ class YouTubeDistributionCsvFeedHelper
 		return $feed;
 	}
 
-	public function setDataByFieldValues(array $fieldValues, KalturaYouTubeDistributionProfile $distributionProfile, $videoId = null)
+	public function setDataByFieldValues(array $fieldValues, KalturaYouTubeDistributionProfile $distributionProfile, $videoId = null, $videoFilePath = null)
 	{
 		if ($videoId)
 			$this->setCsvFieldValue('video_id',$videoId);
+		else if (file_exists($videoFilePath))
+			$this->setCsvFieldValue("filename", pathinfo($videoFilePath, PATHINFO_BASENAME));
 
 		if ($this->isAllowedValue($distributionProfile->enableContentId))
 		{
