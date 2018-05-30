@@ -74,7 +74,7 @@ class YouTubeDistributionCsvFeedHelper
 		$this->setDataByFieldValues($fieldValues, $distributionProfile, $videoId);
 
 		$this->setAdParamsByFieldValues($fieldValues, $distributionProfile);
-		$this->appendRightsAdminByFieldValues($fieldValues, $distributionProfile);
+
 
 	}
 
@@ -91,14 +91,22 @@ class YouTubeDistributionCsvFeedHelper
 		if ($videoId)
 			$this->setCsvFieldValue('video_id',$videoId);
 
-		if ($distributionProfile->enableContentId)
+		if ($this->isAllowedValue($distributionProfile->enableContentId))
+		{
 			$this->setCsvFieldValue('enable_content_id',"Yes");
+			$this->appendRightsAdminByFieldValues($fieldValues, $distributionProfile);
+		}
+		if ($this->isNotAllowedValue($distributionProfile->enableContentId))
+			$this->setCsvFieldValue('enable_content_id',"No");
 
-		if ($distributionProfile->blockOutsideOwnership)
+		if ($this->isAllowedValue($distributionProfile->blockOutsideOwnership))
 			$this->setCsvFieldValue('block_outside_ownership',"Yes");
+		if ($this->isNotAllowedValue($distributionProfile->blockOutsideOwnership))
+			$this->setCsvFieldValue('block_outside_ownership',"No");
 
 		$this->setPrivacyStatus($fieldValues,$distributionProfile);
 		$this->setDefaultCategory($fieldValues,$distributionProfile);
+		$this->setNotifySubscribers($fieldValues,$distributionProfile);
 
 		$this->setCsvFieldValueIfHasValue('custom_id', $fieldValues, KalturaYouTubeDistributionField::ASSET_CUSTOM_ID);
 		$this->setCsvFieldValueIfHasValue('title', $fieldValues, KalturaYouTubeDistributionField::ASSET_TITLE);
@@ -106,7 +114,6 @@ class YouTubeDistributionCsvFeedHelper
 		$this->setCsvFieldValueIfHasValue('description', $fieldValues, KalturaYouTubeDistributionField::MEDIA_DESCRIPTION); //make this like privacy context
 		$this->setCsvFieldValueIfHasValue('channel', $fieldValues, KalturaYouTubeDistributionField::VIDEO_CHANNEL);
 		$this->setCsvFieldValueIfHasValue('require_paid_subscription', $fieldValues, KalturaYouTubeDistributionField::REQUIRE_PAID_SUBSCRIPTION_TO_VIEW);
-		$this->setCsvFieldValueIfHasValue('notify_subscribers', $fieldValues, KalturaYouTubeDistributionField::VIDEO_NOTIFY_SUBSCRIBERS);
 
 		$this->setTime('start_time', $fieldValues, KalturaYouTubeDistributionField::START_TIME);
 		$this->setTime('end_time', $fieldValues, KalturaYouTubeDistributionField::END_TIME);
@@ -153,9 +160,25 @@ class YouTubeDistributionCsvFeedHelper
 	 * @param KalturaYoutubeDistributionProfile $distributionProfile
 	 * @return null|string
 	 */
+	protected function setNotifySubscribers(array $fieldValues , KalturaYoutubeDistributionProfile $distributionProfile)
+	{
+		$notifySubscribers = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::VIDEO_NOTIFY_SUBSCRIBERS);
+		if ($notifySubscribers == "" || is_null($notifySubscribers))
+			$notifySubscribers = $distributionProfile->notifySubscribers;
+
+		if ($this->isAllowedValue($notifySubscribers))
+			$this->_csvMap["notify_subscribers"] = "Yes";
+		else if ($this->isNotAllowedValue($notifySubscribers))
+			$this->_csvMap["notify_subscribers"] = "No";
+	}
+
+	/**
+	 * @param KalturaYoutubeDistributionProfile $distributionProfile
+	 * @return null|string
+	 */
 	protected function setPrivacyStatus(array $fieldValues , KalturaYoutubeDistributionProfile $distributionProfile)
 	{
-		$privacyStatus = $this->getValueForField($fieldValues, KalturaYouTubeApiDistributionField::ENTRY_PRIVACY_STATUS);
+		$privacyStatus = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::ENTRY_PRIVACY_STATUS);
 		if ($privacyStatus == "" || is_null($privacyStatus))
 			$privacyStatus = $distributionProfile->privacyStatus;
 
@@ -255,6 +278,9 @@ class YouTubeDistributionCsvFeedHelper
 
 	public function setAdParamsByFieldValues(array $fieldValues, KalturaYouTubeDistributionProfile $distributionProfile)
 	{
+		if (!$distributionProfile->enableAdServer)
+			return;
+
 		$adTypes = '';
 		$delimiter = '|';
 		$adValue = $this->getAdvertisingValue($fieldValues,KalturaYouTubeDistributionField::ADVERTISING_INSTREAM_STANDARD,$distributionProfile->instreamStandard);

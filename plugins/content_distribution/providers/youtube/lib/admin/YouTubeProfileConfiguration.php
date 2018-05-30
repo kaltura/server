@@ -623,7 +623,7 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 
 		// <ad_policy>
 		$this->addDisplayGroup(
-			array( 'instream_trueview','instream_standard','allow_invideo', 'product_listing_ads','allow_adsense_for_video','third_party_ads'),
+			array( 'enable_ad_server','instream_trueview','instream_standard','allow_invideo', 'product_listing_ads','allow_adsense_for_video','third_party_ads'),
 			'ad_policy_group',
 			array('legend' => 'Ad Policy', 'decorators' => array('FormElements', 'Fieldset'), 'order' => $order++)
 		);
@@ -660,7 +660,6 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 		$this->removeElement('allow_syndication');
 		$this->removeElement('hide_view_count');
 		$this->removeElement('target');
-		$this->removeElement('enable_ad_server');
 		$this->removeElement('ad_server_partner_id');
 	}
 
