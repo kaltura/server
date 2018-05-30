@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+
+    <multirequest>
+        <!-- Attachemnt Asset Added -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaHttpNotificationTemplate">
+                <name>Attachment Asset Added</name>
+                <systemName>HTTP_Attachemnt_Asset_Added</systemName>
+                <description>HTTP notification template to be sent when a new Attachemnt asset is added to an entry.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>2</eventType>
+                <!-- EventNotificationEventType::OBJECT_ADDED -->
+                <eventObjectType>attachmentAssetEventNotifications.AttachmentAsset</eventObjectType>
+                <method>2</method>
+                <!-- KalturaHttpNotificationMethod::POST -->
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+
+    <multirequest>
+        <!-- Attachemnt Asset Changed -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaHttpNotificationTemplate">
+                <name>Attachment Asset Changed</name>
+                <systemName>HTTP_Attachemnt_Asset_Changed</systemName>
+                <description>HTTP notification template to be sent when a new Attachemnt asset changed.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType>
+                <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>attachmentAssetEventNotifications.AttachmentAsset</eventObjectType>
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventObjectChangedCondition">
+                        <description>Attachemnt Asset metadata changed, columns defined in modified_columns parameter</description>
+                        <modifiedColumns>{modified_columns}</modifiedColumns>
+                    </item>
+                </eventConditions>		
+                <userParameters objectType="array">
+                    <item objectType="KalturaEventNotificationArrayParameter">
+                        <key>modified_columns</key>
+                        <description>Caption-asset metadata columns that will trigger the event</description>
+                        <allowedValues objectType="array">
+                            <item objectType="KalturaStringValue">
+                                <value>flavor_asset.TAGS</value>
+                                <description>tags</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>flavor_asset.STATUS</value>
+                                <description>status</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>flavor_asset.VERSION</value>
+                                <description>version</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>flavor_asset.DESCRIPTION</value>
+                                <description>description</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>flavor_asset.SIZE</value>
+                                <description>size</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>filename</value>
+                                <description>filename</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>title</value>
+                                <description>title</description>
+                            </item>
+                        </allowedValues>
+                        <values objectType="array">
+                            <item objectType="KalturaString">
+                                <value>flavor_asset.VERSION</value>
+                            </item>
+                        </values>
+                    </item>
+                </userParameters>		
+                <method>2</method>
+                <!-- KalturaHttpNotificationMethod::POST -->
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+
+    <multirequest>
+        <!-- Attachemnt Asset Deleted -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaHttpNotificationTemplate">
+                <name>Attachment Asset Deleted</name>
+                <systemName>HTTP_Attachemnt_Asset_Deleted</systemName>
+                <description>HTTP notification template to be sent when a new Attachemnt asset is deleted.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>7</eventType>
+                <!-- EventNotificationEventType::OBJECT_DELETED -->
+                <eventObjectType>attachmentAssetEventNotifications.AttachmentAsset</eventObjectType>
+                <method>2</method>
+                <!-- KalturaHttpNotificationMethod::POST -->
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+</xml>
