@@ -68,7 +68,7 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 	}
 	
 	/**
-	 * Retrieve a count of all EntryServerNodeType under a partner.
+	 * Retrieve a count of all EntryServerNodeType associated with a partner.
 	 *
 	 * @param      string $partnerId .
 	 * @param      EntryServerNodeType $serverType .
