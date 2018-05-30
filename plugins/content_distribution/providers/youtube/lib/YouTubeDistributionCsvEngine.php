@@ -58,7 +58,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 	 */
 	public function closeSubmit(KalturaDistributionSubmitJobData $data)
 	{
-		$reportCsv = $this->fetchCsv($data, $data->distributionProfile, $data->providerData, 'report');
+		$reportCsv = $this->fetchFile($data, $data->distributionProfile, $data->providerData, 'report');
 
 		if ($reportCsv  === false) // no status yet
 		{
@@ -75,7 +75,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 
 		if ($status != 'Successful')
 		{
-			$errorsCsv = $this->fetchCsv($data, $data->distributionProfile, $data->providerData, 'errors');
+			$errorsCsv = $this->fetchFile($data, $data->distributionProfile, $data->providerData, 'errors');
 			$errorsParser = new YouTubeDistributionCsvParser($errorsCsv);
 			$errors = $errorsParser->getErrorsSummary();
 			throw new Exception('Distribution failed with status ['.$status.'] and errors ['.implode(',', $errors).']');
@@ -158,22 +158,23 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 	 */
 	public function closeUpdate(KalturaDistributionUpdateJobData $data)
 	{
-		$reportCsv = $this->fetchCsv($data, $data->distributionProfile, $data->providerData, 'report');
+		$statusXml = $this->fetchStatusFile($data, $data->distributionProfile, $data->providerData, "status", "xml");
 
-		if ($reportCsv === false) // no status yet
-			return false; // return false to recheck again on next job closing iteration
+		if ($statusXml === false) // no status yet
+			return false;
 
-		$statusParser = new YouTubeDistributionCsvParser($reportCsv);
-		$status = $statusParser->getStatusForAction('Status');
+		$statusParser = new YouTubeDistributionRightsFeedLegacyStatusParser($statusXml);
+		$status = $statusParser->getStatusForAction('Update video');
 		if (is_null($status))
 			throw new Exception('Status could not be found after distribution update');
 
 		if ($status != 'Success')
-			throw new Exception('Update failed with status [' . $status . ']');
+			throw new Exception('Update failed with status ['.$status.']');
 
 		$remoteIdHandler = YouTubeDistributionRemoteIdHandler::initialize($data->remoteId);
 		$videoId = $remoteIdHandler->getVideoId();
 
+		//update captions
 		$captionCsvMap = unserialize($data->providerData->captionsCsvMap);
 		if ($videoId && !empty($captionCsvMap))
 		{
@@ -230,15 +231,19 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 	 * @param KalturaYouTubeDistributionJobProviderData $providerData
 	 * @return Status CSV or FALSE when status is not available yet
 	 */
-	protected function fetchCsv(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData, $prefix = '' )
+	protected function fetchFile(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData, $prefix = '', $extension = null )
 	{
-		$statusFilePath = $providerData->sftpDirectory . '/' . $prefix . '-' . $providerData->sftpMetadataFilename;
+		if ($extension)
+			$statusFilePath = $providerData->sftpDirectory . '/' . $prefix  . '-' . $providerData->sftpMetadataFilename . "." . $extension;
+		else
+			$statusFilePath = $providerData->sftpDirectory . '/' . $prefix . '-' . $providerData->sftpMetadataFilename;
+
 		$sftpManager = $this->getSFTPManager($distributionProfile);
-		$statusCsv = null;
+		$statusFile = null;
 		try
 		{
 			KalturaLog::info('Trying to get the following status file: ['.$statusFilePath.']');
-			$statusCsv = $sftpManager->getFile($statusFilePath);
+			$statusFile = $sftpManager->getFile($statusFilePath);
 		}
 		catch(kFileTransferMgrException $ex) // file is still missing
 		{
@@ -246,7 +251,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 			return false;
 		}
 
-		$data->results = $statusCsv;
-		return $statusCsv;
+		$data->results = $statusFile;
+		return $statusFile;
 	}
 }

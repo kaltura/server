@@ -69,9 +69,7 @@ class YouTubeDistributionCsvFeedHelper
 			$this->setCsvFieldValue('custom_thumbnail', pathinfo($thumbnailFilePath, PATHINFO_BASENAME));
 
 		$this->setDataByFieldValues($fieldValues, $distributionProfile, $videoId, $videoFilePath);
-
 		$this->setAdParamsByFieldValues($fieldValues, $distributionProfile);
-
 
 	}
 
@@ -85,10 +83,13 @@ class YouTubeDistributionCsvFeedHelper
 
 	public function setDataByFieldValues(array $fieldValues, KalturaYouTubeDistributionProfile $distributionProfile, $videoId = null, $videoFilePath = null)
 	{
-		if ($videoId)
+		if ($videoId) // in case of update
 			$this->setCsvFieldValue('video_id',$videoId);
-		else if (file_exists($videoFilePath))
+		else if (file_exists($videoFilePath)) // in case of upload
+		{
 			$this->setCsvFieldValue("filename", pathinfo($videoFilePath, PATHINFO_BASENAME));
+			$this->setCsvFieldValueIfHasValue('channel', $fieldValues, KalturaYouTubeDistributionField::VIDEO_CHANNEL);
+		}
 
 		if ($this->isAllowedValue($distributionProfile->enableContentId))
 		{
@@ -111,7 +112,6 @@ class YouTubeDistributionCsvFeedHelper
 		$this->setCsvFieldValueIfHasValue('title', $fieldValues, KalturaYouTubeDistributionField::ASSET_TITLE);
 		$this->setCsvFieldValueIfHasValue('spoken_language', $fieldValues, KalturaYouTubeDistributionField::ASSET_SPOKEN_LANGUAGE);
 		$this->setCsvFieldValueIfHasValue('description', $fieldValues, KalturaYouTubeDistributionField::MEDIA_DESCRIPTION); //make this like privacy context
-		$this->setCsvFieldValueIfHasValue('channel', $fieldValues, KalturaYouTubeDistributionField::VIDEO_CHANNEL);
 		$this->setCsvFieldValueIfHasValue('require_paid_subscription', $fieldValues, KalturaYouTubeDistributionField::REQUIRE_PAID_SUBSCRIPTION_TO_VIEW);
 
 		$this->setTime('start_time', $fieldValues, KalturaYouTubeDistributionField::START_TIME);
