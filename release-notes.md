@@ -9,7 +9,7 @@
 		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_05_27_player_slide_module_notifications.template.xml
 
 	Run deployment script:
-		php /opt/kaltura/app/deployment/updates/scripts/2018_05_24_deploy_player_slides_module_notifications.xml
+		php /opt/kaltura/app/deployment/updates/scripts/2018_05_24_deploy_player_slides_module_notifications.php
 		
 ### Configuration ###
 	- Get the dynamic enum value for thumb cue point object by runing the following query:
@@ -150,9 +150,13 @@ PLAT-7514
 
 ### Deployment scripts ###
 -Add kms registration http request on partner creation:
-
-     php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/partnerAddedMediaSpaceHttpNotification.xml    
- 
+        
+        	First replcae all tokens from the XML files below and remove ".template" from the fle name:
+        		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_05_29_partner_Added_Media_Space_Http_Notification.template.xml
+        
+        	Run deployment script:
+        		php /opt/kaltura/app/deployment/updates/scripts/2018_05_29_partner_Added_Media_Space.php
+        		
 ## Allow KMC user change account functionality ##
 Issue Type:  New Feature
 Issue ID: KMCNG-1683
@@ -161,7 +165,7 @@ Issue ID: KMCNG-1683
 None.
 
 ### Deployment scripts ###
-php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_15_05_add_partner_permission.php
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_15_05_add_change_account_required_permissions.php
 
 ## Add bulk groupUser sync ##
 Issue Type:  New Feature

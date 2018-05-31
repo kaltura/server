@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaHttpNotificationTemplate">
+                <name>New Caption Asset Added To Entry</name>
+                <systemName>HTTP_New_Caption_Asset_Added_To_Entry</systemName>
+                <description>HTTP notification template to be sent when a new caption asset is added to an entry.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>2</eventType>
+                <!-- EventNotificationEventType::OBJECT_ADDED -->
+                <eventObjectType>captionAssetEventNotifications.CaptionAsset</eventObjectType>
+                <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaOrCondition">
+                        <conditions objectType="array">
+                            <item objectType="KalturaFieldMatchCondition">
+                                <description>language equals</description>
+                                <field objectType="KalturaEvalStringField">
+                                    <code>$scope->getObject()->getLanguage()</code>
+                                </field>
+                                <values objectType="array">
+                                    <item objectType="KalturaStringValue">
+                                        <value>{trigger_language}</value>
+                                    </item>
+                                </values>
+                            </item>
+                            <item objectType="KalturaFieldMatchCondition">
+                                <description>all languages</description>
+                                <field objectType="KalturaEvalStringField">
+                                    <code>'*'</code>
+                                </field>
+                                <values objectType="array">
+                                    <item objectType="KalturaStringValue">
+                                        <value>{trigger_language}</value>
+                                    </item>
+                                </values>
+                            </item>
+                        </conditions>
+                    </item>
+                    <item objectType="KalturaOrCondition">
+                        <conditions objectType="array">
+                            <item objectType="KalturaFieldMatchCondition">
+                                <description>format equals</description>
+                                <field objectType="KalturaEvalStringField">
+                                    <code>$scope->getObject()->getContainerFormat()</code>
+                                </field>
+                                <values objectType="array">
+                                    <item objectType="KalturaStringValue">
+                                        <value>{trigger_format}</value>
+                                    </item>
+                                </values>
+                            </item>
+                            <item objectType="KalturaFieldMatchCondition">
+                                <description>all formats</description>
+                                <field objectType="KalturaEvalStringField">
+                                    <code>'*'</code>
+                                </field>
+                                <values objectType="array">
+                                    <item objectType="KalturaStringValue">
+                                        <value>{trigger_format}</value>
+                                    </item>
+                                </values>
+                            </item>
+                        </conditions>
+                    </item>
+                </eventConditions>		
+                <userParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>trigger_language</key>
+                        <description>Language that triggers the event (use asterisk to all languages), See:KalturaLanguage:/api_v3/testmeDoc/?object=KalturaLanguage</description>
+                        <value objectType="KalturaStringValue">
+                            <value>*</value>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>trigger_format</key>
+                        <description>Captions format that triggers the event (use asterisk to all formats), See:KalturaCaptionType:/api_v3/testmeDoc/?object=KalturaCaptionType</description>
+                        <value objectType="KalturaStringValue">
+                            <value>*</value>
+                        </value>
+                    </item>
+                </userParameters>		
+                <method>2</method>
+                <!-- KalturaHttpNotificationMethod::POST -->
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+
+
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaHttpNotificationTemplate">
+                <name>Caption Asset Changed</name>
+                <systemName>HTTP_Caption_Asset_Changed</systemName>
+                <description>HTTP notification template to be sent when a new caption asset changed.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType>
+                <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>captionAssetEventNotifications.CaptionAsset</eventObjectType>
+                <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventObjectChangedCondition">
+                        <description>Asset metadata changed, columns defined in modified_columns parameter</description>
+                        <modifiedColumns>{modified_columns}</modifiedColumns>
+                    </item>
+                    <item objectType="KalturaOrCondition">
+                        <conditions objectType="array">
+                            <item objectType="KalturaFieldMatchCondition">
+                                <description>language equals</description>
+                                <field objectType="KalturaEvalStringField">
+                                    <code>$scope->getObject()->getLanguage()</code>
+                                </field>
+                                <values objectType="array">
+                                    <item objectType="KalturaStringValue">
+                                        <value>{trigger_language}</value>
+                                    </item>
+                                </values>
+                            </item>
+                            <item objectType="KalturaFieldMatchCondition">
+                                <description>all languages</description>
+                                <field objectType="KalturaEvalStringField">
+                                    <code>'*'</code>
+                                </field>
+                                <values objectType="array">
+                                    <item objectType="KalturaStringValue">
+                                        <value>{trigger_language}</value>
+                                    </item>
+                                </values>
+                            </item>
+                        </conditions>
+                    </item>
+                    <item objectType="KalturaOrCondition">
+                        <conditions objectType="array">
+                            <item objectType="KalturaFieldMatchCondition">
+                                <description>format equals</description>
+                                <field objectType="KalturaEvalStringField">
+                                    <code>$scope->getObject()->getContainerFormat()</code>
+                                </field>
+                                <values objectType="array">
+                                    <item objectType="KalturaStringValue">
+                                        <value>{trigger_format}</value>
+                                    </item>
+                                </values>
+                            </item>
+                            <item objectType="KalturaFieldMatchCondition">
+                                <description>all formats</description>
+                                <field objectType="KalturaEvalStringField">
+                                    <code>'*'</code>
+                                </field>
+                                <values objectType="array">
+                                    <item objectType="KalturaStringValue">
+                                        <value>{trigger_format}</value>
+                                    </item>
+                                </values>
+                            </item>
+                        </conditions>
+                    </item>
+                </eventConditions>		
+                <userParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>trigger_language</key>
+                        <description>Language that triggers the event (use asterisk to all languages), See:KalturaLanguage:/api_v3/testmeDoc/?object=KalturaLanguage</description>
+                        <value objectType="KalturaStringValue">
+                            <value>*</value>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>trigger_format</key>
+                        <description>Captions format that triggers the event (use asterisk to all formats), See:KalturaCaptionType:/api_v3/testmeDoc/?object=KalturaCaptionType</description>
+                        <value objectType="KalturaStringValue">
+                            <value>*</value>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationArrayParameter">
+                        <key>modified_columns</key>
+                        <description>Caption-asset metadata columns that will trigger the event</description>
+                        <allowedValues objectType="array">
+                            <item objectType="KalturaStringValue">
+                                <value>flavor_asset.TAGS</value>
+                                <description>tags</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>flavor_asset.STATUS</value>
+                                <description>status</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>flavor_asset.VERSION</value>
+                                <description>version</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>flavor_asset.DESCRIPTION</value>
+                                <description>description</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>flavor_asset.SIZE</value>
+                                <description>size</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>language</value>
+                                <description>language</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>default</value>
+                                <description>is default</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>label</value>
+                                <description>label</description>
+                            </item>
+                        </allowedValues>
+                        <values objectType="array">
+                            <item objectType="KalturaString">
+                                <value>flavor_asset.VERSION</value>
+                            </item>
+                        </values>
+                    </item>
+                </userParameters>		
+                <method>2</method>
+                <!-- KalturaHttpNotificationMethod::POST -->
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+
+</xml>

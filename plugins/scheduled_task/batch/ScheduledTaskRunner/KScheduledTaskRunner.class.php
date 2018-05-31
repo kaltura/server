@@ -5,8 +5,6 @@
  */
 class KScheduledTaskRunner extends KPeriodicWorker
 {
-
-	private static $dontUpdateMetaDataTaskTypes = array (KalturaObjectTaskType::DELETE_ENTRY);
 	/**
 	 * @var array
 	 */
@@ -63,7 +61,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 	private function isMediaRepurposingProfile(KalturaScheduledTaskProfile $profile)
 	{
-		return ($profile->systemName == "MRP") || (self::startsWith($profile->name, 'MR_'));
+		return ($profile->systemName == "MRP") || (kString::beginsWith($profile->name, 'MR_'));
 	}
 
 	private function isReachProfile(KalturaScheduledTaskProfile $profile)

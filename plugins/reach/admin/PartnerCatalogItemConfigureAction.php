@@ -118,7 +118,7 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 		if ($action->view->allowed)
 		{
 			$formData = $action->getRequest()->getPost();
-			if ($formData['selectAllItemsCheckbox'])
+			if (isset($formData['selectAllItemsCheckbox']))
 			{
 				$partnerCatalogItems = $this->getAvailableCatalogItems($partnerId);
 

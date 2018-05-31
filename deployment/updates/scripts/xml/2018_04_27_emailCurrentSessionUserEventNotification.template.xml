@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Email Current Session User</name>
+                <systemName>Email_Current_Session_User</systemName>
+                <automaticDispatchEnabled>0</automaticDispatchEnabled>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Server configuration: partner_notification_email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Server configuration: partner_notification_name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getName()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_status</key>
+                        <description>Entry status</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getStatus()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_reference_id</key>
+                        <description>Entry reference ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getReferenceID()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>current_user_email</key>
+                        <description>Current User Email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getEmail() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>current_user_full_name</key>
+                        <description>Current User Full Name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getFullName() : ''</code>
+                        </value>
+                    </item>
+                </contentParameters>
+                <format>1</format>
+                <subject>Replace this text with desired email subject</subject>
+                <body>Replace this text with desired email body. You can use {entry_id}, {entry_name}, {entry_status} and {entry_reference_id} as variables.</body>
+                <to objectType="KalturaEmailNotificationStaticRecipientProvider">
+                    <emailRecipients objectType="array">
+                        <item objectType="KalturaEmailNotificationRecipient">
+                            <email objectType="KalturaStringValue">
+                                <value>{current_user_email}</value>
+                            </email>
+                            <name objectType="KalturaStringValue">
+                                <value>{current_user_full_name}</value>
+                            </name>
+                        </item>
+                    </emailRecipients>
+                </to>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <manualDispatchEnabled>1</manualDispatchEnabled>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+</xml>

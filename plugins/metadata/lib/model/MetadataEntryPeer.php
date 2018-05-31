@@ -39,7 +39,7 @@ class MetadataEntryPeer extends entryPeer implements IMetadataPeer
     	
     	// check if all ids are privileged
     	if (kCurrentContext::$ks_object->hasPrivilege(ks::PRIVILEGE_WILDCARD) ||
-    			kkCurrentContext::$ks_object->verifyPrivileges(kSessionBase::PRIVILEGE_EDIT, $objectId))
+    			kCurrentContext::$ks_object->verifyPrivileges(kSessionBase::PRIVILEGE_EDIT, $objectId))
     	{
     		return true;
     	}

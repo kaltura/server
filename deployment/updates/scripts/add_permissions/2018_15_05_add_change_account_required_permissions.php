@@ -8,3 +8,6 @@ $addPermissionsAndItemsScript = realpath(dirname(__FILE__) . '/../../../../') . 
 
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.partner.ini';
 passthru("php $addPermissionsAndItemsScript $config");
+
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.user.ini';
+passthru("php $addPermissionsAndItemsScript $config");
