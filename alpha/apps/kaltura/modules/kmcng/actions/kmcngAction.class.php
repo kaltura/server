@@ -5,6 +5,8 @@
  */
 class kmcngAction extends kalturaAction
 {
+	const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
+
 	public function execute()
 	{
 		if (!kConf::hasParam('kmcng'))
@@ -72,6 +74,10 @@ class kmcngAction extends kalturaAction
 		$this->contentUiconfsPreview = isset($this->previewUIConf) ? array_values($this->previewUIConf) : null;
 		$this->contentUiconfPreview = (is_array($this->contentUiconfsPreview) && reset($this->contentUiconfsPreview)) ? reset($this->contentUiconfsPreview) : null;
 
+		$this->playerV3VersionsUiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, "latest");
+		$this->content_uiconfs_player_v3_versions = isset($this->playerV3VersionsUiConf) ? array_values($this->playerV3VersionsUiConf) : null;
+		$this->content_uiconf_player_v3_versions = (is_array($this->content_uiconfs_player_v3_versions) && reset($this->content_uiconfs_player_v3_versions)) ? reset($this->content_uiconfs_player_v3_versions) : null;
+
 		$secureCDNServerUri = "https://" . kConf::get("cdn_api_host_https");
 		if (isset($kmcngParams["kmcng_debug_mode"]))
 			$secureCDNServerUri = "http://" . kConf::get("cdn_api_host");
@@ -96,7 +102,8 @@ class kmcngAction extends kalturaAction
 			$studioV3 = array(
 				"uri" => '/apps/studioV3/' . kConf::get("studio_v3_version") . "/index.html",
 				"html5_version" => kConf::get("html5_version"),
-				"html5lib" => $secureCDNServerUri . "/html5/html5lib/" . kConf::get("html5_version") . "/mwEmbedLoader.php"
+				"html5lib" => $secureCDNServerUri . "/html5/html5lib/" . kConf::get("html5_version") . "/mwEmbedLoader.php",
+				"playerVersionsMap" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfig() : ''
 			);
 		}
 
