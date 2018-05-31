@@ -57,14 +57,29 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 	{
 		$this->_sort();
 
-
 		$order = $this->_order[self::FORM_PLACEHOLDER_ELEMENT_ID];
 		$this->resetOrderOfLastElements();
 		/** @var $object Kaltura_Client_YouTubeDistribution_Type_YouTubeDistributionProfile */
-		if ($object->feedSpecVersion == Kaltura_Client_YouTubeDistribution_Enum_YouTubeDistributionFeedSpecVersion::VERSION_2)
-			$this->setV2Mode($order++);
-		else
-			$this->setV1Mode($order++);
+		switch($object->feedSpecVersion)
+		{
+			case Kaltura_Client_YouTubeDistribution_Enum_YouTubeDistributionFeedSpecVersion::VERSION_1:
+			{
+				$this->setV1Mode($order++);
+				break;
+			}
+			case Kaltura_Client_YouTubeDistribution_Enum_YouTubeDistributionFeedSpecVersion::VERSION_2:
+			{
+				$this->setV2Mode($order++);
+				break;
+			}
+			case Kaltura_Client_YouTubeDistribution_Enum_YouTubeDistributionFeedSpecVersion::VERSION_3:
+			{
+				$this->setV3Mode($order++);
+				break;
+			}
+			default:
+				$this->setV1Mode($order++);
+		}
 
 		parent::populateFromObject($object, $add_underscore);
 	}
@@ -84,6 +99,7 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 			'multioptions' => array(
 				'1' => 'Version 1 (Legacy Feed)',
 				'2' => 'Version 2 (YouTube Rights Feeds)',
+				'3' => 'Version 3 (YouTube CSV)',
 			),
 			'description' => 'Save to see specific spec configurations',
 		));
@@ -301,6 +317,7 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 			)
 		));
 
+
 		$this->addElement('select', 'allow_adsense_for_video', array(
 			'label' => 'Allow AdSense Ads:',
 			'multioptions' => array(
@@ -309,7 +326,6 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 				'Deny' => 'Deny',
 			)
 		));
-
 		$this->addElement('select', 'allow_invideo', array(
 			'label' => 'Allow InVideo Ads:',
 			'multioptions' => array(
@@ -525,5 +541,175 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 		$this->getElement('ugc_policy')->setLabel('UGC Policy (Match):');
 
 		$this->removeElement('target');
+	}
+
+	protected function setV3Mode($order)
+	{
+		$this->addGeneralElements($order);
+		$this->addV3Elements($order);
+
+		$this->removeElement('ugc_policy');
+		$this->removeElement('commercial_policy');
+
+		// modify the names of the elements to better fit the new spec
+		$this->getElement('username')->setLabel('Channel:');
+		$this->getElement('owner_name')->setLabel('Content Owner:');
+		$this->addElement('select', 'ugc_policy', array(
+			'label' => 'Match Policy:',
+			'multioptions' => array(
+				'' => 'Default',
+				'Monetize in all countries' => 'Monetize',
+				'Track in all countries' => 'Track',
+				'Block in all countries' => 'Block',
+			)));
+
+		$this->addElement('select', 'commercial_policy', array(
+			'label' => 'Usage Policy:',
+			'multioptions' => array(
+				'' => 'Default',
+				'Monetize in all countries' => 'Monetize',
+				'Track in all countries' => 'Track',
+				'Block in all countries' => 'Block',
+			)));
+
+
+		$this->getElement('instream_trueview')->setLabel('Skippable video ads:');
+		$this->getElement('instream_standard')->setLabel('Non-skippable video ads:');
+		$this->getElement('instream_standard')->setOptions( array(
+			'multioptions' => array(
+				'' => 'Default',
+				'True' => 'True',
+				'False' => 'False',
+			)));
+
+		$this->getElement('allow_invideo')->setLabel('Overlay ads:');
+		$this->getElement('allow_invideo')->setOptions( array(
+		'multioptions' => array(
+		'' => 'Default',
+		'True' => 'True',
+		'False' => 'False',
+		)));
+
+		$this->getElement('allow_adsense_for_video')->setLabel('Display ads:');
+		$this->getElement('allow_adsense_for_video')->setOptions( array(
+			'multioptions' => array(
+				'' => 'Default',
+				'True' => 'True',
+				'False' => 'False',
+			)));
+
+		$this->getElement('third_party_ads')->setLabel('Third Party Ads:');
+
+		// SFTP Configuration
+		$this->addDisplayGroup(
+			array('sftp_host', 'sftp_port', 'sftp_login', 'sftp_public_key', 'sftp_private_key', 'sftp_base_dir'),
+			'sftp',
+			array('legend' => 'SFTP Configuration', 'decorators' => array('FormElements', 'Fieldset'), 'order' => $order++)
+		);
+
+		// General
+		$this->addDisplayGroup(
+			array('username', 'notification_email', 'owner_name','privacy_status','domain_whitelist'),
+			'general',
+			array('legend' => 'General', 'decorators' => array('FormElements', 'Fieldset'), 'order' => $order++)
+		);
+
+		// <video>
+		$this->addDisplayGroup(
+			array('notify_subscribers','enable_content_id', 'default_category'),
+			'video_group',
+			array('legend' => 'Video', 'decorators' => array('FormElements', 'Fieldset'), 'order' => $order++)
+		);
+
+		// <ad_policy>
+		$this->addDisplayGroup(
+			array( 'enable_ad_server','instream_trueview','instream_standard','allow_invideo', 'product_listing_ads','allow_adsense_for_video','third_party_ads'),
+			'ad_policy_group',
+			array('legend' => 'Ad Policy', 'decorators' => array('FormElements', 'Fieldset'), 'order' => $order++)
+		);
+
+		// Policies
+		$this->addDisplayGroup(
+			array('commercial_policy','ugc_policy'),
+			'policies',
+			array('legend' => 'Saved Policies', 'decorators' => array('FormElements', 'Fieldset'), 'order' => $order++)
+		);
+
+		// <claim>
+		$this->addDisplayGroup(
+			array('block_outside_ownership'),
+			'claim_group',
+			array('legend' => 'Claim', 'decorators' => array('FormElements', 'Fieldset'), 'order' => $order++)
+		);
+
+
+		$this->removeElement('allow_pre_roll_ads');
+		$this->removeElement('allow_post_roll_ads');
+		$this->removeElement('strict');
+		$this->removeElement('allow_embedding');
+		$this->removeElement('override_manual_edits');
+		$this->removeElement('urgent_reference');
+		$this->removeElement('allow_mid_roll_ads');
+		$this->removeElement('claim_type');
+		$this->removeElement('caption_autosync');
+		$this->removeElement('delete_reference');
+		$this->removeElement('release_claims');
+		$this->removeElement('allow_comments');
+		$this->removeElement('allow_ratings');
+		$this->removeElement('allow_responses');
+		$this->removeElement('allow_syndication');
+		$this->removeElement('hide_view_count');
+		$this->removeElement('target');
+		$this->removeElement('ad_server_partner_id');
+	}
+
+	protected function addV3Elements($order)
+	{
+		$this->addElement('text', 'privacy_status', array(
+			'label'			=> 'Privacy Status ( public, private, unlisted ):',
+			'filters'		=> array('StringTrim'),
+		));
+
+		$this->addElement('select', 'enable_content_id', array(
+			'label' => 'Enable Content Id:',
+			'multioptions' => array(
+				'' => 'Default',
+				'true' => 'True',
+				'false' => 'False'
+			)
+		));
+
+		$this->addElement('select', 'notify_subscribers', array(
+			'label' => 'Notify Subscribers:',
+			'multioptions' => array(
+				'' => 'Default',
+				'true' => 'True',
+				'false' => 'False'
+			)
+		));
+
+		$this->addElement('text', 'domain_whitelist', array(
+			'label'			=> 'Domain WhiteList:',
+			'filters'		=> array('StringTrim'),
+		));
+
+		$this->addElement('select', 'product_listing_ads', array(
+			'label' => 'Allow Product Listing ads:',
+			'multioptions' => array(
+				'' => 'Default',
+				'true' => 'True',
+				'false' => 'False'
+			)
+		));
+
+		$this->addElement('select', 'third_party_ads', array(
+			'label' => 'Allow Third Party Ads:',
+			'multioptions' => array(
+				'' => 'Default',
+				'true' => 'True',
+				'false' => 'False'
+			)
+		));
+
 	}
 }
