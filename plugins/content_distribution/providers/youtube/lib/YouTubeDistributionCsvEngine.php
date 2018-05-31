@@ -89,16 +89,15 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		if ($videoId && !empty($captionCsvMap))
 		{
 			$sftpManager = $this->getSFTPManager($data->distributionProfile);
-			$captionsContent = "video_id,language,caption_file\n";
+			$fp = tempnam(sys_get_temp_dir(), 'temp.') . ".csv";
+			$file = fopen($fp, 'w');
+			fputcsv($file, array('video_id','language','caption_file'));
 			foreach ($captionCsvMap as $captionItem )
 			{
-				$row = $videoId ."," . $captionItem['language'] ."," . $captionItem['language'] ."\n" ;
-				$captionsContent .= $row ."\n";
+				$row = array( $videoId , $captionItem['language'] , $captionItem['caption_file']);
+				fputcsv($file, $row);
 			}
 			// create CSV file
-			$fp = tempnam(sys_get_temp_dir(), 'temp.').".csv";
-			$file = fopen($fp, 'w');
-			fputcsv($file, $captionsContent);
 			fclose($file);
 
 			$sftpManager->putFile($data->providerData->sftpDirectory.'/'.$data->providerData->sftpMetadataFilename, $fp);
@@ -181,10 +180,10 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 			$sftpManager = $this->getSFTPManager($data->distributionProfile);
 			$fp = tempnam(sys_get_temp_dir(), 'temp.') . ".csv";
 			$file = fopen($fp, 'w');
-			fputcsv($file, "video_id,language,caption_file");
+			fputcsv($file, array('video_id','language','caption_file'));
 			foreach ($captionCsvMap as $captionItem)
 			{
-				$row = $videoId . "," . $captionItem['language'] . "," . $captionItem['language'] . "\n";
+				$row = array( $videoId , $captionItem['language'] , $captionItem['caption_file']);
 				fputcsv($file, $row);
 			}
 			fclose($file);
@@ -216,6 +215,9 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		$clientId = $providerData->googleClientId;
 		$clientSecret   = $providerData->googleClientSecret;
 		$tokenData = $providerData->googleTokenData;
+
+		if (!$tokenData)// no token was not setup, do nothing
+			throw new KalturaDistributionException('No google Token was set. the job will fail');
 
 		$youtubeService = YouTubeDistributionGoogleClientHelper::getYouTubeService($clientId, $clientSecret, $tokenData);
 		foreach($videoIdsToDelete as $videoIdToDelete)
