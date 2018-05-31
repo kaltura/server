@@ -76,7 +76,9 @@ class kmcngAction extends kalturaAction
 
 		$this->playerV3VersionsUiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, "latest");
 		$this->content_uiconfs_player_v3_versions = isset($this->playerV3VersionsUiConf) ? array_values($this->playerV3VersionsUiConf) : null;
-		$this->content_uiconf_player_v3_versions = (is_array($this->content_uiconfs_player_v3_versions) && reset($this->content_uiconfs_player_v3_versions)) ? reset($this->content_uiconfs_player_v3_versions) : null;
+		if (is_array($this->content_uiconfs_player_v3_versions)) {
+			$this->content_uiconf_player_v3_versions = reset($this->content_uiconfs_player_v3_versions);
+		}
 
 		$secureCDNServerUri = "https://" . kConf::get("cdn_api_host_https");
 		if (isset($kmcngParams["kmcng_debug_mode"]))
