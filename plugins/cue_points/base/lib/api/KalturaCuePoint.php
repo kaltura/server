@@ -111,6 +111,7 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 
 	/**
 	 * @var bool
+	 * @readonly
 	 */
 	public $isMomentary;
 	
