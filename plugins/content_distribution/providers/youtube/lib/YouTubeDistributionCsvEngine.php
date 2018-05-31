@@ -158,7 +158,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 	 */
 	public function closeUpdate(KalturaDistributionUpdateJobData $data)
 	{
-		$statusXml = $this->fetchStatusFile($data, $data->distributionProfile, $data->providerData, "status", "xml");
+		$statusXml = $this->fetchFile($data, $data->distributionProfile, $data->providerData, "status", "xml");
 
 		if ($statusXml === false) // no status yet
 			return false;
@@ -194,7 +194,8 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 
 		$providerData = $data->providerData;
 		$newPlaylists = $this->syncPlaylists($videoId, $providerData);
-		$providerData->currentPlaylists = implode(',', $newPlaylists);
+		if ($newPlaylists)
+			$providerData->currentPlaylists = implode(',', $newPlaylists);
 
 		return true;
 	}
@@ -209,7 +210,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 	{
 		$videoIdsToDelete = unserialize($providerData->deleteVideoIds);
 
-		if (!empty($videoIdsToDelete))
+		if (empty($videoIdsToDelete))
 			return;
 
 		$clientId = $providerData->googleClientId;
@@ -218,12 +219,23 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 
 		$youtubeService = YouTubeDistributionGoogleClientHelper::getYouTubeService($clientId, $clientSecret, $tokenData);
 		foreach($videoIdsToDelete as $videoIdToDelete)
-			$youtubeService->videos->delete($videoIdToDelete);
+		{
+			KalturaLog::debug("Deleting video with id $videoIdToDelete ");
+			$res = $youtubeService->videos->delete($videoIdToDelete);
+			KalturaLog::debug("Result for Deleting $videoIdToDelete: " .print_r($res,true));
+		}
 
 		$data->sentData = implode(',',$videoIdsToDelete);
 		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
 	}
 
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineCloseDelete::closeDelete()
+	 */
+	public function closeDelete(KalturaDistributionDeleteJobData $data)
+	{
+		return true;
+	}
 
 	/**
 	 * @param KalturaDistributionJobData $data

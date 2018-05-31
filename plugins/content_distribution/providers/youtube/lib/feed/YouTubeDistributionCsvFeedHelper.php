@@ -59,7 +59,6 @@ class YouTubeDistributionCsvFeedHelper
 				$this->_captionCsvMap[] = $captionData;
 			}
 		}
-
 	}
 
 	public function genericHandling(KalturaYouTubeDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $videoId = null)
@@ -89,15 +88,15 @@ class YouTubeDistributionCsvFeedHelper
 		{
 			$this->setCsvFieldValue("filename", pathinfo($videoFilePath, PATHINFO_BASENAME));
 			$this->setCsvFieldValueIfHasValue('channel', $fieldValues, KalturaYouTubeDistributionField::VIDEO_CHANNEL);
-		}
 
-		if ($this->isAllowedValue($distributionProfile->enableContentId))
-		{
-			$this->setCsvFieldValue('enable_content_id',"Yes");
-			$this->appendRightsAdminByFieldValues($fieldValues, $distributionProfile);
+			if ($this->isAllowedValue($distributionProfile->enableContentId))
+			{
+				$this->setCsvFieldValue('enable_content_id',"Yes");
+				$this->appendRightsAdminByFieldValues($fieldValues, $distributionProfile);
+			}
+			if ($this->isNotAllowedValue($distributionProfile->enableContentId))
+				$this->setCsvFieldValue('enable_content_id',"No");
 		}
-		if ($this->isNotAllowedValue($distributionProfile->enableContentId))
-			$this->setCsvFieldValue('enable_content_id',"No");
 
 		if ($this->isAllowedValue($distributionProfile->blockOutsideOwnership))
 			$this->setCsvFieldValue('block_outside_ownership',"Yes");
