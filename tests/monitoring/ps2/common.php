@@ -26,12 +26,12 @@ class KalturaMonitorClientPs2
 	
 	public function __construct(array $config, array $options)
 	{
-		$this->serviceUrl = $config['client-config']['protocol'] . '://' . $options['service-url'] . ':' . $config['client-config']['port'];
+		$this->serviceUrl = $config['config']['protocol'] . '://' . $options['service-url'] . ':' . $config['config']['port'];
 		
 		if(isset($options['debug']))
 			$this->debug = true;
 		
-		foreach($config['client-config'] as $attribute => $value)
+		foreach($config['config'] as $attribute => $value)
 			$this->$attribute = $value;
 	}
 	
