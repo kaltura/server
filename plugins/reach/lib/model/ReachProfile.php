@@ -319,11 +319,21 @@ class ReachProfile extends BaseReachProfile
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_CONTENT_DELETION_POLICY, null, ReachProfileContentDeletionPolicy::DO_NOTHING);
 	}
-	
+
+	public function shouldSyncCredit()
+	{
+		$reachProfileCredit = $this->getCredit();
+		if ($reachProfileCredit && $reachProfileCredit->isSynced())
+			return false;
+		else
+			return true;
+	}
+
 	public function syncCredit()
 	{
 		$reachProfileCredit = $this->getCredit();
-		if ($reachProfileCredit)
+
+		if ($reachProfileCredit )
 		{
 			$syncedCredit = $reachProfileCredit->syncCredit($this->getId());
 			$this->setUsedCredit($syncedCredit);
