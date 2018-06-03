@@ -81,7 +81,7 @@
 						<key>creator_email</key>
 						<description>Task creator email</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getkuser() ? $scope->getEvent()->getObject()->getkuser()->getEmail() : ""</code>
+							<code>$scope->getObject()->getUserId()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
