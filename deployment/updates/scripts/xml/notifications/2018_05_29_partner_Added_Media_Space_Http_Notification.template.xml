@@ -27,7 +27,7 @@
                         <field objectType="KalturaEvalBooleanField">
                             <code>in_array(myPartnerUtils::getFreeTrialAccountType($scope->getObject()),
                                 (kConf::hasParam('MediaSpace_Partner_Registration') ?
-                                explode(",", kConf::getItemFromSection('MediaSpace_Partner_Registration','free_trial_account_types')) : array()))</code>
+                                explode(",", kConf::getItemFromSection('free_trial_account_types', 'MediaSpace_Partner_Registration')) : array()))</code>
                         </field>
                     </item>
                 </eventConditions>
@@ -44,16 +44,16 @@
                         <description>new partner media space hostname</description>
                         <value objectType="KalturaEvalStringField">
                             <code>(kConf::hasParam('MediaSpace_Partner_Registration') ? $scope->getObject()->getId()
-                                . '.' . kConf::getItemFromSection('MediaSpace_Partner_Registration','mediaSpace_url')  : '')</code>
+                                . '.' . kConf::getItemFromSection('mediaSpace_url', 'MediaSpace_Partner_Registration')  : '')</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
                         <key>sig</key>
                         <description>Signature</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>(kConf::hasParam('MediaSpace_Partner_Registration') ?  md5( kConf::getItemFromSection('MediaSpace_Partner_Registration','sig')
+                            <code>(kConf::hasParam('MediaSpace_Partner_Registration') ?  md5( kConf::getItemFromSection('sig', 'MediaSpace_Partner_Registration')
                                 . $scope->getObject()->getId()
-                                . '.' .  kConf::getItemFromSection('MediaSpace_Partner_Registration','mediaSpace_url') . (intval($GLOBALS['start']) + 600)): '')</code>
+                                . '.' .  kConf::getItemFromSection('mediaSpace_url', 'MediaSpace_Partner_Registration') . (intval($GLOBALS['start']) + 600)): '')</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">

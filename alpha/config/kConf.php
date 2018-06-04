@@ -239,7 +239,7 @@ class kConf extends kEnvironment
 	 * @return bool|mixed
 	 * @throws Exception
 	 */
-	public static function getItemFromSection($sectionName, $paramName, $mapName = 'local', $defaultValue = false)
+	public static function getItemFromSection($paramName, $sectionName, $mapName = 'local', $defaultValue = false)
 	{
 		$result = kConf::get($sectionName,$mapName,$defaultValue);
 		if (is_array($result) && isset($result[$paramName]))
