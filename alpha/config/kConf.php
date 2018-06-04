@@ -235,7 +235,7 @@ class kConf extends kEnvironment
 	 * @param string $sectionName
 	 * @param string $paramName
 	 * @param string $mapName
-	 * @param bool $defaultValue
+	 * @param mixed $defaultValue
 	 * @return bool|mixed
 	 * @throws Exception
 	 */
@@ -246,7 +246,7 @@ class kConf extends kEnvironment
 			return $result[$paramName];
 		return $defaultValue;
 	}
-		
+
 	public static function getCachedVersionId()
 	{
 		self::init();
