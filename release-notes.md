@@ -1,3 +1,23 @@
+# Mercury 13.21.0 #
+## Support push notifications for thumb cuePoint ready ##
+- Issue Type: New Feature
+- Issue ID: PLAT-8963
+
+### Deployment scripts ###
+
+	First replcae all tokens from the XML files below and remove ".template" from the fle name:
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_06_03_update_entry_vendor_pending_moderation.template.xml
+		
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_06_03_update_entry_vendor_rejected_moderation.template.xml
+
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_06_03_update_entry_vendor_task_approved_moderation.template.xml
+		
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_06_03_update_entry_vendor_task_done.template.xml
+
+	Run deployment script:
+		php /opt/kaltura/app/deployment/updates/scripts/2018_06_03_deploy_updated_reach_notifications.php
+
+
 # Mercury 13.20.0 #
 
 ## Support push notifications for thumb cuePoint ready ##
