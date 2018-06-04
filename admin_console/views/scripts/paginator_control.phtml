@@ -24,9 +24,10 @@
 		<?php else: ?>
 			<span class="disabled">Next &gt;</span>
 		<?php endif; ?>
-		<form method="post" id="frmPaginator<?php echo $this->index; ?>" action="<?php echo $this->action; ?>" style="display: inline; ">
+
+		<form method="post" <?php if (isset($this->submitFunction)):?> onsubmit="<?php echo $this->submitFunction; ?>()"<?php endif; ?> id="frmPaginator<?php echo $this->index; ?>" action="<?php echo $this->action; ?>" style="display: inline; ">
 			<select id="pageSize" name="pageSize" onchange="gotoPage(<?php echo $this->index; ?>, 1);">
-				<?php 
+				<?php
 					foreach($this->pageSizes as $pageSize)
 					{
 						echo "<option " . (($this->itemCountPerPage == $pageSize) ? 'selected="selected"' : '') . ">$pageSize</option>";
@@ -49,11 +50,19 @@
 	
 <?php if ($this->index == 1 || $this->index == 2): ?>
 	<script type="text/javascript">
-	function gotoPage(index, page)
-	{
-		var frm = document.getElementById("frmPaginator" + index);
-		frm.page.value = page;
-		frm.submit();
-	}
+		function gotoPage(index, page) {
+			var frm = document.getElementById("frmPaginator" + index);
+			frm.page.value = page;
+
+			if (typeof frm.onsubmit === 'function') {
+				var event = new Event('submit');
+				var result = frm.onsubmit(event);
+				if (!event.defaultPrevented && (typeof result !== 'boolean' && result === true)) {
+					frm.submit();
+				}
+			} else {
+				frm.submit();
+			}
+		}
 	</script>
 <?php endif; ?>

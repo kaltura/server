@@ -65,6 +65,7 @@ class Form_PushNotificationTemplateConfiguration extends Form_EventNotificationT
                 'KalturaAdCuePoint' => 'Ad Cue-Point',
                 'KalturaAnnotation' => 'Annotation',
                 'KalturaCodeCuePoint' => 'Code Cue-Point',
+				'KalturaThumbCuePoint' => 'Thumb Cue-Point',
                 'KalturaDistributionProfile' => 'Distribution Profile',
                 'KalturaEntryDistribution' => 'Entry Distribution',
                 'KalturaMetadata' => 'Metadata',
@@ -104,6 +105,7 @@ class Form_PushNotificationTemplateConfiguration extends Form_EventNotificationT
                 'KalturaLiveEntryScheduleResource' => 'Schedule Live-Entry Resource',
                 'KalturaCameraScheduleResource' => 'Schedule Camera Resource',
                 'KalturaScheduleEventResource' => 'Schedule Event-Resource',
+                'KalturaClippingTaskEntryServerNode' => 'Clipping Task Entry-Server-Node',
             ),
         ));
     
@@ -124,6 +126,7 @@ class Form_PushNotificationTemplateConfiguration extends Form_EventNotificationT
         	'service' => 'responseProfile',
         	'pageSize' => 500,
         	'impersonate' => $eventNotificationTemplate->partnerId,
+			'addNull' => true,
         ));
         $this->addElements(array($responseProfile));
     }    

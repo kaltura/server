@@ -179,7 +179,11 @@ class AttachmentAssetService extends KalturaAssetService
 		$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
 		
 		$attachmentAsset->incrementVersion();
-		$attachmentAsset->setFileExt($ext);
+
+		if ($ext)
+        {
+            $attachmentAsset->setFileExt($ext);
+        }
 		$attachmentAsset->setSize(kFile::fileSize($fullPath));
 		$attachmentAsset->save();
 		

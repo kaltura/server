@@ -89,7 +89,8 @@ class MetadataService extends KalturaBaseService
 				}
 			}
 		}
-
+		
+		$this->validateObjectId($objectId, $objectType);
 		$check = MetadataPeer::retrieveByObject($metadataProfileId, $objectType, $objectId);
 		if($check)
 			throw new KalturaAPIException(MetadataErrors::METADATA_ALREADY_EXISTS, $check->getId());
@@ -284,6 +285,7 @@ class MetadataService extends KalturaBaseService
 		if(!$dbMetadataProfile)
 			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE, $dbMetadata->getMetadataProfileId());
 		
+		$this->validateObjectId($dbMetadata->getObjectId(), $dbMetadata->getObjectType());
 		if($xmlData)
 		{
 			// if a metadata xslt is defined on the metadata profile - transform the given metadata
@@ -429,9 +431,10 @@ class MetadataService extends KalturaBaseService
 	function deleteAction($id)
 	{
 		$dbMetadata = MetadataPeer::retrieveByPK($id);
-		
 		if(!$dbMetadata)
 			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND, $id);
+		
+		$this->validateObjectId($dbMetadata->getObjectId(), $dbMetadata->getObjectType());
 		
 		$dbMetadata->setStatus(KalturaMetadataStatus::DELETED);
 		$dbMetadata->save();
@@ -576,7 +579,8 @@ class MetadataService extends KalturaBaseService
 		$dbMetadataObject = MetadataPeer::retrieveByPK($id);
 		if (!$dbMetadataObject)
 			throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND);
-
+		
+		$this->validateObjectId($dbMetadataObject->getObjectId(), $dbMetadataObject->getObjectType());
 		$dbMetadataObjectFileSyncKey = $dbMetadataObject->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 
 		$xsltErrors = array();
@@ -588,5 +592,23 @@ class MetadataService extends KalturaBaseService
 		}
 
 		return $this->updateImpl($id, $transformMetadataObjectData);
+	}
+	
+	private function validateObjectId($objectId, $objectType)
+	{
+		$metadataObjectClassName = kMetadataManager::getObjectTypeName($objectType);
+		$this->applyPartnerFilterForClass($metadataObjectClassName);
+		$objectPeer = kMetadataManager::getObjectPeer($objectType);
+		
+		if(!$objectPeer && !kCurrentContext::$is_admin_session)
+		{
+			KalturaLog::debug("Failed to validate metadata object access for dynamic object id [$objectId]");
+		}
+		
+		if($objectPeer && !$objectPeer::validateMetadataObjectAccess($objectId))
+		{
+			KalturaLog::debug("Failed to validate metadata object access for object id [$objectId] using peer [" .get_class($objectPeer) . "]");
+			//throw new KalturaAPIException(MetadataErrors::METADATA_OBJECT_ID_NOT_FOUND, $objectId);
+		}
 	}
 }

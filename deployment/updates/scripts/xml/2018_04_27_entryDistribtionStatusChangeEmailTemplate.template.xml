@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+    <multirequest>
+        <!-- Entry Distribution Status Changed -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Entry Distribution Status Changed</name>
+                <systemName>Entry_Distribution_Status_Changed</systemName>
+                <description>Email notification template to be sent when an entry distribution status is changed.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType>
+                <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>contentDistributionEventNotifications.EntryDistribution</eventObjectType>
+                <!-- EventNotificationEventObjectType::ENTRY_DISTRIBUTION -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Status field modified</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>in_array(EntryDistributionPeer::STATUS, $scope->getEvent()->getModifiedColumns())</code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaFieldMatchCondition">
+                        <description>Status equals</description>
+                        <field objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getStatus()</code>
+                        </field>
+                        <values objectType="array">
+                            <item objectType="KalturaStringValue">
+                                <value>{trigger_status}</value>
+                            </item>
+                        </values>
+                    </item>
+                </eventConditions>
+                <format>1</format>
+                <subject>[Kaltura] - Entry distribution status changed for entry {entry_id} on distribution profile {distribution_profile_name}</subject>
+                <body>Entry distribution status for {entry_id} on connector {distribution_profile_name} was changed to {trigger_status} on {updated_at_rfc850}</body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <to objectType="KalturaEmailNotificationUserRecipientProvider">
+                    <filter objectType="KalturaUserFilter">
+                        <permissionNamesMultiLikeAnd>CONTENT_MANAGE_DISTRIBUTION_BASE,CONTENT_MANAGE_DISTRIBUTION_SEND</permissionNamesMultiLikeAnd>
+                    </filter>
+                </to>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>From email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>From name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getEntryId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_distribution_id</key>
+                        <description>Entry distribution ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>updated_at</key>
+                        <description>Updated at (Y-m-d H:i:s format)</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getUpdatedAt()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>updated_at_rfc850</key>
+                        <description>Updated at (RFC850 format)</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getUpdatedAt(DateTime::RFC850)</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>distribution_profile_name</key>
+                        <description>Distribution profile name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(DistributionProfilePeer::retrieveByPk($scope->getObject()->getDistributionProfileId())) ? DistributionProfilePeer::retrieveByPk($scope->getObject()->getDistributionProfileId())->getName() : ''</code>
+                        </value>
+                    </item>
+                </contentParameters>
+                <userParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>trigger_status</key>
+                        <description>Entry distribution status that triggers the event, See:KalturaEntryDistributionStatus:/api_v3/testmeDoc/?object=KalturaEntryDistributionStatus</description>
+                        <value objectType="KalturaStringValue">
+                            <value/>
+                        </value>
+                    </item>
+                </userParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+</xml>

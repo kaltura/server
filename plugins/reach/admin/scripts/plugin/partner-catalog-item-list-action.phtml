@@ -1,0 +1,273 @@
+<?php if (!$this->allowed) {echo $this->translate('This partner is not allowed to use Reach'); return;} ?>
+<p><?php echo $this->translate('Here you can configure your Catalog items'); ?></p>
+<?php echo $this->filterForm; ?>
+<?php echo $this->newPartnerCatalogItemFolderForm; ?>
+<div id="partner-catalog_item_list_div" class="clear">
+	<td><input type="checkbox" name="selectAllCatalogItemsOnPageCheckbox" onchange="flipAllCheckboxItemsOnPage()" id="selectAllCatalogItemsInPage" align="left" />Select All Items On Page</td>
+	<button type="button" onclick="bulkDeleteAction(<?php echo $this->filterForm->getElement('filter_input')->getValue(); ?>)">Bulk Delete</button>
+	<table>
+		<thead>
+		<tr>
+			<th>Select</th>
+			<th><?php echo $this->translate('ID'); ?></th>
+			<th><?php echo $this->translate('Status'); ?></th>
+			<th><?php echo $this->translate('System Name'); ?></th>
+			<th><?php echo $this->translate('Publisher ID'); ?></th>
+			<th><?php echo $this->translate('Vendor Partner ID'); ?></th>
+			<th><?php echo $this->translate('Feature'); ?></th>
+			<th><?php echo $this->translate('Type'); ?></th>
+			<th><?php echo $this->translate('Turn Around Time'); ?></th>
+			<th><?php echo $this->translate('Source Language'); ?></th>
+			<th><?php echo $this->translate('Target Language'); ?></th>
+			<th><?php echo $this->translate('Output Format'); ?></th>
+			<th><?php echo $this->translate('Action'); ?></th>
+		</tr>
+		</thead>
+		<tfoot>
+		<tr>
+			<td colspan="13">
+				<?php echo $this->paginator; ?>
+			</td>
+		</tr>
+		</tfoot>
+		<tbody>
+		<?php if ($this->paginator)
+			foreach($this->paginator as /* Kaltura_Client_Reach_Type_VendorCatalogItem */ $catalogItem): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+				<td><input type="checkbox" name="catalogItemsCheckBoxItems[]" id="$catalogItemsCheckBox-<?php echo $catalogItem->id; ?>" value="<?php echo $catalogItem->id; ?>" /></td>
+				<td><?php echo $catalogItem->id; ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemStatus', $catalogItem->status); ?></td>
+				<td><?php echo $catalogItem->systemName; ?></td>
+				<td><?php echo $this->partnerId != null ? $this->partnerId : ' '; ?></td>
+				<td><?php echo $catalogItem->vendorPartnerId; ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceFeature', $catalogItem->serviceFeature); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceType', $catalogItem->serviceType); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $catalogItem->turnAroundTime); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->sourceLanguage); ?></td>
+				<td><?php if (isset($catalogItem->targetLanguage))
+										echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->targetLanguage);
+						  else
+										echo null;?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat', $catalogItem->outputFormat); ?></td>
+				<td>
+					<select class="options" onchange="doAction(this.value, <?php echo $catalogItem->id;?>, <?php echo $this->filterForm->getElement('filter_input')->getValue(); ?>)">
+						<option value=""><?php echo $this->translate('Select Action'); ?></option>
+						<option value="remove" ><?php echo $this->translate('Remove'); ?></option>
+					</select>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
+
+<script type="text/javascript">
+
+	function flipAllCheckboxItemsOnPage()
+	{
+		var shouldSelectAll = $('input[name=selectAllCatalogItemsOnPageCheckbox]').prop('checked');
+		$('input[name=selectAllCatalogItemsCheckbox]').prop('checked',false);
+		$('input[type=checkbox]').each(function () {
+			if($( this ).attr("name") == 'catalogItemsCheckBoxItems[]')
+				$(this).prop('checked', shouldSelectAll);
+		});
+	}
+
+	function bulkDeleteAction(partnerId) {
+		var ok = confirm('<?php echo $this->translate("Are you sure you want to remove selected catalog items for partner"); ?> '+ partnerId + '?');
+		if (ok) {
+			var catalogItems = [];
+			$('input[type=checkbox]').each(function () {
+				if($( this ).attr("name") == 'catalogItemsCheckBoxItems[]' && $(this).prop('checked')) {
+					catalogItems.push($(this).attr("value"));
+				}
+			});
+			var catalogItemsString = catalogItems.toString();
+			changeStatus(
+				catalogItemsString,
+				<?php echo Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED; ?>,
+				partnerId,
+				function() {
+					alert('<?php echo $this->translate('Partner catalog Items removed');?>');
+				}
+			);
+		}
+	}
+
+	$(function () {
+		updateFiltersView();
+	});
+    
+	jQuery('#filter_type').change(function() {
+		if(this.value == "none") {
+			$("#filter_text").css("display","none");
+		}
+		else {
+			$("#filter_text").css("display","inline");
+			$("#filter_text input").focus();
+			if(this.value == "free")
+				$("div.help").show();
+			else
+				$("div.help").hide();
+		}
+	});
+
+	jQuery('#filter_type').change();
+
+	function doAction(action, folderId) {
+		if (action && eval('typeof ' + action) == 'function')
+		{
+			f = eval(action);
+			Array.prototype.shift.apply(arguments);
+			f.apply(this, arguments);
+		}
+		jQuery('select.options').val('');
+	}
+
+	function remove(catalogItemId,partnerId)
+	{
+		var ok = confirm('<?php echo $this->translate('Are you sure you want to remove Catalog Item from partner ?'); ?>');
+		if (ok)
+		{
+			changeStatus(
+				catalogItemId,
+				<?php echo Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED; ?>,
+				partnerId,
+				function() {
+					alert('<?php echo $this->translate('Partner catalog Item removed');?>');
+				}
+			);
+		}
+	}
+
+	function changeStatus(catalogItemIds, status, partnerId, callback)
+	{
+		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemSetStatusAction', 'catalogItemIds' => 'CATALOGITEMIDS','partnerId' => 'PARTNERID', 'catalogItemStatus' => 'STATUS')); ?>';
+		url = url.replace('STATUS', status);
+		url = url.replace('CATALOGITEMIDS', catalogItemIds);
+		url = url.replace('PARTNERID', partnerId);
+		jQuery.ajax({
+			url: url,
+			dataType: 'json',
+			success: function(result) {
+				if (result != 'ok')
+					this.error(result);
+				else
+				{
+					if (callback && (typeof callback == 'function'))
+					{
+						callback.apply(this);
+					}
+				}
+				jQuery('#frmPaginator1').submit();
+			},
+			error: function(result) {
+				alert(JSON.stringify(result));
+			}
+		});
+	}
+
+	function configureCatalogItems(partnerId, serviceFeature, serviceType, turnAroundTime, sourceLanguage, targetLanguage, vendorPartnerId)
+	{
+		var paramsStr = '/partner_id/' + partnerId + '/serviceFeature/' + serviceFeature + '/serviceType/' + serviceType + '/turnAroundTime/' +turnAroundTime + '/sourceLanguage/' + sourceLanguage + '/targetLanguage/'+targetLanguage+'/vendorPartnerId/'+vendorPartnerId +'/page/1/pageSize/10';
+		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemConfigureAction')); ?>' + paramsStr;
+
+		jQuery('#partner-catalog-item-configure-dialog').remove();
+		dialogDiv = jQuery('<div id="partner-catalog-item-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+		dialogDiv.dialog({
+			bgiframe: true,
+			modal: true,
+			resizable: false,
+			width: 'auto',
+			height: 600,
+			title: '<?php echo $this->translate('Catalog Item'); ?>',
+			buttons: {
+				'<?php echo $this->translate('Save'); ?>': function() {
+					jQuery('.ui-widget-overlay').css('z-index', 1003 );
+					jQuery('#loader').show();
+					jQuery(this).find('#frmPartnerCatalogItemInnerConfigure').submit();
+					jQuery(this).find('#frmPartnerCatalogItemConfigure').submit();
+				},
+				'<?php echo $this->translate('Close'); ?>': function() {
+					jQuery(this).dialog('close');
+				}
+			},
+			close: function() {
+				jQuery(this).dialog('destroy').remove();
+			}
+		});
+
+		dialogDiv.load(
+			url,
+			null,
+			function() {
+//				jQuery(this).find('#frmPartnerCatalogItemConfigure').ajaxForm({
+//					success: loadCatalogItemSuccess1,
+//					iframe: true
+//				});
+				jQuery(this).find('#frmPartnerCatalogItemInnerConfigure').ajaxForm({
+					success: loadCatalogItemSuccess,
+					iframe: true
+				});
+
+			}
+		);
+	}
+
+	function loadCatalogItemSuccess(html) {
+		if (jQuery(html).filter('#frmPartnerCatalogItemInnerConfigure').hasClass('valid'))
+		{
+			dialogDiv.dialog('close');
+			if (jQuery('#frmPaginator1').length){
+				jQuery('#frmPaginator1').submit();
+			}
+			else {
+				jQuery('#frmPartnerIdFilter').submit();
+			}
+		}
+		jQuery('.ui-widget-overlay').css('z-index', 1000 );
+		jQuery('#loader').hide();
+		jQuery('#frmPartnerCatalogItemInnerConfigure').replaceWith(html);
+		jQuery('#frmPartnerCatalogItemInnerConfigure').ajaxForm({
+			success: loadCatalogItemSuccess,
+			iframe: true
+		});
+	}
+
+	function loadCatalogItemSuccess1(html) {
+		if (jQuery(html).filter('#frmPartnerCatalogItemConfigure').hasClass('valid'))
+		{
+			dialogDiv.dialog('close');
+			if (jQuery('#frmPaginator1').length){
+				jQuery('#frmPaginator1').submit();
+			}
+			else {
+				jQuery('#frmPartnerIdFilter').submit();
+			}
+		}
+		jQuery('.ui-widget-overlay').css('z-index', 1000 );
+		jQuery('#loader').hide();
+		jQuery('#frmPartnerCatalogItemConfigure').replaceWith(html);
+		jQuery('#frmPartnerCatalogItemConfigure').ajaxForm({
+			success: loadCatalogItemSuccess,
+			iframe: true
+		});
+	}
+
+	function updateFiltersView() {
+		var templateServiceFeature = jQuery('#filterServiceFeature').val();
+
+		jQuery('#filterSourceLanguage').attr('hidden', 1);
+		jQuery('#filterTargetLanguage').attr('hidden', 1);
+
+		if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS; ?>) {
+			jQuery('#filterSourceLanguage').removeAttr('hidden');
+		}
+		
+		if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION; ?>) {
+			jQuery('#filterSourceLanguage').removeAttr('hidden');
+			jQuery('#filterTargetLanguage').removeAttr('hidden');
+		}
+	}
+	
+</script>

@@ -3,7 +3,7 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchEntryResultArray extends KalturaESearchResultArray
+class KalturaESearchEntryResultArray extends KalturaTypedArray
 {
     public function __construct()
     {
@@ -12,8 +12,14 @@ class KalturaESearchEntryResultArray extends KalturaESearchResultArray
 
 	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$newArr = new KalturaESearchEntryResultArray();
-		return parent::populateArray($newArr, 'KalturaESearchEntryResult', $arr, $responseProfile);
+		$outputArray = new KalturaESearchEntryResultArray();
+		foreach ( $arr as $obj )
+		{
+			$nObj = new KalturaESearchEntryResult();
+			$nObj->fromObject($obj, $responseProfile);
+			$outputArray[] = $nObj;
+		}
+		return $outputArray;
 	}
 
 }

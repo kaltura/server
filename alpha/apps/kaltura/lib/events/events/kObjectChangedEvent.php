@@ -103,4 +103,14 @@ class kObjectChangedEvent extends KalturaEvent implements IKalturaDatabaseEvent,
 		
 		return false;
 	}
+	
+	public function getCustomDataOldValue($name = null, $namespace = '')
+	{
+		if(isset($this->modifiedColumns[self::CUSTOM_DATA_OLD_VALUES][$namespace]) && (is_null($name) || array_key_exists($name, $this->modifiedColumns[self::CUSTOM_DATA_OLD_VALUES][$namespace])))
+		{
+			return $this->modifiedColumns[self::CUSTOM_DATA_OLD_VALUES][$namespace][$name];
+		}
+		
+		return null;
+	}
 }

@@ -42,11 +42,6 @@ class ClippingTaskEntryServerNode extends TaskEntryServerNode
 		return $this->putInCustomData(self::CUSTOM_DATA_LIVE_ENTRY_ID, $v);
 	}
 
-	public function validateEntryServerNode()
-	{
-   		return;
-	}
-
 	public function postInsert(PropelPDO $con = null)
 	{
 		$this->addTrackEntryInfo(null, "ClippedEntryId=" . $this->getClippedEntryId());

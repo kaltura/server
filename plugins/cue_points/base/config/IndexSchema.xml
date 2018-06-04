@@ -2,13 +2,13 @@
 <schema>
 	<object name="CuePoint" indexId="str_cue_point_id" id="ID" >
 	        <field name="parent_id" indexName="parent_id" type="string" matchable="yes" />
-	        <field name="entry_id" indexName="entry_id" type="string" skipField="yes" />
+	        <field name="entry_id" indexName="entry_id" type="string" skipField="yes" keepCondition="yes" />
 	        <field name="name" indexName="name" type="string" matchable="yes" />
 	        <field name="system_name" indexName="system_name" type="string" matchable="yes" />
 	        <field name="text" indexName="text" type="string" matchable="yes" />
 	        <field name="tags" indexName="tags" type="string" matchable="yes" />
 	        <field name="roots" indexName="roots" type="string" matchable="yes" />
-	        <field name="id" indexName="int_cue_point_id" getter="indexedId" type="int" skipField="yes" />
+	        <field name="id" indexName="int_cue_point_id" getter="indexedId" type="int" skipField="yes"  />
 	        <field name="int_id" indexName="cue_point_int_id" getter="intId" type="int" />
 	        <field name="partner_id" indexName="partner_id" type="bint" />
 	        <field name="start_time" indexName="start_time" type="int" orderable="yes" />
@@ -29,5 +29,10 @@
 	        <field name="str_cue_point_id" indexName="str_cue_point_id" getter="id" type="string" sphinxStringAttribute="string" />
 	        <field name="is_public" indexName="is_public" getter="isPublicStr" type="string" />
 	        <field name="plugins_data" indexName="plugins_data" type="string" searchableonly="yes" />
+		<cacheInvalidationKey>
+			<value field="id"/>
+			<value field="entry_id"/>
+			<value field="partner_id"/>
+		</cacheInvalidationKey>
 	</object>
 </schema>

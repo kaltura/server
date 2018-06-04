@@ -70,7 +70,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				$this->handleClipConcatParentJob($batchJob);
 			}
 
-			if ($batchJob->getParentJob() && $batchJob->getParentJob()->getJobType() == BatchJobType::CONVERT)
+			if ($batchJob->getParentJob() && $batchJob->getParentJob()->getJobType() == BatchJobType::CONVERT &&
+				!$this->concatJobExist($batchJob->getRootJob()))
 			{
 				$this->startConcat($batchJob->getRootJob());
 			}
@@ -595,6 +596,25 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$effects = new kEffectsManager();
 		return $effects->getFFMPEGEffects($singleAttribute);
 	}
+
+	/**
+	 * @param BatchJob $rootJob
+	 * @return bool
+	 */
+	private function concatJobExist($rootJob)
+	{
+		if (!$rootJob)
+			return false;
+
+		/** @var BatchJob $job */
+		foreach ($rootJob->getChildJobs() as $job)
+		{
+			if ($job->getJobType() == BatchJobType::CONCAT)
+				return true;
+		}
+		return false;
+	}
+
 
 
 }

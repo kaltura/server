@@ -10,8 +10,8 @@
 	<field name="full_ids" indexName="full_ids" getter="searchIndexfullIds" type="string" indexEscapeType="2" searchEscapeType="3" matchable="yes" />
 	<field name="description" indexName="description" type="string" nullable="yes" matchable="yes" />
 	<field name="tags" indexName="tags" type="string" nullable="yes" matchable="yes" />
-	<field name="status" indexName="category_status" getter="status" type="int" orderable="yes"/>
-	<field name="kuser_id" indexName="kuser_id" type="int" orderable="yes"/>
+	<field name="status" indexName="category_status" getter="status" type="int" orderable="yes" />
+	<field name="kuser_id" indexName="kuser_id" type="int" orderable="yes" />
 	<field name="display_in_search" indexName="display_in_search" getter="optimizedDisplayInSearchIndex" type="string" orderable="yes" />
 	<field name="free_text" indexName="(str_category_id,name,tags,description,reference_id)" type="null" searchableonly="yes" matchable="yes" />
 	<field name="name_reference_id" indexName="(name,reference_id)" type="null" searchableonly="yes" />
@@ -38,10 +38,20 @@
 	<field name="partner_sort_value" indexName="partner_sort_value" type="bint" orderable="yes" />
 	<field name="dynamic_attributes" indexName="dynamic_attributes" type="json" searchableonly="yes" />
 	<field name="sphinx_match_optimizations" indexName="sphinx_match_optimizations" type="string" />
-	<field name="aggregation_categories" indexName="aggregation_categories" getter="aggregationCategoriesIndexEngine" type="string" matchable="yes"/>
+	<field name="aggregation_categories" indexName="aggregation_categories" getter="aggregationCategoriesIndexEngine" type="string" matchable="yes" />
 	<index format="%s">
 		<value field="id" />
 	</index>
+	<index format="PARENT%s">
+		<value field="parent_id" />
+	</index>
+	<index format="PID%s">
+		<value field="partner_id" />
+	</index>
+	<cacheInvalidationKey>
+		<value field="id" />
+		<value field="partner_id" />
+	</cacheInvalidationKey>
 </object>
 <object name="categoryKuser">
 	<field name="category_id" indexName="category_id" type="string" matchable="yes" />
@@ -53,10 +63,13 @@
 	<field name="status" indexName="category_kuser_status" getter="searchIndexStatus" type="string" matchable="yes" />
 	<field name="partner_id" indexName="partner_id" type="string" />
 	<field name="update_method" indexName="update_method" getter="searchIndexUpdateMethod" type="string" matchable="yes" />
-	<field name="created_at" indexName="created_at" type="datetime" orderable="yes"/>
-	<field name="updated_at" indexName="updated_at" type="datetime" orderable="yes"/>
+	<field name="created_at" indexName="created_at" type="datetime" orderable="yes" />
+	<field name="updated_at" indexName="updated_at" type="datetime" orderable="yes" />
+	<cacheInvalidationKey>
+		<value field="partner_id" />
+	</cacheInvalidationKey>
 </object>
-<object name="entry" indexId="str_entry_id" id="ID" apiName="KalturaBaseEntry" >
+<object name="entry" indexId="str_entry_id" id="ID" apiName="KalturaBaseEntry">
 	<field name="entry_id" indexName="@name" apiName="@getter" getter="id" type="string" />
 	<field name="str_entry_id" indexName="@name" getter="id" type="string" sphinxStringAttribute="string" />
 	<field name="id" indexName="int_entry_id" getter="indexedId" type="int" skipField="yes" />
@@ -102,13 +115,14 @@
 	<field name="entitled_kusers_publish" indexName="@name" type="string" nullable="yes" matchable="yes" />
 	<field name="entitled_kusers_edit" indexName="@name" type="string" nullable="yes" matchable="yes" />
 	<field name="entitled_kusers" indexName="@name" type="string" nullable="yes" />
+	<field name="entitled_kusers_view" indexName="@name" type="string" nullable="yes" matchable="yes" />
 	<field name="privacy_by_contexts" indexName="@name" type="string" nullable="yes" />
 	<field name="creator_kuser_id" indexName="@name" type="string" />
 	<field name="creator_puser_id" indexName="@name" apiName="creatorId" type="string" />
 	<field name="dynamic_attributes" indexName="@name" type="json" matchable="yes" />
 	<field name="first_broadcast" indexName="dynamic_attributes.first_broadcast" type="null" searchableonly="yes" orderable="yes" />
-	<field name="user_names" indexName="@name" type="string"/>
-	<field name="source" indexName="@name" type="int"/>
+	<field name="user_names" indexName="@name" type="string" />
+	<field name="source" indexName="@name" type="int" />
 	<field name="plugins_data" indexName="@name" type="string" searchableonly="yes" matchable="yes" />
 	<field name="search_text" indexName="(name,tags,description,entry_id,reference_id,roots,puser_id)" apiName="@name" type="null" searchableonly="yes" matchable="yes" />
 	<index format="P%sST%s">
@@ -119,8 +133,12 @@
 		<value field="id" />
 	</index>
 	<index format="isLive%s">
-		<value field="dynamic_attributes.isLive"/>
+		<value field="dynamic_attributes.isLive" />
 	</index>
+	<cacheInvalidationKey>
+		<value field="id" />
+		<value field="partner_id" />
+	</cacheInvalidationKey>
 </object>
 <object name="kuser">
 	<field name="login_data_id" indexName="login_data_id" type="int" orderable="yes" />
@@ -140,7 +158,7 @@
 	<field name="partner_id" indexName="partner_id" type="bint" />
 	<field name="display_in_search" indexName="display_in_search" type="bint" orderable="yes" />
 	<field name="partner_data" indexName="partner_data" type="string" matchable="yes" />
-	<field name="puser_id" indexName="puser_id" type="string" matchable="yes" nullable="yes"/>
+	<field name="puser_id" indexName="puser_id" type="string" matchable="yes" nullable="yes" />
 	<field name="indexed_partner_data_int" indexName="indexed_partner_data_int" type="bint" orderable="yes" />
 	<field name="indexed_partner_data_string" indexName="indexed_partner_data_string" type="string" matchable="yes" />
 	<field name="permission_names" indexName="permission_names" getter="indexedPermissionNames" type="string" matchable="yes" />
@@ -150,5 +168,9 @@
 	<field name="puser_id_or_screen_name" indexName="(puser_id,screen_name)" type="null" searchableonly="yes" />
 	<field name="plugins_data" indexName="plugins_data" type="string" searchableonly="yes" />
 	<field name="type" indexName="type" getter="type" type="int" />
+	<cacheInvalidationKey>
+		<value field="id" />
+		<value field="partner_id" />
+	</cacheInvalidationKey>
 </object>
 </schema>

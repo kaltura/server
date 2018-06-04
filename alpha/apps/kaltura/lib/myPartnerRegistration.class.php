@@ -100,7 +100,7 @@ class myPartnerRegistration
 			$partner_type = 1;
 		}
 
-		if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_DEVELOPER)
+		if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL)
 		{
 			if ($existingUser) {
 				return; // emails will be sent via external system 

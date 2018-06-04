@@ -31,7 +31,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	 * @param KalturaEvent $event
 	 * @return int
 	 */
-	protected function getEventType(KalturaEvent $event) 
+	protected function getEventType(KalturaEvent $event)
 	{
 		$matches = null;
 		if(!preg_match('/k(\w+)Event/', get_class($event), $matches))
@@ -78,7 +78,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	 * @param KalturaEvent $event
 	 * @return string class name
 	 */
-	protected function getEventObjectType(KalturaEvent $event) 
+	protected function getEventObjectType(KalturaEvent $event)
 	{
 		if($event instanceof kBatchJobStatusEvent)
 			return 'BatchJob';
@@ -88,6 +88,21 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 			
 		$object = $event->getObject();
 		return get_class($object);
+	}
+
+	/**
+	 * Events that are excluded from isAllowedPartner are defined here,
+	 * specific event that needs to be activated regardless of partner affiliation
+	 * @param KalturaEvent $event
+	 * @return bool is new Partner Object
+	 */
+	protected function fireEventWithoutPartnerCheck($event, $partnerId)
+	{
+		/** event kObjectCreatedEvent with partner object -> create new partner  */
+		if($event instanceof kObjectCreatedEvent && $event->getObject() instanceof Partner &&  $partnerId > 0)
+			return true;
+
+		return false;
 	}
 
 	/**
@@ -135,10 +150,14 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		$partnerId = $scope->getPartnerId();
 		$ksPartnerId = kCurrentContext::$ks_partner_id;
 
-		if ( (($ksPartnerId && $ksPartnerId == Partner::MEDIA_SERVER_PARTNER_ID) || $partnerId <= 0 || !EventNotificationPlugin::isAllowedPartner($partnerId))
-				&& !in_array($partnerId, kConf::get('media_server_allowed_notifications','local', array())) )
-			return false;
-			
+		$fireEventWithoutPartnerCheck = $this->fireEventWithoutPartnerCheck($event, $partnerId);
+		if (!$fireEventWithoutPartnerCheck)
+		{
+			if ( (($ksPartnerId && $ksPartnerId == Partner::MEDIA_SERVER_PARTNER_ID) || $partnerId <= 0 ||
+					!EventNotificationPlugin::isAllowedPartner($partnerId))
+				&& !in_array($partnerId, kConf::get('media_server_allowed_notifications','local', array()) ) )
+				return false;
+		}
 		$eventType = self::getEventType($event);
 		$eventObjectClassName = self::getEventObjectType($event);
 		

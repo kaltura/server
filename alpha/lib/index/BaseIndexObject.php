@@ -32,7 +32,7 @@ abstract class BaseIndexObject
 	 * last name should appear in this list.
 	 */
 	// protected static $nullableFields;
-	
+
 	/**
 	 * Mapping between property name to escape type for indexing purposes.
 	 * The possible values are taken from SearchIndexFieldEscapeType. 
@@ -95,7 +95,7 @@ abstract class BaseIndexObject
 		$nullableFields = static::getIndexNullableList();
 		return in_array($fieldName, $nullableFields);
 	}
-	
+
 	/**
 	 * Returns the matching field escape type for indexing purposes.
 	 * @param string $fieldName

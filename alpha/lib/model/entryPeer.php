@@ -274,6 +274,13 @@ class entryPeer extends BaseentryPeer
 		$ecf->getFilter()->remove ( entryPeer::STATUS );
 	}
 
+	public static function onlyReadyCriteriaFilter()
+	{
+		$ecf = entryPeer::getCriteriaFilter();
+		$ecf->getFilter()->remove(entryPeer::STATUS);
+		$ecf->getFilter()->addAnd(entryPeer::STATUS, entryStatus::READY, Criteria::EQUAL);
+	}
+
 	public static function blockDeletedInCriteriaFilter()
 	{
 		$ecf = entryPeer::getCriteriaFilter();

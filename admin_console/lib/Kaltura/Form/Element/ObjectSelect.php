@@ -59,6 +59,11 @@ class Kaltura_Form_Element_ObjectSelect extends Zend_Form_Element_Select
 		$listResponse = $client->$service->$action($filter, $pager);
 		Infra_ClientHelper::unimpersonate();
 		
+		if(isset($options['addNull']) && $options['addNull'])
+		{
+			$this->addMultiOption(null, "None");
+		}
+		
 		foreach($listResponse->objects as $object)
 		{
 			$this->addMultiOption($object->$idAttribute, $object->$nameAttribute);

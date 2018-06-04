@@ -346,7 +346,11 @@ class KScheduleHelperManager
 	public static function saveStatuses(array $statuses)
 	{
 		$filePath = self::getStatusFilePath();
-		file_put_contents($filePath, base64_encode(serialize($statuses)), LOCK_EX);
+		$statusesFromFile = array();
+		$data = @file_get_contents($filePath);
+		if($data)
+			$statusesFromFile = unserialize(base64_decode($data));
+		file_put_contents($filePath, base64_encode(serialize(array_merge($statusesFromFile,$statuses))), LOCK_EX);
 	}
 
 	/**

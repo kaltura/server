@@ -234,6 +234,7 @@ class ScheduleEventIndex extends BaseIndexObject
 		if (!self::$orderFields)
 		{
 			self::$orderFields = array(
+				'schedule_event.SUMMARY' => 'summary',
 				'schedule_event.ORIGINAL_START_DATE' => 'original_start_date',
 				'schedule_event.START_DATE' => 'start_date',
 				'schedule_event.END_DATE' => 'end_date',
@@ -245,7 +246,6 @@ class ScheduleEventIndex extends BaseIndexObject
 				'schedule_event.DURATION' => 'duration',
 				'schedule_event.CREATED_AT' => 'created_at',
 				'schedule_event.UPDATED_AT' => 'updated_at',
-				'schedule_event.SUMMARY' => 'summary',
 			);
 		}
 		return self::$orderFields;
@@ -300,12 +300,14 @@ class ScheduleEventIndex extends BaseIndexObject
 		return self::$apiMatchAttributesMap;
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationMap()
 	{
 		return array(
 		);
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationValues()
 	{
 		return array(

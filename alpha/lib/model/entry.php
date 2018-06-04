@@ -3166,9 +3166,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		
 		$categoriesEntryStringIndex = array_unique($categoriesEntryStringIndex);
 		
-		return self::CATEGORIES_INDEXED_FIELD_PREFIX . $this->getPartnerId() . " " .  implode(' ', $categoriesEntryStringIndex);
+		return implode(' ', $categoriesEntryStringIndex);
 	}
-	
+
+	public function enrichCategoriesEntryIds($originalValue)
+	{
+		return self::CATEGORIES_INDEXED_FIELD_PREFIX . $this->getPartnerId() . " " .  $originalValue;
+	}
+
 	/*
 	 * get all categoryEntry objects from categoryEntryPeer
 	 */

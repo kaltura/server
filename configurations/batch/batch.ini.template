@@ -17,7 +17,6 @@ curlTimeout											= 180
 dwhPath												= @LOG_DIR@/dwh.log
 dwhEnabled											= 0
 timezone											= @TIME_ZONE@
-statusInterval										= 300
 logWorkerInterval									= 60
 enabledWorkers.KScheduleHelper						= 1
 enabledWorkers.DirectoryCleanupLocal				= 1
@@ -811,3 +810,19 @@ id                                                  = 700
 friendlyName                                        = Copy Cue Point
 type                                                = KAsyncCopyCuePoints
 scriptPath                                          = ../plugins/cue_points/base/batch/copyCuePoints/KAsyncCopyCuePointsExe.php
+
+[KAsyncEntryVendorTasksCsv : JobHandlerWorker]
+id                                                  = 710
+friendlyName                                        = Entry Vendor Tasks Csv
+type                                                = KAsyncEntryVendorTasksCsv
+params.localTempPath                                = @TMP_DIR@/entryVendorTasksCsv
+params.sharedTempPath                               = @WEB_DIR@/tmp/entryVendorTasksCsv
+scriptPath                                          = ../plugins/reach/batch/EntryVendorTasksCsv/kAsyncEntryVendorTasksCsvExe.php
+maximumExecutionTime                                = 3600
+
+[KSyncReachCreditTaskRunner : PeriodicWorker]
+id                                                  = 720
+type                                                = KSyncReachCreditTaskRunner
+maximumExecutionTime                                = 3600
+scriptPath                                          = ../plugins/reach/batch/KSyncReachCreditTaskRunner/KSyncReachCreditTaskRunnerExe.php
+sleepBetweenStopStart                               = 60
