@@ -32,12 +32,12 @@ class Form_DictionariesSubForm extends ConfigureSubForm
 	public function isValid($data)
 	{
 		if(!$data['ReachProfileDictionaries'])
-			return false;
+			return true;
 		
 		$jsonData = json_decode($data['ReachProfileDictionaries'], true);
-		if(!$jsonData)
-			return false;
+		if(!empty($jsonData))
+			return true;
 		
-		return true;
+		return false;
 	}
 }
