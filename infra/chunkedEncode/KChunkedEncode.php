@@ -701,7 +701,7 @@
 			if(isset($params->acodec)) $cmdLine.= " -c:a ".$params->acodec;
 			if(isset($filterStr))
 				$cmdLine.= " $filterStr";
-			$cmdLine.= " -map 0:a:0";
+			$cmdLine.= " -map 0:a:0 -metadata:s:a:0 language=";
 			if(isset($params->abitrate)) $cmdLine.= " -b:a ".$params->abitrate."k";
 			if(isset($params->ar)) $cmdLine.= " -ar ".$params->ar;
 			if(isset($params->ac)) $cmdLine.= " -ac ".$params->ac;
