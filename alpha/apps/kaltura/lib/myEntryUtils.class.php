@@ -4,7 +4,7 @@ class myEntryUtils
 {
 
 	const TEMP_FILE_POSTFIX = "temp_1.jpg";
-	const DEFAULT_THUMB_LIVE_CLIPPING = 1;
+	const DEFAULT_THUMB_SEC_LIVE = 1;
 
 	static private $liveSourceType = array
 	(
@@ -828,7 +828,7 @@ class myEntryUtils
 				}
 				else // default thumbnail was not created yet
 				{
-					$calc_vid_sec = $entry->getBestThumbOffset($servingVODfromLive ? self::DEFAULT_THUMB_LIVE_CLIPPING : null);
+					$calc_vid_sec = $entry->getBestThumbOffset($servingVODfromLive ? self::DEFAULT_THUMB_SEC_LIVE : null);
 				}
 					
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
@@ -1021,7 +1021,7 @@ class myEntryUtils
 			return false;
 		$packagerCaptureUrl = str_replace(array ( "{dc}", "{liveType}"), array ( $dc, $liveType) , $packagerCaptureUrl );
 		if (!$calc_vid_sec)
-			$calc_vid_sec = self::DEFAULT_THUMB_LIVE_CLIPPING;
+			$calc_vid_sec = self::DEFAULT_THUMB_SEC_LIVE;
 		return self::curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $destThumbPath, $width, $height, '+');
 	}
 	
