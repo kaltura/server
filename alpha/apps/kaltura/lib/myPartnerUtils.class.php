@@ -2146,40 +2146,16 @@ class myPartnerUtils
 		}
 	}
 
-	public static function getFreeAccountTypeFromScope($scope)
+	/**
+	 * @param Partner $partner
+	 * @return null
+	 */
+	public static function getFreeTrialAccountType($partner)
 	{
-		$additionalParams = $scope->getObject()->getAdditionalParams();
+		$additionalParams = $partner->getAdditionalParams();
 		if (isset($additionalParams['freeTrialAccountType']))
 			return $additionalParams['freeTrialAccountType'];
 		return null;
 	}
-
-	public static function getFreeAccountTypesFromKConf()
-	{
-		/** @noinspection PhpUnhandledExceptionInspection */
-		$array = kConf::get('MediaSpace_Partner_Registration');
-		if (isset($array['free_trial_account_types']))
-			return $array['free_trial_account_types'];
-		return null;
-	}
-
-	public static function getMediaSpaceUrlFromKConf()
-	{
-		/** @noinspection PhpUnhandledExceptionInspection */
-		$array = kConf::get('MediaSpace_Partner_Registration');
-		if (isset($array['mediaSpace_url']))
-			return $array['mediaSpace_url'];
-		return null;
-	}
-
-	public static function getSigFromKConf()
-	{
-		/** @noinspection PhpUnhandledExceptionInspection */
-		$array = kConf::get('MediaSpace_Partner_Registration');
-		if (isset($array['sig']))
-			return $array['sig'];
-		return null;
-	}
-
 
 }
