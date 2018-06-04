@@ -134,17 +134,15 @@ $html5Version = safeGetInput('playerVersion', HTML_VERSION_PATTERN);
 		}
 
 		function onSyncPoint(metadata){
-			if ( metadata && metadata.objectType == "KalturaSyncPoint") {
-				if(lastSyncPointTimestamp && lastSyncPointTimestamp >= metadata.timestamp)
-					return;
-				var date = new Date();
-				lastSyncPointTime = date.getTime();
-				lastSyncPointTimestamp = metadata.timestamp;
-				$('#last_cue_point_time').html(new Date(lastSyncPointTimestamp).toUTCString());
+			if(lastSyncPointTimestamp && lastSyncPointTimestamp >= metadata.timestamp)
+				return;
+			var date = new Date();
+			lastSyncPointTime = date.getTime();
+			lastSyncPointTimestamp = metadata.timestamp;
+			$('#last_cue_point_time').html(new Date(lastSyncPointTimestamp).toUTCString());
 
-				$('#btnSendAd').removeAttr('disabled');
-				log('Ads Enabled last offset:' + lastSyncPointOffset + ' last timestamp: ' + lastSyncPointTimestamp);
-			}
+			$('#btnSendAd').removeAttr('disabled');
+			log('Ads Enabled last offset:' + lastSyncPointOffset + ' last timestamp: ' + lastSyncPointTimestamp);
 		}
 		
 		function enableAds(){
