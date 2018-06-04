@@ -2562,7 +2562,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		if ($default_offset === null)
 			$default_offset = 3;
 			
-		$offset = $this->getThumbOffset();
+		$offset = $this->getThumbOffset($default_offset);
 		$duration = $this->getLengthInMsecs();
 		
 		if(!$offset || $offset < 0)
