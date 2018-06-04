@@ -1,4 +1,4 @@
-# Mercury 13.21.0 #
+# Naos 13.21.0 #
 ## Support push notifications for thumb cuePoint ready ##
 - Issue Type: New Feature
 - Issue ID: PLAT-8963
