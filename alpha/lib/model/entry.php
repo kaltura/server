@@ -2564,6 +2564,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			
 		$offset = $this->getThumbOffset();
 		$duration = $this->getLengthInMsecs();
+		if (!$duration && $this->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
+			$duration = $this->getRecordedLengthInMsecs();
 		
 		if(!$offset || $offset < 0)
 			$offset = $default_offset;
