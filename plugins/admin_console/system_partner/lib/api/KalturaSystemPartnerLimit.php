@@ -42,6 +42,10 @@ class KalturaSystemPartnerLimit extends KalturaObject
 			case KalturaSystemPartnerLimitType::USER_LOGIN_ATTEMPTS:
 				$limit->max = $partner->getMaxLoginAttempts();
 				break;
+			
+			case KalturaSystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS:
+				$limit->max = $partner->getMaxLiveRtcStreamInputs();
+				break;
 		}
 		
 		return $limit;
@@ -64,6 +68,10 @@ class KalturaSystemPartnerLimit extends KalturaObject
 				break;
 				
 			case KalturaSystemPartnerLimitType::USER_LOGIN_ATTEMPTS:
+				$this->validatePropertyMinValue('max', 0, true);
+				break;
+				
+			case KalturaSystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS:
 				$this->validatePropertyMinValue('max', 0, true);
 				break;
 		}
@@ -93,6 +101,10 @@ class KalturaSystemPartnerLimit extends KalturaObject
 				
 			case KalturaSystemPartnerLimitType::USER_LOGIN_ATTEMPTS:
 				$partner->setMaxLoginAttempts($this->max);
+				break;
+			
+			case KalturaSystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS:
+				$partner->setMaxLiveRtcStreamInputs($this->max);
 				break;
 		}
 	} 
