@@ -741,23 +741,31 @@
 				$chunkName = $this->getChunkName($idx);
 /* Discontinuity check by analyzing chunk generation log file */
 				$stat = $chunkData->stat;
-				if(isset($prevObjIdx)) {
-					$prevObj = $this->chunkDataArr[$prevObjIdx]->stat;
-					$timeGap = $stat->start - $prevObj->finish;
-					KalturaLog::log($chunkName.":".json_encode($stat).":timeGap:".round($timeGap,9));
-					if($timeGap>1.5*$frameDuration){
-						$toFix = $prevObj->frame+round($timeGap/$frameDuration)-1;
-						$toFixCnt++;
-						KalturaLog::log("Discontinuity: Hole, index($prevObjIdx), frameDur($frameDuration), gap($timeGap), frame($prevObj->frame), toFix($toFix)");
-						$this->chunkDataArr[$prevObjIdx]->toFix = $toFix;
-					}
-					else if($timeGap<0.5*$frameDuration){
-						$toFix = $prevObj->frame-round(abs($timeGap/$frameDuration))-1;
-						$toFixCnt++;
-						KalturaLog::log("Discontinuity: Overlap, index($prevObjIdx), frameDur($frameDuration), gap($timeGap), frame($prevObj->frame), toFix($toFix)");
-						$this->chunkDataArr[$prevObjIdx]->toFix = $toFix;
+				if(isset($stat->finish) && isset($stat->type)) 
+				{
+					if(isset($prevObjIdx)) {
+						$prevObj = $this->chunkDataArr[$prevObjIdx]->stat;
+						if(isset($prevObj->finish) && isset($prevObj->type)) 
+						{
+							$timeGap = $stat->start - $prevObj->finish;
+							KalturaLog::log($chunkName.":".json_encode($stat).":timeGap:".round($timeGap,9));
+							if($timeGap>1.5*$frameDuration){
+								$toFix = $prevObj->frame+round($timeGap/$frameDuration)-1;
+								$toFixCnt++;
+								KalturaLog::log("Discontinuity: Hole, index($prevObjIdx), frameDur($frameDuration), gap($timeGap), frame($prevObj->frame), toFix($toFix)");
+								$this->chunkDataArr[$prevObjIdx]->toFix = $toFix;
+							}
+							else if($timeGap<0.5*$frameDuration){
+								$toFix = $prevObj->frame-round(abs($timeGap/$frameDuration))-1;
+								$toFixCnt++;
+								KalturaLog::log("Discontinuity: Overlap, index($prevObjIdx), frameDur($frameDuration), gap($timeGap), frame($prevObj->frame), toFix($toFix)");
+								$this->chunkDataArr[$prevObjIdx]->toFix = $toFix;
+							}
+						}
+						else KalturaLog::log("Invalid prev ChunkData (idx=$prevObjIdx)");
 					}
 				}
+				else KalturaLog::log("Invalid current ChunkData (idx=$idx)");
 				$prevObjIdx = $idx;
 				$stat = null;
 			}
