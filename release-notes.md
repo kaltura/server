@@ -5,7 +5,7 @@
 
 ### Deployment scripts ###
 
-	First replcae all tokens from the XML files below and remove ".template" from the fle name:
+	First replace all tokens from the XML files below and remove ".template" from the fle name:
 		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_06_03_update_entry_vendor_pending_moderation.template.xml
 		
 		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_06_03_update_entry_vendor_rejected_moderation.template.xml
