@@ -51,7 +51,7 @@ kshowcss:
 flvprovider:
   url:   /flv/:file_info
   param: { module: keditorservices , action: flvprovider }
-  
+
 keditorservices:
   url:   /keditorservices
   param: { module: keditorservices , action: defKeditorservices }
@@ -119,7 +119,7 @@ widget4:
 kwidgetThumbail:
   url:  /kwidget/thumbnail/:wid
   param: { module: extwidget, action: getWidgetThumbnail }
-  
+
 kwidget:
   url:  /kwidget/*
   param: { module: extwidget , action: kwidget }
@@ -159,6 +159,10 @@ kmc:
 kmcng:
   url:   /kmcng
   param: { module: kmcng , action: kmcng }
+
+kmcng_reset_password:
+    url:   /kmcng/resetpassword
+    param: { module: kmcng , action: resetpassword }
 
 kmcng_default:
   url:   /kmcng/*
