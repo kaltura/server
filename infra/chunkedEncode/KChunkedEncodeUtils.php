@@ -169,25 +169,25 @@
 		{
 			KalturaLog::log("$chunkFileName");
 			$cmdLine = "$ffmpegBin -i $chunkFileName -c copy -f mp4 -v quiet -y $chunkFileName.mp4;$ffprobeBin -show_streams -select_streams v -v quiet -show_entries stream=duration,nb_frames -print_format csv $chunkFileName.mp4";
-			KalturaLog::log($cmdLine);
+			KalturaLog::log("copy:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {
 				KalturaLog::log("ERROR: failed to extract frame data from chunk ($chunkFileName).");
 				return null;
 			}
-			KalturaLog::log("rv($rv), output:\n".print_r($outputArr,1));
+			KalturaLog::log("copy:rv($rv), output:\n".print_r($outputArr,1));
 			list($stam,$duration,$frames,$stam2) = explode(",",$outputArr[0]);
 			KalturaLog::log("duration:$duration,frames:$frames");
 /**/
 			$outputArr = array();
 			$cmdLine = "$ffmpegBin -t 1 -i $chunkFileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type -print_format csv -v quiet - | (head -n1)";
-			KalturaLog::log($cmdLine);
+			KalturaLog::log("head:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {
 				KalturaLog::log("ERROR: failed to extract frame data from chunk ($chunkFileName).");
 				return null;
 			}
-			KalturaLog::log("rv($rv), output:\n".print_r($outputArr,1));
+			KalturaLog::log("head:rv($rv), output:\n".print_r($outputArr,1));
 			if($duration<10) {
 				$startFrom = 0;
 			}
@@ -195,13 +195,19 @@
 				$startFrom = $duration-4;
 			}
 			$cmdLine = "$ffmpegBin -ss $startFrom -i $chunkFileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -f mpegts -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type -print_format csv -v quiet - | tail";
-			KalturaLog::log($cmdLine);
+			KalturaLog::log("tail:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {
 				KalturaLog::log("ERROR: failed to extract frame data from chunk ($chunkFileName).");
 				return null;
 			}
-			KalturaLog::log("rv($rv), output:\n".print_r($outputArr,1));
+			KalturaLog::log("tail:rv($rv), output:\n".print_r($outputArr,1));
+			foreach($outputArr as $idx=>$outputLine) {
+				if(strlen(trim($outputLine))==0) {
+					unset($outputArr[$idx]);
+				}
+			}
+			KalturaLog::log("trimmed:output:\n".print_r($outputArr,1));
 
 			$outputLine = array_shift($outputArr);
 			list($stam,$pts,$type,$frame) = explode(",",$outputLine);

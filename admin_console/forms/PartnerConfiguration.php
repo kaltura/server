@@ -894,6 +894,9 @@ class Form_PartnerConfiguration extends Infra_Form
 		$liveStreamOutputsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS, 'Concurrent Live-Plus streams purchased:', false);
 		$liveStreamOutputsSubForm->requirePartnerPermission(Kaltura_Client_Enum_PermissionName::FEATURE_KALTURA_LIVE_STREAM_TRANSCODE);
 		$this->addLimitSubForm($liveStreamOutputsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS);
+		
+		$liveRtcStreamsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS, 'Concurrent Live RTC streams:', false);
+		$this->addLimitSubForm($liveRtcStreamsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS);
 
 	}
 	/**
@@ -960,7 +963,7 @@ class Form_PartnerConfiguration extends Infra_Form
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ACCESS_CONTROLS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_INPUTS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS.'_max',
-
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS.'_max',
 									'crossLine'), 'includedUsageSecondPart');
 
 		$this->addDisplayGroup(

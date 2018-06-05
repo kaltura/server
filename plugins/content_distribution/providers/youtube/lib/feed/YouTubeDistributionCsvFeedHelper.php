@@ -46,7 +46,7 @@ class YouTubeDistributionCsvFeedHelper
 
 	public function handleCaptions($captionAssetIds)
 	{
-		$captionAssetInfo = $this->getCaptionAssetInfo($captionAssetIds);
+		$captionAssetInfo = $this->getCaptionAssetInfoForCsv($captionAssetIds);
 		foreach($captionAssetInfo as $captionInfo)
 		{
 			$captionData = array();
@@ -230,7 +230,7 @@ class YouTubeDistributionCsvFeedHelper
 	}
 
 
-	public function getCaptionAssetInfo($captionAssetIds)
+	public function getCaptionAssetInfoForCsv($captionAssetIds)
 	{
 		$captionAssetInfo = array();
 		
@@ -250,10 +250,14 @@ class YouTubeDistributionCsvFeedHelper
 				$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				if(kFileSyncUtils::fileSync_exists($syncKey))
 				{
-			    	$captionAssetInfo[$asset->getId()]['fileUrl'] = kFileSyncUtils::getLocalFilePathForKey ( $syncKey, false );
-			    	$captionAssetInfo[$asset->getId()]['fileExt'] = $asset->getFileExt();
-			    	$captionAssetInfo[$asset->getId()]['language'] = $asset->getLanguage();
-			    	break;
+					$captionInfo = array();
+					$captionInfo['fileUrl'] = kFileSyncUtils::getLocalFilePathForKey ( $syncKey, false );
+					$captionInfo['fileExt'] = $asset->getFileExt();
+					$twoCodeLanguage = languageCodeManager::getTwoCodeFromKalturaName($asset->getLanguage());
+					if (!$twoCodeLanguage)
+						continue;
+					$captionInfo['language'] = $twoCodeLanguage;
+					$captionAssetInfo[$asset->getId()]= $captionInfo;
 				}
 			}
 		}

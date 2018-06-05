@@ -4,6 +4,7 @@ class myEntryUtils
 {
 
 	const TEMP_FILE_POSTFIX = "temp_1.jpg";
+	const DEFAULT_THUMB_SEC_LIVE = 1;
 
 	static private $liveSourceType = array
 	(
@@ -702,11 +703,11 @@ class myEntryUtils
 			
 		$entry_status = $entry->getStatus();
 
-		$serveingVODfromLive = self::shouldServeVodFromLive($entry);
-		$entryLengthInMsec = $serveingVODfromLive ? $entry->getRecordedLengthInMsecs() : $entry->getLengthInMsecs();
+		$servingVODfromLive = self::shouldServeVodFromLive($entry);
+		$entryLengthInMsec = $servingVODfromLive ? $entry->getRecordedLengthInMsecs() : $entry->getLengthInMsecs();
 		 
 		$thumbName = $entry->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
-		if ($serveingVODfromLive && $vid_slices > 0)
+		if ($servingVODfromLive && $vid_slices > 0)
 			$thumbName .= "_duration_" . $entryLengthInMsec;
 
 		if ($orig_image_path)
@@ -795,7 +796,7 @@ class myEntryUtils
 		if ($entry->getType() == entryType::PLAYLIST)
 			myPlaylistUtils::updatePlaylistStatistics($entry->getPartnerId(), $entry);
 
-		if ($serveingVODfromLive)
+		if ($servingVODfromLive)
 			$orig_image_path = null;
 
 		while($count--)
@@ -827,7 +828,7 @@ class myEntryUtils
 				}
 				else // default thumbnail was not created yet
 				{
-					$calc_vid_sec = $entry->getBestThumbOffset();
+					$calc_vid_sec = $servingVODfromLive ? self::DEFAULT_THUMB_SEC_LIVE : $entry->getBestThumbOffset();
 				}
 					
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
@@ -846,7 +847,7 @@ class myEntryUtils
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
 					$success = false;
-					if(($multi || $serveingVODfromLive) && $packagerRetries)
+					if(($multi || $servingVODfromLive) && $packagerRetries)
 					{
 						list($picWidth, $picHeight) = $shouldResizeByPackager ? array($width, $height) : array(null, null);
 						$destPath = $shouldResizeByPackager ? $capturedThumbPath . uniqid() : $capturedThumbPath;
@@ -1019,7 +1020,8 @@ class myEntryUtils
 		if (is_null($dc))
 			return false;
 		$packagerCaptureUrl = str_replace(array ( "{dc}", "{liveType}"), array ( $dc, $liveType) , $packagerCaptureUrl );
-		
+		if (!$calc_vid_sec) //Temp until packager support time 0
+			$calc_vid_sec = self::DEFAULT_THUMB_SEC_LIVE;
 		return self::curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $destThumbPath, $width, $height, '+');
 	}
 	
