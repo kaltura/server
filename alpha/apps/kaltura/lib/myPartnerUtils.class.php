@@ -2146,16 +2146,4 @@ class myPartnerUtils
 		}
 	}
 
-	/**
-	 * @param Partner $partner
-	 * @return null
-	 */
-	public static function getFreeTrialAccountType(Partner $partner)
-	{
-		$additionalParams = $partner->getAdditionalParams();
-		if (isset($additionalParams['freeTrialAccountType']))
-			return $additionalParams['freeTrialAccountType'];
-		return null;
-	}
-
 }
