@@ -1,4 +1,16 @@
-# Naos 13.21.0 #
+# Naos 14.0.0 #
+## Enable RTC tokenization ##
+- Issue Type: New Feature
+- Issue ID: WEBC-1188
+
+### Configuration ##
+Add 
+```
+    rtc_token_secret = <secret_value>
+    rtc_token_expiry  = 120
+```
+ to local.ini before password_reset_links
+
 ## Support push notifications for thumb cuePoint ready ##
 - Issue Type: New Feature
 - Issue ID: PLAT-8963
