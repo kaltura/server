@@ -828,7 +828,7 @@ class myEntryUtils
 				}
 				else // default thumbnail was not created yet
 				{
-					$calc_vid_sec = $entry->getBestThumbOffset($servingVODfromLive ? self::DEFAULT_THUMB_SEC_LIVE : null);
+					$calc_vid_sec = $servingVODfromLive ? self::DEFAULT_THUMB_SEC_LIVE : $entry->getBestThumbOffset();
 				}
 					
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
@@ -1020,7 +1020,7 @@ class myEntryUtils
 		if (is_null($dc))
 			return false;
 		$packagerCaptureUrl = str_replace(array ( "{dc}", "{liveType}"), array ( $dc, $liveType) , $packagerCaptureUrl );
-		if (!$calc_vid_sec)
+		if (!$calc_vid_sec) //Temp until packager support time 0
 			$calc_vid_sec = self::DEFAULT_THUMB_SEC_LIVE;
 		return self::curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $destThumbPath, $width, $height, '+');
 	}
