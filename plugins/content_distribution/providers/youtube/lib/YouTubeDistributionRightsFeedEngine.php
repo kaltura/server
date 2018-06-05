@@ -302,12 +302,11 @@ class YouTubeDistributionRightsFeedEngine extends PublicPrivateKeysDistributionE
 			if ( $asset instanceof KalturaCaptionAsset )
 			{
 				$captionFileContent = $captionPlugin->captionAsset->serve($asset->id);
-				$fp = tempnam(sys_get_temp_dir(), 'temp.') . ".txt";
-				file_put_contents($fp, $captionFileContent);
+				$filePath = kFileBase::createTempFile($captionFileContent,null,null, "txt");
 				$captionFilePath = $this->getFilePath($asset, $entryId);
 				$captionSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($captionFilePath, PATHINFO_BASENAME);
-				$sftpManager->putFile($captionSFTPPath, $fp );
-				unlink($fp);
+				$sftpManager->putFile($captionSFTPPath, $filePath );
+				unlink($filePath);
 			}
 		}
 	}
