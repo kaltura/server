@@ -713,8 +713,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				case baseObjectFilter::IN:
 					$vals = is_array($val) ? $val : explode(',', $val);
 						
-					foreach($vals as $valIndex => $valValue)
+					foreach($vals as $valIndex => &$valValue)
 					{
+						$valValue = trim($valValue);
 						if(!strlen($valValue))
 							unset($vals[$valIndex]);
 						else
@@ -724,8 +725,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					if(count($vals))
 					{
 						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
-						$vals = array_map("trim", $vals);
-						$vals = array_filter($vals, 'strlen');
 						foreach ($vals as &$value)
 						{
 							$prefix = $this->getFieldPrefix($sphinxField);
