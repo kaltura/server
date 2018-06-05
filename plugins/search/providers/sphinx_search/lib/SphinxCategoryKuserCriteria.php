@@ -42,7 +42,7 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 			$filter->set('_eq_status', categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::STATUS, $filter->get('_eq_status'), kCurrentContext::getCurrentPartnerId()));
 		}
 		
-		if (!is_null($filter->get('_in_update_method')))
+		if ($filter->is_set('_in_update_method') && $filter->get('_in_update_method') != "")
 		{
 			$updateMethodList = explode(',', $filter->get('_in_update_method'));
 			$updateMethodList = $this->translateToSearchIndexFieldValue(categoryKuserPeer::UPDATE_METHOD, $updateMethodList);
