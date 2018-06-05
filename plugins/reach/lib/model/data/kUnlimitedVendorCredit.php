@@ -16,6 +16,27 @@ class kUnlimitedVendorCredit extends kVendorCredit
 	 */
 	protected $credit = ReachProfileCreditValues::UNLIMITED_CREDIT;
 	
+	/**
+	 *  @var string
+	 */
+	protected $toDate;
+	
+	/**
+	 * @return the $toDate
+	 */
+	public function getToDate()
+	{
+		return $this->toDate;
+	}
+	
+	/**
+	 * @param string $toDate
+	 */
+	public function setToDate($toDate)
+	{
+		$this->toDate = $toDate;
+	}
+	
 	/***
 	 * @param $date
 	 * @return int
@@ -23,9 +44,9 @@ class kUnlimitedVendorCredit extends kVendorCredit
 	public function getCurrentCredit($includeOverages = true)
 	{
 		$now = time();
-		if ( $now < $this->fromDate)
+		if ( $now < $this->fromDate || ($this->toDate && $now > $this->toDate) )
 		{
-			KalturaLog::debug("Current date [$now] is not in credit time Range [ from - $this->fromDate ] ");
+			KalturaLog::debug("Current date [$now] is not in credit time Range [ from - $this->fromDate to - $this->toDate] ");
 			return 0;
 		}
 		
