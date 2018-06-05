@@ -34,6 +34,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		fclose($file);
 
 		$sftpManager->putFile($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $fp);
+		unlink($fp);
 
 		$data->sentData = $videoCsv;
 		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
@@ -49,7 +50,6 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 			$sftpManager->putFile($thumbnailSFTPPath, $thumbnailFilePath);
 		}
 
-		$this->addCaptions($providerData, $sftpManager, $data);
 		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
 	}
 
@@ -85,10 +85,12 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		$assetId = $statusParser->getAssetId();
 		$videoId = $statusParser->getVideoId();
 
+		$sftpManager = $this->getSFTPManager($data->distributionProfile);
 		$captionCsvMap = unserialize($data->providerData->captionsCsvMap);
+		$this->addCaptions($data->providerData, $sftpManager, $data);
+
 		if ($videoId && !empty($captionCsvMap))
 		{
-			$sftpManager = $this->getSFTPManager($data->distributionProfile);
 			$fp = tempnam(sys_get_temp_dir(), 'temp.') . ".csv";
 			$file = fopen($fp, 'w');
 			fputcsv($file, array('video_id','language','caption_file'));
@@ -102,6 +104,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 
 			$sftpManager->putFile($data->providerData->sftpDirectory.'/'.$data->providerData->sftpMetadataFilename, $fp);
 			$this->setDeliveryComplete($sftpManager,  $data->providerData->sftpDirectory);
+			unlink($fp);
 		}
 
 		$remoteIdHandler = new YouTubeDistributionRemoteIdHandler();
@@ -138,6 +141,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		fclose($file);
 
 		$sftpManager->putFile($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $fp);
+		unlink($fp);
 
 		$data->sentData = $videoCsv;
 		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
@@ -189,6 +193,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 			fclose($file);
 			$sftpManager->putFile($data->providerData->sftpDirectory . '/' . $data->providerData->sftpMetadataFilename, $fp);
 			$this->setDeliveryComplete($sftpManager, $data->providerData->sftpDirectory);
+			unlink($fp);
 		}
 
 		$providerData = $data->providerData;
