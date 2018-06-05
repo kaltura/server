@@ -729,7 +729,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						{
 							$prefix = $this->getFieldPrefix($sphinxField);
 							if($prefix)
-								$value = $this->getFieldPrefix($sphinxField) . " " .  $value;
+								$value = $prefix . " " .  $value;
 						}
 						if($objectClass::isNullableField($fieldName))
 							$val = "((\\\"^" . implode(" $notEmpty$\\\") | (\\\"^", $vals) . " $notEmpty$\\\"))";
