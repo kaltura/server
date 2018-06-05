@@ -301,12 +301,13 @@ class YouTubeDistributionRightsFeedEngine extends PublicPrivateKeysDistributionE
 		{
 			if ( $asset instanceof KalturaCaptionAsset )
 			{
+				$captionFileContent = $captionPlugin->captionAsset->serve($asset->id);
+				$fp = tempnam(sys_get_temp_dir(), 'temp.') . ".txt";
+				file_put_contents($fp, $captionFileContent);
 				$captionFilePath = $this->getFilePath($asset, $entryId);
-				if (file_exists($captionFilePath))
-				{
-					$captionSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($captionFilePath, PATHINFO_BASENAME);
-					$sftpManager->putFile($captionSFTPPath, $captionFilePath);
-				}
+				$captionSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($captionFilePath, PATHINFO_BASENAME);
+				$sftpManager->putFile($captionSFTPPath, $fp );
+				unlink($fp);
 			}
 		}
 	}
