@@ -22,7 +22,8 @@ class YouTubeDistributionCsvParser
 		foreach ($csvArray as $row)
 		{
 			$rowArray = explode(",", $row);
-			$all_rows[] = array_combine($header, $rowArray);
+			if (!empty($rowArray))
+				$all_rows[] = array_combine($header, $rowArray);
 		}
 
 		$this->rows = $all_rows;
