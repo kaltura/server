@@ -23,6 +23,7 @@
 				<th>Select</th>
 				<th><?php echo $this->translate('ID'); ?></th>
 				<th><?php echo $this->translate('Status'); ?></th>
+				<th><?php echo $this->translate('Name'); ?></th>
 				<th><?php echo $this->translate('System Name'); ?></th>
 				<th><?php echo $this->translate('Vendor Partner ID'); ?></th>
 				<th><?php echo $this->translate('Feature'); ?></th>
@@ -35,7 +36,7 @@
 			</thead>
 			<tfoot>
 			<tr>
-				<td colspan="12">
+				<td colspan="13">
 				</td>
 			</tr>
 			</tfoot>
@@ -46,6 +47,7 @@
 					<td><input type="checkbox" name="catalogItemsCheckBoxes[]" id="$catalogItemsCheckBoxes-<?php echo $catalogItem->id; ?>" value="<?php echo $catalogItem->id; ?>"/></td>
 					<td><?php echo $catalogItem->id; ?></td>
 					<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemStatus', $catalogItem->status); ?></td>
+					<td><?php echo $catalogItem->name; ?></td>
 					<td><?php echo $catalogItem->systemName; ?></td>
 					<td><?php echo $catalogItem->vendorPartnerId; ?></td>
 					<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceFeature', $catalogItem->serviceFeature); ?></td>
