@@ -5,6 +5,8 @@
  */
 class kmcngAction extends kalturaAction
 {
+	const LIVE_ANALYTICS_UICONF_TAG = 'livea_player';
+
 	public function execute()
 	{
 		if (!kConf::hasParam('kmcng'))
@@ -64,7 +66,7 @@ class kmcngAction extends kalturaAction
 
 	private function initConfig($deployUrl, $kmcngParams)
 	{
-		$this->liveAUiConf = uiConfPeer::getUiconfByTagAndVersion('livea_player', kConf::get("liveanalytics_version"));
+		$this->liveAUiConf = uiConfPeer::getUiconfByTagAndVersion(self::LIVE_ANALYTICS_UICONF_TAG, kConf::get("liveanalytics_version"));
 		$this->contentUiconfsLivea = isset($this->liveAUiConf) ? array_values($this->liveAUiConf) : null;
 		$this->contentUiconfLivea = (is_array($this->contentUiconfsLivea) && reset($this->contentUiconfsLivea)) ? reset($this->contentUiconfsLivea) : null;
 
@@ -100,13 +102,17 @@ class kmcngAction extends kalturaAction
 			);
 		}
 
-		// TODO Future use - remove the false flag
 		$liveAnalytics = null;
-		if (false && kConf::hasParam("liveanalytics_version") && isset($this->contentUiconfLivea))
+		if (kConf::hasParam("liveanalytics_version") && isset($this->contentUiconfLivea) && kConf::hasParam("map_zoom_levels") && kConf::hasParam("cdn_static_hosts"))
 		{
 			$liveAnalytics = array(
 				"uri" => '/apps/liveanalytics/' . kConf::get("liveanalytics_version") . "/index.html",
-				"uiConfId" => $this->contentUiconfLivea->getId()
+				"uiConfId" => $this->contentUiconfLivea->getId(),
+				"map_urls" => array_map(function ($s)
+                {
+                    return "$s/content/static/maps/v1";
+                }, kConf::get("cdn_static_hosts")),
+                "map_zoom_levels" => kConf::get("map_zoom_levels")
 			);
 		}
 
