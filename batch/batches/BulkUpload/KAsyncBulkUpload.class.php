@@ -24,14 +24,14 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 	{
 		return KalturaBatchJobType::BULKUPLOAD;
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
 		ini_set('auto_detect_line_endings', true);
-		try 
+		try
 		{
 			$job = $this->startBulkUpload($job);
 		}
@@ -61,10 +61,11 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 			$job = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
 		ini_set('auto_detect_line_endings', false);
-		
+
 		return $job;
 	}
-	
+
+
 	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::getMaxJobsEachRun()
 	 */
@@ -107,6 +108,12 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 		{
 			self::$kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 			return $this->closeJob($job, null, null, "Retrying: ".$countHandledObjects." ".$engine->getObjectTypeTitle()." objects were handled untill now", KalturaBatchJobStatus::RETRY);
+		}
+
+		//check if all items were done already
+		if(!self::$kClient->batch->updateBulkUploadResults($job->id))
+		{
+			return $this->closeJob($job, null, null, 'Finished successfully', KalturaBatchJobStatus::FINISHED);
 		}
 			
 		return $this->closeJob($job, null, null, 'Waiting for objects closure', KalturaBatchJobStatus::ALMOST_DONE, $data);
