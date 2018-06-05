@@ -20,6 +20,11 @@ class KalturaRoomDetails extends KalturaObject
 	 */
 	public $token;
 
+	/**
+	 * @var int
+	 */
+	public $expiry;
+
 	private static $map_between_objects = array
 	(
 	);

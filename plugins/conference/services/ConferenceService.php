@@ -237,7 +237,11 @@ class ConferenceService extends KalturaBaseService {
 		$outObj = new KalturaRoomDetails();
 		$outObj->serverUrl = $confRoom->buildRoomUrl($this->getPartnerId());
 		$outObj->entryId = $entryId;
-		$outObj->token = $liveStreamEntry->getStreamPassword();
+		$expiry = time() + kConf::get('rtc_token_expiry', null, '60');
+		$rtcSecret = kConf::get('rtc_token_secret');
+		$token = hash_hmac("sha256" ,$entryId . $expiry, $rtcSecret);
+		$outObj->token = $token;
+		$outObj->expiry = $expiry;
 		return $outObj;
 	}
 
