@@ -1920,4 +1920,15 @@ class Partner extends BasePartner
 		return $this->id;
 	}
 
+	/**
+	 * @return mixed
+	 */
+	public function getFreeTrialAccountType()
+	{
+		$additionalParams = $this->getAdditionalParams();
+		if (isset($additionalParams['freeTrialAccountType']))
+			return $additionalParams['freeTrialAccountType'];
+		return null;
+	}
+
 }
