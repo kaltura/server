@@ -4,7 +4,7 @@ ob_start();
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 require_once(__DIR__ . '/../bootstrap.php');
 
-class worker_Status_from_Ini extends Zend_Config_Ini
+class Worker_Status_from_Ini extends Zend_Config_Ini
 {
 
 	protected function _processSection($iniArray, $section, $config = array())
@@ -38,7 +38,7 @@ foreach($files as $file)
 	ob_start();
 	try
 	{
-		$config = new worker_Status_from_Ini($file);
+		$config = new Worker_Status_from_Ini($file);
 	}
 	catch (Zend_Config_Exception $e)
 	{
