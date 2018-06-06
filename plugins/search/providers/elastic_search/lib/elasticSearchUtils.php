@@ -190,6 +190,7 @@ class elasticSearchUtils
 		{
 			self::filterHtmlFromLeaf($value);
 			$value = trim($value);
+			$value = @iconv('utf-8', 'utf-8//IGNORE', $value);
 		}
 	}
 
