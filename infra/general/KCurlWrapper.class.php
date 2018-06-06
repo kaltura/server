@@ -225,7 +225,7 @@ class KCurlWrapper
 		if(!$params || !isset($params->curlVerifySSL) || !$params->curlVerifySSL)
 		{
 			curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, false);
-			curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, 2);
+			curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, self::getSslVerifyHostValue());
 		}
 	}
 
@@ -612,6 +612,17 @@ class KCurlWrapper
 		curl_close($ch);
 		
 		return $content;
+	}
+
+	public static function getSslVerifyHostValue()
+	{
+		$curl_version = curl_version();
+		if($curl_version['version_number'] >= 0x071c01 ) // check if curl version is 7.28.1 or higher
+		{
+			return 2;
+		}
+
+		return 1;
 	}
 }
 
