@@ -19,6 +19,7 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 	 * @var string
 	 */
 	public $thumbAssetId;
+
 	/**
 	 * @var string
 	 */
@@ -125,7 +126,7 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 			if(kFileSyncUtils::fileSync_exists($syncKey))
 			{
 				$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
-				$this->thumbAssetId = $thumbAsset->id;
+				$this->thumbAssetId = $thumbAsset->getId();
 			}
 		}
 		
