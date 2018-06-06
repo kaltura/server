@@ -3127,6 +3127,85 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
+	protected static function getEntriesCategories($ids, $partner_id, $context)
+	{
+		// get the category ids of the entries
+		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
+
+		$c->addSelectColumn(categoryEntryPeer::ENTRY_ID);
+		$c->addSelectColumn('GROUP_CONCAT('.categoryEntryPeer::CATEGORY_ID.')');
+		
+		$c->addGroupByColumn(categoryEntryPeer::ENTRY_ID);
+
+		if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
+		{
+			$c->add(categoryEntryPeer::PARTNER_ID, $partner_id);
+		}
+		$c->add(categoryEntryPeer::ENTRY_ID, $ids, Criteria::IN);
+
+		$stmt = categoryEntryPeer::doSelectStmt($c);
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		
+		$all_categories = array();
+		$result = array();
+		foreach ($rows as $row)
+		{
+			$entry_id = $row['ENTRY_ID'];
+			$categories_ids = $row['GROUP_CONCAT('.categoryEntryPeer::CATEGORY_ID.')'];
+			$categories_ids = explode(',', $categories_ids);
+			foreach ($categories_ids as $category_id)
+			{
+				$all_categories[$category_id] = true;
+			}
+			$result[$entry_id] = $categories_ids; 
+		}
+		
+		// get the names of the categories
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+
+		$c->addSelectColumn(categoryPeer::ID);
+		$c->addSelectColumn(categoryPeer::FULL_NAME);
+
+		if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
+		{
+			$c->add(categoryPeer::PARTNER_ID, $partner_id);
+		}
+		$c->add(categoryPeer::ID, array_keys($all_categories), Criteria::IN);
+
+		categoryPeer::setUseCriteriaFilter(false);
+		$stmt = categoryPeer::doSelectStmt($c);
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		categoryPeer::setUseCriteriaFilter(true);
+		
+		$category_name_map = array();
+		foreach ($rows as $row)
+		{
+			$id = $row['ID'];
+			$full_name = $row['FULL_NAME'];
+			$category_name_map[$id] = $full_name; 
+		}
+		
+		// add the names to the result
+		foreach ($result as $entry_id => $categories_ids)
+		{
+			$names = array();
+			foreach ($categories_ids as $category_id)
+			{
+				if (isset($category_name_map[$category_id]))
+				{
+					$names[] = $category_name_map[$category_id];
+				}
+			}
+			
+			$result[$entry_id] = array(
+				'"' . str_replace('"', '""', implode(',', $categories_ids)) . '"', 
+				'"' . str_replace('"', '""', implode(',', $names)) . '"',
+			);
+		}
+		
+		return $result;
+	}
+	
 	protected static function genericQueryEnrich($ids, $partner_id, $context)
 	{
 		$peer = $context['peer'];
