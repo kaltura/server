@@ -13,8 +13,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 	protected function handleSubmit(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
 	{
 		$videoFilePath = $providerData->videoAssetFilePath;
-		$thumbnailFilePath = $providerData->thumbAssetFilePath;
-
+		$thumbAssetId = $providerData->thumbAssetId;
 		if (!$videoFilePath)
 			throw new KalturaDistributionException('No video asset to distribute, the job will fail');
 
@@ -44,13 +43,28 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		$sftpManager->putFile($videoSFTPPath, $videoFilePath);
 
 		// upload the thumbnail if exists
-		if (file_exists($thumbnailFilePath))
-		{
-			$thumbnailSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($thumbnailFilePath, PATHINFO_BASENAME);
-			$sftpManager->putFile($thumbnailSFTPPath, $thumbnailFilePath);
-		}
+		$this->handleThumbUpload($thumbAssetId, $providerData, $sftpManager);
 
 		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
+	}
+
+	public function handleThumbUpload($thumbAssetId, $providerData, $sftpManager)
+	{
+		$thumbAssetPath = $this->getAssetFile($thumbAssetId, sys_get_temp_dir());
+
+		if ($thumbAssetPath && file_exists($thumbAssetPath))
+		{
+			try
+			{
+				$thumbnailSFTPPath = $providerData->sftpDirectory . '/' . pathinfo($thumbAssetPath, PATHINFO_BASENAME);
+				$sftpManager->putFile($thumbnailSFTPPath, $thumbAssetPath);
+			}
+			catch(Exception $e)
+			{
+				KalturaLog::err($e);
+			}
+			unlink($thumbAssetPath);
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -126,7 +140,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 	 */
 	protected function handleUpdate(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
 	{
-		$thumbnailFilePath = $providerData->thumbAssetFilePath;
+		$thumbAssetId = $providerData->thumbAssetId;
 
 		$sftpManager = $this->getSFTPManager($distributionProfile);
 		$updateCsvMap = unserialize($providerData->updateCsvMap);
@@ -147,11 +161,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
 
 		// upload the thumbnail if exists
-		if (file_exists($thumbnailFilePath))
-		{
-			$thumbnailSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($thumbnailFilePath, PATHINFO_BASENAME);
-			$sftpManager->putFile($thumbnailSFTPPath, $thumbnailFilePath);
-		}
+		$this->handleThumbUpload($thumbAssetId, $providerData, $sftpManager);
 
 		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
 	}

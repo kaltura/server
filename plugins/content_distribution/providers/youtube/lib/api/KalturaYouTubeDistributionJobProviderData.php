@@ -14,7 +14,11 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 	 * @var string
 	 */
 	public $thumbAssetFilePath;
-	
+
+	/**
+	 * @var string
+	 */
+	public $thumbAssetId;
 	/**
 	 * @var string
 	 */
@@ -116,9 +120,13 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 		$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
 		if(count($thumbAssets))
 		{
-			$syncKey = reset($thumbAssets)->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			$thumbAsset = reset($thumbAssets);
+			$syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			if(kFileSyncUtils::fileSync_exists($syncKey))
-			    $this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
+			{
+				$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
+				$this->thumbAssetId = $thumbAsset->id;
+			}
 		}
 		
 		//Add caption Asset id's
