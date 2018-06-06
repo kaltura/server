@@ -14,6 +14,8 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 	{
 		$videoFilePath = $providerData->videoAssetFilePath;
 		$thumbAssetId = $providerData->thumbAssetId;
+		$thumbAssetFilePath = $providerData->thumbAssetFilePath;
+
 		if (!$videoFilePath)
 			throw new KalturaDistributionException('No video asset to distribute, the job will fail');
 
@@ -43,14 +45,14 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		$sftpManager->putFile($videoSFTPPath, $videoFilePath);
 
 		// upload the thumbnail if exists
-		$this->handleThumbUpload($thumbAssetId, $providerData, $sftpManager);
+		$this->handleThumbUpload($thumbAssetId, $providerData, $sftpManager, $thumbAssetFilePath);
 
 		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
 	}
 
-	public function handleThumbUpload($thumbAssetId, $providerData, $sftpManager)
+	public function handleThumbUpload($thumbAssetId, $providerData, $sftpManager, $thumbnailFilePath = null)
 	{
-		$thumbAssetPath = $this->getAssetFile($thumbAssetId, sys_get_temp_dir());
+		$thumbAssetPath = $this->getAssetFile($thumbAssetId, sys_get_temp_dir(), pathinfo($thumbnailFilePath, PATHINFO_BASENAME));
 
 		if ($thumbAssetPath && file_exists($thumbAssetPath))
 		{
@@ -140,6 +142,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 	 */
 	protected function handleUpdate(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
 	{
+		$thumbAssetFilePath = $providerData->thumbAssetFilePath;
 		$thumbAssetId = $providerData->thumbAssetId;
 
 		$sftpManager = $this->getSFTPManager($distributionProfile);
@@ -161,7 +164,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
 
 		// upload the thumbnail if exists
-		$this->handleThumbUpload($thumbAssetId, $providerData, $sftpManager);
+		$this->handleThumbUpload($thumbAssetId, $providerData, $sftpManager, $thumbAssetFilePath);
 
 		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
 	}
