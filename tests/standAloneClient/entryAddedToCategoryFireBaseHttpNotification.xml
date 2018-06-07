@@ -69,7 +69,9 @@
                                 "data": {
                                     "entry_id": "{entry_id}",
                                     "category_id": "{category_id}",
-                                    "partner_id": "{partner_id}"
+                                    "partner_id": "{partner_id}",
+                                    "entry_name": "{entry_name}",
+                                    "category_name": "{category_name}"
                                 },
                                 "condition": "'{partner_id}' in topics || '{partner_id}_{category_id}' in topics"
                             }
