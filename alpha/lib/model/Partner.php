@@ -1021,8 +1021,8 @@ class Partner extends BasePartner
 	public function setTemplateEntriesNum($v)			{$this->putInCustomData('template_entries_num', $v);}
 	public function setTemplateCategoriesNum($v)		{$this->putInCustomData('template_categories_num', $v);}
 	public function setTemplateCustomMetadataNum($v)	{$this->putInCustomData('template_custom_metadata_num', $v);}
-	public function setSubPartnerRequestCampaign($v)	{$this->putInCustomData('sub_partner_request_campaign', $v);}
 	public function setInitialPasswordSet($v)			{$this->putInCustomData('initial_password_set', $v);}
+	public function setAdditionalAccountFailureReason($v)			{$this->putInCustomData('additional_account_failure_reason', $v);}
 
 	public function getLoginUsersQuota()				{return $this->getFromCustomData('login_users_quota', null, 0);}
 	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota', null, 3);}
@@ -1072,8 +1072,8 @@ class Partner extends BasePartner
 	public function getTemplateEntriesNum()				{return $this->getFromCustomData('template_entries_num', null, 0);}
 	public function getTemplateCategoriesNum()			{return $this->getFromCustomData('template_categories_num', null, 0);}
 	public function getTemplateCustomMetadataNum()		{return $this->getFromCustomData('template_custom_metadata_num', null, 0);}
-	public function getSubPartnerRequestCampaign()		{return $this->getFromCustomData('sub_partner_request_campaign', null, 0);}
 	public function getInitialPasswordSet()				{return $this->getFromCustomData('initial_password_set', null, 0);}
+	public function getAdditionalAccountFailureReason()				{return $this->getFromCustomData('additional_account_failure_reason', null, 0);}
 
 
     public function setLiveStreamBroadcastUrlConfigurations($key, $value)
