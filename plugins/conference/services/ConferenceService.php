@@ -85,7 +85,7 @@ class ConferenceService extends KalturaBaseService {
 		$confEntryServerNode->setPartnerId($this->getPartnerId());
 		$confEntryServerNode->save();
 
-		$outObj = $this->getRoomDetails($entryId, $confEntryServerNode);
+		$outObj = $this->getRoomDetails($entryId, $confEntryServerNode, $serverNode);
 		return $outObj;
 	}
 
@@ -110,7 +110,7 @@ class ConferenceService extends KalturaBaseService {
 
 			$existingConfRoom->setLastAllocationTime(time());
 
-			$outObj = $this->getRoomDetails($entryId, $existingConfRoom);
+			$outObj = $this->getRoomDetails($entryId, $existingConfRoom, $serverNode);
 			return $outObj;
 		}
 		return null;
@@ -226,7 +226,7 @@ class ConferenceService extends KalturaBaseService {
 	 * @return KalturaRoomDetails
 	 * @throws kCoreException
 	 */
-	protected function getRoomDetails($entryId, ConferenceEntryServerNode $confRoom)
+	protected function getRoomDetails($entryId, ConferenceEntryServerNode $confRoom, ConferenceServerNode $serverNode)
 	{
 		$liveStreamEntry = entryPeer::retrieveByPK($entryId);
 		/** @var LiveStreamEntry $liveStreamEntry */
@@ -242,6 +242,7 @@ class ConferenceService extends KalturaBaseService {
 		$token = hash_hmac("sha256" ,$entryId . $expiry, $rtcSecret);
 		$outObj->token = $token;
 		$outObj->expiry = $expiry;
+		$outObj->serverName = $serverNode->getHostName();
 		return $outObj;
 	}
 
