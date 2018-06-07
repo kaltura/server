@@ -126,7 +126,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const ENTRY_CATEGORY_ESCAPE = "_";
 	const ENTRY_CATEGORY_SEPARATOR = ",";
 	
-	const ENTRY_ID_THAT_DOES_NOT_EXIST = "noneExistingEntryId";
+	const ENTRY_ID_THAT_DOES_NOT_EXIST = "noneExistingId";
 	
 	const CATEGORY_SEARCH_PERFIX = 'c';
 	const CATEGORY_PARENT_SEARCH_PERFIX = 'p';
