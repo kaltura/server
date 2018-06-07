@@ -25,6 +25,11 @@ class KalturaRoomDetails extends KalturaObject
 	 */
 	public $expiry;
 
+	/**
+	 * @var string
+	 */
+	public $serverName;
+
 	private static $map_between_objects = array
 	(
 	);
