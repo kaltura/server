@@ -7,7 +7,7 @@
 		const MinFileSize = 1;
 		const MaxFileSize = 40000000000;		// 40GB
 		const MinDimension = 10;
-		const MaxDimension = 5000;		// 
+		const MaxDimension = 6200;		// 
 	
 		const MinFramerate = 2;
 		const MaxFramerate = 90;		// 
