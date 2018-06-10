@@ -161,7 +161,7 @@ kmcng:
   param: { module: kmcng , action: kmcng }
 
 kmcng_reset_password:
-    url:   /kmcng/resetpassword
+    url:   /kmcng/resetpassword/*
     param: { module: kmcng , action: resetpassword }
 
 kmcng_default:

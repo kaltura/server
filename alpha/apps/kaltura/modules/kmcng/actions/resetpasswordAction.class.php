@@ -3,7 +3,7 @@
  * @package    Core
  * @subpackage KMCNG
  */
-class getpartnerAction extends kalturaAction
+class resetpasswordAction extends kalturaAction
 {
 	const BASE64_ENCODE_CHARS_REGEX = "/^[a-zA-Z0-9\/\+\=]+$/";
 
