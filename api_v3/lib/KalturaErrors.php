@@ -10,7 +10,7 @@ class KalturaErrors extends APIErrors
 	 *
 	 */
 	const CANNOT_RETRIEVE_ANOTHER_USER_USING_NON_ADMIN_SESSION = "CANNOT_RETRIEVE_ANOTHER_USER_USING_NON_ADMIN_SESSION;USER_ID;cannot retrieve another user \"@USER_ID@\" using non-admin session";
-	
+
 	//
 	const INTERNAL_SERVERL_ERROR = "INTERNAL_SERVERL_ERROR;;Internal server error occurred";
 
@@ -37,10 +37,10 @@ class KalturaErrors extends APIErrors
 
 	// ACTION_NAME - action name, SERVICE_NAME - service name
 	const ACTION_BLOCKED = "ACTION_BLOCKED;ACTION_NAME,SERVICE_NAME;Action \"@ACTION_NAME@\" in service \"@SERVICE_NAME@\" is blocked";
-	
+
 	// ACTION_NAME - action name, SERVICE_NAME - service name
 	const ACTION_DOES_NOT_EXISTS = "ACTION_DOES_NOT_EXISTS;ACTION_NAME,SERVICE_NAME;Action \"@ACTION_NAME@\" does not exists for service \"@SERVICE_NAME@\"";
-	
+
 	// ACTION_NAME - action name
 	const ACTION_FORBIDDEN = "ACTION_FORBIDDEN;ACTION_NAME;Action \"@ACTION_NAME@\" is forbidden for use";
 
@@ -102,13 +102,13 @@ class KalturaErrors extends APIErrors
 	const SCHEDULE_EVENT_ID_NOT_FOUND = "SCHEDULE_EVENT_ID_NOT_FOUND;ID;Schedule Event id [@ID@] not found";
 
 	const LOCK_TIMED_OUT = "LOCK_TIMED_OUT;;Timed out while attempting to grab lock";
-	
+
 	const MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED = "MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED;OBJECT_ID;Max update limit was reached. Object ID \"@OBJECT_ID@\" will not updated with latest chnages";
 
 	const RESOURCE_IS_RESERVED = "RESOURCE_IS_RESERVED;RESOURCE_ID;Resource with id @RESOURCE_ID@ is already reserved";
-	
+
 	const FAILED_TO_CALCULATE_DYNAMIC_DEPENDENT_VALUE = "FAILED_TO_CALCULATE_DYNAMIC_DEPENDENT_VALUE;DYNAMIC_VALUE;Dynamic dependent value \"@DYNAMIC_VALUE@\" not found";
-	
+
 	/**
 	 * Service Oriented Errors
 	 *
@@ -147,13 +147,13 @@ class KalturaErrors extends APIErrors
 	const RECORDED_WEBCAM_FILE_NOT_FOUND = "RECORDED_WEBCAM_FILE_NOT_FOUND;;The recorded webcam file was not found by the given token id, or was already used";
 
 	const INVALID_WEBCAM_TOKEN_ID = "INVALID_WEBCAM_TOKEN_ID;;Invalid webcam token id";
-	
+
 	const PERMISSION_DENIED_TO_UPDATE_ENTRY = "PERMISSION_DENIED_TO_UPDATE_ENTRY;;User can update only the entries he own, otherwise an admin session must be used";
 
 	const INVALID_RANK_VALUE = "INVALID_RANK_VALUE;;Invalid rank value, rank should be between 1 and 5";
 
 	const MAX_CATEGORIES_FOR_ENTRY_REACHED = "MAX_CATEGORIES_FOR_ENTRY_REACHED;CATEGORIES;Entry can be linked with a maximum of \"@CATEGORIES@\" categories";
-	
+
 	const MAX_ASSETS_FOR_ENTRY_REACHED = "MAX_ASSETS_FOR_ENTRY_REACHED;ASSETS;Entry can contain maximum of \"@ASSETS@\" assets";
 
 	const INVALID_ENTRY_SCHEDULE_DATES = "INVALID_ENTRY_SCHEDULE_DATES;;Invalid entry schedule dates";
@@ -207,23 +207,23 @@ class KalturaErrors extends APIErrors
 	const MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED = "MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED;MAX_NUM;Max number of \"@MAX_NUM@\" access controls was reached";
 
 	const CANNOT_DELETE_DEFAULT_ACCESS_CONTROL = "CANNOT_DELETE_DEFAULT_ACCESS_CONTROL;;Default access control cannot be deleted";
-	
+
 	const EXCEEDED_ENTRIES_PER_ACCESS_CONTROL_FOR_UPDATE = "EXCEEDED_ENTRIES_PER_ACCESS_CONTROL_FOR_UPDATE;id;exceeded entries per access control id @id@ for update";
-	
+
 	const CANNOT_TRANSFER_ENTRIES_TO_ANOTHER_ACCESS_CONTROL_OBJECT = "CANNOT_TRANSFER_ENTRIES_TO_ANOTHER_ACCESS_CONTROL_OBJECT;;no default access control for current partner";
 
 	/**
 	 * App Token
 	 */
 	const APP_TOKEN_ID_NOT_FOUND = "APP_TOKEN_ID_NOT_FOUND;ID;Application token id \"@ID@\" not found";
-	
+
 	const APP_TOKEN_NOT_ACTIVE = "APP_TOKEN_NOT_ACTIVE;ID;Application token id \"@ID@\" not active";
-	
+
 	const APP_TOKEN_EXPIRED = "APP_TOKEN_EXPIRED;ID;Application token id \"@ID@\" expired";
-	
+
 	const INVALID_APP_TOKEN_HASH = "INVALID_APP_TOKEN_HASH;;Invalid application token hash";
-	
-	
+
+
 	/**
 	 * ConversionProfile Service
 	 */
@@ -293,7 +293,7 @@ class KalturaErrors extends APIErrors
 	const THUMB_ASSET_DOWNLOAD_FAILED = "THUMB_ASSET_DOWNLOAD_FAILED;URL_PATH;Failed to download thumbnail from URL \"@URL_PATH@\"";
 
 	const THUMB_ASSET_IS_DEFAULT = "THUMB_ASSET_IS_DEFAULT;ASSET;Thumbnail asset \"@ASSET@\" is default and could not be deleted";
-	
+
 	const THUMB_ASSET_ID_IS_NOT_TIMED_THUMB_TYPE = "THUMB_ASSET_IS_NOT_OF_TYPE_TIMED_THUMB;ASSET;Thumbnail asset \"@ASSET@\" is not of type timed thumb";
 
 	/**
@@ -334,7 +334,7 @@ class KalturaErrors extends APIErrors
 	const CANNOT_SET_OWNER_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_OWNER_FIELD_WITH_NO_PRIVACY_CONTEXT;;Cannot set owner field when privacy context is not set on the categroy";
 
 	const CANNOT_SET_USER_JOIN_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_USER_JOIN_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT;;Cannot set user join policy field when privacy context is not set on the categroy";
-	
+
 	const CANNOT_SET_OWNER_FIELD_WITH_USER_ID = "CANNOT_SET_OWNER_FIELD_WITH_USER_ID;ID;Cannot set owner field with user id \"@ID@\", user id is invalid";
 
 	const CANNOT_SET_CONTIRUBUTION_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_CONTIRUBUTION_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT;;Cannot set contribution policy field when privacy context is not set on the categroy";
@@ -348,11 +348,11 @@ class KalturaErrors extends APIErrors
 	const CANNOT_SET_USER_JOIN_POLICY_WHEN_CATEGORY_INHERIT_MEMBERS = "CANNOT_SET_USER_JOIN_POLICY_WHEN_CATEGORY_INHERIT_MEMBERS;;Cannot set user join policy when category is set to inherit";
 
 	const CANNOT_SET_DEFAULT_PERMISSION_LEVEL_WHEN_CATEGORY_INHERIT_MEMBERS = "CANNOT_SET_DEFAULT_PERMISSION_LEVEL_WHEN_CATEGORY_INHERIT_MEMBERS;;Cannot set default permission level when category is set to inherit";
-	
+
 	const CANNOT_SET_MULTI_PRIVACY_CONTEXT = "CANNOT_SET_MULTI_PRIVACY_CONTEXT;; Cannot set multiple privacy context when Disable Category Limit feature is turned on";
 
 	const AGGREGATION_CATEGORY_WRONG_ASSOCIATION = "AGGREGATION_CATEGORY_WRONG_ASSOCIATION;; Cannot create aggregation category association";
-	
+
 	/**
 	 * Batch Service
 	 */
@@ -400,7 +400,7 @@ class KalturaErrors extends APIErrors
 	const UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE = "UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE;;Failed to match expected file size";
 
 	const UPLOAD_TOKEN_FILE_TYPE_RESTRICTED_FOR_UPLOAD = "UPLOAD_TOKEN_FILE_TYPE_RESTRICTED_FOR_UPLOAD;;Upload token is restricted due to the file type";
-	
+
 	const UPLOAD_TOKEN_MISSING_FILE_SIZE = "UPLOAD_TOKEN_MISSING_FILE_SIZE;;FileSize is mandatory when enabling autoFinalize";
 
 	/*
@@ -440,9 +440,9 @@ class KalturaErrors extends APIErrors
 	const PERMISSION_ITEM_NOT_FOUND = "PERMISSION_ITEM_NOT_FOUND;;Permission item does not exists";
 
 	const PROPERTY_DEPRECATED = "PROPERTY_DEPRECTAED;PROP;The property \"@PROP@\" is deprecated and should not be used";
-	
+
 	const PROPERTY_IS_NOT_DEFINED = "PROPERTY_IS_NOT_DEFINED;PROP,TYPE;The property \"@PROP@\" is not defined on type \"@TYPE@\"";
-	
+
 	/*
 	 * syndication service
 	 */
@@ -467,14 +467,14 @@ class KalturaErrors extends APIErrors
 
 	const FILE_NOT_FOUND = "FILE_NOT_FOUND;;File not found";
 
-	const STORAGE_PROFILE_ID_NOT_FOUND = "STORAGE_PROFILE_ID_NOT_FOUND;ID;Storage profile id @ID@ not found";	
-	
+	const STORAGE_PROFILE_ID_NOT_FOUND = "STORAGE_PROFILE_ID_NOT_FOUND;ID;Storage profile id @ID@ not found";
+
 	const STORAGE_PROFILE_RULES_NOT_FULFILLED = "STORAGE_PROFILE_RULES_NOT_FULFILLED;ID;Storage profile rules for profile id @ID@ are not fulfilled";
-	
+
 	const FILE_PENDING = "FILE_PENDING;;File is pending";
 
 	const FILE_TYPE_NOT_SUPPORTED = "FILE_TYPE_NOT_SUPPORTED;TYPE;File type @TYPE@ is not supported";
-	
+
 	/*
 	 * resetUserPassword
 	 */
@@ -563,82 +563,82 @@ class KalturaErrors extends APIErrors
 	const CANNOT_LIST_RELATED_ENTITLED_WHEN_ENTITLEMENT_IS_ENABLE = "CANNOT_LIST_RELATED_ENTITLED_WHEN_ENTITLEMENT_IS_ENABLE;FILTER;Objects that require entitlement should not be listed [@FILTER@] as related-objects when enetitlment is enabled";
 
 	const USER_KS_CANNOT_LIST_RELATED_ENTRIES = "USER_KS_CANNOT_LIST_RELATED_ENTRIES;FILTER;Entries should not be listed [@FILTER@] as related-objects with unprivileged user ks";
-	
+
 	// live stream
 	const LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED = "LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED;PROT;Status cannot be determined for live stream protocol [@PROT@]";
 
 	const ENCODING_IP_NOT_PINGABLE = "ENCODING_IP_NOT_PINGABLE;;One or both of the provided encoding IPs is not pingable";
-	
+
 	const EXTENDING_ITEM_INCOMPATIBLE_COMBINATION = "EXTENDING_ITEM_INCOMPATIBLE_COMBINATION;;This extending object MRSS must replace the XPath contents";
-	
+
 	const EXTENDING_ITEM_MISSING_XPATH = "EXTENDING_ITEM_MISSING_XPATH;;Extending item must contain xpath";
-	
+
 	const LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND = 'LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND;SEGMENT_ID;Live channel segment id [@SEGMENT_ID@] not found';
-	
+
 	const LIVE_STREAM_INVALID_TOKEN = "LIVE_STREAM_INVALID_TOKEN;ENTRY_ID;Invalid token supplied for live entry [@ENTRY_ID@]";
-	
+
 	const LIVE_STREAM_EXCEEDED_MAX_PASSTHRU = "LIVE_STREAM_EXCEEDED_MAX_PASSTHRU;ENTRY_ID;Partner exceeded max pass-through live streams in entry[@ENTRY_ID@]";
-	
+
 	const LIVE_STREAM_EXCEEDED_MAX_TRANSCODED = "LIVE_STREAM_EXCEEDED_MAX_TRANSCODED;ENTRY_ID;Partner exceeded max concurrent transcoded live streams in entry[@ENTRY_ID@]";
-	
-	const LIVE_STREAM_EXCEEDED_MAX_RTC_STREAMS = "LIVE_STREAM_EXCEEDED_MAX_RTC_STREAMS;PARTNER_ID;Partner [@PARTNER_ID@] exceeded max concurrent rtc streams allowed";
-	
+
+	const LIVE_STREAM_EXCEEDED_MAX_RTC_STREAMS = "LIVE_STREAM_EXCEEDED_MAX_RTC_STREAMS;PARTNER_ID,ALLOWED;Partner [@PARTNER_ID@] exceeded max concurrent rtc streams allowed [@ALLOWED@]";
+
 	const LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION = "LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION;ENTRY_ID;Entry exceeded max recorded live stream duration in entry[@ENTRY_ID@]";
-	
+
 	const LIVE_STREAM_ALREADY_BROADCASTING = "LIVE_STREAM_ALREADY_BROADCASTING;ENTRY_ID,MEDIA_SERVER;Entry [@ENTRY_ID@] already broadcasting to server [@MEDIA_SERVER@]";
-	
+
 	const CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING = "CANNOT_UPDATE_FIELDS_WHILE_ENTRY_BROADCASTING;FIELD;Cannot update [@FIELD@] while entry is broadcasting";
-	
+
 	const CANNOT_UPDATE_FIELDS_RECORDED_ENTRY_STILL_NOT_READY = "CANNOT_UPDATE_FIELDS_RECORDED_ENTRY_STILL_NOT_READY;FIELD;Cannot update [@FIELD@] while all vod entry flavors are not ready";
-	
+
 	const CANNOT_REGENERATE_STREAM_TOKEN_FOR_EXTERNAL_LIVE_STREAMS = "CANNOT_REGENERATE_STREAM_TOKEN_FOR_EXTERNAL_LIVE_STREAMS;TYPE;Cannot regenerate stream token for external type [@TYPE@] live stream";
-	
+
 	const KALTURA_RECORDING_ENABLED = "KALTURA_RECORDING_ENABLED;PARTNER_ID;Kaltura recording is enabled for partner [@PARTNER_ID@] use liveStream->setRecordedContent to set the live recorded content";
-	
+
 	const KALTURA_RECORDING_DISABLED = "KALTURA_RECORDING_DISABLED;PARTNER_ID;Kaltura recording is disabled for partner [@PARTNER_ID@] use liveStream->appendRecording to set the live recorded content";
-	
+
 	const RECORDING_DISABLED = "RECORDING_DISABLED;;Record status attribute cannot be set, account has recording feature disabled";
-	
+
 	const LIVE_CLIPPING_UNSUPPORTED_OPERATION = "LIVE_CLIPPING_UNSUPPORTED_OPERATION;OPERATION; Unsupported operation for live clipping: @OPERATION@";
-	
+
 	/*
 	 * BaseEntry Service
 	 */
-	
+
 	const DELIVERY_TYPE_NOT_SPECIFIED = "DELIVERY_TYPE_NOT_SPECIFIED;;At least one non auto delivery type must be specified";
-	
+
 	const SPHINX_CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED = "QUERY_EXCEEDED_MAX_MATCHES_ALLOWED;;Unable to generate list. max matches value was reached";
-	
+
 	const ASSIGNING_INFO_TO_ENTRY_WITH_PARENT_IS_FORBIDDEN = "ASSIGNING_INFO_TO_ENTRY_WITH_PARENT_IS_FORBIDDEN;ID;assigning categories|scheduling|access control to entry with parent entry \"@ID@\" is not allowed";
-	
+
 	const PARENT_ENTRY_ID_NOT_FOUND = "PARENT_ENTRY_ID_NOT_FOUND;ID;parent entry id \"@ID@\" not found";
-	
+
 	/*
 	 * FileAsset Service
 	 */
-	
+
 	const FILE_ASSET_ID_NOT_FOUND = "FILE_ASSET_ID_NOT_FOUND;ASSET_ID;File asset id [\"@ASSET_ID@\"] not found";
-	
+
 	/*
 	 * MediaServer Service
 	 */
 	const MEDIA_SERVER_NOT_FOUND = "MEDIA_SERVER_NOT_FOUND;MEDIA_SERVER_ID;Media server [@MEDIA_SERVER_ID@] not found";
-	
+
 	const NO_MEDIA_SERVER_FOUND = "NO_MEDIA_SERVER_FOUND;ENTRY_ID;No media server found for entry [@ENTRY_ID@]";
-	
+
 	const MEDIA_SERVER_SERVICE_NOT_FOUND = "MEDIA_SERVER_SERVICE_NOT_FOUND;MEDIA_SERVER_ID,SERVICE;Media server [@MEDIA_SERVER_ID@] service [@SERVICE@] not found";
-	
+
 	/*
     * Delivery Service
     */
 	const DELIVERY_ID_NOT_FOUND = 'DELIVERY_ID_NOT_FOUND;DELIVERY_ID;delivery id [@DELIVERY_ID@] not found';
 	const DELIVERY_UPDATE_ISNT_ALLOWED = 'DELIVERY_UPDATE_ISNT_ALLOWED;DELIVERY_ID;delivery id [@DELIVERY_ID@] is default and can\'t be set';
-	
+
 	/*
 	 * Live reports Service
 	 */
 	const LIVE_REPORTS_WS_FAILURE = 'LIVE_REPORTS_WS_FAILURE;;failed to retrieve live analytics';
-	
+
 	/*
 	 * Analytics Service
 	 */
@@ -649,22 +649,22 @@ class KalturaErrors extends APIErrors
 	const ANALYTICS_UNSUPPORTED_DIMENSION = 'ANALYTICS_UNSUPPORTED_DIMENSION;DIMENSION;Dimension [@DIMENSION@] is not supported';
 	const ANALYTICS_UNSUPPORTED_QUERY = 'ANALYTICS_UNSUPPORTED_QUERY;;Query for the given dimensions and metrics is currently not supported';
 
-	
+
 	/*
 	 * Response Profiles
 	 */
 	const RESPONSE_PROFILE_NAME_NOT_FOUND = 'RESPONSE_PROFILE_NAME_NOT_FOUND;SYSTEM_NAME;Response profile name [@SYSTEM_NAME@] not found';
-	
+
 	const RESPONSE_PROFILE_ID_NOT_FOUND = 'RESPONSE_PROFILE_ID_NOT_FOUND;ID;Response profile id [@ID@] not found';
-	
+
 	const RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME = 'RESPONSE_PROFILE_DUPLICATE_SYSTEM_NAME;SYSTEM_NAME;Response profile system-name [@SYSTEM_NAME@] already exists';
-	
+
 	const RESPONSE_PROFILE_MAX_NESTING_LEVEL = 'RESPONSE_PROFILE_MAX_NESTING_LEVEL;;Response profile cross maximum nesting level';
-	
+
 	const RESPONSE_PROFILE_CACHE_NOT_FOUND = 'RESPONSE_PROFILE_MAX_NESTING_LEVEL;KEY;Response-Profile key [@KEY@] not found in cache';
-	
+
 	const RESPONSE_PROFILE_CACHE_ALREADY_RECALCULATED = 'RESPONSE_PROFILE_CACHE_ALREADY_RECALCULATED;;Response-Profile cache was recalculated already by a different process';
-	
+
 	const RESPONSE_PROFILE_CACHE_RECALCULATE_RESTARTED = 'RESPONSE_PROFILE_CACHE_RECALCULATE_RESTARTED;;Response-Profile cache recalculate was restarted by a different process';
 
 	/*
@@ -677,7 +677,7 @@ class KalturaErrors extends APIErrors
 	const USER_ENTRY_FILTER_FORBIDDEN_FIELDS_USED = 'USER_ENTRY_FILTER_FORBIDDEN_FIELDS_USED;;UserEntry filter object forbidden fields used';
 	const USER_ENTRY_ALREADY_EXISTS = 'USER_ENTRY_ALREADY_EXISTS;;UserEntry for this type already exists';
 	const USER_ID_NOT_PROVIDED_OR_EMPTY = 'USER_ID_NOT_PROVIDED_OR_EMPTY;;User ID not found neither on the object or KS';
-	
+
 	/*
 	 * serverNode service
 	 */
@@ -694,7 +694,7 @@ class KalturaErrors extends APIErrors
 	const ENTRY_SERVER_NODE_MULTI_RESULT = "ENTRY_SERVER_NODE_NOT_FOUND;ENTRY_ID,SERVER_TYPE;There were several results for entry server node with entry id [@ENTRY_ID@] and server type [@SERVER_TYPE@]";
 	const MUST_FILTER_ON_ENTRY_OR_SERVER_TYPE = "MUST_FILTER_ON_ENTRY_OR_SERVER_TYPE;;Must filter on entry id or server type";
 	const ENTRY_SERVER_NODE_OBJECT_TYPE_ERROR = "ENTRY_SERVER_NODE_OBJECT_TYPE_ERROR;OBJ_TYPE,ENTRY_SERVER_NODE_ID;There is an error in the DB, object type [@OBJ_TYPE@] of EntryServerNode id [@ENTRY_SERVER_NODE_ID@] is unknown";
-	
+
 	/*
 	 * OTP error
 	 */
