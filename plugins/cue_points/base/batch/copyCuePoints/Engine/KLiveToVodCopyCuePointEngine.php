@@ -86,7 +86,7 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
             $amfArray[$key]->pts = $amfArray[$key]->pts  + $totalVodDuration - $currentSegmentDuration;
     }
 
-    protected static function getOffsetForTimestamp($timestamp, $amfArray)
+    protected static function getOffsetForTimestamp($timestamp, $amfArray, $overrideNegative = true)
     {
         $minDistanceAmf = self::getClosestAMF($timestamp, $amfArray);
         $ret = 0;
@@ -97,7 +97,8 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
         else
             $ret = $minDistanceAmf->pts + ($timestamp - $minDistanceAmf->ts);
         // make sure we don't get a negative time
-        $ret = max($ret,0);
+        if ($overrideNegative)
+            $ret = max($ret,0);
         KalturaLog::debug('AMFs array is:' . print_r($amfArray, true) . 'getOffsetForTimestamp returning ' . $ret);
         return $ret;
     }
