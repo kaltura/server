@@ -1,12 +1,12 @@
 # Naos 14.0.0 #
-KMS GO: Push Notification specific Message
-Issue Type: new template
-Issue ID: PLAT-8980
+## KMS Go: change firebase notification template ##
+- Issue type : new template
+- Issue ID: PLAT-8980
 
-Configuration
+### Configuration ###
 None.
 
-Deployment scripts
+### Deployment scripts ###
 Disable current "EntryCategory added FireBase" event notification template
 
 php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/entryAddedToCategoryFireBaseHttpNotification.xml
@@ -15,7 +15,7 @@ php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/stan
 - Issue Type: New Feature
 - Issue ID: WEBC-1188
 
-### Configuration ##
+### Configuration ###
 Add 
 ```
     rtc_token_secret = <secret_value>
