@@ -79,8 +79,6 @@ class ServerNodePeer extends BaseServerNodePeer {
 		$criteria = new Criteria(ServerNodePeer::DATABASE_NAME);
 		$criteria->add(ServerNodePeer::ID, $pk);
 		$criteria->add(ServerNodePeer::STATUS, ServerNodeStatus::ACTIVE);
-		$criteria->add(ServerNodePeer::HEARTBEAT_TIME, time() - ServerNode::SERVER_NODE_TTL_TIME, Criteria::GREATER_EQUAL);
-		$criteria->addOr(ServerNodePeer::HEARTBEAT_TIME, null);
 	
 		return ServerNodePeer::doSelectOne($criteria, $con);
 	
@@ -95,8 +93,6 @@ class ServerNodePeer extends BaseServerNodePeer {
 			$criteria = new Criteria(ServerNodePeer::DATABASE_NAME);
 			$criteria->add(ServerNodePeer::ID, $pks, Criteria::IN);
 			$criteria->add(ServerNodePeer::STATUS, ServerNodeStatus::ACTIVE);
-			$criteria->add(ServerNodePeer::HEARTBEAT_TIME, time() - ServerNode::SERVER_NODE_TTL_TIME, Criteria::GREATER_EQUAL);
-			$criteria->addOr(ServerNodePeer::HEARTBEAT_TIME, null);
 			$orderBy = "FIELD (" . self::ID . "," . implode(",", $pks) . ")";  // first take the pattner_id and then the rest
 			$criteria->addAscendingOrderByColumn($orderBy);
 			$objs = ServerNodePeer::doSelect($criteria, $con);
@@ -139,8 +135,6 @@ class ServerNodePeer extends BaseServerNodePeer {
 		$c = new Criteria();
 		$c->add(ServerNodePeer::STATUS, ServerNodeStatus::ACTIVE);
 		$c->add(ServerNodePeer::TYPE, $type);
-		$c->add(ServerNodePeer::HEARTBEAT_TIME, time() - ServerNode::SERVER_NODE_TTL_TIME, Criteria::GREATER_EQUAL);
-		$c->addOr(ServerNodePeer::HEARTBEAT_TIME, null);
 		$c->add(EntryServerNodePeer::SERVER_NODE_ID, null);
 		$c->addJoin(ServerNodePeer::ID, EntryServerNodePeer::SERVER_NODE_ID, Criteria::LEFT_JOIN);
 		$c->setLimit(3);
