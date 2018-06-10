@@ -144,9 +144,7 @@ while(true)
                 //we save the elastic command as serialized object in the sql field
                 $command = $elasticLog->getSql();
                 $command = unserialize($command);
-                $action = $command['action'];
-
-                $response = $elasticClient->$action($command);
+                $response = $elasticClient->addToBulk($command);
             }
 
             // If the record is an historical record, don't take back the last log id
@@ -165,6 +163,15 @@ while(true)
         {
             KalturaLog::err($e->getMessage());
         }
+    }
+
+    try
+    {
+        $response = $elasticClient->flushBulk();
+    }
+    catch(Exception $e)
+    {
+        KalturaLog::err($e->getMessage());
     }
 
     foreach ($lastLogs as $serverLastLog)
