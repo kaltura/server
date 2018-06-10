@@ -84,10 +84,9 @@ class kmcngAction extends kalturaAction
 			$serverAPIUri = $kmcngParams["kmcng_custom_uri"];
 
 		$this->playerV3VersionsUiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, "latest");
-		$this->content_uiconfs_player_v3_versions = isset($this->playerV3VersionsUiConf) ? array_values         ($this->playerV3VersionsUiConf) : null;
-		if (is_array($this->content_uiconfs_player_v3_versions)) {
-			$this->content_uiconf_player_v3_versions = reset($this->content_uiconfs_player_v3_versions);
-		}
+		$this->content_uiconfs_player_v3_versions = isset($this->playerV3VersionsUiConf) ? array_values($this->playerV3VersionsUiConf) : null;
+		$this->content_uiconf_player_v3_versions = (is_array($this->content_uiconfs_player_v3_versions) && reset($this->content_uiconfs_player_v3_versions)) ? reset($this->content_uiconfs_player_v3_versions) : null;
+
 
 		$studio = null;
 		if (kConf::hasParam("studio_version") && kConf::hasParam("html5_version"))
@@ -107,21 +106,17 @@ class kmcngAction extends kalturaAction
 				"html5_version" => kConf::get("html5_version"),
 				"html5lib" => $secureCDNServerUri . "/html5/html5lib/" . kConf::get("html5_version") . "/mwEmbedLoader.php",
 				"playerVersionsMap" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfig() : ''
-                 			);
 			);
 		}
 
 		$liveAnalytics = null;
-		if (kConf::hasParam("liveanalytics_version") && isset($this->contentUiconfLivea) && kConf::hasParam("map_zoom_levels") && kConf::hasParam("cdn_static_hosts"))
+		if (kConf::hasParam("liveanalytics_version"))
 		{
 			$liveAnalytics = array(
 				"uri" => '/apps/liveanalytics/' . kConf::get("liveanalytics_version") . "/index.html",
-				"uiConfId" => $this->contentUiconfLivea->getId(),
-				"map_urls" => array_map(function ($s)
-                {
-                    return "$s/content/static/maps/v1";
-                }, kConf::get("cdn_static_hosts")),
-                "map_zoom_levels" => kConf::get("map_zoom_levels")
+				"uiConfId" => isset($this->contentUiconfLivea) ? $this->contentUiconfLivea->getId() : 0,
+				"mapUrls" => kConf::hasParam ("cdn_static_hosts") ? array_map(function($s) {return "$s/content/static/maps/v1";}, kConf::get ("cdn_static_hosts")) : array(),
+                "mapZoomLevels" => kConf::hasParam("map_zoom_levels") ? kConf::get("map_zoom_levels") : ''
 			);
 		}
 
@@ -160,7 +155,7 @@ class kmcngAction extends kalturaAction
 				'securedServerUri' => $secureCDNServerUri
 			),
 			"externalApps" => array(
-				"studio" => $studio,
+				"studioV2" => $studio,
 				"studioV3" => $studioV3,
 				"liveAnalytics" => $liveAnalytics,
 				"liveDashboard" => $liveDashboard,
