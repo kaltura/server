@@ -15,17 +15,10 @@ class KalturaDeliveryProfileLivePackagerHls extends KalturaDeliveryProfileLivePa
 	 */
 	public $forceProxy;
 	
-	/**
-	 * Domain used to sign the live url
-	 * @var string
-	 */
-	public $livePackagerSigningDomain;
-	
 	private static $map_between_objects = array
 	(
 		"disableExtraAttributes",
 		"forceProxy",
-		"livePackagerSigningDomain",
 	);
 	
 	public function getMapBetweenObjects ( )

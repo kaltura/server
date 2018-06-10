@@ -16,12 +16,6 @@ class Form_Delivery_DeliveryProfileLivePackagerHls extends Form_Delivery_Deliver
 			'label'			=> 'Force proxy:',
 		));
 		
-		$this->addElement('text', 'livePackagerSigningDomain', array(
-			'label' 		=> 'Live Packager Signing Domain:',
-			'required'		=> false,
-			'filters'		=> array('StringTrim'),
-		));
-		
 		return array('disableExtraAttributes', 'forceProxy', 'livePackagerSigningDomain');
 	}
 }
