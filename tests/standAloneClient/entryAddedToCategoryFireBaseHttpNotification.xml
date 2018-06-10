@@ -64,12 +64,15 @@
                                 "notification": {
                                     "title": "New Media was added",
                                     "body": "{entry_name} was added to {category_name}",
-                                    "badge": 1
+                                    "badge": 1,
+                                    "e":0
                                 },
                                 "data": {
                                     "entry_id": "{entry_id}",
                                     "category_id": "{category_id}",
-                                    "partner_id": "{partner_id}"
+                                    "partner_id": "{partner_id}",
+                                    "entry_name": "{entry_name}",
+                                    "category_name": "{category_name}"
                                 },
                                 "condition": "'{partner_id}' in topics || '{partner_id}_{category_id}' in topics"
                             }
