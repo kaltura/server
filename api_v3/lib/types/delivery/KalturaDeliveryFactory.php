@@ -31,7 +31,6 @@ class KalturaDeliveryProfileFactory {
 				return new KalturaDeliveryProfileAkamaiAppleHttpManifest();
 			case KalturaDeliveryProfileType::AKAMAI_HDS:
 				return new KalturaDeliveryProfileAkamaiHds();
-			case KalturaDeliveryProfileType::LIVE_PACKAGER_HLS:
 			case KalturaDeliveryProfileType::LIVE_HLS:
 				return new KalturaDeliveryProfileLiveAppleHttp();
 			case KalturaDeliveryProfileType::GENERIC_SS:
@@ -45,6 +44,12 @@ class KalturaDeliveryProfileFactory {
 				return new KalturaDeliveryProfileVodPackagerPlayServer();
 			case KalturaDeliveryProfileType::VOD_PACKAGER_MSS:
 				return new KalturaDeliveryProfileVodPackagerPlayServer();
+			case KalturaDeliveryProfileType::LIVE_PACKAGER_HLS:
+				return new KalturaDeliveryProfileLivePackagerHls();
+			case KalturaDeliveryProfileType::LIVE_PACKAGER_DASH:
+			case KalturaDeliveryProfileType::LIVE_PACKAGER_MSS:
+			case KalturaDeliveryProfileType::LIVE_PACKAGER_HDS:
+				return new KalturaDeliveryProfileLivePackager();
 			default:
 				$obj = KalturaPluginManager::loadObject('KalturaDeliveryProfile', $type);
 				if(!$obj)
