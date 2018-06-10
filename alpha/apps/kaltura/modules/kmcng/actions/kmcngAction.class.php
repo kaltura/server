@@ -148,6 +148,7 @@ class kmcngAction extends kalturaAction
 			'kalturaServer' => array(
 				'uri' => $serverAPIUri,
 				'deployUrl' => $deployUrl,
+				'resetPasswordUri': "/kmcng/resetpassword/setpasshashkey/{hash}",
 				'previewUIConf' => $this->contentUiconfPreview->getId(),
 				),
 			'cdnServers' => array(
