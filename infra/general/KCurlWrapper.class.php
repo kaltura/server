@@ -498,6 +498,9 @@ class KCurlWrapper
 	 */
 	public function exec($sourceUrl, $destFile = null,$progressCallBack = null)
 	{
+		if ($this->isInternalUrl($sourceUrl))
+			KalturaLog::debug("Exec Curl - Found Internal url: " . $sourceUrl);
+
 		$this->setSourceUrlAndprotocol($sourceUrl);
 		
 		$returnTransfer = is_null($destFile);
@@ -524,6 +527,18 @@ class KCurlWrapper
 		return $ret;
 	}
 
+	private function isInternalUrl($url = null)
+	{
+		if ((bool)ip2long($url))
+			return kIpAddressUtils::isInternalIp($url);
+		else
+		{
+			$res = gethostbyname($url);
+			if ($res == $url)
+				return false;
+			return kIpAddressUtils::isInternalIp($res);
+		}
+	}
 
 	public function getSourceUrlProtocol($sourceUrl)
 	{
