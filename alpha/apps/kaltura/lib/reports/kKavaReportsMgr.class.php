@@ -3267,26 +3267,25 @@ class kKavaReportsMgr extends kKavaBase
 
 		$peer::setUseCriteriaFilter(false);
 		$stmt = $peer::doSelectStmt($c);
-		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$rows = $stmt->fetchAll(PDO::FETCH_NUM);
 		$peer::setUseCriteriaFilter(true);
 
 		foreach ($rows as $row)
 		{
+			$id = reset($row);
 			$output_row = array();
 			foreach ($columns as $column)
 			{
 				$format = isset($column_formats[$column]) ? $column_formats[$column] : null;
 
+				$value = next($row);
+				
 				$exploded_column = explode('.', $column);
 				if (count($exploded_column) > 1)
 				{
 					list($column, $field) = $exploded_column;
-					$value = @unserialize($row[$column]);
+					$value = @unserialize($value);
 					$value = isset($value[$field]) ? $value[$field] : '';
-				}
-				else
-				{
-					$value = $row[$column];
 				}
 
 				switch ($format)
@@ -3304,7 +3303,6 @@ class kKavaReportsMgr extends kKavaBase
 				$output_row[] = $value;
 			}
 
-			$id = $row[$dim_column];
 			$result[$id] = $output_row;
 		}
 		return $result;
@@ -3357,17 +3355,6 @@ class kKavaReportsMgr extends kKavaBase
 			$enrich_context = isset($enrich_def[self::REPORT_ENRICH_CONTEXT]) ? 
 				$enrich_def[self::REPORT_ENRICH_CONTEXT] : null;
 			
-			// input
-			if (isset($enrich_def[self::REPORT_ENRICH_INPUT]))
-			{
-				$dim_header = $enrich_def[self::REPORT_ENRICH_INPUT];
-			}
-			else
-			{
-				$dim_header = reset($report_def[self::REPORT_DIMENSION_HEADERS]);
-			}
-			$dim_index = array_search($dim_header, $headers);
-
 			// output
 			$cur_fields = $enrich_def[self::REPORT_ENRICH_OUTPUT];
 			if (!is_array($cur_fields))
@@ -3381,6 +3368,18 @@ class kKavaReportsMgr extends kKavaBase
 				$enriched_indexes[] = array_search($field, $headers);
 			}
 
+			// input
+			if (isset($enrich_def[self::REPORT_ENRICH_INPUT]))
+			{
+				$dim_header = $enrich_def[self::REPORT_ENRICH_INPUT];
+			}
+			else
+			{
+				$dim_header = reset($cur_fields);
+			}
+			$dim_index = array_search($dim_header, $headers);
+			
+			// add
 			if (!isset($enrich_specs[$dim_index]))
 			{
 				$enrich_specs[$dim_index] = array();
