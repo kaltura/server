@@ -114,7 +114,7 @@ class kmcngAction extends kalturaAction
 		{
 			$liveAnalytics = array(
 				"uri" => '/apps/liveanalytics/' . kConf::get("liveanalytics_version") . "/index.html",
-				"uiConfId" => isset($this->contentUiconfLivea) ? $this->contentUiconfLivea->getId() : 0,
+				"uiConfId" => isset($this->contentUiconfLivea) ? $this->contentUiconfLivea->getId() : null,
 				"mapUrls" => kConf::hasParam ("cdn_static_hosts") ? array_map(function($s) {return "$s/content/static/maps/v1";}, kConf::get ("cdn_static_hosts")) : array(),
                 "mapZoomLevels" => kConf::hasParam("map_zoom_levels") ? kConf::get("map_zoom_levels") : ''
 			);
@@ -148,7 +148,7 @@ class kmcngAction extends kalturaAction
 			'kalturaServer' => array(
 				'uri' => $serverAPIUri,
 				'deployUrl' => $deployUrl,
-				'resetPasswordUri': "/kmcng/resetpassword/setpasshashkey/{hash}",
+				'resetPasswordUri'=> "/index.php/kmcng/resetpassword/setpasshashkey/{hash}",
 				'previewUIConf' => $this->contentUiconfPreview->getId(),
 				),
 			'cdnServers' => array(
