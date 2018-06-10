@@ -1,4 +1,16 @@
 # Naos 14.0.0 #
+KMS GO: Push Notification specific Message
+Issue Type: new template
+Issue ID: PLAT-8980
+
+Configuration
+None.
+
+Deployment scripts
+Disable current "EntryCategory added FireBase" event notification template
+
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/entryAddedToCategoryFireBaseHttpNotification.xml
+
 ## Enable RTC tokenization ##
 - Issue Type: New Feature
 - Issue ID: WEBC-1188
