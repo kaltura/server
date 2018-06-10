@@ -1036,7 +1036,12 @@ class Partner extends BasePartner
 	public function getAccessControls()					{return $this->getFromCustomData('access_controls', null, self::MAX_ACCESS_CONTROLS);}
 	public function getMaxLiveStreamInputs()			{return $this->getFromCustomData('live_stream_inputs');}
 	public function getMaxLiveStreamOutputs()			{return $this->getFromCustomData('live_stream_outputs');}
-	public function getMaxLiveRtcStreamInputs()			{return $this->getFromCustomData('live_rtc_stream_inputs', null, kConf::get('live_rtc_concurrent_streams', 'local', 2));}
+	public function getMaxLiveRtcStreamInputs()			{
+		$liveRtcStreamInputs = $this->getFromCustomData('live_rtc_stream_inputs');
+		if ($liveRtcStreamInputs === null)
+			$liveRtcStreamInputs = kConf::get('live_rtc_concurrent_streams', 'local', 2);
+		return $liveRtcStreamInputs;
+	}
 	
 	public function getLoginUsersOveragePrice()			{return $this->getFromCustomData('login_users_overage_price');}
 	public function getAdminLoginUsersOveragePrice()	{return $this->getFromCustomData('admin_login_users_overage_price');}
