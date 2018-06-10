@@ -154,9 +154,10 @@ class ServerNodeService extends KalturaBaseService
 	 *
 	 * @action reportStatus
 	 * @param string $hostName
+	 * @param KalturaServerNodeStatus $status
 	 * @return KalturaServerNode
 	 */
-	function reportStatusAction($hostName, KalturaServerNode $serverNode = null)
+	function reportStatusAction($hostName, KalturaServerNode $serverNode = null, $status = null)
 	{
 		$dbType = null;
 		if ($serverNode)
@@ -179,9 +180,12 @@ class ServerNodeService extends KalturaBaseService
 			else 
 				throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND, $hostName);
 		}
-	
+		
+		if(!$status)
+			$status = ServerNodeStatus::ACTIVE;
+		
+		$dbServerNode->setStatus($status);
 		$dbServerNode->setHeartbeatTime(time());
-		$dbServerNode->setStatus(ServerNodeStatus::ACTIVE);
 		$dbServerNode->save();
 	
 		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
