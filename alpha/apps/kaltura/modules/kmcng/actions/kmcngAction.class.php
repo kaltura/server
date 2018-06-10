@@ -6,6 +6,7 @@
 class kmcngAction extends kalturaAction
 {
 	const LIVE_ANALYTICS_UICONF_TAG = 'livea_player';
+	const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
 
 	public function execute()
 	{
@@ -82,6 +83,12 @@ class kmcngAction extends kalturaAction
 		if (isset($kmcngParams["kmcng_custom_uri"]))
 			$serverAPIUri = $kmcngParams["kmcng_custom_uri"];
 
+		$this->playerV3VersionsUiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, "latest");
+		$this->content_uiconfs_player_v3_versions = isset($this->playerV3VersionsUiConf) ? array_values         ($this->playerV3VersionsUiConf) : null;
+		if (is_array($this->content_uiconfs_player_v3_versions)) {
+			$this->content_uiconf_player_v3_versions = reset($this->content_uiconfs_player_v3_versions);
+		}
+
 		$studio = null;
 		if (kConf::hasParam("studio_version") && kConf::hasParam("html5_version"))
 		{
@@ -98,7 +105,9 @@ class kmcngAction extends kalturaAction
 			$studioV3 = array(
 				"uri" => '/apps/studioV3/' . kConf::get("studio_v3_version") . "/index.html",
 				"html5_version" => kConf::get("html5_version"),
-				"html5lib" => $secureCDNServerUri . "/html5/html5lib/" . kConf::get("html5_version") . "/mwEmbedLoader.php"
+				"html5lib" => $secureCDNServerUri . "/html5/html5lib/" . kConf::get("html5_version") . "/mwEmbedLoader.php",
+				"playerVersionsMap" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfig() : ''
+                 			);
 			);
 		}
 
