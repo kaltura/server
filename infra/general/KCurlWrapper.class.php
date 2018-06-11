@@ -1,5 +1,6 @@
 <?php
 
+require_once(KALTURA_ROOT_PATH . '/alpha/apps/kaltura/lib/kIpAddressUtils.php');
 /**
  *  @package infra
  *  @subpackage general
@@ -308,7 +309,7 @@ class KCurlWrapper
 	/**
 	 * @return string
 	 */
-	public function getInfo($opt)
+	public function getInfo($opt = null)
 	{
 		return curl_getinfo($this->ch, $opt);
 	}
@@ -530,14 +531,19 @@ class KCurlWrapper
 	private function isInternalUrl($url = null)
 	{
 		$host = $this->getUrlHost($url);
-		if (filter_var($host, FILTER_VALIDATE_IP))
-			return kIpAddressUtils::isInternalIp($host);
+		if (filter_var($host, FILTER_VALIDATE_IP)) // do we have an ip and not a hostname
+		{
+			if ( filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE |  FILTER_FLAG_NO_RES_RANGE)) // in case of private or reserved ip.
+				return kIpAddressUtils::isInternalIp($host);
+			else
+				return true;
+		}
 		else
 		{
 			$res = gethostbyname($host);
-			if ($res == $host)
+			if ($res == $host) // in case of local machine name
 				return true;
-			return kIpAddressUtils::isInternalIp($host);
+			return kIpAddressUtils::isInternalIp($res);
 		}
 	}
 
