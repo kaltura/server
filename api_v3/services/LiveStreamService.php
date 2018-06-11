@@ -200,16 +200,12 @@ class LiveStreamService extends KalturaLiveEntryService
 		$liveEntries = $this->getLiveEntriesForPartner($liveEntry);
 		
 		$maxPassthroughStreams = $this->getPartner()->getMaxLiveStreamInputs();
-		if(!$maxPassthroughStreams)
-			$maxPassthroughStreams = kConf::get('partner_max_live_stream_inputs', 'local', 10);
 		KalturaLog::debug("Max Passthrough streams [$maxPassthroughStreams]");
 		
 		$maxTranscodedStreams = 0;
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_STREAM_TRANSCODE, $this->getPartnerId()))
 		{
 			$maxTranscodedStreams = $this->getPartner()->getMaxLiveStreamOutputs();
-			if(!$maxTranscodedStreams)
-				$maxTranscodedStreams = kConf::get('partner_max_live_stream_outputs', 'local', 10);
 		}
 		KalturaLog::debug("Max transcoded streams [$maxTranscodedStreams]");
 		

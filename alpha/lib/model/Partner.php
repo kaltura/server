@@ -1034,8 +1034,8 @@ class Partner extends BasePartner
 	public function getMonthlyStorageAndBandwidth()		{return $this->getFromCustomData('monthly_storage_and_bandwidth');}
 	public function getEndUsers()						{return $this->getFromCustomData('end_users');}
 	public function getAccessControls()					{return $this->getFromCustomData('access_controls', null, self::MAX_ACCESS_CONTROLS);}
-	public function getMaxLiveStreamInputs()			{return $this->getFromCustomData('live_stream_inputs');}
-	public function getMaxLiveStreamOutputs()			{return $this->getFromCustomData('live_stream_outputs');}
+	public function getMaxLiveStreamInputs()			{return $this->getFromCustomData('live_stream_inputs', null, kConf::get('partner_max_live_stream_inputs', 'local', 10));}
+	public function getMaxLiveStreamOutputs()			{return $this->getFromCustomData('live_stream_outputs', null, kConf::get('partner_max_live_stream_outputs', 'local', 1));}
 	public function getMaxLiveRtcStreamInputs()			{return $this->getFromCustomData('live_rtc_stream_inputs', null, kConf::get('live_rtc_concurrent_streams', 'local', 2));}
 	
 	public function getLoginUsersOveragePrice()			{return $this->getFromCustomData('login_users_overage_price');}
