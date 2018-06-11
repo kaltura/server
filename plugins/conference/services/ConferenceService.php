@@ -49,14 +49,14 @@ class ConferenceService extends KalturaBaseService {
 		$liveEntryService = new LiveStreamService();
 		$liveEntryService->dumpApiRequest($entryId);
 		$lockKey = "allocate_conference_room_" . $entryId;
-		$conference = kLock::runLocked($lockKey, array($this, 'allocateConferenceRoomImpl'), array($liveEntryDb));
+		$conference = kLock::runLocked($lockKey, array($this, 'allocateConferenceRoomImpl'), array($entryId));
 		return $conference;
 	}
 
-	public function allocateConferenceRoomImpl($liveEntryDb)
+	public function allocateConferenceRoomImpl($entryId)
 	{
 		//In case until this method is run under lock another process already created the conf room.
-		$existingConfRoom = $this->findExistingConferenceRoom($liveEntryDb->getId());
+		$existingConfRoom = $this->findExistingConferenceRoom($entryId);
 		if ($existingConfRoom)
 			return $existingConfRoom;
 		
@@ -71,7 +71,7 @@ class ConferenceService extends KalturaBaseService {
 		
 		$serverNode = $this->findFreeServerNode();
 		$confEntryServerNode = new ConferenceEntryServerNode();
-		$confEntryServerNode->setEntryId($liveEntryDb->getId());
+		$confEntryServerNode->setEntryId($entryId);
 		$confEntryServerNode->setServerNodeId($serverNode->getId());
 		$confEntryServerNode->setServerType(ConferencePlugin::getCoreValue('EntryServerNodeType', ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER ));
 		$confEntryServerNode->setConfRoomStatus(ConferenceRoomStatus::READY);
@@ -80,7 +80,7 @@ class ConferenceService extends KalturaBaseService {
 		$confEntryServerNode->setPartnerId($this->getPartnerId());
 		$confEntryServerNode->save();
 
-		$outObj = $this->getRoomDetails($liveEntryDb->getId(), $confEntryServerNode, $serverNode);
+		$outObj = $this->getRoomDetails($entryId, $confEntryServerNode, $serverNode);
 		return $outObj;
 	}
 
