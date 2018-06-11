@@ -1034,8 +1034,22 @@ class Partner extends BasePartner
 	public function getMonthlyStorageAndBandwidth()		{return $this->getFromCustomData('monthly_storage_and_bandwidth');}
 	public function getEndUsers()						{return $this->getFromCustomData('end_users');}
 	public function getAccessControls()					{return $this->getFromCustomData('access_controls', null, self::MAX_ACCESS_CONTROLS);}
-	public function getMaxLiveStreamInputs()			{return $this->getFromCustomData('live_stream_inputs', null, kConf::get('partner_max_live_stream_inputs', 'local', 10));}
-	public function getMaxLiveStreamOutputs()			{return $this->getFromCustomData('live_stream_outputs', null, kConf::get('partner_max_live_stream_outputs', 'local', 1));}
+	public function getMaxLiveStreamInputs()
+	{
+		$live_stream_inputs = $this->getFromCustomData('live_stream_inputs');
+		if ($live_stream_inputs === null)
+			$live_stream_inputs = kConf::get('partner_max_live_stream_inputs', 'local', 10);
+		
+		return $live_stream_inputs;
+	}
+	public function getMaxLiveStreamOutputs()
+	{
+		$live_stream_outputs = $this->getFromCustomData('live_stream_outputs');
+		if ($live_stream_outputs === null)
+			$live_stream_outputs = kConf::get('partner_max_live_stream_outputs', 'local', 1);
+		
+		return $live_stream_outputs;
+	}
 	public function getMaxLiveRtcStreamInputs()			{return $this->getFromCustomData('live_rtc_stream_inputs', null, kConf::get('live_rtc_concurrent_streams', 'local', 2));}
 	
 	public function getLoginUsersOveragePrice()			{return $this->getFromCustomData('login_users_overage_price');}
