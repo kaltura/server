@@ -315,16 +315,12 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
     protected function updateObjectsResults(array $requestResults, array $bulkUploadResults)
 	{
 		KalturaLog::info("Updating " . count($requestResults) . " results");
-		$actionsCount=0;
 		$dummy=array();
-		KBatchBase::$kClient->startMultiRequest();
 		// checking the created entries
 		foreach($requestResults as $index => $requestResult)
 		{
 			$bulkUploadResult = $bulkUploadResults[$index];
-
-			$this->handleMultiRequest($actionsCount,$dummy);
-
+			$this->handleMultiRequest($dummy);
 			if(is_array($requestResult) && isset($requestResult['code']))
 			{
 			    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
@@ -346,8 +342,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 
 			$this->addBulkUploadResult($bulkUploadResult);
 		}
-
-		$this->handleMultiRequest($actionsCount,$dummy,true);
+		$this->handleMultiRequest($dummy,true);
 	}
 
 
@@ -370,29 +365,25 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 
 	private function getUsers($usersList)
 	{
-		$actionsCount=0;
 		$ret = array();
-		KBatchBase::$kClient->startMultiRequest();
 		foreach ($usersList as $group)
 		{
+			$this->handleMultiRequest($ret);
 			KBatchBase::$kClient->user->get($group->group);
-			$this->handleMultiRequest($actionsCount,$ret);
 		}
-		$this->handleMultiRequest($actionsCount,$ret,true);
+		$this->handleMultiRequest($ret,true);
 		return $ret;
 	}
 
 	private function deleteUsers($usersMap)
 	{
-		$actionsCount=0;
 		$ret = array();
-		KBatchBase::$kClient->startMultiRequest();
 		foreach ($usersMap as $userId=>$group)
 		{
+			$this->handleMultiRequest($ret);
 			KBatchBase::$kClient->groupUser->delete($userId, $group);
-			$this->handleMultiRequest($actionsCount,$ret);
 		}
-		$this->handleMultiRequest($actionsCount,$ret,true);
+		$this->handleMultiRequest($ret,true);
 		return $ret;
 	}
 
@@ -405,56 +396,58 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 
 	private function addUserOfTypeGroup($actualGroupUsersList , $expectedGroupUsersList)
 	{
-		$actionsCount=0;
 		$ret=array();
-		KBatchBase::$kClient->startMultiRequest();
 		foreach ($actualGroupUsersList as $index => $user)
 		{
 			//check if value does not exist
 			if( !($user instanceof KalturaUser)  ||  ($user->type != KalturaUserType::GROUP))
 			{
+				$this->handleMultiRequest($ret);
 				KalturaLog::debug("Adding User of type group" . $expectedGroupUsersList[$index]->group );
 				$groupUser = new KalturaUser();
 				$groupUser->id = $expectedGroupUsersList[$index]->group;
 				$groupUser->type = KalturaUserType::GROUP;
-				KalturaLog::debug("#2.2 Adding user of type group ".print_r($groupUser,true));
 				KBatchBase::$kClient->user->add($groupUser);
-				$this->handleMultiRequest($actionsCount,$ret);
 			}
 		}
-		$this->handleMultiRequest($actionsCount,$ret,true);
+		$this->handleMultiRequest($ret,true);
 		return $ret;
 	}
 
-	private function handleMultiRequest(&$count,&$ret,$finish=false)
+	private function handleMultiRequest(&$ret,$finish=false)
 	{
-		$count++;
-		if( ($count%$this->multiRequestSize)==0 || $finish)
+		$count = KBatchBase::$kClient->getMultiRequestQueueSize();
+		//Start of new multi request session
+		if($count)
 		{
-			$result =  KBatchBase::$kClient->doMultiRequest();
-			if(count($result))
-				$ret = array_merge($ret,$result);
+			if (($count % $this->multiRequestSize) == 0 || $finish)
+			{
+				$result = KBatchBase::$kClient->doMultiRequest();
+				if (count($result))
+					$ret = array_merge($ret, $result);
+				if (!$finish)
+					KBatchBase::$kClient->startMultiRequest();
+			}
 		}
-		if(!$finish)
+		elseif (!$finish)
+		{
 			KBatchBase::$kClient->startMultiRequest();
+		}
 	}
 
 	private function addGroupUsers($groupUsersList)
 	{
-		$actionsCount=0;
 		$ret = array();
-		KBatchBase::$kClient->startMultiRequest();
 		foreach ($groupUsersList as $groupUserParams)
 		{
+			$this->handleMultiRequest($ret);
 			$groupUser = new KalturaGroupUser();
 			$groupUser->userId = $groupUserParams->userId;
 			$groupUser->groupId = $groupUserParams->group;
 			$groupUser->creationMode = KalturaGroupUserCreationMode::AUTOMATIC;
 			KBatchBase::$kClient->groupUser->add($groupUser);
-			$this->handleMultiRequest($actionsCount,$ret);
 		}
-		$this->handleMultiRequest($actionsCount,$ret,true);
-		KalturaLog::debug("#Found users ".print_r($ret,true));
+		$this->handleMultiRequest($ret,true);
 		return $ret;
 	}
 
@@ -465,13 +458,8 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		$userGroupToDeleteMap = array();
 		$groupUsersToAddList= array();
 		$this->multiRequestSize = 100;
-
 		$this->getGroupActionList($groupUsersToAddList,$userGroupToDeleteMap);
-
-		if(count($userGroupToDeleteMap))
-		{
-			$this->deleteUsers($userGroupToDeleteMap);
-		}
+		$this->deleteUsers($userGroupToDeleteMap);
 		if(count($groupUsersToAddList))
 		{
 			$requestResults = $this->getUsers($groupUsersToAddList);
