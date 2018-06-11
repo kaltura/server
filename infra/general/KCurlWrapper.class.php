@@ -529,41 +529,35 @@ class KCurlWrapper
 
 	private function isInternalUrl($url = null)
 	{
-		if ((bool)ip2long($url))
-			return kIpAddressUtils::isInternalIp($url);
+		$host = $this->getUrlHost($url);
+		if (filter_var($host, FILTER_VALIDATE_IP))
+			return kIpAddressUtils::isInternalIp($host);
 		else
 		{
-			$res = gethostbyname($url);
-			if ($res == $url)
-				return false;
-			return kIpAddressUtils::isInternalIp($res);
+			$res = gethostbyname($host);
+			if ($res == $host)
+				return true;
+			return kIpAddressUtils::isInternalIp($host);
 		}
 	}
 
-	public function getSourceUrlProtocol($sourceUrl)
+	private function getUrlHost($url = null)
 	{
-		$protocol = null;
-		$sourceUrl = trim($sourceUrl);
+		$host = null;
 		try
 		{
-			$url_parts = parse_url( $sourceUrl );
-			if ( isset ( $url_parts["scheme"] ) )
-			{
-				if (in_array ($url_parts["scheme"], array ('http', 'https')))
-				{
-					$protocol = self::HTTP_PROTOCOL_HTTP;
-				}
-				elseif ( $url_parts["scheme"] == "ftp" || $url_parts["scheme"] == "ftps" )
-				{
-					$protocol = self::HTTP_PROTOCOL_FTP;
-				}
-			}
+			$url = trim($url);
+			if (strpos($url, "://") === false && substr($url, 0, 1) != "/")
+				$url = "http://" . $url;
+			$url_parts = parse_url($url);
+			if (isset ($url_parts["host"]))
+				$host = $url_parts["host"];
 		}
-		catch ( Exception $exception )
+		catch (Exception $exception)
 		{
 			throw new Exception($exception->getMessage());
 		}
-		return $protocol;
+		return $host;
 	}
 
 
