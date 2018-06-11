@@ -5,7 +5,7 @@
  */
 class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
 {
-    const MAX_CHUNK_DURATION_IN_SEC = 12;
+    const MAX_CHUNK_DURATION_IN_SEC = 6;
 
     protected $currentSegmentStartTime = null;
     protected $currentSegmentEndTime = null;
