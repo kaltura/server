@@ -49,11 +49,11 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
     {
         // if the cp was before the segment start time - move it to the beginning of the segment.
         $cuePointCreationTime = max($cuePoint->createdAt * 1000, $this->currentSegmentStartTime * 1000);
-        $cuePointDestStartTime = self::getOffsetForTimestamp($cuePointCreationTime, $this->amfData);
+        $cuePointDestStartTime = $this->getOffsetForTimestamp($cuePointCreationTime);
 
         $cuePointDestEndTime = null;
         if ($cuePoint->endTime)
-            $cuePointDestEndTime = self::getOffsetForTimestamp($cuePoint->endTime * 1000, $this->amfData);
+            $cuePointDestEndTime = $this->getOffsetForTimestamp($cuePoint->endTime * 1000);
         return array($cuePointDestStartTime, $cuePointDestEndTime);
     }
     
@@ -86,9 +86,9 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
             $amfArray[$key]->pts = $amfArray[$key]->pts  + $totalVodDuration - $currentSegmentDuration;
     }
 
-    protected static function getOffsetForTimestamp($timestamp, $amfArray)
+    protected function getOffsetForTimestamp($timestamp, $overrideNegative = true)
     {
-        $minDistanceAmf = self::getClosestAMF($timestamp, $amfArray);
+        $minDistanceAmf = $this->getClosestAMF($timestamp);
         $ret = 0;
         if (is_null($minDistanceAmf))
             KalturaLog::debug('minDistanceAmf is null - returning 0');
@@ -97,13 +97,15 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
         else
             $ret = $minDistanceAmf->pts + ($timestamp - $minDistanceAmf->ts);
         // make sure we don't get a negative time
-        $ret = max($ret,0);
-        KalturaLog::debug('AMFs array is:' . print_r($amfArray, true) . 'getOffsetForTimestamp returning ' . $ret);
+        if ($overrideNegative)
+            $ret = max($ret,0);
+        KalturaLog::debug('Returning offset of ' . $ret);
         return $ret;
     }
 
-    protected static function getClosestAMF($timestamp, $amfArray)
+    protected function getClosestAMF($timestamp)
     {
+        $amfArray = $this->amfData;
         $len = count($amfArray);
         $ret = null;
         if ($len == 1)
