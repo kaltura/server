@@ -217,7 +217,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 				// make all the media->add as the partner
 				$requestResults = KBatchBase::$kClient->doMultiRequest();
 
-				$this->updateObjectsResults($requestResults, $bulkUploadResultChunk);
+				$this->multiUpdateResults($requestResults, $bulkUploadResultChunk);
 				$this->checkAborted();
 				KBatchBase::$kClient->startMultiRequest();
 				$bulkUploadResultChunk = array();
