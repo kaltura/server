@@ -1,4 +1,21 @@
 # Naos 14.0.0 #
+
+## Self-serve: allow via admin_console ##
+- Issue type : new feature
+- Issue ID: PLAT-8766
+
+### Configuration ###
+	- Add the following to Admin.ini:
+        moduls.SelfServe.enabled = true
+        moduls.SelfServe.permissionType = 2
+        moduls.SelfServe.label = "Self Serve enabled"
+        moduls.SelfServe.permissionName = FEATURE_SELF_SERVE
+        moduls.SelfServe.group = GROUP_ENABLE_DISABLE_FEATURES
+
+
+### Deployment scripts ###
+None.
+
 ## KMS Go: change firebase notification template ##
 - Issue type : new template
 - Issue ID: PLAT-8980

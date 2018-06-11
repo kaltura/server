@@ -440,11 +440,6 @@ class Form_PartnerConfiguration extends Infra_Form
 				'filters'		=> array('StringTrim'),
 		));
 
-		$this->addElement('checkbox', 'enable_self_serve', array(
-			'label'			=> 'Self Serve enabled',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only'))),
-		));
-
 
 		//--------------- Host white list ----------------------------
 
@@ -896,6 +891,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addLimitSubForm($liveStreamOutputsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS);
 		
 		$liveRtcStreamsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS, 'Concurrent Live RTC streams:', false);
+		$liveRtcStreamsSubForm->requirePartnerPermission(Kaltura_Client_Enum_PermissionName::FEATURE_SELF_SERVE);
 		$this->addLimitSubForm($liveRtcStreamsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS);
 
 	}
@@ -968,7 +964,7 @@ class Form_PartnerConfiguration extends Infra_Form
 
 		$this->addDisplayGroup(
 			array_merge(
-				array('default_live_stream_entry_source_type', 'live_stream_provision_params', 'default_live_stream_segment_duration', 'enable_self_serve'),
+				array('default_live_stream_entry_source_type', 'live_stream_provision_params', 'default_live_stream_segment_duration'),
 				array('crossLine')),
 			'liveStreamConfig',
 			array('legend' => 'Live Stream Config')
