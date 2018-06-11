@@ -24,7 +24,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	
 	protected $move_entries_to_parent_category = null;
 
-	const CATEGORY_ID_THAT_DOES_NOT_EXIST = 0;
+	const CATEGORY_ID_THAT_DOES_NOT_EXIST = 9999654325;
 	
 	const IS_AGGREGATION_CATEGORY = 'isAggregationCategory';
 	
