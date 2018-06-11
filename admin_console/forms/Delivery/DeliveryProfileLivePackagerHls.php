@@ -16,6 +16,6 @@ class Form_Delivery_DeliveryProfileLivePackagerHls extends Form_Delivery_Deliver
 			'label'			=> 'Force proxy:',
 		));
 		
-		return array('disableExtraAttributes', 'forceProxy', 'livePackagerSigningDomain');
+		return array_merge(parent::getAdvancedSettings(), array('disableExtraAttributes', 'forceProxy'));
 	}
 }
