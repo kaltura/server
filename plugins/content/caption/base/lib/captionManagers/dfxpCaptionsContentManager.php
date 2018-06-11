@@ -249,7 +249,10 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 				$captionEndTime = $captionStartTime + $duration;
 			}
 			if(!TimeOffsetUtils::onTimeRange($captionStartTime, $captionEndTime, $clipStartTime, $clipEndTime))
+			{
 				$curNode->removeChild($childNode);
+				$i--;
+			}
 			else
 				{
 				$adjustedStartTime = TimeOffsetUtils::getAdjustedStartTime($captionStartTime, $clipStartTime, $globalOffset);
