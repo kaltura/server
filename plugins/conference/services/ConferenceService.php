@@ -22,7 +22,8 @@ class ConferenceService extends KalturaBaseService {
 	public function allocateConferenceRoomAction($entryId)
 	{
 		$partner = $this->getPartner();
-		if (!$partner->getEnableSelfServe())
+
+		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_SELF_SERVE, $this->getPartnerId()))
 		{
 			throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN, $this->serviceId.'->'.$this->actionName);
 		}
@@ -62,18 +63,12 @@ class ConferenceService extends KalturaBaseService {
 		$partner = $this->getPartner();
 		$numOfConcurrentRtcStreams = EntryServerNodePeer::retrieveByPartnerIdAndServerType($this->getPartnerId(), ConferencePlugin::getCoreValue('EntryServerNodeType', ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER ));
 		// $partner->getMaxLiveRtcStreamInputs() will return the number configured for the user in the admin console, otherwise the default value - 2
-		if ($numOfConcurrentRtcStreams >= $partner->getMaxLiveRtcStreamInputs())
+		$maxRTCStreamInputs = $partner->getMaxLiveRtcStreamInputs();
+		if ($numOfConcurrentRtcStreams >= $maxRTCStreamInputs)
 		{
-			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_RTC_STREAMS, $this->getPartnerId());
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_RTC_STREAMS, $this->getPartnerId(), $maxRTCStreamInputs);
 		}
 		
-		$liveStreamEntry = entryPeer::retrieveByPK($entryId);
-		/** @var LiveStreamEntry $liveStreamEntry */
-		if (!$liveStreamEntry)
-		{
-			throw new kCoreException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->getEntryId());
-		}
-
 		$serverNode = $this->findFreeServerNode();
 		$confEntryServerNode = new ConferenceEntryServerNode();
 		$confEntryServerNode->setEntryId($entryId);
