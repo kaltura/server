@@ -357,7 +357,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			$this->groupActionsList[]=$userResult;
 	}
 
-	private function getGroupActionList(&$usersToAddList,&$userGroupToDeleteMap)
+	private function buildGroupActionList(&$usersToAddList,&$userGroupToDeleteMap)
 	{
 		foreach ($this->groupActionsList as $group)
 		{
@@ -417,7 +417,6 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 				$groupUser = new KalturaUser();
 				$groupUser->id = $expectedGroupUsersList[$index]->group;
 				$groupUser->type = KalturaUserType::GROUP;
-				KalturaLog::debug("#2.2 Adding user of type group ".print_r($groupUser,true));
 				KBatchBase::$kClient->user->add($groupUser);
 				$this->handleMultiRequest($actionsCount,$ret);
 			}
@@ -454,7 +453,6 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			$this->handleMultiRequest($actionsCount,$ret);
 		}
 		$this->handleMultiRequest($actionsCount,$ret,true);
-		KalturaLog::debug("#Found users ".print_r($ret,true));
 		return $ret;
 	}
 
@@ -466,7 +464,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		$groupUsersToAddList= array();
 		$this->multiRequestSize = 100;
 
-		$this->getGroupActionList($groupUsersToAddList,$userGroupToDeleteMap);
+		$this->buildGroupActionList($groupUsersToAddList,$userGroupToDeleteMap);
 
 		if(count($userGroupToDeleteMap))
 		{
