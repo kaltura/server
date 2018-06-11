@@ -111,7 +111,7 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 		}
 
 		//check if all items were done already
-		if(!self::$kClient->batch->updateBulkUploadResults($job->id))
+		if(!self::$kClient->batch->updateBulkUploadResults($job->id) && !$countErrorObjects)
 		{
 			return $this->closeJob($job, null, null, 'Finished successfully', KalturaBatchJobStatus::FINISHED);
 		}
