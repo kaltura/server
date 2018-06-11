@@ -344,9 +344,6 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 				continue;
 			}
 
-			/*if (($bulkUploadResult->action != KalturaBulkUploadAction::DELETE)&&($bulkUploadResult->group))
-				$bulkUploadResult = $this->handleGroupUser($bulkUploadResult);*/
-
 			$this->addBulkUploadResult($bulkUploadResult);
 		}
 
@@ -381,7 +378,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			KBatchBase::$kClient->user->get($group->group);
 			$this->handleMultiRequest($actionsCount,$ret);
 		}
-		$this->handleMultiRequest($actionsCount,$ret,true);
+		$this->handleMultiRequest($actionsCount,$ret,true);/
 		return $ret;
 	}
 
@@ -402,11 +399,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 	private function multiUpdateResults($results , $bulkUploadRequest)
 	{
 		KBatchBase::unimpersonate();
-		$actionsCount=0;
-		$ret=array();
-		KBatchBase::$kClient->startMultiRequest();
 		$this->updateObjectsResults($results,$bulkUploadRequest);
-		KBatchBase::$kClient->doMultiRequest();
 		KBatchBase::impersonate($this->currentPartnerId);
 	}
 
