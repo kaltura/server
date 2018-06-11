@@ -9,15 +9,9 @@ class kWowzaSecureTokenUrlTokenizer extends kUrlTokenizer
 	protected $paramPrefix;
 	
 	/**
-	 * @var bool
-	 */
-	protected $shouldIncludeClientIp;
-	
-	/**
 	 * @var string
 	 */
 	protected $hashAlgorithm;
-
 	
 	public function tokenizeSingleUrl($url, $urlPrefix = null)
 	{
@@ -26,90 +20,87 @@ class kWowzaSecureTokenUrlTokenizer extends kUrlTokenizer
 		
 		$params = array();
 		
-		$params["starttime"] = time();
-		$params["endtime"] = time() + $expiryTimeFrame;
+		$params['starttime'] = time();
+		$params['endtime'] = time() + $expiryTimeFrame;
 		
-		$prefixedParams = $this->prefixParams($tokenPrefix,$params);
+		$urlTokenParameters = $this->prefixParams($tokenPrefix,$params);
 		
-		return $url."?".http_build_query($prefixedParams,'','&').'&'.$tokenPrefix.'hash='.$this->getHash($prefixedParams,$url);
+		$urlTokenParameters[$tokenPrefix.'hash'] = $this->getHash($urlTokenParameters,$url);
 		
+		return $url."?".http_build_query($urlTokenParameters);
 	}
 	
 	/**
-     * Get prefixed parameters
-     * 
-     * @return array
-     */
-	protected function prefixParams($prefix,$params){
+	 * Get prefixed parameters
+	 * 
+	 * @return array
+	 */
+	private function prefixParams($prefix, $rawParameters)
+	{
+		$prefixedParameters = array();
 		
-		if(!empty($prefix))
-        {
-            foreach($params as $key => $param)
-            {
-                if(strpos($key, $prefix) === false)
-                {
-                    $params[$prefix . $key] = $param;
-                    unset($params[$key]);
-                }
-            }
-        }
-        
-        return $params;
+		if(empty($rawParameters))
+		{
+			return $prefixedParameters;
+		}
+		
+		foreach($rawParameters as $key => $param)
+		{
+			$prefixedParameters[$prefix.$key] = $param;
+		}
+
+		return $prefixedParameters;
 	}
 		
 	/**
-     * Get hash token
-     * 
-     * @return string
-     */
-    public function getHash($params,$url){
-	
+	 * Get hash token
+	 * 
+	 * @return string
+	 */
+	public function getHash($params, $url)
+	{
 		$tokenKey = $this->getKey();
-		$shouldIncludeClientIp = $this->getShouldIncludeClientIp();
 				
 		$params[$tokenKey] = "";
 		
-		if($shouldIncludeClientIp == true){
+		if($this->getLimitIpAddress())
+		{
 			$params[self::getRemoteAddress()] = "";
 		}
-        
-        ksort($params);
 		
-        $query = '';
-        foreach($params as $k => $v)
-        {
-            $query .= '&' . $k;
-            if(isset($v) && !empty($v))
-            {
-                $query .= '=' . $v;
-            }
-        }
+		ksort($params);
 		
-        $query = trim($query, '&');
+		$query = '';
+		foreach($params as $k => $v)
+		{
+			$query .= '&' . $k;
+			if(isset($v) && !empty($v))
+			{
+				$query .= '=' . $v;
+			}
+		}
 		
-		$urlInfo = parse_url($url);
+		$query = trim($query,'&');
 		
-        $path = ltrim($urlInfo['path'], '/');
-        $pathItems = explode('/', $path);
-
-        $path = "";
-        foreach ($pathItems as $k => $pathItem) {
-            if(1 === preg_match('/(^Manifest|\.m3u8|\.f4m|\.mpd)/',$pathItem)){
-                break;
-            }
-            $path .= $pathItem;
-            if(count($pathItems)-1 != $k) {
-                $path .= '/';
-            }
-        }
-        if(strrpos($path, '/') === strlen($path)-1) {
-            $path = substr($path, 0, -1);
-        }
+		$path = '';
+		
+		if($parsed_url = parse_url($url))
+		{
+			$path = $parsed_url["path"];
+		}
+		
+		$finalSlash = strrpos($path, '/');
+		
+		$filepath = $path = substr($path, 0, $finalSlash);
+		
+		$path = trim($path,'/') . "?" . $query;
+		
+		print_r($path);
+		echo PHP_EOL;
 				
-        $path .= "?".$query;
-        return strtr(base64_encode(hash($this->getHashAlgorithm(), $path, true)),'+/','-_');
-    }
-			
+		return strtr(base64_encode(hash($this->getHashAlgorithm(), $path, true)),'+/','-_');
+	}
+	
 	/**
 	 * @return the $paramPrefix value
 	 */
@@ -127,31 +118,16 @@ class kWowzaSecureTokenUrlTokenizer extends kUrlTokenizer
 	}
 	
 	/**
-	 * @return the $shouldIncludeClientIp value
-	 */
-	public function getShouldIncludeClientIp() {
-		return $this->shouldIncludeClientIp;
-	}
-
-	/**
-	 * param bool $shouldIncludeClientIp
-	 */
-	public function setShouldIncludeClientIp($shouldIncludeClientIp) {
-		$this->shouldIncludeClientIp = $shouldIncludeClientIp;
-	}
-		
-	/**
 	 * @return the $hashAlgorithm value
 	 */
 	public function getHashAlgorithm() {
 		return $this->hashAlgorithm;
 	}
-
+	
 	/**
 	 * param bool $hashAlgorithm
 	 */
 	public function setHashAlgorithm($hashAlgorithm) {
 		$this->hashAlgorithm = $hashAlgorithm;
 	}
-	
 }
