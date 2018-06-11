@@ -378,7 +378,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			KBatchBase::$kClient->user->get($group->group);
 			$this->handleMultiRequest($actionsCount,$ret);
 		}
-		$this->handleMultiRequest($actionsCount,$ret,true);/
+		$this->handleMultiRequest($actionsCount,$ret,true);
 		return $ret;
 	}
 
