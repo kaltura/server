@@ -27,7 +27,7 @@ class kWowzaSecureTokenUrlTokenizer extends kUrlTokenizer
 		
 		$urlTokenParameters[$tokenPrefix.'hash'] = $this->getHash($urlTokenParameters,$url);
 		
-		return $url."?".http_build_query($urlTokenParameters);
+		return $url."?".http_build_query($urlTokenParameters, '', '&');
 	}
 	
 	/**
