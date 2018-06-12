@@ -1042,9 +1042,22 @@ class Partner extends BasePartner
 	public function getMonthlyStorageAndBandwidth()		{return $this->getFromCustomData('monthly_storage_and_bandwidth');}
 	public function getEndUsers()						{return $this->getFromCustomData('end_users');}
 	public function getAccessControls()					{return $this->getFromCustomData('access_controls', null, self::MAX_ACCESS_CONTROLS);}
-	public function getMaxLiveStreamInputs(){return $this->getFromCustomData(self::CUSTOM_DATA_LIVE_STREAM_INPUTS, null, self::PARTNER_MAX_LIVE_STREAM_INPUTS_DEFAULT);}
-	public function getMaxLiveStreamOutputs(){return $this->getFromCustomData(self::CUSTOM_DATA_LIVE_STREAM_OUTPUTS, null, self::PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT);}
+	public function getMaxLiveStreamInputs()
+	{
+		$live_stream_inputs = $this->getFromCustomData(self::CUSTOM_DATA_LIVE_STREAM_INPUTS);
+		if (!$live_stream_inputs)
+			$live_stream_inputs = self::PARTNER_MAX_LIVE_STREAM_INPUTS_DEFAULT;
 
+		return $live_stream_inputs;
+	}
+	public function getMaxLiveStreamOutputs()
+	{
+		$live_stream_outputs = $this->getFromCustomData(self::CUSTOM_DATA_LIVE_STREAM_OUTPUTS);
+		if (!$live_stream_outputs)
+			$live_stream_outputs = self::PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT;
+
+		return $live_stream_outputs;
+	}
 	public function getMaxLiveRtcStreamInputs()			{
 		$liveRtcStreamInputs = $this->getFromCustomData('live_rtc_stream_inputs');
 		if ($liveRtcStreamInputs === null)
