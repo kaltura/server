@@ -38,12 +38,7 @@ class kWowzaSecureTokenUrlTokenizer extends kUrlTokenizer
 	private function prefixParams($prefix, $rawParameters)
 	{
 		$prefixedParameters = array();
-		
-		if(empty($rawParameters))
-		{
-			return $prefixedParameters;
-		}
-		
+				
 		foreach($rawParameters as $key => $param)
 		{
 			$prefixedParameters[$prefix.$key] = $param;
@@ -61,16 +56,22 @@ class kWowzaSecureTokenUrlTokenizer extends kUrlTokenizer
 	{
 		$tokenKey = $this->getKey();
 		
+		// Key is added as parameter name without a value
 		$params[$tokenKey] = "";
 		
 		if($this->getLimitIpAddress())
 		{
+			// Client IP is added as parameter name with no value
 			$params[self::getRemoteAddress()] = "";
 		}
 		
+		// Wowza requires parameters be in alpha order when hashed
 		ksort($params);
 		
 		$query = '';
+		
+		// Building parameters.
+		// Cannot use 'http_build_query' here as it includes the equals sign for parameters that have no value.
 		foreach($params as $k => $v)
 		{
 			$query .= '&' . $k;
@@ -82,16 +83,12 @@ class kWowzaSecureTokenUrlTokenizer extends kUrlTokenizer
 		
 		$query = trim($query,'&');
 		
-		$path = '';
+		$path = parse_url($url,PHP_URL_PATH);
 		
-		if($parsed_url = parse_url($url))
-		{
-			$path = $parsed_url["path"];
-		}
-		
+		// In Wowza url format, the final slash character of path should denote the end of the VOD filename.
 		$finalSlash = strrpos($path, '/');
 		
-		$filepath = $path = substr($path, 0, $finalSlash);
+		$path = substr($path, 0, $finalSlash);
 		
 		$path = trim($path,'/') . "?" . $query;
 		
