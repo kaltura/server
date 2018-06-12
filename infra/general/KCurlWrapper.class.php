@@ -491,10 +491,11 @@ class KCurlWrapper
 	}
 
 	/**
-	 * @param string $sourceUrl
-	 * @param string $destFile
-	 * @param function $progressCallBack
-	 * @return boolean
+	 * @param $sourceUrl
+	 * @param null $destFile
+	 * @param null $progressCallBack
+	 * @return mixed
+	 * @throws Exception
 	 */
 	public function exec($sourceUrl, $destFile = null,$progressCallBack = null)
 	{
@@ -525,6 +526,32 @@ class KCurlWrapper
 		}
 
 		return $ret;
+	}
+
+
+	/**
+	 * @param $sourceUrl
+	 * @return mixed
+	 */
+	public function doExec($sourceUrl)
+	{
+		if ($this->isInternalUrl($sourceUrl))
+			KalturaLog::debug("Exec Curl - Found Internal url: " . $sourceUrl);
+
+		curl_setopt($this->ch, CURLOPT_URL, $sourceUrl);
+
+		return curl_exec($this->ch);
+	}
+
+	/**
+	 * @param $opts
+	 */
+	public function setOpts($opts)
+	{
+		foreach ($opts as $key => $value)
+		{
+			$this->setOpt($key, $value);
+		}
 	}
 
 	private function isInternalUrl($url = null)
