@@ -3,17 +3,12 @@
  * @package api
  * @subpackage objects
  */
-class KalturaUrlTokenizerWowzaSecureToken extends KalturaUrlTokenizer {
-	
+class KalturaUrlTokenizerWowzaSecureToken extends KalturaUrlTokenizer
+{	
 	/**
 	 * @var string
 	 */
 	public $paramPrefix;
-	
-	/**
-	 * @var bool
-	 */
-	public $shouldIncludeClientIp;
 	
 	/**
 	 * @var string
@@ -22,9 +17,8 @@ class KalturaUrlTokenizerWowzaSecureToken extends KalturaUrlTokenizer {
 	
 	private static $map_between_objects = array
 	(
-			"paramPrefix",
-			"shouldIncludeClientIp",
-			"hashAlgorithm"
+		"paramPrefix",
+		"hashAlgorithm"
 	);
 	
 	public function getMapBetweenObjects ( )
