@@ -56,7 +56,7 @@ class kWowzaSecureTokenUrlTokenizer extends kUrlTokenizer
 	{
 		$tokenKey = $this->getKey();
 		
-		// Key is added as parameter name without a value
+		// Key is added as parameter name with no value
 		$params[$tokenKey] = "";
 		
 		if($this->getLimitIpAddress())
