@@ -76,7 +76,7 @@ class Partner extends BasePartner
 
 	const PARTNER_MAX_LIVE_STREAM_INPUTS_DEFAULT = 10;
 
-	const PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT = 1;
+	const PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT = 10;
 
 	public function save(PropelPDO $con = null)
 	{
@@ -1042,22 +1042,9 @@ class Partner extends BasePartner
 	public function getMonthlyStorageAndBandwidth()		{return $this->getFromCustomData('monthly_storage_and_bandwidth');}
 	public function getEndUsers()						{return $this->getFromCustomData('end_users');}
 	public function getAccessControls()					{return $this->getFromCustomData('access_controls', null, self::MAX_ACCESS_CONTROLS);}
-	public function getMaxLiveStreamInputs()
-	{
-		$live_stream_inputs = $this->getFromCustomData(self::CUSTOM_DATA_LIVE_STREAM_INPUTS);
-		if ($live_stream_inputs === null)
-			$live_stream_inputs = kConf::get('partner_max_live_stream_inputs', 'local', self::PARTNER_MAX_LIVE_STREAM_INPUTS_DEFAULT);
+	public function getMaxLiveStreamInputs(){return $this->getFromCustomData(self::CUSTOM_DATA_LIVE_STREAM_INPUTS, null, self::PARTNER_MAX_LIVE_STREAM_INPUTS_DEFAULT);}
+	public function getMaxLiveStreamOutputs(){return $this->getFromCustomData(self::CUSTOM_DATA_LIVE_STREAM_OUTPUTS, null, self::PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT);}
 
-		return $live_stream_inputs;
-	}
-	public function getMaxLiveStreamOutputs()
-	{
-		$live_stream_outputs = $this->getFromCustomData(self::CUSTOM_DATA_LIVE_STREAM_OUTPUTS);
-		if ($live_stream_outputs === null)
-			$live_stream_outputs = kConf::get('partner_max_live_stream_outputs', 'local', self::PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT);
-
-		return $live_stream_outputs;
-	}
 	public function getMaxLiveRtcStreamInputs()			{
 		$liveRtcStreamInputs = $this->getFromCustomData('live_rtc_stream_inputs');
 		if ($liveRtcStreamInputs === null)
