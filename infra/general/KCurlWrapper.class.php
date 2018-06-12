@@ -532,21 +532,24 @@ class KCurlWrapper
 	{
 		$host = $this->getUrlHost($url);
 		if (filter_var($host, FILTER_VALIDATE_IP)) // do we have an ip and not a hostname
-		{
-			if ( filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE |  FILTER_FLAG_NO_RES_RANGE)) // in case of private or reserved ip.
-				return kIpAddressUtils::isInternalIp($host);
-			else
-				return true;
-		}
+			return $this->IsIpPrivateOrReserved($host);
 		else
 		{
 			$res = gethostbyname($host);
 			if ($res == $host) // in case of local machine name
 				return true;
-			return kIpAddressUtils::isInternalIp($res);
+			else
+				return $this->IsIpPrivateOrReserved($res);
 		}
 	}
 
+	private function IsIpPrivateOrReserved($host)
+	{
+		if ( filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE |  FILTER_FLAG_NO_RES_RANGE)) // checks if host is NOT in a private or reserved range
+			return false;
+		else
+			return true;
+	}
 	private function getUrlHost($url = null)
 	{
 		$host = null;
@@ -561,7 +564,7 @@ class KCurlWrapper
 		}
 		catch (Exception $exception)
 		{
-			throw new Exception($exception->getMessage());
+			KalturaLog::debug("Got Exception for getUrlHost method: " . $exception->getMessage());
 		}
 		return $host;
 	}
