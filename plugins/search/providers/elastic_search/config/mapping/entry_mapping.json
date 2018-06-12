@@ -1,5 +1,37 @@
 {
   "settings" : {
+	"index" : {
+	  "search" : {
+		"slowlog" : {
+		  "threshold" : {
+			"fetch": {
+			  "warn": "10s",
+			  "trace": "500ms",
+			  "debug": "2s",
+			  "info": "5s"
+			},
+			"query": {
+			  "warn": "10s",
+			  "trace": "500ms",
+			  "debug": "2s",
+			  "info": "5s"
+			}
+		  }
+		}
+	  },
+	  "indexing" : {
+		"slowlog" : {
+		  "threshold" : {
+			"index": {
+			  "warn": "10s",
+			  "trace": "500ms",
+			  "debug": "2s",
+			  "info": "5s"
+			}
+		  }
+		}
+	  }
+	},
 	"number_of_shards" : 12,
 	"number_of_replicas" : 0,
 	"analysis": {
@@ -18,7 +50,7 @@
 		},
 		"kaltura_english_synonym_filter": {
 		  "type": "synonym",
-		  "synonyms_path": "analysis/kaltura_synonyms.txt"
+		  "synonyms_path": "analysis/kaltura_synonyms_contraction.txt"
 		},
 		"kaltura_unique_token_filter": {
 		  "type": "unique",
@@ -179,7 +211,8 @@
 		  ],
 		  "filter": [
 			"lowercase",
-			"english_stop"
+			"english_stop",
+			"kaltura_english_synonym_filter"
 		  ]
 		}
 	  }

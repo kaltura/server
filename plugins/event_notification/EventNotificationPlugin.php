@@ -236,6 +236,12 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 
 				case EventNotificationEventObjectType::SERVER_NODE:
 					return 'ServerNode';
+				
+				case EventNotificationEventObjectType::ENTRY_VENDOR_TASK:
+					return 'EntryVendorTask';
+				
+				case EventNotificationEventObjectType::REACH_PROFILE:
+					return 'ReachProfile';
 
 			}
 		}

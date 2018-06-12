@@ -98,10 +98,10 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 	{
 		$startCaption = self::parseCaptionTime($matches[1]);
 		$endCaption = self::parseCaptionTime($matches[2]);
-		if (!kCaptionsContentManager::onTimeRange($startCaption, $endCaption, $clipStartTime, $clipEndTime))
+		if (!TimeOffsetUtils::onTimeRange($startCaption, $endCaption, $clipStartTime, $clipEndTime))
 			return null;
-		$adjustedStartTime = kCaptionsContentManager::getAdjustedStartTime($startCaption, $clipStartTime, $globalOffset);
-		$adjustedEndTime = kCaptionsContentManager::getAdjustedEndTime($clipStartTime, $clipEndTime, $endCaption, $globalOffset);
+		$adjustedStartTime = TimeOffsetUtils::getAdjustedStartTime($startCaption, $clipStartTime, $globalOffset);
+		$adjustedEndTime = TimeOffsetUtils::getAdjustedEndTime($endCaption, $clipStartTime, $clipEndTime, $globalOffset);
 		$timeLine = $this->formatSrtTimeStamp($adjustedStartTime) . ' --> ' . $this->formatSrtTimeStamp($adjustedEndTime). kCaptionsContentManager::UNIX_LINE_ENDING;
 		return $timeLine;
 	}

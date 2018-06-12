@@ -1857,4 +1857,15 @@ class kJobsManager
 
 		return self::addJob($batchJob, $jobData, BatchJobType::USERS_CSV);
 	}
+
+	public static function addMultiClipCopyCuePointsJob($destEntryID, $partnerId, $kClipDescriptionArray)
+	{
+		$jobData = new kMultiClipCopyCuePointsJobData();
+		$jobData->setClipsDescriptionArray($kClipDescriptionArray);
+		$jobData->setDestinationEntryId($destEntryID);
+		$batchJob = new BatchJob();
+		$batchJob->setEntryId($destEntryID);
+		$batchJob->setPartnerId($partnerId);
+		return kJobsManager::addJob($batchJob, $jobData, BatchJobType::COPY_CUE_POINTS, CopyCuePointJobType::MULTI_CLIP);
+	}
 }

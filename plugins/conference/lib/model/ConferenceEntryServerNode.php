@@ -23,12 +23,13 @@ class ConferenceEntryServerNode extends EntryServerNode
 
 	public function validateEntryServerNode()
 	{
-		if (!$this->isValid())
-		{
-			KalturaLog::debug("Deleting Conference entryServerNode" );
-			$this->delete();
-		}
-		return;
+		$serverNode = ServerNodePeer::retrieveByPK($this->getServerNodeId());
+		$inUseUrl = $serverNode->getServiceBaseUrl() . "/inUse";
+		$content = KCurlWrapper::getContent($inUseUrl);
+		if (strtolower($content) === 'true')
+			return;
+		KalturaLog::debug("Deleting Conference entryServerNode" );
+		$this->delete();
 	}
 
 	public function buildRoomURL($partnerId = null)
@@ -73,8 +74,4 @@ class ConferenceEntryServerNode extends EntryServerNode
 		$this->putInCustomData(self::CUSTOM_DATA_LAST_ALLOCATE_TIME, $v);
 	}
 
-	public function isValid()
-	{
-		return (time() - kConf::get('conf_not_finished_timeout', 'local', 0)) <= $this->getLastAllocationTime();
-	}
 }

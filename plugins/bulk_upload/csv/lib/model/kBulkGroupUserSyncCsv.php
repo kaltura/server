@@ -25,9 +25,9 @@ class kBulkGroupUserSyncCsv
 		$this->userMap = array();
 	}
 
-	public function getSyncGroupUsersCsvFile()
+	public function getSyncGroupUsersCsvFile($removeFromExistingGroups, $createNewGroups)
 	{
-		list($groupIdsToRemove, $groupIdsToAdd) = $this->getSyncGroupUsers();
+		list($groupIdsToRemove, $groupIdsToAdd) = $this->getSyncGroupUsers($removeFromExistingGroups, $createNewGroups);
 		//if no groups to add/remove don't add the job
 		if(empty($groupIdsToRemove) && empty($groupIdsToAdd))
 			return null;
@@ -53,7 +53,7 @@ class kBulkGroupUserSyncCsv
 		}
 	}
 
-	protected function getSyncGroupUsers()
+	protected function getSyncGroupUsers($removeFromExistingGroups, $createNewGroups)
 	{
 		$requestGroupIds = explode(',', $this->groupIds);
 		$requestGroupIds = array_map('trim', $requestGroupIds);
@@ -76,33 +76,34 @@ class kBulkGroupUserSyncCsv
 
 		foreach ($currentUserGroups as $currentUserGroup)
 		{
-			if($this->shouldRemoveGroup($currentUserGroup, $requestGroupIds))
+			if($this->shouldRemoveGroup($currentUserGroup, $requestGroupIds, $removeFromExistingGroups))
 				$groupsToRemove[] = $currentUserGroup->getPgroupId();
 		}
 
 		foreach ($requestGroupIds as $requestPGroupId)
 		{
-			if($this->shouldAddGroup($requestPGroupId, $currentPgroupsIds))
+			if($this->shouldAddGroup($requestPGroupId, $currentPgroupsIds, $createNewGroups))
 				$groupsToAdd[] = $requestPGroupId;
 		}
 		return array($groupsToRemove, $groupsToAdd);
 	}
 
-	protected function shouldRemoveGroup($currentUserGroup, &$requestGroupIds)
+	protected function shouldRemoveGroup($currentUserGroup, &$requestGroupIds, $removeFromExistingGroups)
 	{
 		if(!in_array($currentUserGroup->getPgroupId(), $requestGroupIds) && //the group is not in the sync group list
 			$currentUserGroup->getCreationMode() == GroupUserCreationMode::AUTOMATIC && //the group creation mode is automatic
-			array_key_exists($currentUserGroup->getKgroupId(), $this->userMap) && //if the the group exists check that it is not protected
+			array_key_exists($currentUserGroup->getKgroupId(), $this->userMap) && //if the the group exists and removeFromExistingGroups flag is true and the group is not protected
+			$removeFromExistingGroups &&
 			$this->isGroupAndNotProtected($currentUserGroup->getKgroupId()))
 			return true;
 
 		return false;
 	}
 
-	protected function shouldAddGroup($requestPGroupId, &$currentPgroupsIds)
+	protected function shouldAddGroup($requestPGroupId, &$currentPgroupsIds, $createNewGroups)
 	{
 		if(!in_array($requestPGroupId, $currentPgroupsIds) &&
-			(!array_key_exists($requestPGroupId, $this->userMap) || //group doesn't exist
+			((!array_key_exists($requestPGroupId, $this->userMap) && $createNewGroups) || //group doesn't exist and create new group flag is true
 				($this->isGroupAndNotProtected($requestPGroupId)))) //group exists and not protected
 			return true;
 

@@ -1,0 +1,95 @@
+
+<?php if($this->errMessage): ?>
+	<div class="error"><?php echo $this->errMessage ?></div><br/>
+<?php endif; ?>
+
+<?php echo $this->form ?>
+
+<script type="text/javascript">
+
+	try{
+		$('fieldset[id^="reachProfileRuleTemplate"]').hide();
+		populateRules();
+		populateDates();
+		$('fieldset[id^="DictionaryTemplate"]').hide();
+		populate("ReachProfileDictionaries", "add-dictionary");
+	}
+	catch (e)
+	{
+	}
+
+	function populate(name, file ) {
+		var data = jQuery('#' + name).val();
+		if (!data)
+			return;
+		var arr = JSON.parse(data);
+		var ts = $("." + file);
+		for (var i = 0, len = arr.length; i < len; i++) {
+			if (name == 'ReachProfileDictionaries')
+				addDictionaryFromObject(ts, arr[i]);
+		}
+	}
+
+	function populateRules() {
+		var data = jQuery('#ReachProfileRules').val();
+		if (!data)
+			return;
+		var arr = JSON.parse(data);
+		var ts = $( ".add-rule" );
+		for (var i = 0, len = arr.length; i < len; i++)
+			addRuleFromObject(ts, arr[i]);
+	}
+
+	try{
+		jQuery(function() {
+		<?php if ($this->formValid): ?>
+		dialogDiv.dialog('close');
+		jQuery('#frmReachProfileConfigure').submit();
+		<?php endif; ?>
+	});
+	}
+	catch (e)
+	{
+
+	}
+	function replaceReachProfileCreditForm() {
+
+		var creditHandlerClass = jQuery('#reachProfileCredit-objectType').val();
+		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'ReachProfileCreditConfigureAction', 'creditHandlerClass' => 'CREDIT_HANDLER')); ?>';
+		url = url.replace('CREDIT_HANDLER', creditHandlerClass);
+
+		subform = jQuery('#reachProfileCredit-element');
+		subform.load(
+			url,
+			null,
+			function(html) {
+				jQuery('#reachProfileCredit-element').replaceWith(jQuery.parseHTML(html)[1]);
+				jQuery('#reachProfileCredit-objectType').change(replaceReachProfileCreditForm);
+			}
+		);
+	}
+
+	try {
+		jQuery('#reachProfileCredit-objectType').change(replaceReachProfileCreditForm);
+	}
+	catch (e)
+	{
+
+	}
+
+	function populateDates() {
+   	    var f = jQuery('#frmReachProfileConfigure');
+    	    f.find( "input[innertype=DateElement]").each(function(idx) {
+      		var val = parseInt($(this).val());
+      		if (isNaN(val))
+        		return;
+
+        	var d = new Date(0);
+        	d.setUTCSeconds(val);
+        	var formattedDate = ("0"+(d.getMonth()+1)).slice(-2) + "." + ("0" + d.getDate()).slice(-2) + "." +
+              	d.getFullYear();
+        	$(this).val(formattedDate);
+    		});
+	}
+
+</script>

@@ -21,6 +21,14 @@ class KalturaEventFieldCondition extends KalturaCondition
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
+	/**
+	 * Init object type
+	 */
+	public function __construct()
+	{
+		$this->type = EventNotificationPlugin::getConditionTypeCoreValue(EventNotificationConditionType::EVENT_NOTIFICATION_FIELD);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
 	 */

@@ -510,7 +510,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			if(!$matchedEntry)
 			{
 				$e = new kTemporaryException('No matching entry found', KalturaDropFolderFileErrorCode::FILE_NO_MATCH);
-				if(($job->queueTime + KBatchBase::$taskConfig->params->maxTimeBeforeFail) >= time())	
+				if(($job->createdAt + KBatchBase::$taskConfig->params->maxTimeBeforeFail) >= time())
 				{
 					$e->setResetJobExecutionAttempts(true);
 				}	

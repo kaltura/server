@@ -148,7 +148,7 @@ abstract class kManifestRenderer
 	protected function replacePlaybackContext($str)
 	{
 		if($this->playbackContext)
-			$str = str_replace("{playbackContext}", "/playbackContext/".urlencode($this->playbackContext), $str);
+			$str = str_replace("{playbackContext}", "/playbackContext/".rawurlencode($this->playbackContext), $str);
 		else
 			$str = str_replace("{playbackContext}", "", $str);
 		
@@ -266,6 +266,10 @@ abstract class kManifestRenderer
 		$headers[] = "Access-Control-Expose-Headers: Server,range,Content-Length,Content-Range";
 		foreach ($headers as $header)
 		{
+			if ($this->deliveryCode)
+			{
+			    $header = str_replace("{deliveryCode}", $this->deliveryCode, $header);
+			}
 			header($header);
 		}
 		

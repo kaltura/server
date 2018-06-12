@@ -7,10 +7,9 @@ class ESearchQueryHighlightsAttributes
 {
 	const GLOBAL_SCOPE = "global";
 	const INNER_SCOPE = "inner";
-	const HIGHLIGHT_HIGHEST_PRIORITY = 1;
-	const HIGHLIGHT_MEDIUM_PRIORITY = 10;
-	const HIGHLIGHT_DEFUALT_PRIORITY = 50;
-	const HIGHLIGHT_LOWEST_PRIORITY = 100;
+	const DEFAULT_PRIORITY_KEY = 'default';
+	const FIELDNAME_PRIORITY_KEY = 'fieldname';
+	const HIGHLIGHT_DEFAULT_PRIORITY = 50;
 
 	/**
 	 * @var array
@@ -107,16 +106,23 @@ class ESearchQueryHighlightsAttributes
 
 	private function getFieldTypePriority($fieldName)
 	{
-		$priority = self::HIGHLIGHT_DEFUALT_PRIORITY;
-		if(kString::endsWith($fieldName, kESearchQueryManager::RAW_FIELD_SUFFIX))
-			$priority =  self::HIGHLIGHT_HIGHEST_PRIORITY;
-		else if(kString::endsWith($fieldName, kESearchQueryManager::NGRAMS_FIELD_SUFFIX))
-			$priority = self::HIGHLIGHT_LOWEST_PRIORITY;
-		else if(kString::endsWith($fieldName, kESearchQueryManager::SYNONYM_FIELD_SUFFIX))
-			$priority = self::HIGHLIGHT_LOWEST_PRIORITY;
-		else if($this->baseFieldNameMapping[$fieldName] == $fieldName)
-			$priority = self::HIGHLIGHT_MEDIUM_PRIORITY;
+		$highlightsPriorityConfig = kConf::get('highlights_priority', 'elastic', array());
 
-		return $priority;
+		foreach ($this->getSuffixPriorityConfig($highlightsPriorityConfig) as $key => $priority)
+		{
+			if(kString::endsWith($fieldName, $key))
+				return $priority;
+		}
+
+		if($this->baseFieldNameMapping[$fieldName] == $fieldName && isset($highlightsPriorityConfig[self::FIELDNAME_PRIORITY_KEY]))
+			return $highlightsPriorityConfig[self::FIELDNAME_PRIORITY_KEY];
+
+		return isset($highlightsPriorityConfig[self::DEFAULT_PRIORITY_KEY]) ? $highlightsPriorityConfig[self::DEFAULT_PRIORITY_KEY] : self::HIGHLIGHT_DEFAULT_PRIORITY;
 	}
+
+	private function getSuffixPriorityConfig($highlightsPriorityConfig)
+	{
+		return array_diff($highlightsPriorityConfig, array(self::DEFAULT_PRIORITY_KEY, self::FIELDNAME_PRIORITY_KEY));
+	}
+
 }

@@ -80,10 +80,26 @@ class YouTubeDistributionEngineSelector extends DistributionEngine implements
 		if (!$data->distributionProfile instanceof KalturaYouTubeDistributionProfile)
 			throw new Exception('Distribution profile is not of type KalturaYouTubeDistributionProfile for entry distribution #'.$data->entryDistributionId);
 
-		if ($data->distributionProfile->feedSpecVersion == KalturaYouTubeDistributionFeedSpecVersion::VERSION_2)
-			$engine = new YouTubeDistributionRightsFeedEngine();
-		else
-			$engine = new YouTubeDistributionLegacyEngine();
+		switch ( $data->distributionProfile->feedSpecVersion )
+		{
+			case KalturaYouTubeDistributionFeedSpecVersion::VERSION_1:
+			{
+				$engine = new YouTubeDistributionLegacyEngine();
+				break;
+			}
+			case KalturaYouTubeDistributionFeedSpecVersion::VERSION_2:
+			{
+				$engine = new YouTubeDistributionRightsFeedEngine();
+				break;
+			}
+			case KalturaYouTubeDistributionFeedSpecVersion::VERSION_3:
+			{
+				$engine = new YouTubeDistributionCsvEngine();
+				break;
+			}
+			default:
+				throw new Exception('Distribution profile feedSpecVersion does not match existing versions');
+		}
 
 		if (KBatchBase::$taskConfig)
 			$engine->configure();

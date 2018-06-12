@@ -135,5 +135,10 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 		return false;
 	}
 
+	public function getIsMomentary()
+	{
+		return true;
+	}
+
 
 }

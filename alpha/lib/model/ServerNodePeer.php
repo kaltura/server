@@ -131,7 +131,7 @@ class ServerNodePeer extends BaseServerNodePeer {
 	
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("serverNode:id%s", self::ID), array("serverNode:hostName=%s", self::HOST_NAME));		
+		return array(array("serverNode:id%s", self::ID), array("serverNode:hostName=%s", self::HOST_NAME));
 	}
 
 	public static function retrieveActiveUnoccupiedServerNodesByType($type, PropelPDO $con = null)
@@ -144,6 +144,7 @@ class ServerNodePeer extends BaseServerNodePeer {
 		$c->add(EntryServerNodePeer::SERVER_NODE_ID, null);
 		$c->addJoin(ServerNodePeer::ID, EntryServerNodePeer::SERVER_NODE_ID, Criteria::LEFT_JOIN);
 		$c->setLimit(3);
+		$c->addAscendingOrderByColumn('LENGTH('. ServerNodePeer::HOST_NAME.'),'.ServerNodePeer::HOST_NAME);
 		$objs = ServerNodePeer::doSelect($c, $con);
 
 		return $objs;

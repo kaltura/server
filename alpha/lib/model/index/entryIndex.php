@@ -94,8 +94,8 @@ class entryIndex extends BaseIndexObject
 				'last_played_at' => 'lastPlayedAt',
 				'entitled_kusers_publish' => 'entitledKusersPublish',
 				'entitled_kusers_edit' => 'entitledKusersEdit',
-				'entitled_kusers_view' => 'entitledKusersView',
 				'entitled_kusers' => 'entitledKusers',
+				'entitled_kusers_view' => 'entitledKusersView',
 				'privacy_by_contexts' => 'privacyByContexts',
 				'creator_kuser_id' => 'creatorKuserId',
 				'creator_puser_id' => 'creatorPuserId',
@@ -158,8 +158,8 @@ class entryIndex extends BaseIndexObject
 				'last_played_at' => IIndexable::FIELD_TYPE_DATETIME,
 				'entitled_kusers_publish' => IIndexable::FIELD_TYPE_STRING,
 				'entitled_kusers_edit' => IIndexable::FIELD_TYPE_STRING,
-				'entitled_kusers_view' => IIndexable::FIELD_TYPE_STRING,
 				'entitled_kusers' => IIndexable::FIELD_TYPE_STRING,
+				'entitled_kusers_view' => IIndexable::FIELD_TYPE_STRING,
 				'privacy_by_contexts' => IIndexable::FIELD_TYPE_STRING,
 				'creator_kuser_id' => IIndexable::FIELD_TYPE_STRING,
 				'creator_puser_id' => IIndexable::FIELD_TYPE_STRING,
@@ -192,8 +192,8 @@ class entryIndex extends BaseIndexObject
 				'roots',
 				'entitled_kusers_publish',
 				'entitled_kusers_edit',
-				'entitled_kusers_view',
 				'entitled_kusers',
+				'entitled_kusers_view',
 				'privacy_by_contexts',
 			);
 		}
@@ -251,8 +251,8 @@ class entryIndex extends BaseIndexObject
 				'entry.LAST_PLAYED_AT' => 'last_played_at',
 				'entry.ENTITLED_KUSERS_PUBLISH' => 'entitled_kusers_publish',
 				'entry.ENTITLED_KUSERS_EDIT' => 'entitled_kusers_edit',
-				'entry.ENTITLED_KUSERS_VIEW' => 'entitled_kusers_view',
 				'entry.ENTITLED_KUSERS' => 'entitled_kusers',
+				'entry.ENTITLED_KUSERS_VIEW' => 'entitled_kusers_view',
 				'entry.PRIVACY_BY_CONTEXTS' => 'privacy_by_contexts',
 				'entry.CREATOR_KUSER_ID' => 'creator_kuser_id',
 				'entry.CREATOR_PUSER_ID' => 'creator_puser_id',
@@ -442,6 +442,7 @@ class entryIndex extends BaseIndexObject
 		return self::$apiMatchAttributesMap;
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationMap()
 	{
 		return array(
@@ -451,6 +452,7 @@ class entryIndex extends BaseIndexObject
 		);
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationValues()
 	{
 		return array(
@@ -465,12 +467,14 @@ class entryIndex extends BaseIndexObject
 		return entryPeer::doCount($c);
 	}
 
+	//This function is generated based on cacheInvalidationKey elements in the relevant IndexSchema.xml
 	public static function getCacheInvalidationKeys($object = null)
 	{
 		if (is_null($object))
-			return array(array("entry:id=%s", entryPeer::ID), array("entry:partnerId=%s", entryPeer::PARTNER_ID));		
+			return array(array("entry:id=%s", entryPeer::ID), array("entry:partnerId=%s", entryPeer::PARTNER_ID));
 		else
 			return array("entry:id=".strtolower($object->getId()), "entry:partnerId=".strtolower($object->getPartnerId()));
 	}
+
 }
 

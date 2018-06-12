@@ -40,6 +40,9 @@ abstract class KalturaEmailNotificationRecipientJobData extends KalturaObject
 				case 'kEmailNotificationUserRecipientJobData':
 					$instance = new KalturaEmailNotificationUserRecipientJobData();
 					break;
+				case 'kEmailNotificationGroupRecipientJobData':
+					$instance = new KalturaEmailNotificationGroupRecipientJobData();
+					break;
 				default:
 					$instance = KalturaPluginManager::loadObject('KalturaEmailNotificationRecipientJobData', $dbData->getProviderType());
 					break;

@@ -167,36 +167,7 @@ abstract class kCaptionsContentManager
 	}
 
 
-	public static function onTimeRange($captionStartTime, $captionEndTime, $clipStartTime, $clipEndTime)
-	{
-		//caption asset items which started before clip start time but ended after the clip started
-		if(($captionEndTime >= $clipStartTime) && ($captionStartTime <= $clipStartTime))
-			return true;
 
-		//caption asset items which started during clip time range
-		if (($captionStartTime >= $clipStartTime) && ($captionStartTime <= $clipEndTime))
-			return true;
-
-		return false;
-	}
-
-
-	public static function getAdjustedStartTime($captionStartTime, $clipStartTime, $globalOffSet)
-	{
-		$adjustedStartTime = $captionStartTime - $clipStartTime + $globalOffSet;
-		if ($adjustedStartTime < $globalOffSet)
-			$adjustedStartTime = $globalOffSet;
-		return $adjustedStartTime;
-	}
-
-
-	public static function getAdjustedEndTime($clipStartTime, $clipEndTime, $captionEndTime, $globalOffSet)
-	{
-		$adjustedEndTime = $captionEndTime - $clipStartTime + $globalOffSet;
-		if ($adjustedEndTime > $clipEndTime - $clipStartTime + $globalOffSet)
-			$adjustedEndTime = $clipEndTime - $clipStartTime + $globalOffSet;
-		return $adjustedEndTime;
-	}
 
 	/**
 	 * @param $timeStr

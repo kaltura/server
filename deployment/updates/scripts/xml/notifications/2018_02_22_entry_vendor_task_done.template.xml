@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<config>
+		<serviceUrl>@SERVICE_URL@</serviceUrl>
+		<partnerId>-2</partnerId>
+		<clientTag>Stand alone php 1.0.0</clientTag>
+		<curlTimeout>30</curlTimeout>
+		<userAgent>Stand alone php 1.0.0</userAgent>
+	</config>
+	<session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+	<multirequest>
+		<!-- Entry Vendor Task Approved -->
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaEmailNotificationTemplate">
+				<name>Task Finished Processing</name>
+				<systemName>Entry_Vendor_Task_Finished_Processing</systemName>
+				<description>Email notification template to be sent when entry vendor task has finished processing.</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>42</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY_VENDOR_TASK -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<field objectType="KalturaEvalBooleanField">
+							<code>$scope->getObject() instanceof EntryVendorTask &amp;&amp; in_array(EntryVendorTaskPeer::STATUS, $scope->getEvent()->getModifiedColumns())</code>
+						</field>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<field objectType="KalturaEvalBooleanField">
+							<code>$scope->getObject()->getCreationMode() == EntryVendorTaskCreationMode::MANUAL &amp;&amp; $scope->getObject()->getStatus() == EntryVendorTaskStatus::READY</code>
+						</field>
+					</item>
+				</eventConditions>
+				<format>1</format>
+				<subject>[AppTitle] - Your entry vendor task has finished processing.</subject>
+				<body>Your caption request [#{task_id}]: For entry name {entry_name} and entry ID {entry_id} requested on {request_date} finished processing. To view task go to [AppEntryUrl]{entry_id}</body>
+				<fromEmail>{from_email}</fromEmail>
+				<fromName>{from_name}</fromName>
+				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
+					<emailRecipients objectType="array">
+						<item objectType = "KalturaEmailNotificationRecipient">
+							<email objectType="KalturaStringValue">
+								<value>{creator_email}</value>
+							</email>
+							<name objectType="KalturaStringValue">
+								<value>{creator_name}</value>
+							</name>
+						</item>
+					</emailRecipients>
+				</to>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>from_email</key>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get("partner_notification_email")</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>from_name</key>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get("partner_notification_name")</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_name</key>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getName() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_id</key>
+						<description>Task entryId</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getEntryId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>creator_email</key>
+						<description>Task creator email</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getUserId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>creator_name</key>
+						<description>Entry creator name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getkuser()->getFirstName() . ' ' . $scope->getEvent()->getObject()->getkuser()->getLastName()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>request_date</key>
+						<description>Task creation time</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getCreatedAt()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>task_id</key>
+						<description>Task ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>reject_reason</key>
+						<description>Reject Reason</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getErrDescription()</code>
+						</value>
+					</item>
+				</contentParameters>
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+</xml>
+

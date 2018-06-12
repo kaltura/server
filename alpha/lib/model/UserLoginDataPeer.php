@@ -299,6 +299,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 		
 		$loginData->resetPassword($newPassword);
+		myPartnerUtils::initialPasswordSetForFreeTrial($loginData);
+
 		return true;
 	}
 	

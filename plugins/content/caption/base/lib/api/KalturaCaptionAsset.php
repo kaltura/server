@@ -71,9 +71,15 @@ class KalturaCaptionAsset extends KalturaAsset
 
 	/**
 	 * The Accuracy of the caption content
-	 *@var int 
+	 * @var int 
 	 */
 	public $accuracy;
+	
+	/**
+	 * The Accuracy of the caption content
+	 * @var bool
+	 */
+	public $displayOnPlayer;
 
 	private static $map_between_objects = array
 	(
@@ -85,6 +91,7 @@ class KalturaCaptionAsset extends KalturaAsset
 		"status",
 		"parentId",
 		"accuracy",
+		"displayOnPlayer",
 	);
 	
 	public function getMapBetweenObjects ( )

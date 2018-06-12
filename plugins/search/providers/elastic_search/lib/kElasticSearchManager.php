@@ -85,9 +85,13 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
             $cache->add($cacheKey, 0, 60);
             $saveCounter = $cache->increment($cacheKey);
         }
-
-        $updatesKey = strtolower($className."_".kCurrentContext::$service."_".kCurrentContext::$action);
+		
         $skipElasticRepetitiveUpdates = kConf::get(self::REPETITIVE_UPDATES_CONFIG_KEY, 'local', array());
+		
+        $updatesKey = strtolower(kCurrentContext::getCurrentPartnerId()."_".$className."_".kCurrentContext::$service."_".kCurrentContext::$action);
+        if(!isset($skipElasticRepetitiveUpdates[$updatesKey]))
+			$updatesKey = strtolower($className."_".kCurrentContext::$service."_".kCurrentContext::$action);
+        
         $skipSave = isset($skipElasticRepetitiveUpdates[$updatesKey]) && $saveCounter > $skipElasticRepetitiveUpdates[$updatesKey];
         KalturaLog::debug("Saving to elastic for object [$className] [$objectId] count [ $saveCounter  ] " . kCurrentContext::$service . ' ' . kCurrentContext::$action . " [$skipSave]");
 

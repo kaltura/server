@@ -95,7 +95,8 @@ class kmcngAction extends kalturaAction
 			);
 		}
 
-		if (kConf::hasParam("studio_v3_version") && kConf::hasParam("html5_version"))
+		// TODO Future use - remove the false flag
+		if (false && kConf::hasParam("studio_v3_version") && kConf::hasParam("html5_version"))
 		{
 			$studioV3 = array(
 				"enabled" => true,

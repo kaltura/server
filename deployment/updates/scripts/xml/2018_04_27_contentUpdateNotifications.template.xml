@@ -1,0 +1,1336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+    <multirequest>
+        <!-- New Item Pending Moderation -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Caption asset content updated</name>
+                <systemName>Caption_Asset_Content_Updated</systemName>
+                <description>Email notification template to be sent when a caption asset's content is updated</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType>
+                <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>captionAssetEventNotifications.CaptionAsset</eventObjectType>
+                <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Status field modified</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>in_array(assetPeer::VERSION, $scope->getEvent()->getModifiedColumns())</code>
+                        </field>
+                    </item>
+                </eventConditions>
+                <format>1</format>
+                <subject>Caption content was updated</subject>
+                <body>Caption content was updated</body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <to objectType="KalturaEmailNotificationStaticRecipientProvider">
+                    <emailRecipients objectType="array">
+                        <item objectType = "KalturaEmailNotificationRecipient">
+                            <email objectType="KalturaStringValue">
+                                <value>{owner_email}</value>
+                            </email>
+                            <name objectType="KalturaStringValue">
+                                <value>{owner_name}</value>
+                            </name>
+                        </item>
+                    </emailRecipients>
+                </to>
+                <cc objectType="KalturaEmailNotificationStaticRecipientProvider">
+                    <emailRecipients objectType="array">
+                        <item objectType = "KalturaEmailNotificationRecipient">
+                            <email objectType="KalturaStringValue">
+                                <value>{user_email}</value>
+                            </email>
+                            <name objectType="KalturaStringValue">
+                                <value>{user_name}</value>
+                            </name>
+                        </item>
+                    </emailRecipients>
+                </cc>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Server configuration: partner_notification_email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Server configuration: partner_notification_name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry Id</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $scope->getObject()->getEntryId() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>file_name</key>
+                        <description>File name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null($scope->getObject()->getLabel()) ? $scope->getObject()->getLabel() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>language</key>
+                        <description>Language</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getLanguage()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>owner_name</key>
+                        <description>Owner name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(PartnerPeer::retrieveByPk($scope->getObject()->getPartnerId())) ? PartnerPeer::retrieveByPk($scope->getObject()->getPartnerId())->getPartnerName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>owner_email</key>
+                        <description>Owner email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(PartnerPeer::retrieveByPk($scope->getObject()->getPartnerId())) ? PartnerPeer::retrieveByPk($scope->getObject()->getPartnerId())->getAdminEmail() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_name</key>
+                        <description>User name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getFirstName().' '.entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getLastName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_email</key>
+                        <description>User email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getEmail() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_id</key>
+                        <description>User ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
+                        </value>
+                    </item>
+                </contentParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+    <multirequest>
+        <!-- New Item Pending Moderation -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Caption asset deleted</name>
+                <systemName>Caption_Asset_Deleted</systemName>
+                <description>Email notification template to be sent when a caption asset is deleted</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType>
+                <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>captionAssetEventNotifications.CaptionAsset</eventObjectType>
+                <!-- EventNotificationEventObjectType::CAPTIONASSET -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Status field modified</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>in_array(assetPeer::STATUS, $scope->getEvent()->getModifiedColumns())</code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaFieldMatchCondition">
+                        <description>Status equals</description>
+                        <field objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getStatus()</code>
+                        </field>
+                        <values objectType="array">
+                            <item objectType="KalturaStringValue">
+                                <value>3</value>
+                            </item>
+                        </values>
+                    </item>
+                </eventConditions>
+                <format>1</format>
+                <subject>Caption asset was deleted</subject>
+                <body>Caption asset was deleted</body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <to objectType="KalturaEmailNotificationStaticRecipientProvider">
+                    <emailRecipients objectType="array">
+                        <item objectType = "KalturaEmailNotificationRecipient">
+                            <email objectType="KalturaStringValue">
+                                <value>{owner_email}</value>
+                            </email>
+                            <name objectType="KalturaStringValue">
+                                <value>{owner_name}</value>
+                            </name>
+                        </item>
+                    </emailRecipients>
+                </to>
+                <cc objectType="KalturaEmailNotificationStaticRecipientProvider">
+                    <emailRecipients objectType="array">
+                        <item objectType = "KalturaEmailNotificationRecipient">
+                            <email objectType="KalturaStringValue">
+                                <value>{user_email}</value>
+                            </email>
+                            <name objectType="KalturaStringValue">
+                                <value>{user_name}</value>
+                            </name>
+                        </item>
+                    </emailRecipients>
+                </cc>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Server configuration: partner_notification_email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Server configuration: partner_notification_name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry Id</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $scope->getObject()->getEntryId() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>file_name</key>
+                        <description>File name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null($scope->getObject()->getLabel()) ? $scope->getObject()->getLabel() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>language</key>
+                        <description>Language</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getLanguage()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>owner_name</key>
+                        <description>Owner name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(PartnerPeer::retrieveByPk($scope->getObject()->getPartnerId())) ? PartnerPeer::retrieveByPk($scope->getObject()->getPartnerId())->getPartnerName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>owner_email</key>
+                        <description>Owner email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(PartnerPeer::retrieveByPk($scope->getObject()->getPartnerId())) ? PartnerPeer::retrieveByPk($scope->getObject()->getPartnerId())->getAdminEmail() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_name</key>
+                        <description>User name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getFirstName().' '.entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getLastName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_email</key>
+                        <description>User email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getEmail() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_id</key>
+                        <description>User ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
+                        </value>
+                    </item>
+                </contentParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+    <multirequest>
+        <!-- New Item Pending Moderation -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>New Caption Asset Added To Entry</name>
+                <systemName>New_Caption_Asset_Added_To_Entry</systemName>
+                <description>Email notification template to be sent when a new caption asset is added to an entry.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>5</eventType>
+                <!-- EventNotificationEventType::OBJECT_CREATED -->
+                <eventObjectType>captionAssetEventNotifications.CaptionAsset</eventObjectType>
+                <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
+                <format>1</format>
+                <subject>A new caption file was added [entry name: {entry_name}]</subject>
+                <body>
+                    <![CDATA[ Hi,<br><p>A new caption file was added to an entry.</p>Entry ID: {entry_id}<br>Entry Name: {entry_name}<br>Caption file name: {file_name}<br>Caption file language: {language}]]>
+                </body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <to objectType="KalturaEmailNotificationStaticRecipientProvider">
+                    <emailRecipients objectType="array">
+                        <item objectType = "KalturaEmailNotificationRecipient">
+                            <email objectType="KalturaStringValue">
+                                <value>{owner_email}</value>
+                            </email>
+                            <name objectType="KalturaStringValue">
+                                <value>{owner_name}</value>
+                            </name>
+                        </item>
+                    </emailRecipients>
+                </to>
+                <cc objectType="KalturaEmailNotificationStaticRecipientProvider">
+                    <emailRecipients objectType="array">
+                        <item objectType = "KalturaEmailNotificationRecipient">
+                            <email objectType="KalturaStringValue">
+                                <value>{user_email}</value>
+                            </email>
+                            <name objectType="KalturaStringValue">
+                                <value>{user_name}</value>
+                            </name>
+                        </item>
+                    </emailRecipients>
+                </cc>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Server configuration: partner_notification_email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Server configuration: partner_notification_name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry Id</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $scope->getObject()->getEntryId() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>file_name</key>
+                        <description>File name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null($scope->getObject()->getLabel()) ? $scope->getObject()->getLabel() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>language</key>
+                        <description>Language</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getLanguage()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>owner_name</key>
+                        <description>Owner name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(PartnerPeer::retrieveByPk($scope->getObject()->getPartnerId())) ? PartnerPeer::retrieveByPk($scope->getObject()->getPartnerId())->getPartnerName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>owner_email</key>
+                        <description>Owner email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(PartnerPeer::retrieveByPk($scope->getObject()->getPartnerId())) ? PartnerPeer::retrieveByPk($scope->getObject()->getPartnerId())->getAdminEmail() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_name</key>
+                        <description>User name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getFirstName().' '.entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getLastName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_email</key>
+                        <description>User email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getEmail() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_id</key>
+                        <description>User ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
+                        </value>
+                    </item>
+                </contentParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+    <multirequest>
+        <!-- New Item Pending Moderation -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Caption asset language or label changed</name>
+                <systemName>Caption_Asset_Language_or_Label_Changed</systemName>
+                <description>Email notification template to be sent when a caption asset's label or language fields are changed</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType>
+                <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>captionAssetEventNotifications.CaptionAsset</eventObjectType>
+                <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Language or label changed</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getEvent()->isCustomDataModified('language') || $scope->getEvent()->isCustomDataModified('label')</code>
+                        </field>
+                    </item>
+                </eventConditions>
+                <format>1</format>
+                <subject>Caption asset was changed</subject>
+                <body>Caption asset was changed</body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <to objectType="KalturaEmailNotificationStaticRecipientProvider">
+                    <emailRecipients objectType="array">
+                        <item objectType = "KalturaEmailNotificationRecipient">
+                            <email objectType="KalturaStringValue">
+                                <value>{owner_email}</value>
+                            </email>
+                            <name objectType="KalturaStringValue">
+                                <value>{owner_name}</value>
+                            </name>
+                        </item>
+                    </emailRecipients>
+                </to>
+                <cc objectType="KalturaEmailNotificationStaticRecipientProvider">
+                    <emailRecipients objectType="array">
+                        <item objectType = "KalturaEmailNotificationRecipient">
+                            <email objectType="KalturaStringValue">
+                                <value>{user_email}</value>
+                            </email>
+                            <name objectType="KalturaStringValue">
+                                <value>{user_name}</value>
+                            </name>
+                        </item>
+                    </emailRecipients>
+                </cc>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Server configuration: partner_notification_email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Server configuration: partner_notification_name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry Id</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $scope->getObject()->getEntryId() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>file_name</key>
+                        <description>File name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null($scope->getObject()->getLabel()) ? $scope->getObject()->getLabel() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>language</key>
+                        <description>Language</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getLanguage()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>owner_name</key>
+                        <description>Owner name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(PartnerPeer::retrieveByPk($scope->getObject()->getPartnerId())) ? PartnerPeer::retrieveByPk($scope->getObject()->getPartnerId())->getPartnerName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>owner_email</key>
+                        <description>Owner email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(PartnerPeer::retrieveByPk($scope->getObject()->getPartnerId())) ? PartnerPeer::retrieveByPk($scope->getObject()->getPartnerId())->getAdminEmail() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_name</key>
+                        <description>User name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getFirstName().' '.entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getLastName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_email</key>
+                        <description>User email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getEmail() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_id</key>
+                        <description>User ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
+                        </value>
+                    </item>
+                </contentParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+    <multirequest>
+        <!-- Comment was added to entry -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Channel was created</name>
+                <systemName>Channel_Created</systemName>
+                <description>Email notification template to be sent when a new channel is created</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>5</eventType>
+                <!-- EventNotificationEventType::OBJECT_CREATED -->
+                <eventObjectType>2</eventObjectType>
+                <!-- EventNotificationEventObjectType::CATEGORY -->
+                <format>1</format>
+                <subject>A new channel was added</subject>
+                <body>A new channel was created</body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Server configuration: partner_notification_email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Server configuration: partner_notification_name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>channel_id</key>
+                        <description>Channel ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>channel_name</key>
+                        <description>Channel name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getName()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>channel_tags</key>
+                        <description>Channel tags</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getTags()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>channel_description</key>
+                        <description>Channel description</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getDescription()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_id</key>
+                        <description>User ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
+                        </value>
+                    </item>
+                </contentParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+    <multirequest>
+        <!-- Comment was added to entry -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Channel was updated</name>
+                <systemName>Channel_Updated</systemName>
+                <description>Email notification template to be sent when an existing channel is updated</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType>
+                <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>2</eventObjectType>
+                <!-- EventNotificationEventObjectType::CATEGORY -->
+                <format>1</format>
+                <subject>Channel was updated</subject>
+                <body>Existing channel was updated</body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Server configuration: partner_notification_email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Server configuration: partner_notification_name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>channel_id</key>
+                        <description>Channel ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>channel_name</key>
+                        <description>Channel name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getName()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>channel_tags</key>
+                        <description>Channel tags</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getTags()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>channel_description</key>
+                        <description>Channel description</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getDescription()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_id</key>
+                        <description>User ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
+                        </value>
+                    </item>
+                </contentParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+    <multirequest>
+        <!-- Comment was added to entry -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Comment was added to entry</name>
+                <systemName>Comment_Was_Added_To_Entry</systemName>
+                <description>Email notification template to be sent to entry creator when a comment is added to his entry.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>5</eventType>
+                <!-- EventNotificationEventType::OBJECT_CREATED -->
+                <eventObjectType>annotationEventNotifications.Annotation</eventObjectType>
+                <!-- annotationEventNotifications.Annotation -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Object type verified</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject() instanceof Annotation</code>
+                        </field>
+                    </item>
+                </eventConditions>
+                <format>1</format>
+                <subject>A new comment was added to your video {entry_name}</subject>
+                <body>A new comment was added to your video {entry_name}. </body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <bcc objectType="KalturaEmailNotificationStaticRecipientProvider">
+                    <emailRecipients objectType="array">
+                        <item objectType = "KalturaEmailNotificationRecipient">
+                            <email objectType="KalturaEvalStringField">
+                                <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? (!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getEmail() : '') : ''</code>
+                            </email>
+                            <name objectType="KalturaEvalStringField">
+                                <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? (!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getFirstName().' '.entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getLastName() : '') : ''</code>
+                            </name>
+                        </item>
+                    </emailRecipients>
+                </bcc>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Server configuration: partner_notification_email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Server configuration: partner_notification_name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getEntryId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>comment_text</key>
+                        <description>Comment Text</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getText()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>comment_user_id</key>
+                        <description>Comment user ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kuserPeer::retrieveByPk($scope->getObject()->getKuserId()) ? kuserPeer::retrieveByPk($scope->getObject()->getKuserId())->getPuserId() : null </code>
+                        </value>
+                    </item>
+                </contentParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Entry Changed</name>
+                <systemName>EMAIL_ENTRY_CHANGED</systemName>
+                <description>Email notification template to be sent when an entry metadata changed.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType>
+                <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>1</eventObjectType>
+                <!-- EventNotificationEventObjectType::ENTRY -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventObjectChangedCondition">
+                        <description>Entry metadata changed, columns defined in modified_columns parameter</description>
+                        <modifiedColumns>{modified_columns}</modifiedColumns>
+                    </item>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>only non-temporary entries</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject()->getDisplayInSearch() != mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM </code>
+                        </field>
+                    </item>	
+                </eventConditions>
+                <format>1</format>
+                <subject>[Kaltura] - Entry metadata changed</subject>
+                <body>Entry with ID {entry_id} NAME {entry_name} metadata changed.</body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>From email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>From name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getName()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_tags</key>
+                        <description>Entry tags</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getTags()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_description</key>
+                        <description>Entry description</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getDescription()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getName()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>owner_name</key>
+                        <description>Account owner name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null($entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $entry->getPartner()->getPartnerName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>owner_email</key>
+                        <description>Account owner email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null($entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $entry->getPartner()->getAdminEmail() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>creator_name</key>
+                        <description>Entry creator name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null($scope->getObject()->getkuser()) ? $scope->getObject()->getkuser()->getFirstName() . ' ' . $scope->getObject()->getkuser()->getLastName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>creator_email</key>
+                        <description>Entry creator email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null($scope->getObject()->getkuser()) ? $scope->getObject()->getkuser()->getEmail() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_id</key>
+                        <description>User ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
+                        </value>
+                    </item>
+                </contentParameters>
+                <userParameters objectType="array">
+                    <item objectType="KalturaEventNotificationArrayParameter">
+                        <key>modified_columns</key>
+                        <description>Entry metadata columns that will trigger the event</description>
+                        <allowedValues objectType="array">
+                            <item objectType="KalturaStringValue">
+                                <value>entry.NAME</value>
+                                <description>name</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>entry.DATA</value>
+                                <description>content</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>entry.THUMBNAIL</value>
+                                <description>thumbnail</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>entry.RANK</value>
+                                <description>rank</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>entry.TAGS</value>
+                                <description>tags</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>entry.STATUS</value>
+                                <description>status</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>entry.LENGTH_IN_MSECS</value>
+                                <description>duration</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>entry.PARTNER_DATA</value>
+                                <description>partner data</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>entry.DESCRIPTION</value>
+                                <description>description</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>entry.MODERATION_STATUS</value>
+                                <description>moderation status</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>entry.PUSER_ID</value>
+                                <description>owner id</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>entry.ACCESS_CONTROL_ID</value>
+                                <description>access control profile id</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>entry.START_DATE</value>
+                                <description>start date</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>entry.END_DATE</value>
+                                <description>end date</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>entry.FLAVOR_PARAMS_IDS</value>
+                                <description>flavor params ids</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>referenceID</value>
+                                <description>reference id</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>partnerSortValue</value>
+                                <description>partner sort value</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>replacementStatus</value>
+                                <description>replacement status</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>replacingEntryId</value>
+                                <description>replacing entry id</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>entitledUserPuserEdit</value>
+                                <description>entitled users - edit</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>entitledUserPuserPublish</value>
+                                <description>entitled users - publish</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>width</value>
+                                <description>width</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>height</value>
+                                <description>height</description>
+                            </item>
+                        </allowedValues>
+                    </item>
+                </userParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+    <multirequest>
+        <!-- Entry was added to channel -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Entry was added to channel</name>
+                <systemName>Entry_Was_Added_To_Channel</systemName>
+                <description>Email notification template to be sent when entry is added to channel.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>5</eventType>
+                <!-- EventNotificationEventType::OBJECT_CREATED -->
+                <eventObjectType>37</eventObjectType>
+                <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Status is active, See:KalturaCategoryEntryStatus:/api_v3/testmeDoc/?object=KalturaCategoryEntryStatus</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject() instanceof categoryEntry &amp;&amp; $scope->getObject()->getStatus() == CategoryEntryStatus::ACTIVE</code>
+                        </field>
+                    </item>
+                </eventConditions>
+                <format>1</format>
+                <subject>An entry was added to {category_name}</subject>
+                <body>Media {entry_name} was added to {category_name}.</body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Server configuration: partner_notification_email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Server configuration: partner_notification_name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_name</key>
+                        <description>Category name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(categoryPeer::retrieveByPk($scope->getObject()->getCategoryId())) ? categoryPeer::retrieveByPk($scope->getObject()->getCategoryId())->getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_id</key>
+                        <description>Category I</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getCategoryId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getEntryId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_id</key>
+                        <description>User ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_tags</key>
+                        <description>Entry tags</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getTags() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_description</key>
+                        <description>Entry description</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getDescription() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_reference_id</key>
+                        <description>Entry reference ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getReferenceId() : ''</code>
+                        </value>
+                    </item>
+                </contentParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Entry Content Replaced</name>
+                <systemName>Entry_Content_Replaced</systemName>
+                <description>Email notification template to be sent when an entry content replaced successfully.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>12</eventType>
+                <!-- EventNotificationEventType::OBJECT_REPLACED -->
+                <eventObjectType>1</eventObjectType>
+                <!-- EventNotificationEventObjectType::ENTRY -->
+                <format>1</format>
+                <subject>Your media was replaced successfully</subject>
+                <body>Your recently replaced media: "{entry_name}", is ready for playback.</body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getName()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_id</key>
+                        <description>User ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
+                        </value>
+                    </item>
+                </contentParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Email Entry Metadata Changed</name>
+                <systemName>EMAIL_ENTRY_METADATA_CHANGED</systemName>
+                <description>Email notification template to be sent when a custom metadata object belonging to an entry changes.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>6</eventType>
+                <!-- EventNotificationEventType::OBJECT_DATA_CHANGED -->
+                <eventObjectType>metadataEventNotifications.Metadata</eventObjectType>
+                <!-- EventNotificationEventObjectType::METADATA -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaFieldMatchCondition">
+                        <description>Object type is entry</description>
+                        <field objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getObjectType()</code>
+                        </field>
+                        <values objectType="array">
+                            <item objectType="KalturaStringValue">
+                                <value>1</value>
+                            </item>
+                        </values>
+                    </item>
+                </eventConditions>
+                <format>1</format>
+                <subject>Custom Data Changed: {entry_name}/ ID: {entry_id} </subject>
+                <body>{changed_fields}</body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <to objectType="KalturaEmailNotificationStaticRecipientProvider">
+                    <emailRecipients objectType="array">			
+                        <item objectType = "KalturaEmailNotificationRecipient">
+                            <email objectType="KalturaStringValue">
+                                <value>{owner_email}</value>
+                            </email>
+                            <name objectType="KalturaStringValue">
+                                <value>{owner_name}</value>
+                            </name>
+                        </item>
+                    </emailRecipients>
+                </to>
+                <cc objectType="KalturaEmailNotificationStaticRecipientProvider">
+                    <emailRecipients objectType="array">			
+                        <item objectType = "KalturaEmailNotificationRecipient">
+                            <email objectType="KalturaStringValue">
+                                <value>{creator_email}</value>
+                            </email>
+                            <name objectType="KalturaStringValue">
+                                <value>{creator_name}</value>
+                            </name>
+                        </item>
+                    </emailRecipients>
+                </cc>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Sender email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Sender name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>creator_name</key>
+                        <description>Entry creator name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getObjectId())) ? entryPeer::retrieveByPk($scope->getObject()->getObjectId())->getkuser()->getFirstName() . ' ' . entryPeer::retrieveByPk($scope->getObject()->getObjectId())->getkuser()->getLastName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>creator_id</key>
+                        <description>Entry creator ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getObjectId())) ? entryPeer::retrieveByPk($scope->getObject()->getObjectId())->getKuserId() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>creator_email</key>
+                        <description>Entry creator email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getObjectId())) ? entryPeer::retrieveByPk($scope->getObject()->getObjectId())->getkuser()->getEmail() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>owner_name</key>
+                        <description>Account owner name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getObjectId())) ? entryPeer::retrieveByPk($scope->getObject()->getObjectId())->getPartner()->getPartnerName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>owner_email</key>
+                        <description>Account owner email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getObjectId())) ? entryPeer::retrieveByPk($scope->getObject()->getObjectId())->getPartner()->getAdminEmail() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>metadata_id</key>
+                        <description>Metadata ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getObjectId())) ? $scope->getObject()->getObjectId() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getObjectId())) ? entryPeer::retrieveByPk($scope->getObject()->getObjectId())->getName() : ''</code>
+                        </value>
+                    </item>	
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>changed_fields</key>
+                        <description>Changed fields</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>print_r(kMetadataManager::retrieveChangedFieldsAndValues ($scope->getObject()->getId(), $scope->getEvent()->getPreviousVersion()),true)</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_id</key>
+                        <description>User ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser()->getPuserId() : ''</code>
+                        </value>
+                    </item>						
+                </contentParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+</xml>

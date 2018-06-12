@@ -76,6 +76,9 @@ class EmailNotificationPlugin extends KalturaPlugin implements IKalturaPermissio
 				case KalturaEmailNotificationRecipientProviderType::USER:
 					return new KEmailNotificationUserRecipientEngine($recipientJobData);
 					break;
+				case KalturaEmailNotificationRecipientProviderType::GROUP:
+					return new KEMailNotificationGroupRecipientEngine($recipientJobData);
+					break;
 			}
 		}
 		

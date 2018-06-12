@@ -154,6 +154,10 @@ class KalturaAnnotation extends KalturaCuePoint
      */
     public function validateParentId($cuePointId = null)
     {
+		//Backward compatibility patch
+		if ($this->isNull('parentId'))
+			$this->parentId = 0;
+
 
         if ($this->parentId)
         {

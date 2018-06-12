@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+    <multirequest>
+        <!-- New Item Pending Moderation (Emailing to KMC Moderators) -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>New Item Pending Moderation (Emailing to KMC Moderators)</name>
+                <systemName>New_Item_Pending_Moderation_Kmc_Moderators</systemName>
+                <description>Email notification template to be sent when a new item is pending to be moderated by a KMC moderator.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType>
+                <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>1</eventObjectType>
+                <!-- EventNotificationEventObjectType::ENTRY -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject() instanceof entry &amp;&amp; in_array(entryPeer::MODERATION_STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION</code>
+                        </field>
+                    </item>
+                </eventConditions>
+                <format>1</format>
+                <subject>[Kaltura] - New Item Pending Moderation</subject>
+                <body>A new item is pending your approval in the Kaltura Management Console</body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <to objectType="KalturaEmailNotificationUserRecipientProvider">
+                    <filter objectType="KalturaUserFilter">
+                        <permissionNamesMultiLikeAnd>CONTENT_MODERATE_APPROVE_REJECT,CONTENT_MODERATE_BASE</permissionNamesMultiLikeAnd>
+                    </filter>
+                </to>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getId())) ? entryPeer::retrieveByPk($scope->getObject()->getId())->getName() : ''</code>
+                        </value>
+                    </item>
+                </contentParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+    <multirequest>
+        <!-- New Item Flagged For Moderation (Emailing to KMC Moderators) -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>New Item Flagged For Moderation (Emailing to KMC Moderators)</name>
+                <systemName>New_Item_Flagged_For_Moderation_Kmc_Moderators</systemName>
+                <description>Email notification template to be sent when an item is flagged for moderation.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType>
+                <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>1</eventObjectType>
+                <!-- EventNotificationEventObjectType::ENTRY -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject() instanceof entry &amp;&amp; in_array(entryPeer::MODERATION_STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_FLAGGED_FOR_REVIEW</code>
+                        </field>
+                    </item>
+                </eventConditions>
+                <format>1</format>
+                <subject>[Kaltura] - New Item Flagged For Review</subject>
+                <body>A new item is flagged for review in the Kaltura Management Console</body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <to objectType="KalturaEmailNotificationUserRecipientProvider">
+                    <filter objectType="KalturaUserFilter">
+                        <permissionNamesMultiLikeAnd>CONTENT_MODERATE_APPROVE_REJECT,CONTENT_MODERATE_BASE</permissionNamesMultiLikeAnd>
+                    </filter>
+                </to>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getId())) ? entryPeer::retrieveByPk($scope->getObject()->getId())->getName() : ''</code>
+                        </value>
+                    </item>
+                </contentParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+</xml>

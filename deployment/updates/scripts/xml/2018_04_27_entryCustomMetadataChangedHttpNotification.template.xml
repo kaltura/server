@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaHttpNotificationTemplate">
+                <name>Entry custom metadata changed</name>
+                <systemName>HTTP_ENTRY_CUSTOM_METADATA_CHANGED</systemName>
+                <description>HTTP notification template to be sent when an entry's custom metadata by any metadata profile changed</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>6</eventType>
+                <!-- EventNotificationEventType::OBJECT_DATA_CHANGED -->
+                <eventObjectType>metadataEventNotifications.Metadata</eventObjectType>
+                <!-- EventNotificationEventObjectType::METADATA -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaFieldMatchCondition">
+                        <description>Object type is entry</description>
+                        <field objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getObjectType()</code>
+                        </field>
+                        <values objectType="array">
+                            <item objectType="KalturaStringValue">
+                                <value>1</value>
+                            </item>
+                        </values>
+                    </item>
+                </eventConditions>
+                <contentParameters objectType="array" />
+                <data objectType="KalturaHttpNotificationObjectData">
+                    <apiObjectType>KalturaBaseEntry</apiObjectType>
+                    <code>(($scope->getObject()->getObjectType() == 1) ? entryPeer::retrieveByPk($scope->getObject()->getObjectId()): null)</code>
+                </data>
+
+                <method>2</method>
+                <!-- KalturaHttpNotificationMethod::POST -->
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+</xml>

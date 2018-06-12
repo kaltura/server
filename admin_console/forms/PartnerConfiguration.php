@@ -440,11 +440,6 @@ class Form_PartnerConfiguration extends Infra_Form
 				'filters'		=> array('StringTrim'),
 		));
 
-		$this->addElement('checkbox', 'enable_self_serve', array(
-			'label'			=> 'Self Serve enabled',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only'))),
-		));
-
 
 		//--------------- Host white list ----------------------------
 
@@ -883,7 +878,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$numberOfEntriesSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES, 'Number of videos allowed:');
 		$this->addLimitSubForm($numberOfEntriesSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES);
-		
+
 		$accessControlsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ACCESS_CONTROLS, 'Maximum access control profiles:', false);
 		$this->addLimitSubForm($accessControlsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ACCESS_CONTROLS);
 		
@@ -894,7 +889,11 @@ class Form_PartnerConfiguration extends Infra_Form
 		$liveStreamOutputsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS, 'Concurrent Live-Plus streams purchased:', false);
 		$liveStreamOutputsSubForm->requirePartnerPermission(Kaltura_Client_Enum_PermissionName::FEATURE_KALTURA_LIVE_STREAM_TRANSCODE);
 		$this->addLimitSubForm($liveStreamOutputsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS);
-				
+		
+		$liveRtcStreamsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS, 'Concurrent Live RTC streams:', false);
+		$liveRtcStreamsSubForm->requirePartnerPermission(Kaltura_Client_Enum_PermissionName::FEATURE_SELF_SERVE);
+		$this->addLimitSubForm($liveRtcStreamsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS);
+
 	}
 	/**
 	 * split the form elements into different display groups
@@ -960,11 +959,12 @@ class Form_PartnerConfiguration extends Infra_Form
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ACCESS_CONTROLS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_INPUTS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS.'_max',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS.'_max',
 									'crossLine'), 'includedUsageSecondPart');
 
 		$this->addDisplayGroup(
 			array_merge(
-				array('default_live_stream_entry_source_type', 'live_stream_provision_params', 'default_live_stream_segment_duration', 'enable_self_serve'),
+				array('default_live_stream_entry_source_type', 'live_stream_provision_params', 'default_live_stream_segment_duration'),
 				array('crossLine')),
 			'liveStreamConfig',
 			array('legend' => 'Live Stream Config')
@@ -991,7 +991,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$subForm->addElementsToForm($this);
 	}
 	
-	    /**
+	/**
      * Validate the form
      *
      * @param  array $data

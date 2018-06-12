@@ -16,6 +16,7 @@ class embedPlaykitJsAction extends sfAction
 	const AUTO_EMBED_PARAM_NAME = "autoembed";
 	const LATEST = "{latest}";
 	const BETA = "{beta}";
+    const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -396,6 +397,19 @@ class embedPlaykitJsAction extends sfAction
 			}
 		}
 	}
+
+	private function getLastConfig($uiConfs) {
+		$uiconfs_content = isset($uiConfs) ? array_values($uiConfs) : null;
+		$last_uiconf_content = (is_array($uiconfs_content) && reset($uiconfs_content)) ? reset($uiconfs_content) : null;
+		$last_uiconf_config = isset($last_uiconf_content) ? $last_uiconf_content->getConfig() : '';
+		return $last_uiconf_config;
+	}
+
+	private function getConfigByVersion($version){
+		$versionUiConfs = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, $version);
+		$versionConfig = $this->getLastConfig($versionUiConfs);
+		return json_decode($versionConfig, true);
+	}
 	
 	private function setLatestOrBetaVersionNumber()
 	{
@@ -404,11 +418,9 @@ class embedPlaykitJsAction extends sfAction
 		$isBetaVersionRequired = array_search(self::BETA, $this->bundleConfig) !== false;
 
 		if ($isLatestVersionRequired || $isBetaVersionRequired) {
-			$latestVersionsMapPath = $this->sourcesPath . "/latest.json";
-			$latestVersionMap = file_exists($latestVersionsMapPath) ? json_decode(file_get_contents($latestVersionsMapPath), true) : null;
 
-			$betaVersionsMapPath = $this->sourcesPath . "/beta.json";
-			$betaVersionMap = file_exists($betaVersionsMapPath) ? json_decode(file_get_contents($betaVersionsMapPath), true) : null;
+			$latestVersionMap = $this->getConfigByVersion("latest");
+			$betaVersionMap = $this->getConfigByVersion("beta");
 
 			foreach ($this->bundleConfig as $key => $val)
 			{

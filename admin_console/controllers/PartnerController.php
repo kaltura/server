@@ -215,6 +215,27 @@ class PartnerController extends Zend_Controller_Action
 	public function kmcRedirectAction()
 	{
 		$partnerId = $this->_getParam('partner_id');
+		$ks = $this->generateAdminKs();
+		if(!$ks)
+			return;
+
+		$url = $this->createKmcRedirectionUrl($ks, $partnerId);
+		$this->getResponse()->setRedirect($url);
+	}
+
+	public function kmcNewRedirectAction()
+	{
+		$ks = $this->generateAdminKs();
+		if(!$ks)
+			return;
+
+		$url = $this->createNewKmcRedirectionUrl($ks);
+		$this->getResponse()->setRedirect($url);
+	}
+
+	private function generateAdminKs()
+	{
+		$partnerId = $this->_getParam('partner_id');
 		$userId = $this->_getParam('user_id');
 		$client = Infra_ClientHelper::getClient();
 		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
@@ -226,10 +247,14 @@ class PartnerController extends Zend_Controller_Action
 		{
 			$this->view->partnerId = $partnerId;
 			$this->view->errorMessage = $e->getMessage();
-			return;
+			return null;
 		}
 
-		$url = null;
+		return $ks;
+	}
+
+	private function createKmcRedirectionUrl($ks, $partnerId)
+	{
 		$settings = Zend_Registry::get('config')->settings;
 		if($settings->kmcUrl)
 		{
@@ -237,14 +262,24 @@ class PartnerController extends Zend_Controller_Action
 		}
 		else
 		{
-			$url = Infra_ClientHelper::getServiceUrl();	
+			$url = Infra_ClientHelper::getServiceUrl();
 			$url .= '/index.php/kmc/extlogin';
 		}
-		
+
 		$url .= '?ks='.$ks.'&partner_id='.$partnerId;
-		$this->getResponse()->setRedirect($url);
+		return $url;
 	}
-	
+
+	private function createNewKmcRedirectionUrl($ks)
+	{
+		$url = Infra_ClientHelper::getServiceUrl();
+		if(substr($url, -1) == '/')
+			$url = substr($url,0,-1);
+		$url .= '/index.php/kmcng/actions/login-by-ks/'.$ks;
+		return $url;
+	}
+
+
 	public function kavaRedirectAction()
 	{
 		$settings = Zend_Registry::get('config')->settings;

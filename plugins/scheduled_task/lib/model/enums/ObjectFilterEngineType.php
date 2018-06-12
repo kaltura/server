@@ -7,4 +7,5 @@
 interface ObjectFilterEngineType extends BaseEnum
 {
 	const ENTRY = 1;
+	const ENTRY_VENDOR_TASK = 2;
 }

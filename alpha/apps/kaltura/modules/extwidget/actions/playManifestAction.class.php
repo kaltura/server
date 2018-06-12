@@ -930,10 +930,20 @@ class playManifestAction extends kalturaAction
 			$c->add(assetPeer::ENTRY_ID, $this->entryId);
 			$c->add(assetPeer::STATUS, asset::ASSET_STATUS_READY);
 			$assets = assetPeer::doSelect($c);
+			
+			//Filter out all caption assets that have displayOnPlayer set to false
+			$filteredAssets = array(); 
+			foreach ($assets as $asset)
+			{
+				if(is_callable($asset, 'getDisplayOnPlayer') && !$asset->getDisplayOnPlayer())
+					continue;
+				
+				$filteredAssets[] = $asset;
+			}
 
 			$assets = array_merge(
-					$this->deliveryAttributes->getFlavorAssets(), 
-					$assets);
+					$this->deliveryAttributes->getFlavorAssets(),
+					$filteredAssets);
 			$this->deliveryAttributes->setFlavorAssets($assets);
 		}
 

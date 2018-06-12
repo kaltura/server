@@ -126,7 +126,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const ENTRY_CATEGORY_ESCAPE = "_";
 	const ENTRY_CATEGORY_SEPARATOR = ",";
 	
-	const ENTRY_ID_THAT_DOES_NOT_EXIST = 0;
+	const ENTRY_ID_THAT_DOES_NOT_EXIST = 'nonExistingId';
 	
 	const CATEGORY_SEARCH_PERFIX = 'c';
 	const CATEGORY_PARENT_SEARCH_PERFIX = 'p';
@@ -2564,6 +2564,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			
 		$offset = $this->getThumbOffset();
 		$duration = $this->getLengthInMsecs();
+		if (!$duration && $this->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
+			$duration = $this->getRecordedLengthInMsecs();
 		
 		if(!$offset || $offset < 0)
 			$offset = $default_offset;
@@ -3166,9 +3168,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		
 		$categoriesEntryStringIndex = array_unique($categoriesEntryStringIndex);
 		
-		return self::CATEGORIES_INDEXED_FIELD_PREFIX . $this->getPartnerId() . " " .  implode(' ', $categoriesEntryStringIndex);
+		return implode(' ', $categoriesEntryStringIndex);
 	}
-	
+
+	public function enrichCategoriesEntryIds($originalValue)
+	{
+		return self::CATEGORIES_INDEXED_FIELD_PREFIX . $this->getPartnerId() . " " .  $originalValue;
+	}
+
 	/*
 	 * get all categoryEntry objects from categoryEntryPeer
 	 */

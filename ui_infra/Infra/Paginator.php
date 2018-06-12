@@ -12,6 +12,7 @@ class Infra_Paginator extends Zend_Paginator
 	private $request = array();
 	private $action = '';
 	public $pageSizes = array(10, 25, 50, 100);
+	public $submitFunction = null;
 	
     /**
      * Constructor.
@@ -46,6 +47,11 @@ class Infra_Paginator extends Zend_Paginator
     {
     	self::$index = $index;
     }
+
+	public function setSubmitFunction($functionName)
+	{
+		$this->submitFunction = $functionName;
+	}
     
     public function setAvailablePageSizes(array $pageSizes)
     {
@@ -152,6 +158,8 @@ class Infra_Paginator extends Zend_Paginator
     		$this->_pageCount = $this->_calculatePageCount();
     	}
     	
-        return parent::_createPages($scrollingStyle);
+        $page =  parent::_createPages($scrollingStyle);
+	    $page->submitFunction = $this->submitFunction;
+	    return $page;
     }
 }

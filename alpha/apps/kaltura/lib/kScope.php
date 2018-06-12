@@ -162,6 +162,20 @@ class kScope
 	}
 
 	/**
+	 * @param string $key
+	 * @return bool wasRemoved
+	 */
+	public function removeDynamicValue($key)
+	{
+		if ($this->dynamicValues[$key])
+		{
+			unset($this->dynamicValues[$key]);
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * @return array
 	 */
 	public function getDynamicValues($keyPrefix = '', $keySuffix = '')
