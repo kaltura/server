@@ -2,7 +2,6 @@
 
 class kWowzaSecureTokenUrlTokenizer extends kUrlTokenizer
 {
-	
 	/**
 	 * @var string
 	 */
@@ -16,6 +15,7 @@ class kWowzaSecureTokenUrlTokenizer extends kUrlTokenizer
 	public function tokenizeSingleUrl($url, $urlPrefix = null)
 	{
 		$tokenPrefix = $this->getParamPrefix();
+		
 		$expiryTimeFrame = $this->getWindow();
 		
 		$params = array();
@@ -51,7 +51,7 @@ class kWowzaSecureTokenUrlTokenizer extends kUrlTokenizer
 
 		return $prefixedParameters;
 	}
-		
+	
 	/**
 	 * Get hash token
 	 * 
@@ -60,7 +60,7 @@ class kWowzaSecureTokenUrlTokenizer extends kUrlTokenizer
 	public function getHash($params, $url)
 	{
 		$tokenKey = $this->getKey();
-				
+		
 		$params[$tokenKey] = "";
 		
 		if($this->getLimitIpAddress())
@@ -95,9 +95,6 @@ class kWowzaSecureTokenUrlTokenizer extends kUrlTokenizer
 		
 		$path = trim($path,'/') . "?" . $query;
 		
-		print_r($path);
-		echo PHP_EOL;
-				
 		return strtr(base64_encode(hash($this->getHashAlgorithm(), $path, true)),'+/','-_');
 	}
 	
@@ -120,14 +117,16 @@ class kWowzaSecureTokenUrlTokenizer extends kUrlTokenizer
 	/**
 	 * @return the $hashAlgorithm value
 	 */
-	public function getHashAlgorithm() {
+	public function getHashAlgorithm()
+	{
 		return $this->hashAlgorithm;
 	}
 	
 	/**
-	 * param bool $hashAlgorithm
+	 * param string $hashAlgorithm
 	 */
-	public function setHashAlgorithm($hashAlgorithm) {
+	public function setHashAlgorithm($hashAlgorithm)
+	{
 		$this->hashAlgorithm = $hashAlgorithm;
 	}
 }
