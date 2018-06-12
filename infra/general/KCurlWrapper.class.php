@@ -1,6 +1,5 @@
 <?php
 
-require_once(KALTURA_ROOT_PATH . '/alpha/apps/kaltura/lib/kIpAddressUtils.php');
 /**
  *  @package infra
  *  @subpackage general
