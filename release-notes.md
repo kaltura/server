@@ -8,7 +8,7 @@
 	- Add the following to Admin.ini:
         moduls.SelfServe.enabled = true
         moduls.SelfServe.permissionType = 2
-        moduls.SelfServe.label = "Self Serve enabled"
+        moduls.SelfServe.label = "Kaltura Live - Self Serve enabled"
         moduls.SelfServe.permissionName = FEATURE_SELF_SERVE
         moduls.SelfServe.group = GROUP_ENABLE_DISABLE_FEATURES
 
