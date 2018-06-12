@@ -76,7 +76,7 @@ class Partner extends BasePartner
 
 	const PARTNER_MAX_LIVE_STREAM_INPUTS_DEFAULT = 10;
 
-	const PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT = 1;
+	const PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT = 10;
 
 	public function save(PropelPDO $con = null)
 	{
@@ -1046,7 +1046,7 @@ class Partner extends BasePartner
 	{
 		$live_stream_inputs = $this->getFromCustomData(self::CUSTOM_DATA_LIVE_STREAM_INPUTS);
 		if (!$live_stream_inputs)
-			$live_stream_inputs = kConf::get('partner_max_live_stream_inputs', 'local', self::PARTNER_MAX_LIVE_STREAM_INPUTS_DEFAULT);
+			$live_stream_inputs = self::PARTNER_MAX_LIVE_STREAM_INPUTS_DEFAULT;
 
 		return $live_stream_inputs;
 	}
@@ -1054,7 +1054,7 @@ class Partner extends BasePartner
 	{
 		$live_stream_outputs = $this->getFromCustomData(self::CUSTOM_DATA_LIVE_STREAM_OUTPUTS);
 		if (!$live_stream_outputs)
-			$live_stream_outputs = kConf::get('partner_max_live_stream_outputs', 'local', self::PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT);
+			$live_stream_outputs = self::PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT;
 
 		return $live_stream_outputs;
 	}

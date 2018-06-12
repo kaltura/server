@@ -1,5 +1,17 @@
 # Naos 14.0.0 #
 
+## Define live concurrency limits for new accounts ##
+- Issue type : Task
+- Issue ID: PLAT-8985
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+Run following with the template partner id
+`php /opt/kaltura/app/alpha/scripts/utils/setDefaultMaxLiveConcurrentStreams.php <template_partner_id>`
+
+
 ## Self-serve: allow via admin_console ##
 - Issue type : new feature
 - Issue ID: PLAT-8766
