@@ -27,7 +27,7 @@ class kWowzaSecureTokenUrlTokenizer extends kUrlTokenizer
 		
 		$urlTokenParameters[$tokenPrefix.'hash'] = $this->getHash($urlTokenParameters,$url);
 		
-		return $url."?".http_build_query($urlTokenParameters, '', '&');
+		return $url.'?'.http_build_query($urlTokenParameters, '', '&');
 	}
 	
 	/**
@@ -57,12 +57,12 @@ class kWowzaSecureTokenUrlTokenizer extends kUrlTokenizer
 		$tokenKey = $this->getKey();
 		
 		// Key is added as parameter name with no value
-		$params[$tokenKey] = "";
+		$params[$tokenKey] = '';
 		
 		if($this->getLimitIpAddress())
 		{
 			// Client IP is added as parameter name with no value
-			$params[self::getRemoteAddress()] = "";
+			$params[self::getRemoteAddress()] = '';
 		}
 		
 		// Wowza requires parameters be in alpha order when hashed
@@ -90,7 +90,7 @@ class kWowzaSecureTokenUrlTokenizer extends kUrlTokenizer
 		
 		$path = substr($path, 0, $finalSlash);
 		
-		$path = trim($path,'/') . "?" . $query;
+		$path = trim($path,'/') . '?' . $query;
 		
 		return strtr(base64_encode(hash($this->getHashAlgorithm(), $path, true)),'+/','-_');
 	}
