@@ -144,8 +144,9 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		{ //is request for specific serverType: we return it if exist but if not throw exception
 			if ($this->liveStreamConfig->getUrl())
 				return;
-			KalturaLog::err("Request stream type of [$requestedServerType] but not entryServerNode for that type on entry: " . $this->getDynamicAttributes()->getEntryId());
-			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, 'streamType');
+			$entryId = $this->getDynamicAttributes()->getEntryId();
+			KalturaLog::err("Request stream type of [$requestedServerType] but not entryServerNode for that type on entry: $entryId");
+			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$entryId] is not broadcasting on stream type [$requestedServerType]");
 		}
 
 		if(!$this->liveStreamConfig->getUrl() && count($liveEntryServerNodes))
