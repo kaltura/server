@@ -112,11 +112,6 @@ class Form_PartnerConfiguration extends Infra_Form
 				'label'	  => 'Default Entitlement Enforcement',
 				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 			));
-
-		$this->addElement('checkbox', 'time_aligned_renditions', array(
-		    'label'	  => 'Kaltura Live Streams - Exclude Source Rendition',
-		    'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
-		));		
 						
 //--------------------------- Publisher specific Delivery Settings ---------------------------
 
@@ -533,7 +528,6 @@ class Form_PartnerConfiguration extends Infra_Form
 			
 			$permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]['Content Moderation'] = 'moderate_content';
 		    $permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]['Default Entitlement Enforcement'] = 'default_entitlement_enforcement';
-		    $permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]['Kaltura Live Streams - Exclude Source Rendition'] = 'time_aligned_renditions';
 			ksort($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]);
 			ksort($permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]);
 			ksort($permissionNames[self::GROUP_REMOTE_STORAGE]);
