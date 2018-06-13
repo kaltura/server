@@ -116,7 +116,8 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		if(!count($liveEntryServerNodes))
 			return;
 
-		$serverType = $this->getDynamicAttributes()->getStreamType();
+		$requestedServerType = $this->getDynamicAttributes()->getStreamType();
+		$serverType = (is_null($requestedServerType)) ? EntryServerNodeType::LIVE_PRIMARY : intval($requestedServerType);
 		foreach($liveEntryServerNodes as $key => $liveEntryServerNode)
 		{
 			/* @var $liveEntryServerNode LiveEntryServerNode */
@@ -129,8 +130,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 				
 				//Order by primary DC first
 				KalturaLog::debug("liveEntryServerNode->getServerType [" . $liveEntryServerNode->getServerType() . "]");
-				$type = (is_null($serverType)) ? EntryServerNodeType::LIVE_PRIMARY : intval($serverType);
-				if($liveEntryServerNode->getServerType() === $type)
+				if($liveEntryServerNode->getServerType() === $serverType)
 				{
 					$this->liveStreamConfig->setUrl($this->getHttpUrl($serverNode));
 					$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
@@ -140,11 +140,11 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			}
 		}
 
-		if (!is_null($serverType))
+		if (!is_null($requestedServerType))
 		{ //is request for specific serverType: we return it if exist but if not throw exception
 			if ($this->liveStreamConfig->getUrl())
 				return;
-			KalturaLog::err("Request stream type of [$serverType] but not entryServerNode for that type on entry: " . $this->getDynamicAttributes()->getEntryId());
+			KalturaLog::err("Request stream type of [$requestedServerType] but not entryServerNode for that type on entry: " . $this->getDynamicAttributes()->getEntryId());
 			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, 'streamType not found on entry');
 		}
 
