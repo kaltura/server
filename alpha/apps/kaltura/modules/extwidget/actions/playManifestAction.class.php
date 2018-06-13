@@ -1118,6 +1118,7 @@ class playManifestAction extends kalturaAction
 		$this->deliveryAttributes->setClipTo($this->getRequestParameter ( "clipTo" , 0));
 
 		$this->deliveryAttributes->setPlaybackRate($this->getRequestParameter ( "playbackRate" , 0));
+		$this->deliveryAttributes->setStreamType($this->getRequestParameter( "streamType", null ));
 		
 		$deliveryCode = $this->getRequestParameter( "deliveryCode", null );
 		$playbackContext = $this->getRequestParameter( "playbackContext", null );
