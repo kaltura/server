@@ -32,7 +32,7 @@ class serveMultiFileAction extends sfAction
 		}
 		
 		// resolve file syncs
-		$filePaths = array();
+		$resolvedFileSyncs = array();
 		foreach ($fileSyncs as $fileSync)
 		{
 			if ( $fileSync->getDc() != $currentDcId )
@@ -61,19 +61,19 @@ class serveMultiFileAction extends sfAction
 				continue;
 			}
 			
-			$filePaths[$fileSync->getId()] = $resolvedPath;
+			$resolvedFileSyncs[] = $fileSyncResolved;
 		}
 		
 		$boundary = md5(uniqid('', true));
 		header('Content-Type: multipart/form-data; boundary='.$boundary);
 
-		foreach ($filePaths as $id => $filePath)
+		foreach ($resolvedFileSyncs as $resolvedFileSync)
 		{
 			echo "--$boundary\n";
 			echo "Content-Type: application/octet-stream\n";
-			echo "Content-Disposition: form-data; name=\"$id\"\n\n";
-			
-			readfile($filePath);
+			echo "Content-Disposition: form-data; name=\"{$resolvedFileSync->getId()}\"\n\n";
+
+			echo kFileSyncUtils::getLocalContentsByFileSync($resolvedFileSync);//already checked that file exists
 			echo "\n";
 		}
 		echo "--$boundary--\n";
