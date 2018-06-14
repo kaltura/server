@@ -1910,7 +1910,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 		//check if entry is in append mode and currently streaming
 		$liveEntry = entryPeer::retrieveByPK($entry->getRootEntryId());
-		if ($liveEntry && $liveEntry->getRecordStatus() == RecordStatus::APPENDED && $liveEntry->getRecordedEntryId() == $entry->getId())
+		if ($liveEntry && $liveEntry instanceof LiveEntry && $liveEntry->getSource() == EntrySourceType::LIVE_STREAM
+			&& $liveEntry->getRecordStatus() == RecordStatus::APPENDED && $liveEntry->getRecordedEntryId() == $entry->getId())
 			return !is_null(EntryServerNodePeer::retrieveByEntryIdAndServerType($liveEntry->getId(), EntryServerNodeType::LIVE_PRIMARY));
 
 		return false;
