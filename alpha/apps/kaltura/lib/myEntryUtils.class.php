@@ -1019,6 +1019,10 @@ class myEntryUtils
 		$dc = self::getLiveEntryDcId($entry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
 		if (is_null($dc))
 			return false;
+
+		if ($dc != kDataCenterMgr::getCurrentDcId ())
+			kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( $dc ) );
+
 		$packagerCaptureUrl = str_replace(array ( "{dc}", "{liveType}"), array ( $dc, $liveType) , $packagerCaptureUrl );
 		if (!$calc_vid_sec) //Temp until packager support time 0
 			$calc_vid_sec = self::DEFAULT_THUMB_SEC_LIVE;
