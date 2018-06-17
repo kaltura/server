@@ -331,7 +331,8 @@ class myPartnerRegistration
 			// if a another user already existing with the same adminEmail, new account will be created only if the right password was given
 			if (!$password)
 			{
-				throw new SignupException("User with email [$email] already exists in system.", SignupException::EMAIL_ALREADY_EXISTS );
+				$this->markExistingEmailRegisterFailure($existingLoginData, SignupException::MISSING_PASSWORD_FOR_EXISTING_EMAIL);
+				throw new SignupException("User with email [$email] already exists in system.", SignupException::MISSING_PASSWORD_FOR_EXISTING_EMAIL );
 			}
 			else if ($existingLoginData->isPasswordValid($password))
 			{
@@ -339,30 +340,11 @@ class myPartnerRegistration
 			}
 			else
 			{
-				throw new SignupException("Invalid password for user with email [$email].", SignupException::EMAIL_ALREADY_EXISTS );
+				$this->markExistingEmailRegisterFailure($existingLoginData, SignupException::INCORRECT_PASSWORD_FOR_EXISTING_EMAIL);
+				throw new SignupException("Invalid password for user with email [$email].", SignupException::INCORRECT_PASSWORD_FOR_EXISTING_EMAIL );
 			}
 
-			if(myPartnerUtils::isPartnerCreatedAsMonitoredFreeTrial($partner, true))
-			{
-				$partnerPackage = $partner->getPartnerPackage();
-				if ($this->partnerParentId)
-				{
-					$parentPartner = PartnerPeer::retrieveByPK($this->partnerParentId);
-					$partnerPackage = $parentPartner->getPartnerPackage();
-				}
-
-				if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_FREE)
-				{
-					$result = myPartnerUtils::retrieveNotDeletedPartnerByEmailAndPackage ($partner, PartnerPackages::PARTNER_PACKAGE_FREE);
-					if($result)
-					{
-						$result->setSubPartnerRequestCampaign(1);
-						$result->save();
-						throw new SignupException("Free Trial user with email [$email] already exists in system.", SignupException::EMAIL_ALREADY_EXISTS);
-					}
-
-				}
-			}
+			$this->allowOnlyOneActiveFreeTrialAccountCreation($partner, $email);
 		}
 
 
@@ -402,7 +384,37 @@ class myPartnerRegistration
 			throw $e;
 		}
 	}
-	
+
+	private function markExistingEmailRegisterFailure($existingLoginData, $failureReason)
+	{
+		$existingPartner = partnerPeer::retrieveByPK($existingLoginData->getConfigPartnerId());
+		$existingPartner->setAdditionalAccountFailureReason($failureReason);
+		$existingPartner->save();
+	}
+
+	private function allowOnlyOneActiveFreeTrialAccountCreation($partner, $email)
+	{
+		$partnerPackage = $partner->getPartnerPackage();
+		if ($this->partnerParentId)
+		{
+			$parentPartner = PartnerPeer::retrieveByPK($this->partnerParentId);
+			$partnerPackage = $parentPartner->getPartnerPackage();
+		}
+
+		if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_FREE)
+		{
+			$existingPartner = myPartnerUtils::retrieveNotDeletedPartnerByEmailAndPackage ($partner, PartnerPackages::PARTNER_PACKAGE_FREE);
+			if($existingPartner)
+			{
+				$existingPartner->setAdditionalAccountFailureReason(SignupException::TRIAL_ACCOUNT_ALREADY_EXIST_FOR_EMAIL);
+				$existingPartner->save();
+				throw new SignupException("Free Trial user with email [$email] already exists in system.", SignupException::TRIAL_ACCOUNT_ALREADY_EXIST_FOR_EMAIL);
+			}
+
+		}
+	}
+
+
 	private function configurePartnerByPackage($partner)
 	{
 		if(!$partner)
@@ -558,6 +570,9 @@ class SignupException extends Exception
     const INVALID_FIELD_VALUE = 501;
     const EMAIL_ALREADY_EXISTS = 502;
     const PASSWORD_STRUCTURE_INVALID = 503;
+    const INCORRECT_PASSWORD_FOR_EXISTING_EMAIL = 504;
+    const MISSING_PASSWORD_FOR_EXISTING_EMAIL = 505;
+    const TRIAL_ACCOUNT_ALREADY_EXIST_FOR_EMAIL = 506;
 
     // Redefine the exception so message/code isn't optional
     public function __construct($message, $code) {

@@ -1,5 +1,37 @@
 {
   "settings" : {
+	"index" : {
+	  "search" : {
+		"slowlog" : {
+		  "threshold" : {
+			"fetch": {
+			  "warn": "10s",
+			  "trace": "500ms",
+			  "debug": "2s",
+			  "info": "5s"
+			},
+			"query": {
+			  "warn": "10s",
+			  "trace": "500ms",
+			  "debug": "2s",
+			  "info": "5s"
+			}
+		  }
+		}
+	  },
+	  "indexing" : {
+		"slowlog" : {
+		  "threshold" : {
+			"index": {
+			  "warn": "10s",
+			  "trace": "500ms",
+			  "debug": "2s",
+			  "info": "5s"
+			}
+		  }
+		}
+	  }
+	},
 	"number_of_shards" : 12,
 	"number_of_replicas" : 0,
 	"analysis": {

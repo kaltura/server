@@ -301,11 +301,22 @@ class YouTubeDistributionRightsFeedEngine extends PublicPrivateKeysDistributionE
 		{
 			if ( $asset instanceof KalturaCaptionAsset )
 			{
-				$captionFilePath = $this->getFilePath($asset, $entryId);
-				if (file_exists($captionFilePath))
+				$filePath = null;
+				try
 				{
-					$captionSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($captionFilePath, PATHINFO_BASENAME);
-					$sftpManager->putFile($captionSFTPPath, $captionFilePath);
+					$captionAssetContentUrl = $captionPlugin->captionAsset->serve($asset->id);
+					$captionFileContent = KCurlWrapper::getContent($captionAssetContentUrl);
+					$filePath = kFileBase::createTempFile($captionFileContent, null, null, "txt");
+					$captionFilePath = $this->getFilePath($asset, $entryId);
+					$captionSFTPPath = $providerData->sftpDirectory . '/' . pathinfo($captionFilePath, PATHINFO_BASENAME);
+					$sftpManager->putFile($captionSFTPPath, $filePath);
+					unlink($filePath);
+				}
+				catch(Exception $e)
+				{
+					KalturaLog::info("Can't serve caption asset id [$asset->id] " . $e->getMessage());
+					if ($filePath && file_exists($filePath))
+						unlink($filePath);
 				}
 			}
 		}

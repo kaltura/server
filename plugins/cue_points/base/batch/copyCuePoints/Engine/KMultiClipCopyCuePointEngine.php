@@ -29,7 +29,7 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 		$clipStartTime = $this->currentClip->startTime;
 		$clipEndTime = $clipStartTime + $this->currentClip->duration;
 		$calculatedEndTime = $cuePoint->calculatedEndTime;
-		if (is_null($cuePoint->calculatedEndTime) && $cuePoint->isMomentary)
+		if ($cuePoint->isMomentary)
 			$calculatedEndTime = $cuePoint->startTime;
 		return is_null($calculatedEndTime) || TimeOffsetUtils::onTimeRange($cuePoint->startTime,$calculatedEndTime,$clipStartTime, $clipEndTime);
 	}

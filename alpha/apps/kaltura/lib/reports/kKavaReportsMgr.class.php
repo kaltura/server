@@ -1462,7 +1462,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function isDateIdValid($date_id)
 	{
-		return strlen($date_id) >= 8 && preg_match('/^\d+$/', substr($date_id, 0, 8));
+		return strlen($date_id) >= 8 && preg_match('/^\d+$/D', substr($date_id, 0, 8));
 	}
 
 	protected static function dateIdToDate($date_id)
@@ -2995,7 +2995,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function getKuserIdFromHash($hash)
 	{
-		if (!preg_match('/^[0-9A-Z]{32}$/', $hash))
+		if (!preg_match('/^[0-9A-Z]{32}$/D', $hash))
 		{
 			return false;
 		}
@@ -3127,6 +3127,85 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
+	protected static function getEntriesCategories($ids, $partner_id, $context)
+	{
+		// get the category ids of the entries
+		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
+
+		$c->addSelectColumn(categoryEntryPeer::ENTRY_ID);
+		$c->addSelectColumn('GROUP_CONCAT('.categoryEntryPeer::CATEGORY_ID.')');
+		
+		$c->addGroupByColumn(categoryEntryPeer::ENTRY_ID);
+
+		if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
+		{
+			$c->add(categoryEntryPeer::PARTNER_ID, $partner_id);
+		}
+		$c->add(categoryEntryPeer::ENTRY_ID, $ids, Criteria::IN);
+
+		$stmt = categoryEntryPeer::doSelectStmt($c);
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		
+		$all_categories = array();
+		$result = array();
+		foreach ($rows as $row)
+		{
+			$entry_id = $row['ENTRY_ID'];
+			$categories_ids = $row['GROUP_CONCAT('.categoryEntryPeer::CATEGORY_ID.')'];
+			$categories_ids = explode(',', $categories_ids);
+			foreach ($categories_ids as $category_id)
+			{
+				$all_categories[$category_id] = true;
+			}
+			$result[$entry_id] = $categories_ids; 
+		}
+		
+		// get the names of the categories
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+
+		$c->addSelectColumn(categoryPeer::ID);
+		$c->addSelectColumn(categoryPeer::FULL_NAME);
+
+		if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
+		{
+			$c->add(categoryPeer::PARTNER_ID, $partner_id);
+		}
+		$c->add(categoryPeer::ID, array_keys($all_categories), Criteria::IN);
+
+		categoryPeer::setUseCriteriaFilter(false);
+		$stmt = categoryPeer::doSelectStmt($c);
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		categoryPeer::setUseCriteriaFilter(true);
+		
+		$category_name_map = array();
+		foreach ($rows as $row)
+		{
+			$id = $row['ID'];
+			$full_name = $row['FULL_NAME'];
+			$category_name_map[$id] = $full_name; 
+		}
+		
+		// add the names to the result
+		foreach ($result as $entry_id => $categories_ids)
+		{
+			$names = array();
+			foreach ($categories_ids as $category_id)
+			{
+				if (isset($category_name_map[$category_id]))
+				{
+					$names[] = $category_name_map[$category_id];
+				}
+			}
+			
+			$result[$entry_id] = array(
+				'"' . str_replace('"', '""', implode(',', $categories_ids)) . '"', 
+				'"' . str_replace('"', '""', implode(',', $names)) . '"',
+			);
+		}
+		
+		return $result;
+	}
+	
 	protected static function genericQueryEnrich($ids, $partner_id, $context)
 	{
 		$peer = $context['peer'];
@@ -3188,26 +3267,25 @@ class kKavaReportsMgr extends kKavaBase
 
 		$peer::setUseCriteriaFilter(false);
 		$stmt = $peer::doSelectStmt($c);
-		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$rows = $stmt->fetchAll(PDO::FETCH_NUM);
 		$peer::setUseCriteriaFilter(true);
 
 		foreach ($rows as $row)
 		{
+			$id = reset($row);
 			$output_row = array();
 			foreach ($columns as $column)
 			{
 				$format = isset($column_formats[$column]) ? $column_formats[$column] : null;
 
+				$value = next($row);
+				
 				$exploded_column = explode('.', $column);
 				if (count($exploded_column) > 1)
 				{
 					list($column, $field) = $exploded_column;
-					$value = @unserialize($row[$column]);
+					$value = @unserialize($value);
 					$value = isset($value[$field]) ? $value[$field] : '';
-				}
-				else
-				{
-					$value = $row[$column];
 				}
 
 				switch ($format)
@@ -3225,7 +3303,6 @@ class kKavaReportsMgr extends kKavaBase
 				$output_row[] = $value;
 			}
 
-			$id = $row[$dim_column];
 			$result[$id] = $output_row;
 		}
 		return $result;
@@ -3278,17 +3355,6 @@ class kKavaReportsMgr extends kKavaBase
 			$enrich_context = isset($enrich_def[self::REPORT_ENRICH_CONTEXT]) ? 
 				$enrich_def[self::REPORT_ENRICH_CONTEXT] : null;
 			
-			// input
-			if (isset($enrich_def[self::REPORT_ENRICH_INPUT]))
-			{
-				$dim_header = $enrich_def[self::REPORT_ENRICH_INPUT];
-			}
-			else
-			{
-				$dim_header = reset($report_def[self::REPORT_DIMENSION_HEADERS]);
-			}
-			$dim_index = array_search($dim_header, $headers);
-
 			// output
 			$cur_fields = $enrich_def[self::REPORT_ENRICH_OUTPUT];
 			if (!is_array($cur_fields))
@@ -3302,6 +3368,18 @@ class kKavaReportsMgr extends kKavaBase
 				$enriched_indexes[] = array_search($field, $headers);
 			}
 
+			// input
+			if (isset($enrich_def[self::REPORT_ENRICH_INPUT]))
+			{
+				$dim_header = $enrich_def[self::REPORT_ENRICH_INPUT];
+			}
+			else
+			{
+				$dim_header = reset($cur_fields);
+			}
+			$dim_index = array_search($dim_header, $headers);
+			
+			// add
 			if (!isset($enrich_specs[$dim_index]))
 			{
 				$enrich_specs[$dim_index] = array();

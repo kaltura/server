@@ -155,12 +155,12 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	public static function getApplicationPages()
 	{
 		$pages = array();
-		$pages[] = new PartnerCatalogItemListAction();
-		$pages[] = new PartnerCatalogItemConfigureAction();
-		$pages[] = new PartnerCatalogItemSetStatusAction();
 		$pages[] = new CatalogItemListAction();
 		$pages[] = new CatalogItemConfigureAction();
 		$pages[] = new CatalogItemSetStatusAction();
+		$pages[] = new PartnerCatalogItemListAction();
+		$pages[] = new PartnerCatalogItemConfigureAction();
+		$pages[] = new PartnerCatalogItemSetStatusAction();
 		$pages[] = new ReachProfileListAction();
 		$pages[] = new ReachProfileConfigureAction();
 		$pages[] = new ReachProfileSetStatusAction();

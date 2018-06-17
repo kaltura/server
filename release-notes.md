@@ -1,3 +1,64 @@
+# Naos 14.0.0 #
+
+## Self-serve: allow via admin_console ##
+- Issue type : new feature
+- Issue ID: PLAT-8766
+
+### Configuration ###
+	- Add the following to Admin.ini:
+        moduls.SelfServe.enabled = true
+        moduls.SelfServe.permissionType = 2
+        moduls.SelfServe.label = "Kaltura Live - Self Serve enabled"
+        moduls.SelfServe.permissionName = FEATURE_SELF_SERVE
+        moduls.SelfServe.group = GROUP_ENABLE_DISABLE_FEATURES
+
+
+### Deployment scripts ###
+None.
+
+## KMS Go: change firebase notification template ##
+- Issue type : new template
+- Issue ID: PLAT-8980
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+Disable current "EntryCategory added FireBase" event notification template
+
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/entryAddedToCategoryFireBaseHttpNotification.xml
+
+## Enable RTC tokenization ##
+- Issue Type: New Feature
+- Issue ID: WEBC-1188
+
+### Configuration ###
+Add 
+```
+    rtc_token_secret = <secret_value>
+    rtc_token_expiry  = 120
+```
+ to local.ini before password_reset_links
+
+## Support push notifications for thumb cuePoint ready ##
+- Issue Type: New Feature
+- Issue ID: PLAT-8963
+
+### Deployment scripts ###
+
+	First replace all tokens from the XML files below and remove ".template" from the fle name:
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_06_03_update_entry_vendor_pending_moderation.template.xml
+		
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_06_03_update_entry_vendor_rejected_moderation.template.xml
+
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_06_03_update_entry_vendor_task_approved_moderation.template.xml
+		
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_06_03_update_entry_vendor_task_done.template.xml
+
+	Run deployment script:
+		php /opt/kaltura/app/deployment/updates/scripts/2018_06_03_deploy_updated_reach_notifications.php
+
+
 # Mercury 13.20.0 #
 
 ## Support push notifications for thumb cuePoint ready ##

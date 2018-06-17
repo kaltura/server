@@ -12,12 +12,15 @@ class kFileBase
      * Lazy saving of file content to a temporary path, the file will exist in this location until the temp files are purged
      * @param string $fileContent
      * @param string $prefix
+     * @param string $postfix
      * @param integer $permission
      * @return string path to temporary file location
      */
-    public static function createTempFile($fileContent, $prefix = '' , $permission = null)
+    public static function createTempFile($fileContent, $prefix = '' , $permission = null, $postfix = null)
     {
         $tempDirectory = sys_get_temp_dir();
+        if ($postfix )
+            $tempDirectory .= ".$postfix";
         $fileLocation = tempnam($tempDirectory, $prefix);
         if (self::safeFilePutContents($fileLocation, $fileContent, $permission))
             return $fileLocation;
