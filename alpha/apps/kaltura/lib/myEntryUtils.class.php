@@ -704,6 +704,12 @@ class myEntryUtils
 		$entry_status = $entry->getStatus();
 
 		$servingVODfromLive = self::shouldServeVodFromLive($entry);
+		if ($servingVODfromLive)
+		{
+			$dc = self::getLiveEntryDcId($entry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
+			if ($dc != kDataCenterMgr::getCurrentDcId ())
+				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( $dc ) );
+		}
 		$entryLengthInMsec = $servingVODfromLive ? $entry->getRecordedLengthInMsecs() : $entry->getLengthInMsecs();
 		 
 		$thumbName = $entry->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
@@ -1018,9 +1024,6 @@ class myEntryUtils
 		$dc = self::getLiveEntryDcId($entry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
 		if (is_null($dc))
 			return false;
-		if ($dc != kDataCenterMgr::getCurrentDcId ())
-			kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( $dc ) );
-
 		$url = 'p/' . $entry->getPartnerId() . '/e/' . $entry->getId();
 		$packagerCaptureUrl = str_replace(array ( "{dc}", "{liveType}"), array ( $dc, $liveType) , $packagerCaptureUrl );
 		if (!$calc_vid_sec) //Temp until packager support time 0
