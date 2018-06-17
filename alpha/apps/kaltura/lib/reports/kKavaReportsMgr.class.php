@@ -1462,7 +1462,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function isDateIdValid($date_id)
 	{
-		return strlen($date_id) >= 8 && preg_match('/^\d+$/', substr($date_id, 0, 8));
+		return strlen($date_id) >= 8 && preg_match('/^\d+$/D', substr($date_id, 0, 8));
 	}
 
 	protected static function dateIdToDate($date_id)
@@ -2995,7 +2995,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function getKuserIdFromHash($hash)
 	{
-		if (!preg_match('/^[0-9A-Z]{32}$/', $hash))
+		if (!preg_match('/^[0-9A-Z]{32}$/D', $hash))
 		{
 			return false;
 		}
