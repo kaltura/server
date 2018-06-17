@@ -745,10 +745,7 @@ class KalturaEntryService extends KalturaBaseService
 	protected function handleLiveClippingFlow($recordedEntry, $clippedEntry, $operationAttributes)
 	{
 		if (($recordedEntry->getId() == $clippedEntry->getId()) || ($recordedEntry->getId() == $clippedEntry->getReplacedEntryId()))
-		{
-			$this->cancelReplace($recordedEntry->getId(), $recordedEntry->getType());
 			throw new KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_OPERATION, "Trimming");
-		}
 		$clippedTask = $this->createRecordedClippingTask($recordedEntry, $clippedEntry, $operationAttributes);
 		$clippedEntry->setSource(EntrySourceType::KALTURA_RECORDED_LIVE);
 		$clippedEntry->setConversionProfileId($recordedEntry->getConversionProfileId());
