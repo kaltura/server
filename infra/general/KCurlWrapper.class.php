@@ -565,8 +565,7 @@ class KCurlWrapper
 		$res = gethostbyname($host);
 		if ($res == $host) // in case of local machine name
 			return true;
-		else
-			return $this->IsIpPrivateOrReserved($res);
+		return $this->IsIpPrivateOrReserved($res);
 	}
 
 	private function IsIpPrivateOrReserved($host)
