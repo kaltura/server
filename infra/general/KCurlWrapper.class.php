@@ -557,6 +557,8 @@ class KCurlWrapper
 	private function isInternalUrl($url = null)
 	{
 		$host = $this->getUrlHost($url);
+		if (!$host)
+			return true;
 		if (filter_var($host, FILTER_VALIDATE_IP)) // do we have an ip and not a hostname
 			return $this->IsIpPrivateOrReserved($host);
 		else
@@ -579,24 +581,17 @@ class KCurlWrapper
 	private function getUrlHost($url = null)
 	{
 		$host = null;
-		try
-		{
-			$url = trim($url);
-			if (strpos($url, "://") === false && substr($url, 0, 1) != "/")
-				$url = "http://" . $url;
-			$url_parts = parse_url($url);
-			if (isset ($url_parts["host"]))
-				$host = $url_parts["host"];
-		}
-		catch (Exception $exception)
-		{
-			KalturaLog::debug("Got Exception for getUrlHost method: " . $exception->getMessage());
-		}
+		$url = trim($url);
+		if (strpos($url, "://") === false && substr($url, 0, 1) != "/")
+			$url = "http://" . $url;
+		$url_parts = parse_url($url);
+		if ($url_parts === false)
+			return false;
+		if (isset ($url_parts["host"]))
+			$host = $url_parts["host"];
 		return $host;
 	}
 
-
-	
 	public function setSourceUrlAndprotocol($sourceUrl)
 	{
 		$sourceUrl = trim($sourceUrl);
