@@ -561,22 +561,17 @@ class KCurlWrapper
 			return true;
 		if (filter_var($host, FILTER_VALIDATE_IP)) // do we have an ip and not a hostname
 			return $this->IsIpPrivateOrReserved($host);
+
+		$res = gethostbyname($host);
+		if ($res == $host) // in case of local machine name
+			return true;
 		else
-		{
-			$res = gethostbyname($host);
-			if ($res == $host) // in case of local machine name
-				return true;
-			else
-				return $this->IsIpPrivateOrReserved($res);
-		}
+			return $this->IsIpPrivateOrReserved($res);
 	}
 
 	private function IsIpPrivateOrReserved($host)
 	{
-		if ( filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE |  FILTER_FLAG_NO_RES_RANGE)) // checks if host is NOT in a private or reserved range
-			return false;
-		else
-			return true;
+		return !filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE |  FILTER_FLAG_NO_RES_RANGE); // checks if host is NOT in a private or reserved range
 	}
 	private function getUrlHost($url = null)
 	{
