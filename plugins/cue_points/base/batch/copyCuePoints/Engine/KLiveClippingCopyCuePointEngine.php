@@ -17,4 +17,11 @@ class KLiveClippingCopyCuePointEngine extends KLiveToVodCopyCuePointEngine
             return true; //if cue point started before the clip but end afterward (no next cue point)
         return ($cuePointStartTime >= 0 || $cuePointEndTime > 0);
     }
+
+    public function getCuePointFilter($entryId, $status = CuePointStatus::READY)
+    {
+        $statuses = array(CuePointStatus::READY, CuePointStatus::HANDLED);
+        $filter = parent::getCuePointFilter($entryId, implode(",",$statuses));
+        return $filter;
+    }
 }
