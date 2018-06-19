@@ -132,7 +132,7 @@ Add
 		134 = "Hello %s,<BR><BR>Following is the download link to your REACH requests csv: %s<BR>Please notice that the link will be available only for 24 hours. <BR><BR> Kaltura Customer Service"\
 	
 	- Add the following to batch & workers.ini:
-		enabledWorkers.KAsyncUsersCsv = 1
+		enabledWorkers.KAsyncEntryVendorTasksCsv = 1
 		enabledWorkers.KSyncReachCreditTaskRunner = 1
 		
 		[KAsyncEntryVendorTasksCsv : JobHandlerWorker]
