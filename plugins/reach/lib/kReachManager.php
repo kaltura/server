@@ -197,6 +197,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			KalturaLog::err("Exceeded max credit allowed, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
 			return true;
 		}
+		
+		if(!kReachUtils::isEntryTypeSupported($entry->getType()))
+		{
+			KalturaLog::err("Entry of type [{$entry->getType()}] is not supported by Reach");
+			return true;
+		}
 
 		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $sourceFlavorVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC);
 		$entryVendorTask->save();
