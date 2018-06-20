@@ -111,24 +111,20 @@ class FacebookGraphSdkUtils
 	/**
 	 *
 	 * Get facebook login url
-	 * @param string $appId
-	 * @param string $appSecret
+	 * @param Facebook\Helpers\FacebookRedirectLoginHelper $loginHelper
 	 * @param string $redirectUrl
 	 * @param string $permissions
-	 * @param Facebook\PersistentData\PersistentDataInterface|string $dataHandler
 	 * @param bool $reRequestPermissions
 	 * @return null|string
 	 */
-	public static function getLoginUrl($appId, $appSecret, $redirectUrl, $permissions, $dataHandler, $reRequestPermissions = false)
+	public static function getLoginUrl($loginHelper, $redirectUrl, $permissions, $reRequestPermissions = false)
 	{
-		$fb = self::createFacebookInstance($appId, $appSecret, $dataHandler);
-		$loginHelper = $fb->getRedirectLoginHelper();
 		$loginUrl = null;
-		if($reRequestPermissions) {
+		if($reRequestPermissions)
 			$loginUrl = $loginHelper->getReRequestUrl($redirectUrl, $permissions);
-		} else {
+		else
 			$loginUrl = $loginHelper->getLoginUrl($redirectUrl, $permissions);
-		}
+
 		return $loginUrl;
 	}
 
@@ -490,6 +486,7 @@ class FacebookConstants
 	const FACEBOOK_NEXT_ACTION_REQUEST_PARAM = 'next_action';
 	const FACEBOOK_KS_REQUEST_PARAM = 'ks';
 	const FACEBOOK_USER_ALREADY_TAGGED_ERROR = 355;
+	const FACEBOOK_LOGIN_STATE = "state";
 }
 
 class FacebookCaptionsFile extends \Facebook\FileUpload\FacebookFile

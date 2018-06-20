@@ -11,8 +11,17 @@ class facebookoauth2Action extends oauth2Action
 	const SUB_ACTION_REDIRECT_SCREEN = 'redirect-screen';
 	const SUB_ACTION_PROCESS_OAUTH2_RESPONSE = 'process-oauth2-response';
 	const SUB_ACTION_LOGIN_SCREEN = 'login-screen';
-
 	const FACEBOOK_DISTRIBUTION_ACCESS_URL = "/api_v3/index.php?service=contentdistribution_distributionprofile&distributionProfile%3AobjectType=KalturaFacebookDistributionProfile";
+
+	private $authDataCache;
+
+	private function getAuthDataCache()
+	{
+		if(!$this->authDataCache)
+			$this->authDataCache = new kAuthDataCache();
+
+		return $this->authDataCache;
+	}
 
 
 	public function execute()
@@ -76,6 +85,7 @@ class facebookoauth2Action extends oauth2Action
 			$this->ksError = true;
 			return;
 		}
+
 		$ks = kCurrentContext::$ks_object;
 		$contextPartnerId = $ks->partner_id;
 		if ( empty($requestPartnerId) || $contextPartnerId != $requestPartnerId)
@@ -83,15 +93,23 @@ class facebookoauth2Action extends oauth2Action
 			$this->partnerError = true;
 			return;
 		}
+
 		$ks = $this->generateTimeLimitedKs($contextPartnerId);
 		$params = $this->getForwardParameters();
 		$params[FacebookConstants::FACEBOOK_KS_REQUEST_PARAM] = $ks;
-		$params[FacebookConstants::FACEBOOK_NEXT_ACTION_REQUEST_PARAM] = base64_encode(self::SUB_ACTION_PROCESS_OAUTH2_RESPONSE);
 		$accessURL = $this->getFacebookDistributionAccessURL($providerId, $ks);
 		$dataHandler = new kDistributionPersistentDataHandler($accessURL);
-		$redirectUrl = $this->getController()->genUrl('extservices/facebookoauth2?'.http_build_query($params, null, '&'), true);
+		//$redirectUrl = $this->getController()->genUrl('extservices/facebookoauth2?'.http_build_query($params, null, '&'), true);
+		$redirectUrl = "http://".kDataCenterMgr::getCurrentDcName()."/index.php/'extservices/facebookoauth2?".
+			http_build_query(array(FacebookConstants::FACEBOOK_NEXT_ACTION_REQUEST_PARAM => SUB_ACTION_PROCESS_OAUTH2_RESPONSE), null, '&');
 		$reRequestPermissions = base64_decode($this->getRequestParameter(FacebookConstants::FACEBOOK_RE_REQUEST_PERMISSIONS_REQUEST_PARAM));
-		$this->oauth2Url = FacebookGraphSdkUtils::getLoginUrl($appId, $appSecret, $redirectUrl, $permissions, $dataHandler, $reRequestPermissions);
+		$fb = FacebookGraphSdkUtils::createFacebookInstance($appId, $appSecret, $dataHandler);
+		$loginHelper = $fb->getRedirectLoginHelper();
+		$this->oauth2Url = FacebookGraphSdkUtils::getLoginUrl($loginHelper, $redirectUrl, $permissions, $reRequestPermissions);
+		$persistentDataHandler = $loginHelper->getPersistentDataHandler();
+		$state = $persistentDataHandler->get(FacebookConstants::FACEBOOK_LOGIN_STATE);
+		$authDataCache = $this->getAuthDataCache();
+		$authDataCache->store($state, $params);
 	}
 
 	/**
@@ -102,10 +120,20 @@ class facebookoauth2Action extends oauth2Action
 		$this->tokenError = null;
 		$appId = $this->getFromConfig(FacebookConstants::FACEBOOK_APP_ID_REQUEST_PARAM);
 		$appSecret = $this->getFromConfig(FacebookConstants::FACEBOOK_APP_SECRET_REQUEST_PARAM);
-		$pageId = base64_decode($this->getRequestParameter(FacebookConstants::FACEBOOK_PAGE_ID_REQUEST_PARAM));
-		$providerId = base64_decode($this->getRequestParameter(FacebookConstants::FACEBOOK_PROVIDER_ID_REQUEST_PARAM));
-		$ks = $this->getRequestParameter(FacebookConstants::FACEBOOK_KS_REQUEST_PARAM);
-		$permissions = explode(',',base64_decode($this->getRequestParameter(FacebookConstants::FACEBOOK_PERMISSIONS_REQUEST_PARAM)));
+		$state = base64_decode($this->getRequestParameter(FacebookConstants::FACEBOOK_LOGIN_STATE));
+		$authDataCache = $this->getAuthDataCache();
+		$data = $authDataCache->retrieve($state);
+		if(!$data)
+		{
+			$msg = "Error while retrieving auth data for facebook with id ".$state;
+			KalturaLog::err($msg);
+			throw new Exception($msg);
+		}
+
+		$pageId = $data[FacebookConstants::FACEBOOK_PAGE_ID_REQUEST_PARAM];
+		$providerId = $data[FacebookConstants::FACEBOOK_PROVIDER_ID_REQUEST_PARAM];
+		$ks = $data[FacebookConstants::FACEBOOK_KS_REQUEST_PARAM];
+		$permissions = explode(',',$data[FacebookConstants::FACEBOOK_PERMISSIONS_REQUEST_PARAM]);
 
 		try
 		{
@@ -162,6 +190,4 @@ class facebookoauth2Action extends oauth2Action
 		$host = requestUtils::getHost();
 		return $host.self::FACEBOOK_DISTRIBUTION_ACCESS_URL."&id=".$providerId."&ks=".$ks;
 	}
-
-
 }
