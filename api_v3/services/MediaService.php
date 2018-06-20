@@ -794,12 +794,12 @@ class MediaService extends KalturaEntryService
 				$this->updateContentInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions);
 		}
 		catch(Exception $e){
-			KalturaLog::info("Exception was thrown during updateContentAction with error: " . $e->getMessage());
-			$this->cancelReplaceAction($entryId);
-
 			if($lock){
 				$lock->unlock();
 			}
+			KalturaLog::info("Exception was thrown during updateContentAction with error: " . $e->getMessage());
+			$this->cancelReplaceAction($entryId);
+			
 			if (($e->getCode() == kCoreException::SOURCE_FILE_NOT_FOUND) && (kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId())))
 			{
 				$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
