@@ -794,6 +794,9 @@ class MediaService extends KalturaEntryService
 				$this->updateContentInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions);
 		}
 		catch(Exception $e){
+			KalturaLog::info("Exception was thrown during updateContentAction with error: " . $e->getMessage());
+			$this->cancelReplaceAction($entryId);
+
 			if($lock){
 				$lock->unlock();
 			}
