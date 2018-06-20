@@ -230,7 +230,9 @@ interface PermissionName extends BaseEnum
 	const AUDIT_TRAIL_ADD = 'AUDIT_TRAIL_ADD';
 
 	const MANAGE_ADMIN_USERS = 'MANAGE_ADMIN_USERS';
-	
+
+	const FEATURE_SELF_SERVE = 'FEATURE_SELF_SERVE';
+
 	// KMC only permissions
 	
 	const ADVERTISING_BASE = 'ADVERTISING_BASE';

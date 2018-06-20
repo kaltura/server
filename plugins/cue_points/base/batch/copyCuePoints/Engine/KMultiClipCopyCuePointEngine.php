@@ -29,7 +29,7 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 		$clipStartTime = $this->currentClip->startTime;
 		$clipEndTime = $clipStartTime + $this->currentClip->duration;
 		$calculatedEndTime = $cuePoint->calculatedEndTime;
-		if (is_null($cuePoint->calculatedEndTime) && $cuePoint->isMomentary)
+		if ($cuePoint->isMomentary)
 			$calculatedEndTime = $cuePoint->startTime;
 		return is_null($calculatedEndTime) || TimeOffsetUtils::onTimeRange($cuePoint->startTime,$calculatedEndTime,$clipStartTime, $clipEndTime);
 	}
@@ -51,7 +51,7 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 		$offsetInDestination = $this->currentClip->offsetInDestination;
 		$clipEndTime = $clipStartTime + $this->currentClip->duration;
 		$cuePointDestStartTime = TimeOffsetUtils::getAdjustedStartTime($cuePoint->startTime, $clipStartTime, $offsetInDestination);
-		$cuePointDestEndTime = TimeOffsetUtils::getAdjustedEndTime($cuePoint->endTime, $clipStartTime ,$clipEndTime ,$offsetInDestination);
+		$cuePointDestEndTime = TimeOffsetUtils::getAdjustedEndTime(self::getEndTimeIfExist($cuePoint), $clipStartTime ,$clipEndTime ,$offsetInDestination);
 		return array($cuePointDestStartTime, $cuePointDestEndTime);
 	}
 

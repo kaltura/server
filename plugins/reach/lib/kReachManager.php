@@ -181,20 +181,26 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		if (kReachUtils::isDuplicateTask($entryId, $vendorCatalogItemId, $entry->getPartnerId(), $sourceFlavorVersion))
 		{
-			KalturaLog::err("Trying to insert a duplicate entry vendor task for entry [$entryId], catalog item [$vendorCatalogItemId] and entry version [$sourceFlavorVersion]");
+			KalturaLog::log("Trying to insert a duplicate entry vendor task for entry [$entryId], catalog item [$vendorCatalogItemId] and entry version [$sourceFlavorVersion]");
 			return true;
 		}
 
 		//check if credit has expired
 		if (kReachUtils::hasCreditExpired($reachProfile))
 		{
-			KalturaLog::err("Credit cycle has expired, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
+			KalturaLog::log("Credit cycle has expired, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
 			return true;
 		}
 
 		if (!kReachUtils::isEnoughCreditLeft($entry, $vendorCatalogItem, $reachProfile))
 		{
-			KalturaLog::err("Exceeded max credit allowed, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
+			KalturaLog::log("Exceeded max credit allowed, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
+			return true;
+		}
+		
+		if(!kReachUtils::isEntryTypeSupported($entry->getType()))
+		{
+			KalturaLog::log("Entry of type [{$entry->getType()}] is not supported by Reach");
 			return true;
 		}
 

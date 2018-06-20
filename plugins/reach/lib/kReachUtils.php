@@ -131,4 +131,16 @@ class kReachUtils
 		
 		return false;
 	}
+	
+	public static function isEntryTypeSupported($type)
+	{
+		switch ($type)
+		{
+			case entryType::MEDIA_CLIP:
+				return true;
+			
+			default:
+				return false;
+		}
+	}
 }

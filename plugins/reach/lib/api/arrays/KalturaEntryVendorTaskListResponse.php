@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.schedule
+ * @package plugins.reach
  * @subpackage api.objects
  */
 class KalturaEntryVendorTaskListResponse extends KalturaListResponse

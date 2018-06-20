@@ -22,7 +22,8 @@ class ConferenceService extends KalturaBaseService {
 	public function allocateConferenceRoomAction($entryId)
 	{
 		$partner = $this->getPartner();
-		if (!$partner->getEnableSelfServe())
+
+		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_SELF_SERVE, $this->getPartnerId()))
 		{
 			throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN, $this->serviceId.'->'.$this->actionName);
 		}
@@ -58,14 +59,16 @@ class ConferenceService extends KalturaBaseService {
 		$existingConfRoom = $this->findExistingConferenceRoom($entryId);
 		if ($existingConfRoom)
 			return $existingConfRoom;
-
-		$liveStreamEntry = entryPeer::retrieveByPK($entryId);
-		/** @var LiveStreamEntry $liveStreamEntry */
-		if (!$liveStreamEntry)
+		
+		$partner = $this->getPartner();
+		$numOfConcurrentRtcStreams = EntryServerNodePeer::retrieveByPartnerIdAndServerType($this->getPartnerId(), ConferencePlugin::getCoreValue('EntryServerNodeType', ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER ));
+		// $partner->getMaxLiveRtcStreamInputs() will return the number configured for the user in the admin console, otherwise the default value - 2
+		$maxRTCStreamInputs = $partner->getMaxLiveRtcStreamInputs();
+		if ($numOfConcurrentRtcStreams >= $maxRTCStreamInputs)
 		{
-			throw new kCoreException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->getEntryId());
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_RTC_STREAMS, $this->getPartnerId(), $maxRTCStreamInputs);
 		}
-
+		
 		$serverNode = $this->findFreeServerNode();
 		$confEntryServerNode = new ConferenceEntryServerNode();
 		$confEntryServerNode->setEntryId($entryId);
@@ -74,9 +77,10 @@ class ConferenceService extends KalturaBaseService {
 		$confEntryServerNode->setConfRoomStatus(ConferenceRoomStatus::READY);
 		$confEntryServerNode->setLastAllocationTime(time());
 		$confEntryServerNode->setStatus(EntryServerNodeStatus::PLAYABLE);
+		$confEntryServerNode->setPartnerId($this->getPartnerId());
 		$confEntryServerNode->save();
 
-		$outObj = $this->getRoomDetails($entryId, $confEntryServerNode);
+		$outObj = $this->getRoomDetails($entryId, $confEntryServerNode, $serverNode);
 		return $outObj;
 	}
 
@@ -101,7 +105,7 @@ class ConferenceService extends KalturaBaseService {
 
 			$existingConfRoom->setLastAllocationTime(time());
 
-			$outObj = $this->getRoomDetails($entryId, $existingConfRoom);
+			$outObj = $this->getRoomDetails($entryId, $existingConfRoom, $serverNode);
 			return $outObj;
 		}
 		return null;
@@ -148,36 +152,42 @@ class ConferenceService extends KalturaBaseService {
 	 * @action finishConf
 	 * @actionAlias liveStream.finishConf
 	 * @param string $entryId
+	 * @param int $serverNodeId
 	 * @return bool
 	 * @throws KalturaAPIException
 	 * @beta
 	 */
-	public function finishConfAction($entryId)
+	public function finishConfAction($entryId, $serverNodeId = null)
 	{
 		$confEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, ConferencePlugin::getCoreValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER));
-		if (!$confEntryServerNode)
+		if ($confEntryServerNode)
 		{
-			throw new KalturaAPIException(KalturaErrors::ENTRY_SERVER_NODE_NOT_FOUND,$entryId, ConferencePlugin::getCoreValue('EntryServerNodeType',ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER));
+			if (!$confEntryServerNode->isValid())
+			{
+				KalturaLog::debug("conf still has grace period, not finishing");
+				return false;
+			}
+			$confEntryServerNode->delete();
+			$serverNodeId = $confEntryServerNode->getServerNodeId();
 		}
-		/** @var ConferenceEntryServerNode $confEntryServerNode */
-		if (!$confEntryServerNode->isValid())
+
+		if ($serverNodeId)
 		{
-			KalturaLog::debug("conf still has grace period, not finishing");
-			return false;
-		}
-		$serverNode = ServerNodePeer::retrieveByPK($confEntryServerNode->getServerNodeId());
-		if (!$serverNode)
-		{
-			KalturaLog::info("Could not find server node with id [" . $confEntryServerNode->getServerNodeId() . "]");
-			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND_WITH_ID, $confEntryServerNode->getServerNodeId());
-		}
-		$confEntryServerNode->delete();
-		$otherEntryServerNodes = EntryServerNodePeer::retrieveByServerNodeIdAndType($serverNode->getId(), ConferencePlugin::getCoreValue('serverNodeType', ConferenceServerNodeType::CONFERENCE_SERVER));
-		if (!count($otherEntryServerNodes))
-		{
-			KalturaLog::debug('No entry server nodes left, marking server node as not registered');
-			$serverNode->setStatus(ServerNodeStatus::NOT_REGISTERED);
-			$serverNode->save();
+			$serverNode = ServerNodePeer::retrieveByPK($confEntryServerNode->getServerNodeId());
+			/** @var ConferenceEntryServerNode $confEntryServerNode */
+			if (!$serverNode)
+			{
+				KalturaLog::info("Could not find server node with id [" . $confEntryServerNode->getServerNodeId() . "]");
+				throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND_WITH_ID, $confEntryServerNode->getServerNodeId());
+			}
+
+			$otherEntryServerNodes = EntryServerNodePeer::retrieveByServerNodeIdAndType($serverNode->getId(), ConferencePlugin::getCoreValue('serverNodeType', ConferenceServerNodeType::CONFERENCE_SERVER));
+			if (!count($otherEntryServerNodes))
+			{
+				KalturaLog::debug('No entry server nodes left, marking server node as not registered');
+				$serverNode->setStatus(ServerNodeStatus::NOT_REGISTERED);
+				$serverNode->save();
+			}
 		}
 		return true;
 	}
@@ -211,7 +221,7 @@ class ConferenceService extends KalturaBaseService {
 	 * @return KalturaRoomDetails
 	 * @throws kCoreException
 	 */
-	protected function getRoomDetails($entryId, ConferenceEntryServerNode $confRoom)
+	protected function getRoomDetails($entryId, ConferenceEntryServerNode $confRoom, ConferenceServerNode $serverNode)
 	{
 		$liveStreamEntry = entryPeer::retrieveByPK($entryId);
 		/** @var LiveStreamEntry $liveStreamEntry */
@@ -222,7 +232,12 @@ class ConferenceService extends KalturaBaseService {
 		$outObj = new KalturaRoomDetails();
 		$outObj->serverUrl = $confRoom->buildRoomUrl($this->getPartnerId());
 		$outObj->entryId = $entryId;
-		$outObj->token = $liveStreamEntry->getStreamPassword();
+		$expiry = time() + kConf::get('rtc_token_expiry', null, '60');
+		$rtcSecret = kConf::get('rtc_token_secret');
+		$token = hash_hmac("sha256" ,$entryId . $expiry, $rtcSecret);
+		$outObj->token = $token;
+		$outObj->expiry = $expiry;
+		$outObj->serverName = $serverNode->getHostName();
 		return $outObj;
 	}
 

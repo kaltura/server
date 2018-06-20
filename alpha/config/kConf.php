@@ -6,6 +6,10 @@
 setlocale(LC_ALL, 'en_US.UTF-8');
 libxml_disable_entity_loader(true);
 
+// to make sure stream calls to localhost machine
+stream_wrapper_unregister ('http');
+stream_wrapper_unregister ('https');
+
 $include_path = realpath(__DIR__ . '/../../vendor/ZendFramework/library') . PATH_SEPARATOR . get_include_path();
 set_include_path($include_path);
 
