@@ -1591,7 +1591,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$newEntry->setCategoriesIds(null);
 
 	    if (!$copyFlavors)
-		    $newEntry->setStatus(entryStatus::NO_CONTENT);
+		{
+			$newEntry->setStatus(entryStatus::NO_CONTENT);
+			$newEntry->setLengthInMsecs(0);
+		}
+
 
 	    if ($toPartner instanceof Partner)
  		{
