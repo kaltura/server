@@ -2706,9 +2706,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function setLengthInMsecs($v)
 	{
-		if(!$v || $v < 0) // null ot negative
+		if(is_null($v) || $v < 0) // null ot negative
 			return;
-			
+
 		if(is_string($v) && !is_numeric($v)) // not numeric
 			return;
 
