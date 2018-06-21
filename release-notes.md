@@ -7,7 +7,7 @@
 ### Configuration ###
 	- Change the following to local.ini:
         [password_reset_links]
-        default = https://kmc.kaltura.com/index.php/kmcng/actions/restore-password/
+        default = @SERVICE_URL@/index.php/kmcng/actions/restore-password/
 
 ## kmc-ng: configure kmc-ng server based links ##
 - Issue type : new feature
