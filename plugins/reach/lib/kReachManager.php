@@ -173,8 +173,14 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	public static function addEntryVendorTaskByObjectIds($entryId, $vendorCatalogItemId, $reachProfileId, $context = null)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
-		$reachProfile = ReachProfilePeer::retrieveByPK($reachProfileId);
+		$reachProfile = ReachProfilePeer::retrieveActiveByPk($reachProfileId);
 		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($vendorCatalogItemId);
+		
+		if(!$entry || !$reachProfile || !$vendorCatalogItem)
+		{
+			KalturaLog::log("Not all mandatory objects were found, task will not be added");
+			return true;
+		}
 
 		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
 		$sourceFlavorVersion = $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
