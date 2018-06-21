@@ -28,6 +28,16 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		$this->_doc->formatOutput = true; 
 	}
 	
+	private function getVersionFromBranchName() {
+	    $filePath = __DIR__ . '/../../../.git/HEAD';
+	    $stringFromfile = file($filePath);
+	    $firstLine = $stringFromfile[0]; //get the string from the array
+	    $explodedStrings = explode("/", $firstLine, 3); //seperate out by the "/" in the string
+	    $branchName = $explodedStrings[2]; //get the one that is always the branch name
+	    $version = trim(preg_replace('/.+-(\d+[.]\d+[.]\d+).*/', '$1', $branchName));
+	    return $version;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 * @see ClientGeneratorFromPhp::generate()
@@ -37,7 +47,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		$this->load();
 		
 		$this->_xmlElement = $this->_doc->createElement("xml");
-		$this->_xmlElement->setAttribute('apiVersion', KALTURA_API_VERSION);
+		$this->_xmlElement->setAttribute('apiVersion', $this->getVersionFromBranchName());
 		$this->_xmlElement->setAttribute('generatedDate', time());
 		exec("which svnversion 2>/dev/null",$out,$rc);
 		if ($rc === 0){
