@@ -1,5 +1,23 @@
 # Naos 14.1.0 #
 
+## Update slide view change push notification ##
+- Issue Type: Update template
+- Issue ID: No Plat
+
+### Deployment scripts ###
+	First replcae all tokens from the XML files below and remove ".template" from the fle name:
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_06_21_update_player_slide_module_notifications.template.xml
+
+	Run deployment script:
+		php /opt/kaltura/app/deployment/updates/scripts/2018_06_21_update_player_slides_module_notifications.php
+		
+### Configuration ###
+	None.
+			
+#### Known Issues & Limitations ####
+	None.
+
+
 ## kmc-ng: update the link provided in the email as part of reset password process of KMC user  ##
 - Issue type : new feature
 - Issue ID: PLAT-8969
