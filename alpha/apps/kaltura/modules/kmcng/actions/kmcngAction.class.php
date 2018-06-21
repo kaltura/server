@@ -114,7 +114,7 @@ class kmcngAction extends kalturaAction
 		{
 			$liveAnalytics = array(
 				"uri" => '/apps/liveanalytics/' . kConf::get("liveanalytics_version") . "/index.html",
-				"uiConfId" => isset($this->contentUiconfLivea) ? $this->contentUiconfLivea->getId() : null,
+				"uiConfId" => isset($this->contentUiconfLivea) ? strval($this->contentUiconfLivea->getId()) : null,
 				"mapUrls" => kConf::hasParam ("cdn_static_hosts") ? array_map(function($s) {return "$s/content/static/maps/v1";}, kConf::get ("cdn_static_hosts")) : array(),
                 "mapZoomLevels" => kConf::hasParam("map_zoom_levels") ? kConf::get("map_zoom_levels") : ''
 			);
