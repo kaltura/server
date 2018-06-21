@@ -29,13 +29,9 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	}
 	
 	private function getVersionFromBranchName() {
-	    $filePath = __DIR__ . '/../../../.git/HEAD';
+	    $filePath = __DIR__ . '/../../../VERSION.txt';
 	    $stringFromfile = file($filePath);
-	    $firstLine = $stringFromfile[0]; //get the string from the array
-	    $explodedStrings = explode("/", $firstLine, 3); //seperate out by the "/" in the string
-	    $branchName = $explodedStrings[2]; //get the one that is always the branch name
-	    $version = trim(preg_replace('/.+-(\d+[.]\d+[.]\d+).*/', '$1', $branchName));
-	    return $version;
+	    return trim($stringFromfile[0]);
 	}
 	
 	/**
