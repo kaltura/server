@@ -30,7 +30,7 @@ class MapFilterToList
 		$filterName = get_class($relatedFilter);
 		$cleanName = self::removeAppendixes($filterName);
 		$clazz = $cleanName . 'Service';
-		/** currently we will not block any response profile that does not have list action on his service */
+		/** if Class is not found then do not allow the response profile filter to get the response  */
 		if (!class_exists($clazz) || !method_exists($clazz, self::LIST_ACTION)) {
 			$e = new KalturaAPIException (APIErrors::SERVICE_FORBIDDEN, 'Service class:  ' . $clazz . 'Not Found');
 			header("X-Kaltura:error-" . $e->getCode());
