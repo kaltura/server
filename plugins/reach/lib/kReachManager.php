@@ -178,7 +178,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		
 		if(!$entry || !$reachProfile || !$vendorCatalogItem)
 		{
-			KalturaLog::log("Not all mandatory object where found, task will not be added");
+			KalturaLog::log("Not all mandatory objects were found, task will not be added");
 			return true;
 		}
 
