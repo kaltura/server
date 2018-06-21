@@ -803,6 +803,9 @@ class MediaService extends KalturaEntryService
 				KalturaLog::info("Source file wasn't found on current DC. dumping the request to DC id [$remoteDc]");
 				kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc));
 			}
+			KalturaLog::info("Exception was thrown during updateContentAction with error: " . $e->getMessage());
+			$this->cancelReplaceAction($entryId);
+			
 	       		throw $e;
 		}
 		if($lock){
