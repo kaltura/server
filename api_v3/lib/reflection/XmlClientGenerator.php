@@ -31,7 +31,9 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	private function getVersionFromBranchName() {
 	    $filePath = __DIR__ . '/../../../VERSION.txt';
 	    $stringFromfile = file($filePath);
-	    return trim($stringFromfile[0]);
+	    $branchName = trim($stringFromfile[0]);
+	    $version = trim(preg_replace('/.+-(\d+[.]\d+[.]\d+).*/', '$1', $branchName));
+	    return $version;
 	}
 	
 	/**
