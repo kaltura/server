@@ -1,3 +1,40 @@
+# Naos 14.1.0 #
+
+## kmc-ng: update the link provided in the email as part of reset password process of KMC user  ##
+- Issue type : new feature
+- Issue ID: PLAT-8969
+
+### Configuration ###
+	- Change the following to local.ini:
+        [password_reset_links]
+        default = @SERVICE_URL@/index.php/kmcng/actions/restore-password/
+
+## kmc-ng: configure kmc-ng server based links ##
+- Issue type : new feature
+- Issue ID: PLAT-8844
+
+### Configuration ###
+	- Add the following to local.ini:
+        [kmcng]
+        previewAndEmbed[embedTypes] = Link to documentation about "Share & Embed > Embed Code Types"
+        previewAndEmbed[deliveryProtocols] = Link to documentation about "Delivery type enforcement"
+        kaltura[kmcOverview] = Link to "KMCng Overview"
+        kaltura[mediaManagement] = Link to "Media Management"
+        kaltura[userManual] = Link to "KMCng User Manual"
+        kaltura[support] = Email support
+        kaltura[signUp] = Link to free trial signup page
+        kaltura[contactUs] = Link to contact us form page
+        kaltura[upgradeAccount] = Link to upgrade account form page
+        kaltura[contactSalesforce] = Link to salesforce contact form page
+        entitlements[manage] = Link to documentation about "Managing Content Entitlement"
+        uploads[needHighSpeedUpload] = Link to "High-Speed Upload Powered by Aspera" registration form 
+        uploads[highSpeedUpload] = Link to "Aspera" page
+        uploads[bulkUploadSamples] = Link to download bulk upload sample zip file
+        live[akamaiEdgeServerIpURL] = Link to akamai server ip list page
+
+### Deployment scripts ###
+None.
+
 # Naos 14.0.0 #
 
 ## Self-serve: allow via admin_console ##
