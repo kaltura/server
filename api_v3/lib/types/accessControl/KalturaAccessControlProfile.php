@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @relatedFilter AccessControlProfileService
  */
 class KalturaAccessControlProfile extends KalturaObject implements IRelatedFilterable 
 {

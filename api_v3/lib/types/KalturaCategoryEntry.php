@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @relatedFilter CategoryEntryService
  */
 class KalturaCategoryEntry extends KalturaObject implements IRelatedFilterable 
 {

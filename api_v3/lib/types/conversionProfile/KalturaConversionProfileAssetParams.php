@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @relatedFilter ConversionProfileAssetParamsService
  */
 class KalturaConversionProfileAssetParams extends KalturaObject implements IRelatedFilterable 
 {

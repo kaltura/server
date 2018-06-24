@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @relatedFilter BaseEntryService
  */
 class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApiObjectFactory
 {

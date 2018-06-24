@@ -2,6 +2,7 @@
 /**
  * @package plugins.metadata
  * @subpackage api.objects
+ * @relatedService MetadataService
  */
 class KalturaMetadata extends KalturaObject implements IRelatedFilterable 
 {

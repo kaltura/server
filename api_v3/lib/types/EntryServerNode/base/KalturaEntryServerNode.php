@@ -3,6 +3,7 @@
  * @package api
  * @subpackage objects
  * @abstract
+ * @relatedFilter EntryServerNodeService
  */
 abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedFilterable, IApiObjectFactory
 {
