@@ -100,8 +100,8 @@ class facebookoauth2Action extends oauth2Action
 		$accessURL = $this->getFacebookDistributionAccessURL($providerId, $ks);
 		$dataHandler = new kDistributionPersistentDataHandler($accessURL);
 		//$redirectUrl = $this->getController()->genUrl('extservices/facebookoauth2?'.http_build_query($params, null, '&'), true);
-		$redirectUrl = "http://".kDataCenterMgr::getCurrentDcName()."/index.php/'extservices/facebookoauth2?".
-			http_build_query(array(FacebookConstants::FACEBOOK_NEXT_ACTION_REQUEST_PARAM => self::SUB_ACTION_PROCESS_OAUTH2_RESPONSE), null, '&');
+		$redirectUrl = "http://".kDataCenterMgr::getCurrentDcName()."/index.php/extservices/facebookoauth2?".
+			http_build_query(array(FacebookConstants::FACEBOOK_NEXT_ACTION_REQUEST_PARAM =>  base64_encode(self::SUB_ACTION_PROCESS_OAUTH2_RESPONSE)), null, '&');
 		$reRequestPermissions = base64_decode($this->getRequestParameter(FacebookConstants::FACEBOOK_RE_REQUEST_PERMISSIONS_REQUEST_PARAM));
 		$fb = FacebookGraphSdkUtils::createFacebookInstance($appId, $appSecret, $dataHandler);
 		$loginHelper = $fb->getRedirectLoginHelper();
@@ -120,7 +120,7 @@ class facebookoauth2Action extends oauth2Action
 		$this->tokenError = null;
 		$appId = $this->getFromConfig(FacebookConstants::FACEBOOK_APP_ID_REQUEST_PARAM);
 		$appSecret = $this->getFromConfig(FacebookConstants::FACEBOOK_APP_SECRET_REQUEST_PARAM);
-		$state = base64_decode($this->getRequestParameter(FacebookConstants::FACEBOOK_LOGIN_STATE));
+		$state = $this->getRequestParameter(FacebookConstants::FACEBOOK_LOGIN_STATE);
 		$authDataCache = $this->getAuthDataCache();
 		$data = $authDataCache->retrieve($state);
 		if(!$data)
