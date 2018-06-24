@@ -8,7 +8,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_SIZE_BYTES = 'size';
 	const METRIC_DURATION_SEC = 'duration';
 	const METRIC_FLAVOR_SIZE_BYTES = 'flavorSize';
-	const METRIC_QUARTILE_PLAY_TIME_SEC = 'playTimeSum';
+	const METRIC_PLAY_TIME_SUM = 'playTimeSum';
 	const METRIC_UNIQUE_USER_IDS = 'uniqueUserIds';
 
 	// druid calculated metrics
@@ -48,6 +48,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_DURATION_DELETED_SEC = 'duration_deleted';
 	const METRIC_BANDWIDTH_SIZE_BYTES = 'bandwidth_size';
 	const METRIC_STORAGE_SIZE_BYTES = 'total_storage';
+	const METRIC_QUARTILE_PLAY_TIME_SEC = 'quartile_play_time';
 	
 	// non druid metrics
 	const METRIC_PEAK_STORAGE_MB = 'peak_storage';
@@ -1307,7 +1308,7 @@ class kKavaReportsMgr extends kKavaBase
 		// other aggregators
 		self::$aggregations_def[self::METRIC_QUARTILE_PLAY_TIME_SEC] = self::getFilteredAggregator(
 			self::getInFilter(self::DIMENSION_EVENT_TYPE, self::$playthrough_event_types), 
-			self::getLongSumAggregator(self::METRIC_QUARTILE_PLAY_TIME_SEC, self::METRIC_QUARTILE_PLAY_TIME_SEC));
+			self::getLongSumAggregator(self::METRIC_QUARTILE_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
 		
 		self::$aggregations_def[self::METRIC_UNIQUE_ENTRIES] = self::getCardinalityAggregator(
 			self::METRIC_UNIQUE_ENTRIES, 
