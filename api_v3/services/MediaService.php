@@ -112,15 +112,15 @@ class MediaService extends KalturaEntryService
 
 		if ($resource)
 		{
+			$resource->validateEntry($dbEntry);
+			$kResource = $resource->toObject();
 			try
 			{
-				$resource->validateEntry($dbEntry);
-				$kResource = $resource->toObject();
 				$this->attachResource($kResource, $dbEntry);
-				$resource->entryHandled($dbEntry);
 			} catch (Exception $e) {
-				$this->handleErrorDuringSetContent($entryId, $e);
+				$this->handleErrorDuringSetResource($entryId, $e);
 			}
+			$resource->entryHandled($dbEntry);
 		}
 		return $this->getEntry($entryId);
     }
@@ -800,7 +800,7 @@ class MediaService extends KalturaEntryService
 			if($lock){
 				$lock->unlock();
 			}
-			$this->handleErrorDuringSetContent($entryId, $e);
+			$this->handleErrorDuringSetResource($entryId, $e);
 		}
 		if($lock){
 			$lock->unlock();
@@ -1224,7 +1224,7 @@ class MediaService extends KalturaEntryService
 		return $content;
 	}
 
-	private function handleErrorDuringSetContent($entryId, Exception $e)
+	private function handleErrorDuringSetResource($entryId, Exception $e)
 	{
 		KalturaLog::info("Exception was thrown during setContent on entry [$entryId] with error: " . $e->getMessage());
 		$this->cancelReplaceAction($entryId);
