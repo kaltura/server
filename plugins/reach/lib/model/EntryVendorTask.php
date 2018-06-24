@@ -150,7 +150,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
  	 */
 	public function preUpdate(PropelPDO $con = null)
 	{
-		if ($this->isColumnModified(EntryVendorTaskPeer::STATUS) && $this->getStatus() == EntryVendorTaskStatus::PROCESSING)
+		if ($this->isColumnModified(EntryVendorTaskPeer::STATUS) && $this->getStatus() == EntryVendorTaskStatus::PENDING)
 		{
 			$this->setQueueTime(time());
 		}
