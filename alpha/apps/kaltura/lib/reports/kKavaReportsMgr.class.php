@@ -9,10 +9,14 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_DURATION_SEC = 'duration';
 	const METRIC_FLAVOR_SIZE_BYTES = 'flavorSize';
 	const METRIC_PLAY_TIME_SUM = 'playTimeSum';
+	const METRIC_BUFFER_TIME_SEC = 'bufferTimeSum';
+	const METRIC_BITRATE_SUM = 'bitrateSum';
+	const METRIC_BITRATE_COUNT = 'bitrateCount';
 	const METRIC_UNIQUE_USER_IDS = 'uniqueUserIds';
 
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
+	const METRIC_VIEW_PERIOD_PLAY_TIME = 'sum_view_period';
 	const METRIC_AVG_PLAY_TIME = 'avg_time_viewed';
 	const METRIC_PLAYER_IMPRESSION_RATIO = 'load_play_ratio';
 	const METRIC_AVG_DROP_OFF = 'avg_view_drop_off';
@@ -39,6 +43,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_DURATION_ADDED_MSEC = 'added_msecs';
 	const METRIC_DURATION_DELETED_MSEC = 'deleted_msecs';
 	const METRIC_DURATION_TOTAL_MSEC = 'total_msecs';
+	const METRIC_BUFFER_TIME_RATIO = 'avg_buffer_time';
+	const METRIC_AVG_BITRATE = 'avg_bitrate';
 	
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -49,6 +55,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_BANDWIDTH_SIZE_BYTES = 'bandwidth_size';
 	const METRIC_STORAGE_SIZE_BYTES = 'total_storage';
 	const METRIC_QUARTILE_PLAY_TIME_SEC = 'quartile_play_time';
+	const METRIC_VIEW_PERIOD_PLAY_TIME_SEC = 'view_period_play_time';
 	
 	// non druid metrics
 	const METRIC_PEAK_STORAGE_MB = 'peak_storage';
@@ -1061,6 +1068,9 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_USERS_ADDED => self::METRIC_USERS_ADDED,
 		self::METRIC_USERS_DELETED => self::METRIC_USERS_DELETED,
 		self::METRIC_USERS_TOTAL => self::METRIC_USERS_TOTAL,
+		self::METRIC_VIEW_PERIOD_PLAY_TIME => self::METRIC_VIEW_PERIOD_PLAY_TIME,
+		self::METRIC_BUFFER_TIME_RATIO => self::METRIC_BUFFER_TIME_RATIO,
+		self::METRIC_AVG_BITRATE => self::METRIC_AVG_BITRATE,
 	);
 	
 	protected static $transform_metrics = array(
@@ -1093,6 +1103,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_AVG_DROP_OFF => true,
 		self::METRIC_UNIQUE_ENTRIES => true,
 		self::METRIC_UNIQUE_USERS => true,
+		self::METRIC_BUFFER_TIME_RATIO => true,
+		self::METRIC_AVG_BITRATE => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -1309,7 +1321,27 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_QUARTILE_PLAY_TIME_SEC] = self::getFilteredAggregator(
 			self::getInFilter(self::DIMENSION_EVENT_TYPE, self::$playthrough_event_types), 
 			self::getLongSumAggregator(self::METRIC_QUARTILE_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
+
+		self::$aggregations_def[self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD), 
+			self::getLongSumAggregator(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
 		
+		self::$aggregations_def[self::METRIC_BUFFER_TIME_SEC] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD), 
+			self::getDoubleSumAggregator(self::METRIC_BUFFER_TIME_SEC, self::METRIC_BUFFER_TIME_SEC));
+
+		self::$aggregations_def[self::METRIC_BITRATE_SUM] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getSelectorFilter(self::DIMENSION_HAS_BITRATE, 1))),
+			self::getLongSumAggregator(self::METRIC_BITRATE_SUM, self::METRIC_BITRATE_SUM));
+
+		self::$aggregations_def[self::METRIC_BITRATE_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getSelectorFilter(self::DIMENSION_HAS_BITRATE, 1))),
+			self::getLongSumAggregator(self::METRIC_BITRATE_COUNT, self::METRIC_BITRATE_COUNT));
+
 		self::$aggregations_def[self::METRIC_UNIQUE_ENTRIES] = self::getCardinalityAggregator(
 			self::METRIC_UNIQUE_ENTRIES, 
 			array(self::DIMENSION_ENTRY_ID));
@@ -1334,6 +1366,11 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_AGGR => array(self::METRIC_QUARTILE_PLAY_TIME_SEC),
 			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
 				self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_QUARTILE_PLAY_TIME_SEC, '60'));
+
+		self::$metrics_def[self::METRIC_VIEW_PERIOD_PLAY_TIME] = array(
+			self::DRUID_AGGR => array(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_VIEW_PERIOD_PLAY_TIME, self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, '60'));
 		
 		self::$metrics_def[self::METRIC_DURATION_TOTAL_MSEC] = array(
 			self::DRUID_AGGR => array(self::METRIC_DURATION_SEC),
@@ -1394,6 +1431,20 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_PLAYER_IMPRESSION_RATIO,
 				self::EVENT_TYPE_PLAY,
 				self::EVENT_TYPE_PLAYER_IMPRESSION));
+
+		self::$metrics_def[self::METRIC_BUFFER_TIME_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_BUFFER_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_BUFFER_TIME_RATIO,
+				self::METRIC_BUFFER_TIME_SEC,
+				self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC));
+
+		self::$metrics_def[self::METRIC_AVG_BITRATE] = array(
+			self::DRUID_AGGR => array(self::METRIC_BITRATE_SUM, self::METRIC_BITRATE_COUNT),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_AVG_BITRATE,
+				self::METRIC_BITRATE_SUM,
+				self::METRIC_BITRATE_COUNT));
 		
 		// complex metrics
 		self::$metrics_def[self::METRIC_AVG_PLAY_TIME] = array(
