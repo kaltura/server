@@ -1,5 +1,20 @@
 # Naos 14.1.0 #
 
+## Support decimal price when defining catalog items ##
+- Issue Type: Update template
+- Issue ID: PLAT-9041
+
+### Deployment scripts ###
+	- mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2018_06_24_update_entry_vendor_task_table.sql
+	
+	- mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2018_06_24_update_reach_profile_table.sql
+		
+### Configuration ###
+	None.
+			
+#### Known Issues & Limitations ####
+	None.
+
 ## Update slide view change push notification ##
 - Issue Type: Update template
 - Issue ID: No Plat
