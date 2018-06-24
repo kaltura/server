@@ -17,7 +17,7 @@ class kAuthDataCache
 	function __construct()
 	{
 		$this->cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_AUTH_CACHED_DATA);
-		$this->ttl = kConf::get('AuthCachedDataDuration', self::DEFAULT_TIME_IN_CACHE_FOR_AUTH_CACHED_DATA);
+		$this->ttl = kConf::get('AuthCachedDataDuration','local', self::DEFAULT_TIME_IN_CACHE_FOR_AUTH_CACHED_DATA);
 	}
 
 	/**
