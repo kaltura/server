@@ -26,7 +26,7 @@ abstract class KalturaRelatedFilter extends KalturaFilter
 	public function validateAndGetListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 
-		if (MapFilterToList::validateAccess($this))
+		if (ValidateAccessResponseProfile::validateAccess($this))
 			return $this->getListResponse($pager,$responseProfile);
 		return new KalturaListResponse();
 

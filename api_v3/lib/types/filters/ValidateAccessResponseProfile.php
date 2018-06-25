@@ -4,10 +4,12 @@
  * @subpackage filters
  */
 
-class MapFilterToList
+class ValidateAccessResponseProfile
 {
 
 	const LIST_ACTION = 'listAction';
+	const COMMENTS = '#@(.*?)\n#s';
+	const RELATED_SERVICE = 'relatedService';
 
 	/**
 	 * @param KalturaRelatedFilter $relatedFilter
@@ -27,9 +29,7 @@ class MapFilterToList
 	 */
 	private static function getServiceClassInstance($relatedFilter)
 	{
-		$filterName = get_class($relatedFilter);
-		$cleanName = self::removeAppendixes($filterName);
-		$clazz = $cleanName . 'Service';
+		$clazz = self::getServiceClazz($relatedFilter);
 		/** if Class is not found then do not allow the response profile filter to get the response  */
 		if (!class_exists($clazz) || !method_exists($clazz, self::LIST_ACTION)) {
 			$e = new KalturaAPIException (APIErrors::SERVICE_FORBIDDEN, 'Service class:  ' . $clazz . 'Not Found');
@@ -41,13 +41,25 @@ class MapFilterToList
 	}
 
 	/**
-	 * @param string $filterName
-	 * @return string
+	 * @param $relatedFilter
+	 * @return string className
+	 * @throws ReflectionException
 	 */
-	private static function removeAppendixes($filterName)
+	private static function getServiceClazz($relatedFilter)
 	{
-		$wordList = array('Kaltura', 'BaseFilter', 'Filter');
-		return str_replace($wordList, '', $filterName);
+		$r = new ReflectionClass(get_parent_class($relatedFilter));
+		$comments = $r->getDocComment();
+		preg_match_all(self::COMMENTS, $comments, $annotationsArray);
+		$annotations = $annotationsArray[1];
+		foreach ($annotations as $annotation)
+		{
+			if (strpos($annotation, self::RELATED_SERVICE) === 0)
+			{
+				list(, $clazz) = explode(' ', $annotation);
+				return $clazz;
+			}
+		}
+		return '';
 	}
 
 	/**

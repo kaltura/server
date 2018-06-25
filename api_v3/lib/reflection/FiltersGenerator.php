@@ -121,14 +121,19 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		
 		$partnetClassName = ($parentType ? $parentType->getType() . "Filter" : ($type->isRelatedFilterable() ? "KalturaRelatedFilter" : "KalturaFilter"));
 		$relatedService = '';
+		$relatedServiceType = $type;
 		if ($type->isRelatedFilterable())
 		{
-			$result = null;
-			if (preg_match("/\\@relatedService (.*)/", $type->getComments() , $result))
-				$relatedService	 = $result[1];
-			if ($parentType && $parentType->isRelatedFilterable() && preg_match("/\\@relatedService (.*)/", $parentType->getComments() , $result))
-				$relatedService	 = $result[1];
-
+			do
+			{
+				$result = null;
+				if (preg_match("/\\@relatedService (.*)/", $relatedServiceType->getComments() , $result))
+				{
+					$relatedService	 = $result[1];
+					break;
+				}
+				$relatedServiceType = $relatedServiceType->getParentTypeReflector();
+			 } while ($relatedServiceType && !$relatedService);
 		}
 
 		$subpackage = ($type->getPackage() == 'api' ? '' : 'api.') . 'filters.base';
@@ -138,7 +143,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		if ($type->isRelatedFilterable() && !$relatedService)
 			throw new Exception('did not find @relatedService annotation  '. PHP_EOL .
 				' in comments for type:' . $type->getType());
-		if ($type->isRelatedFilterable())
+		if ($type->isRelatedFilterable() && $relatedService !== 'NONE')
 			$this->appendLine(" * @relatedService " . $relatedService);
 		$this->appendLine(" * @subpackage $subpackage");
 		$this->appendLine(" * @abstract");
@@ -151,6 +156,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		// properies map
 		foreach($type->getCurrentProperties() as $prop)
 		{
+
 			$filters = $prop->getFilters();
 			foreach($filters as $filter)
 			{

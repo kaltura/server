@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @relatedService SystemPartnerService
  */
 class KalturaUserLoginData extends KalturaObject implements IRelatedFilterable
 
