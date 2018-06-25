@@ -244,10 +244,8 @@ class KalturaMonitorClient
 		if (!self::$stream)
 			return;
 
-		$eventType = self::EVENT_ELASTIC;
-
 		$data = array_merge(self::$basicEventInfo, array(
-			self::FIELD_EVENT_TYPE 		=> $eventType,
+			self::FIELD_EVENT_TYPE 		=> self::EVENT_ELASTIC,
 			self::FIELD_DATABASE		=> $hostName,
 			self::FIELD_TABLE			=> $indexName,
 			self::FIELD_QUERY_TYPE		=> $actionName,
