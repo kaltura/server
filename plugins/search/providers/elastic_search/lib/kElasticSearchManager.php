@@ -183,7 +183,8 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
         $elasticLog = new SphinxLog();
         $elasticLog->setSql($command);
-        $elasticLog->setExecutedServerId($this->retrieveElasticClusterId());
+        $clusterId = $this->retrieveElasticClusterId($object);
+        $elasticLog->setExecutedServerId($clusterId);
         $elasticLog->setObjectId($object->getId());
         $elasticLog->setObjectType($object->getElasticObjectName());
         $elasticLog->setEntryId($object->getElasticEntryId());
@@ -237,10 +238,10 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         return false;
     }
 
-    private function retrieveElasticClusterId()
+    private function retrieveElasticClusterId($object)
     {
         $elasticClusterId = null;
-        if(kConf::hasParam('exec_elastic') && kConf::get('exec_elastic'))
+        if($this->shouldSyncElastic($object))
         {
             $elasticClusterName = kConf::get('elasticCluster', 'elastic', 0);
             $elasticClusterCacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_EXECUTED_CLUSTER);
