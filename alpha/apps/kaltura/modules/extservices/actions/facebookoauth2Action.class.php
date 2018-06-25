@@ -121,7 +121,6 @@ class facebookoauth2Action extends oauth2Action
 		if(!$data)
 		{
 			$msg = "Error while retrieving auth data for facebook with id ".$state;
-			KalturaLog::err($msg);
 			throw new Exception($msg);
 		}
 
