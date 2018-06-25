@@ -63,8 +63,8 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the used_credit field.
-	 * Note: this column has a database default value of: 0
-	 * @var        int
+	 * Note: this column has a database default value of: 0.0
+	 * @var        double
 	 */
 	protected $used_credit;
 
@@ -139,7 +139,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	 */
 	public function applyDefaultValues()
 	{
-		$this->used_credit = 0;
+		$this->used_credit = 0.0;
 	}
 
 	/**
@@ -285,7 +285,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	/**
 	 * Get the [used_credit] column value.
 	 * 
-	 * @return     int
+	 * @return     double
 	 */
 	public function getUsedCredit()
 	{
@@ -538,7 +538,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	/**
 	 * Set the value of [used_credit] column.
 	 * 
-	 * @param      int $v new value
+	 * @param      double $v new value
 	 * @return     ReachProfile The current object (for fluent API support)
 	 */
 	public function setUsedCredit($v)
@@ -547,7 +547,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 			$this->oldColumnsValues[ReachProfilePeer::USED_CREDIT] = $this->used_credit;
 
 		if ($v !== null) {
-			$v = (int) $v;
+			$v = (double) $v;
 		}
 
 		if ($this->used_credit !== $v || $this->isNew()) {
@@ -634,7 +634,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	 */
 	public function hasOnlyDefaultValues()
 	{
-			if ($this->used_credit !== 0) {
+			if ($this->used_credit !== 0.0) {
 				return false;
 			}
 
@@ -670,7 +670,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 			$this->partner_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->type = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
 			$this->status = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->used_credit = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+			$this->used_credit = ($row[$startcol + 7] !== null) ? (double) $row[$startcol + 7] : null;
 			$this->rules = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->dictionary = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->custom_data = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
