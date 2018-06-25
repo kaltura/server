@@ -79,12 +79,17 @@ class ConferenceEntryServerNode extends EntryServerNode
 
 	public function getLastAllocationTime()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_LAST_ALLOCATE_TIME);
+		return $this->getFromCustomData(self::CUSTOM_DATA_LAST_ALLOCATE_TIME, null, 0);
 	}
 
 	public function setLastAllocationTime($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_LAST_ALLOCATE_TIME, $v);
+	}
+
+	public function isValid()
+	{
+		return (time() - kConf::get('conf_not_finished_timeout', 'local', 0)) <= $this->getLastAllocationTime();
 	}
 
 }

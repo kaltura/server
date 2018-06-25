@@ -275,7 +275,15 @@ class infraRequestUtils
 		$headerIPs = explode(',', trim($_SERVER[$httpHeader], ','));
 		foreach ($headerIPs as $ip)
 		{
-			preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', trim($ip), $matches); // ignore any string after the ip address
+			$ip = trim($ip);
+			$ipv6 = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+			if ($ipv6 !== false)
+			{
+				$remote_addr = $ipv6;
+				break;
+			}
+			
+			preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', $ip, $matches); // ignore any string after the ip address
 			if (!isset($matches[0]))
 				continue;
 	
