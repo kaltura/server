@@ -39,12 +39,12 @@ class kReachUtils
 	
 	public static function calcPricePerSecond(entry $entry, $pricePerUnit)
 	{
-		return ceil(($entry->getLengthInMsecs()/1000) * $pricePerUnit);
+		return ceil($entry->getLengthInMsecs()/1000) * $pricePerUnit;
 	}
 
 	public static function calcPricePerMinute(entry $entry, $pricePerUnit)
 	{
-		return ceil(($entry->getLengthInMsecs()/1000/dateUtils::MINUTE) * $pricePerUnit);
+		return ceil($entry->getLengthInMsecs()/1000/dateUtils::MINUTE) * $pricePerUnit;
 	}
 	
 	public static function calculateTaskPrice(entry $entry, VendorCatalogItem $vendorCatalogItem)
