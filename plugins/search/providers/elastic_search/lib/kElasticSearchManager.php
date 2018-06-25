@@ -155,7 +155,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
             $this->saveToSphinxLog($object, $params);
 
-            if(!kConf::get('exec_elastic', 'local', 0))
+            if(!$this->shouldSyncElastic())
                 return true;
 
             $client = new elasticClient();
@@ -190,6 +190,27 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $elasticLog->setPartnerId($object->getPartnerId());
         $elasticLog->setType(SphinxLogType::ELASTIC);
         $elasticLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
+    }
+
+    private function shouldSyncElastic()
+    {
+        if(kConf::get('exec_elastic', 'local', 0))
+            return true;
+
+        if (kConf::hasParam('exec_elastic_client_tags'))
+        {
+            $execElasticTags = kConf::get('exec_elastic_client_tags');
+            $clientTag = kCurrentContext::$client_lang;
+            foreach ($execElasticTags as $execElasticTag)
+            {
+                if (strpos($clientTag, $execElasticTag) === 0)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private function shouldSkipSaveToSphinxLog($object, &$command)
