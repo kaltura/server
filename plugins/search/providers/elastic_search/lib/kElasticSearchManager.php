@@ -155,7 +155,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
             $this->saveToSphinxLog($object, $params);
 
-            if(!$this->shouldSyncElastic())
+            if(!$this->shouldSyncElastic($object))
                 return true;
 
             $client = new elasticClient();
@@ -192,9 +192,17 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $elasticLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
     }
 
-    private function shouldSyncElastic()
+    private function shouldSyncElastic($object)
     {
-        if(kConf::get('exec_elastic', 'local', 0))
+        $key = kCurrentContext::$ks_partner_id . "_" . kCurrentContext::$service . "_" . kCurrentContext::$action . "_" . $object->getElasticIndexName();
+        $map = kConf::get('partner_actions_to_skip_elastic_map', 'local', array());
+        if (isset($map[$key]))
+        {
+            KalturaLog::log("Specific partner action to skip elastic detected $key. skipping elastic sync.");
+            return false;
+        }
+
+        if (kConf::get('exec_elastic', 'local', 0))
             return true;
 
         if (kConf::hasParam('exec_elastic_client_tags'))
