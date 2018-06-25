@@ -130,10 +130,10 @@ class facebookoauth2Action extends oauth2Action
 			throw new Exception($msg);
 		}
 
-		$pageId = $data[FacebookConstants::FACEBOOK_PAGE_ID_REQUEST_PARAM];
-		$providerId = $data[FacebookConstants::FACEBOOK_PROVIDER_ID_REQUEST_PARAM];
+		$pageId = base64_decode($data[FacebookConstants::FACEBOOK_PAGE_ID_REQUEST_PARAM]);
+		$providerId = base64_decode($data[FacebookConstants::FACEBOOK_PROVIDER_ID_REQUEST_PARAM]);
 		$ks = $data[FacebookConstants::FACEBOOK_KS_REQUEST_PARAM];
-		$permissions = explode(',',$data[FacebookConstants::FACEBOOK_PERMISSIONS_REQUEST_PARAM]);
+		$permissions = explode(',',base64_decode($data[FacebookConstants::FACEBOOK_PERMISSIONS_REQUEST_PARAM]));
 
 		try
 		{
