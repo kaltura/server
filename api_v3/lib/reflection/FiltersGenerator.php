@@ -93,7 +93,12 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		
 		$this->writeToFile($filterPath, $this->_txt);
 	}
-	
+
+	/**
+	 * @param KalturaTypeReflector $type
+	 * @throws ReflectionException
+	 * @throws Exception
+	 */
 	private function writeBaseFilterForType(KalturaTypeReflector $type)
 	{
 		$map = KAutoloader::getClassMap();
@@ -115,11 +120,26 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		}
 		
 		$partnetClassName = ($parentType ? $parentType->getType() . "Filter" : ($type->isRelatedFilterable() ? "KalturaRelatedFilter" : "KalturaFilter"));
-		
+		$relatedService = '';
+		if ($type->isRelatedFilterable())
+		{
+			$result = null;
+			if (preg_match("/\\@relatedService (.*)/", $type->getComments() , $result))
+				$relatedService	 = $result[1];
+			if ($parentType && $parentType->isRelatedFilterable() && preg_match("/\\@relatedService (.*)/", $parentType->getComments() , $result))
+				$relatedService	 = $result[1];
+
+		}
+
 		$subpackage = ($type->getPackage() == 'api' ? '' : 'api.') . 'filters.base';
 		$this->appendLine("<?php");
 		$this->appendLine("/**");
 		$this->appendLine(" * @package " . $type->getPackage());
+		if ($type->isRelatedFilterable() && !$relatedService)
+			throw new Exception('did not find @relatedService annotation  '. PHP_EOL .
+				' in comments for type:' . $type->getType());
+		if ($type->isRelatedFilterable())
+			$this->appendLine(" * @relatedService " . $relatedService);
 		$this->appendLine(" * @subpackage $subpackage");
 		$this->appendLine(" * @abstract");
 		$this->appendLine(" */");

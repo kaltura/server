@@ -765,4 +765,12 @@ class KalturaTypeReflector
 	{
 		return $this->_permissions;
 	}
+
+	/**
+	 * @return null|string
+	 */
+	public function getComments()
+	{
+		return $this->_comments;
+	}
 }

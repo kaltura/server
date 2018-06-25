@@ -2,7 +2,7 @@
 /**
  * @package api
  * @subpackage objects
- * @relatedFilter GroupUserService
+ * @relatedService GroupUserService
  */
 class KalturaGroupUser extends KalturaObject implements IRelatedFilterable
 {
