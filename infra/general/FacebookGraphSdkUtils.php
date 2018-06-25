@@ -296,7 +296,7 @@ class FacebookGraphSdkUtils
 	 */
 	private static function doGetUserAccessToken($fb, $appId, $permissions = array())
 	{
-		$loginHelper = $fb->getRedirectLoginHelper(self::getKalturaRedirectUrl);
+		$loginHelper = $fb->getRedirectLoginHelper(self::getKalturaRedirectUrl());
 		$accessToken = $loginHelper->getAccessToken();
 		if (! isset($accessToken))
 		{
