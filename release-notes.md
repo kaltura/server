@@ -8,8 +8,6 @@
 	Add "{dc url}/index.php/extservices/facebookoauth2?next_action=cHJvY2Vzcy1vYXV0aDItcmVzcG9uc2U%3D"
 	To your facebook Valid OAuth Redirect URIs app setting
         
-
-
 ### Deployment scripts ###
 None.
 
