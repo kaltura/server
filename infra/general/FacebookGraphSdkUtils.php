@@ -305,7 +305,6 @@ class FacebookGraphSdkUtils
 			{
 				$errorMessage = "Error: ".$loginHelper->getError()." Error Code: ".$loginHelper->getErrorCode() .
 					" Error Reason: ".$loginHelper->getErrorReason()." Error Description: ".$loginHelper->getErrorDescription();
-				KalturaLog::err($errorMessage);
 				throw new Exception($errorMessage);
 			}
 			else
