@@ -184,7 +184,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
         $elasticLog = new SphinxLog();
         $elasticLog->setSql($command);
-        $clusterId = $this->retrieveElasticClusterId($shouldSyncElastic);
+        $clusterId = $shouldSyncElastic ? $this->retrieveElasticClusterId() : null;
         $elasticLog->setExecutedServerId($clusterId);
         $elasticLog->setObjectId($object->getId());
         $elasticLog->setObjectType($object->getElasticObjectName());
@@ -239,26 +239,23 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         return false;
     }
 
-    private function retrieveElasticClusterId($shouldSyncElastic)
+    private function retrieveElasticClusterId()
     {
         $elasticClusterId = null;
-        if($shouldSyncElastic)
+        $elasticClusterName = kConf::get('elasticCluster', 'elastic', 0);
+        $elasticClusterCacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_EXECUTED_CLUSTER);
+        if ($elasticClusterCacheStore)
         {
-            $elasticClusterName = kConf::get('elasticCluster', 'elastic', 0);
-            $elasticClusterCacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_EXECUTED_CLUSTER);
+            $elasticClusterId = $elasticClusterCacheStore->get(self::CACHE_PREFIX . $elasticClusterName);
+            if ($elasticClusterId)
+                return $elasticClusterId;
+        }
+        $elasticCluster = SphinxLogServerPeer::retrieveByLocalServer($elasticClusterName);
+        if($elasticCluster)
+        {
+            $elasticClusterId = $elasticCluster->getId();
             if ($elasticClusterCacheStore)
-            {
-                $elasticClusterId = $elasticClusterCacheStore->get(self::CACHE_PREFIX . $elasticClusterName);
-                if ($elasticClusterId)
-                    return $elasticClusterId;
-            }
-            $elasticCluster = SphinxLogServerPeer::retrieveByLocalServer($elasticClusterName);
-            if($elasticCluster)
-            {
-                $elasticClusterId = $elasticCluster->getId();
-                if ($elasticClusterCacheStore)
-                    $elasticClusterCacheStore->set(self::CACHE_PREFIX . $elasticClusterName, $elasticClusterId);
-            }
+                $elasticClusterCacheStore->set(self::CACHE_PREFIX . $elasticClusterName, $elasticClusterId);
         }
 
         return $elasticClusterId;
