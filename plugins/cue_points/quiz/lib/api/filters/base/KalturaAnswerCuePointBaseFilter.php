@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.quiz
+ * @relatedService CuePointService
  * @subpackage api.filters.base
  * @abstract
  */
@@ -37,12 +38,11 @@ abstract class KalturaAnswerCuePointBaseFilter extends KalturaCuePointFilter
 	 * @var string
 	 */
 	public $parentIdIn;
-	
+
 	/**
 	 * @var string
 	 */
 	public $quizUserEntryIdEqual;
-	
 
 	/**
 	 * @var string

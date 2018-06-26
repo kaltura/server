@@ -1,6 +1,7 @@
 <?php
 /**
  * @package api
+ * @relatedService FileAssetService
  * @subpackage filters.base
  * @abstract
  */

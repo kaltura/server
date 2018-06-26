@@ -1,6 +1,7 @@
 <?php
 /**
  * @package api
+ * @relatedService PermissionItemService
  * @subpackage filters.base
  * @abstract
  */

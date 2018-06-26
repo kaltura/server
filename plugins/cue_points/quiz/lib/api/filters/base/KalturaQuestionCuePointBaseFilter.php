@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.quiz
+ * @relatedService CuePointService
  * @subpackage api.filters.base
  * @abstract
  */

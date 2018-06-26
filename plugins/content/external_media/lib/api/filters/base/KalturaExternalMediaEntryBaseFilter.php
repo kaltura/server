@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.externalMedia
+ * @relatedService BaseEntryService
  * @subpackage api.filters.base
  * @abstract
  */

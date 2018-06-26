@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.schedule
+ * @relatedService ScheduleResourceService
  * @subpackage api.filters.base
  * @abstract
  */
