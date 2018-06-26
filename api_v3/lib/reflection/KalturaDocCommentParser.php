@@ -65,7 +65,7 @@ class KalturaDocCommentParser
     const MIN_VALUE_CONSTRAINT = "minValue";
     const MAX_VALUE_CONSTRAINT = "maxValue";
 
-	const RELATED_SERVICE = "/\\@relatedService (.*)/";
+    const RELATED_SERVICE = "/\\@relatedService (.*)/";
 
     /**
      * @var bool
