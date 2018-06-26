@@ -1,5 +1,16 @@
 # Naos 14.1.0 #
 
+## Facebook OAuth ##
+- Issue type : bug
+- Issue ID: PLAT-8940
+
+### Configuration ###
+	Add "{dc url}/index.php/extservices/facebookoauth2?next_action=cHJvY2Vzcy1vYXV0aDItcmVzcG9uc2U%3D"
+	To your facebook Valid OAuth Redirect URIs app setting
+        
+### Deployment scripts ###
+None.
+
 ## Support decimal price when defining catalog items ##
 - Issue Type: Update template
 - Issue ID: PLAT-9041
