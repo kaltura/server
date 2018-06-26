@@ -96,12 +96,14 @@ class KalturaTypeReflector
 	    {
 	    	$this->_comments = $comments;
 	    	$commentsParser = new KalturaDocCommentParser($comments);
+		    $candidate = $commentsParser->parseRelatedService($reflectClass);
+		    if ($candidate)
+			    $this->_comments = $candidate;
 	    	$this->_description = $commentsParser->description;
 	    	$this->_deprecated = $commentsParser->deprecated;
 	    	$this->_serverOnly = $commentsParser->serverOnly;
 	    	$this->_package = $commentsParser->package;
 	    	$this->_subpackage = $commentsParser->subpackage;
-
 		    $permissions = array();
 		    $parentType = get_parent_class($this->_type);
 		    if ($parentType !== false)

@@ -64,7 +64,9 @@ class KalturaDocCommentParser
     const MAX_LENGTH_CONSTRAINT = "maxLength";
     const MIN_VALUE_CONSTRAINT = "minValue";
     const MAX_VALUE_CONSTRAINT = "maxValue";
-    
+
+	const RELATED_SERVICE = "/\\@relatedService (.*)/";
+
     /**
      * @var bool
      */
@@ -384,7 +386,40 @@ class KalturaDocCommentParser
 
 		$this->disableRelativeTimeParams = $this->getDisableRelativeTimeParams($comment);
      }
-     
+
+
+	/**
+	 * @param ReflectionClass $reflectClass
+	 * @return null|string
+	 */
+	public function parseRelatedService(ReflectionClass $reflectClass)
+     {
+     	$comments = $reflectClass->getDocComment();
+     	$relatedService = null;
+     	//if found return null
+		if (preg_match(self::RELATED_SERVICE, $reflectClass->getDocComment()))
+			return null;
+		//if not
+		$hierarchyClass = $reflectClass->getParentClass();
+		while ($hierarchyClass  && $hierarchyClass->getName() !== 'KalturaObject')
+		{
+			if (preg_match(self::RELATED_SERVICE, $hierarchyClass->getDocComment(),$result))
+			{
+				$relatedService	 = $result[1];
+				break;
+			}
+
+			$hierarchyClass = $hierarchyClass->getParentClass();
+		}
+		if ($relatedService)
+		{
+			$values = explode(PHP_EOL,$comments);
+			array_splice( $values, count($values) - 1, 0, " * @relatedService $relatedService" );
+			return implode(PHP_EOL, $values);
+		}
+		return null;
+     }
+
      private function fillConstraint($comment, $constraintName) {
      	
      	$result = null;

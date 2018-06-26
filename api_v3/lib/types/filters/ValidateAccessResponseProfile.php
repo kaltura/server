@@ -47,8 +47,8 @@ class ValidateAccessResponseProfile
 	 */
 	private static function getServiceClazz($relatedFilter)
 	{
-		$r = new ReflectionClass(get_parent_class($relatedFilter));
-		$comments = $r->getDocComment();
+		$r = KalturaTypeReflectorCacher::get(get_class($relatedFilter));
+		$comments = $r->getComments();
 		preg_match_all(self::COMMENTS, $comments, $annotationsArray);
 		$annotations = $annotationsArray[1];
 		foreach ($annotations as $annotation)
