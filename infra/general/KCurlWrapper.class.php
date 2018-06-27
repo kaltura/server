@@ -585,6 +585,32 @@ class KCurlWrapper
 			$host = $url_parts["host"];
 		return $host;
 	}
+	
+	public function getSourceUrlProtocol($sourceUrl)
+	{
+		$protocol = null;
+		$sourceUrl = trim($sourceUrl);
+		try
+		{
+			$url_parts = parse_url( $sourceUrl );
+			if ( isset ( $url_parts["scheme"] ) )
+			{
+				if (in_array ($url_parts["scheme"], array ('http', 'https')))
+				{
+					$protocol = self::HTTP_PROTOCOL_HTTP;
+				}
+				elseif ( $url_parts["scheme"] == "ftp" || $url_parts["scheme"] == "ftps" )
+				{
+					$protocol = self::HTTP_PROTOCOL_FTP;
+				}
+			}
+		}
+		catch ( Exception $exception )
+		{
+			throw new Exception($exception->getMessage());
+		}
+		return $protocol;
+	}
 
 	public function setSourceUrlAndprotocol($sourceUrl)
 	{
