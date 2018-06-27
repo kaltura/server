@@ -21,4 +21,23 @@ class SphinxMetadataCriteria extends SphinxCriteria
 		
 		return in_array($fieldName, $metadataFields);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see SphinxCriteria::applyFilterFields()
+	 */
+	protected function applyFilterFields(baseObjectFilter $filter)
+	{
+		/* @var $filter EntryVendorTaskFilter */
+		
+		if ($filter->get('_eq_metadata_profile_id') && $filter->get('_eq_object_type') == MetadataObjectType::DYNAMIC_OBJECT)
+		{
+			$this->sphinxSkipped = false;
+			$this->addMatch("@metadata_profile_id_str " . $filter->get('_eq_metadata_profile_id'));
+			$this->addMatch("@object_type_str " . $filter->get('_eq_object_type'));
+			$filter->unsetByName('_eq_metadata_profile_id');
+			$filter->unsetByName('_eq_object_type');
+		}
+		
+		return parent::applyFilterFields($filter);
+	}
 }
