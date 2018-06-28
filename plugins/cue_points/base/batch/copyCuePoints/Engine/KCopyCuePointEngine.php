@@ -6,7 +6,7 @@
 abstract class KCopyCuePointEngine
 {
     const MAX_CUE_POINT_CHUNKS = 500;
-    
+
     protected $data = null;
     protected $partnerId = null;
     private $lastCuePointPerType = null;
@@ -30,7 +30,8 @@ abstract class KCopyCuePointEngine
 
     protected function copyCuePointsToEntry($srcEntryId, $destEntryId)
     {
-        $filter = $this->getCuePointFilter($srcEntryId);
+	    $this->lastCuePointPerType  = array();
+	    $filter = $this->getCuePointFilter($srcEntryId);
         $pager = $this->getCuePointPager();
         $clonedCuePointIds = array();
         do 
@@ -75,11 +76,10 @@ abstract class KCopyCuePointEngine
     }
 
 
-    public function setData($data, $partnerId) 
+    public function setData($data, $partnerId)
     {
         $this->data = $data;
         $this->partnerId = $partnerId;
-        $this->lastCuePointPerType = array();
     }
     
     public static function initEngine($copyCuePointJobType, $data, $partnerId)
@@ -127,20 +127,41 @@ abstract class KCopyCuePointEngine
         return KBatchBase::$kClient->cuePoint->updateCuePointsTimes($cuePointId, $startTime,$endTime);
     }
 
-    public function cuePointList($filter, $pager)
+    public static function cuePointList($filter, $pager)
     {
         return KBatchBase::$kClient->cuePoint->listAction($filter, $pager);
     }
 
-    public function cuePointClone($cuePointId, $destinationEntryId)
+    public static function cuePointClone($cuePointId, $destinationEntryId)
     {
         return KBatchBase::$kClient->cuePoint->cloneAction($cuePointId, $destinationEntryId);
     }
 
-    public function cuePointUpdateStatus($cuePointId, $newStatus)
+    public static function cuePointUpdateStatus($cuePointId, $newStatus)
     {
         return KBatchBase::$kClient->cuePoint->updateStatus($cuePointId, $newStatus);
     }
+
+	public static function deleteCuePoint($cuePointId)
+	{
+		return KBatchBase::$kClient->cuePoint->delete($cuePointId);
+	}
+
+
+	/**
+	 * @param KalturaCuePoint $currentCuePoint
+	 * @param KalturaCuePoint $nextCuePoint
+	 * @return mixed
+	 */
+	public static function updateTimesAndDeleteNextCuePoint($currentCuePoint, $nextCuePoint)
+	{
+		KBatchBase::$kClient->startMultiRequest();
+		if (property_exists($nextCuePoint,'endTime'))
+			/** @noinspection PhpUndefinedFieldInspection */
+			self::updateCuePointTimes($currentCuePoint->id,$currentCuePoint->startTime,$nextCuePoint->endTime);
+		self::deleteCuePoint($nextCuePoint->id);
+		return KBatchBase::$kClient->doMultiRequest();
+	}
 
 
     protected function setCalculatedEndTimeOnCuePoints(&$cuePoints)
@@ -151,11 +172,12 @@ abstract class KCopyCuePointEngine
         {
             // set on calculatedEndTime the end time if existed or the next cue point start time
             $type = self::getTypeName($cuePoint);
-            $cuePoint->calculatedEndTime = null;
+            $cuePoint->calculatedEndTime = self::getEndTimeIfExist($cuePoint);
             if (array_key_exists($type, $this->lastCuePointPerType))
             {
-                $calculatedEndTime = self::getEndTimeIfExist($this->lastCuePointPerType[$type]);
-                $this->lastCuePointPerType[$type]->calculatedEndTime = $calculatedEndTime ? $calculatedEndTime : $cuePoint->$orderField;
+                //$calculatedEndTime = self::getEndTimeIfExist($this->lastCuePointPerType[$type]);
+                if (!$this->lastCuePointPerType[$type]->calculatedEndTime)
+                	$this->lastCuePointPerType[$type]->calculatedEndTime = $cuePoint->$orderField;
             }
             $this->lastCuePointPerType[$type] = &$cuePoint;
         }

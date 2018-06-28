@@ -23,6 +23,8 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 
 	const INDEXED_FIELD_PREFIX = 'pid';
 
+	const COPIED_FROM = 'copiedFrom';
+
 	public function getIndexObjectName() {
 		return "CuePointIndex";
 	}
@@ -534,5 +536,20 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	{
 		return;
 	}
+
+
+	/**
+	 * @param CuePoint $copiedFrom
+	 */
+	public function setCopiedFrom(CuePoint $copiedFrom)
+	{
+		parent::setCopiedFrom($copiedFrom);
+		$this->putInCustomData(self::COPIED_FROM,$copiedFrom->getId());
+	}
+
+	/**
+	 * @return string|null the original entry
+	 */
+	public function getCopiedFrom()	{ return $this->getFromCustomData(self::COPIED_FROM);	}
 
 } // CuePoint

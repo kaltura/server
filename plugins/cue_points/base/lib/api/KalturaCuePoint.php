@@ -114,6 +114,13 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 	 * @readonly
 	 */
 	public $isMomentary;
+
+
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $copiedFrom;
 	
 	private static $map_between_objects = array
 	(
@@ -132,7 +139,8 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 		"thumbOffset",
 		"systemName",
 		"triggeredAt",
-		"isMomentary"
+		"isMomentary",
+		"copiedFrom"
 	);
 	
 	public function getMapBetweenObjects()
