@@ -157,6 +157,22 @@ class categoryEntryPeer extends BasecategoryEntryPeer implements IRelatedObjectP
 		return categoryEntryPeer::doSelectOne($c);
 	}
 	
+	public static function retrieveOneMostUpdatedByEntryIdStatus($entryId, array $statuses = null)
+	{
+		$c = new Criteria();
+		$c->addAnd(categoryEntryPeer::ENTRY_ID, $entryId);
+		if(!$statuses)
+			$c->addAnd(categoryEntryPeer::STATUS, CategoryEntryStatus::ACTIVE, Criteria::EQUAL);
+		else
+			$c->addAnd(categoryEntryPeer::STATUS, $statuses, Criteria::IN);
+
+		$c->addDescendingOrderByColumn(categoryEntryPeer::UPDATED_AT);
+		self::setUseCriteriaFilter(false);
+		$categoryEntry = categoryEntryPeer::doSelectOne($c);
+		self::setUseCriteriaFilter(true);
+		return $categoryEntry;
+	}
+
 	public static function selectByEntryId($entryId)
 	{
 		$c = new Criteria();
