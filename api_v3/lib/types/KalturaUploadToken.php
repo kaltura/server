@@ -46,7 +46,7 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 	
 	/**
 	 * File size in bytes, can be empty when the upload token is created and will be updated internally after the file is uploaded
-	 * @var float
+	 * @var bigint
 	 * @insertonly
 	 * @filter eq
 	 */
@@ -54,7 +54,7 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 	
 	/**
 	 * Uploaded file size in bytes, can be used to identify how many bytes were uploaded before resuming
-	 * @var float
+	 * @var bigint
 	 * @readonly
 	 */
 	public $uploadedFileSize;

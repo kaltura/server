@@ -605,7 +605,7 @@
 		</index>
 	</table>
     <table skipSql="false" abstract="false" name="batch_job_lock" raiseEvents="false">
-		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="false" />
+		<column lazyLoad="false" name="id" type="bigint" required="true" primaryKey="true" autoIncrement="false" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="job_type" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="job_sub_type" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_id" type="varchar" default="" size="20" />
@@ -625,10 +625,10 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="execution_attempts" type="tinyint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="version" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />
-        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_job_id" type="integer" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_job_id" type="bigint" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_version" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="root_job_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="root_job_id" type="bigint" />
         <foreign-key foreignTable="batch_job_sep">
             <reference local="batch_job_id" foreign="id"/>
         </foreign-key>
@@ -684,7 +684,7 @@
 		</index>
 	</table>
 	<table skipSql="false" abstract="false" name="batch_job_lock_suspend" raiseEvents="false">
-		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="false" />
+		<column lazyLoad="false" name="id" type="bigint" required="true" primaryKey="true" autoIncrement="false" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="job_type" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="job_sub_type" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_id" type="varchar" default="" size="20" />
@@ -707,7 +707,7 @@
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_job_id" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_version" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="root_job_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="root_job_id" type="bigint" />
         <foreign-key foreignTable="batch_job_sep">
             <reference local="batch_job_id" foreign="id"/>
         </foreign-key>
@@ -752,7 +752,7 @@
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="bulk_upload_job_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="bulk_upload_job_id" type="bigint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="line_index" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
@@ -1223,7 +1223,7 @@
 		</index>
 	</table>
 	<table skipSql="false" abstract="false" name="file_sync">
-		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+		<column lazyLoad="false" name="id" type="bigint" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_type" type="tinyint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_id" type="varchar" size="20" />
@@ -1238,7 +1238,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="tinyint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="file_type" type="tinyint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="linked_id" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="link_count" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="link_count" type="bigint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="file_root" type="varchar" size="64" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="file_path" type="varchar" size="128" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="file_size" type="bigint" />

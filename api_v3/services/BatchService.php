@@ -81,7 +81,7 @@ class BatchService extends KalturaBatchService
 	 * batch getBulkUploadLastResultAction action returns the last result of the bulk upload
 	 *
 	 * @action getBulkUploadLastResult
-	 * @param int $bulkUploadJobId The id of the bulk upload job
+	 * @param bigint $bulkUploadJobId The id of the bulk upload job
 	 * @return KalturaBulkUploadResult
 	 */
 	function getBulkUploadLastResultAction($bulkUploadJobId)
@@ -101,7 +101,7 @@ class BatchService extends KalturaBatchService
 	 * Returns total created entries count and total error entries count
 	 *
 	 * @action countBulkUploadEntries
-	 * @param int $bulkUploadJobId The id of the bulk upload job
+	 * @param bigint $bulkUploadJobId The id of the bulk upload job
 	 * @param KalturaBulkUploadObjectType $bulkUploadObjectType
 	 * @return KalturaKeyValueArray the number of created entries and error entries
 	 */
@@ -128,7 +128,7 @@ class BatchService extends KalturaBatchService
 	 * batch updateBulkUploadResults action adds KalturaBulkUploadResult to the DB
 	 *
 	 * @action updateBulkUploadResults
-	 * @param int $bulkUploadJobId The id of the bulk upload job
+	 * @param bigint $bulkUploadJobId The id of the bulk upload job
 	 * @return int the number of unclosed entries
 	 */
 	function updateBulkUploadResultsAction($bulkUploadJobId)
@@ -200,7 +200,7 @@ class BatchService extends KalturaBatchService
 	 * batch updateExclusiveConvertCollectionJobAction action updates a BatchJob of type CONVERT_PROFILE that was claimed using the getExclusiveConvertJobs
 	 *
 	 * @action updateExclusiveConvertCollectionJob
-	 * @param int $id The id of the job to free
+	 * @param bigint $id The id of the job to free
 	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism
 	 * @param KalturaBatchJob $job
 	 * @param KalturaConvertCollectionFlavorDataArray $flavorsData
@@ -338,7 +338,7 @@ class BatchService extends KalturaBatchService
 	 * batch resetJobExecutionAttempts action resets the execution attempts of the job
 	 *
 	 * @action resetJobExecutionAttempts
-	 * @param int $id The id of the job
+	 * @param bigint $id The id of the job
 	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism
 	 * @param KalturaBatchJobType $jobType The type of the job
 	 * @throws KalturaErrors::UPDATE_EXCLUSIVE_JOB_FAILED
@@ -371,7 +371,7 @@ class BatchService extends KalturaBatchService
 	 * batch freeExclusiveJobAction action allows to get a generic BatchJob
 	 *
 	 * @action freeExclusiveJob
-	 * @param int $id The id of the job
+	 * @param bigint $id The id of the job
 	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism
 	 * @param KalturaBatchJobType $jobType The type of the job
 	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero
@@ -480,7 +480,7 @@ class BatchService extends KalturaBatchService
 	 * batch updateExclusiveJobAction action updates a BatchJob of extended type that was claimed using the getExclusiveJobs
 	 *
 	 * @action updateExclusiveJob
-	 * @param int $id The id of the job to free
+	 * @param bigint $id The id of the job to free
 	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism
 	 * @param KalturaBatchJob $job
 	 * @return KalturaBatchJob
@@ -565,7 +565,7 @@ class BatchService extends KalturaBatchService
 	 * batch checkEntryIsDone Check weather a specified entry is done converting and changes it to ready.
 	 *
 	 * @action checkEntryIsDone
-	 * @param string $batchJobId The entry to check
+	 * @param bigint $batchJobId The entry to check
 	 * @return bool
 	 * @throws KalturaAPIException
 	 */

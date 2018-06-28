@@ -269,7 +269,7 @@ CREATE TABLE IF NOT EXISTS `bulk_upload_result` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
-  `bulk_upload_job_id` int(11) DEFAULT NULL,
+  `bulk_upload_job_id` bigint(20) DEFAULT NULL,
   `line_index` int(11) DEFAULT NULL,
   `partner_id` int(11) DEFAULT NULL,
   `object_id` varchar(20) DEFAULT NULL,
