@@ -2,7 +2,7 @@
 
 class kAuthDataCache
 {
-	CONST DEFAULT_TIME_IN_CACHE_FOR_AUTH_CACHED_DATA = 60*30; //half an hour
+	CONST DEFAULT_TIME_IN_CACHE_FOR_AUTH_CACHED_DATA = 1800; //half an hour
 
 	/**
 	 * @var kBaseCacheWrapper $cache
