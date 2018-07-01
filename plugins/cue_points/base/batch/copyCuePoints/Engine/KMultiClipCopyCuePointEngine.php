@@ -8,10 +8,6 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 	/** @var KalturaClipDescription $currentClip */
 	private $currentClip = null;
 
-	/**
-	 * @return bool
-	 * @throws KalturaAPIException
-	 */
 	const CUE_POINT_THUMB = 'thumbCuePoint.Thumb';
 
 	const CUE_POINT_EVENT = 'eventCuePoint.Event';
@@ -20,6 +16,10 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 
 	const CUE_POINT_AD = 'adCuePoint.Ad';
 
+	/**
+	 * @return bool
+	 * @throws KalturaAPIException
+	 */
 	public function copyCuePoints()
 	{
 		$res = true;
@@ -65,7 +65,7 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 		$offsetInDestination = $this->currentClip->offsetInDestination;
 		$clipEndTime = $clipStartTime + $this->currentClip->duration;
 		$cuePointDestStartTime = TimeOffsetUtils::getAdjustedStartTime($cuePoint->startTime, $clipStartTime, $offsetInDestination);
-		$cuePointDestEndTime = TimeOffsetUtils::getAdjustedEndTime(self::getEndTimeIfExist($cuePoint), $clipStartTime ,$clipEndTime ,$offsetInDestination);
+		$cuePointDestEndTime = TimeOffsetUtils::getAdjustedEndTime(self::getCalculatedEndTimeIfExist($cuePoint), $clipStartTime ,$clipEndTime ,$offsetInDestination);
 		return array($cuePointDestStartTime, $cuePointDestEndTime);
 	}
 
@@ -93,11 +93,8 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 
 		$filter = $this->getCuePointFilterForMerge($destinationEntryId);
 		$pager = $this->getCuePointPager();
-		$cuePoints = array();
-		$cuePointSplitIntoType = array(self::CUE_POINT_THUMB => array(), self::CUE_POINT_EVENT => array(),
-				self::ANNOTATION =>array(), self::CUE_POINT_AD =>array());
-		$this->getAllCuePointFromNewEntry($filter, $pager, $cuePoints);
-		$this->sortCuePointIntoType($cuePoints, $cuePointSplitIntoType);
+		$cuePoints = $this->getAllCuePointFromNewEntry($filter, $pager);
+		$cuePointSplitIntoType = $this->sortCuePointIntoType($cuePoints);
 		$this->locateCorrespondingCuePointsAndMergeThem($cuePointSplitIntoType);
 	}
 
@@ -123,18 +120,20 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 				//if Next element does not exit break the loop
 				if(!array_key_exists($i + 1,$type))
 					break;
-				/** @var KalturaCuePoint $nextCuePoint */
-				$nextCuePoint = &$type[$i + 1];
-				if ($currentCuePoint->copiedFrom === $nextCuePoint->copiedFrom) {
+				$relatedCuePointIndex = $this->getNextRelatedElementIndex($type,$i,$currentCuePoint);
+				/** @var KalturaCuePoint $relatedCuePoint */
+				$relatedCuePoint = null;
+				if (array_key_exists($relatedCuePointIndex,$type))
+					$relatedCuePoint =  &$type[$relatedCuePointIndex];
+				if ($relatedCuePoint)
+				{
 					$currentCuePointEndTimeExist = property_exists($currentCuePoint, 'endTime');
-					if ($currentCuePointEndTimeExist && $currentCuePoint->endTime != $nextCuePoint->startTime)
-						continue;
-					$res = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine', 'updateTimesAndDeleteNextCuePoint'), array($currentCuePoint, $nextCuePoint));
+					$res = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine', 'updateTimesAndDeleteNextCuePoint'), array($currentCuePoint, $relatedCuePoint));
 					if ($res)
 					{
 						if ($currentCuePointEndTimeExist)
-							$currentCuePoint->endTime = $nextCuePoint->endTime;
-						unset($type[$i + 1]);
+							$currentCuePoint->endTime = $relatedCuePoint->endTime;
+						unset($type[$relatedCuePointIndex]);
 						$type = array_values($type);
 						$i--; //keep on same index check if need to merge next as well
 					}
@@ -145,11 +144,13 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 
 	/**
 	 * @param $cuePoints
-	 * @param $cuePointSplitIntoType
+	 * @return array
 	 * @throws Exception
 	 */
-	private function sortCuePointIntoType($cuePoints, &$cuePointSplitIntoType)
+	private function sortCuePointIntoType($cuePoints)
 	{
+		$cuePointSplitIntoType = array(self::CUE_POINT_THUMB => array(), self::CUE_POINT_EVENT => array(),
+															self::ANNOTATION => array(), self::CUE_POINT_AD => array());
 		/** @var KalturaCuePoint $cuePoint */
 		foreach ($cuePoints as $cuePoint) {
 			switch ($cuePoint->cuePointType) {
@@ -169,23 +170,48 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 					throw new KalturaAPIException("for cue point: $cuePoint->id , Type: $cuePoint->cuePointType , should not return to the merger.");
 			}
 		}
+		return $cuePointSplitIntoType;
 	}
 
 	/**
 	 * @param $filter
 	 * @param $pager
 	 * @param $cuePoints
+	 * @return array
 	 */
-	private function getAllCuePointFromNewEntry($filter, $pager, &$cuePoints)
+	private function getAllCuePointFromNewEntry($filter, $pager)
 	{
+		$cuePoints = array();
 		do {
 			$listResponse = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine', 'cuePointList'), array($filter, $pager));
 			if (!$listResponse)
-				continue;
+				break;
 			$cuePointsPage = $listResponse->objects;
 			$pager->pageIndex++;
 			$cuePoints = array_merge($cuePoints, $cuePointsPage);
 		} while (count($cuePointsPage) == self::MAX_CUE_POINT_CHUNKS);
+		return $cuePoints;
+	}
+
+	/**
+	 * @param array $type
+	 * @param int $i
+	 * @param KalturaCuePoint $currentCuePoint
+	 * @return int|null
+	 */
+	private function getNextRelatedElementIndex($type, $i, $currentCuePoint)
+	{
+
+		do {
+			$i++;
+			$candidate = $type[$i];
+			$currentCuePointEndTimeExist = property_exists($currentCuePoint, 'endTime');
+			if ($currentCuePointEndTimeExist && $currentCuePoint->endTime != $candidate->startTime)
+				break;
+			if ($currentCuePoint->copiedFrom === $candidate->copiedFrom)
+				return $i;
+		} while (array_key_exists($i + 1,$type));
+		return -1;
 	}
 
 

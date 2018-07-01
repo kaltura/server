@@ -173,6 +173,9 @@ abstract class KCopyCuePointEngine
             // set on calculatedEndTime the end time if existed or the next cue point start time
             $type = self::getTypeName($cuePoint);
             $cuePoint->calculatedEndTime = self::getEndTimeIfExist($cuePoint);
+            /** we will only Override the calculated end time if cue point does not have end time of its own, if
+             * If cue Point has end time meaning it was set by user and we will continue with the times required by the user.
+             */
             if (array_key_exists($type, $this->lastCuePointPerType))
             {
                 //$calculatedEndTime = self::getEndTimeIfExist($this->lastCuePointPerType[$type]);
@@ -183,12 +186,19 @@ abstract class KCopyCuePointEngine
         }
     }
 
-    protected static function getEndTimeIfExist($cuePoint)
+    private static function getEndTimeIfExist($cuePoint)
     {
         if (property_exists($cuePoint, 'endTime'))
             return $cuePoint->endTime;
         return null;
     }
+
+	protected static function getCalculatedEndTimeIfExist($cuePoint)
+	{
+		if (property_exists($cuePoint, 'calculatedEndTime') && $cuePoint->calculatedEndTime > 0)
+			return $cuePoint->calculatedEndTime;
+		return self::getEndTimeIfExist($cuePoint);
+	}
 
     private static function getTypeName($cuePoint) {
         $name = $cuePoint->cuePointType;
