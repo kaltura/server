@@ -48,7 +48,7 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 
 	private function addDateToFilter($profile)
 	{
-		if (self::startsWith($profile->name, 'MR_'))
+		if (kString::beginsWith($profile->name, 'MR_'))
 		{ //as sub task of MR profile
 			//first item on advancedSearch is for the MRP
 			//in the MRP filter: first item is for entry status, second is for MR status
@@ -83,7 +83,7 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 		$xml = ($metadata && $metadata->xml) ? $metadata->xml : null;
 		if ($profile->systemName == "MRP") //as the first schedule task running in this MRP
 			$xml = $this->addMetadataXmlField($profile->id, $xml, $error);
-		elseif (self::startsWith($profile->name, 'MR_'))
+		elseif(kString::beginsWith($profile->name, 'MR_'))
 		{ //sub task of MRP
 			$arr = explode(",", self::getMrAdvancedSearchFilter($profile)->items[1]->value);
 			$xml = $this->updateMetadataXmlField($arr[0], $arr[1] + 1, $xml, $error);
@@ -104,7 +104,7 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 				return null; //delete entry should get exception when update metadata for deleted entry
 
 			throw new KalturaException("Error in metadata for entry [$object->id] with " . $e->getMessage(),
-				KalturaBatchJobAppErrors::MEDIA_REPURPOSING_FAILED, null);
+				KalturaBatchJobAppErrors::MEDIA_REPURPOSING_FAILED);
 		}
 
 		return $result->id;
@@ -118,7 +118,15 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 		$metadataPlugin = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
 		$result = $metadataPlugin->metadata->listAction($filter, null);
 		if ($result->totalCount > 0)
-			return $result->objects[0];
+		{
+			$result = $result->objects[0];
+			if($result->objectId != $objectId)
+				throw new KalturaException("Error in retrieving metadata for entry [$objectId] got entry [$result->objectId].",
+					KalturaBatchJobAppErrors::MEDIA_REPURPOSING_FAILED);
+
+			return $result;
+		}
+
 		return null;
 	}
 
@@ -179,7 +187,7 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 		{
 			$mprsData = $xml->xpath('/metadata/MRPData');
 			for ($i = 0; $i < count($mprsData); $i++)
-				if (self::startsWith($mprsData[$i], $mrId . ","))
+				if (kString::beginsWith($mprsData[$i], $mrId . ","))
 					$mprsData[$i][0] = $newVal;
 		}
 

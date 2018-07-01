@@ -11,10 +11,9 @@ class kString
 {
 	/**
 	 * return true if $str starts with $desired_prefix, false otherwise
-	 *
-	 *
 	 * @param string $str
 	 * @param string $desired_prefix
+	 * @return bool
 	 */
 	public static function beginsWith ( $str , $desired_prefix )
 	{

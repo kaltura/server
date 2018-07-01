@@ -61,12 +61,6 @@ class KGenericProcessor
 		return $maxTotalCountAllowed;
 	}
 
-	protected static function startsWith($haystack, $needle)
-	{
-		$length = strlen($needle);
-		return (substr($haystack, 0, $length) === $needle);
-	}
-
 	protected static function getUpdateDay($waitDays = 0) {
 		$now = intval(time() / 86400);  // as num of sec in day to get day number
 		return $now - $waitDays;
