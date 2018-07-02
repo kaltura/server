@@ -1,7 +1,7 @@
 <?php
 /**
  * @package api
- * @relatedService KalturaAssetService
+ * @relatedService FlavorAssetService
  * @subpackage filters.base
  * @abstract
  */

@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @relatedService FlavorAssetService
  */
 class KalturaFlavorAsset extends KalturaAsset 
 {
