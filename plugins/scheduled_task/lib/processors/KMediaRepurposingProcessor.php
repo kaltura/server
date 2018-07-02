@@ -81,7 +81,7 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 		$metadata = $this->getMetadataOnObject($object->id, $metadataProfileId);
 
 		$xml = ($metadata && $metadata->xml) ? $metadata->xml : null;
-		if ($profile->systemName == "MRP" && strpos($xml, 'MR_'.$profile->id) === false) //as the first schedule task running in this MRP
+		if ($profile->systemName == "MRP" && strpos($xml, 'MR_'.$profile->id.'<') === false) //as the first schedule task running in this MRP
 			$xml = $this->addMetadataXmlField($profile->id, $xml, $error);
 		elseif(kString::beginsWith($profile->name, 'MR_'))
 		{ //sub task of MRP
