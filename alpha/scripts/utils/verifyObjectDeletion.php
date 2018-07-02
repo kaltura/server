@@ -2,7 +2,7 @@
 
 require_once(__DIR__ . '/../bootstrap.php');
 
-define('CHUNK_SIZE', 100);		// number of objects to process each time
+define('CHUNK_SIZE', 2000);		// number of objects to process each time
 define('TIME_DELAY', 3600);		// seconds behind real time, in order to handle events that arrive out of order
 
 function getMaxEntryUpdatedAt()

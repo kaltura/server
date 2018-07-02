@@ -266,6 +266,8 @@ if (!kConf::hasParam('analytics_sync_secret') ||
 DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
 
+myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
+
 $requestHandlers = array(
 	'partner' => 'getPartnerUpdates',
 	'user' => 'getUserUpdates',

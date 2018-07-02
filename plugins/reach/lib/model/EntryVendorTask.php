@@ -146,9 +146,9 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	}
 	
 	/* (non-PHPdoc)
- 	 * @see BaseEntryVendorTask::preUpdate()
+ 	 * @see BaseEntryVendorTask::preSave()
  	 */
-	public function preUpdate(PropelPDO $con = null)
+	public function preSave(PropelPDO $con = null)
 	{
 		if ($this->isColumnModified(EntryVendorTaskPeer::STATUS) && $this->getStatus() == EntryVendorTaskStatus::PENDING)
 		{
@@ -160,7 +160,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 			$this->setFinishTime(time());
 		}
 		
-		return parent::preUpdate($con);
+		return parent::preSave($con);
 	}
 	
 	public function getKuser()
