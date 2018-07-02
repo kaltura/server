@@ -320,7 +320,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
 		
 		
-		//If all the delivery profiles ids available where filtered out return an empty array to block playback
+		//If all the delivery profile ids available where filtered out return an empty array to block playback
 		if ((empty($deliveryIds)))
 			return array();
 		
