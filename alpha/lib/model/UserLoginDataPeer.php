@@ -496,7 +496,9 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			}
 		}
 		
-		if ($kuser->getIsAdmin() && !in_array($kuser->getPartnerId(), kConf::get('no_save_of_last_login_partner_for_partner_ids'))) {
+		if ($kuser->getIsAdmin() && 
+			!in_array($kuser->getPartnerId(), kConf::get('no_save_of_last_login_partner_for_partner_ids')) &&
+			$loginData->getUpdatedAt(null) + 5 < time()) {
 			$loginData->setLastLoginPartnerId($kuser->getPartnerId());
 		}
 		$loginData->save();
