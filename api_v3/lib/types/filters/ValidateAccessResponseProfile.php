@@ -31,7 +31,7 @@ class ValidateAccessResponseProfile
 	{
 		$clazz = self::getServiceClazz($relatedFilter);
 		/** if Class is not found then do not allow the response profile filter to get the response  */
-		if (!class_exists($clazz) || !method_exists($clazz, self::LIST_ACTION)) {
+		if (!class_exists($clazz)) {
 			$e = new KalturaAPIException (APIErrors::SERVICE_FORBIDDEN, 'Service class:  ' . $clazz . 'Not Found');
 			header("X-Kaltura:error-" . $e->getCode());
 			header("X-Kaltura-App: exiting on error " . $e->getCode() . " - " . $e->getMessage());
@@ -76,10 +76,7 @@ class ValidateAccessResponseProfile
 			$service->initService($serviceId, $serviceName, 'list');
 		} catch (Exception $e) {
 			KalturaLog::INFO('Response Profile Validation Access Failed For Class: ' . $clazz);
-			if (is_a($e, 'KalturaAPIException'))
-				throw  $e;
-			KalturaLog::err($e);
-			return false;
+			throw  $e;
 		}
 		return true;
 	}

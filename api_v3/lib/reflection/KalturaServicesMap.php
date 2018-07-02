@@ -22,7 +22,7 @@ class KalturaServicesMap
 		if(class_exists($class))
 		{
 			self::$extraServices[$serviceId] = $class;
-			if(isset($class->serviceId,$class->serviceInfo,$class->serviceInfo->serviceName))
+			if(isset($class->serviceId,$class->serviceInfo->serviceName))
 				self::$serviceClassToIdAndName[$serviceId] = array($class->serviceId,$class->serviceInfo->serviceName);
 		}
 	}
