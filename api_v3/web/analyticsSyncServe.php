@@ -19,12 +19,14 @@ define('SOURCE_CLASSROOM', -10);
 define('SOURCE_CAPTURE', -11);
 define('SOURCE_PITCH', -12);
 define('SOURCE_WEBCAST', -13);
+define('SOURCE_RAPT', -14);
 
 $sourceFromAdminTag = array(
 	'kalturaclassroom' => SOURCE_CLASSROOM,
 	'kalturacapture' => SOURCE_CAPTURE,
 	'videomessage' => SOURCE_PITCH,
 	'kms-webcast-event' => SOURCE_WEBCAST,
+	'raptentry' => SOURCE_RAPT,
 );
 
 function getPartnerVertical($customData)
@@ -263,6 +265,8 @@ if (!kConf::hasParam('analytics_sync_secret') ||
 // init database
 DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
+
+myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
 $requestHandlers = array(
 	'partner' => 'getPartnerUpdates',

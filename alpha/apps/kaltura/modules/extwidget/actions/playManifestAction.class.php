@@ -752,9 +752,13 @@ class playManifestAction extends kalturaAction
 		if($this->requestedDeliveryProfileIds)
 		{
 			$deliveryIdsByStreamerType = $storageProfile->getDeliveryProfileIds();
-			if(isset( $deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()]))
+			$format = $this->deliveryAttributes->getFormat();
+			if (in_array($format, array(self::URL, self::DOWNLOAD)))
+				$format = PlaybackProtocol::HTTP;
+
+			if(isset( $deliveryIdsByStreamerType[$format]))
 			{
-				$storageStreamerTypeDeliveryProfileIds = $deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()];
+				$storageStreamerTypeDeliveryProfileIds = $deliveryIdsByStreamerType[$format];
 				return count(array_intersect($this->requestedDeliveryProfileIds, $storageStreamerTypeDeliveryProfileIds));
 			}
 

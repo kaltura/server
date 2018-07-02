@@ -61,6 +61,8 @@ class KalturaReachErrors implements kReachErrors
 	
 	const CANNOT_UPDATE_STATUS_OF_TASK_WHICH_IS_IN_FINAL_STATE = "CANNOT_UPDATE_STATUS_OF_TASK_WHICH_IS_IN_FINAL_STATE;ID,OLD_STATUS,NEW_STATUS;Cannot update status from [@OLD_STATUS@] to [@NEW_STATUS@] for task with id [@ID@], since task is in final status";
 	
+	const ENTRY_TYPE_NOT_SUPPORTED = "ENTRY_TYPE_NOT_SUPPORTED;TYPE;Requesting tasks for entry type [@TYPE@] is not supported";
+	
 	/* Credit */
 	
 	const CANNOT_SET_ALLOW_OVERAGE_CREDIT = "CANNOT_SET_ALLOW_OVERAGE_CREDIT;;Allow overage set to false but overage credit is set";

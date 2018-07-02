@@ -11,7 +11,7 @@ class Form_VendorCatalogItemPricing extends ConfigureSubForm
 		$this->addElement('text', 'pricePerUnit', array(
 			'label'			=> 'Price Per Unit*:',
 			'required'		=> true,
-			'validators'	=> array('Int'),
+			'validators'	=> array('Float'),
 		));
 		
 		$priceFunction = new Kaltura_Form_Element_EnumSelect('priceFunction', array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction'));
@@ -24,8 +24,12 @@ class Form_VendorCatalogItemPricing extends ConfigureSubForm
 	
 	public function populateFromObject($pricing)
 	{
-		$this->setDefault('pricePerUnit',  $pricing->pricePerUnit);
-		$this->setDefault('priceFunction',  $pricing->priceFunction);
+		//If user does not have permissions to access the pricing data this will cause PHP notices
+		if($pricing)
+		{
+			$this->setDefault('pricePerUnit',  $pricing->pricePerUnit);
+			$this->setDefault('priceFunction',  $pricing->priceFunction);
+		}
 	}
 	
 	public function getObject($properties) 

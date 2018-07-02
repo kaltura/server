@@ -45,7 +45,7 @@ class MetadataEntryPeer extends entryPeer implements IMetadataPeer
     	}
     	
     	/* @var $entryDb entry */
-    	if(strtolower($entryDb->getPuserId()) != strtolower(kCurrentContext::$ks_uid) &&
+    	if(!kCurrentContext::$is_admin_session && strtolower($entryDb->getPuserId()) != strtolower(kCurrentContext::$ks_uid) &&
     			!$entryDb->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId())
     	)
     	{

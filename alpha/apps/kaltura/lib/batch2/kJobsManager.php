@@ -580,7 +580,7 @@ class kJobsManager
 			if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
 				$addImportJob = true;
 			else	
-				throw new kCoreException("Source file not found for flavor conversion [$flavorAsset->getId()]", kCoreException::SOURCE_FILE_NOT_FOUND);
+				throw new kCoreException("Source file not found for flavor conversion [" . $flavorAsset->getId() . "]", kCoreException::SOURCE_FILE_NOT_FOUND);
 		}
 		
 		return $fileSync;		

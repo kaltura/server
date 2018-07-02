@@ -378,7 +378,7 @@ class myEntryUtils
 		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 		{
 			//Check if recorded entry flavors are still not ready to be played, this means set recorded content was not yet called
-			if($entry->isInsideDeleteGracePeriod() && myEntryUtils::shouldServeVodFromLive($entry, false))
+			if($entry->isInsideDeleteGracePeriod() && myEntryUtils::shouldServeVodFromLive($entry, false) && !$entry->getIsTemporary())
 			{
 				KalturaLog::info("Recorded Entry [". $entry->getId() ."] cannot be deleted until recorded content is set");
 				throw new KalturaAPIException(KalturaErrors::RECORDING_CONTENT_NOT_YET_SET, $entry->getId());
@@ -1591,7 +1591,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$newEntry->setCategoriesIds(null);
 
 	    if (!$copyFlavors)
-		    $newEntry->setStatus(entryStatus::NO_CONTENT);
+		{
+			$newEntry->setStatus(entryStatus::NO_CONTENT);
+			$newEntry->setLengthInMsecs(0);
+		}
+
 
 	    if ($toPartner instanceof Partner)
  		{
