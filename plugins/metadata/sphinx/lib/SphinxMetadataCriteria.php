@@ -32,7 +32,8 @@ class SphinxMetadataCriteria extends SphinxCriteria
 		if ($filter->get('_eq_object_type') == MetadataObjectType::DYNAMIC_OBJECT)
 		{
 			$this->sphinxSkipped = false;
-			$this->addMatch("@object_type_str " . $filter->get('_eq_object_type'));
+			$objectTypeStr = MetadataPeer::getSearchIndexFieldValue(MetadataPeer::OBJECT_TYPE, $filter->get('_eq_object_type'), kCurrentContext::getCurrentPartnerId());
+			$this->addMatch("@object_type_str " . $objectTypeStr);
 			$filter->unsetByName('_eq_object_type');
 		}
 		

@@ -15,6 +15,8 @@
  */
 class MetadataPeer extends BaseMetadataPeer implements IRelatedObjectPeer
 {
+	const METADATA_OBJECT_TYPE_PREFIX = "mot";
+	
 	public static function setDefaultCriteriaFilter()
 	{
 		if(self::$s_criteria_filter == null)
@@ -186,4 +188,18 @@ class MetadataPeer extends BaseMetadataPeer implements IRelatedObjectPeer
 			return false;
 		}
 	}
+	
+	public static function getSearchIndexFieldValue ($fieldName, $fieldValue, $partnerId)
+	{
+		switch ($fieldName)
+		{
+			case MetadataPeer::OBJECT_TYPE:
+				return $partnerId . self::METADATA_OBJECT_TYPE_PREFIX . $fieldValue;
+				break;
+			default:
+				return $fieldValue;
+			
+		}
+	}
+	
 } // MetadataPeer

@@ -52,7 +52,7 @@ class MetadataIndex extends BaseIndexObject
 				'partner_id' => 'partnerId',
 				'object_id' => 'objectId',
 				'object_type' => 'objectType',
-				'object_type_str' => 'objectType',
+				'object_type_str' => 'searchIndexMetadataObjectType',
 				'metadata_status' => 'status',
 				'sphinx_match_optimizations' => 'sphinxMatchOptimizations',
 			);
