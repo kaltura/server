@@ -1,3 +1,15 @@
+# Naos 14.2.0 #
+
+## Allow Wowza Media-Server to get conversion profile##
+Issue Type:  New Feature
+Issue ID: PLAT-8484
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_07_02_add_permission_wowza_conversionprofile.php
+
 # Naos 14.1.0 #
 
 ## Facebook OAuth ##
