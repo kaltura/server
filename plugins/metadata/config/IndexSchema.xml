@@ -5,7 +5,6 @@
 		<field name="updated_at" indexName="updated_at" type="datetime" skipField="yes" orderable="yes" />
 		<field name="version" indexName="version" type="int" skipField="yes" orderable="yes" />
 		<field name="metadata_profile_id" indexName="metadata_profile_id" type="int" skipField="yes" />
-		<field name="metadata_profile_id_str" indexName="metadata_profile_id_str" getter="metadataProfileId" type="string" />
 		<field name="metadata_profile_version" indexName="metadata_profile_version" type="int" skipField="yes" orderable="yes" />
 		<field name="partner_id" indexName="partner_id" type="bint" skipField="yes" />
 		<field name="object_id" indexName="object_id" type="string" skipField="yes" />

@@ -29,12 +29,10 @@ class SphinxMetadataCriteria extends SphinxCriteria
 	{
 		/* @var $filter EntryVendorTaskFilter */
 		
-		if ($filter->get('_eq_metadata_profile_id') && $filter->get('_eq_object_type') == MetadataObjectType::DYNAMIC_OBJECT)
+		if ($filter->get('_eq_object_type') == MetadataObjectType::DYNAMIC_OBJECT)
 		{
 			$this->sphinxSkipped = false;
-			$this->addMatch("@metadata_profile_id_str " . $filter->get('_eq_metadata_profile_id'));
 			$this->addMatch("@object_type_str " . $filter->get('_eq_object_type'));
-			$filter->unsetByName('_eq_metadata_profile_id');
 			$filter->unsetByName('_eq_object_type');
 		}
 		
