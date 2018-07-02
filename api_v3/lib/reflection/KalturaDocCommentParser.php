@@ -405,17 +405,13 @@ class KalturaDocCommentParser
         {
             if (preg_match(self::RELATED_SERVICE, $hierarchyClass->getDocComment(),$result))
             {
-                $relatedService	 = $result[1];
-                break;
+                $relatedService = $result[1];
+	            $values = explode(PHP_EOL,$comments);
+	            array_splice( $values, count($values) - 1, 0, " * @relatedService $relatedService" );
+	            return implode(PHP_EOL, $values);
             }
 
             $hierarchyClass = $hierarchyClass->getParentClass();
-        }
-        if ($relatedService)
-        {
-            $values = explode(PHP_EOL,$comments);
-            array_splice( $values, count($values) - 1, 0, " * @relatedService $relatedService" );
-            return implode(PHP_EOL, $values);
         }
         return null;
      }
