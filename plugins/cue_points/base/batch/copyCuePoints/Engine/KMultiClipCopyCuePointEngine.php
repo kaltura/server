@@ -78,11 +78,6 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 		return parent::validateJobData();
 	}
 
-	public function setData($data, $partnerId)
-	{
-		parent::setData($data,$partnerId);
-	}
-
 	/**
 	 * @param string $destinationEntryId
 	 * @throws KalturaAPIException
