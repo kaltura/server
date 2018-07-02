@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.thumbCuePoint
+ * @relatedService CuePointService
  * @subpackage api.filters.base
  * @abstract
  */

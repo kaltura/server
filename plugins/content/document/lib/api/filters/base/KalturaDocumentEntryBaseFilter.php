@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.document
+ * @relatedService BaseEntryService
  * @subpackage api.filters.base
  * @abstract
  */

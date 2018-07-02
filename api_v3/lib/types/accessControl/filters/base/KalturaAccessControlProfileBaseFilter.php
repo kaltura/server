@@ -1,6 +1,7 @@
 <?php
 /**
  * @package api
+ * @relatedService AccessControlProfileService
  * @subpackage filters.base
  * @abstract
  */

@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @relatedService LiveChannelSegmentService
  */
 class KalturaLiveChannelSegment extends KalturaObject implements IRelatedFilterable
 {

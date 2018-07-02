@@ -1,6 +1,7 @@
 <?php
 /**
  * @package api
+ * @relatedService CategoryEntryService
  * @subpackage filters.base
  * @abstract
  */

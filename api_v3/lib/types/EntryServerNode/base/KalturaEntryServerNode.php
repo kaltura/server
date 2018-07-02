@@ -4,7 +4,7 @@
  * @subpackage objects
  * @abstract
  */
-abstract class KalturaEntryServerNode extends KalturaObject implements IRelatedFilterable, IApiObjectFactory
+abstract class KalturaEntryServerNode extends KalturaObject implements IFilterable, IApiObjectFactory
 {
 	/**
 	 * unique auto-generated identifier

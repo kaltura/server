@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @relatedService PermissionService
  */
 class KalturaPermission extends KalturaObject implements IRelatedFilterable
 {
