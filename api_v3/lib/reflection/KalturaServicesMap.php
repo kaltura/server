@@ -192,7 +192,7 @@ class KalturaServicesMap
             if ($apcFetchSuccess && $serviceItemFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] == self::getServiceMapModificationTime())
             {
             	self::populateServiceClassToId();
-                return $serviceItemFromCache["serviceActionItem"];
+            	return $serviceItemFromCache["serviceActionItem"];
             }
         }
 		
