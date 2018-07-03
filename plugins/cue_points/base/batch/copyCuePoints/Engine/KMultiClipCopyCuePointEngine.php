@@ -12,6 +12,8 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 	const CUE_POINT_EVENT = 'eventCuePoint.Event';
 	const ANNOTATION = 'annotation.Annotation';
 	const CUE_POINT_AD = 'adCuePoint.Ad';
+	const CUE_POINT_CODE = 'codeCuePoint.Code';
+
 
 	/**
 	 * @return bool
@@ -26,8 +28,7 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 			$this->currentClip = $clipDescription;
 			$res &= $this->copyCuePointsToEntry($clipDescription->sourceEntryId, $this->data->destinationEntryId);
 		}
-		if ($res)
-			$this->mergeCuePoint($this->data->destinationEntryId);
+		$this->mergeCuePoint($this->data->destinationEntryId);
 		return $res;
 	}
 
@@ -95,7 +96,7 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 		$filter = parent::getCuePointFilter($destinationEntryId);
 		//merge annotation,Ad,event,thumb cue point only
 		$filter->cuePointTypeIn = self::CUE_POINT_THUMB . ',' . self::CUE_POINT_EVENT . ',' .self::ANNOTATION . ',' .
-			self::CUE_POINT_AD;
+			self::CUE_POINT_AD  . ',' . self::CUE_POINT_CODE;
 		return $filter;
 	}
 
@@ -109,9 +110,6 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 			for ($i = 0; $i < count($type) - 1; $i++) {
 				/** @var KalturaCuePoint $currentCuePoint */
 				$currentCuePoint = &$type[$i];
-				//if Next element does not exit break the loop
-				if(!array_key_exists($i + 1,$type))
-					break;
 				$relatedCuePointIndex = $this->getNextRelatedElementIndex($type,$i,$currentCuePoint);
 				/** @var KalturaCuePoint $relatedCuePoint */
 				$relatedCuePoint = null;
@@ -142,25 +140,10 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 	private function sortCuePointIntoType($cuePoints)
 	{
 		$cuePointSplitIntoType = array(self::CUE_POINT_THUMB => array(), self::CUE_POINT_EVENT => array(),
-															self::ANNOTATION => array(), self::CUE_POINT_AD => array());
+			self::ANNOTATION => array(), self::CUE_POINT_AD => array(), self::CUE_POINT_CODE => array());
 		/** @var KalturaCuePoint $cuePoint */
 		foreach ($cuePoints as $cuePoint) {
-			switch ($cuePoint->cuePointType) {
-				case self::CUE_POINT_THUMB:
-					$cuePointSplitIntoType[self::CUE_POINT_THUMB][] = $cuePoint;
-					break;
-				case self::CUE_POINT_EVENT:
-					$cuePointSplitIntoType[self::CUE_POINT_EVENT][] = $cuePoint;
-					break;
-				case self::ANNOTATION:
-					$cuePointSplitIntoType[self::ANNOTATION][] = $cuePoint;
-					break;
-				case self::CUE_POINT_AD:
-					$cuePointSplitIntoType[self::CUE_POINT_AD][] = $cuePoint;
-					break;
-				default:
-					throw new KalturaAPIException("for cue point: $cuePoint->id , Type: $cuePoint->cuePointType , should not return to the merger.");
-			}
+			$cuePointSplitIntoType[$cuePoint->cuePointType][] = $cuePoint;
 		}
 		return $cuePointSplitIntoType;
 	}
@@ -197,7 +180,7 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 		do {
 			$i++;
 			$candidate = $type[$i];
-			if ($currentCuePointEndTimeExist && $currentCuePoint->endTime != $candidate->startTime)
+			if ($currentCuePointEndTimeExist && $currentCuePoint->endTime < $candidate->startTime)
 				break;
 			if ($currentCuePoint->copiedFrom === $candidate->copiedFrom)
 				return $i;
