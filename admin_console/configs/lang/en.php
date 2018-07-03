@@ -1476,4 +1476,5 @@ return array(
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::PT' => "Portuguese",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::RU' => "Russian",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::TR' => "Turkish",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::TH' => "Thai",
 );
