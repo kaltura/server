@@ -129,7 +129,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		if ($type->isRelatedFilterable() && !$relatedService)
 			throw new Exception('did not find @relatedService annotation  '. PHP_EOL .
 				' in comments for type:' . $type->getType());
-		if ($type->isRelatedFilterable() && $relatedService)
+		if ($type->isRelatedFilterable())
 			$this->appendLine(" * @relatedService " . $relatedService);
 		$this->appendLine(" * @subpackage $subpackage");
 		$this->appendLine(" * @abstract");
