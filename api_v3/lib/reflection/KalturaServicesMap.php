@@ -238,6 +238,10 @@ class KalturaServicesMap
 	 */
 	private static function populateServiceClassToId($services = null)
 	{
+		// check if $serviceClassToIdAndName was already loaded
+		if(self::$serviceClassToIdAndName)
+			return;
+		
 		$serviceClassToIdFileCachePath = implode(DIRECTORY_SEPARATOR, array(kConf::get("cache_root_path"), 'api_v3', 'KalturaServiceClassToId.cache'));
 		if(file_exists($serviceClassToIdFileCachePath))
 		{
