@@ -178,7 +178,6 @@ abstract class KCopyCuePointEngine
              */
             if (array_key_exists($type, $this->lastCuePointPerType))
             {
-                //$calculatedEndTime = self::getEndTimeIfExist($this->lastCuePointPerType[$type]);
                 if (!$this->lastCuePointPerType[$type]->calculatedEndTime)
                 	$this->lastCuePointPerType[$type]->calculatedEndTime = $cuePoint->$orderField;
             }
