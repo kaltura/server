@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.thumbCuePoint
+ * @relatedService KalturaAssetService
  * @subpackage api.filters.base
  * @abstract
  */

@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @relatedService UserService
  */
 class KalturaUser extends KalturaObject implements IRelatedFilterable 
 {

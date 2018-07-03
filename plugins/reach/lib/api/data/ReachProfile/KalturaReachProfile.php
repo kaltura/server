@@ -3,6 +3,7 @@
 /**
  * @package plugins.reach
  * @subpackage api.objects
+ * @relatedService ReachProfileService
  */
 class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 {

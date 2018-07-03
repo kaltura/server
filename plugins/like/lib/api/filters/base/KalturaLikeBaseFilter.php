@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.like
+ * @relatedService LikeService
  * @subpackage api.filters.base
  * @abstract
  */

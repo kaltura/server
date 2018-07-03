@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.attachment
+ * @relatedService KalturaAssetService
  * @subpackage api.filters.base
  * @abstract
  */

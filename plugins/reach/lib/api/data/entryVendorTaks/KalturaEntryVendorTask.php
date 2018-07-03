@@ -2,6 +2,7 @@
 /**
  * @package plugins.reach
  * @subpackage api.objects
+ * @relatedService EntryVendorTaskService
  */
 class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 {

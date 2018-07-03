@@ -89,32 +89,34 @@ class KalturaTypeReflector
 			
 		$this->_type = $type;
 		
-	    $reflectClass = new ReflectionClass($this->_type);
-	    $this->_abstract = $reflectClass->isAbstract();
-	    $comments = $reflectClass->getDocComment();
-	    if($comments)
-	    {
-	    	$this->_comments = $comments;
-	    	$commentsParser = new KalturaDocCommentParser($comments);
-	    	$this->_description = $commentsParser->description;
-	    	$this->_deprecated = $commentsParser->deprecated;
-	    	$this->_serverOnly = $commentsParser->serverOnly;
-	    	$this->_package = $commentsParser->package;
-	    	$this->_subpackage = $commentsParser->subpackage;
-
-		    $permissions = array();
-		    $parentType = get_parent_class($this->_type);
-		    if ($parentType !== false)
-		    {
+		$reflectClass = new ReflectionClass($this->_type);
+		$this->_abstract = $reflectClass->isAbstract();
+		$comments = $reflectClass->getDocComment();
+		if($comments)
+		{
+			$this->_comments = $comments;
+			$commentsParser = new KalturaDocCommentParser($comments);
+			$candidate = $commentsParser->parseRelatedService($reflectClass);
+			if ($candidate)
+				$this->_comments = $candidate;
+			$this->_description = $commentsParser->description;
+			$this->_deprecated = $commentsParser->deprecated;
+			$this->_serverOnly = $commentsParser->serverOnly;
+			$this->_package = $commentsParser->package;
+			$this->_subpackage = $commentsParser->subpackage;
+			$permissions = array();
+			$parentType = get_parent_class($this->_type);
+			if ($parentType !== false)
+			{
 				$parentReflector = KalturaTypeReflectorCacher::get($parentType);
-			    $permissions = array_merge($permissions, $parentReflector->_permissions);
-		    }
-		    
-	    	if (!is_null($commentsParser->permissions)) {
-	    		$permissions = array_merge($permissions,explode(',',trim($commentsParser->permissions)));
-	    	}
-		    $this->_permissions=$permissions;
-	    }
+				$permissions = array_merge($permissions, $parentReflector->_permissions);
+			}
+
+			if (!is_null($commentsParser->permissions)) {
+				$permissions = array_merge($permissions,explode(',',trim($commentsParser->permissions)));
+			}
+			$this->_permissions=$permissions;
+		}
 	}
 	
 	/**
@@ -200,7 +202,7 @@ class KalturaTypeReflector
 								
 								if ($property->getDeclaringClass() == $reflectClass) // store current class properties
 								{
-								     $this->_currentProperties[] = $prop;   
+									 $this->_currentProperties[] = $prop;
 								}
 							}
 							
@@ -258,16 +260,16 @@ class KalturaTypeReflector
 		if($this->_type == 'KalturaObject')
 			return null;
 			
-	    $reflectClass = new ReflectionClass($this->_type);
-	    $parentClass = $reflectClass->getParentClass();
-	    if (!$parentClass)
-	    	throw new Exception("API object [$this->_type] must have parent type, package: [$this->_package] subpackage [$this->_subpackage]");
-	    	
-	    $parentClassName = $parentClass->getName();
-	    if (!in_array($parentClassName, array("KalturaObject", "KalturaEnum", "KalturaStringEnum", "KalturaTypedArray"))) // from the api point of view, those objects are ignored
-            return KalturaTypeReflectorCacher::get($parentClass->getName());
-	    else
-	        return null;
+		$reflectClass = new ReflectionClass($this->_type);
+		$parentClass = $reflectClass->getParentClass();
+		if (!$parentClass)
+			throw new Exception("API object [$this->_type] must have parent type, package: [$this->_package] subpackage [$this->_subpackage]");
+
+		$parentClassName = $parentClass->getName();
+		if (!in_array($parentClassName, array("KalturaObject", "KalturaEnum", "KalturaStringEnum", "KalturaTypedArray"))) // from the api point of view, those objects are ignored
+			return KalturaTypeReflectorCacher::get($parentClass->getName());
+		else
+			return null;
 	}
 	
 	/**
@@ -289,7 +291,7 @@ class KalturaTypeReflector
 	{
 		if ($this->_currentProperties === null)
 		{
-		    $this->getProperties();
+			$this->getProperties();
 		}
 		
 		return $this->_currentProperties;
@@ -587,11 +589,11 @@ class KalturaTypeReflector
 	 */
 	public function isParentOf($class)
 	{
-	    if (!class_exists($class))
-	        return false;
-	        
-	    $possibleReflectionClass = new ReflectionClass($class);
-        return $possibleReflectionClass->isSubclassOf(new ReflectionClass($this->_type));
+		if (!class_exists($class))
+			return false;
+
+		$possibleReflectionClass = new ReflectionClass($class);
+		return $possibleReflectionClass->isSubclassOf(new ReflectionClass($this->_type));
 	}
 	
 	public function isFilterable()
@@ -764,5 +766,13 @@ class KalturaTypeReflector
 	public function getRequiredPermissions()
 	{
 		return $this->_permissions;
+	}
+
+	/**
+	 * @return null|string
+	 */
+	public function getComments()
+	{
+		return $this->_comments;
 	}
 }

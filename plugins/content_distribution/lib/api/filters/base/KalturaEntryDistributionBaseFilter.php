@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.contentDistribution
+ * @relatedService EntryDistributionService
  * @subpackage api.filters.base
  * @abstract
  */
