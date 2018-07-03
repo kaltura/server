@@ -9,11 +9,8 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 	private $currentClip = null;
 
 	const CUE_POINT_THUMB = 'thumbCuePoint.Thumb';
-
 	const CUE_POINT_EVENT = 'eventCuePoint.Event';
-
 	const ANNOTATION = 'annotation.Annotation';
-
 	const CUE_POINT_AD = 'adCuePoint.Ad';
 
 	/**
