@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.caption
+ * @relatedService ignore
  * @subpackage api.filters.base
  * @abstract
  */
