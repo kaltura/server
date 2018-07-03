@@ -3,8 +3,6 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 {
 	private $_txt = "";
 
-	const IGNORE = 'ignore';
-
 	protected function writeHeader()
 	{
 		
@@ -131,7 +129,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		if ($type->isRelatedFilterable() && !$relatedService)
 			throw new Exception('did not find @relatedService annotation  '. PHP_EOL .
 				' in comments for type:' . $type->getType());
-		if ($type->isRelatedFilterable() && $relatedService !== self::IGNORE)
+		if ($type->isRelatedFilterable() && $relatedService)
 			$this->appendLine(" * @relatedService " . $relatedService);
 		$this->appendLine(" * @subpackage $subpackage");
 		$this->appendLine(" * @abstract");
