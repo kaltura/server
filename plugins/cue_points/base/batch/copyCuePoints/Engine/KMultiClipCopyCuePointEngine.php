@@ -196,11 +196,10 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 	 */
 	private function getNextRelatedElementIndex($type, $i, $currentCuePoint)
 	{
-
+		$currentCuePointEndTimeExist = property_exists($currentCuePoint, 'endTime');
 		do {
 			$i++;
 			$candidate = $type[$i];
-			$currentCuePointEndTimeExist = property_exists($currentCuePoint, 'endTime');
 			if ($currentCuePointEndTimeExist && $currentCuePoint->endTime != $candidate->startTime)
 				break;
 			if ($currentCuePoint->copiedFrom === $candidate->copiedFrom)
