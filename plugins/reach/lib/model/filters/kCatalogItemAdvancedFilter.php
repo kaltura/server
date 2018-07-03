@@ -124,7 +124,8 @@ class kCatalogItemAdvancedFilter extends AdvancedSearchFilterItem
 			$query->addMatch('@' . ReachPlugin::getSearchFieldName(ReachPlugin::SEARCH_FIELD_CATALOG_ITEM_DATA) . " " . $condition);
 		}
 		
-		if($this->getTurnAroundTimeEqual())
+		$turnAroundTimeEqual = $this->getTurnAroundTimeEqual();
+		if(isset($turnAroundTimeEqual))
 		{
 			$condition = ReachPlugin::CATALOG_ITEM_INDEX_PREFIX . $partnerId;
 			$condition .= " " . ReachPlugin::CATALOG_ITEM_INDEX_TURN_AROUND_TIME . $this->getTurnAroundTimeEqual();
