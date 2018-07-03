@@ -191,8 +191,9 @@ class KalturaServicesMap
             $serviceItemFromCache = apc_fetch($serviceId, $apcFetchSuccess);
             if ($apcFetchSuccess && $serviceItemFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] == self::getServiceMapModificationTime())
             {
+            	self::populateServiceClassToId();
                 return $serviceItemFromCache["serviceActionItem"];
-            } 
+            }
         }
 		
 		// load the service reflector
@@ -235,13 +236,30 @@ class KalturaServicesMap
 	/**
 	 * @param $services
 	 */
-	private static function populateServiceClassToId($services)
+	private static function populateServiceClassToId($services = null)
 	{
+		$serviceClassToIdFileCachePath = implode(DIRECTORY_SEPARATOR, array(kConf::get("cache_root_path"), 'api_v3', 'KalturaServiceClassToId.cache'));
+		if(file_exists($serviceClassToIdFileCachePath))
+		{
+			self::$serviceClassToIdAndName = unserialize(kFile::getFileContent($serviceClassToIdFileCachePath));
+			return;
+		}
+		
+		if(!$services)
+			throw new Exception('Failed to load service class to id map');
+		
 		/** @var KalturaServiceActionItem $service */
 		foreach($services as $service)
 		{
 			self::$serviceClassToIdAndName[$service->serviceClass] = array($service->serviceId,$service->serviceInfo->serviceName);
 		}
+		
+		if (!is_dir(dirname($serviceClassToIdFileCachePath)))
+		{
+			mkdir(dirname($serviceClassToIdFileCachePath));
+			chmod(dirname($serviceClassToIdFileCachePath), 0755);
+		}
+		kFile::safeFilePutContents($serviceClassToIdFileCachePath, serialize(self::$serviceClassToIdAndName), 0644);
 	}
 
 }
