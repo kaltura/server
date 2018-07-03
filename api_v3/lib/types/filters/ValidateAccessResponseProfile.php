@@ -10,12 +10,6 @@ class ValidateAccessResponseProfile
 	const LIST_ACTION = 'listAction';
 	const COMMENTS = '#@(.*?)\n#s';
 	const RELATED_SERVICE = 'relatedService';
-
-	/**
-	 * @param KalturaRelatedFilter $relatedFilter
-	 * @return bool
-	 * @throws Exception
-	 */
 	const IGNORE = 'ignore';
 
 	/**
