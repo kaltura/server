@@ -1,7 +1,7 @@
 <?php
 /**
  * @package plugins.widevine
- * @relatedService KalturaAssetService
+ * @relatedService FlavorAssetService
  * @subpackage api.filters.base
  * @abstract
  */
