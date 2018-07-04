@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.reach
+ * @relatedService ReachProfileService
  * @subpackage api.filters.base
  * @abstract
  */

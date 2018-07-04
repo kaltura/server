@@ -10,9 +10,10 @@ class ValidateAccessResponseProfile
 	const LIST_ACTION = 'listAction';
 	const COMMENTS = '#@(.*?)\n#s';
 	const RELATED_SERVICE = 'relatedService';
+	const IGNORE = 'ignore';
 
 	/**
-	 * @param KalturaRelatedFilter $relatedFilter
+	 * @param $relatedFilter
 	 * @return bool
 	 * @throws Exception
 	 */
@@ -30,9 +31,12 @@ class ValidateAccessResponseProfile
 	private static function getServiceClassInstance($relatedFilter)
 	{
 		$clazz = self::getServiceClazz($relatedFilter);
+		/** @relatedService ignore */
+		if ($clazz === self::IGNORE)
+			return $clazz;
 		/** if Class is not found then do not allow the response profile filter to get the response  */
 		if (!class_exists($clazz)) {
-			$e = new KalturaAPIException (APIErrors::SERVICE_FORBIDDEN, 'Service class:  ' . $clazz . 'Not Found');
+			$e = new KalturaAPIException (APIErrors::SERVICE_FORBIDDEN, 'Service class:  ' . $clazz . ' Not Found');
 			header("X-Kaltura:error-" . $e->getCode());
 			header("X-Kaltura-App: exiting on error " . $e->getCode() . " - " . $e->getMessage());
 			throw $e;
@@ -43,7 +47,6 @@ class ValidateAccessResponseProfile
 	/**
 	 * @param $relatedFilter
 	 * @return string className
-	 * @throws ReflectionException
 	 */
 	private static function getServiceClazz($relatedFilter)
 	{
@@ -69,6 +72,9 @@ class ValidateAccessResponseProfile
 	 */
 	private static function validate($clazz)
 	{
+		/** @relatedService ignore */
+		if ($clazz === self::IGNORE)
+			return true;
 		try {
 			/** @var KalturaBaseService $service */
 			$service = new $clazz();

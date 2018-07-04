@@ -124,7 +124,8 @@ class kCatalogItemAdvancedFilter extends AdvancedSearchFilterItem
 			$query->addMatch('@' . ReachPlugin::getSearchFieldName(ReachPlugin::SEARCH_FIELD_CATALOG_ITEM_DATA) . " " . $condition);
 		}
 		
-		if($this->getTurnAroundTimeEqual())
+		$turnAroundTimeEqual = $this->getTurnAroundTimeEqual();
+		if(isset($turnAroundTimeEqual))
 		{
 			$condition = ReachPlugin::CATALOG_ITEM_INDEX_PREFIX . $partnerId;
 			$condition .= " " . ReachPlugin::CATALOG_ITEM_INDEX_TURN_AROUND_TIME . $this->getTurnAroundTimeEqual();
@@ -133,20 +134,21 @@ class kCatalogItemAdvancedFilter extends AdvancedSearchFilterItem
 			$query->addMatch('@' . ReachPlugin::getSearchFieldName(ReachPlugin::SEARCH_FIELD_CATALOG_ITEM_DATA) . " " . $condition);
 		}
 		
-		if($this->getTurnAroundTimeIn())
+		$turnAroundTimeIn = $this->getTurnAroundTimeIn();
+		if(isset($turnAroundTimeIn))
 		{
-			$turnAroundsStrs = array();
-			$turnAroundTimes = explode(",", $this->turnAroundTimeIn);
+			$turnAroundStrs = array();
+			$turnAroundTimes = explode(",", $turnAroundTimeIn);
 			foreach($turnAroundTimes as $turnAroundTime)
 			{
-				if(!$turnAroundTime)
+				if(!isset($turnAroundTime))
 					continue;
 				
-				$turnAroundsStrs[] = ReachPlugin::CATALOG_ITEM_INDEX_TURN_AROUND_TIME . $turnAroundTime;
+				$turnAroundStrs[] = ReachPlugin::CATALOG_ITEM_INDEX_TURN_AROUND_TIME . $turnAroundTime;
 			}
 			
 			$condition = ReachPlugin::CATALOG_ITEM_INDEX_PREFIX . $partnerId;
-			$condition .= ' (' . implode(' | ', $turnAroundsStrs) . ')';
+			$condition .= ' (' . implode(' | ', $turnAroundStrs) . ')';
 			$condition .= " " . ReachPlugin::CATALOG_ITEM_INDEX_SUFFIX . $partnerId;
 			
 			$query->addMatch('@' . ReachPlugin::getSearchFieldName(ReachPlugin::SEARCH_FIELD_CATALOG_ITEM_DATA) . " " . $condition);

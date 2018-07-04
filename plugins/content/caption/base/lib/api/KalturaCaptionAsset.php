@@ -2,8 +2,9 @@
 /**
  * @package plugins.caption
  * @subpackage api.objects
+ * @relatedService CaptionAssetService
  */
-class KalturaCaptionAsset extends KalturaAsset  
+class KalturaCaptionAsset extends KalturaAsset
 {
 	/**
 	 * The Caption Params used to create this Caption Asset

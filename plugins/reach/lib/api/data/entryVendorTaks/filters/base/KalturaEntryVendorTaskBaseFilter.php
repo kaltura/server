@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.reach
+ * @relatedService EntryVendorTaskService
  * @subpackage api.filters.base
  * @abstract
  */
@@ -35,10 +36,6 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaRelatedFilter
 	(
 		"+id" => "+id",
 		"-id" => "-id",
-		"+price" => "+price",
-		"-price" => "-price",
-		"+status" => "+status",
-		"-status" => "-status",
 		"+createdAt" => "+created_at",
 		"-createdAt" => "-created_at",
 		"+updatedAt" => "+updated_at",
@@ -47,6 +44,10 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaRelatedFilter
 		"-queueTime" => "-queue_time",
 		"+finishTime" => "+finish_time",
 		"-finishTime" => "-finish_time",
+		"+status" => "+status",
+		"-status" => "-status",
+		"+price" => "+price",
+		"-price" => "-price",
 	);
 
 	public function getMapBetweenObjects()
@@ -60,7 +61,7 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaRelatedFilter
 	}
 
 	/**
-	 * @var int
+	 * @var bigint
 	 */
 	public $idEqual;
 

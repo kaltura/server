@@ -2,7 +2,7 @@
 /**
  * @package api
  * @subpackage objects
- * @relatedService KalturaAssetService
+ * @relatedService ignore
  */
 class KalturaAsset extends KalturaObject implements IRelatedFilterable, IApiObjectFactory
 {

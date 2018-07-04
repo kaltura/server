@@ -1,7 +1,7 @@
 <?php
 /**
  * @package plugins.caption
- * @relatedService KalturaAssetService
+ * @relatedService CaptionAssetService
  * @subpackage api.filters.base
  * @abstract
  */
