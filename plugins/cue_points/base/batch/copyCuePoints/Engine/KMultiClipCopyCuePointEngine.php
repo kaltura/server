@@ -17,7 +17,7 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 
 	/**
 	 * @return bool
-	 * @throws KalturaAPIException
+	 * @throws Exception
 	 */
 	public function copyCuePoints()
 	{
@@ -78,17 +78,14 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 
 	/**
 	 * @param string $destinationEntryId
-	 * @throws KalturaAPIException
 	 * @throws Exception
 	 */
 	private function mergeCuePoint($destinationEntryId)
 	{
-
 		$filter = $this->getCuePointFilterForMerge($destinationEntryId);
 		$pager = $this->getCuePointPager();
 		$cuePoints = $this->getAllCuePointFromNewEntry($filter, $pager);
-		$cuePointSplitIntoType = $this->sortCuePointIntoType($cuePoints);
-		$this->locateCorrespondingCuePointsAndMergeThem($cuePointSplitIntoType);
+		$this->mergeCuePointByType($cuePoints);
 	}
 
 	private function getCuePointFilterForMerge($destinationEntryId)
@@ -101,47 +98,18 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 	}
 
 	/**
-	 * @param $cuePointSplitIntoType
-	 */
-	private function locateCorrespondingCuePointsAndMergeThem($cuePointSplitIntoType)
-	{
-		/** @var array[KalturaCuePoint] $type */
-		foreach ($cuePointSplitIntoType as $type) {
-			for ($i = 0; $i < count($type) - 1; $i++) {
-				/** @var KalturaCuePoint $currentCuePoint */
-				$currentCuePoint = &$type[$i];
-				$relatedCuePointIndex = $this->getNextRelatedElementIndex($type,$i,$currentCuePoint);
-				/** @var KalturaCuePoint $relatedCuePoint */
-				$relatedCuePoint = null;
-				if (array_key_exists($relatedCuePointIndex,$type))
-					$relatedCuePoint =  &$type[$relatedCuePointIndex];
-				if ($relatedCuePoint)
-				{
-					$res = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine', 'updateTimesAndDeleteNextCuePoint'), array($currentCuePoint, $relatedCuePoint));
-					if ($res)
-					{
-						$this->adjustArrayAndReIndex($relatedCuePoint, $currentCuePoint, $type, $relatedCuePointIndex);
-						$i--; //keep on same index check if need to merge next as well
-					}
-				}
-			}
-		}
-	}
-
-	/**
 	 * @param $cuePoints
 	 * @return array
 	 * @throws Exception
 	 */
-	private function sortCuePointIntoType($cuePoints)
+	private function mergeCuePointByType($cuePoints)
 	{
 		$cuePointSplitIntoType = array(self::CUE_POINT_THUMB => array(), self::CUE_POINT_EVENT => array(),
 			self::ANNOTATION => array(), self::CUE_POINT_AD => array(), self::CUE_POINT_CODE => array());
 		/** @var KalturaCuePoint $cuePoint */
 		foreach ($cuePoints as $cuePoint)
 		{
-			/** @noinspection PhpIllegalArrayKeyTypeInspection */
-			$cuePointSplitIntoType[$cuePoint->cuePointType][] = $cuePoint;
+			$this->handleNextCuePoint($cuePointSplitIntoType,$cuePoint);
 		}
 		return $cuePointSplitIntoType;
 	}
@@ -149,7 +117,6 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 	/**
 	 * @param $filter
 	 * @param $pager
-	 * @param $cuePoints
 	 * @return array
 	 */
 	private function getAllCuePointFromNewEntry($filter, $pager)
@@ -167,39 +134,31 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 	}
 
 	/**
-	 * @param array $type
-	 * @param int $i
-	 * @param KalturaCuePoint $currentCuePoint
-	 * @return int|null
+	 * @param array $cuePointSplitIntoType
+	 * @param KalturaCuePoint $cuePoint
 	 */
-	private function getNextRelatedElementIndex($type, $i, $currentCuePoint)
+	private function handleNextCuePoint(&$cuePointSplitIntoType, &$cuePoint)
 	{
-		$currentCuePointEndTimeExist = property_exists($currentCuePoint, 'endTime');
-		do {
-			$i++;
-			$candidate = $type[$i];
-			if ($currentCuePointEndTimeExist && $currentCuePoint->endTime < $candidate->startTime)
-				break;
-			if ($currentCuePoint->copiedFrom === $candidate->copiedFrom)
-				return $i;
-		} while (array_key_exists($i + 1,$type));
-		return -1;
+		/** @noinspection PhpIllegalArrayKeyTypeInspection */
+		$type = &$cuePointSplitIntoType[$cuePoint->cuePointType];
+		if (!key_exists($cuePoint->copiedFrom,$type))
+			$type[$cuePoint->copiedFrom] = array();
+		$copiedFromArray = $type[$cuePoint->copiedFrom];
+		if ($copiedFromArray) // not Empty
+		{
+			$lastOfType = &$copiedFromArray[count($copiedFromArray)-1];
+			if (!property_exists($lastOfType, 'endTime') || $lastOfType->endTime >= $cuePoint->startTime)
+			{
+				KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine', 'updateTimesAndDeleteNextCuePoint'),
+					array($lastOfType, $cuePoint));
+				if (property_exists($cuePoint, 'endTime'))
+					$lastOfType->endTime = $cuePoint->endTime;
+			}
+			else //add new element to end of list
+				$type[$cuePoint->copiedFrom][] = $cuePoint;
+		}
+		else // Empty(add new element)
+			$type[$cuePoint->copiedFrom][] = $cuePoint;
 	}
-
-	/**
-	 * @param $relatedCuePoint
-	 * @param $currentCuePoint
-	 * @param $type
-	 * @param $relatedCuePointIndex
-	 */
-	private function adjustArrayAndReIndex($relatedCuePoint, &$currentCuePoint, &$type, $relatedCuePointIndex)
-	{
-		$currentCuePointEndTimeExist = property_exists($currentCuePoint, 'endTime');
-		if ($currentCuePointEndTimeExist)
-			$currentCuePoint->endTime = $relatedCuePoint->endTime;
-		unset($type[$relatedCuePointIndex]);
-		$type = array_values($type);
-	}
-
 
 }
