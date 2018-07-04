@@ -1171,7 +1171,14 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			KalturaLog::info("Entry [".$metadata->getObjectId()."] not found or deleted");
 			return true; 
 		}
-		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($metadata->getObjectId());
+
+		$entryDistributions = EntryDistributionPeer::retrieveWithEnabledProfileByEntryId($metadata->getObjectId());
+		if(!$entryDistributions)
+		{
+			KalturaLog::debug("No enabled distribution profile found.");
+			return true;
+		}
+
 		foreach($entryDistributions as $entryDistribution)
 		{
 			if($entryDistribution->getStatus() != EntryDistributionStatus::QUEUED && $entryDistribution->getStatus() != EntryDistributionStatus::PENDING && $entryDistribution->getStatus() != EntryDistributionStatus::READY)
@@ -1265,7 +1272,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		}
 	
 		$distributionProfiles = array();
-		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entryId);
+		$entryDistributions = EntryDistributionPeer::retrieveWithEnabledProfileByEntryId($entryId);
+		if(!$entryDistributions)
+		{
+			KalturaLog::debug("No enabled distribution profile found.");
+			return true;
+		}
+
 		$entryType = $entry->getType();
 		if($entryType == entryType::LIVE_STREAM)
 		{
@@ -1532,7 +1545,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if(!ContentDistributionPlugin::isAllowedPartner($entry->getPartnerId()))
 			return true;
 		$entryId = $entry->getId();
-		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entryId);
+		$entryDistributions = EntryDistributionPeer::retrieveWithEnabledProfileByEntryId($entryId);
+		if(!$entryDistributions)
+		{
+			KalturaLog::debug("No enabled distribution profile found.");
+			return true;
+		}
+
 		$entryType = $entry->getType();
 		foreach($entryDistributions as $entryDistribution)
 		{
@@ -1729,7 +1748,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			EntryDistributionStatus::READY,
 		);
 		
-		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entry->getId());
+		$entryDistributions = EntryDistributionPeer::retrieveWithEnabledProfileByEntryId($entry->getId());
+		if(!$entryDistributions)
+		{
+			KalturaLog::debug("No enabled distribution profile found.");
+			return true;
+		}
+
 		foreach($entryDistributions as $entryDistribution)
 		{
 			if($entryDistribution->getStatus() == EntryDistributionStatus::DELETING)
@@ -1821,7 +1846,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			return true;
 		}
 			
-		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($asset->getEntryId());
+		$entryDistributions = EntryDistributionPeer::retrieveWithEnabledProfileByEntryId($asset->getEntryId());
+		if(!$entryDistributions)
+		{
+			KalturaLog::debug("No enabled distribution profile found.");
+			return true;
+		}
+
 		KalturaLog::log("Entry distributions [" . count($entryDistributions) . "] found");
 		
 		foreach($entryDistributions as $entryDistribution)
@@ -1871,7 +1902,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			return true;
 		}
 			
-		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($asset->getEntryId());
+		$entryDistributions = EntryDistributionPeer::retrieveWithEnabledProfileByEntryId($asset->getEntryId());
+		if(!$entryDistributions)
+		{
+			KalturaLog::debug("No enabled distribution profile found.");
+			return true;
+		}
+
 		foreach($entryDistributions as $entryDistribution)
 		{
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();

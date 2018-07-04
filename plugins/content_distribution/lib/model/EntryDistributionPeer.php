@@ -46,7 +46,24 @@ class EntryDistributionPeer extends BaseEntryDistributionPeer implements IRelate
 
 		return EntryDistributionPeer::doSelect($criteria, $con);
 	}
-	
+
+	/**
+	 * Retrieve objects by entry id with enabled profile id.
+	 *
+	 * @param      string $entryId
+	 * @param      PropelPDO $con the connection to use
+	 * @return     array<EntryDistribution>
+	 */
+	public static function retrieveWithEnabledProfileByEntryId($entryId, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(EntryDistributionPeer::ENTRY_ID, $entryId);
+		$c->add(DistributionProfilePeer::STATUS, DistributionProfileStatus::ENABLED);
+		$c->addJoin(EntryDistributionPeer::DISTRIBUTION_PROFILE_ID, DistributionProfilePeer::ID, Criteria::INNER_JOIN);
+
+		return EntryDistributionPeer::doSelect($criteria, $con);
+	}
+
 	/**
 	 * Retrieve single EntryDistribution object by entry id and profile id.
 	 *
