@@ -153,7 +153,7 @@ abstract class KCopyCuePointEngine
 	 * @param KalturaCuePoint $nextCuePoint
 	 * @return mixed
 	 */
-	public static function updateTimesAndDeleteNextCuePoint($currentCuePoint, $nextCuePoint)
+	public static function mergeConsecutiveCuePoint($currentCuePoint, $nextCuePoint)
 	{
 		KBatchBase::$kClient->startMultiRequest();
 		if (property_exists($nextCuePoint,'endTime'))

@@ -149,7 +149,7 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 			$lastOfType = &$copiedFromArray[count($copiedFromArray)-1];
 			if (!property_exists($lastOfType, 'endTime') || $lastOfType->endTime >= $cuePoint->startTime)
 			{
-				KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine', 'updateTimesAndDeleteNextCuePoint'),
+				KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine', 'mergeConsecutiveCuePoint'),
 					array($lastOfType, $cuePoint));
 				if (property_exists($cuePoint, 'endTime'))
 					$lastOfType->endTime = $cuePoint->endTime;
