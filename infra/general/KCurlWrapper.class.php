@@ -304,12 +304,15 @@ class KCurlWrapper
 
 		return $err;
 	}
-	
+
 	/**
+	 * @param $opt
 	 * @return string
 	 */
-	public function getInfo($opt = null)
+	public function getInfo($opt)
 	{
+		if (!$opt)
+			return curl_getinfo($this->ch);
 		return curl_getinfo($this->ch, $opt);
 	}
 
