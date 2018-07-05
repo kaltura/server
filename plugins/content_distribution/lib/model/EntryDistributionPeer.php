@@ -58,8 +58,8 @@ class EntryDistributionPeer extends BaseEntryDistributionPeer implements IRelate
 	{
 		$criteria = new Criteria();
 		$criteria->add(EntryDistributionPeer::ENTRY_ID, $entryId);
-		$c->add(DistributionProfilePeer::STATUS, DistributionProfileStatus::ENABLED);
-		$c->addJoin(EntryDistributionPeer::DISTRIBUTION_PROFILE_ID, DistributionProfilePeer::ID, Criteria::INNER_JOIN);
+		$criteria->add(DistributionProfilePeer::STATUS, DistributionProfileStatus::ENABLED);
+		$criteria->addJoin(EntryDistributionPeer::DISTRIBUTION_PROFILE_ID, DistributionProfilePeer::ID, Criteria::INNER_JOIN);
 
 		return EntryDistributionPeer::doSelect($criteria, $con);
 	}
