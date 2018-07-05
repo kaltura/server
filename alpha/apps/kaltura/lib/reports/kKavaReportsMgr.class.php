@@ -1001,7 +1001,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_METRICS => array(self::METRIC_SUM_PRICE),
 			self::REPORT_FILTER => array(
 				self::DRUID_DIMENSION => self::DIMENSION_STATUS,
-				self::DRUID_VALUES => array('Ready', 'Error', 'Aborted')),
+				self::DRUID_VALUES => array(self::TASK_READY)),
 		),
 	);
 	
