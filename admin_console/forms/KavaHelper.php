@@ -10,6 +10,7 @@ class Form_KavaHelper
 	{
 		$jwtPayload = array(
 			'partnerId' => $partnerId,
+			'userId' => Infra_AuthHelper::getAuthInstance()->getIdentity()->getUser()->id,
 			'iat' => time(),
 			'exp' => time() + $sessionExpiry,
 		);
