@@ -4,7 +4,7 @@ var kmc = {
 };
 </script>
 	<div id="kmcHeader"<?php if($templatePartnerId) echo ' class="whiteLabel"'; ?>>
-	 <?php 
+	 <?php
 	 if(isset($kmcVars['logoUrl'])) {
 	 	echo '<div id="logo" style="background: transparent; overflow:hidden;"><img src="' . $kmcVars['logoUrl'] . '" /></div>';
 	 } else {
@@ -16,20 +16,21 @@ var kmc = {
 	 </ul>
 	 <div id="langIcon" style="display: none"></div>
 	 <div id="user"><span class="left-arrow"></span><?php echo $full_name; ?></div>
+	 <div id="newKMC">New KMC</div>
 	 <div id="user_links">
 	  <span id="closeMenu"></span> &nbsp;&nbsp;
 	  <span>
-	  	<?php echo $full_name; ?>&nbsp;&nbsp; 
-	  	<a id="Logout" href="#logout">( Logout )</a>&nbsp;&nbsp; 
+	  	<?php echo $full_name; ?>&nbsp;&nbsp;
+	  	<a id="Logout" href="#logout">( Logout )</a>&nbsp;&nbsp;
 	  	<?php if($showChangeAccount) { ?>
-	  	&nbsp;<span class="sep">|</span>&nbsp; 
+	  	&nbsp;<span class="sep">|</span>&nbsp;
 	  	Account: <?php echo $partner->getName(); ?> &nbsp;
 	  	( <a id="ChangePartner" href="#change_partner">Change Account</a> ) &nbsp;
 	  	<?php } ?>
 	  </span>
 	    <?php if (!$templatePartnerId) { ?>
 	    <span> <span class="sep">|</span> &nbsp; <a id="Quickstart Guide" href="<?php echo $service_url ?>/content/docs/pdf/KMC_User_Manual.pdf" target="_blank">User Manual</a> &nbsp; <span class="sep">|</span> &nbsp;
-	      <?php 
+	      <?php
 	      if( isset($kmcVars['supportUrl']) ){
 	      	$supportUrl = $kmcVars['supportUrl'];
 	      	$supportId = "";
