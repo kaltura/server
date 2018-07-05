@@ -13,6 +13,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_BITRATE_SUM = 'bitrateSum';
 	const METRIC_BITRATE_COUNT = 'bitrateCount';
 	const METRIC_UNIQUE_USER_IDS = 'uniqueUserIds';
+	const METRIC_SUM_PRICE = 'price';
 
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
@@ -166,10 +167,12 @@ class kKavaReportsMgr extends kKavaBase
 		myReportsMgr::REPORT_TYPE_LIVE,
 		myReportsMgr::REPORT_TYPE_TOP_PLAYBACK_CONTEXT,
 		myReportsMgr::REPORT_TYPE_VPAAS_USAGE,
+		myReportsMgr::REPORT_TYPE_REACH_USAGE,
 	);
 		
 	protected static $kava_forced_reports = array(
 		myReportsMgr::REPORT_TYPE_ENTRY_USAGE,
+		myReportsMgr::REPORT_TYPE_REACH_USAGE,
 	);
 	
 	protected static $reports_def = array(
@@ -987,6 +990,19 @@ class kKavaReportsMgr extends kKavaBase
 			),
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addRollupRow',
 		),
+		
+		myReportsMgr::REPORT_TYPE_REACH_USAGE => array(
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_REACH_USAGE,
+			self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
+			self::REPORT_DIMENSION_HEADERS => array('object_id', 'entry_name'),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => 'entry_name',
+				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'),
+			self::REPORT_METRICS => array(self::METRIC_SUM_PRICE),
+			self::REPORT_FILTER => array(
+				self::DRUID_DIMENSION => self::DIMENSION_STATUS,
+				self::DRUID_VALUES => array('Ready', 'Error', 'Aborted')),
+		),
 	);
 	
 	protected static $event_type_count_aggrs = array(
@@ -1071,6 +1087,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_PERIOD_PLAY_TIME => self::METRIC_VIEW_PERIOD_PLAY_TIME,
 		self::METRIC_BUFFER_TIME_RATIO => self::METRIC_BUFFER_TIME_RATIO,
 		self::METRIC_AVG_BITRATE => self::METRIC_AVG_BITRATE,
+		self::METRIC_SUM_PRICE => self::METRIC_SUM_PRICE,
 	);
 	
 	protected static $transform_metrics = array(
@@ -1460,6 +1477,9 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_AVG_DROP_OFF, '/', array(
 					self::getConstantRatioPostAggr('subDropOff', self::METRIC_PLAYTHROUGH, '4'),
 					self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY))));
+		
+		self::$aggregations_def[self::METRIC_SUM_PRICE] = self::getLongSumAggregator(
+			self::METRIC_SUM_PRICE, self::METRIC_SUM_PRICE);
 		
 		foreach (self::$metrics_to_headers as $metric => $header)
 		{

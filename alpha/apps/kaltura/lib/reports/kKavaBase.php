@@ -14,6 +14,7 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_BANDWIDTH_USAGE = 'bandwidth-usage';
 	const DATASOURCE_STORAGE_USAGE = 'storage-usage';
 	const DATASOURCE_TRANSCODING_USAGE = 'transcoding-usage';
+	const DATASOURCE_REACH_USAGE = 'reach-usage';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
