@@ -174,11 +174,11 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 
 		$curlWrapper->close();
 
-		KalturaLog::info("HTTP Request httpCode [" . $httpCode . "]\nResults [$results]");
+		KalturaLog::info("HTTP Request httpCode [" . $httpCode . "] Results [$results]");
 		if(!$results || $httpCode != 200)
 		{
 			throw new kTemporaryException("Sending HTTP request failed [$errCode] httpCode [$httpCode]
-			 url [$url]: $errMessage", $httpCode);
+			    url [$url]: $errMessage", $httpCode);
 		}
 		
 		return true;
