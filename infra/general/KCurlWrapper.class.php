@@ -307,7 +307,7 @@ class KCurlWrapper
 
 	/**
 	 * @param $opt
-	 * @return string
+	 * @return string|array
 	 */
 	public function getInfo($opt)
 	{
