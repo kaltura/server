@@ -168,17 +168,16 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 			$curlWrapper->setOpt( CURLOPT_SSLKEYPASSWD, $data->sslKeyPassword);
 
 		$results = $curlWrapper->doExec($url);
-		$info = $curlWrapper->getInfo();
-		$httpCode = $info['http_code'];
+		$httpCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
 		$errCode = $curlWrapper->getErrorNumber();
 		$errMessage = $curlWrapper->getError();
 
 		$curlWrapper->close();
 
-		KalturaLog::info("HTTP Request info [" . print_r($info, true) . "]\nResults [$results]");
+		KalturaLog::info("HTTP Request httpCode [" . $httpCode . "]\nResults [$results]");
 		if(!$results || $httpCode != 200)
 		{
-			throw new kTemporaryException("Sending HTTP request failed [$errCode]: $errMessage", $httpCode);
+			throw new kTemporaryException("Sending HTTP request failed [$errCode] httpCode [$httpCode]: $errMessage", $httpCode);
 		}
 		
 		return true;
