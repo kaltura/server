@@ -7,7 +7,7 @@
 class kCategorySearch extends kBaseSearch
 {
     const PEER_NAME = 'categoryPeer';
-    const PEER_RETRIEVE_FUNCTION_NAME = 'retrieveByPKs';
+    const PEER_RETRIEVE_FUNCTION_NAME = 'retrieveByPKsNoFilter';
 
     public function __construct()
     {
