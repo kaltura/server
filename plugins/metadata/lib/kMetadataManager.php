@@ -777,10 +777,7 @@ class kMetadataManager
 			$searchValues[self::ELASTIC_DATA_FIELD_NAME] = $metaDataSearchValues;
 		else
 		{
-			if($objectType == MetadataObjectType::CATEGORY)
-				$searchValues[self::ELASTIC_DATA_FIELD_NAME] = null;
-			else
-				$searchValues = null;
+			$searchValues = null;
 		}
 
 		return $searchValues; //return an array(metadata => array(...)) or null if no values
