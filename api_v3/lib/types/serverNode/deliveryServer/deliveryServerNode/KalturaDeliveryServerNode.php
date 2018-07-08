@@ -11,9 +11,16 @@ abstract class KalturaDeliveryServerNode extends KalturaServerNode
 	 */
 	public $deliveryProfileIds;
 
+	/**
+	 * Override server node default configuration - json format
+	 * @var string
+	 */
+	public $config;
+
 	private static $map_between_objects = array 
 	(
 		"deliveryProfileIds",
+		"config",
 	);
 	
 	/* (non-PHPdoc)
