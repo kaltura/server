@@ -80,12 +80,11 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$filter = new KalturaScheduledTaskProfileFilter();
 		$filter->orderBy = KalturaScheduledTaskProfileOrderBy::LAST_EXECUTION_STARTED_AT_ASC;
 		$filter->statusEqual = KalturaScheduledTaskProfileStatus::ACTIVE;
-
+		$filter->lastExecutionStartedAtLessThanOrEqual = strtotime('today midnight');
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = $maxProfiles;
 
 		$result = $scheduledTaskClient->scheduledTaskProfile->listAction($filter, $pager);
-
 		return $result->objects;
 	}
 
