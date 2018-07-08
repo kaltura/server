@@ -1139,7 +1139,7 @@ if (!class_exists("MktMktowsApiService")) {
  * @package External
  * @subpackage Marketo
  */
-class MktMktowsApiService extends kSoapClient {
+class MktMktowsApiService extends SoapClient {
 	/**
 	 * Default class map for wsdl=>php
 	 * @access private
