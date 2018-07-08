@@ -28,7 +28,7 @@ class MediaRepurposingLogsAction extends KalturaApplicationPlugin
 				$results = MediaRepurposingUtils::getDryRunResult($dryRunId);
 				$adapter = new Kaltura_FilterPaginatorList($results->objects);
 				$action->view->paginator = new Infra_Paginator($adapter, $request);
-				$action->view->scheme = $this->getSchema($results->objects);
+				$action->view->scheme = $this->getScheme($results->objects);
 				$form->populateDryRun($dryRunId, $adapter->count());
 			}
 			
@@ -41,20 +41,11 @@ class MediaRepurposingLogsAction extends KalturaApplicationPlugin
 		$action->view->form = $form;
 	}
 
-	private function getSchema($objects)
+	private function getScheme($objects)
 	{
 		if (empty($objects))
 			return array();
-
-		switch(get_class($objects[0]))
-		{
-			case "Kaltura_Client_Reach_Type_EntryVendorTask":
-				return array("id", "entryId", "userId", "status", "createdAt", "queueTime");
-			default: // entry is default media repurposing object to view
-				return array("id", "name", "userId", "views", "createdAt", "lastPlayedAt");
-		}
+		return ScheduleTaskUtils::getSchemeMap($objects[0]);
 	}
 
-
 }
-
