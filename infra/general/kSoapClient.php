@@ -11,8 +11,9 @@ class kSoapClient extends SoapClient
 	public function __soapCall ($function_name, $arguments, $options = NULL, $input_headers = NULL, &$output_headers = NULL)
 	{
 		$this->beforeCall();
-		parent::__soapCall($function_name, $arguments);
+		$ret = parent::__soapCall($function_name, $arguments);
 		$this->afterCall();
+		return $ret;
 	}
 	private function beforeCall()
 	{
