@@ -772,7 +772,7 @@ class serveFlavorAction extends kalturaAction
 		if ($mediaInfo && !$mediaInfo->getAudioBitRate())
 		{
 			$silent = array_merge(array(array('type' => 'silence')),array($clipDesc));
-			$clipDesc = array('sources' => $silent);
+			$clipDesc = array('type' => 'mixFilter','sources' => $silent);
 		}
 		return $clipDesc ;
 	}
