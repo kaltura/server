@@ -78,7 +78,7 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 			throw new Exception("VoiceBase transcription failed. Message: [" . $remoteProcess->response . "]");
 		}
 		
-		if($remoteProcess && $remoteProcess->fileStatus == VoicebaseClientHelper::VOICEBASE_MACHINE_COMPLETE_MESSAGE && $remoteProcess->requestStatus == VoicebaseClientHelper::VOICEBASE_MACHINE_COMPLETE_REQUEST_STATUS)
+		if($remoteProcess && in_array($remoteProcess->fileStatus, array(VoicebaseClientHelper::VOICEBASE_MACHINE_COMPLETE_MESSAGE, VoicebaseClientHelper::VOICEBASE_HUMAN_COMPLETE_MESSAGE)) && $remoteProcess->requestStatus == VoicebaseClientHelper::VOICEBASE_MACHINE_COMPLETE_REQUEST_STATUS)
 		{
 			return true;
 		}
