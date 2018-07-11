@@ -24,16 +24,8 @@ class Form_VendorCatalogItemPricing extends ConfigureSubForm
 	
 	public function populateFromObject($pricing)
 	{
-		if ($pricing)
-		{
-			$this->setDefault('pricePerUnit', $pricing->pricePerUnit);
-			$this->setDefault('priceFunction', $pricing->priceFunction);
-		}
-		else
-		{
-			$this->setDefault('pricePerUnit', 'N\A');
-			$this->setDefault('priceFunction', 'N\A');
-		}
+		$this->setDefault('pricePerUnit',  $pricing->pricePerUnit);
+		$this->setDefault('priceFunction',  $pricing->priceFunction);
 	}
 	
 	public function getObject($properties) 
