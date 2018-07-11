@@ -189,7 +189,10 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				return $value;
 			}
 		}
-		KalturaLog::debug("Key [$keys] not found");
+		if(is_array($keys))
+			KalturaLog::debug("The following keys were not found: " .  print_r($keys, true));
+		else
+			KalturaLog::debug("Key [$keys] not found");
 			
 		return null;
 	}

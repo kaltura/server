@@ -138,8 +138,10 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$responseProfileKey = $responseProfile->getKey();
 		$key = self::getObjectSpecificCacheKey($object, $responseProfileKey);
 		$responseProfileCacheKey = self::getResponseProfileCacheKey($responseProfileKey, $object->getPartnerId());
-		
-		list($value, $responseProfileCache) = self::get(array($key, $responseProfileCacheKey));
+
+		$results = self::get(array($key, $responseProfileCacheKey));
+		$value = array_slice($results, 0, 1);
+		$responseProfileCache = array_slice($results, 1, 1);
 		
 		$invalidationKeys = array(
 			self::getObjectKey($object),
