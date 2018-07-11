@@ -55,7 +55,7 @@
 										<option value="remove"><?php echo $this->translate('Remove'); ?></option>
 									<?php endif; ?>
 								<?php endif; ?>
-								<?php if ($partner->status != Kaltura_Client_Enum_PartnerStatus::BLOCKED): ?>
+								<?php if (false && $partner->status != Kaltura_Client_Enum_PartnerStatus::BLOCKED): ?>
 									<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect')) :?>
                                         <option value="manageNew" ><?php echo $this->translate('New KMC Login'); ?></option>
 									<?php endif;?>
