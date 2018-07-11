@@ -272,11 +272,6 @@ kmc.utils = {
 			$("#user_links").animate( menu_animation_css , 500);
 		};
 
-		var openNewKMC = function() {
-			window.location.href = '/kmcng';
-		};
-
-		$("#newKMC").click( openNewKMC );
 		$("#user").hover( openMenu ).click( openMenu );
 		$("#user_links").mouseover( function(){
 			kmc.vars.close_menu = false;
