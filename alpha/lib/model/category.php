@@ -24,7 +24,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	
 	protected $move_entries_to_parent_category = null;
 
-	const CATEGORY_ID_THAT_DOES_NOT_EXIST = 0;
+	const CATEGORY_ID_THAT_DOES_NOT_EXIST = 0xffffffff;
 	
 	const IS_AGGREGATION_CATEGORY = 'isAggregationCategory';
 	
@@ -1798,6 +1798,36 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		
 		return $parsedFullId ;
 	}
+
+	protected function getElasticMembers()
+	{
+		$categoryIdToGetAllMembers = $this->getId();
+		$inheritedParentId = $this->getInheritedParentId();
+		if($inheritedParentId)
+			$categoryIdToGetAllMembers = $inheritedParentId;
+
+		$members = categoryKuserPeer::retrieveActiveKusersByCategoryId($categoryIdToGetAllMembers);
+		if (!$members)
+			return array();
+
+		$values = array();
+		foreach ($members as $member)
+		{
+			/**
+			 * @var categoryKuser $member
+			*/
+			$values[] = strval($member->getKuserId());
+			$values[] = elasticSearchUtils::formatCategoryUserPermissionLevel($member->getKuserId(), $member->getPermissionLevel());
+			$permissionNames = $member->getPermissionNames();
+			$permissionNames = explode(',', $permissionNames);
+			foreach ($permissionNames as $permissionName)
+			{
+				$values[] = elasticSearchUtils::formatCategoryUserPermissionName($member->getKuserId(), $permissionName);
+			}
+		}
+
+		return $values;
+	}
 	
 	/**
 	 * Force modifiedColumns to be affected even if the value not changed
@@ -1916,38 +1946,37 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	public function getObjectParams($params = null)
 	{
 		$body = array(
-			'doc' => array(
-				'partner_id' => $this->getPartnerId(),
-				'partner_status' => elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()),
-				'privacy' => self::formatPrivacy($this->getPrivacy(), $this->getPartnerId()),
-				'privacy_context' => $this->getElasticSearchIndexPrivacyContext(),
-				'privacy_contexts' => $this->getElasticSearchIndexPrivacyContexts(),
-				'status' => $this->getStatus(),
-				'parent_id' => $this->getParentId(),
-				'depth' => $this->getDepth(),
-				'name' => $this->getName(),
-				'full_name' => $this->getFullName(),
-				'full_ids' => explode(',',$this->getFullIds()),
-				'entries_count' => $this->getEntriesCount(),
-				'created_at' => $this->getCreatedAt(null),
-				'updated_at' => $this->getUpdatedAt(null),
-				'direct_entries_count' => $this->getDirectEntriesCount(),
-				'direct_sub_categories_count' => $this->getDirectSubCategoriesCount(),
-				'members_count' => $this->getMembersCount(),
-				'pending_members_count' => $this->getPendingMembersCount(),
-				'pending_entries_count' => $this->getPendingEntriesCount(),
-				'description' => $this->getDescription(),
-				'tags' => explode(',', $this->getTags()),
-				'display_in_search' => $this->getDisplayInSearch(),
-				'inheritance_type' => $this->getInheritanceType(),
-				'kuser_id' => $this->getKuserId(),
-				'reference_id' => $this->getReferenceId(),
-				'inherited_parent_id' => $this->getInheritedParentId(),
-				'moderation' => $this->getModeration(),
-				'contribution_policy' => $this->getContributionPolicy(),
-			),
-			'doc_as_upsert' => true
+			'partner_id' => $this->getPartnerId(),
+			'partner_status' => elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()),
+			'privacy' => self::formatPrivacy($this->getPrivacy(), $this->getPartnerId()),
+			'privacy_context' => $this->getElasticSearchIndexPrivacyContext(),
+			'privacy_contexts' => $this->getElasticSearchIndexPrivacyContexts(),
+			'status' => $this->getStatus(),
+			'parent_id' => $this->getParentId(),
+			'depth' => $this->getDepth(),
+			'name' => $this->getName(),
+			'full_name' => $this->getFullName(),
+			'full_ids' => explode(',',$this->getFullIds()),
+			'entries_count' => $this->getEntriesCount(),
+			'created_at' => $this->getCreatedAt(null),
+			'updated_at' => $this->getUpdatedAt(null),
+			'direct_entries_count' => $this->getDirectEntriesCount(),
+			'direct_sub_categories_count' => $this->getDirectSubCategoriesCount(),
+			'members_count' => $this->getMembersCount(),
+			'pending_members_count' => $this->getPendingMembersCount(),
+			'pending_entries_count' => $this->getPendingEntriesCount(),
+			'description' => $this->getDescription(),
+			'tags' => explode(',', $this->getTags()),
+			'display_in_search' => $this->getDisplayInSearch(),
+			'inheritance_type' => $this->getInheritanceType(),
+			'kuser_id' => $this->getKuserId(),
+			'reference_id' => $this->getReferenceId(),
+			'inherited_parent_id' => $this->getInheritedParentId(),
+			'moderation' => $this->getModeration(),
+			'contribution_policy' => $this->getContributionPolicy(),
+			'kuser_ids' => $this->getElasticMembers(),
 		);
+		elasticSearchUtils::cleanEmptyValues($body);
 		return $body;
 	}
 
@@ -1956,7 +1985,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	 */
 	public function getElasticSaveMethod()
 	{
-		return ElasticMethodType::UPDATE;
+		return ElasticMethodType::INDEX;
 	}
 
 	/**

@@ -380,6 +380,10 @@ class MetadataService extends KalturaBaseService
 			if(!empty($objectIds))
 			{
 				$objectIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($objectIds, kCurrentContext::getCurrentPartnerId());
+				
+				if(!count($objectIds))
+					return $filter->getEmptyListResponse();
+				
 				if(count($objectIds))
 					$applyPartnerFilter = false;
 			}
@@ -599,7 +603,13 @@ class MetadataService extends KalturaBaseService
 		$metadataObjectClassName = kMetadataManager::getObjectTypeName($objectType);
 		$this->applyPartnerFilterForClass($metadataObjectClassName);
 		$objectPeer = kMetadataManager::getObjectPeer($objectType);
-		if(!$objectPeer::validateMetadataObjectAccess($objectId))
+		
+		if(!$objectPeer && !kCurrentContext::$is_admin_session)
+		{
+			KalturaLog::debug("Failed to validate metadata object access for dynamic object id [$objectId]");
+		}
+		
+		if($objectPeer && !$objectPeer::validateMetadataObjectAccess($objectId))
 		{
 			KalturaLog::debug("Failed to validate metadata object access for object id [$objectId] using peer [" .get_class($objectPeer) . "]");
 			//throw new KalturaAPIException(MetadataErrors::METADATA_OBJECT_ID_NOT_FOUND, $objectId);

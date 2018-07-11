@@ -2,6 +2,7 @@
 /**
  * @package plugins.attachment
  * @subpackage api.objects
+ * @relatedService AttachmentAssetService
  */
 class KalturaAttachmentAsset extends KalturaAsset  
 {

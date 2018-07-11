@@ -76,6 +76,7 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_INFO = 'info';
 	const EVENT_TYPE_SPEED = 'speed';
 	const EVENT_TYPE_VIEW = 'view';
+	const EVENT_TYPE_VIEW_PERIOD = 'viewPeriod';
 
 	// event types - storage / entry lifecycle
 	const EVENT_TYPE_STATUS = 'status';

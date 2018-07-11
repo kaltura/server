@@ -1,6 +1,7 @@
 <?php
 /**
  * @package api
+ * @relatedService FileAssetService
  * @subpackage filters.base
  * @abstract
  */
@@ -41,7 +42,7 @@ abstract class KalturaFileAssetBaseFilter extends KalturaRelatedFilter
 	}
 
 	/**
-	 * @var int
+	 * @var bigint
 	 */
 	public $idEqual;
 

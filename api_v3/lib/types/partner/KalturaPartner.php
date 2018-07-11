@@ -315,6 +315,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public $timeAlignedRenditions;
 	 
 	/**
+	* @var int
 	* @readonly
 	*/
 	public $publisherEnvironmentType;

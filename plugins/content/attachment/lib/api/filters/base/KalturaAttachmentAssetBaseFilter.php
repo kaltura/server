@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.attachment
+ * @relatedService AttachmentAssetService
  * @subpackage api.filters.base
  * @abstract
  */

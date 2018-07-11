@@ -752,6 +752,7 @@ class KalturaEntryService extends KalturaBaseService
 		$clippedEntry->setRootEntryId($recordedEntry->getRootEntryId());
 		$clippedEntry->setIsRecordedEntry(true);
 		$clippedEntry->setFlowType(EntryFlowType::LIVE_CLIPPING);
+		$clippedEntry->setStatus(entryStatus::PENDING);
 		$clippedEntry->save();
 		return $clippedTask;
 	}

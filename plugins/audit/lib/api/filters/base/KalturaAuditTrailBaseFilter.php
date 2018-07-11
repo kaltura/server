@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.audit
+ * @relatedService AuditTrailService
  * @subpackage api.filters.base
  * @abstract
  */

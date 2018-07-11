@@ -182,6 +182,11 @@ class DeliveryProfileDynamicAttributes {
 	protected  $defaultAudioLanguage = null;
 
 	/**
+	 * @var int
+	 */
+	protected  $streamType = null;
+
+	/**
 	 * @return the $addThumbnailExtension
 	 */
 	public function getAddThumbnailExtension() {
@@ -701,6 +706,22 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
+	 * @return int
+	 */
+	public function getStreamType()
+	{
+		return $this->streamType;
+	}
+
+	/**
+	 * @param int  $streamType
+	 */
+	public function setStreamType($streamType)
+	{
+		$this->streamType = $streamType;
+	}
+
+	/**
 	 * 
 	 * @param int $storageId
 	 * @param string $entryId
@@ -752,6 +773,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->sequence = $newObj->getSequence();
 		$this->hasValidSequence = $newObj->getHasValidSequence();
 		$this->defaultAudioLanguage = $newObj->getDefaultAudioLanguage();
+		$this->streamType = $newObj->getStreamType();
 	}
 }
 

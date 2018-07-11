@@ -2,6 +2,7 @@
 /**
  * @package plugins.schedule
  * @subpackage api.objects
+ * @relatedService ScheduleResourceService
  * @abstract
  */
 abstract class KalturaScheduleResource extends KalturaObject implements IRelatedFilterable, IApiObjectFactory

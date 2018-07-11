@@ -8,6 +8,11 @@ class YouTubeDistributionCsvFeedHelper
 	protected $_csvMap = array();
 	protected $_captionCsvMap = array();
 
+	const METADATA_CUSTOME_USAGE_POLICY_FIELD = "CustomUsagePolicy";
+	const METADATA_CUSTOME_MATCH_POLICY_FIELD = "CustomMatchPolicy";
+	const METADATA_PROFILE_YOUTUBE_CUSTOM_MATCH_POLICY_SYSTEM_NAME = "YoutubeCustomMatchPolicy";
+	const METADATA_PROFILE_YOUTUBE_CUSTOM_USAGE_POLICY_SYSTEM_NAME = "YoutubeCustomUsagePolicy";
+
 	/**
 	 * @var string
 	 */
@@ -28,25 +33,25 @@ class YouTubeDistributionCsvFeedHelper
 		$this->_metadataTempFileName = 'youtube_csv20_' . $timestampName . '.csv';
 	}
 
-	public static function initializeDefaultSubmitFeed(KalturaYouTubeDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $captionAssetIds)
+	public static function initializeDefaultSubmitFeed(KalturaYouTubeDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $captionAssetIds, $entryId = null)
 	{
 		$feed = new YouTubeDistributionCsvFeedHelper($distributionProfile);
-		$feed->genericHandling($distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath);
+		$feed->genericHandling($distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, null, $entryId);
 		$feed->handleCaptions($captionAssetIds);
 
 		return $feed;
 	}
 
-	public static function initializeDefaultUpdateFeed(KalturaYouTubeDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, YouTubeDistributionRemoteIdHandler $remoteIdHandler)
+	public static function initializeDefaultUpdateFeed(KalturaYouTubeDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, YouTubeDistributionRemoteIdHandler $remoteIdHandler, $entryId = null)
 	{
 		$feed = new YouTubeDistributionCsvFeedHelper($distributionProfile);
-		$feed->genericHandling($distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $remoteIdHandler->getVideoId());
+		$feed->genericHandling($distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $remoteIdHandler->getVideoId(), $entryId);
 		return $feed;
 	}
 
 	public function handleCaptions($captionAssetIds)
 	{
-		$captionAssetInfo = $this->getCaptionAssetInfo($captionAssetIds);
+		$captionAssetInfo = $this->getCaptionAssetInfoForCsv($captionAssetIds);
 		foreach($captionAssetInfo as $captionInfo)
 		{
 			$captionData = array();
@@ -61,13 +66,13 @@ class YouTubeDistributionCsvFeedHelper
 		}
 	}
 
-	public function genericHandling(KalturaYouTubeDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $videoId = null)
+	public function genericHandling(KalturaYouTubeDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $videoId = null, $entryId)
 	{
 		// thumbnail file
 		if (file_exists($thumbnailFilePath))
 			$this->setCsvFieldValue('custom_thumbnail', pathinfo($thumbnailFilePath, PATHINFO_BASENAME));
 
-		$this->setDataByFieldValues($fieldValues, $distributionProfile, $videoId, $videoFilePath);
+		$this->setDataByFieldValues($fieldValues, $distributionProfile, $videoId, $videoFilePath, $entryId);
 		$this->setAdParamsByFieldValues($fieldValues, $distributionProfile);
 
 	}
@@ -80,7 +85,7 @@ class YouTubeDistributionCsvFeedHelper
 		return $feed;
 	}
 
-	public function setDataByFieldValues(array $fieldValues, KalturaYouTubeDistributionProfile $distributionProfile, $videoId = null, $videoFilePath = null)
+	public function setDataByFieldValues(array $fieldValues, KalturaYouTubeDistributionProfile $distributionProfile, $videoId = null, $videoFilePath = null, $entryId)
 	{
 		if ($videoId) // in case of update
 			$this->setCsvFieldValue('video_id',$videoId);
@@ -92,7 +97,7 @@ class YouTubeDistributionCsvFeedHelper
 			if ($this->isAllowedValue($distributionProfile->enableContentId))
 			{
 				$this->setCsvFieldValue('enable_content_id',"Yes");
-				$this->appendRightsAdminByFieldValues($fieldValues, $distributionProfile);
+				$this->appendRightsAdminByFieldValues($fieldValues, $distributionProfile, $entryId);
 			}
 			if ($this->isNotAllowedValue($distributionProfile->enableContentId))
 				$this->setCsvFieldValue('enable_content_id',"No");
@@ -188,7 +193,6 @@ class YouTubeDistributionCsvFeedHelper
 	}
 	/**
 	 * @param KalturaYoutubeDistributionProfile $distributionProfile
-	 * @return null|string
 	 */
 	protected function setDefaultCategory(array $fieldValues , KalturaYoutubeDistributionProfile $distributionProfile)
 	{
@@ -201,7 +205,9 @@ class YouTubeDistributionCsvFeedHelper
 	}
 
 	/**
-	 * @return null|string
+	 * @param array $fieldValues
+	 * @param $fieldName
+	 * @param $defaultValue
 	 */
 	protected function getAdvertisingValue(array $fieldValues , $fieldName, $defaultValue )
 	{
@@ -216,7 +222,9 @@ class YouTubeDistributionCsvFeedHelper
 
 
 	/**
-	 * @return null|string
+	 * @param array $fieldValues
+	 * @param $fieldName
+	 * @param $defaultValue
 	 */
 	protected function getPolicyValue(array $fieldValues , $fieldName, $defaultValue )
 	{
@@ -230,7 +238,7 @@ class YouTubeDistributionCsvFeedHelper
 	}
 
 
-	public function getCaptionAssetInfo($captionAssetIds)
+	public function getCaptionAssetInfoForCsv($captionAssetIds)
 	{
 		$captionAssetInfo = array();
 		
@@ -250,10 +258,14 @@ class YouTubeDistributionCsvFeedHelper
 				$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				if(kFileSyncUtils::fileSync_exists($syncKey))
 				{
-			    	$captionAssetInfo[$asset->getId()]['fileUrl'] = kFileSyncUtils::getLocalFilePathForKey ( $syncKey, false );
-			    	$captionAssetInfo[$asset->getId()]['fileExt'] = $asset->getFileExt();
-			    	$captionAssetInfo[$asset->getId()]['language'] = $asset->getLanguage();
-			    	break;
+					$captionInfo = array();
+					$captionInfo['fileUrl'] = kFileSyncUtils::getLocalFilePathForKey ( $syncKey, false );
+					$captionInfo['fileExt'] = $asset->getFileExt();
+					$twoCodeLanguage = languageCodeManager::getTwoCodeFromKalturaName($asset->getLanguage());
+					if (!$twoCodeLanguage)
+						continue;
+					$captionInfo['language'] = $twoCodeLanguage;
+					$captionAssetInfo[$asset->getId()]= $captionInfo;
 				}
 			}
 		}
@@ -323,13 +335,37 @@ class YouTubeDistributionCsvFeedHelper
 		$this->setCsvFieldValue('ad_types', $adTypes);
 	}
 
-	public function appendRightsAdminByFieldValues(array $fieldValues, KalturaYouTubeDistributionProfile $distributionProfile)
+	private function getYouTubePolicyMetadataCustomValue($systemName, $fieldName, $partnerId, $entryId)
 	{
-		$usagePolicy = $this->getPolicyValue($fieldValues, KalturaYouTubeDistributionField::POLICY_COMMERCIAL, $distributionProfile->commercialPolicy );
-		$this->setCsvFieldValue('usage_policy', $usagePolicy );
+		$metaDataProfile = MetadataProfilePeer::retrieveBySystemName($systemName, $partnerId);
+		if (!$metaDataProfile)
+			return null;
 
-		$matchPolicy = $this->getPolicyValue($fieldValues, KalturaYouTubeDistributionField::POLICY_UGC, $distributionProfile->ugcPolicy );
-		$this->setCsvFieldValue('match_policy', $matchPolicy );
+		$metadata = MetadataPeer::retrieveByObject($metaDataProfile->getId(), MetadataObjectType::ENTRY, $entryId);
+		if (!$metadata)
+			return null;
+
+		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+		$xml = kFileSyncUtils::file_get_contents($key, true, false);
+		$xmlObj = simplexml_load_string($xml);
+		if (isset($xmlObj->$fieldName))
+			return (string)$xmlObj->$fieldName;
+		return null;
+	}
+
+	public function appendRightsAdminByFieldValues(array $fieldValues, KalturaYouTubeDistributionProfile $distributionProfile, $entryId)
+	{
+		$usagePolicy = $this->getPolicyValue($fieldValues, KalturaYouTubeDistributionField::POLICY_COMMERCIAL, $distributionProfile->commercialPolicy);
+		if ($usagePolicy == self::METADATA_CUSTOME_USAGE_POLICY_FIELD)
+			$usagePolicy = $this->getYouTubePolicyMetadataCustomValue(self::METADATA_PROFILE_YOUTUBE_CUSTOM_USAGE_POLICY_SYSTEM_NAME, self::METADATA_CUSTOME_USAGE_POLICY_FIELD, $distributionProfile->partnerId, $entryId);
+		if ($usagePolicy)
+			$this->setCsvFieldValue('usage_policy', $usagePolicy);
+
+		$matchPolicy = $this->getPolicyValue($fieldValues, KalturaYouTubeDistributionField::POLICY_UGC, $distributionProfile->ugcPolicy);
+		if ($matchPolicy == self::METADATA_CUSTOME_MATCH_POLICY_FIELD)
+			$matchPolicy = $this->getYouTubePolicyMetadataCustomValue(self::METADATA_PROFILE_YOUTUBE_CUSTOM_MATCH_POLICY_SYSTEM_NAME, self::METADATA_CUSTOME_MATCH_POLICY_FIELD, $distributionProfile->partnerId, $entryId);
+		if ($matchPolicy)
+			$this->setCsvFieldValue('match_policy', $matchPolicy);
 	}
 
 	public function getCsvMap()

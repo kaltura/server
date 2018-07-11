@@ -3,6 +3,7 @@
 /**
  * @package plugins.reach
  * @subpackage api.objects
+ * @relatedService ReachProfileService
  */
 class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 {
@@ -126,7 +127,7 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 	public $credit;
 	
 	/**
-	 * @var int
+	 * @var float
 	 * @readonly
 	 */
 	public $usedCredit;

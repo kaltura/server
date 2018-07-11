@@ -11,6 +11,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 	const LOCK_KEY_PREFIX = 'fileSyncLock:id=';
 	const LOCK_EXPIRY = 36000;
 	const MAX_FILESYNCS_PER_CHUNK = 100;
+	const MAX_DELAYED_FILESYNCS_PER_CHUNK = 10;
 	const MAX_FILESYNC_QUERIES_PER_CALL = 100;
 	
 	
@@ -89,7 +90,10 @@ class FileSyncImportBatchService extends KalturaBatchService
 		
 		$baseCriteria->addAscendingOrderByColumn(FileSyncPeer::ID);
 
-		$baseCriteria->setLimit(self::MAX_FILESYNCS_PER_CHUNK);
+		$chunkSize = $createdAtLessThanOrEqual ?
+			self::MAX_DELAYED_FILESYNCS_PER_CHUNK : 
+			self::MAX_FILESYNCS_PER_CHUNK;
+		$baseCriteria->setLimit($chunkSize);
 		
 		$lockedFileSyncs = array();
 		$lockedFileSyncsSize = 0;
@@ -137,7 +141,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 			}
 			
 			// if we got less than the limit no reason to perform any more queries
-			if (count($fileSyncs) < self::MAX_FILESYNCS_PER_CHUNK)
+			if (count($fileSyncs) < $chunkSize)
 			{
 				$done = true;
 			}

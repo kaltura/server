@@ -550,6 +550,8 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 
 		$this->removeElement('ugc_policy');
 		$this->removeElement('commercial_policy');
+		$this->removeElement('notification_email');
+		$this->removeElement('default_category');
 
 		// modify the names of the elements to better fit the new spec
 		$this->getElement('username')->setLabel('Channel:');
@@ -558,18 +560,20 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 			'label' => 'Match Policy:',
 			'multioptions' => array(
 				'' => 'Default',
-				'Monetize in all countries' => 'Monetize',
-				'Track in all countries' => 'Track',
-				'Block in all countries' => 'Block',
+				'Monetize in all countries' => 'Monetize in all countries',
+				'Track in all countries' => 'Track in all countries',
+				'Block in all countries' => 'Block in all countries',
+				'CustomMatchPolicy' => 'Set manually per entry',
 			)));
 
 		$this->addElement('select', 'commercial_policy', array(
 			'label' => 'Usage Policy:',
 			'multioptions' => array(
 				'' => 'Default',
-				'Monetize in all countries' => 'Monetize',
-				'Track in all countries' => 'Track',
-				'Block in all countries' => 'Block',
+				'Monetize in all countries' => 'Monetize in all countries',
+				'Track in all countries' => 'Track in all countries',
+				'Block in all countries' => 'Block in all countries',
+				'CustomUsagePolicy' => 'Set manually per entry',
 			)));
 
 
@@ -591,11 +595,50 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 		)));
 
 		$this->getElement('allow_adsense_for_video')->setLabel('Display ads:');
+
 		$this->getElement('allow_adsense_for_video')->setOptions( array(
 			'multioptions' => array(
 				'' => 'Default',
 				'True' => 'True',
 				'False' => 'False',
+			)));
+
+		$this->addElement('select', 'default_category', array(
+			'label' => 'Default Category:',
+			'multioptions' => array(
+				'' => 'Default',
+				'Animals' => 'Animals',
+				'Autos' => 'Autos',
+				'Autos &Vehicles' => 'Autos & Vehicles',
+				'Comedy' => 'Comedy',
+				'Education' => 'Education',
+				'Entertainment' => 'Entertainment',
+				'Film' => 'Film',
+				'Film  & Animation' => 'Film & Animation',
+				'Films' => 'Films',
+				'Gadgets' => 'Gadgets',
+				'Games' => 'Games',
+				'Gaming' => 'Gaming',
+				'Government' => 'Government',
+				'Howto' => 'Howto',
+				'Howto & style' => 'Howto & Style',
+				'Music' => 'Music',
+				'News' => 'News',
+				'News  & Politics' => 'News & Politics',
+				'Nonprofit' => 'Nonprofit',
+				'Nonprofits' => 'Nonprofits',
+				'Nonprofits  & Activism' => 'Nonprofits & Activism',
+				'People' => 'People',
+				'People  & Blogs' => 'People & Blogs',
+				'Pets' => 'Pets',
+				'Pets  & animals' => 'Pets  & Animals',
+				'Science' => 'Science',
+				'SScience  & Technology' => 'Science  & Technology',
+				'Sports' => 'Sports',
+				'Tech' => 'Tech',
+				'Travel' => 'Travel',
+				'Travel  & Events' => 'Travel & Events',
+				'Vehicles' => 'Vehicles'
 			)));
 
 		$this->getElement('third_party_ads')->setLabel('Third Party Ads:');

@@ -62,7 +62,7 @@ class KalturaVendorCaptionsCatalogItem extends KalturaVendorCatalogItem
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array("sourceLanguage", "outputFormat"));
+		$this->validatePropertyNotNull(array("sourceLanguage"));
 		return parent::validateForInsert($propertiesToSkip);
 	}
 	

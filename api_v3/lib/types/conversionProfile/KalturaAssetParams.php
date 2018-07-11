@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @relatedService ignore
  */
 class KalturaAssetParams extends KalturaObject implements IRelatedFilterable 
 {

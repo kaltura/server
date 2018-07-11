@@ -1345,6 +1345,7 @@ return array(
 	'Kaltura_Client_Type_UrlTokenizerVnpt'        => 'Vnpt Tokenizer',
 	'Kaltura_Client_Type_UrlTokenizerCht'		=> 'CHT Tokenizer',
 	'Kaltura_Client_Type_UrlTokenizerChinaCache'		=> 'ChinaCache Tokenizer',
+	'Kaltura_Client_Type_UrlTokenizerWowzaSecureToken'	=> 'Wowza SecureToken v2',
 
 	'Kaltura_Client_Type_UrlRecognizer' => "default recognizer",
 
@@ -1475,4 +1476,5 @@ return array(
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::PT' => "Portuguese",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::RU' => "Russian",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::TR' => "Turkish",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::TH' => "Thai",
 );

@@ -73,7 +73,9 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer
 		$allMediaRepurposingProfilesOnPartner = ScheduledTaskProfilePeer::retrieveBySystemName(MediaRepurposingUtils::MEDIA_REPURPOSING_SYSTEM_NAME, $partnerId);
 		$mediaRepurposingProfilesWithSearchOnGivenMetadataId = array();
 		foreach($allMediaRepurposingProfilesOnPartner as $mediaRepurposingProfile) {
-			/* @var $mr ScheduledTaskProfile*/
+			/* @var $mediaRepurposingProfile ScheduledTaskProfile*/
+			if (!$mediaRepurposingProfile->getObjectFilter() || !$mediaRepurposingProfile->getObjectFilter()->getAdvancedSearch())
+				continue;
 			$items = $mediaRepurposingProfile->getObjectFilter()->getAdvancedSearch()->getItems(); // always have items in advance search because that how the MR is build
 			foreach($items as $item) {
 				if ($item instanceof MetadataSearchFilter && $item->getMetadataProfileId() == $metadataProfileId)
