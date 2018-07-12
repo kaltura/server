@@ -85,7 +85,8 @@ class kVendorCredit
 	 */
 	public function setFromDate($fromDate)
 	{
-		$this->fromDate = $fromDate;
+		$beginOfDay = strtotime("today", $fromDate);
+		$this->fromDate = $beginOfDay;
 	}
 
 	/**
