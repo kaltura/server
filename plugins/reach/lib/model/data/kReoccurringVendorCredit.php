@@ -14,7 +14,7 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 	 *  @var VendorCreditRecurrenceFrequency
 	 */
 	protected $frequency;
-	
+
 	/**
          *  @var string
          */
@@ -30,8 +30,9 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
  	*/
 	public function setFromDate($toDate)
 	{
-        	$this->periodStartDate = $toDate;
-        	parent::setFromDate($toDate);
+		parent::setFromDate($toDate);
+        $this->periodStartDate = $this->fromDate;
+
 	}
 
 	/**
@@ -39,7 +40,8 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 	 */
 	public function setToDate($toDate)
 	{
-		$this->toDate = $toDate;
+		$endOfDay = strtotime("tomorrow", $toDate) - 1;
+		$this->toDate = $endOfDay;
 	}
 
 	/**
@@ -57,7 +59,7 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 	{
 		return $this->frequency;
 	}
-	
+
 	/**
 	 * @param ScheduleEventRecurrenceFrequency $frequency
 	 */
@@ -78,24 +80,26 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 	}
 
 	       public function calculateNextPeriodDates($startTime,$currentDate)
-       {
-               $endTime = strtotime('+1 '.$this->getFrequency(),$startTime);
-               while ($endTime < $currentDate )
-               {
-                       $startTime = $endTime;
-                       $endTime= strtotime('+1 '.$this->getFrequency(), $endTime);
-               }
-               $this->periodStartDate = $startTime;
-               $this->periodEndDate = min ($endTime, $this->getToDate());
-       }
+	       {
+		       $endTime = strtotime('+1 ' . $this->getFrequency(), $startTime);
+		       while ($endTime < $currentDate)
+		       {
+			       $startTime = $endTime;
+			       $endTime = strtotime('+1 ' . $this->getFrequency(), $endTime);
+		       }
+		       $this->periodStartDate = $beginOfDay = strtotime("today", $startTime);
+		       $this->periodEndDate = min($endTime, $this->getToDate());
+		       $this->periodEndDate = $endOfDay = strtotime("tomorrow", $this->periodEndDate) - 1;
+
+	       }
 
       public function setPeriodDates()
-      {
+       {
 	       $this->periodStartDate = $this->getFromDate();
-               $this->periodEndDate = $this->getFromDate();
-               $this->calculateNextPeriodDates( $this->periodEndDate, time());
-      }
-	
+	       $this->periodEndDate = $this->getFromDate();
+	       $this->calculateNextPeriodDates($this->periodEndDate, time());
+       }
+
         /***
         * @param $date
         * @return int
