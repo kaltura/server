@@ -139,12 +139,23 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$key = self::getObjectSpecificCacheKey($object, $responseProfileKey);
 		$responseProfileCacheKey = self::getResponseProfileCacheKey($responseProfileKey, $object->getPartnerId());
 
+		$objectCache = null;
+		$responseProfileCache = null;
 		$cachedResults = self::get(array($key, $responseProfileCacheKey));
-		$values = array_values($cachedResults);
-		$objectCache = $values[0];
-		$responseProfileCache = $values[1];
+		if($cachedResults)
+		{
+			$values = array_values($cachedResults);
+			if(sizeof($cachedResults) < 2)
+				KalturaLog::debug("Missing values. Only the following values returned: " . print_r($cachedResults));
+			else
+			{
+				$objectCache = $values[0];
+				$responseProfileCache = $values[1];
+			}
+		}
+		else
+			KalturaLog::debug("Missing records for given keys");
 
-		
 		$invalidationKeys = array(
 			self::getObjectKey($object),
 			self::getRelatedObjectKey($object, $responseProfileKey),
