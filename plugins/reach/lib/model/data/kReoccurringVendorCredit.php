@@ -31,7 +31,7 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 	public function setFromDate($toDate)
 	{
 		parent::setFromDate($toDate);
-        $this->periodStartDate = $this->fromDate;
+		$this->periodStartDate = $this->fromDate;
 
 	}
 
