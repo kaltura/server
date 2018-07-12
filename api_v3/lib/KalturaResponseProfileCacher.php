@@ -139,18 +139,20 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$key = self::getObjectSpecificCacheKey($object, $responseProfileKey);
 		$responseProfileCacheKey = self::getResponseProfileCacheKey($responseProfileKey, $object->getPartnerId());
 
-		$results = self::get(array($key, $responseProfileCacheKey));
-		$value = array_slice($results, 0, 1);
-		$responseProfileCache = array_slice($results, 1, 1);
+		$cachedResults = self::get(array($key, $responseProfileCacheKey));
+		$values = array_values($cachedResults);
+		$objectCache = $values[0];
+		$responseProfileCache = $values[1];
+
 		
 		$invalidationKeys = array(
 			self::getObjectKey($object),
 			self::getRelatedObjectKey($object, $responseProfileKey),
 		);
 		
-		if($value && self::areKeysValid($invalidationKeys, $value->{self::CACHE_VALUE_TIME}))
+		if($objectCache && self::areKeysValid($invalidationKeys, $objectCache->{self::CACHE_VALUE_TIME}))
 		{
-			$cachedApiObject = unserialize($value->apiObject);
+			$cachedApiObject = unserialize($objectCache->apiObject);
 			if($cachedApiObject instanceof KalturaObject)
 			{
 				$properties = get_object_vars($cachedApiObject);
