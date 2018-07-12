@@ -89,7 +89,7 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 		       }
 		       $this->periodStartDate = $beginOfDay = strtotime("today", $startTime);
 		       $this->periodEndDate = min($endTime, $this->getToDate());
-		       $this->periodEndDate = $endOfDay = strtotime("tomorrow", $this->periodEndDate) - 1;
+		       $this->periodEndDate = strtotime("tomorrow", $this->periodEndDate) - 1;
 
 	       }
 
