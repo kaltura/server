@@ -195,7 +195,6 @@ class MetadataPeer extends BaseMetadataPeer implements IRelatedObjectPeer
 		{
 			case MetadataPeer::OBJECT_TYPE:
 				return $partnerId . self::METADATA_OBJECT_TYPE_PREFIX . $fieldValue;
-				break;
 			default:
 				return $fieldValue;
 			
