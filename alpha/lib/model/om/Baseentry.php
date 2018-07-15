@@ -4249,8 +4249,17 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			if ($this->isColumnModified(entryPeer::CUSTOM_DATA))
 			{
 				if (!is_null($this->custom_data_md5))
+				{
 					$criteria->add(entryPeer::CUSTOM_DATA, "MD5(cast(" . entryPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
 					//casting to latin char set to avoid mysql and php md5 difference
+					$ids = kDataCenterMgr::getDcIds();
+					if (count($ids) > 1) // if multi DC configuration don't check costume data on other DC
+					{
+						$currentDcId = kDataCenterMgr::getCurrentDcId();
+						//addOr(column, value, comparison)
+						$criteria->addOr(entryPeer::CUSTOM_DATA," '$currentDcId' != getDC()" ,Criteria::CUSTOM);
+					}
+				}
 				else 
 					$criteria->add(entryPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
 			}
@@ -7116,7 +7125,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		$customDataOldValue = $customData->get($name, $namespace);
 		if(!is_null($customDataOldValue) && serialize($customDataOldValue) === serialize($value))
 			return;
-		
+				
 		$currentNamespace = '';
 		if($namespace)
 			$currentNamespace = $namespace;

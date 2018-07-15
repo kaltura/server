@@ -1177,8 +1177,17 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			if (\$this->isColumnModified(".$this->getPeerClassname()."::CUSTOM_DATA))
 			{
 				if (!is_null(\$this->custom_data_md5))
+				{
 					\$criteria->add(".$this->getPeerClassname()."::CUSTOM_DATA, \"MD5(cast(\" . ".$this->getPeerClassname()."::CUSTOM_DATA . \" as char character set latin1)) = '\$this->custom_data_md5'\", Criteria::CUSTOM);
 					//casting to latin char set to avoid mysql and php md5 difference
+					\$ids = kDataCenterMgr::getDcIds();
+					if (count(\$ids) > 1) // if multi DC configuration don't check costume data on other DC
+					{
+						\$currentDcId = kDataCenterMgr::getCurrentDcId();
+						//addOr(column, value, comparison)
+						\$criteria->addOr(entryPeer::CUSTOM_DATA,\" '\$currentDcId' != getDC()\" ,Criteria::CUSTOM);
+					}
+				}
 				else 
 					\$criteria->add(".$this->getPeerClassname()."::CUSTOM_DATA, NULL, Criteria::ISNULL);
 			}

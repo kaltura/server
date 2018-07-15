@@ -1,3 +1,21 @@
+# Naos 14.3.0 #
+
+## Fix out of sync Entries between DC's##
+Issue Type:  Bug
+Issue ID: PLAT-8908
+
+## Notes ##
+    Needs to run only on Multi-DC environments.
+    In the deployment commnad you will need to change:
+        @DB_HOST@ - the host
+        @DB_USER@ - mysql user name
+        @DB_PASSWORD@ - mysql password 
+        @DC_ID@ - The ID of the DC (ID can be found in /opt/kaltura/app/configurations/hosts/dc_config/*.ini files)
+    The script need to run  on each of the Master DB's(PA & NY).
+
+### Deployment command ###
+    Run mysql -h@DB_HOST@ -u@DB_USER@ -p@DB_PASSWORD@ -P3306 kaltura -e "create function getDC() Returns int DETERMINISTIC Return '@DC_ID@'"
+
 # Naos 14.2.0 #
 
 ## Allow Wowza Media-Server to get conversion profile##
