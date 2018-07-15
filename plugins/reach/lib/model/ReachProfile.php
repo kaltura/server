@@ -18,7 +18,6 @@ class ReachProfile extends BaseReachProfile
 	const CUSTOM_DATA_RULES_ARRAY_COMPRESSED = 				'rules_array_compressed';
 	const CUSTOM_DATA_DICTIONARY_ARRAY_COMPRESSED = 		'dictionary_array_compressed';
 	const CUSTOM_DATA_DEFAULT_OUTPUT_FORMAT = 				'default_output_format';
-	const CUSTOM_DATA_DEFAULT_SOURCE_LANGUAGE = 			'default_source_language';
 	
 	const CUSTOM_DATA_AUTO_DISPLAY_MACHINE_ON_PLAYER = 		'auto_display_machine_captions_on_player';
 	const CUSTOM_DATA_AUTO_DISPLAY_HUMAN_ON_PLAYER = 		'auto_display_human_captions_on_player';
@@ -35,9 +34,7 @@ class ReachProfile extends BaseReachProfile
 	
 	const CUSTOM_DATA_CREDIT_USAGE_PERCENTAGE = 			'credit_usage_percentage';
 	const CUSTOM_DATA_CONTENT_DELETION_POLICY = 			'content_deletion_policy';
-
-	const CUSTOM_DATA_CREDIT_RESET_HISTORY =                'credit_reset_history';
-	const MAX_CREDIT_HISTORY_TO_KEEP =                      10;
+	
 	//setters
 	
 	public function setEnableMachineModeration($v)
@@ -53,11 +50,6 @@ class ReachProfile extends BaseReachProfile
 	public function setDefaultOutputFormat($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_DEFAULT_OUTPUT_FORMAT, $v);
-	}
-	
-	public function setDefaultSourceLanguage($v)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_DEFAULT_SOURCE_LANGUAGE, $v);
 	}
 	
 	public function setAutoDisplayMachineCaptionsOnPlayer($v)
@@ -207,11 +199,6 @@ class ReachProfile extends BaseReachProfile
 		return $this->getFromCustomData(self::CUSTOM_DATA_DEFAULT_OUTPUT_FORMAT ,null, VendorCatalogItemOutputFormat::SRT);
 	}
 	
-	public function getDefaultSourceLanguage()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_DEFAULT_SOURCE_LANGUAGE ,null, LanguageKey::ENG);
-	}
-	
 	public function getAutoDisplayMachineCaptionsOnPlayer()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_AUTO_DISPLAY_MACHINE_ON_PLAYER, null, false);
@@ -339,24 +326,6 @@ class ReachProfile extends BaseReachProfile
 			$this->setUsedCredit($syncedCredit);
 		}
 		$this->setCredit($reachProfileCredit);
-	}
-
-	public function setCreditResetHistory($v)
-	{
-		$currentCreditHistory = $this->getCreditResetHistory();
-		$currentCreditHistory[] = $v;
-		$offset = count($currentCreditHistory) >  self::MAX_CREDIT_HISTORY_TO_KEEP ? 1 : 0;
-
-		$currentCreditHistory = array_splice($currentCreditHistory, $offset, self::MAX_CREDIT_HISTORY_TO_KEEP);
-		$this->putInCustomData(self::CUSTOM_DATA_CREDIT_RESET_HISTORY, serialize($currentCreditHistory));
-	}
-
-	public function getCreditResetHistory()
-	{
-		$creditResetHistory = $this->getFromCustomData(self::CUSTOM_DATA_CREDIT_RESET_HISTORY, null, array());
-		if(count($creditResetHistory))
-			$creditResetHistory = unserialize($creditResetHistory);
-		return $creditResetHistory;
 	}
 	
 	public function shouldModerate($type)
