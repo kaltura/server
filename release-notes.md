@@ -11,7 +11,7 @@ Issue ID: PLAT-8908
         @DB_USER@ - mysql user name
         @DB_PASSWORD@ - mysql password 
         @DC_ID@ - The ID of the DC (ID can be found in /opt/kaltura/app/configurations/hosts/dc_config/*.ini files)
-    The script need to run  on each of the Master DB's(PA & NY).
+    The script needs to be run on all Master DB's.
 
 ### Deployment command ###
     Run mysql -h@DB_HOST@ -u@DB_USER@ -p@DB_PASSWORD@ -P3306 kaltura -e "create function getDC() Returns int DETERMINISTIC Return '@DC_ID@'"
