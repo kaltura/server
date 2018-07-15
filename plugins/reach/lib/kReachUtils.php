@@ -83,6 +83,12 @@ class kReachUtils
 	 */
 	public static function hasCreditExpired(ReachProfile $reachProfile)
 	{
+		if ($reachProfile->shouldSyncCredit())
+		{
+			$reachProfile->syncCredit();
+			$reachProfile->save();
+		}
+
 		$credit = $reachProfile->getCredit();
 		return !$credit->isActive();
 	}

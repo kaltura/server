@@ -286,6 +286,9 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		$values = explode(' ',$value);
 		foreach ($values as $val)
 		{
+			if ($this->getFeedSpecVersion() == YouTubeDistributionFeedSpecVersion::VERSION_3)
+				break;
+
 			if (!is_null($val) && !kString::isEmailString($val))
 			{
 				$errorMsg = $this->getUserFriendlyFieldName($fieldName).' value must be an email string [value:'.$val.']';

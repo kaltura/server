@@ -1059,7 +1059,13 @@ class myPartnerUtils
 				$partner->setExtendedFreeTrail(null);
 				$partner->setExtendedFreeTrailExpiryDate(null);
 				$partner->setExtendedFreeTrailExpiryReason('');
-			}else{
+			}
+			elseif (myPartnerUtils::isPartnerCreatedAsMonitoredFreeTrial($partner))
+			{
+				KalturaLog::debug("Partner [" . $partner->getId() . "] trial account extended - monitored trial");
+				return;
+			}
+			else{
 				//ExtendedFreeTrail
 				if (($partner->getExtendedFreeTrailExpiryDate() < (time() + (dateUtils::DAY * 7))) && !$partner->getExtendedFreeTrailEndsWarning())
 				{
@@ -1853,6 +1859,15 @@ class myPartnerUtils
 
 		$endDay = $partnerPackageInfo['trial_num_days'];
 		$deletionDay = $partnerPackageInfo['trial_num_days_until_deletion'];
+
+		if($partner->getExtendedFreeTrailExpiryDate())
+		{
+			$formattedExtensionDate = date('Y-m-d H:i:s', $partner->getExtendedFreeTrailExpiryDate());
+			$endDay = dateUtils::diffInDays($partner->getCreatedAt(), $formattedExtensionDate);
+			$deletionDay = $endDay + 30;
+			KalturaLog::debug("After trial extension the End day is: [$endDay]");
+		}
+
 		$freeTrialUpdatesDays = explode(',', $partnerPackageInfo['notification_days']);
 
 		$dayInFreeTrial = dateUtils::diffInDays($partner->getCreatedAt(), dateUtils::today());

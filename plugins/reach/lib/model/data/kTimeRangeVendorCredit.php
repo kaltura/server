@@ -28,7 +28,8 @@ class kTimeRangeVendorCredit extends kVendorCredit
 	 */
 	public function setToDate($toDate)
 	{
-		$this->toDate = $toDate;
+		$endOfDay = strtotime("tomorrow", $toDate) - 1;
+		$this->toDate = $endOfDay;
 	}
 
 	public function addAdditionalCriteria(Criteria $c)

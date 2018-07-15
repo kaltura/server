@@ -192,8 +192,11 @@ class ReachProfileService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $reachProfileId);
 
 		// set the object status to deleted
-		$dbReachProfile->syncCredit();
-		$dbReachProfile->save();
+		if( $dbReachProfile->shouldSyncCredit())
+		{
+			$dbReachProfile->syncCredit();
+			$dbReachProfile->save();
+		}
 
 		// return the saved object
 		$reachProfile = new KalturaReachProfile();

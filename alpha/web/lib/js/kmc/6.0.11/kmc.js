@@ -1,4 +1,4 @@
-/*! KMC - v6.0.11 - 2018-04-30
+/*! KMC - v6.0.11 - 2018-07-11
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2018 Amir Chervinsky; Licensed GNU */
 /**
@@ -4423,6 +4423,10 @@ kmc.utils = {
 			$("#user_links").css( menu_default_css );
 			$("#user_links").animate( menu_animation_css , 500);
 		};
+		var openNewKMC = function() {
+			window.location.href = '/kmcng';
+		};
+		$("#newKMC").click( openNewKMC );
 
 		$("#user").hover( openMenu ).click( openMenu );
 		$("#user_links").mouseover( function(){
