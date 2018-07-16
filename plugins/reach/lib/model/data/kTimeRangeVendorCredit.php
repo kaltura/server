@@ -51,7 +51,7 @@ class kTimeRangeVendorCredit extends kVendorCredit
 		}
 		
 		$credit = $this->credit;
-		if($this->allowOverage)
+		if(isset($this->overageCredit) && $this->overageCredit > 0)
 			$credit += $this->overageCredit;
 		
 		return $credit;
