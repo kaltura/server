@@ -24,11 +24,15 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 	 */
 	protected $periodEndDate;
 	
-	
 	/**
 	 * @var int
 	 */
 	protected $initialOverageCredit;
+	
+	/**
+	 * @var bool
+	 */
+	protected $initialOverageCreditInitialized;
 	
 	/**
 	 * @param string $toDate
@@ -149,7 +153,10 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 	public function setOverageCredit($overageCredit)
 	{
 		$this->overageCredit = $overageCredit;
-		if(!$this->initialOverageCredit)
+		if(!$this->initialOverageCreditInitialized)
+		{
 			$this->initialOverageCredit = $overageCredit;
+			$this->initialOverageCreditInitialized = true;
+		}
 	}
 }

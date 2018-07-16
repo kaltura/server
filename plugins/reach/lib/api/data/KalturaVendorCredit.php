@@ -50,7 +50,7 @@ class KalturaVendorCredit extends KalturaBaseVendorCredit
 		$this->validatePropertyNotNull("fromDate");
 		$this->validatePropertyNotNull("credit");
 
-		if(isset($this->overageCredit) && $this->overageCredit > 0)
+		if($this->overageCredit > 0)
 			throw new KalturaAPIException(KalturaReachErrors::CANNOT_SET_ALLOW_OVERAGE_CREDIT);
 
 		parent::validateForInsert($propertiesToSkip);

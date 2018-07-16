@@ -163,7 +163,7 @@ class kVendorCredit
 		}
 		
 		$credit = $this->credit;
-		if($includeOverages && isset($this->overageCredit) && $this->overageCredit > 0)
+		if($includeOverages && $this->overageCredit > 0)
 			$credit += $this->overageCredit;
 		
 		return $credit;
