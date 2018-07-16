@@ -31,6 +31,7 @@ class ValidateAccessResponseProfile
 	private static function getServiceClassInstance($relatedFilter)
 	{
 		$clazz = self::getServiceClazz($relatedFilter);
+		$clazz = trim($clazz);
 		/** @relatedService ignore */
 		if ($clazz === self::IGNORE)
 			return $clazz;
