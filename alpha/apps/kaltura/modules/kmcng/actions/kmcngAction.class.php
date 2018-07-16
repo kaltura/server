@@ -136,6 +136,14 @@ class kmcngAction extends kalturaAction
 			);
 		}
 
+		$reach = null;
+        if ($kmcngParams["kmcng_reach_version"])
+        {
+            $reach = array(
+                "uri" => '/apps/reach/' . $kmcngParams["kmcng_reach_version"] . "/index.html"
+            );
+        }
+
 		$usageDashboard = null;
 		if (kConf::get("usagedashboard_version"))
 		{
@@ -161,7 +169,8 @@ class kmcngAction extends kalturaAction
 				"liveAnalytics" => $liveAnalytics,
 				"liveDashboard" => $liveDashboard,
 				"usageDashboard" => $usageDashboard,
-				"editor" => $editor
+				"editor" => $editor,
+				"reach" => $reach
 			),
 			"externalLinks" => array(
 				"previewAndEmbed" => $kmcngParams['previewAndEmbed'],
