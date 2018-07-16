@@ -153,6 +153,25 @@ class kPlaybackContextDataHelper
 	 * @param kContextDataHelper $contextDataHelper
 	 * @return array
 	 */
+	private function getWhiteListedDeliveryProfileIds(kContextDataHelper $contextDataHelper)
+	{
+		$actions = $contextDataHelper->getContextDataResult()->getActions();
+		foreach ($actions as $action)
+		{
+			/* @var $action kAccessControlAction */
+			if ($action->getType() == RuleActionType::LIMIT_DELIVERY_PROFILES && !$action->getIsBlockedList())
+			{
+				/* @var $action kAccessControlLimitDeliveryProfilesAction */
+				return explode(',', $action->getDeliveryProfileIds());
+			}
+		}
+		return array();
+	}
+
+	/**
+	 * @param kContextDataHelper $contextDataHelper
+	 * @return array
+	 */
 	private function getFlavorParamsIdsToFilter(kContextDataHelper $contextDataHelper)
 	{
 		$actions = $contextDataHelper->getContextDataResult()->getActions();
@@ -296,7 +315,8 @@ class kPlaybackContextDataHelper
 		if (!$dbEntry->getPartner()->getEnforceDelivery() && !in_array($dbEntry->getSource(), array(EntrySourceType::MANUAL_LIVE_STREAM, EntrySourceType::AKAMAI_UNIVERSAL_LIVE)))
 		{
 			$streamsTypesToExclude = $this->getStreamsTypeToExclude($liveDeliveryProfiles);
-			$defaultDeliveryProfiles = DeliveryProfilePeer::getDefaultDeliveriesFilteredByStreamerTypes($dbEntry, $dbEntry->getPartner(), $streamsTypesToExclude);
+			$whiteListedDeliveryProfileIds = $this->getWhiteListedDeliveryProfileIds($contextDataHelper);
+			$defaultDeliveryProfiles = DeliveryProfilePeer::getDefaultDeliveriesFilteredByStreamerTypes($dbEntry, $dbEntry->getPartner(), $streamsTypesToExclude, $whiteListedDeliveryProfileIds);
 			$liveDeliveryProfiles = array_merge($liveDeliveryProfiles, $defaultDeliveryProfiles);
 		}
 
@@ -354,7 +374,8 @@ class kPlaybackContextDataHelper
 		if (!$dbEntry->getPartner()->getEnforceDelivery())
 		{
 			$streamsTypesToExclude = $this->getStreamsTypeToExclude($localDeliveryProfiles);
-			$defaultDeliveryProfiles = DeliveryProfilePeer::getDefaultDeliveriesFilteredByStreamerTypes($dbEntry, $dbEntry->getPartner(), $streamsTypesToExclude);
+			$whiteListedDeliveryProfileIds = $this->getWhiteListedDeliveryProfileIds($contextDataHelper);
+			$defaultDeliveryProfiles = DeliveryProfilePeer::getDefaultDeliveriesFilteredByStreamerTypes($dbEntry, $dbEntry->getPartner(), $streamsTypesToExclude, $whiteListedDeliveryProfileIds);
 			$localDeliveryProfiles = array_merge($localDeliveryProfiles, $defaultDeliveryProfiles);
 		}
 
