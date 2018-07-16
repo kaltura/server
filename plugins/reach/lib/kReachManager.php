@@ -234,7 +234,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		//Set calculated values
 		$shouldModerateOutput = !$reachProfile->shouldModerateOutputCaptions($vendorCatalogItem->getServiceType());
-		$entryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($entryVendorTask->getEntryId(), $shouldModerateOutput));
+		$entryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($entryVendorTask->getEntryId(), $shouldModerateOutput, $vendorCatalogItem->getKsExpiry()));
 		$entryVendorTask->setPrice(kReachUtils::calculateTaskPrice($entry, $vendorCatalogItem));
 
 		if ($context)
