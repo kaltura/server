@@ -159,7 +159,7 @@ class kPlaybackContextDataHelper
 		foreach ($actions as $action)
 		{
 			/* @var $action kAccessControlAction */
-			if ($action->getType() == RuleActionType::LIMIT_DELIVERY_PROFILES && !$action->getIsBlockedList())
+			if ($action->getType() == RuleActionType::LIMIT_DELIVERY_PROFILES && !$action->getIsBlockedList() && $action->getDeliveryProfileIds())
 			{
 				/* @var $action kAccessControlLimitDeliveryProfilesAction */
 				return explode(',', $action->getDeliveryProfileIds());
