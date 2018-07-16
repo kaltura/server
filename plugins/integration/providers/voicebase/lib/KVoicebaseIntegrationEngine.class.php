@@ -43,20 +43,21 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 		$this->clientHelper = VoicebasePlugin::getClientHelper($providerData->apiKey, $providerData->apiPassword, $additionalParameters);
 		$flavorUrl = KBatchBase::$kClient->flavorAsset->getUrl($flavorAssetId);
 	
-		$externalEntryExists = $this->clientHelper->checkExistingExternalContent($entryId);
+		$externalId = $entryId . '_' . $job->id;
+		$externalEntryExists = $this->clientHelper->checkExistingExternalContent($externalId);
 		if (!$externalEntryExists)
 		{
-			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $fileLocation);
+			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $externalId, $callBackUrl, $spokenLanguage, $fileLocation);
 		}
 		elseif($shouldReplaceRemoteMedia == true)
 		{
-			$this->clientHelper->deleteRemoteFile($entryId);
-			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $fileLocation);
+			$this->clientHelper->deleteRemoteFile($entryId . '_' . $job->id);
+			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $externalId, $callBackUrl, $spokenLanguage, $fileLocation);
 
 		}
 		elseif($fileLocation)
 		{
-			$result = $this->clientHelper->updateRemoteTranscript($entryId, $fileLocation, $callBackUrl);
+			$result = $this->clientHelper->updateRemoteTranscript($externalId, $fileLocation, $callBackUrl);
 		}	
 		else
 		{
@@ -70,7 +71,7 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 	{
 		$entryId = $providerData->entryId;
 		$this->clientHelper = VoicebasePlugin::getClientHelper($providerData->apiKey, $providerData->apiPassword);
-		$remoteProcess = $this->clientHelper->retrieveRemoteProcess($entryId);
+		$remoteProcess = $this->clientHelper->retrieveRemoteProcess($entryId . '_' . $job->id);
 		
 		//false result means that something has gone wrong - the VB job is either in status error or missing altogether
 		if(!$remoteProcess || $remoteProcess->requestStatus == VoicebaseClientHelper::VOICEBASE_FAILURE_MESSAGE || !isset($remoteProcess->fileStatus) || $remoteProcess->fileStatus == VoicebaseClientHelper::VOICEBASE_MACHINE_FAILURE_MESSAGE)
@@ -78,7 +79,11 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 			throw new Exception("VoiceBase transcription failed. Message: [" . $remoteProcess->response . "]");
 		}
 		
-		if($remoteProcess && $remoteProcess->fileStatus == VoicebaseClientHelper::VOICEBASE_MACHINE_COMPLETE_MESSAGE && $remoteProcess->requestStatus == VoicebaseClientHelper::VOICEBASE_MACHINE_COMPLETE_REQUEST_STATUS)
+		if ($providerData->transcriptId && $remoteProcess->fileStatus == VoicebaseClientHelper::VOICEBASE_HUMAN_COMPLETE_MESSAGE)
+		{
+			return true;
+		}
+		elseif (!$providerData->transcriptId && $remoteProcess->fileStatus == VoicebaseClientHelper::VOICEBASE_MACHINE_COMPLETE_MESSAGE)
 		{
 			return true;
 		}
