@@ -2,6 +2,7 @@
 /**
  * @package plugins.contentDistribution
  * @subpackage api.objects
+ * @relatedService EntryDistributionService
  */
 class KalturaEntryDistribution extends KalturaObject implements IRelatedFilterable
 {

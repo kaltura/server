@@ -2,7 +2,7 @@
 class FiltersGenerator extends ClientGeneratorFromPhp 
 {
 	private $_txt = "";
-	
+
 	protected function writeHeader()
 	{
 		
@@ -93,7 +93,12 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		
 		$this->writeToFile($filterPath, $this->_txt);
 	}
-	
+
+	/**
+	 * @param KalturaTypeReflector $type
+	 * @throws ReflectionException
+	 * @throws Exception
+	 */
 	private function writeBaseFilterForType(KalturaTypeReflector $type)
 	{
 		$map = KAutoloader::getClassMap();
@@ -115,11 +120,17 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		}
 		
 		$partnetClassName = ($parentType ? $parentType->getType() . "Filter" : ($type->isRelatedFilterable() ? "KalturaRelatedFilter" : "KalturaFilter"));
-		
+		$relatedService = $this->getRelatedService($type);
+
 		$subpackage = ($type->getPackage() == 'api' ? '' : 'api.') . 'filters.base';
 		$this->appendLine("<?php");
 		$this->appendLine("/**");
 		$this->appendLine(" * @package " . $type->getPackage());
+		if ($type->isRelatedFilterable() && !$relatedService)
+			throw new Exception('did not find @relatedService annotation  '. PHP_EOL .
+				' in comments for type:' . $type->getType());
+		if ($type->isRelatedFilterable())
+			$this->appendLine(" * @relatedService " . $relatedService);
 		$this->appendLine(" * @subpackage $subpackage");
 		$this->appendLine(" * @abstract");
 		$this->appendLine(" */");
@@ -131,6 +142,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		// properies map
 		foreach($type->getCurrentProperties() as $prop)
 		{
+
 			$filters = $prop->getFilters();
 			foreach($filters as $filter)
 			{
@@ -454,5 +466,27 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		$handle = fopen($fileName, "w");
 		fwrite($handle, $contents);
 		fclose($handle);
+	}
+
+	/**
+	 * @param KalturaTypeReflector $type
+	 * @return mixed
+	 * @throws Exception
+	 */
+	private function getRelatedService(KalturaTypeReflector $type)
+	{
+		$relatedService = '';
+		$relatedServiceType = $type;
+		if ($type->isRelatedFilterable()) {
+			do {
+				$result = null;
+				if (preg_match("/\\@relatedService (.*)/", $relatedServiceType->getComments(), $result)) {
+					$relatedService = $result[1];
+					break;
+				}
+				$relatedServiceType = $relatedServiceType->getParentTypeReflector();
+			} while ($relatedServiceType && !$relatedService);
+		}
+		return $relatedService;
 	}
 }

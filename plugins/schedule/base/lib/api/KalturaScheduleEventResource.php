@@ -2,6 +2,7 @@
 /**
  * @package plugins.schedule
  * @subpackage api.objects
+ * @relatedService ScheduleEventResourceService
  * @abstract
  */
 class KalturaScheduleEventResource extends KalturaObject implements IRelatedFilterable

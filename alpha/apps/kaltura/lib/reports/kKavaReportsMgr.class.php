@@ -17,6 +17,7 @@ class kKavaReportsMgr extends kKavaBase
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
 	const METRIC_VIEW_PERIOD_PLAY_TIME = 'sum_view_period';
+	const METRIC_VIEW_PLAY_TIME_SEC = 'sum_view_time';
 	const METRIC_AVG_PLAY_TIME = 'avg_time_viewed';
 	const METRIC_PLAYER_IMPRESSION_RATIO = 'load_play_ratio';
 	const METRIC_AVG_DROP_OFF = 'avg_view_drop_off';
@@ -56,6 +57,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_STORAGE_SIZE_BYTES = 'total_storage';
 	const METRIC_QUARTILE_PLAY_TIME_SEC = 'quartile_play_time';
 	const METRIC_VIEW_PERIOD_PLAY_TIME_SEC = 'view_period_play_time';
+	const METRIC_VIEW_BUFFER_TIME_SEC = 'view_buffer_time';
+	const METRIC_VIEW_PERIOD_BUFFER_TIME_SEC = 'view_period_buffer_time';
 	
 	// non druid metrics
 	const METRIC_PEAK_STORAGE_MB = 'peak_storage';
@@ -111,6 +114,10 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_TOTAL_METRICS = 'report_total_metrics';
 	const REPORT_TOTAL_MAP = 'report_total_map';
 	const REPORT_TOTAL_FROM_TABLE_FUNC = 'report_total_from_table_func';
+
+	// report settings - custom reports
+	const REPORT_CUSTOM_PARAM = 'custom_param';
+	const REPORT_CUSTOM_PARAM_FUNC = 'func';
 			
 	// graph types
 	const GRAPH_BY_DATE_ID = 'by_date_id';
@@ -132,6 +139,7 @@ class kKavaReportsMgr extends kKavaBase
 	const DAY_START_TIME = 'T00:00:00';
 	const DAY_END_TIME = 'T23:59:59';
 	const BASE_DATE_ID = '2013-12-01';	// the date from which to start aggragating usage data
+	const BASE_TIMESTAMP = '2013-12-01T00:00:00Z';
 	
 	// limits
 	const MAX_RESULT_SIZE = 12000;
@@ -1000,7 +1008,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_EDIT_CLICKED,
 		self::EVENT_TYPE_SHARE_CLICKED,
 		self::EVENT_TYPE_DOWNLOAD_CLICKED,
-		self::EVENT_TYPE_REPORT_CLICKED
+		self::EVENT_TYPE_REPORT_CLICKED,
+		self::EVENT_TYPE_VIEW,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -1071,6 +1080,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_PERIOD_PLAY_TIME => self::METRIC_VIEW_PERIOD_PLAY_TIME,
 		self::METRIC_BUFFER_TIME_RATIO => self::METRIC_BUFFER_TIME_RATIO,
 		self::METRIC_AVG_BITRATE => self::METRIC_AVG_BITRATE,
+		self::METRIC_VIEW_BUFFER_TIME_SEC => self::METRIC_VIEW_BUFFER_TIME_SEC,
+		self::METRIC_VIEW_PLAY_TIME_SEC => self::METRIC_VIEW_PLAY_TIME_SEC,
 	);
 	
 	protected static $transform_metrics = array(
@@ -1326,9 +1337,13 @@ class kKavaReportsMgr extends kKavaBase
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD), 
 			self::getLongSumAggregator(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
 		
-		self::$aggregations_def[self::METRIC_BUFFER_TIME_SEC] = self::getFilteredAggregator(
+		self::$aggregations_def[self::METRIC_VIEW_BUFFER_TIME_SEC] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW), 
+			self::getDoubleSumAggregator(self::METRIC_VIEW_BUFFER_TIME_SEC, self::METRIC_BUFFER_TIME_SEC));
+
+		self::$aggregations_def[self::METRIC_VIEW_PERIOD_BUFFER_TIME_SEC] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD), 
-			self::getDoubleSumAggregator(self::METRIC_BUFFER_TIME_SEC, self::METRIC_BUFFER_TIME_SEC));
+			self::getDoubleSumAggregator(self::METRIC_VIEW_PERIOD_BUFFER_TIME_SEC, self::METRIC_BUFFER_TIME_SEC));
 
 		self::$aggregations_def[self::METRIC_BITRATE_SUM] = self::getFilteredAggregator(
 			self::getAndFilter(array(
@@ -1417,6 +1432,11 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_POST_AGGR => self::getConstantFactorPostAggr(
 				self::METRIC_DURATION_DELETED_MSEC, self::METRIC_DURATION_DELETED_SEC, '-1000'));	// duration is negative for delete events	
 
+		self::$metrics_def[self::METRIC_VIEW_PLAY_TIME_SEC] = array(
+			self::DRUID_AGGR => array(self::EVENT_TYPE_VIEW),
+			self::DRUID_POST_AGGR => self::getConstantFactorPostAggr(
+				self::METRIC_VIEW_PLAY_TIME_SEC, self::EVENT_TYPE_VIEW, '10'));	
+		
 		// field ratio metrics
 		self::$metrics_def[self::METRIC_PLAYTHROUGH_RATIO] = array(
 			self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_100),
@@ -1433,10 +1453,10 @@ class kKavaReportsMgr extends kKavaBase
 				self::EVENT_TYPE_PLAYER_IMPRESSION));
 
 		self::$metrics_def[self::METRIC_BUFFER_TIME_RATIO] = array(
-			self::DRUID_AGGR => array(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_BUFFER_TIME_SEC),
+			self::DRUID_AGGR => array(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_VIEW_PERIOD_BUFFER_TIME_SEC),
 			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
 				self::METRIC_BUFFER_TIME_RATIO,
-				self::METRIC_BUFFER_TIME_SEC,
+				self::METRIC_VIEW_PERIOD_BUFFER_TIME_SEC,
 				self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC));
 
 		self::$metrics_def[self::METRIC_AVG_BITRATE] = array(
@@ -1550,6 +1570,11 @@ class kKavaReportsMgr extends kKavaBase
 		$month = substr($date_id, 4, 2);
 		$day = substr($date_id, 6, 2);
 		return gmmktime(0, 0, 0, $month, $day, $year);
+	}
+	
+	protected static function formatUnixtime($time)
+	{
+		return gmdate('Y-m-d\TH:i:s\Z', $time);
 	}
 
 	protected static function timestampToHourId($timestamp, $tz)
@@ -1702,13 +1727,39 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		$offset = self::fixTimeZoneOffset($input_filter->timeZoneOffset);
 		$input_filter->timeZoneOffset = $offset;
+
+		$report_interval = isset($report_def[self::REPORT_INTERVAL]) ? 
+			$report_def[self::REPORT_INTERVAL] : 
+			self::INTERVAL_START_TO_END;
+		
+		if ($input_filter->from_date && $input_filter->to_date &&
+			!($input_filter->from_day && $input_filter->to_day))
+		{
+			switch ($report_interval)
+			{
+			case self::INTERVAL_START_TO_END:
+				$from_date = self::formatUnixtime($input_filter->from_date);
+				$to_date = self::formatUnixtime($input_filter->to_date);
+				break;
+
+			case self::INTERVAL_BASE_TO_START:
+				$from_date = self::BASE_TIMESTAMP;
+				$to_date = self::formatUnixtime($input_filter->from_date);
+				break;
+
+			case self::INTERVAL_BASE_TO_END:
+				$from_date = self::BASE_TIMESTAMP;
+				$to_date = self::formatUnixtime($input_filter->to_date);
+				break;
+			}
+
+			return array($from_date . '/' . $to_date);
+		}
+
 		$timezone_offset = sprintf('%s%02d:%02d', 
 			$offset <= 0 ? '+' : '-', 
 			intval(abs($offset) / 60), abs($offset) % 60);
 		
-		$report_interval = isset($report_def[self::REPORT_INTERVAL]) ? 
-			$report_def[self::REPORT_INTERVAL] : 
-			self::INTERVAL_START_TO_END;
 		switch ($report_interval)
 		{
 		case self::INTERVAL_START_TO_END:
@@ -1717,10 +1768,7 @@ class kKavaReportsMgr extends kKavaBase
 			break;
 			
 		case self::INTERVAL_BASE_TO_START:
-			$to_date_id = $report_interval == self::INTERVAL_BASE_TO_START ? 
-				$input_filter->from_day : 
-				$input_filter->to_day;
-			$to_date = self::dateIdToDateTime($to_date_id);
+			$to_date = self::dateIdToDateTime($input_filter->from_day);
 			$to_date->sub(new DateInterval('P1D'));
 			$to_date = $to_date->format('Y-m-d');
 			$from_date = self::BASE_DATE_ID;
@@ -1748,8 +1796,7 @@ class kKavaReportsMgr extends kKavaBase
 			$to_date .= self::DAY_END_TIME . $timezone_offset;
 		}
 	
-		$intervals = array($from_date . '/' . $to_date);
-		return $intervals;
+		return array($from_date . '/' . $to_date);
 	}
 
 	protected static function getPlaybackContextCategoriesIds($partner_id, $playback_context, $is_ancestor)
@@ -1882,7 +1929,7 @@ class kKavaReportsMgr extends kKavaBase
 		$c->addDescendingOrderByColumn(kuserPeer::UPDATED_AT);	// second priority - recently updated
 		
 		kuserPeer::setUseCriteriaFilter(false);
-		$stmt = kuserPeer::doSelectStmt($c);
+		$stmt = kuserPeer::doSelectStmt($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 		$rows = $stmt->fetchAll(PDO::FETCH_NUM);
 		kuserPeer::setUseCriteriaFilter(true);
 
@@ -1907,7 +1954,7 @@ class kKavaReportsMgr extends kKavaBase
 		$c->add(categoryPeer::FULL_NAME, explode(',', $categories), Criteria::IN);
 
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-		$stmt = categoryPeer::doSelectStmt($c);
+		$stmt = categoryPeer::doSelectStmt($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 		$rows = $stmt->fetchAll(PDO::FETCH_NUM);
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 
@@ -1975,9 +2022,13 @@ class kKavaReportsMgr extends kKavaBase
 			$entry_filter->setPartnerSearchScope($partner_id);
 
 			if($input_filter->search_in_tags)
+			{
 				$entry_filter->set('_free_text', $input_filter->keywords);
+			}
 			else
+			{
 				$entry_filter->set('_like_admin_tags', $input_filter->keywords);
+			}
 
 			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 			$entry_filter->attachToCriteria($c);
@@ -2513,8 +2564,6 @@ class kKavaReportsMgr extends kKavaBase
 	
 	protected static function getJoinGraphImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids)
 	{
-		self::init();
-		
 		$start = microtime(true);
 
 		$report_defs = isset($report_def[self::REPORT_JOIN_REPORTS]) ? 
@@ -2589,8 +2638,6 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function getKeyedJoinGraphImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids)
 	{
-		self::init();
-		
 		$start = microtime(true);
 		
 		$report_defs = $report_def[self::REPORT_JOIN_GRAPHS];
@@ -2934,7 +2981,7 @@ class kKavaReportsMgr extends kKavaBase
 		$c->add(entryPeer::ID, $ids, Criteria::IN);
 
 		entryPeer::setUseCriteriaFilter(false);
-		$stmt = entryPeer::doSelectStmt($c);
+		$stmt = entryPeer::doSelectStmt($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		entryPeer::setUseCriteriaFilter(true);
 
@@ -2973,7 +3020,7 @@ class kKavaReportsMgr extends kKavaBase
 		$c->add(entryPeer::ID, $ids, Criteria::IN);
 
 		entryPeer::setUseCriteriaFilter(false);
-		$stmt = entryPeer::doSelectStmt($c);
+		$stmt = entryPeer::doSelectStmt($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		entryPeer::setUseCriteriaFilter(true);
 
@@ -3002,7 +3049,7 @@ class kKavaReportsMgr extends kKavaBase
 		$c->add(categoryPeer::ID, $ids, Criteria::IN);
 
 		categoryPeer::setUseCriteriaFilter(false);
-		$stmt = categoryPeer::doSelectStmt($c);
+		$stmt = categoryPeer::doSelectStmt($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		categoryPeer::setUseCriteriaFilter(true);
 
@@ -3145,7 +3192,7 @@ class kKavaReportsMgr extends kKavaBase
 		$c->add(kuserPeer::ID, $ids, Criteria::IN);
 
 		kuserPeer::setUseCriteriaFilter(false);
-		$stmt = kuserPeer::doSelectStmt($c);
+		$stmt = kuserPeer::doSelectStmt($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		kuserPeer::setUseCriteriaFilter(true);
 		
@@ -3195,7 +3242,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		$c->add(categoryEntryPeer::ENTRY_ID, $ids, Criteria::IN);
 
-		$stmt = categoryEntryPeer::doSelectStmt($c);
+		$stmt = categoryEntryPeer::doSelectStmt($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
 		$all_categories = array();
@@ -3225,7 +3272,7 @@ class kKavaReportsMgr extends kKavaBase
 		$c->add(categoryPeer::ID, array_keys($all_categories), Criteria::IN);
 
 		categoryPeer::setUseCriteriaFilter(false);
-		$stmt = categoryPeer::doSelectStmt($c);
+		$stmt = categoryPeer::doSelectStmt($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		categoryPeer::setUseCriteriaFilter(true);
 		
@@ -3264,8 +3311,9 @@ class kKavaReportsMgr extends kKavaBase
 		$columns = $context['columns'];
 		$dim_column = isset($context['dim_column']) ? $context['dim_column'] : 'ID';
 		$partner_id_column = isset($context['partner_id_column']) ? $context['partner_id_column'] : 'PARTNER_ID';
-		$custom_crit = isset($context['custom_criterion']) ? $context['custom_criterion'] : null;
-		$int_ids_only = isset($context['int_ids_only']) ? $context['int_ids_only'] : false; 
+		$group_by_columns = isset($context['group_by_columns']) ? $context['group_by_columns'] : array();
+		$custom_crits = isset($context['custom_criterion']) ? $context['custom_criterion'] : array();
+		$int_ids_only = isset($context['int_ids_only']) ? $context['int_ids_only'] : false;
 
 		$c = KalturaCriteria::create($peer::OM_CLASS);
 
@@ -3289,8 +3337,21 @@ class kKavaReportsMgr extends kKavaBase
 				$column_formats[$column] = self::COLUMN_FORMAT_UNIXTIME;
 				break;
 			}
-			$exploded_column = explode('.', $column);
-			$c->addSelectColumn($table_name . '.' . $exploded_column[0]);
+
+			if (strpos($column, '(') !== false)
+			{
+				$c->addSelectColumn($column);
+			}
+			else
+			{
+				$exploded_column = explode('.', $column);
+				$c->addSelectColumn($table_name . '.' . $exploded_column[0]);
+			}
+		}
+
+		foreach ($group_by_columns as $column)
+		{
+			$c->addGroupByColumn($table_name . '.' . $column);
 		}
 
 		if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
@@ -3312,13 +3373,25 @@ class kKavaReportsMgr extends kKavaBase
 		
 		$c->add($table_name . '.' . $dim_column, $ids, Criteria::IN);
 
-		if ($custom_crit)
+		if (isset($custom_crits['column']))
 		{
-			$c->addAnd($c->getNewCriterion($custom_crit['column'], $custom_crit['value'], Criteria::CUSTOM));
+			$custom_crits = array($custom_crits);
+		}
+
+		foreach ($custom_crits as $custom_crit)
+		{
+			$column = $custom_crit['column'];
+			$value = $custom_crit['value'];
+			$comparison = $custom_crit['comparison'];
+			if ($comparison == Criteria::IN && is_string($value))
+			{
+				$value = explode(',', $value);
+			}
+			$c->addAnd($c->getNewCriterion($column, $value, $comparison));
 		}
 
 		$peer::setUseCriteriaFilter(false);
-		$stmt = $peer::doSelectStmt($c);
+		$stmt = $peer::doSelectStmt($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 		$rows = $stmt->fetchAll(PDO::FETCH_NUM);
 		$peer::setUseCriteriaFilter(true);
 
@@ -3333,7 +3406,7 @@ class kKavaReportsMgr extends kKavaBase
 				$value = next($row);
 				
 				$exploded_column = explode('.', $column);
-				if (count($exploded_column) > 1)
+				if (strpos($column, '(') === false && count($exploded_column) > 1)
 				{
 					list($column, $field) = $exploded_column;
 					$value = @unserialize($value);
@@ -3343,7 +3416,7 @@ class kKavaReportsMgr extends kKavaBase
 				switch ($format)
 				{
 				case self::COLUMN_FORMAT_QUOTE:
-					$value = '"' . str_replace('"', '""', $value) . '"';
+					$value = '"' . str_replace(array('"', "\n", "\r"), array('""', ' ', ''), $value) . '"';
 					break;
 					
 				case self::COLUMN_FORMAT_UNIXTIME:
@@ -4585,10 +4658,84 @@ class kKavaReportsMgr extends kKavaBase
 	}
 	
 	/// custom report functions
+	protected static function replaceCustomParams(&$arr, $params)
+	{
+		foreach ($arr as $key => &$value)
+		{
+			if (is_array($value))
+			{
+				self::replaceCustomParams($value, $params);
+				continue;
+			}
+
+			if ($key != 'value')		// currently, limiting var replacement only for keys called 'value'
+			{
+				continue;
+			}
+
+			if (!is_string($value) || !$value || $value[0] != ':')
+			{
+				continue;
+			}
+
+			$paramName = substr($value, 1);
+			if (!isset($params[$paramName]))
+			{
+				throw new Exception("missing parameter $paramName");
+			}
+			$value = $params[$paramName];
+		}
+	}
+
+	protected static function addEntryDescendants($partner_id, $ids)
+	{
+		$entry_filter = new entryFilter();
+		$entry_filter->setPartnerSearchScope($partner_id);
+		$entry_filter->set('_in_root_entry_id', $ids);
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$entry_filter->attachToCriteria($c);
+		$c->applyFilters();
+
+		$result = array_merge($c->getFetchedIds(), explode(',', $ids));
+
+		return implode(',', $result);
+	}
+
 	public static function customReport($id, $params)
 	{
+		self::init();
+
 		self::$custom_reports = kConf::getMap('custom_reports');
 		$report_def = self::getReportDef(-$id);
+
+		// get the partner id
+		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
+		{
+			$partner_id = Partner::ADMIN_CONSOLE_PARTNER_ID;
+		}
+		else
+		{
+			$partner_id = $params['partner_id'];
+		}
+
+		// apply param processing
+		foreach ($params as $key => $value)
+		{
+			if (!isset($report_def[self::REPORT_CUSTOM_PARAM][$key]))
+			{
+				continue;
+			}
+
+			$func = $report_def[self::REPORT_CUSTOM_PARAM][$key][self::REPORT_CUSTOM_PARAM_FUNC];
+			$newValue = call_user_func($func, $partner_id, $value);
+			if ($newValue == $value)
+			{
+				continue;
+			}
+
+			KalturaLog::log("updating param [$key] from [$value] to [$newValue]");
+			$params[$key] = $newValue;
+		}
 
 		// build the filter
 		$input_filter = new reportsInputFilter();
@@ -4606,44 +4753,38 @@ class kKavaReportsMgr extends kKavaBase
 			$input_filter->$field = $value;
 		}
 		
-		$object_ids = isset($input_filter->object_ids) ? $input_filter->object_ids : null; 
+		if (isset($report_def[self::REPORT_ENRICH_DEF]))
+		{
+			self::replaceCustomParams($report_def[self::REPORT_ENRICH_DEF], $params);
+		}
 
-		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
-		{
-			$partner_id = Partner::ADMIN_CONSOLE_PARTNER_ID;
-		}
-		else
-		{
-			$partner_id = $params['partner_id'];
-		}
-		$report_type = -$id;		// negative report types are used to identify custom reports
+		$object_ids = isset($input_filter->object_ids) ? $input_filter->object_ids : null; 
 
 		if (isset($report_def[self::REPORT_GRAPH_METRICS]))
 		{
 			// graph report
-			$graphs = self::getGraph($partner_id, $report_type, $input_filter, null, $object_ids);
+			$graphs = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
 			list($header, $data) = self::getTableFromGraphs($graphs, false);
 		}
 		else if (isset($report_def[self::REPORT_DIMENSION]))
 		{
 			// table report
-			list($header, $data, $totalCount) = self::getTable(
+			list($header, $data, $totalCount) = self::getTableImpl(
 				$partner_id,
-				$report_type,
+				$report_def,
 				$input_filter,
 				self::MAX_CUSTOM_REPORT_RESULT_SIZE,
 				1,
 				$report_def['order_by'],
 				$object_ids,
-				null,
-				true);
+				self::GET_TABLE_FLAG_IS_CSV);
 		}
 		else
 		{
 			// total report
-			list($header, $data) = self::getTotal(
+			list($header, $data) = self::getTotalImpl(
 				$partner_id,
-				$report_type,
+				$report_def,
 				$input_filter,
 				$object_ids);
 		}
@@ -4787,6 +4928,8 @@ class kKavaReportsMgr extends kKavaBase
 				$object_ids,
 				$page_size, $page_index, $order_by);					
 		}
+		
+		self::init();
 		
 		list($file_path, $file_name) = myReportsMgr::createFileName($partner_id, $report_type, $input_filter, $dimension, $object_ids, $page_size, $page_index, $order_by);
 

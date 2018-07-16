@@ -1,6 +1,7 @@
 <?php
 /**
  * @package api
+ * @relatedService ignore
  * @subpackage filters.base
  * @abstract
  */
@@ -29,12 +30,12 @@ abstract class KalturaAssetParamsBaseFilter extends KalturaRelatedFilter
 	{
 		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
-	
+
 	/**
 	 * @var int
 	 */
 	public $idEqual;
-	
+
 	/**
 	 * @var string
 	 */

@@ -162,7 +162,7 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 			}
 			else
 			{
-				$feed = YouTubeDistributionCsvFeedHelper::initializeDefaultSubmitFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $captionAssetIds);
+				$feed = YouTubeDistributionCsvFeedHelper::initializeDefaultSubmitFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $captionAssetIds, $distributionJobData->entryDistribution->entryId);
 				$this->submitCsvMap = $feed->getCsvMap();
 				$this->captionsCsvMap = $feed->getCaptionsCsvMap();
 			}
@@ -178,7 +178,7 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 			}
 			else
 			{
-				$feed = YouTubeDistributionCsvFeedHelper::initializeDefaultUpdateFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $remoteIdHandler);
+				$feed = YouTubeDistributionCsvFeedHelper::initializeDefaultUpdateFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $remoteIdHandler, $distributionJobData->entryDistribution->entryId);
 				$this->updateCsvMap = $feed->getCsvMap();
 			}
 

@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.annotation
+ * @relatedService CuePointService
  * @subpackage api.filters.base
  * @abstract
  */
@@ -17,7 +18,7 @@ abstract class KalturaAnnotationBaseFilter extends KalturaCuePointFilter
 		"endTimeLessThanOrEqual" => "_lte_end_time",
 		"durationGreaterThanOrEqual" => "_gte_duration",
 		"durationLessThanOrEqual" => "_lte_duration",
-	    "isPublicEqual" => "_eq_is_public",
+		"isPublicEqual" => "_eq_is_public",
 	);
 
 	static private $order_by_map = array
@@ -82,7 +83,7 @@ abstract class KalturaAnnotationBaseFilter extends KalturaCuePointFilter
 	 * @var int
 	 */
 	public $durationLessThanOrEqual;
-	
+
 	/**
 	 * @var KalturaNullableBoolean
 	 */

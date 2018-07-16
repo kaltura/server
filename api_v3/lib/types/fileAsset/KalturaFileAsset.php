@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage api.objects
+ * @relatedService FileAssetService
  */
 class KalturaFileAsset extends KalturaObject implements IRelatedFilterable 
 {

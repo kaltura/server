@@ -171,7 +171,7 @@ class batchStatus
 				return $parts[1];
 			}
 		}
-		throw("could not find php path");
+		throw new Exception("could not find php path");
 	}
 	public static function executeRunBatch ( $action , $batch_name )
 	{

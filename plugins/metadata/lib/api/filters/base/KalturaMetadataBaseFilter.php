@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.metadata
+ * @relatedService MetadataService
  * @subpackage api.filters.base
  * @abstract
  */

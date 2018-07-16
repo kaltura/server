@@ -168,6 +168,7 @@ class DbManager
 			return;
 
 		$stickySessionExpiry = isset(self::$config['sphinx_datasources']['sticky_session_timeout']) ? self::$config['sphinx_datasources']['sticky_session_timeout'] : 600;
+		KalturaLog::debug("Setting sphinx sticky session for key [" . self::$stickySessionKey . "] to sphinx index [" . self::$connIndex . "]");
 		self::$sphinxCache->set(self::$stickySessionKey, self::$connIndex, $stickySessionExpiry);
 		self::$cachedConnIndex = self::$connIndex;
 	}
@@ -180,6 +181,7 @@ class DbManager
 		
 		self::$stickySessionKey = self::getStickySessionKey();
 		$preferredIndex = self::$sphinxCache->get(self::$stickySessionKey);
+		KalturaLog::debug("Got sphinx sticky session for key [" . self::$stickySessionKey . "] to sphinx index [" . $preferredIndex . "]");
 		if ($preferredIndex === false)
 			return false;
 		self::$cachedConnIndex = (int) $preferredIndex; //$preferredIndex returns from self::$sphinxCache->get(..) in type string

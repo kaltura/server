@@ -1,6 +1,7 @@
 <?php
 /**
  * @package api
+ * @relatedService LiveChannelSegmentService
  * @subpackage filters.base
  * @abstract
  */

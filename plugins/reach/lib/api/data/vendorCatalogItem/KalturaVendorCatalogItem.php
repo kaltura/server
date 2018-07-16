@@ -2,6 +2,7 @@
 /**
  * @package plugins.reach
  * @subpackage api.objects
+ * @relatedService VendorCatalogItemService
  */
 abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelatedFilterable, IApiObjectFactory
 {
