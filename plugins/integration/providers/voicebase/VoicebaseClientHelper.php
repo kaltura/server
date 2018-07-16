@@ -7,6 +7,7 @@ class VoicebaseClientHelper
 	const VOICEBASE_FAILURE_MESSAGE = "FAILURE";
 	const VOICEBASE_MACHINE_COMPLETE_REQUEST_STATUS = "SUCCESS";
 	const VOICEBASE_MACHINE_COMPLETE_MESSAGE = "MACHINECOMPLETE";
+	const VOICEBASE_HUMAN_COMPLETE_MESSAGE = "HUMANCOMPLETE";
 	const VOICEBASE_MACHINE_FAILURE_MESSAGE = "ERROR";
 	
 	const VOICEBASE_ACTION_UPLOADMEDIA = "uploadMedia";
@@ -47,7 +48,7 @@ class VoicebaseClientHelper
 		$curlResult = $this->retrieveRemoteProcess($externalId);
 		if($curlResult)
 		{
-			if ($curlResult->requestStatus == self::VOICEBASE_FAILURE_MESSAGE || !isset($curlResult->fileStatus) || !$curlResult->fileStatus == self::VOICEBASE_MACHINE_COMPLETE_MESSAGE)
+			if ($curlResult->requestStatus == self::VOICEBASE_FAILURE_MESSAGE || !isset($curlResult->fileStatus) || !in_array($curlResult->fileStatus, array(self::VOICEBASE_MACHINE_COMPLETE_MESSAGE, self::VOICEBASE_HUMAN_COMPLETE_MESSAGE)))
 				return false;
 			return true;
 		}
