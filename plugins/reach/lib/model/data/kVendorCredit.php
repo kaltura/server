@@ -21,11 +21,6 @@ class kVendorCredit
 	protected $fromDate;
 
 	/**
-	 * @var bool
-	 */
-	protected $allowOverage;
-
-	/**
 	 * @var int
 	 */
 	protected $overageCredit;
@@ -57,14 +52,6 @@ class kVendorCredit
 	}
 
 	/**
-	 * @return the $allowOverage
-	 */
-	public function getAllowOverage()
-	{
-		return $this->allowOverage;
-	}
-
-	/**
 	 * @return the $overageCredit
 	 */
 	public function getOverageCredit()
@@ -87,14 +74,6 @@ class kVendorCredit
 	{
 		$beginOfDay = strtotime("today", $fromDate);
 		$this->fromDate = $beginOfDay;
-	}
-
-	/**
-	 * @param bool $allowOverage
-	 */
-	public function setAllowOverage($allowOverage)
-	{
-		$this->allowOverage = $allowOverage;
 	}
 
 	/**
@@ -184,7 +163,7 @@ class kVendorCredit
 		}
 		
 		$credit = $this->credit;
-		if($includeOverages && $this->allowOverage)
+		if($includeOverages && $this->overageCredit)
 			$credit += $this->overageCredit;
 		
 		return $credit;
