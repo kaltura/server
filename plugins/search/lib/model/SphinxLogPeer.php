@@ -52,9 +52,18 @@ class SphinxLogPeer extends BaseSphinxLogPeer {
 		
 		if($criterions)
 			$criteria->addAnd($criterions);
-			
-		$disabledPartnerIds = kConf::get('disable_sphinx_indexing_partners', 'local', array());
-		if ($disabledPartnerIds)
+
+		$disabledPartnerIds = array();
+		if (in_array($type ,array(SphinxLogType::SPHINX)))
+		{
+			$disabledPartnerIds = kConf::get('disable_sphinx_indexing_partners', 'local', array());
+		}
+		else if (in_array($type ,array(SphinxLogType::ELASTIC)))
+		{
+			$disabledPartnerIds = kConf::get('disable_elastic_populate_indexing_partners', 'local', array());
+		}
+
+		if (count($disabledPartnerIds))
 		{
 			$criteria->add(SphinxLogPeer::PARTNER_ID, $disabledPartnerIds, Criteria::NOT_IN);
 		}
