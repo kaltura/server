@@ -223,7 +223,7 @@ class PartnerController extends Zend_Controller_Action
 		$client->partner->getInfo();
 		if (!$userId)
 		{
-			$client->partner->getInfo($partnerId);
+			$client->partner->get($partnerId);
 		}
 
 		$client->session->impersonate('{1:result:adminSecret}', $partnerId, $userId ? $userId : '{2:result:adminUserId}', Kaltura_Client_Enum_SessionType::ADMIN, '{1:result:id}', null, "disableentitlement,disablechangeaccount");
