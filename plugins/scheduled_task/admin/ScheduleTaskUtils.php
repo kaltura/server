@@ -11,16 +11,20 @@ class ScheduleTaskUtils
 	{
 		if (!$object)
 			return array();
-
-		switch(get_class($object))
+		try
 		{
-			case "Kaltura_Client_Reach_Type_EntryVendorTask":
+			$className = get_class($object);
+			$classObj = new $className();
+			if ($classObj instanceof Kaltura_Client_Reach_Type_EntryVendorTask)
 				return array("id", "entryId", "userId", "status", "createdAt", "queueTime");
-			case "Kaltura_Client_Type_MediaEntry":
+			if ($classObj instanceof Kaltura_Client_Type_BaseEntry)
 				return array("id", "name", "userId", "views", "createdAt", "lastPlayedAt");
-			default:
-				return array();
+			return array();
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+			return array();
 		}
 	}
-
 }

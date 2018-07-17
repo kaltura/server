@@ -193,12 +193,13 @@ class EntryVendorTaskService extends KalturaBaseService
 	 *
 	 * @action reject
 	 * @param int $id vendor task id to reject
+	 * @param string $rejectReason
 	 * @param KalturaEntryVendorTask $entryVendorTask evntry vendor task to reject
 	 *
 	 * @throws KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND
 	 * @throws KalturaReachErrors::CANNOT_REJECT_NOT_MODERATED_TASK
 	 */
-	public function rejectAction($id)
+	public function rejectAction($id,  $rejectReason = null)
 	{
 		$dbEntryVendorTask = EntryVendorTaskPeer::retrieveByPK($id);
 		if (!$dbEntryVendorTask)
@@ -213,6 +214,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		
 		$dbEntryVendorTask->setModeratingUser($this->getKuser()->getPuserId());
 		$dbEntryVendorTask->setStatus(KalturaEntryVendorTaskStatus::REJECTED);
+		$dbEntryVendorTask->setErrDescription($rejectReason);
 		$dbEntryVendorTask->save();
 		
 		// return the saved object
