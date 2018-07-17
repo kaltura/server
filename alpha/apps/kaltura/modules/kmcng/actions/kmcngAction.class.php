@@ -17,11 +17,14 @@ class kmcngAction extends kalturaAction
 		}
 
 		$kmcngParams = kConf::get('kmcng');
+		$enforceSecureProtocol = isset(kConf::get('kmc_secured_login')) && kConf::get('kmc_secured_login') == "1";
+		$requestSecureProtocol = (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on');
 
 		// Check for forced HTTPS
-		if (!isset($kmcngParams["kmcng_debug_mode"]))
+
+		if ($enforceSecureProtocol)
 		{
-			if ((!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on'))
+			if (!$requestSecureProtocol)
 			{
 				header("Location: " . infraRequestUtils::PROTOCOL_HTTPS . "://" . $_SERVER['SERVER_NAME'] . $_SERVER["REQUEST_URI"]);
 				die();
@@ -53,7 +56,7 @@ class kmcngAction extends kalturaAction
 			return sfView::ERROR;
 		}
 
-		$config = $this->initConfig($deployUrl, $kmcngParams);
+		$config = $this->initConfig($deployUrl, $kmcngParams, $enforceSecureProtocol, $requestSecureProtocol);
 		$config = json_encode($config);
 		$config = str_replace("\\/", '/', $config);
 
@@ -65,7 +68,7 @@ class kmcngAction extends kalturaAction
 		echo $content;
 	}
 
-	private function initConfig($deployUrl, $kmcngParams)
+	private function initConfig($deployUrl, $kmcngParams, $enforceSecureProtocol, $requestSecureProtocol)
 	{
 		$this->liveAUiConf = uiConfPeer::getUiconfByTagAndVersion(self::LIVE_ANALYTICS_UICONF_TAG, kConf::get("liveanalytics_version"));
 		$this->contentUiconfsLivea = isset($this->liveAUiConf) ? array_values($this->liveAUiConf) : null;
@@ -76,7 +79,7 @@ class kmcngAction extends kalturaAction
 		$this->contentUiconfPreview = (is_array($this->contentUiconfsPreview) && reset($this->contentUiconfsPreview)) ? reset($this->contentUiconfsPreview) : null;
 
 		$secureCDNServerUri = "https://" . kConf::get("cdn_api_host_https");
-		if (isset($kmcngParams["kmcng_debug_mode"]))
+		if (!$enforceSecureProtocol && !$requestSecureProtocol)
 			$secureCDNServerUri = "http://" . kConf::get("cdn_api_host");
 
 		$serverAPIUri = kConf::get("www_host");
