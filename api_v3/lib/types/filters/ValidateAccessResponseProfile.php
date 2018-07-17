@@ -31,6 +31,7 @@ class ValidateAccessResponseProfile
 	private static function getServiceClassInstance($relatedFilter)
 	{
 		$clazz = self::getServiceClazz($relatedFilter);
+		$clazz = trim($clazz);
 		/** @relatedService ignore */
 		if ($clazz === self::IGNORE)
 			return $clazz;
@@ -77,7 +78,6 @@ class ValidateAccessResponseProfile
 			return true;
 		try {
 			/** @var KalturaBaseService $service */
-			$clazz = trim($clazz);
 			$service = new $clazz();
 			list($serviceId, $serviceName) = KalturaServicesMap::getServiceIdAndServiceNameByClass($clazz);
 			$service->initService($serviceId, $serviceName, 'list');
