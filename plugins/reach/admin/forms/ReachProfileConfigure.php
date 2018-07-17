@@ -53,11 +53,6 @@ class Form_ReachProfileConfigure extends ConfigureForm
 		$profileType->setValue(Kaltura_Client_Reach_Enum_ReachProfileType::FREE_TRIAL);
 		$this->addElement($profileType);
 
-		$defaultSourceLanguageView = new Kaltura_Form_Element_EnumSelect('defaultSourceLanguage', array('enum' => 'Kaltura_Client_Reach_Enum_CatalogItemLanguage'));
-		$defaultSourceLanguageView->setLabel('Default Source Language:');
-		$defaultSourceLanguageView->setValue(Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN);
-		$this->addElement($defaultSourceLanguageView);
-
 		$defaultOutputFormatView = new Kaltura_Form_Element_EnumSelect('defaultOutputFormat', array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat'));
 		$defaultOutputFormatView->setLabel('Default Output Format:');
 		$defaultOutputFormatView->setValue(Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::SRT);

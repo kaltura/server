@@ -78,7 +78,6 @@ class ValidateAccessResponseProfile
 			return true;
 		try {
 			/** @var KalturaBaseService $service */
-			$clazz = trim($clazz);
 			$service = new $clazz();
 			list($serviceId, $serviceName) = KalturaServicesMap::getServiceIdAndServiceNameByClass($clazz);
 			$service->initService($serviceId, $serviceName, 'list');

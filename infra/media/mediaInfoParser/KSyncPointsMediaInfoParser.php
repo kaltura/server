@@ -4,11 +4,13 @@ class KSyncPointsMediaInfoParser
 {
 	const MIN_DIFF_BETWEEN_SYNC_POINTS_IN_MSEC = 60000;
 	const DATA_TRACK_IDENTIFIER = "data";
+	const SUBTITLE_TRACK_IDENTIFIER = "subtitle";
 	const MAX_DISCONTINUANCE_ALLOWED = 1000;
 	const TS_PTS_DELIMITER = ";";
 	
 	protected $ffprobeBin = 'ffprobeKAMFMediaInfoParser';
 	protected $filePath;
+	private static $dataStreamCodecs = array(self::DATA_TRACK_IDENTIFIER, self::SUBTITLE_TRACK_IDENTIFIER);
 	
 	public function __construct($filePath, $ffprobeBin=null)
 	{
@@ -69,7 +71,7 @@ class KSyncPointsMediaInfoParser
 		
 		foreach ($streams as $stream)
 		{
-			if($stream->codec_type == self::DATA_TRACK_IDENTIFIER)
+			if (in_array($stream->codec_type, self::$dataStreamCodecs))
 			{
 				$dataStreamIndex = $stream->index;
 				break;
