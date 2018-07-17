@@ -61,19 +61,5 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	{
 		return 0;
 	}
-	
-	public function getKsExpiry()
-	{
-		$ksExpiry = $this->getTurnAroundTime();
-		
-		switch ($ksExpiry)
-		{
-			case VendorServiceTurnAroundTime::BEST_EFFORT:
-				return dateUtils::DAY * 7;
-			
-			default:
-				return $ksExpiry * 2;
-		}
-	}
 
 } // VendorCatalogItem
