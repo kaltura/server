@@ -771,7 +771,7 @@ class serveFlavorAction extends kalturaAction
 		$clipDesc = array('type' => 'source', 'path' => $path);
 		if ($mediaInfo && !$mediaInfo->getAudioBitRate())
 		{
-			KalturaLog::debug("$flavorId has Audio Bit rate is null or 0 (taken from mediaInfo)");
+			KalturaLog::debug("$flavorId Audio Bit rate is null or 0 (taken from mediaInfo)");
 			$silent = array_merge(array(array('type' => 'silence')),array($clipDesc));
 			$clipDesc = array('type' => 'mixFilter','sources' => $silent);
 		}
