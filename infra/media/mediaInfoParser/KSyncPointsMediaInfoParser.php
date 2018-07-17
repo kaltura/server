@@ -10,6 +10,7 @@ class KSyncPointsMediaInfoParser
 	
 	protected $ffprobeBin = 'ffprobeKAMFMediaInfoParser';
 	protected $filePath;
+	private static $dataStreamCodecs = array(self::DATA_TRACK_IDENTIFIER, self::SUBTITLE_TRACK_IDENTIFIER);
 	
 	public function __construct($filePath, $ffprobeBin=null)
 	{
@@ -70,7 +71,7 @@ class KSyncPointsMediaInfoParser
 		
 		foreach ($streams as $stream)
 		{
-			if (in_array($stream->codec_type, array(self::DATA_TRACK_IDENTIFIER, self::SUBTITLE_TRACK_IDENTIFIER)))
+			if (in_array($stream->codec_type, self::$dataStreamCodecs))
 			{
 				$dataStreamIndex = $stream->index;
 				break;
