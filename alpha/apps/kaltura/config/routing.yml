@@ -164,10 +164,6 @@ kmcng_reset_password:
     url:   /kmcng/resetpassword/*
     param: { module: kmcng , action: resetpassword }
 
-kmcng_ext_login:
-    url:   /kmcng/extlogin/*
-    param: { module: kmcng , action: extlogin }
-
 kmcng_default:
   url:   /kmcng/*
   param: { module: kmcng , action: kmcng }
