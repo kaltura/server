@@ -30,7 +30,7 @@ CREATE TABLE `api_server`(
   `updated_at` datetime DEFAULT NULL,
   `custom_data` text,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=853 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE app_token(
   `id` varchar(20) NOT NULL,
@@ -332,7 +332,7 @@ CREATE TABLE `business_process_case` (
   PRIMARY KEY (`id`),
   KEY `partner_id` (`partner_id`),
   KEY `object_id_and_type` (`object_type`,`object_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=38637802 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `business_process_server` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -347,7 +347,7 @@ CREATE TABLE `business_process_server` (
   `custom_data` text,
   `dc` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `caption_asset_item` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -705,7 +705,7 @@ CREATE TABLE `drm_policy` (
   `custom_data` text,
   PRIMARY KEY (`id`),
   KEY `partner_id_provider_status` (`partner_id`,`provider`,`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=4952 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `drm_profile` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -790,7 +790,7 @@ CREATE TABLE IF NOT EXISTS `dynamic_enum` (
   `value_name` varchar(255) NOT NULL,
   `plugin_name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `edge_server` (
@@ -811,7 +811,7 @@ CREATE TABLE `edge_server` (
   PRIMARY KEY (`id`),
   KEY `partner_id_status_system_name` (`partner_id`,`status`,`system_name`(255)),
   KEY `host_name` (`host_name`(255))
-) ENGINE=InnoDB AUTO_INCREMENT=912 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE IF NOT EXISTS `email_ingestion_profile` (
@@ -889,7 +889,7 @@ CREATE TABLE IF NOT EXISTS `entry` (
   KEY `int_id_index` (`int_id`),
   KEY `partner_status_index` (`partner_id`,`status`),
   KEY `updated_at_index` (`updated_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
 
@@ -937,7 +937,7 @@ CREATE TABLE `entry_server_node` (
   `custom_data` text,
   PRIMARY KEY (`id`),
   KEY `entry_server_type` (`entry_id`,`server_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=12309103 DEFAULT CHARSET=utf8 COMMENT='Relationship between entry and server node';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Relationship between entry and server node';
 
 CREATE TABLE `entry_vendor_task` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1436,7 +1436,7 @@ CREATE TABLE `kuser_kgroup` (
   KEY `partner_kuser_index` (`kuser_id`,`status`),
   KEY `partner_kgroup_index` (`kgroup_id`,`status`),
   KEY `partner_index` (`partner_id`,`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=45079822 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4;
 
 CREATE TABLE IF NOT EXISTS `kuser_to_user_role` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1557,7 +1557,7 @@ CREATE TABLE `mail_job` (
   KEY `STATUS_PRIORITY_INDEX` (`status`,`mail_priority`),
   KEY `recipient_id_index` (`recipient_id`),
   KEY `partner_id_index` (`partner_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1032263 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 CREATE TABLE `media_info` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `created_at` datetime DEFAULT NULL,
@@ -1597,7 +1597,7 @@ CREATE TABLE `media_info` (
   PRIMARY KEY (`id`),
   KEY `flavor_asset_id_index` (`flavor_asset_id`),
   KEY `updated_at_index` (`updated_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=2280256242 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4;
 
 CREATE TABLE `media_server` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1607,7 +1607,7 @@ CREATE TABLE `media_server` (
   `dc` int(11) DEFAULT NULL,
   `custom_data` text,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=332 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `metadata` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1733,7 +1733,7 @@ CREATE TABLE `notification` (
   PRIMARY KEY (`id`),
   KEY `status_partner_id_index` (`status`,`partner_id`),
   KEY `object_type_object_id` (`object_type`,`object_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10884803 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE IF NOT EXISTS `partner` (
@@ -1785,7 +1785,7 @@ CREATE TABLE IF NOT EXISTS `partner` (
   KEY `partner_parent_index` (`partner_parent_id`),
   KEY `admin_email_index` (`admin_email`),
   KEY `partner_group_type` (`partner_group_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
 
@@ -1892,7 +1892,7 @@ CREATE TABLE `partnership` (
   `partnership_date` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `partnership_order_index` (`partnership_order`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `permission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2024,7 +2024,7 @@ CREATE TABLE `response_profile` (
   PRIMARY KEY (`id`),
   KEY `partner_system_name` (`partner_id`,`system_name`),
   KEY `partner_status` (`partner_id`,`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=153692 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `roughcut_entry` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2085,7 +2085,7 @@ CREATE TABLE `schedule_event_resource` (
   PRIMARY KEY (`id`),
   KEY `partner_event_index` (`partner_id`,`event_id`),
   KEY `partner_resource_index` (`partner_id`,`resource_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=174413 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `schedule_resource` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2102,7 +2102,7 @@ CREATE TABLE `schedule_resource` (
   `custom_data` text,
   PRIMARY KEY (`id`),
   KEY `partner_status_type_index` (`partner_id`,`status`,`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=32832 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `scheduled_task_profile` (
@@ -2340,7 +2340,7 @@ CREATE TABLE `system_user` (
   `role` varchar(40) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `system_user_email_unique` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE IF NOT EXISTS `tag` (
