@@ -663,16 +663,11 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		return array();
 	}
 
-	public static function getDefaultDeliveriesFilteredByStreamerTypes($entry, Partner $partner, $excludedStreamerTypes, $whiteListedDeliveryProfileIds = array())
+	public static function getDefaultOrWhiteListedDeliveries($entry, Partner $partner, $excludedStreamerTypes = array(), $whiteListedDeliveryProfileIds = array())
 	{
 		$deliveryAttributes = new DeliveryProfileDynamicAttributes();
 		$isLive = $entry->getType() == entryType::LIVE_STREAM;
 
-		return self::getDefaultDeliveryProfiles($partner, $deliveryAttributes, $isLive, $excludedStreamerTypes, $whiteListedDeliveryProfileIds);
-	}
-
-	protected static function getDefaultDeliveryProfiles(Partner $partner, DeliveryProfileDynamicAttributes $deliveryAttributes, $isLive = false, $excludedStreamerTypes = array(), $whiteListedDeliveryProfileIds = array() )
-	{
 		$c = new Criteria();
 
 		if (count($whiteListedDeliveryProfileIds))

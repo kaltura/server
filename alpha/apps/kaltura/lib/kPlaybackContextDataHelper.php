@@ -316,7 +316,7 @@ class kPlaybackContextDataHelper
 		{
 			$streamsTypesToExclude = $this->getStreamsTypeToExclude($liveDeliveryProfiles);
 			$whiteListedDeliveryProfileIds = $this->getWhiteListedDeliveryProfileIds($contextDataHelper);
-			$defaultDeliveryProfiles = DeliveryProfilePeer::getDefaultDeliveriesFilteredByStreamerTypes($dbEntry, $dbEntry->getPartner(), $streamsTypesToExclude, $whiteListedDeliveryProfileIds);
+			$defaultDeliveryProfiles = DeliveryProfilePeer::getDefaultOrWhiteListedDeliveries($dbEntry, $dbEntry->getPartner(), $streamsTypesToExclude, $whiteListedDeliveryProfileIds);
 			$liveDeliveryProfiles = array_merge($liveDeliveryProfiles, $defaultDeliveryProfiles);
 		}
 
@@ -375,7 +375,7 @@ class kPlaybackContextDataHelper
 		{
 			$streamsTypesToExclude = $this->getStreamsTypeToExclude($localDeliveryProfiles);
 			$whiteListedDeliveryProfileIds = $this->getWhiteListedDeliveryProfileIds($contextDataHelper);
-			$defaultDeliveryProfiles = DeliveryProfilePeer::getDefaultDeliveriesFilteredByStreamerTypes($dbEntry, $dbEntry->getPartner(), $streamsTypesToExclude, $whiteListedDeliveryProfileIds);
+			$defaultDeliveryProfiles = DeliveryProfilePeer::getDefaultOrWhiteListedDeliveries($dbEntry, $dbEntry->getPartner(), $streamsTypesToExclude, $whiteListedDeliveryProfileIds);
 			$localDeliveryProfiles = array_merge($localDeliveryProfiles, $defaultDeliveryProfiles);
 		}
 
