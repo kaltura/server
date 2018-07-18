@@ -17,8 +17,9 @@ class kmcngAction extends kalturaAction
 		}
 
 		$kmcngParams = kConf::get('kmcng');
-		$enforceSecureProtocol = isset(kConf::get('kmc_secured_login')) && kConf::get('kmc_secured_login') == "1";
-		$requestSecureProtocol = (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on');
+		$isSecuredLogin = kConf::get('kmc_secured_login');
+		$enforceSecureProtocol = isset($isSecuredLogin) && $isSecuredLogin == "1";
+		$requestSecureProtocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on');
 
 		// Check for forced HTTPS
 
@@ -132,7 +133,7 @@ class kmcngAction extends kalturaAction
 		}
 
 		$editor = null;
-		if ($kmcngParams["kmcng_kea_version"])
+		if (isset($kmcngParams["kmcng_kea_version"]))
 		{
 			$editor = array(
 				"uri" => '/apps/kea/' . $kmcngParams["kmcng_kea_version"] . "/index.html"
@@ -140,7 +141,7 @@ class kmcngAction extends kalturaAction
 		}
 
 		$reach = null;
-        if ($kmcngParams["kmcng_reach_version"])
+        if (isset($kmcngParams["kmcng_reach_version"]))
         {
             $reach = array(
                 "uri" => '/apps/reach/' . $kmcngParams["kmcng_reach_version"] . "/index.html"
