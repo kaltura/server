@@ -1,5 +1,20 @@
 # Naos 14.3.0 #
 
+## Modify reach_profile used_crdit column type  ##
+- Issue Type: Bug
+- Issue ID: PLAT-9112
+
+### Deployment scripts ###
+	
+	- mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2018_07_19_reach_profile_alter_used_credit_datatype.sql
+		
+### Configuration ###
+	None.
+			
+#### Known Issues & Limitations ####
+	None.
+
+
 ## Update new partner registraion email ##
 - Issue type : task
 - Issue ID: PLAT-9067

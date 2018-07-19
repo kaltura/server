@@ -67,7 +67,7 @@ CREATE TABLE `reach_profile`
 	`partner_id` INTEGER  NOT NULL,
 	`type` TINYINT  NOT NULL,
 	`status` TINYINT  NOT NULL,
-	`used_credit` FLOAT default 0,
+	`used_credit` DOUBLE default 0,
 	`rules` TEXT,
 	`dictionary` TEXT,
 	`custom_data` TEXT,
