@@ -54,14 +54,6 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 	}
 	
 	/**
-	 * @param string $toDate
-	 */
-	public function getToDate()
-	{
-		return $this->toDate;
-	}
-	
-	/**
 	 * @return string $frequency
 	 */
 	public function getFrequency()
@@ -158,5 +150,10 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 			$this->initialOverageCredit = $overageCredit;
 			$this->initialOverageCreditInitialized = true;
 		}
+	}
+	
+	public function getSyncCreditToDate()
+	{
+		return $this->periodEndDate;
 	}
 }
