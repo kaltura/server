@@ -89,7 +89,7 @@ class kVendorCredit
 	 */
 	public function getSyncedCredit()
 	{
-		return $this->syncedCredit;
+		return $this->syncedCredit ? $this->syncedCredit : 0;
 	}
 
 	/**
