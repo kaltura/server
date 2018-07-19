@@ -43,6 +43,11 @@
 								<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect') && $partner->status != Kaltura_Client_Enum_PartnerStatus::BLOCKED): ?>
 									<option value="manage" ><?php echo $this->translate('KMC Login'); ?></option>
 								<?php endif; ?>
+								<?php if ($partner->status != Kaltura_Client_Enum_PartnerStatus::BLOCKED): ?>
+									<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect')) :?>
+                                        <option value="manageNew" ><?php echo $this->translate('New KMC Login'); ?></option>
+									<?php endif;?>
+								<?php endif; ?>
 								<?php if ($partner->id != Infra_Consts::TEMPLATE_PARTNER_ID && $partner->id != $this->currentPartnerId): ?>
 									<?php if (Infra_AclHelper::isAllowed('partner','block')): ?>		
 										<?php if ($partner->status == Kaltura_Client_Enum_PartnerStatus::ACTIVE): ?>
@@ -54,11 +59,6 @@
 									<?php if (Infra_AclHelper::isAllowed('partner','remove') && $partner->id != $this->currentPartnerId): ?>
 										<option value="remove"><?php echo $this->translate('Remove'); ?></option>
 									<?php endif; ?>
-								<?php endif; ?>
-								<?php if (false && $partner->status != Kaltura_Client_Enum_PartnerStatus::BLOCKED): ?>
-									<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect')) :?>
-                                        <option value="manageNew" ><?php echo $this->translate('New KMC Login'); ?></option>
-									<?php endif;?>
 								<?php endif; ?>
 							<?php endif; ?>
 					</select>
