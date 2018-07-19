@@ -368,10 +368,10 @@ php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_05_08_playl
 - Issue ID: PLAT-8844
 
 ### Install KMC-NG application ###
-1. get the relevant version 'kmc-ng' from `opt/kaltura/app/configuration/base.ini` key `kmcng_version`
-2. open [kmc-ng releases](https://github.com/kaltura/kmc-ng/releases) and open the release notes of the relevant version from previous step
-3. download the zip file into kaltura server and extract content into `/opt/kaltura/apps/kmcng/vX.X.X` (replace X.X.X with actual version.
-4. from within the version folder (`/opt/kaltura/apps/kmcng/vX.X.X`) execute the following command `php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --user=www-data --group=www-data --ini=./deploy/config.ini`
+1. Get the relevant version 'kmc-ng' from `opt/kaltura/app/configuration/base.ini` key `kmcng_version`
+2. Open [kmc-ng releases](https://github.com/kaltura/kmc-ng/releases) and navigate to the release notes of the relevant version from previous step
+3. Download the zip file and extract content into `/opt/kaltura/apps/kmcng/vX.X.X` (replace X.X.X with actual version.
+4. From within the version folder (`/opt/kaltura/apps/kmcng/vX.X.X`) execute the following command `php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --user=www-data --group=www-data --ini=./deploy/config.ini`
 5. Optional, update `opt/kaltura/app/configuration/local.ini` with additional information used by the KMC-NG application. 
 
 > All keys here are optional, add them if applicable to your server.
@@ -402,7 +402,7 @@ If you need to run KMC-NG version that is not the one specified in `base.ini`, y
 kmcng_version = vY.Y.Y
 ```
 replace `vY.Y.Y` with the relevant version number.
-> Note that old versions might not be compatible as there are dependencies between KMC-NG and kaltura server API.
+> Old versions might not be compatible as there are dependencies between KMC-NG and kaltura server API.
 
 ## Live Clipping ##
 - Issue Type: live clipping
