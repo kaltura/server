@@ -34,7 +34,7 @@ class kTimeRangeVendorCredit extends kVendorCredit
 
 	public function addAdditionalCriteria(Criteria $c)
 	{
-		$c->add(EntryVendorTaskPeer::QUEUE_TIME ,$this->getToDate() , Criteria::LESS_EQUAL);
+		$c->addAnd(EntryVendorTaskPeer::QUEUE_TIME ,$this->getSyncCreditToDate() , Criteria::LESS_EQUAL);
 	}
 
 	/***
@@ -71,5 +71,10 @@ class kTimeRangeVendorCredit extends kVendorCredit
 			return false;
 		}
 		return true;
+	}
+	
+	public function getSyncCreditToDate()
+	{
+		return $this->toDate;
 	}
 }
