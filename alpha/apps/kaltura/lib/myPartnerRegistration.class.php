@@ -92,6 +92,7 @@ class myPartnerRegistration
 		$quickStartGuideLink = kConf::get('quick_start_guide_url');
 		$uploadMediaVideoLink = kConf::get('upload_media_video_url');
 		$howToPublishVideoLink = kConf::get('how_to_publish_video_url');
+		$freeTrialResourceLink = kConf::get('free_trial_resource_url', 'local', '');
 		if ( $recipient_email == null ) $recipient_email = $loginEmail;
 
 		
@@ -129,7 +130,7 @@ class myPartnerRegistration
 				case Partner::PARTNER_TYPE_BLACKBOARD:
 					if ($existingUser) {
 						$mailType = self::KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION;
-						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
+						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $freeTrialResourceLink);
 					}
 					else {
 						$mailType = self::KALTURAS_BLACKBOARD_DEFAULT_REGISTRATION_CONFIRMATION;
@@ -139,7 +140,7 @@ class myPartnerRegistration
 				default: // all others
 				 	if ($existingUser) {
 						$mailType = self::KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION;
-						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
+						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $freeTrialResourceLink);
 					}
 					else {
 						$mailType = self::KALTURAS_DEFAULT_REGISTRATION_CONFIRMATION;

@@ -1,3 +1,14 @@
+# Naos 14.3.0 #
+
+## Update new partner registraion email ##
+- Issue type : task
+- Issue ID: PLAT-9067
+
+### Configuration ###
+	- Add the following to local.ini:
+        free_trial_resource_url = @FREE_TRIAL_RESOURCE_URL@
+
+
 # Naos 14.2.0 #
 
 ## Allow Wowza Media-Server to get conversion profile##
