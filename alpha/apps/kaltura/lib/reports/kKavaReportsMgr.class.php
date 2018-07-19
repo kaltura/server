@@ -1490,6 +1490,7 @@ class kKavaReportsMgr extends kKavaBase
 	/// time functions
 	protected static function fixTimeZoneOffset($timezone_offset)
 	{
+		$timezone_offset = intval($timezone_offset);
 		if (isset(self::$php_timezone_names[$timezone_offset]))
 		{
 			return $timezone_offset;
@@ -1547,6 +1548,10 @@ class kKavaReportsMgr extends kKavaBase
 		$year = substr($date_id, 0, 4);
 		$month = substr($date_id, 4, 2);
 		$day = substr($date_id, 6, 2);
+		if (!checkdate($month, $day , $year))
+		{
+			return null;
+		}
 
 		return "$year-$month-$day";
 	}
@@ -3885,28 +3890,9 @@ class kKavaReportsMgr extends kKavaBase
 			$page_size = count($dimension_ids);
 			$threshold = $page_size;
 
-			if ($dimension == self::DIMENSION_ENTRY_ID)
-			{
-				// when the dimension is entry id, we can use a more minimal filter that does not
-				// contain the dimensions dependent on entry id - categories + playback type
-				// the partner id filter is retained since otherwise sending a bogus event
-				// with non-matching entryId + partnerId will open access to the entry
-				$druid_filter = array();
-				if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
-				{
-					$druid_filter[] = array(
-						self::DRUID_DIMENSION => self::DIMENSION_PARTNER_ID,
-						self::DRUID_VALUES => array($partner_id)
-					);
-				}
-				self::addEndUserReportsDruidFilters($partner_id, $report_def, $input_filter, $druid_filter);
-			}
-			else
-			{
-				// Note: not passing $dimension_ids as $object_ids since in some reports $object_ids
-				//		filters by entries, and not by $dimension
-				$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, null);
-			}
+			// Note: not passing $dimension_ids as $object_ids since in some reports $object_ids
+			//		filters by entries, and not by $dimension
+			$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, null);
 
 			$druid_filter[] = array(
 				self::DRUID_DIMENSION => $dimension,
