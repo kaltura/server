@@ -7,6 +7,7 @@ class VoicebaseClientHelper
 	const VOICEBASE_FAILURE_MESSAGE = "FAILURE";
 	const VOICEBASE_MACHINE_COMPLETE_REQUEST_STATUS = "SUCCESS";
 	const VOICEBASE_MACHINE_COMPLETE_MESSAGE = "MACHINECOMPLETE";
+	const VOICEBASE_HUMAN_COMPLETE_MESSAGE = "HUMANCOMPLETE";
 	const VOICEBASE_MACHINE_FAILURE_MESSAGE = "ERROR";
 	
 	const VOICEBASE_ACTION_UPLOADMEDIA = "uploadMedia";
@@ -42,12 +43,12 @@ class VoicebaseClientHelper
 		}
 	}
 	
-	public function checkExistingExternalContent($entryId)
+	public function checkExistingExternalContent($externalId)
 	{	
-		$curlResult = $this->retrieveRemoteProcess($entryId);
+		$curlResult = $this->retrieveRemoteProcess($externalId);
 		if($curlResult)
 		{
-			if ($curlResult->requestStatus == self::VOICEBASE_FAILURE_MESSAGE || !isset($curlResult->fileStatus) || !$curlResult->fileStatus == self::VOICEBASE_MACHINE_COMPLETE_MESSAGE)
+			if ($curlResult->requestStatus == self::VOICEBASE_FAILURE_MESSAGE || !isset($curlResult->fileStatus) || !in_array($curlResult->fileStatus, array(self::VOICEBASE_MACHINE_COMPLETE_MESSAGE, self::VOICEBASE_HUMAN_COMPLETE_MESSAGE)))
 				return false;
 			return true;
 		}
@@ -55,22 +56,22 @@ class VoicebaseClientHelper
 		return false;
 	}
 	
-	public function retrieveRemoteProcess ($entryId)
+	public function retrieveRemoteProcess ($externalId)
 	{
-		$params = array("action" => self::VOICEBASE_ACTION_GETFILESTATUS, "externalID" => $entryId);
+		$params = array("action" => self::VOICEBASE_ACTION_GETFILESTATUS, "externalID" => $externalId);
 		$curlResult = $this->sendAPICall($params);
 		
 		return $curlResult;
 	}
 	
-	public function uploadMedia($flavorUrl, $entryId, $callBackUrl, $spokenLanguage, $fileLocation = null)
+	public function uploadMedia($flavorUrl, $entryId, $externalId, $callBackUrl, $spokenLanguage, $fileLocation = null)
 	{
 		if($spokenLanguage)
 			$spokenLanguage = $this->supportedLanguages[$spokenLanguage];
 		
 		$params = array("action" => self::VOICEBASE_ACTION_UPLOADMEDIA,
 						"title" => $entryId,
-						"externalID" => $entryId, 
+						"externalID" => $externalId,
 						"lang" => $spokenLanguage
 						);
 
@@ -142,9 +143,9 @@ class VoicebaseClientHelper
 		return $result;
 	}
 	
-	public function updateRemoteTranscript($entryId, $transcriptContent, $callBack)
+	public function updateRemoteTranscript($externalId, $transcriptContent, $callBack)
 	{
-		$params = array("action" => self::VOICEBASE_ACTION_UPDATETRANSCRIPT, "externalID" => $entryId);
+		$params = array("action" => self::VOICEBASE_ACTION_UPDATETRANSCRIPT, "externalID" => $externalId);
 
 		if (isset($this->additionalParams[self::VOICEBASE_ACTION_UPDATETRANSCRIPT]))
 		{
@@ -169,9 +170,9 @@ class VoicebaseClientHelper
 		return $result;
 	}
 	
-	public function getRemoteTranscripts($entryId, array $formats)
+	public function getRemoteTranscripts($externalId, array $formats)
 	{	
-		$params = array("action" => self::VOICEBASE_ACTION_GETTRANSCRIPT, "externalID" => $entryId);
+		$params = array("action" => self::VOICEBASE_ACTION_GETTRANSCRIPT, "externalID" => $externalId);
 	
 		$results = array();
 		foreach($formats as $format)
@@ -192,9 +193,9 @@ class VoicebaseClientHelper
 		return $results;
 	}
 	
-	public function calculateAccuracy($entryId)
+	public function calculateAccuracy($externalId)
 	{
-		$contentArr = $this->getRemoteTranscripts($entryId, array("JSON"));
+		$contentArr = $this->getRemoteTranscripts($externalId, array("JSON"));
 		$transcriptWordObjects = json_decode($contentArr["JSON"]);
 		$sumOfAccuracies = 0;
 		$numberOfElements = 0;
@@ -214,9 +215,9 @@ class VoicebaseClientHelper
 		return 0;
 	}
 	
-	public function deleteRemoteFile($entryId)
+	public function deleteRemoteFile($externalId)
 	{	
-		$params = array("action" => self::VOICEBASE_ACTION_DELETEFILE, "externalID" => $entryId);
+		$params = array("action" => self::VOICEBASE_ACTION_DELETEFILE, "externalID" => $externalId);
 	
 		$curlResult = $this->sendAPICall($params);
 	}
