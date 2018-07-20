@@ -51,7 +51,7 @@ class KVoicebaseIntegrationEngine implements KIntegrationCloserEngine
 		}
 		elseif($shouldReplaceRemoteMedia == true)
 		{
-			$this->clientHelper->deleteRemoteFile($entryId . '_' . $job->id);
+			$this->clientHelper->deleteRemoteFile($externalId);
 			$uploadSuccess = $this->clientHelper->uploadMedia($flavorUrl, $entryId, $externalId, $callBackUrl, $spokenLanguage, $fileLocation);
 
 		}
