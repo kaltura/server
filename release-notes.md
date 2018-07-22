@@ -39,14 +39,6 @@ Issue ID: PLAT-8908
 ### Deployment command ###
     Run mysql -h@DB_HOST@ -u@DB_USER@ -p@DB_PASSWORD@ -P3306 kaltura -e "set sql_log_bin=0; DROP FUNCTION IF EXISTS getDC; create function getDC() Returns int DETERMINISTIC Return '@DC_ID@'"
 
-- Issue type : task
-- Issue ID: PLAT-9067
-
-### Configuration ###
-	- Add the following to local.ini:
-        free_trial_resource_url = @FREE_TRIAL_RESOURCE_URL@
-
-
 # Naos 14.2.0 #
 
 ## Allow Wowza Media-Server to get conversion profile##
