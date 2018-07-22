@@ -86,8 +86,7 @@
 
         	var d = new Date(0);
         	d.setUTCSeconds(val);
-        	var formattedDate = ("0"+(d.getMonth()+1)).slice(-2) + "." + ("0" + d.getDate()).slice(-2) + "." +
-              	d.getFullYear();
+        	var formattedDate = d.toISOString().slice(0,10).replace(/-/g,".");
         	$(this).val(formattedDate);
     		});
 	}

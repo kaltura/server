@@ -29,7 +29,7 @@ class Form_ReachProfileCredit extends Zend_Form_SubForm
 		));
 
 		$this->addElement('text', 'fromDate', array(
-			'label' => 'From Date: (MM.DD.YYYY)',
+			'label' => 'From Date: (YYYY.MM.DD)',
 			'innerType' => 'DateElement',
 			'required' => true,
 			'filters' => array('StringTrim'),

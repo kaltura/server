@@ -72,10 +72,7 @@ class kVendorCredit
 	 */
 	public function setFromDate($fromDate)
 	{
-		$original = date_default_timezone_get();
-		date_default_timezone_set('UTC');
-		$beginOfDay = strtotime("today", $fromDate);
-		date_default_timezone_set($original);
+		$beginOfDay = kReachUtils::reachStrToTime("today", $fromDate);
 		$this->fromDate = $beginOfDay;
 	}
 

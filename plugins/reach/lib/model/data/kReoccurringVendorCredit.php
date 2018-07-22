@@ -74,18 +74,15 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 
 	public function calculateNextPeriodDates($startTime, $currentDate)
 	{
-		$original = date_default_timezone_get();
-		date_default_timezone_set('UTC');
-		$endTime = strtotime('+1 ' . $this->getFrequency(), $startTime);
+		$endTime = kReachUtils::reachStrToTime('+1 ' . $this->getFrequency(), $startTime);
 		while ($endTime < $currentDate)
 		{
 			$startTime = $endTime;
-			$endTime = strtotime('+1 ' . $this->getFrequency(), $endTime);
+			$endTime = kReachUtils::reachStrToTime('+1 ' . $this->getFrequency(), $endTime);
 		}
-		$this->periodStartDate = $beginOfDay = strtotime("today", $startTime);
+		$this->periodStartDate = kReachUtils::reachStrToTime("today", $startTime);
 		$this->periodEndDate = min($endTime, $this->getToDate());
-		$this->periodEndDate = strtotime("tomorrow", $this->periodEndDate) - 1;
-		date_default_timezone_set($original);
+		$this->periodEndDate = kReachUtils::reachStrToTime("tomorrow", $this->periodEndDate) -1 ;
 	}
 
 	public function setPeriodDates()

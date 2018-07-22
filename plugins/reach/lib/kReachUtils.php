@@ -151,4 +151,14 @@ class kReachUtils
 				return false;
 		}
 	}
+
+	public static function reachStrToTime($offset , $value)
+	{
+		$original = date_default_timezone_get();
+		date_default_timezone_set('UTC');
+		$result = strtotime($offset, $value);
+		date_default_timezone_set($original);
+		return $result;
+	}
+
 }
