@@ -56,11 +56,6 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 	public $profileType;
 	
 	/**
-	 * @var KalturaCatalogItemLanguage
-	 */
-	public $defaultSourceLanguage;
-	
-	/**
 	 * @var KalturaVendorCatalogItemOutputFormat
 	 */
 	public $defaultOutputFormat;
@@ -146,7 +141,6 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 		'updatedAt',
 		'status',
 		'profileType' => 'type',
-		'defaultSourceLanguage',
 		'defaultOutputFormat',
 		'enableMachineModeration',
 		'enableHumanModeration',

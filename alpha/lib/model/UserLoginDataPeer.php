@@ -520,6 +520,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$c = new Criteria();
 		$c->addAnd(kuserPeer::LOGIN_DATA_ID, $loginDataId);
 		$c->addAnd(kuserPeer::STATUS, KuserStatus::ACTIVE, Criteria::EQUAL);
+		$c->addAnd(kuserPeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER, Criteria::GREATER_THAN);
 		if ($notPartnerId) {
 			$c->addAnd(kuserPeer::PARTNER_ID, $notPartnerId, Criteria::NOT_EQUAL);
 		}
