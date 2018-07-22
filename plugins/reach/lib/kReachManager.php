@@ -142,15 +142,19 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$oldPrice = $pendingEntryVendorTask->getPrice();
 			$newPrice = kReachUtils::calculateTaskPrice($entry, $pendingEntryVendorTask->getCatalogItem());
 			$priceDiff = $newPrice - $oldPrice;
+			
+			if(!$priceDiff)
+				continue;
+			
 			$pendingEntryVendorTask->setPrice($newPrice);
-
 			if (!isset($addedCostByProfileId[$pendingEntryVendorTask->getReachProfileId()]))
 				$addedCostByProfileId[$pendingEntryVendorTask->getReachProfileId()] = 0;
 
 			if (kReachUtils::checkPriceAddon($pendingEntryVendorTask, $priceDiff))
 			{
 				$pendingEntryVendorTask->save();
-				$addedCostByProfileId[$pendingEntryVendorTask->getReachProfileId()] += $priceDiff;
+				if($pendingEntryVendorTask->getStatus() != EntryVendorTaskStatus::PENDING_MODERATION)
+					$addedCostByProfileId[$pendingEntryVendorTask->getReachProfileId()] += $priceDiff;
 			}
 			else
 			{
@@ -164,6 +168,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		foreach ($addedCostByProfileId as $reachProfileId => $addedCost)
 		{
+			if(!$addedCost)
+				continue;
+			
 			ReachProfilePeer::updateUsedCredit($reachProfileId, $addedCost);
 		}
 
