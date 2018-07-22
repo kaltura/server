@@ -35,10 +35,10 @@ class ReachProfileService extends KalturaBaseService
 		/* @var $dbReachProfile ReachProfile */
 		$dbReachProfile->setPartnerId(kCurrentContext::getCurrentPartnerId());
 		$dbReachProfile->setStatus(KalturaReachProfileStatus::ACTIVE);
-		
-		if ($dbReachProfile->getCredit() instanceof kReoccurringVendorCredit)
+		$credit = $dbReachProfile->getCredit();
+		if ( $credit && $credit instanceof kReoccurringVendorCredit)
 		{
-			$credit = $dbReachProfile->getCredit();
+			/* @var $credit kReoccurringVendorCredit */
 			$credit->setPeriodDates();
 			$dbReachProfile->setCredit($credit);
 		}

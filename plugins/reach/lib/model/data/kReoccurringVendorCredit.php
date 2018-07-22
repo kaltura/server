@@ -36,23 +36,6 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 	}
 
 	/**
-	 * @param string $toDate
-	 */
-	public function setToDate($toDate)
-	{
-		$endOfDay = strtotime("tomorrow", $toDate) - 1;
-		$this->toDate = $endOfDay;
-	}
-
-	/**
-	 * @param string $toDate
-	 */
-	public function getToDate()
-	{
-		return $this->toDate;
-	}
-
-	/**
 	 * @return string $frequency
 	 */
 	public function getFrequency()
@@ -81,6 +64,8 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 
 	       public function calculateNextPeriodDates($startTime,$currentDate)
 	       {
+		       $original = date_default_timezone_get();
+		       date_default_timezone_set('UTC');
 		       $endTime = strtotime('+1 ' . $this->getFrequency(), $startTime);
 		       while ($endTime < $currentDate)
 		       {
@@ -90,7 +75,7 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 		       $this->periodStartDate = $beginOfDay = strtotime("today", $startTime);
 		       $this->periodEndDate = min($endTime, $this->getToDate());
 		       $this->periodEndDate = strtotime("tomorrow", $this->periodEndDate) - 1;
-
+		       date_default_timezone_set($original);
 	       }
 
       public function setPeriodDates()

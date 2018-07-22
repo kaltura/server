@@ -131,8 +131,9 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 			$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
 			Infra_ClientHelper::impersonate($partnerId);
 			$this->client->startMultiRequest();
-			foreach ($partnerCatalogItems as $partnerCatalogItem)
-				$partnerCatalogItem = $reachPluginClient->PartnerCatalogItem->add($partnerCatalogItem);
+			if (isset($partnerCatalogItems))
+				foreach ($partnerCatalogItems as $partnerCatalogItem)
+					$partnerCatalogItem = $reachPluginClient->PartnerCatalogItem->add($partnerCatalogItem);
 			$result = $this->client->doMultiRequest();
 		}
 

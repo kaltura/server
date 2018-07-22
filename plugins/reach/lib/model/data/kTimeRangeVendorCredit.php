@@ -28,7 +28,10 @@ class kTimeRangeVendorCredit extends kVendorCredit
 	 */
 	public function setToDate($toDate)
 	{
+		$original = date_default_timezone_get();
+		date_default_timezone_set('UTC');
 		$endOfDay = strtotime("tomorrow", $toDate) - 1;
+		date_default_timezone_set($original);
 		$this->toDate = $endOfDay;
 	}
 
