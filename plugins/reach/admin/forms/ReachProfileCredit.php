@@ -79,17 +79,12 @@ class Form_ReachProfileCredit extends Zend_Form_SubForm
 			return new Kaltura_Client_Type_UrlTokenizer();
 
 		$object = new $objectClass();
-		$object->allowOverage = false;
-
 		foreach ($properties as $prop => $value)
 		{
 			if ($prop == "objectType")
 				continue;
 			$object->$prop = $value;
 		}
-
-		if (!empty($properties['overageCredit']))
-			$object->allowOverage = true;
 
 		return $object;
 	}
