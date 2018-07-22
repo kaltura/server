@@ -14,7 +14,7 @@ Issue ID: PLAT-8908
     The script needs to be run on all Master DB's.
 
 ### Deployment command ###
-    Run mysql -h@DB_HOST@ -u@DB_USER@ -p@DB_PASSWORD@ -P3306 kaltura -e "set sql_log_bin=0; create function getDC() Returns int DETERMINISTIC Return '@DC_ID@'"
+    Run mysql -h@DB_HOST@ -u@DB_USER@ -p@DB_PASSWORD@ -P3306 kaltura -e "set sql_log_bin=0; DROP FUNCTION IF EXISTS getDC; create function getDC() Returns int DETERMINISTIC Return '@DC_ID@'"
 
 # Naos 14.2.0 #
 
