@@ -51,10 +51,12 @@ class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEn
 
 	private static function getUserCategories($kuserId, $privacyContext = null, $privacy = null)
 	{
+		$maxUserCategories = kConf::get('maxUserCategories', 'elastic', self::MAX_CATEGORIES);
+
 		$params = array(
 			'index' => ElasticIndexMap::ELASTIC_CATEGORY_INDEX,
 			'type' => ElasticIndexMap::ELASTIC_CATEGORY_TYPE,
-			'size' => self::MAX_CATEGORIES
+			'size' => $maxUserCategories
 		);
 		$body = array();
 		$body['_source'] = false;
@@ -63,6 +65,12 @@ class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEn
 		$partnerStatus = elasticSearchUtils::formatPartnerStatus(kEntryElasticEntitlement::$partnerId, CategoryStatus::ACTIVE);
 		$partnerStatusQuery = new kESearchTermQuery('partner_status', $partnerStatus);
 		$mainBool->addToFilter($partnerStatusQuery);
+
+		if (count(kEntryElasticEntitlement::$filteredCategoryIds))
+		{
+			$filteredCategoryIdsQuery = new kESearchTermsQuery('_id', kEntryElasticEntitlement::$filteredCategoryIds);
+			$mainBool->addToFilter($filteredCategoryIdsQuery);
+		}
 
 		$conditionsBoolQuery = new kESearchBoolQuery();
 
