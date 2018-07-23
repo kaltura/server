@@ -560,18 +560,20 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 			'label' => 'Match Policy:',
 			'multioptions' => array(
 				'' => 'Default',
-				'Monetize in all countries' => 'Monetize',
-				'Track in all countries' => 'Track',
-				'Block in all countries' => 'Block',
+				'Monetize in all countries' => 'Monetize in all countries',
+				'Track in all countries' => 'Track in all countries',
+				'Block in all countries' => 'Block in all countries',
+				'CustomMatchPolicy' => 'Set manually per entry',
 			)));
 
 		$this->addElement('select', 'commercial_policy', array(
 			'label' => 'Usage Policy:',
 			'multioptions' => array(
 				'' => 'Default',
-				'Monetize in all countries' => 'Monetize',
-				'Track in all countries' => 'Track',
-				'Block in all countries' => 'Block',
+				'Monetize in all countries' => 'Monetize in all countries',
+				'Track in all countries' => 'Track in all countries',
+				'Block in all countries' => 'Block in all countries',
+				'CustomUsagePolicy' => 'Set manually per entry',
 			)));
 
 

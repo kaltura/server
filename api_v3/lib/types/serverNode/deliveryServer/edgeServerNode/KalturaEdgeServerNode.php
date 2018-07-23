@@ -13,16 +13,9 @@ class KalturaEdgeServerNode extends KalturaDeliveryServerNode
 	 */
 	public $playbackDomain;
 	
-	/**
-	 * Overdie edge server default configuration - json format
-	 * @var string
-	 */
-	public $config;
-	
 	private static $map_between_objects = array
 	(
 		"playbackDomain" => "playbackHostName",
-		"config",
 	);
 	
 	/* (non-PHPdoc)

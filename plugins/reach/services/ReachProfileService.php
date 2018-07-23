@@ -192,46 +192,15 @@ class ReachProfileService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $reachProfileId);
 
 		// set the object status to deleted
-		$dbReachProfile->syncCredit();
-		$dbReachProfile->save();
+		if( $dbReachProfile->shouldSyncCredit())
+		{
+			$dbReachProfile->syncCredit();
+			$dbReachProfile->save();
+		}
 
 		// return the saved object
 		$reachProfile = new KalturaReachProfile();
 		$reachProfile->fromObject($dbReachProfile, $this->getResponseProfile());
 		return $reachProfile;
 	}
-
-	/**
-	 * reset vednor profile credit
-	 *
-	 * @action resetCredit
-	 * @param int $reachProfileId
-	 * @return KalturaReachProfile
-	 * @throws KalturaReachErrors::REACH_PROFILE_NOT_FOUND
-	 */
-	public function resetCredit($reachProfileId)
-	{
-		$dbReachProfile = ReachProfilePeer::retrieveByPK($reachProfileId);
-		if (!$dbReachProfile)
-			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $reachProfileId);
-
-		$currentCreditHistory = array();
-		$currentCreditHistory ['usedCreditBeforeReset'] = $dbReachProfile->getUsedCredit();
-		$currentCreditHistory ['userId'] = kCurrentContext::$ks_uid;
-		$currentCreditHistory ['resetTime'] = time();
-
-		// reset the used_credit and the usage percentage.
-		$dbReachProfile->setUsedCredit(0);
-		$dbReachProfile->setCreditUsagePercentage(0);
-
-		//add the reset history
-		$dbReachProfile->setCreditResetHistory($currentCreditHistory);
-		$dbReachProfile->save();
-
-		// return the saved object
-		$reachProfile = new KalturaReachProfile();
-		$reachProfile->fromObject($dbReachProfile, $this->getResponseProfile());
-		return $reachProfile;
-	}
-
 }

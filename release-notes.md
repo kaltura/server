@@ -1,3 +1,44 @@
+# Naos 14.3.0 #
+
+## Modify reach_profile used_crdit column type  ##
+- Issue Type: Bug
+- Issue ID: PLAT-9112
+
+### Deployment scripts ###
+	
+	- mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2018_07_19_reach_profile_alter_used_credit_datatype.sql
+		
+### Configuration ###
+	None.
+			
+#### Known Issues & Limitations ####
+	None.
+
+
+## Update new partner registraion email ##
+- Issue type : task
+- Issue ID: PLAT-9067
+
+### Configuration ###
+	- Add the following to local.ini:
+        free_trial_resource_url = @FREE_TRIAL_RESOURCE_URL@
+
+## Fix out of sync Entries between DC's##
+Issue Type:  Bug
+Issue ID: PLAT-8908
+
+## Notes ##
+    Needs to run only on Multi-DC environments.
+    In the deployment commnad you will need to change:
+        @DB_HOST@ - the host
+        @DB_USER@ - mysql user name
+        @DB_PASSWORD@ - mysql password 
+        @DC_ID@ - The ID of the DC (ID can be found in /opt/kaltura/app/configurations/hosts/dc_config/*.ini files)
+    The script needs to be run on all Master DB's.
+
+### Deployment command ###
+    Run mysql -h@DB_HOST@ -u@DB_USER@ -p@DB_PASSWORD@ -P3306 kaltura -e "set sql_log_bin=0; DROP FUNCTION IF EXISTS getDC; create function getDC() Returns int DETERMINISTIC Return '@DC_ID@'"
+
 # Naos 14.2.0 #
 
 ## Allow Wowza Media-Server to get conversion profile##
@@ -64,29 +105,6 @@ None.
 	- Change the following to local.ini:
         [password_reset_links]
         default = @SERVICE_URL@/index.php/kmcng/actions/restore-password/
-
-## kmc-ng: configure kmc-ng server based links ##
-- Issue type : new feature
-- Issue ID: PLAT-8844
-
-### Configuration ###
-	- Add the following to local.ini:
-        [kmcng]
-        previewAndEmbed[embedTypes] = Link to documentation about "Share & Embed > Embed Code Types"
-        previewAndEmbed[deliveryProtocols] = Link to documentation about "Delivery type enforcement"
-        kaltura[kmcOverview] = Link to "KMCng Overview"
-        kaltura[mediaManagement] = Link to "Media Management"
-        kaltura[userManual] = Link to "KMCng User Manual"
-        kaltura[support] = Email support
-        kaltura[signUp] = Link to free trial signup page
-        kaltura[contactUs] = Link to contact us form page
-        kaltura[upgradeAccount] = Link to upgrade account form page
-        kaltura[contactSalesforce] = Link to salesforce contact form page
-        entitlements[manage] = Link to documentation about "Managing Content Entitlement"
-        uploads[needHighSpeedUpload] = Link to "High-Speed Upload Powered by Aspera" registration form 
-        uploads[highSpeedUpload] = Link to "Aspera" page
-        uploads[bulkUploadSamples] = Link to download bulk upload sample zip file
-        live[akamaiEdgeServerIpURL] = Link to akamai server ip list page
 
 ### Deployment scripts ###
 None.
@@ -379,9 +397,43 @@ php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_05_08_playl
 - Issue Type: KMC-NG deployment configuration
 - Issue ID: PLAT-8844
 
-### Configuration ###
-copy all [kmcng] section from base.ini to your local.ini and replace tokens with all relevant info (urls, etc);
+### Install KMC-NG application ###
+1. Get the relevant version 'kmc-ng' from `opt/kaltura/app/configuration/base.ini` key `kmcng_version`
+2. Open [kmc-ng releases](https://github.com/kaltura/kmc-ng/releases) and navigate to the release notes of the relevant version from previous step
+3. Download the zip file and extract content into `/opt/kaltura/apps/kmcng/vX.X.X` (replace X.X.X with actual version.
+4. From within the version folder (`/opt/kaltura/apps/kmcng/vX.X.X`) execute the following command `php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --user=www-data --group=www-data --ini=./deploy/config.ini`
+5. Optional, update `opt/kaltura/app/configuration/local.ini` with additional information used by the KMC-NG application. 
+
+> All keys here are optional, add them if applicable to your server.
  
+```
+[kmcng]
+previewAndEmbed[embedTypes] = URL to documentation about "Share & Embed > Embed Code Types"
+previewAndEmbed[deliveryProtocols] = URL to documentation about "Delivery type enforcement"
+kaltura[kmcOverview] = URL to "KMCng Overview"
+kaltura[mediaManagement] = URL to "Media Management"
+kaltura[userManual] = URL to "KMCng User Manual"
+kaltura[support] = Support email address
+kaltura[signUp] = URL to free trial signup page
+kaltura[contactUs] = URL to contact us form page
+kaltura[upgradeAccount] = URL to upgrade account form page
+kaltura[contactSalesforce] = URL to salesforce contact form page
+entitlements[manage] = URL to documentation about "Managing Content Entitlement"
+uploads[needHighSpeedUpload] = URL to "High-Speed Upload Powered by Aspera" registration form 
+uploads[highSpeedUpload] = URL to "Aspera" page
+uploads[bulkUploadSamples] = URL to download bulk upload sample zip file
+live[akamaiEdgeServerIpURL] = URL to akamai server ip list page
+```
+
+### Running old versions of KMC-NG  ###
+If you need to run KMC-NG version that is not the one specified in `base.ini`, you will need configure your `opt/kaltura/app/configuration/local.ini` with the relevant version.
+```
+[kmcng]
+kmcng_version = vY.Y.Y
+```
+replace `vY.Y.Y` with the relevant version number.
+> Old versions might not be compatible as there are dependencies between KMC-NG and kaltura server API.
+
 ## Live Clipping ##
 - Issue Type: live clipping
 - Issue ID: PLAT-7832

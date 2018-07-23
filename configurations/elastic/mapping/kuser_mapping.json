@@ -156,6 +156,20 @@
 		  "type" : "keyword",
 		  "normalizer" : "kaltura_keyword_normalizer"
 		},
+		"puser_id" : {
+		  "type" : "text",
+		  "analyzer" : "kaltura_text",
+		  "fields": {
+			"ngrams" : {
+			  "type" : "text",
+			  "analyzer" : "kaltura_ngrams"
+			},
+			"raw" : {
+			  "type" : "keyword",
+			  "normalizer" : "kaltura_keyword_normalizer"
+			}
+		  }
+		},
 		"screen_name" : {
 		  "type" : "text",
 		  "analyzer" : "kaltura_text",

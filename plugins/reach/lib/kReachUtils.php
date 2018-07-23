@@ -6,10 +6,12 @@ class kReachUtils
 {
 	/**
 	 * @param $entryId
+	 * @param $shouldModerate
+	 * @param $turnaroundTime
 	 * @return string
 	 * @throws Exception
 	 */
-	public static function generateReachVendorKs($entryId, $shouldModerate = false)
+	public static function generateReachVendorKs($entryId, $shouldModerate = false, $turnaroundTime = dateUtils::DAY)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry)
@@ -30,7 +32,7 @@ class kReachUtils
 			$privileges .= ',' . kSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION;
 
 		$limitedKs = '';
-		$result = kSessionUtils::startKSession($partner->getId(), $partner->getSecret(), '', $limitedKs, dateUtils::DAY, kSessionBase::SESSION_TYPE_USER, '', $privileges, null, null);
+		$result = kSessionUtils::startKSession($partner->getId(), $partner->getSecret(), '', $limitedKs, $turnaroundTime, kSessionBase::SESSION_TYPE_USER, '', $privileges, null, null);
 		if ($result < 0)
 			throw new Exception('Failed to create REACH Vendor limited session for partner '.$partner->getId());
 
@@ -83,6 +85,12 @@ class kReachUtils
 	 */
 	public static function hasCreditExpired(ReachProfile $reachProfile)
 	{
+		if ($reachProfile->shouldSyncCredit())
+		{
+			$reachProfile->syncCredit();
+			$reachProfile->save();
+		}
+
 		$credit = $reachProfile->getCredit();
 		return !$credit->isActive();
 	}

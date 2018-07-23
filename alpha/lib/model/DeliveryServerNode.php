@@ -3,6 +3,7 @@
 abstract class DeliveryServerNode extends ServerNode {
 
 	const CUSTOM_DATA_DELIVERY_IDS = "delivery_profile_ids";
+	const CUSTOM_DATA_CONFIG = "config";
 	
 	public function getPlaybackDomain()
 	{
@@ -23,6 +24,17 @@ abstract class DeliveryServerNode extends ServerNode {
 	public function getDeliveryProfileIds()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_DELIVERY_IDS, null, array());
+	}
+
+	/* Config Settings */
+	public function setConfig($config)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_CONFIG, $config);
+	}
+
+	public function getConfig()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_CONFIG, null, null);
 	}
 
 } // DeliveryServerNode
