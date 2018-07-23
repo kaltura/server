@@ -772,7 +772,7 @@ class serveFlavorAction extends kalturaAction
 		if (is_null($hasAudio))
 		{
 			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorId);
-			$hasAudio = $mediaInfo && $mediaInfo->isContainAudio();
+			$hasAudio = !$mediaInfo || $mediaInfo->isContainAudio();
 		}
 		$clipDesc = array('type' => 'source', 'path' => $path);
 		if (!$hasAudio)
