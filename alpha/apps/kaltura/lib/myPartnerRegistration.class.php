@@ -330,18 +330,20 @@ class myPartnerRegistration
 		if ($existingLoginData && !$ignorePassword)
 		{
 			// if a another user already existing with the same adminEmail, new account will be created only if the right password was given
+			$existingPartner = partnerPeer::retrieveByPK($existingLoginData->getConfigPartnerId());
 			if (!$password)
 			{
-				$this->markExistingEmailRegisterFailure($existingLoginData, SignupException::MISSING_PASSWORD_FOR_EXISTING_EMAIL);
+				$this->addMarketoCampaignId($existingPartner, 'marketo_missing_Password_campaign');
 				throw new SignupException("User with email [$email] already exists in system.", SignupException::MISSING_PASSWORD_FOR_EXISTING_EMAIL );
 			}
 			else if ($existingLoginData->isPasswordValid($password))
 			{
 				KalturaLog::log('Login id ['.$email.'] already used, and given password is valid. Creating new partner with this same login id');
+				$this->addMarketoCampaignId($existingPartner, 'marketo_additional_register_success_campaign');
 			}
 			else
 			{
-				$this->markExistingEmailRegisterFailure($existingLoginData, SignupException::INCORRECT_PASSWORD_FOR_EXISTING_EMAIL);
+				$this->addMarketoCampaignId($existingPartner, 'marketo_wrong_password_campaign');
 				throw new SignupException("Invalid password for user with email [$email].", SignupException::INCORRECT_PASSWORD_FOR_EXISTING_EMAIL );
 			}
 			
@@ -376,6 +378,9 @@ class myPartnerRegistration
 					
 			$this->setAllTemplateEntriesToAdminKuser($newPartner->getId(), $kuserId);
 
+			if(!$existingLoginData)
+				$this->addMarketoCampaignId($newPartner, 'marketo_new_register_success_campaign');
+
 			kEventsManager::raiseEvent(new kObjectAddedEvent($newPartner));
 
 			return array($newPartner->getId(), $newSubPartnerId, $newAdminKuserPassword, $newPassHashKey);
@@ -387,11 +392,14 @@ class myPartnerRegistration
 		}
 	}
 
-	private function markExistingEmailRegisterFailure($existingLoginData, $failureReason)
+	private function addMarketoCampaignId($partner, $campaignName)
 	{
-		$existingPartner = partnerPeer::retrieveByPK($existingLoginData->getConfigPartnerId());
-		$existingPartner->setAdditionalAccountFailureReason($failureReason);
-		$existingPartner->save();
+		if (kConf::hasParam($campaignName))
+		{
+			$campaignId = kConf::get($campaignName);
+			$partner->setMarketoCampaignId($campaignId);
+			$partner->save();
+		}
 	}
 
 	private function allowOnlyOneActiveFreeTrialAccountCreation($partner, $email)

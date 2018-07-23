@@ -4,6 +4,7 @@ elasticClientCurlTimeout = @CURL_TIMEOUT_IN_SEC@
 ;set to true in order to disable elastic indexing
 disableElastic = false
 ngramPercentage = 80
+maxUserCategories = 1024
 
 [innerHits]
 captionInnerHitsSize = 5

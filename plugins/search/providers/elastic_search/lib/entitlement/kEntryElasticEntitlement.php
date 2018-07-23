@@ -17,7 +17,8 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
     public static $publicActiveEntries = false; //active
     public static $parentEntitlement = false;
     public static $entryInSomeCategoryNoPC = false; //active + pending
-    
+    public static $filteredCategoryIds = array();
+
     protected static $entitlementContributors = array(
         'kElasticEntryDisableEntitlementDecorator',
         'kElasticPublicEntriesEntitlementDecorator',
@@ -107,7 +108,7 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
                 $privacy[] = category::formatPrivacy(PrivacyType::AUTHENTICATED_USERS, self::$partnerId);
 
             self::$privacy = $privacy;
-
+            self::$filteredCategoryIds = array();
             self::$userCategoryToEntryEntitlement = true;
         }
     }
@@ -123,4 +124,48 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
 
         return $kuserId;
     }
+
+    public static function setFilteredCategoryIds(ESearchOperator $eSearchOperator, $objectId)
+    {
+        if($eSearchOperator->getOperator() != ESearchOperatorType::AND_OP)
+            return;
+
+        $searchItems = $eSearchOperator->getSearchItems();
+        $filteredCategoryIds = array();
+        $filteredEntryId = $objectId ? array($objectId) : array();
+        foreach ($searchItems as $searchItem)
+        {
+            $filteredObjectId = $searchItem->getFilteredObjectId();
+            if ($filteredObjectId)
+            {
+                $filteredEntryId[] = $filteredObjectId;
+            }
+            $FilteredCategoryId = $searchItem->getFilteredCategoryId();
+            if ($FilteredCategoryId)
+            {
+                $filteredCategoryIds[] = $FilteredCategoryId;
+            }
+        }
+
+        $filteredCategoriesByEntryId = self::getCategoryIdsForEntryId($filteredEntryId);
+        $filteredCategoryIds = array_merge($filteredCategoryIds, $filteredCategoriesByEntryId);
+        self::$filteredCategoryIds = $filteredCategoryIds;
+    }
+
+    protected static function getCategoryIdsForEntryId($filteredEntryId)
+    {
+        $filteredCategoryIds = array();
+        $filteredEntriesIds = array_unique($filteredEntryId);
+        $filteredEntriesIds = array_values($filteredEntriesIds);
+        if (count($filteredEntriesIds) == 1)
+        {
+            $categoryEntries = categoryEntryPeer::selectByEntryId($filteredEntriesIds[0]);
+            foreach ($categoryEntries as $categoryEntry)
+            {
+                $filteredCategoryIds[] = $categoryEntry->getCategoryId();
+            }
+        }
+        return $filteredCategoryIds;
+    }
+
 }
