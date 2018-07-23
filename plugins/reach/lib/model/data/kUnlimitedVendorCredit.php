@@ -34,7 +34,7 @@ class kUnlimitedVendorCredit extends kVendorCredit
 	 */
 	public function setToDate($toDate)
 	{
-		$endOfDay = strtotime("tomorrow", $toDate) - 1;
+		$endOfDay = kReachUtils::reachStrToTime("tomorrow", $toDate) - 1;
 		$this->toDate = $endOfDay;
 	}
 	
