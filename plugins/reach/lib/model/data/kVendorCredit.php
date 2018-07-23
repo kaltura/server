@@ -72,7 +72,7 @@ class kVendorCredit
 	 */
 	public function setFromDate($fromDate)
 	{
-		$beginOfDay = strtotime("today", $fromDate);
+		$beginOfDay = kReachUtils::reachStrToTime("today", $fromDate);
 		$this->fromDate = $beginOfDay;
 	}
 

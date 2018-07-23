@@ -12,7 +12,7 @@ class Form_ReachProfileUnlimitedCredit extends Form_ReachProfileCredit
 		$this->removeElement("overageCredit");
 		
 		$this->addElement('text', 'toDate', array(
-			'label'			=> 'To Date: (MM.DD.YYYY)',
+			'label'			=> 'To Date: (YYYY.MM.DD)',
 			'innerType'     => 'DateElement',
 			'required'      => true,
 			'filters'		=> array('StringTrim'),
