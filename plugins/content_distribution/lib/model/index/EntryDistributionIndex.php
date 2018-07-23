@@ -264,12 +264,14 @@ class EntryDistributionIndex extends BaseIndexObject
 		return self::$apiMatchAttributesMap;
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationMap()
 	{
 		return array(
 		);
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationValues()
 	{
 		return array(

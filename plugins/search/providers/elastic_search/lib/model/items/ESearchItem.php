@@ -134,4 +134,14 @@ abstract class ESearchItem extends BaseObject implements IESearchItem
 		return $result;
 	}
 
+	public function getFilteredCategoryId()
+	{
+		return null;
+	}
+
+	public function getFilteredObjectId()
+	{
+		return null;
+	}
+
 }

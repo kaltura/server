@@ -16,6 +16,7 @@
 class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 {
 	const MAX_NUMBER_OF_GROUPS_PER_USER = 100;
+	const GROUP_USER_CREATION_MODE = 'creation_mode';
 
 
 	public function setPuserId($puserId)
@@ -81,4 +82,7 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 			throw new kCoreException('kuser not found');
 		$kuser->indexToElastic();
 	}
+
+	public function setCreationMode($v)	{$this->putInCustomData (self::GROUP_USER_CREATION_MODE, $v);}
+	public function getCreationMode(){return $this->getFromCustomData(self::GROUP_USER_CREATION_MODE, null, GroupUserCreationMode::MANUAL);}
 } // KuserKgroup

@@ -1,6 +1,7 @@
 <?php
 /**
  * @package api
+ * @relatedService SystemPartnerService
  * @subpackage filters.base
  * @abstract
  */

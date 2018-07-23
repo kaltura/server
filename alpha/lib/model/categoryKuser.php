@@ -13,7 +13,7 @@
  * @package Core
  * @subpackage model
  */
-class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticIndexable
+class categoryKuser extends BasecategoryKuser implements IIndexable
 {
 	
 	private $old_status = null;
@@ -406,146 +406,17 @@ class categoryKuser extends BasecategoryKuser implements IIndexable, IElasticInd
 		return $permissionNamesArr;
 	}
 
-
 	public function getCacheInvalidationKeys()
 	{
 		return array("categoryKuser:id=".strtolower($this->getId()), "categoryKuser:categoryId=".strtolower($this->getCategoryId()));
 	}
 
 	/**
-	 * return the name of the elasticsearch index for this object
+	 * @return partner
 	 */
-	public function getElasticIndexName()
+	public function getPartner()
 	{
-		return ElasticIndexMap::ELASTIC_CATEGORY_INDEX;
-	}
-
-	/**
-	 * return the name of the elasticsearch type for this object
-	 */
-	public function getElasticObjectType()
-	{
-		return ElasticIndexMap::ELASTIC_CATEGORY_TYPE;
-	}
-
-	/**
-	 * return the elasticsearch id for this object
-	 */
-	public function getElasticId()
-	{
-		return $this->getCategoryId();
-	}
-
-	/**
-	 * return the elasticsearch parent id or null if no parent
-	 */
-	public function getElasticParentId()
-	{
-		return null;
-	}
-
-	/**
-	 * get the params we index to elasticsearch for this object
-	 */
-	public function getObjectParams($params = null)
-	{
-		$body = array(
-			'scripted_upsert' => true,
-			'script' => array(
-				'inline' => $this->getInlineScript(),
-				'lang' => 'painless',
-				'params' => $this->getScriptParams(),
-			),
-			'upsert' => new stdClass(),
-			'retry_on_conflict' => 10
-		);
-		return $body;
-	}
-
-	private function getScriptParams()
-	{
-		$removeValues = array(strval($this->getKuserId()));
-		$permissionLevels = elasticSearchUtils::getCategoryUserAllPermissionLevels($this->getKuserId());
-		$removeValues = array_merge($removeValues, $permissionLevels);
-		$permissionNames = elasticSearchUtils::getCategoryUserAllPermissionNames($this->getKuserId());
-		$removeValues = array_merge($removeValues, $permissionNames);
-
-		$params = array(
-			'usersToRemove' => $removeValues
-		);
-
-		if($this->getStatus() == CategoryKuserStatus::ACTIVE)
-		{
-			$addValues = array(strval($this->getKuserId()));
-			$addValues[] = elasticSearchUtils::formatCategoryUserPermissionLevel($this->getKuserId(), $this->getPermissionLevel());
-			$permissionNames = $this->getPermissionNames();
-			$permissionNames = explode(',', $permissionNames);
-			foreach ($permissionNames as $permissionName)
-				$addValues[] = elasticSearchUtils::formatCategoryUserPermissionName($this->getKuserId(), $permissionName);
-
-			$params['usersToAdd'] = $addValues;
-		}
-		return $params;
-	}
-
-	private function getInlineScript()
-	{
-		if($this->getStatus() == CategoryKuserStatus::ACTIVE)
-		{
-			$script = 'if(ctx._source.kuser_ids == null) {ctx._source.kuser_ids = new ArrayList(); for(p in params.usersToAdd){ctx._source.kuser_ids.add(p);}}';
-			$script .= 'else {ctx._source.kuser_ids.removeIf(item-> params.usersToRemove.contains(item)); for(p in params.usersToAdd){ctx._source.kuser_ids.add(p);}}';
-		}
-		else
-		{
-			$script = "if(ctx._source.kuser_ids == null) {ctx.op = 'none'} else {ctx._source.kuser_ids.removeIf(item-> params.usersToRemove.contains(item));}";
-		}
-
-		return $script;
-	}
-
-	/**
-	 * return the save method to elastic: ElasticMethodType::INDEX or ElasticMethodType::UPDATE
-	 */
-	public function getElasticSaveMethod()
-	{
-		return ElasticMethodType::UPDATE;
-	}
-
-	/**
-	 * Index the object into elasticsearch
-	 */
-	public function indexToElastic($params = null)
-	{
-		kEventsManager::raiseEventDeferred(new kObjectReadyForElasticIndexEvent($this));
-	}
-
-	/**
-	 * return true if the object needs to be deleted from elastic
-	 */
-	public function shouldDeleteFromElastic()
-	{
-		return false;
-	}
-
-	/**
-  * @return partner
-  */
-        public function getPartner()
-        {
-                return PartnerPeer::retrieveByPK( $this->getPartnerId() );
-        }
-
-/**
-	 * return the name of the object we are indexing
-	 */
-	public function getElasticObjectName()
-	{
-		return 'category_kuser';
-	}
-
-	public function getElasticEntryId()
-	{
-		return null;
+		return PartnerPeer::retrieveByPK( $this->getPartnerId() );
 	}
 
 } // categoryKuser

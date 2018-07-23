@@ -21,7 +21,7 @@ class IndexableField {
 	
 	/**  Whether the property can be filtered by 'is null' condition */
 	public $nullable = false;
-	
+
 	/**  Whether the query can be ordered by this field */
 	public $orderable = false;
 	
@@ -57,161 +57,161 @@ class IndexableField {
 	}
 	
 	/**
-	 * @return the $name
+	 * @return $name
 	 */
 	public function getName() {
 		return $this->name;
 	}
 
 	/**
-	 * @return the $getter
+	 * @return $getter
 	 */
 	public function getGetter() {
 		return $this->getter;
 	}
 
 	/**
-	 * @return the $type
+	 * @return $type
 	 */
 	public function getType() {
 		return $this->type;
 	}
 
 	/**
-	 * @return the $nullable
+	 * @return $nullable
 	 */
 	public function getNullable() {
 		return $this->nullable;
 	}
 
 	/**
-	 * @return the $orederable
+	 * @return $orederable
 	 */
 	public function getOrderable() {
 		return $this->orderable;
 	}
 
 	/**
-	 * @return the $searchOnly
+	 * @return $searchOnly
 	 */
 	public function getSearchOnly() {
 		return $this->searchOnly;
 	}
 
 	/**
-	 * @return the $skipField
+	 * @return $skipField
 	 */
 	public function getSkipField() {
 		return $this->skipField;
 	}
 
 	/**
-	 * @return the $matchable
+	 * @return $matchable
 	 */
 	public function getMatchable() {
 		return $this->matchable;
 	}
 
 	/**
-	 * @param field_type $name
+	 * @param $name
 	 */
 	public function setName($name) {
 		$this->name = $name;
 	}
 
 	/**
-	 * @param field_type $getter
+	 * @param $getter
 	 */
 	public function setGetter($getter) {
 		$this->getter = $getter;
 	}
 
 	/**
-	 * @param field_type $type
+	 * @param $type
 	 */
 	public function setType($type) {
 		$this->type = $type;
 	}
 
 	/**
-	 * @param field_type $nullable
+	 * @param $nullable
 	 */
 	public function setNullable($nullable) {
 		$this->nullable = $nullable;
 	}
 
 	/**
-	 * @param field_type $orederable
+	 * @param $orederable
 	 */
 	public function setOrderable($orderable) {
 		$this->orderable = $orderable;
 	}
 
 	/**
-	 * @param field_type $searchOnly
+	 * @param $searchOnly
 	 */
 	public function setSearchOnly($searchOnly) {
 		$this->searchOnly = $searchOnly;
 	}
 
 	/**
-	 * @param field_type $skipField
+	 * @param $skipField
 	 */
 	public function setSkipField($skipField) {
 		$this->skipField = $skipField;
 	}
 
 	/**
-	 * @param field_type $matchable
+	 * @param $matchable
 	 */
 	public function setMatchable($matchable) {
 		$this->matchable = $matchable;
 	}
-	
+
 	/**
-	 * @return the $indexEscapeType
+	 * @return $indexEscapeType
 	 */
 	public function getIndexEscapeType() {
 		return $this->indexEscapeType;
 	}
 
 	/**
-	 * @return the $searchEscapeType
+	 * @return $searchEscapeType
 	 */
 	public function getSearchEscapeType() {
 		return $this->searchEscapeType;
 	}
 
 	/**
-	 * @param NULL $indexEscapeType
+	 * @param $indexEscapeType
 	 */
 	public function setIndexEscapeType($indexEscapeType) {
 		$this->indexEscapeType = $indexEscapeType;
 	}
 
 	/**
-	 * @param NULL $searchEscapeType
+	 * @param $searchEscapeType
 	 */
 	public function setSearchEscapeType($searchEscapeType) {
 		$this->searchEscapeType = $searchEscapeType;
 	}
 
 	/**
-	 * @return the $indexName
+	 * @return $indexName
 	 */
 	public function getIndexName() {
 		return $this->indexName;
 	}
 
 	/**
-	 * @param field_type $indexName
+	 * @param $indexName
 	 */
 	public function setIndexName($indexName) {
 		$this->indexName = $indexName;
 	}
 	
 	/**
-	 * @return the $keepCondition
+	 * @return $keepCondition
 	 */
 	public function getKeepCondition() {
 		return $this->keepCondition;
@@ -225,7 +225,7 @@ class IndexableField {
 	}
 	
 	/**
-	 * @return the $sphinxStringAttribute
+	 * @return $sphinxStringAttribute
 	 */
 	public function getSphinxStringAttribute() {
 		return $this->sphinxStringAttribute;

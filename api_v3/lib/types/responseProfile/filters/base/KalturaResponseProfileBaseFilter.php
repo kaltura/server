@@ -39,7 +39,7 @@ abstract class KalturaResponseProfileBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * @var int
+	 * @var bigint
 	 */
 	public $idEqual;
 

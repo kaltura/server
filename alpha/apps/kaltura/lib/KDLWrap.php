@@ -443,7 +443,8 @@ class KDLWrap
 				
 					// Add qt-faststart processing for mp4 targets (relevant to pre-opertors mode) 
 				if($flavor->getFormat()=="mp4" 
-				&& in_array($cdlTrnsId, array(conversionEngineType::FFMPEG, conversionEngineType::FFMPEG_AUX, conversionEngineType::FFMPEG_VP8, conversionEngineType::MENCODER))){
+				&& in_array($cdlTrnsId, array(conversionEngineType::FFMPEG, conversionEngineType::CHUNKED_FFMPEG, 
+							      conversionEngineType::FFMPEG_AUX, conversionEngineType::FFMPEG_VP8, conversionEngineType::MENCODER))){
 					$fsAddonStr = kConvertJobData::CONVERSION_MILTI_COMMAND_LINE_SEPERATOR.kConvertJobData::CONVERSION_FAST_START_SIGN;
 					$commandLines[$cdlTrnsId].=$fsAddonStr;
 				}
@@ -792,7 +793,7 @@ class KDLWrap
 		 */
 		$assetBr = max($contBr,$vidBr+$audBr);
 		$fla->setBitrate($assetBr);
-		
+		$fla->setContainsAudio($cdlMediaInfo->isContainAudio());
 		/*
 		 * Set flavorAsset language to mediaInfo first audio language
 		 */

@@ -11,14 +11,14 @@ class ESearchService extends KalturaBaseService
 	 * @action searchEntry
 	 * @param KalturaESearchEntryParams $searchParams
 	 * @param KalturaPager $pager
-	 * @return KalturaESearchResponse
+	 * @return KalturaESearchEntryResponse
 	 */
 	function searchEntryAction(KalturaESearchEntryParams $searchParams, KalturaPager $pager = null)
 	{
 		$entrySearch = new kEntrySearch();
 		list($coreResults, $objectCount) = $this->initAndSearch($entrySearch, $searchParams, $pager);
-		$response = new KalturaESearchResponse();
-		$response->objects = KalturaESearchEntryResultArray::fromDbArray($coreResults);
+		$response = new KalturaESearchEntryResponse();
+		$response->objects = KalturaESearchEntryResultArray::fromDbArray($coreResults, $this->getResponseProfile());
 		$response->totalCount = $objectCount;
 		return $response;
 	}
@@ -28,14 +28,14 @@ class ESearchService extends KalturaBaseService
 	 * @action searchCategory
 	 * @param KalturaESearchCategoryParams $searchParams
 	 * @param KalturaPager $pager
-	 * @return KalturaESearchResponse
+	 * @return KalturaESearchCategoryResponse
 	 */
 	function searchCategoryAction(KalturaESearchCategoryParams $searchParams, KalturaPager $pager = null)
 	{
 		$categorySearch = new kCategorySearch();
 		list($coreResults, $objectCount) = $this->initAndSearch($categorySearch, $searchParams, $pager);
-		$response = new KalturaESearchResponse();
-		$response->objects = KalturaESearchCategoryResultArray::fromDbArray($coreResults);
+		$response = new KalturaESearchCategoryResponse();
+		$response->objects = KalturaESearchCategoryResultArray::fromDbArray($coreResults, $this->getResponseProfile());
 		$response->totalCount = $objectCount;
 		return $response;
 	}
@@ -45,14 +45,14 @@ class ESearchService extends KalturaBaseService
 	 * @action searchUser
 	 * @param KalturaESearchUserParams $searchParams
 	 * @param KalturaPager $pager
-	 * @return KalturaESearchResponse
+	 * @return KalturaESearchUserResponse
 	 */
 	function searchUserAction(KalturaESearchUserParams $searchParams, KalturaPager $pager = null)
 	{
 		$userSearch = new kUserSearch();
 		list($coreResults, $objectCount) = $this->initAndSearch($userSearch, $searchParams, $pager);
-		$response = new KalturaESearchResponse();
-		$response->objects = KalturaESearchUserResultArray::fromDbArray($coreResults);
+		$response = new KalturaESearchUserResponse();
+		$response->objects = KalturaESearchUserResultArray::fromDbArray($coreResults, $this->getResponseProfile());
 		$response->totalCount = $objectCount;
 		return $response;
 	}

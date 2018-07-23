@@ -1,6 +1,7 @@
 <?php
 /**
  * @package api
+ * @relatedService ThumbAssetService
  * @subpackage filters.base
  * @abstract
  */

@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.schedule
+ * @relatedService ScheduleEventService
  * @subpackage api.filters.base
  * @abstract
  */
@@ -41,6 +42,8 @@ abstract class KalturaScheduleEventBaseFilter extends KalturaRelatedFilter
 
 	static private $order_by_map = array
 	(
+		"+summary" => "+summary",
+		"-summary" => "-summary",
 		"+startDate" => "+start_date",
 		"-startDate" => "-start_date",
 		"+endDate" => "+end_date",
@@ -51,8 +54,6 @@ abstract class KalturaScheduleEventBaseFilter extends KalturaRelatedFilter
 		"-createdAt" => "-created_at",
 		"+updatedAt" => "+updated_at",
 		"-updatedAt" => "-updated_at",
-		"+summary" => "+summary",
-		"-summary" => "-summary",
 	);
 
 	public function getMapBetweenObjects()

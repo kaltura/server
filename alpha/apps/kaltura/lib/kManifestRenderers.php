@@ -60,6 +60,11 @@ abstract class kManifestRenderer
 	 */
 	public $contributors;
 	
+	/**
+	 * @var string
+	 */
+	public $playbackContext = null;
+	
 	protected function prepareFlavors()
 	{
 	}
@@ -101,11 +106,6 @@ abstract class kManifestRenderer
 		return "\n";
 	}
 
-	// allow to replace {deliveryCode} place holder with the deliveryCode parameter passed to the action
-	// a publisher with a rtmpUrl set to {deliveryCode}.example.com/ondemand will be able to use different
-	// cdn configuration for different sub publishers by passing a different deliveryCode to the KDP
-	abstract protected function replaceDeliveryCode();
-	
 	abstract protected function tokenizeUrls();
 	
 	abstract protected function applyDomainPrefix();
@@ -133,6 +133,8 @@ abstract class kManifestRenderer
 		{
 			$this->tokenizer->setPlaybackContext($playbackContext);
 		}
+		
+		$this->playbackContext = $playbackContext;
 	}
 	
 	/**
@@ -141,6 +143,16 @@ abstract class kManifestRenderer
 	public function setDeliveryCode($deliveryCode)
 	{
 		$this->deliveryCode = $deliveryCode ? $deliveryCode : $this->defaultDeliveryCode;
+	}
+	
+	protected function replacePlaybackContext($str)
+	{
+		if($this->playbackContext)
+			$str = str_replace("{playbackContext}", "/playbackContext/".rawurlencode($this->playbackContext), $str);
+		else
+			$str = str_replace("{playbackContext}", "", $str);
+		
+		return $str;
 	}
 
 	protected function sendAnalyticsBeacon($host, $port)
@@ -244,9 +256,6 @@ abstract class kManifestRenderer
 	{
 		$this->prepareFlavors();
 		
-		if ($this->deliveryCode)
-			$this->replaceDeliveryCode();
-
 		$this->replacePlayServerSessionId();
 		
 		$this->tokenizeUrls();
@@ -257,6 +266,10 @@ abstract class kManifestRenderer
 		$headers[] = "Access-Control-Expose-Headers: Server,range,Content-Length,Content-Range";
 		foreach ($headers as $header)
 		{
+			if ($this->deliveryCode)
+			{
+			    $header = str_replace("{deliveryCode}", $this->deliveryCode, $header);
+			}
 			header($header);
 		}
 		
@@ -285,7 +298,12 @@ abstract class kManifestRenderer
 		}
 		$content .= implode($separator, $flavors);
 		$content .= $separator . $footer;
+
+		if($this->deliveryCode)
+			$content = str_replace("{deliveryCode}", $this->deliveryCode, $content);
 		
+		$content = $this->replacePlaybackContext($content);
+
 		header('Content-Length: ' . strlen($content));		// avoid chunked encoding
 		
 		echo $content;
@@ -372,13 +390,7 @@ class kSingleUrlManifestRenderer extends kManifestRenderer
 		$this->flavor = reset($flavors);	
 		$this->entryId = $entryId;
 	}
-	
-	protected function replaceDeliveryCode()
-	{
-		$this->flavor['url'] = str_replace("{deliveryCode}", $this->deliveryCode, $this->flavor['url']);
-		$this->flavor['urlPrefix'] = str_replace("{deliveryCode}", $this->deliveryCode, $this->flavor['urlPrefix']);
- 	}
-	
+
 	protected function tokenizeUrls()
 	{
 		self::normalizeUrlPrefix($this->flavor);
@@ -435,19 +447,7 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 		$this->entryId = $entryId;
 		$this->baseUrl = $baseUrl;
 	}
-	
-	protected function replaceDeliveryCode()
-	{
-		$this->baseUrl = str_replace("{deliveryCode}", $this->deliveryCode, $this->baseUrl);
-		
-		foreach ($this->flavors as &$flavor)
-		{
-			$flavor['url'] = str_replace("{deliveryCode}", $this->deliveryCode, $flavor['url']);
-			if (isset($flavor['urlPrefix']))
-				$flavor['urlPrefix'] = str_replace("{deliveryCode}", $this->deliveryCode, $flavor['urlPrefix']);
-		}
-	}
-	
+
 	protected function tokenizeUrls()
 	{
 		if ($this->baseUrl)
@@ -880,6 +880,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	{
 		$audioFlavorsArr = array(); 
 		$audio = null;
+		$firstAudioStream = null;
 		if ($this->hasAudioFlavors) {
 			$audio = ",AUDIO=\"audio\"";
 		}
@@ -889,7 +890,13 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		{
 			// Sperate audio flavors from video flavors
 			if ( isset($flavor['audioLanguage']) || isset($flavor['audioLabel']) ) {
-				$isFirstAudioStream = (count($audioFlavorsArr) == 0) ? "YES" : "NO";
+				if(count($audioFlavorsArr) == 0) {
+					$isFirstAudioStream = "YES";
+					$firstAudioStream = $flavor;
+				}
+				else
+					$isFirstAudioStream = "NO";
+
 				$language = (isset($flavor['audioLanguage'])) ? $flavor['audioLanguage'] : 'und';
 				$languageName = (isset($flavor['audioLabel'])) ? $flavor['audioLabel'] : $flavor['audioLanguageName'];
 				$content = "#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"audio\",LANGUAGE=\"{$language}\",NAME=\"{$languageName}\"" . 
@@ -897,29 +904,40 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 				$audioFlavorsArr[] = $content;
 			}
 			else {
-				$bitrate = $this->calculateBitRate($flavor);
-				$codecs = "";
-				$resolution = '';
-				if(isset($flavor['width']) && isset($flavor['height']) &&
-					(($flavor['width'] > 0) || ($flavor['height'] > 0)))
-				{
-					$width = $flavor['width'];
-					$height = $flavor['height'];
-					if ($width && $height)
-						$resolution = ",RESOLUTION={$width}x{$height}";
-				}
-				else if ($bitrate && $bitrate <= self::AUDIO_CODECS_BITRATE_THRESHOLD)
-					$codecs = ',CODECS="mp4a.40.2"';
-				$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}{$audio}\n";
-				$content .= $flavor['url'];
-				$flavorsArr[] = $content;
+				$flavorsArr[] = $this->addExtXStreamInf($flavor, $audio);
 			}
 		}
+
+		if ((count($flavorsArr) == 0) && isset($firstAudioStream))
+			$flavorsArr[] = $this->addExtXStreamInf($firstAudioStream, $audio);
+
 		if (count($audioFlavorsArr) > 0) {
 			return array_merge($audioFlavorsArr, array(''), $flavorsArr);
 		}		
 		return $flavorsArr;
 	}
+
+
+	private function addExtXStreamInf($flavor, $audio)
+	{
+		$bitrate = $this->calculateBitRate($flavor);
+		$codecs = "";
+		$resolution = '';
+		if(isset($flavor['width']) && isset($flavor['height']) &&
+			(($flavor['width'] > 0) || ($flavor['height'] > 0)))
+		{
+			$width = $flavor['width'];
+			$height = $flavor['height'];
+			if ($width && $height)
+				$resolution = ",RESOLUTION={$width}x{$height}";
+		}
+		else if ($bitrate && $bitrate <= self::AUDIO_CODECS_BITRATE_THRESHOLD)
+			$codecs = ',CODECS="mp4a.40.2"';
+		$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}{$audio}\n";
+		$content .= $flavor['url'];
+		return $content;
+	}
+
 
 	private function calculateBitRate($flavor)
 	{
@@ -1017,6 +1035,7 @@ class kRedirectManifestRenderer extends kSingleUrlManifestRenderer
 	protected function getHeaders()
 	{
 		$url = str_replace(" ", "%20", $this->flavor['url']);
+		$url = $this->replacePlaybackContext($url);
 		return array("location:{$url}");
 	}
 }

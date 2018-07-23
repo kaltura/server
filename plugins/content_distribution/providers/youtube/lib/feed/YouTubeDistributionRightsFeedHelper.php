@@ -66,7 +66,7 @@ class YouTubeDistributionRightsFeedHelper
 			$feed->appendFileElement('image', false, pathinfo($thumbnailFilePath, PATHINFO_BASENAME), $thumbnailTag);
 			$feed->appendVideoArtworkElement('custom_thumbnail', $thumbnailTag);
 		}
-		
+
 		// Handle addition of caption asset items
 		$captionAssetInfo = $feed->getCaptionAssetInfo($captionAssetIds);
 		foreach($captionAssetInfo as $captionInfo)
@@ -434,7 +434,7 @@ class YouTubeDistributionRightsFeedHelper
 
 		$invideoValue = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::ADVERTISING_INVIDEO);
 		if ($invideoValue)
-			$this->setByXpath('ad_policy/overlay/invideo', $adsenseForVideoValue);
+			$this->setByXpath('ad_policy/overlay/invideo', $invideoValue);
 
 		$instreamStandardValue = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::ADVERTISING_INSTREAM_STANDARD);
 		if ($instreamStandardValue )

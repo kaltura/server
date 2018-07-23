@@ -31,6 +31,8 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 	protected function execute_conversion_cmdline($command, &$returnVar)
 	{
 		KalturaLog::log($command);
+		if(strstr($command,"ffmpeg")===false)
+			return parent::execute_conversion_cmdline($command, $returnVar);
 		if(!isset(KBatchBase::$taskConfig->params->executionMode)){
 			$returnVar = -1;
 			$errMsg = "ERROR: Missing executionMode value in the batch/worker.ini";

@@ -277,8 +277,7 @@ class serveFlavorAction extends kalturaAction
 						$path = '';
 						$storeCache = false;
 					}
-
-					$clips[] = array('type' => 'source', 'path' => $path);
+					$clips[] = $this->getClipData($path,$flavor);
 				}
 				$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($origEntryFlavor->getId(), $origEntry->getId()));
 			}
@@ -759,6 +758,30 @@ class serveFlavorAction extends kalturaAction
 			}
 		}
 		return $flavor;
+	}
+
+	/**
+	 * @param string $path
+	 * @param flavorAsset $flavor
+	 * @return array
+	 */
+	private function getClipData($path, $flavor)
+	{
+		$flavorId = $flavor->getId();
+		$hasAudio = $flavor->getContainsAudio();
+		if (is_null($hasAudio))
+		{
+			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorId);
+			$hasAudio = !$mediaInfo || $mediaInfo->isContainAudio();
+		}
+		$clipDesc = array('type' => 'source', 'path' => $path);
+		if (!$hasAudio)
+		{
+			KalturaLog::debug("$flavorId Audio Bit rate is null or 0 (taken from mediaInfo)");
+			$silent = array_merge(array(array('type' => 'silence')),array($clipDesc));
+			$clipDesc = array('type' => 'mixFilter','sources' => $silent);
+		}
+		return $clipDesc ;
 	}
 
 }

@@ -44,6 +44,7 @@ class kDruidBase
 	const DRUID_NUMERIC = 'numeric';
 	const DRUID_INVERTED = 'inverted';
 	const DRUID_CONTEXT = 'context';
+	const DRUID_COMMENT = 'comment';		// Note: not really defined in druid, anything we put on the context of the query gets printed to log
 	const DRUID_PRIORITY = 'priority';
 	const DRUID_SKIP_EMPTY_BUCKETS = 'skipEmptyBuckets';
 	const DRUID_AND = 'and';
@@ -254,6 +255,16 @@ class kDruidBase
 	{
 		kApiCache::disableConditionalCache();
 		
+		if (!isset($content[self::DRUID_CONTEXT]))
+		{
+			$content[self::DRUID_CONTEXT] = array();
+		}
+
+		$uniqueId = new UniqueId();
+		$comment = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
+		$comment .= "[$uniqueId]";
+		$content[self::DRUID_CONTEXT][self::DRUID_COMMENT] = $comment;
+
 		KalturaLog::log('{' . print_r($content, true) . '}');
 			
 		$post = json_encode($content);

@@ -92,6 +92,7 @@ class myPartnerRegistration
 		$quickStartGuideLink = kConf::get('quick_start_guide_url');
 		$uploadMediaVideoLink = kConf::get('upload_media_video_url');
 		$howToPublishVideoLink = kConf::get('how_to_publish_video_url');
+		$freeTrialResourceLink = kConf::get('free_trial_resource_url', 'local', '');
 		if ( $recipient_email == null ) $recipient_email = $loginEmail;
 
 		
@@ -100,7 +101,7 @@ class myPartnerRegistration
 			$partner_type = 1;
 		}
 
-		if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_DEVELOPER)
+		if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL)
 		{
 			if ($existingUser) {
 				return; // emails will be sent via external system 
@@ -129,7 +130,7 @@ class myPartnerRegistration
 				case Partner::PARTNER_TYPE_BLACKBOARD:
 					if ($existingUser) {
 						$mailType = self::KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION;
-						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
+						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $freeTrialResourceLink);
 					}
 					else {
 						$mailType = self::KALTURAS_BLACKBOARD_DEFAULT_REGISTRATION_CONFIRMATION;
@@ -139,7 +140,7 @@ class myPartnerRegistration
 				default: // all others
 				 	if ($existingUser) {
 						$mailType = self::KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION;
-						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
+						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $freeTrialResourceLink);
 					}
 					else {
 						$mailType = self::KALTURAS_DEFAULT_REGISTRATION_CONFIRMATION;
@@ -329,40 +330,25 @@ class myPartnerRegistration
 		if ($existingLoginData && !$ignorePassword)
 		{
 			// if a another user already existing with the same adminEmail, new account will be created only if the right password was given
+			$existingPartner = partnerPeer::retrieveByPK($existingLoginData->getConfigPartnerId());
 			if (!$password)
 			{
-				throw new SignupException("User with email [$email] already exists in system.", SignupException::EMAIL_ALREADY_EXISTS );
+				$this->addMarketoCampaignId($existingPartner, 'marketo_missing_Password_campaign');
+				throw new SignupException("User with email [$email] already exists in system.", SignupException::MISSING_PASSWORD_FOR_EXISTING_EMAIL );
 			}
 			else if ($existingLoginData->isPasswordValid($password))
 			{
 				KalturaLog::log('Login id ['.$email.'] already used, and given password is valid. Creating new partner with this same login id');
+				$this->addMarketoCampaignId($existingPartner, 'marketo_additional_register_success_campaign');
 			}
 			else
 			{
-				throw new SignupException("Invalid password for user with email [$email].", SignupException::EMAIL_ALREADY_EXISTS );
+				$this->addMarketoCampaignId($existingPartner, 'marketo_wrong_password_campaign');
+				throw new SignupException("Invalid password for user with email [$email].", SignupException::INCORRECT_PASSWORD_FOR_EXISTING_EMAIL );
 			}
-
-			if(myPartnerUtils::isPartnerCreatedAsMonitoredFreeTrial($partner, true))
-			{
-				$partnerPackage = $partner->getPartnerPackage();
-				if ($this->partnerParentId)
-				{
-					$parentPartner = PartnerPeer::retrieveByPK($this->partnerParentId);
-					$partnerPackage = $parentPartner->getPartnerPackage();
-				}
-
-				if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_FREE)
-				{
-					$result = myPartnerUtils::retrieveNotDeletedPartnerByEmailAndPackage ($partner, PartnerPackages::PARTNER_PACKAGE_FREE);
-					if($result)
-					{
-						$result->setSubPartnerRequestCampaign(1);
-						$result->save();
-						throw new SignupException("Free Trial user with email [$email] already exists in system.", SignupException::EMAIL_ALREADY_EXISTS);
-					}
-
-				}
-			}
+			
+			// for now allow multiple accounts using the same user
+			//$this->allowOnlyOneActiveFreeTrialAccountCreation($partner, $email);
 		}
 
 
@@ -392,6 +378,9 @@ class myPartnerRegistration
 					
 			$this->setAllTemplateEntriesToAdminKuser($newPartner->getId(), $kuserId);
 
+			if(!$existingLoginData)
+				$this->addMarketoCampaignId($newPartner, 'marketo_new_register_success_campaign');
+
 			kEventsManager::raiseEvent(new kObjectAddedEvent($newPartner));
 
 			return array($newPartner->getId(), $newSubPartnerId, $newAdminKuserPassword, $newPassHashKey);
@@ -402,7 +391,40 @@ class myPartnerRegistration
 			throw $e;
 		}
 	}
-	
+
+	private function addMarketoCampaignId($partner, $campaignName)
+	{
+		if (kConf::hasParam($campaignName))
+		{
+			$campaignId = kConf::get($campaignName);
+			$partner->setMarketoCampaignId($campaignId);
+			$partner->save();
+		}
+	}
+
+	private function allowOnlyOneActiveFreeTrialAccountCreation($partner, $email)
+	{
+		$partnerPackage = $partner->getPartnerPackage();
+		if ($this->partnerParentId)
+		{
+			$parentPartner = PartnerPeer::retrieveByPK($this->partnerParentId);
+			$partnerPackage = $parentPartner->getPartnerPackage();
+		}
+
+		if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_FREE)
+		{
+			$existingPartner = myPartnerUtils::retrieveNotDeletedPartnerByEmailAndPackage ($partner, PartnerPackages::PARTNER_PACKAGE_FREE);
+			if($existingPartner)
+			{
+				$existingPartner->setAdditionalAccountFailureReason(SignupException::TRIAL_ACCOUNT_ALREADY_EXIST_FOR_EMAIL);
+				$existingPartner->save();
+				throw new SignupException("Free Trial user with email [$email] already exists in system.", SignupException::TRIAL_ACCOUNT_ALREADY_EXIST_FOR_EMAIL);
+			}
+
+		}
+	}
+
+
 	private function configurePartnerByPackage($partner)
 	{
 		if(!$partner)
@@ -558,6 +580,9 @@ class SignupException extends Exception
     const INVALID_FIELD_VALUE = 501;
     const EMAIL_ALREADY_EXISTS = 502;
     const PASSWORD_STRUCTURE_INVALID = 503;
+    const INCORRECT_PASSWORD_FOR_EXISTING_EMAIL = 504;
+    const MISSING_PASSWORD_FOR_EXISTING_EMAIL = 505;
+    const TRIAL_ACCOUNT_ALREADY_EXIST_FOR_EMAIL = 506;
 
     // Redefine the exception so message/code isn't optional
     public function __construct($message, $code) {

@@ -63,11 +63,12 @@ class LiveReportsService extends KalturaBaseService
 			KalturaLiveReportInputFilter $filter = null,
 			KalturaFilterPager $pager = null)
 	{
-		if ($pager->pageIndex > 1)
+		if ($reportType != KalturaLiveReportType::ENTRY_TOTAL && 
+			$pager->pageIndex > 1)
 		{
 			throw new APIException(KalturaErrors::ANALYTICS_UNSUPPORTED_QUERY);
 		}
-		
+
 		$reportTypes = array(
 			KalturaLiveReportType::PARTNER_TOTAL => 
 				array('partnerTotal', 'KalturaLiveStats'),
@@ -88,11 +89,16 @@ class LiveReportsService extends KalturaBaseService
 		
 		try
 		{
-			$items = call_user_func(array('kKavaLiveReportsMgr', $methodName), $this->getPartnerId(), $filter, $pager->pageSize);
+			list($items, $totalCount) = call_user_func(array('kKavaLiveReportsMgr', $methodName), 
+				$this->getPartnerId(), 
+				$filter, 
+				$pager->pageIndex, 
+				$pager->pageSize);
 		}
 		catch (kKavaNoResultsException $e)
 		{
 			$items = array();
+			$totalCount = 0;
 		}
 		
 		$items = $this->arrayToApiObjects($items, $objectType);
@@ -114,8 +120,8 @@ class LiveReportsService extends KalturaBaseService
 		}
 		
 		$result = new KalturaLiveStatsListResponse();
-		$result->objects = array_slice($items, 0, $pager->pageSize);
-		$result->totalCount = count($items);
+		$result->objects = $items;
+		$result->totalCount = $totalCount;
 		return $result;
 	}
 

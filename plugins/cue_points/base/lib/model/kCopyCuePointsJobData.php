@@ -10,11 +10,10 @@ class kCopyCuePointsJobData extends kJobData
 	 */
 	private $destinationEntryId;
 
-	/**
-	 * the sources start time and duration
-	 * @var array
+	/** source entry Id
+	 * @var string
 	 */
-	private $clipsDescriptionArray;
+	private $sourceEntryId;
 
 	/**
 	 * @return string
@@ -32,22 +31,23 @@ class kCopyCuePointsJobData extends kJobData
 		$this->destinationEntryId = $destinationEntryId;
 	}
 
-
 	/**
-	 * @return array
+	 * @return string
 	 */
-	public function getClipsDescriptionArray()
+	public function getSourceEntryId()
 	{
-		return $this->clipsDescriptionArray;
+		return $this->sourceEntryId;
 	}
 
 	/**
-	 * @param array $clipsDescriptionArray
+	 * @param string $sourceEntryId
 	 */
-	public function setClipsDescriptionArray($clipsDescriptionArray)
+	public function setSourceEntryId($sourceEntryId)
 	{
-		$this->clipsDescriptionArray = $clipsDescriptionArray;
+		$this->sourceEntryId = $sourceEntryId;
 	}
+
+
 
 
 }

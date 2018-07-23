@@ -428,6 +428,10 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$this->data = new KalturaCopyCuePointsJobData();
 				break;
 
+			case 'kMultiClipCopyCuePointsJobData':
+				$this->data = new KalturaMultiClipCopyCuePointsJobData();
+				break;
+
 			default:
 				if($dbData instanceof kBulkUploadJobData)
 				{
@@ -666,9 +670,23 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				break;
 
 			case KalturaBatchJobType::COPY_CUE_POINTS:
-				$dbData = new kCopyCuePointsJobData();
-				if(is_null($this->data))
-					$this->data = new KalturaCopyCuePointsJobData();
+				switch ($dbBatchJob->getJobSubType()) {
+					case CopyCuePointJobType::MULTI_CLIP:
+						$dbData = new kMultiClipCopyCuePointsJobData();
+						if(is_null($this->data))
+							$this->data = new KalturaMultiClipCopyCuePointsJobData();
+						break;
+					case CopyCuePointJobType::LIVE_CLIPPING:
+						$dbData = new kLiveToVodJobData();
+						if(is_null($this->data))
+							$this->data = new KalturaLiveToVodJobData();
+						break;
+					default:
+						$dbData = new kCopyCuePointsJobData();
+						if(is_null($this->data))
+							$this->data = new KalturaCopyCuePointsJobData();
+						break;
+				}
 				break;
 
 			case KalturaBatchJobType::COPY_CAPTIONS:

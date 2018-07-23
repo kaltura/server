@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @relatedService GroupUserService
  */
 class KalturaGroupUser extends KalturaObject implements IRelatedFilterable
 {
@@ -51,6 +52,12 @@ class KalturaGroupUser extends KalturaObject implements IRelatedFilterable
 	 */
 	public $updatedAt;
 	
+	/**
+	 * @insertonly
+	 * @var KalturaGroupUserCreationMode
+	 */
+	public $creationMode;
+
 	private static $map_between_objects = array
 	(
 		"userId" => "puserId",
@@ -59,6 +66,7 @@ class KalturaGroupUser extends KalturaObject implements IRelatedFilterable
 		"status",
 		"createdAt",
 		"updatedAt",
+		"creationMode",
 	);
 
 	public function getMapBetweenObjects ( )

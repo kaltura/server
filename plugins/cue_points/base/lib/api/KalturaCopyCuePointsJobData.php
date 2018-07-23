@@ -6,21 +6,21 @@
 class KalturaCopyCuePointsJobData extends KalturaJobData
 {
 	/**
-	 * destination Entry
+	 * destination Entry Id
 	 * @var string
 	 */
 	public $destinationEntryId = null;
 
 	/**
-	 *  an array of source start time and duration
-	 * @var KalturaClipDescriptionArray
+	 * source Entry Id
+	 * @var string
 	 */
-	public $clipsDescriptionArray;
+	public $sourceEntryId = null;
 
 	private static $map_between_objects = array
 	(
 		'destinationEntryId',
-		'clipsDescriptionArray',
+		'sourceEntryId',
 	);
 
 	/* (non-PHPdoc)

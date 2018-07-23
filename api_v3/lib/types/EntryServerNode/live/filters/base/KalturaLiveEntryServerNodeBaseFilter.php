@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaLiveEntryServerNodeBaseFilter extends KalturaEntryServerNodeFilter
+abstract class KalturaLiveEntryServerNodeBaseFilter extends KalturaEntryServerNodeFilter
 {
 	static private $map_between_objects = array
 	(

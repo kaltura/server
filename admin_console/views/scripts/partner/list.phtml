@@ -90,6 +90,16 @@
 										<option value="manage" ><?php echo $this->translate('Manage'); ?></option>
 									<?php endif;?>
 								<?php endif; ?>
+
+								<?php if ($partner->status != Kaltura_Client_Enum_PartnerStatus::BLOCKED): ?>
+									<?php if ($partner->partnerGroupType == Kaltura_Client_Enum_PartnerGroupType::TEMPLATE && $partner->partnerParentId== 0): ?>
+										<?php if (Infra_AclHelper::isAllowed('partner','manage-template-partners')): ?>
+                                            <option value="manageNew" ><?php echo $this->translate('Manage - new'); ?></option>
+										<?php endif; ?>
+									<?php elseif (Infra_AclHelper::isAllowed('partner','kmc-redirect')) :?>
+                                        <option value="manageNew" ><?php echo $this->translate('Manage - new'); ?></option>
+									<?php endif;?>
+								<?php endif; ?>
                                 
                                 
 								<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect')): ?>
@@ -219,6 +229,11 @@ function widgets(partnerId) {
 function manage(partnerId) {
 	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'kmc-redirect', 'partner_id' => ''), null, true); ?>' + partnerId;
 	window.open(url);
+}
+
+function manageNew(partnerId) {
+    var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'kmc-new-redirect', 'partner_id' => ''), null, true); ?>' + partnerId;
+    window.open(url);
 }
 
 function kavaDashboard(partnerId) {

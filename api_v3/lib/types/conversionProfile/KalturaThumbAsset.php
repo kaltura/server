@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @relatedService ThumbAssetService
  */
 class KalturaThumbAsset extends KalturaAsset  
 {

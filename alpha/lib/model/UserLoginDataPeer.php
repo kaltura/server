@@ -299,6 +299,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 		
 		$loginData->resetPassword($newPassword);
+		myPartnerUtils::initialPasswordSetForFreeTrial($loginData);
+
 		return true;
 	}
 	
@@ -494,7 +496,9 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			}
 		}
 		
-		if ($kuser->getIsAdmin() && !in_array($kuser->getPartnerId(), kConf::get('no_save_of_last_login_partner_for_partner_ids'))) {
+		if ($kuser->getIsAdmin() && 
+			!in_array($kuser->getPartnerId(), kConf::get('no_save_of_last_login_partner_for_partner_ids')) &&
+			$loginData->getUpdatedAt(null) + 5 < time()) {
 			$loginData->setLastLoginPartnerId($kuser->getPartnerId());
 		}
 		$loginData->save();
@@ -516,6 +520,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$c = new Criteria();
 		$c->addAnd(kuserPeer::LOGIN_DATA_ID, $loginDataId);
 		$c->addAnd(kuserPeer::STATUS, KuserStatus::ACTIVE, Criteria::EQUAL);
+		$c->addAnd(kuserPeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER, Criteria::GREATER_THAN);
 		if ($notPartnerId) {
 			$c->addAnd(kuserPeer::PARTNER_ID, $notPartnerId, Criteria::NOT_EQUAL);
 		}

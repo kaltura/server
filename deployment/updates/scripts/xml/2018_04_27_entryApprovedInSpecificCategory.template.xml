@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+    <multirequest>
+        <!-- Entry Approved In Category -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaHttpNotificationTemplate">
+                <name>Entry Approved In Specific Category</name>
+                <systemName>Entry_Approved_In_Specific_Category</systemName>
+                <description>Email notification template to be sent when a new entry is approved in a specific category.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType>
+                <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>37</eventObjectType>
+                <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Status changed to active, See:KalturaCategoryEntryStatus:/api_v3/testmeDoc/?object=KalturaCategoryEntryStatus</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject() instanceof categoryEntry &amp;&amp; in_array(categoryEntryPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getStatus() == CategoryEntryStatus::ACTIVE</code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaFieldMatchCondition">
+                        <description>Match category ID</description>
+                        <field objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getCategoryId()</code>
+                        </field>
+                        <values objectType="array">
+                            <item objectType="KalturaStringValue">
+                                <value>{category_id}</value>
+                            </item>
+                        </values>
+                    </item>
+                </eventConditions>
+
+
+                <userParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_id</key>
+                        <description>Category ID</description>
+                        <value objectType="KalturaStringValue">
+                            <value/>
+                        </value>
+                    </item>
+                </userParameters>
+
+                <method>2</method>
+                <!-- KalturaHttpNotificationMethod::POST -->
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+
+</xml>

@@ -2,8 +2,9 @@
 /**
  * @package plugins.caption
  * @subpackage api.objects
+ * @relatedService CaptionAssetService
  */
-class KalturaCaptionAsset extends KalturaAsset  
+class KalturaCaptionAsset extends KalturaAsset
 {
 	/**
 	 * The Caption Params used to create this Caption Asset
@@ -71,9 +72,15 @@ class KalturaCaptionAsset extends KalturaAsset
 
 	/**
 	 * The Accuracy of the caption content
-	 *@var int 
+	 * @var int 
 	 */
 	public $accuracy;
+	
+	/**
+	 * The Accuracy of the caption content
+	 * @var bool
+	 */
+	public $displayOnPlayer;
 
 	private static $map_between_objects = array
 	(
@@ -85,6 +92,7 @@ class KalturaCaptionAsset extends KalturaAsset
 		"status",
 		"parentId",
 		"accuracy",
+		"displayOnPlayer",
 	);
 	
 	public function getMapBetweenObjects ( )

@@ -17,9 +17,15 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	{
 		if (count($dynamicAttributes) <= 1)
 		{
+			$dynamicAttribute = reset($dynamicAttributes);
+			if ($dynamicAttribute instanceof kClipAttributes )
+			{
+				$effects = $dynamicAttribute->getEffectArray();
+				if (!empty($effects))
+					return true;
+			}
 			return false;
 		}
-
 		foreach ($dynamicAttributes as $value)
 		{
 			if ($value instanceof kClipAttributes)
@@ -70,7 +76,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				$this->handleClipConcatParentJob($batchJob);
 			}
 
-			if ($batchJob->getParentJob() && $batchJob->getParentJob()->getJobType() == BatchJobType::CONVERT)
+			if ($batchJob->getParentJob() && $batchJob->getParentJob()->getJobType() == BatchJobType::CONVERT &&
+				!$this->concatJobExist($batchJob->getRootJob()))
 			{
 				$this->startConcat($batchJob->getRootJob());
 			}
@@ -537,11 +544,10 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 */
 	private function fillDestEntry($destEntry, $sourceEntryId, array $operationAttributes)
 	{
-		if ($destEntry->getIsTemporary()) {
-			$destEntry->setClipConcatTrimFlow(true);
-		} else {
-			$destEntry->setClipConcatTrimFlow(false);
-		}
+		if ($destEntry->getIsTemporary())
+			$destEntry->setFlowType(EntryFlowType::TRIM_CONCAT);
+		else 
+			$destEntry->setFlowType(EntryFlowType::CLIP_CONCAT);
 		$destEntry->setSourceEntryId($sourceEntryId);
 		$destEntry->setOperationAttributes($operationAttributes);
 		$destEntry->setStatus(entryStatus::PENDING);
@@ -596,6 +602,25 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$effects = new kEffectsManager();
 		return $effects->getFFMPEGEffects($singleAttribute);
 	}
+
+	/**
+	 * @param BatchJob $rootJob
+	 * @return bool
+	 */
+	private function concatJobExist($rootJob)
+	{
+		if (!$rootJob)
+			return false;
+
+		/** @var BatchJob $job */
+		foreach ($rootJob->getChildJobs() as $job)
+		{
+			if ($job->getJobType() == BatchJobType::CONCAT)
+				return true;
+		}
+		return false;
+	}
+
 
 
 }

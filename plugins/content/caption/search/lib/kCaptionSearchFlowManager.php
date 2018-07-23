@@ -12,7 +12,7 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 	{
 		if(class_exists('CaptionAsset') && $object instanceof CaptionAsset 
 				&& CaptionSearchPlugin::isAllowedPartner($object->getPartnerId())
-					&& $object->getStatus() == CaptionAsset::ASSET_STATUS_READY && $object->getLanguage() != CaptionAsset::MULTI_LANGUAGE){
+				&& $object->getStatus() == CaptionAsset::ASSET_STATUS_READY && $object->getLanguage() != CaptionAsset::MULTI_LANGUAGE){
 						return true;
 					}
 					

@@ -19,6 +19,9 @@ abstract class KalturaEmailNotificationRecipientProvider extends KalturaObject
 			case 'kEmailNotificationUserRecipientProvider':
 				$instance = new KalturaEmailNotificationUserRecipientProvider();
 				break;
+			case 'kEmailNotificationGroupRecipientProvider':
+				$instance = new KalturaEmailNotificationGroupRecipientProvider();
+				break;
 			default:
 				$instance = KalturaPluginManager::loadObject('kEmailNotificationRecipientProvider', get_class($dbObject));
 				break;

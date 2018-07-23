@@ -11,4 +11,6 @@ interface IMetadataPeer
 	public static function validateMetadataObjects($profileField, $objectIds, &$errorMessage);
 
 	public static function getEntry($objectId);
+	
+	public static function validateMetadataObjectAccess($objectId);
 }

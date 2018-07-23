@@ -1,6 +1,7 @@
 <?php
 /**
  * @package plugins.widevine
+ * @relatedService FlavorAssetService
  * @subpackage api.filters.base
  * @abstract
  */

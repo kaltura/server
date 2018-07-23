@@ -77,6 +77,9 @@ class kWebVTTGenerator
 			)
 				continue;
 
+			if ($curCaption["startTime"]>=$curCaption["endTime"])
+				continue;
+
 			// calculate line-level styling
 			$styling = '';
 			$firstChunk = reset($curCaption['content']);

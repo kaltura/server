@@ -154,7 +154,7 @@ class kViewHistoryUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 		if (!count($entryIds))
 		{
 			KalturaLog::err("No user entries found - returning empty result");
-			$entryIds = array (-1);
+			$entryIds = array (entry::ENTRY_ID_THAT_DOES_NOT_EXIST);
 		}
 		
 		if($query instanceof SphinxCriteria)

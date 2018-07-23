@@ -213,7 +213,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			$getter = "get" . $getterName;
 			$fieldType =  $objectIndexClass::getFieldType($field);
 			$nullable = $objectIndexClass::isNullableField($field);
-			
+
 			switch($fieldType)
 			{
 				case IIndexable::FIELD_TYPE_STRING:
@@ -221,13 +221,25 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 					if($nullable)
 					{
 						if(is_null($value) || $value === '')
-							$value = self::HAS_NO_VALUE . $object->getPartnerId();
+						{
+							$suffix = ' '.self::HAS_NO_VALUE.$object->getPartnerId();
+						}
 						else
-							$value .= ' ' . self::HAS_VALUE . $object->getPartnerId();
+						{
+							$suffix = ' '.self::HAS_VALUE.$object->getPartnerId();
+						}
+
+						$enricher = "enrich" . $getterName;
+						if(is_callable(array($object, $enricher)))
+						{
+							$value = $object->$enricher($value);
+						}
+
+						$value.=$suffix;
 					}
+
 					$dataStrings[$field] = $value;
 					break;
-					
 				case IIndexable::FIELD_TYPE_INTEGER:
 					$dataInts[$field] = $object->$getter();
 					break;
@@ -512,6 +524,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	{
 		$className = get_class($object);
 		$objectId = $object->getId();
+		$entryId = $object->getEntryId();
 
 		// track repetitive udpates of the same object (e.g. adding many annotations which cause updates of the entry)
 		// once hitting a threshold, we will avoid more than one update per minute
@@ -520,16 +533,20 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
 		if ($cache)
 		{
-			$cacheKey = "SPHSave:$className:$objectId";
+			$cacheKey = "SPHSave:$className:" . ($entryId ? $entryId : $objectId);
 			$cache->add($cacheKey, 0, 60);
 			$saveCounter = $cache->increment($cacheKey);
 		}
-
-		$updatesKey = strtolower($className."_".kCurrentContext::$service."_".kCurrentContext::$action);
+		
 		$skipSphinxRepetitiveUpdates = kConf::get('skip_sphinx_repetitive_updates', 'local', array());
+		
+		$updatesKey = strtolower(kCurrentContext::getCurrentPartnerId()."_".$className."_".kCurrentContext::$service."_".kCurrentContext::$action);
+		if(!isset($skipSphinxRepetitiveUpdates[$updatesKey]))
+			$updatesKey = strtolower($className."_".kCurrentContext::$service."_".kCurrentContext::$action);
+		
 		$skipSave = isset($skipSphinxRepetitiveUpdates[$updatesKey]) && $saveCounter > $skipSphinxRepetitiveUpdates[$updatesKey];
 		
-		KalturaLog::debug("Updating sphinx for object [$className] [$objectId] count [ $saveCounter  ] " . kCurrentContext::$service . ' ' . kCurrentContext::$action . " [$skipSave]");
+		KalturaLog::debug("Updating sphinx for object [$className] [$entryId] [$objectId] count [$saveCounter] " . kCurrentContext::$service . ' ' . kCurrentContext::$action . " [$skipSave]");
 
 		if ($skipSave)
 			return true;

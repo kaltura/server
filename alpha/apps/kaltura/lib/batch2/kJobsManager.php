@@ -580,7 +580,7 @@ class kJobsManager
 			if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
 				$addImportJob = true;
 			else	
-				throw new kCoreException("Source file not found for flavor conversion [$flavorAsset->getId()]", kCoreException::SOURCE_FILE_NOT_FOUND);
+				throw new kCoreException("Source file not found for flavor conversion [" . $flavorAsset->getId() . "]", kCoreException::SOURCE_FILE_NOT_FOUND);
 		}
 		
 		return $fileSync;		
@@ -1856,5 +1856,16 @@ class kJobsManager
 		$batchJob->setPartnerId($partnerId);
 
 		return self::addJob($batchJob, $jobData, BatchJobType::USERS_CSV);
+	}
+
+	public static function addMultiClipCopyCuePointsJob($destEntryID, $partnerId, $kClipDescriptionArray)
+	{
+		$jobData = new kMultiClipCopyCuePointsJobData();
+		$jobData->setClipsDescriptionArray($kClipDescriptionArray);
+		$jobData->setDestinationEntryId($destEntryID);
+		$batchJob = new BatchJob();
+		$batchJob->setEntryId($destEntryID);
+		$batchJob->setPartnerId($partnerId);
+		return kJobsManager::addJob($batchJob, $jobData, BatchJobType::COPY_CUE_POINTS, CopyCuePointJobType::MULTI_CLIP);
 	}
 }

@@ -7,6 +7,8 @@
 abstract class KBatchBase implements IKalturaLogger
 {
 	const PRIVILEGE_BATCH_JOB_TYPE = "jobtype";
+	const DEFAULT_SLEEP_INTERVAL = 5;
+	const DEFUALT_API_RETRIES_ATTEMPS = 3;
 	
 	/**
 	 * @var KSchedularTaskConfig
@@ -618,7 +620,7 @@ abstract class KBatchBase implements IKalturaLogger
 	public static function pollingFileExists($fileName)
 	{
 		$retries = (self::$taskConfig->inputFileExistRetries ? self::$taskConfig->inputFileExistRetries : 10);
-		$interval = (self::$taskConfig->inputFileExistInterval ? self::$taskConfig->inputFileExistInterval : 5);
+		$interval = (self::$taskConfig->inputFileExistInterval ? self::$taskConfig->inputFileExistInterval : self::DEFAULT_SLEEP_INTERVAL);
 
 		for ($retry = 0; $retry < $retries; $retry++)
 		{
@@ -655,5 +657,25 @@ abstract class KBatchBase implements IKalturaLogger
 	public static function getIV()
 	{
 		return kConf::get("encryption_iv");
+	}
+
+	public static function tryExecuteApiCall($callback, $params, $numOfRetries = self::DEFUALT_API_RETRIES_ATTEMPS, $apiIntervalInSec = self::DEFAULT_SLEEP_INTERVAL)
+	{
+		while ($numOfRetries-- > 0)
+		{
+			try 
+			{
+				$res = call_user_func_array($callback, $params);
+				if (KBatchBase::$kClient->isError($res))
+					throw new APIException($res);
+				return $res;
+			}
+			catch  (Exception $ex) {
+				KalturaLog::warning("API Call for " . print_r($callback, true) . " failed number of retires $numOfRetries");
+				KalturaLog::err($ex->getMessage());
+				sleep($apiIntervalInSec);
+			}
+		}
+		return false;
 	}
 }

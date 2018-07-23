@@ -23,7 +23,7 @@ class KalturaESearchEntryResult extends KalturaESearchResult
 	{
 		$isAdmin = kCurrentContext::$ks_object->isAdmin();
 		$object = KalturaEntryFactory::getInstanceByType($srcObj->getObject()->getType(), $isAdmin);
-		$object->fromObject($srcObj->getObject());
+		$object->fromObject($srcObj->getObject(), $responseProfile);
 		$this->object = $object;
 		return parent::doFromObject($srcObj, $responseProfile);
 	}

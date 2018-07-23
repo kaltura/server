@@ -31,7 +31,7 @@ class AppTokenService extends KalturaBaseService
 	}
 	
 	/**
-	 * Get application authentication token by id
+	 * Get application authentication token by ID
 	 * 
 	 * @action get
 	 * @param string $id
@@ -51,7 +51,7 @@ class AppTokenService extends KalturaBaseService
 	}
 	
 	/**
-	 * Update application authentication token by id
+	 * Update application authentication token by ID
 	 * 
 	 * @action update
 	 * @param string $id
@@ -75,7 +75,7 @@ class AppTokenService extends KalturaBaseService
 	}
 	
 	/**
-	 * Delete application authentication token by id
+	 * Delete application authentication token by ID
 	 * 
 	 * @action delete
 	 * @param string $id
@@ -150,14 +150,14 @@ class AppTokenService extends KalturaBaseService
 	}
 	
 	/**
-	 * Starts a new KS (kaltura Session) based on application authentication token id
+	 * Starts a new KS (kaltura Session) based on an application authentication token ID
 	 * 
 	 * @action startSession
-	 * @param string $id application token id
-	 * @param string $tokenHash hashed token, built of sha1 on current KS concatenated with the application token
-	 * @param string $userId session user id, will be ignored if a different user id already defined on the application token
-	 * @param KalturaSessionType $type session type, will be ignored if a different session type already defined on the application token
-	 * @param int $expiry session expiry (in seconds), could be overwritten by shorter expiry of the application token and the session-expiry that defined on the application token 
+	 * @param string $id application token ID
+	 * @param string $tokenHash a hash [MD5, SHA1, SHA256 and SHA512 are supported] of the current KS concatenated with the application token 
+	 * @param string $userId session user ID, will be ignored if a different user ID already defined on the application token
+	 * @param KalturaSessionType $type session type, will be ignored if a different session type is already defined on the application token
+	 * @param int $expiry session expiry (in seconds), could be overridden by shorter expiry of the application token 
 	 * @throws KalturaErrors::APP_TOKEN_ID_NOT_FOUND
 	 * @return KalturaSessionInfo
 	 */

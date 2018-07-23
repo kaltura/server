@@ -1,6 +1,7 @@
 <?php
 /**
  * @package api
+ * @relatedService FlavorAssetService
  * @subpackage filters.base
  * @abstract
  */

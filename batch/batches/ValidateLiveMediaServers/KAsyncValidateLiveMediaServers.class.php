@@ -35,11 +35,6 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		$entryServerNodeFilter->orderBy = KalturaEntryServerNodeOrderBy::CREATED_AT_ASC;
 		$entryServerNodeFilter->createdAtLessThanOrEqual = time() - $entryServerNodeMinCreationTime;
 		
-		$entryServerNodeFilter->statusIn = KalturaEntryServerNodeStatus::PLAYABLE . ',' . 
-				KalturaEntryServerNodeStatus::BROADCASTING . ',' .
-				KalturaEntryServerNodeStatus::AUTHENTICATED . ',' .
-				KalturaEntryServerNodeStatus::MARKED_FOR_DELETION;
-		
 		$entryServerNodePager = new KalturaFilterPager();
 		$entryServerNodePager->pageSize = 500;
 		$entryServerNodePager->pageIndex = 1;

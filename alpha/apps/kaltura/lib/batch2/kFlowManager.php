@@ -485,6 +485,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
+		/** @var entry $entry */
 		$entry = $object->getentry();
 
 		if ($object->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED || $object->getStatus() == asset::FLAVOR_ASSET_STATUS_IMPORTING)
@@ -497,7 +498,8 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			{
 				if ($entry->getType() == entryType::MEDIA_CLIP)
 				{
-					if ($entry->getOperationAttributes() && $object->getIsOriginal() && is_null($entry->getClipConcatTrimFlow()))
+					$allowedFlows = array(EntryFlowType::CLIP_CONCAT, EntryFlowType::TRIM_CONCAT);
+					if ($entry->getOperationAttributes() && $object->getIsOriginal() && !in_array($entry->getFlowType(), $allowedFlows))
 						kBusinessPreConvertDL::convertSource($object, null, null, $raisedJob);
 					else
 					{

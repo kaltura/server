@@ -282,12 +282,14 @@ class CuePointIndex extends BaseIndexObject
 		return self::$apiMatchAttributesMap;
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationMap()
 	{
 		return array(
 		);
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationValues()
 	{
 		return array(
@@ -299,12 +301,13 @@ class CuePointIndex extends BaseIndexObject
 		return CuePointPeer::doCount($c);
 	}
 
+	//This function is generated based on cacheInvalidationKey elements in the relevant IndexSchema.xml
 	public static function getCacheInvalidationKeys($object = null)
 	{
 		if (is_null($object))
 			return array(array("cue_point:id=%s", CuePointPeer::ID), array("cue_point:entryId=%s", CuePointPeer::ENTRY_ID), array("cue_point:partnerId=%s", CuePointPeer::PARTNER_ID));
 		else
-			return array("cue_point:id=" . strtolower($object->getId()), "cue_point:entryId=" . strtolower($object->getEntryId()), "cue_point:partnerId=" . strtolower($object->getPartnerId()));
+			return array("cue_point:id=".strtolower($object->getId()), "cue_point:entryId=".strtolower($object->getEntryId()), "cue_point:partnerId=".strtolower($object->getPartnerId()));
 	}
 
 }

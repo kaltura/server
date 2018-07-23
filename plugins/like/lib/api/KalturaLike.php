@@ -2,6 +2,7 @@
 /**
  * @package plugins.like
  * @subpackage api.objects
+ * @relatedService LikeService
  */
 class KalturaLike extends KalturaObject implements IRelatedFilterable
 {

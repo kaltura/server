@@ -450,9 +450,12 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$recordedEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $recordedEntryId);
 
-		$totalDuration = (int)($duration * 1000);
-		$dbLiveEntry->setLengthInMsecs($totalDuration);
-		$dbLiveEntry->save();
+		if ($recordedEntry->getFlowType() != EntryFlowType::LIVE_CLIPPING)
+		{
+			$totalDuration = (int)($duration * 1000);
+			$dbLiveEntry->setLengthInMsecs($totalDuration);
+			$dbLiveEntry->save();
+		}
 
 		$this->handleRecording($dbLiveEntry, $recordedEntry, $resource, $flavorParamsId);
 

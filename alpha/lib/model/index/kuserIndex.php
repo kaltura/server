@@ -281,12 +281,14 @@ class kuserIndex extends BaseIndexObject
 		return self::$apiMatchAttributesMap;
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationMap()
 	{
 		return array(
 		);
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
 	public static function getSphinxOptimizationValues()
 	{
 		return array(
@@ -298,12 +300,14 @@ class kuserIndex extends BaseIndexObject
 		return kuserPeer::doCount($c);
 	}
 
+	//This function is generated based on cacheInvalidationKey elements in the relevant IndexSchema.xml
 	public static function getCacheInvalidationKeys($object = null)
 	{
 		if (is_null($object))
 			return array(array("kuser:id=%s", kuserPeer::ID), array("kuser:partnerId=%s", kuserPeer::PARTNER_ID));
 		else
-			return array("kuser:id=" . strtolower($object->getId()), "kuser:partnerId=" . strtolower($object->getPartnerId()));
+			return array("kuser:id=".strtolower($object->getId()), "kuser:partnerId=".strtolower($object->getPartnerId()));
 	}
+
 }
 

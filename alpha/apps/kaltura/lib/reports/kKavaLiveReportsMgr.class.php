@@ -32,6 +32,13 @@ class kKavaLiveReportsMgr extends kKavaBase
 		return max(min($limit, self::MAX_RESULTS), self::MIN_RESULTS);
 	}
 	
+	protected static function applyPager($items, $pageIndex, $pageSize)
+	{
+		return array(
+			array_slice($items, ($pageIndex - 1) * $pageSize, $pageSize),
+			count($items));
+	}
+
 	protected static function getLiveEntries($partnerId, $entryIds, $isLive)
 	{
 		$filter = new entryFilter();
@@ -72,7 +79,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 		$result = array();
 		foreach ($orderedIds as $id)
 		{
-			$result[] = $input[$id];
+			$result[$id] = $input[$id];
 		}
 		return $result;
 	}
@@ -277,7 +284,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 	}
 	
 	// reports
-	public static function partnerTotal($partnerId, $filter, $limit)
+	public static function partnerTotal($partnerId, $filter, $pageIndex, $pageSize)
 	{
 		// view events
 		$query = self::getBaseTimeseriesQuery($partnerId, $filter, null);
@@ -287,10 +294,10 @@ class kKavaLiveReportsMgr extends kKavaBase
 		$result = array();
 		self::updateBaseFields($result, $item);
 
-		return array($result);
+		return self::applyPager(array($result), $pageIndex, $pageSize);
 	}
-		
-	public static function entryTotal($partnerId, $filter, $limit)
+	
+	public static function entryTotal($partnerId, $filter, $pageIndex, $pageSize)
 	{
 		// view events
 		$query = self::getBaseTopNQuery(
@@ -299,7 +306,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 			null, 
 			self::DIMENSION_ENTRY_ID, 
 			self::METRIC_VIEW_COUNT,
-			self::getLimit($limit));
+			self::getLimit(self::MAX_RESULTS));		// must always use the max, since we sort by entry name (not in druid)
 		self::addBaseAggregations($query);
 		$queryResult = self::runGranularityAllQuery($query);
 		
@@ -313,7 +320,18 @@ class kKavaLiveReportsMgr extends kKavaBase
 			$output[self::OUTPUT_PEAK_DVR_AUDIENCE] = 0;	// calculated below
 			self::updateBaseFields($output, $item);
 			$result[$entryId] = $output;
-		} 
+		}
+		
+		// sort and apply the pager
+		$result = self::sortByEntryName($result);
+		
+		list($result, $totalCount) = self::applyPager($result, $pageIndex, $pageSize);
+		if (!$result)
+		{
+			return array(array(), $totalCount);
+		}
+		
+		$filter->entryIds = implode(',', array_keys($result));
 		
 		// peak audience
 		$query = self::getBaseTopNQuery(
@@ -322,7 +340,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 			array(self::EVENT_TYPE_VIEW), 
 			self::DIMENSION_ENTRY_ID, 
 			self::METRIC_VIEW_COUNT,
-			self::getLimit($limit));
+			self::MAX_RESULTS);
 		$query[self::DRUID_AGGR] = array(
 			self::getViewCountAggregator(),
 			self::getAudienceAggregator(),
@@ -360,13 +378,11 @@ class kKavaLiveReportsMgr extends kKavaBase
 				}
 			}
 		}
-		
-		$result = self::sortByEntryName($result);
-		
-		return $result;
+
+		return array($result, $totalCount);
 	}
 	
-	public static function entrySyndicationTotal($partnerId, $filter, $limit)
+	public static function entrySyndicationTotal($partnerId, $filter, $pageIndex, $pageSize)
 	{
 		$query = self::getBaseTopNQuery(
 			$partnerId, 
@@ -374,12 +390,14 @@ class kKavaLiveReportsMgr extends kKavaBase
 			array(self::EVENT_TYPE_PLAY), 
 			self::DIMENSION_URL, 
 			self::OUTPUT_PLAYS,
-			self::getLimit($limit));
+			self::getLimit($pageIndex * $pageSize));
 		$query[self::DRUID_AGGR] = array(
 			self::getPlayCountAggregator(),
 		);
 		
 		$queryResult = self::runGranularityAllQuery($query);
+		
+		list($queryResult, $totalCount) = self::applyPager($queryResult, $pageIndex, $pageSize);
 		
 		$result = array();
 		foreach ($queryResult as $item)
@@ -390,7 +408,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 			$result[] = $output;
 		}
 		
-		return $result;
+		return array($result, $totalCount);
 	}
 	
 	public static function entryTimeline($partnerId, $filter)
@@ -421,7 +439,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 		return $result;
 	}
 	
-	public static function entryGeoTimeline($partnerId, $filter, $limit)
+	public static function entryGeoTimeline($partnerId, $filter, $pageIndex, $pageSize)
 	{
 		$dimensions = array(
 			self::DIMENSION_ENTRY_ID => self::OUTPUT_ENTRY_ID,
@@ -450,7 +468,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 		}
 		
 		$query[self::DRUID_LIMIT_SPEC] = self::getDefaultLimitSpec(
-			self::getLimit($limit), 
+			self::getLimit($pageIndex * $pageSize), 
 			array(self::getOrderByColumnSpec(
 				$orderByField, 
 				self::DRUID_DESCENDING, 
@@ -462,6 +480,8 @@ class kKavaLiveReportsMgr extends kKavaBase
 		$queryResult = self::runGranularityPeriodQuery($query, self::VIEW_EVENT_PERIOD);
 		KalturaLog::log("Druid returned [" . count($queryResult) . "] rows");
 	
+		list($queryResult, $totalCount) = self::applyPager($queryResult, $pageIndex, $pageSize);
+		
 		// format the results
 		$result = array();
 		foreach ($queryResult as $input)
@@ -477,7 +497,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 			self::updateBaseFields($output, $event);
 			$result[] = $output;
 		}
-		
-		return $result;
+
+		return array($result, $totalCount);
 	}
 }

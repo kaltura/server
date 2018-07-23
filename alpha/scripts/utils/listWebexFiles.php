@@ -11,8 +11,9 @@ class scriptLogger
 }
 
 if($argc < 9){
-	scriptLogger::logScript("Usage: [webex service URL] [webex username] [webex password] [webex site id] [webex partner id] [webex siteName] [start date timestamp] [end date timestamp]");
-	scriptLogger::logScript("Usage: [webex siteName] can be '' in case its not relevant.");
+	echo "Usage: [webex service URL] [webex username] [webex password] [webex site id] [webex partner id] [webex siteName] [start date timestamp] [end date timestamp] <fromRecycleBin>.".PHP_EOL;
+	echo "Usage: [webex siteName] can be '' in case its not relevant.".PHP_EOL;
+	echo "Usage: <fromRecycleBin> is optional and should be true/1 in case you want to list from the recycleBin.".PHP_EOL;
 	die("Not enough parameters" . "\n");
 }
 
@@ -24,6 +25,14 @@ $webexPartnerId = $argv[5];
 $webexSiteName = $argv[6];
 $startTime = $argv[7];
 $endTime = $argv[8];
+$fromRecycleBin = null;
+if($argc > 9)
+{
+	$fromRecycleBin = $argv[9];
+}
+else
+	$fromRecycleBin = false;
+
 scriptLogger::logScript('Init webexWrapper');
 $securityContext = new WebexXmlSecurityContext();
 $securityContext->setUid($webexUserName); // webex username
@@ -35,9 +44,12 @@ $webexWrapper = new webexWrapper($webexServiceUrl, $securityContext, array("scri
 $createTimeStart = date('m/j/Y H:i:s', $startTime);
 $createTimeEnd  = date('m/j/Y H:i:s', $endTime);
 $serviceTypes = webexWrapper::stringServicesTypesToWebexXmlArray(array(WebexXmlComServiceTypeType::_MEETINGCENTER));
-$result = $webexWrapper->listAllRecordings($serviceTypes, $createTimeStart, $createTimeEnd);
+$result = $webexWrapper->listAllRecordings($serviceTypes, $createTimeStart, $createTimeEnd, $fromRecycleBin);
 if($result)
 {
 	foreach ($result as $recording)
-		print($recording->getName() . PHP_EOL);
+	{
+		$physicalFileName = $recording->getName() . '_' . $recording->getRecordingID();
+		print($physicalFileName.PHP_EOL);
+	}
 }

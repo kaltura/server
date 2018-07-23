@@ -13,7 +13,8 @@ class KalturaMonitorClient
 	const EVENT_SPHINX = 	'sphinx';
 	const EVENT_CONNTOOK =  'conn';
 	const EVENT_DUMPFILE = 	'file';
-	
+	const EVENT_ELASTIC = 'elastic';
+
 	const FIELD_EVENT_TYPE = 		'e';
 	const FIELD_SERVER = 			's';
 	const FIELD_UNIQUE_ID =			'u';
@@ -237,7 +238,24 @@ class KalturaMonitorClient
 		
 		self::writeDeferredEvent($data);
 	}
-	
+
+	public static function monitorElasticAccess($actionName, $indexName, $body, $queryTook, $hostName = null)
+	{
+		if (!self::$stream)
+			return;
+
+		$data = array_merge(self::$basicEventInfo, array(
+			self::FIELD_EVENT_TYPE 		=> self::EVENT_ELASTIC,
+			self::FIELD_DATABASE		=> $hostName,
+			self::FIELD_TABLE			=> $indexName,
+			self::FIELD_QUERY_TYPE		=> $actionName,
+			self::FIELD_EXECUTION_TIME	=> $queryTook,
+			self::FIELD_LENGTH			=> strlen($body),
+		));
+
+		self::writeDeferredEvent($data);
+	}
+
 	public static function monitorConnTook($dsn, $connTook)
 	{
 		if (!self::$stream)

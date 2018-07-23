@@ -2976,7 +2976,7 @@ class kFlowHelper
 				$entry->setStatus(KalturaEntryStatus::READY);
 				$clipAttr = $task->getClipAttributes();
 				if ($clipAttr)
-					$entry->setLengthInMsecs($clipAttr->getDuration());
+					$entry->setRecordedLengthInMsecs($clipAttr->getDuration());
 				$entry->save();
 				break;
 			case EntryServerNodeStatus::ERROR:

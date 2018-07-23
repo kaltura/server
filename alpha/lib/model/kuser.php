@@ -17,6 +17,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	}
 	
 	const BULK_UPLOAD_ID = "bulk_upload_id";
+	const USER_MODE = 'user_mode';
 	
 	const ANONYMOUS_PUSER_ID = "KALANONYM";
 	
@@ -1186,6 +1187,9 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
     public function setBulkUploadId ($bulkUploadId){$this->putInCustomData (self::BULK_UPLOAD_ID, $bulkUploadId);}
 	public function getBulkUploadId (){return $this->getFromCustomData(self::BULK_UPLOAD_ID);}
 
+	public function setUserMode ($v){$this->putInCustomData (self::USER_MODE, $v);}
+	public function getUserMode (){return $this->getFromCustomData(self::USER_MODE, null, KuserMode::NONE);}
+
 	/**
 	 * Force modifiedColumns to be affected even if the value not changed
 	 * 
@@ -1325,7 +1329,8 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			'last_name' => $this->getLastName(),
 			'role_ids' => explode(',',$this->getRoleIds()), //todo - maybe add help to elastic here
 			'permission_names' => $this->getIndexedPermissionNames(), //todo - replace to array
-			'group_ids' => KuserKgroupPeer::retrieveKgroupIdsByKuserIdAndPartnerId($this->getKuserId(), $this->getPartnerId())
+			'group_ids' => KuserKgroupPeer::retrieveKgroupIdsByKuserIdAndPartnerId($this->getKuserId(), $this->getPartnerId()),
+			'puser_id' => $this->getPuserId()
 		);
 
 		elasticSearchUtils::cleanEmptyValues($body);

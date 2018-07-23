@@ -17,4 +17,5 @@ class SchedulerStatus extends BaseSchedulerStatus
 	const RUNNING_BATCHES_DISC_IO = 5;
 	const RUNNING_BATCHES_DISC_SPACE = 6;
 	const RUNNING_BATCHES_IS_RUNNING = 7;
+	const RUNNING_BATCHES_LAST_EXECUTION_TIME  = 8;
 }

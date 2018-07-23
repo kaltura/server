@@ -318,12 +318,16 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	protected static function getDeliveryByIds($deliveryIds, Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false, $isLive = false)
 	{
 		self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
-
+		
+		
+		//If all the delivery profile ids available where filtered out return an empty array to block playback
+		if ((empty($deliveryIds)))
+			return array();
+		
 		$c = new Criteria();
 		$c->add(DeliveryProfilePeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partner->getId()), Criteria::IN);
-		if (!(empty($deliveryIds)))
-			$c->add(DeliveryProfilePeer::ID, $deliveryIds, Criteria::IN);
-
+		$c->add(DeliveryProfilePeer::ID, $deliveryIds, Criteria::IN);
+		
 		if($isLive)
 			$c->add(DeliveryProfilePeer::TYPE, self::getAllLiveDeliveryProfileTypes(), Criteria::IN);
 		else
@@ -357,14 +361,15 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	{
 		$c = new Criteria();
 
-		if (!count($deliveryAttributes->getDeliveryProfileIds()) && !$deliveryAttributes->getIsDeliveryProfilesBlockedList())
+		// If delivery profile ids were provided and it's a white list don't filter by IS_DEFAULT
+		if (count($deliveryAttributes->getDeliveryProfileIds()) && !$deliveryAttributes->getIsDeliveryProfilesBlockedList())
 		{
-			$c->add(DeliveryProfilePeer::IS_DEFAULT, true);
-			$c->add(DeliveryProfilePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
+			$c->add(DeliveryProfilePeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partner->getId()), Criteria::IN);
 		}
 		else
 		{
-			$c->add(DeliveryProfilePeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partner->getId()), Criteria::IN);
+			$c->add(DeliveryProfilePeer::IS_DEFAULT, true);
+			$c->add(DeliveryProfilePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
 		}
 
 		$c->add(DeliveryProfilePeer::STREAMER_TYPE, $streamerType);
@@ -658,19 +663,25 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		return array();
 	}
 
-	public static function getDefaultDeliveriesFilteredByStreamerTypes($entry, Partner $partner, $excludedStreamerTypes)
+	public static function getDefaultOrWhiteListedDeliveries($entry, Partner $partner, $excludedStreamerTypes = array(), $whiteListedDeliveryProfileIds = array())
 	{
 		$deliveryAttributes = new DeliveryProfileDynamicAttributes();
 		$isLive = $entry->getType() == entryType::LIVE_STREAM;
 
-		return self::getDefaultDeliveryProfiles($partner, $deliveryAttributes, $isLive, $excludedStreamerTypes);
-	}
-
-	protected static function getDefaultDeliveryProfiles(Partner $partner, DeliveryProfileDynamicAttributes $deliveryAttributes, $isLive = false, $excludedStreamerTypes = array())
-	{
 		$c = new Criteria();
-		$c->add(DeliveryProfilePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
-		$c->add(DeliveryProfilePeer::IS_DEFAULT, true);
+
+		if (count($whiteListedDeliveryProfileIds))
+		{
+			$c->add(DeliveryProfilePeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partner->getId()), Criteria::IN);
+			$c->add(DeliveryProfilePeer::ID, $whiteListedDeliveryProfileIds , Criteria::IN);
+		}
+		else
+		{
+			$c->add(DeliveryProfilePeer::IS_DEFAULT, true);
+			$c->add(DeliveryProfilePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
+		}
+
+		//$c->add(DeliveryProfilePeer::IS_DEFAULT, true);
 		if (count($excludedStreamerTypes))
 			$c->add(DeliveryProfilePeer::STREAMER_TYPE, $excludedStreamerTypes, Criteria::NOT_IN);
 

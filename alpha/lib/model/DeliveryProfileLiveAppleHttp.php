@@ -196,7 +196,9 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 
 		if(count($this->getDynamicAttributes()->getPlayerConfig()))
 			$url .= '/playerConfig/' . $this->params->getPlayerConfig();
-			
+		
+		$url .= '{playbackContext}';
+		
 		// TODO encrypt the manifest URL
 		return "$url/a.m3u8?url=$manifestUrl";
 	}

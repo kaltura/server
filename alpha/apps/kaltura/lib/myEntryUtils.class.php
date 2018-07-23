@@ -4,6 +4,7 @@ class myEntryUtils
 {
 
 	const TEMP_FILE_POSTFIX = "temp_1.jpg";
+	const DEFAULT_THUMB_SEC_LIVE = 1;
 
 	static private $liveSourceType = array
 	(
@@ -377,7 +378,7 @@ class myEntryUtils
 		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 		{
 			//Check if recorded entry flavors are still not ready to be played, this means set recorded content was not yet called
-			if($entry->isInsideDeleteGracePeriod() && myEntryUtils::shouldServeVodFromLive($entry, false))
+			if($entry->isInsideDeleteGracePeriod() && myEntryUtils::shouldServeVodFromLive($entry, false) && !$entry->getIsTemporary())
 			{
 				KalturaLog::info("Recorded Entry [". $entry->getId() ."] cannot be deleted until recorded content is set");
 				throw new KalturaAPIException(KalturaErrors::RECORDING_CONTENT_NOT_YET_SET, $entry->getId());
@@ -701,8 +702,19 @@ class myEntryUtils
 		$contentPath = myContentStorage::getFSContentRootPath();
 			
 		$entry_status = $entry->getStatus();
+
+		$servingVODfromLive = self::shouldServeVodFromLive($entry);
+		if ($servingVODfromLive)
+		{
+			$dc = self::getLiveEntryDcId($entry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
+			if ($dc != kDataCenterMgr::getCurrentDcId ())
+				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( $dc ) );
+		}
+		$entryLengthInMsec = $servingVODfromLive ? $entry->getRecordedLengthInMsecs() : $entry->getLengthInMsecs();
 		 
 		$thumbName = $entry->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
+		if ($servingVODfromLive && $vid_slices > 0)
+			$thumbName .= "_duration_" . $entryLengthInMsec;
 
 		if ($orig_image_path)
 			$thumbName.= '_oip_'.basename($orig_image_path);
@@ -775,7 +787,7 @@ class myEntryUtils
 			$vid_slice = 0;
 		
 		$cacheLockKey = "thumb-processing-resize".$finalThumbPath;
-		// creating the thumbnail is a very heavy operation prevent calling it in parallel for the same thubmnail for 5 minutes
+		// creating the thumbnail is a very heavy operation prevent calling it in parallel for the same thumbnail for 5 minutes
 		if ($cache && !$cache->add($cacheLockKey, true, 5 * 60))
 			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
@@ -790,6 +802,8 @@ class myEntryUtils
 		if ($entry->getType() == entryType::PLAYLIST)
 			myPlaylistUtils::updatePlaylistStatistics($entry->getPartnerId(), $entry);
 
+		if ($servingVODfromLive)
+			$orig_image_path = null;
 
 		while($count--)
 		{
@@ -806,14 +820,13 @@ class myEntryUtils
 				(!file_exists($orig_image_path))
 				)
 			{
-
 				if ($vid_sec != -1) // a specific second was requested
 				{
-					$calc_vid_sec = min($vid_sec, floor($entry->getLengthInMsecs() / 1000));
+					$calc_vid_sec = min($vid_sec, floor($entryLengthInMsec / 1000));
 				}
 				else if ($vid_slices != -1) // need to create a thumbnail at a specific slice
 				{
-					$calc_vid_sec = floor($entry->getLengthInMsecs() / $vid_slices * min($vid_slice, $vid_slices) / 1000);
+					$calc_vid_sec = floor($entryLengthInMsec / $vid_slices * min($vid_slice, $vid_slices) / 1000);
 				}
 				else if ($entry->getStatus() != entryStatus::READY && $entry->getLengthInMsecs() == 0) // when entry is not ready and we don't know its duration
 				{
@@ -821,7 +834,7 @@ class myEntryUtils
 				}
 				else // default thumbnail was not created yet
 				{
-					$calc_vid_sec = $entry->getBestThumbOffset();
+					$calc_vid_sec = $servingVODfromLive ? self::DEFAULT_THUMB_SEC_LIVE : $entry->getBestThumbOffset();
 				}
 					
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
@@ -840,7 +853,7 @@ class myEntryUtils
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
 					$success = false;
-					if($multi && $packagerRetries)
+					if(($multi || $servingVODfromLive) && $packagerRetries)
 					{
 						list($picWidth, $picHeight) = $shouldResizeByPackager ? array($width, $height) : array(null, null);
 						$destPath = $shouldResizeByPackager ? $capturedThumbPath . uniqid() : $capturedThumbPath;
@@ -912,6 +925,8 @@ class myEntryUtils
 
 					$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
 				}
+				if ($thumbCaptureByPackager && file_exists($packagerResizeFullPath))
+					unlink($packagerResizeFullPath);
 			}
 
 
@@ -932,7 +947,7 @@ class myEntryUtils
 				++$vid_slice;
 			}
 
-			if ($thumbCaptureByPackager && $shouldResizeByPackager)
+			if ($thumbCaptureByPackager && $shouldResizeByPackager && $multi && file_exists($packagerResizeFullPath))
 				unlink($packagerResizeFullPath);
 
 			if ($isEncryptionNeeded)
@@ -990,6 +1005,9 @@ class myEntryUtils
 
 	public static function captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width = null, $height = null)
 	{
+		if (myEntryUtils::shouldServeVodFromLive($entry))
+			return self::captureLiveThumbUsingPackager($entry, 'recording', $capturedThumbPath, $calc_vid_sec, $width, $height);
+		
 		$mappedThumbEntryTypes = array(entryType::PLAYLIST);
 		if(in_array($entry->getType(), $mappedThumbEntryTypes))
 			return self::captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
@@ -997,6 +1015,29 @@ class myEntryUtils
 		return self::captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
 	}
 
+	private static function captureLiveThumbUsingPackager(entry $entry, $liveType, $destThumbPath, $calc_vid_sec, $width = null, $height = null)
+	{
+		$packagerCaptureUrl = kConf::get('packager_local_live_thumb_capture_url', 'local', null);
+		if (!$packagerCaptureUrl)
+			return false;
+
+		$dc = self::getLiveEntryDcId($entry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
+		if (is_null($dc))
+			return false;
+		$url = 'p/' . $entry->getPartnerId() . '/e/' . $entry->getId();
+		$packagerCaptureUrl = str_replace(array ( "{dc}", "{liveType}"), array ( $dc, $liveType) , $packagerCaptureUrl );
+		if (!$calc_vid_sec) //Temp until packager support time 0
+			$calc_vid_sec = self::DEFAULT_THUMB_SEC_LIVE;
+		return self::curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $destThumbPath, $width, $height, '+');
+	}
+	
+	private static function getLiveEntryDcId($entryId, $type)
+	{
+		$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, $type);
+		if (!$entryServerNode)
+			return null;
+		return $entryServerNode->getDCId();
+	}
 
 	private static function captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width, $height)
 	{
@@ -1019,15 +1060,11 @@ class myEntryUtils
 
 		$flavorUrl = myPlaylistUtils::buildPlaylistThumbPath($entry, $flavorAsset);
 
-		$success = self::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
-		if(!$success)
-			return false;
-
-		return true;
+		return self::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
 	}
 
 
-	private static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null)
+	private static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null, $offsetPrefix = '')
 	{
 		$offset = floor($calc_vid_sec*1000);
 		if ($width)
@@ -1037,7 +1074,7 @@ class myEntryUtils
 
 		$packagerThumbCapture = str_replace(
 		array ( "{url}", "{offset}" ),
-		array ( $url , $offset  ) ,
+		array ( $url , $offsetPrefix . $offset ) ,
 		$packagerCaptureUrl );
 
 		$tempThumbPath = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
@@ -1122,11 +1159,7 @@ class myEntryUtils
 
 		if (!$entry_data_path)
 			return false;
-		$success = self::curlThumbUrlWithOffset($entry_data_path, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
-		if(!$success)
-			return false;
-
-		return true;
+		return self::curlThumbUrlWithOffset($entry_data_path, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
 	}
 
 
@@ -1558,7 +1591,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$newEntry->setCategoriesIds(null);
 
 	    if (!$copyFlavors)
-		    $newEntry->setStatus(entryStatus::NO_CONTENT);
+		{
+			$newEntry->setStatus(entryStatus::NO_CONTENT);
+			$newEntry->setLengthInMsecs(0);
+		}
+
 
 	    if ($toPartner instanceof Partner)
  		{
@@ -1868,17 +1905,25 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	 */
 	public static function shouldServeVodFromLive(entry $entry, $validateStatus = true)
 	{
-		$shouldServeVodFromLive = $entry->getType() == entryType::MEDIA_CLIP && $entry->getSource() == EntrySourceType::KALTURA_RECORDED_LIVE;
-		if($validateStatus)
-			$shouldServeVodFromLive = $shouldServeVodFromLive && $entry->getStatus() == entryStatus::READY;
-				
-		if($shouldServeVodFromLive)
-		{
-			$readyAssets = assetPeer::retrieveFlavorsByEntryIdAndStatusIn($entry->getId(), array(asset::ASSET_STATUS_READY));
-			if(!count($readyAssets))
-				return true;
-		}
-		
+		if ($entry->getType() != entryType::MEDIA_CLIP || $entry->getSource() != EntrySourceType::KALTURA_RECORDED_LIVE)
+			return false;
+
+		if($validateStatus && $entry->getStatus() != entryStatus::READY)
+			return false;
+
+		$readyAssets = assetPeer::retrieveFlavorsByEntryIdAndStatusIn($entry->getId(), array(asset::ASSET_STATUS_READY));
+		if(!count($readyAssets))
+			return true;
+
+		if (!$validateStatus)
+			return false;
+
+		//check if entry is in append mode and currently streaming
+		$liveEntry = entryPeer::retrieveByPK($entry->getRootEntryId());
+		if ($liveEntry && $liveEntry instanceof LiveEntry && $liveEntry->getSource() == EntrySourceType::LIVE_STREAM
+			&& $liveEntry->getRecordStatus() == RecordStatus::APPENDED && $liveEntry->getRecordedEntryId() == $entry->getId())
+			return !is_null(EntryServerNodePeer::retrieveByEntryIdAndServerType($liveEntry->getId(), EntryServerNodeType::LIVE_PRIMARY));
+
 		return false;
 	}
 

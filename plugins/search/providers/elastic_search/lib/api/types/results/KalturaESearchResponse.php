@@ -3,7 +3,7 @@
  * @package plugins.elasticSearch
  * @subpackage api.objects
  */
-class KalturaESearchResponse extends KalturaObject
+abstract class KalturaESearchResponse extends KalturaObject
 {
     /**
      * @var int
@@ -11,9 +11,4 @@ class KalturaESearchResponse extends KalturaObject
      */
     public $totalCount;
 
-    /**
-     * @var KalturaESearchResultArray
-     * @readonly
-     */
-    public $objects;
 }

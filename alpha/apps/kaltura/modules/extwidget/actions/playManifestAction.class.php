@@ -752,9 +752,13 @@ class playManifestAction extends kalturaAction
 		if($this->requestedDeliveryProfileIds)
 		{
 			$deliveryIdsByStreamerType = $storageProfile->getDeliveryProfileIds();
-			if(isset( $deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()]))
+			$format = $this->deliveryAttributes->getFormat();
+			if (in_array($format, array(self::URL, self::DOWNLOAD)))
+				$format = PlaybackProtocol::HTTP;
+
+			if(isset( $deliveryIdsByStreamerType[$format]))
 			{
-				$storageStreamerTypeDeliveryProfileIds = $deliveryIdsByStreamerType[$this->deliveryAttributes->getFormat()];
+				$storageStreamerTypeDeliveryProfileIds = $deliveryIdsByStreamerType[$format];
 				return count(array_intersect($this->requestedDeliveryProfileIds, $storageStreamerTypeDeliveryProfileIds));
 			}
 
@@ -930,10 +934,20 @@ class playManifestAction extends kalturaAction
 			$c->add(assetPeer::ENTRY_ID, $this->entryId);
 			$c->add(assetPeer::STATUS, asset::ASSET_STATUS_READY);
 			$assets = assetPeer::doSelect($c);
+			
+			//Filter out all caption assets that have displayOnPlayer set to false
+			$filteredAssets = array(); 
+			foreach ($assets as $asset)
+			{
+				if(is_callable($asset, 'getDisplayOnPlayer') && !$asset->getDisplayOnPlayer())
+					continue;
+				
+				$filteredAssets[] = $asset;
+			}
 
 			$assets = array_merge(
-					$this->deliveryAttributes->getFlavorAssets(), 
-					$assets);
+					$this->deliveryAttributes->getFlavorAssets(),
+					$filteredAssets);
 			$this->deliveryAttributes->setFlavorAssets($assets);
 		}
 
@@ -1108,6 +1122,7 @@ class playManifestAction extends kalturaAction
 		$this->deliveryAttributes->setClipTo($this->getRequestParameter ( "clipTo" , 0));
 
 		$this->deliveryAttributes->setPlaybackRate($this->getRequestParameter ( "playbackRate" , 0));
+		$this->deliveryAttributes->setStreamType($this->getRequestParameter( "streamType", null ));
 		
 		$deliveryCode = $this->getRequestParameter( "deliveryCode", null );
 		$playbackContext = $this->getRequestParameter( "playbackContext", null );

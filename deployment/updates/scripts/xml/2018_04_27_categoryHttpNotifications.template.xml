@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaHttpNotificationTemplate">
+                <name>Category Created</name>
+                <systemName>CATEGORY_CREATED</systemName>
+                <description>HTTP notification template to be sent when a category is created</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>5</eventType>
+                <!-- EventNotificationEventType::OBJECT_CREATED -->
+                <eventObjectType>2</eventObjectType>
+                <!-- EventNotificationEventObjectType::CATEGORY -->
+
+                <method>2</method>
+                <!-- KalturaHttpNotificationMethod::POST -->
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaHttpNotificationTemplate">
+                <name>Category Metadata Changed</name>
+                <systemName>HTTP_CATEGORY_CHANGED</systemName>
+                <description>HTTP notification template to be sent when a category's metadata has changed</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType>
+                <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>2</eventObjectType>
+                <!-- EventNotificationEventObjectType::CATEGORY -->
+
+                <eventConditions objectType="array">
+                    <item objectType="KalturaFieldMatchCondition">
+                        <description>Status not equal</description>
+                        <field objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getStatus()</code>
+                        </field>
+                        <values objectType="array">
+                            <item objectType="KalturaStringValue">
+                                <value>3</value>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>4</value>
+                            </item>
+                        </values>
+                        <not>1</not>
+                    </item>
+                    <item objectType="KalturaEventObjectChangedCondition">
+                        <description>Entry metadata changed, columns defined in modified_columns parameter</description>
+                        <modifiedColumns>{modified_columns}</modifiedColumns>
+                    </item>
+                </eventConditions>
+
+                <userParameters objectType="array">
+                    <item objectType="KalturaEventNotificationArrayParameter">
+                        <key>modified_columns</key>
+                        <description>Category metadata columns that will trigger the event</description>
+                        <allowedValues objectType="array">
+                            <item objectType="KalturaStringValue">
+                                <value>category.NAME</value>
+                                <description>name</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>category.TAGS</value>
+                                <description>tags</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>category.DESCRIPTION</value>
+                                <description>description</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>category.REFERENCE_ID</value>
+                                <description>reference id</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>category.PARENT_ID</value>
+                                <description>parent id</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>category.STATUS</value>
+                                <description>status</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>category.FULL_NAME</value>
+                                <description>Full name</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>category.FULL_IDS</value>
+                                <description>Full IDs</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>category.ENTRIES_COUNT</value>
+                                <description>Entries count</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>category.MEMBERS_COUNT</value>
+                                <description>Members count</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>category.PRIVACY</value>
+                                <description>Privacy</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>category.INHERITANCE_TYPE</value>
+                                <description>Inheritance type</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>category.USER_JOIN_POLICY</value>
+                                <description>User join policy</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>category.DEFAULT_PERMISSION_LEVEL</value>
+                                <description>Default permission level</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>category.PUSER_ID</value>
+                                <description>User ID</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>category.CONTRIBUTION_POLICY</value>
+                                <description>Contribution policy</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>category.PRIVACY_CONTEXT</value>
+                                <description>Privacy context</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>category.PRIVACY_CONTEXTS</value>
+                                <description>Privacy contexts</description>
+                            </item>
+                            <item objectType="KalturaStringValue">
+                                <value>category.MODERATION</value>
+                                <description>Moderation</description>
+                            </item>
+
+                        </allowedValues>
+                    </item>
+                </userParameters>
+
+                <method>2</method>
+                <!-- KalturaHttpNotificationMethod::POST -->
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaHttpNotificationTemplate">
+                <name>Category Deleted</name>
+                <systemName>HTTP_CATEGORY_DELETED</systemName>
+                <description>HTTP notification template to be sent when a category is deleted.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>7</eventType>
+                <!-- EventNotificationEventType::OBJECT_DELETED -->
+                <eventObjectType>2</eventObjectType>
+                <!-- EventNotificationEventObjectType::CATEGORY -->
+
+                <method>2</method>
+                <!-- KalturaHttpNotificationMethod::POST -->
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+
+</xml>

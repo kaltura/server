@@ -6,6 +6,7 @@
 class kDataCenterMgr
 {
 	private static $s_current_dc;
+	private static $is_multi_dc = null;
 
 	/**
 	 * @var StorageProfile
@@ -50,7 +51,23 @@ class kDataCenterMgr
 		$dc = self::getCurrentDc();
 		return $dc["domain"];
 	}
-		
+
+	public static function getCurrentDcName ()
+	{
+		$dc = self::getCurrentDc();
+		return $dc["name"];
+	}
+
+	public static function isMultiDc()
+	{
+		if (is_null(self::$is_multi_dc))
+		{
+			$ids = self::getDcIds();
+			self::$is_multi_dc = count($ids) > 1;
+		}
+		return self::$is_multi_dc;
+	}
+	
 	public static function getCurrentDc () 
 	{
 		$dc_config = kConf::getMap("dc_config");
@@ -258,7 +275,9 @@ class kDataCenterMgr
 		else
 		{
 			KalturaLog::log("Serving file from [".$resolvedPath."]");
-			kFileUtils::dumpFile( $resolvedPath , null, null, 0 ,$file_sync_resolved->getEncryptionKey(), $file_sync_resolved->getIv(), $file_sync_resolved->getFileSize());
+			//This case handles file sync that links to file but its type is directory
+			$fileSize = $file_sync_resolved->getIsDir() ? null : $file_sync_resolved->getFileSize();
+			kFileUtils::dumpFile( $resolvedPath , null, null, 0 ,$file_sync_resolved->getEncryptionKey(), $file_sync_resolved->getIv(),$fileSize);
 		}
 		
 	}

@@ -15,6 +15,7 @@ abstract class KalturaParentContributedPlugin extends KalturaPlugin implements I
      */
     public function contribute(BaseObject $object, SimpleXMLElement $mrss, kMrssParameters $mrssParams = null)
     {
+		KalturaLog::debug("using ParentContributedPlugin");
 		if(!($object instanceof entry)){
 			return;
 		}

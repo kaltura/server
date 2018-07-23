@@ -293,9 +293,18 @@ class KGenericScheduler
 			$indexedTaskConfigs[$taskConfig->name] = $taskConfig;
 			if(!$taskConfig->type)
 				continue;
-		
+
+			$lastRunTime = null;
+			if(isset($this->lastRunTime[$taskConfig->name]))
+				$lastRunTime = $this->lastRunTime[$taskConfig->name];
+
 			if(!$this->isInitialized($taskConfig))
+			{
 				$this->initSingleWorker($taskConfig);
+				if ($lastRunTime)
+					$statuses[] = $this->createStatus($taskConfig, KalturaSchedulerStatusType::RUNNING_BATCHES_LAST_EXECUTION_TIME, $lastRunTime);
+			}
+
 		
 			$runningTasksCount = $this->numberOfRunningTasks($taskConfig->name);
 			if($fullCycle) {
@@ -304,7 +313,12 @@ class KGenericScheduler
 			}
 		
 			if($this->shouldExecute($taskConfig))
+			{
 				$this->spawn($taskConfig);
+				if ($lastRunTime)
+					$statuses[] = $this->createStatus($taskConfig, KalturaSchedulerStatusType::RUNNING_BATCHES_LAST_EXECUTION_TIME,  $lastRunTime);
+			}
+
 		}
 		
 		if($sendSchedulerStatus)

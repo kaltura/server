@@ -110,15 +110,18 @@ class MediaService extends KalturaEntryService
 		if ($dbEntry->getStatus() != entryStatus::NO_CONTENT)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ALREADY_WITH_CONTENT);
 
-		if($resource)
+		if ($resource)
 		{
-	    	$resource->validateEntry($dbEntry);
-	    	$kResource = $resource->toObject();
-	    	$this->attachResource($kResource, $dbEntry);
-	
-	    	$resource->entryHandled($dbEntry);
+			$resource->validateEntry($dbEntry);
+			$kResource = $resource->toObject();
+			try
+			{
+				$this->attachResource($kResource, $dbEntry);
+			} catch (Exception $e) {
+				$this->handleErrorDuringSetResource($entryId, $e);
+			}
+			$resource->entryHandled($dbEntry);
 		}
-
 		return $this->getEntry($entryId);
     }
 
@@ -797,13 +800,7 @@ class MediaService extends KalturaEntryService
 			if($lock){
 				$lock->unlock();
 			}
-			if (($e->getCode() == kCoreException::SOURCE_FILE_NOT_FOUND) && (kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId())))
-			{
-				$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
-				KalturaLog::info("Source file wasn't found on current DC. dumping the request to DC id [$remoteDc]");
-				kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc));
-			}
-	       		throw $e;
+			$this->handleErrorDuringSetResource($entryId, $e);
 		}
 		if($lock){
 			$lock->unlock();
@@ -1225,6 +1222,19 @@ class MediaService extends KalturaEntryService
 
 		$content = myEntryUtils::getVolumeMapContent($flavorAsset);
 		return $content;
+	}
+
+	private function handleErrorDuringSetResource($entryId, Exception $e)
+	{
+		KalturaLog::info("Exception was thrown during setContent on entry [$entryId] with error: " . $e->getMessage());
+		$this->cancelReplaceAction($entryId);
+		if (($e->getCode() == kCoreException::SOURCE_FILE_NOT_FOUND) && (kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId())))
+		{
+			$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
+			KalturaLog::info("Source file wasn't found on current DC. dumping the request to DC id [$remoteDc]");
+			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc));
+		}
+		throw $e;
 	}
 
 }

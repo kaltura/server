@@ -1,6 +1,7 @@
 <?php
 /**
  * @package api
+ * @relatedService ConversionProfileService
  * @subpackage filters.base
  * @abstract
  */

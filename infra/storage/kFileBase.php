@@ -12,12 +12,15 @@ class kFileBase
      * Lazy saving of file content to a temporary path, the file will exist in this location until the temp files are purged
      * @param string $fileContent
      * @param string $prefix
+     * @param string $postfix
      * @param integer $permission
      * @return string path to temporary file location
      */
-    public static function createTempFile($fileContent, $prefix = '' , $permission = null)
+    public static function createTempFile($fileContent, $prefix = '' , $permission = null, $postfix = null)
     {
         $tempDirectory = sys_get_temp_dir();
+        if ($postfix )
+            $tempDirectory .= ".$postfix";
         $fileLocation = tempnam($tempDirectory, $prefix);
         if (self::safeFilePutContents($fileLocation, $fileContent, $permission))
             return $fileLocation;
@@ -170,6 +173,7 @@ class kFileBase
     
     static public function setFileContent($file_name, $content)
     {
+        $res = null;
         $file_name = self::fixPath($file_name);
 
         // TODO - this code should be written in fullMkdir
@@ -179,13 +183,14 @@ class kFileBase
         $fh = fopen($file_name, 'w');
         try
         {
-            fwrite($fh, $content);
+            $res = fwrite($fh, $content);
         }
         catch(Exception $ex)
         {
-            // whatever happens - don't forget to cloes $fh
+            // whatever happens - don't forget to close $fh
         }
         fclose($fh);
+        return $res;
     }
     
     static public function getFileContent($file_name, $from_byte = 0, $to_byte = -1, $mode = 'r')

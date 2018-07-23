@@ -3,6 +3,7 @@
  * @package api
  * @subpackage objects
  * @abstract
+ * @relatedService UserEntryService
  */
 abstract class KalturaUserEntry extends KalturaObject implements IRelatedFilterable
 {

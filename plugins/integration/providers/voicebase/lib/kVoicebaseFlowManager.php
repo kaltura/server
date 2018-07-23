@@ -31,6 +31,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		$spokenLanguage = $providerData->getSpokenLanguage();
 
 		$transcripts = kTranscriptHelper::getAssetsByLanguage($entryId, array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), $spokenLanguage);
+		$externalId = $entryId . '_' . $dbBatchJob->getId();
 		
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED)
 		{
@@ -73,7 +74,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 		{
 			$clientHelper = VoicebasePlugin::getClientHelper($providerData->getApiKey(), $providerData->getApiPassword());
 		
-			$externalEntryExists = $clientHelper->checkExistingExternalContent($entryId);
+			$externalEntryExists = $clientHelper->checkExistingExternalContent($externalId);
 			if (!$externalEntryExists)
 			{
 				KalturaLog::err("Remote content for entry ID [$entryId] does not exist");
@@ -84,7 +85,7 @@ class kVoicebaseFlowManager implements kBatchJobStatusEventConsumer
 			$formatsArray[] = "TXT";
 			$formatsArray[] = "JSON";
 			
-			$contentsArray = $clientHelper->getRemoteTranscripts($entryId, $formatsArray);
+			$contentsArray = $clientHelper->getRemoteTranscripts($externalId, $formatsArray);
 			KalturaLog::debug('contents are - ' . print_r($contentsArray, true));
 			
 			$accuracy = $clientHelper->calculateAccuracy($entryId);

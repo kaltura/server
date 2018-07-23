@@ -452,7 +452,8 @@ abstract class KalturaObject implements IApiObject
 				$pager = new KalturaFilterPager();
 			}
 			
-			$this->relatedObjects[$relatedProfile->name] = $filter->getListResponse($pager, $relatedProfile);
+			$this->relatedObjects[$relatedProfile->name] = $filter->validateAndGetListResponse($pager, $relatedProfile);
+
 		}
 	}
 	

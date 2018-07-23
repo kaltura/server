@@ -199,7 +199,8 @@ class kDropFolderXmlFileHandler
 		);
 		$fileTransferManager = kFileTransferMgr::getInstance($folder->getFileTransferMgrType(), $engineOptions);
 		$loginStatus = $folder->loginByCredentialsType($fileTransferManager);
-		
+
+
 		if($fileTransferManager->fileSize($folder->getPath().'/'.$file->getFileName()) > kDropFolderXmlEventsConsumer::MAX_XML_FILE_SIZE)
 			throw new Exception(DropFolderXmlBulkUploadPlugin::XML_FILE_SIZE_EXCEED_LIMIT_MESSAGE, DropFolderXmlBulkUploadPlugin::getErrorCodeCoreValue(DropFolderXmlBulkUploadErrorCode::XML_FILE_SIZE_EXCEED_LIMIT));
 			
