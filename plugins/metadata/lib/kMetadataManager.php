@@ -194,11 +194,12 @@ class kMetadataManager
 				$profileField->setLabel($xPathData['label']);
 			if(isset($xPathData['type']))
 				$profileField->setType($xPathData['type']);
-			
+			if(isset($xPathData['trimChars']))
+				$profileField->setTrimChars($xPathData['trimChars']);
+			if(isset($xPathData['explodeChars']))
+				$profileField->setExplodeChars($xPathData['explodeChars']);
 			if(isset($xPathData['matchType']))
 				$profileField->setMatchType(intval($xPathData['matchType']));
-			else
-				$profileField->setMatchType(MetadataProfileFieldMatchType::TEXT);
 
 			self::setAdditionalProfileFieldData($metadataProfile, $profileField, $xPathData);
 
