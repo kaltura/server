@@ -34,7 +34,7 @@ class kThumbnailDescriptor
 
 		$descriptor = new kThumbnailDescriptor();
 
-		$thumbAspectRatio = $thumbWidth / $thumbHeight;
+		$thumbAspectRatio = $thumbHeight > 0 ? $thumbWidth / $thumbHeight : 0 ;
 
 		$descriptor->deltaFromOrigAspectRatio = abs( self::$requiredAspectRatio - $thumbAspectRatio );
 		$descriptor->width = $thumbWidth;
