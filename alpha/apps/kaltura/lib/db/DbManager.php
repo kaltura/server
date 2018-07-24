@@ -44,8 +44,13 @@ class DbManager
 	/**
 	 * @param int
 	 */
-	protected static $connIndex = false; 
-	
+	protected static $connIndex = false;
+
+	/**
+	 * @param array
+	 */
+	protected static $allowedSphinxHosts = array();
+
 	public static function setConfig(array $config)
 	{
 		$reflect = new ReflectionClass('KalturaPDO');
@@ -187,6 +192,39 @@ class DbManager
 		self::$cachedConnIndex = (int) $preferredIndex; //$preferredIndex returns from self::$sphinxCache->get(..) in type string
 		return $preferredIndex;
 	}
+
+	/**
+	 * choose the sphinx db with the smallest lag
+	 * @param $dataSources
+	 * @return bool|mixed
+	 */
+	protected static function getSphinxConnIndexByLag($dataSources)
+	{
+		self::initAllowedSphinxHosts($dataSources);
+		$sphinxLags = kQueryCache::getCachedKeyResults(kQueryCache::SPHINX_LAG_KEY);
+
+		if ($sphinxLags === false)
+			return false;
+
+		$lag = 0;
+		$host = null;
+		$preferredIndex = false;
+		foreach (self::$allowedSphinxHosts as $index => $currentHost)
+		{
+			if (array_key_exists($currentHost, $sphinxLags) && $sphinxLags[$currentHost])
+			{
+				if ($lag < $sphinxLags[$currentHost])
+				{
+					$host = $currentHost;
+					$lag = $sphinxLags[$currentHost];
+					$preferredIndex = $index;
+				}
+			}
+		}
+
+		KalturaLog::debug("Sphinx with best lag chosen [" . $host . "] in datasource index [".$preferredIndex."]");
+		return $preferredIndex;
+	}
 	
 	protected static function getStickySessionKey() 
 	{
@@ -211,6 +249,17 @@ class DbManager
 			
 			$preferredIndex = self::getSphinxConnIndexFromCache();
 
+			if ($preferredIndex === false)
+			try
+			{
+				$preferredIndex = self::getSphinxConnIndexByLag($sphinxDS);
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::err("Error retrieving sphinx connection by lag. " . $e->getMessage());
+				$preferredIndex = false;
+			}
+
 			list(self::$sphinxConnection, self::$connIndex) = self::connectFallbackLogic(
 				array('DbManager', 'getSphinxConnectionInternal'), 
 				array($connectTimeout), 
@@ -227,7 +276,34 @@ class DbManager
 			self::setSphinxConnIndexInCache();
 		return self::$sphinxConnection;
 	}
-	
+
+	/**
+	 * @param $dataSources
+	 */
+	protected static function initAllowedSphinxHosts($dataSources)
+	{
+		if (!empty(self::$allowedSphinxHosts))
+			return;
+
+		foreach ($dataSources as $key => $datasource)
+		{
+			if (isset(self::$config['datasources'][$datasource]['connection']['dsn']))
+			{
+				list($mysql, $connection) = explode(':', self::$config['datasources'][$datasource]['connection']['dsn']);
+				$arguments = explode(';', $connection);
+				foreach ($arguments as $argument)
+				{
+					list($argumentName, $argumentValue) = explode('=', $argument);
+					if (strtolower($argumentName) == 'host')
+					{
+						self::$allowedSphinxHosts[$key] = $argumentValue;
+						break;
+					}
+				}
+			}
+		}
+	}
+
 	private static function getSphinxConnectionInternal($key, $connectTimeout)
 	{
 		if(!isset(self::$config['datasources'][$key]['connection']['dsn']))
