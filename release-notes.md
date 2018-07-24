@@ -1,5 +1,15 @@
 # Naos 14.3.0 #
 
+## Allow media-server partner to get reports##
+Issue Type:  New Feature
+Issue ID: PLAT-9120
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_07_24_add_mediaServer_reports_permissions.php
+
 ## Modify reach_profile used_crdit column type  ##
 - Issue Type: Bug
 - Issue ID: PLAT-9112
