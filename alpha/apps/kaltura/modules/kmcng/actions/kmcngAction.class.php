@@ -19,7 +19,7 @@ class kmcngAction extends kalturaAction
 		$kmcngParams = kConf::get('kmcng');
 
 		// Check for forced HTTPS
-		if (!isset($kmcngParams["kmcng_debug_mode"]))
+		if (kConf::get('kmc_secured_login'))
 		{
 			if ((!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on'))
 			{
@@ -76,8 +76,6 @@ class kmcngAction extends kalturaAction
 		$this->contentUiconfPreview = (is_array($this->contentUiconfsPreview) && reset($this->contentUiconfsPreview)) ? reset($this->contentUiconfsPreview) : null;
 
 		$secureCDNServerUri = "https://" . kConf::get("cdn_api_host_https");
-		if (isset($kmcngParams["kmcng_debug_mode"]))
-			$secureCDNServerUri = "http://" . kConf::get("cdn_api_host");
 
 		$serverAPIUri = kConf::get("www_host");
 		if (isset($kmcngParams["kmcng_custom_uri"]))
@@ -94,7 +92,7 @@ class kmcngAction extends kalturaAction
 			$studio = array(
 				"uri" => '/apps/studio/' . kConf::get("studio_version") . "/index.html",
 				"html5_version" => kConf::get("html5_version"),
-				"html5lib" => $secureCDNServerUri . "/html5/html5lib/" . kConf::get("html5_version") . "/mwEmbedLoader.php"
+				"html5lib" => "/html5/html5lib/" . kConf::get("html5_version") . "/mwEmbedLoader.php"
 			);
 		}
 
@@ -104,7 +102,7 @@ class kmcngAction extends kalturaAction
 			$studioV3 = array(
 				"uri" => '/apps/studioV3/' . kConf::get("studio_v3_version") . "/index.html",
 				"html5_version" => kConf::get("html5_version"),
-				"html5lib" => $secureCDNServerUri . "/html5/html5lib/" . kConf::get("html5_version") . "/mwEmbedLoader.php",
+				"html5lib" => "/html5/html5lib/" . kConf::get("html5_version") . "/mwEmbedLoader.php",
 				"playerVersionsMap" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfig() : ''
 			);
 		}
