@@ -378,7 +378,7 @@ class myPartnerRegistration
 			$this->setAllTemplateEntriesToAdminKuser($newPartner->getId(), $kuserId);
 
 			if(!$existingLoginData)
-				$this->addMarketoCampaignId($newPartner, 'marketo_new_register_success_campaign');
+				$this->addMarketoCampaignId($newPartner, 'marketo_new_register_success_campaign', $newPartner);
 
 			kEventsManager::raiseEvent(new kObjectAddedEvent($newPartner));
 
@@ -391,20 +391,17 @@ class myPartnerRegistration
 		}
 	}
 
-	private function addMarketoCampaignId($partner, $campaignName, $newAddidtionalPartner = null)
+	private function addMarketoCampaignId($partnerToUpdate, $campaignName, $partnerToCheck)
 	{
 		//if an additional account was register we want to check if the additional is free trial and update the existing lead
-		$newPartner = $partner;
-		if($newAddidtionalPartner)
-			$newPartner = $newAddidtionalPartner;
-		$additionalParams = $newPartner->getAdditionalParams();
-		if($newPartner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_FREE && isset($additionalParams['freetrialaccounttype']))
+		$additionalParams = $partnerToCheck->getAdditionalParams();
+		if($partnerToCheck->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_FREE && isset($additionalParams['freetrialaccounttype']))
 		{
 			if (kConf::hasParam($campaignName))
 			{
 				$campaignId = kConf::get($campaignName);
-				$partner->setMarketoCampaignId($campaignId);
-				$partner->save();
+				$partnerToUpdate->setMarketoCampaignId($campaignId);
+				$partnerToUpdate->save();
 			}
 		}
 	}
