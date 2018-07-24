@@ -338,7 +338,6 @@ class myPartnerRegistration
 			else if ($existingLoginData->isPasswordValid($password))
 			{
 				KalturaLog::log('Login id ['.$email.'] already used, and given password is valid. Creating new partner with this same login id');
-				$this->addMarketoCampaignId($existingPartner, 'marketo_additional_register_success_campaign', $partner);
 			}
 			else
 			{
@@ -379,6 +378,10 @@ class myPartnerRegistration
 
 			if(!$existingLoginData)
 				$this->addMarketoCampaignId($newPartner, 'marketo_new_register_success_campaign', $newPartner);
+
+			if ($existingLoginData && !$ignorePassword)
+				$this->addMarketoCampaignId($newPartner, 'marketo_additional_register_success_campaign', $newPartner);
+
 
 			kEventsManager::raiseEvent(new kObjectAddedEvent($newPartner));
 
