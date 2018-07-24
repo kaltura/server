@@ -70,6 +70,8 @@ foreach($files as $file)
 				$criteria = new Criteria(SchedulerPeer::DATABASE_NAME);
 				$criteria->add(SchedulerPeer::ID, $schedulerWorker->getSchedulerId());
 				$scheduler = SchedulerPeer::doSelectOne($criteria);
+				if (!$scheduler || !method_exists($scheduler,'getName'))
+					continue;
 				/** $lastExecutionTime + max($sleepBetweenStopStart , 300 )  we are letting a margin of twice the execution time meaning
 				 *  if job a should run every hour
 				 *  we will wait for two hours before printing it as error
