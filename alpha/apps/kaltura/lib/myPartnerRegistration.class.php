@@ -333,17 +333,17 @@ class myPartnerRegistration
 			$existingPartner = partnerPeer::retrieveByPK($existingLoginData->getConfigPartnerId());
 			if (!$password)
 			{
-				$this->addMarketoCampaignId($existingPartner, 'marketo_missing_Password_campaign');
+				$this->addMarketoCampaignId($existingPartner, 'marketo_missing_Password_campaign', $partner);
 				throw new SignupException("User with email [$email] already exists in system.", SignupException::MISSING_PASSWORD_FOR_EXISTING_EMAIL );
 			}
 			else if ($existingLoginData->isPasswordValid($password))
 			{
 				KalturaLog::log('Login id ['.$email.'] already used, and given password is valid. Creating new partner with this same login id');
-				$this->addMarketoCampaignId($existingPartner, 'marketo_additional_register_success_campaign');
+				$this->addMarketoCampaignId($existingPartner, 'marketo_additional_register_success_campaign', $partner);
 			}
 			else
 			{
-				$this->addMarketoCampaignId($existingPartner, 'marketo_wrong_password_campaign');
+				$this->addMarketoCampaignId($existingPartner, 'marketo_wrong_password_campaign', $partner);
 				throw new SignupException("Invalid password for user with email [$email].", SignupException::INCORRECT_PASSWORD_FOR_EXISTING_EMAIL );
 			}
 			
@@ -379,7 +379,7 @@ class myPartnerRegistration
 			$this->setAllTemplateEntriesToAdminKuser($newPartner->getId(), $kuserId);
 
 			if(!$existingLoginData)
-				$this->addMarketoCampaignId($newPartner, 'marketo_new_register_success_campaign');
+				$this->addMarketoCampaignId($newPartner, 'marketo_new_register_success_campaign', $newPartner);
 
 			kEventsManager::raiseEvent(new kObjectAddedEvent($newPartner));
 
@@ -392,13 +392,18 @@ class myPartnerRegistration
 		}
 	}
 
-	private function addMarketoCampaignId($partner, $campaignName)
+	private function addMarketoCampaignId($partnerToUpdate, $campaignName, $partnerToCheck)
 	{
-		if (kConf::hasParam($campaignName))
+		//if an additional account was register we want to check if the additional is free trial and update the existing lead
+		$additionalParams = $partnerToCheck->getAdditionalParams();
+		if($partnerToCheck->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_FREE && isset($additionalParams['freetrialaccounttype']))
 		{
-			$campaignId = kConf::get($campaignName);
-			$partner->setMarketoCampaignId($campaignId);
-			$partner->save();
+			if (kConf::hasParam($campaignName))
+			{
+				$campaignId = kConf::get($campaignName);
+				$partnerToUpdate->setMarketoCampaignId($campaignId);
+				$partnerToUpdate->save();
+			}
 		}
 	}
 
