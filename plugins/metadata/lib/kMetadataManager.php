@@ -227,11 +227,8 @@ class kMetadataManager
 				$profileField->setTrimChars($xPathData['trimChars']);
 			if(isset($xPathData['explodeChars']))
 				$profileField->setExplodeChars($xPathData['explodeChars']);
-			
 			if(isset($xPathData['matchType']))
 				$profileField->setMatchType(intval($xPathData['matchType']));
-			else
-				$profileField->setMatchType(MetadataProfileFieldMatchType::TEXT);
 			
 			if(isset($xPathData['type']))
 			{
