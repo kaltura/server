@@ -13,7 +13,8 @@ class KalturaMonitorClient
 	const EVENT_SPHINX = 	'sphinx';
 	const EVENT_CONNTOOK =  'conn';
 	const EVENT_DUMPFILE = 	'file';
-	const EVENT_ELASTIC = 'elastic';
+	const EVENT_ELASTIC =	'elastic';
+	const EVENT_DRUID =		'druid';
 
 	const FIELD_EVENT_TYPE = 		'e';
 	const FIELD_SERVER = 			's';
@@ -251,6 +252,24 @@ class KalturaMonitorClient
 			self::FIELD_QUERY_TYPE		=> $actionName,
 			self::FIELD_EXECUTION_TIME	=> $queryTook,
 			self::FIELD_LENGTH			=> strlen($body),
+		));
+
+		self::writeDeferredEvent($data);
+	}
+
+	public static function monitorDruidQuery($hostName, $dataSource, $queryType, $querySize, $queryTook, $errorCode)
+	{
+		if (!self::$stream)
+			return;
+
+		$data = array_merge(self::$basicEventInfo, array(
+			self::FIELD_EVENT_TYPE 		=> self::EVENT_DRUID,
+			self::FIELD_DATABASE		=> $hostName,
+			self::FIELD_TABLE			=> $dataSource,
+			self::FIELD_QUERY_TYPE		=> $queryType,
+			self::FIELD_LENGTH			=> $querySize,
+			self::FIELD_EXECUTION_TIME	=> $queryTook,
+			self::FIELD_ERROR_CODE		=> $errorCode,
 		));
 
 		self::writeDeferredEvent($data);
