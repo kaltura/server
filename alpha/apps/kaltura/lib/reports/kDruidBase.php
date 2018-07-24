@@ -290,26 +290,38 @@ class kDruidBase
 
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
 		
-		$startTime = microtime(true);
-		$response = curl_exec($ch);
-			
-		$druidTook = microtime(true) - $startTime;
-		KalturaLog::debug('Druid query took - ' . $druidTook. ' seconds');
-			
-		if (curl_errno($ch))
+		for ($retry = 0; $retry < 3; $retry++)
 		{
-			throw new Exception('Error while trying to connect to:'. $url .' error=' . curl_error($ch));
+			$startTime = microtime(true);
+			$response = curl_exec($ch);
+				
+			$druidTook = microtime(true) - $startTime;
+			KalturaLog::debug('Druid query took - ' . $druidTook. ' seconds');
+				
+			if (curl_errno($ch))
+			{
+				throw new Exception('Error while trying to connect to:'. $url .' error=' . curl_error($ch));
+			}
+				
+			// Note: not closing the curl handle so that the connection can be reused
+				
+			$result = json_decode($response, true);
+			if (isset($result[self::DRUID_ERROR]) &&
+				strpos($result[self::DRUID_ERROR_MSG], 'Channel disconnected') !== false)
+			{
+				KalturaLog::log('Retrying on error ' . $result[self::DRUID_ERROR_MSG]);
+				continue;
+			}
+
+			break;
 		}
-			
-		// Note: not closing the curl handle so that the connection can be reused
-			
-		$result = json_decode($response, true);
 	
 		if (isset($result[self::DRUID_ERROR])) 
 		{
 			KalturaLog::err('Error while running report ' . $result[self::DRUID_ERROR_MSG]);
 			throw new Exception('Error while running report ' . $result[self::DRUID_ERROR_MSG]);
 		}
+
 		return $result;
 	}
 }
