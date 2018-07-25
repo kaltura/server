@@ -399,6 +399,7 @@ class myPartnerRegistration
 	{
 		//if an additional account was register we want to check if the additional is free trial and update the existing lead
 		$additionalParams = $partnerToCheck->getAdditionalParams();
+		$additionalParams = array_change_key_case($additionalParams);
 		if($partnerToCheck->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_FREE && isset($additionalParams['freetrialaccounttype']))
 		{
 			if (kConf::hasParam($campaignName))
