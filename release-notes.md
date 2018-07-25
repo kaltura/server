@@ -1,5 +1,18 @@
 # Naos 14.3.0 #
 
+## Update entryVendorTask permissions ##
+Issue Type:  Bug
+Issue ID: PLAT-9127
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_07_25_update_reach_entryVemdorTask_permissions.php
+
+#### Known Issues & Limitations ####
+	None.
+
 ## Allow media-server partner to get reports##
 Issue Type:  New Feature
 Issue ID: PLAT-9120
