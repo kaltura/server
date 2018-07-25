@@ -8,9 +8,9 @@
  */
 class kQuizPdf
 {
-    const ASIAN_FONT = 'AsianFont';
-    const NOTO_SANS_FONT = 'notoSansFont';
-    const TIMES_FONT = 'Times';
+	const ASIAN_FONT = 'AsianFont';
+	const NOTO_SANS_FONT = 'notoSansFont';
+	const TIMES_FONT = 'Times';
 	const NORMAL_STYLE = 'normalStyle';
 	const INDENT_LIST_STYLE = 'indentListStyle';
 	const LIST_WITH_ADD_LINE_BEFORE_STYLE = 'listWithAddLineBeforeStyle';
@@ -23,29 +23,29 @@ class kQuizPdf
 	/**
 	 * @var PdfGenerator
 	 */
-    private $pdf;
+	private $pdf;
 
-    private $styles;
-    /**
-     * @var boolean - is it required to set a footer in the PDF document
-     */
-    protected $isFooter = true;
+	private $styles;
+	/**
+	 * @var boolean - is it required to set a footer in the PDF document
+	 */
+	protected $isFooter = true;
 
-    /**
-     * @var boolean - is it required to set a header in the PDF document
-     */
-    protected $isHeader = true;
+	/**
+	 * @var boolean - is it required to set a header in the PDF document
+	 */
+	protected $isHeader = true;
 
-    //db entry id
-    protected $entryId;
+	//db entry id
+	protected $entryId;
 
-    public function __construct($entryId)
-    {
-        $this->entryId = $entryId;
-        $this->initPDF();
+	public function __construct($entryId)
+	{
+		$this->entryId = $entryId;
+		$this->initPDF();
 		$this->initFonts();
 		$this->initStyles();
-    }
+	}
 
 	private function initStyles()
 	{
@@ -73,7 +73,7 @@ class kQuizPdf
 		$this->styles = $styles;
 	}
 
-    private function initPDF()
+	private function initPDF()
 	{
 		$this->pdf = new PdfGenerator('Thank You', 'Questionnaire', '','Questionnaire','Questionnaire', '');
 		$this->pdf->Footer();
@@ -94,34 +94,34 @@ class kQuizPdf
 		$this->pdf->AddFont(self::NOTO_SANS_FONT,'I','NotoSans-Italic.ttf',true);
 	}
 
-    public function createQuestionPdf()
-    {
-        $dbEntry = entryPeer::retrieveByPK($this->entryId);
-        $entryName = $dbEntry->getName();
-        $title = "Here are the questions from  [$entryName]";
-        KalturaLog::debug("Questions from  [$entryName]");
+	public function createQuestionPdf()
+	{
+		$dbEntry = entryPeer::retrieveByPK($this->entryId);
+		$entryName = $dbEntry->getName();
+		$title = "Here are the questions from  [$entryName]";
+		KalturaLog::debug("Questions from  [$entryName]");
 		$stylePrefix = $this->getStylePrefix($title);
-        $this->pdf->addTitle($title, $this->styles[$stylePrefix.self::TITLE_STYLE]);
-        $this->pdf->setOutFileName($dbEntry->getName());
-        $questionType = QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION);
-        $questions = CuePointPeer::retrieveByEntryId($this->entryId, array($questionType));
-        $questNum = 0;
-        foreach ($questions as $question)
-        {
-            $questNum +=1;
+		$this->pdf->addTitle($title, $this->styles[$stylePrefix.self::TITLE_STYLE]);
+		$this->pdf->setOutFileName($dbEntry->getName());
+		$questionType = QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION);
+		$questions = CuePointPeer::retrieveByEntryId($this->entryId, array($questionType));
+		$questNum = 0;
+		foreach ($questions as $question)
+		{
+			$questNum +=1;
 			$stylePrefix = $this->getStylePrefix($question->getName());
-            $this->pdf->addList($questNum, $question->getName(), $this->styles[$stylePrefix.self::LIST_WITH_ADD_LINE_BEFORE_STYLE]);
-            $this->pdf->addHeadline(6, "Optional Answers:", $this->styles[self::HEADING6_STYLE]);
-            $ansNum = 0;
-            foreach ($question->getOptionalAnswers() as $optionalAnswer)
-            {
-                $ansNum +=1;
-                $text = $optionalAnswer->getText();
-                $stylePrefix = $this->getStylePrefix($text);
-                $this->pdf->addList($ansNum, $text, $this->styles[$stylePrefix.self::INDENT_LIST_STYLE]);
-            }
-        }
-    }
+			$this->pdf->addList($questNum, $question->getName(), $this->styles[$stylePrefix.self::LIST_WITH_ADD_LINE_BEFORE_STYLE]);
+			$this->pdf->addHeadline(6, "Optional Answers:", $this->styles[self::HEADING6_STYLE]);
+			$ansNum = 0;
+			foreach ($question->getOptionalAnswers() as $optionalAnswer)
+			{
+				$ansNum +=1;
+				$text = $optionalAnswer->getText();
+				$stylePrefix = $this->getStylePrefix($text);
+				$this->pdf->addList($ansNum, $text, $this->styles[$stylePrefix.self::INDENT_LIST_STYLE]);
+			}
+		}
+	}
 
 	private function getStylePrefix($text)
 	{
@@ -134,8 +134,8 @@ class kQuizPdf
 		return $stylePrefix;
 	}
 
-    public function submitDocument()
-    {
-        return $this->pdf->Submit();
-    }
+	public function submitDocument()
+	{
+		return $this->pdf->Submit();
+	}
 }
