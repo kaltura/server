@@ -117,59 +117,45 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			return;
 
 		$requestedServerType = $this->getDynamicAttributes()->getStreamType();
-		$serverType = (is_null($requestedServerType)) ? EntryServerNodeType::LIVE_PRIMARY : intval($requestedServerType);
-		foreach($liveEntryServerNodes as $key => $liveEntryServerNode)
-		{
-			/* @var $liveEntryServerNode LiveEntryServerNode */
-			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
-			if($serverNode)
-			{
-				//Order by current DC first
-				//KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
-				//if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
-				
-				//Order by primary DC first
-				KalturaLog::debug("liveEntryServerNode->getServerType [" . $liveEntryServerNode->getServerType() . "]");
-				if($liveEntryServerNode->getServerType() === $serverType)
-				{
-					$this->liveStreamConfig->setUrl($this->getHttpUrl($serverNode));
-					$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
-					unset($liveEntryServerNodes[$key]);
-					break;
-				}
-			}
-		}
+		$dcInMaintenance = $this->getDcInMaintenanceFromCache();
+		KalturaLog::debug("Having requested-Server-Type of [$requestedServerType] and DC in maintenance of [$dcInMaintenance]");
+		$liveEntryServerNodes = array_filter($liveEntryServerNodes, function($esn) use ($dcInMaintenance, $requestedServerType){
+			if ($requestedServerType && $esn->getServerType() != intval($requestedServerType))
+				return false; // if request specific type then ignore all others 
+			$esn->sn = ServerNodePeer::retrieveActiveMediaServerNode(null, $esn->getServerNodeId());
+			if (!$esn->sn)
+				return false; // if the entry has no active server node ignore it
+			$esn->weight = ($esn->getServerType() == EntryServerNodeType::LIVE_PRIMARY) ? 10 : 0;
+			if ($esn->sn->getDc() == $dcInMaintenance)
+				$esn->weight -= 100; // if DC in maintenance then lower its priority
+			return true;
+		 });
+		if (empty($liveEntryServerNodes))
+			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [". $this->getDynamicAttributes()->getEntryId() ."] is not broadcasting on stream type [$requestedServerType]");
 
-		if (!is_null($requestedServerType))
-		{ //is request for specific serverType: we return it if exist but if not throw exception
-			if ($this->liveStreamConfig->getUrl())
-				return;
-			$entryId = $this->getDynamicAttributes()->getEntryId();
-			KalturaLog::err("Request stream type of [$requestedServerType] but not entryServerNode for that type on entry: $entryId");
-			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$entryId] is not broadcasting on stream type [$requestedServerType]");
-		}
+		usort($liveEntryServerNodes, function ($a, $b) {return $a->weight - $b->weight;});
 
-		if(!$this->liveStreamConfig->getUrl() && count($liveEntryServerNodes))
-		{
-			$liveEntryServerNode = array_shift($liveEntryServerNodes);
-			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
-			if($serverNode)
-			{
-				$this->liveStreamConfig->setUrl($this->getHttpUrl($serverNode));
-				$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
-			}
+		$liveEntryServerNode = array_shift($liveEntryServerNodes); // after sort first is the primary
+		$this->liveStreamConfig->setUrl($this->getHttpUrl($liveEntryServerNode->sn));
+		$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
+
+		$liveEntryServerNode = array_shift($liveEntryServerNodes);
+		if ($liveEntryServerNode) { // if list has another entry server node set it as backup
+			$this->liveStreamConfig->setBackupUrl($this->getHttpUrl($liveEntryServerNode->sn));
+			$this->liveStreamConfig->setBackupStreamInfo($liveEntryServerNode->getStreams());
 		}
-		
-		if(count($liveEntryServerNodes))
-		{
-			$liveEntryServerNode = array_shift($liveEntryServerNodes);
-			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
-			if ($serverNode)
-			{
-				$this->liveStreamConfig->setBackupUrl($this->getHttpUrl($serverNode));
-				$this->liveStreamConfig->setBackupStreamInfo($liveEntryServerNode->getStreams());
-			}
+	}
+
+	private function getDcInMaintenanceFromCache($default = -1)
+	{
+		$dcInMaintenanceCacheKey = "dcInMaintenance";
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAY_MANIFEST);
+		if ($cache) {
+			$dcInMaintenance = $cache->get($dcInMaintenanceCacheKey);
+			if ($dcInMaintenance)
+				return $dcInMaintenance;
 		}
+		return $default;
 	}
 	
 	protected function initManualLiveStreamConfiguration(LiveStreamEntry $entry)
