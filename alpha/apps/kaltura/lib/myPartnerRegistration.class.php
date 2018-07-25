@@ -118,8 +118,8 @@ class myPartnerRegistration
 			switch($partner_type) { // send different email for different partner types
 				case Partner::PARTNER_TYPE_KMC: // KMC signup
 					if ($existingUser) {
-						$mailType = self::KALTURAS_EXISTING_USER_REGISTRATION_CONFIRMATION;
-						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
+						$mailType = self::KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION;
+						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $freeTrialResourceLink);
 					}
 					else {
 						$mailType = self::KALTURAS_CMS_REGISTRATION_CONFIRMATION;
