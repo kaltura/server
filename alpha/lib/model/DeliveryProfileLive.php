@@ -111,13 +111,15 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$status = array(EntryServerNodeStatus::PLAYABLE);
 		if($this->getDynamicAttributes()->getServeVodFromLive())
 			$status[] = EntryServerNodeStatus::MARKED_FOR_DELETION;
-		
-		$liveEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($this->getDynamicAttributes()->getEntryId(), $status);
+
+		$entryId = $this->getDynamicAttributes()->getEntryId();
+		$liveEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($entryId, $status);
 		if(!count($liveEntryServerNodes))
 			return;
 
+
 		$requestedServerType = $this->getDynamicAttributes()->getStreamType();
-		$dcInMaintenance = $this->getDcInMaintenanceFromCache();
+		$dcInMaintenance = $this->getIsMaintenanceFromCache($entryId);
 		KalturaLog::debug("Having requested-Server-Type of [$requestedServerType] and DC in maintenance of [$dcInMaintenance]");
 		$liveEntryServerNodes = array_filter($liveEntryServerNodes, function($esn) use ($dcInMaintenance, $requestedServerType){
 			if ($requestedServerType && $esn->getServerType() != intval($requestedServerType))
@@ -131,7 +133,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			return true;
 		 });
 		if (empty($liveEntryServerNodes))
-			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [". $this->getDynamicAttributes()->getEntryId() ."] is not broadcasting on stream type [$requestedServerType]");
+			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$entryId] is not broadcasting on stream type [$requestedServerType]");
 
 		usort($liveEntryServerNodes, function ($a, $b) {return $a->weight - $b->weight;});
 
@@ -146,16 +148,19 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		}
 	}
 
-	private function getDcInMaintenanceFromCache($default = -1)
+	private function getIsMaintenanceFromCache($entryId)
 	{
-		$dcInMaintenanceCacheKey = "dcInMaintenance";
+		$dcInMaintenanceCacheKey = "MaintenanceDC";
+		$entryInMaintenanceCacheKey = "MaintenanceDcForEntry:$entryId";
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAY_MANIFEST);
 		if ($cache) {
-			$dcInMaintenance = $cache->get($dcInMaintenanceCacheKey);
-			if ($dcInMaintenance)
-				return $dcInMaintenance;
+			$result = $cache->multiGet(array($dcInMaintenanceCacheKey, $entryInMaintenanceCacheKey));
+			if (key_exists($dcInMaintenanceCacheKey, $result))
+				return $result[$dcInMaintenanceCacheKey];
+			if (key_exists($entryInMaintenanceCacheKey, $result))
+				return $result[$entryInMaintenanceCacheKey];
 		}
-		return $default;
+		return -1; // as default value
 	}
 	
 	protected function initManualLiveStreamConfiguration(LiveStreamEntry $entry)
