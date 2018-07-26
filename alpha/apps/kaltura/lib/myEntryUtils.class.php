@@ -1079,7 +1079,7 @@ class myEntryUtils
 
 		$tempThumbPath = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
 		kFile::closeDbConnections();
-		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath);
+		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath, null, true);
 		return $success;
 	}
 
@@ -1242,7 +1242,7 @@ class myEntryUtils
 			$remoteThumbCapture .= "?$queryString";
 				
 		kFile::closeDbConnections();
-		KCurlWrapper::getDataFromFile($remoteThumbCapture, $orig_image_path);
+		KCurlWrapper::getDataFromFile($remoteThumbCapture, $orig_image_path, null, true);
 		return true;
 	}
 
@@ -2146,7 +2146,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	{
 		$packagerVolumeMapUrl = str_replace(array("{url}"), array($url), $packagerVolumeMapUrlPattern);
 		kFile::closeDbConnections();
-		$content = KCurlWrapper::getDataFromFile($packagerVolumeMapUrl);
+		$content = KCurlWrapper::getDataFromFile($packagerVolumeMapUrl, null, null, true);
 		return $content;
 	}
 

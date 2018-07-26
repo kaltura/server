@@ -106,7 +106,7 @@ class KDistributedFileManager
 			else
 			{			
 				$curlWrapper = new KCurlWrapper();
-				$res = $curlWrapper->exec($remotePath, $localPath);
+				$res = $curlWrapper->exec($remotePath, $localPath, null, true);
 				KalturaLog::debug("Curl results: $res");
 			
 				if(!$res || $curlWrapper->getError())
