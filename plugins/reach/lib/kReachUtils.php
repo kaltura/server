@@ -27,6 +27,10 @@ class kReachUtils
 
 		// Disable entitlement to avoid entitlement validation when accessing an entry
 		$privileges .= ',' . kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY. ':' . $entryId;
+		
+		$privileges .= ',' . kSessionBase::PRIVILEGE_VIEW . ':' . $entryId;
+		
+		$privileges .= ',' . kSessionBase::PRIVILEGE_DOWNLOAD . ':' . $entryId;
 
 		if($shouldModerate)
 			$privileges .= ',' . kSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION;
