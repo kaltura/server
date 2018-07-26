@@ -13,6 +13,7 @@ if (!PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERM
 $c = new Criteria();
 $c->add(PermissionPeer::PARTNER_ID, $partnerId);
 $c->add(PermissionPeer::NAME, "REACH_VENDOR_PARTNER_GROUP_*_PERMISSION");
+$c->add(PermissionPeer::STATUS, PermissionStatus::ACTIVE);
 $existingPermission = PermissionPeer::doSelectOne($c);
 
 if($existingPermission)
@@ -26,6 +27,7 @@ $permission->setFriendlyName("REACH Vendor group permission");
 $permission->setDescription("Reach permission for all partners");
 $permission->setDependsOnPermissionNames("REACH_VENDOR_PARTNER_PERMISSION");
 $permission->setPartnerGroup("*");
+$permission->setStatus(PermissionStatus::ACTIVE);
 $res = $permission->save();
 
 echo "Done, created permission with id [{$permission->getId()}]" . PHP_EOL;
