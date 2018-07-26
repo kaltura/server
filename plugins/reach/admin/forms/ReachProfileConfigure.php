@@ -305,8 +305,5 @@ class Form_ReachProfileConfigure extends ConfigureForm
 		$reachProfile->updatedAt = null;
 		$reachProfile->ReachProfileRules = null;
 		$reachProfile->ReachProfileDictionaries = null;
-		
-		if(!$reachProfile->maxCharactersPerCaptionLine)
-			$reachProfile->maxCharactersPerCaptionLine = null;
 	}
 }

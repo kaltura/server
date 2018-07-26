@@ -236,7 +236,11 @@ class ReachProfile extends BaseReachProfile
 	
 	public function getMaxCharactersPerCaptionLine()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_MAX_CHARS_PER_LINE ,null, self::DEFAULT_MAX_CHARS_PER_LINE);
+		$maxCharactersPerCaptionLine = $this->getFromCustomData(self::CUSTOM_DATA_MAX_CHARS_PER_LINE ,null, null);
+		if(!$maxCharactersPerCaptionLine)
+			$maxCharactersPerCaptionLine = self::DEFAULT_MAX_CHARS_PER_LINE;
+		
+		return $maxCharactersPerCaptionLine;
 	}
 	
 	public function getRulesArrayCompressed()
