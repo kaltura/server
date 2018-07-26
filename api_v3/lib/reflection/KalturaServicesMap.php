@@ -189,7 +189,9 @@ class KalturaServicesMap
         {
             $apcFetchSuccess = null;
             $serviceItemFromCache = apc_fetch($serviceId, $apcFetchSuccess);
-            if ($apcFetchSuccess && $serviceItemFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] == self::getServiceMapModificationTime())
+			$serviceClassToIdFileCachePath = implode(DIRECTORY_SEPARATOR, array(kConf::get("cache_root_path"), 'api_v3', 'KalturaServiceClassToId.cache'));
+            if ($apcFetchSuccess && $serviceItemFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] == self::getServiceMapModificationTime()
+				&& file_exists($serviceClassToIdFileCachePath))
             {
             	self::populateServiceClassToId();
             	return $serviceItemFromCache["serviceActionItem"];
@@ -265,5 +267,4 @@ class KalturaServicesMap
 		}
 		kFile::safeFilePutContents($serviceClassToIdFileCachePath, serialize(self::$serviceClassToIdAndName), 0644);
 	}
-
 }
