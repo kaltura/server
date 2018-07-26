@@ -150,10 +150,9 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 
 	private function getIsMaintenanceFromCache($entryId)
 	{
-		$maintenanceDataCacheKey = "MaintenanceDataCacheKey";
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAY_MANIFEST);
 		if ($cache) {
-			$result = json_decode($cache->get($maintenanceDataCacheKey), true);
+			$result = json_decode($cache->get("MaintenanceDataCacheKey"), true);
 			KalturaLog::debug("Got maintenance data from cache: " . print_r($result, true));
 			if (key_exists("MaintenanceDC", $result))
 				return $result["MaintenanceDC"];
