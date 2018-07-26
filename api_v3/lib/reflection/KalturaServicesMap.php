@@ -189,7 +189,7 @@ class KalturaServicesMap
         {
             $apcFetchSuccess = null;
             $serviceItemFromCache = apc_fetch($serviceId, $apcFetchSuccess);
-			$serviceClassToIdFileCachePath = self::getServiceClassToIdCacheFilePath();
+            $serviceClassToIdFileCachePath = self::getServiceClassToIdCacheFilePath();
             if ($apcFetchSuccess && $serviceItemFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] == self::getServiceMapModificationTime()
 				 && file_exists($serviceClassToIdFileCachePath))
             {
