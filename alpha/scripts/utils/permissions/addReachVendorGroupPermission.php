@@ -28,6 +28,20 @@ $permission->setDescription("Reach permission for all partners");
 $permission->setDependsOnPermissionNames("REACH_VENDOR_PARTNER_PERMISSION");
 $permission->setPartnerGroup("*");
 $permission->setStatus(PermissionStatus::ACTIVE);
-$res = $permission->save();
+$permission->save();
 
 echo "Done, created permission with id [{$permission->getId()}]" . PHP_EOL;
+
+$c = new Criteria();
+$c->add(PermissionItemPeer::PARAM_1, "reach_entryvendortask");
+$c->add(PermissionItemPeer::PARAM_2, "updatejob");
+$existingPermissionItem = PermissionItemPeer::doSelectOne($c);
+if(!$existingPermissionItem)
+	die("Cannot find existing permission item for updatejob action");
+
+$permissionToPermissionItem = new PermissionToPermissionItem();
+$permissionToPermissionItem->setPermissionId($permission->getId());
+$permissionToPermissionItem->setPermissionItemId($existingPermissionItem->getId());
+$permissionToPermissionItem->save();
+
+echo "Done, created permission to permission item with id [{$permissionToPermissionItem->getId()}]" . PHP_EOL;
