@@ -152,12 +152,16 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	{
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAY_MANIFEST);
 		if ($cache) {
-			$result = json_decode($cache->get("MaintenanceDataCacheKey"), true);
-			KalturaLog::debug("Got maintenance data from cache: " . print_r($result, true));
-			if (key_exists("MaintenanceDC", $result))
-				return $result["MaintenanceDC"];
-			if (key_exists($entryId, $result))
-				return $result[$entryId];
+			$val = $cache->get("Live-MaintenanceDataCacheKey");
+			if ($val)
+			{
+				KalturaLog::debug("Got maintenance data from cache: " . print_r($val, true));
+				$result = json_decode($val, true);
+				if (key_exists("maintenanceDC", $result))
+					return $result["maintenanceDC"];
+				if (key_exists($entryId, $result))
+					return $result[$entryId];
+			}
 		}
 		return -1; // as default value
 	}
