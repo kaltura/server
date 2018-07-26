@@ -189,7 +189,7 @@ class KalturaServicesMap
         {
             $apcFetchSuccess = null;
             $serviceItemFromCache = apc_fetch($serviceId, $apcFetchSuccess);
-            $serviceClassToIdFileCachePath = implode(DIRECTORY_SEPARATOR, array(kConf::get("cache_root_path"), 'api_v3', 'KalturaServiceClassToId.cache'));
+			$serviceClassToIdFileCachePath = self::getServiceClassToIdCacheFilePath();
             if ($apcFetchSuccess && $serviceItemFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] == self::getServiceMapModificationTime()
 				&& file_exists($serviceClassToIdFileCachePath))
             {
@@ -244,7 +244,7 @@ class KalturaServicesMap
 		if(self::$serviceClassToIdAndName)
 			return;
 		
-		$serviceClassToIdFileCachePath = implode(DIRECTORY_SEPARATOR, array(kConf::get("cache_root_path"), 'api_v3', 'KalturaServiceClassToId.cache'));
+		$serviceClassToIdFileCachePath = self::getServiceClassToIdCacheFilePath();
 		if(file_exists($serviceClassToIdFileCachePath))
 		{
 			self::$serviceClassToIdAndName = unserialize(kFile::getFileContent($serviceClassToIdFileCachePath));
@@ -266,5 +266,10 @@ class KalturaServicesMap
 			chmod(dirname($serviceClassToIdFileCachePath), 0755);
 		}
 		kFile::safeFilePutContents($serviceClassToIdFileCachePath, serialize(self::$serviceClassToIdAndName), 0644);
+	}
+	
+	private static function getServiceClassToIdCacheFilePath()
+	{
+		return implode(DIRECTORY_SEPARATOR, array(kConf::get("cache_root_path"), 'api_v3', 'KalturaServiceClassToId.cache'));;
 	}
 }
