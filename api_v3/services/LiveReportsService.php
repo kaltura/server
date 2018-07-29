@@ -29,36 +29,75 @@ class LiveReportsService extends KalturaBaseService
 		return $result;
 	}
 	
-	protected function getCoordinates(KalturaCoordinate $dest, $key)
+	protected static function getCoordinatesKey($items)
+	{
+		$key = implode('_', $items);
+		return 'coord_' . preg_replace('/[^a-z0-9_]/', '_', strtolower($key));
+	}
+
+	protected static function parseCoordinates($coords)
+	{
+		return array_map('floatval', explode('/', $coords));
+	}
+
+	protected static function addCoordinates($items)
 	{
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_GEO_COORDINATES);
-		if (!$cache)
+		if ($cache)
 		{
-			return;
-		}
+			// get the keys
+			$keys = array();
+			foreach ($items as $item)
+			{
+				$countryName = $item->countryName;
+				$regionName = $item->regionName;
+				$cityName = $item->cityName;
+				$keys[self::getCoordinatesKey(array($countryName))] = true;
+				$keys[self::getCoordinatesKey(array($countryName, $regionName, $cityName))] = true;
+			}
 
-		$key = 'coord_' . preg_replace('/[^a-z0-9_]/', '_', strtolower($key));
-		
-		$coords = $cache->get($key);
-		if (!$coords)
+			// get from memcache
+			$coords = $cache->multiGet(array_keys($keys));
+
+			// parse the coordinates
+			$coords = array_map('self::parseCoordinates', $coords);
+		}
+		else
 		{
-			return;
+			$coords = array();
 		}
 		
-		list($dest->latitude, $dest->longitude) = array_map('floatval', explode('/', $coords));
-	}
-	
-	protected function setGeoCoordinates($item, $countryName, $regionName, $cityName)
-	{
-		$item->country = new KalturaCoordinate();
-		$item->country->name = strtoupper($countryName);
-		$this->getCoordinates($item->country, $countryName);
+		foreach ($items as $item)
+		{
+			$countryName = $item->countryName;
+			unset($item->countryName);
 
-		$item->city = new KalturaCoordinate();
-		$item->city->name = strtoupper($cityName);
-		$this->getCoordinates($item->city, $countryName . '_' . $regionName . '_' . $cityName);
+			$regionName = $item->regionName;
+			unset($item->regionName);
+
+			$cityName = $item->cityName;
+			unset($item->cityName);
+
+			// country
+			$item->country = new KalturaCoordinate();
+			$item->country->name = strtoupper($countryName);
+			$key = self::getCoordinatesKey(array($countryName));
+			if (isset($coords[$key]))
+			{
+				list($item->country->latitude, $item->country->longitude) = $coords[$key];
+			}
+
+			// city
+			$item->city = new KalturaCoordinate();
+			$item->city->name = strtoupper($cityName);
+			$key = self::getCoordinatesKey(array($countryName, $regionName, $cityName));
+			if (isset($coords[$key]))
+			{
+				list($item->city->latitude, $item->city->longitude) = $coords[$key];
+			}
+		}
 	}
-	
+
 	protected function getReportKava($reportType,
 			KalturaLiveReportInputFilter $filter = null,
 			KalturaFilterPager $pager = null)
@@ -104,19 +143,7 @@ class LiveReportsService extends KalturaBaseService
 		$items = $this->arrayToApiObjects($items, $objectType);
 		if ($objectType == 'KalturaGeoTimeLiveStats')
 		{
-			foreach ($items as $item)
-			{
-				$countryName = $item->countryName;
-				unset($item->countryName);
-				
-				$regionName = $item->regionName;
-				unset($item->regionName);
-
-				$cityName = $item->cityName;
-				unset($item->cityName);
-
-				$this->setGeoCoordinates($item, $countryName, $regionName, $cityName);
-			}
+			self::addCoordinates($items);
 		}
 		
 		$result = new KalturaLiveStatsListResponse();
