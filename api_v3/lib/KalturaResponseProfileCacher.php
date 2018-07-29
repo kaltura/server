@@ -138,17 +138,32 @@ class KalturaResponseProfileCacher extends kResponseProfileCacher
 		$responseProfileKey = $responseProfile->getKey();
 		$key = self::getObjectSpecificCacheKey($object, $responseProfileKey);
 		$responseProfileCacheKey = self::getResponseProfileCacheKey($responseProfileKey, $object->getPartnerId());
-		
-		list($value, $responseProfileCache) = self::get(array($key, $responseProfileCacheKey));
-		
+
+		$objectCache = null;
+		$responseProfileCache = null;
+		$cachedResults = self::get(array($key, $responseProfileCacheKey));
+		if($cachedResults)
+		{
+			$values = array_values($cachedResults);
+			if(sizeof($cachedResults) < 2)
+				KalturaLog::debug("Missing values. Only the following values returned: " . print_r($cachedResults));
+			else
+			{
+				$objectCache = $values[0];
+				$responseProfileCache = $values[1];
+			}
+		}
+		else
+			KalturaLog::debug("Missing records for given keys");
+
 		$invalidationKeys = array(
 			self::getObjectKey($object),
 			self::getRelatedObjectKey($object, $responseProfileKey),
 		);
 		
-		if($value && self::areKeysValid($invalidationKeys, $value->{self::CACHE_VALUE_TIME}))
+		if($objectCache && self::areKeysValid($invalidationKeys, $objectCache->{self::CACHE_VALUE_TIME}))
 		{
-			$cachedApiObject = unserialize($value->apiObject);
+			$cachedApiObject = unserialize($objectCache->apiObject);
 			if($cachedApiObject instanceof KalturaObject)
 			{
 				$properties = get_object_vars($cachedApiObject);
