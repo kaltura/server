@@ -738,7 +738,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 * @param array $keys
 	 * @param mixed $var
 	 */
-	public function multiGetAndTouch(array $keys)
+	public function multiGetAndTouch(array $keys, $associative = false)
 	{
 		try
 		{
@@ -753,10 +753,13 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 				$meta = $metas[$key];
 				if($meta->error)
 				{
-					KalturaLog::warning($meta->error->getMessage());
+					KalturaLog::warning("Key: [$key] Error: " . $meta->error->getMessage());
 				}
-				
-				$values[$key] = $meta->value;
+
+				if($associative)
+					$values[$key] = $meta->value;
+				else
+					$values[] = $meta->value;
 			}
 				
 			return $values;
