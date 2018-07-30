@@ -14,23 +14,23 @@ $c = new Criteria();
 $c->add(PermissionPeer::PARTNER_ID, $partnerId);
 $c->add(PermissionPeer::NAME, "REACH_VENDOR_PARTNER_GROUP_*_PERMISSION");
 $c->add(PermissionPeer::STATUS, PermissionStatus::ACTIVE);
-$existingPermission = PermissionPeer::doSelectOne($c);
+$permission = PermissionPeer::doSelectOne($c);
 
-if($existingPermission)
-	die("Partner id provided [$partnerId] already has required permission" . PHP_EOL);
+if(!$permission)
+{
+	$permission = new Permission();
+	$permission->setPartnerId($partnerId);
+	$permission->setType(PermissionType::PARTNER_GROUP);
+	$permission->setName("REACH_VENDOR_PARTNER_GROUP_*_PERMISSION");
+	$permission->setFriendlyName("REACH Vendor group permission");
+	$permission->setDescription("Reach permission for all partners");
+	$permission->setDependsOnPermissionNames("REACH_VENDOR_PARTNER_PERMISSION");
+	$permission->setPartnerGroup("*");
+	$permission->setStatus(PermissionStatus::ACTIVE);
+	$permission->save();
+}
 
-$permission = new Permission();
-$permission->setPartnerId($partnerId);
-$permission->setType(PermissionType::PARTNER_GROUP);
-$permission->setName("REACH_VENDOR_PARTNER_GROUP_*_PERMISSION");
-$permission->setFriendlyName("REACH Vendor group permission");
-$permission->setDescription("Reach permission for all partners");
-$permission->setDependsOnPermissionNames("REACH_VENDOR_PARTNER_PERMISSION");
-$permission->setPartnerGroup("*");
-$permission->setStatus(PermissionStatus::ACTIVE);
-$permission->save();
-
-echo "Done, created permission with id [{$permission->getId()}]" . PHP_EOL;
+echo "Using permission with id [{$permission->getId()}]" . PHP_EOL;
 
 $c = new Criteria();
 $c->add(PermissionItemPeer::PARAM_1, "reach_entryvendortask");
