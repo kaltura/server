@@ -10,7 +10,7 @@ class Form_ReachProfileTimeFramedCredit extends Form_ReachProfileCredit
 	{
 		parent::init();
 		$this->addElement('text', 'toDate', array(
-				'label'			=> 'To Date: (MM.DD.YYYY)',
+				'label'			=> 'To Date: (YYYY.MM.DD)',
 				'innerType'     => 'DateElement',
 				'required'      => true,
 				'filters'		=> array('StringTrim'),

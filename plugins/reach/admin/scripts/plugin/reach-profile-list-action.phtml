@@ -348,12 +348,12 @@
 		var dateParts = val.split('.');
 		if (dateParts.length != 3 )
 			return false;
-		if (dateParts[0].length > 2 || dateParts[1].length > 2 || dateParts[2].length > 4)
+		if (dateParts[0].length != 4|| dateParts[1].length != 2 || dateParts[2].length > 2)
 		{
 			alert("Not a valid Date");
 			return false;
 		}
-		if (dateParts[0].length != 2 || dateParts[1].length != 2 || dateParts[2].length != 4)
+		if (dateParts[0].length != 4 || dateParts[1].length != 2 || dateParts[2].length != 2)
 			return false;
 		return true;
 	}

@@ -63,6 +63,13 @@ class kCloudFrontUrlTokenizer extends kUrlTokenizer
 				$baseUrl .= $parsedUrl['path'];
 			}
 		}
+
+		//due to Itunes limitations removing unneccesry fields
+		$flavorIdPos = strpos($acl,"/flavorId/");
+		if ($flavorIdPos !== false )
+		{
+			$acl = substr($acl, 0, $flavorIdPos);
+		}
 		
 		$acl = $baseUrl . $acl . '*';
 	

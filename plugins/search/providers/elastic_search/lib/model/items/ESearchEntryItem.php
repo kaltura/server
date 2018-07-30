@@ -181,4 +181,13 @@ class ESearchEntryItem extends ESearchItem
 		return elasticSearchUtils::DOT_FIELD_DELIMITER;
 	}
 
+	public function getFilteredObjectId()
+	{
+		if($this->getFieldName() == ESearchEntryFieldName::ID)
+		{
+			return elasticSearchUtils::formatSearchTerm($this->getSearchTerm());
+		}
+		return null;
+	}
+
 }

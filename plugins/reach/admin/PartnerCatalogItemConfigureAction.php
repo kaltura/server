@@ -118,15 +118,12 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 		if ($action->view->allowed)
 		{
 			$formData = $action->getRequest()->getPost();
+			$partnerCatalogItems = null;
 			if (isset($formData['selectAllItemsCheckbox']))
-			{
 				$partnerCatalogItems = $this->getAvailableCatalogItems($partnerId);
-
-			}
-			else
-			{
+			elseif (isset($formData['catalogItemsCheckBoxes']))
 				$partnerCatalogItems = $formData['catalogItemsCheckBoxes'];
-			}
+
 			$this->client = Infra_ClientHelper::getClient();
 			$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
 			Infra_ClientHelper::impersonate($partnerId);

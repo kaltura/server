@@ -46,6 +46,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryVendorTask->entryId);
 		
+		
 		$dbReachProfile = ReachProfilePeer::retrieveActiveByPk($entryVendorTask->reachProfileId);
 		if (!$dbReachProfile)
 			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $entryVendorTask->reachProfileId);
@@ -193,12 +194,13 @@ class EntryVendorTaskService extends KalturaBaseService
 	 *
 	 * @action reject
 	 * @param int $id vendor task id to reject
+	 * @param string $rejectReason
 	 * @param KalturaEntryVendorTask $entryVendorTask evntry vendor task to reject
 	 *
 	 * @throws KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND
 	 * @throws KalturaReachErrors::CANNOT_REJECT_NOT_MODERATED_TASK
 	 */
-	public function rejectAction($id)
+	public function rejectAction($id,  $rejectReason = null)
 	{
 		$dbEntryVendorTask = EntryVendorTaskPeer::retrieveByPK($id);
 		if (!$dbEntryVendorTask)
@@ -213,6 +215,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		
 		$dbEntryVendorTask->setModeratingUser($this->getKuser()->getPuserId());
 		$dbEntryVendorTask->setStatus(KalturaEntryVendorTaskStatus::REJECTED);
+		$dbEntryVendorTask->setErrDescription($rejectReason);
 		$dbEntryVendorTask->save();
 		
 		// return the saved object
@@ -231,7 +234,7 @@ class EntryVendorTaskService extends KalturaBaseService
 	 */
 	public function getJobsAction(KalturaEntryVendorTaskFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if (!PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, kCurrentContext::getCurrentPartnerId()))
+		if (!PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, kCurrentContext::$ks_partner_id))
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_SERVICE_GET_JOB_NOT_ALLOWED, kCurrentContext::getCurrentPartnerId());
 		
 		if (!$filter)
@@ -256,10 +259,10 @@ class EntryVendorTaskService extends KalturaBaseService
 	 */
 	public function updateJobAction($id, KalturaEntryVendorTask $entryVendorTask)
 	{
-		if (!PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, kCurrentContext::getCurrentPartnerId()))
+		if (!PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, kCurrentContext::$ks_partner_id))
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_SERVICE_GET_JOB_NOT_ALLOWED, kCurrentContext::getCurrentPartnerId());
 		
-		$dbEntryVendorTask = EntryVendorTaskPeer::retrieveByPKAndVendorPartnerId($id, kCurrentContext::getCurrentPartnerId());
+		$dbEntryVendorTask = EntryVendorTaskPeer::retrieveByPKAndVendorPartnerId($id, kCurrentContext::$ks_partner_id);
 		if (!$dbEntryVendorTask)
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
 		

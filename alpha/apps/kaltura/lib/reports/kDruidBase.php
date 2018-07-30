@@ -75,6 +75,7 @@ class kDruidBase
 	const DRUID_EVENT = 'event';
 	const DRUID_RESULT = 'result';
 	const DRUID_ERROR = 'error';
+	const DRUID_ERROR_CLASS = 'errorClass';
 	const DRUID_ERROR_MSG = 'errorMessage';
 	
 	const DRUID_URL = "druid_url";
@@ -290,26 +291,48 @@ class kDruidBase
 
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
 		
-		$startTime = microtime(true);
-		$response = curl_exec($ch);
-			
-		$druidTook = microtime(true) - $startTime;
-		KalturaLog::debug('Druid query took - ' . $druidTook. ' seconds');
-			
-		if (curl_errno($ch))
+		for ($retry = 0; $retry < 3; $retry++)
 		{
-			throw new Exception('Error while trying to connect to:'. $url .' error=' . curl_error($ch));
+			$startTime = microtime(true);
+			$response = curl_exec($ch);
+				
+			$druidTook = microtime(true) - $startTime;
+			KalturaLog::debug('Druid query took - ' . $druidTook. ' seconds');
+
+			if (curl_errno($ch))
+			{
+				throw new Exception('Error while trying to connect to:'. $url .' error=' . curl_error($ch));
+			}
+				
+			// Note: not closing the curl handle so that the connection can be reused
+				
+			$result = json_decode($response, true);
+
+			KalturaMonitorClient::monitorDruidQuery(
+				parse_url($url, PHP_URL_HOST),
+				$content[self::DRUID_DATASOURCE],
+				$content[self::DRUID_QUERY_TYPE],
+				strlen($post),
+				$druidTook,
+				isset($result[self::DRUID_ERROR]) ? 
+					$result[self::DRUID_ERROR_CLASS] . ',' . $result[self::DRUID_ERROR] : '');
+
+			if (isset($result[self::DRUID_ERROR]) &&
+				strpos($result[self::DRUID_ERROR_MSG], 'Channel disconnected') !== false)
+			{
+				KalturaLog::log('Retrying on error ' . $result[self::DRUID_ERROR_MSG]);
+				continue;
+			}
+
+			break;
 		}
-			
-		// Note: not closing the curl handle so that the connection can be reused
-			
-		$result = json_decode($response, true);
 	
 		if (isset($result[self::DRUID_ERROR])) 
 		{
 			KalturaLog::err('Error while running report ' . $result[self::DRUID_ERROR_MSG]);
 			throw new Exception('Error while running report ' . $result[self::DRUID_ERROR_MSG]);
 		}
+
 		return $result;
 	}
 }

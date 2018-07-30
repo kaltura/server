@@ -4,7 +4,7 @@
 /**
  * angular-translate - v1.1.1 - 2013-11-24
  * http://github.com/PascalPrecht/angular-translate
- * Copyright (c) 2013 ; Licensed 
+ * Copyright (c) 2013 ; Licensed
  */
 angular.module('pascalprecht.translate', ['ng']).run([
   '$translate',
@@ -1740,7 +1740,7 @@ if (!Object.keys) {
 // Licensed under the MIT license:
 //   http://www.opensource.org/licenses/mit-license.php
 //
-// The word "QR Code" is registered trademark of 
+// The word "QR Code" is registered trademark of
 // DENSO WAVE INCORPORATED
 //   http://www.denso-wave.com/qrcode/faqpatent-e.html
 //
@@ -1760,7 +1760,7 @@ QR8bitByte.prototype = {
 	getLength : function(buffer) {
 		return this.data.length;
 	},
-	
+
 	write : function(buffer) {
 		for (var i = 0; i < this.data.length; i++) {
 			// not JIS ...
@@ -1783,13 +1783,13 @@ function QRCode(typeNumber, errorCorrectLevel) {
 }
 
 QRCode.prototype = {
-	
+
 	addData : function(data) {
 		var newData = new QR8bitByte(data);
 		this.dataList.push(newData);
 		this.dataCache = null;
 	},
-	
+
 	isDark : function(row, col) {
 		if (row < 0 || this.moduleCount <= row || col < 0 || this.moduleCount <= col) {
 			throw new Error(row + "," + col);
@@ -1800,7 +1800,7 @@ QRCode.prototype = {
 	getModuleCount : function() {
 		return this.moduleCount;
 	},
-	
+
 	make : function() {
 		// Calculate automatically typeNumber if provided is < 1
 		if (this.typeNumber < 1 ){
@@ -1827,49 +1827,49 @@ QRCode.prototype = {
 		}
 		this.makeImpl(false, this.getBestMaskPattern() );
 	},
-	
+
 	makeImpl : function(test, maskPattern) {
-		
+
 		this.moduleCount = this.typeNumber * 4 + 17;
 		this.modules = new Array(this.moduleCount);
-		
+
 		for (var row = 0; row < this.moduleCount; row++) {
-			
+
 			this.modules[row] = new Array(this.moduleCount);
-			
+
 			for (var col = 0; col < this.moduleCount; col++) {
 				this.modules[row][col] = null;//(col + row) % 3;
 			}
 		}
-	
+
 		this.setupPositionProbePattern(0, 0);
 		this.setupPositionProbePattern(this.moduleCount - 7, 0);
 		this.setupPositionProbePattern(0, this.moduleCount - 7);
 		this.setupPositionAdjustPattern();
 		this.setupTimingPattern();
 		this.setupTypeInfo(test, maskPattern);
-		
+
 		if (this.typeNumber >= 7) {
 			this.setupTypeNumber(test);
 		}
-	
+
 		if (this.dataCache == null) {
 			this.dataCache = QRCode.createData(this.typeNumber, this.errorCorrectLevel, this.dataList);
 		}
-	
+
 		this.mapData(this.dataCache, maskPattern);
 	},
 
 	setupPositionProbePattern : function(row, col)  {
-		
+
 		for (var r = -1; r <= 7; r++) {
-			
+
 			if (row + r <= -1 || this.moduleCount <= row + r) continue;
-			
+
 			for (var c = -1; c <= 7; c++) {
-				
+
 				if (col + c <= -1 || this.moduleCount <= col + c) continue;
-				
+
 				if ( (0 <= r && r <= 6 && (c == 0 || c == 6) )
 						|| (0 <= c && c <= 6 && (r == 0 || r == 6) )
 						|| (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
@@ -1877,46 +1877,46 @@ QRCode.prototype = {
 				} else {
 					this.modules[row + r][col + c] = false;
 				}
-			}		
-		}		
+			}
+		}
 	},
-	
+
 	getBestMaskPattern : function() {
-	
+
 		var minLostPoint = 0;
 		var pattern = 0;
-	
+
 		for (var i = 0; i < 8; i++) {
-			
+
 			this.makeImpl(true, i);
-	
+
 			var lostPoint = QRUtil.getLostPoint(this);
-	
+
 			if (i == 0 || minLostPoint >  lostPoint) {
 				minLostPoint = lostPoint;
 				pattern = i;
 			}
 		}
-	
+
 		return pattern;
 	},
-	
+
 	createMovieClip : function(target_mc, instance_name, depth) {
-	
+
 		var qr_mc = target_mc.createEmptyMovieClip(instance_name, depth);
 		var cs = 1;
-	
+
 		this.make();
 
 		for (var row = 0; row < this.modules.length; row++) {
-			
+
 			var y = row * cs;
-			
+
 			for (var col = 0; col < this.modules[row].length; col++) {
-	
+
 				var x = col * cs;
 				var dark = this.modules[row][col];
-			
+
 				if (dark) {
 					qr_mc.beginFill(0, 100);
 					qr_mc.moveTo(x, y);
@@ -1927,19 +1927,19 @@ QRCode.prototype = {
 				}
 			}
 		}
-		
+
 		return qr_mc;
 	},
 
 	setupTimingPattern : function() {
-		
+
 		for (var r = 8; r < this.moduleCount - 8; r++) {
 			if (this.modules[r][6] != null) {
 				continue;
 			}
 			this.modules[r][6] = (r % 2 == 0);
 		}
-	
+
 		for (var c = 8; c < this.moduleCount - 8; c++) {
 			if (this.modules[6][c] != null) {
 				continue;
@@ -1947,27 +1947,27 @@ QRCode.prototype = {
 			this.modules[6][c] = (c % 2 == 0);
 		}
 	},
-	
+
 	setupPositionAdjustPattern : function() {
-	
+
 		var pos = QRUtil.getPatternPosition(this.typeNumber);
-		
+
 		for (var i = 0; i < pos.length; i++) {
-		
+
 			for (var j = 0; j < pos.length; j++) {
-			
+
 				var row = pos[i];
 				var col = pos[j];
-				
+
 				if (this.modules[row][col] != null) {
 					continue;
 				}
-				
+
 				for (var r = -2; r <= 2; r++) {
-				
+
 					for (var c = -2; c <= 2; c++) {
-					
-						if (r == -2 || r == 2 || c == -2 || c == 2 
+
+						if (r == -2 || r == 2 || c == -2 || c == 2
 								|| (r == 0 && c == 0) ) {
 							this.modules[row + r][col + c] = true;
 						} else {
@@ -1978,32 +1978,32 @@ QRCode.prototype = {
 			}
 		}
 	},
-	
+
 	setupTypeNumber : function(test) {
-	
+
 		var bits = QRUtil.getBCHTypeNumber(this.typeNumber);
-	
+
 		for (var i = 0; i < 18; i++) {
 			var mod = (!test && ( (bits >> i) & 1) == 1);
 			this.modules[Math.floor(i / 3)][i % 3 + this.moduleCount - 8 - 3] = mod;
 		}
-	
+
 		for (var i = 0; i < 18; i++) {
 			var mod = (!test && ( (bits >> i) & 1) == 1);
 			this.modules[i % 3 + this.moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
 		}
 	},
-	
+
 	setupTypeInfo : function(test, maskPattern) {
-	
+
 		var data = (this.errorCorrectLevel << 3) | maskPattern;
 		var bits = QRUtil.getBCHTypeInfo(data);
-	
-		// vertical		
+
+		// vertical
 		for (var i = 0; i < 15; i++) {
-	
+
 			var mod = (!test && ( (bits >> i) & 1) == 1);
-	
+
 			if (i < 6) {
 				this.modules[i][8] = mod;
 			} else if (i < 8) {
@@ -2012,12 +2012,12 @@ QRCode.prototype = {
 				this.modules[this.moduleCount - 15 + i][8] = mod;
 			}
 		}
-	
+
 		// horizontal
 		for (var i = 0; i < 15; i++) {
-	
+
 			var mod = (!test && ( (bits >> i) & 1) == 1);
-			
+
 			if (i < 8) {
 				this.modules[8][this.moduleCount - i - 1] = mod;
 			} else if (i < 9) {
@@ -2026,53 +2026,53 @@ QRCode.prototype = {
 				this.modules[8][15 - i - 1] = mod;
 			}
 		}
-	
+
 		// fixed module
 		this.modules[this.moduleCount - 8][8] = (!test);
-	
+
 	},
-	
+
 	mapData : function(data, maskPattern) {
-		
+
 		var inc = -1;
 		var row = this.moduleCount - 1;
 		var bitIndex = 7;
 		var byteIndex = 0;
-		
+
 		for (var col = this.moduleCount - 1; col > 0; col -= 2) {
-	
+
 			if (col == 6) col--;
-	
+
 			while (true) {
-	
+
 				for (var c = 0; c < 2; c++) {
-					
+
 					if (this.modules[row][col - c] == null) {
-						
+
 						var dark = false;
-	
+
 						if (byteIndex < data.length) {
 							dark = ( ( (data[byteIndex] >>> bitIndex) & 1) == 1);
 						}
-	
+
 						var mask = QRUtil.getMask(maskPattern, row, col - c);
-	
+
 						if (mask) {
 							dark = !dark;
 						}
-						
+
 						this.modules[row][col - c] = dark;
 						bitIndex--;
-	
+
 						if (bitIndex == -1) {
 							byteIndex++;
 							bitIndex = 7;
 						}
 					}
 				}
-								
+
 				row += inc;
-	
+
 				if (row < 0 || this.moduleCount <= row) {
 					row -= inc;
 					inc = -inc;
@@ -2080,7 +2080,7 @@ QRCode.prototype = {
 				}
 			}
 		}
-		
+
 	}
 
 };
@@ -2089,11 +2089,11 @@ QRCode.PAD0 = 0xEC;
 QRCode.PAD1 = 0x11;
 
 QRCode.createData = function(typeNumber, errorCorrectLevel, dataList) {
-	
+
 	var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
-	
+
 	var buffer = new QRBitBuffer();
-	
+
 	for (var i = 0; i < dataList.length; i++) {
 		var data = dataList[i];
 		buffer.put(data.mode, 4);
@@ -2127,12 +2127,12 @@ QRCode.createData = function(typeNumber, errorCorrectLevel, dataList) {
 
 	// padding
 	while (true) {
-		
+
 		if (buffer.getLengthInBits() >= totalDataCount * 8) {
 			break;
 		}
 		buffer.put(QRCode.PAD0, 8);
-		
+
 		if (buffer.getLengthInBits() >= totalDataCount * 8) {
 			break;
 		}
@@ -2145,13 +2145,13 @@ QRCode.createData = function(typeNumber, errorCorrectLevel, dataList) {
 QRCode.createBytes = function(buffer, rsBlocks) {
 
 	var offset = 0;
-	
+
 	var maxDcCount = 0;
 	var maxEcCount = 0;
-	
+
 	var dcdata = new Array(rsBlocks.length);
 	var ecdata = new Array(rsBlocks.length);
-	
+
 	for (var r = 0; r < rsBlocks.length; r++) {
 
 		var dcCount = rsBlocks[r].dataCount;
@@ -2159,14 +2159,14 @@ QRCode.createBytes = function(buffer, rsBlocks) {
 
 		maxDcCount = Math.max(maxDcCount, dcCount);
 		maxEcCount = Math.max(maxEcCount, ecCount);
-		
+
 		dcdata[r] = new Array(dcCount);
-		
+
 		for (var i = 0; i < dcdata[r].length; i++) {
 			dcdata[r][i] = 0xff & buffer.buffer[i + offset];
 		}
 		offset += dcCount;
-		
+
 		var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
 		var rawPoly = new QRPolynomial(dcdata[r], rsPoly.getLength() - 1);
 
@@ -2178,7 +2178,7 @@ QRCode.createBytes = function(buffer, rsBlocks) {
 		}
 
 	}
-	
+
 	var totalCodeCount = 0;
 	for (var i = 0; i < rsBlocks.length; i++) {
 		totalCodeCount += rsBlocks[i].totalCount;
@@ -2221,7 +2221,7 @@ var QRMode = {
 //---------------------------------------------------------------------
 // QRErrorCorrectLevel
 //---------------------------------------------------------------------
- 
+
 var QRErrorCorrectLevel = {
 	L : 1,
 	M : 0,
@@ -2247,7 +2247,7 @@ var QRMaskPattern = {
 //---------------------------------------------------------------------
 // QRUtil
 //---------------------------------------------------------------------
- 
+
 var QRUtil = {
 
     PATTERN_POSITION_TABLE : [
@@ -2261,7 +2261,7 @@ var QRUtil = {
 	    [6, 24, 42],
 	    [6, 26, 46],
 	    [6, 28, 50],
-	    [6, 30, 54],		
+	    [6, 30, 54],
 	    [6, 32, 58],
 	    [6, 34, 62],
 	    [6, 26, 46, 66],
@@ -2300,7 +2300,7 @@ var QRUtil = {
     getBCHTypeInfo : function(data) {
 	    var d = data << 10;
 	    while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) >= 0) {
-		    d ^= (QRUtil.G15 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) ) ); 	
+		    d ^= (QRUtil.G15 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) ) );
 	    }
 	    return ( (data << 10) | d) ^ QRUtil.G15_MASK;
     },
@@ -2308,7 +2308,7 @@ var QRUtil = {
     getBCHTypeNumber : function(data) {
 	    var d = data << 12;
 	    while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) >= 0) {
-		    d ^= (QRUtil.G18 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) ) ); 	
+		    d ^= (QRUtil.G18 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) ) );
 	    }
 	    return (data << 12) | d;
     },
@@ -2330,9 +2330,9 @@ var QRUtil = {
     },
 
     getMask : function(maskPattern, i, j) {
-	    
+
 	    switch (maskPattern) {
-		    
+
 	    case QRMaskPattern.PATTERN000 : return (i + j) % 2 == 0;
 	    case QRMaskPattern.PATTERN001 : return i % 2 == 0;
 	    case QRMaskPattern.PATTERN010 : return j % 3 == 0;
@@ -2405,13 +2405,13 @@ var QRUtil = {
     },
 
     getLostPoint : function(qrCode) {
-	    
+
 	    var moduleCount = qrCode.getModuleCount();
-	    
+
 	    var lostPoint = 0;
-	    
+
 	    // LEVEL1
-	    
+
 	    for (var row = 0; row < moduleCount; row++) {
 
 		    for (var col = 0; col < moduleCount; col++) {
@@ -2493,7 +2493,7 @@ var QRUtil = {
 	    }
 
 	    // LEVEL4
-	    
+
 	    var darkCount = 0;
 
 	    for (var col = 0; col < moduleCount; col++) {
@@ -2503,11 +2503,11 @@ var QRUtil = {
 			    }
 		    }
 	    }
-	    
+
 	    var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
 	    lostPoint += ratio * 10;
 
-	    return lostPoint;		
+	    return lostPoint;
     }
 
 };
@@ -2520,33 +2520,33 @@ var QRUtil = {
 var QRMath = {
 
 	glog : function(n) {
-	
+
 		if (n < 1) {
 			throw new Error("glog(" + n + ")");
 		}
-		
+
 		return QRMath.LOG_TABLE[n];
 	},
-	
+
 	gexp : function(n) {
-	
+
 		while (n < 0) {
 			n += 255;
 		}
-	
+
 		while (n >= 256) {
 			n -= 255;
 		}
-	
+
 		return QRMath.EXP_TABLE[n];
 	},
-	
+
 	EXP_TABLE : new Array(256),
-	
+
 	LOG_TABLE : new Array(256)
 
 };
-	
+
 for (var i = 0; i < 8; i++) {
 	QRMath.EXP_TABLE[i] = 1 << i;
 }
@@ -2587,42 +2587,42 @@ QRPolynomial.prototype = {
 	get : function(index) {
 		return this.num[index];
 	},
-	
+
 	getLength : function() {
 		return this.num.length;
 	},
-	
+
 	multiply : function(e) {
-	
+
 		var num = new Array(this.getLength() + e.getLength() - 1);
-	
+
 		for (var i = 0; i < this.getLength(); i++) {
 			for (var j = 0; j < e.getLength(); j++) {
 				num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i) ) + QRMath.glog(e.get(j) ) );
 			}
 		}
-	
+
 		return new QRPolynomial(num, 0);
 	},
-	
+
 	mod : function(e) {
-	
+
 		if (this.getLength() - e.getLength() < 0) {
 			return this;
 		}
-	
+
 		var ratio = QRMath.glog(this.get(0) ) - QRMath.glog(e.get(0) );
-	
+
 		var num = new Array(this.getLength() );
-		
+
 		for (var i = 0; i < this.getLength(); i++) {
 			num[i] = this.get(i);
 		}
-		
+
 		for (var i = 0; i < e.getLength(); i++) {
 			num[i] ^= QRMath.gexp(QRMath.glog(e.get(i) ) + ratio);
 		}
-	
+
 		// recursive call
 		return new QRPolynomial(num, 0).mod(e);
 	}
@@ -2649,7 +2649,7 @@ QRRSBlock.RS_BLOCK_TABLE = [
 	[1, 26, 16],
 	[1, 26, 13],
 	[1, 26, 9],
-	
+
 	// 2
 	[1, 44, 34],
 	[1, 44, 28],
@@ -2662,43 +2662,43 @@ QRRSBlock.RS_BLOCK_TABLE = [
 	[2, 35, 17],
 	[2, 35, 13],
 
-	// 4		
+	// 4
 	[1, 100, 80],
 	[2, 50, 32],
 	[2, 50, 24],
 	[4, 25, 9],
-	
+
 	// 5
 	[1, 134, 108],
 	[2, 67, 43],
 	[2, 33, 15, 2, 34, 16],
 	[2, 33, 11, 2, 34, 12],
-	
+
 	// 6
 	[2, 86, 68],
 	[4, 43, 27],
 	[4, 43, 19],
 	[4, 43, 15],
-	
-	// 7		
+
+	// 7
 	[2, 98, 78],
 	[4, 49, 31],
 	[2, 32, 14, 4, 33, 15],
 	[4, 39, 13, 1, 40, 14],
-	
+
 	// 8
 	[2, 121, 97],
 	[2, 60, 38, 2, 61, 39],
 	[4, 40, 18, 2, 41, 19],
 	[4, 40, 14, 2, 41, 15],
-	
+
 	// 9
 	[2, 146, 116],
 	[3, 58, 36, 2, 59, 37],
 	[4, 36, 16, 4, 37, 17],
 	[4, 36, 12, 4, 37, 13],
-	
-	// 10		
+
+	// 10
 	[2, 86, 68, 2, 87, 69],
 	[4, 69, 43, 1, 70, 44],
 	[6, 43, 19, 2, 44, 20],
@@ -2886,17 +2886,17 @@ QRRSBlock.RS_BLOCK_TABLE = [
 ];
 
 QRRSBlock.getRSBlocks = function(typeNumber, errorCorrectLevel) {
-	
+
 	var rsBlock = QRRSBlock.getRsBlockTable(typeNumber, errorCorrectLevel);
-	
+
 	if (rsBlock == undefined) {
 		throw new Error("bad rs block @ typeNumber:" + typeNumber + "/errorCorrectLevel:" + errorCorrectLevel);
 	}
 
 	var length = rsBlock.length / 3;
-	
+
 	var list = new Array();
-	
+
 	for (var i = 0; i < length; i++) {
 
 		var count = rsBlock[i * 3 + 0];
@@ -2904,10 +2904,10 @@ QRRSBlock.getRSBlocks = function(typeNumber, errorCorrectLevel) {
 		var dataCount  = rsBlock[i * 3 + 2];
 
 		for (var j = 0; j < count; j++) {
-			list.push(new QRRSBlock(totalCount, dataCount) );	
+			list.push(new QRRSBlock(totalCount, dataCount) );
 		}
 	}
-	
+
 	return list;
 }
 
@@ -2942,32 +2942,32 @@ QRBitBuffer.prototype = {
 		var bufIndex = Math.floor(index / 8);
 		return ( (this.buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
 	},
-	
+
 	put : function(num, length) {
 		for (var i = 0; i < length; i++) {
 			this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
 		}
 	},
-	
+
 	getLengthInBits : function() {
 		return this.length;
 	},
-	
+
 	putBit : function(bit) {
-	
+
 		var bufIndex = Math.floor(this.length / 8);
 		if (this.buffer.length <= bufIndex) {
 			this.buffer.push(0);
 		}
-	
+
 		if (bit) {
 			this.buffer[bufIndex] |= (0x80 >>> (this.length % 8) );
 		}
-	
+
 		this.length++;
 	}
 };
-		// if options is string, 
+		// if options is string,
 		if( typeof options === 'string' ){
 			options	= { text: options };
 		}
@@ -3006,8 +3006,8 @@ QRBitBuffer.prototype = {
 					ctx.fillStyle = qrcode.isDark(row, col) ? options.foreground : options.background;
 					var w = (Math.ceil((col+1)*tileW) - Math.floor(col*tileW));
 					var h = (Math.ceil((row+1)*tileW) - Math.floor(row*tileW));
-					ctx.fillRect(Math.round(col*tileW),Math.round(row*tileH), w, h);  
-				}	
+					ctx.fillRect(Math.round(col*tileW),Math.round(row*tileH), w, h);
+				}
 			}
 			// return just built canvas
 			return canvas;
@@ -3019,7 +3019,7 @@ QRBitBuffer.prototype = {
 			var qrcode	= new QRCode(options.typeNumber, options.correctLevel);
 			qrcode.addData(options.text);
 			qrcode.make();
-			
+
 			// create table element
 			var $table	= $('<table></table>')
 				.css("width", options.width+"px")
@@ -3027,7 +3027,7 @@ QRBitBuffer.prototype = {
 				.css("border", "0px")
 				.css("border-collapse", "collapse")
 				.css('background-color', options.background);
-		  
+
 			// compute tileS percentage
 			var tileW	= options.width / qrcode.getModuleCount();
 			var tileH	= options.height / qrcode.getModuleCount();
@@ -3035,18 +3035,18 @@ QRBitBuffer.prototype = {
 			// draw in the table
 			for(var row = 0; row < qrcode.getModuleCount(); row++ ){
 				var $row = $('<tr></tr>').css('height', tileH+"px").appendTo($table);
-				
+
 				for(var col = 0; col < qrcode.getModuleCount(); col++ ){
 					$('<td></td>')
 						.css('width', tileW+"px")
 						.css('background-color', qrcode.isDark(row, col) ? options.foreground : options.background)
 						.appendTo($row);
-				}	
+				}
 			}
 			// return just built canvas
 			return $table;
 		}
-  
+
 
 		return this.each(function(){
 			var element	= options.render == "canvas" ? createCanvas() : createTable();
@@ -3460,10 +3460,10 @@ if ( window.XDomainRequest ) {
 })();
 (function(kmc) {
 
-	/* 
+	/*
 	 * TODO:
 	 * Use ng-view for preview template
-	 * Use filters for delivery 
+	 * Use filters for delivery
 	 */
 
 	var Preview = kmc.Preview || {};
@@ -3837,7 +3837,7 @@ kmcApp.config(['$translateProvider', function ($translateProvider) {
 	}
 	$translateProvider.preferredLanguage(lang);
 }]);
- 
+
 
 kmcApp.factory('previewService', ['$rootScope', function($rootScope) {
 	var previewProps = {};
@@ -4102,7 +4102,7 @@ kmcApp.controller('PreviewCtrl', ['$scope', '$translate', 'previewService', func
 			$scope.shortLinkGenerated = true;
 			$scope.previewUrl = tinyUrl;
 			// Generate QR Code
-			Preview.generateQrCode(tinyUrl);			
+			Preview.generateQrCode(tinyUrl);
 			draw();
 		});
 	});
@@ -4137,10 +4137,10 @@ kmc.log = function() {
 		if (arguments.length == 1) {
 			console.log( arguments[0] );
 		} else {
-			var args = Array.prototype.slice.call(arguments);  
+			var args = Array.prototype.slice.call(arguments);
 			console.log( args[0], args.slice( 1 ) );
 		}
-	}	
+	}
 };
 
 kmc.functions = {
@@ -4201,7 +4201,7 @@ kmc.functions = {
 		}
 		return;
 	},
-	
+
 	expired : function() {
 		kmc.user.logout();
 	},
@@ -4225,7 +4225,7 @@ kmc.functions = {
 			kshow_id		: "-1",
 			terms_of_use	: kmc.vars.terms_of_use,
 			close			: "kmc.functions.onCloseKcw",
-			quick_edit		: 0, 
+			quick_edit		: 0,
 			kvar_conversionQuality : conversion_profile
 		};
 
@@ -4236,7 +4236,7 @@ kmc.functions = {
 			quality: "high",
 			movie: kmc.vars.service_url + "/kcw/ui_conf_id/" + kcw_uiconf
 		};
-		
+
 		kmc.layout.modal.open( {
 			'width' : 700,
 			'height' : 420,
@@ -4267,7 +4267,7 @@ kmc.functions = {
 		return (el.position().left + el.width() - 10);
 	},
 	openClipApp : function( entry_id, mode ) {
-		
+
 		var iframe_url = kmc.vars.base_url + '/apps/clipapp/' + kmc.vars.clipapp.version;
 			iframe_url += '/?kdpUiconf=' + kmc.vars.clipapp.kdp + '&kclipUiconf=' + kmc.vars.clipapp.kclip;
 			iframe_url += '&partnerId=' + kmc.vars.partner_id + '&host=' + kmc.vars.host + '&mode=' + mode + '&config=kmc&entryId=' + entry_id;
@@ -4284,7 +4284,7 @@ kmc.functions = {
 				$("#kcms")[0].gotoPage({
 					moduleName: "content",
 					subtab: "manage"
-				});				
+				});
 			}
 		} );
 	},
@@ -4300,14 +4300,14 @@ kmc.functions = {
     },
 	openLiveAnalytics: function(){
         kmc.utils.hideFlash(true);
-        kmc.utils.openIframe(kmc.vars.base_url + '/apps/liveanalytics/' + kmc.vars.liveanalytics.version + '/index.html'); 
+        kmc.utils.openIframe(kmc.vars.base_url + '/apps/liveanalytics/' + kmc.vars.liveanalytics.version + '/index.html');
         return false;
     },
 	openLiveAnalyticsDrilldown: function(entryId, entryName){
 		// Set title
 		var title = entryName ? entryName : '';
 		var url = kmc.vars.base_url + '/apps/liveanalytics/' + kmc.vars.liveanalytics.version + '/index.html#/entry/' + entryId + '/nonav';
-		
+
 		var modal_content = '<iframe id="liveIF" src="' + url + '" width="100%" height="100%" frameborder="0" ></iframe>';
 
 		kmc.layout.modal.open( {
@@ -4394,7 +4394,7 @@ kmc.utils = {
 
 		// Activate menu links
 		kmc.utils.activateHeader();
-	
+
 		// Calculate menu width
 		var menu_width = 10;
 		$("#user_links > *").each( function() {
@@ -4503,7 +4503,7 @@ kmc.utils = {
 		}
 		catch(err) {}
 	},
-	
+
 	// we should have only one overlay for both flash & html modals
 	maskHeader : function(hide) {
 		if(hide) {
@@ -4518,7 +4518,7 @@ kmc.utils = {
 	createTabs : function(arr) {
 		// Close the user link menu
 		$("#closeMenu").trigger('click');
-	
+
 		if(arr) {
 			var module_url = kmc.vars.service_url + '/index.php/kmc/kmc4',
 				arr_len = arr.length,
@@ -4532,7 +4532,7 @@ kmc.utils = {
                 }
 				tabs_html += '<li><a id="'+ arr[i].module_name +'" ' + tab_class + ' rel="'+ arr[i].subtab +'" href="'+ module_url + '#' + arr[i].module_name +'|'+ arr[i].subtab +'"><span>' + arr[i].display_name + '</span></a></li>';
 			}
-				
+
 			$('#hTabs').html(tabs_html);
 
 			// Get maximum width for user name
@@ -4540,7 +4540,7 @@ kmc.utils = {
 			if( ($("#user").width()+ 20) > max_user_width ) {
 				$("#user").width(max_user_width);
 			}
-				
+
 			$('#hTabs a').click(function(e) {
 				if (window.studioDataChanged === true){
 					var r = confirm("You are about to leave this page without saving.\nContinue?");
@@ -4637,7 +4637,7 @@ kmc.utils = {
 		$("#server_wrap").css("margin-top", "-"+ ($("#flash_wrap").height() + 2) +"px");
 		$("#server_wrap").show();
 	},
-	
+
 	openHelp: function( key ) {
 		$("#kcms")[0].doHelp( key );
 	},
@@ -4666,9 +4666,9 @@ kmc.mediator =  {
 		document.title = "KMC > " + module + ((subtab && subtab !== "") ? " > " + subtab + " |" : "");
 	},
 	readUrlHash : function() {
-		var module = "dashboard", 
+		var module = "dashboard",
 		subtab = "",
-		extra = {}, 
+		extra = {},
 		hash, nohash;
 
 		try {
@@ -4680,7 +4680,7 @@ kmc.mediator =  {
 		if(!nohash && hash[0]!=="") {
 			module = hash[0];
 			subtab = hash[1];
-			
+
 			if (hash[2])
 			{
 				var tmp = hash[2].split("&");
@@ -4734,7 +4734,7 @@ kmc.mediator =  {
 							break;
 					}
 					break;
-		    
+
 				// case for Analytics tab
 				case "reports":
 					module = "analytics";
@@ -4875,7 +4875,7 @@ kmc.client = {
 		};
 		// Merge params and defaults
 		$.extend( params, defaultParams);
-		
+
 		var ksort = function ( arr ) {
 			var sArr = [];
 			var tArr = [];
@@ -4890,7 +4890,7 @@ kmc.client = {
 			}
 			return sArr;
 		};
-		
+
 		var getSignature = function( params ){
 			params = ksort(params);
 			var str = "";
@@ -4900,7 +4900,7 @@ kmc.client = {
 			}
 			return md5(str);
 		};
-		
+
 		// Add kaltura signature param
 		var kalsig = getSignature( params );
 		serviceUrl += '&kalsig=' + kalsig;
@@ -4908,23 +4908,23 @@ kmc.client = {
 		// Make request
 		$.ajax({
 			type: 'GET',
-			url: serviceUrl, 
+			url: serviceUrl,
 			dataType: 'jsonp',
-			data: params, 
+			data: params,
 			cache: false,
 			success: callback
-		});	
+		});
 	},
-		
+
 	createShortURL : function(url, callback) {
 		kmc.log('createShortURL');
-			
+
 		var data = {
 			"shortLink:objectType"	: "KalturaShortLink",
 			"shortLink:systemName"	: "KMC-PREVIEW", // Unique name for filtering
 			"shortLink:fullUrl"		: url
 		};
-			
+
 		kmc.client.makeRequest("shortlink_shortlink", "add", data, function( res ) {
 			var tinyUrl = false;
 			if( callback ) {
@@ -4942,7 +4942,7 @@ kmc.client = {
 kmc.layout = {
 	init: function() {
 		// Close open menu if user click anywhere
-		$("#kmcHeader").bind( 'click', function() { 
+		$("#kmcHeader").bind( 'click', function() {
 			$("#hTabs a").each(function(inx, tab) {
 				var $tab = $(tab);
 				if( $tab.hasClass('menu') && $tab.hasClass('active') ){
@@ -4977,12 +4977,12 @@ kmc.layout = {
 				'contentHeight' : 'auto'
 			};
 			// Overwrite defaults with data
-			$.extend(options, data);			
+			$.extend(options, data);
 			// Set defaults
 			var $modal = $(options.el),
 				$modal_title = $modal.find(".title h2"),
 				$modal_content = $modal.find(".content");
-			
+
 			$modal_content.height(options.contentHeight);
 			// Add default ".modal" class
 			options.className = 'modal ' + options.className;
@@ -5023,11 +5023,11 @@ kmc.layout = {
 			kmc.utils.hideFlash(true);
 			kmc.layout.overlay.show();
 			$modal.fadeIn(600);
-			
+
 			if( ! $.browser.msie ) {
 				$modal.css('display', 'block');
 			}
-			
+
 			if( position ) {
 				this.position(el);
 			}
@@ -5038,7 +5038,7 @@ kmc.layout = {
 			var el = data.el || kmc.layout.modal.el;
 			this.show(el);
 		},
-		
+
 		position: function(el) {
 			el = el || kmc.layout.modal.el;
 			var $modal = $(el);
@@ -5051,7 +5051,7 @@ kmc.layout = {
 				'top' : mTop + "px",
 				'left' : mLeft + "px"
 			});
-			
+
 		},
 		close: function(el) {
 			el = el || kmc.layout.modal.el;
@@ -5210,7 +5210,7 @@ kmc.user = {
 
 			var $form = $('<form />')
 						.attr({
-							'action': url, 
+							'action': url,
 							'method': 'post',
 							'style': 'display: none'
 						})
@@ -5243,7 +5243,7 @@ $(function() {
 
 	// Set resize event to update the flash object size
 	$(window).wresize(kmc.utils.resize);
-	kmc.vars.isLoadedInterval = setInterval(kmc.utils.isModuleLoaded,200);	
+	kmc.vars.isLoadedInterval = setInterval(kmc.utils.isModuleLoaded,200);
 
 	// Load kdp player & playlists for preview & embed
 	kmc.preview_embed.updateList(); // Load players

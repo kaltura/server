@@ -170,4 +170,18 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 		return $nestedSortOrder;
 	}
 
+	public function getFilteredObjectId()
+	{
+		if ($this->getFieldName() == ESearchCuePointFieldName::ID)
+		{
+			$cuePointId = elasticSearchUtils::formatSearchTerm($this->getSearchTerm());
+			$cuePoint = CuePointPeer::retrieveByPK($cuePointId);
+			if ($cuePoint)
+			{
+				return $cuePoint->getEntryId();
+			}
+		}
+		return null;
+	}
+
 }

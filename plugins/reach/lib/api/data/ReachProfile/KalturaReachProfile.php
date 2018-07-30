@@ -3,7 +3,7 @@
 /**
  * @package plugins.reach
  * @subpackage api.objects
- * @relatedService ReachProfileService
+ * @relatedService ignore
  */
 class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 {
@@ -54,11 +54,6 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 	 * @filter eq,in
 	 */
 	public $profileType;
-	
-	/**
-	 * @var KalturaCatalogItemLanguage
-	 */
-	public $defaultSourceLanguage;
 	
 	/**
 	 * @var KalturaVendorCatalogItemOutputFormat
@@ -146,7 +141,6 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 		'updatedAt',
 		'status',
 		'profileType' => 'type',
-		'defaultSourceLanguage',
 		'defaultOutputFormat',
 		'enableMachineModeration',
 		'enableHumanModeration',
@@ -197,14 +191,6 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 	
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		/* @var $sourceObject ReachProfile */
-		//if we are trying to update the credit object we must reset the used credit before.
-		if ($this->credit != null)
-		{
-			if ($this->credit->hasObjectChanged($sourceObject->getCredit()) && $sourceObject->getUsedCredit() > 0)
-				throw new KalturaAPIException(KalturaReachErrors::UPDATE_CREDIT_ERROR_USED_CREDIT_EXISTS, $this->id);
-		}
-		
 		//validating dictionary duplications
 		$this->validateDictionary();
 		

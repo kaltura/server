@@ -35,10 +35,10 @@ class ReachProfileService extends KalturaBaseService
 		/* @var $dbReachProfile ReachProfile */
 		$dbReachProfile->setPartnerId(kCurrentContext::getCurrentPartnerId());
 		$dbReachProfile->setStatus(KalturaReachProfileStatus::ACTIVE);
-		
-		if ($dbReachProfile->getCredit() instanceof kReoccurringVendorCredit)
+		$credit = $dbReachProfile->getCredit();
+		if ( $credit && $credit instanceof kReoccurringVendorCredit)
 		{
-			$credit = $dbReachProfile->getCredit();
+			/* @var $credit kReoccurringVendorCredit */
 			$credit->setPeriodDates();
 			$dbReachProfile->setCredit($credit);
 		}
@@ -107,9 +107,10 @@ class ReachProfileService extends KalturaBaseService
 
 		// save the object
 		$dbReachProfile = $reachProfile->toUpdatableObject($dbReachProfile);
-		if ($dbReachProfile->getCredit() instanceof kReoccurringVendorCredit)
+		$credit = $dbReachProfile->getCredit();
+		if ($credit && $credit instanceof kReoccurringVendorCredit)
 		{
-			$credit = $dbReachProfile->getCredit();
+			/* @var $credit kReoccurringVendorCredit */
 			$credit->setPeriodDates();
 			$dbReachProfile->setCredit($credit);
 		}
@@ -140,10 +141,10 @@ class ReachProfileService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
 		
 		$dbReachProfile->setStatus($status);
-		
-		if ($status == KalturaReachProfileStatus::ACTIVE && $dbReachProfile->getCredit() instanceof kReoccurringVendorCredit)
-                {
-			$credit = $dbReachProfile->getCredit();
+		$credit = $dbReachProfile->getCredit();
+		if ($status == KalturaReachProfileStatus::ACTIVE && $credit && $credit instanceof kReoccurringVendorCredit)
+        {
+	        /* @var $credit kReoccurringVendorCredit */
 			$credit->setPeriodDates();
 			$dbReachProfile->setCredit($credit);
 		}
@@ -203,38 +204,4 @@ class ReachProfileService extends KalturaBaseService
 		$reachProfile->fromObject($dbReachProfile, $this->getResponseProfile());
 		return $reachProfile;
 	}
-
-	/**
-	 * reset vednor profile credit
-	 *
-	 * @action resetCredit
-	 * @param int $reachProfileId
-	 * @return KalturaReachProfile
-	 * @throws KalturaReachErrors::REACH_PROFILE_NOT_FOUND
-	 */
-	public function resetCredit($reachProfileId)
-	{
-		$dbReachProfile = ReachProfilePeer::retrieveByPK($reachProfileId);
-		if (!$dbReachProfile)
-			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $reachProfileId);
-
-		$currentCreditHistory = array();
-		$currentCreditHistory ['usedCreditBeforeReset'] = $dbReachProfile->getUsedCredit();
-		$currentCreditHistory ['userId'] = kCurrentContext::$ks_uid;
-		$currentCreditHistory ['resetTime'] = time();
-
-		// reset the used_credit and the usage percentage.
-		$dbReachProfile->setUsedCredit(0);
-		$dbReachProfile->setCreditUsagePercentage(0);
-
-		//add the reset history
-		$dbReachProfile->setCreditResetHistory($currentCreditHistory);
-		$dbReachProfile->save();
-
-		// return the saved object
-		$reachProfile = new KalturaReachProfile();
-		$reachProfile->fromObject($dbReachProfile, $this->getResponseProfile());
-		return $reachProfile;
-	}
-
 }

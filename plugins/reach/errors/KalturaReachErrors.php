@@ -63,7 +63,9 @@ class KalturaReachErrors implements kReachErrors
 	
 	const ENTRY_TYPE_NOT_SUPPORTED = "ENTRY_TYPE_NOT_SUPPORTED;TYPE;Requesting tasks for entry type [@TYPE@] is not supported";
 	
+	const ENTRY_NOT_READY = "ENTRY_NOT_READY;;Ordering task is not allowed for entries which are not ins status ready";
+	
 	/* Credit */
 	
-	const CANNOT_SET_ALLOW_OVERAGE_CREDIT = "CANNOT_SET_ALLOW_OVERAGE_CREDIT;;Allow overage set to false but overage credit is set";
+	const OVERAGE_CREDIT_CANNOT_BE_NEGATIVE = "OVERAGE_CREDIT_CANNOT_BE_NEGATIVE;;Overage credit value cannot be negative";
 }

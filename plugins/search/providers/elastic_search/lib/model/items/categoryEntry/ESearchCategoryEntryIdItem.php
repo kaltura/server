@@ -48,4 +48,9 @@
 		 return kESearchQueryManager::getExistsQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 	 }
 
+	 public function getFilteredCategoryId()
+	 {
+		 return elasticSearchUtils::formatSearchTerm($this->getSearchTerm());
+	 }
+
  }
