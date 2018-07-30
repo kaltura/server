@@ -30,7 +30,7 @@ if(!$permission)
 	$permission->save();
 }
 
-echo "Done, created permission with id [{$permission->getId()}]" . PHP_EOL;
+echo "Using permission with id [{$permission->getId()}]" . PHP_EOL;
 
 $c = new Criteria();
 $c->add(PermissionItemPeer::PARAM_1, "reach_entryvendortask");
