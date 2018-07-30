@@ -11,7 +11,7 @@
 </style>
 
 <div id="partner_catalog_item_configure_div" align="center">
-	<form id ="frmPartnerCatalogItemInnerConfigure" onSubmit="return addPartnerCatalogItems();" method="post"  >
+	<form id ="frmPartnerCatalogItemInnerConfigure" action="<?php echo $this->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemConfigureAction')); ?>" method="post"  >
 		<td><input type="checkbox" name="selectAllItemsOnPageCheckbox" onchange="flipAllCheckboxesOnPage()" id="selectAllItemsInPage" align="left" />Select All Items On Page</td>
 		<?php if($this->vendorPartnerId != null): ?>
 			<td><input type="checkbox" name="selectAllItemsCheckbox" onchange="flipAllCheckboxes()" id="selectAllItems" align="left" />Select All Items</td>
@@ -103,13 +103,6 @@
 			if($( this ).attr("name") == 'catalogItemsCheckBoxes[]')
 				$(this).prop('checked', shouldSelectAll);
 		});
-	}
-
-	function addPartnerCatalogItems()
-	{
-		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemConfigureAction')); ?>';
-		document.getElementById('frmPartnerCatalogItemInnerConfigure').action = url;
-		jQuery('#frmPartnerCatalogItemInnerConfigure').removeAttr('onsubmit').submit();
 	}
 
 	function loadPartnerCatalogItems()
