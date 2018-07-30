@@ -401,20 +401,19 @@ class kQueryCache
 	public static function getCachedKeyResults($key)
 	{
 		self::initGlobalMemcache();
-		if (self::$s_memcacheKeys === null)	// The keys memcache suffices here
-			return false;
-
-		$cacheResult = self::$s_memcacheKeys->get($key);
-		if ($cacheResult === false)
+		if (self::$s_memcacheKeys !== null)
 		{
+			$cacheResult = self::$s_memcacheKeys->get($key);
+			if ($cacheResult !== false)
+			{
+				$results = json_decode($cacheResult, true);
+				if (!empty($results))
+					return $results;
+				return false;
+			}
 			KalturaLog::log("kQueryCache:getCachedKeyResults - failed to query keys memcache, not using query cache");
 			return false;
 		}
-
-		$results = json_decode($cacheResult, true);
-		if (empty($results))
-			return false;
-
-		return $results;
+		return false;
 	}
 }
