@@ -154,7 +154,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 
 	private function getIsMaintenanceFromCache($entryId)
 	{
-		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAY_MANIFEST);
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
 		if (!$cache)
 			return self::DEFAULT_MAINTENANCE_DC;
 		$val = $cache->get("Live-MaintenanceDataCacheKey");
