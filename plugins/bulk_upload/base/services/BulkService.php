@@ -289,22 +289,26 @@ class BulkService extends KalturaBaseService
 		
  		$response = new KalturaBulkUploadListResponse();
 
-		// limit list to last 100K records in order to constrain query performance
-		$c = new Criteria();
-		$c->addDescendingOrderByColumn(BatchJobLogPeer::ID);
-		$lastLog = BatchJobLogPeer::doSelectOne($c);
-		if (!$lastLog)
-			return $response;
-
-		$lastId = $lastLog->getId() - 1000000;
- 		
 		$coreBulkUploadFilter = new BatchJobLogFilter();
         	$bulkUploadFilter->toObject($coreBulkUploadFilter);
 			
 	    	$c = new Criteria();
+		
+		// limit list to last 100K records in order to constrain query performance
+		if ($bulkUploadFilter->uploadedOnGreaterThanOrEqual)
+		{
+			$c2 = new Criteria();
+			$c2->addDescendingOrderByColumn(BatchJobLogPeer::ID);
+			$lastLog = BatchJobLogPeer::doSelectOne($c2);
+			if (!$lastLog)
+				return $response;
+
+			$lastId = $lastLog->getId() - 1000000;
+			$c->addAnd(BatchJobLogPeer::ID, $lastId, Criteria::GREATER_THAN);
+		}
+		
 		$c->addAnd(BatchJobLogPeer::PARTNER_ID, $this->getPartnerId());
 		$c->addAnd(BatchJobLogPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
-		$c->addAnd(BatchJobLogPeer::ID, $lastId, Criteria::GREATER_THAN);
 		
 		$crit = $c->getNewCriterion(BatchJobLogPeer::ABORT, null);
 		$critOr = $c->getNewCriterion(BatchJobLogPeer::ABORT, 0);
