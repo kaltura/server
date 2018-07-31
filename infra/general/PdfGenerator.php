@@ -1,6 +1,6 @@
 <?php
 
-require('../../vendor/fpdf/fpdf.php');
+require('../../vendor/tfpdf/tfpdf.php');
 
 /**
  * Created by IntelliJ IDEA.
@@ -8,7 +8,7 @@ require('../../vendor/fpdf/fpdf.php');
  * Date: 8/27/2015
  * Time: 11:00 AM
  */
-class PdfGenerator extends FPDF
+class PdfGenerator extends tfpdf
 {
 
     private $heading = '';
