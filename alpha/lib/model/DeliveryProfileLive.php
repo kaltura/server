@@ -3,6 +3,7 @@
 abstract class DeliveryProfileLive extends DeliveryProfile {
 	const USER_TYPE_ADMIN = 'admin';
 	const USER_TYPE_USER = 'user';
+	const DEFAULT_MAINTENANCE_DC = -1;
 
 	/**
 	 * @var kLiveStreamConfiguration
@@ -117,53 +118,60 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		if(!count($liveEntryServerNodes))
 			return;
 
-
 		$requestedServerType = $this->getDynamicAttributes()->getStreamType();
 		$dcInMaintenance = $this->getIsMaintenanceFromCache($entryId);
 		KalturaLog::debug("Having requested-Server-Type of [$requestedServerType] and DC in maintenance of [$dcInMaintenance]");
-		$liveEntryServerNodes = array_filter($liveEntryServerNodes, function($esn) use ($dcInMaintenance, $requestedServerType){
-			if ($requestedServerType && $esn->getServerType() != intval($requestedServerType))
-				return false; // if request specific type then ignore all others 
-			$esn->sn = ServerNodePeer::retrieveActiveMediaServerNode(null, $esn->getServerNodeId());
-			if (!$esn->sn)
-				return false; // if the entry has no active server node ignore it
-			$esn->weight = ($esn->getServerType() == EntryServerNodeType::LIVE_PRIMARY) ? 10 : 0;
-			if ($esn->sn->getDc() == $dcInMaintenance)
-				$esn->weight -= 100; // if DC in maintenance then lower its priority
-			return true;
-		 });
+		$liveEntryServerNodes = $this->filterAndSet($liveEntryServerNodes, $requestedServerType, $dcInMaintenance);
 		if (empty($liveEntryServerNodes))
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$entryId] is not broadcasting on stream type [$requestedServerType]");
 
 		usort($liveEntryServerNodes, function ($a, $b) {return $a->weight - $b->weight;});
-
 		$liveEntryServerNode = array_shift($liveEntryServerNodes); // after sort first is the primary
-		$this->liveStreamConfig->setUrl($this->getHttpUrl($liveEntryServerNode->sn));
+		$this->liveStreamConfig->setUrl($this->getHttpUrl($liveEntryServerNode->serverNode));
 		$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
 
 		$liveEntryServerNode = array_shift($liveEntryServerNodes);
 		if ($liveEntryServerNode) { // if list has another entry server node set it as backup
-			$this->liveStreamConfig->setBackupUrl($this->getHttpUrl($liveEntryServerNode->sn));
+			$this->liveStreamConfig->setBackupUrl($this->getHttpUrl($liveEntryServerNode->serverNode));
 			$this->liveStreamConfig->setBackupStreamInfo($liveEntryServerNode->getStreams());
 		}
+	}
+
+	private function filterAndSet($liveEntryServerNodes, $requestedServerType, $dcInMaintenance)
+	{
+		return array_filter($liveEntryServerNodes, function($esn) use ($dcInMaintenance, $requestedServerType) {
+			if ($requestedServerType && $esn->getServerType() != $requestedServerType)
+				return false; // if request specific type then ignore all others
+			$esn->serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $esn->getServerNodeId());
+			if (!$esn->serverNode)
+				return false; // if the entry has no active server node ignore it
+			$esn->weight = ($esn->getServerType() == EntryServerNodeType::LIVE_PRIMARY) ? 10 : 0;
+			if ($esn->serverNode->getDc() == $dcInMaintenance)
+				$esn->weight -= 100; // if DC in maintenance then lower its priority
+			return true;
+		});
 	}
 
 	private function getIsMaintenanceFromCache($entryId)
 	{
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAY_MANIFEST);
-		if ($cache) {
-			$val = $cache->get("Live-MaintenanceDataCacheKey");
-			if ($val)
-			{
-				KalturaLog::debug("Got maintenance data from cache: " . print_r($val, true));
-				$result = json_decode($val, true);
-				if (key_exists("maintenanceDC", $result))
-					return $result["maintenanceDC"];
-				if (key_exists($entryId, $result))
-					return $result[$entryId];
-			}
+		if (!$cache)
+			return self::DEFAULT_MAINTENANCE_DC;
+		$val = $cache->get("Live-MaintenanceDataCacheKey");
+		if (!$val)
+			return self::DEFAULT_MAINTENANCE_DC;
+		$result = json_decode($val, true);
+		if (!is_array($result))
+		{
+			KalturaLog::notice("Got maintenance data from cache but could not parse it. Raw data: " . print_r($val, true));
+			return self::DEFAULT_MAINTENANCE_DC;
 		}
-		return -1; // as default value
+		KalturaLog::debug("Got maintenance data from cache: " . print_r($result, true));
+		if (key_exists("maintenanceDC", $result))
+			return $result["maintenanceDC"];
+		if (key_exists($entryId, $result))
+			return $result[$entryId];
+		return self::DEFAULT_MAINTENANCE_DC;
 	}
 	
 	protected function initManualLiveStreamConfiguration(LiveStreamEntry $entry)
