@@ -410,7 +410,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	const CB_ACTION_SET = 'set';
 	const CB_ACTION_GET = 'get';
 	const CB_ACTION_DELETE = 'delete';
-	const CB_ACTION_OPEN_BUCKET = 'open_bucket';
+	const CB_ACTION_BUCKET_CONNECTION = 'bucket_connection';
 	
 	/**
 	 * @var string
@@ -463,7 +463,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 			$this->bucket = $cluster->openBucket($this->name);
 			$connTook = microtime(true) - $connStart;
 			self::safeLog("connect took - {$connTook} seconds to {$config['dsn']} bucket {$this->name}");
-			KalturaMonitorClient::monitorCouchBaseAccess($this->dataSource, $this->name, self::CB_ACTION_OPEN_BUCKET, $connTook, strlen($this->name));
+			KalturaMonitorClient::monitorCouchBaseAccess($this->dataSource, $this->name, self::CB_ACTION_BUCKET_CONNECTION, $connTook, strlen($this->name));
 		}
 		catch(CouchbaseException $e)
 		{
