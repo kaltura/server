@@ -128,9 +128,7 @@ class kQuizPdf
 		$stylePrefix = self::NOTO_STYLE_PREFIX;
 		if(preg_match("/\p{Han}+/u", $text)) //contain chinese/japanese letters
 			$stylePrefix = self::ASIAN_STYLE_PREFIX;
-		else if (!preg_match('/[^A-Za-z0-9]/', $text)) // contain only english letters
-			$stylePrefix = "";
-
+		
 		return $stylePrefix;
 	}
 
