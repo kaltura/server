@@ -15,6 +15,8 @@ class KalturaMonitorClient
 	const EVENT_DUMPFILE = 	'file';
 	const EVENT_ELASTIC =	'elastic';
 	const EVENT_DRUID =		'druid';
+	const EVENT_COUCHBASE =	'couchbase';
+
 
 	const FIELD_EVENT_TYPE = 		'e';
 	const FIELD_SERVER = 			's';
@@ -270,6 +272,23 @@ class KalturaMonitorClient
 			self::FIELD_LENGTH			=> $querySize,
 			self::FIELD_EXECUTION_TIME	=> $queryTook,
 			self::FIELD_ERROR_CODE		=> $errorCode,
+		));
+
+		self::writeDeferredEvent($data);
+	}
+
+	public static function monitorCouchBaseAccess($dataSource, $bucketName, $queryType, $queryTook, $querySize)
+	{
+		if (!self::$stream)
+			return;
+
+		$data = array_merge(self::$basicEventInfo, array(
+			self::FIELD_EVENT_TYPE 		=> self::EVENT_COUCHBASE,
+			self::FIELD_DATABASE		=> $dataSource,
+			self::FIELD_TABLE			=> $bucketName,
+			self::FIELD_QUERY_TYPE		=> $queryType,
+			self::FIELD_EXECUTION_TIME	=> $queryTook,
+			self::FIELD_LENGTH			=> $querySize,
 		));
 
 		self::writeDeferredEvent($data);
