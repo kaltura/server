@@ -29,14 +29,15 @@
 						echo $user->roleNames;
 						if ($user->isAccountOwner) {
 							echo ' (Account owner)';
-						}					
+						}
 					?>
-				
+
 				</td>
 				<td>
 					<select class="options" onchange="doAction(this.value, '<?php echo $user->partnerId; ?>','<?php echo $user->id; ?>')">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<option value="kmcLogin"><?php echo $this->translate('Login'); ?></option>
+						<option value="kmcNewLogin"><?php echo $this->translate('Login-new'); ?></option>
 						<?php //if (Infra_AclHelper::isAllowed('partner','reset-user-password')): ?>
 							<option value="resetUserPassword" ><?php echo $this->translate('Reset Password'); ?></option>
 						<?php //endif; ?>
@@ -50,6 +51,11 @@
 
 function kmcLogin(partnerId, userId) {
 	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'kmc-redirect', 'partner_id' => '')); ?>' + partnerId + '/user_id/' + userId;
+	window.open(url);
+}
+
+function kmcNewLogin(partnerId, userId) {
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'kmc-new-redirect', 'partner_id' => '')); ?>' + partnerId + '/user_id/' + userId;
 	window.open(url);
 }
 
@@ -86,9 +92,9 @@ function resetUserPassword(partnerId, userId, pageHtml /* default = null */)
 
 	jQuery('#reset-user-password-dialog').remove();
 	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'reset-user-password', 'partner_id' => '')); ?>' + partnerId + '/user_id/' + userId;
-	
+
 	var dialogDiv = jQuery('<div id="reset-user-password-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
-	
+
 	dialogDiv.dialog({
 		bgiframe: true,
 		modal: true,
@@ -105,10 +111,10 @@ function resetUserPassword(partnerId, userId, pageHtml /* default = null */)
 			}
 		}
 	});
-	
+
 	dialogDiv.load(
-		url, 
-		null, 
+		url,
+		null,
 		function() {
 			if ( pageHtml != null ) {
 				// Replace with the updated server page html, which includes a block
