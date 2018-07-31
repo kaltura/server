@@ -203,7 +203,7 @@ abstract class DistributionEngine implements IDistributionEngine
 				$filePath .= '/asset_'.$assetId;
 
 			$assetContentUrl = self::getAssetUrl($assetId);
-			$res = KCurlWrapper::getDataFromFile($assetContentUrl, $filePath);
+			$res = KCurlWrapper::getDataFromFile($assetContentUrl, $filePath, null, true);
 			if ($res)
 				return $filePath;
 		}
