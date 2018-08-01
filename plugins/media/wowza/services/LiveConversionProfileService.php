@@ -222,7 +222,7 @@ class LiveConversionProfileService extends KalturaBaseService
 
 	private function isGpuSupported($streamParametersArray)
 	{
-		return $streamParametersArray['gpu'] == 'true';
+		return key_exists('gpu', $streamParametersArray) && $streamParametersArray['gpu'] == 'true';
 	}
 	
 	private function isValidJson($strJson)
