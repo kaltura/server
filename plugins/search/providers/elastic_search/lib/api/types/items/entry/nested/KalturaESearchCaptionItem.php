@@ -21,6 +21,8 @@ class KalturaESearchCaptionItem extends KalturaESearchEntryAbstractNestedItem
 		KalturaESearchCaptionFieldName::CONTENT => ESearchCaptionFieldName::CONTENT,
 		KalturaESearchCaptionFieldName::START_TIME => ESearchCaptionFieldName::START_TIME,
 		KalturaESearchCaptionFieldName::END_TIME => ESearchCaptionFieldName::END_TIME,
+		KalturaESearchCaptionFieldName::LANGUAGE => ESearchCaptionFieldName::LANGUAGE,
+		KalturaESearchCaptionFieldName::LABEL => ESearchCaptionFieldName::LABEL,
 	);
 
 	protected function getMapBetweenObjects()
