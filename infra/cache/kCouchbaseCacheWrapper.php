@@ -406,6 +406,11 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	const ERROR_CODE_THE_KEY_ALREADY_EXISTS_IN_THE_SERVER = 12;
 	const ERROR_CODE_THE_KEY_DOES_NOT_EXIST_IN_THE_SERVER = 13;
 	const ERROR_CODE_OPERATION_TIMEOUT_IN_THE_SERVER = 23;
+
+	const CB_ACTION_SET = 'set';
+	const CB_ACTION_GET = 'get';
+	const CB_ACTION_DELETE = 'delete';
+	const CB_ACTION_BUCKET_CONNECTION = 'bucket_connection';
 	
 	/**
 	 * @var string
@@ -426,6 +431,11 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	 * @var array<array> ['designDocumentName' => $, 'viewName' => $]
 	 */
 	protected $views = array();
+
+	/**
+	 * @var string
+	 */
+	protected $dataSource;
 	
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::doInit()
@@ -444,6 +454,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		try
 		{
 			$this->name = $config['name'];
+			$this->dataSource = $config['dsn'];
 			
 			if($this->debug)
 				KalturaLog::debug("Bucket name [$this->name]");
@@ -452,6 +463,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 			$this->bucket = $cluster->openBucket($this->name);
 			$connTook = microtime(true) - $connStart;
 			self::safeLog("connect took - {$connTook} seconds to {$config['dsn']} bucket {$this->name}");
+			KalturaMonitorClient::monitorCouchBaseAccess($this->dataSource, $this->name, self::CB_ACTION_BUCKET_CONNECTION, $connTook, strlen($this->name));
 		}
 		catch(CouchbaseException $e)
 		{
@@ -492,7 +504,10 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 				KalturaLog::debug("Trying to get from couchbase. attempts left: $retries");
 			try
 			{
+				$connStart = microtime(true);
 				$meta = $this->bucket->get($key);
+				$connTook = microtime(true) - $connStart;
+				KalturaMonitorClient::monitorCouchBaseAccess($this->dataSource, $this->name,self::CB_ACTION_GET, $connTook, strlen($key));
 
 				if ($this->debug)
 					KalturaLog::debug("key [$key], meta [" . print_r($meta, true) . "]");
@@ -519,8 +534,11 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	{
 		try
 		{
+			$connStart = microtime(true);
 			$metas = $this->bucket->get($keys);
-			
+			$connTook = microtime(true) - $connStart;
+			KalturaMonitorClient::monitorCouchBaseAccess($this->dataSource, $this->name,self::CB_ACTION_GET, $connTook, strlen(implode('', $keys)));
+
 			if($this->debug)
 				KalturaLog::debug("key [" . print_r($keys, true) . "], metas [" . print_r($metas, true) . "]");
 				
@@ -574,9 +592,14 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 				KalturaLog::debug("Trying to upsert to couchbase. attempts left: $retries");
 			try
 			{
+				$connStart = microtime(true);
 				$meta = $this->bucket->upsert($key, $var, array(
 					'expiry' => $expiry
 				));
+				$connTook = microtime(true) - $connStart;
+				$varLength = is_array($var) ? strlen(implode('', $var)) : strlen($var);
+				$fullLength = strlen($key) + $varLength + strlen(strval($expiry));
+				KalturaMonitorClient::monitorCouchBaseAccess($this->dataSource, $this->name,self::CB_ACTION_SET, $connTook, $fullLength);
 
 				return is_null($meta->error);
 			} catch (CouchbaseException $e)
@@ -603,9 +626,14 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 			
 		try
 		{
+			$connStart = microtime(true);
 			$meta = $this->bucket->insert($key, $var, array(
 				'expiry' => $expiry
 			));
+			$connTook = microtime(true) - $connStart;
+			$varLength = is_array($var) ? strlen(implode('', $var)) : strlen($var);
+			$fullLength = strlen($key) + $varLength + strlen(strval($expiry));
+			KalturaMonitorClient::monitorCouchBaseAccess($this->dataSource, $this->name, self::CB_ACTION_SET, $connTook, $fullLength);
 		}
 		catch(CouchbaseException $e)
 		{
@@ -628,7 +656,10 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 			
 		try
 		{
+			$connStart = microtime(true);
 			$meta = $this->bucket->remove($key);
+			$connTook = microtime(true) - $connStart;
+			KalturaMonitorClient::monitorCouchBaseAccess($this->dataSource, $this->name,self::CB_ACTION_DELETE, $connTook, strlen($key));
 			return is_null($meta->error);
 		}
 		catch(CouchbaseException $e)
@@ -693,7 +724,10 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	{
 		try
 		{
+			$connStart = microtime(true);
 			$meta = $this->bucket->get($key);
+			$connTook = microtime(true) - $connStart;
+			KalturaMonitorClient::monitorCouchBaseAccess($this->dataSource, $this->name,self::CB_ACTION_GET, $connTook, strlen($key));
 			
 			if($this->debug)
 				KalturaLog::debug("key [$key]");
@@ -718,7 +752,10 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	{
 		try
 		{
+			$connStart = microtime(true);
 			$metas = $this->bucket->remove($keys);
+			$connTook = microtime(true) - $connStart;
+			KalturaMonitorClient::monitorCouchBaseAccess($this->dataSource, $this->name,self::CB_ACTION_DELETE, $connTook, strlen(implode('', $keys)));
 			
 			if($this->debug)
 				KalturaLog::debug("key [" . print_r($keys, true) . "]");
@@ -742,7 +779,10 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 	{
 		try
 		{
+			$connStart = microtime(true);
 			$metas = $this->bucket->get($keys);
+			$connTook = microtime(true) - $connStart;
+			KalturaMonitorClient::monitorCouchBaseAccess($this->dataSource, $this->name,self::CB_ACTION_GET, $connTook, strlen(implode('', $keys)));
 			
 			if($this->debug)
 				KalturaLog::debug("key [" . implode(', ', $keys) . "], metas [" . print_r($metas, true) . "]");
