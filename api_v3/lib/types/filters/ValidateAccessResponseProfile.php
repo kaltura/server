@@ -19,6 +19,8 @@ class ValidateAccessResponseProfile
 	 */
 	public static function validateAccess($relatedFilter)
 	{
+		if (self::PartnerExcludedFromResponseProfile())
+			return true;
 		$clazz = self::getServiceClassInstance($relatedFilter);
 		return self::validate($clazz);
 	}
@@ -86,6 +88,22 @@ class ValidateAccessResponseProfile
 			throw  $e;
 		}
 		return true;
+	}
+
+	/**
+	 * @return bool
+	 * @throws Exception
+	 */
+	private static function PartnerExcludedFromResponseProfile()
+	{
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$skipValidation = kConf::get('skip_response_profile_validation_partners','local', array());
+		foreach ($skipValidation as $excludedId)
+		{
+			if ($partnerId === $excludedId)
+				return true;
+		}
+		return false;
 	}
 
 }
