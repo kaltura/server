@@ -97,13 +97,9 @@ class ValidateAccessResponseProfile
 	private static function PartnerExcludedFromResponseProfile()
 	{
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-		$skipValidation = kConf::get('skip_response_profile_validation_partners','local', array());
-		foreach ($skipValidation as $excludedId)
-		{
-			if ($partnerId === $excludedId)
-				return true;
-		}
-		return false;
+		$partnersToSkip = kConf::get('skip_response_profile_validation_partners','local', array());
+		return in_array($partnerId,$partnersToSkip);
+
 	}
 
 }
