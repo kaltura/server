@@ -33,7 +33,7 @@ class DeliveryController extends Zend_Controller_Action
 		$pageSize = $this->_getParam('pageSize', 10);
 	
 		$client = Infra_ClientHelper::getClient();
-		$form = new Form_PartnerIdFilter();
+		$form = new Form_DeliveryProfileFilter();
 		$form->populate($request->getParams());
 		
 		$newForm = new Form_NewDeliveryProfile();
@@ -42,17 +42,32 @@ class DeliveryController extends Zend_Controller_Action
 		$action = $this->view->url(array('controller' => 'delivery', 'action' => 'delivery-profiles-configuration'), null, true);
 		$form->setAction($action);
 	
-		$partnerId = null;
+		$inputValue = null;
 		if ($request->getParam('filter_input') != '') {
-			$partnerId = $request->getParam('filter_input');
-			$newForm->getElement('newPartnerId')->setValue($partnerId);
+			$inputValue = $request->getParam('filter_input');
+			$newForm->getElement('newPartnerId')->setValue($inputValue);
 		}
 		
 		$filter = new Kaltura_Client_Type_DeliveryProfileFilter();
-		$filter->partnerIdEqual = $partnerId;
+		$filterType = $request->getParam('filter_type');
+		$impersonatedPartnerId = null;
+		switch ($filterType)
+		{
+			case "partnerIdEqual":
+				$filter->partnerIdEqual = $inputValue;
+				$impersonatedPartnerId = $inputValue;
+				break;
+			case "idEqual":
+				$filter->idIn = $inputValue;
+				break;
+			default:
+				$filter->partnerIdEqual = $inputValue;
+				$impersonatedPartnerId = $inputValue;
+				break;
+		}
 	
 		// get results and paginate
-		$paginatorAdapter = new Infra_FilterPaginator($client->deliveryProfile, "listAction", $partnerId, $filter);
+		$paginatorAdapter = new Infra_FilterPaginator($client->deliveryProfile, "listAction", $impersonatedPartnerId, $filter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
