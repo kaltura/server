@@ -93,7 +93,7 @@ class myFlickrServices extends myBaseMediaSource implements IMediaSource
 			
 		$api_sig = md5($api_sig);
 			
-		$fullUrl = "http://api.flickr.com/services/$url/?".implode('&', $encoded_params)."&api_sig=$api_sig";
+		$fullUrl = "https://api.flickr.com/services/$url/?".implode('&', $encoded_params)."&api_sig=$api_sig";
 		
 		return $fullUrl;
 	}
