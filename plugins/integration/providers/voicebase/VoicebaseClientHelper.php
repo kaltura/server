@@ -182,7 +182,7 @@ class VoicebaseClientHelper
 			if($format == "TXT")
 			{
 				//removing each pattern of zero/one space followed by \n\n , where it comes after a char not in {.?!}
-				$patterns = array("/([^\.\?!\s])(\n\n)/", "/([^\.\?!])(\s\n\n)/");
+				$patterns = array("/([^\.\?!\s])(\n\n{1,})/", "/([^\.\?!])(\s\n\n{1,})/");
 				$replacements = array("$1", "$1");
 				$result->transcript = preg_replace($patterns, $replacements, $result->transcript);
 			}
