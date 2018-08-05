@@ -33,6 +33,8 @@ class kmcngAction extends kalturaAction
 			header("Strict-Transport-Security: max-age=63072000; includeSubdomains; preload");
 		}
 
+		header("X-XSS-Protection: 1; mode=block");
+
 		//disable cache
 		header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 		header("Cache-Control: post-check=0, pre-check=0", false);
