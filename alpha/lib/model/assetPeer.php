@@ -483,8 +483,12 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		$bitrate2 = 0;
 		if ($b instanceof flavorAsset)
 			$bitrate2 = $b->getBitrate();
-			
-		return ($bitrate1 - $bitrate2); 
+		
+		$res = $bitrate1 - $bitrate2;
+		if($res == 0)
+			$res = $a->getIntId() - $b->getIntId();
+		
+		return $res;
 	}
 	
 	public static function retrieveReadyByEntryIdAndTag($entryId, $tag)
