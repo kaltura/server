@@ -42,7 +42,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		if ($object instanceof EntryVendorTask
 			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
-			&& $object->getStatus() == EntryVendorTaskStatus::ERROR
+			&& in_array($object->getStatus(), array(EntryVendorTaskStatus::ERROR, EntryVendorTaskStatus::READY))
 		)
 			return true;
 
@@ -89,6 +89,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
+		KalturaLog::debug("TTTTTT1");
 		if ($object instanceof EntryVendorTask && in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
 			&& $object->getStatus() == EntryVendorTaskStatus::PENDING
 			&& $object->getColumnsOldValue(EntryVendorTaskPeer::STATUS) == EntryVendorTaskStatus::PENDING_MODERATION
@@ -101,6 +102,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			&& in_array($object->getColumnsOldValue(EntryVendorTaskPeer::STATUS), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING))
 		)
 			return $this->handleErrorTask($object);
+		
+		KalturaLog::debug("TTTTTT");
+		if ($object instanceof EntryVendorTask
+			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
+			&& $object->getStatus() == EntryVendorTaskStatus::READY
+		)
+			return $this->invalidateAccessKey($object);
 
 		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP &&
 			in_array(entryPeer::LENGTH_IN_MSECS, $modifiedColumns)
@@ -130,6 +138,23 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	private function handleErrorTask(EntryVendorTask $entryVendorTask)
 	{
 		ReachProfilePeer::updateUsedCredit($entryVendorTask->getReachProfileId(), -$entryVendorTask->getPrice());
+	}
+	
+	private function invalidateAccessKey(EntryVendorTask $entryVendorTask)
+	{
+		$ksString = $entryVendorTask->getAccessKey();
+		
+		try
+		{
+			$ksObj = kSessionUtils::crackKs($ksString);
+		}
+		catch(Exception $ex)
+		{
+			KalturaLog::debug("Failed to crackKs with error message [" . $ex->getMessage() . "], accessKey won't be invalidated");
+		}
+		
+		KalturaLog::debug("Killing ks object");
+		$ksObj->kill();
 	}
 
 	private function handleEntryDurationChanged(entry $entry)
