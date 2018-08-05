@@ -46,11 +46,6 @@ class DbManager
 	 */
 	protected static $connIndex = false;
 
-	/**
-	 * @param array
-	 */
-	protected static $allowedSphinxHosts = array();
-
 	public static function setConfig(array $config)
 	{
 		$reflect = new ReflectionClass('KalturaPDO');
@@ -198,35 +193,31 @@ class DbManager
 	 * @param $dataSources
 	 * @return bool|mixed
 	 */
-	protected static function getSphinxConnIndexByLag($dataSources)
+	protected static function getSphinxConnIndexByLastUpdatedId($dataSources)
 	{
-		self::initAllowedSphinxHosts($dataSources);
-		$sphinxLags = kQueryCache::getCachedKeyResults(kQueryCache::SPHINX_LAG_KEY);
-
-		if ($sphinxLags === false)
+		$memcache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_KEYS);
+		if (!$memcache)
 			return false;
 
-		$lag = 0;
-		$host = null;
-		$preferredIndex = false;
-		foreach (self::$allowedSphinxHosts as $index => $currentHost)
+		$cacheResult = $memcache->get(kQueryCache::SPHINX_LAG_KEY);
+		if ($cacheResult === false)
 		{
-			if (array_key_exists($currentHost, $sphinxLags) && $sphinxLags[$currentHost])
-			{
-				if ($lag < $sphinxLags[$currentHost])
-				{
-					$host = $currentHost;
-					$lag = $sphinxLags[$currentHost];
-					$preferredIndex = $index;
-				}
-			}
+			KalturaLog::debug("failed to get sphinx_lag_key from memcache, not using query cache");
+			return false;
 		}
 
-		KalturaLog::debug("Sphinx with best lag chosen [" . $host . "] in datasource index [".$preferredIndex."]");
-		return $preferredIndex;
+		$lastUpdatedIdsPerSphinx = json_decode($cacheResult, true);
+		if (empty($lastUpdatedIdsPerSphinx))
+		{
+			KalturaLog::debug("failed decoding sphinx last updated ids, not using query cache");
+			return false;
+		}
+
+		list($filteredLastUpdatedIdsPerSphinx, $filteredHosts) = self::filterLastUpdatedIdsAndHosts($dataSources, $lastUpdatedIdsPerSphinx);
+		return self::getPrefferedSphinxIndexByWeight($filteredLastUpdatedIdsPerSphinx, $filteredHosts);
 	}
-	
-	protected static function getStickySessionKey() 
+
+	protected static function getStickySessionKey()
 	{
 		$ksObject = kCurrentContext::$ks_object;
 
@@ -251,7 +242,7 @@ class DbManager
 
 			$preferredIndexByLag = -1;
 			if ($preferredIndex === false)
-				$preferredIndexByLag = self::getSphinxConnIndexByLag($sphinxDS);
+				$preferredIndexByLag = self::getSphinxConnIndexByLastUpdatedId($sphinxDS);
 
 			list(self::$sphinxConnection, self::$connIndex) = self::connectFallbackLogic(
 				array('DbManager', 'getSphinxConnectionInternal'), 
@@ -273,29 +264,68 @@ class DbManager
 
 	/**
 	 * @param $dataSources
+	 * @param $lastUpdatedIdsPerSphinx
+	 * @return array
 	 */
-	protected static function initAllowedSphinxHosts($dataSources)
+	protected static function filterLastUpdatedIdsAndHosts($dataSources, $lastUpdatedIdsPerSphinx)
 	{
-		if (!empty(self::$allowedSphinxHosts))
-			return;
+		$filteredLastUpdatedIdsPerSphinx = array();
+		$filteredHosts = array();
 
 		foreach ($dataSources as $key => $datasource)
 		{
-			if (isset(self::$config['datasources'][$datasource]['connection']['dsn']))
+			if (!isset(self::$config['datasources'][$datasource]['connection']['dsn']))
+				continue;
+
+			list($mysql, $connection) = explode(':', self::$config['datasources'][$datasource]['connection']['dsn']);
+			preg_match('/host=(.*?);/', $connection, $matches);
+			if (!$matches || !$matches[1])
+				continue;
+
+			$currentHost = $matches[1];
+			if (array_key_exists($currentHost, $lastUpdatedIdsPerSphinx) && $lastUpdatedIdsPerSphinx[$currentHost])
 			{
-				list($mysql, $connection) = explode(':', self::$config['datasources'][$datasource]['connection']['dsn']);
-				$arguments = explode(';', $connection);
-				foreach ($arguments as $argument)
-				{
-					list($argumentName, $argumentValue) = explode('=', $argument);
-					if (strtolower($argumentName) == 'host')
-					{
-						self::$allowedSphinxHosts[$key] = $argumentValue;
-						break;
-					}
-				}
+				$filteredLastUpdatedIdsPerSphinx[] = $lastUpdatedIdsPerSphinx[$currentHost];
+				$filteredHosts[$currentHost] = $key;
 			}
 		}
+		return array($filteredLastUpdatedIdsPerSphinx, $filteredHosts);
+	}
+
+	/**
+	 * @param $filteredLastUpdatedIdsPerSphinx
+	 * @param $filteredHosts
+	 * @param $lastUpdatedIdsPerSphinx
+	 * @return bool
+	 */
+	protected static function getPrefferedSphinxIndexByWeight($filteredLastUpdatedIdsPerSphinx, $filteredHosts)
+	{
+		$max = max(array_values($filteredLastUpdatedIdsPerSphinx));
+
+		$baseRatio = 20;
+		$weights = array();
+
+		// calculate weight for each sphinx last updated id
+		foreach ($filteredHosts as $currentHost => $key)
+		{
+			$weight = intval($baseRatio + ($max - max(time() - $filteredLastUpdatedIdsPerSphinx[$currentHost], 0)) / ($max + 1) * 100);
+			$weights[$currentHost] = $weight;
+		}
+
+		$preferredWeight = rand(0, array_sum($weights));
+		foreach ($weights as $currentHost => $weight)
+		{
+			$preferredWeight -= $weight;
+			if ($preferredWeight <= 0)
+			{
+				$preferredIndex = $filteredHosts[$currentHost];
+				KalturaLog::debug("Sphinx with best lag chosen [" . $currentHost . "] in datasource index [" . $preferredIndex . "]");
+				return $preferredIndex;
+			}
+		}
+
+		KalturaLog::debug("no sphinx was chosen by best last updated id");
+		return false;
 	}
 
 	private static function getSphinxConnectionInternal($key, $connectTimeout)
