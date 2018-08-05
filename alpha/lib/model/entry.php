@@ -3911,9 +3911,36 @@ public function copyTemplate($copyPartnerId = false, $template)
 			return;
 
 		$parentCategoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($parentEntry->getId());
+		$categoryIds = array();
+		$mapCategoryEntryStatus = array();
 		$parentCategoryIdsSearchData = array();
+		$categoryPrivacyByContextsSearchData = array();
 		foreach ($parentCategoryEntries as $parentCategoryEntry)
+		{
 			self::getCategoryEntryElasticSearchData($parentCategoryEntry, $parentCategoryEntry->getStatus(), $parentCategoryIdsSearchData);
+			$categoryIds[] = $parentCategoryEntry->getCategoryId();
+			$mapCategoryEntryStatus[$parentCategoryEntry->getCategoryId()] = $parentCategoryEntry->getStatus();
+		}
+
+		if(count($categoryIds))
+		{
+			$categories = categoryPeer::retrieveByPKs($categoryIds);
+			$privacyByContextCategoryEntryStatuses = array(CategoryEntryStatus::ACTIVE);
+			if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
+			{
+				$privacyByContextCategoryEntryStatuses[] = CategoryEntryStatus::PENDING;
+			}
+
+			foreach ($categories as $category)
+			{
+				$categoryEntryStatus = $mapCategoryEntryStatus[$category->getId()];
+				if (in_array($categoryEntryStatus, $privacyByContextCategoryEntryStatuses))
+				{
+					self::getCategoryPrivacyByContextsSearchData($category, $categoryPrivacyByContextsSearchData);
+				}
+			}
+			$parentEntryPrivacyContexts = self::getCategoriesPrivacyByContextsSearchData($categoryPrivacyByContextsSearchData, $this->getPartnerId());
+		}
 
 		$parentCategoryIdsSearchData = array_unique($parentCategoryIdsSearchData);
 		$parentCategoryIdsSearchData = array_values($parentCategoryIdsSearchData);
@@ -3927,15 +3954,17 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'kuser_id' => $parentEntry->getKuserId(),
 			'creator_kuser_id' => $parentEntry->getCreatorKuserId(),
 			'categories_ids' => $parentCategoryIdsSearchData,
+			'privacy_by_contexts' => $parentEntryPrivacyContexts
 		);
 	}
 
 	protected function addCategoriesToObjectParams(&$body)
 	{
 		$categoryEntries = categoryEntryPeer::selectByEntryId($this->getId());
-		list($categoryIdsSearchData, $categoryNamesSearchData) = $this->getCategoriesElasticSearchData($categoryEntries);
+		list($categoryIdsSearchData, $categoryNamesSearchData, $categoryPrivacyByContextSearchData) = $this->getCategoriesElasticSearchData($categoryEntries);
 		$body['categories_ids'] = $categoryIdsSearchData;
 		$body['categories_names'] = $categoryNamesSearchData;
+		$body['privacy_by_contexts'] = $categoryPrivacyByContextSearchData;
 	}
 
 	protected function getCategoriesElasticSearchData($categoryEntries)
@@ -3944,6 +3973,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 		$mapCategoryEntryStatus = array();
 		$categoryIdsSearchData = array();
 		$categoryNamesSearchData = array();
+		$categoryPrivacyByContextSearchData = array();
 		foreach ($categoryEntries as $categoryEntry)
 		{
 			/** @var categoryEntry $categoryEntry */
@@ -3955,10 +3985,21 @@ public function copyTemplate($copyPartnerId = false, $template)
 		if(count($categoryIds))
 		{
 			$categories = categoryPeer::retrieveByPKs($categoryIds);
+			$privacyByContextCategoryEntryStatuses = array(CategoryEntryStatus::ACTIVE);
+			if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
+			{
+				$privacyByContextCategoryEntryStatuses[] = CategoryEntryStatus::PENDING;
+			}
+
 			foreach ($categories as $category)
 			{
 				$fullName = $category->getFullName();
-				self::getCategoryNamesSearchData($fullName, $mapCategoryEntryStatus[$category->getId()], $category->getName(), $categoryNamesSearchData);
+				$categoryEntryStatus = $mapCategoryEntryStatus[$category->getId()];
+				self::getCategoryNamesSearchData($fullName, $categoryEntryStatus, $category->getName(), $categoryNamesSearchData);
+				if (in_array($categoryEntryStatus, $privacyByContextCategoryEntryStatuses))
+				{
+					self::getCategoryPrivacyByContextsSearchData($category, $categoryPrivacyByContextSearchData);
+				}
 			}
 		}
 
@@ -3967,7 +4008,8 @@ public function copyTemplate($copyPartnerId = false, $template)
 		$categoryNamesSearchData = array_unique($categoryNamesSearchData);
 		$categoryNamesSearchData = array_values($categoryNamesSearchData);
 
-		return array($categoryIdsSearchData, $categoryNamesSearchData);
+		$entryPrivacyContexts = self::getCategoriesPrivacyByContextsSearchData($categoryPrivacyByContextSearchData, $this->getPartnerId());
+		return array($categoryIdsSearchData, $categoryNamesSearchData, $entryPrivacyContexts);
 	}
 
 	/**
@@ -3998,6 +4040,43 @@ public function copyTemplate($copyPartnerId = false, $template)
 			if($categoryId != $categoryEntry->getCategoryId())
 				$categoryIdsSearchArr[] = elasticSearchUtils::formatParentCategoryIdStatus($categoryId, $categoryEntryStatus);
 		}
+	}
+
+	protected static function getCategoryPrivacyByContextsSearchData($category, &$categoryPrivacyByContextSearchData)
+	{
+		$categoryPrivacy = $category->getPrivacy();
+		$categoryPrivacyContexts = $category->getPrivacyContexts();
+		if ($categoryPrivacyContexts)
+		{
+			$categoryPrivacyContexts = explode(',', $categoryPrivacyContexts);
+			foreach ($categoryPrivacyContexts as $categoryPrivacyContext)
+			{
+				if (trim($categoryPrivacyContext) == '')
+				{
+					$categoryPrivacyContext = kEntitlementUtils::DEFAULT_CONTEXT;
+				}
+
+				if (!isset($categoryPrivacyByContextSearchData[$categoryPrivacyContext]) || $categoryPrivacyByContextSearchData[$categoryPrivacyContext] > $categoryPrivacy)
+				{
+					$categoryPrivacyByContextSearchData[trim($categoryPrivacyContext)] = $categoryPrivacy;
+				}
+			}
+		}
+		else
+		{
+			$categoryPrivacyByContextSearchData[kEntitlementUtils::DEFAULT_CONTEXT] = PrivacyType::ALL;
+		}
+	}
+
+	protected static function getCategoriesPrivacyByContextsSearchData(&$categoryPrivacyByContextSearchData, $partnerId)
+	{
+		$entryPrivacyContexts = array();
+		foreach ($categoryPrivacyByContextSearchData as $categoryPrivacyContext => $privacy)
+		{
+			$entryPrivacyContexts[] = $categoryPrivacyContext . kEntitlementUtils::TYPE_SEPERATOR . $privacy;
+		}
+
+		return kEntitlementUtils::addPrivacyContextsPrefix($entryPrivacyContexts, $partnerId);
 	}
 
 	protected static function getCategoryNamesSearchData($categoryFullName, $categoryEntryStatus, $categoryName, &$categoryNameSearchArr)
