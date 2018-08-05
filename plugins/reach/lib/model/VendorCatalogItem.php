@@ -64,16 +64,10 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	
 	public function getKsExpiry()
 	{
-		$ksExpiry = $this->getTurnAroundTime();
+		$ksExpiry = $this->getTurnAroundTime() * 2;
 		
-		switch ($ksExpiry)
-		{
-			case VendorServiceTurnAroundTime::BEST_EFFORT:
-				return dateUtils::DAY * 7;
-			
-			default:
-				return $ksExpiry * 2;
-		}
+		//Minimum KS expiry should be set 7 days
+		return max($ksExpiry, dateUtils::DAY * 7);
 	}
 
 } // VendorCatalogItem
