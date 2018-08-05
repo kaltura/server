@@ -116,7 +116,7 @@ class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEn
 		$body['query'] = $mainBool->getFinalQuery();
 		$params['body'] = $body;
 		//order categories by updated at
-		$params['body']['sort'] = array('updated_at');
+		$params['body']['sort'] = array('updated_at' => 'desc');
 		$elasticClient = new elasticClient();
 		$results = $elasticClient->search($params, true);
 		$categories = $results['hits']['hits'];
