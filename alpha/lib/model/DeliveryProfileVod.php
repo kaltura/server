@@ -414,7 +414,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		
 		//If bitrates are equal return the first flavor to maintain the order of the original array
 		//(make order compatible with php 7)
-		return $flavor1['index'] - $flavor2['index'];
+		return $flavor2['index'] - $flavor1['index'];
 	}
 	
 	private function compareAudio($flavor1, $flavor2)
@@ -455,7 +455,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		if(in_array($audioCodec2, $dolbyAudioCodecList))
 			return 1;
 		
-		return $flavor1['index'] - $flavor2['index'];
+		return $flavor2['index'] - $flavor1['index'];
 	}
 	
 	/**
@@ -489,8 +489,10 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 				}
 			}
 		}
-	
+		
+		KalturaLog::debug("FlavorArrayOrder = [" . print_r($flavors, true));
 		uasort($flavors, array($this,'flavorCmpFunction'));
+		KalturaLog::debug("FlavorArrayOrder = [" . print_r($flavors, true));
 	
 		return $flavors;
 	}
