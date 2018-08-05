@@ -193,28 +193,31 @@ class DbManager
 	 * @param $dataSources
 	 * @return bool|mixed
 	 */
-	protected static function getSphinxConnIndexByLastUpdatedId($dataSources)
+	protected static function getSphinxConnIndexByLastUpdatedAt($dataSources)
 	{
-		$memcache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_KEYS);
-		if (!$memcache)
-			return false;
-
-		$cacheResult = $memcache->get(kQueryCache::SPHINX_LAG_KEY);
-		if ($cacheResult === false)
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_KEYS);
+		if (!$cache)
 		{
-			KalturaLog::debug("failed to get sphinx_lag_key from memcache, not using query cache");
+			KalturaLog::debug("could not retrieve query cache keys form cache, no sphinx index will be chosen by updatedAt");
 			return false;
 		}
 
-		$lastUpdatedIdsPerSphinx = json_decode($cacheResult, true);
-		if (empty($lastUpdatedIdsPerSphinx))
+		$cacheResult = $cache->get(kQueryCache::SPHINX_LAG_KEY);
+		if (!$cacheResult)
 		{
-			KalturaLog::debug("failed decoding sphinx last updated ids, not using query cache");
+			KalturaLog::debug("failed to get sphinx_lag_key from memcache, no sphinx index will be chosen by updatedAt");
 			return false;
 		}
 
-		list($filteredLastUpdatedIdsPerSphinx, $filteredHosts) = self::filterLastUpdatedIdsAndHosts($dataSources, $lastUpdatedIdsPerSphinx);
-		return self::getPrefferedSphinxIndexByWeight($filteredLastUpdatedIdsPerSphinx, $filteredHosts);
+		$lastUpdatedAtPerSphinx = json_decode($cacheResult, true);
+		if (empty($lastUpdatedAtPerSphinx))
+		{
+			KalturaLog::debug("failed decoding sphinx last updated ids, no sphinx index will be chosen by updatedAt");
+			return false;
+		}
+
+		list($filteredLastUpdatedIdsPerSphinx, $filteredHosts) = self::filterLastUpdatedAtAndHosts($dataSources, $lastUpdatedAtPerSphinx);
+		return self::getPreferredSphinxIndexByWeight($filteredLastUpdatedIdsPerSphinx, $filteredHosts);
 	}
 
 	protected static function getStickySessionKey()
@@ -242,7 +245,7 @@ class DbManager
 
 			$preferredIndexByLag = -1;
 			if ($preferredIndex === false)
-				$preferredIndexByLag = self::getSphinxConnIndexByLastUpdatedId($sphinxDS);
+				$preferredIndexByLag = self::getSphinxConnIndexByLastUpdatedAt($sphinxDS);
 
 			list(self::$sphinxConnection, self::$connIndex) = self::connectFallbackLogic(
 				array('DbManager', 'getSphinxConnectionInternal'), 
@@ -264,12 +267,12 @@ class DbManager
 
 	/**
 	 * @param $dataSources
-	 * @param $lastUpdatedIdsPerSphinx
+	 * @param $lastUpdatedAtPerSphinx
 	 * @return array
 	 */
-	protected static function filterLastUpdatedIdsAndHosts($dataSources, $lastUpdatedIdsPerSphinx)
+	protected static function filterLastUpdatedAtAndHosts($dataSources, $lastUpdatedAtPerSphinx)
 	{
-		$filteredLastUpdatedIdsPerSphinx = array();
+		$filteredLastUpdatedAtPerSphinx = array();
 		$filteredHosts = array();
 
 		foreach ($dataSources as $key => $datasource)
@@ -277,30 +280,28 @@ class DbManager
 			if (!isset(self::$config['datasources'][$datasource]['connection']['dsn']))
 				continue;
 
-			list($mysql, $connection) = explode(':', self::$config['datasources'][$datasource]['connection']['dsn']);
-			preg_match('/host=(.*?);/', $connection, $matches);
+			preg_match('/host=(.*?);/', self::$config['datasources'][$datasource]['connection']['dsn'], $matches);
 			if (!$matches || !$matches[1])
 				continue;
 
 			$currentHost = $matches[1];
-			if (array_key_exists($currentHost, $lastUpdatedIdsPerSphinx) && $lastUpdatedIdsPerSphinx[$currentHost])
+			if (array_key_exists($currentHost, $lastUpdatedAtPerSphinx) && $lastUpdatedAtPerSphinx[$currentHost])
 			{
-				$filteredLastUpdatedIdsPerSphinx[] = $lastUpdatedIdsPerSphinx[$currentHost];
+				$filteredLastUpdatedAtPerSphinx[$currentHost] = $lastUpdatedAtPerSphinx[$currentHost];
 				$filteredHosts[$currentHost] = $key;
 			}
 		}
-		return array($filteredLastUpdatedIdsPerSphinx, $filteredHosts);
+		return array($filteredLastUpdatedAtPerSphinx, $filteredHosts);
 	}
 
 	/**
-	 * @param $filteredLastUpdatedIdsPerSphinx
+	 * @param $filteredLastUpdatedAtPerSphinx
 	 * @param $filteredHosts
-	 * @param $lastUpdatedIdsPerSphinx
 	 * @return bool
 	 */
-	protected static function getPrefferedSphinxIndexByWeight($filteredLastUpdatedIdsPerSphinx, $filteredHosts)
+	protected static function getPreferredSphinxIndexByWeight($filteredLastUpdatedAtPerSphinx, $filteredHosts)
 	{
-		$max = max(array_values($filteredLastUpdatedIdsPerSphinx));
+		$max = max(array_values($filteredLastUpdatedAtPerSphinx));
 
 		$baseRatio = 20;
 		$weights = array();
@@ -308,7 +309,8 @@ class DbManager
 		// calculate weight for each sphinx last updated id
 		foreach ($filteredHosts as $currentHost => $key)
 		{
-			$weight = intval($baseRatio + ($max - max(time() - $filteredLastUpdatedIdsPerSphinx[$currentHost], 0)) / ($max + 1) * 100);
+			$lag = time() - $filteredLastUpdatedAtPerSphinx[$currentHost];
+			$weight = intval($baseRatio + ($max - max($lag, 0)) / ($max + 1) * 100);
 			$weights[$currentHost] = $weight;
 		}
 
