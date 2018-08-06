@@ -1,5 +1,18 @@
 # Naos 14.3.0 #
 
+## create CAPTIONS_EDITOR_ROLE for partner 0 ##
+- Issue Type: Task
+- Issue ID: KMS-18227
+
+### Configuration ###
+	None.
+
+#### Deployment Scripts ####
+
+	Run 'php /opt/kaltura/app/deployment/updates/scripts/2018_08_06_create_captions_editor_application_role.php'
+
+# Naos 14.3.0 #
+
 ## Allow media-server partner to get reports##
 Issue Type:  New Feature
 Issue ID: PLAT-9120
