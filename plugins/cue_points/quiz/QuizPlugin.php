@@ -592,18 +592,10 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_ANSWER));
 		$numOfAnswers = 0;
 		$answers = CuePointPeer::doSelect($c);
-		foreach ($answers as $answer)
-		{
-			/**
-			 * @var AnswerCuePoint $answer
-			 */
-			$quizUserEntryId = $answer->getQuizUserEntryId();
-			if ($this->isQuizUserEntrySubmitted($quizUserEntryId))
-			{
-				$numOfAnswers++;
-			}
-		}
-		$res['count_all'] = $numOfAnswers;
+
+		$answers = $this->filterSubmittedAnswers($answers);
+
+		$res['count_all'] = count($answers);
 		return array($res);
 	}
 	
@@ -764,30 +756,29 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 				}
 			}
 			$answers = CuePointPeer::doSelect($c);
+
+			$answers = $this->filterSubmittedAnswers($answers);
+
 			$numOfAnswers = 0;
 			foreach ($answers as $answer)
 			{
 				/**
 				 * @var AnswerCuePoint $answer
 				 */
-				$quizUserEntryId = $answer->getQuizUserEntryId();
-				if ($this->isQuizUserEntrySubmitted($quizUserEntryId))
+				$numOfAnswers++;
+				$optionalAnswers = $question->getOptionalAnswers();
+				$correct = false;
+				foreach ($optionalAnswers as $optionalAnswer)
 				{
-					$numOfAnswers++;
-					$optionalAnswers = $question->getOptionalAnswers();
-					$correct = false;
-					foreach ($optionalAnswers as $optionalAnswer)
+					/**
+					 * @var kOptionalAnswer $optionalAnswer
+					 */
+					if ($optionalAnswer->getKey() === $answer->getAnswerKey())
 					{
-						/**
-						 * @var kOptionalAnswer $optionalAnswer
-						 */
-						if ($optionalAnswer->getKey() === $answer->getAnswerKey())
+						if ($optionalAnswer->getIsCorrect())
 						{
-							if ($optionalAnswer->getIsCorrect())
-							{
-								$numOfCorrectAnswers++;
-								break;
-							}
+							$numOfCorrectAnswers++;
+							break;
 						}
 					}
 				}
@@ -837,19 +828,28 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		return $kuserIds;
 	}
 	
-	//TODO: When cuePoints will be indexed in the sphinx we won't need this anymore since we'll be able to query the shpinx for this info
-	protected function isQuizUserEntrySubmitted($quizUserEntryId)
+	protected function filterSubmittedAnswers($answers)
 	{
-		$ans = false;
-		$quizUserEntry = UserEntryPeer::retrieveByPK($quizUserEntryId);
-		if ($quizUserEntry)
+		$answersByUserEntryId = array();
+		foreach ($answers as $answer)
 		{
-			if ($quizUserEntry->getStatus() == self::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED))
-			{
-				$ans = true;
-			}
+			$answersByUserEntryId[$answer->getQuizUserEntryId()][] = $answer;
 		}
-		return $ans;
+
+		$quizUserEntries = UserEntryPeer::retrieveByPKs(array_keys($answersByUserEntryId));
+
+		$result = array();
+		foreach ($quizUserEntries as $quizUserEntry)
+		{
+			if ($quizUserEntry->getStatus() != self::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED))
+			{
+				continue;
+			}
+
+			$result = array_merge($result, $answersByUserEntryId[$quizUserEntry->getId()]);
+		}
+
+		return $result;
 	}
 
 	/**
