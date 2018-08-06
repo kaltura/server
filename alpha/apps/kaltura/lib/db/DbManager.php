@@ -216,8 +216,8 @@ class DbManager
 			return false;
 		}
 
-		list($filteredLastUpdatedIdsPerSphinx, $filteredHosts) = self::filterLastUpdatedAtAndHosts($dataSources, $lastUpdatedAtPerSphinx);
-		return self::getPreferredSphinxIndexByWeight($filteredLastUpdatedIdsPerSphinx, $filteredHosts);
+		list($hostToLastUpdatedAt, $hostToIndex) = self::filterLastUpdatedAtAndHosts($dataSources, $lastUpdatedAtPerSphinx);
+		return self::getPreferredSphinxIndexByWeight($hostToLastUpdatedAt, $hostToIndex);
 	}
 
 	protected static function getStickySessionKey()
@@ -272,8 +272,8 @@ class DbManager
 	 */
 	protected static function filterLastUpdatedAtAndHosts($dataSources, $lastUpdatedAtPerSphinx)
 	{
-		$filteredLastUpdatedAtPerSphinx = array();
-		$filteredHosts = array();
+		$hostToLastUpdatedAt = array();
+		$hostToIndex = array();
 
 		foreach ($dataSources as $key => $datasource)
 		{
@@ -287,29 +287,29 @@ class DbManager
 			$currentHost = $matches[1];
 			if (array_key_exists($currentHost, $lastUpdatedAtPerSphinx) && $lastUpdatedAtPerSphinx[$currentHost])
 			{
-				$filteredLastUpdatedAtPerSphinx[$currentHost] = $lastUpdatedAtPerSphinx[$currentHost];
-				$filteredHosts[$currentHost] = $key;
+				$hostToLastUpdatedAt[$currentHost] = $lastUpdatedAtPerSphinx[$currentHost];
+				$hostToIndex[$currentHost] = $key;
 			}
 		}
-		return array($filteredLastUpdatedAtPerSphinx, $filteredHosts);
+		return array($hostToLastUpdatedAt, $hostToIndex);
 	}
 
 	/**
-	 * @param $filteredLastUpdatedAtPerSphinx
-	 * @param $filteredHosts
+	 * @param $hostToLastUpdatedAt
+	 * @param $hostToIndex
 	 * @return bool
 	 */
-	protected static function getPreferredSphinxIndexByWeight($filteredLastUpdatedAtPerSphinx, $filteredHosts)
+	protected static function getPreferredSphinxIndexByWeight($hostToLastUpdatedAt, $hostToIndex)
 	{
-		$max = max(array_values($filteredLastUpdatedAtPerSphinx));
+		$max = max(array_values($hostToLastUpdatedAt));
 
 		$baseRatio = 20;
 		$weights = array();
 
 		// calculate weight for each sphinx last updated id
-		foreach ($filteredHosts as $currentHost => $key)
+		foreach ($hostToIndex as $currentHost => $key)
 		{
-			$lag = time() - $filteredLastUpdatedAtPerSphinx[$currentHost];
+			$lag = time() - $hostToLastUpdatedAt[$currentHost];
 			$weight = intval($baseRatio + ($max - max($lag, 0)) / ($max + 1) * 100);
 			$weights[$currentHost] = $weight;
 		}
@@ -320,9 +320,8 @@ class DbManager
 			$preferredWeight -= $weight;
 			if ($preferredWeight <= 0)
 			{
-				$preferredIndex = $filteredHosts[$currentHost];
-				KalturaLog::debug("Sphinx with best lag chosen [" . $currentHost . "] in datasource index [" . $preferredIndex . "]");
-				return $preferredIndex;
+				KalturaLog::debug("Sphinx with best lag chosen [" . $currentHost . "] in datasource index [" . $hostToIndex[$currentHost] . "]");
+				return $hostToIndex[$currentHost];
 			}
 		}
 
