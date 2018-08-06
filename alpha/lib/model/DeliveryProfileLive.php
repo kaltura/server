@@ -125,7 +125,9 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		if (empty($liveEntryServerNodes))
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$entryId] is not broadcasting on stream type [$requestedServerType]");
 
-		usort($liveEntryServerNodes, function ($a, $b) {return $a->weight - $b->weight;});
+		//sort the entryServerNode array by weight from the heaviest to lowest
+		usort($liveEntryServerNodes, function ($a, $b) {return $b->weight - $a->weight;});
+		
 		$liveEntryServerNode = array_shift($liveEntryServerNodes); // after sort first is the primary
 		$this->liveStreamConfig->setUrl($this->getHttpUrl($liveEntryServerNode->serverNode));
 		$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
