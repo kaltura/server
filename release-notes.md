@@ -1,4 +1,4 @@
-# Naos 14.3.0 #
+# Naos 14.4.0 #
 
 ## create CAPTIONS_EDITOR_ROLE for partner 0 ##
 - Issue Type: Task
