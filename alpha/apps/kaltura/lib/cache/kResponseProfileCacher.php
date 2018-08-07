@@ -179,7 +179,10 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				{
 					foreach($value as $key => $item)
 					{
-						KalturaLog::debug("Key [$key] Server[" . $item->{self::CACHE_VALUE_HOSTNAME} . "] Session[" . $item->{self::CACHE_VALUE_SESSION} . "] Time[" . date('Y-m-d H:i:s', $item->{self::CACHE_VALUE_TIME}) . "]");
+						if($item)
+							KalturaLog::debug("Key [$key] Server[" . $item->{self::CACHE_VALUE_HOSTNAME} . "] Session[" . $item->{self::CACHE_VALUE_SESSION} . "] Time[" . date('Y-m-d H:i:s', $item->{self::CACHE_VALUE_TIME}) . "]");
+						else
+							KalturaLog::debug("Could not extract value for key [$key]");
 					}
 				}
 				else
@@ -189,7 +192,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				return $value;
 			}
 		}
-		KalturaLog::debug("Key [$keys] not found");
+		KalturaLog::debug("Key [" . print_r($keys, true) . "] not found");
 			
 		return null;
 	}
@@ -204,7 +207,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		
 			if($store instanceof kCouchbaseCacheWrapper)
 			{
-				$invalidationCaches = $store->multiGetAndTouch($invalidationKeys);
+				$invalidationCaches = $store->multiGetAndTouch($invalidationKeys, true);
 			}
 			else
 			{

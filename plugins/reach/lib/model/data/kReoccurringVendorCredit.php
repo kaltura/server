@@ -147,4 +147,18 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 	{
 		return $this->periodEndDate;
 	}
+	
+	public function getSyncCreditStartDate()
+	{
+		if(!$this->getLastSyncTime() && !$this->periodStartDate)
+			return $this->getFromDate();
+		
+		if(!$this->getLastSyncTime() && $this->periodStartDate)
+			return $this->periodStartDate;
+		
+		if($this->getLastSyncTime() && $this->periodStartDate && $this->getLastSyncTime() < $this->periodStartDate)
+			return $this->periodStartDate;
+		
+		return parent::getSyncCreditStartDate();
+	}
 }

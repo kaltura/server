@@ -360,6 +360,8 @@ abstract class KalturaObject implements IApiObject
 	
 		if($srcObj instanceof IRelatedObject && $responseProfile && $responseProfile->relatedProfiles)
 		{
+			$responseProfile->validateNestedObjects();
+
 			if(KalturaResponseProfileCacher::start($this, $srcObj, $responseProfile))
 			{
 				return;

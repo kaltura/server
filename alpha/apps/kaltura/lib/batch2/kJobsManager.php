@@ -758,7 +758,7 @@ class kJobsManager
 				}
 				
 				$downloadPath = myContentStorage::getFSUploadsPath() . '/' . $thumbAsset->getId() . '.jpg';
-				if (KCurlWrapper::getDataFromFile($url, $downloadPath))
+				if (KCurlWrapper::getDataFromFile($url, $downloadPath, null, true))
 				{
 					kFileSyncUtils::moveFromFile($downloadPath, $srcSyncKey);
 					list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, false, false);
