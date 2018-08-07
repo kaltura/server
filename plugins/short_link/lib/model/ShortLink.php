@@ -109,12 +109,12 @@ class ShortLink extends BaseShortLink implements IBaseObject {
 		throw new Exception("Could not find unique id for short link");
 	}
 
-	public function save(PropelPDO $con = null)
+	public function save(PropelPDO $con = null, $skipReload = false)
 	{
 		if ($this->isNew())
 			$this->setId($this->calculateId());
 			
-		parent::save($con);
+		parent::save($con, $skipReload);
 	}
 		
 } // ShortLink
