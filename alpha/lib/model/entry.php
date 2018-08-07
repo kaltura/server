@@ -287,7 +287,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 		// make sure this entry is saved before calling updateAllMetadataVersionsRelevantForEntry, since fixMetadata retrieves the entry from the DB
 		// and checks its data path which was modified above.
-		$res = parent::save( $con );
+		$res = parent::save($con, $skipReload);
 		if ($is_new)
 		{
 			// when retrieving the entry - ignore thr filter - when in partner has moderate_content =1 - the entry will have status=3 and will fail the retrieveByPk
@@ -301,7 +301,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		{
 			// calling the funciton with null will cause it to use the $this->data_content
 			$this->setDataContent( null );
-			$res = parent::save( $con );
+			$res = parent::save($con, $skipReload);
 		}
 		
 		// the fix should be done whether the status is READY or ERROR_CONVERTING
@@ -315,7 +315,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				try{
 					myMetadataUtils::updateAllMetadataVersionsRelevantForEntry ( $this);
 					$this->resetUpdateWhenReady();
-					$res = parent::save( $con );
+					$res = parent::save($con, $skipReload);
 				}
 				catch(Exception $e)
 				{
