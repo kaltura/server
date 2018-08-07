@@ -79,7 +79,7 @@ class kPluginableEnumsManager
 	
 	public static function getCoreMap($type = null)
 	{
-		if(!count(self::$coreMap))
+		if(self::$coreMap && !count(self::$coreMap))
 			self::loadCoreMap();
 			
 		if(is_null($type))
@@ -93,7 +93,7 @@ class kPluginableEnumsManager
 	
 	public static function getApiMap($type = null)
 	{
-		if(!count(self::$apiMap))
+		if(self::$apiMap && !count(self::$apiMap))
 			self::loadApiMap();
 			
 		if(is_null($type))
