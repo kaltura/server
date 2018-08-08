@@ -825,11 +825,16 @@ class ThumbAssetService extends KalturaAssetService
 	 */
 	public function addFromUrlAction($entryId, $url)
 	{
+
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-			
-		
+
+		$res = KCurlWrapper::getContent($url);
+		if (!$res)
+		{
+			throw new KalturaAPIException(KalturaErrors::URL_NOT_FOUND, $url);
+		}
 		
 		$ext = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
 		
@@ -842,7 +847,8 @@ class ThumbAssetService extends KalturaAssetService
 		$dbThumbAsset->save();
 		
 		$syncKey = $dbThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		kFileSyncUtils::file_put_contents($syncKey, KCurlWrapper::getContent($url));
+
+		kFileSyncUtils::file_put_contents($syncKey, $res);
 		
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		list($width, $height, $type, $attr) = getimagesize($finalPath);
