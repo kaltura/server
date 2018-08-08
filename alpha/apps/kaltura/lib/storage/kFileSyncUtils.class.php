@@ -1712,23 +1712,4 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return false;
 	}
 
-	public static function safeFileGetContents($url)
-	{
-		self::restoreWrappers();
-		$res = file_get_contents($url);
-		self::unRegisterWrappers();
-		return $res;
-	}
-
-	public static function restoreWrappers()
-	{
-		stream_wrapper_restore('http');
-		stream_wrapper_restore('https');
-	}
-	public static function unRegisterWrappers()
-	{
-		stream_wrapper_unregister('https');
-		stream_wrapper_unregister('http');
-	}
-
 }

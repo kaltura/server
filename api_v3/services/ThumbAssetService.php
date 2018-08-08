@@ -842,7 +842,7 @@ class ThumbAssetService extends KalturaAssetService
 		$dbThumbAsset->save();
 		
 		$syncKey = $dbThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		kFileSyncUtils::file_put_contents($syncKey, kFileSyncUtils::safeFileGetContents($url));
+		kFileSyncUtils::file_put_contents($syncKey, KCurlWrapper::getContent($url));
 		
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		list($width, $height, $type, $attr) = getimagesize($finalPath);
