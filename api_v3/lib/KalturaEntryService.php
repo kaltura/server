@@ -1669,8 +1669,13 @@ class KalturaEntryService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::PERMISSION_DENIED_TO_UPDATE_ENTRY);
 			}
 		}*/
-		
-		myEntryUtils::updateThumbnailFromFile($dbEntry, $url, $fileSyncType);
+
+		$content = KCurlWrapper::getContent($url);
+		if (!$content)
+		{
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_DOWNLOAD_FAILED, $url);
+		}
+		myEntryUtils::updateThumbnailFromContent($dbEntry, $content, $fileSyncType);
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$entry->fromObject($dbEntry, $this->getResponseProfile());
@@ -1694,8 +1699,7 @@ class KalturaEntryService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::PERMISSION_DENIED_TO_UPDATE_ENTRY);
 			}
 		}*/
-		
-		myEntryUtils::updateThumbnailFromFile($dbEntry, $fileData["tmp_name"], $fileSyncType);
+		myEntryUtils::updateThumbnailFromContent($dbEntry, file_get_contents($fileData["tmp_name"]), $fileSyncType);
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$entry->fromObject($dbEntry, $this->getResponseProfile());
