@@ -141,6 +141,8 @@ class APIErrors
 	
 	const ENTRY_ID_NOT_FOUND = "ENTRY_ID_NOT_FOUND;ENTRY_ID;Entry id \"@ENTRY_ID@\" not found";
 
+	const URL_NOT_FOUND = "URL_NOT_FOUND;URL;Url \"@URL@\" not found";
+
 	const SUPPORTED_FLAVOR_NOT_EXIST = "SUPPORTED_FLAVOR_NOT_EXIST;ENTRY_ID;Could not find supported flavor for entry id \"@ENTRY_ID@\" ";
 
 	const GIVEN_ID_NOT_SUPPORTED = "GIVEN_ID_NOT_SUPPORTED;;The action is not supported for the given id";
