@@ -293,7 +293,7 @@ class ks extends kSessionBase
 	
 	public function toSecureString()
 	{
-		list($ksVersion, $secret) = $this->getKSVersionAndSecret($this->partner_id);
+		list($ksVersion, $secret,) = $this->getKSVersionAndSecret($this->partner_id);
 		return kSessionBase::generateSession(
 			$ksVersion,
 			$secret,
@@ -731,20 +731,31 @@ class ks extends kSessionBase
 			$cacheStore = kCacheManager::getCache($cacheSection);
 			if (!$cacheStore)
 				continue;
-			
-			$cacheStore->set($cacheKey, array($partner->getAdminSecret(), $partner->getSecret(), $ksVersion));
+			$cacheStore->set($cacheKey, array($partner->getAdminSecret(), $partner->getSecret(), $ksVersion,$this->getAdditionalAdminSecrets($partner)));
 		}
-		
-		return array($ksVersion, $partner->getAdminSecret());
+		return array($ksVersion, $partner->getAdminSecret(),$this->getAdditionalAdminSecrets($partner));
 	}
-	
+
 	protected function logError($msg)
 	{
 		KalturaLog::err($msg);
 	}
-		
+
 	public function kill()
 	{
 		invalidSessionPeer::invalidateKs($this);
+	}
+
+	/**
+	 * @param Partner $partner
+	 * @return null|string
+	 */
+	protected function getAdditionalAdminSecrets($partner)
+	{
+		$adminSecrets = null;
+		$activeSecrets = $partner->getEnableAdditionalAdminSecrets();
+		if (!is_null($activeSecrets))
+			$adminSecrets = implode(',', $activeSecrets);
+		return $adminSecrets;
 	}
 }

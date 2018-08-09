@@ -230,14 +230,14 @@ class kSessionBase
 		}
 		
 		$partnerId = reset($parts);
-		$salt = $this->getAdminSecret($partnerId);
-		if (!$salt)
+		$secret = $this->getAdminSecret($partnerId);
+		if (!$secret)
 		{
 			$this->logError("Couldn't get admin secret for partner [$partnerId]");
 			return null;
 		}
-
-		if (sha1($salt . $real_str) !== $hash)
+		$match = $this->matchAdminSecretV1($hash,$real_str,$partnerId,$secret);
+		if (!$match)
 		{
 			$this->logError("Hash [$hash] doesn't match the sha1 on the salt on partner [$partnerId].");
 			return false;
@@ -339,8 +339,8 @@ class kSessionBase
 		if (!$secrets)
 			return null;
 		
-		list($adminSecret, $userSecret, $ksVersion) = $secrets;
-		return array($ksVersion, $adminSecret);
+		list($adminSecret, $userSecret, $ksVersion,$additionalAdminSecrets) = $secrets;
+		return array($ksVersion, $adminSecret,$additionalAdminSecrets);
 	}
 	
 	protected function getAdminSecret($partnerId)
@@ -348,8 +348,17 @@ class kSessionBase
 		$versionAndSecret = $this->getKSVersionAndSecret($partnerId);
 		if (!$versionAndSecret)
 			return null;
-		list($ksVersion, $adminSecret) = $versionAndSecret;
+		list( , $adminSecret, ) = $versionAndSecret;
 		return $adminSecret;
+	}
+
+	protected function getAdditionalAdminSecret($partnerId)
+	{
+		$versionAndSecret = $this->getKSVersionAndSecret($partnerId);
+		if (!$versionAndSecret)
+			return null;
+		list( , ,$additionalAdminSecret) = $versionAndSecret;
+		return $additionalAdminSecret;
 	}
 	
 	protected function isKSInvalidated()
@@ -557,18 +566,12 @@ class kSessionBase
 			$this->logError("Couldn't get secret for partner [$partnerId].");
 			return null;						// admin secret not found, can't decrypt the KS
 		}
-				
-		$decKs = self::aesDecrypt($adminSecret, $encKs);
-		$decKs = rtrim($decKs, "\0");
-		
-		$hash = substr($decKs, 0, self::SHA1_SIZE);
-		$fields = substr($decKs, self::SHA1_SIZE);
-		if ($hash !== sha1($fields, true))
+		list($hash, $fields, $match) = $this->matchAdminSecretV2($encKs,$partnerId,$adminSecret);
+		if(!$match)
 		{
 			$this->logError("Hash [$hash] doesn't match sha1 on partner [$partnerId].");
 			return false;						// invalid signature
 		}
-		
 		$rand = substr($fields, 0, self::RANDOM_SIZE);
 		$fields = substr($fields, self::RANDOM_SIZE);
 		
@@ -626,5 +629,70 @@ class kSessionBase
 	public function getHash()
 	{
 		return $this->hash;
+	}
+
+	/**
+	 * @param $encKs
+	 * @param $partnerID
+	 * @param string $adminSecret
+	 * @return array
+	 */
+	private function matchAdminSecretV2($encKs,$partnerID,$adminSecret)
+	{
+		$hash = '';
+		$fields = '';
+		$match = false;
+		$adminSecretsArray = $this->combineAllAdminSecrets($partnerID, $adminSecret);
+		foreach ($adminSecretsArray as $adminSecret) {
+			$decKs = self::aesDecrypt($adminSecret, $encKs);
+			$decKs = rtrim($decKs, "\0");
+
+			$hash = substr($decKs, 0, self::SHA1_SIZE);
+			$fields = substr($decKs, self::SHA1_SIZE);
+			if ($hash === sha1($fields, true))
+			{
+				$match = true;
+				break;
+			}
+		}
+		return array($hash, $fields, $match);
+	}
+
+	/**
+	 * @param $adminSecretsArray
+	 * @param $hash
+	 * @param $real_str
+	 * @param $partnerID
+	 * @param $adminSecret
+	 * @return bool
+	 */
+	private function matchAdminSecretV1($hash,$real_str,$partnerID,$adminSecret)
+	{
+		$match = false;
+		$adminSecretsArray = $this->combineAllAdminSecrets($partnerID, $adminSecret);
+		foreach ($adminSecretsArray as $adminSecret) {
+			if (sha1($adminSecret . $real_str) === $hash)
+			{
+				$match = true;
+				break;
+			}
+		}
+		return $match;
+	}
+
+	/**
+	 * @param $partnerID
+	 * @param $adminSecret
+	 * @return array
+	 */
+	private function combineAllAdminSecrets($partnerID, $adminSecret)
+	{
+		$additionalAdminSecrets = $this->getAdditionalAdminSecret($partnerID);
+		if ($additionalAdminSecrets) {
+			$adminSecretsArray = explode(',', $additionalAdminSecrets);
+			array_unshift($adminSecretsArray, $adminSecret);
+		} else
+			$adminSecretsArray = array($adminSecret);
+		return $adminSecretsArray;
 	}
 }
