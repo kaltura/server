@@ -156,6 +156,11 @@ class thumbnailAction extends sfAction
 		if(($vid_slices != -1 && $vid_slices <= 0) || !is_numeric($vid_slices))
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'vid_slices must be positive');
 
+		if($vid_slices > 0 && ($vid_slices * $width) >= 65500)
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, '$width * $vid_slices must be between 0 and 65500');
+		if($vid_slices > 0 && ($vid_slices * $height) >= 65500)
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'height * $vid_slices must be between 0 and 65500');
+
 		if ($upload_token_id)
 		{
 			$upload_token = UploadTokenPeer::retrieveByPK($upload_token_id);
