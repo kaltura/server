@@ -525,4 +525,20 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	{
 		return $this->getFromCustomData("supplementaryAssetsFilter");
 	}
+	
+	public function setRegionPrices($v)
+	{
+		$this->putInCustomData("regionPrices", $v);
+	}
+	
+	public function getRegionPrices()
+	{
+		return $this->getFromCustomData("regionPrices");
+	}
+
+	public function getRegionPrice($region)
+	{
+		$prices = $this->getRegionPrices();
+		return isset($prices[$region]) ? $prices[$region] : false;
+	}
 }

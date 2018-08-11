@@ -13,6 +13,7 @@ class kApiCacheBase
 	const ECF_IP = 'ip';
 	const ECF_COORDINATES = 'coordinates';
 	const ECF_ANONYMOUS_IP = 'anonymousIp';
+	const ECF_CDN_REGION = 'cdnRegion';
 	
 	// extra cache fields data
 	const ECFD_IP_HTTP_HEADER = 'httpHeader';

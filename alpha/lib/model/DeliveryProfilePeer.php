@@ -477,18 +477,48 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @return The matching DeliveryProfile if exists, or null otherwise
 	 */
 	protected static function selectByDeliveryAttributes($deliveries, DeliveryProfileDynamicAttributes $deliveryAttributes) {
+		$fullSupport = array();
 		$partialSupport = null;
 		
 		// find either a fully supported deliveryProfile or the first partial supported one
 		foreach ($deliveries as $delivery) {
 			$result = $delivery->supportsDeliveryDynamicAttributes($deliveryAttributes);
 			if ($result == DeliveryProfile::DYNAMIC_ATTRIBUTES_FULL_SUPPORT)
-				return $delivery;
+				$fullSupport[] = $delivery;
 			else if (!$partialSupport && $result == DeliveryProfile::DYNAMIC_ATTRIBUTES_PARTIAL_SUPPORT)
 				$partialSupport = $delivery;
 		}
+
+		$c = count($fullSupport);
 		
-		return $partialSupport;
+		if (!$c)
+			return $partialSupport;
+		
+		if ($c == 1)
+			return reset($fullSupport);
+
+		$ipGeo = kGeoCoderManager::getGeoCoder();
+		$country = $ipGeo->getCountry(infraRequestUtils::getRemoteAddress());
+		$region = kGeoUtils::countryToRegion($country);
+		
+		$minWeight = PHP_INT_MAX;
+		$minDP = null;
+		foreach ($fullSupport as $delivery)
+		{
+			$weight = $delivery->getRegionPrice($region);
+			if ($weight == false)
+				$weight = PHP_INT_MAX;
+			
+			if ($weight < $minWeight)
+			{
+				$minWeight = $weight;
+				$minDP = $delivery;
+			}
+		}
+
+		kApiCache::addExtraField(kApiCache::ECF_CDN_REGION, kApiCache::COND_MATCH, array($region));
+		
+		return $minDP ? $minDP : reset($fullSupport);
 	}
 	
 	/**
