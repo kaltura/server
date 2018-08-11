@@ -435,4 +435,8 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 		return array("entryDistribution:entryId=".strtolower($this->getEntryId()));
 	}
 
-} // EntryDistribution
+	public function getSphinxMatchOptimizations() {
+		$objectName = $this->getIndexObjectName();
+		return $objectName::getSphinxMatchOptimizations($this);
+	}
+}} // EntryDistribution

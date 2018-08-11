@@ -69,6 +69,7 @@ class EntryDistributionIndex extends BaseIndexObject
 				'error_type' => 'errorType',
 				'error_number' => 'errorNumber',
 				'last_report' => 'lastReport',
+				'sphinx_match_optimizations' => 'sphinxMatchOptimizations',
 			);
 		}
 		return self::$fieldsMap;
@@ -105,6 +106,7 @@ class EntryDistributionIndex extends BaseIndexObject
 				'next_report' => IIndexable::FIELD_TYPE_DATETIME,
 				'str_entry_id' => IIndexable::FIELD_TYPE_STRING,
 				'int_entry_id' => IIndexable::FIELD_TYPE_UINT,
+				'sphinx_match_optimizations' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
 		return self::$typesMap;
@@ -268,6 +270,9 @@ class EntryDistributionIndex extends BaseIndexObject
 	public static function getSphinxOptimizationMap()
 	{
 		return array(
+			array("DIRTY%s","EntryDistribution.dirty_status"),
+			array("SS%s","EntryDistribution.sun_status"),
+			array("EDS%s","EntryDistribution.status"),
 		);
 	}
 
@@ -275,6 +280,9 @@ class EntryDistributionIndex extends BaseIndexObject
 	public static function getSphinxOptimizationValues()
 	{
 		return array(
+			array("DIRTY%s","getDirtyStatus"),
+			array("SS%s","getSunStatus"),
+			array("EDS%s","getStatus"),
 		);
 	}
 
