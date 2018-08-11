@@ -50,6 +50,6 @@ class kGeoUtils
 	{
 		$geoCoder = kGeoCoderManager::getGeoCoder();
 		$country = $geoCoder->getCountry(infraRequestUtils::getRemoteAddress());
-		return array(self::countryToRegion($country));
+		return self::countryToRegion($country);
 	}
 }
