@@ -497,9 +497,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		if ($c == 1)
 			return reset($fullSupport);
 
-		$ipGeo = kGeoCoderManager::getGeoCoder();
-		$country = $ipGeo->getCountry(infraRequestUtils::getRemoteAddress());
-		$region = kGeoUtils::countryToRegion($country);
+		$region = kGeoUtils::getCDNRegionFromIP();
 		
 		$minWeight = PHP_INT_MAX;
 		$minDP = null;

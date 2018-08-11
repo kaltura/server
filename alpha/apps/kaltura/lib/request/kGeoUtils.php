@@ -45,4 +45,11 @@ class kGeoUtils
 		
 		return "unknown";
 	}
+	
+	public static function getCDNRegionFromIP()
+	{
+		$geoCoder = kGeoCoderManager::getGeoCoder();
+		$country = $geoCoder->getCountry(infraRequestUtils::getRemoteAddress());
+		return array(self::countryToRegion($country));
+	}
 }

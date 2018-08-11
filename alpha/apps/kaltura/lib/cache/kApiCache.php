@@ -305,9 +305,7 @@ class kApiCache extends kApiCacheBase
 			return array(infraRequestUtils::getRemoteAddress());
 			
 		case self::ECF_CDN_REGION:
-			$geoCoder = kGeoCoderManager::getGeoCoder();
-			$country = $geoCoder->getCountry(infraRequestUtils::getRemoteAddress());
-			return array(kGeoUtils::countryToRegion($country));
+			return array(kGeoUtils::getCDNRegionFromIP());
 		}
 
 		return array();
