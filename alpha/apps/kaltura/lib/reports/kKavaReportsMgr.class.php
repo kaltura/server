@@ -18,6 +18,7 @@ class kKavaReportsMgr extends kKavaBase
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
 	const METRIC_VIEW_PERIOD_PLAY_TIME = 'sum_view_period';
+	const METRIC_VIEW_PLAY_TIME_SEC = 'sum_view_time';
 	const METRIC_AVG_PLAY_TIME = 'avg_time_viewed';
 	const METRIC_PLAYER_IMPRESSION_RATIO = 'load_play_ratio';
 	const METRIC_AVG_DROP_OFF = 'avg_view_drop_off';
@@ -57,6 +58,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_STORAGE_SIZE_BYTES = 'total_storage';
 	const METRIC_QUARTILE_PLAY_TIME_SEC = 'quartile_play_time';
 	const METRIC_VIEW_PERIOD_PLAY_TIME_SEC = 'view_period_play_time';
+	const METRIC_VIEW_BUFFER_TIME_SEC = 'view_buffer_time';
+	const METRIC_VIEW_PERIOD_BUFFER_TIME_SEC = 'view_period_buffer_time';
 	
 	// non druid metrics
 	const METRIC_PEAK_STORAGE_MB = 'peak_storage';
@@ -133,6 +136,7 @@ class kKavaReportsMgr extends kKavaBase
 	const DAY_START_TIME = 'T00:00:00';
 	const DAY_END_TIME = 'T23:59:59';
 	const BASE_DATE_ID = '2013-12-01';	// the date from which to start aggragating usage data
+	const BASE_TIMESTAMP = '2013-12-01T00:00:00Z';
 	
 	// limits
 	const MAX_RESULT_SIZE = 12000;
@@ -1016,7 +1020,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_EDIT_CLICKED,
 		self::EVENT_TYPE_SHARE_CLICKED,
 		self::EVENT_TYPE_DOWNLOAD_CLICKED,
-		self::EVENT_TYPE_REPORT_CLICKED
+		self::EVENT_TYPE_REPORT_CLICKED,
+		self::EVENT_TYPE_VIEW,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -1088,6 +1093,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_BUFFER_TIME_RATIO => self::METRIC_BUFFER_TIME_RATIO,
 		self::METRIC_AVG_BITRATE => self::METRIC_AVG_BITRATE,
 		self::METRIC_SUM_PRICE => self::METRIC_SUM_PRICE,
+		self::METRIC_VIEW_BUFFER_TIME_SEC => self::METRIC_VIEW_BUFFER_TIME_SEC,
+		self::METRIC_VIEW_PLAY_TIME_SEC => self::METRIC_VIEW_PLAY_TIME_SEC,
 	);
 	
 	protected static $transform_metrics = array(
@@ -1343,9 +1350,13 @@ class kKavaReportsMgr extends kKavaBase
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD), 
 			self::getLongSumAggregator(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
 		
-		self::$aggregations_def[self::METRIC_BUFFER_TIME_SEC] = self::getFilteredAggregator(
+		self::$aggregations_def[self::METRIC_VIEW_BUFFER_TIME_SEC] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW), 
+			self::getDoubleSumAggregator(self::METRIC_VIEW_BUFFER_TIME_SEC, self::METRIC_BUFFER_TIME_SEC));
+
+		self::$aggregations_def[self::METRIC_VIEW_PERIOD_BUFFER_TIME_SEC] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD), 
-			self::getDoubleSumAggregator(self::METRIC_BUFFER_TIME_SEC, self::METRIC_BUFFER_TIME_SEC));
+			self::getDoubleSumAggregator(self::METRIC_VIEW_PERIOD_BUFFER_TIME_SEC, self::METRIC_BUFFER_TIME_SEC));
 
 		self::$aggregations_def[self::METRIC_BITRATE_SUM] = self::getFilteredAggregator(
 			self::getAndFilter(array(
@@ -1434,6 +1445,11 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_POST_AGGR => self::getConstantFactorPostAggr(
 				self::METRIC_DURATION_DELETED_MSEC, self::METRIC_DURATION_DELETED_SEC, '-1000'));	// duration is negative for delete events	
 
+		self::$metrics_def[self::METRIC_VIEW_PLAY_TIME_SEC] = array(
+			self::DRUID_AGGR => array(self::EVENT_TYPE_VIEW),
+			self::DRUID_POST_AGGR => self::getConstantFactorPostAggr(
+				self::METRIC_VIEW_PLAY_TIME_SEC, self::EVENT_TYPE_VIEW, '10'));	
+		
 		// field ratio metrics
 		self::$metrics_def[self::METRIC_PLAYTHROUGH_RATIO] = array(
 			self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_100),
@@ -1450,10 +1466,10 @@ class kKavaReportsMgr extends kKavaBase
 				self::EVENT_TYPE_PLAYER_IMPRESSION));
 
 		self::$metrics_def[self::METRIC_BUFFER_TIME_RATIO] = array(
-			self::DRUID_AGGR => array(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_BUFFER_TIME_SEC),
+			self::DRUID_AGGR => array(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_VIEW_PERIOD_BUFFER_TIME_SEC),
 			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
 				self::METRIC_BUFFER_TIME_RATIO,
-				self::METRIC_BUFFER_TIME_SEC,
+				self::METRIC_VIEW_PERIOD_BUFFER_TIME_SEC,
 				self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC));
 
 		self::$metrics_def[self::METRIC_AVG_BITRATE] = array(
@@ -1570,6 +1586,11 @@ class kKavaReportsMgr extends kKavaBase
 		$month = substr($date_id, 4, 2);
 		$day = substr($date_id, 6, 2);
 		return gmmktime(0, 0, 0, $month, $day, $year);
+	}
+	
+	protected static function formatUnixtime($time)
+	{
+		return gmdate('Y-m-d\TH:i:s\Z', $time);
 	}
 
 	protected static function timestampToHourId($timestamp, $tz)
@@ -1722,13 +1743,39 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		$offset = self::fixTimeZoneOffset($input_filter->timeZoneOffset);
 		$input_filter->timeZoneOffset = $offset;
+
+		$report_interval = isset($report_def[self::REPORT_INTERVAL]) ? 
+			$report_def[self::REPORT_INTERVAL] : 
+			self::INTERVAL_START_TO_END;
+		
+		if ($input_filter->from_date && $input_filter->to_date &&
+			!($input_filter->from_day && $input_filter->to_day))
+		{
+			switch ($report_interval)
+			{
+			case self::INTERVAL_START_TO_END:
+				$from_date = self::formatUnixtime($input_filter->from_date);
+				$to_date = self::formatUnixtime($input_filter->to_date);
+				break;
+
+			case self::INTERVAL_BASE_TO_START:
+				$from_date = self::BASE_TIMESTAMP;
+				$to_date = self::formatUnixtime($input_filter->from_date);
+				break;
+
+			case self::INTERVAL_BASE_TO_END:
+				$from_date = self::BASE_TIMESTAMP;
+				$to_date = self::formatUnixtime($input_filter->to_date);
+				break;
+			}
+
+			return array($from_date . '/' . $to_date);
+		}
+
 		$timezone_offset = sprintf('%s%02d:%02d', 
 			$offset <= 0 ? '+' : '-', 
 			intval(abs($offset) / 60), abs($offset) % 60);
 		
-		$report_interval = isset($report_def[self::REPORT_INTERVAL]) ? 
-			$report_def[self::REPORT_INTERVAL] : 
-			self::INTERVAL_START_TO_END;
 		switch ($report_interval)
 		{
 		case self::INTERVAL_START_TO_END:
@@ -1737,10 +1784,7 @@ class kKavaReportsMgr extends kKavaBase
 			break;
 			
 		case self::INTERVAL_BASE_TO_START:
-			$to_date_id = $report_interval == self::INTERVAL_BASE_TO_START ? 
-				$input_filter->from_day : 
-				$input_filter->to_day;
-			$to_date = self::dateIdToDateTime($to_date_id);
+			$to_date = self::dateIdToDateTime($input_filter->from_day);
 			$to_date->sub(new DateInterval('P1D'));
 			$to_date = $to_date->format('Y-m-d');
 			$from_date = self::BASE_DATE_ID;
@@ -1768,8 +1812,7 @@ class kKavaReportsMgr extends kKavaBase
 			$to_date .= self::DAY_END_TIME . $timezone_offset;
 		}
 	
-		$intervals = array($from_date . '/' . $to_date);
-		return $intervals;
+		return array($from_date . '/' . $to_date);
 	}
 
 	protected static function getPlaybackContextCategoriesIds($partner_id, $playback_context, $is_ancestor)

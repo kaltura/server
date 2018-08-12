@@ -24,11 +24,15 @@ class Form_VendorCatalogItemPricing extends ConfigureSubForm
 	
 	public function populateFromObject($pricing)
 	{
-		//If user does not have permissions to access the pricing data this will cause PHP notices
-		if($pricing)
+		if ($pricing)
 		{
-			$this->setDefault('pricePerUnit',  $pricing->pricePerUnit);
-			$this->setDefault('priceFunction',  $pricing->priceFunction);
+			$this->setDefault('pricePerUnit', $pricing->pricePerUnit);
+			$this->setDefault('priceFunction', $pricing->priceFunction);
+		}
+		else
+		{
+			$this->setDefault('pricePerUnit', 'N\A');
+			$this->setDefault('priceFunction', 'N\A');
 		}
 	}
 	

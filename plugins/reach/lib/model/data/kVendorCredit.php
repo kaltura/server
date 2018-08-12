@@ -85,7 +85,8 @@ class kVendorCredit
 	 */
 	public function setFromDate($fromDate)
 	{
-		$this->fromDate = $fromDate;
+		$beginOfDay = strtotime("today", $fromDate);
+		$this->fromDate = $beginOfDay;
 	}
 
 	/**
@@ -139,6 +140,11 @@ class kVendorCredit
 
 	public function addAdditionalCriteria(Criteria $c)
 	{
+	}
+
+	public function isSynced()
+	{
+		return (intval(time() / 86400) == (intval($this->lastSyncTime / 86400)));
 	}
 
 	public function syncCredit($reachProfileId)
