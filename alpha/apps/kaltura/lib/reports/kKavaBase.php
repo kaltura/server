@@ -38,6 +38,8 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_MEDIA_TYPE = 'mediaType';
 	const DIMENSION_SOURCE_TYPE = 'sourceType';
 	const DIMENSION_STATUS = 'status';
+	const DIMENSION_SERVICE_TYPE = 'serviceType';
+	const DIMENSION_SERVICE_FEATURE = 'serviceFeature';
 
 	// metrics
 	const METRIC_COUNT = 'count';
