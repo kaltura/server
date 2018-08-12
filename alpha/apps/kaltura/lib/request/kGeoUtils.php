@@ -257,9 +257,9 @@ class kGeoUtils
 		return $km <= $radius;
 	}
 	
-	public static function getCDNRegionFromIP($ip = null)
+	public static function getCDNRegionFromIP($getCoderType = null, $ip = null)
 	{
-		$geoCoder = kGeoCoderManager::getGeoCoder();
+		$geoCoder = kGeoCoderManager::getGeoCoder($getCoderType);
 		$country = $geoCoder->getCountry($ip ? $ip : infraRequestUtils::getRemoteAddress());
 		return isset(self::$countryRegion[$country]) ? self::$countryRegion[$country] : "unknown"; 
 	}
