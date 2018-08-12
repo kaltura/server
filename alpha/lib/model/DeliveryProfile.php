@@ -526,19 +526,31 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		return $this->getFromCustomData("supplementaryAssetsFilter");
 	}
 	
-	public function setRegionPrices($v)
+	public function setPricingProfile($v)
 	{
-		$this->putInCustomData("regionPrices", $v);
+		$this->putInCustomData("pricingProfile", $v);
 	}
 	
-	public function getRegionPrices()
+	public function getPricingProfile()
 	{
-		return $this->getFromCustomData("regionPrices");
+		return $this->getFromCustomData("pricingProfile");
 	}
 
 	public function getRegionPrice($region)
 	{
-		$prices = $this->getRegionPrices();
+		$pricingProfile = $this->getPricingProfile();
+		if (!$pricingProfile)
+			return false;
+		
+		$pricingProfiles = kConf::getMap('cdn_pricing_profiles');
+		if (!$pricingProfiles)
+			return false;
+		
+		if (!isset($pricingProfiles[$pricingProfile]))
+			return false;
+		
+		$prices = $pricingProfiles[$pricingProfile];
+		
 		return isset($prices[$region]) ? $prices[$region] : false;
 	}
 }
