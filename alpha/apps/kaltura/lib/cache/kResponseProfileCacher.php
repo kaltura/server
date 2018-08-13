@@ -189,6 +189,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 				{
 					KalturaLog::debug("Key [$keys] Server[" . $value->{self::CACHE_VALUE_HOSTNAME} . "] Session[" . $value->{self::CACHE_VALUE_SESSION} . "] Time[" . date('Y-m-d H:i:s', $value->{self::CACHE_VALUE_TIME}) . "]");
 				}
+				
 				return $value;
 			}
 		}
@@ -231,7 +232,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 					}
 				}
 				
-				$invalidationTime = max($invalidationTimes);
+				$invalidationTime = count($invalidationTimes) ? max($invalidationTimes) : 0;
 				$invalidationTime += kConf::get('cache_invalidation_threshold', 'local', 10);
 				if(intval($invalidationTime) >= intval($time))
 				{
