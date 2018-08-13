@@ -190,7 +190,6 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 					KalturaLog::debug("Key [$keys] Server[" . $value->{self::CACHE_VALUE_HOSTNAME} . "] Session[" . $value->{self::CACHE_VALUE_SESSION} . "] Time[" . date('Y-m-d H:i:s', $value->{self::CACHE_VALUE_TIME}) . "]");
 				}
 				
-				KalturaLog::debug("Value is " . print_r($value, true));
 				return $value;
 			}
 		}
