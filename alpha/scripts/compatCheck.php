@@ -1,7 +1,6 @@
 <?php
 
 require_once(dirname(__FILE__) . '/../apps/kaltura/lib/request/kSessionBase.class.php');
-require_once(dirname(__FILE__) . '/../config/kConf.php');
 
 ini_set("memory_limit", "2048M");
 
@@ -18,37 +17,37 @@ define('DB_NAME','kaltura');
 define('IP_ADDRESS_SALT', '');
 
 $PS2_TESTED_XML_ACTIONS = array(
-		'extwidget.playmanifest',
-		'keditorservices.getmetadata',
-		'keditorservices.getentryinfo',
-		'partnerservices2.executeplaylist',
-		'partnerservices2.getentries',
-		'partnerservices2.getallentries',
-		'partnerservices2.getentry',
-		'partnerservices2.getentryroughcuts',
-		'partnerservices2.getkshow',
-		'partnerservices2.getuiconf',
-		'partnerservices2.getwidget',
-		'partnerservices2.listentries',
-		'partnerservices2.listkshows',
-		'partnerservices2.listplaylists',
-		'extwidget.embediframejs',
-		'extwidget.embedplaykitjs'
-		);
+	'extwidget.playmanifest',
+	'keditorservices.getmetadata',
+	'keditorservices.getentryinfo',
+	'partnerservices2.executeplaylist',
+	'partnerservices2.getentries',
+	'partnerservices2.getallentries',
+	'partnerservices2.getentry',
+	'partnerservices2.getentryroughcuts',
+	'partnerservices2.getkshow',
+	'partnerservices2.getuiconf',
+	'partnerservices2.getwidget',
+	'partnerservices2.listentries',
+	'partnerservices2.listkshows',
+	'partnerservices2.listplaylists',
+	'extwidget.embediframejs',
+	'extwidget.embedplaykitjs'
+);
 
 $PS2_TESTED_BIN_ACTIONS = array(
-		'extwidget.serveflavor',
-		'extwidget.kwidget',
-		'extwidget.thumbnail',
-		'extwidget.download',
-		'keditorservices.flvclipper',
-		'extwidget.raw',
-		);
+	'extwidget.serveflavor',
+	'extwidget.kwidget',
+	'extwidget.thumbnail',
+	'extwidget.download',
+	'keditorservices.flvclipper',
+	'extwidget.raw',
+);
 
 $APIV3_TESTED_SERVICES = array(
-		'*',
+	'*',
 
-		// Entries services:
+	// Entries services:
 //		'baseEntry',
 //		'data',
 //		'document',
@@ -61,26 +60,26 @@ $APIV3_TESTED_SERVICES = array(
 );
 
 $APIV3_TESTED_ACTIONS = array(
-		'syndicationFeed.execute',			// api_v3/getFeed.php
-		'playlist.execute',
-		'*.is',
-		'*.get',
-		'*.list',
-		'*.count',
-		'*.serve',
-		'*.goto',
-		'*.search',
-		'*.startwidgetsession'
-		);
+	'syndicationFeed.execute',			// api_v3/getFeed.php
+	'playlist.execute',
+	'*.is',
+	'*.get',
+	'*.list',
+	'*.count',
+	'*.serve',
+	'*.goto',
+	'*.search',
+	'*.startwidgetsession'
+);
 
 $APIV3_BLOCKED_ACTIONS = array(
-		'*.getexclusive',						// not read-only
-		'report.geturlforreportascsv',			// contains random
-		'aspera_aspera.getfaspurl',				// contains random
-		'widevine_widevinedrm.getlicense',		// contains random
-		);
+	'*.getexclusive',						// not read-only
+	'report.geturlforreportascsv',			// contains random
+	'aspera_aspera.getfaspurl',				// contains random
+	'widevine_widevinedrm.getlicense',		// contains random
+);
 
-$KS_PATTERNS = array('/\/ks\/([a-zA-Z0-9+_\-]+=*)/', '/&ks=([a-zA-Z0-9+\/_\-]+=*)/', '/\?ks=([a-zA-Z0-9+\/_\-]+=*)/');
+$KS_PATTERNS = array('/\/ks\/([a-zA-Z0-9+_\-]+=*)/', '/&ks=([a-zA-Z0-9+\/_\-]+=*)/', '/\?ks=([a-zA-Z0-9+\/_\-]+=*)/', '/<ks>([a-zA-Z0-9+\/_\-]+=*)<\/ks>/');
 
 // compare modes
 define('CM_XML', 0);
@@ -102,14 +101,14 @@ class PartnerSecretPool
 
 	public function __construct()
 	{
-	    $this->link = mysqli_connect(DB_HOST_NAME, DB_USER_NAME, DB_PASSWORD, DB_NAME, DB_PORT)
+		$this->link = mysqli_connect(DB_HOST_NAME, DB_USER_NAME, DB_PASSWORD, DB_NAME, DB_PORT)
 		or die('Error: Could not connect: ' . mysqli_connect_error() . "\n");
 		mysqli_select_db($this->link,DB_NAME) or die("Error: Could not select 'kaltura' database\n");
 	}
 
 	public function __destruct()
 	{
-	    mysqli_close($this->link);
+		mysqli_close($this->link);
 	}
 
 	public function getPartnerSecret($partnerId)
@@ -160,53 +159,53 @@ function extendKsExpiry($ks)
 }
 
 function print_r_reverse($in) {
-    $lines = explode("\n", trim($in));
-    if (trim($lines[0]) != 'Array') {
-        // bottomed out to something that isn't an array
-        return $in;
-    } else {
-        if (!isset($lines[1]))
-            return 'Array';
+	$lines = explode("\n", trim($in));
+	if (trim($lines[0]) != 'Array') {
+		// bottomed out to something that isn't an array
+		return $in;
+	} else {
+		if (!isset($lines[1]))
+			return 'Array';
 
-        // this is an array, lets parse it
-        if (preg_match('/(\s{5,})\(/', $lines[1], $match)) {
-            // this is a tested array/recursive call to this function
-            // take a set of spaces off the beginning
-            $spaces = $match[1];
-            $spaces_length = strlen($spaces);
-            $lines_total = count($lines);
-            for ($i = 0; $i < $lines_total; $i++) {
-                if (substr($lines[$i], 0, $spaces_length) == $spaces) {
-                    $lines[$i] = substr($lines[$i], $spaces_length);
-                }
-            }
-        }
-        array_shift($lines); // Array
-        array_shift($lines); // (
-        array_pop($lines); // )
-        $in = implode("\n", $lines);
-        // make sure we only match stuff with 4 preceding spaces (stuff for this array and not a nested one)
-        preg_match_all('/^\s{4}\[(.+?)\] \=\> /m', $in, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
-        $pos = array();
-        $previous_key = '';
-        $in_length = strlen($in);
-        // store the following in $pos:
-        // array with key = key of the parsed array's item
-        // value = array(start position in $in, $end position in $in)
-        foreach ($matches as $match) {
-            $key = $match[1][0];
-            $start = $match[0][1] + strlen($match[0][0]);
-            $pos[$key] = array($start, $in_length);
-            if ($previous_key != '') $pos[$previous_key][1] = $match[0][1] - 1;
-            $previous_key = $key;
-        }
-        $ret = array();
-        foreach ($pos as $key => $where) {
-            // recursively see if the parsed out value is an array too
-            $ret[$key] = print_r_reverse(substr($in, $where[0], $where[1] - $where[0]));
-        }
-        return $ret;
-    }
+		// this is an array, lets parse it
+		if (preg_match('/(\s{5,})\(/', $lines[1], $match)) {
+			// this is a tested array/recursive call to this function
+			// take a set of spaces off the beginning
+			$spaces = $match[1];
+			$spaces_length = strlen($spaces);
+			$lines_total = count($lines);
+			for ($i = 0; $i < $lines_total; $i++) {
+				if (substr($lines[$i], 0, $spaces_length) == $spaces) {
+					$lines[$i] = substr($lines[$i], $spaces_length);
+				}
+			}
+		}
+		array_shift($lines); // Array
+		array_shift($lines); // (
+		array_pop($lines); // )
+		$in = implode("\n", $lines);
+		// make sure we only match stuff with 4 preceding spaces (stuff for this array and not a nested one)
+		preg_match_all('/^\s{4}\[(.+?)\] \=\> /m', $in, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+		$pos = array();
+		$previous_key = '';
+		$in_length = strlen($in);
+		// store the following in $pos:
+		// array with key = key of the parsed array's item
+		// value = array(start position in $in, $end position in $in)
+		foreach ($matches as $match) {
+			$key = $match[1][0];
+			$start = $match[0][1] + strlen($match[0][0]);
+			$pos[$key] = array($start, $in_length);
+			if ($previous_key != '') $pos[$previous_key][1] = $match[0][1] - 1;
+			$previous_key = $key;
+		}
+		$ret = array();
+		foreach ($pos as $key => $where) {
+			// recursively see if the parsed out value is an array too
+			$ret[$key] = print_r_reverse(substr($in, $where[0], $where[1] - $where[0]));
+		}
+		return $ret;
+	}
 }
 
 function getSignedIpHeader($ipAddress)
@@ -237,16 +236,16 @@ function doCurl($url, $params = array(), $files = array(), $range = null, $reque
 	}
 	if (count($files) > 0)
 	{
-        foreach ($files as &$file) {
-            // The usage of the @filename API for file uploading is
-            // deprecated since PHP 5.5. CURLFile must be used instead.
-            if (PHP_VERSION_ID >= 50500) {
-                $file = new \CURLFile($file);
-            } else {
-                $file = "@" . $file; // let curl know its a file
-            }
-        }
-        curl_setopt($ch, CURLOPT_POSTFIELDS, array_merge($params, $files));
+		foreach ($files as &$file) {
+			// The usage of the @filename API for file uploading is
+			// deprecated since PHP 5.5. CURLFile must be used instead.
+			if (PHP_VERSION_ID >= 50500) {
+				$file = new \CURLFile($file);
+			} else {
+				$file = "@" . $file; // let curl know its a file
+			}
+		}
+		curl_setopt($ch, CURLOPT_POSTFIELDS, array_merge($params, $files));
 	}
 	else if ($params)
 	{
@@ -345,7 +344,7 @@ function xmlToArray($xmlstring)
 			$xmlstring = str_replace("</{$namespace}:", "</{$namespace}_", $xmlstring);
 		}
 	}
-	
+
 	// parse the xml
 	$xml = @simplexml_load_string($xmlstring);
 	$json = json_encode($xml);
@@ -388,62 +387,6 @@ function compareValues($newValue, $oldValue)
 	return $newValue == $oldValue;
 }
 
-function compareKS($newKsString, $oldKsString, $path)
-{
-	global $maxKsValidTimeDiff;
-
-	$errors = array();
-	if(!$newKsString && !$oldKsString)
-	{
-		return $errors;
-	}
-
-	$newKsObj = kSessionBase::getKSObject($newKsString);
-	$oldKsObj = kSessionBase::getKSObject($oldKsString);
-
-	if($newKsObj && !$oldKsObj)
-	{
-		$errors["$path"] = "field key has different value (path=$path new=$newKsString old $oldKsString couldn't get parsed)";
-		return $errors;
-	}
-
-	if($oldKsObj && !$newKsObj)
-	{
-		$errors["$path"] = "field ks has different value (path=$path new=$newKsString couldn't get parsed old $oldKsString)";
-		return $errors;
-	}
-
-	if(!$oldKsObj && !$newKsObj)
-	{
-		return $errors;
-	}
-
-	$errors = array_merge($errors, compareObjectFieldInternal($newKsObj, $oldKsObj, "$path", 'partner_id'));
-	$errors = array_merge($errors, compareObjectFieldInternal($newKsObj, $oldKsObj, "$path", 'type'));
-	$errors = array_merge($errors, compareObjectFieldInternal($newKsObj, $oldKsObj, "$path", 'user'));
-	$errors = array_merge($errors, compareObjectFieldInternal($newKsObj, $oldKsObj, "$path", 'privileges'));
-	$errors = array_merge($errors, compareObjectFieldInternal($newKsObj, $oldKsObj, "$path", 'master_partner_id'));
-	$errors = array_merge($errors, compareObjectFieldInternal($newKsObj, $oldKsObj, "$path", 'additional_data'));
-
-	if ($maxKsValidTimeDiff && abs($newKsObj->valid_until - $oldKsObj->valid_until) > $maxKsValidTimeDiff)
-	{
-		$errors["$path/valid_until"] = "field valid_until has different value (path=$path new=$newKsObj->valid_until old=$oldKsObj->valid_until)";
-	}
-
-	return $errors;
-}
-
-function compareObjectFieldInternal($objNew, $objOld, $path, $fieldName)
-{
-	$errors = array();
-	if (!compareValues($objNew->$fieldName, $objOld->$fieldName))
-	{
-		$errors["$path/$fieldName"] = "field valid_until has different value (path=$path new=$objNew->$fieldName old=$objOld->$fieldName)";
-	}
-
-	return $errors;
-}
-
 function compareArraysInternal($resultNew, $resultOld, $path)
 {
 	global $ID_FIELDS;
@@ -460,12 +403,7 @@ function compareArraysInternal($resultNew, $resultOld, $path)
 		}
 
 		$newValue = $resultNew[$key];
-
-		if($key == 'ks')
-		{
-			$errors = array_merge($errors, compareKS($newValue, $oldValue, $subPath));
-		}
-		else if (is_array($oldValue) && is_array($newValue))
+		if (is_array($oldValue) && is_array($newValue))
 		{
 			$errors = array_merge($errors, compareArrays($newValue, $oldValue, $subPath));
 		}
@@ -483,7 +421,6 @@ function compareArraysInternal($resultNew, $resultOld, $path)
 				{
 					$errors[$subPath] = "field $key has different value (path=$path new=$newValue old=$oldValue)";
 				}
-
 				if (in_array($key, $ID_FIELDS))
 					break;		// id is different, all other fields will be different as well
 			}
@@ -733,7 +670,7 @@ function getRequestHash($fullActionName, $paramsForHash)
 		"filter:uid",
 		"4:pager:uid",
 		"pager:uid",
-		);
+	);
 	foreach ($paramsToUnset as $paramToUnset)
 	{
 		unset($paramsForHash[$paramToUnset]);
@@ -795,7 +732,7 @@ function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParam
 	if ($compareMode == CM_BINARY)
 	{
 		$range = '0-262144';		// 256K
-		
+
 		// use GET
 		if ($postParams)
 		{
@@ -803,7 +740,7 @@ function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParam
 			{
 				$uri .= '?';
 			}
-			else 
+			else
 			{
 				$uri .= '&';
 			}
@@ -838,33 +775,33 @@ function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParam
 
 		switch ($compareMode)
 		{
-		case CM_WIDGET:
-			list($uncompOld, $apiResponseOld, $paramsOld) = parseWidget($resultOld);
-			list($uncompNew, $apiResponseNew, $paramsNew) = parseWidget($resultNew);
-			$errors = compareResults($apiResponseNew, $apiResponseOld);
-			if (countDifferences($uncompNew, $uncompOld) > MAX_BINARY_DIFFS)
-				$errors[] = 'Data does not match - size='.strlen($uncompNew);
-			if ($paramsOld != $paramsNew)
-				$errors[] = 'Params dont match - new='.$paramsNew.' old='.$paramsOld;
-			break;
-
-		case CM_BINARY:
-			$resultOld = normalizeResultBuffer($resultOld);
-			$resultNew = normalizeResultBuffer($resultNew);
-			if (strlen($resultNew) != strlen($resultOld))
-			{
-				$errors = array('Data does not match - newSize='.strlen($resultNew).' oldSize='.strlen($resultOld));
+			case CM_WIDGET:
+				list($uncompOld, $apiResponseOld, $paramsOld) = parseWidget($resultOld);
+				list($uncompNew, $apiResponseNew, $paramsNew) = parseWidget($resultNew);
+				$errors = compareResults($apiResponseNew, $apiResponseOld);
+				if (countDifferences($uncompNew, $uncompOld) > MAX_BINARY_DIFFS)
+					$errors[] = 'Data does not match - size='.strlen($uncompNew);
+				if ($paramsOld != $paramsNew)
+					$errors[] = 'Params dont match - new='.$paramsNew.' old='.$paramsOld;
 				break;
-			}
-			if (countDifferences($resultNew, $resultOld) <= MAX_BINARY_DIFFS)
-				$errors = array();
-			else
-				$errors = array('Data does not match - size='.strlen($resultNew));
-			break;
 
-		case CM_XML:
-			$errors = compareResults($resultNew, $resultOld);
-			break;
+			case CM_BINARY:
+				$resultOld = normalizeResultBuffer($resultOld);
+				$resultNew = normalizeResultBuffer($resultNew);
+				if (strlen($resultNew) != strlen($resultOld))
+				{
+					$errors = array('Data does not match - newSize='.strlen($resultNew).' oldSize='.strlen($resultOld));
+					break;
+				}
+				if (countDifferences($resultNew, $resultOld) <= MAX_BINARY_DIFFS)
+					$errors = array();
+				else
+					$errors = array('Data does not match - size='.strlen($resultNew));
+				break;
+
+			case CM_XML:
+				$errors = compareResults($resultNew, $resultOld);
+				break;
 		}
 
 		if (!count($errors))
@@ -1131,11 +1068,11 @@ function processMultiRequest($ipAddress, $parsedParams)
 
 	switch (shouldProcessRequest($fullActionName, $parsedParams))
 	{
-	case 'quit':
-		return true;
+		case 'quit':
+			return true;
 
-	case 'no':
-		return;
+		case 'no':
+			return;
 	}
 
 	$parsedParams['format'] = '2';		# XML
@@ -1196,11 +1133,11 @@ function processRequest($ipAddress, $parsedParams)
 
 	switch (shouldProcessRequest($fullActionName, $parsedParams))
 	{
-	case 'quit':
-		return true;
+		case 'quit':
+			return true;
 
-	case 'no':
-		return;
+		case 'no':
+			return;
 	}
 
 	ksort($parsedParams);
@@ -1225,11 +1162,11 @@ function processFeedRequest($ipAddress, $parsedParams)
 
 	switch (shouldProcessRequest($fullActionName, $parsedParams))
 	{
-	case 'quit':
-		return true;
+		case 'quit':
+			return true;
 
-	case 'no':
-		return;
+		case 'no':
+			return;
 	}
 
 	$parsedParams['nocache'] = '1';
@@ -1355,11 +1292,11 @@ function processPS2Request($ipAddress, $parsedParams)
 
 	switch (shouldProcessRequest($fullActionName, $parsedParams))
 	{
-	case 'quit':
-		return true;
+		case 'quit':
+			return true;
 
-	case 'no':
-		return;
+		case 'no':
+			return;
 	}
 
 	ksort($parsedParams);
@@ -1466,68 +1403,14 @@ function processGZipFile($apiLogPath, LogProcessor $logProcessor)
 	gzclose($handle);
 }
 
-function getHelpText()
-{
-	$helpText = "Usage:\n\tphp compatCheck [OPTIONS]".PHP_EOL;
-	$helpText.= "options".PHP_EOL;
-	$helpText.= "\t--serviceUrlOld".PHP_EOL;
-	$helpText.= "\t\tMandatory old service url".PHP_EOL;
-	$helpText.= "\t--serviceUrlNew".PHP_EOL;
-	$helpText.= "\t\tMandatory new service url".PHP_EOL;
-	$helpText.= "\t--apiLogPath".PHP_EOL;
-	$helpText.= "\t\tMandatory the input log for the api calls".PHP_EOL;
-	$helpText.= "\t--logFormat".PHP_EOL;
-	$helpText.= "\t\tMandatory format from : api_v3, ps2, feedids, uris".PHP_EOL;
-	$helpText.= "\t--startPosition".PHP_EOL;
-	$helpText.= "\t\tOptional start position".PHP_EOL;
-	$helpText.= "\t--endPosition".PHP_EOL;
-	$helpText.= "\t\tOptional end position".PHP_EOL;
-	$helpText.= "\t--maxTestsPerActionType".PHP_EOL;
-	$helpText.= "\t\tOptional max tests per action type".PHP_EOL;
-	$helpText.= "\t--extraRequestHeaders".PHP_EOL;
-	$helpText.= "\t\tOptional extra requests headers separated by ,".PHP_EOL;
-	$helpText.= "\t--maxKsValidTimeDiff".PHP_EOL;
-	$helpText.= "\t\tOptional max ms difference in ks valid until field".PHP_EOL;
-	$helpText.= "example:php /opt/kaltura/app/alpha/scripts/compatCheck.php --serviceUrlOld=pa-front-api1 --serviceUrlNew=pa-reports --apiLogPath=/data/logs/investigate/2015/04/21/ny-front-api10-kaltura_api_v3.log-2015-04-21-00-40.gz --logFormat=api_v3".PHP_EOL;
-	return $helpText;
-}
 // parse the command line
-$helpText = getHelpText();
-if ($argc < 2)
-	die($helpText);
+if ($argc < 5)
+	die("Usage:\n\tphp compatCheck <old service url> <new service url> <api log> <api_v3/ps2/feedIds/uris> [<start position> [<end position> [<max tests per action> [<request headers]]]]\n");
 
-$longOpts  = array(
-		"serviceUrlOld:",
-		"serviceUrlNew:",
-		"apiLogPath:",
-		"logFormat:",
-		"startPosition:",
-		"endPosition:",
-		"startPosition:",
-		"maxTestsPerActionType:",
-		"extraRequestHeaders:",
-		"maxKsValidTimeDiff:",
-);
-$options = getopt("", $longOpts);
-if(array_key_exists ("serviceUrlOld", $options))
-	$serviceUrlOld = $options["serviceUrlOld"];
-else
-	die("serviceUrlOld is mandatory");
-
-if(array_key_exists ("serviceUrlNew", $options))
-	$serviceUrlNew = $options["serviceUrlNew"];
-else
-	die("$serviceUrlNew is mandatory");
-
-if(array_key_exists ("apiLogPath", $options))
-	$apiLogPath = $options["apiLogPath"];
-else
-	die("apiLogPath is mandatory");
-
-if(array_key_exists ("logFormat", $options))
-	$logFormat = $options["logFormat"];
-else
-	die("logFormat is mandatory");
+$serviceUrlOld = $argv[1];
+$serviceUrlNew = $argv[2];
+$apiLogPath = $argv[3];
+$logFormat = strtolower($argv[4]);
 
 $partnerSecretPool = new PartnerSecretPool();
 
@@ -1551,22 +1434,15 @@ $startPosition = 0;
 $endPosition = 0;
 $maxTestsPerActionType = 10;
 $extraRequestHeaders = array();
-$maxKsValidTimeDiff = 0;
 
-if(array_key_exists ("startPosition", $options))
-	$startPosition = intval($options["startPosition"]);
-
-if(array_key_exists ("endPosition", $options))
-	$endPosition = intval($options["endPosition"]);
-
-if(array_key_exists ("maxTestsPerActionType", $options))
-	$maxTestsPerActionType = intval($options["maxTestsPerActionType"]);
-
-if(array_key_exists ("extraRequestHeaders", $options))
-	$extraRequestHeaders = explode(',', $options["extraRequestHeaders"]);
-
-if(array_key_exists ("maxKsValidTimeDiff", $options))
-	$maxKsValidTimeDiff = intval($options["maxKsValidTimeDiff"]);
+if ($argc > 5)
+	$startPosition = intval($argv[5]);
+if ($argc > 6)
+	$endPosition = intval($argv[6]);
+if ($argc > 7)
+	$maxTestsPerActionType = intval($argv[7]);
+if ($argc > 8)
+	$extraRequestHeaders = explode(',', $argv[8]);
 
 // init globals
 $testedActions = array();
@@ -1575,18 +1451,18 @@ $requestNumber = 0;
 
 switch ($logFormat)
 {
-case 'api_v3':
-	$logProcessor = new LogProcessorApiV3();
-	break;
-case 'ps2':
-	$logProcessor = new LogProcessorPS2();
-	break;
-case 'feedids':
-	$logProcessor = new LogProcessorFeedList();
-	break;
-case 'uris':
-	$logProcessor = new LogProcessorUriList();
-	break;
+	case 'api_v3':
+		$logProcessor = new LogProcessorApiV3();
+		break;
+	case 'ps2':
+		$logProcessor = new LogProcessorPS2();
+		break;
+	case 'feedids':
+		$logProcessor = new LogProcessorFeedList();
+		break;
+	case 'uris':
+		$logProcessor = new LogProcessorUriList();
+		break;
 }
 
 $logFileInfo = pathinfo($apiLogPath);
