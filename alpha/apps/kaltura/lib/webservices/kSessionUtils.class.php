@@ -293,7 +293,7 @@ class ks extends kSessionBase
 	
 	public function toSecureString()
 	{
-		list($ksVersion, $secret,) = $this->getKSVersionAndSecret($this->partner_id);
+		list($ksVersion, $secret) = $this->getKSVersionAndSecret($this->partner_id);
 		return kSessionBase::generateSession(
 			$ksVersion,
 			$secret,
@@ -731,9 +731,9 @@ class ks extends kSessionBase
 			$cacheStore = kCacheManager::getCache($cacheSection);
 			if (!$cacheStore)
 				continue;
-			$cacheStore->set($cacheKey, array($this->getAllAdminSecrets($partner), $partner->getSecret(), $ksVersion));
+			$cacheStore->set($cacheKey, array($this->getAllAdminSecretsFromPartner($partner), $partner->getSecret(), $ksVersion));
 		}
-		return array($ksVersion, $this->getAllAdminSecrets($partner));
+		return array($ksVersion, $this->getAllAdminSecretsFromPartner($partner));
 	}
 
 	protected function logError($msg)
@@ -750,13 +750,15 @@ class ks extends kSessionBase
 	 * @param Partner $partner
 	 * @return null|string
 	 */
-	protected function getAllAdminSecrets($partner)
+	protected function getAllAdminSecretsFromPartner($partner)
 	{
-		$adminSecrets = null;
-		$activeSecrets = $partner->getEnabledAdditionalAdminSecrets();
-		$adminSecrets = implode(',', $activeSecrets);
-		if($adminSecrets)
-			return $partner->getAdminSecret() . ',' .$adminSecrets;
+		$additionalActiveSecrets = $partner->getEnabledAdditionalAdminSecrets();
+		if($additionalActiveSecrets)
+		{
+			$adminSecrets = implode(',', $additionalActiveSecrets);
+			return $partner->getAdminSecret() . ',' . $adminSecrets;
+		}
+
 		return $partner->getAdminSecret();
 	}
 }

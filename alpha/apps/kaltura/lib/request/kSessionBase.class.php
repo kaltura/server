@@ -236,7 +236,7 @@ class kSessionBase
 			$this->logError("Couldn't get admin secrets for partner [$partnerId]");
 			return null;
 		}
-		if (!$this->matchAdminSecretV1($hash,$real_str,$secrets))
+		if (!$this->matchAdminSecretV1($hash, $real_str, $secrets))
 		{
 			$this->logError("Hash [$hash] doesn't match the sha1 on the salt on partner [$partnerId].");
 			return false;
@@ -556,12 +556,14 @@ class kSessionBase
 			$this->logError("Couldn't get secrets for partner [$partnerId].");
 			return null;						// admin secret not found, can't decrypt the KS
 		}
-		list($hash, $fields, $match) = $this->matchAdminSecretV2($encKs,$adminSecrets);
-		if(!$match)
+		$arrayMatch = $this->matchAdminSecretV2($encKs, $adminSecrets);
+		if(!$arrayMatch)
 		{
-			$this->logError("Hash [$hash] doesn't match sha1 on partner [$partnerId].");
+			$this->logError("Hash doesn't match sha1 on partner [$partnerId].");
 			return false;						// invalid signature
 		}
+		$hash = $arrayMatch[0];
+		$fields = $arrayMatch[1];
 		$rand = substr($fields, 0, self::RANDOM_SIZE);
 		$fields = substr($fields, self::RANDOM_SIZE);
 		
@@ -624,27 +626,22 @@ class kSessionBase
 	/**
 	 * @param $encKs
 	 * @param $adminSecrets
-	 * @return array
+	 * @return array|bool
 	 */
-	private function matchAdminSecretV2($encKs,$adminSecrets)
+	private function matchAdminSecretV2($encKs, $adminSecrets)
 	{
-		$hash = '';
-		$fields = '';
-		$match = false;
-		$adminSecretsArray = explode(',',$adminSecrets);
-		foreach ($adminSecretsArray as $adminSecret) {
+		$adminSecretsArray = explode(',', $adminSecrets);
+		foreach ($adminSecretsArray as $adminSecret)
+		{
 			$decKs = self::aesDecrypt($adminSecret, $encKs);
 			$decKs = rtrim($decKs, "\0");
 
 			$hash = substr($decKs, 0, self::SHA1_SIZE);
 			$fields = substr($decKs, self::SHA1_SIZE);
 			if ($hash === sha1($fields, true))
-			{
-				$match = true;
-				break;
-			}
+				return array($hash, $fields, true);
 		}
-		return array($hash, $fields, $match);
+		return false;
 	}
 
 	/**
@@ -655,8 +652,9 @@ class kSessionBase
 	 */
 	private function matchAdminSecretV1($hash, $real_str, $adminSecrets)
 	{
-		$adminSecretsArray = explode(',',$adminSecrets);
-		foreach ($adminSecretsArray as $adminSecrets) {
+		$adminSecretsArray = explode(',', $adminSecrets);
+		foreach ($adminSecretsArray as $adminSecrets)
+		{
 			if (sha1($adminSecrets . $real_str) === $hash)
 			{
 				return true;

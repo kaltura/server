@@ -89,7 +89,7 @@ class Partner extends BasePartner
 	{
 		$additionalSecrets = $this->getEnabledAdditionalAdminSecrets();
 		if ($partner_secret === $this->getAdminSecret() ||
-			in_array($partner_secret,$additionalSecrets) ||
+			in_array($partner_secret, $additionalSecrets, true) ||
 			(!$admin && $partner_secret === $this->getSecret()))
 		{
 			$ks_max_expiry_in_seconds = $this->getKsMaxExpiryInSeconds();
@@ -688,73 +688,24 @@ class Partner extends BasePartner
 	private function getDisabledDeliveryTypes() { return $this->getFromCustomData("disabledDeliveryTypes", array()); }
 	private function setDisabledDeliveryTypes(array $v ) { $this->putInCustomData("disabledDeliveryTypes", $v); }
 
-	/**
-	 * @return kAdditionalAdminSecrets|null
-	 */
-	public function getAdditionalAdminSecrets()
-	{
-		$secrets = $this->getFromCustomData("additionalAdminSecrets");
-		if ($secrets)
-			return unserialize($secrets);
-		return null;
-	}
-
-	/**
-	 * @param kAdditionalAdminSecrets $v
-	 */
-	public function setAdditionalAdminSecrets($v)
-	{
-		$this->putInCustomData( "additionalAdminSecrets",serialize($v) );
-	}
-
-	/**
-	 * @return array
-	 */
 	public function getEnabledAdditionalAdminSecrets()
 	{
-		/** @var kAdditionalAdminSecrets $secrets */
-		$secrets = $this->getAdditionalAdminSecrets();
-		if (!is_null($secrets))
-			return $secrets->getEnabledAdminSecrets();
-		return array();
+		return $this->getFromCustomData("enabledAdditionalAdminSecrets",null,array());
 	}
 
-
-	/**
-	 * @param array<string> $v
-	 */
 	public function setEnabledAdditionalAdminSecrets($v)
 	{
-		$secrets = $this->getAdditionalAdminSecrets();
-		if (!$secrets)
-			$secrets = new kAdditionalAdminSecrets();
-		$secrets->setEnabledAdminSecrets($v);
-		$this->setAdditionalAdminSecrets($secrets);
+		$this->putInCustomData( "enabledAdditionalAdminSecrets", $v);
 	}
 
-
-	/**
-	 * @return array
-	 */
 	public function getDisabledAdditionalAdminSecrets()
 	{
-		/** @var kAdditionalAdminSecrets $secrets */
-		$secrets = $this->getAdditionalAdminSecrets();
-		if (!is_null($secrets))
-			return $secrets->getDisabledAdminSecrets();
-		return array();
+		return $this->getFromCustomData("disabledAdditionalAdminSecrets",null,array());
 	}
 
-	/**
-	 * @param array<string> $v
-	 */
 	public function setDisabledAdditionalAdminSecrets($v)
 	{
-		$secrets = $this->getAdditionalAdminSecrets();
-		if (!$secrets)
-			$secrets = new kAdditionalAdminSecrets();
-		$secrets->setDisabledAdminSecrets($v);
-		$this->setAdditionalAdminSecrets($secrets);
+		$this->putInCustomData( "disabledAdditionalAdminSecrets", $v);
 	}
 
 	public function getCustomDeliveryTypes()
