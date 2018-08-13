@@ -731,9 +731,9 @@ class ks extends kSessionBase
 			$cacheStore = kCacheManager::getCache($cacheSection);
 			if (!$cacheStore)
 				continue;
-			$cacheStore->set($cacheKey, array($this->getAdminSecrets($partner), $partner->getSecret(), $ksVersion));
+			$cacheStore->set($cacheKey, array($this->getAllAdminSecrets($partner), $partner->getSecret(), $ksVersion));
 		}
-		return array($ksVersion, $this->getAdminSecrets($partner));
+		return array($ksVersion, $this->getAllAdminSecrets($partner));
 	}
 
 	protected function logError($msg)
@@ -750,7 +750,7 @@ class ks extends kSessionBase
 	 * @param Partner $partner
 	 * @return null|string
 	 */
-	protected function getAdminSecrets($partner)
+	protected function getAllAdminSecrets($partner)
 	{
 		$adminSecrets = null;
 		$activeSecrets = $partner->getEnabledAdditionalAdminSecrets();

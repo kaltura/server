@@ -7,13 +7,13 @@ class kAdditionalAdminSecrets
 {
 
 	/**
-	 * @var array enableAdminSecret
+	 * @var array
 	 */
 	private $enabledAdminSecrets;
 
 
 	/**
-	 * @var array disableAdminSecret
+	 * @var array
 	 */
 	private $disabledAdminSecrets;
 
