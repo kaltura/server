@@ -754,8 +754,7 @@ class ks extends kSessionBase
 	{
 		$adminSecrets = null;
 		$activeSecrets = $partner->getEnableAdditionalAdminSecrets();
-		if (!is_null($activeSecrets))
-			$adminSecrets = implode(',', $activeSecrets);
+		$adminSecrets = implode(',', $activeSecrets);
 		return $adminSecrets;
 	}
 }

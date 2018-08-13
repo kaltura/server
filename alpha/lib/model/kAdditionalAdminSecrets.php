@@ -17,6 +17,13 @@ class kAdditionalAdminSecrets
 	 */
 	private $disableAdminSecrets;
 
+	public function __construct()
+	{
+		$this->enableAdminSecrets = array();
+		$this->disableAdminSecrets = array();
+	}
+
+
 	/**
 	 * @return array
 	 */

@@ -89,7 +89,7 @@ class Partner extends BasePartner
 	{
 		$additionalSecrets = $this->getEnableAdditionalAdminSecrets();
 		if ($partner_secret === $this->getAdminSecret() ||
-			(!is_null($additionalSecrets) && in_array($partner_secret,$additionalSecrets)) ||
+			in_array($partner_secret,$additionalSecrets) ||
 			(!$admin && $partner_secret === $this->getSecret()))
 		{
 			$ks_max_expiry_in_seconds = $this->getKsMaxExpiryInSeconds();
@@ -691,7 +691,8 @@ class Partner extends BasePartner
 	/**
 	 * @return kAdditionalAdminSecrets|null
 	 */
-	public function getAdditionalAdminSecrets() {
+	public function getAdditionalAdminSecrets()
+	{
 		$secrets = $this->getFromCustomData("additionalAdminSecret");
 		if ($secrets)
 			return unserialize($secrets);
@@ -701,30 +702,33 @@ class Partner extends BasePartner
 	/**
 	 * @param kAdditionalAdminSecrets $v
 	 */
-	public function setAdditionalAdminSecrets($v) {
+	public function setAdditionalAdminSecrets($v)
+	{
 		$this->putInCustomData( "additionalAdminSecret",serialize($v) );
 	}
 
 	/**
-	 * @return array|null
+	 * @return array
 	 */
-	public function getEnableAdditionalAdminSecrets() {
+	public function getEnableAdditionalAdminSecrets()
+	{
 		/** @var kAdditionalAdminSecrets $secrets */
 		$secrets = $this->getAdditionalAdminSecrets();
 		if (!is_null($secrets))
 			return $secrets->getEnableAdminSecrets();
-		return null;
+		return array();
 	}
 
 	/**
-	 * @return array|null
+	 * @return array
 	 */
-	public function getDisableAdditionalAdminSecrets() {
+	public function getDisableAdditionalAdminSecrets()
+	{
 		/** @var kAdditionalAdminSecrets $secrets */
 		$secrets = $this->getAdditionalAdminSecrets();
 		if (!is_null($secrets))
 			return $secrets->getDisableAdminSecrets();
-		return null;
+		return array();
 	}
 
 	public function getCustomDeliveryTypes()
