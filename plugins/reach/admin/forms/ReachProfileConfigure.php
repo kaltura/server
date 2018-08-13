@@ -76,21 +76,21 @@ class Form_ReachProfileConfigure extends ConfigureForm
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
 		$autoDisplayMachineCaptionsOnPlayer->setLabel('Auto Display Machine Captions On Player:');
 		$autoDisplayMachineCaptionsOnPlayer->setRequired(true);
-		$autoDisplayMachineCaptionsOnPlayer->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
+		$autoDisplayMachineCaptionsOnPlayer->setValue(Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE);
 		$this->addElement($autoDisplayMachineCaptionsOnPlayer);
 
 		$autoDisplayHumanCaptionsOnPlayer = new Kaltura_Form_Element_EnumSelect('autoDisplayHumanCaptionsOnPlayer', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 'excludes' => array(
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
 		$autoDisplayHumanCaptionsOnPlayer->setLabel('Auto Display Human Captions On Player:');
 		$autoDisplayHumanCaptionsOnPlayer->setRequired(true);
-		$autoDisplayHumanCaptionsOnPlayer->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
+		$autoDisplayHumanCaptionsOnPlayer->setValue(Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE);
 		$this->addElement($autoDisplayHumanCaptionsOnPlayer);
 
 		$enableMetadataExtraction = new Kaltura_Form_Element_EnumSelect('enableMetadataExtraction', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 'excludes' => array(
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
 		$enableMetadataExtraction->setLabel('Enable Metadata Extraction:');
 		$enableMetadataExtraction->setRequired(true);
-		$enableMetadataExtraction->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
+		$enableMetadataExtraction->setValue(Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE);
 		$this->addElement($enableMetadataExtraction);
 
 		$enableSpeakerChangeIndication = new Kaltura_Form_Element_EnumSelect('enableSpeakerChangeIndication', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 'excludes' => array(
@@ -111,12 +111,12 @@ class Form_ReachProfileConfigure extends ConfigureForm
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
 		$enableProfanityRemoval->setLabel('Enable Profanity Removal:');
 		$enableProfanityRemoval->setRequired(true);
-		$enableProfanityRemoval->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
+		$enableProfanityRemoval->setValue(Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE);
 		$this->addElement($enableProfanityRemoval);
 
 		$contentDeletionPolicy = new Kaltura_Form_Element_EnumSelect('contentDeletionPolicy', array('enum' => 'Kaltura_Client_Reach_Enum_ReachProfileContentDeletionPolicy'));
 		$contentDeletionPolicy->setLabel('Content Deletion Policy:');
-		$contentDeletionPolicy->setValue(Kaltura_Client_Reach_Enum_ReachProfileContentDeletionPolicy::DO_NOTHING);
+		$contentDeletionPolicy->setValue(Kaltura_Client_Reach_Enum_ReachProfileContentDeletionPolicy::DELETE_ONCE_PROCESSED);
 		$this->addElement($contentDeletionPolicy);
 
 		$this->addElement('text', 'maxCharactersPerCaptionLine', array(

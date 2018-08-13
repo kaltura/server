@@ -783,14 +783,14 @@ CREATE TABLE IF NOT EXISTS `drop_folder_file` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
-
+-- dynamic_enum IDs must start from 10001 to avoid conflicts, see https://kaltura.atlassian.net/browse/PLAT-9149
 CREATE TABLE IF NOT EXISTS `dynamic_enum` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `enum_name` varchar(255) NOT NULL,
   `value_name` varchar(255) NOT NULL,
   `plugin_name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `edge_server` (
@@ -1785,7 +1785,7 @@ CREATE TABLE IF NOT EXISTS `partner` (
   KEY `partner_parent_index` (`partner_parent_id`),
   KEY `admin_email_index` (`admin_email`),
   KEY `partner_group_type` (`partner_group_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8;
 
 
 

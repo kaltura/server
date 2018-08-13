@@ -188,7 +188,6 @@
 					jQuery('.ui-widget-overlay').css('z-index', 1003 );
 					jQuery('#loader').show();
 					jQuery(this).find('#frmPartnerCatalogItemInnerConfigure').submit();
-					jQuery(this).find('#frmPartnerCatalogItemConfigure').submit();
 				},
 				'<?php echo $this->translate('Close'); ?>': function() {
 					jQuery(this).dialog('close');
@@ -196,6 +195,8 @@
 			},
 			close: function() {
 				jQuery(this).dialog('destroy').remove();
+				jQuery(document).find('#frmPartnerIdFilter').submit();
+
 			}
 		});
 
@@ -203,10 +204,6 @@
 			url,
 			null,
 			function() {
-//				jQuery(this).find('#frmPartnerCatalogItemConfigure').ajaxForm({
-//					success: loadCatalogItemSuccess1,
-//					iframe: true
-//				});
 				jQuery(this).find('#frmPartnerCatalogItemInnerConfigure').ajaxForm({
 					success: loadCatalogItemSuccess,
 					iframe: true

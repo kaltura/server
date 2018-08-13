@@ -548,7 +548,7 @@ $stub=null;
 		KalturaLog::log("Executing curl to retrieve caption asset file from - $captionUrl");
 		$curlWrapper = new KCurlWrapper();
 		KalturaLog::log("captionFilePath:$captionFilePath");
-		$res = $curlWrapper->exec($captionUrl, $captionFilePath);
+		$res = $curlWrapper->exec($captionUrl, $captionFilePath, null, true);
 		KalturaLog::log("Curl results: $res");
 		if(!$res || $curlWrapper->getError()){
 			$errDescription = "Error: " . $curlWrapper->getError();
