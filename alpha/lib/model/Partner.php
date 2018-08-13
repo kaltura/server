@@ -719,6 +719,20 @@ class Partner extends BasePartner
 		return array();
 	}
 
+
+	/**
+	 * @param array<string> $v
+	 */
+	public function setEnabledAdditionalAdminSecrets($v)
+	{
+		$secrets = $this->getAdditionalAdminSecrets();
+		if (!$secrets)
+			$secrets = new kAdditionalAdminSecrets();
+		$secrets->setEnabledAdminSecrets($v);
+		$this->setAdditionalAdminSecrets($secrets);
+	}
+
+
 	/**
 	 * @return array
 	 */
@@ -729,6 +743,18 @@ class Partner extends BasePartner
 		if (!is_null($secrets))
 			return $secrets->getDisabledAdminSecrets();
 		return array();
+	}
+
+	/**
+	 * @param array<string> $v
+	 */
+	public function setDisabledAdditionalAdminSecrets($v)
+	{
+		$secrets = $this->getAdditionalAdminSecrets();
+		if (!$secrets)
+			$secrets = new kAdditionalAdminSecrets();
+		$secrets->setDisabledAdminSecrets($v);
+		$this->setAdditionalAdminSecrets($secrets);
 	}
 
 	public function getCustomDeliveryTypes()

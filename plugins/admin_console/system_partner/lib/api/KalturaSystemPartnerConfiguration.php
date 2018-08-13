@@ -379,7 +379,17 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var bool
 	 */
 	public $enableSelfServe;
-	
+
+	/**
+	 * @var KalturaStringArray
+	 */
+	public $enabledAdditionalAdminSecrets;
+
+	/**
+	 * @var KalturaStringArray
+	 */
+	public $disabledAdditionalAdminSecrets;
+
 	private static $map_between_objects = array
 	(
 		"id",
@@ -453,6 +463,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"ovpEnvironmentUrl",
 		"ottEnvironmentUrl",
 		"enableSelfServe",
+		"enabledAdditionalAdminSecrets",
+		"disabledAdditionalAdminSecrets",
 	);
 
 	public function getMapBetweenObjects()
