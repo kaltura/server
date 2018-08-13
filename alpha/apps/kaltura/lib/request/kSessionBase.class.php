@@ -656,9 +656,7 @@ class kSessionBase
 		foreach ($adminSecretsArray as $adminSecrets)
 		{
 			if (sha1($adminSecrets . $real_str) === $hash)
-			{
 				return true;
-			}
 		}
 		return false;
 	}
