@@ -143,6 +143,9 @@ class KalturaResponseProfile extends KalturaDetachedResponseProfile implements I
 	 */
 	public function getKey()
 	{
-		return "{$this->id}_{$this->version}";
+		if($this->id)
+			return "{$this->id}_{$this->version}";
+		
+		return md5(serialize($this));
 	}
 }
