@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__) . '/../apps/kaltura/lib/request/kSessionBase.class.php');
+require_once(dirname(__FILE__) . '/../config/kConf.php');
 
 ini_set("memory_limit", "2048M");
 
@@ -69,6 +70,7 @@ $APIV3_TESTED_ACTIONS = array(
 		'*.serve',
 		'*.goto',
 		'*.search',
+		'*.startwidgetsession'
 		);
 
 $APIV3_BLOCKED_ACTIONS = array(
@@ -118,7 +120,7 @@ class PartnerSecretPool
 			return null;
 
 		$query = "SELECT admin_secret FROM partner WHERE id='{$partnerId}'";
-		$result = mysqli_query($this->link,$query) or die('Error: Select from func table query failed: ' . mysqli_error($link) . "\n");
+		$result = mysqli_query($this->link,$query) or die('Error: Select from func table query failed: ' . mysqli_error($this->link) . "\n");
 		$line = mysqli_fetch_array($result, MYSQLI_NUM);
 		if (!$line)
 			return null;
@@ -386,6 +388,62 @@ function compareValues($newValue, $oldValue)
 	return $newValue == $oldValue;
 }
 
+function compareKS($newKsString, $oldKsString, $path)
+{
+	global $maxKsValidTimeDiff;
+
+	$errors = array();
+	if(!$newKsString && !$oldKsString)
+	{
+		return $errors;
+	}
+
+	$newKsObj = kSessionBase::getKSObject($newKsString);
+	$oldKsObj = kSessionBase::getKSObject($oldKsString);
+
+	if($newKsObj && !$oldKsObj)
+	{
+		$errors["$path"] = "field key has different value (path=$path new=$newKsString old $oldKsString couldn't get parsed)";
+		return $errors;
+	}
+
+	if($oldKsObj && !$newKsObj)
+	{
+		$errors["$path"] = "field ks has different value (path=$path new=$newKsString couldn't get parsed old $oldKsString)";
+		return $errors;
+	}
+
+	if(!$oldKsObj && !$newKsObj)
+	{
+		return $errors;
+	}
+
+	$errors = array_merge($errors, compareObjectFieldInternal($newKsObj, $oldKsObj, "$path", 'partner_id'));
+	$errors = array_merge($errors, compareObjectFieldInternal($newKsObj, $oldKsObj, "$path", 'type'));
+	$errors = array_merge($errors, compareObjectFieldInternal($newKsObj, $oldKsObj, "$path", 'user'));
+	$errors = array_merge($errors, compareObjectFieldInternal($newKsObj, $oldKsObj, "$path", 'privileges'));
+	$errors = array_merge($errors, compareObjectFieldInternal($newKsObj, $oldKsObj, "$path", 'master_partner_id'));
+	$errors = array_merge($errors, compareObjectFieldInternal($newKsObj, $oldKsObj, "$path", 'additional_data'));
+
+	if ($maxKsValidTimeDiff && abs($newKsObj->valid_until - $oldKsObj->valid_until) > $maxKsValidTimeDiff)
+	{
+		$errors["$path/valid_until"] = "field valid_until has different value (path=$path new=$newKsObj->valid_until old=$oldKsObj->valid_until)";
+	}
+
+	return $errors;
+}
+
+function compareObjectFieldInternal($objNew, $objOld, $path, $fieldName)
+{
+	$errors = array();
+	if (!compareValues($objNew->$fieldName, $objOld->$fieldName))
+	{
+		$errors["$path/$fieldName"] = "field valid_until has different value (path=$path new=$objNew->$fieldName old=$objOld->$fieldName)";
+	}
+
+	return $errors;
+}
+
 function compareArraysInternal($resultNew, $resultOld, $path)
 {
 	global $ID_FIELDS;
@@ -402,7 +460,12 @@ function compareArraysInternal($resultNew, $resultOld, $path)
 		}
 
 		$newValue = $resultNew[$key];
-		if (is_array($oldValue) && is_array($newValue))
+
+		if($key == 'ks')
+		{
+			$errors = array_merge($errors, compareKS($newValue, $oldValue, $subPath));
+		}
+		else if (is_array($oldValue) && is_array($newValue))
 		{
 			$errors = array_merge($errors, compareArrays($newValue, $oldValue, $subPath));
 		}
@@ -420,6 +483,7 @@ function compareArraysInternal($resultNew, $resultOld, $path)
 				{
 					$errors[$subPath] = "field $key has different value (path=$path new=$newValue old=$oldValue)";
 				}
+
 				if (in_array($key, $ID_FIELDS))
 					break;		// id is different, all other fields will be different as well
 			}
@@ -1402,14 +1466,68 @@ function processGZipFile($apiLogPath, LogProcessor $logProcessor)
 	gzclose($handle);
 }
 
+function getHelpText()
+{
+	$helpText = "Usage:\n\tphp compatCheck [OPTIONS]".PHP_EOL;
+	$helpText.= "options".PHP_EOL;
+	$helpText.= "\t--serviceUrlOld".PHP_EOL;
+	$helpText.= "\t\tMandatory old service url".PHP_EOL;
+	$helpText.= "\t--serviceUrlNew".PHP_EOL;
+	$helpText.= "\t\tMandatory new service url".PHP_EOL;
+	$helpText.= "\t--apiLogPath".PHP_EOL;
+	$helpText.= "\t\tMandatory the input log for the api calls".PHP_EOL;
+	$helpText.= "\t--logFormat".PHP_EOL;
+	$helpText.= "\t\tMandatory format from : api_v3, ps2, feedids, uris".PHP_EOL;
+	$helpText.= "\t--startPosition".PHP_EOL;
+	$helpText.= "\t\tOptional start position".PHP_EOL;
+	$helpText.= "\t--endPosition".PHP_EOL;
+	$helpText.= "\t\tOptional end position".PHP_EOL;
+	$helpText.= "\t--maxTestsPerActionType".PHP_EOL;
+	$helpText.= "\t\tOptional max tests per action type".PHP_EOL;
+	$helpText.= "\t--extraRequestHeaders".PHP_EOL;
+	$helpText.= "\t\tOptional extra requests headers separated by ,".PHP_EOL;
+	$helpText.= "\t--maxKsValidTimeDiff".PHP_EOL;
+	$helpText.= "\t\tOptional max ms difference in ks valid until field".PHP_EOL;
+	$helpText.= "example:php /opt/kaltura/app/alpha/scripts/compatCheck.php --serviceUrlOld=pa-front-api1 --serviceUrlNew=pa-reports --apiLogPath=/data/logs/investigate/2015/04/21/ny-front-api10-kaltura_api_v3.log-2015-04-21-00-40.gz --logFormat=api_v3".PHP_EOL;
+	return $helpText;
+}
 // parse the command line
-if ($argc < 5)
-	die("Usage:\n\tphp compatCheck <old service url> <new service url> <api log> <api_v3/ps2/feedIds/uris> [<start position> [<end position> [<max tests per action> [<request headers]]]]\n");
+$helpText = getHelpText();
+if ($argc < 2)
+	die($helpText);
 
-$serviceUrlOld = $argv[1];
-$serviceUrlNew = $argv[2];
-$apiLogPath = $argv[3];
-$logFormat = strtolower($argv[4]);
+$longOpts  = array(
+		"serviceUrlOld:",
+		"serviceUrlNew:",
+		"apiLogPath:",
+		"logFormat:",
+		"startPosition:",
+		"endPosition:",
+		"startPosition:",
+		"maxTestsPerActionType:",
+		"extraRequestHeaders:",
+		"maxKsValidTimeDiff:",
+);
+$options = getopt("", $longOpts);
+if(array_key_exists ("serviceUrlOld", $options))
+	$serviceUrlOld = $options["serviceUrlOld"];
+else
+	die("serviceUrlOld is mandatory");
+
+if(array_key_exists ("serviceUrlNew", $options))
+	$serviceUrlNew = $options["serviceUrlNew"];
+else
+	die("$serviceUrlNew is mandatory");
+
+if(array_key_exists ("apiLogPath", $options))
+	$apiLogPath = $options["apiLogPath"];
+else
+	die("apiLogPath is mandatory");
+
+if(array_key_exists ("logFormat", $options))
+	$logFormat = $options["logFormat"];
+else
+	die("logFormat is mandatory");
 
 $partnerSecretPool = new PartnerSecretPool();
 
@@ -1433,15 +1551,22 @@ $startPosition = 0;
 $endPosition = 0;
 $maxTestsPerActionType = 10;
 $extraRequestHeaders = array();
+$maxKsValidTimeDiff = 0;
 
-if ($argc > 5)
-	$startPosition = intval($argv[5]);
-if ($argc > 6)
-	$endPosition = intval($argv[6]);
-if ($argc > 7)
-	$maxTestsPerActionType = intval($argv[7]);
-if ($argc > 8)
-	$extraRequestHeaders = explode(',', $argv[8]);
+if(array_key_exists ("startPosition", $options))
+	$startPosition = intval($options["startPosition"]);
+
+if(array_key_exists ("endPosition", $options))
+	$endPosition = intval($options["endPosition"]);
+
+if(array_key_exists ("maxTestsPerActionType", $options))
+	$maxTestsPerActionType = intval($options["maxTestsPerActionType"]);
+
+if(array_key_exists ("extraRequestHeaders", $options))
+	$extraRequestHeaders = explode(',', $options["extraRequestHeaders"]);
+
+if(array_key_exists ("maxKsValidTimeDiff", $options))
+	$maxKsValidTimeDiff = intval($options["maxKsValidTimeDiff"]);
 
 // init globals
 $testedActions = array();
