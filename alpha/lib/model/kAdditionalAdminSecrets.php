@@ -9,51 +9,51 @@ class kAdditionalAdminSecrets
 	/**
 	 * @var array enableAdminSecret
 	 */
-	private $enableAdminSecrets;
+	private $enabledAdminSecrets;
 
 
 	/**
 	 * @var array disableAdminSecret
 	 */
-	private $disableAdminSecrets;
+	private $disabledAdminSecrets;
 
 	public function __construct()
 	{
-		$this->enableAdminSecrets = array();
-		$this->disableAdminSecrets = array();
+		$this->enabledAdminSecrets = array();
+		$this->disabledAdminSecrets = array();
 	}
 
 
 	/**
 	 * @return array
 	 */
-	public function getEnableAdminSecrets()
+	public function getEnabledAdminSecrets()
 	{
-		return $this->enableAdminSecrets;
+		return $this->enabledAdminSecrets;
 	}
 
 	/**
-	 * @param array $enableAdminSecrets
+	 * @param array $enabledAdminSecrets
 	 */
-	public function setEnableAdminSecrets(array $enableAdminSecrets)
+	public function setEnabledAdminSecrets(array $enabledAdminSecrets)
 	{
-		$this->enableAdminSecrets = $enableAdminSecrets;
+		$this->enabledAdminSecrets = $enabledAdminSecrets;
 	}
 
 	/**
 	 * @return array
 	 */
-	public function getDisableAdminSecrets()
+	public function getDisabledAdminSecrets()
 	{
-		return $this->disableAdminSecrets;
+		return $this->disabledAdminSecrets;
 	}
 
 	/**
-	 * @param array $disableAdminSecrets
+	 * @param array $disabledAdminSecrets
 	 */
-	public function setDisableAdminSecrets(array $disableAdminSecrets)
+	public function setDisabledAdminSecrets(array $disabledAdminSecrets)
 	{
-		$this->disableAdminSecrets = $disableAdminSecrets;
+		$this->disabledAdminSecrets = $disabledAdminSecrets;
 	}
 
 	/**
@@ -62,10 +62,10 @@ class kAdditionalAdminSecrets
 	 */
 	public function enableAdminSecret(string $adminSecret)
 	{
-		if (($key = array_search($adminSecret, $this->disableAdminSecrets)) !== false) {
-			unset($this->disableAdminSecrets[$key]);
+		if (($key = array_search($adminSecret, $this->disabledAdminSecrets)) !== false) {
+			unset($this->disabledAdminSecrets[$key]);
 		}
-		$this->enableAdminSecrets[] = $adminSecret;
+		$this->enabledAdminSecrets[] = $adminSecret;
 	}
 
 	/**
@@ -74,10 +74,10 @@ class kAdditionalAdminSecrets
 	 */
 	public function disableAdminSecret(string $adminSecret)
 	{
-		if (($key = array_search($adminSecret, $this->enableAdminSecrets)) !== false) {
-			unset($this->enableAdminSecrets[$key]);
+		if (($key = array_search($adminSecret, $this->enabledAdminSecrets)) !== false) {
+			unset($this->enabledAdminSecrets[$key]);
 		}
-		$this->disableAdminSecrets[] = $adminSecret;
+		$this->disabledAdminSecrets[] = $adminSecret;
 	}
 
 }

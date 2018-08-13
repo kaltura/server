@@ -230,14 +230,13 @@ class kSessionBase
 		}
 		
 		$partnerId = reset($parts);
-		$secret = $this->getAdminSecret($partnerId);
-		if (!$secret)
+		$secrets = $this->getAdminSecrets($partnerId);
+		if (!$secrets)
 		{
-			$this->logError("Couldn't get admin secret for partner [$partnerId]");
+			$this->logError("Couldn't get admin secrets for partner [$partnerId]");
 			return null;
 		}
-		$match = $this->matchAdminSecretV1($hash,$real_str,$partnerId,$secret);
-		if (!$match)
+		if (!$this->matchAdminSecretV1($hash,$real_str,$secrets))
 		{
 			$this->logError("Hash [$hash] doesn't match the sha1 on the salt on partner [$partnerId].");
 			return false;
@@ -339,28 +338,19 @@ class kSessionBase
 		if (!$secrets)
 			return null;
 		
-		list($adminSecret, $userSecret, $ksVersion,$additionalAdminSecrets) = $secrets;
-		return array($ksVersion, $adminSecret,$additionalAdminSecrets);
+		list($adminSecret, $userSecret, $ksVersion) = $secrets;
+		return array($ksVersion, $adminSecret);
 	}
 	
-	protected function getAdminSecret($partnerId)
+	protected function getAdminSecrets($partnerId)
 	{
 		$versionAndSecret = $this->getKSVersionAndSecret($partnerId);
 		if (!$versionAndSecret)
 			return null;
-		list( , $adminSecret, ) = $versionAndSecret;
-		return $adminSecret;
+		list( , $adminSecrets) = $versionAndSecret;
+		return $adminSecrets;
 	}
 
-	protected function getAdditionalAdminSecret($partnerId)
-	{
-		$versionAndSecret = $this->getKSVersionAndSecret($partnerId);
-		if (!$versionAndSecret)
-			return null;
-		list( , ,$additionalAdminSecret) = $versionAndSecret;
-		return $additionalAdminSecret;
-	}
-	
 	protected function isKSInvalidated()
 	{
 		if (strpos($this->privileges, self::PRIVILEGE_ACTIONS_LIMIT) !== false)
@@ -560,13 +550,13 @@ class kSessionBase
 		
 		list($version, $partnerId, $encKs) = $explodedKs;
 		
-		$adminSecret = $this->getAdminSecret($partnerId);
-		if (!$adminSecret)
+		$adminSecrets = $this->getAdminSecrets($partnerId);
+		if (!$adminSecrets)
 		{
-			$this->logError("Couldn't get secret for partner [$partnerId].");
+			$this->logError("Couldn't get secrets for partner [$partnerId].");
 			return null;						// admin secret not found, can't decrypt the KS
 		}
-		list($hash, $fields, $match) = $this->matchAdminSecretV2($encKs,$partnerId,$adminSecret);
+		list($hash, $fields, $match) = $this->matchAdminSecretV2($encKs,$adminSecrets);
 		if(!$match)
 		{
 			$this->logError("Hash [$hash] doesn't match sha1 on partner [$partnerId].");
@@ -633,16 +623,15 @@ class kSessionBase
 
 	/**
 	 * @param $encKs
-	 * @param $partnerID
-	 * @param string $adminSecret
+	 * @param $adminSecrets
 	 * @return array
 	 */
-	private function matchAdminSecretV2($encKs,$partnerID,$adminSecret)
+	private function matchAdminSecretV2($encKs,$adminSecrets)
 	{
 		$hash = '';
 		$fields = '';
 		$match = false;
-		$adminSecretsArray = $this->combineAllAdminSecrets($partnerID, $adminSecret);
+		$adminSecretsArray = explode(',',$adminSecrets);
 		foreach ($adminSecretsArray as $adminSecret) {
 			$decKs = self::aesDecrypt($adminSecret, $encKs);
 			$decKs = rtrim($decKs, "\0");
@@ -659,40 +648,21 @@ class kSessionBase
 	}
 
 	/**
-	 * @param $adminSecretsArray
 	 * @param $hash
 	 * @param $real_str
-	 * @param $partnerID
-	 * @param $adminSecret
+	 * @param $adminSecrets
 	 * @return bool
 	 */
-	private function matchAdminSecretV1($hash,$real_str,$partnerID,$adminSecret)
+	private function matchAdminSecretV1($hash, $real_str, $adminSecrets)
 	{
-		$match = false;
-		$adminSecretsArray = $this->combineAllAdminSecrets($partnerID, $adminSecret);
-		foreach ($adminSecretsArray as $adminSecret) {
-			if (sha1($adminSecret . $real_str) === $hash)
+		$adminSecretsArray = explode(',',$adminSecrets);
+		foreach ($adminSecretsArray as $adminSecrets) {
+			if (sha1($adminSecrets . $real_str) === $hash)
 			{
-				$match = true;
-				break;
+				return true;
 			}
 		}
-		return $match;
+		return false;
 	}
 
-	/**
-	 * @param $partnerID
-	 * @param $adminSecret
-	 * @return array
-	 */
-	private function combineAllAdminSecrets($partnerID, $adminSecret)
-	{
-		$additionalAdminSecrets = $this->getAdditionalAdminSecret($partnerID);
-		if ($additionalAdminSecrets) {
-			$adminSecretsArray = explode(',', $additionalAdminSecrets);
-			array_unshift($adminSecretsArray, $adminSecret);
-		} else
-			$adminSecretsArray = array($adminSecret);
-		return $adminSecretsArray;
-	}
 }
