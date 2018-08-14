@@ -653,9 +653,9 @@ class kSessionBase
 	private function matchAdminSecretV1($hash, $real_str, $adminSecrets)
 	{
 		$adminSecretsArray = explode(',', $adminSecrets);
-		foreach ($adminSecretsArray as $adminSecrets)
+		foreach ($adminSecretsArray as $adminSecret)
 		{
-			if (sha1($adminSecrets . $real_str) === $hash)
+			if (sha1($adminSecret . $real_str) === $hash)
 				return true;
 		}
 		return false;
