@@ -303,6 +303,9 @@ class kApiCache extends kApiCacheBase
 				return array(infraRequestUtils::getIpFromHttpHeader($extraField[self::ECFD_IP_HTTP_HEADER], $extraField[self::ECFD_IP_ACCEPT_INTERNAL_IPS], true));
 
 			return array(infraRequestUtils::getRemoteAddress());
+			
+		case self::ECF_CDN_REGION:
+			return array(kGeoUtils::getCDNRegionFromIP());
 		}
 
 		return array();

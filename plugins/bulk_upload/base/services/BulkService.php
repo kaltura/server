@@ -295,7 +295,7 @@ class BulkService extends KalturaBaseService
 	    	$c = new Criteria();
 		
 		// when filtering the last hour logs, limit list to last 30K records in order to constrain query performance
-		if ($bulkUploadFilter->uploadedOnGreaterThanOrEqual && $bulkUploadFilter->uploadedOnGreaterThanOrEqual > time() - 3600)
+		if ($bulkUploadFilter->uploadedOnGreaterThanOrEqual)// && $bulkUploadFilter->uploadedOnGreaterThanOrEqual > time() - 3600)
 		{
 			$c2 = new Criteria();
 			$c2->addDescendingOrderByColumn(BatchJobLogPeer::ID);
