@@ -558,7 +558,8 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	{
 		if (is_null($this->getHostName()) != is_null($dp->getHostName()) ||
 			is_null($this->getTokenizer()) != is_null($dp->getTokenizer()) ||
-			$this->getParentId() != $dp->getPartnerId())
+			$this->getPriority() != $dp->getPriority() ||
+			$this->getPartnerId() != $dp->getPartnerId())
 		{
 			return false;
 		}
