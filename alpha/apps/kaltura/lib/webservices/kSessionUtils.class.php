@@ -731,9 +731,9 @@ class ks extends kSessionBase
 			$cacheStore = kCacheManager::getCache($cacheSection);
 			if (!$cacheStore)
 				continue;
-			$cacheStore->set($cacheKey, array($this->getAllAdminSecretsFromPartner($partner), $partner->getSecret(), $ksVersion));
+			$cacheStore->set($cacheKey, array($partner->getAllAdminSecretsAsString(), $partner->getSecret(), $ksVersion));
 		}
-		return array($ksVersion, $this->getAllAdminSecretsFromPartner($partner));
+		return array($ksVersion, $partner->getAllAdminSecretsAsString());
 	}
 
 	protected function logError($msg)
@@ -744,21 +744,5 @@ class ks extends kSessionBase
 	public function kill()
 	{
 		invalidSessionPeer::invalidateKs($this);
-	}
-
-	/**
-	 * @param Partner $partner
-	 * @return null|string
-	 */
-	protected function getAllAdminSecretsFromPartner($partner)
-	{
-		$additionalActiveSecrets = $partner->getEnabledAdditionalAdminSecrets();
-		if($additionalActiveSecrets)
-		{
-			$adminSecrets = implode(',', $additionalActiveSecrets);
-			return $partner->getAdminSecret() . ',' . $adminSecrets;
-		}
-
-		return $partner->getAdminSecret();
 	}
 }

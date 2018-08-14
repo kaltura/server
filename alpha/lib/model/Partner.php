@@ -693,17 +693,42 @@ class Partner extends BasePartner
 		return $this->getFromCustomData("enabledAdditionalAdminSecrets",null,array());
 	}
 
+	/**
+	 * @param array<string> $v
+	 */
 	public function setEnabledAdditionalAdminSecrets($v)
 	{
+		$enabled = $this->getEnabledAdditionalAdminSecrets();
+		//in case additional was moved to primary, do not disable it
+		$adminSecretArray = array($this->getAdminSecret());
+		/** @noinspection PhpParamsInspection */
+		$removedEnabledSecrets = array_diff($enabled,$v,$adminSecretArray);
+		if ($removedEnabledSecrets)
+		{
+			$oldDisabled = $this->getDisabledAdditionalAdminSecrets();
+			//unique - in case of secret that was enabled disabled several times.
+			$merged = array_merge($removedEnabledSecrets, $oldDisabled);
+			$newDisabled = array_unique($merged);
+			$this->setDisabledAdditionalAdminSecrets($newDisabled);
+		}
 		$this->putInCustomData( "enabledAdditionalAdminSecrets", $v);
 	}
 
-	public function getDisabledAdditionalAdminSecrets()
+	/**
+	 * disabled admin secret is only accessible from setEnabledAdditionalAdminSecrets
+	 * @return string
+	 */
+	private function getDisabledAdditionalAdminSecrets()
 	{
 		return $this->getFromCustomData("disabledAdditionalAdminSecrets",null,array());
 	}
 
-	public function setDisabledAdditionalAdminSecrets($v)
+
+	/**
+	 * disabled admin secret is only populate using the setEnabledAdditionalAdminSecrets function
+	 * @param $v
+	 */
+	private function setDisabledAdditionalAdminSecrets($v)
 	{
 		$this->putInCustomData( "disabledAdditionalAdminSecrets", $v);
 	}
@@ -1967,6 +1992,21 @@ class Partner extends BasePartner
 		if (isset($additionalParams['freeTrialAccountType']))
 			return $additionalParams['freeTrialAccountType'];
 		return null;
+	}
+
+	/**
+	 * return all enabled admin secret separated by ','
+	 * @return null|string
+	 */
+	public function getAllAdminSecretsAsString()
+	{
+		$additionalActiveSecrets = $this->getEnabledAdditionalAdminSecrets();
+		if($additionalActiveSecrets)
+		{
+			$adminSecrets = implode(',', $additionalActiveSecrets);
+			return $this->getAdminSecret() . ',' . $adminSecrets;
+		}
+		return $this->getAdminSecret();
 	}
 
 }
