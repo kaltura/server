@@ -504,8 +504,14 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		
 		$minWeight = PHP_INT_MAX;
 		$minDP = null;
+		$path = parse_url(reset($supportedDPs)->getUrl(), PHP_URL_PATH);
+		
 		foreach ($supportedDPs as $delivery)
 		{
+			$dpPath = parse_url($delivery->getUrl(), PHP_URL_PATH);
+			if ($path !== $dpPath)
+				continue;
+			
 			$weight = $delivery->getRegionPrice($region);
 			if ($weight == false)
 				$weight = PHP_INT_MAX;
