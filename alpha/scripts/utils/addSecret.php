@@ -25,7 +25,7 @@ if ($replacePrimaryAdminSecret)
 {
 	$oldSecret = $partner->getAdminSecret();
 	$additionalEnableSecrets = $partner->getEnabledAdditionalAdminSecrets();
-	$additionalEnableSecrets[] = $oldSecret;
+	array_unshift($additionalEnableSecrets, $oldSecret);
 	$partner->setEnabledAdditionalAdminSecrets($additionalEnableSecrets);
 	$partner->setAdminSecret($newSecret);
 	ob_end_clean();
