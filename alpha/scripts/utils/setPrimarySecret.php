@@ -5,7 +5,7 @@ error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 echo 'add admin secret start' . PHP_EOL;
 
-if ($argc !== 2)
+if ($argc !== 3)
 	die('scripts must have two arguments  1 -> partner ID , 2 -> secret to set as primary' . PHP_EOL);
 
 $partnerId = $argv[1];
