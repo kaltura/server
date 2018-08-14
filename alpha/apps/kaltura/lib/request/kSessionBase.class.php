@@ -347,7 +347,7 @@ class kSessionBase
 		$versionAndSecret = $this->getKSVersionAndSecret($partnerId);
 		if (!$versionAndSecret)
 			return null;
-		list( , $adminSecrets) = $versionAndSecret;
+		$adminSecrets = $versionAndSecret[1];
 		return $adminSecrets;
 	}
 
