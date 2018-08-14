@@ -16,7 +16,7 @@ class kGeoCoderManager
 	{
 		if(!$type)
 		{
-			$type == geoCoderType::KALTURA;
+			$type = geoCoderType::KALTURA;
 		}
 			
 		switch($type)
