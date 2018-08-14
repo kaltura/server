@@ -293,7 +293,9 @@ class ks extends kSessionBase
 	
 	public function toSecureString()
 	{
-		list($ksVersion, $secret) = $this->getKSVersionAndSecret($this->partner_id);
+		list($ksVersion, $secrets) = $this->getKSVersionAndSecret($this->partner_id);
+		$secretsArray = explode(',',$secrets);
+		$secret = $secretsArray[0]; // first element is always the new Admin secret
 		return kSessionBase::generateSession(
 			$ksVersion,
 			$secret,
