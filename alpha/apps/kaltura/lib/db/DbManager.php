@@ -216,8 +216,8 @@ class DbManager
 			return false;
 		}
 
-		list($hostToLastUpdatedAt, $hostToIndex) = self::filterLastUpdatedAtAndHosts($dataSources, $lastUpdatedAtPerSphinx);
-		return self::getPreferredSphinxIndexByWeight($hostToLastUpdatedAt, $hostToIndex);
+		list($hostToLag, $hostToIndex) = self::filterLagsAndHosts($dataSources, $lastUpdatedAtPerSphinx);
+		return self::getPreferredSphinxIndexByWeight($hostToLag, $hostToIndex);
 	}
 
 	protected static function getStickySessionKey()
@@ -270,9 +270,10 @@ class DbManager
 	 * @param $lastUpdatedAtPerSphinx
 	 * @return array
 	 */
-	protected static function filterLastUpdatedAtAndHosts($dataSources, $lastUpdatedAtPerSphinx)
+	protected static function filterLagsAndHosts($dataSources, $lastUpdatedAtPerSphinx)
 	{
-		$hostToLastUpdatedAt = array();
+		$hostToLag = array();
+		$now = time();
 		$hostToIndex = array();
 
 		foreach ($dataSources as $key => $datasource)
@@ -285,23 +286,23 @@ class DbManager
 				continue;
 
 			$currentHost = $matches[1];
-			if (array_key_exists($currentHost, $lastUpdatedAtPerSphinx) && $lastUpdatedAtPerSphinx[$currentHost])
+			if (array_key_exists($currentHost, $lastUpdatedAtPerSphinx) && is_numeric($lastUpdatedAtPerSphinx[$currentHost]))
 			{
-				$hostToLastUpdatedAt[$currentHost] = $lastUpdatedAtPerSphinx[$currentHost];
+				$hostToLag[$currentHost] = $now - $lastUpdatedAtPerSphinx[$currentHost];
 				$hostToIndex[$currentHost] = $key;
 			}
 		}
-		return array($hostToLastUpdatedAt, $hostToIndex);
+		return array($hostToLag, $hostToIndex);
 	}
 
 	/**
-	 * @param $hostToLastUpdatedAt
+	 * @param $hostToLag
 	 * @param $hostToIndex
 	 * @return bool
 	 */
-	protected static function getPreferredSphinxIndexByWeight($hostToLastUpdatedAt, $hostToIndex)
+	protected static function getPreferredSphinxIndexByWeight($hostToLag, $hostToIndex)
 	{
-		$max = max(array_values($hostToLastUpdatedAt));
+		$maxLag = max(array_values($hostToLag));
 
 		$baseRatio = 20;
 		$weights = array();
@@ -309,8 +310,7 @@ class DbManager
 		// calculate weight for each sphinx last updated id
 		foreach ($hostToIndex as $currentHost => $key)
 		{
-			$lag = time() - $hostToLastUpdatedAt[$currentHost];
-			$weight = intval($baseRatio + ($max - max($lag, 0)) / ($max + 1) * 100);
+			$weight = intval($baseRatio + ($maxLag - max($hostToLag[$currentHost], 0)) / ($maxLag + 1) * 100);
 			$weights[$currentHost] = $weight;
 		}
 
