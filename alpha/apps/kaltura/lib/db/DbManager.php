@@ -44,8 +44,8 @@ class DbManager
 	/**
 	 * @param int
 	 */
-	protected static $connIndex = false; 
-	
+	protected static $connIndex = false;
+
 	public static function setConfig(array $config)
 	{
 		$reflect = new ReflectionClass('KalturaPDO');
@@ -187,8 +187,40 @@ class DbManager
 		self::$cachedConnIndex = (int) $preferredIndex; //$preferredIndex returns from self::$sphinxCache->get(..) in type string
 		return $preferredIndex;
 	}
-	
-	protected static function getStickySessionKey() 
+
+	/**
+	 * choose the sphinx db with the smallest lag
+	 * @param $dataSources
+	 * @return bool|mixed
+	 */
+	protected static function getSphinxConnIndexByLastUpdatedAt($dataSources)
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_KEYS);
+		if (!$cache)
+		{
+			KalturaLog::debug("could not retrieve query cache keys form cache, no sphinx index will be chosen by updatedAt");
+			return false;
+		}
+
+		$cacheResult = $cache->get(kQueryCache::SPHINX_LAG_KEY);
+		if (!$cacheResult)
+		{
+			KalturaLog::debug("failed to get sphinx_lag_key from memcache, no sphinx index will be chosen by updatedAt");
+			return false;
+		}
+
+		$lastUpdatedAtPerSphinx = json_decode($cacheResult, true);
+		if (empty($lastUpdatedAtPerSphinx))
+		{
+			KalturaLog::debug("failed decoding sphinx last updated ids, no sphinx index will be chosen by updatedAt");
+			return false;
+		}
+
+		list($hostToLag, $hostToIndex) = self::filterLagsAndHosts($dataSources, $lastUpdatedAtPerSphinx);
+		return self::getPreferredSphinxIndexByWeight($hostToLag, $hostToIndex);
+	}
+
+	protected static function getStickySessionKey()
 	{
 		$ksObject = kCurrentContext::$ks_object;
 
@@ -211,6 +243,10 @@ class DbManager
 			
 			$preferredIndex = self::getSphinxConnIndexFromCache();
 
+			$preferredIndexByLag = -1;
+			if ($preferredIndex === false)
+				$preferredIndexByLag = self::getSphinxConnIndexByLastUpdatedAt($sphinxDS);
+
 			list(self::$sphinxConnection, self::$connIndex) = self::connectFallbackLogic(
 				array('DbManager', 'getSphinxConnectionInternal'), 
 				array($connectTimeout), 
@@ -221,13 +257,78 @@ class DbManager
 			{
 				throw new Exception('Failed to connect to any Sphinx config');
 			}
+			KalturaLog::debug("Actual sphinx index [". self::$connIndex."] sphinx index by best lag [" .$preferredIndexByLag."]");
 		}
 	
 		if (!$read)
 			self::setSphinxConnIndexInCache();
 		return self::$sphinxConnection;
 	}
-	
+
+	/**
+	 * @param $dataSources
+	 * @param $lastUpdatedAtPerSphinx
+	 * @return array
+	 */
+	protected static function filterLagsAndHosts($dataSources, $lastUpdatedAtPerSphinx)
+	{
+		$hostToLag = array();
+		$now = time();
+		$hostToIndex = array();
+
+		foreach ($dataSources as $key => $datasource)
+		{
+			if (!isset(self::$config['datasources'][$datasource]['connection']['dsn']))
+				continue;
+
+			preg_match('/host=(.*?);/', self::$config['datasources'][$datasource]['connection']['dsn'], $matches);
+			if (!$matches || !$matches[1])
+				continue;
+
+			$currentHost = $matches[1];
+			if (array_key_exists($currentHost, $lastUpdatedAtPerSphinx) && is_numeric($lastUpdatedAtPerSphinx[$currentHost]))
+			{
+				$hostToLag[$currentHost] = max($now - $lastUpdatedAtPerSphinx[$currentHost],0);
+				$hostToIndex[$currentHost] = $key;
+			}
+		}
+		return array($hostToLag, $hostToIndex);
+	}
+
+	/**
+	 * @param $hostToLag
+	 * @param $hostToIndex
+	 * @return bool
+	 */
+	protected static function getPreferredSphinxIndexByWeight($hostToLag, $hostToIndex)
+	{
+		$maxLag = max(array_values($hostToLag));
+
+		$baseRatio = 20;
+		$weights = array();
+
+		// calculate weight for each sphinx last updated id
+		foreach ($hostToIndex as $currentHost => $key)
+		{
+			$weight = intval($baseRatio + ($maxLag - max($hostToLag[$currentHost], 0)) / ($maxLag + 1) * 100);
+			$weights[$currentHost] = $weight;
+		}
+
+		$preferredWeight = rand(0, array_sum($weights));
+		foreach ($weights as $currentHost => $weight)
+		{
+			$preferredWeight -= $weight;
+			if ($preferredWeight <= 0)
+			{
+				KalturaLog::debug("Sphinx with best lag chosen [" . $currentHost . "] in datasource index [" . $hostToIndex[$currentHost] . "]");
+				return $hostToIndex[$currentHost];
+			}
+		}
+
+		KalturaLog::debug("no sphinx was chosen by best last updated id");
+		return false;
+	}
+
 	private static function getSphinxConnectionInternal($key, $connectTimeout)
 	{
 		if(!isset(self::$config['datasources'][$key]['connection']['dsn']))

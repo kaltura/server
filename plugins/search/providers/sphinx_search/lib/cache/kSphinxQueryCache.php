@@ -12,7 +12,6 @@ class kSphinxQueryCache extends kQueryCache
 	const CACHE_PREFIX_QUERY = 'QCQSPH-';				// = Query Cache - Sphinx Query
 	const CACHE_PREFIX_INVALIDATION_KEY = 'QCISPH-';	// = Query Cache - Invalidation key
 	const DONT_CACHE_KEY = 'QCCSPH-DontCache';			// when set new queries won't be cached in the memcache
-	const SPHINX_LAG_KEY = 'QCCSPH-SphinxLag';	// the lags of the diffrent sphinx servers in the current DC
 	
 	protected static $sphinxLag = null;
 	protected static $maxInvalidationTime = null;
