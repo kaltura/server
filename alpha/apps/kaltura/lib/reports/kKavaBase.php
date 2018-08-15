@@ -40,6 +40,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_STATUS = 'status';
 	const DIMENSION_SERVICE_TYPE = 'serviceType';
 	const DIMENSION_SERVICE_FEATURE = 'serviceFeature';
+	const DIMENSION_REACH_PROFILE_ID = 'reachProfileId';
 
 	// metrics
 	const METRIC_COUNT = 'count';

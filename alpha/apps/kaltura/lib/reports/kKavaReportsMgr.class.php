@@ -997,12 +997,13 @@ class kKavaReportsMgr extends kKavaBase
 		
 		myReportsMgr::REPORT_TYPE_REACH_USAGE => array(
 			self::REPORT_DATA_SOURCE => self::DATASOURCE_REACH_USAGE,
-			self::REPORT_DIMENSION => array(self::DIMENSION_ENTRY_ID, self::DIMENSION_SERVICE_TYPE, self::DIMENSION_SERVICE_FEATURE),
-			self::REPORT_DIMENSION_HEADERS => array('object_id', 'entry_name','service_type','service_feature', 'price'),
-			self::REPORT_ENRICH_DEF => array(
+			self::REPORT_DIMENSION => array(self::DIMENSION_ENTRY_ID, self::DIMENSION_REACH_PROFILE_ID, self::DIMENSION_SERVICE_TYPE, self::DIMENSION_SERVICE_FEATURE),
+			self::REPORT_DIMENSION_HEADERS => array('object_id', 'entry_name', 'reachProfileId', 'serviceType', 'serviceFeature', 'price'),
+				self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'entry_name',
 				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'),
 			self::REPORT_METRICS => array(self::METRIC_SUM_PRICE),
+			self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_ENTRIES, self::METRIC_SUM_PRICE),
 			self::REPORT_FILTER => array(
 				self::DRUID_DIMENSION => self::DIMENSION_STATUS,
 				self::DRUID_VALUES => array(self::TASK_READY)),
