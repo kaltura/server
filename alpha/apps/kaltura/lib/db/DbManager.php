@@ -288,7 +288,7 @@ class DbManager
 			$currentHost = $matches[1];
 			if (array_key_exists($currentHost, $lastUpdatedAtPerSphinx) && is_numeric($lastUpdatedAtPerSphinx[$currentHost]))
 			{
-				$hostToLag[$currentHost] = $now - $lastUpdatedAtPerSphinx[$currentHost];
+				$hostToLag[$currentHost] = max($now - $lastUpdatedAtPerSphinx[$currentHost],0);
 				$hostToIndex[$currentHost] = $key;
 			}
 		}
