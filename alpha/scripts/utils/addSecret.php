@@ -5,7 +5,7 @@ error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 echo 'add admin secret start' . PHP_EOL;
 
-if ($argc === 0)
+if ($argc <= 1)
 	die('first argument must exist and be equal  partner ID' . PHP_EOL);
 
 ob_start();
