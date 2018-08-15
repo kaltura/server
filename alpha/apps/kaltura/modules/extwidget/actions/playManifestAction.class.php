@@ -1160,10 +1160,12 @@ class playManifestAction extends kalturaAction
 		if(($this->maxBitrate) && ((!is_numeric($this->maxBitrate)) || ($this->maxBitrate <= 0)))
 			KExternalErrors::dieError(KExternalErrors::INVALID_MAX_BITRATE);
 
+		$this->deliveryAttributes->setMaxBitrate($this->maxBitrate);
 		$this->minBitrate = $this->getRequestParameter ( "minBitrate", null );
 		if(($this->minBitrate) && ((!is_numeric($this->minBitrate)) || ($this->minBitrate <= 0)))
 			KExternalErrors::dieError(KExternalErrors::INVALID_MIN_BITRATE);
-
+		
+		$this->deliveryAttributes->setMinBitrate($this->minBitrate);
 		$this->deliveryAttributes->setStorageId($this->getRequestParameter ( "storageId", null ));
 		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
 

@@ -134,6 +134,9 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 				{
 					$this->liveStreamConfig->setUrl($this->getHttpUrl($serverNode));
 					$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
+					
+					$streamIdsToRequest = $this->retrieveStreamIdsByBitrate($liveEntryServerNode->getStreams());
+					$this->params->setFlavorParamIds($streamIdsToRequest);
 					unset($liveEntryServerNodes[$key]);
 					break;
 				}
@@ -391,6 +394,41 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		
 		$renderer = parent::getRenderer($flavors);
 		return $renderer;
+	}
+	
+	protected function retrieveStreamIdsByBitrate ($streams)
+	{
+		$streamIds = array();
+		if (!$streams || !count($streams))
+		{
+			return $streamIds;
+		}
+		elseif (!$this->params->getMaxBitrate() && !$this->params->getMinBitrate())
+		{
+			return $streamIds;
+		}
+		
+		foreach ($streams as $stream)
+		{
+			/* @var $stream kLiveStreamParams */
+			if ($this->params->getMinBitrate() && $stream->getBitrate()/1024 < $this->params->getMinBitrate())
+			{
+				continue;
+			}
+			if ($this->params->getMaxBitrate() && $stream->getBitrate()/1024 > $this->params->getMaxBitrate())
+			{
+				continue;
+			}
+			
+			$streamIds[] = $stream->getFlavorId();
+		}
+		if (!count($streamIds))
+		{
+			// If the stream info is available to us, min and/or max bitrate params were passed, and no streams comply with them - throw error
+			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND, "Entry [$entryId] has no valid streams");
+		}
+		
+		return $streamIds;
 	}
 	
 	public function setLivePackagerSigningDomain($v)
