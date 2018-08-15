@@ -22,7 +22,7 @@ class KalturaLog
     const LOG_TYPE_ANALYTICS = 'LOG_TYPE_ANALYTICS';
     const STANDARD_ERROR = 'STANDARD_ERROR';
 
-    public static function isInitialized()
+	public static function isInitialized()
 	{
 		return 	self::$_initialized;
 	}
