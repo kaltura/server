@@ -248,4 +248,13 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile, IRelat
 	{
 		$this->likeNew = $likeNew;
 	}
+	
+	/**
+	 * Return object_type property value for index
+	 * @return string
+	 */
+	public function getSearchIndexMetadataObjectType ()
+	{
+		return MetadataPeer::getSearchIndexFieldValue(MetadataPeer::OBJECT_TYPE, $this->getObjectType(), $this->getPartnerId());
+	}
 } // Metadata

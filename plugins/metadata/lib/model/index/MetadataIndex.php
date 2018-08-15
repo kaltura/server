@@ -52,6 +52,7 @@ class MetadataIndex extends BaseIndexObject
 				'partner_id' => 'partnerId',
 				'object_id' => 'objectId',
 				'object_type' => 'objectType',
+				'object_type_str' => 'searchIndexMetadataObjectType',
 				'metadata_status' => 'status',
 				'sphinx_match_optimizations' => 'sphinxMatchOptimizations',
 			);
@@ -74,6 +75,7 @@ class MetadataIndex extends BaseIndexObject
 				'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
 				'object_id' => IIndexable::FIELD_TYPE_STRING,
 				'object_type' => IIndexable::FIELD_TYPE_UINT,
+				'object_type_str' => IIndexable::FIELD_TYPE_STRING,
 				'metadata_status' => IIndexable::FIELD_TYPE_UINT,
 				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
 				'sphinx_match_optimizations' => IIndexable::FIELD_TYPE_STRING,
@@ -109,6 +111,7 @@ class MetadataIndex extends BaseIndexObject
 				'metadata.PARTNER_ID' => 'partner_id',
 				'metadata.OBJECT_ID' => 'object_id',
 				'metadata.OBJECT_TYPE' => 'object_type',
+				'metadata.OBJECT_TYPE_STR' => 'object_type_str',
 				'metadata.STATUS' => 'metadata_status',
 				'metadata.PLUGINS_DATA' => 'plugins_data',
 				'metadata.SPHINX_MATCH_OPTIMIZATIONS' => 'sphinx_match_optimizations',

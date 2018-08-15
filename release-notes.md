@@ -63,6 +63,25 @@ php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_07_02_add_p
 
 # Naos 14.1.0 #
 
+## matadata - pass dynamic object list to sphinx ##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-8560
+
+### Configuration ###
+update app/configurations/sphinx/kaltura.conf file and add the following to kaltura_metadata:
+rt_field = object_type_str
+
+### Deployment scripts ###
+	
+ReIndex and repopulate kaltura_matadata tabel in sphinx.
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Naos 14.1.0 #
+
 ## Facebook OAuth ##
 - Issue type : bug
 - Issue ID: PLAT-8940
