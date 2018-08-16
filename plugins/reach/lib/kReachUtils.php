@@ -27,12 +27,16 @@ class kReachUtils
 
 		// Disable entitlement to avoid entitlement validation when accessing an entry
 		$privileges .= ',' . kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY. ':' . $entryId;
+		
+		$privileges .= ',' . kSessionBase::PRIVILEGE_VIEW . ':' . $entryId;
+		
+		$privileges .= ',' . kSessionBase::PRIVILEGE_DOWNLOAD . ':' . $entryId;
 
 		if($shouldModerate)
 			$privileges .= ',' . kSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION;
 
 		$limitedKs = '';
-		$result = kSessionUtils::startKSession($partner->getId(), $partner->getSecret(), '', $limitedKs, $turnaroundTime, kSessionBase::SESSION_TYPE_USER, '', $privileges, null, null);
+		$result = kSessionUtils::startKSession($partner->getId(), $partner->getSecret(), '', $limitedKs, $turnaroundTime, kSessionBase::SESSION_TYPE_USER, '', $privileges, null, null, false);
 		if ($result < 0)
 			throw new Exception('Failed to create REACH Vendor limited session for partner '.$partner->getId());
 
@@ -151,4 +155,14 @@ class kReachUtils
 				return false;
 		}
 	}
+
+	public static function reachStrToTime($offset , $value)
+	{
+		$original = date_default_timezone_get();
+		date_default_timezone_set('UTC');
+		$result = strtotime($offset, $value);
+		date_default_timezone_set($original);
+		return $result;
+	}
+
 }

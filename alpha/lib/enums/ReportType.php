@@ -36,4 +36,5 @@ interface ReportType extends BaseEnum
    const TOP_PLAYBACK_CONTEXT = 25;
    const VPAAS_USAGE = 26;
    const ENTRY_USAGE = 27;
+   const REACH_USAGE = 28;
 }

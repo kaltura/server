@@ -13,6 +13,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_BITRATE_SUM = 'bitrateSum';
 	const METRIC_BITRATE_COUNT = 'bitrateCount';
 	const METRIC_UNIQUE_USER_IDS = 'uniqueUserIds';
+	const METRIC_SUM_PRICE = 'price';
 
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
@@ -174,10 +175,12 @@ class kKavaReportsMgr extends kKavaBase
 		myReportsMgr::REPORT_TYPE_LIVE,
 		myReportsMgr::REPORT_TYPE_TOP_PLAYBACK_CONTEXT,
 		myReportsMgr::REPORT_TYPE_VPAAS_USAGE,
+		myReportsMgr::REPORT_TYPE_REACH_USAGE,
 	);
 		
 	protected static $kava_forced_reports = array(
 		myReportsMgr::REPORT_TYPE_ENTRY_USAGE,
+		myReportsMgr::REPORT_TYPE_REACH_USAGE,
 	);
 	
 	protected static $reports_def = array(
@@ -995,6 +998,20 @@ class kKavaReportsMgr extends kKavaBase
 			),
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addRollupRow',
 		),
+		
+		myReportsMgr::REPORT_TYPE_REACH_USAGE => array(
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_REACH_USAGE,
+			self::REPORT_DIMENSION => array(self::DIMENSION_ENTRY_ID, self::DIMENSION_REACH_PROFILE_ID, self::DIMENSION_SERVICE_TYPE, self::DIMENSION_SERVICE_FEATURE),
+			self::REPORT_DIMENSION_HEADERS => array('object_id', 'entry_name', 'reachProfileId', 'serviceType', 'serviceFeature', 'price'),
+				self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => 'entry_name',
+				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'),
+			self::REPORT_METRICS => array(self::METRIC_SUM_PRICE),
+			self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_ENTRIES, self::METRIC_SUM_PRICE),
+			self::REPORT_FILTER => array(
+				self::DRUID_DIMENSION => self::DIMENSION_STATUS,
+				self::DRUID_VALUES => array(self::TASK_READY)),
+		),
 	);
 	
 	protected static $event_type_count_aggrs = array(
@@ -1080,6 +1097,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_PERIOD_PLAY_TIME => self::METRIC_VIEW_PERIOD_PLAY_TIME,
 		self::METRIC_BUFFER_TIME_RATIO => self::METRIC_BUFFER_TIME_RATIO,
 		self::METRIC_AVG_BITRATE => self::METRIC_AVG_BITRATE,
+		self::METRIC_SUM_PRICE => self::METRIC_SUM_PRICE,
 		self::METRIC_VIEW_BUFFER_TIME_SEC => self::METRIC_VIEW_BUFFER_TIME_SEC,
 		self::METRIC_VIEW_PLAY_TIME_SEC => self::METRIC_VIEW_PLAY_TIME_SEC,
 	);
@@ -1481,6 +1499,9 @@ class kKavaReportsMgr extends kKavaBase
 					self::getConstantRatioPostAggr('subDropOff', self::METRIC_PLAYTHROUGH, '4'),
 					self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY))));
 		
+		self::$aggregations_def[self::METRIC_SUM_PRICE] = self::getLongSumAggregator(
+			self::METRIC_SUM_PRICE, self::METRIC_SUM_PRICE);
+		
 		foreach (self::$metrics_to_headers as $metric => $header)
 		{
 			self::$headers_to_metrics[$header] = $metric;
@@ -1490,6 +1511,7 @@ class kKavaReportsMgr extends kKavaBase
 	/// time functions
 	protected static function fixTimeZoneOffset($timezone_offset)
 	{
+		$timezone_offset = intval($timezone_offset);
 		if (isset(self::$php_timezone_names[$timezone_offset]))
 		{
 			return $timezone_offset;
@@ -1547,6 +1569,10 @@ class kKavaReportsMgr extends kKavaBase
 		$year = substr($date_id, 0, 4);
 		$month = substr($date_id, 4, 2);
 		$day = substr($date_id, 6, 2);
+		if (!checkdate($month, $day , $year))
+		{
+			return null;
+		}
 
 		return "$year-$month-$day";
 	}
@@ -3885,28 +3911,9 @@ class kKavaReportsMgr extends kKavaBase
 			$page_size = count($dimension_ids);
 			$threshold = $page_size;
 
-			if ($dimension == self::DIMENSION_ENTRY_ID)
-			{
-				// when the dimension is entry id, we can use a more minimal filter that does not
-				// contain the dimensions dependent on entry id - categories + playback type
-				// the partner id filter is retained since otherwise sending a bogus event
-				// with non-matching entryId + partnerId will open access to the entry
-				$druid_filter = array();
-				if ($partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
-				{
-					$druid_filter[] = array(
-						self::DRUID_DIMENSION => self::DIMENSION_PARTNER_ID,
-						self::DRUID_VALUES => array($partner_id)
-					);
-				}
-				self::addEndUserReportsDruidFilters($partner_id, $report_def, $input_filter, $druid_filter);
-			}
-			else
-			{
-				// Note: not passing $dimension_ids as $object_ids since in some reports $object_ids
-				//		filters by entries, and not by $dimension
-				$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, null);
-			}
+			// Note: not passing $dimension_ids as $object_ids since in some reports $object_ids
+			//		filters by entries, and not by $dimension
+			$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, null);
 
 			$druid_filter[] = array(
 				self::DRUID_DIMENSION => $dimension,

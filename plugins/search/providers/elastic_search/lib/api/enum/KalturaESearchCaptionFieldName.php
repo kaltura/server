@@ -8,4 +8,6 @@ class KalturaESearchCaptionFieldName extends KalturaStringEnum
 	const CONTENT = 'content';
 	const START_TIME = 'start_time';
 	const END_TIME = 'end_time';
+	const LANGUAGE = 'language';
+	const LABEL = 'label';
 }

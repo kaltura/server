@@ -67,18 +67,25 @@ foreach($files as $file)
 			$maximumExecutionTime = $worker['maximumExecutionTime'];
 			if ($lastExecutionTime)
 			{
+				$criteria = new Criteria(SchedulerPeer::DATABASE_NAME);
+				$criteria->add(SchedulerPeer::ID, $schedulerWorker->getSchedulerId());
+				$scheduler = SchedulerPeer::doSelectOne($criteria);
+				if (!$scheduler || !method_exists($scheduler,'getName'))
+					continue;
 				/** $lastExecutionTime + max($sleepBetweenStopStart , 300 )  we are letting a margin of twice the execution time meaning
 				 *  if job a should run every hour
 				 *  we will wait for two hours before printing it as error
 				 * minimum is 5 minutes so if job should run every 60 sec will will only inform the error after 5 minutes
 				 */
 				if ($lastExecutionTime + max($sleepBetweenStopStart + $maximumExecutionTime , intval($argv[3]) ) < time() - $sleepBetweenStopStart)
-					$answers[] =  $schedulerWorker->getSchedulerId() . ',' . $schedulerWorker->getConfiguredId() . ',' .
-						$schedulerWorker->getName() . ',' . date('Y-m-d H:i:s', $lastExecutionTime) . ',' . $sleepBetweenStopStart . ',' . 'BAD' . PHP_EOL;
+					$answers[] = $schedulerWorker->getName() . ',' . $scheduler->getName() . ',' .
+						"{$schedulerWorker->getConfiguredId()}_{$schedulerWorker->getSchedulerConfiguredId()}" . ','
+						. '0' . PHP_EOL;
 					//$answers[] = prettyPrintNotRun($schedulerWorker,$lastExecutionTime,$sleepBetweenStopStart);
 				else
-					$answers[] =  $schedulerWorker->getSchedulerId() . ',' . $schedulerWorker->getConfiguredId() . ',' .
-						$schedulerWorker->getName() . ',' . date('Y-m-d H:i:s', $lastExecutionTime) . ',' . $sleepBetweenStopStart . ',' . 'GOOD' . PHP_EOL;
+					$answers[] = $schedulerWorker->getName() . ',' . $scheduler->getName() . ',' .
+						"{$schedulerWorker->getConfiguredId()}_{$schedulerWorker->getSchedulerConfiguredId()}" . ','
+						. '1' . PHP_EOL;
 					//$answers[] = prettyPrintRun($schedulerWorker,$lastExecutionTime);
 
 			}

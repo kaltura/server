@@ -246,7 +246,7 @@ class KCurlWrapper
 	 * @throws Exception | file as string | if $destFilePath provide - true or false
 	 */
 	
-	public static function getDataFromFile($url, $destFilePath = null, $maxFileSize = null)
+	public static function getDataFromFile($url, $destFilePath = null, $maxFileSize = null, $allowInternalUrl = false)
 	{
 		if(!is_null($maxFileSize))
 		{
@@ -275,7 +275,7 @@ class KCurlWrapper
 		}
 		
 		$curlWrapper = new KCurlWrapper();
-		$res = $curlWrapper->exec($url, $destFilePath);
+		$res = $curlWrapper->exec($url, $destFilePath, null, $allowInternalUrl);
 
 		$httpCode = curl_getinfo($curlWrapper->ch, CURLINFO_HTTP_CODE);
 		if (KCurlHeaderResponse::isError($httpCode))
@@ -500,10 +500,10 @@ class KCurlWrapper
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public function exec($sourceUrl, $destFile = null,$progressCallBack = null)
+	public function exec($sourceUrl, $destFile = null,$progressCallBack = null, $allowInternalUrl = false)
 	{
-		if ($this->isInternalUrl($sourceUrl))
-			KalturaLog::debug("Exec Curl - Found Internal url: " . $sourceUrl);
+		if (!$allowInternalUrl && $this->isInternalUrl($sourceUrl))
+			KalturaLog::debug("Exec Curl - Found not allowed Internal url: " . $sourceUrl);
 
 		$this->setSourceUrlAndprotocol($sourceUrl);
 		
@@ -534,12 +534,13 @@ class KCurlWrapper
 
 	/**
 	 * @param $sourceUrl
+	 * @param $allowInternalUrls
 	 * @return mixed
 	 */
-	public function doExec($sourceUrl)
+	public function doExec($sourceUrl, $allowInternalUrl = false)
 	{
-		if ($this->isInternalUrl($sourceUrl))
-			KalturaLog::debug("Exec Curl - Found Internal url: " . $sourceUrl);
+		if (!$allowInternalUrl && $this->isInternalUrl($sourceUrl))
+			KalturaLog::debug("DoExec Curl - Found not allowed Internal url: " . $sourceUrl);
 
 		curl_setopt($this->ch, CURLOPT_URL, $sourceUrl);
 

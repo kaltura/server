@@ -3,6 +3,7 @@
 abstract class DeliveryProfileLive extends DeliveryProfile {
 	const USER_TYPE_ADMIN = 'admin';
 	const USER_TYPE_USER = 'user';
+	const DEFAULT_MAINTENANCE_DC = -1;
 
 	/**
 	 * @var kLiveStreamConfiguration
@@ -111,68 +112,72 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$status = array(EntryServerNodeStatus::PLAYABLE);
 		if($this->getDynamicAttributes()->getServeVodFromLive())
 			$status[] = EntryServerNodeStatus::MARKED_FOR_DELETION;
-		
-		$liveEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($this->getDynamicAttributes()->getEntryId(), $status);
+
+		$entryId = $this->getDynamicAttributes()->getEntryId();
+		$liveEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($entryId, $status);
 		if(!count($liveEntryServerNodes))
 			return;
 
 		$requestedServerType = $this->getDynamicAttributes()->getStreamType();
-		$serverType = (is_null($requestedServerType)) ? EntryServerNodeType::LIVE_PRIMARY : intval($requestedServerType);
-		foreach($liveEntryServerNodes as $key => $liveEntryServerNode)
-		{
-			/* @var $liveEntryServerNode LiveEntryServerNode */
-			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
-			if($serverNode)
-			{
-				//Order by current DC first
-				//KalturaLog::debug("mediaServer->getDc [" . $serverNode->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
-				//if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
-				
-				//Order by primary DC first
-				KalturaLog::debug("liveEntryServerNode->getServerType [" . $liveEntryServerNode->getServerType() . "]");
-				if($liveEntryServerNode->getServerType() === $serverType)
-				{
-					$this->liveStreamConfig->setUrl($this->getHttpUrl($serverNode));
-					$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
-					
-					$streamIdsToRequest = $this->retrieveStreamIdsByBitrate($liveEntryServerNode->getStreams());
-					$this->params->setFlavorParamIds($streamIdsToRequest);
-					unset($liveEntryServerNodes[$key]);
-					break;
-				}
-			}
-		}
 
-		if (!is_null($requestedServerType))
-		{ //is request for specific serverType: we return it if exist but if not throw exception
-			if ($this->liveStreamConfig->getUrl())
-				return;
-			$entryId = $this->getDynamicAttributes()->getEntryId();
-			KalturaLog::err("Request stream type of [$requestedServerType] but not entryServerNode for that type on entry: $entryId");
+		$dcInMaintenance = $this->getIsMaintenanceFromCache($entryId);
+		KalturaLog::debug("Having requested-Server-Type of [$requestedServerType] and DC in maintenance of [$dcInMaintenance]");
+		$liveEntryServerNodes = $this->filterAndSet($liveEntryServerNodes, $requestedServerType, $dcInMaintenance);
+		if (empty($liveEntryServerNodes))
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$entryId] is not broadcasting on stream type [$requestedServerType]");
-		}
 
-		if(!$this->liveStreamConfig->getUrl() && count($liveEntryServerNodes))
-		{
-			$liveEntryServerNode = array_shift($liveEntryServerNodes);
-			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
-			if($serverNode)
-			{
-				$this->liveStreamConfig->setUrl($this->getHttpUrl($serverNode));
-				$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
-			}
-		}
+		//sort the entryServerNode array by weight from the heaviest to lowest
+		usort($liveEntryServerNodes, function ($a, $b) {return $b->weight - $a->weight;});
 		
-		if(count($liveEntryServerNodes))
-		{
-			$liveEntryServerNode = array_shift($liveEntryServerNodes);
-			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
-			if ($serverNode)
-			{
-				$this->liveStreamConfig->setBackupUrl($this->getHttpUrl($serverNode));
-				$this->liveStreamConfig->setBackupStreamInfo($liveEntryServerNode->getStreams());
-			}
+		$liveEntryServerNode = array_shift($liveEntryServerNodes); // after sort first is the primary
+		$this->liveStreamConfig->setUrl($this->getHttpUrl($liveEntryServerNode->serverNode));
+		$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
+		
+		// If min/max bitrate was requested, add the constraint to the array of flavorParamsIds in the profile's attributes.
+		$this->retrieveStreamIdsByBitrate($liveEntryServerNode->getStreams());
+
+		$liveEntryServerNode = array_shift($liveEntryServerNodes);
+		if ($liveEntryServerNode) { // if list has another entry server node set it as backup
+			$this->liveStreamConfig->setBackupUrl($this->getHttpUrl($liveEntryServerNode->serverNode));
+			$this->liveStreamConfig->setBackupStreamInfo($liveEntryServerNode->getStreams());
 		}
+	}
+
+	private function filterAndSet($liveEntryServerNodes, $requestedServerType, $dcInMaintenance)
+	{
+		return array_filter($liveEntryServerNodes, function($esn) use ($dcInMaintenance, $requestedServerType) {
+			if ($requestedServerType && $esn->getServerType() != $requestedServerType)
+				return false; // if request specific type then ignore all others
+			$esn->serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $esn->getServerNodeId());
+			if (!$esn->serverNode)
+				return false; // if the entry has no active server node ignore it
+			$esn->weight = ($esn->getServerType() == EntryServerNodeType::LIVE_PRIMARY) ? 10 : 0;
+			if ($esn->serverNode->getDc() == $dcInMaintenance)
+				$esn->weight -= 100; // if DC in maintenance then lower its priority
+			return true;
+		});
+	}
+
+	private function getIsMaintenanceFromCache($entryId)
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		if (!$cache)
+			return self::DEFAULT_MAINTENANCE_DC;
+		$val = $cache->get("Live-MaintenanceDataCacheKey");
+		if (!$val)
+			return self::DEFAULT_MAINTENANCE_DC;
+		$result = json_decode($val, true);
+		if (!is_array($result))
+		{
+			KalturaLog::notice("Got maintenance data from cache but could not parse it. Raw data: " . print_r($val, true));
+			return self::DEFAULT_MAINTENANCE_DC;
+		}
+		KalturaLog::debug("Got maintenance data from cache: " . print_r($result, true));
+		if (key_exists("maintenanceDC", $result))
+			return $result["maintenanceDC"];
+		if (key_exists($entryId, $result))
+			return $result[$entryId];
+		return self::DEFAULT_MAINTENANCE_DC;
 	}
 	
 	protected function initManualLiveStreamConfiguration(LiveStreamEntry $entry)
@@ -403,7 +408,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		{
 			return $streamIds;
 		}
-		elseif (!$this->params->getMaxBitrate() && !$this->params->getMinBitrate())
+		elseif (!$this->getDynamicAttributes()->getMaxBitrate() && !$this->getDynamicAttributes()->getMinBitrate())
 		{
 			return $streamIds;
 		}
@@ -411,24 +416,29 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		foreach ($streams as $stream)
 		{
 			/* @var $stream kLiveStreamParams */
-			if ($this->params->getMinBitrate() && $stream->getBitrate()/1024 < $this->params->getMinBitrate())
+			if ($this->getDynamicAttributes()->getMinBitrate() && $stream->getBitrate()/1024 < $this->getDynamicAttributes()->getMinBitrate())
 			{
 				continue;
 			}
-			if ($this->params->getMaxBitrate() && $stream->getBitrate()/1024 > $this->params->getMaxBitrate())
+			if ($this->getDynamicAttributes()->getMaxBitrate() && $stream->getBitrate()/1024 > $this->getDynamicAttributes()->getMaxBitrate())
 			{
 				continue;
 			}
 			
 			$streamIds[] = $stream->getFlavorId();
+			
+			if(count($this->getDynamicAttributes()->getFlavorParamIds()))
+			{
+				$streamIds = array_intersect($streamIds, $this->getDynamicAttributes()->getFlavorParamIds());
+			}
 		}
 		if (!count($streamIds))
 		{
 			// If the stream info is available to us, min and/or max bitrate params were passed, and no streams comply with them - throw error
-			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND, "Entry [$entryId] has no valid streams");
+			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND, "Entry [". $this->getDynamicAttributes()->getEntryId() ."] has no valid streams");
 		}
 		
-		return $streamIds;
+		$this->params->setFlavorParamIds($streamIds);
 	}
 	
 	public function setLivePackagerSigningDomain($v)

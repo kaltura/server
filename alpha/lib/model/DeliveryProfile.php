@@ -525,4 +525,48 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	{
 		return $this->getFromCustomData("supplementaryAssetsFilter");
 	}
+	
+	public function setPricingProfile($v)
+	{
+		$this->putInCustomData("pricingProfile", $v);
+	}
+	
+	public function getPricingProfile()
+	{
+		return $this->getFromCustomData("pricingProfile");
+	}
+
+	public function getRegionPrice($region)
+	{
+		$pricingProfile = $this->getPricingProfile();
+		if (!$pricingProfile)
+			return false;
+		
+		$pricingProfiles = kConf::getMap('cdn_pricing_profiles');
+		if (!$pricingProfiles)
+			return false;
+		
+		if (!isset($pricingProfiles[$pricingProfile]))
+			return false;
+		
+		$prices = $pricingProfiles[$pricingProfile];
+		
+		return isset($prices[$region]) ? $prices[$region] : false;
+	}
+	
+	public function isSubstitute(DeliveryProfile $dp)
+	{
+		if (is_null($this->getHostName()) != is_null($dp->getHostName()) ||
+			is_null($this->getTokenizer()) != is_null($dp->getTokenizer()) ||
+			$this->getPriority() != $dp->getPriority() ||
+			$this->getPartnerId() != $dp->getPartnerId())
+		{
+			return false;
+		}
+		
+		$path = parse_url($this->getUrl(), PHP_URL_PATH);
+		$dpPath = parse_url($dp->getUrl(), PHP_URL_PATH);
+		
+		return $path === $dpPath;
+	}
 }

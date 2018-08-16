@@ -34,10 +34,12 @@ class ReachProfile extends BaseReachProfile
 	
 	const CUSTOM_DATA_CREDIT_USAGE_PERCENTAGE = 			'credit_usage_percentage';
 	const CUSTOM_DATA_CONTENT_DELETION_POLICY = 			'content_deletion_policy';
-
-
+	
 	const CUSTOM_DATA_CREDIT_RESET_HISTORY =                'credit_reset_history';
+	
 	const MAX_CREDIT_HISTORY_TO_KEEP =                      10;
+	const DEFAULT_MAX_CHARS_PER_LINE =                      26;
+	
 	//setters
 	
 	public function setEnableMachineModeration($v)
@@ -234,7 +236,11 @@ class ReachProfile extends BaseReachProfile
 	
 	public function getMaxCharactersPerCaptionLine()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_MAX_CHARS_PER_LINE ,null, null);
+		$maxCharactersPerCaptionLine = $this->getFromCustomData(self::CUSTOM_DATA_MAX_CHARS_PER_LINE ,null, null);
+		if(!$maxCharactersPerCaptionLine)
+			$maxCharactersPerCaptionLine = self::DEFAULT_MAX_CHARS_PER_LINE;
+		
+		return $maxCharactersPerCaptionLine;
 	}
 	
 	public function getRulesArrayCompressed()

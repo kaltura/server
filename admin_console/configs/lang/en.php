@@ -1419,38 +1419,51 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION' => 'TRANSLATION',
 	'Kaltura_Client_Reach_Enum_VendorServiceType::HUMAN' => 'HUMAN',
 	'Kaltura_Client_Reach_Enum_VendorServiceType::MACHINE' => 'MACHINE',
+	
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::BEST_EFFORT' => 'BEST_EFFORT',
-	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FIVE_MINUTES' => 'FIVE_MINUTES',
-	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FORTY_EIGHT_HOURS' => 'FORTY_EIGHT_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::IMMEDIATE' => 'IMMEDIATE',
-	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::SIX_HOURS' => 'SIX_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::THIRTY_MINUTES' => 'THIRTY_MINUTES',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWO_HOURS' => 'TWO_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::THREE_HOURS' => 'THREE_HOURS',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::SIX_HOURS' => 'SIX_HOURS',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::EIGHT_HOURS' => 'EIGHT_HOURS',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWELVE_HOURS' => 'TWELVE_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWENTY_FOUR_HOURS' => 'TWENTY_FOUR_HOURS',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FORTY_EIGHT_HOURS' => 'FORTY_EIGHT_HOURS',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TEN_DAYS' => 'TEN_DAYS',
+	
 	'Kaltura_Client_Reach_Type_VendorCatalogItemPricing' => "Default Pricing",
 	'Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE' => "FALSE",
 	'Kaltura_Client_Enum_NullableBoolean::NULL_VALUE' => "NULL VALUE",
 	'Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE' => "TRUE",
+	
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::SRT' => "SRT",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::DFXP' => "DFXP",
+	
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DEPRECATED' => "Deprecated",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED' => "Deleted",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::ACTIVE' => "Enabled",
+	
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_MINUTE' => "Price Per Minute",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_SECOND' => "Price Per Second",
+	
 	'Kaltura_Client_Reach_Enum_ReachProfileType::FREE_TRIAL' => "Free Trial",
 	'Kaltura_Client_Reach_Enum_ReachProfileType::PAID' => "Paid",
+	
 	'Kaltura_Client_Reach_Enum_ReachProfileStatus::DISABLED' => "Disabled",
 	'Kaltura_Client_Reach_Enum_ReachProfileStatus::DELETED' => "Deleted",
 	'Kaltura_Client_Reach_Enum_ReachProfileStatus::ACTIVE' => "Enabled",
+	
 	'Kaltura_Client_Reach_Type_TimeRangeVendorCredit' => "Time Ranged Credit",
 	'Kaltura_Client_Reach_Type_ReoccurringVendorCredit' => "Recurring Credit",
 	'Kaltura_Client_Reach_Type_VendorCredit'  => "Generic Credit",
 	'Kaltura_Client_Reach_Type_UnlimitedVendorCredit' => "Unlimited Credit",
+	
 	'Kaltura_Client_Reach_Enum_VendorCreditRecurrenceFrequency::MONTHLY' => "MONTHLY",
 	'Kaltura_Client_Reach_Enum_VendorCreditRecurrenceFrequency::DAILY' => "DAILY",
 	'Kaltura_Client_Reach_Enum_VendorCreditRecurrenceFrequency::WEEKLY' => "WEEKLY",
 	'Kaltura_Client_Reach_Enum_VendorCreditRecurrenceFrequency::YEARLY' => "YEARLY",
+	
 	'Kaltura_Client_Reach_Enum_ReachProfileContentDeletionPolicy::DO_NOTHING' => "DO_NOTHING",
 	'Kaltura_Client_Reach_Enum_ReachProfileContentDeletionPolicy::DELETE_ONCE_PROCESSED' => "DELETE_ONCE_PROCESSED",
 	'Kaltura_Client_Reach_Enum_ReachProfileContentDeletionPolicy::DELETE_AFTER_WEEK' => "DELETE_AFTER_WEEK",

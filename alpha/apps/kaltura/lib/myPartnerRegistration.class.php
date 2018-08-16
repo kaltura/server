@@ -92,6 +92,7 @@ class myPartnerRegistration
 		$quickStartGuideLink = kConf::get('quick_start_guide_url');
 		$uploadMediaVideoLink = kConf::get('upload_media_video_url');
 		$howToPublishVideoLink = kConf::get('how_to_publish_video_url');
+		$freeTrialResourceLink = kConf::get('free_trial_resource_url', 'local', '');
 		if ( $recipient_email == null ) $recipient_email = $loginEmail;
 
 		
@@ -117,8 +118,8 @@ class myPartnerRegistration
 			switch($partner_type) { // send different email for different partner types
 				case Partner::PARTNER_TYPE_KMC: // KMC signup
 					if ($existingUser) {
-						$mailType = self::KALTURAS_EXISTING_USER_REGISTRATION_CONFIRMATION;
-						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
+						$mailType = self::KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION;
+						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $freeTrialResourceLink);
 					}
 					else {
 						$mailType = self::KALTURAS_CMS_REGISTRATION_CONFIRMATION;
@@ -129,7 +130,7 @@ class myPartnerRegistration
 				case Partner::PARTNER_TYPE_BLACKBOARD:
 					if ($existingUser) {
 						$mailType = self::KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION;
-						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
+						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $freeTrialResourceLink);
 					}
 					else {
 						$mailType = self::KALTURAS_BLACKBOARD_DEFAULT_REGISTRATION_CONFIRMATION;
@@ -139,7 +140,7 @@ class myPartnerRegistration
 				default: // all others
 				 	if ($existingUser) {
 						$mailType = self::KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION;
-						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
+						$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $freeTrialResourceLink);
 					}
 					else {
 						$mailType = self::KALTURAS_DEFAULT_REGISTRATION_CONFIRMATION;
@@ -329,9 +330,10 @@ class myPartnerRegistration
 		if ($existingLoginData && !$ignorePassword)
 		{
 			// if a another user already existing with the same adminEmail, new account will be created only if the right password was given
+			$existingPartner = partnerPeer::retrieveByPK($existingLoginData->getConfigPartnerId());
 			if (!$password)
 			{
-				$this->markExistingEmailRegisterFailure($existingLoginData, SignupException::MISSING_PASSWORD_FOR_EXISTING_EMAIL);
+				$this->addMarketoCampaignId($existingPartner, 'marketo_missing_Password_campaign', $partner);
 				throw new SignupException("User with email [$email] already exists in system.", SignupException::MISSING_PASSWORD_FOR_EXISTING_EMAIL );
 			}
 			else if ($existingLoginData->isPasswordValid($password))
@@ -340,7 +342,7 @@ class myPartnerRegistration
 			}
 			else
 			{
-				$this->markExistingEmailRegisterFailure($existingLoginData, SignupException::INCORRECT_PASSWORD_FOR_EXISTING_EMAIL);
+				$this->addMarketoCampaignId($existingPartner, 'marketo_wrong_password_campaign', $partner);
 				throw new SignupException("Invalid password for user with email [$email].", SignupException::INCORRECT_PASSWORD_FOR_EXISTING_EMAIL );
 			}
 			
@@ -375,6 +377,13 @@ class myPartnerRegistration
 					
 			$this->setAllTemplateEntriesToAdminKuser($newPartner->getId(), $kuserId);
 
+			if(!$existingLoginData)
+				$this->addMarketoCampaignId($newPartner, 'marketo_new_register_success_campaign', $newPartner);
+
+			if ($existingLoginData && !$ignorePassword)
+				$this->addMarketoCampaignId($newPartner, 'marketo_additional_register_success_campaign', $newPartner);
+
+
 			kEventsManager::raiseEvent(new kObjectAddedEvent($newPartner));
 
 			return array($newPartner->getId(), $newSubPartnerId, $newAdminKuserPassword, $newPassHashKey);
@@ -386,11 +395,20 @@ class myPartnerRegistration
 		}
 	}
 
-	private function markExistingEmailRegisterFailure($existingLoginData, $failureReason)
+	private function addMarketoCampaignId($partnerToUpdate, $campaignName, $partnerToCheck)
 	{
-		$existingPartner = partnerPeer::retrieveByPK($existingLoginData->getConfigPartnerId());
-		$existingPartner->setAdditionalAccountFailureReason($failureReason);
-		$existingPartner->save();
+		//if an additional account was register we want to check if the additional is free trial and update the existing lead
+		$additionalParams = $partnerToCheck->getAdditionalParams();
+		$additionalParams = array_change_key_case($additionalParams);
+		if($partnerToCheck->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_FREE && isset($additionalParams['freetrialaccounttype']))
+		{
+			if (kConf::hasParam($campaignName))
+			{
+				$campaignId = kConf::get($campaignName);
+				$partnerToUpdate->setMarketoCampaignId($campaignId);
+				$partnerToUpdate->save();
+			}
+		}
 	}
 
 	private function allowOnlyOneActiveFreeTrialAccountCreation($partner, $email)

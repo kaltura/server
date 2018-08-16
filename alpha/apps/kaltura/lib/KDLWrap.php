@@ -793,7 +793,7 @@ class KDLWrap
 		 */
 		$assetBr = max($contBr,$vidBr+$audBr);
 		$fla->setBitrate($assetBr);
-		
+		$fla->setContainsAudio($cdlMediaInfo->isContainAudio());
 		/*
 		 * Set flavorAsset language to mediaInfo first audio language
 		 */

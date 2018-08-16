@@ -19,6 +19,8 @@ class ValidateAccessResponseProfile
 	 */
 	public static function validateAccess($relatedFilter)
 	{
+		if (self::PartnerExcludedFromResponseProfile())
+			return true;
 		$clazz = self::getServiceClassInstance($relatedFilter);
 		return self::validate($clazz);
 	}
@@ -31,6 +33,7 @@ class ValidateAccessResponseProfile
 	private static function getServiceClassInstance($relatedFilter)
 	{
 		$clazz = self::getServiceClazz($relatedFilter);
+		$clazz = trim($clazz);
 		/** @relatedService ignore */
 		if ($clazz === self::IGNORE)
 			return $clazz;
@@ -77,7 +80,6 @@ class ValidateAccessResponseProfile
 			return true;
 		try {
 			/** @var KalturaBaseService $service */
-			$clazz = trim($clazz);
 			$service = new $clazz();
 			list($serviceId, $serviceName) = KalturaServicesMap::getServiceIdAndServiceNameByClass($clazz);
 			$service->initService($serviceId, $serviceName, 'list');
@@ -86,6 +88,17 @@ class ValidateAccessResponseProfile
 			throw  $e;
 		}
 		return true;
+	}
+
+	/**
+	 * @return bool
+	 * @throws Exception
+	 */
+	private static function PartnerExcludedFromResponseProfile()
+	{
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		$partnersToSkip = kConf::get('skip_response_profile_validation_partners','local', array());
+		return in_array($partnerId,$partnersToSkip);
 	}
 
 }

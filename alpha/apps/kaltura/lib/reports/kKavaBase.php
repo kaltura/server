@@ -14,6 +14,7 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_BANDWIDTH_USAGE = 'bandwidth-usage';
 	const DATASOURCE_STORAGE_USAGE = 'storage-usage';
 	const DATASOURCE_TRANSCODING_USAGE = 'transcoding-usage';
+	const DATASOURCE_REACH_USAGE = 'reach-usage';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
@@ -37,6 +38,9 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_MEDIA_TYPE = 'mediaType';
 	const DIMENSION_SOURCE_TYPE = 'sourceType';
 	const DIMENSION_STATUS = 'status';
+	const DIMENSION_SERVICE_TYPE = 'serviceType';
+	const DIMENSION_SERVICE_FEATURE = 'serviceFeature';
+	const DIMENSION_REACH_PROFILE_ID = 'reachProfileId';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -99,6 +103,9 @@ class kKavaBase extends kDruidBase
 	const MEDIA_TYPE_IMAGE = 'Image';
 	const MEDIA_TYPE_SHOW = 'Show';		// mix
 	const MEDIA_TYPE_FLASH = 'Flash';	// live stream
+	
+	// Entry vendor task statuses
+	const TASK_READY = "Ready";
 
 	public static function isPartnerAllowed($partnerId, $serviceType) {
 	    if (kConf::hasParam(self::DRUID_URL)) {

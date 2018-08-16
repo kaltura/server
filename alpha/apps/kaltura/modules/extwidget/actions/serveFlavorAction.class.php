@@ -277,7 +277,7 @@ class serveFlavorAction extends kalturaAction
 						$path = '';
 						$storeCache = false;
 					}
-					$clips[] = $this->getClipData($path,$flavor->getId());
+					$clips[] = $this->getClipData($path,$flavor);
 				}
 				$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($origEntryFlavor->getId(), $origEntry->getId()));
 			}
@@ -762,15 +762,22 @@ class serveFlavorAction extends kalturaAction
 
 	/**
 	 * @param string $path
-	 * @param int $flavorId
+	 * @param flavorAsset $flavor
 	 * @return array
 	 */
-	private function getClipData($path, $flavorId)
+	private function getClipData($path, $flavor)
 	{
-		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorId);
-		$clipDesc = array('type' => 'source', 'path' => $path);
-		if ($mediaInfo && !$mediaInfo->getAudioBitRate())
+		$flavorId = $flavor->getId();
+		$hasAudio = $flavor->getContainsAudio();
+		if (is_null($hasAudio))
 		{
+			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorId);
+			$hasAudio = !$mediaInfo || $mediaInfo->isContainAudio();
+		}
+		$clipDesc = array('type' => 'source', 'path' => $path);
+		if (!$hasAudio)
+		{
+			KalturaLog::debug("$flavorId Audio Bit rate is null or 0 (taken from mediaInfo)");
 			$silent = array_merge(array(array('type' => 'silence')),array($clipDesc));
 			$clipDesc = array('type' => 'mixFilter','sources' => $silent);
 		}

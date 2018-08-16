@@ -42,7 +42,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		if ($object instanceof EntryVendorTask
 			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
-			&& $object->getStatus() == EntryVendorTaskStatus::ERROR
+			&& in_array($object->getStatus(), array(EntryVendorTaskStatus::ERROR, EntryVendorTaskStatus::READY))
 		)
 			return true;
 
@@ -101,6 +101,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			&& in_array($object->getColumnsOldValue(EntryVendorTaskPeer::STATUS), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING))
 		)
 			return $this->handleErrorTask($object);
+		
+		if ($object instanceof EntryVendorTask
+			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
+			&& $object->getStatus() == EntryVendorTaskStatus::READY
+		)
+			return $this->invalidateAccessKey($object);
 
 		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP &&
 			in_array(entryPeer::LENGTH_IN_MSECS, $modifiedColumns)
@@ -131,6 +137,22 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	{
 		ReachProfilePeer::updateUsedCredit($entryVendorTask->getReachProfileId(), -$entryVendorTask->getPrice());
 	}
+	
+	private function invalidateAccessKey(EntryVendorTask $entryVendorTask)
+	{
+		$ksString = $entryVendorTask->getAccessKey();
+		
+		try
+		{
+			$ksObj = kSessionUtils::crackKs($ksString);
+		}
+		catch(Exception $ex)
+		{
+			KalturaLog::debug("Failed to crackKs with error message [" . $ex->getMessage() . "], accessKey won't be invalidated");
+		}
+		
+		$ksObj->kill();
+	}
 
 	private function handleEntryDurationChanged(entry $entry)
 	{
@@ -142,15 +164,19 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$oldPrice = $pendingEntryVendorTask->getPrice();
 			$newPrice = kReachUtils::calculateTaskPrice($entry, $pendingEntryVendorTask->getCatalogItem());
 			$priceDiff = $newPrice - $oldPrice;
+			
+			if(!$priceDiff)
+				continue;
+			
 			$pendingEntryVendorTask->setPrice($newPrice);
-
 			if (!isset($addedCostByProfileId[$pendingEntryVendorTask->getReachProfileId()]))
 				$addedCostByProfileId[$pendingEntryVendorTask->getReachProfileId()] = 0;
 
 			if (kReachUtils::checkPriceAddon($pendingEntryVendorTask, $priceDiff))
 			{
 				$pendingEntryVendorTask->save();
-				$addedCostByProfileId[$pendingEntryVendorTask->getReachProfileId()] += $priceDiff;
+				if($pendingEntryVendorTask->getStatus() != EntryVendorTaskStatus::PENDING_MODERATION)
+					$addedCostByProfileId[$pendingEntryVendorTask->getReachProfileId()] += $priceDiff;
 			}
 			else
 			{
@@ -164,6 +190,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		foreach ($addedCostByProfileId as $reachProfileId => $addedCost)
 		{
+			if(!$addedCost)
+				continue;
+			
 			ReachProfilePeer::updateUsedCredit($reachProfileId, $addedCost);
 		}
 

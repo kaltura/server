@@ -172,6 +172,11 @@ class flavorAsset extends exportableAsset
 	public function incrementInterFlowCount() { $this->putInCustomData("interFlowCount", $this->getInterFlowCount() ? $this->getInterFlowCount()+1 : 1); }
 	public function removeInterFlowCount() { $this->removeFromCustomData("interFlowCount"); }
 
+
+	public function setContainsAudio($v)	{$this->putInCustomData('containsAudio', $v);}
+	public function getContainsAudio()	{return $this->getFromCustomData('containsAudio');}
+
+
 	public function getLanguage()
 	{
 		$languageCode = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE);

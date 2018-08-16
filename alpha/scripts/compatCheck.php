@@ -69,6 +69,7 @@ $APIV3_TESTED_ACTIONS = array(
 		'*.serve',
 		'*.goto',
 		'*.search',
+		'*.startwidgetsession',
 		);
 
 $APIV3_BLOCKED_ACTIONS = array(
@@ -78,7 +79,7 @@ $APIV3_BLOCKED_ACTIONS = array(
 		'widevine_widevinedrm.getlicense',		// contains random
 		);
 
-$KS_PATTERNS = array('/\/ks\/([a-zA-Z0-9+_\-]+=*)/', '/&ks=([a-zA-Z0-9+\/_\-]+=*)/', '/\?ks=([a-zA-Z0-9+\/_\-]+=*)/');
+$KS_PATTERNS = array('/\/ks\/([a-zA-Z0-9+_\-]+=*)/', '/&ks=([a-zA-Z0-9+\/_\-]+=*)/', '/\?ks=([a-zA-Z0-9+\/_\-]+=*)/', '/<ks>([a-zA-Z0-9+\/_\-]+=*)<\/ks>/');
 
 // compare modes
 define('CM_XML', 0);
@@ -118,7 +119,7 @@ class PartnerSecretPool
 			return null;
 
 		$query = "SELECT admin_secret FROM partner WHERE id='{$partnerId}'";
-		$result = mysqli_query($this->link,$query) or die('Error: Select from func table query failed: ' . mysqli_error($link) . "\n");
+		$result = mysqli_query($this->link,$query) or die('Error: Select from func table query failed: ' . mysqli_error($this->link) . "\n");
 		$line = mysqli_fetch_array($result, MYSQLI_NUM);
 		if (!$line)
 			return null;
@@ -343,7 +344,7 @@ function xmlToArray($xmlstring)
 			$xmlstring = str_replace("</{$namespace}:", "</{$namespace}_", $xmlstring);
 		}
 	}
-	
+
 	// parse the xml
 	$xml = @simplexml_load_string($xmlstring);
 	$json = json_encode($xml);
@@ -731,7 +732,7 @@ function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParam
 	if ($compareMode == CM_BINARY)
 	{
 		$range = '0-262144';		// 256K
-		
+
 		// use GET
 		if ($postParams)
 		{
@@ -739,7 +740,7 @@ function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParam
 			{
 				$uri .= '?';
 			}
-			else 
+			else
 			{
 				$uri .= '&';
 			}

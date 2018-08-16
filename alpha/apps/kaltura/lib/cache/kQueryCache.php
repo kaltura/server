@@ -63,7 +63,9 @@ class kQueryCache
 	const QUERY_DB_SLAVE = 2;
 	
 	const CACHE_VERSION = '2';
-	
+
+	const SPHINX_LAG_KEY = 'QCCSPH-SphinxLag';	// the lags of the different sphinx servers in the current DC
+
 	protected static $s_memcacheKeys = null;
 	protected static $s_memcacheQueries = null;
 	protected static $s_memcacheInited = false;
