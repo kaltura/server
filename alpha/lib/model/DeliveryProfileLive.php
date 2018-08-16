@@ -406,11 +406,11 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$streamIds = array();
 		if (!$streams || !count($streams))
 		{
-			return $streamIds;
+			return;
 		}
 		elseif (!$this->getDynamicAttributes()->getMaxBitrate() && !$this->getDynamicAttributes()->getMinBitrate())
 		{
-			return $streamIds;
+			return;
 		}
 		
 		foreach ($streams as $stream)
