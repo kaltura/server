@@ -490,9 +490,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			}
 		}
 		
-		KalturaLog::debug("FlavorArrayOrder = [" . print_r($flavors, true));
 		uasort($flavors, array($this,'flavorCmpFunction'));
-		KalturaLog::debug("FlavorArrayOrder = [" . print_r($flavors, true));
 	
 		return $flavors;
 	}
