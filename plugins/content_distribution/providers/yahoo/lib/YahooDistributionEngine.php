@@ -114,8 +114,8 @@ class YahooDistributionEngine extends DistributionEngine implements
 			throw new Exception("fieldValues array is empty or null");	
 		}			
 		//xml creation
-		$flavorAssets = $this->getFlavorAssets($entryDistribution);		
-		$thumbAssets = $this->getThumbAssets($entryDistribution);
+		$flavorAssets = $this->getEntryDistributionFlavorAssets($entryDistribution);
+		$thumbAssets = $this->getEntryDistributionThumbAssets($entryDistribution);
 		$feed = new YahooDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile, $providerData, $entryDistribution, $flavorAssets);		
 		$feed->setFieldsForSubmit();		
 		//create unique name for thumbnails 
@@ -226,42 +226,20 @@ class YahooDistributionEngine extends DistributionEngine implements
 		return $ftpManager;
 	}
 	
-	protected function getFlavorAssets(KalturaEntryDistribution $entryDistribution)
+	protected function getEntryDistributionFlavorAssets(KalturaEntryDistribution $entryDistribution)
 	{
-		$flavorAssetFilter = new KalturaFlavorAssetFilter();
-		$flavorAssetFilter->entryIdEqual = $entryDistribution->entryId;
-		$flavorAssetFilter->idIn = $entryDistribution->flavorAssetIds;
+		$flavorAssetIds = $entryDistribution->flavorAssetIds;
+		$partnerId = $entryDistribution->partnerId;
 		
-		try {
-			KBatchBase::impersonate($entryDistribution->partnerId);
-			$flavorAssets = KBatchBase::$kClient->flavorAsset->listAction($flavorAssetFilter);
-			KBatchBase::unimpersonate();
-		}
-		catch (Exception $e) {
-			KBatchBase::unimpersonate();
-			throw $e;
-		}
-		
-		return $flavorAssets->objects;		
+		return parent::getThumbAssets($partnerId, $thumbAssetIds);
 	}
-	
-	protected function getThumbAssets(KalturaEntryDistribution $entryDistribution)
+
+	protected function getEntryDistributionThumbAssets(KalturaEntryDistribution $entryDistribution)
 	{
-		$thumbAssetFilter = new KalturaThumbAssetFilter();
-		$thumbAssetFilter->entryIdEqual = $entryDistribution->entryId;
-		$thumbAssetFilter->idIn = $entryDistribution->thumbAssetIds;
+		$thumbAssetIds = $entryDistribution->thumbAssetIds;
+		$partnerId = $entryDistribution->partnerId;
 		
-		try {
-			KBatchBase::impersonate($entryDistribution->partnerId);
-			$thumbAssets = KBatchBase::$kClient->thumbAsset->listAction($thumbAssetFilter);
-			KBatchBase::unimpersonate();
-		}
-		catch (Exception $e) {
-			KBatchBase::unimpersonate();
-			throw $e;
-		}
-		
-		return $thumbAssets->objects;		
+		return parent::getThumbAssets($partnerId, $thumbAssetIds);
 	}
 	
 	/**

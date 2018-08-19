@@ -79,11 +79,18 @@ abstract class DistributionEngine implements IDistributionEngine
 	 */
 	protected function getFlavorAssets($partnerId, $flavorAssetIds)
 	{
-		KBatchBase::impersonate($partnerId);
 		$filter = new KalturaAssetFilter();
 		$filter->idIn = $flavorAssetIds;
-		$flavorAssetsList = KBatchBase::$kClient->flavorAsset->listAction($filter);
-		KBatchBase::unimpersonate();
+		
+		try {
+			KBatchBase::impersonate($entryDistribution->partnerId);
+			$flavorAssetsList = KBatchBase::$kClient->flavorAsset->listAction($flavorAssetFilter);
+			KBatchBase::unimpersonate();
+		}
+		catch (Exception $e) {
+			KBatchBase::unimpersonate();
+			throw $e;
+		}
 		
 		return $flavorAssetsList->objects;
 	}
@@ -94,11 +101,19 @@ abstract class DistributionEngine implements IDistributionEngine
 	 */
 	protected function getThumbAssets($partnerId, $thumbAssetIds)
 	{
-		KBatchBase::impersonate($partnerId);
 		$filter = new KalturaAssetFilter();
 		$filter->idIn = $thumbAssetIds;
-		$thumbAssetsList = KBatchBase::$kClient->thumbAsset->listAction($filter);
-		KBatchBase::unimpersonate();
+		
+		try {
+			KBatchBase::impersonate($partnerId);
+			$thumbAssetsList = KBatchBase::$kClient->thumbAsset->listAction($filter);
+			KBatchBase::unimpersonate();
+		}
+		catch (Exception $e) {
+			KBatchBase::unimpersonate();
+			throw $e;
+		}
+		
 		return $thumbAssetsList->objects;
 	}
 
@@ -202,7 +217,7 @@ abstract class DistributionEngine implements IDistributionEngine
 			else
 				$filePath .= '/asset_'.$assetId;
 
-			$assetContentUrl = self::getAssetUrl($assetId);
+			$assetContentUrl = $this->getAssetUrl($assetId);
 			$res = KCurlWrapper::getDataFromFile($assetContentUrl, $filePath, null, true);
 			if ($res)
 				return $filePath;

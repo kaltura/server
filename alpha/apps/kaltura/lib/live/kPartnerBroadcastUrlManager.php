@@ -1,5 +1,5 @@
 <?php
-class kPartnerBroadcastUrlManager extends kBroadcastUrlManager
+class 	kPartnerBroadcastUrlManager extends kBroadcastUrlManager
 {
 	protected function getHostName($dc, $primary, $entry, $protocol)
 	{

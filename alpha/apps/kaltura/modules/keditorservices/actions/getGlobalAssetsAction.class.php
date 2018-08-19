@@ -13,7 +13,7 @@ require_once ( __DIR__ . "/defKeditorservicesAction.class.php");
  */
 class getGlobalAssetsAction extends defKeditorservicesAction
 {
-	protected function executeImpl ( kshow  $kshow )
+	protected function executeImpl( kshow $kshow, entry &$entry)
 	{
 		$asset_type = $this->getRequestParameter( "type" , entry::ENTRY_MEDIA_TYPE_VIDEO );
 

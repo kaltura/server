@@ -886,9 +886,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	/* (non-PHPdoc)
 	 * @see Criteria::getNewCriterion()
 	 */
-	public function getNewCriterion($column, $value = null, $comparison = self::EQUAL)
+	public function getNewCriterion($column, $value, $comparison = null)
 	{
-		return new SphinxCriterion($this, $column, $value, $comparison);
+		return new SphinxCriterion($this, $column, $value, $comparison ? $comparison : self::EQUAL);
 	}
 	
 	static private function addCriterionField(&$criterionFields, $field, $comparisons)

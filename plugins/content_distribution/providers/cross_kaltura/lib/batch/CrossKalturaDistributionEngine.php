@@ -437,19 +437,17 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 		}
 		return $contentResource;
 	}
-
-	protected function getAssetUrl( $assetId, KalturaServiceBase $assetService )
+	
+	protected function getAssetUrlByAssetId($assetId, $assetService)
 	{
 		if ( $assetService instanceof KalturaFlavorAssetService ) {
 			$options = new KalturaFlavorAssetUrlOptions();
 			$options->fileName = $assetId;
 			return $assetService->getUrl($assetId, null, false, $options);
 		}
-
+		
 		return $assetService->getUrl($assetId);
 	}
-
-
 
 	// -----------------------------------------------
 	//  methods to transform source to target objects
