@@ -346,4 +346,5 @@ class KalturaUser extends KalturaObject implements IRelatedFilterable
 
     }
 }
+
 ?>
