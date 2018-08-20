@@ -322,29 +322,25 @@ class KalturaUser extends KalturaObject implements IRelatedFilterable
 
     public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
     {
-
-        if (strlen($this->firstName) > self::MAX_NAME_LEN)
-            $this->firstName = kString::alignUtf8String($this->firstName, self::MAX_NAME_LEN);
-        if (strlen($this->lastName) > self::MAX_NAME_LEN)
-            $this->lastName = kString::alignUtf8String($this->lastName, self::MAX_NAME_LEN);
-        if (strlen($this->fullName) > self::MAX_NAME_LEN)
-            $this->fullName = kString::alignUtf8String($this->fullName, self::MAX_NAME_LEN);
-
+        $this->verifyMaxLength();
         return parent::toInsertableObject($object_to_fill, $props_to_skip);
     }
 
     public function toUpdatableObject($object_to_fill, $props_to_skip = array())
     {
+        $this->verifyMaxLength();
+        return parent::toUpdatableObject($object_to_fill, $props_to_skip);
+    }
+
+    public function verifyMaxLength()
+	{
         if (strlen($this->firstName) > self::MAX_NAME_LEN)
             $this->firstName = kString::alignUtf8String($this->firstName, self::MAX_NAME_LEN);
         if (strlen($this->lastName) > self::MAX_NAME_LEN)
             $this->lastName = kString::alignUtf8String($this->lastName, self::MAX_NAME_LEN);
         if (strlen($this->fullName) > self::MAX_NAME_LEN)
             $this->fullName = kString::alignUtf8String($this->fullName, self::MAX_NAME_LEN);
-
-        return parent::toUpdatableObject($object_to_fill, $props_to_skip);
-
-    }
+	}
 }
 
 ?>
