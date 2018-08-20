@@ -334,9 +334,9 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			if (!is_null($obj))
 			{
 				if ($useTwoCodeLang)
-					$audioLanguage = $obj[languageCodeManager::ISO639] ? $obj[languageCodeManager::ISO639] : $lang;
+					$audioLanguage = $obj[languageCodeManager::ISO639] ? $obj[languageCodeManager::ISO639] : $audioLanguage;
 				else
-					$audioLanguage = $obj[languageCodeManager::ISO639_B] ? $obj[languageCodeManager::ISO639_B] : $obj[languageCodeManager::ISO639_T];
+					$audioLanguage = $obj[languageCodeManager::ISO639_T] ? $obj[languageCodeManager::ISO639_T] : $obj[languageCodeManager::ISO639_B];
 			}
 		}
 

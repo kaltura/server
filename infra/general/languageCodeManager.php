@@ -60,9 +60,9 @@ class languageCodeManager
     {
         if(!self::isAlreadyLoaded())
             self::loadLanguageCodeMap();
-        $val = isset(self::$arrayISO639_B[$codeT]) ? self::$arrayISO639_B[$codeT] : null;
+        $val = isset(self::$arrayISO639_T[$codeT]) ? self::$arrayISO639_T[$codeT] : null;
 	    if (!$val)
-            $val = isset(self::$arrayISO639_T[$codeT]) ? self::$arrayISO639_T[$codeT] : null;
+            $val = isset(self::$arrayISO639_B[$codeT]) ? self::$arrayISO639_B[$codeT] : null;
         return self::getObjectFromTwoCode($val);
     }
 
@@ -109,11 +109,11 @@ class languageCodeManager
         if(isset(self::$arrayISO639[$language]))
             return $language;
 
-        if(isset(self::$arrayISO639_B[$language]))
-            return self::$arrayISO639_B[$language];
-
         if(isset(self::$arrayISO639_T[$language]))
             return self::$arrayISO639_T[$language];
+
+        if(isset(self::$arrayISO639_B[$language]))
+            return self::$arrayISO639_B[$language];
 
         if(isset(self::$arrayKalturaName[$language]))
             return self::$arrayKalturaName[$language];
