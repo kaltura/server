@@ -4,334 +4,343 @@
  * @subpackage objects
  * @relatedService UserService
  */
-class KalturaUser extends KalturaObject implements IRelatedFilterable 
+class KalturaUser extends KalturaObject implements IRelatedFilterable
 {
 
-	const MAX_NAME_LEN = 40;
+    const MAX_NAME_LEN = 40;
 
-	/**
-	 * @var string
-	 * @filter order
-	 */
-	public $id;
+    /**
+     * @var string
+     * @filter order
+     */
+    public $id;
 
-	/**
-	 * @var int
-	 * @readonly
-	 * @filter eq
-	 */
-	public $partnerId;
+    /**
+     * @var int
+     * @readonly
+     * @filter eq
+     */
+    public $partnerId;
 
-	/**
-	 * @var KalturaUserType
-	 * @filter eq,in
-	 */
-	public $type;
-	
-	/**
-	 * @var string
-	 * @filter like,likex
-	 */
-	public $screenName;
+    /**
+     * @var KalturaUserType
+     * @filter eq,in
+     */
+    public $type;
 
-	/**
-	 * @var string
-	 * @deprecated
-	 */
-	public $fullName;
+    /**
+     * @var string
+     * @filter like,likex
+     */
+    public $screenName;
 
-	/**
-	 * @var string
-	 * @filter like,likex
-	 */
-	public $email;
+    /**
+     * @var string
+     * @deprecated
+     */
+    public $fullName;
 
-	/**
-	 * @var int
-	 */
-	public $dateOfBirth;
-	
-	/**
-	 * @var string
-	 */
-	public $country;
+    /**
+     * @var string
+     * @filter like,likex
+     */
+    public $email;
 
-	/**
-	 * @var string
-	 */
-	public $state;
+    /**
+     * @var int
+     */
+    public $dateOfBirth;
 
-	/**
-	 * @var string
-	 */
-	public $city;
+    /**
+     * @var string
+     */
+    public $country;
 
-	/**
-	 * @var string
-	 */
-	public $zip;
-	
-	/**
-	 * @var string
-	 */
-	public $thumbnailUrl;
-	
-	/**
-	 * @var string
-	 */
-	public $description;
-	
-	/**
-	 * @var string
-	 * @filter mlikeor,mlikeand
-	 */
-	public $tags;
-	
-	/**
-	 * Admin tags can be updated only by using an admin session
-	 * @deprecated Use "tags" field instead.
-	 * @var string
-	 */
-	public $adminTags;
-	
-	/**
-	 * @var KalturaGender
-	 */
-	public $gender;
+    /**
+     * @var string
+     */
+    public $state;
 
-	/**
-	 * @var KalturaUserStatus
-	 * @filter eq,in
-	 */
-	public $status;
+    /**
+     * @var string
+     */
+    public $city;
 
-	/**
-	 * Creation date as Unix timestamp (In seconds)
-	 * @var time
-	 * @readonly
-	 * @filter gte,lte,order
-	 */
-	public $createdAt;
+    /**
+     * @var string
+     */
+    public $zip;
 
-	/**
-	 * Last update date as Unix timestamp (In seconds)
-	 * @var time
-	 * @readonly
-	 */
-	public $updatedAt;
+    /**
+     * @var string
+     */
+    public $thumbnailUrl;
 
-	/**
-	 * Can be used to store various partner related data as a string 
-	 * @var string
-	 */
-	public $partnerData;
-	
-	/**
-	 * @var int
-	 */
-	public $indexedPartnerDataInt;
-	
-	/**
-	 * @var string
-	 */
-	public $indexedPartnerDataString;
-	
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $storageSize;
-	
-	/**
-	 * @var string
-	 * @insertonly
-	 * @writeonly
-	 */
-	public $password;
-	
-	/**
-	 * @var string
-	 * @filter likex
-	 */
-	public $firstName;
-	
-	/**
-	 * @var string
-	 * @filter likex
-	 */
-	public $lastName;
-		
-	/**
-	 * @var bool
-	 * @filter eq
-	 */
-	public $isAdmin;
-		
-	/**
-	 * @var KalturaLanguageCode
-	 */
-	public $language;
-	
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $lastLoginTime;
-	
-	/**
-	 * 
-	 * @var int
-	 * @readonly
-	 */
-	public $statusUpdatedAt;
-	
-	/**
-	 * 
-	 * @var time
-	 * @readonly
-	 */
-	public $deletedAt;
-	
-	/**
-	 * @var bool
-	 * @insertonly
-	 */
-	public $loginEnabled;
-	
-	
-	/**
-	 * @var string
-	 */
-	public $roleIds;
+    /**
+     * @var string
+     */
+    public $description;
 
-	/**
-	 * @var string
-	 * @readonly
-	 */
-	public $roleNames;
-	
-	/**
-	 * @var bool
-	 * @insertonly
-	 */
-	public $isAccountOwner;
+    /**
+     * @var string
+     * @filter mlikeor,mlikeand
+     */
+    public $tags;
 
-	/**
-	 * @var string
-	 */
-	public $allowedPartnerIds;
+    /**
+     * Admin tags can be updated only by using an admin session
+     * @deprecated Use "tags" field instead.
+     * @var string
+     */
+    public $adminTags;
 
-	/**
-	 * @var string
-	 */
-	public $allowedPartnerPackages;
+    /**
+     * @var KalturaGender
+     */
+    public $gender;
 
-	/**
-	 * @var KalturaUserMode
-	 */
-	public $userMode;
+    /**
+     * @var KalturaUserStatus
+     * @filter eq,in
+     */
+    public $status;
 
-	private static $map_between_objects = array
-	(
-		"id" => "puserId", 
-		"partnerId",
-		"type",
-		"screenName",
-		"email",
-		"dateOfBirth",
-		"country",
-		"state",
-		"city",
-		"zip",
-		"thumbnailUrl" => "picture",
-		"description" => "aboutMe",
-		"tags",
-		"gender",
-		"status",
-		"createdAt",
-		"updatedAt",
-		"partnerData",
-		"storageSize",
-		"firstName",
-		"lastName",
-		"isAdmin",
-		"language",
-		"lastLoginTime",
-		"deletedAt",
-		"roleIds",
-		"roleNames" => "userRoleNames",
-		"isAccountOwner",
-		"allowedPartnerIds" => "allowedPartners",
-		"allowedPartnerPackages",
-		"statusUpdatedAt",
-		"userMode",
-	);
+    /**
+     * Creation date as Unix timestamp (In seconds)
+     * @var time
+     * @readonly
+     * @filter gte,lte,order
+     */
+    public $createdAt;
 
-	public function getMapBetweenObjects ( )
+    /**
+     * Last update date as Unix timestamp (In seconds)
+     * @var time
+     * @readonly
+     */
+    public $updatedAt;
+
+    /**
+     * Can be used to store various partner related data as a string
+     * @var string
+     */
+    public $partnerData;
+
+    /**
+     * @var int
+     */
+    public $indexedPartnerDataInt;
+
+    /**
+     * @var string
+     */
+    public $indexedPartnerDataString;
+
+    /**
+     * @var int
+     * @readonly
+     */
+    public $storageSize;
+
+    /**
+     * @var string
+     * @insertonly
+     * @writeonly
+     */
+    public $password;
+
+    /**
+     * @var string
+     * @filter likex
+     */
+    public $firstName;
+
+    /**
+     * @var string
+     * @filter likex
+     */
+    public $lastName;
+
+    /**
+     * @var bool
+     * @filter eq
+     */
+    public $isAdmin;
+
+    /**
+     * @var KalturaLanguageCode
+     */
+    public $language;
+
+    /**
+     * @var int
+     * @readonly
+     */
+    public $lastLoginTime;
+
+    /**
+     *
+     * @var int
+     * @readonly
+     */
+    public $statusUpdatedAt;
+
+    /**
+     *
+     * @var time
+     * @readonly
+     */
+    public $deletedAt;
+
+    /**
+     * @var bool
+     * @insertonly
+     */
+    public $loginEnabled;
+
+
+    /**
+     * @var string
+     */
+    public $roleIds;
+
+    /**
+     * @var string
+     * @readonly
+     */
+    public $roleNames;
+
+    /**
+     * @var bool
+     * @insertonly
+     */
+    public $isAccountOwner;
+
+    /**
+     * @var string
+     */
+    public $allowedPartnerIds;
+
+    /**
+     * @var string
+     */
+    public $allowedPartnerPackages;
+
+    /**
+     * @var KalturaUserMode
+     */
+    public $userMode;
+
+    private static $map_between_objects = array
+    (
+        "id" => "puserId",
+        "partnerId",
+        "type",
+        "screenName",
+        "email",
+        "dateOfBirth",
+        "country",
+        "state",
+        "city",
+        "zip",
+        "thumbnailUrl" => "picture",
+        "description" => "aboutMe",
+        "tags",
+        "gender",
+        "status",
+        "createdAt",
+        "updatedAt",
+        "partnerData",
+        "storageSize",
+        "firstName",
+        "lastName",
+        "isAdmin",
+        "language",
+        "lastLoginTime",
+        "deletedAt",
+        "roleIds",
+        "roleNames" => "userRoleNames",
+        "isAccountOwner",
+        "allowedPartnerIds" => "allowedPartners",
+        "allowedPartnerPackages",
+        "statusUpdatedAt",
+        "userMode",
+    );
+
+    public function getMapBetweenObjects()
+    {
+        return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+    }
+
+
+    public function toObject($dbObject = null, $skip = array())
+    {
+        if (is_null($dbObject))
+            $dbObject = new kuser();
+
+
+        parent::toObject($dbObject, $skip);
+
+
+        // full name is deprecated and was split to firstName + lastName
+        // this is for backward compatibility with older clients
+        if ($this->fullName && !$this->firstName) {
+            list($firstName, $lastName) = kString::nameSplit($this->fullName);
+            $dbObject->setFirstName($firstName);
+            $dbObject->setLastName($lastName);
+        }
+
+        return $dbObject;
+    }
+
+
+    public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
+    {
+        if (!$sourceObject)
+            return;
+
+        parent::doFromObject($sourceObject, $responseProfile);
+
+        // full name is deprecated and was split to firstName + lastName
+        // this is for backward compatibility
+        if ($this->shouldGet('fullName', $responseProfile))
+            $this->fullName = $sourceObject->getFullName();
+        if ($this->shouldGet('loginEnabled', $responseProfile))
+            $this->loginEnabled = !is_null($sourceObject->getLoginDataId());
+    }
+
+    public function getExtraFilters()
+    {
+        return array();
+    }
+
+    public function getFilterDocs()
+    {
+        return array();
+    }
+
+
+    public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
+    {
+        $this->verifyMaxLength();
+        return parent::toInsertableObject($object_to_fill, $props_to_skip);
+    }
+
+    public function toUpdatableObject($object_to_fill, $props_to_skip = array())
+    {
+        $this->verifyMaxLength();
+        return parent::toUpdatableObject($object_to_fill, $props_to_skip);
+    }
+
+    public function verifyMaxLength()
 	{
-		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
+        if (strlen($this->firstName) > self::MAX_NAME_LEN)
+            $this->firstName = kString::alignUtf8String($this->firstName, self::MAX_NAME_LEN);
+        if (strlen($this->lastName) > self::MAX_NAME_LEN)
+            $this->lastName = kString::alignUtf8String($this->lastName, self::MAX_NAME_LEN);
+        if (strlen($this->fullName) > self::MAX_NAME_LEN)
+            $this->fullName = kString::alignUtf8String($this->fullName, self::MAX_NAME_LEN);
 	}
-
-	
-	public function toObject($dbObject = null, $skip = array())
-	{
-		if (is_null($dbObject))
-			$dbObject = new kuser();
-			
-		
-		parent::toObject($dbObject, $skip);
-		
-		
-		// full name is deprecated and was split to firstName + lastName
-		// this is for backward compatibility with older clients
-		if ($this->fullName && !$this->firstName) {
-			list($firstName, $lastName) = kString::nameSplit($this->fullName);
-			$dbObject->setFirstName($firstName);
-			$dbObject->setLastName($lastName);
-		}
-		
-		return $dbObject;		
-	}
-	
-	
-	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
-	{
-		if(!$sourceObject)
-			return;
-			
-		parent::doFromObject($sourceObject, $responseProfile);
-		
-		// full name is deprecated and was split to firstName + lastName
-		// this is for backward compatibility
-		if($this->shouldGet('fullName', $responseProfile))
-			$this->fullName = $sourceObject->getFullName();
-		if($this->shouldGet('loginEnabled', $responseProfile))
-			$this->loginEnabled = !is_null($sourceObject->getLoginDataId());
-	}
-	
-	public function getExtraFilters()
-	{ 
-		return array();		
-	}
-	
-	public function getFilterDocs()
-	{
-		return array();	
-	}
-
-
-	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
-	{
-
-		if(strlen ($this->firstName) > self::MAX_NAME_LEN)
-			$this->firstName = kString::alignUtf8String($this->firstName, self::MAX_NAME_LEN);
-		if(strlen ($this->lastName) > self::MAX_NAME_LEN)
-			$this->lastName = kString::alignUtf8String($this->lastName, self::MAX_NAME_LEN);
-		if(strlen ($this->fullName) > self::MAX_NAME_LEN)
-			$this->fullName = kString::alignUtf8String($this->fullName, self::MAX_NAME_LEN);
-
-		return parent::toInsertableObject($object_to_fill, $props_to_skip);
-	}
-
 }
+
 ?>
