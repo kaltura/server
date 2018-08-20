@@ -433,7 +433,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 		{
 			// get local resource
 			$contentResource = new KalturaUrlResource();
-			$contentResource->url = $this->getAssetUrl($assetId, $assetService);
+			$contentResource->url = $this->getAssetUrlByAssetId($assetId, $assetService);
 		}
 		return $contentResource;
 	}
