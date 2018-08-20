@@ -755,7 +755,7 @@ class languageCodeManager
 
         $result = "<?php\n\n".self::assignArrayToVar($tmpArrKeyCode ,'arrayISO639');
         $result .= self::assignArrayToVar($tmpArrThreeCodeT, 'arrayISO639_T');
-	    $result .= self::assignArrayToVar($tmpArrThreeCodeB, 'arrayISO639_B');
+        $result .= self::assignArrayToVar($tmpArrThreeCodeB, 'arrayISO639_B');
         $result .= self::assignArrayToVar($tmpArrKalturaName ,'arrayKalturaName');
         return $result;
     }
