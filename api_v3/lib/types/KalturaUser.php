@@ -6,6 +6,9 @@
  */
 class KalturaUser extends KalturaObject implements IRelatedFilterable 
 {
+
+	const MAX_NAME_LEN = 40;
+
 	/**
 	 * @var string
 	 * @filter order
@@ -315,6 +318,7 @@ class KalturaUser extends KalturaObject implements IRelatedFilterable
 	{
 		return array();	
 	}
+
 	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
 	{
 		$this->verifyMaxLength();
