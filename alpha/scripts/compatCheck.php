@@ -30,9 +30,7 @@ $PS2_TESTED_XML_ACTIONS = array(
 		'partnerservices2.getwidget',
 		'partnerservices2.listentries',
 		'partnerservices2.listkshows',
-		'partnerservices2.listplaylists',
-		'extwidget.embediframejs',
-		'extwidget.embedplaykitjs'
+		'partnerservices2.listplaylists'
 		);
 
 $PS2_TESTED_BIN_ACTIONS = array(
@@ -42,6 +40,8 @@ $PS2_TESTED_BIN_ACTIONS = array(
 		'extwidget.download',
 		'keditorservices.flvclipper',
 		'extwidget.raw',
+		'extwidget.embediframejs',
+		'extwidget.embedplaykitjs'
 		);
 
 $APIV3_TESTED_SERVICES = array(
