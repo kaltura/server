@@ -11,6 +11,11 @@ abstract class ESearchItem extends BaseObject implements IESearchItem
 	protected static $field_boost_values = array();
 
 	/**
+	 * @var array
+	 */
+	protected static $searchHistoryFields = array();
+
+	/**
 	 * @var ESearchItemType
 	 */
 	protected $itemType;
@@ -142,6 +147,17 @@ abstract class ESearchItem extends BaseObject implements IESearchItem
 	public function getFilteredObjectId()
 	{
 		return null;
+	}
+
+	public static function shouldAddSearchTermToSearchHistory($fieldName, $isHighlight, &$queryAttributes)
+	{
+		if (in_array($fieldName, static::$searchHistoryFields) &&
+			$isHighlight &&
+			!$queryAttributes->getSearchHistoryMustNotContext()
+		)
+			return true;
+
+		return false;
 	}
 
 }

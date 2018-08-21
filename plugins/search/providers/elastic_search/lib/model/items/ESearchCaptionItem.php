@@ -24,6 +24,10 @@ class ESearchCaptionItem extends ESearchNestedObjectItem
 		ESearchCaptionFieldName::CONTENT => 10,
 	);
 
+	protected static $searchHistoryFields = array(
+		ESearchCaptionFieldName::CONTENT,
+	);
+
 	/**
 	 * @var string
 	 */

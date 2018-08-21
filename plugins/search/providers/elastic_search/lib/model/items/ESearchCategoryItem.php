@@ -50,6 +50,11 @@ class ESearchCategoryItem extends ESearchItem
 		ESearchCategoryFieldName::DESCRIPTION,
 	);
 
+	protected static $searchHistoryFields = array(
+		ESearchCategoryFieldName::NAME,
+		ESearchCategoryFieldName::DESCRIPTION,
+	);
+
 	/**
 	 * @return ESearchCategoryFieldName
 	 */

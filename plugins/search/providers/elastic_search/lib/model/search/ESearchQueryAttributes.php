@@ -75,10 +75,21 @@ class ESearchQueryAttributes
 	 */
 	private $queryHighlightsAttributes;
 
+	/**
+	 * @var array
+	 */
+	protected $searchHistoryTerms;
+
+	/**
+	 * @var bool
+	 */
+	protected $searchHistoryMustNotContext;
+
 	function __construct()
 	{
 		$this->queryHighlightsAttributes = new ESearchQueryHighlightsAttributes();
 		$this->queryFilterAttributes = new ESearchEntryQueryFilterAttributes();
+		$this->searchHistoryTerms = array();
 	}
 
 	/**
@@ -290,6 +301,40 @@ class ESearchQueryAttributes
 	public function setNestedQuerySortOrder($nestedQuerySortOrder)
 	{
 		$this->nestedQuerySortOrder = $nestedQuerySortOrder;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getSearchHistoryTerms()
+	{
+		return $this->searchHistoryTerms;
+	}
+
+	/**
+	 * @param string $searchHistoryTerm
+	 */
+	public function addToSearchHistoryTerms($searchHistoryTerm)
+	{
+		$searchHistoryTerm = elasticSearchUtils::formatSearchTerm($searchHistoryTerm);
+		$searchHistoryTerm = @iconv('utf-8', 'utf-8//IGNORE', $searchHistoryTerm);
+		$this->searchHistoryTerms[] = elasticSearchUtils::formatSearchTerm($searchHistoryTerm);
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getSearchHistoryMustNotContext()
+	{
+		return $this->searchHistoryMustNotContext;
+	}
+
+	/**
+	 * @param boolean $searchHistoryMustNotContext
+	 */
+	public function setSearchHistoryMustNotContext($searchHistoryMustNotContext)
+	{
+		$this->searchHistoryMustNotContext = $searchHistoryMustNotContext;
 	}
 
 }
