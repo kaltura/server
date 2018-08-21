@@ -7,7 +7,6 @@
 class kEntryElasticEntitlement extends kBaseElasticEntitlement
 {
     
-//    public static $kuserId = null;
     public static $privacyContext = null;
     public static $privacy = null;
     public static $userEntitlement = false;
