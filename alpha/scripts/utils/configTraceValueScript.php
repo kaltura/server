@@ -34,6 +34,6 @@ if($map)
 	}
 }
 else
-	die("\nMap {$mapName} key {$valueName} was not found at\n");
+	die("\nMap {$mapName} key {$valueName} was not found!\n");
 
 
