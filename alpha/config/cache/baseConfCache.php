@@ -74,7 +74,7 @@ class baseConfCache
 		isset($this->usageMap[$mapName]) ? $this->usageMap[$mapName]++ : $this->usageMap[$mapName] = 0;
 	}
 
-	public function generateKey()
+	public static function generateKey()
 	{
 		$fileHash = md5(realpath(__file__));
 		$cacheVersion = substr(time(), -6) . substr($fileHash, 0, 4);

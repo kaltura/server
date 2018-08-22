@@ -7,21 +7,33 @@ require_once(__DIR__ . '/../bootstrap.php');
 // If key is unknown - supply *
 //Trace will find the source of the map / key in the configuration files or remote memcache
 // Also it will indicate where it came from in the current request
+if($argc<3)
+	die("\nUsage: $argv[0] <map name> <value name> [<host name>] \n".
+		"<map name> - case sensitive full name of the map\n".
+		"<value name> - case sesitive value search or '*' for entire map\n".
+		"<host name> - optional case sesitive host name , can be used to search for the values that specific host/s sees\n"
+	);
 
 $mapName = $argv[1];
 $valueName = $argv[2];
 if(isset($argv[3]))
 	$_SERVER["HOSTNAME"] = $argv[3];
+$usageBefore = kConfCacheManager::getUsage();
+print_r($usageBefore);
 if($valueName=='*')
-	kConf::getMap($mapName);
+	$map = kConf::getMap($mapName);
 else
-	kConf::get($valueName,$mapName);
-
-$usage = kConfCacheManager::getUsage();
-
-if($usage['usage']['localStorageConf'])
-	print ("\nKey was found at localStorageConf (file system)\n");
-if($usage['usage']['finalCacheSource'])
-	print ("\nKey was found at finalCacheSource (remote memcache)\n");
+	$map = kConf::get($valueName,$mapName);
+if($map)
+{
+	$usageAfter = kConfCacheManager::getUsage();
+	print_r($usageAfter);
+	foreach ($usageAfter['usage'] as $key => $value)
+	{
+		if ($value != $usageBefore['usage'][$key]) print ("\nMap {$mapName} key {$valueName} was found at {$key}\n");
+	}
+}
+else
+	die("\nMap {$mapName} key {$valueName} was not found at\n");
 
 

@@ -37,7 +37,7 @@ class apcConf extends baseConfCache implements mapCacheInterface , keyCacheInter
 	}
 	public function store($key,$mapName,$map,$ttl=0)
 	{
-		if($this->apcFunctionsExist)
+		if($this->apcFunctionsExist && PHP_SAPI != 'cli')
 		{
 			$this->addKeyToMap($map,$mapName,$key);
 			return apc_store($mapName,$map,$ttl);

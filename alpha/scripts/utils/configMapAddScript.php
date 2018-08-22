@@ -11,9 +11,9 @@ isset($argv[3]) ? $mapName = $mapName.'_'.$argv[3] : $mapName = $mapName;
 //Open cache connection
 include (kEnvironment::getConfigDir().'/configCacheParams.php');
 $cache = new kMemcacheCacheWrapper;
-if(!$cache->init(array('host'=>$finalCacheSourceConfiguration['host'],
-	 				   'port'=>$finalCacheSourceConfiguration['port'])))
-	die ("Fail to connect to cache host {$finalCacheSourceConfiguration['host']} port {$finalCacheSourceConfiguration['port']} ");
+if(!$cache->init(array('host'=>$remoteCacheSourceConfiguration['host'],
+	 				   'port'=>$remoteCacheSourceConfiguration['port'])))
+	die ("Fail to connect to cache host {$remoteCacheSourceConfiguration['host']} port {$remoteCacheSourceConfiguration['port']} ");
 
 //get file info
 if(!file_exists($iniFile))
@@ -27,12 +27,12 @@ print_r($fileContent);
 $cache->set($mapName,$fileContent);
 
 //Add file name to map list
-$mapList = $cache->get(finalCacheSource::MAP_LIST_KEY);
+$mapList = $cache->get(remoteCacheSource::MAP_LIST_KEY);
 if(!isset($mapList[$mapName]))
 {
 	print ("Adding map {$mapName} to map list - \r\n");
 	$mapList[] = $mapName;
-	$cache->set(finalCacheSource::MAP_LIST_KEY,$mapList);
+	$cache->set(remoteCacheSource::MAP_LIST_KEY,$mapList);
 }
 
 //Change baseConfCache::CONF_CACHE_VERSION_KEY
