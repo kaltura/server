@@ -20,7 +20,8 @@ class baseMemcacheConf extends baseConfCache implements mapCacheInterface
 		$sectionConfig= array("host"=>$host,'port'=>$port);
 		try
 		{
-			if (!$cache->init($sectionConfig)) $cache = null;
+			if (!$cache->init($sectionConfig))
+				$cache = null;
 		}
 		catch (Exception $e)
 		{

@@ -63,5 +63,8 @@ class apcConf extends baseConfCache implements mapCacheInterface , keyCacheInter
 			if($this->apcFunctionsExist && PHP_SAPI != 'cli')
 				return apc_store(baseConfCache::CONF_CACHE_VERSION_KEY, $key, $ttl);
 	}
-	public function isKeyRequired(){ return true;}
+	public function isKeyRequired()
+	{
+		return true;
+	}
 }

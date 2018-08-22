@@ -2,7 +2,7 @@
 class baseConfCache
 {
 	const FULL_MAP_KEY = '__full';
-	const  CONF_CACHE_VERSION_KEY = "CONF_CACHE_VERSION_KEY";
+	const CONF_CACHE_VERSION_KEY = "CONF_CACHE_VERSION_KEY";
 	const CONF_CACHE_KEY = "CONF_CACHE_KEY";
 	const CONF_CACHE_KEY_PREFIX = "CONF-";
 	private $usageCounter;
@@ -27,11 +27,6 @@ class baseConfCache
 	{
 		return usort($mapsList, function ($a, $b)
 		{
-/*			if(!strpos($a, 'hosts'))
-				return -1;
-			if(!strpos($b, 'hosts'))
-				return 1;
-*/
 			$val = strlen($a) - strlen($b);
 			if (!$val)
 				$val = strpos($b, '#') - strpos($a, '#');
