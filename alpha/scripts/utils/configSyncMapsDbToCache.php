@@ -21,9 +21,8 @@ $mapListInCache = $cache->get(remoteCacheSource::MAP_LIST_KEY);
 
 //Find all exsiting map names in DB
 $cmdLine = 'mysql -u'.$dbUserName.' -p'.$dbPasssword.' kaltura -e "select map_name , host_name from conf_maps where status=1 group by map_name,host_name;"';
-//echo "executing: {$cmdLine}\n";
+echo "executing: {$cmdLine}\n";
 exec($cmdLine, $output);
-//print_r($output);
 $mapNames = array();
 for($i = 1 ; $i < count($output) ; $i++)
 {
@@ -33,10 +32,9 @@ for($i = 1 ; $i < count($output) ; $i++)
 	$hostNameFilter = isset($mapInfoArr[1]) ?  $mapInfoArr[1] : '';
 	//get the latest version of this map
 	$cmdLine = 'mysql -u'.$dbUserName.' -p'.$dbPasssword.' kaltura -e "select version,content from conf_maps where conf_maps.map_name=\''.$rawMapName.'\' and conf_maps.host_name=\''.$hostNameFilter.'\' and status=1 order by version desc limit 1 ;"';
-	//echo "executing: {$cmdLine}\n";
+	echo "executing: {$cmdLine}\n";
 	$output2=array();
 	exec($cmdLine, $output2);
-	//print_r($output2);
 	$mapName = $rawMapName.'_'.$hostNameFilter;
 	list($version, $content) = explode("\t", $output2[1]);
 	if(!isset($mapListInCache[$mapName]))
@@ -61,6 +59,3 @@ if($ret)
 	echo("\nKey - {$chacheKey} was added to cache successfully\n");
 else
 	die("\nFialed inserting key to cache\n");
-
-
-
