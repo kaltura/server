@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__."/baseMemcacheConf.php";
-class remoteCacheSource extends baseMemcacheConf
+class remoteCacheSource extends baseMemcacheConf implements keyCacheInterface
 {
 	const MAP_LIST_KEY='MAP_LIST_KEY';
 	function __construct()
