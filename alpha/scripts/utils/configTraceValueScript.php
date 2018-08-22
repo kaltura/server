@@ -3,15 +3,12 @@
 chdir(__DIR__.'/../');
 require_once(__DIR__ . '/../bootstrap.php');
 
-//values needed required  map / key / hostname
-// If key is unknown - supply *
-//Trace will find the source of the map / key in the configuration files or remote memcache
-// Also it will indicate where it came from in the current request
+//Trace will find the source of the map / key in the configuration sources
 if($argc<3)
 	die("\nUsage: $argv[0] <map name> <value name> [<host name>] \n".
 		"<map name> - case sensitive full name of the map\n".
 		"<value name> - case sesitive value search or '*' for entire map\n".
-		"<host name> - optional case sesitive host name , can be used to search for the values that specific host/s sees\n"
+		"[<host name>] - optional case sesitive host name , can be used to search for the values that specific host/s sees\n"
 	);
 
 $mapName = $argv[1];
