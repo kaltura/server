@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__."/baseConfCache.php";
 require_once __DIR__."/mapCacheInterface.php";
-require_once __DIR__."/keyCacheInterface.php";
 
 class localStorageConf extends baseConfCache implements mapCacheInterface
 {

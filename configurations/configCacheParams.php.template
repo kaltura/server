@@ -1,0 +1,4 @@
+<?php
+$remoteCacheSourceConfiguration=array("port"=>"@REMOTE_CACHE_PORT@","host"=>"@REMOTE_CACHE_HOST@");//URL of the final cache source should be set different per dc
+$localCacheSourceConfiguration=array("port"=>"@LOCAL_CACHE_PORT@"","host"=>"@LOCAL_CACHE_HOST@");
+
