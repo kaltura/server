@@ -331,6 +331,9 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		{
 			$audioLanguage = $lang;
 			$obj = languageCodeManager::getObjectFromKalturaName($lang);
+			if (is_null($obj))
+				$obj = languageCodeManager::getObjectFromThreeCode($lang);
+			
 			if (!is_null($obj))
 			{
 				if ($useTwoCodeLang)
