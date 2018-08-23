@@ -146,7 +146,8 @@ abstract class KalturaBaseService
 		if ($this->globalPartnerAllowed($this->actionName)) {
 			$this->partnerGroup = PartnerPeer::GLOBAL_PARTNER.','.trim($this->partnerGroup,',');
 		}
-		
+
+
 		$this->setPartnerFilters($partnerId);
 		
 		kCurrentContext::$HTMLPurifierBehaviour = $this->getPartner()->getHtmlPurifierBehaviour();
@@ -180,7 +181,11 @@ abstract class KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::MISSING_KS);
 		}
-		
+		$ksObject = kCurrentContext::$ks_object ? kCurrentContext::$ks_object : null;
+
+		if ($ksObject && !$ksObject->validateServiceActionPrivilege($this->serviceName , $this->actionName))
+			return false;
+
 		// check if actions is permitted for current context
 		$isActionPermitted = kPermissionManager::isActionPermitted($this->serviceId, $this->actionName);
 		
