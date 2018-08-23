@@ -53,7 +53,7 @@ class kSessionBase
 	const PRIVILEGE_ENABLE_CAPTION_MODERATION = "enablecaptionmoderation";
 	const PRIVILEGE_EDIT_ADMIN_TAGS = 'editadmintags';
 	const PRIVILEGE_RESTRICT_EXPLICIT_LIVE_VIEW = "restrictexplicitliveview";
-
+	const PRIVILEGE_RESTRICT_SERVICE_ACTION = "restrictserviceaction";
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
 	
 	const INVALID_SESSION_KEY_PREFIX = 'invalid_session_';
@@ -614,7 +614,6 @@ class kSessionBase
 	{
 		return sha1($partnerId . '_' . $sessionId);
 	}
-
 	public function getSessionIdHash()
 	{
 		if(isset($this->parsedPrivileges[self::PRIVILEGE_SESSION_ID][0])) {

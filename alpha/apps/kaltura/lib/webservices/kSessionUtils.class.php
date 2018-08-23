@@ -66,14 +66,14 @@ class kSessionUtils
 	* In the first case, it will be considered invalid for user that are not the ones that started the session
 	*/
 	public static function startKSession ( $partner_id , $partner_secret , $puser_id , &$ks_str  ,
-		$desired_expiry_in_seconds=86400 , $admin = false , $partner_key = "" , $privileges = "", $master_partner_id = null, $additional_data = null, $enforcePartnerKsMaxExpiry = false)
+		$desired_expiry_in_seconds=86400 , $admin = false , $partner_key = "" , $privileges = "", $master_partner_id = null, $additional_data = null)
 	{
 		$ks_max_expiry_in_seconds = ""; // see if we want to use the generic setting of the partner
 		ks::validatePrivileges($privileges,  $partner_id);
 		$result =  myPartnerUtils::isValidSecret ( $partner_id , $partner_secret , $partner_key , $ks_max_expiry_in_seconds , $admin );
 		if ( $result >= 0 )
 		{
-			if ( $ks_max_expiry_in_seconds && $ks_max_expiry_in_seconds < $desired_expiry_in_seconds && $enforcePartnerKsMaxExpiry)
+			if ( $ks_max_expiry_in_seconds && $ks_max_expiry_in_seconds < $desired_expiry_in_seconds )
 				$desired_expiry_in_seconds = 	$ks_max_expiry_in_seconds;
 
 			//	echo "startKSession: from DB: $ks_max_expiry_in_seconds | desired: $desired_expiry_in_seconds " ;
@@ -488,6 +488,29 @@ class ks extends kSessionBase
 		}
 		return false;
 	}
+	public function validateServiceActionPrivilege($serviceName , $actionName)
+	{
+		$ret = true;
+		$allPrivileges = explode(',', $this->privileges);
+		foreach($allPrivileges as $priv)
+		{
+			$exPrivileges = explode(':', $priv);
+			if ($exPrivileges[0] == self::PRIVILEGE_RESTRICT_SERVICE_ACTION)
+			{
+				list($service,$action) = explode('.' , $exPrivileges[1]);
+				$service =  strtolower (trim($service));
+				$action =  strtolower (trim($action));
+				$serviceName = strtolower($serviceName);
+				$actionName = strtolower($actionName);
+				$ret = 	($service == $serviceName &&
+						 $action &&
+						($action == '*' ||  $action == $actionName));
+				break;
+			}
+		}
+		return $ret;
+	}
+
 
 	public function isSetLimitAction()
 	{
