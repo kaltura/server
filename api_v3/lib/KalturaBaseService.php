@@ -146,8 +146,7 @@ abstract class KalturaBaseService
 		if ($this->globalPartnerAllowed($this->actionName)) {
 			$this->partnerGroup = PartnerPeer::GLOBAL_PARTNER.','.trim($this->partnerGroup,',');
 		}
-
-
+		
 		$this->setPartnerFilters($partnerId);
 		
 		kCurrentContext::$HTMLPurifierBehaviour = $this->getPartner()->getHtmlPurifierBehaviour();
