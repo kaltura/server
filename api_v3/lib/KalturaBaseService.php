@@ -180,8 +180,7 @@ abstract class KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::MISSING_KS);
 		}
-		$ksObject = kCurrentContext::$ks_object ? kCurrentContext::$ks_object : null;
-
+		$ksObject = kCurrentContext::$ks_object;
 		if ($ksObject && !$ksObject->validateServiceActionPrivilege($this->serviceName , $this->actionName))
 			return false;
 
