@@ -66,14 +66,14 @@ class kSessionUtils
 	* In the first case, it will be considered invalid for user that are not the ones that started the session
 	*/
 	public static function startKSession ( $partner_id , $partner_secret , $puser_id , &$ks_str  ,
-		$desired_expiry_in_seconds=86400 , $admin = false , $partner_key = "" , $privileges = "", $master_partner_id = null, $additional_data = null)
+		$desired_expiry_in_seconds=86400 , $admin = false , $partner_key = "" , $privileges = "", $master_partner_id = null, $additional_data = null, $enforcePartnerKsMaxExpiry = false)
 	{
 		$ks_max_expiry_in_seconds = ""; // see if we want to use the generic setting of the partner
 		ks::validatePrivileges($privileges,  $partner_id);
 		$result =  myPartnerUtils::isValidSecret ( $partner_id , $partner_secret , $partner_key , $ks_max_expiry_in_seconds , $admin );
 		if ( $result >= 0 )
 		{
-			if ( $ks_max_expiry_in_seconds && $ks_max_expiry_in_seconds < $desired_expiry_in_seconds )
+			if ( $ks_max_expiry_in_seconds && $ks_max_expiry_in_seconds < $desired_expiry_in_seconds && $enforcePartnerKsMaxExpiry)
 				$desired_expiry_in_seconds = 	$ks_max_expiry_in_seconds;
 
 			//	echo "startKSession: from DB: $ks_max_expiry_in_seconds | desired: $desired_expiry_in_seconds " ;
