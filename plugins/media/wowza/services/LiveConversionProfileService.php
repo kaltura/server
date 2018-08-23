@@ -24,7 +24,8 @@ class LiveConversionProfileService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 		
 		$this->applyPartnerFilterForClass('conversionProfile2');
-		$this->applyPartnerFilterForClass('assetParams');
+		if (kCurrentContext::getCurrentPartnerId() != Partner::MEDIA_SERVER_PARTNER_ID)
+			$this->applyPartnerFilterForClass('assetParams');
 	}
 
 	/**
@@ -178,7 +179,16 @@ class LiveConversionProfileService extends KalturaBaseService
 		$decode = $transcode->addChild('Decode');
 		$video = $decode->addChild('Video');
 		$video->addChild('Deinterlace', 'false');
-		
+
+		if ($this->isGpuSupported($streamParametersArray))
+		{
+			$video->addChild('Implementation', 'NVCUVID');
+			$scala = $transcode->addChild('Scale');
+			$scala->addChild('Implementation', 'CUDA');
+			$scala->addChild('Parameters');
+			$scala->addChild('Properties');
+		}
+
 		$streamNameGroups = $transcode->addChild('StreamNameGroups');
 		
 		foreach($groups as $groupName => $groupMembers)
@@ -209,6 +219,11 @@ class LiveConversionProfileService extends KalturaBaseService
 		$dom->loadXML($root->asXML());
 		
 		return new kRendererString($dom->saveXML(), 'text/xml');
+	}
+
+	private function isGpuSupported($streamParametersArray)
+	{
+		return key_exists('gpu', $streamParametersArray) && $streamParametersArray['gpu'] == 'true';
 	}
 	
 	private function isValidJson($strJson)
@@ -391,6 +406,8 @@ class LiveConversionProfileService extends KalturaBaseService
 		}
 		
 		$video->addChild('Transcoder', $mediaServer ? $mediaServer->getTranscoder() : WowzaMediaServerNode::DEFAULT_TRANSCODER);
+		if ($this->isGpuSupported($streamParametersArray))
+			$video->addChild('Implementation', "NVENC");
 		$video->addChild('GPUID', $mediaServer ? $mediaServer->getGPUID() : WowzaMediaServerNode::DEFAULT_GPUID);
 		$frameSize = $video->addChild('FrameSize');
 		

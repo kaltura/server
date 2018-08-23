@@ -207,7 +207,8 @@ class elasticClient
 		$cmd = $this->buildElasticCommandUrl($params, $queryParams);
 
 		$monitorIndexName = isset($params[self::ELASTIC_INDEX_KEY]) ? $params[self::ELASTIC_INDEX_KEY] : self::MONITOR_NO_INDEX;
-		$response = $this->sendRequest($cmd, self::PUT, $params[self::ELASTIC_BODY_KEY], false, self::ELASTIC_ACTION_INDEX, $monitorIndexName);
+		$method = isset($params[self::ELASTIC_ID_KEY]) ? self::PUT : self::POST;//use elastic auto id creation
+		$response = $this->sendRequest($cmd, $method, $params[self::ELASTIC_BODY_KEY], false, self::ELASTIC_ACTION_INDEX, $monitorIndexName);
 		return $response;
 	}
 	
@@ -257,7 +258,7 @@ class elasticClient
 		$cmd = $this->buildElasticCommandUrl($params, $queryParams, self::ELASTIC_ACTION_DELETE_BY_QUERY);
 
 		$monitorIndexName = isset($params[self::ELASTIC_INDEX_KEY]) ? $params[self::ELASTIC_INDEX_KEY] : self::MONITOR_NO_INDEX;
-		$response = $this->sendRequest($cmd, self::POST, $params[self::ELASTIC_BODY_KEY], false, self::ELASTIC_ACTION_DELETE_BY_QUERY, $monitorIndexName);
+		$response = $this->sendRequest($cmd, self::POST, $params[self::ELASTIC_BODY_KEY], true, self::ELASTIC_ACTION_DELETE_BY_QUERY, $monitorIndexName);
 		return $response;
 	}
 	

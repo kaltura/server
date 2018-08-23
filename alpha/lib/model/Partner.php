@@ -87,7 +87,9 @@ class Partner extends BasePartner
 	
 	public function validateSecret ( $partner_secret , $partner_key , &$ks_max_expiry_in_seconds , $admin = false )
 	{
-		if ($partner_secret === $this->getAdminSecret() || 
+		$additionalSecrets = $this->getEnabledAdditionalAdminSecrets();
+		if ($partner_secret === $this->getAdminSecret() ||
+			in_array($partner_secret, $additionalSecrets, true) ||
 			(!$admin && $partner_secret === $this->getSecret()))
 		{
 			$ks_max_expiry_in_seconds = $this->getKsMaxExpiryInSeconds();
@@ -673,7 +675,7 @@ class Partner extends BasePartner
 	
 	public function getKSVersion() { return $this->getFromCustomData( "ksVersion" , null, 1  );	}
 	public function setKSVersion( $v ) { return $this->putInCustomData( "ksVersion", $v );	}
-	
+
 	public function getShouldApplyAccessControlOnEntryMetadata() { return $this->getFromCustomData( "shouldApplyAccessControlOnEntryMetadata" , null, false ); }
 	public function setShouldApplyAccessControlOnEntryMetadata( $v ) { return $this->putInCustomData( "shouldApplyAccessControlOnEntryMetadata", $v ); }
 
@@ -685,7 +687,57 @@ class Partner extends BasePartner
 	
 	private function getDisabledDeliveryTypes() { return $this->getFromCustomData("disabledDeliveryTypes", array()); }
 	private function setDisabledDeliveryTypes(array $v ) { $this->putInCustomData("disabledDeliveryTypes", $v); }
-	
+
+	public function getEnabledAdditionalAdminSecrets()
+	{
+		return $this->getFromCustomData("enabledAdditionalAdminSecrets", null, array());
+	}
+
+	/**
+	 * @param array<string> $v
+	 */
+	public function setEnabledAdditionalAdminSecrets($v)
+	{
+		$enabled = $this->getEnabledAdditionalAdminSecrets();
+		//in case additional was moved to primary, do not disable it
+		$primaryAdminSecretArray = array($this->getAdminSecret());
+		/** @noinspection PhpParamsInspection */
+		$removedEnabledSecrets = array_diff($enabled, $v, $primaryAdminSecretArray);
+		if ($removedEnabledSecrets)
+		{
+			/** @var array $oldDisabled */
+			$oldDisabled = $this->getDisabledAdditionalAdminSecrets();
+			//unique - in case of secret that was enabled disabled several times.
+			$merged = array_merge($removedEnabledSecrets, $oldDisabled);
+			$newDisabled = array_unique($merged);
+			$this->setDisabledAdditionalAdminSecrets($newDisabled);
+		}
+		//In case secret Has been re-enabled Remove it from disabled
+		/** @var array $disabled */
+		$disabled = $this->getDisabledAdditionalAdminSecrets();
+		$newDisabled = array_diff($disabled, $v, $primaryAdminSecretArray);
+		$this->setDisabledAdditionalAdminSecrets($newDisabled);
+		$this->putInCustomData( "enabledAdditionalAdminSecrets", $v);
+	}
+
+	/**
+	 * disabled admin secret is only accessible from setEnabledAdditionalAdminSecrets
+	 */
+	private function getDisabledAdditionalAdminSecrets()
+	{
+		return $this->getFromCustomData("disabledAdditionalAdminSecrets", null, array());
+	}
+
+
+	/**
+	 * disabled admin secret is only populate using the setEnabledAdditionalAdminSecrets function
+	 * @param $v
+	 */
+	private function setDisabledAdditionalAdminSecrets($v)
+	{
+		$this->putInCustomData( "disabledAdditionalAdminSecrets", $v);
+	}
+
 	public function getCustomDeliveryTypes()
 	{
 		$customDeliveryTypes = array();
@@ -1945,6 +1997,21 @@ class Partner extends BasePartner
 		if (isset($additionalParams['freeTrialAccountType']))
 			return $additionalParams['freeTrialAccountType'];
 		return null;
+	}
+
+	/**
+	 * return all enabled admin secret separated by ','
+	 * @return null|string
+	 */
+	public function getAllAdminSecretsAsString()
+	{
+		$additionalActiveSecrets = $this->getEnabledAdditionalAdminSecrets();
+		if($additionalActiveSecrets)
+		{
+			$adminSecrets = implode(',', $additionalActiveSecrets);
+			return $this->getAdminSecret() . ',' . $adminSecrets;
+		}
+		return $this->getAdminSecret();
 	}
 
 }

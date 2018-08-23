@@ -53,7 +53,10 @@ class kTimeRangeVendorCredit extends kVendorCredit
 		$credit = $this->credit;
 		if($this->overageCredit)
 			$credit += $this->overageCredit;
-		
+
+		if($this->addOn)
+			$credit += $this->addOn;
+
 		return $credit;
 	}
 
