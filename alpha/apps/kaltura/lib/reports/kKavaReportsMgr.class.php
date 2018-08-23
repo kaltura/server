@@ -174,7 +174,6 @@ class kKavaReportsMgr extends kKavaBase
 		myReportsMgr::REPORT_TYPE_BROWSERS,
 		myReportsMgr::REPORT_TYPE_LIVE,
 		myReportsMgr::REPORT_TYPE_TOP_PLAYBACK_CONTEXT,
-		myReportsMgr::REPORT_TYPE_VPAAS_USAGE,
 		myReportsMgr::REPORT_TYPE_REACH_USAGE,
 	);
 		
