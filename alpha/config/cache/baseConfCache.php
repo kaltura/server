@@ -1,7 +1,6 @@
 <?php
 class baseConfCache
 {
-	const FULL_MAP_KEY = '__full';
 	const CONF_CACHE_VERSION_KEY = "CONF_CACHE_VERSION_KEY";
 	const CONF_CACHE_KEY = "CONF_CACHE_KEY";
 	const CONF_CACHE_KEY_PREFIX = "CONF-";
