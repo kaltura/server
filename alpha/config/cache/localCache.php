@@ -4,15 +4,14 @@ class localCache extends baseMemcacheConf
 {
 	function __construct()
 	{
-		if(include(kEnvironment::getConfigDir().'/configCacheParams.php'))
+		$confParams = parent::getConfigParams('localCache');
+		if($confParams)
 		{
-			if(isset($localCacheSourceConfiguration))
-			{
-				$port = $localCacheSourceConfiguration['port'];
-				$host = $localCacheSourceConfiguration['host'];
-				return  parent::__construct($port, $host);
-			}
+			$port = $confParams['port'];
+			$host = $confParams['host'];
+			return  parent::__construct($port, $host);
 		}
+		$this->cache=null;
 	}
 	public function isKeyRequired(){ return true;}
 	public function load($key, $mapName)

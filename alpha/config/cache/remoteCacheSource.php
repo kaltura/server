@@ -5,15 +5,14 @@ class remoteCacheSource extends baseMemcacheConf implements keyCacheInterface
 	const MAP_LIST_KEY='MAP_LIST_KEY';
 	function __construct()
 	{
-		if(include (kEnvironment::getConfigDir().'/configCacheParams.php'))
+		$confParams = parent::getConfigParams('remoteCacheSource');
+		if($confParams)
 		{
-			if (isset($remoteCacheSourceConfiguration))
-			{
-				$port = $remoteCacheSourceConfiguration['port'];
-				$host = $remoteCacheSourceConfiguration['host'];
-				return parent::__construct($port, $host);
-			}
+			$port = $confParams['port'];
+			$host = $confParams['host'];
+			return  parent::__construct($port, $host);
 		}
+		$this->cache=null;
 	}
 	public function loadKey()
 	{

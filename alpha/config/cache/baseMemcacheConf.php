@@ -3,7 +3,7 @@ require_once __DIR__."/baseConfCache.php";
 require_once __DIR__."/mapCacheInterface.php";
 class baseMemcacheConf extends baseConfCache implements mapCacheInterface
 {
-	private $cache;
+	protected $cache;
 
 	protected function getCache()
 	{
@@ -12,6 +12,17 @@ class baseMemcacheConf extends baseConfCache implements mapCacheInterface
 	function __construct($port,$host)
 	{
 		$this->cache = $this->initCache($port,$host);
+	}
+	protected function getConfigParams($sectionName)
+	{
+		$configFile = kEnvironment::getConfigDir() . '/configCacheParams.php';
+		if (file_exists($configFile))
+		{
+			include($configFile);
+			if (isset($cacheConfigParams[$sectionName]))
+				return $cacheConfigParams[$sectionName];
+		}
+		return null;
 	}
 	protected function initCache($port,$host)
 	{
