@@ -15,14 +15,17 @@ class kESearchHistoryCoreAdapter
 
 	public static function getCoreESearchHistoryFromResults($elasticResults)
 	{
+		$objects = array();
+		$totalCount = 0;
 		if (isset($elasticResults[self::SUGGEST_KEY]))
 		{
-			return self::getCoreESearchHistoryFromSuggestResults($elasticResults);
+			list($objects, $totalCount) = self::getCoreESearchHistoryFromSuggestResults($elasticResults);
 		}
 		elseif (isset($elasticResults[self::HITS_KEY][self::HITS_KEY]))
 		{
-			return self::getCoreESearchHistoryFromHitsResults($elasticResults);
+			list($objects, $totalCount) = self::getCoreESearchHistoryFromHitsResults($elasticResults);
 		}
+		return array($objects, $totalCount);
 	}
 
 	protected static function getCoreESearchHistoryFromSuggestResults($elasticResults)
