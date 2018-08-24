@@ -7,6 +7,7 @@ class kESearchHistoryElasticClient
 {
 
 	const INDEX_KEY = 'index';
+	const TYPE_KEY = 'type';
 	const BODY_KEY = 'body';
 	const QUERY_KEY = 'query';
 
@@ -43,7 +44,8 @@ class kESearchHistoryElasticClient
 		$searchTermQuery = new kESearchTermQuery(ESearchHistoryFieldName::SEARCH_TERM, elasticSearchUtils::formatSearchTerm($searchTerm));
 		$deleteByQuery->addToFilter($searchTermQuery);
 		$query = array(
-			self::INDEX_KEY => ESearchHistoryIndexMap::SEARCH_HISTORY_INDEX,
+			self::INDEX_KEY => ESearchHistoryIndexMap::SEARCH_HISTORY_SEARCH_ALIAS,
+			self::TYPE_KEY => ESearchHistoryIndexMap::SEARCH_HISTORY_TYPE,
 			self::BODY_KEY => array(
 				self::QUERY_KEY => $deleteByQuery->getFinalQuery()
 			)
@@ -55,7 +57,8 @@ class kESearchHistoryElasticClient
 	public function searchRecentForUser($queryBody)
 	{
 		$query = array(
-			self::INDEX_KEY => ESearchHistoryIndexMap::SEARCH_HISTORY_INDEX,
+			self::INDEX_KEY => ESearchHistoryIndexMap::SEARCH_HISTORY_SEARCH_ALIAS,
+			self::TYPE_KEY => ESearchHistoryIndexMap::SEARCH_HISTORY_TYPE,
 			self::BODY_KEY => $queryBody
 		);
 

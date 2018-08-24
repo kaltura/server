@@ -57,8 +57,7 @@ class ESearchHistoryFilter extends ESearchBaseFilter
 		$this->applyFilter();
 		$historyClient = new kESearchHistoryElasticClient();
 		$elasticResults = $historyClient->searchRecentForUser($this->query);
-		list($objects,$totalCount) = kESearchHistoryCoreAdapter::getCoreESearchHistoryFromResults($elasticResults);
-		return array($objects, $totalCount);
+		return kESearchHistoryCoreAdapter::getCoreESearchHistoryFromResults($elasticResults);
 	}
 
 	protected function applyFilter()

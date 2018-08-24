@@ -49,7 +49,6 @@ class kESearchHistoryManager implements kESearchSearchHistoryInfoEventConsumer
 		}
 		if (!$object->getPartnerId() || !$object->getKUserId())
 		{
-			KalturaLog::log('Not indexing search history document, missing partner id or kuser id');
 			return false;
 		}
 		return true;
@@ -57,8 +56,8 @@ class kESearchHistoryManager implements kESearchSearchHistoryInfoEventConsumer
 
 	protected function addIndexTypeAction(&$body)
 	{
-		$body[self::INDEX_KEY] = ESearchHistoryIndexMap::SEARCH_HISTORY_INDEX;
-		$body[self::ACTION_KEY] =  ElasticMethodType::INDEX;
+		$body[self::INDEX_KEY] = ESearchHistoryIndexMap::SEARCH_HISTORY_INDEX_ALIAS;
+		$body[self::ACTION_KEY] = ElasticMethodType::INDEX;
 		$body[self::TYPE_KEY] = ESearchHistoryIndexMap::SEARCH_HISTORY_TYPE;
 	}
 
@@ -89,7 +88,7 @@ class kESearchHistoryManager implements kESearchSearchHistoryInfoEventConsumer
 		}
 		$this->addIndexTypeAction($body);
 		$document = json_encode($body);
-		$this->indexDocumentWithRabbit($document);
+		$this->sendDocumentToQueue($document);
 	}
 
 	protected function shouldIndexSearchHistoryDocument($object)
@@ -108,7 +107,7 @@ class kESearchHistoryManager implements kESearchSearchHistoryInfoEventConsumer
 		return true;
 	}
 
-	protected function indexDocumentWithRabbit($document)
+	protected function sendDocumentToQueue($document)
 	{
 		try
 		{

@@ -151,8 +151,8 @@ class ESearchSearchHistoryInfo
 
 	public function getSearchContextArray()
 	{
-		$sc = $this->getSearchContext();
-		return $sc == searchHistoryUtils::DEFAULT_SEARCH_CONTEXT ? array($sc) : array($sc, searchHistoryUtils::DEFAULT_SEARCH_CONTEXT);
+		$searchContext = $this->getSearchContext();
+		return $searchContext == searchHistoryUtils::DEFAULT_SEARCH_CONTEXT ? array($searchContext) : array($searchContext, searchHistoryUtils::DEFAULT_SEARCH_CONTEXT);
 	}
 
 }

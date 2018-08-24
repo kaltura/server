@@ -36,7 +36,7 @@ abstract class kBaseElasticEntitlement
         if($ks && !$kuserId)
         {
             $kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid, true);
-            if($kuser)
+            if ($kuser)
                 $kuserId = $kuser->getId();
         }
 
