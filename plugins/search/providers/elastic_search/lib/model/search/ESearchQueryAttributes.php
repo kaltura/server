@@ -318,7 +318,7 @@ class ESearchQueryAttributes
 	{
 		$searchHistoryTerm = elasticSearchUtils::formatSearchTerm($searchHistoryTerm);
 		$searchHistoryTerm = @iconv('utf-8', 'utf-8//IGNORE', $searchHistoryTerm);
-		$this->searchHistoryTerms[] = elasticSearchUtils::formatSearchTerm($searchHistoryTerm);
+		$this->searchHistoryTerms[] = $searchHistoryTerm;
 	}
 
 	/**
