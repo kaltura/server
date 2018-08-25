@@ -7,12 +7,12 @@ class cacheConfFactory
 	const LOCAL_MEM_CACHE = 'LOCAL_MEM_CACHE';
 	const FILE_SYSTEM = 'FILE_SYSTEM';
 	const REMOTE_MEM_CACHE = 'REMOTE_MEM_CACHE';
-	static private $cacheInstanceList=array();
 
 	static function register($name, $instance)
 	{
 		self::$cacheInstanceList[$name]=$instance;
 	}
+
 	static function getInstance($name)
 	{
 
