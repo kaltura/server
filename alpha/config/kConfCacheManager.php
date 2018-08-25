@@ -11,8 +11,8 @@ class kConfCacheManager
 						cacheConfFactory::REMOTE_MEM_CACHE	=>array(cacheConfFactory::APC,cacheConfFactory::SESSION,cacheConfFactory::LOCAL_MEM_CACHE));
 
 	private static $keyLoadFlow	=array(cacheConfFactory::SESSION,cacheConfFactory::APC,cacheConfFactory::REMOTE_MEM_CACHE);
-	private static $keyStoreFlow	=array(cacheConfFactory::SESSION	=>	array(),
-						cacheConfFactory::APC 	=>	array(cacheConfFactory::SESSION),
+	private static $keyStoreFlow	=array(cacheConfFactory::SESSION		=>	array(),
+						cacheConfFactory::APC 			=>	array(cacheConfFactory::SESSION),
 						cacheConfFactory::REMOTE_MEM_CACHE	=>	array(cacheConfFactory::APC,cacheConfFactory::SESSION));
 
 	public static function getMap($mapName)
