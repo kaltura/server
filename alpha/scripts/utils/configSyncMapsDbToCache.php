@@ -1,6 +1,7 @@
 <?php
 chdir(__DIR__.'/../');
 require_once(__DIR__ . '/../bootstrap.php');
+require_once __DIR__ . '/../../config/cache/remoteMemCacheConf.php';
 
 if($argc != 3)
 	die ("Usage : $argv[0] <db user name> <db password>\n");
@@ -10,13 +11,13 @@ $dbPasssword = $argv[2];
 
 //get map list from cache
 include (kEnvironment::getConfigDir().'/configCacheParams.php');
-if(!isset($remoteCacheSourceConfiguration))
+if(!isset($cacheConfigParams))
 	die("\nRemote cache cofiguration is no accessible");
 
 $cache = new kMemcacheCacheWrapper;
-if(!$cache->init(array('host'=>$remoteCacheSourceConfiguration['host'],
-	'port'=>$remoteCacheSourceConfiguration['port'])))
-	die ("Fail to connect to cache host {$remoteCacheSourceConfiguration['host']} port {$remoteCacheSourceConfiguration['port']} ");
+if(!$cache->init(array('host'=>$cacheConfigParams['remoteMemCacheConf']['host'],
+	'port'=>$cacheConfigParams['remoteMemCacheConf']['port'])))
+	die ("Fail to connect to cache host {$cacheConfigParams['remoteMemCacheConf']['host']} port {$cacheConfigParams['remoteMemCacheConf']['port']} ");
 $mapListInCache = $cache->get(remoteMemCacheConf::MAP_LIST_KEY);
 
 //Find all exsiting map names in DB
@@ -58,4 +59,4 @@ $ret = $cache->set(baseConfCache::CONF_CACHE_VERSION_KEY,$chacheKey);
 if($ret)
 	echo("\nKey - {$chacheKey} was added to cache successfully\n");
 else
-	die("\nFialed inserting key to cache\n");
+	die("\nFailed inserting key to cache\n");
