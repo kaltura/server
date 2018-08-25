@@ -23,15 +23,6 @@ require_once __DIR__ . '/kConfCacheManager.php';
  */
 class kConf extends kEnvironment
 {
-	const APC_CACHE_MAP = 'kConf-';
-	
-	const FULL_MAP_KEY = '__full';
-	
-	protected static $cacheKey = null;
-	
-	protected static $cacheVersion = null;
-	protected static $map = array();
-
 	public static function hasMap($mapName)
 	{
 		return kConfCacheManager::hasMap($mapName);
@@ -79,7 +70,7 @@ class kConf extends kEnvironment
 	 */
 	public static function getArrayValue($paramName, $sectionName, $mapName = 'local', $defaultValue = false)
 	{
-		$result = kConf::get($sectionName,$mapName,$defaultValue);
+		$result = kConf::get($sectionName, $mapName, $defaultValue);
 		if (is_array($result) && isset($result[$paramName]))
 			return $result[$paramName];
 		return $defaultValue;

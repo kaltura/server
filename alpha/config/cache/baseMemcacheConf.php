@@ -9,9 +9,9 @@ class baseMemcacheConf extends baseConfCache implements mapCacheInterface
 	{
 		return $this->cache;
 	}
-	function __construct($port,$host)
+	function __construct($port, $host)
 	{
-		$this->cache = $this->initCache($port,$host);
+		$this->cache = $this->initCache($port, $host);
 	}
 	protected function getConfigParams($sectionName)
 	{
@@ -24,7 +24,7 @@ class baseMemcacheConf extends baseConfCache implements mapCacheInterface
 		}
 		return null;
 	}
-	protected function initCache($port,$host)
+	protected function initCache($port, $host)
 	{
 		require_once (__DIR__ . '/../../../infra/cache/kMemcacheCacheWrapper.php');
 		$cache = new kMemcacheCacheWrapper;
@@ -42,21 +42,23 @@ class baseMemcacheConf extends baseConfCache implements mapCacheInterface
 	}
 	public function load($key, $mapName)
 	{
-		if($cache = $this->getCache())
+		$cache = $this->getCache();
+		if($cache)
 			return $cache->get($mapName);
 		return null;
 	}
 
 	public function store($key, $mapName, $map, $ttl = 0)
 	{
-		if($cache = $this->getCache())
+		$cache = $this->getCache();
+		if($cache)
 			return $cache->set($mapName, $map); // try to fetch from cache
-
 		return null;
 	}
-	public function delete($key,$mapName)
+	public function delete($key, $mapName)
 	{
-		if($cache = $this->getCache())
+		$cache = $this->getCache();
+		if($cache)
 			return $cache->delete($mapName);
 		return false;
 	}

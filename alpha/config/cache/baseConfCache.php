@@ -92,6 +92,6 @@ class baseConfCache
 	public function getUsageCounter(){return $this->usageCounter;}
 	public function getUsageMap(){return $this->usageMap;}
 	public function isKeyRequired(){ return false;}
-	public function storeKey($key,$ttl=30){return;}
+	public function storeKey($key, $ttl=30){return;}
 	public function loadKey(){return false;}
 }

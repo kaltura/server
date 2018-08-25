@@ -17,7 +17,7 @@ $cache = new kMemcacheCacheWrapper;
 if(!$cache->init(array('host'=>$remoteCacheSourceConfiguration['host'],
 	'port'=>$remoteCacheSourceConfiguration['port'])))
 	die ("Fail to connect to cache host {$remoteCacheSourceConfiguration['host']} port {$remoteCacheSourceConfiguration['port']} ");
-$mapListInCache = $cache->get(remoteCacheSource::MAP_LIST_KEY);
+$mapListInCache = $cache->get(remoteMemCacheConf::MAP_LIST_KEY);
 
 //Find all exsiting map names in DB
 $cmdLine = 'mysql -u'.$dbUserName.' -p'.$dbPasssword.' kaltura -e "select map_name , host_name from conf_maps where status=1 group by map_name,host_name;"';
@@ -51,7 +51,7 @@ for($i = 1 ; $i < count($output) ; $i++)
 	$cache->set($mapName,$content);
 }
 $mapListInCache['UPDATED_AT']=date("Y-m-d H:i:s");
-$cache->set(remoteCacheSource::MAP_LIST_KEY,$mapListInCache);
+$cache->set(remoteMemCacheConf::MAP_LIST_KEY,$mapListInCache);
 //todo reset the generarted key
 $chacheKey = baseConfCache::generateKey();
 $ret = $cache->set(baseConfCache::CONF_CACHE_VERSION_KEY,$chacheKey);

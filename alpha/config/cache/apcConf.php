@@ -22,7 +22,7 @@ class apcConf extends baseConfCache implements mapCacheInterface , keyCacheInter
 		if($this->apcFunctionsExist)
 			return apc_delete($mapName);
 	}
-	public function load($key,$mapName)
+	public function load($key, $mapName)
 	{
 		if($this->apcFunctionsExist)
 		{
@@ -35,12 +35,12 @@ class apcConf extends baseConfCache implements mapCacheInterface , keyCacheInter
 		}
 		return null;
 	}
-	public function store($key,$mapName,$map,$ttl=0)
+	public function store($key, $mapName, $map, $ttl=0)
 	{
 		if($this->apcFunctionsExist && PHP_SAPI != 'cli')
 		{
-			$this->addKeyToMap($map,$mapName,$key);
-			return apc_store($mapName,$map,$ttl);
+			$this->addKeyToMap($map, $mapName, $key);
+			return apc_store($mapName, $map, $ttl);
 		}
 		return false;
 	}
@@ -58,7 +58,7 @@ class apcConf extends baseConfCache implements mapCacheInterface , keyCacheInter
 		}
 		return null;
 	}
-	public function storeKey($key,$ttl=30)
+	public function storeKey($key, $ttl=30)
 	{
 			if($this->apcFunctionsExist && PHP_SAPI != 'cli')
 				return apc_store(baseConfCache::CONF_CACHE_VERSION_KEY, $key, $ttl);
