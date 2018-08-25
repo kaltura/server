@@ -20,5 +20,4 @@ class sessionConf extends baseConfCache implements mapCacheInterface , keyCacheI
 	public function loadKey(){return self::$cacheKey;}
 	public function storeKey($key, $ttl = 30){self::$cacheKey = $key;}
 	public function deleteKey(){self::$cacheKey = null;}
-
 }

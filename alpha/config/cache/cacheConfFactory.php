@@ -8,12 +8,11 @@ class cacheConfFactory
 	const FILE_SYSTEM = 'FILE_SYSTEM';
 	const REMOTE_MEM_CACHE = 'REMOTE_MEM_CACHE';
 	const cacheConfRequireArray = array(
-								self::SESSION =>  array('sessionConf','sessionConf.php'),
-								self::APC => array('apcConf','apcConf.php'),
-								self::LOCAL_MEM_CACHE => array('localMemCacheConf','localMemCacheConf.php'),
-								self::FILE_SYSTEM => array('fileSystemConf','fileSystemConf.php'),
-								self::REMOTE_MEM_CACHE => array('remoteMemCacheConf','remoteMemCacheConf.php'));
-
+				self::SESSION =>  array('sessionConf','sessionConf.php'),
+				self::APC => array('apcConf','apcConf.php'),
+				self::LOCAL_MEM_CACHE => array('localMemCacheConf','localMemCacheConf.php'),
+				self::FILE_SYSTEM => array('fileSystemConf','fileSystemConf.php'),
+				self::REMOTE_MEM_CACHE => array('remoteMemCacheConf','remoteMemCacheConf.php'));
 
 	static private $cacheInstanceList=array();
 
