@@ -29,7 +29,7 @@ if (!in_array($newPrimarySecret, $additionalSecrets,true))
 
 $partner->setAdminSecret($newPrimarySecret);
 $newPrimarySecretArray = array($newPrimarySecret);
-$additionalSecrets = array_diff($additionalSecrets,$newPrimarySecretArray);
+$additionalSecrets = array_diff($additionalSecrets, $newPrimarySecretArray);
 array_unshift($additionalSecrets, $oldPrimarySecret);
 $partner->setEnabledAdditionalAdminSecrets($additionalSecrets);
 

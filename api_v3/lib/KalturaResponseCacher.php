@@ -397,8 +397,8 @@ class KalturaResponseCacher extends kApiCache
 		}
 		list($adminSecrets, $userSecret, $ksVersion) = $secrets;
 		$paramSecret = $params['secret'];
-		$adminSecretArray = explode(',',$adminSecrets);
-		if(!self::matchParamSecret($paramSecret, $adminSecretArray , $userSecret, $type))
+		$adminSecretArray = explode(',', $adminSecrets);
+		if(!self::matchParamSecret($paramSecret, $adminSecretArray, $userSecret, $type))
 			return;
 		$adminSecret = $adminSecretArray[0];
 		$startTime = microtime(true);

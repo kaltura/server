@@ -22,7 +22,7 @@ if (!in_array($toDisable, $additionalSecrets,true))
 	die("$toDisable does not exist in enabledAdditionalSecretArray on partner: $partnerId" . PHP_EOL);
 
 $toDisableArray = array($toDisable);
-$additionalSecrets = array_diff($additionalSecrets,$toDisableArray);
+$additionalSecrets = array_diff($additionalSecrets, $toDisableArray);
 $partner->setEnabledAdditionalAdminSecrets($additionalSecrets);
 
 try
