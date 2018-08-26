@@ -149,8 +149,8 @@ class EmailIngestionProfileService extends KalturaEntryService
 	function addMediaEntryAction(KalturaMediaEntry $mediaEntry, $uploadTokenId, $emailProfId, $fromAddress, $emailMsgId)
 	{
 		try
-	    {
-	    	// check that the uploaded file exists 
+		{
+			// check that the uploaded file exists
 			$entryFullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadTokenId);
 		}
 		catch(kCoreException $ex)

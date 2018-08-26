@@ -439,8 +439,8 @@ class MediaService extends KalturaEntryService
 	 */
 	function addFromUploadedFileAction(KalturaMediaEntry $mediaEntry, $uploadTokenId)
 	{
-    	if($mediaEntry->conversionQuality && !$mediaEntry->conversionProfileId)
-    		$mediaEntry->conversionProfileId = $mediaEntry->conversionQuality;
+		if($mediaEntry->conversionQuality && !$mediaEntry->conversionProfileId)
+			$mediaEntry->conversionProfileId = $mediaEntry->conversionQuality;
 
 		try
 		{
