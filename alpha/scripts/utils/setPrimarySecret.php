@@ -24,7 +24,7 @@ if ($oldPrimarySecret === $newPrimarySecret)
 /** @var array $additionalSecrets */
 $additionalSecrets = $partner->getEnabledAdditionalAdminSecrets();
 
-if (!in_array($newPrimarySecret, $additionalSecrets,true))
+if (!in_array($newPrimarySecret, $additionalSecrets, true))
 	die("$newPrimarySecret does not exist in enabledAdditionalSecretArray on partner: $partnerId" . PHP_EOL);
 
 $partner->setAdminSecret($newPrimarySecret);

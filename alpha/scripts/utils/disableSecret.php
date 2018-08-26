@@ -18,7 +18,7 @@ $partner = PartnerPeer::retrieveByPK($partnerId);
 /** @var array $additionalSecrets */
 $additionalSecrets = $partner->getEnabledAdditionalAdminSecrets();
 
-if (!in_array($toDisable, $additionalSecrets,true))
+if (!in_array($toDisable, $additionalSecrets, true))
 	die("$toDisable does not exist in enabledAdditionalSecretArray on partner: $partnerId" . PHP_EOL);
 
 $toDisableArray = array($toDisable);
