@@ -62,19 +62,19 @@ class DocumentsService extends KalturaEntryService
 	function addFromUploadedFileAction(KalturaDocumentEntry $documentEntry, $uploadTokenId)
 	{
 		try
-	    {
-	    	// check that the uploaded file exists
+		{
+			// check that the uploaded file exists
 			$entryFullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadTokenId);
-	    }
-	    catch(kCoreException $ex)
-	    {
-	    	if ($ex->getCode() == kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS)
+		}
+		catch(kCoreException $ex)
+		{
+			if ($ex->getCode() == kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS)
 			{
 				throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY);
 			}
-	    	throw($ex);
-	    }
-	    	
+			throw($ex);
+		}
+
 		if (!file_exists($entryFullPath))
 		{
 			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
