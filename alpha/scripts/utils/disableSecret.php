@@ -2,10 +2,14 @@
 require_once(__DIR__ . '/../bootstrap.php');
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
-echo 'add admin secret start' . PHP_EOL;
+KalturaLog::info('add admin secret start' . PHP_EOL);
 
 if ($argc !== 3)
-	die('scripts must have two arguments  1 -> partner ID , 2 -> secret to disable' . PHP_EOL);
+	die(PHP_EOL . "Usage: $argv[0] <partnerId> <secretToDisable>". PHP_EOL .
+		"<partnerId> - the Partner ID" . PHP_EOL .
+		"<secretToDisable> - the secret to disable **disabled secret cannot be main admin secret**" . PHP_EOL
+	);
+
 
 $partnerId = $argv[1];
 $toDisable = $argv[2];

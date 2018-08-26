@@ -690,7 +690,7 @@ class Partner extends BasePartner
 
 	public function getEnabledAdditionalAdminSecrets()
 	{
-		return $this->getFromCustomData("enabledAdditionalAdminSecrets",null,array());
+		return $this->getFromCustomData("enabledAdditionalAdminSecrets", null, array());
 	}
 
 	/**
@@ -702,21 +702,26 @@ class Partner extends BasePartner
 		//in case additional was moved to primary, do not disable it
 		$adminSecretArray = array($this->getAdminSecret());
 		/** @noinspection PhpParamsInspection */
-		$removedEnabledSecrets = array_diff($enabled,$v,$adminSecretArray);
+		$removedEnabledSecrets = array_diff($enabled, $v, $adminSecretArray);
 		if ($removedEnabledSecrets)
 		{
+			/** @var array $oldDisabled */
 			$oldDisabled = $this->getDisabledAdditionalAdminSecrets();
 			//unique - in case of secret that was enabled disabled several times.
 			$merged = array_merge($removedEnabledSecrets, $oldDisabled);
 			$newDisabled = array_unique($merged);
 			$this->setDisabledAdditionalAdminSecrets($newDisabled);
 		}
+		//In case secret Has been re-enabled Remove it from disabled
+		/** @var array $disabled */
+		$disabled = $this->getDisabledAdditionalAdminSecrets();
+		$newDisabled = array_diff($disabled ,$v);
+		$this->setDisabledAdditionalAdminSecrets($newDisabled);
 		$this->putInCustomData( "enabledAdditionalAdminSecrets", $v);
 	}
 
 	/**
 	 * disabled admin secret is only accessible from setEnabledAdditionalAdminSecrets
-	 * @return string
 	 */
 	private function getDisabledAdditionalAdminSecrets()
 	{

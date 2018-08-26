@@ -428,7 +428,7 @@ class KalturaResponseCacher extends kApiCache
 
 		foreach ($adminSecretArray as $adminSecret)
 		{
-			if ($type && $paramSecret === $adminSecret)
+			if ($paramSecret === $adminSecret) // admin secret works for users as well
 				return true;
 		}
 		return false;

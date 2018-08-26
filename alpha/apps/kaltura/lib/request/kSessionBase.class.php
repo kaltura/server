@@ -562,8 +562,7 @@ class kSessionBase
 			$this->logError("Hash doesn't match sha1 on partner [$partnerId].");
 			return false;						// invalid signature
 		}
-		$hash = $arrayMatch[0];
-		$fields = $arrayMatch[1];
+		list($hash, $fields) = $arrayMatch;
 		$rand = substr($fields, 0, self::RANDOM_SIZE);
 		$fields = substr($fields, self::RANDOM_SIZE);
 		
@@ -639,7 +638,7 @@ class kSessionBase
 			$hash = substr($decKs, 0, self::SHA1_SIZE);
 			$fields = substr($decKs, self::SHA1_SIZE);
 			if ($hash === sha1($fields, true))
-				return array($hash, $fields, true);
+				return array($hash, $fields);
 		}
 		return false;
 	}
