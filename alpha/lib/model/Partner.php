@@ -700,9 +700,9 @@ class Partner extends BasePartner
 	{
 		$enabled = $this->getEnabledAdditionalAdminSecrets();
 		//in case additional was moved to primary, do not disable it
-		$adminSecretArray = array($this->getAdminSecret());
+		$primaryAdminSecretArray = array($this->getAdminSecret());
 		/** @noinspection PhpParamsInspection */
-		$removedEnabledSecrets = array_diff($enabled, $v, $adminSecretArray);
+		$removedEnabledSecrets = array_diff($enabled, $v, $primaryAdminSecretArray);
 		if ($removedEnabledSecrets)
 		{
 			/** @var array $oldDisabled */
@@ -715,7 +715,7 @@ class Partner extends BasePartner
 		//In case secret Has been re-enabled Remove it from disabled
 		/** @var array $disabled */
 		$disabled = $this->getDisabledAdditionalAdminSecrets();
-		$newDisabled = array_diff($disabled ,$v);
+		$newDisabled = array_diff($disabled, $v, $primaryAdminSecretArray);
 		$this->setDisabledAdditionalAdminSecrets($newDisabled);
 		$this->putInCustomData( "enabledAdditionalAdminSecrets", $v);
 	}
@@ -725,7 +725,7 @@ class Partner extends BasePartner
 	 */
 	private function getDisabledAdditionalAdminSecrets()
 	{
-		return $this->getFromCustomData("disabledAdditionalAdminSecrets",null,array());
+		return $this->getFromCustomData("disabledAdditionalAdminSecrets", null, array());
 	}
 
 

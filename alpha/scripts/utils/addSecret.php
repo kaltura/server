@@ -6,7 +6,7 @@ error_reporting(E_ERROR | E_WARNING | E_PARSE);
 KalturaLog::info('add admin secret start' . PHP_EOL);
 
 if ($argc <= 1)
-	die(PHP_EOL . "Usage: $argv[0] <partnerId> [<replacePrimarySecret>] [<adminSecret>]". PHP_EOL .
+	die(PHP_EOL. 'php' . "Usage: $argv[0] <partnerId> [<replacePrimarySecret>] [<adminSecret>]". PHP_EOL .
 		"<partnerId> - the Partner ID" . PHP_EOL .
 		"<replacePrimarySecret> - OPTIONAL - if set and equal to true replace primary secret with new Secret" . PHP_EOL .
 		"<adminSecret> - OPTIONAL -  if set And MD5 validation Pass will be the new secret
@@ -21,7 +21,7 @@ if (isset($argv[2]) && $argv[2] === 'true')
 if (isset($argv[3]))
 {
 	if (!preg_match('/^[a-f0-9]{32}$/', $argv[3]))
-		die($argv[3] . 'is Not Valid a valid MD5 Hash');
+		die('Error ' .$argv[3] . ' ->  Not a valid MD5 hash' . PHP_EOL);
 	$newSecret = $argv[3];
 }
 else
@@ -43,8 +43,8 @@ if ($replacePrimaryAdminSecret)
 	/** @var array $additionalEnableSecrets */
 	$additionalEnableSecrets = $partner->getEnabledAdditionalAdminSecrets();
 	array_unshift($additionalEnableSecrets, $oldSecret);
-	$partner->setEnabledAdditionalAdminSecrets($additionalEnableSecrets);
 	$partner->setAdminSecret($newSecret);
+	$partner->setEnabledAdditionalAdminSecrets($additionalEnableSecrets);
 	KalturaLog::info('primary admin Secret replaced' . PHP_EOL);
 }
 else

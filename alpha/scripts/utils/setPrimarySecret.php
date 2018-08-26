@@ -6,7 +6,7 @@ error_reporting(E_ERROR | E_WARNING | E_PARSE);
 KalturaLog::info('add admin secret start' . PHP_EOL);
 
 if ($argc !== 3)
-	die(PHP_EOL . "Usage: $argv[0] <partnerId> <secretToSetAsPrimary>". PHP_EOL .
+	die(PHP_EOL . 'php' ."Usage: $argv[0] <partnerId> <secretToSetAsPrimary>". PHP_EOL .
 		"<partnerId> - the Partner ID" . PHP_EOL .
 		"<secretToSetAsPrimary> - the secret to set as primary **Must exist in enabled Additional Secrets**" . PHP_EOL
 	);
