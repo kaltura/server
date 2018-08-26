@@ -157,11 +157,12 @@ class AppTokenService extends KalturaBaseService
 	 * @param string $tokenHash a hash [MD5, SHA1, SHA256 and SHA512 are supported] of the current KS concatenated with the application token 
 	 * @param string $userId session user ID, will be ignored if a different user ID already defined on the application token
 	 * @param KalturaSessionType $type session type, will be ignored if a different session type is already defined on the application token
-	 * @param int $expiry session expiry (in seconds), could be overridden by shorter expiry of the application token 
+	 * @param int $expiry session expiry (in seconds), could be overridden by shorter expiry of the application token
+	 * @param string $sessionPrivileges session privileges, will be ignored if a similar pricilege is already defined on the application token or the privilege is not allowed
 	 * @throws KalturaErrors::APP_TOKEN_ID_NOT_FOUND
 	 * @return KalturaSessionInfo
 	 */
-	function startSessionAction($id, $tokenHash, $userId = null, $type = null, $expiry = null)
+	function startSessionAction($id, $tokenHash, $userId = null, $type = null, $expiry = null, $sessionPrivileges = null)
 	{
 		$dbAppToken = AppTokenPeer::retrieveByPK($id);
 		if(!$dbAppToken)
@@ -209,6 +210,13 @@ class AppTokenService extends KalturaBaseService
 		{
 			$privilegesArray = array_merge_recursive($privilegesArray, ks::parsePrivileges($dbAppToken->getSessionPrivileges()));
 		}
+
+		if($sessionPrivileges)
+		{
+			$parsedAppSessionPrivilegesArray = ks::parsePrivileges($sessionPrivileges);
+			$privilegesArray = array_merge_recursive($privilegesArray, ks::retrieveAdditionalAppSessionPrivileges($privilegesArray, $parsedAppSessionPrivilegesArray));
+		}
+
 		$privileges = ks::buildPrivileges($privilegesArray);
 		
 		$ks = kSessionUtils::createKSession($partnerId, $secret, $userId, $expiry, $type, $privileges);

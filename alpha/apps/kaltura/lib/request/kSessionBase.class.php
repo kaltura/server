@@ -24,6 +24,7 @@ class kSessionBase
 	const TYPE_KS =  0; // change to be 1
 	const TYPE_KAS = 1; // change to be 2
 
+	//when you add new privilege add it as well to the array on ks::retrieveAdditionalAppSessionPrivileges
 	const PRIVILEGE_EDIT = "edit";
 	const PRIVILEGE_VIEW = "sview";
 	const PRIVILEGE_LIST = "list"; // used to bypass the user filter in entry and cue point list
