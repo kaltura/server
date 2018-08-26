@@ -484,9 +484,19 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		foreach ($deliveries as $delivery) {
 			$result = $delivery->supportsDeliveryDynamicAttributes($deliveryAttributes);
 			if ($result == DeliveryProfile::DYNAMIC_ATTRIBUTES_FULL_SUPPORT)
+			{
+				if ($supportedDPs && !$delivery->isSubstitute(reset($supportedDPs)))
+					continue;
+					
 				$supportedDPs[] = $delivery;
+			}
 			else if (!$partialSupport && $result == DeliveryProfile::DYNAMIC_ATTRIBUTES_PARTIAL_SUPPORT)
+			{
+				if ($partialSupport && !$delivery->isSubstitute(reset($partialSupport)))
+					continue;
+					
 				$partialSupport[] = $delivery;
+			}
 		}
 
 		if (!count($supportedDPs))
@@ -504,6 +514,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		
 		$minWeight = PHP_INT_MAX;
 		$minDP = null;
+		
 		foreach ($supportedDPs as $delivery)
 		{
 			$weight = $delivery->getRegionPrice($region);
