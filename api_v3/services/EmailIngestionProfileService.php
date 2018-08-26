@@ -157,6 +157,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 		{
 			if ($ex->getCode() == kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS)
 				throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY);
+			throw($ex);
 		}
 
 		if (!file_exists($entryFullPath))
