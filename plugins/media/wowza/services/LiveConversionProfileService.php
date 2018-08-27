@@ -93,7 +93,7 @@ class LiveConversionProfileService extends KalturaBaseService
 			$mediaServer = ServerNodePeer::retrieveActiveMediaServerNode($hostname);
 		
 		$conversionProfileId = $entry->getConversionProfileId();
-		$liveParams = assetParamsPeer::retrieveByProfile($conversionProfileId);
+		$liveParams = assetParamsPeer::retrieveByProfileIdNoFilter($conversionProfileId);
 		
 		$liveParamsInput = null;
 		$disableIngested = true;

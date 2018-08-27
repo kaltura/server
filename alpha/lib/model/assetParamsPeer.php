@@ -253,6 +253,17 @@ class assetParamsPeer extends BaseassetParamsPeer
 		return assetParamsPeer::doSelect($criteria, $con);
 	}
 
+	/**
+	 * @param int $conversionProfileId
+	 * @param $con
+	 * @return array<flavorParamsOutput>
+	 */
+	public static function retrieveByProfileIdNoFilter($conversionProfileId, $con = null)
+	{
+		$flavorIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($conversionProfileId);
+		return self::retrieveByPKsNoFilter($flavorIds, $con);
+	}
+
 	public static function retrieveFlavorsByPKs($pks, PropelPDO $con = null)
 	{
 		$criteria = new Criteria(assetParamsPeer::DATABASE_NAME);
