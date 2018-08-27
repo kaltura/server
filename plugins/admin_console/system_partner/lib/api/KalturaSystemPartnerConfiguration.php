@@ -379,7 +379,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var bool
 	 */
 	public $enableSelfServe;
-	
+
 	private static $map_between_objects = array
 	(
 		"id",
