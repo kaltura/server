@@ -327,11 +327,20 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			if($useTwoCodeLang)
 				$audioLanguage = !is_null($obj)? $obj[languageCodeManager::ISO639]: $audioLanguage;
 		}
-		else {
+		else
+		{
+			$audioLanguage = $lang;
 			$obj = languageCodeManager::getObjectFromKalturaName($lang);
-			$audioLanguage = !is_null($obj)? $obj[languageCodeManager::ISO639_T]: $lang;
-			if($useTwoCodeLang)
-				$audioLanguage = !is_null($obj)? $obj[languageCodeManager::ISO639]: $lang;
+			if (is_null($obj))
+				$obj = languageCodeManager::getObjectFromThreeCode($lang);
+			
+			if (!is_null($obj))
+			{
+				if ($useTwoCodeLang)
+					$audioLanguage = $obj[languageCodeManager::ISO639] ? $obj[languageCodeManager::ISO639] : $audioLanguage;
+				else
+					$audioLanguage = $obj[languageCodeManager::ISO639_T] ? $obj[languageCodeManager::ISO639_T] : $obj[languageCodeManager::ISO639_B];
+			}
 		}
 
 		$audioLanguageName = $this->getAudioLanguageName($obj, $audioLanguage);
@@ -340,11 +349,13 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	
 	protected function getAudioLanguageName($languageObject, $audioLanguage)
 	{
-		$audioLanguageName = !is_null($languageObject) ? $languageObject[languageCodeManager::KALTURA_NAME] : $audioLanguage;
-		if($audioLanguageName == $audioLanguage)
-			KalturaLog::info("Language code [$audioLanguage] was not found. Setting [$audioLanguageName] instead");
-	
-		return $audioLanguageName;
+		if (is_null($languageObject))
+		{
+			KalturaLog::info("Language object was not found. Setting [$audioLanguage] instead");
+			return $audioLanguage;
+		}
+
+		return $languageObject[languageCodeManager::KALTURA_NAME];
 	}
 	
 	/**
@@ -524,5 +535,49 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	public function getSupplementaryAssetsFilter()
 	{
 		return $this->getFromCustomData("supplementaryAssetsFilter");
+	}
+	
+	public function setPricingProfile($v)
+	{
+		$this->putInCustomData("pricingProfile", $v);
+	}
+	
+	public function getPricingProfile()
+	{
+		return $this->getFromCustomData("pricingProfile");
+	}
+
+	public function getRegionPrice($region)
+	{
+		$pricingProfile = $this->getPricingProfile();
+		if (!$pricingProfile)
+			return false;
+		
+		$pricingProfiles = kConf::getMap('cdn_pricing_profiles');
+		if (!$pricingProfiles)
+			return false;
+		
+		if (!isset($pricingProfiles[$pricingProfile]))
+			return false;
+		
+		$prices = $pricingProfiles[$pricingProfile];
+		
+		return isset($prices[$region]) ? $prices[$region] : false;
+	}
+	
+	public function isSubstitute(DeliveryProfile $dp)
+	{
+		if (is_null($this->getHostName()) != is_null($dp->getHostName()) ||
+			is_null($this->getTokenizer()) != is_null($dp->getTokenizer()) ||
+			$this->getPriority() != $dp->getPriority() ||
+			$this->getPartnerId() != $dp->getPartnerId())
+		{
+			return false;
+		}
+		
+		$path = parse_url($this->getUrl(), PHP_URL_PATH);
+		$dpPath = parse_url($dp->getUrl(), PHP_URL_PATH);
+		
+		return $path === $dpPath;
 	}
 }
