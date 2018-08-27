@@ -43,6 +43,7 @@ class myReportsMgr
 	const REPORT_TYPE_TOP_PLAYBACK_CONTEXT = 25;
 	const REPORT_TYPE_VPAAS_USAGE = 26;
 	const REPORT_TYPE_ENTRY_USAGE = 27;
+	const REPORT_TYPE_REACH_USAGE = 28;
 
 	const REPORTS_TABLE_MAX_QUERY_SIZE = 20000;
 	const REPORTS_CSV_MAX_QUERY_SIZE = 130000;
@@ -75,7 +76,7 @@ class myReportsMgr
 								   self::APPLICATION_NAME_PLACE_HOLDER,
 								   self::PUSERS_PLACE_HOLDER);
 								   
-	static $reports_without_graph = array(self::REPORT_TYPE_VPAAS_USAGE);
+	static $reports_without_graph = array(self::REPORT_TYPE_VPAAS_USAGE, self::REPORT_TYPE_REACH_USAGE);
 	
 	static $reports_without_totals = array(self::REPORT_TYPE_VPAAS_USAGE);
 	

@@ -395,14 +395,12 @@ class KalturaResponseCacher extends kApiCache
 		{
 			return;			// can't find the secrets of the partner in the cache
 		}
-		list($adminSecret, $userSecret, $ksVersion) = $secrets;				
+		list($adminSecrets, $userSecret, $ksVersion) = $secrets;
 		$paramSecret = $params['secret'];
-		if ($paramSecret !== $adminSecret &&
-			($type || $paramSecret !== $userSecret))
-		{
-			return;			// invalid secret
-		}
-		
+		$adminSecretArray = explode(',', $adminSecrets);
+		if(!self::matchParamSecret($paramSecret, $adminSecretArray, $userSecret, $type))
+			return;
+		$adminSecret = $adminSecretArray[0];
 		$startTime = microtime(true);
 		
 		$userId = isset($params['userId']) ? $params['userId'] : '';
@@ -414,6 +412,26 @@ class KalturaResponseCacher extends kApiCache
 		$processingTime = microtime(true) - $startTime;
 		$cacheKey = md5("{$partnerId}_{$userId}_{$type}_{$expiry}_{$privileges}");
 		self::returnCacheResponseStructure($processingTime, $format, $result, $cacheKey);
+	}
+
+	/**
+	 * @param string $paramSecret
+	 * @param array<string> $adminSecretArray
+	 * @param int $type
+	 * @param string $userSecret
+	 * @return bool|string
+	 */
+	private static function matchParamSecret($paramSecret, $adminSecretArray, $userSecret, $type)
+	{
+		if (!$type && $paramSecret === $userSecret) // userKS match
+			return true;
+
+		foreach ($adminSecretArray as $adminSecret)
+		{
+			if ($paramSecret === $adminSecret) // admin secret works for users as well
+				return true;
+		}
+		return false;
 	}
 
 	private static function returnCacheResponseStructure($processingTime, $format, $result ,$cacheKey='noCacheKey')

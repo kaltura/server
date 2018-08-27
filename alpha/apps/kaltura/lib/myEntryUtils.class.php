@@ -13,17 +13,17 @@ class myEntryUtils
 		EntrySourceType::LECTURE_CAPTURE,
 	);
 
-	public static function updateThumbnailFromFile(entry $dbEntry, $filePath, $fileSyncType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB)
+	public static function updateThumbnailFromContent(entry $dbEntry, $content, $fileSyncType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB)
 	{
 		$dbEntry->setThumbnail(".jpg"); // this will increase the thumbnail version
 		$dbEntry->setCreateThumb(false);
 		$dbEntry->save();
-		
+
 		$dbEntry->reload();
 		$fileSyncKey = $dbEntry->getSyncKey($fileSyncType);
-		kFileSyncUtils::file_put_contents($fileSyncKey, file_get_contents($filePath));
-		
-		try 
+		kFileSyncUtils::file_put_contents($fileSyncKey, $content);
+
+		try
 		{
 			$wrapper = objectWrapperBase::getWrapperClass($dbEntry);
 			$wrapper->removeFromCache("entry", $dbEntry->getId());
@@ -32,7 +32,7 @@ class myEntryUtils
 		{
 			KalturaLog::err($e);
 		}
-		
+
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE_THUMBNAIL, $dbEntry);
 	}
 	
