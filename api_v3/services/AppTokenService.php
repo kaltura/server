@@ -215,7 +215,7 @@ class AppTokenService extends KalturaBaseService
 		{
 			$sessionPrivileges = str_replace(' ', '', $sessionPrivileges);
 			$parsedAppSessionPrivilegesArray = ks::parsePrivileges($sessionPrivileges);
-			$privilegesArray = array_merge_recursive($privilegesArray, ks::retrieveAdditionalAppSessionPrivileges($privilegesArray, $parsedAppSessionPrivilegesArray));
+			$privilegesArray = array_merge_recursive($privilegesArray, ks::retrieveAllowedAppSessionPrivileges($privilegesArray, $parsedAppSessionPrivilegesArray));
 		}
 
 		$privileges = ks::buildPrivileges($privilegesArray);

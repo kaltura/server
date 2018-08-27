@@ -749,50 +749,30 @@ class ks extends kSessionBase
 	}
 
 
-	public static function retrieveAdditionalAppSessionPrivileges($privilegesArray, $appSessionPrivileges)
+	public static function retrieveAllowedAppSessionPrivileges($privilegesArray, $appSessionPrivileges)
 	{
-		$allPrivileges  = array (
-			ks::PRIVILEGE_EDIT,
-			ks::PRIVILEGE_VIEW,
-			ks::PRIVILEGE_LIST,
-			ks::PRIVILEGE_DOWNLOAD,
-			ks::PRIVILEGE_DOWNLOAD_ASSET,
-			ks::PRIVILEGE_EDIT_ENTRY_OF_PLAYLIST,
-			ks::PRIVILEGE_VIEW_ENTRY_OF_PLAYLIST,
-			ks::PRIVILEGE_ACTIONS_LIMIT,
-			ks::PRIVILEGE_SET_ROLE,
-			ks::PRIVILEGE_LIMIT_ENTRY,
-			ks::PRIVILEGE_IP_RESTRICTION,
-			ks::PRIVILEGE_URI_RESTRICTION,
-			ks::PRIVILEGE_ENABLE_ENTITLEMENT,
-			ks::PRIVILEGE_DISABLE_ENTITLEMENT,
-			ks::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY,
-			ks::PRIVILEGE_PRIVACY_CONTEXT,
-			ks::PRIVILEGE_ENABLE_CATEGORY_MODERATION,
-			ks::PRIVILEGE_REFERENCE_TIME,
-			ks::PRIVILEGE_SESSION_KEY,
-			ks::PRIVILEGE_PREVIEW,
-			ks::PRIVILEGE_SESSION_ID,
-			ks::PRIVILEGE_BATCH_JOB_TYPE,
-			ks::PRIVILEGE_APP_TOKEN,
-			ks::PRIVILEGES_DELIMITER,
-			ks::PRIVILEGE_DISABLE_PARTNER_CHANGE_ACCOUNT,
-			ks::PRIVILEGE_EDIT_USER,
-			ks::PRIVILEGE_ENABLE_CAPTION_MODERATION,
-			ks::PRIVILEGE_EDIT_ADMIN_TAGS,
-			ks::PRIVILEGE_RESTRICT_EXPLICIT_LIVE_VIEW
-		);
+		$existingSessionPrivileges = array();
+		$allowedAppSessionPrivileges = array();
 
-		$allPrivileges = array_merge_recursive($allPrivileges , array_keys($privilegesArray));
+		$refl = new ReflectionClass('kSessionBase');
+		$refConstants = $refl->getConstants();
 
-		$additionalAppSessionPrivileges = array();
-		foreach($appSessionPrivileges as $privilegeName => $privilegeValue)
+		foreach($refConstants as $constName => $constValue)
 		{
-			if(!in_array($privilegeName, $allPrivileges))
-				$additionalAppSessionPrivileges[$privilegeName] = $privilegeValue;
+			if(substr($constName, 0, 10) === "PRIVILEGE_")
+				$existingSessionPrivileges[] = $constValue;
 		}
 
-		return $additionalAppSessionPrivileges;
+		$existingSessionPrivileges = array_merge_recursive($existingSessionPrivileges , array_keys($privilegesArray));
+
+		// allow adding privileges to app token only if they are not in use by the server and were not set on the original app token
+		foreach($appSessionPrivileges as $privilegeName => $privilegeValue)
+		{
+			if(!in_array($privilegeName, $existingSessionPrivileges))
+				$allowedAppSessionPrivileges[$privilegeName] = $privilegeValue;
+		}
+
+		return $allowedAppSessionPrivileges;
 	}
 
 }
