@@ -95,8 +95,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		
 		$conversionProfileId = $entry->getConversionProfileId();
 
-		$mediaPartner = (kCurrentContext::getCurrentPartnerId() == Partner::MEDIA_SERVER_PARTNER_ID); // partner -5 need no filter on flavors
-		$liveParams = assetParamsPeer::retrieveByProfile($conversionProfileId, null, !$mediaPartner);
+		$liveParams = assetParamsPeer::retrieveByProfile($conversionProfileId);
 		
 		$liveParamsInput = null;
 		$disableIngested = true;
