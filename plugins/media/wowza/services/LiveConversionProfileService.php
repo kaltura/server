@@ -24,7 +24,8 @@ class LiveConversionProfileService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 		
 		$this->applyPartnerFilterForClass('conversionProfile2');
-		$this->applyPartnerFilterForClass('assetParams');
+		if (kCurrentContext::getCurrentPartnerId() != Partner::MEDIA_SERVER_PARTNER_ID)
+			$this->applyPartnerFilterForClass('assetParams');
 	}
 
 	/**
