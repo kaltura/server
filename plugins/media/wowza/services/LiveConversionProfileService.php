@@ -94,7 +94,9 @@ class LiveConversionProfileService extends KalturaBaseService
 			$mediaServer = ServerNodePeer::retrieveActiveMediaServerNode($hostname);
 		
 		$conversionProfileId = $entry->getConversionProfileId();
-		$liveParams = assetParamsPeer::retrieveByProfile($conversionProfileId);
+
+		$mediaPartner = (kCurrentContext::getCurrentPartnerId() == Partner::MEDIA_SERVER_PARTNER_ID); // partner -5 need no filter on flavors
+		$liveParams = assetParamsPeer::retrieveByProfile($conversionProfileId, null, !$mediaPartner);
 		
 		$liveParamsInput = null;
 		$disableIngested = true;
