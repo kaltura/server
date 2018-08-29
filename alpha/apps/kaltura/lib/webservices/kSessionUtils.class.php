@@ -293,7 +293,9 @@ class ks extends kSessionBase
 	
 	public function toSecureString()
 	{
-		list($ksVersion, $secret) = $this->getKSVersionAndSecret($this->partner_id);
+		list($ksVersion, $secrets) = $this->getKSVersionAndSecret($this->partner_id);
+		$secretsArray = explode(',', $secrets);
+		$secret = $secretsArray[0]; // first element is always the main Admin Secret
 		return kSessionBase::generateSession(
 			$ksVersion,
 			$secret,
@@ -610,7 +612,23 @@ class ks extends kSessionBase
 		
 		return null;
 	}
-	
+
+	public function getSearchContext()
+	{
+		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
+		// edit privilege (edit:XX,edit:YYY,...)
+		$allPrivileges = explode(',', $this->privileges);
+
+		foreach($allPrivileges as $priv)
+		{
+			$exPrivileges = explode(':', $priv, 2);
+			if (count($exPrivileges) == 2 && $exPrivileges[0] == self::PRIVILEGE_SEARCH_CONTEXT)
+				return $exPrivileges[1];
+		}
+
+		return null;
+	}
+
 	public function getLimitEntry()
 	{
 		return $this->getPrivilegeValue(self::PRIVILEGE_LIMIT_ENTRY, null);
@@ -726,23 +744,22 @@ class ks extends kSessionBase
 
 		$cacheKey = self::getSecretsCacheKey($partnerId);
 		$cacheSections = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PARTNER_SECRETS);
+		$adminSecretsAsString = $partner->getAllAdminSecretsAsString();
 		foreach ($cacheSections as $cacheSection)
 		{
 			$cacheStore = kCacheManager::getCache($cacheSection);
 			if (!$cacheStore)
 				continue;
-			
-			$cacheStore->set($cacheKey, array($partner->getAdminSecret(), $partner->getSecret(), $ksVersion));
+			$cacheStore->set($cacheKey, array($adminSecretsAsString, $partner->getSecret(), $ksVersion));
 		}
-		
-		return array($ksVersion, $partner->getAdminSecret());
+		return array($ksVersion, $adminSecretsAsString);
 	}
-	
+
 	protected function logError($msg)
 	{
 		KalturaLog::err($msg);
 	}
-		
+
 	public function kill()
 	{
 		invalidSessionPeer::invalidateKs($this);

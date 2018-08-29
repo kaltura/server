@@ -27,6 +27,8 @@ abstract class kBaseSearch
 
 	public abstract function getPeerRetrieveFunctionName();
 
+    public abstract function getElasticTypeName();
+
 	/**
 	 * @return ESearchQueryAttributes
 	 */
@@ -47,6 +49,8 @@ abstract class kBaseSearch
         $this->applyElasticSearchConditions();
         $this->addGlobalHighlights();
         $result = $this->elasticClient->search($this->query, true);
+        $resultCount = isset($result[kESearchCoreAdapter::HITS_KEY][kESearchCoreAdapter::TOTAL_KEY]) ? $result[kESearchCoreAdapter::HITS_KEY][kESearchCoreAdapter::TOTAL_KEY] : 0;
+        $this->addSearchTermsToSearchHistory($resultCount);
         return $result;
     }
 
@@ -164,6 +168,33 @@ abstract class kBaseSearch
         $innerHitsConfig = kConf::get('innerHits', 'elastic');
         $overrideInnerHitsSize = isset($innerHitsConfig['innerHitsWithObjectId']) ? $innerHitsConfig['innerHitsWithObjectId'] : null;
         $this->queryAttributes->setOverrideInnerHitsSize($overrideInnerHitsSize);
+    }
+
+    protected function addSearchTermsToSearchHistory($resultCount)
+    {
+        if (!$resultCount)
+        {
+            KalturaLog::log("Not adding search terms to search history result count[$resultCount]");
+            return;
+        }
+
+        $searchTerms = $this->queryAttributes->getSearchHistoryTerms();
+        $searchTerms = array_unique($searchTerms);
+        $searchTerms = array_values($searchTerms);
+        if (!$searchTerms)
+        {
+            KalturaLog::log("Empty search terms, not adding to search history");
+            return;
+        }
+
+        $searchHistoryInfo = new ESearchSearchHistoryInfo();
+        $searchHistoryInfo->setSearchTerms($searchTerms);
+        $searchHistoryInfo->setPartnerId(kBaseElasticEntitlement::$partnerId);
+        $searchHistoryInfo->setKUserId(kBaseElasticEntitlement::$kuserId);
+        $searchHistoryInfo->setSearchContext(searchHistoryUtils::getSearchContext());
+        $searchHistoryInfo->setSearchedObject($this->getElasticTypeName());
+        $searchHistoryInfo->setTimestamp(time());
+        kEventsManager::raiseEventDeferred(new kESearchSearchHistoryInfoEvent($searchHistoryInfo));
     }
 
 }

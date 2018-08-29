@@ -48,6 +48,11 @@ class ESearchCuePointItem extends ESearchNestedObjectItem
 
 	private static $multiLanguageFields = array();
 
+	protected static $searchHistoryFields = array(
+		ESearchCuePointFieldName::NAME,
+		ESearchCuePointFieldName::TEXT,
+	);
+
 	/**
 	 * @return ESearchCuePointFieldName
 	 */
