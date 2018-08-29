@@ -26,6 +26,11 @@ class kVendorCredit
 	protected $overageCredit;
 
 	/**
+	 * @var int
+	 */
+	protected $addOn;
+
+	/**
 	 * @var string
 	 */
 	public $lastSyncTime;
@@ -65,6 +70,22 @@ class kVendorCredit
 	public function setCredit($credit)
 	{
 		$this->credit = $credit;
+	}
+
+	/**
+	 * @return the $addOn
+	 */
+	public function getAddOn()
+	{
+		return $this->addOn;
+	}
+
+	/**
+	 * @param int $addOn
+	 */
+	public function setAddOn($addOn)
+	{
+		$this->addOn = $addOn;
 	}
 
 	/**
@@ -164,6 +185,9 @@ class kVendorCredit
 		$credit = $this->credit;
 		if($includeOverages && $this->overageCredit)
 			$credit += $this->overageCredit;
+
+		if($this->addOn)
+			$credit += $this->addOn;
 		
 		return $credit;
 	}
