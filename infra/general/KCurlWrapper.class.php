@@ -502,7 +502,7 @@ class KCurlWrapper
 	 */
 	public function exec($sourceUrl, $destFile = null,$progressCallBack = null, $allowInternalUrl = false)
 	{
-		if (!$allowInternalUrl && $this->isInternalUrl($sourceUrl))
+		if (!$allowInternalUrl && self::isInternalUrl($sourceUrl))
 			KalturaLog::debug("Exec Curl - Found not allowed Internal url: " . $sourceUrl);
 
 		$this->setSourceUrlAndprotocol($sourceUrl);
@@ -539,7 +539,7 @@ class KCurlWrapper
 	 */
 	public function doExec($sourceUrl, $allowInternalUrl = false)
 	{
-		if (!$allowInternalUrl && $this->isInternalUrl($sourceUrl))
+		if (!$allowInternalUrl && self::isInternalUrl($sourceUrl))
 			KalturaLog::debug("DoExec Curl - Found not allowed Internal url: " . $sourceUrl);
 
 		curl_setopt($this->ch, CURLOPT_URL, $sourceUrl);
@@ -558,25 +558,25 @@ class KCurlWrapper
 		}
 	}
 
-	private function isInternalUrl($url = null)
+	private static function isInternalUrl($url = null)
 	{
-		$host = $this->getUrlHost($url);
+		$host = self::getUrlHost($url);
 		if (!$host)
 			return true;
 		if (filter_var($host, FILTER_VALIDATE_IP)) // do we have an ip and not a hostname
-			return $this->IsIpPrivateOrReserved($host);
+			return self::IsIpPrivateOrReserved($host);
 
 		$res = gethostbyname($host);
 		if ($res == $host) // in case of local machine name
 			return true;
-		return $this->IsIpPrivateOrReserved($res);
+		return self::IsIpPrivateOrReserved($res);
 	}
 
-	private function IsIpPrivateOrReserved($host)
+	private static function IsIpPrivateOrReserved($host)
 	{
 		return !filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE |  FILTER_FLAG_NO_RES_RANGE); // checks if host is NOT in a private or reserved range
 	}
-	private function getUrlHost($url = null)
+	private static function getUrlHost($url = null)
 	{
 		$host = null;
 		$url = trim($url);
@@ -656,6 +656,9 @@ class KCurlWrapper
 
 	public static function getContent($url, $headers = null)
 	{
+		if (self::isInternalUrl($url))
+			KalturaLog::debug("Exec Curl in getContent - Found Internal url: " . $url);
+
 		$ch = curl_init();
 		
 		// set URL and other appropriate options
