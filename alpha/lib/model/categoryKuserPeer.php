@@ -120,6 +120,7 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 				{
 					if($categoryKuser->hasPermission($requiredPermission))
 					{
+						//In case of multiple category users return the one with the highest permission level
 						if(!$permittedCategoryKuser || $categoryKuser->getPermissionLevel() < $permittedCategoryKuser->getPermissionLevel())
 							$permittedCategoryKuser = $categoryKuser;
 					}
