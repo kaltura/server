@@ -130,12 +130,12 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		usort($liveEntryServerNodes, function ($a, $b) {return $b->weight - $a->weight;});
 		
 		$liveEntryServerNode = array_shift($liveEntryServerNodes); // after sort first is the primary
+		// If min/max bitrate was requested, add the constraint to the array of flavorParamsIds in the profile's attributes.
+		$this->retrieveStreamIdsByBitrate($liveEntryServerNode->getStreams());
+		
 		$this->liveStreamConfig->setUrl($this->getHttpUrl($liveEntryServerNode->serverNode));
 		$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
 		
-		// If min/max bitrate was requested, add the constraint to the array of flavorParamsIds in the profile's attributes.
-		$this->retrieveStreamIdsByBitrate($liveEntryServerNode->getStreams());
-
 		$liveEntryServerNode = array_shift($liveEntryServerNodes);
 		if ($liveEntryServerNode) { // if list has another entry server node set it as backup
 			$this->liveStreamConfig->setBackupUrl($this->getHttpUrl($liveEntryServerNode->serverNode));
