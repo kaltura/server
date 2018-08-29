@@ -43,7 +43,7 @@ class kESearchHistoryElasticClient
 		$deleteByQuery->addToFilter($partnerTerm);
 		$kuserTerm = new kESearchTermQuery(ESearchHistoryFieldName::KUSER_ID, $kuserId);
 		$deleteByQuery->addToFilter($kuserTerm);
-		$searchContextTerm = new kESearchTermQuery(ESearchHistoryFieldName::SEARCH_CONTEXT, elasticSearchUtils::formatSearchTerm(searchHistoryUtils::getSearchContext()));
+		$searchContextTerm = new kESearchTermQuery(ESearchHistoryFieldName::SEARCH_CONTEXT, searchHistoryUtils::getSearchContext());
 		$deleteByQuery->addToFilter($searchContextTerm);
 		$searchTermQuery = new kESearchTermQuery(ESearchHistoryFieldName::SEARCH_TERM, elasticSearchUtils::formatSearchTerm($searchTerm));
 		$deleteByQuery->addToFilter($searchTermQuery);
