@@ -490,6 +490,29 @@ class ks extends kSessionBase
 		}
 		return false;
 	}
+	public function validateServiceActionPrivilege($serviceName , $actionName)
+	{
+		$ret = true;
+		$allPrivileges = explode(',', $this->privileges);
+		foreach($allPrivileges as $priv)
+		{
+			$exPrivileges = explode(':', $priv);
+			if ($exPrivileges[0] == self::PRIVILEGE_RESTRICT_SERVICE_ACTION)
+			{
+				list($service,$action) = explode('.' , $exPrivileges[1]);
+				$service =  strtolower (trim($service));
+				$action =  strtolower (trim($action));
+				$serviceName = strtolower($serviceName);
+				$actionName = strtolower($actionName);
+				$ret = 	($service == $serviceName &&
+						 $action &&
+						($action == '*' ||  $action == $actionName));
+				break;
+			}
+		}
+		return $ret;
+	}
+
 
 	public function isSetLimitAction()
 	{

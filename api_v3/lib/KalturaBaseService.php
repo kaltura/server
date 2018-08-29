@@ -180,7 +180,10 @@ abstract class KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::MISSING_KS);
 		}
-		
+		$ksObject = kCurrentContext::$ks_object;
+		if ($ksObject && !$ksObject->validateServiceActionPrivilege($this->serviceName , $this->actionName))
+			return false;
+
 		// check if actions is permitted for current context
 		$isActionPermitted = kPermissionManager::isActionPermitted($this->serviceId, $this->actionName);
 		
