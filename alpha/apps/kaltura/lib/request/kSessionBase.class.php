@@ -627,4 +627,19 @@ class kSessionBase
 	{
 		return $this->hash;
 	}
+
+	public static function getServerPrivileges()
+	{
+		$serverPrivileges = array();
+		$refl = new ReflectionClass('kSessionBase');
+		$refConstants = $refl->getConstants();
+
+		foreach($refConstants as $constName => $constValue)
+		{
+			if(substr($constName, 0, 10) === "PRIVILEGE_")
+				$serverPrivileges[] = $constValue;
+		}
+
+		return $serverPrivileges;
+	}
 }

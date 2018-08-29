@@ -158,7 +158,7 @@ class AppTokenService extends KalturaBaseService
 	 * @param string $userId session user ID, will be ignored if a different user ID already defined on the application token
 	 * @param KalturaSessionType $type session type, will be ignored if a different session type is already defined on the application token
 	 * @param int $expiry session expiry (in seconds), could be overridden by shorter expiry of the application token
-	 * @param string $sessionPrivileges session privileges, will be ignored if a similar pricilege is already defined on the application token or the privilege is not allowed
+	 * @param string $sessionPrivileges session privileges, will be ignored if a similar privilege is already defined on the application token or the privilege is server reserved
 	 * @throws KalturaErrors::APP_TOKEN_ID_NOT_FOUND
 	 * @return KalturaSessionInfo
 	 */
@@ -213,9 +213,9 @@ class AppTokenService extends KalturaBaseService
 
 		if($sessionPrivileges)
 		{
-			$sessionPrivileges = str_replace(' ', '', $sessionPrivileges);
 			$parsedAppSessionPrivilegesArray = ks::parsePrivileges($sessionPrivileges);
-			$privilegesArray = array_merge_recursive($privilegesArray, ks::retrieveAllowedAppSessionPrivileges($privilegesArray, $parsedAppSessionPrivilegesArray));
+			$additionalAllowedSessionPrivliges = ks::retrieveAllowedAppSessionPrivileges($privilegesArray, $parsedAppSessionPrivilegesArray);
+			$privilegesArray = array_merge_recursive($privilegesArray, $additionalAllowedSessionPrivliges);
 		}
 
 		$privileges = ks::buildPrivileges($privilegesArray);
