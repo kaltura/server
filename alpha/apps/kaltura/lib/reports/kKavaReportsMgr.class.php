@@ -174,6 +174,7 @@ class kKavaReportsMgr extends kKavaBase
 		myReportsMgr::REPORT_TYPE_BROWSERS,
 		myReportsMgr::REPORT_TYPE_LIVE,
 		myReportsMgr::REPORT_TYPE_TOP_PLAYBACK_CONTEXT,
+		myReportsMgr::REPORT_TYPE_VPAAS_USAGE,
 		myReportsMgr::REPORT_TYPE_REACH_USAGE,
 	);
 		
@@ -4951,7 +4952,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		//adding BOM for fixing problem in open .csv file with special chars using excel.
 		$BOM = "\xEF\xBB\xBF";
-		$f = @fopen($file_path, 'w');
+		$f = kFileBase::kFOpen($file_path, 'w', true);
 		fwrite($f, $BOM);
 		fwrite($f, $data);
 		fclose($f);

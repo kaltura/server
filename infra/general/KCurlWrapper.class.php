@@ -503,14 +503,14 @@ class KCurlWrapper
 	public function exec($sourceUrl, $destFile = null,$progressCallBack = null, $allowInternalUrl = false)
 	{
 		if (!$allowInternalUrl && self::isInternalUrl($sourceUrl))
-			KalturaLog::debug("Exec Curl - Found not allowed Internal url: " . $sourceUrl);
+			KalturaLog::debug("Exec Curl - Found not allowed Internal url: " . self::encodeUrl($sourceUrl));
 
 		$this->setSourceUrlAndprotocol($sourceUrl);
 		
 		$returnTransfer = is_null($destFile);
 		$destFd = null;
 		if (!is_null($destFile))
-			$destFd = fopen($destFile, "ab");
+			$destFd = kFileBase::kFOpen($destFile, "ab");
 
 		curl_setopt($this->ch, CURLOPT_HEADER, false);
 		curl_setopt($this->ch, CURLOPT_NOBODY, false);
@@ -654,13 +654,24 @@ class KCurlWrapper
 	{
 	}
 
+	public static function getSslVerifyHostValue()
+	{
+		$curl_version = curl_version();
+		if($curl_version['version_number'] >= 0x071c01 ) // check if curl version is 7.28.1 or higher
+		{
+			return 2;
+		}
+
+		return 1;
+	}
+
 	public static function getContent($url, $headers = null)
 	{
 		if (self::isInternalUrl($url))
 			KalturaLog::debug("getContent - Found Internal url: " . $url);
 
 		$ch = curl_init();
-		
+
 		// set URL and other appropriate options
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_HEADER, false);
@@ -673,22 +684,11 @@ class KCurlWrapper
 		{
 			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		}
-			
+
 		$content = curl_exec($ch);
 		curl_close($ch);
-		
+
 		return $content;
-	}
-
-	public static function getSslVerifyHostValue()
-	{
-		$curl_version = curl_version();
-		if($curl_version['version_number'] >= 0x071c01 ) // check if curl version is 7.28.1 or higher
-		{
-			return 2;
-		}
-
-		return 1;
 	}
 }
 

@@ -753,13 +753,13 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		KalturaLog::log("FastStart: $fastStart");
 		return $fastStart;
 /*		
-		$hf=fopen($srcFileName,"rb");
+		$hf=fbopen($srcFileName,"rb");
 		$sz = filesize($srcFileName);
 		$sz = 10000;
 		$contents = fread($hf, $sz);
 		fclose($hf);
 		$auxFilename = "d:\\tmp\\aaa1.mp4";
-		$hf=fopen($auxFilename,"wb");
+		$hf=fbopen($auxFilename,"wb");
 		$rv = fwrite($hf, $contents);
 		
 		

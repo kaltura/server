@@ -21,24 +21,20 @@ class KOperationEngineSegmenter  extends KSingleOutputOperationEngine
 
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
-//$this->outFilePath = "k:".$this->outFilePath;
 		KalturaLog::debug("creating directory:".$this->outFilePath);
 		kFile::fullMkfileDir($this->outFilePath, 0777, true);
 		$res = parent::operate($operator, $inFilePath, $configFilePath);
-		rename("$this->outFilePath//playlist.m3u8", "$this->outFilePath//playlist.tmp");
+		kFileBase::kRename("$this->outFilePath//playlist.m3u8", "$this->outFilePath//playlist.tmp");
 		self::parsePlayList("$this->outFilePath//playlist.tmp","$this->outFilePath//playlist.m3u8");
-//		rename("out_dummy.m3u8", "$this->outFilePath//out_dummy.m3u8");
-//		KalturaLog::info("operator($operator), inFilePath($inFilePath), configFilePath($configFilePath)");
-
 		return $res;
 	}
 
 	private function parsePlayList($fileIn, $fileOut)
 	{
-		$fdIn = fopen($fileIn, 'r');
+		$fdIn = kFileBase::kFOpen($fileIn, "r");
 		if($fdIn==false)
 			return false;
-		$fdOut = fopen($fileOut, 'w');
+		$fdOut  = kFileBase::kFOpen($fileOut, "w");
 		if($fdOut==false)
 			return false;
 		$strIn=null;

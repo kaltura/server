@@ -62,7 +62,7 @@ class KScheduleHelperManager
 
 		// ranames the file to prevent the helper from editing it
 		$tmp_path = $commandsFilePath . '.tmp';
-		$res = @rename($commandsFilePath, $tmp_path);
+		$res = kFileBase::kRename($commandsFilePath, $tmp_path, null, true);
 		if(!$res)
 			return null;
 		
@@ -196,7 +196,7 @@ class KScheduleHelperManager
 	public static function saveRunningBatch($workerName, $batchIndex)
 	{
 		$statusDirPath = self::getCommandsDir();
-		file_put_contents("$statusDirPath/$workerName.$batchIndex.run", getmypid());
+		kFileBase::kFilePutContents("$statusDirPath/$workerName.$batchIndex.run", getmypid());
 	}
 
 	/**
@@ -208,7 +208,7 @@ class KScheduleHelperManager
 		$data = base64_encode(serialize($filter));
 
 		$filtersFilePath = self::getQueueFiltersDir() . DIRECTORY_SEPARATOR . $filtersFileName;
-		file_put_contents($filtersFilePath, $data);
+		kFileBase::kFilePutContents($filtersFilePath, $data);
 	}
 	
 	/**
@@ -250,8 +250,8 @@ class KScheduleHelperManager
 		$data = '';
 		foreach($commands as $command)
 			$data .= base64_encode(serialize($command)) . "\n";
-			
-		file_put_contents($commandsFilePath, $data, FILE_APPEND);
+
+		kFileBase::kFilePutContents($commandsFilePath, $data, FILE_APPEND);
 	}
 
 	/**
@@ -328,7 +328,7 @@ class KScheduleHelperManager
 		$tmp_path = $filePath . '.tmp';
 		if(file_exists($tmp_path))
 			unlink($tmp_path);
-		rename($filePath, $tmp_path);
+		kFileBase::kRename($filePath, $tmp_path);
 		
 		// loads the commands
 		$data = file_get_contents($tmp_path);
@@ -352,7 +352,7 @@ class KScheduleHelperManager
 			$data = @file_get_contents($filePath);
 		if($data)
 			$statusesFromFile = unserialize(base64_decode($data));
-		file_put_contents($filePath, base64_encode(serialize(array_merge($statusesFromFile,$statuses))), LOCK_EX);
+		kFileBase::kFilePutContents($filePath, base64_encode(serialize(array_merge($statusesFromFile,$statuses))), LOCK_EX);
 	}
 
 	/**
@@ -366,7 +366,7 @@ class KScheduleHelperManager
 
 		// ranames the file to prevent the helper from editing it
 		$tmp_path = $filePath . '.tmp';
-		rename($filePath, $tmp_path);
+		kFileBase::kRename($filePath, $tmp_path);
 		
 		// loads the commands
 		$configItem_lines = file($tmp_path);
@@ -391,6 +391,6 @@ class KScheduleHelperManager
 			$data .= base64_encode(serialize($configItem)) . "\n";
 			
 		$filePath = self::getConfigItemsFilePath();
-		file_put_contents($filePath, $data, FILE_APPEND);
+		kFileBase::kFilePutContents($filePath, $data, FILE_APPEND);
 	}
 }

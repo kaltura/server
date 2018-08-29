@@ -49,7 +49,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		{
 			$this->tempXmlPath = KBatchBase::$taskConfig->params->tempXmlPath;
 			if(!is_dir($this->tempXmlPath))
-				mkdir($this->tempXmlPath, 0777, true);
+				kFileBase::kMkDir($this->tempXmlPath, 0777, true);
 		}
 		else
 		{
@@ -221,7 +221,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 
 				if (!file_exists($videoPathNew))
 				{
-					copy($videoPath,$videoPathNew);
+					kFileBase::kCopy($videoPath,$videoPathNew);
 					$needDel = true;
 				}
 				$videoPath = $videoPathNew;

@@ -88,7 +88,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 		$fileName = uniqid('sheduledtask_');
 		$this->sharedFilePath = $sharedPath.DIRECTORY_SEPARATOR.$fileName;
 		$this->tempFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.$fileName;
-		$this->handle = fopen($this->tempFilePath, "w");
+		$this->handle = kFileBase::kFOpen($this->tempFilePath, "w");
 		KalturaLog::info('Temp file: '.$this->tempFilePath);
 	}
 

@@ -94,7 +94,7 @@ class KGenericScheduler
 				KalturaLog::err("Scheduler already running - pid[" . file_get_contents($pid) . "]");
 				exit(1);
 			}
-			file_put_contents($pid, getmypid());
+			kFileBase::kFilePutContents($pid, getmypid());
 
 			KalturaLog::info(file_get_contents('VERSION.txt'));
 			

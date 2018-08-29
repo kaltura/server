@@ -36,7 +36,7 @@ class kDigitalElementIPGeocoder extends kGeoCoder
 			if (!self::$readerAnonymous)
 			{
 				$dbFilePath = __DIR__ . '/../../../../../data/DigitalElement/Anonymous/kanonymous.bin';
-				self::$readerAnonymous = fopen($dbFilePath, "rb");
+				self::$readerAnonymous = kFileBase::kFOpen($dbFilePath, "rb");
 				
 				// read proxy type and description lookup
 				$types = trim(fgets(self::$readerAnonymous));

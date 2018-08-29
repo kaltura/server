@@ -28,7 +28,7 @@ class viewPartnersEditDataAction extends kalturaSystemAction
 		{
 			$time_str = strftime( "-%Y-%d-%m_%H-%M-%S" , time() ); 
 			kFile::moveFile ( $file_path , $file_path.$time_str );
-			file_put_contents( $file_path , $data ); // sync - OK
+			kFileBase::kFilePutContents($file_path , $data ); // sync - OK
 		}
 		else
 		{

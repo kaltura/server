@@ -70,7 +70,7 @@
 			}
 			
 			$this->returnStatus = KChunkedEncodeReturnStatus::OK;
-			copy($this->chunker->getSessionName(), $this->chunker->params->output);
+			kFileBase::kCopy($this->chunker->getSessionName(), $this->chunker->params->output);
 						
 			return true;
 		}
@@ -415,7 +415,7 @@
 		 */
 		public function SerializeSession()
 		{
-			file_put_contents($this->chunker->getSessionName("session"), serialize($this));
+			kFileBase::kFilePutContents($this->chunker->getSessionName("session"), serialize($this));
 		}
 		
 		/********************
@@ -425,7 +425,7 @@
 		{
 			$logTail = null;
 			if(file_exists($logFilename)) {
-				$fHd = fopen($logFilename,"r");
+				$fHd = kFileBase::kFOpen($logFilename, 'r');
 				$fileSz = filesize($logFilename);
 				if($fileSz>$size)
 					fseek($fHd,$fileSz-$size);

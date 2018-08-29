@@ -440,7 +440,7 @@ class KAsyncImport extends KJobHandlerWorker
 				$sharedFile .= ".$ext";
 
 			KalturaLog::debug("rename('$destFile', '$sharedFile')");
-			rename($destFile, $sharedFile);
+			kFileBase::kRename($destFile, $sharedFile);
 			if(!file_exists($sharedFile))
 			{
 				KalturaLog::err("Error: renamed file doesn't exist");

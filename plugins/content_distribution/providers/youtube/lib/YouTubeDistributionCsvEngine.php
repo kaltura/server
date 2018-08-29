@@ -29,7 +29,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		$sftpManager = $this->getSFTPManager($distributionProfile);
 		// create CSV file
 		$fp = tempnam(sys_get_temp_dir(), 'temp.').".csv";
-		$file = fopen($fp, 'w');
+		$file  = kFileBase::kFOpen($fp, "w");
 		fputcsv($file, array_keys($csvMap));
 		fputcsv($file, array_values($csvMap));
 		fclose($file);
@@ -108,7 +108,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		if ($videoId && !empty($captionCsvMap))
 		{
 			$fp = tempnam(sys_get_temp_dir(), 'temp.') . ".csv";
-			$file = fopen($fp, 'w');
+			$file  = kFileBase::kFOpen($fp, "w");
 			fputcsv($file, array('video_id','language','caption_file'));
 			foreach ($captionCsvMap as $captionItem )
 			{
@@ -152,7 +152,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 
 		//create update Csv
 		$fp = tempnam(sys_get_temp_dir(), 'temp.').".csv";
-		$file = fopen($fp, 'w');
+		$file  = kFileBase::kFOpen($fp, "w");
 		fputcsv($file, array_keys($updateCsvMap));
 		fputcsv($file, array_values($updateCsvMap));
 		fclose($file);
@@ -196,7 +196,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		{
 			$sftpManager = $this->getSFTPManager($data->distributionProfile);
 			$fp = tempnam(sys_get_temp_dir(), 'temp.') . ".csv";
-			$file = fopen($fp, 'w');
+			$file  = kFileBase::kFOpen($fp, "w");
 			fputcsv($file, array('video_id','language','caption_file'));
 			foreach ($captionCsvMap as $captionItem)
 			{

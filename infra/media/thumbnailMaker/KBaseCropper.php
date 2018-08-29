@@ -86,7 +86,7 @@ abstract class KBaseCropper
 		}
 		
 		KalturaLog::info("No conversion required, copying source[$this->srcPath] to target[$this->targetPath]");
-		return copy($this->srcPath, $this->targetPath);
+		return kFileBase::kCopy($this->srcPath, $this->targetPath);
 	}
 	
 	/**

@@ -633,7 +633,7 @@
 		{
 			$cmdLine = "time $cmdLine >> $logFile 2>&1 ";
 			$started = time();
-			file_put_contents($logFile, "Started:".date('Y-m-d H:i:s', $started)."\n");
+			kFileBase::kFilePutContents($logFile, "Started:".date('Y-m-d H:i:s', $started)."\n");
 			KalturaLog::log("cmdLine:\n$cmdLine\n");
 			return parent::executeCmdline($cmdLine);
 		}

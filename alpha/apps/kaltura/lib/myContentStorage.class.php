@@ -252,15 +252,15 @@ class myContentStorage
 		}
 		
 		if ($copy)
-			return copy($from, $to);
+			return kFileBase::kCopy($from, $to);
 		else
-			return rename($from, $to);
+			return kFileBase::kRename($from, $to);
 	}
 
 	// make sure the file is closed , then remove it
 	public static function deleteFile ( $file_name )
 	{
-		$fh = fopen($file_name, 'w') or die("can't open file");
+		$fh = kFileBase::kFOpen($file_name, 'w') or die("can't open file");
 		fclose($fh);
 		unlink($file_name);
 	}

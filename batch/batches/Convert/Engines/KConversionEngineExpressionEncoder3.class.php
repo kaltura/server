@@ -112,7 +112,7 @@ class KConversionEngineExpressionEncoder3 extends KCollectionConversionEngine
 		$arr = null;
 		if(preg_match('/(<smil[\s\w\W]+<\/smil>)/', $xml, $arr))
 			$xml = $arr[1];
-		file_put_contents($xmlPath, $xml);
+		kFileBase::kFilePutContents($xmlPath, $xml);
 		
 		//echo $xml;
 		$doc = new DOMDocument();

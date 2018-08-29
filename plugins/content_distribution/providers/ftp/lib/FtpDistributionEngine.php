@@ -172,7 +172,7 @@ class FtpDistributionEngine extends PublicPrivateKeysDistributionEngine implemen
 		{
 			$filename = uniqid(null, true) . '.' . pathinfo($file->filename, PATHINFO_EXTENSION);
 			$tempFilePath = $this->tempFilePath . '/' . $filename;
-			file_put_contents($tempFilePath, $file->contents);
+			kFileBase::kFilePutContents($tempFilePath, $file->contents);
 			KalturaLog::info('Sending contents, using temp path [' . $tempFilePath . ']');
 		}
 		else

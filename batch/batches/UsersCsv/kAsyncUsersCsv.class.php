@@ -55,7 +55,7 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 		KalturaLog::info("Temp file path: [$filePath]");
 
 		//fill the csv with users data
-		$csvFile = fopen($filePath,"w");
+		$csvFile = kFileBase::kFOpen($filePath,"w");
 		$this->fillUsersCsv($csvFile, $data);
 		fclose($csvFile);
 		$this->setFilePermissions($filePath);
@@ -83,7 +83,7 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 		$sharedLocation = $directory . $fileName;
 
 		$fileSize = kFile::fileSize($data->outputPath);
-		rename($data->outputPath, $sharedLocation);
+		kFileBase::kRename($data->outputPath, $sharedLocation);
 		$data->outputPath = $sharedLocation;
 
 		$this->setFilePermissions($sharedLocation);

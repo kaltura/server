@@ -75,7 +75,7 @@
 			
 			if(!isset($this->chunker->setup->commandExecitionScript)) {
 				$this->chunker->setup->commandExecitionScript = $this->chunker->setup->output."execitionScript.sh";
-				file_put_contents($this->chunker->setup->commandExecitionScript, 'echo $@'."\n".'echo $1'."\n".'eval "$1"'."\n"."echo exit_code:".'$?');
+				kFileBase::kFilePutContents($this->chunker->setup->commandExecitionScript, 'echo $@'."\n".'echo $1'."\n".'eval "$1"'."\n"."echo exit_code:".'$?');
 				chmod($this->chunker->setup->commandExecitionScript,0755);
 				sleep(2);
 			}
@@ -433,7 +433,7 @@
 //			$cmdLine = "$executionScript \"time $cmdLine \" >> $logFile 2>&1 & echo $! ";
 			$cmdLine = "$executionScript \"time $cmdLine \" >> $logFile 2>&1 ";
 			$started = time();
-			file_put_contents($logFile, "Started:".date('Y-m-d H:i:s', $started)."\n");
+			kFileBase::kFilePutContents($logFile, "Started:".date('Y-m-d H:i:s', $started)."\n");
 			KalturaLog::log("cmdLine:\n$cmdLine\n");
 			return parent::executeCmdline($cmdLine);
 		}
@@ -515,7 +515,7 @@
 			$this->chunker->updateChunkFileStatData($idx, $stat); 
 			$jsonStr = json_encode($stat);
 			if(!file_exists($statFileName)){
-				file_put_contents($statFileName, $jsonStr);
+				kFileBase::kFilePutContents($statFileName, $jsonStr);
 			}
 			return $stat;
 		}

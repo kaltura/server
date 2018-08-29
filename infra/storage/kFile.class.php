@@ -230,7 +230,7 @@ class kFile extends kFileBase
 					return false;
 				}
 			} else {
-				if (! mkdir($dest)) {
+				if (! self::kMkDir($dest)) {
 					KalturaLog::err("Failed to create directory [$dest]");
 					return false;
 				}
@@ -269,7 +269,7 @@ class kFile extends kFileBase
 		if($deleteSrc) {
 			// In case of move, first try to move the file before copy & unlink.
 			$startTime = microtime(true);
-			if(rename($src, $dest))
+			if(kFileBase::kRename($src, $dest))
 			{
 				KalturaLog::log("rename took : ".(microtime(true) - $startTime)." [$src] to [$dest] size: ".filesize($dest));
 				return true;
@@ -278,7 +278,7 @@ class kFile extends kFileBase
 			KalturaLog::err("Failed to rename file : [$src] to [$dest]");
 		}
 		
-		if (!copy($src,$dest)) {
+		if (!kFileBase::kCopy($src,$dest)) {
 			KalturaLog::err("Failed to copy file : [$src] to [$dest]");
 			return false;
 		}

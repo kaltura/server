@@ -81,7 +81,7 @@ class editPendingAction extends kalturaSystemAction
 				$fixed_content = $xml_doc->saveXML();
 				$file_name = realpath($this->entry->getFullDataPath());
 				
-				$res = file_put_contents( $file_name , $fixed_content ); // sync - NOTOK 
+				$res = kFileBase::kFilePutContents($file_name , $fixed_content ); // sync - NOTOK
 				
 				$this->metadata = $fixed_content;
 			}

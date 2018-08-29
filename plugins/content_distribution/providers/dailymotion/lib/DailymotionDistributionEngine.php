@@ -37,7 +37,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		{
 			$this->tempXmlPath = KBatchBase::$taskConfig->params->tempXmlPath;
 			if(!is_dir($this->tempXmlPath))
-				mkdir($this->tempXmlPath, 0777, true);
+				kFileBase::kMkDir($this->tempXmlPath, 0777, true);
 		}
 		else
 		{
@@ -145,7 +145,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 			$videoFilePathNew = $this->tempXmlPath . "/" . uniqid() . ".dme";
 			if (!file_exists($videoFilePathNew))
 			{
-				copy($videoFilePath,$videoFilePathNew);
+				kFileBase::kCopy($videoFilePath,$videoFilePathNew);
 				$needDel = true;
 			}
 			$videoFilePath = $videoFilePathNew;

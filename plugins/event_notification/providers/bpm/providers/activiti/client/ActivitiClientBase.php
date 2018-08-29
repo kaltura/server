@@ -136,9 +136,9 @@ abstract class ActivitiClientBase
 //					curl_setopt($c, CURLOPT_POSTFIELDS, $content);
 				
 					$fileName = tempnam(sys_get_temp_dir(), 'activitiPut');
-					file_put_contents($fileName, $content);
+					kFileBase::kFilePutContents($fileName, $content);
 	 
-					$f = fopen($fileName, 'rb');
+					$f = kFileBase::kFOpen($fileName, "w");
 					curl_setopt($c, CURLOPT_INFILE, $f);
 					curl_setopt($c, CURLOPT_INFILESIZE, strlen($content));
 				}

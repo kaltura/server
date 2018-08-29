@@ -35,7 +35,7 @@ class KOperationEngineSmilManifest extends KSingleOutputOperationEngine
 
 		$smilFilePath = $this->outFilePath.".smil";
 		$smilData = $smilTemplate->saveXML();
-		file_put_contents($smilFilePath, $smilData);
+		kFileBase::kFilePutContents($smilFilePath, $smilData);
 
 		$destFileSyncDescArr = array();
 		$fileSyncDesc = new KalturaDestFileSyncDescriptor();

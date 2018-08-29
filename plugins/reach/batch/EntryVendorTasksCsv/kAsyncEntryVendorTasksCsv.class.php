@@ -55,7 +55,7 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		KalturaLog::info("Temp file path: [$filePath]");
 
 		//fill the csv with users data
-		$csvFile = fopen($filePath, "w");
+		$f = kFileBase::kFOpen($filePath, 'w');
 		$this->fillEntryVendorTasksCsv($csvFile, $data);
 		fclose($csvFile);
 		$this->setFilePermissions($filePath);

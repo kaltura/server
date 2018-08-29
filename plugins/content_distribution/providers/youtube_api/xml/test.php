@@ -137,5 +137,4 @@ $engine->submit($distributionJobData);
 //
 //$xml = $xml->saveXML();
 //
-//file_put_contents('out.xml', $xml);
 //KalturaLog::debug("XML [$xml]");

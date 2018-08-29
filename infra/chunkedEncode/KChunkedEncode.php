@@ -133,7 +133,7 @@
 				$setup->output.= "_".$this->chunkEncodeToken."/";
 				if(!file_exists($setup->output)) {
 					KalturaLog::log("Create tmp folder:".$setup->output);
-					mkdir($setup->output);
+					kFileBase::kMkDir($setup->output);
 				}
 				$setup->output.= $pInfo['filename'];
 			}
@@ -170,7 +170,7 @@
 				 * Handle Subs(SRT) file splitting, if it is required
 				 */
 			if(isset($this->params->videoFilters->subsFilename)){
-				$subsFileHd = fopen($this->params->videoFilters->subsFilename,'r');
+				$subsFileHd = kFileBase::kFOpen($this->params->videoFilters->subsFilename,'r');
 				$subsArr = array();
 			}
 				/*

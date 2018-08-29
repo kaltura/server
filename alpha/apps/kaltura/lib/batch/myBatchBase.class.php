@@ -67,7 +67,7 @@ abstract class myBatchBase
 		}
 		$running_filename = str_replace('.php', '', $batch_script).'.running.'.getmypid();
 		$file_path = self::getBatchwatchPath() . "/" . $running_filename;
-		file_put_contents( $file_path, date('Y-m-d H:i:s')); // sync - OK
+		kFileBase::kFilePutContents($file_path, date('Y-m-d H:i:s')); // sync - OK
 
 		
 		$line = $cls . "," . $script_name . "," . implode ( "," , $args );
@@ -75,7 +75,7 @@ abstract class myBatchBase
 		$file_path = self::getBatchwatchPath() . "/" . self::REGISTERED_BATCHS;
 		if ( ! file_exists( $file_path ) )
 		{
-			file_put_contents( $file_path , $line ); // sync - OK
+			kFileBase::kFilePutContents($file_path , $line ); // sync - OK
 			return;
 		}
 		
@@ -84,7 +84,7 @@ abstract class myBatchBase
 
 		// add to file only of does not already exists
 		$content .= self::SEPARATOR  . $line;
-		file_put_contents( $file_path , $content ); // sync - OK
+		kFileBase::kFilePutContents( $file_path , $content ); // sync - OK
 	}
 	
 	// read from file all registered batchs
@@ -256,7 +256,7 @@ abstract class myBatchBase
 		$batch_script = substr(self::$batch_script_name, strrpos(str_replace("\\", "/", self::$batch_script_name), "/")+1);
 		$running_filename = str_replace('.php', '', $batch_script).'.running.'.getmypid();
 		$file_path = self::getBatchwatchPath() . "/" . $running_filename;
-		file_put_contents( $file_path, date('Y-m-d H:i:s')); // sync - OK
+		kFileBase::kFilePutContents( $file_path, date('Y-m-d H:i:s')); // sync - OK
 	}
 }
 ?>

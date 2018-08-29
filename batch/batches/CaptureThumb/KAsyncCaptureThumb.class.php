@@ -145,7 +145,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 		
 		clearstatcache();
 		$fileSize = filesize($data->thumbPath);
-		rename($data->thumbPath, $sharedFile);
+		kFileBase::kRename($data->thumbPath, $sharedFile);
 		if(!file_exists($sharedFile) || filesize($sharedFile) != $fileSize)
 		{
 			$err = 'moving file failed';

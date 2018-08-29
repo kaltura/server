@@ -35,7 +35,7 @@ class KOperationEngineExpressionEncoder  extends KSingleOutputOperationEngine
 		KalturaLog::info("outFilePath(dirname($this->outFilePath)),auxPath($outDir)");
 			// Add slashes to solve JSON serialization issue
 		$xmlStr = str_replace ('\"' , '"' ,  $this->operator->config);
-		file_put_contents($this->configFilePath, $xmlStr);
+		kFileBase::kFilePutContents($this->configFilePath, $xmlStr);
 
 		$exeCmd =  parent::getCmdLine();
 		KalturaLog::info(print_r($this,true));

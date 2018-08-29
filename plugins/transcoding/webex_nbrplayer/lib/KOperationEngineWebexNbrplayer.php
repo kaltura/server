@@ -88,7 +88,7 @@ public function buildCfgFile($inputFile, $outputFile, $format=null,
 	{
 		$cfgStr = $this->buildCfgFile($this->inFilePath, $this->outFilePath);
 		$this->configFilePath = $this->outFilePath.".cfg";
-		file_put_contents($this->configFilePath, $cfgStr);
+		kFileBase::kFilePutContents($this->configFilePath, $cfgStr);
 		$this->addToLogFile("Webex CFG:\n*******\n$cfgStr\n*******\n");
 
 		$exeCmd =  parent::getCmdLine();
@@ -122,7 +122,7 @@ public function buildCfgFile($inputFile, $outputFile, $format=null,
 		$tempOutPath = "$tempFolder/".$path_parts['basename'];
 		if(!file_exists($tempFolder)){
 			$oldUmask = umask(00);
-			$result = @mkdir($tempFolder, 0777, true);
+			$result = kFileBase::kMkDir($tempFolder, 0777, true,null, true);
 			umask($oldUmask);
 		}
 			/*

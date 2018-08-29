@@ -182,7 +182,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 		foreach($configFilePaths as $configFilePath)
 			$content .= file_get_contents($configFilePath) . "\n";
 
-		file_put_contents($path, $content);
+		kFileBase::kFilePutContents($path, $content);
 	}
 
 	protected function calculateFileTimestamp()

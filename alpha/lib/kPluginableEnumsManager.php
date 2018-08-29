@@ -50,7 +50,7 @@ class kPluginableEnumsManager
 				
 			self::$coreMap[$dynamicEnumType][$dynamicEnumId] = $dynamicEnumApiName;
 		}
-		file_put_contents($coreCachePath, serialize(self::$coreMap));
+		kFileBase::kFilePutContents($coreCachePath, serialize(self::$coreMap));
 	}
 	
 	protected static function loadApiMap($useCache = true)
@@ -74,7 +74,7 @@ class kPluginableEnumsManager
 				
 			self::$apiMap[$dynamicEnumType][$dynamicEnumApiName] = $dynamicEnumId;
 		}
-		file_put_contents($apiCachePath, serialize(self::$apiMap));
+		kFileBase::kFilePutContents($apiCachePath, serialize(self::$apiMap));
 	}
 	
 	public static function getCoreMap($type = null)

@@ -231,8 +231,7 @@ class sftpMgr extends kFileTransferMgr
 	
 	/**
 	 * Upload a file to the server
-	 * Uses fopen and fwrite or sftp CLI, according to config and file size
-	 * 
+	 *
 	 * (non-PHPdoc)
 	 * @see kFileTransferMgr::doPutFile()
 	 */
@@ -243,11 +242,11 @@ class sftpMgr extends kFileTransferMgr
 		if($this->passphrase || !$this->useCmd || kFile::fileSize($localFile) < $this->cmdPutMinimumFileSize)
 		{
 			$absolutePath = trim($remoteFile, '/');
-			$stream = @fopen("ssh2.sftp://" . intval($sftp) . "/$absolutePath", 'w');
+			$stream = kFileBase::kFOpen("ssh2.sftp://" . intval($sftp) . "/$absolutePath",'w', true);
 			if($stream)
 			{
 				// Writes the file in chunks (for large files bug)
-				$fileToReadHandle = fopen($localFile, "r");
+				$fileToReadHandle= kFileBase::kFOpen($localFile, "r");
 				$ret = $this->writeFileInChunks($fileToReadHandle, $stream);
 				@fclose($fileToReadHandle);
 				@fclose($stream);
@@ -263,8 +262,7 @@ class sftpMgr extends kFileTransferMgr
 	
 	/** 
 	 * Download a file from the server
-	 * Uses fopen and fread or sftp CLI, according to config
-	 * 
+	 *
 	 * (non-PHPdoc)
 	 * @see kFileTransferMgr::doGetFile()
 	 */
@@ -282,7 +280,7 @@ class sftpMgr extends kFileTransferMgr
 			
 		$sftp = $this->getSftpConnection();
 		$absolutePath = trim($remoteFile, '/');
-		$stream = @fopen("ssh2.sftp://" . intval($sftp) . "/$absolutePath", 'r');
+		$stream = kFileBase::kFOpen("ssh2.sftp://" . intval($sftp) . "/$absolutePath", 'r', true);
 		if(!$stream)
 			return false;
 			
@@ -298,7 +296,7 @@ class sftpMgr extends kFileTransferMgr
 		}
 		
 		// Writes the file in chunks (for large files bug)
-		$fileToWriteHandle = fopen($localFile, "w+");
+		$fileToWriteHandle = kFileBase::kFOpen($localFile, "w+");
 		$ret = $this->writeFileInChunks($stream, $fileToWriteHandle);
 		@fclose($fileToWriteHandle);
 		@fclose($stream);
@@ -436,8 +434,7 @@ class sftpMgr extends kFileTransferMgr
 	
 	/**
 	 * Upload content to the server
-	 * Uses fopen and fwrite
-	 * 
+	 *
 	 * @param string $remoteFile
 	 * @param string $contents
 	 * @throws kFileTransferMgrException
@@ -449,7 +446,7 @@ class sftpMgr extends kFileTransferMgr
 		
 		$sftp = $this->getSftpConnection();
 		$absolutePath = trim($remoteFile, '/');
-		$stream = @fopen("ssh2.sftp://" . intval($sftp) . "/$absolutePath", 'w');
+		$stream = kFileBase::kFOpen("ssh2.sftp://" . intval($sftp) . "/$absolutePath",'w', true);
 		if(!$stream)
 			throw new kFileTransferMgrException("Failed to open stream [" . $uri . "]");
 		

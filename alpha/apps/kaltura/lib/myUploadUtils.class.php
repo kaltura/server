@@ -11,7 +11,6 @@ class myUploadUtils
 		if($realHash == $hash && $hash != "")
 		{
 			//create the directory if doesn't exists (should have write permissons)
-			// if(!is_dir("./files")) mkdir("./files", 0755);
 			//move the uploaded file
 
 			$origFilename = $file_data['name'];

@@ -53,7 +53,7 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 		$inputExtension = strtolower(pathinfo($inFilePath, PATHINFO_EXTENSION));
 		if (($inputExtension == 'pdf') && (!$this->data->flavorParamsOutput->readonly)) {
 			KalturaLog::notice('Bypassing PDF Creator for source PDF files');
-			if (!@copy($inFilePath, $this->outFilePath)) {
+			if (!kFileBase::kCopy($inFilePath, $this->outFilePath, null, true)) {
 				$error = '';
 				if (function_exists('error_get_last')) {
 					$error = error_get_last();
@@ -70,7 +70,7 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 		$tmpUniqInFilePath = dirname($inFilePath).'/'.uniqid().'_'.basename($inFilePath);
 		$realInFilePath = '';
 		$uniqueName = false;
-		if (@copy($inFilePath, $tmpUniqInFilePath)) {
+		if (kFileBase::kCopy($inFilePath, $tmpUniqInFilePath,null ,true)) {
 			$realInFilePath = realpath($tmpUniqInFilePath);
 			$uniqueName = true;
 		}
@@ -171,7 +171,7 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 			$fileUnlockInterval = self::DEFAULT_FILE_UNLOCK_INTERVAL; 
 		}
 		$tmpFile = realpath($tmpFile);
-		while (!rename($tmpFile, $this->outFilePath) && $fileUnlockRetries > 0) {
+		while (!kFileBase::kRename($tmpFile, $this->outFilePath) && $fileUnlockRetries > 0) {
 			sleep($fileUnlockInterval);
 			$fileUnlockRetries--;
 			clearstatcache();

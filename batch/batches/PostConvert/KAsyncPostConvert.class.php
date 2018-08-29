@@ -202,7 +202,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			if(! file_exists($rootPath))
 			{
 				KalturaLog::info("Creating temp thumbnail directory [$rootPath]");
-				mkdir($rootPath);
+				kFileBase::kMkDir($rootPath);
 			}
 			else
 			{
@@ -217,7 +217,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		
 		clearstatcache();
 		$fileSize = kFile::fileSize($data->thumbPath);
-		rename($data->thumbPath, $sharedFile);
+		kFileBase::kRename($data->thumbPath, $sharedFile);
 		if(!file_exists($sharedFile) || kFile::fileSize($sharedFile) != $fileSize)
 		{
 			$err = 'moving file failed';

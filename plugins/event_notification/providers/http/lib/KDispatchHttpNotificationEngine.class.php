@@ -103,7 +103,7 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 				if ($curlData)
 				{
 					$filename = tempnam($this->tempFolderPath, 'httpPut_');
-					file_put_contents($filename, $curlData);
+					kFileBase::kFilePutContents($filename, $curlData);
 					$curlWrapper->setOpt(CURLOPT_INFILE, $filename);
 				}
 				break;

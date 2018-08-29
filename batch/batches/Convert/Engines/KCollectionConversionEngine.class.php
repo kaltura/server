@@ -34,10 +34,10 @@ abstract class KCollectionConversionEngine extends KConversionEngine
 	{
 		$uniqid = uniqid("convert_") . '.xml';
 		$xmlPath = $data->destDirLocalPath . DIRECTORY_SEPARATOR . $uniqid;
-		copy($data->inputXmlLocalPath, $xmlPath);
+		kFileBase::kCopy($data->inputXmlLocalPath, $xmlPath);
 		$xml = file_get_contents($xmlPath);
 		$xml = str_replace(KDLCmdlinePlaceholders::OutDir, $data->destDirLocalPath, $xml);
-		file_put_contents($xmlPath, $xml);
+		kFileBase::kFilePutContents($xmlPath, $xml);
 
 		KalturaLog::debug("Config File Path: $xmlPath");
 		$this->configFilePath = $xmlPath;

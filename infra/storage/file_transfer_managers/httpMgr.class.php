@@ -192,7 +192,7 @@ class httpMgr extends kFileTransferMgr
 		}
 		
 		if($local_file)
-			file_put_contents($local_file, $results);
+			kFileBase::kFilePutContents($local_file, $results);
 			
 		return $results;
 	}

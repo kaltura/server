@@ -87,7 +87,7 @@ class QuickPlayDistributionEngine extends DistributionEngine implements
 		}
 
 		$tmpfile = tempnam(sys_get_temp_dir(), time());
-		file_put_contents($tmpfile, $providerData->xml);
+		kFileBase::kFilePutContents($tmpfile, $providerData->xml);
 		// upload the metadata file
 		$res = $sftpManager->putFile('/'.$distributionProfile->sftpBasePath.'/'.$fileName, $tmpfile);
 		unlink($tmpfile);

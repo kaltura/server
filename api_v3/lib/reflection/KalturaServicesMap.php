@@ -162,7 +162,7 @@ class KalturaServicesMap
 		$serviceMap = array_filter($serviceMap, array('KalturaServicesMap', 'filterEmptyServices'));
 
 		if (!is_dir(dirname($cacheFilePath))) {
-			mkdir(dirname($cacheFilePath));
+			kFile::kMkDir(dirname($cacheFilePath));
 			chmod(dirname($cacheFilePath), 0755);
 		}
 		kFile::safeFilePutContents($cacheFilePath, serialize($serviceMap), 0644);
@@ -262,7 +262,7 @@ class KalturaServicesMap
 		
 		if (!is_dir(dirname($serviceClassToIdFileCachePath)))
 		{
-			mkdir(dirname($serviceClassToIdFileCachePath));
+			kFile::kMkDir(dirname($serviceClassToIdFileCachePath));
 			chmod(dirname($serviceClassToIdFileCachePath), 0755);
 		}
 		kFile::safeFilePutContents($serviceClassToIdFileCachePath, serialize(self::$serviceClassToIdAndName), 0644);

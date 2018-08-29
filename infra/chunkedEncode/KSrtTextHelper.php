@@ -74,7 +74,7 @@ ini_set("memory_limit","512M");
 				foreach($txArr as $idx=>$tx) {
 					if($tx->getTime(0)<$chunkStart+$chunkDur){
 						$str = $tx->toString($tmpIdx,$chunkStart);
-						file_put_contents($fileName, "$str", FILE_APPEND);
+						kFileBase::kFilePutContents($fileName, "$str", FILE_APPEND);
 						if($tx->getTime(1)<$chunkStart+$chunkDur)
 							unset($txArr[$idx]);
 						$tmpIdx++;
@@ -83,7 +83,7 @@ ini_set("memory_limit","512M");
 			}
 			else {
 				$str = KSrtText::emptyToString($fileName);
-				file_put_contents($fileName, "$str", FILE_APPEND);
+				kFileBase::kFilePutContents($fileName, "$str", FILE_APPEND);
 			}
 		}
 		

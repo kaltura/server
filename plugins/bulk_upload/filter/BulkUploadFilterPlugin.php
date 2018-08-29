@@ -118,7 +118,7 @@ class BulkUploadFilterPlugin extends KalturaPlugin implements IKalturaBulkUpload
 		if(!count($bulkUploadResults))
 			die("Log file is not ready");
 			
-		$STDOUT = fopen('php://output', 'w');
+		$STDOUT = kFileBase::kFOpen('php://output', 'w');
 		$data = $batchJob->getData();
         /* @var $data kBulkUploadFilterJobData */		
 		$handledResults = 0;

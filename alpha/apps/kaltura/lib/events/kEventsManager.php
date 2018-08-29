@@ -93,7 +93,7 @@ class kEventsManager
 		if(!file_exists($cacheDir))
 			kFile::fullMkfileDir($cacheDir, 0777, true);
 			
-		@file_put_contents($cachePath, serialize(self::$consumers));
+		kFileBase::kFilePutContents($cachePath, serialize(self::$consumers),null, null, true);
 	}
 	
 	protected static function compareConsumers($consumerA, $consumerB)

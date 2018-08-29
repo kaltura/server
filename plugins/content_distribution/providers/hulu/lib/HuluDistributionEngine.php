@@ -126,7 +126,7 @@ class HuluDistributionEngine extends DistributionEngine implements
 		$fileLocation = $tempDirectory . $fileName;
 		if (!file_exists($fileLocation) || (file_get_contents($fileLocation) !== $content))
 		{
-			file_put_contents($fileLocation, $content);
+			kFileBase::kFilePutContents($fileLocation, $content);
 			chmod($fileLocation, 0600);
 		}
 		
@@ -137,7 +137,7 @@ class HuluDistributionEngine extends DistributionEngine implements
 	{
 		$tempFilePath = $this->tempDirectory . '/' . self::TEMP_DIRECTORY . '/' . $distributionProfileId . '/';
 		if (!file_exists($tempFilePath))
-			mkdir($tempFilePath, 0777, true);
+			kFileBase::kMkDir($tempFilePath, 0777, true);
 		return $tempFilePath;
 	}
 	

@@ -32,7 +32,7 @@ class KalturaTypeReflectorCacher
 			$cachedDir = KAutoloader::buildPath(kConf::get("cache_root_path"), "api_v3", "typeReflector");
 			if (!is_dir($cachedDir))
 			{
-				mkdir($cachedDir);
+				kFile::kMkDir($cachedDir);
 				chmod($cachedDir, 0775);
 			}
 			

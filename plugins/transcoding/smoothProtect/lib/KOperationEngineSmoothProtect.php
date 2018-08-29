@@ -69,18 +69,18 @@ class KOperationEngineSmoothProtect  extends KSingleOutputOperationEngine
 		}
 		$ismStr = $ismXml->asXML();
 		KalturaLog::info("After file name update:\n$ismStr");
-		file_put_contents($auxOutName.".ism", $ismStr);
+		kFileBase::kFilePutContents($auxOutName.".ism", $ismStr);
 		
 		/*
 		 * Update the ISM/ISMC/ISMV file names to correct output file names
 		 */
-		rename($auxOutName.".ism",  "$outFolderName//$outFileName.ism");
-		rename($auxOutName.".ismc", "$outFolderName//$outFileName.ismc");
+		kFileBase::kRename($auxOutName.".ism",  "$outFolderName//$outFileName.ism");
+		kFileBase::kRename($auxOutName.".ismc", "$outFolderName//$outFileName.ismc");
 		if(isset($extStr)){
-			rename($auxOutName.".$extStr", "$outFolderName//$outBaseName");
+			kFileBase::kRename($auxOutName.".$extStr", "$outFolderName//$outBaseName");
 		}
 		else{
-			rename($auxOutName, "$outFolderName//$outBaseName");
+			kFileBase::kRename($auxOutName, "$outFolderName//$outBaseName");
 		}
 
 		/*

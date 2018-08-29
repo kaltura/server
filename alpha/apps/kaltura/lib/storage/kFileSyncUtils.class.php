@@ -242,7 +242,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		// create a file path for the current key - the fileSyncKey should already include the file path
 		// place the content there
-		file_put_contents ( $fullPath , $content );
+		kFileBase::kFilePutContents($fullPath , $content );
 		self::setPermissions($fullPath);
 		self::createSyncFileForKey($rootPath, $filePath,  $key , $strict , !is_null($res), false, md5($content));
 		self::encryptByFileSyncKey($key);
@@ -342,7 +342,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		// make sure folder exists
 		self::fullMkdir($target_file_path);
 
-		$copyResult = copy($file_path, $target_file_path);
+		$copyResult = kFileBase::kCopy($file_path, $target_file_path);
 		if($copyResult)
 		{
 			self::setPermissions($target_file_path);
@@ -502,7 +502,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		if($copyOnly)
 		{
-			$success = copy($temp_file_path, $targetFullPath);
+			$success = kFileBase::kCopy($temp_file_path, $targetFullPath);
 		}
 		else
 		{

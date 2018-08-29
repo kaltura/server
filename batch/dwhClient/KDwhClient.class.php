@@ -91,7 +91,7 @@ class KDwhClient
 
 			$this->_stream = $streamOrUrl;
 		} else {
-			if (! $this->_stream = @fopen($streamOrUrl, $mode, false)) {
+			if (! $this->_stream = kFileBase::kFOpen($streamOrUrl, $mode, true, false)) {
 				$msg = "\"$streamOrUrl\" cannot be opened with mode \"$mode\"";
 				throw new KDwhClientException($msg);
 			}

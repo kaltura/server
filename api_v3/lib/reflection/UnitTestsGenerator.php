@@ -675,9 +675,9 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			
 		$dirname = dirname($fileName);
 		if(!file_exists($dirname))
-		mkdir($dirname, 0777, true);
+			kFile::kMkDir($dirname, 0777, true);
 			
-		$handle = fopen($fileName, "w");
+		$handle = kFileBase::kFOpen($fileName, "w");
 		fwrite($handle, $contents);
 		fclose($handle);
 	}

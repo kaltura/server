@@ -69,7 +69,7 @@ class FreewheelDistributionEngine extends DistributionEngine implements
 		if(!$sftp_id) {
 			throw new Exception('Distribution failed with error [Could not establish connection to FTP server]');
 		}
-		$stream = fopen("ssh2.sftp://" . intval($sftp_id) . "/$filename", 'r');
+		$stream = kFileBase::kFOpen("ssh2.sftp://" . intval($sftp_id) . "/$filename", 'r');
 		if(!$stream) {
 			throw new Exception('Distribution failed with error [Could not open stream to FTP server]');
 		}
@@ -274,7 +274,7 @@ class FreewheelDistributionEngine extends DistributionEngine implements
 		
 		//do something
 		$xmlTemplate = realpath(dirname(__FILE__) . '/../') . '/xml/submit.template.xml';
-		$handle = fopen($xmlTemplate, "r");
+		$handle = kFileBase::kFOpen($xmlTemplate, "r");
 		$template = fread($handle, 4096);
 		foreach ($mydata as $key=>$value) {
 			$template = str_replace("%%".$key."%%", $value, $template);

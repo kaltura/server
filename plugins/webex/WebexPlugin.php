@@ -60,7 +60,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 			$destFileLocalPath = preg_replace("/$fileName\.[\w\d]+/", "$fileName.arf", $importData->destFileLocalPath);
 		}
 		$importData->destFileLocalPath = $destFileLocalPath;
-		rename($tmpPath, $importData->destFileLocalPath);
+		kFileBase::kRename($tmpPath, $importData->destFileLocalPath);
 		
 		$curlWrapper->close();
 

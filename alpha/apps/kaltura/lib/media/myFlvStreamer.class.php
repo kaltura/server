@@ -836,7 +836,7 @@ self::log ( __METHOD__ , "after findBytesFromTimestamps" , $flv_file_name );
 	private static  function setMetadataInCache ( $filePath , $streamInfo , $addPadding, $metadata_content )
 	{
 		$file_name = $filePath . ".". $streamInfo[1] . $streamInfo[2] . ".metadata" . ($addPadding ? "-padding" : "") ;
-		file_put_contents( $file_name , $metadata_content ); // sync - OK
+		kFileBase::kFilePutContents($file_name , $metadata_content ); // sync - OK
 	}
 	
 	private static function log ( $method )

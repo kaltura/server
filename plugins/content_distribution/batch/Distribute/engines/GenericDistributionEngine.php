@@ -70,8 +70,8 @@ class GenericDistributionEngine extends DistributionEngine implements
 			$destFile .= '/' . $fileName;
 			
 		$destFile = str_replace('{REMOTE_ID}', $data->remoteId, $destFile);
-		
-		file_put_contents($srcFile, $providerData->xml);
+
+		kFileBase::kFilePutContents($srcFile, $providerData->xml);
 		KalturaLog::log("XML written to file [$srcFile]");
 		
 		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();

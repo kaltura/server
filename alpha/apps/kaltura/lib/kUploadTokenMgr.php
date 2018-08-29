@@ -221,7 +221,7 @@ class kUploadTokenMgr
 		if (file_exists($fileData['tmp_name']))
 		{
 			$errorFilePath = $this->getUploadPath('error-'.$this->_uploadToken->getId(), microtime(true));
-			rename($fileData['tmp_name'], $errorFilePath);
+			kFileBase::kRename($fileData['tmp_name'], $errorFilePath);
 		}
 	}
 
@@ -250,7 +250,7 @@ class kUploadTokenMgr
 			$expectedFileSize = $verifyFinalChunk ? ($resumeAt + $chunkSize) : 0;
 
 			$chunkFilePath = "$uploadFilePath.chunk.$resumeAt";
-			$succeeded = rename($sourceFilePath, $chunkFilePath);
+			$succeeded = kFileBase::kRename($sourceFilePath, $chunkFilePath);
 			
 			if($this->_autoFinalize && $this->checkIsFinalChunk($chunkSize) && $succeeded)
 			{
@@ -273,7 +273,7 @@ class kUploadTokenMgr
 			if ($verifyFinalChunk && $currentFileSize != $expectedFileSize)
 				throw new kUploadTokenException("final size $currentFileSize failed to match expected size $expectedFileSize", kUploadTokenException::UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE);
 		} else {
-			$uploadFileResource = fopen($uploadFilePath, 'r+b');
+			$uploadFileResource = kFileBase::kFOpen($uploadFilePath, 'r+b');
 			fseek($uploadFileResource, 0, SEEK_END);
 			
 			self::appendChunk($sourceFilePath, $uploadFileResource);
@@ -347,7 +347,7 @@ class kUploadTokenMgr
 
 	static protected function appendChunk($sourceFilePath, $targetFileResource)
 	{
-		$sourceFileResource = fopen($sourceFilePath, 'rb');
+		$sourceFileResource = kFileBase::kFOpen($sourceFilePath, 'rb');
 		
 		while (! feof($sourceFileResource)) {
 			$data = fread($sourceFileResource, 1024 * 100);
@@ -360,7 +360,7 @@ class kUploadTokenMgr
 
 	static protected function appendAvailableChunks($targetFilePath)
 	{
-		$targetFileResource = fopen($targetFilePath, 'r+b');
+		$targetFileResource = kFileBase::kFOpen($targetFilePath, 'r+b');
 		
 		fseek($targetFileResource, 0, SEEK_END);
 		
@@ -408,7 +408,7 @@ class kUploadTokenMgr
 				break;
 			
 			$lockedFile = "$nextChunk.".microtime(true).".locked";
-			if (! rename($nextChunk, $lockedFile)) // another process is already appending this file
+			if (!kFileBase::kRename($nextChunk, $lockedFile)) // another process is already appending this file
 			{
 				KalturaLog::log("rename($nextChunk, $lockedFile) failed");
 				break;

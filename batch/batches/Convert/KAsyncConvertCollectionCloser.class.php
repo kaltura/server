@@ -153,7 +153,7 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 				unlink($destPath);
 				
 			KalturaLog::info("rename($srcPath, $destPath)");
-			rename($srcPath, $destPath);
+			kFileBase::kRename($srcPath, $destPath);
 		
 			if(!file_exists($destPath) || kFile::fileSize($destPath) != $fileSize)
 			{

@@ -155,7 +155,7 @@ class myMailAttachmentImporter
 		$data=$this->getdecodevalue($mege,$part->encoding);
 
 		$filename="$this->savedDirPath".$mid."_attach.".$ext;
-		$fp=fopen($filename,"w");
+		$fp= kFileBase::kFOpen($filename, 'w');
 		fputs($fp,$data);
 		fclose($fp);
 

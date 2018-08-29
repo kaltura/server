@@ -167,7 +167,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		
 		try
 		{
-			rename($data->logFileSyncLocalPath, "$sharedFile.log");
+			kFileBase::kRename($data->logFileSyncLocalPath, "$sharedFile.log");
 		}
 		catch(Exception $ex)
 		{
@@ -216,7 +216,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 			$newName = $newName.'.'.$ext;
 		}
 		$fileSize = kFile::fileSize($oldName);
-		rename($oldName, $newName);
+		kFileBase::kRename($oldName, $newName);
 		if(!file_exists($newName) || kFile::fileSize($newName) != $fileSize)
 		{
 			KalturaLog::err("Error: moving file failed: ".$oldName);

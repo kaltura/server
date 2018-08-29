@@ -73,7 +73,7 @@ class KalturaMonitorClient
 				KalturaLog::err("Open socket failed: $errstr");
 		}
 
-		self::$stream = fopen($uri, 'a');
+		self::$stream = kFileBase::kFOpen($uri, 'a');
 		if(self::$stream)
 			return true;
 

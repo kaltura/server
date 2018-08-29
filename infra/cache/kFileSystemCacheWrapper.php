@@ -63,7 +63,7 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 		$dirname = dirname($filePath);
 		if (!is_dir($dirname))
 		{
-			mkdir($dirname, 0777, true);
+			kFileBase::kMkDir($dirname, 0777, true);
 		}
 	}
 		
@@ -146,9 +146,9 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 	{
 		// write to a temp file and then rename, so that the write will be atomic
 		$tempFilePath = tempnam(dirname($filePath), basename($filePath));
-		if (file_put_contents($tempFilePath, $var) === false)
+		if (kFileBase::kFilePutContents($tempFilePath, $var) === false)
 			return false;
-		if (rename($tempFilePath, $filePath) === false)
+		if (kFileBase::kRename($tempFilePath, $filePath) === false)
 		{
 			self::safeUnlink($tempFilePath);
 			return false;

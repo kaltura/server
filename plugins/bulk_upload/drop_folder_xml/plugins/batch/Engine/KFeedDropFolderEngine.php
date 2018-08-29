@@ -232,7 +232,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		}
 		
 		$feedItemPath = $rootPath . DIRECTORY_SEPARATOR. $feedFileName;
-		$res = file_put_contents($feedItemPath, $feedItem->saveXML());
+		$res = kFileBase::kFilePutContents($feedItemPath, $feedItem->saveXML());
 		chmod($feedItemPath, KBatchBase::$taskConfig->chmod ? octdec(KBatchBase::$taskConfig->chmod) : 0660);
 		return $feedItemPath;
 	}

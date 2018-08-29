@@ -537,7 +537,7 @@ class KAsyncBulkUploadTest extends PHPUnit_Framework_TestCase
 		
 		$data->fileName = 'test';
 		$data->filePath = tempnam(sys_get_temp_dir(), 'bulk.');
-		file_put_contents($data->filePath, $content);
+		kFileBase::kFilePutContents($data->filePath, $content);
 		
 		$job = new KalturaBatchJob();
 		$job->id = 1;

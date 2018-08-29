@@ -115,7 +115,7 @@ class kXmlConfig
 			
 			if ( $file_name != null )
 			{
-				file_put_contents( $file_name , $res ); // sync - OK
+				kFileBase::kFilePutContents( $file_name , $res ); // sync - OK
 				$this->created_cache = true;   
 			}
 		}

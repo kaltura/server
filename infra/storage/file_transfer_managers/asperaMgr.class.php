@@ -36,7 +36,7 @@ class asperaMgr extends kFileTransferMgr
 		$remotePath = dirname ( $remote_file );
 		$linkPath =  $this->asperaTempFolder . '/' .$remoteFileName;
 		if (!file_exists(dirname( $linkPath )))
-			mkdir(dirname( $linkPath ), 0750, true);
+			kFileBase::kMkDir(dirname( $linkPath ), 0750, true);
 		symlink($local_file, $linkPath);
 		
 		$this->validateParameters($remotePath);

@@ -307,7 +307,7 @@
 		{
 			if(!file_exists($logFileName))
 				return;
-			$fp = fopen($logFileName, 'r');
+			$fp = kFileBase::kFOpen($logFileName, 'r');
 			if($fp==null)
 				return;
 			$line = fgets($fp);

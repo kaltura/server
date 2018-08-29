@@ -66,7 +66,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		{
 			$cacheFolder = kConf::get("cache_root_path") . "/audit";
 			if(!is_dir($cacheFolder))
-				mkdir($cacheFolder, 0777);
+				kFileBase::kMkDir($cacheFolder, 0777);
 				
 			$cachePath = "$cacheFolder/$partnerId.cfg";
 			if(file_exists($cachePath))
@@ -82,8 +82,8 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 					foreach($auditTrailConfigs as $auditTrailConfig)
 						$config[$auditTrailConfig->getObjectType()] = $auditTrailConfig;
 				}
-				
-				file_put_contents($cachePath, serialize($config));
+
+				kFileBase::kFilePutContents($cachePath, serialize($config));
 			}
 			
 			self::$cachedPartnerConfig[$partnerId] = $config;

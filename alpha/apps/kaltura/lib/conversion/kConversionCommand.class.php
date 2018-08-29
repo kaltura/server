@@ -34,7 +34,7 @@ class kConversionCommand
 	{
 KalturaLog::debug ( "Setting file [$file_name] indicator [$create_indicator]" )	;	
 		if ( file_exists ( $file_name ) ) { @unlink( $file_name ); }
-		file_put_contents( $file_name , $this->toString() ); // sync - OK
+		kFileBase::kFilePutContents( $file_name , $this->toString() ); // sync - OK
 		if ( $create_indicator ) $this->createIndicator( $file_name );
 	}
 	

@@ -58,7 +58,7 @@ abstract class LiveReportExporter {
 	public function run() {
 		
 		$fileName = $this->fileName;
-		$fp = fopen ( $fileName, 'w' );
+		$fp = kFileBase::kFOpen($fileName,'w');
 		if (! $fp)
 			throw new KOperationEngineException ( "Failed to open report file : " . $fileName );
 		

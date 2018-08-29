@@ -337,7 +337,7 @@ class KAsyncEmailIngestion extends KPeriodicWorker
 			}
 			KalturaLog::info("Attachment [{$cur_attach->filename}] is temporarly saved with name [$filename]");
 			$this->temp_files[] = $filename; // keep a list of saved files that will be cleaned up during destruction
-			$handle = fopen($filename, 'w');
+			$handle  = kFileBase::kFOpen($filename,'w');
 			$fileWritten = $handle && fwrite($handle, $cur_attach->content);
 			$fileWritten = $fileWritten && fclose($handle);
 			if (!$fileWritten) {

@@ -233,10 +233,10 @@ class defPartnerservices2baseAction extends kalturaAction
 		$key = md5(implode("|", $params).implode("|", $keys));
 
 		if (!file_exists("/tmp/cache_v2"))
-			mkdir("/tmp/cache_v2");	
-		file_put_contents("/tmp/cache_v2/cache-$key.log", "cachekey: $key\n".print_r($params, true)."\n".$response); // sync - OK
-		file_put_contents("/tmp/cache_v2/cache-$key.headers", $this->getResponse()->getHttpHeader  ( "Content-Type" )); // sync - OK
-		file_put_contents("/tmp/cache_v2/cache-$key", $response); // sync - OK
+			kFileBase::kMkDir("/tmp/cache_v2");
+		kFileBase::kFilePutContents("/tmp/cache_v2/cache-$key.log", "cachekey: $key\n".print_r($params, true)."\n".$response); // sync - OK
+		kFileBase::kFilePutContents("/tmp/cache_v2/cache-$key.headers", $this->getResponse()->getHttpHeader  ( "Content-Type" )); // sync - OK
+		kFileBase::kFilePutContents("/tmp/cache_v2/cache-$key", $response); // sync - OK
 	}
 
 	public function setHttpHeader ( $hdr_name , $hdr_value  )

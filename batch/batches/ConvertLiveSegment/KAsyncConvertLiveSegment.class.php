@@ -123,7 +123,7 @@ class KAsyncConvertLiveSegment extends KJobHandlerWorker
 				$localTempAmfFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $amfFileName;
 				$sharedTempAmfFilePath = $this->sharedTempPath . DIRECTORY_SEPARATOR . $amfFileName;
 
-				file_put_contents($localTempAmfFilePath, serialize($amfArray));
+				kFileBase::kFilePutContents($localTempAmfFilePath, serialize($amfArray));
 
 				self::moveDataFile($data, $localTempAmfFilePath, $sharedTempAmfFilePath);
 			}

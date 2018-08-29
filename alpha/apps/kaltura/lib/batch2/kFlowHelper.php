@@ -1391,7 +1391,7 @@ class kFlowHelper
 		$ismContent = str_replace("content=\"$oldName\"", "content=\"$newName\"", $ismContent);
 
 		$ismPath .= '.tmp';
-		$bytesWritten = file_put_contents($ismPath, $ismContent);
+		$bytesWritten = kFileBase::kFilePutContents($ismPath, $ismContent);
 		if(!$bytesWritten)
 			KalturaLog::err("Failed to update file [$ismPath]");
 
@@ -2894,7 +2894,7 @@ class kFlowHelper
 		$fileName =  basename($data->getOutputPath());
 		$directory =  myContentStorage::getFSContentRootPath() . "/content/userscsv/" . $dbBatchJob->getPartnerId() ;
 		if(!file_exists($directory))
-			mkdir($directory);
+			kFileBase::kMkDir($directory);
 		$filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
 
 		if(!$data->getOutputPath())

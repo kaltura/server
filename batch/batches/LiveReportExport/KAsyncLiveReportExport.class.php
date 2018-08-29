@@ -44,7 +44,7 @@ class KAsyncLiveReportExport  extends KJobHandlerWorker
 		$sharedLocation = self::$taskConfig->params->sharedPath . DIRECTORY_SEPARATOR . $partnerId . "_" . $fileName;
 		
 		$fileSize = kFile::fileSize($data->outputPath);
-		rename($data->outputPath, $sharedLocation);
+		kFileBase::kRename($data->outputPath, $sharedLocation);
 		$data->outputPath = $sharedLocation;
 		
 		$this->setFilePermissions($sharedLocation);

@@ -30,9 +30,9 @@ class kFileBase
     {
         // write to a temp file and then rename, so that the write will be atomic
         $tempFilePath = tempnam(dirname($filePath), basename($filePath));
-        if (file_put_contents($tempFilePath, $var) === false)
+        if (kFileBase::kFilePutContents($tempFilePath, $var) === false)
             return false;
-        if (rename($tempFilePath, $filePath) === false)
+        if (kFileBase::kRename($tempFilePath, $filePath) === false)
         {
             @unlink($tempFilePath);
             return false;
@@ -51,7 +51,7 @@ class kFileBase
 
     public static function readLastBytesFromFile($file_name, $bytes = 1024)
     {
-        $fh = fopen($file_name, 'r');
+        $fh  = kFileBase::kFOpen($file_name,'r');
         $data = "";
         if($fh)
         {
@@ -92,7 +92,7 @@ class kFileBase
     // make sure the file is closed , then remove it
     public static function deleteFile($file_name)
     {
-        $fh = fopen($file_name, 'w') or die("can't open file");
+        $fh = kFileBase::kFOpen($file_name,'w') or die("can't open file");
         fclose($fh);
         unlink($file_name);
     }
@@ -110,7 +110,7 @@ class kFileBase
             return true;
 
         $oldUmask = umask(00);
-        $result = @mkdir($path, $rights, $recursive);
+        $result = self::kMkDir($path, $rights, $recursive, null, true);
         umask($oldUmask);
         return $result;
     }
@@ -161,7 +161,7 @@ class kFileBase
 
     static public function appendToFile($file_name , $str)
     {
-        file_put_contents($file_name, $str, FILE_APPEND);
+        kFileBase::kFilePutContents($file_name, $str, FILE_APPEND);
     }
 
     static public function fixPath($file_name)
@@ -180,7 +180,7 @@ class kFileBase
         if(! file_exists(dirname($file_name)))
             self::fullMkdir($file_name);
 
-        $fh = fopen($file_name, 'w');
+        $fh  = kFileBase::kFOpen($file_name,'w');
         try
         {
             $res = fwrite($fh, $content);
@@ -201,7 +201,7 @@ class kFileBase
         {
             if(! file_exists($file_name))
                 return NULL;
-            $fh = fopen($file_name, $mode);
+            $fh  = kFileBase::kFOpen($file_name, $mode);
 
             if($fh == NULL)
                 return NULL;
@@ -258,5 +258,46 @@ class kFileBase
         $mode = substr(decoct(fileperms($srcFile)), -4);
         self::chmod($destFile,intval($mode,8));
     }
+
+    public static function kFOpen($filePath, $mode = null, $suppressWarnings = false, $useIncludePath = null, $context = null)
+    {
+        KalturaLog::debug("Opening file investigation $filePath :\n" . debug_print_backtrace());
+        if ($suppressWarnings)
+            return @fopen($filePath, $mode, $useIncludePath, $context);
+        return fopen($filePath, $mode, $useIncludePath, $context);
+    }
+
+    public static function kMkDir($filePath, $mode = null, $recursive = false, $context = null, $suppressWarnings = false)
+    {
+        KalturaLog::debug("Making Dir investigation $filePath :\n" . debug_print_backtrace());
+        if ($suppressWarnings)
+            return @mkdir($filePath, $mode, $recursive, $context);
+        return mkdir($filePath, $mode, $recursive, $context);
+    }
+
+    public static function kCopy($src, $dst = null , $context = null, $suppressWarnings = false)
+    {
+        KalturaLog::debug("Copying investigation from $src to $dst:\n" . debug_print_backtrace());
+        if ($suppressWarnings)
+            return @copy($src, $dst, $context);
+        return copy($src, $dst, $context);
+    }
+
+    public static function kRename($src, $dst, $suppressWarnings = false)
+    {
+        KalturaLog::debug("Rename investigation from $src to $dst:\n" . debug_print_backtrace());
+        if ($suppressWarnings)
+            return @rename($src, $dst);
+        return rename($src, $dst);
+    }
+
+    public static function kFilePutContents($filePath, $data = null, $flags = null, $context = null,  $suppressWarnings = false )
+    {
+        KalturaLog::debug("file_put_contents investigation to $filePath:\n" . debug_print_backtrace());
+        if ($suppressWarnings)
+            return @file_put_contents($filePath, $data, $flags, $context);
+        return file_put_contents($filePath, $data, $flags, $context);
+    }
+
 
 }

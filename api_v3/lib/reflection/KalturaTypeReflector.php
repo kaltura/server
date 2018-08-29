@@ -711,8 +711,8 @@ class KalturaTypeReflector
 					$parentClass = get_parent_class($parentClass);
 				}
 			}
-			
-			file_put_contents(self::$_classInheritMapLocation, serialize(self::$_classInheritMap));
+
+			kFileBase::kFilePutContents(self::$_classInheritMapLocation, serialize(self::$_classInheritMap));
 		}
 		else 
 		{

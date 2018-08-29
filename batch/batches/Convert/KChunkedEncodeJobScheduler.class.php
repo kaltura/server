@@ -98,7 +98,7 @@ class KChunkedEncodeJobScheduler extends KPeriodicWorker
 			$myPid = getmypid();
 			KalturaLog::log("myPid:$myPid");
 			if(!file_exists($fileName)){
-				file_put_contents($fileName, $myPid);
+				kFileBase::kFilePutContents($fileName, $myPid);
 				KalturaLog::log("Locking process ($processName,pid:$myPid) in file ($fileName)");
 				return true;
 			}
@@ -118,7 +118,7 @@ class KChunkedEncodeJobScheduler extends KPeriodicWorker
 					}
 				}
 			}
-			file_put_contents($fileName, $myPid);
+			kFileBase::kFilePutContents($fileName, $myPid);
 			KalturaLog::log("Locking process ($processName,pid:$myPid) in file ($fileName)");
 			return true;
 		}

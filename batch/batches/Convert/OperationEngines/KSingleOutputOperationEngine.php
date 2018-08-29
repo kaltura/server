@@ -20,7 +20,7 @@ class KSingleOutputOperationEngine extends KOperationEngine
 					array(KDLCmdlinePlaceholders::OutDir,KDLCmdlinePlaceholders::OutFileName), 
 					array($this->outDir,$this->outFilePath), 
 					$xml);
-			file_put_contents($this->configFilePath, $xml);
+			kFileBase::kFilePutContents($this->configFilePath, $xml);
 		}
 		
 		$command = '';

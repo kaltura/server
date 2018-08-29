@@ -129,7 +129,7 @@ referrer
 	function writeToFile ( $evenLogFullPath , $eventLine )
 	{
 		// write line to log
-		$stream = @fopen( $evenLogFullPath , 'a', false) ;
+		$stream = kFileBase::kFOpen($evenLogFullPath , "a", true, false);
 		$res = fwrite($stream, $eventLine);
 		if ( ! $res )
 		{

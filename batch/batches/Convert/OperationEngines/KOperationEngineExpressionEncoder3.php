@@ -30,7 +30,7 @@ class KOperationEngineExpressionEncoder3 extends KOperationEngine
 	{
 		$xml = file_get_contents($this->configFilePath);
 		$xml = str_replace(KDLCmdlinePlaceholders::OutDir, $this->outDir, $xml);
-		file_put_contents($this->configFilePath, $xml);
+		kFileBase::kFilePutContents($this->configFilePath, $xml);
 
 		$this->addToLogFile("Config File Path: $this->configFilePath");
 		$this->addToLogFile($xml);
@@ -88,7 +88,7 @@ class KOperationEngineExpressionEncoder3 extends KOperationEngine
 		$arr = null;
 		if(preg_match('/(<smil[\s\w\W]+<\/smil>)/', $xml, $arr))
 			$xml = $arr[1];
-		file_put_contents($xmlPath, $xml);
+		kFileBase::kFilePutContents($xmlPath, $xml);
 		
 		//echo $xml;
 		$doc = new DOMDocument();

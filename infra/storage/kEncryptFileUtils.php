@@ -72,8 +72,8 @@ class kEncryptFileUtils
         try
         {
             $tempPath =  self::getClearTempPath($srcFilePath);
-            $fd1 = fopen($srcFilePath, "rb");
-            $fd2 = fopen($tempPath, "w");
+            $fd1 = kFileBase::kFOpen($srcFilePath,'rb');
+            $fd2 = kFileBase::kFOpen($tempPath,'w');
             while (!feof($fd1))
             {
                 $iv = call_user_func_array("self::$functionName", array($fd1, $key, $iv, $fd2));
@@ -84,7 +84,7 @@ class kEncryptFileUtils
             if (!$dstFilePath)
                 $dstFilePath = $srcFilePath;
             // adding @ to avoid valid case which in 2 process creating clear file at the same time
-            return @rename($tempPath, $dstFilePath);
+            return kFileBase::kRename($tempPath, $dstFilePath, true);
         }
         catch(Exception $e)
         {

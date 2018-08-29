@@ -31,14 +31,14 @@ class KOperationEngineIsmIndex  extends KSingleOutputOperationEngine
 		$baseName = $rvPath['basename'];
 		$ismStr = file_get_contents("$this->outFilePath.ism");
 		$ismStr = str_replace(array("$this->outFilePath.ismc", $inFilePath), array("$fileName.ismc",$baseName), $ismStr);
-		file_put_contents("$this->outFilePath.ism", $ismStr);
+		kFileBase::kFilePutContents("$this->outFilePath.ism", $ismStr);
 		
-		$rv=mkdir($this->outFilePath."_tmpism",0777);
+		$rv = kFileBase::kMkDir($this->outFilePath."_tmpism",0777);
 		if($rv==false)
 			return false;
 		$newIsmBaseName = $this->outFilePath."_tmpism/$fileName";
-		rename("$this->outFilePath.ism", "$newIsmBaseName.ism");
-		rename("$this->outFilePath.ismc", "$newIsmBaseName.ismc");
+		kFileBase::kRename("$this->outFilePath.ism", "$newIsmBaseName.ism");
+		kFileBase::kRename("$this->outFilePath.ismc", "$newIsmBaseName.ismc");
 		
 		$fsDescArr = array();
 		$fsDesc = new KalturaDestFileSyncDescriptor();

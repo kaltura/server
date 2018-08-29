@@ -341,7 +341,7 @@
 		protected static function parsePrintout($fileName)
 		{
 			KalturaLog::log("fileName($fileName)");
-			$fHd = fopen($fileName, "r");
+			$fHd = kFileBase::kFOpen($fileName,'w');
 			if(!isset($fHd))
 				return null;
 			

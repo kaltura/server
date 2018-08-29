@@ -27,10 +27,10 @@ class KOperationEngineIsmManifest extends KSingleOutputOperationEngine
 		$ismcFilePath = $this->outFilePath.".ismc";
 		
 		$ismcStr = $this->mergeIsmcManifests($this->data->srcFileSyncs);
-		file_put_contents($ismcFilePath, $ismcStr);
+		kFileBase::kFilePutContents($ismcFilePath, $ismcStr);
 		
 		$ismStr = $this->mergeIsmManifests($this->data->srcFileSyncs, $ismcFilePath);
-		file_put_contents($ismFilePath, $ismStr);
+		kFileBase::kFilePutContents($ismFilePath, $ismStr);
 		
 		$destFileSyncDescArr = array();
 		$fileSyncDesc = new KalturaDestFileSyncDescriptor();

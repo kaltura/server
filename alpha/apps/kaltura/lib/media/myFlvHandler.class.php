@@ -37,7 +37,7 @@ class myFlvHandler
 		$this->status = file_exists($this->flv_file_name);
 		
 		if ($this->status)
-			$this->fh = fopen($this->flv_file_name, "rb");
+			$this->fh = kFileBase::kFOpen($this->flv_file_name, "rb");
 	}
 	
 	public function __destruct()
@@ -390,7 +390,7 @@ class myFlvHandler
 			
 		list($total_bytes, $duration, $from_byte, $to_byte) = $this->clip($from_msecs, $to_msecs);
 		
-		$new_fh = fopen($new_file , "wb");
+		$new_fh = kFileBase::kFOpen($new_file , 'wb');
 
 		fwrite($new_fh , self::createFlvHeader());
 		
@@ -866,8 +866,8 @@ class myFlvHandler
 
 		ksort($sorted_tags, SORT_NUMERIC);
 		
-		$fh = fopen ( $new_file , "wb" );
-		
+		$fh = kFileBase::kFOpen($new_file , 'wb');
+
 		fwrite ( $fh , $header ) ;
 
 		foreach($sorted_tags as $timestamp => $pos)
@@ -889,7 +889,7 @@ class myFlvHandler
 		$flv_wrapper = new myFlvHandler ( $srcName );
 		$header = $flv_wrapper->getHeader();
 			
-		$fh = fopen ( $outName , "wb" );
+		$fh = kFileBase::kFOpen($outName, 'wb');
 		fwrite ($fh , $header) ;
 		$aTS = 0; $aInsaneTS = null;
 		$vTS = 0; $vInsaneTS = null;
@@ -1061,14 +1061,14 @@ abstract class FlvInfo
 		$this->close();
 		if ($this->exists()) // enfore the creation of a new file by deleting the current one
 			@unlink($this->info_file_name);
-		$this->fh = fopen($this->info_file_name, "wb");
+		$this->fh = kFileBase::kFOpen($this->info_file_name, 'wb');
 	}
 	
 	public function open()
 	{
 		if ($this->exists())
 		{
-			$this->fh = fopen($this->info_file_name, "rb");
+			$this->fh = kFileBase::kFOpen($this->info_file_name, 'rb');
 			return true;
 		}
 		

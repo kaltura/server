@@ -55,7 +55,7 @@ class localMgr extends kFileTransferMgr
 		if($this->createLink)
 			return symlink($local_file, $remote_file);			
 		else		
-			return copy($local_file, $remote_file);
+			return kFileBase::kCopy($local_file, $remote_file);
 	}
 
 
@@ -63,7 +63,7 @@ class localMgr extends kFileTransferMgr
 	protected function doGetFile ($remote_file, $local_file = null)
 	{
 		if($local_file && !$this->createLink)
-			return @copy($local_file, $remote_file);
+			return kFileBase::kCopy($local_file, $remote_file, null, true);
 			
 		return file_get_contents($remote_file);
 	}
@@ -72,7 +72,7 @@ class localMgr extends kFileTransferMgr
 	// create a new directory on the server
 	protected function doMkDir ($remote_path)
 	{
-	    return mkdir($remote_path);
+		return kFile::kMkDir($remote_path);
 	}
 
 	// chmod to the given remote file

@@ -29,7 +29,7 @@ class batchwatchAction extends kalturaSystemAction
 			$batch_name = $this->getP ( "batch" );
 			$path = "/web/batchwatch/$batch_name";
 			echo $path;
-			@file_put_contents( $path , "restart" ); // sync - OK
+			kFileBase::kFilePutContents($path , "restart", null, null, true ); // sync - OK
 			die();	
 		}
 		

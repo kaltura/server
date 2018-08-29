@@ -44,7 +44,7 @@ else
 }
 
 if(!file_exists($outputPathBase))
-	mkdir($outputPathBase, 0755, true);
+	kFileBase::kMkDir($outputPathBase, 0755, true);
 
 $xmlFileName = "$outputPathBase/KalturaClient.xml";
 

@@ -247,7 +247,7 @@ $pixFmt = "yuv420p";
 					}
 				}
 				$keyFramesStr = implode(" I\n",$keyFramesArr)." I\n";
-				file_put_contents("$outFilePath.qp", $keyFramesStr);
+				kFileBase::kFilePutContents("$outFilePath.qp", $keyFramesStr);
 			}
 			else {
 				KalturaLog::log("Missing gop($gop) or frameRate($frameRate) or duration($duration) - will be generated without fixed keyframes!");
@@ -380,7 +380,7 @@ $pixFmt = "yuv420p";
 			else if(strstr($wmData->format, "png")!==false){
 				$wmData->format = "png";
 			}
-			rename($wmTmpFilepath, "$wmTmpFilepath.$wmData->format");
+			kFileBase::kRename($wmTmpFilepath, "$wmTmpFilepath.$wmData->format");
 			$wmTmpFilepath = "$wmTmpFilepath.$wmData->format";
 
 			KalturaLog::log("Updated Watermark data:".json_encode($wmData));

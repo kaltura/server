@@ -27,7 +27,7 @@ class testNotificationsAction extends sfAction
 		
 		
 $myFile = "/var/log/notifications_log";
-$fh = fopen($myFile, 'a') ;
+$fh = kFileBase::kFOpen($myFile, 'a');
 fwrite($fh, microtime(true) . ":\n" );
 fwrite($fh, print_r ( $_REQUEST , true ) . "\n"  );
 fwrite($fh, "- not_list: ---\n");

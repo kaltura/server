@@ -32,7 +32,7 @@ class bulkuploadfileAction extends sfAction
 			if(!count($bulkUploadResults))
 				die("Log file is not ready");
 				
-			$STDOUT = fopen('php://output', 'w');
+			$STDOUT = kFileBase::kFOpen('php://output', 'w');
 			$data = $batchJob->getData();
 			
 			$handledResults = 0;

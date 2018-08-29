@@ -368,7 +368,7 @@ class LiveReportsService extends KalturaBaseService
 		$folderPath = "/content/reports/live/$partnerId";
 		$directory =  myContentStorage::getFSContentRootPath() . $folderPath;
 		if(!file_exists($directory))
-			mkdir($directory);
+			kFileBase::kMkDir($directory);
 		return $directory;
 	}
 	

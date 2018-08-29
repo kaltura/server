@@ -133,8 +133,8 @@ class YahooDistributionEngine extends DistributionEngine implements
 		$path = $distributionProfile->ftpPath;
 		$destFile = "{$path}/{$fileName}";
 			
-		$xmlString = $feed->getXmlString();	
-		file_put_contents($srcFile, $xmlString);	
+		$xmlString = $feed->getXmlString();
+		kFileBase::kFilePutContents($srcFile, $xmlString);
 		KalturaLog::info("XML written to file [$srcFile]");
 		//upload file to FTP
 
@@ -189,7 +189,7 @@ class YahooDistributionEngine extends DistributionEngine implements
 			throw new Exception("FTP manager not loaded");
 	
 		$xmlString = $feed->getXmlString();
-		file_put_contents($srcFile, $xmlString);
+		kFileBase::kFilePutContents($srcFile, $xmlString);
 		KalturaLog::info("XML written to file [$srcFile]");
 		//upload file to FTP
 		$ftpManager = $this->getFTPManager($distributionProfile);

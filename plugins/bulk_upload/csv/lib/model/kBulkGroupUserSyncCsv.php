@@ -139,7 +139,7 @@ class kBulkGroupUserSyncCsv
 				self::GROUP_ID => $addGroupId
 			);
 		}
-		$f = fopen($csvPath, 'w');
+		$f = kFileBase::kFOpen($csvPath, 'w');
 		fputcsv($f, array(self::ACTION, self::USER_ID, self::GROUP_ID));
 		foreach ($csvData as $csvLine)
 		{

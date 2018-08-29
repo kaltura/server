@@ -214,7 +214,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 			}
 				
 			KalturaLog::debug("rename($srcPath, $destPath)");
-			rename($srcPath, $destPath);
+			kFileBase::kRename($srcPath, $destPath);
 		
 			if(!file_exists($destPath) || kFile::fileSize($destPath) != $fileSize)
 			{

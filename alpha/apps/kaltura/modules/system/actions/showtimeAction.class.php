@@ -132,8 +132,8 @@ class showtimeAction extends kalturaSystemAction
 				$from_file[$clean_id]=1;
 			}
 		}
-		
-		file_put_contents(self::getExcludeFileName(), serialize($from_file) ); // sync - OK
+
+		kFileBase::kFilePutContents(self::getExcludeFileName(), serialize($from_file) ); // sync - OK
 	}	
 	
 	private static function getExcludeFileName()

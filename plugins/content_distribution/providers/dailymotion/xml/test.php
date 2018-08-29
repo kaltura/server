@@ -93,10 +93,6 @@ print_r($myp->validateForSubmission($dbEntryDistribution, "submit"));
 $providerData = new KalturaDailymotionDistributionJobProviderData($distributionJobData);
 $distributionJobData->providerData = $providerData;
 
-//file_put_contents('out.xml', $providerData->xml);
-//KalturaLog::debug("XML [$providerData->xml]");
-
-//return;
 $engine = new DailymotionDistributionEngine();
 $engine->submit($distributionJobData);
 
@@ -142,5 +138,4 @@ $engine->submit($distributionJobData);
 //
 //$xml = $xml->saveXML();
 //
-//file_put_contents('out.xml', $xml);
 //KalturaLog::debug("XML [$xml]");

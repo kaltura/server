@@ -35,9 +35,9 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		
 		$logFileDir = dirname($logFilePath);
 		if(!file_exists($logFileDir))
-			mkdir(dirname($logFilePath), 0665, true);
-			
-		file_put_contents($logFilePath, $cmd, FILE_APPEND);
+			kFileBase::kMkDir(dirname($logFilePath), 0665, true);
+
+		kFileBase::kFilePutContents($logFilePath, $cmd, FILE_APPEND);
 		$output = system( $cmd , $rv );
 		KalturaLog::debug("Returned value: '$rv'");
 
@@ -53,7 +53,7 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 			else {
 				$rv = null;
 				KalturaLog::info("Executing: $cmd");
-				file_put_contents($logFilePath, $cmd, FILE_APPEND);
+				kFileBase::kFilePutContents($logFilePath, $cmd, FILE_APPEND);
 				$output = system( $cmd , $rv );
 				KalturaLog::debug("Returned value: '$rv'");
 				

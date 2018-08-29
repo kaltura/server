@@ -45,7 +45,7 @@ class kBulkUploadXmlFlowManager implements kBatchJobStatusEventConsumer
 		$fileName = $dbBatchJob->getEntryId() . '_update_' . uniqid() . ".xml";
 		$filePath = $tmpSharedFolder . DIRECTORY_SEPARATOR. $fileName;
 		kFile::fullMkdir($filePath,0755);
-		$res = file_put_contents($filePath, $transformedXml);
+		$res = kFileBase::kFilePutContents($filePath, $transformedXml);
 		chmod($filePath, 0640);
 		
 		$jobData = new kBulkUploadXmlJobData();

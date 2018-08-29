@@ -521,7 +521,7 @@ class infraRequestUtils
 	public static function dumpFilePart($file_name, $range_from, $range_length)
 	{
 		$chunk_size = 100000;
-		$fh = fopen($file_name, "rb");
+		$fh  = kFileBase::kFOpen($file_name, "rb");
 		if($fh)
 		{
 			$pos = 0;

@@ -45,7 +45,7 @@ class kIsmIndexEventsConsumer implements kObjectChangedEventConsumer
 		$ismXml->head->meta['content'] = $ismcNewName;
 		
 		$tmpPath = kFileSyncUtils::getLocalFilePathForKey($ismPrevVersionFileSyncKey).'.tmp';
-		file_put_contents($tmpPath, $ismXml->asXML());
+		kFileBase::kFilePutContents($tmpPath, $ismXml->asXML());
 		
 		kFileSyncUtils::moveFromFile($tmpPath, $object->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET));
 					

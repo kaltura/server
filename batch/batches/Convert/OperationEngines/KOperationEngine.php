@@ -125,7 +125,7 @@ abstract class KOperationEngine
 				if(isset($this->message)) $msg.= ", message :[".$this->message."]"; 
 				$msg.= ".Operator is defined as optional, therefore switching to passthrough mode - copy the source to output.";
 				$this->message = $msg;
-				copy($this->inFilePath, $this->outFilePath);
+				kFileBase::kCopy($this->inFilePath, $this->outFilePath);
 			}
 			else 
 				throw new KOperationEngineException("return value: [$return_value]");
