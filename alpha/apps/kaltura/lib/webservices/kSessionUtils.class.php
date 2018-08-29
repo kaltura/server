@@ -612,7 +612,23 @@ class ks extends kSessionBase
 		
 		return null;
 	}
-	
+
+	public function getSearchContext()
+	{
+		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
+		// edit privilege (edit:XX,edit:YYY,...)
+		$allPrivileges = explode(',', $this->privileges);
+
+		foreach($allPrivileges as $priv)
+		{
+			$exPrivileges = explode(':', $priv, 2);
+			if (count($exPrivileges) == 2 && $exPrivileges[0] == self::PRIVILEGE_SEARCH_CONTEXT)
+				return $exPrivileges[1];
+		}
+
+		return null;
+	}
+
 	public function getLimitEntry()
 	{
 		return $this->getPrivilegeValue(self::PRIVILEGE_LIMIT_ENTRY, null);
