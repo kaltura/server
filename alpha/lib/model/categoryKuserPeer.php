@@ -96,7 +96,8 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 		if (!is_null($categoryKuser)){
 			return $categoryKuser;
 		}
-
+		
+		$permittedCategoryKuser = null;
 		//check if kuserId has permission in category by a junction group
 		if($supportGroups)
 		{
@@ -111,15 +112,21 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 			$categoryKusers = categoryKuserPeer::doSelect($criteria, $con);
 			if(!$categoryKusers)
 				return null;
-			foreach( $categoryKusers as $categoryKuser){
-				foreach($requiredPermissions as $requiredPermission){
-					if($categoryKuser->hasPermission($requiredPermission)){
-						return $categoryKuser;
+			
+			foreach( $categoryKusers as $categoryKuser)
+			{
+				/* @var $categoryKuser categoryKuser */
+				foreach($requiredPermissions as $requiredPermission)
+				{
+					if($categoryKuser->hasPermission($requiredPermission))
+					{
+						if(!$permittedCategoryKuser || $categoryKuser->getPermissionLevel() < $permittedCategoryKuser->getPermissionLevel())
+							$permittedCategoryKuser = $categoryKuser;
 					}
 				}
 			}
 		}
-		return null;
+		return $permittedCategoryKuser;
 	}
 	
 	/**
