@@ -657,7 +657,7 @@ class KCurlWrapper
 	public static function getContent($url, $headers = null)
 	{
 		if (self::isInternalUrl($url))
-			KalturaLog::debug("Exec Curl in getContent - Found Internal url: " . $url);
+			KalturaLog::debug("getContent - Found Internal url: " . $url);
 
 		$ch = curl_init();
 		
