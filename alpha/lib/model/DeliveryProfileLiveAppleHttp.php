@@ -261,10 +261,25 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		{
 			return parent::buildHttpFlavorsArray();
 		}
-		
+
+
+		if($this->params->getEdgeServerIds() && count($this->params->getEdgeServerIds()))
+		{
+			KalturaLog::err("@@NA DOING IT");
+			foreach ($this->getDynamicAttributes()->getEdgeServerIds() as $currEdgeServerId)
+			{
+				$serverNode = ServerNodePeer::retrieveByPK($currEdgeServerId);
+				/** @var EdgeServerNode $currEdgeServer */
+				$primaryFlavorBitrateInfo = $this->buildFlavorBitrateInfoArray($primaryStreamInfo);
+				$this->buildM3u8Flavors($primaryManifestUrl, $flavors, $primaryStreamInfo, $primaryFlavorBitrateInfo);
+			}
+		}
+
 		$this->buildM3u8Flavors($primaryManifestUrl, $flavors, $primaryStreamInfo);
+		KalturaLog::err("@@NA force proxy is [" . $this->getForceProxy() . "] backup url [".$backupManifestUrl."] edge servers [".print_r($this->params->getEdgeServerIds(),true)."]");
 		if($backupManifestUrl && ($this->getForceProxy() || count($flavors) == 0))
 		{
+			//TODO: Save edge server node ids and create super-redundancy manifest for backup as well
 			//Until a full solution will be made on the liveServer side we need to manually sync bitrates Between primary and backup streams
 			$primaryFlavorBitrateInfo = $this->buildFlavorBitrateInfoArray($primaryStreamInfo);
 			$this->buildM3u8Flavors($backupManifestUrl, $flavors, $backupStreamInfo, $primaryFlavorBitrateInfo);

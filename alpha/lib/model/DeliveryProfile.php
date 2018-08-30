@@ -469,8 +469,9 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		{
 			if(isset($flavor['domainPrefix']))
 				continue;
-			
-			$domainPrefix = $this->getDeliveryServerNodeUrl();
+
+			//TODO: Should happen only if triggered by super-redundancy on access control
+			$domainPrefix = $this->getDeliveryServerNodeUrl(true);
 			if($domainPrefix)
 				$flavor['domainPrefix'] = $domainPrefix;
 		}
