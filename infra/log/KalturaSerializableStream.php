@@ -51,7 +51,7 @@ class KalturaSerializableStream extends Zend_Log_Writer_Stream
 		}
 		else
 		{
-			$this->_stream = kfileBase::kFOpen($this->_url, $this->_mode, true, false);
+			$this->_stream = @fopen($this->_url, $this->_mode);
 		}
 		
 		if (! $this->_stream)
