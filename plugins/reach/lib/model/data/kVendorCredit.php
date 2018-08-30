@@ -206,6 +206,11 @@ class kVendorCredit
 		}
 		return true;
 	}
+
+	public function toDateNotReached($now)
+	{
+		return true;
+	}
 	
 	public function getSyncCreditStartDate()
 	{

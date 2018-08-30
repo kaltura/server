@@ -68,6 +68,12 @@ class kTimeRangeVendorCredit extends kVendorCredit
 		$now = $time != null ? $time : time();
 		if (!parent::isActive($now))
 			return false;
+
+		return $this->toDateNotReached($now);
+	}
+
+	public function toDateNotReached($now)
+	{
 		if ( $now > $this->toDate)
 		{
 			KalturaLog::debug("Current date [$now] is not in credit time Range [from - $this->fromDate to - $this->toDate] ");

@@ -126,6 +126,11 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 		if (!parent::isActive($now))
 			return false;
 
+		return $this->toDateNotReached($now);
+	}
+
+	public function toDateNotReached($now)
+	{
 		if ($now < $this->periodStartDate || $now > $this->periodEndDate)
 		{
 			KalturaLog::debug("Current date [$now] is not in frequency credit time Range cycle [from - $this->periodStartDate to - $this->periodEndDate] ");
