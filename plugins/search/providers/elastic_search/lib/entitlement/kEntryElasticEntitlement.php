@@ -7,7 +7,6 @@
 class kEntryElasticEntitlement extends kBaseElasticEntitlement
 {
     
-    public static $kuserId = null;
     public static $privacyContext = null;
     public static $privacy = null;
     public static $userEntitlement = false;
@@ -36,7 +35,6 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
 
         self::initializeParentEntitlement();
         self::initializeDisableEntitlement(self::$ks);
-        self::$kuserId = self::getKuserIdForEntitlement(self::$partnerId, self::$kuserId, self::$ks);
         self::initializeUserEntitlement(self::$ks);
 
         if(self::$ks)
@@ -111,18 +109,6 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
             self::$filteredCategoryIds = array();
             self::$userCategoryToEntryEntitlement = true;
         }
-    }
-
-    private static function getKuserIdForEntitlement($partnerId, $kuserId = null, $ks = null)
-    {
-        if($ks && !$kuserId)
-        {
-            $kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid, true);
-            if($kuser)
-                $kuserId = $kuser->getId();
-        }
-
-        return $kuserId;
     }
 
     public static function setFilteredCategoryIds(ESearchOperator $eSearchOperator, $objectId)

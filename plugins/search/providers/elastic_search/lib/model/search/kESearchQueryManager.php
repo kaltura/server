@@ -38,6 +38,8 @@ class kESearchQueryManager
 	const SYNONYM_FIELD_SUFFIX = 'synonym';
 	const MATCH_PHRASE_KEY = 'match_phrase';
 	const KALTURA_TEXT_PARTIAL_SEARCH_ANALYZER = 'kaltura_text_partial_search';
+	const FROM_KEY = 'from';
+	const SIZE_KEY = 'size';
 
 	const DEFAULT_TRIGRAM_PERCENTAGE = 80;
 	const RAW_FIELD_BOOST_FACTOR = 4;
@@ -107,6 +109,11 @@ class kESearchQueryManager
 			$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName, $trigramFieldName);
 		$partialQuery->addToShould($matchQuery);
 
+		if ($searchItem->shouldAddSearchTermToSearchHistory($fieldName, $searchItem->getAddHighlight(), $queryAttributes))
+		{
+			$queryAttributes->addToSearchHistoryTerms($searchItem->getSearchTerm());
+		}
+
 		return $partialQuery;
 	}
 
@@ -124,6 +131,11 @@ class kESearchQueryManager
 		$exactMatch->setBoostFactor($fieldBoostFactor);
 		if($searchItem->getAddHighlight())
 			$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName, $fieldName . $fieldSuffix);
+
+		if ($searchItem->shouldAddSearchTermToSearchHistory($fieldName, $searchItem->getAddHighlight(), $queryAttributes))
+		{
+			$queryAttributes->addToSearchHistoryTerms($searchItem->getSearchTerm());
+		}
 
 		return $exactMatch;
 	}
