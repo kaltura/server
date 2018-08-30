@@ -259,44 +259,86 @@ class kFileBase
         self::chmod($destFile,intval($mode,8));
     }
 
-    public static function kFOpen($filePath, $mode = null, $suppressWarnings = false, $useIncludePath = null, $context = null)
+    public static function kFOpen($filePath, $mode, $suppressWarnings = false, $useIncludePath = null, $context = null)
     {
-        KalturaLog::debug("Opening file investigation $filePath :\n" . debug_print_backtrace());
+        $e = new Exception();
+        KalturaLog::debug("\n****************************************** \n Opening file investigation $filePath :\n" . $e->getTraceAsString() . "\n****************************************** \n");
+        if($context)
+        {
+            if ($suppressWarnings)
+                return @fopen($filePath, $mode, $useIncludePath, $context);
+            return fopen($filePath, $mode, $useIncludePath, $context);
+        }
+
         if ($suppressWarnings)
-            return @fopen($filePath, $mode, $useIncludePath, $context);
-        return fopen($filePath, $mode, $useIncludePath, $context);
+            return @fopen($filePath, $mode, $useIncludePath);
+        return fopen($filePath, $mode, $useIncludePath);
     }
 
-    public static function kMkDir($filePath, $mode = null, $recursive = false, $context = null, $suppressWarnings = false)
+    public static function kMkDir($filePath, $mode = 0777, $recursive = false, $context = null, $suppressWarnings = false)
     {
-        KalturaLog::debug("Making Dir investigation $filePath :\n" . debug_print_backtrace());
+        $e = new Exception();
+        KalturaLog::debug("\n****************************************** \n Making Dir investigation $filePath :\n" . $e->getTraceAsString() . "\n****************************************** \n");
+        if ($context)
+        {
+            if ($suppressWarnings)
+                return @mkdir($filePath, $mode, $recursive, $context);
+            return mkdir($filePath, $mode, $recursive, $context);
+        }
+
         if ($suppressWarnings)
-            return @mkdir($filePath, $mode, $recursive, $context);
-        return mkdir($filePath, $mode, $recursive, $context);
+            return @mkdir($filePath, $mode, $recursive);
+        return mkdir($filePath, $mode, $recursive);
     }
 
-    public static function kCopy($src, $dst = null , $context = null, $suppressWarnings = false)
+    public static function kCopy($src, $dst, $context = null, $suppressWarnings = false)
     {
-        KalturaLog::debug("Copying investigation from $src to $dst:\n" . debug_print_backtrace());
+        $e = new Exception();
+        KalturaLog::debug("Copying investigation from $src to $dst:\n" . $e->getTraceAsString() . "\n****************************************** \n");
+
+        if ($context)
+        {
+            if ($suppressWarnings)
+                return @copy($src, $dst, $context);
+            return copy($src, $dst, $context);
+        }
+
         if ($suppressWarnings)
-            return @copy($src, $dst, $context);
-        return copy($src, $dst, $context);
+            return @copy($src, $dst);
+        return copy($src, $dst);
     }
 
-    public static function kRename($src, $dst, $suppressWarnings = false)
+    public static function kRename($src, $dst, $context = null, $suppressWarnings = false)
     {
-        KalturaLog::debug("Rename investigation from $src to $dst:\n" . debug_print_backtrace());
+        $e = new Exception();
+        KalturaLog::debug("\n****************************************** \n Rename investigation from $src to $dst:\n" . $e->getTraceAsString() . "\n****************************************** \n");
+
+        if ($context)
+        {
+            if ($suppressWarnings)
+                return @rename($src, $dst, $context);
+            return rename($src, $dst, $context);
+        }
+
         if ($suppressWarnings)
             return @rename($src, $dst);
         return rename($src, $dst);
     }
 
-    public static function kFilePutContents($filePath, $data = null, $flags = null, $context = null,  $suppressWarnings = false )
+    public static function kFilePutContents($filePath, $data, $flags = null, $context = null,  $suppressWarnings = false )
     {
-        KalturaLog::debug("file_put_contents investigation to $filePath:\n" . debug_print_backtrace());
+        $e = new Exception();
+        KalturaLog::debug("\n****************************************** \n file_put_contents investigation to $filePath:\n" . $e->getTraceAsString() . "\n****************************************** \n");
+        if ($context)
+        {
+            if ($suppressWarnings)
+                return @file_put_contents($filePath, $data, $flags, $context);
+            return file_put_contents($filePath, $data, $flags, $context);
+        }
+
         if ($suppressWarnings)
-            return @file_put_contents($filePath, $data, $flags, $context);
-        return file_put_contents($filePath, $data, $flags, $context);
+            return @file_put_contents($filePath, $data, $flags);
+        return file_put_contents($filePath, $data, $flags);
     }
 
 
