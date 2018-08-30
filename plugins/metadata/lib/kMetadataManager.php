@@ -875,12 +875,12 @@ class kMetadataManager
 			}
 			else
 			{
-				foreach ($searchItemValues as &$searchItemValue)
+				foreach ($searchItemValues as &$searchValue)
 				{
 					if(strlen($searchItemValue) > kElasticSearchManager::METADATA_MAX_LENGTH)
-						$searchItemValue = substr($searchItemValue, 0, kElasticSearchManager::METADATA_MAX_LENGTH);
+						$searchValue = substr($searchValue, 0, kElasticSearchManager::METADATA_MAX_LENGTH);
 				}
-				$profileFieldData['value_text'] = $searchItemValues;
+				$profileFieldData['value_text'] = $searchValue;
 			}
 
 			$metaDataSearchValues[] = $profileFieldData;
