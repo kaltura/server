@@ -8,11 +8,12 @@ require_once(dirname(__file__) . '/kRendererBase.php');
  */
 class kRendererRedirect implements kRendererBase
 {
-	public $url;
-	
-	public function __construct($url)
+	private $url;
+	private $statusCode;
+	public function __construct($url,$statusCode = 303)
 	{
 		$this->url = $url;
+		$this->statusCode = $statusCode;
 	}
 	
 	public function validate()
@@ -22,6 +23,6 @@ class kRendererRedirect implements kRendererBase
 	
 	public function output()
 	{
-		header("Location: {$this->url}");
+		header("Location: {$this->url}" , true, $this->statusCode);
 	}
 }
