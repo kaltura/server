@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This class will make common tasks in the action classes much easier.
  *
@@ -17,7 +16,7 @@ abstract class kalturaAction extends sfAction
 	const VERIFICATION_MODE_VIEW = "view";
 	
 	const ON_ERROR_RETURN_RESULT = 1;
-	const ON_ERROR_WIZARD = 2;
+	const ON_ERROR_WIZARD = 2 ;
 	const ON_ERROR_FULL_SCREEN = 3;
 	
 	// likuser === Logged In Kuser
@@ -25,100 +24,88 @@ abstract class kalturaAction extends sfAction
 	protected $likuser = NULL;
 	protected $lipuser_id = NULL;
 	
-	public function preExecute()
+	protected function getP ( $param_name , $default_val = NULL )
 	{
-		set_error_handler("errorHandler");
+		return requestUtils::getParameter ( $param_name , $default_val );
 	}
 	
-	public function errorHandler($errNo, $errStr, $errFile, $errLine)
+	protected function injectIfEmpty ( $map_of_parameterts )
 	{
-		
-		$errorFormat = "%s line %d - %s";
-		switch ($errNo)
+		foreach ( $map_of_parameterts as $param => $val )
 		{
-			case E_NOTICE:
-			case E_STRICT:
-			case E_USER_NOTICE:
-				KalturaLog::log(sprintf($errorFormat, $errFile, $errLine, $errStr), KalturaLog::NOTICE);
-				break;
-			case E_USER_WARNING:
-			case E_WARNING:
-				KalturaLog::log(sprintf($errorFormat, $errFile, $errLine, $errStr), KalturaLog::WARN);
-				break;
-			case E_DEPRECATED:
-				KalturaLog::log(sprintf($errorFormat, $errFile, $errLine, $errStr), KalturaLog::NOTICE);
-				break;
-			default: // throw it as an exception
-				throw new ErrorException($errStr, 0, $errNo, $errFile, $errLine);
-		}
-	}
-
-	protected function getP($param_name, $default_val = NULL)
-	{
-		return requestUtils::getParameter($param_name, $default_val);
-	}
-	
-	protected function injectIfEmpty($map_of_parameterts)
-	{
-		foreach ($map_of_parameterts as $param => $val) {
-			if ($this->getP($param) == "")
+			if ( $this->getP ( $param ) == "" )
 				$_REQUEST[$param] = $val;
 		}
 	}
 	
-	protected function getLoggedInUserId()
+	
+	protected function getLoggedInUserId ( )
 	{
-		try {
-			if ($this->likuser_id == NULL) {
+		try
+		{
+			if ( $this->likuser_id == NULL )
+			{
 				list($this->likuser_id, $email, $screenname) = $this->getUserzoneCookie();
 			}
 			return $this->likuser_id;
-		} catch (Exception $ex) {
+		}
+		catch ( Exception $ex )
+		{
 			return NULL;
 		}
 	}
 	
-	protected function getLoggedInPuserId()
+	protected function getLoggedInPuserId ( )
 	{
-		try {
-			if ($this->lipuser_id == NULL) {
+		try
+		{
+			if ( $this->lipuser_id == NULL )
+			{
 				list($id, $this->lipuser_id, $screenname) = $this->getUserzoneCookie();
 			}
 			return $this->lipuser_id;
-		} catch (Exception $ex) {
+		}
+		catch ( Exception $ex )
+		{
 			return NULL;
 		}
 	}
 	
-	protected function getLoggedInUser()
+	protected function getLoggedInUser (  )
 	{
-		if ($this->likuser != NULL) {
+		if ( $this->likuser != NULL )
+		{
 			return $this->likuser;
 		}
-		try {
+		try
+		{
 			$id = $this->getLoggedInUserId();
-			if ($id == NULL) {
+			if ( $id == NULL )
+			{
 				return NULL;
 			}
-			$this->likuser = kuser::getKuserById($id);
+			$this->likuser = kuser::getKuserById ( $id );
 			return $this->likuser;
-		} catch (Exception $ex) {
+		}
+		catch ( Exception $ex )
+		{
 			return NULL;
 		}
 	}
 	
-	protected function logOut()
+	protected function logOut ()
 	{
-		// TODO - add kill credentails & invalidate the authentication 
+		// TODO - add kill credentails & invalidate the authentication
 		self::removeAllSecureCookies();
 	}
 	
-	protected function playDead($msg = "")
+	protected function playDead( $msg = "" )
 	{
 		// a page worth displaying
-		if ($msg != NULL) {
-			$this->setFlash('message_404', $msg);
-			return $this->forward404($msg);
+		if ( $msg != NULL )
+		{
+			$this->setFlash( 'message_404', $msg );
+			return $this->forward404( $msg );
 		}
 		
 		// no dispaly - exit now.
@@ -128,15 +115,19 @@ abstract class kalturaAction extends sfAction
 	/**
 	 * A common task is to force authentication
 	 */
-	protected function forceAuthentication($allow_redirect = true)
+	protected function forceAuthentication ( $allow_redirect = true )
 	{
-		if (!$this->getUserzoneCookie()) {
-			//echo ( "forceAuthentication [$allow_redirect]" ); 
-			if ($allow_redirect) {
+		if ( !$this->getUserzoneCookie() )
+		{
+			//echo ( "forceAuthentication [$allow_redirect]" );
+			if ( $allow_redirect )
+			{
 				
 				$this->setFlash('sign_in_referer', $_SERVER["REQUEST_URI"]);
-				return $this->forward('login', 'signinAjaxShowForm');
-			} else {
+				return $this->forward('login','signinAjaxShowForm');
+			}
+			else
+			{
 				// this must be an action the kuser is deliberatly trying to hack into
 				return false;
 			}
@@ -145,33 +136,34 @@ abstract class kalturaAction extends sfAction
 		return true;
 	}
 	
-	protected function forceContribPermissions($kshow, $kshow_id, $allow_redirect = true, $full_window = false)
+	protected function forceContribPermissions ( $kshow , $kshow_id , $allow_redirect = true , $full_window = false)
 	{
-		return $this->forcePermissionsImpl($kshow, $kshow_id, self::VERIFICATION_MODE_CONTRIB, $allow_redirect, $full_window);
+		return $this->forcePermissionsImpl ( $kshow ,$kshow_id , self::VERIFICATION_MODE_CONTRIB , $allow_redirect , $full_window );
 	}
 	
-	protected function forceEditPermissions($kshow, $kshow_id, $allow_redirect = true, $full_window = false)
+	protected function forceEditPermissions ( $kshow ,$kshow_id , $allow_redirect = true , $full_window = false)
 	{
-		return $this->forcePermissionsImpl($kshow, $kshow_id, self::VERIFICATION_MODE_EDIT, $allow_redirect, $full_window);
+		return $this->forcePermissionsImpl ( $kshow ,$kshow_id , self::VERIFICATION_MODE_EDIT , $allow_redirect , $full_window );
 	}
 	
-	protected function forceCustomizePermissions($kshow, $kshow_id, $allow_redirect = true, $full_window = false)
+	protected function forceCustomizePermissions ( $kshow ,$kshow_id , $allow_redirect = true , $full_window = false)
 	{
-		return $this->forcePermissionsImpl($kshow, $kshow_id, self::VERIFICATION_MODE_CUSTOMIZE, $allow_redirect, $full_window);
+		return $this->forcePermissionsImpl ( $kshow ,$kshow_id , self::VERIFICATION_MODE_CUSTOMIZE , $allow_redirect , $full_window );
 	}
 	
-	protected function forceViewPermissions($kshow, $kshow_id, $allow_redirect = true, $full_window = false)
+	protected function forceViewPermissions ( $kshow ,$kshow_id , $allow_redirect = true , $full_window = false )
 	{
-		return $this->forcePermissionsImpl($kshow, $kshow_id, self::VERIFICATION_MODE_VIEW, $allow_redirect, $full_window);
+		return $this->forcePermissionsImpl ( $kshow ,$kshow_id , self::VERIFICATION_MODE_VIEW , $allow_redirect , $full_window );
 	}
 	
-	// if $allow_redirect == true  $full_window can be true too which will cause a page to open and only then open the authentication wizard 
-	// 
-	private function forcePermissionsImpl($kshow, $kshow_id, $verification_mode, $allow_redirect = true, $full_window = false)
+	// if $allow_redirect == true  $full_window can be true too which will cause a page to open and only then open the authentication wizard
+	//
+	private function forcePermissionsImpl ( $kshow ,$kshow_id , $verification_mode , $allow_redirect = true , $full_window = false)
 	{
-		if ($kshow == NULL) $kshow = kshowPeer::retrieveByPK($kshow_id);
-		if (!$kshow) {
-			$this->playDead("This Kaltura is no longer available. (Message No." . $kshow_id . ")");
+		if ( $kshow == NULL )	$kshow = kshowPeer::retrieveByPK( $kshow_id);
+		if ( !$kshow )
+		{
+			$this->playDead( "This Kaltura is no longer available. (Message No." .$kshow_id.")" );
 			//throw new Exception ( "Cannot force permission for show $kshow_id");
 		}
 		
@@ -179,52 +171,65 @@ abstract class kalturaAction extends sfAction
 		
 		
 		// if the user is eother the producer or an admin - return true
-		$viewer_type = myKshowUtils::getViewerType($kshow, $likuser_id);
+		$viewer_type = myKshowUtils::getViewerType($kshow , $likuser_id ) ;
 		
-		if ($viewer_type == KshowKuser::KSHOWKUSER_VIEWER_PRODUCER) return true;
+		if ( $viewer_type == KshowKuser::KSHOWKUSER_VIEWER_PRODUCER ) return true;
 		
-		$this->setCredentialByName("requestKshow", $kshow_id);
-		$this->setCredentialByName("verificationMode", $verification_mode);
+		$this->setCredentialByName ( "requestKshow" , $kshow_id );
+		$this->setCredentialByName ( "verificationMode" , $verification_mode );
 
 //		echo ("verificationMode: " .  $this->getCredentialByName ( "verificationMode" ) );
 		
-		if ($full_window) {
+		if ( $full_window )
+		{
 			// check if all's well - if not - forward
-			$result = $this->forcePermissionsDoCheckOrRedirect($kshow, $kshow_id, $verification_mode, false);
-			if ($result)
+			$result = $this->forcePermissionsDoCheckOrRedirect( $kshow ,$kshow_id , $verification_mode , false );
+			if ( $result )
 				return true;// ALL IS OK !
 			$this->setFlash('vm', $verification_mode);
 			$this->setFlash('kshow_id', $kshow_id);
-			return $this->forward('login', 'openAuthenticate');
-		} else {
-			return $this->forcePermissionsDoCheckOrRedirect($kshow, $kshow_id, $verification_mode, $allow_redirect);
+			return $this->forward('login','openAuthenticate');
+		}
+		else
+		{
+			return $this->forcePermissionsDoCheckOrRedirect( $kshow ,$kshow_id , $verification_mode , $allow_redirect );
 		}
 	}
 	
-	private function forcePermissionsDoCheckOrRedirect($kshow, $kshow_id, $verification_mode, $allow_redirect = true)
+	private function forcePermissionsDoCheckOrRedirect ( $kshow ,$kshow_id , $verification_mode , $allow_redirect = true )
 	{
-		$this->setCredentialByName("requestKshowName", $kshow->getName());
+		$this->setCredentialByName ( "requestKshowName" , $kshow->getName() );
 		
 		$force_auth = false;
-		if ($verification_mode == self::VERIFICATION_MODE_CONTRIB) {
+		if ( $verification_mode == self::VERIFICATION_MODE_CONTRIB )
+		{
 			$permissions = $kshow->getContribPermissions();
 			$pwd = $kshow->getContribPassword();
-		} else if ($verification_mode == self::VERIFICATION_MODE_EDIT) {
-			$permissions = $kshow->getEditPermissions();
+		}
+		else if ( $verification_mode == self::VERIFICATION_MODE_EDIT  )
+		{
+			$permissions = $kshow->getEditPermissions ();
 			$pwd = $kshow->getEditPassword();
-			// in this case - force authentication when not for everyone 
+			// in this case - force authentication when not for everyone
 			$force_auth = true;
-		} else if ($verification_mode == self::VERIFICATION_MODE_VIEW) {
-			$permissions = $kshow->getViewPermissions();
+		}
+		else if ( $verification_mode == self::VERIFICATION_MODE_VIEW  )
+		{
+			$permissions = $kshow->getViewPermissions ();
 			$pwd = $kshow->getViewPassword();
-		} else if ($verification_mode == self::VERIFICATION_MODE_CUSTOMIZE) {
+		}
+		else if ( $verification_mode == self::VERIFICATION_MODE_CUSTOMIZE  )
+		{
 			// only the producer can customize
-			if (!$this->isProducer($kshow)) {
-				$this->playDead(NULL);
+			if ( ! $this->isProducer( $kshow ) )
+			{
+				$this->playDead( NULL );
 			}
 			return true;
-		} else {
-			throw new Exception ("Cannot force permission for type $verification_mode");
+		}
+		else
+		{
+			throw new Exception ( "Cannot force permission for type $verification_mode");
 		}
 		/*
 				echo "kshow_id: $kshow_id, verification_mode: $verification_mode<br>" .
@@ -242,35 +247,38 @@ abstract class kalturaAction extends sfAction
 		
 		$res = true;
 		
-		debugUtils::log("kshow_id [$kshow_id], verification_mode: " . $verification_mode . " permissions: $permissions");
+		debugUtils::log ( "kshow_id [$kshow_id], verification_mode: " . $verification_mode . " permissions: $permissions" );
 		
-		switch ($permissions) {
+		switch ( $permissions )
+		{
 			case kshow::KSHOW_PERMISSION_EVERYONE:
 				break;
 			case kshow::KSHOW_PERMISSION_REGISTERED:
 				// if users are authenticated already - there will be no work here
-				$res = $this->forceAuthentication($allow_redirect);
+				$res = $this->forceAuthentication( $allow_redirect );
 				break;
 			case kshow::KSHOW_PERMISSION_JUST_ME:
-				if ($force_auth) {
-					$res = $this->forceAuthentication($allow_redirect);
-					if (!$res) break; // user was not authenticated but was supposed to be - don't continue
+				if ( $force_auth )
+				{
+					$res = $this->forceAuthentication( $allow_redirect );
+					if ( !$res ) break; // user was not authenticated but was supposed to be - don't continue
 				}
 				
-				if (!$this->isProducer($kshow)) // ( $kshow->getProducerId() != $this->likuser_id )
+				if ( ! $this->isProducer( $kshow ) ) // ( $kshow->getProducerId() != $this->likuser_id )
 				{
-					$res = $this->justMe($allow_redirect);
+					$res = $this->justMe ( $allow_redirect );
 				}
 				break;
 			case kshow::KSHOW_PERMISSION_INVITE_ONLY:
-				if ($force_auth) {
-					$res = $this->forceAuthentication($allow_redirect);
-					if (!$res) break; // user was not authenticated but was supposed to be - don't continue
+				if ( $force_auth )
+				{
+					$res = $this->forceAuthentication( $allow_redirect );
+					if ( !$res ) break; // user was not authenticated but was supposed to be - don't continue
 				}
 				// no need to force verification on producer himself
-				if (!$this->isProducer($kshow)) // $kshow->getProducerId() != $this->likuser_id )
+				if ( ! $this->isProducer( $kshow ) ) // $kshow->getProducerId() != $this->likuser_id )
 				{
-					$res = $this->inviteOnly($kshow, $verification_mode, $allow_redirect);
+					$res = $this->inviteOnly ( $kshow , $verification_mode , $allow_redirect ) ;
 				}
 				break;
 			case kshow::KSHOW_PERMISSION_NONE:
@@ -282,71 +290,78 @@ abstract class kalturaAction extends sfAction
 		return $res;
 	}
 	
-	protected function isProducer($kshow)
+	protected function isProducer ( $kshow )
 	{
-		return ($kshow->getProducerId() == $this->getLoggedInUserId());
+		return 	( $kshow->getProducerId() == $this->getLoggedInUserId() );
 	}
 	
-	protected function justMe($allow_redirect = true)
+	protected function justMe ( $allow_redirect = true )
 	{
-		if (!$allow_redirect) return false;
+		if ( ! $allow_redirect ) return false;
 		$this->setFlash('sign_in_referer', $_SERVER["REQUEST_URI"]);
-		return $this->forward('login', 'justMe');
+		return $this->forward('login','justMe');
 	}
 	
-	protected function inviteOnly($kshow, $verification_mode, $allow_redirect = true)
+	protected function inviteOnly ( $kshow , $verification_mode , $allow_redirect = true )
 	{
 		$kshow_id = $kshow->getId();
 		
-		if (!$this->isValidExpiryCredential("$verification_mode" . "kshow" . $kshow_id)) {
+		if ( ! $this->isValidExpiryCredential ( "$verification_mode" . "kshow" . $kshow_id) )
+		{
 			/*
 			 * TODO - PRIVILEGES - should not enforce authentication
 			 */
 			
 			//$this->forceAuthentication( $allow_redirect );
-			if (!$allow_redirect) return false;
+			if ( ! $allow_redirect ) return false;
 			/*
 						$this->setCredentialByName ( "requestKshow" , $kshow_id );
 						$this->setCredentialByName ( "requestKshowName" , $kshow->getName() );
 						$this->setCredentialByName ( "verificationMode" , $verification_mode );
 				*/
-			// be sure the likuser can 
+			// be sure the likuser can
 			$this->setFlash('sign_in_referer', $_SERVER["REQUEST_URI"]);
-			return $this->forward('login', 'inviteOnlyForm');
+			return $this->forward('login','inviteOnlyForm');
 		}
 		
 		return true;
 	}
 	
 	
-	protected function setCredentialByName($cred_name, $cred_val)
+	protected function setCredentialByName  ( $cred_name , $cred_val )
 	{
 //		debugUtils::log( "setCredentialByName: [$cred_name]=[$cred_val]" );
 		$use_cookies = $this->getLoggedInUser() == NULL;
-		if ($use_cookies) {
-			requestUtils::setSecureCookie($cred_name, $cred_val, self::COOKIE_CREDENTAIL_IV, self::COOKIE_EXPIRY);
+		if ( $use_cookies )
+		{
+			requestUtils::setSecureCookie( $cred_name , $cred_val , self::COOKIE_CREDENTAIL_IV , self::COOKIE_EXPIRY  );
 //			self::addToSecureCookieList ( $cred_name );
-		} else {
+		}
+		else
+		{
 			// if the user is logged in - use the credential mechaism
-			$real_cred = $this->findCredential($cred_name);
-			if ($real_cred) $this->getUser()->removeCredential($real_cred);
-			$this->getUser()->addCredential($cred_name . ":" . $cred_val);
+			$real_cred = $this->findCredential ( $cred_name );
+			if ( $real_cred )	$this->getUser()->removeCredential( $real_cred );
+			$this->getUser()->addCredential ( $cred_name . ":" . $cred_val );
 		}
 		
 	}
 	
-	protected function getCredentialByName($cred_name)
+	protected function getCredentialByName ( $cred_name )
 	{
-		$use_cookies = ($this->getLoggedInUser() == NULL);
-		if ($use_cookies) {
-			$val = requestUtils::getSecureCookie($cred_name, self::COOKIE_CREDENTAIL_IV);
-		} else {
+		$use_cookies = ( $this->getLoggedInUser() == NULL );
+		if ( $use_cookies )
+		{
+			$val = requestUtils::getSecureCookie( $cred_name , self::COOKIE_CREDENTAIL_IV );
+		}
+		else
+		{
 			// if the user is logged in - use the credential mechaism
-			$real_cred = $this->findCredential($cred_name);
-			if (!$real_cred) return NULL;
+			$real_cred = $this->findCredential ( $cred_name );
+			if ( !$real_cred ) return NULL;
 
 //			$cred_list = $this->getUser()->listCredentials();
-			$values = explode(":", $real_cred);
+			$values = explode ( ":" , $real_cred );
 			$val = $values[1];
 		}
 
@@ -355,10 +370,10 @@ abstract class kalturaAction extends sfAction
 		return $val;
 	}
 	
-	// use $response->setCookie to reset the values 
-	public static function removeAllSecureCookiesFromResponse($response)
+	// use $response->setCookie to reset the values
+	public static function removeAllSecureCookiesFromResponse ( $response )
 	{
-		requestUtils::removeAllSecureCookies();
+		requestUtils::removeAllSecureCookies ();
 		/*
 				$secure_cookie_list = requestUtils::getSecureCookie( "secure_cookie_list" , self::COOKIE_CREDENTAIL_IV );
 				
@@ -374,9 +389,9 @@ abstract class kalturaAction extends sfAction
 		*/
 	}
 	
-	public static function removeAllSecureCookies()
+	public static function removeAllSecureCookies ( )
 	{
-		requestUtils::removeAllSecureCookies();
+		requestUtils::removeAllSecureCookies ();
 		/*
 				$secure_cookie_list = requestUtils::getSecureCookie( "secure_cookie_list" , self::COOKIE_CREDENTAIL_IV );
 				if ( empty ( $secure_cookie_list )) return;
@@ -389,7 +404,6 @@ abstract class kalturaAction extends sfAction
 				requestUtils::removeSecureCookieByName( "secure_cookie_list" );
 		*/
 	}
-	
 	/*
 		private function addToSecureCookieList ( $name )
 		{
@@ -404,36 +418,37 @@ abstract class kalturaAction extends sfAction
 			 }
 		}
 	*/
-	protected function hasCredentialByName($cred_name)
+	protected function hasCredentialByName  ( $cred_name )
 	{
-		return ($this->findCredential($cred_name) != NULL);
+		return ( $this->findCredential( $cred_name ) != NULL );
 	}
 	
-	private function findCredential($cred_name)
+	private function findCredential ( $cred_name )
 	{
 		$cred_list = $this->getUser()->listCredentials();
 		$prefix = $cred_name . ":";
-		foreach ($cred_list as $cred_index => $val) {
-			if (kString::beginsWith($val, $prefix)) return $val;
+		foreach ( $cred_list as $cred_index => $val )
+		{
+			if ( kString::beginsWith( $val , $prefix))		return $val;
 		}
 		
 		return NULL;
 	}
 	
-	protected function isValidExpiryCredential($cred_name)
+	protected function isValidExpiryCredential ( $cred_name )
 	{
 		// assume the val is time that might have expired
-		$val = $this->getCredentialByName($cred_name);
+		$val = $this->getCredentialByName ( $cred_name );
 //		echo ( "isValidExpiryCredential, $cred_name = $val" );
-		if (!$val) return false;
-		return $val > time();
+		if ( !$val ) return false;
+		return $val > time() ;
 	}
 	
-	protected function setExpiryCredential($cred_name, $ttl_in_sec)
+	protected function setExpiryCredential ( $cred_name , $ttl_in_sec )
 	{
 		// assume the val is time that might have expired
-		$val = time() + $ttl_in_sec;
-		$this->setCredentialByName($cred_name, $val);
+		$val = time() + $ttl_in_sec ;
+		$this->setCredentialByName( $cred_name , $val );
 	}
 	
 	protected function getUserzoneCookie()
@@ -444,12 +459,13 @@ abstract class kalturaAction extends sfAction
 	protected function followRedirectCookie()
 	{
 		$return_to = @$_COOKIE["kaltura_redirect"];
-		if ($return_to) {
+		if ($return_to)
+		{
 			$return_to = base64_decode($return_to);
 			// make the redirect cookie expire
-			setcookie('kaltura_redirect', '', time() - 86400, '/');
+			setcookie( 'kaltura_redirect', '', time() - 86400 , '/' );
 			
-			$this->redirect("http://$return_to/" . $_SERVER["REQUEST_URI"]);
+			$this->redirect( "http://$return_to/".$_SERVER["REQUEST_URI"] );
 		}
 	}
 }
