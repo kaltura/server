@@ -4,14 +4,39 @@
  */
 require_once (__DIR__ . '/../../bootstrap.php');
 
+checkMandatoryPluginsEnabled();
 $script = realpath(dirname(__FILE__) . "/../../../tests/standAloneClient/exec.php");
 
-$newTemplateUpdate = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/2018_09_01_reach_credit_expired.xml");
+$taskApprovedModeration = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/notifications/2018_09_01_reach_credit_expired.xml");
+deployTemplate($script, $taskApprovedModeration);
 
-if(!file_exists($newTemplateUpdate) || !file_exists($script))
+function deployTemplate($script, $config)
 {
-	KalturaLog::err("Missing update script file");
-	return;
+	if(!file_exists($config))
+	{
+		KalturaLog::err("Missing file [$config] will not deploy");
+		return;
+	}
+
+	passthru("php $script $config");
 }
 
-passthru("php $script $newTemplateUpdate");
+
+/**
+ * @return bool If all required plugins are installed
+ */
+function checkMandatoryPluginsEnabled()
+{
+	$pluginsFilePath = realpath(dirname(__FILE__) . "/../../../configurations/plugins.ini");
+	KalturaLog::debug("Loading Plugins config from [$pluginsFilePath]");
+
+
+	$pluginsData = file($pluginsFilePath);
+	foreach ($pluginsData as $item)
+	{
+		if (trim($item) == "Reach")
+			return;
+	}
+	KalturaLog::debug("[Reach] plugin is disabled or not configured, aborting execution");
+	exit(-2);
+}
