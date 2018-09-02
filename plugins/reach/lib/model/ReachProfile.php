@@ -34,7 +34,7 @@ class ReachProfile extends BaseReachProfile
 	
 	const CUSTOM_DATA_CREDIT_USAGE_PERCENTAGE = 			'credit_usage_percentage';
 	const CUSTOM_DATA_CONTENT_DELETION_POLICY = 			'content_deletion_policy';
-	const CUSTOM_DATA_LAST_EXPIRY_NOTIFICATION = 			'last_expiry_notification';
+	const CUSTOM_DATA_LAST_CREDIT_EXPIRY_NOTIFICATION = 	'last_credit_expiry_notification';
 	
 	const CUSTOM_DATA_CREDIT_RESET_HISTORY =                'credit_reset_history';
 	
@@ -188,9 +188,9 @@ class ReachProfile extends BaseReachProfile
 		$this->putInCustomData(self::CUSTOM_DATA_CONTENT_DELETION_POLICY, $v);
 	}
 
-	public function setLastExpiryNotification($v)
+	public function setLastCreditExpiryNotification($v)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_LAST_EXPIRY_NOTIFICATION, $v);
+		$this->putInCustomData(self::CUSTOM_DATA_LAST_CREDIT_EXPIRY_NOTIFICATION, $v);
 	}
 	
 	//getters
@@ -322,9 +322,9 @@ class ReachProfile extends BaseReachProfile
 		return $this->getFromCustomData(self::CUSTOM_DATA_CONTENT_DELETION_POLICY, null, ReachProfileContentDeletionPolicy::DO_NOTHING);
 	}
 
-	public function getLastExpiryNotification()
+	public function getLastCreditExpiryNotification()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_LAST_EXPIRY_NOTIFICATION, null, 0);
+		return $this->getFromCustomData(self::CUSTOM_DATA_LAST_CREDIT_EXPIRY_NOTIFICATION, null, 0);
 	}
 
 	public function shouldSyncCredit()
@@ -347,15 +347,11 @@ class ReachProfile extends BaseReachProfile
 		}
 		$this->setCredit($reachProfileCredit);
 
+		if($reachProfileCredit->shouldResetLastCreditExpiry($this->getLastCreditExpiryNotification()))
+				$this->setLastCreditExpiryNotification(0);
 
-		if(($reachProfileCredit instanceof kUnlimitedVendorCredit || $reachProfileCredit instanceof kTimeRangeVendorCredit) && $this->getLastExpiryNotification())
-		{
-			if($reachProfileCredit->getToDate() > $this->getLastExpiryNotification() && $reachProfileCredit->getToDate() > time())
-				$this->setLastExpiryNotification(0);
-		}
-
-		if(!$reachProfileCredit->toDateNotReached(time()) && !$this->getLastExpiryNotification())
-			$this->setLastExpiryNotification(time());
+		if($reachProfileCredit->toDateHasExpired(time()) && !$this->getLastCreditExpiryNotification())
+			$this->setLastCreditExpiryNotification(time());
 	}
 	
 	public function setCreditResetHistory($v)

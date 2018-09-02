@@ -25,18 +25,18 @@
                 <eventConditions objectType="array">
                     <item objectType="KalturaEventFieldCondition">
                         <field objectType="KalturaEvalBooleanField">
-                            <code>$scope->getObject() instanceof ReachProfile &amp;&amp; $scope->getEvent()->isCustomDataModified('last_expiry_notification')</code>
+                            <code>$scope->getObject() instanceof ReachProfile &amp;&amp; $scope->getEvent()->isCustomDataModified('last_credit_expiry_notification')</code>
                         </field>
                     </item>
                     <item objectType="KalturaEventFieldCondition">
                         <field objectType="KalturaEvalBooleanField">
-                            <code>$scope->getObject()->getLastExpiryNotification() != 0</code>
+                            <code>$scope->getObject()->getLastCreditExpiryNotification() != 0</code>
                         </field>
                     </item>
                 </eventConditions>
                 <format>1</format>
                 <subject>[AppTitle] - Reach Credit Expired</subject>
-                <body>Your reach credit expired, please contact your Kaltura contact if you wish to extend your credit time range</body>
+                <body>Your reach credit has expired, please contact your Kaltura contact if you wish to extend your credit time range</body>
                 <fromEmail>{from_email}</fromEmail>
                 <fromName>{from_name}</fromName>
                 <to objectType="KalturaEmailNotificationGroupRecipientProvider">

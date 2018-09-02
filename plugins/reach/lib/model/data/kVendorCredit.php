@@ -207,13 +207,18 @@ class kVendorCredit
 		return true;
 	}
 
-	public function toDateNotReached($now)
+	public function toDateHasExpired($now)
 	{
-		return true;
+		return false;
 	}
 	
 	public function getSyncCreditStartDate()
 	{
 		return $this->getLastSyncTime() ? $this->getLastSyncTime() : $this->getFromDate();
+	}
+
+	public function shouldResetLastCreditExpiry($lastCreditExpiry)
+	{
+		return false;
 	}
 }
