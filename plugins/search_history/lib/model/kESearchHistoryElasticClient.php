@@ -19,14 +19,7 @@ class kESearchHistoryElasticClient
 
 	public function __construct()
 	{
-		$searchHistoryConfig = kConf::get('search_history', 'elastic', array());
-		if (!isset($searchHistoryConfig['elasticHost']) || !isset($searchHistoryConfig['elasticPort']))
-		{
-			throw new kESearchHistoryException('Missing mandatory config', kESearchHistoryException::INTERNAL_SERVER_ERROR);
-		}
-		$elasticHost = $searchHistoryConfig['elasticHost'];
-		$elasticPort = $searchHistoryConfig['elasticPort'];
-		$this->client = new elasticClient($elasticHost, $elasticPort);
+		$this->client = new elasticClient();
 	}
 
 	public function deleteSearchTermForUser($searchTerm)
