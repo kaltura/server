@@ -105,4 +105,20 @@ class kESearchHistoryCoreAdapter
 		return array($objects, $totalCount);
 	}
 
+	public static function getIdsToDeleteFromHitsResults($elasticResults)
+	{
+		$ids = array();
+		foreach ($elasticResults[self::HITS_KEY][self::HITS_KEY] as $key => $elasticObject)
+		{
+			if (isset($elasticObject['_id']) && isset($elasticObject['_index']))
+			{
+				$result = array();
+				$result['id'] = $elasticObject['_id'];
+				$result['index'] = $elasticObject['_index'];
+				$ids[] = $result;
+			}
+		}
+		return $ids;
+	}
+
 }
