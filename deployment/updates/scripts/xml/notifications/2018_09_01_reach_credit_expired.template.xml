@@ -25,7 +25,7 @@
                 <eventConditions objectType="array">
                     <item objectType="KalturaEventFieldCondition">
                         <field objectType="KalturaEvalBooleanField">
-                            <code>$scope->getObject() instanceof ReachProfile &amp;&amp; $scope->getEvent()->isCustomDataModified('last_credit_expiry_notification')</code>
+                            <code>$scope->getEvent()->isCustomDataModified('last_credit_expiry_notification')</code>
                         </field>
                     </item>
                     <item objectType="KalturaEventFieldCondition">
