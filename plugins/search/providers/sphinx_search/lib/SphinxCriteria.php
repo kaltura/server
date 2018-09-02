@@ -555,7 +555,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			if(count($this->numericalOrderConditions))
 				$conditions .= "," . implode(",", $this->numericalOrderConditions);
 		}
-		elseif (count($this->forcedOrderIds))
+		elseif ($this->forcedOrderIds && count($this->forcedOrderIds))
 		{
 			$this->applySortRequired = true;
 		}
