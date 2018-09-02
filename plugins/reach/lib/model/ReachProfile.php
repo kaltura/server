@@ -347,6 +347,13 @@ class ReachProfile extends BaseReachProfile
 		}
 		$this->setCredit($reachProfileCredit);
 
+
+		if(($reachProfileCredit instanceof kUnlimitedVendorCredit || $reachProfileCredit instanceof kTimeRangeVendorCredit) && $this->getLastExpiryNotification())
+		{
+			if($reachProfileCredit->getToDate() > $this->getLastExpiryNotification() && $reachProfileCredit->getToDate() > time())
+				$this->setLastExpiryNotification(0);
+		}
+
 		if(!$reachProfileCredit->toDateNotReached(time()) && !$this->getLastExpiryNotification())
 			$this->setLastExpiryNotification(time());
 	}

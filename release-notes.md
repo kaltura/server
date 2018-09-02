@@ -1,3 +1,21 @@
+# Naos 14.6.0 #
+
+## Add event notification for Reach credit expiry ##
+- Issue Type: Task
+- Issue ID: PLAT-8864
+
+### Configuration ###
+	None.
+
+#### Deployment Scripts ####
+
+	First replcae all tokens from the XML files below and remove ".template" from the fle name:
+        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_09_01_reach_credit_expired.template.xml
+
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/2018_09_01_deploy_reach_credit_expired_email_notification.php
+
+
 # Naos 14.4.0 #
 
 ## create CAPTIONS_EDITOR_ROLE for partner 0 ##
