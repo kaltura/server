@@ -48,7 +48,7 @@ class kSessionBase
 	const PRIVILEGE_BATCH_JOB_TYPE = "jobtype";
 	const PRIVILEGE_APP_TOKEN = "apptoken";
 	const PRIVILEGES_DELIMITER = "/";
-	const PRIVILEGE_DISABLE_PARTNER_CHANGE_ACCOUNT = "disablechangeaccount";
+	const PRIVILEGE_ENABLE_PARTNER_CHANGE_ACCOUNT = "enablechangeaccount";
 	const PRIVILEGE_EDIT_USER = "edituser";
 	const PRIVILEGE_ENABLE_CAPTION_MODERATION = "enablecaptionmoderation";
 	const PRIVILEGE_EDIT_ADMIN_TAGS = 'editadmintags';

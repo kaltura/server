@@ -302,8 +302,9 @@ class KalturaBaseUserService extends KalturaBaseService
 		
 		if(!$ksObj->user || $ksObj->user == '')
 			throw new KalturaAPIException(APIErrors::INVALID_USER_ID, $ksObj->user);
-		
-		if($ksObj->getPrivilegeByName(kSessionBase::PRIVILEGE_DISABLE_PARTNER_CHANGE_ACCOUNT))
+
+		if($ksObj->hasPrivilege(kSessionBase::PRIVILEGE_ENABLE_PARTNER_CHANGE_ACCOUNT) &&
+			!$ksObj->verifyPrivileges(kSessionBase::PRIVILEGE_ENABLE_PARTNER_CHANGE_ACCOUNT, $destPartnerId))
 			throw new KalturaAPIException(APIErrors::PARTNER_CHANGE_ACCOUNT_DISABLED);
 		
 		try 
