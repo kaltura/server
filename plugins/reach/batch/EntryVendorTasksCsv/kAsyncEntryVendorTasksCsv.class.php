@@ -240,12 +240,12 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		if(isset(self::$catalogItemData[$id]))
 			return self::$catalogItemData[$id];
 
-		$catalogItem = KBatchBase::$kClient->vendorCatalogItem->get($id);
-		if(!$catalogItem)
+		$vendorCatalogItem = KBatchBase::$kClient->vendorCatalogItem->get($id);
+		if(!$vendorCatalogItem)
 			return null;
 		
-		$catalogItemData = array("TAT" => $catalogItem->turnAroundTime);
-		self::$catalogItemData[$id] = $catalogItemData;
-		return $catalogItemData;
+		$catalogItemInfo = array("TAT" => $vendorCatalogItem->turnAroundTime);
+		self::$catalogItemData[$id] = $catalogItemInfo;
+		return $catalogItemInfo;
 	}
 }
