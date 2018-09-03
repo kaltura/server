@@ -10,7 +10,7 @@
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package plugins.reach
+ * @package plugins.vendor
  * @subpackage model
  */
 class VendorIntegration extends BaseVendorIntegration {
@@ -21,6 +21,9 @@ class VendorIntegration extends BaseVendorIntegration {
 	public function setRefreshToken ($v)	{ $this->putInCustomData ( "refreshToken" , $v);	}
 	public function getRefreshToken ( )	{ return $this->getFromCustomData( "refreshToken" );	}
 
+	public function setExpiresIn ($v)	{ $this->putInCustomData ( "expiresIn" , $v);	}
+	public function getExpiresIn( )	{ return $this->getFromCustomData( "expiresIn" );	}
+
 	public function setDeleteContentOnDAuthorization ($v)	{ $this->putInCustomData ( "deleteContentOnDAuthorization" , $v);	}
 	public function getDeleteContentOnDAuthorization ( )	{ return $this->getFromCustomData( "deleteContentOnDAuthorization" );	}
 
@@ -29,5 +32,8 @@ class VendorIntegration extends BaseVendorIntegration {
 
 	public function setDefaultUserEMail ($v)	{ $this->putInCustomData ( "defaultUserEMail" , $v);	}
 	public function getDefaultUserEMail ( )	{ return $this->getFromCustomData( "defaultUserEMail" );	}
+
+	public function setZoomCategory($v)	{ $this->putInCustomData ( "zoomCategory" , $v);	}
+	public function getZoomCategory( )	{ return $this->getFromCustomData( "zoomCategory" );	}
 
 } // VendorIntegration

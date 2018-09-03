@@ -5,7 +5,7 @@
  *
  * 
  *
- * @package plugins.reach
+ * @package plugins.vendor
  * @subpackage model.om
  */
 abstract class BaseVendorIntegrationPeer {
@@ -20,7 +20,7 @@ abstract class BaseVendorIntegrationPeer {
 	const OM_CLASS = 'VendorIntegration';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'plugins.reach.VendorIntegration';
+	const CLASS_DEFAULT = 'plugins.vendor.VendorIntegration';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'VendorIntegrationTableMap';

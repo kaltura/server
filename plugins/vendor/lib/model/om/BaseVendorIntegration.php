@@ -5,7 +5,7 @@
  *
  * 
  *
- * @package plugins.reach
+ * @package plugins.vendor
  * @subpackage model.om
  */
 abstract class BaseVendorIntegration extends BaseObject  implements Persistent {

@@ -16,10 +16,10 @@ class kZoomOauth implements kVendorOauth
 	 * @param string $response
 	 * @return array<tokens>
 	 */
-	function extractTokensFromResponse($response)
+	public function extractTokensFromResponse($response)
 	{
 		$dataArray = json_decode($response, true);
-		return array($dataArray[self::ACCESS_TOKEN], $dataArray[self::REFRESH_TOKEN]);
+		return array(self::ACCESS_TOKEN => $dataArray[self::ACCESS_TOKEN], self::REFRESH_TOKEN => $dataArray[self::REFRESH_TOKEN]);
 	}
 
 	/**
@@ -27,7 +27,7 @@ class kZoomOauth implements kVendorOauth
 	 * @return string newAccessToken
 	 * @throws Exception
 	 */
-	function refreshTokens($oldRefreshToken)
+	public function refreshTokens($oldRefreshToken)
 	{
 		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
 		$clientId = $zoomConfiguration['clientId'];
@@ -44,7 +44,7 @@ class kZoomOauth implements kVendorOauth
 	 * @return mixed
 	 * @throws Exception
 	 */
-	function retrieveTokensData()
+	public function retrieveTokensData()
 	{
 		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
 		$clientId = $zoomConfiguration['clientId'];
