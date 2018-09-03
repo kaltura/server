@@ -193,10 +193,10 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		$defaultRowValues = array(
 			'Task id' => $entryVendorTask->id,
 			'vendorPartnerId' => $entryVendorTask->vendorPartnerId,
-			'createdAt' => $this->getHumanReadbaleData($entryVendorTask->createdAt),
-			'updatedAt' => $this->getHumanReadbaleData($entryVendorTask->updatedAt),
-			'queueTime' => $this->getHumanReadbaleData($entryVendorTask->queueTime),
-			'finishTime' => $this->getHumanReadbaleData($entryVendorTask->finishTime),
+			'createdAt' => $this->getHumanReadbaleDate($entryVendorTask->createdAt),
+			'updatedAt' => $this->getHumanReadbaleDate($entryVendorTask->updatedAt),
+			'queueTime' => $this->getHumanReadbaleDate($entryVendorTask->queueTime),
+			'finishTime' => $this->getHumanReadbaleDate($entryVendorTask->finishTime),
 			'entryId' => $entryVendorTask->entryId,
 			'status' => $this->translateStatusToHumanReadable($entryVendorTask->status),
 			'reachProfileId' => $entryVendorTask->reachProfileId,
@@ -219,7 +219,7 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		return $entryVendorTaskIdToRow;
 	}
 	
-	private function getHumanReadbaleData($unixTimeStamp)
+	private function getHumanReadbaleDate($unixTimeStamp)
 	{
 		if(!$unixTimeStamp)
 			return null;
