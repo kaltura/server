@@ -132,18 +132,15 @@ class ESearchSearchHistoryInfo
 		$this->searchContext = $searchContext;
 	}
 
-	public function getPidUidContextObject()
+	public function getPidUidContext()
 	{
-		$month = searchHistoryUtils::getMonthFromTimestamp($this->getTimestamp());
 		$pidUidContextObject = array(
-			searchHistoryUtils::formatMonthPartnerIdUserIdContext($month, $this->getPartnerId(), $this->getKUserId(), searchHistoryUtils::DEFAULT_SEARCH_CONTEXT),
-			searchHistoryUtils::formatMonthPartnerIdUserIdContextObject($month, $this->getPartnerId(), $this->getKUserId(), searchHistoryUtils::DEFAULT_SEARCH_CONTEXT, $this->getSearchedObject())
+			searchHistoryUtils::formatPartnerIdUserIdContext($this->getPartnerId(), $this->getKUserId(), searchHistoryUtils::DEFAULT_SEARCH_CONTEXT),
 		);
 
 		if ($this->getSearchContext() != searchHistoryUtils::DEFAULT_SEARCH_CONTEXT)
 		{
-			$pidUidContextObject[] = searchHistoryUtils::formatMonthPartnerIdUserIdContext($month, $this->getPartnerId(), $this->getKUserId(), $this->getSearchContext());
-			$pidUidContextObject[] = searchHistoryUtils::formatMonthPartnerIdUserIdContextObject($month, $this->getPartnerId(), $this->getKUserId(), $this->getSearchContext(), $this->getSearchedObject());
+			$pidUidContextObject[] = searchHistoryUtils::formatPartnerIdUserIdContext($this->getPartnerId(), $this->getKUserId(), $this->getSearchContext());
 		}
 
 		return $pidUidContextObject;

@@ -46,21 +46,11 @@
           "type": "keyword",
           "normalizer": "kaltura_keyword_normalizer"
         },
-        "search_term_completion": {
-          "type": "completion",
-          "contexts": [
-            {
-              "name": "context_category",
-              "type": "category",
-              "path": "pid_uid_context_object"
-            }
-          ]
-        },
         "kuser_id": {
           "type": "keyword",
           "normalizer": "kaltura_keyword_normalizer"
         },
-        "pid_uid_context_object": {
+        "pid_uid_context": {
           "type": "keyword",
           "normalizer": "kaltura_keyword_normalizer"
         },
