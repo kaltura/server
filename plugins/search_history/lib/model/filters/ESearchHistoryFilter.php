@@ -78,9 +78,9 @@ class ESearchHistoryFilter extends ESearchBaseFilter
 		$boolQuery->addToFilter($pidUidContextQuery);
 		if ($this->getSearchTermStartsWith())
 		{
-			$searchTermStartsWithQuery = new kESearchPrefixQuery(ESearchHistoryFieldName::SEARCH_TERM, elasticSearchUtils::formatSearchTerm($this->searchTermStartsWith));
+			$searchTermStartsWithQuery = new kESearchPrefixQuery(ESearchHistoryFieldName::SEARCH_TERM, elasticSearchUtils::formatSearchTerm($this->getSearchTermStartsWith()));
 			$boolQuery->addToFilter($searchTermStartsWithQuery);
-			$pageSize = isset($searchHistoryConfig['completionSize']) ? $searchHistoryConfig['completionSize'] : self::STARTS_WITH_PAGE_SIZE;
+			$pageSize = isset($searchHistoryConfig['completionListSize']) ? $searchHistoryConfig['completionListSize'] : self::STARTS_WITH_PAGE_SIZE;
 		}
 		if($this->searchedObjectIn)
 		{

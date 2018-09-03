@@ -30,7 +30,7 @@ thai = 150
 
 [search_history]
 disableHistoryIndexing = false
-completionSize = 100
+completionListSize = 100
 emptyTermListSize = 500
 
 [search_history_collect_objects]
