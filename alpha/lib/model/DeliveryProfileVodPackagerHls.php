@@ -41,29 +41,27 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp {
 	protected function buildHttpFlavorsArray()
 	{
 		$flavors = array();
-		foreach($this->params->getflavorAssets() as $flavorAsset)
+		if ($this->params->getEdgeServerFallback() && $this->params->getEdgeServerIds() && count($this->params->getEdgeServerIds()))
 		{
-			if ($this->params->getEdgeServerIds() && count($this->params->getEdgeServerIds()))
+			foreach ($this->params->getEdgeServerIds() as $currEdgeServerId)
 			{
-				foreach ($this->params->getEdgeServerIds() as $currEdgeServerId)
+				$domainPrefix = $this->getDeliveryServerNodeUrl(true);
+				foreach($this->params->getflavorAssets() as $flavorAsset)
 				{
-					$serverNode = ServerNodePeer::retrieveByPK($currEdgeServerId);
-					/** @var EdgeServerNode $currEdgeServer */
 					$httpUrl = $this->getFlavorHttpUrl($flavorAsset);
 					if ($httpUrl)
+					{
+						$httpUrl['domainPrefix'] = $domainPrefix;
 						$flavors[] = $httpUrl;
-
+					}
 				}
 			}
 		}
-		foreach($this->params->getflavorAssets() as $flavorAsset)
-		{
-			/* @var $flavorAsset asset */
-			$httpUrl = $this->getFlavorHttpUrl($flavorAsset);
-			if ($httpUrl)
-				$flavors[] = $httpUrl;
-		}
-		return $flavors;
+
+		$parentFlavors = parent::buildHttpFlavorsArray();
+		$mergedFlavors = array_merge($parentFlavors, $flavors);
+		return $mergedFlavors;
+
 	}
 
 

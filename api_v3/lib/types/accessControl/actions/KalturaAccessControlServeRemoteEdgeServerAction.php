@@ -11,10 +11,17 @@ class KalturaAccessControlServeRemoteEdgeServerAction extends KalturaRuleAction
 	 * @var string
 	 */
 	public $edgeServerIds;
+
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $seamlessFallback;
+
 	
 	private static $mapBetweenObjects = array
 	(
 		'edgeServerIds',
+		'seamlessFallback',
 	);
 	/**
 	 * Init object type

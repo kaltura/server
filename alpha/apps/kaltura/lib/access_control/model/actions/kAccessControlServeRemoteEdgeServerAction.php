@@ -9,9 +9,13 @@ class kAccessControlServeRemoteEdgeServerAction extends kRuleAction
 	 * @var string
 	 */
 	protected $edgeServerIds;
-	
-	
-	public function __construct() 
+
+	/**
+	 * @var bool
+	 */
+	protected $seamlessFallback;
+
+	public function __construct()
 	{
 		parent::__construct(RuleActionType::SERVE_FROM_REMOTE_SERVER);
 	}
@@ -58,6 +62,26 @@ class kAccessControlServeRemoteEdgeServerAction extends kRuleAction
 			return false;
 		
 		$deliveryAttributes->setEdgeServerIds($activeEdgeServerIds);
+		$deliveryAttributes->setEdgeServerFallback($this->getSeamlessFallback());
 		return true;
 	}
+
+	/**
+	 * @return bool
+	 */
+	public function getSeamlessFallback()
+	{
+		return $this->seamlessFallback;
+	}
+
+	/**
+	 * @param bool $seamlessFallback
+	 */
+	public function setSeamlessFallback(bool $seamlessFallback)
+	{
+		$this->seamlessFallback = $seamlessFallback;
+	}
+
+
 }
+e
