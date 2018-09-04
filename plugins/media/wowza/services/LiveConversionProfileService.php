@@ -24,8 +24,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 		
 		$this->applyPartnerFilterForClass('conversionProfile2');
-		if (kCurrentContext::getCurrentPartnerId() != Partner::MEDIA_SERVER_PARTNER_ID)
-			$this->applyPartnerFilterForClass('assetParams');
+		$this->applyPartnerFilterForClass('assetParams');
 	}
 
 	/**
@@ -63,7 +62,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		$suffix = $matches[2];
 		
 		$entry = null;
-		if (!kCurrentContext::$ks)
+		if (!kCurrentContext::$ks || (kCurrentContext::getCurrentPartnerId() == Partner::MEDIA_SERVER_PARTNER_ID))
 		{
 			kEntitlementUtils::initEntitlementEnforcement(null, false);
 			$entry = kCurrentContext::initPartnerByEntryId($entryId);

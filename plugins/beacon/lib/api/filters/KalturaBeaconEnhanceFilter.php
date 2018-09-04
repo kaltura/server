@@ -34,7 +34,7 @@ class KalturaBeaconEnhanceFilter extends KalturaFilter
 		
 		$searchQuery = array();
 		$searchQuery['body']['query']['bool']['must'] = $queryJsonObject['query'];
-		$searchQuery['body']['query']['bool']['filter']['term'] = array ("partnerId" => kCurrentContext::getCurrentPartnerId());
+		$searchQuery['body']['query']['bool']['filter']['term'] = array ("partner_id" => kCurrentContext::getCurrentPartnerId());
 		$searchQuery[elasticClient::ELASTIC_INDEX_KEY] = kBeacon::ELASTIC_BEACONS_INDEX_NAME;
 		$searchQuery[kESearchQueryManager::BODY_KEY][elasticClient::ELASTIC_SIZE_KEY] = $pager->pageSize;
 		$searchQuery[kESearchQueryManager::BODY_KEY][elasticClient::ELASTIC_FROM_KEY] = $pager->calcOffset();

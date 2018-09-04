@@ -67,12 +67,9 @@ class kESearchHistoryManager implements kESearchSearchHistoryInfoEventConsumer
 			ESearchHistoryFieldName::PARTNER_ID => $eSearchSearchHistoryInfo->getPartnerId(),
 			ESearchHistoryFieldName::SEARCHED_OBJECT => $eSearchSearchHistoryInfo->getSearchedObject(),
 			//ESearchHistoryFieldName::SEARCH_TERM is created using split filter in logstash
-			ESearchHistoryFieldName::SEARCH_TERM_COMPLETION => array(
-				self::INPUT_KEY => $eSearchSearchHistoryInfo->getSearchTerms(),
-				self::WEIGHT_KEY => searchHistoryUtils::getWeightFromTimestamp($eSearchSearchHistoryInfo->getTimestamp())
-			),
+			ESearchHistoryFieldName::SEARCH_TERM => $eSearchSearchHistoryInfo->getSearchTerms(),
 			ESearchHistoryFieldName::KUSER_ID => $eSearchSearchHistoryInfo->getKUserId(),
-			ESearchHistoryFieldName::PID_UID_CONTEXT_OBJECT => $eSearchSearchHistoryInfo->getPidUidContextObject(),
+			ESearchHistoryFieldName::PID_UID_CONTEXT => $eSearchSearchHistoryInfo->getPidUidContext(),
 			ESearchHistoryFieldName::TIMESTAMP => $eSearchSearchHistoryInfo->getTimestamp(),
 			ESearchHistoryFieldName::SEARCH_CONTEXT => $eSearchSearchHistoryInfo->getSearchContextArray()
 		);

@@ -30,10 +30,8 @@ thai = 150
 
 [search_history]
 disableHistoryIndexing = false
-completionSize = 5
+completionListSize = 100
 emptyTermListSize = 500
-elasticHost = @SEARCH_HISTORY_ELASTIC_HOST@
-elasticPort = @SEARCH_HISTORY_ELASTIC_PORT@
 
 [search_history_collect_objects]
 0 = @OBJECT_NAME@

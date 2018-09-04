@@ -90,11 +90,16 @@ class UploadTokenService extends KalturaBaseService
 		if (is_null($uploadTokenDb))
 			throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_NOT_FOUND);
 
-		// if the token was generated on another datacenter, proxy the upload action there
-		$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
-		if($remoteDCHost)
+		// dont dump an upload to the other DC if it's the first uploaded chunk
+		// optimizes cases where an upload token is created in one DC and the uploads go to the other
+		if ($uploadTokenDb->getStatus() != UploadToken::UPLOAD_TOKEN_PENDING)
 		{
-			kFileUtils::dumpApiRequest($remoteDCHost);
+			// if the token was already used for upload on another datacenter, proxy the upload action there
+			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
+			if($remoteDCHost)
+			{
+				kFileUtils::dumpApiRequest($remoteDCHost);
+			}
 		}
 
 		$uploadTokenMgr = new kUploadTokenMgr($uploadTokenDb, $finalChunk);

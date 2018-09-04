@@ -74,7 +74,7 @@ class QuizUserEntry extends UserEntry{
 			$totalPoints += $totalForQuestion;
 			$userPoints += $userPointsForQuestion;
 		}
-		$score = $totalPoints?($userPoints/$totalPoints):0;
+		$score = $totalPoints?($userPoints/$totalPoints):1;
 		return array( $score, $numOfCorrectAnswers );
 	}
 

@@ -7,6 +7,7 @@ class ESearchHistoryFilter extends ESearchBaseFilter
 {
 
 	const DEFAULT_SUGGEST_SIZE = 5;
+	const STARTS_WITH_PAGE_SIZE = 100;
 	const DEFAULT_LIST_SIZE = 500;
 	const SUGGEST_SEARCH_HISTORY = 'suggest_search_history';
 
@@ -69,78 +70,29 @@ class ESearchHistoryFilter extends ESearchBaseFilter
 		{
 			throw new kESearchHistoryException('Invalid userId', kESearchHistoryException::INVALID_USER_ID);
 		}
+		$pageSize = isset($searchHistoryConfig['emptyTermListSize']) ? $searchHistoryConfig['emptyTermListSize'] : self::DEFAULT_LIST_SIZE;
 
+		$boolQuery = new kESearchBoolQuery();
+		$pidUidContext = searchHistoryUtils::formatPartnerIdUserIdContext($partnerId, $kuserId, searchHistoryUtils::getSearchContext());
+		$pidUidContextQuery = new kESearchTermQuery(ESearchHistoryFieldName::PID_UID_CONTEXT, $pidUidContext);
+		$boolQuery->addToFilter($pidUidContextQuery);
 		if ($this->getSearchTermStartsWith())
 		{
-			$suggest = new kESearchContextCompletionSuggestQuery();
-			$suggest->setPrefix(elasticSearchUtils::formatSearchTerm($this->searchTermStartsWith));
-			$suggest->setField(ESearchHistoryFieldName::SEARCH_TERM_COMPLETION);
-			$completionSize = isset($searchHistoryConfig['completionSize']) ? $searchHistoryConfig['completionSize'] : self::DEFAULT_SUGGEST_SIZE;
-			$suggest->setSize($completionSize);
-			$suggest->setSkipDuplicates(true);
-			$suggest->setSuggestName(self::SUGGEST_SEARCH_HISTORY);
-			$this->addContextsToSuggester($suggest, $partnerId, $kuserId);
-			$this->query = $suggest->getFinalQuery();
+			$searchTermStartsWithQuery = new kESearchPrefixQuery(ESearchHistoryFieldName::SEARCH_TERM, elasticSearchUtils::formatSearchTerm($this->getSearchTermStartsWith()));
+			$boolQuery->addToFilter($searchTermStartsWithQuery);
+			$pageSize = isset($searchHistoryConfig['completionListSize']) ? $searchHistoryConfig['completionListSize'] : self::STARTS_WITH_PAGE_SIZE;
 		}
-		else
-		{
-			$boolQuery = new kESearchBoolQuery();
-			$partnerTerm = new kESearchTermQuery(ESearchHistoryFieldName::PARTNER_ID, $partnerId);
-			$boolQuery->addToFilter($partnerTerm);
-			$kuserTerm = new kESearchTermQuery(ESearchHistoryFieldName::KUSER_ID, $kuserId);
-			$boolQuery->addToFilter($kuserTerm);
-			$searchContextTerm = new kESearchTermQuery(ESearchHistoryFieldName::SEARCH_CONTEXT, searchHistoryUtils::getSearchContext());
-			$boolQuery->addToFilter($searchContextTerm);
-			if($this->searchedObjectIn)
-			{
-				$searchedObjects = $this->getSearchedObjectsArray();
-				$searchObjectsQuery = new kESearchTermsQuery(ESearchHistoryFieldName::SEARCHED_OBJECT, $searchedObjects);
-				$boolQuery->addToFilter($searchObjectsQuery);
-			}
-
-			$this->query[kESearchQueryManager::QUERY_KEY] = $boolQuery->getFinalQuery();
-			$this->query[kESearchQueryManager::SORT_KEY] = array(ESearchHistoryFieldName::TIMESTAMP => array(kESearchQueryManager::ORDER_KEY => ESearchSortOrder::ORDER_BY_DESC));
-			$this->query[kESearchQueryManager::FROM_KEY] = 0;
-			$this->query[kESearchQueryManager::SIZE_KEY] = isset($searchHistoryConfig['emptyTermListSize']) ? $searchHistoryConfig['emptyTermListSize'] : self::DEFAULT_LIST_SIZE;
-		}
-	}
-
-	protected function addContextsToSuggester(&$suggest, $partnerId, $kuserId)
-	{
-		$searchContext = searchHistoryUtils::getSearchContext();
-		$monthBoostMap = searchHistoryUtils::getBoostMap();
-		if ($this->getSearchedObjectIn())
+		if($this->searchedObjectIn)
 		{
 			$searchedObjects = $this->getSearchedObjectsArray();
-			foreach ($searchedObjects as $searchedObject)
-			{
-				$this->addSearchContexts($suggest, $monthBoostMap, $partnerId, $kuserId, $searchContext, $searchedObject);
-			}
+			$searchObjectsQuery = new kESearchTermsQuery(ESearchHistoryFieldName::SEARCHED_OBJECT, $searchedObjects);
+			$boolQuery->addToFilter($searchObjectsQuery);
 		}
-		else
-		{
-			$this->addSearchContexts($suggest, $monthBoostMap, $partnerId, $kuserId, $searchContext);
-		}
-	}
 
-	protected function addSearchContexts(&$suggest, $monthBoostMap, $partnerId, $kuserId, $searchContext, $searchedObject = null)
-	{
-		foreach ($monthBoostMap as $month => $boost)
-		{
-			$context = new kESearchSuggestContext();
-			$context->setName(ESearchHistoryFieldName::CONTEXT_CATEGORY);
-			if ($searchedObject)
-			{
-				$value = searchHistoryUtils::formatMonthPartnerIdUserIdContextObject($month, $partnerId, $kuserId, $searchContext, $searchedObject);
-			}
-			else
-			{
-				$value = searchHistoryUtils::formatMonthPartnerIdUserIdContext($month, $partnerId, $kuserId, $searchContext);
-			}
-			$context->setValue(strtolower($value));
-			$context->setBoost($boost);
-			$suggest->addContext($context);
-		}
+		$this->query[kESearchQueryManager::QUERY_KEY] = $boolQuery->getFinalQuery();
+		$this->query[kESearchQueryManager::SORT_KEY] = array(ESearchHistoryFieldName::TIMESTAMP => array(kESearchQueryManager::ORDER_KEY => ESearchSortOrder::ORDER_BY_DESC));
+		$this->query[kESearchQueryManager::FROM_KEY] = 0;
+		$this->query[kESearchQueryManager::SIZE_KEY] = $pageSize;
 	}
 
 	protected function getSearchedObjectsArray()

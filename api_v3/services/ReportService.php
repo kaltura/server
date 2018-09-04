@@ -145,9 +145,27 @@ class ReportService extends KalturaBaseService
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
 		
 		$reportTable = new KalturaReportTable();
+
+		// Temporary hack to allow admin console to request a report for any partner
+		//	can remove once moving to Kava
+		$partnerId = $this->getPartnerId();
+		if ($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID && $objectIds && ctype_digit($objectIds))
+		{
+			$partnerReports = array(
+				KalturaReportType::VAR_USAGE,
+				KalturaReportType::VPAAS_USAGE,
+				KalturaReportType::ENTRY_USAGE,
+				KalturaReportType::PARTNER_USAGE,
+			);
+
+			if (in_array($reportType, $partnerReports))
+			{
+				$partnerId = $objectIds;
+			}
+		}
 		
 		list ( $header , $data , $totalCount ) = kKavaReportsMgr::getTable(
-		    $this->getPartnerId() ,
+		    $partnerId ,
 		    $reportType ,
 		    $reportInputFilter->toReportsInputFilter() ,
 		    $pager->pageSize , $pager->pageIndex ,

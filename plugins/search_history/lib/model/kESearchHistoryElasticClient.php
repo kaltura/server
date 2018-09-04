@@ -10,19 +10,16 @@ class kESearchHistoryElasticClient
 	const TYPE_KEY = 'type';
 	const BODY_KEY = 'body';
 	const QUERY_KEY = 'query';
+	const ACTION_KEY = '_action';
+	const DELETE_KEY = 'delete';
+	const IDS_TO_DELETE = 'ids_to_delete';
+	const MAX_SEARCH_TERMS_TO_DELETE = 1000;
 
 	protected $client;
 
 	public function __construct()
 	{
-		$searchHistoryConfig = kConf::get('search_history', 'elastic', array());
-		if (!isset($searchHistoryConfig['elasticHost']) || !isset($searchHistoryConfig['elasticPort']))
-		{
-			throw new kESearchHistoryException('Missing mandatory config', kESearchHistoryException::INTERNAL_SERVER_ERROR);
-		}
-		$elasticHost = $searchHistoryConfig['elasticHost'];
-		$elasticPort = $searchHistoryConfig['elasticPort'];
-		$this->client = new elasticClient($elasticHost, $elasticPort);
+		$this->client = new elasticClient();
 	}
 
 	public function deleteSearchTermForUser($searchTerm)
@@ -47,11 +44,34 @@ class kESearchHistoryElasticClient
 			self::INDEX_KEY => ESearchHistoryIndexMap::SEARCH_HISTORY_SEARCH_ALIAS,
 			self::TYPE_KEY => ESearchHistoryIndexMap::SEARCH_HISTORY_TYPE,
 			self::BODY_KEY => array(
+				kESearchQueryManager::FROM_KEY => 0,
+				kESearchQueryManager::SIZE_KEY => self::MAX_SEARCH_TERMS_TO_DELETE,
 				self::QUERY_KEY => $deleteByQuery->getFinalQuery()
 			)
 		);
 
-		$this->client->deleteByQuery($query);
+		$result = $this->client->search($query, true);
+		$ids = kESearchHistoryCoreAdapter::getIdsToDeleteFromHitsResults($result);
+		if (!$ids)
+			return;
+
+		$body = array(
+			self::ACTION_KEY => self::DELETE_KEY,
+			'_'.self::TYPE_KEY => ESearchHistoryIndexMap::SEARCH_HISTORY_TYPE,
+			self::IDS_TO_DELETE => $ids
+		);
+		$document = json_encode($body);
+		try
+		{
+			$constructorArgs['exchangeName'] = kESearchHistoryManager::HISTORY_EXCHANGE_NAME;
+			$queueProvider = QueueProvider::getInstance(null, $constructorArgs);
+			$queueProvider->send(kESearchHistoryManager::HISTORY_QUEUE_NAME, $document);
+		}
+		catch (Exception $e)
+		{
+			//don't fail the request, just log
+			KalturaLog::err("cannot connect to rabbit");
+		}
 	}
 
 	public function searchRecentForUser($queryBody)
