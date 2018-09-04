@@ -50,4 +50,6 @@ class MetadataErrors extends KalturaErrors
 	const METADATA_NO_PERMISSION_ON_ENTRY = "METADATA_NO_PERMISSION_ON_ENTRY;ID;No permissions to add metadata for entry [@ID@]";
 
 	const METADATA_PROFILE_NOT_SPECIFIED = "METADATA_PROFILE_NOT_SPECIFIED;;Metadata Profile need to be specified";
+	
+	const METADATA_OBJECT_ID_NOT_FOUND = "METADATA_OBJECT_ID_NOT_FOUND;ID;Object Id [@ID@], not found";
 }
