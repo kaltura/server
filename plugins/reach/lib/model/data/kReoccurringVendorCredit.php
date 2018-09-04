@@ -84,7 +84,7 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 		}
 		$this->periodStartDate = kReachUtils::reachStrToTime("today", $startTime);
 		$this->periodEndDate = min($endTime, $this->getToDate());
-		$this->periodEndDate = kReachUtils::reachStrToTime("tomorrow", $this->periodEndDate) -1 ;
+		$this->periodEndDate = kReachUtils::reachStrToTime("tomorrow", kReachUtils::reachStrToTime("-1 day", $this->periodEndDate)) -1;
 	}
 
 	public function setPeriodDates()
