@@ -14,9 +14,10 @@ interface kVendorOauth
 
 	/**
 	 * @param string $oldRefreshToken
+	 * @param VendorIntegration $vendorIntegration
 	 * @return string newAccessToken
 	 */
-	function refreshTokens($oldRefreshToken);
+	function refreshTokens($oldRefreshToken, $vendorIntegration);
 
 
 }
