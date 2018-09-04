@@ -7,9 +7,10 @@ interface kVendorOauth
 {
 
 	/**
+	 * @param bool $forceNewToken
 	 * @return mixed
 	 */
-	function retrieveTokensData();
+	function retrieveTokensData($forceNewToken = false);
 
 	/**
 	 * @param string $oldRefreshToken

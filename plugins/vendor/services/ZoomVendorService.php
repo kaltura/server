@@ -170,7 +170,7 @@ class ZoomVendorService extends KalturaBaseService
 		$zoomAuth = new kZoomOauth();
 		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
 		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
-		$tokens = $zoomAuth->retrieveTokensData();
+		$tokens = $zoomAuth->retrieveTokensData(true);
 		$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
 		$curlWrapper = new KCurlWrapper();
 		$url = $zoomBaseURL . '/v2/users/me/permissions?' . 'access_token=' . $accessToken;

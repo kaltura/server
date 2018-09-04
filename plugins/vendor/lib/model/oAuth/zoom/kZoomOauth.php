@@ -35,16 +35,17 @@ class kZoomOauth implements kVendorOauth
 	}
 
 	/**
+	 * @param bool $forceNewToken
 	 * @return array
 	 * @throws Exception
 	 */
-	public function retrieveTokensData()
+	public function retrieveTokensData($forceNewToken = false)
 	{
 		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
 		$clientId = $zoomConfiguration['clientId'];
 		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
 		$zoomClientData = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($clientId, VendorTypeEnum::ZOOM_CONFIGURATION);
-		if ($zoomClientData) // tokens exist
+		if ($zoomClientData && !$forceNewToken) // tokens exist
 		{
 			if (time() > $zoomClientData->getExpiresIn()) // token had expired -> refresh
 			 	return $this->refreshTokens($zoomClientData->getRefreshToken());
