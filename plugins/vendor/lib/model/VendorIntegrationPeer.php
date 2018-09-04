@@ -38,7 +38,7 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 	 * @return VendorIntegration
 	 * @throws PropelException
 	 */
-	public static function retrieveSingleVendor($accountID, $vendorType)
+	public static function retrieveSingleVendorPerAccountAndType($accountID, $vendorType)
 	{
 		$c = new Criteria();
 		$c->add(VendorIntegrationPeer::ACCOUNT_ID, $accountID);

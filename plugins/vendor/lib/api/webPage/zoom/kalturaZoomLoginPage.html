@@ -54,17 +54,11 @@
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script>
-        var encryption = {
-            enc : '@encryptData@',
-            iv : '@iv@'
-        }
-    </script>
-    <script>
         function onLoginSuccess(redirectUrl, res) {
             $.ajax({
                 url: redirectUrl,
                 type: "post",
-                data: {"ks": res, "data": encryption.enc, "iv": encryption.iv},
+                data: {"ks": res},
                 success: function (registrationPage) {
                     $("body").css("cursor", "default");
                     if (registrationPage) {

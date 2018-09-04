@@ -12,19 +12,11 @@ class kZoomOauth implements kVendorOauth
 	const EXPIRES_IN = 'expires_in';
 	const SCOPE = 'scope';
 
-	/**
-	 * @param string $response
-	 * @return array<tokens>
-	 */
-	public function extractTokensFromResponse($response)
-	{
-		$dataArray = json_decode($response, true);
-		return array(self::ACCESS_TOKEN => $dataArray[self::ACCESS_TOKEN], self::REFRESH_TOKEN => $dataArray[self::REFRESH_TOKEN]);
-	}
+
 
 	/**
 	 * @param string $oldRefreshToken
-	 * @return string newAccessToken
+	 * @return array
 	 * @throws Exception
 	 */
 	public function refreshTokens($oldRefreshToken)
@@ -36,12 +28,14 @@ class kZoomOauth implements kVendorOauth
 		$header = array('Content-Type:application/x-www-form-urlencoded');
 		$userPwd = "$clientId:$clientSecret";
 		$postFields = "grant_type=refresh_token&refresh_token=$oldRefreshToken";
-		$response = $this->curlRetrieveData($zoomBaseURL, $userPwd, $header, $postFields);
-		return $response;
+		$response = $this->curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
+		$tokensData = $this->parseTokens($response);
+		$this->saveNewTokenDataToZoom($tokensData, $clientId);
+		return $tokensData;
 	}
 
 	/**
-	 * @return mixed
+	 * @return array
 	 * @throws Exception
 	 */
 	public function retrieveTokensData()
@@ -49,13 +43,23 @@ class kZoomOauth implements kVendorOauth
 		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
 		$clientId = $zoomConfiguration['clientId'];
 		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
+		$zoomClientData = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($clientId, VendorTypeEnum::ZOOM_CONFIGURATION);
+		if ($zoomClientData) // tokens exist
+		{
+			if (time() > $zoomClientData->getExpiresIn()) // token had expired -> refresh
+			 	return $this->refreshTokens($zoomClientData->getRefreshToken());
+			return array(self::ACCESS_TOKEN => $zoomClientData->getAccessToken(), self::REFRESH_TOKEN => $zoomClientData->getRefreshToken(),
+				self::EXPIRES_IN => $zoomClientData->getExpiresIn());
+		}
 		$redirectUrl = $zoomConfiguration['redirectUrl'];
 		$clientSecret = $zoomConfiguration['clientSecret'];
 		$header = array('Content-Type:application/x-www-form-urlencoded');
 		$userPwd = "$clientId:$clientSecret";
 		$postFields = "grant_type=authorization_code&code={$_GET['code']}&redirect_uri=$redirectUrl";
-		$response = $this->curlRetrieveData($zoomBaseURL, $userPwd, $header, $postFields);
-		return $response;
+		$response = $this->curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
+		$tokensData = $this->parseTokens($response);
+		$this->saveNewTokenDataToZoom($tokensData, $clientId);
+		return $tokensData;
 	}
 
 	/**
@@ -66,7 +70,7 @@ class kZoomOauth implements kVendorOauth
 	 * @return mixed|string
 	 * @throws Exception
 	 */
-	private function curlRetrieveData($url, $userPwd, $header, $postFields)
+	private function curlRetrieveTokensData($url, $userPwd, $header, $postFields)
 	{
 		KalturaLog::info('Calling zoom auth');
 		$curlWrapper = new KCurlWrapper();
@@ -77,13 +81,59 @@ class kZoomOauth implements kVendorOauth
 		$curlWrapper->setOpt(CURLOPT_POSTFIELDS, $postFields);
 		$response = $curlWrapper->exec($url . self::OAUTH_TOKEN_PATH);
 		$httpCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
-		//if ($httpCode === 400 || $httpCode === 401)
-		//	$response = $this->refreshTokens();
 		if (!$response || $httpCode !== 200 || $curlWrapper->getError())
 		{
 			KalturaLog::err('Zoom Curl returned error, Tokens were not received, Error: ' . $curlWrapper->getError());
 			KExternalErrors::dieGracefully();
 		}
 		return $response;
+	}
+
+	/**
+	 * @param array $data
+	 * @return array
+	 */
+	private function setValidUntil($data)
+	{
+		$expiresIn = $data[self::EXPIRES_IN];
+		$data[self::EXPIRES_IN] = time() + $expiresIn - 120;
+		return $data;
+	}
+
+	/**
+	 * @param array $data
+	 * @return array<tokens>
+	 */
+	private function extractTokensFromResponse($data)
+	{
+		return array(self::ACCESS_TOKEN => $data[self::ACCESS_TOKEN], self::REFRESH_TOKEN => $data[self::REFRESH_TOKEN],
+			self::EXPIRES_IN => $data[self::EXPIRES_IN]);
+	}
+
+	/**
+	 * @param $dataAsArray
+	 * @param $clientId
+	 * @throws PropelException
+	 */
+	private function saveNewTokenDataToZoom($dataAsArray, $clientId)
+	{
+		$zoomClientConfiguration = new VendorIntegration();
+		$zoomClientConfiguration->setExpiresIn($dataAsArray[self::EXPIRES_IN]);
+		$zoomClientConfiguration->setAccessToken($dataAsArray[self::ACCESS_TOKEN]);
+		$zoomClientConfiguration->setRefreshToken($dataAsArray[self::REFRESH_TOKEN]);
+		$zoomClientConfiguration->setAccountId($clientId);
+		$zoomClientConfiguration->setVendorType(VendorTypeEnum::ZOOM_CONFIGURATION);
+		$zoomClientConfiguration->save();
+	}
+
+	/**
+	 * @param $response
+	 * @return array
+	 */
+	private function parseTokens($response)
+	{
+		$dataAsArray = json_decode($response, true);
+		$dataAsArray = $this->setValidUntil($dataAsArray);
+		return $this->extractTokensFromResponse($dataAsArray);
 	}
 }

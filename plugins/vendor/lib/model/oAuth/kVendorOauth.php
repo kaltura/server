@@ -12,12 +12,6 @@ interface kVendorOauth
 	function retrieveTokensData();
 
 	/**
-	 * @param string $response
-	 * @return array<tokens>
-	 */
-	function extractTokensFromResponse($response);
-
-	/**
 	 * @param string $oldRefreshToken
 	 * @return string newAccessToken
 	 */

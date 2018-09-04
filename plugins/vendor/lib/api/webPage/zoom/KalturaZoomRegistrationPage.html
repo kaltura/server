@@ -63,10 +63,6 @@
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script>
-        var encryption = {
-            enc : '@encryptData@',
-            iv : '@iv@'
-        };
         var ks = '@ks@';
         var url = '@BaseServiceUrl@/api_v3/service/vendor_zoomvendor/action/submitRegistration';
     </script>
@@ -84,7 +80,7 @@
                 url : url,
                 type : "post",
                 data: {"ks": ks, "defaultUserId": defaultUserId, "uploadEnabled": enableUpload, "zoomCategory" : zoomCategory
-                    , "tokenData": encryption.enc, "iv": encryption.iv, "format": 1},
+                   , "format": 1},
                 success : function(res) {
                     $("body").css("cursor", "default");
                     console.log(res);
