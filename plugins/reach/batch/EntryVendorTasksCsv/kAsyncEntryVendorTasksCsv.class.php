@@ -156,7 +156,7 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 	 */
 	private function addHeaderRowToCsv($csvFile)
 	{
-		$headerRow = 'Task id,vendorPartnerId,createdAt,updatedAt,queueTime,finishTime,entryId,status,reachProfileId,catalogItemId,turnaroundTime,price,userId,moderatingUser,errDescription,notes,version,context,accuracy,outputObjectId,partnerData';
+		$headerRow = 'Task id,createdAt,finishTime,entryId,status,reachProfileId,turnaroundTime,serviceType,serviceFeature,price,userId,moderatingUser,errDescription,notes,accuracy,context,partnerData';
 		fputcsv($csvFile, explode(',', $headerRow));
 		return $csvFile;
 	}
@@ -192,26 +192,22 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		
 		$defaultRowValues = array(
 			'Task id' => $entryVendorTask->id,
-			'vendorPartnerId' => $entryVendorTask->vendorPartnerId,
 			'createdAt' => $this->getHumanReadbaleDate($entryVendorTask->createdAt),
-			'updatedAt' => $this->getHumanReadbaleDate($entryVendorTask->updatedAt),
-			'queueTime' => $this->getHumanReadbaleDate($entryVendorTask->queueTime),
 			'finishTime' => $this->getHumanReadbaleDate($entryVendorTask->finishTime),
 			'entryId' => $entryVendorTask->entryId,
 			'status' => $this->translateStatusToHumanReadable($entryVendorTask->status),
 			'reachProfileId' => $entryVendorTask->reachProfileId,
-			'catalogItemId' => $entryVendorTask->catalogItemId,
 			'turnaroundTime' => $catalogItemData ? $catalogItemData["TAT"] : null,
+			'serviceType' => $catalogItemData ? $catalogItemData["serviceType"] : null,
+			'serviceFeature' => $catalogItemData ? $catalogItemData["serviceFeature"] : null,
 			'price' => $entryVendorTask->price,
 			'userId' => $entryVendorTask->userId,
 			'moderatingUser' => $entryVendorTask->moderatingUser,
 			'errDescription' => $entryVendorTask->errDescription,
 			'notes' => $entryVendorTask->notes,
-			'version' => $entryVendorTask->version,
-			'context' => $entryVendorTask->context,
 			'accuracy' => $entryVendorTask->accuracy,
-			'outputObjectId' => $entryVendorTask->outputObjectId,
-			'partnerData' => $entryVendorTask->partnerData
+			'context' => $entryVendorTask->context,
+			'partnerData' => $entryVendorTask->partnerDatacontext
 		);
 
 		$entryVendorTaskIdToRow[$entryVendorTask->id] = $defaultRowValues;
@@ -244,7 +240,11 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		if(!$vendorCatalogItem)
 			return null;
 		
-		$catalogItemInfo = array("TAT" => $vendorCatalogItem->turnAroundTime);
+		$catalogItemInfo = array(
+			"TAT" => $vendorCatalogItem->turnAroundTime,
+			"serviceType" => $vendorCatalogItem->serviceType,
+			"serviceFeature" => $vendorCatalogItem->serviceFeature
+		);
 		self::$catalogItemData[$id] = $catalogItemInfo;
 		return $catalogItemInfo;
 	}
