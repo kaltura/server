@@ -30,6 +30,14 @@
             width: auto;
         }
 
+        p.error {
+            background-color: #ccc;
+            color: rgba(202, 22, 40, 0.59);
+            border: 1px solid #ccc;
+            font-weight: bold;
+            font-size: large;
+        }
+
         /* Add a hover effect for buttons */
         button:hover {
             opacity: 0.8;
@@ -91,9 +99,9 @@
             var email = $emailField.val();
             var pwd = $passwordField.val();
             var partnerId = $partnerId.val();
-            if(partnerId == null || partnerId === '')
+            if(partnerId == null || partnerId === '' || partnerId === 0)
             {
-                alert('partnerId cannot be empty');
+                $('#loginError').show();
                 $("body").css("cursor", "default");
                 return false;
             }
@@ -104,14 +112,15 @@
                 data: { "loginId" : email, "password" : pwd, "partnerId" : partnerId, "format" : 1},
                 success : function(res) {
                     if(res.code){
-                        alert(res.code);
+                        $('#loginError').show();
                     }
                     else {
                         onLoginSuccess(redirectUrl, res);
                     }
                 },
                 error: function() {
-                    console.log('err during api call');
+                    console.log('err during api call,please check server');
+                    $('#loginError').show();
                     $("body").css("cursor", "default");
                 }
             });
@@ -139,6 +148,8 @@
         <label for="partnerId"><b>Partner ID</b></label>
         <input type="number" placeholder="Enter Partner ID" id="partnerId" name="partnerId" required>
         <button type="submit" class="submit-button">Login</button>
+        <p id="loginError" class="error" style="display:none">Login Process Failed!  <br> Check User, password and partnerID. <br>
+            Partner id  must be greater than Zero.</p>
     </div>
 </form>
 </html>

@@ -39,6 +39,21 @@
             width: auto;
         }
 
+        p.success {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+            font-size: large;
+        }
+
+        p.error {
+            background-color: #ccc;
+            color: rgba(202, 22, 40, 0.59);
+            border: 1px solid #ccc;
+            font-weight: bold;
+            font-size: large;
+        }
+
         /* Add a hover effect for buttons */
         button:hover {
             opacity: 0.8;
@@ -86,10 +101,12 @@
                     $("body").css("cursor", "default");
                     console.log(res);
                     if(res){
-                        alert('Saved Successfully');
+                        $('#submitError').hide();
+                        $('#submitOK').show();
                     }
                     else {
-                        alert('Data was Not Saved , please check the server');
+                        $('#submitOK').hide();
+                        $('#submitError').show();
                     }
                 },
                 error: function() {
@@ -121,6 +138,8 @@
         <label for="enableUpload"><b>Enable Upload</b></label>
         <input type="checkbox" id="enableUpload" name="enableUpload" @checked@ required>
         <button type="submit" class="submit-button">Submit</button>
+        <p id="submitError" class="error" style="display:none">Data was Not Saved , please check server logs'.</p>
+        <p id="submitOK" class="success" style="display:none">Saved Successfully</p>
     </div>
 </form>
 </html>
