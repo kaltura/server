@@ -44,7 +44,7 @@ else
 }
 
 if(!file_exists($outputPathBase))
-	mkdir($outputPathBase, 0755, true);
+	kfilebase::kMkDir($outputPathBase, 0755, true);
 
 $xmlFileName = "$outputPathBase/KalturaClient.xml";
 
@@ -53,6 +53,6 @@ $xmlGenerator = new XmlClientGenerator();
 $xmlGenerator->generate();
 
 $files = $xmlGenerator->getOutputFiles();
-file_put_contents($xmlFileName, $files["KalturaClient.xml"]);
+kfilebase::kFilePutContents($xmlFileName, $files["KalturaClient.xml"]);
 
 KalturaLog::info("XML generated: $xmlFileName");

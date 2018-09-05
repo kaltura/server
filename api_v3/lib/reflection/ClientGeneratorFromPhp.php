@@ -322,7 +322,7 @@ abstract class ClientGeneratorFromPhp
 		$class = get_class($this);
 		$dir = kConf::get("cache_root_path") . "/generator";
 		if (!is_dir($dir))
-			mkdir($dir, 0777, true);
+			KFileBase::kMkDir($dir, 0777, true);
 			
 		return "$dir/$class.typeClassMap.cache";
 	}
