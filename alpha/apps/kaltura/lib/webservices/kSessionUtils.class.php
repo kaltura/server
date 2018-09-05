@@ -612,7 +612,23 @@ class ks extends kSessionBase
 		
 		return null;
 	}
-	
+
+	public function getSearchContext()
+	{
+		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
+		// edit privilege (edit:XX,edit:YYY,...)
+		$allPrivileges = explode(',', $this->privileges);
+
+		foreach($allPrivileges as $priv)
+		{
+			$exPrivileges = explode(':', $priv, 2);
+			if (count($exPrivileges) == 2 && $exPrivileges[0] == self::PRIVILEGE_SEARCH_CONTEXT)
+				return $exPrivileges[1];
+		}
+
+		return null;
+	}
+
 	public function getLimitEntry()
 	{
 		return $this->getPrivilegeValue(self::PRIVILEGE_LIMIT_ENTRY, null);
@@ -748,4 +764,23 @@ class ks extends kSessionBase
 	{
 		invalidSessionPeer::invalidateKs($this);
 	}
+
+
+	public static function retrieveAllowedAppSessionPrivileges($privilegesArray, $appSessionPrivileges)
+	{
+		$allowedAppSessionPrivileges = array();
+		$serverPrivileges = kSessionBase::getServerPrivileges();
+		$privilegesKeys = array_map('trim', array_keys($privilegesArray));
+		$forbidenSessionPrivileges = array_merge_recursive($serverPrivileges , $privilegesKeys);
+
+		// allow adding privileges to app token only if they are not in use by the server and were not set on the original app token
+		foreach($appSessionPrivileges as $privilegeName => $privilegeValue)
+		{
+			if(!in_array(trim($privilegeName), $forbidenSessionPrivileges))
+				$allowedAppSessionPrivileges[$privilegeName] = $privilegeValue;
+		}
+
+		return $allowedAppSessionPrivileges;
+	}
+
 }

@@ -124,4 +124,10 @@ class kEntrySearch extends kBaseSearch
     {
         return self::PEER_RETRIEVE_FUNCTION_NAME;
     }
+
+    public function getElasticTypeName()
+    {
+        return ElasticIndexMap::ELASTIC_ENTRY_TYPE;
+    }
+
 }

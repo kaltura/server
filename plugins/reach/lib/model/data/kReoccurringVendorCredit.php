@@ -69,6 +69,7 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 			$this->calculateNextPeriodDates( $this->periodEndDate, $this->getLastSyncTime());
 			$this->setSyncedCredit($syncedCredit);
 			$this->overageCredit = $this->initialOverageCredit;
+			$this->addOn = 0;
 		}
 		return $syncedCredit;
 	}
@@ -83,7 +84,7 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 		}
 		$this->periodStartDate = kReachUtils::reachStrToTime("today", $startTime);
 		$this->periodEndDate = min($endTime, $this->getToDate());
-		$this->periodEndDate = kReachUtils::reachStrToTime("tomorrow", $this->periodEndDate) -1 ;
+		$this->periodEndDate = kReachUtils::reachStrToTime("tomorrow", kReachUtils::reachStrToTime("-1 day", $this->periodEndDate)) -1;
 	}
 
 	public function setPeriodDates()
@@ -109,6 +110,9 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 		$credit = $this->credit;
 		if ($this->overageCredit)
 			$credit += $this->overageCredit;
+
+		if($this->addOn)
+			$credit += $this->addOn;
 
 		return $credit;
 	}

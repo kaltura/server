@@ -20,6 +20,10 @@ class ESearchMetadataItem extends ESearchNestedObjectItem
 		ESearchMetadataFieldName::VALUE_INT => 100,
 	);
 
+	protected static $searchHistoryFields = array(
+		ESearchMetadataFieldName::VALUE_TEXT
+	);
+
 	/**
 	 * @var string
 	 */

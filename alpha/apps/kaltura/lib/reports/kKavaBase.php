@@ -40,6 +40,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_STATUS = 'status';
 	const DIMENSION_SERVICE_TYPE = 'serviceType';
 	const DIMENSION_SERVICE_FEATURE = 'serviceFeature';
+	const DIMENSION_TURNAROUND_TIME = 'turnaroundTime';
 	const DIMENSION_REACH_PROFILE_ID = 'reachProfileId';
 
 	// metrics
