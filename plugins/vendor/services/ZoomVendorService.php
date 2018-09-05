@@ -80,7 +80,7 @@ class ZoomVendorService extends KalturaBaseService
 		$iv = base64_decode($iv);
 		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
 		$verificationToken = $zoomConfiguration['verificationToken'];
-		$tokens = aESHelper::aesDecrypt($verificationToken, $tokensData, $iv);
+		$tokens = AESOauthZoom::aesDecrypt($verificationToken, $tokensData, $iv);
 		$tokens = json_decode($tokens, true);
 		$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
 		$retrieveDataFromZoom = new RetrieveDataFromZoom();
@@ -180,7 +180,7 @@ class ZoomVendorService extends KalturaBaseService
 			$tokensString = json_encode($tokens);
 			$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
 			$verificationToken = $zoomConfiguration['verificationToken'];
-			list($enc, $iv) = aESHelper::aesEncrypt($verificationToken, $tokensString);
+			list($enc, $iv) = AESOauthZoom::aesEncrypt($verificationToken, $tokensString);
 			$page = str_replace('@BaseServiceUrl@', requestUtils::getHost(), $page);
 			$page = str_replace('@encryptData@', base64_encode($enc), $page);
 			$page = str_replace('@iv@', base64_encode($iv), $page);

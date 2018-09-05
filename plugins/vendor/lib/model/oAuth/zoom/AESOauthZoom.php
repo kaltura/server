@@ -4,7 +4,7 @@
  * @subpackage model.zoomOauth
  */
 
-class aESHelper
+class AESOauthZoom
 {
 	/**
 	 * @param $key
