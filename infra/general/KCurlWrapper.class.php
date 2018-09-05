@@ -666,9 +666,9 @@ class KCurlWrapper
 	{
 	}
 
-	public static function getContent($url, $headers = null)
+	public static function getContent($url, $headers = null, $allowInternalUrl = false)
 	{
-		if (self::isInternalUrl($url) && !self::isWhiteListedInternalUrl($url))
+		if (!$allowInternalUrl && self::isInternalUrl($url) && !self::isWhiteListedInternalUrl($url))
 			KalturaLog::debug("Exec Curl in getContent - Found Internal and not whiteListed url: $url");
 
 		$ch = curl_init();
