@@ -173,7 +173,7 @@ class ConferenceService extends KalturaBaseService {
 
 		if ($serverNodeId)
 		{
-			$serverNode = ServerNodePeer::retrieveByPK($confEntryServerNode->getServerNodeId());
+			$serverNode = ServerNodePeer::retrieveByPK($serverNodeId);
 			/** @var ConferenceEntryServerNode $confEntryServerNode */
 			if (!$serverNode)
 			{
