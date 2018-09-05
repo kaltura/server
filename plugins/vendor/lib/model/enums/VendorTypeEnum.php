@@ -5,7 +5,6 @@
  */
 interface VendorTypeEnum extends BaseEnum
 {
-	const ZOOM_CONFIGURATION = 1;
-	const ZOOM_ACCOUNT = 2;
+	const ZOOM_ACCOUNT = 1;
 
 }

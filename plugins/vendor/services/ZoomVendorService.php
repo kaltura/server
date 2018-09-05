@@ -14,6 +14,12 @@ class ZoomVendorService extends KalturaBaseService
 	 * @param string $actionName
 	 * @return bool
 	 */
+	const ACCOUNT_ID = "account_id";
+
+	const USERS_ME = '/v2/users/me';
+
+	const USERS_ME_PERMISSIONS = '/v2/users/me/permissions';
+
 	protected function partnerRequired($actionName)
 	{
 		if ($actionName == 'oauthValidation' || $actionName == 'recordingComplete')
@@ -38,6 +44,7 @@ class ZoomVendorService extends KalturaBaseService
 		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
 		$redirectUrl = $zoomConfiguration['redirectUrl'];
 		$isAdmin = false;
+		$tokens = null;
 		if (!array_key_exists('code', $_GET))
 		{
 			$url = $zoomBaseURL . '/oauth/authorize?' . 'response_type=code' . '&client_id=' . $clientId .  '&redirect_uri=' . $redirectUrl;
@@ -45,30 +52,52 @@ class ZoomVendorService extends KalturaBaseService
 		}
 		else
 		{
-			$permissions = $this->retrieveZoomUserPermissionsAsArray();
+			$dataRetriever = new RetrieveDataFromZoom();
+			list($tokens, $permissions) = $dataRetriever->retrieveZoomDataAsArray(self::USERS_ME_PERMISSIONS, true);
+			list(, $user) = $dataRetriever->retrieveZoomDataAsArray(self::USERS_ME, false, $tokens, null);
+			$accountId = $user[self::ACCOUNT_ID];
+			$this->saveNewTokenData($tokens, $accountId); // table is empty
+			$permissions = $permissions['permissions'];
 			$isAdmin = $this->canConfigureEventSubscription($permissions);
 		}
 		if ($isAdmin)
 		{
-			$this->loadLoginPage();
+			$this->loadLoginPage($tokens);
 		}
 		return false;
 	}
 
 	/**
 	 * @action fetchRegistrationPage
+	 * @param string $tokensData
+	 * @param string $iv
 	 * @return string
 	 * @throws Exception
 	 */
-	public function fetchRegistrationPageAction()
+	public function fetchRegistrationPageAction($tokensData, $iv)
 	{
-		$zoomUserData = $this->retrieveZoomUserDataAsArray();
-		$accountId = $zoomUserData["account_id"];
+		$tokensData = base64_decode($tokensData);
+		$iv = base64_decode($iv);
+		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
+		$verificationToken = $zoomConfiguration['verificationToken'];
+		$tokens = aESHelper::aesDecrypt($verificationToken, $tokensData, $iv);
+		$tokens = json_decode($tokens, true);
+		$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
+		$retrieveDataFromZoom = new RetrieveDataFromZoom();
+		list($tokens,$zoomUserData) = $retrieveDataFromZoom->retrieveZoomDataAsArray(self::USERS_ME, false, $tokens, null) ;
+		$accountId = $zoomUserData[self::ACCOUNT_ID];
+		if ($accessToken !== $tokens[kZoomOauth::ACCESS_TOKEN])
+			$this->saveNewTokenData($tokens, $accountId);
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		$vendorIntegrationPeer = new VendorIntegrationPeer();
-		$zoomIntegration = $vendorIntegrationPeer->retrieveSingleVendorPerPartner($accountId,
-					VendorTypeEnum::ZOOM_ACCOUNT, $partnerId);
-		$this->loadSubmitPage($zoomIntegration);
+		$zoomIntegration = $vendorIntegrationPeer->retrieveSingleVendorPerAccountAndType($accountId,
+					VendorTypeEnum::ZOOM_ACCOUNT);
+		if (intval($partnerId) !== $zoomIntegration->getPartnerId() && $partnerId !== 0)
+		{
+			$zoomIntegration->setPartnerId($partnerId);
+			$zoomIntegration->save();
+		}
+		$this->loadSubmitPage($zoomIntegration, $accountId);
 		return false;
 	}
 
@@ -78,13 +107,12 @@ class ZoomVendorService extends KalturaBaseService
 	 * @param string $defaultUserId
 	 * @param bool $uploadEnabled
 	 * @param string $zoomCategory
+	 * @param string $accountId
 	 * @return string
-	 * @throws Exception
+	 * @throws PropelException
 	 */
-	public function submitRegistrationAction($defaultUserId, $uploadEnabled, $zoomCategory)
+	public function submitRegistrationAction($defaultUserId, $uploadEnabled, $zoomCategory, $accountId)
 	{
-		$zoomUserData = $this->retrieveZoomUserDataAsArray();
-		$accountId = $zoomUserData["account_id"];
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		$vendorIntegrationPeer = new VendorIntegrationPeer();
 		$zoomIntegration = $vendorIntegrationPeer->retrieveSingleVendorPerPartner($accountId,
@@ -141,56 +169,21 @@ class ZoomVendorService extends KalturaBaseService
 	}
 
 	/**
-	 * @return array
+	 * @param array $tokens
 	 * @throws Exception
 	 */
-	private function retrieveZoomUserDataAsArray()
-	{
-		KalturaLog::info('Calling zoom api : get user data');
-		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
-		$zoomOauth = new kZoomOauth();
-		$dataAsArray = $zoomOauth->retrieveTokensData();
-		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
-		$accessToken = $dataAsArray[kZoomOauth::ACCESS_TOKEN];
-		$curlWrapper = new KCurlWrapper();
-		$url = $zoomBaseURL . '/v2/users/me?' . 'access_token=' . $accessToken;
-		$response = $curlWrapper->exec($url);
-		$httpCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
-		$this->handelCurlResponse($response, $httpCode, $curlWrapper);
-		return json_decode($response, true);
-	}
-
-	/**
-	 * @return array
-	 * @throws Exception
-	 */
-	private function retrieveZoomUserPermissionsAsArray()
-	{
-		KalturaLog::info('Calling zoom api : get user permissions');
-		$zoomAuth = new kZoomOauth();
-		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
-		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
-		$tokens = $zoomAuth->retrieveTokensData(true);
-		$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
-		$curlWrapper = new KCurlWrapper();
-		$url = $zoomBaseURL . '/v2/users/me/permissions?' . 'access_token=' . $accessToken;
-		$response = $curlWrapper->exec($url);
-		$httpCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
-		$this->handelCurlResponse($response, $httpCode, $curlWrapper);
-		$data = json_decode($response, true);
-		$permissions = $data['permissions'];
-		return $permissions;
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	private function loadLoginPage()
+	private function loadLoginPage($tokens)
 	{
 		$file_path = dirname(__FILE__) . "/../lib/api/webPage/zoom/kalturaZoomLoginPage.html";
 		if (file_exists($file_path)) {
 			$page = file_get_contents($file_path);
+			$tokensString = json_encode($tokens);
+			$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
+			$verificationToken = $zoomConfiguration['verificationToken'];
+			list($enc, $iv) = aESHelper::aesEncrypt($verificationToken, $tokensString);
 			$page = str_replace('@BaseServiceUrl@', requestUtils::getHost(), $page);
+			$page = str_replace('@encryptData@', base64_encode($enc), $page);
+			$page = str_replace('@iv@', base64_encode($iv), $page);
 			echo $page;
 			die();
 		}
@@ -198,8 +191,9 @@ class ZoomVendorService extends KalturaBaseService
 
 	/**
 	 * @param VendorIntegration $zoomIntegration
+	 * @param $accountId
 	 */
-	private function loadSubmitPage($zoomIntegration)
+	private function loadSubmitPage($zoomIntegration, $accountId)
 	{
 		$file_path = dirname(__FILE__) . "/../lib/api/webPage/zoom/KalturaZoomRegistrationPage.html";
 		if (file_exists($file_path)) {
@@ -209,7 +203,7 @@ class ZoomVendorService extends KalturaBaseService
 			if (!is_null($zoomIntegration))
 			{
 				$page = str_replace('@defaultUserID@', $zoomIntegration->getDefaultUserEMail() , $page);
-				$page = str_replace('@zoomCategory@', $zoomIntegration->getZoomCategory()  , $page);
+				$page = str_replace('@zoomCategory@', $zoomIntegration->getZoomCategory() ? $zoomIntegration->getZoomCategory()  : 'Zoom Recordings'  , $page);
 				$page = str_replace('@checked@', $zoomIntegration->getEnableUpload() ? 'checked' : '' , $page);
 			}
 			else {
@@ -217,22 +211,27 @@ class ZoomVendorService extends KalturaBaseService
 				$page = str_replace('@zoomCategory@', 'Zoom Recordings' , $page);
 				$page = str_replace('@checked@', '' , $page);
 			}
+			$page = str_replace('@accountId@', $accountId , $page);
 			echo $page;
 			die();
 		}
 	}
 
 	/**
-	 * @param $response
-	 * @param int $httpCode
-	 * @param KCurlWrapper $curlWrapper
+	 * @param $dataAsArray
+	 * @param $accountId
+	 * @throws PropelException
 	 */
-	private function handelCurlResponse($response, $httpCode, $curlWrapper)
+	private function saveNewTokenData($dataAsArray, $accountId)
 	{
-		if (!$response || $httpCode !== 200 || $curlWrapper->getError()) {
-			KalturaLog::err('Zoom Curl returned error, Tokens were not received, Error: ' . $curlWrapper->getError());
-			KExternalErrors::dieGracefully();
-		}
+		$zoomClientData = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+		if (!$zoomClientData)
+			$zoomClientData = new VendorIntegration();
+		$zoomClientData->setExpiresIn($dataAsArray[kZoomOauth::EXPIRES_IN]);
+		$zoomClientData->setAccessToken($dataAsArray[kZoomOauth::ACCESS_TOKEN]);
+		$zoomClientData->setRefreshToken($dataAsArray[kZoomOauth::REFRESH_TOKEN]);
+		$zoomClientData->setAccountId($accountId);
+		$zoomClientData->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
+		$zoomClientData->save();
 	}
-
 }

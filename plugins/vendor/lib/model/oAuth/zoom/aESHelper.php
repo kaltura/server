@@ -30,7 +30,7 @@ class aESHelper
 	{
 		$key = substr(sha1($key, true), 0, 16);
 		/** @noinspection PhpUndefinedMethodInspection */
-		return KCryptoWrapper::decrypt_aes($message, $key, $iv);
+		return rtrim(KCryptoWrapper::decrypt_aes($message, $key, $iv), "\0");
 	}
 
 	/**
