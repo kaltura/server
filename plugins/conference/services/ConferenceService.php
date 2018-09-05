@@ -174,11 +174,10 @@ class ConferenceService extends KalturaBaseService {
 		if ($serverNodeId)
 		{
 			$serverNode = ServerNodePeer::retrieveByPK($serverNodeId);
-			/** @var ConferenceEntryServerNode $confEntryServerNode */
 			if (!$serverNode)
 			{
-				KalturaLog::info("Could not find server node with id [" . $confEntryServerNode->getServerNodeId() . "]");
-				throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND_WITH_ID, $confEntryServerNode->getServerNodeId());
+				KalturaLog::info("Could not find server node with id [$serverNodeId]");
+				throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND_WITH_ID, $serverNodeId);
 			}
 
 			$otherEntryServerNodes = EntryServerNodePeer::retrieveByServerNodeIdAndType($serverNode->getId(), ConferencePlugin::getCoreValue('serverNodeType', ConferenceServerNodeType::CONFERENCE_SERVER));
