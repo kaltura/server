@@ -31,9 +31,7 @@ class KAsyncDispatchEventNotification extends KJobHandlerWorker
 		$engine = $this->getEngine($job->jobSubType);
 		if(!$engine)
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, "Engine not found", KalturaBatchJobStatus::FAILED);
-
-		KalturaLog::debug("MOSHE5".print_r($this,true));
-
+		
 		$this->impersonate($job->partnerId);
 		$engine->dispatch($eventNotificationTemplate, $data);
 		$this->unimpersonate();
