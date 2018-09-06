@@ -82,7 +82,6 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 			}
 		}
 		
-		
 		$curlWrapper = new KCurlWrapper();
 
 		if(count($headers))
@@ -118,6 +117,12 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 			default:
 				if($curlData)
 					$url .= '?' . $curlData;
+		}
+
+		$curlTimeOut = KBatchBase::$taskConfig->getCurlTimeout();
+		if($curlTimeOut)
+		{
+			$curlWrapper->setOpt(CURLOPT_TIMEOUT, $curlTimeOut);
 		}
 
 		if($data->timeout)
