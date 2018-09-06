@@ -56,7 +56,10 @@ class ZoomVendorService extends KalturaBaseService
 			list($tokens, $permissions) = $dataRetriever->retrieveZoomDataAsArray(self::USERS_ME_PERMISSIONS, true);
 			list(, $user) = $dataRetriever->retrieveZoomDataAsArray(self::USERS_ME, false, $tokens, null);
 			$accountId = $user[self::ACCOUNT_ID];
-			$this->saveNewTokenData($tokens, $accountId); // table is empty
+			$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+			if($zoomIntegration && $zoomIntegration->getStatus() === VendorStatus::DELETED)
+				$zoomIntegration->setStatus(VendorStatus::ACTIVE);
+			$this->saveNewTokenData($tokens, $accountId, $zoomIntegration);
 			$permissions = $permissions['permissions'];
 			$isAdmin = $this->canConfigureEventSubscription($permissions);
 		}
@@ -86,13 +89,14 @@ class ZoomVendorService extends KalturaBaseService
 		$retrieveDataFromZoom = new RetrieveDataFromZoom();
 		list($tokens,$zoomUserData) = $retrieveDataFromZoom->retrieveZoomDataAsArray(self::USERS_ME, false, $tokens, null) ;
 		$accountId = $zoomUserData[self::ACCOUNT_ID];
-		if ($accessToken !== $tokens[kZoomOauth::ACCESS_TOKEN])
-			$this->saveNewTokenData($tokens, $accountId);
+		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId,
+			VendorTypeEnum::ZOOM_ACCOUNT);
+		if ($accessToken !== $tokens[kZoomOauth::ACCESS_TOKEN]) // token changed -> refresh tokens
+		{
+			$this->saveNewTokenData($tokens, $accountId, $zoomIntegration);
+		}
 		$partnerId = kCurrentContext::getCurrentPartnerId();
-		$vendorIntegrationPeer = new VendorIntegrationPeer();
-		$zoomIntegration = $vendorIntegrationPeer->retrieveSingleVendorPerAccountAndType($accountId,
-					VendorTypeEnum::ZOOM_ACCOUNT);
-		if (intval($partnerId) !== $zoomIntegration->getPartnerId() && $partnerId !== 0)
+		if ($zoomIntegration && intval($partnerId) !==  $zoomIntegration->getPartnerId() && $partnerId !== 0)
 		{
 			$zoomIntegration->setPartnerId($partnerId);
 			$zoomIntegration->save();
@@ -124,6 +128,7 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomIntegration->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
 			$zoomIntegration->setPartnerId($partnerId);
 		}
+		$zoomIntegration->setStatus(VendorStatus::ACTIVE);
 		$zoomIntegration->setEnableUpload($uploadEnabled);
 		$zoomIntegration->setDefaultUserEMail($defaultUserId);
 		$zoomIntegration->setZoomCategory($zoomCategory);
@@ -218,20 +223,18 @@ class ZoomVendorService extends KalturaBaseService
 	}
 
 	/**
-	 * @param $dataAsArray
+	 * @param $tokensDataAsArray
 	 * @param $accountId
+	 * @param VendorIntegration $zoomClientData
 	 * @throws PropelException
 	 */
-	private function saveNewTokenData($dataAsArray, $accountId)
+	private function saveNewTokenData($tokensDataAsArray, $accountId, $zoomClientData = null)
 	{
-		$zoomClientData = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
-		if (!$zoomClientData)
+		if (!$zoomClientData) // create new vendorIntegration during oauth first time
+		{
 			$zoomClientData = new VendorIntegration();
-		$zoomClientData->setExpiresIn($dataAsArray[kZoomOauth::EXPIRES_IN]);
-		$zoomClientData->setAccessToken($dataAsArray[kZoomOauth::ACCESS_TOKEN]);
-		$zoomClientData->setRefreshToken($dataAsArray[kZoomOauth::REFRESH_TOKEN]);
-		$zoomClientData->setAccountId($accountId);
-		$zoomClientData->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
-		$zoomClientData->save();
+			$zoomClientData->setStatus(VendorStatus::DISABLED);
+		}
+		$zoomClientData->saveNewTokenData($tokensDataAsArray,$accountId);
 	}
 }

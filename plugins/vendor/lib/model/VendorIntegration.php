@@ -36,4 +36,20 @@ class VendorIntegration extends BaseVendorIntegration {
 	public function setZoomCategory($v)	{ $this->putInCustomData ( "zoomCategory" , $v);	}
 	public function getZoomCategory( )	{ return $this->getFromCustomData( "zoomCategory" );	}
 
+
+	/**
+	 * @param array $tokensDataAsArray
+	 * @param string $accountId
+	 */
+	public function saveNewTokenData($tokensDataAsArray, $accountId)
+	{
+		$this->setExpiresIn($tokensDataAsArray[kZoomOauth::EXPIRES_IN]);
+		$this->setAccessToken($tokensDataAsArray[kZoomOauth::ACCESS_TOKEN]);
+		$this->setRefreshToken($tokensDataAsArray[kZoomOauth::REFRESH_TOKEN]);
+		$this->setAccountId($accountId);
+		$this->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
+		$this->save();
+	}
+
+
 } // VendorIntegration

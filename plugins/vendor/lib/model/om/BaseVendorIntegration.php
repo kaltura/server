@@ -1246,7 +1246,7 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 					{
 						$currentDcId = kDataCenterMgr::getCurrentDcId();
 						//addOr(column, value, comparison)
-						$criteria->addOr(entryPeer::CUSTOM_DATA," '$currentDcId' != getDC()" ,Criteria::CUSTOM);
+						$criteria->addOr(VendorIntegrationPeer::CUSTOM_DATA," '$currentDcId' != getDC()" ,Criteria::CUSTOM);
 					}
 				}
 				else 

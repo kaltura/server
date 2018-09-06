@@ -4,7 +4,7 @@
  * @subpackage model.enum
  */
 
-class VendorStatus
+interface VendorStatus
 {
 	const DISABLED = 1;
 	const ACTIVE = 2;

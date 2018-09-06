@@ -1184,7 +1184,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 					{
 						\$currentDcId = kDataCenterMgr::getCurrentDcId();
 						//addOr(column, value, comparison)
-						\$criteria->addOr(entryPeer::CUSTOM_DATA,\" '\$currentDcId' != getDC()\" ,Criteria::CUSTOM);
+						\$criteria->addOr(".$this->getPeerClassname()."::CUSTOM_DATA,\" '\$currentDcId' != getDC()\" ,Criteria::CUSTOM);
 					}
 				}
 				else 

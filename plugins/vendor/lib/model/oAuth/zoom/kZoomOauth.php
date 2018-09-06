@@ -41,16 +41,16 @@ class kZoomOauth implements kVendorOauth
 	 */
 	public function retrieveTokensData($forceNewToken = false, $accountId = null)
 	{
-		$zoomClientData = null;
+		$zoomIntegration = null;
 		if (!$forceNewToken && $accountId)
 		{
-			$zoomClientData = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
-			if ($zoomClientData) // tokens exist
+			$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+			if ($zoomIntegration) // tokens exist
 			{
-				if (time() > $zoomClientData->getExpiresIn()) // token had expired -> refresh
-					return $this->refreshTokens($zoomClientData->getRefreshToken(), $zoomClientData);
-				return array(self::ACCESS_TOKEN => $zoomClientData->getAccessToken(), self::REFRESH_TOKEN => $zoomClientData->getRefreshToken(),
-					self::EXPIRES_IN => $zoomClientData->getExpiresIn());
+				if (time() > $zoomIntegration->getExpiresIn()) // token had expired -> refresh
+					return $this->refreshTokens($zoomIntegration->getRefreshToken(), $zoomIntegration);
+				return array(self::ACCESS_TOKEN => $zoomIntegration->getAccessToken(), self::REFRESH_TOKEN => $zoomIntegration->getRefreshToken(),
+					self::EXPIRES_IN => $zoomIntegration->getExpiresIn());
 			}
 		}
 		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
