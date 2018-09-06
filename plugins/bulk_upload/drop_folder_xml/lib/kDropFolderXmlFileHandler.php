@@ -113,7 +113,7 @@ class kDropFolderXmlFileHandler
 			KalturaLog::info('The XML file is not uploaded yet - changing status to WAITING');
 			return false;
 		}
-		$statuses = array(DropFolderFileStatus::PARSED, DropFolderFileStatus::UPLOADING, DropFolderFileStatus::DETECTED, DropFolderFileStatus::PROCESSING);
+		$statuses = array(DropFolderFileStatus::PARSED, DropFolderFileStatus::UPLOADING, DropFolderFileStatus::DETECTED);
 		$nonReadyFiles = DropFolderFilePeer::retrieveByLeadIdAndStatuses($file->getLeadDropFolderFileId(), $statuses);
 		
 		if($nonReadyFiles && count($nonReadyFiles) > 0)
