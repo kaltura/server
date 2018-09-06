@@ -5,7 +5,7 @@
  *
  * 
  *
- * @package plugins.vendor
+ * @package plugins.reach
  * @subpackage model.om
  */
 abstract class BaseVendorIntegrationPeer {
@@ -20,13 +20,13 @@ abstract class BaseVendorIntegrationPeer {
 	const OM_CLASS = 'VendorIntegration';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'plugins.vendor.VendorIntegration';
+	const CLASS_DEFAULT = 'plugins.reach.VendorIntegration';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'VendorIntegrationTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 5;
+	const NUM_COLUMNS = 8;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -46,6 +46,15 @@ abstract class BaseVendorIntegrationPeer {
 	/** the column name for the CUSTOM_DATA field */
 	const CUSTOM_DATA = 'vendor_integration.CUSTOM_DATA';
 
+	/** the column name for the STATUS field */
+	const STATUS = 'vendor_integration.STATUS';
+
+	/** the column name for the CREATED_AT field */
+	const CREATED_AT = 'vendor_integration.CREATED_AT';
+
+	/** the column name for the UPDATED_AT field */
+	const UPDATED_AT = 'vendor_integration.UPDATED_AT';
+
 	/**
 	 * An identiy map to hold any loaded instances of VendorIntegration objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -62,11 +71,11 @@ abstract class BaseVendorIntegrationPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'AccountId', 'PartnerId', 'VendorType', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'accountId', 'partnerId', 'vendorType', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::ACCOUNT_ID, self::PARTNER_ID, self::VENDOR_TYPE, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'account_id', 'partner_id', 'vendor_Type', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'AccountId', 'PartnerId', 'VendorType', 'CustomData', 'Status', 'CreatedAt', 'UpdatedAt', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'accountId', 'partnerId', 'vendorType', 'customData', 'status', 'createdAt', 'updatedAt', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::ACCOUNT_ID, self::PARTNER_ID, self::VENDOR_TYPE, self::CUSTOM_DATA, self::STATUS, self::CREATED_AT, self::UPDATED_AT, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'account_id', 'partner_id', 'vendor_Type', 'custom_data', 'status', 'created_at', 'updated_at', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
 	);
 
 	/**
@@ -76,11 +85,11 @@ abstract class BaseVendorIntegrationPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'AccountId' => 1, 'PartnerId' => 2, 'VendorType' => 3, 'CustomData' => 4, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'accountId' => 1, 'partnerId' => 2, 'vendorType' => 3, 'customData' => 4, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::ACCOUNT_ID => 1, self::PARTNER_ID => 2, self::VENDOR_TYPE => 3, self::CUSTOM_DATA => 4, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'account_id' => 1, 'partner_id' => 2, 'vendor_Type' => 3, 'custom_data' => 4, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'AccountId' => 1, 'PartnerId' => 2, 'VendorType' => 3, 'CustomData' => 4, 'Status' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'accountId' => 1, 'partnerId' => 2, 'vendorType' => 3, 'customData' => 4, 'status' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::ACCOUNT_ID => 1, self::PARTNER_ID => 2, self::VENDOR_TYPE => 3, self::CUSTOM_DATA => 4, self::STATUS => 5, self::CREATED_AT => 6, self::UPDATED_AT => 7, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'account_id' => 1, 'partner_id' => 2, 'vendor_Type' => 3, 'custom_data' => 4, 'status' => 5, 'created_at' => 6, 'updated_at' => 7, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
 	);
 
 	/**
@@ -155,6 +164,9 @@ abstract class BaseVendorIntegrationPeer {
 		$criteria->addSelectColumn(VendorIntegrationPeer::PARTNER_ID);
 		$criteria->addSelectColumn(VendorIntegrationPeer::VENDOR_TYPE);
 		$criteria->addSelectColumn(VendorIntegrationPeer::CUSTOM_DATA);
+		$criteria->addSelectColumn(VendorIntegrationPeer::STATUS);
+		$criteria->addSelectColumn(VendorIntegrationPeer::CREATED_AT);
+		$criteria->addSelectColumn(VendorIntegrationPeer::UPDATED_AT);
 	}
 
 	/**

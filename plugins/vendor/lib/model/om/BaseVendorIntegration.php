@@ -5,7 +5,7 @@
  *
  * 
  *
- * @package plugins.vendor
+ * @package plugins.reach
  * @subpackage model.om
  */
 abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
@@ -48,6 +48,24 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 	 * @var        string
 	 */
 	protected $custom_data;
+
+	/**
+	 * The value for the status field.
+	 * @var        int
+	 */
+	protected $status;
+
+	/**
+	 * The value for the created_at field.
+	 * @var        string
+	 */
+	protected $created_at;
+
+	/**
+	 * The value for the updated_at field.
+	 * @var        string
+	 */
+	protected $updated_at;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -142,6 +160,96 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 	public function getCustomData()
 	{
 		return $this->custom_data;
+	}
+
+	/**
+	 * Get the [status] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getStatus()
+	{
+		return $this->status;
+	}
+
+	/**
+	 * Get the [optionally formatted] temporal [created_at] column value.
+	 * 
+	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
+	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
+	 *
+	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
+	 *							If format is NULL, then the raw unix timestamp integer will be returned.
+	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+	 * @throws     PropelException - if unable to parse/validate the date/time value.
+	 */
+	public function getCreatedAt($format = 'Y-m-d H:i:s')
+	{
+		if ($this->created_at === null) {
+			return null;
+		}
+
+
+		if ($this->created_at === '0000-00-00 00:00:00') {
+			// while technically this is not a default value of NULL,
+			// this seems to be closest in meaning.
+			return null;
+		} else {
+			try {
+				$dt = new DateTime($this->created_at);
+			} catch (Exception $x) {
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
+			}
+		}
+
+		if ($format === null) {
+			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
+			return (int) $dt->format('U');
+		} elseif (strpos($format, '%') !== false) {
+			return strftime($format, $dt->format('U'));
+		} else {
+			return $dt->format($format);
+		}
+	}
+
+	/**
+	 * Get the [optionally formatted] temporal [updated_at] column value.
+	 * 
+	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
+	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
+	 *
+	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
+	 *							If format is NULL, then the raw unix timestamp integer will be returned.
+	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+	 * @throws     PropelException - if unable to parse/validate the date/time value.
+	 */
+	public function getUpdatedAt($format = 'Y-m-d H:i:s')
+	{
+		if ($this->updated_at === null) {
+			return null;
+		}
+
+
+		if ($this->updated_at === '0000-00-00 00:00:00') {
+			// while technically this is not a default value of NULL,
+			// this seems to be closest in meaning.
+			return null;
+		} else {
+			try {
+				$dt = new DateTime($this->updated_at);
+			} catch (Exception $x) {
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
+			}
+		}
+
+		if ($format === null) {
+			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
+			return (int) $dt->format('U');
+		} elseif (strpos($format, '%') !== false) {
+			return strftime($format, $dt->format('U'));
+		} else {
+			return $dt->format($format);
+		}
 	}
 
 	/**
@@ -257,6 +365,127 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 	} // setCustomData()
 
 	/**
+	 * Set the value of [status] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     VendorIntegration The current object (for fluent API support)
+	 */
+	public function setStatus($v)
+	{
+		if(!isset($this->oldColumnsValues[VendorIntegrationPeer::STATUS]))
+			$this->oldColumnsValues[VendorIntegrationPeer::STATUS] = $this->status;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->status !== $v) {
+			$this->status = $v;
+			$this->modifiedColumns[] = VendorIntegrationPeer::STATUS;
+		}
+
+		return $this;
+	} // setStatus()
+
+	/**
+	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+	 * 
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
+	 *						be treated as NULL for temporal objects.
+	 * @return     VendorIntegration The current object (for fluent API support)
+	 */
+	public function setCreatedAt($v)
+	{
+		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
+		// -- which is unexpected, to say the least.
+		if ($v === null || $v === '') {
+			$dt = null;
+		} elseif ($v instanceof DateTime) {
+			$dt = $v;
+		} else {
+			// some string/numeric value passed; we normalize that so that we can
+			// validate it.
+			try {
+				if (is_numeric($v)) { // if it's a unix timestamp
+					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
+					// We have to explicitly specify and then change the time zone because of a
+					// DateTime bug: http://bugs.php.net/bug.php?id=43003
+					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+				} else {
+					$dt = new DateTime($v);
+				}
+			} catch (Exception $x) {
+				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
+			}
+		}
+
+		if ( $this->created_at !== null || $dt !== null ) {
+			// (nested ifs are a little easier to read in this case)
+
+			$currNorm = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
+
+			if ( ($currNorm !== $newNorm) // normalized values don't match 
+					)
+			{
+				$this->created_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+				$this->modifiedColumns[] = VendorIntegrationPeer::CREATED_AT;
+			}
+		} // if either are not null
+
+		return $this;
+	} // setCreatedAt()
+
+	/**
+	 * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+	 * 
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
+	 *						be treated as NULL for temporal objects.
+	 * @return     VendorIntegration The current object (for fluent API support)
+	 */
+	public function setUpdatedAt($v)
+	{
+		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
+		// -- which is unexpected, to say the least.
+		if ($v === null || $v === '') {
+			$dt = null;
+		} elseif ($v instanceof DateTime) {
+			$dt = $v;
+		} else {
+			// some string/numeric value passed; we normalize that so that we can
+			// validate it.
+			try {
+				if (is_numeric($v)) { // if it's a unix timestamp
+					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
+					// We have to explicitly specify and then change the time zone because of a
+					// DateTime bug: http://bugs.php.net/bug.php?id=43003
+					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+				} else {
+					$dt = new DateTime($v);
+				}
+			} catch (Exception $x) {
+				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
+			}
+		}
+
+		if ( $this->updated_at !== null || $dt !== null ) {
+			// (nested ifs are a little easier to read in this case)
+
+			$currNorm = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
+
+			if ( ($currNorm !== $newNorm) // normalized values don't match 
+					)
+			{
+				$this->updated_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+				$this->modifiedColumns[] = VendorIntegrationPeer::UPDATED_AT;
+			}
+		} // if either are not null
+
+		return $this;
+	} // setUpdatedAt()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -296,6 +525,9 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 			$this->partner_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
 			$this->vendor_type = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
 			$this->custom_data = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->status = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+			$this->created_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->updated_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -305,7 +537,7 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 5; // 5 = VendorIntegrationPeer::NUM_COLUMNS - VendorIntegrationPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 8; // 8 = VendorIntegrationPeer::NUM_COLUMNS - VendorIntegrationPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating VendorIntegration object", $e);
@@ -630,6 +862,8 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
+		$this->setCreatedAt(time());
+		$this->setUpdatedAt(time());
 		return parent::preInsert($con);
 	}
 	
@@ -717,6 +951,9 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 			return true;
 		}	
 		
+		
+		if($this->isModified())
+			$this->setUpdatedAt(time());
 		
 		$this->tempModifiedColumns = $this->modifiedColumns;
 		return parent::preUpdate($con);
@@ -835,6 +1072,15 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 			case 4:
 				return $this->getCustomData();
 				break;
+			case 5:
+				return $this->getStatus();
+				break;
+			case 6:
+				return $this->getCreatedAt();
+				break;
+			case 7:
+				return $this->getUpdatedAt();
+				break;
 			default:
 				return null;
 				break;
@@ -861,6 +1107,9 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 			$keys[2] => $this->getPartnerId(),
 			$keys[3] => $this->getVendorType(),
 			$keys[4] => $this->getCustomData(),
+			$keys[5] => $this->getStatus(),
+			$keys[6] => $this->getCreatedAt(),
+			$keys[7] => $this->getUpdatedAt(),
 		);
 		return $result;
 	}
@@ -907,6 +1156,15 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 			case 4:
 				$this->setCustomData($value);
 				break;
+			case 5:
+				$this->setStatus($value);
+				break;
+			case 6:
+				$this->setCreatedAt($value);
+				break;
+			case 7:
+				$this->setUpdatedAt($value);
+				break;
 		} // switch()
 	}
 
@@ -936,6 +1194,9 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[2], $arr)) $this->setPartnerId($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setVendorType($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setCustomData($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setStatus($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
 	}
 
 	/**
@@ -952,6 +1213,9 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(VendorIntegrationPeer::PARTNER_ID)) $criteria->add(VendorIntegrationPeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(VendorIntegrationPeer::VENDOR_TYPE)) $criteria->add(VendorIntegrationPeer::VENDOR_TYPE, $this->vendor_type);
 		if ($this->isColumnModified(VendorIntegrationPeer::CUSTOM_DATA)) $criteria->add(VendorIntegrationPeer::CUSTOM_DATA, $this->custom_data);
+		if ($this->isColumnModified(VendorIntegrationPeer::STATUS)) $criteria->add(VendorIntegrationPeer::STATUS, $this->status);
+		if ($this->isColumnModified(VendorIntegrationPeer::CREATED_AT)) $criteria->add(VendorIntegrationPeer::CREATED_AT, $this->created_at);
+		if ($this->isColumnModified(VendorIntegrationPeer::UPDATED_AT)) $criteria->add(VendorIntegrationPeer::UPDATED_AT, $this->updated_at);
 
 		return $criteria;
 	}
@@ -969,6 +1233,38 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 		$criteria = new Criteria(VendorIntegrationPeer::DATABASE_NAME);
 
 		$criteria->add(VendorIntegrationPeer::ID, $this->id);
+		
+		if($this->alreadyInSave)
+		{
+			if ($this->isColumnModified(VendorIntegrationPeer::CUSTOM_DATA))
+			{
+				if (!is_null($this->custom_data_md5))
+				{
+					$criteria->add(VendorIntegrationPeer::CUSTOM_DATA, "MD5(cast(" . VendorIntegrationPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
+					//casting to latin char set to avoid mysql and php md5 difference
+					if (kDataCenterMgr::isMultiDc()) // if multi DC configuration don't check costume data on other DC
+					{
+						$currentDcId = kDataCenterMgr::getCurrentDcId();
+						//addOr(column, value, comparison)
+						$criteria->addOr(entryPeer::CUSTOM_DATA," '$currentDcId' != getDC()" ,Criteria::CUSTOM);
+					}
+				}
+				else 
+					$criteria->add(VendorIntegrationPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
+			}
+			
+			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(VendorIntegrationPeer::UPDATED_AT))
+			{
+				$theModifiedColumn = null;
+				foreach($this->modifiedColumns as $modifiedColumn)
+					if($modifiedColumn != VendorIntegrationPeer::UPDATED_AT)
+						$theModifiedColumn = $modifiedColumn;
+						
+				$atomicColumns = VendorIntegrationPeer::getAtomicColumns();
+				if(in_array($theModifiedColumn, $atomicColumns))
+					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+			}
+		}		
 
 		return $criteria;
 	}
@@ -1013,6 +1309,12 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 		$copyObj->setVendorType($this->vendor_type);
 
 		$copyObj->setCustomData($this->custom_data);
+
+		$copyObj->setStatus($this->status);
+
+		$copyObj->setCreatedAt($this->created_at);
+
+		$copyObj->setUpdatedAt($this->updated_at);
 
 
 		$copyObj->setNew(true);
