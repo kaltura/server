@@ -41,7 +41,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	/**
 	 * @param int $partnerId
 	 * @param string $puserId
-	 * @param bool $ignore_puser_kuser
+	 * @param bool $ignorePuserKuser
 	 * @return kuser
 	 */
 	public static function getKuserByPartnerAndUid($partnerId, $puserId, $ignorePuserKuser = false)
