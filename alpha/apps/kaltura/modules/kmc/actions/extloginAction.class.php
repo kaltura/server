@@ -41,8 +41,9 @@ class extloginAction extends kalturaAction
 
 		$ksObj = kSessionUtils::crackKs($ks);
 		$ksPartnerId = $ksObj->partner_id;
-		
-		if($ksObj->getPrivilegeByName(kSessionBase::PRIVILEGE_DISABLE_PARTNER_CHANGE_ACCOUNT) && $requestedPartnerId != $ksPartnerId)
+
+		if($ksObj->hasPrivilege(kSessionBase::PRIVILEGE_ENABLE_PARTNER_CHANGE_ACCOUNT) &&
+			!$ksObj->verifyPrivileges(kSessionBase::PRIVILEGE_ENABLE_PARTNER_CHANGE_ACCOUNT, $requestedPartnerId))
 			$this->dieOnError  ( APIErrors::PARTNER_CHANGE_ACCOUNT_DISABLED );
 
 		if (!$requestedPartnerId) {
@@ -109,7 +110,12 @@ class extloginAction extends kalturaAction
 		{
 			$ks = null;
 			$sessionType = $adminKuser->getIsAdmin() ? SessionType::ADMIN : SessionType::USER;
-			kSessionUtils::createKSessionNoValidations ( $partner_id ,  $admin_puser_id , $ks , 30 * 86400 , $sessionType , "" , "*," . kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT );
+			$privileges =  "*," . kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT;
+			if($ksObj->hasPrivilege(kSessionBase::PRIVILEGE_ENABLE_PARTNER_CHANGE_ACCOUNT))
+				$privileges = $privileges.",".kSessionBase::PRIVILEGE_ENABLE_PARTNER_CHANGE_ACCOUNT.":".
+					implode(kSessionBase::PRIVILEGES_DELIMITER, $ksObj->getPrivilegeValues(kSessionBase::PRIVILEGE_ENABLE_PARTNER_CHANGE_ACCOUNT));
+
+			kSessionUtils::createKSessionNoValidations ( $partner_id ,  $admin_puser_id , $ks , 30 * 86400 , $sessionType , "" , $privileges );
 		}
 		
 		
