@@ -9,5 +9,5 @@ interface ServerNodeStatus extends BaseEnum
 	const DISABLED = 2;
 	const DELETED = 3;
 	const NOT_REGISTERED = 4;
-	const ISSUES_FOUND = 5;
+	const NOT_HEALTHY = 5;
 }

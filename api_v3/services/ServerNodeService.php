@@ -231,16 +231,16 @@ class ServerNodeService extends KalturaBaseService
 	/**
 	 * Get the edge server node full path
 	 *
-	 * @action getServerNodeFullPath
+	 * @action getFullPath
 	 * @param string $hostName
 	 * @param string $protocol
 	 * @param string $deliveryFormat
 	 * @param string $deliveryType
 	 * @return string
 	 */
-	function getServerNodeFullPathAction($hostName, $protocol = 'http', $deliveryFormat = null, $deliveryType = null)
+	function getFullPathAction($hostName, $protocol = 'http', $deliveryFormat = null, $deliveryType = null)
 	{
-		$dbServerNode = ServerNodePeer::retrieveActiveServerNode($hostName, $this->getPartnerId());
+		$dbServerNode = ServerNodePeer::retrieveActiveServerNode($hostName, $this->getPartnerId(), ServerNodeType::EDGE);
 		if (!$dbServerNode)
 		{
 			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND, $hostName);
