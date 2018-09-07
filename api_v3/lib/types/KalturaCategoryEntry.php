@@ -97,12 +97,13 @@ class KalturaCategoryEntry extends KalturaObject implements IRelatedFilterable
 	
 	public function toObject($dbObject = null, $skip = array()) 
 	{
-	    
+		$this->categoryId	= trim($this->categoryId);
+		$this->entryId		= trim($this->entryId);
 		if (is_null ( $dbObject ))
 			$dbObject = new categoryEntry();
 			
 		parent::toObject ( $dbObject, $skip );
-		
+
 		return $dbObject;
 	}
 	
