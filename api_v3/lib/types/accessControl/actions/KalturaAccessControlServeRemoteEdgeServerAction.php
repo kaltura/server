@@ -15,13 +15,13 @@ class KalturaAccessControlServeRemoteEdgeServerAction extends KalturaRuleAction
 	/**
 	 * @var KalturaNullableBoolean
 	 */
-	public $seamlessFallback;
+	public $seamlessFallbackEnabled;
 
 	
 	private static $mapBetweenObjects = array
 	(
 		'edgeServerIds',
-		'seamlessFallback',
+		'seamlessFallbackEnabled',
 	);
 	/**
 	 * Init object type

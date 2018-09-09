@@ -262,32 +262,15 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			return parent::buildHttpFlavorsArray();
 		}
 
-		$edgeServerIds = null;
-		$edgeServerFallback = false;
-		if($this->params->getEdgeServerFallback() && $this->params->getEdgeServerIds() && count($this->params->getEdgeServerIds()))
-		{
-			$edgeServerFallback = true;
-			$edgeServerIds = $this->params->getEdgeServerIds();
-			foreach ($this->params->getEdgeServerIds() as $currEdgeServerId)
-			{
-				$this->buildM3u8Flavors($primaryManifestUrl, $flavors, $primaryStreamInfo);
-			}
-		}
-
+		$edgeServerIds = $this->params->getEdgeServerIds();
+		$this->addFallbackM3u8Flavors($edgeServerIds, $flavors, $primaryManifestUrl, $primaryStreamInfo );
 		$this->buildM3u8Flavors($primaryManifestUrl, $flavors, $primaryStreamInfo);
 		if($backupManifestUrl && ($this->getForceProxy() || count($flavors) == 0))
 		{
 			//Until a full solution will be made on the liveServer side we need to manually sync bitrates Between primary and backup streams
 			$primaryFlavorBitrateInfo = $this->buildFlavorBitrateInfoArray($primaryStreamInfo);
 
-			if ($edgeServerFallback)
-			{
-				$this->params->setEdgeServerIds($edgeServerIds);
-				foreach ($this->params->getEdgeServerIds() as $currEdgeServerId)
-				{
-					$this->buildM3u8Flavors($backupManifestUrl, $flavors, $backupStreamInfo, $primaryFlavorBitrateInfo);
-				}
-			}
+			$this->addFallbackM3u8Flavors($edgeServerIds, $flavors, $backupManifestUrl, $backupStreamInfo, $primaryFlavorBitrateInfo);
 			$this->buildM3u8Flavors($backupManifestUrl, $flavors, $backupStreamInfo, $primaryFlavorBitrateInfo);
 		}
 
@@ -334,6 +317,19 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$exists = in_array($flavorParamId, $aclFlavorParamsIds);
 		
 		return $isBlockedList ? !$exists : $exists;
+	}
+
+	protected function addFallbackM3u8Flavors($edgeServerIds, &$flavors, $manifestUrl, $streamInfo, $flavorBitrateInfo = array())
+	{
+		if($this->params->getEdgeServerFallback() && $edgeServerIds && count($edgeServerIds))
+		{
+			$this->params->setEdgeServerIds($edgeServerIds);
+			foreach ($this->params->getEdgeServerIds() as $currEdgeServerId)
+			{
+				$this->buildM3u8Flavors($manifestUrl, $flavors, $streamInfo, $flavorBitrateInfo);
+			}
+		}
+
 	}
 }
 

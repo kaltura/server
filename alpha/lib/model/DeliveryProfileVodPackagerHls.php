@@ -35,7 +35,6 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp {
 	}
 
 	/**
-	 * @param bool $oneOnly
 	 * @return array
 	 */
 	protected function buildHttpFlavorsArray()

@@ -13,7 +13,7 @@ class kAccessControlServeRemoteEdgeServerAction extends kRuleAction
 	/**
 	 * @var bool
 	 */
-	protected $seamlessFallback;
+	protected $seamlessFallbackEnabled;
 
 	public function __construct()
 	{
@@ -62,24 +62,24 @@ class kAccessControlServeRemoteEdgeServerAction extends kRuleAction
 			return false;
 		
 		$deliveryAttributes->setEdgeServerIds($activeEdgeServerIds);
-		$deliveryAttributes->setEdgeServerFallback($this->getSeamlessFallback());
+		$deliveryAttributes->setEdgeServerFallback($this->getSeamlessFallbackEnabled());
 		return true;
 	}
 
 	/**
 	 * @return bool
 	 */
-	public function getSeamlessFallback()
+	public function getSeamlessFallbackEnabled()
 	{
-		return $this->seamlessFallback;
+		return $this->seamlessFallbackEnabled;
 	}
 
 	/**
-	 * @param bool $seamlessFallback
+	 * @param bool $seamlessFallbackEnabled
 	 */
-	public function setSeamlessFallback(bool $seamlessFallback)
+	public function setSeamlessFallbackEnabled($seamlessFallbackEnabled)
 	{
-		$this->seamlessFallback = $seamlessFallback;
+		$this->seamlessFallbackEnabled = $seamlessFallbackEnabled;
 	}
 
 
