@@ -40,7 +40,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	const KUSER_SORT_PRODUCED_KSHOWS = 10;
 	
 	const PUSER_ID_REGEXP = '/^[A-Za-z0-9,!#\$%&\'\*\+\?\^_`\{\|}~.@-]{1,320}$/';
-	const URL_PATTERN = "://";
+	const URL_PATTERN = '://';
 	
 	const PARTNER_INDEX_PREFIX  = 'p';
 	const PERMISSION_NAMES_INDEX_PREFIX = 'pn';

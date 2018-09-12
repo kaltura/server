@@ -711,7 +711,7 @@ class UserService extends KalturaBaseUserService
 		$names = array('firstName', 'lastName', 'fullName', 'screenName');
 		foreach ($names as $name)
 		{
-			if (!is_null($user->{$name}) && strpos($user->{$name}, kuser::URL_PATTERN) !== false)
+			if (!is_null($user->$name) && strpos($user->$name, kuser::URL_PATTERN) !== false)
 				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $name);
 		}
 	}
