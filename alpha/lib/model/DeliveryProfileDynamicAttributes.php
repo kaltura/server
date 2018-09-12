@@ -187,6 +187,13 @@ class DeliveryProfileDynamicAttributes {
 	protected  $streamType = null;
 
 	/**
+	 * Signifies weather we should use seamless fallback with edge servers
+	 * @var bool
+	 */
+	protected $edgeServerFallback = false;
+
+
+	/**
 	 * @return the $addThumbnailExtension
 	 */
 	public function getAddThumbnailExtension() {
@@ -722,6 +729,22 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
+	 * @return boolean edgeServerFallback
+	 */
+	public function getEdgeServerFallback()
+	{
+		return $this->edgeServerFallback;
+	}
+
+	/**
+	 * @param boolean edgeServerFallback
+	 */
+	public function setEdgeServerFallback($edgeServerFallback)
+	{
+		$this->edgeServerFallback = $edgeServerFallback;
+	}
+
+	/**
 	 * 
 	 * @param int $storageId
 	 * @param string $entryId
@@ -774,6 +797,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->hasValidSequence = $newObj->getHasValidSequence();
 		$this->defaultAudioLanguage = $newObj->getDefaultAudioLanguage();
 		$this->streamType = $newObj->getStreamType();
+		$this->edgeServerFallback = $newObj->getEdgeServerFallback();
 	}
 }
 
