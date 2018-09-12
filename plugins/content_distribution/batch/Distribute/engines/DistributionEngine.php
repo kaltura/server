@@ -82,12 +82,14 @@ abstract class DistributionEngine implements IDistributionEngine
 		$filter = new KalturaAssetFilter();
 		$filter->idIn = $flavorAssetIds;
 		
-		try {
+		try
+		{
 			KBatchBase::impersonate($entryDistribution->partnerId);
-			$flavorAssetsList = KBatchBase::$kClient->flavorAsset->listAction($flavorAssetFilter);
+			$flavorAssetsList = KBatchBase::$kClient->flavorAsset->listAction($filter);
 			KBatchBase::unimpersonate();
 		}
-		catch (Exception $e) {
+		catch (Exception $e)
+		{
 			KBatchBase::unimpersonate();
 			throw $e;
 		}
@@ -104,12 +106,14 @@ abstract class DistributionEngine implements IDistributionEngine
 		$filter = new KalturaAssetFilter();
 		$filter->idIn = $thumbAssetIds;
 		
-		try {
+		try
+		{
 			KBatchBase::impersonate($partnerId);
 			$thumbAssetsList = KBatchBase::$kClient->thumbAsset->listAction($filter);
 			KBatchBase::unimpersonate();
 		}
-		catch (Exception $e) {
+		catch (Exception $e)
+		{
 			KBatchBase::unimpersonate();
 			throw $e;
 		}

@@ -99,7 +99,7 @@ class AbstractEntityBodyDecorator implements EntityBodyInterface
 
     public function setStream($stream, $size = null)
     {
-		$size = $size ? $size : 0;
+        $size = $size ? $size : 0;
 		
         $this->body->setStream($stream, $size);
 

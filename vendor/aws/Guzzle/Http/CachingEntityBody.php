@@ -164,7 +164,7 @@ class CachingEntityBody extends AbstractEntityBodyDecorator
 
     public function setStream($stream, $size = null)
     {
-    	$size = $size ? $size : 0;
+        $size = $size ? $size : 0;
         $this->remoteStream->setStream($stream, $size);
     }
 

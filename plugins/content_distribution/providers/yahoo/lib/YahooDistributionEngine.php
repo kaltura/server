@@ -231,7 +231,7 @@ class YahooDistributionEngine extends DistributionEngine implements
 		$flavorAssetIds = $entryDistribution->flavorAssetIds;
 		$partnerId = $entryDistribution->partnerId;
 		
-		return parent::getThumbAssets($partnerId, $thumbAssetIds);
+		return parent::getFlavorAssets($partnerId, $thumbAssetIds);
 	}
 
 	protected function getEntryDistributionThumbAssets(KalturaEntryDistribution $entryDistribution)
