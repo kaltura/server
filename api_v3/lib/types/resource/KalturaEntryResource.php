@@ -52,9 +52,7 @@ class KalturaEntryResource extends KalturaContentResource
 		if(!$srcEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
 		if ($validateLocal && !$this->checkIfFileExist(true))
-			throw new kCoreException("Source file not found locally for entry [" . $this->entryId . "]", kCoreException::SOURCE_FILE_NOT_FOUND);
-		if($srcEntry->getMediaType() == KalturaMediaType::IMAGE)
-			return parent::validateEntry($dbEntry);
+			throw new KalturaAPIException(KalturaErrors::LOCAL_FILE_NOT_FOUND, $this->entryId);
 	}
 
 	private function checkIfFileExist($local = false)
