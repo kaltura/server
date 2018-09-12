@@ -45,6 +45,7 @@ class kReportManager
 			$user = $dbConfig["user"];
 			$password = $dbConfig["password"];
 			$dbName = $dbConfig["db_name"];
+			$db = kConf::getDB();
 			$charset = isset($dbConfig["charset"]) ? $dbConfig["charset"] : null;
 			
 			$pdoString = "mysql:host={$host};port={$port};dbname={$dbName};";
