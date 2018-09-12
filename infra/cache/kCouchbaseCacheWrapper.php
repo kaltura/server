@@ -843,7 +843,7 @@ class kCouchbaseCacheWrapper extends kBaseCacheWrapper
 		$couchBaseQuery = $query->toQuery();
 		$meta =  $this->bucket->query($couchBaseQuery);
 		if(phpversion('couchbase') > '2.0.7')
-			$meta = json_decode(json_encode($meta), True);
+			$meta = json_decode(json_encode($meta), true);
 		return new kCouchbaseCacheList($meta);
 	}
 }
