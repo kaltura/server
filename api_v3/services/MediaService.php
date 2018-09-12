@@ -1233,7 +1233,7 @@ class MediaService extends KalturaEntryService
 		KalturaLog::info("Exception was thrown during setContent on entry [$entryId] with error: " . $e->getMessage());
 		$this->cancelReplaceAction($entryId);
 
-		$errorArr = array(kCoreException::SOURCE_FILE_NOT_FOUND, KalturaErrors::SOURCE_FILE_REMOTE);
+		$errorArr = array(kCoreException::SOURCE_FILE_NOT_FOUND, KalturaErrors::SOURCE_FILE_NOT_FOUND);
 		if ((in_array($e->getCode(), $errorArr)) && (kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId())))
 		{
 			$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
