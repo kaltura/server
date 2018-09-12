@@ -112,10 +112,10 @@ class MediaService extends KalturaEntryService
 
 		if ($resource)
 		{
-			$resource->validateEntry($dbEntry);
-			$kResource = $resource->toObject();
 			try
 			{
+				$resource->validateEntry($dbEntry, true);
+				$kResource = $resource->toObject();
 				$this->attachResource($kResource, $dbEntry);
 			} catch (Exception $e) {
 				$this->handleErrorDuringSetResource($entryId, $e);
@@ -139,7 +139,7 @@ class MediaService extends KalturaEntryService
     	}
 		if($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT || $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
-			$resource->validateEntry($dbEntry);
+			$resource->validateEntry($dbEntry, true);
 
 			if($conversionProfileId)
 			{
