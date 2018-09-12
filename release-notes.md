@@ -15,6 +15,19 @@
     Run deployment script:
         php /opt/kaltura/app/deployment/updates/scripts/2018_09_01_deploy_reach_credit_expired_email_notification.php
 
+## Add ability to get server node path ##
+- Issue Type: Task
+- Issue ID: PLAT-9212
+
+### Configuration ###
+	None.
+
+#### Deployment Scripts ####
+
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_09_06_server_node_getServerNodePath.php
+
+
 
 # Naos 14.4.0 #
 
