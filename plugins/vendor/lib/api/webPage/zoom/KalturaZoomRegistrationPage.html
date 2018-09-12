@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* Bordered form */
+        form {
+            border: 7px solid #f1f1f1;
+            margin-left: 35%;
+            margin-right: 35%;
+        }
+
+        /* Full-width inputs */
+        input[type=text], input[type=number] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            /*display: inline-block;*/
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        input[type=checkbox] {
+            width: 30%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            /*display: inline-block;*/
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        /* Set a style for all buttons */
+        button {
+            background-color: #3b60af;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 35%;
+            border: none;
+            cursor: pointer;
+            width: auto;
+        }
+
+        p.success {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+            font-size: large;
+        }
+
+        p.error {
+            background-color: #ccc;
+            color: rgba(202, 22, 40, 0.59);
+            border: 1px solid #ccc;
+            font-weight: bold;
+            font-size: large;
+        }
+
+        /* Add a hover effect for buttons */
+        button:hover {
+            opacity: 0.8;
+        }
+
+        /* Center the avatar image inside this container */
+        .imgcontainer {
+            text-align: center;
+            margin: 24px 0 12px 0;
+        }
+
+        /* Avatar image */
+        img.avatar {
+            width: 20%;
+        }
+
+        /* Add padding to containers */
+        .container {
+            padding: 16px;
+        }
+
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        var ks = '@ks@';
+        var url = '@BaseServiceUrl@/api_v3/service/vendor_zoomvendor/action/submitRegistration';
+        var accountId = '@accountId@';
+    </script>
+    <script>
+        function trySubmit(event) {
+            $("body").css("cursor", "progress");
+            event.preventDefault();
+            var $defaultUserId = $('#defaultUserId');
+            var $enableUpload  = $('#enableUpload');
+            var $zoomCategory  = $('#zoomCategory');
+            var defaultUserId = $defaultUserId.val();
+            var enableUpload = $enableUpload.is(":checked");
+            var zoomCategory = $zoomCategory.val();
+            $.ajax({
+                url : url,
+                type : "post",
+                data: {"ks": ks, "defaultUserId": defaultUserId, "uploadEnabled": enableUpload, "zoomCategory" : zoomCategory
+                   , "accountId" : accountId ,"format": 1},
+                success : function(res) {
+                    $("body").css("cursor", "default");
+                    console.log(res);
+                    if(res){
+                        $('#submitError').hide();
+                        $('#submitOK').show();
+                    }
+                    else {
+                        $('#submitOK').hide();
+                        $('#submitError').show();
+                    }
+                },
+                error: function() {
+                    $("body").css("cursor", "default");
+                    console.log('err during api call');
+                }
+            });
+        }
+    </script>
+    <script>
+        (function() {
+            document.addEventListener('DOMContentLoaded', function () {
+                var submitButton = document.querySelector('.submit-button');
+                submitButton.addEventListener('click', trySubmit);
+            });
+        })();
+    </script>
+</head>
+<form action="">
+    <div class="imgcontainer">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f7/KalturaLogo_Updatedpng.png" alt="Avatar" class="avatar">
+    </div>
+
+    <div class="container">
+        <label for="defaultUserId"><b>Default User ID</b></label>
+        <input type="text" value="@defaultUserID@" id="defaultUserId" name="defaultUserId" required>
+        <label for="zoomCategory"><b>Zoom Category</b></label>
+        <input type="text" value="@zoomCategory@" id="zoomCategory" name="zoomCategory" required>
+        <label for="enableUpload"><b>Enable Upload</b></label>
+        <input type="checkbox" id="enableUpload" name="enableUpload" @checked@ required>
+        <button type="submit" class="submit-button">Submit</button>
+        <p id="submitError" class="error" style="display:none">Data was Not Saved , please check server logs'.</p>
+        <p id="submitOK" class="success" style="display:none">Saved Successfully</p>
+    </div>
+</form>
+</html>
