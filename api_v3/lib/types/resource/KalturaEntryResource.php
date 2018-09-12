@@ -52,7 +52,7 @@ class KalturaEntryResource extends KalturaContentResource
 		if(!$srcEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
 		if ($validateLocal && !$this->checkIfFileExist(true))
-			throw new KalturaAPIException(KalturaErrors::LOCAL_FILE_NOT_FOUND, $this->entryId);
+			throw new KalturaAPIException(KalturaErrors::SOURCE_FILE_REMOTE);
 	}
 
 	private function checkIfFileExist($local = false)
