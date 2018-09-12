@@ -118,8 +118,7 @@ class ZoomVendorService extends KalturaBaseService
 	public function submitRegistrationAction($defaultUserId, $uploadEnabled, $zoomCategory, $accountId)
 	{
 		$partnerId = kCurrentContext::getCurrentPartnerId();
-		$vendorIntegrationPeer = new VendorIntegrationPeer();
-		$zoomIntegration = $vendorIntegrationPeer->retrieveSingleVendorPerPartner($accountId,
+		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId,
 			VendorTypeEnum::ZOOM_ACCOUNT, $partnerId);
 		if(is_null($zoomIntegration))
 		{
@@ -142,15 +141,58 @@ class ZoomVendorService extends KalturaBaseService
 	 */
 	public function recordingCompleteAction()
 	{
-
+		KalturaLog::info('starting upload token to Kaltura server');
 		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
-		$zoomAuth = new kZoomOauth();
-		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
-		$zoomPeer = new VendorIntegrationPeer();
-		$account = $zoomPeer->retrieveSingleVendorPerPartner('9ekf-VdORCWVWXTCIKLIlw',1,100);
-		$zoomUserData = $this->retrieveZoomUserDataAsArray($account->getAccessToken(), $zoomBaseURL);
-		$test = 1;
+		$verificationToken = $zoomConfiguration['verificationToken'];
+
+		if($verificationToken !== $verificationToken) //todo:: Roie get recived token
+			KExternalErrors::dieGracefully('Received verification token is different from existing token');
+		$accountId = 1; //todo:: Roie retrive account Id
+		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+
+		// user logged in - need to re-init kPermissionManager in order to determine current user's permissions
+		$ks = null;
+		// todo: take user email from data
+		$dbUser = kuserPeer::getKuserByPartnerAndUid($zoomIntegration->getPartnerId(), $zoomIntegration->getDefaultUserEMail());
+		kSessionUtils::createKSessionNoValidations($dbUser->getPartnerId() , $dbUser->getPuserId() , $ks, 86400 , false , "" , '*' );
+		kCurrentContext::initKsPartnerUser($ks);
+		kPermissionManager::init();
+		$entry = $this->createEntryForZoom($dbUser, $zoomIntegration->getZoomCategory(),$this->parseUrl());
+
 	}
+
+	private function parseUrl()
+	{
+	}
+
+	/**
+	 * @param kuser $dbUser
+	 * @param string $zoomCategory
+	 * @param $url
+	 * @return entry
+	 * @throws PropelException
+	 * @throws kCoreException
+	 */
+	private function createEntryForZoom($dbUser, $zoomCategory, $url)
+	{
+		$entry = new entry();
+		$entry->setType(entryType::MEDIA_CLIP);
+		$entry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
+		$entry->setName('ZOOM_'.time());
+		$entry->setPartnerId($dbUser->getPartnerId());
+		$entry->setStatus(entryStatus::NO_CONTENT);
+		$entry->setSourceType(EntrySourceType::ZOOM);
+		$entry->setPuserId($dbUser->getPuserId());
+		$entry->setkuser($dbUser->getKuserId());
+		$entry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($dbUser->getPartnerId())->getId());
+		$entry->setAdminTags('zoom');
+		$entry->setCategories($zoomCategory);
+		$entry->save();
+		KalturaLog::info('Zoom Entry Created, Entry ID:  ' . $entry->getId());
+		kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url);
+		return $entry;
+	}
+
 
 	/**
 	 * @param array $zoomUserPermissions
@@ -226,7 +268,6 @@ class ZoomVendorService extends KalturaBaseService
 	 * @param $tokensDataAsArray
 	 * @param $accountId
 	 * @param VendorIntegration $zoomClientData
-	 * @throws PropelException
 	 */
 	private function saveNewTokenData($tokensDataAsArray, $accountId, $zoomClientData = null)
 	{

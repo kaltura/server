@@ -11,7 +11,7 @@
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package plugins.reach
+ * @package plugins.vendor
  * @subpackage model.map
  */
 class VendorIntegrationTableMap extends TableMap {
@@ -19,7 +19,7 @@ class VendorIntegrationTableMap extends TableMap {
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'plugins.reach.VendorIntegrationTableMap';
+	const CLASS_NAME = 'plugins.vendor.VendorIntegrationTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -34,7 +34,7 @@ class VendorIntegrationTableMap extends TableMap {
 		$this->setName('vendor_integration');
 		$this->setPhpName('VendorIntegration');
 		$this->setClassname('VendorIntegration');
-		$this->setPackage('plugins.reach');
+		$this->setPackage('plugins.vendor');
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);

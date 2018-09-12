@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.venodr
+ * @package plugins.vendor
  * @subpackage model.zoomOauth
  */
 
@@ -46,9 +46,8 @@ class AESOauthZoom
 		{
 			$efforts+=1;
 			$iv = openssl_random_pseudo_bytes(16, $wasItSecure);
-			if($efforts == $maxEfforts){
-				throw new Exception('Unable to genereate secure iv.');
-				break;
+			if($efforts > $maxEfforts){
+				throw new KalturaAPIException('Unable to genereate secure iv for tokens.');
 			}
 		} while (!$wasItSecure);
 

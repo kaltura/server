@@ -83,14 +83,7 @@ class kZoomOauth implements kVendorOauth
 		$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $header);
 		$curlWrapper->setOpt(CURLOPT_USERPWD, $userPwd);
 		$curlWrapper->setOpt(CURLOPT_POSTFIELDS, $postFields);
-		$response = $curlWrapper->exec($url . self::OAUTH_TOKEN_PATH);
-		$httpCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
-		if (!$response || $httpCode !== 200 || $curlWrapper->getError())
-		{
-			KalturaLog::err('Zoom Curl returned error, Tokens were not received, Error: ' . $curlWrapper->getError());
-			KExternalErrors::dieGracefully();
-		}
-		return $response;
+		return $curlWrapper->exec($url . self::OAUTH_TOKEN_PATH);
 	}
 
 	/**
