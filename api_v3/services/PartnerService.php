@@ -376,18 +376,13 @@ class PartnerService extends KalturaBaseService
 	 * 
 	 */
 	public function listPartnersForUserAction(KalturaPartnerFilter $partnerFilter = null, KalturaFilterPager $pager = null)
-	{	
-		$partnerId = kCurrentContext::$master_partner_id;
-		
-		if (isset(kCurrentContext::$partner_id))
-			$partnerId = kCurrentContext::$partner_id;
-		
+	{
+		$partnerId = kCurrentContext::getCurrentPartnerId();
 		$c = new Criteria();
 		$currentUser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid, true);
-		
+
 		if(!$currentUser)
 		{
-		    $userId = kCurrentContext::$ks_uid;
 		    throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
 		}
 		
@@ -404,11 +399,9 @@ class PartnerService extends KalturaBaseService
 		}	
 			
 		$allowedIds = $currentUser->getAllowedPartnerIds($dbFilter);
-		
 		$pager->attachToCriteria($c);
-		$partners = array();
 		$partners = myPartnerUtils::getPartnersArray($allowedIds, $c);	
-		$kalturaPartners = KalturaPartnerArray::fromPartnerArray($partners );
+		$kalturaPartners = KalturaPartnerArray::fromPartnerArray($partners);
 		$response = new KalturaPartnerListResponse();
 		$response->objects = $kalturaPartners;
 		$response->totalCount = count($partners);	
