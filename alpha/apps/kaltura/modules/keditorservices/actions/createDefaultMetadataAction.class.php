@@ -14,7 +14,7 @@ class createDefaultMetadataAction extends defKeditorservicesAction
 	/**
 	 * Executes index action
 	 */
-	protected function executeImpl ( kshow $kshow )
+	protected function executeImpl( kshow $kshow, entry &$entry)
 	{
 		$this->xml_content = ""; 
 

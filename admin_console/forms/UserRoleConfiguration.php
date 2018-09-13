@@ -74,7 +74,7 @@ class Form_UserRoleConfiguration extends Infra_Form
 		}
 	}
 	
-	public function populateFromObject($userRole)
+	public function populateFromObject($userRole, $add_underscore = true)
 	{
 		$this->getElement('name')->setValue($userRole->name);
 		$this->getElement('description')->setValue($userRole->description);

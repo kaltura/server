@@ -1,7 +1,7 @@
 <?php
 class kMultiCentersBroadcastUrlManager extends kBroadcastUrlManager
 {
-	public function getBroadcastUrl(entry $entry, $mediaServerIndex)
+	public function getBroadcastUrl(LiveStreamEntry $entry, $protocol, $hostname, $mediaServerIndex, $concatStreamName = false)
 	{
 		$mediaServerConfig = kConf::get($mediaServerIndex, 'broadcast');
 		$app = $mediaServerConfig['application'];

@@ -5,11 +5,11 @@
  */
 abstract class kalturaAction extends sfAction
 {
-  private $cookieSecret = 'y3tAno3therS$cr3T';
-  
-	const COOKIE_CREDENTAIL_IV = "76Abigail13bisca"; 
+	private $cookieSecret = 'y3tAno3therS$cr3T';
+	
+	const COOKIE_CREDENTAIL_IV = "76Abigail13bisca";
 	const COOKIE_EXPIRY = 100000;
-	 
+	
 	const VERIFICATION_MODE_CONTRIB = "contrib";
 	const VERIFICATION_MODE_EDIT = "edit";
 	const VERIFICATION_MODE_CUSTOMIZE = "customize";
@@ -18,12 +18,12 @@ abstract class kalturaAction extends sfAction
 	const ON_ERROR_RETURN_RESULT = 1;
 	const ON_ERROR_WIZARD = 2 ;
 	const ON_ERROR_FULL_SCREEN = 3;
-	 
+	
 	// likuser === Logged In Kuser
 	protected $likuser_id = NULL;
 	protected $likuser = NULL;
 	protected $lipuser_id = NULL;
-
+	
 	protected function getP ( $param_name , $default_val = NULL )
 	{
 		return requestUtils::getParameter ( $param_name , $default_val );
@@ -54,7 +54,7 @@ abstract class kalturaAction extends sfAction
 			return NULL;
 		}
 	}
-
+	
 	protected function getLoggedInPuserId ( )
 	{
 		try
@@ -95,7 +95,7 @@ abstract class kalturaAction extends sfAction
 	
 	protected function logOut ()
 	{
-		// TODO - add kill credentails & invalidate the authentication 
+		// TODO - add kill credentails & invalidate the authentication
 		self::removeAllSecureCookies();
 	}
 	
@@ -119,7 +119,7 @@ abstract class kalturaAction extends sfAction
 	{
 		if ( !$this->getUserzoneCookie() )
 		{
-			//echo ( "forceAuthentication [$allow_redirect]" ); 
+			//echo ( "forceAuthentication [$allow_redirect]" );
 			if ( $allow_redirect )
 			{
 				
@@ -135,17 +135,17 @@ abstract class kalturaAction extends sfAction
 		
 		return true;
 	}
-
+	
 	protected function forceContribPermissions ( $kshow , $kshow_id , $allow_redirect = true , $full_window = false)
 	{
 		return $this->forcePermissionsImpl ( $kshow ,$kshow_id , self::VERIFICATION_MODE_CONTRIB , $allow_redirect , $full_window );
 	}
-
+	
 	protected function forceEditPermissions ( $kshow ,$kshow_id , $allow_redirect = true , $full_window = false)
 	{
 		return $this->forcePermissionsImpl ( $kshow ,$kshow_id , self::VERIFICATION_MODE_EDIT , $allow_redirect , $full_window );
 	}
-
+	
 	protected function forceCustomizePermissions ( $kshow ,$kshow_id , $allow_redirect = true , $full_window = false)
 	{
 		return $this->forcePermissionsImpl ( $kshow ,$kshow_id , self::VERIFICATION_MODE_CUSTOMIZE , $allow_redirect , $full_window );
@@ -156,10 +156,10 @@ abstract class kalturaAction extends sfAction
 		return $this->forcePermissionsImpl ( $kshow ,$kshow_id , self::VERIFICATION_MODE_VIEW , $allow_redirect , $full_window );
 	}
 	
-	// if $allow_redirect == true  $full_window can be true too which will cause a page to open and only then open the authentication wizard 
-	// 
+	// if $allow_redirect == true  $full_window can be true too which will cause a page to open and only then open the authentication wizard
+	//
 	private function forcePermissionsImpl ( $kshow ,$kshow_id , $verification_mode , $allow_redirect = true , $full_window = false)
-	{	
+	{
 		if ( $kshow == NULL )	$kshow = kshowPeer::retrieveByPK( $kshow_id);
 		if ( !$kshow )
 		{
@@ -174,10 +174,10 @@ abstract class kalturaAction extends sfAction
 		$viewer_type = myKshowUtils::getViewerType($kshow , $likuser_id ) ;
 		
 		if ( $viewer_type == KshowKuser::KSHOWKUSER_VIEWER_PRODUCER ) return true;
-				
+		
 		$this->setCredentialByName ( "requestKshow" , $kshow_id );
 		$this->setCredentialByName ( "verificationMode" , $verification_mode );
-		
+
 //		echo ("verificationMode: " .  $this->getCredentialByName ( "verificationMode" ) );
 		
 		if ( $full_window )
@@ -199,7 +199,7 @@ abstract class kalturaAction extends sfAction
 	private function forcePermissionsDoCheckOrRedirect ( $kshow ,$kshow_id , $verification_mode , $allow_redirect = true )
 	{
 		$this->setCredentialByName ( "requestKshowName" , $kshow->getName() );
-
+		
 		$force_auth = false;
 		if ( $verification_mode == self::VERIFICATION_MODE_CONTRIB )
 		{
@@ -210,7 +210,7 @@ abstract class kalturaAction extends sfAction
 		{
 			$permissions = $kshow->getEditPermissions ();
 			$pwd = $kshow->getEditPassword();
-			// in this case - force authentication when not for everyone 
+			// in this case - force authentication when not for everyone
 			$force_auth = true;
 		}
 		else if ( $verification_mode == self::VERIFICATION_MODE_VIEW  )
@@ -226,16 +226,16 @@ abstract class kalturaAction extends sfAction
 				$this->playDead( NULL );
 			}
 			return true;
-		}		
+		}
 		else
 		{
 			throw new Exception ( "Cannot force permission for type $verification_mode");
 		}
-/*		
-		echo "kshow_id: $kshow_id, verification_mode: $verification_mode<br>" .
-			"producer: " . $kshow->getProducerId() . ", likuser id: " . $this->likuser_id . "<br>". 
-			"permission: $permissions, pwd: $pwd<br>";
-*/
+		/*
+				echo "kshow_id: $kshow_id, verification_mode: $verification_mode<br>" .
+					"producer: " . $kshow->getProducerId() . ", likuser id: " . $this->likuser_id . "<br>".
+					"permission: $permissions, pwd: $pwd<br>";
+		*/
 		/*
 		 const KSHOW_PERMISSION_EVERYONE = 1;
 		 const KSHOW_PERMISSION_JUST_ME = 2;
@@ -246,7 +246,7 @@ abstract class kalturaAction extends sfAction
 //		echo ( "$kshow_id , $verification_mode , $allow_redirect , $permissions\n" );
 		
 		$res = true;
-
+		
 		debugUtils::log ( "kshow_id [$kshow_id], verification_mode: " . $verification_mode . " permissions: $permissions" );
 		
 		switch ( $permissions )
@@ -258,7 +258,7 @@ abstract class kalturaAction extends sfAction
 				$res = $this->forceAuthentication( $allow_redirect );
 				break;
 			case kshow::KSHOW_PERMISSION_JUST_ME:
-				if ( $force_auth )	
+				if ( $force_auth )
 				{
 					$res = $this->forceAuthentication( $allow_redirect );
 					if ( !$res ) break; // user was not authenticated but was supposed to be - don't continue
@@ -270,7 +270,7 @@ abstract class kalturaAction extends sfAction
 				}
 				break;
 			case kshow::KSHOW_PERMISSION_INVITE_ONLY:
-				if ( $force_auth )	
+				if ( $force_auth )
 				{
 					$res = $this->forceAuthentication( $allow_redirect );
 					if ( !$res ) break; // user was not authenticated but was supposed to be - don't continue
@@ -284,12 +284,12 @@ abstract class kalturaAction extends sfAction
 			case kshow::KSHOW_PERMISSION_NONE:
 				// do nothing - exit
 				throw new sfStopException();
-				break;				
+				break;
 		}
-
+		
 		return $res;
 	}
-
+	
 	protected function isProducer ( $kshow )
 	{
 		return 	( $kshow->getProducerId() == $this->getLoggedInUserId() );
@@ -301,25 +301,25 @@ abstract class kalturaAction extends sfAction
 		$this->setFlash('sign_in_referer', $_SERVER["REQUEST_URI"]);
 		return $this->forward('login','justMe');
 	}
-
+	
 	protected function inviteOnly ( $kshow , $verification_mode , $allow_redirect = true )
 	{
 		$kshow_id = $kshow->getId();
-
+		
 		if ( ! $this->isValidExpiryCredential ( "$verification_mode" . "kshow" . $kshow_id) )
 		{
-/*
- * TODO - PRIVILEGES - should not enforce authentication
- */
-
+			/*
+			 * TODO - PRIVILEGES - should not enforce authentication
+			 */
+			
 			//$this->forceAuthentication( $allow_redirect );
 			if ( ! $allow_redirect ) return false;
-/*			
-			$this->setCredentialByName ( "requestKshow" , $kshow_id );
-			$this->setCredentialByName ( "requestKshowName" , $kshow->getName() );
-			$this->setCredentialByName ( "verificationMode" , $verification_mode );
-	*/		
-			// be sure the likuser can 
+			/*
+						$this->setCredentialByName ( "requestKshow" , $kshow_id );
+						$this->setCredentialByName ( "requestKshowName" , $kshow->getName() );
+						$this->setCredentialByName ( "verificationMode" , $verification_mode );
+				*/
+			// be sure the likuser can
 			$this->setFlash('sign_in_referer', $_SERVER["REQUEST_URI"]);
 			return $this->forward('login','inviteOnlyForm');
 		}
@@ -346,7 +346,7 @@ abstract class kalturaAction extends sfAction
 		}
 		
 	}
-
+	
 	protected function getCredentialByName ( $cred_name )
 	{
 		$use_cookies = ( $this->getLoggedInUser() == NULL );
@@ -359,65 +359,65 @@ abstract class kalturaAction extends sfAction
 			// if the user is logged in - use the credential mechaism
 			$real_cred = $this->findCredential ( $cred_name );
 			if ( !$real_cred ) return NULL;
-			
+
 //			$cred_list = $this->getUser()->listCredentials();
 			$values = explode ( ":" , $real_cred );
 			$val = $values[1];
 		}
-		
+
 //		debugUtils::log ( "getCredentialByName  [$cred_name]=[$val]" );
 		
 		return $val;
-	}	
-
-	// use $response->setCookie to reset the values 
+	}
+	
+	// use $response->setCookie to reset the values
 	public static function removeAllSecureCookiesFromResponse ( $response )
 	{
 		requestUtils::removeAllSecureCookies ();
-/*		
-		$secure_cookie_list = requestUtils::getSecureCookie( "secure_cookie_list" , self::COOKIE_CREDENTAIL_IV );
+		/*
+				$secure_cookie_list = requestUtils::getSecureCookie( "secure_cookie_list" , self::COOKIE_CREDENTAIL_IV );
+				
+				if ( empty ( $secure_cookie_list ) ) return;
 		
-		if ( empty ( $secure_cookie_list ) ) return;
-
-		$response->setCookie( "secure_cookie_list" , '', time()-3600, '/');		
-		
-		$arr = explode ( ";" , $secure_cookie_list );
-		foreach ( $arr as $secure_cookie_hashed_name )
-		{
-			$response->setCookie($secure_cookie_hashed_name, '', time()-3600, '/');  
-		}
-*/		 
+				$response->setCookie( "secure_cookie_list" , '', time()-3600, '/');
+				
+				$arr = explode ( ";" , $secure_cookie_list );
+				foreach ( $arr as $secure_cookie_hashed_name )
+				{
+					$response->setCookie($secure_cookie_hashed_name, '', time()-3600, '/');
+				}
+		*/
 	}
 	
 	public static function removeAllSecureCookies ( )
 	{
 		requestUtils::removeAllSecureCookies ();
-/*		
-		$secure_cookie_list = requestUtils::getSecureCookie( "secure_cookie_list" , self::COOKIE_CREDENTAIL_IV );
-		if ( empty ( $secure_cookie_list )) return;
-			
-		$arr = explode ( ";" , $secure_cookie_list );
-		foreach ( $arr as $secure_cookie_hashed_name )
+		/*
+				$secure_cookie_list = requestUtils::getSecureCookie( "secure_cookie_list" , self::COOKIE_CREDENTAIL_IV );
+				if ( empty ( $secure_cookie_list )) return;
+					
+				$arr = explode ( ";" , $secure_cookie_list );
+				foreach ( $arr as $secure_cookie_hashed_name )
+				{
+					requestUtils::removeSecureCookieByName ( $secure_cookie_hashed_name );
+				}
+				requestUtils::removeSecureCookieByName( "secure_cookie_list" );
+		*/
+	}
+	/*
+		private function addToSecureCookieList ( $name )
 		{
-			requestUtils::removeSecureCookieByName ( $secure_cookie_hashed_name );
+			 $secure_cookie_list = requestUtils::getSecureCookie( "secure_cookie_list" , self::COOKIE_CREDENTAIL_IV );
+			 if ( empty ( $secure_cookie_list ) )
+				 $secure_cookie_list = "";
+			 $hashname = requestUtils::getSecureCookieName ( $name );
+			 if ( strpos ( $secure_cookie_list , $hashname . ";" ) === false )
+			 {
+				 $secure_cookie_list .= $hashname . ";";
+				 requestUtils::setSecureCookie( "secure_cookie_list" , $secure_cookie_list , self::COOKIE_CREDENTAIL_IV , self::COOKIE_EXPIRY );
+			 }
 		}
-		requestUtils::removeSecureCookieByName( "secure_cookie_list" );
-*/
-	}
-/*	
-	private function addToSecureCookieList ( $name )
-	{
-		 $secure_cookie_list = requestUtils::getSecureCookie( "secure_cookie_list" , self::COOKIE_CREDENTAIL_IV );
-		 if ( empty ( $secure_cookie_list ) )
-		 	$secure_cookie_list = "";
-		 $hashname = requestUtils::getSecureCookieName ( $name );
-		 if ( strpos ( $secure_cookie_list , $hashname . ";" ) === false )
-		 {
-		 	$secure_cookie_list .= $hashname . ";";
-		 	requestUtils::setSecureCookie( "secure_cookie_list" , $secure_cookie_list , self::COOKIE_CREDENTAIL_IV , self::COOKIE_EXPIRY );
-		 }
-	}
-*/
+	*/
 	protected function hasCredentialByName  ( $cred_name )
 	{
 		return ( $this->findCredential( $cred_name ) != NULL );
@@ -431,7 +431,7 @@ abstract class kalturaAction extends sfAction
 		{
 			if ( kString::beginsWith( $val , $prefix))		return $val;
 		}
-
+		
 		return NULL;
 	}
 	
@@ -449,25 +449,25 @@ abstract class kalturaAction extends sfAction
 		// assume the val is time that might have expired
 		$val = time() + $ttl_in_sec ;
 		$this->setCredentialByName( $cred_name , $val );
-	}	
- 
-  protected function getUserzoneCookie() 
-  {
-  	return null;
-  }
-  
-  protected function followRedirectCookie()
-  {
-	$return_to = @$_COOKIE["kaltura_redirect"];
-	if ($return_to)
-	{
-		$return_to = base64_decode($return_to);
-		// make the redirect cookie expire
-		setcookie( 'kaltura_redirect', '', time() - 86400 , '/' );
-		
-		$this->redirect( "http://$return_to/".$_SERVER["REQUEST_URI"] );
 	}
-  }
+	
+	protected function getUserzoneCookie()
+	{
+		return null;
+	}
+	
+	protected function followRedirectCookie()
+	{
+		$return_to = @$_COOKIE["kaltura_redirect"];
+		if ($return_to)
+		{
+			$return_to = base64_decode($return_to);
+			// make the redirect cookie expire
+			setcookie( 'kaltura_redirect', '', time() - 86400 , '/' );
+			
+			$this->redirect( "http://$return_to/".$_SERVER["REQUEST_URI"] );
+		}
+	}
 }
 
 ?>

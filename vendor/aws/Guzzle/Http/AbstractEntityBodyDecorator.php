@@ -97,8 +97,10 @@ class AbstractEntityBodyDecorator implements EntityBodyInterface
         return $this->body->getStream();
     }
 
-    public function setStream($stream, $size = 0)
+    public function setStream($stream, $size = null)
     {
+        $size = $size ? $size : 0;
+		
         $this->body->setStream($stream, $size);
 
         return $this;

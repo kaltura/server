@@ -23,7 +23,6 @@
 		}
 
 		public function __destruct() {
-			unset($this);
 		}
 
 		/**

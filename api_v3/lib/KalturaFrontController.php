@@ -118,6 +118,12 @@ class KalturaFrontController
 				$errorCode = $ex->getCode();
 				$result = $this->getExceptionObject($ex, $this->service, $this->action);
 			}
+			catch (Error $ex) 
+			{
+				$success = false;
+				$errorCode = $ex->getCode();
+				$result = $this->getExceptionObject($ex, $this->service, $this->action);
+			}
 			
 			$this->onRequestEnd($success, $errorCode);
 		}
@@ -310,6 +316,12 @@ class KalturaFrontController
 					$errorCode = $ex->getCode();
 					$currentResult = $this->getExceptionObject($ex, $currentService, $currentAction);
 				}
+				catch (Error $ex)
+				{
+					$success = false;
+					$errorCode = $ex->getCode();
+					$currentResult = $this->getExceptionObject($ex, $currentService, $currentAction);
+				}
 				$cache->storeCache($currentResult, array(), true);
 			}
 			$this->onRequestEnd($success, $errorCode, kCurrentContext::$multiRequest_index);
@@ -386,6 +398,9 @@ class KalturaFrontController
 			case E_USER_WARNING:
 			case E_WARNING:
 				KalturaLog::log(sprintf($errorFormat, $errFile, $errLine, $errStr), KalturaLog::WARN);
+				break;
+			case E_DEPRECATED:
+				KalturaLog::log(sprintf($errorFormat, $errFile, $errLine, $errStr), KalturaLog::NOTICE);
 				break;
 			default: // throw it as an exception
 				throw new ErrorException($errStr, 0, $errNo, $errFile, $errLine);

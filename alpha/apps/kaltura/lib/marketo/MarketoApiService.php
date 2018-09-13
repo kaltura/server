@@ -10,7 +10,7 @@ class MarketoApiService extends MktMktowsApiService
 	public $accessKey;
 	public $secretKey;
 	
-	public function setCredentials($accessKey, $secretKey)
+	public function setCredentials($accessKey, $secretKey, $authtype = 'basic', $certRequest = array())
 	{
 		$this->accessKey = $accessKey;
 		$this->secretKey = $secretKey;

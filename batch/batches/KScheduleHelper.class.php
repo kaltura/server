@@ -50,24 +50,24 @@ class KScheduleHelper extends KPeriodicWorker
 		
 		// get command results from the scheduler
 		$commandResults = KScheduleHelperManager::loadResultsCommandsFile();
-		KalturaLog::info(count($commandResults) . " command results returned from the scheduler");
-		if(count($commandResults))
+		KalturaLog::info(is_array($commandResults) ? count($commandResults) : 0 . " command results returned from the scheduler");
+		if(is_array($commandResults) && count($commandResults))
 			$this->sendCommandResults($commandResults);
 		
 		// get config from the schduler
 		$configItems = KScheduleHelperManager::loadConfigItems();
-		if(count($configItems))
+		if(is_array($configItems) && count($configItems))
 		{
 			KalturaLog::info(count($configItems) . " config records sent from the scheduler");
 			$this->sendConfigItems($scheduler, $configItems);
 		}
 		
 		$filters = KScheduleHelperManager::loadFilters();
-		KalturaLog::info(count($filters) . " filter records found for the scheduler");
+		KalturaLog::info(is_array($filters) ? count($filters) : 0 . " filter records found for the scheduler");
 		
 		// get status from the schduler
 		$statuses = KScheduleHelperManager::loadStatuses();
-		KalturaLog::info(count($statuses) . " status records sent from the scheduler");
+		KalturaLog::info(is_array($statuses) ? count($statuses) : 0 . " status records sent from the scheduler");
 		
 		// send status to the server
 		$statusResponse = self::$kClient->batchcontrol->reportStatus($scheduler, (array)$statuses, (array)$filters);
@@ -77,7 +77,7 @@ class KScheduleHelper extends KPeriodicWorker
 		
 		// send commands to the scheduler		
 		$commands = array_merge($statusResponse->queuesStatus, $statusResponse->schedulerConfigs, $statusResponse->controlPanelCommands);
-		KalturaLog::info(count($commands) . " commands sent to scheduler");
+		KalturaLog::info(is_array($commands) ? count($commands) : 0 . " commands sent to scheduler");
 		$this->saveSchedulerCommands($commands);
 	}
 	
