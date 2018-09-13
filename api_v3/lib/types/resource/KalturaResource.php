@@ -8,7 +8,7 @@
  */
 abstract class KalturaResource extends KalturaObject 
 {
-	public function validateEntry(entry $dbEntry)
+	public function validateEntry(entry $dbEntry, $validateLocal = false)
 	{
 		
 	}
