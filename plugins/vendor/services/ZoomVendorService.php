@@ -22,7 +22,7 @@ class ZoomVendorService extends KalturaBaseService
 	const MP4 = 'MP4';
 	const FILE_TYPE = 'file_type';
 	const DOWNLOAD_URL = 'download_url';
-	const MEETING_ID = 'meeting_id';
+	const MEETING_ID = 'id';
 
 
 	/**
@@ -161,7 +161,8 @@ class ZoomVendorService extends KalturaBaseService
 		$meeting = $payload[self::MEETING];
 		$hostEmail = $meeting[self::HOST_EMAIL];
 		$recordingFiles = $meeting[self::RECORDING_FILES];
-		list($downloadURL, $meetingId)= $this->getMeetingsParameters($recordingFiles);
+		$downloadURL = $this->getDownloadUrl($recordingFiles);
+		$meetingId = $meeting[self::MEETING_ID];
 		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 		$retrieveDataFromZoom = new RetrieveDataFromZoom();
 		$meetingApi = str_replace('@meetingId@', $meetingId, self::API_PARTICIPANT);
@@ -192,8 +193,7 @@ class ZoomVendorService extends KalturaBaseService
 	 * @param string $zoomCategory
 	 * @param $url
 	 * @param $emails
-	 * @throws PropelException
-	 * @throws kCoreException
+	 * @throws Exception
 	 */
 	private function createEntryForZoom($dbUser, $zoomCategory, $url, $emails)
 	{
@@ -346,21 +346,17 @@ class ZoomVendorService extends KalturaBaseService
 
 	/**
 	 * @param array $recordingFiles
-	 * @return array<string>
+	 * @return string
 	 */
-	private function getMeetingsParameters($recordingFiles)
+	private function getDownloadUrl($recordingFiles)
 	{
 		$downloadURL = '';
-		$meetingId = '';
 		foreach ($recordingFiles as $recordingFile) {
 			if ($recordingFile[self::FILE_TYPE] === self::MP4)
-			{
 				$downloadURL = $recordingFile[self::DOWNLOAD_URL];
-				$meetingId = $recordingFile[self::MEETING_ID];
-			}
 		}
 		if (!$downloadURL)
 			KExternalErrors::dieGracefully('Zoom - MP4 downland url was not found');
-		return array($downloadURL, $meetingId);
+		return $downloadURL;
 	}
 }
