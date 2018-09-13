@@ -194,7 +194,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		if($uiConfId)
 			$url .= '/uiConfId/' . $uiConfId;
 
-		if(count($this->getDynamicAttributes()->getPlayerConfig()))
+		if($this->getDynamicAttributes()->getPlayerConfig())
 			$url .= '/playerConfig/' . $this->params->getPlayerConfig();
 		
 		$url .= '{playbackContext}';

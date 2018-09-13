@@ -38,7 +38,6 @@ protected
 		$this->serverUrl=$serverUrl;
 	}
 	public function __destruct() {
-		unset($this);
 	}
 	
 	/***********************

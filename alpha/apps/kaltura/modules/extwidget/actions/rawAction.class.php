@@ -182,14 +182,19 @@ class rawAction extends sfAction
 			$version = $this->getRequestParameter("version");
 			$syncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA, $version);
 			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+			
+			$path = null;
 			if($local)
+			{
 				$path = $fileSync->getFullPath();
-			else
+			}
+			elseif($fileSync)
 			{
 				$path = kDataCenterMgr::getRedirectExternalUrl($fileSync);
 				header("Location: $path");
 				KExternalErrors::dieGracefully();
 			}
+			
 			if (!$path)
 			{
 				header('KalturaRaw: no data was found available for download');

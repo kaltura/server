@@ -162,8 +162,9 @@ class CachingEntityBody extends AbstractEntityBodyDecorator
         return $this->remoteStream->close() && $this->body->close();
     }
 
-    public function setStream($stream, $size = 0)
+    public function setStream($stream, $size = null)
     {
+        $size = $size ? $size : 0;
         $this->remoteStream->setStream($stream, $size);
     }
 

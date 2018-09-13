@@ -71,7 +71,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			$subConditions = array();
 			$pluginName = MetadataPlugin::PLUGIN_NAME;
 			
-			if(count($this->items))
+			if($this->items && count($this->items))
 			{
 				foreach($this->items as $item)
 				{

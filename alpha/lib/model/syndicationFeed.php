@@ -38,8 +38,8 @@ class syndicationFeed extends BasesyndicationFeed implements IBaseObject
 		
 		die();
 	}
-        
-	public function save(PropelPDO $con = null)
+
+	public function save(PropelPDO $con = null, $skipReload = false)
 	{
 		$is_new = false;
 		if ( $this->isNew() )
@@ -48,7 +48,7 @@ class syndicationFeed extends BasesyndicationFeed implements IBaseObject
 		}
 		
 		$is_new = true;
-		$res = parent::save( $con );
+		$res = parent::save($con, $skipReload);
 		if ($is_new)
 		{
 			// when retrieving the entry - ignore thr filter - when in partner has moderate_content =1 - the entry will have status=3 and will fail the retrieveByPk 

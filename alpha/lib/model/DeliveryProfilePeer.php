@@ -221,7 +221,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		else
 			$deliveryIds = self::getCustomDeliveryIds($entry, $partner, $streamerType, $isLive, $deliveryAttributes);
 		// if the partner has an override for the required format on the partner object - use that
-		if(count($deliveryIds))
+		if($deliveryIds && count($deliveryIds))
 		{
 			$deliveries = self::getDeliveryByIds($deliveryIds, $partner, $streamerType, $deliveryAttributes, $cdnHost, $isSecured, $isLive);
 		}
@@ -362,7 +362,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$c = new Criteria();
 
 		// If delivery profile ids were provided and it's a white list don't filter by IS_DEFAULT
-		if (count($deliveryAttributes->getDeliveryProfileIds()) && !$deliveryAttributes->getIsDeliveryProfilesBlockedList())
+		if ($deliveryAttributes->getDeliveryProfileIds() && count($deliveryAttributes->getDeliveryProfileIds()) && !$deliveryAttributes->getIsDeliveryProfilesBlockedList())
 		{
 			$c->add(DeliveryProfilePeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partner->getId()), Criteria::IN);
 		}

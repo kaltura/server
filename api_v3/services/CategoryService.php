@@ -22,6 +22,7 @@ class CategoryService extends KalturaBaseService
 	 * 
 	 * @action add
 	 * @param KalturaCategory $category
+	 * @throws KalturaAPIException
 	 * @return KalturaCategory
 	 */
 	function addAction(KalturaCategory $category)
@@ -93,6 +94,7 @@ class CategoryService extends KalturaBaseService
 	 * @action update
 	 * @param int $id
 	 * @param KalturaCategory $category
+	 * @throws KalturaAPIException
 	 * @return KalturaCategory
 	 */
 	function updateAction($id, KalturaCategory $category)
@@ -155,6 +157,7 @@ class CategoryService extends KalturaBaseService
 	 * @action delete
 	 * @param int $id
 	 * @param KalturaNullableBoolean $moveEntriesToParentCategory
+	 * @throws KalturaAPIException
 	 */
 	function deleteAction($id, $moveEntriesToParentCategory = KalturaNullableBoolean::TRUE_VALUE)
 	{

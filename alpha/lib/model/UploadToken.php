@@ -43,7 +43,7 @@ class UploadToken extends BaseUploadToken implements IBaseObject
 	 */
 	const UPLOAD_TOKEN_DELETED = 5;
 
-	public function save(PropelPDO $con = null)
+	public function save(PropelPDO $con = null, $skipReload = false)
 	{
 		if ($this->isNew())
 		{
@@ -52,7 +52,7 @@ class UploadToken extends BaseUploadToken implements IBaseObject
 			if($this->autoFinalize)
 				$this->addAutoFinalizeToCache();
 		}
-		parent::save($con);
+		parent::save($con, $skipReload);
 	}
 
 	/* (non-PHPdoc)
