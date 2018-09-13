@@ -135,7 +135,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 		foreach ($entries as $entry)
 		{
 			$csvEntryData = $this->getCsvData($entry);
-			KCsvWrapper::sanitizedFPutCsv($this->handle, $csvEntryData, ",");
+			KCsvWrapper::sanitizedFputCsv($this->handle, $csvEntryData, ",");
 		}
 	}
 
@@ -145,7 +145,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 		$resultsCount = count($firstPage->objects);
 		try
 		{
-			KCsvWrapper::sanitizedFPutCsv($this->handle, $this->getCsvHeaders());
+			KCsvWrapper::sanitizedFputCsv($this->handle, $this->getCsvHeaders());
 			$this->writeEntriesToCsv($firstPage->objects);
 			$count = $resultsCount;
 			$this->updateFitler($firstPage->objects);

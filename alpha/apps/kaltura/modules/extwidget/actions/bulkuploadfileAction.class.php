@@ -63,7 +63,7 @@ class bulkuploadfileAction extends sfAction
 					$values[] = $bulkUploadResult->getEntryStatus();
 					$values[] = $bulkUploadResult->getErrorDescription();
 
-					KCsvWrapper::sanitizedFPutCsv($STDOUT, $values);
+					KCsvWrapper::sanitizedFputCsv($STDOUT, $values);
 				}
 	    		
 	    		if(count($bulkUploadResults) < $criteria->getLimit())
