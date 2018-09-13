@@ -439,8 +439,8 @@ class MediaService extends KalturaEntryService
 	 */
 	function addFromUploadedFileAction(KalturaMediaEntry $mediaEntry, $uploadTokenId)
 	{
-    	if($mediaEntry->conversionQuality && !$mediaEntry->conversionProfileId)
-    		$mediaEntry->conversionProfileId = $mediaEntry->conversionQuality;
+		if($mediaEntry->conversionQuality && !$mediaEntry->conversionProfileId)
+			$mediaEntry->conversionProfileId = $mediaEntry->conversionQuality;
 
 		try
 		{
@@ -458,10 +458,11 @@ class MediaService extends KalturaEntryService
 		}
 		catch(kCoreException $ex)
 		{
-		    if ($ex->getCode() == kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS);
-			    throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY);
-
-		    throw $ex;
+			if ($ex->getCode() == kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS)
+			{
+				throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY);
+			}
+			throw($ex);
 		}
 
 		if (!file_exists($entryFullPath))

@@ -34,4 +34,34 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp {
 		return $this->getFromCustomData("allowFairplayOffline", null, false);
 	}
 
+	/**
+	 * @return array
+	 */
+	protected function buildHttpFlavorsArray()
+	{
+		$flavors = array();
+		if ($this->params->getEdgeServerFallback() && $this->params->getEdgeServerIds() && count($this->params->getEdgeServerIds()))
+		{
+			foreach ($this->params->getEdgeServerIds() as $currEdgeServerId)
+			{
+				$domainPrefix = $this->getDeliveryServerNodeUrl(true);
+				foreach($this->params->getflavorAssets() as $flavorAsset)
+				{
+					$httpUrl = $this->getFlavorHttpUrl($flavorAsset);
+					if ($httpUrl)
+					{
+						$httpUrl['domainPrefix'] = $domainPrefix;
+						$flavors[] = $httpUrl;
+					}
+				}
+			}
+		}
+
+		$parentFlavors = parent::buildHttpFlavorsArray();
+		$mergedFlavors = array_merge($parentFlavors, $flavors);
+		return $mergedFlavors;
+
+	}
+
+
 }

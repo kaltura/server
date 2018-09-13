@@ -154,9 +154,11 @@ class ServerNodeService extends KalturaBaseService
 	 *
 	 * @action reportStatus
 	 * @param string $hostName
+	 * @param KalturaServerNode $serverNode
+	 * @param KalturaServerNodeStatus $serverNodeStatus
 	 * @return KalturaServerNode
 	 */
-	function reportStatusAction($hostName, KalturaServerNode $serverNode = null)
+	function reportStatusAction($hostName, KalturaServerNode $serverNode = null, $serverNodeStatus = ServerNodeStatus::ACTIVE)
 	{
 		$dbType = null;
 		if ($serverNode)
@@ -179,9 +181,10 @@ class ServerNodeService extends KalturaBaseService
 			else 
 				throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND, $hostName);
 		}
-	
+
+
 		$dbServerNode->setHeartbeatTime(time());
-		$dbServerNode->setStatus(ServerNodeStatus::ACTIVE);
+		$dbServerNode->setStatus($serverNodeStatus);
 		$dbServerNode->save();
 	
 		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
@@ -224,4 +227,27 @@ class ServerNodeService extends KalturaBaseService
 		$serverNode = KalturaServerNode::getInstance($dbServerNode, $this->getResponseProfile());
 		return $serverNode;
 	}
+
+	/**
+	 * Get the edge server node full path
+	 *
+	 * @action getFullPath
+	 * @param string $hostName
+	 * @param string $protocol
+	 * @param string $deliveryFormat
+	 * @param string $deliveryType
+	 * @return string
+	 */
+	function getFullPathAction($hostName, $protocol = 'http', $deliveryFormat = null, $deliveryType = null)
+	{
+		$dbServerNode = ServerNodePeer::retrieveActiveServerNode($hostName, $this->getPartnerId(), ServerNodeType::EDGE);
+		if (!$dbServerNode)
+		{
+			throw new KalturaAPIException(KalturaErrors::SERVER_NODE_NOT_FOUND, $hostName);
+		}
+		/** @var EdgeServerNode $dbServerNode */
+		return $dbServerNode->buildEdgeFullPath($protocol, $deliveryFormat, $deliveryType);
+	}
+
+
 }
