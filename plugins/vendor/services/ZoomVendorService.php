@@ -7,6 +7,22 @@
 class ZoomVendorService extends KalturaBaseService
 {
 
+	/** API */
+	const API_USERS_ME = '/v2/users/me';
+	const API_PARTICIPANT = '/v2/report/meetings/@meetingId@/participants';
+	const API_USERS_ME_PERMISSIONS = '/v2/users/me/permissions';
+
+	/** payload data */
+	const ACCOUNT_ID = "account_id";
+	const PAYLOAD = 'payload';
+	const DOWNLOAD_TOKEN = 'download_token';
+	const MEETING = 'meeting';
+	const HOST_EMAIL = 'host_email';
+	const RECORDING_FILES = 'recording_files';
+	const MP4 = 'MP4';
+	const FILE_TYPE = 'file_type';
+	const DOWNLOAD_URL = 'download_url';
+	const MEETING_ID = 'meeting_id';
 
 
 	/**
@@ -14,14 +30,6 @@ class ZoomVendorService extends KalturaBaseService
 	 * @param string $actionName
 	 * @return bool
 	 */
-	const ACCOUNT_ID = "account_id";
-
-	const USERS_ME = '/v2/users/me';
-
-	const PARTICIPANT = '/v2/metrics/meetings/@meetingId@/participants';
-
-	const USERS_ME_PERMISSIONS = '/v2/users/me/permissions';
-
 	protected function partnerRequired($actionName)
 	{
 		if ($actionName == 'oauthValidation' || $actionName == 'recordingComplete')
@@ -55,8 +63,8 @@ class ZoomVendorService extends KalturaBaseService
 		else
 		{
 			$dataRetriever = new RetrieveDataFromZoom();
-			list($tokens, $permissions) = $dataRetriever->retrieveZoomDataAsArray(self::USERS_ME_PERMISSIONS, true);
-			list(, $user) = $dataRetriever->retrieveZoomDataAsArray(self::USERS_ME, false, $tokens, null);
+			list($tokens, $permissions) = $dataRetriever->retrieveZoomDataAsArray(self::API_USERS_ME_PERMISSIONS, true);
+			list(, $user) = $dataRetriever->retrieveZoomDataAsArray(self::API_USERS_ME, false, $tokens, null);
 			$accountId = $user[self::ACCOUNT_ID];
 			$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 			if($zoomIntegration && $zoomIntegration->getStatus() === VendorStatus::DELETED)
@@ -89,7 +97,7 @@ class ZoomVendorService extends KalturaBaseService
 		$tokens = json_decode($tokens, true);
 		$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
 		$retrieveDataFromZoom = new RetrieveDataFromZoom();
-		list($tokens, $zoomUserData) = $retrieveDataFromZoom->retrieveZoomDataAsArray(self::USERS_ME, false, $tokens, null);
+		list($tokens, $zoomUserData) = $retrieveDataFromZoom->retrieveZoomDataAsArray(self::API_USERS_ME, false, $tokens, null);
 		$accountId = $zoomUserData[self::ACCOUNT_ID];
 		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId,
 			VendorTypeEnum::ZOOM_ACCOUNT);
@@ -143,38 +151,51 @@ class ZoomVendorService extends KalturaBaseService
 	 */
 	public function recordingCompleteAction()
 	{
-		KalturaLog::info('starting upload token to Kaltura server');
-		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
-		$verificationToken = $zoomConfiguration['verificationToken'];
-
-		if($verificationToken !== $verificationToken) //todo:: Roie get recived token
-			KExternalErrors::dieGracefully('Received verification token is different from existing token');
-		$accountId = 1; //todo:: Roie retrive account Id
+		KalturaLog::info('Zoom - upload entry to Kaltura starter');
+		$this->verifyHeaderToken();
+		$request_body = file_get_contents('php://input');
+		$data = json_decode($request_body, true);
+		$payload = $data[self::PAYLOAD];
+		$accountId = $payload[self::ACCOUNT_ID];
+		$downloadToken = $payload[self::DOWNLOAD_TOKEN];
+		$meeting = $payload[self::MEETING];
+		$hostEmail = $meeting[self::HOST_EMAIL];
+		$recordingFiles = $meeting[self::RECORDING_FILES];
+		list($downloadURL, $meetingId)= $this->getMeetingsParameters($recordingFiles);
 		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
-
+		$retrieveDataFromZoom = new RetrieveDataFromZoom();
+		$meetingApi = str_replace('@meetingId@', $meetingId, self::API_PARTICIPANT);
+		list($tokens, $participants) = $retrieveDataFromZoom->retrieveZoomDataAsArray($meetingApi, false, $zoomIntegration->getTokens(), $accountId);
+		if ($zoomIntegration->getAccessToken() !== $tokens[kZoomOauth::ACCESS_TOKEN]) // token changed -> refresh tokens
+		{
+			$this->saveNewTokenData($tokens, $accountId, $zoomIntegration);
+		}
+		KalturaLog::info('----------------------------------------------');
+		KalturaLog::info(print_r($participants,true));
 		// user logged in - need to re-init kPermissionManager in order to determine current user's permissions
 		$ks = null;
-		// todo: take user email from data
-		$dbUser = kuserPeer::getKuserByPartnerAndUid($zoomIntegration->getPartnerId(), $zoomIntegration->getDefaultUserEMail());
+		$dbUser = kuserPeer::getKuserByPartnerAndUid($zoomIntegration->getPartnerId(), $hostEmail);
+		$emails = array($hostEmail);
+		if (!$dbUser) //if not go to default user
+		{
+			$dbUser = kuserPeer::getKuserByPartnerAndUid($zoomIntegration->getPartnerId(), $zoomIntegration->getDefaultUserEMail());
+		}
 		kSessionUtils::createKSessionNoValidations($dbUser->getPartnerId() , $dbUser->getPuserId() , $ks, 86400 , false , "" , '*' );
 		kCurrentContext::initKsPartnerUser($ks);
 		kPermissionManager::init();
-		$entry = $this->createEntryForZoom($dbUser, $zoomIntegration->getZoomCategory(),$this->parseUrl());
-
-	}
-
-	private function parseUrl()
-	{
+		$this->createEntryForZoom($dbUser, $zoomIntegration->getZoomCategory(), $this->parseDownloadUrl($downloadURL, $downloadToken), $emails);
+		KalturaLog::info('Zoom - upload entry to Kaltura done');
 	}
 
 	/**
 	 * @param kuser $dbUser
 	 * @param string $zoomCategory
 	 * @param $url
-	 * @return entry
-	 * @throws Exception
+	 * @param $emails
+	 * @throws PropelException
+	 * @throws kCoreException
 	 */
-	private function createEntryForZoom($dbUser, $zoomCategory, $url)
+	private function createEntryForZoom($dbUser, $zoomCategory, $url, $emails)
 	{
 		$entry = new entry();
 		$entry->setType(entryType::MEDIA_CLIP);
@@ -188,10 +209,10 @@ class ZoomVendorService extends KalturaBaseService
 		$entry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($dbUser->getPartnerId())->getId());
 		$entry->setAdminTags('zoom');
 		$entry->setCategories($zoomCategory);
+		$entry->setEntitledPusersPublish(implode(",", array_unique($emails)));
 		$entry->save();
 		KalturaLog::info('Zoom Entry Created, Entry ID:  ' . $entry->getId());
 		kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url);
-		return $entry;
 	}
 
 
@@ -269,6 +290,7 @@ class ZoomVendorService extends KalturaBaseService
 	 * @param $tokensDataAsArray
 	 * @param $accountId
 	 * @param VendorIntegration $zoomClientData
+	 * @throws PropelException
 	 */
 	private function saveNewTokenData($tokensDataAsArray, $accountId, $zoomClientData = null)
 	{
@@ -278,5 +300,67 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomClientData->setStatus(VendorStatus::DISABLED);
 		}
 		$zoomClientData->saveNewTokenData($tokensDataAsArray,$accountId);
+	}
+
+	/**
+	 * @return array
+	 */
+	private function getAllHeaders()
+	{
+		if (!function_exists('getallheaders')) {
+			$headers = array();
+			foreach ($_SERVER as $name => $value) {
+				/* RFC2616 (HTTP/1.1) defines header fields as case-insensitive entities. */
+				if (strtolower(substr($name, 0, 5)) == 'http_') {
+					$headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+				}
+			}
+			return $headers;
+		} else {
+			return getallheaders();
+		}
+	}
+
+	/**
+	 * verify headers tokens, if not equal die
+	 * @throws Exception
+	 */
+	private function verifyHeaderToken()
+	{
+		$headers = $this->getAllHeaders();
+		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
+		$verificationToken = $zoomConfiguration['verificationToken'];
+		if ($verificationToken !== $headers['Authorization'])
+			KExternalErrors::dieGracefully('ZOOM - Received verification token is different from existing token');
+	}
+
+	/**
+	 * @param string $downloadURL
+	 * @param string $downloadToken
+	 * @return string
+	 */
+	private function parseDownloadUrl($downloadURL, $downloadToken)
+	{
+		return $downloadURL . '?access_token=' . $downloadToken;
+	}
+
+	/**
+	 * @param array $recordingFiles
+	 * @return array<string>
+	 */
+	private function getMeetingsParameters($recordingFiles)
+	{
+		$downloadURL = '';
+		$meetingId = '';
+		foreach ($recordingFiles as $recordingFile) {
+			if ($recordingFile[self::FILE_TYPE] === self::MP4)
+			{
+				$downloadURL = $recordingFile[self::DOWNLOAD_URL];
+				$meetingId = $recordingFile[self::MEETING_ID];
+			}
+		}
+		if (!$downloadURL)
+			KExternalErrors::dieGracefully('Zoom - MP4 downland url was not found');
+		return array($downloadURL, $meetingId);
 	}
 }

@@ -38,8 +38,19 @@ class VendorIntegration extends BaseVendorIntegration {
 
 
 	/**
+	 * returns all tokens as array
+	 * @return array
+	 */
+	public function getTokens()
+	{
+		return array(kZoomOauth::ACCESS_TOKEN => $this->getAccessToken(), kZoomOauth::REFRESH_TOKEN => $this->getRefreshToken(),
+			kZoomOauth::EXPIRES_IN => $this->getExpiresIn());
+	}
+
+	/**
 	 * @param array $tokensDataAsArray
 	 * @param string $accountId
+	 * @throws PropelException
 	 */
 	public function saveNewTokenData($tokensDataAsArray, $accountId)
 	{
