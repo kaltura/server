@@ -180,7 +180,9 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		}
 
 		foreach ($entryVendorTaskIdToRow as $key => $val)
+		{
 			KCsvWrapper::sanitizedFPutCsv($csvFile, $val);
+		}
 	}
 
 	/**

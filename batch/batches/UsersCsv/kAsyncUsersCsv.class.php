@@ -198,7 +198,9 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 				$userIdToRow = $this->fillAdditionalFieldsFromMetadata($usersMetadata, $additionalFields, $userIdToRow);
 		}
 		foreach ($userIdToRow as $key=>$val)
+		{
 			KCsvWrapper::sanitizedFPutCsv($csvFile, $val);
+		}
 	}
 
 	/**
