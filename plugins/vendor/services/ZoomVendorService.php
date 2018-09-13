@@ -180,6 +180,11 @@ class ZoomVendorService extends KalturaBaseService
 		$ks = null;
 		$dbUser = kuserPeer::getKuserByPartnerAndUid($zoomIntegration->getPartnerId(), $hostEmail);
 		$emails = array();
+		KalturaLog::info('Test Roie');
+		KalturaLog::info("$hostEmail");
+		KalturaLog::info("{$zoomIntegration->getPartnerId()}");
+		KalturaLog::info("{$zoomIntegration->getPartnerId()}      {$zoomIntegration->getDefaultUserEMail()}");
+
 		if (!$dbUser) //if not go to default user
 		{
 			$emails[] = $hostEmail;

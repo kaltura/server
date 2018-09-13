@@ -21,6 +21,7 @@ class kZoomOauth implements kVendorOauth
 	 */
 	public function refreshTokens($oldRefreshToken, $vendorIntegration)
 	{
+		KalturaLog::info('Refreshing Tokens');
 		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
 		$clientId = $zoomConfiguration['clientId'];
 		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
@@ -41,6 +42,7 @@ class kZoomOauth implements kVendorOauth
 	 */
 	public function retrieveTokensData($forceNewToken = false, $accountId = null)
 	{
+		KalturaLog::info('Retrieving Tokens');
 		$zoomIntegration = null;
 		if (!$forceNewToken && $accountId)
 		{
