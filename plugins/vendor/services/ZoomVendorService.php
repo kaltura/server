@@ -171,14 +171,18 @@ class ZoomVendorService extends KalturaBaseService
 		{
 			$this->saveNewTokenData($tokens, $accountId, $zoomIntegration);
 		}
-		KalturaLog::info('----------------------------------------------');
-		KalturaLog::info(print_r($participants,true));
+		if ($participants)
+		{
+			KalturaLog::info('----------------------------------------------');
+			KalturaLog::info(print_r($participants,true));
+		}
 		// user logged in - need to re-init kPermissionManager in order to determine current user's permissions
 		$ks = null;
 		$dbUser = kuserPeer::getKuserByPartnerAndUid($zoomIntegration->getPartnerId(), $hostEmail);
-		$emails = array($hostEmail);
+		$emails = array();
 		if (!$dbUser) //if not go to default user
 		{
+			$emails[] = $hostEmail;
 			$dbUser = kuserPeer::getKuserByPartnerAndUid($zoomIntegration->getPartnerId(), $zoomIntegration->getDefaultUserEMail());
 		}
 		kSessionUtils::createKSessionNoValidations($dbUser->getPartnerId() , $dbUser->getPuserId() , $ks, 86400 , false , "" , '*' );
@@ -209,7 +213,8 @@ class ZoomVendorService extends KalturaBaseService
 		$entry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($dbUser->getPartnerId())->getId());
 		$entry->setAdminTags('zoom');
 		$entry->setCategories($zoomCategory);
-		$entry->setEntitledPusersPublish(implode(",", array_unique($emails)));
+		if ($emails)
+			$entry->setEntitledPusersPublish(implode(",", array_unique($emails)));
 		$entry->save();
 		KalturaLog::info('Zoom Entry Created, Entry ID:  ' . $entry->getId());
 		kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url);

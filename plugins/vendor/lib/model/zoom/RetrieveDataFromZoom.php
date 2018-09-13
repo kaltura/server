@@ -27,7 +27,7 @@ class RetrieveDataFromZoom
 		$url = $zoomBaseURL . $apiPath . '?' . 'access_token=' . $accessToken;
 		$response = $curlWrapper->exec($url);
 		$httpCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
-		list($tokens, $refreshed) = $this->handelCurlResponse($response, $httpCode, $curlWrapper, $accountId, $tokens);
+		list($tokens, $refreshed) = $this->handelCurlResponse($response, $httpCode, $curlWrapper, $accountId, $tokens, $apiPath);
 		if ($refreshed)
 		{
 			$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
@@ -35,7 +35,7 @@ class RetrieveDataFromZoom
 			$url = $zoomBaseURL . $apiPath . '?' . 'access_token=' . $accessToken;
 			$response = $curlWrapper->exec($url);
 			$httpCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
-			list($tokens, ) = $this->handelCurlResponse($response, $httpCode, $curlWrapper, $accountId, $tokens);
+			list($tokens, ) = $this->handelCurlResponse($response, $httpCode, $curlWrapper, $accountId, $tokens, $apiPath);
 		}
 		$data = json_decode($response, true);
 		return array($tokens, $data);
@@ -48,11 +48,13 @@ class RetrieveDataFromZoom
 	 * @param KCurlWrapper $curlWrapper
 	 * @param $accountId
 	 * @param $tokens
+	 * @param $apiPath
 	 * @return array<array,bool> token refreshed
-	 * @throws Exception
+	 * @throws PropelException
 	 */
-	private function handelCurlResponse($response, $httpCode, $curlWrapper, $accountId, $tokens)
+	private function handelCurlResponse(&$response, $httpCode, $curlWrapper, $accountId, $tokens, $apiPath)
 	{
+		//access token invalid and need to be refreshed
 		if (($httpCode === 400 || $httpCode === 401) && $accountId)
 		{
 			KalturaLog::err("Zoom Curl returned  $httpCode, with massage: {$response} " . $curlWrapper->getError());
@@ -60,6 +62,13 @@ class RetrieveDataFromZoom
 			$zoomAuth = new kZoomOauth();
 			return array($zoomAuth->refreshTokens($zoomClientData->getRefreshToken(), $zoomClientData), true);
 		}
+		//could Not find the meeting participant
+		if ($httpCode === 404 && (strpos($apiPath,'participants') !== false))
+		{
+			$response = null;
+			return array($tokens, false);
+		}
+		//other error -> dieGracefully
 		if (!$response || $httpCode !== 200 || $curlWrapper->getError())
 		{
 			KalturaLog::err('Zoom Curl returned error, Tokens were not received, Error: ' . $curlWrapper->getError());
