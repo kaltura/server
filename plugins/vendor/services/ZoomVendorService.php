@@ -178,7 +178,7 @@ class ZoomVendorService extends KalturaBaseService
 		}
 		// user logged in - need to re-init kPermissionManager in order to determine current user's permissions
 		$ks = null;
-		$dbUser = kuserPeer::getKuserByPartnerAndUid($zoomIntegration->getPartnerId(), $hostEmail);
+		$dbUser = kuserPeer::getKuserByPartnerAndUid($zoomIntegration->getPartnerId(), $hostEmail, true);
 		$emails = array();
 		KalturaLog::info('Test Roie');
 		KalturaLog::info("$hostEmail");
@@ -188,7 +188,7 @@ class ZoomVendorService extends KalturaBaseService
 		if (!$dbUser) //if not go to default user
 		{
 			$emails[] = $hostEmail;
-			$dbUser = kuserPeer::getKuserByPartnerAndUid($zoomIntegration->getPartnerId(), $zoomIntegration->getDefaultUserEMail());
+			$dbUser = kuserPeer::getKuserByPartnerAndUid($zoomIntegration->getPartnerId(), $zoomIntegration->getDefaultUserEMail(), true);
 		}
 		kSessionUtils::createKSessionNoValidations($dbUser->getPartnerId() , $dbUser->getPuserId() , $ks, 86400 , false , "" , '*' );
 		kCurrentContext::initKsPartnerUser($ks);
