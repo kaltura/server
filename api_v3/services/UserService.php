@@ -39,6 +39,7 @@ class UserService extends KalturaBaseUserService
 			$user->isAdmin = true;
 		}
 
+		$this->validateUserNames($user);
 		$lockKey = "user_add_" . $this->getPartnerId() . $user->id;
 		return kLock::runLocked($lockKey, array($this, 'adduserImpl'), array($user));
 	}
@@ -127,7 +128,9 @@ class UserService extends KalturaBaseUserService
 		if ($dbUser->getIsAdmin() && !is_null($user->isAdmin) && !$user->isAdmin) {
 			throw new KalturaAPIException(KalturaErrors::CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN);
 		}
-			
+
+		$this->validateUserNames($user);
+
 		// update user
 		try
 		{
@@ -697,6 +700,20 @@ class UserService extends KalturaBaseUserService
 		$file_path = "$fullPath/$id";
 
 		return $this->dumpFile($file_path, 'text/csv');
+	}
+
+
+	/**
+	 * @param KalturaUser $user The user parameters to validate
+	 */
+	protected function validateUserNames(KalturaUser $user)
+	{
+		$names = array('firstName', 'lastName', 'fullName', 'screenName');
+		foreach ($names as $name)
+		{
+			if (!is_null($user->$name) && strpos($user->$name, kuser::URL_PATTERN) !== false)
+				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $name);
+		}
 	}
 
 }
