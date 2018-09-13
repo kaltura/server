@@ -189,7 +189,7 @@ class ZoomVendorService extends KalturaBaseService
 		kSessionUtils::createKSessionNoValidations($dbUser->getPartnerId() , $dbUser->getPuserId() , $ks, 86400 , false , "" , '*' );
 		kCurrentContext::initKsPartnerUser($ks);
 		kPermissionManager::init();
-		$this->createEntryForZoom($dbUser, $zoomIntegration->getZoomCategory(), $this->parseDownloadUrl($downloadURL, $downloadToken), $emails);
+		$this->createEntryForZoom($dbUser, $zoomIntegration->getZoomCategory(), $this->parseDownloadUrl($downloadURL, $downloadToken), $emails, $meetingId);
 		KalturaLog::info('Zoom - upload entry to Kaltura done');
 	}
 
@@ -198,14 +198,15 @@ class ZoomVendorService extends KalturaBaseService
 	 * @param string $zoomCategory
 	 * @param $url
 	 * @param $emails
+	 * @param $meetingId
 	 * @throws Exception
 	 */
-	private function createEntryForZoom($dbUser, $zoomCategory, $url, $emails)
+	private function createEntryForZoom($dbUser, $zoomCategory, $url, $emails, $meetingId)
 	{
 		$entry = new entry();
 		$entry->setType(entryType::MEDIA_CLIP);
 		$entry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
-		$entry->setName('ZOOM_'.time());
+		$entry->setName('Zoom_'. $meetingId);
 		$entry->setPartnerId($dbUser->getPartnerId());
 		$entry->setStatus(entryStatus::NO_CONTENT);
 		$entry->setSourceType(EntrySourceType::ZOOM);
