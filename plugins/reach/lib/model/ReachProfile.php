@@ -34,6 +34,7 @@ class ReachProfile extends BaseReachProfile
 	
 	const CUSTOM_DATA_CREDIT_USAGE_PERCENTAGE = 			'credit_usage_percentage';
 	const CUSTOM_DATA_CONTENT_DELETION_POLICY = 			'content_deletion_policy';
+	const CUSTOM_DATA_LAST_CREDIT_EXPIRY_NOTIFICATION = 	'last_credit_expiry_notification';
 	
 	const CUSTOM_DATA_CREDIT_RESET_HISTORY =                'credit_reset_history';
 	
@@ -186,6 +187,11 @@ class ReachProfile extends BaseReachProfile
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_CONTENT_DELETION_POLICY, $v);
 	}
+
+	public function setLastCreditExpiryNotification($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_LAST_CREDIT_EXPIRY_NOTIFICATION, $v);
+	}
 	
 	//getters
 	
@@ -316,6 +322,11 @@ class ReachProfile extends BaseReachProfile
 		return $this->getFromCustomData(self::CUSTOM_DATA_CONTENT_DELETION_POLICY, null, ReachProfileContentDeletionPolicy::DO_NOTHING);
 	}
 
+	public function getLastCreditExpiryNotification()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_LAST_CREDIT_EXPIRY_NOTIFICATION, null, 0);
+	}
+
 	public function shouldSyncCredit()
 	{
 		$reachProfileCredit = $this->getCredit();
@@ -335,6 +346,12 @@ class ReachProfile extends BaseReachProfile
 			$this->setUsedCredit($syncedCredit);
 		}
 		$this->setCredit($reachProfileCredit);
+
+		if($reachProfileCredit->shouldResetLastCreditExpiry($this->getLastCreditExpiryNotification()))
+				$this->setLastCreditExpiryNotification(0);
+
+		if($reachProfileCredit->toDateHasExpired(time()) && !$this->getLastCreditExpiryNotification())
+			$this->setLastCreditExpiryNotification(time());
 	}
 	
 	public function setCreditResetHistory($v)

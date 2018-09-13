@@ -93,8 +93,9 @@ class kPluginableEnumsManager
 	
 	public static function getApiMap($type = null)
 	{
-		if(!count(self::$apiMap))
-			self::loadApiMap();
+		if((!is_array(self::$apiMap) && !$self::$apiMap instanceof Countable) || !count(self::$apiMap)){
+		    self::loadApiMap();
+		}
 			
 		if(is_null($type))
 			return self::$apiMap;

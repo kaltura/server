@@ -317,7 +317,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 	{
 		$c = new Criteria();
 		$c->add(self::ENTRY_ID, $entryId);
-		if(count($types))
+		if ((is_array($types) || $types instanceof Countable) && count($types))
 			$c->add(self::TYPE, $types, Criteria::IN);
 		
 		return self::doCount($c);
@@ -389,6 +389,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		}
 		
 		if(count($paramsIds)) {
+		if ((is_array($paramsIds) || $paramsIds instanceof Countable) && count($paramsIds)){
 			$c->add(assetPeer::FLAVOR_PARAMS_ID, $paramsIds, Criteria::IN);
 		}
 		

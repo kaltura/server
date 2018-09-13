@@ -27,3 +27,11 @@ raw = 1
 ngrams = 100
 synonym = 100
 thai = 150
+
+[search_history]
+disableHistoryIndexing = false
+completionListSize = 100
+emptyTermListSize = 500
+
+[search_history_collect_objects]
+0 = @OBJECT_NAME@
