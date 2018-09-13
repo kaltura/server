@@ -157,7 +157,7 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 	private function addHeaderRowToCsv($csvFile)
 	{
 		$headerRow = 'Task id,createdAt,finishTime,entryId,status,reachProfileId,turnaroundTime,serviceType,serviceFeature,price,userId,moderatingUser,errDescription,notes,accuracy,context,partnerData';
-		fputcsv($csvFile, explode(',', $headerRow));
+		KCsvWrapper::sanitizedFPutCsv($csvFile, explode(',', $headerRow));
 		return $csvFile;
 	}
 
@@ -180,7 +180,7 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		}
 
 		foreach ($entryVendorTaskIdToRow as $key => $val)
-			fputcsv($csvFile, $val);
+			KCsvWrapper::sanitizedFPutCsv($csvFile, $val);
 	}
 
 	/**
