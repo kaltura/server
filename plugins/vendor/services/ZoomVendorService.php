@@ -153,6 +153,7 @@ class ZoomVendorService extends KalturaBaseService
 	{
 		KalturaLog::info('Zoom - upload entry to Kaltura starter');
 		$this->verifyHeaderToken();
+		myPartnerUtils::resetAllFilters();
 		$request_body = file_get_contents('php://input');
 		$data = json_decode($request_body, true);
 		$payload = $data[self::PAYLOAD];
@@ -180,11 +181,6 @@ class ZoomVendorService extends KalturaBaseService
 		$ks = null;
 		$dbUser = kuserPeer::getKuserByPartnerAndUid($zoomIntegration->getPartnerId(), $hostEmail, true);
 		$emails = array();
-		KalturaLog::info('Test Roie');
-		KalturaLog::info("$hostEmail");
-		KalturaLog::info("{$zoomIntegration->getPartnerId()}");
-		KalturaLog::info("{$zoomIntegration->getPartnerId()}      {$zoomIntegration->getDefaultUserEMail()}");
-
 		if (!$dbUser) //if not go to default user
 		{
 			$emails[] = $hostEmail;
@@ -214,12 +210,18 @@ class ZoomVendorService extends KalturaBaseService
 		$entry->setStatus(entryStatus::NO_CONTENT);
 		$entry->setSourceType(EntrySourceType::ZOOM);
 		$entry->setPuserId($dbUser->getPuserId());
-		$entry->setkuser($dbUser->getKuserId());
+		$entry->setKuserId($dbUser->getKuserId());
 		$entry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($dbUser->getPartnerId())->getId());
 		$entry->setAdminTags('zoom');
 		$entry->setCategories($zoomCategory);
 		if ($emails)
+		{
+			foreach ($emails as $email)
+			{
+				kuserPeer::createUniqueKuserForPartner($dbUser->getPartnerId(),$email);
+			}
 			$entry->setEntitledPusersPublish(implode(",", array_unique($emails)));
+		}
 		$entry->save();
 		KalturaLog::info('Zoom Entry Created, Entry ID:  ' . $entry->getId());
 		kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url);
