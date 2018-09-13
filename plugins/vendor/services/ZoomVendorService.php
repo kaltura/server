@@ -18,6 +18,8 @@ class ZoomVendorService extends KalturaBaseService
 
 	const USERS_ME = '/v2/users/me';
 
+	const PARTICIPANT = '/v2/metrics/meetings/@meetingId@/participants';
+
 	const USERS_ME_PERMISSIONS = '/v2/users/me/permissions';
 
 	protected function partnerRequired($actionName)
@@ -87,7 +89,7 @@ class ZoomVendorService extends KalturaBaseService
 		$tokens = json_decode($tokens, true);
 		$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
 		$retrieveDataFromZoom = new RetrieveDataFromZoom();
-		list($tokens,$zoomUserData) = $retrieveDataFromZoom->retrieveZoomDataAsArray(self::USERS_ME, false, $tokens, null) ;
+		list($tokens, $zoomUserData) = $retrieveDataFromZoom->retrieveZoomDataAsArray(self::USERS_ME, false, $tokens, null);
 		$accountId = $zoomUserData[self::ACCOUNT_ID];
 		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId,
 			VendorTypeEnum::ZOOM_ACCOUNT);
@@ -170,8 +172,7 @@ class ZoomVendorService extends KalturaBaseService
 	 * @param string $zoomCategory
 	 * @param $url
 	 * @return entry
-	 * @throws PropelException
-	 * @throws kCoreException
+	 * @throws Exception
 	 */
 	private function createEntryForZoom($dbUser, $zoomCategory, $url)
 	{

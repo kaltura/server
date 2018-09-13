@@ -27,7 +27,16 @@ class RetrieveDataFromZoom
 		$url = $zoomBaseURL . $apiPath . '?' . 'access_token=' . $accessToken;
 		$response = $curlWrapper->exec($url);
 		$httpCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
-		$tokens = $this->handelCurlResponse($response, $httpCode, $curlWrapper, $accountId, $tokens);
+		list($tokens, $refreshed) = $this->handelCurlResponse($response, $httpCode, $curlWrapper, $accountId, $tokens);
+		if ($refreshed)
+		{
+			$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
+			$curlWrapper = new KCurlWrapper();
+			$url = $zoomBaseURL . $apiPath . '?' . 'access_token=' . $accessToken;
+			$response = $curlWrapper->exec($url);
+			$httpCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
+			list($tokens, ) = $this->handelCurlResponse($response, $httpCode, $curlWrapper, $accountId, $tokens);
+		}
 		$data = json_decode($response, true);
 		return array($tokens, $data);
 	}
@@ -39,22 +48,23 @@ class RetrieveDataFromZoom
 	 * @param KCurlWrapper $curlWrapper
 	 * @param $accountId
 	 * @param $tokens
-	 * @return array
+	 * @return array<array,bool> token refreshed
 	 * @throws Exception
 	 */
 	private function handelCurlResponse($response, $httpCode, $curlWrapper, $accountId, $tokens)
 	{
 		if (($httpCode === 400 || $httpCode === 401) && $accountId)
 		{
+			KalturaLog::err("Zoom Curl returned  $httpCode, with massage: {$response} " . $curlWrapper->getError());
 			$zoomClientData = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 			$zoomAuth = new kZoomOauth();
-			return $zoomAuth->refreshTokens($zoomClientData->getRefreshToken(), $zoomClientData);
+			return array($zoomAuth->refreshTokens($zoomClientData->getRefreshToken(), $zoomClientData), true);
 		}
 		if (!$response || $httpCode !== 200 || $curlWrapper->getError())
 		{
 			KalturaLog::err('Zoom Curl returned error, Tokens were not received, Error: ' . $curlWrapper->getError());
 			KExternalErrors::dieGracefully();
 		}
-		return $tokens;
+		return array($tokens, false);
 	}
 }
