@@ -35,7 +35,7 @@ class remoteMemCacheConf extends baseMemcacheConf implements keyCacheInterface,m
 		$this->orderMap($mapNames);
 		return $this->mergeMaps($mapNames);
 	}
-	private function getRelevantMapList($requestedMapName , $hostname)
+	protected function getRelevantMapList($requestedMapName , $hostname)
 	{
 		$filteredMapsList = array($requestedMapName);
 		$mapsList=null;
@@ -65,7 +65,7 @@ class remoteMemCacheConf extends baseMemcacheConf implements keyCacheInterface,m
 		}
 		return $filteredMapsList;
 	}
-	private function mergeMaps($mapNames)
+	protected function mergeMaps($mapNames)
 	{
 		$mergedMaps = array();
 		$cache = $this->getCache();

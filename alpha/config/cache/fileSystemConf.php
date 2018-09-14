@@ -13,7 +13,7 @@ class fileSystemConf extends baseConfCache implements mapCacheInterface
 		}
 		parent::__construct();
 	}
-	private function getFileNames ($mapName , $hostname)
+	protected function getFileNames ($mapName , $hostname)
 	{
 		$configDir = kEnvironment::getConfigDir();
 		$iniFiles = array();

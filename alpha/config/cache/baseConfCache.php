@@ -4,10 +4,10 @@ class baseConfCache
 	const CONF_CACHE_VERSION_KEY = "CONF_CACHE_VERSION_KEY";
 	const CONF_CACHE_KEY = "CONF_CACHE_KEY";
 	const CONF_CACHE_KEY_PREFIX = "CONF-";
-	private $usageCounter;
-	private $cacheMissCounter;
-	private $usageMap;
-	private $keyUsageCounter;
+	protected $usageCounter;
+	protected $cacheMissCounter;
+	protected $usageMap;
+	protected $keyUsageCounter;
 
 	function __construct()
 	{

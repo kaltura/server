@@ -5,15 +5,15 @@ require_once __DIR__."/keyCacheInterface.php";
 
 class apcConf extends baseConfCache implements mapCacheInterface , keyCacheInterface
 {
-	private $reloadFile;
-	private $apcFunctionsExist;
+	protected $reloadFile;
+	protected $apcFunctionsExist;
 	public function __construct()
 	{
 		$this->apcFunctionsExist = function_exists('apc_fetch');
 		$this->reloadFile = kEnvironment::get('cache_root_path').'/base.reload';
 		parent::__construct();
 	}
-	private function isReloadFileExist()
+	protected function isReloadFileExist()
 	{
 		return file_exists($this->reloadFile);
 	}
