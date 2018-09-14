@@ -266,7 +266,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		if(!$data->flavorParamsOutput->sourceRemoteStorageProfileId)
 		{
 			$destFileExists = false;			
-			if(count($data->extraDestFileSyncs))
+			if(is_array($data->extraDestFileSyncs) && count($data->extraDestFileSyncs))
 			{
 				$this->moveExtraFiles($data, $sharedFile);
 			}			

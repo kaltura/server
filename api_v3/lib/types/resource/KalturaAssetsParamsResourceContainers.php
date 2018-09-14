@@ -11,15 +11,15 @@ class KalturaAssetsParamsResourceContainers extends KalturaResource
 	 */
 	public $resources;
 
-	public function validateEntry(entry $dbEntry)
+	public function validateEntry(entry $dbEntry,$validateLocal = false)
 	{
-		parent::validateEntry($dbEntry);
+		parent::validateEntry($dbEntry,$validateLocal);
     	$this->validatePropertyNotNull('resources');
     	
 		$dc = null;
     	foreach($this->resources as $resource)
     	{
-    		$resource->validateEntry($dbEntry);
+    		$resource->validateEntry($dbEntry,$validateLocal);
     	
     		if(!($resource instanceof KalturaDataCenterContentResource))
     			continue;
