@@ -77,7 +77,7 @@ class kConfCacheManager
 		cacheConfFactory::getInstance(cacheConfFactory::SESSION) -> store($key, $mapName,array());
 		return array();
 	}
-	static private function store ($key, $mapName, $map, $foundIn)
+	static protected function store ($key, $mapName, $map, $foundIn)
 	{
 		$storeFlow = self::$mapStoreFlow[$foundIn];
 		foreach ($storeFlow as $cacheEntity)
