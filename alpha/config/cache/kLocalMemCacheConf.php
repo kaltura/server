@@ -5,7 +5,7 @@ class kLocalMemCacheConf extends kBaseMemcacheConf
 {
 	function __construct()
 	{
-		$confParams = parent::getConfigParams('kLocalMemCacheConf');
+		$confParams = parent::getConfigParams('localMemCacheConf');
 		if($confParams)
 		{
 			$port = $confParams['port'];

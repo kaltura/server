@@ -7,7 +7,7 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 
 	function __construct()
 	{
-		$confParams = parent::getConfigParams('kRemoteMemCacheConf');
+		$confParams = parent::getConfigParams('remoteMemCacheConf');
 		if($confParams)
 		{
 			$port = $confParams['port'];
