@@ -1,13 +1,13 @@
 <?php
-require_once __DIR__.'/baseMemcacheConf.php';
+require_once __DIR__ . '/kKBaseMemcacheConf.php';
 
-class remoteMemCacheConf extends baseMemcacheConf implements keyCacheInterface,mapCacheInterface
+class kRemoteMemCacheConf extends kKBaseMemcacheConf implements kKeyCacheInterface,kMapCacheInterface
 {
 	const MAP_LIST_KEY='MAP_LIST_KEY';
 
 	function __construct()
 	{
-		$confParams = parent::getConfigParams('remoteMemCacheConf');
+		$confParams = parent::getConfigParams('kRemoteMemCacheConf');
 		if($confParams)
 		{
 			$port = $confParams['port'];
@@ -22,7 +22,7 @@ class remoteMemCacheConf extends baseMemcacheConf implements keyCacheInterface,m
 		$key=null;
 		$cache = $this->getCache();
 		if($cache)
-			$key = $cache->get(baseConfCache::CONF_CACHE_VERSION_KEY);
+			$key = $cache->get(kBaseConfCache::CONF_CACHE_VERSION_KEY);
 
 		if (!$key)
 			$key = self::generateKey();

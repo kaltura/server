@@ -1,9 +1,9 @@
 <?php
-require_once __DIR__.'/baseConfCache.php';
-require_once __DIR__.'/mapCacheInterface.php';
-require_once __DIR__.'/keyCacheInterface.php';
+require_once __DIR__ . '/kBaseConfCache.php';
+require_once __DIR__ . '/kMapCacheInterface.php';
+require_once __DIR__ . '/kKeyCacheInterface.php';
 
-class apcConf extends baseConfCache implements mapCacheInterface , keyCacheInterface
+class kApcConf extends kBaseConfCache implements kMapCacheInterface , kKeyCacheInterface
 {
 	protected $reloadFile;
 	protected $apcFunctionsExist;
@@ -53,7 +53,7 @@ class apcConf extends baseConfCache implements mapCacheInterface , keyCacheInter
 	public function loadKey()
 	{
 		if($this->apcFunctionsExist && !$this->isReloadFileExist())
-			return apc_fetch(baseConfCache::CONF_CACHE_VERSION_KEY);
+			return apc_fetch(kBaseConfCache::CONF_CACHE_VERSION_KEY);
 
 		if($this->isReloadFileExist())
 		{
@@ -68,7 +68,7 @@ class apcConf extends baseConfCache implements mapCacheInterface , keyCacheInter
 	public function storeKey($key, $ttl=30)
 	{
 			if($this->apcFunctionsExist && PHP_SAPI != 'cli')
-				return apc_store(baseConfCache::CONF_CACHE_VERSION_KEY, $key, $ttl);
+				return apc_store(kBaseConfCache::CONF_CACHE_VERSION_KEY, $key, $ttl);
 	}
 
 	public function isKeyRequired()

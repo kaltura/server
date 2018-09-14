@@ -1,8 +1,8 @@
 <?php
-require_once __DIR__.'/baseConfCache.php';
-require_once __DIR__.'/mapCacheInterface.php';
+require_once __DIR__ . '/kBaseConfCache.php';
+require_once __DIR__ . '/kMapCacheInterface.php';
 
-class fileSystemConf extends baseConfCache implements mapCacheInterface
+class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 {
 	function __construct()
 	{

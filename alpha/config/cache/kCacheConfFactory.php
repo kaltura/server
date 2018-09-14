@@ -1,6 +1,6 @@
 <?php
 
-class cacheConfFactory
+class kCacheConfFactory
 {
 	const SESSION = 'SESSION';
 
@@ -23,11 +23,11 @@ class cacheConfFactory
 	{
 
 		$cacheConfRequireArray = array(
-			self::SESSION =>  array('sessionConf','sessionConf.php'),
-			self::APC => array('apcConf','apcConf.php'),
-			self::LOCAL_MEM_CACHE => array('localMemCacheConf','localMemCacheConf.php'),
-			self::FILE_SYSTEM => array('fileSystemConf','fileSystemConf.php'),
-			self::REMOTE_MEM_CACHE => array('remoteMemCacheConf','remoteMemCacheConf.php'));
+			self::SESSION =>  array('kSessionConf','kSessionConff.php'),
+			self::APC => array('kApcConf','kApcConf.phpp'),
+			self::LOCAL_MEM_CACHE => array('kLocalMemCacheConf','kLocalMemCacheConf.phpp'),
+			self::FILE_SYSTEM => array('kFileSystemConf','kFileSystemConff.php'),
+			self::REMOTE_MEM_CACHE => array('kRemoteMemCacheConf','kRemoteMemCacheConff.php'));
 
 		if(!isset(self::$cacheInstanceList[$name]))
 		{

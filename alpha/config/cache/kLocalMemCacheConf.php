@@ -1,11 +1,11 @@
 <?php
-require_once __DIR__.'/baseMemcacheConf.php';
+require_once __DIR__ . '/kKBaseMemcacheConf.php';
 
-class localMemCacheConf extends baseMemcacheConf
+class kLocalMemCacheConf extends kKBaseMemcacheConf
 {
 	function __construct()
 	{
-		$confParams = parent::getConfigParams('localMemCacheConf');
+		$confParams = parent::getConfigParams('kLocalMemCacheConf');
 		if($confParams)
 		{
 			$port = $confParams['port'];

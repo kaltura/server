@@ -1,10 +1,10 @@
 <?php
 
-require_once __DIR__.'/baseConfCache.php';
-require_once __DIR__.'/mapCacheInterface.php';
-require_once __DIR__.'/keyCacheInterface.php';
+require_once __DIR__ . '/kBaseConfCache.php';
+require_once __DIR__ . '/kMapCacheInterface.php';
+require_once __DIR__ . '/kKeyCacheInterface.php';
 
-class sessionConf extends baseConfCache implements mapCacheInterface , keyCacheInterface
+class kSessionConf extends kBaseConfCache implements kMapCacheInterface , kKeyCacheInterface
 {
 	protected static $map = array();
 	protected static $cacheKey=null;

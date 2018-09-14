@@ -1,5 +1,5 @@
 <?php
-interface mapCacheInterface
+interface kMapCacheInterface
 {
 	public function store($key, $mapName, $map, $ttl=0);
 	public function load($key, $mapName);

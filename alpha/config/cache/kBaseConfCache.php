@@ -1,5 +1,5 @@
 <?php
-class baseConfCache
+class kBaseConfCache
 {
 	const CONF_CACHE_VERSION_KEY = 'CONF_CACHE_VERSION_KEY';
 	const CONF_CACHE_KEY = 'CONF_CACHE_KEY';
@@ -73,7 +73,7 @@ class baseConfCache
 	{
 		$fileHash = md5(realpath(__file__));
 		$cacheVersion = substr(time(), -6) . substr($fileHash, 0, 4);
-		return baseConfCache::CONF_CACHE_KEY_PREFIX . $cacheVersion;
+		return kBaseConfCache::CONF_CACHE_KEY_PREFIX . $cacheVersion;
 	}
 
 	public function hasMap($key, $mapName)
