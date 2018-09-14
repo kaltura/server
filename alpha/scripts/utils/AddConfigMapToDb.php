@@ -27,12 +27,12 @@ print_r($fileContent);
 $cache->set($mapName,$fileContent);
 
 //Add file name to map list
-$mapList = $cache->get(kRemoteMemCacheConf::MAP_LIST_KEY);
+$mapList = $cache->get(remoteMemCacheConf::MAP_LIST_KEY);
 if(!isset($mapList[$mapName]))
 {
 	print ("Adding map {$mapName} to map list - \r\n");
 	$mapList[] = $mapName;
-	$cache->set(kRemoteMemCacheConf::MAP_LIST_KEY,$mapList);
+	$cache->set(remoteMemCacheConf::MAP_LIST_KEY,$mapList);
 }
 
 //Change kBaseConfCache::CONF_CACHE_VERSION_KEY
