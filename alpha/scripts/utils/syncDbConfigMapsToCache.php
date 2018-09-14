@@ -1,7 +1,7 @@
 <?php
 chdir(__DIR__.'/../');
 require_once(__DIR__ . '/../bootstrap.php');
-require_once __DIR__ . '/../../config/cache/remoteMemCacheConf.php';
+require_once __DIR__ . '/../../config/cache/kRemoteMemCacheConf.php';
 
 if($argc != 3)
 	die ("Usage : $argv[0] <db user name> <db password>\n");
@@ -15,10 +15,10 @@ if(!isset($cacheConfigParams))
 	die("\nRemote cache cofiguration is no accessible");
 
 $cache = new kMemcacheCacheWrapper;
-if(!$cache->init(array('host'=>$cacheConfigParams['remoteMemCacheConf']['host'],
-	'port'=>$cacheConfigParams['remoteMemCacheConf']['port'])))
-	die ("Fail to connect to cache host {$cacheConfigParams['remoteMemCacheConf']['host']} port {$cacheConfigParams['remoteMemCacheConf']['port']} ");
-$mapListInCache = $cache->get(remoteMemCacheConf::MAP_LIST_KEY);
+if(!$cache->init(array('host'=>$cacheConfigParams['kRemoteMemCacheConf']['host'],
+	'port'=>$cacheConfigParams['kRemoteMemCacheConf']['port'])))
+	die ("Fail to connect to cache host {$cacheConfigParams['kRemoteMemCacheConf']['host']} port {$cacheConfigParams['kRemoteMemCacheConf']['port']} ");
+$mapListInCache = $cache->get(kRemoteMemCacheConf::MAP_LIST_KEY);
 
 //Find all exsiting map names in DB
 $cmdLine = 'mysql -u'.$dbUserName.' -p'.$dbPasssword.' kaltura -e "select map_name , host_name from conf_maps where status=1 group by map_name,host_name;"';
@@ -52,7 +52,7 @@ for($i = 1 ; $i < count($output) ; $i++)
 	$cache->set($mapName,$content);
 }
 $mapListInCache['UPDATED_AT']=date("Y-m-d H:i:s");
-$cache->set(remoteMemCacheConf::MAP_LIST_KEY,$mapListInCache);
+$cache->set(kRemoteMemCacheConf::MAP_LIST_KEY,$mapListInCache);
 //todo reset the generarted key
 $chacheKey = kBaseConfCache::generateKey();
 $ret = $cache->set(kBaseConfCache::CONF_CACHE_VERSION_KEY,$chacheKey);

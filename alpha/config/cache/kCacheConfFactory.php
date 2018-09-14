@@ -25,9 +25,9 @@ class kCacheConfFactory
 		$cacheConfRequireArray = array(
 			self::SESSION =>  array('kSessionConf','kSessionConf.php'),
 			self::APC => array('kApcConf','kApcConf.php'),
-			self::LOCAL_MEM_CACHE => array('localMemCacheConf','localMemCacheConf.php'),
+			self::LOCAL_MEM_CACHE => array('kLocalMemCacheConf','kLocalMemCacheConf.php'),
 			self::FILE_SYSTEM => array('kFileSystemConf','kFileSystemConf.php'),
-			self::REMOTE_MEM_CACHE => array('remoteMemCacheConf','remoteMemCacheConf.php'));
+			self::REMOTE_MEM_CACHE => array('kRemoteMemCacheConf','kRemoteMemCacheConf.php'));
 
 		if(!isset(self::$cacheInstanceList[$name]))
 		{
