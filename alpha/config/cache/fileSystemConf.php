@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__."/baseConfCache.php";
-require_once __DIR__."/mapCacheInterface.php";
+require_once __DIR__.'/baseConfCache.php';
+require_once __DIR__.'/mapCacheInterface.php';
 
 class fileSystemConf extends baseConfCache implements mapCacheInterface
 {

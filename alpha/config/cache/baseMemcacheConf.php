@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__."/baseConfCache.php";
-require_once __DIR__."/mapCacheInterface.php";
+require_once __DIR__.'/baseConfCache.php';
+require_once __DIR__.'/mapCacheInterface.php';
 
 class baseMemcacheConf extends baseConfCache implements mapCacheInterface
 {
@@ -32,7 +32,7 @@ class baseMemcacheConf extends baseConfCache implements mapCacheInterface
 	{
 		require_once (__DIR__ . '/../../../infra/cache/kMemcacheCacheWrapper.php');
 		$cache = new kMemcacheCacheWrapper;
-		$sectionConfig= array("host"=>$host,'port'=>$port);
+		$sectionConfig= array('host'=>$host,'port'=>$port);
 		try
 		{
 			if (!$cache->init($sectionConfig))

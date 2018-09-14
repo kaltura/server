@@ -1,9 +1,9 @@
 <?php
 class baseConfCache
 {
-	const CONF_CACHE_VERSION_KEY = "CONF_CACHE_VERSION_KEY";
-	const CONF_CACHE_KEY = "CONF_CACHE_KEY";
-	const CONF_CACHE_KEY_PREFIX = "CONF-";
+	const CONF_CACHE_VERSION_KEY = 'CONF_CACHE_VERSION_KEY';
+	const CONF_CACHE_KEY = 'CONF_CACHE_KEY';
+	const CONF_CACHE_KEY_PREFIX = 'CONF-';
 
 	protected $usageCounter;
 	protected $cacheMissCounter;
@@ -84,7 +84,7 @@ class baseConfCache
 
 	public function getHostName ()
 	{
-		return isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname();
+		return isset($_SERVER['HOSTNAME']) ? $_SERVER['HOSTNAME'] : gethostname();
 	}
 
 	public function incKeyUsageCounter() { $this->keyUsageCounter++; }

@@ -102,18 +102,18 @@ class kConfCacheManager
 	{
 		$str = "Conf usage:";
 		foreach (self::$mapLoadFlow as $cacheEntity)
-			$str .= $cacheEntity."={". cacheConfFactory::getInstance($cacheEntity)->getUsageCounter()."}";
-			$str .= "| Key usage: ";
+			$str .= $cacheEntity.'={'. cacheConfFactory::getInstance($cacheEntity)->getUsageCounter().'}';
+			$str .= '| Key usage: ';
 		foreach (self::$keyLoadFlow as $cacheEntity)
-			$str .= $cacheEntity."={". cacheConfFactory::getInstance($cacheEntity)->getKeyUsageCounter()."}";
-		$str .= "| Cache Miss: ";
+			$str .= $cacheEntity.'={'. cacheConfFactory::getInstance($cacheEntity)->getKeyUsageCounter().'}';
+		$str .= '| Cache Miss: ';
 		foreach (self::$mapLoadFlow as $cacheEntity)
-			$str .= $cacheEntity."={". cacheConfFactory::getInstance($cacheEntity)->getCacheMissCounter()."}";
+			$str .= $cacheEntity.'={'. cacheConfFactory::getInstance($cacheEntity)->getCacheMissCounter().'}';
 
 			foreach (self::$mapLoadFlow as $cacheEntity)
 		{
 			$mapStr = cacheConfFactory::getInstance($cacheEntity)->getUsageMap();
-			$str .= "\n\r" . $cacheEntity . "=============>" . print_r($mapStr, true);
+			$str .= "\n\r" . $cacheEntity . '=============>' . print_r($mapStr, true);
 		}
 		KalturaLog::debug($str);
 	}

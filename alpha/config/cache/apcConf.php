@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__."/baseConfCache.php";
-require_once __DIR__."/mapCacheInterface.php";
-require_once __DIR__."/keyCacheInterface.php";
+require_once __DIR__.'/baseConfCache.php';
+require_once __DIR__.'/mapCacheInterface.php';
+require_once __DIR__.'/keyCacheInterface.php';
 
 class apcConf extends baseConfCache implements mapCacheInterface , keyCacheInterface
 {
@@ -58,9 +58,9 @@ class apcConf extends baseConfCache implements mapCacheInterface , keyCacheInter
 		if($this->isReloadFileExist())
 		{
 			$deleted = @unlink($this->reloadFile);
-			error_log("Base configuration reloaded");
+			error_log('Base configuration reloaded');
 			if(!$deleted)
-				error_log("Failed to delete base.reload file");
+				error_log('Failed to delete base.reload file');
 		}
 		return null;
 	}

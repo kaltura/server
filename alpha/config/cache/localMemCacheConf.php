@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__."/baseMemcacheConf.php";
+require_once __DIR__.'/baseMemcacheConf.php';
 
 class localMemCacheConf extends baseMemcacheConf
 {

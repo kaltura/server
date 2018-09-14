@@ -1,8 +1,8 @@
 <?php
 
-require_once __DIR__."/baseConfCache.php";
-require_once __DIR__."/mapCacheInterface.php";
-require_once __DIR__."/keyCacheInterface.php";
+require_once __DIR__.'/baseConfCache.php';
+require_once __DIR__.'/mapCacheInterface.php';
+require_once __DIR__.'/keyCacheInterface.php';
 
 class sessionConf extends baseConfCache implements mapCacheInterface , keyCacheInterface
 {
