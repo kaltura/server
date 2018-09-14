@@ -4,6 +4,7 @@ class baseConfCache
 	const CONF_CACHE_VERSION_KEY = "CONF_CACHE_VERSION_KEY";
 	const CONF_CACHE_KEY = "CONF_CACHE_KEY";
 	const CONF_CACHE_KEY_PREFIX = "CONF-";
+
 	protected $usageCounter;
 	protected $cacheMissCounter;
 	protected $usageMap;
@@ -85,13 +86,22 @@ class baseConfCache
 	{
 		return isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname();
 	}
-	public function incKeyUsageCounter(){$this->keyUsageCounter++;}
-	public function getKeyUsageCounter(){return $this->keyUsageCounter;}
-	public function incCacheMissCounter(){$this->cacheMissCounter++;}
-	public function getCacheMissCounter(){return $this->cacheMissCounter;}
-	public function getUsageCounter(){return $this->usageCounter;}
-	public function getUsageMap(){return $this->usageMap;}
-	public function isKeyRequired(){ return false;}
-	public function storeKey($key, $ttl=30){return;}
-	public function loadKey(){return false;}
+
+	public function incKeyUsageCounter() { $this->keyUsageCounter++; }
+
+	public function getKeyUsageCounter() { return $this->keyUsageCounter; }
+
+	public function incCacheMissCounter() { $this->cacheMissCounter++; }
+
+	public function getCacheMissCounter() { return $this->cacheMissCounter; }
+
+	public function getUsageCounter() { return $this->usageCounter; }
+
+	public function getUsageMap() { return $this->usageMap; }
+
+	public function isKeyRequired() { return false;}
+
+	public function storeKey($key, $ttl=30) { return; }
+
+	public function loadKey() { return false; }
 }

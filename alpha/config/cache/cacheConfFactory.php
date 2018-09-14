@@ -3,10 +3,15 @@
 class cacheConfFactory
 {
 	const SESSION = 'SESSION';
+
 	const APC = 'APC';
+
 	const LOCAL_MEM_CACHE = 'LOCAL_MEM_CACHE';
+
 	const FILE_SYSTEM = 'FILE_SYSTEM';
+
 	const REMOTE_MEM_CACHE = 'REMOTE_MEM_CACHE';
+
 	protected static $cacheInstanceList;
 
 	static function register($name, $instance)

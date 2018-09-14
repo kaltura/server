@@ -7,21 +7,25 @@ class apcConf extends baseConfCache implements mapCacheInterface , keyCacheInter
 {
 	protected $reloadFile;
 	protected $apcFunctionsExist;
+
 	public function __construct()
 	{
 		$this->apcFunctionsExist = function_exists('apc_fetch');
 		$this->reloadFile = kEnvironment::get('cache_root_path').'/base.reload';
 		parent::__construct();
 	}
+
 	protected function isReloadFileExist()
 	{
 		return file_exists($this->reloadFile);
 	}
+
 	public function delete($mapName)
 	{
 		if($this->apcFunctionsExist)
 			return apc_delete($mapName);
 	}
+
 	public function load($key, $mapName)
 	{
 		if($this->apcFunctionsExist)
@@ -35,6 +39,7 @@ class apcConf extends baseConfCache implements mapCacheInterface , keyCacheInter
 		}
 		return null;
 	}
+
 	public function store($key, $mapName, $map, $ttl=0)
 	{
 		if($this->apcFunctionsExist && PHP_SAPI != 'cli')
@@ -44,6 +49,7 @@ class apcConf extends baseConfCache implements mapCacheInterface , keyCacheInter
 		}
 		return false;
 	}
+
 	public function loadKey()
 	{
 		if($this->apcFunctionsExist && !$this->isReloadFileExist())
@@ -58,11 +64,13 @@ class apcConf extends baseConfCache implements mapCacheInterface , keyCacheInter
 		}
 		return null;
 	}
+
 	public function storeKey($key, $ttl=30)
 	{
 			if($this->apcFunctionsExist && PHP_SAPI != 'cli')
 				return apc_store(baseConfCache::CONF_CACHE_VERSION_KEY, $key, $ttl);
 	}
+
 	public function isKeyRequired()
 	{
 		return true;

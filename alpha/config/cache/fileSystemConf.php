@@ -13,6 +13,7 @@ class fileSystemConf extends baseConfCache implements mapCacheInterface
 		}
 		parent::__construct();
 	}
+
 	protected function getFileNames ($mapName , $hostname)
 	{
 		$configDir = kEnvironment::getConfigDir();
@@ -67,6 +68,7 @@ class fileSystemConf extends baseConfCache implements mapCacheInterface
 		$mergedMaps = $this->mergeMaps($iniFiles,($mapName=='local'));
 		return $mergedMaps;
 	}
+
 	public function store($key, $mapName, $map, $ttl = 0)
 	{
 		return true;

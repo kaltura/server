@@ -1,8 +1,10 @@
 <?php
 require_once __DIR__."/baseMemcacheConf.php";
+
 class remoteMemCacheConf extends baseMemcacheConf implements keyCacheInterface,mapCacheInterface
 {
 	const MAP_LIST_KEY='MAP_LIST_KEY';
+
 	function __construct()
 	{
 		$confParams = parent::getConfigParams('remoteMemCacheConf');
@@ -14,6 +16,7 @@ class remoteMemCacheConf extends baseMemcacheConf implements keyCacheInterface,m
 		}
 		$this->cache=null;
 	}
+
 	public function loadKey()
 	{
 		$key=null;
@@ -27,7 +30,9 @@ class remoteMemCacheConf extends baseMemcacheConf implements keyCacheInterface,m
 		//key must be supplied.
 		return $key;
 	}
+
 	public function storeKey($key, $ttl=30){return;}
+
 	public function load($key, $mapName)
 	{
 		$hostname = $this->getHostName();
@@ -35,6 +40,7 @@ class remoteMemCacheConf extends baseMemcacheConf implements keyCacheInterface,m
 		$this->orderMap($mapNames);
 		return $this->mergeMaps($mapNames);
 	}
+
 	protected function getRelevantMapList($requestedMapName , $hostname)
 	{
 		$filteredMapsList = array($requestedMapName);
@@ -65,6 +71,7 @@ class remoteMemCacheConf extends baseMemcacheConf implements keyCacheInterface,m
 		}
 		return $filteredMapsList;
 	}
+
 	protected function mergeMaps($mapNames)
 	{
 		$mergedMaps = array();

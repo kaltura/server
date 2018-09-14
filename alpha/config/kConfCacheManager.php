@@ -35,6 +35,7 @@ class kConfCacheManager
 		}
 		return null ; //no key is available
 	}
+
 	static function storeKey($key, $foundIn)
 	{
 		$storeFlow = self::$keyStoreFlow[$foundIn];
@@ -56,7 +57,6 @@ class kConfCacheManager
 		return false;
 	}
 
-
 	static function load ($mapName, $key=null)
 	{
 		foreach (self::$mapLoadFlow as $cacheEntity)
@@ -77,12 +77,14 @@ class kConfCacheManager
 		cacheConfFactory::getInstance(cacheConfFactory::SESSION) -> store($key, $mapName,array());
 		return array();
 	}
+
 	static protected function store ($key, $mapName, $map, $foundIn)
 	{
 		$storeFlow = self::$mapStoreFlow[$foundIn];
 		foreach ($storeFlow as $cacheEntity)
 			cacheConfFactory::getInstance($cacheEntity)->store($key, $mapName, $map);
 	}
+
 	static public function getUsage()
 	{
 		$out = array();
@@ -95,6 +97,7 @@ class kConfCacheManager
 			$out['getKey'][$cacheEntity] = cacheConfFactory::getInstance($cacheEntity)->getKeyUsageCounter();
 		return $out;
 	}
+
 	static public function printUsage()
 	{
 		$str = "Conf usage:";

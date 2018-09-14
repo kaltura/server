@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__."/baseMemcacheConf.php";
+
 class localMemCacheConf extends baseMemcacheConf
 {
 	function __construct()
@@ -14,6 +15,7 @@ class localMemCacheConf extends baseMemcacheConf
 		$this->cache=null;
 	}
 	public function isKeyRequired(){ return true;}
+
 	public function load($key, $mapName)
 	{
 		$map = parent::load($key, $mapName);
@@ -24,6 +26,7 @@ class localMemCacheConf extends baseMemcacheConf
 		}
 		return null;
 	}
+
 	public function store($key, $mapName, $map, $ttl=0)
 	{
 		if(PHP_SAPI != 'cli')
