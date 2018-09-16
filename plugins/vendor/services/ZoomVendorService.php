@@ -156,6 +156,11 @@ class ZoomVendorService extends KalturaBaseService
 		$data = json_decode($request_body, true);
 		list($accountId, $downloadToken, $hostEmail, $downloadURL, $meetingId) = $this->extractDataFromPayload($data);
 		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+		if (!$zoomIntegration->getEnableUpload())
+		{
+			KalturaLog::info('Zoom upload Is disabled -> stopping upload');
+			KExternalErrors::dieGracefully();
+		}
 		$retrieveDataFromZoom = new RetrieveDataFromZoom();
 		$meetingApi = str_replace('@meetingId@', $meetingId, self::API_PARTICIPANT);
 		list($tokens, $participants) = $retrieveDataFromZoom->retrieveZoomDataAsArray($meetingApi, false, $zoomIntegration->getTokens(), $accountId);
