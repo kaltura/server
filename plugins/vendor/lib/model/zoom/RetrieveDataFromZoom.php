@@ -20,7 +20,7 @@ class RetrieveDataFromZoom
 		$zoomAuth = new kZoomOauth();
 		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
 		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
-		if (!$tokens)
+		if (!$tokens || $forceNewToken)
 			$tokens = $zoomAuth->retrieveTokensData($forceNewToken, $accountId);
 		list($response, $tokens, $refreshed) = $this->executeZoomCall($apiPath, $tokens, $accountId, $zoomBaseURL);
 		if ($refreshed)
