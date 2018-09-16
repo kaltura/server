@@ -12,6 +12,9 @@ class ZoomVendorService extends KalturaBaseService
 	const API_PARTICIPANT = '/v2/report/meetings/@meetingId@/participants';
 	const API_USERS_ME_PERMISSIONS = '/v2/users/me/permissions';
 
+	/** php body */
+	const PHP_INPUT = 'php://input';
+
 	/** payload data */
 	const ACCOUNT_ID = "account_id";
 	const PAYLOAD = 'payload';
@@ -79,6 +82,26 @@ class ZoomVendorService extends KalturaBaseService
 			$this->loadLoginPage($tokens);
 		}
 		return false;
+	}
+
+
+	/**
+	 * @action deAuthorization
+	 * @return string
+	 * @throws Exception
+	 */
+	public function deAuthorizationAction()
+	{
+		$this->verifyHeaderToken();
+		myPartnerUtils::resetAllFilters();
+		$request_body = file_get_contents(self::PHP_INPUT);
+		$data = json_decode($request_body, true);
+		$accountId = $this->extractAccountIdFromDeAuthPayload($data);
+		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId,
+			VendorTypeEnum::ZOOM_ACCOUNT);
+		$zoomIntegration->setStatus(VendorStatus::DELETED);
+		$zoomIntegration->save();
+		return true;
 	}
 
 	/**
@@ -153,9 +176,9 @@ class ZoomVendorService extends KalturaBaseService
 		KalturaLog::info('Zoom - upload entry to Kaltura starter');
 		$this->verifyHeaderToken();
 		myPartnerUtils::resetAllFilters();
-		$request_body = file_get_contents('php://input');
+		$request_body = file_get_contents(self::PHP_INPUT);
 		$data = json_decode($request_body, true);
-		list($accountId, $downloadToken, $hostEmail, $downloadURL, $meetingId) = $this->extractDataFromPayload($data);
+		list($accountId, $downloadToken, $hostEmail, $downloadURL, $meetingId) = $this->extractDataFromRecordingCompletePayload($data);
 		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 		if (!$zoomIntegration->getEnableUpload())
 		{
@@ -362,7 +385,7 @@ class ZoomVendorService extends KalturaBaseService
 	 * @param $data
 	 * @return array
 	 */
-	private function extractDataFromPayload($data)
+	private function extractDataFromRecordingCompletePayload($data)
 	{
 		$payload = $data[self::PAYLOAD];
 		$accountId = $payload[self::ACCOUNT_ID];
@@ -374,6 +397,18 @@ class ZoomVendorService extends KalturaBaseService
 		$meetingId = $meeting[self::MEETING_ID];
 		return array($accountId, $downloadToken, $hostEmail, $downloadURL, $meetingId);
 	}
+
+	/**
+	 * @param $data
+	 * @return string
+	 */
+	private function extractAccountIdFromDeAuthPayload($data)
+	{
+		$payload = $data[self::PAYLOAD];
+		$accountId = $payload[self::ACCOUNT_ID];
+		return $accountId;
+	}
+
 
 	/**
 	 * @param $meetingId
