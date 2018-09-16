@@ -73,6 +73,8 @@ class RetrieveDataFromZoom
 		//could Not find meeting -> zoom bug
 		if ($httpCode === 404 && (strpos($apiPath,'participants') !== false))
 		{
+			KalturaLog::info('participants api returned 404');
+			KalturaLog::info(print_r($response, true));
 			$response = null;
 			return array($tokens, false);
 		}
