@@ -362,40 +362,40 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			return \$affectedRows;";
 		} else {
 			// save without runtime hooks
-	    $this->applyBehaviorModifier('preSave', $script, "			");
+			$this->applyBehaviorModifier('preSave', $script, "			");
 			if ($this->hasBehaviorModifier('preUpdate'))
 			{
-			  $script .= "
+				$script .= "
 			if(!\$isInsert) {";
-	      $this->applyBehaviorModifier('preUpdate', $script, "				");
-	      $script .= "
+				$this->applyBehaviorModifier('preUpdate', $script, "				");
+				$script .= "
 			}";
 			}
 			if ($this->hasBehaviorModifier('preInsert'))
 			{
-			  $script .= "
+				$script .= "
 			if(\$isInsert) {";
-	    	$this->applyBehaviorModifier('preInsert', $script, "				");
-	      $script .= "
+				$this->applyBehaviorModifier('preInsert', $script, "				");
+				$script .= "
 			}";
 			}
 			$script .= "
 			\$affectedRows = \$this->doSave(\$con".($reloadOnUpdate || $reloadOnInsert ? ", \$skipReload" : "").");";
-	    $this->applyBehaviorModifier('postSave', $script, "			");
+			$this->applyBehaviorModifier('postSave', $script, "			");
 			if ($this->hasBehaviorModifier('postUpdate'))
 			{
-			  $script .= "
+				$script .= "
 			if(!\$isInsert) {";
-	      $this->applyBehaviorModifier('postUpdate', $script, "				");
-	      $script .= "
+				$this->applyBehaviorModifier('postUpdate', $script, "				");
+				$script .= "
 			}";
 			}
 			if ($this->hasBehaviorModifier('postInsert'))
 			{
-			  $script .= "
+				$script .= "
 			if(\$isInsert) {";
-	      $this->applyBehaviorModifier('postInsert', $script, "				");
-	      $script .= "
+				$this->applyBehaviorModifier('postInsert', $script, "				");
+				$script .= "
 			}";
 			}
 			$script .= "
@@ -474,7 +474,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		} // if (count(foreign keys))
 
 		if ($table->hasAutoIncrementPrimaryKey() ) {
-		$script .= "
+			$script .= "
 			if (\$this->isNew() ) {
 				\$this->modifiedColumns[] = " . $this->getColumnConstant($table->getAutoIncrementPrimaryKey() ) . ";
 			}";
@@ -628,7 +628,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	public function preSave(PropelPDO \$con = null)
 	{";
 		if($customDataColumn)
-		$script .= "
+			$script .= "
 		\$this->setCustomDataObj();
     	";
 
@@ -646,7 +646,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		\$this->oldColumnsValues = array();";
 
 		if($customDataColumn)
-		$script .= "
+			$script .= "
 		\$this->oldCustomDataValues = array();
     	";
 
@@ -663,11 +663,11 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	{";
 
 		if($createdAtColumn)
-		$script .= "
+			$script .= "
 		\$this->setCreatedAt(time());";
 
 		if($updatedAtColumn)
-		$script .= "
+			$script .= "
 		\$this->setUpdatedAt(time());";
 
 		$script .= "
@@ -739,9 +739,9 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		parent::postUpdate(\$con);
 	}";
 
-	if ($this->isDeletable())
-	{
-	    $script .= "
+		if ($this->isDeletable())
+		{
+			$script .= "
 	    
 	/**
 	 * Code to be run after deleting the object from database
@@ -752,17 +752,17 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		kQueryCache::invalidateQueryCache(\$this);
 		
 		";
-		if ($this->shouldRaiseEvents())
-		{
-			$script .= "
+			if ($this->shouldRaiseEvents())
+			{
+				$script .= "
 		kEventsManager::raiseEvent(new kObjectErasedEvent(\$this));
 		";
-		}
-		$script .= "
+			}
+			$script .= "
 		parent::postDelete(\$con);
 	}
 	";
-	}
+		}
 		if(!$this->shouldRaiseEvents())
 			return;
 
@@ -814,7 +814,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		";
 
 		if($updatedAtColumn)
-		$script .= "
+			$script .= "
 		
 		if(\$this->isModified())
 			\$this->setUpdatedAt(time());";
@@ -1184,7 +1184,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 					{
 						\$currentDcId = kDataCenterMgr::getCurrentDcId();
 						//addOr(column, value, comparison)
-						\$criteria->addOr(entryPeer::CUSTOM_DATA,\" '\$currentDcId' != getDC()\" ,Criteria::CUSTOM);
+						\$criteria->addOr(".$this->getPeerClassname()."::CUSTOM_DATA,\" '\$currentDcId' != getDC()\" ,Criteria::CUSTOM);
 					}
 				}
 				else 
