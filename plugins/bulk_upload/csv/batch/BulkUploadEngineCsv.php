@@ -102,7 +102,7 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 			$values = fgetcsv($fileHandle);
 		}
 		
-		if(!count($this->data->columns))
+		if(!is_array($this->data->columns) || !count($this->data->columns))
 		{
 			foreach ($columns as $columnName)
 			{
