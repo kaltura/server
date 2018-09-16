@@ -25,5 +25,4 @@ interface EntrySourceType extends BaseEnum
 
 	const LIVE_STREAM_ONTEXTDATA_CAPTIONS = 42;
 
-	const ZOOM = 43;
 }

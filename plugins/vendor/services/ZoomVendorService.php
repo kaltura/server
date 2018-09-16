@@ -213,6 +213,7 @@ class ZoomVendorService extends KalturaBaseService
 	{
 		$entry = new entry();
 		$entry->setType(entryType::MEDIA_CLIP);
+		$entry->setSourceType(EntrySourceType::URL);
 		$entry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
 		$entry->setName('Zoom_'. $meetingId);
 		$entry->setPartnerId($dbUser->getPartnerId());
