@@ -23,7 +23,8 @@ class ZoomVendorService extends KalturaBaseService
 	const FILE_TYPE = 'file_type';
 	const DOWNLOAD_URL = 'download_url';
 	const MEETING_ID = 'id';
-
+	const USER_EMAIL = 'user_email';
+	const PARTICIPANTS = 'participants';
 
 	/**
 	 * no partner will be provided by vendors as this called externally and not from kaltura
@@ -161,20 +162,10 @@ class ZoomVendorService extends KalturaBaseService
 			KalturaLog::info('Zoom upload Is disabled -> stopping upload');
 			KExternalErrors::dieGracefully();
 		}
-		$retrieveDataFromZoom = new RetrieveDataFromZoom();
-		$meetingApi = str_replace('@meetingId@', $meetingId, self::API_PARTICIPANT);
-		list($tokens, $participants) = $retrieveDataFromZoom->retrieveZoomDataAsArray($meetingApi, false, $zoomIntegration->getTokens(), $accountId);
-		if ($zoomIntegration->getAccessToken() !== $tokens[kZoomOauth::ACCESS_TOKEN]) // token changed -> refresh tokens
-			$this->saveNewTokenData($tokens, $accountId, $zoomIntegration);
-		if ($participants)
-		{
-			KalturaLog::info('----------------------------------------------');
-			KalturaLog::info(print_r($participants,true));
-		}
+		$emails = $this->extractCoHosts($meetingId, $zoomIntegration, $accountId);
 		// user logged in - need to re-init kPermissionManager in order to determine current user's permissions
 		$ks = null;
 		$dbUser = kuserPeer::getKuserByPartnerAndUid($zoomIntegration->getPartnerId(), $hostEmail, true);
-		$emails = array();
 		if (!$dbUser) //if not go to default user
 		{
 			$emails[] = $hostEmail;
@@ -382,5 +373,30 @@ class ZoomVendorService extends KalturaBaseService
 		$downloadURL = $this->getDownloadUrl($recordingFiles);
 		$meetingId = $meeting[self::MEETING_ID];
 		return array($accountId, $downloadToken, $hostEmail, $downloadURL, $meetingId);
+	}
+
+	/**
+	 * @param $meetingId
+	 * @param VendorIntegration $zoomIntegration
+	 * @param $accountId
+	 * @return array
+	 * @throws Exception
+	 */
+	private function extractCoHosts($meetingId, $zoomIntegration, $accountId)
+	{
+		$emails = array();
+		$retrieveDataFromZoom = new RetrieveDataFromZoom();
+		$meetingApi = str_replace('@meetingId@', $meetingId, self::API_PARTICIPANT);
+		list($tokens, $participants) = $retrieveDataFromZoom->retrieveZoomDataAsArray($meetingApi, false, $zoomIntegration->getTokens(), $accountId);
+		if ($zoomIntegration->getAccessToken() !== $tokens[kZoomOauth::ACCESS_TOKEN]) // token changed -> refresh tokens
+			$this->saveNewTokenData($tokens, $accountId, $zoomIntegration);
+		if ($participants) {
+			$participants = $participants[self::PARTICIPANTS];
+			foreach ($participants as $participant) {
+				if (isset($participant[self::USER_EMAIL]) && $participant[self::USER_EMAIL])
+					$emails[] = $participant[self::USER_EMAIL];
+			}
+		}
+		return $emails;
 	}
 }
