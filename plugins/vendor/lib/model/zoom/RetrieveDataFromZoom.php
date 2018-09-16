@@ -16,31 +16,39 @@ class RetrieveDataFromZoom
 	 */
 	public function retrieveZoomDataAsArray($apiPath, $forceNewToken = false, $tokens = null, $accountId = null)
 	{
-		KalturaLog::info('Calling zoom api : get user permissions');
+		KalturaLog::info("Calling zoom api: " . $apiPath);
 		$zoomAuth = new kZoomOauth();
 		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
 		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
 		if (!$tokens)
 			$tokens = $zoomAuth->retrieveTokensData($forceNewToken, $accountId);
+		list($response, $tokens, $refreshed) = $this->executeZoomCall($apiPath, $tokens, $accountId, $zoomBaseURL);
+		if ($refreshed)
+		{
+			list($response, $tokens, ) = $this->executeZoomCall($apiPath, $tokens, $accountId, $zoomBaseURL);
+		}
+		$data = json_decode($response, true);
+		return array($tokens, $data);
+	}
+
+	/**
+	 * @param $apiPath
+	 * @param $tokens
+	 * @param $accountId
+	 * @param $zoomBaseURL
+	 * @return array
+	 * @throws Exception
+	 */
+	private function executeZoomCall($apiPath, $tokens, $accountId, $zoomBaseURL)
+	{
 		$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
 		$curlWrapper = new KCurlWrapper();
 		$url = $zoomBaseURL . $apiPath . '?' . 'access_token=' . $accessToken;
 		$response = $curlWrapper->exec($url);
 		$httpCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
 		list($tokens, $refreshed) = $this->handelCurlResponse($response, $httpCode, $curlWrapper, $accountId, $tokens, $apiPath);
-		if ($refreshed)
-		{
-			$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
-			$curlWrapper = new KCurlWrapper();
-			$url = $zoomBaseURL . $apiPath . '?' . 'access_token=' . $accessToken;
-			$response = $curlWrapper->exec($url);
-			$httpCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
-			list($tokens, ) = $this->handelCurlResponse($response, $httpCode, $curlWrapper, $accountId, $tokens, $apiPath);
-		}
-		$data = json_decode($response, true);
-		return array($tokens, $data);
+		return array($response, $tokens, $refreshed);
 	}
-
 
 	/**
 	 * @param $response
@@ -50,7 +58,7 @@ class RetrieveDataFromZoom
 	 * @param $tokens
 	 * @param $apiPath
 	 * @return array<array,bool> token refreshed
-	 * @throws PropelException
+	 * @throws Exception
 	 */
 	private function handelCurlResponse(&$response, $httpCode, $curlWrapper, $accountId, $tokens, $apiPath)
 	{
@@ -62,7 +70,7 @@ class RetrieveDataFromZoom
 			$zoomAuth = new kZoomOauth();
 			return array($zoomAuth->refreshTokens($zoomClientData->getRefreshToken(), $zoomClientData), true);
 		}
-		//could Not find the meeting participant
+		//could Not find meeting -> zoom bug
 		if ($httpCode === 404 && (strpos($apiPath,'participants') !== false))
 		{
 			$response = null;

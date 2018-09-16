@@ -102,9 +102,7 @@ class ZoomVendorService extends KalturaBaseService
 		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId,
 			VendorTypeEnum::ZOOM_ACCOUNT);
 		if ($accessToken !== $tokens[kZoomOauth::ACCESS_TOKEN]) // token changed -> refresh tokens
-		{
 			$this->saveNewTokenData($tokens, $accountId, $zoomIntegration);
-		}
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		if ($zoomIntegration && intval($partnerId) !==  $zoomIntegration->getPartnerId() && $partnerId !== 0)
 		{
@@ -156,22 +154,13 @@ class ZoomVendorService extends KalturaBaseService
 		myPartnerUtils::resetAllFilters();
 		$request_body = file_get_contents('php://input');
 		$data = json_decode($request_body, true);
-		$payload = $data[self::PAYLOAD];
-		$accountId = $payload[self::ACCOUNT_ID];
-		$downloadToken = $payload[self::DOWNLOAD_TOKEN];
-		$meeting = $payload[self::MEETING];
-		$hostEmail = $meeting[self::HOST_EMAIL];
-		$recordingFiles = $meeting[self::RECORDING_FILES];
-		$downloadURL = $this->getDownloadUrl($recordingFiles);
-		$meetingId = $meeting[self::MEETING_ID];
+		list($accountId, $downloadToken, $hostEmail, $downloadURL, $meetingId) = $this->extractDataFromPayload($data);
 		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 		$retrieveDataFromZoom = new RetrieveDataFromZoom();
 		$meetingApi = str_replace('@meetingId@', $meetingId, self::API_PARTICIPANT);
 		list($tokens, $participants) = $retrieveDataFromZoom->retrieveZoomDataAsArray($meetingApi, false, $zoomIntegration->getTokens(), $accountId);
 		if ($zoomIntegration->getAccessToken() !== $tokens[kZoomOauth::ACCESS_TOKEN]) // token changed -> refresh tokens
-		{
 			$this->saveNewTokenData($tokens, $accountId, $zoomIntegration);
-		}
 		if ($participants)
 		{
 			KalturaLog::info('----------------------------------------------');
@@ -371,5 +360,22 @@ class ZoomVendorService extends KalturaBaseService
 		if (!$downloadURL)
 			KExternalErrors::dieGracefully('Zoom - MP4 downland url was not found');
 		return $downloadURL;
+	}
+
+	/**
+	 * @param $data
+	 * @return array
+	 */
+	private function extractDataFromPayload($data)
+	{
+		$payload = $data[self::PAYLOAD];
+		$accountId = $payload[self::ACCOUNT_ID];
+		$downloadToken = $payload[self::DOWNLOAD_TOKEN];
+		$meeting = $payload[self::MEETING];
+		$hostEmail = $meeting[self::HOST_EMAIL];
+		$recordingFiles = $meeting[self::RECORDING_FILES];
+		$downloadURL = $this->getDownloadUrl($recordingFiles);
+		$meetingId = $meeting[self::MEETING_ID];
+		return array($accountId, $downloadToken, $hostEmail, $downloadURL, $meetingId);
 	}
 }
