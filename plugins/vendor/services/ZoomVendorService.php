@@ -218,7 +218,6 @@ class ZoomVendorService extends KalturaBaseService
 		$entry->setName('Zoom_'. $meetingId);
 		$entry->setPartnerId($dbUser->getPartnerId());
 		$entry->setStatus(entryStatus::NO_CONTENT);
-		$entry->setSourceType(EntrySourceType::ZOOM);
 		$entry->setPuserId($dbUser->getPuserId());
 		$entry->setKuserId($dbUser->getKuserId());
 		$entry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($dbUser->getPartnerId())->getId());
