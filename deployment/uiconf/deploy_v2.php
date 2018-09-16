@@ -158,7 +158,7 @@ class uiConfDeployment
 		foreach ($confObj as $sectionName=> $sectionValue)
 		{
 			//If we are in the widgets section (like kmc, kcw, kse)
-			if($sectionName != "general" && count($sectionValue->widgets))
+			if($sectionName != "general" && is_array($sectionValue->widgets) && count($sectionValue->widgets))
 			{
 				//Set section values
 				$baseSwfUrl = $sectionValue->swfPath;
