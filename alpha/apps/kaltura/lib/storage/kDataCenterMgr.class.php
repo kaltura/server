@@ -289,7 +289,7 @@ class kDataCenterMgr
 	 */
 	private static function sortListDirFiles($a, $b)
 	{
-		return strcasecmp($a[0], $b[0]);
+		return strnatcasecmp($a[0], $b[0]);
 	}
 	
 	/**
