@@ -189,7 +189,9 @@ class ZoomVendorService extends KalturaBaseService
 		kSessionUtils::createKSessionNoValidations($dbUser->getPartnerId() , $dbUser->getPuserId() , $ks, 86400 , false , "" , '*' );
 		kCurrentContext::initKsPartnerUser($ks);
 		kPermissionManager::init();
-		$entryId = $this->createEntryForZoom($dbUser, $zoomIntegration->getZoomCategory(), $this->parseDownloadUrl($downloadURL, $downloadToken), $emails, $meetingId);
+		$url = $this->parseDownloadUrl($downloadURL, $downloadToken);
+		$entryId = $this->createEntryForZoom($dbUser, $zoomIntegration->getZoomCategory(), $emails, $meetingId);
+		kJobsManager::addImportJob(null, $entryId, $dbUser->getPartnerId(), $url);
 		KalturaLog::info('Zoom - upload entry to kaltura started, partner id: '. $zoomIntegration->getPartnerId() . 'host email: ' . $hostEmail . 'emails: ' . print_r($emails, true) .
 		'meeting Id: ' . $meetingId . 'entry Id: ' . $entryId);
 	}
@@ -197,13 +199,12 @@ class ZoomVendorService extends KalturaBaseService
 	/**
 	 * @param kuser $dbUser
 	 * @param string $zoomCategory
-	 * @param $url
 	 * @param $emails
 	 * @param $meetingId
 	 * @return string
 	 * @throws Exception
 	 */
-	private function createEntryForZoom($dbUser, $zoomCategory, $url, $emails, $meetingId)
+	private function createEntryForZoom($dbUser, $zoomCategory, $emails, $meetingId)
 	{
 		$entry = new entry();
 		$entry->setType(entryType::MEDIA_CLIP);
@@ -226,8 +227,6 @@ class ZoomVendorService extends KalturaBaseService
 			$entry->setEntitledPusersPublish(implode(",", array_unique($emails)));
 		}
 		$entry->save();
-		KalturaLog::info('Zoom Entry Created, Entry ID:  ' . $entry->getId());
-		kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url);
 		return $entry->getId();
 	}
 
