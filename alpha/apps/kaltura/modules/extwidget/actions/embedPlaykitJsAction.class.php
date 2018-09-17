@@ -79,7 +79,7 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		$url = $context->bundlerUrl . "/build?config=" . base64_encode($config) . "&name=" . $context->bundle_name . "&source=" . base64_encode($context->sourcesPath);
-		$content = KCurlWrapper::getContent($url, array('Content-Type: application/json'));
+		$content = KCurlWrapper::getContent($url, array('Content-Type: application/json'), true);
 
 		if (!$content) 
 		{

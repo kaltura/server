@@ -502,8 +502,8 @@ class KCurlWrapper
 	 */
 	public function exec($sourceUrl, $destFile = null,$progressCallBack = null, $allowInternalUrl = false)
 	{
-		if (!$allowInternalUrl && self::isInternalUrl($sourceUrl))
-			KalturaLog::debug("Exec Curl - Found not allowed Internal url: " . $sourceUrl);
+		if (!$allowInternalUrl && self::isInternalUrl($sourceUrl) && !self::isWhiteListedInternalUrl($sourceUrl))
+			KalturaLog::debug("Exec Curl - Found not allowed not whiteListed Internal url: . $sourceUrl");
 
 		$this->setSourceUrlAndprotocol($sourceUrl);
 		
@@ -539,8 +539,8 @@ class KCurlWrapper
 	 */
 	public function doExec($sourceUrl, $allowInternalUrl = false)
 	{
-		if (!$allowInternalUrl && self::isInternalUrl($sourceUrl))
-			KalturaLog::debug("DoExec Curl - Found not allowed Internal url: " . $sourceUrl);
+		if (!$allowInternalUrl && self::isInternalUrl($sourceUrl) && !self::isWhiteListedInternalUrl($sourceUrl))
+			KalturaLog::debug("DoExec Curl - Found not allowed and not whiteListed Internal url: $sourceUrl");
 
 		curl_setopt($this->ch, CURLOPT_URL, $sourceUrl);
 
@@ -576,6 +576,18 @@ class KCurlWrapper
 	{
 		return !filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE |  FILTER_FLAG_NO_RES_RANGE); // checks if host is NOT in a private or reserved range
 	}
+
+	private static function isWhiteListedInternalUrl($url)
+	{
+		$whiteListedInternalPatterns = kConf::get('internal_url_whitelist', 'security', array());
+		foreach ($whiteListedInternalPatterns as $pattern)
+		{
+			if (preg_match($pattern, $url))
+				return true;
+		}
+		return false;
+	}
+
 	private static function getUrlHost($url = null)
 	{
 		$host = null;
@@ -654,10 +666,10 @@ class KCurlWrapper
 	{
 	}
 
-	public static function getContent($url, $headers = null)
+	public static function getContent($url, $headers = null, $allowInternalUrl = false)
 	{
-		if (self::isInternalUrl($url))
-			KalturaLog::debug("getContent - Found Internal url: " . $url);
+		if (!$allowInternalUrl && self::isInternalUrl($url) && !self::isWhiteListedInternalUrl($url))
+			KalturaLog::debug("Exec Curl in getContent - Found Internal and not whiteListed url: $url");
 
 		$ch = curl_init();
 		
