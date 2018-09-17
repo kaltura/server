@@ -24,6 +24,16 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		7 => "ABORTED"
 	);
 	
+	static private $serviceFeatureEnumTranslate = array(
+		1 => "CAPTIONS",
+		2 => "TRANSLATION",
+	);
+	
+	static private $serviceTypeEnumTranslate = array(
+		1 => "HUMAN",
+		2 => "MACHINE",
+	);
+	
 	static private $catalogItemData = array();
 
 	/* (non-PHPdoc)
@@ -195,11 +205,11 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 			'createdAt' => $this->getHumanReadbaleDate($entryVendorTask->createdAt),
 			'finishTime' => $this->getHumanReadbaleDate($entryVendorTask->finishTime),
 			'entryId' => $entryVendorTask->entryId,
-			'status' => $this->translateStatusToHumanReadable($entryVendorTask->status),
+			'status' => $this->translateEnumsToHumanReadable("status",$entryVendorTask->status),
 			'reachProfileId' => $entryVendorTask->reachProfileId,
 			'turnaroundTime' => $catalogItemData ? $catalogItemData["TAT"] : null,
-			'serviceType' => $catalogItemData ? $catalogItemData["serviceType"] : null,
-			'serviceFeature' => $catalogItemData ? $catalogItemData["serviceFeature"] : null,
+			'serviceType' => $catalogItemData ?  $this->translateEnumsToHumanReadable("serviceType",$catalogItemData["serviceType"]) : null,
+			'serviceFeature' => $catalogItemData ? $this->translateEnumsToHumanReadable("serviceFeature",$catalogItemData["serviceFeature"]) : null,
 			'price' => $entryVendorTask->price,
 			'userId' => $entryVendorTask->userId,
 			'moderatingUser' => $entryVendorTask->moderatingUser,
@@ -207,7 +217,7 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 			'notes' => $entryVendorTask->notes,
 			'accuracy' => $entryVendorTask->accuracy,
 			'context' => $entryVendorTask->context,
-			'partnerData' => $entryVendorTask->partnerDatacontext
+			'partnerData' => $entryVendorTask->partnerData
 		);
 
 		$entryVendorTaskIdToRow[$entryVendorTask->id] = $defaultRowValues;
@@ -223,12 +233,18 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		return date("Y-m-d H:i", $unixTimeStamp);
 	}
 	
-	private function translateStatusToHumanReadable($status)
+	private function translateEnumsToHumanReadable($enumName, $enumValue)
 	{
-		if(isset(self::$statusEnumTranslate[$status]))
-			return self::$statusEnumTranslate[$status];
+		$mapName = $enumName . "EnumTranslate";
 		
-		return null;
+		if(!self::${$enumName."EnumTranslate"})
+			return null;
+		
+		if (!isset(self::${$enumName."EnumTranslate"}[$enumValue]))
+			return null;
+		
+		return self::${$enumName."EnumTranslate"}[$enumValue];
+		
 	}
 	
 	private function getCatalogItemDataById($id)
