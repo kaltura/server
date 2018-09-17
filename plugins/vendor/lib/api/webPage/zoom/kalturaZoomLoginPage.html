@@ -99,7 +99,7 @@
             var email = $emailField.val();
             var pwd = $passwordField.val();
             var partnerId = $partnerId.val();
-            if(partnerId == null || partnerId === '' || partnerId >= 100)
+            if(partnerId == null || partnerId === '' || partnerId < 100)
             {
                 $('#loginError').show();
                 $("body").css("cursor", "default");
