@@ -134,6 +134,20 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 			}
 		}
 		
+		if($this->shouldSetContent())
+		{
+			foreach ($this->content as $contentItem)
+			{
+				$confFile = $this->getConfFileBySuffix($contentItem['suffix']);
+				if ($confFile)
+					$this->saveConfFileToDisk($confFile, $contentItem['suffix']);
+				$contentItem['shouldSet'] = false;
+				
+			}
+			$res = parent::save( $con );
+		}
+		$this->getConfFilePath();
+		
 		return $res;
 	}
 	
@@ -636,22 +650,8 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 			$content = $this->getConfFileBySuffix($suffix);
 			$cloned->setConfFileBySuffix($suffix, $content);			
 		}
-		$cloned->save(null);
 		
-		if($this->shouldSetContent())
-		{
-			foreach ($this->content as $contentItem)
-			{
-				$confFile = $this->getConfFileBySuffix($contentItem['suffix']);
-				if ($confFile)
-					$this->saveConfFileToDisk($confFile, $contentItem['suffix'], true);
-				$contentItem['shouldSet'] = false;
-				
-			}
-			parent::save();
-		}
-		$this->getConfFilePath();
-
+		$cloned->save(null);
 		return $cloned;
 	}
 

@@ -39,9 +39,9 @@ class KalturaDropFolderFileResource extends KalturaGenericDataCenterContentResou
 		return $dropFolder->getDc();
 	}
 	
-	public function validateEntry(entry $dbEntry)
+	public function validateEntry(entry $dbEntry, $validateLocal = false)
 	{
-		parent::validateEntry($dbEntry);
+		parent::validateEntry($dbEntry,$validateLocal);
     	$this->validatePropertyNotNull('dropFolderFileId');
     	
     	$dropFolderFile = DropFolderFilePeer::retrieveByPK($this->dropFolderFileId);

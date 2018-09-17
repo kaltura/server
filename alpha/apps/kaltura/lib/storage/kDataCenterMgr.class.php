@@ -266,7 +266,7 @@ class kDataCenterMgr
 		{
 			KalturaLog::log("Serving directory content from [".$resolvedPath."]");
 			$contents = kFile::listDir($resolvedPath);
-			sort($contents, SORT_STRING);
+			usort($contents, array("kDataCenterMgr", "sortListDirFiles"));
 			$contents = serialize($contents);
 			header("file-sync-type: dir");
 			echo $contents;
@@ -280,6 +280,16 @@ class kDataCenterMgr
 			kFileUtils::dumpFile( $resolvedPath , null, null, 0 ,$file_sync_resolved->getEncryptionKey(), $file_sync_resolved->getIv(),$fileSize);
 		}
 		
+	}
+	
+	/**
+	 * Custom function to sort result of kFile::listDir based on fileName
+	 * Example output of listDir:
+	 * Array ( [0] => Array ( [0] => Slide_0_6b7fixqe_0_igzhilpq_2_0001.jpg [1] => file [2] => 26087 )
+	 */
+	private static function sortListDirFiles($a, $b)
+	{
+		return strnatcasecmp($a[0], $b[0]);
 	}
 	
 	/**

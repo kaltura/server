@@ -17,13 +17,13 @@ class KalturaAssetParamsResourceContainer extends KalturaResource
 	 */
 	public $assetParamsId;
 
-	public function validateEntry(entry $dbEntry)
+	public function validateEntry(entry $dbEntry,$validateLocal = false)
 	{
-		parent::validateEntry($dbEntry);
+		parent::validateEntry($dbEntry, $validateLocal);
     	$this->validatePropertyNotNull('resource');
     	$this->validatePropertyNotNull('assetParamsId');
     	
-   		$this->resource->validateEntry($dbEntry);
+   		$this->resource->validateEntry($dbEntry, $validateLocal);
 	}
 	
 	public function entryHandled(entry $dbEntry)
