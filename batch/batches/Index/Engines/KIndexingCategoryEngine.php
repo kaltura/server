@@ -23,7 +23,7 @@ class KIndexingCategoryEngine extends KIndexingEngine
 		$filter->orderBy = KalturaCategoryOrderBy::DEPTH_ASC . ',' . KalturaCategoryOrderBy::CREATED_AT_ASC;
 		
 		$categoriesList = KBatchBase::$kClient->category->listAction($filter, $this->pager);
-		if(!count($categoriesList->objects))
+		if(!$categoriesList->objects || !count($categoriesList->objects))
 			return 0;
 			
 		KBatchBase::$kClient->startMultiRequest();

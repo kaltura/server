@@ -23,7 +23,7 @@ class KIndexingEntryEngine extends KIndexingEngine
 		$filter->orderBy = KalturaBaseEntryOrderBy::CREATED_AT_ASC;
 		
 		$entriesList = KBatchBase::$kClient->baseEntry->listAction($filter, $this->pager);
-		if(!count($entriesList->objects))
+		if(!$entriesList->objects || !count($entriesList->objects))
 			return 0;
 			
 		KBatchBase::$kClient->startMultiRequest();

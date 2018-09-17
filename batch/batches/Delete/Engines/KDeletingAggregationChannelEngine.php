@@ -41,7 +41,7 @@ class KDeletingAggregationChannelEngine extends  KDeletingEngine
 		
 		$entryFilter->statusIn = implode (',', array (KalturaEntryStatus::ERROR_CONVERTING, KalturaEntryStatus::ERROR_IMPORTING, KalturaEntryStatus::IMPORT, KalturaEntryStatus::NO_CONTENT, KalturaEntryStatus::READY));
 		$entriesList = KBatchBase::$kClient->baseEntry->listAction($entryFilter, $this->pager);
-		if(!count($entriesList->objects))
+		if(!$entriesList->objects || !count($entriesList->objects))
 			return 0;
 			
 		$this->lastCreatedAt = $entriesList->objects[count ($entriesList->objects) -1];
@@ -69,6 +69,10 @@ class KDeletingAggregationChannelEngine extends  KDeletingEngine
 		$categoryIdsToReturn = array ();
 		
 		$categoryResponse = KBatchBase::$kClient->category->listAction($filter, $categoryPager);
+		
+		if(!$categoryResponse->objects)
+			return "";
+		
 		while (count ($categoryResponse->objects))
 		{
 			foreach ($categoryResponse->objects as $category)
