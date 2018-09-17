@@ -22,11 +22,7 @@ class RetrieveDataFromZoom
 		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
 		if (!$tokens || $forceNewToken)
 			$tokens = $zoomAuth->retrieveTokensData($forceNewToken, $accountId);
-		list($response, $tokens, $refreshed) = $this->executeZoomCall($apiPath, $tokens, $accountId, $zoomBaseURL);
-		if ($refreshed)
-		{
-			list($response, $tokens, ) = $this->executeZoomCall($apiPath, $tokens, $accountId, $zoomBaseURL);
-		}
+		list($response, $tokens) = $this->callZoom($apiPath, $tokens, $accountId, $zoomBaseURL);
 		$data = json_decode($response, true);
 		return array($tokens, $data);
 	}
@@ -66,7 +62,7 @@ class RetrieveDataFromZoom
 		if (($httpCode === 400 || $httpCode === 401) && $accountId)
 		{
 			KalturaLog::err("Zoom Curl returned  $httpCode, with massage: {$response} " . $curlWrapper->getError());
-			$zoomClientData = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+			$zoomClientData = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 			$zoomAuth = new kZoomOauth();
 			return array($zoomAuth->refreshTokens($zoomClientData->getRefreshToken(), $zoomClientData), true);
 		}
@@ -81,9 +77,25 @@ class RetrieveDataFromZoom
 		//other error -> dieGracefully
 		if (!$response || $httpCode !== 200 || $curlWrapper->getError())
 		{
-			KalturaLog::err('Zoom Curl returned error, Tokens were not received, Error: ' . $curlWrapper->getError());
+			KalturaLog::err("Zoom Curl returned error, Error code : $httpCode, Error: {$curlWrapper->getError()} ");
 			KExternalErrors::dieGracefully();
 		}
 		return array($tokens, false);
+	}
+
+	/**
+	 * @param $apiPath
+	 * @param $tokens
+	 * @param $accountId
+	 * @param $zoomBaseURL
+	 * @return array
+	 * @throws Exception
+	 */
+	private function callZoom($apiPath, $tokens, $accountId, $zoomBaseURL)
+	{
+		list($response, $tokens, $refreshed) = $this->executeZoomCall($apiPath, $tokens, $accountId, $zoomBaseURL);
+		if ($refreshed) // in case we receive 401
+			list($response, $tokens,) = $this->executeZoomCall($apiPath, $tokens, $accountId, $zoomBaseURL);
+		return array($response, $tokens);
 	}
 }

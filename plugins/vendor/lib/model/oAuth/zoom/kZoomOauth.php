@@ -22,12 +22,7 @@ class kZoomOauth implements kVendorOauth
 	public function refreshTokens($oldRefreshToken, $vendorIntegration)
 	{
 		KalturaLog::info('Refreshing Tokens');
-		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
-		$clientId = $zoomConfiguration['clientId'];
-		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
-		$clientSecret = $zoomConfiguration['clientSecret'];
-		$header = array('Content-Type:application/x-www-form-urlencoded');
-		$userPwd = "$clientId:$clientSecret";
+		list($zoomBaseURL, , $header, $userPwd) = $this->getZoomHeaderData();
 		$postFields = "grant_type=refresh_token&refresh_token=$oldRefreshToken";
 		$response = $this->curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
 		$tokensData = $this->parseTokens($response);
@@ -46,7 +41,7 @@ class kZoomOauth implements kVendorOauth
 		$zoomIntegration = null;
 		if (!$forceNewToken && $accountId)
 		{
-			$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerAccountAndType($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+			$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 			if ($zoomIntegration) // tokens exist
 			{
 				if (time() > $zoomIntegration->getExpiresIn()) // token had expired -> refresh
@@ -55,13 +50,7 @@ class kZoomOauth implements kVendorOauth
 					self::EXPIRES_IN => $zoomIntegration->getExpiresIn());
 			}
 		}
-		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
-		$clientId = $zoomConfiguration['clientId'];
-		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
-		$redirectUrl = $zoomConfiguration['redirectUrl'];
-		$clientSecret = $zoomConfiguration['clientSecret'];
-		$header = array('Content-Type:application/x-www-form-urlencoded');
-		$userPwd = "$clientId:$clientSecret";
+		list($zoomBaseURL, $redirectUrl, $header, $userPwd) = $this->getZoomHeaderData();
 		$postFields = "grant_type=authorization_code&code={$_GET['code']}&redirect_uri=$redirectUrl";
 		$response = $this->curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
 		$tokensData = $this->parseTokens($response);
@@ -78,7 +67,6 @@ class kZoomOauth implements kVendorOauth
 	 */
 	private function curlRetrieveTokensData($url, $userPwd, $header, $postFields)
 	{
-		KalturaLog::info('Calling zoom auth');
 		$curlWrapper = new KCurlWrapper();
 		$curlWrapper->setOpt(CURLOPT_POST, 1);
 		$curlWrapper->setOpt(CURLOPT_HEADER, true);
@@ -89,14 +77,13 @@ class kZoomOauth implements kVendorOauth
 	}
 
 	/**
-	 * @param array $data
-	 * @return array
+	 * set two minutes off the token expiration, avoid 401 response from zoom
+	 * @param int $expiresIn
+	 * @return int
 	 */
-	private function setValidUntil($data)
+	private function setValidUntil($expiresIn)
 	{
-		$expiresIn = $data[self::EXPIRES_IN];
-		$data[self::EXPIRES_IN] = time() + $expiresIn - 120;
-		return $data;
+		return time() + $expiresIn - 120;
 	}
 
 	/**
@@ -112,11 +99,34 @@ class kZoomOauth implements kVendorOauth
 	/**
 	 * @param $response
 	 * @return array
+	 * @throws Exception
 	 */
 	private function parseTokens($response)
 	{
 		$dataAsArray = json_decode($response, true);
-		$dataAsArray = $this->setValidUntil($dataAsArray);
+		if (!$dataAsArray)
+		{
+			KalturaLog::err('Parse Tokens failed, response received from zoom is: ' . $response);
+			throw new KalturaAPIException("Unable To parse Tokens please check zoom configuration");
+		}
+		$expiresIn = $dataAsArray[self::EXPIRES_IN];
+		$dataAsArray[self::EXPIRES_IN] = $this->setValidUntil($expiresIn);
 		return $this->extractTokensFromResponse($dataAsArray);
+	}
+
+	/**
+	 * @return array
+	 * @throws Exception
+	 */
+	private function getZoomHeaderData()
+	{
+		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
+		$clientId = $zoomConfiguration['clientId'];
+		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
+		$redirectUrl = $zoomConfiguration['redirectUrl'];
+		$clientSecret = $zoomConfiguration['clientSecret'];
+		$header = array('Content-Type:application/x-www-form-urlencoded');
+		$userPwd = "$clientId:$clientSecret";
+		return array($zoomBaseURL, $redirectUrl, $header, $userPwd);
 	}
 }

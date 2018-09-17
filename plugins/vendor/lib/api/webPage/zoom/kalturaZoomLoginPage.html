@@ -99,7 +99,7 @@
             var email = $emailField.val();
             var pwd = $passwordField.val();
             var partnerId = $partnerId.val();
-            if(partnerId == null || partnerId === '' || partnerId === 0)
+            if(partnerId == null || partnerId === '' || partnerId >= 100)
             {
                 $('#loginError').show();
                 $("body").css("cursor", "default");
@@ -148,8 +148,8 @@
         <label for="partnerId"><b>Partner ID</b></label>
         <input type="number" placeholder="Enter Partner ID" id="partnerId" name="partnerId" required>
         <button type="submit" class="submit-button">Login</button>
-        <p id="loginError" class="error" style="display:none">Login Process Failed!  <br> Check User, password and partnerID. <br>
-            Partner id  must be greater than Zero.</p>
+        <p id="loginError" class="error" style="display:none">Login Failed!  <br> Check User, password and partner ID. <br>
+            Partner ID must be valid.</p>
     </div>
 </form>
 </html>

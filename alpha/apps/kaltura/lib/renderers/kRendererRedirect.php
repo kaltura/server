@@ -10,7 +10,7 @@ class kRendererRedirect implements kRendererBase
 {
 	private $url;
 	private $statusCode;
-	public function __construct($url,$statusCode = 303)
+	public function __construct($url,$statusCode = KCurlHeaderResponse::HTTP_STATUS_REDIRECT_METHOD)
 	{
 		$this->url = $url;
 		$this->statusCode = $statusCode;
@@ -23,6 +23,6 @@ class kRendererRedirect implements kRendererBase
 	
 	public function output()
 	{
-		header("Location: {$this->url}" , true, $this->statusCode);
+		header("Location: $this->url" , true, $this->statusCode);
 	}
 }

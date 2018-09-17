@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <database defaultPhpNamingMethod="underscore" heavyIndexing="false" name="propel" defaultIdMethod="native" package="plugins.reach">
-
-	
 	<table skipSql="false" abstract="false" name="vendor_integration">
 		<column primaryKey="true"  required="true"  autoIncrement="true"  lazyLoad="false" name="id" type="integer" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="account_id" type="varchar" size="64" />
@@ -14,7 +12,7 @@
 		<index name="partner_id_vendor_Type_status_index">
 			<index-column name="partner_id" />
 			<index-column name="vendor_Type" />
-            <index-column name="status" />
+			<index-column name="status" />
 		</index>
 		<index name="account_id_vendor_Type_index">
 			<index-column name="account_id" />

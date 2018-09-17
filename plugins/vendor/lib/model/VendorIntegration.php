@@ -26,10 +26,6 @@ class VendorIntegration extends BaseVendorIntegration {
 
 	public function setDeleteContentOnDAuthorization ($v)	{ $this->putInCustomData ( "deleteContentOnDAuthorization" , $v);	}
 	public function getDeleteContentOnDAuthorization ( )	{ return $this->getFromCustomData( "deleteContentOnDAuthorization" );	}
-
-	public function setEnableUpload ($v)	{ $this->putInCustomData ( "enableUpload" , $v);	}
-	public function getEnableUpload ( )	{ return $this->getFromCustomData( "enableUpload" );	}
-
 	public function setDefaultUserEMail ($v)	{ $this->putInCustomData ( "defaultUserEMail" , $v);	}
 	public function getDefaultUserEMail ( )	{ return $this->getFromCustomData( "defaultUserEMail" );	}
 

@@ -87,15 +87,13 @@
             $("body").css("cursor", "progress");
             event.preventDefault();
             var $defaultUserId = $('#defaultUserId');
-            var $enableUpload  = $('#enableUpload');
             var $zoomCategory  = $('#zoomCategory');
             var defaultUserId = $defaultUserId.val();
-            var enableUpload = $enableUpload.is(":checked");
             var zoomCategory = $zoomCategory.val();
             $.ajax({
                 url : url,
                 type : "post",
-                data: {"ks": ks, "defaultUserId": defaultUserId, "uploadEnabled": enableUpload, "zoomCategory" : zoomCategory
+                data: {"ks": ks, "defaultUserId": defaultUserId, "zoomCategory" : zoomCategory
                    , "accountId" : accountId ,"format": 1},
                 success : function(res) {
                     $("body").css("cursor", "default");
@@ -135,8 +133,6 @@
         <input type="text" value="@defaultUserID@" id="defaultUserId" name="defaultUserId" required>
         <label for="zoomCategory"><b>Zoom Category</b></label>
         <input type="text" value="@zoomCategory@" id="zoomCategory" name="zoomCategory" required>
-        <label for="enableUpload"><b>Enable Upload</b></label>
-        <input type="checkbox" id="enableUpload" name="enableUpload" @checked@ required>
         <button type="submit" class="submit-button">Submit</button>
         <p id="submitError" class="error" style="display:none">Data was Not Saved , please check server logs'.</p>
         <p id="submitOK" class="success" style="display:none">Saved Successfully</p>

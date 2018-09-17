@@ -44,13 +44,11 @@ class AESOauthZoom
 		$wasItSecure = false;
 		do
 		{
-			$efforts+=1;
+			$efforts += 1;
 			$iv = openssl_random_pseudo_bytes(16, $wasItSecure);
-			if($efforts > $maxEfforts){
+			if($efforts > $maxEfforts)
 				throw new KalturaAPIException('Unable to genereate secure iv for tokens.');
-			}
 		} while (!$wasItSecure);
-
 		return $iv;
 	}
 }
