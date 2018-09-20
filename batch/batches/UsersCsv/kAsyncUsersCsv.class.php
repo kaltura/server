@@ -121,7 +121,7 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 			try
 			{
 				$userList = KBatchBase::$kClient->user->listAction($filter, $pager);
-				$returnedSize = count($userList->objects);
+				$returnedSize = $userList->objects ? count($userList->objects) : 0;
 			}
 			catch(Exception $e)
 			{
