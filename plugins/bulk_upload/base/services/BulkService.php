@@ -11,6 +11,7 @@ class BulkService extends KalturaBaseService
 	const PARTNER_DEFAULT_CONVERSION_PROFILE_ID = -1;
 	
 	const SERVICE_NAME = "bulkUpload";
+	const USER_GROUP_SYNC_THRESHOLD_DEFUALT = "50";
 
 	/**
 	 * Add new bulk upload batch job
@@ -445,18 +446,13 @@ class BulkService extends KalturaBaseService
 	 */
 	public function syncGroupUsersAction($userId, $groupIds, $removeFromExistingGroups = true, $createNewGroups = true)
 	{
-		$groupLimit = kConf::get('user_groups_sync_threshold','local',50);
+		$groupLimit = kConf::get('user_groups_sync_threshold','local',self::USER_GROUP_SYNC_THRESHOLD_DEFUALT);
 		$bulkUpload = null;
 
 		$kUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
 		if (!$kUser || $kUser->getType() != KuserType::USER)
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
-		}
-
-		if (!$groupIds)
-		{
-			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'groupIds');
 		}
 
 		$bulkGroupUserSyncCsv = new kBulkGroupUserSyncCsv($kUser, $groupIds);
