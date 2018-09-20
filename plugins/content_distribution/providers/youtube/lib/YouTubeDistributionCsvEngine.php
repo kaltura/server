@@ -30,8 +30,8 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		// create CSV file
 		$fp = tempnam(sys_get_temp_dir(), 'temp.').".csv";
 		$file = fopen($fp, 'w');
-		KCsvWrapper::sanitizedFputCsv($file, array_keys($csvMap));
-		KCsvWrapper::sanitizedFputCsv($file, array_values($csvMap));
+		fputcsv($file, array_keys($csvMap));
+		fputcsv($file, array_values($csvMap));
 		fclose($file);
 
 		$sftpManager->putFile($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $fp);
@@ -109,11 +109,11 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		{
 			$fp = tempnam(sys_get_temp_dir(), 'temp.') . ".csv";
 			$file = fopen($fp, 'w');
-			KCsvWrapper::sanitizedFputCsv($file, array('video_id','language','caption_file'));
+			fputcsv($file, array('video_id','language','caption_file'));
 			foreach ($captionCsvMap as $captionItem )
 			{
 				$row = array( $videoId , $captionItem['language'] , $captionItem['caption_file']);
-				KCsvWrapper::sanitizedFputCsv($file, $row);
+				fputcsv($file, $row);
 			}
 			// create CSV file
 			fclose($file);
@@ -153,8 +153,8 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		//create update Csv
 		$fp = tempnam(sys_get_temp_dir(), 'temp.').".csv";
 		$file = fopen($fp, 'w');
-		KCsvWrapper::sanitizedFputCsv($file, array_keys($updateCsvMap));
-		KCsvWrapper::sanitizedFputCsv($file, array_values($updateCsvMap));
+		fputcsv($file, array_keys($updateCsvMap));
+		fputcsv($file, array_values($updateCsvMap));
 		fclose($file);
 
 		$sftpManager->putFile($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $fp);
@@ -197,11 +197,11 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 			$sftpManager = $this->getSFTPManager($data->distributionProfile);
 			$fp = tempnam(sys_get_temp_dir(), 'temp.') . ".csv";
 			$file = fopen($fp, 'w');
-			KCsvWrapper::sanitizedFputCsv($file, array('video_id','language','caption_file'));
+			fputcsv($file, array('video_id','language','caption_file'));
 			foreach ($captionCsvMap as $captionItem)
 			{
 				$row = array( $videoId , $captionItem['language'] , $captionItem['caption_file']);
-				KCsvWrapper::sanitizedFputCsv($file, $row);
+				fputcsv($file, $row);
 			}
 			fclose($file);
 			$sftpManager->putFile($data->providerData->sftpDirectory . '/' . $data->providerData->sftpMetadataFilename, $fp);
