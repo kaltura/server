@@ -60,10 +60,7 @@ class KAsyncSyncCategoryPrivacyContext extends KJobHandlerWorker
 			$categoryEntryFilter->createdAtGreaterThanOrEqual = $data->lastUpdatedCategoryEntryCreatedAt;		
 		$categoryEntryList = KBatchBase::$kClient->categoryEntry->listAction($categoryEntryFilter, $categoryEntryPager);
 		
-		if(!$categoryEntryList->objects)
-			return;
-		
-		while(count($categoryEntryList->objects))
+		while($categoryEntryList->objects && count($categoryEntryList->objects))
 		{
 			KBatchBase::$kClient->startMultiRequest();
 			foreach ($categoryEntryList->objects as $categoryEntry) 

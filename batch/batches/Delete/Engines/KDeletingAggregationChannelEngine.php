@@ -70,10 +70,7 @@ class KDeletingAggregationChannelEngine extends  KDeletingEngine
 		
 		$categoryResponse = KBatchBase::$kClient->category->listAction($filter, $categoryPager);
 		
-		if(!$categoryResponse->objects)
-			return "";
-		
-		while (count ($categoryResponse->objects))
+		while ($categoryResponse->objects && count($categoryResponse->objects))
 		{
 			foreach ($categoryResponse->objects as $category)
 			{

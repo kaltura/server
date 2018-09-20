@@ -34,10 +34,7 @@ class KAsyncServerNodeMonitor extends KPeriodicWorker
 		$pager->pageIndex = 1;
 		$serverNodes = self::$kClient->serverNode->listAction($filter, $pager);
 		
-		if(!$serverNodes->objects)
-			return;
-		
-		while (count($serverNodes->objects))
+		while ($serverNodes->objects && count($serverNodes->objects))
 		{
 			foreach ($serverNodes->objects as $serverNode)
 			{
