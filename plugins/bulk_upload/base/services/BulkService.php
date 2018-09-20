@@ -455,6 +455,9 @@ class BulkService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
 		}
 
+		if(!trim($groupIds))
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'groupIds');
+
 		$bulkGroupUserSyncCsv = new kBulkGroupUserSyncCsv($kUser, $groupIds);
 		$shouldHandleGroupsInBatch = ($groupLimit < count(explode(",", $groupIds)));
 		if (!$shouldHandleGroupsInBatch)
