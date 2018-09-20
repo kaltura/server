@@ -140,10 +140,10 @@ class kBulkGroupUserSyncCsv
 			);
 		}
 		$f = fopen($csvPath, 'w');
-		KCsvWrapper::sanitizedFputCsv($f, array(self::ACTION, self::USER_ID, self::GROUP_ID));
+		fputcsv($f, array(self::ACTION, self::USER_ID, self::GROUP_ID));
 		foreach ($csvData as $csvLine)
 		{
-			KCsvWrapper::sanitizedFputCsv($f, $csvLine);
+			fputcsv($f, $csvLine);
 		}
 		fclose($f);
 		return $csvPath;
