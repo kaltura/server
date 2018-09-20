@@ -169,7 +169,7 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 		$headerRow = 'User ID,First Name,Last Name,Email';
 		foreach ($additionalFields as $field)
 			$headerRow .= ','.$field->fieldName;
-		fputcsv($csvFile, explode(',', $headerRow));
+		KCsvWrapper::sanitizedFputCsv($csvFile, explode(',', $headerRow));
 		return $csvFile;
 	}
 
@@ -198,7 +198,9 @@ class KAsyncUsersCsv extends KJobHandlerWorker
 				$userIdToRow = $this->fillAdditionalFieldsFromMetadata($usersMetadata, $additionalFields, $userIdToRow);
 		}
 		foreach ($userIdToRow as $key=>$val)
-			fputcsv($csvFile, $val);
+		{
+			KCsvWrapper::sanitizedFputCsv($csvFile, $val);
+		}
 	}
 
 	/**

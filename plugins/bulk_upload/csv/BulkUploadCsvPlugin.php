@@ -133,7 +133,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
     		$headerRow[] = "objectId";
     		$headerRow[] = "objectStatus";
     		$headerRow[] = "errorDescription";
-    		fputcsv($STDOUT, $headerRow);
+    		KCsvWrapper::sanitizedFputCsv($STDOUT, $headerRow);
 		}
 		
 		$handledResults = 0;
@@ -167,9 +167,9 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 				$values[] = $bulkUploadResult->getObjectId();
 				$values[] = $bulkUploadResult->getObjectStatus();
 				$values[] = preg_replace('/[\n\r\t]/', ' ', $bulkUploadResult->getErrorDescription());
-				
-				
-				fputcsv($STDOUT, $values);
+
+
+				KCsvWrapper::sanitizedFputCsv($STDOUT, $values);
 			}
 			
     		if(count($bulkUploadResults) < $criteria->getLimit())
