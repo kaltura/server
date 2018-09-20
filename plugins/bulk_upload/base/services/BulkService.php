@@ -157,7 +157,7 @@ class BulkService extends KalturaBaseService
 	 * @action addUsers
 	 * @actionAlias user.addFromBulkUpload
 	 * Action adds users from a bulkupload CSV file
-	 * @param array $fileData
+	 * @param file $fileData
 	 * @param KalturaBulkUploadJobData $bulkUploadData
 	 * @param KalturaBulkUploadUserData $bulkUploadUserData
 	 * @return KalturaBulkUpload
