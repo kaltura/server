@@ -125,7 +125,12 @@ class LiveReportsService extends KalturaBaseService
 		}
 		
 		list($methodName, $objectType) = $reportTypes[$reportType];
-		
+		if ($methodName == 'entryTotal' &&
+			kString::beginsWith(kCurrentContext::$client_lang, 'KWP:'))
+		{
+			$methodName = 'entryQuality';
+		} 
+
 		try
 		{
 			list($items, $totalCount) = call_user_func(array('kKavaLiveReportsMgr', $methodName), 

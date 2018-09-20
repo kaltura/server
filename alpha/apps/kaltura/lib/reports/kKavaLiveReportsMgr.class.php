@@ -241,18 +241,18 @@ class kKavaLiveReportsMgr extends kKavaBase
 		);
 	}
 	
-	protected static function addBaseAggregations(&$query)
+	protected static function addQualityAggregations(&$query)
 	{
-		$query[self::DRUID_AGGR] = array(
-			self::getPlayCountAggregator(),
-			self::getViewCountAggregator(),
-			self::getAudienceAggregator(),
-			self::getDvrAudienceAggregator(),
-			self::getBufferTimeAggregator(),
-			self::getBitrateCountAggregator(),
-			self::getBitrateSumAggregator(),
+		$query[self::DRUID_AGGR] = array_merge(
+			isset($query[self::DRUID_AGGR]) ? $query[self::DRUID_AGGR] : array(),
+			array(
+				self::getViewCountAggregator(),
+				self::getBufferTimeAggregator(),
+				self::getBitrateCountAggregator(),
+				self::getBitrateSumAggregator(),
+			)
 		);
-		
+
 		$query[self::DRUID_POST_AGGR] = array(
 			self::getArithmeticPostAggregator(self::OUTPUT_AVG_BITRATE, '/', array(
 				self::getFieldAccessPostAggregator(self::METRIC_BITRATE_SUM),
@@ -265,6 +265,17 @@ class kKavaLiveReportsMgr extends kKavaBase
 		);
 	}
 	
+	protected static function addBaseAggregations(&$query)
+	{
+		$query[self::DRUID_AGGR] = array(
+			self::getPlayCountAggregator(),
+			self::getAudienceAggregator(),
+			self::getDvrAudienceAggregator(),
+		);
+
+		self::addQualityAggregations($query);
+	}
+
 	protected static function updateBaseFields(&$dest, $src)
 	{
 		$fieldNames = array(
@@ -297,6 +308,37 @@ class kKavaLiveReportsMgr extends kKavaBase
 		return self::applyPager(array($result), $pageIndex, $pageSize);
 	}
 	
+	public static function entryQuality($partnerId, $filter, $pageIndex, $pageSize)
+	{
+		// view events
+		$query = self::getBaseTopNQuery(
+			$partnerId, 
+			$filter, 
+			null, 
+			self::DIMENSION_ENTRY_ID, 
+			self::METRIC_VIEW_COUNT,
+			self::getLimit(self::MAX_RESULTS));		// must always use the max, since we sort by entry name (not in druid)
+		self::addQualityAggregations($query);
+		$queryResult = self::runGranularityAllQuery($query);
+
+		$result = array();
+		foreach ($queryResult as $item)
+		{
+			$output = array();
+			$entryId = $item[self::DIMENSION_ENTRY_ID];
+			$output[self::OUTPUT_ENTRY_ID] = $entryId;
+			$output[self::OUTPUT_AVG_BITRATE] = isset($item[self::OUTPUT_AVG_BITRATE]) ? $item[self::OUTPUT_AVG_BITRATE] : 0;
+			$output[self::OUTPUT_BUFFER_TIME] = isset($item[self::OUTPUT_BUFFER_TIME]) ? 
+				$item[self::OUTPUT_BUFFER_TIME] * 6 : 0;	// return in minutes
+			$result[$entryId] = $output;
+		}
+
+		// sort and apply the pager
+		$result = self::sortByEntryName($result);
+
+		return self::applyPager($result, $pageIndex, $pageSize);
+	}
+
 	public static function entryTotal($partnerId, $filter, $pageIndex, $pageSize)
 	{
 		// view events
@@ -330,9 +372,9 @@ class kKavaLiveReportsMgr extends kKavaBase
 		{
 			return array(array(), $totalCount);
 		}
-		
+
 		$filter->entryIds = implode(',', array_keys($result));
-		
+
 		// peak audience
 		$query = self::getBaseTopNQuery(
 			$partnerId, 
