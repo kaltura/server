@@ -40,7 +40,14 @@ class Form_RulesSubForm extends ConfigureSubForm
 
 	public function isValid($data)
 	{
-		return ($data['ReachProfileRules']);
+		if(!$data['ReachProfileRules'])
+			return true;
+		
+		$jsonData = json_decode($data['ReachProfileRules'], true);
+		if(!empty($jsonData))
+			return true;
+		
+		return false;
 	}
 
 }
