@@ -291,8 +291,9 @@
 			var newRule= buildOutputParams($( this ).attr("id"), currentIndex);
 			rules.push(newRule);
 		});
-
-		jQuery('#ReachProfileRules').val(JSON.stringify(rules));
+		
+		if (rules.length>0)
+			jQuery('#ReachProfileRules').val(JSON.stringify(rules));
 	}
 
     function buildOutputParams(paramName, index) {
