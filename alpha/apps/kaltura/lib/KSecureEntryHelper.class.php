@@ -50,7 +50,7 @@ class KSecureEntryHelper
 	 * @var bool
 	 */
 	private $disableCache;
-	
+
 	/**
 	 * @var array
 	 */
@@ -108,6 +108,15 @@ class KSecureEntryHelper
 		if ($accessControl)
 			return $accessControl->hasRules($contextType);
 			
+		return false;
+	}
+
+	public function hasKESRule()
+	{
+		$accessControl = $this->entry->getAccessControl();
+		if ($accessControl)
+			return $accessControl->hasKESRule();
+
 		return false;
 	}
 	

@@ -156,7 +156,20 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		}
 		return false;
 	}
-	
+
+	public function hasKESRule()
+	{
+		$rules = $this->getRulesArray();
+
+		foreach($rules as $rule)
+		{
+			/* @var $rule kRule */
+			if (json_decode($rule->getRuleData())->type == 'ServeFromKESRule')
+				return true;
+		}
+
+	}
+
 	/**
 	 * @param kEntryContextDataResult $context
 	 * @param accessControlScope $scope
@@ -181,7 +194,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 				 
 			if($rule->shouldDisableCache())
 				$disableCache = true;
-				
+
 			if($fulfilled && $rule->getStopProcessing())
 				break;
 		}
