@@ -17,7 +17,7 @@ class kIpAddressUtils
 	
 	static protected $isInternalIp = array();
 	
-	private static function getAddressType($ip)
+	public static function getAddressType($ip)
 	{
 		$mask     = strpos($ip, self::IP_ADDRESS_MASK_CHAR);
 		$range    = strpos($ip, self::IP_ADDRESS_RANGE_CHAR);
