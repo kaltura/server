@@ -186,7 +186,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			$acceptInternalIps = $ipTree["acceptInternalIps"];
 			$ip = infraRequestUtils::getIpFromHttpHeader($header, $acceptInternalIps, true);
 
-			$filteredRules = self::filterIpInTree($ip, $ipTree);
+			$filteredRules = self::filterTreeByIp($ip, $ipTree);
 
 			$newRules = array();
 			foreach($filteredRules as $filteredRule => $filteredConds) {
@@ -497,15 +497,15 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	}
 	
 	/**
-	 * Return an Build a binary tree of IPs based on a given access control rules array
-	 * The function returns a list of the non-filtered rules and the optimized tree of ips to match
+	 * Filter an IP using the optimized ipTree
+	 * The function returns an array of the matching rules and conditions as well as the non-filtered rules which don't exist in the tree
 	 * 
 	 * @param string $ip
 	 * @param array $rulesIpTree
 	 * 
 	 * @return array
 	 */
-	public static function filterIpInTree($ip, $rulesIpTree)
+	public static function filterTreeByIp($ip, $rulesIpTree)
 	{
 		$unfilteredRules = $rulesIpTree["unfiltered"];
 		$ipTree = $rulesIpTree["tree"];
