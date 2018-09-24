@@ -66,6 +66,23 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	{
 		if( $object instanceof thumbAsset && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && $object->isLocalReadyStatus())
 			return true;
+
+		if ($object instanceof FileSync)
+		{
+			$entry = entryPeer::retrieveByPK($object->getObjectId());
+			if ($entry instanceof entry)
+			{
+				// TODO: add more straight(non-flavor) entry types to be processed
+				$entryTypes = array(
+					entry::ENTRY_MEDIA_TYPE_IMAGE
+				);
+
+				if (in_array($entry->getMediaType(), $entryTypes))
+					return true;
+			}
+
+			return false;
+		}			
 		
 	}
 
@@ -74,9 +91,21 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
 		foreach($externalStorages as $externalStorage)
 		{
-			if ($externalStorage->triggerFitsReadyAsset($object->getEntryId()))
+			if (($object instanceof thumbAsset) && $externalStorage->triggerFitsReadyAsset($object->getEntryId()))
 			{
 				self::exportFlavorAsset($object, $externalStorage);
+			}
+
+			if ($object instanceof FileSync) 
+			{
+				$entry = entryPeer::retrieveByPK($object->getObjectId());
+				if (!$entry instanceof entry)
+					return true;
+
+				if ($object->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_FILE)
+					return true;
+
+				self::exportEntry($entry, $externalStorage);
 			}
 		}
 		return true;
