@@ -182,7 +182,14 @@ class accessControl extends BaseaccessControl implements IBaseObject {
 			$filteredRules = self::filterIpInTree($ip, $ipTree);
 
 			$newRules = array();
-			foreach($filteredRules as $filteredRule => $cond) {
+			foreach($filteredRules as $filteredRule => $filteredConds) {
+				$rule = $rules[$filteredRule];
+				
+				// remove conditions which were already found in the ipTree
+				if (is_array($filteredConds)) {
+					$rule->setConditions(array_diff_key($rule->getConditions(), $filteredConds));
+				}
+				
 				$newRules[] = $rules[$filteredRule];
 			}
 
@@ -454,8 +461,9 @@ class accessControl extends BaseaccessControl implements IBaseObject {
 					}
 				}
 			}
-			if (!$filtered)
+			if (!$filtered) {
 					$unfilteredRules[$ruleNum] = true;
+			}
 		}
 		
 		if ($largestCondType) {
