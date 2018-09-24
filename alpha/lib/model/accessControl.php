@@ -429,6 +429,21 @@ class accessControl extends BaseaccessControl implements IBaseObject
 						$ruleCondNum = "$ruleNum:$condNum";
 
 						$rangesArr = $condition->getStringValues(null);
+						
+						// can't optimize ip ranges
+						$skipIpRange = false;
+						foreach($rangesArr as $ranges)
+						{
+							if (strpos($ranges, "-")) {
+								$skipIpRange = true;
+								break;
+							}
+						}
+						
+						if ($skipIpRange) {
+							continue;
+						}
+						
 						foreach($rangesArr as $ranges)
 						{
 							foreach (explode(',', $ranges) as $range)
