@@ -430,24 +430,14 @@ class accessControl extends BaseaccessControl implements IBaseObject
 
 						$rangesArr = $condition->getStringValues(null);
 						
-						// can't optimize ip ranges
-						$skipIpRange = false;
-						foreach($rangesArr as $ranges)
+						foreach($rangesArr as $rangesItem)
 						{
-							if (strpos($ranges, "-")) {
-								$skipIpRange = true;
-								break;
-							}
-						}
-						
-						if ($skipIpRange) {
-							continue;
-						}
-						
-						foreach($rangesArr as $ranges)
-						{
-							foreach (explode(',', $ranges) as $range)
+							$ranges = explode(',', $rangesItem);
+							
+							for($i = 0; $i < count($ranges); $i++)
 							{
+								$range = $ranges[$i];
+
 								$rangeType = kIpAddressUtils::getAddressType($range);
 
 								$rangeMask = 0;
@@ -458,6 +448,14 @@ class accessControl extends BaseaccessControl implements IBaseObject
 										$rangeMask = 32;
 										$rangeIp = $range;
 										break;
+									
+									case kIpAddressUtils::IP_ADDRESS_TYPE_RANGE:
+										$cidrList = kIpAddressUtils::ipRangeToCIDR($range);
+										
+										foreach($cidrList as $cidr) {
+											 $ranges[] = $cidr;
+										}
+										continue;
 
 									case kIpAddressUtils::IP_ADDRESS_TYPE_MASK_ADDRESS:
 										list ($rangeIp, $rangeMask) = array_map('trim', explode(kIpAddressUtils::IP_ADDRESS_MASK_CHAR, $range));

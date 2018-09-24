@@ -132,4 +132,40 @@ class kIpAddressUtils
 		self::$isInternalIp[$ipAddress] = false;
 		return false;				
 	}
+
+	public static function ipRangeToCIDR($range)
+	{
+		$d = strpos($range, self::IP_ADDRESS_RANGE_CHAR);
+		$from = trim(ip2long(substr($range, 0, $d)));
+		$to = trim(ip2long(substr($range, $d + 1)));
+
+		$result = array();
+
+		while($to >= $from) {
+			$maxSize = 32;
+			while ($maxSize > 0) {
+				$mask = (0xffffffff >> ($maxSize - 1)) ^ 0xffffffff;
+				$maskBase = $from & $mask;
+
+				if($maskBase != $from) {
+					break;
+				}
+
+				$maxSize--;
+			}
+
+			$highBit = log($to - $from + 1, 2);
+			$maxDiff = 32 - floor($highBit);
+
+			if($maxSize < $maxDiff) {
+					$maxSize = $maxDiff;
+			}
+
+			$ip = long2ip($from);
+			array_push($result, "$ip/$maxSize");
+			$from += 1 << (32 - $maxSize);
+		}
+
+		return $result;
+	}
 }
