@@ -259,7 +259,7 @@ class kIpAddressUtils
 				$root = &$ipTree;
 
 				while($count--)
-                {
+				{
 					$bit = ($ipLong & 0x80000000) ? 1 : 0;
 					$ipLong <<= 1;
 
@@ -305,8 +305,9 @@ class kIpAddressUtils
 				$values[] = $root[self::IP_TREE_NODE_VALUE];
 			}
 
-			if (!isset($root[$bit]))
+			if (!isset($root[$bit])) {
 				break;
+			}
 
 			$root = $root[$bit];
 		}
