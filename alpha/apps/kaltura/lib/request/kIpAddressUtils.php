@@ -133,12 +133,8 @@ class kIpAddressUtils
 		return false;				
 	}
 
-	public static function ipRangeToCIDR($range)
+	public static function ipRangeToCIDR($from, $to)
 	{
-		$d = strpos($range, self::IP_ADDRESS_RANGE_CHAR);
-		$from = trim(ip2long(substr($range, 0, $d)));
-		$to = trim(ip2long(substr($range, $d + 1)));
-
 		$result = array();
 
 		while($to >= $from) {
@@ -162,10 +158,31 @@ class kIpAddressUtils
 			}
 
 			$ip = long2ip($from);
-			array_push($result, "$ip/$maxSize");
+			$result[$ip] = $maxSize;
 			$from += 1 << (32 - $maxSize);
 		}
 
 		return $result;
+	}
+	
+	public static function compressIpRanges($ipRanges)
+	{
+		$from = 0;
+		$to = -2;
+		$compressedIps = array();
+		foreach($ipRanges as $ipFrom => $ipTo)
+		{
+			if ($ipFrom > $to + 1) {
+				$from = $ipFrom;
+				$to = $ipTo;
+				$compressedIps[$ipFrom] = $ipTo;
+			}
+			else if ($ipTo > $to) {
+				$to = $ipTo;
+				$compressedIps[$from] = $ipTo;
+			}
+		}
+	
+		return $compressedIps;
 	}
 }

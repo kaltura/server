@@ -430,6 +430,11 @@ class accessControl extends BaseaccessControl implements IBaseObject
 
 						$rangesArr = $condition->getStringValues(null);
 						
+						// compress ips into smallest CIDR list
+						
+						// first run over ips and create an array of ip ranges
+						$ips = array();
+						
 						foreach($rangesArr as $rangesItem)
 						{
 							$ranges = explode(',', $rangesItem);
@@ -440,41 +445,54 @@ class accessControl extends BaseaccessControl implements IBaseObject
 
 								$rangeType = kIpAddressUtils::getAddressType($range);
 
-								$rangeMask = 0;
-
 								switch ($rangeType)
 								{
 									case kIpAddressUtils::IP_ADDRESS_TYPE_SINGLE:
-										$rangeMask = 32;
-										$rangeIp = $range;
+										$fromIp = $toIp = ip2long($range);
 										break;
 									
 									case kIpAddressUtils::IP_ADDRESS_TYPE_RANGE:
-										$cidrList = kIpAddressUtils::ipRangeToCIDR($range);
-										
-										foreach($cidrList as $cidr) {
-											 $ranges[] = $cidr;
-										}
+										$d = strpos($range, kIpAddressUtils::IP_ADDRESS_RANGE_CHAR);
+										$fromIp = ip2long(substr($range, 0, $d));
+										$toIp = ip2long(substr($range, $d + 1));
 										continue;
 
 									case kIpAddressUtils::IP_ADDRESS_TYPE_MASK_ADDRESS:
 										list ($rangeIp, $rangeMask) = array_map('trim', explode(kIpAddressUtils::IP_ADDRESS_MASK_CHAR, $range));
 										// convert mask address to CIDR
 										$long = ip2long($rangeMask);
-										$base = ip2long('255.255.255.255');
-										$rangeMask = 32-log(($long ^ $base)+1,2);
+										$fromIp = ip2long('255.255.255.255');
+										$rangeMask = 32 - log(($long ^ $base) + 1, 2);
+										$toIp = $fromIp + (1 << $rangeMask);
 										break;
 
 									case kIpAddressUtils::IP_ADDRESS_TYPE_MASK_CIDR:
 										list ($rangeIp, $rangeMask) = array_map('trim', explode(kIpAddressUtils::IP_ADDRESS_MASK_CHAR, $range));
+										$fromIp = ip2long($rangeIp);
+										$toIp = $fromIp + (1 << $rangeMask); 
 										break;
 								}
-
-								if ($rangeMask <= 0) {
-									continue;
+								
+								if (!array_key_exists($fromIp, $ips)) {
+									$ips[$fromIp] = $toIp;
 								}
-
-								$netBinaryStr = sprintf("%032b",ip2long($rangeIp));
+								else if ($ips[$fromIp] < $toIp) {
+									$ips[$fromIp] = $toIp;
+								}
+							}
+						}
+						
+						// compress ip ranges 
+						$ips = kIpAddressUtils::compressIpRanges($ips);
+						
+						// turn each ip range into a CIDR and add to the ipTree
+						foreach($ips as $fromIp => $toIp)
+						{
+							$rangeCIDRs = kIpAddressUtils::ipRangeToCIDR($fromIp, $toIp);
+							
+							foreach($rangeCIDRs as $rangeIp => $rangeMask)
+							{
+								$netBinaryStr = sprintf("%032b", ip2long($rangeIp));
 								$binIp = str_split(substr($netBinaryStr, 0, $rangeMask));
 								$root = &$ipTree;
 
