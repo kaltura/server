@@ -64,6 +64,8 @@ class ZoomWrapper
 			KalturaLog::err("Zoom Curl returned  $httpCode, with massage: {$response} " . $curlWrapper->getError());
 			/** @var ZoomVendorIntegration $zoomClientData */
 			$zoomClientData = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+			if (!$zoomClientData)
+				throw new KalturaAPIException('Zoom Integration data Does Not Exist for current Partner');
 			$zoomAuth = new kZoomOauth();
 			return array($zoomAuth->refreshTokens($zoomClientData->getRefreshToken(), $zoomClientData), true);
 		}

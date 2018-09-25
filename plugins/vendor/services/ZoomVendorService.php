@@ -7,9 +7,6 @@
 class ZoomVendorService extends KalturaBaseService
 {
 
-	/** php body */
-	const PHP_INPUT = 'php://input';
-
 	/**
 	 * no partner will be provided by vendors as this called externally and not from kaltura
 	 * @param string $actionName
@@ -85,13 +82,13 @@ class ZoomVendorService extends KalturaBaseService
 	public function deAuthorizationAction()
 	{
 		ZoomHelper::verifyHeaderToken();
-		myPartnerUtils::resetAllFilters();
-		$request_body = file_get_contents(self::PHP_INPUT);
-		$data = json_decode($request_body, true);
+		$data = ZoomHelper::getPayloadData();
 		$accountId = ZoomHelper::extractAccountIdFromDeAuthPayload($data);
 		KalturaLog::info("Zoom changing account id: $accountId status to deleted , user de-authorized the app");
 		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId,
 			VendorTypeEnum::ZOOM_ACCOUNT);
+		if (!$zoomIntegration)
+			throw new KalturaAPIException('Zoom Integration data Does Not Exist for current Partner');
 		$zoomIntegration->setStatus(VendorStatus::DELETED);
 		$zoomIntegration->save();
 		return true;
@@ -143,7 +140,7 @@ class ZoomVendorService extends KalturaBaseService
 		/** @var ZoomVendorIntegration $zoomIntegration */
 		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId,
 			VendorTypeEnum::ZOOM_ACCOUNT);
-		if(is_null($zoomIntegration))
+		if(!$zoomIntegration)
 		{
 			$zoomIntegration = new VendorIntegration();
 			$zoomIntegration->setAccountId($accountId);
@@ -164,12 +161,12 @@ class ZoomVendorService extends KalturaBaseService
 	public function recordingCompleteAction()
 	{
 		ZoomHelper::verifyHeaderToken();
-		myPartnerUtils::resetAllFilters();
-		$request_body = kFileUtils::getFileContent(self::PHP_INPUT);
-		$data = json_decode($request_body, true);
+		$data = ZoomHelper::getPayloadData();
 		list($accountId, $downloadToken, $hostEmail, $downloadURL, $meetingId) = ZoomHelper::extractDataFromRecordingCompletePayload($data);
 		/** @var ZoomVendorIntegration $zoomIntegration */
 		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+		if (!$zoomIntegration)
+			throw new KalturaAPIException('Zoom Integration data Does Not Exist for current Partner');
 		$emails = ZoomHelper::extractCoHosts($meetingId, $zoomIntegration, $accountId);
 		// user logged in - need to re-init kPermissionManager in order to determine current user's permissions
 		$ks = null;

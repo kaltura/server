@@ -26,6 +26,9 @@ class ZoomHelper
 	const MEETING_ID = 'id';
 	const USER_EMAIL = 'user_email';
 	const PARTICIPANTS = 'participants';
+	/** php body */
+	const PHP_INPUT = 'php://input';
+
 	/**
 	 * @param kuser $dbUser
 	 * @param string $zoomCategory
@@ -259,4 +262,17 @@ class ZoomHelper
 			KExternalErrors::dieGracefully('Zoom - MP4 downland url was not found');
 		return $downloadURL;
 	}
+
+	/**
+	 * @return string
+	 * @throws Exception
+	 */
+	public static function getPayloadData()
+	{
+		myPartnerUtils::resetAllFilters();
+		$request_body = kFileUtils::getFileContent(self::PHP_INPUT);
+		$data = json_decode($request_body, true);
+		return $data;
+	}
+
 }
