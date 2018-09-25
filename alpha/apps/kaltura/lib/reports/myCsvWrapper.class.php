@@ -38,6 +38,7 @@ class myCsvWrapper
 		else
 		{
 			if ( !$this->new_line ) $this->data .= self::CELL_SEPARATOR;
+			$obj = KCsvWrapper::handleInvalidChars($obj);
 			$this->data .= '"' . str_replace('"', '""', $obj) . '"';	
 		}
 		

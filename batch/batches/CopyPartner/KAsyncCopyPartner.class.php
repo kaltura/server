@@ -71,7 +71,7 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 			self::impersonate( $this->fromPartnerId );
 			$entriesList = $this->getClient()->baseEntry->listAction( $entryFilter, $pageFilter );
 
-			$receivedObjectsCount = count($entriesList->objects);
+			$receivedObjectsCount = $entriesList->objects ? count($entriesList->objects) : 0;
 			$pageFilter->pageIndex++;
 			
 			if ( $receivedObjectsCount > 0 )

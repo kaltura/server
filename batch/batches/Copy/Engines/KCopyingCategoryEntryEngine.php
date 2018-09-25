@@ -19,7 +19,7 @@ class KCopyingCategoryEntryEngine extends KCopyingEngine
 		$filter->orderBy = KalturaCategoryEntryOrderBy::CREATED_AT_ASC;
 		
 		$categoryEntryList = KBatchBase::$kClient->categoryEntry->listAction($filter, $this->pager);
-		if(!count($categoryEntryList->objects))
+		if(!$categoryEntryList->objects || !count($categoryEntryList->objects))
 			return 0;
 			
 		KBatchBase::$kClient->startMultiRequest();

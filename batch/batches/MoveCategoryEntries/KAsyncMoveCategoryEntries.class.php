@@ -120,6 +120,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 			
 		$movedEntries = 0;
 		$categoryEntriesList = KBatchBase::$kClient->categoryEntry->listAction($categoryEntryFilter, $categoryEntryPager);
+		
 		do {
 			$entryIds = array();
 			$categoryIds = array();
@@ -156,7 +157,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 
 			$movedEntries += count($deletedCategoryEntriesResults);
 			$categoryEntriesList = KBatchBase::$kClient->categoryEntry->listAction($categoryEntryFilter, $categoryEntryPager);
-		} while(count($categoryEntriesList->objects) == $categoryEntryPager->pageSize);
+		} while( $categoryEntriesList->objects && count($categoryEntriesList->objects) == $categoryEntryPager->pageSize);
 
 		KBatchBase::$kClient->category->index($data->destCategoryId);
 		

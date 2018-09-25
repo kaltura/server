@@ -22,7 +22,7 @@ class KDeletingCategoryUserEngine extends KDeletingEngine
 		$filter->orderBy = KalturaCategoryUserOrderBy::CREATED_AT_ASC;
 		
 		$categoryUsersList = KBatchBase::$kClient->categoryUser->listAction($filter, $this->pager);
-		if(!count($categoryUsersList->objects))
+		if(!$categoryUsersList->objects || !count($categoryUsersList->objects))
 			return 0;
 			
 		KBatchBase::$kClient->startMultiRequest();

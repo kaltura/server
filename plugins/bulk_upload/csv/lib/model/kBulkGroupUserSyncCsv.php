@@ -53,7 +53,7 @@ class kBulkGroupUserSyncCsv
 		}
 	}
 
-	protected function getSyncGroupUsers($removeFromExistingGroups, $createNewGroups)
+	public function getSyncGroupUsers($removeFromExistingGroups, $createNewGroups)
 	{
 		$requestGroupIds = explode(',', $this->groupIds);
 		$requestGroupIds = array_map('trim', $requestGroupIds);

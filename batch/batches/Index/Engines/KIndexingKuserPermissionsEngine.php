@@ -18,7 +18,7 @@ class KIndexingKuserPermissionsEngine extends KIndexingEngine
 		$filter->orderBy = KalturaBaseEntryOrderBy::CREATED_AT_ASC;
 		
 		$usersList = KBatchBase::$kClient->user->listAction($filter, $this->pager);
-		if(!count($usersList->objects))
+		if(!$usersList->objects || !count($usersList->objects))
 			return 0;
 			
 		KBatchBase::$kClient->startMultiRequest();

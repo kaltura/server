@@ -496,7 +496,7 @@ $stub=null;
 			$filter = new KalturaAssetFilter();
 			$filter->entryIdEqual = $flavorAsset->entryId;
 			$captionAssetList = KBatchBase::$kClient->captionAsset->listAction($filter, null); 
-			if(!isset($captionAssetList) || count($captionAssetList->objects)==0){
+			if(!isset($captionAssetList) || !$captionAssetList->objects || count($captionAssetList->objects)==0){
 				$jobMsg = "No caption assets for entry (".$flavorAsset->entryId.")";
 				KalturaLog::notice("ERROR:".$jobMsg);
 				return null;
