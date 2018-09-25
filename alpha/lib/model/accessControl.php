@@ -10,8 +10,6 @@
  */ 
 class accessControl extends BaseaccessControl implements IBaseObject
 {
-	const IP_TREE_NODE_TYPE_RULE = 2;
-	
 	/**
 	 * True when set as partner default (saved on partner object)
 	 * 
@@ -28,7 +26,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	const IP_ADDRESS_RESTRICTION_COLUMN_NAME = 'ip_address_restriction';
 	const USER_AGENT_RESTRICTION_COLUMN_NAME = 'user_agent_restriction';
 	const CUSTOM_DATA_RULES_ARRAY_COMPRESSED = 'rules_array_compressed';
-	const CUSTOM_DATA_IP_TREE = "ip_tree";
+	const CUSTOM_DATA_IP_TREE = 'ip_tree';
 	
 	/* (non-PHPdoc)
 	 * @see BaseaccessControl::preSave()
@@ -179,14 +177,35 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		
 		$rules = $this->getRulesArray();
 		
+		// in case of an IP optimization tree filter relevant rules
 		$ipTree = $this->getIpTree();
 		if ($ipTree)
 		{
-			$header = $ipTree["header"];
-			$acceptInternalIps = $ipTree["acceptInternalIps"];
+			// get the ip the tree was optimized for
+			$header = $ipTree['header'];
+			$acceptInternalIps = $ipTree['acceptInternalIps'];
 			$ip = infraRequestUtils::getIpFromHttpHeader($header, $acceptInternalIps, true);
 
-			$filteredRules = self::filterTreeByIp($ip, $ipTree);
+			// find relevant rules and add the rules the tree didn't optimize
+			$values = kIpAddressUtils::filterTreeByIp($ip, $ipTree['tree']);
+			
+			$filteredRules = array();
+			foreach($values as $value)
+			{
+				foreach(explode(',', $value) as $ruleCond)
+				{
+					list($rule, $cond) = explode(':', $ruleCond);
+
+					if (!isset($filteredRules[$rule]))
+					{
+						$filteredRules[$rule] = array();
+					}
+
+					$filteredRules[$rule][] = $cond;
+				}
+			}
+
+			$filteredRules += $ipTree['unfiltered'];
 
 			$newRules = array();
 			foreach($filteredRules as $filteredRule => $filteredConds) {
@@ -203,7 +222,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			$rules = $newRules;
 
 			// since there are many ip related caching rules, cache the response only for this specific ip
-			kApiCache::addExtraField(array("type" => kApiCache::ECF_IP,
+			kApiCache::addExtraField(array('type' => kApiCache::ECF_IP,
 				kApiCache::ECFD_IP_HTTP_HEADER => $header,
 				kApiCache::ECFD_IP_ACCEPT_INTERNAL_IPS => $acceptInternalIps),
 				kApiCache::COND_IP_RANGE, array($ip));
@@ -376,7 +395,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		
 		$unfilteredRules = array();
 		$ipTree = array();
-		$rulesIpTree = array("unfiltered" => &$unfilteredRules, "tree" => &$ipTree);
+		$rulesIpTree = array('unfiltered' => &$unfilteredRules, 'tree' => &$ipTree);
 
 		// find most common ip cond type rule (internal / specific header + accept internal ips)
 		$ipCondTypes = array();
@@ -391,7 +410,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 				$condition = $conditions[$condNum];
 				if (!$condition->getNot() && $condition instanceof kIpAddressCondition)
 				{
-					$key = $condition->getHttpHeader() . "," . $condition->getAcceptInternalIps();
+					$key = $condition->getHttpHeader() . ',' . $condition->getAcceptInternalIps();
 					if (!isset($ipCondTypes[$key])) {
 						$ipCondTypes[$key] = 1;
 					}
@@ -420,100 +439,20 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			for($condNum = 0; $condNum < count($conditions); $condNum++)
 			{
 				$condition = $conditions[$condNum];
-				if ($condition instanceof kIpAddressCondition)
-				{
-					$key = $condition->getHttpHeader() . "," . $condition->getAcceptInternalIps();
-					if ($key == $largestCondType)
-					{
-						$filtered = true;
-						$ruleCondNum = "$ruleNum:$condNum";
-
-						$rangesArr = $condition->getStringValues(null);
-						
-						// compress ips into smallest CIDR list
-						
-						// first run over ips and create an array of ip ranges
-						$ips = array();
-						
-						foreach($rangesArr as $rangesItem)
-						{
-							$ranges = explode(',', $rangesItem);
-							
-							for($i = 0; $i < count($ranges); $i++)
-							{
-								$range = $ranges[$i];
-
-								$rangeType = kIpAddressUtils::getAddressType($range);
-
-								switch ($rangeType)
-								{
-									case kIpAddressUtils::IP_ADDRESS_TYPE_SINGLE:
-										$fromIp = $toIp = ip2long($range);
-										break;
-									
-									case kIpAddressUtils::IP_ADDRESS_TYPE_RANGE:
-										$d = strpos($range, kIpAddressUtils::IP_ADDRESS_RANGE_CHAR);
-										$fromIp = ip2long(substr($range, 0, $d));
-										$toIp = ip2long(substr($range, $d + 1));
-										continue;
-
-									case kIpAddressUtils::IP_ADDRESS_TYPE_MASK_ADDRESS:
-										list ($rangeIp, $rangeMask) = array_map('trim', explode(kIpAddressUtils::IP_ADDRESS_MASK_CHAR, $range));
-										// convert mask address to CIDR
-										$long = ip2long($rangeMask);
-										$fromIp = ip2long('255.255.255.255');
-										$rangeMask = 32 - log(($long ^ $base) + 1, 2);
-										$toIp = $fromIp + (1 << $rangeMask);
-										break;
-
-									case kIpAddressUtils::IP_ADDRESS_TYPE_MASK_CIDR:
-										list ($rangeIp, $rangeMask) = array_map('trim', explode(kIpAddressUtils::IP_ADDRESS_MASK_CHAR, $range));
-										$fromIp = ip2long($rangeIp);
-										$toIp = $fromIp + (1 << $rangeMask); 
-										break;
-								}
-								
-								if (!array_key_exists($fromIp, $ips)) {
-									$ips[$fromIp] = $toIp;
-								}
-								else if ($ips[$fromIp] < $toIp) {
-									$ips[$fromIp] = $toIp;
-								}
-							}
-						}
-						
-						// compress ip ranges 
-						$ips = kIpAddressUtils::compressIpRanges($ips);
-						
-						// turn each ip range into a CIDR and add to the ipTree
-						foreach($ips as $fromIp => $toIp)
-						{
-							$rangeCIDRs = kIpAddressUtils::ipRangeToCIDR($fromIp, $toIp);
-							
-							foreach($rangeCIDRs as $rangeIp => $rangeMask)
-							{
-								$netBinaryStr = sprintf("%032b", ip2long($rangeIp));
-								$binIp = str_split(substr($netBinaryStr, 0, $rangeMask));
-								$root = &$ipTree;
-
-								foreach($binIp as $bit)
-								{
-									if (!isset($root[$bit])) {
-										$root[$bit] = array();
-									}
-
-									$root = &$root[$bit];
-								}
-
-								if (!isset($root[self::IP_TREE_NODE_TYPE_RULE])) {
-										$root[self::IP_TREE_NODE_TYPE_RULE] = $ruleCondNum;
-								} else {
-										$root[self::IP_TREE_NODE_TYPE_RULE] .= ",$ruleCondNum";
-								}
-							}
-						}
-					}
+				if ($condition->getNot() || !($condition instanceof kIpAddressCondition)) {
+					continue;
 				}
+				
+				$key = $condition->getHttpHeader() . ',' . $condition->getAcceptInternalIps();
+				if ($key != $largestCondType)
+				{
+					continue;
+				}
+
+				$filtered = true;
+				$ruleCondNum = "$ruleNum:$condNum";
+
+				kIpAddressUtils::insertRangesIntoIpTree(&$ipTree, $condition->getStringValues(null), $ruleCondNum);
 			}
 			if (!$filtered) {
 					$unfilteredRules[$ruleNum] = true;
@@ -521,55 +460,9 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		}
 		
 		if ($largestCondType) {
-			list($rulesIpTree["header"], $rulesIpTree["acceptInternalIps"]) = explode(",", $largestCondType);
+			list($rulesIpTree['header'], $rulesIpTree['acceptInternalIps']) = explode(',', $largestCondType);
 		}
 			
 		return $rulesIpTree;
-	}
-	
-	/**
-	 * Filter an IP using the optimized ipTree
-	 * The function returns an array of the matching rules and conditions as well as the non-filtered rules which don't exist in the tree
-	 * 
-	 * @param string $ip
-	 * @param array $rulesIpTree
-	 * 
-	 * @return array
-	 */
-	public static function filterTreeByIp($ip, $rulesIpTree)
-	{
-		$unfilteredRules = $rulesIpTree["unfiltered"];
-		$ipTree = $rulesIpTree["tree"];
-
-		$netBinaryStr = sprintf("%032b", ip2long($ip));
-		$binIp = str_split($netBinaryStr);
-
-		$rules = array();
-
-		$root = $ipTree;
-		foreach($binIp as $bit)
-		{
-			if (isset($root[self::IP_TREE_NODE_TYPE_RULE]))
-			{
-				foreach(explode(",", $root[self::IP_TREE_NODE_TYPE_RULE]) as $ruleCond)
-				{
-					list($rule, $cond) = explode(":", $ruleCond);
-
-					if (!isset($rules[$rule]))
-					{
-						$rules[$rule] = array();
-					}
-
-					$rules[$rule][] = $cond;
-				}
-			}
-
-			if (!isset($root[$bit]))
-				break;
-
-			$root = $root[$bit];
-		}
-
-		return $rules + $unfilteredRules;
 	}
 }
