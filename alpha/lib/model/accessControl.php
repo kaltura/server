@@ -412,13 +412,12 @@ class accessControl extends BaseaccessControl implements IBaseObject
 				{
 					$key = $condition->getHttpHeader() . ',' . $condition->getAcceptInternalIps();
 					if (!isset($ipCondTypes[$key])) {
-						$ipCondTypes[$key] = 1;
+						$ipCondTypes[$key] = array();
 					}
-					else {
-						$ipCondTypes[$key]++;
-					}
+					
+					$ipCondTypes[$key][] = array($ruleNum, $condNum);
 
-					if (!$largestCondType || $ipCondTypes[$key] > $ipCondTypes[$largestCondType]) {
+					if (!$largestCondType || count($ipCondTypes[$key]) > $ipCondTypes[$largestCondType]) {
 						$largestCondType = $key;
 					}
 				}
@@ -431,32 +430,19 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		
 		// build tree from most common ip cond type conditions
 		
-		for($ruleNum = 0; $ruleNum < count($rules); $ruleNum++)
+		$unfilteredRules = range(0, count($rules) - 1);
+		
+		foreach($ipCondTypes[$largestCondType] as $value)
 		{
+			list($ruleNum, $condNum) = $value;
 			$rule = $rules[$ruleNum];
 			$conditions = $rule->getConditions();
-			$filtered = false;
-			for($condNum = 0; $condNum < count($conditions); $condNum++)
-			{
-				$condition = $conditions[$condNum];
-				if ($condition->getNot() || !($condition instanceof kIpAddressCondition)) {
-					continue;
-				}
-				
-				$key = $condition->getHttpHeader() . ',' . $condition->getAcceptInternalIps();
-				if ($key != $largestCondType)
-				{
-					continue;
-				}
-
-				$filtered = true;
-				$ruleCondNum = "$ruleNum:$condNum";
-
-				kIpAddressUtils::insertRangesIntoIpTree(&$ipTree, $condition->getStringValues(null), $ruleCondNum);
-			}
-			if (!$filtered) {
-					$unfilteredRules[$ruleNum] = true;
-			}
+			$condition = $conditions[$condNum];
+			$ruleCondNum = "$ruleNum:$condNum";
+			
+			kIpAddressUtils::insertRangesIntoIpTree(&$ipTree, $condition->getStringValues(null), $ruleCondNum);
+			
+			unset($unfilteredRules[$ruleNum]);
 		}
 		
 		if ($largestCondType) {
