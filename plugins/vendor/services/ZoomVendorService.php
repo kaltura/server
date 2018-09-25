@@ -142,7 +142,7 @@ class ZoomVendorService extends KalturaBaseService
 			VendorTypeEnum::ZOOM_ACCOUNT);
 		if(!$zoomIntegration)
 		{
-			$zoomIntegration = new VendorIntegration();
+			$zoomIntegration = new ZoomVendorIntegration();
 			$zoomIntegration->setAccountId($accountId);
 			$zoomIntegration->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
 			$zoomIntegration->setPartnerId($partnerId);

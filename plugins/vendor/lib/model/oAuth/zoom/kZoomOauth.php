@@ -15,7 +15,7 @@ class kZoomOauth implements kVendorOauth
 
 	/**
 	 * @param string $oldRefreshToken
-	 * @param VendorIntegration $vendorIntegration
+	 * @param ZoomVendorIntegration $vendorIntegration
 	 * @return array
 	 * @throws Exception
 	 */

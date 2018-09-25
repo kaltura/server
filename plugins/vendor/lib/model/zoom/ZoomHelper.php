@@ -1,11 +1,8 @@
 <?php
 /**
- * Created by IntelliJ IDEA.
- * User: roie.beck
- * Date: 9/25/2018
- * Time: 10:22 AM
+ * @package plugins.venodr
+ * @subpackage model.zoom
  */
-
 class ZoomHelper
 {
 	/** API */
@@ -91,7 +88,7 @@ class ZoomHelper
 	 */
 	public static function loadLoginPage($tokens)
 	{
-		$file_path = dirname(__FILE__) . "/../lib/api/webPage/zoom/kalturaZoomLoginPage.html";
+		$file_path = dirname(__FILE__) . "/../../api/webPage/zoom/kalturaZoomLoginPage.html";
 		if (file_exists($file_path)) {
 			$page = file_get_contents($file_path);
 			$tokensString = json_encode($tokens);
@@ -114,7 +111,7 @@ class ZoomHelper
 	 */
 	public static function loadSubmitPage($zoomIntegration, $accountId, $ks)
 	{
-		$file_path = dirname(__FILE__) . "/../lib/api/webPage/zoom/KalturaZoomRegistrationPage.html";
+		$file_path = dirname(__FILE__) . "/../../api/webPage/zoom/KalturaZoomRegistrationPage.html";
 		if (file_exists($file_path)) {
 			$page = file_get_contents($file_path);
 			/** @noinspection PhpUndefinedMethodInspection */
@@ -146,7 +143,7 @@ class ZoomHelper
 	{
 		if (!$zoomClientData) // create new vendorIntegration during oauth first time
 		{
-			$zoomClientData = new VendorIntegration();
+			$zoomClientData = new ZoomVendorIntegration();
 			$zoomClientData->setStatus(VendorStatus::DISABLED);
 		}
 		$zoomClientData->saveNewTokenData($tokensDataAsArray,$accountId);

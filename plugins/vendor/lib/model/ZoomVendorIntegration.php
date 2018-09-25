@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by IntelliJ IDEA.
- * User: roie.beck
- * Date: 9/25/2018
- * Time: 10:35 AM
+ * @package plugins.vendor
+ * @subpackage model
  */
 
 class ZoomVendorIntegration extends VendorIntegration
