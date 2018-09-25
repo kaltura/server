@@ -4,7 +4,7 @@ CREATE TABLE  IF NOT EXISTS `vendor_integration` (
 	`partner_id` int NOT NULL,
 	`vendor_Type` smallint(6) NOT NULL,
 	`custom_data` text,
-	`status` smallint(6) NOT NULL,
+	`status` TINYINT NOT NULL,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	PRIMARY KEY (`id`),

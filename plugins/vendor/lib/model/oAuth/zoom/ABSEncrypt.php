@@ -4,7 +4,7 @@
  * @subpackage model.zoomOauth
  */
 
-class AESOauthZoom
+class ABSEncrypt
 {
 	/**
 	 * @param $key

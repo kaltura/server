@@ -3,7 +3,7 @@
  * @package plugins.venodr
  * @subpackage model.zoom
  */
-class RetrieveDataFromZoom
+class ZoomWrapper
 {
 
 	/**
@@ -14,7 +14,7 @@ class RetrieveDataFromZoom
 	 * @return array
 	 * @throws Exception
 	 */
-	public function retrieveZoomDataAsArray($apiPath, $forceNewToken = false, $tokens = null, $accountId = null)
+	public static function retrieveZoomDataAsArray($apiPath, $forceNewToken = false, $tokens = null, $accountId = null)
 	{
 		KalturaLog::info("Calling zoom api: " . $apiPath);
 		$zoomAuth = new kZoomOauth();
@@ -22,7 +22,7 @@ class RetrieveDataFromZoom
 		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
 		if (!$tokens || $forceNewToken)
 			$tokens = $zoomAuth->retrieveTokensData($forceNewToken, $accountId);
-		list($response, $tokens) = $this->callZoom($apiPath, $tokens, $accountId, $zoomBaseURL);
+		list($response, $tokens) = self::callZoom($apiPath, $tokens, $accountId, $zoomBaseURL);
 		$data = json_decode($response, true);
 		return array($tokens, $data);
 	}
@@ -35,14 +35,14 @@ class RetrieveDataFromZoom
 	 * @return array
 	 * @throws Exception
 	 */
-	private function executeZoomCall($apiPath, $tokens, $accountId, $zoomBaseURL)
+	private static function executeZoomCall($apiPath, $tokens, $accountId, $zoomBaseURL)
 	{
 		$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
 		$curlWrapper = new KCurlWrapper();
 		$url = $zoomBaseURL . $apiPath . '?' . 'access_token=' . $accessToken;
 		$response = $curlWrapper->exec($url);
 		$httpCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
-		list($tokens, $refreshed) = $this->handelCurlResponse($response, $httpCode, $curlWrapper, $accountId, $tokens, $apiPath);
+		list($tokens, $refreshed) = self::handelCurlResponse($response, $httpCode, $curlWrapper, $accountId, $tokens, $apiPath);
 		return array($response, $tokens, $refreshed);
 	}
 
@@ -56,12 +56,13 @@ class RetrieveDataFromZoom
 	 * @return array<array,bool> token refreshed
 	 * @throws Exception
 	 */
-	private function handelCurlResponse(&$response, $httpCode, $curlWrapper, $accountId, $tokens, $apiPath)
+	private static function handelCurlResponse(&$response, $httpCode, $curlWrapper, $accountId, $tokens, $apiPath)
 	{
 		//access token invalid and need to be refreshed
 		if (($httpCode === 400 || $httpCode === 401) && $accountId)
 		{
 			KalturaLog::err("Zoom Curl returned  $httpCode, with massage: {$response} " . $curlWrapper->getError());
+			/** @var ZoomVendorIntegration $zoomClientData */
 			$zoomClientData = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 			$zoomAuth = new kZoomOauth();
 			return array($zoomAuth->refreshTokens($zoomClientData->getRefreshToken(), $zoomClientData), true);
@@ -91,11 +92,11 @@ class RetrieveDataFromZoom
 	 * @return array
 	 * @throws Exception
 	 */
-	private function callZoom($apiPath, $tokens, $accountId, $zoomBaseURL)
+	private static function callZoom($apiPath, $tokens, $accountId, $zoomBaseURL)
 	{
-		list($response, $tokens, $refreshed) = $this->executeZoomCall($apiPath, $tokens, $accountId, $zoomBaseURL);
+		list($response, $tokens, $refreshed) = self::executeZoomCall($apiPath, $tokens, $accountId, $zoomBaseURL);
 		if ($refreshed) // in case we receive 401
-			list($response, $tokens,) = $this->executeZoomCall($apiPath, $tokens, $accountId, $zoomBaseURL);
+			list($response, $tokens,) = self::executeZoomCall($apiPath, $tokens, $accountId, $zoomBaseURL);
 		return array($response, $tokens);
 	}
 }

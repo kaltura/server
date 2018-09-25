@@ -16,20 +16,18 @@
 class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 
 
+
 	/**
 	 * @param $accountID
 	 * @param $vendorType
-	 * @param $partnerId
 	 * @return VendorIntegration
 	 * @throws PropelException
 	 */
-	public static function retrieveSingleVendorPerPartner($accountID, $vendorType, $partnerId = null)
+	public static function retrieveSingleVendorPerPartner($accountID, $vendorType)
 	{
 		$c = new Criteria();
 		$c->add(VendorIntegrationPeer::ACCOUNT_ID, $accountID);
 		$c->add(VendorIntegrationPeer::VENDOR_TYPE, $vendorType);
-		if(!is_null($partnerId))
-			$c->add(VendorIntegrationPeer::PARTNER_ID , $partnerId);
 		return self::doSelectOne($c);
 	}
 

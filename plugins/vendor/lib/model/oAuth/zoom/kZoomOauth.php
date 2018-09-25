@@ -41,6 +41,7 @@ class kZoomOauth implements kVendorOauth
 		$zoomIntegration = null;
 		if (!$forceNewToken && $accountId)
 		{
+			/** @var ZoomVendorIntegration $zoomIntegration */
 			$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 			if ($zoomIntegration) // tokens exist
 			{
