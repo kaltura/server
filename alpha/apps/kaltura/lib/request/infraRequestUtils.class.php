@@ -264,7 +264,7 @@ class infraRequestUtils
 	public static function getIpFromHttpHeader($httpHeader, $acceptInternalIps, $phpizeHeader = false)
 	{
 		$key = "header:$httpHeader:$acceptInternalIps:$phpizeHeader";
-		if(in_array($key, self::$remoteAddress)) {
+		if(array_key_exists($key, self::$remoteAddress)) {
 			return self::$remoteAddress[$key];
 		}
 			
@@ -308,7 +308,7 @@ class infraRequestUtils
 	
 	public static function getRemoteAddress()
 	{
-		if(in_array("ip", self::$remoteAddress)) {
+		if(array_key_exists("ip", self::$remoteAddress)) {
 			return self::$remoteAddress["ip"];
 		}
 			
@@ -324,7 +324,7 @@ class infraRequestUtils
 	
 	protected static function internalGetRemoteAddress()
 	{
-		if(in_array("ip", self::$remoteAddress)) {
+		if(array_key_exists("ip", self::$remoteAddress)) {
 			return self::$remoteAddress["ip"];
 		}
 			
