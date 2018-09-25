@@ -188,6 +188,41 @@ class kIpAddressUtils
 		return $compressedIps;
 	}
 	
+	public static function rangetoIps($range)
+	{
+		$rangeType = self::getAddressType($range);
+
+		switch ($rangeType)
+		{
+			case self::IP_ADDRESS_TYPE_SINGLE:
+				$fromIp = $toIp = ip2long($range);
+				break;
+
+			case self::IP_ADDRESS_TYPE_RANGE:
+				$d = strpos($range, self::IP_ADDRESS_RANGE_CHAR);
+				$fromIp = ip2long(substr($range, 0, $d));
+				$toIp = ip2long(substr($range, $d + 1));
+				continue;
+
+			case self::IP_ADDRESS_TYPE_MASK_ADDRESS:
+				list ($rangeIp, $rangeMask) = array_map('trim', explode(self::IP_ADDRESS_MASK_CHAR, $range));
+				// convert mask address to CIDR
+				$long = ip2long($rangeMask);
+				$fromIp = ip2long('255.255.255.255');
+				$rangeMask = 32 - log(($long ^ $base) + 1, 2);
+				$toIp = $fromIp + (1 << $rangeMask);
+				break;
+
+			case self::IP_ADDRESS_TYPE_MASK_CIDR:
+				list ($rangeIp, $rangeMask) = array_map('trim', explode(self::IP_ADDRESS_MASK_CHAR, $range));
+				$fromIp = ip2long($rangeIp);
+				$toIp = $fromIp + (1 << $rangeMask); 
+				break;
+		}
+		
+		return array($fromIp, $toIp);
+	}
+	
 	/*
 	 * insert ip ranges array into an ip binary tree built from the ip bits.
 	 * The end node will be set with the given value
@@ -203,37 +238,7 @@ class kIpAddressUtils
 
 			for($i = 0; $i < count($ranges); $i++)
 			{
-				$range = $ranges[$i];
-
-				$rangeType = self::getAddressType($range);
-
-				switch ($rangeType)
-				{
-					case self::IP_ADDRESS_TYPE_SINGLE:
-						$fromIp = $toIp = ip2long($range);
-						break;
-
-					case self::IP_ADDRESS_TYPE_RANGE:
-						$d = strpos($range, self::IP_ADDRESS_RANGE_CHAR);
-						$fromIp = ip2long(substr($range, 0, $d));
-						$toIp = ip2long(substr($range, $d + 1));
-						continue;
-
-					case self::IP_ADDRESS_TYPE_MASK_ADDRESS:
-						list ($rangeIp, $rangeMask) = array_map('trim', explode(self::IP_ADDRESS_MASK_CHAR, $range));
-						// convert mask address to CIDR
-						$long = ip2long($rangeMask);
-						$fromIp = ip2long('255.255.255.255');
-						$rangeMask = 32 - log(($long ^ $base) + 1, 2);
-						$toIp = $fromIp + (1 << $rangeMask);
-						break;
-
-					case self::IP_ADDRESS_TYPE_MASK_CIDR:
-						list ($rangeIp, $rangeMask) = array_map('trim', explode(self::IP_ADDRESS_MASK_CHAR, $range));
-						$fromIp = ip2long($rangeIp);
-						$toIp = $fromIp + (1 << $rangeMask); 
-						break;
-				}
+				list($fromIp, $toIp) = self::rangetoIps($ranges[$i]);
 
 				if (!array_key_exists($fromIp, $ips)) {
 					$ips[$fromIp] = $toIp;
