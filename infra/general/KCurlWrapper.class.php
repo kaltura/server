@@ -396,8 +396,7 @@ class KCurlWrapper
 			$header = reset(self::$headers);
 
 			// this line is true if the protocol is HTTP (or HTTPS);
-			$matches = null;
-			if(preg_match('/HTTP\/?[\d.]{0,3}/', $header, $matches))
+			if(preg_match('/HTTP\/?[\d.]{0,3}/', $header))
 			{
 				$matches = explode(" ", $header, 3);
 				if(isset($matches[1]) && is_numeric($matches[1]))
