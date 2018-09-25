@@ -5,7 +5,7 @@
  *
  * 
  *
- * @package plugins.reach
+ * @package plugins.vendor
  * @subpackage model.om
  */
 abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
@@ -39,6 +39,7 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the vendor_type field.
+	 * Note: this column has a database default value of: 0
 	 * @var        int
 	 */
 	protected $vendor_type;
@@ -110,6 +111,27 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 			return $this->oldColumnsValues[$name];
 			
 		return null;
+	}
+
+	/**
+	 * Applies default values to this object.
+	 * This method should be called from the object's constructor (or
+	 * equivalent initialization method).
+	 * @see        __construct()
+	 */
+	public function applyDefaultValues()
+	{
+		$this->vendor_type = 0;
+	}
+
+	/**
+	 * Initializes internal state of BaseVendorIntegration object.
+	 * @see        applyDefaults()
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+		$this->applyDefaultValues();
 	}
 
 	/**
@@ -336,7 +358,7 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 			$v = (int) $v;
 		}
 
-		if ($this->vendor_type !== $v) {
+		if ($this->vendor_type !== $v || $this->isNew()) {
 			$this->vendor_type = $v;
 			$this->modifiedColumns[] = VendorIntegrationPeer::VENDOR_TYPE;
 		}
@@ -495,6 +517,10 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 	 */
 	public function hasOnlyDefaultValues()
 	{
+			if ($this->vendor_type !== 0) {
+				return false;
+			}
+
 		// otherwise, everything was equal, so return TRUE
 		return true;
 	} // hasOnlyDefaultValues()

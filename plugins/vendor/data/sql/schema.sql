@@ -15,7 +15,7 @@ CREATE TABLE `vendor_integration`
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`account_id` VARCHAR(64)  NOT NULL,
 	`partner_id` INTEGER  NOT NULL,
-	`vendor_Type` TINYINT  NOT NULL,
+	`vendor_Type` TINYINT default 0 NOT NULL,
 	`custom_data` TEXT,
 	`status` TINYINT  NOT NULL,
 	`created_at` DATETIME,

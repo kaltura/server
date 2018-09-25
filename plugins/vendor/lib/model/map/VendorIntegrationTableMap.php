@@ -40,7 +40,7 @@ class VendorIntegrationTableMap extends TableMap {
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addColumn('ACCOUNT_ID', 'AccountId', 'VARCHAR', true, 64, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
-		$this->addColumn('VENDOR_TYPE', 'VendorType', 'TINYINT', true, null, null);
+		$this->addColumn('VENDOR_TYPE', 'VendorType', 'TINYINT', true, null, 0);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('STATUS', 'Status', 'TINYINT', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
