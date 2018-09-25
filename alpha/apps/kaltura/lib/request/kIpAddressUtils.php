@@ -254,12 +254,15 @@ class kIpAddressUtils
 
 			foreach($rangeCIDRs as $rangeIp => $rangeMask)
 			{
-				$netBinaryStr = sprintf('%032b', ip2long($rangeIp));
-				$binIp = str_split(substr($netBinaryStr, 0, $rangeMask));
+				$ipLong = ip2long($rangeIp);
+				$count = $rangeMask;
 				$root = &$ipTree;
 
-				foreach($binIp as $bit)
-				{
+				while($count--)
+                {
+					$bit = ($ipLong & 0x80000000) ? 1 : 0;
+					$ipLong <<= 1;
+
 					if (!isset($root[$bit])) {
 						$root[$bit] = array();
 					}
@@ -287,14 +290,17 @@ class kIpAddressUtils
 	 */
 	public static function filterTreeByIp($ip, $ipTree)
 	{
-		$netBinaryStr = sprintf('%032b', ip2long($ip));
-		$binIp = str_split($netBinaryStr);
-
 		$values = array();
+		$ipLong = ip2long($ip);
 
 		$root = $ipTree;
-		foreach($binIp as $bit)
+		$count = 32;
+
+		while($count--)
 		{
+			$bit = ($ipLong & 0x80000000) ? 1 : 0;
+			$ipLong <<= 1;
+			
 			if (isset($root[self::IP_TREE_NODE_VALUE])) {
 				$values[] = $root[self::IP_TREE_NODE_VALUE];
 			}
