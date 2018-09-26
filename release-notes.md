@@ -1,5 +1,22 @@
 # Naos 14.6.0 #
 
+##Zoom Integration Configuration##
+- New Feature
+- ID: PLAT-91901     
+
+
+### Configuration ###
+	None.
+
+#### Deployment Scripts ####
+    
+        Run:
+        - mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2018_08_28_create_vendor_integration_table.sql
+         
+         Run deployment script:
+                php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_08_29_zoom_vendor_Integration_permissions.php   
+        
+
 ## Add event notification for Reach credit expiry ##
 - Issue Type: Task
 - Issue ID: PLAT-8864
