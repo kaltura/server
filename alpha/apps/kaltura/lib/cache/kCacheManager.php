@@ -37,6 +37,7 @@ class kCacheManager
 	const CACHE_TYPE_GEO_COORDINATES = 'geoCoordinates';
 	const CACHE_TYPE_ELASTIC_STICKY_SESSIONS = 'elasticStickySessions';
 	const CACHE_TYPE_AUTH_CACHED_DATA = 'authCachedData';
+	const CACHE_TYPE_DRUID_QUERIES = 'druidQueries';
 
 	protected static $caches = array();
 	
