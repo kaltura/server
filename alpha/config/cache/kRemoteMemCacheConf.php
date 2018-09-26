@@ -44,29 +44,37 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 	protected function getRelevantMapList($requestedMapName , $hostname)
 	{
 		$filteredMapsList = array($requestedMapName);
-		$mapsList=null;
+		$mapsList = null;
 		$cache = $this->getCache();
-		if($cache)
+		if( !$cache )
 		{
-			$mapsList = $cache->get(self::MAP_LIST_KEY);
-			if ($mapsList)
+			return $filteredMapsList;
+		}
+		$mapsList = $cache->get(self::MAP_LIST_KEY);
+		if( !$mapsList )
+		{
+			return $filteredMapsList;
+		}
+		foreach ($mapsList as $mapName => $version)
+		{
+			$mapVar = explode('_', $mapName);
+			$storedMapName = $mapVar[0];
+			$hostPattern = isset($mapVar[1]) ? $mapVar[1] : null;
+			if ($requestedMapName == $storedMapName)
 			{
-				foreach ($mapsList as $mapName =>$version)
+				if ($hostname == $hostPattern)
 				{
-					$mapVar = explode('_', $mapName);
-					$storedMapName = $mapVar[0];
-					$hostPattern = isset($mapVar[1]) ? $mapVar[1] : null;
-					if ($requestedMapName == $storedMapName)
+					$filteredMapsList[] = $mapName;
+				}
+				elseif($hostPattern)
+				{
+					$hostPattern = str_replace('#', '*', $hostPattern);
+					if(preg_match('/' . $hostPattern . '/', $hostname))
 					{
-						if ($hostPattern && $hostname != $hostPattern)
-						{
-							$hostPattern = str_replace('#', '*', $hostPattern);
-							if(!preg_match('/'.$hostPattern.'/', $hostname))
-								continue;
-						}
 						$filteredMapsList[] = $mapName;
 					}
 				}
+
 			}
 		}
 		return $filteredMapsList;
