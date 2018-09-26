@@ -4,7 +4,7 @@
  * @subpackage model.zoomOauth
  */
 
-class ABSEncrypt
+class AESEncrypt
 {
 	/**
 	 * @param $key
@@ -12,7 +12,7 @@ class ABSEncrypt
 	 * @return array
 	 * @throws Exception
 	 */
-	public static function aesEncrypt($key, $message)
+	public static function encrypt($key, $message)
 	{
 		$key = substr(sha1($key, true), 0, 16);
 		$iv = self::genIv();
@@ -26,7 +26,7 @@ class ABSEncrypt
 	 * @param $iv
 	 * @return string
 	 */
-	public static function aesDecrypt($key, $message, $iv)
+	public static function decrypt($key, $message, $iv)
 	{
 		$key = substr(sha1($key, true), 0, 16);
 		/** @noinspection PhpUndefinedMethodInspection */
@@ -46,8 +46,10 @@ class ABSEncrypt
 		{
 			$efforts += 1;
 			$iv = openssl_random_pseudo_bytes(16, $wasItSecure);
-			if($efforts > $maxEfforts)
+			if ($efforts > $maxEfforts)
+			{
 				throw new KalturaAPIException('Unable to genereate secure iv for tokens.');
+			}
 		} while (!$wasItSecure);
 		return $iv;
 	}

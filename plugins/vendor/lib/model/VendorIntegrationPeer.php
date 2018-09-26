@@ -31,15 +31,16 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 	public static function getOMClass($row, $colnum)
 	{
 		$vendorType = null;
-		if($row)
+		if ($row)
 		{
 			$typeField = self::translateFieldName(self::VENDOR_TYPE, BasePeer::TYPE_COLNAME, BasePeer::TYPE_NUM);
 			$vendorType = $row[$typeField];
-			if(isset(self::$class_types_cache[$vendorType]))
+			if (isset(self::$class_types_cache[$vendorType]))
+			{
 				return self::$class_types_cache[$vendorType];
-
+			}
 			$extendedCls = KalturaPluginManager::getObjectClass(parent::OM_CLASS, $vendorType);
-			if($extendedCls)
+			if ($extendedCls)
 			{
 				self::$class_types_cache[$vendorType] = $extendedCls;
 				return $extendedCls;
@@ -51,7 +52,9 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 	public static function setDefaultCriteriaFilter ()
 	{
 		if ( self::$s_criteria_filter == null )
+		{
 			self::$s_criteria_filter = new criteriaFilter();
+		}
 
 		$c = KalturaCriteria::create(VendorIntegrationPeer::OM_CLASS);
 		$c->addAnd ( VendorIntegrationPeer::STATUS, VendorStatus::DELETED, Criteria::NOT_EQUAL);

@@ -46,7 +46,9 @@ class kZoomOauth implements kVendorOauth
 			if ($zoomIntegration) // tokens exist
 			{
 				if (time() > $zoomIntegration->getExpiresIn()) // token had expired -> refresh
+				{
 					return $this->refreshTokens($zoomIntegration->getRefreshToken(), $zoomIntegration);
+				}
 				return array(self::ACCESS_TOKEN => $zoomIntegration->getAccessToken(), self::REFRESH_TOKEN => $zoomIntegration->getRefreshToken(),
 					self::EXPIRES_IN => $zoomIntegration->getExpiresIn());
 			}

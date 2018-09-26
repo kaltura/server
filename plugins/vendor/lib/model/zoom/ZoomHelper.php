@@ -68,7 +68,9 @@ class ZoomHelper
 	public static function canConfigureEventSubscription($zoomUserPermissions)
 	{
 		if (in_array('Recording:Read', $zoomUserPermissions) && in_array('Recording:Edit', $zoomUserPermissions))
+		{
 			return true;
+		}
 		return false;
 	}
 	/**
@@ -89,12 +91,13 @@ class ZoomHelper
 	public static function loadLoginPage($tokens)
 	{
 		$file_path = dirname(__FILE__) . "/../../api/webPage/zoom/kalturaZoomLoginPage.html";
-		if (file_exists($file_path)) {
+		if (file_exists($file_path))
+		{
 			$page = file_get_contents($file_path);
 			$tokensString = json_encode($tokens);
 			$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
 			$verificationToken = $zoomConfiguration['verificationToken'];
-			list($enc, $iv) = ABSEncrypt::aesEncrypt($verificationToken, $tokensString);
+			list($enc, $iv) = AESEncrypt::encrypt($verificationToken, $tokensString);
 			$page = str_replace('@BaseServiceUrl@', requestUtils::getHost(), $page);
 			$page = str_replace('@encryptData@', base64_encode($enc), $page);
 			$page = str_replace('@iv@', base64_encode($iv), $page);
@@ -112,7 +115,8 @@ class ZoomHelper
 	public static function loadSubmitPage($zoomIntegration, $accountId, $ks)
 	{
 		$file_path = dirname(__FILE__) . "/../../api/webPage/zoom/KalturaZoomRegistrationPage.html";
-		if (file_exists($file_path)) {
+		if (file_exists($file_path))
+		{
 			$page = file_get_contents($file_path);
 			/** @noinspection PhpUndefinedMethodInspection */
 			$page = str_replace('@ks@', $ks->getOriginalString(), $page);
@@ -146,7 +150,7 @@ class ZoomHelper
 			$zoomClientData = new ZoomVendorIntegration();
 			$zoomClientData->setStatus(VendorStatus::DISABLED);
 		}
-		$zoomClientData->saveNewTokenData($tokensDataAsArray,$accountId);
+		$zoomClientData->saveNewTokenData($tokensDataAsArray, $accountId);
 	}
 
 
@@ -160,7 +164,9 @@ class ZoomHelper
 		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
 		$verificationToken = $zoomConfiguration['verificationToken'];
 		if ($verificationToken !== $headers['Authorization'])
+		{
 			KExternalErrors::dieGracefully('ZOOM - Received verification token is different from existing token');
+		}
 	}
 
 	/**
@@ -213,13 +219,20 @@ class ZoomHelper
 		$emails = array();
 		$meetingApi = str_replace('@meetingId@', $meetingId, self::API_PARTICIPANT);
 		list($tokens, $participants) = ZoomWrapper::retrieveZoomDataAsArray($meetingApi, false, $zoomIntegration->getTokens(), $accountId);
-		if ($zoomIntegration->getAccessToken() !== $tokens[kZoomOauth::ACCESS_TOKEN]) // token changed -> refresh tokens
+		if ($zoomIntegration->getAccessToken() !== $tokens[kZoomOauth::ACCESS_TOKEN])
+		{
+			// token changed -> refresh tokens
 			self::saveNewTokenData($tokens, $accountId, $zoomIntegration);
-		if ($participants) {
+		}
+		if ($participants)
+		{
 			$participants = $participants[self::PARTICIPANTS];
-			foreach ($participants as $participant) {
+			foreach ($participants as $participant)
+			{
 				if (isset($participant[self::USER_EMAIL]) && $participant[self::USER_EMAIL])
+				{
 					$emails[] = $participant[self::USER_EMAIL];
+				}
 			}
 		}
 		return $emails;
@@ -230,11 +243,14 @@ class ZoomHelper
 	 */
 	private static function getAllHeaders()
 	{
-		if (!function_exists('getallheaders')) {
+		if (!function_exists('getallheaders'))
+		{
 			$headers = array();
-			foreach ($_SERVER as $name => $value) {
+			foreach ($_SERVER as $name => $value)
+			{
 				/* RFC2616 (HTTP/1.1) defines header fields as case-insensitive entities. */
-				if (strtolower(substr($name, 0, 5)) == 'http_') {
+				if (strtolower(substr($name, 0, 5)) == 'http_')
+				{
 					$headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
 				}
 			}
@@ -253,10 +269,14 @@ class ZoomHelper
 		$downloadURL = '';
 		foreach ($recordingFiles as $recordingFile) {
 			if ($recordingFile[self::FILE_TYPE] === self::MP4)
+			{
 				$downloadURL = $recordingFile[self::DOWNLOAD_URL];
+			}
 		}
 		if (!$downloadURL)
+		{
 			KExternalErrors::dieGracefully('Zoom - MP4 downland url was not found');
+		}
 		return $downloadURL;
 	}
 
