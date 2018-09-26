@@ -28,7 +28,6 @@ class ZoomVendorService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		//$this->applyPartnerFilterForClass('VendorIntegration');
 	}
 
 	/**
