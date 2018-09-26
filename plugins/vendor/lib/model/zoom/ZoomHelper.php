@@ -266,8 +266,7 @@ class ZoomHelper
 	 */
 	public static function getPayloadData()
 	{
-		myPartnerUtils::resetAllFilters();
-		$request_body = kFileUtils::getFileContent(self::PHP_INPUT);
+		$request_body = file_get_contents(self::PHP_INPUT);
 		$data = json_decode($request_body, true);
 		return $data;
 	}

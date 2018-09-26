@@ -83,6 +83,7 @@ class ZoomVendorService extends KalturaBaseService
 	public function deAuthorizationAction()
 	{
 		KalturaResponseCacher::disableCache();
+		myPartnerUtils::resetAllFilters();
 		ZoomHelper::verifyHeaderToken();
 		$data = ZoomHelper::getPayloadData();
 		$accountId = ZoomHelper::extractAccountIdFromDeAuthPayload($data);
@@ -165,6 +166,7 @@ class ZoomVendorService extends KalturaBaseService
 	public function recordingCompleteAction()
 	{
 		KalturaResponseCacher::disableCache();
+		myPartnerUtils::resetAllFilters();
 		ZoomHelper::verifyHeaderToken();
 		$data = ZoomHelper::getPayloadData();
 		list($accountId, $downloadToken, $hostEmail, $downloadURL, $meetingId) = ZoomHelper::extractDataFromRecordingCompletePayload($data);
