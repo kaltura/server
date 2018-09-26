@@ -52,7 +52,7 @@ class ZoomHelper
 		{
 			foreach ($emails as $email)
 			{
-				kuserPeer::createUniqueKuserForPartner($dbUser->getPartnerId(),$email);
+				kuserPeer::createUniqueKuserForPartner($dbUser->getPartnerId(), $email);
 			}
 			$entry->setEntitledPusersPublish(implode(",", array_unique($emails)));
 		}
