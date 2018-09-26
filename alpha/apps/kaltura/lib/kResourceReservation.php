@@ -5,7 +5,7 @@ class kResourceReservation
 	/**
 	 * @var ResourceReservation $resourceReservator
 	 */
-	private $resourceReservator;
+	protected $resourceReservator;
 
 	function __construct($ttl = null)
 	{

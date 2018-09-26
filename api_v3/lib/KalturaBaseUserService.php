@@ -109,6 +109,8 @@ class KalturaBaseUserService extends KalturaBaseService
 		KalturaResponseCacher::disableCache();
 		
 		$this->validateApiAccessControlByEmail($email);
+		$this->validateRequestsAmountPerEmail($email);
+		$this->validateRequestsAmountPerIp();
 		
 		try {
 			$new_password = UserLoginDataPeer::resetUserPassword($email);
@@ -284,7 +286,7 @@ class KalturaBaseUserService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 		}
 	}
-	
+
 	protected function validateApiAccessControlByEmail($email)
 	{ 
 		$loginData = UserLoginDataPeer::getByEmail($email);
@@ -293,6 +295,58 @@ class KalturaBaseUserService extends KalturaBaseService
 			$this->validateApiAccessControl($loginData->getLastLoginPartnerId());
 		}
 	}
+
+	/**
+	 * check if there were more than max_allowed calls to reset password action per sepecific email in specific time frame
+	 * @param string $email
+	 * @throws KalturaErrors::RESOURCE_IS_RESERVED
+	 */
+	protected function validateRequestsAmountPerEmail($email)
+	{
+		$resourceId = kCurrentContext::getCurrentPartnerId() . '_' . $email;
+		$maxRequestsNum = kConf::get('max_reset_requests_per_email', 'local', 100);
+		$reservationTime = kConf::get('reservation_time_per_email', 'local', 600);
+		$this->validateRequestsAmount($resourceId, $maxRequestsNum, $reservationTime);
+	}
+
+	/**
+	 * check if there were more than max_allowed calls to reset password action per sepecific ip in specific time frame
+	 * @throws KalturaErrors::RESOURCE_IS_RESERVED
+	 */
+	protected function validateRequestsAmountPerIp()
+	{
+		$resourceId = 'ip_' . kCurrentContext::$user_ip;
+		$maxRequestsNum = kConf::get('max_reset_requests_per_ip', 'local', 1000);
+		$reservationTime = kConf::get('reservation_time_per_ip', 'local', 600);
+		$this->validateRequestsAmount($resourceId, $maxRequestsNum, $reservationTime);
+	}
+
+	/**
+	 * check if there were more than max_allowed calls to reset password action per sepecific resource in specific time frame
+	 * @param string $resourceId
+	 * @param int $maxRequestsNum
+	 * @param int $reservationTime
+	 * @throws KalturaErrors::RESOURCE_IS_RESERVED
+	 */
+	protected function validateRequestsAmount($resourceId, $maxRequestsNum, $reservationTime)
+	{
+		$resourceReservator = new kVarResourceReservation($reservationTime);
+		$resourceValue = $resourceReservator->retrieveValue($resourceId);
+		if ($resourceValue)
+		{
+			if ((int)$resourceValue >= $maxRequestsNum)
+			{
+				throw new KalturaAPIException(KalturaErrors::RESOURCE_IS_RESERVED, $resourceId);
+			}
+			$newValue = (int)$resourceValue + 1;
+		}
+		else
+		{
+			$newValue = 1;
+		}
+		$resourceReservator->reserveWithValue($resourceId, $newValue);
+	}
+
 	
 	public function loginByKsImpl($ks, $destPartnerId)
 	{
