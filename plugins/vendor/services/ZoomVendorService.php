@@ -39,6 +39,7 @@ class ZoomVendorService extends KalturaBaseService
 	 */
 	public function oauthValidationAction()
 	{
+		KalturaResponseCacher::disableCache();
 		if(!kConf::hasMap('vendor'))
 		{
 			throw new KalturaAPIException("Vendor configuration file wasn't found!");
@@ -81,6 +82,7 @@ class ZoomVendorService extends KalturaBaseService
 	 */
 	public function deAuthorizationAction()
 	{
+		KalturaResponseCacher::disableCache();
 		ZoomHelper::verifyHeaderToken();
 		$data = ZoomHelper::getPayloadData();
 		$accountId = ZoomHelper::extractAccountIdFromDeAuthPayload($data);
@@ -102,6 +104,7 @@ class ZoomVendorService extends KalturaBaseService
 	 */
 	public function fetchRegistrationPageAction($tokensData, $iv)
 	{
+		KalturaResponseCacher::disableCache();
 		$tokensData = base64_decode($tokensData);
 		$iv = base64_decode($iv);
 		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
@@ -136,6 +139,7 @@ class ZoomVendorService extends KalturaBaseService
 	 */
 	public function submitRegistrationAction($defaultUserId, $zoomCategory, $accountId)
 	{
+		KalturaResponseCacher::disableCache();
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		/** @var ZoomVendorIntegration $zoomIntegration */
 		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId,
@@ -160,6 +164,7 @@ class ZoomVendorService extends KalturaBaseService
 	 */
 	public function recordingCompleteAction()
 	{
+		KalturaResponseCacher::disableCache();
 		ZoomHelper::verifyHeaderToken();
 		$data = ZoomHelper::getPayloadData();
 		list($accountId, $downloadToken, $hostEmail, $downloadURL, $meetingId) = ZoomHelper::extractDataFromRecordingCompletePayload($data);
