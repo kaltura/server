@@ -396,11 +396,15 @@ class KCurlWrapper
 			$header = reset(self::$headers);
 
 			// this line is true if the protocol is HTTP (or HTTPS);
-			$matches = null;
-			if(preg_match('/HTTP\/?[\d.]{0,3} ([\d]{3}) ([^\n\r]+)/', $header, $matches))
+			if(preg_match('/HTTP\/?[\d.]{0,3}/', $header))
 			{
-				$curlHeaderResponse->code = $matches[1];
-				$curlHeaderResponse->codeName = $matches[2];
+				$matches = explode(" ", $header, 3);
+				if(isset($matches[1]) && is_numeric($matches[1]))
+				{
+					$curlHeaderResponse->code = $matches[1];
+					if(isset($matches[2]) && !empty($matches[2]))
+						$curlHeaderResponse->codeName = $matches[2];
+				}
 			}
 
 			foreach ( self::$headers as $header )
