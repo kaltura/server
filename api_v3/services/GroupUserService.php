@@ -7,6 +7,7 @@
  */
 class GroupUserService extends KalturaBaseService
 {
+	const USER_GROUP_SYNC_THRESHOLD_DEFUALT = '50';
 
 	public function initService($serviceId, $serviceName, $actionName)
 	{
@@ -118,5 +119,108 @@ class GroupUserService extends KalturaBaseService
 			$pager = new KalturaFilterPager();
 			
 		return $filter->getListResponse($pager, $this->getResponseProfile());
+	}
+	/**
+	 * sync by userId and groupIds
+	 *
+	 * @action sync
+	 * @param string $userId
+	 * @param string $groupIds
+	 * @param bool $removeFromExistingGroups
+	 * @param bool $createNewGroups
+	 * @return KalturaBulkUpload|null
+	 * @throws KalturaAPIException
+	 */
+	public function syncAction($userId, $groupIds, $removeFromExistingGroups = true, $createNewGroups = true)
+	{
+		$groupIdsList = explode(',', $groupIds);
+		self::validateSyncGroupUserArgs($userId, $groupIdsList, $groupIds);
+
+		$kUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
+		if (!$kUser || $kUser->getType() != KuserType::USER)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
+		}
+
+		$groupLimit = kConf::get('user_groups_sync_threshold', 'local', self::USER_GROUP_SYNC_THRESHOLD_DEFUALT);
+		$bulkUpload = null;
+		$bulkGroupUserSyncCsv = new kBulkGroupUserSyncCsv($kUser, $groupIdsList);
+		$shouldHandleGroupsInBatch = ($groupLimit < count($groupIdsList));
+		if (!$shouldHandleGroupsInBatch)
+		{
+			list($groupIdsToRemove, $groupIdsToAdd) = $bulkGroupUserSyncCsv->getSyncGroupUsers($removeFromExistingGroups, $createNewGroups);
+			$this->initService('groupuser', 'groupuser', 'add');
+			$shouldHandleGroupsInBatch = $this->addUserGroups($userId, $groupIdsToAdd) || !empty($groupIdsToRemove);
+		}
+		if ($shouldHandleGroupsInBatch)
+		{
+			$bulkUpload = self::handleGroupUserInBatch($bulkGroupUserSyncCsv, $removeFromExistingGroups, $createNewGroups);
+		}
+
+		return $bulkUpload;
+	}
+
+	protected static function handleGroupUserInBatch(kBulkGroupUserSyncCsv $bulkGroupUserSyncCsv, $removeFromExistingGroups, $createNewGroups)
+	{
+		$fileData = $bulkGroupUserSyncCsv->getSyncGroupUsersCsvFile($removeFromExistingGroups, $createNewGroups);
+		if (!$fileData)
+			return null;
+
+		$bulkService = new BulkService();
+		$bulkService->initService('bulkupload_bulk', 'bulk', 'addUsers');
+		return $bulkService->addUsersAction($fileData);
+	}
+
+	/**
+	 * @param $userId
+	 * @param $groupIdsToAdd
+	 * @return bool (true if errors occurred)
+	 */
+	protected function addUserGroups($userId, $groupIdsToAdd)
+	{
+		$shouldHandleGroupsInBatch = false;
+		foreach ($groupIdsToAdd as $groupId)
+		{
+			try
+			{
+				$groupUser = new KalturaGroupUser();
+				$groupUser->userId = $userId;
+				$groupUser->groupId = $groupId;
+				$groupUser->creationMode = KalturaGroupUserCreationMode::AUTOMATIC;
+				$this->addAction($groupUser);
+			}
+			catch (Exception $e)
+			{
+				$shouldHandleGroupsInBatch = true;
+			}
+		}
+		return $shouldHandleGroupsInBatch;
+	}
+
+	/**
+	 * @param $userId
+	 * @param $groupIdsList
+	 * @param $groupIds
+	 * @throws KalturaAPIException
+	 */
+	protected static function validateSyncGroupUserArgs($userId, $groupIdsList, $groupIds)
+	{
+		if (!preg_match(kuser::PUSER_ID_REGEXP, $userId))
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'userId');
+		}
+
+		if(!strlen(trim($groupIds)))
+		{
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'groupIds');
+		}
+
+		foreach ($groupIdsList as $groupId)
+		{
+			if (!preg_match(kuser::PUSER_ID_REGEXP, trim($groupId)))
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'groupIds');
+			}
+		}
 	}
 }
