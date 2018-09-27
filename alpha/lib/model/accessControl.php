@@ -210,6 +210,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 				}
 			}
 
+			// use + and not array_merge because the arrays have numerical indexes
 			$filteredRules += $ipTree['unfiltered'];
 
 			$newRules = array();
@@ -232,11 +233,10 @@ class accessControl extends BaseaccessControl implements IBaseObject
 				// since there are many ip related caching rules, cache the response only for this specific ip
 				kApiCache::addExtraField(array('type' => kApiCache::ECF_IP,
 					kApiCache::ECFD_IP_HTTP_HEADER => $header,
-					kApiCache::ECFD_IP_ACCEPT_INTERNAL_IPS => $acceptInternalIps),
-					kApiCache::COND_IP_RANGE, array($ip));
+					kApiCache::ECFD_IP_ACCEPT_INTERNAL_IPS => $acceptInternalIps));
 			}
 			else {
-				kApiCache::addExtraField(kApiCache::ECF_IP, kApiCache::COND_IP_RANGE, array($ip));
+				kApiCache::addExtraField(kApiCache::ECF_IP);
 			}
 		}
 		
