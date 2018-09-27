@@ -432,9 +432,6 @@ class BulkService extends KalturaBaseService
     	return $ret;
 	}
 
-
-
-
 	/**
 	 * sync by userId and groupIds
 	 *
