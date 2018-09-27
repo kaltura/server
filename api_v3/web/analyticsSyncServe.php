@@ -227,6 +227,9 @@ function getCategoryEntryUpdates($updatedAt)
 		$maxUpdatedAt = max($maxUpdatedAt, (int)$updatedAt->format('U'));
 	}
 	
+	$con = categoryEntryPeer::alternativeCon(null);
+	$con->exec('SET SESSION group_concat_max_len = 1000000');
+
 	// get the categories
 	$categoryIdsCol = 'GROUP_CONCAT('.categoryEntryPeer::CATEGORY_FULL_IDS.')';
 	$c = new Criteria();
