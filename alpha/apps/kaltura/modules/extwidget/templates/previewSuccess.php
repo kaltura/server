@@ -76,10 +76,68 @@
 	<?php } ?>
 				<div id="framePlayerContainer">
 <script>
-var scriptToEval = '';
+function isObject(item) {
+    return item && typeof item === 'object' && !Array.isArray(item);
+}
+function mergeDeep(target,source) {
+    if (isObject(target) && isObject(source)) {
+      for (const key in source) {
+        if (this.isObject(source[key])) {
+          if (!target[key]) Object.assign(target, {[key]: {}});
+          mergeDeep(target[key], source[key]);
+        } else {
+          Object.assign(target, {[key]: source[key]});
+        }
+      }
+    }
+    return target;
+  }
+
+  function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+var scriptToEval = ''; 
 var code = new kEmbedCodeGenerator(<?php echo json_encode($embedParams); ?>).getCode();
 var embedType = '<?php echo $embedType;?>';
 var ltIE10 = $('html').hasClass('lt-ie10');
+var isPlaykit = '<?php echo $isPlaykit?>';
+if (isPlaykit === '1') {
+    var data = <?php echo json_encode($embedParams); ?>;
+    var width = <?php echo $uiConf->getWidth();?>;
+    var height = <?php echo $uiConf->getHeight();?>;
+    var playerConfig = {"provider":{"partnerId": data.partnerId,"uiConfId": data.uiConfId},"targetId":"framePlayerContainer"};
+    var externalConfig = getParameterByName("playerConfig");
+    if (externalConfig){
+        try {
+            var parsedConfig = JSON.parse(externalConfig);
+            playerConfig = mergeDeep(playerConfig,parsedConfig);
+        }
+        catch(ee){}
+    }
+	//default
+    if (!height) {
+        height = 400;
+    }
+    if (!width) {
+        width = 600;
+    }
+    var codeUrl = "https://" + data.securedHost + "/p/" + data.partnerId +"/embedPlaykitJs/uiconf_id/"+ data.uiConfId;
+    var iframeURL = codeUrl + "/entry_id/" + data.entryId + "?iframeembed=true";
+    var embedCode = '<scr'+'ipt src="'+ codeUrl +'"></scr'+'ipt><scr'+'ipt> var kalturaPlayer = KalturaPlayer.setup('+ JSON.stringify(playerConfig)+');	kalturaPlayer.loadMedia({entryId: "'+ data.entryId +'"})</scr'+'ipt>';
+    code = embedCode;
+    if (data.embedType === 'iframe') {
+        code = '<iframe id="kaltura_player" src="'+iframeURL+'" width="'+ width +'" height="'+height+'" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen="" allow="autoplay; fullscreen; encrypted-media" frameborder="0" style="width: '+width+'px; height: '+height+'px;" itemprop="video" itemscope="" itemtype="http://schema.org/VideoObject">';
+    }
+    document.getElementById('framePlayerContainer').style.height = height + 'px';
+    document.getElementById('framePlayerContainer').style.width = width + 'px';
+
+}
 
 // IE9 and below has issue with document.write script tag
 if( ltIE10 && (embedType == 'dynamic' || embedType == 'thumb') ) {
