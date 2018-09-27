@@ -449,7 +449,9 @@ class BulkService extends KalturaBaseService
 	 */
 	public function syncGroupUsersAction($userId, $groupIds, $removeFromExistingGroups = true, $createNewGroups = true)
 	{
-		$this->validateSyncGroupUserArgs($userId,$groupIds);
+		$groupIdsList = explode(',', $groupIds);
+		self::validateSyncGroupUserArgs($userId, $groupIdsList, $groupIds);
+
 		$kUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
 		if (!$kUser || $kUser->getType() != KuserType::USER)
 		{
@@ -458,9 +460,7 @@ class BulkService extends KalturaBaseService
 
 		$groupLimit = kConf::get('user_groups_sync_threshold', 'local', self::USER_GROUP_SYNC_THRESHOLD_DEFUALT);
 		$bulkUpload = null;
-		$groupIdsList = explode(',', $groupIds);
-
-		$bulkGroupUserSyncCsv = new kBulkGroupUserSyncCsv($kUser, $groupIds);
+		$bulkGroupUserSyncCsv = new kBulkGroupUserSyncCsv($kUser, $groupIdsList);
 		$shouldHandleGroupsInBatch = ($groupLimit < count($groupIdsList));
 		if (!$shouldHandleGroupsInBatch)
 		{
@@ -517,23 +517,24 @@ class BulkService extends KalturaBaseService
 	/**
 	 * @param $userId
 	 * @param $groupIdsList
+	 * @param $groupIds
 	 * @throws KalturaAPIException
 	 */
-	protected static function validateSyncGroupUserArgs($userId, $groupIdsList)
+	protected static function validateSyncGroupUserArgs($userId, $groupIdsList, $groupIds)
 	{
 		if (!preg_match(kuser::PUSER_ID_REGEXP, $userId))
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'userId');
 		}
 
-		if(!count($groupIdsList))
+		if(!strlen(trim($groupIds)))
 		{
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'groupIds');
 		}
 
 		foreach ($groupIdsList as $groupId)
 		{
-			if (!preg_match(kuser::PUSER_ID_REGEXP, $groupId))
+			if (!preg_match(kuser::PUSER_ID_REGEXP, trim($groupId)))
 			{
 				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'groupIds');
 			}
