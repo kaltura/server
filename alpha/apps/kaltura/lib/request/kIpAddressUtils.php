@@ -139,27 +139,17 @@ class kIpAddressUtils
 		$result = array();
 
 		while($to >= $from) {
-			$maxSize = 32;
-			while ($maxSize > 0) {
-				$mask = (0xffffffff >> ($maxSize - 1)) ^ 0xffffffff;
-				$maskBase = $from & $mask;
-
-				if($maskBase != $from) {
-					break;
-				}
-
-				$maxSize--;
-			}
+			$netmask = 32 - log((-$from & $from), 2);
 
 			$highBit = log($to - $from + 1, 2);
 			$maxDiff = 32 - floor($highBit);
 
-			if($maxSize < $maxDiff) {
-					$maxSize = $maxDiff;
+			if($netmask < $maxDiff) {
+				$netmask = $maxDiff;
 			}
 
-			$result[$from] = $maxSize;
-			$from += 1 << (32 - $maxSize);
+			$result[$from] = $netmask;
+			$from += 1 << (32 - $netmask);
 		}
 
 		return $result;
