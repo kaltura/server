@@ -3430,6 +3430,9 @@ class kKavaReportsMgr extends kKavaBase
 			$c->addAnd($c->getNewCriterion($column, $value, $comparison));
 		}
 
+		$con = $peer::alternativeCon(null);
+		$con->exec('SET SESSION group_concat_max_len = 102400');
+
 		$peer::setUseCriteriaFilter(false);
 		$stmt = $peer::doSelectStmt($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 		$rows = $stmt->fetchAll(PDO::FETCH_NUM);
