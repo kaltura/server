@@ -1,5 +1,17 @@
 # Naos 14.6.0 #
 
+## Improve group user sync + move group user sync action to GroupUserService ##
+- Issue Type: Task
+- Issue ID: PLAT-9237
+
+### Configuration ###
+	None.
+
+#### Deployment Scripts ####
+
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_10_03_update_groupuser_sync_action.php
+
 ## Add event notification for Reach credit expiry ##
 - Issue Type: Task
 - Issue ID: PLAT-8864
