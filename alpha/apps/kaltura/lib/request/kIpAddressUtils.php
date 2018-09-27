@@ -158,8 +158,7 @@ class kIpAddressUtils
 					$maxSize = $maxDiff;
 			}
 
-			$ip = long2ip($from);
-			$result[$ip] = $maxSize;
+			$result[$from] = $maxSize;
 			$from += 1 << (32 - $maxSize);
 		}
 
@@ -168,20 +167,21 @@ class kIpAddressUtils
 	
 	public static function compressIpRanges($ipRanges)
 	{
-		$from = 0;
-		$to = -2;
+		ksort($ipRanges);
+		
+		$lastRangeTo = -2;
 		$compressedIps = array();
 		foreach($ipRanges as $ipFrom => $ipTo)
 		{
 			// either create a new ip range
-			if ($ipFrom > $to + 1) {
-				$from = $ipFrom;
-				$to = $ipTo;
+			if ($ipFrom > $lastRangeTo + 1) {
+				$lastRangeFrom = $ipFrom;
+				$lastRangeTo = $ipTo;
 				$compressedIps[$ipFrom] = $ipTo;
 			}
-			else if ($ipTo > $to) { // or extend the current range
-				$to = $ipTo;
-				$compressedIps[$from] = $ipTo;
+			else if ($ipTo > $lastRangeTo) { // or extend the current range
+				$lastRangeTo = $ipTo;
+				$compressedIps[$lastRangeFrom] = $ipTo;
 			}
 		}
 	
@@ -207,16 +207,16 @@ class kIpAddressUtils
 			case self::IP_ADDRESS_TYPE_MASK_ADDRESS:
 				list ($rangeIp, $rangeMask) = array_map('trim', explode(self::IP_ADDRESS_MASK_CHAR, $range));
 				// convert mask address to CIDR
-				$long = ip2long($rangeMask);
-				$fromIp = ip2long('255.255.255.255');
-				$rangeMask = 32 - log(($long ^ $base) + 1, 2);
+				$fromIp = ip2long($rangeMask);
+				$base = ip2long('255.255.255.255');
+				$rangeMask = 32 - log(($fromIp ^ $base) + 1, 2);
 				$toIp = $fromIp + (1 << $rangeMask);
 				break;
 
 			case self::IP_ADDRESS_TYPE_MASK_CIDR:
 				list ($rangeIp, $rangeMask) = array_map('trim', explode(self::IP_ADDRESS_MASK_CHAR, $range));
 				$fromIp = ip2long($rangeIp);
-				$toIp = $fromIp + (1 << $rangeMask); 
+				$toIp = $fromIp + (1 << (32 - $rangeMask)) - 1; 
 				break;
 		}
 		
@@ -227,7 +227,7 @@ class kIpAddressUtils
 	 * insert ip ranges array into an ip binary tree built from the ip bits.
 	 * The end node will be set with the given value
 	 */
-	public static function insertRangesIntoIpTree($ipTree, $rangesArr, $value)
+	public static function insertRangesIntoIpTree(&$ipTree, $rangesArr, $value)
 	{
 		// run over ips and create an array of ip ranges
 		$ips = array();
@@ -236,9 +236,9 @@ class kIpAddressUtils
 		{
 			$ranges = explode(',', $rangesItem);
 
-			for($i = 0; $i < count($ranges); $i++)
+			foreach($ranges as $range)
 			{
-				list($fromIp, $toIp) = self::rangetoIps($ranges[$i]);
+				list($fromIp, $toIp) = self::rangetoIps($range);
 
 				if (!array_key_exists($fromIp, $ips)) {
 					$ips[$fromIp] = $toIp;
@@ -259,14 +259,11 @@ class kIpAddressUtils
 
 			foreach($rangeCIDRs as $rangeIp => $rangeMask)
 			{
-				$ipLong = ip2long($rangeIp);
-				$count = $rangeMask;
 				$root = &$ipTree;
 
-				while($count--)
+				for ($bitIndex = 31; $bitIndex >= 32 - $rangeMask; $bitIndex--)
 				{
-					$bit = ($ipLong & 0x80000000) ? 1 : 0;
-					$ipLong <<= 1;
+					$bit = ($rangeIp >> $bitIndex) & 1;
 
 					if (!isset($root[$bit])) {
 						$root[$bit] = array();
@@ -299,17 +296,14 @@ class kIpAddressUtils
 		$ipLong = ip2long($ip);
 
 		$root = $ipTree;
-		$count = 32;
 
-		while($count--)
+		for ($bitIndex = 31; $bitIndex >= 0; $bitIndex--)
 		{
-			$bit = ($ipLong & 0x80000000) ? 1 : 0;
-			$ipLong <<= 1;
-			
 			if (isset($root[self::IP_TREE_NODE_VALUE])) {
 				$values[] = $root[self::IP_TREE_NODE_VALUE];
 			}
 
+			$bit = ($ipLong >> $bitIndex) & 1;
 			if (!isset($root[$bit])) {
 				break;
 			}
