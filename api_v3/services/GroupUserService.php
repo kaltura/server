@@ -164,7 +164,9 @@ class GroupUserService extends KalturaBaseService
 	{
 		$fileData = $bulkGroupUserSyncCsv->getSyncGroupUsersCsvFile($removeFromExistingGroups, $createNewGroups);
 		if (!$fileData)
+		{
 			return null;
+		}
 
 		$bulkService = new BulkService();
 		$bulkService->initService('bulkupload_bulk', 'bulk', 'addUsers');
