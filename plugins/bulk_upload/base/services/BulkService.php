@@ -432,6 +432,9 @@ class BulkService extends KalturaBaseService
     	return $ret;
 	}
 
+
+
+
 	/**
 	 * sync by userId and groupIds
 	 *
@@ -446,20 +449,19 @@ class BulkService extends KalturaBaseService
 	 */
 	public function syncGroupUsersAction($userId, $groupIds, $removeFromExistingGroups = true, $createNewGroups = true)
 	{
-		$groupLimit = kConf::get('user_groups_sync_threshold','local',self::USER_GROUP_SYNC_THRESHOLD_DEFUALT);
-		$bulkUpload = null;
-
+		$this->validateSyncGroupUserArgs($userId,$groupIds);
 		$kUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
 		if (!$kUser || $kUser->getType() != KuserType::USER)
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
 		}
 
-		if(!trim($groupIds))
-			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'groupIds');
+		$groupLimit = kConf::get('user_groups_sync_threshold', 'local', self::USER_GROUP_SYNC_THRESHOLD_DEFUALT);
+		$bulkUpload = null;
+		$groupIdsList = explode(',', $groupIds);
 
 		$bulkGroupUserSyncCsv = new kBulkGroupUserSyncCsv($kUser, $groupIds);
-		$shouldHandleGroupsInBatch = ($groupLimit < count(explode(",", $groupIds)));
+		$shouldHandleGroupsInBatch = ($groupLimit < count($groupIdsList));
 		if (!$shouldHandleGroupsInBatch)
 		{
 			list($groupIdsToRemove, $groupIdsToAdd) = $bulkGroupUserSyncCsv->getSyncGroupUsers($removeFromExistingGroups, $createNewGroups);
@@ -512,4 +514,29 @@ class BulkService extends KalturaBaseService
 		return $shouldHandleGroupsInBatch;
 	}
 
+	/**
+	 * @param $userId
+	 * @param $groupIdsList
+	 * @throws KalturaAPIException
+	 */
+	protected static function validateSyncGroupUserArgs($userId, $groupIdsList)
+	{
+		if (!preg_match(kuser::PUSER_ID_REGEXP, $userId))
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'userId');
+		}
+
+		if(!count($groupIdsList))
+		{
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'groupIds');
+		}
+
+		foreach ($groupIdsList as $groupId)
+		{
+			if (!preg_match(kuser::PUSER_ID_REGEXP, $groupId))
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'groupIds');
+			}
+		}
+	}
 }
