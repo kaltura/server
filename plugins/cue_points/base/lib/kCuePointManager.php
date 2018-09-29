@@ -157,6 +157,13 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 				KalturaLog::debug("Failed to read sync point info from file [$rawSyncPointDataPath], copy live to vod will not execute");
 				return $dbBatchJob;
 			}
+
+			$liveEntry = entryPeer::retrieveByPK($liveEntryId);
+			if(!$liveEntry || !in_array($liveEntry->getSourceType(), LiveEntry::$kalturaLiveSourceTypes))
+			{
+				KalturaLog::debug("Live entry with id [$liveEntryId] not found, this should not happen, copy live to vod will not execute");
+				return $dbBatchJob;
+			}
 			
 			$syncPointInfoArr = unserialize($rawSyncPointInfo);
 			$syncPointIntoToAmfArr = array();
@@ -179,7 +186,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			}
 			
 			//get last cue points sync, to avoid two sequential jobs working on the same cue points  
-			$lastCuePointSyncTime = self::getLatestCuePointSyncTime($liveEntryId, reset($syncPointIntoToAmfArr), $lastSegmentDuration, $segmentDrift, $liveClipping);
+			$lastCuePointSyncTime = self::getLatestCuePointSyncTime($liveEntry, reset($syncPointIntoToAmfArr), $lastSegmentDuration, $segmentDrift, $liveClipping);
 			
 			$liveToVodJobData = new kLiveToVodJobData();
 			$liveToVodJobData->setLiveEntryId($liveEntryId);
@@ -255,18 +262,12 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		return $retArr;
 	}
 	
-	private static function getLatestCuePointSyncTime($liveEntryId, $syncPoint, $lastSegmentDuration, $segmentDrift, $liveClipping = false)
+	private static function getLatestCuePointSyncTime($liveEntry, $syncPoint, $lastSegmentDuration, $segmentDrift, $liveClipping = false)
 	{
 		/** @var $liveEntry LiveEntry */
-		$liveEntry = entryPeer::retrieveByPK($liveEntryId);
-		if(!$liveEntry)
-		{
-			KalturaLog::debug("Live entry with id [$liveEntryId] not found, this should not happen, sync time is 0");
-			return 0;
-		}
 		if ($liveClipping)
 		{
-			KalturaLog::debug("Live Clipping Flow on [$liveEntryId] , return lastSyncTime as created Time");
+			KalturaLog::debug("Live Clipping Flow on [" . $liveEntry->getId() . "] , return lastSyncTime as created Time");
 			return $liveEntry->getCreatedAt(null);
 		}
 
