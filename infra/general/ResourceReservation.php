@@ -8,17 +8,17 @@ class ResourceReservation
 	/**
 	 * @var kBaseCacheWrapper $cache
 	 */
-	private $cache;
+	protected $cache;
 
 	/**
 	 * @var int $ttl
 	 */
-	private $ttl;
+	protected $ttl;
 
 	/**
 	 * @var string $userToken
 	 */
-	private $userToken;
+	protected $userToken;
 
 
 	function __construct($cache, $ttl, $userToken)
@@ -36,7 +36,7 @@ class ResourceReservation
 	 * @param string $resourceId
 	 * @return string
 	 */
-	private function getCacheKeyForResource($resourceId)
+	protected function getCacheKeyForResource($resourceId)
 	{
 		return "resource_reservation_cache_key_$resourceId";
 	}
