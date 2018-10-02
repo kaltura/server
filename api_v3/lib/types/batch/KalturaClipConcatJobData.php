@@ -32,6 +32,11 @@ class KalturaClipConcatJobData extends KalturaJobData
 	 */
 	public $priority;
 
+	/** $isEncrypted
+	 * @var bool
+	 */
+	public $isEncrypted;
+
 
 	/** clip operations
 	 * @var KalturaObjectArray $operationAttributes
@@ -46,7 +51,8 @@ class KalturaClipConcatJobData extends KalturaJobData
 		'partnerId',
 		'priority',
 		'operationAttributes',
-		'sourceEntryId'
+		'sourceEntryId',
+		'isEncrypted'
 	);
 
 	/* (non-PHPdoc)

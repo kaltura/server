@@ -670,10 +670,12 @@ class KalturaEntryService extends KalturaBaseService
 		if ($isLiveClippingFlow && $isMultiClipFlow)
 			throw new KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_OPERATION, "MultiClip");
 
+		$encryptionKey = $this->getEncryptionKey($dbEntry);
+
 		if ($isMultiClipFlow)
 		{
 			$clipManager = new kClipManager();
-			$this->handleMultiClipRequest($resource,$dbEntry, $clipManager, $operationAttributes);
+			$this->handleMultiClipRequest($resource,$dbEntry, $clipManager, $operationAttributes, $encryptionKey);
 			return $dbAsset;
 		}
 		if ($isLiveClippingFlow)
@@ -697,7 +699,7 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			$isNewAsset = true;
 			$isSource = true;
-			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
+			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId(),$msg, $encryptionKey);
 		}
 
 		if(!$dbAsset && $dbEntry->getStatus() == entryStatus::NO_CONTENT)
@@ -740,6 +742,37 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		
 		return $dbAsset;
+	}
+
+	/***
+	 * @param $dbEntry
+	 * @return bool
+	 */
+	private function getEncryptionKey($dbEntry)
+	{
+		if (!$dbEntry)
+		{
+			return null;
+		}
+
+		if ($dbEntry->getIsTemporary())
+		{
+			$replacingEntryId = $dbEntry->getReplacedEntryId();
+			if ($replacingEntryId)
+			{
+				$replacingEntryOriginalflavorAsset = assetPeer::retrieveOriginalByEntryId($replacingEntryId);
+				if ($replacingEntryOriginalflavorAsset)
+				{
+					$encKey = $replacingEntryOriginalflavorAsset->getEncryptionKey();
+					if ($encKey)
+					{
+						return $encKey;
+					}
+				}
+			}
+		}
+
+		return null;
 	}
 
 	protected function handleLiveClippingFlow($recordedEntry, $clippedEntry, $operationAttributes)
@@ -1894,13 +1927,13 @@ class KalturaEntryService extends KalturaBaseService
 	 * @throws Exception
 	 * @throws KalturaErrors
 	 */
-	protected function handleMultiClipRequest($resource, entry $dbEntry, $clipManager, $operationAttributes)
+	protected function handleMultiClipRequest($resource, entry $dbEntry, $clipManager, $operationAttributes, $encryptionKey = null)
 	{
 		KalturaLog::info("clipping service detected start to create sub flavors;");
 		$clipEntry = $clipManager->createTempEntryForClip($this->getPartnerId());
-		$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId());
+		$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId(), $msg, $encryptionKey);
 		$dbAsset = $this->attachResource($resource->getResource(), $clipEntry, $clipDummySourceAsset);
-		$clipManager->startBatchJob($resource, $dbEntry,$operationAttributes, $clipEntry);
+		$clipManager->startBatchJob($resource, $dbEntry,$operationAttributes, $clipEntry, $encryptionKey);
 		return $dbAsset;
 	}
 

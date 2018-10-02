@@ -31,6 +31,10 @@ class kClipConcatJobData extends kJobData
 	 */
 	private $priority;
 
+	/** $isEncrypted
+	 * @var bool
+	 */
+	private $isEncrypted;
 
 	/** clip operations
 	 * @var array $operationAttributes
@@ -116,6 +120,22 @@ class kClipConcatJobData extends kJobData
 	public function setPriority($priority)
 	{
 		$this->priority = $priority;
+	}
+
+	/**
+	 * @param bool $isEncrypted
+	 */
+	public function setIsEncrypted($isEncrypted)
+	{
+		$this->isEncrypted = $isEncrypted;
+	}
+
+	/**
+	 * @return bool isEncrypted
+	 */
+	public function getIsEncrypted()
+	{
+		return $this->isEncrypted;
 	}
 
 
