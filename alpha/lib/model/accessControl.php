@@ -14,6 +14,9 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	const IP_TREE_UNFILTERED = 'unfiltered';
 	const IP_TREE_HEADER = 'header';
 	const IP_TREE_ACCEPT_INTERNAL_IPS = 'acceptInternalIps';
+	
+	// header to mark the rules fulfilled in the current request
+	const ACP_DEBUG_HEADER = 'X-KALTURA-ACP';
 
 	/**
 	 * True when set as partner default (saved on partner object)
@@ -212,6 +215,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 
 			// use + and not array_merge because the arrays have numerical indexes
 			$filteredRules += $ipTree['unfiltered'];
+			ksort($filteredRules);
 
 			$newRules = array();
 			foreach($filteredRules as $filteredRule => $filteredConds) {
@@ -222,8 +226,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 					$rule->setConditions(array_diff_key($rule->getConditions(), $filteredConds));
 				}
 				
-				$newRules[] = $rules[$filteredRule];
-				ksort($newRules);
+				$newRules[$filteredRule] = $rules[$filteredRule];
 			}
 
 			$rules = $newRules;
@@ -240,7 +243,8 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			}
 		}
 		
-		foreach($rules as $rule)
+		$fulfilledRules = array();
+		foreach($rules as $ruleNum => $rule)
 		{
 			if($isKsAdmin && !$rule->getForceAdminValidation())
 				continue;
@@ -251,9 +255,16 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			if($rule->shouldDisableCache())
 				$disableCache = true;
 				
-			if($fulfilled && $rule->getStopProcessing())
-				break;
+			if($fulfilled)
+			{
+				$fulfilledRules[] = $ruleNum;
+				
+				if ($rule->getStopProcessing())
+					break;
+			}
 		}
+		
+		header(self::ACP_DEBUG_HEADER . ':' . $this->getId() . ' ' . implode(',', $fulfilledRules));
 			
 		return $disableCache;
 	}
