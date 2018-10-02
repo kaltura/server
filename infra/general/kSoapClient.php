@@ -8,6 +8,13 @@ class kSoapClient extends SoapClient
 		parent::__construct($wsdl, $options);
 		$this->afterCall();
 	}
+	public function __call ($function_name , $arguments)
+	{
+		$this->beforeCall();
+		$ret = parent::__call($function_name, $arguments);
+		$this->afterCall();
+		return $ret;
+	}
 	public function __soapCall ($function_name, $arguments, $options = NULL, $input_headers = NULL, &$output_headers = NULL)
 	{
 		$this->beforeCall();
