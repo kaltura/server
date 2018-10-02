@@ -289,19 +289,19 @@ class kIpAddressUtils
 
 		for ($bitIndex = 31; $bitIndex >= 0; $bitIndex--)
 		{
-			if (isset($root[self::IP_TREE_NODE_VALUE])) {
-				$values[] = $root[self::IP_TREE_NODE_VALUE];
-			}
-
 			$bit = ($ipLong >> $bitIndex) & 1;
 			if (!isset($root[$bit])) {
 				break;
 			}
 
 			$root = $root[$bit];
+
+			if (isset($root[self::IP_TREE_NODE_VALUE])) {
+				$values[] = $root[self::IP_TREE_NODE_VALUE];
+			}
 		}
 
 		return $values;
 	}
 	
-}
+}	
