@@ -320,6 +320,9 @@ class kBusinessPreConvertDL
 					$params['dar'] = $mediaInfo->getVideoDar();
 					$params['scanType'] = $mediaInfo->getScanType();
 				}
+
+				$params['encryption_key']= $srcAsset->getEncryptionKey();
+
 				// generates the thumbnail
 				$thumbMaker = new KFFMpegThumbnailMaker($srcPath, $destPath, kConf::get('bin_path_ffmpeg'));
 				$created = $thumbMaker->createThumnail($destThumbParamsOutput->getVideoOffset(), $srcAsset->getWidth(), $srcAsset->getHeight(), $params);

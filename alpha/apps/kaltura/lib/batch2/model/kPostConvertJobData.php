@@ -39,6 +39,11 @@ class kPostConvertJobData extends kConvartableJobData
 	private $thumbHeight;
 
 	/**
+	* @var string
+	*/
+	private $flavorAssetEncryptionKey;
+
+	/**
 	 * The bit rate of the movie, will be used to comapare if this thumbnail is the best we can have
 	 *
 	 * @var int
@@ -71,6 +76,22 @@ class kPostConvertJobData extends kConvartableJobData
 	public function setThumbHeight($thumbHeight)
 	{
 		$this->thumbHeight = $thumbHeight;
+	}
+
+	/**
+	 * @param $encryptionKey the $flavorAssetEncryptionKey to set
+	 */
+	public function setFlavorAssetEncryptionKey($encryptionKey)
+	{
+		$this->flavorAssetEncryptionKey = $encryptionKey;
+	}
+
+	/**
+	 * @return the $flavorAssetEncryptionKey
+	 */
+	public function getFlavorAssetEncryptionKey()
+	{
+		return $this->flavorAssetEncryptionKey;
 	}
 
 	/**
