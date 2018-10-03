@@ -4,6 +4,8 @@ class myEntryUtils
 {
 
 	const TEMP_FILE_POSTFIX = "temp_1.jpg";
+	const VOLUME_MAP_POSTFIX = "/volume_map.csv";
+	const MP4_FILENAME_PARAMETER = "/name/a.mp4";
 	const DEFAULT_THUMB_SEC_LIVE = 1;
 
 	static private $liveSourceType = array
@@ -788,8 +790,8 @@ class myEntryUtils
 		
 		$cacheLockKey = "thumb-processing-resize".$finalThumbPath;
 		// creating the thumbnail is a very heavy operation prevent calling it in parallel for the same thumbnail for 5 minutes
-		if ($cache && !$cache->add($cacheLockKey, true, 5 * 60))
-			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
+//		if ($cache && !$cache->add($cacheLockKey, true, 5 * 60))
+//			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
 		// limit creation of more than XX Imagemagick processes
 		if (kConf::hasParam("resize_thumb_max_processes_imagemagick") &&
@@ -849,8 +851,8 @@ class myEntryUtils
 					// prevent calling it in parallel for the same thumbnail for 5 minutes
 					
 					$cacheLockKeyProcessing = "thumb-processing".$orig_image_path;
-					if ($cache && !$cache->add($cacheLockKeyProcessing, true, 5 * 60))
-						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
+//					if ($cache && !$cache->add($cacheLockKeyProcessing, true, 5 * 60))
+//						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
 					$success = false;
 					if(($multi || $servingVODfromLive) && $packagerRetries)
@@ -1007,12 +1009,30 @@ class myEntryUtils
 	{
 		if (myEntryUtils::shouldServeVodFromLive($entry))
 			return self::captureLiveThumbUsingPackager($entry, 'recording', $capturedThumbPath, $calc_vid_sec, $width, $height);
-		
-		$mappedThumbEntryTypes = array(entryType::PLAYLIST);
-		if(in_array($entry->getType(), $mappedThumbEntryTypes))
-			return self::captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
 
-		return self::captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
+		$mappedThumbEntryTypes = array(entryType::PLAYLIST);
+		$isPlayList = in_array($entry->getType(), $mappedThumbEntryTypes);
+		if($isPlayList)
+		{
+			$entry = myPlaylistUtils::getFirstEntryFromPlaylist($entry);
+			if (!$entry)
+			{
+				return false;
+			}
+		}
+		$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($entry->getId());
+		if(!$flavorAsset)
+		{
+			return false;
+		}
+		if ($isPlayList || $flavorAsset->getEncryptionKey())
+		{
+			return self::captureMappedThumbUsingPackager($entry, $flavorAsset, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
+		}
+		else
+		{
+			return self::captureLocalThumbUsingPackager( $flavorAsset, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
+		}
 	}
 
 	private static function captureLiveThumbUsingPackager(entry $entry, $liveType, $destThumbPath, $calc_vid_sec, $width = null, $height = null)
@@ -1039,17 +1059,12 @@ class myEntryUtils
 		return $entryServerNode->getDCId();
 	}
 
-	private static function captureMappedThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width, $height)
+	private static function captureMappedThumbUsingPackager($entry, $flavorAsset, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width, $height)
 	{
 		$packagerCaptureUrl = kConf::get('packager_mapped_thumb_capture_url', 'local', null);
 		if (!$packagerCaptureUrl)
 			return false;
 
-		$firstEntry = myPlaylistUtils::getFirstEntryFromPlaylist($entry);
-		if (!$firstEntry)
-			return false;
-
-		$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($firstEntry->getId());
 		if(!$flavorAsset)
 			return false;
 
@@ -1058,9 +1073,23 @@ class myEntryUtils
 		if(!$flavorParamsId)
 			return false;
 
-		$flavorUrl = myPlaylistUtils::buildPlaylistThumbPath($entry, $flavorAsset);
+		$flavorUrl = self::buildThumbUrl($entry, $flavorAsset);
 
 		return self::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
+	}
+
+
+	private static function buildThumbUrl($entry, $flavorAsset)
+	{
+		$partnerId = $flavorAsset->getPartnerId();
+		$subpId = $entry->getSubpId();
+		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
+		$entryVersion = $entry->getVersion();
+
+		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
+		$url .= ($entryVersion ? "/v/$entryVersion" : '');
+		$url .= "/flavorParamIds/" . $flavorAsset->getFlavorParamsId().self::MP4_FILENAME_PARAMETER;
+		return $url;
 	}
 
 
@@ -1142,14 +1171,10 @@ class myEntryUtils
 		return true;
 	}
 
-	public static function captureLocalThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width, $height)
+	public static function captureLocalThumbUsingPackager($flavorAsset, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width, $height)
 	{
 		$packagerCaptureUrl = kConf::get('packager_local_thumb_capture_url', 'local', null);
 		if (!$packagerCaptureUrl)
-			return false;
-
-		$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($entry->getId());
-		if(!$flavorAsset)
 			return false;
 
 		$flavorAssetId = $flavorAsset->getId();
@@ -1185,8 +1210,6 @@ class myEntryUtils
 
 	public static function isFlavorSupportedByPackager($flavorAsset, $excludeAudioFlavors = true)
 	{
-		if($flavorAsset->getEncryptionKey())
-			return false;
 		if($excludeAudioFlavors)
 		{
 			if (!$flavorAsset->getVideoCodecId() || ($flavorAsset->getWidth() == 0) || ($flavorAsset->getHeight() == 0))
@@ -2112,7 +2135,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$content = null;
 		while ($packagerRetries && !$content)
 		{
-			$content = self::retrieveLocalVolumeMapFromPackager($flavorAsset);
+			$content = self::retrieveVolumeMapFromPackager($flavorAsset);
 			$packagerRetries--;
 		}
 		if(!$content)
@@ -2122,6 +2145,33 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return new kRendererString($content, 'text/csv');
 	}
 
+	private static function retrieveVolumeMapFromPackager($flavorAsset)
+	{
+		if ($flavorAsset->getEncryptionKey())
+		{
+			return self::retrieveMappedVolumeMapFromPackager($flavorAsset);
+		}
+		return self::retrieveLocalVolumeMapFromPackager($flavorAsset);
+	}
+
+	private static function retrieveMappedVolumeMapFromPackager($flavorAsset)
+	{
+		$packagerVolumeMapUrlPattern = kConf::get('packager_mapped_volume_map_url', 'local', null);
+		if (!$packagerVolumeMapUrlPattern)
+			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
+
+		$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
+		if (!$entry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND);
+
+		$volumeMapUrl = self::buildVolumeMapPath($entry, $flavorAsset);
+
+		$content = self::curlVolumeMapUrl($volumeMapUrl, $packagerVolumeMapUrlPattern);
+		if(!$content)
+			return false;
+
+		return $content;
+	}
 
 	private static function retrieveLocalVolumeMapFromPackager($flavorAsset)
 	{
@@ -2135,14 +2185,14 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		if (!$entry_data_path)
 			return null;
 
-		$content = self::curlLocalVolumeMapUrl($entry_data_path, $packagerVolumeMapUrlPattern);
+		$content = self::curlVolumeMapUrl($entry_data_path, $packagerVolumeMapUrlPattern);
 		if(!$content)
 			return false;
 
 		return $content;
 	}
 
-	private static function curlLocalVolumeMapUrl($url, $packagerVolumeMapUrlPattern)
+	private static function curlVolumeMapUrl($url, $packagerVolumeMapUrlPattern)
 	{
 		$packagerVolumeMapUrl = str_replace(array("{url}"), array($url), $packagerVolumeMapUrlPattern);
 		kFile::closeDbConnections();
@@ -2166,5 +2216,20 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$trackEntry->setEntryId($entry->getId());
 		$trackEntry->setDescription($message);
 		TrackEntry::addTrackEntry($trackEntry);
+	}
+
+	private static function buildVolumeMapPath($entry, $flavorAsset)
+	{
+		$partnerId = $flavorAsset->getPartnerId();
+		$subpId = $entry->getSubpId();
+		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
+		$entryVersion = $entry->getVersion();
+
+		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
+		$url .= ($entryVersion ? "/v/$entryVersion" : '');
+		$url .= "/flavorId/".$flavorAsset->getId();
+		$url .= self::MP4_FILENAME_PARAMETER;
+		$url .= self::VOLUME_MAP_POSTFIX;
+		return $url;
 	}
 }
