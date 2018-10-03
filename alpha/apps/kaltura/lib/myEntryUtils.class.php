@@ -790,8 +790,8 @@ class myEntryUtils
 		
 		$cacheLockKey = "thumb-processing-resize".$finalThumbPath;
 		// creating the thumbnail is a very heavy operation prevent calling it in parallel for the same thumbnail for 5 minutes
-//		if ($cache && !$cache->add($cacheLockKey, true, 5 * 60))
-//			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
+		if ($cache && !$cache->add($cacheLockKey, true, 5 * 60))
+			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
 		// limit creation of more than XX Imagemagick processes
 		if (kConf::hasParam("resize_thumb_max_processes_imagemagick") &&
@@ -851,8 +851,8 @@ class myEntryUtils
 					// prevent calling it in parallel for the same thumbnail for 5 minutes
 					
 					$cacheLockKeyProcessing = "thumb-processing".$orig_image_path;
-//					if ($cache && !$cache->add($cacheLockKeyProcessing, true, 5 * 60))
-//						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
+					if ($cache && !$cache->add($cacheLockKeyProcessing, true, 5 * 60))
+						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
 					$success = false;
 					if(($multi || $servingVODfromLive) && $packagerRetries)
