@@ -6,6 +6,8 @@ class kKavaLiveReportsMgr extends kKavaBase
 	const MAX_RESULTS = 10000;
 	const MAX_LIVE_ENTRIES = 1000;
 	const PEAK_AUDIENCE_MAX_BUCKETS = 1000;
+	const FILTER_GRANULARITY = 10;
+	const CACHE_EXPIRATION = 30;
 	
 	// intermediate metrics
 	const METRIC_VIEW_COUNT = 'viewCount';
@@ -126,8 +128,33 @@ class kKavaLiveReportsMgr extends kKavaBase
 		return self::getAndFilter($result);
 	}
 	
+	protected static function roundUpToMultiple($num, $mult)
+	{
+		$rem = $num % $mult;
+		if (!$rem)
+		{
+			return $num;
+		}
+
+		return $num - $rem + $mult;
+	}
+
+	protected static function alignTimeFilters($filter)
+	{
+		// Note: the timestamps are aligned in order to improve cache hit ratio
+		$currentTime = time();
+		$filter->fromTime = min($filter->fromTime, $currentTime);
+		$filter->toTime = min($filter->toTime, $currentTime);
+
+		$timeRange = self::roundUpToMultiple($filter->toTime - $filter->fromTime, self::FILTER_GRANULARITY);
+		$filter->fromTime = self::roundUpToMultiple($filter->fromTime, self::FILTER_GRANULARITY);
+		$filter->toTime = $filter->fromTime + $timeRange;
+	}
+
 	protected static function getFilterIntervals($filter)
 	{
+		self::alignTimeFilters($filter);
+
 		$fromTime = $filter->fromTime;
 		$toTime = $filter->toTime + self::VIEW_EVENT_INTERVAL;
 		return self::getIntervals($fromTime, $toTime);
@@ -150,6 +177,34 @@ class kKavaLiveReportsMgr extends kKavaBase
 	}
 	
 	// base queries
+	protected static function runGranularityAllQuery($query)
+	{
+		$query[self::DRUID_GRANULARITY] = self::getGranularityAll();
+		$result = self::runQuery(
+			$query,
+			kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_DRUID_QUERIES),
+			self::CACHE_EXPIRATION);
+		if (!$result)
+		{
+			return array();
+		}
+		$result = reset($result);
+		$result = $result[self::DRUID_RESULT];
+		KalturaLog::log("Druid returned [" . count($result) . "] rows");
+		return $result;
+	}
+
+	protected static function runGranularityPeriodQuery($query, $period)
+	{
+		$query[self::DRUID_GRANULARITY] = self::getGranularityPeriod($period);
+		$result = self::runQuery(
+			$query,
+			kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_DRUID_QUERIES),
+			self::CACHE_EXPIRATION);
+		KalturaLog::log("Druid returned [" . count($result) . "] rows");
+		return $result;
+	}
+
 	protected static function getBaseTimeseriesQuery($partnerId, $filter, $eventTypes)
 	{
 		return array(

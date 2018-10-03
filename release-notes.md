@@ -9,8 +9,18 @@
 
 #### Deployment Scripts ####
 
-    Run deployment script:
-        php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_10_03_update_groupuser_sync_action.php
+	Run deployment script:
+  	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_10_03_update_groupuser_sync_action.php
+
+##Zoom Integration Configuration##
+- New Feature
+- ID: PLAT-91901     
+
+#### Deployment Scripts ####
+	Run:
+  	- mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2018_08_28_create_vendor_integration_table.sql
+	Run deployment script:
+  		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_08_29_zoom_vendor_Integration_permissions.php   
 
 ## Add event notification for Reach credit expiry ##
 - Issue Type: Task
