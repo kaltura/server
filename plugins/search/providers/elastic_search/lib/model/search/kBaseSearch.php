@@ -49,8 +49,7 @@ abstract class kBaseSearch
         $this->applyElasticSearchConditions();
         $this->addGlobalHighlights();
         $result = $this->elasticClient->search($this->query, true);
-        $resultCount = isset($result[kESearchCoreAdapter::HITS_KEY][kESearchCoreAdapter::TOTAL_KEY]) ? $result[kESearchCoreAdapter::HITS_KEY][kESearchCoreAdapter::TOTAL_KEY] : 0;
-        $this->addSearchTermsToSearchHistory($resultCount);
+        $this->addSearchTermsToSearchHistory();
         return $result;
     }
 
@@ -170,14 +169,8 @@ abstract class kBaseSearch
         $this->queryAttributes->setOverrideInnerHitsSize($overrideInnerHitsSize);
     }
 
-    protected function addSearchTermsToSearchHistory($resultCount)
+    protected function addSearchTermsToSearchHistory()
     {
-        if (!$resultCount)
-        {
-            KalturaLog::log("Not adding search terms to search history result count[$resultCount]");
-            return;
-        }
-
         $searchTerms = $this->queryAttributes->getSearchHistoryTerms();
         $searchTerms = array_unique($searchTerms);
         $searchTerms = array_values($searchTerms);
