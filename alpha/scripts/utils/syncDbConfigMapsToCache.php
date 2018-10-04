@@ -15,29 +15,30 @@ if(!isset($cacheConfigParams))
 	die("\nRemote cache cofiguration is no accessible");
 
 $cache = new kMemcacheCacheWrapper;
-if(!$cache->init(array('host'=>$cacheConfigParams['kRemoteMemCacheConf']['host'],
-	'port'=>$cacheConfigParams['kRemoteMemCacheConf']['port'])))
-	die ("Fail to connect to cache host {$cacheConfigParams['kRemoteMemCacheConf']['host']} port {$cacheConfigParams['kRemoteMemCacheConf']['port']} ");
+if(!$cache->init(array('host'=>$cacheConfigParams['remoteMemCacheConf']['host'],
+	'port'=>$cacheConfigParams['remoteMemCacheConf']['port'])))
+	die ("Fail to connect to cache host {$cacheConfigParams['remoteMemCacheConf']['host']} port {$cacheConfigParams['remoteMemCacheConf']['port']} ");
 $mapListInCache = $cache->get(kRemoteMemCacheConf::MAP_LIST_KEY);
 
+$dbConnection = getPdoConnection();
 //Find all exsiting map names in DB
-$cmdLine = 'mysql -u'.$dbUserName.' -p'.$dbPasssword.' kaltura -e "select map_name , host_name from conf_maps where status=1 group by map_name,host_name;"';
-echo "executing: {$cmdLine}\n";
-exec($cmdLine, $output);
-$mapNames = array();
-for($i = 1 ; $i < count($output) ; $i++)
+$cmdLine = 'select map_name , host_name from conf_maps where status=1 group by map_name,host_name;';
+$mapsInfo = query($dbConnection,$cmdLine);
+foreach($mapsInfo as $mapInfo)
 {
-	$mapInfo = $output[$i];
-	$mapInfoArr = explode("\t", $mapInfo);
-	$rawMapName = $mapInfoArr[0];
-	$hostNameFilter = isset($mapInfoArr[1]) ?  $mapInfoArr[1] : '';
+	$rawMapName =$mapInfo['map_name'];
+	if(trim($rawMapName)=='')
+	{
+		continue;
+	}
+	$hostNameFilter = $mapInfo['host_name'];
 	//get the latest version of this map
-	$cmdLine = 'mysql -u'.$dbUserName.' -p'.$dbPasssword.' kaltura -e "select version,content from conf_maps where conf_maps.map_name=\''.$rawMapName.'\' and conf_maps.host_name=\''.$hostNameFilter.'\' and status=1 order by version desc limit 1 ;"';
-	echo "executing: {$cmdLine}\n";
-	$output2=array();
-	exec($cmdLine, $output2);
+	$cmdLine = "select version,content from conf_maps where conf_maps.map_name='$rawMapName' and conf_maps.host_name='$hostNameFilter' and status=1 order by version desc limit 1 ;";
+
+	$output2 = query($dbConnection,$cmdLine);
 	$mapName = $rawMapName.'_'.$hostNameFilter;
-	list($version, $content) = explode("\t", $output2[1]);
+	$version = $output2[0]['version'];
+	$content = $output2[0]['content'];
 	if(!isset($mapListInCache[$mapName]))
 		echo("\nMap {$mapName} not found in map list in cache\n");
 	//check if need to update version
@@ -60,3 +61,27 @@ if($ret)
 	echo("\nKey - {$chacheKey} was added to cache successfully\n");
 else
 	die("\nFailed inserting key to cache\n");
+
+function getPdoConnection()
+{
+	$dbMap = kConf::getMap('db');
+	if(!$dbMap)
+	{
+		die('Cannot get db.ini map from configuration!');
+	}
+	$defaultSource = $dbMap['datasources']['default'];
+	$dbConfig = $dbMap['datasources'][$defaultSource]['connection'];
+	$dsn = $dbConfig['dsn'];
+	$user = $dbConfig['user'];
+	$password = $dbConfig['password'];
+	$connection = new PDO($dsn, $user, $password);
+	return $connection;
+}
+function query($dbConnection,$commandLine)
+{
+	echo "executing: {$commandLine}\n";
+	$statement = $dbConnection->query($commandLine);
+	$output1 = $statement->fetchAll();
+	var_dump($output1);
+	return $output1;
+}
