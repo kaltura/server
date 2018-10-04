@@ -1,4 +1,6 @@
 <?php
+/** @noinspection PhpParamsInspection */
+/** @noinspection PhpUndefinedMethodInspection */
 
 require_once(__DIR__ . '/../bootstrap.php');
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
@@ -35,6 +37,9 @@ $partnerId = $argv[1];
 
 
 $partner = PartnerPeer::retrieveByPK($partnerId);
+
+if (in_array($newSecret, $partner->getEnabledAdditionalAdminSecrets(), true) || $newSecret === $partner->getAdminSecret())
+	die('Error ' . $newSecret . ' Already Exist, if you want to set it as primary please use setPrimarySecret script' . PHP_EOL);
 
 //in case we need to replace primary admin secret
 if ($replacePrimaryAdminSecret)
