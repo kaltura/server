@@ -255,7 +255,9 @@ class ZoomHelper
 				}
 			}
 			return $headers;
-		} else {
+		}
+		else
+		{
 			return getallheaders();
 		}
 	}

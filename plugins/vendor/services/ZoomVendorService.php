@@ -59,7 +59,7 @@ class ZoomVendorService extends KalturaBaseService
 		else
 		{
 			list($tokens, $permissions) = ZoomWrapper::retrieveZoomDataAsArray(ZoomHelper::API_USERS_ME_PERMISSIONS, true);
-			list(, $user) =  ZoomWrapper::retrieveZoomDataAsArray(ZoomHelper::API_USERS_ME, false, $tokens, null);
+			list(, $user) = ZoomWrapper::retrieveZoomDataAsArray(ZoomHelper::API_USERS_ME, false, $tokens, null);
 			$accountId = $user[ZoomHelper::ACCOUNT_ID];
 			$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 			if ($zoomIntegration && $zoomIntegration->getStatus() === VendorStatus::DELETED)
