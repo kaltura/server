@@ -49,7 +49,7 @@ $cmdLine = "insert into conf_maps (map_name,host_name,status,version,created_at,
 $ret = execute($dbConnection,$cmdLine);
 if(!$ret)
 {
-	die("Insert new document to DB failed.");
+	die('Insert new document to DB failed.');
 }
 
 function getPdoConnection()
