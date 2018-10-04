@@ -2039,19 +2039,23 @@ class kKavaReportsMgr extends kKavaBase
 			);
 		}
 
-		if ($input_filter->categoriesIds)
-		{
-			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_CATEGORIES,
-				self::DRUID_VALUES => explode(',', $input_filter->categoriesIds)
-			);
-		}
+		$field_dim_map = array(
+			'categoriesIds' => self::DIMENSION_CATEGORIES,
+			'countries' => self::DIMENSION_LOCATION_COUNTRY,
+			'custom_var1' => self::DIMENSION_CUSTOM_VAR1,
+		);
 
-		if ($input_filter->countries)
+		foreach ($field_dim_map as $field => $dimension)
 		{
+			$value = $input_filter->$field;
+			if (!$value)
+			{
+				continue;
+			}
+
 			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_LOCATION_COUNTRY,
-				self::DRUID_VALUES => explode(',', $input_filter->countries)
+				self::DRUID_DIMENSION => $dimension,
+				self::DRUID_VALUES => explode(',', $value)
 			);
 		}
 

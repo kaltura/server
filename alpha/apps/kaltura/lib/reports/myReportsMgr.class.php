@@ -1503,6 +1503,7 @@ class reportsInputFilter
 	public $extra_map;
 	public $categories;
 	public $categoriesIds;
+	public $custom_var1;
 	public $timeZoneOffset;
 	public $interval;
 	public $countries;
