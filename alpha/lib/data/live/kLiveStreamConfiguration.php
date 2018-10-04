@@ -121,7 +121,7 @@ class kLiveStreamConfiguration
 	}
 	
 	public function getPrimaryStreamInfo() {
-		return $this->primaryStreamInfo;
+		return $this->primaryStreamInfo ? $this->primaryStreamInfo : array();
 	}
 	
 	public function setBackupStreamInfo($v) {
@@ -129,6 +129,6 @@ class kLiveStreamConfiguration
 	}
 	
 	public function getBackupStreamInfo() {
-		return $this->backupStreamInfo;
+		return $this->backupStreamInfo ? $this->backupStreamInfo : array();
 	}
 }
