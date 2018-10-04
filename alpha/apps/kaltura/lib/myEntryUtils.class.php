@@ -4,7 +4,6 @@ class myEntryUtils
 {
 
 	const TEMP_FILE_POSTFIX = "temp_1.jpg";
-	const VOLUME_MAP_POSTFIX = "/volume_map.csv";
 	const MP4_FILENAME_PARAMETER = "/name/a.mp4";
 	const DEFAULT_THUMB_SEC_LIVE = 1;
 
@@ -1014,17 +1013,23 @@ class myEntryUtils
 		$isPlayList = in_array($entry->getType(), $mappedThumbEntryTypes);
 		if($isPlayList)
 		{
-			$entry = myPlaylistUtils::getFirstEntryFromPlaylist($entry);
-			if (!$entry)
+			$firstEntry = myPlaylistUtils::getFirstEntryFromPlaylist($entry);
+			if (!$firstEntry)
 			{
 				return false;
 			}
+			$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($firstEntry->getId());
 		}
-		$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($entry->getId());
+		else
+		{
+			$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($entry->getId());
+		}
+
 		if(!$flavorAsset)
 		{
 			return false;
 		}
+
 		if ($isPlayList || $flavorAsset->getEncryptionKey())
 		{
 			return self::captureMappedThumbUsingPackager($entry, $flavorAsset, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
@@ -1079,7 +1084,7 @@ class myEntryUtils
 	}
 
 
-	private static function buildThumbUrl($entry, $flavorAsset)
+	protected static function buildThumbUrl($entry, $flavorAsset)
 	{
 		$partnerId = $flavorAsset->getPartnerId();
 		$subpId = $entry->getSubpId();
@@ -1171,7 +1176,7 @@ class myEntryUtils
 		return true;
 	}
 
-	public static function captureLocalThumbUsingPackager($flavorAsset, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width, $height)
+	protected static function captureLocalThumbUsingPackager($flavorAsset, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width, $height)
 	{
 		$packagerCaptureUrl = kConf::get('packager_local_thumb_capture_url', 'local', null);
 		if (!$packagerCaptureUrl)
@@ -2158,17 +2163,23 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	{
 		$packagerVolumeMapUrlPattern = kConf::get('packager_mapped_volume_map_url', 'local', null);
 		if (!$packagerVolumeMapUrlPattern)
+		{
 			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
+		}
 
 		$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
 		if (!$entry)
+		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND);
+		}
 
 		$volumeMapUrl = self::buildVolumeMapPath($entry, $flavorAsset);
 
 		$content = self::curlVolumeMapUrl($volumeMapUrl, $packagerVolumeMapUrlPattern);
 		if(!$content)
+		{
 			return false;
+		}
 
 		return $content;
 	}
@@ -2229,7 +2240,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$url .= ($entryVersion ? "/v/$entryVersion" : '');
 		$url .= "/flavorId/".$flavorAsset->getId();
 		$url .= self::MP4_FILENAME_PARAMETER;
-		$url .= self::VOLUME_MAP_POSTFIX;
 		return $url;
 	}
 }
