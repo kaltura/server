@@ -20,6 +20,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	const CATALOG_ITEM_INDEX_TURN_AROUND_TIME = 'citat';
 	const CATALOG_ITEM_INDEX_SERVICE_FEATURE = 'cisf';
 	const CATALOG_ITEM_INDEX_LANGUAGE = 'cil';
+	const CATALOG_ITEM_INDEX_TARGET_LANGUAGE = 'citl';
 	
 	/**
 	 * return field name as appears in index schema
@@ -290,6 +291,8 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		$data .= " " . self::CATALOG_ITEM_INDEX_SERVICE_FEATURE . $catalogItem->getServiceFeature();
 		$data .= " " . self::CATALOG_ITEM_INDEX_TURN_AROUND_TIME . $catalogItem->getTurnAroundTime();
 		$data .= " " . self::CATALOG_ITEM_INDEX_LANGUAGE . $catalogItem->getSourceLanguage();
+		if($catalogItem->getTargetLanguage())
+			$data .= " " . self::CATALOG_ITEM_INDEX_TARGET_LANGUAGE . $catalogItem->getTargetLanguage();
 		
 		$data .= " " . self::CATALOG_ITEM_INDEX_SUFFIX . $partnerId;
 		
