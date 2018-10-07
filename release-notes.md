@@ -1,5 +1,16 @@
 # Naos 14.6.0 #
 
+## Support volume map and thumb serving with encrypted at rest ##
+- Issue Type: Task
+- Issue ID: PLAT-9262
+
+### Configuration ###
+	Add to local.ini after replacing the pacth-holders of VOD_PACKAGER_HOST and VOD_PACKAGER_PORT: 
+	packager_mapped_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/mappedthumb/{url}/volume_map.csv
+
+#### Deployment Scripts ####
+	None
+
 ## Support filtering entryVendorTasks based on VendorCaptionsCatalogItem target language value ##
 - Issue Type: New Feature
 - Issue ID: PLAT-8950
