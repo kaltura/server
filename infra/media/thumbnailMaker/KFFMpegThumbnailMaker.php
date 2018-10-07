@@ -95,7 +95,7 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		if (isset($params['encryption_key']))
 		{
 			$decryptionKey = bin2hex(base64_decode($params['encryption_key']));
-			$command .= " -decryption_key " . $decryptionKey;
+			$command .= ' -decryption_key ' . $decryptionKey;
 		}
 
 		$cmdArr[] = "$command $position_str -noautorotate -i $this->srcPath -an$scanType -y -r 1 $dimensions -vframes $frameCount -f $targetType $position_str_suffix" .

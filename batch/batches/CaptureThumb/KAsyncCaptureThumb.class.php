@@ -84,7 +84,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 				$params['dar'] = $mediaInfoDar;
 				$params['vidDur'] = $mediaInfoVidDur;
 				$params['scanType'] = $mediaInfoScanType;
-				$params['decryption_key']= $data->srcAssetEncryptionKey;
+				$params['encryption_key']= $data->srcAssetEncryptionKey;
 
 				$created = $thumbMaker->createThumnail($videoOffset, $mediaInfoWidth, $mediaInfoHeight, $params);
 				if(!$created || !file_exists($capturePath))
