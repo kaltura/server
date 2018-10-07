@@ -40,6 +40,11 @@ class KalturaCatalogItemAdvancedFilter extends KalturaSearchItem
 	 */
 	public $sourceLanguageEqual;
 	
+	/**
+	 * @var KalturaCatalogItemLanguage
+	 */
+	public $targetLanguageEqual;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -50,6 +55,7 @@ class KalturaCatalogItemAdvancedFilter extends KalturaSearchItem
 		'turnAroundTimeEqual',
 		'turnAroundTimeIn',
 		'sourceLanguageEqual',
+		'targetLanguageEqual',
 	);
 	
 	/* (non-PHPdoc)
