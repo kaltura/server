@@ -96,9 +96,11 @@ class kKavaBase extends kDruidBase
 	
 	// params
 	const VOD_ALLOWED_PARTNERS = "kava_vod_partners";
+	const VOD_DISABLED_PARTNERS = "disabled_kava_vod_partners";
 	const LIVE_ALLOWED_PARTNERS = "kava_live_partners";
-	const DISABLED_PARTNERS_PREFIX = "disabled_";
-	
+	const LIVE_DISABLED_PARTNERS = "disabled_kava_live_partners";
+
+
 	// media types
 	const MEDIA_TYPE_VIDEO = 'Video';
 	const MEDIA_TYPE_AUDIO = 'Audio';
@@ -111,11 +113,9 @@ class kKavaBase extends kDruidBase
 
 	public static function isPartnerAllowed($partnerId, $serviceType) {
 	    if (kConf::hasParam(self::DRUID_URL)) {
-		if (kConf::hasParam(self::DISABLED_PARTNERS_PREFIX . $serviceType) && in_array($partnerId, self::DISABLED_PARTNERS_PREFIX . $serviceType ))
-			return false;
-	        if (!kConf::hasParam($serviceType))
-	            return true;
-	        return in_array($partnerId, kConf::get($serviceType));
+		if (!kConf::hasParam($serviceType))
+			return true;
+		return !in_array($partnerId, kConf::get($serviceType));
 	    }
 	    return false;
 	}

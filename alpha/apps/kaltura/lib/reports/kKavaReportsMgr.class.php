@@ -1666,7 +1666,7 @@ class kKavaReportsMgr extends kKavaBase
 	    }
 	    
 	    if (in_array($report_type, self::$kava_enabled_reports) && 
-	    	kKavaBase::isPartnerAllowed($partner_id, kKavaBase::VOD_ALLOWED_PARTNERS))
+	    	kKavaBase::isPartnerAllowed($partner_id, kKavaBase::VOD_DISABLED_PARTNERS))
 	    {
 	        return true;
 	    }
