@@ -185,6 +185,8 @@ class ZoomHelper
 	 */
 	public static function extractDataFromRecordingCompletePayload($data)
 	{
+		KalturaLog::debug('recordingcomplete data recived from zoom:');
+		KalturaLog::debug(print_r($data, true));
 		$payload = $data[self::PAYLOAD];
 		$accountId = $payload[self::ACCOUNT_ID];
 		$downloadToken = $payload[self::DOWNLOAD_TOKEN];

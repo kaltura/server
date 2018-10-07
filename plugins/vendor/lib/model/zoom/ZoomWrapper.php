@@ -61,7 +61,7 @@ class ZoomWrapper
 	private static function handelCurlResponse(&$response, $httpCode, $curlWrapper, $accountId, $tokens, $apiPath)
 	{
 		//access token invalid and need to be refreshed
-		if (($httpCode === 400 || $httpCode === 401) && $accountId)
+		if ($httpCode === 401 && $accountId)
 		{
 			KalturaLog::err("Zoom Curl returned  $httpCode, with massage: {$response} " . $curlWrapper->getError());
 			/** @var ZoomVendorIntegration $zoomClientData */
@@ -72,6 +72,14 @@ class ZoomWrapper
 			}
 			$zoomAuth = new kZoomOauth();
 			return array($zoomAuth->refreshTokens($zoomClientData->getRefreshToken(), $zoomClientData), true);
+		}
+		// Sometimes we get  response 400, with massage: {"code":1010,"message":"User not belong to this account}
+		//in this case do not refresh tokens, they are valid --> return null
+		if ($httpCode === 400 && strpos($response, '1010') !== false)
+		{
+			KalturaLog::err(print_r($response, true));
+			$response = null;
+			return array($tokens, false);
 		}
 		//could Not find meeting -> zoom bug
 		if ($httpCode === 404 && (strpos($apiPath, 'participants') !== false))
