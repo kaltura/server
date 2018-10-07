@@ -26,7 +26,7 @@ class kFlowHelper
 	 * @param string $msg
 	 * @return flavorAsset
 	 */
-	public static function createOriginalFlavorAsset($partnerId, $entryId, &$msg = null, $encryptionKey = null)
+	public static function createOriginalFlavorAsset($partnerId, $entryId, &$msg = null)
 	{
 		$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if ($flavorAsset)
@@ -48,11 +48,6 @@ class kFlowHelper
 		$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
 		$flavorAsset->setPartnerId($partnerId);
 		$flavorAsset->setEntryId($entryId);
-
-		if ($encryptionKey)
-		{
-			$flavorAsset->setEncryptionKey($encryptionKey);
-		}
 
 		$flavorAsset->save();
 

@@ -45,7 +45,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param null $encryptionKey
 	 * @param int $priority
 	 */
-	public function createParentBatchJob($sourceEntryId,$clipEntry, $destEntry, $partnerId, array $operationAttributes, $encryptionKey = null, $priority = 0)
+	public function createParentBatchJob($sourceEntryId,$clipEntry, $destEntry, $partnerId, array $operationAttributes, $priority = 0)
 	{
 		$parentJob = new BatchJob();
 		$parentJob->setPartnerId($partnerId);
@@ -58,10 +58,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$jobData->setSourceEntryId($sourceEntryId);
 		$jobData->setPartnerId($partnerId);
 		$jobData->setPriority($priority);
-		if($encryptionKey)
-		{
-			$jobData->setIsEncrypted(true);
-		}
 
 		$jobData->setOperationAttributes($operationAttributes);
 
@@ -128,28 +124,32 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param $operationAttributes
 	 * @param $clipEntry
 	 */
-	public function startBatchJob($resource, entry $dbEntry, $operationAttributes, $clipEntry, $encryptionKey)
+	public function startBatchJob($resource, entry $dbEntry, $operationAttributes, $clipEntry)
 	{
 		$internalResource = $resource->getResource();
 		if ($internalResource instanceof kFileSyncResource && $internalResource->getOriginEntryId()) {
-			$this->createParentBatchJob($internalResource->getOriginEntryId(), $clipEntry, $dbEntry, $dbEntry->getPartnerId(), $operationAttributes, $encryptionKey);
+			$this->createParentBatchJob($internalResource->getOriginEntryId(), $clipEntry, $dbEntry, $dbEntry->getPartnerId(), $operationAttributes);
 		} else {
-			$this->createParentBatchJob(null, $clipEntry, $dbEntry, $dbEntry->getPartnerId(), $operationAttributes, $encryptionKey);
+			$this->createParentBatchJob(null, $clipEntry, $dbEntry, $dbEntry->getPartnerId(), $operationAttributes);
 		}
 	}
 
 	/***
 	 * @param kClipAttributes $singleAttribute
 	 * @param string $originalConversionEnginesExtraParams
+	 * @param string $encryptionKey
 	 * @return int
 	 * @throws kCoreException
 	 */
-	private function cloneFlavorParam($singleAttribute, $originalConversionEnginesExtraParams, $isEncrypted = false)
+	private function cloneFlavorParam($singleAttribute, $originalConversionEnginesExtraParams, $encryptionKey = null)
 	{
 		$flavorParamsObj = assetParamsPeer::getTempAssetParamByPk(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
 		$flavorParamsObj->setFormat(flavorParams::CONTAINER_FORMAT_MPEGTS);
 		$this->fixConversionParam($flavorParamsObj, $singleAttribute, $originalConversionEnginesExtraParams);
-		$flavorParamsObj->setIsEncrypted($isEncrypted);
+		if ($encryptionKey)
+		{
+			$flavorParamsObj->setIsEncrypted(true);
+		}
 		assetParamsPeer::addInstanceToPool($flavorParamsObj);
 		return $flavorParamsObj->getId();
 	}
@@ -272,7 +272,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				$jobData = $batchJob->getData();
 				$this->addClipJobs($batchJob, $jobData->getTempEntryId(), $errDesc,
 					$jobData->getPartnerId(),
-					$jobData->getOperationAttributes(), $jobData->getIsEncrypted(), $jobData->getPriority());
+					$jobData->getOperationAttributes(), $jobData->getPriority());
 				kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_PROCESSING);
 				break;
 
@@ -293,16 +293,24 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @throws kCoreException
 	 */
 	private function addClipJobs($parentJob , $entryId, &$errDescription, $partnerId,
-	                             array $operationAttributes, $isEncrypted = false, $priority = 0)
+	                             array $operationAttributes, $priority = 0)
 	{
 		$batchArray = array();
 		$order = 0;
 		$originalConversionEnginesExtraParams =
 			assetParamsPeer::retrieveByPK(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID)->getConversionEnginesExtraParams();
+
+		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
+		$encryptionKey = null;
+		if ($originalFlavorAsset)
+		{
+			$encryptionKey = $originalFlavorAsset->getEncryptionKey();
+		}
+
 		foreach($operationAttributes as $singleAttribute)
 		{
 			KalturaLog::info("Going To create Flavor for clip: " . print_r($singleAttribute));
-			$clonedID =	$this->cloneFlavorParam($singleAttribute, $originalConversionEnginesExtraParams, $isEncrypted);
+			$clonedID =	$this->cloneFlavorParam($singleAttribute, $originalConversionEnginesExtraParams, $encryptionKey);
 			$flavorAsst = $this->createTempClipFlavorAsset($partnerId,$entryId,$clonedID,$order);
 			$batchJob =	kBusinessPreConvertDL::decideAddEntryFlavor($parentJob, $entryId,
 					$clonedID, $errDescription,$flavorAsst->getId()

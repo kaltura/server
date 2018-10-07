@@ -247,7 +247,7 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		
 		$srcSyncKey = $syncable->getSyncKey($resource->getObjectSubType(), $resource->getVersion());
-		$dbAsset = $this->attachFileSync($srcSyncKey, $dbEntry, $dbAsset);
+		$dbAsset = $this->attachFileSync($srcSyncKey, $dbEntry, $dbAsset,$syncable->getEncryptionKey());
 		
 		//In case the target entry's media type is image no asset is created and the image is set on a entry level file sync
 		if(!$dbAsset && $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
@@ -273,7 +273,38 @@ class KalturaEntryService extends KalturaBaseService
 		
 		return $dbAsset;
 	}
-	
+
+	/***
+	 * @param $dbEntry
+	 * @return bool
+	 */
+	protected function getEncryptionKey($dbEntry)
+	{
+		if (!$dbEntry)
+		{
+			return null;
+		}
+
+		if ($dbEntry->getIsTemporary())
+		{
+			$replacedEntryId = $dbEntry->getReplacedEntryId();
+			if ($replacedEntryId)
+			{
+				$replacedEntryOriginalflavorAsset = assetPeer::retrieveOriginalByEntryId($replacedEntryId);
+				if ($replacedEntryOriginalflavorAsset)
+				{
+					$encKey = $replacedEntryOriginalflavorAsset->getEncryptionKey();
+					if ($encKey)
+					{
+						return $encKey;
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
 	/**
 	 * @param kLiveEntryResource $resource
 	 * @param entry $dbEntry
@@ -605,10 +636,11 @@ class KalturaEntryService extends KalturaBaseService
 	 * @param FileSyncKey $srcSyncKey
 	 * @param entry $dbEntry
 	 * @param asset $dbAsset
+	 * @param string $encryptionKey
 	 * @return asset
 	 * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
 	 */
-	protected function attachFileSync(FileSyncKey $srcSyncKey, entry $dbEntry, asset $dbAsset = null)
+	protected function attachFileSync(FileSyncKey $srcSyncKey, entry $dbEntry, asset $dbAsset = null, $encryptionKey = null)
 	{
 		// TODO - move image handling to media service
 		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
@@ -627,6 +659,7 @@ class KalturaEntryService extends KalturaBaseService
 	  	{
 	  		$isNewAsset = true;
 			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
+
 	  	}
 	  	
 		if(!$dbAsset)
@@ -641,9 +674,12 @@ class KalturaEntryService extends KalturaBaseService
 			
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED);
 		}
-				
+
 		$newSyncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
+
+		if ($encryptionKey)
+			$dbAsset->setEncryptionKey($encryptionKey);
 
 		if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
@@ -666,16 +702,12 @@ class KalturaEntryService extends KalturaBaseService
 		$srcEntry = self::getEntryFromContentResource($resource->getResource());
 		$isLiveClippingFlow = $srcEntry && myEntryUtils::isLiveClippingEntry($srcEntry);
 		$isMultiClipFlow = kClipManager::isMultipleClipOperation($operationAttributes);
-
 		if ($isLiveClippingFlow && $isMultiClipFlow)
 			throw new KalturaAPIException(KalturaErrors::LIVE_CLIPPING_UNSUPPORTED_OPERATION, "MultiClip");
-
-		$encryptionKey = $this->getEncryptionKey($dbEntry);
-
 		if ($isMultiClipFlow)
 		{
 			$clipManager = new kClipManager();
-			$this->handleMultiClipRequest($resource,$dbEntry, $clipManager, $operationAttributes, $encryptionKey);
+			$this->handleMultiClipRequest($resource,$dbEntry, $clipManager, $operationAttributes);
 			return $dbAsset;
 		}
 		if ($isLiveClippingFlow)
@@ -699,7 +731,7 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			$isNewAsset = true;
 			$isSource = true;
-			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId(),$msg, $encryptionKey);
+			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId(),$msg);
 		}
 
 		if(!$dbAsset && $dbEntry->getStatus() == entryStatus::NO_CONTENT)
@@ -742,37 +774,6 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		
 		return $dbAsset;
-	}
-
-	/***
-	 * @param $dbEntry
-	 * @return bool
-	 */
-	private function getEncryptionKey($dbEntry)
-	{
-		if (!$dbEntry)
-		{
-			return null;
-		}
-
-		if ($dbEntry->getIsTemporary())
-		{
-			$replacingEntryId = $dbEntry->getReplacedEntryId();
-			if ($replacingEntryId)
-			{
-				$replacingEntryOriginalflavorAsset = assetPeer::retrieveOriginalByEntryId($replacingEntryId);
-				if ($replacingEntryOriginalflavorAsset)
-				{
-					$encKey = $replacingEntryOriginalflavorAsset->getEncryptionKey();
-					if ($encKey)
-					{
-						return $encKey;
-					}
-				}
-			}
-		}
-
-		return null;
 	}
 
 	protected function handleLiveClippingFlow($recordedEntry, $clippedEntry, $operationAttributes)
@@ -1922,18 +1923,17 @@ class KalturaEntryService extends KalturaBaseService
 	 * @param kOperationResource $resource
 	 * @param entry $dbEntry
 	 * @param kClipManager $clipManager
-	 * @param $operationAttributes
 	 * @return asset
 	 * @throws Exception
 	 * @throws KalturaErrors
 	 */
-	protected function handleMultiClipRequest($resource, entry $dbEntry, $clipManager, $operationAttributes, $encryptionKey = null)
+	protected function handleMultiClipRequest($resource, entry $dbEntry, $clipManager, $operationAttributes)
 	{
 		KalturaLog::info("clipping service detected start to create sub flavors;");
 		$clipEntry = $clipManager->createTempEntryForClip($this->getPartnerId());
-		$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId(), $msg, $encryptionKey);
+		$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId(), $msg);
 		$dbAsset = $this->attachResource($resource->getResource(), $clipEntry, $clipDummySourceAsset);
-		$clipManager->startBatchJob($resource, $dbEntry,$operationAttributes, $clipEntry, $encryptionKey);
+		$clipManager->startBatchJob($resource, $dbEntry,$operationAttributes, $clipEntry);
 		return $dbAsset;
 	}
 
