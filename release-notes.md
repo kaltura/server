@@ -49,6 +49,15 @@
     Run deployment script:
         php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_09_06_server_node_getServerNodePath.php
 
+## limit reset password attempts to avoid flooding ##
+- Issue Type: Bug
+- Issue ID: PLAT-8342
+
+### Configuration ###
+	Add to cache.ini mapping for resourceReservation for example: resourceReservation = memcacheGlobal
+
+#### Deployment Scripts ####
+	None.
 
 
 # Naos 14.4.0 #

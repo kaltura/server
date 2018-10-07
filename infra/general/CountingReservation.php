@@ -5,7 +5,7 @@
 
 class CountingReservation
 {
-	CONST DEFAULT_TIME_IN_CACHE_FOR_RESERVATION = 300;
+	const DEFAULT_TIME_IN_CACHE_FOR_RESERVATION = 300;
 
 	/**
 	 * @var kBaseCacheWrapper $cache
@@ -61,13 +61,13 @@ class CountingReservation
 			}
 			else
 			{
-				$this->storeResourceInCache($resourceId, $cacheCounter);
+				$this->storeResourceInCache($resourceId);
 			}
 		}
 		else
 		{
 			KalturaLog::info("Resource id [$resourceId] is not stored. Adding with counter value: [$this->maxValue]");
-			$this->storeResourceInCache($resourceId, $this->maxValue);
+			$this->storeResourceInCache($resourceId);
 		}
 		return true;
 	}
@@ -78,14 +78,14 @@ class CountingReservation
 	 * @param int $cacheCounter
 	 * @return bool
 	 */
-	private function storeResourceInCache ($resourceId, $cacheCounter)
+	private function storeResourceInCache($resourceId)
 	{
 		$key = $this->getCacheKeyForResource($resourceId);
-		if ($this->cache->add($key, $cacheCounter, $this->ttl))
+		if ($this->cache->add($key, $this->maxValue, $this->ttl))
 		{
 			return true;
 		}
-		if ($this->cache->set($key, $cacheCounter, $this->ttl))
+		if ($this->cache->decrement($key, 1))
 		{
 			return true;
 		}
