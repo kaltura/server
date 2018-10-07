@@ -47,22 +47,8 @@ class accessControl extends BaseaccessControl implements IBaseObject
 
 		if ($this->isColumnModified(accessControlPeer::RULES))
 		{
-			$rules = $this->getRulesArray();
-			$hasKESRule = false;
-			foreach($rules as $rule)
-			{
-				/* @var $rule kRule */
-				$actions = $rule->getActions();
-				foreach ($actions as $action)
-				{
-					/* @var kRuleAction $action */
-					if ($action->getType() == RuleActionType::SERVE_FROM_REMOTE_SERVER)
-					{
-						$hasKESRule = true;
-					}
-				}
-			}
-			$this->putInCustomData(self::CUSTOM_DATA_HAS_KES_RULE, $hasKESRule);
+			$hasKESRule = $this->calculateHasKESRule();
+			$this->setHasKES($hasKESRule);
 		}
 
 		return parent::preSave($con);
@@ -180,7 +166,16 @@ class accessControl extends BaseaccessControl implements IBaseObject
 
 	public function hasKESRule()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_HAS_KES_RULE, null, false);
+		$hasKes = $this->getHasKES();
+		if (is_null($hasKes))
+		{
+			$hasKes = $this->calculateHasKESRule();
+			$this->setHasKES($hasKes);
+			$this->save();
+		}
+		return $hasKes;
+
+
 	}
 
 	/**
@@ -334,5 +329,38 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	public function getCacheInvalidationKeys()
 	{
 		return array("accessControl:id=".strtolower($this->getId()));
+	}
+
+	public function getHasKES()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_HAS_KES_RULE);
+	}
+
+	public function setHasKES($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_HAS_KES_RULE, $v);
+	}
+
+	/**
+	 * @return bool
+	 */
+	protected function calculateHasKESRule(): bool
+	{
+		$rules = $this->getRulesArray();
+		$hasKESRule = false;
+		foreach ($rules as $rule)
+		{
+			/* @var $rule kRule */
+			$actions = $rule->getActions();
+			foreach ($actions as $action)
+			{
+				/* @var kRuleAction $action */
+				if ($action->getType() == RuleActionType::SERVE_FROM_REMOTE_SERVER)
+				{
+					$hasKESRule = true;
+				}
+			}
+		}
+		return $hasKESRule;
 	}
 }
