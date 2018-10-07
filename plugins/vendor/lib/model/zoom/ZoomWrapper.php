@@ -63,7 +63,7 @@ class ZoomWrapper
 		//access token invalid and need to be refreshed
 		if ($httpCode === 401 && $accountId)
 		{
-			KalturaLog::err("Zoom Curl returned  $httpCode, with massage: {$response} " . $curlWrapper->getError());
+			KalturaLog::warning("Zoom Curl returned  $httpCode, with massage: {$response} " . $curlWrapper->getError());
 			/** @var ZoomVendorIntegration $zoomClientData */
 			$zoomClientData = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 			if (!$zoomClientData)
@@ -77,7 +77,7 @@ class ZoomWrapper
 		//in this case do not refresh tokens, they are valid --> return null
 		if ($httpCode === 400 && strpos($response, '1010') !== false)
 		{
-			KalturaLog::err(print_r($response, true));
+			KalturaLog::warning("Zoom Curl returned  $httpCode, with massage: {$response} " . $curlWrapper->getError());
 			$response = null;
 			return array($tokens, false);
 		}
