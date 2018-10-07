@@ -1,5 +1,17 @@
 # Naos 14.6.0 #
 
+## Support filtering entryVendorTasks based on VendorCaptionsCatalogItem target language value ##
+- Issue Type: New Feature
+- Issue ID: PLAT-8950
+
+### Configuration ###
+	None.
+
+#### Deployment Scripts ####
+
+	Re-Index entryVendorTask sphinx table:
+	php opt/kaltura/app/deployment/base/scripts/populateSphinxEntryVendorTasks.php
+
 ## Improve group user sync + move group user sync action to GroupUserService ##
 - Issue Type: Task
 - Issue ID: PLAT-9237
