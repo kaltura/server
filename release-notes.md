@@ -6,7 +6,7 @@
 
 ### Configuration ###
 	Add to local.ini after replacing the pacth-holders of VOD_PACKAGER_HOST and VOD_PACKAGER_PORT: 
-	packager_mapped_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/mappedthumb/{url}/volume_map.csv
+	packager_mapped_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/mappedvolume/{url}/volume_map.csv
 
 #### Deployment Scripts ####
 	None
