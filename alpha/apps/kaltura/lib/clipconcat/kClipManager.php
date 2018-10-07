@@ -37,12 +37,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	}
 
 	/**
-	 * @param $sourceEntryId
-	 * @param $clipEntry
-	 * @param $destEntry
+	 * @param string $sourceEntryId
+	 * @param entry $clipEntry
+	 * @param entry $destEntry
 	 * @param $partnerId
 	 * @param array $operationAttributes
-	 * @param null $encryptionKey
 	 * @param int $priority
 	 */
 	public function createParentBatchJob($sourceEntryId,$clipEntry, $destEntry, $partnerId, array $operationAttributes, $priority = 0)

@@ -1920,12 +1920,12 @@ class KalturaEntryService extends KalturaBaseService
 	}
 
 	/**
-	 * @param kOperationResource $resource
+	 * @param $resource
 	 * @param entry $dbEntry
-	 * @param kClipManager $clipManager
+	 * @param $clipManager
+	 * @param $operationAttributes
 	 * @return asset
-	 * @throws Exception
-	 * @throws KalturaErrors
+	 * @throws KalturaAPIException
 	 */
 	protected function handleMultiClipRequest($resource, entry $dbEntry, $clipManager, $operationAttributes)
 	{
