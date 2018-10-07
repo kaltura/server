@@ -247,7 +247,7 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		
 		$srcSyncKey = $syncable->getSyncKey($resource->getObjectSubType(), $resource->getVersion());
-		$dbAsset = $this->attachFileSync($srcSyncKey, $dbEntry, $dbAsset,$syncable->getEncryptionKey());
+		$dbAsset = $this->attachFileSync($srcSyncKey, $dbEntry, $dbAsset, $syncable->getEncryptionKey());
 		
 		//In case the target entry's media type is image no asset is created and the image is set on a entry level file sync
 		if(!$dbAsset && $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
@@ -272,37 +272,6 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		
 		return $dbAsset;
-	}
-
-	/***
-	 * @param $dbEntry
-	 * @return bool
-	 */
-	protected function getEncryptionKey($dbEntry)
-	{
-		if (!$dbEntry)
-		{
-			return null;
-		}
-
-		if ($dbEntry->getIsTemporary())
-		{
-			$replacedEntryId = $dbEntry->getReplacedEntryId();
-			if ($replacedEntryId)
-			{
-				$replacedEntryOriginalflavorAsset = assetPeer::retrieveOriginalByEntryId($replacedEntryId);
-				if ($replacedEntryOriginalflavorAsset)
-				{
-					$encKey = $replacedEntryOriginalflavorAsset->getEncryptionKey();
-					if ($encKey)
-					{
-						return $encKey;
-					}
-				}
-			}
-		}
-
-		return null;
 	}
 
 	/**
@@ -679,7 +648,9 @@ class KalturaEntryService extends KalturaBaseService
 		kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
 
 		if ($encryptionKey)
+		{
 			$dbAsset->setEncryptionKey($encryptionKey);
+		}
 
 		if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
@@ -731,7 +702,7 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			$isNewAsset = true;
 			$isSource = true;
-			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId(),$msg);
+			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId(), $msg);
 		}
 
 		if(!$dbAsset && $dbEntry->getStatus() == entryStatus::NO_CONTENT)

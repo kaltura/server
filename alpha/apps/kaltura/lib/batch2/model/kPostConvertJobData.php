@@ -79,7 +79,7 @@ class kPostConvertJobData extends kConvartableJobData
 	}
 
 	/**
-	 * @param $encryptionKey the $flavorAssetEncryptionKey to set
+	 * @param $encryptionKey
 	 */
 	public function setFlavorAssetEncryptionKey($encryptionKey)
 	{

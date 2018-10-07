@@ -45,7 +45,7 @@ class KalturaClipConcatJobData extends KalturaJobData
 		'partnerId',
 		'priority',
 		'operationAttributes',
-		'sourceEntryId',
+		'sourceEntryId'
 	);
 
 	/* (non-PHPdoc)

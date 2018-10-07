@@ -61,7 +61,7 @@ class KalturaCaptureThumbJobData extends KalturaJobData
 		"srcAssetId" ,
 		"srcAssetType" ,
 		"thumbPath" ,
-		"srcAssetEncryptionKey",
+		"srcAssetEncryptionKey"
 	);
 
 

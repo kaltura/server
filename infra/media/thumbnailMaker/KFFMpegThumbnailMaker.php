@@ -91,7 +91,7 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		
 		$cmdArr = array();
 			// '-noautorotate' to adjust to ffm2.7.2 that automatically normalizes rotated sources
-		$command = "$this->cmdPath ";
+		$command = $this->cmdPath;
 		if (isset($params['encryption_key']))
 		{
 			$decryptionKey = bin2hex(base64_decode($params['encryption_key']));
