@@ -26,6 +26,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	const IP_ADDRESS_RESTRICTION_COLUMN_NAME = 'ip_address_restriction';
 	const USER_AGENT_RESTRICTION_COLUMN_NAME = 'user_agent_restriction';
 	const CUSTOM_DATA_RULES_ARRAY_COMPRESSED = 'rules_array_compressed';
+	const CUSTOM_DATA_HAS_KES_RULE = 'HAS_KES_RULE';
 
 	/* (non-PHPdoc)
 	 * @see BaseaccessControl::preSave()
@@ -43,7 +44,27 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			
 			entryPeer::updateAccessControl($this->getPartnerId(), $this->id, $defaultAccessControl);
 		}
-		
+
+		if ($this->isColumnModified(accessControlPeer::RULES))
+		{
+			$rules = $this->getRulesArray();
+			$hasKESRule = false;
+			foreach($rules as $rule)
+			{
+				/* @var $rule kRule */
+				$actions = $rule->getActions();
+				foreach ($actions as $action)
+				{
+					/* @var kRuleAction $action */
+					if ($action->getType() == RuleActionType::SERVE_FROM_REMOTE_SERVER)
+					{
+						$hasKESRule = true;
+					}
+				}
+			}
+			$this->putInCustomData(self::CUSTOM_DATA_HAS_KES_RULE, $hasKESRule);
+		}
+
 		return parent::preSave($con);
 	}
 
@@ -159,15 +180,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 
 	public function hasKESRule()
 	{
-		$rules = $this->getRulesArray();
-
-		foreach($rules as $rule)
-		{
-			/* @var $rule kRule */
-			if (json_decode($rule->getRuleData())->type == 'ServeFromKESRule')
-				return true;
-		}
-
+		return $this->getFromCustomData(self::CUSTOM_DATA_HAS_KES_RULE, null, false);
 	}
 
 	/**
