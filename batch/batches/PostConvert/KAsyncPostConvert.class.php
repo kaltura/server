@@ -165,6 +165,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $thumbPath, KBatchBase::$taskConfig->params->FFMpegCmd);
 			$params['dar'] = $mediaInfo->videoDar;
 			$params['scanType'] = $mediaInfo->scanType;
+			$params['encryption_key'] = $data->flavorAssetEncryptionKey;
 			$created = $thumbMaker->createThumnail($data->thumbOffset, $mediaInfo->videoWidth, $mediaInfo->videoHeight, $params);
 			
 			if(!$created || !file_exists($thumbPath))
