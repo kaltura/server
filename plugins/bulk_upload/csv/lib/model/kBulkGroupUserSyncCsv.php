@@ -55,8 +55,7 @@ class kBulkGroupUserSyncCsv
 
 	public function getSyncGroupUsers($removeFromExistingGroups, $createNewGroups)
 	{
-		$requestGroupIds = explode(',', $this->groupIds);
-		$requestGroupIds = array_map('trim', $requestGroupIds);
+		$requestGroupIds = array_map('trim', $this->groupIds);
 		$partnerId = $this->kuser->getPartnerId();
 		$currentUserGroups = KuserKgroupPeer::retrieveByKuserIds(array($this->kuser->getId()));
 		$currentKgroupsIds = array();

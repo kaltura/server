@@ -227,7 +227,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		// make all the category actions as the partner
 		$requestResults = KBatchBase::$kClient->doMultiRequest();
 
-		if(count($requestResults))
+		if($requestResults && count($requestResults))
 			$this->updateObjectsResults($requestResults, $bulkUploadResultChunk);
 
 

@@ -47,7 +47,10 @@ class EdgeServerNode extends DeliveryServerNode {
 			return $edgeFullPath;
 		
 		$parentEdge = $this->getActiveParent($parentIds);
-		$edgeFullPath = $edgeFullPath . $parentEdge->buildEdgeFullPath($protocol, $format, $deliveryType, $assetType);
+		if ($parentEdge)
+		{
+			$edgeFullPath = $edgeFullPath . $parentEdge->buildEdgeFullPath($protocol, $format, $deliveryType, $assetType);
+		}
 		
 		return $edgeFullPath;
 	}

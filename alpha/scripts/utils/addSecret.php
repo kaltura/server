@@ -36,6 +36,9 @@ $partnerId = $argv[1];
 
 $partner = PartnerPeer::retrieveByPK($partnerId);
 
+if (in_array($newSecret, $partner->getEnabledAdditionalAdminSecrets(), true) || $newSecret === $partner->getAdminSecret())
+	die('Error ' . $newSecret . ' Already Exist, if you want to set it as primary please use setPrimarySecret script' . PHP_EOL);
+
 //in case we need to replace primary admin secret
 if ($replacePrimaryAdminSecret)
 {
