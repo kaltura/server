@@ -302,19 +302,23 @@ abstract class KBatchBase implements IKalturaLogger
 	}
 
 	/**
+	 * @param string $extraPrivileges
 	 * @return string
 	 */
-	private function createKS()
+	protected function createKS($extraPrivileges = null)
 	{
 		$partnerId = self::$taskConfig->getPartnerId();
 		$sessionType = KalturaSessionType::ADMIN;
 		$puserId = 'batchUser';
 		$privileges = implode(',', $this->getPrivileges());
+		if($extraPrivileges)
+		{
+			$privileges = $privileges.','.$extraPrivileges;
+		}
+
 		$adminSecret = self::$taskConfig->getSecret();
 		$expiry = 60 * 60 * 24 * 30; // 30 days
 
-
-		$rand = rand(0, 32000);
 		$rand = microtime(true);
 		$expiry = time() + $expiry;
 		$masterPartnerId = self::$taskConfig->getPartnerId();

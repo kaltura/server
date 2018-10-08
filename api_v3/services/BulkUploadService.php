@@ -76,8 +76,21 @@ class BulkUploadService extends KalturaBaseService
 		$data->setUserId($puserId);
 		$data->setUploadedBy($uploadedBy);
 		$data->setFileName($fileName);
+		$ks = null;
+		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
+		if ($ksString != '') // for actions with no KS or when creating ks.
+		{
+			$ks = ks::fromSecureString($ksString);
+			if($ks->getEnableCategoryModeration())
+			{
+				$data->setPrivileges(kSessionBase::PRIVILEGE_ENABLE_CATEGORY_MODERATION);
+			}
+		}
+
 		if (!$conversionProfileId)
+		{
 			$conversionProfileId = $partner->getDefaultConversionProfileId();
+		}
 			
 		$kmcVersion = $partner->getKmcVersion();
 		$check = null;
