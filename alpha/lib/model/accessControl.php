@@ -16,7 +16,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	const IP_TREE_ACCEPT_INTERNAL_IPS = 'acceptInternalIps';
 	
 	// header to mark the rules fulfilled in the current request
-	const ACP_DEBUG_HEADER = 'X-KALTURA-ACP';
+	const ACP_DEBUG_HEADER = 'X-Kaltura-ACP';
 
 	/**
 	 * True when set as partner default (saved on partner object)
@@ -170,6 +170,67 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		return false;
 	}
 	
+	public function filterRulesByTree($rules)
+	{
+		// in case of an IP optimization tree filter relevant rules
+		$ipTree = $this->getIpTree();
+		if ($ipTree)
+		{
+			// get the ip the tree was optimized for
+			$header = $ipTree[self::IP_TREE_HEADER];
+			$acceptInternalIps = $ipTree[self::IP_TREE_ACCEPT_INTERNAL_IPS];
+			$ip = infraRequestUtils::getIpFromHttpHeader($header, $acceptInternalIps, true);
+		
+			// find relevant rules and add the rules the tree didn't optimize
+			$values = kIpAddressUtils::traverseIpTree($ip, $ipTree[self::IP_TREE_TREE]);
+				
+			$filteredRules = array();
+			foreach($values as $value)
+			{
+				foreach(explode(',', $value) as $ruleCond)
+				{
+					list($rule, $cond) = explode(':', $ruleCond);
+		
+					if (!isset($filteredRules[$rule]))
+					{
+						$filteredRules[$rule] = array();
+					}
+		
+					$filteredRules[$rule][] = $cond;
+				}
+			}
+		
+			// use + and not array_merge because the arrays have numerical indexes
+			$filteredRules += $ipTree[self::IP_TREE_UNFILTERED];
+			ksort($filteredRules);
+		
+			$newRules = array();
+			foreach($filteredRules as $filteredRule => $filteredConds) {
+				$rule = $rules[$filteredRule];
+		
+				// remove conditions which were already found in the ipTree
+				if (is_array($filteredConds)) {
+					$rule->setConditions(array_diff_key($rule->getConditions(), $filteredConds));
+				}
+		
+				$newRules[$filteredRule] = $rules[$filteredRule];
+			}
+		
+			$rules = $newRules;
+		
+			if ($header || $acceptInternalIps)
+			{
+				// since there are many ip related caching rules, cache the response only for this specific ip
+				kApiCache::addExtraField(array('type' => kApiCache::ECF_IP,
+					kApiCache::ECFD_IP_HTTP_HEADER => $header,
+					kApiCache::ECFD_IP_ACCEPT_INTERNAL_IPS => $acceptInternalIps));
+			}
+			else {
+				kApiCache::addExtraField(kApiCache::ECF_IP);
+			}
+		}
+	}
+	
 	/**
 	 * @param kEntryContextDataResult $context
 	 * @param accessControlScope $scope
@@ -184,64 +245,8 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		$isKsAdmin = $this->scope && $this->scope->getKs() && $this->scope->getKs()->isAdmin();
 		
 		$rules = $this->getRulesArray();
-		
-		// in case of an IP optimization tree filter relevant rules
-		$ipTree = $this->getIpTree();
-		if ($ipTree)
-		{
-			// get the ip the tree was optimized for
-			$header = $ipTree[self::IP_TREE_HEADER];
-			$acceptInternalIps = $ipTree[self::IP_TREE_ACCEPT_INTERNAL_IPS];
-			$ip = infraRequestUtils::getIpFromHttpHeader($header, $acceptInternalIps, true);
 
-			// find relevant rules and add the rules the tree didn't optimize
-			$values = kIpAddressUtils::filterTreeByIp($ip, $ipTree[self::IP_TREE_TREE]);
-			
-			$filteredRules = array();
-			foreach($values as $value)
-			{
-				foreach(explode(',', $value) as $ruleCond)
-				{
-					list($rule, $cond) = explode(':', $ruleCond);
-
-					if (!isset($filteredRules[$rule]))
-					{
-						$filteredRules[$rule] = array();
-					}
-
-					$filteredRules[$rule][] = $cond;
-				}
-			}
-
-			// use + and not array_merge because the arrays have numerical indexes
-			$filteredRules += $ipTree['unfiltered'];
-			ksort($filteredRules);
-
-			$newRules = array();
-			foreach($filteredRules as $filteredRule => $filteredConds) {
-				$rule = $rules[$filteredRule];
-				
-				// remove conditions which were already found in the ipTree
-				if (is_array($filteredConds)) {
-					$rule->setConditions(array_diff_key($rule->getConditions(), $filteredConds));
-				}
-				
-				$newRules[$filteredRule] = $rules[$filteredRule];
-			}
-
-			$rules = $newRules;
-
-			if ($header || $acceptInternalIps)
-			{
-				// since there are many ip related caching rules, cache the response only for this specific ip
-				kApiCache::addExtraField(array('type' => kApiCache::ECF_IP,
-					kApiCache::ECFD_IP_HTTP_HEADER => $header,
-					kApiCache::ECFD_IP_ACCEPT_INTERNAL_IPS => $acceptInternalIps));
-			}
-			else {
-				kApiCache::addExtraField(kApiCache::ECF_IP);
-			}
-		}
+		$this->filterRulesByTree($rules);
 		
 		$fulfilledRules = array();
 		foreach($rules as $ruleNum => $rule)
@@ -308,9 +313,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 
 	public function getIpTree() {
 		$s = $this->getFromCustomData(self::CUSTOM_DATA_IP_TREE, null, false);
-		if ($s) {
-			return json_decode(gzuncompress($s), true);
-		}
+		return $s ? json_decode(gzuncompress($s), true): null;
 	}
 	
 	/**
@@ -418,10 +421,9 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		
 		$unfilteredRules = array();
 		$ipTree = array();
-		$rulesIpTree = array(self::IP_TREE_UNFILTERED => &$unfilteredRules, self::IP_TREE_TREE => &$ipTree);
 
 		// find most common ip cond type rule (internal / specific header + accept internal ips)
-		$ipCondTypes = array();
+		$ipRuleConds = array();
 		$largestCondType = false;
 		
 		for($ruleNum = 0; $ruleNum < count($rules); $ruleNum++)
@@ -435,27 +437,27 @@ class accessControl extends BaseaccessControl implements IBaseObject
 					continue;
 				
 				$key = $condition->getHttpHeader() . ',' . $condition->getAcceptInternalIps();
-				if (!isset($ipCondTypes[$key])) {
-					$ipCondTypes[$key] = array();
+				if (!isset($ipRuleConds[$key])) {
+					$ipRuleConds[$key] = array();
 				}
 
-				$ipCondTypes[$key][] = array($ruleNum, $condNum);
+				$ipRuleConds[$key][] = array($ruleNum, $condNum);
 
-				if (!$largestCondType || count($ipCondTypes[$key]) > count($ipCondTypes[$largestCondType])) {
+				if (!$largestCondType || count($ipRuleConds[$key]) > count($ipRuleConds[$largestCondType])) {
 					$largestCondType = $key;
 				}
 			}
 		}
 		
 		// don't bother with building the ip tree for a small number of conditions
-		if ($largestCondType === false || count($ipCondTypes[$largestCondType]) < 100)
+		if ($largestCondType === false || count($ipRuleConds[$largestCondType]) < 100)
 			return null;
 		
 		// build tree from most common ip cond type conditions
 		
 		$unfilteredRules = range(0, count($rules) - 1);
 		
-		foreach($ipCondTypes[$largestCondType] as $value)
+		foreach($ipRuleConds[$largestCondType] as $value)
 		{
 			list($ruleNum, $condNum) = $value;
 			$rule = $rules[$ruleNum];
@@ -467,6 +469,8 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			
 			unset($unfilteredRules[$ruleNum]);
 		}
+		
+		$rulesIpTree = array(self::IP_TREE_UNFILTERED => $unfilteredRules, self::IP_TREE_TREE => $ipTree);
 		
 		list($rulesIpTree[self::IP_TREE_HEADER], $rulesIpTree[self::IP_TREE_ACCEPT_INTERNAL_IPS]) = explode(',', $largestCondType);
 			

@@ -178,7 +178,7 @@ class kIpAddressUtils
 		return $compressedIps;
 	}
 	
-	public static function rangetoIps($range)
+	public static function parseIpRange($range)
 	{
 		$rangeType = self::getAddressType($range);
 
@@ -195,10 +195,10 @@ class kIpAddressUtils
 				continue;
 
 			case self::IP_ADDRESS_TYPE_MASK_ADDRESS:
-				list ($rangeIp, $rangeMask) = array_map('trim', explode(self::IP_ADDRESS_MASK_CHAR, $range));
+				list (, $rangeMask) = array_map('trim', explode(self::IP_ADDRESS_MASK_CHAR, $range));
 				// convert mask address to CIDR
 				$fromIp = ip2long($rangeMask);
-				$base = ip2long('255.255.255.255');
+				$base = 0xffffffff;
 				$rangeMask = 32 - log(($fromIp ^ $base) + 1, 2);
 				$toIp = $fromIp + (1 << $rangeMask);
 				break;
@@ -228,7 +228,7 @@ class kIpAddressUtils
 
 			foreach($ranges as $range)
 			{
-				list($fromIp, $toIp) = self::rangetoIps($range);
+				list($fromIp, $toIp) = self::parseIpRange($range);
 
 				if (!array_key_exists($fromIp, $ips)) {
 					$ips[$fromIp] = $toIp;
@@ -272,36 +272,42 @@ class kIpAddressUtils
 	}
 
 	/**
-	 * Filter an IP using the optimized ipTree
-	 * The function returns an array of the values found in the matching tree nodes
+	 * Traverse an ipTree and return all of the values on the path of a given IP
 	 * 
 	 * @param string $ip
 	 * @param array $ipTree
 	 * 
 	 * @return array
 	 */
-	public static function filterTreeByIp($ip, $ipTree)
+	public static function traverseIpTree($ip, $ipTree)
 	{
 		$values = array();
 		$ipLong = ip2long($ip);
 
 		$root = $ipTree;
 
-		for ($bitIndex = 31; $bitIndex >= 0; $bitIndex--)
+		$bitIndex = 32;
+		while(1)
 		{
+			if (isset($root[self::IP_TREE_NODE_VALUE])) {
+				$values[] = $root[self::IP_TREE_NODE_VALUE];
+			}
+				
+			if (!$bitIndex) {
+				break;
+			}
+			
+			$bitIndex--;
+						
 			$bit = ($ipLong >> $bitIndex) & 1;
 			if (!isset($root[$bit])) {
 				break;
 			}
 
 			$root = $root[$bit];
-
-			if (isset($root[self::IP_TREE_NODE_VALUE])) {
-				$values[] = $root[self::IP_TREE_NODE_VALUE];
-			}
 		}
 
 		return $values;
 	}
 	
-}	
+}
