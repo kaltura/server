@@ -95,11 +95,8 @@ class kKavaBase extends kDruidBase
 	const VIEW_EVENT_PERIOD = 'PT10S';	
 	
 	// params
-	const VOD_ALLOWED_PARTNERS = "kava_vod_partners";
 	const VOD_DISABLED_PARTNERS = "disabled_kava_vod_partners";
-	const LIVE_ALLOWED_PARTNERS = "kava_live_partners";
 	const LIVE_DISABLED_PARTNERS = "disabled_kava_live_partners";
-
 
 	// media types
 	const MEDIA_TYPE_VIDEO = 'Video';
