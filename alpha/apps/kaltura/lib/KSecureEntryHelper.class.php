@@ -102,13 +102,22 @@ class KSecureEntryHelper
 		$this->applyContext();
 	}
 	
-	public function hasRules($contextType = null)
+	public function hasRules($contextType = null, $actionTypes = null)
 	{
+		$retVal = false;
 		$accessControl = $this->entry->getAccessControl();
 		if ($accessControl)
-			return $accessControl->hasRules($contextType);
+		{
+			/* @var accessControl $accessControl */
+			$retVal = $accessControl->hasRules($contextType);
+			if ($retVal && $actionTypes)
+			{
+				$retVal = !is_null($this->getActionList(RuleActionType::BLOCK)) || !is_null($this->getActionList(RuleActionType::LIMIT_THUMBNAIL_CAPTURE));
+			}
+
+		}
 			
-		return false;
+		return $retVal;
 	}
 	
 	public function shouldPreview()

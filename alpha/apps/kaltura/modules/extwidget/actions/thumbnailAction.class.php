@@ -297,7 +297,11 @@ class thumbnailAction extends sfAction
 			$referrer = kApiCache::getHttpReferrer();
 		$ksStr = $this->getRequestParameter("ks");
 		$secureEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, ContextType::THUMBNAIL);
-		$secureEntryHelper->validateForPlay();
+		$enableCacheValidation = $secureEntryHelper->hasRules(ContextType::THUMBNAIL, array(RuleActionType::BLOCK,RuleActionType::LIMIT_THUMBNAIL_CAPTURE));
+		if (!$enableCacheValidation)
+		{
+			$secureEntryHelper->validateForPlay();
+		}
 		
 		// not allow capturing frames if the partner has FEATURE_DISALLOW_FRAME_CAPTURE permission
 		if(($vid_sec != -1) || ($vid_slice != -1) || ($vid_slices != -1))
@@ -453,10 +457,8 @@ class thumbnailAction extends sfAction
 		}
 		
 		$nocache = false;
-		if ((!is_null($secureEntryHelper->getActionList(RuleActionType::BLOCK)) || !is_null($secureEntryHelper->getActionList(RuleActionType::LIMIT_THUMBNAIL_CAPTURE)) ) &&
-			($secureEntryHelper->shouldDisableCache() || kApiCache::hasExtraFields() ||
-			(!$secureEntryHelper->isKsWidget() && $secureEntryHelper->hasRules(ContextType::THUMBNAIL)))
-		)
+		if ($enableCacheValidation && ($secureEntryHelper->shouldDisableCache() || kApiCache::hasExtraFields() ||
+			(!$secureEntryHelper->isKsWidget() && $secureEntryHelper->hasRules(ContextType::THUMBNAIL))) )
 			$nocache = true;
 
 		$cache = null;
