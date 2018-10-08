@@ -453,7 +453,7 @@ class thumbnailAction extends sfAction
 		}
 		
 		$nocache = false;
-		if (!$secureEntryHelper->hasKESRule() && ($secureEntryHelper->shouldDisableCache() || kApiCache::hasExtraFields() ||
+		if (!$secureEntryHelper->hasRemoteServerRule() && ($secureEntryHelper->shouldDisableCache() || kApiCache::hasExtraFields() ||
 			(!$secureEntryHelper->isKsWidget() && $secureEntryHelper->hasRules(ContextType::THUMBNAIL))) )
 			$nocache = true;
 

@@ -111,11 +111,11 @@ class KSecureEntryHelper
 		return false;
 	}
 
-	public function hasKESRule()
+	public function hasRemoteServerRule()
 	{
 		$accessControl = $this->entry->getAccessControl();
 		if ($accessControl)
-			return $accessControl->hasKESRule();
+			return $accessControl->hasRemoteServerRule();
 
 		return false;
 	}
