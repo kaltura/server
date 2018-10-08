@@ -42,6 +42,20 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	public $customVar1In;
 
 	/**
+	 * Filter by customVar2
+	 *
+	 * @var string
+	 */
+	public $customVar2In;
+
+	/**
+	 * Filter by customVar3
+	 *
+	 * @var string
+	 */
+	public $customVar3In;
+
+	/**
 	 * Time zone offset in minutes
 	 * 
 	 * @var int
@@ -67,6 +81,8 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		$reportInputFilter->search_in_admin_tags = $this->searchInAdminTags;
 		$reportInputFilter->categories = $this->categories;
 		$reportInputFilter->custom_var1 = $this->customVar1In;
+		$reportInputFilter->custom_var2 = $this->customVar2In;
+		$reportInputFilter->custom_var3 = $this->customVar3In;
 		$reportInputFilter->timeZoneOffset = $this->timeZoneOffset;
 		$reportInputFilter->interval = $this->interval;
 		
@@ -85,6 +101,8 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		$this->searchInAdminTags = $reportInputFilter->search_in_admin_tags ;
 		$this->categories = $reportInputFilter->categories;
 		$this->customVar1In = $reportInputFilter->custom_var1;
+		$this->customVar2In = $reportInputFilter->custom_var2;
+		$this->customVar3In = $reportInputFilter->custom_var3;
 		$this->timeZoneOffset = $reportInputFilter->timeZoneOffset;
 		
 		return $this;

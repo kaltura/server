@@ -1020,6 +1020,14 @@ class kKavaReportsMgr extends kKavaBase
 				self::DRUID_DIMENSION => self::DIMENSION_STATUS,
 				self::DRUID_VALUES => array(self::TASK_READY)),
 		),
+
+		myReportsMgr::REPORT_TYPE_TOP_CUSTOM_VAR1 => array(
+			self::REPORT_DIMENSION => self::DIMENSION_CUSTOM_VAR1,
+			self::REPORT_DIMENSION_HEADERS => array('custom_var1'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
+			self::REPORT_FILTER_DIMENSION => self::DIMENSION_CUSTOM_VAR1,
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
+		),
 	);
 	
 	protected static $event_type_count_aggrs = array(
@@ -2043,6 +2051,8 @@ class kKavaReportsMgr extends kKavaBase
 			'categoriesIds' => self::DIMENSION_CATEGORIES,
 			'countries' => self::DIMENSION_LOCATION_COUNTRY,
 			'custom_var1' => self::DIMENSION_CUSTOM_VAR1,
+			'custom_var2' => self::DIMENSION_CUSTOM_VAR2,
+			'custom_var3' => self::DIMENSION_CUSTOM_VAR3,
 		);
 
 		foreach ($field_dim_map as $field => $dimension)
