@@ -76,7 +76,6 @@ class WowzaMediaServerNode extends MediaServerNode {
 		if(!$this->getIsExternalMediaServer())
 			$hostname = preg_replace('/\..*$/', '', $hostname);
 		
-		$mediaServerConfig = kConf::getMap('media_servers');
 		if($baseUrl && $baseUrl !== '')
 		{
 			$domain = preg_replace("(https?://)", "", $baseUrl);
@@ -84,6 +83,10 @@ class WowzaMediaServerNode extends MediaServerNode {
 		}
 		else
 		{
+			$mediaServerConfig = array();
+			if(kConf::hasMap('media_servers'))
+				$mediaServerConfig = kConf::getMap('media_servers');
+
 			$domain = $this->getDomainByProtocolAndFormat($mediaServerConfig, $protocol, $format);
 			$port = $this->getPortByProtocolAndFormat($mediaServerConfig, $protocol, $format);
 			$domain = "$domain:$port";
