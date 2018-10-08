@@ -183,12 +183,12 @@ class kKavaReportsMgr extends kKavaBase
 		myReportsMgr::REPORT_TYPE_BROWSERS,
 		myReportsMgr::REPORT_TYPE_LIVE,
 		myReportsMgr::REPORT_TYPE_TOP_PLAYBACK_CONTEXT,
-		myReportsMgr::REPORT_TYPE_REACH_USAGE,
 	);
 		
 	protected static $kava_forced_reports = array(
 		myReportsMgr::REPORT_TYPE_ENTRY_USAGE,
 		myReportsMgr::REPORT_TYPE_REACH_USAGE,
+		myReportsMgr::REPORT_TYPE_TOP_CUSTOM_VAR1,
 	);
 	
 	protected static $reports_def = array(
