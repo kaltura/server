@@ -107,6 +107,7 @@ class kZoomOauth implements kVendorOauth
 	private function parseTokens($response)
 	{
 		$dataAsArray = json_decode($response, true);
+		KalturaLog::debug(print_r($dataAsArray, true));
 		if (!$dataAsArray)
 		{
 			KalturaLog::err('Parse Tokens failed, response received from zoom is: ' . $response);
