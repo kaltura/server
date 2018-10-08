@@ -188,8 +188,8 @@ class ZoomHelper
 		KalturaLog::debug('recordingcomplete data recived from zoom:');
 		KalturaLog::debug(print_r($data, true));
 		$payload = $data[self::PAYLOAD];
+		$downloadToken = $data[self::DOWNLOAD_TOKEN];
 		$accountId = $payload[self::ACCOUNT_ID];
-		$downloadToken = $payload[self::DOWNLOAD_TOKEN];
 		$meeting = $payload[self::MEETING];
 		$hostEmail = $meeting[self::HOST_EMAIL];
 		$recordingFiles = $meeting[self::RECORDING_FILES];
