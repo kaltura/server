@@ -26,7 +26,6 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	const IP_ADDRESS_RESTRICTION_COLUMN_NAME = 'ip_address_restriction';
 	const USER_AGENT_RESTRICTION_COLUMN_NAME = 'user_agent_restriction';
 	const CUSTOM_DATA_RULES_ARRAY_COMPRESSED = 'rules_array_compressed';
-	const CUSTOM_DATA_HAS_REMOTE_SERVER_RULE = 'HAS_REMOTE_SERVER_RULE';
 
 	/* (non-PHPdoc)
 	 * @see BaseaccessControl::preSave()
@@ -44,13 +43,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			
 			entryPeer::updateAccessControl($this->getPartnerId(), $this->id, $defaultAccessControl);
 		}
-
-		if ($this->isColumnModified(accessControlPeer::RULES))
-		{
-			$hasRemoteServerRule = $this->calculateHasRemoteServerRule();
-			$this->setHasRemoteServer($hasRemoteServerRule);
-		}
-
+		
 		return parent::preSave($con);
 	}
 
@@ -163,21 +156,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		}
 		return false;
 	}
-
-	public function hasRemoteServerRule()
-	{
-		$hasRemoteServer = $this->getHasRemoteServer();
-		if (is_null($hasRemoteServer))
-		{
-			$hasRemoteServer = $this->calculateHasRemoteServerRule();
-			$this->setHasRemoteServer($hasRemoteServer);
-			$this->save();
-		}
-		return $hasRemoteServer;
-
-
-	}
-
+	
 	/**
 	 * @param kEntryContextDataResult $context
 	 * @param accessControlScope $scope
@@ -202,7 +181,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 				 
 			if($rule->shouldDisableCache())
 				$disableCache = true;
-
+				
 			if($fulfilled && $rule->getStopProcessing())
 				break;
 		}
@@ -329,39 +308,5 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	public function getCacheInvalidationKeys()
 	{
 		return array("accessControl:id=".strtolower($this->getId()));
-	}
-
-	public function getHasRemoteServer()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_HAS_REMOTE_SERVER_RULE);
-	}
-
-	public function setHasRemoteServer($v)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_HAS_REMOTE_SERVER_RULE, $v);
-	}
-
-	/**
-	 * @return bool
-	 */
-	protected function calculateHasRemoteServerRule()
-	{
-		$rules = $this->getRulesArray();
-		$hasRemoteServerRule = false;
-		foreach ($rules as $rule)
-		{
-			/* @var $rule kRule */
-			$actions = $rule->getActions();
-			foreach ($actions as $action)
-			{
-				/* @var kRuleAction $action */
-				if ($action->getType() == RuleActionType::SERVE_FROM_REMOTE_SERVER)
-				{
-					$hasRemoteServerRule = true;
-					break;
-				}
-			}
-		}
-		return $hasRemoteServerRule;
 	}
 }
