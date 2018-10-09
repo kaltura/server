@@ -35,7 +35,12 @@
 	Run deployment script:
   	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_10_03_update_groupuser_sync_action.php
 
-## Zoom Integration Configuration ##
+	Run after deployment:
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_10_09_update_bulk_sync_group_users_permissions.php 
+
+
+ 
+##Zoom Integration Configuration ##
 - New Feature
 - ID: PLAT-9190     
 
