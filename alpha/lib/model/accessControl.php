@@ -179,7 +179,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			// get the ip the tree was optimized for
 			$header = $ipTree[self::IP_TREE_HEADER];
 			$acceptInternalIps = $ipTree[self::IP_TREE_ACCEPT_INTERNAL_IPS];
-			$ip = infraRequestUtils::getIpFromHttpHeader($header, $acceptInternalIps, true);
+			$ip = $header ? infraRequestUtils::getIpFromHttpHeader($header, $acceptInternalIps, true) : infraRequestUtils::getRemoteAddress();
 		
 			// find relevant rules and add the rules the tree didn't optimize
 			$values = kIpAddressUtils::traverseIpTree($ip, $ipTree[self::IP_TREE_TREE]);
