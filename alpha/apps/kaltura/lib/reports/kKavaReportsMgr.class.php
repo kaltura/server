@@ -2058,7 +2058,7 @@ class kKavaReportsMgr extends kKavaBase
 		foreach ($field_dim_map as $field => $dimension)
 		{
 			$value = $input_filter->$field;
-			if (!$value)
+			if (is_null($value))
 			{
 				continue;
 			}
