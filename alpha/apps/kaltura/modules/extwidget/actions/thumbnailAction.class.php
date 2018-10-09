@@ -296,10 +296,19 @@ class thumbnailAction extends sfAction
 		if (!$referrer)
 			$referrer = kApiCache::getHttpReferrer();
 		$ksStr = $this->getRequestParameter("ks");
-		$secureEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, ContextType::THUMBNAIL);
-		$enableCacheValidation = $secureEntryHelper->hasRules(ContextType::THUMBNAIL, array(RuleActionType::BLOCK,RuleActionType::LIMIT_THUMBNAIL_CAPTURE));
-		if (!$enableCacheValidation)
+
+		$enableCacheValidation = true;
+		$accessControl = $entry->getAccessControl();
+		if ($accessControl)
 		{
+			/* @var accessControl $accessControl */
+			$enableCacheValidation = $accessControl->hasRules(ContextType::THUMBNAIL, array(RuleActionType::BLOCK,RuleActionType::LIMIT_THUMBNAIL_CAPTURE));
+		}
+
+
+		if ($enableCacheValidation)
+		{
+			$secureEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, ContextType::THUMBNAIL);
 			$secureEntryHelper->validateForPlay();
 		}
 		

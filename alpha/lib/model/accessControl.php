@@ -138,21 +138,25 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	 * 
 	 * @return boolean
 	 */
-	public function hasRules($contextType = null)
+	public function hasRules($contextType = null, $actionTypes = null)
 	{
 		$rules = $this->getRulesArray();
 		if (is_null($contextType))
 			return count($rules) ? true : false;
-		
+
 		foreach($rules as $rule)
 		{
 			/* @var $rule kRule */
 			$contexts = $rule->getContexts();
 			if(!is_array($contexts) || !count($contexts))
-				return true;
+			{
+				return $rule->hasActionType($actionTypes);
+			}
 			
 			if (in_array($contextType, $contexts))
-				return true;
+			{
+				return $rule->hasActionType($actionTypes);
+			}
 		}
 		return false;
 	}
@@ -309,4 +313,5 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	{
 		return array("accessControl:id=".strtolower($this->getId()));
 	}
+
 }
