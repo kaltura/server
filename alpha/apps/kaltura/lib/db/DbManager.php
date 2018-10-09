@@ -318,7 +318,10 @@ class DbManager
 		{
 			$preferredWeight -= $weight;
 			if ($preferredWeight <= 0)
+			{
+				KalturaLog::log("Chosen Sphinx [$currentHost]. Sphinx weights ".print_r($weights, true));
 				return $hostToIndex[$currentHost];
+			}
 		}
 
 		KalturaLog::debug("no sphinx was chosen by best last updated id");
