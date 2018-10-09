@@ -44,6 +44,7 @@ class myReportsMgr
 	const REPORT_TYPE_VPAAS_USAGE = 26;
 	const REPORT_TYPE_ENTRY_USAGE = 27;
 	const REPORT_TYPE_REACH_USAGE = 28;
+	const REPORT_TYPE_TOP_CUSTOM_VAR1 = 29;
 
 	const REPORTS_TABLE_MAX_QUERY_SIZE = 20000;
 	const REPORTS_CSV_MAX_QUERY_SIZE = 130000;
@@ -1503,6 +1504,9 @@ class reportsInputFilter
 	public $extra_map;
 	public $categories;
 	public $categoriesIds;
+	public $custom_var1;
+	public $custom_var2;
+	public $custom_var3;
 	public $timeZoneOffset;
 	public $interval;
 	public $countries;
