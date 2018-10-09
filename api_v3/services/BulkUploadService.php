@@ -12,7 +12,8 @@
 class BulkUploadService extends KalturaBaseService
 {
 	const PARTNER_DEFAULT_CONVERSION_PROFILE_ID = -1;
-	
+	private $privilegesToPass = array(kSessionBase::PRIVILEGE_ENABLE_CATEGORY_MODERATION, kSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION);
+
 	/**
 	 * Add new bulk upload batch job
 	 * Conversion profile id can be specified in the API or in the CSV file, the one in the CSV file will be stronger.
@@ -76,16 +77,7 @@ class BulkUploadService extends KalturaBaseService
 		$data->setUserId($puserId);
 		$data->setUploadedBy($uploadedBy);
 		$data->setFileName($fileName);
-		$ks = null;
-		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
-		if ($ksString != '') // for actions with no KS or when creating ks.
-		{
-			$ks = ks::fromSecureString($ksString);
-			if($ks->getEnableCategoryModeration())
-			{
-				$data->setPrivileges(kSessionBase::PRIVILEGE_ENABLE_CATEGORY_MODERATION);
-			}
-		}
+		$this->handlePrivileges($data);
 
 		if (!$conversionProfileId)
 		{
@@ -168,19 +160,16 @@ class BulkUploadService extends KalturaBaseService
 		
 		return $response;
 	}
-	
-	
-	
-	
+
+
 	/**
-	 * serve action returan the original file.
-	 * 
+	 * serve action return the original file.
 	 * @action serve
 	 * @param bigint $id job id
 	 * @return file
-	 * 
+	 * @throws KalturaAPIException
 	 */
-function serveAction($id)
+	public function serveAction($id)
 	{
 		$c = new Criteria();
 		$c->addAnd(BatchJobPeer::ID, $id);
@@ -289,6 +278,27 @@ function serveAction($id)
 		$ret = new KalturaBulkUpload();
 		$ret->fromObject($batchJobLog, $this->getResponseProfile());
 		return $ret;
+	}
 
+	protected function handlePrivileges(&$data)
+	{
+		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
+		if ($ksString != '') // for actions with no KS or when creating ks.
+		{
+			$ks = ks::fromSecureString($ksString);
+			$extraPrivileges = array();
+			foreach ($this->privilegesToPass as $privilege)
+			{
+				if($ks->hasPrivilege($privilege))
+				{
+					$extraPrivileges[] = $privilege;
+				}
+			}
+
+			if($extraPrivileges)
+			{
+				$data->setPrivileges(implode(',', $extraPrivileges));
+			}
+		}
 	}
 }
