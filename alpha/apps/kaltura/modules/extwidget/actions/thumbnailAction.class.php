@@ -319,10 +319,13 @@ class thumbnailAction extends sfAction
 			{
 				KExternalErrors::dieError(KExternalErrors::NOT_ALLOWED_PARAMETER);
 			}
-			
-			$actionList = $secureEntryHelper->getActionList(RuleActionType::LIMIT_THUMBNAIL_CAPTURE);
-			if ($actionList)
-				KExternalErrors::dieError(KExternalErrors::NOT_ALLOWED_PARAMETER);
+
+			if ($enableCacheValidation)
+			{
+				$actionList = $secureEntryHelper->getActionList(RuleActionType::LIMIT_THUMBNAIL_CAPTURE);
+				if ($actionList)
+					KExternalErrors::dieError(KExternalErrors::NOT_ALLOWED_PARAMETER);
+			}
 		}
 
 		if ($partner)
