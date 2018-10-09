@@ -1581,7 +1581,7 @@ class endUserReportsInputFilter extends reportsInputFilter
 	public function getCacheKey($object_ids)
 	{
 		$cacheKey = parent::getCacheKey($object_ids);
-		$cacheKey .= $input_filter->application . $input_filter->userIds . $input_filter->playbackContext . $input_filter->ancestorPlaybackContext;;
+		$cacheKey .= $input_filter->application . $input_filter->userIds . $input_filter->playbackContext . $input_filter->ancestorPlaybackContext;
 		
 		return $cacheKey;
 	}
