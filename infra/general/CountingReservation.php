@@ -52,9 +52,9 @@ class CountingReservation
 		$cacheCounter = $this->cache->get($this->getCacheKeyForResource($resourceId));
 		if ($cacheCounter)
 		{
-			$cacheCounter = trim($cacheCounter);
+			$cacheCounter = (int)($cacheCounter);
 			KalturaLog::info("Resource id [$resourceId] is already stored. Existing counter value: [$cacheCounter]");
-			$cacheCounter = (int)$cacheCounter - 1;
+			$cacheCounter = $cacheCounter - 1;
 			if ($cacheCounter <= 0)
 			{
 				KalturaLog::info("Resource was acquired more then [$this->maxValue] times");
