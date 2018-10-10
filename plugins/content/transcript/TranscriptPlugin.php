@@ -107,6 +107,17 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 		return null;
 	}
 
+	private static function getValuesFromContetnt($content)
+	{
+	    $newContent= "";
+		$decoded = json_decode($content, true);
+		foreach ($decoded['segments'] as $segment)
+			foreach ($segment['sequences'] as $sequence)
+				foreach ($sequence['tokens'] as $token)
+                    $newContent .= ($token['value']."\t");
+		return $newContent;
+	}
+
 	public static function getTranscriptSearchData(entry $entry)
 	{
 		$transcriptAssets = assetPeer::retrieveByEntryId($entry->getId(), array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)));
@@ -122,7 +133,7 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 				continue;
 			
 			$syncKey = $transcriptAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$content = kFileSyncUtils::file_get_contents($syncKey, true, false);
+			$content = self::getValuesFromContetnt( kFileSyncUtils::file_get_contents($syncKey, true, false) );
 			if(!$content)
 				continue;
 
