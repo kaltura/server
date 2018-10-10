@@ -107,7 +107,7 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 		return null;
 	}
 
-	private static function getValuesFromContetnt($content)
+	private static function getValuesFromContent($content)
 	{
 		$newContent= '';
 		$decoded = json_decode($content, true);
@@ -145,7 +145,7 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 				continue;
 			
 			$syncKey = $transcriptAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$content = self::getValuesFromContetnt( kFileSyncUtils::file_get_contents($syncKey, true, false) );
+			$content = self::getValuesFromContent( kFileSyncUtils::file_get_contents($syncKey, true, false) );
 			if(!$content)
 				continue;
 
