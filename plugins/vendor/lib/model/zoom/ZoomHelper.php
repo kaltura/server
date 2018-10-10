@@ -307,10 +307,9 @@ class ZoomHelper
 	 * @param $emails
 	 * @param $meetingId
 	 * @param $hostEmail
-	 * @param $categoryId
 	 * @throws Exception
 	 */
-	public static function uploadToKaltura($urls, $dbUser, $zoomIntegration, $emails, $meetingId, $hostEmail, $categoryId)
+	public static function uploadToKaltura($urls, $dbUser, $zoomIntegration, $emails, $meetingId, $hostEmail)
 	{
 		foreach ($urls as $url) {
 			$entryId = ZoomHelper::createEntryForZoom($dbUser, $zoomIntegration->getZoomCategory(), $emails, $meetingId);
@@ -319,7 +318,7 @@ class ZoomHelper
 				$zoomIntegration->getPartnerId() . ' host email: ' . $hostEmail .
 				' emails: ' . print_r($emails, true) . ' category: ' .  $zoomIntegration->getZoomCategory() .
 				' meeting Id: ' . $meetingId . ' entry Id: ' . $entryId);
-			self::createCategoryEntry($entryId, $categoryId, $dbUser->getPartnerId());
+			self::createCategoryEntry($entryId, $zoomIntegration->getZoomCategoryId(), $dbUser->getPartnerId());
 		}
 	}
 

@@ -145,6 +145,7 @@ class ZoomVendorService extends KalturaBaseService
 	 * @param string $accountId
 	 * @return string
 	 * @throws PropelException
+	 * @throws Exception
 	 */
 	public function submitRegistrationAction($defaultUserId, $zoomCategory, $accountId)
 	{
@@ -163,6 +164,8 @@ class ZoomVendorService extends KalturaBaseService
 		$zoomIntegration->setStatus(VendorStatus::ACTIVE);
 		$zoomIntegration->setDefaultUserEMail($defaultUserId);
 		$zoomIntegration->setZoomCategory($zoomCategory);
+		$categoryId = ZoomHelper::createCategoryForZoom($partnerId, $zoomCategory);
+		$zoomIntegration->setZoomCategoryId($categoryId);
 		$zoomIntegration->save();
 		return true;
 	}
@@ -198,8 +201,7 @@ class ZoomVendorService extends KalturaBaseService
 		kCurrentContext::initKsPartnerUser($ks);
 		kPermissionManager::init();
 		$urls = ZoomHelper::parseDownloadUrls($downloadURLs, $downloadToken);
-		$categoryId = ZoomHelper::createCategoryForZoom($dbUser->getPartnerId(), $zoomIntegration->getZoomCategory());
-		ZoomHelper::uploadToKaltura($urls, $dbUser, $zoomIntegration, $emails, $meetingId, $hostEmail, $categoryId);
+		ZoomHelper::uploadToKaltura($urls, $dbUser, $zoomIntegration, $emails, $meetingId, $hostEmail);
 	}
 
 }
