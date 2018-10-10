@@ -81,7 +81,7 @@ function isObject(item) {
 }
 function mergeDeep(target,source) {
     if (isObject(target) && isObject(source)) {
-      for (const key in source) {
+      for (var key in source) {
         if (this.isObject(source[key])) {
           if (!target[key]) Object.assign(target, {[key]: {}});
           mergeDeep(target[key], source[key]);
