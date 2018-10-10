@@ -1,5 +1,41 @@
 # Naos 14.6.0 #
 
+## Add new SearchHistory plugin ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7981
+
+### pre-requisite ###
+
+* Install elasticSearch, logstash, RabbitMQ
+
+### configuration ###
+Enable SearchHistory plugin:
+
+	- Add the following to plugins.ini file: "SearchHistory"
+	- Make sure the following plugins are enabled since they are required for searchHistory service to work: ElasticSearch, RabbitMQ, Queue.
+    - Add the following to your elastic.ini file in search_history section:
+          disableHistoryIndexing = false
+          completionListSize = 100
+          emptyTermListSize = 500
+    - Add the following to your elastic.ini file in search_history_collect_objects section:
+          0 = entry
+          1 = category
+
+Configure logstash:
+
+	- Copy configurations/logstash/kaltura_search_history.template.conf to logstash config dir and update the necessary tokens.
+
+Configure rabbitMq:
+	- Add new exchange called: history_exchange (Type=fanout, durable=true, Policy=ha-all)
+	- Add new queue called: history (x-message-ttl=86400000, durable=true, Policy=ha-all)
+	- Bind queue to exchange.
+
+### Deployment scripts ###
+    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    2. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_08_19_add_searchhistory_permissions.php
+
+
 ## Support volume map and thumb serving with encrypted at rest ##
 - Issue Type: Task
 - Issue ID: PLAT-9262
