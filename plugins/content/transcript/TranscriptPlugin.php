@@ -109,12 +109,12 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 
 	private static function getValuesFromContetnt($content)
 	{
-	    $newContent= "";
+		$newContent= "";
 		$decoded = json_decode($content, true);
 		foreach ($decoded['segments'] as $segment)
 			foreach ($segment['sequences'] as $sequence)
 				foreach ($sequence['tokens'] as $token)
-                    $newContent .= ($token['value']."\t");
+					$newContent .= ($token['value']."\t");
 		return $newContent;
 	}
 
