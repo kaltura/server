@@ -281,9 +281,11 @@ class FacebookGraphSdkUtils
 
 	public static function getKalturaRedirectUrl()
 	{
-		return kDataCenterMgr::getCurrentDcUrl()."/index.php/extservices/facebookoauth2?".
+		$url = kDataCenterMgr::getCurrentDcUrl()."/index.php/extservices/facebookoauth2?" .
 			http_build_query(array(FacebookConstants::FACEBOOK_NEXT_ACTION_REQUEST_PARAM =>  base64_encode(FacebookConstants::SUB_ACTION_PROCESS_OAUTH2_RESPONSE)),
 				null, '&');
+		$url = str_replace("http:","https:",$url);
+		return $url;
 	}
 
 	/**
