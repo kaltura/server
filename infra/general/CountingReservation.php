@@ -25,7 +25,7 @@ class CountingReservation
 	function __construct($cache, $ttl, $maxValue)
 	{
 		$this->cache = $cache;
-		$this->maxValue = $maxValue;
+		$this->maxValue = intval($maxValue);
 		$this->ttl = intval($ttl);
 		if (!$this->ttl)
 			$this->ttl = self::DEFAULT_TIME_IN_CACHE_FOR_RESERVATION;
@@ -52,7 +52,6 @@ class CountingReservation
 		$cacheCounter = $this->cache->get($this->getCacheKeyForResource($resourceId));
 		if ($cacheCounter)
 		{
-			$cacheCounter = (int)$cacheCounter;
 			KalturaLog::info("Resource id [$resourceId] is already stored. Existing counter value: [$cacheCounter]");
 			$cacheCounter = $cacheCounter - 1;
 			if ($cacheCounter <= 0)
