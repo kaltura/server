@@ -47,7 +47,10 @@ class ZoomHelper
 		$entry->setKuserId($dbUser->getKuserId());
 		$entry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($dbUser->getPartnerId())->getId());
 		$entry->setAdminTags('zoom');
-		$entry->setCategories($zoomCategory);
+		if ($zoomCategory)
+		{
+			$entry->setCategories($zoomCategory);
+		}
 		if ($emails)
 		{
 			foreach ($emails as $email)
@@ -318,7 +321,10 @@ class ZoomHelper
 				$zoomIntegration->getPartnerId() . ' host email: ' . $hostEmail .
 				' emails: ' . print_r($emails, true) . ' category: ' .  $zoomIntegration->getZoomCategory() .
 				' meeting Id: ' . $meetingId . ' entry Id: ' . $entryId);
-			self::createCategoryEntry($entryId, $zoomIntegration->getZoomCategoryId(), $dbUser->getPartnerId());
+			if ($zoomIntegration->getZoomCategoryId() > 0)
+			{
+				self::createCategoryEntry($entryId, $zoomIntegration->getZoomCategoryId(), $dbUser->getPartnerId());
+			}
 		}
 	}
 
@@ -330,6 +336,8 @@ class ZoomHelper
 	 */
 	public static function createCategoryForZoom($partnerId, $categoryName)
 	{
+		if (!$categoryName)
+			return 0;
 		try
 		{
 			$categoryDb = new category();
