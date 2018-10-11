@@ -163,9 +163,12 @@ class ZoomVendorService extends KalturaBaseService
 		}
 		$zoomIntegration->setStatus(VendorStatus::ACTIVE);
 		$zoomIntegration->setDefaultUserEMail($defaultUserId);
-		$zoomIntegration->setZoomCategory($zoomCategory);
-		$categoryId = ZoomHelper::createCategoryForZoom($partnerId, $zoomCategory);
-		$zoomIntegration->setZoomCategoryId($categoryId);
+		if ($zoomCategory)
+		{
+			$zoomIntegration->setZoomCategory($zoomCategory);
+			$categoryId = ZoomHelper::createCategoryForZoom($partnerId, $zoomCategory);
+			$zoomIntegration->setZoomCategoryId($categoryId);
+		}
 		$zoomIntegration->save();
 		return true;
 	}
