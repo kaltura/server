@@ -40,11 +40,11 @@ class KalturaOperationResource extends KalturaContentResource
 	/* (non-PHPdoc)
 	 * @see KalturaResource::validateEntry()
 	 */
-	public function validateEntry(entry $dbEntry, $validateLocal = false)
+	public function validateEntry(entry $dbEntry)
 	{
-		parent::validateEntry($dbEntry, $validateLocal);
+		parent::validateEntry($dbEntry);
 		
-		$this->resource->validateEntry($dbEntry, $validateLocal);
+		$this->resource->validateEntry($dbEntry);
 	}
 	
 	/* (non-PHPdoc)
