@@ -13,6 +13,7 @@ class ZoomVendorIntegration extends VendorIntegration
 	const DELETE_CONTENT_ON_DAUTHORIZATION = "deleteContentOnDAuthorization";
 	const DEFAULT_USER_E_MAIL = "defaultUserEMail";
 	const ZOOM_CATEGORY = "zoomCategory";
+	const ZOOM_CATEGORY_ID = "zoomCategoryId";
 
 	public function setAccessToken ($v)	{ $this->putInCustomData ( "" . self::ACCESS_TOKEN . "", $v);	}
 	public function getAccessToken ( )	{ return $this->getFromCustomData(self::ACCESS_TOKEN);	}
@@ -32,6 +33,8 @@ class ZoomVendorIntegration extends VendorIntegration
 	public function setZoomCategory($v)	{ $this->putInCustomData ( self::ZOOM_CATEGORY, $v);	}
 	public function getZoomCategory( )	{ return $this->getFromCustomData(self::ZOOM_CATEGORY);	}
 
+	public function setZoomCategoryId($v)	{ $this->putInCustomData ( self::ZOOM_CATEGORY_ID, $v);	}
+	public function getZoomCategoryId( )	{ return $this->getFromCustomData(self::ZOOM_CATEGORY_ID);	}
 
 	/**
 	 * returns all tokens as array
