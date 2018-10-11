@@ -14,10 +14,11 @@ include (kEnvironment::getConfigDir().'/configCacheParams.php');
 if(!isset($cacheConfigParams))
 	die("\nRemote cache cofiguration is no accessible");
 
+$map=kConfCacheManager::getMap('kRemoteMemCacheConf');
+
 $cache = new kMemcacheCacheWrapper;
-if(!$cache->init(array('host'=>$cacheConfigParams['remoteMemCacheConf']['host'],
-	'port'=>$cacheConfigParams['remoteMemCacheConf']['port'])))
-	die ("Fail to connect to cache host {$cacheConfigParams['remoteMemCacheConf']['host']} port {$cacheConfigParams['remoteMemCacheConf']['port']} ");
+if(!$cache->init(array('host'=>$map['host'],'port'=>$map['port'])))
+	die ("Fail to connect to cache host {$map['host']} port {$map['port']} ");
 $mapListInCache = $cache->get(kRemoteMemCacheConf::MAP_LIST_KEY);
 
 $dbConnection = getPdoConnection();
