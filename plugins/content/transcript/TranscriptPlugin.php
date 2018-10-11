@@ -10,10 +10,12 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 	const ENTRY_TRANSCRIPT_SUFFIX = 'tr_suf';
 	const SEARCH_TEXT_SUFFIX = 'trend';
 	const PLUGINS_DATA = 'plugins_data';
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaPlugin::getPluginName()
-	 */
+	public static $newContent;
+
+
+    /* (non-PHPdoc)
+     * @see IKalturaPlugin::getPluginName()
+     */
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
@@ -107,27 +109,12 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 		return null;
 	}
 
-	private static function getValuesFromContent($content)
+	private static function getValues($item, $key)
 	{
-		$newContent= '';
-		$decoded = json_decode($content, true);
-		foreach ($decoded['segments'] as $segment)
+		if ($key === 'value')
 		{
-			foreach ($segment['sequences'] as $sequence)
-			{
-				foreach ($sequence['tokens'] as $token)
-				{
-					if (isset($token['value']))
-						$newContent .= ($token['value'] . ' ');
-					else
-					{
-						KalturaLog::err('value is not set [' . $token['value'] . ']');
-						return null;
-					}
-				}
-			}
+			self::$newContent .= ($item . ' ');
 		}
-		return $newContent;
 	}
 
 	public static function getTranscriptSearchData(entry $entry)
@@ -143,9 +130,14 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 
 			if($transcriptAsset->getContainerFormat() != AttachmentType::TEXT)
 				continue;
-			
+
 			$syncKey = $transcriptAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$content = self::getValuesFromContent( kFileSyncUtils::file_get_contents($syncKey, true, false) );
+			$fileContent = kFileSyncUtils::file_get_contents($syncKey, true, false);
+			$decoded = json_decode($fileContent, true);
+			self::$newContent='';
+			array_walk_recursive($decoded, array(TranscriptPlugin,'getValues'));
+			$content = self::$newContent;
+
 			if(!$content)
 				continue;
 
