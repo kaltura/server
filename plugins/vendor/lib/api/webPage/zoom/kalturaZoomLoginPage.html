@@ -96,7 +96,7 @@
             var $emailField = $('#uname');
             var $passwordField = $('#pwd');
             var $partnerId = $('#partnerId');
-            var email = $emailField.val();
+            var email = $emailField.val().trim();
             var pwd = $passwordField.val();
             var partnerId = $partnerId.val();
             if(partnerId == null || partnerId === '' || partnerId < 100)
