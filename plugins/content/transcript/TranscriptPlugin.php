@@ -135,7 +135,7 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 			$fileContent = kFileSyncUtils::file_get_contents($syncKey, true, false);
 			$decoded = json_decode($fileContent, true);
 			self::$newContent='';
-			array_walk_recursive($decoded, array(TranscriptPlugin,'getValues'));
+			array_walk_recursive($decoded, array('TranscriptPlugin','getValues'));
 			$content = self::$newContent;
 
 			if(!$content)
