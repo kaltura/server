@@ -251,7 +251,7 @@ class ZoomHelper
 	/**
 	 * @return array
 	 */
-	private static function getAllHeaders()
+	protected static function getAllHeaders()
 	{
 		if (!function_exists('getallheaders'))
 		{
@@ -276,7 +276,7 @@ class ZoomHelper
 	 * @param array $recordingFiles
 	 * @return array
 	 */
-	private static function getDownloadUrls($recordingFiles)
+	protected static function getDownloadUrls($recordingFiles)
 	{
 		$downloadURLs = array();
 		foreach ($recordingFiles as $recordingFile) {
@@ -314,14 +314,15 @@ class ZoomHelper
 	 */
 	public static function uploadToKaltura($urls, $dbUser, $zoomIntegration, $emails, $meetingId, $hostEmail)
 	{
-		foreach ($urls as $url) {
+		foreach ($urls as $url)
+		{
 			$entryId = ZoomHelper::createEntryForZoom($dbUser, $zoomIntegration->getZoomCategory(), $emails, $meetingId);
 			kJobsManager::addImportJob(null, $entryId, $dbUser->getPartnerId(), $url);
 			KalturaLog::debug('Zoom - upload entry to kaltura started, partner id: ' .
 				$zoomIntegration->getPartnerId() . ' host email: ' . $hostEmail .
 				' emails: ' . print_r($emails, true) . ' category: ' .  $zoomIntegration->getZoomCategory() .
 				' meeting Id: ' . $meetingId . ' entry Id: ' . $entryId);
-			if ($zoomIntegration->getZoomCategoryId() > 0)
+			if ($zoomIntegration->getZoomCategoryId())
 			{
 				self::createCategoryEntry($entryId, $zoomIntegration->getZoomCategoryId(), $dbUser->getPartnerId());
 			}
@@ -336,8 +337,6 @@ class ZoomHelper
 	 */
 	public static function createCategoryForZoom($partnerId, $categoryName)
 	{
-		if (!$categoryName)
-			return 0;
 		try
 		{
 			$categoryDb = new category();
@@ -366,7 +365,7 @@ class ZoomHelper
 	 * @param $getPartnerId
 	 * @throws PropelException
 	 */
-	private static function createCategoryEntry($entryId, $categoryId, $getPartnerId)
+	protected static function createCategoryEntry($entryId, $categoryId, $getPartnerId)
 	{
 		$categoryEntry = new categoryEntry();
 		$categoryEntry->setEntryId($entryId);
