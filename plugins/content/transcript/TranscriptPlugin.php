@@ -109,7 +109,7 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 		return null;
 	}
 
-	private static function getValues($item, $key)
+	public static function getValues($item, $key)
 	{
 		if ($key === 'value')
 		{
