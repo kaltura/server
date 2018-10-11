@@ -3,17 +3,6 @@ require_once __DIR__ . '/kBaseMemcacheConf.php';
 
 class kLocalMemCacheConf extends kBaseMemcacheConf
 {
-	function __construct()
-	{
-		$confParams = parent::getConfigParams('localMemCacheConf');
-		if($confParams)
-		{
-			$port = $confParams['port'];
-			$host = $confParams['host'];
-			return  parent::__construct($port, $host);
-		}
-		$this->cache=null;
-	}
 	public function isKeyRequired(){ return true;}
 
 	public function load($key, $mapName)

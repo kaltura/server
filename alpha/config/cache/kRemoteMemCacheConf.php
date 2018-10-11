@@ -5,18 +5,6 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 {
 	const MAP_LIST_KEY='MAP_LIST_KEY';
 
-	function __construct()
-	{
-		$confParams = parent::getConfigParams('remoteMemCacheConf');
-		if($confParams)
-		{
-			$port = $confParams['port'];
-			$host = $confParams['host'];
-			return  parent::__construct($port, $host);
-		}
-		$this->cache=null;
-	}
-
 	public function loadKey()
 	{
 		$key=null;
@@ -46,35 +34,27 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 		$filteredMapsList = array($requestedMapName);
 		$mapsList = null;
 		$cache = $this->getCache();
-		if( !$cache )
+		if($cache)
 		{
-			return $filteredMapsList;
-		}
-		$mapsList = $cache->get(self::MAP_LIST_KEY);
-		if( !$mapsList )
-		{
-			return $filteredMapsList;
-		}
-		foreach ($mapsList as $mapName => $version)
-		{
-			$mapVar = explode('_', $mapName);
-			$storedMapName = $mapVar[0];
-			$hostPattern = isset($mapVar[1]) ? $mapVar[1] : null;
-			if ($requestedMapName == $storedMapName)
+			$mapsList = $cache->get(self::MAP_LIST_KEY);
+			if ($mapsList)
 			{
-				if ($hostname == $hostPattern)
+				foreach ($mapsList as $mapName => $version)
 				{
-					$filteredMapsList[] = $mapName;
-				}
-				elseif($hostPattern)
-				{
-					$hostPattern = str_replace('#', '*', $hostPattern);
-					if(preg_match('/' . $hostPattern . '/', $hostname))
+					$mapVar = explode('_', $mapName);
+					$storedMapName = $mapVar[0];
+					$hostPattern = isset($mapVar[1]) ? $mapVar[1] : null;
+					if ($requestedMapName == $storedMapName)
 					{
+						if ($hostPattern && $hostname != $hostPattern)
+						{
+							$hostPattern = str_replace('#', '*', $hostPattern);
+							if(!preg_match('/' . $hostPattern . '/', $hostname))
+								continue;
+						}
 						$filteredMapsList[] = $mapName;
 					}
 				}
-
 			}
 		}
 		return $filteredMapsList;
@@ -85,7 +65,9 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 		$mergedMaps = array();
 		$cache = $this->getCache();
 		if(!$cache)
+		{
 			return null;
+		}
 		foreach ($mapNames as $mapName)
 		{
 			$map = $cache->get($mapName);

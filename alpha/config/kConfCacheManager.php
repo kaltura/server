@@ -3,17 +3,25 @@ require_once (__DIR__ . "/cache/kCacheConfFactory.php");
 
 class kConfCacheManager
 {
-	private static $mapLoadFlow	=array(kCacheConfFactory::SESSION,kCacheConfFactory::APC,kCacheConfFactory::LOCAL_MEM_CACHE,kCacheConfFactory::FILE_SYSTEM,kCacheConfFactory::REMOTE_MEM_CACHE);
-	private static $mapStoreFlow	=array(kCacheConfFactory::SESSION		=>array(),
-						kCacheConfFactory::APC			=>array(kCacheConfFactory::SESSION),
-						kCacheConfFactory::LOCAL_MEM_CACHE	=>array(kCacheConfFactory::APC,kCacheConfFactory::SESSION),
-						kCacheConfFactory::FILE_SYSTEM		=>array(kCacheConfFactory::APC,kCacheConfFactory::SESSION),
-						kCacheConfFactory::REMOTE_MEM_CACHE	=>array(kCacheConfFactory::APC,kCacheConfFactory::SESSION,kCacheConfFactory::LOCAL_MEM_CACHE));
+	private static $mapLoadFlow	= array(kCacheConfFactory::SESSION,
+										kCacheConfFactory::APC,
+										kCacheConfFactory::LOCAL_MEM_CACHE,
+										kCacheConfFactory::FILE_SYSTEM,
+										kCacheConfFactory::REMOTE_MEM_CACHE);
 
-	private static $keyLoadFlow	=array(kCacheConfFactory::SESSION,kCacheConfFactory::APC,kCacheConfFactory::REMOTE_MEM_CACHE);
-	private static $keyStoreFlow	=array(kCacheConfFactory::SESSION		=>array(),
-						kCacheConfFactory::APC 			=>array(kCacheConfFactory::SESSION),
-						kCacheConfFactory::REMOTE_MEM_CACHE	=>array(kCacheConfFactory::APC,kCacheConfFactory::SESSION));
+	private static $mapStoreFlow = array(kCacheConfFactory::SESSION	=> array(),
+										kCacheConfFactory::APC => array(kCacheConfFactory::SESSION),
+										kCacheConfFactory::LOCAL_MEM_CACHE => array(kCacheConfFactory::APC, kCacheConfFactory::SESSION),
+										kCacheConfFactory::FILE_SYSTEM => array(kCacheConfFactory::APC, kCacheConfFactory::SESSION),
+										kCacheConfFactory::REMOTE_MEM_CACHE	=> array(kCacheConfFactory::APC, kCacheConfFactory::SESSION, kCacheConfFactory::LOCAL_MEM_CACHE));
+
+	private static $keyLoadFlow	= array(kCacheConfFactory::SESSION,
+										kCacheConfFactory::APC,
+										kCacheConfFactory::REMOTE_MEM_CACHE);
+
+	private static $keyStoreFlow = array(kCacheConfFactory::SESSION	=> array(),
+										kCacheConfFactory::APC => array(kCacheConfFactory::SESSION),
+										kCacheConfFactory::REMOTE_MEM_CACHE	=> array(kCacheConfFactory::APC, kCacheConfFactory::SESSION));
 
 	public static function getMap($mapName)
 	{
@@ -61,10 +69,17 @@ class kConfCacheManager
 	{
 		foreach (self::$mapLoadFlow as $cacheEntity)
 		{
+			//this check allows adding configuration files for each module entity
+			if($mapName == $cacheEntity )
+			{
+				continue;
+			}
+
 			/* @var $cacheObj kBaseConfCache*/
 			$cacheObj = kCacheConfFactory::getInstance($cacheEntity);
 			if(!$key && $cacheObj->isKeyRequired() && PHP_SAPI != 'cli')
 				$key = self::loadKey();
+
 			$map = $cacheObj->load($key, $mapName);
 			if($map)
 			{

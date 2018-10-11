@@ -5,27 +5,29 @@ require_once __DIR__ . '/kMapCacheInterface.php';
 class kBaseMemcacheConf extends kBaseConfCache implements kMapCacheInterface
 {
 	protected $cache;
+	protected $inLoad;
 
 	protected function getCache()
 	{
 		return $this->cache;
 	}
 
-	function __construct($port, $host)
+	function __construct()
 	{
-		$this->cache = $this->initCache($port, $host);
+		$this->cache=null;
+		$confParams = $this->getConfigParams(get_class($this));
+		if($confParams)
+		{
+			$port = $confParams['port'];
+			$host = $confParams['host'];
+			$this->cache = $this->initCache($port, $host);
+		}
 	}
 
-	protected function getConfigParams($sectionName)
+	protected function getConfigParams($mapName)
 	{
-		$configFile = kEnvironment::getConfigDir() . '/configCacheParams.php';
-		if (file_exists($configFile))
-		{
-			include($configFile);
-			if (isset($cacheConfigParams[$sectionName]))
-				return $cacheConfigParams[$sectionName];
-		}
-		return null;
+		$map = kConfCacheManager::load($mapName,$mapName);
+		return $map;
 	}
 
 	protected function initCache($port, $host)
