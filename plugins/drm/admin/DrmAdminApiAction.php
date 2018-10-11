@@ -84,8 +84,15 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 	private function getBody($drmType, $partnerId, $params)
 	{
 		$body = "drmType=$drmType&partnerId=$partnerId";
-		foreach($params as $key => $value)
-			$body .= "&$key=$value";
+		if (isset($params['configuration_json']))
+		{
+			$jsonParams = json_decode($params['configuration_json']);
+			if (!json_last_error() == JSON_ERROR_NONE)
+			{
+				throw new Exception("Configuration json is not configured correctly.");
+			}
+			$body .= "&configuration_json=".$params['configuration_json'];
+		}
 		return $body;
 	}
 

@@ -40,17 +40,20 @@ class Form_AdminApiConfigure extends Infra_Form
 		$partnerDocFields = array('provider_sign_key', 'key', 'iv', 'provider', 'seed', 'cas_username', 'cas_password');
 		$fpsDocFields = array('ask', 'key_pem');
 
-		foreach($partnerDocFields as $field)
-			$this->addTextElement($field, "$field:", "", $this->readOnly);
-
-		if ($this->drmType == 'fps') {
-			$this->addLine("fps_line");
-			$this->addTitle("FPS");
-			$this->addComment('KeyPemNote', 'The KeyPem is private key base64 encoded for FPS documents. Note - It has to be un-encrypted data');
-			foreach($fpsDocFields as $field)
-				$this->addTextElement($field, "$field:", "", $this->readOnly);
-			$this->addTextElement('fps_default_persistence_duration', "offline_duration (Rental Duration):", "", $this->readOnly);
+		$options = array(
+			'label'			=> 'Configuration Json:',
+			'filters'=> array('StringTrim'),
+			'value'         => ""
+		);
+		if ($this->readOnly)
+		{
+			$options['readonly'] = true;
 		}
+
+		$this->addElement('textarea', 'configuration_json', $options);
+		$this->getElement('configuration_json')->getDecorator('Description')->setEscape(false);
+		$this->addComment('JsonExample', '* Json Example: {"provider_sign_key":"SIGN_KEY", "iv":"IV", "key":"KEY", "provider":"kaltura", "ask":"ASK_VALUE", "key_pem":"PEM"}\');');
+		$this->addComment('KeyPemNote', '* KeyPem is private key base64 encoded for FPS documents. Note - It has to be un-encrypted data');
 
 	}
 	
@@ -59,9 +62,10 @@ class Form_AdminApiConfigure extends Infra_Form
 		$values = json_decode($res, true);
 		if (json_last_error() == JSON_ERROR_NONE)
 		{
-			foreach($values as $key => $val)
-				if ($elem = $this->getElement($key))
-					$elem->setValue($val);
+			if ($elem = $this->getElement('configuration_json'))
+			{
+				$elem->setValue(json_encode($values, JSON_PRETTY_PRINT));
+			}
 		} else {
 			$this->addLine("server_results_line");
 			$this->addTextElement('serverResults', 'Raw Results', $res);
