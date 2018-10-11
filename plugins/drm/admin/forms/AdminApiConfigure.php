@@ -49,6 +49,7 @@ class Form_AdminApiConfigure extends Infra_Form
 			$this->addComment('KeyPemNote', 'The KeyPem is private key base64 encoded for FPS documents. Note - It has to be un-encrypted data');
 			foreach($fpsDocFields as $field)
 				$this->addTextElement($field, "$field:", "", $this->readOnly);
+			$this->addTextElement('fps_default_persistence_duration', "offline_duration (Rental Duration):", "", $this->readOnly);
 		}
 
 	}
