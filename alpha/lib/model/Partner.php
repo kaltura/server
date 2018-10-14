@@ -78,6 +78,8 @@ class Partner extends BasePartner
 
 	const PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT = 10;
 
+	const CUSTOMER_DATA_CONF_TAG_NAME = 'conf_tag_name';
+
 	public function save(PropelPDO $con = null)
 	{
 		PartnerPeer::removePartnerFromCache( $this->getId() );
@@ -2013,5 +2015,16 @@ class Partner extends BasePartner
 		}
 		return $this->getAdminSecret();
 	}
+
+	public function getConfTagName()
+	{
+		return $this->getFromCustomData( self::CUSTOMER_DATA_CONF_TAG_NAME, null , '' );
+	}
+
+	public function setConfTagName($v)
+	{
+		$this->putInCustomData(self::CUSTOMER_DATA_CONF_TAG_NAME, $v);
+	}
+
 
 }
