@@ -467,7 +467,7 @@ class kPlaybackContextDataHelper
 			case PlaybackProtocol::APPLE_HTTP:
 				return array(
 					array(assetParams::TAG_APPLEMBR),
-					array('ipadnew', 'iphonenew','h265'),
+					array('ipadnew', 'iphonenew', 'h265', 'dash'),
 					array('ipad', 'iphone'),
 				);
 			case PlaybackProtocol::HDS:
