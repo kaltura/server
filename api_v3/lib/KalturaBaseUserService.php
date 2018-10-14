@@ -109,6 +109,7 @@ class KalturaBaseUserService extends KalturaBaseService
 		KalturaResponseCacher::disableCache();
 		
 		$this->validateApiAccessControlByEmail($email);
+		$this->validateRequestsAmount($email);
 		
 		try {
 			$new_password = UserLoginDataPeer::resetUserPassword($email);
@@ -291,6 +292,60 @@ class KalturaBaseUserService extends KalturaBaseService
 		if ($loginData)
 		{
 			$this->validateApiAccessControl($loginData->getLastLoginPartnerId());
+		}
+	}
+
+	/**
+	 * check if there were more than max_allowed calls for different resources
+	 * @param string $email
+	 * @throws KalturaErrors::FAILED_TO_INIT_OBJECT
+	 */
+	protected function validateRequestsAmount($email)
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_RESOURCE_RESERVATION);
+		if (!$cache)
+		{
+			throw new KalturaAPIException(KalturaErrors::FAILED_TO_INIT_OBJECT);
+		}
+		$this->validateRequestsAmountPerEmail($email, $cache);
+		$this->validateRequestsAmountPerIp($cache);
+	}
+
+
+	/**
+	 * check if there were more than max_allowed calls to reset password action per sepecific email in specific time frame
+	 * @param string $email
+	 * @param kBaseCacheWrapper $cache
+	 * @throws KalturaErrors::RESOURCE_IS_RESERVED
+	 */
+	protected function validateRequestsAmountPerEmail($email, $cache)
+	{
+		$resourceId = kCurrentContext::getCurrentPartnerId() . '_' . $email;
+		$maxRequestsNum = kConf::get('max_reset_requests_per_email', 'local', 10);
+		$reservationTime = kConf::get('reservation_time_per_email', 'local', 600);
+		$resourceReservator = new CountingReservation($cache, $reservationTime, $maxRequestsNum);
+		if(!$resourceReservator->tryAcquire($resourceId))
+		{
+			throw new KalturaAPIException(KalturaErrors::RESOURCE_IS_RESERVED, $resourceId);
+		}
+	}
+
+	/**
+	 * check if there were more than max_allowed calls to reset password action per sepecific ip in specific time frame
+	 * @param kBaseCacheWrapper $cache
+	 * @throws KalturaErrors::RESOURCE_IS_RESERVED
+	 */
+	protected function validateRequestsAmountPerIp($cache)
+	{
+		if (!kCurrentContext::$user_ip)
+			return;
+		$resourceId = 'ip_' . kCurrentContext::$user_ip;
+		$maxRequestsNum = kConf::get('max_reset_requests_per_ip', 'local', 100);
+		$reservationTime = kConf::get('reservation_time_per_ip', 'local', 600);
+		$resourceReservator = new CountingReservation($cache, $reservationTime, $maxRequestsNum);
+		if(!$resourceReservator->tryAcquire($resourceId))
+		{
+			throw new KalturaAPIException(KalturaErrors::RESOURCE_IS_RESERVED, $resourceId);
 		}
 	}
 	

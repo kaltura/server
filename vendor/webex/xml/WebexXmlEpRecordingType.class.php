@@ -234,6 +234,9 @@ class WebexXmlEpRecordingType extends WebexXmlRequestType
 				
 			case 'deleteTime':
 				return 'string';
+				
+			default:
+				return 'string';
 	
 		}
 		

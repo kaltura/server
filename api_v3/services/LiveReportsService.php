@@ -146,7 +146,7 @@ class LiveReportsService extends KalturaBaseService
 		}
 		
 		$items = $this->arrayToApiObjects($items, $objectType);
-		if ($objectType == 'KalturaGeoTimeLiveStats')
+		if ($objectType == 'KalturaGeoTimeLiveStats' && $items)
 		{
 			self::addCoordinates($items);
 		}
@@ -199,7 +199,7 @@ class LiveReportsService extends KalturaBaseService
 		if(is_null($pager))
 			$pager = new KalturaFilterPager;
 		
-		if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::LIVE_ALLOWED_PARTNERS))
+		if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::LIVE_DISABLED_PARTNERS))
 		{
 			return $this->getEventsKava($reportType, $filter);
 		}
@@ -244,7 +244,7 @@ class LiveReportsService extends KalturaBaseService
 		if(is_null($pager))
 			$pager = new KalturaFilterPager();
 		
-		if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::LIVE_ALLOWED_PARTNERS))
+		if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::LIVE_DISABLED_PARTNERS))
 		{
 			return $this->getReportKava($reportType, $filter, $pager);			
 		}

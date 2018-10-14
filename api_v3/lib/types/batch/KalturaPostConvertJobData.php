@@ -9,7 +9,12 @@ class KalturaPostConvertJobData extends KalturaConvartableJobData
 	 * @var string
 	 */
 	public $flavorAssetId;
-	
+
+	/**
+	* @var string
+	*/
+	public $flavorAssetEncryptionKey;
+
 	/**
 	 * Indicates if a thumbnail should be created
 	 * 
@@ -55,6 +60,7 @@ class KalturaPostConvertJobData extends KalturaConvartableJobData
 		"flavorAssetId" ,
 		"createThumb" ,
 		"thumbPath" ,
+		"flavorAssetEncryptionKey",
 		"thumbOffset" ,
 		"thumbHeight" ,
 		"thumbBitrate" ,
@@ -71,10 +77,10 @@ class KalturaPostConvertJobData extends KalturaConvartableJobData
 	{
 		if(is_null($dbData))
 			$dbData = new kPostConvertJobData();
-			
+
 		return parent::toObject($dbData);
 	}
-	
+
 	/**
 	 * @param string $subType from enum KalturaMediaParserType
 	 * @return int from enum mediaParserType

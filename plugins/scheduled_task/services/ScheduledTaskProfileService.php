@@ -208,8 +208,9 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		if(!$ks || !($ks->isAdmin() || $ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $requestId)))
 			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
 
+		$fileName = $requestId."csv";
 		$batchJob = $this->getScheduledTaskBatchJob($requestId);
-		return $this->serveFile($batchJob, BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
+		return $this->serveFile($batchJob, BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD, $fileName);
 	}
 
 	/**

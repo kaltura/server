@@ -15,6 +15,16 @@
  */
 class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer 
 {
+	public static function setDefaultCriteriaFilter ()
+	{
+		if(is_null(self::$s_criteria_filter))
+			self::$s_criteria_filter = new criteriaFilter();
+		
+		$c = new Criteria();
+		$c->add(self::STATUS, EntryVendorTaskStatus::ABORTED, Criteria::NOT_EQUAL);
+		self::$s_criteria_filter->setFilter($c);
+	}
+	
 	public static function retrieveEntryIdAndCatalogItemIdAndEntryVersion($entryId, $catalogItemId, $partnerId, $version)
 	{
 		$c = new Criteria();

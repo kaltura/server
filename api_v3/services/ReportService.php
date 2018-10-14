@@ -295,7 +295,7 @@ class ReportService extends KalturaBaseService
 		
 		ini_set( "memory_limit","512M" );
 		
-		if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::VOD_ALLOWED_PARTNERS))
+		if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::VOD_DISABLED_PARTNERS))
 		{
 			$customReports = kConf::getMap('custom_reports');
 			if (!isset($customReports[$id]))
