@@ -132,11 +132,16 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 				continue;
 
 			$syncKey = $transcriptAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$fileContent = kFileSyncUtils::file_get_contents($syncKey, true, false);
-			$decoded = json_decode($fileContent, true);
-			self::$newContent='';
-			array_walk_recursive($decoded, array('TranscriptPlugin','getValues'));
-			$content = self::$newContent;
+			$content = kFileSyncUtils::file_get_contents($syncKey, true, false);
+			$allowed =  array('json');
+			$ext = pathinfo($transcriptAsset->getFilename(), PATHINFO_EXTENSION);
+			if(in_array($ext,$allowed) )
+			{
+				$decoded = json_decode($content, true);
+				self::$newContent = '';
+				array_walk_recursive($decoded, array('TranscriptPlugin', 'getValues'));
+				$content = self::$newContent;
+			}
 
 			if(!$content)
 				continue;
