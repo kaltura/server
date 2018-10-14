@@ -464,15 +464,22 @@ class FacebookGraphSdkUtils
 	 * @param Facebook\PersistentData\PersistentDataInterface|string $dataHandler
 	 * @return \Facebook\Facebook
 	 */
-	public static function createFacebookInstance($appId, $appSecret, $dataHandler = "session"){
-		return new Facebook\Facebook(
-			array (
-				'app_id' => $appId,
-				'app_secret' => $appSecret,
-				'default_graph_version' => FacebookConstants::FACEBOOK_SDK_VERSION,
-				'default_access_token' => 'APP-ID|APP-SECRET',
-				'persistent_data_handler' => $dataHandler,
-			));
+	public static function createFacebookInstance($appId, $appSecret, $dataHandler = null)
+	{
+		$config = array (
+			'app_id' => $appId,
+			'app_secret' => $appSecret,
+			'default_graph_version' => FacebookConstants::FACEBOOK_SDK_VERSION,
+			'default_access_token' => 'APP-ID|APP-SECRET'
+		);
+
+		if($dataHandler)
+		{
+			$config['persistent_data_handler'] = $dataHandler;
+		}
+
+		return new Facebook\Facebook($config);
+
 	}
 }
 

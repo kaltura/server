@@ -25,7 +25,7 @@ class CountingReservation
 	function __construct($cache, $ttl, $maxValue)
 	{
 		$this->cache = $cache;
-		$this->maxValue = $maxValue;
+		$this->maxValue = intval($maxValue);
 		$this->ttl = intval($ttl);
 		if (!$this->ttl)
 			$this->ttl = self::DEFAULT_TIME_IN_CACHE_FOR_RESERVATION;
