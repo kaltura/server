@@ -79,7 +79,8 @@ class kBaseConfCache
 	public function hasMap($key, $mapName)
 	{
 		$ret = $this->load($key, $mapName);
-		return count($ret);
+		$hasMap = (is_array($ret) && count($ret));
+		return $hasMap;
 	}
 
 	public function getHostName ()
