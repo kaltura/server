@@ -8,17 +8,17 @@ class reachReportsInputFilter extends reportsInputFilter
 
 	public $turnAroundTime;
 	
-	private $serviceTypeMapping = array(
+	protected static $serviceTypeMapping = array(
 		1 => 'Human',
 		2 => 'Machine'
 	);
 	
-	private $serviceFeatureMapping = array(
+	protected static $serviceFeatureMapping = array(
 		1 => 'Captions',
 		2 => 'Translation',
 	);
 	
-	private $turnaroundTimeMapping = array(
+	protected static $turnaroundTimeMapping = array(
 		-1     => 'Best effort',
 		0      => 'Immediate',
 		1800   => '30 minutes',
@@ -32,26 +32,10 @@ class reachReportsInputFilter extends reportsInputFilter
 		864000 => '10 days',
 	);
 	
-	public function getFilterBy()
-    {
-		$filterBy = ""; 
-		
-		if ($this->serviceType != null)
-			$filterBy = "_by_serviceType";
-		
-		if ($this->serviceFeature != null)
-			$filterBy = $filterBy . "_by_serviceFeature";
-		
-		if ($this->turnAroundTime != null)
-			$filterBy = $filterBy . "_by_turnaroundTime";
-
-		return $filterBy;
-	}
-	
 	public function addReportsDruidFilters($partner_id, $report_def, &$druid_filter)
 	{
 		$serviceType = $this->serviceType;
-		if($serviceType && isset($this->serviceTypeMapping[$serviceType]))
+		if($serviceType && isset(self::$serviceTypeMapping[$serviceType]))
 		{
 			$druid_filter[] = array(
 				kKavaReportsMgr::DRUID_DIMENSION => kKavaReportsMgr::DIMENSION_SERVICE_TYPE,
@@ -60,7 +44,7 @@ class reachReportsInputFilter extends reportsInputFilter
 		}
 		
 		$serviceFeature = $this->serviceFeature;
-		if ($serviceFeature && isset($this->serviceFeatureMapping[$serviceFeature]))
+		if ($serviceFeature && isset(self::$serviceFeatureMapping[$serviceFeature]))
 		{
 			$druid_filter[] = array(
 				kKavaReportsMgr::DRUID_DIMENSION => kKavaReportsMgr::DIMENSION_SERVICE_FEATURE,
@@ -69,7 +53,7 @@ class reachReportsInputFilter extends reportsInputFilter
 		}
 		
 		$turnAroundTime = $this->turnAroundTime;
-		if ($turnAroundTime && isset($this->turnaroundTimeMapping[$turnAroundTime]))
+		if ($turnAroundTime && isset(self::$turnaroundTimeMapping[$turnAroundTime]))
 		{
 			$druid_filter[] = array(
 				kKavaReportsMgr::DRUID_DIMENSION => kKavaReportsMgr::DIMENSION_TURNAROUND_TIME,

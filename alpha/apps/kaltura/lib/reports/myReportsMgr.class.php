@@ -1568,14 +1568,6 @@ class endUserReportsInputFilter extends reportsInputFilter
 				kKavaReportsMgr::DRUID_VALUES => explode(',', $this->application)
 			);
 		}
-		
-		if ($this->userIds != null)
-		{
-			$druid_filter[] = array(
-				kKavaReportsMgr::DRUID_DIMENSION => kKavaReportsMgr::DIMENSION_KUSER_ID,
-				kKavaReportsMgr::DRUID_VALUES => kKavaReportsMgr::getKuserIds($report_def, $this->userIds, $partner_id),
-			);
-		}
 	}
 	
 	public function getCacheKey($object_ids)
@@ -1584,5 +1576,35 @@ class endUserReportsInputFilter extends reportsInputFilter
 		$cacheKey .= $input_filter->application . $input_filter->userIds . $input_filter->playbackContext . $input_filter->ancestorPlaybackContext;
 		
 		return $cacheKey;
+	}
+	
+	protected static function getPlaybackContextCategoriesIds($partner_id, $playback_context, $is_ancestor)
+	{
+		$category_filter = new categoryFilter();
+		
+		if ($is_ancestor)
+		{
+			$category_filter->set('_matchor_likex_full_name', $playback_context);
+		}
+		else
+		{
+			$category_filter->set('_in_full_name', $playback_context);
+		}
+		
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$category_filter->attachToCriteria($c);
+		$category_filter->setPartnerSearchScope($partner_id);
+		$c->applyFilters();
+		
+		$category_ids_from_db = $c->getFetchedIds();
+		
+		if (count($category_ids_from_db))
+		{
+			return $category_ids_from_db;
+		}
+		else
+		{
+			return array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
+		}
 	}
 }
