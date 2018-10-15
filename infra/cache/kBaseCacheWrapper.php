@@ -244,7 +244,7 @@ abstract class kBaseCacheWrapper
 	 */
 	protected static function safeLog($msg)
 	{
-		if (class_exists('KalturaLog') && KalturaLog::isInitialized())
+		if (class_exists('KalturaLog'))
 			KalturaLog::debug($msg);
 	}
 }
