@@ -146,7 +146,7 @@ class LiveReportsService extends KalturaBaseService
 		}
 		
 		$items = $this->arrayToApiObjects($items, $objectType);
-		if ($objectType == 'KalturaGeoTimeLiveStats')
+		if ($objectType == 'KalturaGeoTimeLiveStats' && $items)
 		{
 			self::addCoordinates($items);
 		}

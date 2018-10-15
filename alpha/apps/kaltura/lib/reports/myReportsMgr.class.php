@@ -44,6 +44,7 @@ class myReportsMgr
 	const REPORT_TYPE_VPAAS_USAGE = 26;
 	const REPORT_TYPE_ENTRY_USAGE = 27;
 	const REPORT_TYPE_REACH_USAGE = 28;
+	const REPORT_TYPE_TOP_CUSTOM_VAR1 = 29;
 
 	const REPORTS_TABLE_MAX_QUERY_SIZE = 20000;
 	const REPORTS_CSV_MAX_QUERY_SIZE = 130000;
@@ -655,12 +656,10 @@ class myReportsMgr
 		else
 			$partner_id_str = $partner_id;
 			
-		$key = 	$partner_id_str . "|" . $report_type . "|" . 
-			$input_filter->from_date . $input_filter->to_date . $input_filter->keywords . $input_filter->search_in_admin_tags . $input_filter->search_in_tags . $input_filter->interval .
-			$object_ids . $input_filter->categories;
-		if ($input_filter instanceof endUserReportsInputFilter)
-			$key = $key .  $input_filter->application . $input_filter->userIds . $input_filter->playbackContext . $input_filter->ancestorPlaybackContext;
-		return $key;
+		$key = 	$partner_id_str . "|" . $report_type . "|";
+		$inputFilterCacheKey = $input_filter->getCacheKey($object_ids);
+		
+		return $key . $inputFilterCacheKey;
 	}
 	
 	public static function formatDateFromDateId ( $val )
@@ -1503,6 +1502,9 @@ class reportsInputFilter
 	public $extra_map;
 	public $categories;
 	public $categoriesIds;
+	public $custom_var1;
+	public $custom_var2;
+	public $custom_var3;
 	public $timeZoneOffset;
 	public $interval;
 	public $countries;
@@ -1510,6 +1512,17 @@ class reportsInputFilter
 	public function getFilterBy() {
 		return "";
 			
+	}
+	
+	public function addReportsDruidFilters($partner_id, $report_def, &$druid_filter)
+	{
+		return;
+	}
+	
+	public function getCacheKey($object_ids)
+	{
+		return $this->from_date . $this->to_date . $this->keywords . $this->search_in_admin_tags . $this->search_in_tags . $this->interval .
+		$object_ids . $this->categories;
 	}
 }
 
@@ -1531,5 +1544,71 @@ class endUserReportsInputFilter extends reportsInputFilter
 
 		return $filterBy;
 			
+	}
+	
+	public function addReportsDruidFilters($partner_id, $report_def, &$druid_filter)
+	{
+		if ($this->playbackContext || $this->ancestorPlaybackContext)
+		{
+			if ($this->playbackContext && $this->ancestorPlaybackContext)
+			{
+				$category_ids = array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
+			}
+			else
+			{
+				$category_ids = self::getPlaybackContextCategoriesIds($partner_id, $this->playbackContext ?
+					$this->playbackContext : $this->ancestorPlaybackContext, isset($this->ancestorPlaybackContext));
+			}
+			
+			$druid_filter[] = array(
+				kKavaReportsMgr::DRUID_DIMENSION => kKavaReportsMgr::DIMENSION_PLAYBACK_CONTEXT,
+				kKavaReportsMgr::DRUID_VALUES => $category_ids);
+		}
+		
+		if ($this->application)
+		{
+			$druid_filter[] = array(
+				kKavaReportsMgr::DRUID_DIMENSION => kKavaReportsMgr::DIMENSION_APPLICATION,
+				kKavaReportsMgr::DRUID_VALUES => explode(',', $this->application)
+			);
+		}
+	}
+	
+	public function getCacheKey($object_ids)
+	{
+		$cacheKey = parent::getCacheKey($object_ids);
+		$cacheKey .= $input_filter->application . $input_filter->userIds . $input_filter->playbackContext . $input_filter->ancestorPlaybackContext;
+		
+		return $cacheKey;
+	}
+	
+	protected static function getPlaybackContextCategoriesIds($partner_id, $playback_context, $is_ancestor)
+	{
+		$category_filter = new categoryFilter();
+		
+		if ($is_ancestor)
+		{
+			$category_filter->set('_matchor_likex_full_name', $playback_context);
+		}
+		else
+		{
+			$category_filter->set('_in_full_name', $playback_context);
+		}
+		
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$category_filter->attachToCriteria($c);
+		$category_filter->setPartnerSearchScope($partner_id);
+		$c->applyFilters();
+		
+		$category_ids_from_db = $c->getFetchedIds();
+		
+		if (count($category_ids_from_db))
+		{
+			return $category_ids_from_db;
+		}
+		else
+		{
+			return array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
+		}
 	}
 }

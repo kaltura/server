@@ -47,7 +47,10 @@ class ZoomHelper
 		$entry->setKuserId($dbUser->getKuserId());
 		$entry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($dbUser->getPartnerId())->getId());
 		$entry->setAdminTags('zoom');
-		$entry->setCategories($zoomCategory);
+		if ($zoomCategory)
+		{
+			$entry->setCategories($zoomCategory);
+		}
 		if ($emails)
 		{
 			foreach ($emails as $email)
@@ -170,13 +173,18 @@ class ZoomHelper
 	}
 
 	/**
-	 * @param string $downloadURL
+	 * @param array $downloadURLs
 	 * @param string $downloadToken
-	 * @return string
+	 * @return array
 	 */
-	public static function parseDownloadUrl($downloadURL, $downloadToken)
+	public static function parseDownloadUrls($downloadURLs, $downloadToken)
 	{
-		return $downloadURL . '?access_token=' . $downloadToken;
+		$urls = array();
+		foreach ($downloadURLs as $downloadURL)
+		{
+			$urls[] = $downloadURL . '?access_token=' . $downloadToken;
+		}
+		return $urls;
 	}
 
 	/**
@@ -193,9 +201,9 @@ class ZoomHelper
 		$meeting = $payload[self::MEETING];
 		$hostEmail = $meeting[self::HOST_EMAIL];
 		$recordingFiles = $meeting[self::RECORDING_FILES];
-		$downloadURL = self::getDownloadUrl($recordingFiles);
+		$downloadURLs = self::getDownloadUrls($recordingFiles);
 		$meetingId = $meeting[self::MEETING_ID];
-		return array($accountId, $downloadToken, $hostEmail, $downloadURL, $meetingId);
+		return array($accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId);
 	}
 
 	/**
@@ -243,7 +251,7 @@ class ZoomHelper
 	/**
 	 * @return array
 	 */
-	private static function getAllHeaders()
+	protected static function getAllHeaders()
 	{
 		if (!function_exists('getallheaders'))
 		{
@@ -266,22 +274,22 @@ class ZoomHelper
 
 	/**
 	 * @param array $recordingFiles
-	 * @return string
+	 * @return array
 	 */
-	private static function getDownloadUrl($recordingFiles)
+	protected static function getDownloadUrls($recordingFiles)
 	{
-		$downloadURL = '';
+		$downloadURLs = array();
 		foreach ($recordingFiles as $recordingFile) {
 			if ($recordingFile[self::FILE_TYPE] === self::MP4)
 			{
-				$downloadURL = $recordingFile[self::DOWNLOAD_URL];
+				$downloadURLs[] = $recordingFile[self::DOWNLOAD_URL];
 			}
 		}
-		if (!$downloadURL)
+		if (!$downloadURLs)
 		{
 			KExternalErrors::dieGracefully('Zoom - MP4 downland url was not found');
 		}
-		return $downloadURL;
+		return $downloadURLs;
 	}
 
 	/**
@@ -293,6 +301,78 @@ class ZoomHelper
 		$request_body = file_get_contents(self::PHP_INPUT);
 		$data = json_decode($request_body, true);
 		return $data;
+	}
+
+	/**
+	 * @param array $urls
+	 * @param kuser $dbUser
+	 * @param ZoomVendorIntegration $zoomIntegration
+	 * @param $emails
+	 * @param $meetingId
+	 * @param $hostEmail
+	 * @throws Exception
+	 */
+	public static function uploadToKaltura($urls, $dbUser, $zoomIntegration, $emails, $meetingId, $hostEmail)
+	{
+		foreach ($urls as $url)
+		{
+			$entryId = ZoomHelper::createEntryForZoom($dbUser, $zoomIntegration->getZoomCategory(), $emails, $meetingId);
+			kJobsManager::addImportJob(null, $entryId, $dbUser->getPartnerId(), $url);
+			KalturaLog::debug('Zoom - upload entry to kaltura started, partner id: ' .
+				$zoomIntegration->getPartnerId() . ' host email: ' . $hostEmail .
+				' emails: ' . print_r($emails, true) . ' category: ' .  $zoomIntegration->getZoomCategory() .
+				' meeting Id: ' . $meetingId . ' entry Id: ' . $entryId);
+			if ($zoomIntegration->getZoomCategoryId())
+			{
+				self::createCategoryEntry($entryId, $zoomIntegration->getZoomCategoryId(), $dbUser->getPartnerId());
+			}
+		}
+	}
+
+	/**
+	 * @param int $partnerId
+	 * @param string $categoryName
+	 * @throws Exception
+	 * @return int id;
+	 */
+	public static function createCategoryForZoom($partnerId, $categoryName)
+	{
+		try
+		{
+			$categoryDb = new category();
+			$categoryDb->setName($categoryName);
+			$categoryDb->setPartnerId($partnerId);
+			$categoryDb->save();
+			return $categoryDb->getId();
+		}
+		catch(Exception $ex)
+		{
+			if ($ex->getCode() === kCoreException::DUPLICATE_CATEGORY)
+			{
+				KalturaLog::debug('category: ' . $categoryName . ' already exist for partner: ' . $partnerId);
+			}
+			else
+			{
+				throw $ex;
+			}
+		}
+		return categoryPeer::getByFullNameExactMatch($categoryName, null, $partnerId)->getId();
+	}
+
+	/**
+	 * @param $entryId
+	 * @param $categoryId
+	 * @param $getPartnerId
+	 * @throws PropelException
+	 */
+	protected static function createCategoryEntry($entryId, $categoryId, $getPartnerId)
+	{
+		$categoryEntry = new categoryEntry();
+		$categoryEntry->setEntryId($entryId);
+		$categoryEntry->setCategoryId($categoryId);
+		$categoryEntry->setPartnerId($getPartnerId);
+		$categoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
+		$categoryEntry->save();
 	}
 
 }

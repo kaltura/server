@@ -145,6 +145,7 @@ class ZoomVendorService extends KalturaBaseService
 	 * @param string $accountId
 	 * @return string
 	 * @throws PropelException
+	 * @throws Exception
 	 */
 	public function submitRegistrationAction($defaultUserId, $zoomCategory, $accountId)
 	{
@@ -162,7 +163,17 @@ class ZoomVendorService extends KalturaBaseService
 		}
 		$zoomIntegration->setStatus(VendorStatus::ACTIVE);
 		$zoomIntegration->setDefaultUserEMail($defaultUserId);
-		$zoomIntegration->setZoomCategory($zoomCategory);
+		if ($zoomCategory)
+		{
+			$zoomIntegration->setZoomCategory($zoomCategory);
+			$categoryId = ZoomHelper::createCategoryForZoom($partnerId, $zoomCategory);
+			$zoomIntegration->setZoomCategoryId($categoryId);
+		}
+		if (!$zoomCategory && $zoomIntegration->getZoomCategory() && $zoomIntegration->getZoomCategoryId())
+		{
+			$zoomIntegration->unsetCategory();
+			$zoomIntegration->unsetCategoryId();
+		}
 		$zoomIntegration->save();
 		return true;
 	}
@@ -177,7 +188,7 @@ class ZoomVendorService extends KalturaBaseService
 		myPartnerUtils::resetAllFilters();
 		ZoomHelper::verifyHeaderToken();
 		$data = ZoomHelper::getPayloadData();
-		list($accountId, $downloadToken, $hostEmail, $downloadURL, $meetingId) = ZoomHelper::extractDataFromRecordingCompletePayload($data);
+		list($accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId) = ZoomHelper::extractDataFromRecordingCompletePayload($data);
 		/** @var ZoomVendorIntegration $zoomIntegration */
 		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 		if (!$zoomIntegration)
@@ -193,14 +204,12 @@ class ZoomVendorService extends KalturaBaseService
 			$emails[] = $hostEmail;
 			$dbUser = kuserPeer::getKuserByPartnerAndUid($zoomIntegration->getPartnerId(), $zoomIntegration->getDefaultUserEMail(), true);
 		}
+		$this->setPartnerFilters($zoomIntegration->getPartnerId());
 		kSessionUtils::createKSessionNoValidations($dbUser->getPartnerId() , $dbUser->getPuserId() , $ks, 86400 , false , "" , '*' );
 		kCurrentContext::initKsPartnerUser($ks);
 		kPermissionManager::init();
-		$url = ZoomHelper::parseDownloadUrl($downloadURL, $downloadToken);
-		$entryId = ZoomHelper::createEntryForZoom($dbUser, $zoomIntegration->getZoomCategory(), $emails, $meetingId);
-		kJobsManager::addImportJob(null, $entryId, $dbUser->getPartnerId(), $url);
-		KalturaLog::debug('Zoom - upload entry to kaltura started, partner id: '. $zoomIntegration->getPartnerId() . 'host email: ' . $hostEmail . 'emails: ' . print_r($emails, true) .
-		'meeting Id: ' . $meetingId . 'entry Id: ' . $entryId);
+		$urls = ZoomHelper::parseDownloadUrls($downloadURLs, $downloadToken);
+		ZoomHelper::uploadToKaltura($urls, $dbUser, $zoomIntegration, $emails, $meetingId, $hostEmail);
 	}
 
 }

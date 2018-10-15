@@ -313,7 +313,11 @@ class MediaRepurposingUtils
 
 	private static function getTypeOfVar($obj, $name)
 	{
-		$reflectClass = new ReflectionClass(get_class($obj));
+		if($obj)
+			$reflectClass = new ReflectionClass(get_class($obj));
+		else
+			$reflectClass = new ReflectionClass(get_class());
+		
 		$property = $reflectClass->getProperty($name);
 		return ConfigureForm::getTypeFromDoc($property->getDocComment());
 	}

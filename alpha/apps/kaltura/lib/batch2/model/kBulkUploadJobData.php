@@ -5,18 +5,17 @@
  */
 class kBulkUploadJobData extends kJobData
 {
-/**
+	/**
 	 * @var int
 	 */
 	private $userId;
 	
 	/**
 	 * The screen name of the user
-	 * 
 	 * @var string
 	 */
 	private $uploadedBy;
-	
+
 	/**
 	 * Selected profile id for all bulk entries
 	 * @deprecated
@@ -33,32 +32,28 @@ class kBulkUploadJobData extends kJobData
 	
 	/**
 	 * Created by the API
-	 * 
 	 * @var string
 	 */
 	private $resultsFileLocalPath;
 	
 	/**
 	 * Created by the API
-	 * 
 	 * @var string
 	 */
 	private $resultsFileUrl;
 
 	/**
-	 * 
 	 * The bulk upload job file path
 	 * @var string
 	 */
 	private $filePath;
 	
 	/**
-	 * 
 	 * The bulk upload job file name
 	 * @var string
 	 */
 	private $fileName;
-	
+
 	/**
 	 * Type of object for bulk upload
 	 * @var int
@@ -83,199 +78,239 @@ class kBulkUploadJobData extends kJobData
 	 */
 	protected $numOfErrorObjects;
 
-    	/**
-    	 * Recipients of the email for bulk upload success/failure
-     	* @var string
-     	*/
-   	 protected $emailRecipients;
+	/**
+	 * Recipients of the email for bulk upload success/failure
+	 * @var string
+	 */
+	 protected $emailRecipients;
 
 	/**
-	 * @return the $userId
+	 * The bulk upload job ks privileges
+	 * @var string
 	 */
-	public function getUserId() {
+	protected $privileges;
+
+	/**
+	 * @return int $userId
+	 */
+	public function getUserId()
+	{
 		return $this->userId;
 	}
 
 	/**
-	 * @return the $uploadedBy
+	 * @return string $uploadedBy
 	 */
-	public function getUploadedBy() {
+	public function getUploadedBy()
+	{
 		return $this->uploadedBy;
 	}
 
 	/**
-	 * @return the $conversionProfileId
+	 * @return int $conversionProfileId
 	 */
-	public function getConversionProfileId() {
+	public function getConversionProfileId()
+	{
 		return $this->conversionProfileId;
 	}
 
 	/**
-	 * @return the $numOfEntries
+	 * @return int $numOfEntries
 	 */
-	public function getNumOfEntries() {
+	public function getNumOfEntries()
+	{
 		return $this->numOfEntries;
+	}
+
+	/**
+	 * @return string $privileges
+	 */
+	public function getPrivileges()
+	{
+		return $this->privileges;
 	}
 
 	/**
 	 * @param int $userId
 	 */
-	public function setUserId($userId) {
+	public function setUserId($userId)
+	{
 		$this->userId = $userId;
 	}
 
 	/**
 	 * @param string $uploadedBy
 	 */
-	public function setUploadedBy($uploadedBy) {
+	public function setUploadedBy($uploadedBy)
+	{
 		$this->uploadedBy = $uploadedBy;
 	}
 
 	/**
 	 * @param int $conversionProfileId
 	 */
-	public function setConversionProfileId($conversionProfileId) {
+	public function setConversionProfileId($conversionProfileId)
+	{
 		$this->conversionProfileId = $conversionProfileId;
 	}
 
 	/**
 	 * @param int $numOfEntries
 	 */
-	public function setNumOfEntries($numOfEntries) {
+	public function setNumOfEntries($numOfEntries)
+	{
 		$this->numOfEntries = $numOfEntries;
 	}
 	
 	/**
-	 * @return the $filePath
+	 * @return string $filePath
 	 */
-	public function getFilePath() {
+	public function getFilePath()
+	{
 		return $this->filePath;
 	}
 
 	/**
 	 * @param string $filePath
 	 */
-	public function setFilePath($filePath) {
+	public function setFilePath($filePath)
+	{
 		$this->filePath = $filePath;
 	}
 	
 	/**
-	 * @return the $fileName
+	 * @return string $fileName
 	 */
-	public function getFileName() {
+	public function getFileName()
+	{
 		return $this->fileName;
 	}
 
 	/**
 	 * @param string $fileName
 	 */
-	public function setFileName($fileName) {
+	public function setFileName($fileName)
+	{
 		$this->fileName = $fileName;
 	}
 
 	/**
-	 * @return the $resultsFileLocalPath
+	 * @return string $resultsFileLocalPath
 	 */
-	public function getResultsFileLocalPath() {
+	public function getResultsFileLocalPath()
+	{
 		return $this->resultsFileLocalPath;
 	}
 
 	/**
-	 * @return the $resultsFileUrl
+	 * @return string $resultsFileUrl
 	 */
-	public function getResultsFileUrl() {
+	public function getResultsFileUrl()
+	{
 		return $this->resultsFileUrl;
 	}
 
 	/**
 	 * @param string $resultsFileLocalPath
 	 */
-	public function setResultsFileLocalPath($resultsFileLocalPath) {
+	public function setResultsFileLocalPath($resultsFileLocalPath)
+	{
 		$this->resultsFileLocalPath = $resultsFileLocalPath;
 	}
 
 	/**
 	 * @param string $resultsFileUrl
 	 */
-	public function setResultsFileUrl($resultsFileUrl) {
+	public function setResultsFileUrl($resultsFileUrl)
+	{
 		$this->resultsFileUrl = $resultsFileUrl;
 	}
-	/**
-     	* @return the $numOfObjects
-     	*/
-    	public function getNumOfObjects ()
-   	{
-      	 	return $this->numOfObjects;
-   	}
 
 	/**
-	* @param int $numOfObjects
-    	*/
-   	public function setNumOfObjects ($numOfObjects)
-    	{
-    	    	$this->numOfObjects = $numOfObjects;
-   	}
-	/**
-	* @return the $bulkUploadObjectType
-    	*/
-    	public function getBulkUploadObjectType ()
-   	{
-        	return $this->bulkUploadObjectType;
-    	}
+	 * @return int $numOfObjects
+	 */
+	public function getNumOfObjects ()
+	{
+		return $this->numOfObjects;
+	}
 
 	/**
-     	* @param int $bulkUploadObjectType
-     	*/
-   	public function setBulkUploadObjectType ($bulkUploadObjectType)
-   	{
-       		$this->bulkUploadObjectType = $bulkUploadObjectType;
-   	}
-	/**
-     	* @return kBulkUploadObjectData
-     	*/
-    	public function getObjectData ()
- 	{
-        	return $this->objectData;
-    	}
+	 * @param int $numOfObjects
+	 */
+	public function setNumOfObjects ($numOfObjects)
+	{
+		$this->numOfObjects = $numOfObjects;
+	}
 
 	/**
-    	* @param kBulkUploadObjectData $objectData
-     	*/
-    	public function setObjectData ($objectData)
-    	{
-        	$this->objectData = $objectData;
-    	}
-    
-	/**
-     	* @return int
-     	*/
-    	public function getNumOfErrorObjects ()
-    	{
-     	   	return $this->numOfErrorObjects;
-   	}
+	 * @return int $bulkUploadObjectType
+	 */
+	public function getBulkUploadObjectType ()
+	{
+		return $this->bulkUploadObjectType;
+	}
 
 	/**
-     	* @param int $numOfErrorObjects
-     	*/
-    	public function setNumOfErrorObjects ($numOfErrorObjects)
-    	{
-        	$this->numOfErrorObjects = $numOfErrorObjects;
-    	}
+	 * @param int $bulkUploadObjectType
+	 */
+	public function setBulkUploadObjectType ($bulkUploadObjectType)
+	{
+		$this->bulkUploadObjectType = $bulkUploadObjectType;
+	}
 
-    	/**
-     	* @param string $emailRecipients
-     	*/
-    	public function setEmailRecipients ($emailRecipients)
-    	{
-        	$this->emailRecipients = $emailRecipients;
-    	}
+	/**
+	 * @return kBulkUploadObjectData $objectData
+	 */
+	public function getObjectData ()
+	{
+		return $this->objectData;
+	}
 
-    	/**
-     	* @return string
-     	*/
-    	public function getEmailRecipients ()
-    	{
-        	return $this->emailRecipients;
-    	}
+	/**
+	 * @param kBulkUploadObjectData $objectData
+	 */
+	public function setObjectData ($objectData)
+	{
+		$this->objectData = $objectData;
+	}
 
+	/**
+	 * @return int $numOfErrorObjects
+	 */
+	public function getNumOfErrorObjects ()
+	{
+		return $this->numOfErrorObjects;
+	}
+
+	/**
+	 * @param int $numOfErrorObjects
+	 */
+	public function setNumOfErrorObjects ($numOfErrorObjects)
+	{
+		$this->numOfErrorObjects = $numOfErrorObjects;
+	}
+
+	/**
+	 * @param string $emailRecipients
+	 */
+	public function setEmailRecipients ($emailRecipients)
+	{
+		$this->emailRecipients = $emailRecipients;
+	}
+
+	/**
+	 * @param string $privileges
+	 */
+	public function setPrivileges($privileges)
+	{
+		$this->privileges = $privileges;
+	}
+
+	/**
+	 * @return string $emailRecipients
+	 */
+	public function getEmailRecipients ()
+	{
+		return $this->emailRecipients;
+	}
 }

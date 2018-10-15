@@ -467,7 +467,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 				
 				foreach ($fieldMapping as $src => $dest)
 				{
-					$value = intval($entryResult[$src] / $bucketSize);
+					$value = ceil($entryResult[$src] / $bucketSize);
 					if ($value > $result[$entryId][$dest])
 					{
 						$result[$entryId][$dest] = $value;

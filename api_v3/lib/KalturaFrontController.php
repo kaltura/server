@@ -287,9 +287,6 @@ class KalturaFrontController
 							
 			$cache = new KalturaResponseCacher($currentParams);
 			
-			$success = true;
-			$errorCode = null;
-			$this->onRequestStart($currentService, $currentAction, $currentParams, kCurrentContext::$multiRequest_index, true);
 			$cachedResult = $cache->checkCache('X-Kaltura-Part-Of-MultiRequest');
 			if ($cachedResult)
 			{
@@ -297,6 +294,9 @@ class KalturaFrontController
 			}
 			else
 			{
+				$success = true;
+				$errorCode = null;
+				$this->onRequestStart($currentService, $currentAction, $currentParams, kCurrentContext::$multiRequest_index, true);
 				if (kCurrentContext::$multiRequest_index != 1)
 				{
 					kMemoryManager::clearMemory();
@@ -323,8 +323,8 @@ class KalturaFrontController
 					$currentResult = $this->getExceptionObject($ex, $currentService, $currentAction);
 				}
 				$cache->storeCache($currentResult, array(), true);
+				$this->onRequestEnd($success, $errorCode, kCurrentContext::$multiRequest_index);
 			}
-			$this->onRequestEnd($success, $errorCode, kCurrentContext::$multiRequest_index);
 			
 			for($nextMultiRequestIndex = ($i + 1); $nextMultiRequestIndex <= count($listOfRequests); $nextMultiRequestIndex++)
 			{

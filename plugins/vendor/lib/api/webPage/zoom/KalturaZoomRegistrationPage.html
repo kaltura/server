@@ -88,8 +88,8 @@
             event.preventDefault();
             var $defaultUserId = $('#defaultUserId');
             var $zoomCategory  = $('#zoomCategory');
-            var defaultUserId = $defaultUserId.val();
-            var zoomCategory = $zoomCategory.val();
+            var defaultUserId = $defaultUserId.val().trim();
+            var zoomCategory = $zoomCategory.val().trim();
             $.ajax({
                 url : url,
                 type : "post",
