@@ -53,13 +53,11 @@ class kConfCacheManager
 
 	static function hasMap ($mapName)
 	{
-		$key=null;
 		foreach (self::$mapLoadFlow as $cacheEntity)
 		{
 			/* @var $cacheObj kBaseConfCache*/
 			$cacheObj = kCacheConfFactory::getInstance($cacheEntity);
-			if(!$key && $cacheObj->isKeyRequired())
-				if($cacheObj->hasMap($key, $mapName))
+			if($cacheObj->hasMap(null, $mapName))
 					return true;
 		}
 		return false;
