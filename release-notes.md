@@ -16,7 +16,7 @@
         	{ "add" : { "index" : "beacon_entry_index_XXX", "alias" : "beacon_entry_index_search" } },
         	{ "add" : { "index" : "beacon_entry_server_node_index_XXX", "alias" : "beacon_entry_server_node_index_search" } },
         	{ "add" : { "index" : "beacon_scheduled_resource_index_XXX", "alias" : "beacon_scheduled_resource_index_search" } },
-        	{ "add" : { "index" : "beacon_server_node_index_2017_01_21", "alias" : "beacon_server_node_index_search" } },
+        	{ "add" : { "index" : "beacon_server_node_index_XXX", "alias" : "beacon_server_node_index_search" } },
 			]
 		}'
 		
