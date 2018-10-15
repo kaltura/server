@@ -32,9 +32,11 @@ class ZoomVendorIntegration extends VendorIntegration
 
 	public function setZoomCategory($v)	{ $this->putInCustomData ( self::ZOOM_CATEGORY, $v);	}
 	public function getZoomCategory( )	{ return $this->getFromCustomData(self::ZOOM_CATEGORY);	}
+	public function unsetCategory( )  {return $this->removeFromCustomData(self::ZOOM_CATEGORY);	}
 
 	public function setZoomCategoryId($v)	{ $this->putInCustomData ( self::ZOOM_CATEGORY_ID, $v);	}
 	public function getZoomCategoryId( )	{ return $this->getFromCustomData(self::ZOOM_CATEGORY_ID);	}
+	public function unsetCategoryId( )  {return $this->removeFromCustomData(self::ZOOM_CATEGORY_ID);	}
 
 	/**
 	 * returns all tokens as array
