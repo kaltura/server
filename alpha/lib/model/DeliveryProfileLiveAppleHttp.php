@@ -127,6 +127,10 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			if(!$this->isFlavorAllowed($kLiveStreamParams->getFlavorId()))
 				continue;
 			
+			if(count($this->getDynamicAttributes()->getFlavorParamIds()) &&
+				!in_array($kLiveStreamParams->getFlavorId(), $this->getDynamicAttributes()->getFlavorParamIds()))
+				continue;
+			
 			/* @var $kLiveStreamParams kLiveStreamParams */
 			/* @var $stream kLiveStreamParams */
 			$flavor = array(
