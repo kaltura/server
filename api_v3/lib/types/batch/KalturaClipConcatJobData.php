@@ -32,7 +32,6 @@ class KalturaClipConcatJobData extends KalturaJobData
 	 */
 	public $priority;
 
-
 	/** clip operations
 	 * @var KalturaObjectArray $operationAttributes
 	 */

@@ -435,8 +435,10 @@ $stub=null;
 		if(strstr($data->flavorParamsOutput->tags,KConversionEngineFfmpeg::TAG_NGS_STUB)!=false)
 			$stub="--stub";
 	
-		$digSignStub = "-f rawvideo -pix_fmt yuv420p - | %s -w %d -h %d -f %s %s --%s| %s -f rawvideo -s %dx%d -r %s -i -";
-		$digSignStr = sprintf($digSignStub, $ngsBin, $srcWid, $srcHgt, $srcFps, $stub, $prepMode,KDLCmdlinePlaceholders::BinaryName, $srcWid, $srcHgt, $srcFps);
+		$digSignStub = "-f rawvideo -s %dx%d -pix_fmt yuv420p - | %s -w %d -h %d -f %s %s --%s| %s -f rawvideo -s %dx%d -r %s -i -";
+		$digSignStr = sprintf($digSignStub, $srcWid, $srcHgt, $ngsBin, $srcWid, $srcHgt, $srcFps, 
+				      		$stub, $prepMode,KDLCmdlinePlaceholders::BinaryName, $srcWid, $srcHgt, $srcFps);
+
 		$cmdLine = KDLOperatorFfmpeg::SplitCommandLineForVideoPiping($cmdLine, $digSignStr);
 		KalturaLog::log("After:cmdLine($cmdLine)");
 		return $cmdLine;
@@ -496,7 +498,7 @@ $stub=null;
 			$filter = new KalturaAssetFilter();
 			$filter->entryIdEqual = $flavorAsset->entryId;
 			$captionAssetList = KBatchBase::$kClient->captionAsset->listAction($filter, null); 
-			if(!isset($captionAssetList) || count($captionAssetList->objects)==0){
+			if(!isset($captionAssetList) || !$captionAssetList->objects || count($captionAssetList->objects)==0){
 				$jobMsg = "No caption assets for entry (".$flavorAsset->entryId.")";
 				KalturaLog::notice("ERROR:".$jobMsg);
 				return null;

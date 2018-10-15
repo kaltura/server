@@ -84,6 +84,11 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 				$params['dar'] = $mediaInfoDar;
 				$params['vidDur'] = $mediaInfoVidDur;
 				$params['scanType'] = $mediaInfoScanType;
+				if ( $data->srcAssetEncryptionKey )
+				{
+					$params['encryption_key'] = $data->srcAssetEncryptionKey;
+				}
+
 				$created = $thumbMaker->createThumnail($videoOffset, $mediaInfoWidth, $mediaInfoHeight, $params);
 				if(!$created || !file_exists($capturePath))
 					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "Thumbnail not created", KalturaBatchJobStatus::FAILED);
@@ -190,7 +195,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 		$this->impersonate($partnerId);
 		$mediaInfoList = self::$kClient->mediaInfo->listAction($mediaInfoFilter);
 		$this->unimpersonate();
-		if(count($mediaInfoList->objects))
+		if($mediaInfoList->objects && count($mediaInfoList->objects))
 		{
 			$mediaInfo = reset($mediaInfoList->objects);
 			/* @var $mediaInfo KalturaMediaInfo */

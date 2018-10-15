@@ -69,6 +69,7 @@ abstract class ESearchBaseOperator extends ESearchItem
 				break;
 			case ESearchOperatorType::NOT_OP:
 				$boolOperator = kESearchBoolQuery::MUST_NOT_KEY;
+				$queryAttributes->setSearchHistoryMustNotContext(true);
 				break;
 			default:
 				KalturaLog::crit('unknown operator type');
@@ -77,6 +78,9 @@ abstract class ESearchBaseOperator extends ESearchItem
 
 		$categorizedSearchItems = self::getCategorizedSearchItems($eSearchItemsArr);
 		$outQuery = static::createSearchQueryForItems($categorizedSearchItems, $boolOperator, $queryAttributes);
+
+		if ($boolOperator == kESearchBoolQuery::MUST_NOT_KEY)
+			$queryAttributes->setSearchHistoryMustNotContext(false);
 
 		return $outQuery;
 	}

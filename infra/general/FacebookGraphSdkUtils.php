@@ -281,9 +281,11 @@ class FacebookGraphSdkUtils
 
 	public static function getKalturaRedirectUrl()
 	{
-		return kDataCenterMgr::getCurrentDcUrl()."/index.php/extservices/facebookoauth2?".
+		$url = kDataCenterMgr::getCurrentDcUrl()."/index.php/extservices/facebookoauth2?" .
 			http_build_query(array(FacebookConstants::FACEBOOK_NEXT_ACTION_REQUEST_PARAM =>  base64_encode(FacebookConstants::SUB_ACTION_PROCESS_OAUTH2_RESPONSE)),
 				null, '&');
+		$url = str_replace("http:", "https:", $url);
+		return $url;
 	}
 
 	/**
@@ -462,15 +464,22 @@ class FacebookGraphSdkUtils
 	 * @param Facebook\PersistentData\PersistentDataInterface|string $dataHandler
 	 * @return \Facebook\Facebook
 	 */
-	public static function createFacebookInstance($appId, $appSecret, $dataHandler = "session"){
-		return new Facebook\Facebook(
-			array (
-				'app_id' => $appId,
-				'app_secret' => $appSecret,
-				'default_graph_version' => FacebookConstants::FACEBOOK_SDK_VERSION,
-				'default_access_token' => 'APP-ID|APP-SECRET',
-				'persistent_data_handler' => $dataHandler,
-			));
+	public static function createFacebookInstance($appId, $appSecret, $dataHandler = null)
+	{
+		$config = array (
+			'app_id' => $appId,
+			'app_secret' => $appSecret,
+			'default_graph_version' => FacebookConstants::FACEBOOK_SDK_VERSION,
+			'default_access_token' => 'APP-ID|APP-SECRET'
+		);
+
+		if($dataHandler)
+		{
+			$config['persistent_data_handler'] = $dataHandler;
+		}
+
+		return new Facebook\Facebook($config);
+
 	}
 }
 

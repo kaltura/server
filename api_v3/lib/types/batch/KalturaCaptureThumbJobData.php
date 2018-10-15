@@ -35,7 +35,12 @@ class KalturaCaptureThumbJobData extends KalturaJobData
 	 * @var string
 	 */
 	public $srcAssetId;
-	
+
+	/**
+	 * @var string
+	 */
+	public $srcAssetEncryptionKey;
+
 	/**
 	 * @var KalturaAssetType
 	 */
@@ -56,6 +61,7 @@ class KalturaCaptureThumbJobData extends KalturaJobData
 		"srcAssetId" ,
 		"srcAssetType" ,
 		"thumbPath" ,
+		"srcAssetEncryptionKey"
 	);
 
 

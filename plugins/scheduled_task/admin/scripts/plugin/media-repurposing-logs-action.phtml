@@ -6,7 +6,7 @@
 	echo $this->form;
 ?>
 
-<?php if(count($this->paginator)): ?>
+<?php if($this->paginator && count($this->paginator)): ?>
 <div id="log_list" class="clear">
 	<table>
 		<thead>

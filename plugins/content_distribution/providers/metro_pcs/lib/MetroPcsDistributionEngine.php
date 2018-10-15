@@ -130,7 +130,7 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		$flavorAssetArray = $this->getFlavorAsset($entryDistribution, $firstFlavorAssetId);	
 		$flavorAsset = 	$flavorAssetArray[0];
 		//getting thumbnails
-		$thumbAssets = $this->getThumbAssets($entryDistribution);		
+		$thumbAssets = $this->getEntryDistributionThumbAssets($entryDistribution);
 		$entryDuration = $this->getEntryDuration($entryDistribution);
 		
 		//building feed
@@ -266,22 +266,12 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		return $fileTransferMgr->listDir('/');
 	}
 	
-	protected function getThumbAssets(KalturaEntryDistribution $entryDistribution)
+	protected function getEntryDistributionThumbAssets(KalturaEntryDistribution $entryDistribution)
 	{
-		$thumbAssetFilter = new KalturaThumbAssetFilter();
-		$thumbAssetFilter->entryIdEqual = $entryDistribution->entryId;
-		$thumbAssetFilter->idIn = $entryDistribution->thumbAssetIds;
+		$thumbAssetIds = $entryDistribution->thumbAssetIds;
+		$partnerId = $entryDistribution->partnerId;
 		
-		try {
-			KBatchBase::impersonate($entryDistribution->partnerId);
-			$thumbAssets = KBatchBase::$kClient->thumbAsset->listAction($thumbAssetFilter);
-			KBatchBase::unimpersonate();
-		}
-		catch (Exception $e) {
-			KBatchBase::unimpersonate();
-			throw $e;
-		}		
-		return $thumbAssets->objects;		
+		return parent::getThumbAssets($partnerId, $thumbAssetIds);
 	}
 	
 	protected function getFlavorAsset(KalturaEntryDistribution $entryDistribution, $flavorAssetId)

@@ -348,4 +348,27 @@ class kRule
 		unset($vars['scope']);
 		return array_keys($vars);
 	}
+
+	public function hasActionType($actionTypes)
+	{
+		if ($actionTypes)
+		{
+			$ruleActions = $this->getActions();
+			if (!$ruleActions)
+			{
+				return false;
+			}
+			foreach ($ruleActions as $currAction)
+			{
+				/* @var kRuleAction $currAction */
+				if (in_array($currAction->getType(), $actionTypes))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		return true;
+	}
+
 }

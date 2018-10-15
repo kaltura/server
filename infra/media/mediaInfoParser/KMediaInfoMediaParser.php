@@ -438,10 +438,10 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 		preg_match_all("/(([0-9]*)h ?)?(([0-9]*)mn ?)?(([0-9]*)s ?)?(([0-9]*)ms ?)?/",
 			$str, $res);
 			
-		$hour = @$res[2][0];
-		$min  = @$res[4][0];
-		$sec  = @$res[6][0];
-		$msec = @$res[8][0];
+		$hour = @$res[2][0] ? @$res[2][0] : 0;
+		$min  = @$res[4][0] ? @$res[4][0] : 0;
+		$sec  = @$res[6][0] ? @$res[6][0] : 0;
+		$msec = @$res[8][0] ? @$res[8][0] : 0;
 		
 		$rv = ($hour*3600 + $min*60 + $sec)*1000 + $msec;
 		

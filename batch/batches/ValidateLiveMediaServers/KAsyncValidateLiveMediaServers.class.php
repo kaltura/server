@@ -40,7 +40,8 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		$entryServerNodePager->pageIndex = 1;
 		
 		$entryServerNodes = self::$kClient->entryServerNode->listAction($entryServerNodeFilter, $entryServerNodePager);
-		while(count($entryServerNodes->objects))
+		
+		while($entryServerNodes->objects && count($entryServerNodes->objects))
 		{
 			foreach($entryServerNodes->objects as $entryServerNode)
 			{

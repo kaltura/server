@@ -604,10 +604,15 @@
 				 * Required for udrm support
 				 */
 			if($params->format=="mp4") {
+				$ffmpegVerStr = self::getFFMpegVersion($setup->ffmpegBin);
+				/*
+				 * This fix is required for uDRM support. 
+				 * FFmpeg 3.2 got Kaltura patch. FFMpeg 4 comes with native solution that includes H265 as well. 
+				 */
 				if($params->vcodec=="libx264")
-					$mergeCmd.= " -nal_types_mask 0x3e";
+					$mergeCmd.= ((int)$ffmpegVerStr<4)?" -nal_types_mask 0x3e":" -bsf:v filter_units=pass_types=1-5";
 				else if($params->vcodec=="libx265")
-					$mergeCmd.= " -nal_types_mask 0xffffffff";
+					$mergeCmd.= ((int)$ffmpegVerStr<4)?" -nal_types_mask 0xffffffff":" -bsf:v filter_units=pass_types=0-31";
 			}
 
 			if(($key=array_search("-tag:v", $params->cmdLineArr))!==false) {
@@ -921,6 +926,23 @@
 			}
 			KalturaLog::log(print_r($arr,1));
 			return $arr;
+		}
+
+		/********************
+		 *
+		 */
+		protected static function getFFMpegVersion($ffmpegBin)
+		{
+			KalturaLog::log($ffmpegBin);
+			$lastLine=exec("$ffmpegBin -version" , $outputArr, $rv);
+			if($rv!=0) {
+				KalturaLog::log("ERROR: failed to run $ffmpegBin binary.");
+				return null;
+			}
+			$str = $strVer = null;
+			sscanf($outputArr[0],"%s %s %s ",$str,$str,$strVer);
+			KalturaLog::log("$strVer");
+			return $strVer;
 		}
 	}
 	

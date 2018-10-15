@@ -243,9 +243,8 @@ class DbManager
 			
 			$preferredIndex = self::getSphinxConnIndexFromCache();
 
-			$preferredIndexByLag = -1;
 			if ($preferredIndex === false)
-				$preferredIndexByLag = self::getSphinxConnIndexByLastUpdatedAt($sphinxDS);
+				$preferredIndex = self::getSphinxConnIndexByLastUpdatedAt($sphinxDS);
 
 			list(self::$sphinxConnection, self::$connIndex) = self::connectFallbackLogic(
 				array('DbManager', 'getSphinxConnectionInternal'), 
@@ -257,7 +256,7 @@ class DbManager
 			{
 				throw new Exception('Failed to connect to any Sphinx config');
 			}
-			KalturaLog::debug("Actual sphinx index [". self::$connIndex."] sphinx index by best lag [" .$preferredIndexByLag."]");
+			KalturaLog::debug("Actual sphinx index [". self::$connIndex. "] sphinx index by best lag [" . $preferredIndex. "]");
 		}
 	
 		if (!$read)
@@ -320,7 +319,7 @@ class DbManager
 			$preferredWeight -= $weight;
 			if ($preferredWeight <= 0)
 			{
-				KalturaLog::debug("Sphinx with best lag chosen [" . $currentHost . "] in datasource index [" . $hostToIndex[$currentHost] . "]");
+				KalturaLog::log("Chosen Sphinx [$currentHost]. Sphinx weights " . print_r($weights, true));
 				return $hostToIndex[$currentHost];
 			}
 		}

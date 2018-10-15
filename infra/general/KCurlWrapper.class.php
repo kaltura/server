@@ -396,11 +396,15 @@ class KCurlWrapper
 			$header = reset(self::$headers);
 
 			// this line is true if the protocol is HTTP (or HTTPS);
-			$matches = null;
-			if(preg_match('/HTTP\/?[\d.]{0,3} ([\d]{3}) ([^\n\r]+)/', $header, $matches))
+			if(preg_match('/HTTP\/?[\d.]{0,3}/', $header))
 			{
-				$curlHeaderResponse->code = $matches[1];
-				$curlHeaderResponse->codeName = $matches[2];
+				$matches = explode(" ", $header, 3);
+				if(isset($matches[1]) && is_numeric($matches[1]))
+				{
+					$curlHeaderResponse->code = $matches[1];
+					if(isset($matches[2]) && !empty($matches[2]))
+						$curlHeaderResponse->codeName = $matches[2];
+				}
 			}
 
 			foreach ( self::$headers as $header )
@@ -502,8 +506,8 @@ class KCurlWrapper
 	 */
 	public function exec($sourceUrl, $destFile = null,$progressCallBack = null, $allowInternalUrl = false)
 	{
-		if (!$allowInternalUrl && $this->isInternalUrl($sourceUrl))
-			KalturaLog::debug("Exec Curl - Found not allowed Internal url: " . $sourceUrl);
+		if (!$allowInternalUrl && self::isInternalUrl($sourceUrl) && !self::isWhiteListedInternalUrl($sourceUrl))
+			KalturaLog::debug("Exec Curl - Found not allowed not whiteListed Internal url: . $sourceUrl");
 
 		$this->setSourceUrlAndprotocol($sourceUrl);
 		
@@ -539,8 +543,8 @@ class KCurlWrapper
 	 */
 	public function doExec($sourceUrl, $allowInternalUrl = false)
 	{
-		if (!$allowInternalUrl && $this->isInternalUrl($sourceUrl))
-			KalturaLog::debug("DoExec Curl - Found not allowed Internal url: " . $sourceUrl);
+		if (!$allowInternalUrl && self::isInternalUrl($sourceUrl) && !self::isWhiteListedInternalUrl($sourceUrl))
+			KalturaLog::debug("DoExec Curl - Found not allowed and not whiteListed Internal url: $sourceUrl");
 
 		curl_setopt($this->ch, CURLOPT_URL, $sourceUrl);
 
@@ -558,25 +562,40 @@ class KCurlWrapper
 		}
 	}
 
-	private function isInternalUrl($url = null)
+	private static function isInternalUrl($url = null)
 	{
-		$host = $this->getUrlHost($url);
+		$host = self::getUrlHost($url);
 		if (!$host)
 			return true;
 		if (filter_var($host, FILTER_VALIDATE_IP)) // do we have an ip and not a hostname
-			return $this->IsIpPrivateOrReserved($host);
+			return self::IsIpPrivateOrReserved($host);
 
 		$res = gethostbyname($host);
 		if ($res == $host) // in case of local machine name
 			return true;
-		return $this->IsIpPrivateOrReserved($res);
+		return self::IsIpPrivateOrReserved($res);
 	}
 
-	private function IsIpPrivateOrReserved($host)
+	private static function IsIpPrivateOrReserved($host)
 	{
 		return !filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE |  FILTER_FLAG_NO_RES_RANGE); // checks if host is NOT in a private or reserved range
 	}
-	private function getUrlHost($url = null)
+
+	private static function isWhiteListedInternalUrl($url)
+	{
+		if(!kConf::hasMap('security'))
+			return false;
+		
+		$whiteListedInternalPatterns = kConf::get('internal_url_whitelist', 'security', array());
+		foreach ($whiteListedInternalPatterns as $pattern)
+		{
+			if (preg_match($pattern, $url))
+				return true;
+		}
+		return false;
+	}
+
+	private static function getUrlHost($url = null)
 	{
 		$host = null;
 		$url = trim($url);
@@ -654,8 +673,11 @@ class KCurlWrapper
 	{
 	}
 
-	public static function getContent($url, $headers = null)
+	public static function getContent($url, $headers = null, $allowInternalUrl = false)
 	{
+		if (!$allowInternalUrl && self::isInternalUrl($url) && !self::isWhiteListedInternalUrl($url))
+			KalturaLog::debug("Exec Curl in getContent - Found Internal and not whiteListed url: $url");
+
 		$ch = curl_init();
 		
 		// set URL and other appropriate options

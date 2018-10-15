@@ -323,7 +323,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		}
 		else
 		{
-			if(count($partner_search_scope) == 1)
+			if(!is_array($partner_search_scope) || count($partner_search_scope) == 1)
 				$this->add(entryPeer::PARTNER_ID, $partner_search_scope, Criteria::EQUAL);
 			else
 				$this->add(entryPeer::PARTNER_ID, $partner_search_scope, Criteria::IN);

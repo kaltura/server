@@ -393,7 +393,6 @@ KalturaLog::log("Automatic Intermediate Source will be generated");
 			;
 		}
 		public function __destruct() {
-			unset($this);
 		}
 
 		/* ---------------------------

@@ -246,11 +246,7 @@ class assetParamsPeer extends BaseassetParamsPeer
 	public static function retrieveByProfile($conversionProfileId, $con = null)
 	{
 		$flavorIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($conversionProfileId);
-		
-		$criteria = new Criteria();
-		$criteria->add(assetParamsPeer::ID, $flavorIds, Criteria::IN);
-
-		return assetParamsPeer::doSelect($criteria, $con);
+		return assetParamsPeer::retrieveByPKs($flavorIds, $con);
 	}
 
 	public static function retrieveFlavorsByPKs($pks, PropelPDO $con = null)

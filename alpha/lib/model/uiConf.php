@@ -111,7 +111,7 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 	const CUSTOM_DATA_CON_FILE_VERSION = 'conf_file_version';
 	const CUSTOM_DATA_CONF_FILE_FEATURES_VERSION = 'conf_file_features_version';
 	
-	public function save(PropelPDO $con = null, $isClone = false)
+	public function save(PropelPDO $con = null)
 	{
 		try
 		{
@@ -136,17 +136,18 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 		
 		if($this->shouldSetContent())
 		{
-			foreach ($this->content as $contentItem) 
+			foreach ($this->content as $contentItem)
 			{
 				$confFile = $this->getConfFileBySuffix($contentItem['suffix']);
 				if ($confFile)
-					$this->saveConfFileToDisk($confFile, $contentItem['suffix'], $isClone); 
+					$this->saveConfFileToDisk($confFile, $contentItem['suffix']);
 				$contentItem['shouldSet'] = false;
 				
 			}
 			$res = parent::save( $con );
 		}
 		$this->getConfFilePath();
+		
 		return $res;
 	}
 	
@@ -638,17 +639,19 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 				baseObjectUtils::CLONE_POLICY_PREFER_NEW , null , BasePeer::TYPE_PHPNAME );
 		}
 
-		if ($new_name) {
+		if ($new_name)
+		{
 			$cloned->setName( $new_name );
 		}
+		
 		foreach (self::$validSubTypes as $subType) 
 		{
 			$suffix = $this->getSuffixBySubType($subType);
 			$content = $this->getConfFileBySuffix($suffix);
 			$cloned->setConfFileBySuffix($suffix, $content);			
 		}
-		$cloned->save(null, true);
-
+		
+		$cloned->save(null);
 		return $cloned;
 	}
 

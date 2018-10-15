@@ -114,10 +114,9 @@ class LiveEntryServerNode extends EntryServerNode
 	
 	public function getStreams()
 	{
-		$streams = $this->getFromCustomData(self::CUSTOM_DATA_STREAMS, null, array());
+		$streams = $this->getFromCustomData(self::CUSTOM_DATA_STREAMS, null, null);
 		
-		if(count($streams))
-			$streams = unserialize($streams);
+		$streams = $streams ? unserialize($streams) : array();
 		
 		return $streams;
 	}

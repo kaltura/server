@@ -27,9 +27,6 @@ class kDruidBase
 	const DRUID_DOUBLE_SUM_AGGR = 'doubleSum';
 	const DRUID_GRANULARITY = 'granularity';
 	const DRUID_GRANULARITY_ALL = 'all';
-	const DRUID_GRANULARITY_DAY = 'day';
-	const DRUID_GRANULARITY_HOUR = 'hour';
-	const DRUID_GRANULARITY_MONTH = 'month';
 	const DRUID_DATASOURCE = 'dataSource';
 	const DRUID_INTERVALS = 'intervals';
 	const DRUID_FIELDS = 'fields';
@@ -80,6 +77,8 @@ class kDruidBase
 	
 	const DRUID_URL = "druid_url";
 	
+	const COMMENT_MARKER = '@COMMENT@';
+
 	protected static $curl_handle = null;
 	
 	protected static function getIntervals($fromTime, $toTime)
@@ -230,29 +229,7 @@ class kDruidBase
 		);
 	}
 	
-	protected static function runGranularityAllQuery($query)
-	{
-		$query[self::DRUID_GRANULARITY] = self::getGranularityAll();
-		$result = self::runQuery($query);
-		if (!$result)
-		{
-			return array();
-		}
-		$result = reset($result);
-		$result = $result[self::DRUID_RESULT];
-		KalturaLog::log("Druid returned [" . count($result) . "] rows");
-		return $result;
-	}
-	
-	protected static function runGranularityPeriodQuery($query, $period)
-	{
-		$query[self::DRUID_GRANULARITY] = self::getGranularityPeriod($period);
-		$result = self::runQuery($query);
-		KalturaLog::log("Druid returned [" . count($result) . "] rows");
-		return $result;
-	}
-	
-	protected static function runQuery($content) 
+	protected static function runQuery($content, $cache = null, $cacheExpiration = 0)
 	{
 		kApiCache::disableConditionalCache();
 		
@@ -261,14 +238,31 @@ class kDruidBase
 			$content[self::DRUID_CONTEXT] = array();
 		}
 
+		$content[self::DRUID_CONTEXT][self::DRUID_COMMENT] = self::COMMENT_MARKER;
+
+		KalturaLog::log('{' . print_r($content, true) . '}');
+
+		$post = json_encode($content);
+
+		if ($cache)
+		{
+			$cacheKey = 'druidQuery-' . md5($post);
+			$response = $cache->get($cacheKey);
+			if ($response)
+			{
+				$result = json_decode($response, true);
+				if ($result)
+				{
+					KalturaLog::log("Returning from cache $cacheKey");
+					return $result;
+				}
+			}
+		}
+
 		$uniqueId = new UniqueId();
 		$comment = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
 		$comment .= "[$uniqueId]";
-		$content[self::DRUID_CONTEXT][self::DRUID_COMMENT] = $comment;
-
-		KalturaLog::log('{' . print_r($content, true) . '}');
-			
-		$post = json_encode($content);
+		$post = str_replace(self::COMMENT_MARKER, $comment, $post);
 		KalturaLog::log($post);
 			
 		$url = kConf::get(self::DRUID_URL);
@@ -331,6 +325,12 @@ class kDruidBase
 		{
 			KalturaLog::err('Error while running report ' . $result[self::DRUID_ERROR_MSG]);
 			throw new Exception('Error while running report ' . $result[self::DRUID_ERROR_MSG]);
+		}
+
+		if ($cache)
+		{
+			KalturaLog::log("Saving query response to cache $cacheKey");
+			$cache->set($cacheKey, $response, $cacheExpiration);
 		}
 
 		return $result;

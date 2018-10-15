@@ -230,7 +230,8 @@ class Form_ReachProfileConfigure extends ConfigureForm
 				$rules[] = $newRule;
 			}
 		}
-		$this->setDefault('ReachProfileRules', json_encode($rules));
+		if (!empty($rules))
+			$this->setDefault('ReachProfileRules', json_encode($dictionaries));
 	}
 
 	private function createAutomaticRule($rule, $ruleType)
@@ -253,7 +254,7 @@ class Form_ReachProfileConfigure extends ConfigureForm
 
 		$rules = $properties['ReachProfileRules'];
 		$rulesArray = array();
-		foreach (json_decode($rules) as $rule)
+		foreach ((array)json_decode($rules) as $rule)
 		{
 			switch (array_search($rule->ruleType, self::$rulesMap))
 			{

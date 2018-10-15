@@ -106,7 +106,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 		return false;	
 	}
 
-	public function save(PropelPDO $con = null)
+	public function save(PropelPDO $con = null, $skipReload = false)
 	{
 		if ($this->isNew())
 		{
@@ -116,7 +116,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 			$this->setId($this->calculateId());
 		}
 			
-		return parent::save($con);
+		return parent::save($con, $skipReload);
 	}
 	
 	/* (non-PHPdoc)

@@ -296,8 +296,21 @@ class thumbnailAction extends sfAction
 		if (!$referrer)
 			$referrer = kApiCache::getHttpReferrer();
 		$ksStr = $this->getRequestParameter("ks");
-		$secureEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, ContextType::THUMBNAIL);
-		$secureEntryHelper->validateForPlay();
+
+		$enableCacheValidation = true;
+		$accessControl = $entry->getAccessControl();
+		if ($accessControl)
+		{
+			/* @var accessControl $accessControl */
+			$enableCacheValidation = $accessControl->hasRules(ContextType::THUMBNAIL, array(RuleActionType::BLOCK,RuleActionType::LIMIT_THUMBNAIL_CAPTURE));
+		}
+
+
+		if ($enableCacheValidation)
+		{
+			$secureEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, ContextType::THUMBNAIL);
+			$secureEntryHelper->validateForPlay();
+		}
 		
 		// not allow capturing frames if the partner has FEATURE_DISALLOW_FRAME_CAPTURE permission
 		if(($vid_sec != -1) || ($vid_slice != -1) || ($vid_slices != -1))
@@ -306,10 +319,13 @@ class thumbnailAction extends sfAction
 			{
 				KExternalErrors::dieError(KExternalErrors::NOT_ALLOWED_PARAMETER);
 			}
-			
-			$actionList = $secureEntryHelper->getActionList(RuleActionType::LIMIT_THUMBNAIL_CAPTURE);
-			if ($actionList)
-				KExternalErrors::dieError(KExternalErrors::NOT_ALLOWED_PARAMETER);
+
+			if ($enableCacheValidation)
+			{
+				$actionList = $secureEntryHelper->getActionList(RuleActionType::LIMIT_THUMBNAIL_CAPTURE);
+				if ($actionList)
+					KExternalErrors::dieError(KExternalErrors::NOT_ALLOWED_PARAMETER);
+			}
 		}
 
 		if ($partner)
@@ -452,10 +468,8 @@ class thumbnailAction extends sfAction
 			}
 		}
 		
-		$nocache = false;
-		if ($secureEntryHelper->shouldDisableCache() || kApiCache::hasExtraFields() ||
-			(!$secureEntryHelper->isKsWidget() && $secureEntryHelper->hasRules(ContextType::THUMBNAIL)))
-			$nocache = true;
+		$nocache = ($enableCacheValidation && ($secureEntryHelper->shouldDisableCache() || kApiCache::hasExtraFields() ||
+			(!$secureEntryHelper->isKsWidget() && $secureEntryHelper->hasRules(ContextType::THUMBNAIL))) );
 
 		$cache = null;
 		

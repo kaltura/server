@@ -229,7 +229,7 @@ class kshow extends Basekshow implements IBaseObject
 		die();
 	}
 	
-	public function save(PropelPDO $con = null)
+	public function save(PropelPDO $con = null, $skipReload = false)
 	{
 		$is_new = false;
 		if ( $this->isNew() )
@@ -245,7 +245,7 @@ class kshow extends Basekshow implements IBaseObject
 
 		mySearchUtils::setDisplayInSearch( $this );
 		
-		$res =  parent::save( $con );
+		$res =  parent::save($con, $skipReload);
 		if ($is_new)
 		{
 			$obj = kshowPeer::retrieveByPk($this->getId());

@@ -54,4 +54,34 @@ class kUnlimitedVendorCredit extends kVendorCredit
 		return $this->credit;
 	}
 
+	public function isActive($time = null)
+	{
+		$now = $time != null ? $time : time();
+		if (!parent::isActive($now))
+			return false;
+
+		return !$this->toDateHasExpired($now);
+	}
+
+	public function toDateHasExpired($now)
+	{
+		if ( $now > $this->toDate)
+		{
+			KalturaLog::debug("Current date [$now] is not in credit time Range [from - $this->fromDate to - $this->toDate] ");
+			return true;
+		}
+		return false;
+	}
+
+	public function shouldResetLastCreditExpiry($lastCreditExpiry)
+	{
+		if(!$lastCreditExpiry)
+			return false;
+
+		if($this->getToDate() > $lastCreditExpiry && $this->getToDate() > time())
+			return true;
+
+		return false;
+	}
+
 }

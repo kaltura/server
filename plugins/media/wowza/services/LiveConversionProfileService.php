@@ -62,7 +62,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		$suffix = $matches[2];
 		
 		$entry = null;
-		if (!kCurrentContext::$ks)
+		if (!kCurrentContext::$ks || (kCurrentContext::getCurrentPartnerId() == Partner::MEDIA_SERVER_PARTNER_ID))
 		{
 			kEntitlementUtils::initEntitlementEnforcement(null, false);
 			$entry = kCurrentContext::initPartnerByEntryId($entryId);

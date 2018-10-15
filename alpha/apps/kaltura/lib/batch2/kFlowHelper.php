@@ -29,11 +29,11 @@ class kFlowHelper
 	public static function createOriginalFlavorAsset($partnerId, $entryId, &$msg = null)
 	{
 		$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
-		if($flavorAsset)
+		if ($flavorAsset)
 			return $flavorAsset;
 
 		$entry = entryPeer::retrieveByPK($entryId);
-		if(!$entry)
+		if (!$entry)
 		{
 			KalturaLog::err("Entry [$entryId] not found");
 			return null;
@@ -48,6 +48,7 @@ class kFlowHelper
 		$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
 		$flavorAsset->setPartnerId($partnerId);
 		$flavorAsset->setEntryId($entryId);
+
 		$flavorAsset->save();
 
 		return $flavorAsset;
