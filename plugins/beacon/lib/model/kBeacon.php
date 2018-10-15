@@ -13,6 +13,13 @@ class kBeacon
 			BeaconObjectTypes::SERVER_NODE_BEACON => "beacon_server_node_index",
 	);
 	
+	public static $searchIndexNameByBeaconObjectType = array(
+		BeaconObjectTypes::ENTRY_BEACON => "beacon_entry_index_search",
+		BeaconObjectTypes::ENTRY_SERVER_NODE_BEACON => "beacon_entry_server_node_index_search",
+		BeaconObjectTypes::SCHEDULE_RESOURCE_BEACON => "beacon_scheduled_resource_index_search",
+		BeaconObjectTypes::SERVER_NODE_BEACON => "beacon_server_node_index_search",
+	);
+	
 	public static $indexTypeByBeaconObjectType = array(
 			BeaconObjectTypes::ENTRY_BEACON => "entry_beacon",
 			BeaconObjectTypes::ENTRY_SERVER_NODE_BEACON => "entry_server_node_beacon",

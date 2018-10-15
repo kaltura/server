@@ -32,7 +32,7 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 		$indexType = null;
 		if($relatedObjectType && $relatedObjectType != "") 
 		{
-			$indexName = kBeacon::$indexNameByBeaconObjectType[$relatedObjectType];
+			$indexName = kBeacon::$searchIndexNameByBeaconObjectType[$relatedObjectType];
 			$indexType = kBeacon::$indexTypeByBeaconObjectType[$relatedObjectType];
 		}
 		
