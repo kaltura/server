@@ -445,6 +445,8 @@ class KalturaErrors extends APIErrors
 
 	const PROPERTY_IS_NOT_DEFINED = "PROPERTY_IS_NOT_DEFINED;PROP,TYPE;The property \"@PROP@\" is not defined on type \"@TYPE@\"";
 
+	const NAME_CONTAINS_URL = "NAME_CONTAINS_URL;;One of partner name fields contains url";
+
 	/*
 	 * syndication service
 	 */

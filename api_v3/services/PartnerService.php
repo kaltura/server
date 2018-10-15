@@ -75,6 +75,11 @@ class PartnerService extends KalturaBaseService
 					}
 				}
 			}
+
+			if(!myPartnerUtils::validatePartnerNames($dbPartner))
+			{
+				throw new SignupException("One of partner name fields contains url", SignupException::INVALID_FIELD_VALUE);
+			}
 			
 			$partner_registration = new myPartnerRegistration ( $parentPartnerId );
 			
@@ -144,6 +149,12 @@ class PartnerService extends KalturaBaseService
 		
 		try {
 			$dbPartner = $partner->toUpdatableObject($dbPartner);
+
+			if(!myPartnerUtils::validatePartnerNames($dbPartner))
+			{
+				throw new KalturaAPIException(KalturaErrors::NAME_CONTAINS_URL);
+			}
+
 			$dbPartner->save();
 		}
 		catch(kUserException $e) {

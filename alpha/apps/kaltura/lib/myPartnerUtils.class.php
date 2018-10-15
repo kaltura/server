@@ -13,6 +13,8 @@ class myPartnerUtils
 	
 	const BLOCKING_DAYS_GRACE = 7;
 
+	const URL_PATTERN = '://';
+
 	const MARKETO_NEW_TRIAL_ACCOUNT = 'marketo_new_register_success_campaign';
 	const MARKETO_NEW_ADDITIONAL_TRIAL_ACCOUNT = 'marketo_additional_register_success_campaign';
 	const MARKETO_NEW_INTERNAL_TRIAL_ACCOUNT = 'marketo_new_register_internal_success_campaign';
@@ -2168,6 +2170,24 @@ class myPartnerUtils
 			$partner->setInitialPasswordSet(true);
 			$partner->save();
 		}
+	}
+
+
+	public static function validatePartnerNames($partner)
+	{
+		if (!$partner)
+		{
+			return false;
+		}
+
+		if ((!is_null($partner->getName()) && strpos($partner->getName(), myPartnerUtils::URL_PATTERN) !== false) ||
+			(!is_null($partner->getFirstName()) && strpos($partner->getFirstName(), myPartnerUtils::URL_PATTERN) !== false) ||
+			(!is_null($partner->getLastName()) && strpos($partner->getLastName(), myPartnerUtils::URL_PATTERN) !== false))
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 }
