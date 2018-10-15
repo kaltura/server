@@ -12,7 +12,6 @@
 class BulkUploadService extends KalturaBaseService
 {
 	const PARTNER_DEFAULT_CONVERSION_PROFILE_ID = -1;
-	protected static $privilegesToPass = array(kSessionBase::PRIVILEGE_ENABLE_CATEGORY_MODERATION, kSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION);
 
 	/**
 	 * Add new bulk upload batch job
@@ -77,7 +76,7 @@ class BulkUploadService extends KalturaBaseService
 		$data->setUserId($puserId);
 		$data->setUploadedBy($uploadedBy);
 		$data->setFileName($fileName);
-		$this->handlePrivileges($data);
+		$data->handleKsPrivileges();
 
 		if (!$conversionProfileId)
 		{
@@ -278,26 +277,5 @@ class BulkUploadService extends KalturaBaseService
 		$ret = new KalturaBulkUpload();
 		$ret->fromObject($batchJobLog, $this->getResponseProfile());
 		return $ret;
-	}
-
-	protected function handlePrivileges(&$data)
-	{
-		if (!empty(kCurrentContext::$ks))
-		{
-			$ks = ks::fromSecureString(kCurrentContext::$ks);
-			$extraPrivileges = array();
-			foreach (self::$privilegesToPass as $privilege)
-			{
-				if($ks->hasPrivilege($privilege))
-				{
-					$extraPrivileges[] = $privilege;
-				}
-			}
-
-			if($extraPrivileges)
-			{
-				$data->setPrivileges(implode(',', $extraPrivileges));
-			}
-		}
 	}
 }
