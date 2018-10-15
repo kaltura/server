@@ -65,8 +65,16 @@ class kConfCacheManager
 		return false;
 	}
 
+	static $loadRecursiveLock;
+
 	static function load ($mapName, $key=null)
 	{
+		if(self::$loadRecursiveLock)
+		{
+			return array();
+		}
+		self::$loadRecursiveLock=true;
+
 		foreach (self::$mapLoadFlow as $cacheEntity)
 		{
 			//this check allows adding configuration files for each module entity
@@ -85,11 +93,13 @@ class kConfCacheManager
 			{
 				$cacheObj->incUsage($mapName);
 				self::store($key, $mapName, $map, $cacheEntity);
+				self::$loadRecursiveLock=false;
 				return $map;
 			}
 			$cacheObj->incCacheMissCounter();
 		}
 		kCacheConfFactory::getInstance(kCacheConfFactory::SESSION) -> store($key, $mapName,array());
+		self::$loadRecursiveLock=false;
 		return array();
 	}
 
