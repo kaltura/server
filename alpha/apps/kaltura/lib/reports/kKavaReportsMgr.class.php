@@ -1842,77 +1842,6 @@ class kKavaReportsMgr extends kKavaBase
 		return array($from_date . '/' . $to_date);
 	}
 
-	protected static function getPlaybackContextCategoriesIds($partner_id, $playback_context, $is_ancestor)
-	{
-		$category_filter = new categoryFilter();
-
-		if ($is_ancestor)
-		{
-			$category_filter->set('_matchor_likex_full_name', $playback_context);
-		}
-		else
-		{
-			$category_filter->set('_in_full_name', $playback_context);
-		}
-
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		$category_filter->attachToCriteria($c);
-		$category_filter->setPartnerSearchScope($partner_id);
-		$c->applyFilters();
-
-		$category_ids_from_db = $c->getFetchedIds();
-
-		if (count($category_ids_from_db))
-		{
-			return $category_ids_from_db;
-		}
-		else
-		{
-			return array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
-		}
-	}
-
-	protected static function addEndUserReportsDruidFilters($partner_id, $report_def, $input_filter, &$druid_filter)
-	{
-		if (!($input_filter instanceof endUserReportsInputFilter))
-		{
-			return;
-		}
-
-		if ($input_filter->playbackContext || $input_filter->ancestorPlaybackContext)
-		{
-			if ($input_filter->playbackContext && $input_filter->ancestorPlaybackContext)
-			{
-				$category_ids = array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
-			}
-			else
-			{
-				$category_ids = self::getPlaybackContextCategoriesIds($partner_id, $input_filter->playbackContext ?
-					$input_filter->playbackContext : $input_filter->ancestorPlaybackContext, isset($input_filter->ancestorPlaybackContext));
-			}
-
-			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT,
-				self::DRUID_VALUES => $category_ids);
-		}
-
-		if ($input_filter->application)
-		{
-			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_APPLICATION,
-				self::DRUID_VALUES => explode(',', $input_filter->application)
-			);
-		}
-
-		if ($input_filter->userIds != null)
-		{
-			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_KUSER_ID,
-				self::DRUID_VALUES => self::getKuserIds($report_def, $input_filter->userIds, $partner_id),
-			);
-		}
-	}
-
 	protected static function getKuserIds($report_def, $puser_ids, $partner_id)
 	{
 		$result = array();
@@ -2036,7 +1965,15 @@ class kKavaReportsMgr extends kKavaBase
 			$druid_filter = array_merge($druid_filter, $report_filter);
 		}
 		
-		self::addEndUserReportsDruidFilters($partner_id, $report_def, $input_filter, $druid_filter);
+		$input_filter->addReportsDruidFilters($partner_id, $report_def, $druid_filter);
+		//Calculating druid filter userIds uses core logic which we don't want to move to the filter
+		if ($input_filter instanceof endUserReportsInputFilter && $input_filter->userIds != null)
+		{
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_KUSER_ID,
+				self::DRUID_VALUES => self::getKuserIds($report_def, $input_filter->userIds, $partner_id),
+			);
+		}
 
 		if ($input_filter->categories)
 		{
