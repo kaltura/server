@@ -1834,7 +1834,7 @@ class kKavaReportsMgr extends kKavaBase
 		return array($from_date . '/' . $to_date);
 	}
 
-	public static function getKuserIds($report_def, $puser_ids, $partner_id)
+	protected static function getKuserIds($report_def, $puser_ids, $partner_id)
 	{
 		$result = array();
 		
