@@ -1,3 +1,18 @@
+# Naos 14.7.0 #
+
+## Add reqreuied permissions for managing reach partner catalog items ##
+- Issue Type: Task
+- Issue ID: PLAT-9285
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_15_10_add_partner_catalog_item_service_permissions.php
+
+#### Known Issues & Limitations ####
+	None
+
 # Naos 14.6.0 #
 
 ## Add new SearchHistory plugin ##
