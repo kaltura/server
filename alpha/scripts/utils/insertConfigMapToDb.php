@@ -4,10 +4,10 @@ if($argc != 8)
 		"<db user name> - User with write permissions\n".
 		"<db password> - Password of the ralted user\n".
 		"<map name> - Name of the map \n".
-		"<host name> - Host name regex (# instead of *) \n".
+		"<host name> - Host name regex (use '#' for wild card)\n".
 		"<ini file> - Path to the ini file contaitning the configuration \n".
 		"<justification> - Must explain why was it added and by who \n".
-		"<status> - 1 for enable , 0 for disable\n\n");
+		"<status> - 1 enable , 0 disable\n\n");
 
 $dbUserName 	= $argv[1];
 $dbPasssword 	= $argv[2];
