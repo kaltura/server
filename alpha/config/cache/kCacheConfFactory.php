@@ -22,7 +22,7 @@ class kCacheConfFactory
 			self::APC => self::APC ,
 			self::LOCAL_MEM_CACHE => self::LOCAL_MEM_CACHE ,
 			self::FILE_SYSTEM => self::FILE_SYSTEM,
-			self::REMOTE_MEM_CACHE => self::FILE_SYSTEM);
+			self::REMOTE_MEM_CACHE => self::REMOTE_MEM_CACHE);
 
 		if(!isset(self::$cacheInstanceList[$name]))
 		{

@@ -1,10 +1,11 @@
 <?php
-chdir(__DIR__.'/../');
-require_once(__DIR__ . '/../bootstrap.php');
-require_once __DIR__ . '/../../config/cache/kRemoteMemCacheConf.php';
 
 if($argc != 3)
 	die ("Usage : $argv[0] <db user name> <db password>\n");
+
+chdir(__DIR__.'/../');
+require_once(__DIR__ . '/../bootstrap.php');
+require_once __DIR__ . '/../../config/cache/kRemoteMemCacheConf.php';
 
 $dbUserName = $argv[1];
 $dbPasssword = $argv[2];
@@ -13,8 +14,12 @@ $dbPasssword = $argv[2];
 include (kEnvironment::getConfigDir().'/configCacheParams.php');
 if(!isset($cacheConfigParams))
 	die("\nRemote cache cofiguration is no accessible");
-
-$map=kConfCacheManager::getMap('kRemoteMemCacheConf');
+$mapName = 'kRemoteMemCacheConf';
+$map=kConfCacheManager::getMap($mapName);
+if(!$map)
+{
+	die("\n Map $mapName was not found in configuration directory");
+}
 
 $cache = new kMemcacheCacheWrapper;
 if(!$cache->init(array('host'=>$map['host'],'port'=>$map['port'])))
@@ -41,14 +46,12 @@ foreach($mapsInfo as $mapInfo)
 	$version = $output2[0]['version'];
 	$content = $output2[0]['content'];
 	if(!isset($mapListInCache[$mapName]))
-		echo("\nMap {$mapName} not found in map list in cache\n");
+		echo("\nNOTICE - Map {$mapName} is new! adding it to the list in cache\n");
 	//check if need to update version
 	else if($mapListInCache[$mapName]!=$version)
-		echo("\nMap {$mapName} version needs to be updated to {$version}\n");
+		echo("\nNOTICE - Map {$mapName} version needs to be updated to {$version}\n");
 	else
-		echo("\nMap {$mapName} already found in cache with version {$version}\n");
-
-	echo ("\r\nContent - $content.\r\n");
+		echo("\nINFO - Map {$mapName} already found in cache with version {$version}\n");
 
 	$mapListInCache[$mapName]=$version;//set version
 	$cache->set($mapName,$content);
@@ -83,6 +86,5 @@ function query($dbConnection,$commandLine)
 	echo "executing: {$commandLine}\n";
 	$statement = $dbConnection->query($commandLine);
 	$output1 = $statement->fetchAll();
-	var_dump($output1);
 	return $output1;
 }

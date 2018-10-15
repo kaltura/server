@@ -72,7 +72,6 @@ function query($dbConnection,$commandLine)
 	echo "executing: {$commandLine}\n";
 	$statement = $dbConnection->query($commandLine);
 	$output1 = $statement->fetch();
-	var_dump($output1);
 	return $output1;
 }
 function execute($dbConnection,$commandLine)
