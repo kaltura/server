@@ -77,7 +77,7 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 	/**
 	 * @param KalturaBulkUploadJobData $kBulkUploadJobData
 	 */
-	private function updateKSJobPrivileges($kBulkUploadJobData)
+	protected function updateKSJobPrivileges($kBulkUploadJobData)
 	{
 		if($kBulkUploadJobData->privileges)
 		{

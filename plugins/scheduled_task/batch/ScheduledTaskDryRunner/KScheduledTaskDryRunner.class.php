@@ -68,7 +68,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 	private function initClient($jobData, $partnerId)
 	{
 		$client = $this->getClient();
-		$ks = $this->createKs($client, $jobData);
+		$ks = $this->createDryRunnerKs($client, $jobData);
 		$client->setKs($ks);
 		$this->impersonate($partnerId);
 		$this->client = $client;
@@ -103,7 +103,7 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 		return $scheduledTaskClient->scheduledTaskProfile->get($profileId);
 	}
 
-	protected function createKs(KalturaClient $client, KalturaScheduledTaskJobData $jobData)
+	protected function createDryRunnerKs(KalturaClient $client, KalturaScheduledTaskJobData $jobData)
 	{
 		$partnerId = self::$taskConfig->getPartnerId();
 		$sessionType = KalturaSessionType::ADMIN;
