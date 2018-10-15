@@ -10,12 +10,6 @@ class kEnvironment
 	const APC_CACHE_MAP = 'kConf';
 	
 	protected static $envMap = null;
-
-	public static function getEnvMap()
-	{
-		self::init();
-		return self::$envMap;
-	}
 	
 	protected static function init()
 	{
