@@ -20,8 +20,12 @@ class myBatchPartnerUsage extends myBatchBase
 			{
 				$c->addAnd(PartnerPeer::ID, $partnerId);
 			}
-			
-			$c->addAnd(PartnerPeer::PARTNER_PACKAGE, $partnerPackage); 
+
+			if($partnerPackage == PartnerPackages::PARTNER_PACKAGE_FREE)
+				$c->addAnd(PartnerPeer::PARTNER_PACKAGE, array(PartnerPackages::PARTNER_PACKAGE_FREE, PartnerPackages::PARTNER_PACKAGE_INTERNAL_TRIAL), Criteria::IN);
+			else
+				$c->addAnd(PartnerPeer::PARTNER_PACKAGE, $partnerPackage);
+
 			$c->addAnd(PartnerPeer::MONITOR_USAGE, 1);
 			$c->addAnd(PartnerPeer::STATUS, Partner::PARTNER_STATUS_DELETED, Criteria::NOT_EQUAL);
 
@@ -29,7 +33,7 @@ class myBatchPartnerUsage extends myBatchBase
 			$c->addAscendingOrderByColumn(PartnerPeer::ID);
 			$c->setLimit($bulk_size);
 			$partners = PartnerPeer::doSelect($c);
-			$freeTrialTypes = array(PartnerPackages::PARTNER_PACKAGE_FREE, PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL);
+			$freeTrialTypes = PartnerPackages::getFreeTrialPackages();
 
 			if (!$partners)
 			{

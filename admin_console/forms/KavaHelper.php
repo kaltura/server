@@ -23,7 +23,7 @@ class Form_KavaHelper
 		return str_replace('=', '', strtr(base64_encode($input), '+/', '-_'));
 	}
 	
-	private function encode($payload, $key)
+	private static function encode($payload, $key)
 	{
 		$header = array('typ' => 'JWT', 'alg' => 'HS256');
 		$result = self::urlsafeB64Encode(json_encode($header)) . '.' .

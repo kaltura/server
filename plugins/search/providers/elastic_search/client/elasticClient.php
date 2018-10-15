@@ -14,7 +14,9 @@ class elasticClient
 	const ELASTIC_ID_KEY = 'id';
 	const ELASTIC_BODY_KEY = 'body';
 	const ELASTIC_RETRY_ON_CONFLICT_KEY = 'retry_on_conflict';
-	
+	const ELASTIC_PREFERENCE_KEY = 'preference';
+	const ELASTIC_STICKY_SESSION_PREFIX = 'ELStickySessionIndex_';
+
 	const GET = 'GET';
 	const POST = 'POST';
 	const PUT = 'PUT';
@@ -71,6 +73,17 @@ class elasticClient
 		curl_close($this->ch);
 	}
 
+	protected function getPreferenceStickySessionKey()
+	{
+		$ksObject = kCurrentContext::$ks_object;
+
+		if ($ksObject && $ksObject->hasPrivilege(kSessionBase::PRIVILEGE_SESSION_KEY))
+		{
+			return self::ELASTIC_STICKY_SESSION_PREFIX . kCurrentContext::getCurrentPartnerId() . '_' . $ksObject->getPrivilegeValue(kSessionBase::PRIVILEGE_SESSION_KEY);
+		}
+		return self::ELASTIC_STICKY_SESSION_PREFIX . infraRequestUtils::getRemoteAddress();
+	}
+
 	/**
 	 * @param int $seconds
 	 * @return boolean
@@ -85,11 +98,17 @@ class elasticClient
 		$val = '';
 		$queryParams = array();
 		
-		if (isset($params[self::ELASTIC_BODY_KEY][self::ELASTIC_RETRY_ON_CONFLICT_KEY])) {
+		if (isset($params[self::ELASTIC_BODY_KEY][self::ELASTIC_RETRY_ON_CONFLICT_KEY]))
+		{
 			$queryParams[self::ELASTIC_RETRY_ON_CONFLICT_KEY] = $params[self::ELASTIC_BODY_KEY][self::ELASTIC_RETRY_ON_CONFLICT_KEY];
 			unset($params[self::ELASTIC_BODY_KEY][self::ELASTIC_RETRY_ON_CONFLICT_KEY]);
 		}
-		
+
+		if (isset($params[self::ELASTIC_PREFERENCE_KEY]))
+		{
+			$queryParams[self::ELASTIC_PREFERENCE_KEY] = $params[self::ELASTIC_PREFERENCE_KEY];
+			unset($params[self::ELASTIC_PREFERENCE_KEY]);
+		}
 		
 		if (count($queryParams) > 0) {
 			$val .= '?';
@@ -178,12 +197,19 @@ class elasticClient
 	 * search API
 	 * @param array $params
 	 * @param $logQuery bool
+	 * @param $shouldAddPreference bool
 	 * @return mixed
 	 */
-	public function search(array $params, $logQuery = false)
+	public function search(array $params, $logQuery = false, $shouldAddPreference = false)
 	{
 		kApiCache::disableConditionalCache();
-		$cmd = $this->buildElasticCommandUrl($params, '', self::ELASTIC_ACTION_SEARCH);
+		if ($shouldAddPreference)
+		{
+			//add preference so that requests from the same session will hit the same shards
+			$params[self::ELASTIC_PREFERENCE_KEY] = $this->getPreferenceStickySessionKey();
+		}
+		$queryParams = $this->getQueryParams($params);
+		$cmd = $this->buildElasticCommandUrl($params, $queryParams, self::ELASTIC_ACTION_SEARCH);
 		
 		if (isset($params[self::ELASTIC_SIZE_KEY]))
 			$params[self::ELASTIC_BODY_KEY][self::ELASTIC_SIZE_KEY] = $params[self::ELASTIC_SIZE_KEY];
@@ -207,7 +233,8 @@ class elasticClient
 		$cmd = $this->buildElasticCommandUrl($params, $queryParams);
 
 		$monitorIndexName = isset($params[self::ELASTIC_INDEX_KEY]) ? $params[self::ELASTIC_INDEX_KEY] : self::MONITOR_NO_INDEX;
-		$response = $this->sendRequest($cmd, self::PUT, $params[self::ELASTIC_BODY_KEY], false, self::ELASTIC_ACTION_INDEX, $monitorIndexName);
+		$method = isset($params[self::ELASTIC_ID_KEY]) ? self::PUT : self::POST;//use elastic auto id creation
+		$response = $this->sendRequest($cmd, $method, $params[self::ELASTIC_BODY_KEY], false, self::ELASTIC_ACTION_INDEX, $monitorIndexName);
 		return $response;
 	}
 	
@@ -257,7 +284,7 @@ class elasticClient
 		$cmd = $this->buildElasticCommandUrl($params, $queryParams, self::ELASTIC_ACTION_DELETE_BY_QUERY);
 
 		$monitorIndexName = isset($params[self::ELASTIC_INDEX_KEY]) ? $params[self::ELASTIC_INDEX_KEY] : self::MONITOR_NO_INDEX;
-		$response = $this->sendRequest($cmd, self::POST, $params[self::ELASTIC_BODY_KEY], false, self::ELASTIC_ACTION_DELETE_BY_QUERY, $monitorIndexName);
+		$response = $this->sendRequest($cmd, self::POST, $params[self::ELASTIC_BODY_KEY], true, self::ELASTIC_ACTION_DELETE_BY_QUERY, $monitorIndexName);
 		return $response;
 	}
 	

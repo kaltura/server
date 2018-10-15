@@ -22,7 +22,7 @@ class KDeletingCategoryEntryEngine extends KDeletingEngine
 		$filter->orderBy = KalturaCategoryEntryOrderBy::CREATED_AT_ASC;
 		
 		$categoryEntriesList = KBatchBase::$kClient->categoryEntry->listAction($filter, $this->pager);
-		if(!count($categoryEntriesList->objects))
+		if(!$categoryEntriesList->objects || !count($categoryEntriesList->objects))
 			return 0;
 			
 		KBatchBase::$kClient->startMultiRequest();

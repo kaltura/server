@@ -15,7 +15,7 @@ class infraRequestUtils
 	const DEFAULT_HTTP_TIME = 'Sun, 19 Nov 2000 08:52:00 GMT';
 	
 	protected static $isInGetRemoteAddress = false;
-	protected static $remoteAddress = null;
+	protected static $remoteAddress = array();
 	protected static $requestParams = null;
 	protected static $hostname = null;
 	public static $jsonData = null;
@@ -263,11 +263,18 @@ class infraRequestUtils
 
 	public static function getIpFromHttpHeader($httpHeader, $acceptInternalIps, $phpizeHeader = false)
 	{
+		$key = "header:$httpHeader:$acceptInternalIps:$phpizeHeader";
+		if(array_key_exists($key, self::$remoteAddress)) {
+			return self::$remoteAddress[$key];
+		}
+			
 		if ($phpizeHeader)
 			$httpHeader = "HTTP_".strtoupper(str_replace("-", "_", $httpHeader));
 		
-		if (!isset($_SERVER[$httpHeader]))
-				return null;
+		if (!isset($_SERVER[$httpHeader])) {
+			self::$remoteAddress[$key] = null;
+			return null;
+		}
 		
 		$remote_addr = null;
 				
@@ -295,28 +302,31 @@ class infraRequestUtils
 			break;
 		}
 		 
+		self::$remoteAddress[$key] = $remote_addr;
 		return $remote_addr;
 	}
 	
 	public static function getRemoteAddress()
 	{
-		if(self::$remoteAddress)
-			return self::$remoteAddress;
+		if(array_key_exists("ip", self::$remoteAddress)) {
+			return self::$remoteAddress["ip"];
+		}
 			
 		// Prevent call cycles in case KalturaLog will be used in internalGetRemoteAddress
 		if (self::$isInGetRemoteAddress)
 			return null;
 		
 		self::$isInGetRemoteAddress = true;
-		self::$remoteAddress = self::internalGetRemoteAddress();
+		self::$remoteAddress["ip"] = self::internalGetRemoteAddress();
 		self::$isInGetRemoteAddress = false;
-		return self::$remoteAddress;
+		return self::$remoteAddress["ip"];
 	}
 	
 	protected static function internalGetRemoteAddress()
 	{
-		if(self::$remoteAddress)
-			return self::$remoteAddress;
+		if(array_key_exists("ip", self::$remoteAddress)) {
+			return self::$remoteAddress["ip"];
+		}
 			
 		// enable access control debug
 		if(isset($_POST['debug_ip']) && kConf::hasParam('debug_ip_enabled') && kConf::get('debug_ip_enabled'))

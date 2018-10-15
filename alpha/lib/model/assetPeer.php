@@ -265,7 +265,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 	{
 		$c = new Criteria();
 		$c->add(self::ENTRY_ID, $entryId);
-		if(count($types))
+		if(is_array($types) && count($types))
 			$c->add(self::TYPE, $types, Criteria::IN);
 		if(is_array($statuses) && count($statuses))
 			$c->add(self::STATUS, $statuses, Criteria::IN);
@@ -317,7 +317,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 	{
 		$c = new Criteria();
 		$c->add(self::ENTRY_ID, $entryId);
-		if(count($types))
+		if(is_array($types) && count($types))
 			$c->add(self::TYPE, $types, Criteria::IN);
 		
 		return self::doCount($c);
@@ -355,7 +355,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 	{
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
-		if(count($statuses))
+		if(is_array($statuses) && count($statuses))
 		    $c->add(assetPeer::STATUS, $statuses, Criteria::IN);
 		else 
 			$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
@@ -370,7 +370,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		$c->add(assetPeer::ENTRY_ID, $entryId);
 		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
 		
-		if(count($paramsIds))
+		if(is_array($paramsIds) && count($paramsIds))
 			$c->add(assetPeer::FLAVOR_PARAMS_ID, $paramsIds, Criteria::IN);
 		
 		$flavorTypes = self::retrieveAllFlavorsTypes();
@@ -384,11 +384,11 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
 		
-		if(count($statuses)) {
+		if(is_array($statuses) && count($statuses)) {
 		    $c->add(assetPeer::STATUS, $statuses, Criteria::IN);
 		}
 		
-		if(count($paramsIds)) {
+		if(is_array($paramsIds) && count($paramsIds)) {
 			$c->add(assetPeer::FLAVOR_PARAMS_ID, $paramsIds, Criteria::IN);
 		}
 		
@@ -405,7 +405,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		$c->add(assetPeer::ENTRY_ID, $entryId);
 		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
 		
-		if(count($paramsIds))
+		if(is_array($paramsIds) && count($paramsIds))
 			$c->add(assetPeer::FLAVOR_PARAMS_ID, $paramsIds, Criteria::IN);
 		
 		$flavorTypes = self::retrieveAllFlavorsTypes();
@@ -421,7 +421,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		$c->add(assetPeer::ENTRY_ID, $entryId);
 		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
 		
-		if(count($paramsIds))
+		if(is_array($paramsIds) && count($paramsIds))
 			$c->add(assetPeer::FLAVOR_PARAMS_ID, $paramsIds, Criteria::IN);
 			
 		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::THUMBNAIL);
@@ -483,8 +483,12 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		$bitrate2 = 0;
 		if ($b instanceof flavorAsset)
 			$bitrate2 = $b->getBitrate();
-			
-		return ($bitrate1 - $bitrate2); 
+		
+		$res = $bitrate1 - $bitrate2;
+		if($res == 0)
+			$res = $a->getIntId() - $b->getIntId();
+		
+		return $res;
 	}
 	
 	public static function retrieveReadyByEntryIdAndTag($entryId, $tag)

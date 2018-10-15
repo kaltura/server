@@ -50,7 +50,13 @@ class WebexXmlEpRecordingType extends WebexXmlRequestType
 	 * @var string
 	 */
 	protected $streamURL;
-	
+
+	/**
+	 *
+	 * @var string
+	 */
+	protected $hostStreamURL;
+
 	/**
 	 *
 	 * @var string
@@ -177,7 +183,10 @@ class WebexXmlEpRecordingType extends WebexXmlRequestType
 	
 			case 'streamURL':
 				return 'string';
-	
+
+			case 'hostStreamURL':
+				return 'string';
+
 			case 'fileURL':
 				return 'string';
 	
@@ -225,6 +234,9 @@ class WebexXmlEpRecordingType extends WebexXmlRequestType
 				
 			case 'deleteTime':
 				return 'string';
+				
+			default:
+				return 'string';
 	
 		}
 		
@@ -245,6 +257,7 @@ class WebexXmlEpRecordingType extends WebexXmlRequestType
 			'timeZoneID',
 			'size',
 			'streamURL',
+			'hostStreamURL',
 			'fileURL',
 			'sessionKey',
 			'trackingCode',
@@ -278,6 +291,7 @@ class WebexXmlEpRecordingType extends WebexXmlRequestType
 			'timeZoneID',
 			'size',
 			'streamURL',
+			'hostStreamURL',
 			'fileURL',
 			'recordingType',
 			'duration',
@@ -419,6 +433,22 @@ class WebexXmlEpRecordingType extends WebexXmlRequestType
 	public function getStreamURL()
 	{
 		return $this->streamURL;
+	}
+
+	/**
+	 * @param string $hostStreamURL
+	 */
+	public function setHostStreamURL($hostStreamURL)
+	{
+		$this->hostStreamURL = $hostStreamURL;
+	}
+
+	/**
+	 * @return string $hostStreamURL
+	 */
+	public function getHostStreamURL()
+	{
+		return $this->hostStreamURL;
 	}
 	
 	/**

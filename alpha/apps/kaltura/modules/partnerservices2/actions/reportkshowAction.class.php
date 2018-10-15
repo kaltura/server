@@ -32,9 +32,15 @@ class reportkshowAction extends addmoderationAction
 			); 
 	}
 	
-	protected function ticketType()				{	return self::REQUIED_TICKET_REGULAR;	}
-
-	protected function getStatusToUpdate () 	{		return moderation::MODERATION_STATUS_REVIEW; 	}
+	protected function ticketType()
+	{
+		return self::REQUIED_TICKET_REGULAR;
+	}
+	
+	protected function getStatusToUpdate ( $moderation = null )
+	{
+		return moderation::MODERATION_STATUS_REVIEW;
+	}
 	
 	protected function fixModeration  ( moderation &$moderation ) 	
 	{

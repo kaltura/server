@@ -28,6 +28,12 @@ class Form_ReachProfileCredit extends Zend_Form_SubForm
 			'validators' => array(),
 		));
 
+		$this->addElement('text', 'addOn', array(
+			'label' => 'AddOn Credit:',
+			'filters' => array('StringTrim'),
+			'validators' => array('Int'),
+		));
+
 		$this->addElement('text', 'fromDate', array(
 			'label' => 'From Date: (YYYY.MM.DD)',
 			'innerType' => 'DateElement',

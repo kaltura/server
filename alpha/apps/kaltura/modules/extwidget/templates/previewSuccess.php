@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="lt-ie10 lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="lt-ie10 lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="lt-ie10 lt-ie9"> <![endif]-->
@@ -76,10 +76,102 @@
 	<?php } ?>
 				<div id="framePlayerContainer">
 <script>
-var scriptToEval = '';
+function isObject(item) {
+    return item && typeof item === 'object' && !Array.isArray(item);
+}
+
+/*!
+ * Merge two or more objects together.
+ * (c) 2017 Chris Ferdinandi, MIT License, https://gomakethings.com
+ * @param   {Boolean}  deep     If true, do a deep (or recursive) merge [optional]
+ * @param   {Object}   objects  The objects to merge together
+ * @returns {Object}            Merged values of defaults and options
+ */
+function extend() {
+    // Variables
+    var extended = {};
+    var deep = false;
+    var i = 0;
+
+    // Check if a deep merge
+    if ( Object.prototype.toString.call( arguments[0] ) === '[object Boolean]' ) {
+        deep = arguments[0];
+        i++;
+    }
+
+    // Merge the object into the extended object
+    var merge = function (obj) {
+        for (var prop in obj) {
+            if (obj.hasOwnProperty(prop)) {
+                // If property is an object, merge properties
+                if (deep && Object.prototype.toString.call(obj[prop]) === '[object Object]') {
+                    extended[prop] = extend(extended[prop], obj[prop]);
+                } else {
+                    extended[prop] = obj[prop];
+                }
+            }
+        }
+    };
+
+    // Loop through each object and conduct a merge
+    for (; i < arguments.length; i++) {
+        var obj = arguments[i];
+        merge(obj);
+    }
+
+    return extended;
+
+};
+
+function mergeDeep(target,source) {
+    return extend(true,target,source);
+}
+
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+var scriptToEval = ''; 
 var code = new kEmbedCodeGenerator(<?php echo json_encode($embedParams); ?>).getCode();
 var embedType = '<?php echo $embedType;?>';
 var ltIE10 = $('html').hasClass('lt-ie10');
+var isPlaykit = '<?php echo $isPlaykit?>';
+if (isPlaykit === '1') {
+    var data = <?php echo json_encode($embedParams); ?>;
+    var width = <?php echo $uiConf->getWidth();?>;
+    var height = <?php echo $uiConf->getHeight();?>;
+    var playerConfig = {"provider":{"partnerId": data.partnerId,"uiConfId": data.uiConfId},"targetId":"framePlayerContainer"};
+    var externalConfig = getParameterByName("playerConfig");
+    if (externalConfig){
+        try {
+            var parsedConfig = JSON.parse(externalConfig);
+            playerConfig = mergeDeep(playerConfig,parsedConfig);
+        }
+        catch(ee){}
+    }
+	//default
+    if (!height) {
+        height = 400;
+    }
+    if (!width) {
+        width = 600;
+    }
+    var codeUrl = "https://" + data.securedHost + "/p/" + data.partnerId +"/embedPlaykitJs/uiconf_id/"+ data.uiConfId;
+    var iframeURL = codeUrl + "/entry_id/" + data.entryId + "?iframeembed=true";
+    var embedCode = '<scr'+'ipt src="'+ codeUrl +'"></scr'+'ipt><scr'+'ipt> var kalturaPlayer = KalturaPlayer.setup('+ JSON.stringify(playerConfig)+');	kalturaPlayer.loadMedia({entryId: "'+ data.entryId +'"})</scr'+'ipt>';
+    code = embedCode;
+    if (data.embedType === 'iframe') {
+        code = '<iframe id="kaltura_player" src="'+iframeURL+'" width="'+ width +'" height="'+height+'" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen="" allow="autoplay; fullscreen; encrypted-media" frameborder="0" style="width: '+width+'px; height: '+height+'px;" itemprop="video" itemscope="" itemtype="http://schema.org/VideoObject">';
+    }
+    document.getElementById('framePlayerContainer').style.height = height + 'px';
+    document.getElementById('framePlayerContainer').style.width = width + 'px';
+
+}
 
 // IE9 and below has issue with document.write script tag
 if( ltIE10 && (embedType == 'dynamic' || embedType == 'thumb') ) {

@@ -131,7 +131,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 	 */
 	protected function sendEmail(KalturaEmailNotificationTemplate $emailNotificationTemplate, KalturaEmailNotificationDispatchJobData &$data)
 	{
-		if(!count($data->to) && !count($data->cc) && !count($data->bcc))
+		if(!$data->to && !$data->cc && !$data->bcc)
 			throw new Exception("Recipient e-mail address cannot be null");
 			
 		$this::$mailer->IsHTML($emailNotificationTemplate->format == KalturaEmailNotificationFormat::HTML);

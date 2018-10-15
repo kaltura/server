@@ -22,7 +22,7 @@ class KDeletingUserEntryEngine extends KDeletingEngine
 		$filter->orderBy = KalturaUserEntryOrderBy::CREATED_AT_ASC;
 		
 		$userEntryList = KBatchBase::$kClient->userEntry->listAction($filter, $this->pager);
-		if(!count($userEntryList->objects))
+		if(!$userEntryList->objects || !count($userEntryList->objects))
 			return 0;
 			
 		KBatchBase::$kClient->startMultiRequest();

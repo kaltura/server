@@ -40,6 +40,11 @@ class kCatalogItemAdvancedFilter extends AdvancedSearchFilterItem
 	 */
 	public $sourceLanguageEqual;
 	
+	/**
+	 * @var string
+	 */
+	public $targetLanguageEqual;
+	
 	// Class Getters
 	public function getServiceTypeEqual() 		{ return $this->serviceTypeEqual; 	}
 	public function getServiceTypeIn() 			{ return $this->serviceTypeIn; 		}
@@ -48,6 +53,7 @@ class kCatalogItemAdvancedFilter extends AdvancedSearchFilterItem
 	public function getTurnAroundTimeEqual()	{ return $this->turnAroundTimeEqual; }
 	public function getTurnAroundTimeIn()		{ return $this->turnAroundTimeIn; }
 	public function getSourceLanguageEqual()	{ return $this->sourceLanguageEqual; }
+	public function getTargetLanguageEqual()	{ return $this->targetLanguageEqual; }
 	
 	// Class Setters
 	public function setServiceTypeEqual($v)		{ $this->serviceTypeEqual = $v; }
@@ -57,6 +63,7 @@ class kCatalogItemAdvancedFilter extends AdvancedSearchFilterItem
 	public function setTurnAroundTimeEqual($v)	{ $this->turnAroundTimeEqual = $v; }
 	public function setTurnAroundTimeIn($v)		{ $this->turnAroundTimeIn = $v; }
 	public function setSourceLanguageEqual($v)	{ $this->sourceLanguageEqual = $v; }
+	public function setTargetLanguageEqual($v)	{ $this->targetLanguageEqual = $v; }
 	
 	
 	// Internal functions
@@ -158,6 +165,15 @@ class kCatalogItemAdvancedFilter extends AdvancedSearchFilterItem
 		{
 			$condition = ReachPlugin::CATALOG_ITEM_INDEX_PREFIX . $partnerId;
 			$condition .= " " . ReachPlugin::CATALOG_ITEM_INDEX_LANGUAGE . $this->getSourceLanguageEqual();
+			$condition .= " " . ReachPlugin::CATALOG_ITEM_INDEX_SUFFIX . $partnerId;
+			
+			$query->addMatch('@' . ReachPlugin::getSearchFieldName(ReachPlugin::SEARCH_FIELD_CATALOG_ITEM_DATA) . " " . $condition);
+		}
+		
+		if($this->getTargetLanguageEqual())
+		{
+			$condition = ReachPlugin::CATALOG_ITEM_INDEX_PREFIX . $partnerId;
+			$condition .= " " . ReachPlugin::CATALOG_ITEM_INDEX_TARGET_LANGUAGE . $this->getTargetLanguageEqual();
 			$condition .= " " . ReachPlugin::CATALOG_ITEM_INDEX_SUFFIX . $partnerId;
 			
 			$query->addMatch('@' . ReachPlugin::getSearchFieldName(ReachPlugin::SEARCH_FIELD_CATALOG_ITEM_DATA) . " " . $condition);

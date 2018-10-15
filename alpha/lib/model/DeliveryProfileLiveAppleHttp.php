@@ -194,7 +194,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		if($uiConfId)
 			$url .= '/uiConfId/' . $uiConfId;
 
-		if(count($this->getDynamicAttributes()->getPlayerConfig()))
+		if($this->getDynamicAttributes()->getPlayerConfig())
 			$url .= '/playerConfig/' . $this->params->getPlayerConfig();
 		
 		$url .= '{playbackContext}';
@@ -261,12 +261,16 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		{
 			return parent::buildHttpFlavorsArray();
 		}
-		
+
+		$edgeServerIds = $this->params->getEdgeServerIds();
+		$this->addFallbackM3u8Flavors($edgeServerIds, $flavors, $primaryManifestUrl, $primaryStreamInfo );
 		$this->buildM3u8Flavors($primaryManifestUrl, $flavors, $primaryStreamInfo);
 		if($backupManifestUrl && ($this->getForceProxy() || count($flavors) == 0))
 		{
 			//Until a full solution will be made on the liveServer side we need to manually sync bitrates Between primary and backup streams
 			$primaryFlavorBitrateInfo = $this->buildFlavorBitrateInfoArray($primaryStreamInfo);
+
+			$this->addFallbackM3u8Flavors($edgeServerIds, $flavors, $backupManifestUrl, $backupStreamInfo, $primaryFlavorBitrateInfo);
 			$this->buildM3u8Flavors($backupManifestUrl, $flavors, $backupStreamInfo, $primaryFlavorBitrateInfo);
 		}
 
@@ -313,6 +317,19 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$exists = in_array($flavorParamId, $aclFlavorParamsIds);
 		
 		return $isBlockedList ? !$exists : $exists;
+	}
+
+	protected function addFallbackM3u8Flavors($edgeServerIds, &$flavors, $manifestUrl, $streamInfo, $flavorBitrateInfo = array())
+	{
+		if($this->params->getEdgeServerFallback() && $edgeServerIds && count($edgeServerIds))
+		{
+			$this->params->setEdgeServerIds($edgeServerIds);
+			foreach ($this->params->getEdgeServerIds() as $currEdgeServerId)
+			{
+				$this->buildM3u8Flavors($manifestUrl, $flavors, $streamInfo, $flavorBitrateInfo);
+			}
+		}
+
 	}
 }
 

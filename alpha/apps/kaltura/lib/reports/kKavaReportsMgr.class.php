@@ -2,6 +2,9 @@
 
 class kKavaReportsMgr extends kKavaBase
 {
+	// dimensions
+	const DIMENSION_TIME = '__time';
+
 	/// metrics
 	// druid predefined metrics
 	const METRIC_DELTA = 'delta';
@@ -126,6 +129,12 @@ class kKavaReportsMgr extends kKavaBase
 	const GRAPH_ASSOC_MULTI_BY_DATE_ID = 'assoc_multi_by_date_id';
 	const GRAPH_MULTI_BY_DATE_ID = 'multi_by_date_id';
 	const GRAPH_MULTI_BY_NAME = 'multi_by_name';
+
+	// granularities
+	const GRANULARITY_THIRTY_MINUTE = 'thirty_minute';
+	const GRANULARITY_HOUR = 'hour';
+	const GRANULARITY_DAY = 'day';
+	const GRANULARITY_MONTH = 'month';
 	
 	// report intervals
 	const INTERVAL_START_TO_END = 'start_to_end';
@@ -174,13 +183,12 @@ class kKavaReportsMgr extends kKavaBase
 		myReportsMgr::REPORT_TYPE_BROWSERS,
 		myReportsMgr::REPORT_TYPE_LIVE,
 		myReportsMgr::REPORT_TYPE_TOP_PLAYBACK_CONTEXT,
-		myReportsMgr::REPORT_TYPE_VPAAS_USAGE,
-		myReportsMgr::REPORT_TYPE_REACH_USAGE,
 	);
 		
 	protected static $kava_forced_reports = array(
 		myReportsMgr::REPORT_TYPE_ENTRY_USAGE,
 		myReportsMgr::REPORT_TYPE_REACH_USAGE,
+		myReportsMgr::REPORT_TYPE_TOP_CUSTOM_VAR1,
 	);
 	
 	protected static $reports_def = array(
@@ -336,7 +344,7 @@ class kKavaReportsMgr extends kKavaBase
 		),
 
 		myReportsMgr::REPORT_TYPE_LIVE => array(
-			self::REPORT_GRANULARITY => self::DRUID_GRANULARITY_HOUR,
+			self::REPORT_GRANULARITY => self::GRANULARITY_HOUR,
 			self::REPORT_PLAYBACK_TYPES => array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR), 
 			self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
 			self::REPORT_DIMENSION_HEADERS => array('object_id', 'entry_name'),
@@ -1001,8 +1009,8 @@ class kKavaReportsMgr extends kKavaBase
 		
 		myReportsMgr::REPORT_TYPE_REACH_USAGE => array(
 			self::REPORT_DATA_SOURCE => self::DATASOURCE_REACH_USAGE,
-			self::REPORT_DIMENSION => array(self::DIMENSION_ENTRY_ID, self::DIMENSION_REACH_PROFILE_ID, self::DIMENSION_SERVICE_TYPE, self::DIMENSION_SERVICE_FEATURE),
-			self::REPORT_DIMENSION_HEADERS => array('object_id', 'entry_name', 'reachProfileId', 'serviceType', 'serviceFeature', 'price'),
+			self::REPORT_DIMENSION => array(self::DIMENSION_ENTRY_ID, self::DIMENSION_REACH_PROFILE_ID, self::DIMENSION_SERVICE_TYPE, self::DIMENSION_SERVICE_FEATURE, self::DIMENSION_TURNAROUND_TIME),
+			self::REPORT_DIMENSION_HEADERS => array('object_id', 'entry_name', 'reachProfileId', 'serviceType', 'serviceFeature', "turnaroundTime"),
 				self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'entry_name',
 				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'),
@@ -1011,6 +1019,14 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_FILTER => array(
 				self::DRUID_DIMENSION => self::DIMENSION_STATUS,
 				self::DRUID_VALUES => array(self::TASK_READY)),
+		),
+
+		myReportsMgr::REPORT_TYPE_TOP_CUSTOM_VAR1 => array(
+			self::REPORT_DIMENSION => self::DIMENSION_CUSTOM_VAR1,
+			self::REPORT_DIMENSION_HEADERS => array('custom_var1'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
+			self::REPORT_FILTER_DIMENSION => self::DIMENSION_CUSTOM_VAR1,
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
 		),
 	);
 	
@@ -1114,15 +1130,16 @@ class kKavaReportsMgr extends kKavaBase
 	);
 
 	protected static $transform_time_dimensions = array(
-		self::DRUID_GRANULARITY_HOUR => array('kKavaReportsMgr', 'timestampToHourId'),
-		self::DRUID_GRANULARITY_DAY => array('kKavaReportsMgr', 'timestampToDateId'),
-		self::DRUID_GRANULARITY_MONTH => array('kKavaReportsMgr', 'timestampToMonthId')
+		self::GRANULARITY_HOUR => array('kKavaReportsMgr', 'timestampToHourId'),
+		self::GRANULARITY_DAY => array('kKavaReportsMgr', 'timestampToDateId'),
+		self::GRANULARITY_MONTH => array('kKavaReportsMgr', 'timestampToMonthId')
 	);
 
 	protected static $granularity_mapping = array(
-		self::DRUID_GRANULARITY_DAY => 'P1D',
-		self::DRUID_GRANULARITY_MONTH => 'P1M',
-		self::DRUID_GRANULARITY_HOUR => 'PT1H',
+		self::GRANULARITY_DAY => 'P1D',
+		self::GRANULARITY_MONTH => 'P1M',
+		self::GRANULARITY_HOUR => 'PT1H',
+		self::GRANULARITY_THIRTY_MINUTE => 'PT30M',
 	);
 
 	protected static $non_linear_metrics = array(
@@ -1657,7 +1674,7 @@ class kKavaReportsMgr extends kKavaBase
 	    }
 	    
 	    if (in_array($report_type, self::$kava_enabled_reports) && 
-	    	kKavaBase::isPartnerAllowed($partner_id, kKavaBase::VOD_ALLOWED_PARTNERS))
+	    	kKavaBase::isPartnerAllowed($partner_id, kKavaBase::VOD_DISABLED_PARTNERS))
 	    {
 	        return true;
 	    }
@@ -1825,77 +1842,6 @@ class kKavaReportsMgr extends kKavaBase
 		return array($from_date . '/' . $to_date);
 	}
 
-	protected static function getPlaybackContextCategoriesIds($partner_id, $playback_context, $is_ancestor)
-	{
-		$category_filter = new categoryFilter();
-
-		if ($is_ancestor)
-		{
-			$category_filter->set('_matchor_likex_full_name', $playback_context);
-		}
-		else
-		{
-			$category_filter->set('_in_full_name', $playback_context);
-		}
-
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		$category_filter->attachToCriteria($c);
-		$category_filter->setPartnerSearchScope($partner_id);
-		$c->applyFilters();
-
-		$category_ids_from_db = $c->getFetchedIds();
-
-		if (count($category_ids_from_db))
-		{
-			return $category_ids_from_db;
-		}
-		else
-		{
-			return array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
-		}
-	}
-
-	protected static function addEndUserReportsDruidFilters($partner_id, $report_def, $input_filter, &$druid_filter)
-	{
-		if (!($input_filter instanceof endUserReportsInputFilter))
-		{
-			return;
-		}
-
-		if ($input_filter->playbackContext || $input_filter->ancestorPlaybackContext)
-		{
-			if ($input_filter->playbackContext && $input_filter->ancestorPlaybackContext)
-			{
-				$category_ids = array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
-			}
-			else
-			{
-				$category_ids = self::getPlaybackContextCategoriesIds($partner_id, $input_filter->playbackContext ?
-					$input_filter->playbackContext : $input_filter->ancestorPlaybackContext, isset($input_filter->ancestorPlaybackContext));
-			}
-
-			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT,
-				self::DRUID_VALUES => $category_ids);
-		}
-
-		if ($input_filter->application)
-		{
-			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_APPLICATION,
-				self::DRUID_VALUES => explode(',', $input_filter->application)
-			);
-		}
-
-		if ($input_filter->userIds != null)
-		{
-			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_KUSER_ID,
-				self::DRUID_VALUES => self::getKuserIds($report_def, $input_filter->userIds, $partner_id),
-			);
-		}
-	}
-
 	protected static function getKuserIds($report_def, $puser_ids, $partner_id)
 	{
 		$result = array();
@@ -2011,10 +1957,23 @@ class kKavaReportsMgr extends kKavaBase
 		
 		if (isset($report_def[self::REPORT_FILTER]))
 		{
-			$druid_filter[] = $report_def[self::REPORT_FILTER];
+			$report_filter = $report_def[self::REPORT_FILTER];
+			if (isset($report_filter[self::DRUID_DIMENSION]))
+			{
+				$report_filter = array($report_filter);
+			}
+			$druid_filter = array_merge($druid_filter, $report_filter);
 		}
 		
-		self::addEndUserReportsDruidFilters($partner_id, $report_def, $input_filter, $druid_filter);
+		$input_filter->addReportsDruidFilters($partner_id, $report_def, $druid_filter);
+		//Calculating druid filter userIds uses core logic which we don't want to move to the filter
+		if ($input_filter instanceof endUserReportsInputFilter && $input_filter->userIds != null)
+		{
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_KUSER_ID,
+				self::DRUID_VALUES => self::getKuserIds($report_def, $input_filter->userIds, $partner_id),
+			);
+		}
 
 		if ($input_filter->categories)
 		{
@@ -2025,19 +1984,25 @@ class kKavaReportsMgr extends kKavaBase
 			);
 		}
 
-		if ($input_filter->categoriesIds)
-		{
-			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_CATEGORIES,
-				self::DRUID_VALUES => explode(',', $input_filter->categoriesIds)
-			);
-		}
+		$field_dim_map = array(
+			'categoriesIds' => self::DIMENSION_CATEGORIES,
+			'countries' => self::DIMENSION_LOCATION_COUNTRY,
+			'custom_var1' => self::DIMENSION_CUSTOM_VAR1,
+			'custom_var2' => self::DIMENSION_CUSTOM_VAR2,
+			'custom_var3' => self::DIMENSION_CUSTOM_VAR3,
+		);
 
-		if ($input_filter->countries)
+		foreach ($field_dim_map as $field => $dimension)
 		{
+			$value = $input_filter->$field;
+			if (is_null($value))
+			{
+				continue;
+			}
+
 			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_LOCATION_COUNTRY,
-				self::DRUID_VALUES => explode(',', $input_filter->countries)
+				self::DRUID_DIMENSION => $dimension,
+				self::DRUID_VALUES => explode(',', $value)
 			);
 		}
 
@@ -2493,7 +2458,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		// get the granularity
 		$granularity = isset($report_def[self::REPORT_GRANULARITY]) ? 
-			$report_def[self::REPORT_GRANULARITY] : self::DRUID_GRANULARITY_DAY;
+			$report_def[self::REPORT_GRANULARITY] : self::GRANULARITY_DAY;
 		
 		$graph_type = isset($report_def[self::REPORT_GRAPH_TYPE]) ? $report_def[self::REPORT_GRAPH_TYPE] : self::GRAPH_BY_DATE_ID;
 		switch ($graph_type)
@@ -3416,6 +3381,9 @@ class kKavaReportsMgr extends kKavaBase
 			$c->addAnd($c->getNewCriterion($column, $value, $comparison));
 		}
 
+		$con = $peer::alternativeCon(null);
+		$con->exec('SET SESSION group_concat_max_len = 102400');
+
 		$peer::setUseCriteriaFilter(false);
 		$stmt = $peer::doSelectStmt($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 		$rows = $stmt->fetchAll(PDO::FETCH_NUM);
@@ -3840,6 +3808,21 @@ class kKavaReportsMgr extends kKavaBase
 		if (isset(self::$non_linear_metrics[$order_by]) ||
 			is_array($dimension))
 		{
+			if (is_array($dimension) && in_array(self::DIMENSION_TIME, $dimension))
+			{
+				$granularity = $report_def[self::REPORT_GRANULARITY];
+				$granularity_def = self::getGranularityDef($granularity, $input_filter->timeZoneOffset);
+
+				// remove the time dimension from the list
+				$timeKey = array_search(self::DIMENSION_TIME, $dimension);
+				unset($dimension[$timeKey]);
+				$dimension = array_values($dimension);		// make sure the dimension is not rendered as an object in the druid query
+			}
+			else
+			{
+				$granularity_def = self::DRUID_GRANULARITY_ALL;
+			}
+
 			// topN works badly for non-linear metrics like avg drop off, since taking the topN per segment
 			// does not necessarily yield the combined topN
 			$threshold = $page_size * $page_index;
@@ -3848,7 +3831,7 @@ class kKavaReportsMgr extends kKavaBase
 				$data_source,
 				$partner_id,
 				$intervals,
-				self::DRUID_GRANULARITY_ALL,
+				$granularity_def,
 				is_array($dimension) ? $dimension : array($dimension),
 				$metrics,
 				$druid_filter);
@@ -4044,6 +4027,7 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY)
 			{
+				$timestamp = $row[self::DRUID_TIMESTAMP];
 				$row = $row[self::DRUID_EVENT];
 			}
 
@@ -4059,6 +4043,10 @@ class kKavaReportsMgr extends kKavaBase
 						{
 							$value = 0;
 						}
+					}
+					else if ($column == self::DIMENSION_TIME)
+					{
+						$value = $timestamp;
 					}
 					else
 					{

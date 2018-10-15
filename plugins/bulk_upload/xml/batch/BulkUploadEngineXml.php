@@ -720,7 +720,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			foreach($requestResults as $requestResult)
 			{
 				if(is_array($requestResult) && isset($requestResult['code']))
-					throw new KalturaException($requestResult['message'], $requestResult['code']);
+					throw new KalturaException($requestResult['message'], $requestResult['code'], $requestResult["args"]);
 
 				if($requestResult instanceof Exception)
 					throw $requestResult;

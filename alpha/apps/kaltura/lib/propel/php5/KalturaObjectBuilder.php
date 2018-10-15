@@ -19,7 +19,7 @@ class KalturaObjectBuilder extends PHP5ObjectBuilder
 	const KALTURA_COLUMN_CREATED_AT = 'created_at';
 	const KALTURA_COLUMN_UPDATED_AT = 'updated_at';
 	const KALTURA_COLUMN_CUSTOM_DATA = 'custom_data';
-	
+
 	protected static $systemColumns = array(
 		self::KALTURA_COLUMN_CREATED_AT,
 		self::KALTURA_COLUMN_UPDATED_AT,
@@ -85,23 +85,23 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		}
 		return $pkg;
 	}
-	
+
 	public function shouldRaiseEvents()
 	{
 		return ($this->getTable()->getAttribute('raiseEvents', 'true') == 'true');
 	}
-	
+
 	public function isDeletable()
 	{
 		return ($this->getTable()->getAttribute('deletable', 'false') == 'true');
 	}
-	
+
 	public function getSubpackage()
 	{
 		$pkg = $this->getBuildProperty('subpackage');
 		return "$pkg.om";
 	}
-	
+
 	/**
 	 * Adds class attributes.
 	 * @param      string &$script The script will be modified in this method.
@@ -109,7 +109,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	protected function addAttributes(&$script)
 	{
 		parent::addAttributes($script);
-		
+
 		$this->addTraceAttributes($script);
 	}
 
@@ -146,7 +146,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	}
 ";
 	}
-	
+
 	/**
 	 * Adds the methods related to refreshing, saving and deleting the object.
 	 * @param      string &$script The script will be modified in this method.
@@ -154,42 +154,42 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	protected function addManipulationMethods(&$script)
 	{
 		parent::addManipulationMethods($script);
-		
+
 		$this->addSaveHooks($script);
 	}
-	
+
 	protected function addReload(&$script)
 	{
 		$parentReload = '';
 		parent::addReload($parentReload);
-		
+
 		// disable default criteria during the call to doSelectStmt
 		$doSelectStmt = "\$stmt = ".$this->getPeerClassname()."::doSelectStmt(\$this->buildPkeyCriteria(), \$con);";
 		$doSelectPos = strpos($parentReload, $doSelectStmt);
-		
+
 		if ($doSelectPos === false)
 		{
 			throw new EngineException("Unexpected: could not find the call to doSelectStmt in reload function");
 		}
-		
+
 		$newLine = "\n\t\t";
-		
-		$script .= 
+
+		$script .=
 			substr($parentReload, 0, $doSelectPos) .
 			$this->getPeerClassname() . "::setUseCriteriaFilter(false);" . $newLine .
 			"\$criteria = \$this->buildPkeyCriteria();" . $newLine .
 			$this->getPeerClassname() . "::addSelectColumns(\$criteria);" . $newLine .
-			"\$stmt = BasePeer::doSelect(\$criteria, \$con);" . $newLine . 
+			"\$stmt = BasePeer::doSelect(\$criteria, \$con);" . $newLine .
 			$this->getPeerClassname() . "::setUseCriteriaFilter(true);" .
 			substr($parentReload, $doSelectPos + strlen($doSelectStmt));
-		
-		
+
+
 	}
-	
+
 	protected function addHydrateOpen(&$script) {
 		parent::addHydrateOpen($script);
 		$newLine = "\n\t\t";
-		
+
 		$table = $this->getTable();
 		$customDataColumn = $table->getColumn(self::KALTURA_COLUMN_CUSTOM_DATA);
 		if($customDataColumn) {
@@ -226,7 +226,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	protected function addSave(&$script)
 	{
 		parent::addSave($script);
-		
+
 		$script .= "	
 	public function wasObjectSaved()
 	{
@@ -234,7 +234,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	}
 ";
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see PHP5ObjectBuilder::addSaveBody($script)
 	 */
@@ -258,7 +258,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		\$con->beginTransaction();
 		\$isInsert = \$this->isNew();
 		try {";
-		
+
 		if($this->getGeneratorConfig()->getBuildProperty('addHooks')) {
 			// save with runtime hools
 			$script .= "
@@ -362,40 +362,40 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			return \$affectedRows;";
 		} else {
 			// save without runtime hooks
-	    $this->applyBehaviorModifier('preSave', $script, "			");
+			$this->applyBehaviorModifier('preSave', $script, "			");
 			if ($this->hasBehaviorModifier('preUpdate'))
 			{
-			  $script .= "
+				$script .= "
 			if(!\$isInsert) {";
-	      $this->applyBehaviorModifier('preUpdate', $script, "				");
-	      $script .= "
+				$this->applyBehaviorModifier('preUpdate', $script, "				");
+				$script .= "
 			}";
 			}
 			if ($this->hasBehaviorModifier('preInsert'))
 			{
-			  $script .= "
+				$script .= "
 			if(\$isInsert) {";
-	    	$this->applyBehaviorModifier('preInsert', $script, "				");
-	      $script .= "
+				$this->applyBehaviorModifier('preInsert', $script, "				");
+				$script .= "
 			}";
 			}
 			$script .= "
 			\$affectedRows = \$this->doSave(\$con".($reloadOnUpdate || $reloadOnInsert ? ", \$skipReload" : "").");";
-	    $this->applyBehaviorModifier('postSave', $script, "			");
+			$this->applyBehaviorModifier('postSave', $script, "			");
 			if ($this->hasBehaviorModifier('postUpdate'))
 			{
-			  $script .= "
+				$script .= "
 			if(!\$isInsert) {";
-	      $this->applyBehaviorModifier('postUpdate', $script, "				");
-	      $script .= "
+				$this->applyBehaviorModifier('postUpdate', $script, "				");
+				$script .= "
 			}";
 			}
 			if ($this->hasBehaviorModifier('postInsert'))
 			{
-			  $script .= "
+				$script .= "
 			if(\$isInsert) {";
-	      $this->applyBehaviorModifier('postInsert', $script, "				");
-	      $script .= "
+				$this->applyBehaviorModifier('postInsert', $script, "				");
+				$script .= "
 			}";
 			}
 			$script .= "
@@ -403,14 +403,14 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			".$this->getPeerClassname()."::addInstanceToPool(\$this);
 			return \$affectedRows;";
 		}
-		
+
 		$script .= "
 		} catch (PropelException \$e) {
 			\$con->rollBack();
 			throw \$e;
 		}";
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see PHP5ObjectBuilder::addDoSave($script)
 	 */
@@ -472,9 +472,9 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 ";
 			} // foreach foreign k
 		} // if (count(foreign keys))
-		
+
 		if ($table->hasAutoIncrementPrimaryKey() ) {
-		$script .= "
+			$script .= "
 			if (\$this->isNew() ) {
 				\$this->modifiedColumns[] = " . $this->getColumnConstant($table->getAutoIncrementPrimaryKey() ) . ";
 			}";
@@ -592,7 +592,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 ";
 
 	}
-	
+
 	/**
 	 * Adds the save hook methods.
 	 * @param      string &$script The script will be modified in this method.
@@ -604,7 +604,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		$updatedAtColumn = $table->getColumn(self::KALTURA_COLUMN_UPDATED_AT);
 		$customDataColumn = $table->getColumn(self::KALTURA_COLUMN_CUSTOM_DATA);
 		$reloadOnInsert = $table->isReloadOnInsert();
-		
+
 		$script .= "
 	/**
 	 * Override in order to use the query cache.
@@ -628,10 +628,10 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	public function preSave(PropelPDO \$con = null)
 	{";
 		if($customDataColumn)
-		$script .= "
+			$script .= "
 		\$this->setCustomDataObj();
     	";
-		
+
 		$script .= "
 		return parent::preSave(\$con);
 	}
@@ -644,12 +644,12 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	{
 		kEventsManager::raiseEvent(new kObjectSavedEvent(\$this));
 		\$this->oldColumnsValues = array();";
-		
+
 		if($customDataColumn)
-		$script .= "
+			$script .= "
 		\$this->oldCustomDataValues = array();
     	";
-				
+
 		$script .= " 
 		parent::postSave(\$con);
 	}
@@ -661,15 +661,15 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	 */
 	public function preInsert(PropelPDO \$con = null)
 	{";
-		
+
 		if($createdAtColumn)
-		$script .= "
+			$script .= "
 		\$this->setCreatedAt(time());";
-		
+
 		if($updatedAtColumn)
-		$script .= "
+			$script .= "
 		\$this->setUpdatedAt(time());";
-		
+
 		$script .= "
 		return parent::preInsert(\$con);
 	}
@@ -684,7 +684,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	{
 		kQueryCache::invalidateQueryCache(\$this);
 		";
-		
+
 		if ($this->shouldRaiseEvents())
 		{
 			$script .= "
@@ -716,12 +716,12 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		{
 			kQueryCache::invalidateQueryCache(\$this);
 			\$modifiedColumns = \$this->tempModifiedColumns;";
-			
+
 			if($customDataColumn) {
 				$script .= "
 			\$modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES] = \$this->oldCustomDataValues;";
 			}
-			
+
 			$script .= "
 			kEventsManager::raiseEvent(new kObjectChangedEvent(\$this, \$modifiedColumns));
 		}
@@ -738,10 +738,10 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		$script .= "
 		parent::postUpdate(\$con);
 	}";
-	
-	if ($this->isDeletable())
-	{
-	    $script .= "
+
+		if ($this->isDeletable())
+		{
+			$script .= "
 	    
 	/**
 	 * Code to be run after deleting the object from database
@@ -752,20 +752,20 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		kQueryCache::invalidateQueryCache(\$this);
 		
 		";
-		if ($this->shouldRaiseEvents())
-		{
-			$script .= "
+			if ($this->shouldRaiseEvents())
+			{
+				$script .= "
 		kEventsManager::raiseEvent(new kObjectErasedEvent(\$this));
 		";
-		}
-		$script .= "
+			}
+			$script .= "
 		parent::postDelete(\$con);
 	}
 	";
-	}	
+		}
 		if(!$this->shouldRaiseEvents())
 			return;
-	
+
 		$script .= "
 	/**
 	 * Saves the modified columns temporarily while saving
@@ -812,22 +812,22 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			return true;
 		}	
 		";
-		
+
 		if($updatedAtColumn)
-		$script .= "
+			$script .= "
 		
 		if(\$this->isModified())
 			\$this->setUpdatedAt(time());";
-		
+
 		$script .= "
 		
 		\$this->tempModifiedColumns = \$this->modifiedColumns;
 		return parent::preUpdate(\$con);
 	}
 	";
-		
+
 	}
-	
+
 	/**
 	 * Adds the copy() method, which (in complex OM) includes the $deepCopy param for making copies of related objects.
 	 * @param      string &$script The script will be modified in this method.
@@ -879,7 +879,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	}
 ";
 	} // addCopy()
-	
+
 	/**
 	 * Specifies the methods that are added as part of the basic OM class.
 	 * This can be overridden by subclasses that wish to add more methods.
@@ -888,7 +888,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	protected function addClassBody(&$script)
 	{
 		parent::addClassBody($script);
-		
+
 		$table = $this->getTable();
 		$customDataColumn = $table->getColumn(self::KALTURA_COLUMN_CUSTOM_DATA);
 		if($customDataColumn)
@@ -901,22 +901,22 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	 * @param      Column $col The current column.
 	 * @see        addMutatorOpen()
 	 **/
-	protected function addMutatorOpenBody(&$script, Column $col) 
+	protected function addMutatorOpenBody(&$script, Column $col)
 	{
 		parent::addMutatorOpenBody($script, $col);
-		
+
 		$clo = strtolower($col->getName());
-		
+
 		if(in_array($clo, self::$systemColumns))
 			return;
-			
+
 		$fullColumnName = $this->getColumnConstant($col);
 		$script .= "
 		if(!isset(\$this->oldColumnsValues[$fullColumnName]))
 			\$this->oldColumnsValues[$fullColumnName] = \$this->$clo;
 ";
 	}
-	
+
 
 	/**
 	 * Adds a setter method for date/time/timestamp columns.
@@ -945,7 +945,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	 */
 	".$visibility." function set$cfc(\$v)
 	{";
-		
+
 		$this->addMutatorOpenBody($script, $col);
 
 		$fmt = var_export($this->getTemporalFormatter($col), true);
@@ -998,8 +998,8 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 ";
 		$this->addMutatorClose($script, $col);
 	}
-	
-	
+
+
 	/**
 	 * Adds all custom data required methods
 	 * @param      string &$script The script will be modified in this method.
@@ -1156,23 +1156,23 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	
 	/* ---------------------- CustomData functions ------------------------- */
 	";
-		
+
 	} // addCustomDataMethods()
 
 	/* (non-PHPdoc)
 	 * @see PHP5ObjectBuilder::addBuildPkeyCriteriaClose($script)
 	 */
-	protected function addBuildPkeyCriteriaClose(&$script) 
+	protected function addBuildPkeyCriteriaClose(&$script)
 	{
 		$table = $this->getTable();
 		if(!$table->getColumn(self::KALTURA_COLUMN_UPDATED_AT))
 			return parent::addBuildPkeyCriteriaClose($script);
-			
+
 		$script .= "
 		
 		if(\$this->alreadyInSave)
 		{";
-		if ($table->containsColumn(self::KALTURA_COLUMN_CUSTOM_DATA)){	
+		if ($table->containsColumn(self::KALTURA_COLUMN_CUSTOM_DATA)){
 			$script .= "
 			if (\$this->isColumnModified(".$this->getPeerClassname()."::CUSTOM_DATA))
 			{
@@ -1184,13 +1184,13 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 					{
 						\$currentDcId = kDataCenterMgr::getCurrentDcId();
 						//addOr(column, value, comparison)
-						\$criteria->addOr(entryPeer::CUSTOM_DATA,\" '\$currentDcId' != getDC()\" ,Criteria::CUSTOM);
+						\$criteria->addOr(".$this->getPeerClassname()."::CUSTOM_DATA,\" '\$currentDcId' != getDC()\" ,Criteria::CUSTOM);
 					}
 				}
 				else 
 					\$criteria->add(".$this->getPeerClassname()."::CUSTOM_DATA, NULL, Criteria::ISNULL);
 			}
-			";	
+			";
 		}
 		$script .= "
 			if (count(\$this->modifiedColumns) == 2 && \$this->isColumnModified(".$this->getPeerClassname()."::UPDATED_AT))

@@ -216,31 +216,54 @@ class PartnerController extends Zend_Controller_Action
 
 	private function generateAdminKs()
 	{
-		$partnerId = $this->_getParam('partner_id');
+		$impersonatedPartnerId = $this->_getParam('partner_id');
 		$userId = $this->_getParam('user_id');
 		$client = Infra_ClientHelper::getClient();
 		$client->startMultiRequest();
 		$client->partner->getInfo();
 		if (!$userId)
 		{
-			$client->partner->get($partnerId);
+			$client->partner->get($impersonatedPartnerId);
 		}
 
-		$client->session->impersonate('{1:result:adminSecret}', $partnerId, $userId ? $userId : '{2:result:adminUserId}', Kaltura_Client_Enum_SessionType::ADMIN, '{1:result:id}', null, "disableentitlement,disablechangeaccount");
+		$client->session->impersonate('{1:result:adminSecret}', $impersonatedPartnerId, $userId ? $userId : '{2:result:adminUserId}', Kaltura_Client_Enum_SessionType::ADMIN, '{1:result:id}', null, "disableentitlement");
 		try
 		{
 			$result = $client->doMultiRequest();
 		}
 		catch(Exception $e)
 		{
-			$this->view->partnerId = $partnerId;
+			$this->view->partnerId = $impersonatedPartnerId;
 			$this->view->errorMessage = $e->getMessage();
 			return null;
 		}
 
 		// The KS is always the last item received in the multi-request
-		$ks = $result[count($result)-1];
+		if(!$userId)
+			$userId = $result[1]->adminUserId;
+
+		$adminSecret = $result[0]->adminSecret;
+		$partnerId =  $result[0]->id;
+		$kalturaPartnerFilter = new Kaltura_Client_Type_PartnerFilter();
+		$kalturaPartnerFilter->statusEqual = 1;
+		$userKs = $result[count($result)-1];
+		$masterKs = $client->getKs();
+		$client->setKs($userKs);
+		$partnersResult = $client->partner->listPartnersForUser($kalturaPartnerFilter);
+		$partnersId = self::getPartnersIdsFromPartnerListResponse($partnersResult);
+		$client->setKs($masterKs);
+		$ks = $client->session->impersonate($adminSecret, $impersonatedPartnerId, $userId, Kaltura_Client_Enum_SessionType::ADMIN, $partnerId, null, "disableentitlement,enablechangeaccount:".$partnersId);
+
 		return $ks;
+	}
+
+	private static function getPartnersIdsFromPartnerListResponse($partnerListResponse)
+	{
+		$partnersId = array();
+		foreach($partnerListResponse->objects as $partner)
+			$partnersId[] = $partner->id;
+
+		return  implode("/", $partnersId);
 	}
 
 	private function createKmcRedirectionUrl($ks, $partnerId)

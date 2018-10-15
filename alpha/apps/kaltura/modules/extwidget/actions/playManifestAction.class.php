@@ -576,7 +576,7 @@ class playManifestAction extends kalturaAction
 	{
 		//in case asset id specified, allow url and download regardless of asset type
 		//ignoring flavor-assets due to backward compat.
-		if(count($this->flavorIds) == 1 && in_array($this->deliveryAttributes->getFormat(), array(self::URL, self::DOWNLOAD)))
+		if($this->flavorIds && count($this->flavorIds) == 1 && in_array($this->deliveryAttributes->getFormat(), array(self::URL, self::DOWNLOAD)))
 		{
 			$asset = assetPeer::retrieveById($this->flavorIds[0]);
 			if($asset && $asset->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && !in_array($asset->getType(), assetPeer::retrieveAllFlavorsTypes()))

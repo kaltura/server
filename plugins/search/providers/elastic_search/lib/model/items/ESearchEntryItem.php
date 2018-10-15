@@ -74,6 +74,12 @@ class ESearchEntryItem extends ESearchItem
 		ESearchEntryFieldName::ID,
 	);
 
+	protected static $searchHistoryFields = array(
+		ESearchEntryFieldName::NAME,
+		ESearchEntryFieldName::DESCRIPTION,
+		ESearchEntryFieldName::TAGS,
+	);
+
 	/**
 	 * @return ESearchEntryFieldName
 	 */

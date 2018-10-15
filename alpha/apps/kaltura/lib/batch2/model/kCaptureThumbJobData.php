@@ -46,7 +46,13 @@ class kCaptureThumbJobData extends kJobData
 	 * @var string
 	 */
 	private $srcAssetId;
-	
+
+	/**
+	 * @var string
+	 */
+	private $srcAssetEncryptionKey;
+
+
 	/**
 	 * @var string
 	 */
@@ -90,6 +96,22 @@ class kCaptureThumbJobData extends kJobData
 	public function getSrcAssetType()
 	{
 		return $this->srcAssetType;
+	}
+
+	/**
+	 * @param $srcAssetEncryptionKey the $srcAssetEncryptionKey to set
+	 */
+	public function setSrcAssetEncryptionKey($srcAssetEncryptionKey)
+	{
+		$this->srcAssetEncryptionKey = $srcAssetEncryptionKey;
+	}
+
+	/**
+	 * @return the $srcAssetEncryptionKey
+	 */
+	public function getSrcAssetEncryptionKey()
+	{
+		return $this->srcAssetEncryptionKey;
 	}
 
 	/**

@@ -327,11 +327,20 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			if($useTwoCodeLang)
 				$audioLanguage = !is_null($obj)? $obj[languageCodeManager::ISO639]: $audioLanguage;
 		}
-		else {
+		else
+		{
+			$audioLanguage = $lang;
 			$obj = languageCodeManager::getObjectFromKalturaName($lang);
-			$audioLanguage = !is_null($obj)? $obj[languageCodeManager::ISO639_T]: $lang;
-			if($useTwoCodeLang)
-				$audioLanguage = !is_null($obj)? $obj[languageCodeManager::ISO639]: $lang;
+			if (is_null($obj))
+				$obj = languageCodeManager::getObjectFromThreeCode($lang);
+			
+			if (!is_null($obj))
+			{
+				if ($useTwoCodeLang)
+					$audioLanguage = $obj[languageCodeManager::ISO639] ? $obj[languageCodeManager::ISO639] : $audioLanguage;
+				else
+					$audioLanguage = $obj[languageCodeManager::ISO639_T] ? $obj[languageCodeManager::ISO639_T] : $obj[languageCodeManager::ISO639_B];
+			}
 		}
 
 		$audioLanguageName = $this->getAudioLanguageName($obj, $audioLanguage);
@@ -340,11 +349,13 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	
 	protected function getAudioLanguageName($languageObject, $audioLanguage)
 	{
-		$audioLanguageName = !is_null($languageObject) ? $languageObject[languageCodeManager::KALTURA_NAME] : $audioLanguage;
-		if($audioLanguageName == $audioLanguage)
-			KalturaLog::info("Language code [$audioLanguage] was not found. Setting [$audioLanguageName] instead");
-	
-		return $audioLanguageName;
+		if (is_null($languageObject))
+		{
+			KalturaLog::info("Language object was not found. Setting [$audioLanguage] instead");
+			return $audioLanguage;
+		}
+
+		return $languageObject[languageCodeManager::KALTURA_NAME];
 	}
 	
 	/**
@@ -458,7 +469,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		{
 			if(isset($flavor['domainPrefix']))
 				continue;
-			
+
 			$domainPrefix = $this->getDeliveryServerNodeUrl();
 			if($domainPrefix)
 				$flavor['domainPrefix'] = $domainPrefix;

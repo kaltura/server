@@ -777,6 +777,7 @@ class kJobsManager
 		$data = new kCaptureThumbJobData();
 		$data->setThumbAssetId($thumbAssetId);
 		$data->setSrcAssetId($srcAssetId);
+		$data->setSrcAssetEncryptionKey(self::getAssetEncyptionKey($srcAssetId));
 		$data->setSrcAssetType($srcAssetType);
 		$data->setFileContainer(self::getFileContainerByFileSync($fileSync));
 		$data->setSrcFileSyncRemoteUrl($remoteUrl);
@@ -841,6 +842,7 @@ class kJobsManager
 				{
 					$postConvertData->setThumbHeight($flavorAsset->getHeight());
 					$postConvertData->setThumbBitrate($flavorAsset->getBitrate());
+					$postConvertData->setFlavorAssetEncryptionKey($flavorAsset->getEncryptionKey());
 				}
 				else
 				{
@@ -878,6 +880,7 @@ class kJobsManager
 						$postConvertData->setCreateThumb(true);
 						$postConvertData->setThumbHeight($thisFlavorHeight);
 						$postConvertData->setThumbBitrate($thisFlavorBitrate);
+						$postConvertData->setFlavorAssetEncryptionKey($flavorAsset->getEncryptionKey());
 					}
 				}
 			}
@@ -1792,6 +1795,23 @@ class kJobsManager
 
 		$fileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($syncKey);
 		return self::getFileContainerByFileSync($fileSync);
+	}
+
+	protected static function getAssetEncyptionKey($assetId)
+	{
+		if (!$assetId)
+		{
+			return null;
+		}
+
+		$flavorAsset = assetPeer::retrieveById($assetId);
+
+		if(!$flavorAsset)
+		{
+			return null;
+		}
+
+		return $flavorAsset->getEncryptionKey();
 	}
 
 	protected static function getFileContainerByFileSync(FileSync $fileSync)

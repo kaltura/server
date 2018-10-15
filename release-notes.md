@@ -1,3 +1,144 @@
+# Naos 14.7.0 #
+
+## Add reqreuied permissions for managing reach partner catalog items ##
+- Issue Type: Task
+- Issue ID: PLAT-9285
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_15_10_add_partner_catalog_item_service_permissions.php
+
+#### Known Issues & Limitations ####
+	None
+
+# Naos 14.6.0 #
+
+## Add new SearchHistory plugin ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-7981
+
+### pre-requisite ###
+
+* Install elasticSearch, logstash, RabbitMQ
+
+### configuration ###
+Enable SearchHistory plugin:
+
+	- Add the following to plugins.ini file: "SearchHistory"
+	- Make sure the following plugins are enabled since they are required for searchHistory service to work: ElasticSearch, RabbitMQ, Queue.
+    - Add the following to your elastic.ini file in search_history section:
+          disableHistoryIndexing = false
+          completionListSize = 100
+          emptyTermListSize = 500
+    - Add the following to your elastic.ini file in search_history_collect_objects section:
+          0 = entry
+          1 = category
+
+Configure logstash:
+
+	- Copy configurations/logstash/kaltura_search_history.template.conf to logstash config dir and update the necessary tokens.
+
+Configure rabbitMq:
+	- Add new exchange called: history_exchange (Type=fanout, durable=true, Policy=ha-all)
+	- Add new queue called: history (x-message-ttl=86400000, durable=true, Policy=ha-all)
+	- Bind queue to exchange.
+
+### Deployment scripts ###
+    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    2. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_08_19_add_searchhistory_permissions.php
+
+
+## Support volume map and thumb serving with encrypted at rest ##
+- Issue Type: Task
+- Issue ID: PLAT-9262
+
+### Configuration ###
+	Add to local.ini after replacing the pacth-holders of VOD_PACKAGER_HOST and VOD_PACKAGER_PORT: 
+	packager_mapped_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/mappedvolume/{url}/volume_map.csv
+
+#### Deployment Scripts ####
+	None
+
+## Support filtering entryVendorTasks based on VendorCaptionsCatalogItem target language value ##
+- Issue Type: New Feature
+- Issue ID: PLAT-8950
+
+### Configuration ###
+	None.
+
+#### Deployment Scripts ####
+
+	Re-Index entryVendorTask sphinx table:
+	php opt/kaltura/app/deployment/base/scripts/populateSphinxEntryVendorTasks.php
+
+## Improve group user sync + move group user sync action to GroupUserService ##
+- Issue Type: Task
+- Issue ID: PLAT-9237
+
+### Configuration ###
+	None.
+
+#### Deployment Scripts ####
+
+	Run deployment script:
+  	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_10_03_update_groupuser_sync_action.php
+
+	Run after deployment:
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_10_09_update_bulk_sync_group_users_permissions.php 
+
+
+ 
+##Zoom Integration Configuration ##
+- New Feature
+- ID: PLAT-9190     
+
+#### Deployment Scripts ####
+	Run:
+  	- mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2018_08_28_create_vendor_integration_table.sql
+	Run deployment script:
+  		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_08_29_zoom_vendor_Integration_permissions.php   
+
+## Add event notification for Reach credit expiry ##
+- Issue Type: Task
+- Issue ID: PLAT-8864
+
+### Configuration ###
+	None.
+
+#### Deployment Scripts ####
+
+	First replcae all tokens from the XML files below and remove ".template" from the fle name:
+        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_09_01_reach_credit_expired.template.xml
+
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/2018_09_01_deploy_reach_credit_expired_email_notification.php
+
+## Add ability to get server node path ##
+- Issue Type: Task
+- Issue ID: PLAT-9212
+
+### Configuration ###
+	None.
+
+#### Deployment Scripts ####
+
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_09_06_server_node_getServerNodePath.php
+
+## limit reset password attempts to avoid flooding ##
+- Issue Type: Bug
+- Issue ID: PLAT-8342
+
+### Configuration ###
+	Add to cache.ini mapping for resourceReservation for example: resourceReservation = memcacheGlobal
+
+#### Deployment Scripts ####
+	None.
+
+
 # Naos 14.4.0 #
 
 ## create CAPTIONS_EDITOR_ROLE for partner 0 ##

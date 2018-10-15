@@ -13,6 +13,28 @@
 class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 {
 	private $apiError = null;
+	
+	static private $statusEnumTranslate = array(
+		1 => "PENDING",
+		2 => "READY",
+		3 => "PROCESSING",
+		4 => "PENDING_MODERATION",
+		5 => "REJECTED",
+		6 => "ERROR",
+		7 => "ABORTED"
+	);
+	
+	static private $serviceFeatureEnumTranslate = array(
+		1 => "CAPTIONS",
+		2 => "TRANSLATION",
+	);
+	
+	static private $serviceTypeEnumTranslate = array(
+		1 => "HUMAN",
+		2 => "MACHINE",
+	);
+	
+	static private $catalogItemData = array();
 
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -144,8 +166,8 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 	 */
 	private function addHeaderRowToCsv($csvFile)
 	{
-		$headerRow = 'Task id,vendorPartnerId,createdAt,updatedAt,queueTime,finishTime,entryId,status,reachProfileId,catalogItemId,price,userId,moderatingUser,errDescription,notes,version,context,accuracy,outputObjectId,partnerData';
-		fputcsv($csvFile, explode(',', $headerRow));
+		$headerRow = 'Task id,createdAt,finishTime,entryId,status,reachProfileId,turnaroundTime,serviceType,serviceFeature,price,userId,moderatingUser,errDescription,notes,accuracy,context,partnerData';
+		KCsvWrapper::sanitizedFputCsv($csvFile, explode(',', $headerRow));
 		return $csvFile;
 	}
 
@@ -168,7 +190,9 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		}
 
 		foreach ($entryVendorTaskIdToRow as $key => $val)
-			fputcsv($csvFile, $val);
+		{
+			KCsvWrapper::sanitizedFputCsv($csvFile, $val);
+		}
 	}
 
 	/**
@@ -176,31 +200,70 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 	 */
 	private function initializeCsvRowValues($entryVendorTask, $entryVendorTaskIdToRow)
 	{
+		$catalogItemData = $this->getCatalogItemDataById($entryVendorTask->catalogItemId);
+		
 		$defaultRowValues = array(
 			'Task id' => $entryVendorTask->id,
-			'vendorPartnerId' => $entryVendorTask->vendorPartnerId,
-			'createdAt' => $entryVendorTask->createdAt,
-			'updatedAt' => $entryVendorTask->updatedAt,
-			'queueTime' => $entryVendorTask->queueTime,
-			'finishTime' => $entryVendorTask->finishTime,
+			'createdAt' => $this->getHumanReadbaleDate($entryVendorTask->createdAt),
+			'finishTime' => $this->getHumanReadbaleDate($entryVendorTask->finishTime),
 			'entryId' => $entryVendorTask->entryId,
-			'status' => $entryVendorTask->status,
+			'status' => $this->translateEnumsToHumanReadable("status",$entryVendorTask->status),
 			'reachProfileId' => $entryVendorTask->reachProfileId,
-			'catalogItemId' => $entryVendorTask->catalogItemId,
+			'turnaroundTime' => $catalogItemData ? $catalogItemData["TAT"] : null,
+			'serviceType' => $catalogItemData ?  $this->translateEnumsToHumanReadable("serviceType",$catalogItemData["serviceType"]) : null,
+			'serviceFeature' => $catalogItemData ? $this->translateEnumsToHumanReadable("serviceFeature",$catalogItemData["serviceFeature"]) : null,
 			'price' => $entryVendorTask->price,
 			'userId' => $entryVendorTask->userId,
 			'moderatingUser' => $entryVendorTask->moderatingUser,
 			'errDescription' => $entryVendorTask->errDescription,
 			'notes' => $entryVendorTask->notes,
-			'version' => $entryVendorTask->version,
-			'context' => $entryVendorTask->context,
 			'accuracy' => $entryVendorTask->accuracy,
-			'outputObjectId' => $entryVendorTask->outputObjectId,
+			'context' => $entryVendorTask->context,
 			'partnerData' => $entryVendorTask->partnerData
 		);
 
 		$entryVendorTaskIdToRow[$entryVendorTask->id] = $defaultRowValues;
 
 		return $entryVendorTaskIdToRow;
+	}
+	
+	private function getHumanReadbaleDate($unixTimeStamp)
+	{
+		if(!$unixTimeStamp)
+			return null;
+		
+		return date("Y-m-d H:i", $unixTimeStamp);
+	}
+	
+	private function translateEnumsToHumanReadable($enumName, $enumValue)
+	{
+		$mapName = $enumName . "EnumTranslate";
+		
+		if(!self::${$enumName."EnumTranslate"})
+			return null;
+		
+		if (!isset(self::${$enumName."EnumTranslate"}[$enumValue]))
+			return null;
+		
+		return self::${$enumName."EnumTranslate"}[$enumValue];
+		
+	}
+	
+	private function getCatalogItemDataById($id)
+	{
+		if(isset(self::$catalogItemData[$id]))
+			return self::$catalogItemData[$id];
+
+		$vendorCatalogItem = KBatchBase::$kClient->vendorCatalogItem->get($id);
+		if(!$vendorCatalogItem)
+			return null;
+		
+		$catalogItemInfo = array(
+			"TAT" => $vendorCatalogItem->turnAroundTime,
+			"serviceType" => $vendorCatalogItem->serviceType,
+			"serviceFeature" => $vendorCatalogItem->serviceFeature
+		);
+		self::$catalogItemData[$id] = $catalogItemInfo;
+		return $catalogItemInfo;
 	}
 }

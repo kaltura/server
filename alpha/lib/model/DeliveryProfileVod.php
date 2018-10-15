@@ -407,12 +407,14 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		}
 	
 		// sort the flavors in ascending bitrate order
-		if ($flavor1['bitrate'] >= $flavor2['bitrate'])
+		if ($flavor1['bitrate'] > $flavor2['bitrate'])
 		{
 			return 1;
 		}
-	
-		return -1;
+		
+		//If bitrates are equal return the first flavor to maintain the order of the original array
+		//(make order compatible with php 7)
+		return $flavor1['index'] - $flavor2['index'];
 	}
 	
 	private function compareAudio($flavor1, $flavor2)
@@ -453,7 +455,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		if(in_array($audioCodec2, $dolbyAudioCodecList))
 			return 1;
 		
-		return -1;
+		return $flavor1['index'] - $flavor2['index'];
 	}
 	
 	/**
@@ -487,7 +489,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 				}
 			}
 		}
-	
+		
 		uasort($flavors, array($this,'flavorCmpFunction'));
 	
 		return $flavors;

@@ -211,6 +211,9 @@ class myPartnerRegistration
 			$newPartner->setMonitorUsage(PartnerFreeTrialType::NO_LIMIT);
 			$parentPartner = PartnerPeer::retrieveByPK($this->partnerParentId);
 			$newPartner->setPartnerPackage($parentPartner->getPartnerPackage());
+			$newPartner->setCrmId($parentPartner->getCrmId());
+			$newPartner->setCrmLink($parentPartner->getCrmLink());
+			$newPartner->setVerticalClasiffication($parentPartner->getVerticalClasiffication());
 		}
 		
 		if(substr_count($description, 'Drupal module|'))
@@ -324,8 +327,19 @@ class myPartnerRegistration
 
 		if ($SDK_terms_agreement != "yes")
 			throw new SignupException('You haven`t approved Terms & Conds.', SignupException::INVALID_FIELD_VALUE);
-						
-		
+
+
+		if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_INTERNAL_TRIAL)
+		{
+			$internalTrialAllowedDomains = kConf::get('internal_trial_allowed_domains', 'local', null);
+			if($internalTrialAllowedDomains)
+			{
+				$domain = substr(strrchr($email, "@"), 1);
+				if(!in_array($domain, $internalTrialAllowedDomains))
+					throw new SignupException('The email domain is not allowed', SignupException::INVALID_FIELD_VALUE);
+			}
+		}
+
 		$existingLoginData = UserLoginDataPeer::getByEmail($email);
 		if ($existingLoginData && !$ignorePassword)
 		{
@@ -333,7 +347,7 @@ class myPartnerRegistration
 			$existingPartner = partnerPeer::retrieveByPK($existingLoginData->getConfigPartnerId());
 			if (!$password)
 			{
-				$this->addMarketoCampaignId($existingPartner, 'marketo_missing_Password_campaign', $partner);
+				$this->addMarketoCampaignId($existingPartner, myPartnerUtils::MARKETO_MISSING_PASSWORD, $partner);
 				throw new SignupException("User with email [$email] already exists in system.", SignupException::MISSING_PASSWORD_FOR_EXISTING_EMAIL );
 			}
 			else if ($existingLoginData->isPasswordValid($password))
@@ -342,7 +356,7 @@ class myPartnerRegistration
 			}
 			else
 			{
-				$this->addMarketoCampaignId($existingPartner, 'marketo_wrong_password_campaign', $partner);
+				$this->addMarketoCampaignId($existingPartner, myPartnerUtils::MARKETO_WRONG_PASSWORD, $partner);
 				throw new SignupException("Invalid password for user with email [$email].", SignupException::INCORRECT_PASSWORD_FOR_EXISTING_EMAIL );
 			}
 			
@@ -377,12 +391,17 @@ class myPartnerRegistration
 					
 			$this->setAllTemplateEntriesToAdminKuser($newPartner->getId(), $kuserId);
 
-			if(!$existingLoginData)
-				$this->addMarketoCampaignId($newPartner, 'marketo_new_register_success_campaign', $newPartner);
+			if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_INTERNAL_TRIAL)
+				$this->addMarketoCampaignId($newPartner, myPartnerUtils::MARKETO_NEW_INTERNAL_TRIAL_ACCOUNT, $newPartner);
+			else
+			{
+				if(!$existingLoginData)
+					$this->addMarketoCampaignId($newPartner, myPartnerUtils::MARKETO_NEW_TRIAL_ACCOUNT, $newPartner);
 
-			if ($existingLoginData && !$ignorePassword)
-				$this->addMarketoCampaignId($newPartner, 'marketo_additional_register_success_campaign', $newPartner);
+				if ($existingLoginData && !$ignorePassword)
+					$this->addMarketoCampaignId($newPartner, myPartnerUtils::MARKETO_NEW_ADDITIONAL_TRIAL_ACCOUNT, $newPartner);
 
+			}
 
 			kEventsManager::raiseEvent(new kObjectAddedEvent($newPartner));
 
@@ -400,7 +419,8 @@ class myPartnerRegistration
 		//if an additional account was register we want to check if the additional is free trial and update the existing lead
 		$additionalParams = $partnerToCheck->getAdditionalParams();
 		$additionalParams = array_change_key_case($additionalParams);
-		if($partnerToCheck->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_FREE && isset($additionalParams['freetrialaccounttype']))
+		$freeTrialPackages = array(PartnerPackages::PARTNER_PACKAGE_FREE, PartnerPackages::PARTNER_PACKAGE_INTERNAL_TRIAL);
+		if(in_array($partnerToCheck->getPartnerPackage(), $freeTrialPackages) && isset($additionalParams['freetrialaccounttype']))
 		{
 			if (kConf::hasParam($campaignName))
 			{

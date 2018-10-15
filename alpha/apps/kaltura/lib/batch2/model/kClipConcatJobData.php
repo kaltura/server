@@ -31,7 +31,6 @@ class kClipConcatJobData extends kJobData
 	 */
 	private $priority;
 
-
 	/** clip operations
 	 * @var array $operationAttributes
 	 */
@@ -117,7 +116,6 @@ class kClipConcatJobData extends kJobData
 	{
 		$this->priority = $priority;
 	}
-
 
 	/**
 	 * @return kOperationAttributes[] $operationAttributes

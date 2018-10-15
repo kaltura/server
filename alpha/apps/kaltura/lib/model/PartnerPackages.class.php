@@ -11,6 +11,7 @@ class PartnerPackages
 	const PARTNER_PACKAGE_DEVELOPER_TRIAL = 100;
 	const PARTNER_PACKAGE_DEVELOPER_PAYG = 101;
 	const PARTNER_PACKAGE_DEVELOPER_COMMIT = 102;
+	const PARTNER_PACKAGE_INTERNAL_TRIAL = 103;
 	
 	const CLASS_OF_SERVICE_SILVER = 1;
 	const CLASS_OF_SERVICE_GOLD = 2;
@@ -121,6 +122,13 @@ class PartnerPackages
 			return 'transcoding';
 			
 		return null;
+	}
+
+	public static function getFreeTrialPackages()
+	{
+		return array(PartnerPackages::PARTNER_PACKAGE_FREE,
+					 PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL,
+					 PartnerPackages::PARTNER_PACKAGE_INTERNAL_TRIAL);
 	}
 	
 }

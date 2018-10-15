@@ -30,7 +30,8 @@ class asperaMgr extends kFileTransferMgr
 			$this->ascpCmd = $options['ascpCmd'];
 	}
 	
-	public function putFile($remote_file, $local_file){
+	public function putFile ($remote_file, $local_file, $overwrite = false, $overwrite_if_different = true)
+	{
 		$remote_file = ltrim($remote_file,'/');
 		$remoteFileName = basename ( $remote_file ) ;
 		$remotePath = dirname ( $remote_file );

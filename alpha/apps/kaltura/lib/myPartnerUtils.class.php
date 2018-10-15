@@ -12,6 +12,12 @@ class myPartnerUtils
 	const ALL_PARTNERS_WILD_CHAR = "*";
 	
 	const BLOCKING_DAYS_GRACE = 7;
+
+	const MARKETO_NEW_TRIAL_ACCOUNT = 'marketo_new_register_success_campaign';
+	const MARKETO_NEW_ADDITIONAL_TRIAL_ACCOUNT = 'marketo_additional_register_success_campaign';
+	const MARKETO_NEW_INTERNAL_TRIAL_ACCOUNT = 'marketo_new_register_internal_success_campaign';
+	const MARKETO_MISSING_PASSWORD = 'marketo_missing_Password_campaign';
+	const MARKETO_WRONG_PASSWORD = 'marketo_wrong_password_campaign';
 	
 	private static $s_current_partner_id = null;
 	private static $s_set_partner_id_policy  = self::PARTNER_SET_POLICY_NONE;
@@ -2110,6 +2116,9 @@ class myPartnerUtils
 	 */
 	public static function isPartnerCreatedAsMonitoredFreeTrial($partner, $useCurrentTime = false)
 	{
+		if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_INTERNAL_TRIAL)
+			return true;
+
 		$freeTrialStartDate = myPartnerUtils::getFreeTrialStartDate($partner);
 		if(!$freeTrialStartDate)
 			return false;
@@ -2153,7 +2162,7 @@ class myPartnerUtils
 	public static function initialPasswordSetForFreeTrial($loginData)
 	{
 		$partner = PartnerPeer::retrieveByPK($loginData->getConfigPartnerId());
-		$freeTrialTypes = array(PartnerPackages::PARTNER_PACKAGE_FREE, PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL);
+		$freeTrialTypes = PartnerPackages::getFreeTrialPackages();
 		if(in_array($partner->getPartnerPackage(), $freeTrialTypes) && myPartnerUtils::isPartnerCreatedAsMonitoredFreeTrial($partner))
 		{
 			$partner->setInitialPasswordSet(true);

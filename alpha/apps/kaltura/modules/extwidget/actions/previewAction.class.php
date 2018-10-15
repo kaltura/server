@@ -15,7 +15,7 @@ class previewAction extends kalturaAction
 		$this->uiConf = uiConfPeer::retrieveByPK($this->uiconf_id);
 		if(!$this->uiConf)
 			KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
-
+        $this->isPlaykit = strpos($this->uiConf->getTags(), 'kalturaPlayerJs') !== false;
 		$this->partner_id = intval($this->getRequestParameter('partner_id', $this->uiConf->getPartnerId()));
 		if(!$this->partner_id)
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'partner_id');
@@ -134,7 +134,7 @@ class previewAction extends kalturaAction
 		}
 		// Don't include flashvars if empty array
 		if( count($flashVars) ) {
-			$embedParams['flashVars'] = $flashVars;
+			$embedParams['flashVars'] = $flashVars; 
 		}
 
 		// Export embedParams to our view
@@ -161,8 +161,13 @@ class previewAction extends kalturaAction
 			$this->flavorUrl = 'https://' . $embed_host_https . '/p/'. $this->partner_id .'/sp/' . $this->partner_id . '00/playManifest/entryId/' . $this->entry_id . '/flavorId/' . $this->flavor_asset_id . '/format/url/protocol/' . $protocol . '/a.mp4';
 		}
 
-		// set player url
-		$this->playerUrl = 'https://' . $embed_host_https . '/p/'. $this->partner_id .'/sp/' . $this->partner_id . '00/embedIframeJs/uiconf_id/' . $this->uiconf_id . '/partner_id/' . $this->partner_id . '?iframeembed=true&entry_id=' . $this->entry_id . '&flashvars[streamerType]=auto';
+        // set player url
+        if ($this->isPlaykit){
+            $this->playerUrl = 'https://' . $embed_host_https . '/p/'. $this->partner_id . '/embedPlaykitJs/uiconf_id/' . $this->uiconf_id .'/entry_id/'.$this->entry_id .'?iframeembed=true';
+        } else {
+            $this->playerUrl = 'https://' . $embed_host_https . '/p/'. $this->partner_id .'/sp/' . $this->partner_id . '00/embedIframeJs/uiconf_id/' . $this->uiconf_id . '/partner_id/' . $this->partner_id . '?iframeembed=true&entry_id=' . $this->entry_id . '&flashvars[streamerType]=auto';
+
+        }
 
 		// Set Page name
 		if(!$this->entry_id) {
@@ -172,7 +177,7 @@ class previewAction extends kalturaAction
 
 	}
 
-	private function isJson($string) {
+	private function isJson($string) { 
 		json_decode($string);
 		return (json_last_error() == JSON_ERROR_NONE);
 	}

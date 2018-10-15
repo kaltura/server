@@ -6,6 +6,8 @@ class kKavaLiveReportsMgr extends kKavaBase
 	const MAX_RESULTS = 10000;
 	const MAX_LIVE_ENTRIES = 1000;
 	const PEAK_AUDIENCE_MAX_BUCKETS = 1000;
+	const FILTER_GRANULARITY = 10;
+	const CACHE_EXPIRATION = 30;
 	
 	// intermediate metrics
 	const METRIC_VIEW_COUNT = 'viewCount';
@@ -126,8 +128,33 @@ class kKavaLiveReportsMgr extends kKavaBase
 		return self::getAndFilter($result);
 	}
 	
+	protected static function roundUpToMultiple($num, $mult)
+	{
+		$rem = $num % $mult;
+		if (!$rem)
+		{
+			return $num;
+		}
+
+		return $num - $rem + $mult;
+	}
+
+	protected static function alignTimeFilters($filter)
+	{
+		// Note: the timestamps are aligned in order to improve cache hit ratio
+		$currentTime = time();
+		$filter->fromTime = min($filter->fromTime, $currentTime);
+		$filter->toTime = min($filter->toTime, $currentTime);
+
+		$timeRange = self::roundUpToMultiple($filter->toTime - $filter->fromTime, self::FILTER_GRANULARITY);
+		$filter->fromTime = self::roundUpToMultiple($filter->fromTime, self::FILTER_GRANULARITY);
+		$filter->toTime = $filter->fromTime + $timeRange;
+	}
+
 	protected static function getFilterIntervals($filter)
 	{
+		self::alignTimeFilters($filter);
+
 		$fromTime = $filter->fromTime;
 		$toTime = $filter->toTime + self::VIEW_EVENT_INTERVAL;
 		return self::getIntervals($fromTime, $toTime);
@@ -150,6 +177,34 @@ class kKavaLiveReportsMgr extends kKavaBase
 	}
 	
 	// base queries
+	protected static function runGranularityAllQuery($query)
+	{
+		$query[self::DRUID_GRANULARITY] = self::getGranularityAll();
+		$result = self::runQuery(
+			$query,
+			kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_DRUID_QUERIES),
+			self::CACHE_EXPIRATION);
+		if (!$result)
+		{
+			return array();
+		}
+		$result = reset($result);
+		$result = $result[self::DRUID_RESULT];
+		KalturaLog::log("Druid returned [" . count($result) . "] rows");
+		return $result;
+	}
+
+	protected static function runGranularityPeriodQuery($query, $period)
+	{
+		$query[self::DRUID_GRANULARITY] = self::getGranularityPeriod($period);
+		$result = self::runQuery(
+			$query,
+			kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_DRUID_QUERIES),
+			self::CACHE_EXPIRATION);
+		KalturaLog::log("Druid returned [" . count($result) . "] rows");
+		return $result;
+	}
+
 	protected static function getBaseTimeseriesQuery($partnerId, $filter, $eventTypes)
 	{
 		return array(
@@ -241,18 +296,18 @@ class kKavaLiveReportsMgr extends kKavaBase
 		);
 	}
 	
-	protected static function addBaseAggregations(&$query)
+	protected static function addQualityAggregations(&$query)
 	{
-		$query[self::DRUID_AGGR] = array(
-			self::getPlayCountAggregator(),
-			self::getViewCountAggregator(),
-			self::getAudienceAggregator(),
-			self::getDvrAudienceAggregator(),
-			self::getBufferTimeAggregator(),
-			self::getBitrateCountAggregator(),
-			self::getBitrateSumAggregator(),
+		$query[self::DRUID_AGGR] = array_merge(
+			isset($query[self::DRUID_AGGR]) ? $query[self::DRUID_AGGR] : array(),
+			array(
+				self::getViewCountAggregator(),
+				self::getBufferTimeAggregator(),
+				self::getBitrateCountAggregator(),
+				self::getBitrateSumAggregator(),
+			)
 		);
-		
+
 		$query[self::DRUID_POST_AGGR] = array(
 			self::getArithmeticPostAggregator(self::OUTPUT_AVG_BITRATE, '/', array(
 				self::getFieldAccessPostAggregator(self::METRIC_BITRATE_SUM),
@@ -265,6 +320,17 @@ class kKavaLiveReportsMgr extends kKavaBase
 		);
 	}
 	
+	protected static function addBaseAggregations(&$query)
+	{
+		$query[self::DRUID_AGGR] = array(
+			self::getPlayCountAggregator(),
+			self::getAudienceAggregator(),
+			self::getDvrAudienceAggregator(),
+		);
+
+		self::addQualityAggregations($query);
+	}
+
 	protected static function updateBaseFields(&$dest, $src)
 	{
 		$fieldNames = array(
@@ -297,6 +363,37 @@ class kKavaLiveReportsMgr extends kKavaBase
 		return self::applyPager(array($result), $pageIndex, $pageSize);
 	}
 	
+	public static function entryQuality($partnerId, $filter, $pageIndex, $pageSize)
+	{
+		// view events
+		$query = self::getBaseTopNQuery(
+			$partnerId, 
+			$filter, 
+			null, 
+			self::DIMENSION_ENTRY_ID, 
+			self::METRIC_VIEW_COUNT,
+			self::getLimit(self::MAX_RESULTS));		// must always use the max, since we sort by entry name (not in druid)
+		self::addQualityAggregations($query);
+		$queryResult = self::runGranularityAllQuery($query);
+
+		$result = array();
+		foreach ($queryResult as $item)
+		{
+			$output = array();
+			$entryId = $item[self::DIMENSION_ENTRY_ID];
+			$output[self::OUTPUT_ENTRY_ID] = $entryId;
+			$output[self::OUTPUT_AVG_BITRATE] = isset($item[self::OUTPUT_AVG_BITRATE]) ? $item[self::OUTPUT_AVG_BITRATE] : 0;
+			$output[self::OUTPUT_BUFFER_TIME] = isset($item[self::OUTPUT_BUFFER_TIME]) ? 
+				$item[self::OUTPUT_BUFFER_TIME] * 6 : 0;	// return in minutes
+			$result[$entryId] = $output;
+		}
+
+		// sort and apply the pager
+		$result = self::sortByEntryName($result);
+
+		return self::applyPager($result, $pageIndex, $pageSize);
+	}
+
 	public static function entryTotal($partnerId, $filter, $pageIndex, $pageSize)
 	{
 		// view events
@@ -330,9 +427,9 @@ class kKavaLiveReportsMgr extends kKavaBase
 		{
 			return array(array(), $totalCount);
 		}
-		
+
 		$filter->entryIds = implode(',', array_keys($result));
-		
+
 		// peak audience
 		$query = self::getBaseTopNQuery(
 			$partnerId, 
@@ -370,7 +467,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 				
 				foreach ($fieldMapping as $src => $dest)
 				{
-					$value = intval($entryResult[$src] / $bucketSize);
+					$value = ceil($entryResult[$src] / $bucketSize);
 					if ($value > $result[$entryId][$dest])
 					{
 						$result[$entryId][$dest] = $value;

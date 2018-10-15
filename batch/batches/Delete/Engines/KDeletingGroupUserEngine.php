@@ -22,7 +22,7 @@ class KDeletingGroupUserEngine extends KDeletingEngine
 		$filter->orderBy = KalturaGroupUserOrderBy::CREATED_AT_ASC;
 		
 		$groupUsersList = KBatchBase::$kClient->groupUser->listAction($filter, $this->pager);
-		if(!count($groupUsersList->objects))
+		if(!$groupUsersList->objects || !count($groupUsersList->objects))
 			return 0;
 			
 		KBatchBase::$kClient->startMultiRequest();

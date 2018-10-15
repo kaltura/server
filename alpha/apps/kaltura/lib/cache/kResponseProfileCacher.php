@@ -200,6 +200,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	
 	protected static function areKeysValid(array $invalidationKeys, $time)
 	{
+		if(self::avoidInvalidation())
+			return false;
+
 		$invalidationKeys = self::addCacheVersion($invalidationKeys);
 		$invalidationCacheStores = self::getInvalidationStores();
 		foreach ($invalidationCacheStores as $store)
@@ -328,6 +331,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
+		if(self::avoidInvalidation())
+			return false;
+
 		if($object instanceof ResponseProfile)
 			return true;
 
@@ -382,6 +388,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	 */
 	public function shouldConsumeDeletedEvent(BaseObject $object)
 	{
+		if(self::avoidInvalidation())
+			return false;
+
 		if($object instanceof ResponseProfile)
 			return true;
 
@@ -426,6 +435,9 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	 */
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
+		if(self::avoidInvalidation())
+			return false;
+
 		if($object instanceof IRelatedObject)
 		{
 			if($this->hasCachedRelatedObjects($object))
@@ -887,5 +899,12 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 		}
 		
 		return true;
+	}
+
+	protected static function avoidInvalidation()
+	{
+		if(in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('skip_cb_invalidation_partners', 'local', array())))
+			return true;
+		return false;
 	}
 }

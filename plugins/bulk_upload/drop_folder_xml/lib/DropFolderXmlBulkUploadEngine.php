@@ -120,7 +120,7 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	/* (non-PHPdoc)
 	 * @see BulkUploadEngineXml::validateResource()
 	 */
-	protected function validateResource(KalturaResource $resource, SimpleXMLElement $elementToSearchIn)
+	protected function validateResource(KalturaResource $resource = null, SimpleXMLElement $elementToSearchIn)
 	{
 		if($resource instanceof KalturaDropFolderFileResource)
 		{

@@ -157,7 +157,7 @@ abstract class kMatchCondition extends kCondition
 		$field = $this->getFieldValue($scope);
 		$values = $this->getStringValues($scope);
 		
-		KalturaLog::debug("[$this->description] Matches field [$field] to values [" . print_r($values, true) . "]");
+		KalturaLog::debug("[$this->description] Matches field [" . print_r($field, true) . "] to values [" . print_r($values, true) . "]");
 		if (!count($values))
 		{
 			KalturaLog::debug("[$this->description] No values found, condition is true");

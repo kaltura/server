@@ -47,7 +47,7 @@ class FacebookSessionPersistentDataHandler implements PersistentDataInterface
     public function __construct($enableSessionCheck = true)
     {
 //        if ($enableSessionCheck && session_status() !== PHP_SESSION_ACTIVE) {
-		  if($enableSessionCheck && $this->session_is_active()){
+		  if($enableSessionCheck && !$this->session_is_active()){
             throw new FacebookSDKException(
                 'Sessions are not active. Please make sure session_start() is at the top of your script.',
                 720
@@ -60,16 +60,19 @@ class FacebookSessionPersistentDataHandler implements PersistentDataInterface
 	 */
 	private function session_is_active()
 	{
-	    $setting = 'session.use_trans_sid';
-	    $current = ini_get($setting);
-	    if (FALSE === $current)
-	    {
-	    	throw new FacebookSDKException(
-                'Setting '.$setting .' does not exists.'
-            );
-	    }
-	    $result = @ini_set($setting, $current); 
-	    return $result !== $current;
+		if ( php_sapi_name() !== 'cli' )
+		{
+			if ( version_compare(phpversion(), '5.4.0', '>=') )
+			{
+				return session_status() === PHP_SESSION_ACTIVE ? true : false;
+			}
+			else
+			{
+				return session_id() === '' ? false : true;
+			}
+		}
+		
+		return false;
 	}
 
     /**
