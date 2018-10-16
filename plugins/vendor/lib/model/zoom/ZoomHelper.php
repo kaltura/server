@@ -354,6 +354,10 @@ class ZoomHelper
 			$parentCategoryFullNameArray = array_slice ($categoryNameArray,0,-1);
 			$parentCategoryFullName = implode(categoryPeer::CATEGORY_SEPARATOR, $parentCategoryFullNameArray );
 			$parentCategory = categoryPeer::getByFullNameExactMatch($parentCategoryFullName, null, $partnerId);
+			if(!$parentCategory)
+			{
+				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_NOT_FOUND, $parentCategoryFullName);
+			}
 			$parentCategoryId = $parentCategory->getId();
 			$categoryDb->setParentId($parentCategoryId);
 		}
