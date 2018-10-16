@@ -15,7 +15,7 @@
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
 				<name>New Item Pending Moderation</name>
-				<systemName>New_Item_Pending_Moderation</systemName>
+				<systemName>Unique_Kms_New_Item_Pending_Moderation</systemName>
 				<description>Email notification template to be sent when a new item is pending moderation in a specific category (channel).</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
@@ -25,6 +25,12 @@
 						<description>Status is pending, See:KalturaCategoryEntryStatus:/api_v3/testmeDoc/?object=KalturaCategoryEntryStatus</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getObject() instanceof categoryEntry &amp;&amp; $scope->getObject()->getStatus() == CategoryEntryStatus::PENDING</code>
+						</field>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<description>Category is inside of specified category root</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array($scope->getDynamicValues()['root_category_id'], explode('>', $scope->getObject()->getCategoryFullIds()))</code>
 						</field>
 					</item>
 				</eventConditions>
@@ -85,6 +91,15 @@
 						</value>
 					</item>
 				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>root_category_id</key>
+						<description>KMS instance root category ID</description>
+						<value objectType="KalturaStringValue">
+							<value/>
+						</value>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -97,7 +112,7 @@
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
 				<name>New Item Pending Moderation</name>
-				<systemName>New_Item_Pending_Moderation_2</systemName>
+				<systemName>Unique_Kms_New_Item_Pending_Moderation_2</systemName>
 				<description>Email notification template to be sent when a new item is pending moderation in a specific category (channel).</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
@@ -107,6 +122,12 @@
 						<description>Status changed to pending, See:KalturaCategoryEntryStatus:/api_v3/testmeDoc/?object=KalturaCategoryEntryStatus</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getObject() instanceof categoryEntry &amp;&amp; in_array(categoryEntryPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getStatus() == CategoryEntryStatus::PENDING</code>
+						</field>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<description>Category is inside of specified category root</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array($scope->getDynamicValues()['root_category_id'], explode('>', $scope->getObject()->getCategoryFullIds()))</code>
 						</field>
 					</item>
 				</eventConditions>
@@ -167,6 +188,15 @@
 						</value>
 					</item>
 				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>root_category_id</key>
+						<description>KMS instance root category ID</description>
+						<value objectType="KalturaStringValue">
+							<value/>
+						</value>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -179,7 +209,7 @@
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
 				<name>Entry Approved In Category</name>
-				<systemName>Entry_Approved_In_Category</systemName>
+				<systemName>Unique_Kms_Entry_Approved_In_Category</systemName>
 				<description>Email notification template to be sent when a new entry is approved in a category.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
@@ -189,6 +219,12 @@
 						<description>Status changed to active, See:KalturaCategoryEntryStatus:/api_v3/testmeDoc/?object=KalturaCategoryEntryStatus</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getObject() instanceof categoryEntry &amp;&amp; in_array(categoryEntryPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getStatus() == CategoryEntryStatus::ACTIVE</code>
+						</field>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<description>Category is inside of specified category root</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array($scope->getDynamicValues()['root_category_id'], explode('>', $scope->getObject()->getCategoryFullIds()))</code>
 						</field>
 					</item>
 				</eventConditions>
@@ -246,6 +282,15 @@
 						</value>
 					</item>
 				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>root_category_id</key>
+						<description>KMS instance root category ID</description>
+						<value objectType="KalturaStringValue">
+							<value/>
+						</value>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -258,7 +303,7 @@
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
 				<name>Entry Rejected In Category</name>
-				<systemName>Entry_Rejected_In_Category</systemName>
+				<systemName>Unique_Kms_Entry_Rejected_In_Category</systemName>
 				<description>Email notification template to be sent when a new entry is rejected in a category.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
@@ -268,6 +313,12 @@
 						<description>Status changed to rejected, See:KalturaCategoryEntryStatus:/api_v3/testmeDoc/?object=KalturaCategoryEntryStatus</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getObject() instanceof categoryEntry &amp;&amp; in_array(categoryEntryPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getStatus() == CategoryEntryStatus::REJECTED</code>
+						</field>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<description>Category is inside of specified category root</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array($scope->getDynamicValues()['root_category_id'], explode('>', $scope->getObject()->getCategoryFullIds()))</code>
 						</field>
 					</item>
 				</eventConditions>
@@ -325,6 +376,15 @@
 						</value>
 					</item>
 				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>root_category_id</key>
+						<description>KMS instance root category ID</description>
+						<value objectType="KalturaStringValue">
+							<value/>
+						</value>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -337,7 +397,7 @@
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
 				<name>Entry Rejected</name>
-				<systemName>Entry_Rejected</systemName>
+				<systemName>Unique_Kms_Entry_Rejected</systemName>
 				<description>Email notification template to be sent when a new entry is rejected.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
@@ -348,6 +408,16 @@
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getObject() instanceof entry &amp;&amp; in_array(entryPeer::MODERATION_STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_REJECTED</code>
 						</field>
+					</item>
+					<item objectType="KalturaMatchMetadataCondition">
+						<description>Custom metadata indicates that the entry belongs to the instance</description>
+						<xPath>//*[local-name()='Key' and text()='InstanceId']/following-sibling::*[local-name()='Value']</xPath>
+						<profileSystemName>EntryAdditionalInfo</profileSystemName>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{instance_id}</value>
+							</item>
+						</values>
 					</item>
 				</eventConditions>
 				<format>1</format>
@@ -390,6 +460,15 @@
 						</value>
 					</item>
 				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>instance_id</key>
+						<description>KMS instance ID</description>
+						<value objectType="KalturaStringValue">
+							<value/>
+						</value>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -402,7 +481,7 @@
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
 				<name>Entry Approved</name>
-				<systemName>Entry_Approved</systemName>
+				<systemName>Unique_Kms_Entry_Approved</systemName>
 				<description>Email notification template to be sent when a new entry is approved.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
@@ -413,6 +492,16 @@
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getObject() instanceof entry &amp;&amp; in_array(entryPeer::MODERATION_STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_APPROVED</code>
 						</field>
+					</item>
+					<item objectType="KalturaMatchMetadataCondition">
+						<description>Custom metadata indicates that the entry belongs to the instance</description>
+						<xPath>//*[local-name()='Key' and text()='InstanceId']/following-sibling::*[local-name()='Value']</xPath>
+						<profileSystemName>EntryAdditionalInfo</profileSystemName>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{instance_id}</value>
+							</item>
+						</values>
 					</item>
 				</eventConditions>
 				<format>1</format>
@@ -455,6 +544,15 @@
 						</value>
 					</item>
 				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>instance_id</key>
+						<description>KMS instance ID</description>
+						<value objectType="KalturaStringValue">
+							<value/>
+						</value>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -467,7 +565,7 @@
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
 				<name>Entry Ready</name>
-				<systemName>Entry_Ready</systemName>
+				<systemName>Unique_Kms_Entry_Ready</systemName>
 				<description>Email notification template to be sent when a new entry is ready.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
@@ -492,6 +590,19 @@
 								</field>
 							</item>
 						</conditions>
+					</item>
+					<item objectType="KalturaFieldMatchCondition">
+						<description>Custom metadata indicates that the entry belongs to the instance</description>
+						<field objectType="KalturaEvalStringField">
+							<!-- EntryReady event is out of partner context, so KalturaMatchMetadataCondition won't work here -->
+							<!-- parseMetadataValues() returns an array of 0 or 1 elements - implode the array to have a string value -->
+							<code>($metadata = MetadataPeer::retrieveByObject(MetadataProfilePeer::retrieveBySystemName('EntryAdditionalInfo', array($scope->getPartnerId()))->getId(), MetadataObjectType::ENTRY, $scope->getObject()->getId())) ? implode('', kMetadataManager::parseMetadataValues($metadata, "//*[local-name()='Key' and text()='InstanceId']/following-sibling::*[local-name()='Value']")) : ''</code>
+						</field>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{instance_id}</value>
+							</item>
+						</values>
 					</item>
 				</eventConditions>
 				<format>1</format>
@@ -588,6 +699,15 @@
 						</value>
 					</item>
 				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>instance_id</key>
+						<description>KMS instance ID</description>
+						<value objectType="KalturaStringValue">
+							<value/>
+						</value>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -600,7 +720,7 @@
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
 				<name>User was added to category as [role]</name>
-				<systemName>User_Added_To_Category_As_Role</systemName>
+				<systemName>Unique_Kms_User_Added_To_Category_As_Role</systemName>
 				<description>Email notification template to be sent when a used is added to a category with a specific role.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>2</eventType> <!-- EventNotificationEventType::OBJECT_ADDED -->
@@ -616,6 +736,12 @@
 						<description>User has role, See:KalturaCategoryUserPermissionLevel:/api_v3/testmeDoc/?object=KalturaCategoryUserStatus</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getObject() instanceof categoryKuser &amp;&amp; category::getPermissionLevelName($scope->getObject()->getPermissionLevel())</code>
+						</field>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<description>Category is inside of specified category root</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array($scope->getDynamicValues()['root_category_id'], explode('>', $scope->getObject()->getCategoryFullIds()))</code>
 						</field>
 					</item>
 				</eventConditions>
@@ -666,6 +792,15 @@
 						</value>
 					</item>
 				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>root_category_id</key>
+						<description>KMS instance root category ID</description>
+						<value objectType="KalturaStringValue">
+							<value/>
+						</value>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -678,7 +813,7 @@
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
 				<name>User's role was changed in category</name>
-				<systemName>User_Role_Was_Changed_In_Category</systemName>
+				<systemName>Unique_Kms_User_Role_Was_Changed_In_Category</systemName>
 				<description>Email notification template to be sent when user's role is changed in category.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
@@ -688,6 +823,12 @@
 						<description>Permission level change, See:KalturaCategoryUserPermissionLevel:/api_v3/testmeDoc/?object=KalturaCategoryUserStatus, and status is active, See:KalturaCategoryUserStatus:/api_v3/testmeDoc/?object=KalturaCategoryUserStatus</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getObject() instanceof categoryKuser &amp;&amp; in_array(categoryKuserPeer::PERMISSION_LEVEL, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getStatus() == CategoryKuserStatus::ACTIVE</code>
+						</field>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<description>Category is inside of specified category root</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array($scope->getDynamicValues()['root_category_id'], explode('>', $scope->getObject()->getCategoryFullIds()))</code>
 						</field>
 					</item>
 				</eventConditions>
@@ -738,6 +879,15 @@
 						</value>
 					</item>
 				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>root_category_id</key>
+						<description>KMS instance root category ID</description>
+						<value objectType="KalturaStringValue">
+							<value/>
+						</value>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -750,7 +900,7 @@
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
 				<name>User was removed from category</name>
-				<systemName>User_Was_Removed_From_Category</systemName>
+				<systemName>Unique_Kms_User_Was_Removed_From_Category</systemName>
 				<description>Email notification template to be sent when user was removed from category.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>7</eventType> <!-- EventNotificationEventType::OBJECT_DELETED -->
@@ -760,6 +910,12 @@
 						<description>Object type verified</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getObject() instanceof categoryKuser</code>
+						</field>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<description>Category is inside of specified category root</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array($scope->getDynamicValues()['root_category_id'], explode('>', $scope->getObject()->getCategoryFullIds()))</code>
 						</field>
 					</item>
 				</eventConditions>
@@ -803,6 +959,15 @@
 						</value>
 					</item>
 				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>root_category_id</key>
+						<description>KMS instance root category ID</description>
+						<value objectType="KalturaStringValue">
+							<value/>
+						</value>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -815,7 +980,7 @@
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
 				<name>Entry was added to channel</name>
-				<systemName>Entry_Was_Added_To_Channel</systemName>
+				<systemName>Unique_Kms_Entry_Was_Added_To_Channel</systemName>
 				<description>Email notification template to be sent when entry is added to channel.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
@@ -825,6 +990,12 @@
 						<description>Status is active, See:KalturaCategoryEntryStatus:/api_v3/testmeDoc/?object=KalturaCategoryEntryStatus</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getObject() instanceof categoryEntry &amp;&amp; $scope->getObject()->getStatus() == CategoryEntryStatus::ACTIVE</code>
+						</field>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<description>Category is inside of specified category root</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array($scope->getDynamicValues()['root_category_id'], explode('>', $scope->getObject()->getCategoryFullIds()))</code>
 						</field>
 					</item>
 				</eventConditions>
@@ -878,6 +1049,15 @@
 						</value>
 					</item>
 				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>root_category_id</key>
+						<description>KMS instance root category ID</description>
+						<value objectType="KalturaStringValue">
+							<value/>
+						</value>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -890,16 +1070,27 @@
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
 				<name>Comment was added to entry</name>
-				<systemName>Comment_Was_Added_To_Entry</systemName>
+				<systemName>Unique_Kms_Comment_Was_Added_To_Entry</systemName>
 				<description>Email notification template to be sent to entry creator when a comment is added to his entry.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
-				<eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
-				<eventObjectType>annotationEventNotifications.Annotation</eventObjectType>
+				<eventType>6</eventType> <!-- EventNotificationEventType::OBJECT_DATA_CHANGED -->
+				<eventObjectType>metadataEventNotifications.Metadata</eventObjectType> <!-- EventNotificationEventObjectType::METADATA -->
 				<eventConditions objectType="array">
+					<item objectType="KalturaFieldMatchCondition">
+						<description>Metadata profile ID matches user parameters</description>
+						<field objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getMetadataProfileId()</code>
+						</field>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{metadata_profile_id}</value>
+							</item>
+						</values>
+					</item>
 					<item objectType="KalturaEventFieldCondition">
-						<description>An annotation object was created</description>
+						<description>Object type is annotation</description>
 						<field objectType="KalturaEvalBooleanField">
-							<code>$scope->getObject() instanceof Annotation</code>
+							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) instanceof Annotation</code>
 						</field>
 					</item>
 					<item objectType="KalturaOrCondition">
@@ -907,30 +1098,42 @@
 						<conditions objectType="array">
 							<item objectType="KalturaEventFieldCondition">
 								<field objectType="KalturaEvalBooleanField">
-									<code>(strpos($scope->getObject()->getTags(),"KMS_public_comment") !== false)</code>
+									<code>(strpos(CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getTags(),"KMS_public_comment") !== false)</code>
 								</field>
 							</item>
 							<item objectType="KalturaEventFieldCondition">
 								<field objectType="KalturaEvalBooleanField">
-									<code>(strpos($scope->getObject()->getTags(),"KMS_comment_context_") !== false)</code>
+									<code>(strpos(CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getTags(),"KMS_comment_context_") !== false)</code>
 								</field>
 							</item>
 						</conditions>
 					</item>
+					<item objectType="KalturaFieldMatchCondition">
+						<description>Custom metadata indicates that the comment belongs to the instance</description>
+						<field objectType="KalturaEvalStringField">
+							<!-- getMetadataValueForField() returns an array of 0 or 1 elements - implode the array to have a string value -->
+							<code>implode('', kMetadataManager::getMetadataValueForField($scope->getObject(), 'InstanceId'))</code>
+						</field>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{instance_id}</value>
+							</item>
+						</values>
+					</item>
 				</eventConditions>
 				<format>1</format>
 				<subject>[AppTitle] - A new comment was added to your video {entry_name}</subject>
-				<body>A new comment was added to your video {entry_name}.Comment: {comment_text}. You can access the video page here: [AppEntryUrl]{entry_id}</body>
+				<body>A new comment was added to your video {entry_name}.Comment: {comment_text}. You can access the video page here: [AppEntryUrl]{entry_id}/{category_id}</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
 				<bcc objectType="KalturaEmailNotificationStaticRecipientProvider">
 					<emailRecipients objectType="array">
 						<item objectType = "KalturaEmailNotificationRecipient">
 							<email objectType="KalturaEvalStringField">
-								<code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? (!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getEmail() : '') : ''</code>
+								<code>!is_null(entryPeer::retrieveByPk(CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getEntryId())) ? (!is_null(entryPeer::retrieveByPk(CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getEntryId())->getkuser()) ? entryPeer::retrieveByPk(CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getEntryId())->getkuser()->getEmail() : '') : ''</code>
 							</email>
 							<name objectType="KalturaEvalStringField">
-								<code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? (!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getFirstName().' '.entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getLastName() : '') : ''</code>
+								<code>!is_null(entryPeer::retrieveByPk(CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getEntryId())) ? (!is_null(entryPeer::retrieveByPk(CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getEntryId())->getkuser()) ? entryPeer::retrieveByPk(CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getEntryId())->getkuser()->getFirstName().' '.entryPeer::retrieveByPk(CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getEntryId())->getkuser()->getLastName() : '') : ''</code>
 							</name>
 						</item>
 					</emailRecipients>
@@ -951,82 +1154,106 @@
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_id</key>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getEntryId()</code>
+							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getEntryId() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_name</key>
 						<value objectType="KalturaEvalStringField">
-							<code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getName() : ''</code>
+							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) &amp;&amp; !is_null(entryPeer::retrieveByPk(CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getEntryId())) ? entryPeer::retrieveByPk(CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getEntryId())->getName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_text</key>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getText()</code>
+							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getText() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_id</key>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getId()</code>
+							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getId() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_parent_id</key>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getParentId()</code>
+							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getParentId() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_system_name</key>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getSystemName()</code>
+							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getSystemName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_user_id</key>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getPuserId()</code>
+							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getPuserId() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_created_at</key>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getCreatedAt()</code>
+							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getCreatedAt() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_updated_at</key>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getUpdatedAt()</code>
+							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getUpdatedAt() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_partner_data</key>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getPartnerData()</code>
+							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getPartnerData() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_start_time</key>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getStartTime()</code>
+							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getStartTime() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_end_time</key>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getEndTime()</code>
+							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getEndTime() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_duration</key>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getObject()->getDuration()</code>
+							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getDuration() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>category_id</key>
+						<description>Category ID</description>
+						<value objectType="KalturaEvalStringField">
+							<!-- getMetadataValueForField() returns an array of 0 or 1 elements - implode the array to have a string value -->
+							<code>implode('', kMetadataManager::getMetadataValueForField($scope->getObject(), 'CategoryId'))</code>
 						</value>
 					</item>
 				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_profile_id</key>
+						<description>Comment metadata profile ID</description>
+						<value objectType="KalturaStringValue">
+							<value/>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>instance_id</key>
+						<description>KMS instance ID</description>
+						<value objectType="KalturaStringValue">
+							<value/>
+						</value>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
