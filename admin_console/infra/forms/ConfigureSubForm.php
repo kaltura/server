@@ -24,13 +24,13 @@ class ConfigureSubForm extends Zend_Form_SubForm
 
 	}
 
-	protected function addObjectProperties($obj, $ignore, $prefix) {
-		if($obj)
-			$reflectClass = new ReflectionClass(get_class($obj));
-		else
-			$reflectClass = new ReflectionClass(get_class());
+	protected function addObjectProperties($obj, $ignore, $prefix)
+	{
+		if(!$obj)
+			$obj = $this;
 		
-		$properties = $reflectClass	->getProperties(ReflectionProperty::IS_PUBLIC);
+		$reflectClass = new ReflectionClass(get_class($obj));
+		$properties = $reflectClass->getProperties(ReflectionProperty::IS_PUBLIC);
 
 		foreach($properties as $property) {
 			if (!in_array($property->name, $ignore)) {
