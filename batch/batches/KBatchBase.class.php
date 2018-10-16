@@ -335,6 +335,19 @@ abstract class KBatchBase implements IKalturaLogger
 	}
 
 	/**
+	 * Replace the current client ks with a new ks that also have $privileges append to it
+	 * @param string $privileges
+	 */
+	protected function appendPrivilegesToKs($privileges)
+	{
+		if(!empty($privileges))
+		{
+			$newKS = $this->createKS($privileges);
+			self::$kClient->setKs($newKS);
+		}
+	}
+
+	/**
 	 * @param string $salt
 	 * @param string $str
 	 * @return string

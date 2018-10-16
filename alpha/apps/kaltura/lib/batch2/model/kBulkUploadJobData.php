@@ -5,6 +5,8 @@
  */
 class kBulkUploadJobData extends kJobData
 {
+	protected static $privilegesToPass = array(kSessionBase::PRIVILEGE_ENABLE_CATEGORY_MODERATION, kSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION);
+
 	/**
 	 * @var int
 	 */
@@ -312,5 +314,26 @@ class kBulkUploadJobData extends kJobData
 	public function getEmailRecipients ()
 	{
 		return $this->emailRecipients;
+	}
+
+	public function handleKsPrivileges()
+	{
+		if (!empty(kCurrentContext::$ks))
+		{
+			$ks = ks::fromSecureString(kCurrentContext::$ks);
+			$extraPrivileges = array();
+			foreach (self::$privilegesToPass as $privilege)
+			{
+				if($ks->hasPrivilege($privilege))
+				{
+					$extraPrivileges[] = $privilege;
+				}
+			}
+
+			if(!empty($extraPrivileges))
+			{
+				$this->setPrivileges(implode(',', $extraPrivileges));
+			}
+		}
 	}
 }
