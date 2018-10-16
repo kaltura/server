@@ -275,6 +275,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 
 		if ($filterType != 'Kaltura_Client_Reach_Type_EntryVendorTaskFilter')
 		{
+			$advanceSearch = isset($formData['AdvanceSearch']) ? $formData['AdvanceSearch'] : "[]";
 			$metadataSearchArray = $this->buildMetadataSearchArray($formData['AdvanceSearch']);
 			$filter->advancedSearch = MediaRepurposingUtils::createSearchOperator($metadataSearchArray);
 		}
