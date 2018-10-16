@@ -8,7 +8,6 @@
  */
 class ConferenceService extends KalturaBaseService {
 	const CAN_REACH_EXPECTED_VALUE = 'kaltura';
-	const CONFERENCE_SERVER_NODE_TAG_NAME = 'conference_server_node_tag_name';
 
 	/**
 	 * Allocates a conference room or returns ones that has already been allocated
@@ -113,15 +112,11 @@ class ConferenceService extends KalturaBaseService {
 		return null;
 	}
 
-	protected function findFreeServerNode($tag, $partner)
+	protected function findFreeServerNode($tag, Partner $partner)
 	{
 		if (empty($tag))
 		{
-			$tag = $partner->getConfTagName();
-			if (empty($tag))
-			{
-				$tag = kConf::get(self::CONFERENCE_SERVER_NODE_TAG_NAME);
-			}
+			$tag = $partner->getRTCTag();
 		}
 		$serverNodes = ServerNodePeer::retrieveActiveUnoccupiedServerNodesByType(ConferencePlugin::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER), $tag);
 		if (!$serverNodes)

@@ -78,7 +78,9 @@ class Partner extends BasePartner
 
 	const PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT = 10;
 
-	const CUSTOMER_DATA_CONF_TAG_NAME = 'conf_tag_name';
+	const CUSTOMER_DATA_RTC_TAG = 'rtc_tag_name';
+
+	const RTC_SERVER_NODE_TAG = 'rtc_server_node_tag';
 
 	public function save(PropelPDO $con = null)
 	{
@@ -2016,14 +2018,14 @@ class Partner extends BasePartner
 		return $this->getAdminSecret();
 	}
 
-	public function getConfTagName()
+	public function getRTCTag()
 	{
-		return $this->getFromCustomData( self::CUSTOMER_DATA_CONF_TAG_NAME, null , '' );
+		return $this->getFromCustomData( self::CUSTOMER_DATA_RTC_TAG, null , kConf::get(self::RTC_SERVER_NODE_TAG) );
 	}
 
-	public function setConfTagName($v)
+	public function setRTCTag($v)
 	{
-		$this->putInCustomData(self::CUSTOMER_DATA_CONF_TAG_NAME, $v);
+		$this->putInCustomData(self::CUSTOMER_DATA_RTC_TAG, $v);
 	}
 
 
