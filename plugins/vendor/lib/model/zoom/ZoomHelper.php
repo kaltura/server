@@ -331,32 +331,38 @@ class ZoomHelper
 
 	/**
 	 * @param int $partnerId
-	 * @param string $categoryName
+	 * @param string $categoryFullName
 	 * @throws Exception
 	 * @return int id;
 	 */
-	public static function createCategoryForZoom($partnerId, $categoryName)
+	public static function createCategoryForZoom($partnerId, $categoryFullName)
 	{
-		try
+		$category = categoryPeer::getByFullNameExactMatch($categoryFullName, null, $partnerId);
+		if($category)
 		{
-			$categoryDb = new category();
-			$categoryDb->setName($categoryName);
-			$categoryDb->setPartnerId($partnerId);
-			$categoryDb->save();
-			return $categoryDb->getId();
+			KalturaLog::debug('Category: ' . $categoryFullName . ' already exist for partner: ' . $partnerId);
+			return $category->getId();
 		}
-		catch(Exception $ex)
+
+		$categoryDb = new category();
+
+		//Check if this is a root category or child , if child get its parent ID
+		$categoryNameArray = explode(categoryPeer::CATEGORY_SEPARATOR, $categoryFullName);
+		$categoryName = end($categoryNameArray);
+		if(count($categoryNameArray) > 1)
 		{
-			if ($ex->getCode() === kCoreException::DUPLICATE_CATEGORY)
-			{
-				KalturaLog::debug('category: ' . $categoryName . ' already exist for partner: ' . $partnerId);
-			}
-			else
-			{
-				throw $ex;
-			}
+			$parentCategoryFullNameArray = array_slice ($categoryNameArray,0,-1);
+			$parentCategoryFullName = implode(categoryPeer::CATEGORY_SEPARATOR, $parentCategoryFullNameArray );
+			$parentCategory = categoryPeer::getByFullNameExactMatch($parentCategoryFullName, null, $partnerId);
+			$parentCategoryId = $parentCategory->getId();
+			$categoryDb->setParentId($parentCategoryId);
 		}
-		return categoryPeer::getByFullNameExactMatch($categoryName, null, $partnerId)->getId();
+
+		$categoryDb->setName($categoryName);
+		$categoryDb->setFullName($categoryFullName);
+		$categoryDb->setPartnerId($partnerId);
+		$categoryDb->save();
+		return $categoryDb->getId();
 	}
 
 	/**
