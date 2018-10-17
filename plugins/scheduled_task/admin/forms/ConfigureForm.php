@@ -21,11 +21,10 @@ class ConfigureForm extends Infra_Form
 	}
 
 	protected function addObjectProperties($obj, $ignore, $prefix) {
-		if($obj)
-			$reflectClass = new ReflectionClass(get_class($obj));
-		else
-			$reflectClass = new ReflectionClass(get_class());
+		if(!$obj)
+			return;
 		
+		$reflectClass = new ReflectionClass(get_class($obj));
 		$properties = $reflectClass	->getProperties(ReflectionProperty::IS_PUBLIC);
 
 		foreach($properties as $property) {

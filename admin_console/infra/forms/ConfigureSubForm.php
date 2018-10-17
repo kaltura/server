@@ -27,7 +27,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 	protected function addObjectProperties($obj, $ignore, $prefix)
 	{
 		if(!$obj)
-			$obj = $this;
+			return;
 		
 		$reflectClass = new ReflectionClass(get_class($obj));
 		$properties = $reflectClass->getProperties(ReflectionProperty::IS_PUBLIC);
