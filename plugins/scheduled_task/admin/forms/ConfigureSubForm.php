@@ -30,7 +30,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 			return;
 		
 		$reflectClass = new ReflectionClass(get_class($obj));
-		$properties = $reflectClass	->getProperties(ReflectionProperty::IS_PUBLIC);
+		$properties = $reflectClass->getProperties(ReflectionProperty::IS_PUBLIC);
 
 		foreach($properties as $property) {
 			if (!in_array($property->name, $ignore)) {
