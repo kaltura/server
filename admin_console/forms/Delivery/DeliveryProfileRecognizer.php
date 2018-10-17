@@ -34,11 +34,10 @@ class Form_Delivery_DeliveryProfileRecognizer extends Zend_Form_SubForm
 	
 	public function populateFromObject($recognizer, $add_underscore = false)
 	{
-		$this->getElement("objectType")->setValue(get_class($recognizer));
-		
 		if(is_null($recognizer))
 			return;
 		
+		$this->getElement("objectType")->setValue(get_class($recognizer));
 		$props = $recognizer;
 		if(is_object($recognizer))
 			$props = get_object_vars($recognizer);
