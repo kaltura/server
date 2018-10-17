@@ -10,6 +10,12 @@ class kEnvironment
 	const APC_CACHE_MAP = 'kConf';
 	
 	protected static $envMap = null;
+
+	public static function getEnvMap()
+	{
+		self::init();
+		return self::$envMap;
+	}
 	
 	protected static function init()
 	{
@@ -75,19 +81,12 @@ class kEnvironment
 		{
 			foreach($newConfig as $key => $value)
 			{
-				if(is_numeric($key))
+				if(!isset($srcConfig[$key]))
 				{
-					$returnedConfig[] = $newConfig[$key];
-				}
-				elseif(!isset($srcConfig[$key]))
-				{
-					$returnedConfig[$key] = $newConfig[$key];
+					$returnedConfig[$key] = $value;
 				}
 				elseif(is_array($value))
 				{
-					if(!isset($srcConfig[$key]))
-						$srcConfig[$key] = array();
-						
 					$returnedConfig[$key] = self::mergeConfigItem($srcConfig[$key], $newConfig[$key], $valuesOnly, $overwrite);
 				}
 				elseif($overwrite)

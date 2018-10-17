@@ -12,7 +12,7 @@
 class BulkUploadService extends KalturaBaseService
 {
 	const PARTNER_DEFAULT_CONVERSION_PROFILE_ID = -1;
-	
+
 	/**
 	 * Add new bulk upload batch job
 	 * Conversion profile id can be specified in the API or in the CSV file, the one in the CSV file will be stronger.
@@ -76,8 +76,12 @@ class BulkUploadService extends KalturaBaseService
 		$data->setUserId($puserId);
 		$data->setUploadedBy($uploadedBy);
 		$data->setFileName($fileName);
+		$data->handleKsPrivileges();
+
 		if (!$conversionProfileId)
+		{
 			$conversionProfileId = $partner->getDefaultConversionProfileId();
+		}
 			
 		$kmcVersion = $partner->getKmcVersion();
 		$check = null;
@@ -155,19 +159,16 @@ class BulkUploadService extends KalturaBaseService
 		
 		return $response;
 	}
-	
-	
-	
-	
+
+
 	/**
-	 * serve action returan the original file.
-	 * 
+	 * serve action return the original file.
 	 * @action serve
 	 * @param bigint $id job id
 	 * @return file
-	 * 
+	 * @throws KalturaAPIException
 	 */
-function serveAction($id)
+	public function serveAction($id)
 	{
 		$c = new Criteria();
 		$c->addAnd(BatchJobPeer::ID, $id);
@@ -276,6 +277,5 @@ function serveAction($id)
 		$ret = new KalturaBulkUpload();
 		$ret->fromObject($batchJobLog, $this->getResponseProfile());
 		return $ret;
-
 	}
 }

@@ -1,3 +1,45 @@
+# Naos 14.7.0 #
+
+## Support beacons rolling index to avoid high disk usage ##
+- Issue Type: Task
+- Issue ID: PLAT-9288
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	Create new alises in elastic:
+	curl -XPOST 'ELASTIC_HOST:ELASTIC_PORT/_aliases?pretty' -H 'Content-Type: application/json' -d'{
+    	"actions" : [
+        	{ "add" : { "index" : "beacon_entry_index_XXX", "alias" : "beacon_entry_index_search" } },
+        	{ "add" : { "index" : "beacon_entry_server_node_index_XXX", "alias" : "beacon_entry_server_node_index_search" } },
+        	{ "add" : { "index" : "beacon_scheduled_resource_index_XXX", "alias" : "beacon_scheduled_resource_index_search" } },
+        	{ "add" : { "index" : "beacon_server_node_index_XXX", "alias" : "beacon_server_node_index_search" } },
+			]
+		}'
+		
+		XXX = The index postfix
+
+
+#### Known Issues & Limitations ####
+
+	None.
+
+## Add reqreuied permissions for managing reach partner catalog items ##
+- Issue Type: Task
+- Issue ID: PLAT-9285
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_15_10_add_partner_catalog_item_service_permissions.php
+
+#### Known Issues & Limitations ####
+	None
+
 # Naos 14.6.0 #
 
 ## Add new SearchHistory plugin ##

@@ -302,19 +302,23 @@ abstract class KBatchBase implements IKalturaLogger
 	}
 
 	/**
+	 * @param string $extraPrivileges
 	 * @return string
 	 */
-	private function createKS()
+	protected function createKS($extraPrivileges = null)
 	{
 		$partnerId = self::$taskConfig->getPartnerId();
 		$sessionType = KalturaSessionType::ADMIN;
 		$puserId = 'batchUser';
 		$privileges = implode(',', $this->getPrivileges());
+		if($extraPrivileges)
+		{
+			$privileges = $privileges.','.$extraPrivileges;
+		}
+
 		$adminSecret = self::$taskConfig->getSecret();
 		$expiry = 60 * 60 * 24 * 30; // 30 days
 
-
-		$rand = rand(0, 32000);
 		$rand = microtime(true);
 		$expiry = time() + $expiry;
 		$masterPartnerId = self::$taskConfig->getPartnerId();
@@ -328,6 +332,19 @@ abstract class KBatchBase implements IKalturaLogger
 		$decoded_str = base64_encode($hashed_str);
 
 		return $decoded_str;
+	}
+
+	/**
+	 * Replace the current client ks with a new ks that also have $privileges append to it
+	 * @param string $privileges
+	 */
+	protected function appendPrivilegesToKs($privileges)
+	{
+		if(!empty($privileges))
+		{
+			$newKS = $this->createKS($privileges);
+			self::$kClient->setKs($newKS);
+		}
 	}
 
 	/**

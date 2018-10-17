@@ -48,7 +48,7 @@ abstract class kBaseSearch
         $this->mainBoolQuery->addToMust($subQuery);
         $this->applyElasticSearchConditions();
         $this->addGlobalHighlights();
-        $result = $this->elasticClient->search($this->query, true);
+        $result = $this->elasticClient->search($this->query, true, true);
         $this->addSearchTermsToSearchHistory();
         return $result;
     }
