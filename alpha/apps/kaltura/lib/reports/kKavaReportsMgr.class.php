@@ -3588,7 +3588,7 @@ class kKavaReportsMgr extends kKavaBase
 		return null;
 	}
 	
-	protected static function getTableFromGraphs($graphs, $has_aligned_dates, $date_column_name = 'date_id')
+	protected static function getTableFromGraphs($graphs, $has_aligned_dates, $date_column_name = 'date_id', $page_size = null, $page_index = 1)
 	{
 		if (!$has_aligned_dates)
 		{
@@ -3619,6 +3619,11 @@ class kKavaReportsMgr extends kKavaBase
 				$row[] = isset($graphs[$column][$date]) ? $graphs[$column][$date] : 0;
 			}
 			$data[] = $row;
+		}
+
+		if ($page_size)
+		{
+			$data = array_slice($data, ($page_index - 1) * $page_size, $page_size);
 		}
 
 		return array(array_merge(array($date_column_name), $header), $data, count($data));
@@ -4257,7 +4262,8 @@ class kKavaReportsMgr extends kKavaBase
 		if (!isset($report_def[self::REPORT_DIMENSION]))
 		{
 			$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
-			$result = self::getTableFromGraphs($result, true, self::getDateColumnName($input_filter->interval));
+			$result = self::getTableFromGraphs($result, true, self::getDateColumnName($input_filter->interval),
+				$page_size, $page_index);
 		}
 		else if (isset($report_def[self::REPORT_JOIN_GRAPHS]))
 		{

@@ -34,11 +34,10 @@ abstract class Form_Delivery_DeliveryProfileTokenizer extends Zend_Form_SubForm
 	
 	public function populateFromObject($tokenizer, $add_underscore = false)
 	{
-		$this->getElement("objectType")->setValue(get_class($tokenizer));
-		
 		if(is_null($tokenizer))
 			return;
 		
+		$this->getElement("objectType")->setValue(get_class($tokenizer));
 		$props = $tokenizer;
 		if(is_object($tokenizer))
 			$props = get_object_vars($tokenizer);
