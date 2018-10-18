@@ -111,6 +111,7 @@ class kFileUtils extends kFile
 		{
 			$post_params[$key] = $value;
 		}
+		$strPostParams = http_build_query($post_params);
 		
 		$url = $_SERVER['REQUEST_URI'];
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' && kConf::hasParam('https_param_salt'))
@@ -140,7 +141,14 @@ class kFileUtils extends kFile
 		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_POST, TRUE);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $post_params);
+		if(isset(infraRequestUtils::$jsonData))
+		{
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $post_params);
+		}
+		else
+		{
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $strPostParams);
+		}
 		// Set callback function for body
 		curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'kFileUtils::read_body');
 		// Set callback function for headers
