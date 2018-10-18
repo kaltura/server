@@ -1154,79 +1154,79 @@
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_id</key>
 						<value objectType="KalturaEvalStringField">
-							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getEntryId() : ''</code>
+							<code>($comment = CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())) ? $comment->getEntryId() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_name</key>
 						<value objectType="KalturaEvalStringField">
-							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) &amp;&amp; !is_null(entryPeer::retrieveByPk(CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getEntryId())) ? entryPeer::retrieveByPk(CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getEntryId())->getName() : ''</code>
+							<code>($comment = CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())) &amp;&amp; ($entry = entryPeer::retrieveByPk($comment->getEntryId())) ? $entry->getName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_text</key>
 						<value objectType="KalturaEvalStringField">
-							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getText() : ''</code>
+							<code>($comment = CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())) ? $comment->getText() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_id</key>
 						<value objectType="KalturaEvalStringField">
-							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getId() : ''</code>
+							<code>($comment = CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())) ? $comment->getId() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_parent_id</key>
 						<value objectType="KalturaEvalStringField">
-							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getParentId() : ''</code>
+							<code>($comment = CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())) ? $comment->getParentId() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_system_name</key>
 						<value objectType="KalturaEvalStringField">
-							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getSystemName() : ''</code>
+							<code>($comment = CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())) ? $comment->getSystemName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_user_id</key>
 						<value objectType="KalturaEvalStringField">
-							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getPuserId() : ''</code>
+							<code>($comment = CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())) ? $comment->getPuserId() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_created_at</key>
 						<value objectType="KalturaEvalStringField">
-							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getCreatedAt() : ''</code>
+							<code>($comment = CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())) ? $comment->getCreatedAt() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_updated_at</key>
 						<value objectType="KalturaEvalStringField">
-							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getUpdatedAt() : ''</code>
+							<code>($comment = CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())) ? $comment->getUpdatedAt() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_partner_data</key>
 						<value objectType="KalturaEvalStringField">
-							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getPartnerData() : ''</code>
+							<code>($comment = CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())) ? $comment->getPartnerData() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_start_time</key>
 						<value objectType="KalturaEvalStringField">
-							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getStartTime() : ''</code>
+							<code>($comment = CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())) ? $comment->getStartTime() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_end_time</key>
 						<value objectType="KalturaEvalStringField">
-							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getEndTime() : ''</code>
+							<code>($comment = CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())) ? $comment->getEndTime() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>comment_duration</key>
 						<value objectType="KalturaEvalStringField">
-							<code>CuePointPeer::retrieveByPK($scope->getObject()->getObjectId()) ? CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())->getDuration() : ''</code>
+							<code>($comment = CuePointPeer::retrieveByPK($scope->getObject()->getObjectId())) ? $comment->getDuration() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
