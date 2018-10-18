@@ -150,82 +150,72 @@ class KalturaEntryService extends KalturaBaseService
 
 		$this->attachResource($kResource, $tempDbEntry);
 	}
-	
+
+	protected function validateEntryForReplace($entryId, $dbEntry, $entryType)
+	{
+		if (!$dbEntry || $dbEntry->getType() != $entryType)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
+	}
+
 	/**
 	 * Approves entry replacement
 	 *
-	 * @param string $entryId entry id to replace
-	 * @param KalturaEntryType $entryType the entry type
-	 * @return KalturaMediaEntry The replaced media entry
-	 *
-	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @param $dbEntry
+	 * @throws KalturaAPIException
 	 */
-	protected function approveReplace($entryId, $entryType)
+	protected function approveReplace($dbEntry)
 	{
-		$dbEntry = entryPeer::retrieveByPK($entryId);
-	
-		if (!$dbEntry || $dbEntry->getType() != $entryType)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-	
-		switch($dbEntry->getReplacementStatus())
+		switch ($dbEntry->getReplacementStatus())
 		{
 			case entryReplacementStatus::APPROVED_BUT_NOT_READY:
 				break;
-	
+
 			case entryReplacementStatus::READY_BUT_NOT_APPROVED:
 				kBusinessConvertDL::replaceEntry($dbEntry);
 				break;
-	
+
 			case entryReplacementStatus::NOT_READY_AND_NOT_APPROVED:
 				$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
 				$dbEntry->save();
-	
+
 				//preventing race conditions of temp entry being ready just as you approve the replacement
 				$dbReplacingEntry = entryPeer::retrieveByPK($dbEntry->getReplacingEntryId());
 				if ($dbReplacingEntry && $dbReplacingEntry->getStatus() == entryStatus::READY)
 					kBusinessConvertDL::replaceEntry($dbEntry);
 				break;
-	
+
 			case entryReplacementStatus::NONE:
 			case entryReplacementStatus::FAILED:
 			default:
-				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_REPLACED, $entryId);
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_REPLACED, $dbEntry->getId());
 				break;
 		}
-	
-		return $this->getEntry($entryId, -1, $entryType);
 	}
-	
+
 	/**
 	 * Cancels media replacement
-	 *
-	 * @param string $entryId Media entry id to cancel
-	 * @param KalturaEntryType $entryType the entry type
-	 * @return KalturaMediaEntry The canceled media entry
-	 *
-	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * 
+	 * @param $dbEntry
+	 * @throws KalturaAPIException
 	 */
-	protected function cancelReplace($entryId, $entryType)
+	protected function cancelReplace($dbEntry)
 	{
-		$dbEntry = entryPeer::retrieveByPK($entryId);
-	
-		if (!$dbEntry || $dbEntry->getType() != $entryType)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-	
-		if($dbEntry->getReplacingEntryId())
+		if ($dbEntry->getReplacingEntryId())
 		{
 			$dbTempEntry = entryPeer::retrieveByPK($dbEntry->getReplacingEntryId());
-			if($dbTempEntry)
+			if ($dbTempEntry)
+			{
 				myEntryUtils::deleteEntry($dbTempEntry);
+			}
 		}
-	
+
 		$dbEntry->setReplacingEntryId(null);
 		$dbEntry->setReplacementStatus(entryReplacementStatus::NONE);
 		$dbEntry->save();
-	
-		return $this->getEntry($entryId, -1, $entryType);
 	}
-	
+
 	/**
 	 * @param kFileSyncResource $resource
 	 * @param entry $dbEntry
