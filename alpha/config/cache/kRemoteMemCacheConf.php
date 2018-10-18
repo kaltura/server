@@ -46,7 +46,7 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 					$hostPattern = isset($mapVar[1]) ? $mapVar[1] : null;
 					if ($requestedMapName == $storedMapName)
 					{
-						if ($hostPattern && $hostname != $hostPattern)
+						if ($hostPattern && $hostname != $hostPattern && $hostPattern !== '#')
 						{
 							$hostPattern = str_replace('#', '*', $hostPattern);
 							if(!preg_match('/' . $hostPattern . '/', $hostname))
