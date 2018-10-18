@@ -10,10 +10,6 @@ require_once __DIR__ . '/../../config/cache/kRemoteMemCacheConf.php';
 $dbUserName = $argv[1];
 $dbPasssword = $argv[2];
 
-//get map list from cache
-include (kEnvironment::getConfigDir().'/configCacheParams.php');
-if(!isset($cacheConfigParams))
-	die("\nRemote cache cofiguration is no accessible");
 $mapName = 'kRemoteMemCacheConf';
 $map=kConfCacheManager::getMap($mapName);
 if(!$map)
