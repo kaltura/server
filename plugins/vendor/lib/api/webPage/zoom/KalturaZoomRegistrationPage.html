@@ -94,17 +94,22 @@
                 url : url,
                 type : "post",
                 data: {"ks": ks, "defaultUserId": defaultUserId, "zoomCategory" : zoomCategory
-                   , "accountId" : accountId ,"format": 1},
+                    , "accountId" : accountId ,"format": 1},
                 success : function(res) {
                     $("body").css("cursor", "default");
                     console.log(res);
                     if(res){
-                        $('#submitError').hide();
-                        $('#submitOK').show();
+                        if(res.objectType == 'KalturaAPIException')
+                        {
+                            onFail(res.message);
+                        }
+                        else
+                        {
+                            onSuccess();
+                        }
                     }
                     else {
-                        $('#submitOK').hide();
-                        $('#submitError').show();
+                        onSuccess();
                     }
                 },
                 error: function() {
@@ -113,6 +118,16 @@
                 }
             });
         }
+        function  onSuccess() {
+            $('#submitError').hide();
+            $('#submitOK').show();
+        }
+        function onFail(errorMessage) {
+            $('#submitOK').hide();
+            $('#submitError').show();
+            $('#submitError').html(errorMessage);
+        }
+
     </script>
     <script>
         (function() {
