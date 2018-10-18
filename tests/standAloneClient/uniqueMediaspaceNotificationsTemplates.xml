@@ -1123,7 +1123,7 @@
 				</eventConditions>
 				<format>1</format>
 				<subject>[AppTitle] - A new comment was added to your video {entry_name}</subject>
-				<body>A new comment was added to your video {entry_name}.Comment: {comment_text}. You can access the video page here: [AppEntryUrl]{entry_id}/{category_id}</body>
+				<body>A new comment was added to your media {entry_name}. Comment: {comment_text}. You can see the media here: [AppEntryUrl]{entry_id}/{category_id}</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
 				<bcc objectType="KalturaEmailNotificationStaticRecipientProvider">
