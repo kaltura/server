@@ -7,6 +7,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	const ZERO_DATE = '12/31/1971 00:00:01';
 	const ARF_FORMAT = 'ARF';
 	const MAX_QUERY_DATE_RANGE_DAYS = 25; //Maximum querying date range is 28 days we define it as less than that
+	const MIN_TIME_BEFORE_HANDLING_UPLOADING = 60; //the time in seconds
 	private static $unsupported_file_formats = array('WARF');
 	private $serviceTypes = null;
 	private $dropFolderFilesMap = null;
@@ -36,7 +37,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		$this->dropFolder = $dropFolder;
 	}
 
-	public function watchFolder (KalturaDropFolder $dropFolder)
+	public function watchFolder(KalturaDropFolder $dropFolder)
 	{
 		/* @var $dropFolder KalturaWebexDropFolder */
 		$this->dropFolder = $dropFolder;
@@ -133,6 +134,16 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		}
 
 		return $result;
+	}
+
+	public function handleUploadingFiles()
+	{
+		$minHandlingTime = time() - self::MIN_TIME_BEFORE_HANDLING_UPLOADING;
+		$dropFolderFilesMap = $this->loadDropFolderUpLoadingFiles($minHandlingTime);
+		foreach($dropFolderFilesMap as $name => $dropFolderFile)
+		{
+			$this->handleExistingDropFolderFile($dropFolderFile);
+		}
 	}
 
 	public function processFolder (KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
