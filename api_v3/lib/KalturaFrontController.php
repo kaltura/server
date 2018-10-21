@@ -378,7 +378,7 @@ class KalturaFrontController
 		
 		if ($object instanceof KalturaTypedArray)
 		{
-			if($currentProperty == "__all")
+			if($currentProperty == "_all")
 			{
 				return $this->getValuesFromObjectsArray($object->toArray(), array_shift($path));
 			}
@@ -395,12 +395,16 @@ class KalturaFrontController
 	{
 		$res = null;
 		if(!$objectsArray)
+		{
 			return $res;
+		}
 		
 		foreach ($objectsArray as $object)
 		{
 			if(!isset($object->$attr))
+			{
 				continue;
+			}
 			
 			$res .= $object->$attr . ",";
 		}
