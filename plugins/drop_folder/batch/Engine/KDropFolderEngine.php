@@ -95,6 +95,47 @@ abstract class KDropFolderEngine implements IKalturaLogger
 	}
 
 	/**
+	 * Load all the files from the database that their status is UPLOADING and updatedAt LessThan Or Equal $updatedAt
+	 * @param $updatedAt time
+	 * @return array
+	 */
+	protected function loadDropFolderUpLoadingFiles($updatedAt)
+	{
+		$dropFolderFilesMap = array();
+		$dropFolderFiles =null;
+
+		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
+		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolder->id;
+		$dropFolderFileFilter->statusEqual = KalturaDropFolderFileStatus::UPLOADING;
+		$dropFolderFileFilter->updatedAtLessThanOrEqual = $updatedAt;
+		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::CREATED_AT_ASC;
+
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 500;
+		if(KBatchBase::$taskConfig && KBatchBase::$taskConfig->params->pageSize)
+			$pager->pageSize = KBatchBase::$taskConfig->params->pageSize;
+
+		$totalCount = 0;
+		do
+		{
+			$pager->pageIndex++;
+			$dropFolderFiles = $this->dropFolderFileService->listAction($dropFolderFileFilter, $pager);
+			if (!$totalCount)
+				$totalCount = $dropFolderFiles->totalCount;
+			$dropFolderFiles = $dropFolderFiles->objects;
+			foreach ($dropFolderFiles as $dropFolderFile)
+			{
+				$dropFolderFilesMap[$dropFolderFile->fileName] = $dropFolderFile;
+			}
+		}while (count($dropFolderFiles) >= $pager->pageSize);
+		$mapCount = count($dropFolderFilesMap);
+		KalturaLog::debug("Drop folder [" . $this->dropFolder->id . "] has [$totalCount] file");
+		if ($totalCount != $mapCount)
+			KalturaLog::warning("Map is missing files - Drop folder [" . $this->dropFolder->id . "] has [$totalCount] file from list BUT has [$mapCount] files in map");
+		return $dropFolderFilesMap;
+	}
+
+	/**
 	 * Update drop folder entity with error
 	 * @param int $dropFolderFileId
 	 * @param int $errorStatus
