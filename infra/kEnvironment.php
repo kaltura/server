@@ -81,12 +81,19 @@ class kEnvironment
 		{
 			foreach($newConfig as $key => $value)
 			{
-				if(!isset($srcConfig[$key]))
+				if(is_numeric($key))
 				{
-					$returnedConfig[$key] = $value;
+					$returnedConfig[] = $newConfig[$key];
+				}
+				elseif(!isset($srcConfig[$key]))
+				{
+					$returnedConfig[$key] = $newConfig[$key];
 				}
 				elseif(is_array($value))
 				{
+					if(!isset($srcConfig[$key]))
+						$srcConfig[$key] = array();
+						
 					$returnedConfig[$key] = self::mergeConfigItem($srcConfig[$key], $newConfig[$key], $valuesOnly, $overwrite);
 				}
 				elseif($overwrite)
