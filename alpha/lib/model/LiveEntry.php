@@ -475,6 +475,7 @@ abstract class LiveEntry extends entry
 		if(!count($liveEntryServerNodes))
 			return false;
 
+		$foundCurrentDc = false;
 		/* @var LiveEntryServerNode $liveEntryServerNode*/
 		foreach($liveEntryServerNodes as $liveEntryServerNode)
 		{
@@ -482,12 +483,17 @@ abstract class LiveEntry extends entry
 			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
 			if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
 			{
-				if ($this->getExplicitLive() && !$this->canViewExplicitLive() && !$liveEntryServerNode->getIsPlayableUser())
-					return false;
-				return true;
+				$foundCurrentDc = true;
+				if (!$this->getExplicitLive() || $this->canViewExplicitLive() || $liveEntryServerNode->getIsPlayableUser())
+				{
+					return true;
+				}
 			}
 		}
-		
+		if ($foundCurrentDc)
+		{
+			return false;
+		}
 		return !$currentDcOnly;
 	}
 	
