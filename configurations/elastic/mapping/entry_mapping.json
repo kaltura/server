@@ -618,6 +618,10 @@
 		  "type" : "keyword",
 		  "normalizer" : "kaltura_keyword_normalizer"
 		},
+        "privacy_by_context" : {
+          "type" : "keyword",
+          "normalizer" : "kaltura_keyword_normalizer"
+        },
 		"parent_entry" : {
 		  "properties" : {
 			"entry_id" : {
@@ -650,7 +654,11 @@
 			"categories_ids" : {
 			  "type" : "keyword",
 			  "normalizer" : "kaltura_keyword_normalizer"
-			}
+            },
+            "privacy_by_contexts" : {
+              "type" : "keyword",
+              "normalizer" : "kaltura_keyword_normalizer"
+            }
 		  }
 		},
 		"caption_assets": {
