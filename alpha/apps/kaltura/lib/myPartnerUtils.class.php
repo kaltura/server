@@ -1863,15 +1863,15 @@ class myPartnerUtils
 		$packages = new PartnerPackages();
 		$partnerPackageInfo = $packages->getPackageDetails($partner->getPartnerPackage());
 
-		$endDay = $partnerPackageInfo['trial_num_days'];
+		$blockingDay = $partnerPackageInfo['trial_num_days_until_blocking'];
 		$deletionDay = $partnerPackageInfo['trial_num_days_until_deletion'];
 
 		if($partner->getExtendedFreeTrailExpiryDate())
 		{
 			$formattedExtensionDate = date('Y-m-d H:i:s', $partner->getExtendedFreeTrailExpiryDate());
-			$endDay = dateUtils::diffInDays($partner->getCreatedAt(), $formattedExtensionDate);
-			$deletionDay = $endDay + 30;
-			KalturaLog::debug("After trial extension the End day is: [$endDay]");
+			$blockingDay = dateUtils::diffInDays($partner->getCreatedAt(), $formattedExtensionDate);
+			$deletionDay = $blockingDay + 30;
+			KalturaLog::debug("After trial extension the End day is: [$blockingDay]");
 		}
 
 		$freeTrialUpdatesDays = explode(',', $partnerPackageInfo['notification_days']);
@@ -1879,7 +1879,7 @@ class myPartnerUtils
 		$dayInFreeTrial = dateUtils::diffInDays($partner->getCreatedAt(), dateUtils::today());
 		KalturaLog::debug("partner [{$partner->getId()}] is currently at the [$dayInFreeTrial] day of free trial");
 
-		$partner = self::checkIfPartnerStatusChangeRequired($partner, $dayInFreeTrial, $endDay, $deletionDay);
+		$partner = self::checkIfPartnerStatusChangeRequired($partner, $dayInFreeTrial, $blockingDay, $deletionDay);
 		if($freeTrialUpdatesDays)
 			$partner = self::checkForNotificationDay($partner, $dayInFreeTrial, $freeTrialUpdatesDays);
 

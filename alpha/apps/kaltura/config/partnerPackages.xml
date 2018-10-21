@@ -9,7 +9,8 @@
 		<overage_fee>0</overage_fee>
 		<support_types>1</support_types>
 		<trial_num_days>30</trial_num_days>
-		<trial_num_days_until_deletion>60</trial_num_days_until_deletion>
+		<trial_num_days_until_blocking>180</trial_num_days_until_blocking>
+		<trial_num_days_until_deletion>210</trial_num_days_until_deletion>
 		<notification_days>2,10,22,30</notification_days>
 	</package>
 	<package>
@@ -68,7 +69,7 @@
 		<cycle_fee>0</cycle_fee>
 		<overage_fee>0</overage_fee>
 		<support_types>1</support_types>
-		<trial_num_days>180</trial_num_days>
+		<trial_num_days_until_blocking>180</trial_num_days_until_blocking>
 		<trial_num_days_until_deletion>210</trial_num_days_until_deletion>
 		<notification_days>30,90,150,173,180</notification_days>
 		<cycle_bw_for_monitored_trial>500</cycle_bw_for_monitored_trial>
@@ -102,7 +103,7 @@
 		<cycle_fee>0</cycle_fee>
 		<overage_fee>0</overage_fee>
 		<support_types>1</support_types>
-		<trial_num_days>180</trial_num_days>
+		<trial_num_days_until_blocking>180</trial_num_days_until_blocking>
 		<trial_num_days_until_deletion>210</trial_num_days_until_deletion>
 		<notification_days>2,10,22,30,175,180</notification_days>
 	</package>
