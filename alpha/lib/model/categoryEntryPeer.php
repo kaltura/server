@@ -120,7 +120,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer implements IRelatedObjectP
 		$c = new Criteria();
 		$c->addAnd(categoryEntryPeer::ENTRY_ID, $entryId);
 		$c->addAnd(categoryEntryPeer::STATUS, array(CategoryEntryStatus::PENDING, CategoryEntryStatus::ACTIVE), Criteria::IN);
-		$c->addAnd(categoryEntryPeer::PRIVACY_CONTEXT, $privacyContext, Criteria::IN);
+		$c->addAnd(categoryEntryPeer::PRIVACY_CONTEXT, "%" . $privacyContext . "%" , Criteria::LIKE);
 		
 		return categoryEntryPeer::doSelect($c);
 	}
