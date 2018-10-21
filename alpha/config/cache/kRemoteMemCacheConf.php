@@ -74,7 +74,14 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 			if($map)
 			{
 				$map = json_decode($map,true);
-				$mergedMaps = kEnvironment::mergeConfigItem($mergedMaps, $map);
+				if($mergedMaps)
+				{
+					$mergedMaps = kEnvironment::mergeConfigItem($mergedMaps, $map);
+				}
+				else
+				{
+					$mergedMaps = $map;
+				}
 			}
 		}
 		return $mergedMaps;
