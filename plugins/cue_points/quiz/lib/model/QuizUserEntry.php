@@ -13,6 +13,21 @@ class QuizUserEntry extends UserEntry{
 	protected $score;
 
 	/**
+	 * @var float
+	 */
+	protected $previousScore;
+
+	/**
+	 * @var float
+	 */
+	protected $bestScore;
+
+	/**
+	 * @var int
+	 */
+	protected $numOfRetakesAllowed;
+
+	/**
 	 * @var int
 	 */
 	protected $numOfQuestions;
@@ -32,10 +47,16 @@ class QuizUserEntry extends UserEntry{
 
 	public function setScore($v){ $this->putInCustomData("score", $v);}
 	public function getScore(){ return $this->getFromCustomData("score");}
+	public function setPreviousScore($v){ $this->putInCustomData("previousScore", $v);}
+	public function getPreviousScore(){ return $this->getFromCustomData("previousScore");}
+	public function setBestScore($v){ $this->putInCustomData("bestScore", $v);}
+	public function getBestScore(){ return $this->getFromCustomData("bestScore");}
 	public function setNumOfQuestions($v){ $this->putInCustomData("numOfQuestions", $v);}
 	public function getNumOfQuestions(){ return $this->getFromCustomData("numOfQuestions");}
 	public function setNumOfCorrectAnswers($v){ $this->putInCustomData("numOfCorrectAnswers", $v);}
 	public function getNumOfCorrectAnswers(){ return $this->getFromCustomData("numOfCorrectAnswers");}
+	public function setNumOfRetakesAllowed($v){ $this->putInCustomData("numOfRetakesAllowed", $v);}
+	public function getNumOfRetakesAllowed(){ return $this->getFromCustomData("numOfRetakesAllowed");}
 	public function addAnswerId($questionId, $answerId)
 	{
 		$answerIds = $this->getAnswerIds();

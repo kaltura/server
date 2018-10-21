@@ -52,6 +52,12 @@ class kQuiz {
 	protected $showGradeAfterSubmission;
 
 	/**
+	 *
+	 * @var int
+	 */
+	protected $numOfRetakesAllowed;
+
+	/**
 	 * @return int
 	 */
 	public function getVersion()
@@ -65,6 +71,22 @@ class kQuiz {
 	public function setVersion($version)
 	{
 		$this->version = $version;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getNumOfRetakesAllowed()
+	{
+		return $this->numOfRetakesAllowed;
+	}
+
+	/**
+	 * @param int $numOfRetakesAllowed
+	 */
+	public function setNumOfRetakesAllowed($numOfRetakesAllowed)
+	{
+		$this->numOfRetakesAllowed = $numOfRetakesAllowed;
 	}
 
 	/**

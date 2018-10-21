@@ -12,9 +12,30 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	 */
 	public $score;
 
+	/**
+	 * @var float
+	 * @readonly
+	 */
+	public $previousScore;
+
+	/**
+	 * @var float
+	 * @readonly
+	 */
+	public $bestScore;
+
+	/**
+	 * @var int
+	 * @readonly
+	 */
+	public $numOfRetakesAllowed;
+
 	private static $map_between_objects = array
 	(
-		"score"
+		"score",
+		"numOfRetakesAllowed",
+		"bestScore",
+		"previousScore"
 	);
 
 	public function getMapBetweenObjects ( )
@@ -66,6 +87,18 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 				throw new KalturaAPIException(KalturaQuizErrors::QUIZ_USER_ENTRY_ALREADY_EXISTS, $this->entryId);
 			}
 		}
+
+		if (empty($object_to_fill->setNumOfRetakesAllowed()) && $this->entryId)
+		{
+			$entry = entryPeer::retrieveByPK($this->entryId);
+			if (!$entry)
+				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $entry);
+
+			$kQuiz = QuizPlugin::getQuizData($entry);
+			if (!$kQuiz)
+				throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $entry);
+			$object_to_fill->setNumOfRetakesAllowed($kQuiz->getNumOfRetakesAllowed());
+		}
 		return $object_to_fill;
 	}
 
@@ -86,6 +119,16 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	{
 		//do nothing
 		return null;
+	}
+
+	protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$this->numOfRetakesAllowed = $srcObj->getNumOfRetakesAllowed();
+		$this->previousScore = $srcObj->getPreviousScore();
+		$this->score = $srcObj->getScore();
+		$this->bestScore = $srcObj->getBestScore();
+
+		parent::doFromObject($srcObj, $responseProfile);
 	}
 
 }
