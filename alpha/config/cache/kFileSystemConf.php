@@ -54,7 +54,14 @@ class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 			if(file_exists($iniFile))
 			{
 				$config = new Zend_Config_Ini($iniFile);
-				$result = kEnvironment::mergeConfigItem($result, $config->toArray());
+				if($result)
+				{
+					$result = kEnvironment::mergeConfigItem($result, $config->toArray());
+				}
+				else
+				{
+					$result = $config->toArray();
+				}
 			}
 		}
 		return $result;
