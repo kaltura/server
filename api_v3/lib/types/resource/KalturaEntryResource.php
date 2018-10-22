@@ -36,7 +36,25 @@ class KalturaEntryResource extends KalturaContentResource
 			$srcEntry->getMediaType() == KalturaMediaType::LIVE_STREAM_FLASH ||
 				myEntryUtils::isLiveClippingEntry($srcEntry))
 			return;
-		
+
+		if (!$this->checkIfFileExist())
+			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
+	}
+
+	private function checkIfFileExist($local = false)
+	{
+		$fileSyncs = $this->getFileSyncsForSrcFlavor($local);
+		foreach($fileSyncs as $fileSync)
+		{
+			$fileSync = kFileSyncUtils::resolve($fileSync);
+			if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_LINK)
+				return true;
+		}
+		return false;
+	}
+
+	private function getFileSyncsForSrcFlavor($local = false)
+	{
 		$srcFlavorAsset = null;
 		if(is_null($this->flavorParamsId))
 		{
@@ -50,32 +68,27 @@ class KalturaEntryResource extends KalturaContentResource
 			if (!$srcFlavorAsset)
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $this->assetId);
 		}
-		
+
 		$key = $srcFlavorAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$c = FileSyncPeer::getCriteriaForFileSyncKey($key);
-		$fileSyncs = FileSyncPeer::doSelect($c);
-
-		foreach($fileSyncs as $fileSync)
-		{
-			$fileSync = kFileSyncUtils::resolve($fileSync);
-			if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_LINK)
-				return;
-		}
-		throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
+		if ($local)
+			$c->add(FileSyncPeer::DC, kDataCenterMgr::getCurrentDcId());
+		return FileSyncPeer::doSelect($c);
 	}
 	
 	/* (non-PHPdoc)
 	 * @see KalturaResource::validateEntry()
 	 */
-	public function validateEntry(entry $dbEntry)
+	public function validateEntry(entry $dbEntry, $validateLocal = false)
 	{
-		parent::validateEntry($dbEntry);
+		parent::validateEntry($dbEntry, $validateLocal);
 		
 		$srcEntry = entryPeer::retrieveByPK($this->entryId);
 		if(!$srcEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
-		if($srcEntry->getMediaType() == KalturaMediaType::IMAGE)
-			return parent::validateEntry($dbEntry);
+		if ($validateLocal && !myEntryUtils::isLiveClippingEntry($srcEntry) // live clipping entry doesn't require actual local file
+			  && !$this->checkIfFileExist(true))
+			throw new KalturaAPIException(KalturaErrors::SOURCE_FILE_NOT_FOUND);
 	}
 
 	/* (non-PHPdoc)

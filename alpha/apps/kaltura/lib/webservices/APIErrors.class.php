@@ -68,6 +68,17 @@ class APIErrors
 	
 		return $errorData;
 	}
+
+	/**
+	 *
+	 * @param $errorString string
+	 * @return string
+	 */
+	public static function getErrorCode($errorString)
+	{
+		$data = self::getErrorData($errorString);
+		return $data["code"];
+	}
 	
 	//  ERR_TEXT - some text to display in the message
 	const INTERNAL_SERVERL_ERROR = "INTERNAL_SERVER_ERROR;ERR_TEXT;Internal server error @ERR_TEXT@";
