@@ -32,8 +32,8 @@ class kBaseMemcacheConf extends kBaseConfCache implements kMapCacheInterface
 
 	protected function initCache($port, $host)
 	{
-		require_once (__DIR__ . '/../../../infra/cache/kMemcacheCacheWrapper.php');
-		$cache = new kMemcacheCacheWrapper;
+		require_once (__DIR__ . '/../../../infra/cache/kInfraMemcacheCacheWrapper.php');
+		$cache = new kInfraMemcacheCacheWrapper;
 		$sectionConfig= array('host'=>$host,'port'=>$port);
 		try
 		{

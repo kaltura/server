@@ -6,7 +6,7 @@ require_once(dirname(__FILE__) . '/kInfraBaseCacheWrapper.php');
  * @package infra
  * @subpackage cache
  */
-class kMemcacheCacheWrapper extends kInfraBaseCacheWrapper
+class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 {
 	const MAX_CONNECT_ATTEMPTS = 4;
 	
