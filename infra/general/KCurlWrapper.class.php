@@ -514,18 +514,27 @@ class KCurlWrapper
 		$returnTransfer = is_null($destFile);
 		$destFd = null;
 		if (!is_null($destFile))
+		{
 			$destFd = fopen($destFile, "ab");
-
+			if(!$destFd)
+			{
+				KalturaLog::err('Failed to open file: '.$destFd);
+				return null;
+			}
+		}
+		
 		curl_setopt($this->ch, CURLOPT_HEADER, false);
 		curl_setopt($this->ch, CURLOPT_NOBODY, false);
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, $returnTransfer);
 		if (!is_null($destFd))
 			curl_setopt($this->ch, CURLOPT_FILE, $destFd);
+
 		if($progressCallBack)
 		{
 			curl_setopt($this->ch, CURLOPT_NOPROGRESS, false);
 			curl_setopt($this->ch, CURLOPT_PROGRESSFUNCTION, $progressCallBack);
 		}
+
 		$ret = curl_exec($this->ch);
 
 		if (!is_null($destFd)) {
