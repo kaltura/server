@@ -1,5 +1,27 @@
 # Naos 14.7.0 #
 
+## Split firbase IOS and Android notifications ##
+- Issue Type: Task
+- Issue ID: No-Plat
+
+### Configuration ###
+
+	None.
+
+### Deployment scripts ###
+
+	First replace all tokens from the XML files below and remove ".template" from the file name:
+        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_10_22_split_firebase_ios_and_android_notifications.template.xml
+        
+	*** Please note this file contains the following token {FIRE_BASE_AUTHORIZATION_KEY}, this should be replaced with the authorization token from your firebase account (example key=XXXX).
+
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/2018_10_22_deploy_split_firebase_ios_and_android_notifications.php
+
+#### Known Issues & Limitations ####
+
+	None.
+
 ## Support beacons rolling index to avoid high disk usage ##
 - Issue Type: Task
 - Issue ID: PLAT-9288
