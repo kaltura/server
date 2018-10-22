@@ -23,6 +23,42 @@ class kConfCacheManager
 										kCacheConfFactory::APC => array(kCacheConfFactory::SESSION),
 										kCacheConfFactory::REMOTE_MEM_CACHE	=> array(kCacheConfFactory::APC, kCacheConfFactory::SESSION));
 
+	private static $mapInitFlow = array(kCacheConfFactory::SESSION,
+										kCacheConfFactory::APC,
+										kCacheConfFactory::FILE_SYSTEM);
+
+	private static $init=false;
+
+	protected static function initLoad($cacheName)
+	{
+		foreach (self::$mapInitFlow as $cacheEntity)
+		{
+			/* @var $cacheObj kBaseConfCache*/
+			$cacheObj = kCacheConfFactory::getInstance($cacheEntity);
+			$map = $cacheObj->load(null, $cacheName);
+			if($map)
+			{
+				self::store(null, $cacheName, $map, $cacheEntity);
+				kCacheConfFactory::getInstance($cacheName);
+			}
+		}
+	}
+
+
+	protected static function init()
+	{
+		if(self::$init)
+		{
+			return;
+		}
+		self::$init=true;
+		//load basic parameters
+		//remote and local memcache	configuration maps
+		self::initLoad(kCacheConfFactory::LOCAL_MEM_CACHE);
+		self::initLoad(kCacheConfFactory::REMOTE_MEM_CACHE);
+	}
+
+
 	public static function getMap($mapName)
 	{
 		return self::load($mapName);
@@ -30,6 +66,8 @@ class kConfCacheManager
 
 	public static function loadKey()
 	{
+		self::init();
+
 		foreach (self::$keyLoadFlow as $cacheEntity)
 		{
 			$cacheObj = kCacheConfFactory::getInstance($cacheEntity);
@@ -44,15 +82,17 @@ class kConfCacheManager
 		return null ; //no key is available
 	}
 
-	static function storeKey($key, $foundIn)
+	protected static function storeKey($key, $foundIn)
 	{
 		$storeFlow = self::$keyStoreFlow[$foundIn];
 		foreach ($storeFlow as $cacheEntity)
 			kCacheConfFactory::getInstance($cacheEntity)->storeKey($key);
 	}
 
-	static function hasMap ($mapName)
+	public static function hasMap ($mapName)
 	{
+		self::init();
+
 		foreach (self::$mapLoadFlow as $cacheEntity)
 		{
 			/* @var $cacheObj kBaseConfCache*/
@@ -65,8 +105,9 @@ class kConfCacheManager
 
 	static $loadRecursiveLock;
 
-	static function load ($mapName, $key=null)
+	public static function load ($mapName, $key=null)
 	{
+		self::init();
 		if(self::$loadRecursiveLock)
 		{
 			return array();
@@ -75,12 +116,6 @@ class kConfCacheManager
 
 		foreach (self::$mapLoadFlow as $cacheEntity)
 		{
-			//this check allows adding configuration files for each module entity
-			if($mapName == $cacheEntity )
-			{
-				continue;
-			}
-
 			/* @var $cacheObj kBaseConfCache*/
 			$cacheObj = kCacheConfFactory::getInstance($cacheEntity);
 			if(!$key && $cacheObj->isKeyRequired() && PHP_SAPI != 'cli')
