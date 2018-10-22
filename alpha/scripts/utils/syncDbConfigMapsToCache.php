@@ -18,7 +18,7 @@ if(!$map)
 	die("\n Map $mapName was not found in configuration directory");
 }
 
-$cache = new kMemcacheCacheWrapper;
+$cache = new kInfraMemcacheCacheWrapper;
 if(!$cache->init(array('host'=>$map['host'],'port'=>$map['port'])))
 	die ("Fail to connect to cache host {$map['host']} port {$map['port']} ");
 $mapListInCache = $cache->get(kRemoteMemCacheConf::MAP_LIST_KEY);

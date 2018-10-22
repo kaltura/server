@@ -40,7 +40,7 @@ ini_set("memory_limit","512M");
 		 */
 		public function Setup($config)
 		{
-			$this->cacheStore = new kMemcacheCacheWrapper();
+			$this->cacheStore = new kInfraMemcacheCacheWrapper();
 			if($this->cacheStore->init($config)===false){
 				KalturaLog::log("cacheStore failed to initialize with config:".serialize($config));
 				false;

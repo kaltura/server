@@ -1,12 +1,12 @@
 <?php
 
-require_once(dirname(__FILE__) . '/kBaseCacheWrapper.php');
+require_once(dirname(__FILE__) . '/kInfraBaseCacheWrapper.php');
 
 /**
  * @package infra
  * @subpackage cache
  */
-class kApcCacheWrapper extends kBaseCacheWrapper
+class kApcCacheWrapper extends kInfraBaseCacheWrapper
 {
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::init()

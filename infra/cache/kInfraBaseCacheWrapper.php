@@ -4,7 +4,7 @@
  * @package infra
  * @subpackage cache
  */
-abstract class kBaseCacheWrapper
+abstract class kInfraBaseCacheWrapper
 {
 	private $serializeData;
 	
