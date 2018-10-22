@@ -1,5 +1,35 @@
 # Naos 14.7.0 #
 
+## PLAT-8932 - oad configuration from central memcache
+- Issue type:Task
+- Issue Id:Plat-8932
+
+### Configuration ###
+
+    1. Rename 'Memcache' inside cache.ini to 'InfraMemcache'
+    2. Rename 'FileSystem' inside cache.ini to 'InfraFileSystem'
+    3. Add kLocalMemCacheConf.ini file to your configurations/ directory , the file sould containt 2 values - 
+        a. IP\host of local memcache
+        b. Port number of local memcache
+    4.  Add kRemoteMemCacheConf.ini file to your configuration/ directory , the file sould containt 2 values - 
+        a. IP\host of remote (central) memcache
+        b. Port number of remote memcache
+
+### Deployment scripts ###
+    
+    run mysql script that adds new table     
+    - mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2018_08_19_create_config_maps_table.sql 
+
+### How to add new maps? ###
+    
+    1. Using alpha/scripts/utils/insertConfigMapToDb.php you can add new maps to the DB
+    2. Using alpha/scripts/utils/syncDbConfigMapsToCache.phpthe new maps will be inserted into the central memcach
+    Once this is done , calling kConf::getMap(<mapName>) will retrive the values from the memcache
+
+#### Known Issues & Limitations ####
+    
+    None
+
 ## Split firbase IOS and Android notifications ##
 - Issue Type: Task
 - Issue ID: No-Plat
