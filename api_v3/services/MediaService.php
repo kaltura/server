@@ -836,7 +836,21 @@ class MediaService extends KalturaEntryService
 	 */
 	function approveReplaceAction($entryId)
 	{
-		return $this->approveReplace($entryId, KalturaEntryType::MEDIA_CLIP);
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		$this->validateEntryForReplace($entryId, $dbEntry, KalturaEntryType::MEDIA_CLIP);
+		$this->approveReplace($dbEntry);
+
+		$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entryId, $dbEntry->getPartnerId());
+		foreach ($childEntries as $childEntry)
+		{
+			if ($childEntry->getId() != $entryId)
+			{
+				$this->validateEntryForReplace($childEntry->getId(), $childEntry);
+				$this->approveReplace($childEntry);
+			}
+		}
+
+		return $this->getEntry($entryId, -1, KalturaEntryType::MEDIA_CLIP);
 	}
 
 	/**
@@ -851,7 +865,21 @@ class MediaService extends KalturaEntryService
 	 */
 	function cancelReplaceAction($entryId)
 	{
-		return $this->cancelReplace($entryId, KalturaEntryType::MEDIA_CLIP);
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		$this->validateEntryForReplace($entryId, $dbEntry, KalturaEntryType::MEDIA_CLIP);
+		$this->cancelReplace($dbEntry);
+
+		$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entryId, $dbEntry->getPartnerId());
+		foreach ($childEntries as $childEntry)
+		{
+			if ($childEntry->getId() != $entryId)
+			{
+				$this->validateEntryForReplace($childEntry->getId(), $childEntry);
+				$this->cancelReplace($childEntry);
+			}
+		}
+
+		return $this->getEntry($entryId, -1, KalturaEntryType::MEDIA_CLIP);
 	}
 
 	/**

@@ -616,9 +616,12 @@ class DocumentsService extends KalturaEntryService
 	 */
 	function approveReplaceAction($entryId)
 	{
-		return $this->approveReplace($entryId, KalturaEntryType::DOCUMENT);
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		$this->validateEntryForReplace($entryId, $dbEntry, KalturaEntryType::DOCUMENT);
+		$this->approveReplace($dbEntry);
+		return $this->getEntry($entryId, -1, KalturaEntryType::DOCUMENT);
 	}
-	
+
 	/**
 	 * Cancels document replacement
 	 *
@@ -630,9 +633,12 @@ class DocumentsService extends KalturaEntryService
 	 */
 	function cancelReplaceAction($entryId)
 	{
-		return $this->cancelReplace($entryId, KalturaEntryType::DOCUMENT);
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		$this->validateEntryForReplace($entryId, $dbEntry, KalturaEntryType::DOCUMENT);
+		$this->cancelReplace($dbEntry);
+		return $this->getEntry($entryId, -1, KalturaEntryType::DOCUMENT);
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KalturaEntryService::prepareEntryForInsert()
 	 */
