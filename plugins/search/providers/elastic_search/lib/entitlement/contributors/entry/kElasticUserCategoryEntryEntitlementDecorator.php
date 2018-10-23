@@ -18,26 +18,9 @@ class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEn
 
 	public static function getEntitlementCondition(array $params = array(), $fieldPrefix = '')
 	{
-		$condition = new kESearchBoolQuery();
-		//members
 		$ids = self::getFormattedCategoryIds($params['category_ids']);
-		$idsFieldName = ESearchBaseCategoryEntryItem::CATEGORY_IDS_MAPPING_FIELD;
-		$idsCondition = new kESearchTermsQuery("{$fieldPrefix}{$idsFieldName}", $ids);
-		$condition->addToShould($idsCondition);
-		//privacy_by_contexts
-		$privacyByContexts = array();
-		$privacyContexts = self::getPrivacyContexts(kEntryElasticEntitlement::$privacyContext);
-		foreach ($privacyContexts as $privacyContext)
-		{
-			foreach (kEntryElasticEntitlement::$privacy as $privacyValue)
-			{
-				$privacyByContexts[] = elasticSearchUtils::formatSearchTerm($privacyContext . kEntitlementUtils::TYPE_SEPERATOR . $privacyValue);
-			}
-		}
-		$pcFieldName = ESearchEntryFieldName::PRIVACY_BY_CONTEXTS;
-		$privacyByContextCondition = new kESearchTermsQuery("{$fieldPrefix}{$pcFieldName}", $privacyByContexts);
-		$condition->addToShould($privacyByContextCondition);
-
+		$fieldName = ESearchBaseCategoryEntryItem::CATEGORY_IDS_MAPPING_FIELD;
+		$condition = new kESearchTermsQuery("{$fieldPrefix}{$fieldName}", $ids);
 		return $condition;
 	}
 
@@ -50,7 +33,7 @@ class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEn
 			$kuserId = -1;
 		}
 		//get category ids with $privacyContext
-		$categories = self::getUserCategories($kuserId, kEntryElasticEntitlement::$privacyContext);
+		$categories = self::getUserCategories($kuserId, kEntryElasticEntitlement::$privacyContext, kEntryElasticEntitlement::$privacy);
 		if(count($categories) == 0)
 			$categories = array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 
@@ -66,24 +49,7 @@ class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEn
 		$entryQuery->addToShould($condition);
 	}
 
-	protected static function getPrivacyContexts($privacyContext)
-	{
-		$privacyContexts = null;
-		if (!$privacyContext || trim($privacyContext) == '')
-		{
-			$privacyContexts = array(kEntitlementUtils::getDefaultContextString(kEntryElasticEntitlement::$partnerId));
-		}
-		else
-		{
-			$privacyContexts = explode(',', $privacyContext);
-			$privacyContexts = kEntitlementUtils::addPrivacyContextsPrefix($privacyContexts, kEntryElasticEntitlement::$partnerId);
-		}
-
-		$privacyContexts = array_map('elasticSearchUtils::formatSearchTerm', $privacyContexts);
-		return $privacyContexts;
-	}
-
-	protected static function getUserCategories($kuserId, $privacyContext = null)
+	private static function getUserCategories($kuserId, $privacyContext = null, $privacy = null)
 	{
 		$maxUserCategories = kConf::get('maxUserCategories', 'elastic', self::MAX_CATEGORIES);
 
@@ -126,20 +92,29 @@ class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEn
 			$conditionsBoolQuery->addToShould($noPcQuery);
 		}
 
-		$privacyContexts = self::getPrivacyContexts($privacyContext);
+		$privacyContexts = null;
+		if (!$privacyContext || trim($privacyContext) == '')
+			$privacyContexts = array(kEntitlementUtils::getDefaultContextString(kEntryElasticEntitlement::$partnerId));
+		else
+		{
+			$privacyContexts = explode(',', $privacyContext);
+			$privacyContexts = kEntitlementUtils::addPrivacyContextsPrefix( $privacyContexts, kEntryElasticEntitlement::$partnerId );
+		}
+
+		$privacyContexts = array_map('elasticSearchUtils::formatSearchTerm', $privacyContexts);
 		$privacyContextsQuery = new kESearchTermsQuery('privacy_contexts',$privacyContexts);
 		$mainBool->addToFilter($privacyContextsQuery);
 
-		//fetch only categories with privacy MEMBERS_ONLY
-		//categories with privacy ALL/AUTHENTICATED_USERS will be handled with privacy_by_contexts
-		$privacyQuery = new kESearchTermQuery('privacy', category::formatPrivacy(PrivacyType::MEMBERS_ONLY, kEntryElasticEntitlement::$partnerId));
-		$mainBool->addToFilter($privacyQuery);
+		if($privacy) //privacy is an array
+		{
+			$privacy = array_map('elasticSearchUtils::formatSearchTerm', $privacy);
+			$privacyQuery = new kESearchTermsQuery('privacy', $privacy);
+			$conditionsBoolQuery->addToShould($privacyQuery);
+		}
 
 		$mainBool->addToFilter($conditionsBoolQuery);
 		$body['query'] = $mainBool->getFinalQuery();
 		$params['body'] = $body;
-		//order categories by updated at
-		$params['body']['sort'] = array('updated_at' => 'desc');
 		$elasticClient = new elasticClient();
 		$results = $elasticClient->search($params, true);
 		$categories = $results['hits']['hits'];
