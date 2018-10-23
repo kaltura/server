@@ -3,7 +3,7 @@
  * @package api
  * @subpackage v3
  */
-class KalturaDocCommentParser
+class   KalturaDocCommentParser
 {
     const DOCCOMMENT_READONLY = "/\\@readonly/i";
     const DOCCOMMENT_INSERTONLY = "/\\@insertonly/i";

@@ -1227,13 +1227,15 @@ class MediaService extends KalturaEntryService
 
 	private function handleErrorDuringSetResource($entryId, Exception $e)
 	{
-		if ($e->getCode() == APIErrors::getErrorCode(APIErrors::ENTRY_ID_NOT_FOUND))
+		if ($e->getCode() == APIErrors::getCode(APIErrors::ENTRY_ID_NOT_FOUND))
+		{
 			throw $e; //if no entry found then no need to do anything
+		}
 
 		KalturaLog::info("Exception was thrown during setContent on entry [$entryId] with error: " . $e->getMessage());
 		$this->cancelReplaceAction($entryId);
 		
-		$errorCodeArr = array(kCoreException::SOURCE_FILE_NOT_FOUND, APIErrors::getErrorCode(APIErrors::SOURCE_FILE_NOT_FOUND));
+		$errorCodeArr = array(kCoreException::SOURCE_FILE_NOT_FOUND, APIErrors::getCode(APIErrors::SOURCE_FILE_NOT_FOUND));
 		if ((in_array($e->getCode(), $errorCodeArr)) && (kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId())))
 		{
 			$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
