@@ -376,12 +376,40 @@ class KalturaFrontController
 			return $this->getValueFromObject($object->$currentProperty, $path);
 		}
 		
-		if ($object instanceof KalturaTypedArray && $object->offsetExists($currentProperty))
+		if ($object instanceof KalturaTypedArray)
 		{
-			return $this->getValueFromObject($object->offsetGet($currentProperty), $path);
+			if($currentProperty == "_all")
+			{
+				return $this->getValuesFromObjectsArray($object->toArray(), array_shift($path));
+			}
+			elseif($object->offsetExists($currentProperty))
+			{
+				return $this->getValueFromObject($object->offsetGet($currentProperty), $path);
+			}
 		}
 		
 		return null;
+	}
+	
+	public function getValuesFromObjectsArray($objectsArray, $attr)
+	{
+		$res = null;
+		if(!$objectsArray)
+		{
+			return $res;
+		}
+		
+		foreach ($objectsArray as $object)
+		{
+			if(!isset($object->$attr))
+			{
+				continue;
+			}
+			
+			$res .= $object->$attr . ",";
+		}
+		
+		return $res;
 	}
 	
 	public function errorHandler($errNo, $errStr, $errFile, $errLine)

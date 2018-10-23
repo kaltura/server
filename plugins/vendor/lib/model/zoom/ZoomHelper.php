@@ -331,32 +331,49 @@ class ZoomHelper
 
 	/**
 	 * @param int $partnerId
-	 * @param string $categoryName
+	 * @param string $categoryFullName
 	 * @throws Exception
 	 * @return int id;
 	 */
-	public static function createCategoryForZoom($partnerId, $categoryName)
+	public static function createCategoryForZoom($partnerId, $categoryFullName)
 	{
-		try
+		//Validate category full name does not contain spacial chars
+		$tempCategoryFullName = categoryPeer::getParsedFullName($categoryFullName);
+		if(strcmp($tempCategoryFullName, $categoryFullName))
 		{
-			$categoryDb = new category();
-			$categoryDb->setName($categoryName);
-			$categoryDb->setPartnerId($partnerId);
-			$categoryDb->save();
-			return $categoryDb->getId();
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_NAME_CONTAINS_INVALID_CHARS);
 		}
-		catch(Exception $ex)
+
+		$category = categoryPeer::getByFullNameExactMatch($categoryFullName, null, $partnerId);
+		if($category)
 		{
-			if ($ex->getCode() === kCoreException::DUPLICATE_CATEGORY)
-			{
-				KalturaLog::debug('category: ' . $categoryName . ' already exist for partner: ' . $partnerId);
-			}
-			else
-			{
-				throw $ex;
-			}
+			KalturaLog::debug('Category: ' . $categoryFullName . ' already exist for partner: ' . $partnerId);
+			return $category->getId();
 		}
-		return categoryPeer::getByFullNameExactMatch($categoryName, null, $partnerId)->getId();
+
+		$categoryDb = new category();
+
+		//Check if this is a root category or child , if child get its parent ID
+		$categoryNameArray = explode(categoryPeer::CATEGORY_SEPARATOR, $categoryFullName);
+		$categoryName = end($categoryNameArray);
+		if(count($categoryNameArray) > 1)
+		{
+			$parentCategoryFullNameArray = array_slice ($categoryNameArray,0,-1);
+			$parentCategoryFullName = implode(categoryPeer::CATEGORY_SEPARATOR, $parentCategoryFullNameArray );
+			$parentCategory = categoryPeer::getByFullNameExactMatch($parentCategoryFullName, null, $partnerId);
+			if(!$parentCategory)
+			{
+				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_NOT_FOUND, $parentCategoryFullName);
+			}
+			$parentCategoryId = $parentCategory->getId();
+			$categoryDb->setParentId($parentCategoryId);
+		}
+
+		$categoryDb->setName($categoryName);
+		$categoryDb->setFullName($categoryFullName);
+		$categoryDb->setPartnerId($partnerId);
+		$categoryDb->save();
+		return $categoryDb->getId();
 	}
 
 	/**

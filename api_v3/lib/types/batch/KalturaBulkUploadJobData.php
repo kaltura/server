@@ -102,8 +102,13 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	 * @var int
 	 */
 	public $numOfErrorObjects;
-	
-	
+
+	/**
+	 * privileges for the job
+	 * @var string
+	 */
+	public $privileges;
+
 	private static $map_between_objects = array
 	(
 		"userId",
@@ -116,9 +121,10 @@ class KalturaBulkUploadJobData extends KalturaJobData
 		"filePath",
 		"fileName",
 		"bulkUploadObjectType",
-	    	"objectData",
+		"objectData",
 		"numOfErrorObjects",
-        	"emailRecipients"
+		"emailRecipients",
+		"privileges"
 	);
 
 	

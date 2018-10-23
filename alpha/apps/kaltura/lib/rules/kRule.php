@@ -354,6 +354,10 @@ class kRule
 		if ($actionTypes)
 		{
 			$ruleActions = $this->getActions();
+			if (!$ruleActions)
+			{
+				return false;
+			}
 			foreach ($ruleActions as $currAction)
 			{
 				/* @var kRuleAction $currAction */

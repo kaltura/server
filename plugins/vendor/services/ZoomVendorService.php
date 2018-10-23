@@ -169,6 +169,11 @@ class ZoomVendorService extends KalturaBaseService
 			$categoryId = ZoomHelper::createCategoryForZoom($partnerId, $zoomCategory);
 			$zoomIntegration->setZoomCategoryId($categoryId);
 		}
+		if (!$zoomCategory && $zoomIntegration->getZoomCategory() && $zoomIntegration->getZoomCategoryId())
+		{
+			$zoomIntegration->unsetCategory();
+			$zoomIntegration->unsetCategoryId();
+		}
 		$zoomIntegration->save();
 		return true;
 	}
