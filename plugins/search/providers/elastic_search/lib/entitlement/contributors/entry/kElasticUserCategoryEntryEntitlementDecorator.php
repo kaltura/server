@@ -132,7 +132,8 @@ class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEn
 
 		//fetch only categories with privacy MEMBERS_ONLY
 		//categories with privacy ALL/AUTHENTICATED_USERS will be handled with privacy_by_contexts
-		$privacyQuery = new kESearchTermQuery('privacy', category::formatPrivacy(PrivacyType::MEMBERS_ONLY, kEntryElasticEntitlement::$partnerId));
+		$privacy = category::formatPrivacy(PrivacyType::MEMBERS_ONLY, kEntryElasticEntitlement::$partnerId);
+		$privacyQuery = new kESearchTermQuery('privacy', elasticSearchUtils::formatSearchTerm($privacy));
 		$mainBool->addToFilter($privacyQuery);
 
 		$mainBool->addToFilter($conditionsBoolQuery);
