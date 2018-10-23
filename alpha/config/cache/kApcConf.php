@@ -30,7 +30,8 @@ class kApcConf extends kBaseConfCache implements kMapCacheInterface , kKeyCacheI
 	{
 		if($this->apcFunctionsExist)
 		{
-			$map = apc_fetch($mapName);
+			$mapStr = apc_fetch($mapName);
+			$map = json_decode($mapStr,true);
 			if ($map && $this->validateMap($map, $mapName, $key))
 			{
 				$this->removeKeyFromMap($map);
@@ -45,7 +46,8 @@ class kApcConf extends kBaseConfCache implements kMapCacheInterface , kKeyCacheI
 		if($this->apcFunctionsExist && PHP_SAPI != 'cli')
 		{
 			$this->addKeyToMap($map, $mapName, $key);
-			return apc_store($mapName, $map, $ttl);
+			$mapStr = json_encode($map);
+			return apc_store($mapName, $mapStr, $ttl);
 		}
 		return false;
 	}
