@@ -1,6 +1,6 @@
 # Naos 14.7.0 #
 
-## PLAT-8932 - oad configuration from central memcache
+## PLAT-8932 - Load configuration from central memcache
 - Issue type:Task
 - Issue Id:Plat-8932
 
