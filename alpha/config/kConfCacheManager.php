@@ -29,6 +29,8 @@ class kConfCacheManager
 
 	private static $init=false;
 
+	const KEY_TTL=30;
+
 	protected static function initLoad($cacheName)
 	{
 		foreach (self::$mapInitFlow as $cacheEntity)
@@ -84,9 +86,17 @@ class kConfCacheManager
 
 	protected static function storeKey($key, $foundIn)
 	{
+		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
+		$ttl=0;
+		if($remoteCache->isActive())
+		{
+			$ttl=self::KEY_TTL;
+		}
+
 		$storeFlow = self::$keyStoreFlow[$foundIn];
+
 		foreach ($storeFlow as $cacheEntity)
-			kCacheConfFactory::getInstance($cacheEntity)->storeKey($key);
+			kCacheConfFactory::getInstance($cacheEntity)->storeKey($key,$ttl);
 	}
 
 	public static function hasMap ($mapName)

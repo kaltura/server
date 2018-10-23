@@ -12,6 +12,11 @@ class kBaseMemcacheConf extends kBaseConfCache implements kMapCacheInterface
 		return $this->cache;
 	}
 
+	function isActive()
+	{
+		return !is_null($this->cache);
+	}
+
 	function __construct()
 	{
 		$this->cache=null;
