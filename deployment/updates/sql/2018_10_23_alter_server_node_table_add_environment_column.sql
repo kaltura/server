@@ -1,0 +1,1 @@
+ALTER TABLE server_node	ADD  environment VARCHAR(256) NULL AFTER custom_data;

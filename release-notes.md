@@ -1,3 +1,19 @@
+# Naos 14.8.0 #
+
+## Allow allocating specific conference room from pool ##
+
+- Issue Type: Story
+- Issue ID: PLAT-9228
+
+### Configuration ###
+
+	None.	
+
+#### Deployment Scripts ####
+
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /deployment/updates/sql/2018_10_23_alter_server_node_table_add_environment_column.sql
+
+
 # Naos 14.7.0 #
 
 ## PLAT-8932 - Load configuration from central memcache
