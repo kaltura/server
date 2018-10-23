@@ -20,10 +20,10 @@ class KalturaAssetParamsResourceContainer extends KalturaResource
 	public function validateEntry(entry $dbEntry,$validateLocalExist = false)
 	{
 		parent::validateEntry($dbEntry, $validateLocalExist);
-    	$this->validatePropertyNotNull('resource');
-    	$this->validatePropertyNotNull('assetParamsId');
-    	
-   		$this->resource->validateEntry($dbEntry, $validateLocalExist);
+		$this->validatePropertyNotNull('resource');
+		$this->validatePropertyNotNull('assetParamsId');
+
+		$this->resource->validateEntry($dbEntry, $validateLocalExist);
 	}
 	
 	public function entryHandled(entry $dbEntry)
