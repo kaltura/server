@@ -6,8 +6,11 @@
 
 ### Configuration ###
 
+    The following is must - 
     1. Rename 'Memcache' inside cache.ini to 'InfraMemcache'
     2. Rename 'FileSystem' inside cache.ini to 'InfraFileSystem'
+    
+    The following is optional - 
     3. Add kLocalMemCacheConf.ini file to your configurations/ directory , the file sould containt 2 values - 
         a. IP\host of local memcache
         b. Port number of local memcache
