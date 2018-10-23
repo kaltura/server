@@ -120,9 +120,19 @@ class categoryEntryPeer extends BasecategoryEntryPeer implements IRelatedObjectP
 		$c = new Criteria();
 		$c->addAnd(categoryEntryPeer::ENTRY_ID, $entryId);
 		$c->addAnd(categoryEntryPeer::STATUS, array(CategoryEntryStatus::PENDING, CategoryEntryStatus::ACTIVE), Criteria::IN);
-		$c->addAnd(categoryEntryPeer::PRIVACY_CONTEXT, $privacyContext, Criteria::IN);
-		
-		return categoryEntryPeer::doSelect($c);
+		$categoryEntryObjectList = categoryEntryPeer::doSelect($c);
+		$categoryEntryObjectArrayResult=array();
+		foreach ($categoryEntryObjectList as $categoryEntryObjectItem)
+		{
+			$privacyContextList = explode(",",$categoryEntryObjectItem->getPrivacyContext());
+			if (in_array ($privacyContext, $privacyContextList))
+			{
+				$categoryEntryObjectArrayResult[] = $categoryEntryObjectItem;
+			}
+
+		}
+
+		return $categoryEntryObjectArrayResult;
 	}
 
 	public static function retrieveByEntryIdStatusPrivacyContextExistance($entryId, array $statuses = null, $hasPrivacyContext = false)
