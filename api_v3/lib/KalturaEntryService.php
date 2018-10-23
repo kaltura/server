@@ -151,11 +151,16 @@ class KalturaEntryService extends KalturaBaseService
 		$this->attachResource($kResource, $tempDbEntry);
 	}
 
-	protected function validateEntryForReplace($entryId, $dbEntry, $entryType)
+	protected function validateEntryForReplace($entryId, $dbEntry, $entryType = null)
 	{
-		if (!$dbEntry || $dbEntry->getType() != $entryType)
+		if (!$dbEntry)
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
+
+		if ($entryType && $dbEntry->getType() != $entryType)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_TYPE, $entryId, $dbEntry->getType(), $entryType);
 		}
 	}
 

@@ -840,12 +840,12 @@ class MediaService extends KalturaEntryService
 		$this->validateEntryForReplace($entryId, $dbEntry, KalturaEntryType::MEDIA_CLIP);
 		$this->approveReplace($dbEntry);
 
-		$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entryId, kCurrentContext::getCurrentPartnerId());
+		$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entryId, $dbEntry->getPartnerId());
 		foreach ($childEntries as $childEntry)
 		{
 			if ($childEntry->getId() != $entryId)
 			{
-				$this->validateEntryForReplace($childEntry->getId(), $childEntry, KalturaEntryType::MEDIA_CLIP);
+				$this->validateEntryForReplace($childEntry->getId(), $childEntry);
 				$this->approveReplace($childEntry);
 			}
 		}
@@ -869,12 +869,12 @@ class MediaService extends KalturaEntryService
 		$this->validateEntryForReplace($entryId, $dbEntry, KalturaEntryType::MEDIA_CLIP);
 		$this->cancelReplace($dbEntry);
 
-		$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entryId, kCurrentContext::getCurrentPartnerId());
+		$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entryId, $dbEntry->getPartnerId());
 		foreach ($childEntries as $childEntry)
 		{
 			if ($childEntry->getId() != $entryId)
 			{
-				$this->validateEntryForReplace($childEntry->getId(), $childEntry, KalturaEntryType::MEDIA_CLIP);
+				$this->validateEntryForReplace($childEntry->getId(), $childEntry);
 				$this->cancelReplace($childEntry);
 			}
 		}
