@@ -355,7 +355,7 @@ class KalturaErrors extends APIErrors
 
 	const AGGREGATION_CATEGORY_WRONG_ASSOCIATION = "AGGREGATION_CATEGORY_WRONG_ASSOCIATION;; Cannot create aggregation category association";
 
-	const CATEGORY_NAME_CONTAIN_INVALID_CHARS = "CATEGORY_NAME_CONTAIN_INVALID_CHARS;;Category name contain invalid chars.";
+	const CATEGORY_NAME_CONTAINS_INVALID_CHARS = "CATEGORY_NAME_CONTAINS_INVALID_CHARS;;Category name contains invalid chars.";
 
 	/**
 	 * Batch Service

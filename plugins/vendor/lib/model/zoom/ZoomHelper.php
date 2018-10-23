@@ -341,7 +341,7 @@ class ZoomHelper
 		$tempCategoryFullName = categoryPeer::getParsedFullName($categoryFullName);
 		if(strcmp($tempCategoryFullName,$categoryFullName))
 		{
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_NAME_CONTAIN_INVALID_CHARS);
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_NAME_CONTAINS_INVALID_CHARS);
 		}
 
 		$category = categoryPeer::getByFullNameExactMatch($categoryFullName, null, $partnerId);
