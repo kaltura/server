@@ -15,12 +15,12 @@ class ConferenceService extends KalturaBaseService {
 	 * @action allocateConferenceRoom
 	 * @actionAlias liveStream.allocateConferenceRoom
 	 * @param string $entryId
-	 * @param string $tag
+	 * @param string $env
 	 * @return KalturaRoomDetails
 	 * @throws KalturaAPIException
 	 * @beta
 	 */
-	public function allocateConferenceRoomAction($entryId, $tag = '')
+	public function allocateConferenceRoomAction($entryId, $env = '')
 	{
 		$partner = $this->getPartner();
 
@@ -50,11 +50,11 @@ class ConferenceService extends KalturaBaseService {
 		$liveEntryService = new LiveStreamService();
 		$liveEntryService->dumpApiRequest($entryId);
 		$lockKey = "allocate_conference_room_" . $entryId;
-		$conference = kLock::runLocked($lockKey, array($this, 'allocateConferenceRoomImpl'), array($entryId, $tag));
+		$conference = kLock::runLocked($lockKey, array($this, 'allocateConferenceRoomImpl'), array($entryId, $env));
 		return $conference;
 	}
 
-	public function allocateConferenceRoomImpl($entryId, $tag)
+	public function allocateConferenceRoomImpl($entryId, $env)
 	{
 		//In case until this method is run under lock another process already created the conf room.
 		$existingConfRoom = $this->findExistingConferenceRoom($entryId);
@@ -70,7 +70,7 @@ class ConferenceService extends KalturaBaseService {
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_RTC_STREAMS, $this->getPartnerId(), $maxRTCStreamInputs);
 		}
 		
-		$serverNode = $this->findFreeServerNode($tag, $partner);
+		$serverNode = $this->findFreeServerNode($env, $partner);
 		$confEntryServerNode = new ConferenceEntryServerNode();
 		$confEntryServerNode->setEntryId($entryId);
 		$confEntryServerNode->setServerNodeId($serverNode->getId());
@@ -112,13 +112,13 @@ class ConferenceService extends KalturaBaseService {
 		return null;
 	}
 
-	protected function findFreeServerNode($tag, Partner $partner)
+	protected function findFreeServerNode($env, Partner $partner)
 	{
-		if (empty($tag))
+		if (empty($env))
 		{
-			$tag = $partner->getRTCTag();
+			$env = $partner->getRTCEnv();
 		}
-		$serverNodes = ServerNodePeer::retrieveActiveUnoccupiedServerNodesByType(ConferencePlugin::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER), $tag);
+		$serverNodes = ServerNodePeer::retrieveActiveUnoccupiedServerNodesByType(ConferencePlugin::getCoreValue('serverNodeType',ConferenceServerNodeType::CONFERENCE_SERVER), $env);
 		if (!$serverNodes)
 		{
 			KalturaLog::debug("Could not find avaialable conference server node in pool");
