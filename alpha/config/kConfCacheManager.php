@@ -101,16 +101,7 @@ class kConfCacheManager
 
 	public static function hasMap ($mapName)
 	{
-		self::init();
-
-		foreach (self::$mapLoadFlow as $cacheEntity)
-		{
-			/* @var $cacheObj kBaseConfCache*/
-			$cacheObj = kCacheConfFactory::getInstance($cacheEntity);
-			if($cacheObj->hasMap(null, $mapName))
-					return true;
-		}
-		return false;
+		return !empty(self::load($mapName));
 	}
 
 	static $loadRecursiveLock;
