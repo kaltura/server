@@ -339,7 +339,7 @@ class ZoomHelper
 	{
 		//Validate category full name does not contain spacial chars
 		$tempCategoryFullName = categoryPeer::getParsedFullName($categoryFullName);
-		if(strcmp($tempCategoryFullName,$categoryFullName))
+		if(strcmp($tempCategoryFullName, $categoryFullName))
 		{
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NAME_CONTAINS_INVALID_CHARS);
 		}
