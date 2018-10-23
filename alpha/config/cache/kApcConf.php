@@ -10,10 +10,10 @@ class kApcConf extends kBaseConfCache implements kMapCacheInterface , kKeyCacheI
 
 	public function __construct()
 	{
-		$reloadFile = kEnvironment::get('cache_root_path').'/base.reload';
+		$reloadFile = kEnvironment::get('cache_root_path').'base.reload';
 		$this->apcFunctionsExist = function_exists('apc_fetch');
 		$this->reloadFileExist = file_exists($reloadFile);
-		if($this->isReloadFileExist())
+		if($this->reloadFileExist)
 		{
 			$deleted = @unlink($reloadFile);
 			error_log('Base configuration reloaded');
@@ -24,11 +24,6 @@ class kApcConf extends kBaseConfCache implements kMapCacheInterface , kKeyCacheI
 		parent::__construct();
 	}
 
-	protected function isReloadFileExist()
-	{
-		return $this->reloadFileExist;
-	}
-
 	public function delete($mapName)
 	{
 		if($this->apcFunctionsExist)
@@ -37,7 +32,7 @@ class kApcConf extends kBaseConfCache implements kMapCacheInterface , kKeyCacheI
 
 	public function load($key, $mapName)
 	{
-		if($this->apcFunctionsExist && !$this->isReloadFileExist())
+		if($this->apcFunctionsExist && !$this->reloadFileExist)
 		{
 			$mapStr = apc_fetch($mapName);
 			$map = json_decode($mapStr,true);
@@ -63,7 +58,7 @@ class kApcConf extends kBaseConfCache implements kMapCacheInterface , kKeyCacheI
 
 	public function loadKey()
 	{
-		if($this->apcFunctionsExist && !$this->isReloadFileExist())
+		if($this->apcFunctionsExist && !$this->reloadFileExist)
 			return apc_fetch(kBaseConfCache::CONF_CACHE_VERSION_KEY);
 
 		return null;
