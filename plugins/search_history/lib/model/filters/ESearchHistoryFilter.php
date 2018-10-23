@@ -9,6 +9,7 @@ class ESearchHistoryFilter extends ESearchBaseFilter
 	const DEFAULT_SUGGEST_SIZE = 5;
 	const STARTS_WITH_PAGE_SIZE = 100;
 	const DEFAULT_LIST_SIZE = 500;
+	const MAX_SEARCH_TERM_LENGTH = 64;
 	const SUGGEST_SEARCH_HISTORY = 'suggest_search_history';
 
 	/**
@@ -76,9 +77,14 @@ class ESearchHistoryFilter extends ESearchBaseFilter
 		$pidUidContext = searchHistoryUtils::formatPartnerIdUserIdContext($partnerId, $kuserId, searchHistoryUtils::getSearchContext());
 		$pidUidContextQuery = new kESearchTermQuery(ESearchHistoryFieldName::PID_UID_CONTEXT, $pidUidContext);
 		$boolQuery->addToFilter($pidUidContextQuery);
-		if ($this->getSearchTermStartsWith())
+		$searchTermStartsWith = $this->getSearchTermStartsWith();
+		if ($searchTermStartsWith)
 		{
-			$searchTermStartsWithQuery = new kESearchPrefixQuery(ESearchHistoryFieldName::SEARCH_TERM, elasticSearchUtils::formatSearchTerm($this->getSearchTermStartsWith()));
+			if (strlen($searchTermStartsWith) > self::MAX_SEARCH_TERM_LENGTH)
+			{
+				$searchTermStartsWith = mb_strcut($searchTermStartsWith, 0, self::MAX_SEARCH_TERM_LENGTH, "utf-8");
+			}
+			$searchTermStartsWithQuery = new kESearchPrefixQuery(ESearchHistoryFieldName::SEARCH_TERM, elasticSearchUtils::formatSearchTerm($searchTermStartsWith));
 			$boolQuery->addToFilter($searchTermStartsWithQuery);
 			$pageSize = isset($searchHistoryConfig['completionListSize']) ? $searchHistoryConfig['completionListSize'] : self::STARTS_WITH_PAGE_SIZE;
 		}
