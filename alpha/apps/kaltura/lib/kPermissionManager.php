@@ -768,7 +768,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		{
 		    throw new kCoreException("Partner blocked", kCoreException::PARTNER_BLOCKED);
 		}
-		if($partnerStatus == Partner::PARTNER_STATUS_FULL_BLOCK)
+		if($partnerStatus != Partner::PARTNER_STATUS_ACTIVE)
 		{
 		    throw new kCoreException("Partner fully blocked", kCoreException::PARTNER_BLOCKED);
 		}
