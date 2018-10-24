@@ -18,7 +18,7 @@ $mapName = 'kRemoteMemCacheConf';
 $map=array(host=>$host,port=>$port);
 
 $cache = new kInfraMemcacheCacheWrapper;
-if(!$cache->init(array('host'=>$map['host'],'port'=>$map['port'])))
+if(!$cache->init(array('host'=>$map['host'], 'port'=>$map['port'])))
 	die ("Fail to connect to cache host {$map['host']} port {$map['port']} ");
 $mapListInCache = $cache->get(kRemoteMemCacheConf::MAP_LIST_KEY);
 
