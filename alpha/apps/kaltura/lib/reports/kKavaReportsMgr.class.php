@@ -4090,6 +4090,7 @@ class kKavaReportsMgr extends kKavaBase
 			reportsInputFilter $input_filter,
 			$page_size, $page_index, $order_by, $object_ids = null, $flags = 0)
 	{
+		$interval = $input_filter->interval;
 		// use interval=all, only relevant if the join includes graphs
 		$input_filter->interval = self::INTERVAL_ALL;
 		
@@ -4241,7 +4242,8 @@ class kKavaReportsMgr extends kKavaBase
 				array_fill(0, count($report_def[self::REPORT_DIMENSION_HEADERS]), $cur_id),
 				$row);
 		}
-		
+
+		$input_filter->interval = $interval;
 		return array($headers, $data, $total_count);
 	}
 
@@ -4557,6 +4559,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function getTotalImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids = null)
 	{
+		$interval = $input_filter->interval;
 		if (isset($report_def[self::REPORT_TOTAL_FROM_TABLE_FUNC]))
 		{
 			$input_filter->interval = self::INTERVAL_ALL;
@@ -4578,6 +4581,7 @@ class kKavaReportsMgr extends kKavaBase
 			$result = self::getSimpleTotalImpl($partner_id, $report_def, $input_filter, $object_ids);
 		}
 
+		$input_filter->interval = $interval;
 		return $result;
 	}
 	
@@ -4842,7 +4846,11 @@ class kKavaReportsMgr extends kKavaBase
 
 		$arr = array();
 
-		if (!in_array($report_type, myReportsMgr::$reports_without_graph))
+		list ($headers_for_total ,$headers_for_table) = explode ( ";" , $headers );
+
+		$report_def = self::getReportDef($report_type);
+
+		if (isset($report_def[self::REPORT_JOIN_REPORTS]) || isset($report_def[self::REPORT_JOIN_GRAPHS]) || isset($report_def[self::REPORT_GRAPH_METRICS]))
 		{
 			$arr = self::getGraph(
 				$partner_id,
@@ -4852,7 +4860,7 @@ class kKavaReportsMgr extends kKavaBase
 				$object_ids);
 		}
 
-		if (!in_array($report_type, myReportsMgr::$reports_without_totals))
+		if (!empty($headers_for_total))
 			list($total_header, $total_data) = self::getTotal(
 				$partner_id,
 				$report_type,
@@ -4864,17 +4872,17 @@ class kKavaReportsMgr extends kKavaBase
 			throw new kCoreException('Exceeded max query size: ' . self::MAX_CSV_RESULT_SIZE, kCoreException::SEARCH_TOO_GENERAL);
 		}
 
-		if (!in_array($report_type, myReportsMgr::$reports_without_table))
+		if (!empty($headers_for_table))
 		{
 			list($table_header, $table_data, $table_total_count) = self::getTable(
 				$partner_id,
 				$report_type,
 				$input_filter,
-				$page_size, 
+				$page_size,
 				$page_index,
-				$order_by, 
-				$object_ids, 
-				null, 
+				$order_by,
+				$object_ids,
+				null,
 				true);
 
 			self::adjustCsvTableUnits($headers, $table_header, $table_data);
