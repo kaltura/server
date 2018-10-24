@@ -1,7 +1,7 @@
 <?php
 
 if($argc != 5)
-	die ("Usage : $argv[0] <db user name> <db password> <cahce host> <cache port> \n");
+	die ("Usage : $argv[0] <db user name> <db password> <cache host> <cache port> \n");
 
 chdir(__DIR__.'/../');
 require_once(__DIR__ . '/../bootstrap.php');
