@@ -14,7 +14,7 @@ $cacheList = explode(',',$argv[2]);
 $cacheObjects = array();
 foreach ($cacheList as $cacheItem)
 {
-	$cacheObject = new kInfraMemcacheCacheWrapper;
+	$cacheObject = new kInfraMemcacheCacheWrapper();
 	$ret = $cacheObject->init(array('host'=>$cacheItem ,'port'=>$port));
 	if(!$ret)
 		die ("Fail to connect to cache host {$cacheItem} port {$port} ");
