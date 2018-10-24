@@ -254,8 +254,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setCatalogItemId($vendorCatalogItem->getId());
 		$entryVendorTask->setReachProfileId($reachProfile->getId());
 		$entryVendorTask->setPartnerId($entry->getPartnerId());
-		$entryVendorTask->setKuserId(kCurrentContext::getCurrentKsKuserId());
-		$entryVendorTask->setUserId(kCurrentContext::$ks_uid);
+		$entryVendorTask->setKuserId(self::getTaskKuserId($entry));
+		$entryVendorTask->setUserId(self::getTaskPuserId($entry));
 		$entryVendorTask->setVendorPartnerId($vendorCatalogItem->getVendorPartnerId());
 		$entryVendorTask->setVersion($version);
 		$entryVendorTask->setQueueTime(null);
@@ -282,6 +282,30 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		$entryVendorTask->setStatus($status);
 		return $entryVendorTask;
+	}
+	
+	private static function getTaskKuserId(entry $entry)
+	{
+		//For automatic dispatched tasks make sure to set the entry creator user as the task owner
+		$kuserId = kCurrentContext::getCurrentKsKuserId();
+		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
+		{
+			$kuserId = $entry->getKuserId();
+		}
+		
+		return $kuserId;
+	}
+	
+	//For automatic dispatched tasks make sure to set the entry creator user as the task owner
+	private static function getTaskPuserId(entry $entry)
+	{
+		$puserId = kCurrentContext::$ks_uid;
+		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
+		{
+			$puserId = $entry->getPuserId();
+		}
+		
+		return $puserId;
 	}
 
 	private function checkAutomaticRules($object, $checkEmptyRulesOnly = false)
