@@ -30,6 +30,8 @@ class kConfCacheManager
 	private static $init=false;
 
 	const KEY_TTL=30;
+	const LONG_KEY_TTL=300;
+
 
 	protected static function initLoad($cacheName)
 	{
@@ -87,7 +89,7 @@ class kConfCacheManager
 	protected static function storeKey($key, $foundIn)
 	{
 		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
-		$ttl=0;
+		$ttl=self::LONG_KEY_TTL;
 		if($remoteCache->isActive())
 		{
 			$ttl=self::KEY_TTL;
@@ -101,7 +103,8 @@ class kConfCacheManager
 
 	public static function hasMap ($mapName)
 	{
-		return !empty(self::load($mapName));
+		$map = self::load($mapName);
+		return !empty($map);
 	}
 
 	static $loadRecursiveLock;

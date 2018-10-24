@@ -1,7 +1,7 @@
 <?php
 
-if($argc != 3)
-	die ("Usage : $argv[0] <db user name> <db password>\n");
+if($argc != 5)
+	die ("Usage : $argv[0] <db user name> <db password> <cache host> <cache port> \n");
 
 chdir(__DIR__.'/../');
 require_once(__DIR__ . '/../bootstrap.php');
@@ -9,17 +9,16 @@ require_once __DIR__ . '/../../config/cache/kRemoteMemCacheConf.php';
 
 $dbUserName = $argv[1];
 $dbPasssword = $argv[2];
+$host = $argv[3];
+$port = $argv[4];
+
 
 //get map list from cache
 $mapName = 'kRemoteMemCacheConf';
-$map=kConfCacheManager::getMap($mapName);
-if(!$map)
-{
-	die("\n Map $mapName was not found in configuration directory");
-}
+$map=array(host=>$host,port=>$port);
 
 $cache = new kInfraMemcacheCacheWrapper;
-if(!$cache->init(array('host'=>$map['host'],'port'=>$map['port'])))
+if(!$cache->init(array('host'=>$map['host'], 'port'=>$map['port'])))
 	die ("Fail to connect to cache host {$map['host']} port {$map['port']} ");
 $mapListInCache = $cache->get(kRemoteMemCacheConf::MAP_LIST_KEY);
 
