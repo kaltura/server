@@ -284,9 +284,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return $entryVendorTask;
 	}
 	
-	private static function getTaskKuserId(entry $entry)
+	//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
+	protected static function getTaskKuserId(entry $entry)
 	{
-		//For automatic dispatched tasks make sure to set the entry creator user as the task owner
 		$kuserId = kCurrentContext::getCurrentKsKuserId();
 		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
 		{
@@ -296,8 +296,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return $kuserId;
 	}
 	
-	//For automatic dispatched tasks make sure to set the entry creator user as the task owner
-	private static function getTaskPuserId(entry $entry)
+	//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
+	protected static function getTaskPuserId(entry $entry)
 	{
 		$puserId = kCurrentContext::$ks_uid;
 		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
