@@ -4,6 +4,7 @@ class kBaseConfCache
 	const CONF_CACHE_VERSION_KEY = 'CONF_CACHE_VERSION_KEY';
 	const CONF_CACHE_KEY = 'CONF_CACHE_KEY';
 	const CONF_CACHE_KEY_PREFIX = 'CONF-';
+	const CONF_MAP_PREFIX = 'CONF-MAP-';
 
 	protected $usageCounter;
 	protected $cacheMissCounter;

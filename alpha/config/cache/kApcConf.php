@@ -27,14 +27,14 @@ class kApcConf extends kBaseConfCache implements kMapCacheInterface , kKeyCacheI
 	public function delete($mapName)
 	{
 		if($this->apcFunctionsExist)
-			return apc_delete($mapName);
+			return apc_delete(self::CONF_MAP_PREFIX.$mapName);
 	}
 
 	public function load($key, $mapName)
 	{
 		if($this->apcFunctionsExist && !$this->reloadFileExist)
 		{
-			$mapStr = apc_fetch($mapName);
+			$mapStr = apc_fetch(self::CONF_MAP_PREFIX.$mapName);
 			$map = json_decode($mapStr,true);
 			if ($map && $this->validateMap($map, $mapName, $key))
 			{
@@ -51,7 +51,7 @@ class kApcConf extends kBaseConfCache implements kMapCacheInterface , kKeyCacheI
 		{
 			$this->addKeyToMap($map, $mapName, $key);
 			$mapStr = json_encode($map);
-			return apc_store($mapName, $mapStr, $ttl);
+			return apc_store(self::CONF_MAP_PREFIX.$mapName, $mapStr, $ttl);
 		}
 		return false;
 	}
