@@ -11,16 +11,16 @@ class kSessionConf extends kBaseConfCache implements kMapCacheInterface , kKeyCa
 
 	public function load($key, $mapName)
 	{
-		if(isset(self::$map[$mapName]))
-			return self::$map[$mapName];
+		if(isset(self::$map[self::CONF_MAP_PREFIX.$mapName]))
+			return self::$map[self::CONF_MAP_PREFIX.$mapName];
 		return false;
 	}
 
-	public function hasMap($key, $mapName) { return isset(self::$map[$mapName]); }
+	public function hasMap($key, $mapName) { return isset(self::$map[self::CONF_MAP_PREFIX.$mapName]); }
 
-	public function store($key, $mapName, $map, $ttl=0) { self::$map[$mapName] = $map; }
+	public function store($key, $mapName, $map, $ttl=0) { self::$map[self::CONF_MAP_PREFIX.$mapName] = $map; }
 
-	public function deleteMap($key, $mapName) { unset(self::$map[$mapName]); }
+	public function deleteMap($key, $mapName) { unset(self::$map[self::CONF_MAP_PREFIX.$mapName]); }
 
 	public function loadKey() { return self::$cacheKey; }
 
