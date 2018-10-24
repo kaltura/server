@@ -8,16 +8,16 @@ require_once(__DIR__ . '/../bootstrap.php');
 require_once __DIR__ . '/../../config/cache/kRemoteMemCacheConf.php';
 
 $port = $argv[1];
-$cacheList = explode(',',$argv[2]);
+$cacheHostList = explode(',',$argv[2]);
 
 //Init all cache items
 $cacheObjects = array();
-foreach ($cacheList as $cacheItem)
+foreach ($cacheHostList as $cacheHost)
 {
 	$cacheObject = new kInfraMemcacheCacheWrapper();
-	$ret = $cacheObject->init(array('host'=>$cacheItem ,'port'=>$port));
+	$ret = $cacheObject->init(array('host'=>$cacheHost ,'port'=>$port));
 	if(!$ret)
-		die ("Fail to connect to cache host {$cacheItem} port {$port} ");
+		die ("Failed to connect to cache host {$cacheHost} port {$port} ");
 	$cacheObjects[] = $cacheObject;
 }
 
@@ -71,7 +71,7 @@ foreach ($cacheObjects as $cacheObject)
 {
 	$ret = $cacheObject->set(kBaseConfCache::CONF_CACHE_VERSION_KEY, $chacheKey);
 	if(!$ret)
-		("\nFailed inserting key to cache\n");
+		die ("\nFailed inserting key to cache\n");
 	print_r($cacheObject);
 	echo("\nKey - {$chacheKey} was added to cache successfully\n");
 }
