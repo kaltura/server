@@ -242,7 +242,8 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		
 		$srcSyncKey = $syncable->getSyncKey($resource->getObjectSubType(), $resource->getVersion());
-		$dbAsset = $this->attachFileSync($srcSyncKey, $dbEntry, $dbAsset, $syncable->getEncryptionKey());
+		$encryptionKey = method_exists($syncable, 'getEncryptionKey') ? $syncable->getEncryptionKey() : null;
+		$dbAsset = $this->attachFileSync($srcSyncKey, $dbEntry, $dbAsset, $encryptionKey);
 		
 		//In case the target entry's media type is image no asset is created and the image is set on a entry level file sync
 		if(!$dbAsset && $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
