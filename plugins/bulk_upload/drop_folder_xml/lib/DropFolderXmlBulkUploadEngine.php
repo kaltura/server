@@ -44,7 +44,10 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 		list($this->xmlDropFolderFile, $this->dropFolder) = KBatchBase::$kClient->doMultiRequest();
 				
 		$this->fileTransferMgr = KDropFolderFileTransferEngine::getFileTransferManager($this->dropFolder);
-		$this->data->filePath = $this->getLocalFilePath($this->xmlDropFolderFile->fileName, $this->xmlDropFolderFile->id);
+		if(!$this->data->filePath)
+		{
+			$this->data->filePath = $this->getLocalFilePath($this->xmlDropFolderFile->fileName, $this->xmlDropFolderFile->id);
+		}
 		
 		KBatchBase::unimpersonate();
 	}
