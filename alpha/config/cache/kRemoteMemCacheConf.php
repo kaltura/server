@@ -49,7 +49,7 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 					{
 						if ($hostPattern && $hostname != $hostPattern && $hostPattern !== '#')
 						{
-							$hostPattern = str_replace('#', '*', $hostPattern);
+							$hostPattern = str_replace('#', '.*', $hostPattern);
 							if(!preg_match('/' . $hostPattern . '/', $hostname))
 								continue;
 						}
