@@ -54,7 +54,7 @@ foreach($mapsInfo as $mapInfo)
 	$mapListInCache[$mapName]=$version;//set version
 	foreach ($cacheObjects as $cacheObject)
 	{
-		$cacheObject->set($mapName,$content);
+		$cacheObject->set(kBaseConfCache::CONF_MAP_PREFIX.$mapName,$content);
 	}
 }
 

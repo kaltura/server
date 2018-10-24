@@ -71,7 +71,7 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 		}
 		foreach ($mapNames as $mapName)
 		{
-			$map = $cache->get($mapName);
+			$map = $cache->get(self::CONF_MAP_PREFIX.$mapName);
 			if($map)
 			{
 				$map = json_decode($map,true);
