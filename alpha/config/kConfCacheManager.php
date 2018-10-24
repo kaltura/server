@@ -44,6 +44,7 @@ class kConfCacheManager
 			{
 				self::store(null, $cacheName, $map, $cacheEntity);
 				kCacheConfFactory::getInstance($cacheName);
+				return;
 			}
 		}
 	}
