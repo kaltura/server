@@ -4846,7 +4846,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		$arr = array();
 
-		list ($headers_for_total, $headers_for_table) = explode (';', $headers);
+		list($headers_for_total, $headers_for_table) = explode(';', $headers);
 
 		$report_def = self::getReportDef($report_type);
 
