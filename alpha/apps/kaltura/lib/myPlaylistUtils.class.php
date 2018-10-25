@@ -247,7 +247,7 @@ class myPlaylistUtils
 		
 		if ( $playlist->getType() != entryType::PLAYLIST )
 		{
-			$exceptionData = array('playlistId' => $playlist_id, 'wrongType' => $playlist->getType(), 'rightType' => entryType::PLAYLIST);
+			$exceptionData = array('playlistId' => $playlist_id, 'wrongType' => $playlist->getType(), 'correctType' => entryType::PLAYLIST);
 			throw new kCoreException("Invalid entry type [$playlist_id]", APIErrors::INVALID_ENTRY_TYPE, $exceptionData);
 		}
 		
