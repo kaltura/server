@@ -4560,15 +4560,15 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function getTotalImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids = null)
 	{
 		$interval = $input_filter->interval;
-		if (isset($report_def[self::REPORT_TOTAL_FROM_TABLE_FUNC]))
+        	$input_filter->interval = self::INTERVAL_ALL;
+
+        	if (isset($report_def[self::REPORT_TOTAL_FROM_TABLE_FUNC]))
 		{
-			$input_filter->interval = self::INTERVAL_ALL;
 			$table = self::getTableImpl($partner_id, $report_def, $input_filter, self::MAX_RESULT_SIZE, 1, null, $object_ids);
 			$result = call_user_func($report_def[self::REPORT_TOTAL_FROM_TABLE_FUNC], $table);
 		}
 		else if (!isset($report_def[self::REPORT_DIMENSION]) || isset($report_def[self::REPORT_JOIN_GRAPHS]))
 		{
-			$input_filter->interval = self::INTERVAL_ALL;
 			$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
 			$result = array(array_keys($result), array_values($result));
 		}
@@ -4846,7 +4846,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		$arr = array();
 
-		list ($headers_for_total ,$headers_for_table) = explode ( ";" , $headers );
+		list ($headers_for_total, $headers_for_table) = explode (';', $headers);
 
 		$report_def = self::getReportDef($report_type);
 
