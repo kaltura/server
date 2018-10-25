@@ -60,6 +60,7 @@ class thumbnailAction extends sfAction
 		$widget_id = $this->getRequestParameter("widget_id", 0);
 		$upload_token_id = $this->getRequestParameter("upload_token_id");
 		$version = $this->getIntRequestParameter("version", null, 0, 10000000);
+		$version = $version < 1 ? null : $version;
 		$type = $this->getIntRequestParameter("type", 1, 1, 5);
 		//Hack: if KMS sends thumbnail request containing "!" char, the type should be treated as 5.
 		
@@ -360,7 +361,7 @@ class thumbnailAction extends sfAction
 		
 		$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
 		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
-			$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA;
+			$subType = $entry->getThumbnailOrDataSubType($version);
 			
 		$dataKey = $entry->getSyncKey($subType);
 		list ( $file_sync , $local ) = kFileSyncUtils::getReadyFileSyncForKey( $dataKey ,true , false );

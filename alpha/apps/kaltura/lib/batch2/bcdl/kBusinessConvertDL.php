@@ -300,15 +300,15 @@ class kBusinessConvertDL
 			$thumbAsset->addTags(array(thumbParams::TAG_DEFAULT_THUMB));
 			$thumbAsset->save();
 			KalturaLog::info("Setting entry [". $thumbAsset->getEntryId() ."] default ThumbAsset to [". $thumbAsset->getId() ."]");
+
+			$entry->setThumbnail(".jpg");
+			$entry->setCreateThumb(false, $thumbAsset);
+			$entry->save();
+
+			$thumbSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $thumbSyncKey);
 		}
-
-		$entry->setThumbnail(".jpg");
-		$entry->setCreateThumb(false, $thumbAsset);
-		$entry->save();
-
-		$thumbSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-		kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $thumbSyncKey);
 	}
 
 	public static function parseFlavorDescription(flavorParamsOutputWrap $flavor)
