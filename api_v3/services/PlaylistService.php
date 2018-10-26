@@ -72,7 +72,7 @@ class PlaylistService extends KalturaEntryService
 		}
 		try
 		{
-			myPlaylistUtils::validatePlaylist( $dbPlaylist );
+			myPlaylistUtils::validatePlaylist($dbPlaylist);
 		}
 		catch (Exception $e)
 		{
@@ -180,7 +180,18 @@ class PlaylistService extends KalturaEntryService
 		if(!is_null($playlistUpdate->getDataContent(true)) && $playlistUpdate->getDataContent(true) != $dbPlaylist->getDataContent())
 		{
 			$dbPlaylist->setDataContent ( $playlistUpdate->getDataContent(true)  );
-			myPlaylistUtils::validatePlaylist( $dbPlaylist );
+			if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
+			{
+				myPlaylistUtils::setIsAdminKs(true);
+			}
+			try
+			{
+				myPlaylistUtils::validatePlaylist($dbPlaylist);
+			}
+			catch (Exception $e)
+			{
+				throw new KalturaAPIException($e->getMessage(), "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
+			}
 		}
 		
 		if ( $updateStats )
@@ -203,8 +214,23 @@ class PlaylistService extends KalturaEntryService
 	 * @throws APIErrors::INVALID_PLAYLIST_TYPE
 	 * @validateUser entry id edit
 	 */
-	function deleteAction(  $id )
+	function deleteAction($id)
 	{
+		if (!kPermissionManager::isPermitted(PermissionName::PLAYLIST_DELETE) &&
+			($this->getKs() && is_object($this->getKs()) && !$this->getKs()->isAdmin()))
+		{
+			$entry = entryPeer::retrieveByPK($id);
+			if(!$entry)
+			{
+				throw new Exception ('Invalid entry ID ' . $id);
+			}
+			if($entry->getMediaType() != KalturaPlaylistType::STATIC_LIST)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
+			}
+			myPlaylistUtils::isEntryAllowed ($id);
+		}
+
 		$this->deleteEntry($id, KalturaEntryType::PLAYLIST);
 	}
 	
