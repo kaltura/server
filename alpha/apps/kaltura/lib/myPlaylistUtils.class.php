@@ -49,9 +49,20 @@ class myPlaylistUtils
 			{
 				// TODO - hack for removing 'null' from the entry id due to a bug on the client's side
 				$trimmed = preg_replace ( "/null/" , "" , trim ( $entry_id ) );
-				if ( $trimmed ) { $fixed_playlist[] = $trimmed; }
+				if ($trimmed)
+				{
+					$fixed_playlist[] = $trimmed;
+					if (!self::$isAdminKs && !kPermissionManager::isPermitted(PermissionName::PLAYLIST_ADD))
+					{
+						$entry = entryPeer::retrieveByPK($trimmed);
+						if(!$entry || !kEntitlementUtils::isEntryEntitled($entry))
+						{
+							throw new Exception ('Invalid entry ID in playlist ' . $trimmed);
+						}
+					}
+				}
 			}
-		
+
 			$fixed_playlist_str = implode ( "," , $fixed_playlist );
 			$playlist->setDataContent( $fixed_playlist_str , false ); // don't increment the version after fixing the data
 		}
