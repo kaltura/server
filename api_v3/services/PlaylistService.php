@@ -66,19 +66,7 @@ class PlaylistService extends KalturaEntryService
 		$dbPlaylist->setKshowId ( null ); // this is brave !!
 		$dbPlaylist->setType ( entryType::PLAYLIST );
 
-		if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
-		{
-			myPlaylistUtils::setIsAdminKs(true);
-		}
-		try
-		{
-			myPlaylistUtils::validatePlaylist($dbPlaylist);
-		}
-		catch (Exception $e)
-		{
-			throw new KalturaAPIException($e->getMessage(), "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
-		}
-
+		$this->validatePlaylist($dbPlaylist);
 		
 		$dbPlaylist->save();
 		
@@ -180,18 +168,7 @@ class PlaylistService extends KalturaEntryService
 		if(!is_null($playlistUpdate->getDataContent(true)) && $playlistUpdate->getDataContent(true) != $dbPlaylist->getDataContent())
 		{
 			$dbPlaylist->setDataContent ( $playlistUpdate->getDataContent(true)  );
-			if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
-			{
-				myPlaylistUtils::setIsAdminKs(true);
-			}
-			try
-			{
-				myPlaylistUtils::validatePlaylist($dbPlaylist);
-			}
-			catch (Exception $e)
-			{
-				throw new KalturaAPIException($e->getMessage(), "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
-			}
+		$this->validatePlaylist($dbPlaylist);
 		}
 		
 		if ( $updateStats )
@@ -201,6 +178,22 @@ class PlaylistService extends KalturaEntryService
 		$playlist->fromObject($dbPlaylist, $this->getResponseProfile());
 		
 		return $playlist;
+	}
+
+	protected function validatePlaylist($dbPlaylist)
+	{
+		if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
+		{
+			myPlaylistUtils::setIsAdminKs(true);
+		}
+		try
+		{
+			myPlaylistUtils::validatePlaylist($dbPlaylist);
+		}
+		catch (Exception $e)
+		{
+			throw new KalturaAPIException($e->getMessage(), "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
+		}
 	}
 		
 
