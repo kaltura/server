@@ -55,9 +55,20 @@ class myPlaylistUtils
 					if (!self::$isAdminKs && !kPermissionManager::isPermitted(PermissionName::PLAYLIST_ADD))
 					{
 						$entry = entryPeer::retrieveByPK($trimmed);
-						if(!$entry || !kEntitlementUtils::isEntryEntitled($entry))
+						if(!$entry)
 						{
 							throw new Exception ('Invalid entry ID in playlist ' . $trimmed);
+						}
+						if (!kEntitlementUtils::getEntitlementEnforcement())
+						{
+							if(!kEntitlementUtils::isPlaylistEntitledForUser($entry))
+							{
+								throw new Exception ('Entitlements disabled and user is not allowed for entry ID ' . $trimmed);
+							}
+						}
+						elseif (!kEntitlementUtils::isEntryEntitled($entry))
+						{
+							throw new Exception ('Entitlements enabled and user is not allowed for entry ID ' . $trimmed);
 						}
 					}
 				}
