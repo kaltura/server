@@ -572,25 +572,20 @@ class kEntitlementUtils
 		return $dbEntry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
 	}
 
-	public static function checkUserRelationToEntry($entry, $kuserId = null)
+	public static function validateUserPublishAndEditEntitlements($entry, $kuserId = null)
 	{
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		$kuserId = self::getKuserIdForEntitlement($kuserId, $ks);
 
-		if($ks && $kuserId)
+		if($entry->isEntitledKuserEdit($kuserId) || $entry->isEntitledKuserPublish($kuserId))
 		{
-			$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuserId);
-			$kgroupIds[] = $kuserId;
-
-			foreach ($kgroupIds as $id)
-			{
-				if ($id != '' && ($entry->getKuserId() == $id || $entry->isEntitledKuserPublish($id)))
-				{
-					KalturaLog::info('Entry ['.print_r($entry->getId(), true).'] entitled: ks user or associated user group is the same as entry kuserId/creatorKuserId/entitledKusersPublish ['.$id.']');
-					return true;
-				}
-			}
+			KalturaLog::info('Entry ['.print_r($entry->getId(), true).'] entitled: user or associated user group allowed: ['.$kuserId.']');
+			return true;
 		}
+
 		return false;
 	}
+
+
+
 }

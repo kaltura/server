@@ -52,10 +52,7 @@ class myPlaylistUtils
 				if ($trimmed)
 				{
 					$fixed_playlist[] = $trimmed;
-					if (!self::$isAdminKs && !kPermissionManager::isPermitted(PermissionName::PLAYLIST_ADD))
-					{
-						self::isEntryAllowed ($trimmed);
-					}
+					self::validatePlaylistInnerEntry($trimmed);
 				}
 			}
 
@@ -82,19 +79,17 @@ class myPlaylistUtils
 		
 	}
 
-	public static function isEntryAllowed ($entryId)
+	public static function validatePlaylistInnerEntry ($entryId)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
 		if(!$entry)
 		{
-			throw new Exception ('Invalid entry ID ' . $entryId);
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
 		}
-		if (!kEntitlementUtils::getEntitlementEnforcement())
+		//Entitlements disabled and user and his groups donr have edit/publish/owner permissions
+		if (!self::$isAdminKs && !kEntitlementUtils::getEntitlementEnforcement() && !kEntitlementUtils::validateUserPublishAndEditEntitlements($entry, null))
 		{
-			if(!kEntitlementUtils::checkUserRelationToEntry($entry))
-			{
-				throw new Exception ('User is not allowed for entry ID ' . $entryId);
-			}
+				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
 		}
 	}
 

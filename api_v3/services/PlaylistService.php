@@ -66,8 +66,12 @@ class PlaylistService extends KalturaEntryService
 		$dbPlaylist->setKshowId ( null ); // this is brave !!
 		$dbPlaylist->setType ( entryType::PLAYLIST );
 
-		$this->validatePlaylist($dbPlaylist);
-		
+		if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
+		{
+			myPlaylistUtils::setIsAdminKs(true);
+		}
+		myPlaylistUtils::validatePlaylist($dbPlaylist);
+
 		$dbPlaylist->save();
 		
 		if ( $updateStats )
@@ -171,7 +175,11 @@ class PlaylistService extends KalturaEntryService
 			{
 				$dbPlaylist->setDataContent ($playlistUpdate->getDataContent(true));
 			}
-			$this->validatePlaylist($dbPlaylist);
+			if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
+			{
+				myPlaylistUtils::setIsAdminKs(true);
+			}
+			myPlaylistUtils::validatePlaylist($dbPlaylist);
 		}
 		
 		if ( $updateStats )
@@ -183,21 +191,7 @@ class PlaylistService extends KalturaEntryService
 		return $playlist;
 	}
 
-	protected function validatePlaylist($dbPlaylist)
-	{
-		if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
-		{
-			myPlaylistUtils::setIsAdminKs(true);
-		}
-		try
-		{
-			myPlaylistUtils::validatePlaylist($dbPlaylist);
-		}
-		catch (Exception $e)
-		{
-			throw new KalturaAPIException($e->getMessage(), "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
-		}
-	}
+
 		
 
 	/**
@@ -212,19 +206,13 @@ class PlaylistService extends KalturaEntryService
 	 */
 	function deleteAction($id)
 	{
-		if (!kPermissionManager::isPermitted(PermissionName::PLAYLIST_DELETE) &&
-			($this->getKs() && is_object($this->getKs()) && !$this->getKs()->isAdmin()))
+		if (!kPermissionManager::isPermitted(PermissionName::PLAYLIST_DELETE))
 		{
 			$entry = entryPeer::retrieveByPK($id);
-			if(!$entry)
+			if(!$entry || $entry->getMediaType() != KalturaPlaylistType::STATIC_LIST)
 			{
-				throw new Exception ('Invalid entry ID ' . $id);
+				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_MEDIA_TYPE, $id, $entry->getMediaType(), KalturaPlaylistType::STATIC_LIST);
 			}
-			if($entry->getMediaType() != KalturaPlaylistType::STATIC_LIST)
-			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "delete non-static playlist is not allowed for user ks", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
-			}
-			myPlaylistUtils::isEntryAllowed ($id);
 		}
 
 		$this->deleteEntry($id, KalturaEntryType::PLAYLIST);
