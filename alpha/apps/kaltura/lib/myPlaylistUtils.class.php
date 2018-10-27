@@ -91,9 +91,9 @@ class myPlaylistUtils
 		}
 		if (!kEntitlementUtils::getEntitlementEnforcement())
 		{
-			if(!kEntitlementUtils::isPlaylistEntitledForUser($entry))
+			if(!kEntitlementUtils::checkUserRelationToEntry($entry))
 			{
-				throw new Exception ('Entitlements disabled and user is not allowed for entry ID ' . $entryId);
+				throw new Exception ('User is not allowed for entry ID ' . $entryId);
 			}
 		}
 	}

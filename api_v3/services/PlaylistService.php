@@ -55,7 +55,7 @@ class PlaylistService extends KalturaEntryService
 	function addAction( KalturaPlaylist $playlist , $updateStats = false)
 	{
 		$dbPlaylist = $playlist->toInsertableObject();
-		
+
 		$this->checkAndSetValidUserInsert($playlist, $dbPlaylist);
 		$this->checkAdminOnlyInsertProperties($playlist);
 		$this->validateAccessControlId($playlist);
@@ -165,10 +165,13 @@ class PlaylistService extends KalturaEntryService
 		// copy properties from the playlistUpdate to the $dbPlaylist
 		baseObjectUtils::autoFillObjectFromObject ( $playlistUpdate , $dbPlaylist , $allowEmpty );
 		// after filling the $dbPlaylist from  $playlist - make sure the data content is set properly
-		if(!is_null($playlistUpdate->getDataContent(true)) && $playlistUpdate->getDataContent(true) != $dbPlaylist->getDataContent())
+		if(!is_null($playlistUpdate->getDataContent(true)))
 		{
-			$dbPlaylist->setDataContent ( $playlistUpdate->getDataContent(true)  );
-		$this->validatePlaylist($dbPlaylist);
+			if($playlistUpdate->getDataContent(true) != $dbPlaylist->getDataContent())
+			{
+				$dbPlaylist->setDataContent ($playlistUpdate->getDataContent(true));
+			}
+			$this->validatePlaylist($dbPlaylist);
 		}
 		
 		if ( $updateStats )
@@ -219,7 +222,7 @@ class PlaylistService extends KalturaEntryService
 			}
 			if($entry->getMediaType() != KalturaPlaylistType::STATIC_LIST)
 			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
+				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "delete non-static playlist is not allowed for user ks", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
 			}
 			myPlaylistUtils::isEntryAllowed ($id);
 		}

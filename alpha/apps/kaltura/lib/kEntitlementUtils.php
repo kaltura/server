@@ -572,7 +572,7 @@ class kEntitlementUtils
 		return $dbEntry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
 	}
 
-	public static function isPlaylistEntitledForUser(entry $entry, $kuserId = null)
+	public static function checkUserRelationToEntry($entry, $kuserId = null)
 	{
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		$kuserId = self::getKuserIdForEntitlement($kuserId, $ks);
@@ -583,10 +583,12 @@ class kEntitlementUtils
 			$kgroupIds[] = $kuserId;
 
 			foreach ($kgroupIds as $id)
-			if ($id != '' && ($entry->getKuserId() == $id || $entry->isEntitledKuserPublish($id)))
 			{
-				KalturaLog::info('Entry ['.print_r($entry->getId(), true).'] entitled: ks user or associated user group is the same as entry kuserId/creatorKuserId/entitledKusersPublish ['.$id.']');
-				return true;
+				if ($id != '' && ($entry->getKuserId() == $id || $entry->isEntitledKuserPublish($id)))
+				{
+					KalturaLog::info('Entry ['.print_r($entry->getId(), true).'] entitled: ks user or associated user group is the same as entry kuserId/creatorKuserId/entitledKusersPublish ['.$id.']');
+					return true;
+				}
 			}
 		}
 		return false;
