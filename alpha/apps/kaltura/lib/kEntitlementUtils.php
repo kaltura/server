@@ -571,5 +571,4 @@ class kEntitlementUtils
 
 		return $dbEntry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
 	}
-
 }

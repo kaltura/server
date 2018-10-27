@@ -372,7 +372,7 @@ class BaseEntryService extends KalturaEntryService
 	 */
 	function updateAction($entryId, KalturaBaseEntry $baseEntry)
 	{
-    	$dbEntry = entryPeer::retrieveByPK($entryId);
+		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
@@ -383,7 +383,7 @@ class BaseEntryService extends KalturaEntryService
 		}
 
 		$baseEntry = $this->updateEntry($entryId, $baseEntry);
-    	return $baseEntry;
+		return $baseEntry;
 	}
 	
 	/**
