@@ -86,10 +86,10 @@ class myPlaylistUtils
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
 		}
-		//Entitlements disabled and user and his groups donr have edit/publish/owner permissions
+		//Entitlements disabled and user or his groups dont have edit/publish/owner permissions
 		if (!self::$isAdminKs && !kEntitlementUtils::getEntitlementEnforcement() && !kEntitlementUtils::validateUserPublishAndEditEntitlements($entry, null))
 		{
-				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
 		}
 	}
 
