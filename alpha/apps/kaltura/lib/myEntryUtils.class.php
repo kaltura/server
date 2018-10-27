@@ -2242,4 +2242,16 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$url .= self::MP4_FILENAME_PARAMETER;
 		return $url;
 	}
+
+	public static function verifyEntryType($entry)
+	{
+		$blockedTypes = array('KalturaPlaylist');
+		foreach ($blockedTypes as $type)
+		{
+			if ($entry instanceof $type)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, $type);
+			}
+		}
+	}
 }
