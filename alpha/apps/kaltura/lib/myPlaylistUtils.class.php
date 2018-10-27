@@ -87,7 +87,8 @@ class myPlaylistUtils
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
 		}
 		//Entitlements disabled and user or his groups dont have edit/publish/owner permissions
-		if (!self::$isAdminKs && !kEntitlementUtils::getEntitlementEnforcement() && !kEntitlementUtils::validateUserPublishAndEditEntitlements($entry, null))
+		if (!kCurrentContext::$is_admin_session && !kPermissionManager::isPermitted(PermissionName::PLAYLIST_ADD)
+			&& !kEntitlementUtils::getEntitlementEnforcement() && !self::validatePlaylistContentEntitlement($entry, null))
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
 		}
@@ -1213,6 +1214,20 @@ HTML;
 		if(empty($entryList))
 			return null;
 		return $entryList[0];
+	}
+
+	public static function validatePlaylistContentEntitlement($entry, $kuserId = null)
+	{
+		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		$kuserId = kEntitlementUtils::getKuserIdForEntitlement($kuserId, $ks);
+
+		if($entry->isEntitledKuserEdit($kuserId) || $entry->isEntitledKuserPublish($kuserId))
+		{
+			KalturaLog::info('Entry ['.print_r($entry->getId(), true).'] entitled: user or associated user group allowed: ['.$kuserId.']');
+			return true;
+		}
+
+		return false;
 	}
 
 }

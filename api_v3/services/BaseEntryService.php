@@ -64,12 +64,12 @@ class BaseEntryService extends KalturaEntryService
     	if($type && $type != KalturaEntryType::AUTOMATIC)
     		$entry->type = $type;
 
-		$blockedTypes = array(KalturaEntryType::PLAYLIST);
-		if($entry->type && in_array($entry->type ,$blockedTypes))
-		{
-				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, KalturaEntryType::PLAYLIST);
-		}
-    	
+    	$blockedTypes = array(KalturaEntryType::PLAYLIST);
+    	if(($entry->type && in_array($entry->type ,$blockedTypes))|| $entry instanceof KalturaPlaylist)
+    	{
+    		throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, KalturaEntryType::PLAYLIST);
+    	}
+
     	$dbEntry = parent::add($entry, $entry->conversionProfileId);
     	if($dbEntry->getStatus() != entryStatus::READY)
     	{
@@ -377,7 +377,7 @@ class BaseEntryService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		$blockedTypes = array(KalturaEntryType::PLAYLIST);
-		if($dbEntry->getType() && in_array($dbEntry->getType() ,$blockedTypes))
+		if(($dbEntry->getType() && in_array($dbEntry->getType() ,$blockedTypes)) || $baseEntry instanceof KalturaPlaylist)
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, KalturaEntryType::PLAYLIST);
 		}

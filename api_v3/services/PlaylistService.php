@@ -66,10 +66,6 @@ class PlaylistService extends KalturaEntryService
 		$dbPlaylist->setKshowId ( null ); // this is brave !!
 		$dbPlaylist->setType ( entryType::PLAYLIST );
 
-		if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
-		{
-			myPlaylistUtils::setIsAdminKs(true);
-		}
 		myPlaylistUtils::validatePlaylist($dbPlaylist);
 
 		$dbPlaylist->save();
@@ -174,10 +170,6 @@ class PlaylistService extends KalturaEntryService
 			if($playlistUpdate->getDataContent(true) != $dbPlaylist->getDataContent())
 			{
 				$dbPlaylist->setDataContent ($playlistUpdate->getDataContent(true));
-			}
-			if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
-			{
-				myPlaylistUtils::setIsAdminKs(true);
 			}
 			myPlaylistUtils::validatePlaylist($dbPlaylist);
 		}

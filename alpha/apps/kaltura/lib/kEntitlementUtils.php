@@ -185,7 +185,7 @@ class kEntitlementUtils
 		return self::isMemberOfCategory($allCategoriesEntry, $entry, $partner, $kuserId, $ks, $ksPrivacyContexts);
 	}
 
-	private static function getKuserIdForEntitlement($kuserId = null, $ks = null)
+	public static function getKuserIdForEntitlement($kuserId = null, $ks = null)
 	{
 		if($ks && !$kuserId)
 		{
@@ -571,21 +571,5 @@ class kEntitlementUtils
 
 		return $dbEntry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
 	}
-
-	public static function validateUserPublishAndEditEntitlements($entry, $kuserId = null)
-	{
-		$ks = ks::fromSecureString(kCurrentContext::$ks);
-		$kuserId = self::getKuserIdForEntitlement($kuserId, $ks);
-
-		if($entry->isEntitledKuserEdit($kuserId) || $entry->isEntitledKuserPublish($kuserId))
-		{
-			KalturaLog::info('Entry ['.print_r($entry->getId(), true).'] entitled: user or associated user group allowed: ['.$kuserId.']');
-			return true;
-		}
-
-		return false;
-	}
-
-
 
 }
