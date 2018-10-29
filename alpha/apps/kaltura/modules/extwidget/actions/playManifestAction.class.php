@@ -988,11 +988,6 @@ class playManifestAction extends kalturaAction
 			}
 			$filteredFlavors[$currentFlavor->getId()] = $currentFlavor;
 		}
-		if (count($filteredFlavors) < 2)
-		{
-			$filteredFlavors[$firstFlavor->getId()] = $firstFlavor;
-		}
-
 		$this->deliveryAttributes->setFlavorAssets($filteredFlavors);
 	}
 
