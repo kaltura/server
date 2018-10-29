@@ -401,7 +401,7 @@ class kCouchbaseCacheList
 	}
 }
 
-class kCouchbaseCacheWrapper extends kBaseCacheWrapper
+class kCouchbaseCacheWrapper extends kInfraBaseCacheWrapper
 {
 	const ERROR_CODE_THE_KEY_ALREADY_EXISTS_IN_THE_SERVER = 12;
 	const ERROR_CODE_THE_KEY_DOES_NOT_EXIST_IN_THE_SERVER = 13;

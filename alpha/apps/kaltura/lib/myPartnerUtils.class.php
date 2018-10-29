@@ -1879,7 +1879,8 @@ class myPartnerUtils
 		$dayInFreeTrial = dateUtils::diffInDays($partner->getCreatedAt(), dateUtils::today());
 		KalturaLog::debug("partner [{$partner->getId()}] is currently at the [$dayInFreeTrial] day of free trial");
 
-		$partner = self::checkIfPartnerStatusChangeRequired($partner, $dayInFreeTrial, $endDay, $deletionDay);
+		// in case we want to delete/block partner that reached to specific day we wil disable this line
+		//$partner = self::checkIfPartnerStatusChangeRequired($partner, $dayInFreeTrial, $endDay, $deletionDay);
 		if($freeTrialUpdatesDays)
 			$partner = self::checkForNotificationDay($partner, $dayInFreeTrial, $freeTrialUpdatesDays);
 

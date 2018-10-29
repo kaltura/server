@@ -38,7 +38,7 @@ class Form_AdminApiConfigure extends Infra_Form
 	private function addDocFields()
 	{
 		$partnerDocFields = array('provider_sign_key', 'key', 'iv', 'provider', 'seed', 'cas_username', 'cas_password');
-		$fpsDocFields = array('ask', 'key_pem');
+		$fpsDocFields = array('ask', 'key_pem', 'fps_default_persistence_duration');
 
 		foreach($partnerDocFields as $field)
 			$this->addTextElement($field, "$field:", "", $this->readOnly);
@@ -49,6 +49,7 @@ class Form_AdminApiConfigure extends Infra_Form
 			$this->addComment('KeyPemNote', 'The KeyPem is private key base64 encoded for FPS documents. Note - It has to be un-encrypted data');
 			foreach($fpsDocFields as $field)
 				$this->addTextElement($field, "$field:", "", $this->readOnly);
+
 		}
 
 	}

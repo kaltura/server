@@ -1,12 +1,12 @@
 <?php
 
-require_once(dirname(__FILE__) . '/kBaseCacheWrapper.php');
+require_once(dirname(__FILE__) . '/kInfraBaseCacheWrapper.php');
 
 /**
  * @package infra
  * @subpackage cache
  */
-class kFileSystemCacheWrapper extends kBaseCacheWrapper
+class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 {
 	const EXPIRY_SUFFIX = '__expiry';
 

@@ -112,10 +112,10 @@ class MediaService extends KalturaEntryService
 
 		if ($resource)
 		{
-			$resource->validateEntry($dbEntry);
-			$kResource = $resource->toObject();
 			try
 			{
+				$resource->validateEntry($dbEntry, true);
+				$kResource = $resource->toObject();
 				$this->attachResource($kResource, $dbEntry);
 			} catch (Exception $e) {
 				$this->handleErrorDuringSetResource($entryId, $e);
@@ -139,7 +139,7 @@ class MediaService extends KalturaEntryService
     	}
 		if($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT || $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
-			$resource->validateEntry($dbEntry);
+			$resource->validateEntry($dbEntry, true);
 
 			if($conversionProfileId)
 			{
@@ -836,7 +836,21 @@ class MediaService extends KalturaEntryService
 	 */
 	function approveReplaceAction($entryId)
 	{
-		return $this->approveReplace($entryId, KalturaEntryType::MEDIA_CLIP);
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		$this->validateEntryForReplace($entryId, $dbEntry, KalturaEntryType::MEDIA_CLIP);
+		$this->approveReplace($dbEntry);
+
+		$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entryId, $dbEntry->getPartnerId());
+		foreach ($childEntries as $childEntry)
+		{
+			if ($childEntry->getId() != $entryId)
+			{
+				$this->validateEntryForReplace($childEntry->getId(), $childEntry);
+				$this->approveReplace($childEntry);
+			}
+		}
+
+		return $this->getEntry($entryId, -1, KalturaEntryType::MEDIA_CLIP);
 	}
 
 	/**
@@ -851,7 +865,21 @@ class MediaService extends KalturaEntryService
 	 */
 	function cancelReplaceAction($entryId)
 	{
-		return $this->cancelReplace($entryId, KalturaEntryType::MEDIA_CLIP);
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		$this->validateEntryForReplace($entryId, $dbEntry, KalturaEntryType::MEDIA_CLIP);
+		$this->cancelReplace($dbEntry);
+
+		$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entryId, $dbEntry->getPartnerId());
+		foreach ($childEntries as $childEntry)
+		{
+			if ($childEntry->getId() != $entryId)
+			{
+				$this->validateEntryForReplace($childEntry->getId(), $childEntry);
+				$this->cancelReplace($childEntry);
+			}
+		}
+
+		return $this->getEntry($entryId, -1, KalturaEntryType::MEDIA_CLIP);
 	}
 
 	/**
@@ -1227,9 +1255,16 @@ class MediaService extends KalturaEntryService
 
 	private function handleErrorDuringSetResource($entryId, Exception $e)
 	{
+		if ($e->getCode() == APIErrors::getCode(APIErrors::ENTRY_ID_NOT_FOUND))
+		{
+			throw $e; //if no entry found then no need to do anything
+		}
+
 		KalturaLog::info("Exception was thrown during setContent on entry [$entryId] with error: " . $e->getMessage());
 		$this->cancelReplaceAction($entryId);
-		if (($e->getCode() == kCoreException::SOURCE_FILE_NOT_FOUND) && (kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId())))
+		
+		$errorCodeArr = array(kCoreException::SOURCE_FILE_NOT_FOUND, APIErrors::getCode(APIErrors::SOURCE_FILE_NOT_FOUND));
+		if ((in_array($e->getCode(), $errorCodeArr)) && (kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId())))
 		{
 			$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
 			KalturaLog::info("Source file wasn't found on current DC. dumping the request to DC id [$remoteDc]");

@@ -11,6 +11,9 @@ import sys
 
 eventsBuffer = {}
 
+def stripNewlines(value):
+	return value.replace('\n', ' ').replace('\r', ' ')
+
 def parseAddress(addressStr):
     address, port = addressStr.split(':')
     return (address, int(port))
@@ -199,10 +202,10 @@ class CommandHandler(SocketServer.BaseRequestHandler):
             for groupByValues, (selectValues, _, count, aggrFields) in result.items():
                 resultText += ('%s\t' % count + 
                     aggrFieldsFormat % aggrFieldGetter(aggrFields) +
-                    '%s\t%s\n' % (groupByValues, selectValues))
+                    '%s\t%s\n' % (stripNewlines(groupByValues), stripNewlines(selectValues)))
         else:
             for groupByValues, (selectValues, _, count, _) in result.items():
-                resultText += '%s\t%s\t%s\n' % (count, groupByValues, selectValues)
+                resultText += '%s\t%s\t%s\n' % (count, stripNewlines(groupByValues), stripNewlines(selectValues))
         self.request.sendall(resultText)
         
 class CommandThread(Thread):
