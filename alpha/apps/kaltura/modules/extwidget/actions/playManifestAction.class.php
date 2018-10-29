@@ -16,6 +16,7 @@ class playManifestAction extends kalturaAction
 		'http',
 		'https',
 	);
+	const FLAVOR_GOROUPING_PRECENTAGE_FACTOR = 0.05; // 5 percent
 
 	/**
 	 * When this list start to contain plugins - 
@@ -918,7 +919,7 @@ class playManifestAction extends kalturaAction
 		}
 
 		// <-- 
-		
+		$this->optimizeFlavors();
 		$this->deliveryProfile = $this->initDeliveryProfile();
 		if(!$this->deliveryProfile)
 			return null;
@@ -956,7 +957,56 @@ class playManifestAction extends kalturaAction
 		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);	
 		return $this->deliveryProfile->serve();
 	}
-	
+
+	private function optimizeFlavors()
+	{
+		if (count($this->deliveryAttributes->getFlavorAssets()) < 2)
+		{
+			return;
+		}
+
+		$flavors = $this->deliveryAttributes->getFlavorAssets();
+
+		usort($flavors, function ($a, $b)
+		{
+			/* @var $a flavorAsset */
+			/* @var $b flavorAsset */
+			if ($a->getHeight() * $a->getWidth() == ($b->getHeight() * $b->getWidth()))
+			{
+				return $a->getBitrate() - $b->getBitrate();
+			}
+			else
+			{
+				return ($a->getHeight() * $a->getWidth()) - ($b->getHeight() * $b->getWidth());
+			}
+		});
+
+		$firstFlavor = array_shift($flavors);
+		$filteredFlavors = array($firstFlavor->getId() => $firstFlavor );
+		foreach ($flavors as $currentFlavor)
+		{
+			foreach ($filteredFlavors as $elementKey => $flavor)
+			{
+				/* @var $flavor flavorAsset */
+				if (abs(($currentFlavor->getBitrate() - $flavor->getBitrate())) <= ($currentFlavor->getBitrate() * self::FLAVOR_GOROUPING_PRECENTAGE_FACTOR)
+					&& ($currentFlavor->getBitrate() >= $flavor->getBitrate())
+					&& (($currentFlavor->getHeight() * $currentFlavor->getWidth()) >= ($flavor->getHeight() * $flavor->getWidth()))
+				)
+				{
+					//delete this particular object from the filttered flavors array
+					unset($filteredFlavors[$elementKey]);
+				}
+			}
+			$filteredFlavors[$currentFlavor->getId()] = $currentFlavor;
+		}
+		if (count($filteredFlavors) < 2)
+		{
+			$filteredFlavors[$firstFlavor->getId()] = $firstFlavor[0];
+		}
+
+		$this->deliveryAttributes->setFlavorAssets($filteredFlavors);
+	}
+
 	private function serveHDNetwork()
 	{
 		kApiCache::setConditionalCacheExpiry(600);		// the result contains a KS so we shouldn't cache it for a long time
