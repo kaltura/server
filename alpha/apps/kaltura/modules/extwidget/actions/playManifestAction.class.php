@@ -1369,7 +1369,8 @@ class playManifestAction extends kalturaAction
 		/* @var $b flavorAsset */
 		if ($a->getHeight() * $a->getWidth() == ($b->getHeight() * $b->getWidth()))
 		{
-			return $a->getBitrate() - $b->getBitrate();
+			$val = $a->getBitrate() - $b->getBitrate();
+			return $val ? $val : $a->getIntId() - $b->getIntId();
 		}
 		else
 		{
