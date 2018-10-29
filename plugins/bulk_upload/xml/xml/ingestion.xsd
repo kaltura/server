@@ -947,13 +947,18 @@
 	</xs:complexType>
 
 	<xs:complexType name="T_categories">
-		<xs:sequence>
+		<xs:choice>
 			<xs:element maxOccurs="32" minOccurs="0" name="category" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>Specifies a single category assigned to an entry. Use the &gt; character (`&amp;gt;`) to indicate the position of the category in the category tree hierarchy</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-		</xs:sequence>
+			<xs:element maxOccurs="32" minOccurs="0" name="categoryId" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Specifies a single category ID assigned to an entry. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
 	</xs:complexType>
 	
 	<xs:complexType name="T_pluginReplacementOptions">
