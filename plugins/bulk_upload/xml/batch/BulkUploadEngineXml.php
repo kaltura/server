@@ -1300,7 +1300,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			return $bulkuploadResult;
 		}
 		
-		KBatchBase::impersonate($this->currentPartnerId);;
+		KBatchBase::impersonate($this->currentPartnerId);
 		
 		$existingCategoryIds = array(); // category ids that already associated with the entry - current list
 		$requiredCategoryIds = array(); // category ids that should be associated with the entry - final list
