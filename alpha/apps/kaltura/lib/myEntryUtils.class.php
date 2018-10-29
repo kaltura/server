@@ -2251,7 +2251,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		{
 			if ($entry instanceof $type)
 			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, $type);
+				KalturaLog::debug("Entry type [$type] is not allowed");
+				//throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, $type);
 			}
 		}
 	}
