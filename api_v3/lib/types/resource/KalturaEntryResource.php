@@ -31,13 +31,8 @@ class KalturaEntryResource extends KalturaContentResource
     	$srcEntry = entryPeer::retrieveByPK($this->entryId);
 		if (!$srcEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
-			
-		if($srcEntry->getMediaType() == KalturaMediaType::IMAGE || 
-			$srcEntry->getMediaType() == KalturaMediaType::LIVE_STREAM_FLASH ||
-				myEntryUtils::isLiveClippingEntry($srcEntry))
-			return;
 
-		if (!$this->checkIfFileExist())
+		if($this->shouldValidateFileExistance($srcEntry) && !$this->checkIfFileExist())
 		{
 			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
 		}
@@ -99,8 +94,7 @@ class KalturaEntryResource extends KalturaContentResource
 		$srcEntry = entryPeer::retrieveByPK($this->entryId);
 		if(!$srcEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
-		if ($validateLocalExist && !myEntryUtils::isLiveClippingEntry($srcEntry) // live clipping entry doesn't require actual local file
-			  && !$this->checkIfFileExist(true))
+		if ($this->shouldValidateFileExistance($srcEntry) && $validateLocalExist && !$this->checkIfFileExist(true))
 		{
 			throw new KalturaAPIException(KalturaErrors::SOURCE_FILE_NOT_FOUND);
 		}
@@ -225,5 +219,16 @@ class KalturaEntryResource extends KalturaContentResource
     	}
     	
     	return parent::entryHandled($dbEntry);
+	}
+
+	/**
+	 * @param $srcEntry
+	 * @return bool
+	 */
+	protected function shouldValidateFileExistance($srcEntry)
+	{
+		return ($srcEntry->getMediaType() != KalturaMediaType::IMAGE &&
+			$srcEntry->getMediaType() != KalturaMediaType::LIVE_STREAM_FLASH &&
+			!myEntryUtils::isLiveClippingEntry($srcEntry));
 	}
 }
