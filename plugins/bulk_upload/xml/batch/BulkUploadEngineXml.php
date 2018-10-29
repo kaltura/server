@@ -1280,7 +1280,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		else
 		{
-			KalturaLog::info ('Entry not published to categories');
+			KalturaLog::info ("Entry [$entryId] not published to categories");
 			return $bulkuploadResult;
 		}
 		
@@ -1296,7 +1296,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		// no change requested
 		if(is_null($categories))
+		{
 			return $bulkuploadResult;
+		}
 		
 		KBatchBase::impersonate($this->currentPartnerId);;
 		
@@ -1428,11 +1430,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param KalturaBulkUploadResultEntry $bulkuploadResult
 	 * @param bool $update indicates that we are in update state and old categories that aren't in the list should be removed.
 	 */
-	private function createCategoryAssociationsByCategoryIds ($entryId, $categories, KalturaBulkUploadResultEntry $bulkuploadResult, $update = false)
+	protected function createCategoryAssociationsByCategoryIds ($entryId, $categories, KalturaBulkUploadResultEntry $bulkuploadResult, $update = false)
 	{
 		// no change requested
 		if(is_null($categories))
+		{
 			return $bulkuploadResult;
+		}
 		
 		KalturaLog::info("Publishing entry $entryId to categories: $categories");
 		KBatchBase::impersonate($this->currentPartnerId);
@@ -1442,8 +1446,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		try
 		{
 			// if update - check whether the same entry already exists on some of the intended category IDs
-			if ($update) {
-				KalturaLog::info("Update context - determining categoryEntry diff.");
+			if ($update)
+			{
+				KalturaLog::info("Update context - determining categoryEntry diff for entry [$entryId].");
 				$existingCategories = array();
 				$categoriesToRemove = array();
 				$categoryEntryFilter = new kalturaCategoryEntryFilter();
