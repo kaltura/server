@@ -3,8 +3,8 @@
  * @package deployment
  * @subpackage naos.roles_and_permissions
  *
- * Update categoryEntry permissions
+ * Update bulk permissions
  */
 $script = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/permissions/addPermissionsAndItems.php';
-$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.categoryentry.ini';
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.bulkupload.bulk.ini';
 passthru("php $script $config");

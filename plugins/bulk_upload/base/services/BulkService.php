@@ -433,14 +433,14 @@ class BulkService extends KalturaBaseService
 
 	/**
 	 * @action activateCategoryEntries
-	 * @actionAlias categoryEntry.activatefrombulkupload
-	 * Action activate categoryEntrys from a bulkupload CSV file
+	 * @actionAlias categoryEntry.updateStatusfrombulk
+	 * Action activate or rejects categoryEntrys from a bulkupload CSV file
 	 * @param file $fileData
 	 * @param KalturaBulkUploadJobData $bulkUploadData
 	 * @param KalturaBulkUploadCategoryEntryData $bulkUploadCategoryEntryData
 	 * @return KalturaBulkUpload
 	 */
-	public function activateCategoryEntriesAction($fileData, KalturaBulkUploadJobData $bulkUploadData = null, KalturaBulkUploadCategoryEntryData $bulkUploadCategoryEntryData = null)
+	public function updateCategoryEntriesStatusAction($fileData, KalturaBulkUploadJobData $bulkUploadData = null, KalturaBulkUploadCategoryEntryData $bulkUploadCategoryEntryData = null)
 	{
 		if (!$bulkUploadData)
 		{
@@ -449,11 +449,13 @@ class BulkService extends KalturaBaseService
 
 		if (!$bulkUploadCategoryEntryData)
 		{
-			$bulkUploadUserData = new KalturaBulkUploadCategoryEntryData();
+			$bulkUploadCategoryEntryData = new KalturaBulkUploadCategoryEntryData();
 		}
 
 		if(!$bulkUploadData->fileName)
+		{
 			$bulkUploadData->fileName = $fileData["name"];
+		}
 
 		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
 		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
@@ -466,7 +468,9 @@ class BulkService extends KalturaBaseService
 		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $dbBulkUploadJobData, $bulkUploadCoreType);
 		$dbJobLog = BatchJobLogPeer::retrieveByBatchJobId($dbJob->getId());
 		if(!$dbJobLog)
+		{
 			return null;
+		}
 
 		$bulkUpload = new KalturaBulkUpload();
 		$bulkUpload->fromObject($dbJobLog, $this->getResponseProfile());

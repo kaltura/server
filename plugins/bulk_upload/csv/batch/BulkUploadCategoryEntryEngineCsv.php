@@ -101,7 +101,9 @@ class BulkUploadCategoryEntryEngineCsv extends BulkUploadEngineCsv
 		foreach($columns as $index => $column)
 		{
 			if(!is_numeric($index))
+			{
 				continue;
+			}
 			if(iconv_strlen($values[$index], 'UTF-8'))
 			{
 				$bulkUploadResult->$column = $values[$index];
@@ -121,7 +123,9 @@ class BulkUploadCategoryEntryEngineCsv extends BulkUploadEngineCsv
 
 		$bulkUploadResult = $this->validateBulkUploadResult($bulkUploadResult);
 		if($bulkUploadResult)
+		{
 			$this->bulkUploadResults[] = $bulkUploadResult;
+		}
 	}
 
 	protected function validateBulkUploadResult (KalturaBulkUploadResult $bulkUploadResult)
@@ -152,8 +156,8 @@ class BulkUploadCategoryEntryEngineCsv extends BulkUploadEngineCsv
 	protected function updateObjectsResults(array $requestResults, array $bulkUploadResults)
 	{
 		KalturaLog::info("Updating " . count($requestResults) . " results");
-		$dummy=array();
-		// checking the created entries
+		$dummy = array();
+		// checking the status of the category entries
 		foreach($requestResults as $index => $requestResult)
 		{
 			$bulkUploadResult = $bulkUploadResults[$index];
