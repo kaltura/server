@@ -13,6 +13,9 @@ class BulkUploadCategoryEntryEngineCsv extends BulkUploadEngineCsv
 	const ENTRY_ID = 'entryId';
 	const CATEGORY_ID = 'categoryId';
 
+	const MISSING_COLUMN = 'Mandatory Column missing from CSV';
+	const EXCEEDED_MAX_RESULTS = 'Exceeded max records count per bulk';
+
 	protected function createObjects()
 	{
 		// start a multi request for activating category entries
@@ -94,26 +97,9 @@ class BulkUploadCategoryEntryEngineCsv extends BulkUploadEngineCsv
 
 		$bulkUploadResult->bulkUploadResultObjectType = KalturaBulkUploadObjectType::CATEGORY_ENTRY;
 
-		// trim the values
 		array_walk($values, array('BulkUploadCategoryEntryEngineCsv', 'trimArray'));
+		$this->setResultValues($columns, $values, $bulkUploadResult);
 
-		// sets the result values
-		foreach($columns as $index => $column)
-		{
-			if(!is_numeric($index))
-			{
-				continue;
-			}
-			if(iconv_strlen($values[$index], 'UTF-8'))
-			{
-				$bulkUploadResult->$column = $values[$index];
-				KalturaLog::info("Set value $column [{$bulkUploadResult->$column}]");
-			}
-			else
-			{
-				KalturaLog::info("Value $column is empty");
-			}
-		}
 		$bulkUploadResult->status = KalturaBulkUploadResultStatus::IN_PROGRESS;
 
 		if (!$bulkUploadResult->action)
@@ -133,15 +119,11 @@ class BulkUploadCategoryEntryEngineCsv extends BulkUploadEngineCsv
 		/* @var $bulkUploadResult KalturaBulkUploadResultUser */
 		if (!$bulkUploadResult->entryId || !$bulkUploadResult->categoryId)
 		{
-			$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
-			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
-			$bulkUploadResult->errorDescription = "Mandatory Column missing from CSV.";
+			$this->handleResultError($bulkUploadResult, KalturaBatchJobErrorTypes::APP, self::MISSING_COLUMN);
 
 			if($this->maxRecords && $this->lineNumber > $this->maxRecords) // check max records
 			{
-				$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
-				$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
-				$bulkUploadResult->errorDescription = "Exceeded max records count per bulk";
+				$this->handleResultError($bulkUploadResult, KalturaBatchJobErrorTypes::APP, self::EXCEEDED_MAX_RESULTS);
 			}
 
 			if($bulkUploadResult->status == KalturaBulkUploadResultStatus::ERROR)
@@ -164,19 +146,15 @@ class BulkUploadCategoryEntryEngineCsv extends BulkUploadEngineCsv
 			$this->handleMultiRequest($dummy);
 			if(is_array($requestResult) && isset($requestResult['code']))
 			{
-				$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
-				$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
+				$this->handleResultError($bulkUploadResult, KalturaBatchJobErrorTypes::KALTURA_API, $requestResult['message']);
 				$bulkUploadResult->objectStatus = $requestResult['code'];
-				$bulkUploadResult->errorDescription = $requestResult['message'];
 				$this->addBulkUploadResult($bulkUploadResult);
 				continue;
 			}
 
 			if($requestResult instanceof Exception)
 			{
-				$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
-				$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
-				$bulkUploadResult->errorDescription = $requestResult->getMessage();
+				$this->handleResultError($bulkUploadResult, KalturaBatchJobErrorTypes::KALTURA_API, $requestResult->getMessage());
 				$this->addBulkUploadResult($bulkUploadResult);
 				continue;
 			}
