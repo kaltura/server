@@ -132,7 +132,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$xsdURL = KBatchBase::$kClient->schema->serve($this->getSchemaType());
 		if(KBatchBase::$taskConfig->params->xmlSchemaVersion)
 			$xsdURL .=  "&version=" . KBatchBase::$taskConfig->params->xmlSchemaVersion;
-		$xsd = KCurlWrapper::getContent($xsdURL);
+		$xsd = KCurlWrapper::getContent($xsdURL, null, true);
 		
 		if(!$xdoc->schemaValidateSource($xsd))
 		{
