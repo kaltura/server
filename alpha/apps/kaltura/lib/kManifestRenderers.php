@@ -200,7 +200,7 @@ abstract class kManifestRenderer
 		if ($this->playLocation)
 		{
 			$output['serverNodeIds'] = $this->playLocation;
-			$output['internal_ip'] = $this->internalIP;
+			$output['internalIp'] = $this->internalIP;
 		}
 
 

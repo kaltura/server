@@ -84,7 +84,7 @@ class kIpAddressCondition extends kMatchCondition
 		if ($res && $this->getHttpHeader())
 		{
 			$this->setExtraProperties('partnerInternal', true);
-			$this->setExtraProperties('partnerInternal_IP', $field);
+			$this->setExtraProperties('partnerInternalIp', $field);
 		}
 		return $res;
 	}
