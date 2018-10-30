@@ -65,7 +65,9 @@ class BulkUploadCategoryEntryEngineCsv extends BulkUploadEngineCsv
 		KBatchBase::unimpersonate();
 
 		if(count($requestResults))
+		{
 			$this->updateObjectsResults($requestResults, $bulkUploadResultChunk);
+		}
 
 		KalturaLog::info("job[{$this->job->id}] finish updating category entries");
 	}
@@ -93,7 +95,9 @@ class BulkUploadCategoryEntryEngineCsv extends BulkUploadEngineCsv
 	{
 		$bulkUploadResult = parent::createUploadResult($values, $columns);
 		if (!$bulkUploadResult)
+		{
 			return;
+		}
 
 		$bulkUploadResult->bulkUploadResultObjectType = KalturaBulkUploadObjectType::CATEGORY_ENTRY;
 
@@ -138,33 +142,28 @@ class BulkUploadCategoryEntryEngineCsv extends BulkUploadEngineCsv
 	protected function updateObjectsResults(array $requestResults, array $bulkUploadResults)
 	{
 		KalturaLog::info("Updating " . count($requestResults) . " results");
-		$dummy = array();
+		$multiRequestResults = array();
 		// checking the status of the category entries
 		foreach($requestResults as $index => $requestResult)
 		{
 			$bulkUploadResult = $bulkUploadResults[$index];
-			$this->handleMultiRequest($dummy);
+			$this->handleMultiRequest($multiRequestResults);
 			if(is_array($requestResult) && isset($requestResult['code']))
 			{
 				$this->handleResultError($bulkUploadResult, KalturaBatchJobErrorTypes::KALTURA_API, $requestResult['message']);
 				$bulkUploadResult->objectStatus = $requestResult['code'];
-				$this->addBulkUploadResult($bulkUploadResult);
-				continue;
 			}
-
-			if($requestResult instanceof Exception)
+			else if($requestResult instanceof Exception)
 			{
 				$this->handleResultError($bulkUploadResult, KalturaBatchJobErrorTypes::KALTURA_API, $requestResult->getMessage());
-				$this->addBulkUploadResult($bulkUploadResult);
-				continue;
 			}
 
 			$this->addBulkUploadResult($bulkUploadResult);
 		}
-		$this->handleMultiRequest($dummy,true);
+		$this->handleMultiRequest($multiRequestResults,true);
 	}
 
-	private function handleMultiRequest(&$ret,$finish=false)
+	protected function handleMultiRequest(&$ret, $finish = false)
 	{
 		$count = KBatchBase::$kClient->getMultiRequestQueueSize();
 		//Start of new multi request session
@@ -174,9 +173,13 @@ class BulkUploadCategoryEntryEngineCsv extends BulkUploadEngineCsv
 			{
 				$result = KBatchBase::$kClient->doMultiRequest();
 				if (count($result))
+				{
 					$ret = array_merge($ret, $result);
+				}
 				if (!$finish)
+				{
 					KBatchBase::$kClient->startMultiRequest();
+				}
 			}
 		}
 		elseif (!$finish)
