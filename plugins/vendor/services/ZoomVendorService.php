@@ -176,7 +176,7 @@ class ZoomVendorService extends KalturaBaseService
 		}
 		$zoomIntegration->save();
 
-		kuserPeer::createKuserForPartner($partnerId,$defaultUserId);
+		kuserPeer::createKuserForPartner($partnerId, $defaultUserId);
 
 		return true;
 	}
