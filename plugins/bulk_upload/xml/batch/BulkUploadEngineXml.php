@@ -108,7 +108,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		if(!file_exists($this->data->filePath))
 		{
-			throw new KalturaBatchException("File doesn't exist [{$this->data->filePath}]", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND, null);
+			throw new KalturaBatchException("File doesn't exist [{$this->data->filePath}]", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND);
 		}
 		
 		libxml_use_internal_errors(true);
@@ -124,7 +124,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		libxml_clear_errors();
 		if(!$xdoc->loadXML($this->xslTransformedContent)){
 			$errorMessage = kXml::getLibXmlErrorDescription($this->xslTransformedContent);
-			throw new KalturaBatchException("Could not load xml [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED, null);
+			throw new KalturaBatchException("Could not load xml [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
 		//Validate the XML file against the schema
 		libxml_clear_errors();
@@ -137,7 +137,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(!$xdoc->schemaValidateSource($xsd))
 		{
 			$errorMessage = kXml::getLibXmlErrorDescription($this->xslTransformedContent);
-			throw new KalturaBatchException("Validate files failed on job [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED, null);
+			throw new KalturaBatchException("Validate files failed on job [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
 		
 		return true;
@@ -152,7 +152,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//TODO: remove this statement once its purpose is served - conversionProfileId information should be taken only from the objectData
 		$conversionProfileId = isset ($data->objectData->conversionProfileId) ? $data->objectData->conversionProfileId : $data->conversionProfileId;
 		if(!$conversionProfileId)
-			throw new KalturaBatchException("Conversion profile not defined", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER, null);
+			throw new KalturaBatchException("Conversion profile not defined", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
 		
 		KBatchBase::impersonate($this->currentPartnerId);;
 		$conversionProfile = KBatchBase::$kClient->conversionProfile->get($conversionProfileId);
@@ -179,7 +179,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$xml = new KDOMDocument();
 		if(!$xml->loadXML($xdoc)){
 			$errorMessage = kXml::getLibXmlErrorDescription($xdoc);
-			throw new KalturaBatchException("Could not load xml [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED, null);
+			throw new KalturaBatchException("Could not load xml [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
 		
 		libxml_clear_errors();
@@ -188,14 +188,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$xsl = new KDOMDocument();
 		if(!$xsl->loadXML($this->conversionProfileXsl)){
 			$errorMessage = kXml::getLibXmlErrorDescription($this->conversionProfileXsl);
-			throw new KalturaBatchException("Could not load xsl [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED, null);
+			throw new KalturaBatchException("Could not load xsl [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
 		$proc->importStyleSheet($xsl);
 		libxml_clear_errors();
 		$transformedXml = $proc->transformToXML($xml);
 		if(!$transformedXml){
 			$errorMessage = kXml::getLibXmlErrorDescription($this->conversionProfileXsl);
-			throw new KalturaBatchException("Could not transform xml [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED, null);
+			throw new KalturaBatchException("Could not transform xml [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
 		return $transformedXml;
 	}
@@ -348,7 +348,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 						$this->handleItemDelete($item);
 						break;
 					default :
-						throw new KalturaBatchException("Action: {$actionToPerform} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED, null);
+						throw new KalturaBatchException("Action: {$actionToPerform} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
 				}
 			}
 			catch (Exception $e)
@@ -1761,7 +1761,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		if(!in_array($assetParamsId, $this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]))
 		{
-			throw new KalturaBatchException("Asset Params Id [$assetParamsId] not found for conversion profile [$conversionProfileId] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED, null);
+			throw new KalturaBatchException("Asset Params Id [$assetParamsId] not found for conversion profile [$conversionProfileId] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
 	}
 	
@@ -1811,7 +1811,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(isset($this->assetParamsNameToIdPerConversionProfile["$conversionProfileId"]["$assetParamsName"]))
 			return $this->assetParamsNameToIdPerConversionProfile["$conversionProfileId"]["$assetParamsName"];
 		
-		throw new KalturaBatchException("{$assetParams} system name [$assetParamsName] not found for conversion profile [$conversionProfileId] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED, null);
+		throw new KalturaBatchException("{$assetParams} system name [$assetParamsName] not found for conversion profile [$conversionProfileId] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 	}
 	
 	/**
@@ -1863,7 +1863,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		if(!in_array($converionProfileId, $this->conversionProfileNameToId))
 		{
-			throw new KalturaBatchException("conversion profile Id [$converionProfileId] not found", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED, null);
+			throw new KalturaBatchException("conversion profile Id [$converionProfileId] not found", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
 	}
 	
@@ -1881,7 +1881,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		if(!in_array($storageProfileId, $this->storageProfileNameToId))
 		{
-			throw new KalturaBatchException("Storage profile id [$storageProfileId] not found", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED, null);
+			throw new KalturaBatchException("Storage profile id [$storageProfileId] not found", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
 	}
 	
@@ -1909,7 +1909,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(isset($this->conversionProfileNameToId["$elementToSearchIn->conversionProfile"]))
 			return $this->conversionProfileNameToId["$elementToSearchIn->conversionProfile"];
 		
-		throw new KalturaBatchException("conversion profile system name [{$elementToSearchIn->conversionProfile}] not valid", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED, null);
+		throw new KalturaBatchException("conversion profile system name [{$elementToSearchIn->conversionProfile}] not valid", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 	}
 	
 	/**
@@ -1938,7 +1938,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		if(!in_array($accessControlId, $this->accessControlNameToId))
 		{
-			throw new KalturaBatchException("access control Id [$accessControlId] not valid", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED, null);
+			throw new KalturaBatchException("access control Id [$accessControlId] not valid", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
 	}
 	
@@ -1966,7 +1966,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(isset($this->accessControlNameToId["$elementToSearchIn->accessControl"]))
 			return trim($this->accessControlNameToId["$elementToSearchIn->accessControl"]);
 		
-		throw new KalturaBatchException("access control system name [{$elementToSearchIn->accessControl}] not found", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED, null);
+		throw new KalturaBatchException("access control system name [{$elementToSearchIn->accessControl}] not found", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 	}
 	
 	/**
@@ -1993,7 +1993,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(isset($this->storageProfileNameToId["$elementToSearchIn->storageProfile"]))
 			return trim($this->storageProfileNameToId["$elementToSearchIn->storageProfile"]);
 		
-		throw new KalturaBatchException("storage profile system name [{$elementToSearchIn->storageProfileId}] not found", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED, null);
+		throw new KalturaBatchException("storage profile system name [{$elementToSearchIn->storageProfileId}] not found", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 	}
 	
 	/**
@@ -2259,19 +2259,19 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$typeNumber = trim($typeNumber);
 		
 		if(isset($item->media) && $item->type != KalturaEntryType::MEDIA_CLIP)
-			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED, null);
+			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		
 		if(isset($item->mix) && $item->type != KalturaEntryType::MIX)
-			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED, null);
+			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		
 		if(isset($item->playlist) && $item->type != KalturaEntryType::PLAYLIST)
-			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED, null);
+			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		
 		if(isset($item->liveStream) && $item->type != KalturaEntryType::LIVE_STREAM)
-			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED, null);
+			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		
 		if(isset($item->data) && $item->type != KalturaEntryType::DATA)
-			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED, null);
+			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 	}
 	
 	/**
