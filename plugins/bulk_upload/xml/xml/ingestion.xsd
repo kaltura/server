@@ -1498,17 +1498,17 @@ tK1yWx3LOnxokoJUtNRSdEi</privateKey>
 						<contentAssets>...</contentAssets>
 					</item>
 				</example>
-                <example title="XML Example: Entry categories IDs">
-                    <item>
-                        <action>add</action>
-                        <categories>
-                            <categoryId>1234</categoryId>
-                            <categoryId>5678</categoryId>
-                        </categories>
-                        <media>...</media>
-                        <contentAssets>...</contentAssets>
-                    </item>
-                </example>
+				<example title="XML Example: Entry categories IDs">
+				    <item>
+					<action>add</action>
+					<categories>
+					    <categoryId>1234</categoryId>
+					    <categoryId>5678</categoryId>
+					</categories>
+					<media>...</media>
+					<contentAssets>...</contentAssets>
+				    </item>
+				</example>
 			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
