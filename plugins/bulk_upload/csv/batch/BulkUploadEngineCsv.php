@@ -61,9 +61,19 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
                 continue;
             }
 			//removing UTF-8 BOM if exists
-			if(substr($values[0], 0,3) == pack('CCC',0xef,0xbb,0xbf)) {
+			if(substr($values[0], 0,3) == pack('CCC',0xef,0xbb,0xbf))
+			{
        			 $values[0]=substr($values[0], 3);
+				 try
+				 {
+					 $values[0] = trim($values[0],'\'"');
+				 }
+				 catch (Exception $e)
+				 {
+					 KalturaLog::debug("Could not trim enclosing characters ". $e->getMessage());
+				 }
     		}
+
 			// use version 3 (dynamic columns cassiopeia) identified by * in first char
 			if(substr(trim($values[0]), 0, 1) == '*') // is a remark
 			{
