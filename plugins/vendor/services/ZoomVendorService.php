@@ -175,14 +175,10 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomIntegration->unsetCategoryId();
 		}
 		$zoomIntegration->save();
+
 		//Validate that default user exist on partner otherwise create it.
-		if(!kuserPeer::getKuserByPartnerAndUid($partnerId, $defaultUserId, true))
-		{
-			$defaultZoomKuser = new kuser();
-			$defaultZoomKuser->setPuserId($defaultUserId);
-			$defaultZoomKuser->setPartnerId($partnerId);
-			kuserPeer::addUser($defaultZoomKuser);
-		}
+		kuserPeer::createKuserForPartner($partnerId,$defaultUserId);
+
 		return true;
 	}
 
