@@ -180,6 +180,7 @@ class ZoomVendorService extends KalturaBaseService
 		{
 			$defaultZoomKuser = new kuser();
 			$defaultZoomKuser->setPuserId($defaultUserId);
+			$defaultZoomKuser->setPartnerId($partnerId);
 			kuserPeer::addUser($defaultZoomKuser);
 		}
 		return true;
