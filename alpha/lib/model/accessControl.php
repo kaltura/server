@@ -29,8 +29,12 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	 * @var accessControlScope
 	 */
 	protected $scope;
-	
-	
+
+	/**
+	 * @var bool
+	 */
+	protected $partnerInternal = false;
+
 	const IP_ADDRESS_RESTRICTION_COLUMN_NAME = 'ip_address_restriction';
 	const USER_AGENT_RESTRICTION_COLUMN_NAME = 'user_agent_restriction';
 	const CUSTOM_DATA_RULES_ARRAY_COMPRESSED = 'rules_array_compressed';
@@ -267,7 +271,9 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			if($fulfilled)
 			{
 				$fulfilledRules[] = $ruleNum;
-				
+
+				$this->partnerInternal = $this->partnerInternal || $rule->partnerInternal();
+
 				if ($rule->getStopProcessing())
 					break;
 			}
@@ -480,4 +486,14 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			
 		return $rulesIpTree;
 	}
+
+	/**
+	 * @return bool
+	 */
+	public function partnerInternal()
+	{
+		return $this->partnerInternal;
+	}
+
+
 }

@@ -80,7 +80,12 @@ class kIpAddressCondition extends kMatchCondition
 	 */
 	protected function matches($field, $value)
 	{
-		return kIpAddressUtils::isIpInRanges($field, $value);
+		$res = kIpAddressUtils::isIpInRanges($field, $value);
+		if ($res && $this->getHttpHeader())
+		{
+			$this->partnerInternal = true;
+		}
+		return $res;
 	}
 
 	/**

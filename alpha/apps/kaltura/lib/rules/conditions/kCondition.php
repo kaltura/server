@@ -21,6 +21,11 @@ abstract class kCondition
 	 */
 	protected $not = false;
 
+	/**
+	 * @var bool
+	 */
+	protected $partnerInternal = false;
+
 	public function __construct($not = false)
 	{
 		$this->setNot($not);
@@ -115,4 +120,13 @@ abstract class kCondition
 	{
 		return true;
 	}
+
+	/**
+	 * @return bool
+	 */
+	public function partnerInternal()
+	{
+		return $this->partnerInternal;
+	}
+
 }

@@ -64,7 +64,12 @@ abstract class kManifestRenderer
 	 * @var string
 	 */
 	public $playbackContext = null;
-	
+
+	/**
+	 * @var string
+	 */
+	protected $playLocation = 'External';
+
 	protected function prepareFlavors()
 	{
 	}
@@ -144,7 +149,24 @@ abstract class kManifestRenderer
 	{
 		$this->deliveryCode = $deliveryCode ? $deliveryCode : $this->defaultDeliveryCode;
 	}
-	
+
+	/**
+	 * @return string
+	 */
+	public function getPlayLocation()
+	{
+		return $this->playLocation;
+	}
+
+	/**
+	 * @param string $playLocation
+	 */
+	public function setPlayLocation($playLocation)
+	{
+		$this->playLocation = $playLocation;
+	}
+
+
 	protected function replacePlaybackContext($str)
 	{
 		if($this->playbackContext)
@@ -165,6 +187,7 @@ abstract class kManifestRenderer
 			'entryId' => $this->entryId,
 			'partnerId' => $this->partnerId,
 			'playbackType' => $this->entryType,
+			'playLocation' => $this->playLocation,
 		);
 
 		$params = infraRequestUtils::getRequestParams();

@@ -88,7 +88,12 @@ class kRule
 	{
 		$this->scope = $scope;
 	}
-	
+
+	/**
+	 * @var bool
+	 */
+	protected $partnerInternal = false;
+
 	/**
 	 * @return the $conditions
 	 */
@@ -144,6 +149,7 @@ class kRule
 				KalturaLog::debug("Condition [" . get_class($condition) . "] not  fulfilled");
 				return false;
 			}
+			$this->partnerInternal = $this->partnerInternal || $condition->partnerInternal();
 		}
 				
 		KalturaLog::debug("All conditions fulfilled");
@@ -371,4 +377,11 @@ class kRule
 		return true;
 	}
 
+	/**
+	 * @return bool
+	 */
+	public function partnerInternal()
+	{
+		return $this->partnerInternal;
+	}
 }

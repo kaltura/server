@@ -76,6 +76,11 @@ class KSecureEntryHelper
 	protected static $trustedPartnerIds = array (Partner::BATCH_PARTNER_ID);
 
 	/**
+	 * @var bool
+	 */
+	protected $partnerInternal = false;
+
+	/**
 	 * 
 	 * @param entry $entry
 	 */
@@ -309,7 +314,8 @@ class KSecureEntryHelper
 		$this->contextResult = new kEntryContextDataResult();
 		$scope = $this->getAccessControlScope();
 		$this->disableCache = $accessControl->applyContext($this->contextResult, $scope);
-		
+		$this->partnerInternal = $accessControl->partnerInternal();
+
 		if (count ( $this->contextResult->getActions () )) {
 			foreach ( $this->contextResult->getActions () as $action )
 			{
@@ -467,4 +473,13 @@ class KSecureEntryHelper
 			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
 		}
 	}
+
+	/**
+	 * @return bool
+	 */
+	public function partnerInternal()
+	{
+		return $this->partnerInternal;
+	}
+
 }
