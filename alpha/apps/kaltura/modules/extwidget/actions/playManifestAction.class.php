@@ -959,7 +959,7 @@ class playManifestAction extends kalturaAction
 		return $this->deliveryProfile->serve();
 	}
 
-	private function optimizeFlavors()
+	protected function optimizeFlavors()
 	{
 		if (count($this->deliveryAttributes->getFlavorAssets()) < 2)
 		{
@@ -971,7 +971,7 @@ class playManifestAction extends kalturaAction
 		usort($flavors, array($this,'sortFlavorsByFrameSizeAndBitrate'));
 
 		$firstFlavor = array_shift($flavors);
-		$filteredFlavors = array($firstFlavor->getId() => $firstFlavor );
+		$filteredFlavors = array($firstFlavor->getId() => $firstFlavor);
 		foreach ($flavors as $currentFlavor)
 		{
 			foreach ($filteredFlavors as $elementKey => $flavor)
@@ -979,7 +979,7 @@ class playManifestAction extends kalturaAction
 				/* @var $flavor flavorAsset */
 				if (abs(($currentFlavor->getBitrate() - $flavor->getBitrate())) <= ($currentFlavor->getBitrate() * self::FLAVOR_GROUPING_PERCENTAGE_FACTOR)
 					&& ($currentFlavor->getBitrate() >= $flavor->getBitrate())
-					&& (($currentFlavor->getHeight() * $currentFlavor->getWidth()) >= ($flavor->getHeight() * $flavor->getWidth()))
+					&& ($currentFlavor->getFrameSize() >= $flavor->getFrameSize())
 				)
 				{
 					//delete this particular object from the filttered flavors array
@@ -1367,14 +1367,14 @@ class playManifestAction extends kalturaAction
 	{
 		/* @var $a flavorAsset */
 		/* @var $b flavorAsset */
-		if ($a->getHeight() * $a->getWidth() == ($b->getHeight() * $b->getWidth()))
+		if ($a->getFrameSize() == $b->getFrameSize())
 		{
 			$val = $a->getBitrate() - $b->getBitrate();
 			return $val ? $val : $a->getIntId() - $b->getIntId();
 		}
 		else
 		{
-			return ($a->getHeight() * $a->getWidth()) - ($b->getHeight() * $b->getWidth());
+			return $a->getFrameSize() - $b->getFrameSize();
 		}
 	}
 }
