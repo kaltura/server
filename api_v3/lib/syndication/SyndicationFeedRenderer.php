@@ -46,7 +46,8 @@ abstract class SyndicationFeedRenderer {
 		if ( $this->syndicationFeedDB->getPlayerType() == PlayerType::HTML5Player )
 		{
 		    $isPlaykit = false;
-		    if ($this->syndicationFeed->playerUiconfId) {
+		    if ($this->syndicationFeed->playerUiconfId) 
+		    {
 			$dbUiConf = uiConfPeer::retrieveByPK( $this->syndicationFeed->playerUiconfId );
 			if($dbUiConf && strpos( $dbUiConf->getTags() , 'kalturaPlayerJs') !== false) 
 			{
