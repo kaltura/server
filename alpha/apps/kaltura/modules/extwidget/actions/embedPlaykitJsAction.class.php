@@ -519,7 +519,7 @@ class embedPlaykitJsAction extends sfAction
 		
 		//create base64 bundle name from json config
 		$config_str = json_encode($this->bundleConfig);
-		$this->bundle_name = base64_encode($config_str);
+		$this->bundle_name = md5($config_str);
 		if($this->cacheVersion)
 			$this->bundle_name = $this->cacheVersion . "_" . $this->bundle_name;
 	}
