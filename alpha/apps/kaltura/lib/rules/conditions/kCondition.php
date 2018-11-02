@@ -22,13 +22,14 @@ abstract class kCondition
 	protected $not = false;
 
 	/**
-	 * @var bool
+	 * @var array
 	 */
-	protected $partnerInternal = false;
+	protected $extraProperties;
 
 	public function __construct($not = false)
 	{
 		$this->setNot($not);
+		$this->extraProperties = array();
 	}
 	
 	/**
@@ -121,12 +122,28 @@ abstract class kCondition
 		return true;
 	}
 
-	/**
-	 * @return bool
-	 */
-	public function partnerInternal()
+	public function getExtraProperties()
 	{
-		return $this->partnerInternal;
+		if (is_null($this->extraProperties))
+		{
+			return array();
+		}
+		return $this->extraProperties;
 	}
+
+	public function getExtraPropertyByName($fieldName)
+	{
+		if (isset($this->extraProperties[$fieldName]))
+		{
+			return $this->extraProperties[$fieldName];
+		}
+		return null;
+	}
+
+	public function setExtraProperties($fieldName, $value)
+	{
+		$this->extraProperties[$fieldName] = $value;
+	}
+
 
 }

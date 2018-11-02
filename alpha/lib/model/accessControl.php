@@ -31,15 +31,23 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	protected $scope;
 
 	/**
-	 * @var bool
+	 * @var array
 	 */
-	protected $partnerInternal = false;
+	protected $extraProperties;
+
 
 	const IP_ADDRESS_RESTRICTION_COLUMN_NAME = 'ip_address_restriction';
 	const USER_AGENT_RESTRICTION_COLUMN_NAME = 'user_agent_restriction';
 	const CUSTOM_DATA_RULES_ARRAY_COMPRESSED = 'rules_array_compressed';
 	const CUSTOM_DATA_IP_TREE = 'ip_tree';
-	
+
+	public function __construct()
+	{
+		parent::__construct();
+		$this->extraProperties = array();
+	}
+
+
 	/* (non-PHPdoc)
 	 * @see BaseaccessControl::preSave()
 	 */
@@ -259,10 +267,14 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		$fulfilledRules = array();
 		foreach($rules as $ruleNum => $rule)
 		{
+			/* @var $rule kRule */
+			if ($rule->getRuleData() === '{"type":"ServeFromKESRule"}')
+			{
+				$this->extraProperties['ServeFromKESRule'] = true;
+			}
 			if($isKsAdmin && !$rule->getForceAdminValidation())
 				continue;
-				
-			/* @var $rule kRule */
+
 			$fulfilled = $rule->applyContext($context);
 				 
 			if($rule->shouldDisableCache())
@@ -272,7 +284,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			{
 				$fulfilledRules[] = $ruleNum;
 
-				$this->partnerInternal = $this->partnerInternal || $rule->partnerInternal();
+				$this->extraProperties = array_merge($this->getExtraProperties(), $rule->getExtraProperties());
 
 				if ($rule->getStopProcessing())
 					break;
@@ -487,12 +499,13 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		return $rulesIpTree;
 	}
 
-	/**
-	 * @return bool
-	 */
-	public function partnerInternal()
+	public function getExtraProperties()
 	{
-		return $this->partnerInternal;
+		if (is_null($this->extraProperties))
+		{
+			return array();
+		}
+		return $this->extraProperties;
 	}
 
 

@@ -1297,17 +1297,19 @@ class playManifestAction extends kalturaAction
 		$renderer->setPlaybackContext($playbackContext);
 		$renderer->setDeliveryCode($deliveryCode);
 
-		$playLocation = 'external';
-		if ($this->deliveryAttributes->getEdgeServerIds() && count($this->deliveryAttributes->getEdgeServerIds()))
+		if ($this->secureEntryHelper->getExtraPropertyByName('ServeFromKESRule'))
 		{
-			$playLocation = implode(",", $this->deliveryAttributes->getEdgeServerIds());
+			$playLocation = 'external';
+			if ($this->deliveryAttributes->getEdgeServerIds() && count($this->deliveryAttributes->getEdgeServerIds()))
+			{
+				$playLocation = implode(",", $this->deliveryAttributes->getEdgeServerIds());
+			} else if ($this->secureEntryHelper->getExtraPropertyByName('partnerInternal'))
+			{
+				$playLocation = 'internal';
+			}
+			$renderer->setPlayLocation($playLocation);
+			$renderer->setInternalIP($this->secureEntryHelper->getExtraPropertyByName('partnerInternal_IP'));
 		}
-		else if ($this->secureEntryHelper->partnerInternal())
-		{
-			$playLocation = 'internal';
-		}
-		$renderer->setPlayLocation($playLocation);
-
 		$renderer->output();
 	}
 

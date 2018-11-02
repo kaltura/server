@@ -83,7 +83,8 @@ class kIpAddressCondition extends kMatchCondition
 		$res = kIpAddressUtils::isIpInRanges($field, $value);
 		if ($res && $this->getHttpHeader())
 		{
-			$this->partnerInternal = true;
+			$this->setExtraProperties('partnerInternal', true);
+			$this->setExtraProperties('partnerInternal_IP', $field);
 		}
 		return $res;
 	}

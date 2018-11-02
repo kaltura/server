@@ -80,19 +80,20 @@ class kRule
 	 */
 	
 	protected $scope;
-	
+
+	/**
+	 * @var array
+	 */
+	protected $extraProperties;
+
 	/**
 	 * @param kScope $scope
 	 */
 	public function __construct(kScope $scope = null)
 	{
 		$this->scope = $scope;
+		$this->extraProperties = array();
 	}
-
-	/**
-	 * @var bool
-	 */
-	protected $partnerInternal = false;
 
 	/**
 	 * @return the $conditions
@@ -149,7 +150,7 @@ class kRule
 				KalturaLog::debug("Condition [" . get_class($condition) . "] not  fulfilled");
 				return false;
 			}
-			$this->partnerInternal = $this->partnerInternal || $condition->partnerInternal();
+			$this->extraProperties = array_merge($this->getExtraProperties(), $condition->getExtraProperties());
 		}
 				
 		KalturaLog::debug("All conditions fulfilled");
@@ -377,11 +378,13 @@ class kRule
 		return true;
 	}
 
-	/**
-	 * @return bool
-	 */
-	public function partnerInternal()
+	public function getExtraProperties()
 	{
-		return $this->partnerInternal;
+		if (is_null($this->extraProperties))
+		{
+			return array();
+		}
+		return $this->extraProperties;
 	}
+
 }

@@ -68,7 +68,7 @@ abstract class kManifestRenderer
 	/**
 	 * @var string
 	 */
-	protected $playLocation = 'External';
+	protected $playLocation = null;
 
 	protected function prepareFlavors()
 	{
@@ -166,6 +166,13 @@ abstract class kManifestRenderer
 		$this->playLocation = $playLocation;
 	}
 
+	/**
+	 * @param string $internalIP
+	 */
+	public function setInternalIP($internalIP)
+	{
+		$this->internalIP = $internalIP;
+	}
 
 	protected function replacePlaybackContext($str)
 	{
@@ -189,6 +196,13 @@ abstract class kManifestRenderer
 			'playbackType' => $this->entryType,
 			'playLocation' => $this->playLocation,
 		);
+
+		if ($this->playLocation)
+		{
+			$output['serverNodeIds'] = $this->playLocation;
+			$output['internal_ip'] = $this->internalIP;
+		}
+
 
 		$params = infraRequestUtils::getRequestParams();
 		$mapping = array(

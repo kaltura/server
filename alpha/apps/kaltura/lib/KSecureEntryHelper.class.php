@@ -76,9 +76,9 @@ class KSecureEntryHelper
 	protected static $trustedPartnerIds = array (Partner::BATCH_PARTNER_ID);
 
 	/**
-	 * @var bool
+	 * @var array
 	 */
-	protected $partnerInternal = false;
+	protected $extraProperties;
 
 	/**
 	 * 
@@ -95,7 +95,8 @@ class KSecureEntryHelper
 			if(!$entry)
 				KExternalErrors::dieError(KExternalErrors::PARENT_ENTRY_ID_NOT_FOUND, "Entry is configured with parent entry, but parent entry was not found");
 		}
-			
+
+		$this->extraProperties = array();
 		$this->entry = $entry;
 		$this->ksStr = $ksStr;
 		$this->referrer = $referrer;
@@ -314,7 +315,7 @@ class KSecureEntryHelper
 		$this->contextResult = new kEntryContextDataResult();
 		$scope = $this->getAccessControlScope();
 		$this->disableCache = $accessControl->applyContext($this->contextResult, $scope);
-		$this->partnerInternal = $accessControl->partnerInternal();
+		$this->extraProperties = $accessControl->getExtraProperties();
 
 		if (count ( $this->contextResult->getActions () )) {
 			foreach ( $this->contextResult->getActions () as $action )
@@ -474,12 +475,22 @@ class KSecureEntryHelper
 		}
 	}
 
-	/**
-	 * @return bool
-	 */
-	public function partnerInternal()
+	public function getExtraProperties()
 	{
-		return $this->partnerInternal;
+		if (is_null($this->extraProperties))
+		{
+			return array();
+		}
+		return $this->extraProperties;
+	}
+
+	public function getExtraPropertyByName($fieldName)
+	{
+		if (isset($this->extraProperties[$fieldName]))
+		{
+			return $this->extraProperties[$fieldName];
+		}
+		return null;
 	}
 
 }
