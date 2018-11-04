@@ -241,6 +241,8 @@ class KalturaErrors extends APIErrors
 
 	const INGEST_NOT_FOUND_IN_CONVERSION_PROFILE = "INGEST_NOT_FOUND_IN_CONVERSION_PROFILE;STREAM_NAME;Ingest \"@STREAM_NAME@\" is not in conversion profile";
 
+	const SOURCE_FLAVOR_CHANGED_DURING_CONVERSION = "SOURCE_FLAVOR_CHANGED_DURING_CONVERSION;ORIGINAL_SOURCE_FILE;Source flavor was changed during conversion, current - \"@CURRENT_SOURCE_FILE@\" ,original source file - \"@ORIGINAL_SOURCE_FILE@\", ID - \"@ID@\" ,  aborting.";
+
 	/**
 	 * FlavorParams Service
 	 */
@@ -354,8 +356,6 @@ class KalturaErrors extends APIErrors
 	const CANNOT_SET_MULTI_PRIVACY_CONTEXT = "CANNOT_SET_MULTI_PRIVACY_CONTEXT;; Cannot set multiple privacy context when Disable Category Limit feature is turned on";
 
 	const AGGREGATION_CATEGORY_WRONG_ASSOCIATION = "AGGREGATION_CATEGORY_WRONG_ASSOCIATION;; Cannot create aggregation category association";
-
-	const CATEGORY_NAME_CONTAINS_INVALID_CHARS = "CATEGORY_NAME_CONTAINS_INVALID_CHARS;;Category name contains invalid chars.";
 
 	/**
 	 * Batch Service

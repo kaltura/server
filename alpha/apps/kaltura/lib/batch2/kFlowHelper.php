@@ -722,6 +722,7 @@ class kFlowHelper
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
+
 		// verifies that flavor asset created
 		if(!$data->getFlavorAssetId())
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
@@ -730,6 +731,11 @@ class kFlowHelper
 		// verifies that flavor asset exists
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+
+		$originalSrcFileSync = $data->getSrcFileSyncLocalPath();
+		/* @var  $sourceFileSyncDescriptor kSourceFileSyncDescriptor*/
+		$sourceFileSyncDescriptor = $data->getSrcFileSyncs();
+		self::validateSourceFileSync(basename($originalSrcFileSync),$sourceFileSyncDescriptor[0],$dbBatchJob->getPartnerId());
 
 		$shouldSave = false;
 		if(!is_null($data->getEngineMessage())) {
@@ -787,6 +793,28 @@ class kFlowHelper
 		}
 		return $dbBatchJob;
 	}
+
+	protected static function validateSourceFileSync($originalSrcPath,$sourceFileSyncDescriptor,$partnerId)
+	{
+		//validate that the source is still the same
+		$srcAssetId = $sourceFileSyncDescriptor->getAssetId();
+		$originalFlavor = assetPeer::retrieveById($srcAssetId);
+
+		$fileSyncKey = new FileSyncKey();
+		$fileSyncKey->setObjectType(FileSyncObjectType::ASSET);
+		$fileSyncKey->setObjectId($srcAssetId);
+		$fileSyncKey->setVersion($originalFlavor->getVersion());
+		$fileSyncKey->setObjectSubType($sourceFileSyncDescriptor->getFileSyncObjectSubType());
+		$fileSyncKey->setPartnerId($partnerId);
+
+		$currentSrcFileSync = FileSyncPeer::retrieveByFileSyncKey($fileSyncKey,true);
+		$currentFilePath = basename($currentSrcFileSync->getFilePath());
+		if(!empty($currentFilePath) && strcmp($currentFilePath,$originalSrcPath))
+		{
+			throw new APIException(KalturaErrors::SOURCE_FLAVOR_CHANGED_DURING_CONVERSION, $currentFilePath, $originalSrcPath, $srcAssetId);
+		}
+	}
+
 	private static function handleFlavorAssetConvertFinished(flavorAsset $flavorAsset, flavorParamsOutput $flavorParamsOutput, BatchJob $dbBatchJob, kConvertJobData $data)
 	{
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
