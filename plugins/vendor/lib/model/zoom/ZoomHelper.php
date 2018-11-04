@@ -26,6 +26,8 @@ class ZoomHelper
 	/** php body */
 	const PHP_INPUT = 'php://input';
 
+	const ADMIN_TAG_ZOOM = 'zoomentry';
+
 	/**
 	 * @param kuser $dbUser
 	 * @param string $zoomCategory
@@ -46,7 +48,7 @@ class ZoomHelper
 		$entry->setPuserId($dbUser->getPuserId());
 		$entry->setKuserId($dbUser->getKuserId());
 		$entry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($dbUser->getPartnerId())->getId());
-		$entry->setAdminTags('zoom');
+		$entry->setAdminTags(self::ADMIN_TAG_ZOOM);
 		if ($zoomCategory)
 		{
 			$entry->setCategories($zoomCategory);
