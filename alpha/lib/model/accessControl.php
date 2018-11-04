@@ -174,7 +174,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		return false;
 	}
 	
-	public function filterRulesByTree($rules)
+	public function filterRulesByTree(&$rules)
 	{
 		// in case of an IP optimization tree filter relevant rules
 		$ipTree = $this->getIpTree();

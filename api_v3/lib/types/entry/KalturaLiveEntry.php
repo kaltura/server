@@ -348,7 +348,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		
 		/* @var $sourceObject LiveEntry */
 		$getter = "get" . ucfirst($resolvedAttrName);
-		if($sourceObject->$getter() !== $this->$attr)
+		if(!$sourceObject || $sourceObject->$getter() !== $this->$attr)
 			return true;
 		
 		return false;

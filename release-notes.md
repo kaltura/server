@@ -1,3 +1,22 @@
+# Naos 14.8.0 #
+
+## Add permission in Admin Console for New Analytics ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-9334
+
+### configuration ###
+    Add the following to admin.ini:
+    
+    moduls.newAnalyticsTab.enabled = true
+    moduls.newAnalyticsTab.permissionType = 2
+    moduls.newAnalyticsTab.label = "New Analytics"
+    moduls.newAnalyticsTab.permissionName = FEATURE_NEW_ANALYTICS_TAB
+    moduls.newAnalyticsTab.group = GROUP_ENABLE_DISABLE_FEATURES
+    
+### Deployment scripts ###
+    None
+    
 # Naos 14.7.0 #
 
 ## PLAT-8932 - Load configuration from central memcache

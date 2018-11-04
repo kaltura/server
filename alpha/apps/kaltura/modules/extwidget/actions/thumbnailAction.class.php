@@ -172,6 +172,8 @@ class thumbnailAction extends sfAction
 				if ($partner)
 				{
 					KalturaMonitorClient::initApiMonitor(false, 'extwidget.thumbnail', $partner->getId());
+					myPartnerUtils::blockInactivePartner($partner->getId());
+
 					if ($quality == 0)
 						$quality = $partner->getDefThumbQuality();
 
@@ -258,6 +260,7 @@ class thumbnailAction extends sfAction
 		}
 
 		KalturaMonitorClient::initApiMonitor(false, 'extwidget.thumbnail', $entry->getPartnerId());
+		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
 		
 		if ( $nearest_aspect_ratio )
 		{

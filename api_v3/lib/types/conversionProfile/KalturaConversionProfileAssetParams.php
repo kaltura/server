@@ -86,6 +86,12 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IRela
          */
         public $tags;
 
+	/**
+	 * JSON string containing an array of flavotParams field-value pairs.
+	 * @var string
+	 */
+	public $overloadParams;
+	
 	private static $map_between_objects = array
 	(
 		'conversionProfileId',
@@ -100,6 +106,7 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IRela
 		'chunkedEncodeMode',
 		'twoPass',
 		'tags',
+		'overloadParams',
 	);
 	
 	/* (non-PHPdoc)
