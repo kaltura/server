@@ -73,14 +73,22 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
+		//Gets the right job for the engine
+		if($baseClass == 'KalturaDropFolderBulkUploadJobData' && $enumValue == self::getBulkUploadTypeCoreValue(DropFolderXmlBulkUploadType::DROP_FOLDER_XML))
+			return new KalturaDropFolderXmlBulkUploadJobData();
+
+		//Gets the right job for the engine
+		if($baseClass == 'KalturaBulkUploadJobData' && $enumValue == self::getBulkUploadTypeCoreValue(DropFolderXmlBulkUploadType::DROP_FOLDER_XML))
+			return new KalturaDropFolderXmlBulkUploadJobData();
+
 		//Gets the right job for the engine	
 		if($baseClass == 'kBulkUploadJobData' && $enumValue == self::getBulkUploadTypeCoreValue(DropFolderXmlBulkUploadType::DROP_FOLDER_XML))
-			return new kBulkUploadXmlJobData();
-		
-		 //Gets the right job for the engine	
-		if($baseClass == 'KalturaBulkUploadJobData' && $enumValue == self::getBulkUploadTypeCoreValue(DropFolderXmlBulkUploadType::DROP_FOLDER_XML))
-			return new KalturaBulkUploadXmlJobData();
-		
+			return new kDropFolderBulkUploadXmlJobData();
+
+		//Gets the right job for the engine
+		if($baseClass == 'kDropFolderBulkUploadXmlJobData' && $enumValue == self::getBulkUploadTypeCoreValue(DropFolderXmlBulkUploadType::DROP_FOLDER_XML))
+			return new kDropFolderBulkUploadXmlJobData();
+
 		//Gets the engine (only for clients)
 		if($baseClass == 'KBulkUploadEngine' && class_exists('KalturaClient') && $enumValue == KalturaBulkUploadType::DROP_FOLDER_XML)
 		{

@@ -310,16 +310,16 @@ class kDropFolderXmlFileHandler
 			$objectType = DropFolderXmlBulkUploadPlugin::getBatchJobObjectTypeCoreValue(DropFolderBatchJobObjectType::DROP_FOLDER_FILE);
 			$partner = PartnerPeer::retrieveByPK($folder->getPartnerId());
 			
-			$data = KalturaPluginManager::loadObject('kBulkUploadJobData', $coreBulkUploadType);
-			/* @var $data kBulkUploadJobData */
+			$data = KalturaPluginManager::loadObject('kDropFolderBulkUploadXmlJobData', $coreBulkUploadType);
+			/* @var $data kDropFolderBulkUploadXmlJobData */
 			$data->setUploadedBy(kDropFolderXmlEventsConsumer::UPLOADED_BY);
 			$data->setFileName($leadDropFolderFile->getFileName());
 			$data->setBulkUploadObjectType(BulkUploadObjectType::ENTRY);
-						
+			$data->setDropFolderId($folder->getId());
 			$objectData = new kBulkUploadEntryData();
 			$objectData->setConversionProfileId($folder->getConversionProfileId());
 			$data->setObjectData($objectData);
-	
+
 			$job = kJobsManager::addBulkUploadJob($partner, $data, $coreBulkUploadType, $objectId, $objectType);
 			return $job;
 		}
