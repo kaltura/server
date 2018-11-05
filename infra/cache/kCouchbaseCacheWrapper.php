@@ -847,7 +847,16 @@ class kCouchbaseCacheWrapper extends kInfraBaseCacheWrapper
 	public function query(kCouchbaseCacheQuery $query)
 	{
 		$couchBaseQuery = $query->toQuery();
-		$meta =  $this->bucket->query($couchBaseQuery);
+		try
+		{
+			$meta =  $this->bucket->query($couchBaseQuery);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::debug("Failed to query CouchBase bucket with error [" . $e->getMessage() . "]");
+			return new kCouchbaseCacheList(array());;
+		}
+		
 		if(phpversion('couchbase') > '2.0.7')
 			$meta = json_decode(json_encode($meta), true);
 		return new kCouchbaseCacheList($meta);
