@@ -241,7 +241,7 @@ class KalturaErrors extends APIErrors
 
 	const INGEST_NOT_FOUND_IN_CONVERSION_PROFILE = "INGEST_NOT_FOUND_IN_CONVERSION_PROFILE;STREAM_NAME;Ingest \"@STREAM_NAME@\" is not in conversion profile";
 
-	const SOURCE_FLAVOR_CHANGED_DURING_CONVERSION = "SOURCE_FLAVOR_CHANGED_DURING_CONVERSION;ORIGINAL_SOURCE_FILE;Source flavor was changed during conversion, current - \"@CURRENT_SOURCE_FILE@\" ,original source file - \"@ORIGINAL_SOURCE_FILE@\", ID - \"@ID@\" ,  aborting.";
+	const SOURCE_FLAVOR_CHANGED_DURING_CONVERSION = "SOURCE_FLAVOR_CHANGED_DURING_CONVERSION;CURRENT_SOURCE_FILE;ORIGINAL_SOURCE_FILE;ID;Source flavor was changed during conversion, current - \"@CURRENT_SOURCE_FILE@\" ,original source file - \"@ORIGINAL_SOURCE_FILE@\", ID - \"@ID@\" ,  aborting.";
 
 	/**
 	 * FlavorParams Service
