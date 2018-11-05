@@ -149,7 +149,7 @@ class ZoomVendorService extends KalturaBaseService
 	 * @throws PropelException
 	 * @throws Exception
 	 */
-	public function submitRegistrationAction($defaultUserId, $zoomCategory=null, $accountId, $enableRecordingUpload, $createUserIfNotExist)
+	public function submitRegistrationAction($defaultUserId, $zoomCategory = null, $accountId, $enableRecordingUpload, $createUserIfNotExist)
 	{
 		KalturaResponseCacher::disableCache();
 		$partnerId = kCurrentContext::getCurrentPartnerId();
