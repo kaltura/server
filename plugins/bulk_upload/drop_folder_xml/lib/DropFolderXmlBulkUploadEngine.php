@@ -38,17 +38,12 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 		
 		KBatchBase::impersonate($this->currentPartnerId);
 		$dropFolderPlugin = KalturaDropFolderClientPlugin::get(KBatchBase::$kClient);
-		KBatchBase::$kClient->startMultiRequest();
 		$this->xmlDropFolderFileId = $this->job->jobObjectId;
-		$dropFolderPlugin->dropFolder->get($job->data->dropFolderId);
-		list($this->dropFolder) = KBatchBase::$kClient->doMultiRequest();
-				
+		$this->dropFolder = $dropFolderPlugin->dropFolder->get($job->data->dropFolderId);
 		$this->fileTransferMgr = KDropFolderFileTransferEngine::getFileTransferManager($this->dropFolder);
 		if(!$this->data->filePath)
 		{
-			KBatchBase::$kClient->startMultiRequest();
-			$dropFolderPlugin->dropFolderFile->get($this->xmlDropFolderFileId);
-			list($xmlDropFolderFile) = KBatchBase::$kClient->doMultiRequest();
+			$xmlDropFolderFile = $dropFolderPlugin->dropFolderFile->get($this->xmlDropFolderFileId);
 			$this->data->filePath = $this->getLocalFilePath($xmlDropFolderFile->fileName, $this->xmlDropFolderFileId);
 		}
 		

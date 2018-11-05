@@ -12,7 +12,7 @@ class kDropFolderBulkUploadXmlJobData extends kBulkUploadXmlJobData
 	protected $dropFolderId;
 
 	/**
-	 * @return int $privileges
+	 * @return int $dropFolderId
 	 */
 	public function getDropFolderId()
 	{
