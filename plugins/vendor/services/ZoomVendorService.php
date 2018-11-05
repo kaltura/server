@@ -208,7 +208,7 @@ class ZoomVendorService extends KalturaBaseService
 		}
 		if($zoomIntegration->getStatus()==VendorStatus::DISABLED)
 		{
-			throw new KalturaAPIException('Uploads are disabled for this Zoom account');
+			throw new KalturaAPIException('Uploads are disabled for current Partner');
 		}
 		$emails = ZoomHelper::extractCoHosts($meetingId, $zoomIntegration, $accountId);
 		// user logged in - need to re-init kPermissionManager in order to determine current user's permissions
