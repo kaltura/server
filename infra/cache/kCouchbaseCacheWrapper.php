@@ -853,7 +853,7 @@ class kCouchbaseCacheWrapper extends kInfraBaseCacheWrapper
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::err("Failed to query CouchBase bucket with error [" . $e->getMessage() . "]");
+			KalturaLog::debug("Failed to query CouchBase bucket with error [" . $e->getMessage() . "]");
 			return new kCouchbaseCacheList(array());;
 		}
 		
