@@ -107,6 +107,10 @@ class kEntitlementUtils
 		}
 
 		$partner = $entry->getPartner();
+		if ($partner->getId() == PartnerPeer::GLOBAL_PARTNER)
+		{
+			return true;
+		}
 
 		if(!$ks && !$partner->getDefaultEntitlementEnforcement())
 		{
