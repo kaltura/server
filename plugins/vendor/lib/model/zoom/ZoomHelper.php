@@ -332,23 +332,21 @@ class ZoomHelper
 	/**
 	 * @param int $partnerId
 	 * @param string $categoryFullName
+	 * @param bool $createIfNotExist
 	 * @throws Exception
 	 * @return int id;
 	 */
-	public static function createCategoryForZoom($partnerId, $categoryFullName)
+	public static function createCategoryForZoom($partnerId, $categoryFullName, $createIfNotExist)
 	{
-		//Validate category full name does not contain spacial chars
-		$tempCategoryFullName = categoryPeer::getParsedFullName($categoryFullName);
-		if(strcmp($tempCategoryFullName, $categoryFullName))
-		{
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_NAME_CONTAINS_INVALID_CHARS);
-		}
-
 		$category = categoryPeer::getByFullNameExactMatch($categoryFullName, null, $partnerId);
 		if($category)
 		{
 			KalturaLog::debug('Category: ' . $categoryFullName . ' already exist for partner: ' . $partnerId);
 			return $category->getId();
+		}
+		if(!$createIfNotExist)
+		{
+			return null;
 		}
 
 		$categoryDb = new category();
