@@ -210,7 +210,7 @@ class ZoomVendorService extends KalturaBaseService
 		}
 		if($zoomIntegration->getStatus()==VendorStatus::DISABLED)
 		{
-			KalturaLog::info("Recieved recording complete event from Zoom account {$accountId} while upload is disabled.")
+			KalturaLog::info("Recieved recording complete event from Zoom account {$accountId} while upload is disabled.");
 			throw new KalturaAPIException('Uploads are disabled for current Partner');
 		}
 		$emails = ZoomHelper::extractCoHosts($meetingId, $zoomIntegration, $accountId);
