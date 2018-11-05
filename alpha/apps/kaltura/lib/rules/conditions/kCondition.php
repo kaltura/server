@@ -29,7 +29,6 @@ abstract class kCondition
 	public function __construct($not = false)
 	{
 		$this->setNot($not);
-		$this->extraProperties = array();
 	}
 	
 	/**
@@ -129,15 +128,6 @@ abstract class kCondition
 			return array();
 		}
 		return $this->extraProperties;
-	}
-
-	public function getExtraPropertyByName($fieldName)
-	{
-		if (isset($this->extraProperties[$fieldName]))
-		{
-			return $this->extraProperties[$fieldName];
-		}
-		return null;
 	}
 
 	public function setExtraProperties($fieldName, $value)

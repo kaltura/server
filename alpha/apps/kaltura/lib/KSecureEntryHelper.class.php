@@ -96,7 +96,6 @@ class KSecureEntryHelper
 				KExternalErrors::dieError(KExternalErrors::PARENT_ENTRY_ID_NOT_FOUND, "Entry is configured with parent entry, but parent entry was not found");
 		}
 
-		$this->extraProperties = array();
 		$this->entry = $entry;
 		$this->ksStr = $ksStr;
 		$this->referrer = $referrer;

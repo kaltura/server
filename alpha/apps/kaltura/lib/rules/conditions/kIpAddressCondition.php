@@ -81,6 +81,7 @@ class kIpAddressCondition extends kMatchCondition
 	protected function matches($field, $value)
 	{
 		$res = kIpAddressUtils::isIpInRanges($field, $value);
+		//The assumption is that if we have a HTTP header set and that the IP is in range it comes from an internal IP source.
 		if ($res && $this->getHttpHeader())
 		{
 			$this->setExtraProperties('partnerInternal', true);

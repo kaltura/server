@@ -92,7 +92,6 @@ class kRule
 	public function __construct(kScope $scope = null)
 	{
 		$this->scope = $scope;
-		$this->extraProperties = array();
 	}
 
 	/**

@@ -192,6 +192,11 @@ class DeliveryProfileDynamicAttributes {
 	 */
 	protected $edgeServerFallback = false;
 
+	/**
+	 * List of edge server ids content should b server from
+	 * @var array
+	 */
+	protected $usedEdgeServerIds;
 
 	/**
 	 * @return the $addThumbnailExtension
@@ -596,6 +601,20 @@ class DeliveryProfileDynamicAttributes {
 	public function getServeLiveAsVodEntryId()
 	{
 		return $this->serveLiveAsVodEntryId;
+	}
+
+	public function addUsedEdgeServerIds($serverNodesIds)
+	{
+		if (is_null($this->usedEdgeServerIds))
+		{
+			$this->usedEdgeServerIds = array();
+		}
+		$this->usedEdgeServerIds = array_merge($this->usedEdgeServerIds, array_diff($serverNodesIds, $this->usedEdgeServerIds ));
+	}
+
+	public function getUsedEdgeServerIds()
+	{
+		return $this->usedEdgeServerIds;
 	}
 
 	/**

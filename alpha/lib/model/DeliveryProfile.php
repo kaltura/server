@@ -513,6 +513,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	
 		if(count($deliveryNodes) && $removeAfterUse)
 			$this->params->setEdgeServerIds(array_diff($deliveryNodeIds, array($deliveryNode->getId())));
+		$this->params->addUsedEdgeServerIds(array($deliveryNode->getId()));
 	
 		return $deliveryUrl;
 	}

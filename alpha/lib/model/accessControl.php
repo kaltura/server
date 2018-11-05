@@ -41,12 +41,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	const CUSTOM_DATA_RULES_ARRAY_COMPRESSED = 'rules_array_compressed';
 	const CUSTOM_DATA_IP_TREE = 'ip_tree';
 
-	public function __construct()
-	{
-		parent::__construct();
-		$this->extraProperties = array();
-	}
-
+	const SERVE_FROM_SERVER_NODE_RULE = 'SERVE_FROM_SERVER_NODE_RULE';
 
 	/* (non-PHPdoc)
 	 * @see BaseaccessControl::preSave()
@@ -268,10 +263,11 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		foreach($rules as $ruleNum => $rule)
 		{
 			/* @var $rule kRule */
-			if ($rule->getRuleData() === '{"type":"ServeFromKESRule"}')
+			if (is_null($this->extraProperties[self::SERVE_FROM_SERVER_NODE_RULE]) && $rule->hasActionType(array(RuleActionType::SERVE_FROM_REMOTE_SERVER)))
 			{
-				$this->extraProperties['ServeFromKESRule'] = true;
+				$this->extraProperties[self::SERVE_FROM_SERVER_NODE_RULE] = true;
 			}
+
 			if($isKsAdmin && !$rule->getForceAdminValidation())
 				continue;
 

@@ -70,6 +70,12 @@ abstract class kManifestRenderer
 	 */
 	protected $playLocation = null;
 
+	/**
+	 * @var string
+	 */
+	protected $internalIP = null;
+
+
 	protected function prepareFlavors()
 	{
 	}
@@ -151,14 +157,6 @@ abstract class kManifestRenderer
 	}
 
 	/**
-	 * @return string
-	 */
-	public function getPlayLocation()
-	{
-		return $this->playLocation;
-	}
-
-	/**
 	 * @param string $playLocation
 	 */
 	public function setPlayLocation($playLocation)
@@ -194,7 +192,6 @@ abstract class kManifestRenderer
 			'entryId' => $this->entryId,
 			'partnerId' => $this->partnerId,
 			'playbackType' => $this->entryType,
-			'playLocation' => $this->playLocation,
 		);
 
 		if ($this->playLocation)
