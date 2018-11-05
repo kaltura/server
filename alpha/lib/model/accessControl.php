@@ -30,11 +30,6 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	 */
 	protected $scope;
 
-	/**
-	 * @var array
-	 */
-	protected $extraProperties;
-
 
 	const IP_ADDRESS_RESTRICTION_COLUMN_NAME = 'ip_address_restriction';
 	const USER_AGENT_RESTRICTION_COLUMN_NAME = 'user_agent_restriction';
@@ -210,6 +205,11 @@ class accessControl extends BaseaccessControl implements IBaseObject
 					$filteredRules[$rule][] = $cond;
 				}
 			}
+			if (count($filteredRules) && $header)
+			{
+				$this->scope->setOutputVar(kIpAddressCondition::PARTNER_INTERNAL, true);
+				$this->scope->setOutputVar(kIpAddressCondition::PARTNER_INTERNAL_IP, $ip);
+			}
 		
 			// use + and not array_merge because the arrays have numerical indexes
 			$filteredRules += $ipTree[self::IP_TREE_UNFILTERED];
@@ -263,9 +263,9 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		foreach($rules as $ruleNum => $rule)
 		{
 			/* @var $rule kRule */
-			if (is_null($this->extraProperties[self::SERVE_FROM_SERVER_NODE_RULE]) && $rule->hasActionType(array(RuleActionType::SERVE_FROM_REMOTE_SERVER)))
+			if (is_null($this->scope->getOutputVarByName(self::SERVE_FROM_SERVER_NODE_RULE)) && $rule->hasActionType(array(RuleActionType::SERVE_FROM_REMOTE_SERVER)))
 			{
-				$this->extraProperties[self::SERVE_FROM_SERVER_NODE_RULE] = true;
+				$this->scope->setOutputVar(self::SERVE_FROM_SERVER_NODE_RULE,true);
 			}
 
 			if($isKsAdmin && !$rule->getForceAdminValidation())
@@ -279,8 +279,6 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			if($fulfilled)
 			{
 				$fulfilledRules[] = $ruleNum;
-
-				$this->extraProperties = array_merge($this->getExtraProperties(), $rule->getExtraProperties());
 
 				if ($rule->getStopProcessing())
 					break;
@@ -468,8 +466,8 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		}
 		
 		// don't bother with building the ip tree for a small number of conditions
-		if ($largestCondType === false || count($ipRuleConds[$largestCondType]) < 100)
-			return null;
+//		if ($largestCondType === false || count($ipRuleConds[$largestCondType]) < 100)
+//			return null;
 		
 		// build tree from most common ip cond type conditions
 		
@@ -494,15 +492,4 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			
 		return $rulesIpTree;
 	}
-
-	public function getExtraProperties()
-	{
-		if (is_null($this->extraProperties))
-		{
-			return array();
-		}
-		return $this->extraProperties;
-	}
-
-
 }

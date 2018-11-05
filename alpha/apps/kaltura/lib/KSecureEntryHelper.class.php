@@ -76,9 +76,9 @@ class KSecureEntryHelper
 	protected static $trustedPartnerIds = array (Partner::BATCH_PARTNER_ID);
 
 	/**
-	 * @var array
+	 * @var accessControlScope
 	 */
-	protected $extraProperties;
+	protected $scope;
 
 	/**
 	 * 
@@ -313,8 +313,8 @@ class KSecureEntryHelper
 			
 		$this->contextResult = new kEntryContextDataResult();
 		$scope = $this->getAccessControlScope();
+		$this->scope = $scope;
 		$this->disableCache = $accessControl->applyContext($this->contextResult, $scope);
-		$this->extraProperties = $accessControl->getExtraProperties();
 
 		if (count ( $this->contextResult->getActions () )) {
 			foreach ( $this->contextResult->getActions () as $action )
@@ -474,13 +474,8 @@ class KSecureEntryHelper
 		}
 	}
 
-	public function getExtraPropertyByName($fieldName)
+	public function getScope()
 	{
-		if (isset($this->extraProperties[$fieldName]))
-		{
-			return $this->extraProperties[$fieldName];
-		}
-		return null;
+		return $this->scope;
 	}
-
 }
