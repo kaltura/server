@@ -25,7 +25,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_DOMAIN = 'urlParts.domain';
 	const DIMENSION_URL = 'urlParts.canonicalUrl';
 	const DIMENSION_KUSER_ID = 'kuserId';
-	const DIMENSION_USER_IS_ADMIN = 'userIsAdmin';
+	const DIMENSION_USER_TYPE = 'userType';
 	const DIMENSION_APPLICATION = 'application';
 	const DIMENSION_DEVICE = 'userAgent.device';
 	const DIMENSION_OS = 'userAgent.operatingSystem';

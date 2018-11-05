@@ -1313,13 +1313,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::getLongSumAggregator($media_type, self::METRIC_COUNT)); 
 		}
 
-		$is_admin_metrics = array(
-			self::METRIC_COUNT_UGC => '0', 
-			self::METRIC_COUNT_ADMIN => '1');
-		foreach ($is_admin_metrics as $metric => $value)
+		$user_type_metrics = array(
+			self::METRIC_COUNT_UGC => 'User', 
+			self::METRIC_COUNT_ADMIN => 'Admin');
+		foreach ($user_type_metrics as $metric => $value)
 		{
 			self::$aggregations_def[$metric] = self::getFilteredAggregator(
-				self::getSelectorFilter(self::DIMENSION_USER_IS_ADMIN, $value),
+				self::getSelectorFilter(self::DIMENSION_USER_TYPE, $value),
 				self::getLongSumAggregator($metric, self::METRIC_COUNT));
 		}
 		
