@@ -112,7 +112,7 @@ abstract class KalturaServerNode extends KalturaObject implements IFilterable, I
 	 * Environment
 	 *
 	 * @var string
-	 * @filter eq
+	 * @filter eq,in
 	 */
 	public $environment;
 

@@ -971,8 +971,8 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 			$this->host_name = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->playback_host_name = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
 			$this->parent_id = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-			$this->custom_data = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
-			$this->environment = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+			$this->environment = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->custom_data = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1548,10 +1548,10 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 				return $this->getParentId();
 				break;
 			case 15:
-				return $this->getCustomData();
+				return $this->getEnvironment();
 				break;
 			case 16:
-				return $this->getEnvironment();
+				return $this->getCustomData();
 				break;
 			default:
 				return null;
@@ -1589,8 +1589,8 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 			$keys[12] => $this->getHostName(),
 			$keys[13] => $this->getPlaybackHostName(),
 			$keys[14] => $this->getParentId(),
-			$keys[15] => $this->getCustomData(),
-			$keys[16] => $this->getEnvironment(),
+			$keys[15] => $this->getEnvironment(),
+			$keys[16] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1668,10 +1668,10 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 				$this->setParentId($value);
 				break;
 			case 15:
-				$this->setCustomData($value);
+				$this->setEnvironment($value);
 				break;
 			case 16:
-				$this->setEnvironment($value);
+				$this->setCustomData($value);
 				break;
 		} // switch()
 	}
@@ -1712,8 +1712,8 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[12], $arr)) $this->setHostName($arr[$keys[12]]);
 		if (array_key_exists($keys[13], $arr)) $this->setPlaybackHostName($arr[$keys[13]]);
 		if (array_key_exists($keys[14], $arr)) $this->setParentId($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setCustomData($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setEnvironment($arr[$keys[16]]);
+		if (array_key_exists($keys[15], $arr)) $this->setEnvironment($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setCustomData($arr[$keys[16]]);
 	}
 
 	/**
@@ -1740,8 +1740,8 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(ServerNodePeer::HOST_NAME)) $criteria->add(ServerNodePeer::HOST_NAME, $this->host_name);
 		if ($this->isColumnModified(ServerNodePeer::PLAYBACK_HOST_NAME)) $criteria->add(ServerNodePeer::PLAYBACK_HOST_NAME, $this->playback_host_name);
 		if ($this->isColumnModified(ServerNodePeer::PARENT_ID)) $criteria->add(ServerNodePeer::PARENT_ID, $this->parent_id);
-		if ($this->isColumnModified(ServerNodePeer::CUSTOM_DATA)) $criteria->add(ServerNodePeer::CUSTOM_DATA, $this->custom_data);
 		if ($this->isColumnModified(ServerNodePeer::ENVIRONMENT)) $criteria->add(ServerNodePeer::ENVIRONMENT, $this->environment);
+		if ($this->isColumnModified(ServerNodePeer::CUSTOM_DATA)) $criteria->add(ServerNodePeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}

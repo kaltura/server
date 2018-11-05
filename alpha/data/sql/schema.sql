@@ -1919,8 +1919,8 @@ CREATE TABLE `server_node`
 	`host_name` VARCHAR(256)  NOT NULL,
 	`playback_host_name` VARCHAR(256),
 	`parent_id` VARCHAR(256),
-	`custom_data` TEXT,
-	`environment` VARCHAR(256),
+	`environment` VARCHAR(32),
+	`custom_data` TEXT
 	PRIMARY KEY (`id`),
 	KEY `partner_id_status_system_name`(`partner_id`, `status`, `system_name`),
 	KEY `partner_id_status_host_name`(`partner_id`, `status`, `host_name`)

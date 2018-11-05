@@ -98,10 +98,10 @@ abstract class BaseServerNodePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'Dc', 'CreatedAt', 'UpdatedAt', 'HeartbeatTime', 'PartnerId', 'Name', 'SystemName', 'Description', 'Status', 'Type', 'Tags', 'HostName', 'PlaybackHostName', 'ParentId', 'CustomData', 'Environment', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'dc', 'createdAt', 'updatedAt', 'heartbeatTime', 'partnerId', 'name', 'systemName', 'description', 'status', 'type', 'tags', 'hostName', 'playbackHostName', 'parentId', 'customData', 'environment', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::DC, self::CREATED_AT, self::UPDATED_AT, self::HEARTBEAT_TIME, self::PARTNER_ID, self::NAME, self::SYSTEM_NAME, self::DESCRIPTION, self::STATUS, self::TYPE, self::TAGS, self::HOST_NAME, self::PLAYBACK_HOST_NAME, self::PARENT_ID, self::CUSTOM_DATA, self::ENVIRONMENT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'dc', 'created_at', 'updated_at', 'heartbeat_time', 'partner_id', 'name', 'system_name', 'description', 'status', 'type', 'tags', 'host_name', 'playback_host_name', 'parent_id', 'custom_data', 'environment', ),
+		BasePeer::TYPE_PHPNAME => array ('Id', 'Dc', 'CreatedAt', 'UpdatedAt', 'HeartbeatTime', 'PartnerId', 'Name', 'SystemName', 'Description', 'Status', 'Type', 'Tags', 'HostName', 'PlaybackHostName', 'ParentId', 'Environment', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'dc', 'createdAt', 'updatedAt', 'heartbeatTime', 'partnerId', 'name', 'systemName', 'description', 'status', 'type', 'tags', 'hostName', 'playbackHostName', 'parentId', 'environment', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::DC, self::CREATED_AT, self::UPDATED_AT, self::HEARTBEAT_TIME, self::PARTNER_ID, self::NAME, self::SYSTEM_NAME, self::DESCRIPTION, self::STATUS, self::TYPE, self::TAGS, self::HOST_NAME, self::PLAYBACK_HOST_NAME, self::PARENT_ID, self::ENVIRONMENT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'dc', 'created_at', 'updated_at', 'heartbeat_time', 'partner_id', 'name', 'system_name', 'description', 'status', 'type', 'tags', 'host_name', 'playback_host_name', 'parent_id', 'environment', 'custom_data', ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
 	);
 
@@ -112,10 +112,10 @@ abstract class BaseServerNodePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Dc' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, 'HeartbeatTime' => 4, 'PartnerId' => 5, 'Name' => 6, 'SystemName' => 7, 'Description' => 8, 'Status' => 9, 'Type' => 10, 'Tags' => 11, 'HostName' => 12, 'PlaybackHostName' => 13, 'ParentId' => 14, 'CustomData' => 15, 'Environment' => 16, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'dc' => 1, 'createdAt' => 2, 'updatedAt' => 3, 'heartbeatTime' => 4, 'partnerId' => 5, 'name' => 6, 'systemName' => 7, 'description' => 8, 'status' => 9, 'type' => 10, 'tags' => 11, 'hostName' => 12, 'playbackHostName' => 13, 'parentId' => 14, 'customData' => 15, 'environment' => 16, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::DC => 1, self::CREATED_AT => 2, self::UPDATED_AT => 3, self::HEARTBEAT_TIME => 4, self::PARTNER_ID => 5, self::NAME => 6, self::SYSTEM_NAME => 7, self::DESCRIPTION => 8, self::STATUS => 9, self::TYPE => 10, self::TAGS => 11, self::HOST_NAME => 12, self::PLAYBACK_HOST_NAME => 13, self::PARENT_ID => 14, self::CUSTOM_DATA => 15, self::ENVIRONMENT => 16, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'dc' => 1, 'created_at' => 2, 'updated_at' => 3, 'heartbeat_time' => 4, 'partner_id' => 5, 'name' => 6, 'system_name' => 7, 'description' => 8, 'status' => 9, 'type' => 10, 'tags' => 11, 'host_name' => 12, 'playback_host_name' => 13, 'parent_id' => 14, 'custom_data' => 15, 'environment' => 16, ),
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Dc' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, 'HeartbeatTime' => 4, 'PartnerId' => 5, 'Name' => 6, 'SystemName' => 7, 'Description' => 8, 'Status' => 9, 'Type' => 10, 'Tags' => 11, 'HostName' => 12, 'PlaybackHostName' => 13, 'ParentId' => 14, 'Environment' => 15, 'CustomData' => 16, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'dc' => 1, 'createdAt' => 2, 'updatedAt' => 3, 'heartbeatTime' => 4, 'partnerId' => 5, 'name' => 6, 'systemName' => 7, 'description' => 8, 'status' => 9, 'type' => 10, 'tags' => 11, 'hostName' => 12, 'playbackHostName' => 13, 'parentId' => 14, 'environment' => 15, 'customData' => 16, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::DC => 1, self::CREATED_AT => 2, self::UPDATED_AT => 3, self::HEARTBEAT_TIME => 4, self::PARTNER_ID => 5, self::NAME => 6, self::SYSTEM_NAME => 7, self::DESCRIPTION => 8, self::STATUS => 9, self::TYPE => 10, self::TAGS => 11, self::HOST_NAME => 12, self::PLAYBACK_HOST_NAME => 13, self::PARENT_ID => 14, self::ENVIRONMENT => 15, self::CUSTOM_DATA => 16, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'dc' => 1, 'created_at' => 2, 'updated_at' => 3, 'heartbeat_time' => 4, 'partner_id' => 5, 'name' => 6, 'system_name' => 7, 'description' => 8, 'status' => 9, 'type' => 10, 'tags' => 11, 'host_name' => 12, 'playback_host_name' => 13, 'parent_id' => 14, 'environment' => 16, 'custom_data' => 16, ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
 	);
 
@@ -201,8 +201,8 @@ abstract class BaseServerNodePeer {
 		$criteria->addSelectColumn(ServerNodePeer::HOST_NAME);
 		$criteria->addSelectColumn(ServerNodePeer::PLAYBACK_HOST_NAME);
 		$criteria->addSelectColumn(ServerNodePeer::PARENT_ID);
-		$criteria->addSelectColumn(ServerNodePeer::CUSTOM_DATA);
 		$criteria->addSelectColumn(ServerNodePeer::ENVIRONMENT);
+		$criteria->addSelectColumn(ServerNodePeer::CUSTOM_DATA);
 	}
 
 	/**
