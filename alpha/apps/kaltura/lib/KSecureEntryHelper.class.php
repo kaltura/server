@@ -474,15 +474,6 @@ class KSecureEntryHelper
 		}
 	}
 
-	public function getExtraProperties()
-	{
-		if (is_null($this->extraProperties))
-		{
-			return array();
-		}
-		return $this->extraProperties;
-	}
-
 	public function getExtraPropertyByName($fieldName)
 	{
 		if (isset($this->extraProperties[$fieldName]))
