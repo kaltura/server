@@ -5,32 +5,36 @@ require_once __DIR__ . '/kKeyCacheInterface.php';
 
 class kApcConf extends kBaseConfCache implements kMapCacheInterface , kKeyCacheInterface
 {
-	protected $reloadFile;
+	protected $reloadFileExist;
 	protected $apcFunctionsExist;
 
 	public function __construct()
 	{
+		$reloadFile = kEnvironment::get('cache_root_path').'base.reload';
 		$this->apcFunctionsExist = function_exists('apc_fetch');
-		$this->reloadFile = kEnvironment::get('cache_root_path').'/base.reload';
-		parent::__construct();
-	}
+		$this->reloadFileExist = file_exists($reloadFile);
+		if($this->reloadFileExist)
+		{
+			$deleted = @unlink($reloadFile);
+			error_log('Base configuration reloaded');
+			if(!$deleted)
+				error_log('Failed to delete base.reload file');
+		}
 
-	protected function isReloadFileExist()
-	{
-		return file_exists($this->reloadFile);
+		parent::__construct();
 	}
 
 	public function delete($mapName)
 	{
 		if($this->apcFunctionsExist)
-			return apc_delete($mapName);
+			return apc_delete(self::CONF_MAP_PREFIX.$mapName);
 	}
 
 	public function load($key, $mapName)
 	{
-		if($this->apcFunctionsExist)
+		if($this->apcFunctionsExist && !$this->reloadFileExist)
 		{
-			$mapStr = apc_fetch($mapName);
+			$mapStr = apc_fetch(self::CONF_MAP_PREFIX.$mapName);
 			$map = json_decode($mapStr,true);
 			if ($map && $this->validateMap($map, $mapName, $key))
 			{
@@ -47,23 +51,16 @@ class kApcConf extends kBaseConfCache implements kMapCacheInterface , kKeyCacheI
 		{
 			$this->addKeyToMap($map, $mapName, $key);
 			$mapStr = json_encode($map);
-			return apc_store($mapName, $mapStr, $ttl);
+			return apc_store(self::CONF_MAP_PREFIX.$mapName, $mapStr, $ttl);
 		}
 		return false;
 	}
 
 	public function loadKey()
 	{
-		if($this->apcFunctionsExist && !$this->isReloadFileExist())
+		if($this->apcFunctionsExist && !$this->reloadFileExist)
 			return apc_fetch(kBaseConfCache::CONF_CACHE_VERSION_KEY);
 
-		if($this->isReloadFileExist())
-		{
-			$deleted = @unlink($this->reloadFile);
-			error_log('Base configuration reloaded');
-			if(!$deleted)
-				error_log('Failed to delete base.reload file');
-		}
 		return null;
 	}
 

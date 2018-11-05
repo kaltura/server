@@ -58,7 +58,7 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp {
 		}
 
 		$parentFlavors = parent::buildHttpFlavorsArray();
-		$mergedFlavors = array_merge($parentFlavors, $flavors);
+		$mergedFlavors = array_merge($flavors, $parentFlavors);
 		return $mergedFlavors;
 
 	}

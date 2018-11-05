@@ -1,5 +1,22 @@
 # Naos 14.8.0 #
 
+## Add permission in Admin Console for New Analytics ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-9334
+
+### configuration ###
+    Add the following to admin.ini:
+    
+    moduls.newAnalyticsTab.enabled = true
+    moduls.newAnalyticsTab.permissionType = 2
+    moduls.newAnalyticsTab.label = "New Analytics"
+    moduls.newAnalyticsTab.permissionName = FEATURE_NEW_ANALYTICS_TAB
+    moduls.newAnalyticsTab.group = GROUP_ENABLE_DISABLE_FEATURES
+    
+### Deployment scripts ###
+    None
+    
 ## Allow allocating specific conference room from pool ##
 
 - Issue Type: Story
@@ -12,7 +29,6 @@
 #### Deployment Scripts ####
 
 		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /deployment/updates/sql/2018_10_23_alter_server_node_table_add_environment_column.sql
-
 
 # Naos 14.7.0 #
 

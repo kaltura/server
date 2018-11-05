@@ -3,7 +3,8 @@ require_once __DIR__ . '/kBaseMemcacheConf.php';
 
 class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterface,kMapCacheInterface
 {
-	const MAP_LIST_KEY='MAP_LIST_KEY';
+	const MAP_LIST_KEY = 'MAP_LIST_KEY';
+	const MAP_DELIMITER = '|';
 
 	public function loadKey()
 	{
@@ -41,14 +42,14 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 			{
 				foreach ($mapsList as $mapName => $version)
 				{
-					$mapVar = explode('_', $mapName);
+					$mapVar = explode(self::MAP_DELIMITER, $mapName);
 					$storedMapName = $mapVar[0];
 					$hostPattern = isset($mapVar[1]) ? $mapVar[1] : null;
 					if ($requestedMapName == $storedMapName)
 					{
 						if ($hostPattern && $hostname != $hostPattern && $hostPattern !== '#')
 						{
-							$hostPattern = str_replace('#', '*', $hostPattern);
+							$hostPattern = str_replace('#', '.*', $hostPattern);
 							if(!preg_match('/' . $hostPattern . '/', $hostname))
 								continue;
 						}
@@ -70,7 +71,7 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 		}
 		foreach ($mapNames as $mapName)
 		{
-			$map = $cache->get($mapName);
+			$map = $cache->get(self::CONF_MAP_PREFIX.$mapName);
 			if($map)
 			{
 				$map = json_decode($map,true);

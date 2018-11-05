@@ -2039,6 +2039,28 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				$flavorParams->setTags($flavorParamsConversionProfile->getTags());
 			if($flavorParamsConversionProfile->getChunkedEncodeMode()!==null)
 				$flavorParams->setChunkedEncodeMode($flavorParamsConversionProfile->getChunkedEncodeMode());
+			$overloadParamsJsonStr = $flavorParamsConversionProfile->getOverloadParams();
+				/*
+				 * OverloadParams is JSON string containing an array of flavotParams field-value pairs. 
+				 * For example following JSON string will override flavorParams MaxFrameRate and VideoBitrate settings - 
+				 * {"MaxFrameRate":"60","VideoBitrate":"500"}
+				 * The older separate override vals (IsEncrypted, ContentAwareness, .. see above) will be overwritten by JSON vals, 
+				 * if both are provided
+				 */
+			if(isset($overloadParamsJsonStr) && ($overloadParams=json_decode($overloadParamsJsonStr,true))!==null) {
+				KalturaLog::log("OverloadParams JSON string ($overloadParamsJsonStr)");
+				foreach($overloadParams as $name=>$val) {
+					$getFunc = "get$name";
+					if(method_exists($flavorParams, $getFunc)) {
+						KalturaLog::log("Current value: $name => ".$flavorParams->$getFunc());
+					}
+					$setFunc = "set$name";
+					if(method_exists($flavorParams, $setFunc)) {
+						$flavorParams->$setFunc($val);
+						KalturaLog::log("Overridden value: $name => $val");
+					}
+				}
+			}
 		}
 	}
 

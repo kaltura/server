@@ -1313,13 +1313,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::getLongSumAggregator($media_type, self::METRIC_COUNT)); 
 		}
 
-		$is_admin_metrics = array(
-			self::METRIC_COUNT_UGC => '0', 
-			self::METRIC_COUNT_ADMIN => '1');
-		foreach ($is_admin_metrics as $metric => $value)
+		$user_type_metrics = array(
+			self::METRIC_COUNT_UGC => 'User', 
+			self::METRIC_COUNT_ADMIN => 'Admin');
+		foreach ($user_type_metrics as $metric => $value)
 		{
 			self::$aggregations_def[$metric] = self::getFilteredAggregator(
-				self::getSelectorFilter(self::DIMENSION_USER_IS_ADMIN, $value),
+				self::getSelectorFilter(self::DIMENSION_USER_TYPE, $value),
 				self::getLongSumAggregator($metric, self::METRIC_COUNT));
 		}
 		
@@ -4095,6 +4095,7 @@ class kKavaReportsMgr extends kKavaBase
 			reportsInputFilter $input_filter,
 			$page_size, $page_index, $order_by, $object_ids = null, $flags = 0)
 	{
+		$interval = $input_filter->interval;
 		// use interval=all, only relevant if the join includes graphs
 		$input_filter->interval = self::INTERVAL_ALL;
 		
@@ -4246,7 +4247,8 @@ class kKavaReportsMgr extends kKavaBase
 				array_fill(0, count($report_def[self::REPORT_DIMENSION_HEADERS]), $cur_id),
 				$row);
 		}
-		
+
+		$input_filter->interval = $interval;
 		return array($headers, $data, $total_count);
 	}
 
@@ -4563,15 +4565,16 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function getTotalImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids = null)
 	{
-		if (isset($report_def[self::REPORT_TOTAL_FROM_TABLE_FUNC]))
+		$interval = $input_filter->interval;
+        	$input_filter->interval = self::INTERVAL_ALL;
+
+        	if (isset($report_def[self::REPORT_TOTAL_FROM_TABLE_FUNC]))
 		{
-			$input_filter->interval = self::INTERVAL_ALL;
 			$table = self::getTableImpl($partner_id, $report_def, $input_filter, self::MAX_RESULT_SIZE, 1, null, $object_ids);
 			$result = call_user_func($report_def[self::REPORT_TOTAL_FROM_TABLE_FUNC], $table);
 		}
 		else if (!isset($report_def[self::REPORT_DIMENSION]) || isset($report_def[self::REPORT_JOIN_GRAPHS]))
 		{
-			$input_filter->interval = self::INTERVAL_ALL;
 			$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
 			$result = array(array_keys($result), array_values($result));
 		}
@@ -4584,6 +4587,7 @@ class kKavaReportsMgr extends kKavaBase
 			$result = self::getSimpleTotalImpl($partner_id, $report_def, $input_filter, $object_ids);
 		}
 
+		$input_filter->interval = $interval;
 		return $result;
 	}
 	
@@ -4848,7 +4852,11 @@ class kKavaReportsMgr extends kKavaBase
 
 		$arr = array();
 
-		if (!in_array($report_type, myReportsMgr::$reports_without_graph))
+		list($headers_for_total, $headers_for_table) = explode(';', $headers);
+
+		$report_def = self::getReportDef($report_type);
+
+		if (isset($report_def[self::REPORT_JOIN_REPORTS]) || isset($report_def[self::REPORT_JOIN_GRAPHS]) || isset($report_def[self::REPORT_GRAPH_METRICS]))
 		{
 			$arr = self::getGraph(
 				$partner_id,
@@ -4858,7 +4866,7 @@ class kKavaReportsMgr extends kKavaBase
 				$object_ids);
 		}
 
-		if (!in_array($report_type, myReportsMgr::$reports_without_totals))
+		if (!empty($headers_for_total))
 			list($total_header, $total_data) = self::getTotal(
 				$partner_id,
 				$report_type,
@@ -4870,17 +4878,17 @@ class kKavaReportsMgr extends kKavaBase
 			throw new kCoreException('Exceeded max query size: ' . self::MAX_CSV_RESULT_SIZE, kCoreException::SEARCH_TOO_GENERAL);
 		}
 
-		if (!in_array($report_type, myReportsMgr::$reports_without_table))
+		if (!empty($headers_for_table))
 		{
 			list($table_header, $table_data, $table_total_count) = self::getTable(
 				$partner_id,
 				$report_type,
 				$input_filter,
-				$page_size, 
+				$page_size,
 				$page_index,
-				$order_by, 
-				$object_ids, 
-				null, 
+				$order_by,
+				$object_ids,
+				null,
 				true);
 
 			self::adjustCsvTableUnits($headers, $table_header, $table_data);

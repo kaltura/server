@@ -12,6 +12,11 @@ class kBaseMemcacheConf extends kBaseConfCache implements kMapCacheInterface
 		return $this->cache;
 	}
 
+	function isActive()
+	{
+		return !is_null($this->cache);
+	}
+
 	function __construct()
 	{
 		$this->cache=null;
@@ -51,7 +56,7 @@ class kBaseMemcacheConf extends kBaseConfCache implements kMapCacheInterface
 	{
 		$cache = $this->getCache();
 		if($cache)
-			return $cache->get($mapName);
+			return $cache->get(self::CONF_MAP_PREFIX.$mapName);
 		return null;
 	}
 
@@ -59,7 +64,7 @@ class kBaseMemcacheConf extends kBaseConfCache implements kMapCacheInterface
 	{
 		$cache = $this->getCache();
 		if($cache)
-			return $cache->set($mapName, $map); // try to fetch from cache
+			return $cache->set(self::CONF_MAP_PREFIX.$mapName, $map); // try to fetch from cache
 		return null;
 	}
 
@@ -67,7 +72,7 @@ class kBaseMemcacheConf extends kBaseConfCache implements kMapCacheInterface
 	{
 		$cache = $this->getCache();
 		if($cache)
-			return $cache->delete($mapName);
+			return $cache->delete(self::CONF_MAP_PREFIX.$mapName);
 		return false;
 	}
 }

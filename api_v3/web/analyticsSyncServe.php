@@ -20,6 +20,8 @@ define('SOURCE_CAPTURE', -11);
 define('SOURCE_PITCH', -12);
 define('SOURCE_WEBCAST', -13);
 define('SOURCE_RAPT', -14);
+define('SOURCE_WEBEX', -15);
+define('SOURCE_ZOOM', -16);
 
 $sourceFromAdminTag = array(
 	'kalturaclassroom' => SOURCE_CLASSROOM,
@@ -27,6 +29,8 @@ $sourceFromAdminTag = array(
 	'videomessage' => SOURCE_PITCH,
 	'kms-webcast-event' => SOURCE_WEBCAST,
 	'raptentry' => SOURCE_RAPT,
+	'webexentry' => SOURCE_WEBEX,
+	'zoomentry' => SOURCE_ZOOM,
 );
 
 function getPartnerVertical($customData)

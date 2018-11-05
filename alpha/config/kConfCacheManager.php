@@ -29,6 +29,10 @@ class kConfCacheManager
 
 	private static $init=false;
 
+	const KEY_TTL=30;
+	const LONG_KEY_TTL=300;
+
+
 	protected static function initLoad($cacheName)
 	{
 		foreach (self::$mapInitFlow as $cacheEntity)
@@ -40,6 +44,7 @@ class kConfCacheManager
 			{
 				self::store(null, $cacheName, $map, $cacheEntity);
 				kCacheConfFactory::getInstance($cacheName);
+				return;
 			}
 		}
 	}
@@ -84,23 +89,23 @@ class kConfCacheManager
 
 	protected static function storeKey($key, $foundIn)
 	{
+		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
+		$ttl=self::LONG_KEY_TTL;
+		if($remoteCache->isActive())
+		{
+			$ttl=self::KEY_TTL;
+		}
+
 		$storeFlow = self::$keyStoreFlow[$foundIn];
+
 		foreach ($storeFlow as $cacheEntity)
-			kCacheConfFactory::getInstance($cacheEntity)->storeKey($key);
+			kCacheConfFactory::getInstance($cacheEntity)->storeKey($key,$ttl);
 	}
 
 	public static function hasMap ($mapName)
 	{
-		self::init();
-
-		foreach (self::$mapLoadFlow as $cacheEntity)
-		{
-			/* @var $cacheObj kBaseConfCache*/
-			$cacheObj = kCacheConfFactory::getInstance($cacheEntity);
-			if($cacheObj->hasMap(null, $mapName))
-					return true;
-		}
-		return false;
+		$map = self::load($mapName);
+		return !empty($map);
 	}
 
 	static $loadRecursiveLock;

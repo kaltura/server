@@ -371,8 +371,8 @@ ini_set("memory_limit","512M");
 		{
 			KalturaLog::log("host:$host, port:$port, token:$token, concurrent:$concurrent, sessionName:$sessionName, cmdLine:$cmdLine");
 			$storeManager = new KChunkedEncodeMemcacheWrap($token);
-			
-			$config = array('host'=>$host, 'port'=>$port);//, 'flags'=>1);
+				// 'flags=1' stands for 'compress stored data'
+			$config = array('host'=>$host, 'port'=>$port, 'flags'=>1);
 			$storeManager->Setup($config);
 			
 			$setup = new KChunkedEncodeSetup;
@@ -601,8 +601,8 @@ ini_set("memory_limit","512M");
 		{
 			KalturaLog::log("host:$host, port:$port, token:$token, jobIndex:$jobIndex");
 			$storeManager = new KChunkedEncodeMemcacheWrap($token);
-			
-			$config = array('host'=>$host, 'port'=>$port);//, 'flags'=>1);
+				// 'flags=1' stands for 'compress stored data'			
+			$config = array('host'=>$host, 'port'=>$port, 'flags'=>1);
 			$storeManager->Setup($config);
 			
 			if(!isset($jobIndex)) {
