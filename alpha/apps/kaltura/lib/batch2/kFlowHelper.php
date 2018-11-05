@@ -722,6 +722,7 @@ class kFlowHelper
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
+
 		// verifies that flavor asset created
 		if(!$data->getFlavorAssetId())
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
@@ -730,6 +731,11 @@ class kFlowHelper
 		// verifies that flavor asset exists
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+
+		$originalSrcFileSync = $data->getSrcFileSyncLocalPath();
+		/* @var  $sourceFileSyncDescriptor kSourceFileSyncDescriptor*/
+		$sourceFileSyncDescriptor = $data->getSrcFileSyncs();
+		self::validateSourceFileSync($originalSrcFileSync, $sourceFileSyncDescriptor);
 
 		$shouldSave = false;
 		if(!is_null($data->getEngineMessage())) {
@@ -787,6 +793,24 @@ class kFlowHelper
 		}
 		return $dbBatchJob;
 	}
+
+	protected static function validateSourceFileSync($originalSrcPath, $sourceFileSyncDescriptors)
+	{
+		//validate that the source is still the same
+		foreach ($sourceFileSyncDescriptors as $sourceFileSyncDescriptor)
+		{
+			$srcAssetId = $sourceFileSyncDescriptor->getAssetId();
+			$originalFlavor = assetPeer::retrieveById($srcAssetId);
+			$fileSyncKey = $originalFlavor->getSyncKey($sourceFileSyncDescriptor->getFileSyncObjectSubType());
+			$currentSourceFileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($fileSyncKey);
+			$currentSourceFilePath = $currentSourceFileSync->getFilePath();
+			if(!empty($currentSourceFilePath) && strcmp(basename($currentSourceFilePath),basename($originalSrcPath)))
+			{
+				throw new APIException(KalturaErrors::SOURCE_FLAVOR_CHANGED_DURING_CONVERSION, $currentSourceFilePath, $originalSrcPath, $srcAssetId);
+			}
+		}
+	}
+
 	private static function handleFlavorAssetConvertFinished(flavorAsset $flavorAsset, flavorParamsOutput $flavorParamsOutput, BatchJob $dbBatchJob, kConvertJobData $data)
 	{
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
