@@ -412,6 +412,8 @@ class kCouchbaseCacheWrapper extends kInfraBaseCacheWrapper
 	const CB_ACTION_DELETE = 'delete';
 	const CB_ACTION_BUCKET_CONNECTION = 'bucket_connection';
 	
+	const COUCHBASE_BUCKET_VIEW_QUERY_TIMEOUT = 5000000; // 5 seconds in microseconds
+	
 	/**
 	 * @var string
 	 */
@@ -461,6 +463,10 @@ class kCouchbaseCacheWrapper extends kInfraBaseCacheWrapper
 				
 			$connStart = microtime(true);
 			$this->bucket = $cluster->openBucket($this->name);
+			
+			//Set view query timeout to 5 seconds to avoid runing query for the default 75 seconds if something is wrong
+			$this->bucket->__set('viewTimeout', self::COUCHBASE_BUCKET_VIEW_QUERY_TIMEOUT);
+			
 			$connTook = microtime(true) - $connStart;
 			self::safeLog("connect took - {$connTook} seconds to {$config['dsn']} bucket {$this->name}");
 			KalturaMonitorClient::monitorCouchBaseAccess($this->dataSource, $this->name, self::CB_ACTION_BUCKET_CONNECTION, $connTook, strlen($this->name));
