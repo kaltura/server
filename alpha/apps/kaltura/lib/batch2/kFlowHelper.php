@@ -735,7 +735,7 @@ class kFlowHelper
 		$originalSrcFileSync = $data->getSrcFileSyncLocalPath();
 		/* @var  $sourceFileSyncDescriptor kSourceFileSyncDescriptor*/
 		$sourceFileSyncDescriptor = $data->getSrcFileSyncs();
-		self::validateSourceFileSync(basename($originalSrcFileSync),$sourceFileSyncDescriptor[0],$dbBatchJob->getPartnerId());
+		self::validateSourceFileSync($originalSrcFileSync, $sourceFileSyncDescriptor);
 
 		$shouldSave = false;
 		if(!is_null($data->getEngineMessage())) {
@@ -794,24 +794,20 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
-	protected static function validateSourceFileSync($originalSrcPath,$sourceFileSyncDescriptor,$partnerId)
+	protected static function validateSourceFileSync($originalSrcPath, $sourceFileSyncDescriptors)
 	{
 		//validate that the source is still the same
-		$srcAssetId = $sourceFileSyncDescriptor->getAssetId();
-		$originalFlavor = assetPeer::retrieveById($srcAssetId);
-
-		$fileSyncKey = new FileSyncKey();
-		$fileSyncKey->setObjectType(FileSyncObjectType::ASSET);
-		$fileSyncKey->setObjectId($srcAssetId);
-		$fileSyncKey->setVersion($originalFlavor->getVersion());
-		$fileSyncKey->setObjectSubType($sourceFileSyncDescriptor->getFileSyncObjectSubType());
-		$fileSyncKey->setPartnerId($partnerId);
-
-		$currentSrcFileSync = FileSyncPeer::retrieveByFileSyncKey($fileSyncKey,true);
-		$currentFilePath = basename($currentSrcFileSync->getFilePath());
-		if(!empty($currentFilePath) && strcmp($currentFilePath,$originalSrcPath))
+		foreach ($sourceFileSyncDescriptors as $sourceFileSyncDescriptor)
 		{
-			throw new APIException(KalturaErrors::SOURCE_FLAVOR_CHANGED_DURING_CONVERSION, $currentFilePath, $originalSrcPath, $srcAssetId);
+			$srcAssetId = $sourceFileSyncDescriptor->getAssetId();
+			$originalFlavor = assetPeer::retrieveById($srcAssetId);
+			$fileSyncKey = $originalFlavor->getSyncKey($sourceFileSyncDescriptor->getFileSyncObjectSubType());
+			$currentSourceFileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($fileSyncKey);
+			$currentSourceFilePath = $currentSourceFileSync->getFilePath();
+			if(!empty($currentSourceFilePath) && strcmp(basename($currentSourceFilePath),basename($originalSrcPath)))
+			{
+				throw new APIException(KalturaErrors::SOURCE_FLAVOR_CHANGED_DURING_CONVERSION, $currentSourceFilePath, $originalSrcPath, $srcAssetId);
+			}
 		}
 	}
 
