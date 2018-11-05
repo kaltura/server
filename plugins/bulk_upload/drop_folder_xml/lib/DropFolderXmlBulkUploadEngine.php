@@ -11,9 +11,9 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	private $dropFolder = null;
 	
 	/**
-	 * @var KalturaDropFolderFile
+	 * @var int KalturaDropFolderFileId
 	 */
-	private $xmlDropFolderFile = null;
+	private $xmlDropFolderFileId = null;
 	
 	/**
 	 * @var kFileTransferMgr
@@ -38,13 +38,14 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 		
 		KBatchBase::impersonate($this->currentPartnerId);
 		$dropFolderPlugin = KalturaDropFolderClientPlugin::get(KBatchBase::$kClient);
-		KBatchBase::$kClient->startMultiRequest();
-		$dropFolderFile = $dropFolderPlugin->dropFolderFile->get($this->job->jobObjectId);
-		$dropFolderPlugin->dropFolder->get($dropFolderFile->dropFolderId);
-		list($this->xmlDropFolderFile, $this->dropFolder) = KBatchBase::$kClient->doMultiRequest();
-				
+		$this->xmlDropFolderFileId = $this->job->jobObjectId;
+		$this->dropFolder = $dropFolderPlugin->dropFolder->get($job->data->dropFolderId);
 		$this->fileTransferMgr = KDropFolderFileTransferEngine::getFileTransferManager($this->dropFolder);
-		$this->data->filePath = $this->getLocalFilePath($this->xmlDropFolderFile->fileName, $this->xmlDropFolderFile->id);
+		if(!$this->data->filePath)
+		{
+			$xmlDropFolderFile = $dropFolderPlugin->dropFolderFile->get($this->xmlDropFolderFileId);
+			$this->data->filePath = $this->getLocalFilePath($xmlDropFolderFile->fileName, $this->xmlDropFolderFileId);
+		}
 		
 		KBatchBase::unimpersonate();
 	}
@@ -74,7 +75,7 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	{
 		$filter = new KalturaDropFolderFileFilter();
 		$filter->dropFolderIdEqual = $this->dropFolder->id;
-		$filter->leadDropFolderFileIdEqual = $this->xmlDropFolderFile->id;
+		$filter->leadDropFolderFileIdEqual = $this->xmlDropFolderFileId;
 		
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
