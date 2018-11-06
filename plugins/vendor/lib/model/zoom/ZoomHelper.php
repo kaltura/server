@@ -336,7 +336,7 @@ class ZoomHelper
 	 * @throws Exception
 	 * @return int id;
 	 */
-	public static function createCategoryForZoom($partnerId, $categoryFullName, $createIfNotExist)
+	public static function createCategoryForZoom($partnerId, $categoryFullName, $createIfNotExist = true)
 	{
 		$category = categoryPeer::getByFullNameExactMatch($categoryFullName, null, $partnerId);
 		if($category)
