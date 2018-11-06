@@ -127,15 +127,15 @@ class myFileConverter
 		return true;
 	}
 
-	static public function autoCaptureFrame ( $source_file , $thumbTempPrefix , $position = null, $width = 0, $height = 0 , $plain_log_file_name = false )
+	static public function autoCaptureFrame ( $source_file , $thumbTempPrefix , $position = null, $width = 0, $height = 0 , $plain_log_file_name = false , $decryptionKey = null)
 	{
-		self::captureFrame($source_file, $thumbTempPrefix.'%d.jpg', 1, "image2", $width, $height, $position, $plain_log_file_name );
+		self::captureFrame($source_file, $thumbTempPrefix.'%d.jpg', 1, "image2", $width, $height, $position, $plain_log_file_name, $decryptionKey );
 
 		// in case the file wasnt created, the movie clip might be too short
 		// try taking a snapshot at the first frame
 		if (!file_exists($thumbTempPrefix.'1.jpg'))
 		{
-			self::captureFrame($source_file, $thumbTempPrefix.'%d.jpg', 1, "image2", $width, $height, 0 , $plain_log_file_name );
+			self::captureFrame($source_file, $thumbTempPrefix.'%d.jpg', 1, "image2", $width, $height, 0 , $plain_log_file_name , $decryptionKey);
 		}
 	}
 	// "F:\web\ffmpeg\ffmpeg-0.4.9\Riva FLV Encoder 2.0\ffmpeg.exe" -an -y  -i "F:\web\ffmpeg\robot.avi" -t 0.001 -s 640x480 -deinterlace   -hq -f image2 "F:\web\ffmpeg\robot%%d.jpg" 2>encode.txt
@@ -147,7 +147,7 @@ class myFileConverter
 	// -dframes: number     set the number of data frames to record
 	// -ss:  set the start time offset
 	static public function captureFrame ( $source_file , $target_file , $frame_count = 1, $target_type = "image2" ,
-	$width = self::DEFAULT_THUMBNAIL_WIDTH , $height = self::DEFAULT_THUMBNAIL_HEIGHT , $position = null , $plain_log_file_name = false )
+	$width = self::DEFAULT_THUMBNAIL_WIDTH , $height = self::DEFAULT_THUMBNAIL_HEIGHT , $position = null , $plain_log_file_name = false , $decryptionKey = null )
 	{
 		if ($width == 0)
 		$width = self::DEFAULT_THUMBNAIL_WIDTH;
@@ -196,6 +196,10 @@ class myFileConverter
 		$position_str_suffix = $position ? " -ss 0.01 " : "";
 		$dimensions = ($width == -1 || $height == -1) ? "" : ("-s ". $width ."x" . $height);
 			// '-noautorotate' to adjust to ffm2.7.2 that automatically normalizes rotated sources
+		if ($decryptionKey)
+		{
+			$cmd .= ' -decryption_key ' . $decryptionKey;
+		}
 		$exec_cmd = $cmd . $position_str . " -noautorotate -i " . "\"$source_file\"" . " -an -y -r 1 " . $dimensions .
 			" " . " -vframes $frame_count -f \"" . $target_type . "\" " . $position_str_suffix . "\"$target_file\"" . " 2>&1";
 		
