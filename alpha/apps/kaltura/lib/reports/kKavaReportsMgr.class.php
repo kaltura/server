@@ -3621,12 +3621,13 @@ class kKavaReportsMgr extends kKavaBase
 			$data[] = $row;
 		}
 
+		$total_count = count($data);
 		if ($page_size)
 		{
 			$data = array_slice($data, ($page_index - 1) * $page_size, $page_size);
 		}
 
-		return array(array_merge(array($date_column_name), $header), $data, count($data));
+		return array(array_merge(array($date_column_name), $header), $data, $total_count);
 	}
 
 	protected static function getTableFromKeyedGraphs($partner_id, $report_def, reportsInputFilter $input_filter, 
