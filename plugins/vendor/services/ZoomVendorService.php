@@ -153,6 +153,17 @@ class ZoomVendorService extends KalturaBaseService
 	{
 		KalturaResponseCacher::disableCache();
 		$partnerId = kCurrentContext::getCurrentPartnerId();
+
+		$dbUser = kuserPeer::getKuserByPartnerAndUid($partnerId, $defaultUserId);
+		if($createUserIfNotExist && !$dbUser)
+		{
+			$dbUser = kuserPeer::createKuserForPartner($partnerId, $defaultUserId);
+		}
+		if(!$dbUser)
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
+		}
+
 		/** @var ZoomVendorIntegration $zoomIntegration */
 		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 		if (!$zoomIntegration)
@@ -176,7 +187,7 @@ class ZoomVendorService extends KalturaBaseService
 		if ($zoomCategory)
 		{
 			$zoomIntegration->setZoomCategory($zoomCategory);
-			$categoryId = ZoomHelper::createCategoryForZoom($partnerId, $zoomCategory, $createUserIfNotExist);
+			$categoryId = ZoomHelper::createCategoryForZoom($partnerId, $zoomCategory);
 			if($categoryId)
 			{
 				$zoomIntegration->setZoomCategoryId($categoryId);
@@ -187,6 +198,7 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomIntegration->unsetCategory();
 			$zoomIntegration->unsetCategoryId();
 		}
+
 		$zoomIntegration->save();
 		return true;
 	}
