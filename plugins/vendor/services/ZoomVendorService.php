@@ -143,17 +143,18 @@ class ZoomVendorService extends KalturaBaseService
 	 * @param string $defaultUserId
 	 * @param string $zoomCategory
 	 * @param string $accountId
+	 * @param bool $enableRecordingUpload
+	 * @param bool $createUserIfNotExist
 	 * @return string
 	 * @throws PropelException
 	 * @throws Exception
 	 */
-	public function submitRegistrationAction($defaultUserId, $zoomCategory, $accountId)
+	public function submitRegistrationAction($defaultUserId, $zoomCategory = null, $accountId, $enableRecordingUpload, $createUserIfNotExist)
 	{
 		KalturaResponseCacher::disableCache();
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		/** @var ZoomVendorIntegration $zoomIntegration */
-		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId,
-			VendorTypeEnum::ZOOM_ACCOUNT);
+		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 		if (!$zoomIntegration)
 		{
 			$zoomIntegration = new ZoomVendorIntegration();
@@ -161,13 +162,25 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomIntegration->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
 			$zoomIntegration->setPartnerId($partnerId);
 		}
-		$zoomIntegration->setStatus(VendorStatus::ACTIVE);
+
+		if($enableRecordingUpload)
+		{
+			$zoomIntegration->setStatus(VendorStatus::ACTIVE);
+		}
+		else
+		{
+			$zoomIntegration->setStatus(VendorStatus::DISABLED);
+		}
+
 		$zoomIntegration->setDefaultUserEMail($defaultUserId);
 		if ($zoomCategory)
 		{
 			$zoomIntegration->setZoomCategory($zoomCategory);
-			$categoryId = ZoomHelper::createCategoryForZoom($partnerId, $zoomCategory);
-			$zoomIntegration->setZoomCategoryId($categoryId);
+			$categoryId = ZoomHelper::createCategoryForZoom($partnerId, $zoomCategory, $createUserIfNotExist);
+			if($categoryId)
+			{
+				$zoomIntegration->setZoomCategoryId($categoryId);
+			}
 		}
 		if (!$zoomCategory && $zoomIntegration->getZoomCategory() && $zoomIntegration->getZoomCategoryId())
 		{
@@ -175,9 +188,6 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomIntegration->unsetCategoryId();
 		}
 		$zoomIntegration->save();
-
-		kuserPeer::createKuserForPartner($partnerId, $defaultUserId);
-
 		return true;
 	}
 
@@ -197,6 +207,11 @@ class ZoomVendorService extends KalturaBaseService
 		if (!$zoomIntegration)
 		{
 			throw new KalturaAPIException('Zoom Integration data Does Not Exist for current Partner');
+		}
+		if($zoomIntegration->getStatus()==VendorStatus::DISABLED)
+		{
+			KalturaLog::info("Recieved recording complete event from Zoom account {$accountId} while upload is disabled.");
+			throw new KalturaAPIException('Uploads are disabled for current Partner');
 		}
 		$emails = ZoomHelper::extractCoHosts($meetingId, $zoomIntegration, $accountId);
 		// user logged in - need to re-init kPermissionManager in order to determine current user's permissions
