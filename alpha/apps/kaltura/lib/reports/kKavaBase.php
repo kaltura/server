@@ -45,6 +45,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_CUSTOM_VAR1 = 'customVar1';
 	const DIMENSION_CUSTOM_VAR2 = 'customVar2';
 	const DIMENSION_CUSTOM_VAR3 = 'customVar3';
+	const DIMENSION_TYPE = 'type';
 
 	// metrics
 	const METRIC_COUNT = 'count';
