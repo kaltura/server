@@ -258,10 +258,10 @@ class SyndicationFeedService extends KalturaBaseService
 			$data = $exception->getData();
 			switch ($code)
 			{
-				case APIErrors::INVALID_ENTRY_ID:
+				case kCoreException::INVALID_ENTRY_ID:
 					$id = isset($data['playlistId']) ? $data['playlistId'] : '';
 					throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
-				case APIErrors::INVALID_ENTRY_TYPE:
+				case kCoreException::INVALID_ENTRY_TYPE:
 					$id = isset($data['playlistId']) ? $data['playlistId'] : '';
 					$wrongType = isset($data['wrongType']) ? $data['wrongType'] : '';
 					$correctType = isset($data['correctType']) ? $data['correctType'] : '';

@@ -242,13 +242,13 @@ class myPlaylistUtils
 		if ( ! $playlist )
 		{
 			$exceptionData = array('playlistId' => $playlist_id);
-			throw new kCoreException("Invalid entry id [$playlist_id]", APIErrors::INVALID_ENTRY_ID, $exceptionData);
+			throw new kCoreException("Invalid entry id [$playlist_id]", kCoreException::INVALID_ENTRY_ID, $exceptionData);
 		}
 		
 		if ( $playlist->getType() != entryType::PLAYLIST )
 		{
 			$exceptionData = array('playlistId' => $playlist_id, 'wrongType' => $playlist->getType(), 'correctType' => entryType::PLAYLIST);
-			throw new kCoreException("Invalid entry type [$playlist_id]", APIErrors::INVALID_ENTRY_TYPE, $exceptionData);
+			throw new kCoreException("Invalid entry type [$playlist_id]", kCoreException::INVALID_ENTRY_TYPE, $exceptionData);
 		}
 		
 		return self::getPlaylistFilters ( $playlist );
