@@ -45,8 +45,24 @@ abstract class SyndicationFeedRenderer {
 		$partnerId = $this->syndicationFeed->partnerId;
 		if ( $this->syndicationFeedDB->getPlayerType() == PlayerType::HTML5Player )
 		{
-			$uiconfId = ($this->syndicationFeed->playerUiconfId)? '/uiconf_id/'.$this->syndicationFeed->playerUiconfId: '';
+		    $isPlaykit = false;
+		    if ($this->syndicationFeed->playerUiconfId) 
+		    {
+			$dbUiConf = uiConfPeer::retrieveByPK( $this->syndicationFeed->playerUiconfId );
+			if($dbUiConf && strpos( $dbUiConf->getTags() , 'kalturaPlayerJs') !== false) 
+			{
+			    $isPlaykit = true;
+			}
+		    }
+		    $uiconfId = ($this->syndicationFeed->playerUiconfId)? '/uiconf_id/'.$this->syndicationFeed->playerUiconfId: '';
+		    if ($isPlaykit)
+		    {
+			$url .= '/p/' .$partnerId.'/embedPlaykitJs' .$uiconfId. '?iframeembed=true&entry_id=' .$entryId;
+		    } 
+		    else 
+		    {
 			$url .= '/p/' .$partnerId. '/sp/' .$partnerId. '00/embedIframeJs'.$uiconfId. '/partner_id/' .$partnerId.'?iframeembed=true&entry_id='.$entryId;
+		    }
 		}
 		else
 		{
