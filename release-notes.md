@@ -16,7 +16,20 @@
     
 ### Deployment scripts ###
     None
-    
+
+## Add permission to use playlist service with user ks ##
+- Issue Type: Task
+- Issue ID: PLAT-9230
+
+### Configuration ###
+	None.
+
+#### Deployment Scripts ####
+
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_01_11_update_playlist_service_permissions.php
+
+
 # Naos 14.7.0 #
 
 ## PLAT-8932 - Load configuration from central memcache

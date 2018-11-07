@@ -49,9 +49,13 @@ class myPlaylistUtils
 			{
 				// TODO - hack for removing 'null' from the entry id due to a bug on the client's side
 				$trimmed = preg_replace ( "/null/" , "" , trim ( $entry_id ) );
-				if ( $trimmed ) { $fixed_playlist[] = $trimmed; }
+				if ($trimmed)
+				{
+					$fixed_playlist[] = $trimmed;
+					self::validatePlaylistInnerEntry($trimmed);
+				}
 			}
-		
+
 			$fixed_playlist_str = implode ( "," , $fixed_playlist );
 			$playlist->setDataContent( $fixed_playlist_str , false ); // don't increment the version after fixing the data
 		}
@@ -74,6 +78,22 @@ class myPlaylistUtils
 		
 		
 	}
+
+	public static function validatePlaylistInnerEntry ($entryId)
+	{
+		$entry = entryPeer::retrieveByPK($entryId);
+		if(!$entry)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
+		}
+		//Entitlements disabled and user or his groups dont have edit/publish/owner permissions
+		if (!kCurrentContext::$is_admin_session && !kPermissionManager::isPermitted(PermissionName::PLAYLIST_ADD)
+			&& !kEntitlementUtils::getEntitlementEnforcement() && !self::validatePlaylistContentEntitlement($entry, null))
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
+		}
+	}
+
 	
 	// will update the statistics of the playlist:
 	// count - the number of entries that return at the current time
@@ -1194,6 +1214,20 @@ HTML;
 		if(empty($entryList))
 			return null;
 		return $entryList[0];
+	}
+
+	public static function validatePlaylistContentEntitlement($entry, $kuserId = null)
+	{
+		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		$kuserId = kEntitlementUtils::getKuserIdForEntitlement($kuserId, $ks);
+
+		if($entry->isEntitledKuserEdit($kuserId) || $entry->isEntitledKuserPublish($kuserId))
+		{
+			KalturaLog::info('Entry ['.print_r($entry->getId(), true).'] entitled: user or associated user group allowed: ['.$kuserId.']');
+			return true;
+		}
+
+		return false;
 	}
 
 }

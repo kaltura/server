@@ -94,6 +94,11 @@ class KalturaPlaylist extends KalturaBaseEntry
 		$this->validatePropertyNotNull("playlistType");
 		if ($this->playlistType == KalturaPlaylistType::DYNAMIC)
 			$this->validatePropertyNotNull("totalResults");
+
+		if (!kPermissionManager::isPermitted(PermissionName::PLAYLIST_ADD) && $this->playlistType != KalturaPlaylistType::STATIC_LIST)
+		{
+				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
+		}
 	}
 	
 	public function toObject($dbObject = null, $skip = array())
