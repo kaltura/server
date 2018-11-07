@@ -4252,12 +4252,12 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 				{
 					$criteria->add(entryPeer::CUSTOM_DATA, "MD5(cast(" . entryPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
 					//casting to latin char set to avoid mysql and php md5 difference
-					if (kDataCenterMgr::isMultiDc()) // if multi DC configuration don't check costume data on other DC
-					{
-						$currentDcId = kDataCenterMgr::getCurrentDcId();
-						//addOr(column, value, comparison)
-						$criteria->addOr(entryPeer::CUSTOM_DATA," '$currentDcId' != getDC()" ,Criteria::CUSTOM);
-					}
+//					if (kDataCenterMgr::isMultiDc()) // if multi DC configuration don't check costume data on other DC
+//					{
+//						$currentDcId = kDataCenterMgr::getCurrentDcId();
+//						//addOr(column, value, comparison)
+//						$criteria->addOr(entryPeer::CUSTOM_DATA," '$currentDcId' != getDC()" ,Criteria::CUSTOM);
+//					}
 				}
 				else 
 					$criteria->add(entryPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
