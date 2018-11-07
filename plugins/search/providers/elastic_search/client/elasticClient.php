@@ -328,7 +328,7 @@ class elasticClient
 	}
 
 	/**
-	 * return the aliases for index pattern
+	 * return the aliases for index name
 	 * @param $indexName
 	 * @return mixed
 	 * @throws kESearchException
@@ -362,7 +362,7 @@ class elasticClient
 	 */
 	public function changeAliases($body)
 	{
-		$cmd = $this->elasticHost . "/_aliases";
+		$cmd = $this->elasticHost . '/_aliases';
 		$response = $this->sendRequest($cmd, self::POST, $body, false, self::ELASTIC_CHANGE_ALIASES, self::MONITOR_NO_INDEX);
 		return $response;
 	}

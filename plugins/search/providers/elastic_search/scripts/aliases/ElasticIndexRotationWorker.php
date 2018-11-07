@@ -134,15 +134,27 @@ class ElasticIndexRotationWorker
 
 				if ($aliasName == $this->searchAlias)
 				{
-					list($indexKey, $indexDate) = explode('-', $indexName, 2);
-					$indexDate = intval($indexDate);
-					$currentSearchingIndices[$indexDate] = $indexName;
+					$currentSearchingIndices[] = $indexName;
 				}
 			}
 		}
 
-		krsort($currentSearchingIndices);
+		$currentSearchingIndices = $this->sortSearchIndices($currentSearchingIndices);
+
 		return array($currentIndexingIndices, $currentSearchingIndices);
+	}
+
+	protected function sortSearchIndices($currentSearchingIndices)
+	{
+		$sortedArray = array();
+		foreach ($currentSearchingIndices as $indexName)
+		{
+			list($indexKey, $indexDate) = explode('-', $indexName, 2);
+			$indexDate = intval($indexDate);
+			$sortedArray[$indexDate] = $indexName;
+		}
+		krsort($sortedArray);
+		return $sortedArray;
 	}
 
 	protected function runRotate()
