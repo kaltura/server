@@ -968,7 +968,7 @@ class playManifestAction extends kalturaAction
 
 		$flavors = $this->deliveryAttributes->getFlavorAssets();
 
-		usort($flavors, array($this,'sortFlavorsByFrameSizeAndBitrate'));
+		usort($flavors, array($this, 'sortFlavorsByFrameSizeAndBitrate'));
 
 		$firstFlavor = array_shift($flavors);
 		$filteredFlavors = array($firstFlavor->getId() => $firstFlavor);
@@ -976,13 +976,8 @@ class playManifestAction extends kalturaAction
 		{
 			foreach ($filteredFlavors as $elementKey => $flavor)
 			{
-				/* @var $flavor flavorAsset */
-				if (abs(($currentFlavor->getBitrate() - $flavor->getBitrate())) <= ($currentFlavor->getBitrate() * self::FLAVOR_GROUPING_PERCENTAGE_FACTOR)
-					&& ($currentFlavor->getBitrate() >= $flavor->getBitrate())
-					&& ($currentFlavor->getFrameSize() >= $flavor->getFrameSize())
-				)
+				if ($this->isRedundantFlavor($currentFlavor, $flavor))
 				{
-					//delete this particular object from the filttered flavors array
 					unset($filteredFlavors[$elementKey]);
 				}
 			}
@@ -1376,5 +1371,31 @@ class playManifestAction extends kalturaAction
 		{
 			return $a->getFrameSize() - $b->getFrameSize();
 		}
+	}
+
+	/**
+	 * @param $currentFlavor
+	 * @param $flavor
+	 */
+	protected function isRedundantFlavor($currentFlavor, $flavor )
+	{
+		/* @var $flavor flavorAsset */
+		/* @var $currentFlavor flavorAsset */
+		if ($currentFlavor->getLabel() && $flavor->getLabel() && $currentFlavor->getLabel() != $flavor->getLabel())
+		{
+			return false;
+		}
+
+		if ($currentFlavor->getLanguage() && $flavor->getLanguage() && $currentFlavor->getLanguage() != $flavor->getLanguage())
+		{
+			return false;
+		}
+
+		if (abs(($currentFlavor->getBitrate() - $flavor->getBitrate())) <= ($currentFlavor->getBitrate() * self::FLAVOR_GROUPING_PERCENTAGE_FACTOR)
+			&& ($currentFlavor->getBitrate() >= $flavor->getBitrate()) && ($currentFlavor->getFrameSize() >= $flavor->getFrameSize()))
+		{
+			return true;
+		}
+		return false;
 	}
 }
