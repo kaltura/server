@@ -306,9 +306,16 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$encryptionKey = $originalFlavorAsset->getEncryptionKey();
 		}
 
+		/* @var $singleAttribute kClipAttributes */
 		foreach($operationAttributes as $singleAttribute)
 		{
-			KalturaLog::info("Going To create Flavor for clip: " . print_r($singleAttribute));
+			KalturaLog::info("Going To create Flavor for clip: " . print_r($singleAttribute,true));
+			if($singleAttribute->getDuration()<=0)
+			{
+				KalturaLog::info("Ingnoring clip attribute with non positive durtation");
+				continue;
+			}
+
 			$clonedID =	$this->cloneFlavorParam($singleAttribute, $originalConversionEnginesExtraParams, $encryptionKey);
 			$flavorAsst = $this->createTempClipFlavorAsset($partnerId,$entryId,$clonedID,$order);
 			$batchJob =	kBusinessPreConvertDL::decideAddEntryFlavor($parentJob, $entryId,
