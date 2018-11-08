@@ -1,5 +1,15 @@
 # Naos 14.8.0 #
 
+## Update permission of media::addFromUploadedFile ##
+- Issue Type: Feature
+- Issue ID: PLAT-9393
+
+### configuration ###
+    N/A
+
+### Deployment scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_11_08_update_media_addfromuploadedfile.php
+
 ## Add permission in Admin Console for New Analytics ##
 
 - Issue Type: Feature
