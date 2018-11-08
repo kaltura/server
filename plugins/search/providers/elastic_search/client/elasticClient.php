@@ -28,8 +28,11 @@ class elasticClient
 	const ELASTIC_ACTION_DELETE = 'delete';
 	const ELASTIC_ACTION_PING = 'ping';
 	const ELASTIC_GET_MASTER_INFO = 'get_master_info';
+	const ELASTIC_GET_ALIAS_INFO = 'get_alias_info';
 	const ELASTIC_ACTION_DELETE_BY_QUERY = 'delete_by_query';
 	const ELASTIC_ACTION_GET = 'get';
+	const ELASTIC_CREATE_INDEX = 'create_index';
+	const ELASTIC_CHANGE_ALIASES = 'change_aliases';
 
 	const MONITOR_NO_INDEX = 'no_index';
 
@@ -323,7 +326,47 @@ class elasticClient
 		$response = $this->sendRequest($cmd, self::GET, null, false, self::ELASTIC_GET_MASTER_INFO, self::MONITOR_NO_INDEX);
 		return $response;
 	}
-	
+
+	/**
+	 * return the aliases for index name
+	 * @param $indexName
+	 * @return mixed
+	 * @throws kESearchException
+	 */
+	public function getAliasesForIndicesByIndexName($indexName)
+	{
+		$cmd = $this->elasticHost . "/$indexName/_alias/*";
+		$response = $this->sendRequest($cmd, self::GET, null, false, self::ELASTIC_GET_ALIAS_INFO, self::MONITOR_NO_INDEX);
+		return $response;
+	}
+
+	/**
+	 * creates a new index
+	 * @param $indexName
+	 * @param $body - index mapping in json format
+	 * @return mixed
+	 * @throws kESearchException
+	 */
+	public function createIndex($indexName, $body)
+	{
+		$cmd = $this->elasticHost . "/$indexName";
+		$response = $this->sendRequest($cmd, self::PUT, $body, false, self::ELASTIC_CREATE_INDEX, $indexName);
+		return $response;
+	}
+
+	/**
+	 * removes/add aliases from indices
+	 * @param $body
+	 * @return mixed
+	 * @throws kESearchException
+	 */
+	public function changeAliases($body)
+	{
+		$cmd = $this->elasticHost . '/_aliases';
+		$response = $this->sendRequest($cmd, self::POST, $body, false, self::ELASTIC_CHANGE_ALIASES, self::MONITOR_NO_INDEX);
+		return $response;
+	}
+
 	/**
 	 * return true if index, type and document id are set
 	 * @param $params
