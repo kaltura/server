@@ -309,7 +309,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		/* @var $singleAttribute kClipAttributes */
 		foreach($operationAttributes as $singleAttribute)
 		{
-			KalturaLog::info("Going To create Flavor for clip: " . print_r($singleAttribute,true));
+			KalturaLog::info("Going To create Flavor for clip: " . print_r($singleAttribute, true));
 			if($singleAttribute->getDuration()<=0)
 			{
 				KalturaLog::info("Ingnoring clip attribute with non-positive duration");
