@@ -173,7 +173,7 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 			$curlWrapper->setOpt( CURLOPT_SSLKEYPASSWD, $data->sslKeyPassword);
 
 		$results = $curlWrapper->doExec($url);
-		$httpCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
+		$httpCode = $curlWrapper->getHttpCode();
 		$errCode = $curlWrapper->getErrorNumber();
 		$errMessage = $curlWrapper->getError();
 
