@@ -732,10 +732,7 @@ class kFlowHelper
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 
-		$originalSrcFileSync = $data->getSrcFileSyncLocalPath();
-		/* @var  $sourceFileSyncDescriptor kSourceFileSyncDescriptor*/
-		$sourceFileSyncDescriptor = $data->getSrcFileSyncs();
-		self::validateSourceFileSync($originalSrcFileSync, $sourceFileSyncDescriptor);
+		self::validateSourceFileSync($data->getSrcFileSyncs());
 
 		$shouldSave = false;
 		if(!is_null($data->getEngineMessage())) {
@@ -794,9 +791,10 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
-	protected static function validateSourceFileSync($originalSrcPath, $sourceFileSyncDescriptors)
+	protected static function validateSourceFileSync($sourceFileSyncDescriptors)
 	{
 		//validate that the source is still the same
+		/* @var  $sourceFileSyncDescriptor kSourceFileSyncDescriptor*/
 		foreach ($sourceFileSyncDescriptors as $sourceFileSyncDescriptor)
 		{
 			$srcAssetId = $sourceFileSyncDescriptor->getAssetId();
@@ -804,6 +802,7 @@ class kFlowHelper
 			$fileSyncKey = $originalFlavor->getSyncKey($sourceFileSyncDescriptor->getFileSyncObjectSubType());
 			$currentSourceFileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($fileSyncKey);
 			$currentSourceFilePath = $currentSourceFileSync->getFilePath();
+			$originalSrcPath = $sourceFileSyncDescriptor->getFileSyncLocalPath();
 			if(!empty($currentSourceFilePath) && strcmp(basename($currentSourceFilePath),basename($originalSrcPath)))
 			{
 				throw new APIException(KalturaErrors::SOURCE_FLAVOR_CHANGED_DURING_CONVERSION, $currentSourceFilePath, $originalSrcPath, $srcAssetId);
