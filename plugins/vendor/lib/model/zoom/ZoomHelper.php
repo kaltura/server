@@ -269,12 +269,12 @@ class ZoomHelper
 		{
 			if(kuserPeer::getKuserByPartnerAndUid($partnerId, $usersEmail, true))
 			{
-				$validatedEmails = $usersEmail;
+				$validatedEmails[] = $usersEmail;
 			}
 			elseif($createIfNotFound)
 			{
 				kuserPeer::createKuserForPartner($partnerId, $usersEmail);
-				$validatedEmails = $usersEmail;
+				$validatedEmails[] = $usersEmail;
 			}
 		}
 		return $validatedEmails;
