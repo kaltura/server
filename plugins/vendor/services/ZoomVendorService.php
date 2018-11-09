@@ -219,8 +219,8 @@ class ZoomVendorService extends KalturaBaseService
 			throw new KalturaAPIException('Uploads are disabled for current Partner');
 		}
 		$emails = ZoomHelper::extractCoHosts($meetingId, $zoomIntegration, $accountId);
-		$emails = ZoomHelper::getValidateUsers($emails,$zoomIntegration->getPartnerId(),$zoomIntegration->getCreateUserIfNotExist());
-		$dbUser = ZoomHelper::getEntryOwner($hostEmail,$zoomIntegration->getDefaultUserEMail(),$zoomIntegration->getPartnerId(),$zoomIntegration->getCreateUserIfNotExist());
+		$emails = ZoomHelper::getValidatedUsers($emails, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
+		$dbUser = ZoomHelper::getEntryOwner($hostEmail, $zoomIntegration->getDefaultUserEMail(), $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
 		// user logged in - need to re-init kPermissionManager in order to determine current user's permissions
 		$ks = null;
 		$this->setPartnerFilters($zoomIntegration->getPartnerId());

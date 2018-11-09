@@ -262,7 +262,7 @@ class ZoomHelper
 	 * @param $createIfNoFound
 	 * @return array
 	 */
-	public static function getValidateUsers($emails,$partnerId,$createIfNotFound)
+	public static function getValidatedUsers($emails, $partnerId, $createIfNotFound)
 	{
 		$validatedEmails=array();
 		foreach ($emails as $usersEmail)
