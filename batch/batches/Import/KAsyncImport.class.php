@@ -80,7 +80,7 @@ class KAsyncImport extends KJobHandlerWorker
 			$progressCallBack 		= array('KAsyncImport', 'progressWatchDog');
 		}
 		$res 						= $curlWrapper->exec($sourceUrl, $localPath,$progressCallBack);
-		$responseStatusCode			= $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
+		$responseStatusCode			= $curlWrapper->getHttpCode();
 		$errorMessage				= $curlWrapper->getError();
 		$errorNumber				= $curlWrapper->getErrorNumber();
 		$curlWrapper->close();
