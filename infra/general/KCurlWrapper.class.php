@@ -410,9 +410,8 @@ class KCurlWrapper
 
 		self::$headers = "";
 		self::$lastHeader = false;
-		curl_exec($this->ch);
 
-		$this->setExecResults();
+		$this->execCurl();
 
 		//Added to support multiple curl executions using the same curl. Wince this is the same curl re-used we need to reset the range option before continuing forward
 		if(!$noBody)
@@ -564,8 +563,7 @@ class KCurlWrapper
 			curl_setopt($this->ch, CURLOPT_NOPROGRESS, false);
 			curl_setopt($this->ch, CURLOPT_PROGRESSFUNCTION, $progressCallBack);
 		}
-		$ret = curl_exec($this->ch);
-		$this->setExecResults();
+		$ret = $this->execCurl();
 
 		if (!is_null($destFd)) {
 			fclose($destFd);
@@ -591,8 +589,7 @@ class KCurlWrapper
 
 		curl_setopt($this->ch, CURLOPT_URL, $sourceUrl);
 
-		$res = curl_exec($this->ch);
-		$this->setExecResults();
+		$res = $this->execCurl();
 
 		return $res;
 	}
@@ -603,11 +600,13 @@ class KCurlWrapper
 		$this->error = "Internal not allowed url [$url] -  curl will not be invoked";
 	}
 
-	private function setExecResults()
+	private function execCurl()
 	{
+		$res = curl_exec($this->ch);
 		$this->httpCode = $this->getInfo(CURLINFO_HTTP_CODE);
 		$this->errorNumber = curl_errno($this->ch);
 		$this->error = $this->getErrorMsg();
+		return $res;
 	}
 
 	/**
@@ -754,7 +753,7 @@ class KCurlWrapper
 		{
 			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		}
-			
+
 		$content = curl_exec($ch);
 		curl_close($ch);
 		
