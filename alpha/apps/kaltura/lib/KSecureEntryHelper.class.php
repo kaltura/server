@@ -312,9 +312,8 @@ class KSecureEntryHelper
 			return;
 			
 		$this->contextResult = new kEntryContextDataResult();
-		$scope = $this->getAccessControlScope();
-		$this->scope = $scope;
-		$this->disableCache = $accessControl->applyContext($this->contextResult, $scope);
+		$this->scope = $this->getAccessControlScope();
+		$this->disableCache = $accessControl->applyContext($this->contextResult, $this->scope);
 
 		if (count ( $this->contextResult->getActions () )) {
 			foreach ( $this->contextResult->getActions () as $action )

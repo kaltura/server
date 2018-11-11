@@ -144,9 +144,12 @@ class kRule
 				KalturaLog::debug("Condition [" . get_class($condition) . "] not  fulfilled");
 				return false;
 			}
-			foreach ($condition->getExtraProperties() as $key => $value)
+			if ($this->scope)
 			{
-				$this->scope->setOutputVar($key, $value);
+				foreach ($condition->getExtraProperties() as $key => $value)
+				{
+					$this->scope->setOutputVar($key, $value);
+				}
 			}
 		}
 				

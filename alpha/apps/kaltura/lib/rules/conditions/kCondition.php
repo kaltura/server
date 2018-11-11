@@ -29,6 +29,7 @@ abstract class kCondition
 	public function __construct($not = false)
 	{
 		$this->setNot($not);
+		$this->extraProperties = array();
 	}
 	
 	/**

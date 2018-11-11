@@ -207,8 +207,8 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			}
 			if (count($filteredRules) && $header)
 			{
-				$this->scope->setOutputVar(kIpAddressCondition::PARTNER_INTERNAL, true);
-				$this->scope->setOutputVar(kIpAddressCondition::PARTNER_INTERNAL_IP, $ip);
+				$this->getScope()->setOutputVar(kIpAddressCondition::PARTNER_INTERNAL, true);
+				$this->getScope()->setOutputVar(kIpAddressCondition::PARTNER_INTERNAL_IP, $ip);
 			}
 		
 			// use + and not array_merge because the arrays have numerical indexes
@@ -263,9 +263,9 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		foreach($rules as $ruleNum => $rule)
 		{
 			/* @var $rule kRule */
-			if (is_null($this->scope->getOutputVarByName(self::SERVE_FROM_SERVER_NODE_RULE)) && $rule->hasActionType(array(RuleActionType::SERVE_FROM_REMOTE_SERVER)))
+			if (is_null($this->getScope()->getOutputVarByName(self::SERVE_FROM_SERVER_NODE_RULE)) && $rule->hasActionType(array(RuleActionType::SERVE_FROM_REMOTE_SERVER)))
 			{
-				$this->scope->setOutputVar(self::SERVE_FROM_SERVER_NODE_RULE,true);
+				$this->getScope()->setOutputVar(self::SERVE_FROM_SERVER_NODE_RULE,true);
 			}
 
 			if($isKsAdmin && !$rule->getForceAdminValidation())
@@ -466,8 +466,8 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		}
 		
 		// don't bother with building the ip tree for a small number of conditions
-//		if ($largestCondType === false || count($ipRuleConds[$largestCondType]) < 100)
-//			return null;
+		if ($largestCondType === false || count($ipRuleConds[$largestCondType]) < 100)
+			return null;
 		
 		// build tree from most common ip cond type conditions
 		

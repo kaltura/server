@@ -609,12 +609,12 @@ class DeliveryProfileDynamicAttributes {
 		{
 			$this->usedEdgeServerIds = array();
 		}
-		$this->usedEdgeServerIds = array_merge($this->usedEdgeServerIds, array_diff($serverNodesIds, $this->usedEdgeServerIds ));
+		$this->usedEdgeServerIds = array_merge($this->usedEdgeServerIds, $serverNodesIds);
 	}
 
 	public function getUsedEdgeServerIds()
 	{
-		return $this->usedEdgeServerIds;
+		return array_unique($this->usedEdgeServerIds);
 	}
 
 	/**
