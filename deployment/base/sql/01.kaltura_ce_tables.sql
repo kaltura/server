@@ -2230,6 +2230,7 @@ CREATE TABLE `server_node` (
   `host_name` varchar(256) NOT NULL,
   `playback_host_name` varchar(256) DEFAULT NULL,
   `parent_id` varchar(256) DEFAULT NULL,
+	`environment` VARCHAR(32),
   `custom_data` text,
   PRIMARY KEY (`id`),
   KEY `partner_id_status_system_name` (`partner_id`,`status`,`system_name`(255)),

@@ -117,6 +117,12 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 	protected $custom_data;
 
 	/**
+	 * The value for the environment field.
+	 * @var        string
+	 */
+	protected $environment;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -430,6 +436,16 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 	public function getCustomData()
 	{
 		return $this->custom_data;
+	}
+
+	/**
+	 * Get the [environment] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getEnvironment()
+	{
+		return $this->environment;
 	}
 
 	/**
@@ -879,6 +895,29 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 	} // setCustomData()
 
 	/**
+	 * Set the value of [environment] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     ServerNode The current object (for fluent API support)
+	 */
+	public function setEnvironment($v)
+	{
+		if(!isset($this->oldColumnsValues[ServerNodePeer::ENVIRONMENT]))
+			$this->oldColumnsValues[ServerNodePeer::ENVIRONMENT] = $this->environment;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->environment !== $v) {
+			$this->environment = $v;
+			$this->modifiedColumns[] = ServerNodePeer::ENVIRONMENT;
+		}
+
+		return $this;
+	} // setEnvironment()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -932,7 +971,8 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 			$this->host_name = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->playback_host_name = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
 			$this->parent_id = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-			$this->custom_data = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->environment = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->custom_data = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -942,7 +982,7 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 16; // 16 = ServerNodePeer::NUM_COLUMNS - ServerNodePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 17; // 17 = ServerNodePeer::NUM_COLUMNS - ServerNodePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating ServerNode object", $e);
@@ -1508,6 +1548,9 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 				return $this->getParentId();
 				break;
 			case 15:
+				return $this->getEnvironment();
+				break;
+			case 16:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1546,7 +1589,8 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 			$keys[12] => $this->getHostName(),
 			$keys[13] => $this->getPlaybackHostName(),
 			$keys[14] => $this->getParentId(),
-			$keys[15] => $this->getCustomData(),
+			$keys[15] => $this->getEnvironment(),
+			$keys[16] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1624,6 +1668,9 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 				$this->setParentId($value);
 				break;
 			case 15:
+				$this->setEnvironment($value);
+				break;
+			case 16:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1665,7 +1712,8 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[12], $arr)) $this->setHostName($arr[$keys[12]]);
 		if (array_key_exists($keys[13], $arr)) $this->setPlaybackHostName($arr[$keys[13]]);
 		if (array_key_exists($keys[14], $arr)) $this->setParentId($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setCustomData($arr[$keys[15]]);
+		if (array_key_exists($keys[15], $arr)) $this->setEnvironment($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setCustomData($arr[$keys[16]]);
 	}
 
 	/**
@@ -1692,6 +1740,7 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(ServerNodePeer::HOST_NAME)) $criteria->add(ServerNodePeer::HOST_NAME, $this->host_name);
 		if ($this->isColumnModified(ServerNodePeer::PLAYBACK_HOST_NAME)) $criteria->add(ServerNodePeer::PLAYBACK_HOST_NAME, $this->playback_host_name);
 		if ($this->isColumnModified(ServerNodePeer::PARENT_ID)) $criteria->add(ServerNodePeer::PARENT_ID, $this->parent_id);
+		if ($this->isColumnModified(ServerNodePeer::ENVIRONMENT)) $criteria->add(ServerNodePeer::ENVIRONMENT, $this->environment);
 		if ($this->isColumnModified(ServerNodePeer::CUSTOM_DATA)) $criteria->add(ServerNodePeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
@@ -1800,6 +1849,8 @@ abstract class BaseServerNode extends BaseObject  implements Persistent {
 		$copyObj->setParentId($this->parent_id);
 
 		$copyObj->setCustomData($this->custom_data);
+
+		$copyObj->setEnvironment($this->environment);
 
 
 		$copyObj->setNew(true);
