@@ -390,8 +390,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 					$audioLabel = $flavor->getLabel();
 				}
 				
-				$audioLanguageData = $this->getAudioLanguage($flavor);
-				
+				$audioLanguageData = is_callable(array($flavor, 'getLanguage')) ? $this->getAudioLanguage($flavor) : null;
 				if (!$audioLanguageData) 
 				{
 					$audioLanguage = 'und';
@@ -402,7 +401,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 					list($audioLanguage, $audioLanguageName) = $audioLanguageData;
 				}
 				
-				$audioCodec = $this->getAudioCodec($flavor);
+				$audioCodec = is_callable(array($flavor, 'getMediaInfo')) ? $this->getAudioCodec($flavor) : null;
 				if(!$audioCodec)
 					$audioCodec = "und";
 				
