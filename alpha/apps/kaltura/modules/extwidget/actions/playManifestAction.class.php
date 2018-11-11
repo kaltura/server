@@ -1381,13 +1381,8 @@ class playManifestAction extends kalturaAction
 	{
 		/* @var $flavor flavorAsset */
 		/* @var $currentFlavor flavorAsset */
-		if ($currentFlavor->getLabel() && $flavor->getLabel() && $currentFlavor->getLabel() != $flavor->getLabel())
-		{
-			return false;
-		}
-
-		if ($currentFlavor->getLanguage() && $flavor->getLanguage() && $currentFlavor->getLanguage() != $flavor->getLanguage())
-		{
+		if (  !$flavor->getWidth() && !$flavor->getHeight())
+		{   //audio flavor is not redundant
 			return false;
 		}
 
