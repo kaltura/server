@@ -26,6 +26,8 @@ class ZoomHelper
 	/** php body */
 	const PHP_INPUT = 'php://input';
 
+	const ADMIN_TAG_ZOOM = 'zoomentry';
+
 	/**
 	 * @param kuser $dbUser
 	 * @param string $zoomCategory
@@ -46,7 +48,7 @@ class ZoomHelper
 		$entry->setPuserId($dbUser->getPuserId());
 		$entry->setKuserId($dbUser->getKuserId());
 		$entry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($dbUser->getPartnerId())->getId());
-		$entry->setAdminTags('zoom');
+		$entry->setAdminTags(self::ADMIN_TAG_ZOOM);
 		if ($zoomCategory)
 		{
 			$entry->setCategories($zoomCategory);
@@ -332,23 +334,21 @@ class ZoomHelper
 	/**
 	 * @param int $partnerId
 	 * @param string $categoryFullName
+	 * @param bool $createIfNotExist
 	 * @throws Exception
 	 * @return int id;
 	 */
-	public static function createCategoryForZoom($partnerId, $categoryFullName)
+	public static function createCategoryForZoom($partnerId, $categoryFullName, $createIfNotExist = true)
 	{
-		//Validate category full name does not contain spacial chars
-		$tempCategoryFullName = categoryPeer::getParsedFullName($categoryFullName);
-		if(strcmp($tempCategoryFullName, $categoryFullName))
-		{
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_NAME_CONTAINS_INVALID_CHARS);
-		}
-
 		$category = categoryPeer::getByFullNameExactMatch($categoryFullName, null, $partnerId);
 		if($category)
 		{
 			KalturaLog::debug('Category: ' . $categoryFullName . ' already exist for partner: ' . $partnerId);
 			return $category->getId();
+		}
+		if(!$createIfNotExist)
+		{
+			return null;
 		}
 
 		$categoryDb = new category();

@@ -66,8 +66,15 @@ class kApcConf extends kBaseConfCache implements kMapCacheInterface , kKeyCacheI
 
 	public function storeKey($key, $ttl=30)
 	{
-			if($this->apcFunctionsExist && PHP_SAPI != 'cli')
+		if($this->apcFunctionsExist && PHP_SAPI != 'cli')
+		{
+			$existingKey = apc_fetch(kBaseConfCache::CONF_CACHE_VERSION_KEY);
+			if(!$existingKey || strcmp($existingKey, $key))
+			{
 				return apc_store(kBaseConfCache::CONF_CACHE_VERSION_KEY, $key, $ttl);
+			}
+		}
+		return null;
 	}
 
 	public function isKeyRequired()

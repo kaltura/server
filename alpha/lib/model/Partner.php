@@ -78,6 +78,10 @@ class Partner extends BasePartner
 
 	const PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT = 10;
 
+	const CUSTOMER_DATA_RTC_ENV = 'rtc_env_name';
+
+	const RTC_SERVER_NODE_ENV = 'rtc_server_node_env';
+
 	public function save(PropelPDO $con = null)
 	{
 		PartnerPeer::removePartnerFromCache( $this->getId() );
@@ -2013,5 +2017,16 @@ class Partner extends BasePartner
 		}
 		return $this->getAdminSecret();
 	}
+
+	public function getRTCEnv()
+	{
+		return $this->getFromCustomData( self::CUSTOMER_DATA_RTC_ENV, null , kConf::get(self::RTC_SERVER_NODE_ENV) );
+	}
+
+	public function setRTCEnv($v)
+	{
+		$this->putInCustomData(self::CUSTOMER_DATA_RTC_ENV, $v);
+	}
+
 
 }

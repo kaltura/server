@@ -243,13 +243,34 @@ class SyndicationFeedService extends KalturaBaseService
 		
 		$feedCount = new KalturaSyndicationFeedEntryCount();
 		
-		$feedRenderer = new KalturaSyndicationFeedRenderer($feedId);
-		$feedCount->totalEntryCount = $feedRenderer->getEntriesCount();
-		
-		$feedRenderer = new KalturaSyndicationFeedRenderer($feedId);
-		$feedRenderer->addFlavorParamsAttachedFilter();
-		$feedCount->actualEntryCount = $feedRenderer->getEntriesCount();
-		
+		try
+		{
+			$feedRenderer = new KalturaSyndicationFeedRenderer($feedId);
+			$feedCount->totalEntryCount = $feedRenderer->getEntriesCount();
+
+			$feedRenderer = new KalturaSyndicationFeedRenderer($feedId);
+			$feedRenderer->addFlavorParamsAttachedFilter();
+			$feedCount->actualEntryCount = $feedRenderer->getEntriesCount();
+		}
+		catch (kCoreException $exception)
+		{
+			$code = $exception->getCode();
+			$data = $exception->getData();
+			switch ($code)
+			{
+				case kCoreException::INVALID_ENTRY_ID:
+					$id = isset($data['playlistId']) ? $data['playlistId'] : '';
+					throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
+				case kCoreException::INVALID_ENTRY_TYPE:
+					$id = isset($data['playlistId']) ? $data['playlistId'] : '';
+					$wrongType = isset($data['wrongType']) ? $data['wrongType'] : '';
+					$correctType = isset($data['correctType']) ? $data['correctType'] : '';
+					throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_TYPE, $id, $wrongType, $correctType);
+				default:
+					throw $exception;
+			}
+		}
+
 		$feedCount->requireTranscodingCount = $feedCount->totalEntryCount - $feedCount->actualEntryCount;
 		
 		return $feedCount;
