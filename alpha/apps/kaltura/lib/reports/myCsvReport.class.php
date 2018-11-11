@@ -75,9 +75,8 @@ class myCsvReport
 			$csv->addNewLine( "# ------------------------------------" );
 			$csv->addNewLine( "# Total" );
 			$csv->addNewLine( "# ------------------------------------" );
-			$total_headers_count = count($total_dictionary);
 			$csv->addNewLine($total_dictionary/* $total_header */);
-			$csv->addNewLine(array_slice($total_data, 0, $total_headers_count));
+			$csv->addNewLine(array_slice($total_data, 0, count($total_dictionary)));
 		}
 		
 		
