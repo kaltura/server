@@ -411,11 +411,10 @@ class kMrssManager
 
 	/**
 	 * @param entry $entry
-	 * @param SimpleXMLElement|null $mrss
-	 * @param kMrssParameters|null $mrssParams
-	 * @param null $features
+	 * @param SimpleXMLElement $mrss
+	 * @param kMrssParameters $mrssParams
+	 * @params string $features
 	 * @return SimpleXMLElement
-	 * @throws PropelException
 	 */
 	public static function getEntryMrssXml(entry $entry, SimpleXMLElement $mrss = null, kMrssParameters $mrssParams = null, $features = null)
 	{
@@ -582,7 +581,7 @@ class kMrssManager
 			{
 				try
 				{
-					if ( (is_array($features) && !count($features)) || in_array($mrssContributor->getObjectFeatureType(), $features))
+					if ((is_array($features) && !count($features)) || in_array($mrssContributor->getObjectFeatureType(), $features))
 						$mrssContributor->contribute($entry, $mrss, $mrssParams);
 				}
 				catch(kCoreException $ex)
