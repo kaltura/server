@@ -614,6 +614,10 @@ class DeliveryProfileDynamicAttributes {
 
 	public function getUsedEdgeServerIds()
 	{
+		if (!$this->usedEdgeServerIds)
+		{
+			return array();
+		}
 		return array_unique($this->usedEdgeServerIds);
 	}
 
