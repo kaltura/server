@@ -55,7 +55,7 @@ class PlaylistService extends KalturaEntryService
 	function addAction( KalturaPlaylist $playlist , $updateStats = false)
 	{
 		$dbPlaylist = $playlist->toInsertableObject();
-		
+
 		$this->checkAndSetValidUserInsert($playlist, $dbPlaylist);
 		$this->checkAdminOnlyInsertProperties($playlist);
 		$this->validateAccessControlId($playlist);
@@ -65,9 +65,9 @@ class PlaylistService extends KalturaEntryService
 		$dbPlaylist->setStatus ( entryStatus::READY );
 		$dbPlaylist->setKshowId ( null ); // this is brave !!
 		$dbPlaylist->setType ( entryType::PLAYLIST );
-		
-		myPlaylistUtils::validatePlaylist( $dbPlaylist );
-		
+
+		myPlaylistUtils::validatePlaylist($dbPlaylist);
+
 		$dbPlaylist->save();
 		
 		if ( $updateStats )
@@ -165,10 +165,13 @@ class PlaylistService extends KalturaEntryService
 		// copy properties from the playlistUpdate to the $dbPlaylist
 		baseObjectUtils::autoFillObjectFromObject ( $playlistUpdate , $dbPlaylist , $allowEmpty );
 		// after filling the $dbPlaylist from  $playlist - make sure the data content is set properly
-		if(!is_null($playlistUpdate->getDataContent(true)) && $playlistUpdate->getDataContent(true) != $dbPlaylist->getDataContent())
+		if(!is_null($playlistUpdate->getDataContent(true)))
 		{
-			$dbPlaylist->setDataContent ( $playlistUpdate->getDataContent(true)  );
-			myPlaylistUtils::validatePlaylist( $dbPlaylist );
+			if($playlistUpdate->getDataContent(true) != $dbPlaylist->getDataContent())
+			{
+				$dbPlaylist->setDataContent ($playlistUpdate->getDataContent(true));
+			}
+			myPlaylistUtils::validatePlaylist($dbPlaylist);
 		}
 		
 		if ( $updateStats )
@@ -179,6 +182,8 @@ class PlaylistService extends KalturaEntryService
 		
 		return $playlist;
 	}
+
+
 		
 
 	/**
@@ -191,8 +196,17 @@ class PlaylistService extends KalturaEntryService
 	 * @throws APIErrors::INVALID_PLAYLIST_TYPE
 	 * @validateUser entry id edit
 	 */
-	function deleteAction(  $id )
+	function deleteAction($id)
 	{
+		if (!kPermissionManager::isPermitted(PermissionName::PLAYLIST_DELETE))
+		{
+			$entry = entryPeer::retrieveByPK($id);
+			if(!$entry || $entry->getMediaType() != KalturaPlaylistType::STATIC_LIST)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_MEDIA_TYPE, $id, $entry->getMediaType(), KalturaPlaylistType::STATIC_LIST);
+			}
+		}
+
 		$this->deleteEntry($id, KalturaEntryType::PLAYLIST);
 	}
 	

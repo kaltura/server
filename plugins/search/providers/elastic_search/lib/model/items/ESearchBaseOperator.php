@@ -72,8 +72,7 @@ abstract class ESearchBaseOperator extends ESearchItem
 				$queryAttributes->setSearchHistoryMustNotContext(true);
 				break;
 			default:
-				KalturaLog::crit('unknown operator type');
-				return null;
+				throw new kESearchException('Missing operator type', kESearchException::MISSING_OPERATOR_TYPE);
 		}
 
 		$categorizedSearchItems = self::getCategorizedSearchItems($eSearchItemsArr);

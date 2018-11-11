@@ -1093,7 +1093,7 @@ class myEntryUtils
 
 		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
 		$url .= ($entryVersion ? "/v/$entryVersion" : '');
-		$url .= "/flavorParamIds/" . $flavorAsset->getFlavorParamsId().self::MP4_FILENAME_PARAMETER;
+		$url .= '/flavorId/' . $flavorAsset->getId().self::MP4_FILENAME_PARAMETER;
 		return $url;
 	}
 
@@ -1172,7 +1172,8 @@ class myEntryUtils
 		
 		// close db connections as we won't be requiring the database anymore and capturing a thumbnail may take a long time
 		kFile::closeDbConnections();
-		myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath."temp_", $calc_vid_sec, -1, -1);
+		$decryptionKey = $flavorAsset->getEncryptionKey() ? bin2hex(base64_decode($flavorAsset->getEncryptionKey())) : null;
+		myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath."temp_", $calc_vid_sec, -1, -1, false, $decryptionKey);
 		return true;
 	}
 
@@ -2241,5 +2242,17 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$url .= "/flavorId/".$flavorAsset->getId();
 		$url .= self::MP4_FILENAME_PARAMETER;
 		return $url;
+	}
+
+	public static function verifyEntryType($entry)
+	{
+		$blockedTypes = array('KalturaPlaylist');
+		foreach ($blockedTypes as $type)
+		{
+			if ($entry instanceof $type)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, $type);
+			}
+		}
 	}
 }

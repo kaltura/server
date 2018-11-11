@@ -189,7 +189,7 @@ class kEntitlementUtils
 		return self::isMemberOfCategory($allCategoriesEntry, $entry, $partner, $kuserId, $ks, $ksPrivacyContexts);
 	}
 
-	private static function getKuserIdForEntitlement($kuserId = null, $ks = null)
+	public static function getKuserIdForEntitlement($kuserId = null, $ks = null)
 	{
 		if($ks && !$kuserId)
 		{

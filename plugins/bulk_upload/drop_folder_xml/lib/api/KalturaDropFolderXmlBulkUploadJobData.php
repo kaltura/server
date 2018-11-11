@@ -3,7 +3,7 @@
 /**
  *
  * Represents the Bulk upload job data for drop folder xml bulk upload
- * @package  plugins.dropFolderXmlBulkUpload
+ * @package plugins.dropFolderXmlBulkUpload
  * @subpackage api.objects
  *
  */

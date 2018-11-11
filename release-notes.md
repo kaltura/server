@@ -1,5 +1,15 @@
 # Naos 14.8.0 #
 
+## Update permission of media::addFromUploadedFile ##
+- Issue Type: Feature
+- Issue ID: PLAT-9393
+
+### configuration ###
+    N/A
+
+### Deployment scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_11_08_update_media_addfromuploadedfile.php
+
 ## Add permission in Admin Console for New Analytics ##
 
 - Issue Type: Feature
@@ -29,6 +39,19 @@
 #### Deployment Scripts ####
 
 		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /deployment/updates/sql/2018_10_23_alter_server_node_table_add_environment_column.sql
+
+## Add permission to use playlist service with user ks ##
+- Issue Type: Task
+- Issue ID: PLAT-9230
+
+### Configuration ###
+	None.
+
+#### Deployment Scripts ####
+
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_01_11_update_playlist_service_permissions.php
+
 
 # Naos 14.7.0 #
 

@@ -28,6 +28,7 @@ class ESearchUserItem extends ESearchItem
 		'group_ids' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH),
 		'updated_at' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 		'created_at' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
+		ESearchUserFieldName::PUSER_ID => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH),
 	);
 
 	private static $multiLanguageFields = array();
