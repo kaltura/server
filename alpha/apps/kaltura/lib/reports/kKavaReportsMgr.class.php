@@ -51,7 +51,6 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_BUFFER_TIME_RATIO = 'avg_buffer_time';
 	const METRIC_AVG_BITRATE = 'avg_bitrate';
 	const METRIC_ORIGIN_BANDWIDTH_SIZE_MB = 'origin_bandwidth_consumption';
-	const METRIC_ORIGIN_BANDWIDTH_SIZE_KB = 'origin_bandwidth_consumption_kb';
 	
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -1519,11 +1518,6 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_AGGR => array(self::METRIC_ORIGIN_BANDWIDTH_SIZE_BYTES),
 			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
 				self::METRIC_ORIGIN_BANDWIDTH_SIZE_MB, self::METRIC_ORIGIN_BANDWIDTH_SIZE_BYTES, '1048576'));
-
-		self::$metrics_def[self::METRIC_ORIGIN_BANDWIDTH_SIZE_KB] = array(
-			self::DRUID_AGGR => array(self::METRIC_ORIGIN_BANDWIDTH_SIZE_BYTES),
-			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
-				self::METRIC_ORIGIN_BANDWIDTH_SIZE_KB, self::METRIC_ORIGIN_BANDWIDTH_SIZE_BYTES, '1024'));
 
 		// complex metrics
 		self::$metrics_def[self::METRIC_AVG_PLAY_TIME] = array(
