@@ -29,13 +29,15 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	 * @var accessControlScope
 	 */
 	protected $scope;
-	
-	
+
+
 	const IP_ADDRESS_RESTRICTION_COLUMN_NAME = 'ip_address_restriction';
 	const USER_AGENT_RESTRICTION_COLUMN_NAME = 'user_agent_restriction';
 	const CUSTOM_DATA_RULES_ARRAY_COMPRESSED = 'rules_array_compressed';
 	const CUSTOM_DATA_IP_TREE = 'ip_tree';
-	
+
+	const SERVE_FROM_SERVER_NODE_RULE = 'SERVE_FROM_SERVER_NODE_RULE';
+
 	/* (non-PHPdoc)
 	 * @see BaseaccessControl::preSave()
 	 */
@@ -203,6 +205,11 @@ class accessControl extends BaseaccessControl implements IBaseObject
 					$filteredRules[$rule][] = $cond;
 				}
 			}
+			if (count($filteredRules) && $header)
+			{
+				$this->getScope()->setOutputVar(kIpAddressCondition::PARTNER_INTERNAL, true);
+				$this->getScope()->setOutputVar(kIpAddressCondition::PARTNER_INTERNAL_IP, $ip);
+			}
 		
 			// use + and not array_merge because the arrays have numerical indexes
 			$filteredRules += $ipTree[self::IP_TREE_UNFILTERED];
@@ -255,10 +262,15 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		$fulfilledRules = array();
 		foreach($rules as $ruleNum => $rule)
 		{
+			/* @var $rule kRule */
+			if (is_null($this->getScope()->getOutputVarByName(self::SERVE_FROM_SERVER_NODE_RULE)) && $rule->hasActionType(array(RuleActionType::SERVE_FROM_REMOTE_SERVER)))
+			{
+				$this->getScope()->setOutputVar(self::SERVE_FROM_SERVER_NODE_RULE,true);
+			}
+
 			if($isKsAdmin && !$rule->getForceAdminValidation())
 				continue;
-				
-			/* @var $rule kRule */
+
 			$fulfilled = $rule->applyContext($context);
 				 
 			if($rule->shouldDisableCache())
@@ -267,7 +279,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			if($fulfilled)
 			{
 				$fulfilledRules[] = $ruleNum;
-				
+
 				if ($rule->getStopProcessing())
 					break;
 			}

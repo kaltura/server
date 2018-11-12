@@ -80,7 +80,7 @@ class kRule
 	 */
 	
 	protected $scope;
-	
+
 	/**
 	 * @param kScope $scope
 	 */
@@ -88,7 +88,7 @@ class kRule
 	{
 		$this->scope = $scope;
 	}
-	
+
 	/**
 	 * @return the $conditions
 	 */
@@ -143,6 +143,13 @@ class kRule
 			{
 				KalturaLog::debug("Condition [" . get_class($condition) . "] not  fulfilled");
 				return false;
+			}
+			if ($this->scope)
+			{
+				foreach ($condition->getExtraProperties() as $key => $value)
+				{
+					$this->scope->setOutputVar($key, $value);
+				}
 			}
 		}
 				
@@ -370,5 +377,4 @@ class kRule
 		}
 		return true;
 	}
-
 }
