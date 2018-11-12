@@ -30,6 +30,10 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	 */
 	protected $scope;
 
+	/**
+	 * @var array
+	 */
+	protected $specialProperty;
 
 	const IP_ADDRESS_RESTRICTION_COLUMN_NAME = 'ip_address_restriction';
 	const USER_AGENT_RESTRICTION_COLUMN_NAME = 'user_agent_restriction';
@@ -37,6 +41,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	const CUSTOM_DATA_IP_TREE = 'ip_tree';
 
 	const SERVE_FROM_SERVER_NODE_RULE = 'SERVE_FROM_SERVER_NODE_RULE';
+	const CUSTOM_DATA_SPECIAL_PROPERTIES = 'special_properties';
 
 	/* (non-PHPdoc)
 	 * @see BaseaccessControl::preSave()
@@ -81,6 +86,16 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	public function save(PropelPDO $con = null)
 	{
 		if ($this->isColumnModified(accessControlPeer::RULES)) {
+			foreach($this->getRulesArray() as $rule)
+			{
+				$specialProperties = $this->getSpecialProperties();
+				/* @var $rule kRule */
+				if ($rule->hasActionType(array(RuleActionType::SERVE_FROM_REMOTE_SERVER)))
+				{
+					$this->setSpecialProperty(self::SERVE_FROM_SERVER_NODE_RULE, true);
+					break;
+				}
+			}
 			$this->setIpTree($this->buildRulesIpTree());
 		}
 
@@ -256,18 +271,16 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		$isKsAdmin = $this->scope && $this->scope->getKs() && $this->scope->getKs()->isAdmin();
 		
 		$rules = $this->getRulesArray();
-
+		$specialProperties = $this->getSpecialProperties();
+		if ($specialProperties[self::SERVE_FROM_SERVER_NODE_RULE])
+		{
+			$this->getScope()->setOutputVar(self::SERVE_FROM_SERVER_NODE_RULE,true);
+		}
 		$this->filterRulesByTree($rules);
 		
 		$fulfilledRules = array();
 		foreach($rules as $ruleNum => $rule)
 		{
-			/* @var $rule kRule */
-			if (is_null($this->getScope()->getOutputVarByName(self::SERVE_FROM_SERVER_NODE_RULE)) && $rule->hasActionType(array(RuleActionType::SERVE_FROM_REMOTE_SERVER)))
-			{
-				$this->getScope()->setOutputVar(self::SERVE_FROM_SERVER_NODE_RULE,true);
-			}
-
 			if($isKsAdmin && !$rule->getForceAdminValidation())
 				continue;
 
@@ -492,4 +505,16 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			
 		return $rulesIpTree;
 	}
+
+	public function getSpecialProperties()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_SPECIAL_PROPERTIES, null, array());
+	}
+	public function setSpecialProperty($key, $value)
+	{
+		$specialProperties = $this->getSpecialProperties();
+		$specialProperties[$key] = $value;
+		$this->putInCustomData(self::CUSTOM_DATA_SPECIAL_PROPERTIES, $specialProperties);
+	}
+
 }

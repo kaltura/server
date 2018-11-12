@@ -1336,11 +1336,11 @@ class playManifestAction extends kalturaAction
 			if ($this->deliveryProfile->getDynamicAttributes()->getUsedEdgeServerIds() && count($this->deliveryProfile->getDynamicAttributes()->getUsedEdgeServerIds()))
 			{
 				$playLocation = implode(",", $this->deliveryProfile->getDynamicAttributes()->getUsedEdgeServerIds());
-				header('X-ServerNodeIds:' . $playLocation);
 			} else if ($this->secureEntryHelper->getScope()->getOutputVarByName(kIpAddressCondition::PARTNER_INTERNAL))
 			{
 				$playLocation = self::PLAY_LOCATION_INTERNAL;
 			}
+			header('X-ServerNodeIds:' . $playLocation);
 			$renderer->setPlayLocation($playLocation);
 			$renderer->setInternalIP($this->secureEntryHelper->getScope()->getOutputVarByName(kIpAddressCondition::PARTNER_INTERNAL_IP));
 		}
