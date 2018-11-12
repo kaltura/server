@@ -153,16 +153,7 @@ class ZoomVendorService extends KalturaBaseService
 	{
 		KalturaResponseCacher::disableCache();
 		$partnerId = kCurrentContext::getCurrentPartnerId();
-
-		$dbUser = kuserPeer::getKuserByPartnerAndUid($partnerId, $defaultUserId);
-		if($createUserIfNotExist && !$dbUser)
-		{
-			$dbUser = kuserPeer::createKuserForPartner($partnerId, $defaultUserId);
-		}
-		if(!$dbUser)
-		{
-			throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
-		}
+		$dbUser = kuserPeer::createKuserForPartner($partnerId, $defaultUserId);
 
 		/** @var ZoomVendorIntegration $zoomIntegration */
 		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
@@ -173,6 +164,8 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomIntegration->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
 			$zoomIntegration->setPartnerId($partnerId);
 		}
+
+		$zoomIntegration->setCreateUserIfNotExist($createUserIfNotExist);
 
 		if($enableRecordingUpload)
 		{
@@ -226,14 +219,10 @@ class ZoomVendorService extends KalturaBaseService
 			throw new KalturaAPIException('Uploads are disabled for current Partner');
 		}
 		$emails = ZoomHelper::extractCoHosts($meetingId, $zoomIntegration, $accountId);
+		$emails = ZoomHelper::getValidatedUsers($emails, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
+		$dbUser = ZoomHelper::getEntryOwner($hostEmail, $zoomIntegration->getDefaultUserEMail(), $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
 		// user logged in - need to re-init kPermissionManager in order to determine current user's permissions
 		$ks = null;
-		$dbUser = kuserPeer::getKuserByPartnerAndUid($zoomIntegration->getPartnerId(), $hostEmail, true);
-		if (!$dbUser) //if not go to default user
-		{
-			$emails[] = $hostEmail;
-			$dbUser = kuserPeer::getKuserByPartnerAndUid($zoomIntegration->getPartnerId(), $zoomIntegration->getDefaultUserEMail(), true);
-		}
 		$this->setPartnerFilters($zoomIntegration->getPartnerId());
 		kSessionUtils::createKSessionNoValidations($dbUser->getPartnerId() , $dbUser->getPuserId() , $ks, 86400 , false , "" , '*' );
 		kCurrentContext::initKsPartnerUser($ks);

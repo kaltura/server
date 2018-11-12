@@ -130,10 +130,15 @@ class ZoomHelper
 			{
 				$page = str_replace('@defaultUserID@', $zoomIntegration->getDefaultUserEMail() , $page);
 				$page = str_replace('@zoomCategory@', $zoomIntegration->getZoomCategory() ? $zoomIntegration->getZoomCategory()  : 'Zoom Recordings'  , $page);
+				$page = str_replace('@enableRecordingUpload@', $zoomIntegration->getStatus()== VendorStatus::ACTIVE ? 'checked'  : ''  , $page);
+				$page = str_replace('@createUserIfNotExist@', $zoomIntegration->getCreateUserIfNotExist() ? 'checked'  : ''  , $page);
 			}
-			else {
+			else
+			{
 				$page = str_replace('@defaultUserID@', '' , $page);
-				$page = str_replace('@zoomCategory@', 'Zoom Recordings' , $page);
+				$page = str_replace('@zoomCategory@', 'Zoom Recordings', $page);
+				$page = str_replace('@enableRecordingUpload@', 'checked', $page);
+				$page = str_replace('@createUserIfNotExist@', 'checked', $page);
 			}
 			$page = str_replace('@accountId@', $accountId , $page);
 			echo $page;
@@ -247,8 +252,59 @@ class ZoomHelper
 				}
 			}
 		}
+
 		return $emails;
 	}
+
+	/**
+	 * @param $emails
+	 * @param $partnerId
+	 * @param $createIfNoFound
+	 * @return array
+	 */
+	public static function getValidatedUsers($emails, $partnerId, $createIfNotFound)
+	{
+		$validatedEmails=array();
+		foreach ($emails as $usersEmail)
+		{
+			if(kuserPeer::getKuserByPartnerAndUid($partnerId, $usersEmail, true))
+			{
+				$validatedEmails = $usersEmail;
+			}
+			elseif($createIfNotFound)
+			{
+				kuserPeer::createKuserForPartner($partnerId, $usersEmail);
+				$validatedEmails = $usersEmail;
+			}
+		}
+		return $validatedEmails;
+	}
+
+	/**
+	 * @param $hostEmail
+	 * @param $defaultHostEmail
+	 * @param $partnerId
+	 * @param $createIfNotFound
+	 * @return kuser
+	 */
+	public static function getEntryOwner($hostEmail, $defaultHostEmail, $partnerId, $createIfNotFound)
+	{
+		$dbUser = kuserPeer::getKuserByPartnerAndUid($partnerId, $hostEmail, true);
+		if (!$dbUser)
+		{
+			if($createIfNotFound)
+			{
+				$dbUser = kuserPeer::createKuserForPartner($partnerId, $hostEmail);
+			}
+			else//get the default user that will be the owner if the entry.
+			{
+				$dbUser = kuserPeer::getKuserByPartnerAndUid($partnerId, $defaultHostEmail, true);
+			}
+		}
+		return $dbUser;
+	}
+
+
 
 	/**
 	 * @return array

@@ -14,6 +14,7 @@ class ZoomVendorIntegration extends VendorIntegration
 	const DEFAULT_USER_E_MAIL = "defaultUserEMail";
 	const ZOOM_CATEGORY = "zoomCategory";
 	const ZOOM_CATEGORY_ID = "zoomCategoryId";
+	const CREATE_USER_IF_NOT_EXIST = "createUserIfNotExist";
 
 	public function setAccessToken ($v)	{ $this->putInCustomData ( "" . self::ACCESS_TOKEN . "", $v);	}
 	public function getAccessToken ( )	{ return $this->getFromCustomData(self::ACCESS_TOKEN);	}
@@ -37,6 +38,11 @@ class ZoomVendorIntegration extends VendorIntegration
 	public function setZoomCategoryId($v)	{ $this->putInCustomData ( self::ZOOM_CATEGORY_ID, $v);	}
 	public function getZoomCategoryId( )	{ return $this->getFromCustomData(self::ZOOM_CATEGORY_ID);	}
 	public function unsetCategoryId( )  {return $this->removeFromCustomData(self::ZOOM_CATEGORY_ID);	}
+
+	public function setCreateUserIfNotExist($v) { $this->putInCustomData ( self::CREATE_USER_IF_NOT_EXIST, $v); }
+	public function getCreateUserIfNotExist() { return $this->getFromCustomData ( self::CREATE_USER_IF_NOT_EXIST,null, false); }
+
+
 
 	/**
 	 * returns all tokens as array
