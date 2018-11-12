@@ -403,9 +403,11 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		$dbEntry->setSource($resource->getSourceType());
 		$dbEntry->save();
-		
-		if($resource->getIsReady())
+
+		if ($resource->getIsReady())
+		{
 			return $this->attachFile($resource->getLocalFilePath(), $dbEntry, $dbAsset, $resource->getKeepOriginalFile());
+		}
 	
 		$lowerStatuses = array(
 			entryStatus::ERROR_CONVERTING,
@@ -549,7 +551,6 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		
 		$dbAsset->setFileExt($ext);
-		$dbAsset->save();
 		
 		if($dbAsset && ($dbAsset instanceof thumbAsset))
 		{
@@ -561,8 +562,12 @@ class KalturaEntryService extends KalturaBaseService
 		
 		$syncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		
-		try {
+		try
+		{
 			kFileSyncUtils::moveFromFile($entryFullPath, $syncKey, true, $copyOnly);
+			$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey);
+			$dbAsset->setSize($fileSync->getFileSize());
+			$dbAsset->save();
 		}
 		catch (Exception $e) {
 			
