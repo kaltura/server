@@ -136,9 +136,9 @@ class playManifestAction extends kalturaAction
 	 * @param string $urlToken
 	 * @return boolean
 	 */
-	const PLAY_LOCATION_EXTERNAL = 'external';
+	const PLAY_LOCATION_EXTERNAL = 'External';
 
-	const PLAY_LOCATION_INTERNAL = 'internal';
+	const PLAY_LOCATION_INTERNAL = 'Internal';
 
 	static protected function validateKalturaToken($url, $urlToken)
 	{
