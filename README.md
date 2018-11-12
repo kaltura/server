@@ -32,7 +32,7 @@ You can contribute meaningfully to the project from day one:
 + By creating [documentation](https://github.com/kaltura/platform-install-packages/tree/master/doc), demos and examples.
 + By translating Kaltura and the documentation.
 
-To make a contribution, follow the [See our CONTRIBUTERS doc](https://github.com/kaltura/platform-install-packages/blob/master/doc/CONTRIBUTERS.md)
+To make a contribution, follow the [See our CONTRIBUTERS doc](https://github.com/kaltura/platform-install-packages/blob/master/CONTRIBUTING.md)
 
 Contact the authors or email community@kaltura.org if you have other ideas.
 
