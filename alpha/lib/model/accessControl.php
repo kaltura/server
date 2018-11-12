@@ -86,16 +86,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	public function save(PropelPDO $con = null)
 	{
 		if ($this->isColumnModified(accessControlPeer::RULES)) {
-			foreach($this->getRulesArray() as $rule)
-			{
-				$specialProperties = $this->getSpecialProperties();
-				/* @var $rule kRule */
-				if ($rule->hasActionType(array(RuleActionType::SERVE_FROM_REMOTE_SERVER)))
-				{
-					$this->setSpecialProperty(self::SERVE_FROM_SERVER_NODE_RULE, true);
-					break;
-				}
-			}
+			$this->calcSpecialProperties();
 			$this->setIpTree($this->buildRulesIpTree());
 		}
 
@@ -515,6 +506,21 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		$specialProperties = $this->getSpecialProperties();
 		$specialProperties[$key] = $value;
 		$this->putInCustomData(self::CUSTOM_DATA_SPECIAL_PROPERTIES, $specialProperties);
+	}
+
+	protected function calcSpecialProperties()
+	{
+		$isServeFromKES = false;
+		foreach ($this->getRulesArray() as $rule)
+		{
+			/* @var $rule kRule */
+			if ($rule->hasActionType(array(RuleActionType::SERVE_FROM_REMOTE_SERVER)))
+			{
+				$isServeFromKES = true;
+				break;
+			}
+		}
+		$this->setSpecialProperty(self::SERVE_FROM_SERVER_NODE_RULE, $isServeFromKES);
 	}
 
 }
