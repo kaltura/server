@@ -98,7 +98,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		}
 
 		$curlWrapper = new KCurlWrapper();
-		$curlWrapper->setOpt(CURLOPT_COOKIE, 'DetectionBrowserStatus=3|1|32|1|11|2;'.$curlInfo->headers["set-cookie"]);
+		$curlWrapper->setOpt(CURLOPT_COOKIE, 'DetectionBrowserStatus=3|1|32|1|11|2;');
 
 		if($destFileLocalPath)
 			$data = file_get_contents($destFileLocalPath);
