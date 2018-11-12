@@ -64,7 +64,18 @@ abstract class kManifestRenderer
 	 * @var string
 	 */
 	public $playbackContext = null;
-	
+
+	/**
+	 * @var string
+	 */
+	protected $playLocation = null;
+
+	/**
+	 * @var string
+	 */
+	protected $internalIP = null;
+
+
 	protected function prepareFlavors()
 	{
 	}
@@ -144,7 +155,23 @@ abstract class kManifestRenderer
 	{
 		$this->deliveryCode = $deliveryCode ? $deliveryCode : $this->defaultDeliveryCode;
 	}
-	
+
+	/**
+	 * @param string $playLocation
+	 */
+	public function setPlayLocation($playLocation)
+	{
+		$this->playLocation = $playLocation;
+	}
+
+	/**
+	 * @param string $internalIP
+	 */
+	public function setInternalIP($internalIP)
+	{
+		$this->internalIP = $internalIP;
+	}
+
 	protected function replacePlaybackContext($str)
 	{
 		if($this->playbackContext)
@@ -166,6 +193,13 @@ abstract class kManifestRenderer
 			'partnerId' => $this->partnerId,
 			'playbackType' => $this->entryType,
 		);
+
+		if ($this->playLocation)
+		{
+			$output['serverNodeIds'] = $this->playLocation;
+			$output['internalIp'] = $this->internalIP;
+		}
+
 
 		$params = infraRequestUtils::getRequestParams();
 		$mapping = array(

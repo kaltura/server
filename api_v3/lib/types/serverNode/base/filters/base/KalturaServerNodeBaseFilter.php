@@ -35,6 +35,8 @@ abstract class KalturaServerNodeBaseFilter extends KalturaFilter
 		"parentIdLike" => "_like_parent_id",
 		"parentIdMultiLikeOr" => "_mlikeor_parent_id",
 		"parentIdMultiLikeAnd" => "_mlikeand_parent_id",
+		"environmentEqual" => "_eq_environment",
+		"environmentIn" => "_in_environment",
 	);
 
 	static private $order_by_map = array
@@ -192,4 +194,14 @@ abstract class KalturaServerNodeBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $parentIdMultiLikeAnd;
+
+	/**
+	 * @var string
+	 */
+	public $environmentEqual;
+
+	/**
+	 * @var string
+	 */
+	public $environmentIn;
 }

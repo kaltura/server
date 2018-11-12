@@ -76,6 +76,11 @@ class KSecureEntryHelper
 	protected static $trustedPartnerIds = array (Partner::BATCH_PARTNER_ID);
 
 	/**
+	 * @var accessControlScope
+	 */
+	protected $scope;
+
+	/**
 	 * 
 	 * @param entry $entry
 	 */
@@ -90,7 +95,7 @@ class KSecureEntryHelper
 			if(!$entry)
 				KExternalErrors::dieError(KExternalErrors::PARENT_ENTRY_ID_NOT_FOUND, "Entry is configured with parent entry, but parent entry was not found");
 		}
-			
+
 		$this->entry = $entry;
 		$this->ksStr = $ksStr;
 		$this->referrer = $referrer;
@@ -307,9 +312,9 @@ class KSecureEntryHelper
 			return;
 			
 		$this->contextResult = new kEntryContextDataResult();
-		$scope = $this->getAccessControlScope();
-		$this->disableCache = $accessControl->applyContext($this->contextResult, $scope);
-		
+		$this->scope = $this->getAccessControlScope();
+		$this->disableCache = $accessControl->applyContext($this->contextResult, $this->scope);
+
 		if (count ( $this->contextResult->getActions () )) {
 			foreach ( $this->contextResult->getActions () as $action )
 			{
@@ -466,5 +471,10 @@ class KSecureEntryHelper
 		{
 			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
 		}
+	}
+
+	public function getScope()
+	{
+		return $this->scope;
 	}
 }

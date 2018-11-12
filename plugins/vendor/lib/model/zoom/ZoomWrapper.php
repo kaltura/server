@@ -43,7 +43,7 @@ class ZoomWrapper
 		$curlWrapper = new KCurlWrapper();
 		$url = $zoomBaseURL . $apiPath . '?' . 'access_token=' . $accessToken;
 		$response = $curlWrapper->exec($url);
-		$httpCode = $curlWrapper->getInfo(CURLINFO_HTTP_CODE);
+		$httpCode = $curlWrapper->getHttpCode();
 		list($tokens, $refreshed) = self::handelCurlResponse($response, $httpCode, $curlWrapper, $accountId, $tokens, $apiPath);
 		return array($response, $tokens, $refreshed);
 	}

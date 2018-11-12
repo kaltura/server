@@ -26,6 +26,19 @@
     
 ### Deployment scripts ###
     None
+    
+## Allow allocating specific conference room from pool ##
+
+- Issue Type: Story
+- Issue ID: PLAT-9228
+
+### Configuration ###
+
+	None.	
+
+#### Deployment Scripts ####
+
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /deployment/updates/sql/2018_10_23_alter_server_node_table_add_environment_column.sql
 
 ## Add permission to use playlist service with user ks ##
 - Issue Type: Task
