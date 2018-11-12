@@ -32,7 +32,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		$fileSize = self::getFileSizeFromWebexDownloadUrl($downloadUrl);
 
 		$curlWrapper = new KCurlWrapper();
-		$curlWrapper->setOpt(CURLOPT_COOKIE, 'DetectionBrowserStatus=3|1|32|1|11|2;'.$curlInfo->headers["set-cookie"]);
+		$curlWrapper->setOpt(CURLOPT_COOKIE, 'DetectionBrowserStatus=3|1|32|1|11|2;');
 		$curlWrapper->setOpt(CURLOPT_RETURNTRANSFER, false);
 		$fileName = pathinfo($importData->destFileLocalPath, PATHINFO_FILENAME);
 		
