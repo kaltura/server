@@ -642,9 +642,9 @@ class KCurlWrapper
 	private static function isWhiteListedInternalUrl($url)
 	{
 		if(!kConf::hasMap('security'))
-			return false;
+			return true;
 
-		$whiteListedInternalPatterns = kConf::get('internal_url_whitelist', 'security', array());
+    $whiteListedInternalPatterns = kConf::get('internal_url_whitelist', 'security', array());
 		foreach ($whiteListedInternalPatterns as $pattern)
 		{
 			if (preg_match($pattern, $url))
