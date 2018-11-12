@@ -16,6 +16,7 @@ class playManifestAction extends kalturaAction
 		'http',
 		'https',
 	);
+	const FLAVOR_GROUPING_PERCENTAGE_FACTOR = 0.05; // 5 percent
 
 	/**
 	 * When this list start to contain plugins - 
@@ -877,7 +878,9 @@ class playManifestAction extends kalturaAction
 			$flavorAsset = reset($flavorAssets);
 			$this->deliveryAttributes->setFlavorAssets(array($flavorAsset));
 		}
-		
+
+		$this->optimizeFlavors();
+
 		$this->initStorageProfile();
 		
 		// Fixing ALL kinds of historical bugs.
@@ -918,7 +921,6 @@ class playManifestAction extends kalturaAction
 		}
 
 		// <-- 
-		
 		$this->deliveryProfile = $this->initDeliveryProfile();
 		if(!$this->deliveryProfile)
 			return null;
@@ -956,7 +958,34 @@ class playManifestAction extends kalturaAction
 		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);	
 		return $this->deliveryProfile->serve();
 	}
-	
+
+	protected function optimizeFlavors()
+	{
+		if (count($this->deliveryAttributes->getFlavorAssets()) < 2)
+		{
+			return;
+		}
+
+		$flavors = $this->deliveryAttributes->getFlavorAssets();
+
+		usort($flavors, array($this, 'sortFlavorsByFrameSizeAndBitrate'));
+
+		$firstFlavor = array_shift($flavors);
+		$filteredFlavors = array($firstFlavor->getId() => $firstFlavor);
+		foreach ($flavors as $currentFlavor)
+		{
+			foreach ($filteredFlavors as $elementKey => $flavor)
+			{
+				if ($this->isRedundantFlavor($currentFlavor, $flavor))
+				{
+					unset($filteredFlavors[$elementKey]);
+				}
+			}
+			$filteredFlavors[$currentFlavor->getId()] = $currentFlavor;
+		}
+		$this->deliveryAttributes->setFlavorAssets($filteredFlavors);
+	}
+
 	private function serveHDNetwork()
 	{
 		kApiCache::setConditionalCacheExpiry(600);		// the result contains a KS so we shouldn't cache it for a long time
@@ -1322,5 +1351,46 @@ class playManifestAction extends kalturaAction
 
 		$this->deliveryAttributes->setStorageId(null);
 		$this->deliveryAttributes->setFlavorAssets($filteredFlavorAssets);
+	}
+
+	/**
+	 * @param $a
+	 * @param $b
+	 * @return int
+	 */
+	public static function sortFlavorsByFrameSizeAndBitrate($a, $b)
+	{
+		/* @var $a flavorAsset */
+		/* @var $b flavorAsset */
+		if ($a->getFrameSize() == $b->getFrameSize())
+		{
+			$val = $a->getBitrate() - $b->getBitrate();
+			return $val ? $val : $a->getIntId() - $b->getIntId();
+		}
+		else
+		{
+			return $a->getFrameSize() - $b->getFrameSize();
+		}
+	}
+
+	/**
+	 * @param $currentFlavor
+	 * @param $flavor
+	 */
+	protected function isRedundantFlavor($currentFlavor, $flavor )
+	{
+		/* @var $flavor flavorAsset */
+		/* @var $currentFlavor flavorAsset */
+		if (  !$flavor->getWidth() && !$flavor->getHeight())
+		{   //audio flavor is not redundant
+			return false;
+		}
+
+		if (abs(($currentFlavor->getBitrate() - $flavor->getBitrate())) <= ($currentFlavor->getBitrate() * self::FLAVOR_GROUPING_PERCENTAGE_FACTOR)
+			&& ($currentFlavor->getBitrate() >= $flavor->getBitrate()) && ($currentFlavor->getFrameSize() >= $flavor->getFrameSize()))
+		{
+			return true;
+		}
+		return false;
 	}
 }

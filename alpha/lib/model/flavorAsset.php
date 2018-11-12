@@ -371,5 +371,12 @@ class flavorAsset extends exportableAsset
 		return parent::preSave($con);
 	}
 
+	/**
+	 * Get frameSize - width * height - CD (color depth) is not supported hench ingring in calculation
+	 */
+	public function getFrameSize()
+	{
+		return $this->height * $this->width;
+	}
 
 }
