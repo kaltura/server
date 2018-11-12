@@ -1404,6 +1404,11 @@ class playManifestAction extends kalturaAction
 			return false;
 		}
 
+		if (!(strpos($flavor->getTags(), 'watermark') === false))
+		{   // watermark needs duplicate flavors so they are not redundant
+			return false;
+		}
+
 		if (abs(($currentFlavor->getBitrate() - $flavor->getBitrate())) <= ($currentFlavor->getBitrate() * self::FLAVOR_GROUPING_PERCENTAGE_FACTOR)
 			&& ($currentFlavor->getBitrate() >= $flavor->getBitrate()) && ($currentFlavor->getFrameSize() >= $flavor->getFrameSize()))
 		{
