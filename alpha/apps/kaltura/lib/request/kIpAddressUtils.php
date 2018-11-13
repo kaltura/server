@@ -137,7 +137,10 @@ class kIpAddressUtils
 	public static function ipRangeToCIDR($from, $to)
 	{
 		$result = array();
-
+		if (!$from) {
+			$from = 1;
+		}
+		
 		while($to >= $from) {
 			$netmask = 32 - log((-$from & $from), 2);
 
