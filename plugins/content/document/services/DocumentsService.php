@@ -114,6 +114,8 @@ class DocumentsService extends KalturaEntryService
 			$ext = pathinfo($entryFullPath, PATHINFO_EXTENSION);	
 			KalturaLog::info("Uploaded file extension: $ext");
 			$flavorAsset->setFileExt($ext);
+			$size = kFileBase::fileSize($entryFullPath);
+			$flavorAsset->setSize($size);
 			$flavorAsset->save();
 			
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
