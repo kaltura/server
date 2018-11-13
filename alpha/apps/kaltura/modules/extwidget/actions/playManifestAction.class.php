@@ -17,6 +17,7 @@ class playManifestAction extends kalturaAction
 		'https',
 	);
 	const FLAVOR_GROUPING_PERCENTAGE_FACTOR = 0.05; // 5 percent
+	const WATERMARK = 'watermark';
 
 	/**
 	 * When this list start to contain plugins - 
@@ -1401,6 +1402,11 @@ class playManifestAction extends kalturaAction
 		/* @var $currentFlavor flavorAsset */
 		if (  !$flavor->getWidth() && !$flavor->getHeight())
 		{   //audio flavor is not redundant
+			return false;
+		}
+
+		if (!(strpos($flavor->getTags(), self::WATERMARK) === false))
+		{   // watermark needs duplicate flavors so they are not redundant
 			return false;
 		}
 
