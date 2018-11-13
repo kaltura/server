@@ -1716,6 +1716,11 @@ class kKavaReportsMgr extends kKavaBase
 		return $name;
 	}
 
+	protected static function fromSafeIds($names)
+	{
+		return array_map('self::fromSafeId()', $names);
+	}
+    
 	protected static function transformBrowserName($name)
 	{
 		$name = str_replace(array('Internet Explorer', 'Microsoft Edge'), array('IE', 'Edge'), $name);
@@ -2009,7 +2014,7 @@ class kKavaReportsMgr extends kKavaBase
 			'custom_var1' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR1),
 			'custom_var2' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR2),
 			'custom_var3' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR3),
-			'devices' => array(self::DRUID_DIMENSION => self::DIMENSION_DEVICE, self::REPORT_FILTER_DIMENSION_TRANSFORM => array('kKavaReportsMgr', 'fromSafeId')),
+			'devices' => array(self::DRUID_DIMENSION => self::DIMENSION_DEVICE, self::REPORT_FILTER_DIMENSION_TRANSFORM => array('kKavaReportsMgr', 'fromSafeIds')),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
@@ -2020,11 +2025,11 @@ class kKavaReportsMgr extends kKavaBase
 				continue;
 			}
 
-            $values = explode(',', $value);
-            if (isset($field_filter_def[self::REPORT_FILTER_DIMENSION_TRANSFORM]))
-            {
-                $values = array_map($field_filter_def[self::REPORT_FILTER_DIMENSION_TRANSFORM], $values);
-            }
+			$values = explode(',', $value);
+			if (isset($field_filter_def[self::REPORT_FILTER_DIMENSION_TRANSFORM]))
+			{
+				$values = call_user_func($field_filter_def[self::REPORT_FILTER_DIMENSION_TRANSFORM], $values);
+			}
 
 			$druid_filter[] = array(
 				self::DRUID_DIMENSION => $field_filter_def[self::DRUID_DIMENSION],
