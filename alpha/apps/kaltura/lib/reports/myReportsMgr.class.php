@@ -1508,6 +1508,7 @@ class reportsInputFilter
 	public $timeZoneOffset;
 	public $interval;
 	public $countries;
+	public $devices;
 	
 	public function getFilterBy() {
 		return "";

@@ -87,6 +87,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_PLAYBACK_TYPES = 'report_playback_types';
 	const REPORT_OBJECT_IDS_TRANSFORM = 'report_object_ids_transform';
 	const REPORT_SKIP_PARTNER_FILTER = 'report_skip_partner_filter';
+	const REPORT_FILTER_DIMENSION_TRANSFORM = 'report_filter_dimension_transform';
 	
 	// report settings - table
 	const REPORT_DIMENSION = 'report_dimension';
@@ -2003,14 +2004,15 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		$field_dim_map = array(
-			'categoriesIds' => self::DIMENSION_CATEGORIES,
-			'countries' => self::DIMENSION_LOCATION_COUNTRY,
-			'custom_var1' => self::DIMENSION_CUSTOM_VAR1,
-			'custom_var2' => self::DIMENSION_CUSTOM_VAR2,
-			'custom_var3' => self::DIMENSION_CUSTOM_VAR3,
+			'categoriesIds' => array(self::DRUID_DIMENSION => self::DIMENSION_CATEGORIES),
+			'countries' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_COUNTRY),
+			'custom_var1' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR1),
+			'custom_var2' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR2),
+			'custom_var3' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR3),
+			'devices' => array(self::DRUID_DIMENSION => self::DIMENSION_DEVICE, self::REPORT_FILTER_DIMENSION_TRANSFORM => array('kKavaReportsMgr', 'fromSafeId')),
 		);
 
-		foreach ($field_dim_map as $field => $dimension)
+		foreach ($field_dim_map as $field => $field_filter_def)
 		{
 			$value = $input_filter->$field;
 			if (is_null($value))
@@ -2018,9 +2020,15 @@ class kKavaReportsMgr extends kKavaBase
 				continue;
 			}
 
+            $values = explode(',', $value);
+            if (isset($field_filter_def[self::REPORT_FILTER_DIMENSION_TRANSFORM]))
+            {
+                $values = array_map($field_filter_def[self::REPORT_FILTER_DIMENSION_TRANSFORM], $values);
+            }
+
 			$druid_filter[] = array(
-				self::DRUID_DIMENSION => $dimension,
-				self::DRUID_VALUES => explode(',', $value)
+				self::DRUID_DIMENSION => $field_filter_def[self::DRUID_DIMENSION],
+				self::DRUID_VALUES => $values
 			);
 		}
 
