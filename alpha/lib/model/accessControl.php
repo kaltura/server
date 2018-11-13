@@ -263,7 +263,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		
 		$rules = $this->getRulesArray();
 		$specialProperties = $this->getSpecialProperties();
-		if ($specialProperties[self::SERVE_FROM_SERVER_NODE_RULE])
+		if (isset($specialProperties[self::SERVE_FROM_SERVER_NODE_RULE]) && $specialProperties[self::SERVE_FROM_SERVER_NODE_RULE])
 		{
 			$this->getScope()->setOutputVar(self::SERVE_FROM_SERVER_NODE_RULE,true);
 		}
