@@ -1,1 +1,1 @@
-ALTER TABLE server_node	ADD  environment VARCHAR(32) NULL AFTER parent_id;
+ALTER TABLE server_node	ADD  environment VARCHAR(32) NULL AFTER custom_data;
