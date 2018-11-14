@@ -581,7 +581,7 @@ class kMrssManager
 			{
 				try
 				{
-					if ((is_array($features) && !count($features)) || in_array($mrssContributor->getObjectFeatureType(), $features))
+					if (!is_array($features) || !count($features) || in_array($mrssContributor->getObjectFeatureType(), $features))
 						$mrssContributor->contribute($entry, $mrss, $mrssParams);
 				}
 				catch(kCoreException $ex)
