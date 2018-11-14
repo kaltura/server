@@ -201,6 +201,7 @@ class kKavaReportsMgr extends kKavaBase
 		myReportsMgr::REPORT_TYPE_ENTRY_USAGE,
 		myReportsMgr::REPORT_TYPE_REACH_USAGE,
 		myReportsMgr::REPORT_TYPE_TOP_CUSTOM_VAR1,
+		myReportsMgr::REPORT_TYPE_CITIES
 	);
 	
 	protected static $reports_def = array(
@@ -1074,6 +1075,12 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_CUSTOM_VAR1,
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
 		),
+
+		myReportsMgr::REPORT_TYPE_CITIES => array(
+			self::REPORT_DIMENSION => self::DIMENSION_LOCATION_CITY,
+			self::REPORT_DIMENSION_HEADERS => array('object_id', 'city'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
+		),
 	);
 	
 	protected static $event_type_count_aggrs = array(
@@ -1756,7 +1763,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function fromSafeIds($names)
 	{
-		return array_map('self::fromSafeId()', $names);
+		return array_map('self::fromSafeId', $names);
 	}
     
 	protected static function transformBrowserName($name)
@@ -2053,6 +2060,7 @@ class kKavaReportsMgr extends kKavaBase
 			'custom_var2' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR2),
 			'custom_var3' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR3),
 			'devices' => array(self::DRUID_DIMENSION => self::DIMENSION_DEVICE, self::REPORT_FILTER_DIMENSION_TRANSFORM => array('kKavaReportsMgr', 'fromSafeIds')),
+			'regions' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_REGION),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
