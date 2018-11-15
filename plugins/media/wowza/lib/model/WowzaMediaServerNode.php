@@ -83,10 +83,11 @@ class WowzaMediaServerNode extends MediaServerNode {
 		}
 		else
 		{
-			$mediaServerConfig = array();
-			if(kConf::hasMap('media_servers'))
-				$mediaServerConfig = kConf::getMap('media_servers');
-
+			if(!kConf::hasMap('media_servers'))
+				throw new Exception('PlaybackHost cannot be determined, base url provided is null and no media_servers config file found');
+			
+			$mediaServerConfig = kConf::getMap('media_servers');
+			$domain = $this->getDomainByProtocolAndFormat($mediaServerConfig, $protocol, $format);
 			$domain = $this->getDomainByProtocolAndFormat($mediaServerConfig, $protocol, $format);
 			$port = $this->getPortByProtocolAndFormat($mediaServerConfig, $protocol, $format);
 			$domain = "$domain:$port";
@@ -105,8 +106,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 		if(!$this->getIsExternalMediaServer())
 			$hostname = preg_replace('/\..*$/', '', $hostname);
 		
-		$mediaServerConfig = kConf::getMap('media_servers');
-		$appPrefix = $this->getApplicationPrefix($mediaServerConfig);
+		$appPrefix = $this->getApplicationPrefix();
 		$applicationName = $this->getApplicationName();
 		
 		if($appPrefix && $appPrefix !== '')
@@ -152,15 +152,16 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return $port;
 	}
 	
-	public function getApplicationPrefix($mediaServerConfig)
+	public function getApplicationPrefix()
 	{
-		$appPrefix = "";
-		$appPrefix = $this->getValueByField($mediaServerConfig, 'appPrefix', $appPrefix);
-		
 		if(!is_null($this->getAppPrefix()))
-			$appPrefix = $this->getAppPrefix();
+			return $this->getAppPrefix();
 		
-		return $appPrefix;
+		if(!kConf::hasMap('media_servers'))
+			throw new Exception('Wowza node config does not contain app prefix data and no media_servers config file found');
+		
+		$mediaServerConfig = kConf::getMap('media_servers');
+		return $this->getValueByField($mediaServerConfig, 'appPrefix', '');
 	}
 	
 	public function getValueByField($config, $filedValue, $defaultValue)
