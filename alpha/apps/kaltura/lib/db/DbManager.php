@@ -236,7 +236,7 @@ class DbManager
 	public static function getSphinxConnection($read = true, $indexName = null)
 	{
 		$indexName = $indexName ? $indexName : 'default_index';
-		KalturaLog::debug("TTT:: indexName [$indexName]");
+		KalturaLog::debug("Using index with name [$indexName]");
 		if(!isset(self::$sphinxConnection[$indexName]))
 		{
 			if($indexName && isset(self::$config['sphinx_datasources_'.$indexName]) && isset(self::$config['sphinx_datasources_'.$indexName]['datasources']))
