@@ -196,6 +196,11 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	{
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
+	
+	public function getSphinxIndexName()
+	{
+		return kSphinxSearchManager::getSphinxIndexName(CuePointIndex::getObjectIndexName());
+	}
 
 	/**
 	 * Get the [duration] column value.

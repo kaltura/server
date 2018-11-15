@@ -228,4 +228,14 @@ abstract class BaseIndexObject
 	{
 		return array();
 	}
+
+	public static function getSphinxSplitIndexFieldName()
+	{
+		return null;
+	}
+	
+	public static function getSphinxIndexId($originalValue = null)
+	{
+		return null;
+	}
 }

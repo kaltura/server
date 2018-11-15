@@ -19,9 +19,13 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 * @param string $baseName
 	 * @return string
 	 */
-	public static function getSphinxIndexName($baseName)
+	public static function getSphinxIndexName($baseName, $splitIndexValue = null)
 	{
-		return self::SPHINX_INDEX_NAME . '_' . $baseName;
+		$res = self::SPHINX_INDEX_NAME . '_' . $baseName;
+		if(isset($splitIndexValue))
+			$res .= '_' . $splitIndexValue;
+		
+		return $res;
 	}
 	
 	/**
@@ -343,7 +347,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			$data[$key] = "'" . $valueStr . "'";
 		}
 		
-		$index = kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName());
+		$index = $object->getSphinxIndexName();
 
 		$placeHolders = isset($options["placeHolders"]) ? $options["placeHolders"] : false;
 
@@ -435,7 +439,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		}
 		
 		$sphinxLog = new SphinxLog();
-		$sphinxLog->setExecutedServerId($this->retrieveSphinxConnectionId());
+		$sphinxLog->setExecutedServerId($this->retrieveSphinxConnectionId($object->getSphinxIndexName()));
 		$sphinxLog->setObjectId($object->getId());
 		$objectIndexClass = $object->getIndexObjectName();
 		$sphinxLog->setObjectType($objectIndexClass::getObjectName());
@@ -443,6 +447,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$sphinxLog->setPartnerId($object->getPartnerId());
 		$sphinxLog->setSql($sql);
 		$sphinxLog->setType(SphinxLogType::SPHINX);
+		$sphinxLog->setIndexName($object->getSphinxIndexName());
 		$sphinxLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
 
 		kSphinxQueryCache::invalidateQueryCache($object);
@@ -460,7 +465,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		if(!kConf::get('exec_sphinx', 'local', 0))
 			return true;
 					
-		$sphinxConnection = DbManager::getSphinxConnection(false);
+		$sphinxConnection = DbManager::getSphinxConnection(false, $object->getSphinxIndexName());
 		$ret = $sphinxConnection->exec($sql);
 		if($ret)
 			return true;
@@ -470,12 +475,12 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		return false;
 	}
 
-	private function retrieveSphinxConnectionId ()
+	private function retrieveSphinxConnectionId ($indexName)
 	{
 		$sphinxConnectionId = null;
 		if(kConf::hasParam('exec_sphinx') && kConf::get('exec_sphinx'))
         {
-        	$sphinxConnection = DbManager::getSphinxConnection(false);
+        	$sphinxConnection = DbManager::getSphinxConnection(false, $indexName);
 			$sphinxServerCacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_SPHINX_EXECUTED_SERVER);
 			if ($sphinxServerCacheStore)
 			{

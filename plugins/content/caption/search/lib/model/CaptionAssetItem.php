@@ -66,6 +66,11 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	{
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
+	
+	public function getSphinxIndexName()
+	{
+		return kSphinxSearchManager::getSphinxIndexName(CaptionAssetItemIndex::getObjectIndexName());
+	}
 
 	/**
 	 * @return string

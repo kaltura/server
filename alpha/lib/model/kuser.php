@@ -1167,6 +1167,11 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	{
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
+	
+	public function getSphinxIndexName()
+	{
+		return kSphinxSearchManager::getSphinxIndexName(kuserIndex::getObjectIndexName());
+	}
     
 	/* (non-PHPdoc)
 	 * @see lib/model/om/Baseentry#postInsert()

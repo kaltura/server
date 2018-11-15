@@ -100,7 +100,7 @@ class kQueryCache
 		return substr_replace($formatString, $variableValue, $firstVarPos, 2);
 	}
 	
-	protected static function getCriterionValues($criterion, $columnName)
+	public static function getCriterionValues($criterion, $columnName)
 	{
 		// get current criterion values
 		if ($criterion->getComparison() == Criteria::EQUAL)
@@ -207,7 +207,10 @@ class kQueryCache
 			if ($criterion->getComparison() == Criteria::IN && !$criterion->getValue())
 			{
 				KalturaLog::debug("kQueryCache: criteria has empty IN, returning empty result set, peer=$peerClassName");
-				return array();
+				if($queryType == kQueryCache::QUERY_TYPE_COUNT)
+					return 0;
+				else
+					return array();
 			}
 		}
 		

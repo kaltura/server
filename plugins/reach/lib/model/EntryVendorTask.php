@@ -216,6 +216,11 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
 	
+	public function getSphinxIndexName()
+	{
+		return kSphinxSearchManager::getSphinxIndexName(EntryVendorTaskIndex::getObjectIndexName());
+	}
+	
 	public function postSave(PropelPDO $con = null)
 	{
 		parent::postSave($con);

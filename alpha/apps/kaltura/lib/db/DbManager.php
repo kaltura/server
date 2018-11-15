@@ -233,26 +233,31 @@ class DbManager
 	/**
 	 * @return KalturaPDO
 	 */
-	public static function getSphinxConnection($read = true)
+	public static function getSphinxConnection($read = true, $indexName = null)
 	{
-		if(!self::$sphinxConnection)
+		$indexName = $indexName ? $indexName : 'default_index';
+		KalturaLog::debug("TTT:: indexName [$indexName]");
+		if(!isset(self::$sphinxConnection[$indexName]))
 		{
-			$sphinxDS = isset(self::$config['sphinx_datasources']['datasources']) ? self::$config['sphinx_datasources']['datasources'] : array(self::DB_CONFIG_SPHINX);
+			if($indexName && isset(self::$config['sphinx_datasources_'.$indexName]) && isset(self::$config['sphinx_datasources_'.$indexName]['datasources']))
+				$sphinxDS = self::$config['sphinx_datasources_'.$indexName]['datasources'];
+			else
+				$sphinxDS = isset(self::$config['sphinx_datasources']['datasources']) ? self::$config['sphinx_datasources']['datasources'] : array(self::DB_CONFIG_SPHINX);
+			
 			$cacheExpiry = isset(self::$config['sphinx_datasources']['cache_expiry']) ? self::$config['sphinx_datasources']['cache_expiry'] : 30;
 			$connectTimeout = isset(self::$config['sphinx_datasources']['connect_timeout']) ? self::$config['sphinx_datasources']['connect_timeout'] : 1;
 			
 			$preferredIndex = self::getSphinxConnIndexFromCache();
-
 			if ($preferredIndex === false)
 				$preferredIndex = self::getSphinxConnIndexByLastUpdatedAt($sphinxDS);
 
-			list(self::$sphinxConnection, self::$connIndex) = self::connectFallbackLogic(
+			list(self::$sphinxConnection[$indexName], self::$connIndex) = self::connectFallbackLogic(
 				array('DbManager', 'getSphinxConnectionInternal'), 
-				array($connectTimeout), 
+				array($connectTimeout, $indexName),
 				$sphinxDS, 
 				$preferredIndex, 
 				$cacheExpiry);
-			if (!self::$sphinxConnection)
+			if (!self::$sphinxConnection[$indexName])
 			{
 				throw new Exception('Failed to connect to any Sphinx config');
 			}
@@ -261,7 +266,7 @@ class DbManager
 	
 		if (!$read)
 			self::setSphinxConnIndexInCache();
-		return self::$sphinxConnection;
+		return self::$sphinxConnection[$indexName];
 	}
 
 	/**
@@ -328,16 +333,17 @@ class DbManager
 		return false;
 	}
 
-	private static function getSphinxConnectionInternal($key, $connectTimeout)
+	private static function getSphinxConnectionInternal($key, $connectTimeout, $indexName)
 	{
 		if(!isset(self::$config['datasources'][$key]['connection']['dsn']))
 			throw new Exception("DB Config [$key] not found");
 
 		$dataSource = self::$config['datasources'][$key]['connection']['dsn'];
-		self::$sphinxConnection = new KalturaPDO($dataSource, null, null, array(PDO::ATTR_TIMEOUT => $connectTimeout, KalturaPDO::KALTURA_ATTR_NAME => $key), $key);					
-		self::$sphinxConnection->setCommentsEnabled(false);
+		self::$sphinxConnection[$indexName] =
+			($dataSource, null, null, array(PDO::ATTR_TIMEOUT => $connectTimeout, KalturaPDO::KALTURA_ATTR_NAME => $key), $key);
+		self::$sphinxConnection[$indexName]->setCommentsEnabled(false);
 		
-		return self::$sphinxConnection;
+		return self::$sphinxConnection[$indexName];
 	}
 
 	public static function connectFallbackLogic($connectCallback, array $connectParams, $dataSources, $preferredIndex = false, $cacheExpiry = 30)

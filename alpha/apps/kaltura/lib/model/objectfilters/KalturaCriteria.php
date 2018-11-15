@@ -82,7 +82,7 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 	/**
 	 * @param int $recordsCount
 	 */
-	public function setRecordsCount($recordsCount) 
+	public function setRecordsCount($recordsCount)
 	{
 		$this->recordsCount = $recordsCount;
 	}

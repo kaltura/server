@@ -141,7 +141,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 */
 	protected function executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions = '')
 	{
-		$pdo = DbManager::getSphinxConnection();
+		$pdo = DbManager::getSphinxConnection(true, $index);
 		$objectClass = $this->getIndexObjectName();
 		
 		if (!$this->selectColumn)
@@ -570,7 +570,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$this->ranker = self::RANKER_BM25;
 		}
 		
-		$index = kSphinxSearchManager::getSphinxIndexName($objectClass::getObjectIndexName());
+		$index = $this->getSphinxIndexName();
 		$maxMatches = self::getMaxRecords();
 		$limit = $maxMatches;
 		
@@ -598,6 +598,39 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 
 		$this->applySphinxResult($setLimit);
 	}
+	
+	protected function getSphinxIndexName()
+	{
+		$objectClass = $this->getIndexObjectName();
+		
+		$splitIndexValue = null;
+		$splitIndexAttr = $objectClass::getSphinxSplitIndexField();
+		if($splitIndexAttr)
+		{
+			$criteria = $this->getCriterion($splitIndexAttr);
+			if(!$criteria)
+			{
+				KalturaLog::debug("Split index attribute not found on Criteria, will query distributed index");
+			}
+			else
+			{
+				$splitIndexValue = kQueryCache::getCriterionValues($criteria, $splitIndexAttr);
+				if($splitIndexValue && count($splitIndexValue) > 1 )
+				{
+					KalturaLog::debug("Found multiple values for Split index attribute, will query distributed index");
+					$splitIndexValue = null;
+				}
+				else
+				{
+					
+					$splitIndexValue = reset($splitIndexValue);
+				}
+			}
+		}
+		
+		return kSphinxSearchManager::getSphinxIndexName($objectClass::getObjectIndexName(), $objectClass::getSphinxSplitIndexFieldValue($splitIndexValue));
+	}
+	
 	
 	/**
 	 * Applies all filter fields and unset the handled fields
@@ -999,7 +1032,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			KalturaLog::log("doCountOnPeer for sphinx criteria is disabled, objectClass [$objectClass], service:action [".kCurrentContext::$service.":".kCurrentContext::$action."]");
 			//return 0;
 		}
-
 
 		$c = clone $this;
 		$c->setLimit(null);

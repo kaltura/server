@@ -243,6 +243,11 @@ class categoryKuser extends BasecategoryKuser implements IIndexable
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
 	
+	public function getSphinxIndexName()
+	{
+		return kSphinxSearchManager::getSphinxIndexName(categoryKuser::getObjectIndexName());
+	}
+	
 	/**
 	 * Return permission_names property value for index
 	 * @return string
