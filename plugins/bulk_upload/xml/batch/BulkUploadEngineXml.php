@@ -1269,11 +1269,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		if(!empty($categories) && count($categories->children()))
 		{
-			if ($categories->children()[0]->getName() == 'categoryId')
+			$children = $categories->children();
+			if ($children[0]->getName() == 'categoryId')
 			{
 				return $this->createCategoryAssociationsByCategoryIds($entryId, $this->implodeChildElements($categories), $bulkuploadResult, $update);
 			}
-			elseif ($categories->children()[0]->getName() == 'category')
+			elseif ($children[0]->getName() == 'category')
 			{
 				return $this->createCategoryAssociationsByFullNames($entryId, $this->implodeChildElements($categories), $bulkuploadResult, $update);
 			}
