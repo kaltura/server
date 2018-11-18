@@ -60,21 +60,35 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 *
 	 * @var string
 	 */
-	public $devicesIn;
+	public $deviceIn;
 
 	/**
 	 * Filter by country
 	 *
 	 * @var string
 	 */
-	public $countriesIn;
+	public $countryIn;
 
 	/**
 	 * Filter by region
 	 *
 	 * @var string
 	 */
-	public $regionsIn;
+	public $regionIn;
+
+	/**
+	 * Filter by operating system family
+	 *
+	 * @var string
+	 */
+	public $operatingSystemFamilyIn;
+
+	/**
+	 * Filter by browser family
+	 *
+	 * @var string
+	 */
+	public $browserFamilyIn;
 
 	/**
 	 * Time zone offset in minutes
@@ -104,9 +118,11 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		$reportInputFilter->custom_var1 = $this->customVar1In;
 		$reportInputFilter->custom_var2 = $this->customVar2In;
 		$reportInputFilter->custom_var3 = $this->customVar3In;
-		$reportInputFilter->devices = $this->devicesIn;
-		$reportInputFilter->countries = $this->countriesIn;
-		$reportInputFilter->regions = $this->regionsIn;
+		$reportInputFilter->devices = $this->deviceIn;
+		$reportInputFilter->countries = $this->countryIn;
+		$reportInputFilter->regions = $this->regionIn;
+		$reportInputFilter->os_families = $this->operatingSystemFamilyIn;
+		$reportInputFilter->browsers_families = $this->browserFamilyIn;
 		$reportInputFilter->timeZoneOffset = $this->timeZoneOffset;
 		$reportInputFilter->interval = $this->interval;
 		
@@ -127,9 +143,11 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		$this->customVar1In = $reportInputFilter->custom_var1;
 		$this->customVar2In = $reportInputFilter->custom_var2;
 		$this->customVar3In = $reportInputFilter->custom_var3;
-		$this->devicesIn = $reportInputFilter->devices;
-		$this->countriesIn = $reportInputFilter->countries;
-		$this->regionsIn = $reportInputFilter->regions;
+		$this->deviceIn = $reportInputFilter->devices;
+		$this->countryIn = $reportInputFilter->countries;
+		$this->regionIn = $reportInputFilter->regions;
+		$this->operatingSystemFamilyIn = $reportInputFilter->os_families;
+		$this->browserFamilyIn = $reportInputFilter->browsers_families;
 		$this->timeZoneOffset = $reportInputFilter->timeZoneOffset;
 		
 		return $this;
