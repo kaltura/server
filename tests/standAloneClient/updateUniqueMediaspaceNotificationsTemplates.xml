@@ -35,7 +35,7 @@
 					<item objectType="KalturaEventFieldCondition">
 						<description>Category is inside of specified category root</description>
 						<field objectType="KalturaEvalBooleanField">
-							<code>in_array($scope->getDynamicValues()['root_category_id'], explode('>', $scope->getObject()->getCategoryFullIds()))</code>
+							<code>in_array($scope->getDynamicValueByKey('root_category_id'), explode('>', $scope->getObject()->getCategoryFullIds()))</code>
 						</field>
 					</item>
 				</eventConditions>
@@ -67,7 +67,7 @@
 					<item objectType="KalturaEventFieldCondition">
 						<description>Category is inside of specified category root</description>
 						<field objectType="KalturaEvalBooleanField">
-							<code>in_array($scope->getDynamicValues()['root_category_id'], explode('>', $scope->getObject()->getCategoryFullIds()))</code>
+							<code>in_array($scope->getDynamicValueByKey('root_category_id'), explode('>', $scope->getObject()->getCategoryFullIds()))</code>
 						</field>
 					</item>
 				</eventConditions>
@@ -99,7 +99,7 @@
 					<item objectType="KalturaEventFieldCondition">
 						<description>Category is inside of specified category root</description>
 						<field objectType="KalturaEvalBooleanField">
-							<code>in_array($scope->getDynamicValues()['root_category_id'], explode('>', $scope->getObject()->getCategoryFullIds()))</code>
+							<code>in_array($scope->getDynamicValueByKey('root_category_id'), explode('>', $scope->getObject()->getCategoryFullIds()))</code>
 						</field>
 					</item>
 				</eventConditions>
@@ -131,7 +131,7 @@
 					<item objectType="KalturaEventFieldCondition">
 						<description>Category is inside of specified category root</description>
 						<field objectType="KalturaEvalBooleanField">
-							<code>in_array($scope->getDynamicValues()['root_category_id'], explode('>', $scope->getObject()->getCategoryFullIds()))</code>
+							<code>in_array($scope->getDynamicValueByKey('root_category_id'), explode('>', $scope->getObject()->getCategoryFullIds()))</code>
 						</field>
 					</item>
 				</eventConditions>
@@ -169,7 +169,7 @@
 					<item objectType="KalturaEventFieldCondition">
 						<description>Category is inside of specified category root</description>
 						<field objectType="KalturaEvalBooleanField">
-							<code>in_array($scope->getDynamicValues()['root_category_id'], explode('>', $scope->getObject()->getCategoryFullIds()))</code>
+							<code>in_array($scope->getDynamicValueByKey('root_category_id'), explode('>', $scope->getObject()->getCategoryFullIds()))</code>
 						</field>
 					</item>
 				</eventConditions>
@@ -201,7 +201,7 @@
 					<item objectType="KalturaEventFieldCondition">
 						<description>Category is inside of specified category root</description>
 						<field objectType="KalturaEvalBooleanField">
-							<code>in_array($scope->getDynamicValues()['root_category_id'], explode('>', $scope->getObject()->getCategoryFullIds()))</code>
+							<code>in_array($scope->getDynamicValueByKey('root_category_id'), explode('>', $scope->getObject()->getCategoryFullIds()))</code>
 						</field>
 					</item>
 				</eventConditions>
@@ -233,7 +233,7 @@
 					<item objectType="KalturaEventFieldCondition">
 						<description>Category is inside of specified category root</description>
 						<field objectType="KalturaEvalBooleanField">
-							<code>in_array($scope->getDynamicValues()['root_category_id'], explode('>', $scope->getObject()->getCategoryFullIds()))</code>
+							<code>in_array($scope->getDynamicValueByKey('root_category_id'), explode('>', $scope->getObject()->getCategoryFullIds()))</code>
 						</field>
 					</item>
 				</eventConditions>
@@ -265,7 +265,7 @@
 					<item objectType="KalturaEventFieldCondition">
 						<description>Category is inside of specified category root</description>
 						<field objectType="KalturaEvalBooleanField">
-							<code>in_array($scope->getDynamicValues()['root_category_id'], explode('>', $scope->getObject()->getCategoryFullIds()))</code>
+							<code>in_array($scope->getDynamicValueByKey('root_category_id'), explode('>', $scope->getObject()->getCategoryFullIds()))</code>
 						</field>
 					</item>
 				</eventConditions>
