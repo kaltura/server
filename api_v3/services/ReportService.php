@@ -328,6 +328,7 @@ class ReportService extends KalturaBaseService
 		echo implode(',', $columns) . "\n";
 		foreach($rows as $row) 
 		{
+			$row = str_replace(',', ' ', $row);
 			echo implode(',', $row) . "\n";
 		}
 		die;
