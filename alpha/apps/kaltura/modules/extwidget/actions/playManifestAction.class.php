@@ -1331,7 +1331,7 @@ class playManifestAction extends kalturaAction
 		$renderer->setPlaybackContext($playbackContext);
 		$renderer->setDeliveryCode($deliveryCode);
 
-		if ($this->secureEntryHelper && $this->secureEntryHelper->getScope()->getOutputVarByName(accessControl::SERVE_FROM_SERVER_NODE_RULE))
+		if ($this->secureEntryHelper && $this->secureEntryHelper->getScope() && $this->secureEntryHelper->getScope()->getOutputVarByName(accessControl::SERVE_FROM_SERVER_NODE_RULE))
 		{
 			$playLocation = self::PLAY_LOCATION_EXTERNAL;
 			if ($this->deliveryProfile->getDynamicAttributes()->getUsedEdgeServerIds() && count($this->deliveryProfile->getDynamicAttributes()->getUsedEdgeServerIds()))
