@@ -176,6 +176,11 @@ class kScope
 	}
 
 	/**
+	 * Get dynamic field values as an associative array: key => value
+	 * Returns empty string if dynamic value with the given key is missing
+	 *
+	 * @param string $keyPrefix
+	 * @param string $keySuffix
 	 * @return array
 	 */
 	public function getDynamicValues($keyPrefix = '', $keySuffix = '')
@@ -195,6 +200,20 @@ class kScope
 		}
 		
 		return $values;
+	}
+
+	/**
+	 * Get dynamic field value by key name
+	 *
+	 * @param string $key
+	 * @param string $keyPrefix
+	 * @param string $keySuffix
+	 * @return string
+	 */
+	public function getDynamicValueByKey($key, $keyPrefix = '', $keySuffix = '')
+	{
+		$values = $this->getDynamicValues($keyPrefix, $keySuffix);
+		return isset($values[$key]) ? $values[$key] : '';
 	}
 	
 	/**
