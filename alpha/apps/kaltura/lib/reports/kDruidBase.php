@@ -289,17 +289,23 @@ class kDruidBase
 		{
 			$startTime = microtime(true);
 			$response = curl_exec($ch);
-				
 			$druidTook = microtime(true) - $startTime;
+
 			KalturaLog::debug('Druid query took - ' . $druidTook. ' seconds');
 
 			if (curl_errno($ch))
 			{
 				throw new Exception('Error while trying to connect to:'. $url .' error=' . curl_error($ch));
 			}
-				
+
+			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			if ($httpCode != 200)
+			{
+				throw new Exception('Got invalid status code from druid: ' . $httpCode);
+			}
+
 			// Note: not closing the curl handle so that the connection can be reused
-				
+
 			$result = json_decode($response, true);
 
 			KalturaMonitorClient::monitorDruidQuery(
