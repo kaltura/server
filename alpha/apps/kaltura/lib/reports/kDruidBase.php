@@ -299,7 +299,7 @@ class kDruidBase
 			}
 
 			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			if ($httpCode != 200)
+			if ($httpCode != KCurlHeaderResponse::HTTP_STATUS_OK)
 			{
 				throw new Exception('Got invalid status code from druid: ' . $httpCode);
 			}
