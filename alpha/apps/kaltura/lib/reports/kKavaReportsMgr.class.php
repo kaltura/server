@@ -21,7 +21,6 @@ class kKavaReportsMgr extends kKavaBase
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
 	const METRIC_VIEW_PERIOD_PLAY_TIME = 'sum_view_period';
-	const METRIC_VIEW_PLAY_TIME_SEC = 'sum_view_time';
 	const METRIC_AVG_PLAY_TIME = 'avg_time_viewed';
 	const METRIC_PLAYER_IMPRESSION_RATIO = 'load_play_ratio';
 	const METRIC_AVG_DROP_OFF = 'avg_view_drop_off';
@@ -63,7 +62,6 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_QUARTILE_PLAY_TIME_SEC = 'quartile_play_time';
 	const METRIC_VIEW_PERIOD_PLAY_TIME_SEC = 'view_period_play_time';
 	const METRIC_VIEW_BUFFER_TIME_SEC = 'view_buffer_time';
-	const METRIC_VIEW_PERIOD_BUFFER_TIME_SEC = 'view_period_buffer_time';
 	const METRIC_ORIGIN_BANDWIDTH_SIZE_BYTES = 'origin_bandwidth_size';
 
 	// non druid metrics
@@ -83,6 +81,11 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_AVERAGE_DURATION_MSEC = 'average_msecs';
 	const METRIC_LATEST_DURATION_MSEC = 'latest_msecs';
 	
+	// player-events-realtime specific metrics
+	const METRIC_VIEW_PLAY_TIME_SEC = 'sum_view_time';
+	const METRIC_VIEW_BITRATE_COUNT = 'view_bitrate_count';
+	const METRIC_AVG_VIEW_BITRATE = 'avg_view_bitrate';
+
 	/// report settings
 	// report settings - common
 	const REPORT_DATA_SOURCE = 'report_data_source';
@@ -143,6 +146,7 @@ class kKavaReportsMgr extends kKavaBase
 	const GRAPH_MULTI_BY_NAME = 'multi_by_name';
 
 	// granularities
+	const GRANULARITY_MINUTE = 'minute';
 	const GRANULARITY_THIRTY_MINUTE = 'thirty_minute';
 	const GRANULARITY_HOUR = 'hour';
 	const GRANULARITY_DAY = 'day';
@@ -380,7 +384,7 @@ class kKavaReportsMgr extends kKavaBase
 		),
 
 		myReportsMgr::REPORT_TYPE_VPAAS_USAGE => array(
-			self::REPORT_JOIN_REPORTS => array(
+			self::REPORT_JOIN_GRAPHS => array(
 				// bandwidth
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
@@ -611,7 +615,7 @@ class kKavaReportsMgr extends kKavaBase
 		),
 
 		myReportsMgr::REPORT_TYPE_SPECIFIC_USER_USAGE => array(
-			self::REPORT_JOIN_REPORTS => array(
+			self::REPORT_JOIN_GRAPHS => array(
 				// entries added / deleted
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
@@ -679,7 +683,7 @@ class kKavaReportsMgr extends kKavaBase
 				
 		myReportsMgr::REPORT_TYPE_PARTNER_USAGE => array(
 			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
-			self::REPORT_JOIN_REPORTS => array(
+			self::REPORT_JOIN_GRAPHS => array(
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
@@ -748,7 +752,7 @@ class kKavaReportsMgr extends kKavaBase
 		),
 
 		myReportsMgr::REPORT_TYPE_ENTRY_USAGE => array(
-			self::REPORT_JOIN_REPORTS => array(
+			self::REPORT_JOIN_GRAPHS => array(
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
 					self::REPORT_FILTER => array(
@@ -981,7 +985,7 @@ class kKavaReportsMgr extends kKavaBase
 		// Note: historically this report returns the bandwidth in kb in table, and in mb in graph
 		myReportsMgr::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE => array(
 			self::REPORT_EDIT_FILTER_FUNC => 'self::partnerUsageEditFilter',
-			self::REPORT_JOIN_REPORTS => array(
+			self::REPORT_JOIN_GRAPHS => array(
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB, self::METRIC_BANDWIDTH_SIZE_KB),
@@ -1020,7 +1024,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		myReportsMgr::REPORT_TYPE_PARTNER_USAGE_DASHBOARD => array(
 			self::REPORT_EDIT_FILTER_FUNC => 'self::partnerUsageEditFilter',
-			self::REPORT_JOIN_REPORTS => array(
+			self::REPORT_JOIN_GRAPHS => array(
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_KB),
@@ -1129,6 +1133,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_DOWNLOAD_CLICKED => 'count_download',
 		self::EVENT_TYPE_SHARE_CLICKED => 'count_viral',
 		self::EVENT_TYPE_EDIT_CLICKED => 'count_edit',
+		self::EVENT_TYPE_VIEW => 'views',
 		self::MEDIA_TYPE_VIDEO => 'count_video',
 		self::MEDIA_TYPE_AUDIO => 'count_audio',
 		self::MEDIA_TYPE_IMAGE => 'count_image',
@@ -1166,6 +1171,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_PERIOD_PLAY_TIME => self::METRIC_VIEW_PERIOD_PLAY_TIME,
 		self::METRIC_BUFFER_TIME_RATIO => self::METRIC_BUFFER_TIME_RATIO,
 		self::METRIC_AVG_BITRATE => self::METRIC_AVG_BITRATE,
+		self::METRIC_AVG_VIEW_BITRATE => self::METRIC_AVG_VIEW_BITRATE, 
 		self::METRIC_SUM_PRICE => self::METRIC_SUM_PRICE,
 		self::METRIC_VIEW_BUFFER_TIME_SEC => self::METRIC_VIEW_BUFFER_TIME_SEC,
 		self::METRIC_VIEW_PLAY_TIME_SEC => self::METRIC_VIEW_PLAY_TIME_SEC,
@@ -1194,6 +1200,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::GRANULARITY_MONTH => 'P1M',
 		self::GRANULARITY_HOUR => 'PT1H',
 		self::GRANULARITY_THIRTY_MINUTE => 'PT30M',
+		self::GRANULARITY_MINUTE => 'PT1M',
 	);
 
 	protected static $non_linear_metrics = array(
@@ -1427,16 +1434,16 @@ class kKavaReportsMgr extends kKavaBase
 			self::getLongSumAggregator(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
 		
 		self::$aggregations_def[self::METRIC_VIEW_BUFFER_TIME_SEC] = self::getFilteredAggregator(
-			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW), 
+			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
+				self::EVENT_TYPE_VIEW,				// realtime
+				self::EVENT_TYPE_VIEW_PERIOD)),		// historical 
 			self::getDoubleSumAggregator(self::METRIC_VIEW_BUFFER_TIME_SEC, self::METRIC_BUFFER_TIME_SEC));
-
-		self::$aggregations_def[self::METRIC_VIEW_PERIOD_BUFFER_TIME_SEC] = self::getFilteredAggregator(
-			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD), 
-			self::getDoubleSumAggregator(self::METRIC_VIEW_PERIOD_BUFFER_TIME_SEC, self::METRIC_BUFFER_TIME_SEC));
 
 		self::$aggregations_def[self::METRIC_BITRATE_SUM] = self::getFilteredAggregator(
 			self::getAndFilter(array(
-				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
+					self::EVENT_TYPE_VIEW,				// realtime
+					self::EVENT_TYPE_VIEW_PERIOD)),		// historical 
 				self::getSelectorFilter(self::DIMENSION_HAS_BITRATE, 1))),
 			self::getLongSumAggregator(self::METRIC_BITRATE_SUM, self::METRIC_BITRATE_SUM));
 
@@ -1445,6 +1452,12 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
 				self::getSelectorFilter(self::DIMENSION_HAS_BITRATE, 1))),
 			self::getLongSumAggregator(self::METRIC_BITRATE_COUNT, self::METRIC_BITRATE_COUNT));
+
+		self::$aggregations_def[self::METRIC_VIEW_BITRATE_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getSelectorFilter(self::DIMENSION_HAS_BITRATE, 1))),
+			self::getLongSumAggregator(self::METRIC_VIEW_BITRATE_COUNT, self::METRIC_COUNT));
 
 		self::$aggregations_def[self::METRIC_UNIQUE_ENTRIES] = self::getCardinalityAggregator(
 			self::METRIC_UNIQUE_ENTRIES, 
@@ -1547,10 +1560,10 @@ class kKavaReportsMgr extends kKavaBase
 				self::EVENT_TYPE_PLAYER_IMPRESSION));
 
 		self::$metrics_def[self::METRIC_BUFFER_TIME_RATIO] = array(
-			self::DRUID_AGGR => array(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_VIEW_PERIOD_BUFFER_TIME_SEC),
+			self::DRUID_AGGR => array(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_VIEW_BUFFER_TIME_SEC),
 			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
 				self::METRIC_BUFFER_TIME_RATIO,
-				self::METRIC_VIEW_PERIOD_BUFFER_TIME_SEC,
+				self::METRIC_VIEW_BUFFER_TIME_SEC,
 				self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC));
 
 		self::$metrics_def[self::METRIC_AVG_BITRATE] = array(
@@ -1559,6 +1572,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_AVG_BITRATE,
 				self::METRIC_BITRATE_SUM,
 				self::METRIC_BITRATE_COUNT));
+
+		self::$metrics_def[self::METRIC_AVG_VIEW_BITRATE] = array(
+			self::DRUID_AGGR => array(self::METRIC_BITRATE_SUM, self::METRIC_VIEW_BITRATE_COUNT),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_AVG_VIEW_BITRATE,
+				self::METRIC_BITRATE_SUM,
+				self::METRIC_VIEW_BITRATE_COUNT));
 
 		self::$metrics_def[self::METRIC_ORIGIN_BANDWIDTH_SIZE_MB] = array(
 			self::DRUID_AGGR => array(self::METRIC_ORIGIN_BANDWIDTH_SIZE_BYTES),
@@ -2056,6 +2076,7 @@ class kKavaReportsMgr extends kKavaBase
 		$field_dim_map = array(
 			'categoriesIds' => array(self::DRUID_DIMENSION => self::DIMENSION_CATEGORIES),
 			'countries' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_COUNTRY),
+			'server_node_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_SERVER_NODE_IDS),
 			'custom_var1' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR1),
 			'custom_var2' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR2),
 			'custom_var3' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR3),
@@ -2386,7 +2407,11 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$row_data = $row[self::DRUID_RESULT];
 
-			$date = call_user_func($transform, $row[self::DRUID_TIMESTAMP], $tz);
+			$date = $row[self::DRUID_TIMESTAMP];
+			if ($transform)
+			{
+				$date = call_user_func($transform, $date, $tz);
+			}
 
 			foreach ($graph_metrics_to_headers as $column => $header)
 			{
@@ -2605,7 +2630,8 @@ class kKavaReportsMgr extends kKavaBase
 			break;
 			
 		default:
-			$result = self::getGraphsByDateId($result, $graph_metrics_to_headers, $input_filter->timeZoneOffset, self::$transform_time_dimensions[$granularity]);
+			$transform = isset(self::$transform_time_dimensions[$granularity]) ? self::$transform_time_dimensions[$granularity] : null;
+			$result = self::getGraphsByDateId($result, $graph_metrics_to_headers, $input_filter->timeZoneOffset, $transform);
 			break;
 		}
 
@@ -2886,7 +2912,7 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$map = $report_def[self::REPORT_GRAPH_MAP];
 		}
-		else if ($report_def[self::REPORT_COLUMN_MAP])
+		else if (isset($report_def[self::REPORT_COLUMN_MAP]))
 		{
 			$map = $report_def[self::REPORT_COLUMN_MAP];
 		}
@@ -4749,7 +4775,8 @@ class kKavaReportsMgr extends kKavaBase
 			$table = self::getTableImpl($partner_id, $report_def, $input_filter, self::MAX_RESULT_SIZE, 1, null, $object_ids);
 			$result = call_user_func($report_def[self::REPORT_TOTAL_FROM_TABLE_FUNC], $table);
 		}
-		else if (!isset($report_def[self::REPORT_DIMENSION]) || isset($report_def[self::REPORT_JOIN_GRAPHS]))
+		else if (isset($report_def[self::REPORT_JOIN_GRAPHS]) ||
+				(!isset($report_def[self::REPORT_DIMENSION]) && isset($report_def[self::REPORT_GRAPH_METRICS])))
 		{
 			$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
 			$result = array(array_keys($result), array_values($result));
@@ -4869,12 +4896,12 @@ class kKavaReportsMgr extends kKavaBase
 				continue;
 			}
 
-			$paramName = substr($value, 1);
-			if (!isset($params[$paramName]))
+			$param_name = substr($value, 1);
+			if (!isset($params[$param_name]))
 			{
-				throw new Exception("missing parameter $paramName");
+				throw new Exception("missing parameter $param_name");
 			}
-			$value = $params[$paramName];
+			$value = $params[$param_name];
 		}
 	}
 
@@ -4910,6 +4937,9 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		// apply param processing
+		$optional_params = isset($report_def['report_optional_params']) ? 
+			explode(',', $report_def['report_optional_params']) : array();
+
 		foreach ($params as $key => $value)
 		{
 			if (!isset($report_def[self::REPORT_CUSTOM_PARAM][$key]))
@@ -4929,17 +4959,23 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		// build the filter
-		$input_filter = new reportsInputFilter();
+		$filter_type = isset($report_def['filter']['type']) ? 
+			$report_def['filter']['type'] : 'reportsInputFilter'; 
+		$input_filter = new $filter_type();
 		foreach ($report_def['filter'] as $field => $value)
 		{
 			if (is_string($value) && $value[0] == ':')
 			{
-				$paramName = substr($value, 1);
-				if (!isset($params[$paramName]))
+				$param_name = substr($value, 1);
+				if (!isset($params[$param_name]))
 				{
-					throw new Exception("missing parameter $paramName");
+					if (in_array($param_name, $optional_params))
+					{
+						continue;
+					}
+					throw new Exception("missing parameter $param_name");
 				}
-				$value = $params[$paramName];
+				$value = $params[$param_name];
 			}
 			$input_filter->$field = $value;
 		}
@@ -4954,8 +4990,24 @@ class kKavaReportsMgr extends kKavaBase
 		if (isset($report_def[self::REPORT_GRAPH_METRICS]))
 		{
 			// graph report
+			$date_column_name = 'date_id';
+			if (isset($report_def[self::REPORT_GRANULARITY]))
+			{
+				$date_column_name = $report_def[self::REPORT_GRANULARITY];
+
+				$date_name_map = array(
+					self::GRANULARITY_HOUR => 'hour_id',
+					self::GRANULARITY_DAY => 'date_id',
+					self::GRANULARITY_MONTH => 'month_id',
+				);
+				if (isset($date_name_map[$date_column_name]))
+				{
+					$date_column_name = $date_name_map[$date_column_name];
+				}
+			}
+
 			$graphs = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
-			list($header, $data) = self::getTableFromGraphs($graphs, false);
+			list($header, $data) = self::getTableFromGraphs($graphs, false, $date_column_name);
 		}
 		else if (isset($report_def[self::REPORT_DIMENSION]))
 		{
@@ -4964,7 +5016,7 @@ class kKavaReportsMgr extends kKavaBase
 				$partner_id,
 				$report_def,
 				$input_filter,
-				self::MAX_CUSTOM_REPORT_RESULT_SIZE,
+				isset($params['limit']) ? $params['limit'] : self::MAX_CUSTOM_REPORT_RESULT_SIZE,
 				1,
 				$report_def['order_by'],
 				$object_ids,
@@ -4978,6 +5030,7 @@ class kKavaReportsMgr extends kKavaBase
 				$report_def,
 				$input_filter,
 				$object_ids);
+			$data = array($data);
 		}
 
 		if (isset($report_def['header']))

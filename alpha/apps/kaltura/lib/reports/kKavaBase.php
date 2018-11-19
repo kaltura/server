@@ -32,6 +32,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_BROWSER = 'userAgent.browser';
 	const DIMENSION_PLAYBACK_CONTEXT = 'playbackContext';
 	const DIMENSION_PLAYBACK_TYPE = 'playbackType';
+	const DIMENSION_SERVER_NODE_IDS = 'serverNodeIds';
 	const DIMENSION_CATEGORIES = 'categories';
 	const DIMENSION_EVENT_TYPE = 'eventType';
 	const DIMENSION_HAS_BITRATE = 'hasBitrate';
