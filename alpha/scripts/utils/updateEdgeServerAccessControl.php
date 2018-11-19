@@ -22,6 +22,10 @@ foreach($partnerIds as $partnerId)
 	if (!$partnerId || !is_numeric($partnerId))
 		continue;
 
+	$partner = PartnerPeer::retrieveByPk($partnerId);
+	if (!$partner)
+		continue;
+
 	$criteria = new Criteria();
 	$criteria->add(accessControlPeer::PARTNER_ID, $partnerId);
 	$acps = accessControlPeer::doSelect($criteria);
