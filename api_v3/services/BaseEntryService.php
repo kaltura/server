@@ -63,7 +63,9 @@ class BaseEntryService extends KalturaEntryService
     {
     	if($type && $type != KalturaEntryType::AUTOMATIC)
     		$entry->type = $type;
-    	
+
+		myEntryUtils::verifyEntryType($entry);
+
     	$dbEntry = parent::add($entry, $entry->conversionProfileId);
     	if($dbEntry->getStatus() != entryStatus::READY)
     	{
@@ -366,12 +368,14 @@ class BaseEntryService extends KalturaEntryService
 	 */
 	function updateAction($entryId, KalturaBaseEntry $baseEntry)
 	{
-    	$dbEntry = entryPeer::retrieveByPK($entryId);
+		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-	
+
+		myEntryUtils::verifyEntryType($baseEntry);
+
 		$baseEntry = $this->updateEntry($entryId, $baseEntry);
-    	return $baseEntry;
+		return $baseEntry;
 	}
 	
 	/**

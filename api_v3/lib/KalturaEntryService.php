@@ -242,7 +242,8 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		
 		$srcSyncKey = $syncable->getSyncKey($resource->getObjectSubType(), $resource->getVersion());
-		$dbAsset = $this->attachFileSync($srcSyncKey, $dbEntry, $dbAsset, $syncable->getEncryptionKey());
+		$encryptionKey = method_exists($syncable, 'getEncryptionKey') ? $syncable->getEncryptionKey() : null;
+		$dbAsset = $this->attachFileSync($srcSyncKey, $dbEntry, $dbAsset, $encryptionKey);
 		
 		//In case the target entry's media type is image no asset is created and the image is set on a entry level file sync
 		if(!$dbAsset && $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
@@ -402,9 +403,11 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		$dbEntry->setSource($resource->getSourceType());
 		$dbEntry->save();
-		
-		if($resource->getIsReady())
+
+		if ($resource->getIsReady())
+		{
 			return $this->attachFile($resource->getLocalFilePath(), $dbEntry, $dbAsset, $resource->getKeepOriginalFile());
+		}
 	
 		$lowerStatuses = array(
 			entryStatus::ERROR_CONVERTING,
@@ -548,7 +551,6 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		
 		$dbAsset->setFileExt($ext);
-		$dbAsset->save();
 		
 		if($dbAsset && ($dbAsset instanceof thumbAsset))
 		{
@@ -560,8 +562,12 @@ class KalturaEntryService extends KalturaBaseService
 		
 		$syncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		
-		try {
+		try
+		{
 			kFileSyncUtils::moveFromFile($entryFullPath, $syncKey, true, $copyOnly);
+			$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey);
+			$dbAsset->setSize($fileSync->getFileSize());
+			$dbAsset->save();
 		}
 		catch (Exception $e) {
 			

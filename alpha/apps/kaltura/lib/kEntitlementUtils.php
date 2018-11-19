@@ -80,6 +80,11 @@ class kEntitlementUtils
 	 */
 	public static function isEntryEntitled(entry $entry, $kuserId = null)
 	{
+		if($entry->getPartnerId() == PartnerPeer::GLOBAL_PARTNER)
+		{
+			return true;
+		}
+
 		if($entry->getSecurityParentId())
 		{
 			$entry = $entry->getParentEntry();
@@ -107,7 +112,6 @@ class kEntitlementUtils
 		}
 
 		$partner = $entry->getPartner();
-
 		if(!$ks && !$partner->getDefaultEntitlementEnforcement())
 		{
 			KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: no ks and default is with no enforcement');
@@ -185,7 +189,7 @@ class kEntitlementUtils
 		return self::isMemberOfCategory($allCategoriesEntry, $entry, $partner, $kuserId, $ks, $ksPrivacyContexts);
 	}
 
-	private static function getKuserIdForEntitlement($kuserId = null, $ks = null)
+	public static function getKuserIdForEntitlement($kuserId = null, $ks = null)
 	{
 		if($ks && !$kuserId)
 		{

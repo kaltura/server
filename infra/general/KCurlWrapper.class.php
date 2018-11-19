@@ -153,6 +153,21 @@ class KCurlWrapper
 	private static $headers;
 	private static $lastHeader;
 
+	/**
+	 * @var int
+	 */
+	public $errorNumber;
+
+	/**
+	 * @var false|string
+	 */
+	public $error;
+
+	/**
+	 * @var int
+	 */
+	public $httpCode = 0;
+
 	private static function read_header($ch, $string) {
 		self::$headers .= $string;
 		if ($string == "\r\n")
@@ -277,7 +292,7 @@ class KCurlWrapper
 		$curlWrapper = new KCurlWrapper();
 		$res = $curlWrapper->exec($url, $destFilePath, null, $allowInternalUrl);
 
-		$httpCode = curl_getinfo($curlWrapper->ch, CURLINFO_HTTP_CODE);
+		$httpCode = $curlWrapper->getHttpCode();
 		if (KCurlHeaderResponse::isError($httpCode))
 		{
 			KalturaLog::info("curl request [$url] return with http-code of [$httpCode]");
@@ -298,6 +313,14 @@ class KCurlWrapper
 	 */
 	public function getError()
 	{
+		return $this->error;
+	}
+
+	/**
+	 * @return false|string
+	 */
+	public function getErrorMsg()
+	{
 		$err = curl_error($this->ch);
 		if(!strlen($err))
 			return false;
@@ -307,9 +330,18 @@ class KCurlWrapper
 
 	/**
 	 * @param $opt
+	 * @return string
+	 */
+	public function getHttpCode()
+	{
+		return $this->httpCode;
+	}
+
+	/**
+	 * @param $opt
 	 * @return string|array
 	 */
-	public function getInfo($opt)
+	private function getInfo($opt)
 	{
 		if (!$opt)
 			return curl_getinfo($this->ch);
@@ -321,7 +353,7 @@ class KCurlWrapper
 	 */
 	public function getErrorNumber()
 	{
-		return curl_errno($this->ch);
+		return $this->errorNumber;
 	}
 
 	/**
@@ -378,7 +410,8 @@ class KCurlWrapper
 
 		self::$headers = "";
 		self::$lastHeader = false;
-		curl_exec($this->ch);
+
+		$this->execCurl();
 
 		//Added to support multiple curl executions using the same curl. Wince this is the same curl re-used we need to reset the range option before continuing forward
 		if(!$noBody)
@@ -507,10 +540,14 @@ class KCurlWrapper
 	public function exec($sourceUrl, $destFile = null,$progressCallBack = null, $allowInternalUrl = false)
 	{
 		if (!$allowInternalUrl && self::isInternalUrl($sourceUrl) && !self::isWhiteListedInternalUrl($sourceUrl))
-			KalturaLog::debug("Exec Curl - Found not allowed not whiteListed Internal url: . $sourceUrl");
+		{
+			KalturaLog::debug("Exec Curl - Found not allowed and not whiteListed Internal url: $sourceUrl");
+			$this->setInternalUrlErrorResults($sourceUrl);
+			return false;
+		}
 
 		$this->setSourceUrlAndprotocol($sourceUrl);
-		
+
 		$returnTransfer = is_null($destFile);
 		$destFd = null;
 		if (!is_null($destFile))
@@ -526,7 +563,7 @@ class KCurlWrapper
 			curl_setopt($this->ch, CURLOPT_NOPROGRESS, false);
 			curl_setopt($this->ch, CURLOPT_PROGRESSFUNCTION, $progressCallBack);
 		}
-		$ret = curl_exec($this->ch);
+		$ret = $this->execCurl();
 
 		if (!is_null($destFd)) {
 			fclose($destFd);
@@ -544,11 +581,32 @@ class KCurlWrapper
 	public function doExec($sourceUrl, $allowInternalUrl = false)
 	{
 		if (!$allowInternalUrl && self::isInternalUrl($sourceUrl) && !self::isWhiteListedInternalUrl($sourceUrl))
+		{
 			KalturaLog::debug("DoExec Curl - Found not allowed and not whiteListed Internal url: $sourceUrl");
+			$this->setInternalUrlErrorResults($sourceUrl);
+			return false;
+		}
 
 		curl_setopt($this->ch, CURLOPT_URL, $sourceUrl);
 
-		return curl_exec($this->ch);
+		$res = $this->execCurl();
+
+		return $res;
+	}
+
+	private function setInternalUrlErrorResults($url)
+	{
+		$this->errorNumber = -1;
+		$this->error = "Internal not allowed url [$url] -  curl will not be invoked";
+	}
+
+	private function execCurl()
+	{
+		$res = curl_exec($this->ch);
+		$this->httpCode = $this->getInfo(CURLINFO_HTTP_CODE);
+		$this->errorNumber = curl_errno($this->ch);
+		$this->error = $this->getErrorMsg();
+		return $res;
 	}
 
 	/**
@@ -584,9 +642,9 @@ class KCurlWrapper
 	private static function isWhiteListedInternalUrl($url)
 	{
 		if(!kConf::hasMap('security'))
-			return false;
-		
-		$whiteListedInternalPatterns = kConf::get('internal_url_whitelist', 'security', array());
+			return true;
+
+    $whiteListedInternalPatterns = kConf::get('internal_url_whitelist', 'security', array());
 		foreach ($whiteListedInternalPatterns as $pattern)
 		{
 			if (preg_match($pattern, $url))
@@ -676,7 +734,10 @@ class KCurlWrapper
 	public static function getContent($url, $headers = null, $allowInternalUrl = false)
 	{
 		if (!$allowInternalUrl && self::isInternalUrl($url) && !self::isWhiteListedInternalUrl($url))
+		{
 			KalturaLog::debug("Exec Curl in getContent - Found Internal and not whiteListed url: $url");
+			return false;
+		}
 
 		$ch = curl_init();
 		
@@ -692,7 +753,7 @@ class KCurlWrapper
 		{
 			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		}
-			
+
 		$content = curl_exec($ch);
 		curl_close($ch);
 		

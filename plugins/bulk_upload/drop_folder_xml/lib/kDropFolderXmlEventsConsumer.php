@@ -117,15 +117,19 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 				if(!is_null($jobData->getFilePath()))
 				{
 					$syncKey = $dbBatchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
-					try{
-						kFileSyncUtils::moveFromFile($jobData->getFilePath(), $syncKey, true);
-					}
-					catch(Exception $e)
+					if(!kFileSyncUtils::fileSync_exists($syncKey))
 					{
-						KalturaLog::err($e);
-						throw new APIException(APIErrors::BULK_UPLOAD_CREATE_CSV_FILE_SYNC_ERROR);
+						try
+						{
+							kFileSyncUtils::moveFromFile($jobData->getFilePath(), $syncKey, true);
+						}
+						catch (Exception $e)
+						{
+							KalturaLog::err($e);
+							throw new APIException(APIErrors::BULK_UPLOAD_CREATE_CSV_FILE_SYNC_ERROR);
+						}
 					}
-					
+
 					$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 					$jobData->setFilePath($filePath);
 					

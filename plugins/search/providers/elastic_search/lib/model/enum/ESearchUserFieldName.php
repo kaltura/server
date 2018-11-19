@@ -16,5 +16,6 @@ interface ESearchUserFieldName extends BaseEnum
 	const PERMISSION_NAMES = 'permission_names';
 	const GROUP_IDS = 'group_ids';
 	const ROLE_IDS = 'role_ids';
+	const PUSER_ID = 'puser_id';
 
 }

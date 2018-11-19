@@ -147,6 +147,8 @@ class ESearchService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaESearchErrors::MISSING_MANDATORY_PARAMETERS_IN_ORDER_ITEM);
 			case kESearchException::MIXED_SEARCH_ITEMS_IN_NESTED_OPERATOR_NOT_ALLOWED:
 				throw new KalturaAPIException(KalturaESearchErrors::MIXED_SEARCH_ITEMS_IN_NESTED_OPERATOR_NOT_ALLOWED);
+			case kESearchException::MISSING_OPERATOR_TYPE:
+				throw new KalturaAPIException(KalturaESearchErrors::MISSING_OPERATOR_TYPE);
 
 			default:
 				throw new KalturaAPIException(KalturaESearchErrors::INTERNAL_SERVERL_ERROR);

@@ -412,6 +412,8 @@ class kCouchbaseCacheWrapper extends kInfraBaseCacheWrapper
 	const CB_ACTION_DELETE = 'delete';
 	const CB_ACTION_BUCKET_CONNECTION = 'bucket_connection';
 	
+	const COUCHBASE_BUCKET_VIEW_QUERY_TIMEOUT = 5000000; // 5 seconds in microseconds
+	
 	/**
 	 * @var string
 	 */
@@ -461,6 +463,10 @@ class kCouchbaseCacheWrapper extends kInfraBaseCacheWrapper
 				
 			$connStart = microtime(true);
 			$this->bucket = $cluster->openBucket($this->name);
+			
+			//Set view query timeout to 5 seconds to avoid runing query for the default 75 seconds if something is wrong
+			$this->bucket->__set('viewTimeout', self::COUCHBASE_BUCKET_VIEW_QUERY_TIMEOUT);
+			
 			$connTook = microtime(true) - $connStart;
 			self::safeLog("connect took - {$connTook} seconds to {$config['dsn']} bucket {$this->name}");
 			KalturaMonitorClient::monitorCouchBaseAccess($this->dataSource, $this->name, self::CB_ACTION_BUCKET_CONNECTION, $connTook, strlen($this->name));
@@ -841,7 +847,16 @@ class kCouchbaseCacheWrapper extends kInfraBaseCacheWrapper
 	public function query(kCouchbaseCacheQuery $query)
 	{
 		$couchBaseQuery = $query->toQuery();
-		$meta =  $this->bucket->query($couchBaseQuery);
+		try
+		{
+			$meta =  $this->bucket->query($couchBaseQuery);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::debug("Failed to query CouchBase bucket with error [" . $e->getMessage() . "]");
+			return new kCouchbaseCacheList(array());;
+		}
+		
 		if(phpversion('couchbase') > '2.0.7')
 			$meta = json_decode(json_encode($meta), true);
 		return new kCouchbaseCacheList($meta);

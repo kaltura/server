@@ -1,29 +1,21 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head >
     <style>
-        /* Bordered form */
-        form {
+        .zoom-form {
             border: 7px solid #f1f1f1;
-            margin-left: 35%;
-            margin-right: 35%;
+            margin-left: 0%;
+            margin-right: 0%;
+            margin: auto;
+            max-width: 400px;
+            max-height: 400px;
         }
 
         /* Full-width inputs */
-        input[type=text], input[type=number] {
+        input[type=text]{
             width: 100%;
-            padding: 12px 20px;
-            margin: 8px 0;
-            /*display: inline-block;*/
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-        }
-
-        input[type=checkbox] {
-            width: 30%;
-            padding: 12px 20px;
-            margin: 8px 0;
-            /*display: inline-block;*/
+            padding: 8px 12px;
+            margin: 4px 0;
             border: 1px solid #ccc;
             box-sizing: border-box;
         }
@@ -38,6 +30,23 @@
             cursor: pointer;
             width: auto;
         }
+        p {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            margin: 2px 10px;
+            padding-top: 10px;
+        }
+
+        a.small {
+            font-size: 11px;
+        }
+
+        a.big {
+            font-size: 13px;
+            font-weight: bold;
+            padding-left: 10px;
+        }
+
 
         p.success {
             background-color: #4CAF50;
@@ -62,7 +71,7 @@
         /* Center the avatar image inside this container */
         .imgcontainer {
             text-align: center;
-            margin: 24px 0 12px 0;
+            margin: 20px 0 12px 0;
         }
 
         /* Avatar image */
@@ -72,7 +81,7 @@
 
         /* Add padding to containers */
         .container {
-            padding: 16px;
+            padding: 10px;
         }
 
     </style>
@@ -90,11 +99,17 @@
             var $zoomCategory  = $('#zoomCategory');
             var defaultUserId = $defaultUserId.val().trim();
             var zoomCategory = $zoomCategory.val().trim();
+            var enableRecordingUploadObj = $(".enableRecordingUpload");
+            var createUserIfNotExistObj = $(".createUserIfNotExist");
+            var enableRecordingUpload = enableRecordingUploadObj.is(":checked");
+            var createUserIfNotExist = createUserIfNotExistObj.is(":checked");
+
+
             $.ajax({
                 url : url,
                 type : "post",
                 data: {"ks": ks, "defaultUserId": defaultUserId, "zoomCategory" : zoomCategory
-                    , "accountId" : accountId ,"format": 1},
+                    , "accountId" : accountId ,"enableRecordingUpload":enableRecordingUpload ,"createUserIfNotExist":createUserIfNotExist,"format": 1 },
                 success : function(res) {
                     $("body").css("cursor", "default");
                     console.log(res);
@@ -137,20 +152,34 @@
             });
         })();
     </script>
+    <title>Kaltura-Zoom registration</title>
 </head>
-<form action="">
+<form action="" class="zoom-form">
     <div class="imgcontainer">
         <img src="https://upload.wikimedia.org/wikipedia/commons/f/f7/KalturaLogo_Updatedpng.png" alt="Avatar" class="avatar">
     </div>
 
-    <div class="container">
-        <label for="defaultUserId"><b>Default User ID</b></label>
+    <p class="container">
+    <p>
+        <a class="big"><label for="defaultUserId"><b>Default User ID</b></label></a>
         <input type="text" value="@defaultUserID@" id="defaultUserId" name="defaultUserId" required>
-        <label for="zoomCategory"><b>Zoom Category</b></label>
+    </p>
+    <p>
+        <a class="big"><label for="zoomCategory"><b>Zoom Category</b></label></a>
         <input type="text" value="@zoomCategory@" id="zoomCategory" name="zoomCategory" required>
+    </p>
+
+    <p>
+        <a class="small"><input type="checkbox" class="enableRecordingUpload" @enableRecordingUpload@>Enable recording upload</a>
+        <a class="small"><input type="checkbox" class="createUserIfNotExist" @createUserIfNotExist@>Create users automatically if not exist</a>
+    </p>
+
+    <div align="center">
         <button type="submit" class="submit-button">Submit</button>
-        <p id="submitError" class="error" style="display:none">Data was Not Saved , please check server logs'.</p>
-        <p id="submitOK" class="success" style="display:none">Saved Successfully</p>
+    </div>
+    <p id="submitError" class="error" style="display:none">Data was Not Saved , please check server logs'.</p>
+    <p id="submitOK" class="success" style="display:none">Saved Successfully</p>
     </div>
 </form>
+</body>
 </html>

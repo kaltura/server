@@ -231,7 +231,7 @@ class Form_ReachProfileConfigure extends ConfigureForm
 			}
 		}
 		if (!empty($rules))
-			$this->setDefault('ReachProfileRules', json_encode($dictionaries));
+			$this->setDefault('ReachProfileRules', json_encode($rules));
 	}
 
 	private function createAutomaticRule($rule, $ruleType)

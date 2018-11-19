@@ -49,10 +49,10 @@ class kMrssManager
 	 * @param string $objectId
 	 * @param kMrssParameters $mrssParams
 	 * @param string $features
-	 * 
+	 *
 	 * returns instance key for pool
 	 */
-	
+
 	protected static function generateInstanceKey($objectId, kMrssParameters $mrssParams = null, $features = null)
 	{
 		$instanceKey = $objectId;
@@ -408,7 +408,7 @@ class kMrssManager
 			}
 		}
 	}
-	
+
 	/**
 	 * @param entry $entry
 	 * @param SimpleXMLElement $mrss
@@ -581,7 +581,7 @@ class kMrssManager
 			{
 				try
 				{
-					if (!count($features) || in_array($mrssContributor->getObjectFeatureType(), $features))
+					if (!is_array($features) || !count($features) || in_array($mrssContributor->getObjectFeatureType(), $features))
 						$mrssContributor->contribute($entry, $mrss, $mrssParams);
 				}
 				catch(kCoreException $ex)

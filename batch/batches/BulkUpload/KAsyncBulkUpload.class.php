@@ -109,7 +109,7 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 		if($engine->shouldRetry())
 		{
 			self::$kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
-			return $this->closeJob($job, null, null, "Retrying: ".$countHandledObjects." ".$engine->getObjectTypeTitle()." objects were handled untill now", KalturaBatchJobStatus::RETRY);
+			return $this->closeJob($job, null, null, "Retrying: ".$countHandledObjects." ".$engine->getObjectTypeTitle()." objects were handled until now", KalturaBatchJobStatus::RETRY);
 		}
 
 		//check if all items were done already
