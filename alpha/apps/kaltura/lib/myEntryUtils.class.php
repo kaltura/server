@@ -1093,7 +1093,15 @@ class myEntryUtils
 
 		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
 		$url .= ($entryVersion ? "/v/$entryVersion" : '');
-		$url .= '/flavorId/' . $flavorAsset->getId().self::MP4_FILENAME_PARAMETER;
+		if($entry->getType() == entryType::PLAYLIST)
+		{
+			$url .= "/flavorParamIds/" . $flavorAsset->getFlavorParamsId();
+		}
+		else
+		{
+			$url .= '/flavorId/' . $flavorAsset->getId();
+		}
+		$url .= self::MP4_FILENAME_PARAMETER;
 		return $url;
 	}
 
