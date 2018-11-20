@@ -24,9 +24,10 @@ class kFlowHelper
 	 * @param int $partnerId
 	 * @param string $entryId
 	 * @param string $msg
+	 * @param string $fileExt
 	 * @return flavorAsset
 	 */
-	public static function createOriginalFlavorAsset($partnerId, $entryId, &$msg = null)
+	public static function createOriginalFlavorAsset($partnerId, $entryId, &$msg = null, $fileExt = null)
 	{
 		$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if ($flavorAsset)
@@ -48,6 +49,11 @@ class kFlowHelper
 		$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
 		$flavorAsset->setPartnerId($partnerId);
 		$flavorAsset->setEntryId($entryId);
+
+		if ($fileExt)
+		{
+			$flavorAsset->setFileExt($fileExt);
+		}
 
 		$flavorAsset->save();
 
