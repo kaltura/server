@@ -450,7 +450,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$isNewAsset = false;
 		if(!$dbEntry)
 		{
-			KalturaLog::err("Flavor asset not created for entry [" . $entryId . "]");
+			KalturaLog::err("Flavor asset not created for entry [ $entryId ]");
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		}
 		if(!$dbAsset)
