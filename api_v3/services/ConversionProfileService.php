@@ -281,9 +281,6 @@ class ConversionProfileService extends KalturaBaseService
 			if(in_array($assetParams->getId(), $existingIds))
 				continue;
 				
-			if($conversionProfileDb->getType() == ConversionProfileType::LIVE_STREAM && $assetParams->getType() != assetType::LIVE)
-				throw new KalturaAPIException(KalturaErrors::ASSET_PARAMS_INVALID_TYPE, $assetParams->getId(), $assetParams->getType());
-				
 			$fpc = new flavorParamsConversionProfile();
 			$fpc->setConversionProfileId($conversionProfileDb->getId());
 			$fpc->setFlavorParamsId($assetParams->getId());

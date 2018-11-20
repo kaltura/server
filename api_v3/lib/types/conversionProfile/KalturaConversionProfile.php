@@ -345,6 +345,11 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 					
 				$sourceFound = true;
 			}
+			
+			if($this->type == KalturaConversionProfileType::LIVE_STREAM && $flavorParamsItem->getType() != assetType::LIVE ||
+				$this->type == KalturaConversionProfileType::MEDIA && $flavorParamsItem->getType() == assetType::LIVE)
+				throw new KalturaAPIException(KalturaErrors::ASSET_PARAMS_INVALID_TYPE, $flavorParamsItem->getId(), $flavorParamsItem->getType());
+			
 			$indexedFlavorParams[$flavorParamsItem->getId()] = $flavorParamsItem;
 		}
 			
