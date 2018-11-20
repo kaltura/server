@@ -1095,12 +1095,13 @@ class myEntryUtils
 		$url .= ($entryVersion ? "/v/$entryVersion" : '');
 		if($entry->getType() == entryType::PLAYLIST)
 		{
-			$url .= "/flavorParamIds/" . $flavorAsset->getFlavorParamsId().self::MP4_FILENAME_PARAMETER;
+			$url .= "/flavorParamIds/" . $flavorAsset->getFlavorParamsId();
 		}
 		else
 		{
-			$url .= '/flavorId/' . $flavorAsset->getId().self::MP4_FILENAME_PARAMETER;
+			$url .= '/flavorId/' . $flavorAsset->getId();
 		}
+		$url .= self::MP4_FILENAME_PARAMETER;
 		return $url;
 	}
 
