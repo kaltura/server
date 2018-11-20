@@ -360,7 +360,6 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_DIMENSION => self::DIMENSION_OS_FAMILY,
 			self::REPORT_DIMENSION_HEADERS => array('os_family'),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
-			self::REPORT_FORCE_TOTAL_COUNT => true,
 			self::REPORT_GRAPH_TYPE => self::GRAPH_MULTI_BY_NAME,
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
 		),
@@ -369,7 +368,6 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_DIMENSION => self::DIMENSION_BROWSER_FAMILY,
 			self::REPORT_DIMENSION_HEADERS => array('browser_family'),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
-			self::REPORT_FORCE_TOTAL_COUNT => true,
 			self::REPORT_GRAPH_TYPE => self::GRAPH_MULTI_BY_NAME,
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
 		),
@@ -2079,8 +2077,8 @@ class kKavaReportsMgr extends kKavaBase
 			'custom_var3' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR3),
 			'devices' => array(self::DRUID_DIMENSION => self::DIMENSION_DEVICE, self::REPORT_FILTER_DIMENSION_TRANSFORM => array('kKavaReportsMgr', 'fromSafeIds')),
 			'regions' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_REGION),
-			'os_families' => array(self::DRUID_DIMENSION => self::DIMENSION_OS_FAMILY, self::REPORT_FILTER_DIMENSION_TRANSFORM => array('kKavaReportsMgr', 'fromSafeIds')),
-			'browsers_families' => array(self::DRUID_DIMENSION => self::DIMENSION_BROWSER_FAMILY, self::REPORT_FILTER_DIMENSION_TRANSFORM => array('kKavaReportsMgr', 'fromSafeIds')),
+			'os_families' => array(self::DRUID_DIMENSION => self::DIMENSION_OS_FAMILY),
+			'browsers_families' => array(self::DRUID_DIMENSION => self::DIMENSION_BROWSER_FAMILY),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
