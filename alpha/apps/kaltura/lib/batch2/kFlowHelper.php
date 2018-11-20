@@ -799,13 +799,16 @@ class kFlowHelper
 		{
 			$srcAssetId = $sourceFileSyncDescriptor->getAssetId();
 			$originalFlavor = assetPeer::retrieveById($srcAssetId);
-			$fileSyncKey = $originalFlavor->getSyncKey($sourceFileSyncDescriptor->getFileSyncObjectSubType());
-			$currentSourceFileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($fileSyncKey);
-			$currentSourceFilePath = $currentSourceFileSync->getFilePath();
-			$originalSrcPath = $sourceFileSyncDescriptor->getFileSyncLocalPath();
-			if(!empty($currentSourceFilePath) && strcmp(basename($currentSourceFilePath),basename($originalSrcPath)))
+			if($originalFlavor)
 			{
-				throw new APIException(KalturaErrors::SOURCE_FLAVOR_CHANGED_DURING_CONVERSION, $currentSourceFilePath, $originalSrcPath, $srcAssetId);
+				$fileSyncKey = $originalFlavor->getSyncKey($sourceFileSyncDescriptor->getFileSyncObjectSubType());
+				$currentSourceFileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($fileSyncKey);
+				$currentSourceFilePath = $currentSourceFileSync->getFilePath();
+				$originalSrcPath = $sourceFileSyncDescriptor->getFileSyncLocalPath();
+				if (!empty($currentSourceFilePath) && strcmp(basename($currentSourceFilePath), basename($originalSrcPath)))
+				{
+					throw new APIException(KalturaErrors::SOURCE_FLAVOR_CHANGED_DURING_CONVERSION, $currentSourceFilePath, $originalSrcPath, $srcAssetId);
+				}
 			}
 		}
 	}
