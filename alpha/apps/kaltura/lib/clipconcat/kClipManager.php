@@ -448,6 +448,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$dbAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		$isNewAsset = false;
+		if(!$dbEntry)
+		{
+			$this->updateAssetFailedToConvert($entryId, $dbEntry);
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND);
+		}
 		if(!$dbAsset)
 		{
 			$isNewAsset = true;
