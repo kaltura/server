@@ -188,15 +188,7 @@ class kScope
 		$values = array();
 		foreach($this->dynamicValues as $key => $value)
 		{
-			/* @var $value kValue */
-			if($value instanceof IScopeField)
-				$value->setScope($this);
-				
-			$dynamicValue = $value->getValue();
-			if(is_null($dynamicValue))
-				$dynamicValue = '';
-				
-			$values[$keyPrefix . $key . $keySuffix] = $dynamicValue;
+			$values[$keyPrefix . $key . $keySuffix] = $this->calculateDynamicValue($value);
 		}
 		
 		return $values;
@@ -205,17 +197,39 @@ class kScope
 	/**
 	 * Get dynamic field value by key name
 	 *
-	 * @param string $key
-	 * @param string $keyPrefix
-	 * @param string $keySuffix
+	 * @param string $key Field key name, without prefix and suffix
 	 * @return string
 	 */
-	public function getDynamicValueByKey($key, $keyPrefix = '', $keySuffix = '')
+	public function getDynamicValueByKey($key)
 	{
-		$values = $this->getDynamicValues($keyPrefix, $keySuffix);
-		return isset($values[$key]) ? $values[$key] : '';
+		if(isset($this->dynamicValues[$key]))
+		{
+			return $this->calculateDynamicValue($this->dynamicValues[$key]);
+		}
+		else
+		{
+			return '';
+		}
 	}
-	
+
+	/**
+	 * Calculate dynamic field value by kValue object
+	 *
+	 * @param kValue $value
+	 * @return string
+	 */
+	protected function calculateDynamicValue($value)
+	{
+		if($value instanceof IScopeField)
+			$value->setScope($this);
+
+		$dynamicValue = $value->getValue();
+		if(is_null($dynamicValue))
+			$dynamicValue = '';
+
+		return $dynamicValue;
+	}
+
 	/**
 	 * @param string $v
 	 */
