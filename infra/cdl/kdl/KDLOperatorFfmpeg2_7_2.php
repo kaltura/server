@@ -23,7 +23,8 @@ class KDLOperatorFfmpeg2_7_2 extends KDLOperatorFfmpeg2_2 {
 		if(isset($target->_decryptionKey)){
 			$cmdStr = "-decryption_key $target->_decryptionKey $cmdStr";
 		}
-		if($target->_isEncrypted==true) {
+		// PLAT-9429 - allow 2 enc modes
+		if(isset($target->_isEncrypted) && $target->_isEncrypted>0) {
 				// Add key & key_if placeholder. To be replaced by real values after asset creation
 			$str = " -encryption_scheme cenc-aes-ctr";
 			$str.= " -encryption_key ".KDLFlavor::ENCRYPTION_KEY_PLACEHOLDER;
