@@ -7,6 +7,14 @@
 
 class KalturaReachReportInputFilter extends KalturaReportInputFilter
 {
+
+	private static $map_between_objects = array
+	(
+		'serviceType',
+		'serviceFeature',
+		'turnAroundTime',
+	);
+
 	/**
 	 * @var KalturaVendorServiceType
 	 */
@@ -22,24 +30,16 @@ class KalturaReachReportInputFilter extends KalturaReportInputFilter
 	 */
 	public $turnAroundTime;
 
-
-	public function toReportsInputFilter ($reportsInputFilter = null)
+	protected function getMapBetweenObjects()
 	{
-		$reachReportsInputFilter = new reachReportsInputFilter();
-		parent::toReportsInputFilter($reachReportsInputFilter);
-		$reachReportsInputFilter->serviceFeature = $this->serviceFeature;
-		$reachReportsInputFilter->serviceType = $this->serviceType;
-		$reachReportsInputFilter->turnAroundTime = $this->turnAroundTime;
-
-		return $reachReportsInputFilter;
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 
-	public function fromReportsInputFilter (  $reachReportsInputFilter )
+	public function toReportsInputFilter($reportInputFilter = null)
 	{
-		parent::fromReportsInputFilter($reachReportsInputFilter);
-		$this->serviceFeature = $reachReportsInputFilter->serviceFeature;
-		$this->serviceType = $reachReportsInputFilter->serviceType;
-		$this->turnAroundTime = $reachReportsInputFilter->turnAroundTime;
-		return $this;
+		if (!$reportInputFilter)
+			$reportInputFilter = new reachReportsInputFilter();
+
+		return parent::toReportsInputFilter($reportInputFilter);
 	}
 }
