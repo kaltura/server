@@ -44,7 +44,7 @@ class KDLFlavor extends KDLMediaDataSet {
 	
 	public $_optimizationPolicy = KDLOptimizationPolicy::BitrateFlagBit;
 	
-	public $_isEncrypted = false; // CENC encryption
+	public $_isEncrypted = 0;	// CENC encryption, 0:not encrypted, 1:encrypt >10sec, 2:encrypt all
 	
 	public	$_transcoders = array();
 
@@ -514,9 +514,11 @@ $plannedDur = 0;
 
 			/*
 			 * Disable encryption for sources shorter than 10sec (PLAT-5558)
+			 * and IsEncrypt==1
+			 * For IsEncrypt==2 ==> encrypt ALL contents
 			 */
-		if(isset($this->_isEncrypted) && $sourceDur<10000) {
-			$target->_isEncrypted = false;
+		if(isset($target->_isEncrypted) && $target->_isEncrypted==1 && $sourceDur<10000) {
+			$target->_isEncrypted = 0;
 		}
 		
 		if(isset($source->_decryptionKey)) {
