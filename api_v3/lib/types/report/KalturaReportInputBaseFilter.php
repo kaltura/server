@@ -5,14 +5,6 @@
  */
 class KalturaReportInputBaseFilter extends KalturaObject 
 {
-	private static $map_between_objects = array
-	(
-		'fromDate' => 'from_date',
-		'toDate' => 'to_date',
-		'fromDay' => 'from_day',
-		'toDay' => 'to_day',
-	);
-
 	/**
 	 * Start date as Unix timestamp (In seconds)
 	 * 
@@ -40,11 +32,14 @@ class KalturaReportInputBaseFilter extends KalturaObject
 	 * @var string
 	 */
 	public $toDay;
-	
-	
-	
 
-
+	private static $map_between_objects = array
+	(
+		'fromDate' => 'from_date',
+		'toDate' => 'to_date',
+		'fromDay' => 'from_day',
+		'toDay' => 'to_day',
+	);
 
 	protected function getMapBetweenObjects()
 	{
