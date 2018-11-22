@@ -205,7 +205,8 @@ class kKavaReportsMgr extends kKavaBase
 		myReportsMgr::REPORT_TYPE_ENTRY_USAGE,
 		myReportsMgr::REPORT_TYPE_REACH_USAGE,
 		myReportsMgr::REPORT_TYPE_TOP_CUSTOM_VAR1,
-		myReportsMgr::REPORT_TYPE_CITIES
+		myReportsMgr::REPORT_TYPE_CITIES,
+        	myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT_TIMELINE,
 	);
 	
 	protected static $reports_def = array(
@@ -627,7 +628,7 @@ class kKavaReportsMgr extends kKavaBase
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
 				),
-			
+
 				// entries total
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
@@ -1084,6 +1085,11 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_DIMENSION => self::DIMENSION_LOCATION_CITY,
 			self::REPORT_DIMENSION_HEADERS => array('object_id', 'city'),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
+		),
+
+		myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT_TIMELINE => array(
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
 		),
 	);
 	
@@ -1934,7 +1940,7 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function getKuserIds($report_def, $puser_ids, $partner_id)
 	{
 		$result = array();
-		
+
 		// leave error ids as is
 		$puser_ids = explode(',', $puser_ids);
 		foreach ($puser_ids as $index => $id)
@@ -2560,7 +2566,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		// get the granularity
 		$granularity = isset($report_def[self::REPORT_GRANULARITY]) ? 
-			$report_def[self::REPORT_GRANULARITY] : self::GRANULARITY_DAY;
+			$report_def[self::REPORT_GRANULARITY] : self::getGranularity($input_filter->interval);
 		
 		$graph_type = isset($report_def[self::REPORT_GRAPH_TYPE]) ? $report_def[self::REPORT_GRAPH_TYPE] : self::GRAPH_BY_DATE_ID;
 		switch ($graph_type)
@@ -3880,6 +3886,15 @@ class kKavaReportsMgr extends kKavaBase
 			$headers, 
 			array_slice($data, ($page_index - 1) * $page_size, $page_size), 
 			count($data));
+	}
+
+	protected static function getGranularity($interval)
+	{
+		if ($interval == reportInterval::MONTHS) 
+		{
+			return self::GRANULARITY_MONTH;
+		}
+		return self::GRANULARITY_DAY;
 	}
 
 	protected static function getTotalTableCount($partner_id, $report_def, reportsInputFilter $input_filter, $intervals, $druid_filter, $dimension, $object_ids = null)
