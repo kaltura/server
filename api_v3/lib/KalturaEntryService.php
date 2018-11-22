@@ -703,7 +703,7 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			$isNewAsset = true;
 			$isSource = true;
-			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId(), $msg);
+			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		}
 
 		if(!$dbAsset && $dbEntry->getStatus() == entryStatus::NO_CONTENT)
@@ -1215,11 +1215,10 @@ class KalturaEntryService extends KalturaBaseService
 	 	$kshow = $this->createDummyKShow();
 		$kshowId = $kshow->getId();
 		
-		$msg = null;
-		$flavorAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId(), $msg);
+		$flavorAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		if(!$flavorAsset)
 		{
-			KalturaLog::err("Flavor asset not created for entry [" . $dbEntry->getId() . "] reason [$msg]");
+			KalturaLog::err("Flavor asset not created for entry [" . $dbEntry->getId() . "]");
 			
 			if($dbEntry->getStatus() == entryStatus::NO_CONTENT)
 			{
@@ -1227,7 +1226,7 @@ class KalturaEntryService extends KalturaBaseService
 				$dbEntry->save();
 			}
 			
-			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED, $msg);
+			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED);
 		}
 				
 		$srcSyncKey = $srcFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -1903,7 +1902,7 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		KalturaLog::info("clipping service detected start to create sub flavors;");
 		$clipEntry = $clipManager->createTempEntryForClip($this->getPartnerId());
-		$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId(), $msg);
+		$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId());
 		$dbAsset = $this->attachResource($resource->getResource(), $clipEntry, $clipDummySourceAsset);
 		$clipManager->startBatchJob($resource, $dbEntry,$operationAttributes, $clipEntry);
 		return $dbAsset;

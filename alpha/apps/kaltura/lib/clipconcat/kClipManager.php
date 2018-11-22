@@ -456,9 +456,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		if(!$dbAsset)
 		{
 			$isNewAsset = true;
-			$dbAsset = kFlowHelper::createOriginalFlavorAsset($dbEntry->getPartnerId(), $entryId);
-			$dbAsset->setFileExt($concatAsset->getFileExt());
-			$dbAsset->save();
+			$dbAsset = kFlowHelper::createOriginalFlavorAsset($dbEntry->getPartnerId(), $entryId, $concatAsset->getFileExt());
 		}
 
 		if(!$dbAsset)
