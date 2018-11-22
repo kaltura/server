@@ -448,12 +448,15 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$dbAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		$isNewAsset = false;
+		if(!$dbEntry)
+		{
+			KalturaLog::err("Flavor asset not created for entry [ $entryId ]");
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
 		if(!$dbAsset)
 		{
 			$isNewAsset = true;
-			$dbAsset = kFlowHelper::createOriginalFlavorAsset($dbEntry->getPartnerId(), $entryId);
-			$dbAsset->setFileExt($concatAsset->getFileExt());
-			$dbAsset->save();
+			$dbAsset = kFlowHelper::createOriginalFlavorAsset($dbEntry->getPartnerId(), $entryId, $concatAsset->getFileExt());
 		}
 
 		if(!$dbAsset)

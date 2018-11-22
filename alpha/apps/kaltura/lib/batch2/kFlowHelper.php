@@ -23,10 +23,10 @@ class kFlowHelper
 	/**
 	 * @param int $partnerId
 	 * @param string $entryId
-	 * @param string $msg
+	 * @param string $fileExt
 	 * @return flavorAsset
 	 */
-	public static function createOriginalFlavorAsset($partnerId, $entryId, &$msg = null)
+	public static function createOriginalFlavorAsset($partnerId, $entryId, $fileExt = null)
 	{
 		$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if ($flavorAsset)
@@ -48,6 +48,11 @@ class kFlowHelper
 		$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
 		$flavorAsset->setPartnerId($partnerId);
 		$flavorAsset->setEntryId($entryId);
+
+		if ($fileExt)
+		{
+			$flavorAsset->setFileExt($fileExt);
+		}
 
 		$flavorAsset->save();
 
@@ -168,14 +173,12 @@ class kFlowHelper
 		$isNewFlavor = false;
 		if(!$flavorAsset)
 		{
-			$msg = null;
-			$flavorAsset = kFlowHelper::createOriginalFlavorAsset($dbBatchJob->getPartnerId(), $dbBatchJob->getEntryId(), $msg);
+			$flavorAsset = kFlowHelper::createOriginalFlavorAsset($dbBatchJob->getPartnerId(), $dbBatchJob->getEntryId());
 			if(!$flavorAsset)
 			{
 				KalturaLog::err("Flavor asset not created for entry [" . $dbBatchJob->getEntryId() . "]");
 				kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
-				$dbBatchJob->setMessage($msg);
-				$dbBatchJob->setDescription($dbBatchJob->getDescription() . "\n" . $msg);
+				$dbBatchJob->setDescription($dbBatchJob->getDescription());
 				return $dbBatchJob;
 			}
 			$isNewFlavor = true;
