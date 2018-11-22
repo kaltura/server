@@ -5,6 +5,14 @@
  */
 class KalturaReportInputBaseFilter extends KalturaObject 
 {
+	private static $map_between_objects = array
+	(
+		'fromDate' => 'from_date',
+		'toDate' => 'to_date',
+		'fromDay' => 'from_day',
+		'toDay' => 'to_day',
+	);
+
 	/**
 	 * Start date as Unix timestamp (In seconds)
 	 * 
@@ -35,46 +43,38 @@ class KalturaReportInputBaseFilter extends KalturaObject
 	
 	
 	
+
+
+
+	protected function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+
 	/**
 	 * @param reportsInputFilter $reportInputFilter
 	 * @return reportsInputFilter
 	 */
-	public function toReportsInputFilter ($reportInputFilter = null)
+	public function toReportsInputFilter($reportInputFilter = null)
 	{
-		if (is_null($reportInputFilter)) 
+		if (!$reportInputFilter)
 			$reportInputFilter = new reportsInputFilter();
-		
+
 		if ($this->fromDay && $this->toDay) {
-			$reportInputFilter->from_date = strtotime(date('Y-m-d 00:00:00', strtotime($this->fromDay)));
-			$reportInputFilter->to_date = strtotime(date('Y-m-d 23:59:59', strtotime($this->toDay)));
-			$reportInputFilter->from_day = $this->fromDay;
-			$reportInputFilter->to_day = $this->toDay;
+			$this->fromDate = strtotime(date('Y-m-d 00:00:00', strtotime($this->fromDay)));
+			$this->toDate = strtotime(date('Y-m-d 23:59:59', strtotime($this->toDay)));
 		} else if ($this->fromDate && $this->toDate) {
-			$reportInputFilter->from_date = $this->fromDate;
-			$reportInputFilter->to_date = $this->toDate;
-			$reportInputFilter->from_day = date ( "Ymd" , $this->fromDate );
-			$reportInputFilter->to_day = date ( "Ymd" , $this->toDate );
-		} else {
-			$reportInputFilter->from_date = $this->fromDate;
-			$reportInputFilter->to_date = $this->toDate;
-			$reportInputFilter->from_day = $this->fromDay;
-			$reportInputFilter->to_day = $this->toDay;
+			$this->fromDay = date ( "Ymd" , $this->fromDate );
+			$this->toDay = date ( "Ymd" , $this->toDate );
 		}
-		
+
+		foreach ($this->getMapBetweenObjects() as $apiName => $memberName)
+		{
+			if (is_numeric($apiName)) {
+				$apiName = $memberName;
+			}
+			$reportInputFilter->$memberName = $this->$apiName;
+		}
 		return $reportInputFilter;
 	}
-	
-	/**
-	 * @param reportsInputFilter $reportInputFilter
-	 * @return KalturaReportInputBaseFilter
-	 */
-	public function fromReportsInputFilter (  $reportInputFilter )
-	{
-		$this->fromDate = $reportInputFilter->from_date ;
-		$this->toDate = $reportInputFilter->to_date ;
-		$this->fromDay = $reportInputFilter->from_day ;
-		$this->toDay = $reportInputFilter->to_day ;
-		
-		return $this;
-	}	
 }
