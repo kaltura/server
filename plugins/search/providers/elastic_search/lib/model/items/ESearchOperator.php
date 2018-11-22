@@ -17,8 +17,8 @@ class ESearchOperator extends ESearchBaseOperator
 
 			if($itemClassName == ESearchNestedOperator::ESEARCH_NESTED_OPERATOR)
 				$queryAttributes->setInitNestedQuery(true);
-
-			$itemClassName::createSearchQuery($itemSearchItems, $boolOperator, $queryAttributes, $operatorType);
+			
+			$subQuery = $itemClassName::createSearchQuery($itemSearchItems, $boolOperator, $queryAttributes, $operatorType);
 			self::addSubQueryToFinalQuery($subQuery, $outQuery, $itemClassName, $boolOperator);
 		}
 
