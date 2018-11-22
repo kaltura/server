@@ -224,6 +224,33 @@
 			return $framesStat;
 		}
 		
+		/********************
+		 * getData
+		 *	Retrieve following chunk stat data - 
+		 */
+		public static function getFrameData($fileName, $startFrom, $duration, $ffprobeBin="ffprobe", $ffmpegBin="ffmpeg")
+		{
+			$outputArr = array();
+			$cmdLine = "$ffmpegBin -ss $startFrom -t $duration -i $fileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type -print_format csv -v quiet - ";
+			KalturaLog::log("head:$cmdLine");
+			$lastLine=exec($cmdLine , $outputArr, $rv);
+			if($rv!=0) {
+				KalturaLog::log("ERROR: failed to extract frame data from chunk ($fileName).");
+				return null;
+			}
+			$statsArr = array();
+			foreach($outputArr as $idx=>$line) {
+				if(strlen($line)>10){
+					list($stam,$pts,$type,$frame) = explode(",",$line);
+					$framesStat = new KChunkFramesStat();
+					$framesStat->start = $pts;
+					$framesStat->type = $type;
+					$framesStat->frame = (int)($frame);
+					$statsArr[] = $framesStat;
+				}
+			}
+			return $statsArr;
+		}
 
 	}
 	
