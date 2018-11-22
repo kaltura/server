@@ -18,7 +18,7 @@ class ESearchNestedOperator extends ESearchBaseOperator
 			list($itemClassName, $itemSearchItems, $operatorType) = self::getParamsFromCategorizedSearchItem($categorizedSearchItem);
 			$queryAttributes->addToNestedOperatorObjectTypes($itemClassName);
 			//call createSearchQuery on child nested object items or nested operator
-			$subQuery = call_user_func_array(array($itemClassName, 'createSearchQuery'), array($itemSearchItems, $boolOperator, $queryAttributes, $operatorType));
+			$itemClassName::createSearchQuery($itemSearchItems, $boolOperator, $queryAttributes, $operatorType);
 			self::addSubQueryToFinalQuery($subQuery, $outQuery, $itemClassName, $boolOperator);
 		}
 
