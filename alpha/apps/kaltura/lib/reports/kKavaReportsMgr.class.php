@@ -403,6 +403,7 @@ class kKavaReportsMgr extends kKavaBase
 				// storage
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
 						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
@@ -426,6 +427,7 @@ class kKavaReportsMgr extends kKavaBase
 				// media entries
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(
 						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
 						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_FLASH)
@@ -550,6 +552,7 @@ class kKavaReportsMgr extends kKavaBase
 				// entries added / deleted
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_DURATION_DELETED_MSEC),
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_DURATION_DELETED_MSEC),
 				),
@@ -557,6 +560,7 @@ class kKavaReportsMgr extends kKavaBase
 				// storage added / deleted
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
 				),
@@ -620,12 +624,14 @@ class kKavaReportsMgr extends kKavaBase
 				// entries added / deleted
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_DURATION_DELETED_MSEC),
 				),
 			
 				// storage added / deleted
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
 				),
 
@@ -699,6 +705,7 @@ class kKavaReportsMgr extends kKavaBase
 
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
 						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
@@ -756,6 +763,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_JOIN_GRAPHS => array(
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(
 						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
@@ -822,6 +830,7 @@ class kKavaReportsMgr extends kKavaBase
 					self::REPORT_JOIN_GRAPHS => array(
 						array(
 							self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+							self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 							self::REPORT_FILTER => array(		// can exclude logical deltas in this report
 								self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 								self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
@@ -898,6 +907,7 @@ class kKavaReportsMgr extends kKavaBase
 
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
 						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
@@ -959,6 +969,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_JOIN_GRAPHS => array(
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
 						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
@@ -994,6 +1005,7 @@ class kKavaReportsMgr extends kKavaBase
 				
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
 						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
@@ -1033,6 +1045,7 @@ class kKavaReportsMgr extends kKavaBase
 				
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
 						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
