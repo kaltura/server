@@ -69,7 +69,7 @@ class BeaconService extends KalturaBaseService
 	}
 
 	/**
-	 * @action SearchScheduledResource
+	 * @action searchScheduledResource
 	 * @param KalturaBeaconSearchParams $searchParams
 	 * @param KalturaPager $pager
 	 * @return KalturaBeaconListResponse
