@@ -60,21 +60,35 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 *
 	 * @var string
 	 */
-	public $devicesIn;
+	public $deviceIn;
 
 	/**
 	 * Filter by country
 	 *
 	 * @var string
 	 */
-	public $countriesIn;
+	public $countryIn;
 
 	/**
 	 * Filter by region
 	 *
 	 * @var string
 	 */
-	public $regionsIn;
+	public $regionIn;
+
+	/**
+	 * Filter by operating system family
+	 *
+	 * @var string
+	 */
+	public $operatingSystemFamilyIn;
+
+	/**
+	 * Filter by browser family
+	 *
+	 * @var string
+	 */
+	public $browserFamilyIn;
 
 	/**
 	 * Time zone offset in minutes
@@ -89,49 +103,34 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 * @var KalturaReportInterval
 	 */
 	public $interval;
-	
+
+	private static $map_between_objects = array
+	(
+		'keywords',
+		'searchInTags' => 'search_in_tags',
+		'searchInAdminTags' => 'search_in_admin_tags',
+		'customVar1In' => 'custom_var1',
+		'customVar2In' => 'custom_var2',
+		'customVar3In' => 'custom_var3',
+		'deviceIn' => 'devices',
+		'countryIn' => 'countries',
+		'regionIn' => 'regions',
+		'operatingSystemFamilyIn' => 'os_families',
+		'browserFamilyIn' => 'browsers_families',
+		'timeZoneOffset',
+		'interval',
+	);
+
+	protected function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+
 	/* (non-PHPdoc)
 	 * @see KalturaReportInputBaseFilter::toReportsInputFilter()
 	 */
 	public function toReportsInputFilter($reportInputFilter = null)
 	{
-		$reportInputFilter = parent::toReportsInputFilter($reportInputFilter);
-		
-		$reportInputFilter->keywords = $this->keywords;
-		$reportInputFilter->search_in_tags= $this->searchInTags;
-		$reportInputFilter->search_in_admin_tags = $this->searchInAdminTags;
-		$reportInputFilter->categories = $this->categories;
-		$reportInputFilter->custom_var1 = $this->customVar1In;
-		$reportInputFilter->custom_var2 = $this->customVar2In;
-		$reportInputFilter->custom_var3 = $this->customVar3In;
-		$reportInputFilter->devices = $this->devicesIn;
-		$reportInputFilter->countries = $this->countriesIn;
-		$reportInputFilter->regions = $this->regionsIn;
-		$reportInputFilter->timeZoneOffset = $this->timeZoneOffset;
-		$reportInputFilter->interval = $this->interval;
-		
-		return $reportInputFilter;
+		return parent::toReportsInputFilter($reportInputFilter);
 	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaReportInputBaseFilter::fromReportsInputFilter()
-	 */
-	public function fromReportsInputFilter($reportInputFilter )
-	{
-		parent::fromReportsInputFilter($reportInputFilter);
-		
-		$this->keywords = $reportInputFilter->keywords ;
-		$this->searchInTags = $reportInputFilter->search_in_tags ;
-		$this->searchInAdminTags = $reportInputFilter->search_in_admin_tags ;
-		$this->categories = $reportInputFilter->categories;
-		$this->customVar1In = $reportInputFilter->custom_var1;
-		$this->customVar2In = $reportInputFilter->custom_var2;
-		$this->customVar3In = $reportInputFilter->custom_var3;
-		$this->devicesIn = $reportInputFilter->devices;
-		$this->countriesIn = $reportInputFilter->countries;
-		$this->regionsIn = $reportInputFilter->regions;
-		$this->timeZoneOffset = $reportInputFilter->timeZoneOffset;
-		
-		return $this;
-	}	
 }
