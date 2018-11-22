@@ -5,14 +5,6 @@
  */
 class KalturaEndUserReportInputFilter extends KalturaReportInputFilter 
 {
-	private static $map_between_objects = array
-	(
-		'application',
-		'userIds',
-		'playbackContext',
-		'ancestorPlaybackContext'
-	);
-
 	/**
 	 * 
 	 * @var string
@@ -37,6 +29,13 @@ class KalturaEndUserReportInputFilter extends KalturaReportInputFilter
 	 */
 	public $ancestorPlaybackContext;
 
+	private static $map_between_objects = array
+	(
+		'application',
+		'userIds',
+		'playbackContext',
+		'ancestorPlaybackContext'
+	);
 
 	protected function getMapBetweenObjects()
 	{

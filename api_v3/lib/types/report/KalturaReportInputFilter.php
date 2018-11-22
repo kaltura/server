@@ -131,9 +131,6 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public function toReportsInputFilter($reportInputFilter = null)
 	{
-		if (!$reportInputFilter)
-			$reportInputFilter = new reportsInputFilter();
-
 		return parent::toReportsInputFilter($reportInputFilter);
 	}
 }
