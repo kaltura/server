@@ -35,7 +35,7 @@ class kESearchCoreAdapter
 		return array($coreResults, $objectCount);
 	}
 
-	private static function getElasticResultAsArray($elasticResults, $queryHighlightsAttribute)
+	public static function getElasticResultAsArray($elasticResults, $queryHighlightsAttribute)
 	{
 		$objectData = array();
 		$objectOrder = array();

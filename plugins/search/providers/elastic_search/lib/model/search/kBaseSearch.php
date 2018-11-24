@@ -45,11 +45,11 @@ abstract class kBaseSearch
     {
         $subQuery = $eSearchOperator::createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
         $this->handleDisplayInSearch();
-        $this->mainBoolQuery->addToMust($subQuery);
+        $this->mainBoolQuery->addToMust($subQuery);//todo
         $this->applyElasticSearchConditions();
         $this->addGlobalHighlights();
         $result = $this->elasticClient->search($this->query, true, true);
-        $this->addSearchTermsToSearchHistory();
+//        $this->addSearchTermsToSearchHistory();
         return $result;
     }
 
@@ -138,7 +138,7 @@ abstract class kBaseSearch
 
     protected function initQueryAttributes($partnerId, $objectId)
     {
-        $this->initPartnerLanguages($partnerId);
+//        $this->initPartnerLanguages($partnerId);
         $this->queryAttributes->setObjectId($objectId);
         $this->initOverrideInnerHits($objectId);
     }
