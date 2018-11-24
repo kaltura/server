@@ -57,7 +57,7 @@ class kEntrySearch extends kBaseSearch
 
         $finalStatuses = array();
         foreach($statuses as $status)
-            $finalStatuses[] = kPluginableEnumsManager::apiToCore($enumType, $status);;
+            $finalStatuses[] = kPluginableEnumsManager::apiToCore($enumType, $status);
 
         return $finalStatuses;
     }
