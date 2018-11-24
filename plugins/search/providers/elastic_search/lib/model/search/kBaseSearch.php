@@ -14,6 +14,8 @@ abstract class kBaseSearch
     protected $queryAttributes;
 	protected $mainBoolQuery;
 
+	protected static $filterOnly = false;
+
     public function __construct()
     {
         $this->elasticClient = new elasticClient();
@@ -41,15 +43,27 @@ abstract class kBaseSearch
 	{
 	}
 
+	public function setFilterOnly()
+	{
+		self::$filterOnly = true;
+	}
+
     protected function execSearch(ESearchOperator $eSearchOperator)
     {
         $subQuery = $eSearchOperator::createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
         $this->handleDisplayInSearch();
-        $this->mainBoolQuery->addToMust($subQuery);//todo
+        if(self::$filterOnly)
+		{
+			$this->mainBoolQuery->addToFilter($subQuery);
+		}
+		else
+		{
+			$this->mainBoolQuery->addToMust($subQuery);
+		}
         $this->applyElasticSearchConditions();
         $this->addGlobalHighlights();
         $result = $this->elasticClient->search($this->query, true, true);
-//        $this->addSearchTermsToSearchHistory();
+        $this->addSearchTermsToSearchHistory();
         return $result;
     }
 
@@ -138,7 +152,7 @@ abstract class kBaseSearch
 
     protected function initQueryAttributes($partnerId, $objectId)
     {
-//        $this->initPartnerLanguages($partnerId);
+        $this->initPartnerLanguages($partnerId);
         $this->queryAttributes->setObjectId($objectId);
         $this->initOverrideInnerHits($objectId);
     }

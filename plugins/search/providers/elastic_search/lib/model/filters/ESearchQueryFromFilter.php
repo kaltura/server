@@ -10,6 +10,7 @@ class ESearchQueryFromFilter
 	/**
 	 *
 	 * @param baseObjectFilter $filter
+	 * @param kPager $pager
 	 */
 	public function runElasticQueryFromFilter(baseObjectFilter $filter, kPager $pager)
 	{
@@ -17,7 +18,7 @@ class ESearchQueryFromFilter
 		foreach($filter->fields as $field => $fieldValue)
 		{
 			//add relevant handeling
-			if ($field == '_order_by' || $field == '_limit') {
+			if ($field == ESearchCaptionAssetItemFilterFields::ORDER_BY || $field == ESearchCaptionAssetItemFilterFields::LIMIT) {
 				continue;
 			}
 
@@ -42,11 +43,15 @@ class ESearchQueryFromFilter
 		$operator->setOperator(ESearchOperatorType::AND_OP);
 		$operator->setSearchItems($this->searchItems);
 		$entrySearch = new kEntrySearch();
+		$entrySearch->setFilterOnly();
 
 		$elasticResults = $entrySearch->doSearch($operator, array(),null, $pager , null);
 
-		list($coreResults, $objectCount) = kESearchCoreAdapter::getElasticResultAsArray($elasticResults,
+		list($coreResults, $objectOrder, $objectCount, $objectHighlight) = kESearchCoreAdapter::getElasticResultAsArray($elasticResults,
 			$entrySearch->getQueryAttributes()->getQueryHighlightsAttributes());
+		$entryIds = array_keys($coreResults);
+
+		return array ($entryIds, $objectCount);
 
 	}
 

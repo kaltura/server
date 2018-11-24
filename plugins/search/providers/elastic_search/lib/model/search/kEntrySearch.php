@@ -53,11 +53,11 @@ class kEntrySearch extends kBaseSearch
 
     protected function initEntryStatuses($statuses)
     {
-//        $enumType = call_user_func(array('KalturaEntryStatus', 'getEnumClass'));
+        $enumType = call_user_func(array('KalturaEntryStatus', 'getEnumClass'));
 
         $finalStatuses = array();
         foreach($statuses as $status)
-            $finalStatuses[] = $status;
+            $finalStatuses[] = kPluginableEnumsManager::apiToCore($enumType, $status);;
 
         return $finalStatuses;
     }
