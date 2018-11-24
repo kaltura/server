@@ -335,27 +335,59 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 
 		$deliveries = DeliveryProfilePeer::doSelect($c);
 
-		$cmp = new DeliveryProfileComparator($isSecured, $cdnHost);
-
 		if($isLive)
 		{
-			$partnersDeliveryProfileIdsByUserOrder = $partner->getLiveDeliveryProfileIds();
+			$partnersDeliveryProfileIdsByFormatUserOrder = $partner->getLiveDeliveryProfileIds();
 		}
 		else
 		{
-			$partnersDeliveryProfileIdsByUserOrder = $partner->getDeliveryProfileIds();
+			$partnersDeliveryProfileIdsByFormatUserOrder = $partner->getDeliveryProfileIds();
 		}
 
-		if(isset( $partnersDeliveryProfileIdsByUserOrder[$deliveryAttributes->getFormat()]))
+		if(isset( $partnersDeliveryProfileIdsByFormatUserOrder[$deliveryAttributes->getFormat()]))
 		{
-			$partnersDeliveryProfileIdsByUserOrder = $partnersDeliveryProfileIdsByUserOrder[$deliveryAttributes->getFormat()];
+			$partnersDeliveryProfileIdsByFormatUserOrder = $partnersDeliveryProfileIdsByFormatUserOrder[$deliveryAttributes->getFormat()];
 		}
 
-		array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $partnersDeliveryProfileIdsByUserOrder);
-		uasort($deliveries, array($cmp, "compare"));
-
+		$deliveries = self::getDeliveriesByUserOrder($deliveries, $partnersDeliveryProfileIdsByFormatUserOrder);
 		return $deliveries;
 	}
+
+	protected static function getDeliveriesByUserOrder($deliveries, $partnersDeliveryProfileIdsByFormatUserOrder)
+	{
+		$orderedPartnerDeliveryProfileIds = self::getOrderedPartnerDeliveryProfileIds($partnersDeliveryProfileIdsByFormatUserOrder);
+
+		foreach ($deliveries as &$deliveryProfile)
+		{
+			$deliveryProfileId = $deliveryProfile->getId();
+			$deliveryProfile->userOrder = $orderedPartnerDeliveryProfileIds[$deliveryProfileId];
+		}
+
+		uasort($deliveries, array('DeliveryProfilePeer', 'compareByDeliveryProfileUserOrder'));
+		return $deliveries;
+	}
+
+	protected static function getOrderedPartnerDeliveryProfileIds($partnersDeliveryProfileIdsByFormatUserOrder)
+	{
+		$deliveryProfileIdToOrderIndex = array();
+		$index = 1;
+		foreach ($partnersDeliveryProfileIdsByFormatUserOrder as $format => $deliveryProfileIds)
+		{
+			foreach($deliveryProfileIds as $deliveryProfileId)
+			{
+				$deliveryProfileIdToOrderIndex[$deliveryProfileId] = $index;
+				$index++;
+			}
+		}
+		KalturaLog::debug("Delivery profile ids after ordering: " . print_r($deliveryProfileIdToOrderIndex, true));
+		return $deliveryProfileIdToOrderIndex;
+	}
+
+	protected static function compareByDeliveryProfileUserOrder(DeliveryProfile $a, DeliveryProfile $b)
+	{
+		return $a->userOrder - $b->userOrder;
+	}
+
 
 	protected static function getDefaultDelivery(Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false, $isLive = false)
 	{
