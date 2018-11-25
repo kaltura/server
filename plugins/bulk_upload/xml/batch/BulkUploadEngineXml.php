@@ -132,7 +132,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$xsdURL = KBatchBase::$kClient->schema->serve($this->getSchemaType());
 		if(KBatchBase::$taskConfig->params->xmlSchemaVersion)
 			$xsdURL .=  "&version=" . KBatchBase::$taskConfig->params->xmlSchemaVersion;
-		$xsd = KCurlWrapper::getContent($xsdURL);
+		$xsd = KCurlWrapper::getContent($xsdURL, null, true);
 		
 		if(!$xdoc->schemaValidateSource($xsd))
 		{
@@ -629,7 +629,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->handleFlavorAndThumbsAdditionalData($entryId, $flavorAssets, $thumbAssets);
 		
 		//Updates the bulk upload result for the given entry (with the status and other data)
-		$updatedEntryBulkUploadResult->errorDescription .= $nonCriticalErrors;
+		$updatedEntryBulkUploadResult->errorDescription = $nonCriticalErrors;
 		$this->updateObjectsResults(array($entry), array($updatedEntryBulkUploadResult));
 	}
 	
@@ -928,7 +928,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		if (isset ($item->categories))
 			$createdEntryBulkUploadResult = $this->createCategoryAssociations($createdEntry->id, $item->categories, $createdEntryBulkUploadResult);
-		$createdEntryBulkUploadResult->errorDescription .= $nonCriticalErrors;
+		$createdEntryBulkUploadResult->errorDescription = $nonCriticalErrors;
 		//Updates the bulk upload result for the given entry (with the status and other data)
 		$this->updateObjectsResults(array($createdEntry), array($createdEntryBulkUploadResult));
 		
@@ -1269,11 +1269,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		if(!empty($categories) && count($categories->children()))
 		{
-			if ($categories->children()[0]->getName() == 'categoryId')
+			$children = $categories->children();
+			if ($children[0]->getName() == 'categoryId')
 			{
 				return $this->createCategoryAssociationsByCategoryIds($entryId, $this->implodeChildElements($categories), $bulkuploadResult, $update);
 			}
-			elseif ($categories->children()[0]->getName() == 'category')
+			elseif ($children[0]->getName() == 'category')
 			{
 				return $this->createCategoryAssociationsByFullNames($entryId, $this->implodeChildElements($categories), $bulkuploadResult, $update);
 			}
@@ -1506,6 +1507,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					$bulkuploadResult->errorDescription .= $singleResponse['message'];
 				}
 			}
+			KBatchBase::$kClient->doMultiRequest();
 		}
 		catch(KalturaException $ex)
 		{
