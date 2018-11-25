@@ -1507,7 +1507,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					$bulkuploadResult->errorDescription .= $singleResponse['message'];
 				}
 			}
-			KBatchBase::$kClient->doMultiRequest();
 		}
 		catch(KalturaException $ex)
 		{
