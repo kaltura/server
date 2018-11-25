@@ -13,6 +13,11 @@
         <sessionType>2</sessionType>
     </session>
 	<multirequest>
+		<request service="responseProfile" action="listAction" partnerId="0">
+			<filter objectType="KalturaResponseProfileFilter">
+				<systemNameEqual>QandA</systemNameEqual>
+			</filter>
+		</request>
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaPushNotificationTemplate">
 				<name>POLLS_PUSH_NOTIFICATIONS</name>
@@ -67,10 +72,13 @@
 						</value>
 					</item>
 				</userParameters>
+				<apiObjectType>KalturaCodeCuePoint</apiObjectType>
+				<objectFormat>1</objectFormat> <!-- KalturaResponseType::RESPONSE_TYPE_JSON -->
+				<responseProfileId>{1:result:objects:0:id}</responseProfileId>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
-			<id>{1:result:id}</id>
+			<id>{2:result:id}</id>
 			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
 		</request>
 	</multirequest>

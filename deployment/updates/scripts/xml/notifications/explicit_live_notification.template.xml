@@ -42,6 +42,7 @@
 				</queueNameParameters>
 				<apiObjectType>KalturaLiveStreamEntry</apiObjectType>
 				<objectFormat>1</objectFormat> <!-- KalturaResponseType::RESPONSE_TYPE_JSON -->
+				<responseProfileId>null</responseProfileId>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
