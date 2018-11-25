@@ -55,28 +55,20 @@ class ZoomHelper
 		}
 		if ($emails)
 		{
-			$extaraUserList = array();
-			//User John.Doe@k.com will be added both as John.Doe@k.com and John.Doe
-			foreach ($emails as $email)
-			{
-				$extaraUserList [] = self::getEmailLocalPart($email);
-			}
-			$emails = array_merge($emails,$extaraUserList);
 			foreach ($emails as $email)
 			{
 				kuserPeer::createUniqueKuserForPartner($dbUser->getPartnerId(), $email);
+				//User John.Doe@k.com will be added both as John.Doe@k.com and John.Doe
+				$emailParts = explode('@',$email);
+				if(count($emailParts)>1)
+				{
+					kuserPeer::createUniqueKuserForPartner($dbUser->getPartnerId(), $emailParts[0]);
+				}
 			}
 			$entry->setEntitledPusersPublish(implode(",", array_unique($emails)));
 		}
 		$entry->save();
 		return $entry->getId();
-	}
-
-
-	protected static function getEmailLocalPart($emailAddress)
-	{
-		$emailParts  = explode('@',$emailAddress);
-		return $emailParts[0];
 	}
 
 	/**
