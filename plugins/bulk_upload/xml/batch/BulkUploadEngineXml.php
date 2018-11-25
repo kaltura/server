@@ -629,7 +629,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->handleFlavorAndThumbsAdditionalData($entryId, $flavorAssets, $thumbAssets);
 		
 		//Updates the bulk upload result for the given entry (with the status and other data)
-		$updatedEntryBulkUploadResult->errorDescription = $nonCriticalErrors;
+		$updatedEntryBulkUploadResult->errorDescription .= $nonCriticalErrors;
 		$this->updateObjectsResults(array($entry), array($updatedEntryBulkUploadResult));
 	}
 	
@@ -928,7 +928,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		if (isset ($item->categories))
 			$createdEntryBulkUploadResult = $this->createCategoryAssociations($createdEntry->id, $item->categories, $createdEntryBulkUploadResult);
-		$createdEntryBulkUploadResult->errorDescription = $nonCriticalErrors;
+		$createdEntryBulkUploadResult->errorDescription .= $nonCriticalErrors;
 		//Updates the bulk upload result for the given entry (with the status and other data)
 		$this->updateObjectsResults(array($createdEntry), array($createdEntryBulkUploadResult));
 		
