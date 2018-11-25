@@ -830,7 +830,6 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_JOIN_REPORTS => array(
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
-					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_METRICS => array(self::EVENT_TYPE_PLAYER_IMPRESSION, self::EVENT_TYPE_PLAY),
 				),
@@ -842,13 +841,11 @@ class kKavaReportsMgr extends kKavaBase
 				),
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
-					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_METRICS => array(self::METRIC_COUNT_TOTAL, self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_SHOW),
 				),
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
-					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
 				),				
@@ -883,7 +880,6 @@ class kKavaReportsMgr extends kKavaBase
 				),
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_TRANSCODING_USAGE,
-					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
 				),
@@ -2613,7 +2609,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		// get the granularity
 		$granularity = isset($report_def[self::REPORT_GRANULARITY]) ? 
-			$report_def[self::REPORT_GRANULARITY] : self::getGranularity($input_filter->interval);
+			$report_def[self::REPORT_GRANULARITY] : self::getGranularityFromFilterInterval($input_filter->interval);
 		
 		$graph_type = isset($report_def[self::REPORT_GRAPH_TYPE]) ? $report_def[self::REPORT_GRAPH_TYPE] : self::GRAPH_BY_DATE_ID;
 		switch ($graph_type)
@@ -3935,7 +3931,7 @@ class kKavaReportsMgr extends kKavaBase
 			count($data));
 	}
 
-	protected static function getGranularity($interval)
+	protected static function getGranularityFromFilterInterval($interval)
 	{
 		if ($interval == reportInterval::MONTHS) 
 		{
