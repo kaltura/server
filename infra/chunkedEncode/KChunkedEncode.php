@@ -171,19 +171,22 @@
 				 */
 			if(isset($this->params->videoFilters->subsFilename)){
 				$subsFileHd = fopen($this->params->videoFilters->subsFilename,'r');
-				if($subsFileHd)
+				if(!$subsFileHd)
 				{
-					$subsArr = array();
-					foreach($this->chunkDataArr as $idx=>$chunkData){
-							/*
-							 * SRT splitting
-							 */
-						$chunkSrtFile = $this->getChunkName($chunkData->index,"srt");
-						if(file_exists($chunkSrtFile))
-							unlink($chunkSrtFile);
-						KSrtText::SplitSrtFile($subsFileHd, $chunkSrtFile, $chunkData->start, $chunkData->duration, $subsArr);
-						KalturaLog::log("$chunkSrtFile, $chunkData->start, $chunkData->duration");
-					}
+					KalturaLog::log('ERROR: missing caption file ['.$this->params->videoFilters->subsFilename.'] - exsiting.');
+					return false;
+					
+				}
+				$subsArr = array();
+				foreach($this->chunkDataArr as $idx=>$chunkData){
+						/*
+						 * SRT splitting
+						 */
+					$chunkSrtFile = $this->getChunkName($chunkData->index,"srt");
+					if(file_exists($chunkSrtFile))
+						unlink($chunkSrtFile);
+					KSrtText::SplitSrtFile($subsFileHd, $chunkSrtFile, $chunkData->start, $chunkData->duration, $subsArr);
+					KalturaLog::log("$chunkSrtFile, $chunkData->start, $chunkData->duration");
 				}
 			}
 			
