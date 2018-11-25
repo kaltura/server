@@ -322,7 +322,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 			throw $e;
 		}
 
-		$lock->unlock();
+		if ($lock)
+		{
+			$lock->unlock();
+		}
 
 		return $recordedEntry;
 	}

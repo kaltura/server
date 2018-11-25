@@ -319,7 +319,8 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		
 		$prefix = '@' . MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ';
 		
-		if(is_null($partnerScope) || (count($partnerScope) != 1)) {
+		if(is_null($partnerScope) || (is_array($partnerScope) && count($partnerScope) != 1))
+		{
 			return $prefix . MetadataSearchFilter::createSphinxSearchCondition(null, $text, false);
 		}
 		

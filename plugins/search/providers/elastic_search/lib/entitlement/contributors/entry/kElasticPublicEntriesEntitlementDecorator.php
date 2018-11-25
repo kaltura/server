@@ -20,7 +20,7 @@ class kElasticPublicEntriesEntitlementDecorator implements IKalturaESearchEntryE
 		$condition = new kESearchBoolQuery();
 		$statuses = $params['category_statues'];
 		$statuses = array_map('elasticSearchUtils::formatCategoryEntryStatus', $statuses);
-		$termsQuery = new kESearchTermsQuery("{$fieldPrefix}category_ids", $statuses);
+		$termsQuery = new kESearchTermsQuery($fieldPrefix . ESearchBaseCategoryEntryItem::CATEGORY_IDS_MAPPING_FIELD, $statuses);
 		$condition->addToMustNot($termsQuery);
 		return $condition;
 	}

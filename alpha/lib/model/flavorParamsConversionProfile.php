@@ -75,5 +75,9 @@ class flavorParamsConversionProfile extends BaseflavorParamsConversionProfile
         public function getTags()           	{return $this->getFromCustomData('Tags', null, null);}
 
 	public function setChunkedEncodeMode($v){ $this->putInCustomData('ChunkedEncodeMode', $v);}
-	public function getChunkedEncodeMode()        {return $this->getFromCustomData('ChunkedEncodeMode', null, null);}
+	public function getChunkedEncodeMode()	{return $this->getFromCustomData('ChunkedEncodeMode', null, null);}
+	
+		// JSON string containing an array of flavotParams field-value pairs.
+	public function setOverloadParams($v)	{$this->putInCustomData('OverloadParams', $v);}
+	public function getOverloadParams()	{return $this->getFromCustomData('OverloadParams', null, null);}
 }

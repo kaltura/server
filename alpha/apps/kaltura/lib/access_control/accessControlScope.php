@@ -15,7 +15,13 @@ class accessControlScope extends kScope
 	 * @var asset
 	 */
 	protected $asset;
-	
+
+	/**
+	 * @var array
+	 */
+	protected $outputVars;
+
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -49,4 +55,35 @@ class accessControlScope extends kScope
 	public function setAsset($asset) {
 		$this->asset = $asset;
 	}
+
+	/**
+	 * @return array
+	 */
+	public function getOutputVars()
+	{
+		if (is_null($this->outputVars))
+		{
+			return array();
+		}
+		return $this->outputVars;
+	}
+
+	/**
+	 * @param array $outputVars
+	 */
+	public function setOutputVar($fieldName, $value)
+	{
+		$this->outputVars[$fieldName] = $value;
+	}
+
+
+	public function getOutputVarByName($fieldName)
+	{
+		if (isset($this->outputVars[$fieldName]))
+		{
+			return $this->outputVars[$fieldName];
+		}
+		return null;
+	}
+
 }

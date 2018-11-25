@@ -5,7 +5,6 @@
  */
 class KalturaEndUserReportInputFilter extends KalturaReportInputFilter 
 {
-	
 	/**
 	 * 
 	 * @var string
@@ -29,27 +28,25 @@ class KalturaEndUserReportInputFilter extends KalturaReportInputFilter
 	 * @var string
 	 */
 	public $ancestorPlaybackContext;
-	
-	
-	public function toReportsInputFilter ($reportsInputFilter = null)
+
+	private static $map_between_objects = array
+	(
+		'application',
+		'userIds',
+		'playbackContext',
+		'ancestorPlaybackContext'
+	);
+
+	protected function getMapBetweenObjects()
 	{
-		$endUserReportsInputFilter = new endUserReportsInputFilter();
-		parent::toReportsInputFilter($endUserReportsInputFilter);
-		$endUserReportsInputFilter->application = $this->application;
-		$endUserReportsInputFilter->userIds = $this->userIds;
-		$endUserReportsInputFilter->playbackContext = $this->playbackContext;
-		$endUserReportsInputFilter->ancestorPlaybackContext = $this->ancestorPlaybackContext;
-			
-		return $endUserReportsInputFilter;
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-	
-	public function fromReportsInputFilter (  $endUserReportsInputFilter )
+
+	public function toReportsInputFilter($reportsInputFilter = null)
 	{
-		parent::fromReportsInputFilter($endUserReportsInputFilter);
-		$this->application = $endUserReportsInputFilter->application ;
-		$this->userIds = $endUserReportsInputFilter->userIds ;
-		$this->playbackContext = $endUserReportsInputFilter->playbackContext;	
-		$this->ancestorPlaybackContext = $endUserReportsInputFilter->ancestorPlaybackContext;	
-		return $this;
-	}	
+		if (!$reportsInputFilter)
+			$reportsInputFilter = new endUserReportsInputFilter();
+
+		return parent::toReportsInputFilter($reportsInputFilter);
+	}
 }

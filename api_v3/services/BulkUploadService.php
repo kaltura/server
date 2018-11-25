@@ -207,7 +207,7 @@ class BulkUploadService extends KalturaBaseService
 	
 	
 	/**
-	 * serveLog action returan the original file.
+	 * serveLog action return the original file.
 	 * 
 	 * @action serveLog
 	 * @param bigint $id job id

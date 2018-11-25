@@ -8,6 +8,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	const ARF_FORMAT = 'ARF';
 	const MAX_QUERY_DATE_RANGE_DAYS = 25; //Maximum querying date range is 28 days we define it as less than that
 	const MIN_TIME_BEFORE_HANDLING_UPLOADING = 60; //the time in seconds
+	const ADMIN_TAG_WEBEX = 'webexentry';
 	private static $unsupported_file_formats = array('WARF');
 	private $serviceTypes = null;
 	private $dropFolderFilesMap = null;
@@ -376,6 +377,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		$newEntry->userId = $data->parsedUserId ? $data->parsedUserId : $this->retrieveUserFromWebexHostId($data, $folder);
 		$newEntry->creatorId = $newEntry->userId;
 		$newEntry->referenceId = $data->parsedSlug;
+		$newEntry->adminTags = self::ADMIN_TAG_WEBEX;
 			
 		KBatchBase::$kClient->startMultiRequest();
 		$addedEntry = KBatchBase::$kClient->media->add($newEntry, null);

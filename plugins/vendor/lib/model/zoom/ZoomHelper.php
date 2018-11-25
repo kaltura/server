@@ -26,6 +26,8 @@ class ZoomHelper
 	/** php body */
 	const PHP_INPUT = 'php://input';
 
+	const ADMIN_TAG_ZOOM = 'zoomentry';
+
 	/**
 	 * @param kuser $dbUser
 	 * @param string $zoomCategory
@@ -46,7 +48,7 @@ class ZoomHelper
 		$entry->setPuserId($dbUser->getPuserId());
 		$entry->setKuserId($dbUser->getKuserId());
 		$entry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($dbUser->getPartnerId())->getId());
-		$entry->setAdminTags('zoom');
+		$entry->setAdminTags(self::ADMIN_TAG_ZOOM);
 		if ($zoomCategory)
 		{
 			$entry->setCategories($zoomCategory);
@@ -128,10 +130,15 @@ class ZoomHelper
 			{
 				$page = str_replace('@defaultUserID@', $zoomIntegration->getDefaultUserEMail() , $page);
 				$page = str_replace('@zoomCategory@', $zoomIntegration->getZoomCategory() ? $zoomIntegration->getZoomCategory()  : 'Zoom Recordings'  , $page);
+				$page = str_replace('@enableRecordingUpload@', $zoomIntegration->getStatus()== VendorStatus::ACTIVE ? 'checked'  : ''  , $page);
+				$page = str_replace('@createUserIfNotExist@', $zoomIntegration->getCreateUserIfNotExist() ? 'checked'  : ''  , $page);
 			}
-			else {
+			else
+			{
 				$page = str_replace('@defaultUserID@', '' , $page);
-				$page = str_replace('@zoomCategory@', 'Zoom Recordings' , $page);
+				$page = str_replace('@zoomCategory@', 'Zoom Recordings', $page);
+				$page = str_replace('@enableRecordingUpload@', 'checked', $page);
+				$page = str_replace('@createUserIfNotExist@', 'checked', $page);
 			}
 			$page = str_replace('@accountId@', $accountId , $page);
 			echo $page;
@@ -245,8 +252,59 @@ class ZoomHelper
 				}
 			}
 		}
+
 		return $emails;
 	}
+
+	/**
+	 * @param $emails
+	 * @param $partnerId
+	 * @param $createIfNoFound
+	 * @return array
+	 */
+	public static function getValidatedUsers($emails, $partnerId, $createIfNotFound)
+	{
+		$validatedEmails=array();
+		foreach ($emails as $usersEmail)
+		{
+			if(kuserPeer::getKuserByPartnerAndUid($partnerId, $usersEmail, true))
+			{
+				$validatedEmails[] = $usersEmail;
+			}
+			elseif($createIfNotFound)
+			{
+				kuserPeer::createKuserForPartner($partnerId, $usersEmail);
+				$validatedEmails[] = $usersEmail;
+			}
+		}
+		return $validatedEmails;
+	}
+
+	/**
+	 * @param $hostEmail
+	 * @param $defaultHostEmail
+	 * @param $partnerId
+	 * @param $createIfNotFound
+	 * @return kuser
+	 */
+	public static function getEntryOwner($hostEmail, $defaultHostEmail, $partnerId, $createIfNotFound)
+	{
+		$dbUser = kuserPeer::getKuserByPartnerAndUid($partnerId, $hostEmail, true);
+		if (!$dbUser)
+		{
+			if($createIfNotFound)
+			{
+				$dbUser = kuserPeer::createKuserForPartner($partnerId, $hostEmail);
+			}
+			else//get the default user that will be the owner if the entry.
+			{
+				$dbUser = kuserPeer::getKuserByPartnerAndUid($partnerId, $defaultHostEmail, true);
+			}
+		}
+		return $dbUser;
+	}
+
+
 
 	/**
 	 * @return array
@@ -332,23 +390,21 @@ class ZoomHelper
 	/**
 	 * @param int $partnerId
 	 * @param string $categoryFullName
+	 * @param bool $createIfNotExist
 	 * @throws Exception
 	 * @return int id;
 	 */
-	public static function createCategoryForZoom($partnerId, $categoryFullName)
+	public static function createCategoryForZoom($partnerId, $categoryFullName, $createIfNotExist = true)
 	{
-		//Validate category full name does not contain spacial chars
-		$tempCategoryFullName = categoryPeer::getParsedFullName($categoryFullName);
-		if(strcmp($tempCategoryFullName, $categoryFullName))
-		{
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_NAME_CONTAINS_INVALID_CHARS);
-		}
-
 		$category = categoryPeer::getByFullNameExactMatch($categoryFullName, null, $partnerId);
 		if($category)
 		{
 			KalturaLog::debug('Category: ' . $categoryFullName . ' already exist for partner: ' . $partnerId);
 			return $category->getId();
+		}
+		if(!$createIfNotExist)
+		{
+			return null;
 		}
 
 		$categoryDb = new category();

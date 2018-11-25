@@ -107,7 +107,17 @@ abstract class KalturaServerNode extends KalturaObject implements IFilterable, I
 	 * @filter like,mlikeor,mlikeand
 	 */
 	public $parentId;
-	
+
+	/**
+	 * Environment
+	 *
+	 * @var string
+	 * @filter eq,in
+	 */
+	public $environment;
+
+
+
 	private static $map_between_objects = array
 	(
 		"id",
@@ -123,7 +133,8 @@ abstract class KalturaServerNode extends KalturaObject implements IFilterable, I
 		"type",
 		"tags",
 		"dc",
-		"parentId"
+		"parentId",
+		"environment",
 	);
 	
 	/* (non-PHPdoc)

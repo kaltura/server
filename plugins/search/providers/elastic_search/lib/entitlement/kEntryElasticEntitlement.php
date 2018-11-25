@@ -101,9 +101,9 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
 
         if(self::$kuserId)
         {
-            $privacy = array(category::formatPrivacy(PrivacyType::ALL, self::$partnerId));
+            $privacy = array(PrivacyType::ALL);
             if($ks && !$ks->isAnonymousSession())
-                $privacy[] = category::formatPrivacy(PrivacyType::AUTHENTICATED_USERS, self::$partnerId);
+                $privacy[] = PrivacyType::AUTHENTICATED_USERS;
 
             self::$privacy = $privacy;
             self::$filteredCategoryIds = array();

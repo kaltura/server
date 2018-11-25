@@ -25,13 +25,16 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_DOMAIN = 'urlParts.domain';
 	const DIMENSION_URL = 'urlParts.canonicalUrl';
 	const DIMENSION_KUSER_ID = 'kuserId';
-	const DIMENSION_USER_IS_ADMIN = 'userIsAdmin';
+	const DIMENSION_USER_TYPE = 'userType';
 	const DIMENSION_APPLICATION = 'application';
 	const DIMENSION_DEVICE = 'userAgent.device';
 	const DIMENSION_OS = 'userAgent.operatingSystem';
+	const DIMENSION_OS_FAMILY = 'userAgent.operatingSystemFamily';
 	const DIMENSION_BROWSER = 'userAgent.browser';
+	const DIMENSION_BROWSER_FAMILY = 'userAgent.browserFamily';
 	const DIMENSION_PLAYBACK_CONTEXT = 'playbackContext';
 	const DIMENSION_PLAYBACK_TYPE = 'playbackType';
+	const DIMENSION_SERVER_NODE_IDS = 'serverNodeIds';
 	const DIMENSION_CATEGORIES = 'categories';
 	const DIMENSION_EVENT_TYPE = 'eventType';
 	const DIMENSION_HAS_BITRATE = 'hasBitrate';
@@ -45,6 +48,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_CUSTOM_VAR1 = 'customVar1';
 	const DIMENSION_CUSTOM_VAR2 = 'customVar2';
 	const DIMENSION_CUSTOM_VAR3 = 'customVar3';
+	const DIMENSION_TYPE = 'type';
 
 	// metrics
 	const METRIC_COUNT = 'count';

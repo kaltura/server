@@ -99,12 +99,10 @@ class DocumentsService extends KalturaEntryService
 		$te->setDescription(__METHOD__ . ":" . __LINE__ . "::ENTRY_MEDIA_SOURCE_FILE");
 		TrackEntry::addTrackEntry( $te );
     
-		$msg = null;
-		
-		$flavorAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId(), $msg);
+		$flavorAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		if(!$flavorAsset)
 		{
-			KalturaLog::err("Flavor asset not created for entry [" . $dbEntry->getId() . "] reason [$msg]");
+			KalturaLog::err("Flavor asset not created for entry [" . $dbEntry->getId() . "]");
 			
 			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
 			$dbEntry->save();
@@ -114,6 +112,8 @@ class DocumentsService extends KalturaEntryService
 			$ext = pathinfo($entryFullPath, PATHINFO_EXTENSION);	
 			KalturaLog::info("Uploaded file extension: $ext");
 			$flavorAsset->setFileExt($ext);
+			$size = kFileBase::fileSize($entryFullPath);
+			$flavorAsset->setSize($size);
 			$flavorAsset->save();
 			
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);

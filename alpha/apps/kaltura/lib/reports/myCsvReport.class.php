@@ -74,9 +74,9 @@ class myCsvReport
 			$csv->addNewLine( "" );
 			$csv->addNewLine( "# ------------------------------------" );
 			$csv->addNewLine( "# Total" );
-			$csv->addNewLine( "# ------------------------------------" );		
-			$csv->addNewLine( $total_dictionary /* $total_header */);
-			$csv->addNewLine( $total_data );
+			$csv->addNewLine( "# ------------------------------------" );
+			$csv->addNewLine($total_dictionary/* $total_header */);
+			$csv->addNewLine(array_slice($total_data, 0, count($total_dictionary)));
 		}
 		
 		
@@ -85,11 +85,12 @@ class myCsvReport
 			$csv->addNewLine( "" );
 			$csv->addNewLine( "# ------------------------------------" );
 			$csv->addNewLine( "# Table" , "" , "Total Count" , $table_total_count );
-			$csv->addNewLine( "# ------------------------------------" );		
+			$csv->addNewLine( "# ------------------------------------" );
+			$table_headers_count = count($table_dictionary);
 			$csv->addNewLine( $table_dictionary /* $table_header */);
 			foreach ( $table_data as $row )
 			{
-				$csv->addNewLine( $row );
+				$csv->addNewLine(array_slice($row, 0, $table_headers_count));
 			}
 		}
 		

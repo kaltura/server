@@ -146,14 +146,8 @@ class kReachUtils
 	
 	public static function isEntryTypeSupported($type)
 	{
-		switch ($type)
-		{
-			case entryType::MEDIA_CLIP:
-				return true;
-			
-			default:
-				return false;
-		}
+		$supportedTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP);
+		return in_array($type, $supportedTypes);
 	}
 
 	public static function reachStrToTime($offset , $value)

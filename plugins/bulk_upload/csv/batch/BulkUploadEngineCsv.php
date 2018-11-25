@@ -52,6 +52,13 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 		KalturaLog::info("Opened file: $filePath");
 		
 		$columns = $this->getV1Columns();
+
+		//removing UTF-8 BOM if exists
+		if (fread($fileHandle,3) != pack('CCC',0xef,0xbb,0xbf))
+		{
+			fseek($fileHandle,0);
+		}
+
 		$values = fgetcsv($fileHandle);
 		while($values)
 		{
@@ -60,10 +67,7 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
                 $values = fgetcsv($fileHandle);
                 continue;
             }
-			//removing UTF-8 BOM if exists
-			if(substr($values[0], 0,3) == pack('CCC',0xef,0xbb,0xbf)) {
-       			 $values[0]=substr($values[0], 3);
-    		}
+
 			// use version 3 (dynamic columns cassiopeia) identified by * in first char
 			if(substr(trim($values[0]), 0, 1) == '*') // is a remark
 			{
@@ -237,4 +241,32 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 	}
 	
 	abstract protected function getUploadResultInstance ();
+
+	protected function setResultValues($columns, $values, &$bulkUploadResult)
+	{
+		foreach($columns as $index => $column)
+		{
+			if(!is_numeric($index))
+			{
+				continue;
+			}
+			if(iconv_strlen($values[$index], 'UTF-8'))
+			{
+				$bulkUploadResult->$column = $values[$index];
+				KalturaLog::info("Set value $column [{$bulkUploadResult->$column}]");
+			}
+			else
+			{
+				KalturaLog::info("Value $column is empty");
+			}
+		}
+	}
+
+	protected function handleResultError(&$bulkUploadResult, $type, $description)
+	{
+		$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+		$bulkUploadResult->errorType = $type;
+		$bulkUploadResult->errorDescription = $description;
+	}
+
 }

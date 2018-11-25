@@ -23,10 +23,10 @@ class kFlowHelper
 	/**
 	 * @param int $partnerId
 	 * @param string $entryId
-	 * @param string $msg
+	 * @param string $fileExt
 	 * @return flavorAsset
 	 */
-	public static function createOriginalFlavorAsset($partnerId, $entryId, &$msg = null)
+	public static function createOriginalFlavorAsset($partnerId, $entryId, $fileExt = null)
 	{
 		$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if ($flavorAsset)
@@ -48,6 +48,11 @@ class kFlowHelper
 		$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
 		$flavorAsset->setPartnerId($partnerId);
 		$flavorAsset->setEntryId($entryId);
+
+		if ($fileExt)
+		{
+			$flavorAsset->setFileExt($fileExt);
+		}
 
 		$flavorAsset->save();
 
@@ -168,14 +173,12 @@ class kFlowHelper
 		$isNewFlavor = false;
 		if(!$flavorAsset)
 		{
-			$msg = null;
-			$flavorAsset = kFlowHelper::createOriginalFlavorAsset($dbBatchJob->getPartnerId(), $dbBatchJob->getEntryId(), $msg);
+			$flavorAsset = kFlowHelper::createOriginalFlavorAsset($dbBatchJob->getPartnerId(), $dbBatchJob->getEntryId());
 			if(!$flavorAsset)
 			{
 				KalturaLog::err("Flavor asset not created for entry [" . $dbBatchJob->getEntryId() . "]");
 				kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
-				$dbBatchJob->setMessage($msg);
-				$dbBatchJob->setDescription($dbBatchJob->getDescription() . "\n" . $msg);
+				$dbBatchJob->setDescription($dbBatchJob->getDescription());
 				return $dbBatchJob;
 			}
 			$isNewFlavor = true;
@@ -722,6 +725,7 @@ class kFlowHelper
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
+
 		// verifies that flavor asset created
 		if(!$data->getFlavorAssetId())
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
@@ -730,6 +734,8 @@ class kFlowHelper
 		// verifies that flavor asset exists
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+
+		self::validateSourceFileSync($data->getSrcFileSyncs());
 
 		$shouldSave = false;
 		if(!is_null($data->getEngineMessage())) {
@@ -787,6 +793,29 @@ class kFlowHelper
 		}
 		return $dbBatchJob;
 	}
+
+	protected static function validateSourceFileSync($sourceFileSyncDescriptors)
+	{
+		//validate that the source is still the same
+		/* @var  $sourceFileSyncDescriptor kSourceFileSyncDescriptor*/
+		foreach ($sourceFileSyncDescriptors as $sourceFileSyncDescriptor)
+		{
+			$srcAssetId = $sourceFileSyncDescriptor->getAssetId();
+			$originalFlavor = assetPeer::retrieveById($srcAssetId);
+			if($originalFlavor)
+			{
+				$fileSyncKey = $originalFlavor->getSyncKey($sourceFileSyncDescriptor->getFileSyncObjectSubType());
+				$currentSourceFileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($fileSyncKey);
+				$currentSourceFilePath = $currentSourceFileSync->getFilePath();
+				$originalSrcPath = $sourceFileSyncDescriptor->getFileSyncLocalPath();
+				if (!empty($currentSourceFilePath) && strcmp(basename($currentSourceFilePath), basename($originalSrcPath)))
+				{
+					throw new APIException(KalturaErrors::SOURCE_FLAVOR_CHANGED_DURING_CONVERSION, $currentSourceFilePath, $originalSrcPath, $srcAssetId);
+				}
+			}
+		}
+	}
+
 	private static function handleFlavorAssetConvertFinished(flavorAsset $flavorAsset, flavorParamsOutput $flavorParamsOutput, BatchJob $dbBatchJob, kConvertJobData $data)
 	{
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
