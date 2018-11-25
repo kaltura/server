@@ -348,6 +348,11 @@ class kUploadTokenMgr
 	static protected function appendChunk($sourceFilePath, $targetFileResource)
 	{
 		$sourceFileResource = fopen($sourceFilePath, 'rb');
+		if(!$sourceFileResource)
+		{
+			KalturaLog::err("Could not open file [{$sourceFilePath}] for read");
+			return;
+		}
 		
 		while (! feof($sourceFileResource)) {
 			$data = fread($sourceFileResource, 1024 * 100);
