@@ -208,7 +208,7 @@ class kKavaReportsMgr extends kKavaBase
 		myReportsMgr::REPORT_TYPE_CITIES,
 		myReportsMgr::REPORT_TYPE_OPERATING_SYSTEMS_FAMILIES,
 		myReportsMgr::REPORT_TYPE_BROWSERS_FAMILIES,
-                myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT_TIMELINE,
+		myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT_TIMELINE,
 	);
 	
 	protected static $reports_def = array(
