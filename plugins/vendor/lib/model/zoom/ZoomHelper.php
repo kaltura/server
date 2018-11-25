@@ -59,9 +59,9 @@ class ZoomHelper
 			{
 				kuserPeer::createUniqueKuserForPartner($dbUser->getPartnerId(), $email);
 				//User John.Doe@k.com will be added both as John.Doe@k.com and John.Doe
-				$emailParts = explode('@',$email);
-				if(count($emailParts)>1)
+				if(kString::isEmailString($email))
 				{
+					$emailParts = explode('@',$email);
 					kuserPeer::createUniqueKuserForPartner($dbUser->getPartnerId(), $emailParts[0]);
 				}
 			}
