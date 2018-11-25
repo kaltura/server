@@ -175,7 +175,6 @@
 				{
 					KalturaLog::log('ERROR: missing caption file ['.$this->params->videoFilters->subsFilename.'] - exsiting.');
 					return false;
-					
 				}
 				$subsArr = array();
 				foreach($this->chunkDataArr as $idx=>$chunkData){
