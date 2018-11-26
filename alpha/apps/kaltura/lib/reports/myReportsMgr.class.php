@@ -1513,6 +1513,7 @@ class reportsInputFilter
 	public $timeZoneOffset;
 	public $interval;
 	public $countries;
+	public $server_node_ids;
 	public $regions;
 	public $devices;
 	public $os_families;
