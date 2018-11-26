@@ -3160,7 +3160,11 @@ class kKavaReportsMgr extends kKavaBase
 					$result[self::METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB] = 
 						self::getAverageAggregatedMonthly($graphs[self::METRIC_AVERAGE_STORAGE_MB]);
 				}
-				
+
+				foreach ($result as $key => $value)
+				{
+					$result[$key] = array($value);
+				}
 				return $result;
 				
 			// Note: no need to do anything for 'days', input data is already per day
@@ -3933,11 +3937,15 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function getGranularityFromFilterInterval($interval)
 	{
-		if ($interval == reportInterval::MONTHS) 
+		switch ($interval)
 		{
-			return self::GRANULARITY_MONTH;
+			case self::INTERVAL_MONTHS:
+				return self::GRANULARITY_MONTH;
+			case self::INTERVAL_ALL:
+				return self::DRUID_GRANULARITY_ALL;
+			default:
+				return self::GRANULARITY_DAY;
 		}
-		return self::GRANULARITY_DAY;
 	}
 
 	protected static function getTotalTableCount($partner_id, $report_def, reportsInputFilter $input_filter, $intervals, $druid_filter, $dimension, $object_ids = null)
@@ -4837,7 +4845,7 @@ class kKavaReportsMgr extends kKavaBase
 				(!isset($report_def[self::REPORT_DIMENSION]) && isset($report_def[self::REPORT_GRAPH_METRICS])))
 		{
 			$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
-			$result = array(array_keys($result), array_values($result));
+			$result = array(array_keys($result), array_map('reset', array_values($result)));
 		}
 		else if (isset($report_def[self::REPORT_JOIN_REPORTS]))
 		{

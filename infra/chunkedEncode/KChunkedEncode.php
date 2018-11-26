@@ -171,8 +171,10 @@
 				 */
 			if(isset($this->params->videoFilters->subsFilename)){
 				$subsFileHd = fopen($this->params->videoFilters->subsFilename,'r');
-				if(!isset($subsFileHd)){
-					break;
+				if(!$subsFileHd)
+				{
+					KalturaLog::log('ERROR: missing caption file ['.$this->params->videoFilters->subsFilename.'] - exsiting.');
+					return false;
 				}
 				$subsArr = array();
 				foreach($this->chunkDataArr as $idx=>$chunkData){
