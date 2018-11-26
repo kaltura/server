@@ -208,6 +208,7 @@ class kKavaReportsMgr extends kKavaBase
 		myReportsMgr::REPORT_TYPE_CITIES,
 		myReportsMgr::REPORT_TYPE_OPERATING_SYSTEMS_FAMILIES,
 		myReportsMgr::REPORT_TYPE_BROWSERS_FAMILIES,
+		myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT_TIMELINE,
 	);
 	
 	protected static $reports_def = array(
@@ -406,6 +407,7 @@ class kKavaReportsMgr extends kKavaBase
 				// bandwidth
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB, self::METRIC_ORIGIN_BANDWIDTH_SIZE_MB),
 				),
@@ -413,6 +415,7 @@ class kKavaReportsMgr extends kKavaBase
 				// transcoding
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_TRANSCODING_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
 				),
@@ -420,6 +423,7 @@ class kKavaReportsMgr extends kKavaBase
 				// storage
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
 						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
@@ -443,6 +447,7 @@ class kKavaReportsMgr extends kKavaBase
 				// media entries
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(
 						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
 						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_FLASH)
@@ -466,6 +471,7 @@ class kKavaReportsMgr extends kKavaBase
 				// named users
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_USER_LIFECYCLE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
 						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
@@ -489,6 +495,7 @@ class kKavaReportsMgr extends kKavaBase
 				// plays
 				array(
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION),
 				),
 			),
@@ -567,6 +574,7 @@ class kKavaReportsMgr extends kKavaBase
 				// entries added / deleted
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_DURATION_DELETED_MSEC),
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_DURATION_DELETED_MSEC),
 				),
@@ -574,6 +582,7 @@ class kKavaReportsMgr extends kKavaBase
 				// storage added / deleted
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
 				),
@@ -637,15 +646,17 @@ class kKavaReportsMgr extends kKavaBase
 				// entries added / deleted
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_DURATION_DELETED_MSEC),
 				),
 			
 				// storage added / deleted
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
 				),
-			
+
 				// entries total
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
@@ -704,18 +715,21 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_JOIN_GRAPHS => array(
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
 				),
 				
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_TRANSCODING_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
 				),
 
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
 						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
@@ -773,6 +787,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_JOIN_GRAPHS => array(
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(
 						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
@@ -839,6 +854,7 @@ class kKavaReportsMgr extends kKavaBase
 					self::REPORT_JOIN_GRAPHS => array(
 						array(
 							self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+							self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 							self::REPORT_FILTER => array(		// can exclude logical deltas in this report
 								self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 								self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
@@ -903,18 +919,21 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_JOIN_GRAPHS => array(
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_TRANSCODING_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
 				),
 
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
 				),
 
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
 						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
@@ -976,6 +995,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_JOIN_GRAPHS => array(
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
 						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
@@ -1006,11 +1026,13 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_JOIN_GRAPHS => array(
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB, self::METRIC_BANDWIDTH_SIZE_KB),
 				),
 				
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
 						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
@@ -1045,11 +1067,13 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_JOIN_GRAPHS => array(
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_KB),
 				),
 				
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
 						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
@@ -1102,6 +1126,11 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_DIMENSION => self::DIMENSION_LOCATION_CITY,
 			self::REPORT_DIMENSION_HEADERS => array('object_id', 'city'),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
+		),
+
+		myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT_TIMELINE => array(
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
 		),
 	);
 	
@@ -1952,7 +1981,7 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function getKuserIds($report_def, $puser_ids, $partner_id)
 	{
 		$result = array();
-		
+
 		// leave error ids as is
 		$puser_ids = explode(',', $puser_ids);
 		foreach ($puser_ids as $index => $id)
@@ -2580,7 +2609,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		// get the granularity
 		$granularity = isset($report_def[self::REPORT_GRANULARITY]) ? 
-			$report_def[self::REPORT_GRANULARITY] : self::GRANULARITY_DAY;
+			$report_def[self::REPORT_GRANULARITY] : self::getGranularityFromFilterInterval($input_filter->interval);
 		
 		$graph_type = isset($report_def[self::REPORT_GRAPH_TYPE]) ? $report_def[self::REPORT_GRAPH_TYPE] : self::GRAPH_BY_DATE_ID;
 		switch ($graph_type)
@@ -3131,7 +3160,11 @@ class kKavaReportsMgr extends kKavaBase
 					$result[self::METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB] = 
 						self::getAverageAggregatedMonthly($graphs[self::METRIC_AVERAGE_STORAGE_MB]);
 				}
-				
+
+				foreach ($result as $key => $value)
+				{
+					$result[$key] = array($value);
+				}
 				return $result;
 				
 			// Note: no need to do anything for 'days', input data is already per day
@@ -3900,6 +3933,19 @@ class kKavaReportsMgr extends kKavaBase
 			$headers, 
 			array_slice($data, ($page_index - 1) * $page_size, $page_size), 
 			count($data));
+	}
+
+	protected static function getGranularityFromFilterInterval($interval)
+	{
+		switch ($interval)
+		{
+			case self::INTERVAL_MONTHS:
+				return self::GRANULARITY_MONTH;
+			case self::INTERVAL_ALL:
+				return self::DRUID_GRANULARITY_ALL;
+			default:
+				return self::GRANULARITY_DAY;
+		}
 	}
 
 	protected static function getTotalTableCount($partner_id, $report_def, reportsInputFilter $input_filter, $intervals, $druid_filter, $dimension, $object_ids = null)
@@ -4799,7 +4845,7 @@ class kKavaReportsMgr extends kKavaBase
 				(!isset($report_def[self::REPORT_DIMENSION]) && isset($report_def[self::REPORT_GRAPH_METRICS])))
 		{
 			$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
-			$result = array(array_keys($result), array_values($result));
+			$result = array(array_keys($result), array_map('reset', array_values($result)));
 		}
 		else if (isset($report_def[self::REPORT_JOIN_REPORTS]))
 		{
