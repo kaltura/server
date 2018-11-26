@@ -247,6 +247,9 @@ class kRule
 	 */
 	public function getActions() 
 	{
+		if(!$this->actions)
+			return array();
+		
 		return $this->actions;
 	}
 

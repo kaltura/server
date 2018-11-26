@@ -247,7 +247,7 @@ class kContextDataHelper
 		$flavorAssets = array();
 		if (is_null($this->asset))
 		{
-			if(count($flavorParamsIds))
+			if($flavorParamsIds && count($flavorParamsIds))
 				$flavorAssets = assetPeer::retrieveReadyByEntryIdAndFlavorParams($mediaEntryId, $flavorParamsIds, $flavorParamsNotIn);
 			else 
 				$flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($mediaEntryId, null, array(flavorAsset::ASSET_STATUS_READY));

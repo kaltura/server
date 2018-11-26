@@ -83,7 +83,7 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem implements I
 		
 		if(!$this->condition)
 		{
-			if(count($this->items))
+			if($this->items && count($this->items))
 			{
 				$queryDestination = $this;
 				if($this->type == self::SEARCH_AND)
@@ -113,7 +113,7 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem implements I
 	public function getFreeTextConditions($partnerScope, $freeTexts)
 	{
 		$additionalConditions = array();
-		if(count($this->items))
+		if($this->items && count($this->items))
 		{
 			foreach($this->items as $item)
 			{
