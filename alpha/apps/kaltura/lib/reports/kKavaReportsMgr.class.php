@@ -209,6 +209,7 @@ class kKavaReportsMgr extends kKavaBase
 		myReportsMgr::REPORT_TYPE_OPERATING_SYSTEMS_FAMILIES,
 		myReportsMgr::REPORT_TYPE_BROWSERS_FAMILIES,
 		myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT_TIMELINE,
+		myReportsMgr::REPORT_TYPE_UNIQUE_USERS_PLAY,
 	);
 	
 	protected static $reports_def = array(
@@ -1132,6 +1133,15 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
 		),
+
+		myReportsMgr::REPORT_TYPE_UNIQUE_USERS_PLAY => array(
+			self::REPORT_FILTER => array(
+				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+				self::DRUID_VALUES => array(self::EVENT_TYPE_PLAY)
+			),
+			self::REPORT_METRICS => array(self::METRIC_UNIQUE_USERS),
+			self::REPORT_GRAPH_METRICS => array(self::METRIC_UNIQUE_USERS),
+		)
 	);
 	
 	protected static $event_type_count_aggrs = array(
