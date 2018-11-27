@@ -260,8 +260,9 @@ class kDruidBase
 		}
 
 		$uniqueId = new UniqueId();
+		$clientTag = kCurrentContext::$client_lang;
 		$comment = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
-		$comment .= "[$uniqueId]";
+		$comment .= "[$uniqueId][$clientTag]";
 		$post = str_replace(self::COMMENT_MARKER, $comment, $post);
 		KalturaLog::log($post);
 			
