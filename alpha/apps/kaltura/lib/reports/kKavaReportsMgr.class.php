@@ -2133,6 +2133,7 @@ class kKavaReportsMgr extends kKavaBase
 		$field_dim_map = array(
 			'categoriesIds' => array(self::DRUID_DIMENSION => self::DIMENSION_CATEGORIES),
 			'countries' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_COUNTRY),
+			'playback_types' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE),
 			'server_node_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_SERVER_NODE_IDS),
 			'custom_var1' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR1),
 			'custom_var2' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR2),
