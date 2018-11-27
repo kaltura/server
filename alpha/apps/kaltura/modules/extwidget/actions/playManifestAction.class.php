@@ -297,13 +297,21 @@ class playManifestAction extends kalturaAction
 			$this->flavorParamsIds = $this->secureEntryHelper->filterAllowedFlavorParams($this->flavorParamsIds);
 	}
 
-	private static function shouldAddAltAudioFlavors($format)
+	private function shouldAddAltAudioFlavors()
 	{
 		$supportedProtocols = Array(PlaybackProtocol::APPLE_HTTP, PlaybackProtocol::MPEG_DASH, PlaybackProtocol::SILVER_LIGHT);
-		if (in_array($format, $supportedProtocols))
-			return true;
+		if (!in_array($this->deliveryAttributes->getFormat(), $supportedProtocols))
+		{
+			return false;
+		}
 
-		return false;
+		// audio flavors should not be added for hls media playlists
+		if ($this->getRequestParameter('type', null) == 'media')
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 	protected function initFlavorParamsIds()
@@ -553,7 +561,7 @@ class playManifestAction extends kalturaAction
 				$filteredFlavorAssets[] = $flavorAsset;
 		}
 
-		if(count($filteredFlavorAssets) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
+		if(count($filteredFlavorAssets) && $this->shouldAddAltAudioFlavors())
 			$this->addAltAudioFlavors($filteredFlavorAssets, $flavorAssets);
 		return $filteredFlavorAssets;
 	}
@@ -629,7 +637,7 @@ class playManifestAction extends kalturaAction
 		if ($flavorByTags)
 		{
 			$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
-			if(count($filteredFlavorAssets) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
+			if(count($filteredFlavorAssets) && $this->shouldAddAltAudioFlavors())
 				$this->addAltAudioFlavors($filteredFlavorAssets, $flavorAssets);
 		}
 
@@ -1155,7 +1163,8 @@ class playManifestAction extends kalturaAction
 			$this->deliveryAttributes->setSeekFromTime(-1);
 		$this->deliveryAttributes->setClipTo($this->getRequestParameter ( "clipTo" , 0));
 
-		$this->deliveryAttributes->setPlaybackRate($this->getRequestParameter ( "playbackRate" , 0));
+		$this->deliveryAttributes->setPlaybackRate($this->getRequestParameter( "playbackRate" , 0 ));
+		$this->deliveryAttributes->setTrackSelection($this->getRequestParameter( "tracks" , '' ));
 		$this->deliveryAttributes->setStreamType($this->getRequestParameter( "streamType", null ));
 		
 		$deliveryCode = $this->getRequestParameter( "deliveryCode", null );
@@ -1364,7 +1373,7 @@ class playManifestAction extends kalturaAction
 		if (!$filteredFlavorAssets || !count($filteredFlavorAssets))
 		{
 			$filteredFlavorAssets = $this->deliveryAttributes->filterFlavorsByTags($flavorAssets);
-			if (count($filteredFlavorAssets) && self::shouldAddAltAudioFlavors($this->deliveryAttributes->getFormat()))
+			if (count($filteredFlavorAssets) && $this->shouldAddAltAudioFlavors())
 				$this->addAltAudioFlavors($filteredFlavorAssets, $flavorAssets);
 		}
 
