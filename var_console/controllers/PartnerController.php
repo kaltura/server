@@ -231,20 +231,18 @@ class PartnerController extends Zend_Controller_Action
 		$client->session->impersonate('{1:result:adminSecret}', $impersonatedPartnerId, $userId ? $userId : '{2:result:adminUserId}', Kaltura_Client_Enum_SessionType::ADMIN, '{1:result:id}', null, "disableentitlement");
 		$result = $client->doMultiRequest();
 
+		foreach($result as $resultItem)
+		{
+			if(is_a($resultItem, 'Exception'))
+			{
+				throw $resultItem;
+			}
+		}
+
 		// The KS is always the last item received in the multi-request
 		if(!$userId)
 		{
-			if(is_a($result[1], 'Exception'))
-			{
-				throw $result[1];
-			}
-
 			$userId = $result[1]->adminUserId;
-		}
-
-		if(is_a($result[0], 'Exception'))
-		{
-			throw $result[0];
 		}
 
 		$adminSecret = $result[0]->adminSecret;
