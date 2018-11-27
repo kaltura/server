@@ -208,7 +208,9 @@ class PartnerController extends Zend_Controller_Action
 	{
 		$ks = $this->generateAdminKs();
 		if(!$ks)
+		{
 			return;
+		}
 
 		$url = $this->createNewKmcRedirectionUrl($ks);
 		$this->getResponse()->setRedirect($url);
@@ -227,20 +229,23 @@ class PartnerController extends Zend_Controller_Action
 		}
 
 		$client->session->impersonate('{1:result:adminSecret}', $impersonatedPartnerId, $userId ? $userId : '{2:result:adminUserId}', Kaltura_Client_Enum_SessionType::ADMIN, '{1:result:id}', null, "disableentitlement");
-		try
-		{
-			$result = $client->doMultiRequest();
-		}
-		catch(Exception $e)
-		{
-			$this->view->partnerId = $impersonatedPartnerId;
-			$this->view->errorMessage = $e->getMessage();
-			return null;
-		}
+		$result = $client->doMultiRequest();
 
 		// The KS is always the last item received in the multi-request
 		if(!$userId)
+		{
+			if(is_a($result[1], 'Exception'))
+			{
+				throw $result[1];
+			}
+
 			$userId = $result[1]->adminUserId;
+		}
+
+		if(is_a($result[0], 'Exception'))
+		{
+			throw $result[0];
+		}
 
 		$adminSecret = $result[0]->adminSecret;
 		$partnerId =  $result[0]->id;

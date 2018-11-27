@@ -192,8 +192,10 @@ class PartnerService extends KalturaBaseService
 		    throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $id);
 		}
 
-		if($this->getPartnerId != $id)
-			myPartnerUtils::addPartnerToCriteria( 'kuser', $id, true);
+		if($this->getPartnerId() != $id)
+		{
+			myPartnerUtils::addPartnerToCriteria('kuser', $id, true);
+		}
 
 		$partner = new KalturaPartner();
 		$partner->fromObject($dbPartner, $this->getResponseProfile());
