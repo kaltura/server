@@ -280,12 +280,11 @@ class KAsyncConvert extends KJobHandlerWorker
 					$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
 			
 				kFile::moveFile($data->destFileSyncLocalPath, $sharedFile);
-			
+
 				// directory sizes may differ on different devices
 				if(!file_exists($sharedFile) || (is_file($sharedFile) && kFile::fileSize($sharedFile) != $fileSize))
 				{
-					KalturaLog::err("Error: moving file failed");
-					die();
+					return $this->closeJob($job, null, null, "moving file ".$sharedFile. "failed", KalturaBatchJobStatus::RETRY);
 				}			
 				$data->destFileSyncLocalPath = $this->translateLocalPath2Shared($sharedFile);
 				if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
