@@ -3842,23 +3842,27 @@ class kKavaReportsMgr extends kKavaBase
 		return null;
 	}
 
-	protected static function orderTableByMetric($order_metric, $order_by, &$result)
+	protected static function orderTableByMetric($order_metric, $order_by, $headers, &$data)
 	{
-		$order_by_dir = '-';
-		if (!$order_metric && ($order_by[0] === '-' || $order_by[0] === '+'))
+		$order_by_dir = $order_by[0];
+		if (!$order_metric)
 		{
-			$order_by_dir = $order_by[0];
 			$order_metric = substr($order_by, 1);
 		}
 
-		if (!in_array($order_metric, $result[0]))
+		if ($order_metric && !in_array($order_metric, $headers))
 		{
 			return;
 		}
 
-		$headers_map = array_flip($result[0]);
+		if (!($order_by[0] === '-' || $order_by[0] === '+'))
+		{
+			return;
+		}
+
+		$headers_map = array_flip($headers);
 		$header_index = $headers_map[$order_metric];
-		usort($result[1] , function($a, $b) use ($order_by_dir, $header_index){
+		usort($data , function($a, $b) use ($order_by_dir, $header_index){
 			if ($order_by_dir === '+')
 			{
 				return ($a[$header_index] > $b[$header_index]) ? 1 : -1;
@@ -3867,7 +3871,8 @@ class kKavaReportsMgr extends kKavaBase
 		});
 	}
 
-	protected static function getTableFromGraphs($graphs, $has_aligned_dates, $date_column_name = 'date_id', $page_size = null, $page_index = 1)
+	protected static function getTableFromGraphs($graphs, $has_aligned_dates, $date_column_name = 'date_id',
+		$page_size = null, $page_index = 1, $order_by = null, $order_metric = null)
 	{
 		if (!$has_aligned_dates)
 		{
@@ -3901,16 +3906,19 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		$total_count = count($data);
+		$headers = array_merge(array($date_column_name), $header);
+		self::orderTableByMetric($order_metric, $order_by, $headers, $data);
+
 		if ($page_size)
 		{
 			$data = array_slice($data, ($page_index - 1) * $page_size, $page_size);
 		}
 
-		return array(array_merge(array($date_column_name), $header), $data, $total_count);
+		return array($headers, $data, $total_count);
 	}
 
 	protected static function getTableFromKeyedGraphs($partner_id, $report_def, reportsInputFilter $input_filter, 
-		$page_size, $page_index, $object_ids)
+		$page_size, $page_index, $object_ids, $order_by)
 	{
 		// calculate the graphs
 		$result = self::getKeyedJoinGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
@@ -3964,6 +3972,7 @@ class kKavaReportsMgr extends kKavaBase
 			}
 		}
 
+		self::orderTableByMetric(self::getMetricFromOrderBy($report_def, $order_by), $order_by, $headers, $data);
 		return array(
 			$headers,
 			array_slice($data, ($page_index - 1) * $page_size, $page_size),
@@ -4557,16 +4566,12 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids);
 			$result = self::getTableFromGraphs($result, true, self::getDateColumnName($input_filter->interval),
-				$page_size, $page_index);
-			$order_metric = self::getMetricFromOrderBy($report_def, $order_by);
-			self::orderTableByMetric($order_metric, $order_by, $result);
+				$page_size, $page_index, $order_by, self::getMetricFromOrderBy($report_def, $order_by));
 		}
 		else if (isset($report_def[self::REPORT_JOIN_GRAPHS]))
 		{
 			$result = self::getTableFromKeyedGraphs($partner_id, $report_def, $input_filter,
-				$page_size, $page_index, $object_ids);
-			$order_metric = self::getMetricFromOrderBy($report_def, $order_by);
-			self::orderTableByMetric($order_metric, $order_by, $result);
+				$page_size, $page_index, $object_ids, $order_by);
 		}
 		else if (isset($report_def[self::REPORT_JOIN_REPORTS]))
 		{
