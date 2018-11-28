@@ -3206,7 +3206,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function getSphinxIndexName()
 	{
-		return kSphinxSearchManager::getSphinxIndexName(entryIndex::getObjectIndexName(), entryIndex::getSphinxIndexId($this->getPartnerId()));
+		return kSphinxSearchManager::getSphinxIndexName(entryIndex::getObjectIndexName(), entryIndex::getSphinxSplitIndexId($this->getPartnerId()));
 	}
 	
 	public function getCacheInvalidationKeys()

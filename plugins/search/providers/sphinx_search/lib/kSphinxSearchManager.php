@@ -347,8 +347,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			$data[$key] = "'" . $valueStr . "'";
 		}
 		
-		$index = $object->getSphinxIndexName();
-
+		$index = kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName());
 		$placeHolders = isset($options["placeHolders"]) ? $options["placeHolders"] : false;
 
 		if (is_array($placeHolders))
@@ -403,7 +402,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 * @param IIndexable $object
 	 * @return bool
 	 */
-	public function execSphinx($sql, IIndexable $object)
+	public function execSphinx($sql, IIndexable $object, $splitIndexName = null)
 	{
 		$disabledPartnerIds = kConf::get('disable_sphinx_indexing_partners', 'local', array());
 		if (in_array($object->getPartnerId(), $disabledPartnerIds))
@@ -447,7 +446,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$sphinxLog->setPartnerId($object->getPartnerId());
 		$sphinxLog->setSql($sql);
 		$sphinxLog->setType(SphinxLogType::SPHINX);
-		$sphinxLog->setIndexName($object->getSphinxIndexName());
+		$sphinxLog->setIndexName($splitIndexName);
 		$sphinxLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
 
 		kSphinxQueryCache::invalidateQueryCache($object);
@@ -466,6 +465,9 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			return true;
 					
 		$sphinxConnection = DbManager::getSphinxConnection(false, $object->getSphinxIndexName());
+		if($sphinxConnection->getKalturaOption('sharded') && $splitIndexName)
+			$sql = str_replace(kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName()), $splitIndexName, $sql);
+		
 		$ret = $sphinxConnection->exec($sql);
 		if($ret)
 			return true;
@@ -475,7 +477,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		return false;
 	}
 
-	private function retrieveSphinxConnectionId ($indexName)
+	private function retrieveSphinxConnectionId ($indexName = null)
 	{
 		$sphinxConnectionId = null;
 		if(kConf::hasParam('exec_sphinx') && kConf::get('exec_sphinx'))
@@ -508,13 +510,15 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	public function deleteFromSphinx(IIndexable $object)
 	{
 		$objectIndexClass = $object->getIndexObjectName();
-		$index = kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName());
+		$objectIndexName = $object->getSphinxIndexName();
+		$index = kSphinxSearchManager::getSphinxIndexName($objectIndexClass);
+		$splitIndexName = kSphinxSearchManager::getSphinxIndexName($objectIndexClass, $objectIndexName);
 		$id = $object->getIntId();
 		
 		KalturaLog::debug('Deleting sphinx document for object [' . get_class($object) . '] [' . $object->getId() . ']');
 		$sql = "delete from $index where id = $id";
 		
-		return $this->execSphinx($sql, $object);
+		return $this->execSphinx($sql, $object, $splitIndexName);
 	}
 		
 	/**
@@ -560,7 +564,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		if(!$sql)
 			return true;
 
-		return $this->execSphinx($sql, $object);
+		return $this->execSphinx($sql, $object, $object->getSphinxIndexName());
 	}
     /* (non-PHPdoc)
      * @see kObjectErasedEventConsumer::objectErased()

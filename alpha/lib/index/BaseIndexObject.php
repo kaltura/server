@@ -234,7 +234,7 @@ abstract class BaseIndexObject
 		return null;
 	}
 	
-	public static function getSphinxIndexId($originalValue = null)
+	public static function getSphinxSplitIndexId($originalValue = null)
 	{
 		return null;
 	}

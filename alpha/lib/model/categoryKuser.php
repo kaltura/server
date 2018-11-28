@@ -245,7 +245,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable
 	
 	public function getSphinxIndexName()
 	{
-		return kSphinxSearchManager::getSphinxIndexName(categoryKuser::getObjectIndexName());
+		return kSphinxSearchManager::getSphinxIndexName(categoryKuserIndex::getObjectIndexName());
 	}
 	
 	/**

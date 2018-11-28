@@ -42,16 +42,16 @@ class entryIndex extends BaseIndexObject
 		return $config['sphinx_split_index'][self::getObjectIndexName()];
 	}
 	
-	public static function getSphinxIndexId($originalValue = null)
+	public static function getSphinxSplitIndexId($originalValue = null)
 	{
-		if(!$originalValue)
+		if(!isset($originalValue))
 			return null;
 		
 		$splitIndexFactor = self::getSplitIndexFactor();
 		if(!$splitIndexFactor)
 			return null;
 		
-		return $originalValue%$splitIndexFactor;
+		return ($originalValue/10)%$splitIndexFactor;
 	}
 
 	public static function getPropelIdField()
