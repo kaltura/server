@@ -296,6 +296,11 @@ class playManifestAction extends kalturaAction
 		if($this->secureEntryHelper)
 			$this->flavorParamsIds = $this->secureEntryHelper->filterAllowedFlavorParams($this->flavorParamsIds);
 	}
+	
+	protected function isMediaPlaylist()
+	{
+		return $this->getRequestParameter('type', null) == 'media';
+	}
 
 	private function shouldAddAltAudioFlavors()
 	{
@@ -306,7 +311,7 @@ class playManifestAction extends kalturaAction
 		}
 
 		// audio flavors should not be added for hls media playlists
-		if ($this->getRequestParameter('type', null) == 'media')
+		if ($this->isMediaPlaylist())
 		{
 			return false;
 		}
@@ -590,7 +595,9 @@ class playManifestAction extends kalturaAction
 	{
 		//in case asset id specified, allow url and download regardless of asset type
 		//ignoring flavor-assets due to backward compat.
-		if($this->flavorIds && count($this->flavorIds) == 1 && in_array($this->deliveryAttributes->getFormat(), array(self::URL, self::DOWNLOAD)))
+		if($this->flavorIds && count($this->flavorIds) == 1 && 
+			(in_array($this->deliveryAttributes->getFormat(), array(self::URL, self::DOWNLOAD)) || 
+			$this->isMediaPlaylist()))
 		{
 			$asset = assetPeer::retrieveById($this->flavorIds[0]);
 			if($asset && $asset->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && !in_array($asset->getType(), assetPeer::retrieveAllFlavorsTypes()))
@@ -942,7 +949,9 @@ class playManifestAction extends kalturaAction
 		$this->setParamsForPlayServer($this->deliveryProfile->getAdStitchingEnabled());
 
 		$filter = $this->deliveryProfile->getSupplementaryAssetsFilter();
-		if ($filter && !$this->deliveryAttributes->getHasValidSequence())
+		if ($filter && 
+			!$this->deliveryAttributes->getHasValidSequence() && 
+			!$this->isMediaPlaylist())
 		{
 			$c = new Criteria();
 			$filter->attachToCriteria($c);
