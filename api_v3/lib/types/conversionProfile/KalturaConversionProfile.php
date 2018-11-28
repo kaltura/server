@@ -287,7 +287,7 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
 		}
 		
-		$this->validateFlavorParamsIds();
+		$this->validateFlavorParamsIds($sourceObject);
 		
 		$this->validateDefaultEntry();
 		
@@ -324,8 +324,12 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->defaultEntryId);
 	}
 	
-	public function validateFlavorParamsIds()
+	public function validateFlavorParamsIds($sourceObject = null)
 	{
+		$conversionProfileType = $this->type;
+		if(!$conversionProfileType && $sourceObject)
+			$conversionProfileType = $sourceObject->getType();
+		
 		$flavorParamsIds = $this->getFlavorParamsAsArray();
 		if ( empty($flavorParamsIds) )
 		{
@@ -346,8 +350,8 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 				$sourceFound = true;
 			}
 			
-			if($this->type == KalturaConversionProfileType::LIVE_STREAM && $flavorParamsItem->getType() != assetType::LIVE ||
-				$this->type == KalturaConversionProfileType::MEDIA && $flavorParamsItem->getType() == assetType::LIVE)
+			if($conversionProfileType == KalturaConversionProfileType::LIVE_STREAM && $flavorParamsItem->getType() != assetType::LIVE ||
+				$conversionProfileType == KalturaConversionProfileType::MEDIA && $flavorParamsItem->getType() == assetType::LIVE)
 				throw new KalturaAPIException(KalturaErrors::ASSET_PARAMS_INVALID_TYPE, $flavorParamsItem->getId(), $flavorParamsItem->getType());
 			
 			$indexedFlavorParams[$flavorParamsItem->getId()] = $flavorParamsItem;
