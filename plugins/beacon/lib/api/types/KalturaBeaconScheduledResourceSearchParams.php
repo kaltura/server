@@ -5,21 +5,7 @@
  */
 class KalturaBeaconScheduledResourceSearchParams extends KalturaBeaconSearchParams
 {
-	/**
-	 * @var KalturaBeaconSearchScheduledResourceOrderBy
-	 */
-	public $orderBy;
-
-	/**
-	 * @var KalturaBeaconScheduledResourceOperator
-	 */
-	public $searchOperator;
-
-	private static $mapBetweenObjects = array
-	(
-		"orderBy",
-		"searchOperator",
-	);
+	private static $mapBetweenObjects = array();
 
 	public function getMapBetweenObjects()
 	{

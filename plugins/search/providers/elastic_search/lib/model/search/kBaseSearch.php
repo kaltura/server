@@ -71,33 +71,39 @@ abstract class kBaseSearch
         }
     }
 
-    protected function initOrderBy(ESearchOrderBy $order = null)
-    {
-        if($order)
-        {
-            $orderItems = $order->getOrderItems();
-            $fields = array();
-            $sortConditions = array();
-            foreach ($orderItems as $orderItem)
-            {
-                $field = $orderItem->getSortField();
-                if(isset($fields[$field]))
-                {
-                    KalturaLog::log("Order by condition already set for field [$field]" );
-                    continue;
-                }
-                $fields[$field] = true;
-				$conditions = $orderItem->getSortConditions();
-				foreach ($conditions as $condition)
-					$sortConditions[] = $condition;
-            }
+	protected function initOrderBy(ESearchOrderBy $order = null)
+	{
+		if($order)
+		{
+			$sortConditions = $this->getSortConditions($order);
+			if(count($sortConditions))
+				$sortConditions[] = '_score';
 
-            if(count($sortConditions))
-                $sortConditions[] = '_score';
+			$this->query['body']['sort'] = $sortConditions;
+		}
+	}
 
-            $this->query['body']['sort'] = $sortConditions;
-        }
-    }
+    protected function getSortConditions(ESearchOrderBy $order)
+	{
+		$orderItems = $order->getOrderItems();
+		$fields = array();
+		$sortConditions = array();
+		foreach ($orderItems as $orderItem)
+		{
+			$field = $orderItem->getSortField();
+			if(isset($fields[$field]))
+			{
+				KalturaLog::log("Order by condition already set for field [$field]" );
+				continue;
+			}
+			$fields[$field] = true;
+			$conditions = $orderItem->getSortConditions();
+			foreach ($conditions as $condition)
+				$sortConditions[] = $condition;
+		}
+
+		return $sortConditions;
+	}
 
     protected function initBaseFilter($partnerId, array $statuses, $objectId)
     {

@@ -80,22 +80,13 @@ class BeaconService extends KalturaBaseService
 	{
 		$scheduledResourceSearch = new kScheduledResourceSearch();
 		$searchMgr = new kBeaconSearchQueryManger();
-		//$elasticResponse = $this->initAndSearch($scheduledResourceSearch, $searchParams, $pager);
-		$elasticResponse = $searchMgr->search($this->getMockUpQuery());
+		$elasticResponse = $this->initAndSearch($scheduledResourceSearch, $searchParams, $pager);
 		$totalCount = $searchMgr->getTotalCount($elasticResponse);
 		$responseArray = $searchMgr->getHitsFromElasticResponse($elasticResponse);
 		$response = new KalturaBeaconListResponse();
 		$response->objects = KalturaBeaconArray::fromDbArray($responseArray);
 		$response->totalCount = $totalCount;
 		return $response;
-	}
-
-	private function getMockUpQuery()
-	{
-		$query = array();
-		$query[kESearchQueryManager::BODY_KEY]["query"] = array("match_all" => new stdClass());
-		$query["index"] = 'beacon_scheduled_resource_index_search';
-		return $query;
 	}
 
 	/**

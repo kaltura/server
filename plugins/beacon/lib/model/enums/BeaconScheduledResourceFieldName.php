@@ -12,4 +12,5 @@ interface BeaconScheduledResourceFieldName extends BaseEnum
 	const EVENT_TYPE = 'event_type';
 	const OBJECT_ID = 'object_id';
 	const IS_LOG = 'is_log';
+	const PARTNER_ID = 'partner_id';
 }

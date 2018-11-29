@@ -17,7 +17,6 @@ class BeaconScheduledResourceItem extends ESearchItem
 
 	private static $allowed_search_types_for_field = array(
 		BeaconScheduledResourceFieldName::EVENT_TYPE => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
-		BeaconScheduledResourceFieldName::PARTNER_ID => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
 		BeaconScheduledResourceFieldName::OBJECT_ID => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
 		BeaconScheduledResourceFieldName::IS_LOG => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
 		BeaconScheduledResourceFieldName::STATUS => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
@@ -88,11 +87,11 @@ class BeaconScheduledResourceItem extends ESearchItem
 	}
 
 	/**
-	 * @param $entryQuery
+	 * @param $scheduledResourceQuery
 	 * @param $allowedSearchTypes
 	 * @param $queryAttributes ESearchQueryAttributes
 	 */
-	public function getSingleItemSearchQuery(&$entryQuery, $allowedSearchTypes, &$queryAttributes)
+	public function getSingleItemSearchQuery(&$scheduledResourceQuery, $allowedSearchTypes, &$queryAttributes)
 	{
 		$this->validateItemInput();
 		$subQuery = null;
@@ -116,7 +115,7 @@ class BeaconScheduledResourceItem extends ESearchItem
 
 		if($subQuery)
 		{
-			$entryQuery[] = $subQuery;
+			$scheduledResourceQuery[] = $subQuery;
 		}
 	}
 
