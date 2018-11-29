@@ -8,6 +8,8 @@ class elasticSearchUtils
 	const UNDERSCORE_FIELD_DELIMITER ='_';
 	const DOT_FIELD_DELIMITER = '.';
 
+	public static $shouldLower = true;
+
 	private static $html_chars_to_replace = array('<br />', '<br>',
 		'<br/>', '<div>', '</div>', '<div/>', '<p>', '</p>', '<p/>');
 
@@ -141,7 +143,11 @@ class elasticSearchUtils
 		//remove extra spaces
 		$term = preg_replace('/\s+/', ' ', $searchTerm);
 		//lowercase and trim
-		$term = strtolower($term);
+		if(self::$shouldLower)
+		{
+			$term = strtolower($term);
+		}
+
 		$term = trim($term);
 		return $term;
 	}

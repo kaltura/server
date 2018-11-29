@@ -18,10 +18,12 @@ class kScheduledResourceSearch extends kBaseSearch
 	public function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null,
 							 ESearchOrderBy $order = null)
 	{
+		elasticSearchUtils::$shouldLower = false;
 		kScheduledResourceSearchEntitlement::init();
 		$this->initQuery($statuses, $objectId, $pager, $order);
 		$this->initEntitlement();
 		$result = $this->execSearch($eSearchOperator);
+		elasticSearchUtils::$shouldLower = true;
 		return $result;
 	}
 

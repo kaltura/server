@@ -14,6 +14,8 @@ class KalturaBeaconScheduledResourceItem extends KalturaBeaconAbstractScheduledR
 		'fieldName'
 	);
 
+	private static $map_dynamic_enum = array();
+
 	private static $map_field_enum = array(
 		KalturaBeaconScheduledResourceFieldName::EVENT_TYPE => BeaconScheduledResourceFieldName::EVENT_TYPE,
 		KalturaBeaconScheduledResourceFieldName::OBJECT_ID => BeaconScheduledResourceFieldName::OBJECT_ID,
@@ -47,5 +49,10 @@ class KalturaBeaconScheduledResourceItem extends KalturaBeaconAbstractScheduledR
 	protected function getFieldEnumMap()
 	{
 		return self::$map_field_enum;
+	}
+
+	protected function getDynamicEnumMap()
+	{
+		return self::$map_dynamic_enum;
 	}
 }
