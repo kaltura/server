@@ -93,7 +93,7 @@ class BeaconService extends KalturaBaseService
 	private function getMockUpQuery()
 	{
 		$query = array();
-		$query[kESearchQueryManager::BODY_KEY]["query"] = array ("match_all");
+		$query[kESearchQueryManager::BODY_KEY]["query"] = array("match_all" => new stdClass());
 		$query["index"] = 'beacon_scheduled_resource_index_search';
 		return $query;
 	}

@@ -22,7 +22,7 @@ class kBeaconSearchQueryManger
 	
 	public function search($searchQuery)
 	{
-		return self::$elasticClient->search($searchQuery);
+		return self::$elasticClient->search($searchQuery, true);
 	}
 	
 	public function get($searchQuery)
