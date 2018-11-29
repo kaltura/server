@@ -6,7 +6,6 @@
 class KalturaBeaconScheduledResourceFieldName extends KalturaStringEnum
 {
 	const EVENT_TYPE = 'event_type';
-	const PARTNER_ID = 'partner_id';
 	const OBJECT_ID = 'object_id';
 	const IS_LOG = 'is_log';
 	const STATUS = 'status';

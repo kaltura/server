@@ -16,7 +16,6 @@ class KalturaBeaconScheduledResourceItem extends KalturaBeaconAbstractScheduledR
 
 	private static $map_field_enum = array(
 		KalturaBeaconScheduledResourceFieldName::EVENT_TYPE => BeaconScheduledResourceFieldName::EVENT_TYPE,
-		KalturaBeaconScheduledResourceFieldName::PARTNER_ID => BeaconScheduledResourceFieldName::PARTNER_ID,
 		KalturaBeaconScheduledResourceFieldName::OBJECT_ID => BeaconScheduledResourceFieldName::OBJECT_ID,
 		KalturaBeaconScheduledResourceFieldName::IS_LOG => BeaconScheduledResourceFieldName::IS_LOG,
 		KalturaBeaconScheduledResourceFieldName::STATUS => BeaconScheduledResourceFieldName::STATUS,
