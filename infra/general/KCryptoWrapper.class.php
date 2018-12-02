@@ -29,8 +29,22 @@ class OpenSSLWrapper
 {
     const AES_BLOCK_SIZE = 16;
     const DES3_BLOCK_SIZE = 8;
-    const AES_METHOD = 'AES-128-CBC';
     const DES3_METHOD = 'DES-EDE3';
+
+	protected static function get_aes_method($key)
+	{
+		switch (strlen($key))
+		{
+		case 32:
+			return 'AES-256-CBC';
+
+		case 24:
+			return 'AES-192-CBC';
+
+		default:
+			return 'AES-128-CBC';
+		}
+    }
 
     public static function random_pseudo_bytes($length)
     {
@@ -70,7 +84,7 @@ class OpenSSLWrapper
 	    }
 	    return openssl_encrypt(
 		    $str,
-		    self::AES_METHOD,
+		    self::get_aes_method($key),
 		    $key,
 		    OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING,
 		    $iv
@@ -81,7 +95,7 @@ class OpenSSLWrapper
     {
 	    return openssl_decrypt(
 		    $str,
-		    self::AES_METHOD,
+		    self::get_aes_method($key),
 		    $key,
 		    OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING,
 		    $iv
