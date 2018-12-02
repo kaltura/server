@@ -29,12 +29,11 @@ class kScheduledResourceSearch extends kBaseSearch
 
 	protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null)
 	{
-		$this->query = array('index' => self::INDEX_NAME);
+		$this->query = array(elasticClient::ELASTIC_INDEX_KEY => BeaconIndexName::SCHEDULED_RESOURCE_INDEX);
 		$partnerId = kBaseElasticEntitlement::$partnerId;
 		$this->initQueryAttributes($partnerId, $objectId);
 		$this->initPager($pager);
 		$this->initOrderBy($order);
-		$searchQuery[elasticClient::ELASTIC_INDEX_KEY] = kBeacon::ELASTIC_BEACONS_INDEX_NAME;
 	}
 
 	protected function initOrderBy(ESearchOrderBy $order = null)

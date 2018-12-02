@@ -3,7 +3,7 @@
  * @package plugins.beacon
  * @subpackage model.items
  */
-class BeaconScheduledResourceItem extends ESearchItem
+class kBeaconScheduledResourceItem extends ESearchItem
 {
 	/**
 	 * @var BeaconScheduledResourceFieldName

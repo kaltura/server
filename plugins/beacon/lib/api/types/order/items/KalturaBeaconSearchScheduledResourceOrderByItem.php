@@ -29,7 +29,10 @@ class KalturaBeaconSearchScheduledResourceOrderByItem extends KalturaESearchOrde
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (!$object_to_fill)
-			$object_to_fill = new ESearchCategoryOrderByItem();
+		{
+			$object_to_fill = new kBeaconScheduledResourceOrderByItem();
+		}
+
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 

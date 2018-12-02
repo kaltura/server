@@ -35,7 +35,7 @@ class KalturaBeaconScheduledResourceItem extends KalturaBeaconAbstractScheduledR
 	{
 		if (!$object_to_fill)
 		{
-			$object_to_fill = new BeaconScheduledResourceItem();
+			$object_to_fill = new kBeaconScheduledResourceItem();
 		}
 
 		return parent::toObject($object_to_fill, $props_to_skip);
