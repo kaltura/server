@@ -39,6 +39,7 @@ if(!file_exists($configFile))
 $config = parse_ini_file($configFile);
 $sphinxServer = $config['sphinxServer'];
 $sphinxPort = (isset($config['sphinxPort']) ? $config['sphinxPort'] : 9312);
+$isSharded = isset($config['sharded']) ? $config['sharded'] : false;
 $processSqlUpdates = (isset($config['processSqlUpdates']) ? $config['processSqlUpdates'] : false);
 $systemSettings = kConf::getMap('system');
 if(!$systemSettings || !$systemSettings['LOG_DIR'])
@@ -87,6 +88,8 @@ while(true)
 	try
 	{
 		$sphinxCon = DbManager::createSphinxConnection($sphinxServer,$sphinxPort);
+		$sphinxRtTables = getSphinxRtTables($sphinxCon);
+		KalturaLog::log("sphinxServer [$sphinxServer], running rt index names [" . implode(",", $sphinxRtTables) . "]");
 	}
 	catch(Exception $e)
 	{
@@ -101,13 +104,22 @@ while(true)
 		$dc = $sphinxLog->getDc();
 		$executedServerId = $sphinxLog->getExecutedServerId();
 		$sphinxLogId = $sphinxLog->getId();
+		$sphinxLogIndexName = $sphinxLog->getIndexName();
 		
+		
+		if($isSharded && $sphinxLogIndexName && !in_array($sphinxLogIndexName, $sphinxRtTables))
+		{
+			KalturaLog::log("Sphinx log id [$sphinxLogId] index name [$sphinxLogIndexName] not in rt table list, continue to next one");
+			continue;
+		}
 		
 		$serverLastLog = null;
-		
-		if(isset($lastLogs[$dc])) {
+		if(isset($lastLogs[$dc]))
+		{
 			$serverLastLog = $lastLogs[$dc];
-		} else {
+		}
+		else
+		{
 			$serverLastLog = new SphinxLogServer();
 			$serverLastLog->setServer($sphinxServer);
 			$serverLastLog->setDc($dc);
@@ -121,34 +133,40 @@ while(true)
 		try
 		{
 			if ($skipExecutedUpdates && $executedServerId == $serverLastLog->getId())
-                       {
-                               KalturaLog::log ("Sphinx server is initiated and the command already ran synchronously on this machine. Skipping");
-                       }
-                       else
-                       {
-                        	$sql = $sphinxLog->getSql();
-                        	
-                        	// sql update commands are created only via an external script for updating entries plays count
-                        	// by default these won't be updated by this script
-                        	if ($processSqlUpdates || substr($sql, 0, 6) != "update")
-                        	{
-	                        	$affected = $sphinxCon->exec($sql);
-
-	                        	if(!$affected)
-	                              		$errorInfo = $sphinxCon->errorInfo();
-                        	}
-                       }
-
+			{
+				KalturaLog::log ("Sphinx server is initiated and the command already ran synchronously on this machine. Skipping");
+			}
+			else
+			{
+				$sql = $sphinxLog->getSql();
+				if($isSharded && $sphinxLog->getObjectType() == "entry")
+				{
+					$shardedIndexName = $sphinxLog->getIndexName() ? $sphinxLog->getIndexName() : "kaltura_entry_" . ($sphinxLog->getPartnerId()/10)%10;
+					$sql = str_replace("kaltura_entry", $shardedIndexName, $sql);
+				}
+				
+				// sql update commands are created only via an external script for updating entries plays count
+				// by default these won't be updated by this script
+				if ($processSqlUpdates || substr($sql, 0, 6) != "update")
+				{
+					$affected = $sphinxCon->exec($sql);
+					if(!$affected)
+						$errorInfo = $sphinxCon->errorInfo();
+				}
+			}
+			
 			// If the record is an historical record, don't take back the last log id
-			if($serverLastLog->getLastLogId() < $sphinxLogId) {
+			if($serverLastLog->getLastLogId() < $sphinxLogId)
+			{
 				$serverLastLog->setLastLogId($sphinxLogId);
- 				
- 				// Clear $handledRecords from before last - gap.
- 				foreach($serverLastLogs as $serverLastLog) {
- 					$dc = $serverLastLog->getDc();
- 					$threshold = $serverLastLog->getLastLogId() - $gap;
- 					$handledRecords[$dc] = array_filter($handledRecords[$dc], array(new OldLogRecordsFilter($threshold), 'filter'));
- 				}
+				
+				// Clear $handledRecords from before last - gap.
+				foreach($serverLastLogs as $serverLastLog)
+				{
+					$dc = $serverLastLog->getDc();
+					$threshold = $serverLastLog->getLastLogId() - $gap;
+					$handledRecords[$dc] = array_filter($handledRecords[$dc], array(new OldLogRecordsFilter($threshold), 'filter'));
+				}
 			}
 		}
 		catch(Exception $e)
@@ -168,3 +186,18 @@ while(true)
 }
 
 KalturaLog::log('Done');
+
+function getSphinxRtTables($sphinxCon)
+{
+	$sphinxRtTables = array();
+	$query = $sphinxCon->query("SHOW TABLES");
+	$sphinxTablesData = $query->fetchAll();
+	
+	foreach ($sphinxTablesData as $sphinxTableData)
+	{
+		if($sphinxTableData['Type'] == "rt")
+			$sphinxRtTables[] = $sphinxTableData['Index'];
+	}
+	
+	return $sphinxRtTables;
+}
