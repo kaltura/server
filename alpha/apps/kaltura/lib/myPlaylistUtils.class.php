@@ -102,7 +102,7 @@ class myPlaylistUtils
 	public static function updatePlaylistStatistics ( $partner_id , $playlist )
 	{
 		$entry_list = self::executePlaylist( $partner_id , $playlist );
-		$count = count ( $entry_list );
+		$count = $entry_list ? count ($entry_list) : 0;
 		$count_date = time();
 		$duration = 0;
 		if ( $count > 0 )
