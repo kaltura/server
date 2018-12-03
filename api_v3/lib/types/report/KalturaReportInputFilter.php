@@ -109,6 +109,7 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'keywords',
 		'searchInTags' => 'search_in_tags',
 		'searchInAdminTags' => 'search_in_admin_tags',
+		'categories',
 		'customVar1In' => 'custom_var1',
 		'customVar2In' => 'custom_var2',
 		'customVar3In' => 'custom_var3',
