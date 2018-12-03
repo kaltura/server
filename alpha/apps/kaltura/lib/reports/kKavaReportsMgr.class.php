@@ -3189,12 +3189,12 @@ class kKavaReportsMgr extends kKavaBase
 		if (!$dates)
 		{
 			$result[self::METRIC_BANDWIDTH_STORAGE_MB] = array(
-				reset(array_values($result[self::METRIC_BANDWIDTH_SIZE_MB])) +
-				reset(array_values($result[self::METRIC_AVERAGE_STORAGE_MB])));
+				reset($result[self::METRIC_BANDWIDTH_SIZE_MB]) +
+				reset($result[self::METRIC_AVERAGE_STORAGE_MB]));
 			
 			$result[self::METRIC_BANDWIDTH_STORAGE_AGGR_MONTHLY_MB] = array(
-				reset(array_values($result[self::METRIC_BANDWIDTH_SIZE_MB])) +
-				reset(array_values($result[self::METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB])));
+				reset($result[self::METRIC_BANDWIDTH_SIZE_MB]) +
+				reset($result[self::METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB]));
 			return;
 		}
 		
