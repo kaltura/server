@@ -6,9 +6,6 @@
 
 abstract class kBaseSearch
 {
-
-	const GLOBAL_HIGHLIGHT_CONFIG = 'globalMaxNumberOfFragments';
-
     protected $elasticClient;
     protected $query;
     protected $queryAttributes;
@@ -23,12 +20,6 @@ abstract class kBaseSearch
 
     public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null);
 
-    public abstract function getPeerName();
-
-	public abstract function getPeerRetrieveFunctionName();
-
-    public abstract function getElasticTypeName();
-
 	/**
 	 * @return ESearchQueryAttributes
 	 */
@@ -41,26 +32,9 @@ abstract class kBaseSearch
 	{
 	}
 
-    protected function execSearch(ESearchOperator $eSearchOperator)
-    {
-        $subQuery = $eSearchOperator::createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
-        $this->handleDisplayInSearch();
-        $this->mainBoolQuery->addToMust($subQuery);
-        $this->applyElasticSearchConditions();
-        $this->addGlobalHighlights();
-        $result = $this->elasticClient->search($this->query, true, true);
-        $this->addSearchTermsToSearchHistory();
-        return $result;
-    }
+    protected abstract function execSearch(ESearchOperator $eSearchOperator);
 
-    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null)
-    {
-        $partnerId = kBaseElasticEntitlement::$partnerId;
-        $this->initQueryAttributes($partnerId, $objectId);
-        $this->initBaseFilter($partnerId, $statuses, $objectId);
-        $this->initPager($pager);
-        $this->initOrderBy($order);
-    }
+    protected abstract function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null);
 
     protected function initPager(kPager $pager = null)
     {
@@ -77,7 +51,9 @@ abstract class kBaseSearch
 		{
 			$sortConditions = $this->getSortConditions($order);
 			if(count($sortConditions))
+			{
 				$sortConditions[] = '_score';
+			}
 
 			$this->query['body']['sort'] = $sortConditions;
 		}
@@ -96,10 +72,13 @@ abstract class kBaseSearch
 				KalturaLog::log("Order by condition already set for field [$field]" );
 				continue;
 			}
+
 			$fields[$field] = true;
 			$conditions = $orderItem->getSortConditions();
 			foreach ($conditions as $condition)
+			{
 				$sortConditions[] = $condition;
+			}
 		}
 
 		return $sortConditions;
@@ -127,16 +106,6 @@ abstract class kBaseSearch
         $this->query['body']['_source'] = false;
     }
 
-    protected function addGlobalHighlights()
-	{
-        $this->queryAttributes->getQueryHighlightsAttributes()->setScopeToGlobal();
-        $numOfFragments = elasticSearchUtils::getNumOfFragmentsByConfigKey(self::GLOBAL_HIGHLIGHT_CONFIG);
-        $highlight = new kESearchHighlightQuery($this->queryAttributes->getQueryHighlightsAttributes()->getFieldsToHighlight(), $numOfFragments);
-        $highlight = $highlight->getFinalQuery();
-        if($highlight)
-            $this->query['body']['highlight'] = $highlight;
-	}
-
     protected function applyElasticSearchConditions()
     {
         $this->query['body']['query'] = $this->mainBoolQuery->getFinalQuery();
@@ -153,7 +122,9 @@ abstract class kBaseSearch
     {
         $partner = PartnerPeer::retrieveByPK($partnerId);
         if(!$partner)
-            return;
+        {
+			return;
+		}
 
         $partnerLanguages = $partner->getESearchLanguages();
         if(!count($partnerLanguages))
@@ -168,32 +139,12 @@ abstract class kBaseSearch
     protected function initOverrideInnerHits($objectId)
     {
         if(!$objectId)
-            return;
+        {
+			return;
+		}
 
         $innerHitsConfig = kConf::get('innerHits', 'elastic');
         $overrideInnerHitsSize = isset($innerHitsConfig['innerHitsWithObjectId']) ? $innerHitsConfig['innerHitsWithObjectId'] : null;
         $this->queryAttributes->setOverrideInnerHitsSize($overrideInnerHitsSize);
     }
-
-    protected function addSearchTermsToSearchHistory()
-    {
-        $searchTerms = $this->queryAttributes->getSearchHistoryTerms();
-        $searchTerms = array_unique($searchTerms);
-        $searchTerms = array_values($searchTerms);
-        if (!$searchTerms)
-        {
-            KalturaLog::log("Empty search terms, not adding to search history");
-            return;
-        }
-
-        $searchHistoryInfo = new ESearchSearchHistoryInfo();
-        $searchHistoryInfo->setSearchTerms($searchTerms);
-        $searchHistoryInfo->setPartnerId(kBaseElasticEntitlement::$partnerId);
-        $searchHistoryInfo->setKUserId(kBaseElasticEntitlement::$kuserId);
-        $searchHistoryInfo->setSearchContext(searchHistoryUtils::getSearchContext());
-        $searchHistoryInfo->setSearchedObject($this->getElasticTypeName());
-        $searchHistoryInfo->setTimestamp(time());
-        kEventsManager::raiseEventDeferred(new kESearchSearchHistoryInfoEvent($searchHistoryInfo));
-    }
-
 }

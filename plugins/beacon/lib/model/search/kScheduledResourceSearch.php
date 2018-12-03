@@ -5,7 +5,6 @@
  */
 class kScheduledResourceSearch extends kBaseSearch
 {
-	const INDEX_NAME = 'beacon_scheduled_resource_index_search';
 	public function __construct()
 	{
 		parent::__construct();
@@ -52,21 +51,6 @@ class kScheduledResourceSearch extends kBaseSearch
 		$this->applyElasticSearchConditions();
 		$result = $this->elasticClient->search($this->query, true, true);
 		return $result;
-	}
-
-	public function getPeerName()
-	{
-		// TODO: Implement getPeerName() method.
-	}
-
-	public function getPeerRetrieveFunctionName()
-	{
-		// TODO: Implement getPeerRetrieveFunctionName() method.
-	}
-
-	public function getElasticTypeName()
-	{
-		// TODO: Implement getElasticTypeName() method.
 	}
 
 	private function initEntitlement()
