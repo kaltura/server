@@ -467,7 +467,7 @@ class kMrssManager
 		}
 			
 		$categories = explode(',', $entry->getCategories());
-		if (count($features) && in_array (ObjectFeatureType::CATEGORY_ENTRIES, $features))
+		if ($features && count($features) && in_array (ObjectFeatureType::CATEGORY_ENTRIES, $features))
 		{
 			$partner = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId());
 			$partnerEntitlement = $partner->getDefaultEntitlementEnforcement();

@@ -58,13 +58,18 @@ class ZoomHelper
 			foreach ($emails as $email)
 			{
 				kuserPeer::createUniqueKuserForPartner($dbUser->getPartnerId(), $email);
+				//User John.Doe@k.com will be added both as John.Doe@k.com and John.Doe
+				if(kString::isEmailString($email))
+				{
+					$emailParts = explode('@',$email);
+					kuserPeer::createUniqueKuserForPartner($dbUser->getPartnerId(), $emailParts[0]);
+				}
 			}
 			$entry->setEntitledPusersPublish(implode(",", array_unique($emails)));
 		}
 		$entry->save();
 		return $entry->getId();
 	}
-
 
 	/**
 	 * @param array $zoomUserPermissions

@@ -241,4 +241,32 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 	}
 	
 	abstract protected function getUploadResultInstance ();
+
+	protected function setResultValues($columns, $values, &$bulkUploadResult)
+	{
+		foreach($columns as $index => $column)
+		{
+			if(!is_numeric($index))
+			{
+				continue;
+			}
+			if(iconv_strlen($values[$index], 'UTF-8'))
+			{
+				$bulkUploadResult->$column = $values[$index];
+				KalturaLog::info("Set value $column [{$bulkUploadResult->$column}]");
+			}
+			else
+			{
+				KalturaLog::info("Value $column is empty");
+			}
+		}
+	}
+
+	protected function handleResultError(&$bulkUploadResult, $type, $description)
+	{
+		$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+		$bulkUploadResult->errorType = $type;
+		$bulkUploadResult->errorDescription = $description;
+	}
+
 }

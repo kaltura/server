@@ -202,7 +202,7 @@ class kPlaybackContextDataHelper
 
 		list($flavorParamsIdsToFilter, $flavorsParamsNotIn) = $this->getFlavorParamsIdsToFilter($contextDataHelper);
 
-		if(count($flavorParamsIdsToFilter) || $flavorsParamsNotIn)
+		if($flavorParamsIdsToFilter && count($flavorParamsIdsToFilter) || $flavorsParamsNotIn)
 			self::filterFlavorAssetsByFlavorParamsIds($flavorAssets, $flavorParamsIdsToFilter, $flavorsParamsNotIn);
 
 		$this->flavorAssets = $flavorAssets;
@@ -371,7 +371,7 @@ class kPlaybackContextDataHelper
 
 		list($deliveryProfileIds, $deliveryProfilesParamsNotIn) = $this->getProfileIdsToFilter($contextDataHelper);
 
-		if (count($deliveryProfileIds) || $deliveryProfilesParamsNotIn)
+		if ($deliveryProfileIds && count($deliveryProfileIds) || $deliveryProfilesParamsNotIn)
 			$this->filterDeliveryProfiles($localDeliveryProfiles, $deliveryProfileIds, $deliveryProfilesParamsNotIn, $contextDataHelper);
 
 		$this->filterDeliveryProfilesByStreamerType($localDeliveryProfiles, $contextDataHelper);

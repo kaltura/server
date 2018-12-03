@@ -498,8 +498,18 @@ class KDLWrap
 				$kdlFlavor->_multiStream = isset($fromJson)? $fromJson: null;
 			}
 			$kdlFlavor->_optimizationPolicy = $cdlFlavor->getOptimizationPolicy();
-			if($cdlFlavor->getIsEncrypted()){
-				$kdlFlavor->_isEncrypted = true;
+			/*
+			 * 'IsEncrypted' was switched from true/false flag vals,
+			 * to 'mode' values 
+			 *	0:don't encrypt (equivalent to original 'false')
+			 *	1:encrypt contents >10sec (equivalent to original 'true')
+			 *	2:encrypt all 
+			 */
+			if(($tmpEncrypted=$cdlFlavor->getIsEncrypted())){
+				if($tmpEncrypted===true)
+					$kdlFlavor->_isEncrypted = 1; 
+				else if($tmpEncrypted>0)
+					$kdlFlavor->_isEncrypted = $tmpEncrypted;
 			}
 		}
 		else if($cdlFlavor instanceof flavorParamsOutput){

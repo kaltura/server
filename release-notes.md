@@ -1,3 +1,18 @@
+# Naos 14.9.0 #
+
+## Add permission for bulk update categoryEntry status ##
+- Issue Type: Task
+- Issue ID: PLAT-9399
+
+### Configuration ###
+	None.
+
+#### Deployment Scripts ####
+
+    Run deployment scripts:
+        php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_11_12_add_bulk_update_category_entries_status_permissions.php
+        php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_11_12_update_category_entry_permissions.php
+
 # Naos 14.8.0 #
 
 ## Update permission of media::addFromUploadedFile ##

@@ -46,6 +46,10 @@ class myReportsMgr
 	const REPORT_TYPE_REACH_USAGE = 28;
 	const REPORT_TYPE_TOP_CUSTOM_VAR1 = 29;
 	const REPORT_TYPE_CITIES = 30;
+	const REPORT_TYPE_OPERATING_SYSTEMS_FAMILIES = 32;
+	const REPORT_TYPE_BROWSERS_FAMILIES = 33;
+	const REPORT_TYPE_USER_ENGAGEMENT_TIMELINE = 34;
+	const REPORT_TYPE_UNIQUE_USERS_PLAY = 35;
 
 	const REPORTS_TABLE_MAX_QUERY_SIZE = 20000;
 	const REPORTS_CSV_MAX_QUERY_SIZE = 130000;
@@ -1509,8 +1513,12 @@ class reportsInputFilter
 	public $timeZoneOffset;
 	public $interval;
 	public $countries;
+	public $playback_types;
+	public $server_node_ids;
 	public $regions;
 	public $devices;
+	public $os_families;
+	public $browsers_families;
 
 	public function getFilterBy() {
 		return "";
