@@ -7,9 +7,7 @@ class elasticSearchUtils
 {
 	const UNDERSCORE_FIELD_DELIMITER ='_';
 	const DOT_FIELD_DELIMITER = '.';
-
-	public static $shouldLower = true;
-
+	
 	private static $html_chars_to_replace = array('<br />', '<br>',
 		'<br/>', '<div>', '</div>', '<div/>', '<p>', '</p>', '<p/>');
 
@@ -143,11 +141,7 @@ class elasticSearchUtils
 		//remove extra spaces
 		$term = preg_replace('/\s+/', ' ', $searchTerm);
 		//lowercase and trim
-		if(self::$shouldLower)
-		{
-			$term = strtolower($term);
-		}
-
+		$term = strtolower($term);
 		$term = trim($term);
 		return $term;
 	}
@@ -243,7 +237,8 @@ class elasticSearchUtils
 				throw new KalturaAPIException(KalturaESearchErrors::MIXED_SEARCH_ITEMS_IN_NESTED_OPERATOR_NOT_ALLOWED);
 			case kESearchException::MISSING_OPERATOR_TYPE:
 				throw new KalturaAPIException(KalturaESearchErrors::MISSING_OPERATOR_TYPE);
-
+			case kESearchException::INVALID_SEARCH_ITEM_TYPE:
+				throw new  KalturaAPIException(KalturaESearchErrors::INVALID_SEARCH_ITEM_TYPE);
 			default:
 				throw new KalturaAPIException(KalturaESearchErrors::INTERNAL_SERVERL_ERROR);
 		}

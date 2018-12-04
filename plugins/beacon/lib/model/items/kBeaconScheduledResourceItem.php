@@ -77,7 +77,6 @@ class kBeaconScheduledResourceItem extends ESearchItem
 	{
 		$scheduledResourceQuery = array();
 		$allowedSearchTypes = ESearchEntryItem::getAllowedSearchTypesForField();
-		$queryAttributes->getQueryHighlightsAttributes()->setScopeToGlobal();
 		foreach ($eSearchItemsArr as $scheduledResourceSearchItem)
 		{
 			$scheduledResourceSearchItem->getSingleItemSearchQuery($scheduledResourceQuery, $allowedSearchTypes, $queryAttributes);
@@ -111,6 +110,8 @@ class kBeaconScheduledResourceItem extends ESearchItem
 				break;
 			default:
 				KalturaLog::log("Undefined item type[" . $this->getItemType() . "]");
+				throw new kESearchException('Type of search [' . $this->getItemType() . '] not allowed on specific field 
+				[' . $this->getFieldName() . ']', kESearchException::SEARCH_TYPE_NOT_ALLOWED_ON_FIELD);
 		}
 
 		if($subQuery)
