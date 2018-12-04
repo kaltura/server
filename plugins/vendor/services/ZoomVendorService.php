@@ -85,20 +85,21 @@ class ZoomVendorService extends KalturaBaseService
 	 */
 	public function deAuthorizationAction()
 	{
+		http_response_code(KCurlHeaderResponse::HTTP_STATUS_BAD_REQUEST);
 		KalturaResponseCacher::disableCache();
 		myPartnerUtils::resetAllFilters();
 		ZoomHelper::verifyHeaderToken();
 		$data = ZoomHelper::getPayloadData();
 		$accountId = ZoomHelper::extractAccountIdFromDeAuthPayload($data);
 		KalturaLog::info("Zoom changing account id: $accountId status to deleted , user de-authorized the app");
-		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId,
-			VendorTypeEnum::ZOOM_ACCOUNT);
+		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 		if (!$zoomIntegration)
 		{
 			throw new KalturaAPIException('Zoom Integration data Does Not Exist for current Partner');
 		}
 		$zoomIntegration->setStatus(VendorStatus::DELETED);
 		$zoomIntegration->save();
+		http_response_code(KCurlHeaderResponse::HTTP_STATUS_OK);
 		return true;
 	}
 
