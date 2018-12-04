@@ -142,6 +142,8 @@ class KCurlWrapper
 	const LOW_SPEED_TIME_LIMIT = 595; //595 sec + 5 sec until it is detected total is 600 sec = 10 min
 
 	const HTTP_USER_AGENT = "\"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.6) Gecko/2009011913 Firefox/3.0.6\"";
+	
+	const ERROR_CODE_FAILED_TO_OPEN_FILE_FOR_WRITING = 37;
 
 	/**
 	 * @var resource
@@ -607,9 +609,9 @@ class KCurlWrapper
 		$this->error = "Internal not allowed url [$url] -  curl will not be invoked";
 	}
 	
-	private function setFailedOpeningFileErrorResults($filePath)
+	protected function setFailedOpeningFileErrorResults($filePath)
 	{
-		$this->errorNumber = 37;
+		$this->errorNumber = self::ERROR_CODE_FAILED_TO_OPEN_FILE_FOR_WRITING;
 		$this->error = "Failed opening file [$filePath]";
 	}
 
