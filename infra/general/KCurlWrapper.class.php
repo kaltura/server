@@ -551,7 +551,14 @@ class KCurlWrapper
 		$returnTransfer = is_null($destFile);
 		$destFd = null;
 		if (!is_null($destFile))
+		{
 			$destFd = fopen($destFile, "ab");
+			if($destFd === false)
+			{
+				$this->setFailedOpeningFileErrorResults($destFile);
+				return false;
+			}
+		}
 
 		curl_setopt($this->ch, CURLOPT_HEADER, false);
 		curl_setopt($this->ch, CURLOPT_NOBODY, false);
@@ -598,6 +605,12 @@ class KCurlWrapper
 	{
 		$this->errorNumber = -1;
 		$this->error = "Internal not allowed url [$url] -  curl will not be invoked";
+	}
+	
+	private function setFailedOpeningFileErrorResults($filePath)
+	{
+		$this->errorNumber = 37;
+		$this->error = "Failed opening file [$filePath]";
 	}
 
 	private function execCurl()
