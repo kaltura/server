@@ -557,6 +557,7 @@ class KCurlWrapper
 			$destFd = fopen($destFile, "ab");
 			if($destFd === false)
 			{
+				KalturaLog::debug("Exec Curl - Failed opening file [$destFile] for writing");
 				$this->setFailedOpeningFileErrorResults($destFile);
 				return false;
 			}
