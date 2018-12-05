@@ -65,7 +65,7 @@ class PollService extends KalturaBaseService
 				if ($remoteDCHost)
 				{
 					$_POST[$otherDcVotesKey] = json_encode($localDcVotes);
-					return kFileUtils::dumpApiRequest($remoteDCHost);
+					return kFileUtils::dumpApiRequest($remoteDCHost, true);
 				}
 			}
 		}
@@ -114,7 +114,7 @@ class PollService extends KalturaBaseService
 			{
 				$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId(1 - kDataCenterMgr::getCurrentDcId());
 				if ($remoteDCHost)
-					return kFileUtils::dumpApiRequest($remoteDCHost);
+					return kFileUtils::dumpApiRequest($remoteDCHost, true);
 			}
 		}
 	}
