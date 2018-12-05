@@ -509,11 +509,11 @@ class kKavaCountryCodes
 	
 	public static function toShortName($name)
 	{
-		return self::$longToShort[$name];
+		return isset(self::$longToShort[$name]) ? self::$longToShort[$name] : $name;
 	}
 
 	public static function toLongName($name)
 	{
-		return self::$shortToLong[$name];
+		return isset(self::$shortToLong[$name]) ? self::$shortToLong[$name] : $name;
 	}
 }

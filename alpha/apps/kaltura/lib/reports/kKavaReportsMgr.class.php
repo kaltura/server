@@ -174,6 +174,7 @@ class kKavaReportsMgr extends kKavaBase
 	const MIN_THRESHOLD = 500;
 	
 	const ENRICH_CHUNK_SIZE = 10000;
+	const ENRICH_DIM_DELIMITER = '|';
 	const CLIENT_TAG_PRIORITY = 5;
 	
 	const GET_TABLE_FLAG_IS_CSV = 0x01;
@@ -217,7 +218,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
 			self::REPORT_DIMENSION_HEADERS => array('object_id', 'entry_name'),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => 'entry_name', 
+				self::REPORT_ENRICH_OUTPUT => 'entry_name',
 				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_USERS),
 			self::REPORT_FORCE_TOTAL_COUNT => true,
@@ -1124,9 +1125,14 @@ class kKavaReportsMgr extends kKavaBase
 		),
 
 		myReportsMgr::REPORT_TYPE_CITIES => array(
-			self::REPORT_DIMENSION => self::DIMENSION_LOCATION_CITY,
-			self::REPORT_DIMENSION_HEADERS => array('object_id', 'city'),
+			self::REPORT_DIMENSION => array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_LOCATION_REGION, self::DIMENSION_LOCATION_CITY),
+			self::REPORT_DIMENSION_HEADERS => array('country', 'region', 'city', 'country_coordinates', 'region_coordinates', 'city_coordinates'),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
+				self::REPORT_ENRICH_OUTPUT => array('country_coordinates', 'region_coordinates', 'city_coordinates'),
+				self::REPORT_ENRICH_FUNC => 'self::getCoordinates'
+			),
 		),
 
 		myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT_TIMELINE => array(
@@ -1659,11 +1665,8 @@ class kKavaReportsMgr extends kKavaBase
 		
 		self::$aggregations_def[self::METRIC_SUM_PRICE] = self::getLongSumAggregator(
 			self::METRIC_SUM_PRICE, self::METRIC_SUM_PRICE);
-		
-		foreach (self::$metrics_to_headers as $metric => $header)
-		{
-			self::$headers_to_metrics[$header] = $metric;
-		}
+
+		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 	}
 	
 	/// time functions
@@ -2086,7 +2089,7 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$result[] = $row[0];
 		}
-		return $result;
+		return array_map('reset', $rows);
 	}
 
 	protected static function getDruidFilter($partner_id, $report_def, $input_filter, $object_ids)
@@ -3245,6 +3248,42 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
+	protected static function getCoordinates($keys)
+	{
+		$coorKeys = array();
+		foreach ($keys as $row => $key)
+		{
+			$enrichedIndexes = explode(self::ENRICH_DIM_DELIMITER, $key);
+			$memcKeys = array();
+			foreach ($enrichedIndexes as $location)
+			{
+				$memcKeys[] = kKavaCountryCodes::toLongName($location);
+				$coorKeys[kKavaBase::getCoordinatesKey($memcKeys)] = true;
+			}
+		}
+
+		$coords = kKavaBase::getCoordinatesMapForKeys($coorKeys);
+		$result = array();
+		foreach ($keys as $row => $key)
+		{
+			$enrichedIndexes = explode(self::ENRICH_DIM_DELIMITER, $key);
+			$memcKeys = array();
+			$rowData = array();
+			foreach ($enrichedIndexes as $location)
+			{
+				$memcKeys[] = kKavaCountryCodes::toLongName($location);
+
+				if(isset($coords[kKavaBase::getCoordinatesKey($memcKeys)]))
+				{
+					$rowData[] = implode(':',$coords[kKavaBase::getCoordinatesKey($memcKeys)]);
+				}
+			}
+			$result[$key] = $rowData;
+		}
+
+		return $result;
+	}
+
 	protected static function getEntriesUserIdsAndNames($ids, $partner_id)
 	{
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
@@ -3710,7 +3749,28 @@ class kKavaReportsMgr extends kKavaBase
 		
 		return $result;
 	}
-	
+
+	protected static function arrayGetIndexes($arr, $elements)
+	{
+		$result = array();
+		foreach ($elements as $element)
+		{
+			$result[] = array_search($element, $arr);
+		}
+		return $result;
+	}
+
+	protected static function arrayGetElements($arr, $indexes)
+	{
+		$indexes = explode(',', $indexes);
+		$result = array();
+		foreach ($indexes as $index)
+		{
+			$result[] = $arr[$index];
+		}
+		return $result;
+	}
+
 	protected static function enrichData($report_def, $headers, $partner_id, &$data)
 	{
 		// get the enrichment specification
@@ -3730,34 +3790,35 @@ class kKavaReportsMgr extends kKavaBase
 				$cur_fields = array($cur_fields);
 			}
 		
-			$enriched_indexes = array();
-			foreach ($cur_fields as $field)
-			{
-				$enriched_indexes[] = array_search($field, $headers);
-			}
 
+			$enriched_indexes = self::arrayGetIndexes($headers, $cur_fields);
 			// input
 			if (isset($enrich_def[self::REPORT_ENRICH_INPUT]))
 			{
-				$dim_header = $enrich_def[self::REPORT_ENRICH_INPUT];
+				$dim_headers = $enrich_def[self::REPORT_ENRICH_INPUT];
+				if (!is_array($dim_headers))
+				{
+					$dim_headers = array($cur_fields);
+				}
 			}
 			else
 			{
-				$dim_header = reset($cur_fields);
+				$dim_headers = array(reset($cur_fields));
 			}
-			$dim_index = array_search($dim_header, $headers);
-			
+			$dim_indexes = self::arrayGetIndexes($headers, $dim_headers);
+			$dim_indexes = implode(',', $dim_indexes);
+
 			// add
-			if (!isset($enrich_specs[$dim_index]))
+			if (!isset($enrich_specs[$dim_indexes]))
 			{
-				$enrich_specs[$dim_index] = array();
+				$enrich_specs[$dim_indexes] = array();
 			}
-			$enrich_specs[$dim_index][] = array($enrich_func, $enrich_context, $enriched_indexes);
+			$enrich_specs[$dim_indexes][] = array($enrich_func, $enrich_context, $enriched_indexes);
 		}
 		
 		// enrich the data in chunks
 		$rows_count = count($data);
-		foreach ($enrich_specs as $dim_index => $cur_enrich_specs)
+		foreach ($enrich_specs as $dim_indexes => $cur_enrich_specs)
 		{
 			$start = 0;
 			while ($start < $rows_count)
@@ -3767,7 +3828,8 @@ class kKavaReportsMgr extends kKavaBase
 				$dimension_ids = array();
 				for ($current_row = $start; $current_row < $limit; $current_row++) 
 				{
-					$key = $data[$current_row][$dim_index];
+					$key = self::arrayGetElements($data[$current_row], $dim_indexes);
+					$key = implode(self::ENRICH_DIM_DELIMITER, $key);
 					$dimension_ids[$key] = true;
 				}
 				
@@ -3775,14 +3837,15 @@ class kKavaReportsMgr extends kKavaBase
 				foreach ($cur_enrich_specs as $enrich_spec)
 				{
 					list($enrich_func, $enrich_context, $enriched_indexes) = $enrich_spec;
-	
+
 					$entities = call_user_func($enrich_func, array_keys($dimension_ids), $partner_id, $enrich_context);
 			
 					for ($current_row = $start; $current_row < $limit; $current_row++) 
 					{
-						$key = $data[$current_row][$dim_index];
+						$key = self::arrayGetElements($data[$current_row], $dim_indexes);
+						$key = implode(self::ENRICH_DIM_DELIMITER, $key);
 						$entity = isset($entities[$key]) ? $entities[$key] : null;
-						foreach ($enriched_indexes as $index => $enrich_field) 
+						foreach ($enriched_indexes as $index => $enrich_field)
 						{
 							$data[$current_row][$enrich_field] = is_array($entity) ? $entity[$index] : $entity;
 						}
@@ -4291,10 +4354,8 @@ class kKavaReportsMgr extends kKavaBase
 			}
 		}
 
-		foreach ($metrics as $column)
-		{
-			$row_mapping[] = $column;
-		}
+
+		$row_mapping = array_merge($row_mapping, $metrics);
 
 		// map the rows
 		foreach ($rows as $index => $row)
