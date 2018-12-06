@@ -75,7 +75,6 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	 */
 	public $pricing;
 
-
 	private static $map_between_objects = array
 	(
 		'id',
@@ -184,6 +183,10 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 
 			case VendorServiceFeature::TRANSLATION:
 				$object = new KalturaVendorTranslationCatalogItem();
+				break;
+				
+			case VendorServiceFeature::ALIGNMENT:
+				$object = new KalturaVendorAlignmentCatalogItem();
 				break;
 
 			default:

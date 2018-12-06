@@ -85,6 +85,8 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 			return new Kaltura_Client_Reach_Type_VendorCaptionsCatalogItemFilter();
 		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
 			return new Kaltura_Client_Reach_Type_VendorTranslationCatalogItemFilter();
+		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT)
+			return new Kaltura_Client_Reach_Type_VendorAlignmentCatalogItemFilter();
 		else
 			return new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
 	}

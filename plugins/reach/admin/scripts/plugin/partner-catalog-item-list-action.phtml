@@ -262,6 +262,10 @@
 		if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS; ?>) {
 			jQuery('#filterSourceLanguage').removeAttr('hidden');
 		}
+
+        if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT; ?>) {
+            jQuery('#filterSourceLanguage').removeAttr('hidden');
+        }
 		
 		if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION; ?>) {
 			jQuery('#filterSourceLanguage').removeAttr('hidden');

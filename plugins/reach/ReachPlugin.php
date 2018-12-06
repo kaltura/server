@@ -40,12 +40,6 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if ($baseClass == 'BaseVendorCatalogItem' && $enumValue == KalturaVendorCatalogItemType::CAPTIONS)
-			return 'KalturaVendorCaptionsCatalogItem';
-		
-		if ($baseClass == 'BaseVendorCatalogItem' && $enumValue == KalturaVendorCatalogItemType::TRANSLATION)
-			return 'KalturaVendorTranslationCatalogItem';
-		
 		if ($baseClass == 'KalturaCondition' && $enumValue == ReachPlugin::getConditionTypeCoreValue(ReachConditionType::EVENT_CATEGORY_ENTRY))
 			return 'KalturaCategoryEntryCondition';
 		
