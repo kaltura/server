@@ -2,6 +2,9 @@
 <p><?php echo $this->translate('Here you can configure your Catalog items'); ?></p>
 <?php echo $this->filterForm; ?>
 <?php echo $this->newPartnerCatalogItemFolderForm; ?>
+<p><?php echo $this->translate("Here you can clone all partner's catalog items"); ?></p>
+<?php echo $this->clonePartnerCatalogItemsForm; ?>
+
 <div id="partner-catalog_item_list_div" class="clear">
 	<td><input type="checkbox" name="selectAllCatalogItemsOnPageCheckbox" onchange="flipAllCheckboxItemsOnPage()" id="selectAllCatalogItemsInPage" align="left" />Select All Items On Page</td>
 	<button type="button" onclick="bulkDeleteAction(<?php echo $this->filterForm->getElement('filter_input')->getValue(); ?>)">Bulk Delete</button>
@@ -268,5 +271,53 @@
 			jQuery('#filterTargetLanguage').removeAttr('hidden');
 		}
 	}
-	
+
+	function clonePartnerCatalogItems(fromPartnerId, toPartnerId)
+	{
+		if(!fromPartnerId.length || isNaN(fromPartnerId)){
+			alert('<?php echo $this->translate('From Publisher ID not supplied'); ?>');
+			return;
+		}
+
+		if(!toPartnerId.length || isNaN(toPartnerId)){
+			alert('<?php echo $this->translate('To Publisher ID not supplied'); ?>');
+			return;
+		}
+		var msg = 'Are you sure you want to clone Partner Catalog Items from partner ' + fromPartnerId + ' to partner ' + toPartnerId +'?';
+		var ok = confirm("<?php echo $this->translate('" + msg + "');?>");
+		if (ok)
+		{
+			cloneItems(
+				fromPartnerId,toPartnerId,
+				function() {
+				}
+			);
+		}
+	}
+
+	function cloneItems(fromPartnerId, toPartnerId, callback)
+	{
+		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemsCloneAction', 'fromPartnerId' => 'FROMPARTNERID','toPartnerId' => 'TOPARTNERID')); ?>';
+		url = url.replace('FROMPARTNERID', fromPartnerId);
+		url = url.replace('TOPARTNERID', toPartnerId);
+		jQuery.ajax({
+			url: url,
+			dataType: 'json',
+			success: function(result) {
+				if (result != 'ok')
+				{
+					alert(JSON.stringify(result));
+				}
+				else
+				{
+					alert('<?php echo $this->translate('Partner Catalog Items cloned');?>');
+				}
+				jQuery('#frmPaginator1').submit();
+			},
+			error: function(result) {
+				alert(JSON.stringify(result));
+			}
+		});
+	}
+
 </script>

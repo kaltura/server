@@ -62,6 +62,15 @@ class ReachProfileListAction extends KalturaApplicationPlugin
 
 		$action->view->newReachProfileFolderForm = $createReachProfileForm;
 
+		$cloneReachProfileForm = new Form_CloneReachProfile();
+		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'ReachProfileClone'), null, true);
+		$cloneReachProfileForm->setAction($actionUrl);
+
+		if ($partnerId)
+			$cloneReachProfileForm->getElement("toPartnerId")->setValue($partnerId);
+
+		$action->view->cloneReachProfileForm = $cloneReachProfileForm;
+
 	}
 
 	public function getInstance($interface)
