@@ -43,4 +43,6 @@ interface ReportType extends BaseEnum
    const BROWSERS_FAMILIES = 33;
    const USER_ENGAGEMENT_TIMELINE = 34;
    const UNIQUE_USERS_PLAY = 35;
+   const MAP_OVERLAY_COUNTRY = 36;
+   const MAP_OVERLAY_REGION = 37;
 }

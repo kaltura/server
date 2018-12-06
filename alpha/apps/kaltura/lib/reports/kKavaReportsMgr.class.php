@@ -211,6 +211,8 @@ class kKavaReportsMgr extends kKavaBase
 		myReportsMgr::REPORT_TYPE_BROWSERS_FAMILIES,
 		myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT_TIMELINE,
 		myReportsMgr::REPORT_TYPE_UNIQUE_USERS_PLAY,
+		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_COUNTRY,
+		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_REGION,
 	);
 	
 	protected static $reports_def = array(
@@ -1129,9 +1131,30 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_DIMENSION_HEADERS => array('country', 'region', 'city', 'country_coordinates', 'region_coordinates', 'city_coordinates'),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
-				self::REPORT_ENRICH_OUTPUT => array('country_coordinates', 'region_coordinates', 'city_coordinates'),
-				self::REPORT_ENRICH_FUNC => 'self::getCoordinates'
+				array(
+					self::REPORT_ENRICH_INPUT =>  array('country'),
+					self::REPORT_ENRICH_OUTPUT => array('country_coordinates'),
+					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'object' => 'country'
+					)
+				),
+				array(
+					self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
+					self::REPORT_ENRICH_OUTPUT => array('region_coordinates'),
+					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'object' => 'region'
+					)
+				),
+				array(
+					self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
+					self::REPORT_ENRICH_OUTPUT => array('city_coordinates'),
+					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'object' => 'city'
+					)
+				)
 			),
 		),
 
@@ -1147,7 +1170,35 @@ class kKavaReportsMgr extends kKavaBase
 			),
 			self::REPORT_METRICS => array(self::METRIC_UNIQUE_USERS),
 			self::REPORT_GRAPH_METRICS => array(self::METRIC_UNIQUE_USERS),
-		)
+		),
+
+		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_COUNTRY => array(
+			self::REPORT_DIMENSION => self::DIMENSION_LOCATION_COUNTRY,
+			self::REPORT_DIMENSION_HEADERS => array('country', 'country_coordinates'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_INPUT =>  array('country'),
+				self::REPORT_ENRICH_OUTPUT => array('country_coordinates'),
+				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				self::REPORT_ENRICH_CONTEXT => array(
+					'object' => 'country'
+				)
+			),
+		),
+
+		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_REGION => array(
+			self::REPORT_DIMENSION => array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_LOCATION_REGION),
+			self::REPORT_DIMENSION_HEADERS => array('country', 'region', 'region_coordinates'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
+				self::REPORT_ENRICH_OUTPUT => array('region_coordinates'),
+				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				self::REPORT_ENRICH_CONTEXT => array(
+					'object' => 'region'
+				)
+			),
+		),
 	);
 	
 	protected static $event_type_count_aggrs = array(
@@ -3248,39 +3299,44 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
-	protected static function getCoordinates($keys)
+	protected static function getMemcacheCoordinatesKey($enrich_context, $country, $region, $city)
+	{
+		$objectContext = isset($enrich_context['object']) ? $enrich_context['object'] : null;
+		switch ($objectContext)
+		{
+			case 'country':
+				return array(kKavaCountryCodes::toLongName($country));
+			case 'region':
+				return array(kKavaCountryCodes::toLongName($country), $region);
+			case 'city':
+				return array(kKavaCountryCodes::toLongName($country), $region, $city);
+			default:
+				return array();
+		}
+	}
+
+	protected static function getCoordinates($keys, $partner_id, $enrich_context)
 	{
 		$coorKeys = array();
 		foreach ($keys as $row => $key)
 		{
-			$enrichedIndexes = explode(self::ENRICH_DIM_DELIMITER, $key);
-			$memcKeys = array();
-			foreach ($enrichedIndexes as $location)
-			{
-				$memcKeys[] = kKavaCountryCodes::toLongName($location);
-				$coorKeys[kKavaBase::getCoordinatesKey($memcKeys)] = true;
-			}
+			list($country, $region, $city) = array_pad(explode(self::ENRICH_DIM_DELIMITER, $key), 3, null);
+			$memcKey = self::getMemcacheCoordinatesKey($enrich_context, $country, $region, $city);
+			$coorKeys[kKavaBase::getCoordinatesKey($memcKey)] = true;
 		}
-
 		$coords = kKavaBase::getCoordinatesMapForKeys($coorKeys);
 		$result = array();
 		foreach ($keys as $row => $key)
 		{
-			$enrichedIndexes = explode(self::ENRICH_DIM_DELIMITER, $key);
-			$memcKeys = array();
 			$rowData = array();
-			foreach ($enrichedIndexes as $location)
+			list($country, $region, $city) = array_pad(explode(self::ENRICH_DIM_DELIMITER, $key), 3, null);
+			$memcKey = self::getMemcacheCoordinatesKey($enrich_context, $country, $region, $city);
+			if (isset($coords[kKavaBase::getCoordinatesKey($memcKey)]))
 			{
-				$memcKeys[] = kKavaCountryCodes::toLongName($location);
-
-				if(isset($coords[kKavaBase::getCoordinatesKey($memcKeys)]))
-				{
-					$rowData[] = implode(':',$coords[kKavaBase::getCoordinatesKey($memcKeys)]);
-				}
+				$rowData[] = implode(':',$coords[kKavaBase::getCoordinatesKey($memcKey)]);
 			}
 			$result[$key] = $rowData;
 		}
-
 		return $result;
 	}
 
@@ -3782,7 +3838,7 @@ class kKavaReportsMgr extends kKavaBase
 			$enrich_func = $enrich_def[self::REPORT_ENRICH_FUNC];
 			$enrich_context = isset($enrich_def[self::REPORT_ENRICH_CONTEXT]) ? 
 				$enrich_def[self::REPORT_ENRICH_CONTEXT] : null;
-			
+
 			// output
 			$cur_fields = $enrich_def[self::REPORT_ENRICH_OUTPUT];
 			if (!is_array($cur_fields))

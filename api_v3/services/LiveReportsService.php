@@ -28,44 +28,19 @@ class LiveReportsService extends KalturaBaseService
 		}
 		return $result;
 	}
-	
-	protected static function getCoordinatesKey($items)
-	{
-		$key = implode('_', $items);
-		return 'coord_' . preg_replace('/[^a-z0-9_]/', '_', strtolower($key));
-	}
-
-	protected static function parseCoordinates($coords)
-	{
-		return array_map('floatval', explode('/', $coords));
-	}
 
 	protected static function addCoordinates($items)
 	{
-		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_GEO_COORDINATES);
-		if ($cache)
+		$keys = array();
+		foreach ($items as $item)
 		{
-			// get the keys
-			$keys = array();
-			foreach ($items as $item)
-			{
-				$countryName = $item->countryName;
-				$regionName = $item->regionName;
-				$cityName = $item->cityName;
-				$keys[self::getCoordinatesKey(array($countryName))] = true;
-				$keys[self::getCoordinatesKey(array($countryName, $regionName, $cityName))] = true;
-			}
-
-			// get from memcache
-			$coords = $cache->multiGet(array_keys($keys));
-
-			// parse the coordinates
-			$coords = array_map('self::parseCoordinates', $coords);
+			$countryName = $item->countryName;
+			$regionName = $item->regionName;
+			$cityName = $item->cityName;
+			$keys[kKavaBase::getCoordinatesKey(array($countryName))] = true;
+			$keys[kKavaBase::getCoordinatesKey(array($countryName, $regionName, $cityName))] = true;
 		}
-		else
-		{
-			$coords = array();
-		}
+		$coords = kKavaBase::getCoordinatesMapForKeys($keys);
 		
 		foreach ($items as $item)
 		{
@@ -81,7 +56,7 @@ class LiveReportsService extends KalturaBaseService
 			// country
 			$item->country = new KalturaCoordinate();
 			$item->country->name = strtoupper($countryName);
-			$key = self::getCoordinatesKey(array($countryName));
+			$key = kKavaBase::getCoordinatesKey(array($countryName));
 			if (isset($coords[$key]))
 			{
 				list($item->country->latitude, $item->country->longitude) = $coords[$key];
@@ -90,7 +65,7 @@ class LiveReportsService extends KalturaBaseService
 			// city
 			$item->city = new KalturaCoordinate();
 			$item->city->name = strtoupper($cityName);
-			$key = self::getCoordinatesKey(array($countryName, $regionName, $cityName));
+			$key = kKavaBase::getCoordinatesKey(array($countryName, $regionName, $cityName));
 			if (isset($coords[$key]))
 			{
 				list($item->city->latitude, $item->city->longitude) = $coords[$key];
