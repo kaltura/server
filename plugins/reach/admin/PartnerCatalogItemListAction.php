@@ -76,6 +76,12 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 		$createProfileForm->setAction($actionUrl);
 
 		$action->view->newPartnerCatalogItemFolderForm = $createProfileForm;
+
+		$clonePartnerCatalogItemsForm = new Form_ClonePartnerCatalogItems();
+		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemClone'), null, true);
+		$clonePartnerCatalogItemsForm->setAction($actionUrl);
+
+		$action->view->clonePartnerCatalogItemsForm = $clonePartnerCatalogItemsForm;
 		$action->view->partnerId = $partnerId;
 	}
 
