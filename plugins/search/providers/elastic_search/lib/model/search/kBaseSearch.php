@@ -14,7 +14,7 @@ abstract class kBaseSearch
     protected $queryAttributes;
 	protected $mainBoolQuery;
 
-	protected static $filterOnly = false;
+	protected $filterOnlyContext = false;
 
     public function __construct()
     {
@@ -45,14 +45,14 @@ abstract class kBaseSearch
 
 	public function setFilterOnly()
 	{
-		self::$filterOnly = true;
+		$this->filterOnlyContext = true;
 	}
 
     protected function execSearch(ESearchOperator $eSearchOperator)
     {
         $subQuery = $eSearchOperator::createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
         $this->handleDisplayInSearch();
-        if(self::$filterOnly)
+        if($this->filterOnlyContext)
 		{
 			$this->mainBoolQuery->addToFilter($subQuery);
 		}

@@ -130,13 +130,6 @@ class CaptionAssetItemService extends KalturaBaseService
 				
 			$captionAssetItemCoreFilter->setEntryIdIn($entryIds);
 		}
-
-		$captionAssetItemCorePager = new kPager();
-		$captionAssetItemPager->toObject($captionAssetItemCorePager);
-
-		$captionItemQueryToFilter = new ESearchCaptionQueryFromFilter();
-		$captionItemQueryToFilter->runElasticQueryFromFilter($captionAssetItemCoreFilter, $captionAssetItemCorePager);
-
 		$captionAssetItemCriteria = KalturaCriteria::create(CaptionAssetItemPeer::OM_CLASS);
 		
 		$captionAssetItemCoreFilter->attachToCriteria($captionAssetItemCriteria);
@@ -385,7 +378,7 @@ class CaptionAssetItemService extends KalturaBaseService
 				$captionAssetItemCoreFilter->setEntryIdIn($chunk);
 			}
 
-			list ($currEntries, $count) = $captionItemQueryToFilter->runElasticQueryFromFilter($currFilter, $captionAssetItemCorePager);
+			list ($currEntries, $count) = $captionItemQueryToFilter->retrieveElasticQueryEntryIds($currFilter, $captionAssetItemCorePager);
 
 			//sorting this chunk according to results of first sphinx query
 			if ($shouldSortCaptionFiltering)
@@ -431,6 +424,68 @@ class CaptionAssetItemService extends KalturaBaseService
 		$response->objects = $list;
 		$response->totalCount = $counter;
 
+		return $response;
+	}
+
+	/**
+	 * Search caption asset items by filter, pager and free text
+	 *
+	 * @action searchElastic
+	 * @param KalturaBaseEntryFilter $entryFilter
+	 * @param KalturaCaptionAssetItemFilter $captionAssetItemFilter
+	 * @param KalturaFilterPager $captionAssetItemPager
+	 * @return KalturaCaptionAssetItemListResponse
+	 */
+	function searchElasticAction(KalturaBaseEntryFilter $entryFilter = null, KalturaCaptionAssetItemFilter $captionAssetItemFilter = null, KalturaFilterPager $captionAssetItemPager = null)
+	{
+		if (!$captionAssetItemPager)
+		{
+			$captionAssetItemPager = new KalturaFilterPager();
+		}
+
+		if (!$captionAssetItemFilter)
+		{
+			$captionAssetItemFilter = new KalturaCaptionAssetItemFilter();
+		}
+
+		$captionAssetItemFilter->validatePropertyNotNull(array("contentLike", "contentMultiLikeOr", "contentMultiLikeAnd"));
+
+		$captionAssetItemCoreFilter = new CaptionAssetItemFilter();
+		$captionAssetItemFilter->toObject($captionAssetItemCoreFilter);
+
+		if($entryFilter || kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$entryCoreFilter = new entryFilter();
+			if($entryFilter)
+			{
+				$entryFilter->toObject($entryCoreFilter);
+			}
+			$entryCoreFilter->setPartnerSearchScope($this->getPartnerId());
+			$this->addEntryAdvancedSearchFilter($captionAssetItemFilter, $entryCoreFilter);
+
+			$entryCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+			$entryCoreFilter->attachToCriteria($entryCriteria);
+			$entryCriteria->applyFilters();
+
+			$entryIds = $entryCriteria->getFetchedIds();
+			if(!$entryIds || !count($entryIds))
+			{
+				$entryIds = array('NOT_EXIST');
+			}
+
+			$captionAssetItemCoreFilter->setEntryIdIn($entryIds);
+		}
+
+		$captionAssetItemCorePager = new kPager();
+		$captionAssetItemPager->toObject($captionAssetItemCorePager);
+
+		$captionItemQueryToFilter = new ESearchCaptionQueryFromFilter();
+		list($captionAssetItems, $objectsCount) = $captionItemQueryToFilter->retrieveElasticQueryCaptions($captionAssetItemCoreFilter, $captionAssetItemCorePager);
+
+		$list = KalturaCaptionAssetItemArray::fromDbArray($captionAssetItems, $this->getResponseProfile());
+		$response = new KalturaCaptionAssetItemListResponse();
+		$response->objects = $list;
+		$response->totalCount = $objectsCount;
 		return $response;
 	}
 

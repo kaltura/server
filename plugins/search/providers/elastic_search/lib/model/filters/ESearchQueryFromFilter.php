@@ -12,7 +12,7 @@ class ESearchQueryFromFilter
 	 * @param baseObjectFilter $filter
 	 * @param kPager $pager
 	 */
-	public function runElasticQueryFromFilter(baseObjectFilter $filter, kPager $pager)
+	public function createElasticQueryFromFilter(baseObjectFilter $filter, kPager $pager)
 	{
 		$this->searchItems = array();
 		foreach($filter->fields as $field => $fieldValue)
@@ -38,21 +38,26 @@ class ESearchQueryFromFilter
 			$this->AddFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue);
 		}
 
-		KalturaLog::debug(print_r($this->searchItems, true));
+		//KalturaLog::debug(print_r($this->searchItems, true));
 		$operator = new ESearchOperator();
 		$operator->setOperator(ESearchOperatorType::AND_OP);
 		$operator->setSearchItems($this->searchItems);
+		return $operator;
+	}
+
+	public function retrieveElasticQueryEntryIds(baseObjectFilter $filter, kPager $pager)
+	{
+		$query = self::createElasticQueryFromFilter($filter, $pager);
+
 		$entrySearch = new kEntrySearch();
 		$entrySearch->setFilterOnly();
-
-		$elasticResults = $entrySearch->doSearch($operator, array(),null, $pager , null);
+		$elasticResults = $entrySearch->doSearch($query, array(),null, $pager , null);
 
 		list($coreResults, $objectOrder, $objectCount, $objectHighlight) = kESearchCoreAdapter::getElasticResultAsArray($elasticResults,
 			$entrySearch->getQueryAttributes()->getQueryHighlightsAttributes());
+
 		$entryIds = array_keys($coreResults);
-
 		return array ($entryIds, $objectCount);
-
 	}
 
 	protected function AddFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue)

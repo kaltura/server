@@ -3,6 +3,8 @@
 class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 {
 
+	const ITEMS = 'items';
+
 	protected $nonSupportedSearchFields = array(
 		ESearchCaptionAssetItemFilterFields::PARTNER_ID,
 		ESearchCaptionAssetItemFilterFields::FORMAT,
@@ -79,6 +81,39 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 			return new ESearchCaptionItem();
 		}
 		return new ESearchEntryItem();
+	}
+
+	public function retrieveElasticQueryCaptions(baseObjectFilter $filter, kPager $pager)
+	{
+		$query = self::createElasticQueryFromFilter($filter, $pager);
+
+		$entrySearch = new kEntrySearch();
+		$entrySearch->setFilterOnly();
+		$elasticResults = $entrySearch->doSearch($query, array(),null, $pager , null);
+
+		list($coreResults, $objectOrder, $objectCount, $objectHighlight) = kESearchCoreAdapter::getElasticResultAsArray($elasticResults,
+			$entrySearch->getQueryAttributes()->getQueryHighlightsAttributes());
+
+		$captionAssetItemArray = array();
+		foreach ($coreResults as $entryId => $captionsResults)
+		{
+			foreach($captionsResults as $captionGroup)
+			{
+				$items = $captionGroup[self::ITEMS];
+				foreach ($items as $captionItem)
+				{
+					$currCaption = new CaptionAssetItem();
+					$currCaption->setEntryId($entryId);
+					$currCaption->setCaptionAssetId($captionItem->getCaptionAssetId());
+					$currCaption->setContent($captionItem->getLine());
+					$currCaption->setStartTime($captionItem->getStartsAt());
+					$currCaption->setEndTime($captionItem->getEndsAt());
+					$captionAssetItemArray[] = $currCaption;
+				}
+			}
+		}
+
+		return array ($captionAssetItemArray, sizeof($captionAssetItemArray));
 	}
 
 }
