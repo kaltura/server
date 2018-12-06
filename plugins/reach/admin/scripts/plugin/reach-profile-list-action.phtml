@@ -169,7 +169,9 @@
 			dataType: 'json',
 			success: function(result) {
 				if (result != 'ok')
+				{
 					this.error(result);
+				}
 				else
 				{
 					if (callback && (typeof callback == 'function'))

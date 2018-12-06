@@ -288,8 +288,10 @@
 		if (ok)
 		{
 			cloneItems(
-				fromPartnerId,toPartnerId,
-				function() {
+				fromPartnerId,
+				toPartnerId,
+				function(){
+					alert('<?php echo $this->translate('Partner Catalog Items cloned');?>');
 				}
 			);
 		}
@@ -310,7 +312,10 @@
 				}
 				else
 				{
-					alert('<?php echo $this->translate('Partner Catalog Items cloned');?>');
+					if (callback && (typeof callback == 'function'))
+					{
+						callback.apply(this);
+					}
 				}
 				jQuery('#frmPaginator1').submit();
 			},

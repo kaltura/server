@@ -30,7 +30,7 @@ class PartnerCatalogItemsCloneAction extends KalturaApplicationPlugin
 			$client->startMultiRequest();
 			foreach ($partnerCatalogItems as $partnerCatalogItem)
 			{
-				$partnerCatalogItem = $reachPluginClient->PartnerCatalogItem->add($partnerCatalogItem->id);
+				$reachPluginClient->PartnerCatalogItem->add($partnerCatalogItem->id);
 			}
 
 			$result = $client->doMultiRequest();
@@ -39,16 +39,18 @@ class PartnerCatalogItemsCloneAction extends KalturaApplicationPlugin
 			{
 				if ($resultItem instanceof Kaltura_Client_Exception)
 				{
-					if ($resultItem->getCode() == "SERVICE_FORBIDDEN_CONTENT_BLOCKED")
+					if ($resultItem->getCode() == 'SERVICE_FORBIDDEN_CONTENT_BLOCKED')
 					{
-						$resultMessage = $resultItem->getMessage(). ". ";
+						$resultMessage = $resultItem->getMessage(). '. ';
 						break;
 					}
 					else
-						$resultMessage .= $resultItem->getMessage(). ". ";
+					{
+						$resultMessage .= $resultItem->getMessage(). '. ';
+					}
 				}
 			}
-			if (count($resultMessage))
+			if (!is_null($resultMessage))
 			{
 				echo $action->getHelper('json')->sendJson($resultMessage, false);
 			}
@@ -70,7 +72,7 @@ class PartnerCatalogItemsCloneAction extends KalturaApplicationPlugin
 		Infra_ClientHelper::unimpersonate();// to get all catalog items from partner 0
 
 		$catalogItemProfileFilter = new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
-		$catalogItemProfileFilter->orderBy = "-createdAt";
+		$catalogItemProfileFilter->orderBy = '-createdAt';
 		$catalogItemProfileFilter->partnerIdEqual = $partnerId;
 
 		$client = Infra_ClientHelper::getClient();
@@ -82,19 +84,17 @@ class PartnerCatalogItemsCloneAction extends KalturaApplicationPlugin
 		$pager->pageSize = 500;
 
 		$partnerCatalogItems = array();
-		$result = $reachPluginClient->vendorCatalogItem->listAction($catalogItemProfileFilter, $pager);
-		$totalCount = $result->totalCount;
-		while ($totalCount > 0)
+		do
 		{
+			$result = $reachPluginClient->vendorCatalogItem->listAction($catalogItemProfileFilter, $pager);
 			foreach ($result->objects as $partnerCatalogItem)
 			{
 				/* @var $partnerCatalogItem Kaltura_Client_Reach_Type_VendorCatalogItem */
 				$partnerCatalogItems[] = $partnerCatalogItem;
 			}
 			$pager->pageIndex++;
-			$totalCount = $totalCount - $pager->pageSize;
-			$result = $reachPluginClient->vendorCatalogItem->listAction($catalogItemProfileFilter, $pager);
-		}
+		} while(count($result->objects));
+
 		return $partnerCatalogItems;
 	}
 }
