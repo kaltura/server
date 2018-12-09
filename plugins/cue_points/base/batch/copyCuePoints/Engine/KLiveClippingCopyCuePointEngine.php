@@ -31,7 +31,7 @@ class KLiveClippingCopyCuePointEngine extends KLiveToVodCopyCuePointEngine
      */
     private function checkShouldCopyCuePointBeforeTimeWindow($cuePoint)
     {
-        $noCopiedTag = array("poll-data","select-poll-state","poll-results","remove-selected-thumb");
+        $noCopiedTag = array("poll-data","select-poll-state","poll-results");
         return (count(array_intersect(explode(",", $cuePoint->tags), $noCopiedTag)) == 0);
     }
 }
