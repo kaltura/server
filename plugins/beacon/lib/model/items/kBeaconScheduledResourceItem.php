@@ -76,7 +76,7 @@ class kBeaconScheduledResourceItem extends ESearchItem
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
 		$scheduledResourceQuery = array();
-		$allowedSearchTypes = ESearchEntryItem::getAllowedSearchTypesForField();
+		$allowedSearchTypes = kBeaconScheduledResourceItem::getAllowedSearchTypesForField();
 		foreach ($eSearchItemsArr as $scheduledResourceSearchItem)
 		{
 			$scheduledResourceSearchItem->getSingleItemSearchQuery($scheduledResourceQuery, $allowedSearchTypes, $queryAttributes);
