@@ -33,7 +33,11 @@ class KLiveClippingCopyCuePointEngine extends KLiveToVodCopyCuePointEngine
      */
     private function shouldCopyCuePointBeforeTimeWindow($cuePoint)
     {
-        $noCopiedTag = array("poll-data","select-poll-state","poll-results");
-        return (count(array_intersect(explode(",", $cuePoint->tags), $noCopiedTag)) == 0);
+        if ($cuePoint instanceof KalturaCodeCuePoint)
+        {
+            $noCopiedTag = array("poll-data","select-poll-state","poll-results");
+            return (count(array_intersect(explode(",", $cuePoint->tags), $noCopiedTag)) == 0);
+        }
+        return true;
     }
 }
