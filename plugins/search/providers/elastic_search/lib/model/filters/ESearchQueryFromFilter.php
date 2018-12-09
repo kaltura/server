@@ -50,7 +50,7 @@ class ESearchQueryFromFilter
 		$query = self::createElasticQueryFromFilter($filter, $pager);
 
 		$entrySearch = new kEntrySearch();
-		$entrySearch->setFilterOnly();
+		$entrySearch->setFilterOnlyContext();
 		$elasticResults = $entrySearch->doSearch($query, array(),null, $pager , null);
 
 		list($coreResults, $objectOrder, $objectCount, $objectHighlight) = kESearchCoreAdapter::getElasticResultAsArray($elasticResults,
@@ -69,7 +69,7 @@ class ESearchQueryFromFilter
 				break;
 
 			case ESearchFilterItemType::EXACT_MATCH_MULTI :
-				$this->addExactMatchMultiQuery($elasticFieldName, $fieldValue);
+				$this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH, ESearchOperatorType::OR_OP);
 				break;
 
 			case ESearchFilterItemType::PARTIAL :
@@ -77,11 +77,11 @@ class ESearchQueryFromFilter
 				break;
 
 			case ESearchFilterItemType::PARTIAL_MULTI_OR :
-				$this->addPartialMultiQuery($elasticFieldName, $fieldValue, ESearchOperatorType::OR_OP);
+				$this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::PARTIAL, ESearchOperatorType::OR_OP);
 				break;
 
 			case ESearchFilterItemType::PARTIAL_MULTI_AND :
-				$this->addPartialMultiQuery($elasticFieldName, $fieldValue, ESearchOperatorType::AND_OP);
+				$this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::PARTIAL, ESearchOperatorType::AND_OP);
 				break;
 
 			case ESearchFilterItemType::RANGE_GTE :
@@ -97,25 +97,14 @@ class ESearchQueryFromFilter
 		}
 	}
 
-	protected function addExactMatchMultiQuery($elasticFieldName, $fieldValue)
-	{
-		$values = $this->createValuesArray($fieldValue);
-		if(count($values))
-		{
-			foreach ($values as $value) {
-				$this->searchItems[] = $this->addSearchItem($elasticFieldName, $value, ESearchItemType::EXACT_MATCH);
-			}
-		}
-	}
-
-	protected function addPartialMultiQuery($elasticFieldName, $fieldValue, $operatorType)
+	protected function addMultiQuery($elasticFieldName, $fieldValue, $searchType, $operatorType)
 	{
 		$values = $this->createValuesArray($fieldValue);
 		if(count($values))
 		{
 			$innerSearchItems = array();
 			foreach ($values as $value) {
-				$searchItem = $this->addSearchItem($elasticFieldName, $value, ESearchItemType::PARTIAL);
+				$searchItem = $this->addSearchItem($elasticFieldName, $value, $searchType);
 				$innerSearchItems[] = $searchItem;
 			}
 			$operator = new ESearchOperator();

@@ -15,6 +15,7 @@ abstract class kBaseSearch
 	protected $mainBoolQuery;
 
 	protected $filterOnlyContext = false;
+	protected $forceInnerHitsSizeOverride = false;
 
     public function __construct()
     {
@@ -43,9 +44,14 @@ abstract class kBaseSearch
 	{
 	}
 
-	public function setFilterOnly()
+	public function setFilterOnlyContext()
 	{
 		$this->filterOnlyContext = true;
+	}
+
+	public function setForceInnerHitsSizeOverride()
+	{
+		$this->forceInnerHitsSizeOverride = true;
 	}
 
     protected function execSearch(ESearchOperator $eSearchOperator)
@@ -175,7 +181,7 @@ abstract class kBaseSearch
 
     protected function initOverrideInnerHits($objectId)
     {
-        if(!$objectId)
+        if(!$objectId && !$this->forceInnerHitsSizeOverride)
             return;
 
         $innerHitsConfig = kConf::get('innerHits', 'elastic');
