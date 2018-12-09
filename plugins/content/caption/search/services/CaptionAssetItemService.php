@@ -116,6 +116,9 @@ class CaptionAssetItemService extends KalturaBaseService
 		$captionAssetItemCoreFilter = new CaptionAssetItemFilter();
 		$captionAssetItemFilter->toObject($captionAssetItemCoreFilter);
 
+		$captionItemQueryToFilter = new ESearchCaptionQueryFromFilter();
+
+		$filterOnEntryIds = false;
 		if($entryFilter || kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$entryCoreFilter = new entryFilter();
@@ -137,13 +140,17 @@ class CaptionAssetItemService extends KalturaBaseService
 			}
 
 			$captionAssetItemCoreFilter->setEntryIdIn($entryIds);
+			$filterOnEntryIds = true;
+			if($entryCoreFilter->get('_eq_id'))
+			{
+				$captionItemQueryToFilter->setEntryIdEqual();
+			}
 		}
 
-		$captionAssetItemCorePager = new kPager();
+		$captionAssetItemCorePager = new kFilterPager();
 		$captionAssetItemPager->toObject($captionAssetItemCorePager);
 
-		$captionItemQueryToFilter = new ESearchCaptionQueryFromFilter();
-		list($captionAssetItems, $objectsCount) = $captionItemQueryToFilter->retrieveElasticQueryCaptions($captionAssetItemCoreFilter, $captionAssetItemCorePager);
+		list($captionAssetItems, $objectsCount) = $captionItemQueryToFilter->retrieveElasticQueryCaptions($captionAssetItemCoreFilter, $captionAssetItemCorePager, $filterOnEntryIds);
 
 		$list = KalturaCaptionAssetItemArray::fromDbArray($captionAssetItems, $this->getResponseProfile());
 		$response = new KalturaCaptionAssetItemListResponse();

@@ -2,6 +2,7 @@
 
 class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 {
+	protected $entryIdEqual = false;
 
 	const ITEMS = 'items';
 
@@ -92,10 +93,17 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 		{
 			list ($currEntries, $count) = $this->retrieveElasticQueryEntryIds($filter, $pager);
 			$filter->setEntryIdIn($currEntries);
+			$pager->setPageIndex(1);
 		}
 
-		$query = self::createElasticQueryFromFilter($filter, $pager);
+		$query = $this->createElasticQueryFromFilter($filter);
 		$entrySearch->setForceInnerHitsSizeOverride();
+		$captionsPager = clone ($pager);
+		if($this->entryIdEqual)
+		{
+			$pager->setPageSize(1);
+			$pager->setPageIndex(1);
+		}
 		$elasticResults = $entrySearch->doSearch($query, array(),null, $pager , null);
 		list($coreResults, $objectOrder, $objectCount, $objectHighlight) = kESearchCoreAdapter::getElasticResultAsArray($elasticResults,
 			$entrySearch->getQueryAttributes()->getQueryHighlightsAttributes());
@@ -106,9 +114,10 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 			foreach($captionsResults as $captionGroup)
 			{
 					$items = $captionGroup[self::ITEMS];
-					foreach ($items as $captionItem)
+					list($startIndex, $endIndex) = $this->getCaptionsIndexesFromPager($captionsPager, $filter, sizeof($items), $filterOnEntryIds);
+					for ($i = $startIndex; $i < $endIndex; $i++)
 					{
-						$captionAssetItemArray[] = $this->createCaptionAssetItem($entryId, $captionItem);
+						$captionAssetItemArray[] = $this->createCaptionAssetItem($entryId, $items[$i]);
 					}
 			}
 		}
@@ -125,6 +134,30 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 		$currCaption->setStartTime($captionItem->getStartsAt());
 		$currCaption->setEndTime($captionItem->getEndsAt());
 		return $currCaption;
+	}
+
+	/*
+	 *  if we got on the request a single entry id we will return caption results based on the pager sizes that were set,
+	 *  else pager sizes will be used only to set the number of entries returned from elastic query and not inner number of captions
+	 */
+	protected function getCaptionsIndexesFromPager(kPager $pager, $filter, $itemsNum, $filterOnEntryIds)
+	{
+		$startIndex = 0;
+		$endIndex = $itemsNum;
+		KalturaLog::debug("FILTER: " . print_r($filter, true));
+
+		if($filterOnEntryIds && $this->entryIdEqual)
+		{
+			$startIndex = min($pager->calcOffset(), $itemsNum);
+			$endIndex = min($startIndex + $pager->getPageSize(), $itemsNum);
+		}
+		KalturaLog::debug("startIndex [$startIndex] endIndex [$endIndex]");
+		return array ($startIndex, $endIndex);
+	}
+
+	public function setEntryIdEqual()
+	{
+		$this->entryIdEqual = true;
 	}
 
 }

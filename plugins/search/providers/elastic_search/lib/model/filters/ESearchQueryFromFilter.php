@@ -12,7 +12,7 @@ class ESearchQueryFromFilter
 	 * @param baseObjectFilter $filter
 	 * @param kPager $pager
 	 */
-	public function createElasticQueryFromFilter(baseObjectFilter $filter, kPager $pager)
+	public function createElasticQueryFromFilter(baseObjectFilter $filter)
 	{
 		$this->searchItems = array();
 		foreach($filter->fields as $field => $fieldValue)
@@ -47,7 +47,7 @@ class ESearchQueryFromFilter
 
 	public function retrieveElasticQueryEntryIds(baseObjectFilter $filter, kPager $pager)
 	{
-		$query = self::createElasticQueryFromFilter($filter, $pager);
+		$query = $this->createElasticQueryFromFilter($filter);
 
 		$entrySearch = new kEntrySearch();
 		$entrySearch->setFilterOnlyContext();
