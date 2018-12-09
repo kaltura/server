@@ -2142,6 +2142,9 @@ class kKavaReportsMgr extends kKavaBase
 			'regions' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_REGION),
 			'os_families' => array(self::DRUID_DIMENSION => self::DIMENSION_OS_FAMILY),
 			'browsers_families' => array(self::DRUID_DIMENSION => self::DIMENSION_BROWSER_FAMILY),
+			'cities' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_CITY),
+			'media_types' => array(self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE),
+			'source_types' => array(self::DRUID_DIMENSION => self::DIMENSION_SOURCE_TYPE),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
