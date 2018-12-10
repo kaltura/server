@@ -59,13 +59,13 @@ abstract class kBaseSearch
         $subQuery = $eSearchOperator::createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
         $this->handleDisplayInSearch();
         if($this->filterOnlyContext)
-		{
-			$this->mainBoolQuery->addToFilter($subQuery);
-		}
-		else
-		{
-			$this->mainBoolQuery->addToMust($subQuery);
-		}
+        {
+        	$this->mainBoolQuery->addToFilter($subQuery);
+        }
+        else
+        {
+        	$this->mainBoolQuery->addToMust($subQuery);
+        }
         $this->applyElasticSearchConditions();
         $this->addGlobalHighlights();
         $result = $this->elasticClient->search($this->query, true, true);
@@ -182,7 +182,9 @@ abstract class kBaseSearch
     protected function initOverrideInnerHits($objectId)
     {
         if(!$objectId && !$this->forceInnerHitsSizeOverride)
-            return;
+        {
+        	return;
+        }
 
         $innerHitsConfig = kConf::get('innerHits', 'elastic');
         $overrideInnerHitsSize = isset($innerHitsConfig['innerHitsWithObjectId']) ? $innerHitsConfig['innerHitsWithObjectId'] : null;

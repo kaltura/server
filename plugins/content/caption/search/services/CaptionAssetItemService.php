@@ -245,13 +245,13 @@ class CaptionAssetItemService extends KalturaBaseService
 
 		foreach ($entryIdChunks as $chunk)
 		{
-			$currFilter = clone ($captionAssetItemCoreFilter);
+			$currCoreFilter = clone ($captionAssetItemCoreFilter);
 			if ($chunk)
 			{
 				$captionAssetItemCoreFilter->setEntryIdIn($chunk);
 			}
 
-			list ($currEntries, $count) = $captionItemQueryToFilter->retrieveElasticQueryEntryIds($currFilter, $captionAssetItemCorePager);
+			list ($currEntries, $count) = $captionItemQueryToFilter->retrieveElasticQueryEntryIds($currCoreFilter, $captionAssetItemCorePager);
 
 			//sorting this chunk according to results of first sphinx query
 			if ($shouldSortCaptionFiltering)

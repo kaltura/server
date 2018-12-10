@@ -5,6 +5,7 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 	protected $entryIdEqual = false;
 
 	const ITEMS = 'items';
+	const TOTAL_COUNT = 'totalCount';
 
 	protected $nonSupportedSearchFields = array(
 		ESearchCaptionAssetItemFilterFields::PARTNER_ID,
@@ -50,7 +51,7 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 	{
 		$operatorsMap = array(
 			baseObjectFilter::EQ => ESearchFilterItemType::EXACT_MATCH,
-			baseObjectFilter::IN => ESearchFilterItemType::EXACT_MATCH_MULTI,
+			baseObjectFilter::IN => ESearchFilterItemType::EXACT_MATCH_MULTI_OR,
 			baseObjectFilter::NOT_IN => ESearchFilterItemType::EXACT_MATCH_NOT,
 			baseObjectFilter::GTE => ESearchFilterItemType::RANGE_GTE,
 			baseObjectFilter::LTE => ESearchFilterItemType::RANGE_LTE,
@@ -91,67 +92,79 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 
 		if(!$filterOnEntryIds)
 		{
-			list ($currEntries, $count) = $this->retrieveElasticQueryEntryIds($filter, $pager);
-			$filter->setEntryIdIn($currEntries);
+			list ($currEntryIds, $count) = $this->retrieveElasticQueryEntryIds($filter, $pager);
+			$filter->setEntryIdIn($currEntryIds);
+
+			// when filtering on entry ids the number of ids will be at most the page size and we will want to go
+			// over all of them so page index most be 1
 			$pager->setPageIndex(1);
 		}
 
 		$query = $this->createElasticQueryFromFilter($filter);
 		$entrySearch->setForceInnerHitsSizeOverride();
 		$captionsPager = clone ($pager);
+
+		// when we have entryIdEqual we will want to get back only this entry and run with original pager inside the captions
 		if($this->entryIdEqual)
 		{
 			$pager->setPageSize(1);
 			$pager->setPageIndex(1);
 		}
+
 		$elasticResults = $entrySearch->doSearch($query, array(),null, $pager , null);
 		list($coreResults, $objectOrder, $objectCount, $objectHighlight) = kESearchCoreAdapter::getElasticResultAsArray($elasticResults,
 			$entrySearch->getQueryAttributes()->getQueryHighlightsAttributes());
 
+		return $this->getCaptionAssetItemsArray($coreResults, $captionsPager, $filter, $filterOnEntryIds);
+	}
+
+	protected function getCaptionAssetItemsArray($coreResults,kPager $captionsPager, baseObjectFilter $filter, $filterOnEntryIds)
+	{
 		$captionAssetItemArray = array();
+		$totalCount = 0;
 		foreach ($coreResults as $entryId => $captionsResults)
 		{
 			foreach($captionsResults as $captionGroup)
 			{
-					$items = $captionGroup[self::ITEMS];
-					list($startIndex, $endIndex) = $this->getCaptionsIndexesFromPager($captionsPager, $filter, sizeof($items), $filterOnEntryIds);
-					for ($i = $startIndex; $i < $endIndex; $i++)
-					{
-						$captionAssetItemArray[] = $this->createCaptionAssetItem($entryId, $items[$i]);
-					}
+				$totalCount += $captionGroup[self::TOTAL_COUNT];
+				$items = $captionGroup[self::ITEMS];
+				list($startIndex, $endIndex) = $this->getCaptionsIndexesFromPager($captionsPager, $filter, sizeof($items), $filterOnEntryIds);
+				for ($i = $startIndex; $i < $endIndex; $i++)
+				{
+					$captionAssetItemArray[] = $this->createCaptionAssetItem($entryId, $items[$i]);
+				}
 			}
 		}
-
-		return array ($captionAssetItemArray, sizeof($captionAssetItemArray));
+		return array ($captionAssetItemArray, $totalCount);
 	}
 
-	protected function createCaptionAssetItem($entryId, $captionItem)
+
+	protected function createCaptionAssetItem($entryId, $elasticCaptionItem)
 	{
-		$currCaption = new CaptionAssetItem();
-		$currCaption->setEntryId($entryId);
-		$currCaption->setCaptionAssetId($captionItem->getCaptionAssetId());
-		$currCaption->setContent($captionItem->getLine());
-		$currCaption->setStartTime($captionItem->getStartsAt());
-		$currCaption->setEndTime($captionItem->getEndsAt());
-		return $currCaption;
+		$captionItem = new CaptionAssetItem();
+		$captionItem->setEntryId($entryId);
+		$captionItem->setCaptionAssetId($elasticCaptionItem->getCaptionAssetId());
+		$captionItem->setContent($elasticCaptionItem->getLine());
+		$captionItem->setStartTime($elasticCaptionItem->getStartsAt());
+		$captionItem->setEndTime($elasticCaptionItem->getEndsAt());
+		return $captionItem;
 	}
 
 	/*
 	 *  if we got on the request a single entry id we will return caption results based on the pager sizes that were set,
 	 *  else pager sizes will be used only to set the number of entries returned from elastic query and not inner number of captions
 	 */
-	protected function getCaptionsIndexesFromPager(kPager $pager, $filter, $itemsNum, $filterOnEntryIds)
+	protected function getCaptionsIndexesFromPager(kPager $pager, baseObjectFilter $filter, $itemsNum, $filterOnEntryIds)
 	{
 		$startIndex = 0;
 		$endIndex = $itemsNum;
-		KalturaLog::debug("FILTER: " . print_r($filter, true));
 
 		if($filterOnEntryIds && $this->entryIdEqual)
 		{
 			$startIndex = min($pager->calcOffset(), $itemsNum);
 			$endIndex = min($startIndex + $pager->getPageSize(), $itemsNum);
 		}
-		KalturaLog::debug("startIndex [$startIndex] endIndex [$endIndex]");
+
 		return array ($startIndex, $endIndex);
 	}
 

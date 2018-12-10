@@ -7,17 +7,11 @@ class ESearchQueryFromFilter
 {
 	protected $searchItems;
 
-	/**
-	 *
-	 * @param baseObjectFilter $filter
-	 * @param kPager $pager
-	 */
 	public function createElasticQueryFromFilter(baseObjectFilter $filter)
 	{
 		$this->searchItems = array();
 		foreach($filter->fields as $field => $fieldValue)
 		{
-			//add relevant handeling
 			if ($field == ESearchCaptionAssetItemFilterFields::ORDER_BY || $field == ESearchCaptionAssetItemFilterFields::LIMIT) {
 				continue;
 			}
@@ -26,19 +20,18 @@ class ESearchQueryFromFilter
 			list($prefix, $operator, $fieldName) = $fieldParts;
 			if(in_array($fieldName, $this->getNonSupportedFields()) || is_null($fieldValue) || $fieldValue === '')
 			{
+				KalturaLog::debug("Skipping field [$fieldName] with value [$fieldValue]");
 				continue;
 			}
 
 			$searchItemType = $this->getSphinxToElasticSearchItemType($operator);
 			$elasticFieldName = $this->getSphinxToElasticFieldName($fieldName);
-			if(!$elasticFieldName || !$searchItemType)
+			if($elasticFieldName && $searchItemType)
 			{
-				continue;
+				$this->AddFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue);
 			}
-			$this->AddFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue);
 		}
 
-		//KalturaLog::debug(print_r($this->searchItems, true));
 		$operator = new ESearchOperator();
 		$operator->setOperator(ESearchOperatorType::AND_OP);
 		$operator->setSearchItems($this->searchItems);
@@ -68,7 +61,7 @@ class ESearchQueryFromFilter
 				$this->searchItems[] = $this->addSearchItem($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH);
 				break;
 
-			case ESearchFilterItemType::EXACT_MATCH_MULTI :
+			case ESearchFilterItemType::EXACT_MATCH_MULTI_OR :
 				$this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH, ESearchOperatorType::OR_OP);
 				break;
 
@@ -93,7 +86,7 @@ class ESearchQueryFromFilter
 				break;
 
 			default:
-				KalturaLog::debug("Skip field [$elasticFieldName] has no search item type [$searchItemType]");
+				KalturaLog::debug("Skip field [$elasticFieldName] as it has no search item type [$searchItemType]");
 		}
 	}
 
