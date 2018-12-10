@@ -15,9 +15,7 @@
  */
 class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject 
 {
-	
-	const CUSTOM_DATA_FIXED_PRICE_ADDONS = "fixed_price_addons";
-	
+
 	/**
 	 * Initializes internal state of VendorCatalogItem object.
 	 * @see        parent::__construct()
@@ -72,14 +70,9 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return max($ksExpiry, dateUtils::DAY * 7);
 	}
 	
-	public function setFixedPriceAddons($fixedPriceAddons)
+	public function calculatePriceForEntry(entry $entry)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_FIXED_PRICE_ADDONS, $fixedPriceAddons);
-	}
-	
-	public function getFixedPriceAddons()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_FIXED_PRICE_ADDONS);
+		return call_user_func($this->getPricing()->getPriceFunction(), $entry, $this->getPricing()->getPricePerUnit());
 	}
 
 } // VendorCatalogItem
