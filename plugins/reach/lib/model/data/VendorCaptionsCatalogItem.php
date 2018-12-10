@@ -47,7 +47,7 @@ class VendorCaptionsCatalogItem extends VendorCatalogItem
 	public function calculatePriceForEntry(entry $entry)
 	{
 		$taskPrice = parent::calculatePriceForEntry($entry);
-		$taskPrice += $vendorCatalogItem->getFixedPriceAddons();
+		$taskPrice += $this->getFixedPriceAddons();
 		return $taskPrice;
 	}
 
