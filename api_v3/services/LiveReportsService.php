@@ -41,6 +41,8 @@ class LiveReportsService extends KalturaBaseService
 			$keys[kKavaBase::getCoordinatesKey(array($countryName, $regionName, $cityName))] = true;
 		}
 		$coords = kKavaBase::getCoordinatesMapForKeys($keys);
+		// parse the coordinates
+		$coords = array_map('kKavaBase::parseCoordinates', $coords);
 		
 		foreach ($items as $item)
 		{

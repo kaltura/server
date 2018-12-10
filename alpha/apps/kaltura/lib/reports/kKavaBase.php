@@ -140,10 +140,7 @@ class kKavaBase extends kDruidBase
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_GEO_COORDINATES);
 		if ($cache)
 		{
-			// get from memcache
 			$coords = $cache->multiGet(array_keys($keys));
-			// parse the coordinates
-			$coords = array_map('self::parseCoordinates', $coords);
 		}
 		else
 		{
