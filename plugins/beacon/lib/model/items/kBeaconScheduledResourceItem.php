@@ -99,6 +99,9 @@ class kBeaconScheduledResourceItem extends ESearchItem
 			case ESearchItemType::EXACT_MATCH:
 				$subQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
+			case ESearchItemType::PARTIAL:
+				$subQuery = kESearchQueryManager::getPartialQuery($this, $this->getFieldName(), $queryAttributes);
+				break;
 			case ESearchItemType::STARTS_WITH:
 				$subQuery = kESearchQueryManager::getPrefixQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
@@ -110,8 +113,9 @@ class kBeaconScheduledResourceItem extends ESearchItem
 				break;
 			default:
 				KalturaLog::log("Undefined item type[" . $this->getItemType() . "]");
+				$data = array('itemType' => $this->getItemType(), 'fieldName' => $this->getFieldName());
 				throw new kESearchException('Type of search [' . $this->getItemType() . '] not allowed on specific field 
-				[' . $this->getFieldName() . ']', kESearchException::SEARCH_TYPE_NOT_ALLOWED_ON_FIELD);
+				[' . $this->getFieldName() . ']', kESearchException::SEARCH_TYPE_NOT_ALLOWED_ON_FIELD, $data);
 		}
 
 		if($subQuery)
