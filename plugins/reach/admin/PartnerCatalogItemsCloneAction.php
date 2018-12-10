@@ -39,14 +39,10 @@ class PartnerCatalogItemsCloneAction extends KalturaApplicationPlugin
 			{
 				if ($resultItem instanceof Kaltura_Client_Exception)
 				{
-					if ($resultItem->getCode() == 'SERVICE_FORBIDDEN_CONTENT_BLOCKED')
+					$resultMessage = $resultItem->getMessage(). '. ';
+					if (in_array($resultItem->getCode() ,array('SERVICE_FORBIDDEN_CONTENT_BLOCKED', 'FEATURE_FORBIDDEN')))
 					{
-						$resultMessage = $resultItem->getMessage(). '. ';
 						break;
-					}
-					else
-					{
-						$resultMessage .= $resultItem->getMessage(). '. ';
 					}
 				}
 			}
