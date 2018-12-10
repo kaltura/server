@@ -237,8 +237,6 @@ class elasticSearchUtils
 				throw new KalturaAPIException(KalturaESearchErrors::MIXED_SEARCH_ITEMS_IN_NESTED_OPERATOR_NOT_ALLOWED);
 			case kESearchException::MISSING_OPERATOR_TYPE:
 				throw new KalturaAPIException(KalturaESearchErrors::MISSING_OPERATOR_TYPE);
-			case kESearchException::INVALID_SEARCH_ITEM_TYPE:
-				throw new  KalturaAPIException(KalturaESearchErrors::INVALID_SEARCH_ITEM_TYPE);
 			default:
 				throw new KalturaAPIException(KalturaESearchErrors::INTERNAL_SERVERL_ERROR);
 		}
