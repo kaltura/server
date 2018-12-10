@@ -10,7 +10,6 @@
  */
 class EntryVendorTaskService extends KalturaBaseService
 {
-	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -23,7 +22,6 @@ class EntryVendorTaskService extends KalturaBaseService
 			$this->applyPartnerFilterForClass('entryVendorTask');
 			$this->applyPartnerFilterForClass('reachProfile');
 		}
-			
 	}
 	
 	/**

@@ -21,27 +21,15 @@ class VendorCaptionsCatalogItem extends VendorCatalogItem
 	}
 	
 	const CUSTOM_DATA_ENABLE_SPEAKER_ID = "enable_speaker_id";
-	const CUSTOM_DATA_FIXED_PRICE_ADDONS = "fixed_price_addons";
-	
 	
 	public function setEnableSpeakerId($enableSpeakerId)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_ENABLE_SPEAKER_ID, $enableSpeakerId);
 	}
 	
-	public function setFixedPriceAddons($fixedPriceAddons)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_FIXED_PRICE_ADDONS, $fixedPriceAddons);
-	}
-	
 	public function getEnableSpeakerId()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_ENABLE_SPEAKER_ID);
-	}
-	
-	public function getFixedPriceAddons()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_FIXED_PRICE_ADDONS);
 	}
 
 } // VendorCaptionsCatalogItem
