@@ -43,7 +43,7 @@ class ReachProfileCloneAction extends KalturaApplicationPlugin
 				$reachProfile->status = null;
 
 				Infra_ClientHelper::impersonate($partnerId);
-				$reachProfile = $reachPluginClient->reachProfile->add($reachProfile);
+				$reachPluginClient->reachProfile->add($reachProfile);
 				echo $action->getHelper('json')->sendJson('ok', false);
 			}
 		}
