@@ -176,40 +176,33 @@ class kReachFlowManager implements kBatchJobStatusEventConsumer
 	 */
 	protected function handleCopyReachDataToPartner(BatchJob $dbBatchJob)
 	{
-		try
+		/** @var $dbBatchJob kCopyPartnerJobData */
+		$fromPartnerId = $dbBatchJob->getData()->getFromPartnerId();
+		$toPartnerId = $dbBatchJob->getData()->getToPartnerId();
+
+		if (!ReachPlugin::isAllowedPartner($fromPartnerId) || !ReachPlugin::isAllowedPartner($toPartnerId))
 		{
-			/** @var $dbBatchJob kCopyPartnerJobData */
-			$fromPartnerId = $dbBatchJob->getData()->getFromPartnerId();
-			$toPartnerId = $dbBatchJob->getData()->getToPartnerId();
-
-			if (!ReachPlugin::isAllowedPartner($fromPartnerId) || !ReachPlugin::isAllowedPartner($toPartnerId))
-			{
-				KalturaLog::info("Skip copying reach data to partner. Reach plugin is not enabled");
-				return true;
-			}
-
-			KalturaLog::info("Start Copying Active ReachProfiles and PartnerCatalogItems from partner [$fromPartnerId]: to partner [$toPartnerId]");
-			$reachProfiles = ReachProfilePeer::retrieveByPartnerId($fromPartnerId);
-			foreach ($reachProfiles as $profile)
-			{
-				/* @var $profile ReachProfile */
-				$newreachProfiles = $profile->copy();
-				$newreachProfiles->setPartnerId($toPartnerId);
-				$newreachProfiles->save();
-			}
-
-			$catalogItems = PartnerCatalogItemPeer::retrieveActiveCatalogItems($fromPartnerId);
-			foreach ($catalogItems as $catalogItem)
-			{
-				/* @var $catalogItem PartnerCatalogItem */
-				$newCatalogItem = $catalogItem->copy();
-				$newCatalogItem->setPartnerId($toPartnerId);
-				$newCatalogItem->save();
-			}
+			KalturaLog::info("Skip copying reach data from partner [$fromPartnerId] to partner [$toPartnerId]. Reach plugin is not enabled");
+			return true;
 		}
-		catch (Exception $ex)
+
+		KalturaLog::info("Start Copying Active ReachProfiles and PartnerCatalogItems from partner [$fromPartnerId]: to partner [$toPartnerId]");
+		$reachProfiles = ReachProfilePeer::retrieveByPartnerId($fromPartnerId);
+		foreach ($reachProfiles as $profile)
 		{
-			KalturaLog::err("Error:" . $ex->getMessage());
+			/* @var $profile ReachProfile */
+			$newreachProfiles = $profile->copy();
+			$newreachProfiles->setPartnerId($toPartnerId);
+			$newreachProfiles->save();
+		}
+
+		$catalogItems = PartnerCatalogItemPeer::retrieveActiveCatalogItems($fromPartnerId);
+		foreach ($catalogItems as $catalogItem)
+		{
+			/* @var $catalogItem PartnerCatalogItem */
+			$newCatalogItem = $catalogItem->copy();
+			$newCatalogItem->setPartnerId($toPartnerId);
+			$newCatalogItem->save();
 		}
 
 		return true;
