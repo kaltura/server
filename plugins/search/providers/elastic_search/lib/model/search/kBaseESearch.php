@@ -18,7 +18,14 @@ abstract class kBaseESearch extends kBaseSearch
 	{
 		$subQuery = $eSearchOperator::createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
 		$this->handleDisplayInSearch();
-		$this->mainBoolQuery->addToMust($subQuery);
+		if($this->filterOnlyContext)
+		{
+			$this->mainBoolQuery->addToFilter($subQuery);
+		}
+		else
+		{
+			$this->mainBoolQuery->addToMust($subQuery);
+		}
 		$this->applyElasticSearchConditions();
 		$this->addGlobalHighlights();
 		$result = $this->elasticClient->search($this->query, true, true);

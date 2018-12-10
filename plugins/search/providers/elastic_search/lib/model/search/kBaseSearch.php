@@ -11,6 +11,9 @@ abstract class kBaseSearch
 	protected $queryAttributes;
 	protected $mainBoolQuery;
 
+	protected $filterOnlyContext = false;
+	protected $forceInnerHitsSizeOverride = false;
+
 	public function __construct()
 	{
 		$this->elasticClient = new elasticClient();
@@ -138,7 +141,7 @@ abstract class kBaseSearch
 
 	protected function initOverrideInnerHits($objectId)
 	{
-		if(!$objectId)
+		if(!$objectId && !$this->forceInnerHitsSizeOverride)
 		{
 			return;
 		}
@@ -147,4 +150,14 @@ abstract class kBaseSearch
 		$overrideInnerHitsSize = isset($innerHitsConfig['innerHitsWithObjectId']) ? $innerHitsConfig['innerHitsWithObjectId'] : null;
 		$this->queryAttributes->setOverrideInnerHitsSize($overrideInnerHitsSize);
 	}
+
+	public function setFilterOnlyContext()
+	{
+		$this->filterOnlyContext = true;
+	}
+	public function setForceInnerHitsSizeOverride()
+	{
+		$this->forceInnerHitsSizeOverride = true;
+	}
+
 }
