@@ -78,7 +78,7 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 			ESearchCaptionFieldName::LABEL,
 			ESearchCaptionFieldName::CAPTION_ASSET_ID);
 
-		if(in_array($elasticFieldName,$captionFields))
+		if(in_array($elasticFieldName, $captionFields))
 		{
 			return new ESearchCaptionItem();
 		}
@@ -111,14 +111,14 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 			$pager->setPageIndex(1);
 		}
 
-		$elasticResults = $entrySearch->doSearch($query, array(),null, $pager , null);
+		$elasticResults = $entrySearch->doSearch($query, array(), null, $pager, null);
 		list($coreResults, $objectOrder, $objectCount, $objectHighlight) = kESearchCoreAdapter::getElasticResultAsArray($elasticResults,
 			$entrySearch->getQueryAttributes()->getQueryHighlightsAttributes());
 
 		return $this->getCaptionAssetItemsArray($coreResults, $captionsPager, $filter, $filterOnEntryIds);
 	}
 
-	protected function getCaptionAssetItemsArray($coreResults,kPager $captionsPager, baseObjectFilter $filter, $filterOnEntryIds)
+	protected function getCaptionAssetItemsArray($coreResults, kPager $captionsPager, baseObjectFilter $filter, $filterOnEntryIds)
 	{
 		$captionAssetItemArray = array();
 		$totalCount = 0;

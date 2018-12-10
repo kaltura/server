@@ -44,7 +44,7 @@ class ESearchQueryFromFilter
 
 		$entrySearch = new kEntrySearch();
 		$entrySearch->setFilterOnlyContext();
-		$elasticResults = $entrySearch->doSearch($query, array(),null, $pager , null);
+		$elasticResults = $entrySearch->doSearch($query, array(), null, $pager, null);
 
 		list($coreResults, $objectOrder, $objectCount, $objectHighlight) = kESearchCoreAdapter::getElasticResultAsArray($elasticResults,
 			$entrySearch->getQueryAttributes()->getQueryHighlightsAttributes());
