@@ -963,15 +963,17 @@ return array($genericWidget, $myspaceWidget);
 		}
 		elseif ( $prefix == "k-" )
 		{
+			$entryId = -1;
 			$id = substr ( $generic_id , 2 ); // the rest of the string
-			list ( $kshow , $entry , $error ) = self::getKshowAndEntry ( $id , -1 );
+			list ( $kshow , $entry , $error ) = self::getKshowAndEntry ( $id , $entryId );
 			if ( $error )	return null;
 			return array ( null , $kshow , $entry );
 		}
 		elseif ( $prefix == "e-" )
 		{
+			$kShowId = -1;
 			$id = substr ( $generic_id , 2 ); // the rest of the string
-			list ( $kshow , $entry , $error ) = self::getKshowAndEntry ( -1 , $id );
+			list ( $kshow , $entry , $error ) = self::getKshowAndEntry ( $kShowId , $id );
 			if ( $error )	return null;
 			return array ( null , $kshow , $entry );
 		}

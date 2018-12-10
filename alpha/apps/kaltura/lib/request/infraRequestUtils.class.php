@@ -213,7 +213,7 @@ class infraRequestUtils
 		$baseHeader = array(trim($ip), time(), microtime(true));
 		$baseHeader = implode(',', $baseHeader);
 		$ipHeader = $baseHeader . ',' . md5($baseHeader . ',' . $salt);
-		return array('X_KALTURA_REMOTE_ADDR', $ipHeader);
+		return array('X-KALTURA-REMOTE-ADDR', $ipHeader);
 	}
 	
 	public static function isIpPrivate($ip)

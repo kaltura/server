@@ -4,7 +4,7 @@
  * @subpackage model.search
  */
 
-class kCategorySearch extends kBaseSearch
+class kCategorySearch extends kBaseESearch
 {
     const PEER_NAME = 'categoryPeer';
     const PEER_RETRIEVE_FUNCTION_NAME = 'retrieveByPKsNoFilter';

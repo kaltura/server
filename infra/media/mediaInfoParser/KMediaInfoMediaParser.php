@@ -296,7 +296,9 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 				$mediaInfo->audioCodecId = $val;
 				break;
 			case "duration":
-				$mediaInfo->audioDuration = self::convertDuration2msec($val);
+				$dur = self::convertDuration2msec($val);
+				if(!isset($mediaInfo->audioDuration) || $dur>0)
+					$mediaInfo->audioDuration = $dur;
 				break;
 			case "bit rate":
 				$mediaInfo->audioBitRate = self::convertValue2kbits(self::trima($val));
@@ -335,7 +337,9 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 				$mediaInfo->videoCodecId = $val;
 				break;
 			case "duration":
-				$mediaInfo->videoDuration = self::convertDuration2msec($val);
+				$dur = self::convertDuration2msec($val);
+				if(!isset($mediaInfo->videoDuration) || $dur>0)
+					$mediaInfo->videoDuration = $dur;
 				break;
 			case "bit rate":
 				$mediaInfo->videoBitRate = self::convertValue2kbits(self::trima($val));
@@ -419,7 +423,9 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 				$mediaInfo->containerId = $val;
 				break;
 			case "duration":
-				$mediaInfo->containerDuration = self::convertDuration2msec($val);
+				$dur = self::convertDuration2msec($val);
+				if(!isset($mediaInfo->containerDuration) || $dur>0)
+					$mediaInfo->containerDuration = $dur;
 				break;
 			case "overall bit rate":
 				$mediaInfo->containerBitRate = self::convertValue2kbits(self::trima($val));
@@ -444,6 +450,10 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 		$msec = @$res[8][0] ? @$res[8][0] : 0;
 		
 		$rv = ($hour*3600 + $min*60 + $sec)*1000 + $msec;
+		if($rv==0){
+			sscanf($str,"%d:%d:%f", $hour, $min, $sec);
+			$rv = ($hour*3600 + $min*60 + $sec)*1000 ;
+		}
 		
 		return (int)$rv;
 	}
