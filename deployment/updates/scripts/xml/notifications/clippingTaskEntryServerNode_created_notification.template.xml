@@ -38,7 +38,12 @@
 				</queueNameParameters>
 				<apiObjectType>KalturaClippingTaskEntryServerNode</apiObjectType>
 				<objectFormat>1</objectFormat> <!-- KalturaResponseType::RESPONSE_TYPE_JSON -->
+				<responseProfileId>null</responseProfileId>
 			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
 		</request>
 	</multirequest>
 </xml>
