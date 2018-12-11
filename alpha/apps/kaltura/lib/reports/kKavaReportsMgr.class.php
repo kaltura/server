@@ -3301,21 +3301,21 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function getCoordinates($keys, $partner_id, $enrich_context)
 	{
-		$coorKeys = array();
+		$coordKeys = array();
 		foreach ($keys as $row => $key)
 		{
-			$memcKey = array(str_replace(self::ENRICH_DIM_DELIMITER, '_',$key));
-			$coorKeys[kKavaBase::getCoordinatesKey($memcKey)] = true;
+			$memcKey = kKavaBase::getCoordinatesKey(array($key));
+			$coordKeys[$memcKey] = true;
 		}
-		$coords = kKavaBase::getCoordinatesMapForKeys($coorKeys);
+		$coords = kKavaBase::getCoordinatesForKeys($coordKeys);
 		$result = array();
 		foreach ($keys as $row => $key)
 		{
 			$rowData = array();
-			$memcKey = array(str_replace(self::ENRICH_DIM_DELIMITER, '_',$key));
-			if (isset($coords[kKavaBase::getCoordinatesKey($memcKey)]))
+			$memcKey = kKavaBase::getCoordinatesKey(array($key));
+			if (isset($coords[$memcKey]))
 			{
-				$rowData[] = $coords[kKavaBase::getCoordinatesKey($memcKey)];
+				$rowData[] = $coords[$memcKey];
 			}
 			$result[$key] = $rowData;
 		}

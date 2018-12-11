@@ -135,18 +135,15 @@ class kKavaBase extends kDruidBase
 		return array_map('floatval', explode('/', $coords));
 	}
 
-	public static function getCoordinatesMapForKeys($keys)
+	public static function getCoordinatesForKeys($keys)
 	{
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_GEO_COORDINATES);
-		if ($cache)
+		if (!$cache)
 		{
-			$coords = $cache->multiGet(array_keys($keys));
+			return array();
 		}
-		else
-		{
-			$coords = array();
-		}
-		return $coords;
+
+		return $cache->multiGet(array_keys($keys));;
 	}
 
 }
