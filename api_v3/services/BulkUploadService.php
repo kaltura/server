@@ -19,7 +19,7 @@ class BulkUploadService extends KalturaBaseService
 	 * If no conversion profile was specified, partner's default will be used
 	 * 
 	 * @action add
-	 * @param int $conversionProfileId Convertion profile id to use for converting the current bulk (-1 to use partner's default)
+	 * @param int $conversionProfileId Conversion profile id to use for converting the current bulk (-1 to use partner's default)
 	 * @param file $csvFileData bulk upload file
 	 * @param KalturaBulkUploadType $bulkUploadType
 	 * @param string $uploadedBy

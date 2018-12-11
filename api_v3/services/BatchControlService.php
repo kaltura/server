@@ -2,10 +2,10 @@
 /**
  * batch service lets you handle different batch process from remote machines.
  * As opposed to other objects in the system, locking mechanism is critical in this case.
- * For this reason the GetExclusiveXX, UpdateExclusiveXX and FreeExclusiveXX actions are important for the system's intergity.
+ * For this reason the GetExclusiveXX, UpdateExclusiveXX and FreeExclusiveXX actions are important for the system's integrity.
  * In general - updating batch object should be done only using the UpdateExclusiveXX which in turn can be called only after 
- * acuiring a batch objet properly (using  GetExclusiveXX).
- * If an object was aquired and should be returned to the pool in it's initial state - use the FreeExclusiveXX action 
+ * acquiring a batch object properly (using  GetExclusiveXX).
+ * If an object was acquired and should be returned to the pool in it's initial state - use the FreeExclusiveXX action 
  *
  *	Terminology:
  *		LocationId
@@ -35,7 +35,7 @@ class BatchControlService extends KalturaBaseService
 		
 	
 	/**
-	 * batch reportStatus action saves the a status attribute from a remote scheduler and returns pending commands for the scheduler
+	 * batch reportStatus action saves the status attribute from a remote scheduler and returns pending commands for the scheduler
 	 * 
 	 * @action reportStatus
 	 * @param KalturaScheduler $scheduler The scheduler
@@ -133,7 +133,7 @@ class BatchControlService extends KalturaBaseService
 	
 	
 	/**
-	 * batch getOrCreateScheduler returns a scheduler by name, create it if doesnt exist
+	 * batch getOrCreateScheduler returns a scheduler by name, create it if doesn't exist
 	 * 
 	 * @param KalturaScheduler $scheduler
 	 * @return Scheduler
@@ -173,7 +173,7 @@ class BatchControlService extends KalturaBaseService
 	
 	
 	/**
-	 * batch getOrCreateWorker returns a worker by name, create it if doesnt exist
+	 * batch getOrCreateWorker returns a worker by name, create it if doesn't exist
 	 * 
 	 * @param Scheduler $scheduler The scheduler object
 	 * @param int $workerConfigId The worker configured id
@@ -396,7 +396,7 @@ class BatchControlService extends KalturaBaseService
 	}	
 	
 	/**
-	 * batch kill action forces stop og a batch on a remote scheduler
+	 * batch kill action forces stop of a batch on a remote scheduler
 	 * 
 	 * @action kill
 	 * @param int $workerId The id of the job to be stopped
@@ -666,7 +666,7 @@ class BatchControlService extends KalturaBaseService
 	}
 	
 	/**
-	 * batch setCommandResult action saves the results of a command as recieved from a remote scheduler
+	 * batch setCommandResult action saves the results of a command as received from a remote scheduler
 	 * 
 	 * @action setCommandResult
 	 * @param int $commandId The id of the command
