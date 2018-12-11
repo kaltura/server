@@ -24,7 +24,7 @@
      	    "actions" : [
                 { "add" : { "index" : "beacon_scheduled_resource_index_2018_12_10", "alias" : "beacon_scheduled_resource_index" } },
                 { "add" : { "index" : " beacon_scheduled_resource_index_2018_12_10", "alias" : "beaconindex" } },
-                { "add" : { "index" : " beacon_scheduled_resource_index_2018_12_10", "alias" : "beacon_entry_server_node_index_search" } }
+                { "add" : { "index" : " beacon_scheduled_resource_index_2018_12_10", "alias" : "beacon_scheduled_resource_index_search" } }
             ]
          }
     
