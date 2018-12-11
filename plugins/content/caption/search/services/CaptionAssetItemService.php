@@ -149,8 +149,14 @@ class CaptionAssetItemService extends KalturaBaseService
 
 		$captionAssetItemCorePager = new kFilterPager();
 		$captionAssetItemPager->toObject($captionAssetItemCorePager);
-
-		list($captionAssetItems, $objectsCount) = $captionItemQueryToFilter->retrieveElasticQueryCaptions($captionAssetItemCoreFilter, $captionAssetItemCorePager, $filterOnEntryIds);
+		try
+		{
+			list($captionAssetItems, $objectsCount) = $captionItemQueryToFilter->retrieveElasticQueryCaptions($captionAssetItemCoreFilter, $captionAssetItemCorePager, $filterOnEntryIds);
+		}
+		catch (kESearchException $e)
+		{
+			elasticSearchUtils::handleSearchException($e);
+		}
 
 		$list = KalturaCaptionAssetItemArray::fromDbArray($captionAssetItems, $this->getResponseProfile());
 		$response = new KalturaCaptionAssetItemListResponse();
@@ -251,7 +257,14 @@ class CaptionAssetItemService extends KalturaBaseService
 				$captionAssetItemCoreFilter->setEntryIdIn($chunk);
 			}
 
-			list ($currEntries, $count) = $captionItemQueryToFilter->retrieveElasticQueryEntryIds($currCoreFilter, $captionAssetItemCorePager);
+			try
+			{
+				list ($currEntries, $count) = $captionItemQueryToFilter->retrieveElasticQueryEntryIds($currCoreFilter, $captionAssetItemCorePager);
+			}
+			catch (kESearchException $e)
+			{
+				elasticSearchUtils::handleSearchException($e);
+			}
 
 			//sorting this chunk according to results of first sphinx query
 			if ($shouldSortCaptionFiltering)

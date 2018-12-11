@@ -18,6 +18,15 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 		ESearchCaptionAssetItemFilterFields::DELETED_AT,
 		ESearchCaptionAssetItemFilterFields::FLAVOR_PARAMS_ID);
 
+
+	protected $captionNestedFields = array(
+		ESearchCaptionFieldName::CONTENT,
+		ESearchCaptionFieldName::START_TIME,
+		ESearchCaptionFieldName::END_TIME,
+		ESearchCaptionFieldName::LANGUAGE,
+		ESearchCaptionFieldName::LABEL,
+		ESearchCaptionFieldName::CAPTION_ASSET_ID);
+
 	protected function getNonSupportedFields()
 	{
 		return $this->nonSupportedSearchFields;
@@ -55,9 +64,9 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 			baseObjectFilter::NOT_IN => ESearchFilterItemType::EXACT_MATCH_NOT,
 			baseObjectFilter::GTE => ESearchFilterItemType::RANGE_GTE,
 			baseObjectFilter::LTE => ESearchFilterItemType::RANGE_LTE,
-			baseObjectFilter::LIKE => ESearchFilterItemType::PARTIAL,
-			baseObjectFilter::MULTI_LIKE_OR => ESearchFilterItemType::PARTIAL_MULTI_OR,
-			baseObjectFilter::MULTI_LIKE_AND => ESearchFilterItemType::PARTIAL_MULTI_AND);
+			baseObjectFilter::LIKE => ESearchFilterItemType::EXACT_MATCH,
+			baseObjectFilter::MULTI_LIKE_OR => ESearchFilterItemType::EXACT_MATCH_MULTI_OR,
+			baseObjectFilter::MULTI_LIKE_AND => ESearchFilterItemType::EXACT_MATCH_MULTI_AND);
 
 		if(array_key_exists($operator, $operatorsMap))
 		{
@@ -71,12 +80,7 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 
 	protected function createSearchItemByFieldType($elasticFieldName)
 	{
-		$captionFields = array(	ESearchCaptionFieldName::CONTENT,
-			ESearchCaptionFieldName::START_TIME,
-			ESearchCaptionFieldName::END_TIME,
-			ESearchCaptionFieldName::LANGUAGE,
-			ESearchCaptionFieldName::LABEL,
-			ESearchCaptionFieldName::CAPTION_ASSET_ID);
+		$captionFields = $this->getNestedQueryFields();
 
 		if(in_array($elasticFieldName, $captionFields))
 		{
@@ -171,6 +175,11 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 	public function setEntryIdEqual()
 	{
 		$this->entryIdEqual = true;
+	}
+
+	protected function getNestedQueryFields()
+	{
+		return $this->captionNestedFields;
 	}
 
 }

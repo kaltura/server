@@ -6,10 +6,12 @@
 class ESearchQueryFromFilter
 {
 	protected $searchItems;
+	protected $nestedSearchItem;
 
 	public function createElasticQueryFromFilter(baseObjectFilter $filter)
 	{
 		$this->searchItems = array();
+		$this->nestedSearchItem = array();
 		foreach($filter->fields as $field => $fieldValue)
 		{
 			if ($field == ESearchCaptionAssetItemFilterFields::ORDER_BY || $field == ESearchCaptionAssetItemFilterFields::LIMIT) {
@@ -20,7 +22,6 @@ class ESearchQueryFromFilter
 			list($prefix, $operator, $fieldName) = $fieldParts;
 			if(in_array($fieldName, $this->getNonSupportedFields()) || is_null($fieldValue) || $fieldValue === '')
 			{
-				KalturaLog::debug("Skipping field [$fieldName] with value [$fieldValue]");
 				continue;
 			}
 
@@ -32,6 +33,7 @@ class ESearchQueryFromFilter
 			}
 		}
 
+		$this->addNestedQueryPart();
 		$operator = new ESearchOperator();
 		$operator->setOperator(ESearchOperatorType::AND_OP);
 		$operator->setSearchItems($this->searchItems);
@@ -58,15 +60,21 @@ class ESearchQueryFromFilter
 		switch($searchItemType)
 		{
 			case ESearchFilterItemType::EXACT_MATCH:
-				$this->searchItems[] = $this->addSearchItem($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH);
+				$searchItem = $this->addSearchItem($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH);
+				$this->addToSearchItemsByField($elasticFieldName, $searchItem);
 				break;
 
 			case ESearchFilterItemType::EXACT_MATCH_MULTI_OR :
 				$this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH, ESearchOperatorType::OR_OP);
 				break;
 
+			case ESearchFilterItemType::EXACT_MATCH_MULTI_AND :
+				$this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH, ESearchOperatorType::AND_OP);
+				break;
+
 			case ESearchFilterItemType::PARTIAL :
-				$this->searchItems[] = $this->addSearchItem($elasticFieldName, $fieldValue, ESearchItemType::PARTIAL);
+				$searchItem = $this->addSearchItem($elasticFieldName, $fieldValue, ESearchItemType::PARTIAL);
+				$this->addToSearchItemsByField($elasticFieldName, $searchItem);
 				break;
 
 			case ESearchFilterItemType::PARTIAL_MULTI_OR :
@@ -100,10 +108,10 @@ class ESearchQueryFromFilter
 				$searchItem = $this->addSearchItem($elasticFieldName, $value, $searchType);
 				$innerSearchItems[] = $searchItem;
 			}
-			$operator = new ESearchOperator();
+			$operator = $this->getEsearchOperatorByField($elasticFieldName);
 			$operator->setOperator($operatorType);
 			$operator->setSearchItems($innerSearchItems);
-			$this->searchItems[] = $operator;
+			$this->addToSearchItemsByField($elasticFieldName, $operator);
 		}
 	}
 
@@ -113,7 +121,7 @@ class ESearchQueryFromFilter
 		$range = new ESearchRange();
 		$range->setGreaterThanOrEqual($fieldValue);
 		$searchItem->setRange($range);
-		$this->searchItems[] = $searchItem;
+		$this->addToSearchItemsByField($elasticFieldName, $searchItem);
 	}
 
 	protected function addRangeLteQuery($elasticFieldName, $fieldValue)
@@ -122,7 +130,7 @@ class ESearchQueryFromFilter
 		$range = new ESearchRange();
 		$range->setLessThanOrEqual($fieldValue);
 		$searchItem->setRange($range);
-		$this->searchItems[] = $searchItem;
+		$this->addToSearchItemsByField($elasticFieldName, $searchItem);
 	}
 
 	protected function addSearchItem($elasticFieldName, $value, $itemType, $range = false)
@@ -152,6 +160,41 @@ class ESearchQueryFromFilter
 		return $values;
 	}
 
+	protected function addToSearchItemsByField($elasticFieldName, $searchItem)
+	{
+		if(in_array($elasticFieldName, $this->getNestedQueryFields()))
+		{
+			$this->nestedSearchItem[] = $searchItem;
+		}
+		else
+		{
+			$this->searchItems[] = $searchItem;
+		}
+	}
+
+	protected function getEsearchOperatorByField($elasticFieldName)
+	{
+		if(in_array($elasticFieldName, $this->getNestedQueryFields()))
+		{
+			return new ESearchNestedOperator();
+		}
+		else
+		{
+			return new ESearchOperator();
+		}
+	}
+
+	protected function addNestedQueryPart()
+	{
+		if($this->nestedSearchItem)
+		{
+			$nestedOperator = new ESearchNestedOperator();
+			$nestedOperator->setOperator(ESearchOperatorType::AND_OP);
+			$nestedOperator->setSearchItems($this->nestedSearchItem);
+			$this->searchItems[] = $nestedOperator;
+		}
+	}
+
 	protected function createSearchItemByFieldType($elasticFieldName)
 	{
 		return new ESearchEntryItem();
@@ -168,6 +211,11 @@ class ESearchQueryFromFilter
 	}
 
 	protected function getNonSupportedFields()
+	{
+		return array();
+	}
+
+	protected function getNestedQueryFields()
 	{
 		return array();
 	}
