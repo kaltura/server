@@ -53,7 +53,7 @@ class ConfControlService extends KalturaBaseService
 	 */
 	function listAction(KalturaConfigMapFilter $filter = null)
 	{
-		$reponse = new KalturaConfigMapArray();
+		$items = new KalturaConfigMapArray();
 
 		//Check if map exist in file system or in remote cache
 		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
@@ -67,7 +67,7 @@ class ConfControlService extends KalturaBaseService
 				$mapObject->relatedHost = $host;
 				$mapObject->soucreLocation = KalturaConfMapSourceLocation::DB;
 				$mapObject->content = $remoteCache->getMap($filter->name, $host);
-				$reponse->insert($mapObject);
+				$items->insert($mapObject);
 			}
 		}
 		else
@@ -87,12 +87,16 @@ class ConfControlService extends KalturaBaseService
 				$mapObject->soucreLocation = KalturaConfMapSourceLocation::FS;
 				$fsMap = new Zend_Config_Ini($host);
 				$mapObject->content = json_encode($fsMap->toArray());
-				$reponse->insert($mapObject);
+				$items->insert($mapObject);
 			}
 
         }
 
-		return $reponse;
+		$response = new KalturaConfControlListResponse();
+		$response->objects = $items;
+		$response->totalCount = count($items);
+
+		return $response;
 	}
 
 	/**
