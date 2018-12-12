@@ -25,6 +25,11 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 	public function load($key, $mapName)
 	{
 		$hostname = $this->getHostName();
+		return $this->loadByHostName($mapName,$hostname);
+	}
+
+	public function loadByHostName($mapName,$hostname)
+	{
 		$mapNames = $this->getRelevantMapList($mapName, $hostname);
 		$this->orderMap($mapNames);
 		return $this->mergeMaps($mapNames);
@@ -86,5 +91,39 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 			}
 		}
 		return $mergedMaps;
+	}
+
+	public function getRelatedHostList($requesteMapName)
+	{
+		$hostList = array();
+		$cache = $this->getCache();
+		if(!$cache)
+		{
+			return $hostList;
+		}
+
+		$mapsList = $cache->get(self::MAP_LIST_KEY);
+		foreach ($mapsList as $mapName => $version)
+		{
+			$mapVar = explode(self::MAP_DELIMITER, $mapName);
+			$storedMapName = $mapVar[0];
+			$hostPattern = isset($mapVar[1]) ? $mapVar[1] : null;
+			if ($requesteMapName == $storedMapName)
+			{
+				$hostList[] = $hostPattern;
+			}
+		}
+
+		return $hostList;
+	}
+	public function getMap($mapName,$hostName)
+	{
+		$cache = $this->getCache();
+		if(!$cache)
+		{
+			return null;
+		}
+		$mapKeyInCache = self::CONF_MAP_PREFIX.$mapName.self::MAP_DELIMITER.$hostName;
+		return $cache->get($mapKeyInCache);
 	}
 }

@@ -14,7 +14,7 @@ class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 		parent::__construct();
 	}
 
-	protected function getFileNames ($mapName , $hostname)
+	public function getFileNames ($mapName , $hostname)
 	{
 		$configDir = kEnvironment::getConfigDir();
 		$iniFiles = array();
@@ -70,6 +70,11 @@ class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 	public function load ($key, $mapName)
 	{
 		$hostname = $this->getHostName();
+		return $this->loadByHostName($mapName,$hostname);
+	}
+
+	public function loadByHostName ($mapName , $hostname)
+	{
 		$iniFiles = $this->getFileNames ($mapName , $hostname);
 		$this->orderMap($iniFiles);
 		$mergedMaps = $this->mergeMaps($iniFiles,($mapName=='local'));
