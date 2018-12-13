@@ -49,7 +49,7 @@ class ConfControlService extends KalturaBaseService
 	 * @action list
 	 * @param KalturaConfigMapFilter $filter
 	 * @param KalturaFilterPager $pager Pager
-	 * @return KalturaConfigMapArray
+	 * @return KalturaConfControlListResponse
 	 */
 	function listAction(KalturaConfigMapFilter $filter = null)
 	{
@@ -73,23 +73,15 @@ class ConfControlService extends KalturaBaseService
 		else
 		//Check in file system
         {
-			$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::FILE_SYSTEM);
-			$hostList = $remoteCache->getFileNames($filter->name ,$filter->relatedHost);
-			foreach ($hostList as $host)
+			$fileSystemCache = kCacheConfFactory::getInstance(kCacheConfFactory::FILE_SYSTEM);
+			$fileNames = $fileSystemCache->getIniFilesList($filter->name ,$filter->relatedHost);
+			foreach ($fileNames as $fileName)
 			{
-			    if(!kFileUtils::fileSize($host))
-                {
-                    continue;
-                }
 				$mapObject = new KalturaConfigMap();
-				$mapObject->name = $filter->name;
-				$mapObject->relatedHost = $host;
+			    list($mapObject->name , $mapObject->relatedHost ,$mapObject->content )  = $fileSystemCache->getMapInfo($fileName);
 				$mapObject->soucreLocation = KalturaConfMapSourceLocation::FS;
-				$fsMap = new Zend_Config_Ini($host);
-				$mapObject->content = json_encode($fsMap->toArray());
 				$items->insert($mapObject);
 			}
-
         }
 
 		$response = new KalturaConfControlListResponse();
