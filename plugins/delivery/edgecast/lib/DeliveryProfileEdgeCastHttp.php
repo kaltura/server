@@ -31,7 +31,7 @@ class DeliveryProfileEdgeCastHttp extends DeliveryProfileHttp
 		
 		$url = parent::doGetFileSyncUrl($fileSync);
 		$url = preg_replace('/^mp4:(\/)*/', 'mp4:', $url);
-		if ($this->protocol == PlaybackProtocol::HTTP)
+		if ($this->params->getFormat() == PlaybackProtocol::HTTP)
 		{
     		$syncKey = kFileSyncUtils::getKeyForFileSync($fileSync);
     		$url = $this->addEcSeek($url, $syncKey);
