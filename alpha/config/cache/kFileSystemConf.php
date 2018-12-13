@@ -121,7 +121,7 @@ class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 		{
 			$hostname =  basename($iniFile,'.ini');
 			$iniNameBlocks = explode ('/',$iniFile);
-			$mapName = $iniNameBlocks[count($iniNameBlocks)-3];
+			$mapName = $iniNameBlocks[count($iniNameBlocks)-2];
 		}
 		else
 		{
