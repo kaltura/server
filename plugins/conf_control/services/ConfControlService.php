@@ -63,9 +63,10 @@ class ConfControlService extends KalturaBaseService
 	 */
 	function listAction(KalturaConfigMapFilter $filter = null)
 	{
+		$response = new KalturaConfControlListResponse();
 		if(!$filter->name || $filter->name=='')
         {
-            throw new KalturaAPIException(KalturaErrors::MISSING_MAP_NAME);
+            return $response;
         }
 
 		$items = new KalturaConfigMapArray();
@@ -98,11 +99,8 @@ class ConfControlService extends KalturaBaseService
 				$items->insert($mapObject);
 			}
         }
-
-		$response = new KalturaConfControlListResponse();
 		$response->objects = $items;
 		$response->totalCount = count($items);
-
 		return $response;
 	}
 
