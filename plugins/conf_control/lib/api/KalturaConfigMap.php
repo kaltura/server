@@ -62,5 +62,5 @@ class KalturaConfigMap extends KalturaObject
 	 * @var KalturaConfMapSourceLocation
 	 * @insertonly
 	 */
-	public $soucreLocation;
+	public $sourceLocation;
 }
