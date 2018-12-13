@@ -712,5 +712,11 @@ class KalturaErrors extends APIErrors
 	 */
 
 	const CANNOT_CREATE_CLIP_FLAVOR_JOB = "CANNOT_CREATE_CLIP_FLAVOR_JOB;;cannot create clip, flavor convert batch job returned as null";
+
+	/*
+	 * Conf Control
+	 */
+	const MISSING_MAP_NAME = "MISSING_MAP_NAME;;Map name must be supplied";
+
 }
 

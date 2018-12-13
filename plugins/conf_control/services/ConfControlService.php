@@ -59,15 +59,16 @@ class ConfControlService extends KalturaBaseService
 	 * @action list
 	 * @param KalturaConfigMapFilter $filter
 	 * @return KalturaConfControlListResponse
+     * @throws KalturaAPIException MISSING_MAP_NAME
 	 */
 	function listAction(KalturaConfigMapFilter $filter = null)
 	{
-		$items = new KalturaConfigMapArray();
-
 		if(!$filter->name || $filter->name=='')
         {
-            return;
+            throw new KalturaAPIException(KalturaErrors::MISSING_MAP_NAME);
         }
+
+		$items = new KalturaConfigMapArray();
 
 		//Check if map exist in file system or in remote cache
 		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
