@@ -3242,8 +3242,17 @@ public function copyTemplate($copyPartnerId = false, $template)
 
 
 	if($copyPartnerId)
+	{
 		$this->setPartnerId($template->getPartnerId());
-
+	}
+	if(is_null($this->getStartDate()) && !is_null($template->getStartDate()))
+	{
+		$this->setStartDate($template->getStartDate());
+	}
+	if(is_null($this->getEndDate()) && !is_null($template->getEndDate()))
+	{
+		$this->setEndDate($template->getEndDate());
+	}
 
 	$this->setNew(true);
 	$this->setCopiedFrom($template);

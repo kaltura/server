@@ -48,7 +48,7 @@ class ConferenceService extends KalturaBaseService {
 		KalturaLog::log('Could not find existing conference room');
 
 		$liveEntryService = new LiveStreamService();
-		$liveEntryService->dumpApiRequest($entryId);
+		$liveEntryService->dumpApiRequest($entryId, true);
 		$lockKey = "allocate_conference_room_" . $entryId;
 		$conference = kLock::runLocked($lockKey, array($this, 'allocateConferenceRoomImpl'), array($entryId, $env));
 		return $conference;
