@@ -40,7 +40,17 @@ class ConfControlService extends KalturaBaseService
 	 */
 	function updateAction(KalturaConfigMap $map,$relatedHost)
 	{
+        //validate input
+            //1. Maps can only be unpdated
+            //2. Only DB maps
 
+        //Insert value to DB
+
+        //Get list of all memcache servers
+
+        //Sync values to all memcache servers
+
+        //Reset the configuration key
 	}
 
 	/**
@@ -48,12 +58,16 @@ class ConfControlService extends KalturaBaseService
 	 *
 	 * @action list
 	 * @param KalturaConfigMapFilter $filter
-	 * @param KalturaFilterPager $pager Pager
 	 * @return KalturaConfControlListResponse
 	 */
 	function listAction(KalturaConfigMapFilter $filter = null)
 	{
 		$items = new KalturaConfigMapArray();
+
+		if(!$filter->name || $filter->name=='')
+        {
+            return;
+        }
 
 		//Check if map exist in file system or in remote cache
 		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
