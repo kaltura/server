@@ -65,7 +65,7 @@ class ConfControlService extends KalturaBaseService
 				$mapObject = new KalturaConfigMap();
 				$mapObject->name = $filter->name;
 				$mapObject->relatedHost = $host;
-				$mapObject->soucreLocation = KalturaConfMapSourceLocation::DB;
+				$mapObject->sourceLocation = KalturaConfMapSourceLocation::DB;
 				$mapObject->content = $remoteCache->getMap($filter->name, $host);
 				$items->insert($mapObject);
 			}
@@ -79,7 +79,7 @@ class ConfControlService extends KalturaBaseService
 			{
 				$mapObject = new KalturaConfigMap();
 			    list($mapObject->name , $mapObject->relatedHost ,$mapObject->content )  = $fileSystemCache->getMapInfo($fileName);
-				$mapObject->soucreLocation = KalturaConfMapSourceLocation::FS;
+				$mapObject->sourceLocation = KalturaConfMapSourceLocation::FS;
 				$items->insert($mapObject);
 			}
         }
@@ -119,7 +119,7 @@ class ConfControlService extends KalturaBaseService
 		$map = $remoteCache->loadByHostName($mapName, $hostPatern);
 		if($map)
 		{
-			$confMap->soucreLocation = KalturaConfMapSourceLocation::DB;
+			$confMap->sourceLocation = KalturaConfMapSourceLocation::DB;
 			$confMap->isEditable = true;
 		}
 		else
@@ -127,7 +127,7 @@ class ConfControlService extends KalturaBaseService
 			/*  @var kFileSystemConf $confFs  */
 			$confFs = kCacheConfFactory::getInstance(kCacheConfFactory::FILE_SYSTEM);
 			$map = $confFs->loadByHostName($mapName, $hostPatern);
-			$confMap->soucreLocation = KalturaConfMapSourceLocation::FS;
+			$confMap->sourceLocation = KalturaConfMapSourceLocation::FS;
 			$confMap->isEditable = false;
 		}
 		if(!$map)
