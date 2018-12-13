@@ -4,6 +4,7 @@ require_once __DIR__ . '/kMapCacheInterface.php';
 
 class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 {
+	const HOSTS_DIR = '/hosts/';
 	function __construct()
 	{
 		if(!class_exists('Zend_Config_Ini'))
@@ -23,9 +24,9 @@ class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 		$iniFiles[] = "$configDir/$mapName.ini";
 		if($hostname)
 		{
-			$configPath = "$configDir/hosts";
+			$configPath = $configDir.self::HOSTS_DIR;
 			if ($mapName != 'local')
-				$configPath .= "/$mapName";
+				$configPath .= $mapName;
 
 			if(is_dir($configPath))
 			{
@@ -87,15 +88,24 @@ class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 	}
 
 
-	public function getIniFilesList($mapName, $hostName)
+	public function getIniFilesList($mapName, $hostNameRegex)
 	{
 		$iniFile = array();
 		$configDir = kEnvironment::getConfigDir();
-		$iniFile[] = $configDir.DIRECTORY_SEPARATOR.$mapName.'.ini';
-		$iniFilesFiles = kFile::listDir($configDir.'/hosts/'.$mapName);
+		$baseConfigFile = $configDir . DIRECTORY_SEPARATOR . $mapName . '.ini';
+		if(kFile::fileSize($baseConfigFile))
+		{
+			$iniFile[] = $baseConfigFile;
+		}
+		$hostNameRegexPattern = '/'.$hostNameRegex.'/';
+		$iniFilesFiles = kFile::listDir($configDir . self::HOSTS_DIR . $mapName);
 		foreach ($iniFilesFiles as $iniFileItem)
 		{
-			$iniFile[]=$configDir.'/hosts/'.$mapName.DIRECTORY_SEPARATOR.$iniFileItem[0];
+			$mapHostNameRegex = $iniFileItem[0];
+			if(preg_match($hostNameRegexPattern, $mapHostNameRegex))
+			{
+				$iniFile[] = $configDir . self::HOSTS_DIR . $mapName . DIRECTORY_SEPARATOR .$mapHostNameRegex;
+			}
 		}
 		return $iniFile;
 	}
@@ -107,9 +117,9 @@ class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 			return array (null, null ,null);
 		}
 
-		if(strpos ($iniFile,'/hosts/'))
+		if(strpos ($iniFile,self::HOSTS_DIR))
 		{
-			$hostname =  basename($iniFile,'ini');
+			$hostname =  basename($iniFile,'.ini');
 			$iniNameBlocks = explode ('/',$iniFile);
 			$mapName = $iniNameBlocks[count($iniNameBlocks)-1];
 		}

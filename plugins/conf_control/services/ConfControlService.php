@@ -57,7 +57,7 @@ class ConfControlService extends KalturaBaseService
 
 		//Check if map exist in file system or in remote cache
 		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
-		$hostList =$remoteCache->getRelatedHostList($filter->name);
+		$hostList =$remoteCache->getRelatedHostList($filter->name ,$filter->relatedHost );
 		if($hostList)
 		{
 			foreach ($hostList as $host)

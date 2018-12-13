@@ -93,7 +93,7 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 		return $mergedMaps;
 	}
 
-	public function getRelatedHostList($requesteMapName)
+	public function getRelatedHostList($requesteMapName , $hostNameRegex = null)
 	{
 		$hostList = array();
 		$cache = $this->getCache();
@@ -110,7 +110,10 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 			$hostPattern = isset($mapVar[1]) ? $mapVar[1] : null;
 			if ($requesteMapName == $storedMapName)
 			{
-				$hostList[] = $hostPattern;
+				if(!$hostNameRegex || preg_match('/'.$hostNameRegex.'/' ,$hostPattern ) )
+				{
+					$hostList[] = $hostPattern;
+				}
 			}
 		}
 
