@@ -1268,7 +1268,7 @@ class MediaService extends KalturaEntryService
 		{
 			$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
 			KalturaLog::info("Source file wasn't found on current DC. Dumping the request to DC ID [$remoteDc]");
-			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc));
+			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
 		}
 		throw $e;
 	}
