@@ -1,4 +1,4 @@
-find<?php
+<?php
 /**
  * Created by IntelliJ IDEA.
  * User: moshe.maor
