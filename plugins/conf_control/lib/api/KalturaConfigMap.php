@@ -63,4 +63,9 @@ class KalturaConfigMap extends KalturaObject
 	 * @insertonly
 	 */
 	public $sourceLocation;
+
+	public function validateForUpdate($sourceObject)
+	{
+
+	}
 }

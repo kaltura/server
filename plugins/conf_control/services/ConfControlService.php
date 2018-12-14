@@ -35,22 +35,20 @@ class ConfControlService extends KalturaBaseService
 	 *
 	 * @action update
 	 * @param KalturaConfigMap $map
-	 * @param string $relatedHost
 	 * @return KalturaConfigMap
 	 */
-	function updateAction(KalturaConfigMap $map,$relatedHost)
+	function updateAction(KalturaConfigMap $map)
 	{
         //validate input
             //1. Maps can only be unpdated
             //2. Only DB maps
+		//$map->validateForUpdate();
 
         //Insert value to DB
-
-        //Get list of all memcache servers
-
-        //Sync values to all memcache servers
-
-        //Reset the configuration key
+		$confControlDb = new kConfControlDb();
+		$confControlDb->setMapName($map->name);
+		$confControlDb->setHostNameRegex($map->relatedHost);
+		$confControlDb->update($map->content);
 	}
 
 	/**
@@ -63,6 +61,7 @@ class ConfControlService extends KalturaBaseService
 	 */
 	function listAction(KalturaConfigMapFilter $filter = null)
 	{
+		kApiCache::disableCache();
 		$response = new KalturaConfControlListResponse();
 		if(!$filter->name || $filter->name=='')
         {
@@ -76,13 +75,19 @@ class ConfControlService extends KalturaBaseService
 		$hostList =$remoteCache->getRelatedHostList($filter->name ,$filter->relatedHost );
 		if($hostList)
 		{
+
 			foreach ($hostList as $host)
 			{
+				$confControlDb = new kConfControlDb();
+				$confControlDb->setMapName($filter->name);
+				$confControlDb->setHostNameRegex($host);
 				$mapObject = new KalturaConfigMap();
 				$mapObject->name = $filter->name;
 				$mapObject->relatedHost = $host;
 				$mapObject->sourceLocation = KalturaConfMapSourceLocation::DB;
-				$mapObject->content = $remoteCache->getMap($filter->name, $host);
+				$mapObject->content = $confControlDb->getContent();
+				$mapObject->version = $confControlDb->getVersion();
+				$mapObject->isEditable = true;
 				$items->insert($mapObject);
 			}
 		}
@@ -97,6 +102,8 @@ class ConfControlService extends KalturaBaseService
 			    list($mapObject->name , $mapObject->relatedHost ,$mapObject->content )  = $fileSystemCache->getMapInfo($fileName);
 				$mapObject->sourceLocation = KalturaConfMapSourceLocation::FS;
 				$items->insert($mapObject);
+				$mapObject->version = l;
+				$mapObject->isEditable = false;
 			}
         }
 		$response->objects = $items;
