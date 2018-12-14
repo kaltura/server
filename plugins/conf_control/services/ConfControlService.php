@@ -23,10 +23,9 @@ class ConfControlService extends KalturaBaseService
 	 *
 	 * @action add
 	 * @param KalturaConfigMap $map
-	 * @param string $relatedHost
 	 * @return KalturaConfigMap
 	 */
-	function addAction(KalturaConfigMap $map,$relatedHost)
+	function addAction(KalturaConfigMap $map)
 	{
 
 	}
