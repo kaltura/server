@@ -175,8 +175,9 @@ class kKavaReportsMgr extends kKavaBase
 	
 	const ENRICH_CHUNK_SIZE = 10000;
 	const ENRICH_DIM_DELIMITER = '|';
+	const ENRICH_FOREACH_FUNC = 'func';
 	const CLIENT_TAG_PRIORITY = 5;
-	
+
 	const GET_TABLE_FLAG_IS_CSV = 0x01;
 	const GET_TABLE_FLAG_IDS_ONLY = 0x02;
 	
@@ -261,14 +262,14 @@ class kKavaReportsMgr extends kKavaBase
 					self::REPORT_ENRICH_OUTPUT => 'country',
 					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
 					self::REPORT_ENRICH_CONTEXT => array(
-						'func' => 'kKavaCountryCodes::toShortName',
+						self::ENRICH_FOREACH_FUNC => 'kKavaCountryCodes::toShortName',
 					)
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'location_name',
 					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
 					self::REPORT_ENRICH_CONTEXT => array(
-						'func' => 'strtoupper',
+						self::ENRICH_FOREACH_FUNC => 'strtoupper',
 					)
 				)
 			)
@@ -364,14 +365,14 @@ class kKavaReportsMgr extends kKavaBase
 					self::REPORT_ENRICH_OUTPUT => 'device',
 					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
 					self::REPORT_ENRICH_CONTEXT => array(
-						'func' => 'self::toSafeId',
+						self::ENRICH_FOREACH_FUNC => 'self::toSafeId',
 					)
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'os',
 					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
 					self::REPORT_ENRICH_CONTEXT => array(
-						'func' => 'self::transformOperatingSystemName',
+						self::ENRICH_FOREACH_FUNC => 'self::transformOperatingSystemName',
 					)
 				)
 			),
@@ -393,14 +394,14 @@ class kKavaReportsMgr extends kKavaBase
 					self::REPORT_ENRICH_OUTPUT => 'os',
 					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
 					self::REPORT_ENRICH_CONTEXT => array(
-						'func' => 'self::transformOperatingSystemName',
+						self::ENRICH_FOREACH_FUNC => 'self::transformOperatingSystemName',
 					)
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'browser',
 					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
 					self::REPORT_ENRICH_CONTEXT => array(
-						'func' => 'self::transformBrowserName',
+						self::ENRICH_FOREACH_FUNC => 'self::transformBrowserName',
 					)
 				)
 			),
@@ -417,7 +418,7 @@ class kKavaReportsMgr extends kKavaBase
 				self::REPORT_ENRICH_OUTPUT => 'browser',
 				self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
 				self::REPORT_ENRICH_CONTEXT => array(
-					'func' => 'self::transformBrowserName',
+					self::ENRICH_FOREACH_FUNC => 'self::transformBrowserName',
 				)
 			),
 		),
@@ -603,7 +604,7 @@ class kKavaReportsMgr extends kKavaBase
 				self::REPORT_ENRICH_OUTPUT => 'entry_media_source_name',
 				self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
 				self::REPORT_ENRICH_CONTEXT => array(
-					'func' => 'self::toSafeId',
+					self::ENRICH_FOREACH_FUNC => 'self::toSafeId',
 				)
 			),
 		),
@@ -3329,7 +3330,7 @@ class kKavaReportsMgr extends kKavaBase
 		$result = array();
 		foreach ($keys as $row => $key)
 		{
-			$result[$key] = call_user_func($enrich_context['func'], $key);
+			$result[$key] = call_user_func($enrich_context[self::ENRICH_FOREACH_FUNC], $key);
 		}
 		return $result;
 	}
