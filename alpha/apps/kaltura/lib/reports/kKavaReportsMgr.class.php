@@ -117,8 +117,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_TABLE_MAP = 'report_table_map';
 	const REPORT_TABLE_FINALIZE_FUNC = 'report_table_finalize_func';
 	const REPORT_EDIT_FILTER_FUNC = 'report_edit_filter_func';
-	const REPORT_TRANSFORM_DEF = 'report_transform_definition';
-	
+
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
 	const REPORT_GRAPH_TYPE = 'report_graph_type';
@@ -257,10 +256,22 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_LOCATION_COUNTRY,
 			self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_LOCATION_REGION,
 			self::REPORT_DRILLDOWN_DIMENSION_HEADERS => array('object_id', 'location_name'),
-			self::REPORT_TRANSFORM_DEF => array(
-				self::DIMENSION_LOCATION_COUNTRY => array('kKavaCountryCodes', 'toShortName'),
-				self::DIMENSION_LOCATION_REGION => 'strtoupper',
-			),
+			self::REPORT_ENRICH_DEF => array(
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'func' => 'kKavaCountryCodes::toShortName',
+					)
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'location_name',
+					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'func' => 'strtoupper',
+					)
+				)
+			)
 		),
 
 		myReportsMgr::REPORT_TYPE_TOP_SYNDICATION => array(
@@ -348,9 +359,21 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_OBJECT_IDS_TRANSFORM => array('kKavaReportsMgr', 'fromSafeId'),
 			self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_OS,
 			self::REPORT_DRILLDOWN_DIMENSION_HEADERS => array('os'),
-			self::REPORT_TRANSFORM_DEF => array(
-				self::DIMENSION_DEVICE => array('kKavaReportsMgr', 'toSafeId'),
-				self::DIMENSION_OS => array('kKavaReportsMgr', 'transformOperatingSystemName'),
+			self::REPORT_ENRICH_DEF => array(
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'device',
+					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'func' => 'self::toSafeId',
+					)
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'os',
+					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'func' => 'self::transformOperatingSystemName',
+					)
+				)
 			),
 		),
 
@@ -365,9 +388,21 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_OBJECT_IDS_TRANSFORM => array('kKavaReportsMgr', 'fromSafeId'),
 			self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_BROWSER,
 			self::REPORT_DRILLDOWN_DIMENSION_HEADERS => array('browser'),
-			self::REPORT_TRANSFORM_DEF => array(
-				self::DIMENSION_OS => array('kKavaReportsMgr', 'transformOperatingSystemName'),
-				self::DIMENSION_BROWSER => array('kKavaReportsMgr', 'transformBrowserName'),
+			self::REPORT_ENRICH_DEF => array(
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'os',
+					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'func' => 'self::transformOperatingSystemName',
+					)
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'browser',
+					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'func' => 'self::transformBrowserName',
+					)
+				)
 			),
 		),
 
@@ -378,8 +413,12 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_FORCE_TOTAL_COUNT => true,
 			self::REPORT_GRAPH_TYPE => self::GRAPH_MULTI_BY_NAME,
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_UNIQUE_USERS),
-			self::REPORT_TRANSFORM_DEF => array(
-				self::DIMENSION_BROWSER => array('kKavaReportsMgr', 'transformBrowserName'),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => 'browser',
+				self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
+				self::REPORT_ENRICH_CONTEXT => array(
+					'func' => 'self::transformBrowserName',
+				)
 			),
 		),
 
@@ -560,8 +599,12 @@ class kKavaReportsMgr extends kKavaBase
 				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 				self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD)),
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_SOURCE_TYPE,
-			self::REPORT_TRANSFORM_DEF => array(
-				self::DIMENSION_SOURCE_TYPE => array('kKavaReportsMgr', 'toSafeId')
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => 'entry_media_source_name',
+				self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
+				self::REPORT_ENRICH_CONTEXT => array(
+					'func' => 'self::toSafeId',
+				)
 			),
 		),
 			
@@ -1940,12 +1983,6 @@ class kKavaReportsMgr extends kKavaBase
 		return $report_def[self::REPORT_METRICS];
 	}
 
-	protected static function getTransformMetrics($report_def)
-	{
-		$transform_def = isset($report_def[self::REPORT_TRANSFORM_DEF]) ? $report_def[self::REPORT_TRANSFORM_DEF] : array();
-		return array_merge($transform_def, self::$transform_metrics);
-	}
-
 	protected static function getFilterValues($filter, $dimension)
 	{
 		foreach ($filter as $cur_filter)
@@ -2581,7 +2618,6 @@ class kKavaReportsMgr extends kKavaBase
 			{
 				$multiline_val = call_user_func($transform, $multiline_val);
 			}
-			
 			foreach ($graph_metrics_to_headers as $column => $header)
 			{
 				if (isset($graphs[$header][$date]))
@@ -2689,8 +2725,7 @@ class kKavaReportsMgr extends kKavaBase
 		case self::GRAPH_MULTI_BY_DATE_ID:
 		case self::GRAPH_MULTI_BY_NAME:				
 			$dimension = self::getDimension($report_def, $object_ids);
-			$transform_met = self::getTransformMetrics($report_def);
-			$transform = isset($transform_met[$dimension]) ? $transform_met[$dimension] : null;
+			$transform = isset(self::$transform_metrics[$dimension]) ? self::$transform_metrics[$dimension] : null;
 			$query = self::getGroupByReport($data_source, $partner_id, $intervals, $granularity_def, array($dimension), $metrics, $druid_filter);
 			break;
 				
@@ -2738,7 +2773,7 @@ class kKavaReportsMgr extends kKavaBase
 			break;
 		}
 
-		foreach (self::getTransformMetrics($report_def) as $metric => $func)
+		foreach (self::$transform_metrics as $metric => $func)
 		{
 			if (isset($result[self::$metrics_to_headers[$metric]]))
 			{
@@ -3289,6 +3324,16 @@ class kKavaReportsMgr extends kKavaBase
 		return $entries_names;
 	}
 
+	protected static function forEachKeys($keys, $partner_id, $enrich_context)
+	{
+		$result = array();
+		foreach ($keys as $row => $key)
+		{
+			$result[$key] = call_user_func($enrich_context['func'], $key);
+		}
+		return $result;
+	}
+
 	protected static function getQuotedEntriesNames($ids, $partner_id)
 	{
 		$result = self::getEntriesNames($ids, $partner_id);
@@ -3299,7 +3344,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
-	protected static function getCoordinates($keys, $partner_id, $enrich_context)
+	protected static function getCoordinates($keys)
 	{
 		$coordKeys = array();
 		foreach ($keys as $row => $key)
@@ -3826,7 +3871,6 @@ class kKavaReportsMgr extends kKavaBase
 			{
 				$cur_fields = array($cur_fields);
 			}
-		
 
 			$enriched_indexes = self::arrayGetIndexes($headers, $cur_fields);
 			// input
@@ -3844,7 +3888,10 @@ class kKavaReportsMgr extends kKavaBase
 			}
 			$dim_indexes = self::arrayGetIndexes($headers, $dim_headers);
 			$dim_indexes = implode(',', $dim_indexes);
-
+			if ($dim_indexes === '')
+			{
+				continue;
+			}
 			// add
 			if (!isset($enrich_specs[$dim_indexes]))
 			{
@@ -4440,7 +4487,7 @@ class kKavaReportsMgr extends kKavaBase
 		// set to null to free memory as we dont need this var anymore
 		$rows = null;
 
-		foreach (self::getTransformMetrics($report_def) as $metric => $func)
+		foreach (self::$transform_metrics as $metric => $func)
 		{
 			$field_index = array_search(self::$metrics_to_headers[$metric], $headers);
 			if (false !== $field_index)
@@ -4901,7 +4948,7 @@ class kKavaReportsMgr extends kKavaBase
 				$data[] = $value;
 			}
 
-			foreach (self::getTransformMetrics($report_def) as $metric => $func)
+			foreach (self::$transform_metrics as $metric => $func)
 			{
 				$field_index = array_search(self::$metrics_to_headers[$metric], $headers);
 				if (false !== $field_index)
