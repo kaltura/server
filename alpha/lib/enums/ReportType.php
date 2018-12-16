@@ -38,7 +38,7 @@ interface ReportType extends BaseEnum
    const ENTRY_USAGE = 27;
    const REACH_USAGE = 28;
    const TOP_CUSTOM_VAR1 = 29;
-   const CITIES = 30;
+   const MAP_OVERLAY_CITY = 30;
    const OPERATING_SYSTEM_FAMILIES = 32;
    const BROWSERS_FAMILIES = 33;
    const USER_ENGAGEMENT_TIMELINE = 34;

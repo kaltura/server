@@ -175,7 +175,6 @@ class kKavaReportsMgr extends kKavaBase
 	
 	const ENRICH_CHUNK_SIZE = 10000;
 	const ENRICH_DIM_DELIMITER = '|';
-	const ENRICH_FOREACH_FUNC = 'func';
 	const CLIENT_TAG_PRIORITY = 5;
 
 	const GET_TABLE_FLAG_IS_CSV = 0x01;
@@ -207,7 +206,7 @@ class kKavaReportsMgr extends kKavaBase
 		myReportsMgr::REPORT_TYPE_ENTRY_USAGE,
 		myReportsMgr::REPORT_TYPE_REACH_USAGE,
 		myReportsMgr::REPORT_TYPE_TOP_CUSTOM_VAR1,
-		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_CITIES,
+		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_CITY,
 		myReportsMgr::REPORT_TYPE_OPERATING_SYSTEMS_FAMILIES,
 		myReportsMgr::REPORT_TYPE_BROWSERS_FAMILIES,
 		myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT_TIMELINE,
@@ -261,16 +260,12 @@ class kKavaReportsMgr extends kKavaBase
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'country',
 					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
-					self::REPORT_ENRICH_CONTEXT => array(
-						self::ENRICH_FOREACH_FUNC => 'kKavaCountryCodes::toShortName',
-					)
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toShortName',
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'location_name',
 					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
-					self::REPORT_ENRICH_CONTEXT => array(
-						self::ENRICH_FOREACH_FUNC => 'strtoupper',
-					)
+					self::REPORT_ENRICH_CONTEXT => 'strtoupper',
 				)
 			)
 		),
@@ -364,16 +359,12 @@ class kKavaReportsMgr extends kKavaBase
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'device',
 					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
-					self::REPORT_ENRICH_CONTEXT => array(
-						self::ENRICH_FOREACH_FUNC => 'self::toSafeId',
-					)
+					self::REPORT_ENRICH_CONTEXT => 'self::toSafeId',
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'os',
 					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
-					self::REPORT_ENRICH_CONTEXT => array(
-						self::ENRICH_FOREACH_FUNC => 'self::transformOperatingSystemName',
-					)
+					self::REPORT_ENRICH_CONTEXT => 'self::transformOperatingSystemName',
 				)
 			),
 		),
@@ -393,16 +384,12 @@ class kKavaReportsMgr extends kKavaBase
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'os',
 					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
-					self::REPORT_ENRICH_CONTEXT => array(
-						self::ENRICH_FOREACH_FUNC => 'self::transformOperatingSystemName',
-					)
+					self::REPORT_ENRICH_CONTEXT => 'self::transformOperatingSystemName',
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'browser',
 					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
-					self::REPORT_ENRICH_CONTEXT => array(
-						self::ENRICH_FOREACH_FUNC => 'self::transformBrowserName',
-					)
+					self::REPORT_ENRICH_CONTEXT => 'self::transformBrowserName',
 				)
 			),
 		),
@@ -417,9 +404,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'browser',
 				self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
-				self::REPORT_ENRICH_CONTEXT => array(
-					self::ENRICH_FOREACH_FUNC => 'self::transformBrowserName',
-				)
+				self::REPORT_ENRICH_CONTEXT => 'self::transformBrowserName',
 			),
 		),
 
@@ -603,9 +588,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'entry_media_source_name',
 				self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
-				self::REPORT_ENRICH_CONTEXT => array(
-					self::ENRICH_FOREACH_FUNC => 'self::toSafeId',
-				)
+				self::REPORT_ENRICH_CONTEXT => 'self::toSafeId',
 			),
 		),
 			
@@ -1189,13 +1172,13 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
 		),
 
-		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_CITIES => array(
+		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_CITY => array(
 			self::REPORT_DIMENSION => array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_LOCATION_REGION, self::DIMENSION_LOCATION_CITY),
-			self::REPORT_DIMENSION_HEADERS => array('country', 'region', 'city', 'city_coordinates'),
+			self::REPORT_DIMENSION_HEADERS => array('country', 'region', 'city', 'coordinates'),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
-				self::REPORT_ENRICH_OUTPUT => 'city_coordinates',
+				self::REPORT_ENRICH_OUTPUT => 'coordinates',
 				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
 			),
 		),
@@ -1216,22 +1199,22 @@ class kKavaReportsMgr extends kKavaBase
 
 		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_COUNTRY => array(
 			self::REPORT_DIMENSION => self::DIMENSION_LOCATION_COUNTRY,
-			self::REPORT_DIMENSION_HEADERS => array('country', 'country_coordinates'),
+			self::REPORT_DIMENSION_HEADERS => array('country', 'coordinates'),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_INPUT =>  array('country'),
-				self::REPORT_ENRICH_OUTPUT => array('country_coordinates'),
+				self::REPORT_ENRICH_OUTPUT => 'coordinates',
 				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
 			),
 		),
 
 		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_REGION => array(
 			self::REPORT_DIMENSION => array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_LOCATION_REGION),
-			self::REPORT_DIMENSION_HEADERS => array('country', 'region', 'region_coordinates'),
+			self::REPORT_DIMENSION_HEADERS => array('country', 'region', 'coordinates'),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
-				self::REPORT_ENRICH_OUTPUT => array('region_coordinates'),
+				self::REPORT_ENRICH_OUTPUT => 'coordinates',
 				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
 			),
 		),
@@ -3328,9 +3311,9 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function forEachKeys($keys, $partner_id, $enrich_context)
 	{
 		$result = array();
-		foreach ($keys as $row => $key)
+		foreach ($keys as $key)
 		{
-			$result[$key] = call_user_func($enrich_context[self::ENRICH_FOREACH_FUNC], $key);
+			$result[$key] = call_user_func($enrich_context, $key);
 		}
 		return $result;
 	}
@@ -3348,22 +3331,20 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function getCoordinates($keys)
 	{
 		$coordKeys = array();
-		foreach ($keys as $row => $key)
+		foreach ($keys as $key)
 		{
 			$memcKey = kKavaBase::getCoordinatesKey(array($key));
 			$coordKeys[$memcKey] = true;
 		}
-		$coords = kKavaBase::getCoordinatesForKeys($coordKeys);
+		$coords = kKavaBase::getCoordinatesForKeys(array_keys($coordKeys));
 		$result = array();
-		foreach ($keys as $row => $key)
+		foreach ($keys as $key)
 		{
-			$rowData = array();
 			$memcKey = kKavaBase::getCoordinatesKey(array($key));
 			if (isset($coords[$memcKey]))
 			{
-				$rowData[] = $coords[$memcKey];
+				$result[$key] = array($coords[$memcKey]);
 			}
-			$result[$key] = $rowData;
 		}
 		return $result;
 	}
@@ -3839,7 +3820,12 @@ class kKavaReportsMgr extends kKavaBase
 		$result = array();
 		foreach ($elements as $element)
 		{
-			$result[] = array_search($element, $arr);
+			$index = array_search($element, $arr);
+			if ($index === false)
+			{
+				return false;
+			}
+			$result[] = $index;
 		}
 		return $result;
 	}
@@ -3874,6 +3860,10 @@ class kKavaReportsMgr extends kKavaBase
 			}
 
 			$enriched_indexes = self::arrayGetIndexes($headers, $cur_fields);
+			if (!$enriched_indexes)
+			{
+				continue;
+			}
 			// input
 			if (isset($enrich_def[self::REPORT_ENRICH_INPUT]))
 			{
@@ -3888,11 +3878,12 @@ class kKavaReportsMgr extends kKavaBase
 				$dim_headers = array(reset($cur_fields));
 			}
 			$dim_indexes = self::arrayGetIndexes($headers, $dim_headers);
-			$dim_indexes = implode(',', $dim_indexes);
-			if ($dim_indexes === '')
+			if (!$dim_indexes)
 			{
 				continue;
 			}
+			$dim_indexes = implode(',', $dim_indexes);
+
 			// add
 			if (!isset($enrich_specs[$dim_indexes]))
 			{

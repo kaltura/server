@@ -40,7 +40,7 @@ class LiveReportsService extends KalturaBaseService
 			$keys[kKavaBase::getCoordinatesKey(array($countryName))] = true;
 			$keys[kKavaBase::getCoordinatesKey(array($countryName, $regionName, $cityName))] = true;
 		}
-		$coords = kKavaBase::getCoordinatesForKeys($keys);
+		$coords = kKavaBase::getCoordinatesForKeys(array_keys($keys));
 		// parse the coordinates
 		$coords = array_map('kKavaBase::parseCoordinates', $coords);
 		

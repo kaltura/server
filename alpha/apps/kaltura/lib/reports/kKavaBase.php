@@ -143,7 +143,7 @@ class kKavaBase extends kDruidBase
 			return array();
 		}
 
-		return $cache->multiGet(array_keys($keys));;
+		return $cache->multiGet($keys);
 	}
 
 }
