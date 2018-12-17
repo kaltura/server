@@ -61,6 +61,6 @@ class KalturaDataEntry extends KalturaBaseEntry
 		if($retrieveDataContentByGet != true && $this->shouldGet('dataContent', $responseProfile))
 			$this->dataContent = '';
 
-		$this->dataContent = kString::stringToSafeXml($this->dataContent);
+		//$this->dataContent = kString::stringToSafeXml($this->dataContent);
 	}
 }
