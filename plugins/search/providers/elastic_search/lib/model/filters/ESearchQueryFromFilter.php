@@ -15,7 +15,8 @@ class ESearchQueryFromFilter
 	{
 		foreach($filter->fields as $field => $fieldValue)
 		{
-			if ($field == ESearchCaptionAssetItemFilterFields::ORDER_BY || $field == ESearchCaptionAssetItemFilterFields::LIMIT) {
+			if ($field == ESearchCaptionAssetItemFilterFields::ORDER_BY || $field == ESearchCaptionAssetItemFilterFields::LIMIT)
+			{
 				continue;
 			}
 
