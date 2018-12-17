@@ -123,54 +123,70 @@ class kCielo24FlowManager implements kBatchJobStatusEventConsumer
 			
 			if(count ($transcripts))
 			{
-				foreach ($transcripts as $transcript)
-				{
-					/* @var $transcript TranscriptAsset */
-					if ($transcript->getContainerFormat() == AttachmentType::TEXT)
-					{
-						$transcriptContent = $clientHelper->getRemoteTranscript($remoteJobId);
-						$this->setObjectContent($transcript, $transcriptContent, $accuracyRate, null, true, $humanVerified);
+				
+				foreach ($transcripts as $transcript) {
+					try {
+						/* @var $transcript TranscriptAsset */
+						if ($transcript->getContainerFormat() == AttachmentType::TEXT) {
+							
+							$transcriptContent = $clientHelper->getRemoteTranscript($remoteJobId);
+							$this->setObjectContent($transcript, $transcriptContent, $accuracyRate, null, true, $humanVerified);
+						}
+						elseif ($transcript->getContainerFormat() == AttachmentType::JSON)
+						{
+							$transcriptContent = $clientHelper->getRemoteTranscriptTokens($remoteJobId);
+							$transcriptContent = $this->normalizeJson($transcriptContent);
+							$this->setObjectContent($transcript, $transcriptContent, $accuracyRate, "JSON", true, $humanVerified);
+						}
+							
+						KalturaLog::debug("transcript content - $transcriptContent");
 					}
-					elseif ($transcript->getContainerFormat() == AttachmentType::JSON)
+					catch (Exception $e)
 					{
-						$transcriptContent = $clientHelper->getRemoteTranscriptTokens($remoteJobId);
-						$transcriptContent = $this->normalizeJson ($transcriptContent);
-						$this->setObjectContent($transcript, $transcriptContent, $accuracyRate, "JSON", true, $humanVerified);
+						$dbBatchJob->setDescription($dbBatchJob->getDescription() . '\n' . $e->getMessage());
+						$dbBatchJob->save();
+						$transcript->setStatus(asset::ASSET_STATUS_ERROR);
+						$transcript->save();
 					}
-					
-					KalturaLog::debug("transcript content - $transcriptContent");
+						
 				}
 			}
 			
 			$formatsArray = explode(',',$formatsString);
-			$captionsContentArray = $clientHelper->getRemoteCaptions($remoteJobId, $formatsArray);
-			KalturaLog::debug("captions content - " . print_r($captionsContentArray, true));
-	
-			$captions = kTranscriptHelper::getAssetsByLanguage($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), $spokenLanguage, array (asset::FLAVOR_ASSET_STATUS_ERROR));
-			foreach ($captionsContentArray as $format => $content)
-			{        
-				$captionFormatConst = constant("KalturaCaptionType::" . $format);
-				if(isset($captions[$captionFormatConst]))
-					$caption = $captions[$captionFormatConst];
-				else
-				{
-					$caption = new CaptionAsset();
-					$caption->setEntryId($entryId);
-					$caption->setPartnerId($partnerId);
-					$caption->setLanguage($spokenLanguage);
-					$caption->setContainerFormat($captionFormatConst);
-					$caption->setStatus(CaptionAsset::ASSET_STATUS_QUEUED);
-					$caption->save();
+			try
+			{
+				$captionsContentArray = $clientHelper->getRemoteCaptions($remoteJobId, $formatsArray);
+				KalturaLog::debug("captions content - " . print_r($captionsContentArray, true));
+				
+				$captions = kTranscriptHelper::getAssetsByLanguage($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), $spokenLanguage, array(asset::FLAVOR_ASSET_STATUS_ERROR));
+				foreach ($captionsContentArray as $format => $content) {
+					$captionFormatConst = constant("KalturaCaptionType::" . $format);
+					if (isset($captions[$captionFormatConst]))
+						$caption = $captions[$captionFormatConst];
+					else {
+						$caption = new CaptionAsset();
+						$caption->setEntryId($entryId);
+						$caption->setPartnerId($partnerId);
+						$caption->setLanguage($spokenLanguage);
+						$caption->setContainerFormat($captionFormatConst);
+						$caption->setStatus(CaptionAsset::ASSET_STATUS_QUEUED);
+						$caption->save();
+					}
+					if ($captionFormatConst == KalturaCaptionType::DFXP) {
+						$cielo24Options = Cielo24Plugin::getPartnerCielo24Options($partnerId);
+						if ($cielo24Options->transformDfxp)
+							$content = $this->transformDfxp($content);
+					}
+					$this->setObjectContent($caption, $content, $accuracyRate, $format);
 				}
-				if ($captionFormatConst == KalturaCaptionType::DFXP)
-				{
-					$cielo24Options = Cielo24Plugin::getPartnerCielo24Options($partnerId);
-					if ($cielo24Options->transformDfxp)
-						$content = $this->transformDfxp($content);
-				}
-				$this->setObjectContent($caption, $content, $accuracyRate, $format);
+			}
+			catch (Exception $e)
+			{
+				$dbBatchJob->setDescription($dbBatchJob->getDescription() . '\n' . $e->getMessage());
+				$dbBatchJob->save();
 			}
 		}
+		
 		return true;					    
 	}
 	
