@@ -123,4 +123,27 @@ class kKavaBase extends kDruidBase
 	    }
 	    return false;
 	}
+
+	public static function getCoordinatesKey($items)
+	{
+		$key = implode('_', $items);
+		return 'coord_' . preg_replace('/[^a-z0-9_]/', '_', strtolower($key));
+	}
+
+	protected static function parseCoordinates($coords)
+	{
+		return array_map('floatval', explode('/', $coords));
+	}
+
+	public static function getCoordinatesForKeys($keys)
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_GEO_COORDINATES);
+		if (!$cache)
+		{
+			return array();
+		}
+
+		return $cache->multiGet($keys);
+	}
+
 }

@@ -117,7 +117,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_TABLE_MAP = 'report_table_map';
 	const REPORT_TABLE_FINALIZE_FUNC = 'report_table_finalize_func';
 	const REPORT_EDIT_FILTER_FUNC = 'report_edit_filter_func';
-	
+
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
 	const REPORT_GRAPH_TYPE = 'report_graph_type';
@@ -174,8 +174,9 @@ class kKavaReportsMgr extends kKavaBase
 	const MIN_THRESHOLD = 500;
 	
 	const ENRICH_CHUNK_SIZE = 10000;
+	const ENRICH_DIM_DELIMITER = '|';
 	const CLIENT_TAG_PRIORITY = 5;
-	
+
 	const GET_TABLE_FLAG_IS_CSV = 0x01;
 	const GET_TABLE_FLAG_IDS_ONLY = 0x02;
 	
@@ -205,11 +206,13 @@ class kKavaReportsMgr extends kKavaBase
 		myReportsMgr::REPORT_TYPE_ENTRY_USAGE,
 		myReportsMgr::REPORT_TYPE_REACH_USAGE,
 		myReportsMgr::REPORT_TYPE_TOP_CUSTOM_VAR1,
-		myReportsMgr::REPORT_TYPE_CITIES,
+		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_CITY,
 		myReportsMgr::REPORT_TYPE_OPERATING_SYSTEMS_FAMILIES,
 		myReportsMgr::REPORT_TYPE_BROWSERS_FAMILIES,
 		myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT_TIMELINE,
 		myReportsMgr::REPORT_TYPE_UNIQUE_USERS_PLAY,
+		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_COUNTRY,
+		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_REGION,
 	);
 	
 	protected static $reports_def = array(
@@ -217,7 +220,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
 			self::REPORT_DIMENSION_HEADERS => array('object_id', 'entry_name'),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => 'entry_name', 
+				self::REPORT_ENRICH_OUTPUT => 'entry_name',
 				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_USERS),
 			self::REPORT_FORCE_TOTAL_COUNT => true,
@@ -253,6 +256,18 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_LOCATION_COUNTRY,
 			self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_LOCATION_REGION,
 			self::REPORT_DRILLDOWN_DIMENSION_HEADERS => array('object_id', 'location_name'),
+			self::REPORT_ENRICH_DEF => array(
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toShortName',
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'location_name',
+					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
+					self::REPORT_ENRICH_CONTEXT => 'strtoupper',
+				)
+			)
 		),
 
 		myReportsMgr::REPORT_TYPE_TOP_SYNDICATION => array(
@@ -340,6 +355,18 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_OBJECT_IDS_TRANSFORM => array('kKavaReportsMgr', 'fromSafeId'),
 			self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_OS,
 			self::REPORT_DRILLDOWN_DIMENSION_HEADERS => array('os'),
+			self::REPORT_ENRICH_DEF => array(
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'device',
+					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
+					self::REPORT_ENRICH_CONTEXT => 'self::toSafeId',
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'os',
+					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
+					self::REPORT_ENRICH_CONTEXT => 'self::transformOperatingSystemName',
+				)
+			),
 		),
 
 		myReportsMgr::REPORT_TYPE_OPERATING_SYSTEM => array(
@@ -352,7 +379,19 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_OS,
 			self::REPORT_OBJECT_IDS_TRANSFORM => array('kKavaReportsMgr', 'fromSafeId'),
 			self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_BROWSER,
-			self::REPORT_DRILLDOWN_DIMENSION_HEADERS => array('browser')
+			self::REPORT_DRILLDOWN_DIMENSION_HEADERS => array('browser'),
+			self::REPORT_ENRICH_DEF => array(
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'os',
+					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
+					self::REPORT_ENRICH_CONTEXT => 'self::transformOperatingSystemName',
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'browser',
+					self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
+					self::REPORT_ENRICH_CONTEXT => 'self::transformBrowserName',
+				)
+			),
 		),
 
 		myReportsMgr::REPORT_TYPE_BROWSERS => array(
@@ -362,6 +401,11 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_FORCE_TOTAL_COUNT => true,
 			self::REPORT_GRAPH_TYPE => self::GRAPH_MULTI_BY_NAME,
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_UNIQUE_USERS),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => 'browser',
+				self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
+				self::REPORT_ENRICH_CONTEXT => 'self::transformBrowserName',
+			),
 		),
 
 		myReportsMgr::REPORT_TYPE_OPERATING_SYSTEMS_FAMILIES => array(
@@ -541,6 +585,11 @@ class kKavaReportsMgr extends kKavaBase
 				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 				self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD)),
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_SOURCE_TYPE,
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => 'entry_media_source_name',
+				self::REPORT_ENRICH_FUNC => 'self::forEachKeys',
+				self::REPORT_ENRICH_CONTEXT => 'self::toSafeId',
+			),
 		),
 			
 		myReportsMgr::REPORT_TYPE_TOP_CREATORS => array(
@@ -1123,10 +1172,15 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
 		),
 
-		myReportsMgr::REPORT_TYPE_CITIES => array(
-			self::REPORT_DIMENSION => self::DIMENSION_LOCATION_CITY,
-			self::REPORT_DIMENSION_HEADERS => array('object_id', 'city'),
+		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_CITY => array(
+			self::REPORT_DIMENSION => array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_LOCATION_REGION, self::DIMENSION_LOCATION_CITY),
+			self::REPORT_DIMENSION_HEADERS => array('country', 'region', 'city', 'coordinates'),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
+				self::REPORT_ENRICH_OUTPUT => 'coordinates',
+				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+			),
 		),
 
 		myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT_TIMELINE => array(
@@ -1141,7 +1195,29 @@ class kKavaReportsMgr extends kKavaBase
 			),
 			self::REPORT_METRICS => array(self::METRIC_UNIQUE_USERS),
 			self::REPORT_GRAPH_METRICS => array(self::METRIC_UNIQUE_USERS),
-		)
+		),
+
+		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_COUNTRY => array(
+			self::REPORT_DIMENSION => self::DIMENSION_LOCATION_COUNTRY,
+			self::REPORT_DIMENSION_HEADERS => array('country', 'coordinates'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_INPUT =>  array('country'),
+				self::REPORT_ENRICH_OUTPUT => 'coordinates',
+				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+			),
+		),
+
+		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_REGION => array(
+			self::REPORT_DIMENSION => array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_LOCATION_REGION),
+			self::REPORT_DIMENSION_HEADERS => array('country', 'region', 'coordinates'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
+				self::REPORT_ENRICH_OUTPUT => 'coordinates',
+				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+			),
+		),
 	);
 	
 	protected static $event_type_count_aggrs = array(
@@ -1234,16 +1310,11 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_PLAY_TIME_SEC => self::METRIC_VIEW_PLAY_TIME_SEC,
 		self::METRIC_ORIGIN_BANDWIDTH_SIZE_MB => self::METRIC_ORIGIN_BANDWIDTH_SIZE_MB,
 	);
-	
+
+	//global transform
 	protected static $transform_metrics = array(
 		self::METRIC_UNIQUE_ENTRIES => 'floor',
 		self::METRIC_UNIQUE_USERS => 'floor',
-		self::DIMENSION_DEVICE => array('kKavaReportsMgr', 'toSafeId'),
-		self::DIMENSION_BROWSER => array('kKavaReportsMgr', 'transformBrowserName'),
-		self::DIMENSION_OS => array('kKavaReportsMgr', 'transformOperatingSystemName'),
-		self::DIMENSION_LOCATION_COUNTRY => array('kKavaCountryCodes', 'toShortName'),
-		self::DIMENSION_LOCATION_REGION => 'strtoupper',
-		self::DIMENSION_SOURCE_TYPE => array('kKavaReportsMgr', 'toSafeId'),
 	);
 
 	protected static $transform_time_dimensions = array(
@@ -1659,11 +1730,8 @@ class kKavaReportsMgr extends kKavaBase
 		
 		self::$aggregations_def[self::METRIC_SUM_PRICE] = self::getLongSumAggregator(
 			self::METRIC_SUM_PRICE, self::METRIC_SUM_PRICE);
-		
-		foreach (self::$metrics_to_headers as $metric => $header)
-		{
-			self::$headers_to_metrics[$header] = $metric;
-		}
+
+		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 	}
 	
 	/// time functions
@@ -2081,12 +2149,7 @@ class kKavaReportsMgr extends kKavaBase
 			return array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 		}
 
-		$result = array();
-		foreach ($rows as $row)
-		{
-			$result[] = $row[0];
-		}
-		return $result;
+		return array_map('reset', $rows);
 	}
 
 	protected static function getDruidFilter($partner_id, $report_def, $input_filter, $object_ids)
@@ -2542,7 +2605,6 @@ class kKavaReportsMgr extends kKavaBase
 			{
 				$multiline_val = call_user_func($transform, $multiline_val);
 			}
-			
 			foreach ($graph_metrics_to_headers as $column => $header)
 			{
 				if (isset($graphs[$header][$date]))
@@ -2696,6 +2758,17 @@ class kKavaReportsMgr extends kKavaBase
 			$transform = isset(self::$transform_time_dimensions[$granularity]) ? self::$transform_time_dimensions[$granularity] : null;
 			$result = self::getGraphsByDateId($result, $graph_metrics_to_headers, $input_filter->timeZoneOffset, $transform);
 			break;
+		}
+
+		foreach (self::$transform_metrics as $metric => $func)
+		{
+			if (isset($result[self::$metrics_to_headers[$metric]]))
+			{
+				foreach ($result[self::$metrics_to_headers[$metric]] as &$value)
+				{
+					$value = call_user_func($func, $value);
+				}
+			}
 		}
 
 		$end = microtime(true);
@@ -3238,12 +3311,43 @@ class kKavaReportsMgr extends kKavaBase
 		return $entries_names;
 	}
 
+	protected static function forEachKeys($keys, $partner_id, $enrich_context)
+	{
+		$result = array();
+		foreach ($keys as $key)
+		{
+			$result[$key] = call_user_func($enrich_context, $key);
+		}
+		return $result;
+	}
+
 	protected static function getQuotedEntriesNames($ids, $partner_id)
 	{
 		$result = self::getEntriesNames($ids, $partner_id);
 		foreach ($result as &$name)
 		{
 			$name = '"' . str_replace('"', '""', $name) . '"';
+		}
+		return $result;
+	}
+
+	protected static function getCoordinates($keys)
+	{
+		$coordKeys = array();
+		foreach ($keys as $key)
+		{
+			$memcKey = kKavaBase::getCoordinatesKey(array($key));
+			$coordKeys[$memcKey] = true;
+		}
+		$coords = kKavaBase::getCoordinatesForKeys(array_keys($coordKeys));
+		$result = array();
+		foreach ($keys as $key)
+		{
+			$memcKey = kKavaBase::getCoordinatesKey(array($key));
+			if (isset($coords[$memcKey]))
+			{
+				$result[$key] = array($coords[$memcKey]);
+			}
 		}
 		return $result;
 	}
@@ -3713,7 +3817,32 @@ class kKavaReportsMgr extends kKavaBase
 		
 		return $result;
 	}
-	
+
+	protected static function arrayGetIndexes($arr, $elements)
+	{
+		$result = array();
+		foreach ($elements as $element)
+		{
+			$index = array_search($element, $arr);
+			if ($index === false)
+			{
+				return false;
+			}
+			$result[] = $index;
+		}
+		return $result;
+	}
+
+	protected static function arrayGetElements($arr, $indexes)
+	{
+		$result = array();
+		foreach ($indexes as $index)
+		{
+			$result[] = $arr[$index];
+		}
+		return $result;
+	}
+
 	protected static function enrichData($report_def, $headers, $partner_id, &$data)
 	{
 		// get the enrichment specification
@@ -3725,43 +3854,52 @@ class kKavaReportsMgr extends kKavaBase
 			$enrich_func = $enrich_def[self::REPORT_ENRICH_FUNC];
 			$enrich_context = isset($enrich_def[self::REPORT_ENRICH_CONTEXT]) ? 
 				$enrich_def[self::REPORT_ENRICH_CONTEXT] : null;
-			
+
 			// output
 			$cur_fields = $enrich_def[self::REPORT_ENRICH_OUTPUT];
 			if (!is_array($cur_fields))
 			{
 				$cur_fields = array($cur_fields);
 			}
-		
-			$enriched_indexes = array();
-			foreach ($cur_fields as $field)
-			{
-				$enriched_indexes[] = array_search($field, $headers);
-			}
 
+			$enriched_indexes = self::arrayGetIndexes($headers, $cur_fields);
+			if (!$enriched_indexes)
+			{
+				continue;
+			}
 			// input
 			if (isset($enrich_def[self::REPORT_ENRICH_INPUT]))
 			{
-				$dim_header = $enrich_def[self::REPORT_ENRICH_INPUT];
+				$dim_headers = $enrich_def[self::REPORT_ENRICH_INPUT];
+				if (!is_array($dim_headers))
+				{
+					$dim_headers = array($cur_fields);
+				}
 			}
 			else
 			{
-				$dim_header = reset($cur_fields);
+				$dim_headers = array(reset($cur_fields));
 			}
-			$dim_index = array_search($dim_header, $headers);
-			
-			// add
-			if (!isset($enrich_specs[$dim_index]))
+			$dim_indexes = self::arrayGetIndexes($headers, $dim_headers);
+			if (!$dim_indexes)
 			{
-				$enrich_specs[$dim_index] = array();
+				continue;
 			}
-			$enrich_specs[$dim_index][] = array($enrich_func, $enrich_context, $enriched_indexes);
+			$dim_indexes = implode(',', $dim_indexes);
+
+			// add
+			if (!isset($enrich_specs[$dim_indexes]))
+			{
+				$enrich_specs[$dim_indexes] = array();
+			}
+			$enrich_specs[$dim_indexes][] = array($enrich_func, $enrich_context, $enriched_indexes);
 		}
 		
 		// enrich the data in chunks
 		$rows_count = count($data);
-		foreach ($enrich_specs as $dim_index => $cur_enrich_specs)
+		foreach ($enrich_specs as $dim_indexes => $cur_enrich_specs)
 		{
+			$dim_indexes = explode(',', $dim_indexes);
 			$start = 0;
 			while ($start < $rows_count)
 			{
@@ -3770,7 +3908,8 @@ class kKavaReportsMgr extends kKavaBase
 				$dimension_ids = array();
 				for ($current_row = $start; $current_row < $limit; $current_row++) 
 				{
-					$key = $data[$current_row][$dim_index];
+					$key = self::arrayGetElements($data[$current_row], $dim_indexes);
+					$key = implode(self::ENRICH_DIM_DELIMITER, $key);
 					$dimension_ids[$key] = true;
 				}
 				
@@ -3778,14 +3917,15 @@ class kKavaReportsMgr extends kKavaBase
 				foreach ($cur_enrich_specs as $enrich_spec)
 				{
 					list($enrich_func, $enrich_context, $enriched_indexes) = $enrich_spec;
-	
+
 					$entities = call_user_func($enrich_func, array_keys($dimension_ids), $partner_id, $enrich_context);
 			
 					for ($current_row = $start; $current_row < $limit; $current_row++) 
 					{
-						$key = $data[$current_row][$dim_index];
+						$key = self::arrayGetElements($data[$current_row], $dim_indexes);
+						$key = implode(self::ENRICH_DIM_DELIMITER, $key);
 						$entity = isset($entities[$key]) ? $entities[$key] : null;
-						foreach ($enriched_indexes as $index => $enrich_field) 
+						foreach ($enriched_indexes as $index => $enrich_field)
 						{
 							$data[$current_row][$enrich_field] = is_array($entity) ? $entity[$index] : $entity;
 						}
@@ -4294,10 +4434,8 @@ class kKavaReportsMgr extends kKavaBase
 			}
 		}
 
-		foreach ($metrics as $column)
-		{
-			$row_mapping[] = $column;
-		}
+
+		$row_mapping = array_merge($row_mapping, $metrics);
 
 		// map the rows
 		foreach ($rows as $index => $row)
