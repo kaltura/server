@@ -1,17 +1,18 @@
 <?php
-/**
- * @package plugins.elasticSearch
- * @subpackage model.filters
- */
+
 class ESearchQueryFromFilter
 {
 	protected $searchItems;
 	protected $nestedSearchItem;
 
-	public function createElasticQueryFromFilter(baseObjectFilter $filter)
+	public function __construct()
 	{
 		$this->searchItems = array();
 		$this->nestedSearchItem = array();
+	}
+
+	public function createElasticQueryFromFilter(baseObjectFilter $filter)
+	{
 		foreach($filter->fields as $field => $fieldValue)
 		{
 			if ($field == ESearchCaptionAssetItemFilterFields::ORDER_BY || $field == ESearchCaptionAssetItemFilterFields::LIMIT) {
@@ -19,8 +20,8 @@ class ESearchQueryFromFilter
 			}
 
 			$fieldParts = explode(baseObjectFilter::FILTER_PREFIX, $field, 3);
-			list($prefix, $operator, $fieldName) = $fieldParts;
-			if(in_array($fieldName, $this->getNonSupportedFields()) || is_null($fieldValue) || $fieldValue === '')
+			list( , $operator, $fieldName) = $fieldParts;
+			if(!in_array($fieldName, static::getSupportedFields()) || is_null($fieldValue) || $fieldValue === '')
 			{
 				continue;
 			}
@@ -104,7 +105,8 @@ class ESearchQueryFromFilter
 		if(count($values))
 		{
 			$innerSearchItems = array();
-			foreach ($values as $value) {
+			foreach ($values as $value)
+			{
 				$searchItem = $this->addSearchItem($elasticFieldName, $value, $searchType);
 				$innerSearchItems[] = $searchItem;
 			}
@@ -162,7 +164,7 @@ class ESearchQueryFromFilter
 
 	protected function addToSearchItemsByField($elasticFieldName, $searchItem)
 	{
-		if(in_array($elasticFieldName, $this->getNestedQueryFields()))
+		if(in_array($elasticFieldName, static::getNestedQueryFields()))
 		{
 			$this->nestedSearchItem[] = $searchItem;
 		}
@@ -174,7 +176,7 @@ class ESearchQueryFromFilter
 
 	protected function getEsearchOperatorByField($elasticFieldName)
 	{
-		if(in_array($elasticFieldName, $this->getNestedQueryFields()))
+		if(in_array($elasticFieldName, static::getNestedQueryFields()))
 		{
 			return new ESearchNestedOperator();
 		}
@@ -202,7 +204,24 @@ class ESearchQueryFromFilter
 
 	protected function getSphinxToElasticSearchItemType($operator)
 	{
+		$operatorsMap = array(
+			baseObjectFilter::EQ => ESearchFilterItemType::EXACT_MATCH,
+			baseObjectFilter::IN => ESearchFilterItemType::EXACT_MATCH_MULTI_OR,
+			baseObjectFilter::NOT_IN => ESearchFilterItemType::EXACT_MATCH_NOT,
+			baseObjectFilter::GTE => ESearchFilterItemType::RANGE_GTE,
+			baseObjectFilter::LTE => ESearchFilterItemType::RANGE_LTE,
+			baseObjectFilter::LIKE => ESearchFilterItemType::EXACT_MATCH,
+			baseObjectFilter::MULTI_LIKE_OR => ESearchFilterItemType::EXACT_MATCH_MULTI_OR,
+			baseObjectFilter::MULTI_LIKE_AND => ESearchFilterItemType::EXACT_MATCH_MULTI_AND);
+
+		if(array_key_exists($operator, $operatorsMap))
+		{
+			return $operatorsMap[$operator];
+		}
+		else
+		{
 			return null;
+		}
 	}
 
 	protected function getSphinxToElasticFieldName($field)
@@ -210,12 +229,12 @@ class ESearchQueryFromFilter
 			return null;
 	}
 
-	protected function getNonSupportedFields()
+	protected static function getSupportedFields()
 	{
 		return array();
 	}
 
-	protected function getNestedQueryFields()
+	protected static function getNestedQueryFields()
 	{
 		return array();
 	}

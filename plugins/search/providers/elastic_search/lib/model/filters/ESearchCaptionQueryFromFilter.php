@@ -7,19 +7,22 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 	const ITEMS = 'items';
 	const TOTAL_COUNT = 'totalCount';
 
-	protected $nonSupportedSearchFields = array(
-		ESearchCaptionAssetItemFilterFields::PARTNER_ID,
-		ESearchCaptionAssetItemFilterFields::FORMAT,
+	protected static $supportedSearchFields = array(
+		ESearchCaptionAssetItemFilterFields::CAPTION_ASSET_ID,
+		ESearchCaptionAssetItemFilterFields::ENTRY_ID,
 		ESearchCaptionAssetItemFilterFields::STATUS,
-		ESearchCaptionAssetItemFilterFields::SIZE,
-		ESearchCaptionAssetItemFilterFields::TAGS,
-		ESearchCaptionAssetItemFilterFields::PARTNER_DESCRIPTION,
-		ESearchCaptionAssetItemFilterFields::ID,
-		ESearchCaptionAssetItemFilterFields::DELETED_AT,
-		ESearchCaptionAssetItemFilterFields::FLAVOR_PARAMS_ID);
+		ESearchCaptionAssetItemFilterFields::CREATED_AT,
+		ESearchCaptionAssetItemFilterFields::UPDATED_AT,
+		ESearchCaptionAssetItemFilterFields::CONTENT,
+		ESearchCaptionAssetItemFilterFields::LANGUAGE,
+		ESearchCaptionAssetItemFilterFields::LABEL,
+		ESearchCaptionAssetItemFilterFields::START_TIME,
+		ESearchCaptionAssetItemFilterFields::END_TIME,
+		ESearchCaptionAssetItemFilterFields::LABEL,
+		ESearchCaptionAssetItemFilterFields::START_TIME);
 
 
-	protected $captionNestedFields = array(
+	protected static $captionNestedFields = array(
 		ESearchCaptionFieldName::CONTENT,
 		ESearchCaptionFieldName::START_TIME,
 		ESearchCaptionFieldName::END_TIME,
@@ -27,9 +30,15 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 		ESearchCaptionFieldName::LABEL,
 		ESearchCaptionFieldName::CAPTION_ASSET_ID);
 
-	protected function getNonSupportedFields()
+	public function __construct()
 	{
-		return $this->nonSupportedSearchFields;
+		parent::__construct();
+		$this->entryIdEqual = false;
+	}
+
+	protected static function getSupportedFields()
+	{
+		return self::$supportedSearchFields;
 	}
 
 	protected function getSphinxToElasticFieldName($field)
@@ -56,28 +65,6 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 		}
 	}
 
-	protected function getSphinxToElasticSearchItemType($operator)
-	{
-		$operatorsMap = array(
-			baseObjectFilter::EQ => ESearchFilterItemType::EXACT_MATCH,
-			baseObjectFilter::IN => ESearchFilterItemType::EXACT_MATCH_MULTI_OR,
-			baseObjectFilter::NOT_IN => ESearchFilterItemType::EXACT_MATCH_NOT,
-			baseObjectFilter::GTE => ESearchFilterItemType::RANGE_GTE,
-			baseObjectFilter::LTE => ESearchFilterItemType::RANGE_LTE,
-			baseObjectFilter::LIKE => ESearchFilterItemType::EXACT_MATCH,
-			baseObjectFilter::MULTI_LIKE_OR => ESearchFilterItemType::EXACT_MATCH_MULTI_OR,
-			baseObjectFilter::MULTI_LIKE_AND => ESearchFilterItemType::EXACT_MATCH_MULTI_AND);
-
-		if(array_key_exists($operator, $operatorsMap))
-		{
-			return $operatorsMap[$operator];
-		}
-		else
-		{
-			return null;
-		}
-	}
-
 	protected function createSearchItemByFieldType($elasticFieldName)
 	{
 		$captionFields = $this->getNestedQueryFields();
@@ -89,37 +76,53 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 		return new ESearchEntryItem();
 	}
 
-	public function retrieveElasticQueryCaptions(baseObjectFilter $filter, kPager $pager, $filterOnEntryIds)
+	public function retrieveElasticQueryCaptions(baseObjectFilter $filter, kPager $entryPager, $filterOnEntryIds)
 	{
 		$entrySearch = new kEntrySearch();
 		$entrySearch->setFilterOnlyContext();
+		$entrySearch->setForceInnerHitsSizeOverride();
 
 		if(!$filterOnEntryIds)
 		{
-			list ($currEntryIds, $count) = $this->retrieveElasticQueryEntryIds($filter, $pager);
-			$filter->setEntryIdIn($currEntryIds);
-
-			// when filtering on entry ids the number of ids will be at most the page size and we will want to go
-			// over all of them so page index most be 1
-			$pager->setPageIndex(1);
+			list ($currEntryIds, $count) = $this->retrieveElasticQueryEntryIds($filter, $entryPager);
+			if($currEntryIds)
+			{
+				$filter->setEntryIdIn($currEntryIds);
+				$this->updateEntryPager($entryPager, $filterOnEntryIds);
+			}
+			else
+			{
+				return array(array(), 0);
+			}
 		}
+
+		$captionsPager = clone ($entryPager);
+		$this->updateEntryPager($entryPager, $filterOnEntryIds);
 
 		$query = $this->createElasticQueryFromFilter($filter);
-		$entrySearch->setForceInnerHitsSizeOverride();
-		$captionsPager = clone ($pager);
-
-		// when we have entryIdEqual we will want to get back only this entry and run with original pager inside the captions
-		if($this->entryIdEqual)
-		{
-			$pager->setPageSize(1);
-			$pager->setPageIndex(1);
-		}
-
-		$elasticResults = $entrySearch->doSearch($query, array(), null, $pager, null);
+		$elasticResults = $entrySearch->doSearch($query, array(), null, $entryPager, null);
 		list($coreResults, $objectOrder, $objectCount, $objectHighlight) = kESearchCoreAdapter::getElasticResultAsArray($elasticResults,
 			$entrySearch->getQueryAttributes()->getQueryHighlightsAttributes());
 
 		return $this->getCaptionAssetItemsArray($coreResults, $captionsPager, $filter, $filterOnEntryIds);
+	}
+
+	protected function updateEntryPager(&$entryPager, $filterOnEntryIds)
+	{
+		// when we have entryIdEqual we will want to get back only this entry and run with original pager inside the captions
+		// so we retrieve a single entry and then use the caption pager for the inner hits
+		if($this->entryIdEqual)
+		{
+			$entryPager->setPageSize(1);
+			$entryPager->setPageIndex(1);
+		}
+
+		// when filtering on entry ids that we extracted on a previous elastic query with specific pager,
+		// on the next query when greater number of inner hits is wanted we will need to retrieve only the first page as all the entries will be returned in it
+		if(!$filterOnEntryIds)
+		{
+			$entryPager->setPageIndex(1);
+		}
 	}
 
 	protected function getCaptionAssetItemsArray($coreResults, kPager $captionsPager, baseObjectFilter $filter, $filterOnEntryIds)
@@ -132,10 +135,13 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 			{
 				$totalCount += $captionGroup[self::TOTAL_COUNT];
 				$items = $captionGroup[self::ITEMS];
-				list($startIndex, $endIndex) = $this->getCaptionsIndexesFromPager($captionsPager, $filter, sizeof($items), $filterOnEntryIds);
+				list($startIndex, $endIndex) = $this->getCaptionsIndexesFromPager($captionsPager, sizeof($items));
 				for ($i = $startIndex; $i < $endIndex; $i++)
 				{
-					$captionAssetItemArray[] = $this->createCaptionAssetItem($entryId, $items[$i]);
+					if(sizeof($captionAssetItemArray) < $captionsPager->getPageSize())
+					{
+						$captionAssetItemArray[] = $this->createCaptionAssetItem($entryId, $items[$i]);
+					}
 				}
 			}
 		}
@@ -158,12 +164,12 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 	 *  if we got on the request a single entry id we will return caption results based on the pager sizes that were set,
 	 *  else pager sizes will be used only to set the number of entries returned from elastic query and not inner number of captions
 	 */
-	protected function getCaptionsIndexesFromPager(kPager $pager, baseObjectFilter $filter, $itemsNum, $filterOnEntryIds)
+	protected function getCaptionsIndexesFromPager(kPager $pager, $itemsNum)
 	{
 		$startIndex = 0;
 		$endIndex = $itemsNum;
 
-		if($filterOnEntryIds && $this->entryIdEqual)
+		if($this->entryIdEqual)
 		{
 			$startIndex = min($pager->calcOffset(), $itemsNum);
 			$endIndex = min($startIndex + $pager->getPageSize(), $itemsNum);
@@ -177,9 +183,9 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 		$this->entryIdEqual = true;
 	}
 
-	protected function getNestedQueryFields()
+	protected static function getNestedQueryFields()
 	{
-		return $this->captionNestedFields;
+		return self::$captionNestedFields;
 	}
 
 }

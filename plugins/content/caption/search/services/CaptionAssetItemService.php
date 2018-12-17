@@ -252,27 +252,29 @@ class CaptionAssetItemService extends KalturaBaseService
 		foreach ($entryIdChunks as $chunk)
 		{
 			$currCoreFilter = clone ($captionAssetItemCoreFilter);
+			$currCorePager = clone ($captionAssetItemCorePager);
 			if ($chunk)
 			{
-				$captionAssetItemCoreFilter->setEntryIdIn($chunk);
+				$currCoreFilter->setEntryIdIn($chunk);
+				$currCorePager->setPageSize(sizeof($chunk));
+				$currCorePager->setPageIndex(1);
 			}
 
 			try
 			{
-				list ($currEntries, $count) = $captionItemQueryToFilter->retrieveElasticQueryEntryIds($currCoreFilter, $captionAssetItemCorePager);
+				list ($currEntries, $count) = $captionItemQueryToFilter->retrieveElasticQueryEntryIds($currCoreFilter, $currCorePager);
+				//sorting this chunk according to results of first sphinx query
+				if ($shouldSortCaptionFiltering)
+				{
+					$currEntries = array_intersect($entryIds, $currEntries);
+				}
+				$entries = array_merge ($entries , $currEntries);
+				$counter += $count;
 			}
 			catch (kESearchException $e)
 			{
 				elasticSearchUtils::handleSearchException($e);
 			}
-
-			//sorting this chunk according to results of first sphinx query
-			if ($shouldSortCaptionFiltering)
-			{
-				$currEntries = array_intersect($entryIds, $currEntries);
-			}
-			$entries = array_merge ($entries , $currEntries);
-			$counter += $count;
 		}
 
 		$inputPageSize = $captionAssetItemPager->pageSize;

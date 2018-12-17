@@ -11,14 +11,16 @@ abstract class kBaseSearch
 	protected $queryAttributes;
 	protected $mainBoolQuery;
 
-	protected $filterOnlyContext = false;
-	protected $forceInnerHitsSizeOverride = false;
+	protected $filterOnlyContext;
+	protected $forceInnerHitsSizeOverride;
 
 	public function __construct()
 	{
 		$this->elasticClient = new elasticClient();
 		$this->queryAttributes = new ESearchQueryAttributes();
 		$this->mainBoolQuery = new kESearchBoolQuery();
+		$this->filterOnlyContext = false;
+		$this->forceInnerHitsSizeOverride = false;
 	}
 
 	public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null);
