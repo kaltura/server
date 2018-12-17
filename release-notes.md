@@ -1,3 +1,35 @@
+# Naos 14.10.0 #
+
+## Beacon service searchScheduledResource api ##
+- Issue Type: Task
+- Issue ID: PLAT-9398, PLAT-9396
+
+### Configuration ###
+	None.
+
+#### Deployment Scripts ####
+
+    1. Run deployment scripts:
+        php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_11_22_add_beacon_service_permissions.php
+    
+    2. Stop logstash process to avoid re-creating the old beacon index.
+    
+    3. Create new indexes in elastic by runing:
+    	curl -XPUT 'ELASTIC_HOST:ELASTIC_PORT/beacon_scheduled_resource_index_2018_12_10' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_scheduled_resource_index.json"
+    
+    4. Delete all old beacon_scheduled_resource elastic aliases.
+    
+    5. Create new alises in elastic:
+        curl -XPOST 'ELASTIC_HOST:ELASTIC_PORT/_aliases?pretty' -H 'Content-Type: application/json' -d'{
+     	    "actions" : [
+                { "add" : { "index" : "beacon_scheduled_resource_index_2018_12_10", "alias" : "beacon_scheduled_resource_index" } },
+                { "add" : { "index" : " beacon_scheduled_resource_index_2018_12_10", "alias" : "beaconindex" } },
+                { "add" : { "index" : " beacon_scheduled_resource_index_2018_12_10", "alias" : "beacon_scheduled_resource_index_search" } }
+            ]
+         }
+    
+    6. start logstash process.
+
 # Naos 14.9.0 #
 
 ## Add permission for bulk update categoryEntry status ##
@@ -1073,7 +1105,7 @@ None.
 
 	1. Stop logstash process to avoid re-creating the old beacon index.
 
-	2. Delete all old elstic aliases.
+	2. Delete all old elastic aliases.
 	
 	3. Delete old beaconIndex.
 	
@@ -1097,7 +1129,7 @@ None.
 			]
 		}'
 		
-	6. strat logstash process.
+	6. start logstash process.
 
 #### Known Issues & Limitations ####
 

@@ -4,7 +4,7 @@
  * @subpackage model.search
  */
 
-class kUserSearch extends kBaseSearch
+class kUserSearch extends kBaseESearch
 {
     const PEER_NAME = 'kuserPeer';
     const PEER_RETRIEVE_FUNCTION_NAME = 'retrieveByPKs';

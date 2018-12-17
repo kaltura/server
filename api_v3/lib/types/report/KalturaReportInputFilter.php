@@ -13,14 +13,14 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	public $keywords;
 	
 	/**
-	 * Search keywords in onjects tags
+	 * Search keywords in objects tags
 	 * 
 	 * @var bool
 	 */
 	public $searchInTags;	
 
 	/**
-	 * Search keywords in onjects admin tags
+	 * Search keywords in objects admin tags
 	 * 
 	 * @var bool
 	 * @deprecated
@@ -28,12 +28,19 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	public $searchInAdminTags;	
 	
 	/**
-	 * Search onjects in specified categories
+	 * Search objects in specified categories
 	 * 
 	 * @var string
 	 */
 	public $categories;
-	
+
+	/**
+	 * Search objects in specified category ids
+	 *
+	 * @var string
+	 */
+	public $categoriesIdsIn;
+
 	/**
 	 * Filter by customVar1
 	 *
@@ -77,6 +84,13 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	public $regionIn;
 
 	/**
+	 * Filter by city
+	 *
+	 * @var string
+	 */
+	public $citiesIn;
+
+	/**
 	 * Filter by operating system family
 	 *
 	 * @var string
@@ -104,21 +118,40 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $interval;
 
+	/**
+	 * Filter by media types
+	 *
+	 * @var string
+	 */
+	public $mediaTypeIn;
+
+	/**
+	 * Filter by source types
+	 *
+	 * @var string
+	 */
+	public $sourceTypeIn;
+
 	private static $map_between_objects = array
 	(
 		'keywords',
 		'searchInTags' => 'search_in_tags',
 		'searchInAdminTags' => 'search_in_admin_tags',
+		'categories',
+		'categoriesIdsIn' => 'categoriesIds',
 		'customVar1In' => 'custom_var1',
 		'customVar2In' => 'custom_var2',
 		'customVar3In' => 'custom_var3',
 		'deviceIn' => 'devices',
 		'countryIn' => 'countries',
 		'regionIn' => 'regions',
+		'citiesIn' => 'cities',
 		'operatingSystemFamilyIn' => 'os_families',
 		'browserFamilyIn' => 'browsers_families',
 		'timeZoneOffset',
 		'interval',
+		'mediaTypeIn' => 'media_types',
+		'sourceTypeIn' => 'source_types'
 	);
 
 	protected function getMapBetweenObjects()

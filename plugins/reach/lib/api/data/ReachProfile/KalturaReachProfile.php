@@ -132,6 +132,12 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 	 */
 	public $dictionaries;
 	
+	/**
+	 * Comma separated flavorParamsIds that the vendor should look for it matching asset when trying to download the asset
+	 * @var string
+	 */
+	public $flavorParamsIds;
+	
 	private static $map_between_objects = array
 	(
 		'id',
@@ -156,6 +162,7 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 		'credit',
 		'usedCredit',
 		'dictionaries' => 'dictionariesArray',
+		'flavorParamsIds',
 	);
 	
 	/* (non-PHPdoc)

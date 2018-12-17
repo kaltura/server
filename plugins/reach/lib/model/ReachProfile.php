@@ -37,6 +37,7 @@ class ReachProfile extends BaseReachProfile
 	const CUSTOM_DATA_LAST_CREDIT_EXPIRY_NOTIFICATION = 	'last_credit_expiry_notification';
 	
 	const CUSTOM_DATA_CREDIT_RESET_HISTORY =                'credit_reset_history';
+	const CUSTOM_DATA_FLAVOR_PARAM_IDS =                	'flavor_param_ids';
 	
 	const MAX_CREDIT_HISTORY_TO_KEEP =                      10;
 	const DEFAULT_MAX_CHARS_PER_LINE =                      26;
@@ -193,6 +194,11 @@ class ReachProfile extends BaseReachProfile
 		$this->putInCustomData(self::CUSTOM_DATA_LAST_CREDIT_EXPIRY_NOTIFICATION, $v);
 	}
 	
+	public function setFlavorParamsIds($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_FLAVOR_PARAM_IDS, $v);
+	}
+	
 	//getters
 	
 	public function getEnableMachineModeration()
@@ -325,6 +331,11 @@ class ReachProfile extends BaseReachProfile
 	public function getLastCreditExpiryNotification()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_LAST_CREDIT_EXPIRY_NOTIFICATION, null, 0);
+	}
+	
+	public function getFlavorParamsIds()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_FLAVOR_PARAM_IDS);
 	}
 
 	public function shouldSyncCredit()

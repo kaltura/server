@@ -350,11 +350,29 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		{
 			$partnersDeliveryProfileIdsByUserOrder = $partnersDeliveryProfileIdsByUserOrder[$deliveryAttributes->getFormat()];
 		}
+		else
+		{
+			$partnersDeliveryProfileIdsByUserOrder = self::getOrderedDeliveryIdsForAllFormatsArray($partnersDeliveryProfileIdsByUserOrder);
+		}
 
 		array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $partnersDeliveryProfileIdsByUserOrder);
 		uasort($deliveries, array($cmp, "compare"));
 
 		return $deliveries;
+	}
+
+	protected static function getOrderedDeliveryIdsForAllFormatsArray($partnersDeliveryProfileIdsByUserOrder)
+	{
+		$orderedDeliveryIds = array();
+		foreach ($partnersDeliveryProfileIdsByUserOrder as $format => $deliveryProfileIds)
+		{
+			foreach($deliveryProfileIds as $deliveryProfileId)
+			{
+				$orderedDeliveryIds[] = $deliveryProfileId;
+			}
+		}
+		KalturaLog::debug("Delivery profile ids after ordering: " . print_r($orderedDeliveryIds, true));
+		return $orderedDeliveryIds;
 	}
 
 	protected static function getDefaultDelivery(Partner $partner, $streamerType, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $isSecured = false, $isLive = false)
