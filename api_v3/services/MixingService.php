@@ -179,12 +179,12 @@ class MixingService extends KalturaEntryService
 	}
 	
 	/**
-	 * Count mix entries by filter.
-	 * 
-	 * @action count
-     * @param KalturaMediaEntryFilter $filter Media entry filter
-	 * @return int
-	 */
+	* Count mix entries by filter.
+	* 
+	* @action count
+	* @param KalturaMediaEntryFilter $filter Media entry filter
+	* @return int
+	*/
 	function countAction(KalturaMediaEntryFilter $filter = null)
 	{
 	    if (!$filter)
@@ -236,7 +236,7 @@ class MixingService extends KalturaEntryService
 	}
 	
 	/**
-	 * Appends a media entry to a the end of the mix timeline, this will save the mix timeline as a new version.
+	 * Appends a media entry to the end of the mix timeline, this will save the mix timeline as a new version.
 	 * 
 	 * @action appendMediaEntry
 	 * @param string $mixEntryId Mix entry to append to its timeline

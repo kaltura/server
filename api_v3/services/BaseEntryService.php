@@ -618,7 +618,7 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
-	 * Update entry thumbnail using url.
+	 * Update entry thumbnail using URL.
 	 *
 	 * @action updateThumbnailFromUrl
 	 * @param string $entryId Media entry id

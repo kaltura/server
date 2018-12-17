@@ -301,7 +301,7 @@ class ConversionProfileService extends KalturaBaseService
 	 * Delete the relation of flavorParams <> conversionProfile2
 	 * 
 	 * @param conversionProfile2 $conversionProfileDb
-	 * @param string|array $notInFlavorIds comma sepeartaed id that should not be deleted
+	 * @param string|array $notInFlavorIds comma separated ID[s] that should not be deleted
 	 */
 	protected function deleteFlavorParamsRelation(conversionProfile2 $conversionProfileDb, $notInFlavorIds = null)
 	{

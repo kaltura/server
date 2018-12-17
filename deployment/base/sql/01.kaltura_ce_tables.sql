@@ -1994,7 +1994,22 @@ CREATE TABLE IF NOT EXISTS `puser_role` (
   KEY `puser_role_FI_3` (`puser_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-
+CREATE TABLE `reach_profile` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(256) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `partner_id` int(11) NOT NULL,
+  `type` tinyint(4) NOT NULL,
+  `status` tinyint(4) NOT NULL,
+  `used_credit` double NOT NULL,
+  `rules` text,
+  `dictionary` text,
+  `custom_data` text,
+  PRIMARY KEY (`id`),
+  KEY `partner_id_status_index` (`partner_id`,`status`),
+  KEY `partner_id_type_index` (`partner_id`,`type`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `report` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2664,7 +2679,6 @@ CREATE TABLE IF NOT EXISTS `widget_log` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
-
 CREATE TABLE IF NOT EXISTS `work_group` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `created_at` datetime DEFAULT NULL,
@@ -2675,11 +2689,5 @@ CREATE TABLE IF NOT EXISTS `work_group` (
   `description` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-
-
-
-
 
 

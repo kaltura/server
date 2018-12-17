@@ -887,7 +887,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		return $dbAsset;
 	}
-	
+
 	/**
 	 * @param kUrlResource $resource
 	 * @param entry $dbEntry
@@ -896,14 +896,11 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function attachUrlResource(kUrlResource $resource, entry $dbEntry, asset $dbAsset = null)
 	{
-		if($dbAsset instanceof flavorAsset)
-		{
-			$dbEntry->setSource(KalturaSourceType::URL);
-			$dbEntry->save();
-		}
-		
+		$dbEntry->setSource(entry::ENTRY_MEDIA_SOURCE_URL);
+		$dbEntry->save();
+
 		$url = $resource->getUrl();
-		
+
 		if (!$resource->getForceAsyncDownload())
 		{
 			$ext = pathinfo($url, PATHINFO_EXTENSION);
@@ -913,14 +910,14 @@ class KalturaEntryService extends KalturaBaseService
 			    $entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
     			if (KCurlWrapper::getDataFromFile($url, $entryFullPath))
     				return $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
-    			
+
     			KalturaLog::err("Failed downloading file[$url]");
     			$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
     			$dbEntry->save();
-    			
+
     			return null;
     		}
-    	
+
     		if($dbAsset && !($dbAsset instanceof flavorAsset))
     		{
     			$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
@@ -929,20 +926,20 @@ class KalturaEntryService extends KalturaBaseService
     				$dbAsset = $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
     				return $dbAsset;
     			}
-    			
+
     			KalturaLog::err("Failed downloading file[$url]");
     			$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_ERROR);
     			$dbAsset->save();
-    			
+
     			return null;
     		}
 		}
-		
+
 		kJobsManager::addImportJob(null, $dbEntry->getId(), $this->getPartnerId(), $url, $dbAsset, null, $resource->getImportJobData());
-		
+
 		return $dbAsset;
 	}
-	
+
 	/**
 	 * @param kAssetsParamsResourceContainers $resource
 	 * @param entry $dbEntry
@@ -957,17 +954,17 @@ class KalturaEntryService extends KalturaBaseService
 			$dbAsset = $this->attachAssetParamsResourceContainer($assetParamsResourceContainer, $dbEntry);
 			if(!$dbAsset)
 				continue;
-				
+
 			KalturaLog::debug("Resource asset id [" . $dbAsset->getId() . "]");
-			
+
 			if($dbAsset->getIsOriginal())
 				$ret = $dbAsset;
 		}
 		$dbEntry->save();
-		
+
 		return $ret;
 	}
-	
+
 	/**
 	 * @param kAssetParamsResourceContainer $resource
 	 * @param entry $dbEntry

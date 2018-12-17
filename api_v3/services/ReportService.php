@@ -31,7 +31,7 @@ class ReportService extends KalturaBaseService
 	/**
 	 * Validates that all object ids are allowed partner ids
 	 * 
-	 * @param string $objectIds comma seperated ids
+	 * @param string $objectIds comma separated IDs
 	 * @return string comma seperated ids
 	 */
 	protected function validateObjectsAreAllowedPartners($objectIds = null)
@@ -107,7 +107,7 @@ class ReportService extends KalturaBaseService
 	}
 	
 	/**
-	 * report getBaseTotal action allows to get a the total base for storage reports  
+	 * report getBaseTotal action allows to get the total base for storage reports  
 	 * 
 	 * @action getBaseTotal
 	 * @param KalturaReportType $reportType  
@@ -178,7 +178,7 @@ class ReportService extends KalturaBaseService
 	
 	/**
 	 * 
-	 * will create a Csv file for the given report and return the URL to access it
+	 * will create a CSV file for the given report and return the URL to access it
 	 * @action getUrlForReportAsCsv
 	 * 
 	 * @param string $reportTitle The title of the report to display at top of CSV 

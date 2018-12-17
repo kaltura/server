@@ -2,10 +2,10 @@
 /**
  * batch service lets you handle different batch process from remote machines.
  * As opposed to other objects in the system, locking mechanism is critical in this case.
- * For this reason the GetExclusiveXX, UpdateExclusiveXX and FreeExclusiveXX actions are important for the system's intergity.
+ * For this reason the GetExclusiveXX, UpdateExclusiveXX and FreeExclusiveXX actions are important for the system's integrity.
  * In general - updating batch object should be done only using the UpdateExclusiveXX which in turn can be called only after
- * acuiring a batch objet properly (using  GetExclusiveXX).
- * If an object was aquired and should be returned to the pool in it's initial state - use the FreeExclusiveXX action
+ * acquiring a batch object properly (using  GetExclusiveXX).
+ * If an object was acquired and should be returned to the pool in it's initial state - use the FreeExclusiveXX action
  *
  *	Terminology:
  *		LocationId
@@ -285,9 +285,9 @@ class BatchService extends KalturaBatchService
 	 *
 	 * @action getExclusiveNotificationJobs
 	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
+	 * @param int $maxExecutionTime The maximum time in seconds the job regularly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
 	 * @param int $numberOfJobs The maximum number of jobs to return.
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs
+	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only partial list of jobs
 	 * @return KalturaBatchGetExclusiveNotificationJobsResponse
 	 */
 	function getExclusiveNotificationJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
@@ -376,7 +376,7 @@ class BatchService extends KalturaBatchService
 	 * @param int $id The id of the job
 	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism
 	 * @param KalturaBatchJobType $jobType The type of the job
-	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero
+	 * @param bool $resetExecutionAttempts Resets the job execution attempts to zero
 	 * @return KalturaFreeJobResponse
 	 */
 	function freeExclusiveJobAction($id ,KalturaExclusiveLockKey $lockKey, $jobType, $resetExecutionAttempts = false)
@@ -441,9 +441,9 @@ class BatchService extends KalturaBatchService
 	 *
 	 * @action getExclusiveJobs
 	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
+	 * @param int $maxExecutionTime The maximum time in seconds the job regularly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
 	 * @param int $numberOfJobs The maximum number of jobs to return.
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs
+	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only partial list of jobs
 	 * @param KalturaBatchJobType $jobType The type of the job - could be a custom extended type
 	 * @param int $maxJobToPullForCache The number of job to pull to cache
 	 * @return KalturaBatchJobArray
@@ -461,9 +461,9 @@ class BatchService extends KalturaBatchService
 	 *
 	 * @action getExclusiveAlmostDone
 	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
+	 * @param int $maxExecutionTime The maximum time in seconds the job regularly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
 	 * @param int $numberOfJobs The maximum number of jobs to return.
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs
+	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only partial list of jobs
 	 * @param KalturaBatchJobType $jobType The type of the job - could be a custom extended type
 	 * @return KalturaBatchJobArray
 	 */
