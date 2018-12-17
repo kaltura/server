@@ -10,16 +10,13 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 	protected static $supportedSearchFields = array(
 		ESearchCaptionAssetItemFilterFields::CAPTION_ASSET_ID,
 		ESearchCaptionAssetItemFilterFields::ENTRY_ID,
-		ESearchCaptionAssetItemFilterFields::STATUS,
 		ESearchCaptionAssetItemFilterFields::CREATED_AT,
 		ESearchCaptionAssetItemFilterFields::UPDATED_AT,
 		ESearchCaptionAssetItemFilterFields::CONTENT,
 		ESearchCaptionAssetItemFilterFields::LANGUAGE,
 		ESearchCaptionAssetItemFilterFields::LABEL,
 		ESearchCaptionAssetItemFilterFields::START_TIME,
-		ESearchCaptionAssetItemFilterFields::END_TIME,
-		ESearchCaptionAssetItemFilterFields::LABEL,
-		ESearchCaptionAssetItemFilterFields::START_TIME);
+		ESearchCaptionAssetItemFilterFields::END_TIME);
 
 
 	protected static $captionNestedFields = array(
