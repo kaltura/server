@@ -1,4 +1,4 @@
-find<?php
+<?php
 /**
  * Created by IntelliJ IDEA.
  * User: moshe.maor
@@ -23,10 +23,9 @@ class ConfControlService extends KalturaBaseService
 	 *
 	 * @action add
 	 * @param KalturaConfigMap $map
-	 * @param string $relatedHost
 	 * @return KalturaConfigMap
 	 */
-	function addAction(KalturaConfigMap $map,$relatedHost)
+	function addAction(KalturaConfigMap $map)
 	{
 
 	}
@@ -35,10 +34,9 @@ class ConfControlService extends KalturaBaseService
 	 *
 	 * @action update
 	 * @param KalturaConfigMap $map
-	 * @param string $relatedHost
 	 * @return KalturaConfigMap
 	 */
-	function updateAction(KalturaConfigMap $map,$relatedHost)
+	function updateAction(KalturaConfigMap $map)
 	{
         //validate input
             //1. Maps can only be unpdated
