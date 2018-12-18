@@ -681,6 +681,12 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 		elseif ($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 		{
+			if(!$entry)
+			{
+				KalturaLog::debug("Entry [" . $object->getEntryId() . "] not found, this should not happen");
+				return true;
+			}
+
 			// If we get a ready flavor and the entry is in no content
 			if($entry->getStatus() == entryStatus::NO_CONTENT)
 			{
