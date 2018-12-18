@@ -1196,13 +1196,20 @@ class kKavaReportsMgr extends kKavaBase
 		),
 
 		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_COUNTRY => array(
-			self::REPORT_DIMENSION_MAP => array('country' => self::DIMENSION_LOCATION_COUNTRY, 'coordinates' => self::DIMENSION_LOCATION_COUNTRY),
+			self::REPORT_DIMENSION_MAP => array('object_id' =>  self::DIMENSION_LOCATION_COUNTRY, 'country' => self::DIMENSION_LOCATION_COUNTRY, 'coordinates' => self::DIMENSION_LOCATION_COUNTRY),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_INPUT =>  array('country'),
-				self::REPORT_ENRICH_OUTPUT => 'coordinates',
-				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
-			),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'object_id',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toShortName',
+				),
+				array(
+					self::REPORT_ENRICH_INPUT =>  array('country'),
+					self::REPORT_ENRICH_OUTPUT => 'coordinates',
+					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				)
+			)
 		),
 
 		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_REGION => array(
@@ -2554,7 +2561,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $graphs;
 	}
 
-	protected static function getAssociativeMultiGraphsByDateId($result, $multiline_column, $graph_metrics_to_headers, $transform, $tz_offset)
+	protected static function getAssociativeMultiGraphsByDateId($result, $multiline_column, $graph_metrics_to_headers, $tz_offset)
 	{
 		$tz = self::getPhpTimezone($tz_offset);
 
@@ -2568,10 +2575,6 @@ class kKavaReportsMgr extends kKavaBase
 
 			$date = self::timestampToDateId($row[self::DRUID_TIMESTAMP], $tz);
 			$multiline_val = $row_data[$multiline_column];
-			if ($transform)
-			{
-				$multiline_val = call_user_func($transform, $multiline_val);
-			}
 			
 			if (!isset($graphs[$multiline_val]))
 			{
@@ -2590,7 +2593,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $graphs;
 	}
 	
-	protected static function getMultiGraphsByDateId ($result, $multiline_column, $graph_metrics_to_headers, $transform, $tz_offset)
+	protected static function getMultiGraphsByDateId ($result, $multiline_column, $graph_metrics_to_headers, $tz_offset)
 	{
 		$tz = self::getPhpTimezone($tz_offset);
 
@@ -2608,10 +2611,7 @@ class kKavaReportsMgr extends kKavaBase
 
 			$date = self::timestampToDateId($row[self::DRUID_TIMESTAMP], $tz);
 			$multiline_val = $row_data[$multiline_column];
-			if ($transform)
-			{
-				$multiline_val = call_user_func($transform, $multiline_val);
-			}
+
 			foreach ($graph_metrics_to_headers as $column => $header)
 			{
 				if (isset($graphs[$header][$date]))
@@ -2629,7 +2629,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $graphs;
 	}
 
-	protected static function getMultiGraphsByColumnName ($result, $graph_metrics_to_headers, $dimension, $transform)
+	protected static function getMultiGraphsByColumnName ($result, $graph_metrics_to_headers, $dimension)
 	{
 		$graphs = array();
 
@@ -2641,12 +2641,7 @@ class kKavaReportsMgr extends kKavaBase
 		foreach ($result as $row)
 		{
 			$row_data = $row[self::DRUID_EVENT];
-
 			$dim_value = $row_data[$dimension];
-			if ($transform)
-			{
-				$dim_value = call_user_func($transform, $dim_value);
-			}
 
 			foreach ($graph_metrics_to_headers as $column => $header)
 			{
@@ -2683,13 +2678,10 @@ class kKavaReportsMgr extends kKavaBase
 		foreach ($enrich_defs as $enrich_def)
 		{
 			$dim = $enrich_def[self::REPORT_ENRICH_OUTPUT];
-			if ($enrich_def[self::REPORT_ENRICH_FUNC] !== self::ENRICH_FOREACH_KEYS_FUNC ||
-				$report_def[self::REPORT_DIMENSION_MAP][$dim] !== $dimension)
+			if ($report_def[self::REPORT_DIMENSION_MAP][$dim] === $dimension)
 			{
-				continue;
+				return $enrich_def[self::REPORT_ENRICH_CONTEXT];
 			}
-
-			return $enrich_def[self::REPORT_ENRICH_CONTEXT];
 		}
 		return null;
 	}
@@ -2755,23 +2747,44 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$graph_metrics_to_headers[$column] = self::$metrics_to_headers[$column];
 		}
-		
+
+		//collect dimensions to transform
+		$values = array();
+		foreach ($result as $row)
+		{
+			$row_data = $row[self::DRUID_EVENT];
+			$values[$row_data[$dimension]] = true;
+		}
+
+		//transform
+		$transform_values = array_map($transform, array_keys($values));
+		$transform_map = array_combine(array_keys($values), $transform_values);
+		//update the result
+		foreach ($result as &$row)
+		{
+			$row_data = $row[self::DRUID_EVENT];
+			if (isset($transform_map[$row_data[$dimension]]))
+			{
+				$row[self::DRUID_EVENT][$dimension] = $transform_map[$row_data[$dimension]];
+			}
+		}
+
 		switch ($graph_type)
 		{
 		case self::GRAPH_ASSOC_MULTI_BY_DATE_ID:
-			$result = self::getAssociativeMultiGraphsByDateId($result, $dimension, $graph_metrics_to_headers, $transform, $input_filter->timeZoneOffset);
+			$result = self::getAssociativeMultiGraphsByDateId($result, $dimension, $graph_metrics_to_headers, $input_filter->timeZoneOffset);
 			break;
 			
 		case self::GRAPH_MULTI_BY_DATE_ID:
 			if (!$object_ids)
 			{
-				$result = self::getMultiGraphsByDateId($result, $dimension, $graph_metrics_to_headers, $transform, $input_filter->timeZoneOffset);
+				$result = self::getMultiGraphsByDateId($result, $dimension, $graph_metrics_to_headers, $input_filter->timeZoneOffset);
 				break;
 			}
 			// fallthrough
 			
 		case self::GRAPH_MULTI_BY_NAME:
-			$result = self::getMultiGraphsByColumnName($result, $graph_metrics_to_headers, $dimension, $transform);
+			$result = self::getMultiGraphsByColumnName($result, $graph_metrics_to_headers, $dimension);
 			break;
 			
 		case self::GRAPH_BY_NAME:
