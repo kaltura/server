@@ -5,8 +5,8 @@
  */
 interface BeaconScheduledResourceOrderByFieldName extends BaseEnum
 {
-	const STATUS = 'private_data.Errors.APP_STATUS.keyword';
-	const RECORDING = 'private_data.RecordingData.recordingPhase.keyword';
-	const RESOURCE_NAME = 'private_data.ResourceDetails.resourceName.keyword';
+	const STATUS = 'private_data.Errors.APP_STATUS';
+	const RECORDING = 'private_data.RecordingData.recordingPhase';
+	const RESOURCE_NAME = 'private_data.ResourceDetails.resourceName.raw';
 	const UPDATED_AT = 'updated_at';
 }

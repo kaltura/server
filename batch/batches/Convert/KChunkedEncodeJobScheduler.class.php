@@ -30,7 +30,11 @@ class KChunkedEncodeJobScheduler extends KPeriodicWorker
         public function run($jobs = null)
         {
 			$pidFileName = isset(KBatchBase::$taskConfig->params->tempDirectoryPath)? KBatchBase::$taskConfig->params->tempDirectoryPath : sys_get_temp_dir();
-			$pidFileName.= '/chunked_encode_scheduler.pid';
+			if(isset(KBatchBase::$taskConfig->params->chunkedEncodeMemcacheToken)){
+				$pidFileName.= '/chunked_encode_scheduler_'.KBatchBase::$taskConfig->params->chunkedEncodeMemcacheToken.'.pid';
+			}
+			else
+				$pidFileName.= '/chunked_encode_scheduler.pid';
 			if($this->lockSchedulerProcessId($pidFileName,get_class($this))==false){
 				return("Duplicate Chunk Schedulers");
 			}
