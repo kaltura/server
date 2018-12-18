@@ -11,11 +11,16 @@ abstract class kBaseSearch
 	protected $queryAttributes;
 	protected $mainBoolQuery;
 
+	protected $filterOnlyContext;
+	protected $forceInnerHitsSizeOverride;
+
 	public function __construct()
 	{
 		$this->elasticClient = new elasticClient();
 		$this->queryAttributes = new ESearchQueryAttributes();
 		$this->mainBoolQuery = new kESearchBoolQuery();
+		$this->filterOnlyContext = false;
+		$this->forceInnerHitsSizeOverride = false;
 	}
 
 	public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null);
@@ -94,7 +99,7 @@ abstract class kBaseSearch
 
 		$partnerStatusQuery = new kESearchTermsQuery('partner_status', $partnerStatus);
 		$this->mainBoolQuery->addToFilter($partnerStatusQuery);
-		
+
 		if($objectId)
 		{
 			$id = elasticSearchUtils::formatSearchTerm($objectId);
@@ -138,7 +143,7 @@ abstract class kBaseSearch
 
 	protected function initOverrideInnerHits($objectId)
 	{
-		if(!$objectId)
+		if(!$objectId && !$this->forceInnerHitsSizeOverride)
 		{
 			return;
 		}
@@ -147,4 +152,14 @@ abstract class kBaseSearch
 		$overrideInnerHitsSize = isset($innerHitsConfig['innerHitsWithObjectId']) ? $innerHitsConfig['innerHitsWithObjectId'] : null;
 		$this->queryAttributes->setOverrideInnerHitsSize($overrideInnerHitsSize);
 	}
+
+	public function setFilterOnlyContext()
+	{
+		$this->filterOnlyContext = true;
+	}
+	public function setForceInnerHitsSizeOverride()
+	{
+		$this->forceInnerHitsSizeOverride = true;
+	}
+
 }
