@@ -43,4 +43,6 @@ interface ReportType extends BaseEnum
    const BROWSERS_FAMILIES = 33;
    const USER_ENGAGEMENT_TIMELINE = 34;
    const UNIQUE_USERS_PLAY = 35;
+   const UNIQUE_ACTIVE_USERS = 40;
+   const UNIQUE_APP_DOMAIN_ACTIVE_USERS = 41;
 }

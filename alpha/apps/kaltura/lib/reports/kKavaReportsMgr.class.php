@@ -210,6 +210,8 @@ class kKavaReportsMgr extends kKavaBase
 		myReportsMgr::REPORT_TYPE_BROWSERS_FAMILIES,
 		myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT_TIMELINE,
 		myReportsMgr::REPORT_TYPE_UNIQUE_USERS_PLAY,
+		myReportsMgr::REPORT_TYPE_UNIQUE_ACTIVE_USERS,
+		myReportsMgr::REPORT_TYPE_APP_DOMAIN_UNIQUE_ACTIVE_USERS,
 	);
 	
 	protected static $reports_def = array(
@@ -1141,7 +1143,21 @@ class kKavaReportsMgr extends kKavaBase
 			),
 			self::REPORT_METRICS => array(self::METRIC_UNIQUE_USERS),
 			self::REPORT_GRAPH_METRICS => array(self::METRIC_UNIQUE_USERS),
-		)
+		),
+
+		myReportsMgr::REPORT_TYPE_UNIQUE_ACTIVE_USERS => array(
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_API_USAGE,
+			self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+			self::REPORT_METRICS => array(self::METRIC_UNIQUE_USERS)
+		),
+
+		myReportsMgr::REPORT_TYPE_APP_DOMAIN_UNIQUE_ACTIVE_USERS => array(
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_API_USAGE,
+			self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+			self::REPORT_DIMENSION => array(self::DIMENSION_APPLICATION, self::DIMENSION_DOMAIN),
+			self::REPORT_DIMENSION_HEADERS => array('application', 'domain'),
+			self::REPORT_METRICS => array(self::METRIC_UNIQUE_USERS)
+		),
 	);
 	
 	protected static $event_type_count_aggrs = array(
