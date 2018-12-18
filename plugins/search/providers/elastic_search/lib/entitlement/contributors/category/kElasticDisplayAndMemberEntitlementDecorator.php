@@ -4,7 +4,7 @@
  * @subpackage lib.entitlement
  */
 
-class kElasticDisplayAndMemberEntitlement extends kElasticCategoryEntitlementDecorator
+class kElasticDisplayAndMemberEntitlementDecorator extends kElasticCategoryEntitlementDecorator
 {
 	public static function getEntitlementCondition(array $params = array(), $fieldPrefix = '')
 	{

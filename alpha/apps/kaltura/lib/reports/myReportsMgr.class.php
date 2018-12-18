@@ -1519,6 +1519,9 @@ class reportsInputFilter
 	public $devices;
 	public $os_families;
 	public $browsers_families;
+	public $cities;
+	public $media_types;
+	public $source_types;
 
 	public function getFilterBy() {
 		return "";

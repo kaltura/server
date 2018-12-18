@@ -3,7 +3,7 @@
  * @package plugins.elasticSearch
  * @subpackage model.search
  */
-class kEntrySearch extends kBaseSearch
+class kEntrySearch extends kBaseESearch
 {
 
     const PEER_NAME = 'entryPeer';

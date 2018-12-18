@@ -213,7 +213,11 @@ class kFileUtils extends kFile
 
 		$host = kConf::get('www_host');
 		if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
-			$host =  $_SERVER['HTTP_X_FORWARDED_HOST'];
+		{
+			$host = $_SERVER['HTTP_X_FORWARDED_HOST'];
+			$host = explode(',', $host);
+			$host = trim(reset($host));
+		}
 		else if (isset($_SERVER['HTTP_HOST']))
 			$host = $_SERVER['HTTP_HOST'];
 
