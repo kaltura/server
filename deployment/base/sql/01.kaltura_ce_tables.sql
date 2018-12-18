@@ -2691,20 +2691,3 @@ CREATE TABLE IF NOT EXISTS `work_group` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE `reach_profile` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(256) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  `partner_id` int(11) NOT NULL,
-  `type` tinyint(4) NOT NULL,
-  `status` tinyint(4) NOT NULL,
-  `used_credit` double NOT NULL,
-  `rules` text,
-  `dictionary` text,
-  `custom_data` text,
-  PRIMARY KEY (`id`),
-  KEY `partner_id_status_index` (`partner_id`,`status`),
-  KEY `partner_id_type_index` (`partner_id`,`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=492 DEFAULT CHARSET=utf8;
-
