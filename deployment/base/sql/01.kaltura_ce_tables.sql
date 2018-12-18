@@ -2009,7 +2009,7 @@ CREATE TABLE `reach_profile` (
   PRIMARY KEY (`id`),
   KEY `partner_id_status_index` (`partner_id`,`status`),
   KEY `partner_id_type_index` (`partner_id`,`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=492 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `report` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
