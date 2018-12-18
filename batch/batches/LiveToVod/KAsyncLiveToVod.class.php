@@ -15,6 +15,7 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 {
 	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
 	const MAX_CHUNK_DURATION_IN_SEC = 12;
+	const MIN_SEGMENT_DURATION = 1000; // 1 sec
 	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -45,6 +46,10 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 	 */
 	private function copyCuePoint(KalturaBatchJob $job, KalturaLiveToVodJobData $data)
 	{
+		if ($data->lastSegmentDuration < self::MIN_SEGMENT_DURATION)
+		{
+			$data->lastSegmentDuration = $data->totalVodDuration;
+		}
 		$amfArray = json_decode($data->amfArray);
 		$currentSegmentStartTime = self::getSegmentStartTime($amfArray);
 		$currentSegmentEndTime = self::getSegmentEndTime($amfArray, $data->lastSegmentDuration + $data->lastSegmentDrift) + self::MAX_CHUNK_DURATION_IN_SEC;
