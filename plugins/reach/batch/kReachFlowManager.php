@@ -2,6 +2,7 @@
 class kReachFlowManager implements kBatchJobStatusEventConsumer
 {
 	const SERVE_CSV_PARTIAL_URL = "/api_v3/index.php/service/reach_entryvendortask/action/serveCsv/ks/";
+	const ADMIN_CONSOLE_RULE_PREFIX = "AutomaticAdminConsoleRule_";
 
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
@@ -11,7 +12,7 @@ class kReachFlowManager implements kBatchJobStatusEventConsumer
 		if ($dbBatchJob->getJobType() == ReachPlugin::getBatchJobTypeCoreValue(ReachEntryVendorTasksCsvBatchType::ENTRY_VENDOR_TASK_CSV))
 			return true;
 
-		if ($dbBatchJob->getJobType() == KalturaBatchJobType::COPY_PARTNER &&  $dbBatchJob->getStatus() == KalturaBatchJobStatus::FINISHED)
+		if ($dbBatchJob->getJobType() == BatchJobType::COPY_PARTNER &&  $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 			return true;
 
 		return false;
@@ -27,7 +28,7 @@ class kReachFlowManager implements kBatchJobStatusEventConsumer
 			return $this->handleEntryVendorTaskCsv($dbBatchJob);
 		}
 
-		if ($dbBatchJob->getJobType() == KalturaBatchJobType::COPY_PARTNER &&  $dbBatchJob->getStatus() == KalturaBatchJobStatus::FINISHED)
+		if ($dbBatchJob->getJobType() == BatchJobType::COPY_PARTNER &&  $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{
 			return $this->handleCopyReachDataToPartner($dbBatchJob);
 		}
@@ -191,9 +192,20 @@ class kReachFlowManager implements kBatchJobStatusEventConsumer
 		foreach ($reachProfiles as $profile)
 		{
 			/* @var $profile ReachProfile */
-			$newreachProfiles = $profile->copy();
-			$newreachProfiles->setPartnerId($toPartnerId);
-			$newreachProfiles->save();
+			$newReachProfiles = $profile->copy();
+			$newReachProfiles->setPartnerId($toPartnerId);
+			$rules = $newReachProfiles->getRulesArray();
+			foreach ( $rules as $key => $rule )
+			{
+				/* @var krule $rule*/
+				if (empty($rule->getDescription())
+					|| substr($rule->getDescription(), 0, strlen(self::ADMIN_CONSOLE_RULE_PREFIX)) !== self::ADMIN_CONSOLE_RULE_PREFIX)
+				{
+					unset($rules[$key]);
+				}
+			}
+			$newReachProfiles->setRulesArray($rules);
+			$newReachProfiles->save();
 		}
 
 		$catalogItems = PartnerCatalogItemPeer::retrieveActiveCatalogItems($fromPartnerId);
