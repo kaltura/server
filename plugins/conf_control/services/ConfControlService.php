@@ -42,7 +42,8 @@ class ConfControlService extends KalturaBaseService
         //validate input
             //1. Maps can only be unpdated
             //2. Only DB maps
-		//$map->validateForUpdate();
+		$map->validateContent(json_decode($map->content,true));
+
 
         //Insert value to DB
 		$confControlDb = new kConfControlDb();

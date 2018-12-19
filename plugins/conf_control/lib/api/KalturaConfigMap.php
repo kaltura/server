@@ -64,8 +64,12 @@ class KalturaConfigMap extends KalturaObject
 	 */
 	public $sourceLocation;
 
-	public function validateForUpdate($sourceObject)
+	public function validateContent(array $content)
 	{
-		
+		$initStr = iniUtils::arrayToIniString($content);
+		if(!parse_ini_string($initStr,true))
+		{
+			throw new Exception("Bad ini Content $countedEqualCharInString vs $numOfLeafsInArray - \r\n".$initStr);
+		}
 	}
 }
