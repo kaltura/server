@@ -66,6 +66,6 @@ class KalturaConfigMap extends KalturaObject
 
 	public function validateForUpdate($sourceObject)
 	{
-
+		
 	}
 }
