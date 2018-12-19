@@ -151,7 +151,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 				return $dbBatchJob;
 			}
 			
-			$rawSyncPointInfo = file_get_contents($rawSyncPointDataPath);
+			$rawSyncPointInfo = kFile::getFileContent($rawSyncPointDataPath);
 			if($rawSyncPointInfo == '')
 			{
 				KalturaLog::debug("Failed to read sync point info from file [$rawSyncPointDataPath], copy live to vod will not execute");
