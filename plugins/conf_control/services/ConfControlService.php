@@ -36,20 +36,29 @@ class ConfControlService extends KalturaBaseService
 	 * @action update
 	 * @param KalturaConfigMap $map
 	 * @return KalturaConfigMap
+	 * @throws KalturaAPIException
 	 */
 	function updateAction(KalturaConfigMap $map)
 	{
-        //validate input
-            //1. Maps can only be unpdated
-            //2. Only DB maps
-		$map->validateContent(json_decode($map->content,true));
-
+		$contentArray = json_decode($map->content, true);
+		if(!$contentArray)
+		{
+			throw new KalturaAPIException(KalturaErrors::CANNOT_PARSE_CONTENT , "Cannot JSON decode content"  ,$map->content );
+		}
+		$map->validateContent($contentArray);
 
         //Insert value to DB
 		$confControlDb = new kConfControlDb();
 		$confControlDb->setMapName($map->name);
 		$confControlDb->setHostNameRegex($map->relatedHost);
-		$confControlDb->update($map->content);
+		try
+		{
+			$confControlDb->update($map->content);
+		}
+		catch (Exception $e)
+		{
+			throw new KalturaAPIException(KalturaErrors::CONF_CONTORL_ERROR,$e->getMessage());
+		}
 	}
 
 	/**
@@ -76,7 +85,6 @@ class ConfControlService extends KalturaBaseService
 		$hostList =$remoteCache->getRelatedHostList($filter->name ,$filter->relatedHost );
 		if($hostList)
 		{
-
 			foreach ($hostList as $host)
 			{
 				$confControlDb = new kConfControlDb();
@@ -86,14 +94,13 @@ class ConfControlService extends KalturaBaseService
 				$mapObject->name = $filter->name;
 				$mapObject->relatedHost = $host;
 				$mapObject->sourceLocation = KalturaConfMapSourceLocation::DB;
-				$mapObject->content = $confControlDb->getContent();
-				$mapObject->version = $confControlDb->getVersion();
+				$mapObject->content = $confControlDb->getMapContent();
+				$mapObject->version = $confControlDb->getMapVersionInCache();
 				$mapObject->isEditable = true;
 				$items->insert($mapObject);
 			}
 		}
-		else
-		//Check in file system
+		else		//Check in file system
         {
 			$fileSystemCache = kCacheConfFactory::getInstance(kCacheConfFactory::FILE_SYSTEM);
 			$fileNames = $fileSystemCache->getIniFilesList($filter->name ,$filter->relatedHost);

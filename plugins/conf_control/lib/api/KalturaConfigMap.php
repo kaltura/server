@@ -69,7 +69,7 @@ class KalturaConfigMap extends KalturaObject
 		$initStr = iniUtils::arrayToIniString($content);
 		if(!parse_ini_string($initStr,true))
 		{
-			throw new Exception("Bad ini Content $countedEqualCharInString vs $numOfLeafsInArray - \r\n".$initStr);
+			throw new KalturaAPIException(KalturaErrors::CANNOT_PARSE_CONTENT, "Cannot parse INI", $initStr);
 		}
 	}
 }

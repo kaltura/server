@@ -717,6 +717,8 @@ class KalturaErrors extends APIErrors
 	 * Conf Control
 	 */
 	const MISSING_MAP_NAME = "MISSING_MAP_NAME;;Map name must be supplied";
+	const CANNOT_PARSE_CONTENT = "CANNOT_PARSE_CONTENT;ERR,CONTENT;Error - [@ERR@] Cannot parse content - \r\n [@CONTENT@]";
+	const CONF_CONTORL_ERROR = "CONF_CONTORL_ERROR;ERR;Conf control error - [@ERR@]";
 
 }
 
