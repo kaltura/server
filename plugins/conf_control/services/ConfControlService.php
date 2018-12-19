@@ -23,9 +23,10 @@ class ConfControlService extends KalturaBaseService
 	 *
 	 * @action add
 	 * @param KalturaConfigMap $map
+	 * @param string $relatedHost
 	 * @return KalturaConfigMap
 	 */
-	function addAction(KalturaConfigMap $map)
+	function addAction(KalturaConfigMap $map,$relatedHost)
 	{
 
 	}
@@ -101,7 +102,7 @@ class ConfControlService extends KalturaBaseService
 			    list($mapObject->name , $mapObject->relatedHost ,$mapObject->content )  = $fileSystemCache->getMapInfo($fileName);
 				$mapObject->sourceLocation = KalturaConfMapSourceLocation::FS;
 				$items->insert($mapObject);
-				$mapObject->version = l;
+				$mapObject->version = 1;
 				$mapObject->isEditable = false;
 			}
         }
