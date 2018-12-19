@@ -101,7 +101,7 @@ class ConfControlService extends KalturaBaseService
 			    list($mapObject->name , $mapObject->relatedHost ,$mapObject->content )  = $fileSystemCache->getMapInfo($fileName);
 				$mapObject->sourceLocation = KalturaConfMapSourceLocation::FS;
 				$items->insert($mapObject);
-				$mapObject->version = l;
+				$mapObject->version = 1;
 				$mapObject->isEditable = false;
 			}
         }
