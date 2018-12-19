@@ -356,7 +356,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 * @param $dbObject
 	 * @return bool
 	 */
-	protected function isPlayable($dbObject): bool
+	protected function isPlayable($dbObject)
 	{
 		return $dbObject->getViewMode() == ViewMode::ALLOW_ALL && in_array($dbObject->getLiveStatus(), array(KalturaEntryServerNodeStatus::PLAYABLE, KalturaEntryServerNodeStatus::BROADCASTING, KalturaEntryServerNodeStatus::AUTHENTICATED));
 	}
