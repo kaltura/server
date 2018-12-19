@@ -6,11 +6,13 @@
 class Form_ConfigurationMapConfigure extends ConfigureForm
 {
 	protected $disableAttributes;
+	protected $disableEdit;
 
-	public function __construct($disableAttributes = null)
+	public function __construct($disableAttributes = null, $isEditable = null)
 	{
 		$this->disableAttributes = $disableAttributes;
-
+		if($isEditable === false)
+			$this->disableEdit = true;
 		parent::__construct();
 	}
 
@@ -50,6 +52,7 @@ class Form_ConfigurationMapConfigure extends ConfigureForm
 			'label' => 'Content:',
 			'filters' => array('StringTrim'),
 			'placement' => 'prepend',
+			'readonly' => $this->disableEdit,
 		));
 
 	}

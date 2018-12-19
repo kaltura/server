@@ -79,9 +79,17 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 			}
 			else
 			{
-				$ini = new Zend_Config(json_decode($configurationMap->content, true), true);
-				$configurationMap->content = $this->iniToString($ini->toArray());
-				$form->populateFromObject($configurationMap, false);
+				$content = json_decode($configurationMap->content, true);
+				if ($content)
+				{
+					$ini = new Zend_Config($content, true);
+					$configurationMap->content = $this->iniToString($ini->toArray());
+					$form->populateFromObject($configurationMap, false);
+				}
+				else
+				{
+					$action->view->errMessage = "Could Not load map for Name [$configurationMapName] and Host [$configurationMapHost]";
+				}
 			}
 
 		}
@@ -137,7 +145,7 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 		$form->populate($formData);
 		if ($form->isValid($formData))
 		{
-			$formData['content'] = json_encode($formData['content']);
+			$formData['content'] = json_encode(parse_ini_string($formData['content'],true));
 			$configurationMap = $form->getObject('Kaltura_Client_ConfControl_Type_ConfigMap', $formData, false, true);
 
 			$form->resetUnUpdatebleAttributes($configurationMap);
@@ -168,10 +176,9 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 		);
 		if ($configurationMap)
 		{
-			$form = new Form_ConfigurationMapConfigure(true);
+			$form = new Form_ConfigurationMapConfigure(true, $configurationMap->isEditable);
 			$urlParams['configuration_map_name'] = $configurationMap->name;
 			$urlParams['configuration_map_host'] = $configurationMap->relatedHost;
-//			$urlParams['configuration_map_content'] = $configurationMap->content;
 
 		}
 		else
