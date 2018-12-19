@@ -9,7 +9,7 @@ class kConfControlDb
 	private $connection;
 	private $memcacheObjects;
 
-	function __construct($mapName , $hostNameRegex)
+	function __construct()
 	{
 		$this->initConfParams();
 		$this->initPdoConnection();
