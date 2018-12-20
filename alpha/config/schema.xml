@@ -2170,4 +2170,20 @@
             <index-column name="server_type" />
         </index>
     </table>
+	<table skipSql="false" abstract="false" name="conf_maps" reloadOnInsert="true">
+		<column primaryKey="true" required="true"  lazyLoad="false" name="id" type="integer" autoIncrement="true" />
+		<column required="true"  lazyLoad="false" name="map_name" type="varchar" size="256" />
+		<column required="true"  lazyLoad="false" name="host_name" type="varchar" size="256" />
+		<column required="true"  lazyLoad="false" name="status" type="integer" />
+		<column required="true"  lazyLoad="false" name="created_at" type="timestamp" />
+		<column required="false" lazyLoad="false" name="remarks" type="varchar" size="255" />
+		<column required="false" lazyLoad="false" name="content" type="longvarchar" />
+		<index name="primary_map_index">
+			<index-column name="map_name" />
+			<index-column name="host_name" />
+		</index>
+		<index name="id_index">
+			<index-column name="id" />
+		</index>
+	</table>
 </database>
