@@ -69,5 +69,10 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		//Minimum KS expiry should be set 7 days
 		return max($ksExpiry, dateUtils::DAY * 7);
 	}
+	
+	public function calculatePriceForEntry(entry $entry)
+	{
+		return call_user_func($this->getPricing()->getPriceFunction(), $entry, $this->getPricing()->getPricePerUnit());
+	}
 
 } // VendorCatalogItem
