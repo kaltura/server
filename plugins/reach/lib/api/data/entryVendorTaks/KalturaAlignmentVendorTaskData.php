@@ -44,7 +44,9 @@ class KalturaAlignmentVendorTaskData extends KalturaVendorTaskData
 	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (is_null($object_to_fill))
+		{
 			$object_to_fill = new kAlignmentVendorTaskData();
+		}
 		
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
@@ -61,15 +63,19 @@ class KalturaAlignmentVendorTaskData extends KalturaVendorTaskData
 	{
 		/* @var $sourceObject kAlignmentVendorTaskData */
 		if(isset($this->transcriptAssetId) && $sourceObject->getTranscriptAssetId() != $this->transcriptAssetId)
+		{
 			$this->validateTranscriptAsset($this->transcriptAssetId);
+		}
 
-		return parent::validateForInsert($propertiesToSkip);
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
 	protected function validateTranscriptAsset($transcriptAssetId)
 	{
 		$transcriptAssetDb = assetPeer::retrieveById($transcriptAssetId);
 		if (!$transcriptAssetDb || !($transcriptAssetDb instanceof TranscriptAsset))
+		{
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $transcriptAssetId);
+		}
 	}
 }
