@@ -198,7 +198,8 @@ class kReachFlowManager implements kBatchJobStatusEventConsumer
 			foreach ( $rules as $key => $rule )
 			{
 				/* @var krule $rule*/
-				if (empty($rule->getDescription())
+				$description = $rule->getDescription();
+				if (empty($description)
 					|| substr($rule->getDescription(), 0, strlen(self::ADMIN_CONSOLE_RULE_PREFIX)) !== self::ADMIN_CONSOLE_RULE_PREFIX)
 				{
 					unset($rules[$key]);

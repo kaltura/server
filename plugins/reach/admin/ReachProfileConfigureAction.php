@@ -157,7 +157,8 @@ class ReachProfileConfigureAction extends KalturaApplicationPlugin
 		//handle added or updated rules
 		foreach ($reachProfile->rules as $rule)
 		{
-			if (!empty($rule->description))
+			$description = $rule->description;
+			if (!empty($description))
 			{
 				$actualDescriptionMap[] = $rule->description;
 				// in case of new rule add to end of array otherwise replace the rule
