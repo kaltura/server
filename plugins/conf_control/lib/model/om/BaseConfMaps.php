@@ -62,6 +62,12 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 	protected $content;
 
 	/**
+	 * The value for the version field.
+	 * @var        int
+	 */
+	protected $version;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -204,6 +210,16 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 	public function getContent()
 	{
 		return $this->content;
+	}
+
+	/**
+	 * Get the [version] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getVersion()
+	{
+		return $this->version;
 	}
 
 	/**
@@ -394,6 +410,29 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 	} // setContent()
 
 	/**
+	 * Set the value of [version] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     ConfMaps The current object (for fluent API support)
+	 */
+	public function setVersion($v)
+	{
+		if(!isset($this->oldColumnsValues[ConfMapsPeer::VERSION]))
+			$this->oldColumnsValues[ConfMapsPeer::VERSION] = $this->version;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->version !== $v) {
+			$this->version = $v;
+			$this->modifiedColumns[] = ConfMapsPeer::VERSION;
+		}
+
+		return $this;
+	} // setVersion()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -432,6 +471,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 			$this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
 			$this->remarks = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->content = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->version = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -441,7 +481,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 7; // 7 = ConfMapsPeer::NUM_COLUMNS - ConfMapsPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 8; // 8 = ConfMapsPeer::NUM_COLUMNS - ConfMapsPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating ConfMaps object", $e);
@@ -922,6 +962,9 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 			case 6:
 				return $this->getContent();
 				break;
+			case 7:
+				return $this->getVersion();
+				break;
 			default:
 				return null;
 				break;
@@ -950,6 +993,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 			$keys[4] => $this->getCreatedAt(),
 			$keys[5] => $this->getRemarks(),
 			$keys[6] => $this->getContent(),
+			$keys[7] => $this->getVersion(),
 		);
 		return $result;
 	}
@@ -1002,6 +1046,9 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 			case 6:
 				$this->setContent($value);
 				break;
+			case 7:
+				$this->setVersion($value);
+				break;
 		} // switch()
 	}
 
@@ -1033,6 +1080,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setRemarks($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setContent($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setVersion($arr[$keys[7]]);
 	}
 
 	/**
@@ -1051,6 +1099,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(ConfMapsPeer::CREATED_AT)) $criteria->add(ConfMapsPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(ConfMapsPeer::REMARKS)) $criteria->add(ConfMapsPeer::REMARKS, $this->remarks);
 		if ($this->isColumnModified(ConfMapsPeer::CONTENT)) $criteria->add(ConfMapsPeer::CONTENT, $this->content);
+		if ($this->isColumnModified(ConfMapsPeer::VERSION)) $criteria->add(ConfMapsPeer::VERSION, $this->version);
 
 		return $criteria;
 	}
@@ -1116,6 +1165,8 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 		$copyObj->setRemarks($this->remarks);
 
 		$copyObj->setContent($this->content);
+
+		$copyObj->setVersion($this->version);
 
 
 		$copyObj->setNew(true);

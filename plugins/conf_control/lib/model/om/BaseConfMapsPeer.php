@@ -26,7 +26,7 @@ abstract class BaseConfMapsPeer {
 	const TM_CLASS = 'ConfMapsTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 7;
+	const NUM_COLUMNS = 8;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -52,6 +52,9 @@ abstract class BaseConfMapsPeer {
 	/** the column name for the CONTENT field */
 	const CONTENT = 'conf_maps.CONTENT';
 
+	/** the column name for the VERSION field */
+	const VERSION = 'conf_maps.VERSION';
+
 	/**
 	 * An identiy map to hold any loaded instances of ConfMaps objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -68,11 +71,11 @@ abstract class BaseConfMapsPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'MapName', 'HostName', 'Status', 'CreatedAt', 'Remarks', 'Content', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'mapName', 'hostName', 'status', 'createdAt', 'remarks', 'content', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::MAP_NAME, self::HOST_NAME, self::STATUS, self::CREATED_AT, self::REMARKS, self::CONTENT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'map_name', 'host_name', 'status', 'created_at', 'remarks', 'content', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'MapName', 'HostName', 'Status', 'CreatedAt', 'Remarks', 'Content', 'Version', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'mapName', 'hostName', 'status', 'createdAt', 'remarks', 'content', 'version', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::MAP_NAME, self::HOST_NAME, self::STATUS, self::CREATED_AT, self::REMARKS, self::CONTENT, self::VERSION, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'map_name', 'host_name', 'status', 'created_at', 'remarks', 'content', 'version', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
 	);
 
 	/**
@@ -82,11 +85,11 @@ abstract class BaseConfMapsPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'MapName' => 1, 'HostName' => 2, 'Status' => 3, 'CreatedAt' => 4, 'Remarks' => 5, 'Content' => 6, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'mapName' => 1, 'hostName' => 2, 'status' => 3, 'createdAt' => 4, 'remarks' => 5, 'content' => 6, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::MAP_NAME => 1, self::HOST_NAME => 2, self::STATUS => 3, self::CREATED_AT => 4, self::REMARKS => 5, self::CONTENT => 6, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'map_name' => 1, 'host_name' => 2, 'status' => 3, 'created_at' => 4, 'remarks' => 5, 'content' => 6, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'MapName' => 1, 'HostName' => 2, 'Status' => 3, 'CreatedAt' => 4, 'Remarks' => 5, 'Content' => 6, 'Version' => 7, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'mapName' => 1, 'hostName' => 2, 'status' => 3, 'createdAt' => 4, 'remarks' => 5, 'content' => 6, 'version' => 7, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::MAP_NAME => 1, self::HOST_NAME => 2, self::STATUS => 3, self::CREATED_AT => 4, self::REMARKS => 5, self::CONTENT => 6, self::VERSION => 7, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'map_name' => 1, 'host_name' => 2, 'status' => 3, 'created_at' => 4, 'remarks' => 5, 'content' => 6, 'version' => 7, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
 	);
 
 	/**
@@ -163,6 +166,7 @@ abstract class BaseConfMapsPeer {
 		$criteria->addSelectColumn(ConfMapsPeer::CREATED_AT);
 		$criteria->addSelectColumn(ConfMapsPeer::REMARKS);
 		$criteria->addSelectColumn(ConfMapsPeer::CONTENT);
+		$criteria->addSelectColumn(ConfMapsPeer::VERSION);
 	}
 
 	/**

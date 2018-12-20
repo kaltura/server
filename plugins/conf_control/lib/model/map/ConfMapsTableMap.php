@@ -44,6 +44,7 @@ class ConfMapsTableMap extends TableMap {
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
 		$this->addColumn('REMARKS', 'Remarks', 'VARCHAR', false, 255, null);
 		$this->addColumn('CONTENT', 'Content', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('VERSION', 'Version', 'INTEGER', false, null, null);
 		// validators
 	} // initialize()
 
