@@ -93,7 +93,7 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 		return $mergedMaps;
 	}
 
-	public function getRelatedHostList($requesteMapName , $hostNameRegex = null)
+	public function getHostList($requesteMapName , $hostNameRegex = null)
 	{
 		$hostList = array();
 		$cache = $this->getCache();
