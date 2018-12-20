@@ -11,9 +11,16 @@ class KalturaVendorAlignmentCatalogItem extends KalturaVendorCatalogItem
 	 */
 	public $sourceLanguage;
 	
+	/**
+	 * @var KalturaVendorCatalogItemOutputFormat
+	 * @filter eq,in
+	 */
+	public $outputFormat;
+
 	private static $map_between_objects = array
 	(
 		'sourceLanguage',
+		'outputFormat',
 	);
 	
 	protected function getServiceFeature()

@@ -174,6 +174,11 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	 */
 	public $creationMode;
 	
+	/**
+	 * @var KalturaVendorTaskData
+	 */
+	public $taskJobData;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -200,6 +205,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'dictionary',
 		'partnerData',
 		'creationMode',
+		'taskJobData'
 	);
 	
 	/* (non-PHPdoc)
@@ -266,6 +272,20 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_TYPE_NOT_SUPPORTED, $dbEntry->getType());
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject()
+	 */
+	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		/* @var $dbObject EntryVendorTask */
+		parent::doFromObject($dbObject, $responseProfile);
+
+		if ($this->shouldGet('taskJobData', $responseProfile) && !is_null($dbObject->getTaskJobData()))
+		{
+			$this->taskJobData = KalturaVendorTaskData::getInstance($dbObject->getTaskJobData(), $responseProfile);
+		}
+	}
+
 	public function getExtraFilters()
 	{
 		return array();
