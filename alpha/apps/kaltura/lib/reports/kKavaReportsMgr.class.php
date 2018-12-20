@@ -182,39 +182,7 @@ class kKavaReportsMgr extends kKavaBase
 	
 	const COLUMN_FORMAT_QUOTE = 'quote';
 	const COLUMN_FORMAT_UNIXTIME = 'unixtime';
-	
-	protected static $kava_enabled_reports = array(
-		myReportsMgr::REPORT_TYPE_TOP_CONTENT,
-		myReportsMgr::REPORT_TYPE_CONTENT_DROPOFF,
-		myReportsMgr::REPORT_TYPE_CONTENT_INTERACTIONS,
-		myReportsMgr::REPORT_TYPE_MAP_OVERLAY,
-		myReportsMgr::REPORT_TYPE_TOP_SYNDICATION,
-		myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT,
-		myReportsMgr::REPORT_TYPE_SPECIFIC_USER_ENGAGEMENT,
-		myReportsMgr::REPORT_TYPE_USER_TOP_CONTENT,
-		myReportsMgr::REPORT_TYPE_USER_CONTENT_DROPOFF,
-		myReportsMgr::REPORT_TYPE_USER_CONTENT_INTERACTIONS,
-		myReportsMgr::REPORT_TYPE_APPLICATIONS,
-		myReportsMgr::REPORT_TYPE_PLATFORMS,
-		myReportsMgr::REPORT_TYPE_OPERATING_SYSTEM,
-		myReportsMgr::REPORT_TYPE_BROWSERS,
-		myReportsMgr::REPORT_TYPE_LIVE,
-		myReportsMgr::REPORT_TYPE_TOP_PLAYBACK_CONTEXT,
-	);
 		
-	protected static $kava_forced_reports = array(
-		myReportsMgr::REPORT_TYPE_ENTRY_USAGE,
-		myReportsMgr::REPORT_TYPE_REACH_USAGE,
-		myReportsMgr::REPORT_TYPE_TOP_CUSTOM_VAR1,
-		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_CITY,
-		myReportsMgr::REPORT_TYPE_OPERATING_SYSTEMS_FAMILIES,
-		myReportsMgr::REPORT_TYPE_BROWSERS_FAMILIES,
-		myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT_TIMELINE,
-		myReportsMgr::REPORT_TYPE_UNIQUE_USERS_PLAY,
-		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_COUNTRY,
-		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_REGION,
-	);
-	
 	protected static $reports_def = array(
 		myReportsMgr::REPORT_TYPE_TOP_CONTENT => array(
 			self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
@@ -1876,20 +1844,7 @@ class kKavaReportsMgr extends kKavaBase
 	/// common query functions
 	protected static function shouldUseKava($partner_id, $report_type) 
 	{
-		if ($report_type < 0 ||		// kava custom reports
-			in_array($report_type, self::$kava_forced_reports))
-		{
-			return true;
-		}
-
-		if (in_array($report_type, self::$kava_enabled_reports) && 
-			kKavaBase::isPartnerAllowed($partner_id, kKavaBase::VOD_DISABLED_PARTNERS))
-		{
-			return true;
-		}
-
-		KalturaLog::debug("Not using kava - partner id [$partner_id] report type [$report_type]");
-		return false;
+		return true;
 	}
 		
 	protected static function toSafeId($name)
