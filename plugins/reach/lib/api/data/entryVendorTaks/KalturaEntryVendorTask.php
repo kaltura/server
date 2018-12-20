@@ -237,7 +237,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		if($this->partnerData && !$this->checkIsValidJson($this->partnerData))
 			throw new KalturaAPIException(KalturaReachErrors::PARTNER_DATA_NOT_VALID_JSON_STRING);
 		
-		if($this->taskJobData)
+		if(isset($this->taskJobData))
 			$this->taskJobData->validateForInsert();
 		
 		return parent::validateForInsert($propertiesToSkip);
