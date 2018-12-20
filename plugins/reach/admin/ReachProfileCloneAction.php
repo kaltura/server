@@ -5,6 +5,7 @@
  */
 class ReachProfileCloneAction extends KalturaApplicationPlugin
 {
+	const ADMIN_CONSOLE_RULE_PREFIX = "AutomaticAdminConsoleRule_";
 
 	/**
 	 * @return string - absolute file path of the phtml template
@@ -41,6 +42,15 @@ class ReachProfileCloneAction extends KalturaApplicationPlugin
 				$reachProfile->updatedAt = null;
 				$reachProfile->usedCredit = null;
 				$reachProfile->status = null;
+
+				foreach ( $reachProfile->rules as $key => $rule )
+				{
+					if (empty($rule->description)
+						|| substr($rule->description, 0, strlen(self::ADMIN_CONSOLE_RULE_PREFIX)) !== self::ADMIN_CONSOLE_RULE_PREFIX)
+					{
+						unset($reachProfile->rules[$key]);
+					}
+				}
 
 				Infra_ClientHelper::impersonate($partnerId);
 				$reachPluginClient->reachProfile->add($reachProfile);
