@@ -52,6 +52,24 @@ class KalturaAlignmentVendorTaskData extends KalturaVendorTaskData
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyNotNull("transcriptAssetId");
+		$this->validateTranscriptAsset($this->transcriptAssetId);
+
 		return parent::validateForInsert($propertiesToSkip);
+	}
+	
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		/* @var $sourceObject kAlignmentVendorTaskData */
+		if(isset($this->transcriptAssetId) && $sourceObject->getTranscriptAssetId() != $this->transcriptAssetId)
+			$this->validateTranscriptAsset($this->transcriptAssetId);
+
+		return parent::validateForInsert($propertiesToSkip);
+	}
+
+	protected function validateTranscriptAsset($transcriptAssetId)
+	{
+		$transcriptAssetDb = assetPeer::retrieveById($transcriptAssetId);
+		if (!$transcriptAssetDb || !($transcriptAssetDb instanceof TranscriptAsset))
+			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $transcriptAssetId);
 	}
 }
