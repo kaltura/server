@@ -160,7 +160,10 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 			$form->setAttrib('class', 'valid');
 			$action->view->formValid = true;
 		}
-		$action->view->FormFormat = "invalid";
+		else
+		{
+			$action->view->FormFormat = "invalid";
+		}
 	}
 
 	/***
