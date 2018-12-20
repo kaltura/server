@@ -311,12 +311,7 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Entry ID not defined");
 		}
 		
-		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME);
-		if(!$config)
-		{
-			$config = array();
-		}
-		
+		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME, array());
 		//enable passing nested config options
 		foreach ($config as $key=>$val)
 		{
@@ -533,5 +528,10 @@ class embedPlaykitJsAction extends sfAction
 			$this->bundle_name = $this->cacheVersion . "_" . $this->bundle_name;
 	}
 	
+	public function getRequestParameter($name, $default = null)
+	{
+		$returnValue = parent::getRequestParameter($name, $default);
+		return $returnValue ? $returnValue : $default;
+	}
 	
 }
