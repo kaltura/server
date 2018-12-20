@@ -994,4 +994,15 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData(self::CUSTOM_DATA_RECORDING_STATUS, $v);
 	}
 
+	public function getRedirectEntryId()
+	{
+		if ($this->getViewMode() == ViewMode::ALLOW_ALL && in_array($this->getLiveStatus(), array(EntryServerNodeStatus::PLAYABLE, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::AUTHENTICATED)))
+		{
+			return null;
+		}
+
+		return parent::getRedirectEntryId();
+	}
+
+
 }
