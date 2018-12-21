@@ -9,8 +9,8 @@ abstract class KalturaConfigMapBaseFilter extends KalturaRelatedFilter
 {
 	static private $map_between_objects = array
 	(
-		"nameEqual" => "_eq_name",
-		"relatedHostEqual" => "_eq_related_host",
+		"nameEqual" => "_eq_map_name",
+		"relatedHostEqual" => "_eq_host_name",
 	);
 
 	static private $order_by_map = array

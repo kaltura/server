@@ -15,4 +15,34 @@
  */
 class ConfMapsPeer extends BaseConfMapsPeer {
 
+	public static function setDefaultCriteriaFilter()
+	{
+		if(self::$s_criteria_filter == null)
+		{
+			self::$s_criteria_filter = new criteriaFilter();
+		}
+
+		$c = new Criteria();
+		$c->add(self::STATUS, ConfMaps::STATUS_ENABLED);
+		self::$s_criteria_filter->setFilter($c);
+	}
+
+	public static function getLatestMap($mapName , $hostNameRegex)
+	{
+		$c = new criteria();
+		$c->add(self::MAP_NAME ,$mapName );
+		$c->add(self::HOST_NAME ,$hostNameRegex );
+		$c->addDescendingOrderByColumn(self::VERSION);
+		return self::doSelectOne($c);
+	}
+	public static function addNewMapVersion($mapName, $hostNameRegex, $content, $newVersion)
+	{
+		$c = new criteria();
+		$c->add(self::MAP_NAME ,$mapName );
+		$c->add(self::HOST_NAME ,$hostNameRegex );
+		$c->add(self::CONTENT ,$content );
+		$c->add(self::VERSION ,$newVersion );
+		$c->add(self::STATUS ,ConfMaps::STATUS_ENABLED );
+		return self::doInsert($c);
+	}
 } // ConfMapsPeer

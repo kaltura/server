@@ -109,6 +109,7 @@ class kConfControlDb
 	 */
 	protected function updateMapInDb($content)
 	{
+
 		$currentVersion = $this->getLatestVersion($this->mapName, $this->hostNameRegex);
 		if(!$currentVersion)
 		{
@@ -143,8 +144,8 @@ class kConfControlDb
 	{
 		$content = str_replace('\/','/',$content);
 		$content = str_replace('"','\"',$content);
-		$cmdLine = "insert into conf_maps (map_name,host_name,status,version,created_at,remarks,content)values('$this->mapName','$this->hostNameRegex',1,$version,'".date("Y-m-d H:i:s")."','','$content');";
-		if(!$this->execute($this->connection,$cmdLine))
+		$ret = ConfMapsPeer::addNewMapVersion($this->mapName, $this->hostNameRegex, $content, $version );
+		if(!$ret)
 		{
 			throw new Exception('Fail to write into conf_maps table');
 		}
@@ -159,9 +160,8 @@ class kConfControlDb
 	 */
 	protected function getLatestVersion($mapName , $hostNameRegex)
 	{
-		$cmdLine = 'select version from conf_maps where conf_maps.map_name=\''.$mapName.'\' and conf_maps.host_name=\''.$hostNameRegex.'\' order by version desc limit 1 ;';
-		$output1 = $this->query($this->connection,$cmdLine);
-		$version = isset($output1['version']) ? $output1['version'] : 0;
+		$mapRecord = ConfMapsPeer::getLatestMap($mapName,$hostNameRegex);
+		$version = $mapRecord->getVersion();
 		KalturaLog::debug("Found version - {$version} for map {$mapName} hostNameRegex {$hostNameRegex}");
 		return $version;
 	}

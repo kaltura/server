@@ -9,15 +9,17 @@
 /**
  * @package plugins.confControl
  * @subpackage api.objects
+ * @relatedService ConfControlService
  */
 
-class KalturaConfigMap extends KalturaObject
+class KalturaConfigMap extends KalturaObject implements IRelatedFilterable
 {
 	/**
 	 * Name of the map
 	 *
 	 * @var string
 	 * @insertonly
+	 * @filter eq
 	 */
 	public $name;
 
@@ -48,6 +50,7 @@ class KalturaConfigMap extends KalturaObject
 	 * Regex that represent the host/s that this map affect
 	 *
 	 * @var string
+	 * @filter eq
 	 */
 	public $relatedHost;
 
@@ -72,4 +75,21 @@ class KalturaConfigMap extends KalturaObject
 			throw new KalturaAPIException(KalturaErrors::CANNOT_PARSE_CONTENT, "Cannot parse INI", $initStr);
 		}
 	}
+
+	/* (non-PHPdoc)
+ * @see IFilterable::getExtraFilters()
+ */
+	public function getExtraFilters()
+	{
+		return array();
+	}
+
+	/* (non-PHPdoc)
+	 * @see IFilterable::getFilterDocs()
+	 */
+	public function getFilterDocs()
+	{
+		return array();
+	}
+
 }
