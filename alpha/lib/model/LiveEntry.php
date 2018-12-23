@@ -996,12 +996,17 @@ abstract class LiveEntry extends entry
 
 	public function getRedirectEntryId()
 	{
-		if ($this->getViewMode() == ViewMode::ALLOW_ALL && in_array($this->getLiveStatus(), array(EntryServerNodeStatus::PLAYABLE, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::AUTHENTICATED)))
+		if ($this->isPlayable())
 		{
 			return null;
 		}
 
 		return parent::getRedirectEntryId();
+	}
+
+	public function isPlayable()
+	{
+		return $this->getViewMode() == ViewMode::ALLOW_ALL && in_array($this->getLiveStatus(), array(KalturaEntryServerNodeStatus::PLAYABLE, KalturaEntryServerNodeStatus::BROADCASTING, KalturaEntryServerNodeStatus::AUTHENTICATED));
 	}
 
 
