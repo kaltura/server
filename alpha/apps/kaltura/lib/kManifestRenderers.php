@@ -246,8 +246,13 @@ abstract class kManifestRenderer
 
 		if (isset($params['referrer']))
 		{
-			$base64Referrer = $params['referrer'];
-			$referrer = base64_decode(str_replace(array('-', '_', ' '), array('+', '/', '+'), $base64Referrer));
+			$base64Referrer = trim($params['referrer']);
+			$referrer = base64_decode(str_replace(array('-', '_', ' '), array('+', '/', '+'), $base64Referrer), true);
+			if (!$referrer || !mb_check_encoding($referrer, 'utf-8'))
+			{
+				$referrer = $base64Referrer;
+			}
+
 			if ($referrer)
 			{
 				$output['referrer'] = $referrer;
