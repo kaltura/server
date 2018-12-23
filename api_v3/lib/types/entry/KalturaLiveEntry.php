@@ -207,15 +207,6 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 			$this->recordingOptions = new KalturaLiveEntryRecordingOptions();
 			$this->recordingOptions->fromObject($dbObject->getRecordingOptions());
 		}
-
-		if ($this->isPlayable($dbObject))
-		{
-			$this->redirectEntryId = null;
-			kApiCache::setExpiry( kApiCache::REDIRECT_ENTRY_CACHE_EXPIRY );
-		} else
-		{
-			$this->redirectEntryId = $this->recordedEntryId;
-		}
 	}
 
 	public function validateConversionProfile(entry $sourceObject = null)
