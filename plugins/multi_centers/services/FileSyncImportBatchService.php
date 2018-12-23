@@ -11,9 +11,8 @@ class FileSyncImportBatchService extends KalturaBatchService
 	const LOCK_KEY_PREFIX = 'fileSyncLock:id=';
 	const LOCK_EXPIRY = 36000;
 	const MAX_FILESYNCS_PER_CHUNK = 100;
-	const MAX_DELAYED_FILESYNCS_PER_CHUNK = 10;
 	const MAX_FILESYNC_QUERIES_PER_CALL = 100;
-	
+	const MAX_FILESYNC_ID_RANGE = 100000;
 	
 	protected static function getOriginalFileSync($fileSync)
 	{
@@ -68,6 +67,9 @@ class FileSyncImportBatchService extends KalturaBatchService
 			throw new KalturaAPIException(MultiCentersErrors::GET_MAX_FILESYNC_ID_FAILED, $sourceDc);
 		}
 		
+		// Note: reducing slightly the max id, because the ids may arrive out of order in the mysql replication
+		$maxId -= 1000;
+
 		$initialLastId = $keysCache->get(self::LAST_FILESYNC_ID_PREFIX . $workerId);
 		KalturaLog::info("got lastId [$initialLastId] for worker [$workerId]");
 		
@@ -90,29 +92,19 @@ class FileSyncImportBatchService extends KalturaBatchService
 		
 		$baseCriteria->addAscendingOrderByColumn(FileSyncPeer::ID);
 
-		$chunkSize = $createdAtLessThanOrEqual ?
-			self::MAX_DELAYED_FILESYNCS_PER_CHUNK : 
-			self::MAX_FILESYNCS_PER_CHUNK;
+		$chunkSize = self::MAX_FILESYNCS_PER_CHUNK;
 		$baseCriteria->setLimit($chunkSize);
 		
 		$lockedFileSyncs = array();
 		$lockedFileSyncsSize = 0;
 		$limitReached = false;
 		$selectCount = 0;
-		$lastSelectId = 0;
 		$done = false;
 		
-		while (!$done && $selectCount < self::MAX_FILESYNC_QUERIES_PER_CALL)
+		while (!$done && 
+				$selectCount < self::MAX_FILESYNC_QUERIES_PER_CALL && 
+				$lastId + 100 < $maxId)
 		{
-			// make sure last id is always increasing
-			if ($lastId <= $lastSelectId)
-			{
-				KalturaLog::info("last id was decremented $lastId <= $lastSelectId, stopping");
-				break;
-			}
-			
-			$lastSelectId = $lastId;
-			
 			// clear the instance pool every once in a while (not clearing every time since 
 			//	some objects repeat between selects)
 			$selectCount++;
@@ -121,11 +113,12 @@ class FileSyncImportBatchService extends KalturaBatchService
 				FileSyncPeer::clearInstancePool();
 			}
 			
+			$idLimit = min($lastId + self::MAX_FILESYNC_ID_RANGE, $maxId);
 			// get a chunk of file syncs
 			// Note: starting slightly before the last id, because the ids may arrive out of order in the mysql replication
 			$c = clone $baseCriteria;
-			$idCriterion = $c->getNewCriterion(FileSyncPeer::ID, $lastId - 100, Criteria::GREATER_THAN);
-			$idCriterion->addAnd($c->getNewCriterion(FileSyncPeer::ID, $maxId, Criteria::LESS_THAN));
+			$idCriterion = $c->getNewCriterion(FileSyncPeer::ID, $lastId, Criteria::GREATER_EQUAL);
+			$idCriterion->addAnd($c->getNewCriterion(FileSyncPeer::ID, $idLimit, Criteria::LESS_THAN));
 			$c->addAnd($idCriterion);
 
 			// Note: disabling the criteria because it accumulates more and more criterions, and the status was already explicitly added
@@ -133,22 +126,18 @@ class FileSyncImportBatchService extends KalturaBatchService
 			FileSyncPeer::setUseCriteriaFilter(false);
 			$fileSyncs = FileSyncPeer::doSelect($c);
 			FileSyncPeer::setUseCriteriaFilter(true);
-			
-			if (!$fileSyncs)
-			{
-				$lastId = $maxId;
-				break;
-			}
-			
+
 			// if we got less than the limit no reason to perform any more queries
 			if (count($fileSyncs) < $chunkSize)
 			{
-				$done = true;
+				$lastId = $idLimit;
 			}
-			
-			$lastFileSync = end($fileSyncs);
-			$lastId = $lastFileSync->getId();
-			
+			else
+			{
+				$lastFileSync = end($fileSyncs);
+				$lastId = $lastFileSync->getId() + 1;
+			}
+
 			// filter by source dc
 			foreach ($fileSyncs as $index => $fileSync)
 			{
@@ -160,41 +149,26 @@ class FileSyncImportBatchService extends KalturaBatchService
 
 			// filter by object type / sub type
 			$fileSyncs = array_filter($fileSyncs, array('kFileSyncUtils', 'shouldSyncFileObjectType'));
-			if (!$fileSyncs)
-			{
-				continue;
-			}
-			
+
 			// filter by created at
 			if ($createdAtLessThanOrEqual)
 			{
-				$firstFileSync = reset($fileSyncs);
-				$prevLastId = $firstFileSync->getId();
-				
 				foreach ($fileSyncs as $index => $fileSync)
 				{
 					if ($fileSync->getCreatedAt(null) > $createdAtLessThanOrEqual)
 					{
 						$done = true;
 						unset($fileSyncs[$index]);
-						if (!is_null($prevLastId))
-						{
-							$lastId = $prevLastId;
-							$prevLastId = null;
-						}
+						$lastId = min($lastId, $fileSync->getId());
 					}
-					else
-					{
-						$prevLastId = $fileSync->getId();
-					}
-				}
-				
-				if (!$fileSyncs)
-				{
-					break;
 				}
 			}
-			
+
+			if (!$fileSyncs)
+			{
+				continue;
+			}
+
 			// get locked file syncs with multi get
 			$lockKeys = array();
 			foreach ($fileSyncs as $fileSync)
@@ -243,15 +217,11 @@ class FileSyncImportBatchService extends KalturaBatchService
 				if (count($lockedFileSyncs) >= $maxCount ||
 					($maxSize && $lockedFileSyncsSize >= $maxSize))
 				{
-					$lastId = $fileSync->getId();
+					$lastId = min($lastId, $fileSync->getId() + 1);
 					$limitReached = true;
+					$done = true;
 					break;
 				}
-			}
-			
-			if ($limitReached)
-			{
-				break;
 			}
 		}
 		
