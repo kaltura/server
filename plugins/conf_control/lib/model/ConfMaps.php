@@ -14,5 +14,7 @@
  * @subpackage model
  */
 class ConfMaps extends BaseConfMaps {
-
+	const STATUS_ENABLED=1;
+	const STATUS_DISABLED=0;
 } // ConfMaps
+
