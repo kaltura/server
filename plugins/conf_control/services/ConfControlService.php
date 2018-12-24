@@ -145,7 +145,7 @@ class ConfControlService extends KalturaBaseService
 		/*  @var kRemoteMemCacheConf $remoteCache  */
 		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
 		$map = $remoteCache->loadByHostName($mapName, $hostPatern);
-		if($map)
+		if(!empty($map))
 		{
 			$confMap->sourceLocation = KalturaConfMapSourceLocation::DB;
 			$confMap->isEditable = true;
@@ -158,7 +158,7 @@ class ConfControlService extends KalturaBaseService
 			$confMap->sourceLocation = KalturaConfMapSourceLocation::FS;
 			$confMap->isEditable = false;
 		}
-		if(!$map)
+		if(empty($map))
 		{
 			return null;
 		}

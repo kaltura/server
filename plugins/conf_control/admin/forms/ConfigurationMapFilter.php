@@ -22,14 +22,22 @@ class Form_ConfigurationMapFilter extends Form_PartnerIdFilter
 		));
 
 
-		// submit button
+		// search button
 		$this->addElement('button', 'cmdSubmit', array(
 			'type' => 'submit',
 			'label'		=> 'Search',
 			'decorators' => array('ViewHelper'),
 		));
 
-		// submit button
+		// create button
+		$this->addElement('button', 'viewConfigurationMapButton', array(
+			'ignore' => true,
+			'label' => 'View',
+			'onclick' => "viewConfigurationMap($('#filter_input').val(), $('#filterHostName').val(),)",
+			'decorators' => array('ViewHelper'),
+		));
+
+		// create button
 		$this->addElement('button', 'newConfigurationMap', array(
 			'ignore' => true,
 			'label' => 'Create New',
