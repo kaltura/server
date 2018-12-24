@@ -1188,13 +1188,18 @@ class kKavaReportsMgr extends kKavaBase
 		),
 
 		myReportsMgr::REPORT_TYPE_TOP_CONTENT_CREATOR => array(
-			self::REPORT_DIMENSION_MAP => array('object_id' => self::DIMENSION_ENTRY_ID, 'entry_name' => self::DIMENSION_ENTRY_ID, 'creator_name' => self::DIMENSION_ENTRY_ID, 'created_at' => self::DIMENSION_ENTRY_ID),
+			self::REPORT_DIMENSION_MAP => array(
+				'object_id' => self::DIMENSION_ENTRY_ID,
+				'entry_name' => self::DIMENSION_ENTRY_ID,
+				'creator_name' => self::DIMENSION_ENTRY_ID,
+				'created_at' => self::DIMENSION_ENTRY_ID,
+			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('entry_name', 'creator_name', 'created_at'),
 				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'peer' => 'entryPeer',
-					'columns' => array('NAME', 'PUSER_ID', '@CREATED_AT'),
+					'columns' => array('"NAME"', 'PUSER_ID', '@CREATED_AT'),
 				),
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_USERS),
