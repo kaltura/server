@@ -1844,7 +1844,7 @@ class kKavaReportsMgr extends kKavaBase
 	/// common query functions
 	protected static function shouldUseKava($partner_id, $report_type) 
 	{
-		return true;
+		return kKavaBase::isPartnerAllowed($partner_id, kKavaBase::VOD_DISABLED_PARTNERS);
 	}
 		
 	protected static function toSafeId($name)
@@ -2872,9 +2872,15 @@ class kKavaReportsMgr extends kKavaBase
 					isset($result[$dim]) ? $result[$dim] : $filler_graphs,
 					$graphs);
 			}
-			
+
+			$missing_dims = array_diff_key($result, $cur_result);
 			foreach ($cur_report_def[self::REPORT_GRAPH_METRICS] as $metric)
 			{
+				foreach ($missing_dims as $dim => $ignore)
+				{
+					$result[$dim][$metric] = array();
+				}
+
 				$filler_graphs[$metric] = array();
 			}
 		}
@@ -4032,7 +4038,7 @@ class kKavaReportsMgr extends kKavaBase
 				$row = array_fill(0, $dim_header_count, $dim);
 				foreach ($metric_headers as $header)
 				{
-					$row[] = isset($graphs[$header]) ? $graphs[$header] : 0;
+					$row[] = isset($graphs[$header]) ? reset($graphs[$header]) : 0;
 				}
 				$data[] = $row;
 			}
@@ -4689,7 +4695,7 @@ class kKavaReportsMgr extends kKavaBase
 		
 		$orig_header_count = count($result[0]);
 		$result[0] = $header;		
-		if ($indexes == range(0, count($orig_header_count) - 1))
+		if ($indexes == range(0, $orig_header_count - 1))
 		{
 			return;
 		}
