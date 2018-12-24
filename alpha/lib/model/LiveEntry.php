@@ -1006,7 +1006,7 @@ abstract class LiveEntry extends entry
 
 	public function isPlayable()
 	{
-		return $this->getViewMode() == ViewMode::ALLOW_ALL && in_array($this->getLiveStatus(), array(KalturaEntryServerNodeStatus::PLAYABLE, KalturaEntryServerNodeStatus::BROADCASTING, KalturaEntryServerNodeStatus::AUTHENTICATED));
+		return $this->getViewMode() == ViewMode::ALLOW_ALL && in_array($this->getLiveStatus(), array(EntryServerNodeStatus::PLAYABLE, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::AUTHENTICATED));
 	}
 
 
