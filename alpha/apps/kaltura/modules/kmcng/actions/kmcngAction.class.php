@@ -151,7 +151,7 @@ class kmcngAction extends kalturaAction
         	}
 
 		$usageDashboard = null;
-		if (kConf::get("usagedashboard_version"))
+		if (kConf::hasParam("usagedashboard_version"))
 		{
 			$usageDashboard = array(
 				"uri" => '/apps/usage-dashboard/' . kConf::get("usagedashboard_version") . "/index.html"
@@ -159,12 +159,12 @@ class kmcngAction extends kalturaAction
 		}
 
 		$kmcAnalytics = null;
-		if (kConf::get("kmc_analytics_version"))
-                {
-                        $kmcAnalytics = array(
-                                "uri" => '/apps/kmc-analytics/' . kConf::get("kmc_analytics_version") . "/index.html"
-                        );
-                }
+		if (kConf::hasParam("kmc_analytics_version"))
+		{
+			$kmcAnalytics = array(
+				"uri" => '/apps/kmc-analytics/' . kConf::get("kmc_analytics_version") . "/index.html"
+			);
+		}
 
 		$config = array(
 			'kalturaServer' => array(
