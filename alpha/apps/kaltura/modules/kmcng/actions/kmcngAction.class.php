@@ -143,12 +143,12 @@ class kmcngAction extends kalturaAction
 		}
 
 		$reach = null;
-        	if (isset($kmcngParams["kmcng_reach_version"]))
-        	{
-            		$reach = array(
-                		"uri" => '/apps/reach/' . $kmcngParams["kmcng_reach_version"] . "/index.html"
-            		);
-        	}
+		if (isset($kmcngParams["kmcng_reach_version"]))
+		{
+			$reach = array(
+				"uri" => '/apps/reach/' . $kmcngParams["kmcng_reach_version"] . "/index.html"
+			);
+		}
 
 		$usageDashboard = null;
 		if (kConf::hasParam("usagedashboard_version"))
