@@ -10,20 +10,9 @@ Alias /hosted_pages "@BASE_DIR@/apps/hosted_pages/web"
     </IfVersion>
 </Directory>
 
-Alias /html5 "@WEB_DIR@/html5"
-<Directory "@WEB_DIR@/html5">
-    ExpiresActive On
-    DirectoryIndex index.php
-    Options -Indexes +FollowSymLinks +Includes
-    AllowOverride None
-    Order allow,deny
-    Allow from all
-    <IfVersion >= 2.4>
-	Require all granted
-    </IfVersion>
-</Directory>
-
 Alias /apps "@BASE_DIR@/apps"
+Alias /kea "@BASE_DIR@/apps/kea"
+Alias /html5 "@BASE_DIR@/apps/html5"
 <Directory "@BASE_DIR@/apps">
     DirectoryIndex index.php
     Options -Indexes +FollowSymLinks +Includes
@@ -35,11 +24,3 @@ Alias /apps "@BASE_DIR@/apps"
     </IfVersion>
 </Directory>
 
-Alias /apps/kea "@BASE_DIR@/apps/kea"
-<Directory "@BASE_DIR@/apps/kea">
-    DirectoryIndex index.php
-    Options -Indexes +FollowSymLinks +Includes
-    Order allow,deny
-    Allow from all
-    AllowOverride all
-</Directory>
