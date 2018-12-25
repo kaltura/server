@@ -15,6 +15,28 @@ class kPlaybackContextDataResult
     private $flavorIdsToRemove = array();
 
     /**
+     *
+     * @var array
+     */
+    private $playbackCaptions = array();
+
+    /**
+     * @return array
+     */
+    public function getPlaybackCaptions()
+    {
+        return $this->playbackCaptions;
+    }
+
+    /**
+     * @param array $playbackCaptions
+     */
+    public function setPlaybackCaptions($playbackCaptions)
+    {
+        $this->playbackCaptions = $playbackCaptions;
+    }
+
+    /**
      * @return array
      */
     public function getFlavorIdsToRemove()

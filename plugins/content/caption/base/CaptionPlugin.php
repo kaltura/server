@@ -3,7 +3,7 @@
  * Enable caption assets management for entry objects
  * @package plugins.caption
  */
-class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaApplicationPartialView, IKalturaSchemaContributor, IKalturaMrssContributor, IKalturaPlayManifestContributor, IKalturaEventConsumers
+class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaApplicationPartialView, IKalturaSchemaContributor, IKalturaMrssContributor, IKalturaPlayManifestContributor, IKalturaEventConsumers, IKalturaPlaybackContextDataContributor
 {
 	const PLUGIN_NAME = 'caption';
 	const KS_PRIVILEGE_CAPTION = 'caption';
@@ -625,6 +625,54 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		}
 
 		return $languageCode;
+	}
+
+	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
+	{
+		if ($entryPlayingDataParams->getType() == 'captions')
+		{
+			$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), array(asset::ASSET_STATUS_READY));
+			$playbackCaptions = array();
+			foreach ($captionAssets as $assetDb)
+			{
+				/** @var CaptionAsset $assetDb */
+				$url = null;
+				$webVttUrl = null;
+
+				try
+				{
+					$webVttUrl = myPartnerUtils::getCdnHost($assetDb->getPartnerId()) . self::SERVE_WEBVTT_URL_PREFIX . '/captionAssetId/' . $assetDb->getId() . '/segmentDuration/-1/version/' . $assetDb->getVersion() . '/captions.vtt';
+					$url = $assetDb->getDownloadUrl(true, false, null, null, false);
+
+				}
+				catch (Exception $e)
+				{
+					KalturaLog::debug("Could not get Download url for caption asset " . $assetDb->getId() . $e->getMessage());
+				}
+				$playbackCaptions []= new kCaptionPlaybackPluginData($assetDb->getLabel(), $assetDb->getContainerFormat(), $assetDb->getLanguage(), $assetDb->getDefault(), $webVttUrl, $url);
+			}
+			$result->setPlaybackCaptions($playbackCaptions);
+		}
+	}
+
+	/**
+	 * @param $streamerType
+	 * @return boolean
+	 */
+	public function isSupportStreamerTypes($streamerType)
+	{
+		return false;
+	}
+
+	/**
+	 * @param $drmProfile
+	 * @param $scheme
+	 * @param $customDataObject
+	 * @return boolean
+	 */
+	public function constructUrl($drmProfile, $scheme, $customDataObject)
+	{
+		return '';
 	}
 }
 
