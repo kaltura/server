@@ -81,42 +81,4 @@ class ConfControlService extends KalturaBaseService
 		$confMap = $filter->getMap();
 		return $confMap;
 	}
-
-<<<<<<< HEAD
-=======
-	/**
-	 * @param $mapName
-	 * @param $hostPatern
-	 *
-	 * @return KalturaConfigMap
-	 */
-	protected function getMap($mapName , $hostPatern)
-	{
-		$confMap = new KalturaConfigMap();
-		$hostPatern = str_replace('*','#', $hostPatern);
-		/*  @var kRemoteMemCacheConf $remoteCache  */
-		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
-		$map = $remoteCache->loadByHostName($mapName, $hostPatern);
-		if(!empty($map))
-		{
-			$confMap->sourceLocation = KalturaConfMapSourceLocation::DB;
-			$confMap->isEditable = true;
-		}
-		else
-		{
-			/*  @var kFileSystemConf $confFs  */
-			$confFs = kCacheConfFactory::getInstance(kCacheConfFactory::FILE_SYSTEM);
-			$map = $confFs->loadByHostName($mapName, $hostPatern);
-			$confMap->sourceLocation = KalturaConfMapSourceLocation::FS;
-			$confMap->isEditable = false;
-		}
-		if(empty($map))
-		{
-			return null;
-		}
-		$confMap->name = $mapName;
-		$confMap->content = json_encode($map);
->>>>>>> 97eca3b6795858b61826ba1a9a7cbbc9309308ec
-
-
 }
