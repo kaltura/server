@@ -2178,9 +2178,11 @@
 		<column required="true"  lazyLoad="false" name="created_at" type="timestamp" />
 		<column required="false" lazyLoad="false" name="remarks" type="varchar" size="255" />
 		<column required="false" lazyLoad="false" name="content" type="longvarchar" />
+		<column required="false" lazyLoad="false" name="version" type="integer" />
 		<index name="primary_map_index">
 			<index-column name="map_name" />
 			<index-column name="host_name" />
+			<index-column name="version" />
 		</index>
 		<index name="id_index">
 			<index-column name="id" />
