@@ -40,25 +40,17 @@ class ConfControlService extends KalturaBaseService
 	 */
 	function updateAction(KalturaConfigMap $map)
 	{
-		$contentArray = json_decode($map->content, true);
-		if(!$contentArray)
+		//get map by values name / hostname
+		$dbMap = ConfMapsPeer::getLatestMap($map->name , $map->relatedHost);
+		if(!$dbMap)
 		{
-			throw new KalturaAPIException(KalturaErrors::CANNOT_PARSE_CONTENT , "Cannot JSON decode content"  ,$map->content );
+			throw new KalturaAPIException(KalturaErrors::MAP_NOT_EXIST );
 		}
-		$map->validateContent($contentArray);
-
-        //Insert value to DB
-		$confControlDb = new kConfControlDb();
-		$confControlDb->setMapName($map->name);
-		$confControlDb->setHostNameRegex($map->relatedHost);
-		try
-		{
-			$confControlDb->update($map->content);
-		}
-		catch (Exception $e)
-		{
-			throw new KalturaAPIException(KalturaErrors::CONF_CONTORL_ERROR,$e->getMessage());
-		}
+		$map->validateContent();
+		$newMapVersion = new ConfMaps();
+		$newMapVersion->addNewMapVersion($dbMap, $map->content);
+		$map->fromObject($newMapVersion);
+		return $map;
 	}
 
 	/**
@@ -72,50 +64,8 @@ class ConfControlService extends KalturaBaseService
 	function listAction(KalturaConfigMapFilter $filter = null)
 	{
 		kApiCache::disableCache();
-		$response = new KalturaConfControlListResponse();
-		if(!$filter->name || $filter->name=='')
-        {
-            return $response;
-        }
-
-		$items = new KalturaConfigMapArray();
-
-		//Check if map exist in file system or in remote cache
-		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
-		$hostList =$remoteCache->getHostList($filter->name ,$filter->relatedHost );
-		if($hostList)
-		{
-			foreach ($hostList as $host)
-			{
-				$confControlDb = new kConfControlDb();
-				$confControlDb->setMapName($filter->name);
-				$confControlDb->setHostNameRegex($host);
-				$mapObject = new KalturaConfigMap();
-				$mapObject->name = $filter->name;
-				$mapObject->relatedHost = $host;
-				$mapObject->sourceLocation = KalturaConfMapSourceLocation::DB;
-				$mapObject->content = $confControlDb->getMapContent();
-				$mapObject->version = $confControlDb->getMapVersionInCache();
-				$mapObject->isEditable = true;
-				$items->insert($mapObject);
-			}
-		}
-		else		//Check in file system
-        {
-			$fileSystemCache = kCacheConfFactory::getInstance(kCacheConfFactory::FILE_SYSTEM);
-			$fileNames = $fileSystemCache->getIniFilesList($filter->name ,$filter->relatedHost);
-			foreach ($fileNames as $fileName)
-			{
-				$mapObject = new KalturaConfigMap();
-			    list($mapObject->name , $mapObject->relatedHost ,$mapObject->content )  = $fileSystemCache->getMapInfo($fileName);
-				$mapObject->sourceLocation = KalturaConfMapSourceLocation::FS;
-				$items->insert($mapObject);
-				$mapObject->version = 1;
-				$mapObject->isEditable = false;
-			}
-        }
-		$response->objects = $items;
-		$response->totalCount = count($items);
+		$pager = new KalturaFilterPager();
+		$response = $filter->getListResponse($pager);
 		return $response;
 	}
 
@@ -128,44 +78,10 @@ class ConfControlService extends KalturaBaseService
 	 */
 	function getAction(KalturaConfigMapFilter $filter)
 	{
-		$confMap = $this->getMap($filter->name , $filter->relatedHost);
+		$confMap = $filter->getMap();
 		return $confMap;
 	}
 
-	/**
-	 * @param $mapName
-	 * @param $hostPatern
-	 *
-	 * @return KalturaConfigMap
-	 */
-	protected function getMap($mapName , $hostPatern)
-	{
-		$confMap = new KalturaConfigMap();
-		$hostPatern = str_replace('*','#', $hostPatern);
-		/*  @var kRemoteMemCacheConf $remoteCache  */
-		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
-		$map = $remoteCache->loadByHostName($mapName, $hostPatern);
-		if($map)
-		{
-			$confMap->sourceLocation = KalturaConfMapSourceLocation::DB;
-			$confMap->isEditable = true;
-		}
-		else
-		{
-			/*  @var kFileSystemConf $confFs  */
-			$confFs = kCacheConfFactory::getInstance(kCacheConfFactory::FILE_SYSTEM);
-			$map = $confFs->loadByHostName($mapName, $hostPatern);
-			$confMap->sourceLocation = KalturaConfMapSourceLocation::FS;
-			$confMap->isEditable = false;
-		}
-		if(!$map)
-		{
-			return null;
-		}
-		$confMap->name = $mapName;
-		$confMap->content = json_encode($map);
 
-		return $confMap;
-	}
 
 }

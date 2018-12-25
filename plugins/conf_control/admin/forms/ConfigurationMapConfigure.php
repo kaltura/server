@@ -87,6 +87,9 @@ class Form_ConfigurationMapConfigure extends ConfigureForm
 	{
 		// reset readonly attributes
 		$configurationItem->lastUpdate = null;
+		$configurationItem->version = null;
+		$configurationItem->isEditable = null;
+		$configurationItem->sourceLocation = null;
 	}
 
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)

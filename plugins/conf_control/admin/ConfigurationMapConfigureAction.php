@@ -50,7 +50,6 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 	 * @param $action
 	 * @param $configurationMapName
 	 * @param $configurationMapHost
-	 * @param $configurationMapContent
 	 * @return Form_ConfigurationMapConfigure
 	 */
 	protected function handleExistingConfigurationItem($action, $configurationMapName, $configurationMapHost)
@@ -58,8 +57,8 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 		$request = $action->getRequest();
 		$configurationPluginClient = Kaltura_Client_ConfControl_Plugin::get($this->client);
 		$configurationMapFilter = new Kaltura_Client_ConfControl_Type_ConfigMapFilter();
-		$configurationMapFilter->name= $configurationMapName;
-		$configurationMapFilter->relatedHost = $configurationMapHost;
+		$configurationMapFilter->nameEqual= $configurationMapName;
+		$configurationMapFilter->relatedHostEqual = $configurationMapHost;
 		$results = $configurationPluginClient->confControl->listAction($configurationMapFilter);
 		$form = null;
 		foreach ($results->objects as $configurationMap )

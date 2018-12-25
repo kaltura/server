@@ -35,11 +35,11 @@ class ConfigurationMapListAction extends KalturaApplicationPlugin implements IKa
 
 		if($configurationMapName)
 		{
-			$configurationMapFilter->name = $configurationMapName;
+			$configurationMapFilter->nameEqual = $configurationMapName;
 		}
 	    if($hostName)
 	    {
-		   $configurationMapFilter->relatedHost = $hostName;
+		   $configurationMapFilter->relatedHostEqual = $hostName;
 	    }
 
 		$client = Infra_ClientHelper::getClient();

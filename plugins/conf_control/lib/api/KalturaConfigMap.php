@@ -67,9 +67,38 @@ class KalturaConfigMap extends KalturaObject implements IRelatedFilterable
 	 */
 	public $sourceLocation;
 
-	public function validateContent(array $content)
+	/**
+	 * @var KalturaConfMapSourceLocation
+	 * @insertonly
+	 */
+	public $remarks;
+
+
+	private static $map_between_objects = array
+	(
+		"name" => "mapName",
+		"relatedHost" => "hostName",
+		"status",
+		"version",
+		"lastUpdate" => "createdAt",
+		"remarks",
+		"content"
+	);
+
+	public function getMapBetweenObjects()
 	{
-		$initStr = iniUtils::arrayToIniString($content);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+
+
+	public function validateContent()
+	{
+		$contentArray = json_decode($this->content, true);
+		if(!$contentArray)
+		{
+			throw new KalturaAPIException(KalturaErrors::CANNOT_PARSE_CONTENT , "Cannot JSON decode content"  ,$this->content );
+		}
+		$initStr = iniUtils::arrayToIniString($contentArray);
 		if(!parse_ini_string($initStr,true))
 		{
 			throw new KalturaAPIException(KalturaErrors::CANNOT_PARSE_CONTENT, "Cannot parse INI", $initStr);

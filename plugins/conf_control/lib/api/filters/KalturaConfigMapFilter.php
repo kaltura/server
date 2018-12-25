@@ -8,41 +8,31 @@ class KalturaConfigMapFilter extends KalturaConfigMapBaseFilter
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$response = new KalturaConfControlListResponse();
-		if(!$this->name || $this->name=='')
+		if(!$this->nameEqual || $this->nameEqual=='')
 		{
 			return $response;
 		}
-
 		$items = new KalturaConfigMapArray();
 
 		//Check if map exist in file system or in remote cache
 		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
-		$hostList =$remoteCache->getHostList($this->name ,$this->relatedHost );
+		$hostList =$remoteCache->getHostList($this->nameEqual ,$this->relatedHostEqual );
 		if($hostList)
 		{
 			foreach ($hostList as $host)
 			{
-				$confControlDb = new kConfControlDb();
-				$confControlDb->setMapName($this->name);
-				$confControlDb->setHostNameRegex($host);
-
-				ConfMapsPeer::
-				//TODO from object - from DB
-
-				$mapObject = new KalturaConfigMap();
-				$mapObject->name = $this->name;
-				$mapObject->relatedHost = $host;
-				$mapObject->sourceLocation = KalturaConfMapSourceLocation::DB;
-				$mapObject->content = $confControlDb->getMapContent();
-				$mapObject->version = $confControlDb->getMapVersionInCache();
-				$mapObject->isEditable = true;
-				$items->insert($mapObject);
+				$dbMapObject = ConfMapsPeer::getLatestMap($this->nameEqual,$host);
+				$apiMapObject = new KalturaConfigMap();
+				$apiMapObject->fromObject($dbMapObject);
+				$apiMapObject->sourceLocation = KalturaConfMapSourceLocation::DB;
+				$apiMapObject->isEditable = true;
+				$items->insert($apiMapObject);
 			}
 		}
 		else		//Check in file system
 		{
 			$fileSystemCache = kCacheConfFactory::getInstance(kCacheConfFactory::FILE_SYSTEM);
-			$fileNames = $fileSystemCache->getIniFilesList($this->name ,$filter->relatedHost);
+			$fileNames = $fileSystemCache->getIniFilesList($this->nameEqual ,$this->relatedHostEqual);
 			foreach ($fileNames as $fileName)
 			{
 				$mapObject = new KalturaConfigMap();
@@ -55,6 +45,7 @@ class KalturaConfigMapFilter extends KalturaConfigMapBaseFilter
 		}
 		$response->objects = $items;
 		$response->totalCount = count($items);
+		return $response;
 	}
 	public function getCoreFilter()
 	{
@@ -67,10 +58,10 @@ class KalturaConfigMapFilter extends KalturaConfigMapBaseFilter
 	public function getMap()
 	{
 		$confMap = new KalturaConfigMap();
-		$hostPatern = str_replace('*','#', $hostPatern);
+		$hostPatern = str_replace('*','#', $this->relatedHostEqual);
 		/*  @var kRemoteMemCacheConf $remoteCache  */
 		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
-		$map = $remoteCache->loadByHostName($this->mapName, $this->hostPatern);
+		$map = $remoteCache->loadByHostName($this->nameEqual, $hostPatern);
 		if(!empty($map))
 		{
 			$confMap->sourceLocation = KalturaConfMapSourceLocation::DB;
@@ -80,7 +71,7 @@ class KalturaConfigMapFilter extends KalturaConfigMapBaseFilter
 		{
 			/*  @var kFileSystemConf $confFs  */
 			$confFs = kCacheConfFactory::getInstance(kCacheConfFactory::FILE_SYSTEM);
-			$map = $confFs->loadByHostName($this->mapName, $this->hostPatern);
+			$map = $confFs->loadByHostName($this->nameEqual, $hostPatern);
 			$confMap->sourceLocation = KalturaConfMapSourceLocation::FS;
 			$confMap->isEditable = false;
 		}
@@ -88,7 +79,7 @@ class KalturaConfigMapFilter extends KalturaConfigMapBaseFilter
 		{
 			return null;
 		}
-		$confMap->name = $this->mapName;
+		$confMap->name = $this->nameEqual;
 		$confMap->content = json_encode($map);
 
 		return $confMap;

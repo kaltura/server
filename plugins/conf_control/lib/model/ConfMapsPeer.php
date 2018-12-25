@@ -27,11 +27,14 @@ class ConfMapsPeer extends BaseConfMapsPeer {
 		self::$s_criteria_filter->setFilter($c);
 	}
 
-	public static function getLatestMap($mapName , $hostNameRegex)
+	public static function getLatestMap($mapName , $hostNameRegex = null)
 	{
 		$c = new criteria();
 		$c->add(self::MAP_NAME ,$mapName );
-		$c->add(self::HOST_NAME ,$hostNameRegex );
+		if($hostNameRegex)
+		{
+			$c->add(self::HOST_NAME, $hostNameRegex);
+		}
 		$c->addDescendingOrderByColumn(self::VERSION);
 		return self::doSelectOne($c);
 	}
