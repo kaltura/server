@@ -20,6 +20,7 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 		$mapName = $this->_getParam('configuration_map_name');
 		$mapHost = $this->_getParam('configuration_map_host');
 		$isNew = $this->_getParam('is_new') === 'true' ? true : false;
+		$isView = $this->_getParam('is_view') === 'true' ? true : false;
 		$action->view->errMessage = null;
 		$action->view->form = '';
 		$form = null;
@@ -29,7 +30,7 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 			if ($isNew)
 				$form = $this->handleNewConfigurationItem($action);
 			else
-				$form = $this->handleExistingConfigurationItem($action, $mapName, $mapHost);
+				$form = $this->handleExistingConfigurationItem($action, $mapName, $mapHost, $isView);
 		} catch (Exception $e)
 		{
 			KalturaLog::err($e->getMessage() . "\n" . $e->getTraceAsString());
@@ -50,26 +51,41 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 	 * @param $action
 	 * @param $configurationMapName
 	 * @param $configurationMapHost
+	 * @param $configurationMapContent
+	 * @param $isView
 	 * @return Form_ConfigurationMapConfigure
 	 */
-	protected function handleExistingConfigurationItem($action, $configurationMapName, $configurationMapHost)
+	protected function handleExistingConfigurationItem($action, $configurationMapName, $configurationMapHost, $isView = false)
 	{
+		$form = null;
 		$request = $action->getRequest();
+
 		$configurationPluginClient = Kaltura_Client_ConfControl_Plugin::get($this->client);
 		$configurationMapFilter = new Kaltura_Client_ConfControl_Type_ConfigMapFilter();
 		$configurationMapFilter->nameEqual= $configurationMapName;
 		$configurationMapFilter->relatedHostEqual = $configurationMapHost;
-		$results = $configurationPluginClient->confControl->listAction($configurationMapFilter);
-		$form = null;
-		foreach ($results->objects as $configurationMap )
+		if ($isView)
 		{
-			/* @var Kaltura_Client_ConfControl_Type_ConfigMap $configurationMap */
-			if ( $configurationMap->name == $configurationMapName && $configurationMap->relatedHost== $configurationMapHost )
+			$configurationMap = $configurationPluginClient->confControl->get($configurationMapFilter);
+			if ($configurationMap)
 			{
 				$form = $this->initForm($action, $configurationMap);
-				break;
 			}
 		}
+		else
+		{
+			$results = $configurationPluginClient->confControl->listAction($configurationMapFilter);
+			foreach ($results->objects as $configurationMap )
+			{
+				/* @var Kaltura_Client_ConfControl_Type_ConfigMap $configurationMap */
+				if ( $configurationMap->name == $configurationMapName && $configurationMap->relatedHost== $configurationMapHost )
+				{
+					$form = $this->initForm($action, $configurationMap);
+					break;
+				}
+			}
+		}
+
 		if ($form)
 		{
 			if ($request->isPost())
@@ -79,7 +95,7 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 			else
 			{
 				$content = json_decode($configurationMap->content, true);
-				if ($content)
+				if (!is_null($content))
 				{
 					$ini = new Zend_Config($content, true);
 					$configurationMap->content = $this->iniToString($ini->toArray());
@@ -179,6 +195,10 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 		if ($configurationMap)
 		{
 			$form = new Form_ConfigurationMapConfigure(true, $configurationMap->isEditable);
+			if(!$configurationMap->isEditable)
+			{
+				$action->view->blockSave = true;
+			}
 			$urlParams['configuration_map_name'] = $configurationMap->name;
 			$urlParams['configuration_map_host'] = $configurationMap->relatedHost;
 
