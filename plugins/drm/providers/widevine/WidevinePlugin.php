@@ -322,7 +322,7 @@ class WidevinePlugin extends BaseDrmPlugin implements IKalturaEnumerator, IKaltu
 
 	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
 	{
-		if ($entryPlayingDataParams->getType() == self::getPluginName() && self::shouldContributeToPlaybackContext($contextDataHelper->getContextDataResult()->getActions()) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
+		if ($entryPlayingDataParams->getType() == self::BASE_PLUGIN_NAME && self::shouldContributeToPlaybackContext($contextDataHelper->getContextDataResult()->getActions()) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
 		{
 			foreach ($entryPlayingDataParams->getFlavors() as $flavor)
 			{
