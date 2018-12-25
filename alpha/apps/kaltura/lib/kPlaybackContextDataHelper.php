@@ -19,9 +19,11 @@ class kPlaybackContextDataHelper
 	private $remoteFlavorsByDc = array();
 	private $remoteDeliveryProfileIds = array();
 	private $remoteDcByDeliveryProfile = array();
-
+	private $captionAssetItems = array();
 	private $localPlaybackSources = array();
 	private $remotePlaybackSources = array();
+
+	const SERVE_WEBVTT_URL_PREFIX = '/api_v3/index.php/service/caption_captionasset/action/serveWebVTT';
 
 	public function getPlaybackContext()
 	{
@@ -69,11 +71,13 @@ class kPlaybackContextDataHelper
 			$this->createFlavorsMapping($dbEntry);
 			$this->constructLocalPlaybackSources($dbEntry, $contextDataHelper);
 			$this->constructRemotePlaybackSources($dbEntry, $contextDataHelper);
+			$this->constructCaptionAssetUrls($dbEntry);
 		}
 
 		$this->setPlaybackSources($dbEntry->getPartner()->getStorageServePriority());
 		$this->filterFlavorsBySources();
 		$this->playbackContext->setFlavorAssets($this->flavorAssets);
+		$this->playbackContext->setCaptionAssets($this->captionAssetItems);
 	}
 
 	/**
@@ -446,7 +450,37 @@ class kPlaybackContextDataHelper
 			}
 		}
 	}
+	/**
+	 * @param entry $dbEntry
+	 * @return array
+	 */
+	private function constructCaptionAssetUrls(entry $dbEntry)
+	{
+		$captionAssets = assetPeer::retrieveByEntryId($dbEntry->getId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
 
+		foreach($captionAssets as $assetDb)
+		{
+			$url = null;
+			$webVttUrl = null;
+			/** @var CaptionAsset $assetDb */
+			if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
+			{
+				continue;
+			}
+
+			try
+			{
+				$webVttUrl = myPartnerUtils::getCdnHost($assetDb->getPartnerId()) . self::SERVE_WEBVTT_URL_PREFIX . '/captionAssetId/' . $assetDb->getId() . '/segmentDuration/-1/version/' . $assetDb->getVersion() . '/captions.vtt';
+				$url = $assetDb->getDownloadUrl(true, false, null, null, false);
+
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::debug("Could not get Download url for caption asset " . $assetDb->getId() . $e->getMessage());
+			}
+			$this->captionAssetItems[] = new kPlaybackCaption($assetDb->getLabel(), $assetDb->getContainerFormat(), $assetDb->getLanguage(), $assetDb->getDefault(), $webVttUrl, $url);
+		}
+	}
 
 	private function getTagsByFormat($format)
 	{

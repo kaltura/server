@@ -11,6 +11,11 @@ class kPlaybackContext {
 	protected $sources;
 
 	/**
+	 * @var array<kPlaybackCaption>
+	 */
+	protected $captionAssets;
+
+	/**
 	 * @var array
 	 */
 	protected $flavorAssets;
@@ -58,6 +63,22 @@ class kPlaybackContext {
 	public function setFlavorAssets($flavorAssets)
 	{
 		$this->flavorAssets = $flavorAssets;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getCaptionAssets()
+	{
+		return $this->captionAssets;
+	}
+
+	/**
+	 * @param array $captionAssetsItems
+	 */
+	public function setCaptionAssets($captionAssetsItems)
+	{
+		$this->captionAssets = $captionAssetsItems;
 	}
 
 	/**

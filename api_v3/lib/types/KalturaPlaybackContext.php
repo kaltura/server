@@ -9,7 +9,12 @@ class KalturaPlaybackContext extends KalturaObject{
 	 * @var KalturaPlaybackSourceArray
 	 */
 	public $sources;
-    
+
+	/**
+	 * @var KalturaPlaybackCaptionArray
+	 */
+	public $captionAssets;
+
 	/**
 	 * @var KalturaFlavorAssetArray
 	 */
@@ -29,6 +34,7 @@ class KalturaPlaybackContext extends KalturaObject{
 
 	private static $mapBetweenObjects = array
 	(
+		'captionAssets',
 		'flavorAssets',
 		'sources',
 		'messages',
