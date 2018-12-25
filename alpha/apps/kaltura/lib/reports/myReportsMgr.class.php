@@ -694,7 +694,6 @@ class myReportsMgr
 		$start = microtime(true);
 		try
 		{
-			$link = self::getConnection();
 			$add_search_text = false;
 			
                         $str_object_ids = $object_ids;
@@ -736,6 +735,8 @@ class myReportsMgr
 				throw new kCoreException("Cannot find sql for [$report_type] [$report_flavor] at [$file_path]", kCoreException::QUERY_NOT_FOUND);
 			}
 			
+			$link = self::getConnection();
+
 			$entryFilter = new entryFilter();
 			$entryFilter->setPartnerSearchScope($partner_id);
 			$shouldSelectFromSearchEngine = false;
