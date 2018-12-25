@@ -163,7 +163,7 @@ class DrmPlugin extends BaseDrmPlugin implements IKalturaServices, IKalturaAdmin
 
 	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
 	{
-		if ( $entryPlayingDataParams->getType() == 'drm' && self::shouldContributeToPlaybackContext($contextDataHelper->getContextDataResult()->getActions()) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
+		if ( $entryPlayingDataParams->getType() == self::getPluginName() && self::shouldContributeToPlaybackContext($contextDataHelper->getContextDataResult()->getActions()) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()))
 		{
 			$dbProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(KalturaDrmProviderType::CENC, kCurrentContext::getCurrentPartnerId());
 			if ($dbProfile)

@@ -645,14 +645,16 @@ class kPlaybackContextDataHelper
 	/* @param entry $dbEntry
 	 * @return array
 	 */
-	private static function getPlaybackCaptionsData(entry $dbEntry, $contextDataHelper)
+	protected static function getPlaybackCaptionsData(entry $dbEntry, $contextDataHelper)
 	{
 		$playbackContextDataParams = new kPlaybackContextDataParams();
-		$playbackContextDataParams->setType('captions');
+		$playbackContextDataParams->setType('caption');
 		$result = new kPlaybackContextDataResult();
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaPlaybackContextDataContributor');
 		foreach ($pluginInstances as $pluginInstance)
+		{
 			$pluginInstance->contributeToPlaybackContextDataResult($dbEntry, $playbackContextDataParams, $result, $contextDataHelper);
+		}
 
 		return $result->getPlaybackCaptions();
 	}

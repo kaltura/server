@@ -629,7 +629,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
 	{
-		if ($entryPlayingDataParams->getType() == 'captions')
+		if ($entryPlayingDataParams->getType() == self::getPluginName())
 		{
 			$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), array(asset::ASSET_STATUS_READY));
 			$playbackCaptions = array();
@@ -641,15 +641,19 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 				try
 				{
-					$webVttUrl = myPartnerUtils::getCdnHost($assetDb->getPartnerId()) . self::SERVE_WEBVTT_URL_PREFIX . '/captionAssetId/' . $assetDb->getId() . '/segmentDuration/-1/version/' . $assetDb->getVersion() . '/captions.vtt';
-					$url = $assetDb->getDownloadUrl(true, false, null, null, false);
 
+					$url = $assetDb->getDownloadUrl(true, false, null, null, false);
+					if ($url)
+					{
+						$webVttUrl = myPartnerUtils::getCdnHost($assetDb->getPartnerId()) . self::SERVE_WEBVTT_URL_PREFIX . '/captionAssetId/' . $assetDb->getId() . '/segmentDuration/-1/version/' . $assetDb->getVersion() . '/captions.vtt';
+						$playbackCaptions [] = new kCaptionPlaybackPluginData($assetDb->getLabel(), $assetDb->getContainerFormat(), $assetDb->getLanguage(), $assetDb->getDefault(), $webVttUrl, $url);
+					}
 				}
 				catch (Exception $e)
 				{
 					KalturaLog::debug("Could not get Download url for caption asset " . $assetDb->getId() . $e->getMessage());
 				}
-				$playbackCaptions []= new kCaptionPlaybackPluginData($assetDb->getLabel(), $assetDb->getContainerFormat(), $assetDb->getLanguage(), $assetDb->getDefault(), $webVttUrl, $url);
+
 			}
 			$result->setPlaybackCaptions($playbackCaptions);
 		}
