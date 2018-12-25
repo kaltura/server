@@ -2754,13 +2754,17 @@ class kKavaReportsMgr extends kKavaBase
 		return array($type_str => $graph);
 	}
 
-	protected static function getTransformEnrichDef($report_def, $dimension)
+	protected static function getTransformEnrichDef($report_def)
 	{
 		$enrich_defs = self::getEnrichDefs($report_def);
+		$dim = reset($report_def[self::REPORT_DIMENSION_HEADERS]);
 		foreach ($enrich_defs as $enrich_def)
 		{
-			$dim = $enrich_def[self::REPORT_ENRICH_OUTPUT];
-			if ($report_def[self::REPORT_DIMENSION_MAP][$dim] === $dimension)
+			if (is_array($enrich_def[self::REPORT_ENRICH_OUTPUT]))
+			{
+				continue;
+			}
+			if ($dim == $enrich_def[self::REPORT_ENRICH_OUTPUT])
 			{
 				return $enrich_def;
 			}
@@ -2811,13 +2815,13 @@ class kKavaReportsMgr extends kKavaBase
 		case self::GRAPH_MULTI_BY_NAME:				
 			$dimension = self::getDimension($report_def, $object_ids);
 			$dimension = is_array($dimension) ? reset($dimension) : $dimension;
-			$transform_enrich_def = self::getTransformEnrichDef($report_def, $dimension);
+			$transform_enrich_def = self::getTransformEnrichDef($report_def);
 			$query = self::getGroupByReport($data_source, $partner_id, $intervals, $granularity_def, array($dimension), $metrics, $druid_filter);
 			break;
 				
 		default:
 			$dimension = null;
-			$transform = null;
+			$transform_enrich_def = null;
 			$query = self::getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity_def, $metrics, $druid_filter);
 			break;
 		}
@@ -2830,25 +2834,28 @@ class kKavaReportsMgr extends kKavaBase
 			$graph_metrics_to_headers[$column] = self::$metrics_to_headers[$column];
 		}
 
-		//collect dimensions to transform
-		$values = array();
-		foreach ($result as $row)
+		if ($transform_enrich_def)
 		{
-			$row_data = $row[self::DRUID_EVENT];
-			$values[$row_data[$dimension]] = true;
-		}
-
-		//transform
-		$enrich_context = isset($transform_enrich_def[self::REPORT_ENRICH_CONTEXT]) ? $transform_enrich_def[self::REPORT_ENRICH_CONTEXT] : null;
-		$transform_map = call_user_func($transform_enrich_def[self::REPORT_ENRICH_FUNC], array_keys($values), $partner_id, $enrich_context);
-
-		//update the result
-		foreach ($result as &$row)
-		{
-			$row_data = $row[self::DRUID_EVENT];
-			if (isset($transform_map[$row_data[$dimension]]))
+			//collect dimensions to transform
+			$values = array();
+			foreach ($result as $row)
 			{
-				$row[self::DRUID_EVENT][$dimension] = $transform_map[$row_data[$dimension]];
+				$dim_value = $row[self::DRUID_EVENT][$dimension];
+				$values[$dim_value] = true;
+			}
+
+			//transform
+			$enrich_context = isset($transform_enrich_def[self::REPORT_ENRICH_CONTEXT]) ? $transform_enrich_def[self::REPORT_ENRICH_CONTEXT] : null;
+			$transform_map = call_user_func($transform_enrich_def[self::REPORT_ENRICH_FUNC], array_keys($values), $partner_id, $enrich_context);
+
+			//update the result
+			foreach ($result as &$row)
+			{
+				$dim_value = $row[self::DRUID_EVENT][$dimension];
+				if (isset($transform_map[$dim_value]))
+				{
+					$row[self::DRUID_EVENT][$dimension] = $transform_map[$dim_value];
+				}
 			}
 		}
 
