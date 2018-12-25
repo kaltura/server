@@ -150,12 +150,9 @@ class categoryFilter extends baseObjectFilter
 		kArray::trim($cats);
 		
 		$categoryFullIdsToIds = array();
-		foreach($cats as $cat)
+		$categories = categoryPeer::retrieveByPKs($cats); //all sub categories and not the category itself
+		foreach($categories as $category)
 		{
-			$category = categoryPeer::retrieveByPK($cat); //all sub categories and not the category itself
-			if(!$category)
-				continue;
-			
 			$categoryFullIdsToIds[] = $category->getFullIds() . '>';
 		}
 
