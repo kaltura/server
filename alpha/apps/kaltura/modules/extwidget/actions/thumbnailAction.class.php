@@ -17,7 +17,7 @@ class thumbnailAction extends sfAction
 	 *
 	 * Needed because some partners add .jpg at the end of the url, it might be added to a real attribute.
 	 */
-	public function getRequestParameter($name, $default = null)
+	public function getRequestParameter($name, $default = null, $regex = null)
 	{
 		$exts = implode('|', self::$extensions);
 	
@@ -25,7 +25,12 @@ class thumbnailAction extends sfAction
 		if(!$val)
 			return $val;
 			
-		return preg_replace("/^(.*)\.($exts)$/", '$1', $val);
+		$val = preg_replace("/^(.*)\.($exts)$/", '$1', $val);
+		if ($regex && !preg_match($regex,$val))
+		{
+			return $default;
+		}
+		return $val;
 	}
 
 	public function getIntRequestParameter($name, $default, $min, $max)
@@ -56,7 +61,7 @@ class thumbnailAction extends sfAction
 		
 		ignore_user_abort();
 		
-		$entry_id = $this->getRequestParameter("entry_id");
+		$entry_id = $this->getRequestParameter("entry_id", null , "/\d_[A-Za-z0-9]{8}/");
 		$widget_id = $this->getRequestParameter("widget_id", 0);
 		$upload_token_id = $this->getRequestParameter("upload_token_id");
 		$version = $this->getIntRequestParameter("version", null, 0, 10000000);
