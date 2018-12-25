@@ -1844,6 +1844,16 @@ class kKavaReportsMgr extends kKavaBase
 	/// common query functions
 	protected static function shouldUseKava($partner_id, $report_type) 
 	{
+		if ($report_type < 0)	// kava custom reports
+		{
+			return true;
+		}
+
+		if (!isset(self::$reports_def[$report_type]))
+		{
+			return false;
+		}
+
 		return kKavaBase::isPartnerAllowed($partner_id, kKavaBase::VOD_DISABLED_PARTNERS);
 	}
 		
