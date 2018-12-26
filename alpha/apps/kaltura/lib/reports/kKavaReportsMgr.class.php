@@ -1288,7 +1288,7 @@ class kKavaReportsMgr extends kKavaBase
 				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'peer' => 'entryPeer',
-					'columns' => array('"NAME"', 'PUSER_ID', '@CREATED_AT'),
+					'columns' => array('NAME', 'PUSER_ID', '@CREATED_AT'),
 				),
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_USERS),
