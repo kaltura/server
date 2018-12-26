@@ -711,7 +711,8 @@ class myEntryUtils
 			if ($dc != kDataCenterMgr::getCurrentDcId ())
 				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( $dc ) );
 		}
-		if ($entry->getType() == entryType::PLAYLIST && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
+		$isStaticPlaylist = ($entry->getType() == entryType::PLAYLIST && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT);
+		if ($isStaticPlaylist)
 		{
 			list($entryIds, $durations, $mediaEntry, $captionFiles) = myPlaylistUtils::executeStitchedPlaylist($entry);
 			$entryLengthInMsec = array_sum($durations);
@@ -862,7 +863,7 @@ class myEntryUtils
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
 					$success = false;
-					if(($multi || $servingVODfromLive || $vid_sec != -1) && $packagerRetries)
+					if(($multi || $servingVODfromLive || $isStaticPlaylist) && $packagerRetries)
 					{
 						list($picWidth, $picHeight) = $shouldResizeByPackager ? array($width, $height) : array(null, null);
 						$destPath = $shouldResizeByPackager ? $capturedThumbPath . uniqid() : $capturedThumbPath;
