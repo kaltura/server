@@ -110,6 +110,17 @@ class kCategoryEntryCondition extends kCondition
 			return false;
 		}
 		
+		$categoryUserPermission = $this->getCategoryUserPermission();
+		$comparisonOperator = $this->getComparison();
+		
+		if(!isset($categoryUserPermission) && !isset($comparisonOperator))
+		{
+			//By definition if the rule does not provide comparison level and user permission than it mean that at task
+			// should be created without the restriction of the user being a member of the category
+			KalturaLog::debug("Comparison and permission level are not defined by rule, task should be created for all users");
+			return true;
+		}
+		
 		$dbCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($matchingCategoryEntry->getCategoryId(), $matchingCategoryEntry->getCreatorKuserId());
 		if(!$dbCategoryKuser)
 		{
@@ -118,28 +129,27 @@ class kCategoryEntryCondition extends kCondition
 		}
 		
 		$dbUserPermission = $dbCategoryKuser->getPermissionLevel();
-		$ValueToCompareTo = $this->getCategoryUserPermission();
-		switch($this->getComparison())
+		switch($comparisonOperator)
 		{
 			case searchConditionComparison::GREATER_THAN:
-				KalturaLog::debug("Compares field[$dbUserPermission] > value[$ValueToCompareTo]");
-				return ($dbUserPermission > $ValueToCompareTo);
+				KalturaLog::debug("Compares field[$dbUserPermission] > value[$categoryUserPermission]");
+				return ($dbUserPermission > $categoryUserPermission);
 			
 			case searchConditionComparison::GREATER_THAN_OR_EQUAL:
-				KalturaLog::debug("Compares field[$dbUserPermission] >= value[$ValueToCompareTo]");
-				return ($dbUserPermission >= $ValueToCompareTo);
+				KalturaLog::debug("Compares field[$dbUserPermission] >= value[$categoryUserPermission]");
+				return ($dbUserPermission >= $categoryUserPermission);
 			
 			case searchConditionComparison::LESS_THAN:
-				KalturaLog::debug("Compares field[$dbUserPermission] < value[$ValueToCompareTo]");
-				return ($dbUserPermission < $ValueToCompareTo);
+				KalturaLog::debug("Compares field[$dbUserPermission] < value[$categoryUserPermission]");
+				return ($dbUserPermission < $categoryUserPermission);
 			
 			case searchConditionComparison::LESS_THAN_OR_EQUAL:
-				KalturaLog::debug("Compares field[$dbUserPermission] <= value[$ValueToCompareTo]");
-				return ($dbUserPermission <= $ValueToCompareTo);
+				KalturaLog::debug("Compares field[$dbUserPermission] <= value[$categoryUserPermission]");
+				return ($dbUserPermission <= $categoryUserPermission);
 			
 			case searchConditionComparison::EQUAL:
-				KalturaLog::debug("Compares field[$dbUserPermission] == value[$ValueToCompareTo]");
-				return ($dbUserPermission == $ValueToCompareTo);
+				KalturaLog::debug("Compares field[$dbUserPermission] == value[$categoryUserPermission]");
+				return ($dbUserPermission == $categoryUserPermission);
 		}
 		
 		return false;

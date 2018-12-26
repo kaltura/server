@@ -144,7 +144,7 @@ class UiConfService extends KalturaBaseService
 	 *
 	 * @throws APIErrors::INVALID_UI_CONF_ID
 	 */	
-	// TODO - get the new data of uiConf - will help override the parameters withiout needing to call update 
+	// TODO - get the new data of uiConf - will help override the parameters without needing to call update 
 	function cloneAction( $id ) // , KalturaUiConf $_uiConf )
 	{
 		$dbUiConf = uiConfPeer::retrieveByPK( $id );

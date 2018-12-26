@@ -70,7 +70,7 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 		$this->addElement('button', 'newCatalogItem', array(
 			'ignore' => true,
 			'label' => 'Create New',
-			'onclick' => "addNewCatalogItem(0, $('#filterServiceFeature').val(), $('#filterServiceType').val(), $('#filterTurnAroundTime').val())",
+			'onclick' => "addNewCatalogItem($('#filter_input').val(), $('#filterServiceFeature').val(), $('#filterServiceType').val(), $('#filterTurnAroundTime').val())",
 			'decorators' => array('ViewHelper'),
 		));
 	}

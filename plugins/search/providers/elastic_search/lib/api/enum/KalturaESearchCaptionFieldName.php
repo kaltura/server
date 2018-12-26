@@ -10,4 +10,5 @@ class KalturaESearchCaptionFieldName extends KalturaStringEnum
 	const END_TIME = 'end_time';
 	const LANGUAGE = 'language';
 	const LABEL = 'label';
+	const CAPTION_ASSET_ID = 'caption_asset_id';
 }

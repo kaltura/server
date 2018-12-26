@@ -52,7 +52,8 @@ class myReportsMgr
 	const REPORT_TYPE_UNIQUE_USERS_PLAY = 35;
 	const REPORT_TYPE_MAP_OVERLAY_COUNTRY = 36;
 	const REPORT_TYPE_MAP_OVERLAY_REGION = 37;
-	const REPORT_TYPE_APP_DOMAIN_UNIQUE_ACTIVE_USERS = 40;
+	const REPORT_TYPE_TOP_CONTENT_CREATOR = 38;
+        const REPORT_TYPE_APP_DOMAIN_UNIQUE_ACTIVE_USERS = 40;
 
 	const REPORTS_TABLE_MAX_QUERY_SIZE = 20000;
 	const REPORTS_CSV_MAX_QUERY_SIZE = 130000;
@@ -695,7 +696,6 @@ class myReportsMgr
 		$start = microtime(true);
 		try
 		{
-			$link = self::getConnection();
 			$add_search_text = false;
 			
                         $str_object_ids = $object_ids;
@@ -737,6 +737,8 @@ class myReportsMgr
 				throw new kCoreException("Cannot find sql for [$report_type] [$report_flavor] at [$file_path]", kCoreException::QUERY_NOT_FOUND);
 			}
 			
+			$link = self::getConnection();
+
 			$entryFilter = new entryFilter();
 			$entryFilter->setPartnerSearchScope($partner_id);
 			$shouldSelectFromSearchEngine = false;

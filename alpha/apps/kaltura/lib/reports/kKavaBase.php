@@ -131,7 +131,7 @@ class kKavaBase extends kDruidBase
 		return 'coord_' . preg_replace('/[^a-z0-9_]/', '_', strtolower($key));
 	}
 
-	protected static function parseCoordinates($coords)
+	public static function parseCoordinates($coords)
 	{
 		return array_map('floatval', explode('/', $coords));
 	}

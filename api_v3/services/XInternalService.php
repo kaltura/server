@@ -9,7 +9,7 @@ class XInternalService extends KalturaBaseService
 {
 	/**
 	 * Creates new download job for multiple entry ids (comma separated), an email will be sent when the job is done
-	 * This sevice support the following entries: 
+	 * This service support the following entries: 
 	 * - MediaEntry
 	 * 	   - Video will be converted using the flavor params id
 	 *     - Audio will be downloaded as MP3

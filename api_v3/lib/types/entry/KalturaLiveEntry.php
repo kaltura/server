@@ -208,13 +208,9 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 			$this->recordingOptions->fromObject($dbObject->getRecordingOptions());
 		}
 
-		if ($this->isPlayable($dbObject))
+		if ($dbObject->isPlayable())
 		{
-			$this->redirectEntryId = null;
 			kApiCache::setExpiry( kApiCache::REDIRECT_ENTRY_CACHE_EXPIRY );
-		} else
-		{
-			$this->redirectEntryId = $this->recordedEntryId;
 		}
 	}
 
@@ -350,15 +346,6 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 			return true;
 		
 		return false;
-	}
-
-	/**
-	 * @param $dbObject
-	 * @return bool
-	 */
-	protected function isPlayable($dbObject): bool
-	{
-		return $dbObject->getViewMode() == ViewMode::ALLOW_ALL && in_array($dbObject->getLiveStatus(), array(KalturaEntryServerNodeStatus::PLAYABLE, KalturaEntryServerNodeStatus::BROADCASTING, KalturaEntryServerNodeStatus::AUTHENTICATED));
 	}
 
 }
