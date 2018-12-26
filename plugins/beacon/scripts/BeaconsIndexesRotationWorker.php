@@ -20,7 +20,7 @@ class BeaconsIndexesRotationWorker extends ElasticIndexRotationWorker
 			$count++;
 			if ($count >= $this->maxNumberOfIndices)
 			{
-				$aliasesToRemove[]  = new ElasticIndexAlias($index, $this->indexPattern . self::ELASTIC_INDEX_OLD_POSTFIX . $count);
+				$aliasesToRemove[]  = new ElasticIndexAlias($index, $this->indexPattern . kBeacon::ELASTIC_INDEX_OLD_POSTFIX . $count);
 				$aliasesToRemove[] = new ElasticIndexAlias($index, $this->searchAlias);
 			}
 		}
@@ -31,7 +31,7 @@ class BeaconsIndexesRotationWorker extends ElasticIndexRotationWorker
 			$count++;
 			if ($count < $this->maxNumberOfIndices)
 			{
-				$aliasesToAdd[]  = new ElasticIndexAlias($index, $this->indexPattern . self::ELASTIC_INDEX_OLD_POSTFIX . $count);
+				$aliasesToAdd[]  = new ElasticIndexAlias($index, $this->indexPattern . kBeacon::ELASTIC_INDEX_OLD_POSTFIX . $count);
 			}
 		}
 	}
