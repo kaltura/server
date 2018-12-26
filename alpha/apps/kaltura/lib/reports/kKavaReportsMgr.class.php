@@ -1248,7 +1248,8 @@ class kKavaReportsMgr extends kKavaBase
 				'application' => self::DIMENSION_APPLICATION,
 				'domain' => self::DIMENSION_DOMAIN
 			),
-			self::REPORT_METRICS => array(self::METRIC_UNIQUE_USERS)
+			self::REPORT_METRICS => array(self::METRIC_UNIQUE_USERS),
+			self::REPORT_GRAPH_METRICS => array(self::METRIC_UNIQUE_USERS)
 		),
 
 		myReportsMgr::REPORT_TYPE_MAP_OVERLAY_COUNTRY => array(
