@@ -713,8 +713,7 @@ class myEntryUtils
 		}
 		if ($entry->getType() == entryType::PLAYLIST && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
 		{
-			list($entryIds, $durations, $mediaEntry, $captionFiles) =
-				myPlaylistUtils::executeStitchedPlaylist($entry);
+			list($entryIds, $durations, $mediaEntry, $captionFiles) = myPlaylistUtils::executeStitchedPlaylist($entry);
 			$entryLengthInMsec = array_sum($durations);
 		}
 		else
