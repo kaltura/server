@@ -195,7 +195,10 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			if ($header)
 			{
 				$ip = infraRequestUtils::getIpFromHttpHeader($header, $acceptInternalIps, true);
-				$this->getScope()->setOutputVar(kIpAddressCondition::PARTNER_INTERNAL_IP, $ip);
+				if ($ip)
+				{
+					$this->getScope()->setOutputVar(kIpAddressCondition::PARTNER_INTERNAL_IP, $ip);
+				}
 			}
 			else
 			{

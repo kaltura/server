@@ -73,7 +73,10 @@ class kIpAddressCondition extends kMatchCondition
 					kApiCache::COND_IP_RANGE, $this->getStringValues($scope));
 
 			$headerIp = infraRequestUtils::getIpFromHttpHeader($this->getHttpHeader(), $this->getAcceptInternalIps(), true);
-			$this->setExtraProperties(self::PARTNER_INTERNAL_IP, $headerIp);
+			if ($headerIp)
+			{
+				$this->setExtraProperties(self::PARTNER_INTERNAL_IP, $headerIp);
+			}
 			return $headerIp;
 		}
 		
