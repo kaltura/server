@@ -191,8 +191,20 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			// get the ip the tree was optimized for
 			$header = $ipTree[self::IP_TREE_HEADER];
 			$acceptInternalIps = $ipTree[self::IP_TREE_ACCEPT_INTERNAL_IPS];
-			$ip = $header ? infraRequestUtils::getIpFromHttpHeader($header, $acceptInternalIps, true) : infraRequestUtils::getRemoteAddress();
-		
+			$ip = null;
+			if ($header)
+			{
+				$ip = infraRequestUtils::getIpFromHttpHeader($header, $acceptInternalIps, true);
+				if ($ip)
+				{
+					$this->getScope()->setOutputVar(kIpAddressCondition::PARTNER_INTERNAL_IP, $ip);
+				}
+			}
+			else
+			{
+				$ip = infraRequestUtils::getRemoteAddress();
+			}
+
 			// find relevant rules and add the rules the tree didn't optimize
 			$values = kIpAddressUtils::traverseIpTree($ip, $ipTree[self::IP_TREE_TREE]);
 				
@@ -214,7 +226,6 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			if (count($filteredRules) && $header)
 			{
 				$this->getScope()->setOutputVar(kIpAddressCondition::PARTNER_INTERNAL, true);
-				$this->getScope()->setOutputVar(kIpAddressCondition::PARTNER_INTERNAL_IP, $ip);
 			}
 		
 			// use + and not array_merge because the arrays have numerical indexes
