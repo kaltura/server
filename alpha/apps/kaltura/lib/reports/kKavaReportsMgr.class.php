@@ -2025,16 +2025,16 @@ class kKavaReportsMgr extends kKavaBase
 		if (isset($report_def[self::REPORT_DIMENSION_MAP]))
 		{
 			$dimension_map = $report_def[self::REPORT_DIMENSION_MAP];
-			$dimensions = array_values(array_unique($dimension_map));
-			$report_def[self::REPORT_DIMENSION] = count($dimensions) == 1 ? reset($dimensions) : $dimensions;
+			$dimensions = array_unique($dimension_map);
+			$report_def[self::REPORT_DIMENSION] = count($dimensions) == 1 ? reset($dimensions) : array_values($dimensions);
 			$report_def[self::REPORT_DIMENSION_HEADERS] = array_keys($dimension_map);
 		}
 
 		if (isset($report_def[self::REPORT_DRILLDOWN_DIMENSION_MAP]))
 		{
 			$drilldown_dimension_map = $report_def[self::REPORT_DRILLDOWN_DIMENSION_MAP];
-			$drilldown_dimensions = array_values(array_unique($drilldown_dimension_map));
-			$report_def[self::REPORT_DRILLDOWN_DIMENSION] = count($drilldown_dimensions) == 1 ? reset($drilldown_dimensions) : $drilldown_dimensions;
+			$drilldown_dimensions = array_unique($drilldown_dimension_map);
+			$report_def[self::REPORT_DRILLDOWN_DIMENSION] = count($drilldown_dimensions) == 1 ? reset($drilldown_dimensions) : array_values($drilldown_dimensions);
 			$report_def[self::REPORT_DRILLDOWN_DIMENSION_HEADERS] = array_keys($drilldown_dimension_map);
 		}
 
