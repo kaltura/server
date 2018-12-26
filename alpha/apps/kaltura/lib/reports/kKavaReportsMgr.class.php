@@ -1284,12 +1284,18 @@ class kKavaReportsMgr extends kKavaBase
 				'created_at' => self::DIMENSION_ENTRY_ID,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => array('entry_name', 'creator_name', 'created_at'),
-				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
-				self::REPORT_ENRICH_CONTEXT => array(
-					'peer' => 'entryPeer',
-					'columns' => array('NAME', 'PUSER_ID', '@CREATED_AT'),
+				array(
+					self::REPORT_ENRICH_OUTPUT => array('entry_name', 'creator_name', 'created_at'),
+					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'peer' => 'entryPeer',
+						'columns' => array('NAME', 'KUSER_ID', '@CREATED_AT'),
+					)
 				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => array('creator_name'),
+					self::REPORT_ENRICH_FUNC => 'self::getUserScreenNameWithFallback'
+				)
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_USERS),
 			self::REPORT_FORCE_TOTAL_COUNT => true,
