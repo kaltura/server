@@ -39,6 +39,7 @@ class kBeacon
 	const ELASTIC_INDEX_KEY = '_index';
 	const ELASTIC_INDEX_TYPE_KEY = '_type';
 	const ELASTIC_DOCUMENT_ID_KEY = '_id';
+	const ELASTIC_INDEX_OLD_POSTFIX = '_old';
 	
 	const FIELD_UPDATED_AT = 'updated_at';
 	const FIELD_RELATED_OBJECT_TYPE = 'related_object_type';
@@ -145,7 +146,46 @@ class kBeacon
 	{
 		return $this->updatedAt;
 	}
-	
+
+	protected function getDeleteFromOldIndexObjectsJson($docId)
+	{
+		$deleteFromOldIndexObjects = array();
+		$oldIndexNames = $this->getOldIndexesName();
+		foreach($oldIndexNames as $oldIndexName)
+		{
+			$deleteFromOldIndexObject = array();
+			$deleteFromOldIndexObject[self::ELASTIC_DOCUMENT_ID_KEY] = $docId;
+			$deleteFromOldIndexObject[self::ELASTIC_ACTION_KEY] = self::ELASTIC_DELETE_ACTION_VALUE;
+			$deleteFromOldIndexObject[self::ELASTIC_INDEX_KEY] = self::$indexNameByBeaconObjectType[$oldIndexName];
+			$deleteFromOldIndexObject[self::ELASTIC_INDEX_TYPE_KEY] = self::$indexTypeByBeaconObjectType[$this->relatedObjectType];
+
+			$deleteFromOldIndexObjects[] = json_encode($deleteFromOldIndexObject);
+		}
+
+
+		return $deleteFromOldIndexObjects;
+	}
+
+	protected function getOldIndexesName()
+	{
+		$oldIndexesNames = array();
+		$beaconElasticConfig = kConf::get('beacon', 'elastic');
+		if(!$beaconElasticConfig)
+		{
+			throw new KalturaAPIException("Missing beacon configuration");
+		}
+
+		$maxNumberOfIndices = isset($beaconElasticConfig['maxNumberOfIndices']) ? $beaconElasticConfig['maxNumberOfIndices'] : 1;
+
+		$indexName = self::$indexNameByBeaconObjectType[$this->relatedObjectType];
+		for($i = 1; $i < $maxNumberOfIndices; $i++ )
+		{
+			$oldIndexesNames[] = $indexName . self::ELASTIC_INDEX_OLD_POSTFIX . $i;
+		}
+
+		return $oldIndexesNames;
+	}
+
 	public function index($shouldLog = false, $queueProvider = null)
 	{
 		kApiCache::disableConditionalCache();
@@ -160,6 +200,8 @@ class kBeacon
 		
 		//Modify base object to index to State 
 		$stateIndexObjectJson = $this->getIndexObjectForState($indexBaseObject);
+
+		$this->deleteItemsFromOldIndex($stateIndexObjectJson[self::ELASTIC_DOCUMENT_ID_KEY], $queueProvider);
 		$queueProvider->send(self::BEACONS_QUEUE_NAME, $stateIndexObjectJson);
 		
 		//Sent to log index of requested
@@ -171,7 +213,17 @@ class kBeacon
 		
 		return true;
 	}
-	
+
+
+	public function deleteItemsFromOldIndex($docId, $queueProvider)
+	{
+		$deleteFromOldIndexObjectsJson = $this->getDeleteFromOldIndexObjectsJson($docId);
+		foreach($deleteFromOldIndexObjectsJson as $deleteFromOldIndexObjectJson)
+		{
+			$queueProvider->send(self::BEACONS_QUEUE_NAME, $deleteFromOldIndexObjectJson);
+		}
+	}
+
 	private function getQueueProvider()
 	{
 		$constructorArgs = array();
