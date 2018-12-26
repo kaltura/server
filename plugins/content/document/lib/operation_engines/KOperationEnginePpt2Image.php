@@ -40,7 +40,8 @@ class KOperationEnginePpt2Image extends KOperationEngineDocument
 		$realInFilePath = realpath($inFilePath);
 
 		$errorMsg = $this->checkFileType($realInFilePath, $this->SUPPORTED_FILE_TYPES);
-		if(!is_null($errorMsg)){
+		if(!is_null($errorMsg))
+		{
 			$this->data->engineMessage = $errorMsg;
 			throw new KOperationEngineException($errorMsg);
 		}
