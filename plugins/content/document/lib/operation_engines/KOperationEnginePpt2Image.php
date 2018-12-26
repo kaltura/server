@@ -13,8 +13,14 @@ class KOperationEnginePpt2Image extends KOperationEngineDocument
 	const LIST_XML_LABEL_NAME = 'name';
 	const LIST_XML_ATTRIBUTE_METADATA = 'metadata';
 	const LIST_XML_ATTRIBUTE_COUNT = 'count';
-	
-	
+
+
+	// List of supported file types
+	private $SUPPORTED_FILE_TYPES = array(
+		'PDF document',
+		'Microsoft',
+	);
+
 	protected function createOutputDirectory() {
 		if(!kFile::fullMkfileDir($this->outFilePath)){
 			throw new KOperationEngineException('failed to create ['.$this->outFilePath.'] directory');
@@ -32,7 +38,14 @@ class KOperationEnginePpt2Image extends KOperationEngineDocument
 	{
 		$this->createOutputDirectory();
 		$realInFilePath = realpath($inFilePath);
-		
+
+		$errorMsg = $this->checkFileType($realInFilePath, $this->SUPPORTED_FILE_TYPES);
+		if(!is_null($errorMsg))
+		{
+			$this->data->engineMessage = $errorMsg;
+			throw new KOperationEngineException($errorMsg);
+		}
+
 		parent::operate($operator, $realInFilePath, $configFilePath);
 		
 		$this->createDirDescriber($this->outFilePath, self::IMAGES_LIST_XML_NAME);
