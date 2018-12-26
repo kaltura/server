@@ -4,6 +4,7 @@
  */
 class BaseDrmPlugin extends KalturaPlugin
 {
+	const BASE_PLUGIN_NAME = 'drm';
 	/**
 	 * @return string the name of the plugin
 	 */
