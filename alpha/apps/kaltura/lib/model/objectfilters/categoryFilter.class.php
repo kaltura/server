@@ -144,19 +144,24 @@ class categoryFilter extends baseObjectFilter
 	public static function categoryIdsToAllSubCategoriesIdsParsed($cats)
 	{
 		if ($cats === "")
-			$cats = array();
-		else
-			$cats = explode(",", $cats);
+		{
+			return $cats;
+		}
+
+		$cats = explode(",", $cats);
 		kArray::trim($cats);
 		
 		$categoryFullIdsToIds = array();
+		$items = array();
+		$categories = categoryPeer::retrieveByPKs($cats); //all sub categories and not the category itself
+		foreach($categories as $category)
+		{
+			$items[$category->getId()] = $category;
+		}
+
 		foreach($cats as $cat)
 		{
-			$category = categoryPeer::retrieveByPK($cat); //all sub categories and not the category itself
-			if(!$category)
-				continue;
-			
-			$categoryFullIdsToIds[] = $category->getFullIds() . '>';
+			$categoryFullIdsToIds[]= $items[$cat]->getFullIds() . '>';
 		}
 
 		return implode(",", $categoryFullIdsToIds);
