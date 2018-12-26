@@ -711,8 +711,7 @@ class myEntryUtils
 			if ($dc != kDataCenterMgr::getCurrentDcId ())
 				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( $dc ) );
 		}
-		if ($entry->getType() == entryType::PLAYLIST &&
-			$entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
+		if ($entry->getType() == entryType::PLAYLIST && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
 		{
 			list($entryIds, $durations, $mediaEntry, $captionFiles) =
 				myPlaylistUtils::executeStitchedPlaylist($entry);
