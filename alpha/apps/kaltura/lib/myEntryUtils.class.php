@@ -711,7 +711,17 @@ class myEntryUtils
 			if ($dc != kDataCenterMgr::getCurrentDcId ())
 				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( $dc ) );
 		}
-		$entryLengthInMsec = $servingVODfromLive ? $entry->getRecordedLengthInMsecs() : $entry->getLengthInMsecs();
+		if ($entry->getType() == entryType::PLAYLIST &&
+			$entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
+		{
+			list($entryIds, $durations, $mediaEntry, $captionFiles) =
+				myPlaylistUtils::executeStitchedPlaylist($entry);
+			$entryLengthInMsec = array_sum($durations);
+		}
+		else
+		{
+			$entryLengthInMsec = $servingVODfromLive ? $entry->getRecordedLengthInMsecs() : $entry->getLengthInMsecs();
+		}
 		 
 		$thumbName = $entry->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
 		if ($servingVODfromLive && $vid_slices > 0)
@@ -854,7 +864,7 @@ class myEntryUtils
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
 					$success = false;
-					if(($multi || $servingVODfromLive) && $packagerRetries)
+					if(($multi || $servingVODfromLive || $vid_sec != -1) && $packagerRetries)
 					{
 						list($picWidth, $picHeight) = $shouldResizeByPackager ? array($width, $height) : array(null, null);
 						$destPath = $shouldResizeByPackager ? $capturedThumbPath . uniqid() : $capturedThumbPath;
