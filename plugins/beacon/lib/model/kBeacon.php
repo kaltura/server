@@ -198,7 +198,7 @@ class kBeacon
 		$indexBaseObject = $this->createIndexBaseObject();
 		
 
-		$docId = calculateDocId();
+		$docId = $this->calculateDocId();
 		//Modify base object to index to State
 		$stateIndexObjectJson = $this->getIndexObjectForState($indexBaseObject, $docId);
 		$queueProvider->send(self::BEACONS_QUEUE_NAME, $stateIndexObjectJson);
