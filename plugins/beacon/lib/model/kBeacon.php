@@ -147,7 +147,7 @@ class kBeacon
 		return $this->updatedAt;
 	}
 
-	protected function getDeleteFromOldIndexObjectsJson($docId)
+	protected function generateDeleteFromOldIndexCmds($docId)
 	{
 		$deleteFromOldIndexObjects = array();
 		$oldIndexNames = $this->getOldIndexesName();
@@ -158,7 +158,6 @@ class kBeacon
 			$deleteFromOldIndexObject[self::ELASTIC_ACTION_KEY] = self::ELASTIC_DELETE_ACTION_VALUE;
 			$deleteFromOldIndexObject[self::ELASTIC_INDEX_KEY] = $oldIndexName;
 			$deleteFromOldIndexObject[self::ELASTIC_INDEX_TYPE_KEY] = self::$indexTypeByBeaconObjectType[$this->relatedObjectType];
-
 			$deleteFromOldIndexObjects[] = json_encode($deleteFromOldIndexObject);
 		}
 
@@ -198,13 +197,13 @@ class kBeacon
 		//Create base object for index
 		$indexBaseObject = $this->createIndexBaseObject();
 		
-		//Modify base object to index to State
-		$docId = md5($this->relatedObjectType . '_' . $this->eventType . '_' . $this->objectId);
-		$stateIndexObjectJson = $this->getIndexObjectForState($indexBaseObject, $docId);
 
-		$this->deleteItemsFromOldIndex($docId, $queueProvider);
+		$docId = calculateDocId();
+		//Modify base object to index to State
+		$stateIndexObjectJson = $this->getIndexObjectForState($indexBaseObject, $docId);
 		$queueProvider->send(self::BEACONS_QUEUE_NAME, $stateIndexObjectJson);
-		
+		$this->deleteItemsFromOldIndex($docId, $queueProvider);
+
 		//Sent to log index of requested
 		if ($shouldLog) 
 		{
@@ -215,10 +214,14 @@ class kBeacon
 		return true;
 	}
 
+	protected function calculateDocId()
+	{
+		return md5($this->relatedObjectType . '_' . $this->eventType . '_' . $this->objectId);
+	}
 
 	public function deleteItemsFromOldIndex($docId, $queueProvider)
 	{
-		$deleteFromOldIndexObjectsJson = $this->getDeleteFromOldIndexObjectsJson($docId);
+		$deleteFromOldIndexObjectsJson = $this->generateDeleteFromOldIndexCmds($docId);
 		foreach($deleteFromOldIndexObjectsJson as $deleteFromOldIndexObjectJson)
 		{
 			$queueProvider->send(self::BEACONS_QUEUE_NAME, $deleteFromOldIndexObjectJson);
