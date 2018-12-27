@@ -17,7 +17,7 @@ class thumbnailAction extends sfAction
 	 *
 	 * Needed because some partners add .jpg at the end of the url, it might be added to a real attribute.
 	 */
-	public function getRequestParameter($name, $default = null, $regex = null)
+	public function getRequestParameter($name, $default = null)
 	{
 		$exts = implode('|', self::$extensions);
 	
@@ -25,12 +25,7 @@ class thumbnailAction extends sfAction
 		if(!$val)
 			return $val;
 			
-		$val = preg_replace("/^(.*)\.($exts)$/", '$1', $val);
-		if ($regex && !preg_match($regex,$val))
-		{
-			return $default;
-		}
-		return $val;
+		return preg_replace("/^(.*)\.($exts)$/", '$1', $val);
 	}
 
 	public function getIntRequestParameter($name, $default, $min, $max)
@@ -224,16 +219,24 @@ class thumbnailAction extends sfAction
 				}
 			}
 		}
-		
-		
+
+
 		if ($entry_id)
 		{
 			$entry = entryPeer::retrieveByPKNoFilter( $entry_id );
 			
 			if ( ! $entry )
 			{
-				// problem could be due to replication lag
-				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
+				if (preg_match("/\d_[A-Za-z0-9]{8}/",$entry_id))
+				{
+					$entryDc = substr($entry_id, 0, 1);
+					// problem could be due to replication lag
+					if ($entryDc != kDataCenterMgr::getCurrentDcId())
+					{
+						kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc));
+					}
+				}
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 			}
 		}
 		else
