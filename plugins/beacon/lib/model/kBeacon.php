@@ -156,7 +156,7 @@ class kBeacon
 			$deleteFromOldIndexObject = array();
 			$deleteFromOldIndexObject[self::ELASTIC_DOCUMENT_ID_KEY] = $docId;
 			$deleteFromOldIndexObject[self::ELASTIC_ACTION_KEY] = self::ELASTIC_DELETE_ACTION_VALUE;
-			$deleteFromOldIndexObject[self::ELASTIC_INDEX_KEY] = self::$indexNameByBeaconObjectType[$oldIndexName];
+			$deleteFromOldIndexObject[self::ELASTIC_INDEX_KEY] = $oldIndexName;
 			$deleteFromOldIndexObject[self::ELASTIC_INDEX_TYPE_KEY] = self::$indexTypeByBeaconObjectType[$this->relatedObjectType];
 
 			$deleteFromOldIndexObjects[] = json_encode($deleteFromOldIndexObject);
