@@ -20,12 +20,13 @@ class BeaconsIndexesRotationWorker extends ElasticIndexRotationWorker
 			$count++;
 			if ($count >= $this->maxNumberOfIndices)
 			{
-				$aliasesToRemove[]  = new ElasticIndexAlias($index, $this->indexPattern . kBeacon::ELASTIC_INDEX_OLD_POSTFIX . $count);
+				$aliasesToRemove[] = new ElasticIndexAlias($index, $this->indexPattern . kBeacon::ELASTIC_INDEX_OLD_POSTFIX . ($count - 1));
 				$aliasesToRemove[] = new ElasticIndexAlias($index, $this->searchAlias);
 			}
 		}
 
 		//Add the new old indices
+		$count = 0;
 		foreach ($currentSearchingIndices as $index)
 		{
 			$count++;

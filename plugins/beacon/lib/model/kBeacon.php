@@ -198,10 +198,11 @@ class kBeacon
 		//Create base object for index
 		$indexBaseObject = $this->createIndexBaseObject();
 		
-		//Modify base object to index to State 
-		$stateIndexObjectJson = $this->getIndexObjectForState($indexBaseObject);
+		//Modify base object to index to State
+		$docId = md5($this->relatedObjectType . '_' . $this->eventType . '_' . $this->objectId);
+		$stateIndexObjectJson = $this->getIndexObjectForState($indexBaseObject, $docId);
 
-		$this->deleteItemsFromOldIndex($stateIndexObjectJson[self::ELASTIC_DOCUMENT_ID_KEY], $queueProvider);
+		$this->deleteItemsFromOldIndex($docId, $queueProvider);
 		$queueProvider->send(self::BEACONS_QUEUE_NAME, $stateIndexObjectJson);
 		
 		//Sent to log index of requested
@@ -233,9 +234,8 @@ class kBeacon
 		return QueueProvider::getInstance(null, $constructorArgs);
 	}
 	
-	private function getIndexObjectForState($indexObject)
+	private function getIndexObjectForState($indexObject, $docId)
 	{
-		$docId = md5($this->relatedObjectType . '_' . $this->eventType . '_' . $this->objectId);
 		$indexObject[self::ELASTIC_DOCUMENT_ID_KEY] = $docId;
 		$indexObject[self::FIELD_IS_LOG] = false;
 		

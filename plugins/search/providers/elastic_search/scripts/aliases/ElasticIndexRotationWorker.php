@@ -214,10 +214,10 @@ class ElasticIndexRotationWorker
 	protected function createNewIndex($indexName)
 	{
 		KalturaLog::log("Going to create index $indexName");
-		$json = file_get_contents(ROOT_DIR . '/' . $this->mappingPath);
-		$body = json_decode($json);
 		try
 		{
+			$json = file_get_contents(ROOT_DIR . '/' . $this->mappingPath);
+			$body = json_decode($json);
 			$response = $this->client->createIndex($indexName, $body);
 		}
 		catch (Exception $e)

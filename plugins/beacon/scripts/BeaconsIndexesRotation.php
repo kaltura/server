@@ -14,7 +14,7 @@ if (!file_exists($configPath))
 }
 
 chdir(dirname(__FILE__));
-define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../../../../'));
+define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../'));
 require_once(ROOT_DIR . '/infra/KAutoloader.php');
 require_once(ROOT_DIR . '/alpha/config/kConf.php');
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
