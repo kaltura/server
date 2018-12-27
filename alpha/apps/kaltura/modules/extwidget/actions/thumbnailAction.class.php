@@ -56,7 +56,7 @@ class thumbnailAction extends sfAction
 		
 		ignore_user_abort();
 		
-		$entry_id = $this->getRequestParameter("entry_id", null , "/\d_[A-Za-z0-9]{8}/");
+		$entry_id = $this->getRequestParameter("entry_id");
 		$widget_id = $this->getRequestParameter("widget_id", 0);
 		$upload_token_id = $this->getRequestParameter("upload_token_id");
 		$version = $this->getIntRequestParameter("version", null, 0, 10000000);
