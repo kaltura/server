@@ -308,7 +308,7 @@ class CuePointService extends KalturaBaseService
 	}
 	
 	/*
-	 * Track delete and update api calls to identify if enabling validateUser annotation will 
+	 * Track delete and update API calls to identify if enabling validateUser annotation will 
 	 * break any existing functionality
 	 */
 	private function validateUserLog($dbObject)
