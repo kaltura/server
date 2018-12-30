@@ -349,21 +349,8 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_GRAPH_TYPE => self::GRAPH_MULTI_BY_DATE_ID,
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_UNIQUE_USERS),
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_DEVICE,
-			self::REPORT_OBJECT_IDS_TRANSFORM => array('kKavaReportsMgr', 'fromSafeId'),
 			self::REPORT_DRILLDOWN_DIMENSION_MAP => array(
 				'os' => self::DIMENSION_OS
-			),
-			self::REPORT_ENRICH_DEF => array(
-				array(
-					self::REPORT_ENRICH_OUTPUT => 'device',
-					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
-					self::REPORT_ENRICH_CONTEXT => 'self::toSafeId',
-				),
-				array(
-					self::REPORT_ENRICH_OUTPUT => 'os',
-					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
-					self::REPORT_ENRICH_CONTEXT => 'self::transformOperatingSystemName',
-				)
 			),
 		),
 
@@ -376,21 +363,8 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_GRAPH_TYPE => self::GRAPH_MULTI_BY_NAME,
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_UNIQUE_USERS),
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_OS,
-			self::REPORT_OBJECT_IDS_TRANSFORM => array('kKavaReportsMgr', 'fromSafeId'),
 			self::REPORT_DRILLDOWN_DIMENSION_MAP => array(
 				'browser' => self::DIMENSION_BROWSER
-			),
-			self::REPORT_ENRICH_DEF => array(
-				array(
-					self::REPORT_ENRICH_OUTPUT => 'os',
-					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
-					self::REPORT_ENRICH_CONTEXT => 'self::transformOperatingSystemName',
-				),
-				array(
-					self::REPORT_ENRICH_OUTPUT => 'browser',
-					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
-					self::REPORT_ENRICH_CONTEXT => 'self::transformBrowserName',
-				)
 			),
 		),
 
@@ -402,11 +376,6 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_FORCE_TOTAL_COUNT => true,
 			self::REPORT_GRAPH_TYPE => self::GRAPH_MULTI_BY_NAME,
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_UNIQUE_USERS),
-			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => 'browser',
-				self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
-				self::REPORT_ENRICH_CONTEXT => 'self::transformBrowserName',
-			),
 		),
 
 		myReportsMgr::REPORT_TYPE_OPERATING_SYSTEMS_FAMILIES => array(
@@ -1990,26 +1959,6 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		return array_map('self::fromSafeId', $names);
 	}
-    
-	protected static function transformBrowserName($name)
-	{
-		$name = str_replace(array('Internet Explorer', 'Microsoft Edge'), array('IE', 'Edge'), $name);
-		$name = preg_replace('/(\w) (\d)/', '$1$2', $name);
-		$name = strtoupper($name);
-		$name = str_replace(array('(',')'), '', $name);
-		$name = preg_replace('/[^\w]/', '_', $name);
-		return $name;
-	}
-
-	protected static function transformOperatingSystemName($name)
-	{
-		$name = str_replace(array('Windows ', '.x'), array('Windows_', ''), $name);
-		$name = preg_replace('/(\w) (\d)/', '$1$2', $name);
-		$name = strtoupper($name);
-		$name = str_replace(array('(',')'), '', $name);
-		$name = preg_replace('/[^\w]/', '_', $name);
-		return $name;
-	}
 
 	protected static function getReportDef($report_type)
 	{
@@ -2290,7 +2239,7 @@ class kKavaReportsMgr extends kKavaBase
 			'custom_var1' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR1),
 			'custom_var2' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR2),
 			'custom_var3' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR3),
-			'devices' => array(self::DRUID_DIMENSION => self::DIMENSION_DEVICE, self::REPORT_FILTER_DIMENSION_TRANSFORM => array('kKavaReportsMgr', 'fromSafeIds')),
+			'devices' => array(self::DRUID_DIMENSION => self::DIMENSION_DEVICE),
 			'regions' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_REGION),
 			'os_families' => array(self::DRUID_DIMENSION => self::DIMENSION_OS_FAMILY),
 			'browsers_families' => array(self::DRUID_DIMENSION => self::DIMENSION_BROWSER_FAMILY),
@@ -2308,11 +2257,6 @@ class kKavaReportsMgr extends kKavaBase
 			}
 
 			$values = explode(',', $value);
-			if (isset($field_filter_def[self::REPORT_FILTER_DIMENSION_TRANSFORM]))
-			{
-				$values = call_user_func($field_filter_def[self::REPORT_FILTER_DIMENSION_TRANSFORM], $values);
-			}
-
 			$druid_filter[] = array(
 				self::DRUID_DIMENSION => $field_filter_def[self::DRUID_DIMENSION],
 				self::DRUID_VALUES => $values
