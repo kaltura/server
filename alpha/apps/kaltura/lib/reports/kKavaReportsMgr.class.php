@@ -3940,7 +3940,7 @@ class kKavaReportsMgr extends kKavaBase
 				$dim_headers = $enrich_def[self::REPORT_ENRICH_INPUT];
 				if (!is_array($dim_headers))
 				{
-					$dim_headers = array($cur_fields);
+					$dim_headers = array($dim_headers);
 				}
 			}
 			else
