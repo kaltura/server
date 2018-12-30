@@ -1,3 +1,18 @@
+# Naos 14.11.0 #
+
+## Beacon indexes rotation ##
+- Issue Type: Task
+- Issue ID: PLAT-9288
+
+We added a script (plugins/beacon/scripts/BeaconsIndexesRotation.php) to support index rotation in our beacon service.
+
+The indexes name should be in the following format for the script to work {index_name}-{datetime_format} for example: beacon_entry_index-201812 
+### Configuration ###
+	Optional:
+	1) Add the following to your elastic.ini file in beacon section:
+        maxNumberOfIndices = {num of monthly indices you want to keep) by default this will be one
+    2) Add beacon_rotation.ini to you configuration based on beacon_rotation.template.ini
+    
 # Naos 14.10.0 #
 
 ## Beacon service searchScheduledResource api ##
