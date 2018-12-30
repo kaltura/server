@@ -34,6 +34,8 @@ class QuizUserEntry extends UserEntry{
 	public function getScore(){ return $this->getFromCustomData("score");}
 	public function setNumOfQuestions($v){ $this->putInCustomData("numOfQuestions", $v);}
 	public function getNumOfQuestions(){ return $this->getFromCustomData("numOfQuestions");}
+	public function setNumOfRelevnatQuestions($v){ $this->putInCustomData("numOfRelevnatQuestions", $v);}
+	public function getNumOfRelevnatQuestions(){ return $this->getFromCustomData("numOfRelevnatQuestions");}
 	public function setNumOfCorrectAnswers($v){ $this->putInCustomData("numOfCorrectAnswers", $v);}
 	public function getNumOfCorrectAnswers(){ return $this->getFromCustomData("numOfCorrectAnswers");}
 	public function addAnswerId($questionId, $answerId)
