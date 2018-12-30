@@ -1294,7 +1294,7 @@ class kKavaReportsMgr extends kKavaBase
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => array('creator_name'),
-					self::REPORT_ENRICH_FUNC => 'self::getUserScreenNameWithFallback'
+					self::REPORT_ENRICH_FUNC => 'self::getUserNameWithFallback'
 				)
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_USERS),
@@ -3594,7 +3594,22 @@ class kKavaReportsMgr extends kKavaBase
 		
 		return $result;
 	}
-	
+
+	protected static function getUserNameWithFallback($ids, $partner_id)
+	{
+		$context = array(
+			'columns' => array('PUSER_ID', 'FIRST_NAME', 'LAST_NAME'),
+			'hash' => false,
+		);
+		$result = self::getUsersInfo($ids, $partner_id, $context);
+		foreach ($result as $id => $row)
+		{
+			$result[$id] = ($row[1] && $row[2]) ? $row[1] . ' ' . $row[2] : $row[0];
+		}
+
+		return $result;
+	}
+
 	protected static function getUserScreenNameWithFallback($ids, $partner_id)
 	{
 		$context = array(
