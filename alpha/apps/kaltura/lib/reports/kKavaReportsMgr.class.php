@@ -261,8 +261,9 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_AVG_DROP_OFF),
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_DOMAIN,
-			self::REPORT_DRILLDOWN_DIMENSION => self::DIMENSION_URL,
-			self::REPORT_DRILLDOWN_DIMENSION_HEADERS => array('referrer'),
+			self::REPORT_DRILLDOWN_DIMENSION_MAP => array(
+				'referrer' => self::DIMENSION_URL,
+			),
 		),
 
 		myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT => array(
@@ -2630,7 +2631,7 @@ class kKavaReportsMgr extends kKavaBase
 
 			foreach ($graph_metrics_to_headers as $column => $header)
 			{
-				$graphs[$header][$date] = $row_data[$column];
+				$graphs[$header][$date] = self::getMetricValue($row_data, $column);
 			}
 		}
 		return $graphs;
@@ -2662,7 +2663,7 @@ class kKavaReportsMgr extends kKavaBase
 			
 			foreach ($graph_metrics_to_headers as $column => $header)
 			{
-				$graphs[$multiline_val][$header][$date] = $row_data[$column];
+				$graphs[$multiline_val][$header][$date] = self::getMetricValue($row_data, $column);
 			}
 		}
 		return $graphs;
@@ -2698,7 +2699,7 @@ class kKavaReportsMgr extends kKavaBase
 					$graphs[$header][$date] = '';
 				}
 
-				$graphs[$header][$date] .= $multiline_val . ':' . $row_data[$column];
+				$graphs[$header][$date] .= $multiline_val . ':' . self::getMetricValue($row_data, $column);
 			}
 		}
 		return $graphs;
@@ -2720,7 +2721,7 @@ class kKavaReportsMgr extends kKavaBase
 
 			foreach ($graph_metrics_to_headers as $column => $header)
 			{
-				$graphs[$header][$dim_value] = $row_data[$column];
+				$graphs[$header][$dim_value] = self::getMetricValue($row_data, $column);
 			}
 		}
 		return $graphs;
@@ -2734,7 +2735,7 @@ class kKavaReportsMgr extends kKavaBase
 			$row_data = $result[0][self::DRUID_RESULT];
 			foreach ($graph_metrics_to_headers as $column => $header)
 			{
-				$graph[$header] = $row_data[$column];
+				$graph[$header] = self::getMetricValue($row_data, $column);
 			}
 		}
 		else
@@ -2745,6 +2746,15 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		return array($type_str => $graph);
+	}
+
+	protected static function getMetricValue($event, $column)
+	{
+		if (isset(self::$transform_metrics[$column]))
+		{
+			return call_user_func(self::$transform_metrics[$column], $event[$column]);
+		}
+		return $event[$column];
 	}
 
 	protected static function getEnrichDefByHeader($report_def, $header)
@@ -2878,17 +2888,6 @@ class kKavaReportsMgr extends kKavaBase
 			$transform = isset(self::$transform_time_dimensions[$granularity]) ? self::$transform_time_dimensions[$granularity] : null;
 			$result = self::getGraphsByDateId($result, $graph_metrics_to_headers, $input_filter->timeZoneOffset, $transform);
 			break;
-		}
-
-		foreach (self::$transform_metrics as $metric => $func)
-		{
-			if (isset($result[self::$metrics_to_headers[$metric]]))
-			{
-				foreach ($result[self::$metrics_to_headers[$metric]] as &$value)
-				{
-					$value = call_user_func($func, $value);
-				}
-			}
 		}
 
 		$end = microtime(true);
