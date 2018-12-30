@@ -227,7 +227,7 @@ class thumbnailAction extends sfAction
 			
 			if ( ! $entry )
 			{
-				if (preg_match("/\d_[A-Za-z0-9]{8}/",$entry_id))
+				if (preg_match(myEntryUtils::ENTRY_ID_REGEX ,$entry_id))
 				{
 					$entryDc = substr($entry_id, 0, 1);
 					// problem could be due to replication lag
