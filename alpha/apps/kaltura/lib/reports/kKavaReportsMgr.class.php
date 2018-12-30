@@ -99,8 +99,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_PLAYBACK_TYPES = 'report_playback_types';
 	const REPORT_OBJECT_IDS_TRANSFORM = 'report_object_ids_transform';
 	const REPORT_SKIP_PARTNER_FILTER = 'report_skip_partner_filter';
-	const REPORT_FILTER_DIMENSION_TRANSFORM = 'report_filter_dimension_transform';
-	
+
 	// report settings - table
 	const REPORT_DIMENSION = 'report_dimension';
 	const REPORT_DIMENSION_MAP = 'report_dimension_map';
@@ -1946,18 +1945,6 @@ class kKavaReportsMgr extends kKavaBase
 		$name = strtoupper($name);
 		$name = preg_replace('/[^\w]/', '_', $name);
 		return $name;
-	}
-
-	protected static function fromSafeId($name)
-	{
-		$name = str_replace('_', ' ', $name);
-		$name = ucfirst(strtolower($name));
-		return $name;
-	}
-
-	protected static function fromSafeIds($names)
-	{
-		return array_map('self::fromSafeId', $names);
 	}
 
 	protected static function getReportDef($report_type)
