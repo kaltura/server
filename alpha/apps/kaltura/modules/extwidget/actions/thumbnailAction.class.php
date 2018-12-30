@@ -219,16 +219,24 @@ class thumbnailAction extends sfAction
 				}
 			}
 		}
-		
-		
+
+
 		if ($entry_id)
 		{
 			$entry = entryPeer::retrieveByPKNoFilter( $entry_id );
 			
 			if ( ! $entry )
 			{
-				// problem could be due to replication lag
-				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
+				if (preg_match(myEntryUtils::ENTRY_ID_REGEX ,$entry_id))
+				{
+					$entryDc = substr($entry_id, 0, 1);
+					// problem could be due to replication lag
+					if ($entryDc != kDataCenterMgr::getCurrentDcId())
+					{
+						kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc));
+					}
+				}
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 			}
 		}
 		else

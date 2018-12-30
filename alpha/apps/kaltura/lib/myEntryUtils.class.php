@@ -6,6 +6,7 @@ class myEntryUtils
 	const TEMP_FILE_POSTFIX = "temp_1.jpg";
 	const MP4_FILENAME_PARAMETER = "/name/a.mp4";
 	const DEFAULT_THUMB_SEC_LIVE = 1;
+	const ENTRY_ID_REGEX = "/\d_[A-Za-z0-9]{8}/";
 
 	static private $liveSourceType = array
 	(
