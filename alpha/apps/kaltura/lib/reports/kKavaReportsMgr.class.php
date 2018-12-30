@@ -920,6 +920,10 @@ class kKavaReportsMgr extends kKavaBase
 				),
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_FILTER => array(
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD)
+					),
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_METRICS => array(self::METRIC_COUNT_TOTAL, self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_SHOW),
 				),
@@ -1561,12 +1565,6 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		
 		// count aggregators
-		self::$aggregations_def[self::METRIC_COUNT_TOTAL] = 
-			self::getLongSumAggregator(self::METRIC_COUNT_TOTAL, self::METRIC_COUNT);
-
-		self::$aggregations_def[self::METRIC_COUNT_TOTAL_ALL_TIME] = 
-			self::getLongSumAggregator(self::METRIC_COUNT_TOTAL_ALL_TIME, self::METRIC_COUNT);
-
 		self::$aggregations_def[self::METRIC_PLAYTHROUGH] = self::getFilteredAggregator(
 			self::getInFilter(self::DIMENSION_EVENT_TYPE, self::$playthrough_event_types),
 			self::getLongSumAggregator(self::METRIC_PLAYTHROUGH, self::METRIC_COUNT));
@@ -1578,11 +1576,18 @@ class kKavaReportsMgr extends kKavaBase
 				self::getLongSumAggregator($event_type, self::METRIC_COUNT)); 
 		}
 		
+		// delta aggregators
+		self::$aggregations_def[self::METRIC_COUNT_TOTAL] = 
+			self::getLongSumAggregator(self::METRIC_COUNT_TOTAL, self::METRIC_DELTA);
+
+		self::$aggregations_def[self::METRIC_COUNT_TOTAL_ALL_TIME] = 
+			self::getLongSumAggregator(self::METRIC_COUNT_TOTAL_ALL_TIME, self::METRIC_DELTA);
+
 		foreach (self::$media_type_count_aggrs as $media_type)
 		{
 			self::$aggregations_def[$media_type] = self::getFilteredAggregator(
 				self::getSelectorFilter(self::DIMENSION_MEDIA_TYPE, $media_type),
-				self::getLongSumAggregator($media_type, self::METRIC_COUNT)); 
+				self::getLongSumAggregator($media_type, self::METRIC_DELTA)); 
 		}
 
 		$user_type_metrics = array(
@@ -1592,7 +1597,7 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			self::$aggregations_def[$metric] = self::getFilteredAggregator(
 				self::getSelectorFilter(self::DIMENSION_USER_TYPE, $value),
-				self::getLongSumAggregator($metric, self::METRIC_COUNT));
+				self::getLongSumAggregator($metric, self::METRIC_DELTA));
 		}
 		
 		// delta aggregations
