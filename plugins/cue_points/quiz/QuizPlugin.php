@@ -637,10 +637,12 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 				}
 				if (isset($usersTotalQuestions[$userEntry->getKuserId()]))
 				{
-					$usersTotalQuestions[$userEntry->getKuserId()]+=$userEntry->getNumOfRelevnatQuestions();
+					$numOfQuestions = $userEntry->getNumOfRelevnatQuestions() ? $userEntry->getNumOfRelevnatQuestions() : $userEntry->getNumOfQuestions();
+					$usersTotalQuestions[$userEntry->getKuserId()]+= $numOfQuestions;
 				} else
 				{
-					$usersTotalQuestions[$userEntry->getKuserId()] = $userEntry->getNumOfRelevnatQuestions();
+					$numOfQuestions = $userEntry->getNumOfRelevnatQuestions() ? $userEntry->getNumOfRelevnatQuestions() : $userEntry->getNumOfQuestions();
+					$usersTotalQuestions[$userEntry->getKuserId()] = $numOfQuestions;
 				}
 			}
 		}
