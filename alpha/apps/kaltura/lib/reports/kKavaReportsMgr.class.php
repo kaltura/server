@@ -3604,7 +3604,8 @@ class kKavaReportsMgr extends kKavaBase
 		$result = self::getUsersInfo($ids, $partner_id, $context);
 		foreach ($result as $id => $row)
 		{
-			$result[$id] = ($row[1] && $row[2]) ? $row[1] . ' ' . $row[2] : $row[0];
+			$fullName = trim($row[1]. ' ' .$row[2]);
+			$result[$id] = $fullName ? $fullName : $row[0];
 		}
 
 		return $result;
