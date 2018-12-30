@@ -2764,7 +2764,7 @@ class kKavaReportsMgr extends kKavaBase
 		case self::GRAPH_MULTI_BY_NAME:				
 			$dimension = self::getDimension($report_def, $object_ids);
 			$dimension = is_array($dimension) ? reset($dimension) : $dimension;
-			$header = reset($report_def[self::REPORT_DIMENSION_HEADERS]);
+			$header = isset($report_def[self::REPORT_DIMENSION_HEADERS]) ? reset($report_def[self::REPORT_DIMENSION_HEADERS]) : null;
 			$transform_enrich_def = self::getEnrichDefByHeader($report_def, $header);
 			$query = self::getGroupByReport($data_source, $partner_id, $intervals, $granularity_def, array($dimension), $metrics, $druid_filter);
 			break;
