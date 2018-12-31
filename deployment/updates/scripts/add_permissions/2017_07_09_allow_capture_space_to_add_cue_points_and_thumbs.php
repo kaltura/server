@@ -9,5 +9,5 @@ passthru("php $script $config");
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.thumbasset.ini';
 passthru("php $script $config");
 
-$config = realpath(dirname(__FILE__)) . '/../../../permissions/object.KalturaThumbCuePoint.ini';
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/object.KalturaFaceCuePoint.ini';
 passthru("php $script $config");
