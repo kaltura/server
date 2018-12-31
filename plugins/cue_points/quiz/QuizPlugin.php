@@ -651,6 +651,11 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		{
 			$totalCorrect = 0;
 			$totalAnswers = $usersTotalQuestions[$kuserId];
+			if ($totalAnswers == 0)
+			{
+				continue;
+			}
+
 			if (isset($usersCorrectAnswers[$kuserId]))
 			{
 				$totalCorrect = $usersCorrectAnswers[$kuserId];
