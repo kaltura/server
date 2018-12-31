@@ -72,6 +72,11 @@ class ESearchCuePointItemData extends ESearchItemData
 	protected $assetId;
 
 	/**
+	* @string
+	**/
+	protected $puserId;
+
+	/**
 	 * @return mixed
 	 */
 	public function getCuePointType()
@@ -284,6 +289,22 @@ class ESearchCuePointItemData extends ESearchItemData
 		$this->assetId = $assetId;
 	}
 
+	/**
+	* @return mixed
+	*/
+	public function getPuserId()
+	{
+		return $this->puserId;
+	}
+
+	/**
+	* @param mixed $puserId
+	*/
+	public function setPuserId($puserId)
+	{
+		$this->puserId = $puserId;
+	}
+
 	public function loadFromElasticHits($objectResult)
 	{
 		if(isset($objectResult['_source']['cue_point_type']))
@@ -317,6 +338,9 @@ class ESearchCuePointItemData extends ESearchItemData
 
 		if (isset($objectResult['_source']['cue_point_answers']))
 			$this->answers = $objectResult['_source']['cue_point_answers'];
+
+		if (isset($objectResult['_source']['cue_point_puser_id']))
+			$this->puser_id = $objectResult['_source']['cue_point_puser_id'];
 
 		if (isset($objectResult['_source']['cue_point_hint']))
 			$this->hint = $objectResult['_source']['cue_point_hint'];
