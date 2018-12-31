@@ -37,6 +37,7 @@ class KalturaESearchEntryItem extends KalturaESearchAbstractEntryItem
 		KalturaESearchEntryFieldName::REDIRECT_ENTRY_ID => ESearchEntryFieldName::REDIRECT_ENTRY_ID,
 		KalturaESearchEntryFieldName::ENTITLED_USER_EDIT => ESearchEntryFieldName::ENTITLED_USER_EDIT,
 		KalturaESearchEntryFieldName::ENTITLED_USER_PUBLISH => ESearchEntryFieldName::ENTITLED_USER_PUBLISH,
+		KalturaESearchEntryFieldName::ENTITLED_USER_VIEW => ESearchEntryFieldName::ENTITLED_USER_VIEW,
 		KalturaESearchEntryFieldName::TEMPLATE_ENTRY_ID => ESearchEntryFieldName::TEMPLATE_ENTRY_ID,
 		KalturaESearchEntryFieldName::PARENT_ENTRY_ID => ESearchEntryFieldName::PARENT_ENTRY_ID,
 		KalturaESearchEntryFieldName::MEDIA_TYPE => ESearchEntryFieldName::MEDIA_TYPE,
@@ -70,7 +71,7 @@ class KalturaESearchEntryItem extends KalturaESearchAbstractEntryItem
 			$object_to_fill = new ESearchEntryItem();
 
 		if(in_array($this->fieldName, array(KalturaESearchEntryFieldName::USER_ID, KalturaESearchEntryFieldName::ENTITLED_USER_EDIT,
-			KalturaESearchEntryFieldName::ENTITLED_USER_PUBLISH, KalturaESearchEntryFieldName::CREATOR_ID)))
+			KalturaESearchEntryFieldName::ENTITLED_USER_PUBLISH, KalturaESearchEntryFieldName::ENTITLED_USER_VIEW, KalturaESearchEntryFieldName::CREATOR_ID)))
 		{
 			$kuserId = self::KUSER_ID_THAT_DOESNT_EXIST;
 			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->searchTerm, true);
