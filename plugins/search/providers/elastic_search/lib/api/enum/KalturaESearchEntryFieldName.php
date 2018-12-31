@@ -18,6 +18,7 @@ class KalturaESearchEntryFieldName extends KalturaStringEnum
 	const REDIRECT_ENTRY_ID = 'redirect_entry_id';
 	const ENTITLED_USER_EDIT = 'entitled_kusers_edit';
 	const ENTITLED_USER_PUBLISH = 'entitled_kusers_publish';
+	const ENTITLED_USER_VIEW = 'entitled_kusers_view';
 	const TEMPLATE_ENTRY_ID = 'template_entry_id';
 	const PARENT_ENTRY_ID = 'parent_id';
 	const MEDIA_TYPE = 'media_type';
