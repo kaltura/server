@@ -49,4 +49,13 @@ class FaceCuePoint extends CuePoint
         return false;
     }
 
+    public function contributeElasticData()
+    {
+        $data = null;
+        if($this->getPuserId())
+            $data['cue_point_puser_id'] = $this->getPuserId();
+
+        return $data;
+    }
+
 }
