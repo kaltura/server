@@ -12,6 +12,16 @@ class serveFlavorAction extends kalturaAction
 	
 	protected $pathOnly = false;
 	
+	protected static function jsonEncode($obj)
+	{
+		$options = 0;
+		if (defined('JSON_UNESCAPED_UNICODE'))
+		{
+			$options |= JSON_UNESCAPED_UNICODE;
+		}
+		return json_encode($obj, $options);
+	}
+
 	public function getFileSyncFullPath(FileSync $fileSync)
 	{
 		$fullPath = $fileSync->getFullPath();
@@ -87,7 +97,7 @@ class serveFlavorAction extends kalturaAction
 			'sequences' => array($sequence)
 		);
 
-		$json = str_replace('\/', '/', json_encode($result));
+		$json = str_replace('\/', '/', self::jsonEncode($result));
 
 		return new kRendererString(
 				$json,
@@ -296,7 +306,7 @@ class serveFlavorAction extends kalturaAction
 		}
 
 		// build the json
-		$json = json_encode($mediaSet);
+		$json = self::jsonEncode($mediaSet);
 		$renderer = new kRendererString($json, self::JSON_CONTENT_TYPE);
 		if ($storeCache && !$isLive)
 		{
@@ -338,7 +348,7 @@ class serveFlavorAction extends kalturaAction
 
 		$mediaSet = array('durations' => $durations, 'sequences' => $sequences);
 		// build the json
-		$json = json_encode($mediaSet);
+		$json = self::jsonEncode($mediaSet);
 		$renderer = new kRendererString($json, self::JSON_CONTENT_TYPE);
 
 		$this->storeCache($renderer, $partnerId);
