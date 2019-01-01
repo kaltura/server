@@ -999,7 +999,17 @@
 						"cue_point_asset_id": {
 							"type" : "keyword",
 							"normalizer" : "kaltura_keyword_normalizer"
-						}
+						},
+						"cue_point_puser_id" : {
+							"type" : "text",
+							"analyzer" : "kaltura_text",
+							"fields": {
+								"raw" : {
+									"type" : "keyword",
+									"normalizer" : "kaltura_keyword_normalizer"
+								}
+							}
+						}						
 					}
 				}
 			}
