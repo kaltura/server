@@ -77,6 +77,11 @@ class ESearchCuePointItemData extends ESearchItemData
 	protected $puserId;
 
 	/**
+	 * @string
+	 **/
+	protected $thumbnailUrl;
+
+	/**
 	 * @return mixed
 	 */
 	public function getCuePointType()
@@ -305,6 +310,23 @@ class ESearchCuePointItemData extends ESearchItemData
 		$this->puserId = $puserId;
 	}
 
+	/**
+	 * @return mixed
+	 */
+	public function getThumbnailUrl()
+	{
+		return $this->thumbnailUrl;
+	}
+
+	/**
+	 * @param mixed $thumbnailUrl
+	 */
+	public function setThumbnailUrl($thumbnailUrl)
+	{
+		$this->thumbnailUrl = $thumbnailUrl;
+	}
+
+
 	public function loadFromElasticHits($objectResult)
 	{
 		if(isset($objectResult['_source']['cue_point_type']))
@@ -353,6 +375,12 @@ class ESearchCuePointItemData extends ESearchItemData
 
 		if (isset($objectResult['_source']['cue_point_asset_id']))
 			$this->assetId = $objectResult['_source']['cue_point_asset_id'];
+
+		if (isset($objectResult['_source']['cue_point_puser_id']))
+			$this->assetId = $objectResult['_source']['cue_point_puser_id'];
+
+		if (isset($objectResult['_source']['cue_point_thumbnail_url']))
+			$this->assetId = $objectResult['_source']['cue_point_thumbnail_url'];
 
 	}
 }
