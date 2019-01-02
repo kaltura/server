@@ -32,6 +32,8 @@ class KalturaESearchCuePointItem extends KalturaESearchEntryAbstractNestedItem
 		KalturaESearchCuePointFieldName::TEXT => ESearchCuePointFieldName::TEXT,
 		KalturaESearchCuePointFieldName::SUB_TYPE => ESearchCuePointFieldName::SUB_TYPE,
 		KalturaESearchCuePointFieldName::TYPE => ESearchCuePointFieldName::TYPE,
+        KalturaESearchCuePointFieldName::PUSER_ID => ESearchCuePointFieldName::PUSER_ID
+
 	);
 
 	protected function getMapBetweenObjects()
