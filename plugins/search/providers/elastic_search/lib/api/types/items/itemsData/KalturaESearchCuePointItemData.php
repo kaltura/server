@@ -79,7 +79,7 @@ class KalturaESearchCuePointItemData extends KalturaESearchItemData
 	/**
 	 * @var string
 	 **/
-	public $thumbnailUrl;
+	public $thumbUrl;
 
 
 
@@ -98,7 +98,7 @@ class KalturaESearchCuePointItemData extends KalturaESearchItemData
 		'explanation',
 		'assetId',
 		'puserId',
-		'thumbnailUrl'
+		'thumbUrl'
 	);
 
 	protected function getMapBetweenObjects()

@@ -79,7 +79,7 @@ class ESearchCuePointItemData extends ESearchItemData
 	/**
 	 * @string
 	 **/
-	protected $thumbnailUrl;
+	protected $thumbUrl;
 
 	/**
 	 * @return mixed
@@ -313,17 +313,17 @@ class ESearchCuePointItemData extends ESearchItemData
 	/**
 	 * @return mixed
 	 */
-	public function getThumbnailUrl()
+	public function getThumbUrl()
 	{
-		return $this->thumbnailUrl;
+		return $this->thumbUrl;
 	}
 
 	/**
-	 * @param mixed $thumbnailUrl
+	 * @param mixed $thumbUrl
 	 */
-	public function setThumbnailUrl($thumbnailUrl)
+	public function setThumbUrl($thumbUrl)
 	{
-		$this->thumbnailUrl = $thumbnailUrl;
+		$this->thumbUrl = $thumbUrl;
 	}
 
 
@@ -362,7 +362,7 @@ class ESearchCuePointItemData extends ESearchItemData
 			$this->answers = $objectResult['_source']['cue_point_answers'];
 
 		if (isset($objectResult['_source']['cue_point_puser_id']))
-			$this->puser_id = $objectResult['_source']['cue_point_puser_id'];
+			$this->puserId = $objectResult['_source']['cue_point_puser_id'];
 
 		if (isset($objectResult['_source']['cue_point_hint']))
 			$this->hint = $objectResult['_source']['cue_point_hint'];
@@ -376,11 +376,9 @@ class ESearchCuePointItemData extends ESearchItemData
 		if (isset($objectResult['_source']['cue_point_asset_id']))
 			$this->assetId = $objectResult['_source']['cue_point_asset_id'];
 
-		if (isset($objectResult['_source']['cue_point_puser_id']))
-			$this->assetId = $objectResult['_source']['cue_point_puser_id'];
 
-		if (isset($objectResult['_source']['cue_point_thumbnail_url']))
-			$this->assetId = $objectResult['_source']['cue_point_thumbnail_url'];
+		if (isset($objectResult['_source']['cue_point_thumb_url']))
+			$this->thumbUrl = $objectResult['_source']['cue_point_thumb_url'];
 
 	}
 }
