@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.confControl
+ * @package plugins.confMaps
  * @subpackage Admin
  */
 class Form_ConfigurationMapConfigure extends ConfigureForm
@@ -81,9 +81,9 @@ class Form_ConfigurationMapConfigure extends ConfigureForm
 
 	/**
 	 * Set to null all the attributes that shouldn't be updated
-	 * @param Kaltura_Client_ConfControl_Type_ConfigMap $configurationItem
+	 * @param Kaltura_Client_ConfMaps_Type_ConfMaps $configurationItem
 	 */
-	public function resetUnUpdatebleAttributes(Kaltura_Client_ConfControl_Type_ConfigMap $configurationItem)
+	public function resetUnUpdatebleAttributes(Kaltura_Client_ConfMaps_Type_ConfMaps $configurationItem)
 	{
 		// reset readonly attributes
 		$configurationItem->lastUpdate = null;

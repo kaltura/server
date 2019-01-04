@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.confControl
+ * @package plugins.confMaps
  * @subpackage Admin
  */
 class ConfigurationMapListAction extends KalturaApplicationPlugin implements IKalturaAdminConsolePublisherAction
@@ -43,10 +43,10 @@ class ConfigurationMapListAction extends KalturaApplicationPlugin implements IKa
 	    }
 
 		$client = Infra_ClientHelper::getClient();
-		$configurationPluginClient = Kaltura_Client_ConfControl_Plugin::get($client);
+		$configurationPluginClient = Kaltura_Client_ConfMaps_Plugin::get($client);
 
 		// get results and paginate
-		$paginatorAdapter = new Infra_FilterPaginator($configurationPluginClient->confControl, "listAction", $partnerId, $configurationMapFilter);
+		$paginatorAdapter = new Infra_FilterPaginator($configurationPluginClient->confMaps, "listAction", $partnerId, $configurationMapFilter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
@@ -69,7 +69,7 @@ class ConfigurationMapListAction extends KalturaApplicationPlugin implements IKa
 	
 	protected function getConfigurationMapFilter()
 	{
-		return new Kaltura_Client_ConfControl_Type_ConfigMapFilter();
+		return new Kaltura_Client_ConfMaps_Type_ConfigMapFilter();
 	}
 
 	public function getInstance($interface)

@@ -1,6 +1,6 @@
 <?php 
 /**
- * @package plugins.confControl
+ * @package plugins.confMaps
  * @subpackage Admin
  */
 class Form_CreateConfigurationMap extends Infra_Form

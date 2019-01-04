@@ -1,6 +1,6 @@
 <?php 
 /**
- * @package plugins.confControl
+ * @package plugins.confMaps
  * @subpackage Admin
  */
 class Form_ConfigurationMapFilter extends Form_PartnerIdFilter
@@ -22,22 +22,14 @@ class Form_ConfigurationMapFilter extends Form_PartnerIdFilter
 		));
 
 
-		// search button
+		// submit button
 		$this->addElement('button', 'cmdSubmit', array(
 			'type' => 'submit',
 			'label'		=> 'Search',
 			'decorators' => array('ViewHelper'),
 		));
 
-		// create button
-		$this->addElement('button', 'viewConfigurationMapButton', array(
-			'ignore' => true,
-			'label' => 'View',
-			'onclick' => "viewConfigurationMap($('#filter_input').val(), $('#filterHostName').val(),)",
-			'decorators' => array('ViewHelper'),
-		));
-
-		// create button
+		// submit button
 		$this->addElement('button', 'newConfigurationMap', array(
 			'ignore' => true,
 			'label' => 'Create New',
