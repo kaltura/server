@@ -21,7 +21,7 @@
         </tfoot>
         <tbody>
 				<?php if($this->paginator)
-				foreach ($this->paginator as /* Kaltura_Client_ConfControl_Type_ConfigMap */$configurationMap):?>
+				foreach ($this->paginator as /* Kaltura_Client_ConfMaps_Type_ConfMaps*/$configurationMap):?>
                 <tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
                 <td><?php echo $configurationMap->name; ?></td>
 	            <td><?php echo $configurationMap->relatedHost; ?></td>
@@ -89,14 +89,9 @@
 			height: 600,
 			title: '<?php echo $this->translate('Configuration Map'); ?>',
 			buttons: {
-				"SaveButton":{
-					text:'<?php echo $this->translate('Save'); ?>',
-					id: "saveButton",
-					click: function () {
-						jQuery('.ui-widget-overlay').css('z-index', 1003);
-						jQuery('#loader').show();
-						jQuery(this).find('#frmConfigurationMapConfigure').submit();
-					}},
+				'<?php echo $this->translate('Save'); ?>': function () {
+					jQuery(this).find('#frmConfigurationMapConfigure').submit();
+				},
 				'<?php echo $this->translate('Close'); ?>': function () {
 					jQuery(this).dialog('close');
 				}
@@ -118,32 +113,21 @@
 		);
 	}
 
-	function viewConfigurationMap(configurationMapName, configurationMapHost) {
-		var configurationMapStr= '/configuration_map_name/' + encodeURIComponent(configurationMapName) + '/configuration_map_host/' + encodeURIComponent(configurationMapHost) + '/is_new/' + false + '/is_view/' + true;
-		handleConfigurationAction(configurationMapStr, true);
-	}
-
 	function addNewConfigurationMap(configurationMapName, configurationMapHost) {
-		var configurationMapStr = '/configuration_map_name/' + encodeURIComponent(configurationMapName) + '/configuration_map_host/' + encodeURIComponent(configurationMapHost) + '/is_new/' + true;
-		handleConfigurationAction(configurationMapStr);
-	}
-
-	function handleConfigurationAction(configurationMapStr, isViewOnly){
+		var configurationMapStr= '/configuration_map_name/' + encodeURIComponent(configurationMapName) + '/configuration_map_host/' + encodeURIComponent(configurationMapHost) + '/is_new/' + true;
 		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'ConfigurationMapConfigureAction')); ?>' + configurationMapStr;
 
 		jQuery('#configuration-map-configure-dialog').remove();
 		dialogDiv = jQuery('<div id="configuration-map-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
-		var buttons = {};
-		if (isViewOnly)
-		{
-			buttons = {
-				'<?php echo $this->translate('Close'); ?>': function () {
-					jQuery(this).dialog('close');
-				}
-			}
-		}
-		else {
-			buttons = {
+
+		dialogDiv.dialog({
+			bgiframe: true,
+			modal: true,
+			resizable: false,
+			width: 600,
+			height: 600,
+			title: '<?php echo $this->translate('Configuration Map'); ?>',
+			buttons: {
 				'<?php echo $this->translate('Save'); ?>': function () {
 					jQuery('.ui-widget-overlay').css('z-index', 1003);
 					jQuery('#loader').show();
@@ -152,16 +136,7 @@
 				'<?php echo $this->translate('Close'); ?>': function () {
 					jQuery(this).dialog('close');
 				}
-			}
-		}
-		dialogDiv.dialog({
-			bgiframe: true,
-			modal: true,
-			resizable: false,
-			width: 600,
-			height: 600,
-			title: '<?php echo $this->translate('Configuration Map'); ?>',
-			buttons: buttons,
+			},
 			close: function () {
 				jQuery(this).dialog('destroy').remove();
 			}
