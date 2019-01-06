@@ -949,6 +949,7 @@ class myEntryUtils
 			
 			if ($multi)
 			{
+				//please notice the 3rd parameter - image type, is missing. 
 				list($w, $h, , $attr, $srcIm) = myFileConverter::createImageByFile($processingThumbPath);
 				if (!$im)
 					$im = imagecreatetruecolor($w * $vid_slices, $h);
