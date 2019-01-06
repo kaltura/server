@@ -161,9 +161,11 @@ class categoryFilter extends baseObjectFilter
 
 		foreach($cats as $cat)
 		{
-			$categoryFullIdsToIds[]= $items[$cat]->getFullIds() . '>';
+			if (isset($items[$cat]))
+			{
+				$categoryFullIdsToIds[] = $items[$cat]->getFullIds() . '>';
+			}
 		}
-
 		return implode(",", $categoryFullIdsToIds);
 	}
 }
