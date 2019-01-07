@@ -128,10 +128,23 @@
 		{
 			$chunker = $this->chunker;
 			$processArr = array();
+			$maxChunks = $chunker->GetMaxChunks();
 			for($idx=0; $idx<$chunker->GetMaxChunks(); $idx++) {
 				$chunkData = $chunker->GetChunk($idx);
 				if(!isset($chunkData->toFix) || $chunkData->toFix==0)
 					continue;
+				/*
+				 * Check for too short generated chunks. If found - exit with error,
+				 * 10 frame threshold allowed.
+				 */
+				if($idx<$maxChunks-1
+				&& $chunkData->stat->start+$chunkData->gap > $chunkData->stat->finish+10*$chunker->params->frameDuration){
+					$msgStr="Chunk id ($chunkData->index): chunk duration too short - ".($chunkData->stat->finish-$chunkData->stat->start.", should be $chunkData->gap");
+					KalturaLog::log($msgStr);
+					$this->returnMessages[] = $msgStr;
+					$this->returnStatus = KChunkedEncodeReturnStatus::AnalyzeError;
+					return false;
+				}
 
 				$toFixChunkIdx = $chunkData->index;
 				
