@@ -170,18 +170,7 @@ class ElasticIndexRotationWorker
 			$aliasesToRemove[] = new ElasticIndexAlias($indexName, $this->indexAlias);
 		}
 
-		//remove old search aliases
-		//keep only $maxNumberOfIndices indices with search alias
-		$count = 0;
-		foreach ($currentSearchingIndices as $date => $index)
-		{
-			$count++;
-			if ($count < $this->maxNumberOfIndices)
-			{
-				continue;
-			}
-			$aliasesToRemove[] = new ElasticIndexAlias($index, $this->searchAlias);
-		}
+		$this->handleCurrentSearchIndices($currentSearchingIndices, $aliasesToRemove, $aliasesToAdd);
 
 		//add latest to aliases
 		$now = new DateTime();
@@ -202,13 +191,33 @@ class ElasticIndexRotationWorker
 		$this->changeAliases($aliasesToAdd, $aliasesToRemove);
 	}
 
+	/**
+	 * @param $currentSearchingIndices array
+	 * @param $aliasesToRemove array
+	 * @param $aliasesToAdd array
+	 */
+	protected function handleCurrentSearchIndices($currentSearchingIndices, &$aliasesToRemove, &$aliasesToAdd)
+	{
+		//remove old search aliases
+		//keep only $maxNumberOfIndices indices with search alias
+		$count = 0;
+		foreach ($currentSearchingIndices as $index)
+		{
+			$count++;
+			if ($count >= $this->maxNumberOfIndices)
+			{
+				$aliasesToRemove[] = new ElasticIndexAlias($index, $this->searchAlias);
+			}
+		}
+	}
+
 	protected function createNewIndex($indexName)
 	{
 		KalturaLog::log("Going to create index $indexName");
-		$json = file_get_contents(ROOT_DIR . '/' . $this->mappingPath);
-		$body = json_decode($json);
 		try
 		{
+			$json = file_get_contents(ROOT_DIR . '/' . $this->mappingPath);
+			$body = json_decode($json);
 			$response = $this->client->createIndex($indexName, $body);
 		}
 		catch (Exception $e)

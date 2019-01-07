@@ -265,7 +265,7 @@ class PartnerService extends KalturaBaseService
 	 * Get usage statistics for a partner
 	 * Calculation is done according to partner's package
 	 *
-	 * Additional data returned is a graph points of streaming usage in a timeframe
+	 * Additional data returned is a graph points of streaming usage in a time frame
 	 * The resolution can be "days" or "months"
 	 *
 	 * @link http://docs.kaltura.org/api/partner/usage
@@ -413,7 +413,7 @@ class PartnerService extends KalturaBaseService
 
 	/**
 	 * List partners by filter with paging support
-	 * Current implementation will only list the sub partners of the partner initiating the api call (using the current KS).
+	 * Current implementation will only list the sub partners of the partner initiating the API call (using the current KS).
 	 * This action is only partially implemented to support listing sub partners of a VAR partner.
 	 * @action list
 	 * @param KalturaPartnerFilter $filter
@@ -484,18 +484,18 @@ class PartnerService extends KalturaBaseService
 	 * @param KalturaPartnerFilter $filter
 	 * @return int
 	 */
-    public function countAction (KalturaPartnerFilter $filter = null)
-    {
-        if (!$filter)
-            $filter = new KalturaPartnerFilter();
-            
-        $dbFilter = new partnerFilter();
-        $filter->toObject($dbFilter);
-        
-        $c = PartnerPeer::getDefaultCriteria();
-        $dbFilter->attachToCriteria($c);
-        
-        return PartnerPeer::doCount($c);
-    }
+	public function countAction (KalturaPartnerFilter $filter = null)
+	{
+	    if (!$filter)
+		$filter = new KalturaPartnerFilter();
+		
+	    $dbFilter = new partnerFilter();
+	    $filter->toObject($dbFilter);
+	    
+	    $c = PartnerPeer::getDefaultCriteria();
+	    $dbFilter->attachToCriteria($c);
+	    
+	    return PartnerPeer::doCount($c);
+	}
 	
 }

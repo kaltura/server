@@ -269,7 +269,7 @@ class CategoryUserService extends KalturaBaseService
 	}
 	
 	/**
-	 * Copy all memeber from parent category
+	 * Copy all member from parent category
 	 * 
 	 * @action copyFromCategory
 	 * @param int $categoryId

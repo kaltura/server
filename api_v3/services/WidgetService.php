@@ -85,7 +85,7 @@ class WidgetService extends KalturaBaseService
 	}
 
 	/**
- 	 * Update exisiting widget
+ 	 * Update existing widget
  	 * 
 	 * @action update
 	 * @param string $id 
@@ -160,7 +160,7 @@ class WidgetService extends KalturaBaseService
 	 * Must provide valid sourceWidgetId
 	 * 
 	 * @action clone
-	 * @paran KalturaWidget $widget
+	 * @param KalturaWidget $widget
 	 * @return KalturaWidget
 	 */		
 	function cloneAction( KalturaWidget $widget )

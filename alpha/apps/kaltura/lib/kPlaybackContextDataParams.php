@@ -14,6 +14,11 @@ class kPlaybackContextDataParams
 	private $deliveryProfile;
 
 	/**
+	 * @var string
+	 */
+	private $type;
+
+	/**
 	 * @return array
 	 */
 	public function getFlavors()
@@ -27,6 +32,22 @@ class kPlaybackContextDataParams
 	public function setFlavors($flavors)
 	{
 		$this->flavors = $flavors;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getType()
+	{
+		return $this->type;
+	}
+
+	/**
+	 * @param string $type
+	 */
+	public function setType($type)
+	{
+		$this->type = $type;
 	}
 
 	/**

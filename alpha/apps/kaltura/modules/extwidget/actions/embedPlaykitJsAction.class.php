@@ -304,21 +304,25 @@ class embedPlaykitJsAction extends sfAction
 		{
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Player target ID not defined");
 		}
+		
 		$entry_id = $this->getRequestParameter(self::ENTRY_ID_PARAM_NAME);		
 		if (!$entry_id)
 		{
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Entry ID not defined");
 		}
-		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME, array());		
+		
+		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME, array());
 		//enable passing nested config options
 		foreach ($config as $key=>$val)
 		{
 			$config[$key] = json_decode($val);
 		}
 
-		if (!isset($config["provider"])) {
+		if (!isset($config["provider"]))
+		{
 			$config["provider"] = new stdClass();
 		}
+		
 		$config["provider"]->partnerId = $this->partnerId;
 		$config["provider"]->uiConfId = $this->uiconfId;
 
@@ -524,5 +528,10 @@ class embedPlaykitJsAction extends sfAction
 			$this->bundle_name = $this->cacheVersion . "_" . $this->bundle_name;
 	}
 	
+	public function getRequestParameter($name, $default = null)
+	{
+		$returnValue = parent::getRequestParameter($name, $default);
+		return $returnValue ? $returnValue : $default;
+	}
 	
 }

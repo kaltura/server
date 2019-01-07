@@ -45,11 +45,12 @@
                 <td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceType', $catalogItem->serviceType); ?></td>
                 <td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $catalogItem->turnAroundTime); ?></td>
                 <td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->sourceLanguage); ?></td>
-								<td><?php if (isset($catalogItem->targetLanguage))
-								echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->targetLanguage);
-								else
-									echo null;?></td>
-								<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat', $catalogItem->outputFormat); ?></td>
+                <td><?php if (isset($catalogItem->targetLanguage))
+                    echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->targetLanguage);
+                else
+                    echo null;?>
+                </td>
+                <td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat', $catalogItem->outputFormat); ?></td>
                 <td><?php echo date($this->translate('time format'), $catalogItem->createdAt); ?></td>
                 <td><?php echo date($this->translate('time format'), $catalogItem->updatedAt); ?></td>
                 <td>
@@ -359,6 +360,11 @@
 		if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS; ?>) {
 			jQuery('#filterSourceLanguage').removeAttr('hidden');
 		}
+
+		if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT; ?>) {
+			jQuery('#filterSourceLanguage').removeAttr('hidden');
+		}
+		
 		if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION; ?>) {
 			jQuery('#filterSourceLanguage').removeAttr('hidden');
 			jQuery('#filterTargetLanguage').removeAttr('hidden');

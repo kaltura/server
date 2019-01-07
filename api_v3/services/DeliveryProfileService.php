@@ -30,7 +30,7 @@ class DeliveryProfileService extends KalturaBaseService
 	}
 	
 	/**
-	 * Update exisiting delivery
+	 * Update existing delivery profile
 	 *
 	 * @action update
 	 * @param string $id

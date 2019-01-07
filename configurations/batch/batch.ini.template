@@ -66,6 +66,9 @@ enabledWorkers.KAsyncConvertThumbAssetsGenerator	= 1
 enabledWorkers.KAsyncLiveToVod      				= 1
 enabledWorkers.KAsyncCopyCaptions					= 1
 enabledWorkers.KAsyncCopyCuePoints                   = 1
+enabledWorkers.KAsyncEntryVendorTasksCsv	    = 0
+enabledWorkers.KSyncReachCreditTaskRunner	    = 0
+
 
 [mainTemplate : template]
 enabledWorkers.DirectoryCleanupShared				= 1
@@ -825,4 +828,4 @@ id                                                  = 720
 type                                                = KSyncReachCreditTaskRunner
 maximumExecutionTime                                = 3600
 scriptPath                                          = ../plugins/reach/batch/KSyncReachCreditTaskRunner/KSyncReachCreditTaskRunnerExe.php
-sleepBetweenStopStart                               = 60
+sleepBetweenStopStart                               = 21600

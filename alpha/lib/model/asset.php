@@ -503,7 +503,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		return $url;
 	}
 	
-	public function getDownloadUrl($useCdn = false, $forceProxy = false, $preview = null, $fileName = null)
+	public function getDownloadUrl($useCdn = false, $forceProxy = false, $preview = null, $fileName = null, $includeKs = true)
 	{
 		$syncKey = $this->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		
@@ -558,7 +558,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 			$downloadUrl = $fileSync->getExternalUrl($this->getEntryId());
 		}
 		else {
-		    $downloadUrl = $this->getDownloadUrlWithExpiry(86400, $useCdn, $forceProxy, $preview);
+		    $downloadUrl = $this->getDownloadUrlWithExpiry(86400, $useCdn, $forceProxy, $preview, $includeKs);
 		}
 		
 		$downloadUrl = $this->finalizeDownloadUrl($fileSync, $downloadUrl, $fileName, $serveRemote);
@@ -591,7 +591,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		return $entry->isSecuredEntry();
 	}
 	
-	public function getDownloadUrlWithExpiry($expiry, $useCdn = false, $forceProxy = false, $preview = null)
+	public function getDownloadUrlWithExpiry($expiry, $useCdn = false, $forceProxy = false, $preview = null, $includeKs = true)
 	{
 		$ksStr = "";
 		$partnerId = $this->getPartnerId();
@@ -616,7 +616,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		
 		$finalPath = $this->getFinalDownloadUrlPathWithoutKs();
 		
-		if ($ksStr)
+		if ($ksStr && $includeKs)
 			$finalPath .= "/ks/".$ksStr;
 		
 		if ($forceProxy)

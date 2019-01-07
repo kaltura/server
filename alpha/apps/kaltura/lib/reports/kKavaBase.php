@@ -15,6 +15,7 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_STORAGE_USAGE = 'storage-usage';
 	const DATASOURCE_TRANSCODING_USAGE = 'transcoding-usage';
 	const DATASOURCE_REACH_USAGE = 'reach-usage';
+	const DATASOURCE_API_USAGE = 'api-usage';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
@@ -123,4 +124,27 @@ class kKavaBase extends kDruidBase
 	    }
 	    return false;
 	}
+
+	public static function getCoordinatesKey($items)
+	{
+		$key = implode('_', $items);
+		return 'coord_' . preg_replace('/[^a-z0-9_]/', '_', strtolower($key));
+	}
+
+	public static function parseCoordinates($coords)
+	{
+		return array_map('floatval', explode('/', $coords));
+	}
+
+	public static function getCoordinatesForKeys($keys)
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_GEO_COORDINATES);
+		if (!$cache)
+		{
+			return array();
+		}
+
+		return $cache->multiGet($keys);
+	}
+
 }

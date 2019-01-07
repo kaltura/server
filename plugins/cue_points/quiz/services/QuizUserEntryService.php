@@ -53,7 +53,18 @@ class QuizUserEntryService extends KalturaBaseService{
 		$c = new Criteria();
 		$c->add(CuePointPeer::ENTRY_ID, $dbUserEntry->getEntryId(), Criteria::EQUAL);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_QUESTION));
-		$dbUserEntry->setNumOfQuestions(CuePointPeer::doCount($c));
+		$questions = CuePointPeer::doSelect($c);
+		$dbUserEntry->setNumOfQuestions(count($questions));
+		$relevantQuestionCount = 0;
+		foreach($questions as $question)
+		{
+			/* @var QuestionCuePoint $question*/
+			if (!$question->getExcludeFromScore())
+			{
+				$relevantQuestionCount++;
+			}
+		}
+		$dbUserEntry->setNumOfRelevnatQuestions($relevantQuestionCount);
 		$dbUserEntry->setStatus(QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
 		$dbUserEntry->save();
 

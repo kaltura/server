@@ -516,11 +516,11 @@ class MediaService extends KalturaEntryService
 	}
 
 	/**
-	 * Add new entry after the file was recored on the server and the token id exists
+	 * Add new entry after the file was recorded on the server and the token id exists
 	 *
 	 * @action addFromRecordedWebcam
 	 * @param KalturaMediaEntry $mediaEntry Media entry metadata
-	 * @param string $webcamTokenId Token id for the recored webcam file
+	 * @param string $webcamTokenId Token id for the recorded webcam file
 	 * @return KalturaMediaEntry The new media entry
 	 *
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH
@@ -883,13 +883,13 @@ class MediaService extends KalturaEntryService
 	}
 
 	/**
-	 * List media entries by filter with paging support.
-	 *
-	 * @action list
-     * @param KalturaMediaEntryFilter $filter Media entry filter
-	 * @param KalturaFilterPager $pager Pager
-	 * @return KalturaMediaListResponse Wrapper for array of media entries and total count
-	 */
+	* List media entries by filter with paging support.
+	*
+	* @action list
+	* @param KalturaMediaEntryFilter $filter Media entry filter
+	* @param KalturaFilterPager $pager Pager
+	* @return KalturaMediaListResponse Wrapper for array of media entries and total count
+	*/
 	function listAction(KalturaMediaEntryFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
@@ -907,12 +907,12 @@ class MediaService extends KalturaEntryService
 	}
 
 	/**
-	 * Count media entries by filter.
-	 *
-	 * @action count
-     * @param KalturaMediaEntryFilter $filter Media entry filter
-	 * @return int
-	 */
+	* Count media entries by filter.
+	*
+	* @action count
+	* @param KalturaMediaEntryFilter $filter Media entry filter
+	* @return int
+	*/
 	function countAction(KalturaMediaEntryFilter $filter = null)
 	{
 	    if (!$filter)
@@ -1006,7 +1006,7 @@ class MediaService extends KalturaEntryService
 	}
 
 	/**
-	 * Update entry thumbnail using url
+	 * Update entry thumbnail using URL
 	 *
 	 * @action updateThumbnailFromUrl
 	 * @param string $entryId Media entry id
@@ -1149,8 +1149,8 @@ class MediaService extends KalturaEntryService
 		$dbEntry = parent::prepareEntryForInsert($entry, $dbEntry);
 
 		$kshow = $this->createDummyKShow();
-        $kshowId = $kshow->getId();
-        $dbEntry->setKshowId($kshowId);
+	        $kshowId = $kshow->getId();
+		$dbEntry->setKshowId($kshowId);
 		$dbEntry->save();
 		return $dbEntry;
 	}
@@ -1267,7 +1267,7 @@ class MediaService extends KalturaEntryService
 		if ((in_array($e->getCode(), $errorCodeArr)) && (kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId())))
 		{
 			$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
-			KalturaLog::info("Source file wasn't found on current DC. dumping the request to DC id [$remoteDc]");
+			KalturaLog::info("Source file wasn't found on current DC. Dumping the request to DC ID [$remoteDc]");
 			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
 		}
 		throw $e;
