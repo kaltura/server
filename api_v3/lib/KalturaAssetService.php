@@ -126,6 +126,11 @@ abstract class KalturaAssetService extends KalturaBaseService
 	        throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $storageProfileId);
 	    }
 	    
+	    if($dbStorageProfile->getPartnerId() != $dbAsset->getPartnerId())
+	    {
+	        KalturaLog::info('Remote storage profile ID [' . $dbStorageProfile->getId() . '] partner ID is inconsistent with asset [' . $dbAsset->getId() . ']');
+	    }
+	    
 	   	$scope = $dbStorageProfile->getScope();
 	    $scope->setEntryId($dbAsset->getEntryId());
 	    if(!$dbStorageProfile->fulfillsRules($scope))

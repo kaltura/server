@@ -824,6 +824,11 @@ class BaseEntryService extends KalturaEntryService
 	    {
 	        throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $storageProfileId);
 	    }
+		
+		if($dbStorageProfile->getPartnerId() != $dbEntry->getPartnerId())
+		{
+			KalturaLog::info('Remote storage profile ID [' . $dbStorageProfile->getId() . '] partner ID is inconsistent with entry [' . $dbEntry->getId() . ']');
+		}
 	    
 	    $scope = $dbStorageProfile->getScope();
 	    $scope->setEntryId($entryId);

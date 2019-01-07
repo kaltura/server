@@ -35,6 +35,11 @@ class KalturaRemoteStorageResource extends KalturaUrlResource
 		$storageProfile = StorageProfilePeer::retrieveByPK($this->storageProfileId);
 		if(!$storageProfile)
 			throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $this->storageProfileId);
+		
+		if($storageProfile->getPartnerId() != kCurrentContext::getCurrentPartnerId())
+		{
+			KalturaLog::info('Remote storage profile ID [' . $storageProfile->getId() . '] partner ID is inconsistent with currently set partner ID [' . kCurrentContext::getCurrentPartnerId() . ']');
+		}
 	}
 	
 	/* (non-PHPdoc)
