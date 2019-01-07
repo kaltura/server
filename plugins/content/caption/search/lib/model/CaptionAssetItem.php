@@ -13,7 +13,7 @@
  * @package plugins.captionSearch
  * @subpackage model
  */
-class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
+class CaptionAssetItem extends BaseCaptionAssetItem
 {
 	/**
 	 * @var CaptionAsset
@@ -24,10 +24,6 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	 * @var entry
 	 */
 	protected $aEntry = null;
-	
-	public function getIndexObjectName() {
-		return "CaptionAssetItemIndex";
-	}
 	
 	/**
 	 * @return CaptionAsset
@@ -49,22 +45,6 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 			$this->aEntry = entryPeer::retrieveByPK($this->getEntryId());
 			
 		return $this->aEntry;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IIndexable::getIntId()
-	 */
-	public function getIntId()
-	{
-		return $this->getId();
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IIndexable::indexToSearchIndex()
-	 */
-	public function indexToSearchIndex()
-	{
-		kEventsManager::raiseEventDeferred(new kObjectReadyForElasticIndexEvent($this));
 	}
 
 	/**
@@ -167,14 +147,6 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	public function getDeletedAt($format = 'Y-m-d H:i:s')
 	{
 		return $this->getAsset()->getDeletedAt($format);
-	}
-
-	/* (non-PHPdoc)
-	 * @see IIndexable::setUpdatedAt()
-	 */
-	public function setUpdatedAt($time)
-	{
-		return $this; // updates nothing
 	}
 
 	/* (non-PHPdoc)
