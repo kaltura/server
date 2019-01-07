@@ -4,7 +4,7 @@
 /**
  * Skeleton subclass for representing a row from the 'caption_asset_item' table.
  *
- *
+ * 
  *
  * You should add additional methods to this class to meet the
  * application requirements.  This class will only be generated as
@@ -19,16 +19,16 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	 * @var CaptionAsset
 	 */
 	protected $aAsset = null;
-
+	
 	/**
 	 * @var entry
 	 */
 	protected $aEntry = null;
-
+	
 	public function getIndexObjectName() {
 		return "CaptionAssetItemIndex";
 	}
-
+	
 	/**
 	 * @return CaptionAsset
 	 */
@@ -36,10 +36,10 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	{
 		if(!$this->aAsset && $this->getCaptionAssetId())
 			$this->aAsset = assetPeer::retrieveById($this->getCaptionAssetId());
-
+			
 		return $this->aAsset;
 	}
-
+	
 	/**
 	 * @return entry
 	 */
@@ -47,10 +47,10 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	{
 		if(!$this->aEntry && $this->getEntryId())
 			$this->aEntry = entryPeer::retrieveByPK($this->getEntryId());
-
+			
 		return $this->aEntry;
 	}
-
+	
 	/* (non-PHPdoc)
 	 * @see IIndexable::getIntId()
 	 */
@@ -58,7 +58,7 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	{
 		return $this->getId();
 	}
-
+	
 	/* (non-PHPdoc)
 	 * @see IIndexable::indexToSearchIndex()
 	 */
@@ -74,7 +74,7 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	{
 		return $this->getAsset()->getTags();
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -82,7 +82,7 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	{
 		return $this->getAsset()->getPartnerDescription();
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -90,7 +90,7 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	{
 		return $this->getAsset()->getLanguage();
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -98,7 +98,7 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	{
 		return $this->getAsset()->getLabel();
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -106,7 +106,7 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	{
 		return $this->getAsset()->getContainerFormat();
 	}
-
+	
 	/**
 	 * @return int
 	 */
@@ -114,7 +114,7 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	{
 		return $this->getAsset()->getFlavorParamsId();
 	}
-
+	
 	/**
 	 * @return int
 	 */
@@ -122,7 +122,7 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	{
 		return $this->getAsset()->getVersion();
 	}
-
+	
 	/**
 	 * @return int
 	 */
@@ -130,7 +130,7 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	{
 		return $this->getAsset()->getStatus();
 	}
-
+	
 	/**
 	 * @return int
 	 */
@@ -138,7 +138,7 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	{
 		return $this->getAsset()->getSize();
 	}
-
+	
 	/**
 	 * @return int
 	 */
@@ -146,7 +146,7 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	{
 		return $this->getAsset()->getDefault();
 	}
-
+	
 	/**
 	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
 	 *							If format is NULL, then the raw unix timestamp integer will be returned.
@@ -157,7 +157,7 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	{
 		return $this->getAsset()->getUpdatedAt($format);
 	}
-
+	
 	/**
 	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
 	 *							If format is NULL, then the raw unix timestamp integer will be returned.
@@ -183,7 +183,7 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	public function postInsert(PropelPDO $con = null)
 	{
 		parent::postInsert($con);
-
+	
 		if (!$this->alreadyInSave)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
 	}
@@ -195,17 +195,17 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	{
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
-
+		
 		$objectUpdated = $this->isModified();
-
+			
 		$ret = parent::postUpdate($con);
-
+					
 		if($objectUpdated)
 			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
-
+			
 		return $ret;
 	}
-
+	
 	/* (non-PHPdoc)
 	 * @see BaseObject::postDelete()
 	 */
