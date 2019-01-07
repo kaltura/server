@@ -20,9 +20,11 @@ class BulkUploadFilterPlugin extends KalturaPlugin implements IKalturaBulkUpload
 	 */
 	public static function dependsOn()
 	{
-		$drmDependency = new KalturaDependency(BulkUploadPlugin::PLUGIN_NAME);
+		$bulkUploadDependency = new KalturaDependency(BulkUploadPlugin::PLUGIN_NAME);
 		
-		return array($drmDependency);
+		$bulkUploadXmlDependency = new KalturaDependency(BulkUploadXmlPlugin::PLUGIN_NAME);
+		
+		return array($bulkUploadDependency, $bulkUploadXmlDependency);
 	}
 	
 	/**
@@ -69,6 +71,8 @@ class BulkUploadFilterPlugin extends KalturaPlugin implements IKalturaBulkUpload
 			{
 			    case KalturaBulkUploadObjectType::CATEGORY_ENTRY:
 			        return new BulkUploadCategoryEntryEngineFilter($job);
+				case KalturaBulkUploadObjectType::ENTRY:
+					return new BulkUploadMediaEntryEngineFilter($job);
 			    default:
 			        throw new KalturaException("Bulk upload object type [{$job->data->bulkUploadObjectType}] not found", KalturaBatchJobAppErrors::ENGINE_NOT_FOUND);
 			        break;

@@ -161,7 +161,7 @@ abstract class BulkUploadEngineFilter extends KBulkUploadEngine
 		    switch ($bulkUploadResult->action)
 		    {
 		        case KalturaBulkUploadAction::ADD:
-    		        $this->createObjectFromResultAndJobData($bulkUploadResult);       					
+    		        $this->createObjectFromResultAndJobData($bulkUploadResult);
         			$bulkUploadResultChunk[] = $bulkUploadResult;
 		            break;
 		        		            
@@ -233,7 +233,7 @@ abstract class BulkUploadEngineFilter extends KBulkUploadEngine
 			}
 			
 			// update the results with the new object Id
-			if ($requestResult->id)
+			if ($requestResult->id && !$bulkUploadResult->objectId)
 			    $bulkUploadResult->objectId = $requestResult->id;
 			$this->addBulkUploadResult($bulkUploadResult);
 		}
