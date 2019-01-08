@@ -7,12 +7,18 @@ class ESearchQueryFromFilter
 
 	public function __construct()
 	{
+		$this->init();
+	}
+
+	public function init()
+	{
 		$this->searchItems = array();
 		$this->nestedSearchItem = array();
 	}
 
 	public function createElasticQueryFromFilter(baseObjectFilter $filter)
 	{
+		$this->init();
 		foreach($filter->fields as $field => $fieldValue)
 		{
 			if ($field == ESearchCaptionAssetItemFilterFields::ORDER_BY || $field == ESearchCaptionAssetItemFilterFields::LIMIT)
