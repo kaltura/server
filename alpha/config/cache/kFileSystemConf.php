@@ -112,11 +112,6 @@ class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 
 	public function getMapInfo($iniFile)
 	{
-		if(!kFile::fileSize($iniFile))
-		{
-			return array (null, null ,null);
-		}
-
 		if(strpos ($iniFile,self::HOSTS_DIR))
 		{
 			$hostname =  basename($iniFile,'.ini');
@@ -128,6 +123,12 @@ class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 			$hostname = '';
 			$mapName =  basename($iniFile,'.ini');
 		}
+
+		if(!kFile::fileSize($iniFile))
+		{
+			return array (null, null ,null);
+		}
+
 		$fsMap = new Zend_Config_Ini($iniFile);
 		$content = json_encode($fsMap->toArray());
 		return array ($mapName, $hostname ,$content);
