@@ -1,12 +1,5 @@
 <?php
 /**
- * Created by IntelliJ IDEA.
- * User: moshe.maor
- * Date: 12/11/2018
- * Time: 9:52 PM
- */
-
-/**
  * @package plugins.confMaps
  * @subpackage api.objects
  * @relatedService ConfMapsService
