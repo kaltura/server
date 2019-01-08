@@ -720,6 +720,7 @@ class KalturaErrors extends APIErrors
 	const CANNOT_PARSE_CONTENT = "CANNOT_PARSE_CONTENT;ERR,CONTENT;Error - [@ERR@] Cannot parse content - \r\n [@CONTENT@]";
 	const CONF_CONTORL_ERROR = "CONF_CONTORL_ERROR;ERR;Conf control error - [@ERR@]";
 	const MAP_NOT_EXIST = "MAP_NOT_EXIST;;Map does not exist";
+	const MAP_ALREADY_EXIST = "MAP_ALREADY_EXIST;NAME,HOST;Map already exist for this map name {@NAME@} and host {@HOST@}";
 
 }
 
