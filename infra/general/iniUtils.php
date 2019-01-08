@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: moshe.maor
- * Date: 12/19/2018
- * Time: 5:40 PM
- */
-
 class iniUtils
 {
 	public static function arrayToIniString(array $iniData)
