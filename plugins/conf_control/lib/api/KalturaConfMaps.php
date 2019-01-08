@@ -7,12 +7,12 @@
  */
 
 /**
- * @package plugins.confControl
+ * @package plugins.confMaps
  * @subpackage api.objects
- * @relatedService ConfControlService
+ * @relatedService ConfMapsService
  */
 
-class KalturaConfigMap extends KalturaObject implements IRelatedFilterable
+class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 {
 	/**
 	 * Name of the map
@@ -54,7 +54,6 @@ class KalturaConfigMap extends KalturaObject implements IRelatedFilterable
 	 */
 	public $relatedHost;
 
-
 	/**
 	 * @var int
 	 * @readonly
@@ -62,16 +61,25 @@ class KalturaConfigMap extends KalturaObject implements IRelatedFilterable
 	public $version;
 
 	/**
-	 * @var KalturaConfMapSourceLocation
+	 * @var KalturaConfMapsSourceLocation
 	 * @insertonly
 	 */
 	public $sourceLocation;
 
 	/**
-	 * @var KalturaConfMapSourceLocation
+	 * @var KalturaConfMapsSourceLocation
 	 * @insertonly
 	 */
 	public $remarks;
+
+	/**
+	 * map status
+	 *
+	 * @var int
+	 * @filter eq
+	 */
+	public $status;
+
 
 
 	private static $map_between_objects = array

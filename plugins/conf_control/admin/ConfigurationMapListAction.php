@@ -69,7 +69,7 @@ class ConfigurationMapListAction extends KalturaApplicationPlugin implements IKa
 	
 	protected function getConfigurationMapFilter()
 	{
-		return new Kaltura_Client_ConfMaps_Type_ConfigMapFilter();
+		return new Kaltura_Client_ConfMaps_Type_ConfMapsFilter();
 	}
 
 	public function getInstance($interface)

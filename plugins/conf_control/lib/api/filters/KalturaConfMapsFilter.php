@@ -1,18 +1,18 @@
 <?php
 /**
- * @package plugins.confControl
+ * @package plugins.confMaps
  * @subpackage api.filters
  */
-class KalturaConfigMapFilter extends KalturaConfigMapBaseFilter
+class KalturaConfMapsFilter extends KalturaConfMapsBaseFilter
 {
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$response = new KalturaConfControlListResponse();
+		$response = new KalturaConfMapsListResponse();
 		if(!$this->nameEqual || $this->nameEqual=='')
 		{
 			return $response;
 		}
-		$items = new KalturaConfigMapArray();
+		$items = new KalturaConfMapsArray();
 
 		//Check if map exist in file system or in remote cache
 		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
@@ -22,9 +22,9 @@ class KalturaConfigMapFilter extends KalturaConfigMapBaseFilter
 			foreach ($hostList as $host)
 			{
 				$dbMapObject = ConfMapsPeer::getLatestMap($this->nameEqual,$host);
-				$apiMapObject = new KalturaConfigMap();
+				$apiMapObject = new KalturaConfMaps();
 				$apiMapObject->fromObject($dbMapObject);
-				$apiMapObject->sourceLocation = KalturaConfMapSourceLocation::DB;
+				$apiMapObject->sourceLocation = KalturaConfMapsSourceLocation::DB;
 				$apiMapObject->isEditable = true;
 				$items->insert($apiMapObject);
 			}
@@ -35,9 +35,9 @@ class KalturaConfigMapFilter extends KalturaConfigMapBaseFilter
 			$fileNames = $fileSystemCache->getIniFilesList($this->nameEqual ,$this->relatedHostEqual);
 			foreach ($fileNames as $fileName)
 			{
-				$mapObject = new KalturaConfigMap();
+				$mapObject = new KalturaConfMaps();
 				list($mapObject->name , $mapObject->relatedHost ,$mapObject->content )  = $fileSystemCache->getMapInfo($fileName);
-				$mapObject->sourceLocation = KalturaConfMapSourceLocation::FS;
+				$mapObject->sourceLocation = KalturaConfMapsSourceLocation::FS;
 				$items->insert($mapObject);
 				$mapObject->version = 1;
 				$mapObject->isEditable = false;
@@ -53,18 +53,18 @@ class KalturaConfigMapFilter extends KalturaConfigMapBaseFilter
 	}
 
 	/**
-	 * @return KalturaConfigMap
+	 * @return KalturaConfMaps
 	 */
 	public function getMap()
 	{
-		$confMap = new KalturaConfigMap();
+		$confMap = new KalturaConfMaps();
 		$hostPatern = str_replace('*','#', $this->relatedHostEqual);
 		/*  @var kRemoteMemCacheConf $remoteCache  */
 		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
 		$map = $remoteCache->loadByHostName($this->nameEqual, $hostPatern);
 		if(!empty($map))
 		{
-			$confMap->sourceLocation = KalturaConfMapSourceLocation::DB;
+			$confMap->sourceLocation = KalturaConfMapsSourceLocation::DB;
 			$confMap->isEditable = true;
 		}
 		else
@@ -72,7 +72,7 @@ class KalturaConfigMapFilter extends KalturaConfigMapBaseFilter
 			/*  @var kFileSystemConf $confFs  */
 			$confFs = kCacheConfFactory::getInstance(kCacheConfFactory::FILE_SYSTEM);
 			$map = $confFs->loadByHostName($this->nameEqual, $hostPatern);
-			$confMap->sourceLocation = KalturaConfMapSourceLocation::FS;
+			$confMap->sourceLocation = KalturaConfMapsSourceLocation::FS;
 			$confMap->isEditable = false;
 		}
 		if(empty($map))
