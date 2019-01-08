@@ -208,7 +208,7 @@ $debug .= "property: $not_property = [$value]\n";
 		if ( $object_data instanceof BaseObject )
 		{
 			$objectId = $object_data->getId();
-			$notificationData = self::createNotificationData ( $notification_type , $object_data, $extra_notification_data  );
+			$notificationData = self::createNotificationData ( $notification_type , $object_data, $extra_notification_data, $partner_id  );
 				
 			if ( $object_data instanceof entry )
 			{
@@ -274,7 +274,7 @@ $debug .= "property: $not_property = [$value]\n";
 	}
 
 
-	private static function createNotificationData ( $notification_type , $obj , $extra_notification_data = null )
+	private static function createNotificationData ( $notification_type , $obj , $extra_notification_data = null , $partner_id = null)
 	{
 		$params = array();
 		$param_names = null;
@@ -341,7 +341,10 @@ $debug .= "property: $not_property = [$value]\n";
 
 		if ( $param_names == null )
 		return "";
-			
+
+		$httpsServerVal = $_SERVER['HTTPS'];
+		self::setServerHttps('on', $partner_id);
+
 		foreach ( $param_names as $name )
 		{
 			$method_name = "get" . $name;
@@ -372,8 +375,18 @@ $debug .= "property: $not_property = [$value]\n";
 		{
 			KalturaLog::log('could not crack KS ['.kCurrentContext::$ks.'] for adding to notification param');
 		}
-		
+
+		self::setServerHttps($httpsServerVal, $partner_id);
+
 		return serialize( $params );
+	}
+
+	protected static function setServerHttps($val, $partner_id)
+	{
+		if($partner_id && PermissionPeer::isValidForPartner(PermissionName::FEATURE_HTTP_NOTIFICATIONS_DEFAULT_PROTOCOL_HTTPS, $partner_id))
+		{
+			$_SERVER['HTTPS'] = $val;
+		}
 	}
 
 	public static function getDataAsArray ( $serialized_data )
