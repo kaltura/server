@@ -264,7 +264,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	 * @param accessControlScope $scope
 	 * @return boolean disable cache or not
 	 */
-	public function applyContext(kEntryContextDataResult &$context, accessControlScope $scope = null)
+	public function applyContext(kEntryContextDataResult &$context, accessControlScope $scope = null, $checkForceAdminValidation = true)
 	{
 		if($scope)
 			$this->setScope($scope);
@@ -283,7 +283,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		$fulfilledRules = array();
 		foreach($rules as $ruleNum => $rule)
 		{
-			if($isKsAdmin && !$rule->getForceAdminValidation())
+			if($checkForceAdminValidation && $isKsAdmin && !$rule->getForceAdminValidation())
 				continue;
 
 			$fulfilled = $rule->applyContext($context);
