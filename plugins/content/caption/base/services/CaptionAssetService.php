@@ -278,13 +278,13 @@ class CaptionAssetService extends KalturaAssetService
 
 		$newSyncKey = $captionAsset->getSyncKey(CaptionAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
-
-		$finalPath = kFileSyncUtils::getLocalFilePathForKey($newSyncKey);
-		list($width, $height, $type, $attr) = getimagesize($finalPath);
+		
+		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($newSyncKey, false);
+		list($width, $height, $type, $attr) = kImageUtils::getImageSize($fileSync);
 
 		$captionAsset->setWidth($width);
 		$captionAsset->setHeight($height);
-		$captionAsset->setSize(filesize($finalPath));
+		$captionAsset->setSize($fileSync->getFileSize());
 		
 		$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_READY);
 		$captionAsset->save();

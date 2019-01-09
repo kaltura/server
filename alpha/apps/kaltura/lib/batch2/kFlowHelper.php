@@ -2578,8 +2578,9 @@ class kFlowHelper
 
 			if($dbAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_IMPORTING)
 			{
-				$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-				$dbAsset->setSize(kFile::fileSize($finalPath));
+				/* @var $fileSync FileSync */
+				$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey, false);
+				$dbAsset->setSize($fileSync->getFileSize());
 
 				if($dbAsset instanceof flavorAsset)
 				{
@@ -2595,7 +2596,8 @@ class kFlowHelper
 
 				if($dbAsset instanceof thumbAsset)
 				{
-					list($width, $height, $type, $attr) = getimagesize($finalPath);
+					
+					list($width, $height, $type, $attr) = kImageUtils::getImageSize($fileSync);
 					$dbAsset->setWidth($width);
 					$dbAsset->setHeight($height);
 				}
