@@ -273,8 +273,17 @@ $debug .= "property: $not_property = [$value]\n";
 		}
 	}
 
+	protected static function createNotificationData ($notification_type, $obj, $extra_notification_data = null, $partner_id = null)
+	{
+		$httpsServerVal = $_SERVER['HTTPS'];
+		self::setServerHttps('on', $partner_id);
+		$notificationData = self::fillNotificationData($notification_type , $obj, $extra_notification_data);
+		self::setServerHttps($httpsServerVal, $partner_id);
+		return $notificationData;
+	}
 
-	private static function createNotificationData ( $notification_type , $obj , $extra_notification_data = null , $partner_id = null)
+
+	protected static function fillNotificationData ( $notification_type , $obj , $extra_notification_data = null)
 	{
 		$params = array();
 		$param_names = null;
@@ -342,9 +351,6 @@ $debug .= "property: $not_property = [$value]\n";
 		if ( $param_names == null )
 		return "";
 
-		$httpsServerVal = $_SERVER['HTTPS'];
-		self::setServerHttps('on', $partner_id);
-
 		foreach ( $param_names as $name )
 		{
 			$method_name = "get" . $name;
@@ -375,8 +381,6 @@ $debug .= "property: $not_property = [$value]\n";
 		{
 			KalturaLog::log('could not crack KS ['.kCurrentContext::$ks.'] for adding to notification param');
 		}
-
-		self::setServerHttps($httpsServerVal, $partner_id);
 
 		return serialize( $params );
 	}
