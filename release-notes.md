@@ -1,3 +1,22 @@
+# Naos 14.12.0 #
+
+## Add permission in Admin Console for forcing https protocol in http notifications ##
+
+- Issue Type: Feature
+- Issue ID: SUP-16550
+
+### configuration ###
+    Add the following to admin.ini:
+    
+    moduls.httpNotificationDefaultProtocolHttps.enabled = true
+    moduls.httpNotificationDefaultProtocolHttps.permissionType = 2
+    moduls.httpNotificationDefaultProtocolHttps.label = HTTP Notifications Default Protocol HTTPS
+    moduls.httpNotificationDefaultProtocolHttps.permissionName = FEATURE_HTTP_NOTIFICATIONS_DEFAULT_PROTOCOL_HTTPS
+    moduls.httpNotificationDefaultProtocolHttps.group = GROUP_ENABLE_DISABLE_FEATURES
+    
+### Deployment scripts ###
+    None
+
 # Naos 14.11.0 #
 
 ## Beacon indexes rotation ##
