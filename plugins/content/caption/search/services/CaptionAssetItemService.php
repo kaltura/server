@@ -338,7 +338,12 @@ class CaptionAssetItemService extends KalturaBaseService
 		$captionAssetItemFilter->toObject($captionAssetItemCoreFilter);
 	        $captionAssetItemFilter->idEqual = $captionAssetId;
 
-        	$response = CaptionAssetItemService::searchAction(null , $captionAssetItemFilter , $captionAssetItemPager );
+        	$captionAsset = assetPeer::retrieveById($captionAssetId);
+	        $entryId = $captionAsset->getEntryId();
+	        $entryFilter = new KalturaBaseEntryFilter();
+	        $entryFilter->idEqual = $entryId;
+
+        	$response = CaptionAssetItemService::searchAction( $entryFilter , $captionAssetItemFilter , $captionAssetItemPager );
 	        return $response;
 	}
 
