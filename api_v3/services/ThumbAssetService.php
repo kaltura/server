@@ -484,7 +484,7 @@ class ThumbAssetService extends KalturaAssetService
 		{
 			if($options && $options->download)
 				header("Content-Disposition: attachment; filename=\"$fileName\"");
-			return $this->serveAsset($thumbAsset, $fileName, $version);
+			return $this->serveAsset($thumbAsset, $fileName, false, $version);
 		}
 			
 		$thumbParams->validate();
