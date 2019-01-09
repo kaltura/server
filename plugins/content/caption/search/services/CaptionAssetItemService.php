@@ -327,6 +327,7 @@ class CaptionAssetItemService extends KalturaBaseService
 	 */
 	function listAction($captionAssetId, KalturaCaptionAssetItemFilter $captionAssetItemFilter = null, KalturaFilterPager $captionAssetItemPager = null)
 	{
+
 		if (!$captionAssetItemPager)
 			$captionAssetItemPager = new KalturaFilterPager();
 
@@ -335,18 +336,10 @@ class CaptionAssetItemService extends KalturaBaseService
 
 		$captionAssetItemCoreFilter = new CaptionAssetItemFilter();
 		$captionAssetItemFilter->toObject($captionAssetItemCoreFilter);
+	        $captionAssetItemFilter->idEqual = $captionAssetId;
 
-		$captionAssetItemCriteria = KalturaCriteria::create(CaptionAssetItemPeer::OM_CLASS);
-		$captionAssetItemCriteria->add(captionAssetItemPeer::CAPTION_ASSET_ID, $captionAssetId);
-		$captionAssetItemCoreFilter->attachToCriteria($captionAssetItemCriteria);
-		$captionAssetItemPager->attachToCriteria($captionAssetItemCriteria);
-
-		$dbList = CaptionAssetItemPeer::doSelect($captionAssetItemCriteria);
-		$list = KalturaCaptionAssetItemArray::fromDbArray($dbList, $this->getResponseProfile());
-		$response = new KalturaCaptionAssetItemListResponse();
-		$response->objects = $list;
-		$response->totalCount = $captionAssetItemCriteria->getRecordsCount();
-		return $response;
+        	$response = CaptionAssetItemService::searchAction(null , $captionAssetItemFilter , $captionAssetItemPager );
+	        return $response;
 	}
 
 }
