@@ -111,6 +111,10 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 				$event = new KalturaLiveStreamScheduleEvent();
 				break;
 
+			case KalturaScheduleEventType::BLACKOUT:
+				$event = new KalturaBlackoutScheduleEvent();
+				break;
+
 			default:
 				throw new Exception("Event type [$type] not supported");
 		}

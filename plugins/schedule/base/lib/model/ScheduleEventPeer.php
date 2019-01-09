@@ -17,12 +17,13 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 
 	const LIVE_STREAM_OM_CLASS = 'LiveStreamScheduleEvent';
 	const RECORD_OM_CLASS = 'RecordScheduleEvent';
-	
+	const BLACKOUT_OM_CLASS = 'BlackoutScheduleEvent';
 	
 	// cache classes by their type
 	protected static $class_types_cache = array(
 		ScheduleEventType::LIVE_STREAM => self::LIVE_STREAM_OM_CLASS,
 		ScheduleEventType::RECORD => self::RECORD_OM_CLASS,
+		ScheduleEventType::BLACKOUT => self::BLACKOUT_OM_CLASS,
 	);
 	
 	/*
@@ -38,17 +39,17 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		$c->addAnd(ScheduleEventPeer::STATUS, ScheduleEventStatus::DELETED, Criteria::NOT_EQUAL);
 		self::$s_criteria_filter->setFilter($c);
 	}
-	
+
 	/**
 	 * The returned Class will contain objects of the default type or
 	 * objects that inherit from the default.
 	 *
 	 * @param      array $row PropelPDO result row.
-	 * @param      int $colnum Column to examine for OM class information (first is 0).
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
+	 * @param      int $column Column to examine for OM class information (first is 0).
+	 * @return 	   bool|mixed|object|string
+	 * @throws     PropelException Any exceptions caught during processing will be rethrown wrapped into a PropelException.
 	 */
-	public static function getOMClass($row, $colnum)
+	public static function getOMClass($row, $column)
 	{
 		if($row)
 		{
