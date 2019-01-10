@@ -2213,7 +2213,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		return $entry;
 	}
 	
-	protected function parseAndAddToExistingValues ($fieldName, SimpleXMLElement $item, KalturaBaseEntry $existingItem)
+	protected function parseAndAddToExistingValues ($fieldName, SimpleXMLElement $item, KalturaBaseEntry $existingItem = null)
 	{
 		$values = $this->implodeChildElements($item->$fieldName);
 		if($existingItem && strpos($values, self::EXISTING_VALUE_DELIMITER) !== false)

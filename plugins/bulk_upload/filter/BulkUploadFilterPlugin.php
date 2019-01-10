@@ -33,10 +33,13 @@ class BulkUploadFilterPlugin extends KalturaPlugin implements IKalturaBulkUpload
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('BulkUploadFilterType');
+			return array('BulkUploadFilterType', 'BulkUploadJobObjectType');
 	
 		if($baseEnumName == 'BulkUploadType')
 			return array('BulkUploadFilterType');
+		
+		if ($baseEnumName == 'BulkUploadObjectType')
+			return array('BulkUploadJobObjectType');
 		
 		return array();
 	}
@@ -88,6 +91,11 @@ class BulkUploadFilterPlugin extends KalturaPlugin implements IKalturaBulkUpload
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
+		if ($baseClass == BulkUploadResultPeer::OM_CLASS && $enumValue == self::getBulkUploadObjectTypeCoreValue(BulkUploadJobObjectType::JOB))
+		{
+			return 'BulkUploadResultJob';
+		}
+		
 		return null;
 	}
 	
@@ -163,10 +171,20 @@ class BulkUploadFilterPlugin extends KalturaPlugin implements IKalturaBulkUpload
 	}
 	
 	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getBulkUploadObjectTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('BulkUploadObjectType', $value);
+	}
+	
+	/**
 	 * @return string external API value of dynamic enum.
 	 */
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
+
 }

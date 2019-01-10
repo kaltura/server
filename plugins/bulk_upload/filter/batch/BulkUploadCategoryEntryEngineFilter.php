@@ -86,8 +86,6 @@ class BulkUploadCategoryEntryEngineFilter extends BulkUploadEngineFilter
 	 */
 	protected function listObjects(KalturaFilter $filter, KalturaFilterPager $pager = null) 
 	{
-		KBatchBase::impersonate($this->currentPartnerId);
-		
 		$filter->orderBy = "+createdAt";
 		
 		if($filter instanceof KalturaBaseEntryFilter)

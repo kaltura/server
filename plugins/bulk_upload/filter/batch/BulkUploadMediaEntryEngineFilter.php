@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: hila.karimov
- * Date: 12/24/18
- * Time: 10:38 PM
- */
 
 class BulkUploadMediaEntryEngineFilter extends BulkUploadEngineFilter
 {
@@ -16,8 +10,6 @@ class BulkUploadMediaEntryEngineFilter extends BulkUploadEngineFilter
 	
 	protected function listObjects(KalturaFilter $filter, KalturaFilterPager $pager = null)
 	{
-		KBatchBase::impersonate($this->currentPartnerId);
-		
 		$filter->orderBy = "+createdAt";
 		if ($filter instanceof KalturaBaseEntryFilter)
 		{
@@ -33,11 +25,10 @@ class BulkUploadMediaEntryEngineFilter extends BulkUploadEngineFilter
 	
 	protected function createObjectFromResultAndJobData(KalturaBulkUploadResult $bulkUploadResult)
 	{
-		$entryId = $bulkUploadResult->objectId;
+		$entryId = $bulkUploadResult->jobObjectId;
 		
-		$xml = file_get_contents($this->data->filePath);
 		$doc = new KDOMDocument();
-		$doc->loadXML($xml);
+		$doc->load($this->data->filePath);
 		
 		$xpath = new DOMXPath($doc);
 		
@@ -56,7 +47,7 @@ class BulkUploadMediaEntryEngineFilter extends BulkUploadEngineFilter
 		$tmpFilePath = kFile::createTempFile($doc->saveXML());
 		
 		$bulkUploadJobData = new KalturaBulkUploadXmlJobData();
-		$bulkUploadJobData->fileName = $this->job->id . '_' . $bulkUploadResult->objectId . '.xml';
+		$bulkUploadJobData->fileName = $this->job->id . '_' . $entryId . '.xml';
 		
 		KBatchBase::$kClient->media->bulkUploadAdd($tmpFilePath, $bulkUploadJobData);
 	}
@@ -68,9 +59,9 @@ class BulkUploadMediaEntryEngineFilter extends BulkUploadEngineFilter
 	
 	protected function fillUploadResultInstance($object)
 	{
-		$bulkUploadResult = new KalturaBulkUploadResultEntry();
+		$bulkUploadResult = new KalturaBulkUploadResultJob();
 		$bulkUploadResult->bulkUploadJobId = $this->job->id;
-		$bulkUploadResult->objectId = $object->id;
+		$bulkUploadResult->jobObjectId = $object->id;
 		
 		$doc = new KDOMDocument();
 		$doc->load($this->data->filePath);
@@ -97,7 +88,7 @@ class BulkUploadMediaEntryEngineFilter extends BulkUploadEngineFilter
 	
 	protected function getBulkUploadResultObjectType()
 	{
-		return KalturaBulkUploadObjectType::ENTRY;
+		return KalturaBulkUploadObjectType::JOB;
 	}
 	
 	/**
