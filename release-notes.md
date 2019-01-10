@@ -17,6 +17,18 @@
 ### Deployment scripts ###
     None
 
+## Manage configuration maps from admin console ##
+
+- Issue ttype: Feature
+- Issue ID : PLAT-9491
+
+### configuration ###
+    None
+
+### Deployment scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_19_add_conf_maps_role_and_permissions.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_11_confmaps_service.php
+
 # Naos 14.11.0 #
 
 ## Beacon indexes rotation ##
