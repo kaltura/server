@@ -207,18 +207,23 @@ class ZoomVendorService extends KalturaBaseService
 		myPartnerUtils::resetAllFilters();
 		ZoomHelper::verifyHeaderToken();
 		$data = ZoomHelper::getPayloadData();
+		$eventType = $data[ZoomHelper::EVENT];
 		list($accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId) = ZoomHelper::extractDataFromRecordingCompletePayload($data);
-		/** @var ZoomVendorIntegration $zoomIntegration */
-		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
-		if (!$zoomIntegration)
+		$zoomIntegration = ZoomHelper::getIntegrationVendor($accountId);
+
+		if($eventType == ZoomHelper::RECORDING_VIDEO_COMPLETE)
 		{
-			throw new KalturaAPIException('Zoom Integration data Does Not Exist for current Partner');
+			$this->recordingVideoComplete($zoomIntegration, $accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId);
 		}
-		if($zoomIntegration->getStatus()==VendorStatus::DISABLED)
+		else if($eventType == ZoomHelper::RECORDING_TRANSCRIPT_COMPLETE)
 		{
-			KalturaLog::info("Recieved recording complete event from Zoom account {$accountId} while upload is disabled.");
-			throw new KalturaAPIException('Uploads are disabled for current Partner');
+			$this->recordingTranscriptComplete($zoomIntegration, $accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId);
 		}
+	}
+
+
+	public function recordingVideoComplete($zoomIntegration, $accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId)
+	{
 		$emails = ZoomHelper::extractCoHosts($meetingId, $zoomIntegration, $accountId);
 		$emails = ZoomHelper::getValidatedUsers($emails, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
 		$dbUser = ZoomHelper::getEntryOwner($hostEmail, $zoomIntegration->getDefaultUserEMail(), $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
@@ -231,5 +236,26 @@ class ZoomVendorService extends KalturaBaseService
 		$urls = ZoomHelper::parseDownloadUrls($downloadURLs, $downloadToken);
 		ZoomHelper::uploadToKaltura($urls, $dbUser, $zoomIntegration, $emails, $meetingId, $hostEmail);
 	}
+
+	public function recordingTranscriptComplete($zoomIntegration, $accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId)
+	{
+		$entry = entryPeer::retrieveByReferenceIdAndPartnerId ('Zoom_'. $meetingId, $zoomIntegration->getPartnerId());
+		if(!$entry)
+		{
+			throw new KalturaAPIException('could not find entry for meeting: ' . $meetingId);
+		}
+
+		$captionAssetService = new CaptionAssetService();
+		$captionAssetService->initService('caption_captionasset', 'captionasset', 'setContent');
+		foreach($downloadURLs as $transcriptUrl)
+		{
+			$captionAsset = ZoomHelper::createAssetForTranscription($entry);
+			$captionAssetResource = new KalturaUrlResource();
+			$captionAssetResource->url = $transcriptUrl;
+			$captionAssetService->setContentAction($captionAsset->getId(), $captionAssetResource);
+		}
+	}
+
+
 
 }

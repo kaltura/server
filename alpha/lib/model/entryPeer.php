@@ -336,6 +336,14 @@ class entryPeer extends BaseentryPeer
 		return entryPeer::doSelect($v);
 	}
 
+	public static function retrieveByReferenceIdAndPartnerId ($referenceId, $partnerId)
+	{
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$c->addAnd("referenceID", $referenceId);
+		$c->addAnd(entryPeer::PARTNER_ID, $partnerId);
+		return entryPeer::doSelectOne($c);
+	}
+
 	/**
 	 * find all the entries from a list of ids that have the proper status to be considered non-pending
 	 */

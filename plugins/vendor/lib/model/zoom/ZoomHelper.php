@@ -23,8 +23,16 @@ class ZoomHelper
 	const MEETING_ID = 'id';
 	const USER_EMAIL = 'user_email';
 	const PARTICIPANTS = 'participants';
+	const OBJECT = 'object';
+	const EVENT = 'event';
+	const VTT = 'VTT';
 	/** php body */
 	const PHP_INPUT = 'php://input';
+
+	/** event types */
+	const RECORDING_VIDEO_COMPLETE = 'recording.completed';
+	const RECORDING_TRANSCRIPT_COMPLETE = 'recording.transcript_completed';
+
 
 	const ADMIN_TAG_ZOOM = 'zoomentry';
 
@@ -49,6 +57,7 @@ class ZoomHelper
 		$entry->setKuserId($dbUser->getKuserId());
 		$entry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($dbUser->getPartnerId())->getId());
 		$entry->setAdminTags(self::ADMIN_TAG_ZOOM);
+		$entry->setReferenceID('Zoom_'. $meetingId);
 		if ($zoomCategory)
 		{
 			$entry->setCategories($zoomCategory);
@@ -201,19 +210,20 @@ class ZoomHelper
 
 	/**
 	 * @param $data
+	 * @param $eventType
 	 * @return array
 	 */
-	public static function extractDataFromRecordingCompletePayload($data)
+	public static function extractDataFromRecordingCompletePayload($data, $eventType)
 	{
 		KalturaLog::debug('recordingcomplete data recived from zoom:');
 		KalturaLog::debug(print_r($data, true));
 		$payload = $data[self::PAYLOAD];
 		$downloadToken = $data[self::DOWNLOAD_TOKEN];
 		$accountId = $payload[self::ACCOUNT_ID];
-		$meeting = $payload[self::MEETING];
+		$meeting = $payload[self::OBJECT];
 		$hostEmail = $meeting[self::HOST_EMAIL];
 		$recordingFiles = $meeting[self::RECORDING_FILES];
-		$downloadURLs = self::getDownloadUrls($recordingFiles);
+		$downloadURLs = self::getDownloadUrls($recordingFiles, $eventType);
 		$meetingId = $meeting[self::MEETING_ID];
 		return array($accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId);
 	}
@@ -337,22 +347,43 @@ class ZoomHelper
 
 	/**
 	 * @param array $recordingFiles
+	 * @param string $eventType
 	 * @return array
 	 */
-	protected static function getDownloadUrls($recordingFiles)
+	protected static function getDownloadUrls($recordingFiles, $eventType)
 	{
+		$fileType = self::getFileType($eventType);
 		$downloadURLs = array();
-		foreach ($recordingFiles as $recordingFile) {
-			if ($recordingFile[self::FILE_TYPE] === self::MP4)
+		foreach ($recordingFiles as $recordingFile)
+		{
+			if ($recordingFile[self::FILE_TYPE] === $fileType)
 			{
 				$downloadURLs[] = $recordingFile[self::DOWNLOAD_URL];
 			}
 		}
 		if (!$downloadURLs)
 		{
-			KExternalErrors::dieGracefully('Zoom - MP4 downland url was not found');
+			KExternalErrors::dieGracefully('Zoom - downland url was not found');
 		}
 		return $downloadURLs;
+	}
+
+	protected static function getFileType($eventType)
+	{
+		$fileType = '';
+		if($eventType == self::RECORDING_VIDEO_COMPLETE)
+		{
+			$fileType = self::MP4;
+		}
+		else if($eventType == self::RECORDING_TRANSCRIPT_COMPLETE)
+		{
+			$fileType = self::VTT;
+		}
+		else
+		{
+			KExternalErrors::dieGracefully('Zoom - the following event type is not supported: ' . $eventType);
+		}
+		return $fileType;
 	}
 
 	/**
@@ -451,6 +482,33 @@ class ZoomHelper
 		$categoryEntry->setPartnerId($getPartnerId);
 		$categoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
 		$categoryEntry->save();
+	}
+
+	public static function getIntegrationVendor($accountId)
+	{
+		/** @var ZoomVendorIntegration $zoomIntegration */
+		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+		if (!$zoomIntegration)
+		{
+			throw new KalturaAPIException('Zoom Integration data Does Not Exist for current Partner');
+		}
+		if($zoomIntegration->getStatus()==VendorStatus::DISABLED)
+		{
+			KalturaLog::info("Recieved recording complete event from Zoom account {$accountId} while upload is disabled.");
+			throw new KalturaAPIException('Uploads are disabled for current Partner');
+		}
+		return $zoomIntegration;
+	}
+
+	public static function createAssetForTranscription($entry)
+	{
+		$caption = new CaptionAsset();
+		$caption->setEntryId($entry->getId());
+		$caption->setPartnerId($entry->getPartnerId());
+		$caption->setContainerFormat(CaptionType::WEBVTT);
+		$caption->setStatus(CaptionAsset::ASSET_STATUS_QUEUED);
+		$caption->save();
+		return $caption;
 	}
 
 }
