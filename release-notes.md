@@ -30,7 +30,7 @@
 - Issue ttype: Feature
 - Issue ID : PLAT-9491
 
-This feature will allow managing system congfiguration in admin console UI along with file systemm in files.
+This feature will allow managing system congfiguration in admin console UI along with file system INI files.
 It is based on Plat-8932 that is described in this notes below.
 
 ### configuration ###
