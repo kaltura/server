@@ -134,7 +134,7 @@ class DataService extends KalturaEntryService
 	}
 	
 	/**
-	 * serve action returan the file from dataContent field.
+	 * return the file from dataContent field.
 	 * 
 	 * @action serve
 	 * @param string $entryId Data entry id

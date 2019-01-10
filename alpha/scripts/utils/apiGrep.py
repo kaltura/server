@@ -28,6 +28,9 @@ def parseCmdLine():
 	parser.add_option("--match-any",
 					  action="store_true", dest="matchAny", default=False,
 					  help="match the pattern against any line (default is to match only starting log lines)")
+	parser.add_option("-v", "--invert-match",
+					  action="store_true", dest="invertMatch", default=False,
+					  help="select non-matching lines")
 	return parser.parse_args()
 
 def shellQuote(s):
@@ -60,7 +63,7 @@ def processFileMatchAny(inputFile, pattern, prefix):
 			if match(pattern, block):
 				print prefix + block.rstrip().replace('\n', '\n' + prefix)
 			block = curLine
-		else:
+		elif len(block) < 10485760:	# 10MB
 			block += curLine
 	if match(pattern, block):
 		print prefix + block.rstrip().replace('\n', '\n' + prefix)
@@ -96,6 +99,10 @@ if options.ignoreCase:
 else:
 	match = matchCaseSensitive
 
+if options.invertMatch:
+	originalMatch = match
+	match = lambda p, b: not originalMatch(p, b)
+
 prefix = ''
 for fileName in fileNames:
 	if fileName.endswith('.gz'):
@@ -107,6 +114,8 @@ for fileName in fileNames:
 			params.append('--match-any')
 		if options.ignoreCase:
 			params.append('-i')
+		if options.invertMatch:
+			params.append('-v')
 		params.append(pattern)
 		params = ' '.join(map(shellQuote, params))
 		cmdLine = "gzip -cd %s | python %s" % (shellQuote(fileName), params)

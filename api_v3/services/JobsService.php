@@ -2,7 +2,7 @@
 /**
  * batch service lets you handle different batch process from remote machines.
  * As opposed to other objects in the system, locking mechanism is critical in this case.
- * For this reason the GetExclusiveXX, UpdateExclusiveXX and FreeExclusiveXX actions are important for the system's intergity.
+ * For this reason the GetExclusiveXX, UpdateExclusiveXX and FreeExclusiveXX actions are important for the system's integrity.
  * In general - updating batch object should be done only using the UpdateExclusiveXX which in turn can be called only after 
  * acuiring a batch objet properly (using  GetExclusiveXX).
  * If an object was aquired and should be returned to the pool in it's initial state - use the FreeExclusiveXX action 
@@ -74,7 +74,7 @@ class JobsService extends KalturaBaseService
 	
 	
 	/**
-	 * batch retryImportAction retrys and returns the status of import task
+	 * batch retryImportAction retries and returns the status of import task
 	 * 
 	 * @action retryImport
 	 * @param int $jobId the id of the bulk upload job  
@@ -134,7 +134,7 @@ class JobsService extends KalturaBaseService
 	
 	
 	/**
-	 * batch retryProvisionProvideAction retrys and returns the status of ProvisionProvide task
+	 * batch retryProvisionProvideAction retries and returns the status of ProvisionProvide task
 	 * 
 	 * @action retryProvisionProvide
 	 * @param int $jobId the id of the bulk upload job  
@@ -193,7 +193,7 @@ class JobsService extends KalturaBaseService
 	
 	
 	/**
-	 * batch retryProvisionDeleteAction retrys and returns the status of ProvisionDelete task
+	 * batch retryProvisionDeleteAction retries and returns the status of ProvisionDelete task
 	 * 
 	 * @action retryProvisionDelete
 	 * @param int $jobId the id of the bulk upload job  
@@ -252,7 +252,7 @@ class JobsService extends KalturaBaseService
 	
 	
 	/**
-	 * batch retryBulkUploadAction retrys and returns the status of bulk upload task
+	 * batch retryBulkUploadAction retries and returns the status of bulk upload task
 	 * 
 	 * @action retryBulkUpload
 	 * @param int $jobId the id of the bulk upload job  
@@ -372,7 +372,7 @@ class JobsService extends KalturaBaseService
 
 	
 	/**
-	 * batch retryConvertAction retrys and returns the status of convert task
+	 * batch retryConvertAction retries and returns the status of convert task
 	 * 
 	 * @action retryConvert
 	 * @param int $jobId the id of the bulk upload job  
@@ -437,7 +437,7 @@ class JobsService extends KalturaBaseService
 
 	
 	/**
-	 * batch retryConvertCollectionAction retrys and returns the status of convert profile task
+	 * batch retryConvertCollectionAction retries and returns the status of convert profile task
 	 * 
 	 * @action retryConvertCollection
 	 * @param int $jobId the id of the bulk upload job  
@@ -450,7 +450,7 @@ class JobsService extends KalturaBaseService
 
 	
 	/**
-	 * batch retryConvertProfileAction retrys and returns the status of convert profile task
+	 * batch retryConvertProfileAction retries and returns the status of convert profile task
 	 * 
 	 * @action retryConvertProfile
 	 * @param int $jobId the id of the bulk upload job  
@@ -508,7 +508,7 @@ class JobsService extends KalturaBaseService
 	
 	
 	/**
-	 * batch retryPostConvertAction retrys and returns the status of post convert task
+	 * batch retryPostConvertAction retries and returns the status of post convert task
 	 * 
 	 * @action retryPostConvert
 	 * @param int $jobId the id of the bulk upload job  
@@ -565,7 +565,7 @@ class JobsService extends KalturaBaseService
 	
 	
 	/**
-	 * batch retryCaptureThumbAction retrys and returns the status of capture thumbnail task
+	 * batch retryCaptureThumbAction retries and returns the status of capture thumbnail task
 	 * 
 	 * @action retryCaptureThumb
 	 * @param int $jobId the id of the bulk upload job  
@@ -623,7 +623,7 @@ class JobsService extends KalturaBaseService
 	
 	
 	/**
-	 * batch retryExtractMediaAction retrys and returns the status of extract media task
+	 * batch retryExtractMediaAction retries and returns the status of extract media task
 	 * 
 	 * @action retryExtractMedia
 	 * @param int $jobId the id of the bulk upload job  
@@ -682,7 +682,7 @@ class JobsService extends KalturaBaseService
 	
 	
 	/**
-	 * batch retryStorageExportAction retrys and returns the status of export task
+	 * batch retryStorageExportAction retries and returns the status of export task
 	 * 
 	 * @action retryStorageExport
 	 * @param int $jobId the id of the bulk upload job  
@@ -741,7 +741,7 @@ class JobsService extends KalturaBaseService
 	
 	
 	/**
-	 * batch retryStorageDeleteAction retrys and returns the status of export task
+	 * batch retryStorageDeleteAction retries and returns the status of export task
 	 * 
 	 * @action retryStorageDelete
 	 * @param int $jobId the id of the bulk upload job  
@@ -799,7 +799,7 @@ class JobsService extends KalturaBaseService
 	
 	
 	/**
-	 * batch retryNotificationAction retrys and returns the status of notification task
+	 * batch retryNotificationAction retries and returns the status of notification task
 	 * 
 	 * @action retryNotification
 	 * @param int $jobId the id of the bulk upload job  
@@ -858,7 +858,7 @@ class JobsService extends KalturaBaseService
 	
 	
 	/**
-	 * batch retryMailAction retrys and returns the status of mail task
+	 * batch retryMailAction retries and returns the status of mail task
 	 * 
 	 * @action retryMail
 	 * @param int $jobId the id of the bulk upload job  

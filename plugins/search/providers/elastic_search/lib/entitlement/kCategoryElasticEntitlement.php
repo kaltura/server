@@ -7,7 +7,7 @@
 class kCategoryElasticEntitlement extends kBaseElasticEntitlement
 {
 	protected static $entitlementContributors = array(
-		'kElasticDisplayAndMemberEntitlement',
-		'kElasticPrivacyContextEntitlement',
+		'kElasticDisplayAndMemberEntitlementDecorator',
+		'kElasticPrivacyContextEntitlementDecorator',
 	);
 }

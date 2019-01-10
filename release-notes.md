@@ -1,3 +1,70 @@
+# Naos 14.12.0 #
+
+## Add permission in Admin Console for forcing https protocol in http notifications ##
+
+- Issue Type: Feature
+- Issue ID: SUP-16550
+
+### configuration ###
+    Add the following to admin.ini:
+    
+    moduls.httpNotificationDefaultProtocolHttps.enabled = true
+    moduls.httpNotificationDefaultProtocolHttps.permissionType = 2
+    moduls.httpNotificationDefaultProtocolHttps.label = HTTP Notifications Default Protocol HTTPS
+    moduls.httpNotificationDefaultProtocolHttps.permissionName = FEATURE_HTTP_NOTIFICATIONS_DEFAULT_PROTOCOL_HTTPS
+    moduls.httpNotificationDefaultProtocolHttps.group = GROUP_ENABLE_DISABLE_FEATURES
+    
+### Deployment scripts ###
+    None
+
+# Naos 14.11.0 #
+
+## Beacon indexes rotation ##
+- Issue Type: Task
+- Issue ID: PLAT-9288
+
+Added a script (plugins/beacon/scripts/BeaconsIndexesRotation.php) to support index rotation in our beacon service.
+Run this script as a monthly cron job to rotate the indexes so you could delete old beacon events easly.
+
+The indexes name should be in the following format for the script to work {index_name}-{datetime_format} for example: beacon_entry_index-201812 
+### Configuration ###
+	Optional:
+	1) Add the following to your elastic.ini file in beacon section:
+        maxNumberOfIndices = {num of monthly indices you want to keep} by default this will be one
+    2) Add beacon_rotation.ini to you configuration based on beacon_rotation.template.ini
+    
+# Naos 14.10.0 #
+
+## Beacon service searchScheduledResource api ##
+- Issue Type: Task
+- Issue ID: PLAT-9398, PLAT-9396
+
+### Configuration ###
+	None.
+
+#### Deployment Scripts ####
+
+    1. Run deployment scripts:
+        php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_11_22_add_beacon_service_permissions.php
+    
+    2. Stop logstash process to avoid re-creating the old beacon index.
+    
+    3. Create new indexes in elastic by runing:
+    	curl -XPUT 'ELASTIC_HOST:ELASTIC_PORT/beacon_scheduled_resource_index_2018_12_10' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_scheduled_resource_index.json"
+    
+    4. Delete all old beacon_scheduled_resource elastic aliases.
+    
+    5. Create new alises in elastic:
+        curl -XPOST 'ELASTIC_HOST:ELASTIC_PORT/_aliases?pretty' -H 'Content-Type: application/json' -d'{
+     	    "actions" : [
+                { "add" : { "index" : "beacon_scheduled_resource_index_2018_12_10", "alias" : "beacon_scheduled_resource_index" } },
+                { "add" : { "index" : " beacon_scheduled_resource_index_2018_12_10", "alias" : "beaconindex" } },
+                { "add" : { "index" : " beacon_scheduled_resource_index_2018_12_10", "alias" : "beacon_scheduled_resource_index_search" } }
+            ]
+         }
+    
+    6. start logstash process.
+
 # Naos 14.9.0 #
 
 ## Add permission for bulk update categoryEntry status ##
@@ -1073,7 +1140,7 @@ None.
 
 	1. Stop logstash process to avoid re-creating the old beacon index.
 
-	2. Delete all old elstic aliases.
+	2. Delete all old elastic aliases.
 	
 	3. Delete old beaconIndex.
 	
@@ -1097,7 +1164,7 @@ None.
 			]
 		}'
 		
-	6. strat logstash process.
+	6. start logstash process.
 
 #### Known Issues & Limitations ####
 

@@ -139,17 +139,12 @@ class kRule
 			
 		foreach($this->conditions as $condition)
 		{
-			if(!$condition->fulfilled($this->scope))
+			$condRes = $condition->fulfilled($this->scope);
+			$this->copyExtraVals($condition);
+			if(!$condRes)
 			{
 				KalturaLog::debug("Condition [" . get_class($condition) . "] not  fulfilled");
 				return false;
-			}
-			if ($this->scope)
-			{
-				foreach ($condition->getExtraProperties() as $key => $value)
-				{
-					$this->scope->setOutputVar($key, $value);
-				}
 			}
 		}
 				
@@ -379,5 +374,16 @@ class kRule
 			return false;
 		}
 		return true;
+	}
+
+	protected function copyExtraVals($condition)
+	{
+		if ($this->scope)
+		{
+			foreach ($condition->getExtraProperties() as $key => $value)
+			{
+				$this->scope->setOutputVar($key, $value);
+			}
+		}
 	}
 }

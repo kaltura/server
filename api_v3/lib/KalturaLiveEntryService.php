@@ -217,7 +217,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$this->setMediaServerWrapper($dbLiveEntry, $mediaServerIndex, $hostname, $liveEntryStatus, $applicationName);
 
 		// setRedirectEntryId to null in all cases, even for broadcasting...
-		$dbLiveEntry->setRedirectEntryId(null);
 
 		$dbLiveEntry->save();
 		return $this->checkAndCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, true, $shouldCreateRecordedEntry);
@@ -345,7 +344,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	function unregisterMediaServerAction($entryId, $hostname, $mediaServerIndex)
 	{
-		$this->dumpApiRequest($entryId);
+		$this->dumpApiRequest($entryId, true);
 
 		KalturaLog::debug("Entry [$entryId] from mediaServerIndex [$mediaServerIndex] with hostname [$hostname]");
 
@@ -507,7 +506,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	public function createRecordedEntryAction($entryId, $mediaServerIndex, $liveEntryStatus)
 	{
-		$this->dumpApiRequest($entryId);
+		$this->dumpApiRequest($entryId, true);
 		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);

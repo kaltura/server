@@ -26,7 +26,7 @@ class myFlvStreamer
 
 	public function pendingEntriesCount()
 	{
-		return count($this->pendingEntries);
+		return $this->pendingEntries ? count($this->pendingEntries) : 0;
 	}
 
 	public function getTotalLength( $include_metadata = true )

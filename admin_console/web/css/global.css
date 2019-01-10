@@ -1910,6 +1910,14 @@ form#frmCreateReachProfile dd,form#frmCreateReachProfile dt {
 	float: left;
 }
 
+form#frmCloneReachProfile dd,form#frmCloneReachProfile dt {
+	float: left;
+}
+
+form#frmClonePartnerCatalogItems dd,form#frmClonePartnerCatalogItems dt {
+	float: left;
+}
+
 #drop-folder-configure-dialog {
 	padding-top: 10px;
 }

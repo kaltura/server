@@ -76,6 +76,12 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 		$createProfileForm->setAction($actionUrl);
 
 		$action->view->newPartnerCatalogItemFolderForm = $createProfileForm;
+
+		$clonePartnerCatalogItemsForm = new Form_ClonePartnerCatalogItems();
+		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemClone'), null, true);
+		$clonePartnerCatalogItemsForm->setAction($actionUrl);
+
+		$action->view->clonePartnerCatalogItemsForm = $clonePartnerCatalogItemsForm;
 		$action->view->partnerId = $partnerId;
 	}
 
@@ -85,6 +91,8 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 			return new Kaltura_Client_Reach_Type_VendorCaptionsCatalogItemFilter();
 		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
 			return new Kaltura_Client_Reach_Type_VendorTranslationCatalogItemFilter();
+		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT)
+			return new Kaltura_Client_Reach_Type_VendorAlignmentCatalogItemFilter();
 		else
 			return new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
 	}

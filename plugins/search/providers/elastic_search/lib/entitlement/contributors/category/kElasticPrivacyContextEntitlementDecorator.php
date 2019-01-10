@@ -4,7 +4,7 @@
  * @subpackage lib.entitlement
  */
 
-class kElasticPrivacyContextEntitlement extends kElasticCategoryEntitlementDecorator
+class kElasticPrivacyContextEntitlementDecorator extends kElasticCategoryEntitlementDecorator
 {
 	public static function getEntitlementCondition(array $params = array(), $fieldPrefix = '')
 	{
