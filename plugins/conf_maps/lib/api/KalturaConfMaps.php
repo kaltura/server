@@ -60,7 +60,7 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 	public $sourceLocation;
 
 	/**
-	 * @var KalturaConfMapsSourceLocation
+	 * @var string
 	 * @insertonly
 	 */
 	public $remarks;
@@ -68,7 +68,7 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 	/**
 	 * map status
 	 *
-	 * @var int
+	 * @var KalturaConfMapsStatus
 	 * @filter eq
 	 */
 	public $status;

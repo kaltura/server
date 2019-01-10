@@ -1,6 +1,15 @@
 <?php
+/**
+	Ini files manipulation utlities
+	@Package infra
+ */
 class iniUtils
 {
+	/**
+	 * Given an associative array, this function will generate INI file string that represent it.
+	 * @param array $iniData
+	 * @return string
+	 */
 	public static function arrayToIniString(array $iniData)
 	{
 		$res = '';

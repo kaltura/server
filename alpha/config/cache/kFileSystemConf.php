@@ -4,6 +4,7 @@ require_once __DIR__ . '/kMapCacheInterface.php';
 
 class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 {
+	const LOCAL_CONF_FILE = 'local';
 	const HOSTS_DIR = '/hosts/';
 	function __construct()
 	{
@@ -15,17 +16,25 @@ class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 		parent::__construct();
 	}
 
-	public function getFileNames ($mapName , $hostname)
+	public function getFileNames ($mapName, $hostname)
 	{
-		$configDir = kEnvironment::getConfigDir();
 		$iniFiles = array();
-		if ($mapName == 'local')
+
+		if(!$mapName)
+		{
+			return $iniFiles;
+		}
+
+		$configDir = kEnvironment::getConfigDir();
+		if ($mapName == self::LOCAL_CONF_FILE)
+		{
 			$iniFiles[] = "$configDir/base.ini";
+		}
 		$iniFiles[] = "$configDir/$mapName.ini";
 		if($hostname)
 		{
 			$configPath = $configDir.self::HOSTS_DIR;
-			if ($mapName != 'local')
+			if ($mapName != self::LOCAL_CONF_FILE)
 				$configPath .= $mapName;
 
 			if(is_dir($configPath))
@@ -78,7 +87,7 @@ class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 	{
 		$iniFiles = $this->getFileNames ($mapName , $hostname);
 		$this->orderMap($iniFiles);
-		$mergedMaps = $this->mergeMaps($iniFiles,($mapName=='local'));
+		$mergedMaps = $this->mergeMaps($iniFiles,($mapName==self::LOCAL_CONF_FILE));
 		return $mergedMaps;
 	}
 

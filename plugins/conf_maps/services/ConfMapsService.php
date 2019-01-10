@@ -8,16 +8,16 @@ class ConfMapsService extends KalturaBaseService
 {
 	protected function kalturaNetworkAllowed($actionName)
 	{
-		//TODO
 		return true;
 	}
 
 	/**
-	 * Add configuration mapp
+	 * Add configuration map
 	 *
 	 * @action add
 	 * @param KalturaConfMaps $map
 	 * @return KalturaConfMaps
+	 * @throws KalturaErrors::MAP_ALREADY_EXIST
 	 */
 	function addAction(KalturaConfMaps $map)
 	{
@@ -29,7 +29,7 @@ class ConfMapsService extends KalturaBaseService
 		$map->validateContent();
 		$newMapVersion = new ConfMaps();
 		$map->toInsertableObject($newMapVersion);
-		$newMapVersion->setStatus(ConfMaps::STATUS_ENABLED);
+		$newMapVersion->setStatus(ConfMapsStatus::STATUS_ENABLED);
 		$newMapVersion->setVersion(0);
 		$newMapVersion->setRemarks(kCurrentContext::$ks);
 		$newMapVersion->save();
@@ -38,12 +38,12 @@ class ConfMapsService extends KalturaBaseService
 		return $map;
 	}
 	/**
-	 * Add configuration mapp
+	 * Update configuration map
 	 *
 	 * @action update
 	 * @param KalturaConfMaps $map
 	 * @return KalturaConfMaps
-	 * @throws KalturaAPIException
+	 * @throws KalturaErrors::MAP_DOES_NOT_EXIST
 	 */
 	function updateAction(KalturaConfMaps $map)
 	{
@@ -51,7 +51,7 @@ class ConfMapsService extends KalturaBaseService
 		$dbMap = ConfMapsPeer::getLatestMap($map->name, $map->relatedHost);
 		if(!$dbMap)
 		{
-			throw new KalturaAPIException(KalturaErrors::MAP_NOT_EXIST );
+			throw new KalturaAPIException(KalturaErrors::MAP_DOES_NOT_EXIST );
 		}
 		$map->validateContent();
 		$newMapVersion = new ConfMaps();
@@ -67,9 +67,9 @@ class ConfMapsService extends KalturaBaseService
 	 * @action list
 	 * @param KalturaConfMapsFilter $filter
 	 * @return KalturaConfMapsListResponse
-     * @throws KalturaAPIException MISSING_MAP_NAME
+	 * @throws KalturaErrors::MISSING_MAP_NAME
 	 */
-	function listAction(KalturaConfMapsFilter $filter = null)
+	function listAction(KalturaConfMapsFilter $filter)
 	{
 		kApiCache::disableCache();
 		$pager = new KalturaFilterPager();
@@ -89,7 +89,4 @@ class ConfMapsService extends KalturaBaseService
 		$confMap = $filter->getMap();
 		return $confMap;
 	}
-
-
-
 }

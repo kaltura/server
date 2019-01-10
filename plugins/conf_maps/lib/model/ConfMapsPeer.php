@@ -23,7 +23,7 @@ class ConfMapsPeer extends BaseConfMapsPeer {
 		}
 
 		$c = new Criteria();
-		$c->add(self::STATUS, ConfMaps::STATUS_ENABLED);
+		$c->add(self::STATUS, ConfMapsStatus::STATUS_ENABLED);
 		self::$s_criteria_filter->setFilter($c);
 	}
 
@@ -45,7 +45,7 @@ class ConfMapsPeer extends BaseConfMapsPeer {
 		$c->add(self::HOST_NAME ,$hostNameRegex );
 		$c->add(self::CONTENT ,$content );
 		$c->add(self::VERSION ,$newVersion );
-		$c->add(self::STATUS ,ConfMaps::STATUS_ENABLED );
+		$c->add(self::STATUS ,ConfMapsStatus::STATUS_ENABLED );
 		return self::doInsert($c);
 	}
 } // ConfMapsPeer
