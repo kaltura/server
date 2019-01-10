@@ -1,3 +1,46 @@
+# Naos 14.12.0 #
+
+## Add new type of filter bulk upload engine ##
+
+- Issue Type: Feature
+- Issue ID: PSVAMB-5604
+    
+### Deployment scripts ###
+    - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    - php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_01_10_add_media_addbulkupload_to_batch_partner.php
+
+## Add permission in Admin Console for forcing https protocol in http notifications ##
+
+- Issue Type: Feature
+- Issue ID: SUP-16550
+
+### configuration ###
+    Add the following to admin.ini:
+    
+    moduls.httpNotificationDefaultProtocolHttps.enabled = true
+    moduls.httpNotificationDefaultProtocolHttps.permissionType = 2
+    moduls.httpNotificationDefaultProtocolHttps.label = HTTP Notifications Default Protocol HTTPS
+    moduls.httpNotificationDefaultProtocolHttps.permissionName = FEATURE_HTTP_NOTIFICATIONS_DEFAULT_PROTOCOL_HTTPS
+    moduls.httpNotificationDefaultProtocolHttps.group = GROUP_ENABLE_DISABLE_FEATURES
+    
+### Deployment scripts ###
+    None
+
+## Manage configuration maps from admin console ##
+- Issue ttype: Feature
+- Issue ID : PLAT-9491
+
+This feature will allow managing system congfiguration in admin console UI along with file system INI files.
+It is based on Plat-8932 that is described in this notes below.
+
+### configuration ###
+    Add ConfMaps to your plugins.ini
+
+### Deployment scripts ###
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_19_add_conf_maps_role_and_permissions.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_11_confmaps_service.php
+
 # Naos 14.11.0 #
 
 ## Beacon indexes rotation ##

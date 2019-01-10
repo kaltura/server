@@ -4,6 +4,8 @@ require_once __DIR__ . '/kMapCacheInterface.php';
 
 class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 {
+	const LOCAL_CONF_FILE = 'local';
+	const HOSTS_DIR = '/hosts/';
 	function __construct()
 	{
 		if(!class_exists('Zend_Config_Ini'))
@@ -14,18 +16,26 @@ class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 		parent::__construct();
 	}
 
-	protected function getFileNames ($mapName , $hostname)
+	public function getFileNames ($mapName, $hostname)
 	{
-		$configDir = kEnvironment::getConfigDir();
 		$iniFiles = array();
-		if ($mapName == 'local')
+
+		if(!$mapName)
+		{
+			return $iniFiles;
+		}
+
+		$configDir = kEnvironment::getConfigDir();
+		if ($mapName == self::LOCAL_CONF_FILE)
+		{
 			$iniFiles[] = "$configDir/base.ini";
+		}
 		$iniFiles[] = "$configDir/$mapName.ini";
 		if($hostname)
 		{
-			$configPath = "$configDir/hosts";
-			if ($mapName != 'local')
-				$configPath .= "/$mapName";
+			$configPath = $configDir.self::HOSTS_DIR;
+			if ($mapName != self::LOCAL_CONF_FILE)
+				$configPath .= $mapName;
 
 			if(is_dir($configPath))
 			{
@@ -70,14 +80,66 @@ class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 	public function load ($key, $mapName)
 	{
 		$hostname = $this->getHostName();
+		return $this->loadByHostName($mapName,$hostname);
+	}
+
+	public function loadByHostName ($mapName , $hostname)
+	{
 		$iniFiles = $this->getFileNames ($mapName , $hostname);
 		$this->orderMap($iniFiles);
-		$mergedMaps = $this->mergeMaps($iniFiles,($mapName=='local'));
+		$mergedMaps = $this->mergeMaps($iniFiles,($mapName==self::LOCAL_CONF_FILE));
 		return $mergedMaps;
 	}
 
 	public function store($key, $mapName, $map, $ttl = 0)
 	{
 		return true;
+	}
+
+
+	public function getIniFilesList($mapName, $hostNameRegex)
+	{
+		$iniFile = array();
+		$configDir = kEnvironment::getConfigDir();
+		$baseConfigFile = $configDir . DIRECTORY_SEPARATOR . $mapName . '.ini';
+		if(kFile::fileSize($baseConfigFile))
+		{
+			$iniFile[] = $baseConfigFile;
+		}
+		$hostNameRegexPattern = '/'.$hostNameRegex.'/';
+		$iniFilesFiles = kFile::listDir($configDir . self::HOSTS_DIR . $mapName);
+		foreach ($iniFilesFiles as $iniFileItem)
+		{
+			$mapHostNameRegex = $iniFileItem[0];
+			if(preg_match($hostNameRegexPattern, $mapHostNameRegex))
+			{
+				$iniFile[] = $configDir . self::HOSTS_DIR . $mapName . DIRECTORY_SEPARATOR .$mapHostNameRegex;
+			}
+		}
+		return $iniFile;
+	}
+
+	public function getMapInfo($iniFile)
+	{
+		if(strpos ($iniFile,self::HOSTS_DIR))
+		{
+			$hostname =  basename($iniFile,'.ini');
+			$iniNameBlocks = explode ('/',$iniFile);
+			$mapName = $iniNameBlocks[count($iniNameBlocks)-2];
+		}
+		else
+		{
+			$hostname = '';
+			$mapName =  basename($iniFile,'.ini');
+		}
+
+		if(!kFile::fileSize($iniFile))
+		{
+			return array (null, null ,null);
+		}
+
+		$fsMap = new Zend_Config_Ini($iniFile);
+		$content = json_encode($fsMap->toArray());
+		return array ($mapName, $hostname ,$content);
 	}
 }
