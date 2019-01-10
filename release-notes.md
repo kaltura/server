@@ -1,5 +1,14 @@
 # Naos 14.12.0 #
 
+## Add new type of filter bulk upload engine ##
+
+- Issue Type: Feature
+- Issue ID: PSVAMB-5604
+    
+### Deployment scripts ###
+    - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    - php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_01_10_add_media_addbulkupload_to_batch_partner.php
+
 ## Add permission in Admin Console for forcing https protocol in http notifications ##
 
 - Issue Type: Feature
@@ -18,14 +27,17 @@
     None
 
 ## Manage configuration maps from admin console ##
-
 - Issue ttype: Feature
 - Issue ID : PLAT-9491
 
+This feature will allow managing system congfiguration in admin console UI along with file systemm in files.
+It is based on Plat-8932 that is described in this notes below.
+
 ### configuration ###
-    None
+    Add ConfMaps to your plugins.ini
 
 ### Deployment scripts ###
+    php deployment/base/scripts/installPlugins.php
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_19_add_conf_maps_role_and_permissions.php
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_11_confmaps_service.php
 
