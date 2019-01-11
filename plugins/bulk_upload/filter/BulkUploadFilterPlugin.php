@@ -74,8 +74,8 @@ class BulkUploadFilterPlugin extends KalturaPlugin implements IKalturaBulkUpload
 			{
 			    case KalturaBulkUploadObjectType::CATEGORY_ENTRY:
 			        return new BulkUploadCategoryEntryEngineFilter($job);
-				case KalturaBulkUploadObjectType::ENTRY:
-					return new BulkUploadMediaEntryEngineFilter($job);
+			    case KalturaBulkUploadObjectType::ENTRY:
+				return new BulkUploadMediaEntryEngineFilter($job);
 			    default:
 			        throw new KalturaException("Bulk upload object type [{$job->data->bulkUploadObjectType}] not found", KalturaBatchJobAppErrors::ENGINE_NOT_FOUND);
 			        break;
