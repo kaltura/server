@@ -6,9 +6,14 @@
  */
 class ConfMapsService extends KalturaBaseService
 {
-	protected function kalturaNetworkAllowed($actionName)
+	public function initService($serviceId, $serviceName, $actionName)
 	{
-		return true;
+		parent::initService($serviceId, $serviceName, $actionName);
+		$kuser = kCurrentContext::getCurrentKsKuser();
+		if(!$kuser)
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_PROVIDED_OR_EMPTY);
+		}
 	}
 
 	/**
