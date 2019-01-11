@@ -19,8 +19,6 @@ class BulkUploadMediaEntryEngineFilter extends BulkUploadEngineFilter
 		{
 			throw new KalturaBatchException('Unsupported filter: {' . get_class($filter) . '}', KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
-		
-		KBatchBase::unimpersonate();
 	}
 	
 	protected function createObjectFromResultAndJobData(KalturaBulkUploadResult $bulkUploadResult)
