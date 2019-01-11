@@ -126,6 +126,16 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" ref="entitledUsersEdit">
+				<xs:annotation>
+					<xs:documentation>Comma-separated list of entry's co-editors</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" ref="entitledUsersPublish">
+				<xs:annotation>
+					<xs:documentation>Comma-separated list of entry's co-publishers</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element maxOccurs="1" minOccurs="0" name="name">
 				<xs:annotation>
 					<xs:documentation>The title of the entry</xs:documentation>
@@ -936,6 +946,16 @@
 		</xs:restriction>
 	</xs:simpleType>
 
+	<xs:complexType name="T_entitledUsers">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="user" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Specifies a single user to set for an entry's co-publishers</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
 	<xs:complexType name="T_tags">
 		<xs:sequence>
 			<xs:element maxOccurs="unbounded" minOccurs="0" name="tag" type="xs:string">
@@ -1459,6 +1479,44 @@ tK1yWx3LOnxokoJUtNRSdEi</privateKey>
 								<assetContentResource assetId="{existing asset id}"/>
 							</content>
 						</contentAssets>
+					</item>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+
+	<xs:element name="entitledUsersEdit" type="T_entitledUsers">
+		<xs:annotation>
+			<xs:documentation>Co-editors</xs:documentation>
+			<xs:appinfo>
+				<example title="XML Example: Entry tags">
+					<item>
+						<action>add</action>
+						<entitledUsersEdit>
+							<user>user1</user>
+							<user>user2</user>
+						</entitledUsersEdit>
+						<media>...</media>
+						<contentAssets>...</contentAssets>
+					</item>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+
+	<xs:element name="entitledUsersPublish" type="T_entitledUsers">
+		<xs:annotation>
+			<xs:documentation>Co-editors</xs:documentation>
+			<xs:appinfo>
+				<example title="XML Example: Entry tags">
+					<item>
+						<action>add</action>
+						<entitledUsersEdit>
+							<user>user1</user>
+							<user>user2</user>
+						</entitledUsersEdit>
+						<media>...</media>
+						<contentAssets>...</contentAssets>
 					</item>
 				</example>
 			</xs:appinfo>
