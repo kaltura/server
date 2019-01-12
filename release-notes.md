@@ -1,5 +1,14 @@
 # Naos 14.12.0 #
 
+## Add new type of filter bulk upload engine ##
+
+- Issue Type: Feature
+- Issue ID: PSVAMB-5604
+    
+### Deployment scripts ###
+    - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    - php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_01_10_add_media_addbulkupload_to_batch_partner.php
+
 ## Add permission in Admin Console for forcing https protocol in http notifications ##
 
 - Issue Type: Feature
