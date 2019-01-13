@@ -34,7 +34,8 @@ class KalturaScheduleEventResourceFilter extends KalturaScheduleEventResourceBas
 	/* (non-PHPdoc)
 	 * @see KalturaRelatedFilter::getListResponse()
 	 */
-	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null,
+									$filterBlackoutConflicts = true)
 	{
 		$c = new Criteria();
 		$filter = $this->toObject();
@@ -42,20 +43,49 @@ class KalturaScheduleEventResourceFilter extends KalturaScheduleEventResourceBas
 		$pager->attachToCriteria($c);
 			
 		$list = ScheduleEventResourcePeer::doSelect($c);
-	
 		$resultCount = count($list);
 		if ($resultCount && $resultCount < $pager->pageSize)
+		{
 			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
+		}
 		else
 		{
 			KalturaFilterPager::detachFromCriteria($c);
 			$totalCount = ScheduleEventResourcePeer::doCount($c);
 		}
-		
+
+		if($filterBlackoutConflicts)
+		{
+			$list = array_filter($list, [$this, "checkNoBlackoutConflict"]);
+			$resultCount = count($list);
+			if($resultCount < $pager->pageSize)
+			{
+				$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
+			}
+		}
+
 		$response = new KalturaScheduleEventResourceListResponse();
 		$response->objects = KalturaScheduleEventResourceArray::fromDbArray($list, $responseProfile);
 		$response->totalCount = $totalCount;
 		return $response;
 	}
 
+	/**
+	 * @param baseScheduleResource $baseScheduleResource
+	 * @return bool
+	 */
+	public function checkNoBlackoutConflict($baseScheduleResource)
+	{
+		$scheduleEvent = BaseScheduleEventPeer::retrieveByPK($baseScheduleResource->getEventId());
+		if($scheduleEvent && is_subclass_of($scheduleEvent, 'EntryScheduleEvent'))
+		{
+				$blackoutEvents = $scheduleEvent->getBlackoutConflicts();
+				if($blackoutEvents)
+				{
+					return false;
+				}
+		}
+
+		return true;
+	}
 }

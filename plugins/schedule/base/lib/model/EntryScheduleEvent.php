@@ -135,5 +135,6 @@ abstract class EntryScheduleEvent extends ScheduleEvent
 			+ $duration);
 
 		$this->blackout_conflicts = $events;
+		return $events;
 	}
 }
