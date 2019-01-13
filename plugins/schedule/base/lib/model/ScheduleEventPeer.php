@@ -227,9 +227,10 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	 * @param string $resourceIds
 	 * @param date $startDate
 	 * @param date $endDate
-	 * @return array<ScheduleEvent>
+	 * @param string|null $scheduleEventIdToIgnore
+	 * @return array <ScheduleEvent>
 	 */
-	public static function retrieveEventsByResourceIdsAndDateWindow($resourceIds, $startDate, $endDate,$scheduleEventIdToIgnore=null)
+	public static function retrieveEventsByResourceIdsAndDateWindow($resourceIds, $startDate, $endDate, $scheduleEventIdToIgnore = null)
 	{
 		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
 		$c->addAnd(ScheduleEventPeer::START_DATE, $endDate, Criteria::LESS_THAN);
@@ -247,6 +248,30 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		$filter->setResourceIdsIn($resourceIds);
 
 		$filter->attachToCriteria($c);
+
+		return self::doSelect($c);
+	}
+
+	/**
+	 * @param date $startDate
+	 * @param date $endDate
+	 * @param string|null $scheduleEventIdToIgnore
+	 * @return array <ScheduleEvent>
+	 */
+	public static function retrieveBlackoutEventsByDateWindow($startDate, $endDate, $scheduleEventIdToIgnore = null)
+	{
+		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
+		$c->addAnd(ScheduleEventPeer::START_DATE, $endDate, Criteria::LESS_THAN);
+		$c->addAnd(ScheduleEventPeer::END_DATE, $startDate, Criteria::GREATER_THAN);
+		$c->addAnd(ScheduleEventPeer::STATUS, ScheduleEventStatus::ACTIVE, Criteria::EQUAL);
+		$c->addAnd(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRING, Criteria::NOT_EQUAL);
+		$c->addAnd(ScheduleEventPeer::TYPE, scheduleEventType::BLACKOUT, Criteria::EQUAL);
+		if($scheduleEventIdToIgnore)
+		{
+			KalturaLog::info("Ignoring  scheduleEventId {$scheduleEventIdToIgnore}");
+			$c->addAnd(ScheduleEventPeer::ID, $scheduleEventIdToIgnore, Criteria::NOT_EQUAL);
+			$c->addAnd(ScheduleEventPeer::PARENT_ID, $scheduleEventIdToIgnore, Criteria::NOT_IN);
+		}
 
 		return self::doSelect($c);
 	}
