@@ -37,7 +37,7 @@ It is based on Plat-8932 that is described in this notes below.
     Add ConfMaps to your plugins.ini
 
 ### Deployment scripts ###
-    php deployment/base/scripts/installPlugins.php
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_19_add_conf_maps_role_and_permissions.php
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_11_confmaps_service.php
 
