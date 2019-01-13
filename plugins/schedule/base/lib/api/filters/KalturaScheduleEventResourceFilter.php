@@ -79,11 +79,11 @@ class KalturaScheduleEventResourceFilter extends KalturaScheduleEventResourceBas
 		$scheduleEvent = BaseScheduleEventPeer::retrieveByPK($baseScheduleResource->getEventId());
 		if($scheduleEvent && is_subclass_of($scheduleEvent, 'EntryScheduleEvent'))
 		{
-				$blackoutEvents = $scheduleEvent->getBlackoutConflicts();
-				if($blackoutEvents)
-				{
-					return false;
-				}
+			$blackoutEvents = $scheduleEvent->getBlackoutConflicts();
+			if($blackoutEvents)
+			{
+				return false;
+			}
 		}
 
 		return true;
