@@ -1284,7 +1284,8 @@ class kKavaReportsMgr extends kKavaBase
 						'columns' => array('IFNULL(CONCAT(FIRST_NAME, " ", LAST_NAME), PUSER_ID)'),
 						'peer' => 'kuserPeer',
 						'hash' => false
-					)				)
+					)
+				)
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_USERS),
 			self::REPORT_FORCE_TOTAL_COUNT => true,
@@ -1971,7 +1972,7 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		$date = self::dateIdToDateTime($from_day);
 		$interval = new DateInterval('P1D');
-	
+
 		$result = array();
 		for (;;)
 		{
@@ -1980,11 +1981,11 @@ class kKavaReportsMgr extends kKavaBase
 			{
 				break;
 			}
-	
+
 			$result[] = $cur;
 			$date->add($interval);
 		}
-	
+
 		return $result;
 	}
 
@@ -2061,66 +2062,24 @@ class kKavaReportsMgr extends kKavaBase
 			$report_def[self::REPORT_DRILLDOWN_DIMENSION_HEADERS] = array_keys($drilldown_dimension_map);
 		}
 
-		if (isset($report_def[self::REPORT_JOIN_GRAPHS]) || isset($report_def[self::REPORT_JOIN_REPORTS]) && !isset($report_def[self::REPORT_COLUMN_MAP]))
+		if (isset($report_def[REPORT_JOIN_REPORTS]) && !isset($report_def[REPORT_COLUMN_MAP]) && !isset($report_def[REPORT_TABLE_MAP]))
 		{
-			$report_defs = isset($report_def[self::REPORT_JOIN_REPORTS]) ?
-				$report_def[self::REPORT_JOIN_REPORTS] :
-				$report_def[self::REPORT_JOIN_GRAPHS];
-
-			$graph_metrics = array();
-			$total_metrics = array();
+			$report_defs = $report_def[self::REPORT_JOIN_REPORTS];
 			$metrics = array();
 			foreach ($report_defs as $cur_report_def)
 			{
-				if (!isset($report_def[self::REPORT_GRAPH_MAP]) && isset($cur_report_def[self::REPORT_GRAPH_METRICS]))
-				{
-					$graph_metrics = array_merge($cur_report_def[self::REPORT_GRAPH_METRICS], $graph_metrics);
-				}
-
-				if (!isset($report_def[self::REPORT_TOTAL_MAP]))
-				{
-					if (isset($cur_report_def[self::REPORT_TOTAL_METRICS]))
-					{
-						$total_metrics = array_merge($cur_report_def[self::REPORT_TOTAL_METRICS], $total_metrics);
-					}
-					else if (isset($cur_report_def[self::REPORT_METRICS]))
-					{
-						$total_metrics = array_merge($cur_report_def[self::REPORT_METRICS], $total_metrics);
-					}
-				}
-
-				if (!isset($report_def[self::REPORT_TABLE_MAP]) && isset($cur_report_def[self::REPORT_METRICS]))
+				if (isset($cur_report_def[self::REPORT_METRICS]))
 				{
 					$metrics = array_merge($cur_report_def[self::REPORT_METRICS], $metrics);
 				}
 			}
-
-			foreach ($graph_metrics as $metric)
-			{
-				$report_graph_map[] = self::$metrics_to_headers[$metric];
-			}
-
-			if (isset($report_graph_map))
-			{
-				$report_def[self::REPORT_GRAPH_MAP] = array_combine($report_graph_map, $report_graph_map);
-			}
-
-			foreach ($total_metrics as $metric)
-			{
-				$report_total_map[] = self::$metrics_to_headers[$metric];
-			}
-			if (isset($report_total_map))
-			{
-				$report_def[self::REPORT_TOTAL_MAP] = array_combine($report_total_map, $report_total_map);
-			}
-
 			foreach ($metrics as $metric)
 			{
 				$report_map[] = self::$metrics_to_headers[$metric];
 			}
 			if (isset($report_map))
 			{
-				$report_def[self::REPORT_COLUMN_MAP] = array_combine($report_map, $report_map);
+				$report_def[self::REPORT_TABLE_MAP] = array_combine($report_map, $report_map);
 			}
 		}
 
@@ -3696,34 +3655,6 @@ class kKavaReportsMgr extends kKavaBase
 			$result |= ($value & 1) << $i;
 		}
 		
-		return $result;
-	}
-
-	protected static function getUserNameWithFallback($ids, $partner_id, $context)
-	{
-		$columns = array('PUSER_ID', 'FIRST_NAME', 'LAST_NAME');
-		if ($context && isset($context["columns"]))
-		{
-			$columns = array_merge($columns, $context["columns"]);
-		}
-		$context = array(
-			'peer' => 'kuserPeer',
-			'columns' => $columns,
-			'hash' => false,
-		);
-		$result = self::genericQueryEnrich($ids, $partner_id, $context);
-		foreach ($result as $id => $row)
-		{
-			$output = array();
-			$fullName = trim($row[1]. ' ' .$row[2]);
-			$output[] = $fullName ? $fullName : $row[0];
-			for($i = 3; $i < count($columns); $i++)
-			{
-				$output[] = $row[$i];
-			}
-			$result[$id] = $output;
-		}
-
 		return $result;
 	}
 
