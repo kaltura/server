@@ -13,6 +13,12 @@ abstract class EntryScheduleEvent extends ScheduleEvent
 	const CATEGORIES_INDEXED_FIELD_PREFIX = 'pid';
 
 	/**
+	 * An array of blackout conflicts with this event
+	 * @var        array
+	 */
+	protected $blackout_conflicts;
+
+	/**
 	 * @param string $v
 	 */
 	public function setTemplateEntryId($v)
@@ -104,4 +110,30 @@ abstract class EntryScheduleEvent extends ScheduleEvent
 		return implode(' ', $catgoriesIds);
 	}
 
+	public function setBlackoutConflicts($conflicts)
+	{
+		$this->blackout_conflicts = $conflicts;
+	}
+
+	public function getBlackoutConflicts()
+	{
+		if($this->blackout_conflicts != null)
+		{
+			return $this->blackout_conflicts;
+		}
+
+		if($this->getRecurrenceType() === ScheduleEventRecurrenceType::RECURRING)
+		{
+			$duration = $this->getDuration();
+		}
+		else
+		{
+			$duration = $this->getEndDate(null) - $this->getStartDate(null);
+		}
+
+		$events = ScheduleEventPeer::retrieveBlackoutEventsByDateWindow($this->getStartDate(null),$this->getStartDate(null)
+			+ $duration);
+
+		$this->blackout_conflicts = $events;
+	}
 }
