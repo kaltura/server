@@ -27,14 +27,17 @@
     None
 
 ## Manage configuration maps from admin console ##
-
 - Issue ttype: Feature
 - Issue ID : PLAT-9491
 
+This feature will allow managing system congfiguration in admin console UI along with file system INI files.
+It is based on Plat-8932 that is described in this notes below.
+
 ### configuration ###
-    None
+    Add ConfMaps to your plugins.ini
 
 ### Deployment scripts ###
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_19_add_conf_maps_role_and_permissions.php
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_11_confmaps_service.php
 
