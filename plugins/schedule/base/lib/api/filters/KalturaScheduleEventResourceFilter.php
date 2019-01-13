@@ -47,9 +47,11 @@ class KalturaScheduleEventResourceFilter extends KalturaScheduleEventResourceBas
 		if ($resultCount && $resultCount < $pager->pageSize)
 		{
 			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
+			$lastPage = true;
 		}
 		else
 		{
+			$lastPage = false;
 			KalturaFilterPager::detachFromCriteria($c);
 			$totalCount = ScheduleEventResourcePeer::doCount($c);
 		}
@@ -58,7 +60,7 @@ class KalturaScheduleEventResourceFilter extends KalturaScheduleEventResourceBas
 		{
 			$list = array_filter($list, [$this, "checkNoBlackoutConflict"]);
 			$resultCount = count($list);
-			if($resultCount < $pager->pageSize)
+			if($lastPage)
 			{
 				$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
 			}
