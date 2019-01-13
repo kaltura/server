@@ -223,11 +223,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 					$filteredRules[$rule][] = $cond;
 				}
 			}
-			if (count($filteredRules) && $header)
-			{
-				$this->getScope()->setOutputVar(kIpAddressCondition::PARTNER_INTERNAL, true);
-			}
-		
+
 			// use + and not array_merge because the arrays have numerical indexes
 			$filteredRules += $ipTree[self::IP_TREE_UNFILTERED];
 			ksort($filteredRules);
