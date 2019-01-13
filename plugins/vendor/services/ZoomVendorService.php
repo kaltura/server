@@ -208,7 +208,7 @@ class ZoomVendorService extends KalturaBaseService
 		ZoomHelper::verifyHeaderToken();
 		$data = ZoomHelper::getPayloadData();
 		$eventType = $data[ZoomHelper::EVENT];
-		list($accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId) = ZoomHelper::extractDataFromRecordingCompletePayload($data);
+		list($accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId) = ZoomHelper::extractDataFromRecordingCompletePayload($data, $eventType);
 		$zoomIntegration = ZoomHelper::getIntegrationVendor($accountId);
 
 		if($eventType == ZoomHelper::RECORDING_VIDEO_COMPLETE)
@@ -239,7 +239,7 @@ class ZoomVendorService extends KalturaBaseService
 
 	public function recordingTranscriptComplete($zoomIntegration, $accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId)
 	{
-		$entry = entryPeer::retrieveByReferenceIdAndPartnerId ('Zoom_'. $meetingId, $zoomIntegration->getPartnerId());
+		$entry = ZoomHelper::getZoomEntryByReferenceId($meetingId, $zoomIntegration);
 		if(!$entry)
 		{
 			throw new KalturaAPIException('could not find entry for meeting: ' . $meetingId);

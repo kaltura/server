@@ -23,7 +23,7 @@ class ZoomHelper
 	const MEETING_ID = 'id';
 	const USER_EMAIL = 'user_email';
 	const PARTICIPANTS = 'participants';
-	const OBJECT = 'object';
+	const OBJECT_CONTENT = 'object';
 	const EVENT = 'event';
 	const VTT = 'VTT';
 	/** php body */
@@ -32,8 +32,7 @@ class ZoomHelper
 	/** event types */
 	const RECORDING_VIDEO_COMPLETE = 'recording.completed';
 	const RECORDING_TRANSCRIPT_COMPLETE = 'recording.transcript_completed';
-
-
+	
 	const ADMIN_TAG_ZOOM = 'zoomentry';
 
 	/**
@@ -220,7 +219,7 @@ class ZoomHelper
 		$payload = $data[self::PAYLOAD];
 		$downloadToken = $data[self::DOWNLOAD_TOKEN];
 		$accountId = $payload[self::ACCOUNT_ID];
-		$meeting = $payload[self::OBJECT];
+		$meeting = $payload[self::OBJECT_CONTENT];
 		$hostEmail = $meeting[self::HOST_EMAIL];
 		$recordingFiles = $meeting[self::RECORDING_FILES];
 		$downloadURLs = self::getDownloadUrls($recordingFiles, $eventType);
@@ -509,6 +508,20 @@ class ZoomHelper
 		$caption->setStatus(CaptionAsset::ASSET_STATUS_QUEUED);
 		$caption->save();
 		return $caption;
+	}
+
+	public static function getZoomEntryByReferenceId($meetingId, $zoomIntegration)
+	{
+		$entryFilter = new entryFilter();
+		$pager = new KalturaFilterPager();
+		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
+		$entryFilter->set('_eq_reference_id', 'Zoom_'. $meetingId);
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$pager->attachToCriteria($c);
+		$entryFilter->attachToCriteria($c);
+		$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
+		$c->add(entryPeer::PARTNER_ID,  $zoomIntegration->getPartnerId(), Criteria::EQUAL);
+		return entryPeer::doSelectOne($c);
 	}
 
 }
