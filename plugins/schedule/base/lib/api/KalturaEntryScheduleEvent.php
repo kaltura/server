@@ -28,7 +28,8 @@ abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 	public $categoryIds;
 
 	/**
-	 * Categories that associated with this event
+	 * Blackout schedule events the conflict with this event
+	 * @readonly
 	 * @var KalturaScheduleEventArray
 	 */
 	public $blackoutConflicts;

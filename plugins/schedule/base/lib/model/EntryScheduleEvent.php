@@ -103,7 +103,7 @@ abstract class EntryScheduleEvent extends ScheduleEvent
 		}
 		return implode(' ', $catgoriesIds);
 	}
-	
+
 	public function getBlackoutConflicts()
 	{
 		if($this->getRecurrenceType() === ScheduleEventRecurrenceType::RECURRING)
