@@ -1281,7 +1281,7 @@ class kKavaReportsMgr extends kKavaBase
 					self::REPORT_ENRICH_OUTPUT => array('creator_name'),
 					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
 					self::REPORT_ENRICH_CONTEXT => array(
-						'columns' => array('IFNULL(CONCAT(FIRST_NAME, " ", LAST_NAME), PUSER_ID)'),
+						'columns' => array('IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
 						'peer' => 'kuserPeer',
 						'hash' => false
 					)
@@ -1302,7 +1302,7 @@ class kKavaReportsMgr extends kKavaBase
 				self::REPORT_ENRICH_OUTPUT => array('creator_name', 'created_at'),
 				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
 				self::REPORT_ENRICH_CONTEXT => array(
-					'columns' => array('IFNULL(CONCAT(FIRST_NAME, " ", LAST_NAME), PUSER_ID)','@CREATED_AT'),
+					'columns' => array('IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)','@CREATED_AT'),
 					'peer' => 'kuserPeer',
 					'hash' => false
 				)
@@ -2062,7 +2062,7 @@ class kKavaReportsMgr extends kKavaBase
 			$report_def[self::REPORT_DRILLDOWN_DIMENSION_HEADERS] = array_keys($drilldown_dimension_map);
 		}
 
-		if (isset($report_def[REPORT_JOIN_REPORTS]) && !isset($report_def[REPORT_COLUMN_MAP]) && !isset($report_def[REPORT_TABLE_MAP]))
+		if (isset($report_def[self::REPORT_JOIN_REPORTS]) && !isset($report_def[self::REPORT_COLUMN_MAP]) && !isset($report_def[self::REPORT_TABLE_MAP]))
 		{
 			$report_defs = $report_def[self::REPORT_JOIN_REPORTS];
 			$metrics = array();
