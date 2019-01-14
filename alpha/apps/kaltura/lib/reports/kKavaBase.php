@@ -113,6 +113,11 @@ class kKavaBase extends kDruidBase
 	const MEDIA_TYPE_IMAGE = 'Image';
 	const MEDIA_TYPE_SHOW = 'Show';		// mix
 	const MEDIA_TYPE_FLASH = 'Flash';	// live stream
+	const MEDIA_TYPE_LIVE_STREAM = 'Live stream';
+	const MEDIA_TYPE_LIVE_WIN_MEDIA = 'Live stream windows media';
+	const MEDIA_TYPE_LIVE_REAL_MEDIA = 'Live stream real media';
+	const MEDIA_TYPE_LIVE_QUICKTIME = 'Live stream quicktime';
+
 	
 	// Entry vendor task statuses
 	const TASK_READY = "Ready";
