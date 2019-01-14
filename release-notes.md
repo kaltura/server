@@ -1,5 +1,18 @@
 # Naos 14.12.0 #
 
+## Add BulkUpload Status Event Notification to HTTP ##
+
+- Issue Type: Task
+- Issue ID: PLAT-9546
+
+### Configuration ###
+First replcae all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2019_01_20_bulkUploadHttpNotification.template.xml
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/2019_01_20_deploy_bulk_upload_http_notification.php
+
+
 ## Add new type of filter bulk upload engine ##
 
 - Issue Type: Feature
