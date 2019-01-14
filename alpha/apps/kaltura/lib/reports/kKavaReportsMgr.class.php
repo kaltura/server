@@ -1302,7 +1302,7 @@ class kKavaReportsMgr extends kKavaBase
 				self::REPORT_ENRICH_OUTPUT => array('creator_name', 'created_at'),
 				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
 				self::REPORT_ENRICH_CONTEXT => array(
-					'columns' => array('IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME), PUSER_ID))','@CREATED_AT'),
+					'columns' => array('IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)','@CREATED_AT'),
 					'peer' => 'kuserPeer',
 					'hash' => false
 				)
@@ -1333,15 +1333,16 @@ class kKavaReportsMgr extends kKavaBase
 			),
 		),
 
-
 		myReportsMgr::REPORT_TYPE_TOP_SOURCES => array(
 			self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
 			self::REPORT_DIMENSION_MAP => array(
 				'source' => self::DIMENSION_SOURCE_TYPE
 			),
 			self::REPORT_FILTER => array(
-				self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
-				self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_LIVE_STREAM, self::MEDIA_TYPE_LIVE_WIN_MEDIA, self::MEDIA_TYPE_LIVE_REAL_MEDIA, self::MEDIA_TYPE_LIVE_QUICKTIME)
+				array(self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
+				self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_LIVE_STREAM, self::MEDIA_TYPE_LIVE_WIN_MEDIA, self::MEDIA_TYPE_LIVE_REAL_MEDIA, self::MEDIA_TYPE_LIVE_QUICKTIME)),
+				array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+					self::DRUID_VALUES => array(self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_STATUS)),
 			),
 			self::REPORT_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_UNIQUE_CONTRIBUTORS),
 		),
@@ -2081,7 +2082,7 @@ class kKavaReportsMgr extends kKavaBase
 			$report_def[self::REPORT_DRILLDOWN_DIMENSION_HEADERS] = array_keys($drilldown_dimension_map);
 		}
 
-		if (isset($report_def[REPORT_JOIN_REPORTS]) && !isset($report_def[REPORT_COLUMN_MAP]) && !isset($report_def[REPORT_TABLE_MAP]))
+		if (isset($report_def[self::REPORT_JOIN_REPORTS]) && !isset($report_def[self::REPORT_COLUMN_MAP]) && !isset($report_def[self::REPORT_TABLE_MAP]))
 		{
 			$report_defs = $report_def[self::REPORT_JOIN_REPORTS];
 			$metrics = array();
