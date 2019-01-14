@@ -86,8 +86,6 @@ class BulkUploadCategoryEntryEngineFilter extends BulkUploadEngineFilter
 	 */
 	protected function listObjects(KalturaFilter $filter, KalturaFilterPager $pager = null) 
 	{
-		KBatchBase::impersonate($this->currentPartnerId);
-		
 		$filter->orderBy = "+createdAt";
 		
 		if($filter instanceof KalturaBaseEntryFilter)
@@ -100,7 +98,6 @@ class BulkUploadCategoryEntryEngineFilter extends BulkUploadEngineFilter
 		else	
 			throw new KalturaBatchException("Unsupported filter: {get_class($filter)}", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED); 			
 			
-		KBatchBase::unimpersonate();	
 	}
 
 	protected function getBulkUploadResultObjectType()

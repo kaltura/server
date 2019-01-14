@@ -1383,7 +1383,7 @@ CREATE TABLE `access_control`
 	`prv_restrict_length` INTEGER,
 	`kdir_restrict_type` TINYINT,
 	`custom_data` TEXT,
-	`rules` MEDIUMTEXT,
+	`rules` TEXT,
 	PRIMARY KEY (`id`)
 )Type=InnoDB;
 
@@ -1920,7 +1920,7 @@ CREATE TABLE `server_node`
 	`playback_host_name` VARCHAR(256),
 	`parent_id` VARCHAR(256),
 	`environment` VARCHAR(32),
-	`custom_data` TEXT
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_status_system_name`(`partner_id`, `status`, `system_name`),
 	KEY `partner_id_status_host_name`(`partner_id`, `status`, `host_name`)
@@ -2452,7 +2452,6 @@ CREATE TABLE `app_token`
 	`custom_data` TEXT,
 	`kuser_id` INTEGER,
 	PRIMARY KEY (`id`),
-	KEY `int_id`(`int_id`),
 	KEY `kuser_id`(`kuser_id`)
 )Type=InnoDB;
 
@@ -2476,6 +2475,28 @@ CREATE TABLE `entry_server_node`
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `entry_server_type`(`entry_id`, `server_type`)
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
+#-- conf_maps
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `conf_maps`;
+
+
+CREATE TABLE `conf_maps`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`map_name` VARCHAR(256)  NOT NULL,
+	`host_name` VARCHAR(256)  NOT NULL,
+	`status` INTEGER  NOT NULL,
+	`created_at` DATETIME  NOT NULL,
+	`remarks` VARCHAR(255),
+	`content` TEXT,
+	`version` INTEGER,
+	PRIMARY KEY (`id`),
+	KEY `primary_map_index`(`map_name`, `host_name`, `version`),
+	KEY `id_index`(`id`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier

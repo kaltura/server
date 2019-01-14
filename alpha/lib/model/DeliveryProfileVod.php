@@ -121,6 +121,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		}
 		
 		$url = "/api_v3/service/thumbAsset/action/serve/partnerId/$partnerId/thumbAssetId/$thumbAssetId" . ($addExtension ?  "/$thumbAssetId." . $thumbAsset->getFileExt() : "");
+		$url .= '/version/' . $thumbAsset->getVersion();
 	
 		return $url;
 	}
