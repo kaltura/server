@@ -714,8 +714,17 @@ class KalturaErrors extends APIErrors
 	const CANNOT_CREATE_CLIP_FLAVOR_JOB = "CANNOT_CREATE_CLIP_FLAVOR_JOB;;cannot create clip, flavor convert batch job returned as null";
 
 	/*
+	 * Conf Control
+ 	 */
+	const MISSING_MAP_NAME = "MISSING_MAP_NAME;;Map name must be supplied";
+	const CANNOT_PARSE_CONTENT = "CANNOT_PARSE_CONTENT;ERR,CONTENT;Error - [@ERR@] Cannot parse content - \r\n [@CONTENT@]";
+	const CONF_CONTORL_ERROR = "CONF_CONTORL_ERROR;ERR;Conf control error - [@ERR@]";
+	const MAP_DOES_NOT_EXIST = "MAP_DOES_NOT_EXIST;;Map does not exist";
+	const MAP_ALREADY_EXIST = "MAP_ALREADY_EXIST;NAME,HOST;Map already exist for this map name {@NAME@} and host {@HOST@}";
+
+	/*
 	 * zoom
- 	*/
+ 	 */
 
 	const MISSING_VENDOR_CONFIGURATION = 'MISSING_VENDOR_CONFIGURATION;;Vendor configuration file was not found';
 	const ZOOM_USER_NOT_ALLOWED = 'ZOOM_USER_NOT_ALLOWED;;Only Zoom admins are allowed to access kaltura configuration page, please check your user account';
