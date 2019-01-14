@@ -1,5 +1,41 @@
 # Naos 14.12.0 #
 
+## Blackout dates ##
+
+- Issue Type: Epic
+- Issue ID: PLAT-9478
+
+The ability to assign dates as blackouts and to prevent recordings happening in those dates
+ScheduleEventResource list will filter by default events the have conflict with blackout events   
+
+### Configuration ###
+    None
+
+### Deployment scripts ###
+    None
+
+## Add BulkUpload Status Event Notification to HTTP ##
+
+- Issue Type: Task
+- Issue ID: PLAT-9546
+
+### Configuration ###
+    First replcae all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2019_01_20_bulkUploadHttpNotification.template.xml
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/2019_01_20_deploy_bulk_upload_http_notification.php
+
+
+## Add new type of filter bulk upload engine ##
+
+- Issue Type: Feature
+- Issue ID: PSVAMB-5604
+    
+### Deployment scripts ###
+    - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    - php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_01_10_add_media_addbulkupload_to_batch_partner.php
+
 ## Add permission in Admin Console for forcing https protocol in http notifications ##
 
 - Issue Type: Feature
@@ -16,6 +52,21 @@
     
 ### Deployment scripts ###
     None
+
+## Manage configuration maps from admin console ##
+- Issue ttype: Feature
+- Issue ID : PLAT-9491
+
+This feature will allow managing system congfiguration in admin console UI along with file system INI files.
+It is based on Plat-8932 that is described in this notes below.
+
+### configuration ###
+    Add ConfMaps to your plugins.ini
+
+### Deployment scripts ###
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_19_add_conf_maps_role_and_permissions.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_11_confmaps_service.php
 
 # Naos 14.11.0 #
 

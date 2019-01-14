@@ -126,16 +126,22 @@ class ScheduleEventResourceService extends KalturaBaseService
 	 * @action list
 	 * @param KalturaScheduleEventResourceFilter $filter
 	 * @param KalturaFilterPager $pager
+	 * @param bool $filterBlackoutConflicts
 	 * @return KalturaScheduleEventResourceListResponse
 	 */
-	public function listAction(KalturaScheduleEventResourceFilter $filter = null, KalturaFilterPager $pager = null)
+	public function listAction(KalturaScheduleEventResourceFilter $filter = null, KalturaFilterPager $pager = null,
+							   $filterBlackoutConflicts = true)
 	{
 		if (!$filter)
+		{
 			$filter = new KalturaScheduleEventResourceFilter();
-			
+		}
+
 		if(!$pager)
+		{
 			$pager = new KalturaFilterPager();
-			
-		return $filter->getListResponse($pager, $this->getResponseProfile());
+		}
+
+		return $filter->getListResponse($pager, $this->getResponseProfile(), $filterBlackoutConflicts);
 	}
 }

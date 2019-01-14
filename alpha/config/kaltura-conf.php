@@ -245,5 +245,8 @@ return array (
     'EntryServerNodeTableMap' => 'lib/model/map/EntryServerNodeTableMap.php',
     'EntryServerNodePeer' => 'lib/model/EntryServerNodePeer.php',
     'EntryServerNode' => 'lib/model/EntryServerNode.php',
+    'ConfMapsTableMap' => 'lib/model/map/ConfMapsTableMap.php',
+    'ConfMapsPeer' => 'lib/model/ConfMapsPeer.php',
+    'ConfMaps' => 'lib/model/ConfMaps.php',
   ),
 );

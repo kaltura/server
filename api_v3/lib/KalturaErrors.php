@@ -725,5 +725,14 @@ class KalturaErrors extends APIErrors
 	const ZOOM_INTEGRATION_DATA_NOT_EXIST = 'ZOOM_INTEGRATION_DATA_NOT_EXIST;;Zoom Integration data Does Not Exist for current Partner';
 	const ZOOM_UPLOAD_DISABLED = 'ZOOM_UPLOAD_DISABLED;;Uploads are disabled for current Partner';
 
+  /*
+	 * Conf Control
+	 */
+	const MISSING_MAP_NAME = "MISSING_MAP_NAME;;Map name must be supplied";
+	const CANNOT_PARSE_CONTENT = "CANNOT_PARSE_CONTENT;ERR,CONTENT;Error - [@ERR@] Cannot parse content - \r\n [@CONTENT@]";
+	const CONF_CONTORL_ERROR = "CONF_CONTORL_ERROR;ERR;Conf control error - [@ERR@]";
+	const MAP_DOES_NOT_EXIST = "MAP_DOES_NOT_EXIST;;Map does not exist";
+	const MAP_ALREADY_EXIST = "MAP_ALREADY_EXIST;NAME,HOST;Map already exist for this map name {@NAME@} and host {@HOST@}";
+
 }
 
