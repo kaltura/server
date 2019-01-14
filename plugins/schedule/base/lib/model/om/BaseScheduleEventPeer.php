@@ -839,15 +839,15 @@ abstract class BaseScheduleEventPeer {
 	 * objects that inherit from the default.
 	 *
 	 * @param      array $row PropelPDO result row.
-	 * @param      int $column Column to examine for OM class information (first is 0).
+	 * @param      int $colnum Column to examine for OM class information (first is 0).
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
-	public static function getOMClass($row, $column)
+	public static function getOMClass($row, $colnum)
 	{
 		try {
 
-			$omClass = $row[$column + 5];
+			$omClass = $row[$colnum + 5];
 			$omClass = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 		} catch (Exception $e) {

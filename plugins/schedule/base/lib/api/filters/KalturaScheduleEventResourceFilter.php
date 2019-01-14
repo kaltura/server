@@ -47,11 +47,9 @@ class KalturaScheduleEventResourceFilter extends KalturaScheduleEventResourceBas
 		if ($resultCount && $resultCount < $pager->pageSize)
 		{
 			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
-			$lastPage = true;
 		}
 		else
 		{
-			$lastPage = false;
 			KalturaFilterPager::detachFromCriteria($c);
 			$totalCount = ScheduleEventResourcePeer::doCount($c);
 		}
@@ -59,11 +57,6 @@ class KalturaScheduleEventResourceFilter extends KalturaScheduleEventResourceBas
 		if($filterBlackoutConflicts)
 		{
 			$list = array_filter($list, [$this, "checkNoBlackoutConflict"]);
-			$resultCount = count($list);
-			if($lastPage)
-			{
-				$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
-			}
 		}
 
 		$response = new KalturaScheduleEventResourceListResponse();
@@ -79,15 +72,6 @@ class KalturaScheduleEventResourceFilter extends KalturaScheduleEventResourceBas
 	public function checkNoBlackoutConflict($baseScheduleResource)
 	{
 		$scheduleEvent = BaseScheduleEventPeer::retrieveByPK($baseScheduleResource->getEventId());
-		if($scheduleEvent && is_subclass_of($scheduleEvent, 'EntryScheduleEvent'))
-		{
-			$blackoutEvents = $scheduleEvent->getBlackoutConflicts();
-			if($blackoutEvents)
-			{
-				return false;
-			}
-		}
-
-		return true;
+		return !($scheduleEvent && $scheduleEvent->getBlackoutConflicts());
 	}
 }

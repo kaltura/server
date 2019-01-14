@@ -45,11 +45,11 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	 * objects that inherit from the default.
 	 *
 	 * @param      array $row PropelPDO result row.
-	 * @param      int $column Column to examine for OM class information (first is 0).
+	 * @param      int $colnum Column to examine for OM class information (first is 0).
 	 * @return 	   bool|mixed|object|string
 	 * @throws     PropelException Any exceptions caught during processing will be rethrown wrapped into a PropelException.
 	 */
-	public static function getOMClass($row, $column)
+	public static function getOMClass($row, $colnum)
 	{
 		if($row)
 		{
@@ -232,21 +232,9 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	 */
 	public static function retrieveEventsByResourceIdsAndDateWindow($resourceIds, $startDate, $endDate, $scheduleEventIdToIgnore = null)
 	{
-		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
-		$c->addAnd(ScheduleEventPeer::START_DATE, $endDate, Criteria::LESS_THAN);
-		$c->addAnd(ScheduleEventPeer::END_DATE, $startDate, Criteria::GREATER_THAN);
-		$c->addAnd(ScheduleEventPeer::STATUS, ScheduleEventStatus::ACTIVE, Criteria::EQUAL);
-		$c->addAnd(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRING, Criteria::NOT_EQUAL);
-		if($scheduleEventIdToIgnore)
-		{
-			KalturaLog::info("Ignoring  scheduleEventId {$scheduleEventIdToIgnore}");
-			$c->addAnd(ScheduleEventPeer::ID, $scheduleEventIdToIgnore, Criteria::NOT_EQUAL);
-			$c->addAnd(ScheduleEventPeer::PARENT_ID, $scheduleEventIdToIgnore, Criteria::NOT_IN);
-		}
-
+		$c = self::getRetrieveEventsByDateWindowCriteria($startDate, $endDate, $scheduleEventIdToIgnore);
 		$filter = new ScheduleEventFilter();
 		$filter->setResourceIdsIn($resourceIds);
-
 		$filter->attachToCriteria($c);
 
 		return self::doSelect($c);
@@ -260,12 +248,24 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	 */
 	public static function retrieveBlackoutEventsByDateWindow($startDate, $endDate, $scheduleEventIdToIgnore = null)
 	{
+		$c = self::getRetrieveEventsByDateWindowCriteria($startDate, $endDate, $scheduleEventIdToIgnore);
+		$c->addAnd(ScheduleEventPeer::TYPE, scheduleEventType::BLACKOUT, Criteria::EQUAL);
+		return self::doSelect($c);
+	}
+
+	/**
+	 * @param date $startDate
+	 * @param date $endDate
+	 * @param string|null $scheduleEventIdToIgnore
+	 * @return KalturaCriteria
+	 */
+	protected static function getRetrieveEventsByDateWindowCriteria($startDate, $endDate, $scheduleEventIdToIgnore = null)
+	{
 		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
 		$c->addAnd(ScheduleEventPeer::START_DATE, $endDate, Criteria::LESS_THAN);
 		$c->addAnd(ScheduleEventPeer::END_DATE, $startDate, Criteria::GREATER_THAN);
 		$c->addAnd(ScheduleEventPeer::STATUS, ScheduleEventStatus::ACTIVE, Criteria::EQUAL);
 		$c->addAnd(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRING, Criteria::NOT_EQUAL);
-		$c->addAnd(ScheduleEventPeer::TYPE, scheduleEventType::BLACKOUT, Criteria::EQUAL);
 		if($scheduleEventIdToIgnore)
 		{
 			KalturaLog::info("Ignoring  scheduleEventId {$scheduleEventIdToIgnore}");
@@ -273,7 +273,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 			$c->addAnd(ScheduleEventPeer::PARENT_ID, $scheduleEventIdToIgnore, Criteria::NOT_IN);
 		}
 
-		return self::doSelect($c);
+		return $c;
 	}
 	
 	/* (non-PHPdoc)
