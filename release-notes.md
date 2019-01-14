@@ -1,12 +1,26 @@
 # Naos 14.12.0 #
 
+## Blackout dates ##
+
+- Issue Type: Epic
+- Issue ID: PLAT-9478
+
+The ability to assign dates as blackouts and to prevent recordings happening in those dates
+ScheduleEventResource list will filter by default events the have conflict with blackout events   
+
+### Configuration ###
+    None
+
+### Deployment scripts ###
+    None
+
 ## Add BulkUpload Status Event Notification to HTTP ##
 
 - Issue Type: Task
 - Issue ID: PLAT-9546
 
 ### Configuration ###
-First replcae all tokens from the XML files below and remove ".template" from the file name:
+    First replcae all tokens from the XML files below and remove ".template" from the file name:
 	/opt/kaltura/app/deployment/updates/scripts/xml/2019_01_20_bulkUploadHttpNotification.template.xml
 
 ### Deployment scripts ###
