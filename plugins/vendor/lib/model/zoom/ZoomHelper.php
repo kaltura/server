@@ -34,6 +34,7 @@ class ZoomHelper
 	const RECORDING_TRANSCRIPT_COMPLETE = 'recording.transcript_completed';
 	
 	const ADMIN_TAG_ZOOM = 'zoomentry';
+	const ZOOM_PREFIX = 'Zoom_';
 
 	/**
 	 * @param kuser $dbUser
@@ -49,14 +50,14 @@ class ZoomHelper
 		$entry->setType(entryType::MEDIA_CLIP);
 		$entry->setSourceType(EntrySourceType::URL);
 		$entry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
-		$entry->setName('Zoom_'. $meetingId);
+		$entry->setName(self::ZOOM_PREFIX . $meetingId);
 		$entry->setPartnerId($dbUser->getPartnerId());
 		$entry->setStatus(entryStatus::NO_CONTENT);
 		$entry->setPuserId($dbUser->getPuserId());
 		$entry->setKuserId($dbUser->getKuserId());
 		$entry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($dbUser->getPartnerId())->getId());
 		$entry->setAdminTags(self::ADMIN_TAG_ZOOM);
-		$entry->setReferenceID('Zoom_'. $meetingId);
+		$entry->setReferenceID(self::ZOOM_PREFIX . $meetingId);
 		if ($zoomCategory)
 		{
 			$entry->setCategories($zoomCategory);
@@ -157,7 +158,7 @@ class ZoomHelper
 			echo $page;
 			die();
 		}
-		throw new KalturaAPIException('unable to find submit page, please contact support');
+		throw new KalturaAPIException(KalturaErrors::UNABLE_TO_FIND_SUBMIT_PAGE);
 	}
 
 	/**
@@ -489,12 +490,12 @@ class ZoomHelper
 		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 		if (!$zoomIntegration)
 		{
-			throw new KalturaAPIException('Zoom Integration data Does Not Exist for current Partner');
+			throw new KalturaAPIException(KalturaErrors::ZOOM_INTEGRATION_DATA_NOT_EXIST);
 		}
 		if($zoomIntegration->getStatus()==VendorStatus::DISABLED)
 		{
 			KalturaLog::info("Recieved recording complete event from Zoom account {$accountId} while upload is disabled.");
-			throw new KalturaAPIException('Uploads are disabled for current Partner');
+			throw new KalturaAPIException(KalturaErrors::ZOOM_UPLOAD_DISABLED);
 		}
 		return $zoomIntegration;
 	}
@@ -510,17 +511,20 @@ class ZoomHelper
 		return $caption;
 	}
 
-	public static function getZoomEntryByReferenceId($meetingId, $zoomIntegration)
+	public static function getZoomEntryByReferenceId($meetingId)
 	{
 		$entryFilter = new entryFilter();
 		$pager = new KalturaFilterPager();
 		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
-		$entryFilter->set('_eq_reference_id', 'Zoom_'. $meetingId);
+		$entryFilter->set('_eq_reference_id', self::ZOOM_PREFIX . $meetingId);
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$pager->attachToCriteria($c);
 		$entryFilter->attachToCriteria($c);
 		$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
-		$c->add(entryPeer::PARTNER_ID,  $zoomIntegration->getPartnerId(), Criteria::EQUAL);
+		if (kEntitlementUtils::getEntitlementEnforcement() && !kCurrentContext::$is_admin_session && entryPeer::getUserContentOnly())
+		{
+			entryPeer::setFilterResults(true);
+		}
 		return entryPeer::doSelectOne($c);
 	}
 

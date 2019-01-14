@@ -43,7 +43,7 @@ class ZoomVendorService extends KalturaBaseService
 		KalturaResponseCacher::disableCache();
 		if (!kConf::hasMap('vendor'))
 		{
-			throw new KalturaAPIException("Vendor configuration file wasn't found!");
+			throw new KalturaAPIException(KalturaErrors::MISSING_VENDOR_CONFIGURATION);
 		}
 		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
 		$clientId = $zoomConfiguration['clientId'];
@@ -74,7 +74,7 @@ class ZoomVendorService extends KalturaBaseService
 		{
 			ZoomHelper::loadLoginPage($tokens);
 		}
-		throw new KalturaAPIException('Only Zoom admins are allowed to access kaltura configuration page, please check your user account');
+		throw new KalturaAPIException(KalturaErrors::ZOOM_USER_NOT_ALLOWED);
 	}
 
 
@@ -95,7 +95,7 @@ class ZoomVendorService extends KalturaBaseService
 		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 		if (!$zoomIntegration)
 		{
-			throw new KalturaAPIException('Zoom Integration data Does Not Exist for current Partner');
+			throw new KalturaAPIException(KalturaErrors::MISSING_ZOOM_ACCOUNT_CONFIGURATION);
 		}
 		$zoomIntegration->setStatus(VendorStatus::DELETED);
 		$zoomIntegration->save();
@@ -209,40 +209,45 @@ class ZoomVendorService extends KalturaBaseService
 		$data = ZoomHelper::getPayloadData();
 		$eventType = $data[ZoomHelper::EVENT];
 		list($accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId) = ZoomHelper::extractDataFromRecordingCompletePayload($data, $eventType);
+		$downloadURLs = ZoomHelper::parseDownloadUrls($downloadURLs, $downloadToken);
+
 		$zoomIntegration = ZoomHelper::getIntegrationVendor($accountId);
+		$dbUser = ZoomHelper::getEntryOwner($hostEmail, $zoomIntegration->getDefaultUserEMail(), $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
+		$this->initZoomUserPermissions($zoomIntegration, $dbUser);
 
 		if($eventType == ZoomHelper::RECORDING_VIDEO_COMPLETE)
 		{
-			$this->recordingVideoComplete($zoomIntegration, $accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId);
+			$this->recordingVideoComplete($zoomIntegration, $accountId, $hostEmail, $downloadURLs, $meetingId, $dbUser);
 		}
 		else if($eventType == ZoomHelper::RECORDING_TRANSCRIPT_COMPLETE)
 		{
-			$this->recordingTranscriptComplete($zoomIntegration, $accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId);
+			$this->recordingTranscriptComplete($downloadURLs, $meetingId);
 		}
 	}
 
-
-	public function recordingVideoComplete($zoomIntegration, $accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId)
+	public function initZoomUserPermissions($zoomIntegration, $dbUser)
 	{
-		$emails = ZoomHelper::extractCoHosts($meetingId, $zoomIntegration, $accountId);
-		$emails = ZoomHelper::getValidatedUsers($emails, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
-		$dbUser = ZoomHelper::getEntryOwner($hostEmail, $zoomIntegration->getDefaultUserEMail(), $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
 		// user logged in - need to re-init kPermissionManager in order to determine current user's permissions
 		$ks = null;
 		$this->setPartnerFilters($zoomIntegration->getPartnerId());
 		kSessionUtils::createKSessionNoValidations($dbUser->getPartnerId() , $dbUser->getPuserId() , $ks, 86400 , false , "" , '*' );
 		kCurrentContext::initKsPartnerUser($ks);
 		kPermissionManager::init();
-		$urls = ZoomHelper::parseDownloadUrls($downloadURLs, $downloadToken);
-		ZoomHelper::uploadToKaltura($urls, $dbUser, $zoomIntegration, $emails, $meetingId, $hostEmail);
 	}
 
-	public function recordingTranscriptComplete($zoomIntegration, $accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId)
+	public function recordingVideoComplete($zoomIntegration, $accountId, $hostEmail, $downloadURLs, $meetingId, $dbUser)
 	{
-		$entry = ZoomHelper::getZoomEntryByReferenceId($meetingId, $zoomIntegration);
+		$emails = ZoomHelper::extractCoHosts($meetingId, $zoomIntegration, $accountId);
+		$emails = ZoomHelper::getValidatedUsers($emails, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
+		ZoomHelper::uploadToKaltura($downloadURLs, $dbUser, $zoomIntegration, $emails, $meetingId, $hostEmail);
+	}
+
+	public function recordingTranscriptComplete($downloadURLs, $meetingId)
+	{
+		$entry = ZoomHelper::getZoomEntryByReferenceId($meetingId);
 		if(!$entry)
 		{
-			throw new KalturaAPIException('could not find entry for meeting: ' . $meetingId);
+			throw new KalturaAPIException(KalturaErrors::MISSING_ENTRY_FOR_ZOOM_MEETING, $meetingId);
 		}
 
 		$captionAssetService = new CaptionAssetService();
@@ -255,7 +260,5 @@ class ZoomVendorService extends KalturaBaseService
 			$captionAssetService->setContentAction($captionAsset->getId(), $captionAssetResource);
 		}
 	}
-
-
 
 }

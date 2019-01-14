@@ -712,5 +712,18 @@ class KalturaErrors extends APIErrors
 	 */
 
 	const CANNOT_CREATE_CLIP_FLAVOR_JOB = "CANNOT_CREATE_CLIP_FLAVOR_JOB;;cannot create clip, flavor convert batch job returned as null";
+
+	/*
+	 * zoom
+ 	*/
+
+	const MISSING_VENDOR_CONFIGURATION = 'MISSING_VENDOR_CONFIGURATION;;Vendor configuration file was not found';
+	const ZOOM_USER_NOT_ALLOWED = 'ZOOM_USER_NOT_ALLOWED;;Only Zoom admins are allowed to access kaltura configuration page, please check your user account';
+	const MISSING_ZOOM_ACCOUNT_CONFIGURATION = 'MISSING_ZOOM_ACCOUNT_CONFIGURATION;;Zoom integration data does not exist for current partner';
+	const MISSING_ENTRY_FOR_ZOOM_MEETING = 'MISSING_ENTRY_FOR_ZOOM_MEETING;MEETING_ID;Could not find entry for meeting id: [@MEETING_ID@] ';
+	const UNABLE_TO_FIND_SUBMIT_PAGE = 'UNABLE_TO_FIND_SUBMIT_PAGE;;unable to find submit page, please contact support';
+	const ZOOM_INTEGRATION_DATA_NOT_EXIST = 'ZOOM_INTEGRATION_DATA_NOT_EXIST;;Zoom Integration data Does Not Exist for current Partner';
+	const ZOOM_UPLOAD_DISABLED = 'ZOOM_UPLOAD_DISABLED;;Uploads are disabled for current Partner';
+
 }
 
