@@ -91,7 +91,9 @@ class ConfMapsService extends KalturaBaseService
 	 */
 	function getAction(KalturaConfMapsFilter $filter)
 	{
+		kApiCache::disableCache();
 		$confMap = $filter->getMap();
 		return $confMap;
 	}
 }
+
