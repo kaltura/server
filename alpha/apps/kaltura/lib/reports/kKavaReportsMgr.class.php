@@ -1283,7 +1283,6 @@ class kKavaReportsMgr extends kKavaBase
 					self::REPORT_ENRICH_CONTEXT => array(
 						'columns' => array('IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
 						'peer' => 'kuserPeer',
-						'hash' => false
 					)
 				)
 			),
@@ -1299,29 +1298,28 @@ class kKavaReportsMgr extends kKavaBase
 				'created_at' => self::DIMENSION_KUSER_ID
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => array('creator_name', 'created_at'),
+				self::REPORT_ENRICH_OUTPUT => array('user_id', 'creator_name', 'created_at'),
 				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
 				self::REPORT_ENRICH_CONTEXT => array(
-					'columns' => array('IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)','@CREATED_AT'),
+					'columns' => array('PUSER_ID', 'IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)', '@CREATED_AT'),
 					'peer' => 'kuserPeer',
-					'hash' => false
 				)
 			),
 			self::REPORT_JOIN_REPORTS => array(
+				// plays
+                                array(
+                                        self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
+                                        self::REPORT_DIMENSION => self::DIMENSION_ENTRY_OWNER_ID,
+                                        self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
+                                        self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY),
+                                ),
+
 				// entries & msecs added
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
 					self::REPORT_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC),
 					self::REPORT_TOTAL_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_UNIQUE_CONTRIBUTORS),
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_UNIQUE_CONTRIBUTORS),
-				),
-
-				// plays
-				array(
-					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
-					self::REPORT_DIMENSION => self::DIMENSION_ENTRY_OWNER_ID,
-					self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
-					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY),
 				),
 			),
 		),
@@ -1992,8 +1990,7 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function getMonthIdRange($from_day, $to_day)
 	{
 		$date = self::dateIdToDateTime($from_day);
-		$end_date = self::dateIdToDateTime($to_day);
-		$end_month = $end_date->format('Ym');
+		$end_month = substr($to_day, 0, 6);
 		$interval = new DateInterval('P1M');
 
 		$result = array();
@@ -2066,11 +2063,12 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$report_defs = $report_def[self::REPORT_JOIN_REPORTS];
 			$metrics = array();
+			$report_map = array();
 			foreach ($report_defs as $cur_report_def)
 			{
 				if (isset($cur_report_def[self::REPORT_METRICS]))
 				{
-					$metrics = array_merge($cur_report_def[self::REPORT_METRICS], $metrics);
+					$metrics = array_merge($metrics, $cur_report_def[self::REPORT_METRICS]);
 				}
 			}
 			foreach ($metrics as $metric)
