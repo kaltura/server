@@ -91,7 +91,8 @@ class BulkUploadFilterPlugin extends KalturaPlugin implements IKalturaBulkUpload
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if ($baseClass == BulkUploadResultPeer::OM_CLASS && $enumValue == self::getBulkUploadObjectTypeCoreValue(BulkUploadJobObjectType::JOB))
+		// BulkUploadResultPeer::OM_CLASS = 'BulkUploadResult'
+		if ($baseClass == 'BulkUploadResult' && $enumValue == self::getBulkUploadObjectTypeCoreValue(BulkUploadJobObjectType::JOB))
 		{
 			return 'BulkUploadResultJob';
 		}
