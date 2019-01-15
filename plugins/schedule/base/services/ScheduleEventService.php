@@ -355,14 +355,14 @@ class ScheduleEventService extends KalturaBaseService
 
 		foreach($dates as $date)
 		{
-			if($scheduleEventConflictType == KalturaScheduleEventConflictType::BLACKOUT_CONFLICT ||
+			if($scheduleEventConflictType == KalturaScheduleEventConflictType::RESOURCE_CONFLICT ||
 				$scheduleEventConflictType == KalturaScheduleEventConflictType::BOTH )
 			{
 				$events = array_merge($events, ScheduleEventPeer::retrieveEventsByResourceIdsAndDateWindow($resourceIds,
 					$date, $date + $duration, $scheduleEventIdToIgnore));
 			}
 
-			if($scheduleEventConflictType == KalturaScheduleEventConflictType::RESOURCE_CONFLICT ||
+			if($scheduleEventConflictType == KalturaScheduleEventConflictType::BLACKOUT_CONFLICT ||
 				$scheduleEventConflictType == KalturaScheduleEventConflictType::BOTH )
 			{
 				$events = array_merge($events, ScheduleEventPeer::retrieveBlackoutEventsByDateWindow($date,
