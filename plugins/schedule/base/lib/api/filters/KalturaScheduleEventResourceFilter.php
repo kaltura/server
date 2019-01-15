@@ -56,7 +56,7 @@ class KalturaScheduleEventResourceFilter extends KalturaScheduleEventResourceBas
 
 		if($filterBlackoutConflicts)
 		{
-			$list = array_filter($list, [$this, "checkNoBlackoutConflict"]);
+			$list = array_filter($list, array($this, "checkNoBlackoutConflict"));
 		}
 
 		$response = new KalturaScheduleEventResourceListResponse();
