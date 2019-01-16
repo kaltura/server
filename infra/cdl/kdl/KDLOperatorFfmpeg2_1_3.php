@@ -360,7 +360,7 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 				 */
 			switch($inputs){
 				case 1:
-					$mapStr.= "pan=stereo:c0=c0:c1=c1";
+					$mapStr.= "pan=stereo|c0=c0|c1=c1";
 					break;
 /*
 Disabled 'amix', for better stereo by 'amerge'
