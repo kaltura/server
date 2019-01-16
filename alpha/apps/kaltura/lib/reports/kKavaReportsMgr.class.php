@@ -1283,7 +1283,6 @@ class kKavaReportsMgr extends kKavaBase
 					self::REPORT_ENRICH_CONTEXT => array(
 						'columns' => array('IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
 						'peer' => 'kuserPeer',
-						'hash' => false
 					)
 				)
 			),
@@ -1299,12 +1298,11 @@ class kKavaReportsMgr extends kKavaBase
 				'created_at' => self::DIMENSION_KUSER_ID
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => array('creator_name', 'created_at'),
+				self::REPORT_ENRICH_OUTPUT => array('user_id', 'creator_name', 'created_at'),
 				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
 				self::REPORT_ENRICH_CONTEXT => array(
-					'columns' => array('IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)','@CREATED_AT'),
+					'columns' => array('PUSER_ID', 'IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)', '@CREATED_AT'),
 					'peer' => 'kuserPeer',
-					'hash' => false
 				)
 			),
 			self::REPORT_JOIN_REPORTS => array(
@@ -1314,17 +1312,18 @@ class kKavaReportsMgr extends kKavaBase
 					self::REPORT_DIMENSION => self::DIMENSION_ENTRY_OWNER_ID,
 					self::REPORT_FILTER => array(
 						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
-						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_LIVE_STREAM)
+						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_LIVE_STREAM, self::MEDIA_TYPE_LIVE_WIN_MEDIA, self::MEDIA_TYPE_LIVE_REAL_MEDIA, self::MEDIA_TYPE_LIVE_QUICKTIME)
 					),
 					self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
 					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY),
 				),
+
 				// entries & msecs added
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
 					self::REPORT_FILTER => array(
 						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
-						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_LIVE_STREAM)
+						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_LIVE_STREAM, self::MEDIA_TYPE_LIVE_WIN_MEDIA, self::MEDIA_TYPE_LIVE_REAL_MEDIA, self::MEDIA_TYPE_LIVE_QUICKTIME)
 					),
 					self::REPORT_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC),
 					self::REPORT_TOTAL_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_UNIQUE_CONTRIBUTORS),
@@ -1339,10 +1338,14 @@ class kKavaReportsMgr extends kKavaBase
 				'source' => self::DIMENSION_SOURCE_TYPE
 			),
 			self::REPORT_FILTER => array(
-				array(self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
-				self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_LIVE_STREAM, self::MEDIA_TYPE_LIVE_WIN_MEDIA, self::MEDIA_TYPE_LIVE_REAL_MEDIA, self::MEDIA_TYPE_LIVE_QUICKTIME)),
-				array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-					self::DRUID_VALUES => array(self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_STATUS)),
+				array(
+					self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
+					self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_LIVE_STREAM, self::MEDIA_TYPE_LIVE_WIN_MEDIA, self::MEDIA_TYPE_LIVE_REAL_MEDIA, self::MEDIA_TYPE_LIVE_QUICKTIME)
+				),
+				array(
+					self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+					self::DRUID_VALUES => array(self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_STATUS)
+				),
 			),
 			self::REPORT_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_UNIQUE_CONTRIBUTORS),
 		),
@@ -2012,8 +2015,7 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function getMonthIdRange($from_day, $to_day)
 	{
 		$date = self::dateIdToDateTime($from_day);
-		$end_date = self::dateIdToDateTime($to_day);
-		$end_month = $end_date->format('Ym');
+		$end_month = substr($to_day, 0, 6);
 		$interval = new DateInterval('P1M');
 
 		$result = array();
@@ -2086,11 +2088,12 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$report_defs = $report_def[self::REPORT_JOIN_REPORTS];
 			$metrics = array();
+			$report_map = array();
 			foreach ($report_defs as $cur_report_def)
 			{
 				if (isset($cur_report_def[self::REPORT_METRICS]))
 				{
-					$metrics = array_merge($cur_report_def[self::REPORT_METRICS], $metrics);
+					$metrics = array_merge($metrics, $cur_report_def[self::REPORT_METRICS]);
 				}
 			}
 			foreach ($metrics as $metric)
@@ -2561,14 +2564,20 @@ class kKavaReportsMgr extends kKavaBase
 		$filter_def = array();
 		foreach ($filter as $cur_filter)
 		{
-			$filter_def[] = self::getInFilter(
-				$cur_filter[self::DRUID_DIMENSION], 
-				$cur_filter[self::DRUID_VALUES]);
+			$dimension = $cur_filter[self::DRUID_DIMENSION];
+			$values = $cur_filter[self::DRUID_VALUES];
+			if (isset($filter_def[$dimension]))
+			{
+				$values = array_intersect($values, $filter_def[$dimension][self::DRUID_VALUES]);
+			}
+			$filter_def[$dimension] = self::getInFilter(
+				$dimension,
+				$values);
 		}
 		
 		$report_def[self::DRUID_FILTER] = array(
 			self::DRUID_TYPE => 'and',
-			self::DRUID_FIELDS => $filter_def);
+			self::DRUID_FIELDS => array_values($filter_def));
 
 		return $report_def;
 	}
