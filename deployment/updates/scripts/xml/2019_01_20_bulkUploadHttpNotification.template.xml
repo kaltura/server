@@ -371,7 +371,7 @@
     <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
       <template objectType="KalturaHttpNotificationTemplate">
         <name>Media XML - Bulk Job Failed (HTTP)</name>
-        <systemName>>Media_XML_Bulk_Failure_Notification</systemName>
+        <systemName>Media_XML_Bulk_Failure_Notification</systemName>
         <description>HTTP notification template for Media XML Bulk Upload failure.</description>
         <automaticDispatchEnabled>1</automaticDispatchEnabled>
         <eventType>1</eventType>
