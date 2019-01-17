@@ -312,10 +312,10 @@ class entryPeer extends BaseentryPeer
 		return $res;
 	}
 
-	public static function retrieveByPKsNoFilter ($pks, $con = null)
+	public static function retrieveByPKsNoFilter ($pks, $con = null, $filterEntitlements = true)
 	{
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-		self::$filterResults = true;
+		self::$filterResults = $filterEntitlements;
 		self::setUseCriteriaFilter ( false );
 		$res = parent::retrieveByPKs( $pks , $con );
 		self::setUseCriteriaFilter ( true );
@@ -415,7 +415,7 @@ class entryPeer extends BaseentryPeer
 
 				if (count($categoriesIds))
 				{
-					sort($categoriesIds); // sort categories in order to later create identical queries which enable better caching  
+					sort($categoriesIds); // sort categories in order to later create identical queries which enable better caching
 					$critCategories = $c->getNewCriterion(self::CATEGORIES_IDS, $categoriesIds, KalturaCriteria::IN_LIKE);
 					$critCategories->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 					$critEntitled->addOr($critCategories);
@@ -859,6 +859,54 @@ class entryPeer extends BaseentryPeer
 		}
 
 		return $validatedEntries;
+	}
+
+	public static function fetchPlaysViewsData($entries)
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
+		if (!$cache)
+		{
+			return $entries;
+		}
+
+		$keys = array();
+		foreach ($entries as $entry)
+		{
+			if (!self::shouldFetchPlaysViewsForEntryType($entry->getType()))
+			{
+				continue;
+			}
+			$keys[] = entry::PLAYSVIEWS_CACHE_KEY_PREFIX . $entry->getId();
+		}
+
+		$data = $cache->multiGet($keys);
+		foreach ($entries as $entry)
+		{
+			$key = entry::PLAYSVIEWS_CACHE_KEY_PREFIX . $entry->getId();
+			if (!self::shouldFetchPlaysViewsForEntryType($entry->getType()))
+			{
+				continue;
+			}
+			$entry->setPlaysViewsDataInitialized(true);
+			if (isset($data[$key]))
+			{
+				$entry->setMemcPlaysViewsData(json_decode($data[$key], true));
+			}
+		}
+		return $entries;
+	}
+
+	protected static function shouldFetchPlaysViewsForEntryType($type)
+	{
+		switch ($type)
+		{
+			case KalturaEntryType::DATA:
+			case KalturaEntryType::DOCUMENT:
+				return false;
+
+			default:
+				return true;
+		}
 	}
 
 }

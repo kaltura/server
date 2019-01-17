@@ -15,6 +15,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	protected $is_categories_modified = false;
 	protected $is_categories_names_modified = false;
 	protected $creator_kuser_id = null;
+	protected $memcPlaysViewsData = array();
+	protected $playsViewsDataInitialized = false;
 	
 	const MINIMUM_ID_TO_DISPLAY = 8999;
 	
@@ -134,7 +136,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const CATEGORY_SEARCH_STATUS = 's';
 	const PARTNER_STATUS_FORMAT = 'P%sST%s';
 	const CATEGORIES_INDEXED_FIELD_PREFIX = 'pid';
-	
+	const PLAYSVIEWS_CACHE_KEY_PREFIX = 'plays_views_';
+	const PLAYS_CACHE_KEY = 'plays';
+	const VIEWS_CACHE_KEY = 'views';
+	const LAST_PLAYED_AT_CACHE_KEY = 'last_played_at';
 
 	const DEFAULT_IMAGE_HEIGHT = 480;
 	const DEFAULT_IMAGE_WIDTH = 640;
@@ -4157,4 +4162,134 @@ public function copyTemplate($copyPartnerId = false, $template)
 	{
 		return kConf::get("encryption_iv");
 	}
+
+	/**
+	 * @return array
+	 */
+	public function getMemcPlaysViewsData()
+	{
+		return $this->memcPlaysViewsData;
+	}
+
+	/**
+	 * @param array $memcPlaysViewsData
+	 */
+	public function setMemcPlaysViewsData($memcPlaysViewsData)
+	{
+		$this->memcPlaysViewsData = $memcPlaysViewsData;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isPlaysViewsDataInitialized()
+	{
+		return $this->playsViewsDataInitialized;
+	}
+
+	/**
+	 * @param boolean $playsViewsDataInitialized
+	 */
+	public function setPlaysViewsDataInitialized($playsViewsDataInitialized)
+	{
+		$this->playsViewsDataInitialized = $playsViewsDataInitialized;
+	}
+
+	protected function fetchPlaysViewsData()
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
+		if (!$cache)
+		{
+			return;
+		}
+
+		$data = $cache->get(self::PLAYSVIEWS_CACHE_KEY_PREFIX . $this->getId());
+		if ($data)
+		{
+			$this->setMemcPlaysViewsData(json_decode($data, true));
+		}
+		$this->setPlaysViewsDataInitialized(true);
+	}
+
+	protected function getValueFromPlaysViewsData($key)
+	{
+		if (!$this->isPlaysViewsDataInitialized())
+		{
+			$this->fetchPlaysViewsData();
+		}
+
+		$data = $this->getMemcPlaysViewsData();
+		if (isset($data[$key]))
+		{
+			return $data[$key];
+		}
+		return null;
+	}
+
+	public function getPlays()
+	{
+		$memcValue = $this->getValueFromPlaysViewsData(self::PLAYS_CACHE_KEY);
+		if ($memcValue)
+		{
+			return $memcValue;
+		}
+
+		return parent::getPlays();
+	}
+
+	public function getViews()
+	{
+		$memcValue = $this->getValueFromPlaysViewsData(self::VIEWS_CACHE_KEY);
+		if ($memcValue)
+		{
+			return $memcValue;
+		}
+
+		return parent::getViews();
+	}
+
+	public function getLastPlayedAt($format = 'Y-m-d H:i:s')
+	{
+		$memcValue = $this->getValueFromPlaysViewsData(self::LAST_PLAYED_AT_CACHE_KEY);
+		if ($memcValue)
+		{
+			return self::getDateByFormat("@$memcValue", $format);
+		}
+		else
+		{
+			$lastPlayedAt = parent::getLastPlayedAt($format);
+			if ($lastPlayedAt)
+			{
+				$lastPlayedAt = self::getDateByFormat($lastPlayedAt, $format);
+			}
+
+			return $lastPlayedAt;
+		}
+	}
+
+	protected static function getDateByFormat($date, $format)
+	{
+		try
+		{
+			$dateTime = new DateTime($date);
+		}
+		catch (Exception $exception)
+		{
+			throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($date, true), $exception);
+		}
+
+		if ($format === null)
+		{
+			return (int) $dateTime->format('U');
+		}
+		elseif (strpos($format, '%') !== false)
+		{
+			return strftime($format, $dateTime->format('U'));
+		}
+		else
+		{
+			return $dateTime->format($format);
+		}
+	}
+
 }
