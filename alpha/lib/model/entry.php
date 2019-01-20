@@ -4228,10 +4228,10 @@ public function copyTemplate($copyPartnerId = false, $template)
 
 	public function getPlays()
 	{
-		$memcValue = $this->getValueFromPlaysViewsData(self::PLAYS_CACHE_KEY);
-		if ($memcValue)
+		$cacheValue = $this->getValueFromPlaysViewsData(self::PLAYS_CACHE_KEY);
+		if ($cacheValue)
 		{
-			return $memcValue;
+			return $cacheValue;
 		}
 
 		return parent::getPlays();
@@ -4239,10 +4239,10 @@ public function copyTemplate($copyPartnerId = false, $template)
 
 	public function getViews()
 	{
-		$memcValue = $this->getValueFromPlaysViewsData(self::VIEWS_CACHE_KEY);
-		if ($memcValue)
+		$cacheValue = $this->getValueFromPlaysViewsData(self::VIEWS_CACHE_KEY);
+		if ($cacheValue)
 		{
-			return $memcValue;
+			return $cacheValue;
 		}
 
 		return parent::getViews();
@@ -4250,10 +4250,10 @@ public function copyTemplate($copyPartnerId = false, $template)
 
 	public function getLastPlayedAt($format = 'Y-m-d H:i:s')
 	{
-		$memcValue = $this->getValueFromPlaysViewsData(self::LAST_PLAYED_AT_CACHE_KEY);
-		if ($memcValue)
+		$cacheValue = $this->getValueFromPlaysViewsData(self::LAST_PLAYED_AT_CACHE_KEY);
+		if ($cacheValue)
 		{
-			return self::getDateByFormat("@$memcValue", $format);
+			return self::getDateByFormat("@$cacheValue", $format);
 		}
 		else
 		{
@@ -4289,6 +4289,19 @@ public function copyTemplate($copyPartnerId = false, $template)
 		else
 		{
 			return $dateTime->format($format);
+		}
+	}
+
+	public function shouldFetchPlaysViewData()
+	{
+		switch ($this->getType())
+		{
+			case KalturaEntryType::DATA:
+			case KalturaEntryType::DOCUMENT:
+				return false;
+
+			default:
+				return true;
 		}
 	}
 

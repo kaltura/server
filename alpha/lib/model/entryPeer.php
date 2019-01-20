@@ -872,7 +872,7 @@ class entryPeer extends BaseentryPeer
 		$keys = array();
 		foreach ($entries as $entry)
 		{
-			if (!self::shouldFetchPlaysViewsForEntryType($entry->getType()))
+			if (!$entry->shouldFetchPlaysViewData())
 			{
 				continue;
 			}
@@ -882,31 +882,18 @@ class entryPeer extends BaseentryPeer
 		$data = $cache->multiGet($keys);
 		foreach ($entries as $entry)
 		{
-			$key = entry::PLAYSVIEWS_CACHE_KEY_PREFIX . $entry->getId();
-			if (!self::shouldFetchPlaysViewsForEntryType($entry->getType()))
+			if (!$entry->shouldFetchPlaysViewData())
 			{
 				continue;
 			}
 			$entry->setPlaysViewsDataInitialized(true);
+			$key = entry::PLAYSVIEWS_CACHE_KEY_PREFIX . $entry->getId();
 			if (isset($data[$key]))
 			{
 				$entry->setPlaysViewsData(json_decode($data[$key], true));
 			}
 		}
 		return $entries;
-	}
-
-	protected static function shouldFetchPlaysViewsForEntryType($type)
-	{
-		switch ($type)
-		{
-			case KalturaEntryType::DATA:
-			case KalturaEntryType::DOCUMENT:
-				return false;
-
-			default:
-				return true;
-		}
 	}
 
 }
