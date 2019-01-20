@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+    <!-- New Item Pending Moderation -->
+    <multirequest>
+        <!-- Get notification template using system name -->
+        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
+            <filter objectType="KalturaEventNotificationTemplateFilter">
+                <systemNameEqual>Unique_Kms_New_Item_Pending_Moderation</systemNameEqual>
+            </filter>
+            <pager objectType="KalturaFilterPager">
+                <pageSize>1</pageSize>
+            </pager>
+        </request>
+        <!-- Update notification template -->
+        <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
+            <id>{1:result:objects:0:id}</id>
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>New Item Pending Moderation (Application Specific)</name>
+            </template>
+        </request>
+    </multirequest>
+    <!-- New Item Pending Moderation -->
+    <multirequest>
+        <!-- Get notification template using system name -->
+        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
+            <filter objectType="KalturaEventNotificationTemplateFilter">
+                <systemNameEqual>Unique_Kms_New_Item_Pending_Moderation_2</systemNameEqual>
+            </filter>
+            <pager objectType="KalturaFilterPager">
+                <pageSize>1</pageSize>
+            </pager>
+        </request>
+        <!-- Update notification template -->
+        <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
+            <id>{1:result:objects:0:id}</id>
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>New Item Pending Moderation (Application Specific)</name>
+            </template>
+        </request>
+    </multirequest>
+    <!-- Entry Approved In Category -->
+    <multirequest>
+        <!-- Get notification template using system name -->
+        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
+            <filter objectType="KalturaEventNotificationTemplateFilter">
+                <systemNameEqual>Unique_Kms_Entry_Approved_In_Category</systemNameEqual>
+            </filter>
+            <pager objectType="KalturaFilterPager">
+                <pageSize>1</pageSize>
+            </pager>
+        </request>
+        <!-- Update notification template -->
+        <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
+            <id>{1:result:objects:0:id}</id>
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Entry Approved In Category (Application Specific)</name>
+            </template>
+        </request>
+    </multirequest>
+    <!-- Entry Rejected In Category -->
+    <multirequest>
+        <!-- Get notification template using system name -->
+        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
+            <filter objectType="KalturaEventNotificationTemplateFilter">
+                <systemNameEqual>Unique_Kms_Entry_Rejected_In_Category</systemNameEqual>
+            </filter>
+            <pager objectType="KalturaFilterPager">
+                <pageSize>1</pageSize>
+            </pager>
+        </request>
+        <!-- Update notification template -->
+        <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
+            <id>{1:result:objects:0:id}</id>
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Entry Rejected In Category (Application Specific)</name>
+            </template>
+        </request>
+    </multirequest>
+    <!-- Entry Rejected -->
+    <multirequest>
+        <!-- Get notification template using system name -->
+        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
+            <filter objectType="KalturaEventNotificationTemplateFilter">
+                <systemNameEqual>Unique_Kms_Entry_Rejected</systemNameEqual>
+            </filter>
+            <pager objectType="KalturaFilterPager">
+                <pageSize>1</pageSize>
+            </pager>
+        </request>
+        <!-- Update notification template -->
+        <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
+            <id>{1:result:objects:0:id}</id>
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Entry Rejected (Application Specific)</name>
+            </template>
+        </request>
+    </multirequest>
+    <!-- Entry Approved -->
+    <multirequest>
+        <!-- Get notification template using system name -->
+        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
+            <filter objectType="KalturaEventNotificationTemplateFilter">
+                <systemNameEqual>Unique_Kms_Entry_Approved</systemNameEqual>
+            </filter>
+            <pager objectType="KalturaFilterPager">
+                <pageSize>1</pageSize>
+            </pager>
+        </request>
+        <!-- Update notification template -->
+        <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
+            <id>{1:result:objects:0:id}</id>
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Entry Approved (Application Specific)</name>
+            </template>
+        </request>
+    </multirequest>
+    <!-- Entry Ready -->
+    <multirequest>
+        <!-- Get notification template using system name -->
+        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
+            <filter objectType="KalturaEventNotificationTemplateFilter">
+                <systemNameEqual>Unique_Kms_Entry_Ready</systemNameEqual>
+            </filter>
+            <pager objectType="KalturaFilterPager">
+                <pageSize>1</pageSize>
+            </pager>
+        </request>
+        <!-- Update notification template -->
+        <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
+            <id>{1:result:objects:0:id}</id>
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Entry Ready (Application Specific)</name>
+            </template>
+        </request>
+    </multirequest>
+    <!-- User was added to category as [role] -->
+    <multirequest>
+        <!-- Get notification template using system name -->
+        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
+            <filter objectType="KalturaEventNotificationTemplateFilter">
+                <systemNameEqual>Unique_Kms_User_Added_To_Category_As_Role</systemNameEqual>
+            </filter>
+            <pager objectType="KalturaFilterPager">
+                <pageSize>1</pageSize>
+            </pager>
+        </request>
+        <!-- Update notification template -->
+        <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
+            <id>{1:result:objects:0:id}</id>
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>User was added to category as [role] (Application Specific)</name>
+            </template>
+        </request>
+    </multirequest>
+    <!-- User's role was changed in category -->
+    <multirequest>
+        <!-- Get notification template using system name -->
+        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
+            <filter objectType="KalturaEventNotificationTemplateFilter">
+                <systemNameEqual>Unique_Kms_User_Role_Was_Changed_In_Category</systemNameEqual>
+            </filter>
+            <pager objectType="KalturaFilterPager">
+                <pageSize>1</pageSize>
+            </pager>
+        </request>
+        <!-- Update notification template -->
+        <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
+            <id>{1:result:objects:0:id}</id>
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>User's role was changed in category (Application Specific)</name>
+            </template>
+        </request>
+    </multirequest>
+    <!-- User was removed from category -->
+    <multirequest>
+        <!-- Get notification template using system name -->
+        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
+            <filter objectType="KalturaEventNotificationTemplateFilter">
+                <systemNameEqual>Unique_Kms_User_Was_Removed_From_Category</systemNameEqual>
+            </filter>
+            <pager objectType="KalturaFilterPager">
+                <pageSize>1</pageSize>
+            </pager>
+        </request>
+        <!-- Update notification template -->
+        <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
+            <id>{1:result:objects:0:id}</id>
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>User was removed from category (Application Specific)</name>
+            </template>
+        </request>
+    </multirequest>
+    <!-- Entry was added to channel -->
+    <multirequest>
+        <!-- Get notification template using system name -->
+        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
+            <filter objectType="KalturaEventNotificationTemplateFilter">
+                <systemNameEqual>Unique_Kms_Entry_Was_Added_To_Channel</systemNameEqual>
+            </filter>
+            <pager objectType="KalturaFilterPager">
+                <pageSize>1</pageSize>
+            </pager>
+        </request>
+        <!-- Update notification template -->
+        <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
+            <id>{1:result:objects:0:id}</id>
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Entry was added to channel (Application Specific)</name>
+            </template>
+        </request>
+    </multirequest>
+    <!-- Comment was added to entry -->
+    <multirequest>
+        <!-- Get notification template using system name -->
+        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
+            <filter objectType="KalturaEventNotificationTemplateFilter">
+                <systemNameEqual>Unique_Kms_Comment_Was_Added_To_Entry</systemNameEqual>
+            </filter>
+            <pager objectType="KalturaFilterPager">
+                <pageSize>1</pageSize>
+            </pager>
+        </request>
+        <!-- Update notification template -->
+        <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
+            <id>{1:result:objects:0:id}</id>
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Comment was added to entry (Application Specific)</name>
+            </template>
+        </request>
+    </multirequest>
+</xml>
