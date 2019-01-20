@@ -15,7 +15,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	protected $is_categories_modified = false;
 	protected $is_categories_names_modified = false;
 	protected $creator_kuser_id = null;
-	protected $memcPlaysViewsData = array();
+	protected $playsViewsData = array();
 	protected $playsViewsDataInitialized = false;
 	
 	const MINIMUM_ID_TO_DISPLAY = 8999;
@@ -4166,17 +4166,17 @@ public function copyTemplate($copyPartnerId = false, $template)
 	/**
 	 * @return array
 	 */
-	public function getMemcPlaysViewsData()
+	public function getPlaysViewsData()
 	{
-		return $this->memcPlaysViewsData;
+		return $this->playsViewsData;
 	}
 
 	/**
-	 * @param array $memcPlaysViewsData
+	 * @param array $playsViewsData
 	 */
-	public function setMemcPlaysViewsData($memcPlaysViewsData)
+	public function setPlaysViewsData($playsViewsData)
 	{
-		$this->memcPlaysViewsData = $memcPlaysViewsData;
+		$this->playsViewsData = $playsViewsData;
 	}
 
 	/**
@@ -4206,7 +4206,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 		$data = $cache->get(self::PLAYSVIEWS_CACHE_KEY_PREFIX . $this->getId());
 		if ($data)
 		{
-			$this->setMemcPlaysViewsData(json_decode($data, true));
+			$this->setPlaysViewsData(json_decode($data, true));
 		}
 		$this->setPlaysViewsDataInitialized(true);
 	}
@@ -4218,7 +4218,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 			$this->fetchPlaysViewsData();
 		}
 
-		$data = $this->getMemcPlaysViewsData();
+		$data = $this->getPlaysViewsData();
 		if (isset($data[$key]))
 		{
 			return $data[$key];

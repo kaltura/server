@@ -890,7 +890,7 @@ class entryPeer extends BaseentryPeer
 			$entry->setPlaysViewsDataInitialized(true);
 			if (isset($data[$key]))
 			{
-				$entry->setMemcPlaysViewsData(json_decode($data[$key], true));
+				$entry->setPlaysViewsData(json_decode($data[$key], true));
 			}
 		}
 		return $entries;
