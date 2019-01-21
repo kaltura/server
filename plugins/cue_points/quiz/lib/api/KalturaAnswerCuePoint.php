@@ -25,6 +25,11 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	public $answerKey;
 
 	/**
+	* @var string
+	*/
+	public $openAnswer;
+
+	/**
 	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
@@ -56,7 +61,8 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		"parentId",
 		"correctAnswerKeys",
 		"isCorrect",
-		"explanation"
+		"explanation",
+		"openAnswer"
 	);
 
 	/* (non-PHPdoc)
@@ -168,6 +174,8 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		QuizPlugin::validateAndGetQuiz($dbEntry);
 		$this->validateParentId();
 		$this->validateUserEntry();
+		if($this->openAnswer != null)
+			$this->validatePropertyMaxLength("openAnswer", 1024);
 	}
 
 	/* (non-PHPdoc)
