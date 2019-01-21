@@ -12,9 +12,16 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	 */
 	public $score;
 
+	/**
+	* @var string
+	* @maxLength 1024
+	*/
+	public $feedback;
+
 	private static $map_between_objects = array
 	(
-		"score"
+		"score",
+		"feedback"
 	);
 
 	public function getMapBetweenObjects ( )
