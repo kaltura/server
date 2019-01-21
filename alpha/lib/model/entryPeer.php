@@ -886,14 +886,10 @@ class entryPeer extends BaseentryPeer
 			{
 				continue;
 			}
-			$entry->setPlaysViewsDataInitialized(true);
 			$key = entry::PLAYSVIEWS_CACHE_KEY_PREFIX . $entry->getId();
-			if (isset($data[$key]))
-			{
-				$entry->setPlaysViewsData(json_decode($data[$key], true));
-			}
+			$entryData = isset($data[$key]) ? $data[$key] : null;
+			$entry->setPlaysViewsData($entryData);
 		}
-		return $entries;
 	}
 
 }

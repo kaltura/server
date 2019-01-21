@@ -214,7 +214,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		}
 		$list = entryPeer::doSelect($c);
-		$list = entryPeer::fetchPlaysViewsData($list);
+		entryPeer::fetchPlaysViewsData($list);
 		$totalCount = $c->getRecordsCount();
 		
 		if ($disableWidgetSessionFilters)

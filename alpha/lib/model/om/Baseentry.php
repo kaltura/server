@@ -1282,14 +1282,31 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	 */
 	public function getLastPlayedAt($format = 'Y-m-d H:i:s')
 	{
-		if ($this->last_played_at === '0000-00-00 00:00:00')
-		{
-			// while technically this is not a default value of NULL,
-			// this seems to be closest in meaning.
+		if ($this->last_played_at === null) {
 			return null;
 		}
 
-		return $this->last_played_at;
+
+		if ($this->last_played_at === '0000-00-00 00:00:00') {
+			// while technically this is not a default value of NULL,
+			// this seems to be closest in meaning.
+			return null;
+		} else {
+			try {
+				$dt = new DateTime($this->last_played_at);
+			} catch (Exception $x) {
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->last_played_at, true), $x);
+			}
+		}
+
+		if ($format === null) {
+			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
+			return (int) $dt->format('U');
+		} elseif (strpos($format, '%') !== false) {
+			return strftime($format, $dt->format('U'));
+		} else {
+			return $dt->format($format);
+		}
 	}
 
 	/**

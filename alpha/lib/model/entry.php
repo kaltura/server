@@ -4164,35 +4164,12 @@ public function copyTemplate($copyPartnerId = false, $template)
 	}
 
 	/**
-	 * @return array
-	 */
-	public function getPlaysViewsData()
-	{
-		return $this->playsViewsData;
-	}
-
-	/**
 	 * @param array $playsViewsData
 	 */
 	public function setPlaysViewsData($playsViewsData)
 	{
-		$this->playsViewsData = $playsViewsData;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function isPlaysViewsDataInitialized()
-	{
-		return $this->playsViewsDataInitialized;
-	}
-
-	/**
-	 * @param boolean $playsViewsDataInitialized
-	 */
-	public function setPlaysViewsDataInitialized($playsViewsDataInitialized)
-	{
-		$this->playsViewsDataInitialized = $playsViewsDataInitialized;
+		$this->playsViewsData = json_decode($playsViewsData, true);
+		$this->playsViewsDataInitialized = true;
 	}
 
 	protected function fetchPlaysViewsData()
@@ -4204,92 +4181,75 @@ public function copyTemplate($copyPartnerId = false, $template)
 		}
 
 		$data = $cache->get(self::PLAYSVIEWS_CACHE_KEY_PREFIX . $this->getId());
-		if ($data)
-		{
-			$this->setPlaysViewsData(json_decode($data, true));
-		}
-		$this->setPlaysViewsDataInitialized(true);
+		$this->setPlaysViewsData($data);
 	}
 
 	protected function getValueFromPlaysViewsData($key)
 	{
-		if (!$this->isPlaysViewsDataInitialized())
+		if (!$this->playsViewsDataInitialized)
 		{
 			$this->fetchPlaysViewsData();
 		}
 
-		$data = $this->getPlaysViewsData();
-		if (isset($data[$key]))
+		if (isset($this->playsViewsData[$key]))
 		{
-			return $data[$key];
+			return $this->playsViewsData[$key];
 		}
 		return null;
 	}
 
 	public function getPlays()
 	{
-		$cacheValue = $this->getValueFromPlaysViewsData(self::PLAYS_CACHE_KEY);
-		if ($cacheValue)
+		$cacheSection = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
+		if (!$cacheSection)
 		{
-			return $cacheValue;
+			return parent::getPlays();
 		}
 
-		return parent::getPlays();
+		return $this->getValueFromPlaysViewsData(self::PLAYS_CACHE_KEY);
 	}
 
 	public function getViews()
 	{
-		$cacheValue = $this->getValueFromPlaysViewsData(self::VIEWS_CACHE_KEY);
-		if ($cacheValue)
+		$cacheSection = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
+		if (!$cacheSection)
 		{
-			return $cacheValue;
+			return parent::getViews();
 		}
 
-		return parent::getViews();
+		return $this->getValueFromPlaysViewsData(self::VIEWS_CACHE_KEY);
 	}
 
 	public function getLastPlayedAt($format = 'Y-m-d H:i:s')
 	{
-		$cacheValue = $this->getValueFromPlaysViewsData(self::LAST_PLAYED_AT_CACHE_KEY);
-		if ($cacheValue)
+		$cacheSection = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
+		if (!$cacheSection)
 		{
-			return self::getDateByFormat("@$cacheValue", $format);
+			return parent::getLastPlayedAt($format);
 		}
-		else
-		{
-			$lastPlayedAt = parent::getLastPlayedAt($format);
-			if ($lastPlayedAt)
-			{
-				$lastPlayedAt = self::getDateByFormat($lastPlayedAt, $format);
-			}
 
-			return $lastPlayedAt;
+		$cacheValue = $this->getValueFromPlaysViewsData(self::LAST_PLAYED_AT_CACHE_KEY);
+		if (!$cacheValue)
+		{
+			return null;
 		}
+		return self::getDateByFormat($cacheValue, $format);
 	}
 
 	protected static function getDateByFormat($date, $format)
 	{
-		try
-		{
-			$dateTime = new DateTime($date);
-		}
-		catch (Exception $exception)
-		{
-			throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($date, true), $exception);
-		}
-
 		if ($format === null)
 		{
-			return (int) $dateTime->format('U');
+			return $date;
 		}
 		elseif (strpos($format, '%') !== false)
 		{
-			return strftime($format, $dateTime->format('U'));
+			return strftime($format, $date);
 		}
-		else
-		{
-			return $dateTime->format($format);
-		}
+
+		$dateTime = new DateTime();
+		$dateTime->setTimestamp($date);
+		return $dateTime->format($format);
 	}
 
 	public function shouldFetchPlaysViewData()
