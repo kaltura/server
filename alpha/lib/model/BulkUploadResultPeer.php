@@ -95,6 +95,20 @@ class BulkUploadResultPeer extends BaseBulkUploadResultPeer
 	}
 	
 	/**
+	 * Function counts amount of bulk upload results for a given bulk upload job ID
+	 * @param int $bulkUploadJobId
+	 * @return int
+	 */
+	public static function countByBulkUploadId ($bulkUploadJobId)
+	{
+		$criteria = new Criteria();
+		$criteria->add(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID, $bulkUploadJobId);
+		$criteria->add(BulkUploadResultPeer::STATUS, BulkUploadResultStatus::ERROR, Criteria::NOT_EQUAL);
+		
+		return self::doCount($criteria);
+	}
+	
+	/**
 	 * Function counts amount of error bulk upload results for a given bulk upload job ID and object type
 	 * @param int $bulkUploadJobId
 	 * @param int $bulkUploadObjectType

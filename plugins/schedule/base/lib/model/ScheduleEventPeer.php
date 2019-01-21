@@ -17,12 +17,13 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 
 	const LIVE_STREAM_OM_CLASS = 'LiveStreamScheduleEvent';
 	const RECORD_OM_CLASS = 'RecordScheduleEvent';
-	
+	const BLACKOUT_OM_CLASS = 'BlackoutScheduleEvent';
 	
 	// cache classes by their type
 	protected static $class_types_cache = array(
 		ScheduleEventType::LIVE_STREAM => self::LIVE_STREAM_OM_CLASS,
 		ScheduleEventType::RECORD => self::RECORD_OM_CLASS,
+		ScheduleEventType::BLACKOUT => self::BLACKOUT_OM_CLASS,
 	);
 	
 	/*
@@ -38,15 +39,15 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		$c->addAnd(ScheduleEventPeer::STATUS, ScheduleEventStatus::DELETED, Criteria::NOT_EQUAL);
 		self::$s_criteria_filter->setFilter($c);
 	}
-	
+
 	/**
 	 * The returned Class will contain objects of the default type or
 	 * objects that inherit from the default.
 	 *
 	 * @param      array $row PropelPDO result row.
 	 * @param      int $colnum Column to examine for OM class information (first is 0).
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
+	 * @return 	   bool|mixed|object|string
+	 * @throws     PropelException Any exceptions caught during processing will be rethrown wrapped into a PropelException.
 	 */
 	public static function getOMClass($row, $colnum)
 	{
@@ -226,9 +227,39 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	 * @param string $resourceIds
 	 * @param date $startDate
 	 * @param date $endDate
-	 * @return array<ScheduleEvent>
+	 * @param string|null $scheduleEventIdToIgnore
+	 * @return array <ScheduleEvent>
 	 */
-	public static function retrieveEventsByResourceIdsAndDateWindow($resourceIds, $startDate, $endDate,$scheduleEventIdToIgnore=null)
+	public static function retrieveEventsByResourceIdsAndDateWindow($resourceIds, $startDate, $endDate, $scheduleEventIdToIgnore = null)
+	{
+		$c = self::getRetrieveEventsByDateWindowCriteria($startDate, $endDate, $scheduleEventIdToIgnore);
+		$filter = new ScheduleEventFilter();
+		$filter->setResourceIdsIn($resourceIds);
+		$filter->attachToCriteria($c);
+
+		return self::doSelect($c);
+	}
+
+	/**
+	 * @param date $startDate
+	 * @param date $endDate
+	 * @param string|null $scheduleEventIdToIgnore
+	 * @return array <ScheduleEvent>
+	 */
+	public static function retrieveBlackoutEventsByDateWindow($startDate, $endDate, $scheduleEventIdToIgnore = null)
+	{
+		$c = self::getRetrieveEventsByDateWindowCriteria($startDate, $endDate, $scheduleEventIdToIgnore);
+		$c->addAnd(ScheduleEventPeer::TYPE, scheduleEventType::BLACKOUT, Criteria::EQUAL);
+		return self::doSelect($c);
+	}
+
+	/**
+	 * @param date $startDate
+	 * @param date $endDate
+	 * @param string|null $scheduleEventIdToIgnore
+	 * @return KalturaCriteria
+	 */
+	protected static function getRetrieveEventsByDateWindowCriteria($startDate, $endDate, $scheduleEventIdToIgnore = null)
 	{
 		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
 		$c->addAnd(ScheduleEventPeer::START_DATE, $endDate, Criteria::LESS_THAN);
@@ -242,12 +273,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 			$c->addAnd(ScheduleEventPeer::PARENT_ID, $scheduleEventIdToIgnore, Criteria::NOT_IN);
 		}
 
-		$filter = new ScheduleEventFilter();
-		$filter->setResourceIdsIn($resourceIds);
-
-		$filter->attachToCriteria($c);
-
-		return self::doSelect($c);
+		return $c;
 	}
 	
 	/* (non-PHPdoc)

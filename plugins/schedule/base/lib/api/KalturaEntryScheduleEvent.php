@@ -26,7 +26,14 @@ abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 	 * @filter like,mlikeor,mlikeand
 	 */
 	public $categoryIds;
-	
+
+	/**
+	 * Blackout schedule events the conflict with this event
+	 * @readonly
+	 * @var KalturaScheduleEventArray
+	 */
+	public $blackoutConflicts;
+
 	/*
 	 * Mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
@@ -35,6 +42,7 @@ abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 		'templateEntryId',
 		'entryIds',
 		'categoryIds',
+		'blackoutConflicts',
 	 );
 		 
 	/* (non-PHPdoc)

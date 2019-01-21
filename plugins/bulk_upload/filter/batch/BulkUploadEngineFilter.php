@@ -105,6 +105,7 @@ abstract class BulkUploadEngineFilter extends KBulkUploadEngine
 	 */
 	protected function processObjectsList()
 	{
+		KBatchBase::impersonate($this->currentPartnerId);
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 100;		
 		if(KBatchBase::$taskConfig->params->pageSize)
@@ -123,8 +124,11 @@ abstract class BulkUploadEngineFilter extends KBulkUploadEngine
 				// creates a result object
 				$this->createUploadResult($object);
 				if($this->exceededMaxRecordsEachRun)
+				{
+					KBatchBase::unimpersonate();
 					return;
-				    		    
+				}
+				
 				if(KBatchBase::$kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
 				{
 					KBatchBase::$kClient->doMultiRequest();
@@ -139,7 +143,9 @@ abstract class BulkUploadEngineFilter extends KBulkUploadEngine
 				$pager->pageIndex = $this->getPagerIndex($pager->pageSize);						
 				$list = $this->listObjects($this->getData()->filter, $pager);
 			}
-		}		
+		}
+		
+		KBatchBase::unimpersonate();
 	}
 
 	/**
@@ -161,7 +167,7 @@ abstract class BulkUploadEngineFilter extends KBulkUploadEngine
 		    switch ($bulkUploadResult->action)
 		    {
 		        case KalturaBulkUploadAction::ADD:
-    		        $this->createObjectFromResultAndJobData($bulkUploadResult);       					
+    		        $this->createObjectFromResultAndJobData($bulkUploadResult);
         			$bulkUploadResultChunk[] = $bulkUploadResult;
 		            break;
 		        		            
@@ -233,7 +239,7 @@ abstract class BulkUploadEngineFilter extends KBulkUploadEngine
 			}
 			
 			// update the results with the new object Id
-			if ($requestResult->id)
+			if ($requestResult->id && !$bulkUploadResult->objectId)
 			    $bulkUploadResult->objectId = $requestResult->id;
 			$this->addBulkUploadResult($bulkUploadResult);
 		}

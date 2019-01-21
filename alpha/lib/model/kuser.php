@@ -1215,9 +1215,9 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		if ($this->getRoleIds())
 		{
 			$roleIds = explode(",", $this->getRoleIds());
-			foreach($roleIds as $roleId)
+			$roles = UserRolePeer::retrieveByPKs($roleIds);
+			foreach($roles as $role)
 			{
-				$role = UserRolePeer::retrieveByPK($roleId);
 				$permissionNames = $role->getPermissionNames(null, true);
 				$permissionNames = str_replace("*", self::UNIVERSAL_PERMISSION, $permissionNames);
 				$permissionNamesArray = array_merge($permissionNamesArray, explode(",", $permissionNames));

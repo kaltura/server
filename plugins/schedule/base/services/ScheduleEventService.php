@@ -244,10 +244,14 @@ class ScheduleEventService extends KalturaBaseService
 	public function listAction(KalturaScheduleEventFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
+		{
 			$filter = new KalturaScheduleEventFilter();
+		}
 
 		if(!$pager)
+		{
 			$pager = new KalturaFilterPager();
+		}
 
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
@@ -316,37 +320,60 @@ class ScheduleEventService extends KalturaBaseService
 
 	/**
 	 * List conflicting events for resourcesIds by event's dates
-	 *
 	 * @action getConflicts
 	 * @param string $resourceIds comma separated
 	 * @param KalturaScheduleEvent $scheduleEvent
 	 * @param string $scheduleEventIdToIgnore
+	 * @param KalturaScheduleEventConflictType $scheduleEventConflictType
 	 * @return KalturaScheduleEventListResponse
+	 * @throws KalturaAPIException
 	 */
-	public function getConflictsAction($resourceIds, KalturaScheduleEvent $scheduleEvent,$scheduleEventIdToIgnore=null)
+	public function getConflictsAction($resourceIds, KalturaScheduleEvent $scheduleEvent, $scheduleEventIdToIgnore = null,
+									   $scheduleEventConflictType = KalturaScheduleEventConflictType::RESOURCE_CONFLICT)
 	{
 		if (!$resourceIds)
+		{
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'resourceIds');
+		}
 
-		$dbScheduleEvent = $scheduleEvent->toObject();
 		/* @var $dbScheduleEvent ScheduleEvent */
-
+		$dbScheduleEvent = $scheduleEvent->toObject();
 		$events = array();
-
+		$dates = array();
 		if($dbScheduleEvent->getRecurrenceType() === ScheduleEventRecurrenceType::RECURRING)
 		{
 			$maxRecurrences = SchedulePlugin::getScheduleEventmaxRecurrences();
 			$datesGenerator = new DatesGenerator($maxRecurrences, $dbScheduleEvent->getRecurrence()->asArray(), array('KalturaLog', 'debug'));
 			$dates = $datesGenerator->getDates($dbScheduleEvent->getStartDate(null));
+			$duration = $dbScheduleEvent->getDuration();
+		}
+		else
+		{
+			$dates[] = $dbScheduleEvent->getStartDate(null);
+			$duration = $dbScheduleEvent->getEndDate(null) - $dbScheduleEvent->getStartDate(null);
+		}
 
-			foreach($dates as $date)
-				$events = array_merge($events, ScheduleEventPeer::retrieveEventsByResourceIdsAndDateWindow($resourceIds, $date, ($date + $dbScheduleEvent->getDuration()),$scheduleEventIdToIgnore));
+		foreach($dates as $date)
+		{
+			if($scheduleEventConflictType == KalturaScheduleEventConflictType::RESOURCE_CONFLICT ||
+				$scheduleEventConflictType == KalturaScheduleEventConflictType::BOTH )
+			{
+				$events = array_merge($events, ScheduleEventPeer::retrieveEventsByResourceIdsAndDateWindow($resourceIds,
+					$date, $date + $duration, $scheduleEventIdToIgnore));
+			}
+
+			if($scheduleEventConflictType == KalturaScheduleEventConflictType::BLACKOUT_CONFLICT ||
+				$scheduleEventConflictType == KalturaScheduleEventConflictType::BOTH )
+			{
+				$events = array_merge($events, ScheduleEventPeer::retrieveBlackoutEventsByDateWindow($date,
+					$date + $duration, $scheduleEventIdToIgnore));
+			}
 		}
-		else {
-			$events = ScheduleEventPeer::retrieveEventsByResourceIdsAndDateWindow($resourceIds, $dbScheduleEvent->getStartDate(null), $dbScheduleEvent->getEndDate(null),$scheduleEventIdToIgnore);
-		}
+
 		if (!count($events))
+		{
 			$this->reserveResources($resourceIds);
+		}
 
 		$response = new KalturaScheduleEventListResponse();
 		$response->objects = KalturaScheduleEventArray::fromDbArray($events, $this->getResponseProfile());
@@ -359,12 +386,14 @@ class ScheduleEventService extends KalturaBaseService
 		$resourceIdsArray = explode(",", $resourceIds);
 		$resourceReservator = new kResourceReservation();
 		foreach($resourceIdsArray as $resourceId)
+		{
 			if (!$resourceReservator->reserve($resourceId))
 			{
 				KalturaLog::info("Could not reserve all resource id [$resourceId]");
 				$this->clearAllReservation($resourceReservator, $resourceIdsArray);
 				throw new KalturaAPIException(KalturaErrors::RESOURCE_IS_RESERVED, $resourceId);
 			}
+		}
 	}
 
 	private function clearAllReservation($resourceReservator, $resourceIds)
