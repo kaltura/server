@@ -52,14 +52,39 @@ class IndexController extends Zend_Controller_Action
 	public function kavaAction()
 	{
 		$settings = Zend_Registry::get('config')->settings;
-		$sessionExpiry = $settings->sessionExpiry;
-		$kavaDashboardUrl = $settings->kavaDashboard->url;
-		$jwtKey = $settings->kavaDashboard->jwtKey;
-		$partnerId = $settings->partnerId;
+		if (!isset($settings->kavaDashboard))
+		{
+			return;
+		}
 		
-		if(!$kavaDashboardUrl || !$jwtKey)
-			$this->view->kavaDashboardUrl = null;
-		else
-			$this->view->kavaDashboardUrl = Form_KavaHelper::generateSignedKavaDashboardUrl($kavaDashboardUrl, $jwtKey, $partnerId, $sessionExpiry);
+		$kavaDashboard = $settings->kavaDashboard;
+
+		$this->view->kavaDashboardUrl = rtrim($kavaDashboard->url, "/") . "/?jwt=" . 
+			Form_JwtHelper::getJwt(
+				$kavaDashboard->jwtKey, 
+				$settings->partnerId, 
+				$settings->sessionExpiry);
+	}
+
+	public function kelloggsAction()
+	{
+		$settings = Zend_Registry::get('config')->settings;
+		if(!isset($settings->kelloggsDashboard))
+		{
+			return;
+		}
+
+		if (!Infra_AclHelper::isAllowed('developer', 'kelloggs'))
+		{
+			return;
+		}
+
+		$kelloggsDashboard = $settings->kelloggsDashboard;
+		$this->view->kelloggsUrl = $kelloggsDashboard->url;
+		$this->view->kelloggsServiceUrl = $kelloggsDashboard->serviceUrl;
+		$this->view->kelloggsJwt = Form_JwtHelper::getJwt(
+			$kelloggsDashboard->jwtKey, 
+			$settings->partnerId, 
+			$settings->sessionExpiry);
 	}
 }

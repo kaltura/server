@@ -104,4 +104,20 @@ abstract class EntryScheduleEvent extends ScheduleEvent
 		return implode(' ', $catgoriesIds);
 	}
 
+	public function getBlackoutConflicts()
+	{
+		if($this->getRecurrenceType() === ScheduleEventRecurrenceType::RECURRING)
+		{
+			$duration = $this->getDuration();
+		}
+		else
+		{
+			$duration = $this->getEndDate(null) - $this->getStartDate(null);
+		}
+
+		$events = ScheduleEventPeer::retrieveBlackoutEventsByDateWindow($this->getStartDate(null),$this->getStartDate(null)
+			+ $duration);
+
+		return $events;
+	}
 }

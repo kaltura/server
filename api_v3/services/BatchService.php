@@ -181,7 +181,7 @@ class BatchService extends KalturaBatchService
 				//TODO: find some better alternative, find out why the bulk upload result which reports error is
 				// returning objectId "null" for failed entry assets, rather than the entryId to which they pertain.
 				//$data->setNumOfEntries(BulkUploadResultPeer::countWithEntryByBulkUploadId($bulkUploadJobId));
-				$data->setNumOfObjects(BulkUploadResultPeer::countWithObjectTypeByBulkUploadId($bulkUploadJobId, $data->getBulkUploadObjectType()));
+				$data->setNumOfObjects(BulkUploadResultPeer::countByBulkUploadId($bulkUploadJobId));
 				$data->setNumOfErrorObjects($errorObjects);
 				$bulkUpload->setData($data);
 				$bulkUpload->save();

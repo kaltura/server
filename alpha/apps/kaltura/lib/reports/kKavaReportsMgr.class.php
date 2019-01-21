@@ -2562,22 +2562,28 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		$filter_def = array();
+		$filter_values = array();
 		foreach ($filter as $cur_filter)
 		{
 			$dimension = $cur_filter[self::DRUID_DIMENSION];
 			$values = $cur_filter[self::DRUID_VALUES];
-			if (isset($filter_def[$dimension]))
+			if (isset($filter_values[$dimension]))
 			{
-				$values = array_intersect($values, $filter_def[$dimension][self::DRUID_VALUES]);
+				$values = array_intersect($values, $filter_values[$dimension]);
 			}
-			$filter_def[$dimension] = self::getInFilter(
+			$filter_values[$dimension] = array_values($values);
+		}
+
+		foreach ($filter_values as $dimension -> $values)
+		{
+			$filter_def[] = self::getInFilter(
 				$dimension,
 				$values);
 		}
-		
+
 		$report_def[self::DRUID_FILTER] = array(
 			self::DRUID_TYPE => 'and',
-			self::DRUID_FIELDS => array_values($filter_def));
+			self::DRUID_FIELDS => $filter_def);
 
 		return $report_def;
 	}
@@ -4718,6 +4724,7 @@ class kKavaReportsMgr extends kKavaBase
 				}
 			}
 		}
+
 
 		$end = microtime(true);
 		KalturaLog::log('getTable took [' . ($end - $start) . ']');
