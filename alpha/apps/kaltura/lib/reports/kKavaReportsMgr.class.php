@@ -2574,7 +2574,7 @@ class kKavaReportsMgr extends kKavaBase
 			$filter_values[$dimension] = array_values($values);
 		}
 
-		foreach ($filter_values as $dimension -> $values)
+		foreach ($filter_values as $dimension => $values)
 		{
 			$filter_def[] = self::getInFilter(
 				$dimension,
