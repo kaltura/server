@@ -49,6 +49,12 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	 */
 	public $explanation;
 
+	/**
+         * @var string
+         * @maxLength 1024
+         */
+        public $feedback;
+
 
 	public function __construct()
 	{
@@ -63,7 +69,8 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		"correctAnswerKeys",
 		"isCorrect",
 		"explanation",
-		"openAnswer"
+		"openAnswer",
+		"feedback"
 	);
 
 	/* (non-PHPdoc)
