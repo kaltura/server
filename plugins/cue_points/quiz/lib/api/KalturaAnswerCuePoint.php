@@ -26,6 +26,7 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 
 	/**
 	* @var string
+	* @maxLength 1024
 	*/
 	public $openAnswer;
 
@@ -174,8 +175,6 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		QuizPlugin::validateAndGetQuiz($dbEntry);
 		$this->validateParentId();
 		$this->validateUserEntry();
-		if($this->openAnswer != null)
-			$this->validatePropertyMaxLength("openAnswer", 1024);
 	}
 
 	/* (non-PHPdoc)
