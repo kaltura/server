@@ -2561,7 +2561,6 @@ class kKavaReportsMgr extends kKavaBase
 				self::DRUID_VALUES => array_values(array_unique($event_types)));
 		}
 
-		$filter_def = array();
 		$filter_values = array();
 		foreach ($filter as $cur_filter)
 		{
@@ -2574,6 +2573,7 @@ class kKavaReportsMgr extends kKavaBase
 			$filter_values[$dimension] = array_values($values);
 		}
 
+		$filter_def = array();
 		foreach ($filter_values as $dimension => $values)
 		{
 			$filter_def[] = self::getInFilter(
