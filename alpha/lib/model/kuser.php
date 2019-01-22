@@ -876,6 +876,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		$c->addSelectColumn(kuserPeer::PARTNER_ID);
 		$c->addAnd(kuserPeer::LOGIN_DATA_ID, $currentLoginDataId, Criteria::EQUAL);
 		$c->addAnd(kuserPeer::STATUS, KuserStatus::ACTIVE, Criteria::EQUAL);
+		$c->addAnd(kuserPeer::IS_ADMIN, true, Criteria::EQUAL);
 		kuserPeer::setUseCriteriaFilter(false);
 		$stmt = kuserPeer::doSelectStmt($c);
 		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
