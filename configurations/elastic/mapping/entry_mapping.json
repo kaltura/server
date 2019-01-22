@@ -537,6 +537,24 @@
 				"plays": {
 					"type" : "long"
 				},
+				"views_30days": {
+					"type" : "integer"
+				},
+				"plays_30days": {
+					"type" : "integer"
+				},
+				"views_7days": {
+					"type" : "integer"
+				},
+				"plays_7days": {
+					"type" : "integer"
+				},
+				"views_1day": {
+					"type" : "integer"
+				},
+				"plays_1day": {
+					"type" : "integer"
+				},
 				"votes": {
 					"type" : "long"
 				},
