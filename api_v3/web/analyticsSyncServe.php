@@ -14,6 +14,8 @@ define('ENTRY_TYPE', 't');
 define('ENTRY_MEDIA_TYPE', 'mt');
 define('ENTRY_SOURCE_TYPE', 'st');
 define('ENTRY_DURATION', 'd');
+define('ENTRY_CREATOR', 'c');
+define('ENTRY_CREATED_AT', 'ca');
 
 define('SOURCE_CLASSROOM', -10);
 define('SOURCE_CAPTURE', -11);
@@ -68,6 +70,12 @@ function getEntrySourceTypeInt($sourceType, $adminTags)
 
 	// use the source type
 	return $sourceType;
+}
+
+function getEntryCreatedAtUnixTimestamp($createdAt)
+{
+	$dt = new DateTime($createdAt);
+	return (int) $dt->format('U');
 }
 
 function getPartnerUpdates($updatedAt)
@@ -166,6 +174,8 @@ function getEntryUpdates($updatedAt)
 	$c->addSelectColumn(entryPeer::MEDIA_TYPE);
 	$c->addSelectColumn(entryPeer::SOURCE);
 	$c->addSelectColumn(entryPeer::ADMIN_TAGS);
+	$c->addSelectColumn(entryPeer::CREATED_AT);
+	$c->addSelectColumn(entryPeer::CUSTOM_DATA);
 	$c->addSelectColumn(entryPeer::UPDATED_AT);
 	$c->add(entryPeer::UPDATED_AT, $updatedAt, Criteria::GREATER_EQUAL);
 	$c->addAscendingOrderByColumn(entryPeer::UPDATED_AT);
@@ -183,11 +193,15 @@ function getEntryUpdates($updatedAt)
 		$status = $row['STATUS'];
 		if ($status == entryStatus::READY)
 		{
+			$customData = unserialize($row['CUSTOM_DATA']);
+
 			$info = array(
 				ENTRY_KUSER_ID => $row['KUSER_ID'],
 				ENTRY_TYPE => $row['TYPE'],
 				ENTRY_MEDIA_TYPE => $row['MEDIA_TYPE'],
 				ENTRY_SOURCE_TYPE => getEntrySourceTypeInt($row['SOURCE'], $row['ADMIN_TAGS']),
+				ENTRY_CREATED_AT => getEntryCreatedAtUnixTimestamp($row['CREATED_AT']),
+				ENTRY_CREATOR => isset($customData['creatorKuserId']) ? $customData['creatorKuserId'] : $row['KUSER_ID'],
 			);
 			$duration = intval($row['LENGTH_IN_MSECS'] / 1000);
 			if ($duration > 0)
