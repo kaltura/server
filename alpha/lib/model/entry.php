@@ -15,7 +15,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	protected $is_categories_modified = false;
 	protected $is_categories_names_modified = false;
 	protected $creator_kuser_id = null;
-	protected $playsViewsData = array();
+	protected $playsViewsData = null;
 	protected $playsViewsDataInitialized = false;
 	
 	const MINIMUM_ID_TO_DISPLAY = 8999;
@@ -4174,13 +4174,16 @@ public function copyTemplate($copyPartnerId = false, $template)
 	 */
 	public function setPlaysViewsData($playsViewsData)
 	{
-		$this->playsViewsData = json_decode($playsViewsData, true);
+		if ($playsViewsData)
+		{
+			$this->playsViewsData = json_decode($playsViewsData, true);
+		}
 		$this->playsViewsDataInitialized = true;
 	}
 
 	protected function usePlaysViewsCache()
 	{
-		return kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
+		return $this->playsViewsDataInitialized || kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
 	}
 
 	protected function fetchPlaysViewsData()
@@ -4256,51 +4259,26 @@ public function copyTemplate($copyPartnerId = false, $template)
 
 	public function getViewsLast30Days()
 	{
-		if (!$this->usePlaysViewsCache())
-		{
-			return 0;
-		}
-
 		return $this->getValueFromPlaysViewsData(self::VIEWS_30_DAYS_CACHE_KEY);
 	}
 
 	public function getPlaysLast7Days()
 	{
-		if (!$this->usePlaysViewsCache())
-		{
-			return 0;
-		}
-
 		return $this->getValueFromPlaysViewsData(self::PLAYS_7_DAYS_CACHE_KEY);
 	}
 
 	public function getViewsLast7Days()
 	{
-		if (!$this->usePlaysViewsCache())
-		{
-			return 0;
-		}
-
 		return $this->getValueFromPlaysViewsData(self::VIEWS_7_DAYS_CACHE_KEY);
 	}
 
 	public function getPlaysLastDay()
 	{
-		if (!$this->usePlaysViewsCache())
-		{
-			return 0;
-		}
-
 		return $this->getValueFromPlaysViewsData(self::PLAYS_1_DAY_CACHE_KEY);
 	}
 
 	public function getViewsLastDay()
 	{
-		if (!$this->usePlaysViewsCache())
-		{
-			return 0;
-		}
-
 		return $this->getValueFromPlaysViewsData(self::VIEWS_1_DAY_CACHE_KEY);
 	}
 
