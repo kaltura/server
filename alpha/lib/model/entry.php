@@ -140,6 +140,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const PLAYS_CACHE_KEY = 'plays';
 	const VIEWS_CACHE_KEY = 'views';
 	const LAST_PLAYED_AT_CACHE_KEY = 'last_played_at';
+	const PLAYS_30_DAYS_CACHE_KEY = 'plays_30days';
+	const VIEWS_30_DAYS_CACHE_KEY = 'views_30days';
+	const PLAYS_7_DAYS_CACHE_KEY = 'plays_7days';
+	const VIEWS_7_DAYS_CACHE_KEY = 'views_7days';
+	const PLAYS_1_DAY_CACHE_KEY = 'plays_1day';
+	const VIEWS_1_DAY_CACHE_KEY = 'views_1day';
 
 	const DEFAULT_IMAGE_HEIGHT = 480;
 	const DEFAULT_IMAGE_WIDTH = 640;
@@ -4172,6 +4178,11 @@ public function copyTemplate($copyPartnerId = false, $template)
 		$this->playsViewsDataInitialized = true;
 	}
 
+	protected function usePlaysViewsCache()
+	{
+		return kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
+	}
+
 	protected function fetchPlaysViewsData()
 	{
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
@@ -4200,8 +4211,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 
 	public function getPlays()
 	{
-		$cacheSection = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
-		if (!$cacheSection)
+		if (!$this->usePlaysViewsCache())
 		{
 			return parent::getPlays();
 		}
@@ -4211,8 +4221,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 
 	public function getViews()
 	{
-		$cacheSection = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
-		if (!$cacheSection)
+		if (!$this->usePlaysViewsCache())
 		{
 			return parent::getViews();
 		}
@@ -4222,8 +4231,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 
 	public function getLastPlayedAt($format = 'Y-m-d H:i:s')
 	{
-		$cacheSection = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
-		if (!$cacheSection)
+		if (!$this->usePlaysViewsCache())
 		{
 			return parent::getLastPlayedAt($format);
 		}
@@ -4236,20 +4244,78 @@ public function copyTemplate($copyPartnerId = false, $template)
 		return self::getDateByFormat($cacheValue, $format);
 	}
 
-	protected static function getDateByFormat($date, $format)
+	public function getPlaysLast30Days()
+	{
+		if (!$this->usePlaysViewsCache())
+		{
+			return 0;
+		}
+
+		return $this->getValueFromPlaysViewsData(self::PLAYS_30_DAYS_CACHE_KEY);
+	}
+
+	public function getViewsLast30Days()
+	{
+		if (!$this->usePlaysViewsCache())
+		{
+			return 0;
+		}
+
+		return $this->getValueFromPlaysViewsData(self::VIEWS_30_DAYS_CACHE_KEY);
+	}
+
+	public function getPlaysLast7Days()
+	{
+		if (!$this->usePlaysViewsCache())
+		{
+			return 0;
+		}
+
+		return $this->getValueFromPlaysViewsData(self::PLAYS_7_DAYS_CACHE_KEY);
+	}
+
+	public function getViewsLast7Days()
+	{
+		if (!$this->usePlaysViewsCache())
+		{
+			return 0;
+		}
+
+		return $this->getValueFromPlaysViewsData(self::VIEWS_7_DAYS_CACHE_KEY);
+	}
+
+	public function getPlaysLastDay()
+	{
+		if (!$this->usePlaysViewsCache())
+		{
+			return 0;
+		}
+
+		return $this->getValueFromPlaysViewsData(self::PLAYS_1_DAY_CACHE_KEY);
+	}
+
+	public function getViewsLastDay()
+	{
+		if (!$this->usePlaysViewsCache())
+		{
+			return 0;
+		}
+
+		return $this->getValueFromPlaysViewsData(self::VIEWS_1_DAY_CACHE_KEY);
+	}
+
+	protected static function getDateByFormat($timestamp, $format)
 	{
 		if ($format === null)
 		{
-			return $date;
+			return $timestamp;
 		}
 		elseif (strpos($format, '%') !== false)
 		{
-			return strftime($format, $date);
+			return strftime($format, $timestamp);
 		}
 
-		$dateTime = new DateTime();
-		$dateTime->setTimestamp($date);
-		return $dateTime->format($format);
+		return date($format, $timestamp);
 	}
 
 	public function shouldFetchPlaysViewData()
