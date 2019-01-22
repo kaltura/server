@@ -4249,11 +4249,6 @@ public function copyTemplate($copyPartnerId = false, $template)
 
 	public function getPlaysLast30Days()
 	{
-		if (!$this->usePlaysViewsCache())
-		{
-			return 0;
-		}
-
 		return $this->getValueFromPlaysViewsData(self::PLAYS_30_DAYS_CACHE_KEY);
 	}
 
