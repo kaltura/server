@@ -415,7 +415,7 @@ class entryPeer extends BaseentryPeer
 
 				if (count($categoriesIds))
 				{
-					sort($categoriesIds); // sort categories in order to later create identical queries which enable better caching  
+					sort($categoriesIds); // sort categories in order to later create identical queries which enable better caching
 					$critCategories = $c->getNewCriterion(self::CATEGORIES_IDS, $categoriesIds, KalturaCriteria::IN_LIKE);
 					$critCategories->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 					$critEntitled->addOr($critCategories);
@@ -859,6 +859,37 @@ class entryPeer extends BaseentryPeer
 		}
 
 		return $validatedEntries;
+	}
+
+	public static function fetchPlaysViewsData($entries)
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
+		if (!$cache)
+		{
+			return $entries;
+		}
+
+		$keys = array();
+		foreach ($entries as $entry)
+		{
+			if (!$entry->shouldFetchPlaysViewData())
+			{
+				continue;
+			}
+			$keys[] = entry::PLAYSVIEWS_CACHE_KEY_PREFIX . $entry->getId();
+		}
+
+		$data = $cache->multiGet($keys);
+		foreach ($entries as $entry)
+		{
+			if (!$entry->shouldFetchPlaysViewData())
+			{
+				continue;
+			}
+			$key = entry::PLAYSVIEWS_CACHE_KEY_PREFIX . $entry->getId();
+			$entryData = isset($data[$key]) ? $data[$key] : null;
+			$entry->setPlaysViewsData($entryData);
+		}
 	}
 
 }
