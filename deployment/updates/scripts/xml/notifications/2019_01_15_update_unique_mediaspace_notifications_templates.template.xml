@@ -28,6 +28,7 @@
             <id>{1:result:objects:0:id}</id>
             <template objectType="KalturaEmailNotificationTemplate">
                 <name>New Item Pending Moderation (Application Specific)</name>
+                <body><![CDATA[ A new item is pending your approval: <a href="[ChannelSettingsPendingURLPrefix]{category_name_encoded}/{category_id}[ChannelSettingsPendingURLSuffix]">[ChannelSettingsPendingURLPrefix]{category_name_encoded}/{category_id}[ChannelSettingsPendingURLSuffix]</a> ]]></body>
             </template>
         </request>
     </multirequest>
@@ -47,6 +48,7 @@
             <id>{1:result:objects:0:id}</id>
             <template objectType="KalturaEmailNotificationTemplate">
                 <name>New Item Pending Moderation (Application Specific)</name>
+                <body><![CDATA[ A new item is pending your approval: <a href="[ChannelSettingsPendingURLPrefix]{category_name_encoded}/{category_id}[ChannelSettingsPendingURLSuffix]">[ChannelSettingsPendingURLPrefix]{category_name_encoded}/{category_id}[ChannelSettingsPendingURLSuffix]</a> ]]></body>
             </template>
         </request>
     </multirequest>
@@ -66,6 +68,60 @@
             <id>{1:result:objects:0:id}</id>
             <template objectType="KalturaEmailNotificationTemplate">
                 <name>Entry Approved In Category (Application Specific)</name>
+                <body><![CDATA[ Your media {entry_name} <a href="[AppEntryUrl]{entry_id}">[AppEntryUrl]{entry_id}</a> has been approved to be published in <a href="[AppCategoryUrl]{category_name_encoded}/{category_id}">{category_name}</a> ]]></body>
+                <contentParameters objectType="array">
+                    <!-- Existing parameters -->
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Server configuration: partner_notification_email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Server configuration: partner_notification_name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>($entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $entry->getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_name</key>
+                        <description>Category name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>($category = categoryPeer::retrieveByPk($scope->getObject()->getCategoryId())) ? $category->getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getEntryId()</code>
+                        </value>
+                    </item>
+                    <!-- New parameters -->
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_name_encoded</key>
+                        <description>Encoded category name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>urlencode(($category = categoryPeer::retrieveByPk($scope->getObject()->getCategoryId())) ? $category->getName() : '')</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_id</key>
+                        <description>Category ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getCategoryId()</code>
+                        </value>
+                    </item>
+                </contentParameters>
             </template>
         </request>
     </multirequest>
@@ -85,6 +141,60 @@
             <id>{1:result:objects:0:id}</id>
             <template objectType="KalturaEmailNotificationTemplate">
                 <name>Entry Rejected In Category (Application Specific)</name>
+                <body><![CDATA[ Your media {entry_name} <a href="[AppEntryUrl]{entry_id}">[AppEntryUrl]{entry_id}</a> has been rejected to be published in <a href="[AppCategoryUrl]{category_name_encoded}/{category_id}">{category_name}</a> ]]></body>
+                <contentParameters objectType="array">
+                    <!-- Existing parameters -->
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Server configuration: partner_notification_email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Server configuration: partner_notification_name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>($entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $entry->getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_name</key>
+                        <description>Category name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>($category = categoryPeer::retrieveByPk($scope->getObject()->getCategoryId())) ? $category->getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getEntryId()</code>
+                        </value>
+                    </item>
+                    <!-- New parameters -->
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_name_encoded</key>
+                        <description>Encoded category name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>urlencode(($category = categoryPeer::retrieveByPk($scope->getObject()->getCategoryId())) ? $category->getName() : '')</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_id</key>
+                        <description>Category ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getCategoryId()</code>
+                        </value>
+                    </item>
+                </contentParameters>
             </template>
         </request>
     </multirequest>
@@ -142,6 +252,8 @@
             <id>{1:result:objects:0:id}</id>
             <template objectType="KalturaEmailNotificationTemplate">
                 <name>Entry Ready (Application Specific)</name>
+                <subject>[AppTitle] - Entry is Ready for Publishing: {entry_name}/ ID: {entry_id}</subject>
+                <body><![CDATA[ Hello,<p>A new entry is ready for publishing:</p><p>Entry Name: {entry_name} <br>Entry ID:  {entry_id}<br>Entry Creator: {creator_name}, {creator_id}/{creator_email}<br>Entry Link: <a href="[AppEntryUrl]{entry_id}">[AppEntryUrl]{entry_id}</a> </p> ]]></body>
             </template>
         </request>
     </multirequest>
@@ -161,6 +273,53 @@
             <id>{1:result:objects:0:id}</id>
             <template objectType="KalturaEmailNotificationTemplate">
                 <name>User was added to category as [role] (Application Specific)</name>
+                <body><![CDATA[ You have been added as {role} to <a href="[AppCategoryUrl]{category_name_encoded}/{category_id}">{category_name}</a> ]]></body>
+                <contentParameters objectType="array">
+                    <!-- Existing parameters -->
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Server configuration: partner_notification_email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Server configuration: partner_notification_name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_name</key>
+                        <description>Category name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>($category = $scope->getObject()->getcategory()) ? $category->getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>role</key>
+                        <description>Role</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>ucfirst(strtolower(category::getPermissionLevelName($scope->getObject()->getPermissionLevel())))</code>
+                        </value>
+                    </item>
+                    <!-- New parameters -->
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_name_encoded</key>
+                        <description>Encoded category name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>urlencode(($category = $scope->getObject()->getcategory()) ? $category->getName() : '')</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_id</key>
+                        <description>Category ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getCategoryId()</code>
+                        </value>
+                    </item>
+                </contentParameters>
             </template>
         </request>
     </multirequest>
@@ -180,6 +339,53 @@
             <id>{1:result:objects:0:id}</id>
             <template objectType="KalturaEmailNotificationTemplate">
                 <name>User's role was changed in category (Application Specific)</name>
+                <body><![CDATA[ Your role in <a href="[AppCategoryUrl]{category_name_encoded}/{category_id}">{category_name}</a> has changed and is now {role} ]]></body>
+                <contentParameters objectType="array">
+                    <!-- Existing parameters -->
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Server configuration: partner_notification_email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Server configuration: partner_notification_name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_name</key>
+                        <description>Category name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>($category = $scope->getObject()->getcategory()) ? $category->getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>role</key>
+                        <description>Role</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>ucfirst(strtolower(category::getPermissionLevelName($scope->getObject()->getPermissionLevel())))</code>
+                        </value>
+                    </item>
+                    <!-- New parameters -->
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_name_encoded</key>
+                        <description>Encoded category name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>urlencode(($category = $scope->getObject()->getcategory()) ? $category->getName() : '')</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_id</key>
+                        <description>Category ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getCategoryId()</code>
+                        </value>
+                    </item>
+                </contentParameters>
             </template>
         </request>
     </multirequest>
@@ -199,6 +405,46 @@
             <id>{1:result:objects:0:id}</id>
             <template objectType="KalturaEmailNotificationTemplate">
                 <name>User was removed from category (Application Specific)</name>
+                <body>You have been removed from {category_name} by {user_id}</body>
+                <contentParameters objectType="array">
+                    <!-- Existing parameters -->
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Server configuration: partner_notification_email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Server configuration: partner_notification_name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_name</key>
+                        <description>Category name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>($category = $scope->getObject()->getcategory()) ? $category->getName() : ''</code>
+                        </value>
+                    </item>
+                    <!-- New parameters -->
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_id</key>
+                        <description>Category ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getCategoryId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_id</key>
+                        <description>User ID who executed this action</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>($ks = $scope->getKs()) &amp;&amp; ($kUser = $ks->getKuser()) ? $kUser->getPuserId() : ''</code>
+                        </value>
+                    </item>
+                </contentParameters>
             </template>
         </request>
     </multirequest>
@@ -218,6 +464,60 @@
             <id>{1:result:objects:0:id}</id>
             <template objectType="KalturaEmailNotificationTemplate">
                 <name>Entry was added to channel (Application Specific)</name>
+                <body><![CDATA[ Media {entry_name} was added to <a href="[AppCategoryUrl]{category_name_encoded}/{category_id}">{category_name}</a>. You can see the media here: <a href="[AppEntryUrl]{entry_id}">[AppEntryUrl]{entry_id}</a> ]]></body>
+                <contentParameters objectType="array">
+                    <!-- Existing parameters -->
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Server configuration: partner_notification_email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Server configuration: partner_notification_name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_name</key>
+                        <description>Category name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>($category = categoryPeer::retrieveByPk($scope->getObject()->getCategoryId())) ? $category->getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getEntryId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>($entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $entry->getName() : ''</code>
+                        </value>
+                    </item>
+                    <!-- New parameters -->
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_name_encoded</key>
+                        <description>Encoded category name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>urlencode(($category = categoryPeer::retrieveByPk($scope->getObject()->getCategoryId())) ? $category->getName() : '')</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_id</key>
+                        <description>Category ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getCategoryId()</code>
+                        </value>
+                    </item>
+                </contentParameters>
             </template>
         </request>
     </multirequest>
@@ -237,6 +537,7 @@
             <id>{1:result:objects:0:id}</id>
             <template objectType="KalturaEmailNotificationTemplate">
                 <name>Comment was added to entry (Application Specific)</name>
+                <body><![CDATA[ A new comment was added to your media {entry_name}. Comment: {comment_text}. You can see the media here: <a href="[AppEntryUrl]{entry_id}/{category_id}">[AppEntryUrl]{entry_id}/{category_id}</a> ]]></body>
             </template>
         </request>
     </multirequest>
