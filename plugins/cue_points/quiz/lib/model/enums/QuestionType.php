@@ -12,4 +12,5 @@ interface QuestionType extends BaseEnum
 	const FILL_IN_BLANK = 5;
 	const HOT_SPOT = 6;
 	const GO_TO = 7;
+	const OPEN_QUESTION = 8;
 }
