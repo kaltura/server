@@ -81,6 +81,23 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 		if(!QuizPlugin::isQuiz($this->entryId))
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $this->entryId);
 		parent::validateForInsert($propertiesToSkip);
+		if (!$this->validateEntitledKuser())
+			throw new KalturaAPIException(KalturaQuizErrors::NOT_ENTITLED_TO_INSERT_UPDATE);
+	}
+
+
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		if (!$this->validateEntitledKuser())
+			throw new KalturaAPIException(KalturaQuizErrors::NOT_ENTITLED_TO_INSERT_UPDATE);
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+
+	public function validateEntitledKuser()
+	{
+		$entry = entryPeer::retrieveByPK($this->entryId);
+		$kuserId = kCurrentContext::getCurrentKsKuserId();
+		return $entry->isEntitledKuserEdit($kuserId);
 	}
 
 	protected function validateEntryId()
