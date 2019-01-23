@@ -483,7 +483,7 @@
                         <key>user_id</key>
                         <description>User ID who executed this action</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>($ks = $scope->getKs()) &amp;&amp; ($kUser = $ks->getKuser()) ? $kUser->getPuserId() : ''</code>
+                            <code>(($ks = $scope->getKs()) &amp;&amp; ($kUser = $ks->getKuser())) ? $kUser->getPuserId() : ''</code>
                         </value>
                     </item>
                 </contentParameters>
