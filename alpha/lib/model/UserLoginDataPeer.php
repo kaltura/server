@@ -635,6 +635,11 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				$existingData->setSeedFor2FactorAuth(GoogleAuthenticator::createSecret());
 				$existingData->save();
 			}
+			else
+			{
+				//Don't allow assigning existing login data id to a different partner id
+				return null;
+			}
 			
 						
 			KalturaLog::info('Existing login data with the same email & password exists - returning id ['.$existingData->getId().']');	
