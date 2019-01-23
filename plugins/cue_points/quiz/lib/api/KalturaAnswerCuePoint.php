@@ -50,10 +50,10 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	public $explanation;
 
 	/**
-         * @var string
-         * @maxLength 1024
-         */
-        public $feedback;
+	* @var string
+	* @maxLength 1024
+	*/
+	public $feedback;
 
 
 	public function __construct()
@@ -182,6 +182,8 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		QuizPlugin::validateAndGetQuiz($dbEntry);
 		$this->validateParentId();
 		$this->validateUserEntry();
+		if ($this->feedback != null && !KalturaQuizUserEntry::validateEntitledKuser($dbEntry))
+			throw new KalturaAPIException(KalturaQuizErrors::NOT_ENTITLED_TO_INSERT_UPDATE);
 	}
 
 	/* (non-PHPdoc)
@@ -196,6 +198,7 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		if ( !$kQuiz->getAllowAnswerUpdate() ) {
 			throw new KalturaAPIException(KalturaQuizErrors::ANSWER_UPDATE_IS_NOT_ALLOWED, $sourceObject->getEntryId());
 		}
+		if ($this->feedback != null && !KalturaQuizUserEntry::validateEntitledKuser($dbEntry))
+			throw new KalturaAPIException(KalturaQuizErrors::NOT_ENTITLED_TO_INSERT_UPDATE);
 	}
-
 }
