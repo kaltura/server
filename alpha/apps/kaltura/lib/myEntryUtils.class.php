@@ -697,7 +697,7 @@ class myEntryUtils
 	
 	public static function resizeEntryImage( entry $entry, $version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
 		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null, $fileSync = null,
-		$start_sec  = null, $end_sec = null)
+		$start_sec = -1, $end_sec = -1)
 	{
 		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
 			$thumbParams = new kThumbnailParameters();
@@ -880,7 +880,7 @@ class myEntryUtils
 				{
 					// creating the thumbnail is a very heavy operation
 					// prevent calling it in parallel for the same thumbnail for 5 minutes
-					
+
 					$cacheLockKeyProcessing = "thumb-processing".$orig_image_path;
 					if ($cache && !$cache->add($cacheLockKeyProcessing, true, 5 * 60))
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
