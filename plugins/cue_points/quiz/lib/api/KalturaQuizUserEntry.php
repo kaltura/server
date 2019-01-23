@@ -81,23 +81,24 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 		if(!QuizPlugin::isQuiz($this->entryId))
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $this->entryId);
 		parent::validateForInsert($propertiesToSkip);
-		if (!$this->validateEntitledKuser())
-			throw new KalturaAPIException(KalturaQuizErrors::NOT_ENTITLED_TO_INSERT_UPDATE);
+		$dbEntry = entryPeer::retrieveByPK($this->entryId);
+		if ($this->feedback != null && !kEntitlementUtils::isEntitledForEditEntry($dbEntry) )
+		{
+			KalturaLog::debug('Insert feedback on quiz is allowed only with admin KS or entry owner or co-editor');
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+		}
 	}
 
 
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if (!$this->validateEntitledKuser())
-			throw new KalturaAPIException(KalturaQuizErrors::NOT_ENTITLED_TO_INSERT_UPDATE);
+		$dbEntry = entryPeer::retrieveByPK($this->entryId);
+		if ( !kEntitlementUtils::isEntitledForEditEntry($dbEntry) )
+		{
+			KalturaLog::debug('Update quiz allowed only with admin KS or entry owner or co-editor');
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+		}
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
-	}
-
-	public function validateEntitledKuser()
-	{
-		$entry = entryPeer::retrieveByPK($this->entryId);
-		$kuserId = kCurrentContext::getCurrentKsKuserId();
-		return $entry->isEntitledKuserEdit($kuserId);
 	}
 
 	protected function validateEntryId()
