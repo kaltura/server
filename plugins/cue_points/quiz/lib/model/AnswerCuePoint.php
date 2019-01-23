@@ -12,6 +12,7 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 	const CUSTOM_DATA_CORRECT_ANSWER_KEYS = 'correctAnswerKeys';
 	const CUSTOM_DATA_EXPLANATION= 'explanation';
 	const CUSTOM_DATA_OPEN_ANSWER = 'openAnswer';
+	const CUSTOM_DATA_FEEDBACK = 'feedback';
 
 	public function __construct()
 	{
@@ -52,6 +53,10 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 	public function setOpenAnswer($v) {return $this->putInCustomData(self::CUSTOM_DATA_OPEN_ANSWER, $v);}
 
 	public function getOpenAnswer() {return $this->getFromCustomData(self::CUSTOM_DATA_OPEN_ANSWER);}
+
+	public function setFeedback($v){ $this->putInCustomData(self::CUSTOM_DATA_FEEDBACK, $v);}
+
+	public function getFeedback(){ return $this->getFromCustomData(self::CUSTOM_DATA_FEEDBACK);}
 
 	public function copyToClipEntry( entry $clipEntry, $clipStartTime, $clipDuration )
 	{
