@@ -214,6 +214,27 @@
             <id>{1:result:objects:0:id}</id>
             <template objectType="KalturaEmailNotificationTemplate">
                 <name>Entry Rejected (Application Specific)</name>
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Moderation status changed to rejected, see KalturaEntryModerationStatus</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject() instanceof entry &amp;&amp; in_array(entryPeer::MODERATION_STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_REJECTED</code>
+                        </field>
+                    </item>
+                    <!-- Use KalturaFieldMatchCondition instead of KalturaMatchMetadataCondition to support empty values -->
+                    <item objectType="KalturaFieldMatchCondition">
+                        <description>Custom metadata indicates that the entry belongs to the instance</description>
+                        <field objectType="KalturaEvalStringField">
+                            <!-- parseMetadataValues() returns an array of 0 or 1 elements - implode the array to have a string value -->
+                            <code>($metadata = MetadataPeer::retrieveByObject(MetadataProfilePeer::retrieveBySystemName('EntryAdditionalInfo', array($scope->getPartnerId()))->getId(), MetadataObjectType::ENTRY, $scope->getObject()->getId())) ? implode('', kMetadataManager::parseMetadataValues($metadata, "//*[local-name()='Key' and text()='InstanceId']/following-sibling::*[local-name()='Value']")) : ''</code>
+                        </field>
+                        <values objectType="array">
+                            <item objectType="KalturaStringValue">
+                                <value>{instance_id}</value>
+                            </item>
+                        </values>
+                    </item>
+                </eventConditions>
             </template>
         </request>
     </multirequest>
@@ -233,6 +254,27 @@
             <id>{1:result:objects:0:id}</id>
             <template objectType="KalturaEmailNotificationTemplate">
                 <name>Entry Approved (Application Specific)</name>
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Moderation status changed to approved, see KalturaEntryModerationStatus</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject() instanceof entry &amp;&amp; in_array(entryPeer::MODERATION_STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_APPROVED</code>
+                        </field>
+                    </item>
+                    <!-- Use KalturaFieldMatchCondition instead of KalturaMatchMetadataCondition to support empty values -->
+                    <item objectType="KalturaFieldMatchCondition">
+                        <description>Custom metadata indicates that the entry belongs to the instance</description>
+                        <field objectType="KalturaEvalStringField">
+                            <!-- parseMetadataValues() returns an array of 0 or 1 elements - implode the array to have a string value -->
+                            <code>($metadata = MetadataPeer::retrieveByObject(MetadataProfilePeer::retrieveBySystemName('EntryAdditionalInfo', array($scope->getPartnerId()))->getId(), MetadataObjectType::ENTRY, $scope->getObject()->getId())) ? implode('', kMetadataManager::parseMetadataValues($metadata, "//*[local-name()='Key' and text()='InstanceId']/following-sibling::*[local-name()='Value']")) : ''</code>
+                        </field>
+                        <values objectType="array">
+                            <item objectType="KalturaStringValue">
+                                <value>{instance_id}</value>
+                            </item>
+                        </values>
+                    </item>
+                </eventConditions>
             </template>
         </request>
     </multirequest>
