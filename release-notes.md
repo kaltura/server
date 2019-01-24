@@ -13,7 +13,7 @@ and copy the sections from local.ini to the new maps you created.
 create another 2 new maps in the admin console configurations:
 1. api_rate_limit
 2. whitelabel
-copy the content of these files from /opt/kaltura/app/configuration to the new maps you created. 
+copy the content of these files to the new maps you created. 
 
 # Naos 14.12.0 #
 
