@@ -1580,6 +1580,46 @@ class kKavaReportsMgr extends kKavaBase
 	protected static $headers_to_metrics = array();
 	protected static $custom_reports = null;
 	
+	protected static function getIniDef($obj, $prefix = '')
+	{
+		if (!is_array($obj))
+		{
+			return "$prefix = $obj";
+		}
+
+		$is_simple_array = false;
+		if (array_keys($obj) === range(0, count($obj) - 1))
+		{
+			$is_simple_array = true;
+			foreach ($obj as $key => $value)
+			{
+				if (!is_string($value))
+				{
+					$is_simple_array = false;
+					break;
+				}
+			}
+		}
+
+		if ($is_simple_array && $prefix)
+		{
+			$result = '';
+			foreach ($obj as $key => $value)
+			{
+				$result .= "{$prefix}[] = {$value}\n"; 
+			}
+			return $result;
+		}
+
+		$result = '';
+		foreach ($obj as $key => $value)
+		{
+			$new_prefix = $prefix ? "$prefix.$key" : $key; 
+			$result .= rtrim(self::getIniDef($value, $new_prefix)) . "\n";
+		}
+		return $result;
+	}
+
 	/// init functions
 	protected static function getFieldRatioPostAggr($agg_name, $field1, $field2)
 	{
