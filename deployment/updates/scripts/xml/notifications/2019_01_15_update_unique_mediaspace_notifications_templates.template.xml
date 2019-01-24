@@ -447,7 +447,7 @@
             <id>{1:result:objects:0:id}</id>
             <template objectType="KalturaEmailNotificationTemplate">
                 <name>User was removed from category (Application Specific)</name>
-                <body>You have been removed from {category_name} by {user_id}</body>
+                <body>You have been removed from {category_name} by the user {remover_user_id}</body>
                 <contentParameters objectType="array">
                     <!-- Existing parameters -->
                     <item objectType="KalturaEventNotificationParameter">
@@ -480,7 +480,7 @@
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
-                        <key>user_id</key>
+                        <key>remover_user_id</key>
                         <description>User ID who executed this action</description>
                         <value objectType="KalturaEvalStringField">
                             <code>(($ks = $scope->getKs()) &amp;&amp; ($kUser = $ks->getKuser())) ? $kUser->getPuserId() : ''</code>
