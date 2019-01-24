@@ -4,11 +4,8 @@
 - Issue ID: PLAT-9603
 
 ### Configuration ###
-sections: global_whitelisted_domains_exclude and xkava_vod_partners from local.ini were moved to new maps.
-Create 2 new maps in the admin console -> configuration :
-1. global_whitelisted_domains_exclude_list
-2. xkava_vod_partners_list
-and copy the sections from local.ini to the new maps you created.
+section: global_whitelisted_domains_exclude from local.ini was moved to a new map.
+please make sure to create new map called: "global_whitelisted_domains_exclude_list", and copy the content of it.
 
 # Naos 14.12.0 #
 
