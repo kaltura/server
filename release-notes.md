@@ -1,3 +1,20 @@
+# Naos 14.13.0 #
+## Move maps to dynamic configuration ##
+- Issue Type: Task
+- Issue ID: PLAT-9603
+
+### Configuration ###
+sections: global_whitelisted_domains_exclude and xkava_vod_partners from local.ini were moved to new maps.
+Create 2 new maps in the admin console -> configuration :
+1. global_whitelisted_domains_exclude_list
+2. xkava_vod_partners_list
+and copy the sections from local.ini to the new maps you created.
+
+create another 2 new maps in the admin console configurations:
+1. api_rate_limit
+2. whitelabel
+copy the content of these files from /opt/kaltura/app/configuration to the new maps you created. 
+
 # Naos 14.12.0 #
 
 ## Blackout dates ##
