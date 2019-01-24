@@ -39,7 +39,7 @@ class kSiteCondition extends kMatchCondition
 		if ($this->getNot()===true && !$this->globalWhitelistDomainsAppended && strpos($referrer, "kwidget") === false && kConf::hasParam("global_whitelisted_domains"))
 		{
 			$ks = $scope->getKs();
-			if (!$ks || !in_array($ks->partner_id, kConf::get('global_whitelisted_domains_exclude')))
+			if (!$ks || !in_array($ks->partner_id, kConf::get(  'global_whitelisted_domains_exclude' ,'global_whitelisted_domains_exclude_list')))
 			{
 				$this->globalWhitelistDomainsAppended = true;
 			
