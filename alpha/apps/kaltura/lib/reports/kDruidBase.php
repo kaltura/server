@@ -32,6 +32,7 @@ class kDruidBase
 	const DRUID_FIELDS = 'fields';
 	const DRUID_CARDINALITY = 'cardinality';
 	const DRUID_HYPER_UNIQUE = 'hyperUnique';
+	const DRUID_HYPER_UNIQUE_CARDINALITY = 'hyperUniqueCardinality';
 	const DRUID_POST_AGGR = 'postAggregations';
 	const DRUID_AGGR = 'aggregations';
 	const DRUID_FIELD_ACCESS = 'fieldAccess';
@@ -208,6 +209,15 @@ class kDruidBase
 			self::DRUID_NAME => $name,
 			self::DRUID_FUNCTION => $fn,
 			self::DRUID_FIELDS => $fields
+		);
+	}
+
+	protected static function getHyperUniqueCardinalityPostAggregator($name, $fieldName)
+	{
+		return array(
+			self::DRUID_TYPE => self::DRUID_HYPER_UNIQUE_CARDINALITY,
+			self::DRUID_NAME => $name,
+			self::DRUID_FIELD_NAME => $fieldName
 		);
 	}
 	
