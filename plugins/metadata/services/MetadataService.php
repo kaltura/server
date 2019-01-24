@@ -198,14 +198,14 @@ class MetadataService extends KalturaBaseService
 	
 	
 	/**
-	 * Allows you to add a metadata xml data from remote URL
+	 * Allows you to add a metadata XML data from remote URL
 	 * 
 
 	 * @action addFromUrl
 	 * @param int $metadataProfileId
 	 * @param KalturaMetadataObjectType $objectType
 	 * @param string $objectId
-	 * @param string $url XML metadata remote url
+	 * @param string $url XML metadata remote URL
 
 	 * @return KalturaMetadata
 	 */
@@ -217,14 +217,14 @@ class MetadataService extends KalturaBaseService
 	
 	
 	/**
-	 * Allows you to add a metadata xml data from remote URL.
+	 * Allows you to add a metadata XML data from remote URL.
 	 * Enables different permissions than addFromUrl action.
 	 * 
 	 * @action addFromBulk
 	 * @param int $metadataProfileId
 	 * @param KalturaMetadataObjectType $objectType
 	 * @param string $objectId
-	 * @param string $url XML metadata remote url
+	 * @param string $url XML metadata remote URL
 	 * @return KalturaMetadata
 	 */
 	function addFromBulkAction($metadataProfileId, $objectType, $objectId, $url)

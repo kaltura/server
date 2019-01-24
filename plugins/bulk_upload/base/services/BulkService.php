@@ -434,7 +434,7 @@ class BulkService extends KalturaBaseService
 	/**
 	 * @action updateCategoryEntriesStatus
 	 * @actionAlias categoryEntry.updateStatusFromBulk
-	 * Action activate or rejects categoryEntrys from a bulkupload CSV file
+	 * Action activate or rejects categoryEntry objects from a bulkupload CSV file
 	 * @param file $fileData
 	 * @param KalturaBulkUploadJobData $bulkUploadData
 	 * @param KalturaBulkUploadCategoryEntryData $bulkUploadCategoryEntryData
