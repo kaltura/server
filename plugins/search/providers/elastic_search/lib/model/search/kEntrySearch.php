@@ -6,9 +6,6 @@
 class kEntrySearch extends kBaseESearch
 {
 
-    const PEER_NAME = 'entryPeer';
-    const PEER_RETRIEVE_FUNCTION_NAME = 'retrieveByPKsNoFilter';
-
     protected $isInitialized;
     private $entryEntitlementQuery;
     private $parentEntryEntitlementQuery;
@@ -115,19 +112,16 @@ class kEntrySearch extends kBaseESearch
         $this->isInitialized = true;
     }
 
-    public function getPeerName()
-    {
-        return self::PEER_NAME;
-    }
-
-    public function getPeerRetrieveFunctionName()
-    {
-        return self::PEER_RETRIEVE_FUNCTION_NAME;
-    }
-
     public function getElasticTypeName()
     {
         return ElasticIndexMap::ELASTIC_ENTRY_TYPE;
+    }
+
+    public function fetchCoreObjectsByIds($ids)
+    {
+        $entries = entryPeer::retrieveByPKsNoFilter($ids);
+        entryPeer::fetchPlaysViewsData($entries);
+        return $entries;
     }
 
 }

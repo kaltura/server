@@ -7,6 +7,8 @@
 class QuizUserEntry extends UserEntry{
 
 	const QUIZ_OM_CLASS = 'QuizUserEntry';
+	const CUSTOM_DATA_FEEDBACK = 'feedback';
+
 	/**
 	 * @var float
 	 */
@@ -38,6 +40,8 @@ class QuizUserEntry extends UserEntry{
 	public function getNumOfRelevnatQuestions(){ return $this->getFromCustomData("numOfRelevnatQuestions");}
 	public function setNumOfCorrectAnswers($v){ $this->putInCustomData("numOfCorrectAnswers", $v);}
 	public function getNumOfCorrectAnswers(){ return $this->getFromCustomData("numOfCorrectAnswers");}
+	public function setFeedback($v){ $this->putInCustomData(self::CUSTOM_DATA_FEEDBACK, $v);}
+	public function getFeedback(){ return $this->getFromCustomData(self::CUSTOM_DATA_FEEDBACK);}
 	public function addAnswerId($questionId, $answerId)
 	{
 		$answerIds = $this->getAnswerIds();
