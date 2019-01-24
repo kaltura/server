@@ -14,7 +14,7 @@ define('ENTRY_TYPE', 't');
 define('ENTRY_MEDIA_TYPE', 'mt');
 define('ENTRY_SOURCE_TYPE', 'st');
 define('ENTRY_DURATION', 'd');
-define('ENTRY_CREATOR', 'c');
+define('ENTRY_CREATOR_ID', 'c');
 define('ENTRY_CREATED_AT', 'ca');
 
 define('SOURCE_CLASSROOM', -10);
@@ -72,9 +72,9 @@ function getEntrySourceTypeInt($sourceType, $adminTags)
 	return $sourceType;
 }
 
-function getEntryCreatedAtUnixTimestamp($createdAt)
+function getUnixTimestampFromDate($date)
 {
-	$dt = new DateTime($createdAt);
+	$dt = new DateTime($date);
 	return (int) $dt->format('U');
 }
 
@@ -200,8 +200,8 @@ function getEntryUpdates($updatedAt)
 				ENTRY_TYPE => $row['TYPE'],
 				ENTRY_MEDIA_TYPE => $row['MEDIA_TYPE'],
 				ENTRY_SOURCE_TYPE => getEntrySourceTypeInt($row['SOURCE'], $row['ADMIN_TAGS']),
-				ENTRY_CREATED_AT => getEntryCreatedAtUnixTimestamp($row['CREATED_AT']),
-				ENTRY_CREATOR => isset($customData['creatorKuserId']) ? $customData['creatorKuserId'] : $row['KUSER_ID'],
+				ENTRY_CREATED_AT => getUnixTimestampFromDate($row['CREATED_AT']),
+				ENTRY_CREATOR_ID => isset($customData['creatorKuserId']) ? $customData['creatorKuserId'] : $row['KUSER_ID'],
 			);
 			$duration = intval($row['LENGTH_IN_MSECS'] / 1000);
 			if ($duration > 0)
@@ -216,8 +216,8 @@ function getEntryUpdates($updatedAt)
 		}
 
 		$result[$id] = $info;		
-		$updatedAt = new DateTime($row['UPDATED_AT']);
-		$maxUpdatedAt = max($maxUpdatedAt, (int)$updatedAt->format('U'));
+		$updatedAt = getUnixTimestampFromDate($row['UPDATED_AT']);
+		$maxUpdatedAt = max($maxUpdatedAt, $updatedAt);
 	}
 	
 	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
@@ -243,8 +243,8 @@ function getCategoryEntryUpdates($updatedAt)
 	{
 		$entryId = $row['ENTRY_ID'];
 		$result[$entryId] = '';
-		$updatedAt = new DateTime($row['UPDATED_AT']);
-		$maxUpdatedAt = max($maxUpdatedAt, (int)$updatedAt->format('U'));
+		$updatedAt = getUnixTimestampFromDate($row['UPDATED_AT']);
+		$maxUpdatedAt = max($maxUpdatedAt, $updatedAt);
 	}
 	
 	$con = categoryEntryPeer::alternativeCon(null);
