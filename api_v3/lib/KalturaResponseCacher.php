@@ -48,7 +48,7 @@ class KalturaResponseCacher extends kApiCache
 		
 		$this->_params['___cache___uri'] = $_SERVER['SCRIPT_NAME'];
 
-		// extract any baseEntry.getContextData referrer parameters
+		// extract any baseEntry.getContextData and baseEntry.getPlaybackContext referrer parameters
 		for ($i = 0; ; $i++)
 		{
 			$prefix = $i ? "{$i}:" : "";		// 0 = try single request, >0 = try multirequest
@@ -61,8 +61,10 @@ class KalturaResponseCacher extends kApiCache
 			
 			$service = $this->_params["{$prefix}service"];
 			$action = $this->_params["{$prefix}action"];
-			if (strtolower($service) != 'baseentry' || strtolower($action) != 'getcontextdata')
+			if (strtolower($service) != 'baseentry' || !in_array(strtolower($action), array('getcontextdata', 'getplaybackcontext')))
+			{
 				continue;
+			}
 			
 			$referrerKey = "{$prefix}contextDataParams:referrer";
 			if (isset($this->_params[$referrerKey]))
