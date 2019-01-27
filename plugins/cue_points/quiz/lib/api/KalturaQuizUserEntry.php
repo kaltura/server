@@ -12,9 +12,16 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	 */
 	public $score;
 
+	/**
+	* @var string
+	* @maxLength 1024
+	*/
+	public $feedback;
+
 	private static $map_between_objects = array
 	(
-		"score"
+		"score",
+		"feedback"
 	);
 
 	public function getMapBetweenObjects ( )
@@ -74,6 +81,24 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 		if(!QuizPlugin::isQuiz($this->entryId))
 			throw new KalturaAPIException(KalturaQuizErrors::PROVIDED_ENTRY_IS_NOT_A_QUIZ, $this->entryId);
 		parent::validateForInsert($propertiesToSkip);
+		$dbEntry = entryPeer::retrieveByPK($this->entryId);
+		if ($this->feedback != null && !kEntitlementUtils::isEntitledForEditEntry($dbEntry) )
+		{
+			KalturaLog::debug('Insert feedback on quiz is allowed only with admin KS or entry owner or co-editor');
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+		}
+	}
+
+
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		$dbEntry = entryPeer::retrieveByPK($this->entryId);
+		if ( !kEntitlementUtils::isEntitledForEditEntry($dbEntry) )
+		{
+			KalturaLog::debug('Update quiz allowed only with admin KS or entry owner or co-editor');
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+		}
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
 	protected function validateEntryId()

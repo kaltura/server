@@ -474,7 +474,7 @@ class kKavaReportsMgr extends kKavaBase
 					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(
 						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
-						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_FLASH)
+						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_LIVE_STREAM)
 					),
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED),
@@ -485,7 +485,7 @@ class kKavaReportsMgr extends kKavaBase
 					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
 					self::REPORT_FILTER => array(
 						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
-						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_FLASH)
+						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_LIVE_STREAM)
 					),
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_TOTAL),
@@ -1307,16 +1307,24 @@ class kKavaReportsMgr extends kKavaBase
 			),
 			self::REPORT_JOIN_REPORTS => array(
 				// plays
-                                array(
-                                        self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
-                                        self::REPORT_DIMENSION => self::DIMENSION_ENTRY_OWNER_ID,
-                                        self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
-                                        self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY),
-                                ),
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
+					self::REPORT_DIMENSION => self::DIMENSION_ENTRY_OWNER_ID,
+					self::REPORT_FILTER => array(
+						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
+						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_LIVE_STREAM, self::MEDIA_TYPE_LIVE_WIN_MEDIA, self::MEDIA_TYPE_LIVE_REAL_MEDIA, self::MEDIA_TYPE_LIVE_QUICKTIME)
+					),
+					self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
+					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY),
+				),
 
 				// entries & msecs added
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_FILTER => array(
+						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
+						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_LIVE_STREAM, self::MEDIA_TYPE_LIVE_WIN_MEDIA, self::MEDIA_TYPE_LIVE_REAL_MEDIA, self::MEDIA_TYPE_LIVE_QUICKTIME)
+					),
 					self::REPORT_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC),
 					self::REPORT_TOTAL_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_UNIQUE_CONTRIBUTORS),
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_UNIQUE_CONTRIBUTORS),
@@ -1324,6 +1332,23 @@ class kKavaReportsMgr extends kKavaBase
 			),
 		),
 
+		myReportsMgr::REPORT_TYPE_TOP_SOURCES => array(
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+			self::REPORT_DIMENSION_MAP => array(
+				'source' => self::DIMENSION_SOURCE_TYPE
+			),
+			self::REPORT_FILTER => array(
+				array(
+					self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
+					self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_LIVE_STREAM, self::MEDIA_TYPE_LIVE_WIN_MEDIA, self::MEDIA_TYPE_LIVE_REAL_MEDIA, self::MEDIA_TYPE_LIVE_QUICKTIME)
+				),
+				array(
+					self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+					self::DRUID_VALUES => array(self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_STATUS)
+				),
+			),
+			self::REPORT_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_UNIQUE_CONTRIBUTORS),
+		),
 	);
 	
 	protected static $event_type_count_aggrs = array(
@@ -1555,6 +1580,46 @@ class kKavaReportsMgr extends kKavaBase
 	protected static $headers_to_metrics = array();
 	protected static $custom_reports = null;
 	
+	protected static function getIniDef($obj, $prefix = '')
+	{
+		if (!is_array($obj))
+		{
+			return "$prefix = $obj";
+		}
+
+		$is_simple_array = false;
+		if (array_keys($obj) === range(0, count($obj) - 1))
+		{
+			$is_simple_array = true;
+			foreach ($obj as $key => $value)
+			{
+				if (!is_string($value))
+				{
+					$is_simple_array = false;
+					break;
+				}
+			}
+		}
+
+		if ($is_simple_array && $prefix)
+		{
+			$result = '';
+			foreach ($obj as $key => $value)
+			{
+				$result .= "{$prefix}[] = {$value}\n"; 
+			}
+			return $result;
+		}
+
+		$result = '';
+		foreach ($obj as $key => $value)
+		{
+			$new_prefix = $prefix ? "$prefix.$key" : $key; 
+			$result .= rtrim(self::getIniDef($value, $new_prefix)) . "\n";
+		}
+		return $result;
+	}
+
 	/// init functions
 	protected static function getFieldRatioPostAggr($agg_name, $field1, $field2)
 	{
@@ -2345,7 +2410,7 @@ class kKavaReportsMgr extends kKavaBase
 		foreach ($field_dim_map as $field => $field_filter_def)
 		{
 			$value = $input_filter->$field;
-			if (is_null($value))
+			if (is_null($value) || trim($value) === "")
 			{
 				continue;
 			}
@@ -2536,14 +2601,26 @@ class kKavaReportsMgr extends kKavaBase
 				self::DRUID_VALUES => array_values(array_unique($event_types)));
 		}
 
-		$filter_def = array();
+		$filter_values = array();
 		foreach ($filter as $cur_filter)
 		{
-			$filter_def[] = self::getInFilter(
-				$cur_filter[self::DRUID_DIMENSION], 
-				$cur_filter[self::DRUID_VALUES]);
+			$dimension = $cur_filter[self::DRUID_DIMENSION];
+			$values = $cur_filter[self::DRUID_VALUES];
+			if (isset($filter_values[$dimension]))
+			{
+				$values = array_intersect($values, $filter_values[$dimension]);
+			}
+			$filter_values[$dimension] = array_values($values);
 		}
-		
+
+		$filter_def = array();
+		foreach ($filter_values as $dimension => $values)
+		{
+			$filter_def[] = self::getInFilter(
+				$dimension,
+				$values);
+		}
+
 		$report_def[self::DRUID_FILTER] = array(
 			self::DRUID_TYPE => 'and',
 			self::DRUID_FIELDS => $filter_def);
@@ -4687,6 +4764,7 @@ class kKavaReportsMgr extends kKavaBase
 				}
 			}
 		}
+
 
 		$end = microtime(true);
 		KalturaLog::log('getTable took [' . ($end - $start) . ']');

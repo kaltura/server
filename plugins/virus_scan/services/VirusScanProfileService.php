@@ -105,7 +105,7 @@ class VirusScanProfileService extends KalturaBaseService
 
 
 	/**
-	 * Update exisitng virus scan profile, it is possible to update the virus scan profile id too
+	 * Update existing virus scan profile, it is possible to update the virus scan profile id too
 	 * 
 	 * @action update
 	 * @param int $virusScanProfileId
