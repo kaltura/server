@@ -220,6 +220,7 @@ class PartnerController extends Zend_Controller_Action
 	{
 		$impersonatedPartnerId = $this->_getParam('partner_id');
 		$userId = $this->_getParam('user_id');
+		$maLogenInUserId = Zend_Auth::getInstance()->getIdentity()->getUser()->id;;
 		$client = Infra_ClientHelper::getClient();
 		$client->startMultiRequest();
 		$client->partner->getInfo();
@@ -247,6 +248,10 @@ class PartnerController extends Zend_Controller_Action
 
 		$adminSecret = $result[0]->adminSecret;
 		$partnerId =  $result[0]->id;
+		
+		if($userId != $maLogenInUserId)
+			return $client->session->impersonate($adminSecret, $impersonatedPartnerId, $userId, Kaltura_Client_Enum_SessionType::ADMIN, $partnerId, null, "disableentitlement,enablechangeaccount:$impersonatedPartnerId");
+		
 		$kalturaPartnerFilter = new Kaltura_Client_Type_PartnerFilter();
 		$kalturaPartnerFilter->statusEqual = 1;
 		$userKs = $result[count($result)-1];
