@@ -251,8 +251,7 @@ class PartnerController extends Zend_Controller_Action
 		if($userId != Zend_Auth::getInstance()->getIdentity()->getUser()->id)
 			return $client->session->impersonate($adminSecret, $impersonatedPartnerId, $userId, Kaltura_Client_Enum_SessionType::ADMIN, $partnerId, null, "disableentitlement,enablechangeaccount:$impersonatedPartnerId");
 		
-		$ks = $client->session->impersonate($adminSecret, $impersonatedPartnerId, $userId, Kaltura_Client_Enum_SessionType::ADMIN, $partnerId, null, "disableentitlement");
-		return $ks;
+		return end($result);
 	}
 
 	private static function getPartnersIdsFromPartnerListResponse($partnerListResponse)
