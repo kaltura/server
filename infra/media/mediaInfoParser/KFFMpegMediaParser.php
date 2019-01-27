@@ -35,6 +35,10 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		else{
 			$this->ffprobeBin = "ffprobe";
 		}
+		if(strstr($filePath, "http")===false) {
+			if (!file_exists($filePath))
+				throw new kApplicativeException(KBaseMediaParser::ERROR_NFS_FILE_DOESNT_EXIST, "File not found at [$filePath]");
+		}
 		parent::__construct($filePath);
 	}
 	

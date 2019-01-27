@@ -42,9 +42,6 @@ abstract class KBaseMediaParser
 	 */
 	public function __construct($filePath)
 	{
-		if (!file_exists($filePath))
-			throw new kApplicativeException(KBaseMediaParser::ERROR_NFS_FILE_DOESNT_EXIST, "File not found at [$filePath]");
-
 		$this->filePath = $filePath;
 	}
 	
