@@ -19,6 +19,8 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 	public function __construct($filePath, $cmdPath="mediainfo")
 	{
 		$this->cmdPath = $cmdPath;
+		if (!file_exists($filePath))
+			throw new kApplicativeException(KBaseMediaParser::ERROR_NFS_FILE_DOESNT_EXIST, "File not found at [$filePath]");
 		parent::__construct($filePath);
 	}
 	
