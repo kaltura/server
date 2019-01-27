@@ -626,7 +626,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				// partner already has a user with the same login data
 				throw new kUserException('', kUserException::LOGIN_ID_ALREADY_USED);
 			}
-			
 			if ($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
 			{
 				// add google authenticator library to include path
@@ -635,13 +634,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				$existingData->setSeedFor2FactorAuth(GoogleAuthenticator::createSecret());
 				$existingData->save();
 			}
-			else
-			{
-				//Don't allow assigning existing login data id to a different partner id
-				return null;
-			}
 			
-						
 			KalturaLog::info('Existing login data with the same email & password exists - returning id ['.$existingData->getId().']');	
 			$alreadyExisted = true;
 			
