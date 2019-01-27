@@ -247,16 +247,11 @@ class PartnerController extends Zend_Controller_Action
 
 		$adminSecret = $result[0]->adminSecret;
 		$partnerId =  $result[0]->id;
-		$kalturaPartnerFilter = new Kaltura_Client_Type_PartnerFilter();
-		$kalturaPartnerFilter->statusEqual = 1;
-		$userKs = $result[count($result)-1];
-		$masterKs = $client->getKs();
-		$client->setKs($userKs);
-		$partnersResult = $client->partner->listPartnersForUser($kalturaPartnerFilter);
-		$partnersId = self::getPartnersIdsFromPartnerListResponse($partnersResult);
-		$client->setKs($masterKs);
-		$ks = $client->session->impersonate($adminSecret, $impersonatedPartnerId, $userId, Kaltura_Client_Enum_SessionType::ADMIN, $partnerId, null, "disableentitlement,enablechangeaccount:".$partnersId);
-
+		
+		if($userId != Zend_Auth::getInstance()->getIdentity()->getUser()->id)
+			return $client->session->impersonate($adminSecret, $impersonatedPartnerId, $userId, Kaltura_Client_Enum_SessionType::ADMIN, $partnerId, null, "disableentitlement,enablechangeaccount:$impersonatedPartnerId");
+		
+		$ks = $client->session->impersonate($adminSecret, $impersonatedPartnerId, $userId, Kaltura_Client_Enum_SessionType::ADMIN, $partnerId, null, "disableentitlement");
 		return $ks;
 	}
 
