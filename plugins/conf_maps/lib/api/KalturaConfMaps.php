@@ -91,6 +91,18 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		if(strstr($this->relatedHost,'*'))
+		{
+			throw new KalturaAPIException(KalturaErrors::HOST_NAME_CONTAINS_ASTRIX ,$this->relatedHost );
+		}
+		if($this->sourceLocation == KalturaConfMapsSourceLocation::FS)
+		{
+			throw new KalturaAPIException(KalturaErrors::MAP_CANNOT_BE_CREATED_ON_FILE_SYSTEM);
+		}
+		parent::validateForInsert($this);
+	}
 
 	public function validateContent()
 	{
