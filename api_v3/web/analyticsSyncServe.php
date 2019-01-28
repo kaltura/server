@@ -78,6 +78,13 @@ function getUnixTimestampFromDate($date)
 	return (int) $dt->format('U');
 }
 
+function getDayUnixTimestampFromDate($dateTime)
+{
+	list($date, $time) = explode(" ", $dateTime);
+	list($year, $month, $day) = explode('-', $date);
+	return gmmktime(0, 0, 0, $month, $day, $year);
+}
+
 function getPartnerUpdates($updatedAt)
 {
 	$c = new Criteria();
@@ -200,7 +207,7 @@ function getEntryUpdates($updatedAt)
 				ENTRY_TYPE => $row['TYPE'],
 				ENTRY_MEDIA_TYPE => $row['MEDIA_TYPE'],
 				ENTRY_SOURCE_TYPE => getEntrySourceTypeInt($row['SOURCE'], $row['ADMIN_TAGS']),
-				ENTRY_CREATED_AT => getUnixTimestampFromDate($row['CREATED_AT']),
+				ENTRY_CREATED_AT => getDayUnixTimestampFromDate($row['CREATED_AT']),
 				ENTRY_CREATOR_ID => isset($customData['creatorKuserId']) ? $customData['creatorKuserId'] : $row['KUSER_ID'],
 			);
 			$duration = intval($row['LENGTH_IN_MSECS'] / 1000);
