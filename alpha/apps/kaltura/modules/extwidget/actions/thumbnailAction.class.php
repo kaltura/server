@@ -87,8 +87,8 @@ class thumbnailAction extends sfAction
 		$flavor_id = $this->getRequestParameter("flavor_id", null);
 		$file_name = $this->getRequestParameter("file_name", null);
 		$file_name = basename($file_name);
-		$start_sec = $this->getFloatRequestParameter("start_sec", -1, 0);
-		$end_sec = $this->getFloatRequestParameter("end_sec", -1, 0);
+		$start_sec = $this->getFloatRequestParameter("start_sec", -1, -1);
+		$end_sec = $this->getFloatRequestParameter("end_sec", -1, -1);
 		
 		// actual width and height of image from which the src_* values were taken.
 		// these will be used to multiply the src_* parameters to make them relate to the original image size.
