@@ -25,6 +25,7 @@ define('SOURCE_RAPT', -14);
 define('SOURCE_WEBEX', -15);
 define('SOURCE_ZOOM', -16);
 define('SOURCE_EXPRESS_RECORDER', -17);
+define('CREATED_DAY_TS', 'UNIX_TIMESTAMP(DATE(CREATED_AT))');
 
 $sourceFromAdminTag = array(
 	'kalturaclassroom' => SOURCE_CLASSROOM,
@@ -76,13 +77,6 @@ function getUnixTimestampFromDate($date)
 {
 	$dt = new DateTime($date);
 	return (int) $dt->format('U');
-}
-
-function getDayUnixTimestampFromDate($dateTime)
-{
-	list($date, $time) = explode(" ", $dateTime);
-	list($year, $month, $day) = explode('-', $date);
-	return gmmktime(0, 0, 0, $month, $day, $year);
 }
 
 function getPartnerUpdates($updatedAt)
@@ -181,7 +175,7 @@ function getEntryUpdates($updatedAt)
 	$c->addSelectColumn(entryPeer::MEDIA_TYPE);
 	$c->addSelectColumn(entryPeer::SOURCE);
 	$c->addSelectColumn(entryPeer::ADMIN_TAGS);
-	$c->addSelectColumn(entryPeer::CREATED_AT);
+	$c->addSelectColumn(CREATED_DAY_TS);
 	$c->addSelectColumn(entryPeer::CUSTOM_DATA);
 	$c->addSelectColumn(entryPeer::UPDATED_AT);
 	$c->add(entryPeer::UPDATED_AT, $updatedAt, Criteria::GREATER_EQUAL);
@@ -207,7 +201,7 @@ function getEntryUpdates($updatedAt)
 				ENTRY_TYPE => $row['TYPE'],
 				ENTRY_MEDIA_TYPE => $row['MEDIA_TYPE'],
 				ENTRY_SOURCE_TYPE => getEntrySourceTypeInt($row['SOURCE'], $row['ADMIN_TAGS']),
-				ENTRY_CREATED_AT => getDayUnixTimestampFromDate($row['CREATED_AT']),
+				ENTRY_CREATED_AT => $row[CREATED_DAY_TS],
 				ENTRY_CREATOR_ID => isset($customData['creatorKuserId']) ? $customData['creatorKuserId'] : $row['KUSER_ID'],
 			);
 			$duration = intval($row['LENGTH_IN_MSECS'] / 1000);
