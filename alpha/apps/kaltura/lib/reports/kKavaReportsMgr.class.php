@@ -52,7 +52,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_AVG_BITRATE = 'avg_bitrate';
 	const METRIC_ORIGIN_BANDWIDTH_SIZE_MB = 'origin_bandwidth_consumption';
 	const METRIC_UNIQUE_CONTRIBUTORS = 'unique_contributors';
-	const METRIC_PLAYS_USERS_PERCENTILES_RANKING = 'plays_users_percentiles_ranking';
+	const METRIC_ENGAGEMENT_RANKING = 'engagement_ranking';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -120,7 +120,6 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_TABLE_MAP = 'report_table_map';
 	const REPORT_TABLE_FINALIZE_FUNC = 'report_table_finalize_func';
 	const REPORT_EDIT_FILTER_FUNC = 'report_edit_filter_func';
-	const REPORT_DYNAMIC_METRICS = 'report_dynamic_metrics';
 
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -1289,9 +1288,10 @@ class kKavaReportsMgr extends kKavaBase
 					)
 				)
 			),
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_USERS, self::METRIC_PLAYS_USERS_PERCENTILES_RANKING),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_USERS, self::METRIC_ENGAGEMENT_RANKING),
 			self::REPORT_FORCE_TOTAL_COUNT => true,
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
+			self::REPORT_TOTAL_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_USERS),
 		),
 
 		myReportsMgr::REPORT_TYPE_TOP_CONTENT_CONTRIBUTORS => array(
@@ -1405,8 +1405,6 @@ class kKavaReportsMgr extends kKavaBase
 		self::MEDIA_TYPE_AUDIO => 'count_audio',
 		self::MEDIA_TYPE_IMAGE => 'count_image',
 		self::MEDIA_TYPE_SHOW => 'count_mix',
-		self::METRIC_PLAYS_USERS_PERCENTILES_RANKING => 'ranking',
-
 		
 		// TODO: remove the below - assume metric=header for anything not explicitly set
 		self::METRIC_QUARTILE_PLAY_TIME => self::METRIC_QUARTILE_PLAY_TIME,
@@ -1446,6 +1444,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_PLAY_TIME_SEC => self::METRIC_VIEW_PLAY_TIME_SEC,
 		self::METRIC_ORIGIN_BANDWIDTH_SIZE_MB => self::METRIC_ORIGIN_BANDWIDTH_SIZE_MB,
 		self::METRIC_UNIQUE_CONTRIBUTORS => self::METRIC_UNIQUE_CONTRIBUTORS,
+		self::METRIC_ENGAGEMENT_RANKING => self::METRIC_ENGAGEMENT_RANKING
 	);
 
 	//global transform
@@ -1486,7 +1485,7 @@ class kKavaReportsMgr extends kKavaBase
 	);
 
 	protected static $dynamic_metrics = array(
-		self::METRIC_PLAYS_USERS_PERCENTILES_RANKING => 'self::getPlaysUsersPercentilesRankingDef'
+		self::METRIC_ENGAGEMENT_RANKING => 'self::getPlaysUsersPercentilesRankingDef'
 	);
 
 	protected static $php_timezone_names = array(
@@ -1605,7 +1604,7 @@ class kKavaReportsMgr extends kKavaBase
 				self::getConstantPostAggregator('c', $const)));
 	}
 	
-	protected static function getConstantFactorPostAggr($agg_name, $field, $const)
+	protected static function getConstantFactorFieldAccessPostAggr($agg_name, $field, $const)
 	{
 		return self::getArithmeticPostAggregator(
 			$agg_name, '*', array(
@@ -1613,15 +1612,7 @@ class kKavaReportsMgr extends kKavaBase
 				self::getConstantPostAggregator('c', $const)));
 	}
 
-	protected static function getConstantRatioHyperUniquePostAggr($agg_name, $name, $field, $const)
-	{
-		return self::getArithmeticPostAggregator(
-			$agg_name, '/', array(
-			self::getHyperUniqueCardinalityPostAggregator($name, $field),
-			self::getConstantPostAggregator('c', $const)));
-	}
-
-	protected static function getWeightedPostAggr($name, $post_agg, $const)
+	protected static function getConstantFactorPostAggr($name, $post_agg, $const)
 	{
 		return self::getArithmeticPostAggregator($name, '*', array(
 				$post_agg,
@@ -1790,7 +1781,7 @@ class kKavaReportsMgr extends kKavaBase
 		
 		self::$metrics_def[self::METRIC_DURATION_TOTAL_MSEC] = array(
 			self::DRUID_AGGR => array(self::METRIC_DURATION_SEC),
-			self::DRUID_POST_AGGR => self::getConstantFactorPostAggr(
+			self::DRUID_POST_AGGR => self::getConstantFactorFieldAccessPostAggr(
 				self::METRIC_DURATION_TOTAL_MSEC, self::METRIC_DURATION_SEC, '1000'));
 		
 		self::$metrics_def[self::METRIC_BANDWIDTH_SIZE_MB] = array(
@@ -1825,17 +1816,17 @@ class kKavaReportsMgr extends kKavaBase
 				
 		self::$metrics_def[self::METRIC_DURATION_ADDED_MSEC] = array(
 			self::DRUID_AGGR => array(self::METRIC_DURATION_ADDED_SEC),
-			self::DRUID_POST_AGGR => self::getConstantFactorPostAggr(
+			self::DRUID_POST_AGGR => self::getConstantFactorFieldAccessPostAggr(
 				self::METRIC_DURATION_ADDED_MSEC, self::METRIC_DURATION_ADDED_SEC, '1000'));
 
 		self::$metrics_def[self::METRIC_DURATION_DELETED_MSEC] = array(
 			self::DRUID_AGGR => array(self::METRIC_DURATION_DELETED_SEC),
-			self::DRUID_POST_AGGR => self::getConstantFactorPostAggr(
+			self::DRUID_POST_AGGR => self::getConstantFactorFieldAccessPostAggr(
 				self::METRIC_DURATION_DELETED_MSEC, self::METRIC_DURATION_DELETED_SEC, '-1000'));	// duration is negative for delete events	
 
 		self::$metrics_def[self::METRIC_VIEW_PLAY_TIME_SEC] = array(
 			self::DRUID_AGGR => array(self::EVENT_TYPE_VIEW),
-			self::DRUID_POST_AGGR => self::getConstantFactorPostAggr(
+			self::DRUID_POST_AGGR => self::getConstantFactorFieldAccessPostAggr(
 				self::METRIC_VIEW_PLAY_TIME_SEC, self::EVENT_TYPE_VIEW, '10'));	
 		
 		// field ratio metrics
@@ -1918,19 +1909,18 @@ class kKavaReportsMgr extends kKavaBase
 		return array(
 			self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_PERCENTILES_SUM),
 			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
-				self::METRIC_PLAYS_USERS_PERCENTILES_RANKING, '+', array(
-					self::getWeightedPostAggr('score_plays',
-						self::getConstantRatioPostAggr('normalized_plays',
-							self::EVENT_TYPE_PLAY,
-							self::getMaxPlays($partner_id, $report_def, $input_filter, $object_ids)), 5
+				self::METRIC_ENGAGEMENT_RANKING, '+', array(
+					self::getConstantFactorFieldAccessPostAggr('score_plays',
+						self::EVENT_TYPE_PLAY,
+						self::getNormalizedScoreFactor(5,
+							self::getMaxMetric($partner_id, $report_def, $input_filter, $object_ids, self::EVENT_TYPE_PLAY))
 					),
-					self::getWeightedPostAggr('score_unique_users',
-						self::getConstantRatioHyperUniquePostAggr('normalized_users',
-							self::METRIC_UNIQUE_USERS,
-							self::METRIC_UNIQUE_USERS,
-							self::getMaxUsers($partner_id, $report_def, $input_filter, $object_ids)), 2.5
+					self::getConstantFactorPostAggr('score_unique_users',
+						self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_USERS),
+						self::getNormalizedScoreFactor(2.5,
+							self::getMaxMetric($partner_id, $report_def, $input_filter, $object_ids, self::METRIC_UNIQUE_USERS))
 					),
-					self::getWeightedPostAggr('score_unique_percentiles',
+					self::getConstantFactorPostAggr('score_unique_percentiles',
 						self::getFieldRatioPostAggr('avg_unique_percentiles',
 							self::METRIC_UNIQUE_PERCENTILES_SUM,
 							self::EVENT_TYPE_PLAY), 2.5
@@ -1940,34 +1930,28 @@ class kKavaReportsMgr extends kKavaBase
 		);
 	}
 
-	protected static function getMaxPlays($partner_id, $report_def, $input_filter, $object_ids)
+	protected static function getNormalizedScoreFactor($factor, $max)
 	{
-		$data_source = self::DATASOURCE_HISTORICAL;
-		$intervals = self::getFilterIntervals($report_def, $input_filter);
-		$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, $object_ids);
-		$dimension = self::DIMENSION_ENTRY_ID;
-		$metrics = array(self::EVENT_TYPE_PLAY);
-		$order_by = self::EVENT_TYPE_PLAY;
-
-		$query = self::getTopReport($data_source, $partner_id, $intervals, $metrics, $dimension, $druid_filter,
-			$order_by, self::DRUID_DESCENDING, 1, $metrics);
-		$response = self::runQuery($query);
-		return isset($response[0][self::DRUID_RESULT][0][self::EVENT_TYPE_PLAY]) ? $response[0][self::DRUID_RESULT][0][self::EVENT_TYPE_PLAY] : 0;
+		if ($max == 0)
+		{
+			return 0;
+		}
+		return $factor / $max;
 	}
 
-	protected static function getMaxUsers($partner_id, $report_def, $input_filter, $object_ids)
+	protected static function getMaxMetric($partner_id, $report_def, $input_filter, $object_ids, $metric)
 	{
-		$data_source = self::DATASOURCE_HISTORICAL;
+		$data_source = self::getDataSource($report_def);
 		$intervals = self::getFilterIntervals($report_def, $input_filter);
 		$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, $object_ids);
-		$dimension = self::DIMENSION_ENTRY_ID;
-		$metrics = array(self::METRIC_UNIQUE_USERS);
-		$order_by = self::METRIC_UNIQUE_USERS;
+		$dimension = self::getDimension($report_def, $object_ids);
+		$metrics = array($metric);
+		$order_by = $metric;
 
 		$query = self::getTopReport($data_source, $partner_id, $intervals, $metrics, $dimension, $druid_filter,
 			$order_by, self::DRUID_DESCENDING, 1, $metrics);
 		$response = self::runQuery($query);
-		return isset($response[0][self::DRUID_RESULT][0][self::METRIC_UNIQUE_USERS]) ? $response[0][self::DRUID_RESULT][0][self::METRIC_UNIQUE_USERS] : 0;
+		return isset($response[0][self::DRUID_RESULT][0][$metric]) ? $response[0][self::DRUID_RESULT][0][$metric] : 0;
 	}
 
 	/// time functions
@@ -2219,6 +2203,11 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function getMetrics($report_def)
 	{
 		return $report_def[self::REPORT_METRICS];
+	}
+
+	protected static function getDataSource($report_def)
+	{
+		return isset($report_def[self::REPORT_DATA_SOURCE]) ? $report_def[self::REPORT_DATA_SOURCE] : self::DATASOURCE_HISTORICAL;
 	}
 
 	protected static function getFilterValues($filter, $dimension)
@@ -5324,7 +5313,6 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		$interval = $input_filter->interval;
 		$input_filter->interval = self::INTERVAL_ALL;
-		self::initDynamicMetrics($partner_id, $report_def, $input_filter, $object_ids);
 
 		if (isset($report_def[self::REPORT_TOTAL_FROM_TABLE_FUNC]))
 		{
