@@ -608,7 +608,7 @@ class myInsertEntryHelper
 						{
 							KDLWrap::ConvertMediainfoCdl2FlavorAsset($mediaInfo, $flavorAsset);
 							$flavorTags = KDLWrap::CDLMediaInfo2Tags($mediaInfo, array(flavorParams::TAG_WEB));
-							$flavorAsset->setTags(implode(',', $flavorTags));
+							$flavorAsset->addTags($flavorTags);
 						}
 						$flavorAsset->save();
 					}
