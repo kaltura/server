@@ -1485,7 +1485,7 @@ class kKavaReportsMgr extends kKavaBase
 	);
 
 	protected static $dynamic_metrics = array(
-		self::METRIC_ENGAGEMENT_RANKING => 'self::getPlaysUsersPercentilesRankingDef'
+		self::METRIC_ENGAGEMENT_RANKING => 'self::getEngagementRankingDef'
 	);
 
 	protected static $php_timezone_names = array(
@@ -1904,7 +1904,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 	}
 
-	protected static function getPlaysUsersPercentilesRankingDef($partner_id, $report_def, $input_filter, $object_ids)
+	protected static function getEngagementRankingDef($partner_id, $report_def, $input_filter, $object_ids)
 	{
 		return array(
 			self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_PERCENTILES_SUM),
