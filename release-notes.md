@@ -1,4 +1,12 @@
 # Naos 14.13.0 #
+## Conf Maps - add option to view list of all maps in combo box ##
+- Issue Type: Task
+- Issue ID: PLAT-9596
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_11_confmaps_service.php
+
+
 ## Move maps to dynamic configuration ##
 - Issue Type: Task
 - Issue ID: PLAT-9603
