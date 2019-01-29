@@ -21,7 +21,14 @@ class kThumbnailDescriptor
 	{
 		self::$requiredWidth = $requiredWidth;
 		self::$requiredHeight = $requiredHeight;
-		self::$requiredAspectRatio = $requiredWidth / $requiredHeight;
+		if ($requiredHeight)
+		{
+			self::$requiredAspectRatio = $requiredWidth / $requiredHeight;
+		}
+		else
+		{
+			self::$requiredAspectRatio = 1;
+		}
 		self::$initialized = true;
 	}
 
