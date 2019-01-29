@@ -1520,8 +1520,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				if ($fileSync && !$local)
 				{
 					if (!$fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL || !$partner || !$partner->getImportRemoteSourceForConvert())
+					{
 						KalturaLog::err("Source file not found locally for flavor conversion [" . $flavorAsset->getId() . "]");
-					return false;
+						return false;
+					}
 				}
 			}
 		}
