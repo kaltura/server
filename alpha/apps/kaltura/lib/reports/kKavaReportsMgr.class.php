@@ -4821,10 +4821,7 @@ class kKavaReportsMgr extends kKavaBase
 		foreach ($report_defs as $cur_report_def)
 		{
 			// add the current report headers
-			foreach ($cur_report_def[self::REPORT_METRICS] as $column)
-			{
-				$headers[] = $column;
-			}
+			$headers = array_merge($headers, $cur_report_def[self::REPORT_METRICS]);
 
 			if (!isset($cur_report_def[self::REPORT_DIMENSION]))
 			{
