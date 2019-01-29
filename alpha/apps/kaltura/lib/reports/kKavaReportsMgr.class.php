@@ -1913,12 +1913,12 @@ class kKavaReportsMgr extends kKavaBase
 					self::getConstantFactorFieldAccessPostAggr('score_plays',
 						self::EVENT_TYPE_PLAY,
 						self::getNormalizedScoreFactor(5,
-							self::getMaxMetric($partner_id, $report_def, $input_filter, $object_ids, self::EVENT_TYPE_PLAY))
+							self::getMetricMaxValue($partner_id, $report_def, $input_filter, $object_ids, self::EVENT_TYPE_PLAY))
 					),
 					self::getConstantFactorPostAggr('score_unique_users',
 						self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_USERS),
 						self::getNormalizedScoreFactor(2.5,
-							self::getMaxMetric($partner_id, $report_def, $input_filter, $object_ids, self::METRIC_UNIQUE_USERS))
+							self::getMetricMaxValue($partner_id, $report_def, $input_filter, $object_ids, self::METRIC_UNIQUE_USERS))
 					),
 					self::getConstantFactorPostAggr('score_unique_percentiles',
 						self::getFieldRatioPostAggr('avg_unique_percentiles',
@@ -1939,7 +1939,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $factor / $max;
 	}
 
-	protected static function getMaxMetric($partner_id, $report_def, $input_filter, $object_ids, $metric)
+	protected static function getMetricMaxValue($partner_id, $report_def, $input_filter, $object_ids, $metric)
 	{
 		$data_source = self::getDataSource($report_def);
 		$intervals = self::getFilterIntervals($report_def, $input_filter);
