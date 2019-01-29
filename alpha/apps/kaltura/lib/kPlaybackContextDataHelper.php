@@ -19,7 +19,7 @@ class kPlaybackContextDataHelper
 	private $remoteFlavorsByDc = array();
 	private $remoteDeliveryProfileIds = array();
 	private $remoteDcByDeliveryProfile = array();
-
+	private $playbackCaptions = array();
 	private $localPlaybackSources = array();
 	private $remotePlaybackSources = array();
 
@@ -69,11 +69,13 @@ class kPlaybackContextDataHelper
 			$this->createFlavorsMapping($dbEntry);
 			$this->constructLocalPlaybackSources($dbEntry, $contextDataHelper);
 			$this->constructRemotePlaybackSources($dbEntry, $contextDataHelper);
+			$this->constructPlaybackCaptions($dbEntry, $contextDataHelper);
 		}
 
 		$this->setPlaybackSources($dbEntry->getPartner()->getStorageServePriority());
 		$this->filterFlavorsBySources();
 		$this->playbackContext->setFlavorAssets($this->flavorAssets);
+		$this->playbackContext->setPlaybackCaptions($this->playbackCaptions);
 	}
 
 	/**
@@ -202,7 +204,7 @@ class kPlaybackContextDataHelper
 
 		list($flavorParamsIdsToFilter, $flavorsParamsNotIn) = $this->getFlavorParamsIdsToFilter($contextDataHelper);
 
-		if(count($flavorParamsIdsToFilter) || $flavorsParamsNotIn)
+		if($flavorParamsIdsToFilter && count($flavorParamsIdsToFilter) || $flavorsParamsNotIn)
 			self::filterFlavorAssetsByFlavorParamsIds($flavorAssets, $flavorParamsIdsToFilter, $flavorsParamsNotIn);
 
 		$this->flavorAssets = $flavorAssets;
@@ -371,7 +373,7 @@ class kPlaybackContextDataHelper
 
 		list($deliveryProfileIds, $deliveryProfilesParamsNotIn) = $this->getProfileIdsToFilter($contextDataHelper);
 
-		if (count($deliveryProfileIds) || $deliveryProfilesParamsNotIn)
+		if ($deliveryProfileIds && count($deliveryProfileIds) || $deliveryProfilesParamsNotIn)
 			$this->filterDeliveryProfiles($localDeliveryProfiles, $deliveryProfileIds, $deliveryProfilesParamsNotIn, $contextDataHelper);
 
 		$this->filterDeliveryProfilesByStreamerType($localDeliveryProfiles, $contextDataHelper);
@@ -446,7 +448,13 @@ class kPlaybackContextDataHelper
 			}
 		}
 	}
-
+	/**
+	 * @param entry $dbEntry
+	 */
+	private function constructPlaybackCaptions(entry $dbEntry, $contextDataHelper)
+	{
+		$this->playbackCaptions = self::getPlaybackCaptionsData($dbEntry, $contextDataHelper);
+	}
 
 	private function getTagsByFormat($format)
 	{
@@ -621,6 +629,7 @@ class kPlaybackContextDataHelper
 		$playbackContextDataParams = new kPlaybackContextDataParams();
 		$playbackContextDataParams->setDeliveryProfile($deliveryProfile);
 		$playbackContextDataParams->setFlavors(array_values($flavorAssets));
+		$playbackContextDataParams->setType('drm');
 
 		$result = new kPlaybackContextDataResult();
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaPlaybackContextDataContributor');
@@ -631,6 +640,23 @@ class kPlaybackContextDataHelper
 			self::filterFlavorAssets($flavorAssets, $result->getFlavorIdsToRemove(), true);
 
 		return array($result->getPluginData(), $flavorAssets);
+	}
+
+	/* @param entry $dbEntry
+	 * @return array
+	 */
+	protected static function getPlaybackCaptionsData(entry $dbEntry, $contextDataHelper)
+	{
+		$playbackContextDataParams = new kPlaybackContextDataParams();
+		$playbackContextDataParams->setType('caption');
+		$result = new kPlaybackContextDataResult();
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaPlaybackContextDataContributor');
+		foreach ($pluginInstances as $pluginInstance)
+		{
+			$pluginInstance->contributeToPlaybackContextDataResult($dbEntry, $playbackContextDataParams, $result, $contextDataHelper);
+		}
+
+		return $result->getPlaybackCaptions();
 	}
 
 	private function setPlaybackSources($servePriority)

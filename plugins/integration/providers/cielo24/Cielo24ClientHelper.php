@@ -154,7 +154,14 @@ class Cielo24ClientHelper
 				curl_close($ch);
 				throw new Exception("json decode error with response - " . $stringResult);
 			}
+			
+			if (isset($result->ErrorType))
+			{
+				KalturaLog::err('Cielo24 API has returned an error: ' . $result->ErrorType . '::' . $result->ErrorComment);
+				throw new Exception($result->ErrorType . '::' . $result->ErrorComment);
+			}
 		}
+		
 		KalturaLog::debug('result is - ' . var_dump($result));
 		curl_close($ch);
 		return $result;

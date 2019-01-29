@@ -15,6 +15,7 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_STORAGE_USAGE = 'storage-usage';
 	const DATASOURCE_TRANSCODING_USAGE = 'transcoding-usage';
 	const DATASOURCE_REACH_USAGE = 'reach-usage';
+	const DATASOURCE_API_USAGE = 'api-usage';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
@@ -29,9 +30,12 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_APPLICATION = 'application';
 	const DIMENSION_DEVICE = 'userAgent.device';
 	const DIMENSION_OS = 'userAgent.operatingSystem';
+	const DIMENSION_OS_FAMILY = 'userAgent.operatingSystemFamily';
 	const DIMENSION_BROWSER = 'userAgent.browser';
+	const DIMENSION_BROWSER_FAMILY = 'userAgent.browserFamily';
 	const DIMENSION_PLAYBACK_CONTEXT = 'playbackContext';
 	const DIMENSION_PLAYBACK_TYPE = 'playbackType';
+	const DIMENSION_SERVER_NODE_IDS = 'serverNodeIds';
 	const DIMENSION_CATEGORIES = 'categories';
 	const DIMENSION_EVENT_TYPE = 'eventType';
 	const DIMENSION_HAS_BITRATE = 'hasBitrate';
@@ -46,6 +50,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_CUSTOM_VAR2 = 'customVar2';
 	const DIMENSION_CUSTOM_VAR3 = 'customVar3';
 	const DIMENSION_TYPE = 'type';
+	const DIMENSION_ENTRY_OWNER_ID = 'entryKuserId';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -107,8 +112,11 @@ class kKavaBase extends kDruidBase
 	const MEDIA_TYPE_AUDIO = 'Audio';
 	const MEDIA_TYPE_IMAGE = 'Image';
 	const MEDIA_TYPE_SHOW = 'Show';		// mix
-	const MEDIA_TYPE_FLASH = 'Flash';	// live stream
-	
+	const MEDIA_TYPE_LIVE_STREAM = 'Live stream';
+	const MEDIA_TYPE_LIVE_WIN_MEDIA = 'Live stream windows media';
+	const MEDIA_TYPE_LIVE_REAL_MEDIA = 'Live stream real media';
+	const MEDIA_TYPE_LIVE_QUICKTIME = 'Live stream quicktime';
+
 	// Entry vendor task statuses
 	const TASK_READY = "Ready";
 
@@ -120,4 +128,27 @@ class kKavaBase extends kDruidBase
 	    }
 	    return false;
 	}
+
+	public static function getCoordinatesKey($items)
+	{
+		$key = implode('_', $items);
+		return 'coord_' . preg_replace('/[^a-z0-9_]/', '_', strtolower($key));
+	}
+
+	public static function parseCoordinates($coords)
+	{
+		return array_map('floatval', explode('/', $coords));
+	}
+
+	public static function getCoordinatesForKeys($keys)
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_GEO_COORDINATES);
+		if (!$cache)
+		{
+			return array();
+		}
+
+		return $cache->multiGet($keys);
+	}
+
 }

@@ -20,9 +20,11 @@ class BulkUploadFilterPlugin extends KalturaPlugin implements IKalturaBulkUpload
 	 */
 	public static function dependsOn()
 	{
-		$drmDependency = new KalturaDependency(BulkUploadPlugin::PLUGIN_NAME);
+		$bulkUploadDependency = new KalturaDependency(BulkUploadPlugin::PLUGIN_NAME);
 		
-		return array($drmDependency);
+		$bulkUploadXmlDependency = new KalturaDependency(BulkUploadXmlPlugin::PLUGIN_NAME);
+		
+		return array($bulkUploadDependency, $bulkUploadXmlDependency);
 	}
 	
 	/**
@@ -31,10 +33,13 @@ class BulkUploadFilterPlugin extends KalturaPlugin implements IKalturaBulkUpload
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('BulkUploadFilterType');
+			return array('BulkUploadFilterType', 'BulkUploadJobObjectType');
 	
 		if($baseEnumName == 'BulkUploadType')
 			return array('BulkUploadFilterType');
+		
+		if ($baseEnumName == 'BulkUploadObjectType')
+			return array('BulkUploadJobObjectType');
 		
 		return array();
 	}
@@ -69,6 +74,8 @@ class BulkUploadFilterPlugin extends KalturaPlugin implements IKalturaBulkUpload
 			{
 			    case KalturaBulkUploadObjectType::CATEGORY_ENTRY:
 			        return new BulkUploadCategoryEntryEngineFilter($job);
+			    case KalturaBulkUploadObjectType::ENTRY:
+				return new BulkUploadMediaEntryEngineFilter($job);
 			    default:
 			        throw new KalturaException("Bulk upload object type [{$job->data->bulkUploadObjectType}] not found", KalturaBatchJobAppErrors::ENGINE_NOT_FOUND);
 			        break;
@@ -84,6 +91,12 @@ class BulkUploadFilterPlugin extends KalturaPlugin implements IKalturaBulkUpload
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
+		// BulkUploadResultPeer::OM_CLASS = 'BulkUploadResult'
+		if ($baseClass == 'BulkUploadResult' && $enumValue == self::getBulkUploadObjectTypeCoreValue(BulkUploadJobObjectType::JOB))
+		{
+			return 'BulkUploadResultJob';
+		}
+		
 		return null;
 	}
 	
@@ -159,10 +172,20 @@ class BulkUploadFilterPlugin extends KalturaPlugin implements IKalturaBulkUpload
 	}
 	
 	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getBulkUploadObjectTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('BulkUploadObjectType', $value);
+	}
+	
+	/**
 	 * @return string external API value of dynamic enum.
 	 */
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
+
 }

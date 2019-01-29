@@ -703,7 +703,7 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			$isNewAsset = true;
 			$isSource = true;
-			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId(), $msg);
+			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		}
 
 		if(!$dbAsset && $dbEntry->getStatus() == entryStatus::NO_CONTENT)
@@ -887,7 +887,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		return $dbAsset;
 	}
-	
+
 	/**
 	 * @param kUrlResource $resource
 	 * @param entry $dbEntry
@@ -896,14 +896,11 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function attachUrlResource(kUrlResource $resource, entry $dbEntry, asset $dbAsset = null)
 	{
-		if($dbAsset instanceof flavorAsset)
-		{
-			$dbEntry->setSource(KalturaSourceType::URL);
-			$dbEntry->save();
-		}
-		
+		$dbEntry->setSource(entry::ENTRY_MEDIA_SOURCE_URL);
+		$dbEntry->save();
+
 		$url = $resource->getUrl();
-		
+
 		if (!$resource->getForceAsyncDownload())
 		{
 			$ext = pathinfo($url, PATHINFO_EXTENSION);
@@ -913,14 +910,14 @@ class KalturaEntryService extends KalturaBaseService
 			    $entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
     			if (KCurlWrapper::getDataFromFile($url, $entryFullPath))
     				return $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
-    			
+
     			KalturaLog::err("Failed downloading file[$url]");
     			$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
     			$dbEntry->save();
-    			
+
     			return null;
     		}
-    	
+
     		if($dbAsset && !($dbAsset instanceof flavorAsset))
     		{
     			$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
@@ -929,20 +926,20 @@ class KalturaEntryService extends KalturaBaseService
     				$dbAsset = $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
     				return $dbAsset;
     			}
-    			
+
     			KalturaLog::err("Failed downloading file[$url]");
     			$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_ERROR);
     			$dbAsset->save();
-    			
+
     			return null;
     		}
 		}
-		
+
 		kJobsManager::addImportJob(null, $dbEntry->getId(), $this->getPartnerId(), $url, $dbAsset, null, $resource->getImportJobData());
-		
+
 		return $dbAsset;
 	}
-	
+
 	/**
 	 * @param kAssetsParamsResourceContainers $resource
 	 * @param entry $dbEntry
@@ -957,17 +954,17 @@ class KalturaEntryService extends KalturaBaseService
 			$dbAsset = $this->attachAssetParamsResourceContainer($assetParamsResourceContainer, $dbEntry);
 			if(!$dbAsset)
 				continue;
-				
+
 			KalturaLog::debug("Resource asset id [" . $dbAsset->getId() . "]");
-			
+
 			if($dbAsset->getIsOriginal())
 				$ret = $dbAsset;
 		}
 		$dbEntry->save();
-		
+
 		return $ret;
 	}
-	
+
 	/**
 	 * @param kAssetParamsResourceContainer $resource
 	 * @param entry $dbEntry
@@ -1215,11 +1212,10 @@ class KalturaEntryService extends KalturaBaseService
 	 	$kshow = $this->createDummyKShow();
 		$kshowId = $kshow->getId();
 		
-		$msg = null;
-		$flavorAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId(), $msg);
+		$flavorAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		if(!$flavorAsset)
 		{
-			KalturaLog::err("Flavor asset not created for entry [" . $dbEntry->getId() . "] reason [$msg]");
+			KalturaLog::err("Flavor asset not created for entry [" . $dbEntry->getId() . "]");
 			
 			if($dbEntry->getStatus() == entryStatus::NO_CONTENT)
 			{
@@ -1227,7 +1223,7 @@ class KalturaEntryService extends KalturaBaseService
 				$dbEntry->save();
 			}
 			
-			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED, $msg);
+			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED);
 		}
 				
 		$srcSyncKey = $srcFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -1316,8 +1312,8 @@ class KalturaEntryService extends KalturaBaseService
 
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		}
-			
 		$list = entryPeer::doSelect($c);
+		entryPeer::fetchPlaysViewsData($list);
 		$totalCount = $c->getRecordsCount();
 		
 		if ($disableWidgetSessionFilters)
@@ -1903,7 +1899,7 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		KalturaLog::info("clipping service detected start to create sub flavors;");
 		$clipEntry = $clipManager->createTempEntryForClip($this->getPartnerId());
-		$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId(), $msg);
+		$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId());
 		$dbAsset = $this->attachResource($resource->getResource(), $clipEntry, $clipDummySourceAsset);
 		$clipManager->startBatchJob($resource, $dbEntry,$operationAttributes, $clipEntry);
 		return $dbAsset;

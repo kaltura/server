@@ -16,7 +16,13 @@ class KalturaJsonSerializer extends KalturaSerializer
 			return 'null';
 			
 		$object = parent::prepareSerializedObject($object);
-		$json = json_encode($this->unsetNull($object));
+		$options = 0;
+		if (defined('JSON_PARTIAL_OUTPUT_ON_ERROR'))
+		{
+			$options |= JSON_PARTIAL_OUTPUT_ON_ERROR;
+		}
+		
+		$json = json_encode($this->unsetNull($object), $options);
 		return $json;
 	}
 

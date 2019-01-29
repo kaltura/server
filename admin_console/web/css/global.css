@@ -1910,6 +1910,14 @@ form#frmCreateReachProfile dd,form#frmCreateReachProfile dt {
 	float: left;
 }
 
+form#frmCloneReachProfile dd,form#frmCloneReachProfile dt {
+	float: left;
+}
+
+form#frmClonePartnerCatalogItems dd,form#frmClonePartnerCatalogItems dt {
+	float: left;
+}
+
 #drop-folder-configure-dialog {
 	padding-top: 10px;
 }
@@ -1944,6 +1952,55 @@ form#frmCreateReachProfile dd,form#frmCreateReachProfile dt {
 }
 
 #drop-folder-configure-dialog select {
+	min-width: 338px;
+	height: 24px;
+	padding: 1px;
+}
+
+#configuration-map-configure-dialog {
+	padding-top: 10px;
+}
+
+#configuration-map-configure-dialog label {
+	padding: 0;
+	width: 400px;
+}
+
+#configuration-map-configure-dialog dl {
+	margin-top: 15px;
+}
+
+#configuration-map-configure-dialog b {
+	display: block;
+}
+
+#configuration-map-configure-dialog dl p {
+	width: 400px;
+	padding: 3px;
+	margin-top: 5px;
+	border: solid 1px #ccc;
+	background: #f0f0f0;
+}
+
+#configuration-map-configure-dialog dt {
+	margin: 10px 0 5px;
+}
+
+#configuration-map-configure-dialog dd input {
+	width: 333px;
+	height: 22px;
+}
+
+#configuration-map-configure-dialog dd textarea {
+	width: 550px;
+}
+
+
+#configuration-map-configure-dialog dd input#max_bulk_size {
+	width: 150px;
+}
+
+#configuration-map-configure-dialog select {
 	min-width: 338px;
 	height: 24px;
 	padding: 1px;

@@ -15,6 +15,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	const OBJECT_TYPE_TITLE = 'entry';
 	
+	const EXISTING_VALUE_DELIMITER = '{existing_value}';
+	
 	/**
 	 * The default ingestion profile id
 	 * @var int
@@ -454,7 +456,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
 			return;
 		
-		$entry = $this->createEntryFromItem($item, $existingEntry->type); //Creates the entry from the item element
+		$entry = $this->createEntryFromItem($item, $existingEntry->type, $existingEntry); //Creates the entry from the item element
 		
 		$this->handleTypedElement($entry, $item); //Sets the typed element values (Mix, Media, ...)
 		
@@ -1269,11 +1271,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		if(!empty($categories) && count($categories->children()))
 		{
-			if ($categories->children()[0]->getName() == 'categoryId')
+			$children = $categories->children();
+			if ($children[0]->getName() == 'categoryId')
 			{
 				return $this->createCategoryAssociationsByCategoryIds($entryId, $this->implodeChildElements($categories), $bulkuploadResult, $update);
 			}
-			elseif ($categories->children()[0]->getName() == 'category')
+			elseif ($children[0]->getName() == 'category')
 			{
 				return $this->createCategoryAssociationsByFullNames($entryId, $this->implodeChildElements($categories), $bulkuploadResult, $update);
 			}
@@ -1501,7 +1504,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$response = KBatchBase::$kClient->doMultiRequest();
 			foreach ($response as $singleResponse)
 			{
-				if (isset($singleResponse['code']) && isset($singleResponse['message']))
+				if (is_array($singleResponse) && isset($singleResponse['code']) && isset($singleResponse['message']))
 				{
 					$bulkuploadResult->errorDescription .= $singleResponse['message'];
 				}
@@ -2125,9 +2128,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Creates and returns a new media entry for the given job data and bulk upload result object
 	 * @param SimpleXMLElement $bulkUploadResult
 	 * @param int $type
+	 * @param KalturaBaseEntry $existingItem
 	 * @return KalturaBaseEntry
 	 */
-	protected function createEntryFromItem(SimpleXMLElement $item, $type = null)
+	protected function createEntryFromItem(SimpleXMLElement $item, $type = null, KalturaBaseEntry $existingItem = null)
 	{
 		//Create the new media entry and set basic values
 		if(isset($item->type))
@@ -2139,7 +2143,21 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$entry = $this->getEntryInstanceByType($entryType);
 		$entry->type = (int)$item->type;
-		$entry->userId = $this->data->userId;
+		if (!$existingItem || !$existingItem->userId)
+		{
+			$entry->userId = $this->data->userId;
+		}
+		
+		if(isset($item->entitledUsersEdit))
+		{
+			$entry->entitledUsersEdit = $this->parseAndAddToExistingValues('entitledUsersEdit', $item, $existingItem);
+		}
+		
+		if(isset($item->entitledUsersPublish))
+		{
+			$entry->entitledUsersPublish = $this->parseAndAddToExistingValues('entitledUsersPublish', $item, $existingItem);
+		}
+		
 		if(isset($item->referenceId))
 			$entry->referenceId = (string)$item->referenceId;
 		if(isset($item->name))
@@ -2193,6 +2211,21 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		
 		return $entry;
+	}
+	
+	protected function parseAndAddToExistingValues ($fieldName, SimpleXMLElement $item, KalturaBaseEntry $existingItem = null)
+	{
+		$values = $this->implodeChildElements($item->$fieldName);
+		if($existingItem && strpos($values, self::EXISTING_VALUE_DELIMITER) !== false)
+		{
+			$values = str_replace(self::EXISTING_VALUE_DELIMITER, $existingItem->$fieldName, $values);
+		}
+		elseif (!$existingItem && strpos($values, self::EXISTING_VALUE_DELIMITER) !== false)
+		{
+			$values = str_replace(self::EXISTING_VALUE_DELIMITER, '', $values);
+		}
+		
+		return $values;
 	}
 	
 	/**

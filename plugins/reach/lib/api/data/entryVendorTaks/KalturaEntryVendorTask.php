@@ -174,6 +174,11 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	 */
 	public $creationMode;
 	
+	/**
+	 * @var KalturaVendorTaskData
+	 */
+	public $taskJobData;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -200,6 +205,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'dictionary',
 		'partnerData',
 		'creationMode',
+		'taskJobData'
 	);
 	
 	/* (non-PHPdoc)
@@ -216,7 +222,9 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (is_null($object_to_fill))
+		{
 			$object_to_fill = new EntryVendorTask();
+		}
 		
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
@@ -229,7 +237,14 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		$this->validateEntryId();
 		
 		if($this->partnerData && !$this->checkIsValidJson($this->partnerData))
+		{
 			throw new KalturaAPIException(KalturaReachErrors::PARTNER_DATA_NOT_VALID_JSON_STRING);
+		}
+		
+		if(isset($this->taskJobData))
+		{
+			$this->taskJobData->validateForInsert();
+		}
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -245,10 +260,19 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		
 		/* @var $sourceObject EntryVendorTask */
 		if($this->status && $this->status != $sourceObject->getStatus() && in_array($sourceObject->getStatus(), $closedStatuses))
+		{
 			throw new KalturaAPIException(KalturaReachErrors::CANNOT_UPDATE_STATUS_OF_TASK_WHICH_IS_IN_FINAL_STATE, $sourceObject->getId(), $sourceObject->getStatus(), $this->status);
+		}
 		
 		if($this->partnerData && !$this->checkIsValidJson($this->partnerData))
+		{
 			throw new KalturaAPIException(KalturaReachErrors::PARTNER_DATA_NOT_VALID_JSON_STRING);
+		}
+		
+		if(isset($this->taskJobData))
+		{
+			$this->taskJobData->validateForUpdate($sourceObject->getTaskJobData(), $propertiesToSkip);
+		}
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
@@ -257,15 +281,35 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	{
 		$dbEntry = entryPeer::retrieveByPK($this->entryId);
 		if (!$dbEntry)
+		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
+		}
 		
 		if($dbEntry->getStatus() != entryStatus::READY)
+		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_NOT_READY, $this->entryId);
+		}
 		
 		if(!kReachUtils::isEntryTypeSupported($dbEntry->getType()))
+		{
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_TYPE_NOT_SUPPORTED, $dbEntry->getType());
+		}
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject()
+	 */
+	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		/* @var $dbObject EntryVendorTask */
+		parent::doFromObject($dbObject, $responseProfile);
+
+		if ($this->shouldGet('taskJobData', $responseProfile) && !is_null($dbObject->getTaskJobData()))
+		{
+			$this->taskJobData = KalturaVendorTaskData::getInstance($dbObject->getTaskJobData(), $responseProfile);
+		}
+	}
+
 	public function getExtraFilters()
 	{
 		return array();

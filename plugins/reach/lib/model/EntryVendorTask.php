@@ -25,6 +25,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	const CUSTOM_DATA_DICTIONARY =          'dictionary';
 	const CUSTOM_DATA_PARTNER_DATA =        'partner_data';
 	const CUSTOM_DATA_CREATION_MODE =       'creation_mode';
+	const CUSTOM_DATA_TASK_DATA =       	'task_data';
 	
 	//setters
 	
@@ -78,6 +79,11 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		$this->putInCustomData(self::CUSTOM_DATA_CREATION_MODE, $v);
 	}
 	
+	public function setTaskJobData($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_TASK_DATA, $v);
+	}
+
 	//getters
 
 	public function getDictionary()
@@ -145,6 +151,11 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		return $this->getFromCustomData(self::CUSTOM_DATA_CREATION_MODE, null, EntryVendorTaskCreationMode::MANUAL);
 	}
 	
+	public function getTaskJobData()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_TASK_DATA);
+	}
+
 	/* (non-PHPdoc)
  	 * @see BaseEntryVendorTask::preSave()
  	 */

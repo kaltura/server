@@ -49,6 +49,11 @@ class DeliveryProfileDynamicAttributes {
 	 * @var float
 	 */
 	protected $playbackRate = null;
+
+	/**
+	 * @var string
+	 */
+	protected $trackSelection = null;
 	
 	/**
 	 * @var int
@@ -269,6 +274,13 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
+	 * @return the $trackSelection
+	 */
+	public function getTrackSelection() {
+		return $this->trackSelection;
+	}
+
+	/**
 	 * @return the $storageId
 	 */
 	public function getStorageId() {
@@ -388,6 +400,13 @@ class DeliveryProfileDynamicAttributes {
 	 */
 	public function setPlaybackRate($playbackRate) {
 		$this->playbackRate = $playbackRate;
+	}
+
+	/**
+	 * @param string $trackSelection
+	 */
+	public function setTrackSelection($trackSelection) {
+		$this->trackSelection = $trackSelection;
 	}
 	
 	/**
@@ -795,6 +814,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->seekFromTime = $newObj->getSeekFromTime();
 		$this->clipTo = $newObj->getClipTo();
 		$this->playbackRate = $newObj->getPlaybackRate();
+		$this->trackSelection = $newObj->getTrackSelection();
 		$this->storageId = $newObj->getStorageId();
 		$this->entryId = $newObj->getEntryId();
 		$this->tags = $newObj->getTags();

@@ -4,10 +4,8 @@
  * @subpackage model.search
  */
 
-class kUserSearch extends kBaseSearch
+class kUserSearch extends kBaseESearch
 {
-    const PEER_NAME = 'kuserPeer';
-    const PEER_RETRIEVE_FUNCTION_NAME = 'retrieveByPKs';
 
     public function __construct()
     {
@@ -34,19 +32,14 @@ class kUserSearch extends kBaseSearch
         parent::initQuery($statuses, $objectId, $pager, $order);
     }
 
-    function getPeerName()
-    {
-        return self::PEER_NAME;
-    }
-
-    public function getPeerRetrieveFunctionName()
-    {
-        return self::PEER_RETRIEVE_FUNCTION_NAME;
-    }
-
     public function getElasticTypeName()
     {
         return ElasticIndexMap::ELASTIC_KUSER_TYPE;
+    }
+
+    public function fetchCoreObjectsByIds($ids)
+    {
+        return kuserPeer::retrieveByPKs($ids);
     }
 
 }

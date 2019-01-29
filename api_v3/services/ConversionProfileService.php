@@ -281,9 +281,6 @@ class ConversionProfileService extends KalturaBaseService
 			if(in_array($assetParams->getId(), $existingIds))
 				continue;
 				
-			if($conversionProfileDb->getType() == ConversionProfileType::LIVE_STREAM && $assetParams->getType() != assetType::LIVE)
-				throw new KalturaAPIException(KalturaErrors::ASSET_PARAMS_INVALID_TYPE, $assetParams->getId(), $assetParams->getType());
-				
 			$fpc = new flavorParamsConversionProfile();
 			$fpc->setConversionProfileId($conversionProfileDb->getId());
 			$fpc->setFlavorParamsId($assetParams->getId());
@@ -304,7 +301,7 @@ class ConversionProfileService extends KalturaBaseService
 	 * Delete the relation of flavorParams <> conversionProfile2
 	 * 
 	 * @param conversionProfile2 $conversionProfileDb
-	 * @param string|array $notInFlavorIds comma sepeartaed id that should not be deleted
+	 * @param string|array $notInFlavorIds comma separated ID[s] that should not be deleted
 	 */
 	protected function deleteFlavorParamsRelation(conversionProfile2 $conversionProfileDb, $notInFlavorIds = null)
 	{

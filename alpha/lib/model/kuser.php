@@ -876,6 +876,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		$c->addSelectColumn(kuserPeer::PARTNER_ID);
 		$c->addAnd(kuserPeer::LOGIN_DATA_ID, $currentLoginDataId, Criteria::EQUAL);
 		$c->addAnd(kuserPeer::STATUS, KuserStatus::ACTIVE, Criteria::EQUAL);
+		$c->addAnd(kuserPeer::IS_ADMIN, true, Criteria::EQUAL);
 		kuserPeer::setUseCriteriaFilter(false);
 		$stmt = kuserPeer::doSelectStmt($c);
 		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -1220,9 +1221,9 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		if ($this->getRoleIds())
 		{
 			$roleIds = explode(",", $this->getRoleIds());
-			foreach($roleIds as $roleId)
+			$roles = UserRolePeer::retrieveByPKs($roleIds);
+			foreach($roles as $role)
 			{
-				$role = UserRolePeer::retrieveByPK($roleId);
 				$permissionNames = $role->getPermissionNames(null, true);
 				$permissionNames = str_replace("*", self::UNIVERSAL_PERMISSION, $permissionNames);
 				$permissionNamesArray = array_merge($permissionNamesArray, explode(",", $permissionNames));

@@ -223,6 +223,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		{
 			$data = $this->operationEngine->getData();
 			$log = $this->operationEngine->getLogData();
+			KalturaLog::log("Log strlen: ".strlen($log));
 			//removing unsuported XML chars
 			$log  = preg_replace('/[^\t\n\r\x{20}-\x{d7ff}\x{e000}-\x{fffd}\x{10000}-\x{10ffff}]/u','',$log);
 			if($log && strlen($log))
@@ -280,12 +281,11 @@ class KAsyncConvert extends KJobHandlerWorker
 					$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
 			
 				kFile::moveFile($data->destFileSyncLocalPath, $sharedFile);
-			
+
 				// directory sizes may differ on different devices
 				if(!file_exists($sharedFile) || (is_file($sharedFile) && kFile::fileSize($sharedFile) != $fileSize))
 				{
-					KalturaLog::err("Error: moving file failed");
-					die();
+					return $this->closeJob($job, null, null, ' moving file ' . $sharedFile . ' failed ' , KalturaBatchJobStatus::RETRY);
 				}			
 				$data->destFileSyncLocalPath = $this->translateLocalPath2Shared($sharedFile);
 				if(self::$taskConfig->params->isRemoteOutput) // for remote conversion

@@ -108,6 +108,12 @@ class VodPackagerDeliveryUtils
 		{
 			$result .= '/speed/' . $playbackRate;
 		}
+
+		$trackSelection = $params->getTrackSelection();
+		if ($trackSelection)
+		{
+			$result .= '/tracks/' . $trackSelection;
+		}
 	
 		return $result;
 	}

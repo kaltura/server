@@ -5,11 +5,6 @@
  */
 class kIpAddressCondition extends kMatchCondition
 {
-	/* (non-PHPdoc)
-	 * @see kCondition::__construct()
-	 */
-	const PARTNER_INTERNAL = 'partnerInternal';
-
 	const PARTNER_INTERNAL_IP = 'partnerInternalIp';
 
 	public function __construct($not = false)
@@ -71,8 +66,13 @@ class kIpAddressCondition extends kMatchCondition
 					kApiCache::ECFD_IP_HTTP_HEADER => $this->getHttpHeader(),
 					kApiCache::ECFD_IP_ACCEPT_INTERNAL_IPS => $this->getAcceptInternalIps()),
 					kApiCache::COND_IP_RANGE, $this->getStringValues($scope));
-		
-			return infraRequestUtils::getIpFromHttpHeader($this->getHttpHeader(), $this->getAcceptInternalIps(), true);
+
+			$headerIp = infraRequestUtils::getIpFromHttpHeader($this->getHttpHeader(), $this->getAcceptInternalIps(), true);
+			if ($headerIp)
+			{
+				$this->setExtraProperties(self::PARTNER_INTERNAL_IP, $headerIp);
+			}
+			return $headerIp;
 		}
 		
 		kApiCache::addExtraField(kApiCache::ECF_IP, kApiCache::COND_IP_RANGE, $this->getStringValues($scope));
@@ -84,14 +84,7 @@ class kIpAddressCondition extends kMatchCondition
 	 */
 	protected function matches($field, $value)
 	{
-		$res = kIpAddressUtils::isIpInRanges($field, $value);
-		//The assumption is that if we have a HTTP header set and that the IP is in range it comes from an internal IP source.
-		if ($res && $this->getHttpHeader())
-		{
-			$this->setExtraProperties(self::PARTNER_INTERNAL, true);
-			$this->setExtraProperties(self::PARTNER_INTERNAL_IP, $field);
-		}
-		return $res;
+		return kIpAddressUtils::isIpInRanges($field, $value);
 	}
 
 	/**

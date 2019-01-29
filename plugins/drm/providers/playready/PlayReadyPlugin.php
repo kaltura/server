@@ -230,7 +230,7 @@ class PlayReadyPlugin extends BaseDrmPlugin implements IKalturaEnumerator, IKalt
 
     public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
 	{
-		if (self::shouldContributeToPlaybackContext($contextDataHelper->getContextDataResult()->getActions()) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()) )
+		if ($entryPlayingDataParams->getType() == self::BASE_PLUGIN_NAME && self::shouldContributeToPlaybackContext($contextDataHelper->getContextDataResult()->getActions()) && $this->isSupportStreamerTypes($entryPlayingDataParams->getDeliveryProfile()->getStreamerType()) )
 		{
 			$playReadyProfile = DrmProfilePeer::retrieveByProviderAndPartnerID(PlayReadyPlugin::getPlayReadyProviderCoreValue(), kCurrentContext::getCurrentPartnerId());
 			if ($playReadyProfile)

@@ -1765,7 +1765,7 @@ class Partner extends BasePartner
 		$scope->setKs(kCurrentContext::$ks);
 		$scope->setContexts(array(ContextType::PLAY));
 		
-		$disableCache = $accessControl->applyContext($context, $scope);
+		$disableCache = $accessControl->applyContext($context, $scope, false);
 		if ($disableCache)
 			kApiCache::disableCache();
 

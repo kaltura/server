@@ -182,7 +182,7 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 		catch(Exception $ex) 
 		{
 			$this->unimpersonate();
-			KalturaLog::warning("Failed to extract id3tags data or duration data with error: " . print_r($ex));
+			KalturaLog::warning("Failed to extract id3tags data or duration data with error: " . print_r($ex, true));
 		}
 		
 	}

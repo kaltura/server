@@ -5,6 +5,7 @@
  */
 //ini_set("memory_limit","512M");
 
+
 	/********************
 	 * Chunked Encoding module
 	 */
@@ -58,9 +59,29 @@
 				KalturaLog::log($msgStr="ERROR: missing essential - source");
 				return false;
 			}
+
 				// Get source mediaData. Required for 'supported' validation
 			$this->sourceFileDt = $this->getMediaData($params->source);
+			if(!isset($this->sourceFileDt)){
+				KalturaLog::log($msgStr="ERROR: failed on media data retrieval of the source file ($params->source)");
+				return false;
+			}
+			
+				/*
+				 * Setup work folders 
+				 */
+			$pInfo = pathinfo($params->output);
+			$setup->output = realpath($pInfo['dirname'])."/".$pInfo['basename'];
 
+			if(isset($setup->createFolder) && $setup->createFolder==1) {
+				$setup->output.= "_".$this->chunkEncodeToken."/";
+				if(!file_exists($setup->output)) {
+					KalturaLog::log("Create tmp folder:".$setup->output);
+					mkdir($setup->output);
+				}
+				$setup->output.= $pInfo['filename'];
+			}
+			
 				/*
 				 * Evaluate session duration 
 				 */
@@ -123,21 +144,6 @@
 
 			$this->buildTemplateVideoCommandLine();
 
-				/*
-				 * Setup work folders 
-				 */
-			$pInfo = pathinfo($params->output);
-			$setup->output = realpath($pInfo['dirname'])."/".$pInfo['basename'];
-
-			if(isset($setup->createFolder) && $setup->createFolder==1) {
-				$setup->output.= "_".$this->chunkEncodeToken."/";
-				if(!file_exists($setup->output)) {
-					KalturaLog::log("Create tmp folder:".$setup->output);
-					mkdir($setup->output);
-				}
-				$setup->output.= $pInfo['filename'];
-			}
-			
 			KalturaLog::log("data:".print_r($this,1));
 
 				/*
@@ -161,50 +167,32 @@
 				/*
 				 * Generate the pre-planned chunk params (start, frames, ...)
 				 */
-			$start = $this->setup->startFrom;
-//			$this->chunkDataIdx=round($start/$this->setup->chunkDuration);
-			$finish = $this->setup->startFrom+$params->duration;
-			$duration = $this->setup->chunkDuration+$this->calcChunkDrift();
-			$idx = 0;
+			$this->calculateChunkTimings();
+			
+				// Preparations to solve ffmpeg precise positioning anomaly/bug with MPEG files and B-Frames
+				// To be activated in the future
+//			self::fixChunkStartTimingsForBfarmes($params->source, $params->frameDuration, $this->chunkDataArr);
+
 				/*
 				 * Handle Subs(SRT) file splitting, if it is required
 				 */
 			if(isset($this->params->videoFilters->subsFilename)){
 				$subsFileHd = fopen($this->params->videoFilters->subsFilename,'r');
-				$subsArr = array();
-			}
-				/*
-				 * '$finish-$start' condition was added to avoid 'zero' chunks
-				 */
-			while($finish-$start>$params->frameDuration) {
-				$chunkData = new KChunkData($idx, $start, $duration);
-				if($idx>0) {
-					$this->chunkDataArr[$idx-1]->calcGapToNext($chunkData, $params->frameDuration);
+				if(!$subsFileHd)
+				{
+					KalturaLog::log('ERROR: missing caption file ['.$this->params->videoFilters->subsFilename.'] - exiting.');
+					return false;
 				}
-				$this->chunkDataArr[$idx++] = $chunkData;
-		
-					/*
-					 * SRT splitting
-					 */
-				if(isset($subsFileHd)){
+				$subsArr = array();
+				foreach($this->chunkDataArr as $idx=>$chunkData){
+						/*
+						 * SRT splitting
+						 */
 					$chunkSrtFile = $this->getChunkName($chunkData->index,"srt");
 					if(file_exists($chunkSrtFile))
 						unlink($chunkSrtFile);
-					KSrtText::SplitSrtFile($subsFileHd, $chunkSrtFile, $start, $duration, $subsArr);
-					KalturaLog::log("$chunkSrtFile, $start, $duration");
-
-				}
-
-				$start += $this->setup->chunkDuration+$this->calcChunkDrift();
-				$delta = $start-$idx*$this->setup->chunkDuration;
-				$duration = $this->setup->chunkDuration+$this->calcChunkDrift();
-				if($params->frameDuration<$delta) {
-					KalturaLog::log("idx($idx)- remove frame - frameDuration($params->frameDuration), delta($delta)");
-					$start-=($params->frameDuration);
-				}
-				else if($delta<0 && $params->frameDuration>-$delta) {
-					KalturaLog::log("idx($idx)- add frame - frameDuration($params->frameDuration), delta($delta)");
-					$start+=($params->frameDuration);
+					KSrtText::SplitSrtFile($subsFileHd, $chunkSrtFile, $chunkData->start, $chunkData->duration, $subsArr);
+					KalturaLog::log("$chunkSrtFile, $chunkData->start, $chunkData->duration");
 				}
 			}
 			
@@ -436,8 +424,6 @@
 			}
 			$filterGraphBase = $this->params->videoFilters->filterGraph;
 			
-			$toImplode = false;
-
 				/*
 				 * Handle WM fade in's/out's
 				 */
@@ -508,24 +494,32 @@
 			$chunkFilename = $this->getChunkName($chunkIdx,"base");
 			KalturaLog::log("start($start), chunkIdx($chunkIdx), chunkFilename($chunkFilename) :".date("Y-m-d H:i:s"));
 			$setup = $this->setup;
+			$params = $this->params;
 			$chunkWithOverlap = $setup->chunkDuration + $setup->chunkOverlap;
 			
 			{
-				$cmdLine = $this->cmdLine." -t $chunkWithOverlap";
+				$cmdLine = " -i ".$this->cmdLine." -t $chunkWithOverlap";
+				if(isset($params->httpHeaderExtPrefix)){
+					$cmdLine = " -headers \"$params->httpHeaderExtPrefix,chunk($chunkIdx)\"".$cmdLine;
+				}
 					/*
 					 * Timing repositioning should be split into two steps 
-					 * - input step to 'start-5 sec'
-					 * - output step to 5 sec forward
+					 * - input step to 'start-backOffset sec' (default backOffset=5sec)
+					 * - output step to 'backOffset' sec forward
 					 * This is required to overcome some sources that does not reposition correctly. Better solution would be to reposition to the nearest KF, 
 					 * but this will require long source query.
 					 */
-				if($start<5) {
-					$cmdLine = " -ss $start -i ".$cmdLine;
+				$backOffset = 5; 
+				if($start<$backOffset) {
+					$cmdLine = " -ss $start".$cmdLine;
 				}
 				else {
-					$cmdLine = " -ss ".($start-5)." -i ".$cmdLine." -ss 5";
+					$cmdLine = " -ss ".($start-$backOffset).$cmdLine." -ss $backOffset";
 				}
 			
+				if(isset($params->decryption_key))
+					$cmdLine = " -decryption_key $params->decryption_key$cmdLine";
+				
 				$cmdLine = " -threads ".$this->params->threadsDec.$cmdLine;
 				
 				$cmdLine = $this->adjustTimeRelatedFilters($cmdLine, $chunkIdx, $start, $chunkWithOverlap);
@@ -701,6 +695,12 @@
 				$cmdLine.= " $asyncStr";
 			if(isset($setup->startFrom))
 				$cmdLine.= " -ss $setup->startFrom";
+			if(isset($params->decryption_key))
+				$cmdLine.= " -decryption_key $params->decryption_key";
+			if(isset($params->httpHeaderExtPrefix)){
+				$cmdLine.= " -headers \"$params->httpHeaderExtPrefix,audio\"";
+			}
+			
 			$cmdLine.= " -i $params->source";
 			$cmdLine.= " -vn";
 			if(isset($params->acodec)) $cmdLine.= " -c:a ".$params->acodec;
@@ -876,18 +876,169 @@
 			return $name;
 		}
 
+		/********************
+		 *
+		 */
+		protected function calculateChunkTimings_forBframeFixing()
+		{
+			$setup = $this->setup;
+			$params = $this->params;
+
+				/*
+				 * Generate the pre-planned chunk params (start, frames, ...)
+				 */
+			$start = $setup->startFrom;
+			$finish = $setup->startFrom+$params->duration;
+			$frameRate = $params->fps;
+			
+			$framesInChunk =  $setup->chunkDuration*$frameRate;
+			$framesInChunkRemainder = $framesInChunk-(int)(floor($framesInChunk));
+			$frameDuration = $params->frameDuration;
+			$totalChunksNumber = ceil($params->duration/$setup->chunkDuration);
+			KalturaLog::log("framesInChunk:$framesInChunk, framesInChunkRemainder:$framesInChunkRemainder, totalChunksNumber:$totalChunksNumber, frameDur:$frameDuration");
+			$chunkFirstFrame = 0; 
+			$framesTotal = 1;
+			$remainder = 0;
+			
+			for($idx=0; $idx<$totalChunksNumber; $idx++) {
+				$chunkFirstFrame = $framesTotal;
+				$framesCount = (int)(floor($framesInChunk));
+				if($remainder>=1) {
+					$framesCount++;
+					$remainder-=1;
+				}
+				$framesTotal += $framesCount;
+				$chunkStartTime = round($chunkFirstFrame*$frameDuration,6);
+				$chunkLastFrameTime = round(($framesTotal-1)*$frameDuration,6);
+				$chunkDur = round(($framesTotal-$chunkFirstFrame)*$frameDuration,6);
+				KalturaLog::log("idx:$idx, fstFrm:$chunkFirstFrame, frmCnt:$framesCount, fstFrmTm(sec):$chunkStartTime, chkDur:$chunkDur, lstFrmTm(sec):$chunkLastFrameTime, framesTotal:$framesTotal, remainder:$remainder");
+				$remainder = round($remainder+$framesInChunkRemainder,6);
+				$chunkData = new KChunkData($idx, $chunkStartTime, $chunkDur, $framesCount);
+				KalturaLog::log(json_encode($chunkData));
+				$this->chunkDataArr[$idx] = $chunkData;
+			}
+		}
+			
+		/********************
+		 *
+		 */
+		protected static function fixChunkStartTimingsForBfarmes($sourceFilename, $frameDuration, &$chunkDataArr)
+		{
+			foreach($chunkDataArr as $chkIdx=>$chunkData){
+				if($chkIdx==0)
+					continue;
+				$framesStatArr = KChunkFramesStat::getFrameData($sourceFilename, $chunkData->start-1, 1);
+				if(!isset($framesStatArr))
+					continue;
+				
+				$iFrame = new stdClass(); $iFrame->index = $iFrame->delta = null;
+				$pFrame = clone $iFrame;
+				$bFrame = clone $iFrame;
+				
+				foreach($framesStatArr as $fIdx=>$frameStat){
+					switch($frameStat->type){
+					case 'I':
+						if(!isset($iFrame->index) || (abs($chunkData->start-$frameStat->start)<abs($iFrame->delta))){
+							$iFrame->delta = $chunkData->start-$frameStat->start;
+							$iFrame->index = $fIdx;
+						}
+						break;
+					case 'P':
+						if(!isset($pFrame->index) || (abs($chunkData->start-$frameStat->start)<abs($pFrame->delta))){
+							$pFrame->delta = $chunkData->start-$frameStat->start;
+							$pFrame->index = $fIdx;
+						}
+						break;
+					case 'B':
+						if(!isset($bFrame->index) || (abs($chunkData->start-$frameStat->start)<abs($bFrame->delta))){
+							$bFrame->delta = $chunkData->start-$frameStat->start;
+							$bFrame->index = $fIdx;
+						}
+						break;
+					}
+						// Stop the scan through the frameStat array when it passes over the 
+						// alleged chunk start position
+					if($iFrame->delta<0 && $pFrame->delta<0 && $bFrame->delta<0)
+						break;
+				}
+				
+				if(abs($bFrame->delta)<abs($iFrame->delta) && abs($bFrame->delta)<abs($pFrame->delta)){
+					if(abs($pFrame->delta)<abs($iFrame->delta))
+						$fixFrmSt = $framesStatArr[$pFrame->index];
+					else
+						$fixFrmSt = $framesStatArr[$iFrame->index];
+					$gap = $fixFrmSt->start-$chunkData->start;
+					$framesInGap = $gap/$frameDuration;
+					KalturaLog::log("BINGO - chunkStart:$chunkData->start, fixStart:$fixFrmSt->start(".round($gap,6)."),".json_encode($fixFrmSt));
+					if(abs($gap>0)) {
+						$chunkData = $chunkDataArr[$chkIdx-1];
+						$chunkData->duration+= $gap;
+						$chunkData->frames += round($framesInGap);
+						$chunkData->start+= $gap;
+						$chunkDataArr[$chkIdx-1] = $chunkData;
+						$chunkData = $chunkDataArr[$chkIdx];
+						$chunkData->duration-= $gap;
+						$chunkData->frames -= round($framesInGap);
+						$chunkDataArr[$chkIdx] = $chunkData;
+						KalturaLog::log(json_encode($chunkDataArr[$chkIdx]));
+					}
+//					$chunkDataArr[$chkIdx] = $chunkData;
+				}
+			}
+			return;
+		}
+
+		/********************
+		 *
+		 */
+		protected function calculateChunkTimings()
+		{
+			$setup = $this->setup;
+			$params = $this->params;
+
+				/*
+				 * Generate the pre-planned chunk params (start, frames, ...)
+				 */
+			$start = $setup->startFrom;
+//			$this->chunkDataIdx=round($start/$this->setup->chunkDuration);
+			$finish = $setup->startFrom+$params->duration;
+			$duration = $setup->chunkDuration+$this->calcChunkDrift();
+			$idx = 0;
+			while($finish-$start>$params->frameDuration) {
+				$chunkData = new KChunkData($idx, $start, $duration);
+				if($idx>0) {
+					$this->chunkDataArr[$idx-1]->calcGapToNext($chunkData, $params->frameDuration);
+				}
+				$this->chunkDataArr[$idx++] = $chunkData;
+		
+				$start += $setup->chunkDuration+$this->calcChunkDrift();
+				$delta = $start-$idx*$setup->chunkDuration;
+				$duration = $setup->chunkDuration+$this->calcChunkDrift();
+				if($params->frameDuration<$delta) {
+					KalturaLog::log("idx($idx)- remove frame - frameDuration($params->frameDuration), delta($delta)");
+					$start-=($params->frameDuration);
+				}
+				else if($delta<0 && $params->frameDuration>-$delta) {
+					KalturaLog::log("idx($idx)- add frame - frameDuration($params->frameDuration), delta($delta)");
+					$start+=($params->frameDuration);
+				}
+			}
+		}
 
 		/********************
 		 *
 		 */
 		protected static function getMediaData($fileName)
 		{
-			if(!file_exists($fileName))
+			try {
+				$medPrsr = new KFFMpegMediaParser($fileName);//new KMediaInfoMediaParser($fileName);
+				$m=$medPrsr->getMediaInfo();
+				return $m;
+			}
+			catch(Exception $ex){
+				KalturaLog::log($ex->getMessage()."... Leaving");
 				return null;
-				// mediaInfo does not function correctly on some LOOONG sources
-			$medPrsr = new KFFMpegMediaParser($fileName);//new KMediaInfoMediaParser($fileName);
-			$m=$medPrsr->getMediaInfo();
-			return $m;
+			}
 		}
 
 		/********************
@@ -996,6 +1147,7 @@
 									// If not set -
 		public $threads = null; 	// 	The encoding threads set to 4
 		public $threadsDec = null;	//	The decoding threads - for SD:7, >SD:5
+		public $decryption_key = null;
 		
 		public $passes = null;
 
@@ -1007,6 +1159,9 @@
 		public $frameDuration = null;
 
 		public $cmdLineArr = array();
+		
+		public $session = null;
+		public $httpHeaderExtPrefix = null;
 		
 		/********************
 		 *
@@ -1040,13 +1195,21 @@
 			array_pop($cmdLineArr);
 			array_shift($cmdLineArr);
 			$this->cmdLineArr = $cmdLineArr;
+			
+			$this->session = basename($this->output);
+			
+				// In case of remote source, set http-header-ext to improve access logging
+			$urlArr = parse_url ($this->source);
+			if($urlArr!==false && key_exists('host',$urlArr)) {
+				$this->httpHeaderExtPrefix = "User-Agent: Kaltura Chunked Encoding,session($this->session)";
+			}
 			return 0;
 		}
 		
 		/********************
 		 *
 		 */
-		protected function parseEncodingSettings($cmdLineArr) 
+		protected function parseEncodingSettings(&$cmdLineArr) 
 		{
 			foreach($cmdLineArr as $idx=>$val){
 				switch($val){
@@ -1111,7 +1274,12 @@
 					$arr[$idx] = $cmdLineArr[$idx+1];
 					$this->$val = $arr;
 					break;
-					
+				case "-decryption_key":
+					$val = ltrim($val,'-');
+					$this->$val = $cmdLineArr[$idx+1];
+					unset($cmdLineArr[$idx+1]);
+					unset($cmdLineArr[$idx]);
+					break;
 				case "-ar":
 				case "-ac":
 				case "-subq":
@@ -1237,7 +1405,7 @@
 			}
 			$filterStr = "'".implode(';',$filterArrOut)."'";
 			return $filterStr;
-		}		
+		}
 	}
 	
 	/********************
@@ -1250,17 +1418,17 @@
 		public $frames = 0;		// Frame count
 		public $gap = 0;		// Gap to next chunk
 		
-		public $toFix = null;	// If set - the chunk must be fixed by increasing/decreasing the chunks frame cunt to 'toFix' number
+		public $toFix = null;	// If set - the chunk must be fixed by increasing/decreasing the chunks frame count to 'toFix' number
 		
 		public $stat = null;	// Frames stat data
 		
 		/********************
 		 * 
 		 */
-		public function __construct($index=null, $start=null, $finish=null, $frames=null, $gap=null) {
+		public function __construct($index=null, $start=null, $duration=null, $frames=null, $gap=null) {
 			$this->index = $index;
 			$this->start = $start;
-			$this->duration = $finish;
+			$this->duration = $duration;
 			$this->frames = $frames;
 			$this->gap = $gap;
 		}

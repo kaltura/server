@@ -4,10 +4,8 @@
  * @subpackage model.search
  */
 
-class kCategorySearch extends kBaseSearch
+class kCategorySearch extends kBaseESearch
 {
-    const PEER_NAME = 'categoryPeer';
-    const PEER_RETRIEVE_FUNCTION_NAME = 'retrieveByPKsNoFilter';
 
     public function __construct()
     {
@@ -45,18 +43,14 @@ class kCategorySearch extends kBaseSearch
 		}
 	}
 
-    function getPeerName()
-    {
-        return self::PEER_NAME;
-    }
-
-    public function getPeerRetrieveFunctionName()
-    {
-        return self::PEER_RETRIEVE_FUNCTION_NAME;
-    }
-
     public function getElasticTypeName()
     {
         return ElasticIndexMap::ELASTIC_CATEGORY_TYPE;
     }
+
+    public function fetchCoreObjectsByIds($ids)
+    {
+        return categoryPeer::retrieveByPKsNoFilter($ids);
+    }
+
 }

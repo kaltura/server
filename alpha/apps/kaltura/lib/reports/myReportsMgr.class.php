@@ -45,7 +45,17 @@ class myReportsMgr
 	const REPORT_TYPE_ENTRY_USAGE = 27;
 	const REPORT_TYPE_REACH_USAGE = 28;
 	const REPORT_TYPE_TOP_CUSTOM_VAR1 = 29;
-	const REPORT_TYPE_CITIES = 30;
+	const REPORT_TYPE_MAP_OVERLAY_CITY = 30;
+	const REPORT_TYPE_OPERATING_SYSTEMS_FAMILIES = 32;
+	const REPORT_TYPE_BROWSERS_FAMILIES = 33;
+	const REPORT_TYPE_USER_ENGAGEMENT_TIMELINE = 34;
+	const REPORT_TYPE_UNIQUE_USERS_PLAY = 35;
+	const REPORT_TYPE_MAP_OVERLAY_COUNTRY = 36;
+	const REPORT_TYPE_MAP_OVERLAY_REGION = 37;
+	const REPORT_TYPE_TOP_CONTENT_CREATOR = 38;
+	const REPORT_TYPE_TOP_CONTENT_CONTRIBUTORS = 39;
+	const REPORT_TYPE_APP_DOMAIN_UNIQUE_ACTIVE_USERS = 40;
+	const REPORT_TYPE_TOP_SOURCES = 41;
 
 	const REPORTS_TABLE_MAX_QUERY_SIZE = 20000;
 	const REPORTS_CSV_MAX_QUERY_SIZE = 130000;
@@ -688,7 +698,6 @@ class myReportsMgr
 		$start = microtime(true);
 		try
 		{
-			$link = self::getConnection();
 			$add_search_text = false;
 			
                         $str_object_ids = $object_ids;
@@ -730,6 +739,8 @@ class myReportsMgr
 				throw new kCoreException("Cannot find sql for [$report_type] [$report_flavor] at [$file_path]", kCoreException::QUERY_NOT_FOUND);
 			}
 			
+			$link = self::getConnection();
+
 			$entryFilter = new entryFilter();
 			$entryFilter->setPartnerSearchScope($partner_id);
 			$shouldSelectFromSearchEngine = false;
@@ -1509,8 +1520,15 @@ class reportsInputFilter
 	public $timeZoneOffset;
 	public $interval;
 	public $countries;
+	public $playback_types;
+	public $server_node_ids;
 	public $regions;
 	public $devices;
+	public $os_families;
+	public $browsers_families;
+	public $cities;
+	public $media_types;
+	public $source_types;
 
 	public function getFilterBy() {
 		return "";

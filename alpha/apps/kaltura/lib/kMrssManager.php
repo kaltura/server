@@ -458,7 +458,7 @@ class kMrssManager
 		$mrss->addChild('status', self::stringToSafeXml($entry->getStatus()));
 		$mrss->addChild('description', self::stringToSafeXml($entry->getDescription()));
 		$thumbnailUrl = $mrss->addChild('thumbnailUrl');
-		$thumbnailUrl->addAttribute('url', $entry->getThumbnailUrl());
+		$thumbnailUrl->addAttribute('url', $entry->getThumbnailUrl($entry->getThumbnailVersion()));
 		if(trim($entry->getTags(), " \r\n\t"))
 		{
 			$tags = $mrss->addChild('tags');
@@ -467,7 +467,7 @@ class kMrssManager
 		}
 			
 		$categories = explode(',', $entry->getCategories());
-		if (count($features) && in_array (ObjectFeatureType::CATEGORY_ENTRIES, $features))
+		if ($features && count($features) && in_array (ObjectFeatureType::CATEGORY_ENTRIES, $features))
 		{
 			$partner = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId());
 			$partnerEntitlement = $partner->getDefaultEntitlementEnforcement();

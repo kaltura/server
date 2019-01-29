@@ -101,10 +101,6 @@ class kEdgeCastFlowManager implements kObjectDeletedEventConsumer
             
             $serveFlavorUrl = "$partnerPath/serveFlavor/entryId/".$asset->getEntryId()."/flavorId/$assetId".'*'; // * wildcard should delete all serveFlavor urls
             
-            $types = array(
-            		kPluginableEnumsManager::apiToCore(EdgeCastDeliveryProfileType::EDGE_CAST_HTTP),
-            		kPluginableEnumsManager::apiToCore(EdgeCastDeliveryProfileType::EDGE_CAST_RTMP));
-            
             $deliveryProfile = $partner->getDeliveryProfileIds();
             $deliveryProfileIds = array();
             foreach($deliveryProfile as $key=>$value) {

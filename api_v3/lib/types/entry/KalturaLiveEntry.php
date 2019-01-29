@@ -208,15 +208,9 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 			$this->recordingOptions->fromObject($dbObject->getRecordingOptions());
 		}
 
-		if ($dbObject->getExplicitLive())
+		if ($dbObject->isPlayable())
 		{
-			if ($dbObject->getViewMode() == ViewMode::ALLOW_ALL && in_array($dbObject->getLiveStatus(), array(KalturaEntryServerNodeStatus::PLAYABLE, KalturaEntryServerNodeStatus::BROADCASTING)))
-			{
-				$this->redirectEntryId = null;
-			} else
-			{
-				$this->redirectEntryId = $this->recordedEntryId;
-			}
+			kApiCache::setExpiry( kApiCache::REDIRECT_ENTRY_CACHE_EXPIRY );
 		}
 	}
 

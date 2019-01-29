@@ -41,7 +41,14 @@ class VendorCaptionsCatalogItem extends VendorCatalogItem
 	
 	public function getFixedPriceAddons()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_FIXED_PRICE_ADDONS);
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIXED_PRICE_ADDONS, null, 0);
+	}
+	
+	public function calculatePriceForEntry(entry $entry)
+	{
+		$taskPrice = parent::calculatePriceForEntry($entry);
+		$taskPrice += $this->getFixedPriceAddons();
+		return $taskPrice;
 	}
 
 } // VendorCaptionsCatalogItem

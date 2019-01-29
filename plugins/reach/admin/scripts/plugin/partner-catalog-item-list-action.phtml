@@ -2,6 +2,9 @@
 <p><?php echo $this->translate('Here you can configure your Catalog items'); ?></p>
 <?php echo $this->filterForm; ?>
 <?php echo $this->newPartnerCatalogItemFolderForm; ?>
+<p><?php echo $this->translate("Here you can clone all partner's catalog items"); ?></p>
+<?php echo $this->clonePartnerCatalogItemsForm; ?>
+
 <div id="partner-catalog_item_list_div" class="clear">
 	<td><input type="checkbox" name="selectAllCatalogItemsOnPageCheckbox" onchange="flipAllCheckboxItemsOnPage()" id="selectAllCatalogItemsInPage" align="left" />Select All Items On Page</td>
 	<button type="button" onclick="bulkDeleteAction(<?php echo $this->filterForm->getElement('filter_input')->getValue(); ?>)">Bulk Delete</button>
@@ -47,9 +50,10 @@
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $catalogItem->turnAroundTime); ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->sourceLanguage); ?></td>
 				<td><?php if (isset($catalogItem->targetLanguage))
-										echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->targetLanguage);
-						  else
-										echo null;?></td>
+				    echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->targetLanguage);
+				else
+				    echo null;?>
+				</td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat', $catalogItem->outputFormat); ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $catalogItem->id;?>, <?php echo $this->filterForm->getElement('filter_input')->getValue(); ?>)">
@@ -262,11 +266,68 @@
 		if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS; ?>) {
 			jQuery('#filterSourceLanguage').removeAttr('hidden');
 		}
+
+        if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT; ?>) {
+            jQuery('#filterSourceLanguage').removeAttr('hidden');
+        }
 		
 		if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION; ?>) {
 			jQuery('#filterSourceLanguage').removeAttr('hidden');
 			jQuery('#filterTargetLanguage').removeAttr('hidden');
 		}
 	}
-	
+
+	function clonePartnerCatalogItems(fromPartnerId, toPartnerId)
+	{
+		if(!fromPartnerId.length || isNaN(fromPartnerId)){
+			alert('<?php echo $this->translate('From Publisher ID not supplied'); ?>');
+			return;
+		}
+
+		if(!toPartnerId.length || isNaN(toPartnerId)){
+			alert('<?php echo $this->translate('To Publisher ID not supplied'); ?>');
+			return;
+		}
+		var msg = 'Are you sure you want to clone Partner Catalog Items from partner ' + fromPartnerId + ' to partner ' + toPartnerId +'?';
+		var ok = confirm("<?php echo $this->translate('" + msg + "');?>");
+		if (ok)
+		{
+			cloneItems(
+				fromPartnerId,
+				toPartnerId,
+				function(){
+					alert('<?php echo $this->translate('Partner Catalog Items cloned');?>');
+				}
+			);
+		}
+	}
+
+	function cloneItems(fromPartnerId, toPartnerId, callback)
+	{
+		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemsCloneAction', 'fromPartnerId' => 'FROMPARTNERID','toPartnerId' => 'TOPARTNERID')); ?>';
+		url = url.replace('FROMPARTNERID', fromPartnerId);
+		url = url.replace('TOPARTNERID', toPartnerId);
+		jQuery.ajax({
+			url: url,
+			dataType: 'json',
+			success: function(result) {
+				if (result != 'ok')
+				{
+					alert(JSON.stringify(result));
+				}
+				else
+				{
+					if (callback && (typeof callback == 'function'))
+					{
+						callback.apply(this);
+					}
+				}
+				jQuery('#frmPaginator1').submit();
+			},
+			error: function(result) {
+				alert(JSON.stringify(result));
+			}
+		});
+	}
+
 </script>

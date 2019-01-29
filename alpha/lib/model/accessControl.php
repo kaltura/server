@@ -191,8 +191,20 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			// get the ip the tree was optimized for
 			$header = $ipTree[self::IP_TREE_HEADER];
 			$acceptInternalIps = $ipTree[self::IP_TREE_ACCEPT_INTERNAL_IPS];
-			$ip = $header ? infraRequestUtils::getIpFromHttpHeader($header, $acceptInternalIps, true) : infraRequestUtils::getRemoteAddress();
-		
+			$ip = null;
+			if ($header)
+			{
+				$ip = infraRequestUtils::getIpFromHttpHeader($header, $acceptInternalIps, true);
+				if ($ip)
+				{
+					$this->getScope()->setOutputVar(kIpAddressCondition::PARTNER_INTERNAL_IP, $ip);
+				}
+			}
+			else
+			{
+				$ip = infraRequestUtils::getRemoteAddress();
+			}
+
 			// find relevant rules and add the rules the tree didn't optimize
 			$values = kIpAddressUtils::traverseIpTree($ip, $ipTree[self::IP_TREE_TREE]);
 				
@@ -211,12 +223,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 					$filteredRules[$rule][] = $cond;
 				}
 			}
-			if (count($filteredRules) && $header)
-			{
-				$this->getScope()->setOutputVar(kIpAddressCondition::PARTNER_INTERNAL, true);
-				$this->getScope()->setOutputVar(kIpAddressCondition::PARTNER_INTERNAL_IP, $ip);
-			}
-		
+
 			// use + and not array_merge because the arrays have numerical indexes
 			$filteredRules += $ipTree[self::IP_TREE_UNFILTERED];
 			ksort($filteredRules);
@@ -253,7 +260,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 	 * @param accessControlScope $scope
 	 * @return boolean disable cache or not
 	 */
-	public function applyContext(kEntryContextDataResult &$context, accessControlScope $scope = null)
+	public function applyContext(kEntryContextDataResult &$context, accessControlScope $scope = null, $checkForceAdminValidation = true)
 	{
 		if($scope)
 			$this->setScope($scope);
@@ -272,7 +279,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		$fulfilledRules = array();
 		foreach($rules as $ruleNum => $rule)
 		{
-			if($isKsAdmin && !$rule->getForceAdminValidation())
+			if($checkForceAdminValidation && $isKsAdmin && !$rule->getForceAdminValidation())
 				continue;
 
 			$fulfilled = $rule->applyContext($context);

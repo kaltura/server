@@ -202,13 +202,13 @@ class AttachmentAssetService extends KalturaAssetService
 			}												
 			throw $e;
 		}
-
-		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-		list($width, $height, $type, $attr) = getimagesize($finalPath);
+		
+		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey, false);
+		list($width, $height, $type, $attr) = kImageUtils::getImageSize($fileSync);
 		
 		$attachmentAsset->setWidth($width);
 		$attachmentAsset->setHeight($height);
-		$attachmentAsset->setSize(kFile::fileSize($finalPath));
+		$attachmentAsset->setSize($fileSync->getFileSize());
 		
 		$attachmentAsset->setStatus(AttachmentAsset::ASSET_STATUS_READY);
 		$attachmentAsset->save();
@@ -269,13 +269,13 @@ class AttachmentAssetService extends KalturaAssetService
 		
         $newSyncKey = $attachmentAsset->getSyncKey(AttachmentAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
         kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
-                
-		$finalPath = kFileSyncUtils::getLocalFilePathForKey($newSyncKey);
-		list($width, $height, $type, $attr) = getimagesize($finalPath);
+		
+		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($newSyncKey, false);
+		list($width, $height, $type, $attr) = kImageUtils::getImageSize($fileSync);
 		
 		$attachmentAsset->setWidth($width);
 		$attachmentAsset->setHeight($height);
-		$attachmentAsset->setSize(kFile::fileSize($finalPath));
+		$attachmentAsset->setSize($fileSync->getFileSize());
 		
 		$attachmentAsset->setStatus(AttachmentAsset::ASSET_STATUS_READY);
 		$attachmentAsset->save();

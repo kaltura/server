@@ -492,7 +492,7 @@ class MetadataProfileService extends KalturaBaseService
 	}
 
 	/**
-	 * Update an existing metadata object xslt file
+	 * Update an existing metadata object XSLT file
 	 *
 	 * @action updateTransformationFromFile
 	 * @param int $id

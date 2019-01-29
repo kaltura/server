@@ -6,6 +6,7 @@ class myEntryUtils
 	const TEMP_FILE_POSTFIX = "temp_1.jpg";
 	const MP4_FILENAME_PARAMETER = "/name/a.mp4";
 	const DEFAULT_THUMB_SEC_LIVE = 1;
+	const ENTRY_ID_REGEX = "/\d_[A-Za-z0-9]{8}/";
 
 	static private $liveSourceType = array
 	(
@@ -695,7 +696,8 @@ class myEntryUtils
 	
 	
 	public static function resizeEntryImage( entry $entry, $version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
-		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null, $fileSync = null)
+		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null, $fileSync = null,
+		$start_sec = -1, $end_sec = -1)
 	{
 		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
 			$thumbParams = new kThumbnailParameters();
@@ -711,7 +713,16 @@ class myEntryUtils
 			if ($dc != kDataCenterMgr::getCurrentDcId ())
 				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( $dc ) );
 		}
-		$entryLengthInMsec = $servingVODfromLive ? $entry->getRecordedLengthInMsecs() : $entry->getLengthInMsecs();
+		$isStaticPlaylist = ($entry->getType() == entryType::PLAYLIST && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT);
+		if ($isStaticPlaylist)
+		{
+			list($entryIds, $durations, $mediaEntry, $captionFiles) = myPlaylistUtils::executeStitchedPlaylist($entry);
+			$entryLengthInMsec = array_sum($durations);
+		}
+		else
+		{
+			$entryLengthInMsec = $servingVODfromLive ? $entry->getRecordedLengthInMsecs() : $entry->getLengthInMsecs();
+		}
 		 
 		$thumbName = $entry->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
 		if ($servingVODfromLive && $vid_slices > 0)
@@ -723,6 +734,11 @@ class myEntryUtils
 			$thumbName.= "_dns_{$density}";
 		if($stripProfiles)
 			$thumbName .= "_stp_{$stripProfiles}";
+
+		if($start_sec != -1)
+			$thumbName .= "_ssec_{$start_sec}";
+		if($end_sec != -1)
+			$thumbName .= "_esec_{$end_sec}";
 				
 		$entryThumbFilename = $entry->getThumbnail();
 		if(!$entryThumbFilename)
@@ -806,6 +822,15 @@ class myEntryUtils
 		if ($servingVODfromLive)
 			$orig_image_path = null;
 
+		if(($end_sec != -1 && (($end_sec * 1000) > $entryLengthInMsec)) || ($start_sec != -1 && $end_sec == -1))
+		{
+			$end_sec = $entryLengthInMsec / 1000;
+		}
+		if($start_sec == -1 && $end_sec != -1)
+		{
+			$start_sec = 0;
+		}
+
 		while($count--)
 		{
 			$thumbCaptureByPackager = false;
@@ -827,7 +852,14 @@ class myEntryUtils
 				}
 				else if ($vid_slices != -1) // need to create a thumbnail at a specific slice
 				{
-					$calc_vid_sec = floor($entryLengthInMsec / $vid_slices * min($vid_slice, $vid_slices) / 1000);
+					if($start_sec != -1 && $end_sec != -1)
+					{
+						$calc_vid_sec = $start_sec + (($end_sec - $start_sec) / $vid_slices) * min($vid_slice, $vid_slices);
+					}
+					else
+					{
+						$calc_vid_sec = floor($entryLengthInMsec / $vid_slices * min($vid_slice, $vid_slices) / 1000);
+					}
 				}
 				else if ($entry->getStatus() != entryStatus::READY && $entry->getLengthInMsecs() == 0) // when entry is not ready and we don't know its duration
 				{
@@ -848,13 +880,13 @@ class myEntryUtils
 				{
 					// creating the thumbnail is a very heavy operation
 					// prevent calling it in parallel for the same thumbnail for 5 minutes
-					
+
 					$cacheLockKeyProcessing = "thumb-processing".$orig_image_path;
 					if ($cache && !$cache->add($cacheLockKeyProcessing, true, 5 * 60))
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
 					$success = false;
-					if(($multi || $servingVODfromLive) && $packagerRetries)
+					if(($multi || $servingVODfromLive || $isStaticPlaylist) && $packagerRetries)
 					{
 						list($picWidth, $picHeight) = $shouldResizeByPackager ? array($width, $height) : array(null, null);
 						$destPath = $shouldResizeByPackager ? $capturedThumbPath . uniqid() : $capturedThumbPath;
@@ -939,7 +971,8 @@ class myEntryUtils
 			
 			if ($multi)
 			{
-				list($w, $h, $type, $attr, $srcIm) = myFileConverter::createImageByFile($processingThumbPath);
+				//please notice the 3rd parameter - image type, is ignored. 
+				list($w, $h, , $attr, $srcIm) = myFileConverter::createImageByFile($processingThumbPath);
 				if (!$im)
 					$im = imagecreatetruecolor($w * $vid_slices, $h);
 					
@@ -1093,7 +1126,15 @@ class myEntryUtils
 
 		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
 		$url .= ($entryVersion ? "/v/$entryVersion" : '');
-		$url .= '/flavorId/' . $flavorAsset->getId().self::MP4_FILENAME_PARAMETER;
+		if($entry->getType() == entryType::PLAYLIST)
+		{
+			$url .= "/flavorParamIds/" . $flavorAsset->getFlavorParamsId();
+		}
+		else
+		{
+			$url .= '/flavorId/' . $flavorAsset->getId();
+		}
+		$url .= self::MP4_FILENAME_PARAMETER;
 		return $url;
 	}
 
@@ -2251,7 +2292,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		{
 			if ($entry instanceof $type)
 			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, $type);
+				KalturaLog::debug("Entry type [$type] is not allowed");
+				//throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, $type);
 			}
 		}
 	}

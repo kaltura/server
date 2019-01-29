@@ -67,4 +67,49 @@ class BeaconService extends KalturaBaseService
 		
 		return $filter->enhanceSearch($pager);
 	}
+
+	/**
+	 * @action searchScheduledResource
+	 * @param KalturaBeaconSearchParams $searchParams
+	 * @param KalturaPager $pager
+	 * @return KalturaBeaconListResponse
+	 * @throws KalturaAPIException
+	 */
+
+	public function searchScheduledResourceAction(KalturaBeaconSearchParams $searchParams, KalturaPager $pager = null)
+	{
+		$scheduledResourceSearch = new kScheduledResourceSearch();
+		$searchMgr = new kBeaconSearchQueryManger();
+		$elasticResponse = $this->initAndSearch($scheduledResourceSearch, $searchParams, $pager);
+		$totalCount = $searchMgr->getTotalCount($elasticResponse);
+		$responseArray = $searchMgr->getHitsFromElasticResponse($elasticResponse);
+		$response = new KalturaBeaconListResponse();
+		$response->objects = KalturaBeaconArray::fromDbArray($responseArray);
+		$response->totalCount = $totalCount;
+		return $response;
+	}
+
+	/**
+	 * @param kBaseSearch $coreSearchObject
+	 * @param $searchParams
+	 * @param $pager
+	 * @return array
+	 */
+	private function initAndSearch($coreSearchObject, $searchParams, $pager)
+	{
+		try
+		{
+			list($coreSearchOperator, $objectStatusesArr, $objectId, $kPager, $coreOrder) =
+				elasticSearchUtils::initSearchActionParams($searchParams, $pager);
+			$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $objectStatusesArr, $objectId, $kPager,
+				$coreOrder);
+		}
+		catch (kESearchException $e)
+		{
+			elasticSearchUtils::handleSearchException($e);
+		}
+
+		return $elasticResults;
+	}
+
 }

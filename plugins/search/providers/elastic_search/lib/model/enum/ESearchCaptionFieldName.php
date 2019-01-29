@@ -10,4 +10,5 @@ interface ESearchCaptionFieldName extends BaseEnum
     const END_TIME = 'caption_assets.end_time';
     const LANGUAGE = 'caption_assets.language';
     const LABEL = 'caption_assets.label';
+    const CAPTION_ASSET_ID = 'caption_assets.caption_asset_id';
 }

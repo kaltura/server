@@ -304,4 +304,9 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	{
 		return array("scheduleEvent:id".strtolower($this->getId()));
 	}
+
+	public function getBlackoutConflicts()
+	{
+		return array();
+	}
 } // ScheduleEvent

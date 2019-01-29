@@ -124,6 +124,12 @@ class Form_ReachProfileConfigure extends ConfigureForm
 			'filters' => array('StringTrim'),
 			'placement' => 'prepend',
 		));
+		
+		$this->addElement('text', 'flavorParamsIds', array(
+			'label' => 'Flavor Params Idss:',
+			'filters' => array('StringTrim'),
+			'placement' => 'prepend',
+		));
 
 		$this->addRulesSection();
 		$this->addRulesTemplate();

@@ -1,7 +1,7 @@
 <?php
 /**
  * Playlist service lets you create,manage and play your playlists
- * Playlists could be static (containing a fixed list of entries) or dynamic (baseed on a filter)
+ * Playlists could be static (containing a fixed list of entries) or dynamic (based on a filter)
  *
  * @service playlist
  *
@@ -117,7 +117,7 @@ class PlaylistService extends KalturaEntryService
 		
 	/**
 	 * Update existing playlist
-	 * Note - you cannot change playlist type. updated playlist must be of the same type.
+	 * Note - you cannot change playlist type. Updated playlist must be of the same type.
 	 *
 	 * @action update
 	 * @param string $id
@@ -383,7 +383,7 @@ class PlaylistService extends KalturaEntryService
 	}
 	
 	/**
-	 * Revrieve playlist for playing purpose, based on media entry filters
+	 * Retrieve playlist for playing purpose, based on media entry filters
 	 * @disableTags TAG_WIDGET_SESSION
 	 * @action executeFromFilters
 	 * @param KalturaMediaEntryFilterForPlaylistArray $filters
