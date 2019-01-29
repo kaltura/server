@@ -56,7 +56,11 @@ class ConfigurationMapListAction extends KalturaApplicationPlugin implements IKa
 		$configurationMapFilterForm->populate($request->getParams());
 		$configurationMapFilterFormAction = $action->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')), null, true);
 		$configurationMapFilterForm->setAction($configurationMapFilterFormAction);
-
+		$mapNames = $configurationPluginClient->confMaps->getMapNames();
+		$mapNamesValues = array();
+		foreach ($mapNames as $mapName)
+			$mapNamesValues["$mapName->value"] = $mapName->value;
+		$configurationMapFilterForm->getElement("filter_input")->setAttrib('options', $mapNamesValues);
 		$action->view->filterForm = $configurationMapFilterForm;
 		$action->view->paginator = $paginator;
 

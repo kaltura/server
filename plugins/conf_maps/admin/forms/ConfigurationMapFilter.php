@@ -15,6 +15,16 @@ class Form_ConfigurationMapFilter extends Form_PartnerIdFilter
 			'ConfigurationMapNameEqual' => 'Map Name'
 		));
 
+		$this->removeElement("filter_input");
+		$this->addElement('select', 'filter_input', array(
+			'required'	=> true,
+			'filters'	=> array('StringTrim'),
+			'decorators'	=> array(
+				'ViewHelper',
+				array('HtmlTag', array('tag' => 'div', 'id' => 'filter_text')),
+			)
+		));
+
 		// filter by vendor partner id
 		$this->addElement('text', 'filterHostName', array(
 			'label' => 'Host Name',

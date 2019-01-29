@@ -48,4 +48,18 @@ class ConfMapsPeer extends BaseConfMapsPeer {
 		$c->add(self::STATUS ,ConfMapsStatus::STATUS_ENABLED );
 		return self::doInsert($c);
 	}
+
+	public static function retrieveMapsNames()
+	{
+		$mapNames= array();
+		$c = new Criteria();
+		$c->addGroupByColumn(self::MAP_NAME);
+		$maps  = self::doSelect($c);
+		foreach ($maps as $map)
+		{
+			$mapNames[] = $map->getMapName();
+		}
+
+		return $mapNames;
+	}
 } // ConfMapsPeer
