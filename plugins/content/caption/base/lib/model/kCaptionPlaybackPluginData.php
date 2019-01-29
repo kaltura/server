@@ -28,11 +28,17 @@ class kCaptionPlaybackPluginData {
 	protected $webVttUrl;
 
 	/**
+	 * @var string
+	 */
+	protected $languageCode;
+
+
+	/**
 	 * @var bool
 	 */
 	protected $isDefault;
 
-	public function __construct($label = null, $format  = null, $language = null , $isDefault = false, $webVttUrl = null, $url = null)
+	public function __construct($label = null, $format  = null, $language = null , $isDefault = false, $webVttUrl = null, $url = null , $languageCode = null)
 	{
 		$this->label = $label;
 		$this->format = $format;
@@ -40,6 +46,7 @@ class kCaptionPlaybackPluginData {
 		$this->isDefault = $isDefault;
 		$this->webVttUrl = $webVttUrl;
 		$this->url = $url;
+		$this->languageCode = $languageCode;
 	}
 
 	/**
@@ -138,4 +145,19 @@ class kCaptionPlaybackPluginData {
 		$this->isDefault = $isDefault;
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getLanguageCode()
+	{
+		return $this->languageCode;
+	}
+
+	/**
+	 * @param string
+	 */
+	public function setLanguageCode($languageCode)
+	{
+		$this->languageCode = $languageCode;
+	}
 }

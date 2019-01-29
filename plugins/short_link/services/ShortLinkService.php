@@ -113,7 +113,7 @@ class ShortLinkService extends KalturaBaseService
 
 
 	/**
-	 * Update exisitng short link
+	 * Update existing short link
 	 * 
 	 * @action update
 	 * @param string $id
