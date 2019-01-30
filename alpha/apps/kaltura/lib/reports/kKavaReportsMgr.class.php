@@ -173,6 +173,7 @@ class kKavaReportsMgr extends kKavaBase
 	const MAX_CSV_RESULT_SIZE = 60000;
 	const MAX_CUSTOM_REPORT_RESULT_SIZE = 100000;
 	const MIN_THRESHOLD = 500;
+	const MAX_ESEARCH_RESULTS = 1000;
 	
 	const ENRICH_CHUNK_SIZE = 10000;
 	const ENRICH_DIM_DELIMITER = '|';
@@ -2473,6 +2474,35 @@ class kKavaReportsMgr extends kKavaBase
 			else
 			{
 				$entry_ids_from_db = array_merge($object_ids_arr, $entry_ids_from_db);
+			}
+		}
+
+		if ($input_filter->entry_operator)
+		{
+			$core_operator = $input_filter->entry_operator->toObject();
+			$entry_search = new kEntrySearch();
+			$entry_search->setFilterOnlyContext();
+			$entry_search->setOverrideSize(self::MAX_ESEARCH_RESULTS);
+			try
+			{
+				$elasticResults = $entry_search->doSearch($core_operator);
+				$elastic_entry_ids = kESearchCoreAdapter::getObjectIdsFromElasticResults($elasticResults);
+
+				if ($elasticResults[kESearchCoreAdapter::HITS_KEY][kESearchCoreAdapter::TOTAL_KEY] > count($elastic_entry_ids))
+				{
+					throw new kCoreException('Search is to general', kCoreException::SEARCH_TOO_GENERAL);
+				}
+
+				if (!count($elastic_entry_ids))
+				{
+					$elastic_entry_ids[] = entry::ENTRY_ID_THAT_DOES_NOT_EXIST;
+				}
+
+				$entry_ids_from_db = array_merge($entry_ids_from_db, $elastic_entry_ids);
+			}
+			catch (kESearchException $e)
+			{
+				elasticSearchUtils::handleSearchException($e);
 			}
 		}
 

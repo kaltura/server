@@ -13,6 +13,9 @@ abstract class kBaseSearch
 
 	protected $filterOnlyContext;
 	protected $forceInnerHitsSizeOverride;
+	protected $overrideSize;
+
+	const MAX_SIZE = 1000;
 
 	public function __construct()
 	{
@@ -21,9 +24,10 @@ abstract class kBaseSearch
 		$this->mainBoolQuery = new kESearchBoolQuery();
 		$this->filterOnlyContext = false;
 		$this->forceInnerHitsSizeOverride = false;
+		$this->overrideSize = 0;
 	}
 
-	public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null);
+	public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId = null, kPager $pager = null, ESearchOrderBy $order = null);
 
 	/**
 	 * @return ESearchQueryAttributes
@@ -43,10 +47,15 @@ abstract class kBaseSearch
 
 	protected function initPager(kPager $pager = null)
 	{
-		if($pager)
+		if ($pager)
 		{
 			$this->query['from'] = $pager->calcOffset();
 			$this->query['size'] = $pager->calcPageSize();
+		}
+		if ($this->overrideSize)
+		{
+			$this->query['from'] = 0;
+			$this->query['size'] = max(min($this->overrideSize, self::MAX_SIZE), 0);
 		}
 	}
 
@@ -157,9 +166,18 @@ abstract class kBaseSearch
 	{
 		$this->filterOnlyContext = true;
 	}
+
 	public function setForceInnerHitsSizeOverride()
 	{
 		$this->forceInnerHitsSizeOverride = true;
+	}
+
+	/**
+	 * @param boolean $overrideSize
+	 */
+	public function setOverrideSize($overrideSize)
+	{
+		$this->overrideSize = $overrideSize;
 	}
 
 }

@@ -19,7 +19,7 @@ class kScheduledResourceSearch extends kBaseSearch
 		$this->elasticClient = new elasticClient($host, $port);
 	}
 
-	public function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null,
+	public function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId = null, kPager $pager = null,
 							 ESearchOrderBy $order = null)
 	{
 		kScheduledResourceSearchEntitlement::init();

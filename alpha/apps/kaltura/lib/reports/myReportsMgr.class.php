@@ -1529,6 +1529,7 @@ class reportsInputFilter
 	public $cities;
 	public $media_types;
 	public $source_types;
+	public $entry_operator;
 
 	public function getFilterBy() {
 		return "";

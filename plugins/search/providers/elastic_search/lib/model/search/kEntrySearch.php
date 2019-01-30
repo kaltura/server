@@ -26,7 +26,7 @@ class kEntrySearch extends kBaseESearch
         $this->mainBoolQuery->addToFilter($displayInSearchQuery);
     }
 
-    public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null)
+    public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(), $objectId = null, kPager $pager = null, ESearchOrderBy $order = null)
     {
         kEntryElasticEntitlement::init();
         if (!count($entriesStatus))
