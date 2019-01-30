@@ -4209,7 +4209,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 		{
 			return $this->playsViewsData[$key];
 		}
-		return null;
+		return 0;
 	}
 
 	public function getPlays()

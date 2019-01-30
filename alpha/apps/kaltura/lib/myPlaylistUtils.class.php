@@ -194,7 +194,8 @@ class myPlaylistUtils
 
 		// Clear the context for next time
 		self::$playlistContext = null;
-		
+		entryPeer::fetchPlaysViewsData($entryObjectsArray);
+
 		return $entryObjectsArray;
 	}
 
