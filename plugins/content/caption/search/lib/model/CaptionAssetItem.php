@@ -13,7 +13,7 @@
  * @package plugins.captionSearch
  * @subpackage model
  */
-class CaptionAssetItem extends BaseCaptionAssetItem
+class CaptionAssetItem extends BaseCaptionAssetItem implements IBaseObject
 {
 	/**
 	 * @var CaptionAsset
