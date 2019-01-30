@@ -53,19 +53,27 @@ class KalturaCaptionAssetItemFilter extends KalturaCaptionAssetFilter
 	 */
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, array $types = null)
 	{
+		$captionItemQueryToFilter = new ESearchCaptionQueryFromFilter();
+
 		$captionAssetItemFilter = new CaptionAssetItemFilter();
 		$this->toObject($captionAssetItemFilter);
 
-		$c = KalturaCriteria::create(CaptionAssetItemPeer::OM_CLASS);
-		if($pager)
-			$pager->attachToCriteria($c);
+		$captionAssetItemCorePager = new kFilterPager();
+		$pager->toObject($captionAssetItemCorePager);
 
-		$captionAssetItemFilter->attachToCriteria($c);
-		$list = CaptionAssetItemPeer::doSelect($c);
+		try
+		{
+			list($captionAssetItems, $objectsCount) = $captionItemQueryToFilter->retrieveElasticQueryCaptions($captionAssetItemFilter, $captionAssetItemCorePager, false);
+		}
+		catch (kESearchException $e)
+		{
+			elasticSearchUtils::handleSearchException($e);
+		}
 
+		$list = KalturaCaptionAssetItemArray::fromDbArray($captionAssetItems, $responseProfile);
 		$response = new KalturaCaptionAssetItemListResponse();
-		$response->objects = KalturaCaptionAssetItemArray::fromDbArray($list, $responseProfile);
-		$response->totalCount = $c->getRecordsCount();
+		$response->objects = $list;
+		$response->totalCount = $objectsCount;
 		return $response;
 	}
 	
