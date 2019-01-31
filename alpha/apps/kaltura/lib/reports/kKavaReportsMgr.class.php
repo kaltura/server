@@ -1606,15 +1606,13 @@ class kKavaReportsMgr extends kKavaBase
 	
 	protected static function getConstantFactorFieldAccessPostAggr($agg_name, $field, $const)
 	{
-		return self::getArithmeticPostAggregator(
-			$agg_name, '*', array(
-				self::getFieldAccessPostAggregator($field),
-				self::getConstantPostAggregator('c', $const)));
+		return self::getConstantFactorPostAggr($agg_name,
+			self::getFieldAccessPostAggregator($field), $const);
 	}
 
-	protected static function getConstantFactorPostAggr($name, $post_agg, $const)
+	protected static function getConstantFactorPostAggr($agg_name, $post_agg, $const)
 	{
-		return self::getArithmeticPostAggregator($name, '*', array(
+		return self::getArithmeticPostAggregator($agg_name, '*', array(
 				$post_agg,
 				self::getConstantPostAggregator('c', $const)));
 	}
@@ -1906,24 +1904,25 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function getEngagementRankingDef($partner_id, $report_def, $input_filter, $object_ids)
 	{
+		$maxPlays = self::getMetricMaxValue($partner_id, $report_def, $input_filter, $object_ids, self::EVENT_TYPE_PLAY);
+		$maxUniqueUsers = self::getMetricMaxValue($partner_id, $report_def, $input_filter, $object_ids, self::METRIC_UNIQUE_USERS);
+
 		return array(
 			self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_PERCENTILES_SUM),
 			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
 				self::METRIC_ENGAGEMENT_RANKING, '+', array(
 					self::getConstantFactorFieldAccessPostAggr('score_plays',
 						self::EVENT_TYPE_PLAY,
-						self::getNormalizedScoreFactor(5,
-							self::getMetricMaxValue($partner_id, $report_def, $input_filter, $object_ids, self::EVENT_TYPE_PLAY))
+						self::getNormalizedScoreFactor(5, $maxPlays)
 					),
 					self::getConstantFactorPostAggr('score_unique_users',
 						self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_USERS),
-						self::getNormalizedScoreFactor(2.5,
-							self::getMetricMaxValue($partner_id, $report_def, $input_filter, $object_ids, self::METRIC_UNIQUE_USERS))
+						self::getNormalizedScoreFactor(2.5, $maxUniqueUsers)
 					),
 					self::getConstantFactorPostAggr('score_unique_percentiles',
 						self::getFieldRatioPostAggr('avg_unique_percentiles',
 							self::METRIC_UNIQUE_PERCENTILES_SUM,
-							self::EVENT_TYPE_PLAY), 2.5
+							self::EVENT_TYPE_PLAY), 0.025
 					)
 				)
 			)
