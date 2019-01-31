@@ -132,6 +132,14 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $sourceTypeIn;
 
+	/**
+	 * Filter by entry owner
+	 *
+	 * @var string
+	 */
+	public $ownerIn;
+
+
 	private static $map_between_objects = array
 	(
 		'keywords',
@@ -151,7 +159,8 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'timeZoneOffset',
 		'interval',
 		'mediaTypeIn' => 'media_types',
-		'sourceTypeIn' => 'source_types'
+		'sourceTypeIn' => 'source_types',
+		'ownerIn' => 'owners'
 	);
 
 	protected function getMapBetweenObjects()
