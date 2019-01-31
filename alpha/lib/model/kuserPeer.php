@@ -561,7 +561,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	}
 	
 	
-	public static function sendNewUserMail(kuser $user, $existingUser)
+	public static function sendNewUserMail(kuser $user, $existingUser, $userActivationParams = null)
 	{
 		// setup parameters
 		$partnerId = $user->getPartnerId();
@@ -579,7 +579,8 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		$loginEmail = $user->getEmail();
 		$roleName = $user->getUserRoleNames();
 		$puserId = $user->getPuserId();
-		if (!$existingUser) {
+		if (!$existingUser)
+		{
 			$resetPasswordLink = UserLoginDataPeer::getPassResetLink($user->getLoginData()->getPasswordHashKey());
 		}
 		$kmcLink = trim(kConf::get('apphome_url'), '/').'/kmc';
@@ -587,6 +588,9 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		$contactLink = kConf::get('contact_url');
 		$beginnersGuideLink = kConf::get('beginners_tutorial_url');
 		$quickStartGuideLink = kConf::get('quick_start_guide_url');
+		
+		if($existingUser && $userActivationParams)
+			$userActivationUrl = kConf::get('user_activation_url') . "?$userActivationParams";
 		
 		// setup mail
 		$mailType = null;
@@ -616,7 +620,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			if ($existingUser)
 			{
 				$mailType = self::KALTURA_NEW_EXISTING_USER_EMAIL;
-				$bodyParams = array($userName, $creatorUserName, $publisherName, $loginEmail, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
+				$bodyParams = array($userName, $creatorUserName, $publisherName, $userActivationUrl, $loginEmail, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
 			}
 			else
 			{
