@@ -4295,8 +4295,8 @@ public function copyTemplate($copyPartnerId = false, $template)
 	{
 		switch ($this->getType())
 		{
-			case KalturaEntryType::DATA:
-			case KalturaEntryType::DOCUMENT:
+			case entryType::DATA:
+			case entryType::DOCUMENT:
 				return false;
 
 			default:
