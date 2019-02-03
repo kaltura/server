@@ -3,7 +3,6 @@
 class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 {
 	protected $entryIdEqual = false;
-	public static $validStatuses = array(entryStatus::READY,entryStatus::NO_CONTENT);
 
 	const ITEMS = 'items';
 	const TOTAL_COUNT = 'totalCount';
@@ -194,9 +193,7 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 			$captionItem->setFieldName(ESearchCaptionFieldName::CONTENT);
 			$captionItem->setItemType(ESearchItemType::EXISTS);
 			$this->nestedSearchItem[] = $captionItem;
-
 		}
 		parent::addNestedQueryPart();
 	}
-
 }
