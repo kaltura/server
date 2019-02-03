@@ -203,7 +203,6 @@ class ESearchQueryFromFilter
 			$nestedOperator->setSearchItems($this->nestedSearchItem);
 			$this->searchItems[] = $nestedOperator;
 		}
-
 	}
 
 	protected function createSearchItemByFieldType($elasticFieldName)
