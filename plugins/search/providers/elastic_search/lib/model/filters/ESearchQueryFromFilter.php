@@ -54,7 +54,7 @@ class ESearchQueryFromFilter
 
 		$entrySearch = new kEntrySearch();
 		$entrySearch->setFilterOnlyContext();
-		$elasticResults = $entrySearch->doSearch($query, array(), null, $pager, null);
+		$elasticResults = $entrySearch->doSearch($query, ESearchCaptionQueryFromFilter::$validStatuses, null, $pager, null);
 
 		list($coreResults, $objectOrder, $objectCount, $objectHighlight) = kESearchCoreAdapter::getElasticResultAsArray($elasticResults,
 			$entrySearch->getQueryAttributes()->getQueryHighlightsAttributes());
@@ -195,18 +195,18 @@ class ESearchQueryFromFilter
 
 	protected function addNestedQueryPart()
 	{
-		if (!$this->nestedSearchItem)
+		if(!$this->nestedSearchItem)
 		{
 			$captionItem = new ESearchCaptionItem();
 			$captionItem->setFieldName(ESearchCaptionFieldName::CONTENT);
 			$captionItem->setItemType(ESearchItemType::EXISTS);
 			$this->nestedSearchItem[] = $captionItem;
-		}
+        	}
 
 		$nestedOperator = new ESearchNestedOperator();
 		$nestedOperator->setOperator(ESearchOperatorType::AND_OP);
 		$nestedOperator->setSearchItems($this->nestedSearchItem);
-		$this->searchItems[] = $nestedOperator; */
+		$this->searchItems[] = $nestedOperator;
 	}
 
 	protected function createSearchItemByFieldType($elasticFieldName)

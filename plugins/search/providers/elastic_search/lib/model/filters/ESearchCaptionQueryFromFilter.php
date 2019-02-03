@@ -3,6 +3,7 @@
 class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 {
 	protected $entryIdEqual = false;
+	public static $validStatuses = array(entryStatus::READY,entryStatus::NO_CONTENT);
 
 	const ITEMS = 'items';
 	const TOTAL_COUNT = 'totalCount';
@@ -97,7 +98,7 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 		$this->updateEntryPager($entryPager, $filterOnEntryIds);
 
 		$query = $this->createElasticQueryFromFilter($filter);
-		$elasticResults = $entrySearch->doSearch($query, array(), null, $entryPager, null);
+		$elasticResults = $entrySearch->doSearch($query, self::$validStatuses, null, $entryPager, null);
 		list($coreResults, $objectOrder, $objectCount, $objectHighlight) = kESearchCoreAdapter::getElasticResultAsArray($elasticResults,
 			$entrySearch->getQueryAttributes()->getQueryHighlightsAttributes());
 
