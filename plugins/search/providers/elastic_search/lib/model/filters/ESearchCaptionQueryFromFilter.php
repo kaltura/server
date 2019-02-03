@@ -186,4 +186,17 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 		return self::$captionNestedFields;
 	}
 
+	protected function addNestedQueryPart()
+	{
+		if (!$this->nestedSearchItem)
+		{
+			$captionItem = new ESearchCaptionItem();
+			$captionItem->setFieldName(ESearchCaptionFieldName::CONTENT);
+			$captionItem->setItemType(ESearchItemType::EXISTS);
+			$this->nestedSearchItem[] = $captionItem;
+
+		}
+		parent::addNestedQueryPart();
+	}
+
 }
