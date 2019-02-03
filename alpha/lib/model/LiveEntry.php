@@ -579,7 +579,13 @@ abstract class LiveEntry extends entry
 		$shouldSave = false;
 		/* @var $dbLiveEntryServerNode LiveEntryServerNode */
 		$dbLiveEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($this->getId(), $mediaServerIndex);
-		
+
+		$dcForEntryServerNode = kDataCenterMgr::getCurrentDcId();
+		if (isset($_SERVER["HTTP_X_KALTURA_PROXY"]))
+		{
+			$dcForEntryServerNode = 1 - $dcForEntryServerNode;
+		}
+
 		if (!$dbLiveEntryServerNode)
 		{
 			KalturaLog::debug("About to register new media server with index: [$mediaServerIndex], hostname: [$hostname], status: [$liveEntryStatus]");
@@ -590,7 +596,7 @@ abstract class LiveEntry extends entry
 			$dbLiveEntryServerNode->setServerNodeId($serverNodeId);
 			$dbLiveEntryServerNode->setPartnerId($this->getPartnerId());
 			$dbLiveEntryServerNode->setStatus($liveEntryStatus);
-			$dbLiveEntryServerNode->setDc(kDataCenterMgr::getCurrentDcId());
+			$dbLiveEntryServerNode->setDc($dcForEntryServerNode);
 			
 			if($applicationName)
 				$dbLiveEntryServerNode->setApplicationName($applicationName);
@@ -605,7 +611,7 @@ abstract class LiveEntry extends entry
 		if (kDataCenterMgr::getCurrentDcId() !== $dbLiveEntryServerNode->getDc())
 		{
 			$shouldSave = true;
-			$dbLiveEntryServerNode->setDc(kDataCenterMgr::getCurrentDcId());
+			$dbLiveEntryServerNode->setDc($dcForEntryServerNode);
 		}
 		
 		if ($dbLiveEntryServerNode->getServerNodeId() !== $serverNodeId)

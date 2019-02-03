@@ -169,6 +169,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	function authenticateAction($entryId, $token, $hostname = null, $mediaServerIndex = null, $applicationName = null)
 	{
+		$this->dumpApiRequest($entryId, true);
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || $dbEntry->getType() != entryType::LIVE_STREAM)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
