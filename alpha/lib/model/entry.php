@@ -4209,7 +4209,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 		{
 			return $this->playsViewsData[$key];
 		}
-		return null;
+		return 0;
 	}
 
 	public function getPlays()
@@ -4295,8 +4295,8 @@ public function copyTemplate($copyPartnerId = false, $template)
 	{
 		switch ($this->getType())
 		{
-			case KalturaEntryType::DATA:
-			case KalturaEntryType::DOCUMENT:
+			case entryType::DATA:
+			case entryType::DOCUMENT:
 				return false;
 
 			default:

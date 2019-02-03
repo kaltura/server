@@ -646,7 +646,8 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 					if ($url)
 					{
 						$webVttUrl = myPartnerUtils::getCdnHost($assetDb->getPartnerId()) . self::SERVE_WEBVTT_URL_PREFIX . '/captionAssetId/' . $assetDb->getId() . '/segmentIndex/-1/version/' . $assetDb->getVersion() . '/captions.vtt';
-						$playbackCaptions [] = new kCaptionPlaybackPluginData($assetDb->getLabel(), $assetDb->getContainerFormat(), $assetDb->getLanguage(), $assetDb->getDefault(), $webVttUrl, $url);
+						$languageCode = languageCodeManager::getTwoCodeFromKalturaName($assetDb->getLanguage());
+						$playbackCaptions [] = new kCaptionPlaybackPluginData($assetDb->getLabel(), $assetDb->getContainerFormat(), $assetDb->getLanguage(), $assetDb->getDefault(), $webVttUrl, $url, $languageCode);
 					}
 				}
 				catch (Exception $e)

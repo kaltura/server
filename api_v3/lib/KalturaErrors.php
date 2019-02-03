@@ -721,6 +721,7 @@ class KalturaErrors extends APIErrors
 	const CONF_CONTORL_ERROR = "CONF_CONTORL_ERROR;ERR;Conf control error - [@ERR@]";
 	const MAP_DOES_NOT_EXIST = "MAP_DOES_NOT_EXIST;;Map does not exist";
 	const MAP_ALREADY_EXIST = "MAP_ALREADY_EXIST;NAME,HOST;Map already exist for this map name {@NAME@} and host {@HOST@}";
-
+	const MAP_CANNOT_BE_CREATED_ON_FILE_SYSTEM = "MAP_CANNOT_BE_CREATED_ON_FILE_SYSTEM;;Map cannnot be created on file system";
+	const HOST_NAME_CONTAINS_ASTRIX = "HOST_NAME_CONTAINS_ASTRIX;HOST_NAME;Host name contains *, use # instead {@HOST_NAME@}";
 }
 

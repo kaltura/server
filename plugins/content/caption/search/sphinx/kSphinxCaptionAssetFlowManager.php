@@ -22,8 +22,6 @@ class kSphinxCaptionAssetFlowManager implements kObjectDeletedEventConsumer
 	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		$sphinxSearchManager = new kSphinxSearchManager();
-		$sphinxSearchManager->deleteFromSphinx($object);
-		
 		return true;
 	}
 }
