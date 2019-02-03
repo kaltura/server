@@ -195,13 +195,18 @@ class ESearchQueryFromFilter
 
 	protected function addNestedQueryPart()
 	{
-		if($this->nestedSearchItem)
+		if (!$this->nestedSearchItem)
 		{
-			$nestedOperator = new ESearchNestedOperator();
-			$nestedOperator->setOperator(ESearchOperatorType::AND_OP);
-			$nestedOperator->setSearchItems($this->nestedSearchItem);
-			$this->searchItems[] = $nestedOperator;
+			$captionItem = new ESearchCaptionItem();
+			$captionItem->setFieldName(ESearchCaptionFieldName::CONTENT);
+			$captionItem->setItemType(ESearchItemType::EXISTS);
+			$this->nestedSearchItem[] = $captionItem;
 		}
+
+		$nestedOperator = new ESearchNestedOperator();
+		$nestedOperator->setOperator(ESearchOperatorType::AND_OP);
+		$nestedOperator->setSearchItems($this->nestedSearchItem);
+		$this->searchItems[] = $nestedOperator; */
 	}
 
 	protected function createSearchItemByFieldType($elasticFieldName)
