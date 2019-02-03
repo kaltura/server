@@ -581,7 +581,7 @@ abstract class LiveEntry extends entry
 		$dbLiveEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($this->getId(), $mediaServerIndex);
 
 		$dcForEntryServerNode = kDataCenterMgr::getCurrentDcId();
-		if (isset($_SERVER["HTTP_X_KALTURA_PROXY"]))
+		if (kFileUtils::isAlreadyInDumpApi())
 		{
 			$dcForEntryServerNode = 1 - $dcForEntryServerNode;
 		}
