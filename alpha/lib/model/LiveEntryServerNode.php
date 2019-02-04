@@ -30,10 +30,9 @@ class LiveEntryServerNode extends EntryServerNode
 				
 				if(!$liveEntry->getCurrentBroadcastStartTime())
 					$liveEntry->setCurrentBroadcastStartTime(time());
+				$liveEntry->save();
 			}
-			
-			if(!$liveEntry->save())
-				$liveEntry->indexToSearchIndex();
+			$liveEntry->indexToSearchIndex();
 		}
 		
 		parent::postInsert($con);
