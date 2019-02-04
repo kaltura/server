@@ -14,7 +14,9 @@ class KalturaFrontController
 	private $action = "";
 	private $disptacher = null;
 	private $serializer;
-	
+	private static $exceptionHandlersInitialized = false;
+	private $exceptionHandlers = array();
+
 	private function __construct()
 	{
 		$this->dispatcher = KalturaDispatcher::getInstance();
@@ -438,7 +440,8 @@ class KalturaFrontController
 	public function getExceptionObject($ex, $service, $action)
 	{
 		KalturaResponseCacher::adjustApiCacheForException($ex);
-		
+
+		$object = null;
 		if ($ex instanceof KalturaAPIException)
 		{
 			KalturaLog::err($ex);
@@ -535,8 +538,7 @@ class KalturaFrontController
 					break;
 						
 				default:
-					KalturaLog::crit($ex);
-					$object = new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
+					$object = null;
 			}
 		}
 		else if ($ex instanceof PropelException)
@@ -544,16 +546,39 @@ class KalturaFrontController
 			KalturaLog::alert($ex);
 			$object = new KalturaAPIException(KalturaErrors::INTERNAL_DATABASE_ERROR);
 		}
-		else
+
+		if (!$object && $this->shouldHandlePluginException($ex))
+		{
+			$exceptionClass = get_class($ex);
+			$object = call_user_func_array($this->exceptionHandlers[$exceptionClass], array($ex));
+		}
+
+		if (!$object)
 		{
 			KalturaLog::crit($ex);
 			$object = new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 		}
-		
+
 		return $this->handleErrorMapping($object, $service, $action);
 	}
-	
-	
+
+	protected function shouldHandlePluginException($ex)
+	{
+		if (!self::$exceptionHandlersInitialized)
+		{
+			$handlers = KalturaPluginManager::getPluginInstances('IKalturaExceptionHandler');
+			foreach ($handlers as $handler)
+			{
+				/* @var $handler IKalturaExceptionHandler */
+				$this->exceptionHandlers = array_merge($this->exceptionHandlers, $handler->getExceptionMap());
+			}
+			self::$exceptionHandlersInitialized = true;
+		}
+
+		$exceptionClass = get_class($ex);
+		return isset($this->exceptionHandlers[$exceptionClass]);
+	}
+
 	protected function setSerializer($format, $ignoreNull = true)
 	{
 		// Return a serializer according to the given format

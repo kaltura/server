@@ -14,12 +14,12 @@ class kScheduledResourceSearch extends kBaseSearch
 			throw new KalturaAPIException("Missing beacon configuration");
 		}
 
-		$host = isset($beaconElasticConfig['elasticHost']) ? $beaconElasticConfig['elasticHost'] : null;
+		$host = isset($beaconElasticeConfig['elasticHost']) ? $beaconElasticConfig['elasticHost'] : null;
 		$port = isset($beaconElasticConfig['elasticPort']) ? $beaconElasticConfig['elasticPort'] : null;
 		$this->elasticClient = new elasticClient($host, $port);
 	}
 
-	public function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null,
+	public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null,
 							 ESearchOrderBy $order = null)
 	{
 		kScheduledResourceSearchEntitlement::init();

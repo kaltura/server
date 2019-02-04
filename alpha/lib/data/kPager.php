@@ -7,7 +7,7 @@
 class kPager
 {
     const MIN_PAGE_INDEX = 1;
-    const MAX_PAGE_SIZE = 500;
+    const MAX_PAGE_SIZE = 1000;
 
     /**
      * The number of objects to retrieve. (Default is 30, maximum page size is 500).

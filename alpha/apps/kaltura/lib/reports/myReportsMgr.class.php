@@ -1530,6 +1530,7 @@ class reportsInputFilter
 	public $media_types;
 	public $source_types;
 	public $owners;
+	public $entry_operator;
 
 	public function getFilterBy() {
 		return "";

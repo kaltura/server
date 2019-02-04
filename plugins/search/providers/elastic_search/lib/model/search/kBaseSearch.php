@@ -23,7 +23,7 @@ abstract class kBaseSearch
 		$this->forceInnerHitsSizeOverride = false;
 	}
 
-	public abstract function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null);
+	public abstract function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null, ESearchOrderBy $order = null);
 
 	/**
 	 * @return ESearchQueryAttributes
@@ -43,7 +43,7 @@ abstract class kBaseSearch
 
 	protected function initPager(kPager $pager = null)
 	{
-		if($pager)
+		if ($pager)
 		{
 			$this->query['from'] = $pager->calcOffset();
 			$this->query['size'] = $pager->calcPageSize();
@@ -157,6 +157,7 @@ abstract class kBaseSearch
 	{
 		$this->filterOnlyContext = true;
 	}
+
 	public function setForceInnerHitsSizeOverride()
 	{
 		$this->forceInnerHitsSizeOverride = true;

@@ -97,19 +97,23 @@ class BeaconService extends KalturaBaseService
 	 */
 	private function initAndSearch($coreSearchObject, $searchParams, $pager)
 	{
-		try
+		list($coreParams, $kPager) = self::initSearchActionParams($searchParams, $pager);
+		$elasticResults = $coreSearchObject->doSearch($coreParams->getSearchOperator(), $kPager, array(), $coreParams->getObjectId(), $coreParams->getOrderBy());
+		return $elasticResults;
+	}
+
+	protected static function initSearchActionParams($searchParams, KalturaPager $pager = null)
+	{
+		$coreParams = $searchParams->toObject();
+		$kPager = null;
+		if ($pager)
 		{
-			list($coreSearchOperator, $objectStatusesArr, $objectId, $kPager, $coreOrder) =
-				elasticSearchUtils::initSearchActionParams($searchParams, $pager);
-			$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $objectStatusesArr, $objectId, $kPager,
-				$coreOrder);
-		}
-		catch (kESearchException $e)
-		{
-			elasticSearchUtils::handleSearchException($e);
+			$kPager = $pager->toObject();
+			$kPager->setPageSize($pager->calcPageSize());
+			$kPager->setPageIndex($pager->calcPageIndex());
 		}
 
-		return $elasticResults;
+		return array($coreParams, $kPager);
 	}
 
 }

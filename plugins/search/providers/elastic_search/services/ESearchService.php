@@ -63,20 +63,39 @@ class ESearchService extends KalturaBaseService
 	 * @param $pager
 	 * @return array
 	 */
-	private function initAndSearch($coreSearchObject, $searchParams, $pager)
+	protected function initAndSearch($coreSearchObject, $searchParams, $pager)
 	{
-		try
-		{
-			list($coreSearchOperator, $objectStatusesArr, $objectId, $kPager, $coreOrder) =
-				elasticSearchUtils::initSearchActionParams($searchParams, $pager);
-			$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $objectStatusesArr, $objectId, $kPager, $coreOrder);
-		}
-		catch (kESearchException $e)
-		{
-			elasticSearchUtils::handleSearchException($e);
-		}
+		list($coreSearchOperator, $objectStatusesArr, $objectId, $kPager, $coreOrder) =
+			self::initSearchActionParams($searchParams, $pager);
+		$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $kPager, $objectStatusesArr, $objectId, $coreOrder);
 
 		list($coreResults, $objectCount) = kESearchCoreAdapter::transformElasticToCoreObject($elasticResults, $coreSearchObject);
 		return array($coreResults, $objectCount);
 	}
+
+	protected static function initSearchActionParams($searchParams, KalturaPager $pager = null)
+	{
+		/**
+		 * @var ESearchParams $coreParams
+		 */
+		$coreParams = $searchParams->toObject();
+
+		$objectStatusesArr = array();
+		$objectStatuses = $coreParams->getObjectStatuses();
+		if (!empty($objectStatuses))
+		{
+			$objectStatusesArr = explode(',', $objectStatuses);
+		}
+
+		$kPager = null;
+		if ($pager)
+		{
+			$kPager = $pager->toObject();
+			$kPager->setPageSize($pager->calcPageSize());
+			$kPager->setPageIndex($pager->calcPageIndex());
+		}
+
+		return array($coreParams->getSearchOperator(), $objectStatusesArr, $coreParams->getObjectId(), $kPager, $coreParams->getOrderBy());
+	}
+
 }
