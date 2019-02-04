@@ -34,8 +34,8 @@ class KalturaReportInputBaseFilter extends KalturaObject
 	public $toDay;
 
 	/**
-	 * Delimiter for result and filter
-	 * @var delimiter
+	 * Delimiter for result and filter formatting
+	 * @var string
 	 *
 	 */
 	public $delimiter;
