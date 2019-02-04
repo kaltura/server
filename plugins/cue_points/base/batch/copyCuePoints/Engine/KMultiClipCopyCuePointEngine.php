@@ -49,6 +49,7 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 	public function getCuePointFilter($entryId, $status = CuePointStatus::READY)
 	{
 		$filter = parent::getCuePointFilter($entryId, $status);
+		$filter->cuePointTypeIn = 'codeCuePoint.Code,thumbCuePoint.Thumb,annotation.Annotation,adCuePoint.Ad,eventCuePoint.Event,quiz.QUIZ_QUESTION';
 		$filter->startTimeLessThanOrEqual = $this->currentClip->startTime + $this->currentClip->duration;
 		return $filter;
 	}

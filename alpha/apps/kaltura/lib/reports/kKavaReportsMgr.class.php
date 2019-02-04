@@ -259,7 +259,7 @@ class kKavaReportsMgr extends kKavaBase
 				'domain_name' => self::DIMENSION_DOMAIN
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_AVG_DROP_OFF),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_AVG_DROP_OFF, self::METRIC_PLAYER_IMPRESSION_RATIO),
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_DOMAIN,
 			self::REPORT_DRILLDOWN_DIMENSION_MAP => array(
 				'referrer' => self::DIMENSION_URL,
@@ -2489,6 +2489,14 @@ class kKavaReportsMgr extends kKavaBase
 			$druid_filter[] = array(
 				self::DRUID_DIMENSION => self::DIMENSION_PARTNER_ID,
 				self::DRUID_VALUES => array($partner_id)
+			);
+		}
+
+		if ($input_filter->owners != null)
+		{
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_ENTRY_OWNER_ID,
+				self::DRUID_VALUES => self::getKuserIds(array(), $input_filter->owners, $partner_id),
 			);
 		}
 
