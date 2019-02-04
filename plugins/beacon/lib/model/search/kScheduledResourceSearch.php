@@ -14,7 +14,7 @@ class kScheduledResourceSearch extends kBaseSearch
 			throw new KalturaAPIException("Missing beacon configuration");
 		}
 
-		$host = isset($beaconElasticeConfig['elasticHost']) ? $beaconElasticConfig['elasticHost'] : null;
+		$host = isset($beaconElasticConfig['elasticHost']) ? $beaconElasticConfig['elasticHost'] : null;
 		$port = isset($beaconElasticConfig['elasticPort']) ? $beaconElasticConfig['elasticPort'] : null;
 		$this->elasticClient = new elasticClient($host, $port);
 	}
