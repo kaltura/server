@@ -2492,6 +2492,14 @@ class kKavaReportsMgr extends kKavaBase
 			);
 		}
 
+		if ($input_filter->owners != null)
+		{
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_ENTRY_OWNER_ID,
+				self::DRUID_VALUES => self::getKuserIds(array(), $input_filter->owners, $partner_id),
+			);
+		}
+
 		return $druid_filter;
 	}
 
