@@ -137,7 +137,7 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 *
 	 * @var string
 	 */
-	public $ownerIn;
+	public $ownerIdsIn;
 
 
 	private static $map_between_objects = array
@@ -160,7 +160,7 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'interval',
 		'mediaTypeIn' => 'media_types',
 		'sourceTypeIn' => 'source_types',
-		'ownerIn' => 'owners'
+		'ownerIdsIn' => 'owners'
 	);
 
 	protected function getMapBetweenObjects()
