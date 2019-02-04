@@ -2496,7 +2496,7 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$druid_filter[] = array(
 				self::DRUID_DIMENSION => self::DIMENSION_ENTRY_OWNER_ID,
-				self::DRUID_VALUES => self::getKuserIds(array(), $input_filter->owners, $partner_id),
+				self::DRUID_VALUES => self::getKuserIds(array(), $input_filter->owners, $partner_id, $input_filter->delimiter),
 			);
 		}
 
