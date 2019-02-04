@@ -1504,6 +1504,7 @@ class myReportsMgr
 
 class reportsInputFilter
 {
+	public $delimiter;
 	public $from_date;
 	public $to_date;
 	public $from_day;

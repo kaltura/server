@@ -16,10 +16,10 @@ class KalturaReportTotal extends KalturaObject
 	public $data;
 	
 	
-	public function fromReportTotal ( array $header , array $data )
+	public function fromReportTotal ( array $header , array $data , $delimiter )
 	{
 		$this->header = implode ( "," , $header );
-		$this->data = implode ( "," , $data );
+		$this->data = implode ( $delimiter , $data );
 	}
 	
 }

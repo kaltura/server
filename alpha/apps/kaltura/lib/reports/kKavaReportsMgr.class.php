@@ -2253,12 +2253,12 @@ class kKavaReportsMgr extends kKavaBase
 		return array($from_date . '/' . $to_date);
 	}
 
-	protected static function getKuserIds($report_def, $puser_ids, $partner_id)
+	protected static function getKuserIds($report_def, $puser_ids, $partner_id, $delimiter = ',')
 	{
 		$result = array();
 
 		// leave error ids as is
-		$puser_ids = explode(',', $puser_ids);
+		$puser_ids = explode($delimiter, $puser_ids);
 		foreach ($puser_ids as $index => $id)
 		{
 			if (isset(self::$error_ids[$id]))
@@ -2324,7 +2324,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $result ? $result : array(kuser::KUSER_ID_THAT_DOES_NOT_EXIST); 
 	}
 	
-	protected static function getCategoriesIds($categories, $partner_id)
+	protected static function getCategoriesIds($categories, $partner_id, $delimiter)
 	{
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 
@@ -2334,7 +2334,7 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$c->add(categoryPeer::PARTNER_ID, $partner_id);
 		}
-		$c->add(categoryPeer::FULL_NAME, explode(',', $categories), Criteria::IN);
+		$c->add(categoryPeer::FULL_NAME, explode($delimiter, $categories), Criteria::IN);
 
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$stmt = categoryPeer::doSelectStmt($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
@@ -2377,13 +2377,13 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$druid_filter[] = array(
 				self::DRUID_DIMENSION => self::DIMENSION_KUSER_ID,
-				self::DRUID_VALUES => self::getKuserIds($report_def, $input_filter->userIds, $partner_id),
+				self::DRUID_VALUES => self::getKuserIds($report_def, $input_filter->userIds, $partner_id, $input_filter->delimiter),
 			);
 		}
 
 		if ($input_filter->categories)
 		{
-			$category_ids = self::getCategoriesIds($input_filter->categories, $partner_id);
+			$category_ids = self::getCategoriesIds($input_filter->categories, $partner_id, $input_filter->delimiter);
 			$druid_filter[] = array(
 				self::DRUID_DIMENSION => self::DIMENSION_CATEGORIES,
 				self::DRUID_VALUES => $category_ids
@@ -2415,7 +2415,7 @@ class kKavaReportsMgr extends kKavaBase
 				continue;
 			}
 
-			$values = explode(',', $value);
+			$values = explode($input_filter->delimiter, $value);
 			$druid_filter[] = array(
 				self::DRUID_DIMENSION => $field_filter_def[self::DRUID_DIMENSION],
 				self::DRUID_VALUES => $values
@@ -2456,7 +2456,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		if($object_ids)
 		{
-			$object_ids_arr = explode(',', $object_ids);
+			$object_ids_arr = explode($input_filter->delimiter, $object_ids);
 
 			if (isset($report_def[self::REPORT_OBJECT_IDS_TRANSFORM]))
 			{

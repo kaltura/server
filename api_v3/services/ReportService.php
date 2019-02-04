@@ -75,7 +75,8 @@ class ReportService extends KalturaBaseService
 		    $reportType,
 		    $reportInputFilter->toReportsInputFilter(),
 		    $dimension,
-		    $objectIds));
+		    $objectIds),
+		    $reportInputFilter->delimiter);
 
 		return $reportGraphs;
 	}
@@ -101,7 +102,7 @@ class ReportService extends KalturaBaseService
 		    $reportType ,
 		    $reportInputFilter->toReportsInputFilter() , $objectIds);
 		
-		$reportTotal->fromReportTotal ( $header , $data );
+		$reportTotal->fromReportTotal ( $header , $data, $reportInputFilter->delimiter );
 			
 		return $reportTotal;
 	}
@@ -171,7 +172,7 @@ class ReportService extends KalturaBaseService
 		    $pager->pageSize , $pager->pageIndex ,
 		    $order ,  $objectIds);
 
-		$reportTable->fromReportTable ( $header , $data , $totalCount );
+		$reportTable->fromReportTable ( $header , $data , $totalCount, $reportInputFilter->delimiter );
 			
 		return $reportTable;
 	}	
