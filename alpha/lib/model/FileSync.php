@@ -98,6 +98,11 @@ class FileSync extends BaseFileSync implements IBaseObject
 		{
 			/** @var  Asset $asset */
 			$asset = assetPeer::retrieveById($this->object_id);
+			if (!$asset)
+			{
+				KalturaLog::debug("Could not retrieve asset for id [$this->object_id]");
+				return false;
+			}
 			$shouldEncrypt = $asset->shouldEncrypt();
 			KalturaLog::debug("Asset id [$this->object_id] of type [" . $asset->getType() . "] should be encrypt: [$shouldEncrypt]");
 			if (!$shouldEncrypt)
