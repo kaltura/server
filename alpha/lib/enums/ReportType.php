@@ -48,4 +48,5 @@ interface ReportType extends BaseEnum
    const TOP_CONTENT_CREATOR = 38;
    const TOP_CONTENT_CONTRIBUTORS = 39;
    const APP_DOMAIN_UNIQUE_ACTIVE_USERS = 40;
+   const TOP_SOURCES = 41;
 }

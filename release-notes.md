@@ -1,3 +1,20 @@
+# Naos 14.13.0 #
+## Conf Maps - add option to view list of all maps in combo box ##
+- Issue Type: Task
+- Issue ID: PLAT-9596
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_11_confmaps_service.php
+
+
+## Move maps to dynamic configuration ##
+- Issue Type: Task
+- Issue ID: PLAT-9603
+
+### Configuration ###
+section: global_whitelisted_domains_exclude from local.ini was moved to a new map.
+please make sure to create new map called: "global_whitelisted_domains_exclude_list", and copy the content of it.
+
 # Naos 14.12.0 #
 
 ## Blackout dates ##

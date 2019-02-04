@@ -6,6 +6,7 @@
  * @service notification
  * @package api
  * @subpackage services
+ * @deprecated deprecated in favour of eventNotificationTemplate 
  */
 class NotificationService extends KalturaBaseService 
 {

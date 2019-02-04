@@ -36,6 +36,12 @@ class KalturaCaptionPlaybackPluginData extends KalturaObject{
 	 */
 	public $isDefault;
 
+	/**
+	 * @var string
+	 */
+	public $languageCode;
+
+
 	private static $map_between_objects = array
 	(
 		"format",
@@ -43,12 +49,12 @@ class KalturaCaptionPlaybackPluginData extends KalturaObject{
 		"language",
 		"url",
 		"webVttUrl",
-		"isDefault"
+		"isDefault",
+		"languageCode"
 	);
 
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-
 }

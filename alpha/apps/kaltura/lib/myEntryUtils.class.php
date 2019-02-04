@@ -696,7 +696,8 @@ class myEntryUtils
 	
 	
 	public static function resizeEntryImage( entry $entry, $version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
-		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null, $fileSync = null)
+		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null, $fileSync = null,
+		$start_sec = -1, $end_sec = -1)
 	{
 		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
 			$thumbParams = new kThumbnailParameters();
@@ -733,6 +734,11 @@ class myEntryUtils
 			$thumbName.= "_dns_{$density}";
 		if($stripProfiles)
 			$thumbName .= "_stp_{$stripProfiles}";
+
+		if($start_sec != -1)
+			$thumbName .= "_ssec_{$start_sec}";
+		if($end_sec != -1)
+			$thumbName .= "_esec_{$end_sec}";
 				
 		$entryThumbFilename = $entry->getThumbnail();
 		if(!$entryThumbFilename)
@@ -816,6 +822,15 @@ class myEntryUtils
 		if ($servingVODfromLive)
 			$orig_image_path = null;
 
+		if(($end_sec != -1 && (($end_sec * 1000) > $entryLengthInMsec)) || ($start_sec != -1 && $end_sec == -1))
+		{
+			$end_sec = $entryLengthInMsec / 1000;
+		}
+		if($start_sec == -1 && $end_sec != -1)
+		{
+			$start_sec = 0;
+		}
+
 		while($count--)
 		{
 			$thumbCaptureByPackager = false;
@@ -837,7 +852,14 @@ class myEntryUtils
 				}
 				else if ($vid_slices != -1) // need to create a thumbnail at a specific slice
 				{
-					$calc_vid_sec = floor($entryLengthInMsec / $vid_slices * min($vid_slice, $vid_slices) / 1000);
+					if($start_sec != -1 && $end_sec != -1)
+					{
+						$calc_vid_sec = $start_sec + (($end_sec - $start_sec) / $vid_slices) * min($vid_slice, $vid_slices);
+					}
+					else
+					{
+						$calc_vid_sec = floor($entryLengthInMsec / $vid_slices * min($vid_slice, $vid_slices) / 1000);
+					}
 				}
 				else if ($entry->getStatus() != entryStatus::READY && $entry->getLengthInMsecs() == 0) // when entry is not ready and we don't know its duration
 				{
@@ -858,7 +880,7 @@ class myEntryUtils
 				{
 					// creating the thumbnail is a very heavy operation
 					// prevent calling it in parallel for the same thumbnail for 5 minutes
-					
+
 					$cacheLockKeyProcessing = "thumb-processing".$orig_image_path;
 					if ($cache && !$cache->add($cacheLockKeyProcessing, true, 5 * 60))
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);

@@ -8,11 +8,9 @@ abstract class kBaseESearch extends kBaseSearch
 {
 	const GLOBAL_HIGHLIGHT_CONFIG = 'globalMaxNumberOfFragments';
 
-	public abstract function getPeerName();
-
-	public abstract function getPeerRetrieveFunctionName();
-
 	public abstract function getElasticTypeName();
+
+	public abstract function fetchCoreObjectsByIds($ids);
 
 	protected function execSearch(ESearchOperator $eSearchOperator)
 	{

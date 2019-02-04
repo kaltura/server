@@ -216,13 +216,13 @@ class ThumbAssetService extends KalturaAssetService
 			}												
 			throw $e;
 		}
-
-		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-		list($width, $height, $type, $attr) = getimagesize($finalPath);
+		
+		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey, false);
+		list($width, $height, $type, $attr) = kImageUtils::getImageSize($fileSync);
 		
 		$thumbAsset->setWidth($width);
 		$thumbAsset->setHeight($height);
-		$thumbAsset->setSize(filesize($finalPath));
+		$thumbAsset->setSize($fileSync->getFileSize());
 		
 		$thumbAsset->setStatusLocalReady();
 		$thumbAsset->save();
@@ -283,13 +283,13 @@ class ThumbAssetService extends KalturaAssetService
 		
         $newSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
         kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
-                
-		$finalPath = kFileSyncUtils::getLocalFilePathForKey($newSyncKey);
-		list($width, $height, $type, $attr) = getimagesize($finalPath);
+		
+		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($newSyncKey, false);
+		list($width, $height, $type, $attr) = kImageUtils::getImageSize($fileSync);
 		
 		$thumbAsset->setWidth($width);
 		$thumbAsset->setHeight($height);
-		$thumbAsset->setSize(filesize($finalPath));
+		$thumbAsset->setSize($fileSync->getFileSize());
 		
 		$thumbAsset->setStatusLocalReady();
 		$thumbAsset->save();
@@ -850,12 +850,13 @@ class ThumbAssetService extends KalturaAssetService
 
 		kFileSyncUtils::file_put_contents($syncKey, $res);
 		
-		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-		list($width, $height, $type, $attr) = getimagesize($finalPath);
+		/* @var $fileSync FileSync */
+		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey, false);
+		list($width, $height, $type, $attr) = kImageUtils::getImageSize($fileSync);
 		
 		$dbThumbAsset->setWidth($width);
 		$dbThumbAsset->setHeight($height);
-		$dbThumbAsset->setSize(filesize($finalPath));
+		$dbThumbAsset->setSize($fileSync->getFileSize());
 		$dbThumbAsset->setStatusLocalReady();
 		$dbThumbAsset->save();
 		
