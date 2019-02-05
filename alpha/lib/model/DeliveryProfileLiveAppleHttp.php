@@ -309,16 +309,18 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	
 	protected function isFlavorAllowed($flavorParamId)
 	{
+		if(count($this->getDynamicAttributes()->getFlavorParamIds()) &&
+			!in_array($flavorParamId, $this->getDynamicAttributes()->getFlavorParamIds()))
+		{
+			return false;
+		}
+		
 		$aclFlavorParamsIds = $this->getDynamicAttributes()->getAclFlavorParamsIds();
 		if(!$aclFlavorParamsIds)
 			return true;
 		
 		$isBlockedList = $this->getDynamicAttributes()->getIsAclFlavorParamsIdsBlockedList();
 		$exists = in_array($flavorParamId, $aclFlavorParamsIds);
-		
-		if(count($this->getDynamicAttributes()->getFlavorParamIds()) &&
-			!in_array($flavorParamId, $this->getDynamicAttributes()->getFlavorParamIds()))
-			return false;
 		
 		return $isBlockedList ? !$exists : $exists;
 	}

@@ -129,14 +129,21 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		usort($liveEntryServerNodes, function ($a, $b) {return $b->weight - $a->weight;});
 		
 		$liveEntryServerNode = array_shift($liveEntryServerNodes); // after sort first is the primary
+		
 		// If min/max bitrate was requested, add the constraint to the array of flavorParamsIds in the profile's attributes.
-		$this->filterStreamIdsByBitrate($liveEntryServerNode->getStreams());
+		$streams = $liveEntryServerNode->getStreams();
+		$this->filterStreamIdsByBitrate($streams);
+		
 		$this->liveStreamConfig->setUrl($this->getHttpUrl($liveEntryServerNode->serverNode));
 		$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
 		
 		$liveEntryServerNode = array_shift($liveEntryServerNodes);
 		
 		if ($liveEntryServerNode) { // if list has another entry server node set it as backup
+			// If min/max bitrate was requested, it needs to be applied to the backup stream as well.
+			$streams = array_merge($streams, $liveEntryServerNode->getStreams());
+			$this->filterStreamIdsByBitrate($streams);
+			
 			$this->liveStreamConfig->setBackupUrl($this->getHttpUrl($liveEntryServerNode->serverNode));
 			$this->liveStreamConfig->setBackupStreamInfo($liveEntryServerNode->getStreams());
 		}
@@ -430,7 +437,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		
 		if(count($this->getDynamicAttributes()->getFlavorParamIds()))
 		{
-			$streamIds = array_intersect($streamIds, $this->getDynamicAttributes()->getFlavorParamIds());
+			$streamIds = array_unique(array_intersect($streamIds, $this->getDynamicAttributes()->getFlavorParamIds()));
 		}
 		
 		if (!count($streamIds))
