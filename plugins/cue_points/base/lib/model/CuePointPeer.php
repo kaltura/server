@@ -136,6 +136,7 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 		{
 			$ks = kCurrentContext::$ks_object;
 			$privilagedEntryId = null;
+			$privilagedEntryIdEdit = null;
 			if ($ks)
 			{
 				$values = $ks->getPrivilegeValues(ks::PRIVILEGE_LIST);

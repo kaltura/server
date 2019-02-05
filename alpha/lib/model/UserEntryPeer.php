@@ -29,6 +29,26 @@ class UserEntryPeer extends BaseUserEntryPeer {
 
 		$c = KalturaCriteria::create(UserEntryPeer::OM_CLASS);
 		$c->addAnd ( UserEntryPeer::STATUS, array(UserEntryStatus::DELETED), Criteria::NOT_IN);
+
+		$ks = kCurrentContext::$ks_object;
+		$privilagedEntryIdEdit = null;
+		if ($ks)
+		{
+			$valusEdit = $ks->getPrivilegeValues(ks::PRIVILEGE_EDIT);
+			if ($valusEdit && count($valusEdit) > 0)
+				$privilagedEntryIdEdit = $valusEdit[0];
+
+			if ($privilagedEntryIdEdit)
+			{
+				$c->addAnd(UserEntryPeer::ENTRY_ID, $privilagedEntryIdEdit);
+			}
+
+			// when session is not admin and not co-editor, allow access to user's userEntries only
+			if (!kCurrentContext::$is_admin_session && !$privilagedEntryIdEdit)
+			{
+				$c->addAnd(UserEntryPeer::KUSER_ID, kCurrentContext::getCurrentKsKuserId());
+			}
+		}
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
