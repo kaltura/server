@@ -14,6 +14,8 @@ define('ENTRY_TYPE', 't');
 define('ENTRY_MEDIA_TYPE', 'mt');
 define('ENTRY_SOURCE_TYPE', 'st');
 define('ENTRY_DURATION', 'd');
+define('ENTRY_CREATOR_ID', 'c');
+define('ENTRY_CREATED_AT', 'ca');
 
 define('SOURCE_CLASSROOM', -10);
 define('SOURCE_CAPTURE', -11);
@@ -23,6 +25,7 @@ define('SOURCE_RAPT', -14);
 define('SOURCE_WEBEX', -15);
 define('SOURCE_ZOOM', -16);
 define('SOURCE_EXPRESS_RECORDER', -17);
+define('CREATED_DAY_TS', 'UNIX_TIMESTAMP(DATE(CREATED_AT))');
 
 $sourceFromAdminTag = array(
 	'kalturaclassroom' => SOURCE_CLASSROOM,
@@ -68,6 +71,12 @@ function getEntrySourceTypeInt($sourceType, $adminTags)
 
 	// use the source type
 	return $sourceType;
+}
+
+function getUnixTimestampFromDate($date)
+{
+	$dt = new DateTime($date);
+	return (int) $dt->format('U');
 }
 
 function getPartnerUpdates($updatedAt)
@@ -166,6 +175,8 @@ function getEntryUpdates($updatedAt)
 	$c->addSelectColumn(entryPeer::MEDIA_TYPE);
 	$c->addSelectColumn(entryPeer::SOURCE);
 	$c->addSelectColumn(entryPeer::ADMIN_TAGS);
+	$c->addSelectColumn(CREATED_DAY_TS);
+	$c->addSelectColumn(entryPeer::CUSTOM_DATA);
 	$c->addSelectColumn(entryPeer::UPDATED_AT);
 	$c->add(entryPeer::UPDATED_AT, $updatedAt, Criteria::GREATER_EQUAL);
 	$c->addAscendingOrderByColumn(entryPeer::UPDATED_AT);
@@ -183,11 +194,15 @@ function getEntryUpdates($updatedAt)
 		$status = $row['STATUS'];
 		if ($status == entryStatus::READY)
 		{
+			$customData = unserialize($row['CUSTOM_DATA']);
+
 			$info = array(
 				ENTRY_KUSER_ID => $row['KUSER_ID'],
 				ENTRY_TYPE => $row['TYPE'],
 				ENTRY_MEDIA_TYPE => $row['MEDIA_TYPE'],
 				ENTRY_SOURCE_TYPE => getEntrySourceTypeInt($row['SOURCE'], $row['ADMIN_TAGS']),
+				ENTRY_CREATED_AT => $row[CREATED_DAY_TS],
+				ENTRY_CREATOR_ID => isset($customData['creatorKuserId']) ? $customData['creatorKuserId'] : $row['KUSER_ID'],
 			);
 			$duration = intval($row['LENGTH_IN_MSECS'] / 1000);
 			if ($duration > 0)
@@ -202,8 +217,8 @@ function getEntryUpdates($updatedAt)
 		}
 
 		$result[$id] = $info;		
-		$updatedAt = new DateTime($row['UPDATED_AT']);
-		$maxUpdatedAt = max($maxUpdatedAt, (int)$updatedAt->format('U'));
+		$updatedAt = getUnixTimestampFromDate($row['UPDATED_AT']);
+		$maxUpdatedAt = max($maxUpdatedAt, $updatedAt);
 	}
 	
 	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
@@ -229,8 +244,8 @@ function getCategoryEntryUpdates($updatedAt)
 	{
 		$entryId = $row['ENTRY_ID'];
 		$result[$entryId] = '';
-		$updatedAt = new DateTime($row['UPDATED_AT']);
-		$maxUpdatedAt = max($maxUpdatedAt, (int)$updatedAt->format('U'));
+		$updatedAt = getUnixTimestampFromDate($row['UPDATED_AT']);
+		$maxUpdatedAt = max($maxUpdatedAt, $updatedAt);
 	}
 	
 	$con = categoryEntryPeer::alternativeCon(null);
