@@ -30,9 +30,9 @@ class UserEntryPeer extends BaseUserEntryPeer {
 		$c = KalturaCriteria::create(UserEntryPeer::OM_CLASS);
 		$c->addAnd ( UserEntryPeer::STATUS, array(UserEntryStatus::DELETED), Criteria::NOT_IN);
 		// when session is not admin, allow access to user's userEntries only
-		if (kCurrentContext::$ks && !kCurrentContext::$is_admin_session) {
-			$c->addAnd(UserEntryPeer::KUSER_ID, kCurrentContext::getCurrentKsKuserId());
-		}
+//		if (kCurrentContext::$ks && !kCurrentContext::$is_admin_session) {
+//			$c->addAnd(UserEntryPeer::KUSER_ID, kCurrentContext::getCurrentKsKuserId());
+//		}
 		self::$s_criteria_filter->setFilter($c);
 	}
 	

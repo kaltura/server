@@ -194,12 +194,16 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		parent::validateForUpdate($sourceObject, $propertiesToSkip);	
+		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 		$dbEntry = entryPeer::retrieveByPK($this->entryId);
 		$kQuiz = QuizPlugin::validateAndGetQuiz($dbEntry);
-		$this->validateUserEntry();
-		if ( !$kQuiz->getAllowAnswerUpdate() ) {
-			throw new KalturaAPIException(KalturaQuizErrors::ANSWER_UPDATE_IS_NOT_ALLOWED, $sourceObject->getEntryId());
+		if ($this->feedback == null)
+		{
+			$this->validateUserEntry();	
+			if (!$kQuiz->getAllowAnswerUpdate()) 
+			{
+				throw new KalturaAPIException(KalturaQuizErrors::ANSWER_UPDATE_IS_NOT_ALLOWED, $sourceObject->getEntryId());
+			}
 		}
 		if ($this->feedback != null && !kEntitlementUtils::isEntitledForEditEntry($dbEntry) )
 		{
