@@ -5,7 +5,15 @@ class DeliveryProfileLivePackagerHls extends DeliveryProfileLiveAppleHttp {
 	protected function getHttpUrl($serverNode)
 	{
 		$httpUrl = $this->getLivePackagerUrl($serverNode, PlaybackProtocol::HLS);
-		$httpUrl .= "master.m3u8";
+		
+		$httpUrl .= "master";
+		
+		foreach($this->getDynamicAttributes()->getFlavorParamIds() as $flavorId)
+		{
+			$httpUrl .= "-s$flavorId";
+		}
+		
+		$httpUrl .= ".m3u8";
 		
 		KalturaLog::debug("Live Stream url [$httpUrl]");
 		return $httpUrl;
