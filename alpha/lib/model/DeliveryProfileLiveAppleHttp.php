@@ -216,10 +216,10 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		//Move all Dolby audio flavors to the beginning of the audio flavors list
 		if($isAudio1 == true)
 		{
-			if(isset($flavor1['defaultAudio']) && $flavor1['defaultAudio'] == true)
+			if(isset($a['defaultAudio']) && $a['defaultAudio'] == true)
 				return -1;
 			
-			if(isset($flavor2['defaultAudio']) && $flavor2['defaultAudio'] == true)
+			if(isset($b['defaultAudio']) && $b['defaultAudio'] == true)
 				return 1;
 		}
 		
