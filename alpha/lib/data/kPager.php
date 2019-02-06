@@ -6,8 +6,6 @@
 
 class kPager
 {
-    const MIN_PAGE_INDEX = 1;
-    const MAX_PAGE_SIZE = 1000;
 
     /**
      * The number of objects to retrieve. (Default is 30, maximum page size is 500).
@@ -55,19 +53,9 @@ class kPager
         $this->pageIndex = $pageIndex;
     }
 
-    public function calcPageSize()
-    {
-        return max(min($this->pageSize,self::MAX_PAGE_SIZE), 0);
-    }
-
-    public function calcPageIndex()
-    {
-        return max(self::MIN_PAGE_INDEX, $this->pageIndex);
-    }
-
     public function calcOffset()
     {
-        return ($this->calcPageIndex() - 1) * $this->calcPageSize();
+        return ($this->getPageIndex() - 1) * $this->getPageSize();
     }
-    
+
 }

@@ -8,7 +8,7 @@ interface IKalturaExceptionHandler extends IKalturaBase
 {
 
 	/**
-	 * get Exception map - exceptionClass => array(exceptionHandlerClass, exceptionHandlerFunction)
+	 * get Exception map - exceptionClass => array(exceptionClass , callback)
 	 * @return array
 	 */
 	public function getExceptionMap();

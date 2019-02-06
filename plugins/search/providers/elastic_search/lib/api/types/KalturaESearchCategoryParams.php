@@ -27,7 +27,7 @@ class KalturaESearchCategoryParams extends KalturaESearchParams
 			$object_to_fill = new ESearchParams();
 		}
 
-		$this->validateSearchOperator($this->searchOperator);
+		self::validateSearchOperator($this->searchOperator);
 
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}

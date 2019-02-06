@@ -25,7 +25,7 @@ class KalturaESearchEntryParams extends KalturaESearchParams
 		{
 			$finalStatuses[] = kPluginableEnumsManager::apiToCore($enumType, $status);
 		}
-		return implode(',',$finalStatuses);
+		return implode(',', $finalStatuses);
 	}
 
 	public function getMapBetweenObjects()
@@ -40,7 +40,7 @@ class KalturaESearchEntryParams extends KalturaESearchParams
 			$object_to_fill = new ESearchParams();
 		}
 
-		$this->validateSearchOperator($this->searchOperator);
+		self::validateSearchOperator($this->searchOperator);
 
 		if (!empty($this->objectStatuses))
 		{

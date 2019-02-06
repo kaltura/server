@@ -30,7 +30,7 @@ abstract class KalturaBeaconSearchParams extends KalturaObject
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 
-	protected function validateSearchOperator($searchOperator)
+	protected static function validateSearchOperator($searchOperator)
 	{
 		if (!$searchOperator)
 		{

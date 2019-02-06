@@ -14,7 +14,7 @@ class KalturaFrontController
 	private $action = "";
 	private $disptacher = null;
 	private $serializer;
-	private static $exceptionHandlersInitialized = false;
+	private $exceptionHandlersInitialized = false;
 	private $exceptionHandlers = array();
 
 	private function __construct()
@@ -536,9 +536,6 @@ class KalturaFrontController
 				case kCoreException::FILE_PENDING:
 					$object = new KalturaAPIException(KalturaErrors::FILE_PENDING);
 					break;
-						
-				default:
-					$object = null;
 			}
 		}
 		else if ($ex instanceof PropelException)
@@ -547,10 +544,10 @@ class KalturaFrontController
 			$object = new KalturaAPIException(KalturaErrors::INTERNAL_DATABASE_ERROR);
 		}
 
-		if (!$object && $this->shouldHandlePluginException($ex))
+		$exceptionClass = get_class($ex);
+		if (!$object && $this->shouldHandlePluginException($exceptionClass))
 		{
-			$exceptionClass = get_class($ex);
-			$object = call_user_func_array($this->exceptionHandlers[$exceptionClass], array($ex));
+			$object = call_user_func($this->exceptionHandlers[$exceptionClass], $ex);
 		}
 
 		if (!$object)
@@ -562,9 +559,9 @@ class KalturaFrontController
 		return $this->handleErrorMapping($object, $service, $action);
 	}
 
-	protected function shouldHandlePluginException($ex)
+	protected function shouldHandlePluginException($exceptionClass)
 	{
-		if (!self::$exceptionHandlersInitialized)
+		if (!$this->exceptionHandlersInitialized)
 		{
 			$handlers = KalturaPluginManager::getPluginInstances('IKalturaExceptionHandler');
 			foreach ($handlers as $handler)
@@ -572,10 +569,9 @@ class KalturaFrontController
 				/* @var $handler IKalturaExceptionHandler */
 				$this->exceptionHandlers = array_merge($this->exceptionHandlers, $handler->getExceptionMap());
 			}
-			self::$exceptionHandlersInitialized = true;
+			$this->exceptionHandlersInitialized = true;
 		}
 
-		$exceptionClass = get_class($ex);
 		return isset($this->exceptionHandlers[$exceptionClass]);
 	}
 
