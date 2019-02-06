@@ -105,7 +105,7 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 			$this->setIsCorrect(in_array($this->getAnswerKey(), $this->getCorrectAnswerKeys()));
 			$this->setCustomDataObj();
 		}
-		return parent::preSave($con);
+		return parent::preUpdate($con);
 	}
 
 	public function postUpdate(PropelPDO $con = null)
