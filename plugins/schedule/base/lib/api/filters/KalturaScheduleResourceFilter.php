@@ -29,7 +29,6 @@ class KalturaScheduleResourceFilter extends KalturaScheduleResourceBaseFilter
 		{
 			$allowedStatus = array(ScheduleResourceStatus::DISABLED,ScheduleResourceStatus::ACTIVE);
 			$this->statusIn =  implode(',' , $allowedStatus);
-
 		}
 
 		$c = new Criteria();
