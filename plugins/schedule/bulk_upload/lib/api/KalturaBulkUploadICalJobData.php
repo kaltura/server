@@ -45,15 +45,6 @@ class KalturaBulkUploadICalJobData extends KalturaBulkUploadJobData
 	    
 	    return $dbObj;
 	}
-
-	/* (non-PHPdoc)
-	 * @see KalturaObject::validateForInsert($propertiesToSkip)
-	 */
-	public function validateForInsert($propertiesToSkip = array())
-	{
-		$this->validatePropertyNotNull('eventType');
-		parent::validateForInsert($propertiesToSkip);
-	}
 	
 	public function setType ()
 	{
