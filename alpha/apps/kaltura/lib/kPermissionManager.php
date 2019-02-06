@@ -1039,6 +1039,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		{
 			return true;
 		}
+		return false;
 	}
 
 	public function invalidateCache($object, $params = null)
