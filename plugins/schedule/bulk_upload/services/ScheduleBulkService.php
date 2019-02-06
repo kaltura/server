@@ -29,7 +29,7 @@ class ScheduleBulkService extends KalturaBaseService
 
 		if (!$bulkUploadData->eventsType)
 		{
-			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'eventType');
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'eventsType');
 		}
 
 		if(!$bulkUploadData->fileName)
