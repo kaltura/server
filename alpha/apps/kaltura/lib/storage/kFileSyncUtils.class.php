@@ -952,6 +952,16 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 	}
 
+	public static function getAllReadyFileSyncForKey ( FileSyncKey $key )
+	{
+		$c = new Criteria();
+		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
+		$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
+		$file_sync_list = FileSyncPeer::doSelect( $c );
+		return $file_sync_list;
+	}
+
+
 	/**
 	 *
 	 * @param FileSyncKey $key
