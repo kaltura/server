@@ -7,6 +7,12 @@
  */
 class ReportService extends KalturaBaseService
 {
+	protected static $crossPartnerReports = array(
+		ReportType::PARTNER_USAGE,
+		ReportType::VAR_USAGE,
+		ReportType::VPAAS_USAGE_MULTI,
+	);
+
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -34,10 +40,12 @@ class ReportService extends KalturaBaseService
 	 * @param string $objectIds comma separated IDs
 	 * @return string comma seperated ids
 	 */
-	protected function validateObjectsAreAllowedPartners($objectIds = null)
+	protected function validateObjectsAreAllowedPartners($reportType, $objectIds)
 	{
-		if(!$objectIds)
+		if(!$objectIds && $reportType != ReportType::VPAAS_USAGE_MULTI)
+		{
 			return $this->getPartnerId();
+		}
 			
 		$c = new Criteria();
 		$c->addSelectColumn(PartnerPeer::ID);
@@ -45,7 +53,10 @@ class ReportService extends KalturaBaseService
 		$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, $this->getPartnerId());
 		$subCriterion1->addOr($subCriterion2);
 		$c->add($subCriterion1);
-		$c->add(PartnerPeer::ID, explode(',', $objectIds), Criteria::IN);
+		if ($objectIds)
+		{
+			$c->add(PartnerPeer::ID, explode(',', $objectIds), Criteria::IN);
+		}
 		
 		$stmt = PartnerPeer::doSelectStmt($c);
 		$partnerIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -67,8 +78,8 @@ class ReportService extends KalturaBaseService
 	 */
 	public function getGraphsAction( $reportType , KalturaReportInputFilter $reportInputFilter , $dimension = null , $objectIds = null  )
 	{
-		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
-			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
+		if(in_array($reportType, self::$crossPartnerReports))
+			$objectIds = $this->validateObjectsAreAllowedPartners($reportType, $objectIds);
 	
 		$reportGraphs =  KalturaReportGraphArray::fromReportDataArray(kKavaReportsMgr::getGraph(
 		    $this->getPartnerId(),
@@ -91,8 +102,8 @@ class ReportService extends KalturaBaseService
 	 */
 	public function getTotalAction( $reportType , KalturaReportInputFilter $reportInputFilter , $objectIds = null )
 	{
-		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
-			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
+		if(in_array($reportType, self::$crossPartnerReports))
+			$objectIds = $this->validateObjectsAreAllowedPartners($reportType, $objectIds);
 		
 		$reportTotal = new KalturaReportTotal();
 		
@@ -141,8 +152,8 @@ class ReportService extends KalturaBaseService
 	 */
 	public function getTableAction($reportType, KalturaReportInputFilter $reportInputFilter, KalturaFilterPager $pager, $order = null, $objectIds = null)
 	{
-		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
-			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
+		if(in_array($reportType, self::$crossPartnerReports))
+			$objectIds = $this->validateObjectsAreAllowedPartners($reportType, $objectIds);
 		
 		$reportTable = new KalturaReportTable();
 
@@ -203,8 +214,8 @@ class ReportService extends KalturaBaseService
 		if(!$pager)
 			$pager = new KalturaFilterPager();
 		
-		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
-			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
+		if(in_array($reportType, self::$crossPartnerReports))
+			$objectIds = $this->validateObjectsAreAllowedPartners($reportType, $objectIds);
 		
 		try {
 			$report = kKavaReportsMgr::getUrlForReportAsCsv(
