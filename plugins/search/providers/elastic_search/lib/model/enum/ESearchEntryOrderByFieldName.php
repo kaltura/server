@@ -18,6 +18,6 @@ interface ESearchEntryOrderByFieldName extends BaseEnum
     const PLAYS_LAST_30_DAYS = 'plays_30days';
     const VIEWS_LAST_7_DAYS = 'views_7days';
     const PLAYS_LAST_7_DAYS = 'plays_7days';
-    const VIEWS_LAST_1_DAYS = 'views_1day';
-    const PLAYS_LAST_1_DAYS = 'plays_1day';
+    const VIEWS_LAST_1_DAY = 'views_1day';
+    const PLAYS_LAST_1_DAY = 'plays_1day';
 }

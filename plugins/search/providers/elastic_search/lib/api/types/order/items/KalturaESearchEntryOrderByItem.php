@@ -28,8 +28,8 @@ class KalturaESearchEntryOrderByItem extends KalturaESearchOrderByItem
         KalturaESearchEntryOrderByFieldName::VIEWS_LAST_30_DAYS => ESearchEntryOrderByFieldName::VIEWS_LAST_30_DAYS,
         KalturaESearchEntryOrderByFieldName::PLAYS_LAST_7_DAYS => ESearchEntryOrderByFieldName::PLAYS_LAST_7_DAYS,
         KalturaESearchEntryOrderByFieldName::VIEWS_LAST_7_DAYS => ESearchEntryOrderByFieldName::VIEWS_LAST_7_DAYS,
-        KalturaESearchEntryOrderByFieldName::PLAYS_LAST_1_DAYS => ESearchEntryOrderByFieldName::PLAYS_LAST_1_DAYS,
-        KalturaESearchEntryOrderByFieldName::VIEWS_LAST_1_DAYS => ESearchEntryOrderByFieldName::VIEWS_LAST_1_DAYS,
+        KalturaESearchEntryOrderByFieldName::PLAYS_LAST_1_DAY => ESearchEntryOrderByFieldName::PLAYS_LAST_1_DAY,
+        KalturaESearchEntryOrderByFieldName::VIEWS_LAST_1_DAY => ESearchEntryOrderByFieldName::VIEWS_LAST_1_DAY,
     );
 
     public function getMapBetweenObjects()
