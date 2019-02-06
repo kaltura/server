@@ -22,15 +22,8 @@ class ScheduleBulkService extends KalturaBaseService
 		$bulkUploadCoreType = BulkUploadSchedulePlugin::getBulkUploadTypeCoreValue(BulkUploadScheduleType::ICAL);
 		$bulkUploadObjectCoreType = BulkUploadSchedulePlugin::getBulkUploadObjectTypeCoreValue(BulkUploadObjectScheduleType::SCHEDULE_EVENT);
 
-		if (!$bulkUploadData)
-		{
-			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'bulkUploadData');
-		}
-
-		if (!$bulkUploadData->eventsType)
-		{
-			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'eventType');
-		}
+		if(!$bulkUploadData)
+	    	$bulkUploadData = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', $bulkUploadCoreType);
 
 		if(!$bulkUploadData->fileName)
 			$bulkUploadData->fileName = $fileData["name"];
