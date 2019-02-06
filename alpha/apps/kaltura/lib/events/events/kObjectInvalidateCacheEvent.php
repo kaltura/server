@@ -1,11 +1,8 @@
 <?php
 /**
- * Created by IntelliJ IDEA.
- * User: moshe.maor
- * Date: 2/10/2019
- * Time: 10:50 PM
+ * @package Core
+ * @subpackage events
  */
-
 class kObjectInvalidateCacheEvent extends kApplicativeEvent
 {
 	const EVENT_CONSUMER = 'kObjectInvalidateCacheEventConsumer';
