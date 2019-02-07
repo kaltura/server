@@ -119,7 +119,14 @@ class kESearchQueryManager
 
 	public static function getExactMatchQuery($searchItem, $fieldName, $allowedSearchTypes, &$queryAttributes)
 	{
-		$searchTerm = elasticSearchUtils::formatSearchTerm($searchItem->getSearchTerm());
+		if ($searchItem::shouldReplaceBooleanValue($fieldName))
+		{
+			$searchTerm = elasticSearchUtils::getBooleanValue($searchItem->getSearchTerm());
+		}
+		else
+		{
+			$searchTerm = elasticSearchUtils::formatSearchTerm($searchItem->getSearchTerm());
+		}
 		$fieldBoostFactor = $searchItem::getFieldBoostFactor($fieldName);
 		$fieldSuffix = '';
 		$queryObject = 'kESearchTermQuery';
