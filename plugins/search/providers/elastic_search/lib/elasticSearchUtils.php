@@ -11,7 +11,7 @@ class elasticSearchUtils
 	private static $html_chars_to_replace = array('<br />', '<br>',
 		'<br/>', '<div>', '</div>', '<div/>', '<p>', '</p>', '<p/>');
 
-	protected static $elastic_negation_booleans = array(0, '0', false, 'false', 'off', 'no');
+	protected static $elastic_negation_booleans = array('0', 'false', 'off', 'no');
 
     /**
      * return the analyzed language field name
@@ -178,11 +178,7 @@ class elasticSearchUtils
 
 	public static function getBooleanValue($value)
 	{
-		if (in_array(self::formatSearchTerm($value), self::$elastic_negation_booleans ,true))
-		{
-			return false;
-		}
-		return true;
+		return !in_array(self::formatSearchTerm($value), self::$elastic_negation_booleans);
 	}
 
 	/**
