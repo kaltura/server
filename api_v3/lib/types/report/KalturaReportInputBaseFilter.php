@@ -33,13 +33,6 @@ class KalturaReportInputBaseFilter extends KalturaObject
 	 */
 	public $toDay;
 
-	/**
-	 * Delimiter for result and filter formatting
-	 * @var string
-	 *
-	 */
-	public $delimiter;
-
 	private static $map_between_objects = array
 	(
 		'fromDate' => 'from_date',
