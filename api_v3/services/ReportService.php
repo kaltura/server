@@ -65,18 +65,24 @@ class ReportService extends KalturaBaseService
 	 * @param string $objectIds - one ID or more (separated by ',') of specific objects to query
 	 * @return KalturaReportGraphArray 
 	 */
-	public function getGraphsAction( $reportType , KalturaReportInputFilter $reportInputFilter , $dimension = null , $objectIds = null  )
+	public function getGraphsAction( $reportType , KalturaReportInputFilter $reportInputFilter , $dimension = null , $objectIds = null, KalturaReportResponseOptions $responseOptions = null  )
 	{
+		if (!$responseOptions)
+		{
+			$responseOptions = new KalturaReportResponseOptions();
+		}
+
 		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
-	
+
 		$reportGraphs =  KalturaReportGraphArray::fromReportDataArray(kKavaReportsMgr::getGraph(
 		    $this->getPartnerId(),
 		    $reportType,
 		    $reportInputFilter->toReportsInputFilter(),
 		    $dimension,
-		    $objectIds),
-		    $reportInputFilter->delimiter);
+		    $objectIds,
+		    $responseOptions->toObject()),
+		    $responseOptions->delimiter);
 
 		return $reportGraphs;
 	}
@@ -90,8 +96,13 @@ class ReportService extends KalturaBaseService
 	 * @param string $objectIds - one ID or more (separated by ',') of specific objects to query
 	 * @return KalturaReportTotal 
 	 */
-	public function getTotalAction( $reportType , KalturaReportInputFilter $reportInputFilter , $objectIds = null )
+	public function getTotalAction( $reportType , KalturaReportInputFilter $reportInputFilter , $objectIds = null, KalturaReportResponseOptions $responseOptions = null)
 	{
+		if (!$responseOptions)
+		{
+			$responseOptions = new KalturaReportResponseOptions();
+		}
+
 		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
 		
@@ -100,9 +111,9 @@ class ReportService extends KalturaBaseService
 		list ( $header , $data ) = kKavaReportsMgr::getTotal(
 		    $this->getPartnerId() ,
 		    $reportType ,
-		    $reportInputFilter->toReportsInputFilter() , $objectIds);
+		    $reportInputFilter->toReportsInputFilter() , $objectIds, $responseOptions->toObject());
 		
-		$reportTotal->fromReportTotal ( $header , $data, $reportInputFilter->delimiter );
+		$reportTotal->fromReportTotal ( $header , $data, $responseOptions->delimiter );
 			
 		return $reportTotal;
 	}
@@ -116,14 +127,20 @@ class ReportService extends KalturaBaseService
 	 * @param string $objectIds - one ID or more (separated by ',') of specific objects to query
 	 * @return KalturaReportBaseTotalArray 
 	 */
-	public function getBaseTotalAction( $reportType , KalturaReportInputFilter $reportInputFilter , $objectIds = null )
+	public function getBaseTotalAction( $reportType , KalturaReportInputFilter $reportInputFilter , $objectIds = null , KalturaReportResponseOptions $responseOptions = null)
 	{
+		if (!$responseOptions)
+		{
+			$responseOptions = new KalturaReportResponseOptions();
+		}
+
 		$reportSubTotals =  KalturaReportBaseTotalArray::fromReportDataArray(  
 			kKavaReportsMgr::getBaseTotal( 
 				$this->getPartnerId() , 
 				$reportType , 
 				$reportInputFilter->toReportsInputFilter() ,
-				$objectIds));
+				$objectIds,
+				$responseOptions->toObject()));
 
 		return $reportSubTotals;
 	}
@@ -140,8 +157,13 @@ class ReportService extends KalturaBaseService
 	 * @param string $objectIds - one ID or more (separated by ',') of specific objects to query
 	 * @return KalturaReportTable 
 	 */
-	public function getTableAction($reportType, KalturaReportInputFilter $reportInputFilter, KalturaFilterPager $pager, $order = null, $objectIds = null)
+	public function getTableAction($reportType, KalturaReportInputFilter $reportInputFilter, KalturaFilterPager $pager, $order = null, $objectIds = null, KalturaReportResponseOptions $responseOptions = null)
 	{
+		if (!$responseOptions)
+		{
+			$responseOptions = new KalturaReportResponseOptions();
+		}
+
 		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
 		
@@ -170,9 +192,9 @@ class ReportService extends KalturaBaseService
 		    $reportType ,
 		    $reportInputFilter->toReportsInputFilter() ,
 		    $pager->pageSize , $pager->pageIndex ,
-		    $order ,  $objectIds);
+		    $order , $objectIds, null , false , $responseOptions->toObject());
 
-		$reportTable->fromReportTable ( $header , $data , $totalCount, $reportInputFilter->delimiter );
+		$reportTable->fromReportTable ( $header , $data , $totalCount, $responseOptions->delimiter );
 			
 		return $reportTable;
 	}	
@@ -197,13 +219,19 @@ class ReportService extends KalturaBaseService
 	public function getUrlForReportAsCsvAction ( $reportTitle , $reportText , $headers , $reportType , KalturaReportInputFilter $reportInputFilter , 
 		$dimension = null , 
 		KalturaFilterPager $pager = null , 
-		$order = null , $objectIds = null )
+		$order = null , $objectIds = null,
+		KalturaReportResponseOptions $responseOptions = null)
 	{
 		ini_set( "memory_limit","512M" );
 		
 		if(!$pager)
 			$pager = new KalturaFilterPager();
-		
+
+		if (!$responseOptions)
+		{
+			$responseOptions = new KalturaReportResponseOptions();
+		}
+
 		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
 		
@@ -219,7 +247,8 @@ class ReportService extends KalturaBaseService
 				$objectIds,
 				$pager->pageSize,
 				$pager->pageIndex,
-				$order);
+				$order,
+				$responseOptions->toObject());
 		}
 		catch(Exception $e){
 			$code = $e->getCode();
@@ -243,8 +272,7 @@ class ReportService extends KalturaBaseService
 	 * @ksOptional 
 	 */
 	public function serveAction($id) {
-		
-		// KS verification - we accept either admin session or download privilege of the file 
+		// KS verification - we accept either admin session or download privilege of the file
 		$ks = $this->getKs();
 		if(!$ks || !($ks->isAdmin() || $ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id)))
 			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);

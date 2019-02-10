@@ -155,7 +155,8 @@ class VarConsoleService extends KalturaBaseService
     				null , 
     				myReportsMgr::REPORT_TYPE_PARTNER_USAGE , 
     				$inputFilter ,
-    				implode(",", $partnerIds));
+    				implode(",", $partnerIds),
+				null);
 		
     		$total = new KalturaVarPartnerUsageTotalItem();
     		$total->fromString($reportHeader, $reportData);
@@ -164,7 +165,8 @@ class VarConsoleService extends KalturaBaseService
 					null ,
 					myReportsMgr::REPORT_TYPE_PEAK_STORAGE ,
 					$inputFilter ,
-					implode(",", $partnerIds));
+					implode(",", $partnerIds),
+					null);
 
     		if($peakStoragereportData[0])
     			$total->peakStorage = ceil(@$peakStoragereportData[0]);

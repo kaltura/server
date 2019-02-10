@@ -46,7 +46,6 @@ class KalturaReportInputBaseFilter extends KalturaObject
 		'toDate' => 'to_date',
 		'fromDay' => 'from_day',
 		'toDay' => 'to_day',
-		'delimiter',
 	);
 
 	protected function getMapBetweenObjects()
@@ -69,11 +68,6 @@ class KalturaReportInputBaseFilter extends KalturaObject
 		} else if ($this->fromDate && $this->toDate) {
 			$this->fromDay = date ( "Ymd" , $this->fromDate );
 			$this->toDay = date ( "Ymd" , $this->toDate );
-		}
-
-		if (!isset($this->delimiter))
-		{
-			$this->delimiter = ',';
 		}
 
 		foreach ($this->getMapBetweenObjects() as $apiName => $memberName)
