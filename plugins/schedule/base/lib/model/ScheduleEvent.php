@@ -304,4 +304,10 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	{
 		return array();
 	}
+	
+	public function getSphinxMatchOptimizations() {
+		$objectName = $this->getIndexObjectName();
+		return $objectName::getSphinxMatchOptimizations($this);
+	}
+	
 } // ScheduleEvent
