@@ -71,9 +71,15 @@ class KalturaAlignmentVendorTaskData extends KalturaVendorTaskData
 	{
 		$this->validatePropertyNotNull("textTranscriptAssetId");
 		$this->validateTranscriptAsset($this->textTranscriptAssetId, KalturaAttachmentType::TEXT);
+		
 		if($this->jsonTranscriptAssetId)
 		{
 			$this->validateTranscriptAsset($this->jsonTranscriptAssetId, KalturaAttachmentType::JSON);
+		}
+		
+		if($this->captionAssetId)
+		{
+			$this->validateCaptionAsset($this->captionAssetId);
 		}
 
 		return parent::validateForInsert($propertiesToSkip);
@@ -82,9 +88,21 @@ class KalturaAlignmentVendorTaskData extends KalturaVendorTaskData
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		/* @var $sourceObject kAlignmentVendorTaskData */
-		if(isset($this->textTranscriptAssetId) && $sourceObject->getTranscriptAssetId() != $this->textTranscriptAssetId)
+		if(isset($this->textTranscriptAssetId) && $sourceObject->getTextTranscriptAssetId() != $this->textTranscriptAssetId)
 		{
 			$this->validateTranscriptAsset($this->textTranscriptAssetId, KalturaAttachmentType::TEXT);
+		}
+		
+		/* @var $sourceObject kAlignmentVendorTaskData */
+		if(isset($this->jsonTranscriptAssetId) && $sourceObject->getJsonTranscriptAssetId() != $this->jsonTranscriptAssetId)
+		{
+			$this->validateTranscriptAsset($this->jsonTranscriptAssetId, KalturaAttachmentType::JSON);
+		}
+		
+		/* @var $sourceObject kAlignmentVendorTaskData */
+		if(isset($this->captionAssetId) && $sourceObject->getCaptionAssetId() != $this->captionAssetId)
+		{
+			$this->validateCaptionAsset($this->captionAssetId);
 		}
 
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
