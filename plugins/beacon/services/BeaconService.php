@@ -109,8 +109,6 @@ class BeaconService extends KalturaBaseService
 		if ($pager)
 		{
 			$kPager = $pager->toObject();
-			$kPager->setPageSize($pager->calcPageSize());
-			$kPager->setPageIndex($pager->calcPageIndex());
 		}
 
 		return array($coreParams, $kPager);

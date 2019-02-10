@@ -14,8 +14,7 @@ class KalturaFrontController
 	private $action = "";
 	private $disptacher = null;
 	private $serializer;
-	private $exceptionHandlersInitialized = false;
-	private $exceptionHandlers = array();
+	private $exceptionHandlers = null;
 
 	private function __construct()
 	{
@@ -561,15 +560,15 @@ class KalturaFrontController
 
 	protected function shouldHandlePluginException($exceptionClass)
 	{
-		if (!$this->exceptionHandlersInitialized)
+		if (is_null($this->exceptionHandlers))
 		{
+			$this->exceptionHandlers = array();
 			$handlers = KalturaPluginManager::getPluginInstances('IKalturaExceptionHandler');
 			foreach ($handlers as $handler)
 			{
 				/* @var $handler IKalturaExceptionHandler */
 				$this->exceptionHandlers = array_merge($this->exceptionHandlers, $handler->getExceptionMap());
 			}
-			$this->exceptionHandlersInitialized = true;
 		}
 
 		return isset($this->exceptionHandlers[$exceptionClass]);

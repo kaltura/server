@@ -38,12 +38,15 @@ class KalturaPager extends KalturaObject
 
     public function toObject($object = null, $skipProperties = array())
     {
-        if(!$object)
+        if (!$object)
         {
             $object = new kPager();
         }
 
-        return parent::toObject($object, $skipProperties);
+        $object->setPageSize($this->calcPageSize());
+        $object->setPageIndex($this->calcPageIndex());
+
+        return parent::toObject($object, array('pageSize', 'pageIndex'));
     }
 
     public function calcPageSize()
