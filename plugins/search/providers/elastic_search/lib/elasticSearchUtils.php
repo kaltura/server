@@ -11,6 +11,8 @@ class elasticSearchUtils
 	private static $html_chars_to_replace = array('<br />', '<br>',
 		'<br/>', '<div>', '</div>', '<div/>', '<p>', '</p>', '<p/>');
 
+	protected static $elastic_negation_booleans = array('0', 'false', 'off', 'no');
+
     /**
      * return the analyzed language field name
      * @param $language
@@ -174,6 +176,10 @@ class elasticSearchUtils
 		return $numOfFragments;
 	}
 
+	public static function getBooleanValue($value)
+	{
+		return !in_array(self::formatSearchTerm($value), self::$elastic_negation_booleans);
+	}
 
 	/**
 	 * Go over the array and decode html and strip tags from all of its leafs

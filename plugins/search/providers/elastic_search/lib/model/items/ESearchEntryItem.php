@@ -82,6 +82,11 @@ class ESearchEntryItem extends ESearchItem
 		ESearchEntryFieldName::TAGS,
 	);
 
+	protected static $booleanFields = array(
+		ESearchEntryFieldName::IS_LIVE,
+		ESearchEntryFieldName::IS_QUIZ,
+	);
+
 	/**
 	 * @return ESearchEntryFieldName
 	 */

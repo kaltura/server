@@ -29,6 +29,10 @@ class kBeaconScheduledResourceItem extends ESearchItem
 
 	protected static $searchHistoryFields = array();
 
+	protected static $booleanFields = array(
+		BeaconScheduledResourceFieldName::IS_LOG,
+	);
+
 	/**
 	 * @return BeaconScheduledResourceFieldName
 	 */

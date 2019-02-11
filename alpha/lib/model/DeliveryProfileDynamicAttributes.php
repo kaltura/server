@@ -160,7 +160,7 @@ class DeliveryProfileDynamicAttributes {
 	protected $requestedDeliveryProfileIds = null;
 	
 	/**
-	 * List of flavor params ids swhich should be enfroced due to an access control action
+	 * List of flavor params ids which should be enforced due to an access control action
 	 * @var array
 	 */
 	protected $aclFlavorParamsIds = null;
@@ -179,17 +179,17 @@ class DeliveryProfileDynamicAttributes {
 	/**
 	 * @var bool
 	 */
-	protected  $hasValidSequence = false;
+	protected $hasValidSequence = false;
 	
 	/**
 	 * @var string
 	 */
-	protected  $defaultAudioLanguage = null;
+	protected $defaultAudioLanguage = null;
 
 	/**
 	 * @var int
 	 */
-	protected  $streamType = null;
+	protected $streamType = null;
 
 	/**
 	 * Signifies weather we should use seamless fallback with edge servers
@@ -202,6 +202,16 @@ class DeliveryProfileDynamicAttributes {
 	 * @var array
 	 */
 	protected $usedEdgeServerIds;
+	
+	/**
+	 * @var int
+	 */
+	protected $minBitrate = null;
+	
+	/**
+	 * @var int
+	 */
+	protected $maxBitrate = null;
 
 	/**
 	 * @return the $addThumbnailExtension
@@ -785,6 +795,38 @@ class DeliveryProfileDynamicAttributes {
 	{
 		$this->edgeServerFallback = $edgeServerFallback;
 	}
+	
+	/**
+	 * @return int
+	 */
+	public function getMinBitrate()
+	{
+		return $this->minBitrate;
+	}
+	
+	/**
+	 * @param int $minBitrate
+	 */
+	public function setMinBitrate($minBitrate)
+	{
+		$this->minBitrate = $minBitrate;
+	}
+	
+	/**
+	 * @return int
+	 */
+	public function getMaxBitrate()
+	{
+		return $this->maxBitrate;
+	}
+	
+	/**
+	 * @param int $maxBitrate
+	 */
+	public function setMaxBitrate($maxBitrate)
+	{
+		$this->maxBitrate = $maxBitrate;
+	}
 
 	/**
 	 * 
@@ -841,6 +883,8 @@ class DeliveryProfileDynamicAttributes {
 		$this->defaultAudioLanguage = $newObj->getDefaultAudioLanguage();
 		$this->streamType = $newObj->getStreamType();
 		$this->edgeServerFallback = $newObj->getEdgeServerFallback();
+		$this->minBitrate = $newObj->getMinBitrate();
+		$this->maxBitrate = $newObj->getMaxBitrate();
 	}
 }
 
