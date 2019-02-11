@@ -33,9 +33,10 @@
 	        <field name="resource_system_names" indexName="resource_system_names" getter="resourceSystemNamesForIndex" type="string" matchable="yes" />
 	        <field name="template_entry_id" indexName="template_entry_id" getter="templateEntryId" type="string" matchable="yes" />
 	        <field name="sphinx_match_optimizations" indexName="sphinx_match_optimizations" type="string" />
-	        <index format="P%s">
+			<index format="P%sST%s">
 				<value field="partner_id" />
-	        </index>
+				<value field="status" />
+			</index>
 	        <cacheInvalidationKey>
 	            <value field="id" />
 	            <value field="partner_id" />
