@@ -557,8 +557,7 @@ class thumbnailAction extends sfAction
 			$fileSync= kFileSyncUtils::getOriginFileSyncForKey($entryImageSyncKey);
 			if($fileSync)
 			{
-				$lastModified = $fileSync->getUpdatedAt(null);
-				return $lastModified;
+				return $fileSync->getUpdatedAt(null);
 			}
 		}
 		$lastModifiedFlavor = assetPeer::retrieveLastModifiedFlavorByEntryId($entry->getId());
