@@ -307,7 +307,7 @@ class ScheduleEventIndex extends BaseIndexObject
 	public static function getSphinxOptimizationMap()
 	{
 		return array(
-			array("P%s","schedule_event.PARTNER_ID"),
+			array("P%sST%s","schedule_event.PARTNER_ID","schedule_event.STATUS"),
 		);
 	}
 
@@ -315,7 +315,7 @@ class ScheduleEventIndex extends BaseIndexObject
 	public static function getSphinxOptimizationValues()
 	{
 		return array(
-			array("P%s","getPartnerId"),
+			array("P%sST%s","getPartnerId","getStatus"),
 		);
 	}
 
