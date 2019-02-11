@@ -7,14 +7,30 @@
 class KalturaAlignmentVendorTaskData extends KalturaVendorTaskData
 {
 	/**
-	 * The id of the transcript object the vendor should use while runing the alignment task
+	 * The id of the text transcript object the vendor should use while runing the alignment task
 	 * @var string
 	 */
-	public $transcriptAssetId;
+	public $textTranscriptAssetId;
+	
+	/**
+	 * Optional - The id of the json transcript object the vendor should update once alignment task processing is done
+	 * @insertonly
+	 * @var string
+	 */
+	public $jsonTranscriptAssetId;
+	
+	/**
+	 * Optional - The id of the caption asset object the vendor should update once alignment task processing is done
+	 * @insertonly
+	 * @var string
+	 */
+	public $captionAssetId;
 	
 	private static $map_between_objects = array
 	(
-		'transcriptAssetId'
+		'textTranscriptAssetId',
+		'jsonTranscriptAssetId',
+		'captionAssetId',
 	);
 	
 	/* (non-PHPdoc)
@@ -53,8 +69,18 @@ class KalturaAlignmentVendorTaskData extends KalturaVendorTaskData
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull("transcriptAssetId");
-		$this->validateTranscriptAsset($this->transcriptAssetId);
+		$this->validatePropertyNotNull("textTranscriptAssetId");
+		$this->validateTranscriptAsset($this->textTranscriptAssetId, KalturaAttachmentType::TEXT);
+		
+		if($this->jsonTranscriptAssetId)
+		{
+			$this->validateTranscriptAsset($this->jsonTranscriptAssetId, KalturaAttachmentType::JSON);
+		}
+		
+		if($this->captionAssetId)
+		{
+			$this->validateCaptionAsset($this->captionAssetId);
+		}
 
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -62,20 +88,46 @@ class KalturaAlignmentVendorTaskData extends KalturaVendorTaskData
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		/* @var $sourceObject kAlignmentVendorTaskData */
-		if(isset($this->transcriptAssetId) && $sourceObject->getTranscriptAssetId() != $this->transcriptAssetId)
+		if(isset($this->textTranscriptAssetId) && $sourceObject->getTextTranscriptAssetId() != $this->textTranscriptAssetId)
 		{
-			$this->validateTranscriptAsset($this->transcriptAssetId);
+			$this->validateTranscriptAsset($this->textTranscriptAssetId, KalturaAttachmentType::TEXT);
+		}
+		
+		/* @var $sourceObject kAlignmentVendorTaskData */
+		if(isset($this->jsonTranscriptAssetId) && $sourceObject->getJsonTranscriptAssetId() != $this->jsonTranscriptAssetId)
+		{
+			$this->validateTranscriptAsset($this->jsonTranscriptAssetId, KalturaAttachmentType::JSON);
+		}
+		
+		/* @var $sourceObject kAlignmentVendorTaskData */
+		if(isset($this->captionAssetId) && $sourceObject->getCaptionAssetId() != $this->captionAssetId)
+		{
+			$this->validateCaptionAsset($this->captionAssetId);
 		}
 
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
-	protected function validateTranscriptAsset($transcriptAssetId)
+	protected function validateTranscriptAsset($transcriptAssetId, $expectedType)
 	{
-		$transcriptAssetDb = assetPeer::retrieveById($transcriptAssetId);
+		$transcriptAssetDb = assetPeer::retrieveById($textTranscriptAssetId);
 		if (!$transcriptAssetDb || !($transcriptAssetDb instanceof TranscriptAsset))
 		{
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $transcriptAssetId);
+		}
+		
+		if($transcriptAssetDb->getFormat() != $expectedType)
+		{
+			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_FORMAT_MISMATCH, $transcriptAssetId, $expectedType);
+		}
+	}
+	
+	protected function validateCaptionAsset($captionAssetId)
+	{
+		$captionAssetDb = assetPeer::retrieveById($captionAssetId);
+		if (!$captionAssetDb || !($captionAssetDb instanceof CaptionAsset))
+		{
+			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
 		}
 	}
 }
