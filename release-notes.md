@@ -1,3 +1,22 @@
+# Naos 14.14.0 #
+## Schedule Event - Add sphinx match optimization##
+
+ - Issue Type: Task
+ - Issue ID: No-Plat
+
+### Configuration ###
+update configurations/sphinx/kaltura.conf file and add the following to kaltura_schedule_event:
+rt_field = sphinx_match_optimizations
+
+### Deployment scripts ###
+	
+ReIndex and repopulate kaltura_schedule_event tabel in sphinx.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Naos 14.13.0 #
 ## Conf Maps - add option to view list of all maps in combo box ##
 - Issue Type: Task
