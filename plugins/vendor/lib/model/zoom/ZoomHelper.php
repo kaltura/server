@@ -45,7 +45,7 @@ class ZoomHelper
 		$entry->setType(entryType::MEDIA_CLIP);
 		$entry->setSourceType(EntrySourceType::URL);
 		$entry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
-		$entry->setDescription('Zoom meeting id:'. $meetingId);
+		$entry->setDescription('Zoom meeting id:' . $meetingId);
 		$entry->setName($topic);
 		$entry->setPartnerId($dbUser->getPartnerId());
 		$entry->setStatus(entryStatus::NO_CONTENT);
@@ -65,7 +65,7 @@ class ZoomHelper
 				//User John.Doe@k.com will be added both as John.Doe@k.com and John.Doe
 				if(kString::isEmailString($email))
 				{
-					list($puserId,) = explode('@',$email);
+					list($puserId,) = explode('@', $email);
 					kuserPeer::createUniqueKuserForPartner($dbUser->getPartnerId(), $puserId);
 					$emails [] = $puserId;
 				}
@@ -75,7 +75,7 @@ class ZoomHelper
 		//In case that user is saved in Zoom with full email addresss,we keep also user ID on the entry as co-editor.
 		if(kString::isEmailString($dbUser->getPuserId()))
 		{
-			list($puserId,) = explode('@',$dbUser->getPuserId());
+			list($puserId,) = explode('@', $dbUser->getPuserId());
 			kuserPeer::createUniqueKuserForPartner($dbUser->getPartnerId(), $puserId);
 			$entry->setEntitledPusersEdit($puserId);
 		}
@@ -386,6 +386,7 @@ class ZoomHelper
 	 * @param $emails
 	 * @param $meetingId
 	 * @param $hostEmail
+	 * @param $topic
 	 * @throws Exception
 	 */
 	public static function uploadToKaltura($urls, $dbUser, $zoomIntegration, $emails, $meetingId, $hostEmail, $topic)
