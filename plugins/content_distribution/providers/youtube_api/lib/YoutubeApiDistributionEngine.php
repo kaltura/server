@@ -134,7 +134,8 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$youtube = new Google_Service_YouTube($client);
 
 		$listResponse = $youtube->videos->listVideos('status', array('id' => $data->entryDistribution->remoteId));
-		$video = reset($listResponse->getItems());
+		$items = $listResponse->getItems();
+		$video = reset($items);
 		KalturaLog::debug("Video: " . print_r($video, true));
 
 		switch($video['modelData']['status']['uploadStatus'])
