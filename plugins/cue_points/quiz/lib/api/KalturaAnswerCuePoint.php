@@ -202,7 +202,8 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		$dbEntry = entryPeer::retrieveByPK($this->entryId);
 		$kQuiz = QuizPlugin::validateAndGetQuiz($dbEntry);
 		$this->validateUserEntry();
-		if ( !$kQuiz->getAllowAnswerUpdate() && !kCurrentContext::$is_admin_session) {
+		if ( !$kQuiz->getAllowAnswerUpdate() && !kCurrentContext::$is_admin_session) 
+		{
 			throw new KalturaAPIException(KalturaQuizErrors::ANSWER_UPDATE_IS_NOT_ALLOWED, $sourceObject->getEntryId());
 		}
 		if ($this->feedback != null && !kEntitlementUtils::isEntitledForEditEntry($dbEntry) )
