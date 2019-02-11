@@ -23,6 +23,8 @@ class ZoomHelper
 	const MEETING_ID = 'id';
 	const USER_EMAIL = 'user_email';
 	const PARTICIPANTS = 'participants';
+	const UUID = 'uuid';
+	const TOPIC = 'topic';
 	/** php body */
 	const PHP_INPUT = 'php://input';
 
@@ -33,16 +35,18 @@ class ZoomHelper
 	 * @param string $zoomCategory
 	 * @param $emails
 	 * @param $meetingId
+	 * @param $topic
 	 * @return string
 	 * @throws Exception
 	 */
-	public static function createEntryForZoom($dbUser, $zoomCategory, $emails, $meetingId)
+	public static function createEntryForZoom($dbUser, $zoomCategory, $emails, $meetingId, $topic)
 	{
 		$entry = new entry();
 		$entry->setType(entryType::MEDIA_CLIP);
 		$entry->setSourceType(EntrySourceType::URL);
 		$entry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
-		$entry->setName('Zoom_'. $meetingId);
+		$entry->setDescription('Zoom meeting id:'. $meetingId);
+		$entry->setName($topic);
 		$entry->setPartnerId($dbUser->getPartnerId());
 		$entry->setStatus(entryStatus::NO_CONTENT);
 		$entry->setPuserId($dbUser->getPuserId());
@@ -61,11 +65,19 @@ class ZoomHelper
 				//User John.Doe@k.com will be added both as John.Doe@k.com and John.Doe
 				if(kString::isEmailString($email))
 				{
-					$emailParts = explode('@',$email);
-					kuserPeer::createUniqueKuserForPartner($dbUser->getPartnerId(), $emailParts[0]);
+					list($puserId,) = explode('@',$email);
+					kuserPeer::createUniqueKuserForPartner($dbUser->getPartnerId(), $puserId);
+					$emails [] = $puserId;
 				}
 			}
 			$entry->setEntitledPusersPublish(implode(",", array_unique($emails)));
+		}
+		//In case that user is saved in Zoom with full email addresss,we keep also user ID on the entry as co-editor.
+		if(kString::isEmailString($dbUser->getPuserId()))
+		{
+			list($puserId,) = explode('@',$dbUser->getPuserId());
+			kuserPeer::createUniqueKuserForPartner($dbUser->getPartnerId(), $puserId);
+			$entry->setEntitledPusersEdit($puserId);
 		}
 		$entry->save();
 		return $entry->getId();
@@ -215,7 +227,8 @@ class ZoomHelper
 		$recordingFiles = $meeting[self::RECORDING_FILES];
 		$downloadURLs = self::getDownloadUrls($recordingFiles);
 		$meetingId = $meeting[self::MEETING_ID];
-		return array($accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId);
+		$topic = $meeting[self::TOPIC];
+		return array($accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId, $topic);
 	}
 
 	/**
@@ -375,11 +388,11 @@ class ZoomHelper
 	 * @param $hostEmail
 	 * @throws Exception
 	 */
-	public static function uploadToKaltura($urls, $dbUser, $zoomIntegration, $emails, $meetingId, $hostEmail)
+	public static function uploadToKaltura($urls, $dbUser, $zoomIntegration, $emails, $meetingId, $hostEmail, $topic)
 	{
 		foreach ($urls as $url)
 		{
-			$entryId = ZoomHelper::createEntryForZoom($dbUser, $zoomIntegration->getZoomCategory(), $emails, $meetingId);
+			$entryId = ZoomHelper::createEntryForZoom($dbUser, $zoomIntegration->getZoomCategory(), $emails, $meetingId, $topic);
 			kJobsManager::addImportJob(null, $entryId, $dbUser->getPartnerId(), $url);
 			KalturaLog::debug('Zoom - upload entry to kaltura started, partner id: ' .
 				$zoomIntegration->getPartnerId() . ' host email: ' . $hostEmail .
@@ -452,5 +465,4 @@ class ZoomHelper
 		$categoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
 		$categoryEntry->save();
 	}
-
 }
