@@ -341,7 +341,8 @@ class thumbnailAction extends sfAction
 		}
 		
 		// not allow capturing frames if the partner has FEATURE_DISALLOW_FRAME_CAPTURE permission
-		if(($vid_sec != -1) || ($vid_slice != -1) || ($vid_slices != -1))
+		$isCapturing = ($vid_sec != -1) || ($vid_slice != -1) || ($vid_slices != -1);
+		if($isCapturing)
 		{
 			if ($partner->getEnabledService(PermissionName::FEATURE_BLOCK_THUMBNAIL_CAPTURE))
 			{
@@ -523,9 +524,9 @@ class thumbnailAction extends sfAction
 			$cache = new myCache("thumb", 2592000); // 30 days, the max memcache allows
 		}
 
-		$lastModifiedFlavor = assetPeer::retrieveLastModifiedFlavorByEntryId($entry->getId());
-		$lastModified = $lastModifiedFlavor ? $lastModifiedFlavor->getUpdatedAt(null) : null;
-		
+
+		$lastModified = $this->getLastModified($entry, $isCapturing);
+
 		$entryKey = kFileUtils::isFileEncrypt($tempThumbPath) ? $entry->getGeneralEncryptionKey() : null;
 		$entryIv = $entryKey ? $entry->getEncryptionIv() : null;
 		$renderer = kFileUtils::getDumpFileRenderer($tempThumbPath, null, $cacheAge, 0, $lastModified, $entryKey, $entryIv);
@@ -546,6 +547,23 @@ class thumbnailAction extends sfAction
 		
 		// TODO - can delete from disk assuming we caneasily recreate it and it will anyway be cached in the CDN
 		// however dumpfile dies at the end so we cant just write it here (maybe register a shutdown callback)
+	}
+
+	protected function getLastModified(entry $entry, $isCapturing)
+	{
+		if(!$isCapturing)
+		{
+			$entryImageSyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$fileSync= kFileSyncUtils::getOriginFileSyncForKey($entryImageSyncKey);
+			if($fileSync)
+			{
+				return $fileSync->getUpdatedAt(null);
+			}
+		}
+		$lastModifiedFlavor = assetPeer::retrieveLastModifiedFlavorByEntryId($entry->getId());
+		$lastModified = $lastModifiedFlavor ? $lastModifiedFlavor->getUpdatedAt(null) : null;
+
+		return $lastModified;
 	}
 
 	private function getDimensions()
