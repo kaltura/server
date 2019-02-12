@@ -13,7 +13,7 @@ class thumbnailAction extends sfAction
 	);
 
 	/* (non-PHPdoc)
-	 * @see /symfony/action/sfComponent#getRequestParameter()
+	 * @see /symfony/action/sfComponent#getRequestParameter()f
 	 *
 	 * Needed because some partners add .jpg at the end of the url, it might be added to a real attribute.
 	 */
@@ -554,7 +554,7 @@ class thumbnailAction extends sfAction
 		if(!$isCapturing)
 		{
 			$entryImageSyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-			$fileSync= kFileSyncUtils::getOriginFileSyncForKey($entryImageSyncKey);
+			$fileSync= kFileSyncUtils::getOriginFileSyncForKey($entryImageSyncKey,false);
 			if($fileSync)
 			{
 				return $fileSync->getUpdatedAt(null);
