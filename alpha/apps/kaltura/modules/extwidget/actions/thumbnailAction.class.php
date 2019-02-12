@@ -13,7 +13,7 @@ class thumbnailAction extends sfAction
 	);
 
 	/* (non-PHPdoc)
-	 * @see /symfony/action/sfComponent#getRequestParameter()f
+	 * @see /symfony/action/sfComponent#getRequestParameter()
 	 *
 	 * Needed because some partners add .jpg at the end of the url, it might be added to a real attribute.
 	 */
