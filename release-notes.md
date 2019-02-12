@@ -10,7 +10,7 @@ rt_field = sphinx_match_optimizations
 
 ### Deployment scripts ###
 	
-ReIndex and repopulate kaltura_schedule_event tabel in sphinx.
+ReIndex and repopulate kaltura_schedule_event table in sphinx.
 
 #### Known Issues & Limitations ####
 
