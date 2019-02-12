@@ -1433,10 +1433,17 @@ class kKavaReportsMgr extends kKavaBase
 				// plays
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
-					self::REPORT_DIMENSION => self::DIMENSION_ENTRY_OWNER_ID,
+					self::REPORT_DIMENSION => self::DIMENSION_ENTRY_CREATOR_ID,
 					self::REPORT_FILTER => array(
-						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
-						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_LIVE_STREAM, self::MEDIA_TYPE_LIVE_WIN_MEDIA, self::MEDIA_TYPE_LIVE_REAL_MEDIA, self::MEDIA_TYPE_LIVE_QUICKTIME)
+						array(
+							self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
+							self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_LIVE_STREAM, self::MEDIA_TYPE_LIVE_WIN_MEDIA, self::MEDIA_TYPE_LIVE_REAL_MEDIA, self::MEDIA_TYPE_LIVE_QUICKTIME)
+						),
+						array(
+							self::DRUID_DIMENSION => self::DIMENSION_ENTRY_CREATED_DAY,
+							self::DRUID_TYPE => self::DRUID_BOUND_FILTER,
+							self::DRUID_VALUES => array()
+						)
 					),
 					self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
 					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY),
@@ -2660,7 +2667,7 @@ class kKavaReportsMgr extends kKavaBase
 			}
 		}
 
-		if($object_ids)
+		if ($object_ids)
 		{
 			$object_ids_arr = explode(',', $object_ids);
 

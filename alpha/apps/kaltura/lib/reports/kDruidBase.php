@@ -10,6 +10,7 @@ class kDruidBase
 	const DRUID_FILTERED_AGGR = 'filtered';
 	const DRUID_SELECTOR_FILTER = 'selector';
 	const DRUID_IN_FILTER = 'in';
+	const DRUID_BOUND_FILTER = 'bound';
 	const DRUID_TYPE = 'type';
 	const DRUID_FILTER = 'filter';
 	const DRUID_DIMENSION = 'dimension';
@@ -67,6 +68,8 @@ class kDruidBase
 	const DRUID_OUTPUT_NAME = 'outputName';
 	const DRUID_LIST_FILTERED = 'listFiltered';
 	const DRUID_DELEGATE = 'delegate';
+	const DRUID_LOWER = 'lower';
+	const DRUID_UPPER = 'upper';
 	
 	// druid response keywords
 	const DRUID_TIMESTAMP = 'timestamp';
@@ -115,6 +118,29 @@ class kDruidBase
 			self::DRUID_TYPE => self::DRUID_IN_FILTER,
 			self::DRUID_DIMENSION => $dimension,
 			self::DRUID_VALUES => $values
+		);
+	}
+
+	protected static function getBoundFilter($dimension, $values, $order, $input_filter)
+	{
+		if (count($values != 2))
+		{
+			//error
+		}
+		foreach ($values as &$value)
+		{
+			if ($value[0] != ':')
+			{
+				$param_name = substr($value, 1);
+				$value = $input_filter->$param_name;
+			}
+		}
+		return array(
+			self::DRUID_TYPE => self::DRUID_BOUND_FILTER,
+			self::DRUID_DIMENSION => $dimension,
+			self::DRUID_LOWER => $lower,
+			self::DRUID_UPPER => $upper,
+			self::DRUID_SORTING => $order
 		);
 	}
 	
