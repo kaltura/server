@@ -43,7 +43,7 @@ class KalturaPager extends KalturaObject
         $object->setPageSize($this->calcPageSize());
         $object->setPageIndex($this->calcPageIndex());
 
-        return parent::toObject($object, array('pageSize', 'pageIndex'));
+        return parent::toObject($object, $skipProperties);
     }
 
     public function calcPageSize()
