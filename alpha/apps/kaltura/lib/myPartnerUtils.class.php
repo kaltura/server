@@ -2035,7 +2035,7 @@ class myPartnerUtils
 
 		try
 		{
-			$results = $baseSearch->doSearch($operator, $objectStatuses, null, $pager, null);
+			$results = $baseSearch->doSearch($operator, $pager, $objectStatuses, null, null);
 		}
 		catch(Exception $e)
 		{

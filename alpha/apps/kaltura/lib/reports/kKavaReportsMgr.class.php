@@ -175,6 +175,7 @@ class kKavaReportsMgr extends kKavaBase
 	const MAX_CSV_RESULT_SIZE = 60000;
 	const MAX_CUSTOM_REPORT_RESULT_SIZE = 100000;
 	const MIN_THRESHOLD = 500;
+	const MAX_ESEARCH_RESULTS = 1000;
 	
 	const ENRICH_CHUNK_SIZE = 10000;
 	const ENRICH_DIM_DELIMITER = '|';
@@ -2682,11 +2683,35 @@ class kKavaReportsMgr extends kKavaBase
 			}
 		}
 
+		if ($input_filter->entry_operator)
+		{
+			$entry_search = new kEntrySearch();
+			$entry_search->setFilterOnlyContext();
+			$pager = new kPager();
+			$pager->setPageSize(self::MAX_ESEARCH_RESULTS);
+			$elastic_results = $entry_search->doSearch($input_filter->entry_operator, $pager);
+			$elastic_entry_ids = kESearchCoreAdapter::getObjectIdsFromElasticResults($elastic_results);
+
+			if ($elastic_results[kESearchCoreAdapter::HITS_KEY][kESearchCoreAdapter::TOTAL_KEY] > count($elastic_entry_ids))
+			{
+				throw new kCoreException('Search is to general', kCoreException::SEARCH_TOO_GENERAL);
+			}
+
+			if ($elastic_entry_ids)
+			{
+				$entry_ids_from_db = array_merge($entry_ids_from_db, $elastic_entry_ids);
+			}
+			else
+			{
+				$entry_ids_from_db[] = entry::ENTRY_ID_THAT_DOES_NOT_EXIST;
+			}
+		}
+
 		if (count($entry_ids_from_db))
 		{
 			$druid_filter[] = array(
 				self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID,
-				self::DRUID_VALUES => $entry_ids_from_db
+				self::DRUID_VALUES => array_values(array_unique($entry_ids_from_db))
 			);
 		}
 
