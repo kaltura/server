@@ -150,10 +150,36 @@ class KalturaScheduleEventFilter extends KalturaScheduleEventBaseFilter
 		$pager->attachToCriteria($c);
 
 		$list = ScheduleEventPeer::doSelect($c);
+		if(Count($list) && $type != ScheduleEventType::BLACKOUT)
+		{
+			$this->handleBlackoutEventConflictsForList($list);
+		}
 
 		$response = new KalturaScheduleEventListResponse();
 		$response->objects = KalturaScheduleEventArray::fromDbArray($list, $responseProfile);
 		$response->totalCount = $c->getRecordsCount();
 		return $response;
+	}
+
+	protected function handleBlackoutEventConflictsForList($list)
+	{
+		$startDate = PHP_INT_MAX;
+		$endDate = 0;
+		foreach ($list as $event)
+		{
+			$eventStartDate = $event->getStartDate('U');
+			$eventEndDate = $event->getEndDate('U');
+			if ($eventStartDate < $startDate)
+			{
+				$startDate = $eventStartDate;
+			}
+
+			if ($eventEndDate > $endDate)
+			{
+				$endDate = $eventEndDate;
+			}
+		}
+
+		ScheduleEventPeer::retrieveBlackoutEventsByDateWindow($startDate, $endDate);
 	}
 }

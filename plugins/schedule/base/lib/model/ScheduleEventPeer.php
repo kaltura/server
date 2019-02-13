@@ -18,7 +18,12 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	const LIVE_STREAM_OM_CLASS = 'LiveStreamScheduleEvent';
 	const RECORD_OM_CLASS = 'RecordScheduleEvent';
 	const BLACKOUT_OM_CLASS = 'BlackoutScheduleEvent';
-	
+	const BLACKOUT_CACHE_START_DATE = 'start_date';
+	const BLACKOUT_CACHE_END_DATE = 'end_date';
+	const BLACKOUT_CACHE_RESULT = 'result';
+
+	protected static $blackoutCache = array();
+
 	// cache classes by their type
 	protected static $class_types_cache = array(
 		ScheduleEventType::LIVE_STREAM => self::LIVE_STREAM_OM_CLASS,
@@ -248,9 +253,56 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	 */
 	public static function retrieveBlackoutEventsByDateWindow($startDate, $endDate, $scheduleEventIdToIgnore = null)
 	{
+		$cacheResult = self::tryGetBlackoutResultFromCache($startDate, $endDate);
+		if(isset($cacheResult))
+		{
+			return $cacheResult;
+		}
+
 		$c = self::getRetrieveEventsByDateWindowCriteria($startDate, $endDate, $scheduleEventIdToIgnore);
 		$c->addAnd(ScheduleEventPeer::TYPE, scheduleEventType::BLACKOUT, Criteria::EQUAL);
-		return self::doSelect($c);
+		$result = self::doSelect($c);
+		self::addBlackoutResultToCache($startDate, $endDate, $result);
+		return $result;
+	}
+
+	protected static function tryGetBlackoutResultFromCache($startDate, $endDate)
+	{
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		if($partnerId)
+		{
+			if(isset(self::$blackoutCache[$partnerId]))
+			{
+				$cacheResult = self::$blackoutCache[$partnerId];
+				if($cacheResult[self::BLACKOUT_CACHE_START_DATE] <= $startDate && $cacheResult[self::BLACKOUT_CACHE_END_DATE] >= $endDate)
+				{
+					$result = array();
+					foreach ($cacheResult[self::BLACKOUT_CACHE_RESULT] as $event)
+					{
+						if($event->getStartDate('U') <= $endDate && $eventEndDate = $event->getEndDate('U') >= $startDate)
+						{
+							$result[] = $event;
+						}
+					}
+
+					return $result;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	protected static function addBlackoutResultToCache($startDate, $endDate, $result)
+	{
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		if($partnerId)
+		{
+			$cacheResult = array(self::BLACKOUT_CACHE_START_DATE => $startDate,
+				self::BLACKOUT_CACHE_END_DATE => $endDate,
+				self::BLACKOUT_CACHE_RESULT => $result);
+			self::$blackoutCache[$partnerId] = $cacheResult;
+		}
 	}
 
 	/**
