@@ -18,8 +18,8 @@ class KalturaReportResponseOptions extends KalturaObject
 	}
 
 	/* (non-PHPdoc)
- * @see KalturaObject::toObject()
- */
+ 	* @see KalturaObject::toObject()
+ 	*/
 	public function toObject($reportResponseOptions = null, $skip = array())
 	{
 		if(!$reportResponseOptions)
