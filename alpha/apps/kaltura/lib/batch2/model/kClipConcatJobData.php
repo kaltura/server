@@ -21,6 +21,11 @@ class kClipConcatJobData extends kJobData
 	 */
 	private $sourceEntryId;
 
+	/**importUrl
+	 * @var string
+	 */
+	private $importUrl;
+
 	/** $partnerId
 	 * @var int
 	 */
@@ -74,6 +79,22 @@ class kClipConcatJobData extends kJobData
 	public function getSourceEntryId()
 	{
 		return $this->sourceEntryId;
+	}
+
+	/**
+	 * @param string $importUrl
+	 */
+	public function setImportUrl($importUrl)
+	{
+		$this->importUrl = $importUrl;
+	}
+
+	/**
+	 * @return string $importUrl
+	 */
+	public function getImportUrl()
+	{
+		return $this->importUrl;
 	}
 
 	/**

@@ -1899,10 +1899,21 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		KalturaLog::info("clipping service detected start to create sub flavors;");
 		$clipEntry = $clipManager->createTempEntryForClip($this->getPartnerId());
-		$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId());
-		$dbAsset = $this->attachResource($resource->getResource(), $clipEntry, $clipDummySourceAsset);
-		$clipManager->startBatchJob($resource, $dbEntry,$operationAttributes, $clipEntry);
-		return $dbAsset;
+		$shouldimport = false;
+		if ($resource->getResource() instanceof kFileSyncResource && $resource->getResource()->getOriginEntryId())
+		{
+			list($shouldimport, $url) = $clipManager->getImportUrl(null, $resource->getResource()->getOriginEntryId());
+		}
+		if ($shouldimport)
+		{
+			$clipManager->startBatchJob($resource, $dbEntry, $operationAttributes, $clipEntry, $url);
+		}
+		else
+		{
+			$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId());
+			$this->attachResource($resource->getResource(), $clipEntry, $clipDummySourceAsset);
+			$clipManager->startBatchJob($resource, $dbEntry, $operationAttributes, $clipEntry);
+		}
 	}
 
 
