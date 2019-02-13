@@ -2920,15 +2920,20 @@ class kKavaReportsMgr extends kKavaBase
 		return $report_def;
 	}
 
-	protected static function getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity, $metrics, $filter)
+	protected static function getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity, $metrics, $filter, $response_options = null)
 	{
+		if (!$response_options)
+		{
+			$response_options = new kReportResponseOptions();
+		}
+
 		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity);
 		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TIMESERIES;
 		if (!isset($report_def[self::DRUID_CONTEXT]))
 		{
 			$report_def[self::DRUID_CONTEXT] = array();
 		}
-		$report_def[self::DRUID_CONTEXT][self::DRUID_SKIP_EMPTY_BUCKETS] = 'true';
+		$report_def[self::DRUID_CONTEXT][self::DRUID_SKIP_EMPTY_BUCKETS] = $response_options->getSkipEmptyDates();
 		return $report_def;
 	}
 
@@ -3191,7 +3196,7 @@ class kKavaReportsMgr extends kKavaBase
 		default:
 			$dimension = null;
 			$transform_enrich_def = null;
-			$query = self::getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity_def, $metrics, $druid_filter);
+			$query = self::getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity_def, $metrics, $druid_filter, $response_options);
 			break;
 		}
 		$result = self::runQuery($query);
@@ -5451,7 +5456,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		$granularity = self::DRUID_GRANULARITY_ALL;
-		$query = self::getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity, $metrics, $druid_filter);
+		$query = self::getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity, $metrics, $druid_filter, $response_options);
 		$result = self::runQuery($query);
 		
 		$headers = array();

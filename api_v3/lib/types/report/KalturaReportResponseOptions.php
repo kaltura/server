@@ -7,9 +7,15 @@ class KalturaReportResponseOptions extends KalturaObject
 	 */
 	public $delimiter;
 
+	/**
+	 * @var boolean
+	 */
+	public $skipEmptyDates;
+
 	private static $map_between_objects = array
 	(
 		'delimiter',
+		'skipEmptyDates',
 	);
 
 	protected function getMapBetweenObjects()
