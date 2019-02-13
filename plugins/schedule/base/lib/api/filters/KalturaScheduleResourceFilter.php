@@ -25,7 +25,7 @@ class KalturaScheduleResourceFilter extends KalturaScheduleResourceBaseFilter
 	{
 		$type = $this->getListResponseType();
 
-		if(isset($this->statusEqual) || isset($this->statusIn))
+		if(!isset($this->statusEqual) && !isset($this->statusIn))
 		{
 			$allowedStatus = array(ScheduleResourceStatus::DISABLED,ScheduleResourceStatus::ACTIVE);
 			$this->statusIn =  implode(',' , $allowedStatus);
