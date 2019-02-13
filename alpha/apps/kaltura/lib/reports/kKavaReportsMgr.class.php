@@ -2051,7 +2051,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 	}
 
-	protected static function initDynamicMetrics($partner_id, $report_def, $input_filter, $object_ids)
+	protected static function initDynamicMetrics($partner_id, $report_def, $input_filter, $object_ids, $response_options)
 	{
 		$metrics = self::getMetrics($report_def);
 
@@ -2059,15 +2059,15 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			if (isset(self::$dynamic_metrics[$metric]))
 			{
-				self::$metrics_def[$metric] = call_user_func_array(self::$dynamic_metrics[$metric], array($partner_id, $report_def, $input_filter, $object_ids));
+				self::$metrics_def[$metric] = call_user_func_array(self::$dynamic_metrics[$metric], array($partner_id, $report_def, $input_filter, $object_ids, $response_options));
 			}
 		}
 	}
 
-	protected static function getEngagementRankingDef($partner_id, $report_def, $input_filter, $object_ids)
+	protected static function getEngagementRankingDef($partner_id, $report_def, $input_filter, $object_ids, $response_options)
 	{
-		$maxPlays = self::getMetricMaxValue($partner_id, $report_def, $input_filter, $object_ids, self::EVENT_TYPE_PLAY);
-		$maxUniqueUsers = self::getMetricMaxValue($partner_id, $report_def, $input_filter, $object_ids, self::METRIC_UNIQUE_USERS);
+		$maxPlays = self::getMetricMaxValue($partner_id, $report_def, $input_filter, $object_ids, $response_options, self::EVENT_TYPE_PLAY);
+		$maxUniqueUsers = self::getMetricMaxValue($partner_id, $report_def, $input_filter, $object_ids, $response_options, self::METRIC_UNIQUE_USERS);
 
 		return array(
 			self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_PERCENTILES_SUM),
@@ -2100,11 +2100,11 @@ class kKavaReportsMgr extends kKavaBase
 		return $factor / $max;
 	}
 
-	protected static function getMetricMaxValue($partner_id, $report_def, $input_filter, $object_ids, $metric)
+	protected static function getMetricMaxValue($partner_id, $report_def, $input_filter, $object_ids, $response_options, $metric)
 	{
 		$data_source = self::getDataSource($report_def);
 		$intervals = self::getFilterIntervals($report_def, $input_filter);
-		$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, $object_ids);
+		$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, $object_ids, $response_options);
 		$dimension = self::getDimension($report_def, $object_ids);
 		$metrics = array($metric);
 		$order_by = $metric;
@@ -2560,11 +2560,6 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		$druid_filter = array();
 
-		if (!$response_options)
-		{
-			$response_options = new kReportResponseOptions();
-		}
-
 		if (!isset($report_def[self::REPORT_DATA_SOURCE]))
 		{
 			$playback_types = isset($report_def[self::REPORT_PLAYBACK_TYPES]) ? $report_def[self::REPORT_PLAYBACK_TYPES] : array(self::PLAYBACK_TYPE_VOD);
@@ -2920,13 +2915,8 @@ class kKavaReportsMgr extends kKavaBase
 		return $report_def;
 	}
 
-	protected static function getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity, $metrics, $filter, $response_options = null)
+	protected static function getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity, $metrics, $filter, $response_options)
 	{
-		if (!$response_options)
-		{
-			$response_options = new kReportResponseOptions();
-		}
-
 		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity);
 		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TIMESERIES;
 		if (!isset($report_def[self::DRUID_CONTEXT]))
@@ -3547,7 +3537,12 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			return myReportsMgr::getGraph($partner_id, $report_type, $input_filter, $dimension, $object_ids);
 		}
-		
+
+		if (!$response_options)
+		{
+			$response_options = new kReportResponseOptions();
+		}
+
 		self::init();
 		
 		$report_def = self::getReportDef($report_type);
@@ -5200,7 +5195,7 @@ class kKavaReportsMgr extends kKavaBase
 		reportsInputFilter $input_filter,
 		$page_size, $page_index, $order_by, $object_ids = null, $flags = 0, $response_options = null)
 	{
-		self::initDynamicMetrics($partner_id, $report_def, $input_filter, $object_ids);
+		self::initDynamicMetrics($partner_id, $report_def, $input_filter, $object_ids, $response_options);
 
 		if (isset($report_def[self::REPORT_EDIT_FILTER_FUNC]))
 		{
@@ -5305,7 +5300,12 @@ class kKavaReportsMgr extends kKavaBase
 			return myReportsMgr::getTable($partner_id, $report_type, $input_filter,
 				$page_size, $page_index, $order_by, $object_ids, $offset);
 		}
-		
+
+		if (!$response_options)
+		{
+			$response_options = new kReportResponseOptions();
+		}
+
 		self::init();		
 
 		// pager
@@ -5552,7 +5552,12 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			return myReportsMgr::getTotal($partner_id, $report_type, $input_filter, $object_ids);
 		}
-		
+
+		if (!$response_options)
+		{
+			$response_options = new kReportResponseOptions();
+		}
+
 		self::init();
 
 		$report_def = self::getReportDef($report_type);
@@ -5590,7 +5595,12 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			return myReportsMgr::getBaseTotal($partner_id, $report_type, $input_filter, $object_ids);
 		}
-		
+
+		if (!$response_options)
+		{
+			$response_options = new kReportResponseOptions();
+		}
+
 		switch ($report_type)
 		{
 			case myReportsMgr::REPORT_TYPE_USER_USAGE:
@@ -5939,7 +5949,12 @@ class kKavaReportsMgr extends kKavaBase
 				$object_ids,
 				$page_size, $page_index, $order_by);					
 		}
-		
+
+		if (!$response_options)
+		{
+			$response_options = new kReportResponseOptions();
+		}
+
 		self::init();
 		
 		list($file_path, $file_name) = myReportsMgr::createFileName($partner_id, $report_type, $input_filter, $dimension, $object_ids, $page_size, $page_index, $order_by);
