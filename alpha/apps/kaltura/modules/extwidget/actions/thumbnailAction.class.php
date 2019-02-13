@@ -554,7 +554,7 @@ class thumbnailAction extends sfAction
 		if(!$isCapturing)
 		{
 			$entryImageSyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-			$fileSync= kFileSyncUtils::getOriginFileSyncForKey($entryImageSyncKey);
+			$fileSync= kFileSyncUtils::getOriginFileSyncForKey($entryImageSyncKey,false);
 			if($fileSync)
 			{
 				return $fileSync->getUpdatedAt(null);
