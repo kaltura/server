@@ -88,6 +88,12 @@ class MediaService extends KalturaEntryService
 		return $entry;
     }
 
+    protected function shoudlValidateLocal()
+	{
+		//if multi request of more than one api call
+		return  (kCurrentContext::$multiRequest_index <= 1);
+	}
+
     /**
      * Add content to media entry which is not yet associated with content (therefore is in status NO_CONTENT).
      * If the requirement is to replace the entry's associated content, use action updateContent.
@@ -100,39 +106,30 @@ class MediaService extends KalturaEntryService
      * @throws KalturaErrors::ENTRY_ALREADY_WITH_CONTENT
      * @validateUser entry entryId edit
      */
-    function addContentAction($entryId, KalturaResource $resource = null)
-    {
-	    $dbEntry = entryPeer::retrieveByPK($entryId);
+	function addContentAction($entryId, KalturaResource $resource = null)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
 
 	    if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
 		    throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-	    if ($dbEntry->getStatus() != entryStatus::NO_CONTENT)
+		if ($dbEntry->getStatus() != entryStatus::NO_CONTENT)
 		    throw new KalturaAPIException(KalturaErrors::ENTRY_ALREADY_WITH_CONTENT);
 	    if ($resource)
 	    {
-		    try
-		    {
-			    $resource->validateEntry($dbEntry, true);
-		    }
+			try
+			{
+				$validateLocalExist = $this->shoudlValidateLocal();
+				$resource->validateEntry($dbEntry, $validateLocalExist);
+				$kResource = $resource->toObject();
+				$this->attachResource($kResource, $dbEntry);
+			}
 		    catch (Exception $e)
 		    {
 			    $this->handleErrorDuringSetResource($entryId, $e, $resource);
 		    }
 
-		    try
-		    {
-			    $kResource = $resource->toObject();
-			    $this->attachResource($kResource, $dbEntry);
-		    }
-		    catch(Exception $e)
-		    {
-			    KalturaLog::info("Exception was thrown during setContent on entry [$entryId] with error: " . $e->getMessage());
-			    $this->cancelReplaceAction($entryId);
-			    throw $e;
-		    }
-
-		    $resource->entryHandled($dbEntry);
+		       $resource->entryHandled($dbEntry);
 	    }
 	    return $this->getEntry($entryId);
     }
@@ -1265,78 +1262,22 @@ class MediaService extends KalturaEntryService
 		return $content;
 	}
 
-	protected function handleErrorDuringSetResource($entryId, Exception $e, $resource = null)
+	private function handleErrorDuringSetResource($entryId, Exception $e)
 	{
 		if ($e->getCode() == APIErrors::getCode(APIErrors::ENTRY_ID_NOT_FOUND))
 		{
 			throw $e; //if no entry found then no need to do anything
 		}
-
 		KalturaLog::info("Exception was thrown during setContent on entry [$entryId] with error: " . $e->getMessage());
 		$this->cancelReplaceAction($entryId);
 
 		$errorCodeArr = array(kCoreException::SOURCE_FILE_NOT_FOUND, APIErrors::getCode(APIErrors::SOURCE_FILE_NOT_FOUND));
-		if (!(in_array($e->getCode(), $errorCodeArr)) || !(kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId())))
+		if ((in_array($e->getCode(), $errorCodeArr)) && (kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId())))
 		{
-			throw $e;
-		}
-		$this->handleDump($resource, $e);
-	}
-
-	/***
-	 * Check if reuest should be dump to another and DC and retreive the relevant DC
-	 * @param $resource
-	 * @throws Exception
-	 * @throws KalturaAPIException
-	 *
-	 */
-	protected function handleDump($resource, $e)
-	{
-		if (!$resource)
-		{
-			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId( (1 - kDataCenterMgr::getCurrentDcId())), true);
-		}
-		else
-		{
-			$resourceEntryId = $this->getEntryIdFromResource($resource);
-			if ($resourceEntryId)
-			{
-				$originalFlavorAsset = assetPeer::retrieveOriginalReadyByEntryId($resourceEntryId);
-				if ($originalFlavorAsset)
-				{
-					$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-					list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
-					/* @var $fileSync FileSync */
-					if ($fileSync)
-					{
-						$remoteDcs = kDataCenterMgr::getDcIds(false);
-						if (!$local)
-						{
-							if (in_array($fileSync->getDc(), $remoteDcs) && !(kCurrentContext::$multiRequest_index > 1) && $fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)
-							{
-								KalturaLog::info("Source file wasn't found on current DC. Dumping the request to DC ID [" . $fileSync->getDc() . "]");
-								kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($fileSync->getDc()), true);
-							}
-							else
-							{
-								KalturaLog::info("Continue as with flow as usual.");
-								return;
-							}
-						}
-						KalturaLog::CRIT("Should not get here, found a local filesync for flavor [$originalFlavorAsset] and entry [$resourceEntryId] that should have been ingested.");
-					}
-				}
-			}
+			$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
+			KalturaLog::info("Source file wasn't found on current DC. Dumping the request to DC ID [$remoteDc]");
+			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
 		}
 		throw $e;
 	}
-
-
-	protected function getEntryIdFromResource($resource)
-	{
-		if ($resource && $resource->resource)
-			return $resource->resource->entryId;
-		return null;
-	}
-
 }

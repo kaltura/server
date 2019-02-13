@@ -1900,30 +1900,27 @@ class KalturaEntryService extends KalturaBaseService
 		KalturaLog::info("clipping service detected start to create sub flavors;");
 		$clipEntry = $clipManager->createTempEntryForClip($this->getPartnerId());
 		$shouldimport = false;
+		$url = null;
 		if ($resource->getResource() instanceof kFileSyncResource && $resource->getResource()->getOriginEntryId())
 		{
-			list($shouldimport, $url) = $this->checkImportNeeded($resource->getResource()->getOriginEntryId());
+			$url = $this->getImportUrl($resource->getResource()->getOriginEntryId());
 		}
-		if ($shouldimport)
-		{
-			$clipManager->startBatchJob($resource, $dbEntry, $operationAttributes, $clipEntry, $url);
-		}
-		else
+		if (!$url)
 		{
 			$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId());
 			$this->attachResource($resource->getResource(), $clipEntry, $clipDummySourceAsset);
-			$clipManager->startBatchJob($resource, $dbEntry, $operationAttributes, $clipEntry);
 		}
+		$clipManager->startBatchJob($resource, $dbEntry, $operationAttributes, $clipEntry , $url);
 	}
 
 	/***
 	 * @param null $entryId
-	 * @return array
+	 * @return string $url
 	 * @throws Exception
 	 */
-	protected function checkImportNeeded($entryId = null)
+	protected function getImportUrl($entryId = null)
 	{
-		if (!$entryId)
+		if ($entryId)
 		{
 			$originalFlavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
 			if ($originalFlavorAsset)
@@ -1933,11 +1930,11 @@ class KalturaEntryService extends KalturaBaseService
 				/* @var $fileSync FileSync */
 				if ($fileSync && !$local)
 				{
-					return array(true, $fileSync->getExternalUrl($entryId));
+					return $fileSync->getExternalUrl($entryId);
 				}
 			}
 		}
-		return array(null, false);
+		return null;
 	}
 
 	/**

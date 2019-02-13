@@ -43,17 +43,15 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param $partnerId
 	 * @param array $operationAttributes
 	 * @param int $priority
+	 * @param string $importUrl
 	 */
 	public function createParentBatchJob($sourceEntryId,$clipEntry, $destEntry, $partnerId, array $operationAttributes, $priority = 0, $importUrl = null)
 	{
 		$parentJob = new BatchJob();
 		$parentJob->setPartnerId($partnerId);
-		$jobData = new kClipConcatJobData();
-		if ($importUrl)
-		{
-			$jobData->setImportUrl($importUrl);
-		}
-		else
+		$jobData = new kClipConcatJobData($importUrl);
+
+		if(!$jobData->getImportNeeded())
 		{
 			$this->setDummyOriginalFlavorAssetReady($clipEntry->getId());
 		}
@@ -85,29 +83,23 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				$this->handleClipConcatParentJob($batchJob);
 			}
 
-			if ($batchJob->getRootJob() && $batchJob->getRootJob()->getJobType() == BatchJobType::CLIP_CONCAT &&
-				$batchJob->getJobType() == BatchJobType::IMPORT && $batchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
+			elseif ($batchJob->getRootJob() &&
+					 $batchJob->getRootJob()->getJobType() == BatchJobType::CLIP_CONCAT &&
+				     $batchJob->getJobType() == BatchJobType::IMPORT &&
+					 $batchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 			{
-
-				$job = $batchJob->getRootJob();
-				/**@var kClipConcatJobData $jobData */
-				$jobData = $job->getData();
-				//remove importUrl after importing it
-				$jobData->setImportUrl(null);
-				$job->setData($jobData);
-				kEventsManager::raiseEventDeferred(new kBatchJobStatusEvent($job));
+				$this->handleImportFinished($batchJob->getRootJob());
 			}
-			if ($batchJob->getParentJob() && $batchJob->getParentJob()->getJobType() == BatchJobType::CONVERT &&
-				!$this->concatJobExist($batchJob->getRootJob()))
+			elseif ($batchJob->getParentJob() &&
+					$batchJob->getParentJob()->getJobType() == BatchJobType::CONVERT &&
+					!$this->concatJobExist($batchJob->getRootJob()))
 			{
 				$this->startConcat($batchJob->getRootJob());
 			}
-
 			elseif($batchJob->getParentJob() && $batchJob->getParentJob()->getJobType()  == BatchJobType::CONCAT )
 			{
 				$this->concatDone($batchJob);
 			}
-
 		}
 		catch (Exception $ex)
 		{
@@ -115,6 +107,15 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			return false;
 		}
 		return true;
+	}
+
+	protected function handleImportFinished($rootJob)
+	{
+		/**@var kClipConcatJobData $jobData */
+		$jobData = $rootJob->getData();
+		$jobData->setImportNeeded(false);
+		$rootJob->setData($jobData);
+		kEventsManager::raiseEventDeferred(new kBatchJobStatusEvent($rootJob));
 	}
 
 	/**
@@ -148,24 +149,18 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param entry $dbEntry
 	 * @param $operationAttributes
 	 * @param $clipEntry
+	 * @param $importUrl
 	 */
 	public function startBatchJob($resource, entry $dbEntry, $operationAttributes, $clipEntry, $importUrl = null)
 	{
 		$internalResource = $resource->getResource();
-		if ($internalResource instanceof kFileSyncResource && $internalResource->getOriginEntryId())
+		if ($importUrl)
 		{
-			if ($importUrl)
-			{
-				$this->createParentBatchJob(null, $clipEntry, $dbEntry, $dbEntry->getPartnerId(), $operationAttributes, 0 , $importUrl);
-			}
-			else
-			{
-				$this->createParentBatchJob($internalResource->getOriginEntryId(), $clipEntry, $dbEntry, $dbEntry->getPartnerId(), $operationAttributes);
-			}
+			$this->createParentBatchJob(null, $clipEntry, $dbEntry, $dbEntry->getPartnerId(), $operationAttributes, 0 , $importUrl);
 		}
 		else
 		{
-			$this->createParentBatchJob(null, $clipEntry, $dbEntry, $dbEntry->getPartnerId(), $operationAttributes);
+			$this->createParentBatchJob($internalResource->getOriginEntryId(), $clipEntry, $dbEntry, $dbEntry->getPartnerId(), $operationAttributes);
 		}
 	}
 
@@ -251,12 +246,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 		foreach ($batchJob->getChildJobs() as $job)
 		{
-			if ($job->getJobType() == BatchJobType::IMPORT)
-				continue;
-
 			/** @var BatchJob $job */
 			KalturaLog::info('Child job id [' . $job->getId() . '] status [' . $job->getStatus() . ']' . '] type ['.$job->getJobType() .']' );
-			KalturaLog::info('Flavor Param Ids:' .$job->getEntry()->getFlavorParamsIds());
+			if($job->getJobType() == BatchJobType::CONVERT)
+			{
+				KalturaLog::info('Flavor Param Ids:' . $job->getEntry()->getFlavorParamsIds());
+			}
 		}
 		/** @var kClipConcatJobData $jobData */
 		$jobData = $batchJob->getData();
@@ -308,7 +303,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 				/**@var kClipConcatJobData $jobData */
 				$jobData = $batchJob->getData();
-				if ($jobData->getImportUrl())
+				if ($jobData->getImportNeeded())
 				{
 					//set entry flow type to handle import in clip concat
 					$tempEntry = entryPeer::retrieveByPK($jobData->getTempEntryId());

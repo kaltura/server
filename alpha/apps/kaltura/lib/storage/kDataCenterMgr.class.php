@@ -92,7 +92,7 @@ class kDataCenterMgr
 		return $dc;
 //		return array ( $dc_id , $dc );
 	}
-	
+
 	public static function getDcIds( $include_current = true )
 	{
 		$dc_config = kConf::getMap("dc_config");
@@ -102,7 +102,6 @@ class kDataCenterMgr
 			unset ( $dc_list[$dc_config["current"]]);
 		}
 		return array_keys($dc_list);
-
 	}
 		
 	public static function getAllDcs( $include_current = false )

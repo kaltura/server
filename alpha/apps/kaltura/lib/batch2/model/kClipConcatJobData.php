@@ -42,6 +42,25 @@ class kClipConcatJobData extends kJobData
 	private $operationAttributes;
 
 	/**
+	 * @bool clipManagerState
+	 */
+	private $importNeeded;
+
+
+	public function __construct($importUrl = null)
+	{
+		if($importUrl)
+		{
+			$this->importUrl = $importUrl;
+			$this->importNeeded = true;
+		}
+		else
+		{
+			$this->importNeeded = false;
+		}
+	}
+
+	/**
 	 * @return string $entryId
 	 */
 	public function getDestEntryId()
@@ -152,6 +171,16 @@ class kClipConcatJobData extends kJobData
 	public function setOperationAttributes($operationAttributes)
 	{
 		$this->operationAttributes = $operationAttributes;
+	}
+
+	public function setImportNeeded($isNeeded)
+	{
+		$this->importNeeded = $isNeeded;
+	}
+
+	public function getImportNeeded()
+	{
+		return $this->importNeeded;
 	}
 
 
