@@ -8,7 +8,7 @@ class KalturaReportResponseOptions extends KalturaObject
 	public $delimiter;
 
 	/**
-	 * @var boolean
+	 * @var bool
 	 */
 	public $skipEmptyDates;
 
