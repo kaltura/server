@@ -2561,7 +2561,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		if (!$response_options)
 		{
-			$response_options = new reportResponseOptions();
+			$response_options = new kReportResponseOptions();
 		}
 
 		if (!isset($report_def[self::REPORT_DATA_SOURCE]))
@@ -5702,7 +5702,7 @@ class kKavaReportsMgr extends kKavaBase
 			$input_filter->$field = $value;
 		}
 
-		$response_options = new reportResponseOptions();
+		$response_options = new kReportResponseOptions();
 		foreach ($report_def['response_options'] as $field => $value)
 		{
 			$response_options->$field = $value;
@@ -5934,31 +5934,4 @@ class kKavaReportsMgr extends kKavaBase
 		$url = myReportsMgr::createUrl($partner_id, $file_name);
 		return $url;
 	}
-}
-
-class reportResponseOptions
-{
-	protected $delimiter;
-
-	public function __construct()
-	{
-		$this->delimiter = ',';
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getDelimiter()
-	{
-		return $this->delimiter;
-	}
-
-	/**
-	 * @param string $delimiter
-	 */
-	public function setDelimiter($delimiter)
-	{
-		$this->delimiter = $delimiter;
-	}
-
 }

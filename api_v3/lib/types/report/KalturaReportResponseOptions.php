@@ -7,11 +7,6 @@ class KalturaReportResponseOptions extends KalturaObject
 	 */
 	public $delimiter;
 
-	public function __construct()
-	{
-		$this->delimiter = ',';
-	}
-
 	private static $map_between_objects = array
 	(
 		'delimiter',
@@ -28,7 +23,9 @@ class KalturaReportResponseOptions extends KalturaObject
 	public function toObject($reportResponseOptions = null, $skip = array())
 	{
 		if(!$reportResponseOptions)
-			$reportResponseOptions = new reportResponseOptions();
+		{
+			$reportResponseOptions = new kReportResponseOptions();
+		}
 
 		return parent::toObject($reportResponseOptions, $skip);
 	}

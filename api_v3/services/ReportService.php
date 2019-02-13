@@ -79,10 +79,13 @@ class ReportService extends KalturaBaseService
 	public function getGraphsAction( $reportType , KalturaReportInputFilter $reportInputFilter , $dimension = null , $objectIds = null, KalturaReportResponseOptions $responseOptions = null  )
 	{
 		if (!$responseOptions)
+		{
 			$responseOptions = new KalturaReportResponseOptions();
+		}
+		$kResponseOptions = $responseOptions->toObject();
 
 		if(in_array($reportType, self::$crossPartnerReports))
-			$objectIds = $this->validateObjectsAreAllowedPartners($reportType, $objectIds, $responseOptions->delimiter);
+			$objectIds = $this->validateObjectsAreAllowedPartners($reportType, $objectIds, $kResponseOptions->getDelimiter());
 	
 		$reportGraphs =  KalturaReportGraphArray::fromReportDataArray(kKavaReportsMgr::getGraph(
 		    $this->getPartnerId(),
@@ -90,8 +93,8 @@ class ReportService extends KalturaBaseService
 		    $reportInputFilter->toReportsInputFilter(),
 		    $dimension,
 		    $objectIds,
-		    $responseOptions->toObject()),
-		    $responseOptions->delimiter);
+			$kResponseOptions),
+			$kResponseOptions->getDelimiter());
 
 		return $reportGraphs;
 	}
@@ -108,19 +111,22 @@ class ReportService extends KalturaBaseService
 	public function getTotalAction( $reportType , KalturaReportInputFilter $reportInputFilter , $objectIds = null, KalturaReportResponseOptions $responseOptions = null)
 	{
 		if (!$responseOptions)
+		{
 			$responseOptions = new KalturaReportResponseOptions();
+		}
+		$kResponseOptions = $responseOptions->toObject();
 
 		if(in_array($reportType, self::$crossPartnerReports))
-			$objectIds = $this->validateObjectsAreAllowedPartners($reportType, $objectIds, $responseOptions->delimiter);
+			$objectIds = $this->validateObjectsAreAllowedPartners($reportType, $objectIds, $kResponseOptions->getDelimiter());
 
 		$reportTotal = new KalturaReportTotal();
 		
 		list ( $header , $data ) = kKavaReportsMgr::getTotal(
 		    $this->getPartnerId() ,
 		    $reportType ,
-		    $reportInputFilter->toReportsInputFilter() , $objectIds, $responseOptions->toObject());
+		    $reportInputFilter->toReportsInputFilter() , $objectIds, $kResponseOptions);
 		
-		$reportTotal->fromReportTotal ( $header , $data, $responseOptions->delimiter );
+		$reportTotal->fromReportTotal ( $header , $data, $kResponseOptions->getDelimiter() );
 			
 		return $reportTotal;
 	}
@@ -137,7 +143,9 @@ class ReportService extends KalturaBaseService
 	public function getBaseTotalAction( $reportType , KalturaReportInputFilter $reportInputFilter , $objectIds = null , KalturaReportResponseOptions $responseOptions = null)
 	{
 		if (!$responseOptions)
+		{
 			$responseOptions = new KalturaReportResponseOptions();
+		}
 
 		$reportSubTotals =  KalturaReportBaseTotalArray::fromReportDataArray(  
 			kKavaReportsMgr::getBaseTotal( 
@@ -165,10 +173,13 @@ class ReportService extends KalturaBaseService
 	public function getTableAction($reportType, KalturaReportInputFilter $reportInputFilter, KalturaFilterPager $pager, $order = null, $objectIds = null, KalturaReportResponseOptions $responseOptions = null)
 	{
 		if (!$responseOptions)
+		{
 			$responseOptions = new KalturaReportResponseOptions();
+		}
+		$kResponseOptions = $responseOptions->toObject();
 
 		if(in_array($reportType, self::$crossPartnerReports))
-			$objectIds = $this->validateObjectsAreAllowedPartners($reportType, $objectIds, $responseOptions->delimiter);
+			$objectIds = $this->validateObjectsAreAllowedPartners($reportType, $objectIds, $kResponseOptions->getDelimiter());
 
 		$reportTable = new KalturaReportTable();
 
@@ -195,9 +206,9 @@ class ReportService extends KalturaBaseService
 		    $reportType ,
 		    $reportInputFilter->toReportsInputFilter() ,
 		    $pager->pageSize , $pager->pageIndex ,
-		    $order , $objectIds, null , false , $responseOptions->toObject());
+		    $order , $objectIds, null , false , $kResponseOptions);
 
-		$reportTable->fromReportTable ( $header , $data , $totalCount, $responseOptions->delimiter );
+		$reportTable->fromReportTable ( $header , $data , $totalCount, $kResponseOptions->getDelimiter() );
 			
 		return $reportTable;
 	}	
@@ -231,10 +242,13 @@ class ReportService extends KalturaBaseService
 			$pager = new KalturaFilterPager();
 
 		if (!$responseOptions)
+		{
 			$responseOptions = new KalturaReportResponseOptions();
+		}
+		$kResponseOptions = $responseOptions->toObject();
 
 		if(in_array($reportType, self::$crossPartnerReports))
-			$objectIds = $this->validateObjectsAreAllowedPartners($reportType, $objectIds);
+			$objectIds = $this->validateObjectsAreAllowedPartners($reportType, $objectIds, $kResponseOptions->getDelimiter());
 
 		try {
 			$report = kKavaReportsMgr::getUrlForReportAsCsv(
@@ -249,7 +263,7 @@ class ReportService extends KalturaBaseService
 				$pager->pageSize,
 				$pager->pageIndex,
 				$order,
-				$responseOptions->toObject());
+				$kResponseOptions);
 		}
 		catch(Exception $e){
 			$code = $e->getCode();
