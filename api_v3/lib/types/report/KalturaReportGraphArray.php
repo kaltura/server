@@ -5,13 +5,13 @@
  */
 class KalturaReportGraphArray extends KalturaTypedArray
 {
-	public static function fromReportDataArray ( $arr )
+	public static function fromReportDataArray ( $arr, $delimiter = ',' )
 	{
 		$newArr = new KalturaReportGraphArray();
 		foreach ( $arr as $id => $data )
 		{
 			$nObj = new KalturaReportGraph();
-			$nObj->fromReportData ( $id, $data );
+			$nObj->fromReportData ( $id, $data, $delimiter );
 			$newArr[] = $nObj;
 		}
 			
