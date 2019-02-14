@@ -1,7 +1,5 @@
 # Naos 14.14.0 #
 
-## Reach - Update vendor response profile##
-
 ## Schedule Event - Add sphinx match optimization##
 
  - Issue Type: Task
@@ -20,6 +18,23 @@ First replace all tokens in the XML file below and remove ".template" from the f
 Run deployment script:
 		
 		- php /opt/kaltura/app/deployment/updates/scripts/2019_02_14_update_reach_vendor_response_profile.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Schedule Event - Add sphinx match optimization##
+
+ - Issue Type: Task
+ - Issue ID: No-Plat
+
+### Configuration ###
+update configurations/sphinx/kaltura.conf file and add the following to kaltura_schedule_event:
+rt_field = sphinx_match_optimizations
+
+### Deployment scripts ###
+	
+ReIndex and repopulate kaltura_schedule_event table in sphinx.
 
 #### Known Issues & Limitations ####
 
