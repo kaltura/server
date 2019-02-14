@@ -332,41 +332,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 	}
 
-	public function getImportUrl($batchJob, $sourceEntryId = null)
-	{
-		if (!$sourceEntryId)
-		{
-			/**@var kClipConcatJobData $jobData */
-			$jobData = $batchJob->getData();
-			$sourceEntryId = $jobData->getSourceEntryId();
-			if (!$sourceEntryId && !$jobData->getImportUrl())
-			{
-				return array ( null , false );
-			}
-			$sourceEntryId = $jobData->getImportUrl();
-		}
-
-		$originalFlavorAsset = assetPeer::retrieveOriginalReadyByEntryId($sourceEntryId);
-		if (is_null($originalFlavorAsset))
-		{
-			return array ( null , false );
-//			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
-		}
-		$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
-		/* @var $fileSync FileSync */
-		if (!$fileSync)
-		{
-			return array ( null , false );
-//			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
-		}
-		if (!$local)
-		{
-			return array(true, $fileSync->getExternalUrl($sourceEntryId));
-		}
-		return array ( null , false );
-	}
-
 	/**
 	 * @param BatchJob $parentJob clipConcat job
 	 * @param $entryId

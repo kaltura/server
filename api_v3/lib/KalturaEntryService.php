@@ -1902,7 +1902,7 @@ class KalturaEntryService extends KalturaBaseService
 		$shouldimport = false;
 		if ($resource->getResource() instanceof kFileSyncResource && $resource->getResource()->getOriginEntryId())
 		{
-			list($shouldimport, $url) = $clipManager->getImportUrl(null, $resource->getResource()->getOriginEntryId());
+			list($shouldimport, $url) = $this->checkImportNeeded($resource->getResource()->getOriginEntryId());
 		}
 		if ($shouldimport)
 		{
@@ -1916,6 +1916,29 @@ class KalturaEntryService extends KalturaBaseService
 		}
 	}
 
+	/***
+	 * @param null $entryId
+	 * @return array
+	 * @throws Exception
+	 */
+	protected function checkImportNeeded($entryId = null)
+	{
+		if (!$entryId)
+		{
+			$originalFlavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
+			if ($originalFlavorAsset)
+			{
+				$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
+				/* @var $fileSync FileSync */
+				if ($fileSync && !$local)
+				{
+					return array(true, $fileSync->getExternalUrl($entryId));
+				}
+			}
+		}
+		return array(null, false);
+	}
 
 	/**
 	 * Set the default status to ready if other status filters are not specified
