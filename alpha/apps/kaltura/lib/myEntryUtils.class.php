@@ -697,7 +697,7 @@ class myEntryUtils
 	
 	public static function resizeEntryImage( entry $entry, $version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
 		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null, $fileSync = null,
-		$start_sec = -1, $end_sec = -1)
+		$start_sec = -1, $end_sec = -1, $bif = 0)
 	{
 		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
 			$thumbParams = new kThumbnailParameters();
@@ -739,6 +739,11 @@ class myEntryUtils
 			$thumbName .= "_ssec_{$start_sec}";
 		if($end_sec != -1)
 			$thumbName .= "_esec_{$end_sec}";
+		if($bif)
+			$thumbName .= "_bif_{$bif}";
+
+		$imgPathsToUnlink = array();
+		$bifImgPaths = array();
 				
 		$entryThumbFilename = $entry->getThumbnail();
 		if(!$entryThumbFilename)
@@ -797,6 +802,20 @@ class myEntryUtils
 		$multi = $vid_slice == -1 && $vid_slices != -1;
 		$count = $multi ? $vid_slices : 1;
 		$im = null;
+
+		$bifInterval = 0;
+		$calc_vid_sec = 0;
+		if($bif && $vid_slices)
+		{
+			if($count > 100)
+			{
+				KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
+			}
+			$offset = max($start_sec, 0);
+			$bifInterval = round((($entry->getLengthInMsecs() / 1000) - $offset) / $vid_slices, 3);
+			KalturaLog::debug("BIF interval for capturing frames: [$bifInterval] with offset:[$offset]");
+			$calc_vid_sec = $offset;
+		}
 		
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PS2);
 		
@@ -850,6 +869,10 @@ class myEntryUtils
 				{
 					$calc_vid_sec = min($vid_sec, floor($entryLengthInMsec / 1000));
 				}
+				else if($bif)
+				{
+					$calc_vid_sec += $bifInterval;
+				}
 				else if ($vid_slices != -1) // need to create a thumbnail at a specific slice
 				{
 					if($start_sec != -1 && $end_sec != -1)
@@ -868,6 +891,11 @@ class myEntryUtils
 				else // default thumbnail was not created yet
 				{
 					$calc_vid_sec = $servingVODfromLive ? self::DEFAULT_THUMB_SEC_LIVE : $entry->getBestThumbOffset();
+				}
+
+				if($calc_vid_sec > ($entryLengthInMsec / 1000))
+				{
+					continue;
 				}
 					
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
@@ -919,6 +947,13 @@ class myEntryUtils
 						throw new kFileSyncException('no ready filesync on current DC', kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC);
 					}
 				}
+				else
+				{
+					if($bif)
+					{
+						$bifImgPaths[] = $orig_image_path;
+					}
+				}
 			}
 
 			// close db connections as we won't be requiring the database anymore and image manipulation may take a long time
@@ -959,7 +994,17 @@ class myEntryUtils
 					$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
 				}
 				if ($thumbCaptureByPackager && file_exists($packagerResizeFullPath))
-					unlink($packagerResizeFullPath);
+				{
+					if($bif)
+					{
+						$imgPathsToUnlink[] = $packagerResizeFullPath;
+						$bifImgPaths[] = $packagerResizeFullPath;
+					}
+					else
+					{
+						unlink($packagerResizeFullPath);
+					}
+				}
 			}
 
 
@@ -982,17 +1027,56 @@ class myEntryUtils
 			}
 
 			if ($thumbCaptureByPackager && $shouldResizeByPackager && $multi && file_exists($packagerResizeFullPath))
-				unlink($packagerResizeFullPath);
+			{
+				if($bif)
+				{
+					$imgPathsToUnlink[] = $packagerResizeFullPath;
+					$bifImgPaths[] = $packagerResizeFullPath;
+				}
+				else
+				{
+					unlink($packagerResizeFullPath);
+				}
+			}
 
 			if ($isEncryptionNeeded)
 			{
 				$fileSync->deleteTempClear();
 				if (self::isTempFile($orig_image_path) && file_exists($orig_image_path))
-					unlink($orig_image_path);
+				{
+					if($bif)
+					{
+						$imgPathsToUnlink[] = $orig_image_path;
+						$bifImgPaths[] = $orig_image_path;
+					}
+					else
+					{
+						unlink($orig_image_path);
+					}
+				}
+			}
+		}
+
+		if($bif && $bifInterval)
+		{
+			$imgPathsToUnlink = array_unique($imgPathsToUnlink);
+			$bifImgPaths = array_unique($bifImgPaths);
+			$finalThumbPath = kFile::replaceExt($finalThumbPath, 'bif');
+			$jpgProcessingThumbPath = $processingThumbPath;
+			$processingThumbPath = kFile::replaceExt($jpgProcessingThumbPath, 'bif');
+			unlink($jpgProcessingThumbPath);
+			$bifCreator = new kBifCreator($bifImgPaths, $processingThumbPath, $bifInterval);
+			$bifCreator->createBif();
+			foreach ($imgPathsToUnlink as $image)
+			{
+				if(file_exists($image))
+				{
+					unlink($image);
+				}
 			}
 		}
 		
-		if ($multi)
+		if ($multi && !$bif)
 		{
 			imagejpeg($im, $processingThumbPath);
 			imagedestroy($im);

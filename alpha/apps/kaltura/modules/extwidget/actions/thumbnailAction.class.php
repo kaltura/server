@@ -97,6 +97,8 @@ class thumbnailAction extends sfAction
 
 		$def_width = $this->getFloatRequestParameter("def_width", -1, -1, 10000);
 		$def_height = $this->getFloatRequestParameter("def_height", -1, -1, 10000);
+
+		$bif = $this->getRequestParameter("bif", 0);
 		
 		if ($width == self::DEFAULT_DIMENSION && $height == self::DEFAULT_DIMENSION) // for sake of backward compatibility if no dimensions where specified create 120x90 thumbnail
 		{
@@ -177,6 +179,20 @@ class thumbnailAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'start_sec cant be greater then end_sec');
 		}
 
+		if(!is_numeric($bif))
+		{
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'bif most be positive');
+		}
+
+		if($bif && $vid_slices == -1)
+		{
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'bif is not supported without vid_slices');
+		}
+
+		if($bif && $vid_slices > 100)
+		{
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'bif is not supported when vid_slices value is bigger then 100');
+		}
 
 		if ($upload_token_id)
 		{
@@ -341,7 +357,7 @@ class thumbnailAction extends sfAction
 		}
 		
 		// not allow capturing frames if the partner has FEATURE_DISALLOW_FRAME_CAPTURE permission
-		if(($vid_sec != -1) || ($vid_slice != -1) || ($vid_slices != -1))
+		if(($vid_sec != -1) || ($vid_slice != -1) || ($vid_slices != -1) || ($bif != 0))
 		{
 			if ($partner->getEnabledService(PermissionName::FEATURE_BLOCK_THUMBNAIL_CAPTURE))
 			{
@@ -423,7 +439,7 @@ class thumbnailAction extends sfAction
 			
 		if ( ! $file_sync )
 		{
-			$tempThumbPath = $entry->getLocalThumbFilePath($version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $flavor_id, $file_name, $start_sec, $end_sec );
+			$tempThumbPath = $entry->getLocalThumbFilePath($version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $flavor_id, $file_name, $start_sec, $end_sec, $bif);
 			if (!$tempThumbPath ){
 				KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
 			}
@@ -453,7 +469,7 @@ class thumbnailAction extends sfAction
 			try
 			{
 				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality,
-						$src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $imageFilePath, $density, $stripProfiles, $thumbParams, $format, null, $start_sec, $end_sec);
+						$src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $imageFilePath, $density, $stripProfiles, $thumbParams, $format, null, $start_sec, $end_sec, $bif);
 			}
 			catch(Exception $ex)
 			{
