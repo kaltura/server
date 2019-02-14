@@ -153,13 +153,13 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 */
 	public function startBatchJob($resource, entry $dbEntry, $operationAttributes, $clipEntry, $importUrl = null)
 	{
-		$internalResource = $resource->getResource();
 		if ($importUrl)
 		{
 			$this->createParentBatchJob(null, $clipEntry, $dbEntry, $dbEntry->getPartnerId(), $operationAttributes, 0 , $importUrl);
 		}
 		else
 		{
+			$internalResource = $resource->getResource();
 			$this->createParentBatchJob($internalResource->getOriginEntryId(), $clipEntry, $dbEntry, $dbEntry->getPartnerId(), $operationAttributes);
 		}
 	}
