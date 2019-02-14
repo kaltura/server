@@ -110,13 +110,14 @@ class KalturaAlignmentVendorTaskData extends KalturaVendorTaskData
 
 	protected function validateTranscriptAsset($transcriptAssetId, $expectedType)
 	{
-		$transcriptAssetDb = assetPeer::retrieveById($textTranscriptAssetId);
+		$transcriptAssetDb = assetPeer::retrieveById($transcriptAssetId);
 		if (!$transcriptAssetDb || !($transcriptAssetDb instanceof TranscriptAsset))
 		{
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $transcriptAssetId);
 		}
 		
-		if($transcriptAssetDb->getFormat() != $expectedType)
+		/* @var $transcriptAssetDb TranscriptAsset */
+		if($transcriptAssetDb->getContainerFormat() != $expectedType)
 		{
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_FORMAT_MISMATCH, $transcriptAssetId, $expectedType);
 		}
