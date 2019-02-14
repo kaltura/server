@@ -1,16 +1,25 @@
 # Naos 14.14.0 #
+
+## Reach - Update vendor response profile##
+
 ## Schedule Event - Add sphinx match optimization##
 
  - Issue Type: Task
  - Issue ID: No-Plat
 
 ### Configuration ###
-update configurations/sphinx/kaltura.conf file and add the following to kaltura_schedule_event:
-rt_field = sphinx_match_optimizations
+
+None
 
 ### Deployment scripts ###
 	
-ReIndex and repopulate kaltura_schedule_event table in sphinx.
+First replace all tokens in the XML file below and remove ".template" from the fle name:
+		
+		- /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/2019_02_14_update_reach_vendor_response_profiles.template.xml
+		
+Run deployment script:
+		
+		- php /opt/kaltura/app/deployment/updates/scripts/2019_02_14_update_reach_vendor_response_profile.php
 
 #### Known Issues & Limitations ####
 
