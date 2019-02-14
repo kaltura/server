@@ -5743,9 +5743,12 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		$response_options = new kReportResponseOptions();
-		foreach ($report_def['response_options'] as $field => $value)
+		if (isset($report_def['response_options']))
 		{
-			$response_options->$field = $value;
+			foreach ($report_def['response_options'] as $field => $value)
+			{
+				$response_options->$field = $value;
+			}
 		}
 		
 		if (isset($report_def[self::REPORT_ENRICH_DEF]))
