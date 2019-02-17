@@ -26,7 +26,7 @@ class kEntrySearch extends kBaseESearch
         $this->mainBoolQuery->addToFilter($displayInSearchQuery);
     }
 
-    public function doSearch(ESearchOperator $eSearchOperator, $entriesStatus = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null)
+    public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $entriesStatus = array(), $objectId = null, ESearchOrderBy $order = null)
     {
         kEntryElasticEntitlement::init();
         if (!count($entriesStatus))
@@ -43,20 +43,7 @@ class kEntrySearch extends kBaseESearch
             'index' => ElasticIndexMap::ELASTIC_ENTRY_INDEX,
             'type' => ElasticIndexMap::ELASTIC_ENTRY_TYPE
         );
-        $statuses = $this->initEntryStatuses($statuses);
         parent::initQuery($statuses, $objectId, $pager, $order);
-
-    }
-
-    protected function initEntryStatuses($statuses)
-    {
-        $enumType = call_user_func(array('KalturaEntryStatus', 'getEnumClass'));
-
-        $finalStatuses = array();
-        foreach($statuses as $status)
-            $finalStatuses[] = kPluginableEnumsManager::apiToCore($enumType, $status);
-
-        return $finalStatuses;
     }
 
     protected function initEntitlement(ESearchOperator $eSearchOperator, $objectId)

@@ -722,7 +722,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			foreach($requestResults as $requestResult)
 			{
 				if(is_array($requestResult) && isset($requestResult['code']))
-					throw new KalturaException($requestResult['message'], $requestResult['code']);
+					throw new KalturaException($requestResult['message'], $requestResult['code'], $requestResult['args']);
 				
 				if($requestResult instanceof Exception)
 					throw $requestResult;
@@ -1941,7 +1941,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function validateAccessControlId($accessControlId)
 	{
-		if(count($this->accessControlNameToId) == 0) //the name to id profiles weren't initialized
+		if($this->accessControlNameToId && count($this->accessControlNameToId) == 0) //the name to id profiles weren't initialized
 		{
 			$this->initAccessControlNameToId();
 		}

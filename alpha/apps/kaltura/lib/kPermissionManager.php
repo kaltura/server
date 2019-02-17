@@ -1,6 +1,6 @@
 <?php
 
-class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedEventConsumer
+class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedEventConsumer, kObjectInvalidateCacheEventConsumer
 {
 	// -------------------
 	// -- Class members --
@@ -1029,11 +1029,28 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			KalturaLog::err("Cannot find partner with id [$partnerId]");
 			return;
 		}
-		$partner->setRoleCacheDirtyAt(time());
-		$partner->save();
-		PartnerPeer::removePartnerFromCache($partnerId);
+
+		kEventsManager::raiseEventDeferred(new kObjectInvalidateCacheEvent($partner));
 	}
-	
+
+	public function shouldConsumeInvalidateCache($object, $params = null)
+	{
+		if($object instanceof Partner)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	public function invalidateCache($object, $params = null)
+	{
+		if($object instanceof Partner)
+		{
+			$object->setRoleCacheDirtyAt(time());
+			$object->save();
+		}
+		return true;
+	}
 	/**
 	 *
 	 * add ps2 permission for given partner

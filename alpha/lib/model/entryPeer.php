@@ -863,10 +863,15 @@ class entryPeer extends BaseentryPeer
 
 	public static function fetchPlaysViewsData($entries)
 	{
+		if (!$entries)
+		{
+			return;
+		}
+
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
 		if (!$cache)
 		{
-			return $entries;
+			return;
 		}
 
 		$keys = array();
@@ -877,6 +882,11 @@ class entryPeer extends BaseentryPeer
 				continue;
 			}
 			$keys[] = entry::PLAYSVIEWS_CACHE_KEY_PREFIX . $entry->getId();
+		}
+
+		if (!$keys)
+		{
+			return;
 		}
 
 		$data = $cache->multiGet($keys);

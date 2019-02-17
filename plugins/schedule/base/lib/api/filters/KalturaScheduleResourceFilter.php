@@ -24,7 +24,13 @@ class KalturaScheduleResourceFilter extends KalturaScheduleResourceBaseFilter
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$type = $this->getListResponseType();
-		
+
+		if(!isset($this->statusEqual) && !isset($this->statusIn))
+		{
+			$allowedStatus = array(ScheduleResourceStatus::DISABLED,ScheduleResourceStatus::ACTIVE);
+			$this->statusIn =  implode(',' , $allowedStatus);
+		}
+
 		$c = new Criteria();
 		if($type)
 		{
@@ -34,9 +40,8 @@ class KalturaScheduleResourceFilter extends KalturaScheduleResourceBaseFilter
 		$filter = $this->toObject();
 		$filter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
-			
+
 		$list = ScheduleResourcePeer::doSelect($c);
-	
 		$resultCount = count($list);
 		if ($resultCount && $resultCount < $pager->pageSize)
 			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;

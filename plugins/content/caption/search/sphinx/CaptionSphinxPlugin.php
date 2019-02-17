@@ -3,7 +3,7 @@
  * Enable indexing and searching caption asset objects in sphinx
  * @package plugins.captionSphinx
  */
-class CaptionSphinxPlugin extends KalturaPlugin implements IKalturaPending, IKalturaCriteriaFactory, IKalturaSphinxConfiguration, IKalturaEventConsumers
+class CaptionSphinxPlugin extends KalturaPlugin implements IKalturaPending, IKalturaCriteriaFactory, IKalturaSphinxConfiguration
 {
 	const PLUGIN_NAME = 'captionSphinx';
 	
@@ -21,15 +21,8 @@ class CaptionSphinxPlugin extends KalturaPlugin implements IKalturaPending, IKal
 		
 		return array($captionSearchDependency);
 	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaEventConsumers::getEventConsumers()
-	 */
-	public static function getEventConsumers()
-	{
-		return array('kSphinxCaptionAssetFlowManager');
-	}
-	
+
+
 	/* (non-PHPdoc)
 	 * @see IKalturaCriteriaFactory::getKalturaCriteria()
 	 */

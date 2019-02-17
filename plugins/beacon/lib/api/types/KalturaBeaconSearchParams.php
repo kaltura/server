@@ -5,32 +5,20 @@
  */
 abstract class KalturaBeaconSearchParams extends KalturaObject
 {
-	public function getMapBetweenObjects()
-	{
-		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
-	}
-
 	/**
 	 * @var string
 	 */
 	public $objectId;
 
-	/**
-	 * @var KalturaBeaconSearchScheduledResourceOrderBy
-	 */
-	public $orderBy;
-
-	/**
-	 * @var KalturaBeaconScheduledResourceOperator
-	 */
-	public $searchOperator;
-
 	private static $mapBetweenObjects = array
 	(
-		"orderBy",
-		"searchOperator",
 		"objectId",
 	);
+
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+	}
 
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
@@ -41,4 +29,18 @@ abstract class KalturaBeaconSearchParams extends KalturaObject
 
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
+
+	protected static function validateSearchOperator($searchOperator)
+	{
+		if (!$searchOperator)
+		{
+			throw new KalturaAPIException(KalturaESearchErrors::EMPTY_SEARCH_OPERATOR_NOT_ALLOWED);
+		}
+
+		if (!$searchOperator->operator)
+		{
+			$searchOperator->operator = KalturaSearchOperatorType::SEARCH_AND;
+		}
+	}
+
 }

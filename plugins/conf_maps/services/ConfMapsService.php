@@ -95,5 +95,18 @@ class ConfMapsService extends KalturaBaseService
 		$confMap = $filter->getMap();
 		return $confMap;
 	}
+
+	/**
+	* List configuration maps names
+	*
+	* @action getMapNames
+	* @return KalturaStringArray
+	*/
+	public function getMapNamesAction()
+	{
+		$mapNames= ConfMapsPeer::retrieveMapsNames();
+		$result =  KalturaStringArray::fromDbArray($mapNames);
+		return $result;
+	}
 }
 

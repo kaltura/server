@@ -12,7 +12,7 @@ class kUserSearch extends kBaseESearch
         parent::__construct();
     }
     
-    public function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null)
+    public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null, ESearchOrderBy $order = null)
     {
         kUserElasticEntitlement::init();
         if (!count($statuses))

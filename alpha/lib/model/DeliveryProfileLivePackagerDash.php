@@ -11,7 +11,14 @@ class DeliveryProfileLivePackagerDash extends DeliveryProfileLiveDash
 	protected function getHttpUrl($serverNode)
 	{
 		$httpUrl = $this->getLivePackagerUrl($serverNode);
-		$httpUrl .= "manifest.mpd";
+		$httpUrl .= "manifest";
+		
+		foreach($this->getDynamicAttributes()->getFlavorParamIds() as $flavorId)
+		{
+			$httpUrl .= "-s$flavorId";
+		}
+		
+		$httpUrl .= ".mpd";
 		
 		KalturaLog::debug("Live Stream url [$httpUrl]");
 		return $httpUrl;

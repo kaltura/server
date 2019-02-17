@@ -3897,6 +3897,12 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'last_played_at' => $this->getLastPlayedAt(null),
 			'user_names' => $this->getAllUserNamesAsArray(),
 			'root_id' => $this->getRootEntryId(),
+			'views_30days' => $this->getViewsLast30Days(),
+			'plays_30days' => $this->getPlaysLast30Days(),
+			'views_7days' => $this->getViewsLast7Days(),
+			'plays_7days' => $this->getPlaysLast7Days(),
+			'views_1day' => $this->getViewsLastDay(),
+			'plays_1day' => $this->getPlaysLastDay(),
 		);
 
 		$this->addCategoriesToObjectParams($body);
@@ -4214,7 +4220,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 		{
 			return $this->playsViewsData[$key];
 		}
-		return null;
+		return 0;
 	}
 
 	public function getPlays()
@@ -4300,8 +4306,8 @@ public function copyTemplate($copyPartnerId = false, $template)
 	{
 		switch ($this->getType())
 		{
-			case KalturaEntryType::DATA:
-			case KalturaEntryType::DOCUMENT:
+			case entryType::DATA:
+			case entryType::DOCUMENT:
 				return false;
 
 			default:

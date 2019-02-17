@@ -16,6 +16,11 @@ abstract class ESearchItem extends BaseObject implements IESearchItem
 	protected static $searchHistoryFields = array();
 
 	/**
+	 * @var array
+	 */
+	protected static $booleanFields = array();
+
+	/**
 	 * @var ESearchItemType
 	 */
 	protected $itemType;
@@ -158,6 +163,11 @@ abstract class ESearchItem extends BaseObject implements IESearchItem
 			return true;
 
 		return false;
+	}
+
+	public static function shouldReplaceBooleanValue($fieldName)
+	{
+		return in_array($fieldName, static::$booleanFields);
 	}
 
 }
