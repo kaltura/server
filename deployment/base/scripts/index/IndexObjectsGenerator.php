@@ -34,6 +34,7 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 		$this->generateSimpleFunction("getObjectName", $fp, $this->searchableObjects[$key]);
 		$this->generateSimpleFunction("getObjectIndexName", $fp, $this->searchableObjects[$key]);
 		$this->generateSimpleFunction("getSphinxIdField", $fp, $this->searchableObjects[$key]);
+		$this->generateSimpleFunction("getSphinxSplitIndexFieldName", $fp, $this->searchableObjects[$key]);
 		$this->generateSimpleFunction("getPropelIdField", $fp, $this->searchableObjects[$key]);
 		$this->generateSimpleFunction("getIdField", $fp, $this->searchableObjects[$key]);
 		$this->generateSimpleFunction("getDefaultCriteriaFilter", $fp, $this->searchableObjects[$key]);
@@ -305,6 +306,10 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 	
 	private function getSphinxIdField($fp, IndexableObject $object) {
 		$this->printToFile($fp, "return '" . $object->indexId . "';",2);
+	}
+	
+	private function getSphinxSplitIndexFieldName($fp, IndexableObject $object) {
+		$this->printToFile($fp, "return '" . $object->splitIndexFieldName . "';",2);
 	}
 	
 	private function getPropelIdField($fp, IndexableObject $object) {

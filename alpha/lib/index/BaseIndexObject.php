@@ -234,8 +234,24 @@ abstract class BaseIndexObject
 		return null;
 	}
 	
-	public static function getSphinxSplitIndexId($originalValue = null)
+	public static function getSplitIndexFactor($IndexObjectName)
 	{
-		return null;
+		$config = kConf::getDB();
+		if(!isset($config['sphinx_split_index']) || $config['sphinx_split_index']['enabled'] == false || !isset($config['sphinx_split_index'][$IndexObjectName::getObjectIndexName()]))
+			return null;
+		
+		return $config['sphinx_split_index'][$IndexObjectName::getObjectIndexName()];
+	}
+	
+	public static function getSphinxSplitIndexId($originalValue = null, $IndexObjectName)
+	{
+		if(!isset($originalValue))
+			return null;
+		
+		$splitIndexFactor = self::getSplitIndexFactor($IndexObjectName);
+		if(!$splitIndexFactor)
+			return null;
+		
+		return ($originalValue/10)%$splitIndexFactor;
 	}
 }

@@ -438,7 +438,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		}
 		
 		$sphinxLog = new SphinxLog();
-		$sphinxLog->setExecutedServerId($this->retrieveSphinxConnectionId($object->getSphinxIndexName()));
+		$sphinxLog->setExecutedServerId($this->retrieveSphinxConnectionId($splitIndexName));
 		$sphinxLog->setObjectId($object->getId());
 		$objectIndexClass = $object->getIndexObjectName();
 		$sphinxLog->setObjectType($objectIndexClass::getObjectName());
@@ -464,7 +464,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		if(!kConf::get('exec_sphinx', 'local', 0))
 			return true;
 					
-		$sphinxConnection = DbManager::getSphinxConnection(false, $object->getSphinxIndexName());
+		$sphinxConnection = DbManager::getSphinxConnection(false, $splitIndexName);
 		if($sphinxConnection->getKalturaOption('sharded') && $splitIndexName)
 			$sql = str_replace(kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName()), $splitIndexName, $sql);
 		

@@ -32,27 +32,6 @@ class entryIndex extends BaseIndexObject
 	{
 		return 'entry.PARTNER_ID';
 	}
-	
-	public static function getSplitIndexFactor()
-	{
-		$config = kConf::getDB();
-		if(!isset($config['sphinx_split_index']) || $config['sphinx_split_index']['enabled'] == false || !isset($config['sphinx_split_index'][self::getObjectIndexName()]))
-			return null;
-		
-		return $config['sphinx_split_index'][self::getObjectIndexName()];
-	}
-	
-	public static function getSphinxSplitIndexId($originalValue = null)
-	{
-		if(!isset($originalValue))
-			return null;
-		
-		$splitIndexFactor = self::getSplitIndexFactor();
-		if(!$splitIndexFactor)
-			return null;
-		
-		return ($originalValue/10)%$splitIndexFactor;
-	}
 
 	public static function getPropelIdField()
 	{

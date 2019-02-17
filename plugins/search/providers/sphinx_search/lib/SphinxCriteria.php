@@ -631,7 +631,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			}
 		}
 		
-		return kSphinxSearchManager::getSphinxIndexName($objectClass::getObjectIndexName(), $objectClass::getSphinxSplitIndexId($splitIndexValue));
+		return kSphinxSearchManager::getSphinxIndexName($objectClass::getObjectIndexName(), $objectClass::getSphinxSplitIndexId($splitIndexValue, $objectClass::getObjectName()));
 	}
 	
 	
