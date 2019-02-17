@@ -120,6 +120,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_TABLE_MAP = 'report_table_map';
 	const REPORT_TABLE_FINALIZE_FUNC = 'report_table_finalize_func';
 	const REPORT_EDIT_FILTER_FUNC = 'report_edit_filter_func';
+	const REPORT_BOUND_FILTER_FUNC = 'report_bound_filter_func';
 
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -1442,7 +1443,7 @@ class kKavaReportsMgr extends kKavaBase
 						array(
 							self::DRUID_DIMENSION => self::DIMENSION_ENTRY_CREATED_DAY,
 							self::DRUID_TYPE => self::DRUID_BOUND_FILTER,
-							self::DRUID_VALUES => array()
+							self::REPORT_BOUND_FILTER_FUNC => 'self::getReportIntervalsUnixtime'
 						)
 					),
 					self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
@@ -2581,6 +2582,16 @@ class kKavaReportsMgr extends kKavaBase
 			{
 				$report_filter = array($report_filter);
 			}
+
+			foreach ($report_filter as &$cur_filter)
+			{
+				if (!isset($cur_filter[self::DRUID_TYPE]) || $cur_filter[self::DRUID_TYPE] != self::DRUID_BOUND_FILTER))
+				{
+					continue;
+				}
+				$values = call_user_func($cur_filter[self::REPORT_BOUND_FILTER_FUNC], $report_def, $input_filter);
+				$cur_filter[self::DRUID_VALUES] = $values;
+			}
 			$druid_filter = array_merge($druid_filter, $report_filter);
 		}
 		
@@ -2823,15 +2834,23 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		$filter_values = array();
-		foreach ($filter as $cur_filter)
+		$bound_filters = array();
+		foreach ($filter as $cur_filter) 
 		{
-			$dimension = $cur_filter[self::DRUID_DIMENSION];
-			$values = $cur_filter[self::DRUID_VALUES];
-			if (isset($filter_values[$dimension]))
+			if (isset($cur_filter[self::DRUID_TYPE]) && $cur_filter[self::DRUID_TYPE] === self::DRUID_BOUND_FILTER) 
 			{
-				$values = array_intersect($values, $filter_values[$dimension]);
+				$bound_filters[] = $cur_filter;
 			}
-			$filter_values[$dimension] = array_values($values);
+			else
+			{
+				$dimension = $cur_filter[self::DRUID_DIMENSION];
+				$values = $cur_filter[self::DRUID_VALUES];
+				if (isset($filter_values[$dimension])) 
+				{
+					$values = array_intersect($values, $filter_values[$dimension]);
+				}
+				$filter_values[$dimension] = array_values($values);
+			}
 		}
 
 		$filter_def = array();
@@ -2840,6 +2859,11 @@ class kKavaReportsMgr extends kKavaBase
 			$filter_def[] = self::getInFilter(
 				$dimension,
 				$values);
+		}
+		foreach ($bound_filters as $cur_filter)
+		{
+			$order = isset($cur_filter[self::DRUID_SORTING]) ? $cur_filter[self::DRUID_SORTING] : self::DRUID_ORDER_NUMERIC;
+			$filter_def[] = self::getBoundFilter($cur_filter[self::DRUID_DIMENSION], $cur_filter[self::DRUID_VALUES], $order);
 		}
 
 		$report_def[self::DRUID_FILTER] = array(
@@ -5919,5 +5943,18 @@ class kKavaReportsMgr extends kKavaBase
 
 		$url = myReportsMgr::createUrl($partner_id, $file_name);
 		return $url;
+	}
+
+	protected static function getReportIntervalsUnixtime($report_def, $input_filter)
+	{
+		$values = array();
+		$intervals = self::getFilterIntervals($report_def, $input_filter);
+		$intervals = str_split($intervals, "/");
+		foreach ($intervals as $interval) {
+			$dateTime = explode('T', $interval);
+			$dateId = str_replace('-', '', $dateTime[0]);
+			$values[] = self::dateIdToUnixtime($dateId);
+		}
+		return $values;
 	}
 }

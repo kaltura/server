@@ -121,26 +121,19 @@ class kDruidBase
 		);
 	}
 
-	protected static function getBoundFilter($dimension, $values, $order, $input_filter)
+	protected static function getBoundFilter($dimension, $values, $order)
 	{
 		if (count($values != 2))
 		{
 			//error
 		}
-		foreach ($values as &$value)
-		{
-			if ($value[0] != ':')
-			{
-				$param_name = substr($value, 1);
-				$value = $input_filter->$param_name;
-			}
-		}
+
 		return array(
 			self::DRUID_TYPE => self::DRUID_BOUND_FILTER,
 			self::DRUID_DIMENSION => $dimension,
-			self::DRUID_LOWER => $lower,
-			self::DRUID_UPPER => $upper,
-			self::DRUID_SORTING => $order
+			self::DRUID_LOWER => $values[0],
+			self::DRUID_UPPER => $values[1],
+			self::DRUID_SORTING => $order,
 		);
 	}
 	
