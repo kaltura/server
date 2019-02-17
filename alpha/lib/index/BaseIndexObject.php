@@ -237,10 +237,11 @@ abstract class BaseIndexObject
 	public static function getSplitIndexFactor($IndexObjectName)
 	{
 		$config = kConf::getDB();
-		if(!isset($config['sphinx_split_index']) || $config['sphinx_split_index']['enabled'] == false || !isset($config['sphinx_split_index'][$IndexObjectName::getObjectIndexName()]))
+		if(!isset($config['sphinx_split_index']) || !$config['sphinx_split_index']['enabled'] || $config['sphinx_split_index']['enabled'] == false || !isset($config['sphinx_split_index'][$IndexObjectName]))
 			return null;
 		
-		return $config['sphinx_split_index'][$IndexObjectName::getObjectIndexName()];
+		return $config['sphinx_split_index'][$IndexObjectName];
+		
 	}
 	
 	public static function getSphinxSplitIndexId($originalValue = null, $IndexObjectName)
