@@ -24,20 +24,14 @@ class LiveEntryServerNode extends EntryServerNode
 		$liveEntry = $this->getLiveEntry();
 		if($liveEntry)
 		{
-			$shouldIndex = true;
 			if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
 			{
-				$shouldIndex = false;
 				$liveEntry->setPrimaryServerNodeId($this->getServerNodeId());
 				
 				if(!$liveEntry->getCurrentBroadcastStartTime())
 					$liveEntry->setCurrentBroadcastStartTime(time());
-				if (!$liveEntry->save())
-				{
-					$shouldIndex = true;
-				}
 			}
-			if ($shouldIndex)
+			if (!$liveEntry->save())
 			{
 				$liveEntry->indexToSearchIndex();
 			}
@@ -190,7 +184,7 @@ class LiveEntryServerNode extends EntryServerNode
 		}
 		
 		$recordStatus = $liveEntry->getRecordStatus();
-		if(($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY) && $recordStatus && $recordStatus !== RecordStatus::DISABLED)
+		if($recordStatus && $recordStatus !== RecordStatus::DISABLED)
 		{
 			$recordedEntryId = $liveEntry->getRecordedEntryId();
 			$recordedEntry = $recordedEntryId ? entryPeer::retrieveByPK($recordedEntryId) : null;
