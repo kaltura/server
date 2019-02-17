@@ -24,7 +24,7 @@ class VendorAlignmentCatalogItem extends VendorCatalogItem
 	{
 		$taskVersion = parent::getTaskVersion($entryId, $jobData);
 		
-		if(!$jobData || !($jobData instanceof KalturaVendorTaskData))
+		if(!$jobData || !($jobData instanceof kAlignmentVendorTaskData))
 			return $taskVersion;
 		
 		/* @var $jobData kAlignmentVendorTaskData */
