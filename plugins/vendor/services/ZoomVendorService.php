@@ -207,7 +207,7 @@ class ZoomVendorService extends KalturaBaseService
 		myPartnerUtils::resetAllFilters();
 		ZoomHelper::verifyHeaderToken();
 		$data = ZoomHelper::getPayloadData();
-		list($accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId) = ZoomHelper::extractDataFromRecordingCompletePayload($data);
+		list($accountId, $downloadToken, $hostEmail, $downloadURLs, $meetingId, $topic) = ZoomHelper::extractDataFromRecordingCompletePayload($data);
 		/** @var ZoomVendorIntegration $zoomIntegration */
 		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 		if (!$zoomIntegration)
@@ -229,7 +229,6 @@ class ZoomVendorService extends KalturaBaseService
 		kCurrentContext::initKsPartnerUser($ks);
 		kPermissionManager::init();
 		$urls = ZoomHelper::parseDownloadUrls($downloadURLs, $downloadToken);
-		ZoomHelper::uploadToKaltura($urls, $dbUser, $zoomIntegration, $emails, $meetingId, $hostEmail);
+		ZoomHelper::uploadToKaltura($urls, $dbUser, $zoomIntegration, $emails, $meetingId, $hostEmail, $topic);
 	}
-
 }

@@ -163,12 +163,16 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		{
 			throw new KalturaAPIException(KalturaCuePointErrors::USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID, $this->quizUserEntryId);
 		}
-		if ($dbUserEntry->getStatus() === QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED))
+		if (!kCurrentContext::$is_admin_session)
 		{
-			throw new KalturaAPIException(KalturaQuizErrors::USER_ENTRY_QUIZ_ALREADY_SUBMITTED);
-		}
-		if (!kCurrentContext::$is_admin_session && ($dbUserEntry->getKuserId() != kCurrentContext::getCurrentKsKuserId()) ) {
-		    throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+			if ($dbUserEntry->getStatus() === QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED))
+			{
+				throw new KalturaAPIException(KalturaQuizErrors::USER_ENTRY_QUIZ_ALREADY_SUBMITTED);
+			}
+			if ($dbUserEntry->getKuserId() != kCurrentContext::getCurrentKsKuserId()) 
+			{
+			    throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+			}
 		}
 	}
 
@@ -198,7 +202,8 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		$dbEntry = entryPeer::retrieveByPK($this->entryId);
 		$kQuiz = QuizPlugin::validateAndGetQuiz($dbEntry);
 		$this->validateUserEntry();
-		if ( !$kQuiz->getAllowAnswerUpdate() ) {
+		if ( !$kQuiz->getAllowAnswerUpdate() && !kCurrentContext::$is_admin_session) 
+		{
 			throw new KalturaAPIException(KalturaQuizErrors::ANSWER_UPDATE_IS_NOT_ALLOWED, $sourceObject->getEntryId());
 		}
 		if ($this->feedback != null && !kEntitlementUtils::isEntitledForEditEntry($dbEntry) )
