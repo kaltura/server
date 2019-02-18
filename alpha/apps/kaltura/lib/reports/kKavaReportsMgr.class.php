@@ -25,6 +25,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_AVG_PLAY_TIME = 'avg_time_viewed';
 	const METRIC_PLAYER_IMPRESSION_RATIO = 'load_play_ratio';
 	const METRIC_AVG_DROP_OFF = 'avg_view_drop_off';
+	const METRIC_UNIQUE_PERCENTILES_RATIO = 'avg_completion_rate';
 	const METRIC_PLAYTHROUGH_RATIO = 'play_through_ratio';
 	const METRIC_UNIQUE_ENTRIES = 'unique_videos';
 	const METRIC_UNIQUE_USERS = 'unique_known_users';
@@ -303,9 +304,9 @@ class kKavaReportsMgr extends kKavaBase
 				self::REPORT_ENRICH_OUTPUT => 'name',
 				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo'
 			),
-			self::REPORT_METRICS => array(self::METRIC_UNIQUE_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
-			self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
+			self::REPORT_METRICS => array(self::METRIC_UNIQUE_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_UNIQUE_PERCENTILES_RATIO),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_PERCENTILES_RATIO),
+			self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_UNIQUE_PERCENTILES_RATIO),
 		),
 
 		myReportsMgr::REPORT_TYPE_USER_CONTENT_DROPOFF => array(
@@ -1555,6 +1556,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_PLAYER_IMPRESSION_RATIO => true,
 		self::METRIC_PLAYTHROUGH_RATIO => true,
 		self::METRIC_AVG_DROP_OFF => true,
+		self::METRIC_UNIQUE_PERCENTILES_RATIO => true,
 		self::METRIC_UNIQUE_ENTRIES => true,
 		self::METRIC_UNIQUE_USERS => true,
 		self::METRIC_BUFFER_TIME_RATIO => true,
@@ -1882,8 +1884,9 @@ class kKavaReportsMgr extends kKavaBase
 			self::getLongSumAggregator(
 				self::METRIC_ORIGIN_BANDWIDTH_SIZE_BYTES, self::METRIC_SIZE_BYTES));
 
-		self::$aggregations_def[self::METRIC_UNIQUE_PERCENTILES_SUM] = self::getLongSumAggregator(
-			self::METRIC_UNIQUE_PERCENTILES_SUM, self::METRIC_UNIQUE_PERCENTILES_SUM);
+		self::$aggregations_def[self::METRIC_UNIQUE_PERCENTILES_SUM] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+			self::getLongSumAggregator(self::METRIC_UNIQUE_PERCENTILES_SUM, self::METRIC_UNIQUE_PERCENTILES_SUM));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
@@ -2004,7 +2007,14 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_AVG_DROP_OFF, '/', array(
 					self::getConstantRatioPostAggr('subDropOff', self::METRIC_PLAYTHROUGH, '4'),
 					self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY))));
-		
+
+		self::$metrics_def[self::METRIC_UNIQUE_PERCENTILES_RATIO] = array(
+			self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::METRIC_UNIQUE_PERCENTILES_SUM),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_UNIQUE_PERCENTILES_RATIO,
+				self::METRIC_UNIQUE_PERCENTILES_SUM,
+				self::EVENT_TYPE_PLAY));
+
 		self::$aggregations_def[self::METRIC_SUM_PRICE] = self::getLongSumAggregator(
 			self::METRIC_SUM_PRICE, self::METRIC_SUM_PRICE);
 
@@ -4576,7 +4586,7 @@ class kKavaReportsMgr extends kKavaBase
 		
 		// convert the result to a table
 		$metric_headers = isset($report_def[self::REPORT_METRICS]) ? 
-			$report_def[self::REPORT_METRICS] : array_keys(reset($result));
+			$report_def[self::REPORT_METRICS] : array_keys(call_user_func_array('array_merge', $result));
 		$date_headers = $input_filter->interval != self::INTERVAL_ALL ? 
 			array(self::getDateColumnName($input_filter->interval)) : 
 			array();
@@ -5174,7 +5184,7 @@ class kKavaReportsMgr extends kKavaBase
 				$cur_report_def[self::REPORT_DIMENSION_HEADERS] = array('dimension');
 				
 				$result = self::getTableImpl($partner_id, $cur_report_def, $input_filter,
-					count($ids_to_get), 1, null, implode(',', array_keys($ids_to_get)), $flags, $response_options);
+					count($ids_to_get), 1, null, implode($response_options->getDelimiter(), array_keys($ids_to_get)), $flags, $response_options);
 				
 				foreach ($result[1] as $row)
 				{

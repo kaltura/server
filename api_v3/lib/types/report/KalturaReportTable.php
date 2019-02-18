@@ -27,7 +27,7 @@ class KalturaReportTable extends KalturaObject
 	public function fromReportTable (  $header ,  $data , $totalCount, $delimiter )
 	{
 		if ( ! $header ) return;
-		$this->header = implode ( "," , $header );
+		$this->header = implode ( $delimiter , $header );
 		
 		$data_str = "";
 		foreach ( $data as $row )
