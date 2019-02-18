@@ -5158,7 +5158,7 @@ class kKavaReportsMgr extends kKavaBase
 				$cur_report_def[self::REPORT_DIMENSION_HEADERS] = array('dimension');
 				
 				$result = self::getTableImpl($partner_id, $cur_report_def, $input_filter,
-					count($ids_to_get), 1, null, implode(',', array_keys($ids_to_get)), $flags, $response_options);
+					count($ids_to_get), 1, null, implode($response_options->getDelimiter(), array_keys($ids_to_get)), $flags, $response_options);
 				
 				foreach ($result[1] as $row)
 				{
