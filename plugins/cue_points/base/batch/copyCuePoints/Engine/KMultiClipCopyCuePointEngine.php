@@ -8,13 +8,7 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 	/** @var KalturaClipDescription $currentClip */
 	private $currentClip = null;
 
-	const CUE_POINT_THUMB = 'thumbCuePoint.Thumb';
-	const CUE_POINT_EVENT = 'eventCuePoint.Event';
-	const ANNOTATION = 'annotation.Annotation';
-	const CUE_POINT_AD = 'adCuePoint.Ad';
-	const CUE_POINT_CODE = 'codeCuePoint.Code';
-
-
+	private $cuePointTypes = array(self::CUE_POINT_THUMB, self::CUE_POINT_EVENT, self::ANNOTATION, self::CUE_POINT_AD, self::CUE_POINT_CODE);
 	/**
 	 * @return bool
 	 * @throws Exception
@@ -38,6 +32,10 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 	 */
 	public function shouldCopyCuePoint($cuePoint)
 	{
+		if (parent::shouldCopyCuePoint($cuePoint))
+		{
+			return true;
+		}
 		$clipStartTime = $this->currentClip->startTime;
 		$clipEndTime = $clipStartTime + $this->currentClip->duration;
 		$calculatedEndTime = $cuePoint->calculatedEndTime;
@@ -49,7 +47,7 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 	public function getCuePointFilter($entryId, $status = CuePointStatus::READY)
 	{
 		$filter = parent::getCuePointFilter($entryId, $status);
-		$filter->cuePointTypeIn = 'codeCuePoint.Code,thumbCuePoint.Thumb,annotation.Annotation,adCuePoint.Ad,eventCuePoint.Event,quiz.QUIZ_QUESTION';
+		$filter->cuePointTypeIn = implode(",", $this->cuePointTypes) . ',quiz.QUIZ_QUESTION';
 		$filter->startTimeLessThanOrEqual = $this->currentClip->startTime + $this->currentClip->duration;
 		return $filter;
 	}
@@ -93,8 +91,7 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 	{
 		$filter = parent::getCuePointFilter($destinationEntryId);
 		//merge annotation,Ad,event,thumb cue point only
-		$filter->cuePointTypeIn = self::CUE_POINT_THUMB . ',' . self::CUE_POINT_EVENT . ',' .self::ANNOTATION . ',' .
-			self::CUE_POINT_AD  . ',' . self::CUE_POINT_CODE;
+		$filter->cuePointTypeIn = implode(",", $this->cuePointTypes);
 		return $filter;
 	}
 
@@ -105,8 +102,11 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 	 */
 	private function mergeCuePointByType($cuePoints)
 	{
-		$cuePointSplitIntoType = array(self::CUE_POINT_THUMB => array(), self::CUE_POINT_EVENT => array(),
-			self::ANNOTATION => array(), self::CUE_POINT_AD => array(), self::CUE_POINT_CODE => array());
+		$cuePointSplitIntoType = array();
+		foreach($this->cuePointTypes as $type)
+		{
+			$cuePointSplitIntoType[$type] = array();
+		}
 		/** @var KalturaCuePoint $cuePoint */
 		foreach ($cuePoints as $cuePoint)
 		{

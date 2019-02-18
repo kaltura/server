@@ -7,13 +7,24 @@ abstract class KCopyCuePointEngine
 {
 	const MAX_CUE_POINT_CHUNKS = 500;
 
+	const CUE_POINT_THUMB = 'thumbCuePoint.Thumb';
+	const CUE_POINT_EVENT = 'eventCuePoint.Event';
+	const ANNOTATION = 'annotation.Annotation';
+	const CUE_POINT_AD = 'adCuePoint.Ad';
+	const CUE_POINT_CODE = 'codeCuePoint.Code';
+
 	protected $data = null;
 	protected $partnerId = null;
 	private $lastCuePointPerType = null;
 
 	abstract public function copyCuePoints();
 
-	protected function shouldCopyCuePoint($cuePoint) {return true;}
+	protected function shouldCopyCuePoint($cuePoint)
+	{
+		if ($cuePoint->cuePointType == self::CUE_POINT_CODE && in_array("poll-data", explode(",", $cuePoint->tags)))
+			return true; //poll data should be copy regardless of his time
+		return false;
+	}
 
 	protected function calculateCuePointTimes($cuePoint) {return array($cuePoint->startTime, $cuePoint->endTime);}
 
@@ -205,7 +216,7 @@ abstract class KCopyCuePointEngine
 
 	private static function getTypeName($cuePoint) {
 		$name = $cuePoint->cuePointType;
-		if ($name == 'codeCuePoint.Code' && $cuePoint->tags == 'change-view-mode')
+		if ($name == self::CUE_POINT_CODE && $cuePoint->tags == 'change-view-mode')
 			$name .= '_changeViewMode';
 		return $name;
 	}
