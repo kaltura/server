@@ -1442,7 +1442,7 @@ class kKavaReportsMgr extends kKavaBase
 							self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_LIVE_STREAM, self::MEDIA_TYPE_LIVE_WIN_MEDIA, self::MEDIA_TYPE_LIVE_REAL_MEDIA, self::MEDIA_TYPE_LIVE_QUICKTIME)
 						),
 						array(
-							self::DRUID_DIMENSION => self::DIMENSION_ENTRY_CREATED_DAY,
+							self::DRUID_DIMENSION => self::DIMENSION_ENTRY_CREATED_AT,
 							self::DRUID_TYPE => self::DRUID_BOUND_FILTER,
 							self::REPORT_BOUND_FILTER_FUNC => 'self::getReportIntervalsUnixtime'
 						)
@@ -2587,7 +2587,7 @@ class kKavaReportsMgr extends kKavaBase
 
 			foreach ($report_filter as &$cur_filter)
 			{
-				if (!isset($cur_filter[self::DRUID_TYPE]) || $cur_filter[self::DRUID_TYPE] != self::DRUID_BOUND_FILTER))
+				if (!isset($cur_filter[self::DRUID_TYPE]) || $cur_filter[self::DRUID_TYPE] != self::DRUID_BOUND_FILTER)
 				{
 					continue;
 				}
@@ -6017,7 +6017,8 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function getReportIntervalsUnixtime($report_def, $input_filter)
 	{
 		$filter_values = array();
-		$intervals = str_split(self::getFilterIntervals($report_def, $input_filter), "/");
+		$filter_intervals = self::getFilterIntervals($report_def, $input_filter);
+		$intervals = explode("/", $filter_intervals[0]);
 		foreach ($intervals as $interval)
 		{
 			$date_time = explode('T', $interval);

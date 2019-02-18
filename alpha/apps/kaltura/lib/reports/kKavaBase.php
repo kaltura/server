@@ -52,7 +52,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_TYPE = 'type';
 	const DIMENSION_ENTRY_OWNER_ID = 'entryKuserId';
 	const DIMENSION_ENTRY_CREATOR_ID = 'entryCreatorId';
-	const DIMENSION_ENTRY_CREATED_DAY = 'entryCreatedDay';
+	const DIMENSION_ENTRY_CREATED_AT = 'entryCreatedAt';
 
 	// metrics
 	const METRIC_COUNT = 'count';

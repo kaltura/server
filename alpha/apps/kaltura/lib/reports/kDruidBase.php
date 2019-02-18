@@ -70,6 +70,7 @@ class kDruidBase
 	const DRUID_DELEGATE = 'delegate';
 	const DRUID_LOWER = 'lower';
 	const DRUID_UPPER = 'upper';
+	const DRUID_ORDERING = 'ordering';
 	
 	// druid response keywords
 	const DRUID_TIMESTAMP = 'timestamp';
@@ -123,17 +124,12 @@ class kDruidBase
 
 	protected static function getBoundFilter($dimension, $values, $order)
 	{
-		if (count($values != 2))
-		{
-			//error
-		}
-
 		return array(
 			self::DRUID_TYPE => self::DRUID_BOUND_FILTER,
 			self::DRUID_DIMENSION => $dimension,
 			self::DRUID_LOWER => $values[0],
 			self::DRUID_UPPER => $values[1],
-			self::DRUID_SORTING => $order,
+			self::DRUID_ORDERING => $order,
 		);
 	}
 	
