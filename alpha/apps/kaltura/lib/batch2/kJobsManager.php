@@ -986,10 +986,10 @@ class kJobsManager
 		else
 		{
 			$batchJob = new BatchJob();
+			$batchJob->setEntryId($entryId);
+			$batchJob->setPartnerId($partnerId);
 		}
 
-		$batchJob->setEntryId($entryId);
-		$batchJob->setPartnerId($partnerId);
 
 
 		$batchJob->setObjectId($jobData->getFlavorAssetId());
