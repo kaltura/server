@@ -5947,14 +5947,14 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function getReportIntervalsUnixtime($report_def, $input_filter)
 	{
-		$values = array();
-		$intervals = self::getFilterIntervals($report_def, $input_filter);
-		$intervals = str_split($intervals, "/");
-		foreach ($intervals as $interval) {
-			$dateTime = explode('T', $interval);
-			$dateId = str_replace('-', '', $dateTime[0]);
-			$values[] = self::dateIdToUnixtime($dateId);
+		$filter_values = array();
+		$intervals = str_split(self::getFilterIntervals($report_def, $input_filter), "/");
+		foreach ($intervals as $interval)
+		{
+			$date_time = explode('T', $interval);
+			$date_id = str_replace('-', '', $date_time[0]);
+			$filter_values[] = self::dateIdToUnixtime($date_id);
 		}
-		return $values;
+		return $filter_values;
 	}
 }
