@@ -197,4 +197,14 @@ class kESearchCoreAdapter
 			$value = str_replace ("</em><em>", "" ,$value);
 	}
 
+	public static function getObjectIdsFromElasticResults($elasticResults)
+	{
+		$ids = array();
+		foreach ($elasticResults[self::HITS_KEY][self::HITS_KEY] as $elasticObject)
+		{
+			$ids[] = $elasticObject[self::ID_KEY];
+		}
+		return $ids;
+	}
+
 }

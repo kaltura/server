@@ -35,7 +35,24 @@ abstract class KalturaESearchParams extends KalturaObject
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (!$object_to_fill)
+		{
 			$object_to_fill = new ESearchParams();
+		}
+
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
+
+	protected static function validateSearchOperator($searchOperator)
+	{
+		if (!$searchOperator)
+		{
+			throw new KalturaAPIException(KalturaESearchErrors::EMPTY_SEARCH_OPERATOR_NOT_ALLOWED);
+		}
+
+		if (!$searchOperator->operator)
+		{
+			$searchOperator->operator = KalturaSearchOperatorType::SEARCH_AND;
+		}
+	}
+
 }
