@@ -153,13 +153,13 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 */
 	public function startBatchJob($resource, entry $dbEntry, $operationAttributes, $clipEntry, $importUrl = null)
 	{
-		$internalResource = $resource->getResource();
 		if ($importUrl)
 		{
 			$this->createParentBatchJob(null, $clipEntry, $dbEntry, $dbEntry->getPartnerId(), $operationAttributes, 0 , $importUrl);
 		}
 		else
 		{
+			$internalResource = $resource->getResource();
 			$this->createParentBatchJob($internalResource->getOriginEntryId(), $clipEntry, $dbEntry, $dbEntry->getPartnerId(), $operationAttributes);
 		}
 	}
@@ -310,7 +310,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 					$tempEntry->setFlowType(EntryFlowType::IMPORT_FOR_CLIP_CONCAT);
 					$tempEntry->save();
 					KalturaLog::info("Adding import job in clip manager for temp entry " . $jobData->getTempEntryId() . " to url: " . $jobData->getImportUrl());
-					kJobsManager::addImportJob($batchJob, $jobData->getTempEntryId(), $jobData->getPartnerId(), $jobData->getImportUrl(), null, null, null, true, true);
+					kJobsManager::addImportJob($batchJob, $jobData->getTempEntryId(), $jobData->getPartnerId(), $jobData->getImportUrl(), null, null, null, true);
 				}
 				else
 				{

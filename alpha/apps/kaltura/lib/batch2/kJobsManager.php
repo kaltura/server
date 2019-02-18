@@ -913,7 +913,7 @@ class kJobsManager
 	}
 	
 	public static function addImportJob(BatchJob $parentJob = null, $entryId, $partnerId, $entryUrl, asset $asset = null, $subType = null, kImportJobData $jobData = null,
-	                                    $keepCurrentVersion = false, $shouldInheritData = false)
+	                                    $keepCurrentVersion = false)
 	{
 		$entryUrl = str_replace('//', '/', $entryUrl);
 		$entryUrl = preg_replace('/^((https?)|(ftp)|(scp)|(sftp)):\//', '$1://', $entryUrl);
@@ -983,19 +983,16 @@ class kJobsManager
 		if($parentJob)
 		{
 			$batchJob = $parentJob->createChild(BatchJobType::IMPORT, $subType);
-			if ($shouldInheritData)
-			{
-				$batchJob->setEntryId($entryId);
-				$batchJob->setPartnerId($partnerId);
-			}
 		}
 		else
 		{
 			$batchJob = new BatchJob();
-			$batchJob->setEntryId($entryId);
-			$batchJob->setPartnerId($partnerId);
 		}
-		
+
+		$batchJob->setEntryId($entryId);
+		$batchJob->setPartnerId($partnerId);
+
+
 		$batchJob->setObjectId($jobData->getFlavorAssetId());
 		$batchJob->setObjectType(BatchJobObjectType::ASSET);
 		return self::addJob($batchJob, $jobData, BatchJobType::IMPORT, $subType);
