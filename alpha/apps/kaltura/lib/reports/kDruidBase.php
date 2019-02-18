@@ -70,6 +70,8 @@ class kDruidBase
 	const DRUID_DELEGATE = 'delegate';
 	const DRUID_LOWER = 'lower';
 	const DRUID_UPPER = 'upper';
+	const DRUID_LOWER_STRICT = 'lowerStrict';
+	const DRUID_UPPER_STRICT = 'upperStrict';
 	const DRUID_ORDERING = 'ordering';
 	
 	// druid response keywords
@@ -122,15 +124,29 @@ class kDruidBase
 		);
 	}
 
-	protected static function getBoundFilter($dimension, $values, $order)
+	protected static function getBoundFilter($dimension, $lower, $upper, $order, $strict = 'false')
 	{
-		return array(
+		$bound_filter = array(
 			self::DRUID_TYPE => self::DRUID_BOUND_FILTER,
 			self::DRUID_DIMENSION => $dimension,
-			self::DRUID_LOWER => $values[0],
-			self::DRUID_UPPER => $values[1],
-			self::DRUID_ORDERING => $order,
 		);
+
+		if (isset($lower))
+		{
+			$bound_filter[self::DRUID_LOWER] = $lower;
+			$bound_filter[self::DRUID_LOWER_STRICT] = $strict;
+		}
+		if (isset($upper))
+		{
+			$bound_filter[self::DRUID_UPPER] = $upper;
+			$bound_filter[self::DRUID_UPPER_STRICT] = $strict;
+		}
+		if (isset($order))
+		{
+			$bound_filter[self::DRUID_ORDERING] = $order;
+		}
+
+		return $bound_filter;
 	}
 	
 	protected static function getAndFilter($subFilters)

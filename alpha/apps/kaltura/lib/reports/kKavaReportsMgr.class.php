@@ -120,7 +120,6 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_TABLE_MAP = 'report_table_map';
 	const REPORT_TABLE_FINALIZE_FUNC = 'report_table_finalize_func';
 	const REPORT_EDIT_FILTER_FUNC = 'report_edit_filter_func';
-	const REPORT_BOUND_FILTER_FUNC = 'report_bound_filter_func';
 
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -1437,15 +1436,8 @@ class kKavaReportsMgr extends kKavaBase
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
 					self::REPORT_DIMENSION => self::DIMENSION_ENTRY_CREATOR_ID,
 					self::REPORT_FILTER => array(
-						array(
-							self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
-							self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_LIVE_STREAM, self::MEDIA_TYPE_LIVE_WIN_MEDIA, self::MEDIA_TYPE_LIVE_REAL_MEDIA, self::MEDIA_TYPE_LIVE_QUICKTIME)
-						),
-						array(
-							self::DRUID_DIMENSION => self::DIMENSION_ENTRY_CREATED_AT,
-							self::DRUID_TYPE => self::DRUID_BOUND_FILTER,
-							self::REPORT_BOUND_FILTER_FUNC => 'self::getReportIntervalsUnixtime'
-						)
+						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
+						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_LIVE_STREAM, self::MEDIA_TYPE_LIVE_WIN_MEDIA, self::MEDIA_TYPE_LIVE_REAL_MEDIA, self::MEDIA_TYPE_LIVE_QUICKTIME)
 					),
 					self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
 					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY),
@@ -2584,16 +2576,6 @@ class kKavaReportsMgr extends kKavaBase
 			{
 				$report_filter = array($report_filter);
 			}
-
-			foreach ($report_filter as &$cur_filter)
-			{
-				if (!isset($cur_filter[self::DRUID_TYPE]) || $cur_filter[self::DRUID_TYPE] != self::DRUID_BOUND_FILTER)
-				{
-					continue;
-				}
-				$values = call_user_func($cur_filter[self::REPORT_BOUND_FILTER_FUNC], $report_def, $input_filter);
-				$cur_filter[self::DRUID_VALUES] = $values;
-			}
 			$druid_filter = array_merge($druid_filter, $report_filter);
 		}
 		
@@ -2646,6 +2628,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::DRUID_DIMENSION => $field_filter_def[self::DRUID_DIMENSION],
 				self::DRUID_VALUES => $values
 			);
+		}
+
+		if (isset($input_filter->gte_entry_created_at) || isset($input_filter->lte_entry_created_at))
+		{
+			$gte_unixtime = self::dateIdToUnixtime($input_filter->gte_entry_created_at);
+			$lte_unixtime = self::dateIdToUnixtime($input_filter->lte_entry_created_at);
+			$druid_filter[] = self::getBoundFilter(self::DIMENSION_ENTRY_CREATED_AT, $gte_unixtime, $lte_unixtime, self::DRUID_ORDER_NUMERIC);
 		}
 
 		$entry_ids_from_db = array();
@@ -2860,12 +2849,12 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		$filter_values = array();
-		$bound_filters = array();
-		foreach ($filter as $cur_filter) 
+		$filter_def = array();
+		foreach ($filter as $cur_filter)
 		{
 			if (isset($cur_filter[self::DRUID_TYPE]) && $cur_filter[self::DRUID_TYPE] === self::DRUID_BOUND_FILTER) 
 			{
-				$bound_filters[] = $cur_filter;
+				$filter_def[] = $cur_filter;
 			}
 			else
 			{
@@ -2879,17 +2868,11 @@ class kKavaReportsMgr extends kKavaBase
 			}
 		}
 
-		$filter_def = array();
 		foreach ($filter_values as $dimension => $values)
 		{
 			$filter_def[] = self::getInFilter(
 				$dimension,
 				$values);
-		}
-		foreach ($bound_filters as $cur_filter)
-		{
-			$order = isset($cur_filter[self::DRUID_SORTING]) ? $cur_filter[self::DRUID_SORTING] : self::DRUID_ORDER_NUMERIC;
-			$filter_def[] = self::getBoundFilter($cur_filter[self::DRUID_DIMENSION], $cur_filter[self::DRUID_VALUES], $order);
 		}
 
 		$report_def[self::DRUID_FILTER] = array(
