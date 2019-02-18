@@ -5996,18 +5996,4 @@ class kKavaReportsMgr extends kKavaBase
 		$url = myReportsMgr::createUrl($partner_id, $file_name);
 		return $url;
 	}
-
-	protected static function getReportIntervalsUnixtime($report_def, $input_filter)
-	{
-		$filter_values = array();
-		$filter_intervals = self::getFilterIntervals($report_def, $input_filter);
-		$intervals = explode("/", $filter_intervals[0]);
-		foreach ($intervals as $interval)
-		{
-			$date_time = explode('T', $interval);
-			$date_id = str_replace('-', '', $date_time[0]);
-			$filter_values[] = self::dateIdToUnixtime($date_id);
-		}
-		return $filter_values;
-	}
 }
