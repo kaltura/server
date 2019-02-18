@@ -9,33 +9,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	const CLIP_NUMBER = 'clipNumber';
 
-	/***
-	 * @param array $dynamicAttributes
-	 * @return bool is clip attribute exist in dynamic attribute
-	 */
-	public static function isMultipleClipOperation(array $dynamicAttributes)
-	{
-		if (count($dynamicAttributes) <= 1)
-		{
-			$dynamicAttribute = reset($dynamicAttributes);
-			if ($dynamicAttribute instanceof kClipAttributes )
-			{
-				$effects = $dynamicAttribute->getEffectArray();
-				if (!empty($effects))
-					return true;
-			}
-			return false;
-		}
-		foreach ($dynamicAttributes as $value)
-		{
-			if ($value instanceof kClipAttributes)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
 	/**
 	 * @param string $sourceEntryId
 	 * @param entry $clipEntry
@@ -83,21 +56,15 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			{
 				$this->handleClipConcatParentJob($batchJob);
 			}
-
-			elseif ($batchJob->getRootJob() &&
-					 $batchJob->getRootJob()->getJobType() == BatchJobType::CLIP_CONCAT &&
-				     $batchJob->getJobType() == BatchJobType::IMPORT &&
-					 $batchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
+			elseif ($this->isImportFinished($batchJob))
 			{
 				$this->handleImportFinished($batchJob->getRootJob());
 			}
-			elseif ($batchJob->getParentJob() &&
-					$batchJob->getParentJob()->getJobType() == BatchJobType::CONVERT &&
-					!$this->concatJobExist($batchJob->getRootJob()))
+			elseif ($this->shouldStartConcat($batchJob))
 			{
 				$this->startConcat($batchJob->getRootJob());
 			}
-			elseif($batchJob->getParentJob() && $batchJob->getParentJob()->getJobType()  == BatchJobType::CONCAT )
+			elseif($this->isConcatFinished($batchJob))
 			{
 				$this->concatDone($batchJob);
 			}
@@ -108,6 +75,22 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			return false;
 		}
 		return true;
+	}
+
+	protected function isImportFinished(BatchJob $batchJob)
+	{
+		return 	$batchJob->getJobType() == BatchJobType::IMPORT && $batchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED;
+	}
+	protected function shouldStartConcat(BatchJob $batchJob)
+	{
+		return 	$batchJob->getParentJob() &&
+				$batchJob->getParentJob()->getJobType() == BatchJobType::CONVERT &&
+				!$this->concatJobExist($batchJob->getRootJob());
+	}
+	protected function isConcatFinished(BatchJob $batchJob)
+	{
+		return 	$batchJob->getParentJob() &&
+				$batchJob->getParentJob()->getJobType() == BatchJobType::CONCAT;
 	}
 
 	protected function handleImportFinished($rootJob)
@@ -130,15 +113,23 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			return true;
 		}
 
-		if ($batchJob->getRootJob() && $batchJob->getRootJob()->getJobType() == BatchJobType::CLIP_CONCAT &&
-			$batchJob->getJobType() == BatchJobType::IMPORT && $batchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
+		if(!$batchJob->getRootJob())
+		{
+			return false;
+		}
+
+		if($batchJob->getRootJob()->getJobType() != BatchJobType::CLIP_CONCAT)
+		{
+			return false;
+		}
+		//If we are there then there is root job and its type is concat
+
+		if ($batchJob->getJobType() == BatchJobType::IMPORT)
 		{
 			return true;
 		}
 
-		if ($batchJob->getRootJob() && $batchJob->getRootJob()->getJobType() == BatchJobType::CLIP_CONCAT
-			&& $batchJob->getParentJob() && $batchJob->getParentJob()->getJobType() != BatchJobType::IMPORT
-			&& $batchJob->getJobType() != BatchJobType::IMPORT)
+		if (in_array($batchJob->getJobType(), array(BatchJobType::CONVERT,BatchJobType::CONCAT)))
 		{
 			return $this->areAllClipJobsDone($batchJob);
 		}
