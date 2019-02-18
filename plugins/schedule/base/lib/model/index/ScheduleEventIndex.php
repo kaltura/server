@@ -74,6 +74,7 @@ class ScheduleEventIndex extends BaseIndexObject
 				'template_entry_categories_ids' => 'templateEntryCategoriesIdsForIndex',
 				'resource_system_names' => 'resourceSystemNamesForIndex',
 				'template_entry_id' => 'templateEntryId',
+				'sphinx_match_optimizations' => 'sphinxMatchOptimizations',
 			);
 		}
 		return self::$fieldsMap;
@@ -117,6 +118,7 @@ class ScheduleEventIndex extends BaseIndexObject
 				'template_entry_categories_ids' => IIndexable::FIELD_TYPE_STRING,
 				'resource_system_names' => IIndexable::FIELD_TYPE_STRING,
 				'template_entry_id' => IIndexable::FIELD_TYPE_STRING,
+				'sphinx_match_optimizations' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
 		return self::$typesMap;
@@ -172,6 +174,7 @@ class ScheduleEventIndex extends BaseIndexObject
 				'schedule_event.TEMPLATE_ENTRY_CATEGORIES_IDS' => 'template_entry_categories_ids',
 				'schedule_event.RESOURCE_SYSTEM_NAMES' => 'resource_system_names',
 				'schedule_event.TEMPLATE_ENTRY_ID' => 'template_entry_id',
+				'schedule_event.SPHINX_MATCH_OPTIMIZATIONS' => 'sphinx_match_optimizations',
 			);
 		}
 		return self::$searchableFieldsMap;
@@ -304,6 +307,7 @@ class ScheduleEventIndex extends BaseIndexObject
 	public static function getSphinxOptimizationMap()
 	{
 		return array(
+			array("P%sST%s","schedule_event.PARTNER_ID","schedule_event.STATUS"),
 		);
 	}
 
@@ -311,12 +315,22 @@ class ScheduleEventIndex extends BaseIndexObject
 	public static function getSphinxOptimizationValues()
 	{
 		return array(
+			array("P%sST%s","getPartnerId","getStatus"),
 		);
 	}
 
 	public static function doCountOnPeer(Criteria $c)
 	{
 		return ScheduleEventPeer::doCount($c);
+	}
+
+	//This function is generated based on cacheInvalidationKey elements in the relevant IndexSchema.xml
+	public static function getCacheInvalidationKeys($object = null)
+	{
+		if (is_null($object))
+			return array(array("schedule_event:id=%s", ScheduleEventPeer::ID), array("schedule_event:partnerId=%s", ScheduleEventPeer::PARTNER_ID));
+		else
+			return array("schedule_event:id=".strtolower($object->getId()), "schedule_event:partnerId=".strtolower($object->getPartnerId()));
 	}
 
 }

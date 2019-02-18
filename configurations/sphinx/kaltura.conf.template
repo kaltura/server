@@ -447,6 +447,7 @@ index kaltura_schedule_event:kaltura_base
 	rt_field = template_entry_categories_ids
 	rt_field = resource_system_names
 	rt_field = template_entry_id
+	rt_field = sphinx_match_optimizations
 }
 
 index kaltura_entry_vendor_task:kaltura_base

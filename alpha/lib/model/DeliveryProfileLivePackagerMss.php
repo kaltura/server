@@ -13,6 +13,11 @@ class DeliveryProfileLivePackagerMss extends DeliveryProfileLive
 		$httpUrl = $this->getLivePackagerUrl($serverNode);
 		$httpUrl .= "manifest";
 		
+		foreach($this->getDynamicAttributes()->getFlavorParamIds() as $flavorId)
+		{
+			$httpUrl .= "-s$flavorId";
+		}
+		
 		KalturaLog::debug("Live Stream url [$httpUrl]");
 		return $httpUrl;
 	}

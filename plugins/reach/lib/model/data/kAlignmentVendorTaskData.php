@@ -13,21 +13,64 @@ class kAlignmentVendorTaskData
 	/**
 	 * @var string
 	 */
-	public $transcriptAssetId;
+	public $textTranscriptAssetId;
 	
 	/**
-	 * @return the $transcriptAssetId
+	 * @var string
 	 */
-	public function getTranscriptAssetId()
+	public $jsonTranscriptAssetId;
+	
+	/**
+	 * @var string
+	 */
+	public $captionAssetId;
+	
+	/**
+	 * @return the $textTranscriptAssetId
+	 */
+	public function getTextTranscriptAssetId()
 	{
-		return $this->transcriptAssetId;
+		return $this->textTranscriptAssetId;
+	}
+	
+	/**
+	 * @return the $jsonTranscriptAssetId
+	 */
+	public function getJsonTranscriptAssetId()
+	{
+		return $this->jsonTranscriptAssetId;
+	}
+	
+	/**
+	 * @return the $captionAssetId
+	 */
+	public function getCaptionAssetId()
+	{
+		return $this->captionAssetId;
 	}
 
+	
 	/**
-	 * @param int $transcriptAssetId
+	 * @param int $textTranscriptAssetId
 	 */
-	public function setTranscriptAssetId($transcriptAssetId)
+	public function setTextTranscriptAssetId($textTranscriptAssetId)
 	{
-		$this->transcriptAssetId = $transcriptAssetId;
+		$this->textTranscriptAssetId = $textTranscriptAssetId;
+	}
+	
+	/**
+	 * @param int $jsonTranscriptAssetId
+	 */
+	public function setJsonTranscriptAssetId($jsonTranscriptAssetId)
+	{
+		$this->jsonTranscriptAssetId = $jsonTranscriptAssetId;
+	}
+	
+	/**
+	 * @param int $captionAssetId
+	 */
+	public function setCaptionAssetId($captionAssetId)
+	{
+		$this->captionAssetId = $captionAssetId;
 	}
 }

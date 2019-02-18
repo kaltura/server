@@ -18,7 +18,12 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	const LIVE_STREAM_OM_CLASS = 'LiveStreamScheduleEvent';
 	const RECORD_OM_CLASS = 'RecordScheduleEvent';
 	const BLACKOUT_OM_CLASS = 'BlackoutScheduleEvent';
-	
+	const BLACKOUT_SESSION_CACHE_START_DATE = 'start_date';
+	const BLACKOUT_SESSION_CACHE_END_DATE = 'end_date';
+	const BLACKOUT_SESSION_CACHE_RESULT = 'result';
+
+	protected static $blackoutSessionCache = array();
+
 	// cache classes by their type
 	protected static $class_types_cache = array(
 		ScheduleEventType::LIVE_STREAM => self::LIVE_STREAM_OM_CLASS,
@@ -248,9 +253,43 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	 */
 	public static function retrieveBlackoutEventsByDateWindow($startDate, $endDate, $scheduleEventIdToIgnore = null)
 	{
+		$cacheResult = self::tryGetBlackoutResultFromSessionCache($startDate, $endDate);
+		if(isset($cacheResult))
+		{
+			return $cacheResult;
+		}
+
 		$c = self::getRetrieveEventsByDateWindowCriteria($startDate, $endDate, $scheduleEventIdToIgnore);
 		$c->addAnd(ScheduleEventPeer::TYPE, scheduleEventType::BLACKOUT, Criteria::EQUAL);
-		return self::doSelect($c);
+		$result = self::doSelect($c);
+		self::addBlackoutResultToCache($startDate, $endDate, $result);
+		return $result;
+	}
+
+	protected static function tryGetBlackoutResultFromSessionCache($startDate, $endDate)
+	{
+		if(self::$blackoutSessionCache && self::$blackoutSessionCache[self::BLACKOUT_SESSION_CACHE_START_DATE]
+			<= $startDate && self::$blackoutSessionCache[self::BLACKOUT_SESSION_CACHE_END_DATE] >= $endDate)
+		{
+			$result = array();
+			foreach (self::$blackoutSessionCache[self::BLACKOUT_SESSION_CACHE_RESULT] as $event)
+			{
+				if($event->getStartDate('U') <= $endDate && $eventEndDate = $event->getEndDate('U') >= $startDate)
+				{
+					$result[] = $event;
+				}
+			}
+
+			return $result;
+		}
+
+		return null;
+	}
+
+	protected static function addBlackoutResultToCache($startDate, $endDate, $result)
+	{
+		self::$blackoutSessionCache = array(self::BLACKOUT_SESSION_CACHE_START_DATE => $startDate,
+			self::BLACKOUT_SESSION_CACHE_END_DATE => $endDate, self::BLACKOUT_SESSION_CACHE_RESULT => $result);
 	}
 
 	/**
