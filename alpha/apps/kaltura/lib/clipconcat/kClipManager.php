@@ -129,7 +129,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			return true;
 		}
 
-		if (in_array($batchJob->getJobType(), array(BatchJobType::CONVERT,BatchJobType::CONCAT)))
+		if (in_array($batchJob->getJobType(), array(BatchJobType::CONVERT,BatchJobType::CONCAT,BatchJobType::POSTCONVERT)))
 		{
 			return $this->areAllClipJobsDone($batchJob);
 		}
