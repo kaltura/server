@@ -21,8 +21,12 @@ abstract class KCopyCuePointEngine
 
 	protected function shouldCopyCuePoint($cuePoint)
 	{
-		if ($cuePoint->cuePointType == self::CUE_POINT_CODE && in_array("poll-data", explode(",", $cuePoint->tags)))
-			return true; //poll data should be copy regardless of his time
+		$extendedShouldCopyTagsArray = array(self::CUE_POINT_CODE => array("poll-data"));
+		foreach($extendedShouldCopyTagsArray as $type => $tags)
+		{
+			if ($cuePoint->cuePointType == $type && count(array_intersect(explode(",", $cuePoint->tags), $tags)))
+				return true;
+		}
 		return false;
 	}
 
