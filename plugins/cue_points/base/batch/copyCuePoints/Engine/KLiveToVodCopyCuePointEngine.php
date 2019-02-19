@@ -16,6 +16,15 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
         return $this->copyCuePointsToEntry($this->data->liveEntryId, $this->data->vodEntryId);
     }
 
+    /**
+     * @param KalturaCuePoint $cuePoint
+     * @return bool
+     */
+    protected function shouldCopyCuePoint($cuePoint)
+    {
+        return true;
+    }
+
     public function setData($data, $partnerId)
     {
         parent::setData($data, $partnerId);
@@ -38,7 +47,7 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
     public function getCuePointFilter($entryId, $status = CuePointStatus::READY)
     {
         $filter = parent::getCuePointFilter($entryId, $status);
-        $filter->cuePointTypeIn = 'codeCuePoint.Code,thumbCuePoint.Thumb,annotation.Annotation';
+        $filter->cuePointTypeIn = impolde(",", array(self::CUE_POINT_CODE, self::CUE_POINT_THUMB, self::ANNOTATION));
         $filter->createdAtLessThanOrEqual = $this->currentSegmentEndTime;
         if($this->data->lastCuePointSyncTime)
             $filter->createdAtGreaterThanOrEqual = $this->data->lastCuePointSyncTime;
