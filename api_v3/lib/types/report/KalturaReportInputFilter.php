@@ -146,13 +146,13 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 
 	/**
 	 * Entry created at greater than or equal as Unix timestamp
-	 * @var int
+	 * @var time
 	 */
 	public $entryCreatedAtGreaterThanOrEqual;
 
 	/**
 	 * Entry created at less than or equal as Unix timestamp
-	 * @var int
+	 * @var time
 	 */
 	public $entryCreatedAtLessThanOrEqual;
 
