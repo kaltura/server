@@ -2632,9 +2632,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		if (isset($input_filter->gte_entry_created_at) || isset($input_filter->lte_entry_created_at))
 		{
-			$gte_unixtime = self::dateIdToUnixtime($input_filter->gte_entry_created_at);
-			$lte_unixtime = self::dateIdToUnixtime($input_filter->lte_entry_created_at);
-			$druid_filter[] = self::getBoundFilter(self::DIMENSION_ENTRY_CREATED_AT, $gte_unixtime, $lte_unixtime, self::DRUID_ORDER_NUMERIC);
+			$druid_filter[] = self::getBoundFilter(self::DIMENSION_ENTRY_CREATED_AT, $input_filter->gte_entry_created_at, $input_filter->lte_entry_created_at, self::DRUID_ORDER_NUMERIC);
 		}
 
 		$entry_ids_from_db = array();
@@ -2852,20 +2850,19 @@ class kKavaReportsMgr extends kKavaBase
 		$filter_def = array();
 		foreach ($filter as $cur_filter)
 		{
-			if (isset($cur_filter[self::DRUID_TYPE]) && $cur_filter[self::DRUID_TYPE] === self::DRUID_BOUND_FILTER) 
+			if (isset($cur_filter[self::DRUID_TYPE]))
 			{
 				$filter_def[] = $cur_filter;
+				continue;
 			}
-			else
+
+			$dimension = $cur_filter[self::DRUID_DIMENSION];
+			$values = $cur_filter[self::DRUID_VALUES];
+			if (isset($filter_values[$dimension]))
 			{
-				$dimension = $cur_filter[self::DRUID_DIMENSION];
-				$values = $cur_filter[self::DRUID_VALUES];
-				if (isset($filter_values[$dimension])) 
-				{
-					$values = array_intersect($values, $filter_values[$dimension]);
-				}
-				$filter_values[$dimension] = array_values($values);
+				$values = array_intersect($values, $filter_values[$dimension]);
 			}
+			$filter_values[$dimension] = array_values($values);
 		}
 
 		foreach ($filter_values as $dimension => $values)
