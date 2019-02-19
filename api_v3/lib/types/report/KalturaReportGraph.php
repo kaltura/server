@@ -16,13 +16,13 @@ class KalturaReportGraph extends KalturaObject
 	public $data;
 	
 	
-	public function fromReportData ( $id , array $dataArr )
+	public function fromReportData ( $id , array $dataArr , $delimiter )
 	{
 		$this->id = $id;
 		$str = "";
 		foreach ( $dataArr as $x => $y )
 		{
-			$str .= "$x,$y;";
+			$str .= "$x$delimiter$y;";
 		}
 		
 		$this->data = $str;

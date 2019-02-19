@@ -24,17 +24,17 @@ class KalturaReportTable extends KalturaObject
 	 */
 	public $totalCount;
 	
-	public function fromReportTable (  $header ,  $data , $totalCount )
+	public function fromReportTable (  $header ,  $data , $totalCount, $delimiter )
 	{
 		if ( ! $header ) return;
-		$this->header = implode ( "," , $header );
+		$this->header = implode ( $delimiter , $header );
 		
 		$data_str = "";
 		foreach ( $data as $row )
 		{
-			$row = str_replace ( "," , " " , $row ); // TODO - escape the separatos
+			$row = str_replace ( $delimiter , " " , $row ); // TODO - escape the separatos
 			$row = str_replace ( ";" , " " , $row ); // TODO - escape the separatos
-			$data_str .= implode ( "," , $row ) . ";";
+			$data_str .= implode ( $delimiter , $row ) . ";";
 		}
 		
 		$this->data = $data_str;

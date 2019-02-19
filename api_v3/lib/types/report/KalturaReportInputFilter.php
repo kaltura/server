@@ -139,6 +139,22 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $ownerIdsIn;
 
+	/**
+	 * @var KalturaESearchEntryOperator
+	 */
+	public $entryOperator;
+
+	/**
+	 * Entry created at greater than or equal as Unix timestamp
+	 * @var time
+	 */
+	public $entryCreatedAtGreaterThanOrEqual;
+
+	/**
+	 * Entry created at less than or equal as Unix timestamp
+	 * @var time
+	 */
+	public $entryCreatedAtLessThanOrEqual;
 
 	private static $map_between_objects = array
 	(
@@ -160,7 +176,9 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'interval',
 		'mediaTypeIn' => 'media_types',
 		'sourceTypeIn' => 'source_types',
-		'ownerIdsIn' => 'owners'
+		'ownerIdsIn' => 'owners',
+		'entryCreatedAtGreaterThanOrEqual' => 'gte_entry_created_at',
+		'entryCreatedAtLessThanOrEqual' => 'lte_entry_created_at',
 	);
 
 	protected function getMapBetweenObjects()
@@ -173,6 +191,16 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public function toReportsInputFilter($reportInputFilter = null)
 	{
+		if (!$reportInputFilter)
+		{
+			$reportInputFilter = new reportsInputFilter();
+		}
+
+		if ($this->entryOperator)
+		{
+			$reportInputFilter->entry_operator = $this->entryOperator->toObject();
+		}
+
 		return parent::toReportsInputFilter($reportInputFilter);
 	}
 }

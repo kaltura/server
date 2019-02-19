@@ -567,6 +567,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$cuePoints = CuePointPeer::doSelect($c);
 		$update = new Criteria();
 		$update->add(CuePointPeer::STATUS, CuePointStatus::DELETED);
+		$update->add(CuePointPeer::UPDATED_AT, time());
 
 		$con = Propel::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
 		BasePeer::doUpdate($c, $update, $con);

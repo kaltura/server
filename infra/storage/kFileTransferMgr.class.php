@@ -456,7 +456,7 @@ abstract class kFileTransferMgr
 			if(is_null($local_file))
 				return $res;
 
-			$this->validateFileSize(strlen($res), $local_file);
+			$this->validateFileSize(is_string($res) ? strlen($res) : 0, $local_file);
 				
 			return self::FILETRANSFERMGR_RES_OK;
 		}

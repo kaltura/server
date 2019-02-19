@@ -97,7 +97,9 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 		$this->updateEntryPager($entryPager, $filterOnEntryIds);
 
 		$query = $this->createElasticQueryFromFilter($filter);
-		$elasticResults = $entrySearch->doSearch($query, self::$validStatuses, null, $entryPager, null);
+
+		$elasticResults = $entrySearch->doSearch($query, $entryPager, self::$validStatuses);
+
 		list($coreResults, $objectOrder, $objectCount, $objectHighlight) = kESearchCoreAdapter::getElasticResultAsArray($elasticResults,
 			$entrySearch->getQueryAttributes()->getQueryHighlightsAttributes());
 
