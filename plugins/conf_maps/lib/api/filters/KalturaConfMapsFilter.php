@@ -21,7 +21,7 @@ class KalturaConfMapsFilter extends KalturaConfMapsBaseFilter
 		{
 			foreach ($hostList as $host)
 			{
-				$dbMapObject = ConfMapsPeer::getLatestMap($this->nameEqual,$host);
+				$dbMapObject = ConfMapsPeer::getMapByVersion($this->nameEqual, $host);
 				$apiMapObject = new KalturaConfMaps();
 				$apiMapObject->fromObject($dbMapObject);
 				$apiMapObject->sourceLocation = KalturaConfMapsSourceLocation::DB;
@@ -61,7 +61,21 @@ class KalturaConfMapsFilter extends KalturaConfMapsBaseFilter
 		$hostPatern = str_replace('*','#', $this->relatedHostEqual);
 		/*  @var kRemoteMemCacheConf $remoteCache  */
 		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
-		$map = $remoteCache->loadByHostName($this->nameEqual, $hostPatern);
+		if (!is_null($this->versionEqual))
+		{
+			$map = ConfMapsPeer::getMapByVersion($this->nameEqual, $hostPatern, $this->versionEqual);
+			if ($map)
+			{
+				$confMap->fromObject($map);
+				$confMap->sourceLocation = KalturaConfMapsSourceLocation::DB;
+				$confMap->isEditable = true;
+				return $confMap;
+			}
+		}
+		else
+		{
+			$map = $remoteCache->loadByHostName($this->nameEqual, $hostPatern);
+		}
 		if(!empty($map))
 		{
 			$confMap->sourceLocation = KalturaConfMapsSourceLocation::DB;
