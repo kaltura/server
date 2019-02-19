@@ -26,6 +26,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	const CUSTOM_DATA_PARTNER_DATA =        'partner_data';
 	const CUSTOM_DATA_CREATION_MODE =       'creation_mode';
 	const CUSTOM_DATA_TASK_DATA =       	'task_data';
+	const CUSTOM_DATA_BOOLEAN_EVENT_NOTIFICATION_IDS = 'boolean_event_notification_ids';
 	
 	//setters
 	
@@ -84,7 +85,16 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		$this->putInCustomData(self::CUSTOM_DATA_TASK_DATA, $v);
 	}
 
+	public function setBooleanEventNotificationIds($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_BOOLEAN_EVENT_NOTIFICATION_IDS, $v);
+	}
+
 	//getters
+	public function getBooleanEventNotificationIds()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_BOOLEAN_EVENT_NOTIFICATION_IDS, null, null);
+	}
 
 	public function getDictionary()
 	{

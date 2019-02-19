@@ -132,6 +132,26 @@ class EventNotificationTemplatePeer extends BaseEventNotificationTemplatePeer
 		$criteria->add(EventNotificationTemplatePeer::PARTNER_ID, array_map('strval',  $partnerIds), Criteria::IN);
 		return EventNotificationTemplatePeer::doSelect ( $criteria, $con );
 	}
+
+	/**
+	 * Retrieve event notification tamplates according to event and object type and pk
+	 *
+	 * @param      int $eventType
+	 * @param      int $objectType
+	 * @param      int $id
+	 * @param      PropelPDO $con the connection to use
+	 * @return     array<EventNotificationTemplate>
+	 */
+	public static function retrieveByEventTypeObjectTypeAndPKS($eventType, $objectType, $pks, PropelPDO $con = null)
+	{
+		$criteria = new Criteria ( EventNotificationTemplatePeer::DATABASE_NAME );
+		$criteria->add ( EventNotificationTemplatePeer::STATUS, EventNotificationTemplateStatus::ACTIVE );
+		$criteria->add ( EventNotificationTemplatePeer::EVENT_TYPE, $eventType );
+		$criteria->add ( EventNotificationTemplatePeer::OBJECT_TYPE, $objectType );
+		$criteria->add ( EventNotificationTemplatePeer::ID, $pks ,Criteria::IN );
+
+		return EventNotificationTemplatePeer::doSelect ( $criteria, $con );
+	}
 	
 	/**
 	 * Retrieve event notification templates according to systemName

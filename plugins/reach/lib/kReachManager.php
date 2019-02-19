@@ -3,8 +3,130 @@
 /**
  * @package plugins.reach
  */
-class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventConsumer, kObjectAddedEventConsumer
+class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventConsumer, kObjectAddedEventConsumer, kGenericEventConsumer
 {
+	/**
+	 * @var array<booleanNotificationTemplate>
+	 */
+	protected $booleanNotificationTemplates;
+
+	protected $gotBooleanNotificationTemplates;
+	protected $gotEmptyBooleanNotificationTemplates;
+
+	protected function getObjectType($eventObjectClassName)
+	{
+		switch($eventObjectClassName)
+		{
+			case "entry":
+				return  objectType::ENTRY;
+			case "category":
+				return objectType::CATEGORY;
+			case "asset":
+				return objectType::ASSET;
+			case "flavorAsset":
+				return objectType::FLAVORASSET;
+			case "thumbAsset":
+				return objectType::THUMBASSET;
+			case "uiconf":
+				return  objectType::UICONF;
+			case "conversionProfile2":
+				return objectType::CONVERSIONPROFILE2;
+			case "kuser":
+				return objectType::KUSER;
+			case "permission":
+				return objectType::PERMISSION;
+			case "permissionItem":
+				return  objectType::PERMISSIONITEM;
+			case "userRole":
+				return  objectType::USERROLE;
+			default:
+				return null;
+		}
+	}
+	/* (non-PHPdoc)
+	 * @see kGenericEventConsumer::consumeEvent()
+	 */
+	public function consumeEvent(KalturaEvent $event)
+	{
+		$scope = $event->getScope();
+		$partnerId = $scope->getPartnerId();
+		$object = $scope->getObject();
+		$entryId = $object->getEntryId();
+		if (count($this->booleanNotificationTemplates) == 0)
+			return false;
+		foreach ($this->booleanNotificationTemplates as $booleanNotificationTemplate)
+		{
+			$profileId = $booleanNotificationTemplate[0];
+			$booleanNotificationTemaplateObjects = $booleanNotificationTemplate[1];
+			$fullFieldCatalogItemIds = $booleanNotificationTemaplateObjects->getCatalogItemIds();
+			$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($fullFieldCatalogItemIds, $partnerId);
+			if(!count($allowedCatalogItemIds))
+			{
+				KalturaLog::debug("None of the fullfield catalog item ids are active on partner, [" . implode(",", $fullFieldCatalogItemIds) . "]");
+				continue;
+			}
+			$existingCatalogItemIds = EntryVendorTaskPeer::retrieveExistingTasksCatalogItemIds($entryId, $allowedCatalogItemIds);
+			$catalogItemIdsToAdd = array_unique(array_diff($allowedCatalogItemIds, $existingCatalogItemIds));
+			foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
+			{
+				//Pass the object Id as the context of the task
+				self::addEntryVendorTaskByObjectIds($entryId, $catalogItemIdToAdd, $profileId, $this->getContextByObjectType($object));
+			}
+		}
+		return true;
+	}
+
+	/* (non-PHPdoc)
+	 * @see kGenericEventConsumer::shouldConsumeEvent()
+	 */
+	public function shouldConsumeEvent(KalturaEvent $event)
+	{
+		$this->booleanNotificationTemplates = array();
+		$fulfilled = 0;
+
+		$scope = $event->getScope();
+		$partnerId = $scope->getPartnerId();
+		$eventType = kEventNotificationFlowManager::getEventType($event);
+		$eventObjectClassName = kEventNotificationFlowManager::getEventObjectType($event);
+		$objectType = self::getObjectType($eventObjectClassName);
+		if ($objectType)
+		{
+			$reachProfiles = ReachProfilePeer::retrieveByPartnerId($partnerId);
+			foreach ($reachProfiles as $profile)
+			{
+				$rules = $profile->getRulesArray();
+				foreach ($rules as $rule)
+				{
+					foreach ($rule->getActions() as $action)
+					{
+						if ($action->getbooleanEventNotificationIds())
+						{
+							$booleanEventNotificationIdArray = explode(',', $action->getbooleanEventNotificationIds());
+							$boolEventNotificationObjectList = EventNotificationTemplatePeer::retrieveByEventTypeObjectTypeAndPKS($eventType, $objectType, $booleanEventNotificationIdArray);
+
+							foreach ($boolEventNotificationObjectList as $boolEventNotificationObject)
+							{
+								$fulfilled = $boolEventNotificationObject->fulfilled($scope);
+								if ($fulfilled)
+								{
+									$this->booleanNotificationTemplates[] = array($profile->getId(), $action);
+									$fulfilled = 0;
+									break;
+								}
+							}
+						}
+						else if (!$action->getbooleanEventNotificationIds())
+						{
+							KalturaLog::debug("There are no boolean event notification ids on this rule");
+							break;
+						}
+					}
+				}
+			}
+		}
+		return count($this->booleanNotificationTemplates);
+	}
+
 	/**
 	 * @param BaseObject $object
 	 * @param BatchJob $raisedJob
@@ -26,6 +148,33 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 
 		return false;
+	}
+
+	public function settingFlagsBooleanEventNotificationIds(KalturaEvent $event)
+	{
+		$this->gotBooleanNotificationTemplates = false;
+		$this->gotEmptyBooleanNotificationTemplates = false;
+		$scope = $event->getScope();
+		$partnerId = $scope->getPartnerId();
+		$reachProfiles = ReachProfilePeer::retrieveByPartnerId($partnerId);
+		foreach ($reachProfiles as $profile)
+		{
+			$rules = $profile->getRulesArray();
+			foreach ($rules as $rule)
+			{
+				foreach ($rule->getActions() as $action)
+				{
+					if ($action->getbooleanEventNotificationIds())
+					{
+						$this->gotBooleanNotificationTemplates = true;
+					}
+					else
+					{
+						$this->gotEmptyBooleanNotificationTemplates = true;
+					}
+				}
+			}
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -54,7 +203,17 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		if ($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
 			return true;
 
-		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP &&
+		$event = new kObjectChangedEvent($object,$modifiedColumns);
+		$this->settingFlagsBooleanEventNotificationIds($event);
+
+		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP && $object->isModified() && $this->gotBooleanNotificationTemplates)
+		{
+			$event = new kObjectChangedEvent($object,$modifiedColumns);
+			if ($this->shouldConsumeEvent($event))
+				return true;
+		}
+
+		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP && $this->gotEmptyBooleanNotificationTemplates &&
 			in_array(entryPeer::STATUS, $modifiedColumns) && in_array($object->getStatus(), array(entryStatus::READY, entryStatus::DELETED))
 		)
 			return true;
@@ -113,10 +272,17 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		)
 			return $this->handleEntryDurationChanged($object);
 
-		if ($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
+		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP && $object->isModified() && $this->gotBooleanNotificationTemplates)
+		{
+			$event = new kObjectChangedEvent($object,$modifiedColumns);
+			if ($this->consumeEvent($event) && !$this->gotEmptyBooleanNotificationTemplates)
+				return true;
+		}
+
+		if ($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE && $this->gotEmptyBooleanNotificationTemplates)
 			return $this->checkAutomaticRules($object);
 
-		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP && in_array(entryPeer::STATUS, $modifiedColumns))
+		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP && in_array(entryPeer::STATUS, $modifiedColumns) && $this->gotEmptyBooleanNotificationTemplates)
 		{
 			if ($object->getStatus() == entryStatus::READY)
 				return $this->checkAutomaticRules($object, true);
@@ -308,13 +474,41 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return $puserId;
 	}
 
+	protected function filterOnlyReachProfilesWithoutBooleanEventNotification($reachProfiles)
+	{
+		$reachProfilesFiltered = array();
+		foreach ($reachProfiles as $profile)
+		{
+			$profileWasAdded = false;
+			$rules = $profile->getRulesArray();
+			foreach ($rules as $rule)
+			{
+				foreach ($rule->getActions() as $action)
+				{
+					if (!$action->getbooleanEventNotificationIds() && !$profileWasAdded)
+					{
+						$reachProfilesFiltered[] = $profile;
+						$profileWasAdded = true;
+						break;
+					}
+				}
+				if ($profileWasAdded)
+				{
+					break;
+				}
+			}
+		}
+		return $reachProfilesFiltered;
+	}
+
 	private function checkAutomaticRules($object, $checkEmptyRulesOnly = false)
 	{
 		$scope = new kScope();
 		$entryId = $object->getEntryId();
 		$scope->setEntryId($entryId);
 		$reachProfiles = ReachProfilePeer::retrieveByPartnerId($object->getPartnerId());
-		foreach ($reachProfiles as $profile)
+		$reachProfilesFiltered = $this->filterOnlyReachProfilesWithoutBooleanEventNotification($reachProfiles);
+		foreach ($reachProfilesFiltered as $profile)
 		{
 			/* @var $profile ReachProfile */
 			$fullFieldCatalogItemIds = $profile->fulfillsRules($scope, $checkEmptyRulesOnly);
