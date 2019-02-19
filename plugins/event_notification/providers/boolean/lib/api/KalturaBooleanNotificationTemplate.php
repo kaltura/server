@@ -22,14 +22,6 @@ class KalturaBooleanNotificationTemplate extends KalturaEventNotificationTemplat
 	}
 
 	/* (non-PHPdoc)
- 	* @see KalturaObject::validateForInsert()
- 	*/
-	public function validateForInsert($propertiesToSkip = array())
-	{
-		return parent::validateForInsert($propertiesToSkip);
-	}
-
-	/* (non-PHPdoc)
  	* @see KalturaObject::validateForUpdate()
  	*/
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
@@ -37,15 +29,4 @@ class KalturaBooleanNotificationTemplate extends KalturaEventNotificationTemplat
 		$propertiesToSkip[] = 'type';
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
-
-	/* (non-PHPdoc)
-	 * @see KalturaObject::fromObject()
- 	*/
-	public function doFromObject($dbObject, KalturaDetachedResponseProfile $responseProfile = null)
-	{
-		/* @var $dbObject BooleanNotificationTemplate */
-		parent::doFromObject($dbObject, $responseProfile);
-
-	}
-
 }

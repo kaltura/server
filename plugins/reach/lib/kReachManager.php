@@ -8,10 +8,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	/**
 	 * @var array<booleanNotificationTemplate>
 	 */
-	protected $booleanNotificationTemplates;
+	protected static $booleanNotificationTemplatesFulfilled;
+	protected static $booleanNotificationTemplatesFromReachProfiles;
+	protected static $reachProfilesFilteredWithoutBooleanEventNotifications;
 
-	protected $gotBooleanNotificationTemplates;
-	protected $gotEmptyBooleanNotificationTemplates;
+	static $isInit = false;
 
 	protected function getObjectType($eventObjectClassName)
 	{
@@ -52,9 +53,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$partnerId = $scope->getPartnerId();
 		$object = $scope->getObject();
 		$entryId = $object->getEntryId();
-		if (count($this->booleanNotificationTemplates) == 0)
+		if (count(self::$booleanNotificationTemplatesFulfilled) == 0)
 			return false;
-		foreach ($this->booleanNotificationTemplates as $booleanNotificationTemplate)
+		foreach (self::$booleanNotificationTemplatesFulfilled as $booleanNotificationTemplate)
 		{
 			$profileId = $booleanNotificationTemplate[0];
 			$booleanNotificationTemaplateObjects = $booleanNotificationTemplate[1];
@@ -69,31 +70,31 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$catalogItemIdsToAdd = array_unique(array_diff($allowedCatalogItemIds, $existingCatalogItemIds));
 			foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
 			{
-				//Pass the object Id as the context of the task
 				self::addEntryVendorTaskByObjectIds($entryId, $catalogItemIdToAdd, $profileId, $this->getContextByObjectType($object));
 			}
 		}
 		return true;
 	}
 
-	/* (non-PHPdoc)
-	 * @see kGenericEventConsumer::shouldConsumeEvent()
-	 */
-	public function shouldConsumeEvent(KalturaEvent $event)
+	public function initReachProfileForPartner($partnerId)
 	{
-		$this->booleanNotificationTemplates = array();
-		$fulfilled = 0;
-
-		$scope = $event->getScope();
-		$partnerId = $scope->getPartnerId();
-		$eventType = kEventNotificationFlowManager::getEventType($event);
-		$eventObjectClassName = kEventNotificationFlowManager::getEventObjectType($event);
-		$objectType = self::getObjectType($eventObjectClassName);
-		if ($objectType)
+		if (self::$isInit)
 		{
+			return;
+		}
+		else
+		{
+			self::$isInit = true;
+			//will hold array of: array(profileId,action) where there are boolean event notification ids.
+			self::$booleanNotificationTemplatesFromReachProfiles = array();
+
+			//will hold the reach profiles without boolean event notification ids.
+			self::$reachProfilesFilteredWithoutBooleanEventNotifications = array();
+
 			$reachProfiles = ReachProfilePeer::retrieveByPartnerId($partnerId);
 			foreach ($reachProfiles as $profile)
 			{
+				$profileWasAdded = false;
 				$rules = $profile->getRulesArray();
 				foreach ($rules as $rule)
 				{
@@ -101,30 +102,65 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 					{
 						if ($action->getbooleanEventNotificationIds())
 						{
-							$booleanEventNotificationIdArray = explode(',', $action->getbooleanEventNotificationIds());
-							$boolEventNotificationObjectList = EventNotificationTemplatePeer::retrieveByEventTypeObjectTypeAndPKS($eventType, $objectType, $booleanEventNotificationIdArray);
-
-							foreach ($boolEventNotificationObjectList as $boolEventNotificationObject)
-							{
-								$fulfilled = $boolEventNotificationObject->fulfilled($scope);
-								if ($fulfilled)
-								{
-									$this->booleanNotificationTemplates[] = array($profile->getId(), $action);
-									$fulfilled = 0;
-									break;
-								}
-							}
+							self::$booleanNotificationTemplatesFromReachProfiles[] = array($profile->getId(),$action);
 						}
-						else if (!$action->getbooleanEventNotificationIds())
+						else if (!$action->getbooleanEventNotificationIds() && !$profileWasAdded)
 						{
-							KalturaLog::debug("There are no boolean event notification ids on this rule");
+							self::$reachProfilesFilteredWithoutBooleanEventNotifications[] = $profile;
+							$profileWasAdded = true;
+							break;
+						}
+					}
+					if ($profileWasAdded)
+					{
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	/* (non-PHPdoc)
+	 * @see kGenericEventConsumer::shouldConsumeEvent()
+	 */
+	public function shouldConsumeEvent(KalturaEvent $event)
+	{
+		self::$booleanNotificationTemplatesFulfilled = array();
+		$fulfilled = 0;
+
+		$scope = $event->getScope();
+		$partnerId = $scope->getPartnerId();
+		$eventType = kEventNotificationFlowManager::getEventType($event);
+		if (!ReachPlugin::isAllowedPartner($partnerId))
+		{
+			KalturaLog::debug("Reach is not allowed for this partner");
+			return false;
+		}
+		$eventObjectClassName = kEventNotificationFlowManager::getEventObjectType($event);
+		$objectType = self::getObjectType($eventObjectClassName);
+		if ($objectType)
+		{
+			$this->initReachProfileForPartner($partnerId);
+			if (self::$booleanNotificationTemplatesFromReachProfiles)
+			{
+				foreach (self::$booleanNotificationTemplatesFromReachProfiles as $booleanNotificationTemplatesFromReachProfile)
+				{
+					$booleanEventNotificationIdArray = explode(',', $booleanNotificationTemplatesFromReachProfile[1]->getbooleanEventNotificationIds());
+					$boolEventNotificationObjectList = EventNotificationTemplatePeer::retrieveByEventTypeObjectTypeAndPKS($eventType, $objectType, $partnerId, $booleanEventNotificationIdArray);
+					foreach ($boolEventNotificationObjectList as $boolEventNotificationObject)
+					{
+						$fulfilled = $boolEventNotificationObject->fulfilled($scope);
+						if ($fulfilled)
+						{
+							self::$booleanNotificationTemplatesFulfilled[] = array($booleanNotificationTemplatesFromReachProfile[0], $booleanNotificationTemplatesFromReachProfile[1]);
+							$fulfilled = 0;
 							break;
 						}
 					}
 				}
 			}
 		}
-		return count($this->booleanNotificationTemplates);
+		return count(self::$booleanNotificationTemplatesFulfilled);
 	}
 
 	/**
@@ -148,33 +184,6 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 
 		return false;
-	}
-
-	public function settingFlagsBooleanEventNotificationIds(KalturaEvent $event)
-	{
-		$this->gotBooleanNotificationTemplates = false;
-		$this->gotEmptyBooleanNotificationTemplates = false;
-		$scope = $event->getScope();
-		$partnerId = $scope->getPartnerId();
-		$reachProfiles = ReachProfilePeer::retrieveByPartnerId($partnerId);
-		foreach ($reachProfiles as $profile)
-		{
-			$rules = $profile->getRulesArray();
-			foreach ($rules as $rule)
-			{
-				foreach ($rule->getActions() as $action)
-				{
-					if ($action->getbooleanEventNotificationIds())
-					{
-						$this->gotBooleanNotificationTemplates = true;
-					}
-					else
-					{
-						$this->gotEmptyBooleanNotificationTemplates = true;
-					}
-				}
-			}
-		}
 	}
 
 	/* (non-PHPdoc)
@@ -203,17 +212,14 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		if ($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
 			return true;
 
-		$event = new kObjectChangedEvent($object,$modifiedColumns);
-		$this->settingFlagsBooleanEventNotificationIds($event);
-
-		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP && $object->isModified() && $this->gotBooleanNotificationTemplates)
+		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP && $object->isModified() )
 		{
 			$event = new kObjectChangedEvent($object,$modifiedColumns);
 			if ($this->shouldConsumeEvent($event))
 				return true;
 		}
 
-		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP && $this->gotEmptyBooleanNotificationTemplates &&
+		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP &&
 			in_array(entryPeer::STATUS, $modifiedColumns) && in_array($object->getStatus(), array(entryStatus::READY, entryStatus::DELETED))
 		)
 			return true;
@@ -272,17 +278,17 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		)
 			return $this->handleEntryDurationChanged($object);
 
-		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP && $object->isModified() && $this->gotBooleanNotificationTemplates)
+		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP && $object->isModified() )
 		{
 			$event = new kObjectChangedEvent($object,$modifiedColumns);
-			if ($this->consumeEvent($event) && !$this->gotEmptyBooleanNotificationTemplates)
+			if ($this->consumeEvent($event))
 				return true;
 		}
 
-		if ($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE && $this->gotEmptyBooleanNotificationTemplates)
+		if ($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
 			return $this->checkAutomaticRules($object);
 
-		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP && in_array(entryPeer::STATUS, $modifiedColumns) && $this->gotEmptyBooleanNotificationTemplates)
+		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP && in_array(entryPeer::STATUS, $modifiedColumns))
 		{
 			if ($object->getStatus() == entryStatus::READY)
 				return $this->checkAutomaticRules($object, true);
@@ -474,64 +480,39 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return $puserId;
 	}
 
-	protected function filterOnlyReachProfilesWithoutBooleanEventNotification($reachProfiles)
-	{
-		$reachProfilesFiltered = array();
-		foreach ($reachProfiles as $profile)
-		{
-			$profileWasAdded = false;
-			$rules = $profile->getRulesArray();
-			foreach ($rules as $rule)
-			{
-				foreach ($rule->getActions() as $action)
-				{
-					if (!$action->getbooleanEventNotificationIds() && !$profileWasAdded)
-					{
-						$reachProfilesFiltered[] = $profile;
-						$profileWasAdded = true;
-						break;
-					}
-				}
-				if ($profileWasAdded)
-				{
-					break;
-				}
-			}
-		}
-		return $reachProfilesFiltered;
-	}
-
 	private function checkAutomaticRules($object, $checkEmptyRulesOnly = false)
 	{
 		$scope = new kScope();
 		$entryId = $object->getEntryId();
 		$scope->setEntryId($entryId);
-		$reachProfiles = ReachProfilePeer::retrieveByPartnerId($object->getPartnerId());
-		$reachProfilesFiltered = $this->filterOnlyReachProfilesWithoutBooleanEventNotification($reachProfiles);
-		foreach ($reachProfilesFiltered as $profile)
+		if (!self::$isInit)
+			$this->initReachProfileForPartner($object->getPartnerId());
+		if (self::$reachProfilesFilteredWithoutBooleanEventNotifications)
 		{
-			/* @var $profile ReachProfile */
-			$fullFieldCatalogItemIds = $profile->fulfillsRules($scope, $checkEmptyRulesOnly);
-			if (!count($fullFieldCatalogItemIds))
-				continue;
-			
-			$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($fullFieldCatalogItemIds, $object->getPartnerId());
-			if(!count($allowedCatalogItemIds))
+			foreach (self::$reachProfilesFilteredWithoutBooleanEventNotifications as $profile)
 			{
-				KalturaLog::debug("None of the fullfield catalog item ids are active on partner, [" . implode(",", $fullFieldCatalogItemIds) . "]");
-				continue;
-			}
-			
-			$existingCatalogItemIds = EntryVendorTaskPeer::retrieveExistingTasksCatalogItemIds($entryId, $allowedCatalogItemIds);
-			$catalogItemIdsToAdd = array_unique(array_diff($allowedCatalogItemIds, $existingCatalogItemIds));
-			
-			foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
-			{
-				//Pass the object Id as the context of the task
-				self::addEntryVendorTaskByObjectIds($entryId, $catalogItemIdToAdd, $profile->getId(), $this->getContextByObjectType($object));
+				/* @var $profile ReachProfile */
+				$fullFieldCatalogItemIds = $profile->fulfillsRules($scope, $checkEmptyRulesOnly);
+				if (!count($fullFieldCatalogItemIds))
+					continue;
+
+				$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($fullFieldCatalogItemIds, $object->getPartnerId());
+				if(!count($allowedCatalogItemIds))
+				{
+					KalturaLog::debug("None of the fullfield catalog item ids are active on partner, [" . implode(",", $fullFieldCatalogItemIds) . "]");
+					continue;
+				}
+
+				$existingCatalogItemIds = EntryVendorTaskPeer::retrieveExistingTasksCatalogItemIds($entryId, $allowedCatalogItemIds);
+				$catalogItemIdsToAdd = array_unique(array_diff($allowedCatalogItemIds, $existingCatalogItemIds));
+
+				foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
+				{
+					//Pass the object Id as the context of the task
+					self::addEntryVendorTaskByObjectIds($entryId, $catalogItemIdToAdd, $profile->getId(), $this->getContextByObjectType($object));
+				}
 			}
 		}
-
 		return true;
 	}
 
