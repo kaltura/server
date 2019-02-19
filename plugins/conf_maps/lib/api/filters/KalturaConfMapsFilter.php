@@ -61,12 +61,13 @@ class KalturaConfMapsFilter extends KalturaConfMapsBaseFilter
 		$hostPatern = str_replace('*','#', $this->relatedHostEqual);
 		/*  @var kRemoteMemCacheConf $remoteCache  */
 		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
+		$map = null;
 		if (!is_null($this->versionEqual))
 		{
-			$map = ConfMapsPeer::getMapByVersion($this->nameEqual, $hostPatern, $this->versionEqual);
-			if ($map)
+			$dbMap = ConfMapsPeer::getMapByVersion($this->nameEqual, $hostPatern, $this->versionEqual);
+			if ($dbMap)
 			{
-				$confMap->fromObject($map);
+				$confMap->fromObject($dbMap);
 				$confMap->sourceLocation = KalturaConfMapsSourceLocation::DB;
 				$confMap->isEditable = true;
 				return $confMap;

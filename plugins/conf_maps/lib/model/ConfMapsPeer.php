@@ -45,7 +45,10 @@ class ConfMapsPeer extends BaseConfMapsPeer {
 		{
 			$c->add(self::VERSION, $version);
 		}
-		$c->addDescendingOrderByColumn(self::VERSION);
+		else
+		{
+			$c->addDescendingOrderByColumn(self::VERSION);
+		}
 		return self::doSelectOne($c);
 	}
 
