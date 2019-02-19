@@ -879,21 +879,23 @@ HTML;
 
 	/**
 	 * @param $captionAsset
-	 * @param $filteredCaptionAssets
-	 * @return array
+	 * @param &$localFilePath
+	 * @return boolean
 	 * @throws Exception
 	 */
-	protected static function getCaptionFilePath($captionAsset)
+	protected static function getCaptionFilePath($captionAsset, &$localFilePath)
 	{
 		$captionFileSyncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-
-		list($captionFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($captionFileSyncKey, false, false);
-		if ($captionFileSync)
+		list($captionFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($captionFileSyncKey, true, false);
+		if (!$captionFileSync)
 		{
-			$captionFullPath = $captionFileSync->getFullPath();
-			return $captionFullPath;
+			return false;
 		}
-		return false;
+		if($local)
+		{
+			$localFilePath = $captionFileSync->getFullPath();
+		}
+		return true;
 	}
 
 	/**
@@ -1197,15 +1199,18 @@ HTML;
 			if(!$captionAsset->getDisplayOnPlayer())
 				continue;
 
-			$filePath = self::getCaptionFilePath($captionAsset);
-			if ($filePath)
+			//Try getting caption
+			//if exist but no local - return empty path
+			$localFilePath = '';
+			$fileSyncExist = self::getCaptionFilePath($captionAsset,$localFilePath);
+			if ($fileSyncExist)
 			{
 				if (!isset($filteredCaptionAssets[$captionAsset->getEntryId()]))
 					$filteredCaptionAssets[$captionAsset->getEntryId()] = array();
 				if (!isset($filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()]))
 					$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] = array();
 				$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] =
-					array(self::CAPTION_FILES_LABEL => $captionAsset->getLabel(), self::CAPTION_FILES_PATH => $filePath, self::CAPTION_FILES_ID => $captionAsset->getId());
+					array(self::CAPTION_FILES_LABEL => $captionAsset->getLabel(), self::CAPTION_FILES_PATH => $localFilePath, self::CAPTION_FILES_ID => $captionAsset->getId());
 			}
 		}
 		return $filteredCaptionAssets;
