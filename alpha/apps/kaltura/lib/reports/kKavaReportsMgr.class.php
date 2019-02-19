@@ -1435,7 +1435,7 @@ class kKavaReportsMgr extends kKavaBase
 				// plays
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
-					self::REPORT_DIMENSION => self::DIMENSION_ENTRY_OWNER_ID,
+					self::REPORT_DIMENSION => self::DIMENSION_ENTRY_CREATOR_ID,
 					self::REPORT_FILTER => array(
 						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
 						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_LIVE_STREAM, self::MEDIA_TYPE_LIVE_WIN_MEDIA, self::MEDIA_TYPE_LIVE_REAL_MEDIA, self::MEDIA_TYPE_LIVE_QUICKTIME)
@@ -2641,6 +2641,11 @@ class kKavaReportsMgr extends kKavaBase
 			);
 		}
 
+		if (isset($input_filter->gte_entry_created_at) || isset($input_filter->lte_entry_created_at))
+		{
+			$druid_filter[] = self::getBoundFilter(self::DIMENSION_ENTRY_CREATED_AT, $input_filter->gte_entry_created_at, $input_filter->lte_entry_created_at, self::DRUID_ORDER_NUMERIC);
+		}
+
 		$entry_ids_from_db = array();
 		if ($input_filter->keywords)
 		{
@@ -2673,7 +2678,7 @@ class kKavaReportsMgr extends kKavaBase
 			}
 		}
 
-		if($object_ids)
+		if ($object_ids)
 		{
 			$object_ids_arr = explode($response_options->getDelimiter(), $object_ids);
 
@@ -2853,8 +2858,15 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		$filter_values = array();
+		$filter_def = array();
 		foreach ($filter as $cur_filter)
 		{
+			if (isset($cur_filter[self::DRUID_TYPE]))
+			{
+				$filter_def[] = $cur_filter;
+				continue;
+			}
+
 			$dimension = $cur_filter[self::DRUID_DIMENSION];
 			$values = $cur_filter[self::DRUID_VALUES];
 			if (isset($filter_values[$dimension]))
@@ -2864,7 +2876,6 @@ class kKavaReportsMgr extends kKavaBase
 			$filter_values[$dimension] = array_values($values);
 		}
 
-		$filter_def = array();
 		foreach ($filter_values as $dimension => $values)
 		{
 			$filter_def[] = self::getInFilter(
