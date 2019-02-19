@@ -185,12 +185,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		if($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP)
 		{
-			if ($object->isModified())
-			{
-				$event = new kObjectChangedEvent($object,$modifiedColumns);
-				if ($this->shouldConsumeEvent($event))
-					return true;
-			}
+			$event = new kObjectChangedEvent($object,$modifiedColumns);
+			if ($this->shouldConsumeEvent($event))
+				return true;
 
 			if (in_array(entryPeer::LENGTH_IN_MSECS, $modifiedColumns))
 			{
@@ -263,11 +260,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 			if (count(self::$booleanNotificationTemplatesFulfilled))
 			{
-				if ($object->isModified())
-				{
-					$event = new kObjectChangedEvent($object,$modifiedColumns);
-					return $this->consumeEvent($event);
-				}
+				$event = new kObjectChangedEvent($object,$modifiedColumns);
+				$this->consumeEvent($event);
 			}
 
 			if (in_array(entryPeer::LENGTH_IN_MSECS, $modifiedColumns))

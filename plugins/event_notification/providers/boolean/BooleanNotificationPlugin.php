@@ -27,7 +27,7 @@ class BooleanNotificationPlugin extends KalturaPlugin implements IKalturaPermiss
         $partner = PartnerPeer::retrieveByPK($partnerId);
         if ($partner)
         {
-			return $partner->getPluginEnabled(self::PLUGIN_NAME);
+        	return $partner->getPluginEnabled(self::PLUGIN_NAME);
         }
         return false;
     }
@@ -39,7 +39,7 @@ class BooleanNotificationPlugin extends KalturaPlugin implements IKalturaPermiss
     {
         if($baseEnumName == 'EventNotificationTemplateType')
         {
-			return array('BooleanNotificationTemplateType');
+        	return array('BooleanNotificationTemplateType');
         }
         return array();
     }
