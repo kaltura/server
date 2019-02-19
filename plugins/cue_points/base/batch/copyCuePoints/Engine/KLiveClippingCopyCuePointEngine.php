@@ -10,6 +10,10 @@ class KLiveClippingCopyCuePointEngine extends KLiveToVodCopyCuePointEngine
 
     protected function shouldCopyCuePoint($cuePoint)
     {
+        if (KCopyCuePointEngine::shouldCopyCuePoint($cuePoint))
+        {
+            return true;
+        }
         $cuePointStartTime = $this->getOffsetForTimestamp($cuePoint->createdAt * 1000, false);
         $cuePointEndTime = $this->getOffsetForTimestamp($cuePoint->calculatedEndTime * 1000, false);
         KalturaLog::debug("Checking times to know if copy is needed for id[". $cuePoint->id ."]: start- [$cuePointStartTime], end- [$cuePointEndTime], calculatedEndTime - " . $cuePoint->calculatedEndTime);
