@@ -410,6 +410,9 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	protected function filterStreamIdsByBitrate ($streams)
 	{
 		$streamIds = array();
+		
+		$this->sanitizeRequestedFlavorParamsIds($streams);
+		
 		if (!$streams || !count($streams))
 		{
 			return;
@@ -442,11 +445,39 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		
 		if (!count($streamIds))
 		{
-			// If the stream info is available to us, min and/or max bitrate params were passed, and no streams comply with them - throw error
-			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND, "Entry [". $this->getDynamicAttributes()->getEntryId() ."] has no valid streams");
+			// If the stream info is available to us, min and/or max bitrate params were passed, and no streams comply with them - issue warning and cancel restrictions
+			KalturaLog::warning("Entry [". $this->getDynamicAttributes()->getEntryId() ."] has no streams which comply with the min/max bitrate limitations.");
 		}
 		
 		$this->params->setFlavorParamIds($streamIds);
+	}
+	
+	/**
+	 * Sanitize requested flavor params Ids - if non-existent flavor params IDs were requested to play, they should be ignored.
+	 * @param array $streams
+	 */
+	protected function sanitizeRequestedFlavorParamsIds($streams)
+	{
+		if (!$streams || !count($streams))
+		{
+			return;
+		}
+		
+		$allStreamIds = array();
+		
+		foreach ($streams as $stream)
+		{
+			/* @var $stream kLiveStreamParams */
+			$allStreamIds[] = $stream->getFlavorId();
+		}
+		
+		$playableParamsIds = array_unique(array_intersect($this->getDynamicAttributes()->getFlavorParamIds(), $allStreamIds));
+		if (!count($playableParamsIds))
+		{
+			KalturaLog::warning('None of the explicitly requested flavor params IDs are found in the stream list.');
+		}
+		
+		$this->params->setFlavorParamIds($playableParamsIds);
 	}
 	
 	public function setLivePackagerSigningDomain($v)
