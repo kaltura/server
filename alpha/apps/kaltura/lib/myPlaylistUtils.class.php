@@ -1202,7 +1202,7 @@ HTML;
 			//Try getting caption
 			//if exist but no local - return empty path
 			$localFilePath = '';
-			$fileSyncExist = self::getCaptionFilePath($captionAsset,$localFilePath);
+			$fileSyncExist = self::getCaptionFilePath($captionAsset, $localFilePath);
 			if ($fileSyncExist)
 			{
 				if (!isset($filteredCaptionAssets[$captionAsset->getEntryId()]))
