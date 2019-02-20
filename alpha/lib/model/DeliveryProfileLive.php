@@ -131,8 +131,9 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$liveEntryServerNode = array_shift($liveEntryServerNodes); // after sort first is the primary
 		
 		// If min/max bitrate was requested, add the constraint to the array of flavorParamsIds in the profile's attributes.
+		
 		$streams = $liveEntryServerNode->getStreams();
-		$this->filterStreamIdsByBitrate($streams);
+		$this->sanitizeAndFilterStreamIdsByBitrate($streams);
 		
 		$this->liveStreamConfig->setUrl($this->getHttpUrl($liveEntryServerNode->serverNode));
 		$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
@@ -142,7 +143,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		if ($liveEntryServerNode) { // if list has another entry server node set it as backup
 			// If min/max bitrate was requested, it needs to be applied to the backup stream as well.
 			$streams = array_merge($streams, $liveEntryServerNode->getStreams());
-			$this->filterStreamIdsByBitrate($streams);
+			$this->sanitizeAndFilterStreamIdsByBitrate($streams);
 			
 			$this->liveStreamConfig->setBackupUrl($this->getHttpUrl($liveEntryServerNode->serverNode));
 			$this->liveStreamConfig->setBackupStreamInfo($liveEntryServerNode->getStreams());
@@ -407,24 +408,20 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		return $renderer;
 	}
 	
-	protected function filterStreamIdsByBitrate ($streams)
+	protected function sanitizeAndFilterStreamIdsByBitrate ($streams)
 	{
 		if (!$streams || !count($streams))
 		{
 			return;
 		}
 		
-		$this->sanitizeRequestedFlavorParamsIds($streams);
-		
-		if (!$this->getDynamicAttributes()->getMaxBitrate() && !$this->getDynamicAttributes()->getMinBitrate())
-		{
-			return;
-		}
-		
 		$streamIds = array();
+		$allStreamIds = array();
 		foreach ($streams as $stream)
 		{
 			/* @var $stream kLiveStreamParams */
+			$allStreamIds[] = $stream->getFlavorId();
+			
 			if ($this->getDynamicAttributes()->getMinBitrate() && $stream->getBitrate()/1024 < $this->getDynamicAttributes()->getMinBitrate())
 			{
 				continue;
@@ -438,41 +435,25 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			
 		}
 		
-		if(count($this->getDynamicAttributes()->getFlavorParamIds()))
+		$playableStreamIds = array_unique(array_intersect($this->getDynamicAttributes()->getFlavorParamIds(), $allStreamIds));
+		if (count($playableStreamIds))
 		{
-			$streamIds = array_unique(array_intersect($streamIds, $this->getDynamicAttributes()->getFlavorParamIds()));
+			$streamIds = array_unique(array_intersect($streamIds, $playableStreamIds));
 		}
 		
 		if (!count($streamIds))
 		{
 			// If the stream info is available to us, min and/or max bitrate params were passed, and no streams comply with them - issue warning and cancel restrictions
 			KalturaLog::warning('Entry ['. $this->getDynamicAttributes()->getEntryId() .'] has no streams which comply with the min/max bitrate limitations.');
+			$streamIds = $playableStreamIds;
+			
+			if (!count ($playableStreamIds))
+			{
+				KalturaLog::warning('None of the explicitly requested flavor params IDs are found in the stream list.');
+			}
 		}
 		
-		$this->params->setFlavorParamIds($streamIds);
-	}
-	
-	/**
-	 * Sanitize requested flavor params Ids - if non-existent flavor params IDs were requested to play, they should be ignored.
-	 * @param array $streams
-	 */
-	protected function sanitizeRequestedFlavorParamsIds($streams)
-	{
-		$allStreamIds = array();
-		
-		foreach ($streams as $stream)
-		{
-			/* @var $stream kLiveStreamParams */
-			$allStreamIds[] = $stream->getFlavorId();
-		}
-		
-		$playableParamsIds = array_unique(array_intersect($this->getDynamicAttributes()->getFlavorParamIds(), $allStreamIds));
-		if (!count($playableParamsIds))
-		{
-			KalturaLog::warning('None of the explicitly requested flavor params IDs are found in the stream list.');
-		}
-		
-		$this->params->setFlavorParamIds($playableParamsIds);
+		$this->getDynamicAttributes()->setFlavorParamIds($streamIds);
 	}
 	
 	public function setLivePackagerSigningDomain($v)
