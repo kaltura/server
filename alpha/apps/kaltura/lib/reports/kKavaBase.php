@@ -51,7 +51,9 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_CUSTOM_VAR3 = 'customVar3';
 	const DIMENSION_TYPE = 'type';
 	const DIMENSION_ENTRY_OWNER_ID = 'entryKuserId';
-	const DIMENSION_PERCENTILES = 'percentiles';
+	const DIMENSION_ENTRY_CREATOR_ID = 'entryCreatorId';
+	const DIMENSION_ENTRY_CREATED_AT = 'entryCreatedAt';
+        const DIMENSION_PERCENTILES = 'percentiles';
 
 	// metrics
 	const METRIC_COUNT = 'count';
