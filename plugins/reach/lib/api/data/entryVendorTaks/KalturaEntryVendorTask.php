@@ -179,6 +179,12 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	 */
 	public $taskJobData;
 
+	/**
+	 * The boolean event notification id
+	 * @var int
+	 */
+	public $booleanEventNotificationIds;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -205,7 +211,8 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'dictionary',
 		'partnerData',
 		'creationMode',
-		'taskJobData'
+		'taskJobData',
+		'booleanEventNotificationIds'
 	);
 	
 	/* (non-PHPdoc)
