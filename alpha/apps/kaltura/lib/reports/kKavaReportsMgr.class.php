@@ -188,7 +188,9 @@ class kKavaReportsMgr extends kKavaBase
 	
 	const COLUMN_FORMAT_QUOTE = 'quote';
 	const COLUMN_FORMAT_UNIXTIME = 'unixtime';
-		
+
+	const OBJECT_THAT_DOES_NOT_EXIST = 'objectThatDoesNotExist';
+
 	protected static $reports_def = array(
 		myReportsMgr::REPORT_TYPE_TOP_CONTENT => array(
 			self::REPORT_DIMENSION_MAP => array(
@@ -2624,6 +2626,7 @@ class kKavaReportsMgr extends kKavaBase
 			'cities' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_CITY),
 			'media_types' => array(self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE),
 			'source_types' => array(self::DRUID_DIMENSION => self::DIMENSION_SOURCE_TYPE),
+			'entries_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
@@ -2878,6 +2881,10 @@ class kKavaReportsMgr extends kKavaBase
 
 		foreach ($filter_values as $dimension => $values)
 		{
+			if (count($values) == 0)
+			{
+				$values = self::OBJECT_THAT_DOES_NOT_EXIST;
+			}
 			$filter_def[] = self::getInFilter(
 				$dimension,
 				$values);
