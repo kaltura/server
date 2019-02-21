@@ -6,6 +6,8 @@
   */
 class KalturaQuizUserEntry extends KalturaUserEntry{
 
+	CONST DEFAULT_VERSION = 1;
+
 	/**
 	 * @var float
 	 * @readonly
@@ -18,10 +20,18 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	*/
 	public $feedback;
 
+	/**
+	 * @var int
+	 * @readonly
+	 * @filter eq,order
+	 */
+	public $version;
+
 	private static $map_between_objects = array
 	(
 		"score",
-		"feedback"
+		"feedback",
+		"version",
 	);
 
 	public function getMapBetweenObjects ( )
@@ -68,10 +78,25 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 			$c->add(UserEntryPeer::ENTRY_ID, $this->entryId);
 			$c->add(UserEntryPeer::TYPE, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
 			$userEntry = UserEntryPeer::doSelect($c);
-			if (count($userEntry) > 0)
+			if (count($userEntry) == 0 )
 			{
-				throw new KalturaAPIException(KalturaQuizErrors::QUIZ_USER_ENTRY_ALREADY_EXISTS, $this->entryId);
+				$object_to_fill->setVersion(self::DEFAULT_VERSION);
 			}
+			if (count($userEntry) > 0 )
+			{
+				$userEntryNewestVersion = UserEntryPeer::retriveNewestVersionOfUserEntrySubmitted( $object_to_fill->getKuserId(), $this->entryId, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
+				$entry = entryPeer::retrieveByPK($this->entryId);
+				$quiz = QuizPlugin::getQuizData($entry);
+				if ($quiz->getMaxRetakesAllowed() && $userEntryNewestVersion->getVersion() + 1 <= $quiz->getMaxRetakesAllowed())
+				{
+					$object_to_fill->setVersion($userEntryNewestVersion->getVersion() + 1);
+				}
+				else
+				{
+					throw new KalturaAPIException(KalturaQuizErrors::NO_RETAKES_LEFT, $this->entryId);
+				}
+			}
+
 		}
 		return $object_to_fill;
 	}

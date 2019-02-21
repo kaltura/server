@@ -5,6 +5,7 @@
  */
 class KalturaQuiz extends KalturaObject
 {
+	CONST DEFAULT_MAX_RETAKES_ALLOWED = 1;
 	/**
 	 *
 	 * @var int
@@ -49,6 +50,11 @@ class KalturaQuiz extends KalturaObject
 	 */
 	public $showGradeAfterSubmission;
 
+	/**
+	 * @var int
+	 */
+	public $maxRetakesAllowed;
+
 
 	private static $mapBetweenObjects = array
 	(
@@ -60,6 +66,7 @@ class KalturaQuiz extends KalturaObject
 		"showCorrectAfterSubmission",
 		"allowDownload",
 		"showGradeAfterSubmission",
+		"maxRetakesAllowed",
 	);
 
 	/* (non-PHPdoc)
@@ -78,6 +85,10 @@ class KalturaQuiz extends KalturaObject
 		if (!$dbObject)
 		{
 			$dbObject = new kQuiz();
+			if(!isset($dbObject->maxRetakesAllowed))
+			{
+				$dbObject->maxRetakesAllowed = self::DEFAULT_MAX_RETAKES_ALLOWED;
+			}
 		}
 
 		return parent::toObject($dbObject, $propsToSkip);
