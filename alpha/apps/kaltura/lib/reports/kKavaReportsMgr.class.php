@@ -2859,8 +2859,13 @@ class kKavaReportsMgr extends kKavaBase
 
 		$filter_values = array();
 		$filter_def = array();
+		$valid_dimensions_to_filter = self::$datasources_dimensions[$report_def[self::DRUID_DATASOURCE]];
 		foreach ($filter as $cur_filter)
 		{
+			if (!in_array($cur_filter[self::DRUID_DIMENSION], $valid_dimensions_to_filter))
+			{
+				continue;
+			}
 			if (isset($cur_filter[self::DRUID_TYPE]))
 			{
 				$filter_def[] = $cur_filter;
