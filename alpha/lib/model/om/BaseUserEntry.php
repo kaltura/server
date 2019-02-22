@@ -86,12 +86,6 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 	protected $custom_data;
 
 	/**
-	 * The value for the version field.
-	 * @var        int
-	 */
-	protected $version;
-
-	/**
 	 * @var        entry
 	 */
 	protected $aentry;
@@ -314,16 +308,6 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 	public function getCustomData()
 	{
 		return $this->custom_data;
-	}
-
-	/**
-	 * Get the [version] column value.
-	 *
-	 * @return     int
-	 */
-	public function getVersion()
-	{
-		return $this->version;
 	}
 
 	/**
@@ -592,29 +576,6 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setExtendedStatus()
-
-	/**
-	 * Set the value of [version] column.
-	 *
-	 * @param      int $v new value
-	 * @return     UserEntry The current object (for fluent API support)
-	 */
-	public function setVersion($v)
-	{
-		if(!isset($this->oldColumnsValues[UserEntryPeer::VERSION]))
-			$this->oldColumnsValues[UserEntryPeer::VERSION] = $this->version;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->version !== $v) {
-			$this->version = $v;
-			$this->modifiedColumns[] = UserEntryPeer::VERSION;
-		}
-
-		return $this;
-	} // setVersion()
 
 	/**
 	 * Set the value of [privacy_context] column.
@@ -1313,9 +1274,6 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 			case 10:
 				return $this->getCustomData();
 				break;
-			case 11:
-				return $this->getVersion();
-				break;
 			default:
 				return null;
 				break;
@@ -1348,7 +1306,6 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 			$keys[8] => $this->getExtendedStatus(),
 			$keys[9] => $this->getPrivacyContext(),
 			$keys[10] => $this->getCustomData(),
-			$keys[11] => $this->getVersion(),
 		);
 		return $result;
 	}
@@ -1413,9 +1370,6 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 			case 10:
 				$this->setCustomData($value);
 				break;
-			case 11:
-				$this->setVersion($value);
-				break;
 		} // switch()
 	}
 
@@ -1451,7 +1405,6 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[8], $arr)) $this->setExtendedStatus($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setPrivacyContext($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setCustomData($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setVersion($arr[$keys[11]]);
 	}
 
 	/**
@@ -1474,7 +1427,6 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(UserEntryPeer::EXTENDED_STATUS)) $criteria->add(UserEntryPeer::EXTENDED_STATUS, $this->extended_status);
 		if ($this->isColumnModified(UserEntryPeer::PRIVACY_CONTEXT)) $criteria->add(UserEntryPeer::PRIVACY_CONTEXT, $this->privacy_context);
 		if ($this->isColumnModified(UserEntryPeer::CUSTOM_DATA)) $criteria->add(UserEntryPeer::CUSTOM_DATA, $this->custom_data);
-		if ($this->isColumnModified(UserEntryPeer::VERSION)) $criteria->add(UserEntryPeer::VERSION, $this->version);
 
 		return $criteria;
 	}
@@ -1572,8 +1524,6 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 		$copyObj->setPrivacyContext($this->privacy_context);
 
 		$copyObj->setCustomData($this->custom_data);
-
-		$copyObj->setVersion($this->version);
 
 
 		$copyObj->setNew(true);

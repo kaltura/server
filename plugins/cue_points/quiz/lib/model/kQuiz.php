@@ -54,7 +54,7 @@ class kQuiz {
 	/**
 	 * @var int
 	 */
-	public $maxRetakesAllowed;
+	protected $maxRetakesAllowed;
 
 	/**
 	 * @return int
