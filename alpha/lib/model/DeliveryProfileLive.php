@@ -420,18 +420,16 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		foreach ($streams as $stream)
 		{
 			/* @var $stream kLiveStreamParams */
-			$allStreamIds[] = $stream->getFlavorId();
-			
-			if ($this->getDynamicAttributes()->getMinBitrate() && $stream->getBitrate()/1024 < $this->getDynamicAttributes()->getMinBitrate())
-			{
-				continue;
-			}
-			if ($this->getDynamicAttributes()->getMaxBitrate() && $stream->getBitrate()/1024 > $this->getDynamicAttributes()->getMaxBitrate())
-			{
-				continue;
-			}
-			
-			$streamIds[] = $stream->getFlavorId();
+                        $allStreamIds[] = $stream->getFlavorId();
+
+                        if ($this->getDynamicAttributes()->getMinBitrate() && $stream->getBitrate()/1024 > $this->getDynamicAttributes()->getMinBitrate())
+                        {
+                                $streamIds[] = $stream->getFlavorId();
+                        }
+                        if ($this->getDynamicAttributes()->getMaxBitrate() && $stream->getBitrate()/1024 < $this->getDynamicAttributes()->getMaxBitrate())
+                        {
+                                $streamIds[] = $stream->getFlavorId();
+                        }
 			
 		}
 		
