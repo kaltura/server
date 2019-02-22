@@ -666,7 +666,6 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 			$this->extended_status = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
 			$this->privacy_context = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->custom_data = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->version = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
