@@ -19,6 +19,8 @@
  */
 class KAsyncCaptureThumb extends KJobHandlerWorker
 {
+	const LOG_SUFFIX = '.log';
+
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -72,60 +74,14 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			if (!$rootPath)
 				die();
 
-			$capturePath = null;
-			if($data->srcAssetType == KalturaAssetType::FLAVOR)
+			if($thumbParamsOutput->interval)
 			{
-				$capturePath = $this->createUniqFileName($rootPath);
-				list($mediaInfoWidth, $mediaInfoHeight, $mediaInfoDar, $mediaInfoVidDur, $mediaInfoScanType) = $this->getMediaInfoData($job->partnerId, $data->srcAssetId);
-				
-				// generates the thumbnail
-				$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $capturePath, self::$taskConfig->params->FFMpegCmd);
-				$videoOffset = max(0 ,min($thumbParamsOutput->videoOffset, $mediaInfoVidDur-1));
-				$params['dar'] = $mediaInfoDar;
-				$params['vidDur'] = $mediaInfoVidDur;
-				$params['scanType'] = $mediaInfoScanType;
-				if ( $data->srcAssetEncryptionKey )
-				{
-					$params['encryption_key'] = $data->srcAssetEncryptionKey;
-				}
-
-				$created = $thumbMaker->createThumnail($videoOffset, $mediaInfoWidth, $mediaInfoHeight, $params);
-				if(!$created || !file_exists($capturePath))
-					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "Thumbnail not created", KalturaBatchJobStatus::FAILED);
-				
-				$this->updateJob($job, "Thumbnail captured [$capturePath]", KalturaBatchJobStatus::PROCESSING);
+				return $this->createBif($job, $data, $rootPath, $mediaFile, $thumbParamsOutput);
 			}
-			
-			$thumbPath = $this->createUniqFileName($rootPath);
-			
-			if ($capturePath || !$data->fileContainer->encryptionKey)
+			else
 			{
-				//if generate the thumb here or the file is not encrypt just crop
-				$srcPath = $capturePath ? $capturePath : $mediaFile;
-				$cropped = $this->crop($srcPath ,$thumbPath, $thumbParamsOutput);
+				return $this->createBasicThumb($job, $data, $rootPath, $mediaFile, $thumbParamsOutput);
 			}
-			else 
-			{
-				$tempPath = self::createTempClearFile($mediaFile, $data->fileContainer->encryptionKey);
-				$cropped = $this->crop($tempPath ,$thumbPath, $thumbParamsOutput);
-				unlink($tempPath);
-			}
-			
-			
-			if(!$cropped || !file_exists($thumbPath))
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "Thumbnail not cropped", KalturaBatchJobStatus::FAILED);
-				
-			$data->thumbPath = $thumbPath;
-			$job = $this->moveFile($job, $data);
-				
-			if($this->checkFileExists($job->data->thumbPath))
-			{
-				$updateData = new KalturaCaptureThumbJobData();
-				$updateData->thumbPath = $data->thumbPath;
-				return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, $updateData);
-			}
-			
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::FAILED, $data);
 		}
 		catch(Exception $ex)
 		{
@@ -217,6 +173,180 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 	private function createUniqFileName($rootPath)
 	{
 		return realpath($rootPath) . DIRECTORY_SEPARATOR . uniqid('thumb_');
+	}
+
+	private function createBasicThumb($job, $data, $rootPath, $mediaFile, $thumbParamsOutput)
+	{
+		$capturePath = null;
+		if($data->srcAssetType == KalturaAssetType::FLAVOR)
+		{
+			$capturePath = $this->createUniqFileName($rootPath);
+			list($mediaInfoWidth, $mediaInfoHeight, $mediaInfoDar, $mediaInfoVidDur, $mediaInfoScanType) = $this->getMediaInfoData($job->partnerId, $data->srcAssetId);
+
+			// generates the thumbnail
+			$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $capturePath, self::$taskConfig->params->FFMpegCmd);
+			$videoOffset = max(0 ,min($thumbParamsOutput->videoOffset, $mediaInfoVidDur-1));
+			$params['dar'] = $mediaInfoDar;
+			$params['vidDur'] = $mediaInfoVidDur;
+			$params['scanType'] = $mediaInfoScanType;
+			if ( $data->srcAssetEncryptionKey )
+			{
+				$params['encryption_key'] = $data->srcAssetEncryptionKey;
+			}
+
+			$created = $thumbMaker->createThumnail($videoOffset, $mediaInfoWidth, $mediaInfoHeight, $params);
+			if(!$created || !file_exists($capturePath))
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "Thumbnail not created", KalturaBatchJobStatus::FAILED);
+
+			$this->updateJob($job, "Thumbnail captured [$capturePath]", KalturaBatchJobStatus::PROCESSING);
+		}
+
+		$thumbPath = $this->createUniqFileName($rootPath);
+
+		if ($capturePath || !$data->fileContainer->encryptionKey)
+		{
+			//if generate the thumb here or the file is not encrypt just crop
+			$srcPath = $capturePath ? $capturePath : $mediaFile;
+			$cropped = $this->crop($srcPath ,$thumbPath, $thumbParamsOutput);
+		}
+		else
+		{
+			$tempPath = self::createTempClearFile($mediaFile, $data->fileContainer->encryptionKey);
+			$cropped = $this->crop($tempPath ,$thumbPath, $thumbParamsOutput);
+			unlink($tempPath);
+		}
+
+
+		if(!$cropped || !file_exists($thumbPath))
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "Thumbnail not cropped", KalturaBatchJobStatus::FAILED);
+
+		$data->thumbPath = $thumbPath;
+		$job = $this->moveFile($job, $data);
+
+		if($this->checkFileExists($job->data->thumbPath))
+		{
+			$updateData = new KalturaCaptureThumbJobData();
+			$updateData->thumbPath = $data->thumbPath;
+			return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, $updateData);
+		}
+
+		return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::FAILED, $data);
+	}
+
+	private function createBif($job, $data, $rootPath, $mediaFile, $thumbParamsOutput)
+	{
+		$capturePath = null;
+		$images = array();
+		if($data->srcAssetType == KalturaAssetType::FLAVOR)
+		{
+			list($mediaInfoWidth, $mediaInfoHeight, $mediaInfoDar, $mediaInfoVidDur, $mediaInfoScanType) = $this->getMediaInfoData($job->partnerId, $data->srcAssetId);
+
+			$captureVidSec = $thumbParamsOutput->interval;
+			$folderPath = realpath($rootPath) . DIRECTORY_SEPARATOR . uniqid();
+
+			$rootPath = self::createDir($folderPath);
+			if (!$folderPath)
+				die();
+
+			$generalCapturePath = $this->createUniqFileName($rootPath);
+
+			$count = floor($mediaInfoVidDur / $thumbParamsOutput->interval);
+			KalturaLog::debug("Number of images to capture - [$count]");
+
+			while($count--)
+			{
+				$capturePath = $generalCapturePath . '_sec_' . $captureVidSec;
+				//capture from packager
+				//if not capture using ffmpeg
+
+				$created = $this->generateThumbUsingFfmpeg($mediaFile, $capturePath, $thumbParamsOutput, $mediaInfoVidDur, $mediaInfoDar,
+					$mediaInfoScanType, $data, $mediaInfoWidth, $mediaInfoHeight);
+
+				if(!$created || !file_exists($capturePath))
+					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "One of BIF frames was not created", KalturaBatchJobStatus::FAILED);
+
+				if ($capturePath || !$data->fileContainer->encryptionKey)
+				{
+					//if generate the thumb here or the file is not encrypt just crop
+					$srcPath = $capturePath ? $capturePath : $mediaFile;
+					$cropped = $this->crop($srcPath ,$capturePath, $thumbParamsOutput);
+				}
+				else
+				{
+					$tempPath = self::createTempClearFile($mediaFile, $data->fileContainer->encryptionKey);
+					$cropped = $this->crop($tempPath ,$capturePath, $thumbParamsOutput);
+					unlink($tempPath);
+				}
+
+				if(!$cropped || !file_exists($capturePath))
+					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "One of BIF frames was not cropped", KalturaBatchJobStatus::FAILED);
+
+				$captureVidSec += $thumbParamsOutput->interval;
+				$images[] = $capturePath;
+			}
+
+			$files = scandir($rootPath);
+			$files = array_diff($files, array('.', '..'));
+			KalturaLog::debug("files: " . print_r($files, true));
+			KalturaLog::debug("images: " . print_r($images, true));
+
+			//set bif final path
+			$finalBifPath = $generalCapturePath . '.bif';
+
+			KalturaLog::debug("create bif - [$finalBifPath]");
+			$bifCreator = new kBifCreator($images, $finalBifPath, $thumbParamsOutput->interval);
+			$bifCreator->createBif();
+
+			$data->thumbPath = $finalBifPath;
+			$job = $this->moveFile($job, $data);
+
+
+
+			if($this->checkFileExists($job->data->thumbPath))
+			{
+				$updateData = new KalturaCaptureThumbJobData();
+				$updateData->thumbPath = $data->thumbPath;
+				$this->clearDir($rootPath, $files);
+				return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, $updateData);
+			}
+
+			$this->clearDir($rootPath, $files);
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::FAILED, $data);
+
+		}
+
+	}
+
+	private function clearDir($path, $files)
+	{
+		foreach ($files as $file)
+		{
+			$fullFilePath = $path . '/' . $file;
+			if(file_exists($fullFilePath))
+			{
+				KalturaLog::debug("clear path for file - [$fullFilePath]");
+				unlink($fullFilePath);
+			}
+		}
+		rmdir($path);
+		KalturaLog::debug("clear path for path - [$path]");
+	}
+
+	private function generateThumbUsingFfmpeg($mediaFile, $capturePath, $thumbParamsOutput, $mediaInfoVidDur, $mediaInfoDar,
+											  $mediaInfoScanType, $data, $mediaInfoWidth, $mediaInfoHeight)
+	{
+		KalturaLog::debug("capture new frame - [$capturePath]");
+		$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $capturePath, self::$taskConfig->params->FFMpegCmd);
+		$videoOffset = max(0 ,min($thumbParamsOutput->videoOffset, $mediaInfoVidDur-1));
+		$params['dar'] = $mediaInfoDar;
+		$params['vidDur'] = $mediaInfoVidDur;
+		$params['scanType'] = $mediaInfoScanType;
+		if ( $data->srcAssetEncryptionKey )
+		{
+			$params['encryption_key'] = $data->srcAssetEncryptionKey;
+		}
+
+		return $thumbMaker->createThumnail($videoOffset, $mediaInfoWidth, $mediaInfoHeight, $params);
 	}
 
 }

@@ -1048,6 +1048,11 @@ class kFlowHelper
 		$thumbAsset->incrementVersion();
 		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
 
+		$thumbParamsOutput = assetParamsOutputPeer::retrieveByAssetId($data->getThumbAssetId());
+		if($thumbParamsOutput->getInterval())
+		{
+			$thumbAsset->setFileExt('bif');
+		}
 
 		if(file_exists($data->getThumbPath()))
 		{
