@@ -45,10 +45,10 @@ class UserEntryTableMap extends TableMap {
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
 		$this->addColumn('TYPE', 'Type', 'INTEGER', false, null, null);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('EXTENDED_STATUS', 'ExtendedStatus', 'INTEGER', false, null, null);
 		$this->addColumn('PRIVACY_CONTEXT', 'PrivacyContext', 'VARCHAR', false, 255, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
-		$this->addColumn('VERSION', 'Version', 'INTEGER', false, null, null);
 		// validators
 	} // initialize()
 
