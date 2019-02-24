@@ -245,15 +245,12 @@ class Form_ReachProfileConfigure extends ConfigureForm
 		$newRule = array();
 		$newRule['ruleType'] = $ruleType;
 		$catalogItemIds = array();
-		$booleanEventNotificationIds = array();
 		foreach ($rule->actions as $action)
 		{
 			/* @var Kaltura_Client_Reach_Type_AddEntryVendorTaskAction $action */
 			$catalogItemIds[] = $action->catalogItemIds;
-			$booleanEventNotificationIds[] = $action->booleanEventNotificationIds;
 		}
 		$newRule['catalogItemIds'] = implode(', ', $catalogItemIds);
-		$newRule['booleanEventNotificationIds'] = implode(', ', $booleanEventNotificationIds);
 		return $newRule;
 	}
 
@@ -271,7 +268,6 @@ class Form_ReachProfileConfigure extends ConfigureForm
 				{
 					$action = new Kaltura_Client_Reach_Type_AddEntryVendorTaskAction();
 					$action->catalogItemIds = $rule->catalogItemIds;
-					$action->booleanEventNotificationIds = $rule->booleanEventNotificationIds;
 					$description = (empty($rule->description) || $rule->description == self::ADMIN_CONSOLE_RULE_PREFIX) ? (self::ADMIN_CONSOLE_RULE_PREFIX . mt_rand(100000, 999999)) : $rule->description;
 					$rulesArray[] = $this->getReachProfileRule(array($action), $description);
 				}

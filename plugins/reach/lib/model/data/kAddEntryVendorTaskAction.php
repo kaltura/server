@@ -9,12 +9,7 @@ class kAddEntryVendorTaskAction extends kRuleAction
 	 * @var string
 	 */
 	protected $catalogItemIds;
-
-	/**
-	 * @var string
-	 */
-	protected $booleanEventNotificationIds;
-
+	
 	public function __construct() 
 	{
 		parent::__construct(ReachPlugin::getRuleActionTypeCoreValue(ReachRuleActionType::ADD_ENTRY_VENDOR_TASK));
@@ -35,21 +30,4 @@ class kAddEntryVendorTaskAction extends kRuleAction
 	{
 		$this->catalogItemIds = $catalogItemIds;
 	}
-
-	/**
-	 * @return the $booleanEventNotificationIds
-	 */
-	public function getBooleanEventNotificationIds()
-	{
-		return $this->booleanEventNotificationIds;
-	}
-
-	/**
-	 * @param string $booleanEventNotificationIds
-	 */
-	public function setBooleanEventNotificationIds($booleanEventNotificationIds)
-	{
-		$this->booleanEventNotificationIds = $booleanEventNotificationIds;
-	}
-
 }

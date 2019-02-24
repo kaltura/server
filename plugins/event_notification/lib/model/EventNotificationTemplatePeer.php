@@ -120,12 +120,9 @@ class EventNotificationTemplatePeer extends BaseEventNotificationTemplatePeer
 	 * @param      PropelPDO $con the connection to use
 	 * @return     array<EventNotificationTemplate>
 	 */
-	public static function retrieveByEventType($eventType, $objectType, $partnerId = null, PropelPDO $con = null, $criteria = null)
+	public static function retrieveByEventType($eventType, $objectType, $partnerId = null, PropelPDO $con = null)
 	{
-		if (!$criteria)
-		{
-			$criteria = new Criteria ( EventNotificationTemplatePeer::DATABASE_NAME );
-		}
+		$criteria = new Criteria ( EventNotificationTemplatePeer::DATABASE_NAME );
 		$criteria->add ( EventNotificationTemplatePeer::STATUS, EventNotificationTemplateStatus::ACTIVE );
 		$criteria->add ( EventNotificationTemplatePeer::EVENT_TYPE, $eventType );
 		$criteria->add ( EventNotificationTemplatePeer::OBJECT_TYPE, $objectType );
@@ -134,23 +131,6 @@ class EventNotificationTemplatePeer extends BaseEventNotificationTemplatePeer
 		
 		$criteria->add(EventNotificationTemplatePeer::PARTNER_ID, array_map('strval',  $partnerIds), Criteria::IN);
 		return EventNotificationTemplatePeer::doSelect ( $criteria, $con );
-	}
-
-	/**
-	 * Retrieve event notification tamplates according to event and object type and pk
-	 *
-	 * @param      int $eventType
-	 * @param      int $objectType
-	 * @param      int $partnerId use null to retrieve from shared partner only
-	 * @param      int $id
-	 * @param      PropelPDO $con the connection to use
-	 * @return     array<EventNotificationTemplate>
-	 */
-	public static function retrieveByEventTypeObjectTypeAndPKS($eventType, $objectType, $partnerId = null, $pks, PropelPDO $con = null)
-	{
-		$criteria = new Criteria ( EventNotificationTemplatePeer::DATABASE_NAME );
-		$criteria->add ( EventNotificationTemplatePeer::ID, $pks ,Criteria::IN );
-		return EventNotificationTemplatePeer::retrieveByEventType($eventType, $objectType, $partnerId, $con, $criteria);
 	}
 	
 	/**

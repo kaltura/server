@@ -12,18 +12,9 @@ class KalturaAddEntryVendorTaskAction extends KalturaRuleAction
 	 */
 	public $catalogItemIds;
 
-
-	/**
-	 * Boolean Event Notification Id
-	 *
-	 * @var string
-	 */
-	public $booleanEventNotificationIds;
-
 	private static $mapBetweenObjects = array
 	(
 		'catalogItemIds',
-		'booleanEventNotificationIds',
 	);
 
 	/**
