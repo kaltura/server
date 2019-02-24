@@ -5328,7 +5328,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		$order_by_dir = $order_by[0];
-		if (!($order_by_dir === '-' || $order_by_dir === '+'))
+		if (!in_array($order_by_dir, array('-', '+')))
 		{
 			$order_by_dir = '-';
 		}
