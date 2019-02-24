@@ -1,17 +1,3 @@
-# Naos 14.15.0 #
-
-## create new type of event notification template: Boolean ##
-
- - Issue Type: Task
- - Issue ID: PLAT-9656
-
-### Configuration ###
-Add BooleanNotification to your plugins.ini
-
-### Deployment scripts ###
-php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
-
-
 # Naos 14.14.0 #
 
 ## Schedule Event - Add sphinx match optimization##
