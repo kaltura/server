@@ -2312,10 +2312,9 @@ class kKavaReportsMgr extends kKavaBase
 				}
 			}
 
-			$report_map = self::mapMetricsToHeaders($metrics);
-
-			if ($report_map)
+			if ($metrics)
 			{
+				$report_map = self::mapMetricsToHeaders($metrics);
 				$report_def[self::REPORT_TABLE_MAP] = array_combine($report_map, $metrics);
 			}
 		}
@@ -2346,7 +2345,7 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function mapMetricsToHeaders($metrics)
 	{
 		$headers = array();
-		foreach ($metrics as &$metric)
+		foreach ($metrics as $metric)
 		{
 			if (isset(self::$metrics_to_headers[$metric]))
 			{
@@ -2942,32 +2941,31 @@ class kKavaReportsMgr extends kKavaBase
 		return isset($report_def[self::REPORT_GRAPH_TYPE]) ? $report_def[self::REPORT_GRAPH_TYPE] : self::GRAPH_BY_DATE_ID;
 	}
 
-	protected static function replaceMetricsToHeadersKeyedGraph($result)
+	protected static function replaceMetricsToHeadersKeyedGraph($graph)
 	{
-		$graph = array();
-		foreach ($result as $key => $data)
+		$result = array();
+		foreach ($graph as $key => $data)
 		{
-			$headers = self::mapMetricsToHeaders(array_keys($data));
-			$graph[$key] = array_combine($headers, $data);
+			$result[$key] = self::replaceMetricsToHeadersGraph($data);
 		}
-		return $graph;
+		return $result;
 	}
 
-	protected static function replaceMetricsToHeadersGraph($result)
+	protected static function replaceMetricsToHeadersGraph($graph)
 	{
-		$headers = self::mapMetricsToHeaders(array_keys($result));
-		return array_combine($headers, $result);
+		$headers = self::mapMetricsToHeaders(array_keys($graph));
+		return array_combine($headers, $graph);
 	}
 
-	protected static function replaceMetricsToHeadersByGraphType($graph_type, $result)
+	protected static function replaceMetricsToHeadersByGraphType($graph_type, $graph)
 	{
 		switch ($graph_type)
 		{
 			case self::GRAPH_ASSOC_MULTI_BY_DATE_ID:
 			case self::GRAPH_BY_NAME:
-				return self::replaceMetricsToHeadersKeyedGraph($result);
+				return self::replaceMetricsToHeadersKeyedGraph($graph);
 			default:
-				return self::replaceMetricsToHeadersGraph($result);
+				return self::replaceMetricsToHeadersGraph($graph);
 		}
 	}
 
@@ -3598,9 +3596,11 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$result = self::reorderGraphs($map, $result);
 		}
-
-		$graph_type = self::getGraphType($report_def);
-		$result = self::replaceMetricsToHeadersByGraphType($graph_type, $result);
+		else
+		{
+			$graph_type = self::getGraphType($report_def);
+			$result = self::replaceMetricsToHeadersByGraphType($graph_type, $result);
+		}
 
 		return $result;
 	}
@@ -5321,7 +5321,8 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function orderTableByMetric($report_def, $order_by, $headers, &$data)
 	{
 		$order_metric = self::getMetricFromOrderBy($report_def, $order_by);
-		if (!$order_metric || !in_array($order_metric, $headers))
+		$headers_map = array_flip($headers);
+		if (!$order_metric || !isset($headers_map[$order_metric]))
 		{
 			return;
 		}
@@ -5329,17 +5330,17 @@ class kKavaReportsMgr extends kKavaBase
 		$order_by_dir = $order_by[0];
 		if (!($order_by_dir === '-' || $order_by_dir === '+'))
 		{
-			return;
+			$order_by_dir = '-';
 		}
 
-		$headers_map = array_flip($headers);
 		$header_index = $headers_map[$order_metric];
 		usort($data , function($a, $b) use ($order_by_dir, $header_index) {
-			if ($order_by_dir === '+')
+			$result = ($a[$header_index] > $b[$header_index]) ? 1 : -1;
+			if ($order_by_dir === '-')
 			{
-				return ($a[$header_index] > $b[$header_index]) ? 1 : -1;
+				$result = -$result;
 			}
-			return ($a[$header_index] < $b[$header_index]) ? 1 : -1;
+			return $result;
 		});
 	}
 
@@ -5404,8 +5405,10 @@ class kKavaReportsMgr extends kKavaBase
 				true,
 				$result);
 		}
-
-		$result[0] = self::mapMetricsToHeaders($result[0]);
+		else
+		{
+			$result[0] = self::mapMetricsToHeaders($result[0]);
+		}
 
 		return $result;
 	}
@@ -5638,8 +5641,10 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			self::reorderTableColumns(0, $map, false, $result);
 		}
-
-		$result[0] = self::mapMetricsToHeaders($result[0]);
+		else
+		{
+			$result[0] = self::mapMetricsToHeaders($result[0]);
+		}
 
 		return $result;
 	}
