@@ -119,13 +119,34 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP && in_array(entryPeer::STATUS, $modifiedColumns))
 		{
 			if ($object->getStatus() == entryStatus::READY)
-				return $this->checkAutomaticRules($object, true);
+			{
+				$this->checkAutomaticRules($object, true);
+				$this->checkEntryPendingTaks($object);
+				return true;
+			}
+				
 
 			if ($object->getStatus() == entryStatus::DELETED)
 				return $this->handleEntryDeleted($object);
 		}
 
 		return true;
+	}
+	
+	private function checkEntryPendingTaks(entry $object)
+	{
+		//Check if there are any tasks that were created with pending entry ready status
+		$pendingEntryReadyTasks = EntryVendorTaskPeer::retrievePendingByEntryId($object->getId(), $object->getPartnerId(), array(EntryVendorTaskStatus::PENDING_ENTRY_READY));
+		
+		foreach ($pendingEntryReadyTasks as $pendingEntryReadyTask)
+		{
+			/* @var $pendingEntryReadyTask EntryVendorTask */
+			$pendingEntryReadyTask->setStatus(EntryVendorTaskStatus::PENDING);
+			$pendingEntryReadyTask->setAccessKey(kReachUtils::generateReachVendorKs($pendingEntryReadyTask->getEntryId(), $pendingEntryReadyTask->getIsRequestModerated(), $pendingEntryReadyTask->getCatalogItem()->getKsExpiry()));
+			if($pendingEntryReadyTask->getPrice() == 0)
+				$pendingEntryReadyTask->setPrice(kReachUtils::calculateTaskPrice($object, $pendingEntryReadyTask->getCatalogItem()));
+			$pendingEntryReadyTask->save();
+		}
 	}
 
 	private function updateReachProfileCreditUsage(EntryVendorTask $entryVendorTask)
@@ -274,7 +295,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		$status = EntryVendorTaskStatus::PENDING;
 		if ($validateModeration && $reachProfile->shouldModerate($vendorCatalogItem->getServiceType()))
+		{
+			$entryVendorTask->setIsRequestModerated(true);
 			$status = EntryVendorTaskStatus::PENDING_MODERATION;
+		}
+		if($entry->getStatus() != entryStatus::READY)
+			$status = EntryVendorTaskStatus::PENDING_ENTRY_READY;
 
 		$dictionary = $reachProfile->getDictionaryByLanguage($vendorCatalogItem->getSourceLanguage());
 		if ($dictionary)
