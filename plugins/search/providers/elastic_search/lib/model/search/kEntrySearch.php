@@ -106,7 +106,7 @@ class kEntrySearch extends kBaseESearch
 
     public function fetchCoreObjectsByIds($ids)
     {
-        $entries = entryPeer::retrieveByPKsNoFilter($ids);
+        $entries = entryPeer::retrieveByPKsNoFilter($ids, null,false);
         entryPeer::fetchPlaysViewsData($entries);
         return $entries;
     }

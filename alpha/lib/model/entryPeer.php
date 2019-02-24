@@ -312,10 +312,10 @@ class entryPeer extends BaseentryPeer
 		return $res;
 	}
 
-	public static function retrieveByPKsNoFilter ($pks, $con = null)
+	public static function retrieveByPKsNoFilter ($pks, $con = null, $filterEntitlements = true)
 	{
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-		self::$filterResults = true;
+		self::$filterResults = $filterEntitlements;
 		self::setUseCriteriaFilter ( false );
 		$res = parent::retrieveByPKs( $pks , $con );
 		self::setUseCriteriaFilter ( true );
