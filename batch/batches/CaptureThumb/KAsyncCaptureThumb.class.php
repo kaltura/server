@@ -20,6 +20,8 @@
 class KAsyncCaptureThumb extends KJobHandlerWorker
 {
 	const LOG_SUFFIX = '.log';
+	const BIF = 'bif';
+	const DEFAULT_BIF_INTERVAL = 10;
 
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -74,7 +76,9 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			if (!$rootPath)
 				die();
 
-			if($thumbParamsOutput->interval)
+			$tagsArray = explode(',', $thumbParamsOutput->tags);
+			$lowerTagsArray = array_map('strtolower', $tagsArray);
+			if(in_array(self::BIF, $lowerTagsArray))
 			{
 				return $this->createBif($job, $data, $rootPath, $mediaFile, $thumbParamsOutput);
 			}
@@ -175,7 +179,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 		return realpath($rootPath) . DIRECTORY_SEPARATOR . uniqid('thumb_');
 	}
 
-	private function createBasicThumb($job, $data, $rootPath, $mediaFile, $thumbParamsOutput)
+	protected function createBasicThumb($job, $data, $rootPath, $mediaFile, $thumbParamsOutput)
 	{
 		$capturePath = null;
 		if($data->srcAssetType == KalturaAssetType::FLAVOR)
@@ -233,15 +237,16 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 		return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::FAILED, $data);
 	}
 
-	private function createBif($job, $data, $rootPath, $mediaFile, $thumbParamsOutput)
+	protected function createBif($job, $data, $rootPath, $mediaFile, $thumbParamsOutput)
 	{
 		$capturePath = null;
 		$images = array();
 		if($data->srcAssetType == KalturaAssetType::FLAVOR)
 		{
 			list($mediaInfoWidth, $mediaInfoHeight, $mediaInfoDar, $mediaInfoVidDur, $mediaInfoScanType) = $this->getMediaInfoData($job->partnerId, $data->srcAssetId);
+			$bifInterval = $this->getBifInterval($thumbParamsOutput);
 
-			$captureVidSec = $thumbParamsOutput->interval;
+			$captureVidSec = $bifInterval;
 			$folderPath = realpath($rootPath) . DIRECTORY_SEPARATOR . uniqid();
 
 			$rootPath = self::createDir($folderPath);
@@ -250,7 +255,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 
 			$generalCapturePath = $this->createUniqFileName($rootPath);
 
-			$count = floor($mediaInfoVidDur / $thumbParamsOutput->interval);
+			$count = floor($mediaInfoVidDur / $bifInterval);
 			KalturaLog::debug("Number of images to capture - [$count]");
 
 			while($count--)
@@ -281,7 +286,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 				if(!$cropped || !file_exists($capturePath))
 					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "One of BIF frames was not cropped", KalturaBatchJobStatus::FAILED);
 
-				$captureVidSec += $thumbParamsOutput->interval;
+				$captureVidSec += $bifInterval;
 				$images[] = $capturePath;
 			}
 
@@ -294,13 +299,11 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			$finalBifPath = $generalCapturePath . '.bif';
 
 			KalturaLog::debug("create bif - [$finalBifPath]");
-			$bifCreator = new kBifCreator($images, $finalBifPath, $thumbParamsOutput->interval);
+			$bifCreator = new kBifCreator($images, $finalBifPath, $bifInterval);
 			$bifCreator->createBif();
 
 			$data->thumbPath = $finalBifPath;
 			$job = $this->moveFile($job, $data);
-
-
 
 			if($this->checkFileExists($job->data->thumbPath))
 			{
@@ -317,7 +320,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 
 	}
 
-	private function clearDir($path, $files)
+	protected function clearDir($path, $files)
 	{
 		foreach ($files as $file)
 		{
@@ -332,7 +335,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 		KalturaLog::debug("clear path for path - [$path]");
 	}
 
-	private function generateThumbUsingFfmpeg($mediaFile, $capturePath, $thumbParamsOutput, $mediaInfoVidDur, $mediaInfoDar,
+	protected function generateThumbUsingFfmpeg($mediaFile, $capturePath, $thumbParamsOutput, $mediaInfoVidDur, $mediaInfoDar,
 											  $mediaInfoScanType, $data, $mediaInfoWidth, $mediaInfoHeight)
 	{
 		KalturaLog::debug("capture new frame - [$capturePath]");
@@ -347,6 +350,15 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 		}
 
 		return $thumbMaker->createThumnail($videoOffset, $mediaInfoWidth, $mediaInfoHeight, $params);
+	}
+
+	protected function getBifInterval($thumbParamsOutput)
+	{
+		if(!$thumbParamsOutput->interval)
+		{
+			return self::DEFAULT_BIF_INTERVAL;
+		}
+		return $thumbParamsOutput->interval;
 	}
 
 }

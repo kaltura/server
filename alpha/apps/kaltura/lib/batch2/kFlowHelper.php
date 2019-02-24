@@ -1048,18 +1048,21 @@ class kFlowHelper
 		$thumbAsset->incrementVersion();
 		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
 
-		$thumbParamsOutput = assetParamsOutputPeer::retrieveByAssetId($data->getThumbAssetId());
-		if($thumbParamsOutput->getInterval())
-		{
-			$thumbAsset->setFileExt('bif');
-		}
-
 		if(file_exists($data->getThumbPath()))
 		{
 			list($width, $height, $type, $attr) = getimagesize($data->getThumbPath());
 			$thumbAsset->setWidth($width);
 			$thumbAsset->setHeight($height);
 			$thumbAsset->setSize(filesize($data->getThumbPath()));
+
+			$thumbParamsOutput = assetParamsOutputPeer::retrieveByAssetId($data->getThumbAssetId());
+			$lowerTagsArray = array_map('strtolower', $thumbParamsOutput->getTagsArray());
+			if(in_array('bif', $lowerTagsArray))
+			{
+				$thumbAsset->setFileExt('bif');
+				$thumbAsset->setWidth($thumbParamsOutput->getWidth());
+				$thumbAsset->setHeight($thumbParamsOutput->getHeight());
+			}
 		}
 
 		$logPath = $data->getThumbPath() . '.log';

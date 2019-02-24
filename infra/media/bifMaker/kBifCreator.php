@@ -23,7 +23,11 @@ class kBifCreator
 
 	public function createBif()
 	{
-		$targetFile = @fopen($this->targetPath, "wb");
+		$targetFile = fopen($this->targetPath, "wb");
+		if(!$targetFile)
+		{
+			throw new Exception("Cannot open target file [$this->targetPath]", -1);
+		}
 
 		$magicNumber = pack('C*', 0x89, 0x42, 0x49, 0x46, 0x0d, 0x0a, 0x01a, 0x0a);
 		$version =  pack('V', 0);
@@ -62,11 +66,13 @@ class kBifCreator
 		foreach ($images as $image)
 		{
 			$content = file_get_contents($image);
-			//$imageFile = fopen($image, "rb");
-			//$content = fread($imageFile, filesize($image));
-			fwrite($targetFile, $content);
+			$success = fwrite($targetFile, $content);
+			if(!$success)
+			{
+				throw new Exception("Cannot write file content [$image]", -1);
+			}
 		}
 
-		@fclose($targetFile);
+		fclose($targetFile);
 	}
 }

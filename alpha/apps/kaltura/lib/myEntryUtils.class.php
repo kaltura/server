@@ -7,6 +7,7 @@ class myEntryUtils
 	const MP4_FILENAME_PARAMETER = "/name/a.mp4";
 	const DEFAULT_THUMB_SEC_LIVE = 1;
 	const ENTRY_ID_REGEX = "/\d_[A-Za-z0-9]{8}/";
+	const MAX_BIF_FRAMES = 100;
 
 	static private $liveSourceType = array
 	(
@@ -807,7 +808,7 @@ class myEntryUtils
 		$calc_vid_sec = 0;
 		if($bif && $vid_slices)
 		{
-			if($count > 100)
+			if($count > self::MAX_BIF_FRAMES)
 			{
 				KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 			}
