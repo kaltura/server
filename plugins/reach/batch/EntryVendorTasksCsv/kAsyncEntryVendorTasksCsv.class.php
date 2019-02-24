@@ -151,6 +151,8 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 			}
 
 			$this->addEntryVendorTasksToCsv($entryVendorTaskList->objects, $csvFile);
+			$lastEntryVendorTaskObject = end($entryVendorTaskList->objects);
+			$lastCreatedAt = $lastEntryVendorTaskObject->createdAt;
 			$tasksCount = count($entryVendorTaskList->objects);
 			$totalCount += $tasksCount;
 			KalturaLog::debug("Adding More - $tasksCount totalCount - " . $totalCount);
