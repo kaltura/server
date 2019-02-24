@@ -1392,14 +1392,18 @@ class kKavaReportsMgr extends kKavaBase
 				'entry_name' => self::DIMENSION_ENTRY_ID,
 				'creator_name' => self::DIMENSION_ENTRY_ID,
 				'created_at' => self::DIMENSION_ENTRY_ID,
+				'status' => self::DIMENSION_ENTRY_ID,
+				'media_type' => self::DIMENSION_ENTRY_ID,
+				'ms_duration' => self::DIMENSION_ENTRY_ID,
+
 			),
 			self::REPORT_ENRICH_DEF => array(
 				array(
-					self::REPORT_ENRICH_OUTPUT => array('entry_name', 'creator_name', 'created_at'),
+					self::REPORT_ENRICH_OUTPUT => array('entry_name', 'creator_name', 'created_at', 'status', 'media_type', 'ms_duration'),
 					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
 					self::REPORT_ENRICH_CONTEXT => array(
 						'peer' => 'entryPeer',
-						'columns' => array('NAME', 'KUSER_ID', '@CREATED_AT'),
+						'columns' => array('NAME', 'KUSER_ID', '@CREATED_AT', 'STATUS', 'MEDIA_TYPE', 'LENGTH_IN_MSECS'),
 					)
 				),
 				array(
