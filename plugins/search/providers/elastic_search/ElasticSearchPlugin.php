@@ -2,10 +2,11 @@
 /**
  * @package plugins.elasticSearch
  */
-class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaPending, IKalturaServices, IKalturaObjectLoader
+class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaPending, IKalturaServices, IKalturaObjectLoader, IKalturaExceptionHandler
 {
     const PLUGIN_NAME = 'elasticSearch';
     const ELASTIC_SEARCH_MANAGER = 'kElasticSearchManager';
+    const ELASTIC_CORE_EXCEPTION = 'kESearchException';
 
     public static function getPluginName()
     {
@@ -73,6 +74,62 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
     public static function getObjectClass($baseClass, $enumValue)
     {
        return null;
+    }
+
+    public static function handleESearchException($exception)
+    {
+        $code = $exception->getCode();
+        $data = $exception->getData();
+        switch ($code)
+        {
+            case kESearchException::SEARCH_TYPE_NOT_ALLOWED_ON_FIELD:
+                $object = new KalturaAPIException(KalturaESearchErrors::SEARCH_TYPE_NOT_ALLOWED_ON_FIELD, $data['itemType'], $data['fieldName']);
+                break;
+            case kESearchException::EMPTY_SEARCH_TERM_NOT_ALLOWED:
+                $object = new KalturaAPIException(KalturaESearchErrors::EMPTY_SEARCH_TERM_NOT_ALLOWED, $data['fieldName'], $data['itemType']);
+                break;
+            case kESearchException::SEARCH_TYPE_NOT_ALLOWED_ON_UNIFIED_SEARCH:
+                $object = new KalturaAPIException(KalturaESearchErrors::SEARCH_TYPE_NOT_ALLOWED_ON_UNIFIED_SEARCH, $data['itemType']);
+                break;
+            case kESearchException::EMPTY_SEARCH_ITEMS_NOT_ALLOWED:
+                $object = new KalturaAPIException(KalturaESearchErrors::EMPTY_SEARCH_ITEMS_NOT_ALLOWED);
+                break;
+            case kESearchException::UNMATCHING_BRACKETS:
+                $object = new KalturaAPIException(KalturaESearchErrors::UNMATCHING_BRACKETS);
+                break;
+            case kESearchException::MISSING_QUERY_OPERAND:
+                $object = new KalturaAPIException(KalturaESearchErrors::MISSING_QUERY_OPERAND);
+                break;
+            case kESearchException::UNMATCHING_QUERY_OPERAND:
+                $object = new KalturaAPIException(KalturaESearchErrors::UNMATCHING_QUERY_OPERAND);
+                break;
+            case kESearchException::CONSECUTIVE_OPERANDS_MISMATCH:
+                $object = new KalturaAPIException(KalturaESearchErrors::CONSECUTIVE_OPERANDS_MISMATCH);
+                break;
+            case kESearchException::INVALID_FIELD_NAME:
+                $object = new KalturaAPIException(KalturaESearchErrors::INVALID_FIELD_NAME, $data['fieldName']);
+                break;
+            case kESearchException::MISSING_MANDATORY_PARAMETERS_IN_ORDER_ITEM:
+                $object = new KalturaAPIException(KalturaESearchErrors::MISSING_MANDATORY_PARAMETERS_IN_ORDER_ITEM);
+                break;
+            case kESearchException::MIXED_SEARCH_ITEMS_IN_NESTED_OPERATOR_NOT_ALLOWED:
+                $object = new KalturaAPIException(KalturaESearchErrors::MIXED_SEARCH_ITEMS_IN_NESTED_OPERATOR_NOT_ALLOWED);
+                break;
+            case kESearchException::MISSING_OPERATOR_TYPE:
+                $object = new KalturaAPIException(KalturaESearchErrors::MISSING_OPERATOR_TYPE);
+                break;
+
+            default:
+                $object = null;
+        }
+        return $object;
+    }
+
+    public function getExceptionMap()
+    {
+        return array(
+            self::ELASTIC_CORE_EXCEPTION => array('ElasticSearchPlugin', 'handleESearchException'),
+        );
     }
 
 }

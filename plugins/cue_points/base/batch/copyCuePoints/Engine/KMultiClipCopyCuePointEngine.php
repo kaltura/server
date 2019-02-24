@@ -72,7 +72,7 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 	{
 		if (!$this->data || !($this->data instanceof KalturaMultiClipCopyCuePointsJobData))
 			return false;
-		if (!$this->data->clipsDescriptionArray)
+		if (is_null($this->data->clipsDescriptionArray))
 			return false;
 		return parent::validateJobData();
 	}

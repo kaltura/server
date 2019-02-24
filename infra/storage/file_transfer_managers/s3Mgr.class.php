@@ -17,7 +17,7 @@ use Aws\S3\Enum\CannedAcl;
 class s3Mgr extends kFileTransferMgr
 {
 	private $s3;
-		
+	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
 	protected $filesAcl = CannedAcl::PRIVATE_ACCESS;
 	protected $s3Region = '';
 	protected $sseType = '';
@@ -129,53 +129,75 @@ class s3Mgr extends kFileTransferMgr
 	protected function doPutFile ($remote_file , $local_file)
 	{
 		$retries = 3;
-		while($retries)
+
+		$params = array();
+		if ($this->sseType === "KMS")
 		{
-			list($success, $message) = @($this->doPutFileHelper($remote_file , $local_file));
-			if($success)
+			$params['ServerSideEncryption'] = "aws:kms";
+			$params['SSEKMSKeyId'] = $this->sseKmsKeyId;
+		}
+
+		if ($this->sseType === "AES256")
+		{
+			$params['ServerSideEncryption'] = "AES256";
+		}
+
+		while ($retries)
+		{
+			list($success, $message) = @($this->doPutFileHelper($remote_file, $local_file, $params));
+			if ($success)
 				return true;
 
-			KalturaLog::debug("Failed to export File: ".$remote_file." number of retries left: ".$retries);
+			KalturaLog::debug("Failed to export File: " . $remote_file . " number of retries left: " . $retries);
 			$retries--;
 		}
 		//throw temporary exception so that the batch will retry
 		throw new kTemporaryException("Can't put file [$remote_file] - " . $message);
 	}
 
-	private function doPutFileHelper($remote_file , $local_file)
+	private function doPutFileHelper($remote_file , $local_file, $params)
 	{
-		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
-		KalturaLog::debug("remote_file: ".$remote_file);
-
+		list($bucket, $remote_file) = explode("/", ltrim($remote_file, "/"), 2);
+		KalturaLog::debug("remote_file: " . $remote_file);
+		$fp = null;
 		try
 		{
+			$size = filesize($local_file);
+			KalturaLog::debug("file size is : " . $size);
 
-			$params = array(
-					'Bucket'       => $bucket,
-					'Key'          => $remote_file,
-					'SourceFile'   => $local_file,
-					'ACL'          => $this->filesAcl,
-			);
-
-			if($this->sseType === "KMS")
+			if ($size > self::MULTIPART_UPLOAD_MINIMUM_FILE_SIZE)
 			{
-				$params['ServerSideEncryption'] = "aws:kms";
-				$params['SSEKMSKeyId'] = $this->sseKmsKeyId;
+				KalturaLog::debug("Executing Multipart upload to S3: for " . $local_file);
+				$fp = fopen($local_file, 'r');
+				$res = $this->s3->upload($bucket,
+					$remote_file,
+					$fp,
+					$this->filesAcl,
+					array('params' => $params)
+				);
+				fclose($fp);
 			}
-
-			if($this->sseType === "AES256")
+			else
 			{
-				$params['ServerSideEncryption'] = "AES256";
-			}
+				KalturaLog::debug("Executing Single-part upload to S3: for " . $local_file);
+				$params['Bucket'] = $bucket;
+				$params['Key'] = $remote_file;
+				$params['SourceFile'] = $local_file;
+				$params['ACL'] = $this->filesAcl;
 
-			$res = $this->s3->putObject($params);
+				$res = $this->s3->putObject($params);
+			}
 
 			KalturaLog::debug("File uploaded to Amazon, info: " . print_r($res, true));
 			return array(true, null);
 		}
-		catch ( Exception $e )
+		catch (Exception $e)
 		{
-			KalturaLog::err("error uploading file ".$local_file." s3 info: ".$e->getMessage());
+			if ($fp)
+			{
+				fclose($fp);
+			}
+			KalturaLog::err("error uploading file " . $local_file . " s3 info: " . $e->getMessage());
 			return array(false, $e->getMessage());
 		}
 	}
