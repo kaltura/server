@@ -2869,6 +2869,7 @@ class kKavaReportsMgr extends kKavaBase
 			$dimension = $cur_filter[self::DRUID_DIMENSION];
 			if (!isset($valid_dimensions_to_filter[$dimension]))
 			{
+				KalturaLog::log("Invalid filter for dimension [$dimension] in data source [$data_source]. Filter is ignored.");
 				continue;
 			}
 			if (isset($cur_filter[self::DRUID_TYPE]))
