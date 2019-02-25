@@ -21,7 +21,8 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		4 => "PENDING_MODERATION",
 		5 => "REJECTED",
 		6 => "ERROR",
-		7 => "ABORTED"
+		7 => "ABORTED",
+		8 => "PENDING_ENTRY_READY",
 	);
 	
 	static private $serviceFeatureEnumTranslate = array(
@@ -32,6 +33,7 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 	static private $serviceTypeEnumTranslate = array(
 		1 => "HUMAN",
 		2 => "MACHINE",
+		3 => "ALIGNMENT",
 	);
 	
 	static private $catalogItemData = array();
