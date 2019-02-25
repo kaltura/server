@@ -6,7 +6,7 @@
   */
 class KalturaQuizUserEntry extends KalturaUserEntry{
 
-	CONST DEFAULT_VERSION = 1;
+	CONST DEFAULT_VERSION = 0;
 
 	/**
 	 * @var float
@@ -87,7 +87,8 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 				$userEntryNewestVersion = UserEntryPeer::retriveNewestVersionOfUserEntrySubmitted( $object_to_fill->getKuserId(), $this->entryId, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
 				$entry = entryPeer::retrieveByPK($this->entryId);
 				$quiz = QuizPlugin::getQuizData($entry);
-				if ($quiz->getMaxRetakesAllowed() && $userEntryNewestVersion->getVersion() + 1 <= $quiz->getMaxRetakesAllowed())
+				//version counting is starting from zero
+				if ($quiz->getMaxRetakesAllowed() && $userEntryNewestVersion->getVersion() + 1 <= $quiz->getMaxRetakesAllowed() - 1)
 				{
 					$object_to_fill->setVersion($userEntryNewestVersion->getVersion() + 1);
 				}

@@ -1,1 +1,1 @@
-ALTER TABLE user_entry ADD version INTEGER AFTER custom_data;
+ALTER TABLE user_entry ADD version INTEGER DEFAULT 0 AFTER custom_data;
