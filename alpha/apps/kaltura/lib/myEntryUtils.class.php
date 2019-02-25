@@ -813,7 +813,12 @@ class myEntryUtils
 				KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 			}
 			$offset = max($start_sec, 0);
-			$bifInterval = round((($entry->getLengthInMsecs() / 1000) - $offset) / $vid_slices, 3);
+			$lengthInSec = $entry->getLengthInMsecs() / 1000;
+			if($offset > $lengthInSec)
+			{
+				KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
+			}
+			$bifInterval = kBifCreator::calculateBifInterval($lengthInSec, $vid_slices, $offset);
 			KalturaLog::debug("BIF interval for capturing frames: [$bifInterval] with offset:[$offset]");
 			$calc_vid_sec = $offset;
 		}
@@ -873,6 +878,10 @@ class myEntryUtils
 				else if($bif)
 				{
 					$calc_vid_sec += $bifInterval;
+					if($calc_vid_sec > ($entryLengthInMsec / 1000))
+					{
+						continue;
+					}
 				}
 				else if ($vid_slices != -1) // need to create a thumbnail at a specific slice
 				{
@@ -892,11 +901,6 @@ class myEntryUtils
 				else // default thumbnail was not created yet
 				{
 					$calc_vid_sec = $servingVODfromLive ? self::DEFAULT_THUMB_SEC_LIVE : $entry->getBestThumbOffset();
-				}
-
-				if($calc_vid_sec > ($entryLengthInMsec / 1000))
-				{
-					continue;
 				}
 					
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
@@ -1063,11 +1067,10 @@ class myEntryUtils
 			$imgPathsToUnlink = array_unique($imgPathsToUnlink);
 			$bifImgPaths = array_unique($bifImgPaths);
 			$finalThumbPath = kFile::replaceExt($finalThumbPath, 'bif');
-			$jpgProcessingThumbPath = $processingThumbPath;
-			$processingThumbPath = kFile::replaceExt($jpgProcessingThumbPath, 'bif');
-			unlink($jpgProcessingThumbPath);
-			$bifCreator = new kBifCreator($bifImgPaths, $processingThumbPath, $bifInterval);
+			$bifCreator = new kBifCreator($bifImgPaths, $finalThumbPath, $bifInterval);
+			$processingThumbPath = $finalThumbPath;
 			$bifCreator->createBif();
+
 			foreach ($imgPathsToUnlink as $image)
 			{
 				if(file_exists($image))

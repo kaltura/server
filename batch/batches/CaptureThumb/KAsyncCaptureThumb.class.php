@@ -250,7 +250,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			$folderPath = realpath($rootPath) . DIRECTORY_SEPARATOR . uniqid();
 
 			$rootPath = self::createDir($folderPath);
-			if (!$folderPath)
+			if (!$rootPath)
 				die();
 
 			$generalCapturePath = $this->createUniqFileName($rootPath);
@@ -292,13 +292,10 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 
 			$files = scandir($rootPath);
 			$files = array_diff($files, array('.', '..'));
-			KalturaLog::debug("files: " . print_r($files, true));
-			KalturaLog::debug("images: " . print_r($images, true));
 
-			//set bif final path
 			$finalBifPath = $generalCapturePath . '.bif';
 
-			KalturaLog::debug("create bif - [$finalBifPath]");
+			KalturaLog::debug("create bif file in path - [$finalBifPath]");
 			$bifCreator = new kBifCreator($images, $finalBifPath, $bifInterval);
 			$bifCreator->createBif();
 
@@ -327,12 +324,10 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			$fullFilePath = $path . '/' . $file;
 			if(file_exists($fullFilePath))
 			{
-				KalturaLog::debug("clear path for file - [$fullFilePath]");
 				unlink($fullFilePath);
 			}
 		}
 		rmdir($path);
-		KalturaLog::debug("clear path for path - [$path]");
 	}
 
 	protected function generateThumbUsingFfmpeg($mediaFile, $capturePath, $thumbParamsOutput, $mediaInfoVidDur, $mediaInfoDar,
