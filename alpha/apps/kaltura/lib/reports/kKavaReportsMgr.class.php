@@ -2753,8 +2753,12 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity, $filter_metrics = null)
 	{
+		if (!$data_source)
+		{
+			$data_source = self::DATASOURCE_HISTORICAL;
+		}
 		$report_def = array(
-			self::DRUID_DATASOURCE => $data_source ? $data_source : self::DATASOURCE_HISTORICAL,
+			self::DRUID_DATASOURCE => $data_source,
 			self::DRUID_INTERVALS => $intervals,
 			self::DRUID_GRANULARITY => $granularity,
 			self::DRUID_AGGR => array(),
@@ -2859,10 +2863,11 @@ class kKavaReportsMgr extends kKavaBase
 
 		$filter_values = array();
 		$filter_def = array();
-		$valid_dimensions_to_filter = self::$datasources_dimensions[$report_def[self::DRUID_DATASOURCE]];
+		$valid_dimensions_to_filter = self::$datasources_dimensions[$data_source];
 		foreach ($filter as $cur_filter)
 		{
-			if (!in_array($cur_filter[self::DRUID_DIMENSION], $valid_dimensions_to_filter))
+			$dimension = $cur_filter[self::DRUID_DIMENSION];
+			if (!isset($valid_dimensions_to_filter[$dimension]))
 			{
 				continue;
 			}
@@ -2872,7 +2877,6 @@ class kKavaReportsMgr extends kKavaBase
 				continue;
 			}
 
-			$dimension = $cur_filter[self::DRUID_DIMENSION];
 			$values = $cur_filter[self::DRUID_VALUES];
 			if (isset($filter_values[$dimension]))
 			{
