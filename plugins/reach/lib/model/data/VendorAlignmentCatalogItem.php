@@ -19,4 +19,20 @@ class VendorAlignmentCatalogItem extends VendorCatalogItem
 	{
 		$this->setServiceFeature(VendorServiceFeature::ALIGNMENT);
 	}
+	
+	public function getTaskVersion($entryId, $jobData = null)
+	{
+		$taskVersion = parent::getTaskVersion($entryId, $jobData);
+		
+		if(!$jobData || !($jobData instanceof kAlignmentVendorTaskData))
+			return $taskVersion;
+		
+		/* @var $jobData kAlignmentVendorTaskData */
+		$attachmentAsset = assetPeer::retrieveById($jobData->getTextTranscriptAssetId());
+		if(!$attachmentAsset)
+			return $taskVersion;
+		
+		return $taskVersion * $attachmentAsset->getVersion();
+	}
+	
 } // VendorCaptionsCatalogItem
