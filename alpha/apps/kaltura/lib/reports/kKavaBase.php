@@ -229,8 +229,6 @@ class kKavaBase extends kDruidBase
 		),
 	);
 
-
-
 	public static function isPartnerAllowed($partnerId, $serviceType) {
 	    if (kConf::hasParam(self::DRUID_URL)) {
 		if (!kConf::hasParam($serviceType))
