@@ -861,7 +861,7 @@ class myEntryUtils
 			$thumbCaptureByPackager = false;
 			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
 			$params = array($density, $quality, $forceRotation, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
-			$shouldResizeByPackager = self::shouldResizeByPackager($params, $type, array($width, $height));
+			$shouldResizeByPackager = KThumbnailCapture::shouldResizeByPackager($params, $type, array($width, $height));
 			if (
 				// need to create a thumb if either:
 				// 1. entry is a video and a specific second was requested OR a slices were requested
@@ -1174,7 +1174,7 @@ class myEntryUtils
 		$packagerCaptureUrl = str_replace(array ( "{dc}", "{liveType}"), array ( $dc, $liveType) , $packagerCaptureUrl );
 		if (!$calc_vid_sec) //Temp until packager support time 0
 			$calc_vid_sec = self::DEFAULT_THUMB_SEC_LIVE;
-		return self::curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $destThumbPath, $width, $height, '+');
+		return KThumbnailCapture::curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $destThumbPath, $width, $height, '+');
 	}
 	
 	private static function getLiveEntryDcId($entryId, $type)
@@ -1201,7 +1201,7 @@ class myEntryUtils
 
 		$flavorUrl = self::buildThumbUrl($entry, $flavorAsset);
 
-		return self::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
+		return KThumbnailCapture::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
 	}
 
 
@@ -1225,27 +1225,6 @@ class myEntryUtils
 		$url .= self::MP4_FILENAME_PARAMETER;
 		return $url;
 	}
-
-
-	private static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null, $offsetPrefix = '')
-	{
-		$offset = floor($calc_vid_sec*1000);
-		if ($width)
-			$offset .= "-w$width";
-		if ($height)
-			$offset .= "-h$height";
-
-		$packagerThumbCapture = str_replace(
-		array ( "{url}", "{offset}" ),
-		array ( $url , $offsetPrefix . $offset ) ,
-		$packagerCaptureUrl );
-
-		$tempThumbPath = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
-		kFile::closeDbConnections();
-		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath, null, true);
-		return $success;
-	}
-
 
 	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, &$flavorAssetId)
 	{
@@ -1319,7 +1298,7 @@ class myEntryUtils
 
 		if (!$entry_data_path)
 			return false;
-		return self::curlThumbUrlWithOffset($entry_data_path, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
+		return KThumbnailCapture::curlThumbUrlWithOffset($entry_data_path, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
 	}
 
 
@@ -2339,16 +2318,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		kFile::closeDbConnections();
 		$content = KCurlWrapper::getDataFromFile($packagerVolumeMapUrl, null, null, true);
 		return $content;
-	}
-
-	private static function shouldResizeByPackager($params, $type, $dimension)
-	{
-		//check if all null or 0
-		$canBeHandle = (count(array_filter($params)) == 0);
-		// check if only one dimension is given or type 5 (stretches to the exact dimensions)
-		$positiveDimension = array_filter($dimension, function ($v) {return $v > 0;});
-		$validDimension = ($type == 5) || (count($positiveDimension) == 1);
-		return ($canBeHandle && $validDimension);
 	}
 
 	public static function addTrackEntryInfo(entry $entry,$message)
