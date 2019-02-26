@@ -28,12 +28,12 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 	static private $serviceFeatureEnumTranslate = array(
 		1 => "CAPTIONS",
 		2 => "TRANSLATION",
+		3 => "ALIGNMENT",
 	);
 	
 	static private $serviceTypeEnumTranslate = array(
 		1 => "HUMAN",
 		2 => "MACHINE",
-		3 => "ALIGNMENT",
 	);
 	
 	static private $catalogItemData = array();
