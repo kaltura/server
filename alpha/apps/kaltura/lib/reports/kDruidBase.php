@@ -272,6 +272,11 @@ class kDruidBase
 	
 	protected static function runQuery($content, $cache = null, $cacheExpiration = 0)
 	{
+		if (isset($content[self::DRUID_FILTER]) && !$content[self::DRUID_FILTER])
+		{
+			return array();
+		}
+
 		kApiCache::disableConditionalCache();
 		
 		if (!isset($content[self::DRUID_CONTEXT]))

@@ -189,8 +189,6 @@ class kKavaReportsMgr extends kKavaBase
 	const COLUMN_FORMAT_QUOTE = 'quote';
 	const COLUMN_FORMAT_UNIXTIME = 'unixtime';
 
-	const OBJECT_THAT_DOES_NOT_EXIST = 'objectThatDoesNotExist';
-
 	protected static $reports_def = array(
 		myReportsMgr::REPORT_TYPE_TOP_CONTENT => array(
 			self::REPORT_DIMENSION_MAP => array(
@@ -2885,7 +2883,9 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			if (count($values) == 0)
 			{
-				$values = self::OBJECT_THAT_DOES_NOT_EXIST;
+				KalturaLog::Log("Invalid filter for dimension [$dimension]. query with this filter will return empty result.");
+				$report_def[self::DRUID_FILTER] = false;
+				return $report_def;
 			}
 			$filter_def[] = self::getInFilter(
 				$dimension,
