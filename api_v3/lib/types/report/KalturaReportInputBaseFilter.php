@@ -58,9 +58,6 @@ class KalturaReportInputBaseFilter extends KalturaObject
 		if ($this->fromDay && $this->toDay) {
 			$this->fromDate = strtotime(date('Y-m-d 00:00:00', strtotime($this->fromDay)));
 			$this->toDate = strtotime(date('Y-m-d 23:59:59', strtotime($this->toDay)));
-		} else if ($this->fromDate && $this->toDate) {
-			$this->fromDay = gmdate ( "Ymd" , $this->fromDate );
-			$this->toDay = gmdate ( "Ymd" , $this->toDate );
 		}
 
 		foreach ($this->getMapBetweenObjects() as $apiName => $memberName)
