@@ -188,6 +188,8 @@ class kKavaReportsMgr extends kKavaBase
 	
 	const COLUMN_FORMAT_QUOTE = 'quote';
 	const COLUMN_FORMAT_UNIXTIME = 'unixtime';
+
+	const EMPTY_INTERVAL = '2010-01-01T00Z/2010-01-01T00Z';
 		
 	protected static $reports_def = array(
 		myReportsMgr::REPORT_TYPE_TOP_CONTENT => array(
@@ -2169,23 +2171,18 @@ class kKavaReportsMgr extends kKavaBase
 		$day = substr($date_id, 6, 2);
 		return new DateTime("$year-$month-$day");
 	}
-		
-	protected static function dateIdToUnixtime($date_id)
-	{
-		if (!self::isDateIdValid($date_id))
-		{
-			return null;
-		}
-
-		$year = substr($date_id, 0, 4);
-		$month = substr($date_id, 4, 2);
-		$day = substr($date_id, 6, 2);
-		return gmmktime(0, 0, 0, $month, $day, $year);
-	}
 	
 	protected static function formatUnixtime($time)
 	{
 		return gmdate('Y-m-d\TH:i:s\Z', $time);
+	}
+
+	protected static function unixtimeToDateId($time, $tz)
+	{
+		$date = new DateTime();
+		$date->setTimestamp($time);
+		$date->setTimezone($tz);
+		return $date->format('Ymd');
 	}
 
 	protected static function timestampToHourId($timestamp, $tz)
@@ -2252,6 +2249,14 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		return $result;
+	}
+
+	protected static function getFromToDay($input_filter)
+	{
+		$tz = self::getPhpTimezone($input_filter->timeZoneOffset);
+		$from_day = $input_filter->from_day ? $input_filter->from_day : self::unixtimeToDateId($input_filter->from_date, $tz);
+		$to_day = $input_filter->to_day ? $input_filter->to_day : self::unixtimeToDateId($input_filter->to_date, $tz);
+		return array($from_day, $to_day);
 	}
 
 	/// common query functions
@@ -2406,48 +2411,51 @@ class kKavaReportsMgr extends kKavaBase
 				$to_date = self::formatUnixtime($input_filter->to_date);
 				break;
 			}
-
-			return array($from_date . '/' . $to_date);
 		}
-
-		$timezone_offset = sprintf('%s%02d:%02d', 
-			$offset <= 0 ? '+' : '-', 
-			intval(abs($offset) / 60), abs($offset) % 60);
-		
-		switch ($report_interval)
+		else 
 		{
-		case self::INTERVAL_START_TO_END:
-			$from_date = self::dateIdToDate($input_filter->from_day);
-			$to_date = self::dateIdToDate($input_filter->to_day);
-			break;
-			
-		case self::INTERVAL_BASE_TO_START:
-			$to_date = self::dateIdToDateTime($input_filter->from_day);
-			$to_date->sub(new DateInterval('P1D'));
-			$to_date = $to_date->format('Y-m-d');
-			$from_date = self::BASE_DATE_ID;
-			break;
+			$timezone_offset = sprintf('%s%02d:%02d',
+				$offset <= 0 ? '+' : '-',
+				intval(abs($offset) / 60), abs($offset) % 60);
 
-		case self::INTERVAL_BASE_TO_END:
-			$from_date = self::BASE_DATE_ID;
-			$to_date = self::dateIdToDate($input_filter->to_day);
-			break;
-					
-		default:
-			list($from_day, $to_day) = explode('/', $report_interval);
-			$from_date = self::getRelativeDateTime($from_day)->format('Y-m-d');
-			$to_date = self::getRelativeDateTime($to_day)->format('Y-m-d');
-			break;
-		}
+			switch ($report_interval)
+			{
+			case self::INTERVAL_START_TO_END:
+				$from_date = self::dateIdToDate($input_filter->from_day);
+				$to_date = self::dateIdToDate($input_filter->to_day);
+				break;
 
-		if (!$from_date || !$to_date || strcmp($to_date, $from_date) < 0)
-		{
-			$from_date = $to_date = '2010-01-01T00:00:00+00:00';
-		}
-		else
-		{
+			case self::INTERVAL_BASE_TO_START:
+				$to_date = self::dateIdToDateTime($input_filter->from_day);
+				$to_date->sub(new DateInterval('P1D'));
+				$to_date = $to_date->format('Y-m-d');
+				$from_date = self::BASE_DATE_ID;
+				break;
+
+			case self::INTERVAL_BASE_TO_END:
+				$from_date = self::BASE_DATE_ID;
+				$to_date = self::dateIdToDate($input_filter->to_day);
+				break;
+
+			default:
+				list($from_day, $to_day) = explode('/', $report_interval);
+				$from_date = self::getRelativeDateTime($from_day)->format('Y-m-d');
+				$to_date = self::getRelativeDateTime($to_day)->format('Y-m-d');
+				break;
+			}
+
+			if (!$from_date || !$to_date)
+			{
+				return array(self::EMPTY_INTERVAL);
+			}
+
 			$from_date .= self::DAY_START_TIME . $timezone_offset;
 			$to_date .= self::DAY_END_TIME . $timezone_offset;
+
+		}
+		if (strcmp($to_date, $from_date) < 0)
+		{
+			return array(self::EMPTY_INTERVAL);
 		}
 	
 		return array($from_date . '/' . $to_date);
@@ -3370,13 +3378,14 @@ class kKavaReportsMgr extends kKavaBase
 
 
 		// zero fill
+		list($from_day, $to_day) = self::getFromToDay($input_filter);
 		if ($granularity == self::GRANULARITY_MONTH)
 		{
-			$dates = self::getMonthIdRange($input_filter->from_day, $input_filter->to_day);
+			$dates = self::getMonthIdRange($from_day, $to_day);
 		}
 		else
 		{
-			$dates = self::getDateIdRange($input_filter->from_day, $input_filter->to_day);
+			$dates = self::getDateIdRange($from_day, $to_day);
 		}
 		self::zeroFill($result, $dates);
 		
@@ -3488,8 +3497,9 @@ class kKavaReportsMgr extends kKavaBase
 				$filler_graphs[$metric] = array();
 			}
 		}
-
-		$dates = self::getDateIdRange($input_filter->from_day, $input_filter->to_day);
+		
+		list($from_day, $to_day) = self::getFromToDay($input_filter);
+		$dates = self::getDateIdRange($from_day, $to_day);
 		self::zeroFill($filler_graphs, $dates);
 		foreach ($result as $dim => $ignore)
 		{
@@ -4798,7 +4808,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		// Note: using a larger threshold since topN is approximate
-		$intervalDays = intval((self::dateIdToUnixtime($input_filter->to_day) - self::dateIdToUnixtime($input_filter->from_day)) / 86400) + 1;
+		$intervalDays = intval(($input_filter->to_date - $input_filter->from_date) / 86400) + 1;
 		$threshold = max($intervalDays * 30, $page_size * $page_index * 2);		// 30 ~ 10000 / 365, i.e. an interval of 1Y gets a minimum threshold of 10000
 		$threshold = max(self::MIN_THRESHOLD, min($max_result_size, $threshold));
 
@@ -5448,8 +5458,10 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function partnerUsageEditFilter($input_filter)
 	{
 		$current_date_id = date('Ymd');
-		$from_day = min($input_filter->from_day, $current_date_id);
-		
+		$tz = self::getPhpTimezone(self::fixTimeZoneOffset($input_filter->timeZoneOffset));
+		$from_day = $input_filter->from_day ? $input_filter->from_day : self::unixtimeToDateId($input_filter->from_date, $tz);
+		$from_day = min($from_day, $current_date_id);
+	
 		$month_start = substr($from_day, 0, 6) . '01';
 		$date = self::dateIdToDateTime($month_start);
 		$date->modify('+1 month');
