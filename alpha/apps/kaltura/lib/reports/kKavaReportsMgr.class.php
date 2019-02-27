@@ -2221,6 +2221,13 @@ class kKavaReportsMgr extends kKavaBase
 		return gmdate('Y-m-d\TH:i:s\Z', $time);
 	}
 
+	protected static function unixtimeToDateId($time, $tz)
+	{
+		$date = new DateTime("@$time");
+		$date->setTimezone($tz);
+		return $date->format('Ymd');
+	}
+
 	protected static function timestampToHourId($timestamp, $tz)
 	{
 		// hours are returned from druid query with the right offset so no need to change it
@@ -3337,8 +3344,8 @@ class kKavaReportsMgr extends kKavaBase
 
 		// zero fill
 		$tz = self::getPhpTimezone($input_filter->timeZoneOffset);
-		$from_day = $input_filter->from_day ? $input_filter->from_day : self::timestampToDateId($input_filter->from_date, $tz);
-		$to_day = $input_filter->to_day ? $input_filter->to_day : self::timestampToDateId($input_filter->to_date, $tz);
+		$from_day = $input_filter->from_day ? $input_filter->from_day : self::unixtimeToDateId($input_filter->from_date, $tz);
+		$to_day = $input_filter->to_day ? $input_filter->to_day : self::unixtimeToDateId($input_filter->to_date, $tz);
 
 		if ($granularity == self::GRANULARITY_MONTH)
 		{
@@ -3460,8 +3467,8 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		
 		$tz = self::getPhpTimezone($input_filter->timeZoneOffset);
-		$from_day = $input_filter->from_day ? $input_filter->from_day : self::timestampToDateId($input_filter->from_date, $tz);
-		$to_day = $input_filter->to_day ? $input_filter->to_day : self::timestampToDateId($input_filter->to_date, $tz);
+		$from_day = $input_filter->from_day ? $input_filter->from_day : self::unixtimeToDateId($input_filter->from_date, $tz);
+		$to_day = $input_filter->to_day ? $input_filter->to_day : self::unixtimeToDateId($input_filter->to_date, $tz);
 		$dates = self::getDateIdRange($from_day, $to_day);
 		self::zeroFill($filler_graphs, $dates);
 		foreach ($result as $dim => $ignore)
@@ -5392,7 +5399,7 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		$current_date_id = date('Ymd');
 		$tz = self::getPhpTimezone(self::fixTimeZoneOffset($input_filter->timeZoneOffset));
-		$from_day = $input_filter->from_day ? $input_filter->from_day : self::timestampToDateId($input_filter->from_date, $tz);
+		$from_day = $input_filter->from_day ? $input_filter->from_day : self::unixtimeToDateId($input_filter->from_date, $tz);
 		$from_day = min($from_day, $current_date_id);
 	
 		$month_start = substr($from_day, 0, 6) . '01';
