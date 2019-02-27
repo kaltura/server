@@ -2873,7 +2873,7 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			if (count($values) == 0)
 			{
-				KalturaLog::Log("Invalid filter for dimension [$dimension]. query with this filter will return empty result.");
+				KalturaLog::Log("Empty values for dimension [$dimension]. Query with this filter will return empty result.");
 				$report_def[self::DRUID_FILTER] = false;
 				return $report_def;
 			}
