@@ -188,6 +188,8 @@ class kKavaReportsMgr extends kKavaBase
 	
 	const COLUMN_FORMAT_QUOTE = 'quote';
 	const COLUMN_FORMAT_UNIXTIME = 'unixtime';
+
+	const EMPTY_INTERVAL = '2010-01-01T00Z/2010-01-01T00Z';
 		
 	protected static $reports_def = array(
 		myReportsMgr::REPORT_TYPE_TOP_CONTENT => array(
@@ -2202,19 +2204,6 @@ class kKavaReportsMgr extends kKavaBase
 		$day = substr($date_id, 6, 2);
 		return new DateTime("$year-$month-$day");
 	}
-		
-	protected static function dateIdToUnixtime($date_id)
-	{
-		if (!self::isDateIdValid($date_id))
-		{
-			return null;
-		}
-
-		$year = substr($date_id, 0, 4);
-		$month = substr($date_id, 4, 2);
-		$day = substr($date_id, 6, 2);
-		return gmmktime(0, 0, 0, $month, $day, $year);
-	}
 	
 	protected static function formatUnixtime($time)
 	{
@@ -2223,7 +2212,8 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function unixtimeToDateId($time, $tz)
 	{
-		$date = new DateTime("@$time");
+		$date = new DateTime();
+		$date->setTimestamp($time);
 		$date->setTimezone($tz);
 		return $date->format('Ymd');
 	}
@@ -2292,6 +2282,14 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		return $result;
+	}
+
+	protected static function getFromToDay($input_filter)
+	{
+		$tz = self::getPhpTimezone($input_filter->timeZoneOffset);
+		$from_day = $input_filter->from_day ? $input_filter->from_day : self::unixtimeToDateId($input_filter->from_date, $tz);
+		$to_day = $input_filter->to_day ? $input_filter->to_day : self::unixtimeToDateId($input_filter->to_date, $tz);
+		return array($from_day, $to_day);
 	}
 
 	/// common query functions
@@ -2407,8 +2405,6 @@ class kKavaReportsMgr extends kKavaBase
 		$offset = self::fixTimeZoneOffset($input_filter->timeZoneOffset);
 		$input_filter->timeZoneOffset = $offset;
 
-		$is_date_id = false;
-
 		$report_interval = isset($report_def[self::REPORT_INTERVAL]) ? 
 			$report_def[self::REPORT_INTERVAL] : 
 			self::INTERVAL_START_TO_END;
@@ -2436,7 +2432,6 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		else 
 		{
-			$is_date_id = true;
 			$timezone_offset = sprintf('%s%02d:%02d',
 				$offset <= 0 ? '+' : '-',
 				intval(abs($offset) / 60), abs($offset) % 60);
@@ -2466,15 +2461,19 @@ class kKavaReportsMgr extends kKavaBase
 				$to_date = self::getRelativeDateTime($to_day)->format('Y-m-d');
 				break;
 			}
-		}
-		if (!$from_date || !$to_date || strcmp($to_date, $from_date) < 0)
-		{
-			$from_date = $to_date = '2010-01-01T00:00:00+00:00';
-		}
-		else if ($is_date_id)
-		{
+
+			if (!$from_date || !$to_date)
+			{
+				return array(self::EMPTY_INTERVAL);
+			}
+
 			$from_date .= self::DAY_START_TIME . $timezone_offset;
 			$to_date .= self::DAY_END_TIME . $timezone_offset;
+
+		}
+		if (strcmp($to_date, $from_date) < 0)
+		{
+			return array(self::EMPTY_INTERVAL);
 		}
 	
 		return array($from_date . '/' . $to_date);
@@ -3343,10 +3342,7 @@ class kKavaReportsMgr extends kKavaBase
 
 
 		// zero fill
-		$tz = self::getPhpTimezone($input_filter->timeZoneOffset);
-		$from_day = $input_filter->from_day ? $input_filter->from_day : self::unixtimeToDateId($input_filter->from_date, $tz);
-		$to_day = $input_filter->to_day ? $input_filter->to_day : self::unixtimeToDateId($input_filter->to_date, $tz);
-
+		list($from_day, $to_day) = self::getFromToDay($input_filter);
 		if ($granularity == self::GRANULARITY_MONTH)
 		{
 			$dates = self::getMonthIdRange($from_day, $to_day);
@@ -3466,9 +3462,7 @@ class kKavaReportsMgr extends kKavaBase
 			}
 		}
 		
-		$tz = self::getPhpTimezone($input_filter->timeZoneOffset);
-		$from_day = $input_filter->from_day ? $input_filter->from_day : self::unixtimeToDateId($input_filter->from_date, $tz);
-		$to_day = $input_filter->to_day ? $input_filter->to_day : self::unixtimeToDateId($input_filter->to_date, $tz);
+		list($from_day, $to_day) = self::getFromToDay($input_filter);
 		$dates = self::getDateIdRange($from_day, $to_day);
 		self::zeroFill($filler_graphs, $dates);
 		foreach ($result as $dim => $ignore)
