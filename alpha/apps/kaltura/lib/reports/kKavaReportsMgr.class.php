@@ -2606,6 +2606,7 @@ class kKavaReportsMgr extends kKavaBase
 			'cities' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_CITY),
 			'media_types' => array(self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE),
 			'source_types' => array(self::DRUID_DIMENSION => self::DIMENSION_SOURCE_TYPE),
+			'entries_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
@@ -2870,6 +2871,12 @@ class kKavaReportsMgr extends kKavaBase
 
 		foreach ($filter_values as $dimension => $values)
 		{
+			if (count($values) == 0)
+			{
+				KalturaLog::Log("Empty values for dimension [$dimension]. Query with this filter will return empty result.");
+				$report_def[self::DRUID_FILTER] = false;
+				return $report_def;
+			}
 			$filter_def[] = self::getInFilter(
 				$dimension,
 				$values);

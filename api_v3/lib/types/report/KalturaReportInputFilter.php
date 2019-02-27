@@ -156,6 +156,11 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $entryCreatedAtLessThanOrEqual;
 
+	/**
+	 * @var string
+	 */
+	public $entryIdIn;
+
 	private static $map_between_objects = array
 	(
 		'keywords',
@@ -179,6 +184,7 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'ownerIdsIn' => 'owners',
 		'entryCreatedAtGreaterThanOrEqual' => 'gte_entry_created_at',
 		'entryCreatedAtLessThanOrEqual' => 'lte_entry_created_at',
+		'entryIdIn' => 'entries_ids',
 	);
 
 	protected function getMapBetweenObjects()

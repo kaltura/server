@@ -1534,6 +1534,7 @@ class reportsInputFilter
 	public $entry_operator;
 	public $gte_entry_created_at;
 	public $lte_entry_created_at;
+	public $entries_ids;
 
 	public function getFilterBy() {
 		return "";
