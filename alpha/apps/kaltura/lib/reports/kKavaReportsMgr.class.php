@@ -2436,36 +2436,36 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		else 
 		{
-		$is_date_id = true;
-		$timezone_offset = sprintf('%s%02d:%02d', 
-			$offset <= 0 ? '+' : '-', 
-			intval(abs($offset) / 60), abs($offset) % 60);
-		
-		switch ($report_interval)
-		{
-		case self::INTERVAL_START_TO_END:
-			$from_date = self::dateIdToDate($input_filter->from_day);
-			$to_date = self::dateIdToDate($input_filter->to_day);
-			break;
-			
-		case self::INTERVAL_BASE_TO_START:
-			$to_date = self::dateIdToDateTime($input_filter->from_day);
-			$to_date->sub(new DateInterval('P1D'));
-			$to_date = $to_date->format('Y-m-d');
-			$from_date = self::BASE_DATE_ID;
-			break;
+			$is_date_id = true;
+			$timezone_offset = sprintf('%s%02d:%02d',
+				$offset <= 0 ? '+' : '-',
+				intval(abs($offset) / 60), abs($offset) % 60);
 
-		case self::INTERVAL_BASE_TO_END:
-			$from_date = self::BASE_DATE_ID;
-			$to_date = self::dateIdToDate($input_filter->to_day);
-			break;
-					
-		default:
-			list($from_day, $to_day) = explode('/', $report_interval);
-			$from_date = self::getRelativeDateTime($from_day)->format('Y-m-d');
-			$to_date = self::getRelativeDateTime($to_day)->format('Y-m-d');
-			break;
-		}
+			switch ($report_interval)
+			{
+			case self::INTERVAL_START_TO_END:
+				$from_date = self::dateIdToDate($input_filter->from_day);
+				$to_date = self::dateIdToDate($input_filter->to_day);
+				break;
+
+			case self::INTERVAL_BASE_TO_START:
+				$to_date = self::dateIdToDateTime($input_filter->from_day);
+				$to_date->sub(new DateInterval('P1D'));
+				$to_date = $to_date->format('Y-m-d');
+				$from_date = self::BASE_DATE_ID;
+				break;
+
+			case self::INTERVAL_BASE_TO_END:
+				$from_date = self::BASE_DATE_ID;
+				$to_date = self::dateIdToDate($input_filter->to_day);
+				break;
+
+			default:
+				list($from_day, $to_day) = explode('/', $report_interval);
+				$from_date = self::getRelativeDateTime($from_day)->format('Y-m-d');
+				$to_date = self::getRelativeDateTime($to_day)->format('Y-m-d');
+				break;
+			}
 		}
 		if (!$from_date || !$to_date || strcmp($to_date, $from_date) < 0)
 		{
