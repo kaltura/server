@@ -4755,6 +4755,7 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		$start = microtime (true);
 		$total_count = null;
+		$order_found = false;
 
 		$data_source = isset($report_def[self::REPORT_DATA_SOURCE]) ? $report_def[self::REPORT_DATA_SOURCE] : null;
 		$intervals = self::getFilterIntervals($report_def, $input_filter);
@@ -4778,7 +4779,7 @@ class kKavaReportsMgr extends kKavaBase
 					$data[] = array($row[self::DRUID_VALUE]);
 				}
 			}
-			return array($report_def[self::REPORT_DIMENSION_HEADERS], $data, count($data));
+			return array($report_def[self::REPORT_DIMENSION_HEADERS], $data, count($data), $order_found);
 		}
 
 		// Note: max size is already validated externally when $isCsv is true
@@ -4822,6 +4823,10 @@ class kKavaReportsMgr extends kKavaBase
 			if (!in_array($order_by, $metrics))
 			{
 				$order_by = $default_order;
+			}
+			else
+			{
+				$order_found = true;
 			}
 		}
 
@@ -5107,7 +5112,7 @@ class kKavaReportsMgr extends kKavaBase
 		$end = microtime(true);
 		KalturaLog::log('getTable took [' . ($end - $start) . ']');
 
-		return array($headers, $data, $total_count);
+		return array($headers, $data, $total_count, $order_found);
 	}
 
 	protected static function getJoinTableImpl($partner_id, $report_def,
@@ -5274,7 +5279,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		$input_filter->interval = $interval;
-		return array($headers, $data, $total_count);
+		return array($headers, $data, $total_count, $order_found);
 	}
 
 	protected static function getTableImpl($partner_id, $report_def, 
@@ -5282,7 +5287,7 @@ class kKavaReportsMgr extends kKavaBase
 		$page_size, $page_index, $order_by, $object_ids = null, $flags = 0, $response_options)
 	{
 		self::initDynamicMetrics($partner_id, $report_def, $input_filter, $object_ids, $response_options);
-		$retry_order_by_dim = false;
+
 		if (isset($report_def[self::REPORT_EDIT_FILTER_FUNC]))
 		{
 			call_user_func($report_def[self::REPORT_EDIT_FILTER_FUNC], $input_filter);
@@ -5302,16 +5307,12 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$result = self::getJoinTableImpl($partner_id, $report_def, $input_filter, 
 				$page_size, $page_index, $order_by, $object_ids, $flags, $response_options);
-			$retry_order_by_dim = true;
 		}
 		else 
 		{
 			$result = self::getSimpleTableImpl($partner_id, $report_def, $input_filter,
 				$page_size, $page_index, $order_by, $object_ids, $flags, $response_options);
-			$retry_order_by_dim = true;
 		}
-
-		$should_retry_order = self::shouldRetryOrderBy($order_by, $result[0], $report_def, $retry_order_by_dim);
 
 		// finalize / enrich
 		if (isset($report_def[self::REPORT_TABLE_FINALIZE_FUNC]))
@@ -5324,11 +5325,12 @@ class kKavaReportsMgr extends kKavaBase
 			self::enrichData($report_def, $result[0], $partner_id, $result[1]);
 		}
 
-		if ($should_retry_order)
+		//order not found
+		if (isset($result[3]) && $result[3] === false)
 		{
 			self::orderTableByMetric($report_def, $order_by, $result[0], $result[1]);
 		}
-
+		unset($result[3]);
 		return $result;
 	}
 		
@@ -5385,25 +5387,6 @@ class kKavaReportsMgr extends kKavaBase
 			}
 			$result[1] = $new_row;
 		}
-	}
-
-	protected static function shouldRetryOrderBy($order_by, $headers, $report_def, $retry_order_by_dim)
-	{
-		$order_by_metric = self::getMetricFromOrderBy($report_def, $order_by);
-		if (isset($report_def[self::REPORT_JOIN_REPORTS]) && !in_array($order_by_metric, $headers))
-		{
-			//handle the case of join reports where the metric is added in the finalize function
-			return true;
-		}
-
-		$metrics = self::getMetrics($report_def);
-		if ($retry_order_by_dim && !in_array($order_by_metric, $metrics))
-		{
-			//handle the case of ordering not by metric that is not handled
-			return true;
-		}
-
-		return false;
 	}
 
 	protected static function orderTableByMetric($report_def, $order_by, $headers, &$data)
