@@ -5,14 +5,16 @@
  */
 class Form_RulesSubForm extends ConfigureSubForm
 {
-	private $ignore = array('relatedObjects', 'type', 'gs');
+	private $ignore = array('relatedObjects', 'type', 'gs','not');
 	private $prefix = "Rule_";
 
 	private $type;
+	private $condition;
 
-	public function __construct($type)
+	public function __construct($type, $condition)
 	{
 		$this->type = $type;
+		$this->condition = $condition;
 		parent::__construct();
 	}
 
@@ -28,6 +30,9 @@ class Form_RulesSubForm extends ConfigureSubForm
 		$obj = new $this->type();
 		$this->addStringElement("ruleType", $this->prefix);
 		$this->addObjectProperties($obj, $this->ignore, $this->prefix);
+
+		$objCondition = new $this->condition();
+		$this->addObjectProperties($objCondition, $this->ignore, $this->prefix);
 
 		$options = array(
 			'filters' 		=> array('StringTrim'),

@@ -156,6 +156,8 @@ class Form_ReachProfileConfigure extends ConfigureForm
 	}
 
 	public static $rulesMap = array("Kaltura_Client_Reach_Type_AddEntryVendorTaskAction" => "Automatic_Rule");
+	public static $rulesMapCondition = array("boolCondition" => "Kaltura_Client_Type_BooleanEventNotificationCondition");
+
 
 	private function addRulesSection()
 	{
@@ -178,7 +180,7 @@ class Form_ReachProfileConfigure extends ConfigureForm
 	{
 		foreach (self::$rulesMap as $name => $class)
 		{
-			$ruleSubForm = new Form_RulesSubForm($name);
+			$ruleSubForm = new Form_RulesSubForm($name,self::$rulesMapCondition["boolCondition"]);
 			$this->addSubForm($ruleSubForm, "reachProfileRuleTemplate_" . $class);
 		}
 	}
@@ -245,12 +247,19 @@ class Form_ReachProfileConfigure extends ConfigureForm
 		$newRule = array();
 		$newRule['ruleType'] = $ruleType;
 		$catalogItemIds = array();
+		$booleanEventNotificationIds = array();
 		foreach ($rule->actions as $action)
 		{
 			/* @var Kaltura_Client_Reach_Type_AddEntryVendorTaskAction $action */
 			$catalogItemIds[] = $action->catalogItemIds;
 		}
+		foreach ($rule->conditions as $condition)
+		{
+			/* @var  Kaltura_Client_Type_BooleanEventNotificationCondition $condition */
+			$booleanEventNotificationIds[] = $condition->booleanEventNotificationIds;
+		}
 		$newRule['catalogItemIds'] = implode(', ', $catalogItemIds);
+		$newRule['booleanEventNotificationIds'] = implode(', ', $booleanEventNotificationIds);
 		return $newRule;
 	}
 
@@ -269,7 +278,10 @@ class Form_ReachProfileConfigure extends ConfigureForm
 					$action = new Kaltura_Client_Reach_Type_AddEntryVendorTaskAction();
 					$action->catalogItemIds = $rule->catalogItemIds;
 					$description = (empty($rule->description) || $rule->description == self::ADMIN_CONSOLE_RULE_PREFIX) ? (self::ADMIN_CONSOLE_RULE_PREFIX . mt_rand(100000, 999999)) : $rule->description;
-					$rulesArray[] = $this->getReachProfileRule(array($action), $description);
+					$condition = new Kaltura_Client_Type_BooleanEventNotificationCondition();
+					$condition->booleanEventNotificationIds = $rule->booleanEventNotificationIds;
+					$rulesArray[] = $this->getReachProfileRule(array($action), array($condition), $description);
+
 				}
 			}
 		}
@@ -290,12 +302,13 @@ class Form_ReachProfileConfigure extends ConfigureForm
 		return $object;
 	}
 
-	public function getReachProfileRule($actions, $description = null)
+	public function getReachProfileRule($actions, $conditions, $description = null)
 	{
 		$rule = new Kaltura_Client_Type_Rule();
 		$rule->actions = $actions;
 		if ($description)
 			$rule->description = $description;
+		$rule->conditions = $conditions;
 		return $rule;
 	}
 
