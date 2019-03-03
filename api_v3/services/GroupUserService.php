@@ -305,8 +305,9 @@ class GroupUserService extends KalturaBaseService
 
 	protected function checkPermissionsForGroupUserFromKs()
 	{
+
 		return (kCurrentContext::$is_admin_session || kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID ||
-		!PermissionPeer::isValidForPartner("CONTENT_MANAGE_ASSIGN_USER_GROUP", $this->getPartnerId()));
+			kPermissionManager::isPermitted("CONTENT_MANAGE_ASSIGN_USER_GROUP"));
 	}
 
 	/**
