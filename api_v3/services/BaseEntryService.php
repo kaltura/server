@@ -101,8 +101,9 @@ class BaseEntryService extends KalturaEntryService
 
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-    	
-		
+	
+		if ($dbEntry->getStatus() != entryStatus::NO_CONTENT)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ALREADY_WITH_CONTENT);
 		
 		$kResource = $resource->toObject();
     	if($dbEntry->getType() == KalturaEntryType::AUTOMATIC || is_null($dbEntry->getType()))
