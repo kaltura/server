@@ -426,7 +426,13 @@ class KalturaErrors extends APIErrors
 
 	const GROUP_NOT_FOUND = "GROUP_NOT_FOUND;;Group was not found";
 
+	const GROUP_USER_NOT_FOUND = "GROUP_USER_NOT_FOUND;;Group user was not found";
+
 	const GROUP_USER_ALREADY_EXISTS = "GROUP_USER_ALREADY_EXISTS;;GroupUser already exists";
+
+	const NO_PERMISSION_TO_ADD_GROUP_USER_MANAGER = "NO_PERMISSION_TO_ADD_GROUP_USER_MANAGER;;No permission to add a GroupUser manager";
+
+	const NO_PERMISSION_TO_CHANGE_GROUP_USER_ROLE = "NO_PERMISSION_TO_CHANGE_GROUP_USER_ROLE;;No permission to change GroupUser role";
 
 	const USER_EXCEEDED_MAX_GROUPS = "USER_EXCEEDED_MAX_GROUPS;;User exceeded max number of groups";
 

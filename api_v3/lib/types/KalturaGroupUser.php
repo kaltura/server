@@ -6,6 +6,11 @@
  */
 class KalturaGroupUser extends KalturaObject implements IRelatedFilterable
 {
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $id;
 
 	/**
 	 * @var string
@@ -58,8 +63,14 @@ class KalturaGroupUser extends KalturaObject implements IRelatedFilterable
 	 */
 	public $creationMode;
 
+	/**
+	 * @var KalturaGroupUserRole
+	 */
+	public $userRole;
+
 	private static $map_between_objects = array
 	(
+		"id",
 		"userId" => "puserId",
 		"groupId" => "pgroupId",
 		"partnerId",
@@ -67,6 +78,7 @@ class KalturaGroupUser extends KalturaObject implements IRelatedFilterable
 		"createdAt",
 		"updatedAt",
 		"creationMode",
+		"userRole"
 	);
 
 	public function getMapBetweenObjects ( )
@@ -90,5 +102,32 @@ class KalturaGroupUser extends KalturaObject implements IRelatedFilterable
 	public function getFilterDocs()
 	{
 		return array();	
+	}
+
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		parent::validateForUpdate($sourceObject, $propertiesToSkip);
+		if(!kCurrentContext::$is_admin_session)
+		{
+			if($sourceObject->getUserRole() != $this->userRole)
+			{
+				if(!GroupUserService::checkIfKsUserIsGroupManager($this->groupId))
+				{
+					throw new KalturaAPIException(KalturaErrors::NO_PERMISSION_TO_CHANGE_GROUP_USER_ROLE);
+				}
+			}
+		}
+	}
+
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		parent::validateForInsert($propertiesToSkip);
+		if($this->userRole == KalturaGroupUserRole::MANAGER && !kCurrentContext::$is_admin_session)
+		{
+			if(!GroupUserService::checkIfKsUserIsGroupManager($this->groupId))
+			{
+				throw new KalturaAPIException(KalturaErrors::NO_PERMISSION_TO_ADD_GROUP_USER_MANAGER);
+			}
+		}
 	}
 }
