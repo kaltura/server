@@ -460,5 +460,18 @@ class kString
 		else
 			return $str;
 	}
+
+	public static function contains($needle, $str)
+	{
+		$valArray = explode(',', $str);
+		$lowerValArray = array_map('strtolower', $valArray);
+		if(in_array($needle, $lowerValArray))
+		{
+			return true;
+		}
+		return false;
+
+	}
+
 	
 }

@@ -51,7 +51,6 @@ class kBifCreator
 
 		foreach ($images as $image)
 		{
-			KalturaLog::debug("Timestamp index: [$timestampIndex] Image path: [$image] Image offset:[$imageOffset]");
 			if(!file_exists($image))
 			{
 				KalturaLog::debug("Failed to get file [$image]");
@@ -84,11 +83,8 @@ class kBifCreator
 	public static function calculateBifInterval($lengthInSec, $vid_slices, $offset)
 	{
 		$lengthInSec = $lengthInSec - $offset;
-		$interval = floor($lengthInSec / $vid_slices);
-		if ($interval < 1)
-		{
-			$interval = 1;
-		}
+		$interval = max(1, floor($lengthInSec / $vid_slices));
+
 		return $interval;
 	}
 }

@@ -105,6 +105,7 @@ class KalturaThumbParams extends KalturaAssetParams
 	 * interval in seconds for creating thumbnail
 	 *
 	 * @var int
+	 * @minValue 1
 	 */
 	public $interval;
 	
@@ -173,7 +174,6 @@ class KalturaThumbParams extends KalturaAssetParams
 		$this->validatePropertyMinValue('density', 0, true);
 		$this->validatePropertyMinValue('videoOffset', 0, true);
         $this->validatePropertyMinMaxValue('videoOffsetInPercentage', 0, 100, true);
-		$this->validatePropertyMinValue('interval', 1, true);
 
 		$this->validatePropertyMinMaxLength('backgroundColor', 1, 6, true);
 		if(!is_null($this->backgroundColor) && !preg_match('/^[0-9a-fA-F]{1,6}$/', $this->backgroundColor))

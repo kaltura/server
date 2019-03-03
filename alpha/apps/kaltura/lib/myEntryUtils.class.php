@@ -808,18 +808,7 @@ class myEntryUtils
 		$calc_vid_sec = 0;
 		if($bif && $vid_slices)
 		{
-			if($count > self::MAX_BIF_FRAMES)
-			{
-				KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
-			}
-			$offset = max($start_sec, 0);
-			$lengthInSec = $entry->getLengthInMsecs() / 1000;
-			if($offset > $lengthInSec)
-			{
-				KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
-			}
-			$bifInterval = kBifCreator::calculateBifInterval($lengthInSec, $vid_slices, $offset);
-			KalturaLog::debug("BIF interval for capturing frames: [$bifInterval] with offset:[$offset]");
+			list ($offset, $bifInterval) = self::getBifParameters($count, $start_sec, $entry, $vid_slices);
 			$calc_vid_sec = $offset;
 		}
 		
@@ -1174,7 +1163,7 @@ class myEntryUtils
 		$packagerCaptureUrl = str_replace(array ( "{dc}", "{liveType}"), array ( $dc, $liveType) , $packagerCaptureUrl );
 		if (!$calc_vid_sec) //Temp until packager support time 0
 			$calc_vid_sec = self::DEFAULT_THUMB_SEC_LIVE;
-		return KThumbnailCapture::curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $destThumbPath, $width, $height, '+');
+		return self::curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $destThumbPath, $width, $height, '+');
 	}
 	
 	private static function getLiveEntryDcId($entryId, $type)
@@ -1201,7 +1190,7 @@ class myEntryUtils
 
 		$flavorUrl = self::buildThumbUrl($entry, $flavorAsset);
 
-		return KThumbnailCapture::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
+		return self::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
 	}
 
 
@@ -1298,7 +1287,7 @@ class myEntryUtils
 
 		if (!$entry_data_path)
 			return false;
-		return KThumbnailCapture::curlThumbUrlWithOffset($entry_data_path, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
+		return self::curlThumbUrlWithOffset($entry_data_path, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
 	}
 
 
@@ -2354,4 +2343,31 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			}
 		}
 	}
+
+	public static function getBifParameters($count, $start_sec, $entry, $vid_slices)
+	{
+		if($count > self::MAX_BIF_FRAMES)
+		{
+			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
+		}
+		$offset = max($start_sec, 0);
+		$lengthInSec = $entry->getLengthInMsecs() / 1000;
+		if($offset > $lengthInSec)
+		{
+			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
+		}
+		$bifInterval = kBifCreator::calculateBifInterval($lengthInSec, $vid_slices, $offset);
+		KalturaLog::debug("BIF interval for capturing frames: [$bifInterval] with offset:[$offset]");
+
+		return array ($offset, $bifInterval);
+	}
+
+	public static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null, $offsetPrefix = '')
+	{
+		list($packagerThumbCapture, $tempThumbPath) = KThumbnailCapture::generateThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height, $offsetPrefix);
+		kFile::closeDbConnections();
+		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath, null, true);
+		return $success;
+	}
+
 }

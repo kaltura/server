@@ -20,7 +20,7 @@
 class KAsyncCaptureThumb extends KJobHandlerWorker
 {
 	const LOG_SUFFIX = '.log';
-	const BIF = 'bif';
+	const BIF_TAG = 'bif';
 	const DEFAULT_BIF_INTERVAL = 10;
 	const TEMP_FILE_POSTFIX = "temp_1.jpg";
 
@@ -77,9 +77,9 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			if (!$rootPath)
 				die();
 
-			if($this->isBif($thumbParamsOutput))
+			if(kString::contains(self::BIF_TAG, $thumbParamsOutput->tags))
 			{
-				return $this->createBif($job, $data, $rootPath, $mediaFile, $thumbParamsOutput);
+				return $this->createBifFile($job, $data, $rootPath, $mediaFile, $thumbParamsOutput);
 			}
 
 			return $this->createBasicThumb($job, $data, $rootPath, $mediaFile, $thumbParamsOutput);
@@ -236,112 +236,39 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 		return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::FAILED, $data);
 	}
 
-	protected function createBif($job, $data, $rootPath, $mediaFile, $thumbParamsOutput)
+	protected function createBifFile($job, $data, $rootPath, $mediaFile, $thumbParamsOutput)
 	{
-		$capturePath = null;
-		$images = array();
-		if($data->srcAssetType == KalturaAssetType::FLAVOR)
+		if($data->srcAssetType != KalturaAssetType::FLAVOR)
 		{
-			list($mediaInfoWidth, $mediaInfoHeight, $mediaInfoDar, $mediaInfoVidDur, $mediaInfoScanType, $mediaInfoVideoRotation) = $this->getMediaInfoData($job->partnerId, $data->srcAssetId);
-			$bifInterval = $this->getBifInterval($thumbParamsOutput);
-
-			$captureVidSec = $bifInterval;
-			$folderPath = realpath($rootPath) . DIRECTORY_SEPARATOR . uniqid();
-			$rootPath = self::createDir($folderPath);
-			if (!$rootPath)
-				die();
-
-			$generalCapturePath = $this->createUniqFileName($rootPath);
-
-			$count = floor($mediaInfoVidDur / $bifInterval);
-			KalturaLog::debug("Number of images to capture - [$count]");
-
-			$packagerRetries = 3;
-			$this->impersonate($job->partnerId);
-			$entry = self::$kClient->baseEntry->get($job->entryId);
-			$srcFlavorAsset = self::$kClient->flavorAsset->get($data->srcAssetId);
-			$this->unimpersonate();
-			if(!$entry || !$srcFlavorAsset)
-			{
-				KalturaLog::debug("Could not get entry - [$job->entryId] or flavor [$srcFlavorAsset]. Capturing using ffmpeg.");
-				$packagerRetries = 0;
-			}
-
-			$params = array($thumbParamsOutput->density, $thumbParamsOutput->quality, $mediaInfoVideoRotation, $thumbParamsOutput->cropX, $thumbParamsOutput->cropY,
-				$thumbParamsOutput->cropWidth, $thumbParamsOutput->cropHeight, $thumbParamsOutput->stripProfiles);
-			// 5 - always force setting the given dimensions
-			$shouldResizeByPackager = KThumbnailCapture::shouldResizeByPackager($params, 5, array($thumbParamsOutput->width, $thumbParamsOutput->height));
-			list($picWidth, $picHeight) = $shouldResizeByPackager ? array($thumbParamsOutput->width, $thumbParamsOutput->height) : array(null, null);
-
-			while($count--)
-			{
-				$capturePath = $generalCapturePath . '_sec_' . $captureVidSec . '_';
-				if($packagerRetries)
-				{
-					$thumbCaptureByPackager = false;
-					$success = KThumbnailCapture::captureLocalThumbForBifUsingPackager($mediaFile, $capturePath, $captureVidSec, $picWidth, $picHeight);
-					$packagerResizeFullPath = $capturePath . self::TEMP_FILE_POSTFIX;
-					KalturaLog::debug("Packager capture is [$success] with dimension [$picWidth,$picHeight] and packagerResize [$shouldResizeByPackager] in path [$packagerResizeFullPath]");
-					if(!$success)
-					{
-						$packagerRetries--;
-						$thumbCaptureByPackager = $success;
-						$this->captureThumbUsingFfmpeg($mediaFile, $packagerResizeFullPath, $thumbParamsOutput, $mediaInfoVidDur, $mediaInfoDar, $mediaInfoScanType, $data, $mediaInfoWidth, $mediaInfoHeight, $captureVidSec, $job);
-					}
-
-					if ($thumbCaptureByPackager && $shouldResizeByPackager)
-					{
-						KalturaLog::debug("Image was resize in the packager -  setting path [$packagerResizeFullPath]");
-					}
-					else //need to crop the image
-					{
-						$this->cropFrame($packagerResizeFullPath, $data, $mediaFile, $thumbParamsOutput, $job);
-					}
-					$capturePath = $packagerResizeFullPath;
-				}
-				else
-				{
-					$this->captureThumbUsingFfmpeg($mediaFile, $capturePath, $thumbParamsOutput, $mediaInfoVidDur, $mediaInfoDar, $mediaInfoScanType, $data, $mediaInfoWidth, $mediaInfoHeight, $captureVidSec, $job);
-				}
-				$captureVidSec += $bifInterval;
-				$images[] = $capturePath;
-			}
-
-			$finalBifPath = $generalCapturePath . '.bif';
-			KalturaLog::debug("create bif file in path - [$finalBifPath]");
-
-			$bifCreator = new kBifCreator($images, $finalBifPath, $bifInterval);
-			$bifCreator->createBif();
-
-			$data->thumbPath = $finalBifPath;
-			$job = $this->moveFile($job, $data);
-
-			$files = scandir($rootPath);
-			$files = array_diff($files, array('.', '..'));
-			if($this->checkFileExists($job->data->thumbPath))
-			{
-				$updateData = new KalturaCaptureThumbJobData();
-				$updateData->thumbPath = $data->thumbPath;
-				$this->clearDir($rootPath, $files);
-				return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, $updateData);
-			}
-
-			$this->clearDir($rootPath, $files);
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::FAILED, $data);
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::MISSING_ASSETS, 'Asset type not supported', KalturaBatchJobStatus::FAILED, $data);
 		}
-	}
 
-	protected function clearDir($path, $files)
-	{
-		foreach ($files as $file)
+		$bifInterval = $this->getBifInterval($thumbParamsOutput);
+		$rootPath = $this->createRootFolder($rootPath, $job);
+		$generalCapturePath = $this->createUniqFileName($rootPath);
+
+		$images = $this->createBifFrames($job, $data, $bifInterval, $thumbParamsOutput, $generalCapturePath, $mediaFile);
+
+		$finalBifPath = $generalCapturePath . '.bif';
+		KalturaLog::debug("Create bif file in path - [$finalBifPath]");
+		$bifCreator = new kBifCreator($images, $finalBifPath, $bifInterval);
+		$bifCreator->createBif();
+
+		$data->thumbPath = $finalBifPath;
+		$job = $this->moveFile($job, $data);
+
+		$files = scandir($rootPath);
+		$files = array_diff($files, array('.', '..'));
+		if($this->checkFileExists($job->data->thumbPath))
 		{
-			$fullFilePath = $path . '/' . $file;
-			if(file_exists($fullFilePath))
-			{
-				unlink($fullFilePath);
-			}
+			$updateData = new KalturaCaptureThumbJobData();
+			$updateData->thumbPath = $data->thumbPath;
+			$this->removeFiles($rootPath, $files);
+			return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, $updateData);
 		}
-		rmdir($path);
+
+		$this->removeFiles($rootPath, $files);
+		return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::FAILED, $data);
 	}
 
 	protected function generateSingleThumbUsingFfmpeg($mediaFile, $capturePath, $mediaInfoVidDur, $mediaInfoDar,
@@ -369,21 +296,9 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 		return $thumbParamsOutput->interval;
 	}
 
-	protected function cropFrame ($capturePath, $data, $mediaFile, $thumbParamsOutput, $job)
+	protected function cropFrame ($capturePath, $thumbParamsOutput, $job)
 	{
-
-		if ($capturePath || !$data->fileContainer->encryptionKey)
-		{
-			//if generate the thumb here or the file is not encrypt just crop
-			$srcPath = $capturePath ? $capturePath : $mediaFile;
-			$cropped = $this->crop($srcPath ,$capturePath, $thumbParamsOutput);
-		}
-		else
-		{
-			$tempPath = self::createTempClearFile($mediaFile, $data->fileContainer->encryptionKey);
-			$cropped = $this->crop($tempPath ,$capturePath, $thumbParamsOutput);
-			unlink($tempPath);
-		}
+		$cropped = $this->crop($capturePath ,$capturePath, $thumbParamsOutput);
 
 		if(!$cropped || !file_exists($capturePath))
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "One of BIF frames was not cropped", KalturaBatchJobStatus::FAILED);
@@ -394,7 +309,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 	{
 		$tagsArray = explode(',', $thumbParamsOutput->tags);
 		$lowerTagsArray = array_map('strtolower', $tagsArray);
-		if(in_array(self::BIF, $lowerTagsArray))
+		if(in_array(self::BIF_TAG, $lowerTagsArray))
 		{
 			return true;
 		}
@@ -410,6 +325,116 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 		if(!$created || !file_exists($capturePath))
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "One of BIF frames was not created", KalturaBatchJobStatus::FAILED);
 
-		$this->cropFrame($capturePath, $data, $mediaFile, $thumbParamsOutput, $job);
+		$this->cropFrame($capturePath, $thumbParamsOutput, $job);
 	}
+
+	protected function createRootFolder($rootPath, $job)
+	{
+		$folderPath = realpath($rootPath) . DIRECTORY_SEPARATOR . uniqid();
+		$rootPath = self::createDir($folderPath);
+		if (!$rootPath)
+		{
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CANNOT_CREATE_DIRECTORY, 'Can not create directory', KalturaBatchJobStatus::FAILED, $data);
+		}
+		return $rootPath;
+	}
+
+	protected function createBifFrames($job, $data, $bifInterval, $thumbParamsOutput, $generalCapturePath, $mediaFile)
+	{
+		$images = array();
+		$packagerRetries = 3;
+		list($mediaInfoWidth, $mediaInfoHeight, $mediaInfoDar, $mediaInfoVidDur, $mediaInfoScanType, $mediaInfoVideoRotation) = $this->getMediaInfoData($job->partnerId, $data->srcAssetId);
+
+		$captureVidSec = $bifInterval;
+		$count = floor($mediaInfoVidDur / $bifInterval);
+		KalturaLog::debug("Number of images to capture - [$count]");
+
+		$params = array($thumbParamsOutput->density, $thumbParamsOutput->quality, $mediaInfoVideoRotation, $thumbParamsOutput->cropX, $thumbParamsOutput->cropY,
+			$thumbParamsOutput->cropWidth, $thumbParamsOutput->cropHeight, $thumbParamsOutput->stripProfiles);
+		// 5 - always force setting the given dimensions
+		$shouldResizeByPackager = KThumbnailCapture::shouldResizeByPackager($params, 5, array($thumbParamsOutput->width, $thumbParamsOutput->height));
+		list($picWidth, $picHeight) = $shouldResizeByPackager ? array($thumbParamsOutput->width, $thumbParamsOutput->height) : array(null, null);
+		$this->updateJob($job, "Starting to capture [" . $count . "] thumbnails", KalturaBatchJobStatus::PROCESSING);
+		while($count--)
+		{
+			if($captureVidSec >= $mediaInfoVidDur)
+			{
+				continue;
+			}
+			$capturePath = $generalCapturePath . '_sec_' . $captureVidSec . '_';
+			if($packagerRetries)
+			{
+				$thumbCaptureByPackager = false;
+				$success = self::captureLocalThumbForBifUsingPackager($mediaFile, $capturePath, $captureVidSec, $picWidth, $picHeight);
+				$packagerResizeFullPath = $capturePath . self::TEMP_FILE_POSTFIX;
+				KalturaLog::debug("Packager capture is [$success] with dimension [$picWidth,$picHeight] and packagerResize [$shouldResizeByPackager] in path [$packagerResizeFullPath]");
+				if(!$success)
+				{
+					$packagerRetries--;
+					$thumbCaptureByPackager = $success;
+					$this->captureThumbUsingFfmpeg($mediaFile, $packagerResizeFullPath, $thumbParamsOutput, $mediaInfoVidDur, $mediaInfoDar, $mediaInfoScanType, $data, $mediaInfoWidth, $mediaInfoHeight, $captureVidSec, $job);
+					if($packagerRetries == 0)
+					{
+						KalturaLog::warning("Packager retries reached max value. Capturing thumb only using ffmpeg");
+					}
+				}
+				$this->shouldCropImage($thumbCaptureByPackager, $shouldResizeByPackager, $packagerResizeFullPath, $thumbParamsOutput, $job);
+				$capturePath = $packagerResizeFullPath;
+			}
+			else
+			{
+				$this->captureThumbUsingFfmpeg($mediaFile, $capturePath, $thumbParamsOutput, $mediaInfoVidDur, $mediaInfoDar, $mediaInfoScanType, $data, $mediaInfoWidth, $mediaInfoHeight, $captureVidSec, $job);
+			}
+			$captureVidSec += $bifInterval;
+			$images[] = $capturePath;
+		}
+		$this->updateJob($job, "Captured all frames for BIF", KalturaBatchJobStatus::ALMOST_DONE);
+		return $images;
+	}
+
+	protected function shouldCropImage($thumbCaptureByPackager, $shouldResizeByPackager, $packagerResizeFullPath, $thumbParamsOutput, $job)
+	{
+		if ($thumbCaptureByPackager && $shouldResizeByPackager)
+		{
+			KalturaLog::debug("Image was resize in the packager -  setting path [$packagerResizeFullPath]");
+		}
+		else //need to crop the image
+		{
+			$this->cropFrame($packagerResizeFullPath, $thumbParamsOutput, $job);
+		}
+	}
+
+	public static function captureLocalThumbForBifUsingPackager($srcPath, $capturedThumbPath, $calc_vid_sec, $width = null, $height = null)
+	{
+		$packagerCaptureUrl = kConf::get('packager_local_thumb_capture_url', 'local', null);
+		if (!$packagerCaptureUrl || !$srcPath)
+		{
+			return false;
+		}
+		$srcPath = strstr($srcPath, 'content');
+
+		list($packagerThumbCapture, $tempThumbPath) = KThumbnailCapture::generateThumbUrlWithOffset($srcPath, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
+		return  KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath, null, true);
+	}
+
+	protected function removeFiles($dirPath , $filesList = null)
+	{
+		if(!$filesList)
+		{
+			array_map('unlink', array_filter((array) glob($dirPath)));
+		}
+		else
+		{
+			foreach ($filesList as $file)
+			{
+				$fullFilePath = $dirPath . '/' . $file;
+				if(file_exists($fullFilePath))
+				{
+					unlink($fullFilePath);
+				}
+			}
+		}
+		rmdir($dirPath);
+	}
+
 }

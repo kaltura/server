@@ -181,7 +181,7 @@ class thumbnailAction extends sfAction
 
 		if(!is_numeric($bif))
 		{
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'bif most be positive');
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'bif must be positive');
 		}
 
 		if($bif && $vid_slices == -1)
@@ -189,9 +189,9 @@ class thumbnailAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'bif is not supported without vid_slices');
 		}
 
-		if($bif && $vid_slices > 100)
+		if($bif && $vid_slices > myEntryUtils::MAX_BIF_FRAMES)
 		{
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'bif is not supported when vid_slices value is bigger then 100');
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'bif is not supported when vid_slices value is bigger than ' . myEntryUtils::MAX_BIF_FRAMES);
 		}
 
 		if ($upload_token_id)
