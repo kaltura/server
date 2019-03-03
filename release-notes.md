@@ -1,5 +1,5 @@
-# Naos 14.15.0 #
-## Quiz retake - adding version to user_entry table##
+# Naos 14.16.0 #
+## Quiz retake - adding version to user_entry table ##
 
  - Issue Type: Task
  - Issue ID: PLAT-9681
