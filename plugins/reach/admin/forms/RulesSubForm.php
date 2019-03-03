@@ -5,7 +5,8 @@
  */
 class Form_RulesSubForm extends ConfigureSubForm
 {
-	private $ignore = array('relatedObjects', 'type', 'gs','not');
+	private $ignore = array('relatedObjects', 'type', 'gs');
+	private $ignoreCondition = array('relatedObjects', 'type','not');
 	private $prefix = "Rule_";
 
 	private $type;
@@ -32,7 +33,7 @@ class Form_RulesSubForm extends ConfigureSubForm
 		$this->addObjectProperties($obj, $this->ignore, $this->prefix);
 
 		$objCondition = new $this->condition();
-		$this->addObjectProperties($objCondition, $this->ignore, $this->prefix);
+		$this->addObjectProperties($objCondition, $this->ignoreCondition, $this->prefix);
 
 		$options = array(
 			'filters' 		=> array('StringTrim'),

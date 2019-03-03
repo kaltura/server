@@ -156,8 +156,6 @@ class Form_ReachProfileConfigure extends ConfigureForm
 	}
 
 	public static $rulesMap = array("Kaltura_Client_Reach_Type_AddEntryVendorTaskAction" => "Automatic_Rule");
-	public static $rulesMapCondition = array("boolCondition" => "Kaltura_Client_Type_BooleanEventNotificationCondition");
-
 
 	private function addRulesSection()
 	{
@@ -178,11 +176,8 @@ class Form_ReachProfileConfigure extends ConfigureForm
 
 	private function addRulesTemplate()
 	{
-		foreach (self::$rulesMap as $name => $class)
-		{
-			$ruleSubForm = new Form_RulesSubForm($name,self::$rulesMapCondition["boolCondition"]);
-			$this->addSubForm($ruleSubForm, "reachProfileRuleTemplate_" . $class);
-		}
+		$ruleSubForm = new Form_RulesSubForm("Kaltura_Client_Reach_Type_AddEntryVendorTaskAction","Kaltura_Client_Type_BooleanEventNotificationCondition");
+		$this->addSubForm($ruleSubForm, "reachProfileRuleTemplate_" . "Automatic_Rule");
 	}
 
 	public function populateFromObject($object, $add_underscore = true)
