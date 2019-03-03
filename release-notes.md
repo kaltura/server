@@ -1,3 +1,18 @@
+# Naos 14.15.0 #
+## Quiz retake - adding version to user_entry table##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-9681
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+
+mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /deployment/updates/sql/2019_02_25_alter_user_entry_version.sql
+
+
 # Naos 14.14.0 #
 
 ## Schedule Event - Add sphinx match optimization##
