@@ -426,6 +426,8 @@ class KalturaErrors extends APIErrors
 
 	const GROUP_NOT_FOUND = "GROUP_NOT_FOUND;;Group was not found";
 
+	const GROUP_USER_NOT_FOUND = "GROUP_USER_NOT_FOUND;;Group user was not found";
+
 	const GROUP_USER_ALREADY_EXISTS = "GROUP_USER_ALREADY_EXISTS;;GroupUser already exists";
 
 	const USER_EXCEEDED_MAX_GROUPS = "USER_EXCEEDED_MAX_GROUPS;;User exceeded max number of groups";

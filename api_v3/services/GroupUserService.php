@@ -17,15 +17,16 @@ class GroupUserService extends KalturaBaseService
 
 	/**
 	 * Add new GroupUser
-	 * 
+	 *
 	 * @action add
 	 * @param KalturaGroupUser $groupUser
 	 * @return KalturaGroupUser
+	 * @throws KalturaAPIException
 	 */
 	function addAction(KalturaGroupUser $groupUser)
 	{
+		$this->checkPermissionsForGroupUser($groupUser->groupId);
 		/* @var $dbGroupUser KuserKgroup*/
-
 		$partnerId = $this->getPartnerId();
 
 		//verify kuser exists
@@ -60,41 +61,76 @@ class GroupUserService extends KalturaBaseService
 	}
 
 	/**
+	 * update GroupUser
+	 *
+	 * @action update
+	 * @param string $groupUserId
+	 * @param KalturaGroupUser $groupUser
+	 * @return KalturaGroupUser
+	 * @throws KalturaAPIException
+	 */
+	function updateAction($groupUserId, KalturaGroupUser $groupUser)
+	{
+		$currentDBGroupUser = KuserKgroupPeer::retrieveByPK($groupUserId);
+		if (!$currentDBGroupUser)
+		{
+			throw new KalturaAPIException(KalturaErrors::GROUP_USER_NOT_FOUND);
+		}
+
+		$this->checkPermissionsForGroupUser($currentDBGroupUser->getKgroupId());
+		$dbGroupUser = $groupUser->toUpdatableObject($currentDBGroupUser);
+		$dbGroupUser->save();
+		$groupUser = new KalturaGroupUser();
+		$groupUser->fromObject($dbGroupUser, $this->getResponseProfile());
+		return $groupUser;
+	}
+
+	/**
 	 * delete by userId and groupId
 	 *
 	 * @action delete
 	 * @param string $userId
 	 * @param string $groupId
+	 * @throws KalturaAPIException
 	 */
 	function deleteAction($userId, $groupId)
 	{
+		$this->checkPermissionsForGroupUser($groupId);
 		$partnerId = $this->getPartnerId();
-
 		//verify kuser exists
 		$kuser = kuserPeer::getKuserByPartnerAndUid( $partnerId, $userId);
 		if (!$kuser)
+		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
+		}
 
 
 		//verify group exists
 		$kgroup = kuserPeer::getKuserByPartnerAndUid(  $partnerId, $groupId);
-		if (! $kgroup){
+		if (!$kgroup)
+		{
 			//if the delete worker was triggered due to group deletion
-			if (kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
+			if(kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
+			{
 				throw new KalturaAPIException(KalturaErrors::GROUP_NOT_FOUND, $groupId);
+			}
 
 			kuserPeer::setUseCriteriaFilter(false);
 			$kgroup = kuserPeer::getKuserByPartnerAndUid($partnerId, $groupId);
 			kuserPeer::setUseCriteriaFilter(true);
 
-			if (!$kgroup)
-				throw new KalturaAPIException ( KalturaErrors::GROUP_NOT_FOUND, $groupId );
+			if(!$kgroup)
+			{
+				throw new KalturaAPIException (KalturaErrors::GROUP_NOT_FOUND, $groupId);
+			}
 		}
 
 
 		$dbKuserKgroup = KuserKgroupPeer::retrieveByKuserIdAndKgroupId($kuser->getId(), $kgroup->getId());
-		if (!$dbKuserKgroup)
+		if(!$dbKuserKgroup)
+		{
 			throw new KalturaAPIException(KalturaErrors::GROUP_USER_DOES_NOT_EXIST, $userId, $groupId);
+		}
 
 		$dbKuserKgroup->setStatus(KuserKgroupStatus::DELETED);
 		$dbKuserKgroup->save();
@@ -113,10 +149,16 @@ class GroupUserService extends KalturaBaseService
 	function listAction(KalturaGroupUserFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
+		{
 			$filter = new KalturaGroupUserFilter();
-			
+		}
+
+		$this->checkPermissionsForList($filter);
+
 		if (!$pager)
+		{
 			$pager = new KalturaFilterPager();
+		}
 			
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
@@ -222,6 +264,76 @@ class GroupUserService extends KalturaBaseService
 			if (!preg_match(kuser::PUSER_ID_REGEXP, trim($groupId)))
 			{
 				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'groupIds');
+			}
+		}
+	}
+
+	protected function throwServiceForbidden()
+	{
+		$e = new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN, $this->serviceId.'->'.$this->actionName);
+		header("X-Kaltura:error-".$e->getCode());
+		header("X-Kaltura-App: exiting on error ".$e->getCode()." - ".$e->getMessage());
+		throw $e;
+	}
+
+	protected function checkPermissionsForGroupUser($groupId)
+	{
+		if(!CheckPermissionsForGroupUseFromKs() && !self::checkIfKsUserIsGroupManager($groupId))
+		{
+			$this->throwServiceForbidden();
+		}
+	}
+
+	public static function checkIfKsUserIsGroupManager($pUserGroupId)
+	{
+		$kuserId = kCurrentContext::getCurrentKsKuserId();
+		if($kuserId)
+		{
+			$groupUser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $pUserGroupId);
+			if($groupUser)
+			{
+				$ksUserGroup = KuserKgroupPeer::retrieveByKuserIdAndKgroupId($kuserId, $groupUser->getKuserId());
+				if ($ksUserGroup && $ksUserGroup->getUserRole() == GroupUserRole::MANAGER)
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	protected function checkPermissionsForGroupUserFromKs()
+	{
+		return (kCurrentContext::$is_admin_session || kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID ||
+			kPermissionManager::isPermitted("CONTENT_MANAGE_ASSIGN_USER_GROUP"));
+	}
+
+	/**
+	 * @param KalturaGroupUserFilter $filter
+	 * @throws KalturaAPIException
+	 */
+	protected function checkPermissionsForList($filter)
+	{
+		if(!$this->checkPermissionsForGroupUserFromKs())
+		{
+			if($filter->groupIdEqual == null && $filter->userIdEqual == null)
+			{
+				throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL,
+					$filter->getFormattedPropertyNameWithClassName('userIdEqual') .
+					'/' . $this->getFormattedPropertyNameWithClassName('groupIdEqual'));
+			}
+			else if($filter->userIdEqual != null)
+			{
+				$kuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $filter->userIdEqual);
+				if($kuser->getKuserId() != kCurrentContext::getCurrentKsKuserId())
+				{
+					$this->throwServiceForbidden();
+				}
+			}
+			else if(!self::checkIfKsUserIsGroupManager($filter->groupIdEqual))
+			{
+				$this->throwServiceForbidden();
 			}
 		}
 	}
