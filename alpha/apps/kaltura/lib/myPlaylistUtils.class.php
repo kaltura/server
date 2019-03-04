@@ -1159,6 +1159,10 @@ HTML;
 		$captionFiles = array();
 		$mediaEntry = null;
 		$maxFlavorCount = 0;
+		
+		if(!$entries)
+			return array($entryIds, $durations, $mediaEntry, $captionFiles);
+		
 		foreach ($entries as $entry)
 		{
 			$entryIds[] = $entry->getId();
