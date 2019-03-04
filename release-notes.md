@@ -1,4 +1,20 @@
 # Naos 14.16.0 #
+## Groups-BE - Allow group manager ##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-8580
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+			
+Run deployment script:
+		
+		- php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_02_28_update_groupuser_permission.php
+
+
 ## Quiz retake - adding version to user_entry table ##
 
  - Issue Type: Task
