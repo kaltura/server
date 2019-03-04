@@ -278,7 +278,7 @@ class GroupUserService extends KalturaBaseService
 
 	protected function checkPermissionsForGroupUser($groupId)
 	{
-		if(!CheckPermissionsForGroupUseFromKs() && !self::checkIfKsUserIsGroupManager($groupId))
+		if(!$this->checkPermissionsForGroupUserFromKs() && !self::checkIfKsUserIsGroupManager($groupId))
 		{
 			$this->throwServiceForbidden();
 		}
