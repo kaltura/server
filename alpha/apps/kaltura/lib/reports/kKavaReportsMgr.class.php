@@ -1492,6 +1492,23 @@ class kKavaReportsMgr extends kKavaBase
 			),
 			self::REPORT_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_UNIQUE_CONTRIBUTORS),
 		),
+
+		myReportsMgr::REPORT_TYPE_MODERATION_REASONS => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'reason' => self::DIMENSION_EVENT_VAR1
+			),
+			self::REPORT_FILTER => array(
+				array(
+					self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
+					self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_LIVE_STREAM, self::MEDIA_TYPE_LIVE_WIN_MEDIA, self::MEDIA_TYPE_LIVE_REAL_MEDIA, self::MEDIA_TYPE_LIVE_QUICKTIME)
+				),
+				array(
+					self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+					self::DRUID_VALUES => array(self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_STATUS)
+				),
+			),
+			self::REPORT_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_UNIQUE_CONTRIBUTORS),
+		),
 	);
 	
 	protected static $event_type_count_aggrs = array(
