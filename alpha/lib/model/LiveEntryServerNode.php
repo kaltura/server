@@ -24,14 +24,20 @@ class LiveEntryServerNode extends EntryServerNode
 		$liveEntry = $this->getLiveEntry();
 		if($liveEntry)
 		{
+			$shouldIndex = true;
 			if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
 			{
+				$shouldIndex = false;
 				$liveEntry->setPrimaryServerNodeId($this->getServerNodeId());
 				
 				if(!$liveEntry->getCurrentBroadcastStartTime())
 					$liveEntry->setCurrentBroadcastStartTime(time());
+				if (!$liveEntry->save())
+				{
+					$shouldIndex = true;
+				}
 			}
-			if (!$liveEntry->save())
+			if ($shouldIndex)
 			{
 				$liveEntry->indexToSearchIndex();
 			}

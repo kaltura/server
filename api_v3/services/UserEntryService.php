@@ -47,6 +47,7 @@ class UserEntryService extends KalturaBaseService {
 	 * @action update
 	 * @param int $id
 	 * @param KalturaUserEntry $userEntry
+	 * @return KalturaUserEntry
 	 * @throws KalturaAPIException
 	 */
 	public function updateAction($id, KalturaUserEntry $userEntry)

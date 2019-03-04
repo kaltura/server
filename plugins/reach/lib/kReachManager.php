@@ -119,12 +119,36 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP && in_array(entryPeer::STATUS, $modifiedColumns))
 		{
 			if ($object->getStatus() == entryStatus::READY)
-				return $this->checkAutomaticRules($object, true);
-
-			if ($object->getStatus() == entryStatus::DELETED)
-				return $this->handleEntryDeleted($object);
+			{
+				return $this->handleEntryReady($object);
+			}
+			
+			if(in_array($object->getStatus(), array(entryStatus::DELETED, entryStatus::ERROR_CONVERTING, entryStatus::ERROR_CONVERTING)))
+			{
+				return $this->abortTasks($object);
+			}
 		}
 
+		return true;
+	}
+	
+	private function handleEntryReady(entry $object)
+	{
+		$this->checkAutomaticRules($object, true);
+		
+		//Check if there are any tasks that were created with pending entry ready status
+		$pendingEntryReadyTasks = EntryVendorTaskPeer::retrieveByEntryIdAndStatuses($object->getId(), $object->getPartnerId(), array(EntryVendorTaskStatus::PENDING_ENTRY_READY));
+		
+		foreach ($pendingEntryReadyTasks as $pendingEntryReadyTask)
+		{
+			/* @var $pendingEntryReadyTask EntryVendorTask */
+			$newStatus = $pendingEntryReadyTask->getIsRequestModerated() ? EntryVendorTaskStatus::PENDING_MODERATION : EntryVendorTaskStatus::PENDING;
+			$pendingEntryReadyTask->setStatus($newStatus);
+			$pendingEntryReadyTask->setAccessKey(kReachUtils::generateReachVendorKs($pendingEntryReadyTask->getEntryId(), $pendingEntryReadyTask->getIsRequestModerated(), $pendingEntryReadyTask->getCatalogItem()->getKsExpiry()));
+			if($pendingEntryReadyTask->getPrice() == 0)
+				$pendingEntryReadyTask->setPrice(kReachUtils::calculateTaskPrice($object, $pendingEntryReadyTask->getCatalogItem()));
+			$pendingEntryReadyTask->save();
+		}
 		return true;
 	}
 
@@ -274,7 +298,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		$status = EntryVendorTaskStatus::PENDING;
 		if ($validateModeration && $reachProfile->shouldModerate($vendorCatalogItem->getServiceType()))
+		{
+			$entryVendorTask->setIsRequestModerated(true);
 			$status = EntryVendorTaskStatus::PENDING_MODERATION;
+		}
+		if($entry->getStatus() != entryStatus::READY)
+			$status = EntryVendorTaskStatus::PENDING_ENTRY_READY;
 
 		$dictionary = $reachProfile->getDictionaryByLanguage($vendorCatalogItem->getSourceLanguage());
 		if ($dictionary)
@@ -341,16 +370,32 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return true;
 	}
 
-	private function handleEntryDeleted(entry $entry)
+	private function abortTasks(entry $entry)
 	{
-		//Delete all pending moderation tasks
-		$pendingModerationTasks = EntryVendorTaskPeer::retrievePendingByEntryId($entry->getId(), $entry->getPartnerId(), array(EntryVendorTaskStatus::PENDING_MODERATION));
+		//Delete all pending tasks
+		$entryStatusErrorMessage = $this->getAbortEntryStatusMessage($entry->getStatus());
+		$pendingModerationTasks = EntryVendorTaskPeer::retrievePendingByEntryId($entry->getId(), $entry->getPartnerId());
 		foreach ($pendingModerationTasks as $pendingModerationTask)
 		{
 			/* @var $pendingModerationTask EntryVendorTask */
 			$pendingModerationTask->setStatus(EntryVendorTaskStatus::ABORTED);
-			$pendingModerationTask->setErrDescription("Task was aborted by server, associated entry [{$entry->getId()}] was deleted");
+			$pendingModerationTask->setErrDescription("Task was aborted by server, associated entry [{$entry->getId()}] $entryStatusErrorMessage");
 			$pendingModerationTask->save();
+		}
+	}
+	
+	private function getAbortEntryStatusMessage($status)
+	{
+		switch ($status)
+		{
+			case entryStatus::DELETED:
+				return "deleted";
+			case entryStatus::ERROR_CONVERTING:
+				return "error'd while converting";
+			case entryStatus::ERROR_IMPORTING:
+				return "error'd while importing";
+			default:
+				return "invalid status provided";
 		}
 	}
 
