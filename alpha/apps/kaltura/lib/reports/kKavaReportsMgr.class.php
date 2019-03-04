@@ -1481,8 +1481,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_DIMENSION_MAP => array(
 				'percentile' => self::DIMENSION_PERCENTILES
 			),
-			self::REPORT_GRAPH_METRICS => array(self::METRIC_COUNT_VIEWERS),
-			self::REPORT_GRAPH_TYPE => self::GRAPH_MULTI_BY_NAME,
+			self::REPORT_METRICS => array(self::METRIC_COUNT_VIEWERS),
 		)
 	);
 	
@@ -1940,8 +1939,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		self::$aggregations_def[self::METRIC_COUNT_VIEWERS] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
-			self::getLongSumAggregator(self::METRIC_COUNT_VIEWERS, self::METRIC_COUNT)
-		);
+			self::getLongSumAggregator(self::METRIC_COUNT_VIEWERS, self::METRIC_COUNT));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
@@ -3217,18 +3215,6 @@ class kKavaReportsMgr extends kKavaBase
 				$transform_enrich_def = null;
 			}
 			$query = self::getGroupByReport($data_source, $partner_id, $intervals, $granularity_def, array($dimension), $metrics, $druid_filter);
-			/**
-			if (isset($report_def[self::REPORT_DIMENSION_ORDER]))
-			{
-				$query[self::DRUID_LIMIT_SPEC] = self::getDefaultLimitSpec(
-					$threshold,
-					array(self::getOrderByColumnSpec(
-						$dimension,
-						self::DRUID_ASCENDING,
-						self::DRUID_NUMERIC)
-					));
-			}
-			 */
 			break;
 				
 		default:
