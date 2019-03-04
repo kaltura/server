@@ -54,6 +54,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_ORIGIN_BANDWIDTH_SIZE_MB = 'origin_bandwidth_consumption';
 	const METRIC_UNIQUE_CONTRIBUTORS = 'unique_contributors';
 	const METRIC_ENGAGEMENT_RANKING = 'engagement_ranking';
+	const METRIC_PLAYS_RANKING = 'plays_ranking';
+	const METRIC_ENTRIES_RANKING = 'entries_ranking';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -84,6 +86,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_PEAK_DURATION_MSEC = 'peak_msecs';
 	const METRIC_AVERAGE_DURATION_MSEC = 'average_msecs';
 	const METRIC_LATEST_DURATION_MSEC = 'latest_msecs';
+	const METRIC_CONTRIBUTOR_RANKING = 'contributor_ranking';
 	
 	// player-events-realtime specific metrics
 	const METRIC_VIEW_PLAY_TIME_SEC = 'sum_view_time';
@@ -1446,8 +1449,9 @@ class kKavaReportsMgr extends kKavaBase
 						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
 						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_LIVE_STREAM, self::MEDIA_TYPE_LIVE_WIN_MEDIA, self::MEDIA_TYPE_LIVE_REAL_MEDIA, self::MEDIA_TYPE_LIVE_QUICKTIME)
 					),
-					self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
+					self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_PLAYS_RANKING),
 					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY),
+					self::REPORT_TOTAL_METRICS => array(self::EVENT_TYPE_PLAY),
 				),
 
 				// entries & msecs added
@@ -1457,11 +1461,18 @@ class kKavaReportsMgr extends kKavaBase
 						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
 						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_LIVE_STREAM, self::MEDIA_TYPE_LIVE_WIN_MEDIA, self::MEDIA_TYPE_LIVE_REAL_MEDIA, self::MEDIA_TYPE_LIVE_QUICKTIME)
 					),
-					self::REPORT_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC),
+					self::REPORT_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_ENTRIES_RANKING),
 					self::REPORT_TOTAL_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_UNIQUE_CONTRIBUTORS),
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_UNIQUE_CONTRIBUTORS),
 				),
 			),
+			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addContributorRankingColumn',
+			self::REPORT_TABLE_MAP => array(
+				'count_plays' => self::EVENT_TYPE_PLAY,
+				'added_entries' => self::METRIC_ENTRIES_ADDED,
+				'added_msecs' => self::METRIC_DURATION_ADDED_MSEC,
+				'contributor_ranking' => self::METRIC_CONTRIBUTOR_RANKING,
+			)
 		),
 
 		myReportsMgr::REPORT_TYPE_TOP_SOURCES => array(
@@ -1575,7 +1586,9 @@ class kKavaReportsMgr extends kKavaBase
 	);
 
 	protected static $dynamic_metrics = array(
-		self::METRIC_ENGAGEMENT_RANKING => 'self::getEngagementRankingDef'
+		self::METRIC_ENGAGEMENT_RANKING => 'self::getEngagementRankingDef',
+		self::METRIC_PLAYS_RANKING => 'self::getPlaysRankingDef',
+		self::METRIC_ENTRIES_RANKING => 'self::getEntriesRankingDef',
 	);
 
 	protected static $php_timezone_names = array(
@@ -2065,6 +2078,42 @@ class kKavaReportsMgr extends kKavaBase
 						self::getFieldRatioPostAggr('avg_unique_percentiles',
 							self::METRIC_UNIQUE_PERCENTILES_SUM,
 							self::EVENT_TYPE_PLAY), 0.025
+					)
+				)
+			)
+		);
+	}
+
+	protected static function getPlaysRankingDef($partner_id, $report_def, $input_filter, $object_ids, $response_options)
+	{
+		$maxPlays = self::getMetricMaxValue($partner_id, $report_def, $input_filter, $object_ids, $response_options, self::EVENT_TYPE_PLAY);
+
+		return array(
+			self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY),
+			self::DRUID_POST_AGGR => self::getConstantFactorFieldAccessPostAggr(
+				self::METRIC_PLAYS_RANKING,
+				self::EVENT_TYPE_PLAY,
+				self::getNormalizedScoreFactor(5, $maxPlays)
+			)
+		);
+	}
+
+	protected static function getEntriesRankingDef($partner_id, $report_def, $input_filter, $object_ids, $response_options)
+	{
+		$maxAddedEntries = self::getMetricMaxValue($partner_id, $report_def, $input_filter, $object_ids, $response_options, self::METRIC_ENTRIES_ADDED);
+		$maxAddedDuration = self::getMetricMaxValue($partner_id, $report_def, $input_filter, $object_ids, $response_options, self::METRIC_DURATION_ADDED_SEC);
+
+		return array(
+			self::DRUID_AGGR => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_SEC),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_ENTRIES_RANKING, '+', array(
+					self::getConstantFactorFieldAccessPostAggr('score_added_entries',
+						self::METRIC_ENTRIES_ADDED,
+						self::getNormalizedScoreFactor(2.5, $maxAddedEntries)
+					),
+					self::getConstantFactorFieldAccessPostAggr('score_added_duration',
+						self::METRIC_DURATION_ADDED_SEC,
+						self::getNormalizedScoreFactor(2.5, $maxAddedDuration)
 					)
 				)
 			)
@@ -4737,6 +4786,7 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		$start = microtime (true);
 		$total_count = null;
+		$order_found = false;
 
 		$data_source = isset($report_def[self::REPORT_DATA_SOURCE]) ? $report_def[self::REPORT_DATA_SOURCE] : null;
 		$intervals = self::getFilterIntervals($report_def, $input_filter);
@@ -4760,7 +4810,7 @@ class kKavaReportsMgr extends kKavaBase
 					$data[] = array($row[self::DRUID_VALUE]);
 				}
 			}
-			return array($report_def[self::REPORT_DIMENSION_HEADERS], $data, count($data));
+			return array($report_def[self::REPORT_DIMENSION_HEADERS], $data, count($data), $order_found);
 		}
 
 		// Note: max size is already validated externally when $isCsv is true
@@ -4804,6 +4854,10 @@ class kKavaReportsMgr extends kKavaBase
 			if (!in_array($order_by, $metrics))
 			{
 				$order_by = $default_order;
+			}
+			else
+			{
+				$order_found = true;
 			}
 		}
 
@@ -5089,7 +5143,7 @@ class kKavaReportsMgr extends kKavaBase
 		$end = microtime(true);
 		KalturaLog::log('getTable took [' . ($end - $start) . ']');
 
-		return array($headers, $data, $total_count);
+		return array($headers, $data, $total_count, $order_found);
 	}
 
 	protected static function getJoinTableImpl($partner_id, $report_def,
@@ -5256,7 +5310,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		$input_filter->interval = $interval;
-		return array($headers, $data, $total_count);
+		return array($headers, $data, $total_count, $order_found);
 	}
 
 	protected static function getTableImpl($partner_id, $report_def, 
@@ -5290,7 +5344,7 @@ class kKavaReportsMgr extends kKavaBase
 			$result = self::getSimpleTableImpl($partner_id, $report_def, $input_filter,
 				$page_size, $page_index, $order_by, $object_ids, $flags, $response_options);
 		}
-		
+
 		// finalize / enrich
 		if (isset($report_def[self::REPORT_TABLE_FINALIZE_FUNC]))
 		{
@@ -5302,6 +5356,12 @@ class kKavaReportsMgr extends kKavaBase
 			self::enrichData($report_def, $result[0], $partner_id, $result[1]);
 		}
 
+		//order not found
+		if (isset($result[3]) && $result[3] === false)
+		{
+			self::orderTableByMetric($report_def, $order_by, $result[0], $result[1]);
+		}
+		unset($result[3]);
 		return $result;
 	}
 		
@@ -5368,7 +5428,6 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			return;
 		}
-
 		$order_by_dir = $order_by[0];
 		if (!in_array($order_by_dir, array('-', '+')))
 		{
@@ -5509,6 +5568,23 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		
 		return $row;
+	}
+
+	protected static function addContributorRankingColumn(&$result)
+	{
+		$headers = $result[0];
+		$playsRanking = array_search(self::METRIC_PLAYS_RANKING, $headers);
+		$entriesRanking = array_search(self::METRIC_ENTRIES_RANKING, $headers);
+		if ($playsRanking === false || $entriesRanking === false)
+		{
+			return;
+		}
+
+		$result[0][] = self::METRIC_CONTRIBUTOR_RANKING;
+		foreach ($result[1] as &$row)
+		{
+			$row[] = $row[$playsRanking] + $row[$entriesRanking];
+		}
 	}
 	
 	protected static function addRollupRow(&$result)
