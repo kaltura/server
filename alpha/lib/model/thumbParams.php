@@ -42,6 +42,7 @@ class thumbParams extends assetParams
 	const CUSTOM_DATA_FIELD_DENSITY = "ThumbDensity";
 	const CUSTOM_DATA_FIELD_STRIP_PROFILES = "ThumbStripProfiles";
     const CUSTOM_DATA_FIELD_VIDEO_OFFSET_IN_PERCENTAGE = "videoOffsetInPercentage";
+	const CUSTOM_DATA_FIELD_INTERVAL = "Interval";
 
 	public function getSourceParamsId()			{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_SOURCE_PARAMS_ID);}
 	public function getCropType()				{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_CROP_TYPE);}
@@ -59,6 +60,7 @@ class thumbParams extends assetParams
 	public function getDensity()				{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_DENSITY);}
 	public function getStripProfiles()			{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_STRIP_PROFILES);}
     public function getVideoOffsetInPercentage(){return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_VIDEO_OFFSET_IN_PERCENTAGE);}
+	public function getInterval()				{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_INTERVAL);}
 	
 	public function setSourceParamsId($v)		{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_SOURCE_PARAMS_ID, $v);}
 	public function setCropType($v)				{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_CROP_TYPE, $v);}
@@ -76,4 +78,5 @@ class thumbParams extends assetParams
 	public function setDensity($v)				{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_DENSITY, $v);}
 	public function setStripProfiles($v)		{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_STRIP_PROFILES, $v);}
     public function setVideoOffsetInPercentage($v) {return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_VIDEO_OFFSET_IN_PERCENTAGE, $v);}
+	public function setInterval($v)				{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_INTERVAL, $v);}
 }
