@@ -5,6 +5,27 @@
  */
 class kBifCreator
 {
+	/*
+	FORMAT:
+	Magic Number: 0x89,0x42,0x49,0x46,0x0d,0x0a,0x1a,0x0a
+	Version (currently 0): byte 8 - 11
+	Number of BIF images (unsigned 32-bit value): byte 12 - 15
+	Framewise Separation (Timestamp Multiplier): byte 16 - 19
+	Reserved (for future expansion. They shall be 0x00): byte 20 ... 63
+	BIF index ( N+1 entries. Each entry contains two unsigned 32-bit values):
+	----------------------------------------------------------
+	byte      | 64 65 66 67	        | 68 69 70 71
+	index 0   | 0 Frame 0 timestamp	| absolute offset of frame
+	index 1   | 1 Frame 1 timestamp	| absolute offset of frame
+	...
+	index N-1 | Frame N-1 timestamp	| absolute offset of frame
+	index N	  | 0xffffffff      	| last byte of data + 1
+	----------------------------------------------------------
+	Data section: contains the BIF images
+
+	All multibyte integers are stored in little-endian format.
+	*/
+
 	protected $imagesPaths;
 	protected $targetPath;
 	protected $interval;
