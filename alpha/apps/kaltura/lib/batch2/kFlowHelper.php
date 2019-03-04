@@ -1056,7 +1056,7 @@ class kFlowHelper
 			$thumbAsset->setSize(filesize($data->getThumbPath()));
 
 			$thumbParamsOutput = assetParamsOutputPeer::retrieveByAssetId($data->getThumbAssetId());
-			if(kString::contains('bif', $thumbParamsOutput->getTags()))
+			if(KCsvWrapper::contains('bif', $thumbParamsOutput->getTags()))
 			{
 				$thumbAsset->setFileExt('bif');
 				$thumbAsset->setWidth($thumbParamsOutput->getWidth());

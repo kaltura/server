@@ -77,7 +77,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			if (!$rootPath)
 				die();
 
-			if(kString::contains(self::BIF_TAG, $thumbParamsOutput->tags))
+			if(KCsvWrapper::contains(self::BIF_TAG, $thumbParamsOutput->tags))
 			{
 				return $this->createBifFile($job, $data, $rootPath, $mediaFile, $thumbParamsOutput);
 			}
