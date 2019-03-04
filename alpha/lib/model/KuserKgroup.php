@@ -83,7 +83,8 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 
 	public function setCreationMode($v)	{$this->putInCustomData (self::GROUP_USER_CREATION_MODE, $v);}
 
-	public function getCreationMode(){return $this->getFromCustomData(self::GROUP_USER_CREATION_MODE, null, GroupUserRole::MEMBER);}
+	public function getCreationMode(){return $this->getFromCustomData(self::GROUP_USER_CREATION_MODE,
+		null, GroupUserCreationMode::MANUAL);}
 
 	public function setUserRole($v)
 	{
