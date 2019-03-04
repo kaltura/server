@@ -2544,6 +2544,7 @@ CREATE TABLE `user_entry` (
   `extended_status` int(11) DEFAULT NULL,
   `privacy_context` varchar(255) DEFAULT NULL,
   `custom_data` text,
+  `version` int(11) DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `entry_id` (`entry_id`,`kuser_id`),
   KEY `kuser_id_updated_at` (`kuser_id`,`privacy_context`,`updated_at`),
@@ -2690,4 +2691,16 @@ CREATE TABLE IF NOT EXISTS `work_group` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+CREATE TABLE IF NOT EXISTS `conf_maps`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`map_name` VARCHAR(256),
+	`host_name` VARCHAR(256),
+	`status` INTEGER,
+	`version` INTEGER NOT NULL,
+	`created_at` DATETIME  NOT NULL,
+	`remarks` TEXT,
+	`content` TEXT,
+	PRIMARY KEY (`id`),
+	KEY `configuration_map_source` (`map_name`,`host_name`,`version`)
+)ENGINE=INNODB DEFAULT CHARSET=utf8;

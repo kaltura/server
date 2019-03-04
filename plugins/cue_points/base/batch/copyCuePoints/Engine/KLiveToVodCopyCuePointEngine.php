@@ -47,7 +47,7 @@ class KLiveToVodCopyCuePointEngine extends KCopyCuePointEngine
     public function getCuePointFilter($entryId, $status = CuePointStatus::READY)
     {
         $filter = parent::getCuePointFilter($entryId, $status);
-        $filter->cuePointTypeIn = impolde(",", array(self::CUE_POINT_CODE, self::CUE_POINT_THUMB, self::ANNOTATION));
+        $filter->cuePointTypeIn = implode(",", array(self::CUE_POINT_CODE, self::CUE_POINT_THUMB, self::ANNOTATION));
         $filter->createdAtLessThanOrEqual = $this->currentSegmentEndTime;
         if($this->data->lastCuePointSyncTime)
             $filter->createdAtGreaterThanOrEqual = $this->data->lastCuePointSyncTime;

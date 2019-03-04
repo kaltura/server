@@ -98,7 +98,6 @@ while(true)
 
     while(!count($elasticLogs))
     {
-        $skipExecutedUpdates = true;
         sleep(1);
         $elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
     }
