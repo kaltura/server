@@ -207,6 +207,9 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 			$cuePoint->systemName = $scene['systemName'] . '';
 			
 		$cuePoint->startTime = kXml::timeToInteger($scene->sceneStartTime);
+		
+		if(!isset($scene->tags))
+			return $cuePoint;
 	
 		$tags = array();
 		foreach ($scene->tags->children() as $tag)
