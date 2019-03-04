@@ -52,6 +52,11 @@ class kQuiz {
 	protected $showGradeAfterSubmission;
 
 	/**
+	 * @var int
+	 */
+	protected $maxRetakesAllowed;
+
+	/**
 	 * @return int
 	 */
 	public function getVersion()
@@ -178,4 +183,21 @@ class kQuiz {
 	{
 		$this->showGradeAfterSubmission = $showAfterSubmit;
 	}
+
+	/**
+	 * @return int
+	 */
+	public function getMaxRetakesAllowed()
+	{
+		return $this->maxRetakesAllowed;
+	}
+
+	/**
+	 * @param int $maxRetakesAllowed
+	 */
+	public function setMaxRetakesAllowed($maxRetakesAllowed)
+	{
+		$this->maxRetakesAllowed = $maxRetakesAllowed;
+	}
+
 }

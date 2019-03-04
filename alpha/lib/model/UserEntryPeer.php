@@ -82,4 +82,16 @@ class UserEntryPeer extends BaseUserEntryPeer {
 	{
 		return array(array("userEntry:kuserId=%s", self::KUSER_ID));		
 	}
+
+	public static function retriveNewestVersionOfUserEntrySubmitted($kuserId, $entryId, $type)
+	{
+		$c = new Criteria();
+		$c->add(UserEntryPeer::KUSER_ID, $kuserId);
+		$c->add(UserEntryPeer::ENTRY_ID, $entryId);
+		$c->add(UserEntryPeer::TYPE, $type);
+		$c->add(UserEntryPeer::STATUS, QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
+		$c->addDescendingOrderByColumn(UserEntryPeer::VERSION);
+		$userEntryNewestVersion = UserEntryPeer::doSelectOne($c);
+		return $userEntryNewestVersion;
+	}
 } // UserEntryPeer
