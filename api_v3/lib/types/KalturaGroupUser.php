@@ -103,31 +103,4 @@ class KalturaGroupUser extends KalturaObject implements IRelatedFilterable
 	{
 		return array();	
 	}
-
-	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
-	{
-		parent::validateForUpdate($sourceObject, $propertiesToSkip);
-		if(!kCurrentContext::$is_admin_session)
-		{
-			if($sourceObject->getUserRole() != $this->userRole)
-			{
-				if(!GroupUserService::checkIfKsUserIsGroupManager($this->groupId))
-				{
-					throw new KalturaAPIException(KalturaErrors::NO_PERMISSION_TO_CHANGE_GROUP_USER_ROLE);
-				}
-			}
-		}
-	}
-
-	public function validateForInsert($propertiesToSkip = array())
-	{
-		parent::validateForInsert($propertiesToSkip);
-		if($this->userRole == KalturaGroupUserRole::MANAGER && !kCurrentContext::$is_admin_session)
-		{
-			if(!GroupUserService::checkIfKsUserIsGroupManager($this->groupId))
-			{
-				throw new KalturaAPIException(KalturaErrors::NO_PERMISSION_TO_ADD_GROUP_USER_MANAGER);
-			}
-		}
-	}
 }
