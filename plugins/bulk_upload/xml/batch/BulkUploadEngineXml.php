@@ -744,7 +744,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$nonCriticalErrors = '';
 		$newThumbAssetsIds = array();
-		foreach($requestResults as $requestResult)
+		foreach((array)$requestResults as $requestResult)
 		{
 			if (is_array($requestResult) && isset($requestResult['code']))
 				$nonCriticalErrors .= $requestResult['message']."\n";
@@ -779,10 +779,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			if(!in_array($thumbAsset->id, $newThumbAssetsIds))
 				KBatchBase::$kClient->thumbAsset->delete($thumbAsset->id);
 		}
-		$requestResults = KBatchBase::$kClient->doMultiRequest();
 		
+		$requestResults = KBatchBase::$kClient->doMultiRequest();
 		$nonCriticalErrors = '';
-		foreach($requestResults as $requestResult)
+				
+		foreach((array)$requestResults as $requestResult)
 		{
 			if (is_array($requestResult) && isset($requestResult['code']))
 				$nonCriticalErrors .= $requestResult['message']."\n";
@@ -1212,7 +1213,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$requestResults = KBatchBase::$kClient->doMultiRequest();
 		
-		foreach($requestResults as $requestResult)
+		foreach((array)$requestResults as $requestResult)
 		{
 			if(is_array($requestResult) && isset($requestResult['code']))
 				throw new KalturaException($requestResult['message'], $requestResult['code']);
@@ -1764,7 +1765,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function validateAssetParamsId($assetParamsId, $assetType, $conversionProfileId)
 	{
-		if(count($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]) == 0) //the name to id profiles weren't initialized
+		if(!isset($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]) || count($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]) == 0) //the name to id profiles weren't initialized
 		{
 			$this->initAssetParamsNameToId($conversionProfileId);
 		}
