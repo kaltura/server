@@ -199,10 +199,9 @@ abstract class BulkUploadEngineFilter extends KBulkUploadEngine
 		
 		KBatchBase::unimpersonate();
 		
-		if(count($requestResults))
+		if($requestResults && count($requestResults))
 			$this->updateObjectsResults($requestResults, $bulkUploadResultChunk);
-
-
+		
 		KalturaLog::info("job[{$this->job->id}] finished creating objects");
 	}
 	
@@ -239,7 +238,7 @@ abstract class BulkUploadEngineFilter extends KBulkUploadEngine
 			}
 			
 			// update the results with the new object Id
-			if ($requestResult->id && !$bulkUploadResult->objectId)
+			if (isset($requestResult->id) && $requestResult->id && !$bulkUploadResult->objectId)
 			    $bulkUploadResult->objectId = $requestResult->id;
 			$this->addBulkUploadResult($bulkUploadResult);
 		}
