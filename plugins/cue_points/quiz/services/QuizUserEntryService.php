@@ -67,7 +67,7 @@ class QuizUserEntryService extends KalturaBaseService{
 		$dbUserEntry->setNumOfRelevnatQuestions($relevantQuestionCount);
 		$dbUserEntry->setStatus(QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
 		$dbUserEntry->save();
-		QuizUserEntryService::calculateScoreByScoreType($kQuiz,$userEntry, $dbUserEntry, $score);
+		self::calculateScoreByScoreType($kQuiz,$userEntry, $dbUserEntry, $score);
 
 		return $userEntry;
 	}
@@ -86,11 +86,11 @@ class QuizUserEntryService extends KalturaBaseService{
 			switch ($scoreType)
 			{
 				case KalturaScoreType::HIGHEST:
-					$calculatedScore = QuizUserEntryService::getHighestScore($userEntryVersions);
+					$calculatedScore = self::getHighestScore($userEntryVersions);
 					break;
 
 				case KalturaScoreType::LOWEST:
-					$calculatedScore = QuizUserEntryService::getLowestScore($userEntryVersions);
+					$calculatedScore = self::getLowestScore($userEntryVersions);
 					break;
 
 				case KalturaScoreType::LATEST:
@@ -102,7 +102,7 @@ class QuizUserEntryService extends KalturaBaseService{
 					break;
 
 				case KalturaScoreType::AVERAGE:
-					$calculatedScore =  QuizUserEntryService::getAverageScore($userEntryVersions);
+					$calculatedScore = self::getAverageScore($userEntryVersions);
 					break;
 			}
 		}
@@ -115,7 +115,7 @@ class QuizUserEntryService extends KalturaBaseService{
 		}
 	}
 
-	private function getHighestScore($userEntryVersions)
+	protected function getHighestScore($userEntryVersions)
 	{
 		$highest =  reset($userEntryVersions)->getScore();
 		foreach ($userEntryVersions as $userEntry)
@@ -125,11 +125,10 @@ class QuizUserEntryService extends KalturaBaseService{
 				$highest = $userEntry->getScore();
 			}
 		}
-		$calculatedScore = $highest;
-		return $calculatedScore;
+		return $highest;
 	}
 
-	private function getLowestScore($userEntryVersions)
+	protected function getLowestScore($userEntryVersions)
 	{
 		$lowest =  reset($userEntryVersions)->getScore();
 		foreach ($userEntryVersions as $userEntry)
@@ -139,19 +138,17 @@ class QuizUserEntryService extends KalturaBaseService{
 				$lowest = $userEntry->getScore();
 			}
 		}
-		$calculatedScore = $lowest;
-		return $calculatedScore;
+		return $lowest;
 	}
 
-	private function getAverageScore($userEntryVersions)
+	protected function getAverageScore($userEntryVersions)
 	{
 		$sumScores = 0;
 		foreach ($userEntryVersions as $userEntry)
 		{
 			$sumScores += $userEntry->getScore();
 		}
-		ini_set("precision", 3);
-		$calculatedScore =  $sumScores / count($userEntryVersions);
+		$calculatedScore = floatval($sumScores / count($userEntryVersions));
 		return $calculatedScore;
 	}
 }
