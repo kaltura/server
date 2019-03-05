@@ -1,6 +1,6 @@
 # Naos 14.16.0 #
 
-## Reach - Support extending accessKey##
+## Reach - Support extending accessKey ##
 
  - Issue Type: Feature
  - Issue ID: REACH2-525
