@@ -65,6 +65,8 @@ class KalturaReachErrors implements kReachErrors
 	
 	const ENTRY_NOT_READY = "ENTRY_NOT_READY;;Ordering task is not allowed for entries which are not ins status ready";
 	
+	const CANNOT_EXTEND_ACCESS_KEY = "CANNOT_EXTEND_ACCESS_KEY;;Extending accessKey for non processing task is not allowed";
+	
 	/* Credit */
 	
 	const OVERAGE_CREDIT_CANNOT_BE_NEGATIVE = "OVERAGE_CREDIT_CANNOT_BE_NEGATIVE;;Overage credit value cannot be negative";
