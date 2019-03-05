@@ -1,4 +1,22 @@
 # Naos 14.16.0 #
+
+## Reach - Support extending accessKey##
+
+ - Issue Type: Feature
+ - Issue ID: REACH2-525
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_03_05_add_reach_extendAccessKey_action.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Groups-BE - Allow group manager ##
 
  - Issue Type: Task
@@ -27,7 +45,6 @@ None
 ### Deployment scripts ###
 
 mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /deployment/updates/sql/2019_02_25_alter_user_entry_version.sql
-
 
 # Naos 14.14.0 #
 
