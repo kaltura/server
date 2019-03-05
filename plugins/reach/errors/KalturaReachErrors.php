@@ -67,6 +67,8 @@ class KalturaReachErrors implements kReachErrors
 	
 	const CANNOT_EXTEND_ACCESS_KEY = "CANNOT_EXTEND_ACCESS_KEY;;Extending accessKey for non processing task is not allowed";
 	
+	const FAILED_EXTEND_ACCESS_KEY = "FAILED_EXTEND_ACCESS_KEY;;Extending accessKey operation failed";
+	
 	/* Credit */
 	
 	const OVERAGE_CREDIT_CANNOT_BE_NEGATIVE = "OVERAGE_CREDIT_CANNOT_BE_NEGATIVE;;Overage credit value cannot be negative";

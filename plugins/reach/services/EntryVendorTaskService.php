@@ -17,7 +17,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		if (!ReachPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
 		
-		if (!in_array($actionName, array('getJobs', 'updateJob', 'list')))
+		if (!in_array($actionName, array('getJobs', 'updateJob', 'list', 'extendAccessKey')))
 		{
 			$this->applyPartnerFilterForClass('entryVendorTask');
 			$this->applyPartnerFilterForClass('reachProfile');
@@ -384,8 +384,15 @@ class EntryVendorTaskService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::CANNOT_EXTEND_ACCESS_KEY);
 		}
 		
-		$dbEntryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($dbEntryVendorTask->getEntryId(), $dbEntryVendorTask->getIsRequestModerated(), $dbEntryVendorTask->getCatalogItem()->getKsExpiry()));
-		$dbEntryVendorTask->save();
+		try
+		{
+			$dbEntryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($dbEntryVendorTask->getEntryId(), $dbEntryVendorTask->getIsRequestModerated(), $dbEntryVendorTask->getCatalogItem()->getKsExpiry(), true));
+			$dbEntryVendorTask->save();
+		}
+		catch (Exception $e)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::FAILED_EXTEND_ACCESS_KEY);
+		}
 		
 		// return the saved object
 		$entryVendorTask = new KalturaEntryVendorTask();

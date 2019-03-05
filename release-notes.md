@@ -1,3 +1,23 @@
+# Naos 14.16.0 #
+
+## Reach - Support extending accessKey##
+
+ - Issue Type: Feature
+ - Issue ID: REACH2-525
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_03_05_add_reach_extendAccessKey_action.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # Naos 14.14.0 #
 
 ## Schedule Event - Add sphinx match optimization##

@@ -11,9 +11,9 @@ class kReachUtils
 	 * @return string
 	 * @throws Exception
 	 */
-	public static function generateReachVendorKs($entryId, $shouldModerate = false, $turnaroundTime = dateUtils::DAY)
+	public static function generateReachVendorKs($entryId, $shouldModerate = false, $turnaroundTime = dateUtils::DAY, $disableDefaultEntryFilter = false)
 	{
-		$entry = entryPeer::retrieveByPK($entryId);
+		$entry = $disableDefaultEntryFilter ? entryPeer::retrieveByPKNoFilter($entryId) : entryPeer::retrieveByPK($entryId);
 		if (!$entry)
 			throw new Exception("Entry Id [$entryId] not Found to create REACH Vendor limited session");
 
