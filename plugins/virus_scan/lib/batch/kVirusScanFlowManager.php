@@ -100,7 +100,15 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		if (!class_exists('kCurrentContext') || !kCurrentContext::isApiV3Context())
 			return false;
 		if($object instanceof asset)
+		{
+			$entryId = $object->getEntryId();
+			$entry = entryPeer::retrieveByPK($entryId);
+			if ($entry && $entry->getFlowType() == EntryFlowType::IMPORT_FOR_CLIP_CONCAT )
+			{
+				return false;
+			}
 			return true;
+		}
 		if($object instanceof FileSync)
 			return true;
 		
