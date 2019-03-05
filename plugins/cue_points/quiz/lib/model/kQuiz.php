@@ -57,6 +57,11 @@ class kQuiz {
 	protected $maxRetakesAllowed;
 
 	/**
+	 * @var KalturaScoreType
+	 */
+	protected $scoreType;
+
+	/**
 	 * @return int
 	 */
 	public function getVersion()
@@ -198,6 +203,22 @@ class kQuiz {
 	public function setMaxRetakesAllowed($maxRetakesAllowed)
 	{
 		$this->maxRetakesAllowed = $maxRetakesAllowed;
+	}
+
+	/**
+	 * @return KalturaScoreType
+	 */
+	public function getScoreType()
+	{
+		return $this->scoreType;
+	}
+
+	/**
+	 * @param KalturaScoreType
+	 */
+	public function setScoreType($scoreType)
+	{
+		$this->scoreType = $scoreType;
 	}
 
 }

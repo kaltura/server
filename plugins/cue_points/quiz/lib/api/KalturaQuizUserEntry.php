@@ -15,6 +15,12 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	public $score;
 
 	/**
+	 * @var float
+	 * @readonly
+	 */
+	public $calculatedScore;
+
+	/**
 	* @var string
 	* @maxLength 1024
 	*/
@@ -32,6 +38,7 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 		"score",
 		"feedback",
 		"version",
+		"calculatedScore",
 	);
 
 	public function getMapBetweenObjects ( )
@@ -84,7 +91,7 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 			}
 			if (count($userEntry) > 0 )
 			{
-				$userEntryNewestVersion = UserEntryPeer::retriveNewestVersionOfUserEntrySubmitted( $object_to_fill->getKuserId(), $this->entryId, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
+				$userEntryNewestVersion = UserEntryPeer::retriveUserEntriesSubmitted( $object_to_fill->getKuserId(), $this->entryId, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ), true);
 				$entry = entryPeer::retrieveByPK($this->entryId);
 				$quiz = QuizPlugin::getQuizData($entry);
 				//version counting is starting from zero

@@ -67,7 +67,79 @@ class QuizUserEntryService extends KalturaBaseService{
 		$dbUserEntry->setNumOfRelevnatQuestions($relevantQuestionCount);
 		$dbUserEntry->setStatus(QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
 		$dbUserEntry->save();
+		QuizUserEntryService::calculateScoreByScoreType($kQuiz,$userEntry, $dbUserEntry, $score);
 
 		return $userEntry;
+	}
+
+	protected function calculateScoreByScoreType($kQuiz, $kalturaUserEntry, $dbUserEntry, $currentScore)
+	{
+		if ($dbUserEntry->getVersion() == 0)
+		{
+			$calculatedScore = $currentScore;
+		}
+		else
+		{
+			$scoreType = $kQuiz->getScoreType();
+			//retrieve user entry list order by version desc
+			$userEntryVersions = userEntryPeer::retriveUserEntriesSubmitted($dbUserEntry->getKuserId(), $dbUserEntry->getEntryId(), QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ), false);
+			switch ($scoreType)
+			{
+				case KalturaScoreType::HIGHEST:
+					$highest =  $userEntryVersions[0]->getScore();
+					foreach ($userEntryVersions as $userEntry)
+					{
+						if ($userEntry->getScore() > $highest)
+						{
+							$highest = $userEntry->getScore();
+						}
+					}
+					$calculatedScore = $highest;
+					break;
+
+				case KalturaScoreType::LOWEST:
+					$lowest =  $userEntryVersions[0]->getScore();
+					foreach ($userEntryVersions as $userEntry)
+					{
+						if ($userEntry->getScore() < $lowest)
+						{
+							$lowest = $userEntry->getScore();
+						}
+					}
+					$calculatedScore = $lowest;
+					break;
+
+				case KalturaScoreType::LATEST:
+					$calculatedScore = $userEntryVersions[0]->getScore();
+					break;
+
+				case KalturaScoreType::FIRST:
+					$countUserEntryVersions = count($userEntryVersions);
+					$calculatedScore = $userEntryVersions[$countUserEntryVersions - 1 ]->getScore();
+					break;
+
+				case KalturaScoreType::AVERAGE:
+					$sumScores = 0;
+					foreach ($userEntryVersions as $userEntry)
+					{
+						$sumScores += $userEntry->getScore();
+					}
+					ini_set("precision", 3);
+					$calculatedScore =  $sumScores / count($userEntryVersions);
+					break;
+			}
+		}
+
+		$dbUserEntry->setCalculatedScore($calculatedScore);
+		$dbUserEntry->save();
+		if ($kQuiz->getShowGradeAfterSubmission()== KalturaNullableBoolean::TRUE_VALUE || $this->getKs()->isAdmin() == true)
+		{
+			$kalturaUserEntry->calculatedScore = $calculatedScore;
+		}
+		else
+		{
+			$kalturaUserEntry->calculatedScore = null;
+		}
+
 	}
 }

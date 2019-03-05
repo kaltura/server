@@ -54,6 +54,11 @@ class KalturaQuiz extends KalturaObject
 	 */
 	public $maxRetakesAllowed;
 
+	/**
+	 * @var KalturaScoreType
+	 */
+	public $scoreType;
+
 
 	private static $mapBetweenObjects = array
 	(
@@ -66,6 +71,7 @@ class KalturaQuiz extends KalturaObject
 		"allowDownload",
 		"showGradeAfterSubmission",
 		"maxRetakesAllowed",
+		"scoreType",
 	);
 
 	/* (non-PHPdoc)
