@@ -460,5 +460,5 @@ class kString
 		else
 			return $str;
 	}
-	
+
 }

@@ -30,11 +30,13 @@ class UserEntryFilter extends baseObjectFilter
 			"_notin_extended_status",
 			"_eq_privacy_context",
 			"_in_privacy_context",
+			"_eq_version"
 		) , NULL );
 
 		$this->allowed_order_fields = array (
 			"created_at",
 			"updated_at",
+			"version",
 		);
 
 		$this->aliases = array ( 
