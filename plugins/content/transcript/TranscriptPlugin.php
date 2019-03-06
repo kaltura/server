@@ -10,7 +10,6 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 	const ENTRY_TRANSCRIPT_SUFFIX = 'tr_suf';
 	const SEARCH_TEXT_SUFFIX = 'trend';
 	const PLUGINS_DATA = 'plugins_data';
-	public static $newContent;
 
 
     /* (non-PHPdoc)
@@ -108,13 +107,11 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 
 		return null;
 	}
-
-	public static function getValues($item, $key)
+	
+	public static function
 	{
-		if ($key === 'value')
-		{
-			self::$newContent .= ($item . ' ');
-		}
+		json_decode($strJson);
+		return (json_last_error() === JSON_ERROR_NONE);
 	}
 
 	public static function getTranscriptSearchData(entry $entry)
@@ -133,17 +130,18 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 
 			$syncKey = $transcriptAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			$fileContent = kFileSyncUtils::file_get_contents($syncKey, true, false);
-			$decoded = json_decode($fileContent, true);
-			if( json_last_error() == JSON_ERROR_NONE ) //handling Json files
+			
+			//Get values from string file
+			$matches = array();
+			preg_match_all('/value": "(.*?)"/', $s, $matches, PREG_PATTERN_ORDER);
+			
+			$content = $fileContent;
+			if(count($matches))
 			{
-				self::$newContent = '';
-				array_walk_recursive($decoded, array('TranscriptPlugin', 'getValues'));
-				$content = self::$newContent;
+				$matches = $matches[1];
+				$content = implode(" ", $matches);
 			}
-			else // handling text files
-			{
-				$content = $fileContent;
-			}
+			
 			if(!$content)
 				continue;
 
