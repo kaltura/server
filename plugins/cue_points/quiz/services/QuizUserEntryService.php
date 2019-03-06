@@ -67,7 +67,88 @@ class QuizUserEntryService extends KalturaBaseService{
 		$dbUserEntry->setNumOfRelevnatQuestions($relevantQuestionCount);
 		$dbUserEntry->setStatus(QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
 		$dbUserEntry->save();
+		self::calculateScoreByScoreType($kQuiz,$userEntry, $dbUserEntry, $score);
 
 		return $userEntry;
+	}
+
+	protected function calculateScoreByScoreType($kQuiz, $kalturaUserEntry, $dbUserEntry, $currentScore)
+	{
+		if ($dbUserEntry->getVersion() == 0)
+		{
+			$calculatedScore = $currentScore;
+		}
+		else
+		{
+			$scoreType = $kQuiz->getScoreType();
+			//retrieve user entry list order by version desc
+			$userEntryVersions = userEntryPeer::retriveUserEntriesSubmitted($dbUserEntry->getKuserId(), $dbUserEntry->getEntryId(), QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
+			switch ($scoreType)
+			{
+				case KalturaScoreType::HIGHEST:
+					$calculatedScore = self::getHighestScore($userEntryVersions);
+					break;
+
+				case KalturaScoreType::LOWEST:
+					$calculatedScore = self::getLowestScore($userEntryVersions);
+					break;
+
+				case KalturaScoreType::LATEST:
+					$calculatedScore = reset($userEntryVersions)->getScore();
+					break;
+
+				case KalturaScoreType::FIRST:
+					$calculatedScore = end($countUserEntryVersions)->getScore();
+					break;
+
+				case KalturaScoreType::AVERAGE:
+					$calculatedScore = self::getAverageScore($userEntryVersions);
+					break;
+			}
+		}
+
+		$dbUserEntry->setCalculatedScore($calculatedScore);
+		$dbUserEntry->save();
+		if ($kQuiz->getShowGradeAfterSubmission()== KalturaNullableBoolean::TRUE_VALUE || $this->getKs()->isAdmin() == true)
+		{
+			$kalturaUserEntry->calculatedScore = $calculatedScore;
+		}
+	}
+
+	protected function getHighestScore($userEntryVersions)
+	{
+		$highest =  reset($userEntryVersions)->getScore();
+		foreach ($userEntryVersions as $userEntry)
+		{
+			if ($userEntry->getScore() > $highest)
+			{
+				$highest = $userEntry->getScore();
+			}
+		}
+		return $highest;
+	}
+
+	protected function getLowestScore($userEntryVersions)
+	{
+		$lowest =  reset($userEntryVersions)->getScore();
+		foreach ($userEntryVersions as $userEntry)
+		{
+			if ($userEntry->getScore() < $lowest)
+			{
+				$lowest = $userEntry->getScore();
+			}
+		}
+		return $lowest;
+	}
+
+	protected function getAverageScore($userEntryVersions)
+	{
+		$sumScores = 0;
+		foreach ($userEntryVersions as $userEntry)
+		{
+			$sumScores += $userEntry->getScore();
+		}
+		$calculatedScore = floatval($sumScores / count($userEntryVersions));
+		return $calculatedScore;
 	}
 }
