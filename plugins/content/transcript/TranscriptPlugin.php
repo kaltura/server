@@ -107,12 +107,6 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 
 		return null;
 	}
-	
-	public static function
-	{
-		json_decode($strJson);
-		return (json_last_error() === JSON_ERROR_NONE);
-	}
 
 	public static function getTranscriptSearchData(entry $entry)
 	{
