@@ -53,6 +53,9 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_ENTRY_OWNER_ID = 'entryKuserId';
 	const DIMENSION_ENTRY_CREATOR_ID = 'entryCreatorId';
 	const DIMENSION_ENTRY_CREATED_AT = 'entryCreatedAt';
+	const DIMENSION_EVENT_VAR1 = 'eventVar1';
+	const DIMENSION_EVENT_VAR2 = 'eventVar2';
+	const DIMENSION_EVENT_VAR3 = 'eventVar3';
 
 	// metrics
 	const METRIC_COUNT = 'count';
