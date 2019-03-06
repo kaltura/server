@@ -8,6 +8,7 @@ class QuizUserEntry extends UserEntry{
 
 	const QUIZ_OM_CLASS = 'QuizUserEntry';
 	const CUSTOM_DATA_FEEDBACK = 'feedback';
+	const CUSTOM_DATA_CALCULATED_SCORE = 'calculatedScore';
 
 	/**
 	 * @var float
@@ -31,7 +32,8 @@ class QuizUserEntry extends UserEntry{
 		$this->setType(QuizPlugin::getCoreValue('UserEntryType' , QuizUserEntryType::QUIZ));
 	}
 
-
+	public function setCalculatedScore($v){ $this->putInCustomData(self::CUSTOM_DATA_CALCULATED_SCORE, $v);}
+	public function getCalculatedScore(){ return $this->getFromCustomData(self::CUSTOM_DATA_CALCULATED_SCORE);}
 	public function setScore($v){ $this->putInCustomData("score", $v);}
 	public function getScore(){ return $this->getFromCustomData("score");}
 	public function setNumOfQuestions($v){ $this->putInCustomData("numOfQuestions", $v);}

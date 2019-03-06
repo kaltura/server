@@ -6,6 +6,8 @@
   */
 class KalturaQuizUserEntry extends KalturaUserEntry{
 
+	CONST DEFAULT_VERSION = 0;
+
 	/**
 	 * @var float
 	 * @readonly
@@ -13,15 +15,30 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	public $score;
 
 	/**
+	 * @var float
+	 * @readonly
+	 */
+	public $calculatedScore;
+
+	/**
 	* @var string
 	* @maxLength 1024
 	*/
 	public $feedback;
 
+	/**
+	 * @var int
+	 * @readonly
+	 * @filter eq,order
+	 */
+	public $version;
+
 	private static $map_between_objects = array
 	(
 		"score",
-		"feedback"
+		"feedback",
+		"version",
+		"calculatedScore",
 	);
 
 	public function getMapBetweenObjects ( )
@@ -63,15 +80,28 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 		}
 		if (!$isAnonymous)
 		{
-			$c = new Criteria();
-			$c->add(UserEntryPeer::KUSER_ID, $object_to_fill->getKuserId());
-			$c->add(UserEntryPeer::ENTRY_ID, $this->entryId);
-			$c->add(UserEntryPeer::TYPE, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
-			$userEntry = UserEntryPeer::doSelect($c);
-			if (count($userEntry) > 0)
+			$userEntry = UserEntryPeer::retriveUserEntriesSubmitted( $object_to_fill->getKuserId(), $this->entryId, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
+
+			if (count($userEntry) == 0 )
 			{
-				throw new KalturaAPIException(KalturaQuizErrors::QUIZ_USER_ENTRY_ALREADY_EXISTS, $this->entryId);
+				$object_to_fill->setVersion(self::DEFAULT_VERSION);
 			}
+			if (count($userEntry) > 0 )
+			{
+				$userEntryNewestVersion = reset($userEntry);
+				$entry = entryPeer::retrieveByPK($this->entryId);
+				$quiz = QuizPlugin::getQuizData($entry);
+				//version counting is starting from zero
+				if ($quiz->getMaxRetakesAllowed() && $userEntryNewestVersion->getVersion() + 1 <= $quiz->getMaxRetakesAllowed() - 1)
+				{
+					$object_to_fill->setVersion($userEntryNewestVersion->getVersion() + 1);
+				}
+				else
+				{
+					throw new KalturaAPIException(KalturaQuizErrors::NO_RETAKES_LEFT, $this->entryId);
+				}
+			}
+
 		}
 		return $object_to_fill;
 	}

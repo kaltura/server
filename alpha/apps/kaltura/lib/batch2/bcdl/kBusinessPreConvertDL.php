@@ -1064,6 +1064,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$thumbParamsOutput->setScaleWidth($thumbParams->getScaleWidth());
 		$thumbParamsOutput->setScaleHeight($thumbParams->getScaleHeight());
 		$thumbParamsOutput->setBackgroundColor($thumbParams->getBackgroundColor());
+		$thumbParamsOutput->setInterval($thumbParams->getInterval());
 
 		if($mediaInfo && $mediaInfo->getVideoDuration())
 		{

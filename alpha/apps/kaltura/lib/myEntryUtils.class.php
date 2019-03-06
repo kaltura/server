@@ -7,6 +7,7 @@ class myEntryUtils
 	const MP4_FILENAME_PARAMETER = "/name/a.mp4";
 	const DEFAULT_THUMB_SEC_LIVE = 1;
 	const ENTRY_ID_REGEX = "/\d_[A-Za-z0-9]{8}/";
+	const MAX_BIF_FRAMES = 100;
 
 	static private $liveSourceType = array
 	(
@@ -697,7 +698,7 @@ class myEntryUtils
 	
 	public static function resizeEntryImage( entry $entry, $version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
 		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null, $fileSync = null,
-		$start_sec = -1, $end_sec = -1)
+		$start_sec = -1, $end_sec = -1, $bif = 0)
 	{
 		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
 			$thumbParams = new kThumbnailParameters();
@@ -739,6 +740,11 @@ class myEntryUtils
 			$thumbName .= "_ssec_{$start_sec}";
 		if($end_sec != -1)
 			$thumbName .= "_esec_{$end_sec}";
+		if($bif)
+			$thumbName .= "_bif_{$bif}";
+
+		$imgPathsToUnlink = array();
+		$bifImgPaths = array();
 				
 		$entryThumbFilename = $entry->getThumbnail();
 		if(!$entryThumbFilename)
@@ -797,6 +803,14 @@ class myEntryUtils
 		$multi = $vid_slice == -1 && $vid_slices != -1;
 		$count = $multi ? $vid_slices : 1;
 		$im = null;
+
+		$bifInterval = 0;
+		$calc_vid_sec = 0;
+		if($bif && $vid_slices)
+		{
+			list ($offset, $bifInterval) = self::getBifParameters($count, $start_sec, $entry, $vid_slices);
+			$calc_vid_sec = $offset;
+		}
 		
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PS2);
 		
@@ -836,7 +850,7 @@ class myEntryUtils
 			$thumbCaptureByPackager = false;
 			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
 			$params = array($density, $quality, $forceRotation, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
-			$shouldResizeByPackager = self::shouldResizeByPackager($params, $type, array($width, $height));
+			$shouldResizeByPackager = KThumbnailCapture::shouldResizeByPackager($params, $type, array($width, $height));
 			if (
 				// need to create a thumb if either:
 				// 1. entry is a video and a specific second was requested OR a slices were requested
@@ -849,6 +863,14 @@ class myEntryUtils
 				if ($vid_sec != -1) // a specific second was requested
 				{
 					$calc_vid_sec = min($vid_sec, floor($entryLengthInMsec / 1000));
+				}
+				else if($bif)
+				{
+					$calc_vid_sec += $bifInterval;
+					if($calc_vid_sec > ($entryLengthInMsec / 1000))
+					{
+						continue;
+					}
 				}
 				else if ($vid_slices != -1) // need to create a thumbnail at a specific slice
 				{
@@ -919,6 +941,13 @@ class myEntryUtils
 						throw new kFileSyncException('no ready filesync on current DC', kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC);
 					}
 				}
+				else
+				{
+					if($bif)
+					{
+						$bifImgPaths[] = $orig_image_path;
+					}
+				}
 			}
 
 			// close db connections as we won't be requiring the database anymore and image manipulation may take a long time
@@ -959,7 +988,17 @@ class myEntryUtils
 					$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
 				}
 				if ($thumbCaptureByPackager && file_exists($packagerResizeFullPath))
-					unlink($packagerResizeFullPath);
+				{
+					if($bif)
+					{
+						$imgPathsToUnlink[] = $packagerResizeFullPath;
+						$bifImgPaths[] = $packagerResizeFullPath;
+					}
+					else
+					{
+						unlink($packagerResizeFullPath);
+					}
+				}
 			}
 
 
@@ -982,17 +1021,55 @@ class myEntryUtils
 			}
 
 			if ($thumbCaptureByPackager && $shouldResizeByPackager && $multi && file_exists($packagerResizeFullPath))
-				unlink($packagerResizeFullPath);
+			{
+				if($bif)
+				{
+					$imgPathsToUnlink[] = $packagerResizeFullPath;
+					$bifImgPaths[] = $packagerResizeFullPath;
+				}
+				else
+				{
+					unlink($packagerResizeFullPath);
+				}
+			}
 
 			if ($isEncryptionNeeded)
 			{
 				$fileSync->deleteTempClear();
 				if (self::isTempFile($orig_image_path) && file_exists($orig_image_path))
-					unlink($orig_image_path);
+				{
+					if($bif)
+					{
+						$imgPathsToUnlink[] = $orig_image_path;
+						$bifImgPaths[] = $orig_image_path;
+					}
+					else
+					{
+						unlink($orig_image_path);
+					}
+				}
+			}
+		}
+
+		if($bif && $bifInterval)
+		{
+			$imgPathsToUnlink = array_unique($imgPathsToUnlink);
+			$bifImgPaths = array_unique($bifImgPaths);
+			$finalThumbPath = kFile::replaceExt($finalThumbPath, 'bif');
+			$bifCreator = new kBifCreator($bifImgPaths, $finalThumbPath, $bifInterval);
+			$processingThumbPath = $finalThumbPath;
+			$bifCreator->createBif();
+
+			foreach ($imgPathsToUnlink as $image)
+			{
+				if(file_exists($image))
+				{
+					unlink($image);
+				}
 			}
 		}
 		
-		if ($multi)
+		if ($multi && !$bif)
 		{
 			imagejpeg($im, $processingThumbPath);
 			imagedestroy($im);
@@ -1137,27 +1214,6 @@ class myEntryUtils
 		$url .= self::MP4_FILENAME_PARAMETER;
 		return $url;
 	}
-
-
-	private static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null, $offsetPrefix = '')
-	{
-		$offset = floor($calc_vid_sec*1000);
-		if ($width)
-			$offset .= "-w$width";
-		if ($height)
-			$offset .= "-h$height";
-
-		$packagerThumbCapture = str_replace(
-		array ( "{url}", "{offset}" ),
-		array ( $url , $offsetPrefix . $offset ) ,
-		$packagerCaptureUrl );
-
-		$tempThumbPath = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
-		kFile::closeDbConnections();
-		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath, null, true);
-		return $success;
-	}
-
 
 	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, &$flavorAssetId)
 	{
@@ -2253,16 +2309,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return $content;
 	}
 
-	private static function shouldResizeByPackager($params, $type, $dimension)
-	{
-		//check if all null or 0
-		$canBeHandle = (count(array_filter($params)) == 0);
-		// check if only one dimension is given or type 5 (stretches to the exact dimensions)
-		$positiveDimension = array_filter($dimension, function ($v) {return $v > 0;});
-		$validDimension = ($type == 5) || (count($positiveDimension) == 1);
-		return ($canBeHandle && $validDimension);
-	}
-
 	public static function addTrackEntryInfo(entry $entry,$message)
 	{
 		$trackEntry = new TrackEntry();
@@ -2297,4 +2343,31 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			}
 		}
 	}
+
+	public static function getBifParameters($count, $start_sec, $entry, $vid_slices)
+	{
+		if($count > self::MAX_BIF_FRAMES)
+		{
+			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
+		}
+		$offset = max($start_sec, 0);
+		$lengthInSec = $entry->getLengthInMsecs() / 1000;
+		if($offset > $lengthInSec)
+		{
+			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
+		}
+		$bifInterval = kBifCreator::calculateBifInterval($lengthInSec, $vid_slices, $offset);
+		KalturaLog::debug("BIF interval for capturing frames: [$bifInterval] with offset:[$offset]");
+
+		return array ($offset, $bifInterval);
+	}
+
+	public static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null, $offsetPrefix = '')
+	{
+		list($packagerThumbCapture, $tempThumbPath) = KThumbnailCapture::generateThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height, $offsetPrefix);
+		kFile::closeDbConnections();
+		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath, null, true);
+		return $success;
+	}
+
 }
