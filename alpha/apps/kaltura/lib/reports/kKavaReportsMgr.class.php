@@ -1493,7 +1493,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_UNIQUE_CONTRIBUTORS),
 		),
 
-		myReportsMgr::REPORT_TYPE_MODERATION_REASONS => array(
+		myReportsMgr::REPORT_TYPE_CONTENT_REPORT_REASONS => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'reason' => self::DIMENSION_EVENT_VAR1
 			),
@@ -1502,7 +1502,7 @@ class kKavaReportsMgr extends kKavaBase
 				self::DRUID_VALUES => array(self::EVENT_TYPE_REPORT_SUBMITTED)
 
 			),
-			self::REPORT_METRICS => array(self::METRIC_COUNT),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_REPORT_SUBMITTED),
 		),
 	);
 	
@@ -1519,6 +1519,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_DOWNLOAD_CLICKED,
 		self::EVENT_TYPE_REPORT_CLICKED,
 		self::EVENT_TYPE_VIEW,
+		self::EVENT_TYPE_REPORT_SUBMITTED,
 	);
 
 	protected static $media_type_count_aggrs = array(

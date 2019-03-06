@@ -50,5 +50,5 @@ interface ReportType extends BaseEnum
    const APP_DOMAIN_UNIQUE_ACTIVE_USERS = 40;
    const TOP_SOURCES = 41;
    const VPAAS_USAGE_MULTI = 42;
-   const MODERATION_REASONS = 44;
+   const CONTENT_REPORT_REASONS = 44;
 }
