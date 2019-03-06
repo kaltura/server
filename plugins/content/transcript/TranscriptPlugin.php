@@ -135,9 +135,6 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 				$matches = $matches[1];
 				$content = implode(" ", $matches);
 			}
-			
-			if(!$content)
-				continue;
 
 			$content = trim(preg_replace('/\s+/', ' ', $content));
 			if(!$content)
