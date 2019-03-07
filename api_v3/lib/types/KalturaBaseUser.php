@@ -6,8 +6,6 @@
 
 class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 {
-	const MAX_NAME_LEN = 40;
-
 	/**
 	 * @var string
 	 * @filter order
