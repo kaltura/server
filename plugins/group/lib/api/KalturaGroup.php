@@ -6,12 +6,6 @@
 class KalturaGroup extends KalturaBaseUser
 {
 	/**
-	 * @var KalturaUserType
-	 * @insertonly
-	 */
-	public $type;
-
-	/**
 	 * @var int
 	 * @readonly
 	 */
