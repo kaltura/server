@@ -52,7 +52,7 @@ class KalturaQuiz extends KalturaObject
 	/**
 	 * @var int
 	 */
-	public $maxRetakesAllowed;
+	public $attemptsAllowed;
 
 	/**
 	 * @var KalturaScoreType
@@ -70,7 +70,7 @@ class KalturaQuiz extends KalturaObject
 		"showCorrectAfterSubmission",
 		"allowDownload",
 		"showGradeAfterSubmission",
-		"maxRetakesAllowed",
+		"attemptsAllowed",
 		"scoreType",
 	);
 

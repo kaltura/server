@@ -54,7 +54,7 @@ class kQuiz {
 	/**
 	 * @var int
 	 */
-	protected $maxRetakesAllowed;
+	protected $attemptsAllowed;
 
 	/**
 	 * @var KalturaScoreType
@@ -192,17 +192,17 @@ class kQuiz {
 	/**
 	 * @return int
 	 */
-	public function getMaxRetakesAllowed()
+	public function getAttemptsAllowed()
 	{
-		return $this->maxRetakesAllowed;
+		return $this->attemptsAllowed;
 	}
 
 	/**
-	 * @param int $maxRetakesAllowed
+	 * @param int $attemptsAllowed
 	 */
-	public function setMaxRetakesAllowed($maxRetakesAllowed)
+	public function setAttemptsAllowed($attemptsAllowed)
 	{
-		$this->maxRetakesAllowed = $maxRetakesAllowed;
+		$this->attemptsAllowed = $attemptsAllowed;
 	}
 
 	/**
