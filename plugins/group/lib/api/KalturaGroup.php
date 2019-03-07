@@ -2,6 +2,7 @@
 /**
  * @package plugins.group
  * @subpackage api.objects
+ * @relatedService GroupService
  */
 class KalturaGroup extends KalturaBaseUser
 {

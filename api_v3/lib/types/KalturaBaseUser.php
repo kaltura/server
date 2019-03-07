@@ -1,9 +1,9 @@
 <?php
-/*
+/**
 * @package api
 * @subpackage objects
+* @relatedService UserService
 */
-
 class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 {
 	/**

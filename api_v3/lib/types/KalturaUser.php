@@ -7,7 +7,7 @@
 class KalturaUser extends KalturaBaseUser
 {
 	const MAX_NAME_LEN = 40;
-	
+
 	/**
 	 * @var KalturaUserType
 	 * @filter eq,in
