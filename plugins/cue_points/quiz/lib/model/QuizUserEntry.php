@@ -120,4 +120,15 @@ class QuizUserEntry extends UserEntry{
 		return false;
 	}
 
+	public function postUpdate(PropelPDO $con = null)
+	{
+		if($this->isColumnModified(UserEntryPeer::STATUS) && $this->getStatus() == UserEntryStatus::DELETED)
+		{
+			kEventsManager::raiseEventDeferred(new kObjectDeletedEvent($this));
+		}
+
+		parent::postUpdate($con);
+	}
 }
+
+
