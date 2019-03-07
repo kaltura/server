@@ -1,5 +1,16 @@
 # Naos 14.16.0 #
 
+## create new type of event notification template: Boolean ##
+ - Issue Type: Task
+ - Issue ID: REACH2-493
+
+### Configuration ###
+Add BooleanNotification to your plugins.ini
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+
 ## Reach - Support extending accessKey##
 
  - Issue Type: Feature
