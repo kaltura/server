@@ -18,6 +18,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	
 	const BULK_UPLOAD_ID = "bulk_upload_id";
 	const USER_MODE = 'user_mode';
+	const MEMBERS_COUNT = 'members_count';
 	
 	const ANONYMOUS_PUSER_ID = "KALANONYM";
 	
@@ -1191,6 +1192,9 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 
 	public function setUserMode ($v){$this->putInCustomData (self::USER_MODE, $v);}
 	public function getUserMode (){return $this->getFromCustomData(self::USER_MODE, null, KuserMode::NONE);}
+
+	public function setMembersCount ($v){$this->putInCustomData (self::MEMBERS_COUNT, $v);}
+	public function getMembersCount (){return $this->getFromCustomData(self::MEMBERS_COUNT, null, 0);}
 
 	/**
 	 * Force modifiedColumns to be affected even if the value not changed
