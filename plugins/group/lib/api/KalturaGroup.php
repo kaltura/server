@@ -3,7 +3,7 @@
  * @package plugins.group
  * @subpackage api.objects
  */
-class KalturaGroup extends KalturaUser
+class KalturaGroup extends KalturaBaseUser
 {
 	/**
 	 * @var KalturaUserType

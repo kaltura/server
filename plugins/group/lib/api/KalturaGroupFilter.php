@@ -5,17 +5,6 @@
  */
 class KalturaGroupFilter extends KalturaUserFilter
 {
-	static private $order_by_map = array
-	(
-		"+membersCount" => "+members_count",
-		"-membersCount" => "-members_count",
-	);
-
-	public function getOrderByMap()
-	{
-		return array_merge(parent::getOrderByMap(), self::$order_by_map);
-	}
-
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
@@ -32,6 +21,4 @@ class KalturaGroupFilter extends KalturaUserFilter
 		$response->totalCount = $totalCount;
 		return $response;
 	}
-
-
 }
