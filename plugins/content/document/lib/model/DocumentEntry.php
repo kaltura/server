@@ -75,7 +75,7 @@ class DocumentEntry extends entry
 	public function getCreateThumb (  )			{	return false;} // Documents never have a thumb
 	
 	public function getLocalThumbFilePath($version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
-		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $density = 0, $stripProfiles = false, $flavorId = null, $fileName = null, $start_sec = null, $end_sec = null, $bif = null) {
+		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $density = 0, $stripProfiles = false, $flavorId = null, $fileName = null, $start_sec = null, $end_sec = null) {
 		KalturaLog::log ( "flavor_id [$flavorId] file_name [$fileName]" );
 		if (is_null ( $flavorId ))
 			KExternalErrors::dieError ( KExternalErrors::MISSING_PARAMETER, 'flavor_id' );

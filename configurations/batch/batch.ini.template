@@ -480,6 +480,7 @@ params.localTempPath 								= @TMP_DIR@/thumb
 params.sharedTempPath 								= @WEB_DIR@/tmp/thumb
 params.FFMpegCmd	 								= @BIN_DIR@/ffmpeg
 params.ImageMagickCmd								= convert
+maximumExecutionTime								= 3600
 
 
 [KAsyncDistribute : JobHandlerWorker]

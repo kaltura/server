@@ -68,7 +68,7 @@ class kBifCreator
 
 		$bifTableSize = 8 + (8 * sizeof($images));
 		$imageOffset = 64 + $bifTableSize;
-		$timestampIndex = 0;
+		$timestampIndex = 1;
 
 		foreach ($images as $image)
 		{
