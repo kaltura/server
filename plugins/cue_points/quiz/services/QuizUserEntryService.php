@@ -98,7 +98,7 @@ class QuizUserEntryService extends KalturaBaseService{
 					break;
 
 				case KalturaScoreType::FIRST:
-					$calculatedScore = end($countUserEntryVersions)->getScore();
+					$calculatedScore = end($userEntryVersions)->getScore();
 					break;
 
 				case KalturaScoreType::AVERAGE:
