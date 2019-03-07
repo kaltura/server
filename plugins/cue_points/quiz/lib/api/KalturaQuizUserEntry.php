@@ -92,7 +92,7 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 				$entry = entryPeer::retrieveByPK($this->entryId);
 				$quiz = QuizPlugin::getQuizData($entry);
 				//version counting is starting from zero
-				if ($quiz->getattemptsAllowed() && $userEntryNewestVersion->getVersion() + 1 <= $quiz->getAttemptsAllowed() - 1)
+				if ($quiz->getAttemptsAllowed() && $userEntryNewestVersion->getVersion() + 1 <= $quiz->getAttemptsAllowed() - 1)
 				{
 					$object_to_fill->setVersion($userEntryNewestVersion->getVersion() + 1);
 				}
