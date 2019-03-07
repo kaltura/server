@@ -3736,9 +3736,11 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function addAggregatedEntriesGraphs(&$graphs, $base_values, $dates)
 	{
-		if (isset($base_values[self::METRIC_ENTRIES_TOTAL]))
+		$firstDate = reset($dates);
+
+		if (isset($graphs[self::METRIC_ENTRIES_ADDED][$firstDate]))
 		{
-			$cur_value = $base_values[self::METRIC_ENTRIES_TOTAL];
+			$cur_value = isset($base_values[self::METRIC_ENTRIES_TOTAL]) ? $base_values[self::METRIC_ENTRIES_TOTAL] : 0;
 			foreach ($dates as $date)
 			{
 				$cur_value += $graphs[self::METRIC_ENTRIES_ADDED][$date];
@@ -3749,9 +3751,9 @@ class kKavaReportsMgr extends kKavaBase
 			}
 		}
 		
-		if (isset($base_values[self::METRIC_DURATION_TOTAL_MSEC]))
+		if (isset($graphs[self::METRIC_DURATION_ADDED_MSEC][$firstDate]))
 		{
-			$cur_value = $base_values[self::METRIC_DURATION_TOTAL_MSEC];
+			$cur_value = isset($base_values[self::METRIC_DURATION_TOTAL_MSEC]) ? $base_values[self::METRIC_DURATION_TOTAL_MSEC] : 0;
 			foreach ($dates as $date)
 			{
 				$cur_value += $graphs[self::METRIC_DURATION_ADDED_MSEC][$date];
