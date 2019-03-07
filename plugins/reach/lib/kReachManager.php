@@ -78,6 +78,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		{
 			return;
 		}
+
 		self::$isInit = true;
 		//will hold array of: array(profileId,condition,action) where there are boolean event notification ids.
 		self::$booleanNotificationTemplatesFromReachProfiles = array();
@@ -92,7 +93,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			{
 				foreach ($rule->getConditions() as $condition)
 				{
-					if ($condition->getbooleanEventNotificationIds() && $condition->getbooleanEventNotificationIds() != "N/A")
+					if ( $condition->getType()== ConditionType::BOOLEAN && $condition->getbooleanEventNotificationIds() && $condition->getbooleanEventNotificationIds() != "N/A")
 					{
 						self::$booleanNotificationTemplatesFromReachProfiles[] = array($profile->getId(), $condition, $rule->getActions());
 						$profileWasAdded++;
