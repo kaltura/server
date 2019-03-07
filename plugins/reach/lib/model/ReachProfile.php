@@ -429,7 +429,7 @@ class ReachProfile extends BaseReachProfile
 	public function fulfillsRules(kScope $scope, $checkEmptyRulesOnly = false)
 	{
 		$gotBooleanCondition = false;
-		$gotOtherCondition = false;
+		$gotNonBooleanCondition = false;
 		$fullFilledCatalogItemIds = array();
 		if(!is_array($this->getRulesArray()) || !count($this->getRulesArray()))
 			return $fullFilledCatalogItemIds;
@@ -448,7 +448,7 @@ class ReachProfile extends BaseReachProfile
 					}
 					else if($condition->getType() != ConditionType::BOOLEAN)
 					{
-						$gotOtherCondition = true;
+						$gotNonBooleanCondition = true;
 						break;
 					}
 				}
@@ -456,7 +456,7 @@ class ReachProfile extends BaseReachProfile
 			if ($gotBooleanCondition)
 				continue;
 
-			if($gotOtherCondition && $checkEmptyRulesOnly )
+			if($gotNonBooleanCondition && $checkEmptyRulesOnly )
 				continue;
 
 			if(!$checkEmptyRulesOnly && !count($rule->getConditions()))
