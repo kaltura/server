@@ -248,7 +248,7 @@ class Form_ReachProfileConfigure extends ConfigureForm
 			/* @var Kaltura_Client_Reach_Type_AddEntryVendorTaskAction $action */
 			$catalogItemIds[] = $action->catalogItemIds;
 		}
-		if ($rule->conditions)
+		if (isset($rule->conditions))
 		{
 			foreach ($rule->conditions as $condition)
 			{
