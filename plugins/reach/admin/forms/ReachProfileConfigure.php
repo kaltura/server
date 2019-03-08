@@ -248,13 +248,16 @@ class Form_ReachProfileConfigure extends ConfigureForm
 			/* @var Kaltura_Client_Reach_Type_AddEntryVendorTaskAction $action */
 			$catalogItemIds[] = $action->catalogItemIds;
 		}
-		foreach ($rule->conditions as $condition)
+		if ($rule->conditions)
 		{
-			/* @var  Kaltura_Client_Type_BooleanEventNotificationCondition $condition */
-			$booleanEventNotificationIds[] = $condition->booleanEventNotificationIds;
+			foreach ($rule->conditions as $condition)
+			{
+				/* @var  Kaltura_Client_Type_BooleanEventNotificationCondition $condition */
+				$booleanEventNotificationIds[] = $condition->booleanEventNotificationIds;
+			}
+			$newRule['booleanEventNotificationIds'] = implode(', ', $booleanEventNotificationIds)
 		}
 		$newRule['catalogItemIds'] = implode(', ', $catalogItemIds);
-		$newRule['booleanEventNotificationIds'] = implode(', ', $booleanEventNotificationIds);
 		return $newRule;
 	}
 
