@@ -75,7 +75,24 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		$pager->attachToCriteria($c);
 		
 		$list = UserEntryPeer::doSelect($c);
-
+		if ($this instanceof KalturaQuizUserEntryFilter)
+		{
+			if (isset($this->versionEqual))
+			{
+				foreach ($list as $quizUserEntry)
+				{
+					if ($quizUserEntry->getVersion() == $this->versionEqual)
+					{
+						$list = array($quizUserEntry);
+					}
+				}
+			}
+			else
+			{
+				usort($list, array("UserEntryPeer","UserEntryPeer::cmp"));
+				$list = array_reverse($list);
+			}
+		}
 		$resultCount = count($list);
 		if ($resultCount && ($resultCount < $pager->pageSize))
 		{

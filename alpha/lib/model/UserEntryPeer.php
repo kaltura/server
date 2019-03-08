@@ -90,9 +90,14 @@ class UserEntryPeer extends BaseUserEntryPeer {
 		$c->add(UserEntryPeer::ENTRY_ID, $entryId);
 		$c->add(UserEntryPeer::TYPE, $type);
 		$c->add(UserEntryPeer::STATUS, QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
-		$c->addDescendingOrderByColumn(UserEntryPeer::VERSION);
 		$userEntryList = UserEntryPeer::doSelect($c);
-
+		usort($userEntryList, array("UserEntryPeer","self::cmp"));
+		$userEntryList = array_reverse($userEntryList);
 		return $userEntryList;
+	}
+
+	public static function cmp($a, $b)
+	{
+		return strcmp($a->getVersion(), $b->getVersion());
 	}
 } // UserEntryPeer
