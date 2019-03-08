@@ -3,6 +3,7 @@
  - Issue Type: Task
  - Issue ID: PLAT-9742
 ### Configuration ###
+Add Group to your plugins.ini
 
 ### Deployment scripts ###
 Run deployment script:
