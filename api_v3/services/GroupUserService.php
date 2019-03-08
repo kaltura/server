@@ -57,7 +57,7 @@ class GroupUserService extends KalturaBaseService
 		$dbGroupUser->save();
 		$groupUser->fromObject($dbGroupUser);
 
-		$numberOfUsersPerGroup = $this->getNumberOfUsersPerGroup($kgroup);
+		$numberOfUsersPerGroup = $this->getNumberOfUsersInGroup($kgroup->getId());
 		$kgroup->setMembersCount($numberOfUsersPerGroup);
 		$kgroup->save();
 		return $groupUser;
@@ -137,7 +137,7 @@ class GroupUserService extends KalturaBaseService
 
 		$dbKuserKgroup->setStatus(KuserKgroupStatus::DELETED);
 		$dbKuserKgroup->save();
-		$numberOfUsersPerGroup = $this->getNumberOfUsersPerGroup($kgroup);
+		$numberOfUsersPerGroup = $this->getNumberOfUsersInGroup($kgroup->getId());
 		$kgroup->setMembersCount($numberOfUsersPerGroup);
 		$kgroup->save();
 		$groupUser = new KalturaGroupUser();
@@ -208,10 +208,10 @@ class GroupUserService extends KalturaBaseService
 		return $bulkUpload;
 	}
 
-	protected function getNumberOfUsersPerGroup($kgroup)
+	protected function getNumberOfUsersInGroup($groupId)
 	{
 		$criteria = new Criteria();
-		$criteria->add(KuserKgroupPeer::KGROUP_ID, $kgroup->getId());
+		$criteria->add(KuserKgroupPeer::KGROUP_ID, $groupId);
 		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
 		$numberOfUsersPerGroup = KuserKgroupPeer::doCount($criteria);
 		return $numberOfUsersPerGroup;

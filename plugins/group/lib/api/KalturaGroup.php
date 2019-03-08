@@ -27,9 +27,11 @@ class KalturaGroup extends KalturaUser
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if (is_null($dbObject))
+		{
 			$dbObject = new kuser();
+			$dbObject->setType(KuserType::GROUP);
+		}
 		parent::toObject($dbObject, $skip);
-		$dbObject->setType(KuserType::GROUP);
 		return $dbObject;
 	}
 }
