@@ -48,15 +48,21 @@ class GroupUserService extends KalturaBaseService
 		$criteria = new Criteria();
 		$criteria->add(KuserKgroupPeer::KUSER_ID, $kuser->getId());
 		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
-		if ( KuserKgroupPeer::doCount($criteria) > KuserKgroup::MAX_NUMBER_OF_GROUPS_PER_USER){
+		if (KuserKgroupPeer::doCount($criteria) > KuserKgroup::MAX_NUMBER_OF_GROUPS_PER_USER){
 			throw new KalturaAPIException (KalturaErrors::USER_EXCEEDED_MAX_GROUPS);
 		}
-
 		$dbGroupUser = $groupUser->toInsertableObject();
 		$dbGroupUser->setPartnerId($this->getPartnerId());
 		$dbGroupUser->setStatus(KuserKgroupStatus::ACTIVE);
 		$dbGroupUser->save();
 		$groupUser->fromObject($dbGroupUser);
+
+		$criteria = new Criteria();
+		$criteria->add(KuserKgroupPeer::KGROUP_ID, $kgroup->getId());
+		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
+		$numberOfUsersPerGroup = KuserKgroupPeer::doCount($criteria);
+		$kgroup->setMembersCount($numberOfUsersPerGroup+1);
+		$kgroup->save();
 		return $groupUser;
 	}
 
@@ -134,6 +140,8 @@ class GroupUserService extends KalturaBaseService
 
 		$dbKuserKgroup->setStatus(KuserKgroupStatus::DELETED);
 		$dbKuserKgroup->save();
+		$kgroup->setMembersCount($kgroup->getMembersCount()-1);
+		$kgroup->save();
 		$groupUser = new KalturaGroupUser();
 		$groupUser->fromObject($dbKuserKgroup);
 	}
