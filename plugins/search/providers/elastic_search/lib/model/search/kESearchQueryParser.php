@@ -413,11 +413,6 @@ class kESearchQueryParser
 			$kSearchItem = new KalturaESearchUserItem();
 			$kSearchItem->fieldName = constant("KalturaESearchUserFieldName::$fieldName");
 		}
-		if (defined('KalturaESearchGroupFieldName::' . $fieldName))
-		{
-			$kSearchItem = new KalturaESearchGroupItem();
-			$kSearchItem->fieldName = constant("KalturaESearchGroupFieldName::$fieldName");
-		}
 		if ($fieldName == '_METADATA')
 			$kSearchItem = new KalturaESearchMetadataItem();
 		if ($fieldName == '_ALL')

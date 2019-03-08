@@ -17,17 +17,17 @@ class KalturaESearchGroupItem extends KalturaESearchAbstractUserItem
 	private static $map_dynamic_enum = array();
 
 	private static $map_field_enum = array(
-		KalturaESearchUserFieldName::SCREEN_NAME => ESearchUserFieldName::SCREEN_NAME,
-		KalturaESearchUserFieldName::EMAIL => ESearchUserFieldName::EMAIL,
-		KalturaESearchUserFieldName::TAGS => ESearchUserFieldName::TAGS,
-		KalturaESearchUserFieldName::UPDATED_AT => ESearchUserFieldName::UPDATED_AT,
-		KalturaESearchUserFieldName::CREATED_AT => ESearchUserFieldName::CREATED_AT,
-		KalturaESearchUserFieldName::LAST_NAME => ESearchUserFieldName::LAST_NAME,
-		KalturaESearchUserFieldName::FIRST_NAME => ESearchUserFieldName::FIRST_NAME,
-		KalturaESearchUserFieldName::PERMISSION_NAMES => ESearchUserFieldName::PERMISSION_NAMES,
-		KalturaESearchUserFieldName::GROUP_IDS => ESearchUserFieldName::GROUP_IDS,
-		KalturaESearchUserFieldName::ROLE_IDS => ESearchUserFieldName::ROLE_IDS,
-		KalturaESearchUserFieldName::USER_ID => ESearchUserFieldName::PUSER_ID,
+		KalturaESearchGroupFieldName::SCREEN_NAME => ESearchUserFieldName::SCREEN_NAME,
+		KalturaESearchGroupFieldName::EMAIL => ESearchUserFieldName::EMAIL,
+		KalturaESearchGroupFieldName::TAGS => ESearchUserFieldName::TAGS,
+		KalturaESearchGroupFieldName::UPDATED_AT => ESearchUserFieldName::UPDATED_AT,
+		KalturaESearchGroupFieldName::CREATED_AT => ESearchUserFieldName::CREATED_AT,
+		KalturaESearchGroupFieldName::LAST_NAME => ESearchUserFieldName::LAST_NAME,
+		KalturaESearchGroupFieldName::FIRST_NAME => ESearchUserFieldName::FIRST_NAME,
+		KalturaESearchGroupFieldName::PERMISSION_NAMES => ESearchUserFieldName::PERMISSION_NAMES,
+		KalturaESearchGroupFieldName::GROUP_IDS => ESearchUserFieldName::GROUP_IDS,
+		KalturaESearchGroupFieldName::ROLE_IDS => ESearchUserFieldName::ROLE_IDS,
+		KalturaESearchGroupFieldName::USER_ID => ESearchUserFieldName::PUSER_ID,
 	);
 
 	protected function getMapBetweenObjects()
