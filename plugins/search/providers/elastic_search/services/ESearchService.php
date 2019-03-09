@@ -58,23 +58,6 @@ class ESearchService extends KalturaBaseService
 	}
 
 	/**
-	 *
-	 * @action searchGroup
-	 * @param KalturaESearchGroupParams $searchParams
-	 * @param KalturaPager $pager
-	 * @return KalturaESearchGroupResponse
-	 */
-	function searchGroupAction(KalturaESearchGroupParams $searchParams, KalturaPager $pager = null)
-	{
-		$userSearch = new kUserSearch();
-		list($coreResults, $objectCount) = $this->initAndSearch($userSearch, $searchParams, $pager);
-		$response = new KalturaESearchGroupResponse();
-		$response->objects = KalturaESearchGroupResultArray::fromDbArray($coreResults, $this->getResponseProfile());
-		$response->totalCount = $objectCount;
-		return $response;
-	}
-
-	/**
 	 * @param kBaseSearch $coreSearchObject
 	 * @param $searchParams
 	 * @param $pager
