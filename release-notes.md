@@ -7,8 +7,7 @@ Add Group to your plugins.ini
 
 ### Deployment scripts ###
 Run deployment script:
-	- php deployment/updates/scripts/add_permissions/2019_03_10_add_group_permission.php
-	- php deployment/updates/scripts/add_permissions/2017_05_24_eSearch_service.php
+	 php deployment/updates/scripts/add_permissions/2019_03_10_add_group_permission.php
 
 ## create new type of event notification template: Boolean ##
  - Issue Type: Task
