@@ -38,8 +38,8 @@ class GroupService extends KalturaBaseUserService
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
 		}
-
-		$this->validateUserNames($group);
+		$names = array('fullName', 'screenName');
+		$this->validateUserNames($group ,$names);
 		$lockKey = "user_add_" . $this->getPartnerId() . $group->id;
 		$ret =  kLock::runLocked($lockKey, array($this, 'adduserImpl'), array($group));
 		return $ret;

@@ -38,8 +38,8 @@ class UserService extends KalturaBaseUserService
 		{
 			$user->isAdmin = true;
 		}
-
-		$this->validateUserNames($user);
+		$names = array('firstName', 'lastName', 'fullName', 'screenName');
+		$this->validateUserNames($user ,$names);
 		$lockKey = "user_add_" . $this->getPartnerId() . $user->id;
 		return kLock::runLocked($lockKey, array($this, 'adduserImpl'), array($user));
 	}
