@@ -418,20 +418,19 @@ class KalturaBaseUserService extends KalturaBaseService
 		return $ks;
 	}
 	/**
-	 * @param $user The user parameters to validate
+	 * @param $object The object to validate
 	 * @param $names array of names
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 */
-	protected function validateUserNames($user ,array $names)
+	protected function validateNames($object , array $names)
 	{
 		foreach ($names as $name)
 		{
-			if (!is_null($user->$name) && strpos($user->$name, kuser::URL_PATTERN) !== false)
+			if (!is_null($object->$name) && strpos($object->$name, kuser::URL_PATTERN) !== false)
 				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $name);
 		}
 	}
-
-
+	
 	function addUserImpl(KalturaBaseUser $user)
 	{
 		/* @var $dbUser kuser */
