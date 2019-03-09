@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.elasticSearch
+ * @package plugins.group
  * @subpackage model.order
  */
 class ESearchGroupOrderByItem extends ESearchOrderByItem
