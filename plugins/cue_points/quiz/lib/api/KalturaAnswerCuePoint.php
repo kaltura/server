@@ -200,6 +200,10 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	{
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);	
 		$dbEntry = entryPeer::retrieveByPK($this->entryId);
+		if(!$dbEntry)
+		{
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'KalturaAnswerCuePoint:entryId');
+		}
 		$kQuiz = QuizPlugin::validateAndGetQuiz($dbEntry);
 		$this->validateUserEntry();
 		if ( !$kQuiz->getAllowAnswerUpdate() && !kCurrentContext::$is_admin_session) 
