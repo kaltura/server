@@ -37,10 +37,15 @@ class BooleanNotificationPlugin extends KalturaPlugin implements IKalturaPermiss
 	 */
 	public static function getEnums($baseEnumName = null)
 	{
+		if(is_null($baseEnumName))
+		{
+			return array('BooleanNotificationTemplateType');
+		}
 		if($baseEnumName == 'EventNotificationTemplateType')
 		{
 			return array('BooleanNotificationTemplateType');
 		}
+
 		return array();
 	}
 
