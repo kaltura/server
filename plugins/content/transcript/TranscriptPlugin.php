@@ -129,7 +129,7 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 			$matches = array();
 			preg_match_all('/value": "(.*?)"/', $content, $matches, PREG_PATTERN_ORDER);
 			
-			if(count($matches))
+			if(isset($matches[1]) && count($matches[1]))
 			{
 				$matches = $matches[1];
 				$content = implode(" ", $matches);
