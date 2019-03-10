@@ -1499,6 +1499,7 @@ class kKavaReportsMgr extends kKavaBase
 				'percentile' => self::DIMENSION_PERCENTILES
 			),
 			self::REPORT_METRICS => array(self::METRIC_COUNT_VIEWERS),
+			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addZeroPercentiles',
 		)
 	);
 	
@@ -5606,6 +5607,35 @@ class kKavaReportsMgr extends kKavaBase
 		$data[] = self::getRollupRow($data);
 		
 		$result = array($headers, $data, $total_count);
+	}
+
+	protected static function addZeroPercentiles(&$result)
+	{
+		$total_count = $result[2];
+		if (!$total_count)
+		{
+			return;
+		}
+		$percentiles = array_fill(1, 100, 0);
+		$data = $result[1];
+		foreach ($data as $percentile_data)
+		{
+			$percentile = $percentile_data[0];
+			$count = $percentile_data[1];
+			if ($percentile > 0 && $percentile <= 100)
+			{
+				$percentiles[$percentile] = $count;
+			}
+		}
+		$data = array();
+		foreach ($percentiles as $percentile => $count)
+		{
+			$data[] = array($percentile, $count);
+		}
+
+		$result[1] = $data;
+		$result[2] = 100;
+		unset($result[3]);
 	}
 
 	/// total functions
