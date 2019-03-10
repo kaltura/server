@@ -123,19 +123,18 @@ class TranscriptPlugin extends KalturaPlugin implements IKalturaEnumerator, IKal
 				continue;
 
 			$syncKey = $transcriptAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$fileContent = kFileSyncUtils::file_get_contents($syncKey, true, false);
+			$content = kFileSyncUtils::file_get_contents($syncKey, true, false);
 			
 			//Get values from string file
 			$matches = array();
-			preg_match_all('/value": "(.*?)"/', $s, $matches, PREG_PATTERN_ORDER);
+			preg_match_all('/value": "(.*?)"/', $content, $matches, PREG_PATTERN_ORDER);
 			
-			$content = $fileContent;
 			if(count($matches))
 			{
 				$matches = $matches[1];
 				$content = implode(" ", $matches);
 			}
-
+			
 			$content = trim(preg_replace('/\s+/', ' ', $content));
 			if(!$content)
 				continue;
