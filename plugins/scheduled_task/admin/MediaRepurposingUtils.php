@@ -12,7 +12,7 @@ class MediaRepurposingUtils
 	const MPRS_DATA_XPATH_NAME = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPData\']';
 	const MPRS_XPATH_NAME = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPsOnEntry\']';
 	const EXCLUDE = 'Exclude';
-	const UNSET = "N/A";
+	const UNSET_VALUE = "N/A";
 	const MEDIA_REPURPOSING_SYSTEM_NAME = 'MRP';
 	const ADMIN_CONSOLE_PARTNER = "-2";
 	const DRY_RUN_MAX_RESULT_DEFAULT = 500;
@@ -372,7 +372,7 @@ class MediaRepurposingUtils
 	private static function getValueFromString($value, $type) {
 		if ($value)
 		{
-			if($value == self::UNSET)
+			if($value == self::UNSET_VALUE)
 			{
 				return null;
 			}
@@ -405,7 +405,7 @@ class MediaRepurposingUtils
 
 		if(is_null($value))
 		{
-			return self::UNSET;
+			return self::UNSET_VALUE;
 		}
 
 		return $value;
