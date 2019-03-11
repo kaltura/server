@@ -1498,7 +1498,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_DIMENSION_MAP => array(
 				'percentile' => self::DIMENSION_PERCENTILES
 			),
-			self::REPORT_METRICS => array(self::METRIC_COUNT_VIEWERS),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_VIEW_PERIOD),
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addZeroPercentiles',
 		)
 	);
@@ -1516,6 +1516,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_DOWNLOAD_CLICKED,
 		self::EVENT_TYPE_REPORT_CLICKED,
 		self::EVENT_TYPE_VIEW,
+		self::EVENT_TYPE_VIEW_PERIOD,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -1916,9 +1917,6 @@ class kKavaReportsMgr extends kKavaBase
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
 			self::getLongSumAggregator(self::METRIC_UNIQUE_PERCENTILES_SUM, self::METRIC_UNIQUE_PERCENTILES_SUM));
 
-		self::$aggregations_def[self::METRIC_COUNT_VIEWERS] = self::getFilteredAggregator(
-			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
-			self::getLongSumAggregator(self::METRIC_COUNT_VIEWERS, self::METRIC_COUNT));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
@@ -5616,25 +5614,27 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			return;
 		}
-		$percentiles = array_fill(1, 100, 0);
+		$metrics_count = count($result[0]) - 1;
+		$empty_values = array_fill(0, $metrics_count, 0);
+		$percentiles = array_fill(0, 101, $empty_values);
 		$data = $result[1];
 		foreach ($data as $percentile_data)
 		{
-			$percentile = $percentile_data[0];
-			$count = $percentile_data[1];
-			if ($percentile > 0 && $percentile <= 100)
+			$percentile = array_shift($percentile_data);
+			if (isset($percentiles[$percentile]))
 			{
-				$percentiles[$percentile] = $count;
+				$percentiles[$percentile] = $percentile_data;
 			}
 		}
 		$data = array();
-		foreach ($percentiles as $percentile => $count)
+		foreach ($percentiles as $percentile => $metrics)
 		{
-			$data[] = array($percentile, $count);
+			array_unshift($metrics, $percentile);
+			$data[] = array_values($metrics);
 		}
 
 		$result[1] = $data;
-		$result[2] = 100;
+		$result[2] = 101;
 		unset($result[3]);
 	}
 
