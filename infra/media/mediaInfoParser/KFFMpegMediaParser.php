@@ -239,7 +239,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		$mediaInfo->videoCodecId = isset($stream->codec_tag_string)? trim($stream->codec_tag_string): null;
 			// If stream duration is not set or zero'ed, 
 			// try to retrieve duration from stream/tag section 
-		if(isset($stream->duration))
+		if(isset($stream->duration) && $stream->duration>0)
 			$mediaInfo->videoDuration = round($stream->duration*1000);
 		else if(isset($stream->tags->duration))
 			$mediaInfo->videoDuration = self::convertDuration2msec($stream->tags->duration);
