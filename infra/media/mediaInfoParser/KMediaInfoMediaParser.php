@@ -141,6 +141,8 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 				}
 			}
 			
+			self::adjustDurations($kMi, $ffMi);
+			
 			/*
 			 * On off-sanity wid/height - use ffprobe object vals (overwrite the dar too)
 			 */
