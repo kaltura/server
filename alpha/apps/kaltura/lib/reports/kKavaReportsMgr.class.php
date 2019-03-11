@@ -1579,6 +1579,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_SHARE_CLICKED => 'count_viral',
 		self::EVENT_TYPE_EDIT_CLICKED => 'count_edit',
 		self::EVENT_TYPE_VIEW => 'views',
+		self::EVENT_TYPE_VIEW_PERIOD => 'count_viewers',
 		self::MEDIA_TYPE_VIDEO => 'count_video',
 		self::MEDIA_TYPE_AUDIO => 'count_audio',
 		self::MEDIA_TYPE_IMAGE => 'count_image',
@@ -1944,7 +1945,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_UNIQUE_PERCENTILES_SUM] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
 			self::getLongSumAggregator(self::METRIC_UNIQUE_PERCENTILES_SUM, self::METRIC_UNIQUE_PERCENTILES_SUM));
-		
+
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
 		
@@ -5645,19 +5646,17 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		$metrics_count = count($result[0]) - 1;
 		$empty_values = array_fill(0, $metrics_count, 0);
-		$percentiles = array_fill(0, 101, $empty_values);
+
 		$data = $result[1];
 		foreach ($data as $percentile_data)
 		{
 			$percentile = array_shift($percentile_data);
-			if (isset($percentiles[$percentile]))
-			{
-				$percentiles[$percentile] = $percentile_data;
-			}
+			$percentiles[$percentile] = $percentile_data;
 		}
 		$data = array();
-		foreach ($percentiles as $percentile => $metrics)
+		for ($percentile = 0; $percentile <= 100; $percentile++)
 		{
+			$metrics = isset($percentiles[$percentile]) ? $percentiles[$percentile] : $empty_values;
 			array_unshift($metrics, $percentile);
 			$data[] = array_values($metrics);
 		}
