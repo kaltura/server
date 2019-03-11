@@ -1493,6 +1493,14 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_UNIQUE_CONTRIBUTORS),
 		),
 
+		myReportsMgr::REPORT_TYPE_PERCENTILES => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'percentile' => self::DIMENSION_PERCENTILES
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_VIEW_PERIOD),
+			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addZeroPercentiles',
+		),
+
 		myReportsMgr::REPORT_TYPE_CONTENT_REPORT_REASONS => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'reason' => self::DIMENSION_EVENT_VAR1
@@ -1532,6 +1540,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_DOWNLOAD_CLICKED,
 		self::EVENT_TYPE_REPORT_CLICKED,
 		self::EVENT_TYPE_VIEW,
+		self::EVENT_TYPE_VIEW_PERIOD,
 		self::EVENT_TYPE_REPORT_SUBMITTED,
 		self::EVENT_TYPE_CAPTIONS,
 		self::EVENT_TYPE_INFO,
@@ -1570,6 +1579,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_SHARE_CLICKED => 'count_viral',
 		self::EVENT_TYPE_EDIT_CLICKED => 'count_edit',
 		self::EVENT_TYPE_VIEW => 'views',
+		self::EVENT_TYPE_VIEW_PERIOD => 'count_viewers',
 		self::MEDIA_TYPE_VIDEO => 'count_video',
 		self::MEDIA_TYPE_AUDIO => 'count_audio',
 		self::MEDIA_TYPE_IMAGE => 'count_image',
@@ -5625,6 +5635,35 @@ class kKavaReportsMgr extends kKavaBase
 		$data[] = self::getRollupRow($data);
 		
 		$result = array($headers, $data, $total_count);
+	}
+
+	protected static function addZeroPercentiles(&$result)
+	{
+		$total_count = $result[2];
+		if (!$total_count)
+		{
+			return;
+		}
+		$metrics_count = count($result[0]) - 1;
+		$empty_values = array_fill(0, $metrics_count, 0);
+
+		$data = $result[1];
+		foreach ($data as $percentile_data)
+		{
+			$percentile = array_shift($percentile_data);
+			$percentiles[$percentile] = $percentile_data;
+		}
+		$data = array();
+		for ($percentile = 0; $percentile <= 100; $percentile++)
+		{
+			$metrics = isset($percentiles[$percentile]) ? $percentiles[$percentile] : $empty_values;
+			array_unshift($metrics, $percentile);
+			$data[] = array_values($metrics);
+		}
+
+		$result[1] = $data;
+		$result[2] = 101;
+		unset($result[3]);
 	}
 
 	/// total functions
