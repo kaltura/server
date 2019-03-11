@@ -91,6 +91,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$rules = $profile->getRulesArray();
 			foreach ($rules as $rule)
 			{
+				if (!$rule->getConditions())
+				{
+					continue;
+				}
 				foreach ($rule->getConditions() as $condition)
 				{
 					if ( $condition->getType()== ConditionType::BOOLEAN && $condition->getbooleanEventNotificationIds() && $condition->getbooleanEventNotificationIds() != "N/A")
