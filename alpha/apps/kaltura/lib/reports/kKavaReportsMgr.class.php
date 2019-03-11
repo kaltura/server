@@ -69,7 +69,6 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_VIEW_PERIOD_PLAY_TIME_SEC = 'view_period_play_time';
 	const METRIC_VIEW_BUFFER_TIME_SEC = 'view_buffer_time';
 	const METRIC_ORIGIN_BANDWIDTH_SIZE_BYTES = 'origin_bandwidth_size';
-	const METRIC_COUNT_VIEWERS = 'count_viewers';
 
 	// non druid metrics
 	const METRIC_BANDWIDTH_STORAGE_MB = 'combined_bandwidth_storage';
@@ -1945,8 +1944,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_UNIQUE_PERCENTILES_SUM] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
 			self::getLongSumAggregator(self::METRIC_UNIQUE_PERCENTILES_SUM, self::METRIC_UNIQUE_PERCENTILES_SUM));
-
-
+		
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
 		
