@@ -51,4 +51,5 @@ interface ReportType extends BaseEnum
    const TOP_SOURCES = 41;
    const VPAAS_USAGE_MULTI = 42;
    const CONTENT_REPORT_REASONS = 44;
+   const PLAYER_RELATED_INTERACTIONS = 45;
 }
