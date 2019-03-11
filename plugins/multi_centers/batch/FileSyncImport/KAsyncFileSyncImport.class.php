@@ -244,7 +244,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 		$contents = unserialize($contents); // if an exception is thrown, it will be catched in fetchUrl
 		
 		// sort contents alphabetically - this is important so that we will first encounter directories and only later the files in them
-		sort($contents, SORT_STRING);		
+		usort($contents, array($this, 'sortContentsArray'));
 		
 		// fetch each direcotry content
 		foreach ($contents as $current)
@@ -293,6 +293,19 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 		}
 
 		return true;
+	}
+	
+	private function sortContentsArray($a, $b)
+	{
+		if(is_string($a) && is_string($b))
+		{
+			return strcmp($a, $b);
+		}
+		
+		if(is_array($a) && is_array($b) && isset($a[0]) && isset($b[0]))
+		{
+			return strcmp(trim($a[0],' /'), trim($b[0],' /'));
+		}
 	}
 	
 	/**
