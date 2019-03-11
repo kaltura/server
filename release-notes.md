@@ -1,4 +1,49 @@
 # Naos 14.16.0 #
+
+## create new type of event notification template: Boolean ##
+ - Issue Type: Task
+ - Issue ID: REACH2-493
+
+### Configuration ###
+Add BooleanNotification to your plugins.ini
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+
+## Reach - Support extending accessKey##
+
+ - Issue Type: Feature
+ - Issue ID: REACH2-525
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_03_05_add_reach_extendAccessKey_action.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Groups-BE - Allow group manager ##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-8580
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+			
+Run deployment script:
+		
+		- php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_02_28_update_groupuser_permission.php
+
+
 ## Quiz retake - adding version to user_entry table ##
 
  - Issue Type: Task
@@ -11,7 +56,6 @@ None
 ### Deployment scripts ###
 
 mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /deployment/updates/sql/2019_02_25_alter_user_entry_version.sql
-
 
 # Naos 14.14.0 #
 

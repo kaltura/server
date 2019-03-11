@@ -1500,7 +1500,32 @@ class kKavaReportsMgr extends kKavaBase
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_VIEW_PERIOD),
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addZeroPercentiles',
-		)
+		),
+
+		myReportsMgr::REPORT_TYPE_CONTENT_REPORT_REASONS => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'reason' => self::DIMENSION_EVENT_VAR1
+			),
+			self::REPORT_FILTER => array(
+				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+				self::DRUID_VALUES => array(self::EVENT_TYPE_REPORT_SUBMITTED)
+
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_REPORT_SUBMITTED),
+		),
+
+		myReportsMgr::REPORT_TYPE_PLAYER_RELATED_INTERACTIONS => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'object_id' => self::DIMENSION_ENTRY_ID,
+				'entry_name' => self::DIMENSION_ENTRY_ID
+			),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => 'entry_name',
+				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED, self::EVENT_TYPE_CAPTIONS, self::EVENT_TYPE_INFO, self::EVENT_TYPE_RELATED_SELECTED),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED, self::EVENT_TYPE_CAPTIONS, self::EVENT_TYPE_INFO, self::EVENT_TYPE_RELATED_SELECTED),
+		),
 	);
 	
 	protected static $event_type_count_aggrs = array(
@@ -1517,6 +1542,10 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_REPORT_CLICKED,
 		self::EVENT_TYPE_VIEW,
 		self::EVENT_TYPE_VIEW_PERIOD,
+		self::EVENT_TYPE_REPORT_SUBMITTED,
+		self::EVENT_TYPE_CAPTIONS,
+		self::EVENT_TYPE_INFO,
+		self::EVENT_TYPE_RELATED_SELECTED,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -3734,9 +3763,11 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function addAggregatedEntriesGraphs(&$graphs, $base_values, $dates)
 	{
-		if (isset($base_values[self::METRIC_ENTRIES_TOTAL]))
+		$firstDate = reset($dates);
+
+		if (isset($graphs[self::METRIC_ENTRIES_ADDED][$firstDate]))
 		{
-			$cur_value = $base_values[self::METRIC_ENTRIES_TOTAL];
+			$cur_value = isset($base_values[self::METRIC_ENTRIES_TOTAL]) ? $base_values[self::METRIC_ENTRIES_TOTAL] : 0;
 			foreach ($dates as $date)
 			{
 				$cur_value += $graphs[self::METRIC_ENTRIES_ADDED][$date];
@@ -3747,9 +3778,9 @@ class kKavaReportsMgr extends kKavaBase
 			}
 		}
 		
-		if (isset($base_values[self::METRIC_DURATION_TOTAL_MSEC]))
+		if (isset($graphs[self::METRIC_DURATION_ADDED_MSEC][$firstDate]))
 		{
-			$cur_value = $base_values[self::METRIC_DURATION_TOTAL_MSEC];
+			$cur_value = isset($base_values[self::METRIC_DURATION_TOTAL_MSEC]) ? $base_values[self::METRIC_DURATION_TOTAL_MSEC] : 0;
 			foreach ($dates as $date)
 			{
 				$cur_value += $graphs[self::METRIC_DURATION_ADDED_MSEC][$date];

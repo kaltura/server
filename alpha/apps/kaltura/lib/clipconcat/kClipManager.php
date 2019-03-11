@@ -24,6 +24,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$parentJob->setPartnerId($partnerId);
 		$parentJob->setEntryId($clipEntry->getEntryId());
 
+		$trackEntry = new TrackEntry();
+		$trackEntry->setEntryId($destEntry->getEntryId());
+		$trackEntry->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_CLIP);
+		$trackEntry->setDescription("source entry id: [" .$sourceEntryId. "],  template entry id: [" .$clipEntry->getEntryId(). "].");
+		TrackEntry::addTrackEntry($trackEntry);
+
 		$jobData = new kClipConcatJobData($importUrl);
 		if(!$jobData->getImportNeeded())
 		{

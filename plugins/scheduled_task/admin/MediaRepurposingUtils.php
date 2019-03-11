@@ -12,7 +12,7 @@ class MediaRepurposingUtils
 	const MPRS_DATA_XPATH_NAME = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPData\']';
 	const MPRS_XPATH_NAME = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPsOnEntry\']';
 	const EXCLUDE = 'Exclude';
-
+	const UNSET_VALUE = "N/A";
 	const MEDIA_REPURPOSING_SYSTEM_NAME = 'MRP';
 	const ADMIN_CONSOLE_PARTNER = "-2";
 	const DRY_RUN_MAX_RESULT_DEFAULT = 500;
@@ -370,15 +370,25 @@ class MediaRepurposingUtils
 	}
 
 	private static function getValueFromString($value, $type) {
-		if ($value && $value != 'N/A' && strpos($type ,'array') > -1)
+		if ($value)
 		{
-			$arr = array();
-			$elemType = explode(" ", $type); // template is 'array of XXX';
-			foreach(explode(",", $value) as $val) {
-				$arr[] = self::elementTypeCreator($elemType[2], explode(":", $val));
+			if($value == self::UNSET_VALUE)
+			{
+				return null;
 			}
-			return $arr;
+			else if(strpos($type ,'array') > -1)
+			{
+				$arr = array();
+				$elemType = explode(" ", $type); // template is 'array of XXX';
+				foreach (explode(",", $value) as $val)
+				{
+					$arr[] = self::elementTypeCreator($elemType[2], explode(":", $val));
+				}
+
+				return $arr;
+			}
 		}
+
 		return $value;
 	}
 
@@ -392,6 +402,12 @@ class MediaRepurposingUtils
 					$values .= self::getValueFromElement($elemType[2], $elem) . ",";
 			return rtrim($values, ',');
 		}
+
+		if(is_null($value))
+		{
+			return self::UNSET_VALUE;
+		}
+
 		return $value;
 	}
 	

@@ -15,6 +15,12 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	public $score;
 
 	/**
+	 * @var float
+	 * @readonly
+	 */
+	public $calculatedScore;
+
+	/**
 	* @var string
 	* @maxLength 1024
 	*/
@@ -32,6 +38,7 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 		"score",
 		"feedback",
 		"version",
+		"calculatedScore",
 	);
 
 	public function getMapBetweenObjects ( )
@@ -73,22 +80,19 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 		}
 		if (!$isAnonymous)
 		{
-			$c = new Criteria();
-			$c->add(UserEntryPeer::KUSER_ID, $object_to_fill->getKuserId());
-			$c->add(UserEntryPeer::ENTRY_ID, $this->entryId);
-			$c->add(UserEntryPeer::TYPE, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
-			$userEntry = UserEntryPeer::doSelect($c);
+			$userEntry = UserEntryPeer::retriveUserEntriesSubmitted( $object_to_fill->getKuserId(), $this->entryId, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
+
 			if (count($userEntry) == 0 )
 			{
 				$object_to_fill->setVersion(self::DEFAULT_VERSION);
 			}
 			if (count($userEntry) > 0 )
 			{
-				$userEntryNewestVersion = UserEntryPeer::retriveNewestVersionOfUserEntrySubmitted( $object_to_fill->getKuserId(), $this->entryId, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
+				$userEntryNewestVersion = reset($userEntry);
 				$entry = entryPeer::retrieveByPK($this->entryId);
 				$quiz = QuizPlugin::getQuizData($entry);
 				//version counting is starting from zero
-				if ($quiz->getMaxRetakesAllowed() && $userEntryNewestVersion->getVersion() + 1 <= $quiz->getMaxRetakesAllowed() - 1)
+				if ($quiz->getAttemptsAllowed() && $userEntryNewestVersion->getVersion() + 1 <= $quiz->getAttemptsAllowed() - 1)
 				{
 					$object_to_fill->setVersion($userEntryNewestVersion->getVersion() + 1);
 				}
