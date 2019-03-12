@@ -74,7 +74,7 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		// Create local path for csv generation
 		$directory = self::$taskConfig->params->localTempPath . DIRECTORY_SEPARATOR . $job->partnerId;
 		KBatchBase::createDir($directory);
-		$filePath = $directory . DIRECTORY_SEPARATOR . 'reachTasks_' . date("Ymd") . '.csv';
+		$filePath = $directory . DIRECTORY_SEPARATOR . "reachTasks_{$job->id}.csv";
 		$data->outputPath = $filePath;
 		KalturaLog::info("Temp file path: [$filePath]");
 
