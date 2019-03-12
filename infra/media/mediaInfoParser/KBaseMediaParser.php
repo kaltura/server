@@ -203,7 +203,7 @@ $audio_codec_id_synonyms = array(
 				if($f1==$f2)
 					continue;
 				
-				if(is_numeric($m1->$f) && is_numeric($m1->$f)){
+				if(is_numeric($m1->$f) && is_numeric($m2->$f)){
 					if($m1->$f>0) {
 						if(abs(1-$m2->$f/$m1->$f)<0.01)
 							continue;
