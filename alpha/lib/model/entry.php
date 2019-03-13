@@ -15,6 +15,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	protected $is_categories_modified = false;
 	protected $is_categories_names_modified = false;
 	protected $creator_kuser_id = null;
+	protected $playsViewsData = null;
+	protected $playsViewsDataInitialized = false;
 	
 	const MINIMUM_ID_TO_DISPLAY = 8999;
 	
@@ -134,7 +136,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const CATEGORY_SEARCH_STATUS = 's';
 	const PARTNER_STATUS_FORMAT = 'P%sST%s';
 	const CATEGORIES_INDEXED_FIELD_PREFIX = 'pid';
-	
+	const PLAYSVIEWS_CACHE_KEY_PREFIX = 'plays_views_';
+	const PLAYS_CACHE_KEY = 'plays';
+	const VIEWS_CACHE_KEY = 'views';
+	const LAST_PLAYED_AT_CACHE_KEY = 'last_played_at';
+	const PLAYS_30_DAYS_CACHE_KEY = 'plays_30days';
+	const VIEWS_30_DAYS_CACHE_KEY = 'views_30days';
+	const PLAYS_7_DAYS_CACHE_KEY = 'plays_7days';
+	const VIEWS_7_DAYS_CACHE_KEY = 'views_7days';
+	const PLAYS_1_DAY_CACHE_KEY = 'plays_1day';
+	const VIEWS_1_DAY_CACHE_KEY = 'views_1day';
 
 	const DEFAULT_IMAGE_HEIGHT = 480;
 	const DEFAULT_IMAGE_WIDTH = 640;
@@ -3487,7 +3498,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 	 * @return the thumbnail path.
 	 */
 	public function getLocalThumbFilePath($version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
-		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $density = 0, $stripProfiles = false, $flavorId = null, $fileName = null)
+		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $density = 0, $stripProfiles = false, $flavorId = null, $fileName = null, $start_sec = null, $end_sec = null)
 	{
 		$contentPath = myContentStorage::getFSContentRootPath ();
 		// if entry type is audio - serve generic thumb:
@@ -3534,7 +3545,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 		elseif ($this->getType () == entryType::MEDIA_CLIP || $this->getType() == entryType::PLAYLIST) {
 			try {
 				$msgPath = $this->getDefaultThumbPath($this->getType());
-				return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath );
+				return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, 0, false, null, null, null, $start_sec, $end_sec);
 			} catch ( Exception $ex ) {
 				if ($ex->getCode () == kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC) {
 					// get original flavor asset
@@ -3881,6 +3892,12 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'last_played_at' => $this->getLastPlayedAt(null),
 			'user_names' => $this->getAllUserNamesAsArray(),
 			'root_id' => $this->getRootEntryId(),
+			'views_30days' => $this->getViewsLast30Days(),
+			'plays_30days' => $this->getPlaysLast30Days(),
+			'views_7days' => $this->getViewsLast7Days(),
+			'plays_7days' => $this->getPlaysLast7Days(),
+			'views_1day' => $this->getViewsLastDay(),
+			'plays_1day' => $this->getPlaysLastDay(),
 		);
 
 		$this->addCategoriesToObjectParams($body);
@@ -4157,4 +4174,140 @@ public function copyTemplate($copyPartnerId = false, $template)
 	{
 		return kConf::get("encryption_iv");
 	}
+
+	/**
+	 * @param array $playsViewsData
+	 */
+	public function setPlaysViewsData($playsViewsData)
+	{
+		if ($playsViewsData)
+		{
+			$this->playsViewsData = json_decode($playsViewsData, true);
+		}
+		$this->playsViewsDataInitialized = true;
+	}
+
+	protected function usePlaysViewsCache()
+	{
+		return $this->playsViewsDataInitialized || kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
+	}
+
+	protected function fetchPlaysViewsData()
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
+		if (!$cache)
+		{
+			return;
+		}
+
+		$data = $cache->get(self::PLAYSVIEWS_CACHE_KEY_PREFIX . $this->getId());
+		$this->setPlaysViewsData($data);
+	}
+
+	protected function getValueFromPlaysViewsData($key)
+	{
+		if (!$this->playsViewsDataInitialized)
+		{
+			$this->fetchPlaysViewsData();
+		}
+
+		if (isset($this->playsViewsData[$key]))
+		{
+			return $this->playsViewsData[$key];
+		}
+		return 0;
+	}
+
+	public function getPlays()
+	{
+		if (!$this->usePlaysViewsCache())
+		{
+			return parent::getPlays();
+		}
+
+		return $this->getValueFromPlaysViewsData(self::PLAYS_CACHE_KEY);
+	}
+
+	public function getViews()
+	{
+		if (!$this->usePlaysViewsCache())
+		{
+			return parent::getViews();
+		}
+
+		return $this->getValueFromPlaysViewsData(self::VIEWS_CACHE_KEY);
+	}
+
+	public function getLastPlayedAt($format = 'Y-m-d H:i:s')
+	{
+		if (!$this->usePlaysViewsCache())
+		{
+			return parent::getLastPlayedAt($format);
+		}
+
+		$cacheValue = $this->getValueFromPlaysViewsData(self::LAST_PLAYED_AT_CACHE_KEY);
+		if (!$cacheValue)
+		{
+			return null;
+		}
+		return self::getDateByFormat($cacheValue, $format);
+	}
+
+	public function getPlaysLast30Days()
+	{
+		return $this->getValueFromPlaysViewsData(self::PLAYS_30_DAYS_CACHE_KEY);
+	}
+
+	public function getViewsLast30Days()
+	{
+		return $this->getValueFromPlaysViewsData(self::VIEWS_30_DAYS_CACHE_KEY);
+	}
+
+	public function getPlaysLast7Days()
+	{
+		return $this->getValueFromPlaysViewsData(self::PLAYS_7_DAYS_CACHE_KEY);
+	}
+
+	public function getViewsLast7Days()
+	{
+		return $this->getValueFromPlaysViewsData(self::VIEWS_7_DAYS_CACHE_KEY);
+	}
+
+	public function getPlaysLastDay()
+	{
+		return $this->getValueFromPlaysViewsData(self::PLAYS_1_DAY_CACHE_KEY);
+	}
+
+	public function getViewsLastDay()
+	{
+		return $this->getValueFromPlaysViewsData(self::VIEWS_1_DAY_CACHE_KEY);
+	}
+
+	protected static function getDateByFormat($timestamp, $format)
+	{
+		if ($format === null)
+		{
+			return $timestamp;
+		}
+		elseif (strpos($format, '%') !== false)
+		{
+			return strftime($format, $timestamp);
+		}
+
+		return date($format, $timestamp);
+	}
+
+	public function shouldFetchPlaysViewData()
+	{
+		switch ($this->getType())
+		{
+			case entryType::DATA:
+			case entryType::DOCUMENT:
+				return false;
+
+			default:
+				return true;
+		}
+	}
+
 }

@@ -498,6 +498,12 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			{
 				if ($entry->getType() == entryType::MEDIA_CLIP)
 				{
+					if ($entry->getFlowType() == EntryFlowType::IMPORT_FOR_CLIP_CONCAT)
+					{
+						$object->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
+						$object->save();
+						return true;
+					}
 					$allowedFlows = array(EntryFlowType::CLIP_CONCAT, EntryFlowType::TRIM_CONCAT);
 					if ($entry->getOperationAttributes() && $object->getIsOriginal() && !in_array($entry->getFlowType(), $allowedFlows))
 						kBusinessPreConvertDL::convertSource($object, null, null, $raisedJob);

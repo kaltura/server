@@ -17,7 +17,7 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 {
 	const MAX_NUMBER_OF_GROUPS_PER_USER = 1024;
 	const GROUP_USER_CREATION_MODE = 'creation_mode';
-
+	const GROUP_USER_ROLE = 'user_role';
 
 	public function setPuserId($puserId)
 	{
@@ -35,7 +35,6 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 		parent::setKuserId($kuser->getId());
 	}
 
-
 	public function setPgroupId($pgroupId)
 	{
 		if ( self::getPgroupId() == $pgroupId )  // same value - don't set for nothing
@@ -51,7 +50,6 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 
 		parent::setKgroupId($kgroup->getId());
 	}
-
 
 	public function getCacheInvalidationKeys()
 	{
@@ -84,5 +82,17 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 	}
 
 	public function setCreationMode($v)	{$this->putInCustomData (self::GROUP_USER_CREATION_MODE, $v);}
-	public function getCreationMode(){return $this->getFromCustomData(self::GROUP_USER_CREATION_MODE, null, GroupUserCreationMode::MANUAL);}
-} // KuserKgroup
+
+	public function getCreationMode(){return $this->getFromCustomData(self::GROUP_USER_CREATION_MODE,
+		null, GroupUserCreationMode::MANUAL);}
+
+	public function setUserRole($v)
+	{
+		$this->putInCustomData (self::GROUP_USER_ROLE, $v);
+	}
+
+	public function getUserRole()
+	{
+		return $this->getFromCustomData(self::GROUP_USER_ROLE, null, GroupUserRole::MEMBER);
+	}
+}

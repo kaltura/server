@@ -87,6 +87,8 @@ class thumbnailAction extends sfAction
 		$flavor_id = $this->getRequestParameter("flavor_id", null);
 		$file_name = $this->getRequestParameter("file_name", null);
 		$file_name = basename($file_name);
+		$start_sec = $this->getFloatRequestParameter("start_sec", -1, -1);
+		$end_sec = $this->getFloatRequestParameter("end_sec", -1, -1);
 		
 		// actual width and height of image from which the src_* values were taken.
 		// these will be used to multiply the src_* parameters to make them relate to the original image size.
@@ -160,6 +162,20 @@ class thumbnailAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, "width($width) * vid_slices($vid_slices) must be between 0 and 65500");
 		if($vid_slices > 0 && ($vid_slices * $height) >= 65500)
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, "height($height) * vid_slices($vid_slices) must be between 0 and 65500");
+
+		if(!is_numeric($start_sec) || ($start_sec < 0 && $start_sec != -1))
+		{
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'start_sec must be positive');
+		}
+
+		if(!is_numeric($end_sec) || ($end_sec < 0 && $end_sec != -1))
+		{
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'end_sec must be positive');
+		}
+		if($start_sec != -1 && $end_sec != -1 && ($start_sec > $end_sec))
+		{
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'start_sec cant be greater then end_sec');
+		}
 
 		if ($upload_token_id)
 		{
@@ -324,7 +340,8 @@ class thumbnailAction extends sfAction
 		}
 		
 		// not allow capturing frames if the partner has FEATURE_DISALLOW_FRAME_CAPTURE permission
-		if(($vid_sec != -1) || ($vid_slice != -1) || ($vid_slices != -1))
+		$isCapturing = ($vid_sec != -1) || ($vid_slice != -1) || ($vid_slices != -1);
+		if($isCapturing)
 		{
 			if ($partner->getEnabledService(PermissionName::FEATURE_BLOCK_THUMBNAIL_CAPTURE))
 			{
@@ -406,7 +423,7 @@ class thumbnailAction extends sfAction
 			
 		if ( ! $file_sync )
 		{
-			$tempThumbPath = $entry->getLocalThumbFilePath($version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $flavor_id, $file_name );
+			$tempThumbPath = $entry->getLocalThumbFilePath($version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $flavor_id, $file_name, $start_sec, $end_sec);
 			if (!$tempThumbPath ){
 				KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
 			}
@@ -436,7 +453,7 @@ class thumbnailAction extends sfAction
 			try
 			{
 				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality,
-						$src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $imageFilePath, $density, $stripProfiles, $thumbParams, $format);
+						$src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $imageFilePath, $density, $stripProfiles, $thumbParams, $format, null, $start_sec, $end_sec);
 			}
 			catch(Exception $ex)
 			{
@@ -506,9 +523,9 @@ class thumbnailAction extends sfAction
 			$cache = new myCache("thumb", 2592000); // 30 days, the max memcache allows
 		}
 
-		$lastModifiedFlavor = assetPeer::retrieveLastModifiedFlavorByEntryId($entry->getId());
-		$lastModified = $lastModifiedFlavor ? $lastModifiedFlavor->getUpdatedAt(null) : null;
-		
+
+		$lastModified = $this->getLastModified($entry, $isCapturing);
+
 		$entryKey = kFileUtils::isFileEncrypt($tempThumbPath) ? $entry->getGeneralEncryptionKey() : null;
 		$entryIv = $entryKey ? $entry->getEncryptionIv() : null;
 		$renderer = kFileUtils::getDumpFileRenderer($tempThumbPath, null, $cacheAge, 0, $lastModified, $entryKey, $entryIv);
@@ -529,6 +546,23 @@ class thumbnailAction extends sfAction
 		
 		// TODO - can delete from disk assuming we caneasily recreate it and it will anyway be cached in the CDN
 		// however dumpfile dies at the end so we cant just write it here (maybe register a shutdown callback)
+	}
+
+	protected function getLastModified(entry $entry, $isCapturing)
+	{
+		if(!$isCapturing)
+		{
+			$entryImageSyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$fileSync= kFileSyncUtils::getOriginFileSyncForKey($entryImageSyncKey,false);
+			if($fileSync)
+			{
+				return $fileSync->getUpdatedAt(null);
+			}
+		}
+		$lastModifiedFlavor = assetPeer::retrieveLastModifiedFlavorByEntryId($entry->getId());
+		$lastModified = $lastModifiedFlavor ? $lastModifiedFlavor->getUpdatedAt(null) : null;
+
+		return $lastModified;
 	}
 
 	private function getDimensions()

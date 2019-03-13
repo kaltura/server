@@ -68,6 +68,7 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::COPY_CAPTIONS' => 'Copy Caption Assets',
 	'Kaltura_Client_Enum_BatchJobType::USERS_CSV' => 'Users Csv',
 	'Kaltura_Client_Enum_BatchJobType::COPY_CUE_POINTS' => 'Copy cue Points',
+	'Kaltura_Client_Enum_BatchJobType::CLIP_CONCAT' => 'Clip Concat',
 
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_AUX' => 'Convert - FFMpeg Aux',
@@ -1177,6 +1178,7 @@ return array(
 
 	'Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::EMAIL' => 'Email',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::HTTP' => 'HTTP',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::BOOLEAN' => 'BOOLEAN',
 
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventType::BATCH_JOB_STATUS' => 'Batch job status (Very dangerous)',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventType::OBJECT_ADDED' => 'Object added',

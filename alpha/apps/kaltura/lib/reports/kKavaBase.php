@@ -51,6 +51,12 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_CUSTOM_VAR3 = 'customVar3';
 	const DIMENSION_TYPE = 'type';
 	const DIMENSION_ENTRY_OWNER_ID = 'entryKuserId';
+	const DIMENSION_ENTRY_CREATOR_ID = 'entryCreatorId';
+	const DIMENSION_ENTRY_CREATED_AT = 'entryCreatedAt';
+	const DIMENSION_PERCENTILES = 'percentiles';
+	const DIMENSION_EVENT_VAR1 = 'eventVar1';
+	const DIMENSION_EVENT_VAR2 = 'eventVar2';
+	const DIMENSION_EVENT_VAR3 = 'eventVar3';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -112,10 +118,147 @@ class kKavaBase extends kDruidBase
 	const MEDIA_TYPE_AUDIO = 'Audio';
 	const MEDIA_TYPE_IMAGE = 'Image';
 	const MEDIA_TYPE_SHOW = 'Show';		// mix
-	const MEDIA_TYPE_FLASH = 'Flash';	// live stream
-	
+	const MEDIA_TYPE_LIVE_STREAM = 'Live stream';
+	const MEDIA_TYPE_LIVE_WIN_MEDIA = 'Live stream windows media';
+	const MEDIA_TYPE_LIVE_REAL_MEDIA = 'Live stream real media';
+	const MEDIA_TYPE_LIVE_QUICKTIME = 'Live stream quicktime';
+
 	// Entry vendor task statuses
 	const TASK_READY = "Ready";
+
+	protected static $datasources_dimensions = array(
+		self::DATASOURCE_HISTORICAL => array(
+			self::DIMENSION_EVENT_TYPE => 1,
+			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_ENTRY_ID => 1,
+			self::DIMENSION_CATEGORIES => 1,
+			self::DIMENSION_ENTRY_OWNER_ID => 1,
+			self::DIMENSION_ENTRY_CREATOR_ID => 1,
+			self::DIMENSION_ENTRY_CREATED_AT => 1,
+			self::DIMENSION_MEDIA_TYPE => 1,
+			self::DIMENSION_SOURCE_TYPE => 1,
+			self::DIMENSION_LOCATION_COUNTRY => 1,
+			self::DIMENSION_LOCATION_REGION => 1,
+			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_BROWSER_FAMILY => 1,
+			self::DIMENSION_BROWSER => 1,
+			self::DIMENSION_OS_FAMILY => 1,
+			self::DIMENSION_OS => 1,
+			self::DIMENSION_DEVICE => 1,
+			self::DIMENSION_DOMAIN => 1,
+			self::DIMENSION_URL => 1,
+			self::DIMENSION_APPLICATION => 1,
+			self::DIMENSION_PLAYBACK_CONTEXT => 1,
+			self::DIMENSION_PLAYBACK_TYPE => 1,
+			self::DIMENSION_HAS_BITRATE => 1,
+			self::DIMENSION_CUSTOM_VAR1 => 1,
+			self::DIMENSION_CUSTOM_VAR2 => 1,
+			self::DIMENSION_CUSTOM_VAR3 => 1,
+		),
+		self::DATASOURCE_ENTRY_LIFECYCLE => array(
+			self::DIMENSION_EVENT_TYPE => 1,
+			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_CATEGORIES => 1,
+			self::DIMENSION_ENTRY_ID => 1,
+			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_USER_TYPE => 1,
+			self::DIMENSION_MEDIA_TYPE => 1,
+			self::DIMENSION_SOURCE_TYPE => 1,
+		),
+		self::DATASOURCE_STORAGE_USAGE => array(
+			self::DIMENSION_EVENT_TYPE => 1,
+			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_ENTRY_ID => 1,
+			self::DIMENSION_CATEGORIES => 1,
+			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_MEDIA_TYPE => 1,
+			self::DIMENSION_SOURCE_TYPE => 1,
+		),
+		self::DATASOURCE_BANDWIDTH_USAGE => array(
+			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_ENTRY_ID => 1,
+			self::DIMENSION_CATEGORIES => 1,
+			self::DIMENSION_ENTRY_OWNER_ID => 1,
+			self::DIMENSION_MEDIA_TYPE => 1,
+			self::DIMENSION_SOURCE_TYPE => 1,
+			self::DIMENSION_LOCATION_COUNTRY => 1,
+			self::DIMENSION_LOCATION_REGION => 1,
+			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_BROWSER_FAMILY => 1,
+			self::DIMENSION_BROWSER => 1,
+			self::DIMENSION_OS_FAMILY => 1,
+			self::DIMENSION_OS => 1,
+			self::DIMENSION_DEVICE => 1,
+			self::DIMENSION_PLAYBACK_TYPE => 1,
+			self::DIMENSION_STATUS => 1,
+			self::DIMENSION_TYPE => 1,
+		),
+		self::DATASOURCE_TRANSCODING_USAGE => array(
+			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_ENTRY_ID => 1,
+			self::DIMENSION_CATEGORIES => 1,
+			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_MEDIA_TYPE => 1,
+			self::DIMENSION_SOURCE_TYPE => 1,
+			self::DIMENSION_STATUS => 1,
+		),
+		self::DATASOURCE_USER_LIFECYCLE => array(
+			self::DIMENSION_EVENT_TYPE => 1,
+			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_USER_TYPE => 1,
+		),
+		self::DATASOURCE_API_USAGE => array(
+			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_APPLICATION => 1,
+			self::DIMENSION_DOMAIN => 1,
+			self::DIMENSION_LOCATION_COUNTRY => 1,
+			self::DIMENSION_LOCATION_REGION => 1,
+			self::DIMENSION_LOCATION_CITY => 1,
+		),
+		self::DATASOURCE_REACH_USAGE => array(
+			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_ENTRY_ID => 1,
+			self::DIMENSION_CATEGORIES => 1,
+			self::DIMENSION_ENTRY_OWNER_ID => 1,
+			self::DIMENSION_MEDIA_TYPE => 1,
+			self::DIMENSION_SOURCE_TYPE => 1,
+			self::DIMENSION_REACH_PROFILE_ID => 1,
+			self::DIMENSION_STATUS => 1,
+			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_SERVICE_TYPE => 1,
+			self::DIMENSION_SERVICE_FEATURE => 1,
+			self::DIMENSION_TURNAROUND_TIME  => 1,
+		),
+		self::DATASOURCE_REALTIME => array(
+			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_ENTRY_ID => 1,
+			self::DIMENSION_CATEGORIES => 1,
+			self::DIMENSION_ENTRY_OWNER_ID => 1,
+			self::DIMENSION_MEDIA_TYPE => 1,
+			self::DIMENSION_SOURCE_TYPE => 1,
+			self::DIMENSION_LOCATION_COUNTRY => 1,
+			self::DIMENSION_LOCATION_REGION => 1,
+			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_BROWSER_FAMILY => 1,
+			self::DIMENSION_BROWSER => 1,
+			self::DIMENSION_OS_FAMILY => 1,
+			self::DIMENSION_OS => 1,
+			self::DIMENSION_DEVICE => 1,
+			self::DIMENSION_DOMAIN => 1,
+			self::DIMENSION_URL => 1,
+			self::DIMENSION_APPLICATION => 1,
+			self::DIMENSION_PLAYBACK_CONTEXT => 1,
+			self::DIMENSION_PLAYBACK_TYPE => 1,
+			self::DIMENSION_SERVER_NODE_IDS => 1,
+			self::DIMENSION_HAS_BITRATE => 1,
+			self::DIMENSION_CUSTOM_VAR1 => 1,
+			self::DIMENSION_CUSTOM_VAR2 => 1,
+			self::DIMENSION_CUSTOM_VAR3 => 1,
+		),
+	);
 
 	public static function isPartnerAllowed($partnerId, $serviceType) {
 	    if (kConf::hasParam(self::DRUID_URL)) {

@@ -75,7 +75,6 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		$pager->attachToCriteria($c);
 		
 		$list = UserEntryPeer::doSelect($c);
-
 		$resultCount = count($list);
 		if ($resultCount && ($resultCount < $pager->pageSize))
 		{

@@ -25,6 +25,12 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	public $answerKey;
 
 	/**
+	* @var string
+	* @maxLength 1024
+	*/
+	public $openAnswer;
+
+	/**
 	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
@@ -43,6 +49,12 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	 */
 	public $explanation;
 
+	/**
+	* @var string
+	* @maxLength 1024
+	*/
+	public $feedback;
+
 
 	public function __construct()
 	{
@@ -56,7 +68,9 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		"parentId",
 		"correctAnswerKeys",
 		"isCorrect",
-		"explanation"
+		"explanation",
+		"openAnswer",
+		"feedback"
 	);
 
 	/* (non-PHPdoc)
@@ -149,12 +163,16 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		{
 			throw new KalturaAPIException(KalturaCuePointErrors::USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID, $this->quizUserEntryId);
 		}
-		if ($dbUserEntry->getStatus() === QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED))
+		if (!kCurrentContext::$is_admin_session)
 		{
-			throw new KalturaAPIException(KalturaQuizErrors::USER_ENTRY_QUIZ_ALREADY_SUBMITTED);
-		}
-		if (!kCurrentContext::$is_admin_session && ($dbUserEntry->getKuserId() != kCurrentContext::getCurrentKsKuserId()) ) {
-		    throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+			if ($dbUserEntry->getStatus() === QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED))
+			{
+				throw new KalturaAPIException(KalturaQuizErrors::USER_ENTRY_QUIZ_ALREADY_SUBMITTED);
+			}
+			if ($dbUserEntry->getKuserId() != kCurrentContext::getCurrentKsKuserId()) 
+			{
+			    throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+			}
 		}
 	}
 
@@ -168,6 +186,11 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		QuizPlugin::validateAndGetQuiz($dbEntry);
 		$this->validateParentId();
 		$this->validateUserEntry();
+		if ($this->feedback != null && !kEntitlementUtils::isEntitledForEditEntry($dbEntry) )
+		{
+			KalturaLog::debug('Insert feedback on answer cue point is allowed only with admin KS or entry owner or co-editor');
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -175,13 +198,18 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		parent::validateForUpdate($sourceObject, $propertiesToSkip);
+		parent::validateForUpdate($sourceObject, $propertiesToSkip);	
 		$dbEntry = entryPeer::retrieveByPK($this->entryId);
 		$kQuiz = QuizPlugin::validateAndGetQuiz($dbEntry);
 		$this->validateUserEntry();
-		if ( !$kQuiz->getAllowAnswerUpdate() ) {
+		if ( !$kQuiz->getAllowAnswerUpdate() && !kCurrentContext::$is_admin_session) 
+		{
 			throw new KalturaAPIException(KalturaQuizErrors::ANSWER_UPDATE_IS_NOT_ALLOWED, $sourceObject->getEntryId());
 		}
+		if ($this->feedback != null && !kEntitlementUtils::isEntitledForEditEntry($dbEntry) )
+		{
+			KalturaLog::debug('Update feedback on answer cue point is allowed only with admin KS or entry owner or co-editor');
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+		}
 	}
-
 }

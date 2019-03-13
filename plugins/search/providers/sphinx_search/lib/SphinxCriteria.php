@@ -283,7 +283,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	protected static function cartesian($input) {
 		$result = array();
 	
-		while (list($key, $values) = each($input)) {
+		foreach($input as $key => $values) {
 			// If a sub-array is empty, it doesn't affect the cartesian product
 			if (empty($values)) {
 				continue;

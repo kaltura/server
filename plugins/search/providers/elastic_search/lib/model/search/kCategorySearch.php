@@ -6,15 +6,13 @@
 
 class kCategorySearch extends kBaseESearch
 {
-    const PEER_NAME = 'categoryPeer';
-    const PEER_RETRIEVE_FUNCTION_NAME = 'retrieveByPKsNoFilter';
 
     public function __construct()
     {
         parent::__construct();
     }
 
-    public function doSearch(ESearchOperator $eSearchOperator, $statuses = array(), $objectId, kPager $pager = null, ESearchOrderBy $order = null)
+    public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null, ESearchOrderBy $order = null)
     {
         kCategoryElasticEntitlement::init();
         if (!count($statuses))
@@ -45,18 +43,14 @@ class kCategorySearch extends kBaseESearch
 		}
 	}
 
-    function getPeerName()
-    {
-        return self::PEER_NAME;
-    }
-
-    public function getPeerRetrieveFunctionName()
-    {
-        return self::PEER_RETRIEVE_FUNCTION_NAME;
-    }
-
     public function getElasticTypeName()
     {
         return ElasticIndexMap::ELASTIC_CATEGORY_TYPE;
     }
+
+    public function fetchCoreObjectsByIds($ids)
+    {
+        return categoryPeer::retrieveByPKsNoFilter($ids);
+    }
+
 }

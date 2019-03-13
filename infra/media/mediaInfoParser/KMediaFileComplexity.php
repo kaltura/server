@@ -242,6 +242,10 @@
 			}
 			$finishedAt = time();
 
+			if(!(isset($stat) && isset($framesStat))){
+				KalturaLog::log("Missing sampling data, leaving ...");
+				return null;
+			}
 			KalturaLog::log("Frame types stat:".print_r($framesStat,1));
 			$stat->complexityValue = self::estimateBitrate(60, 60*3, $framesStat, $sourceData->videoFrameRate);
 			if(isset($framesStat->y)){

@@ -55,6 +55,12 @@ class myReportsMgr
 	const REPORT_TYPE_TOP_CONTENT_CREATOR = 38;
 	const REPORT_TYPE_TOP_CONTENT_CONTRIBUTORS = 39;
 	const REPORT_TYPE_APP_DOMAIN_UNIQUE_ACTIVE_USERS = 40;
+	const REPORT_TYPE_TOP_SOURCES = 41;
+	const REPORT_TYPE_VPAAS_USAGE_MULTI = 42;
+	const REPORT_TYPE_PERCENTILES = 43;
+	const REPORT_TYPE_CONTENT_REPORT_REASONS = 44;
+	const REPORT_TYPE_PLAYER_RELATED_INTERACTIONS = 45;
+	const REPORT_TYPE_PLAYBACK_RATE = 46;
 
 	const REPORTS_TABLE_MAX_QUERY_SIZE = 20000;
 	const REPORTS_CSV_MAX_QUERY_SIZE = 130000;
@@ -1528,6 +1534,11 @@ class reportsInputFilter
 	public $cities;
 	public $media_types;
 	public $source_types;
+	public $owners;
+	public $entry_operator;
+	public $gte_entry_created_at;
+	public $lte_entry_created_at;
+	public $entries_ids;
 
 	public function getFilterBy() {
 		return "";

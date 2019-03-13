@@ -97,7 +97,9 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 		$this->updateEntryPager($entryPager, $filterOnEntryIds);
 
 		$query = $this->createElasticQueryFromFilter($filter);
-		$elasticResults = $entrySearch->doSearch($query, array(), null, $entryPager, null);
+
+		$elasticResults = $entrySearch->doSearch($query, $entryPager, self::$validStatuses);
+
 		list($coreResults, $objectOrder, $objectCount, $objectHighlight) = kESearchCoreAdapter::getElasticResultAsArray($elasticResults,
 			$entrySearch->getQueryAttributes()->getQueryHighlightsAttributes());
 
@@ -185,4 +187,15 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 		return self::$captionNestedFields;
 	}
 
+	protected function addNestedQueryPart()
+	{
+		if (!$this->nestedSearchItem)
+		{
+			$captionItem = new ESearchCaptionItem();
+			$captionItem->setFieldName(ESearchCaptionFieldName::CONTENT);
+			$captionItem->setItemType(ESearchItemType::EXISTS);
+			$this->nestedSearchItem[] = $captionItem;
+		}
+		parent::addNestedQueryPart();
+	}
 }

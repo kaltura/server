@@ -7,6 +7,10 @@
 class QuizUserEntry extends UserEntry{
 
 	const QUIZ_OM_CLASS = 'QuizUserEntry';
+	const CUSTOM_DATA_FEEDBACK = 'feedback';
+	const CUSTOM_DATA_CALCULATED_SCORE = 'calculatedScore';
+	const CUSTOM_DATA_VERSION = 'version';
+
 	/**
 	 * @var float
 	 */
@@ -29,7 +33,8 @@ class QuizUserEntry extends UserEntry{
 		$this->setType(QuizPlugin::getCoreValue('UserEntryType' , QuizUserEntryType::QUIZ));
 	}
 
-
+	public function setCalculatedScore($v){ $this->putInCustomData(self::CUSTOM_DATA_CALCULATED_SCORE, $v);}
+	public function getCalculatedScore(){ return $this->getFromCustomData(self::CUSTOM_DATA_CALCULATED_SCORE);}
 	public function setScore($v){ $this->putInCustomData("score", $v);}
 	public function getScore(){ return $this->getFromCustomData("score");}
 	public function setNumOfQuestions($v){ $this->putInCustomData("numOfQuestions", $v);}
@@ -38,6 +43,10 @@ class QuizUserEntry extends UserEntry{
 	public function getNumOfRelevnatQuestions(){ return $this->getFromCustomData("numOfRelevnatQuestions");}
 	public function setNumOfCorrectAnswers($v){ $this->putInCustomData("numOfCorrectAnswers", $v);}
 	public function getNumOfCorrectAnswers(){ return $this->getFromCustomData("numOfCorrectAnswers");}
+	public function setFeedback($v){ $this->putInCustomData(self::CUSTOM_DATA_FEEDBACK, $v);}
+	public function getFeedback(){ return $this->getFromCustomData(self::CUSTOM_DATA_FEEDBACK);}
+	public function setVersion($v){ $this->putInCustomData(self::CUSTOM_DATA_VERSION, $v);}
+	public function getVersion(){ return $this->getFromCustomData(self::CUSTOM_DATA_VERSION);}
 	public function addAnswerId($questionId, $answerId)
 	{
 		$answerIds = $this->getAnswerIds();
@@ -113,5 +122,16 @@ class QuizUserEntry extends UserEntry{
 	{
 		return false;
 	}
+
+	public function postUpdate(PropelPDO $con = null)
+	{
+               if($this->isColumnModified(UserEntryPeer::STATUS) && $this->getStatus() == UserEntryStatus::DELETED)
+               {
+                       kEventsManager::raiseEventDeferred(new kObjectDeletedEvent($this));
+               }
+
+               parent::postUpdate($con);
+	}
+
 
 }

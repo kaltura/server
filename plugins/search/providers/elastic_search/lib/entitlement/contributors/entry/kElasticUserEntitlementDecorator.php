@@ -40,6 +40,10 @@ class kElasticUserEntitlementDecorator implements IKalturaESearchEntryEntitlemen
 		$userViewCondition = new kESearchTermQuery("{$fieldPrefix}entitled_kusers_view",$params['kuserId']);
 		$conditions[] = $userViewCondition;
 
+		$userPreFetchGroupCondition = new kESearchTermsQuery("{$fieldPrefix}kuser_id",
+			array('index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
+				'id' => $params['kuserId'],	'path' => 'group_ids'));
+		$conditions[] = $userPreFetchGroupCondition;
 		$userCondition = new kESearchTermQuery("{$fieldPrefix}kuser_id",$params['kuserId']);
 		$conditions[] = $userCondition;
 		return $conditions;

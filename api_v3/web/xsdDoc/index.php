@@ -52,7 +52,17 @@ require_once(__DIR__ . "/left_pane.php");
 				if($inputPage)
 					require_once(__DIR__ . "/$inputPage.php");
 				else if ($schemaType)
-					require_once(__DIR__ . "/schema_info.php"); 
+				{
+					try
+					{
+						require_once(__DIR__ . "/schema_info.php");
+					}
+					catch (PropelException $e)
+					{
+						echo ("Wrong schema type: $schemaType");
+						KExternalErrors::dieError("Wrong schema type: $schemaType");
+					}
+				}
 			?>
 		</div>
 	</div>

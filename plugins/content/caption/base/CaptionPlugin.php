@@ -633,6 +633,13 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		{
 			$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), array(asset::ASSET_STATUS_READY));
 			$playbackCaptions = array();
+			$useThreeCodeLang = false;
+			if (kConf::hasParam('three_code_language_partners') &&
+				in_array($entry->getPartnerId(), kConf::get('three_code_language_partners')))
+			{
+				$useThreeCodeLang = true;
+			}
+
 			foreach ($captionAssets as $assetDb)
 			{
 				/** @var CaptionAsset $assetDb */
@@ -646,7 +653,8 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 					if ($url)
 					{
 						$webVttUrl = myPartnerUtils::getCdnHost($assetDb->getPartnerId()) . self::SERVE_WEBVTT_URL_PREFIX . '/captionAssetId/' . $assetDb->getId() . '/segmentIndex/-1/version/' . $assetDb->getVersion() . '/captions.vtt';
-						$playbackCaptions [] = new kCaptionPlaybackPluginData($assetDb->getLabel(), $assetDb->getContainerFormat(), $assetDb->getLanguage(), $assetDb->getDefault(), $webVttUrl, $url);
+						$languageCode = self::getLanguageCode($assetDb->getLanguage(),$useThreeCodeLang);
+						$playbackCaptions [] = new kCaptionPlaybackPluginData($assetDb->getLabel(), $assetDb->getContainerFormat(), $assetDb->getLanguage(), $assetDb->getDefault(), $webVttUrl, $url, $languageCode);
 					}
 				}
 				catch (Exception $e)

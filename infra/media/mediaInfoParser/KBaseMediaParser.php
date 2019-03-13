@@ -42,9 +42,6 @@ abstract class KBaseMediaParser
 	 */
 	public function __construct($filePath)
 	{
-		if (!file_exists($filePath))
-			throw new kApplicativeException(KBaseMediaParser::ERROR_NFS_FILE_DOESNT_EXIST, "File not found at [$filePath]");
-
 		$this->filePath = $filePath;
 	}
 	
@@ -324,6 +321,77 @@ $audio_codec_id_synonyms = array(
 			return true;
 		
 		return false;
+	}
+	
+	/**
+	 * 
+	 * @param string
+	 * @return int
+	 */
+	protected static function convertDuration2msec($str)
+	{
+		preg_match_all("/(([0-9]*)h ?)?(([0-9]*)mn ?)?(([0-9]*)s ?)?(([0-9]*)ms ?)?/",
+			$str, $res);
+			
+		$hour = @$res[2][0] ? @$res[2][0] : 0;
+		$min  = @$res[4][0] ? @$res[4][0] : 0;
+		$sec  = @$res[6][0] ? @$res[6][0] : 0;
+		$msec = @$res[8][0] ? @$res[8][0] : 0;
+		
+		$rv = ($hour*3600 + $min*60 + $sec)*1000 + $msec;
+		if($rv==0){
+			sscanf($str,"%d:%d:%f", $hour, $min, $sec);
+			$rv = ($hour*3600 + $min*60 + $sec)*1000 ;
+		}
+		
+		return (int)$rv;
+	}
+	
+	/**
+	 * Set 'empty' video params fields with ffmpeg/ffprobe values
+	 * @param KalturaMediaInfo $mediaInfo
+	 * 		  KalturaMediaInfo $mediaInfoFix
+	 */
+	protected static function setVideoParams(KalturaMediaInfo $mediaInfo, KalturaMediaInfo $mediaInfoFix)
+	{
+		$fieldsArr = array("videoCodecId","videoFormat","videoDuration","videoBitRate","videoWidth","videoHeight","videoFrameRate","videoDar");
+		foreach($fieldsArr as $field) {
+			if(isset($mediaInfoFix->$field))
+				$mediaInfo->$field = $mediaInfoFix->$field;
+		}
+	}
+	
+	/**
+	 * Set 'empty' audio params fields with ffmpeg/ffprobe values
+	 * @param KalturaMediaInfo $mediaInfo
+	 * 		  KalturaMediaInfo $mediaInfoFix
+	 */
+	protected static function setAudioParams(KalturaMediaInfo $mediaInfo, KalturaMediaInfo $mediaInfoFix)
+	{
+		$fieldsArr = array("audioCodecId","audioFormat","audioDuration","audioBitRate","audioSamplingRate","audioResolution","audioChannels");
+		foreach($fieldsArr as $field) {
+			if(isset($mediaInfoFix->$field))
+				$mediaInfo->$field = $mediaInfoFix->$field;
+		}
+	}
+	
+	/**
+	 * Adjust/fix duration fields with ffmpeg/ffprobe values
+	 * @param KalturaMediaInfo $mediaInfo
+	 * 		  KalturaMediaInfo $mediaInfoFix
+	 */
+	protected static function adjustDurations(KalturaMediaInfo $mediaInfo, KalturaMediaInfo $mediaInfoFix)
+	{
+		$fieldsArr = array("audioDuration","videoDuration","containerDuration");
+		foreach($fieldsArr as $field) {
+			if(!(isset($mediaInfoFix->$field) && $mediaInfoFix->$field>0))
+				return;
+			
+			if(!(isset($mediaInfo->$field) && $mediaInfo->$field>0) 
+			|| (($ratio=$mediaInfo->$field/$mediaInfoFix->$field)<0.95 || $ratio>1.05)) {
+				$mediaInfo->$field = $mediaInfoFix->$field;
+			}
+		}
 	}
 	
 	/**

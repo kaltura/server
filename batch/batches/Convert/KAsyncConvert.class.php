@@ -223,6 +223,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		{
 			$data = $this->operationEngine->getData();
 			$log = $this->operationEngine->getLogData();
+			KalturaLog::log("Log strlen: ".strlen($log));
 			//removing unsuported XML chars
 			$log  = preg_replace('/[^\t\n\r\x{20}-\x{d7ff}\x{e000}-\x{fffd}\x{10000}-\x{10ffff}]/u','',$log);
 			if($log && strlen($log))

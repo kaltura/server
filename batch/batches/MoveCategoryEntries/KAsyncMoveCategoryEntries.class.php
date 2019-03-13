@@ -115,7 +115,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 		$categoryEntryPager->pageSize = 100;
 		$categoryEntryPager->pageIndex = 1;
 
-		if(KBatchBase::$taskConfig->params->pageSize)
+		if(KBatchBase::$taskConfig->params && KBatchBase::$taskConfig->params->pageSize)
 			$categoryEntryPager->pageSize = KBatchBase::$taskConfig->params->pageSize;
 			
 		$movedEntries = 0;

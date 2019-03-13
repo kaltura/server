@@ -1048,13 +1048,20 @@ class kFlowHelper
 		$thumbAsset->incrementVersion();
 		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
 
-
 		if(file_exists($data->getThumbPath()))
 		{
 			list($width, $height, $type, $attr) = getimagesize($data->getThumbPath());
 			$thumbAsset->setWidth($width);
 			$thumbAsset->setHeight($height);
 			$thumbAsset->setSize(filesize($data->getThumbPath()));
+
+			$thumbParamsOutput = assetParamsOutputPeer::retrieveByAssetId($data->getThumbAssetId());
+			if(KCsvWrapper::contains('bif', $thumbParamsOutput->getTags()))
+			{
+				$thumbAsset->setFileExt('bif');
+				$thumbAsset->setWidth($thumbParamsOutput->getWidth());
+				$thumbAsset->setHeight($thumbParamsOutput->getHeight());
+			}
 		}
 
 		$logPath = $data->getThumbPath() . '.log';
@@ -2578,8 +2585,9 @@ class kFlowHelper
 
 			if($dbAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_IMPORTING)
 			{
-				$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-				$dbAsset->setSize(kFile::fileSize($finalPath));
+				/* @var $fileSync FileSync */
+				$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey, false);
+				$dbAsset->setSize($fileSync->getFileSize());
 
 				if($dbAsset instanceof flavorAsset)
 				{
@@ -2595,7 +2603,8 @@ class kFlowHelper
 
 				if($dbAsset instanceof thumbAsset)
 				{
-					list($width, $height, $type, $attr) = getimagesize($finalPath);
+					
+					list($width, $height, $type, $attr) = kImageUtils::getImageSize($fileSync);
 					$dbAsset->setWidth($width);
 					$dbAsset->setHeight($height);
 				}

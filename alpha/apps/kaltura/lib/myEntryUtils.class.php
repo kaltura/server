@@ -696,7 +696,8 @@ class myEntryUtils
 	
 	
 	public static function resizeEntryImage( entry $entry, $version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
-		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null, $fileSync = null)
+		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null, $fileSync = null,
+		$start_sec = -1, $end_sec = -1)
 	{
 		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
 			$thumbParams = new kThumbnailParameters();
@@ -733,6 +734,11 @@ class myEntryUtils
 			$thumbName.= "_dns_{$density}";
 		if($stripProfiles)
 			$thumbName .= "_stp_{$stripProfiles}";
+
+		if($start_sec != -1)
+			$thumbName .= "_ssec_{$start_sec}";
+		if($end_sec != -1)
+			$thumbName .= "_esec_{$end_sec}";
 				
 		$entryThumbFilename = $entry->getThumbnail();
 		if(!$entryThumbFilename)
@@ -816,12 +822,21 @@ class myEntryUtils
 		if ($servingVODfromLive)
 			$orig_image_path = null;
 
+		if(($end_sec != -1 && (($end_sec * 1000) > $entryLengthInMsec)) || ($start_sec != -1 && $end_sec == -1))
+		{
+			$end_sec = $entryLengthInMsec / 1000;
+		}
+		if($start_sec == -1 && $end_sec != -1)
+		{
+			$start_sec = 0;
+		}
+
 		while($count--)
 		{
 			$thumbCaptureByPackager = false;
 			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
 			$params = array($density, $quality, $forceRotation, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
-			$shouldResizeByPackager = self::shouldResizeByPackager($params, $type, array($width, $height));
+			$shouldResizeByPackager = KThumbnailCapture::shouldResizeByPackager($params, $type, array($width, $height));
 			if (
 				// need to create a thumb if either:
 				// 1. entry is a video and a specific second was requested OR a slices were requested
@@ -837,7 +852,14 @@ class myEntryUtils
 				}
 				else if ($vid_slices != -1) // need to create a thumbnail at a specific slice
 				{
-					$calc_vid_sec = floor($entryLengthInMsec / $vid_slices * min($vid_slice, $vid_slices) / 1000);
+					if($start_sec != -1 && $end_sec != -1)
+					{
+						$calc_vid_sec = $start_sec + (($end_sec - $start_sec) / $vid_slices) * min($vid_slice, $vid_slices);
+					}
+					else
+					{
+						$calc_vid_sec = floor($entryLengthInMsec / $vid_slices * min($vid_slice, $vid_slices) / 1000);
+					}
 				}
 				else if ($entry->getStatus() != entryStatus::READY && $entry->getLengthInMsecs() == 0) // when entry is not ready and we don't know its duration
 				{
@@ -858,7 +880,7 @@ class myEntryUtils
 				{
 					// creating the thumbnail is a very heavy operation
 					// prevent calling it in parallel for the same thumbnail for 5 minutes
-					
+
 					$cacheLockKeyProcessing = "thumb-processing".$orig_image_path;
 					if ($cache && !$cache->add($cacheLockKeyProcessing, true, 5 * 60))
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
@@ -937,7 +959,9 @@ class myEntryUtils
 					$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
 				}
 				if ($thumbCaptureByPackager && file_exists($packagerResizeFullPath))
+				{
 					unlink($packagerResizeFullPath);
+				}
 			}
 
 
@@ -960,13 +984,17 @@ class myEntryUtils
 			}
 
 			if ($thumbCaptureByPackager && $shouldResizeByPackager && $multi && file_exists($packagerResizeFullPath))
+			{
 				unlink($packagerResizeFullPath);
+			}
 
 			if ($isEncryptionNeeded)
 			{
 				$fileSync->deleteTempClear();
 				if (self::isTempFile($orig_image_path) && file_exists($orig_image_path))
+				{
 					unlink($orig_image_path);
+				}
 			}
 		}
 		
@@ -1115,27 +1143,6 @@ class myEntryUtils
 		$url .= self::MP4_FILENAME_PARAMETER;
 		return $url;
 	}
-
-
-	private static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null, $offsetPrefix = '')
-	{
-		$offset = floor($calc_vid_sec*1000);
-		if ($width)
-			$offset .= "-w$width";
-		if ($height)
-			$offset .= "-h$height";
-
-		$packagerThumbCapture = str_replace(
-		array ( "{url}", "{offset}" ),
-		array ( $url , $offsetPrefix . $offset ) ,
-		$packagerCaptureUrl );
-
-		$tempThumbPath = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
-		kFile::closeDbConnections();
-		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath, null, true);
-		return $success;
-	}
-
 
 	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, &$flavorAssetId)
 	{
@@ -2231,16 +2238,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return $content;
 	}
 
-	private static function shouldResizeByPackager($params, $type, $dimension)
-	{
-		//check if all null or 0
-		$canBeHandle = (count(array_filter($params)) == 0);
-		// check if only one dimension is given or type 5 (stretches to the exact dimensions)
-		$positiveDimension = array_filter($dimension, function ($v) {return $v > 0;});
-		$validDimension = ($type == 5) || (count($positiveDimension) == 1);
-		return ($canBeHandle && $validDimension);
-	}
-
 	public static function addTrackEntryInfo(entry $entry,$message)
 	{
 		$trackEntry = new TrackEntry();
@@ -2275,4 +2272,13 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			}
 		}
 	}
+
+	public static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null, $offsetPrefix = '')
+	{
+		list($packagerThumbCapture, $tempThumbPath) = KThumbnailCapture::generateThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height, $offsetPrefix);
+		kFile::closeDbConnections();
+		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath, null, true);
+		return $success;
+	}
+
 }

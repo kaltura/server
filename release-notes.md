@@ -1,3 +1,118 @@
+# Naos 14.16.0 #
+## GroupUser - Count number of users in group on the group object ##
+ - Issue Type: Task
+ - Issue ID: PLAT-9742
+### Configuration ###
+Add Group to your plugins.ini
+
+### Deployment scripts ###
+Run deployment script:
+	- php deployment/updates/scripts/add_permissions/2019_03_10_add_group_permission.php
+	- php deployment/updates/scripts/add_permissions/2017_05_24_eSearch_service.php
+
+## create new type of event notification template: Boolean ##
+ - Issue Type: Task
+ - Issue ID: REACH2-493
+
+### Configuration ###
+Add BooleanNotification to your plugins.ini
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+
+## Reach - Support extending accessKey##
+
+ - Issue Type: Feature
+ - Issue ID: REACH2-525
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_03_05_add_reach_extendAccessKey_action.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Groups-BE - Allow group manager ##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-8580
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+			
+Run deployment script:
+		
+		- php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_02_28_update_groupuser_permission.php
+
+# Naos 14.14.0 #
+
+## Schedule Event - Add sphinx match optimization##
+
+ - Issue Type: Task
+ - Issue ID: No-Plat
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+	
+First replace all tokens in the XML file below and remove ".template" from the fle name:
+		
+		- /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/2019_02_14_update_reach_vendor_response_profiles.template.xml
+		
+Run deployment script:
+		
+		- php /opt/kaltura/app/deployment/updates/scripts/2019_02_14_update_reach_vendor_response_profile.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Schedule Event - Add sphinx match optimization##
+
+ - Issue Type: Task
+ - Issue ID: No-Plat
+
+### Configuration ###
+update configurations/sphinx/kaltura.conf file and add the following to kaltura_schedule_event:
+rt_field = sphinx_match_optimizations
+
+### Deployment scripts ###
+	
+ReIndex and repopulate kaltura_schedule_event table in sphinx.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+# Naos 14.13.0 #
+## Conf Maps - add option to view list of all maps in combo box ##
+- Issue Type: Task
+- Issue ID: PLAT-9596
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_11_confmaps_service.php
+
+
+## Move maps to dynamic configuration ##
+- Issue Type: Task
+- Issue ID: PLAT-9603
+
+### Configuration ###
+section: global_whitelisted_domains_exclude from local.ini was moved to a new map.
+please make sure to create new map called: "global_whitelisted_domains_exclude_list", and copy the content of it.
+
 # Naos 14.12.0 #
 
 ## Blackout dates ##

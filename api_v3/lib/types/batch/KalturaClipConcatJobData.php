@@ -22,6 +22,11 @@ class KalturaClipConcatJobData extends KalturaJobData
 	 */
 	public $sourceEntryId;
 
+	/**$importUrl
+	 * @var string
+	 */
+	public $importUrl;
+
 	/** $partnerId
 	 * @var int
 	 */
@@ -33,7 +38,7 @@ class KalturaClipConcatJobData extends KalturaJobData
 	public $priority;
 
 	/** clip operations
-	 * @var KalturaObjectArray $operationAttributes
+	 * @var KalturaOperationAttributesArray $operationAttributes
 	 */
 	public $operationAttributes;
 
@@ -45,7 +50,8 @@ class KalturaClipConcatJobData extends KalturaJobData
 		'partnerId',
 		'priority',
 		'operationAttributes',
-		'sourceEntryId'
+		'sourceEntryId',
+		'importUrl'
 	);
 
 	/* (non-PHPdoc)

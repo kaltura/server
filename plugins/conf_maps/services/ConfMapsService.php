@@ -26,7 +26,7 @@ class ConfMapsService extends KalturaBaseService
 	 */
 	function addAction(KalturaConfMaps $map)
 	{
-		$dbMap = ConfMapsPeer::getLatestMap($map->name, $map->relatedHost);
+		$dbMap = ConfMapsPeer::getMapByVersion($map->name, $map->relatedHost);
 		if($dbMap)
 		{
 			throw new KalturaAPIException(KalturaErrors::MAP_ALREADY_EXIST, $map->name, $map->relatedHost);
@@ -53,7 +53,7 @@ class ConfMapsService extends KalturaBaseService
 	function updateAction(KalturaConfMaps $map)
 	{
 		//get map by values name / hostname
-		$dbMap = ConfMapsPeer::getLatestMap($map->name, $map->relatedHost);
+		$dbMap = ConfMapsPeer::getMapByVersion($map->name, $map->relatedHost);
 		if(!$dbMap)
 		{
 			throw new KalturaAPIException(KalturaErrors::MAP_DOES_NOT_EXIST );
@@ -94,6 +94,19 @@ class ConfMapsService extends KalturaBaseService
 		kApiCache::disableCache();
 		$confMap = $filter->getMap();
 		return $confMap;
+	}
+
+	/**
+	* List configuration maps names
+	*
+	* @action getMapNames
+	* @return KalturaStringArray
+	*/
+	public function getMapNamesAction()
+	{
+		$mapNames= ConfMapsPeer::retrieveMapsNames();
+		$result =  KalturaStringArray::fromDbArray($mapNames);
+		return $result;
 	}
 }
 

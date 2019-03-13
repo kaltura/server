@@ -27,7 +27,13 @@ class ConfMapsPeer extends BaseConfMapsPeer {
 		self::$s_criteria_filter->setFilter($c);
 	}
 
-	public static function getLatestMap($mapName , $hostNameRegex = null)
+	/**
+	 * @param $mapName
+	 * @param null $hostNameRegex
+	 * @param null $version - setting null as version will bring the latest version
+	 * @return ConfMaps
+	 */
+	public static function getMapByVersion($mapName , $hostNameRegex = null, $version = null)
 	{
 		$c = new criteria();
 		$c->add(self::MAP_NAME ,$mapName );
@@ -35,9 +41,17 @@ class ConfMapsPeer extends BaseConfMapsPeer {
 		{
 			$c->add(self::HOST_NAME, $hostNameRegex);
 		}
-		$c->addDescendingOrderByColumn(self::VERSION);
+		if (!is_null($version))
+		{
+			$c->add(self::VERSION, $version);
+		}
+		else
+		{
+			$c->addDescendingOrderByColumn(self::VERSION);
+		}
 		return self::doSelectOne($c);
 	}
+
 	public static function addNewMapVersion($mapName, $hostNameRegex, $content, $newVersion)
 	{
 		$c = new criteria();
@@ -47,5 +61,19 @@ class ConfMapsPeer extends BaseConfMapsPeer {
 		$c->add(self::VERSION ,$newVersion );
 		$c->add(self::STATUS ,ConfMapsStatus::STATUS_ENABLED );
 		return self::doInsert($c);
+	}
+
+	public static function retrieveMapsNames()
+	{
+		$mapNames= array();
+		$c = new Criteria();
+		$c->addGroupByColumn(self::MAP_NAME);
+		$maps  = self::doSelect($c);
+		foreach ($maps as $map)
+		{
+			$mapNames[] = $map->getMapName();
+		}
+
+		return $mapNames;
 	}
 } // ConfMapsPeer

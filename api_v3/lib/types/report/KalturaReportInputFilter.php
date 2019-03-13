@@ -132,6 +132,35 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $sourceTypeIn;
 
+	/**
+	 * Filter by entry owner
+	 *
+	 * @var string
+	 */
+	public $ownerIdsIn;
+
+	/**
+	 * @var KalturaESearchEntryOperator
+	 */
+	public $entryOperator;
+
+	/**
+	 * Entry created at greater than or equal as Unix timestamp
+	 * @var time
+	 */
+	public $entryCreatedAtGreaterThanOrEqual;
+
+	/**
+	 * Entry created at less than or equal as Unix timestamp
+	 * @var time
+	 */
+	public $entryCreatedAtLessThanOrEqual;
+
+	/**
+	 * @var string
+	 */
+	public $entryIdIn;
+
 	private static $map_between_objects = array
 	(
 		'keywords',
@@ -151,7 +180,11 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'timeZoneOffset',
 		'interval',
 		'mediaTypeIn' => 'media_types',
-		'sourceTypeIn' => 'source_types'
+		'sourceTypeIn' => 'source_types',
+		'ownerIdsIn' => 'owners',
+		'entryCreatedAtGreaterThanOrEqual' => 'gte_entry_created_at',
+		'entryCreatedAtLessThanOrEqual' => 'lte_entry_created_at',
+		'entryIdIn' => 'entries_ids',
 	);
 
 	protected function getMapBetweenObjects()
@@ -164,6 +197,16 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public function toReportsInputFilter($reportInputFilter = null)
 	{
+		if (!$reportInputFilter)
+		{
+			$reportInputFilter = new reportsInputFilter();
+		}
+
+		if ($this->entryOperator)
+		{
+			$reportInputFilter->entry_operator = $this->entryOperator->toObject();
+		}
+
 		return parent::toReportsInputFilter($reportInputFilter);
 	}
 }

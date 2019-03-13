@@ -14,7 +14,8 @@ class KalturaFrontController
 	private $action = "";
 	private $disptacher = null;
 	private $serializer;
-	
+	private $exceptionHandlers = null;
+
 	private function __construct()
 	{
 		$this->dispatcher = KalturaDispatcher::getInstance();
@@ -438,7 +439,8 @@ class KalturaFrontController
 	public function getExceptionObject($ex, $service, $action)
 	{
 		KalturaResponseCacher::adjustApiCacheForException($ex);
-		
+
+		$object = null;
 		if ($ex instanceof KalturaAPIException)
 		{
 			KalturaLog::err($ex);
@@ -533,10 +535,6 @@ class KalturaFrontController
 				case kCoreException::FILE_PENDING:
 					$object = new KalturaAPIException(KalturaErrors::FILE_PENDING);
 					break;
-						
-				default:
-					KalturaLog::crit($ex);
-					$object = new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 			}
 		}
 		else if ($ex instanceof PropelException)
@@ -544,16 +542,38 @@ class KalturaFrontController
 			KalturaLog::alert($ex);
 			$object = new KalturaAPIException(KalturaErrors::INTERNAL_DATABASE_ERROR);
 		}
-		else
+
+		$exceptionClass = get_class($ex);
+		if (!$object && $this->shouldHandlePluginException($exceptionClass))
+		{
+			$object = call_user_func($this->exceptionHandlers[$exceptionClass], $ex);
+		}
+
+		if (!$object)
 		{
 			KalturaLog::crit($ex);
 			$object = new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 		}
-		
+
 		return $this->handleErrorMapping($object, $service, $action);
 	}
-	
-	
+
+	protected function shouldHandlePluginException($exceptionClass)
+	{
+		if (is_null($this->exceptionHandlers))
+		{
+			$this->exceptionHandlers = array();
+			$handlers = KalturaPluginManager::getPluginInstances('IKalturaExceptionHandler');
+			foreach ($handlers as $handler)
+			{
+				/* @var $handler IKalturaExceptionHandler */
+				$this->exceptionHandlers = array_merge($this->exceptionHandlers, $handler->getExceptionMap());
+			}
+		}
+
+		return isset($this->exceptionHandlers[$exceptionClass]);
+	}
+
 	protected function setSerializer($format, $ignoreNull = true)
 	{
 		// Return a serializer according to the given format

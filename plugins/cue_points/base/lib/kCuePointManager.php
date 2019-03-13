@@ -355,6 +355,9 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if($object instanceof CuePoint)
 			return true;
 
+		if($object instanceof QuizUserEntry)
+			return true;
+
 		return false;
 	}
 
@@ -427,8 +430,20 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if($object instanceof CuePoint)
 			$this->cuePointDeleted($object);
 
+		if($object instanceof QuizUserEntry)
+			$this->quizUserEntryDeleted($object);
+
 		return true;
 	}
+
+	public function quizUserEntryDeleted(QuizUserEntry $object)
+	{
+		$c = new Criteria();
+		$c->Add(CuePointPeer::ID,$object->getAnswerIds(),Criteria::IN);
+		$this->deleteCuePoints($c);
+		return true;
+	}
+
 
 	/* (non-PHPdoc)
 	 * @see kObjectReplacedEventConsumer::objectReplaced()
@@ -567,6 +582,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$cuePoints = CuePointPeer::doSelect($c);
 		$update = new Criteria();
 		$update->add(CuePointPeer::STATUS, CuePointStatus::DELETED);
+		$update->add(CuePointPeer::UPDATED_AT, time());
 
 		$con = Propel::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
 		BasePeer::doUpdate($c, $update, $con);
@@ -1031,3 +1047,4 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		return $kClipDescriptionArray;
 	}
 }
+

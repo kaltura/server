@@ -1064,6 +1064,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$thumbParamsOutput->setScaleWidth($thumbParams->getScaleWidth());
 		$thumbParamsOutput->setScaleHeight($thumbParams->getScaleHeight());
 		$thumbParamsOutput->setBackgroundColor($thumbParams->getBackgroundColor());
+		$thumbParamsOutput->setInterval($thumbParams->getInterval());
 
 		if($mediaInfo && $mediaInfo->getVideoDuration())
 		{
@@ -1476,6 +1477,16 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$readySrcFlavorAssets = array($originalFlavorAsset);
 		}
 
+		$srcSyncKeys = array();
+		foreach ($readySrcFlavorAssets as $srcAsset)
+		{
+			$srcSyncKeys[] = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		}
+		if(!self::verifySrcFileSyncsExist($flavorAsset->getId(), $flavor, $srcSyncKeys))
+		{
+			return false;
+		}
+
 		//all source flavors are ready
 		if($flavorAsset->getStatus() == flavorAsset::ASSET_STATUS_WAIT_FOR_CONVERT)
 		{
@@ -1488,12 +1499,36 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$parentJob = self::getParentJobForWaitingAssetConversion($flavorAsset->getEntryId(), $parentJob);
 		}
 
-		$srcSyncKeys = array();
-		foreach ($readySrcFlavorAssets as $srcAsset)
-		{
-			$srcSyncKeys[] = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		}
 		return kJobsManager::addFlavorConvertJob($srcSyncKeys, $flavor, $flavorAsset->getId(), $conversionProfileId, $mediaInfoId, $parentJob, $lastEngineType, $sameRoot, $priority);
+	}
+
+	private static function verifySrcFileSyncsExist($flavorAssetId, $flavor, $srcSyncKeys)
+	{
+		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
+		if(!$flavorAsset)
+		{
+			KalturaLog::err("No flavor asset found for id [$flavorAssetId]");
+			return false;
+		}
+		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
+		$isLocal = ($flavor->getSourceRemoteStorageProfileId() == StorageProfile::STORAGE_KALTURA_DC);
+
+		if($isLocal)
+		{
+			foreach ($srcSyncKeys as $srcSyncKey)
+			{
+				list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
+				if ($fileSync && !$local)
+				{
+					if (!$fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL || !$partner || !$partner->getImportRemoteSourceForConvert())
+					{
+						KalturaLog::err("Source file not found locally for flavor conversion [" . $flavorAsset->getId() . "]");
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	private static function getParentJobForWaitingAssetConversion($entryId, BatchJob $parentJob = null)

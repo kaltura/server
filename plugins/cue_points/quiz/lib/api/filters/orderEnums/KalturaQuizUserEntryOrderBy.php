@@ -5,4 +5,5 @@
  */
 class KalturaQuizUserEntryOrderBy extends KalturaUserEntryOrderBy
 {
+
 }

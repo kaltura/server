@@ -21,12 +21,14 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		4 => "PENDING_MODERATION",
 		5 => "REJECTED",
 		6 => "ERROR",
-		7 => "ABORTED"
+		7 => "ABORTED",
+		8 => "PENDING_ENTRY_READY",
 	);
 	
 	static private $serviceFeatureEnumTranslate = array(
 		1 => "CAPTIONS",
 		2 => "TRANSLATION",
+		3 => "ALIGNMENT",
 	);
 	
 	static private $serviceTypeEnumTranslate = array(
@@ -72,7 +74,7 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 		// Create local path for csv generation
 		$directory = self::$taskConfig->params->localTempPath . DIRECTORY_SEPARATOR . $job->partnerId;
 		KBatchBase::createDir($directory);
-		$filePath = $directory . DIRECTORY_SEPARATOR . 'reachTasks_' . date("Ymd") . '.csv';
+		$filePath = $directory . DIRECTORY_SEPARATOR . "reachTasks_{$job->id}.csv";
 		$data->outputPath = $filePath;
 		KalturaLog::info("Temp file path: [$filePath]");
 
@@ -151,6 +153,8 @@ class KAsyncEntryVendorTasksCsv extends KJobHandlerWorker
 			}
 
 			$this->addEntryVendorTasksToCsv($entryVendorTaskList->objects, $csvFile);
+			$lastEntryVendorTaskObject = end($entryVendorTaskList->objects);
+			$lastCreatedAt = $lastEntryVendorTaskObject->createdAt;
 			$tasksCount = count($entryVendorTaskList->objects);
 			$totalCount += $tasksCount;
 			KalturaLog::debug("Adding More - $tasksCount totalCount - " . $totalCount);

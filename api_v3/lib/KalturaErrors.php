@@ -170,6 +170,8 @@ class KalturaErrors extends APIErrors
 
 	const VOLUME_MAP_NOT_CONFIGURED = "VOLUME_MAP_NOT_CONFIGURED;;Need to add volume map support to configuration";
 
+	const RESOURCE_ENTRY_ID_MISSING= "RESOURCE_ENTRY_ID_MISSING;;Entry Id on resource object is missing";
+
 	/**
 	 * Notification Service
 	 */
@@ -274,6 +276,7 @@ class KalturaErrors extends APIErrors
 	const FLAVOR_ASSET_RECONVERT_ORIGINAL = "FLAVOR_ASSET_RECONVERT_ORIGINAL;;Cannot reconvert original flavor asset";
 
 	const ORIGINAL_FLAVOR_ASSET_IS_MISSING = "ORIGINAL_FLAVOR_ASSET_IS_MISSING;;The original flavor asset is missing";
+
 
 	const ORIGINAL_FLAVOR_ASSET_NOT_CREATED = "ORIGINAL_FLAVOR_ASSET_NOT_CREATED;DATA;The original flavor asset could not be created [@DATA@]";
 
@@ -422,6 +425,8 @@ class KalturaErrors extends APIErrors
 	const USER_NOT_FOUND = "USER_NOT_FOUND;;User was not found";
 
 	const GROUP_NOT_FOUND = "GROUP_NOT_FOUND;;Group was not found";
+
+	const GROUP_USER_NOT_FOUND = "GROUP_USER_NOT_FOUND;;Group user was not found";
 
 	const GROUP_USER_ALREADY_EXISTS = "GROUP_USER_ALREADY_EXISTS;;GroupUser already exists";
 
@@ -721,6 +726,7 @@ class KalturaErrors extends APIErrors
 	const CONF_CONTORL_ERROR = "CONF_CONTORL_ERROR;ERR;Conf control error - [@ERR@]";
 	const MAP_DOES_NOT_EXIST = "MAP_DOES_NOT_EXIST;;Map does not exist";
 	const MAP_ALREADY_EXIST = "MAP_ALREADY_EXIST;NAME,HOST;Map already exist for this map name {@NAME@} and host {@HOST@}";
-
+	const MAP_CANNOT_BE_CREATED_ON_FILE_SYSTEM = "MAP_CANNOT_BE_CREATED_ON_FILE_SYSTEM;;Map cannnot be created on file system";
+	const HOST_NAME_CONTAINS_ASTRIX = "HOST_NAME_CONTAINS_ASTRIX;HOST_NAME;Host name contains *, use # instead {@HOST_NAME@}";
 }
 

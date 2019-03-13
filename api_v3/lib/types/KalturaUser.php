@@ -4,200 +4,32 @@
  * @subpackage objects
  * @relatedService UserService
  */
-class KalturaUser extends KalturaObject implements IRelatedFilterable 
+class KalturaUser extends KalturaBaseUser
 {
 	const MAX_NAME_LEN = 40;
-
-	/**
-	 * @var string
-	 * @filter order
-	 */
-	public $id;
-
-	/**
-	 * @var int
-	 * @readonly
-	 * @filter eq
-	 */
-	public $partnerId;
 
 	/**
 	 * @var KalturaUserType
 	 * @filter eq,in
 	 */
 	public $type;
-	
-	/**
-	 * @var string
-	 * @filter like,likex
-	 */
-	public $screenName;
-
-	/**
-	 * @var string
-	 * @deprecated
-	 */
-	public $fullName;
-
-	/**
-	 * @var string
-	 * @filter like,likex
-	 */
-	public $email;
 
 	/**
 	 * @var int
 	 */
 	public $dateOfBirth;
-	
-	/**
-	 * @var string
-	 */
-	public $country;
 
-	/**
-	 * @var string
-	 */
-	public $state;
-
-	/**
-	 * @var string
-	 */
-	public $city;
-
-	/**
-	 * @var string
-	 */
-	public $zip;
-	
-	/**
-	 * @var string
-	 */
-	public $thumbnailUrl;
-	
-	/**
-	 * @var string
-	 */
-	public $description;
-	
-	/**
-	 * @var string
-	 * @filter mlikeor,mlikeand
-	 */
-	public $tags;
-	
-	/**
-	 * Admin tags can be updated only by using an admin session
-	 * @deprecated Use "tags" field instead.
-	 * @var string
-	 */
-	public $adminTags;
-	
 	/**
 	 * @var KalturaGender
 	 */
 	public $gender;
 
 	/**
-	 * @var KalturaUserStatus
-	 * @filter eq,in
-	 */
-	public $status;
-
-	/**
-	 * Creation date as Unix timestamp (In seconds)
-	 * @var time
-	 * @readonly
-	 * @filter gte,lte,order
-	 */
-	public $createdAt;
-
-	/**
-	 * Last update date as Unix timestamp (In seconds)
-	 * @var time
-	 * @readonly
-	 */
-	public $updatedAt;
-
-	/**
-	 * Can be used to store various partner related data as a string 
-	 * @var string
-	 */
-	public $partnerData;
-	
-	/**
-	 * @var int
-	 */
-	public $indexedPartnerDataInt;
-	
-	/**
-	 * @var string
-	 */
-	public $indexedPartnerDataString;
-	
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $storageSize;
-	
-	/**
-	 * @var string
-	 * @insertonly
-	 * @writeonly
-	 */
-	public $password;
-	
-	/**
-	 * @var string
-	 * @filter likex
-	 */
-	public $firstName;
-	
-	/**
-	 * @var string
-	 * @filter likex
-	 */
-	public $lastName;
-		
-	/**
 	 * @var bool
 	 * @filter eq
 	 */
 	public $isAdmin;
-		
-	/**
-	 * @var KalturaLanguageCode
-	 */
-	public $language;
-	
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $lastLoginTime;
-	
-	/**
-	 * 
-	 * @var int
-	 * @readonly
-	 */
-	public $statusUpdatedAt;
-	
-	/**
-	 * 
-	 * @var time
-	 * @readonly
-	 */
-	public $deletedAt;
-	
-	/**
-	 * @var bool
-	 * @insertonly
-	 */
-	public $loginEnabled;
-	
-	
+
 	/**
 	 * @var string
 	 */
@@ -208,7 +40,8 @@ class KalturaUser extends KalturaObject implements IRelatedFilterable
 	 * @readonly
 	 */
 	public $roleNames;
-	
+
+
 	/**
 	 * @var bool
 	 * @insertonly
@@ -217,70 +50,54 @@ class KalturaUser extends KalturaObject implements IRelatedFilterable
 
 	/**
 	 * @var string
+	 * @insertonly
+	 * @writeonly
 	 */
-	public $allowedPartnerIds;
+	public $password;
 
 	/**
 	 * @var string
+	 * @filter likex
 	 */
-	public $allowedPartnerPackages;
+	public $firstName;
 
 	/**
-	 * @var KalturaUserMode
+	 * @var string
+	 * @filter likex
 	 */
-	public $userMode;
+	public $lastName;
 
-	private static $map_between_objects = array
-	(
-		"id" => "puserId", 
-		"partnerId",
+	/**
+	 * @var bool
+	 * @insertonly
+	 */
+	public $loginEnabled;
+
+	private static $map_between_objects = array (
 		"type",
-		"screenName",
-		"email",
 		"dateOfBirth",
-		"country",
-		"state",
-		"city",
-		"zip",
-		"thumbnailUrl" => "picture",
-		"description" => "aboutMe",
-		"tags",
 		"gender",
-		"status",
-		"createdAt",
-		"updatedAt",
-		"partnerData",
-		"storageSize",
 		"firstName",
 		"lastName",
 		"isAdmin",
-		"language",
-		"lastLoginTime",
-		"deletedAt",
 		"roleIds",
 		"roleNames" => "userRoleNames",
-		"isAccountOwner",
-		"allowedPartnerIds" => "allowedPartners",
-		"allowedPartnerPackages",
-		"statusUpdatedAt",
-		"userMode",
+		"isAccountOwner"
 	);
 
 	public function getMapBetweenObjects ( )
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
-
-	
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if (is_null($dbObject))
 			$dbObject = new kuser();
-			
-		
+
+
 		parent::toObject($dbObject, $skip);
-		
-		
+
+
 		// full name is deprecated and was split to firstName + lastName
 		// this is for backward compatibility with older clients
 		if ($this->fullName && !$this->firstName) {
@@ -288,18 +105,16 @@ class KalturaUser extends KalturaObject implements IRelatedFilterable
 			$dbObject->setFirstName($firstName);
 			$dbObject->setLastName($lastName);
 		}
-		
-		return $dbObject;		
+
+		return $dbObject;
 	}
-	
-	
 	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if(!$sourceObject)
 			return;
-			
+
 		parent::doFromObject($sourceObject, $responseProfile);
-		
+
 		// full name is deprecated and was split to firstName + lastName
 		// this is for backward compatibility
 		if($this->shouldGet('fullName', $responseProfile))
@@ -307,17 +122,6 @@ class KalturaUser extends KalturaObject implements IRelatedFilterable
 		if($this->shouldGet('loginEnabled', $responseProfile))
 			$this->loginEnabled = !is_null($sourceObject->getLoginDataId());
 	}
-	
-	public function getExtraFilters()
-	{ 
-		return array();		
-	}
-	
-	public function getFilterDocs()
-	{
-		return array();	
-	}
-	
 	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
 	{
 		$this->verifyMaxLength();
@@ -330,7 +134,7 @@ class KalturaUser extends KalturaObject implements IRelatedFilterable
 		return parent::toUpdatableObject($object_to_fill, $props_to_skip);
 	}
 
-	private function verifyMaxLength()	
+	private function verifyMaxLength()
 	{
 		if (strlen($this->firstName) > self::MAX_NAME_LEN)
 			$this->firstName = kString::alignUtf8String($this->firstName, self::MAX_NAME_LEN);

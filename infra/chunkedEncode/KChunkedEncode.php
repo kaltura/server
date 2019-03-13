@@ -62,6 +62,10 @@
 
 				// Get source mediaData. Required for 'supported' validation
 			$this->sourceFileDt = $this->getMediaData($params->source);
+			if(!isset($this->sourceFileDt)){
+				KalturaLog::log($msgStr="ERROR: failed on media data retrieval of the source file ($params->source)");
+				return false;
+			}
 			
 				/*
 				 * Setup work folders 
@@ -164,6 +168,9 @@
 				 * Generate the pre-planned chunk params (start, frames, ...)
 				 */
 			$this->calculateChunkTimings();
+			
+				// Preparations to solve ffmpeg precise positioning anomaly/bug with MPEG files and B-Frames
+				// To be activated in the future
 //			self::fixChunkStartTimingsForBfarmes($params->source, $params->frameDuration, $this->chunkDataArr);
 
 				/*
@@ -173,7 +180,7 @@
 				$subsFileHd = fopen($this->params->videoFilters->subsFilename,'r');
 				if(!$subsFileHd)
 				{
-					KalturaLog::log('ERROR: missing caption file ['.$this->params->videoFilters->subsFilename.'] - exsiting.');
+					KalturaLog::log('ERROR: missing caption file ['.$this->params->videoFilters->subsFilename.'] - exiting.');
 					return false;
 				}
 				$subsArr = array();
@@ -491,19 +498,23 @@
 			$chunkWithOverlap = $setup->chunkDuration + $setup->chunkOverlap;
 			
 			{
-				$cmdLine = $this->cmdLine." -t $chunkWithOverlap";
+				$cmdLine = " -i ".$this->cmdLine." -t $chunkWithOverlap";
+				if(isset($params->httpHeaderExtPrefix)){
+					$cmdLine = " -headers \"$params->httpHeaderExtPrefix,chunk($chunkIdx)\"".$cmdLine;
+				}
 					/*
 					 * Timing repositioning should be split into two steps 
-					 * - input step to 'start-5 sec'
-					 * - output step to 5 sec forward
+					 * - input step to 'start-backOffset sec' (default backOffset=5sec)
+					 * - output step to 'backOffset' sec forward
 					 * This is required to overcome some sources that does not reposition correctly. Better solution would be to reposition to the nearest KF, 
 					 * but this will require long source query.
 					 */
-				if($start<5) {
-					$cmdLine = " -ss $start -i ".$cmdLine;
+				$backOffset = 5; 
+				if($start<$backOffset) {
+					$cmdLine = " -ss $start".$cmdLine;
 				}
 				else {
-					$cmdLine = " -ss ".($start-5)." -i ".$cmdLine." -ss 5";
+					$cmdLine = " -ss ".($start-$backOffset).$cmdLine." -ss $backOffset";
 				}
 			
 				if(isset($params->decryption_key))
@@ -686,6 +697,10 @@
 				$cmdLine.= " -ss $setup->startFrom";
 			if(isset($params->decryption_key))
 				$cmdLine.= " -decryption_key $params->decryption_key";
+			if(isset($params->httpHeaderExtPrefix)){
+				$cmdLine.= " -headers \"$params->httpHeaderExtPrefix,audio\"";
+			}
+			
 			$cmdLine.= " -i $params->source";
 			$cmdLine.= " -vn";
 			if(isset($params->acodec)) $cmdLine.= " -c:a ".$params->acodec;
@@ -810,13 +825,13 @@
 		public function getSessionName($mode="merged")
 		{
 			switch($mode){
-			case "merged";
+			case "merged":
 				$name = $this->setup->output."_merged";
 				break;
-			case "audio";
+			case "audio":
 				$name = $this->setup->output."_audio";
 				break;
-			case "qpfile";
+			case "qpfile":
 				$name = $this->setup->output."_qpfile";
 				break;
 			case "log":
@@ -825,7 +840,7 @@
 			case "session":
 				$name = $this->setup->output.".ses";
 				break;
-			case "concat";
+			case "concat":
 				$name = $this->setup->output."_concat.log";
 				break;
 			default:
@@ -842,16 +857,16 @@
 		{
 			$name = $this->setup->output."_$this->chunkEncodeToken"."_$chunkIdx.";
 			switch($mode){
-			case null;
+			case null:
 				$name.= "$this->videoChunkPostfix".$chunkIdx;
 				break;
-			case "fix";
+			case "fix":
 				$name.= "$this->videoChunkPostfix".$chunkIdx.".fix";
 				break;
 			case "base":
 				$name.= "$this->videoChunkPostfix";
 				break;
-			case "srt";
+			case "srt":
 				$name.= "srt";
 				break;
 			default:
@@ -1015,12 +1030,15 @@
 		 */
 		protected static function getMediaData($fileName)
 		{
-			if(!file_exists($fileName))
+			try {
+				$medPrsr = new KFFMpegMediaParser($fileName);//new KMediaInfoMediaParser($fileName);
+				$m=$medPrsr->getMediaInfo();
+				return $m;
+			}
+			catch(Exception $ex){
+				KalturaLog::log($ex->getMessage()."... Leaving");
 				return null;
-				// mediaInfo does not function correctly on some LOOONG sources
-			$medPrsr = new KFFMpegMediaParser($fileName);//new KMediaInfoMediaParser($fileName);
-			$m=$medPrsr->getMediaInfo();
-			return $m;
+			}
 		}
 
 		/********************
@@ -1142,6 +1160,9 @@
 
 		public $cmdLineArr = array();
 		
+		public $session = null;
+		public $httpHeaderExtPrefix = null;
+		
 		/********************
 		 *
 		 */
@@ -1174,6 +1195,14 @@
 			array_pop($cmdLineArr);
 			array_shift($cmdLineArr);
 			$this->cmdLineArr = $cmdLineArr;
+			
+			$this->session = basename($this->output);
+			
+				// In case of remote source, set http-header-ext to improve access logging
+			$urlArr = parse_url ($this->source);
+			if($urlArr!==false && key_exists('host',$urlArr)) {
+				$this->httpHeaderExtPrefix = "User-Agent: Kaltura Chunked Encoding,session($this->session)";
+			}
 			return 0;
 		}
 		

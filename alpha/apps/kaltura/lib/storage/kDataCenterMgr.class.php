@@ -92,7 +92,7 @@ class kDataCenterMgr
 		return $dc;
 //		return array ( $dc_id , $dc );
 	}
-	
+
 	public static function getDcIds()
 	{
 		$dc_config = kConf::getMap("dc_config");
