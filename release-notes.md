@@ -1,4 +1,15 @@
 # Naos 14.16.0 #
+## Change wording and support empty instance_id metadata in KMS email notifications ##
+ - Issue Type: Task
+ - Issue IDs: PSVAMB-4944, PSVAMB-4967
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/2019_01_15_update_unique_mediaspace_notifications_templates.php
+
+
 ## GroupUser - Count number of users in group on the group object ##
  - Issue Type: Task
  - Issue ID: PLAT-9742
