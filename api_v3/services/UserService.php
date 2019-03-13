@@ -38,8 +38,8 @@ class UserService extends KalturaBaseUserService
 		{
 			$user->isAdmin = true;
 		}
-
-		$this->validateUserNames($user);
+		$names = array('firstName', 'lastName', 'fullName', 'screenName');
+		$this->validateNames($user ,$names);
 		$lockKey = "user_add_" . $this->getPartnerId() . $user->id;
 		return kLock::runLocked($lockKey, array($this, 'adduserImpl'), array($user));
 	}
@@ -69,7 +69,8 @@ class UserService extends KalturaBaseUserService
 			throw new KalturaAPIException(KalturaErrors::CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN);
 		}
 
-		$this->validateUserNames($user);
+		$names = array('firstName', 'lastName', 'fullName', 'screenName');
+		$this->validateNames($user, $names);
 
 		// update user
 		try
