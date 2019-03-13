@@ -53,4 +53,5 @@ interface ReportType extends BaseEnum
    const PERCENTILES = 43;
    const CONTENT_REPORT_REASONS = 44;
    const PLAYER_RELATED_INTERACTIONS = 45;
+   const PLAYBACK_RATE = 46;
 }

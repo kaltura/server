@@ -282,7 +282,11 @@
 			  }
 			}
 		  }
+		},
+		"members_count":{
+			"type" : "integer"
 		}
+
 	  }
 	}
   }

@@ -1,4 +1,14 @@
 # Naos 14.16.0 #
+## GroupUser - Count number of users in group on the group object ##
+ - Issue Type: Task
+ - Issue ID: PLAT-9742
+### Configuration ###
+Add Group to your plugins.ini
+
+### Deployment scripts ###
+Run deployment script:
+	- php deployment/updates/scripts/add_permissions/2019_03_10_add_group_permission.php
+	- php deployment/updates/scripts/add_permissions/2017_05_24_eSearch_service.php
 
 ## create new type of event notification template: Boolean ##
  - Issue Type: Task
