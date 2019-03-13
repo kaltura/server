@@ -1505,11 +1505,6 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_DIMENSION_MAP => array(
 				'reason' => self::DIMENSION_EVENT_VAR1
 			),
-			self::REPORT_FILTER => array(
-				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-				self::DRUID_VALUES => array(self::EVENT_TYPE_REPORT_SUBMITTED)
-
-			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_REPORT_SUBMITTED),
 		),
 
@@ -1529,11 +1524,6 @@ class kKavaReportsMgr extends kKavaBase
 		myReportsMgr::REPORT_TYPE_PLAYBACK_RATE => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'playback_rate' => self::DIMENSION_EVENT_VAR1
-			),
-			self::REPORT_FILTER => array(
-				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-				self::DRUID_VALUES => array(self::EVENT_TYPE_SPEED)
-
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_SPEED),
 		),
