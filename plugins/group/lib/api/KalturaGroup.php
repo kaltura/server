@@ -2,15 +2,10 @@
 /**
  * @package plugins.group
  * @subpackage api.objects
+ * @relatedService GroupService
  */
-class KalturaGroup extends KalturaUser
+class KalturaGroup extends KalturaBaseUser
 {
-	/**
-	 * @var KalturaUserType
-	 * @insertonly
-	 */
-	public $type;
-
 	/**
 	 * @var int
 	 * @readonly
