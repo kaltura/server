@@ -1505,11 +1505,6 @@ class kKavaReportsMgr extends kKavaBase
 			self::REPORT_DIMENSION_MAP => array(
 				'reason' => self::DIMENSION_EVENT_VAR1
 			),
-			self::REPORT_FILTER => array(
-				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-				self::DRUID_VALUES => array(self::EVENT_TYPE_REPORT_SUBMITTED)
-
-			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_REPORT_SUBMITTED),
 		),
 
@@ -1524,6 +1519,13 @@ class kKavaReportsMgr extends kKavaBase
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED, self::EVENT_TYPE_CAPTIONS, self::EVENT_TYPE_INFO, self::EVENT_TYPE_RELATED_SELECTED),
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED, self::EVENT_TYPE_CAPTIONS, self::EVENT_TYPE_INFO, self::EVENT_TYPE_RELATED_SELECTED),
+		),
+
+		myReportsMgr::REPORT_TYPE_PLAYBACK_RATE => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'playback_rate' => self::DIMENSION_EVENT_VAR1
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_SPEED),
 		),
 	);
 	
@@ -1545,6 +1547,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_CAPTIONS,
 		self::EVENT_TYPE_INFO,
 		self::EVENT_TYPE_RELATED_SELECTED,
+		self::EVENT_TYPE_SPEED,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -1583,6 +1586,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_CAPTIONS => 'count_captions',
 		self::EVENT_TYPE_INFO => 'count_info',
 		self::EVENT_TYPE_RELATED_SELECTED => 'count_related_selected',
+		self::EVENT_TYPE_SPEED => 'count_speed',
 		self::MEDIA_TYPE_VIDEO => 'count_video',
 		self::MEDIA_TYPE_AUDIO => 'count_audio',
 		self::MEDIA_TYPE_IMAGE => 'count_image',
