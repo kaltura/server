@@ -1586,6 +1586,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_CAPTIONS => 'count_captions',
 		self::EVENT_TYPE_INFO => 'count_info',
 		self::EVENT_TYPE_RELATED_SELECTED => 'count_related_selected',
+		self::EVENT_TYPE_REPORT_SUBMITTED => 'count_report_submitted',
 		self::EVENT_TYPE_SPEED => 'count_speed',
 		self::MEDIA_TYPE_VIDEO => 'count_video',
 		self::MEDIA_TYPE_AUDIO => 'count_audio',
