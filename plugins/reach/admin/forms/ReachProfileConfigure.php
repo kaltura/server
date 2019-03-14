@@ -255,7 +255,7 @@ class Form_ReachProfileConfigure extends ConfigureForm
 				/* @var  Kaltura_Client_Type_BooleanEventNotificationCondition $condition */
 				$booleanEventNotificationIds[] = $condition->booleanEventNotificationIds;
 			}
-			$newRule['booleanEventNotificationIds'] = implode(', ', $booleanEventNotificationIds)
+			$newRule['booleanEventNotificationIds'] = implode(', ', $booleanEventNotificationIds);
 		}
 		$newRule['catalogItemIds'] = implode(', ', $catalogItemIds);
 		return $newRule;
