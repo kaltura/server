@@ -336,7 +336,8 @@ abstract class KJobHandlerWorker extends KBatchBase
 		}
 		
 		$updateJob->status = $status;
-		$updateJob->data = $data;
+		if ($data)
+			$updateJob->data = $data;
 		
 		KalturaLog::info("job[$job->id] status: [$status] msg : [$msg]");
 		if($this->isUnitTest)
