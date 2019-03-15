@@ -110,22 +110,18 @@ class KFileTransferExportEngine extends KExportEngine
         $engine = kFileTransferMgr::getInstance($this->protocol, $engineOptions);
         
         try {
-            $keyPairLogin = false;
-            if($this->protocol == KalturaStorageProfileProtocol::SFTP) 
-            {
-                $keyPairLogin = ($this->data->serverPrivateKey || $this->data->serverPublicKey);
-            }
-
-            if($keyPairLogin) 
-            {
-                $privateKeyFile = self::getTempFileWithContent($this->data->serverPrivateKey, 'privateKey');
-                $publicKeyFile = self::getTempFileWithContent($this->data->serverPublicKey, 'publicKey');
-                $engine->loginPubKey($this->data->serverUrl, $this->data->serverUsername, $publicKeyFile, $privateKeyFile, $this->data->serverPassPhrase);
-            }
-            else
-            {
-                $engine->login($this->data->serverUrl, $this->data->serverUsername, $this->data->serverPassword);
-            }
+			$keyPairLogin = false;
+			if($this->protocol == KalturaStorageProfileProtocol::SFTP) {
+				$keyPairLogin = ($this->data->serverPrivateKey || $this->data->serverPublicKey);
+			}
+			
+			if($keyPairLogin) {
+				$privateKeyFile = $this->data->serverPrivateKey ? kFile::createTempFile($this->data->serverPrivateKey, 'privateKey', 0600) : null;
+				$publicKeyFile = $this->data->serverPublicKey ? kFile::createTempFile($this->data->serverPublicKey, 'publicKey', 0600) : null;
+				$engine->loginPubKey($this->data->serverUrl, $this->data->serverUsername, $publicKeyFile, $privateKeyFile, $this->data->serverPassPhrase);
+			} else {	
+				$engine->login($this->data->serverUrl, $this->data->serverUsername, $this->data->serverPassword);
+			}
             
             $engine->delFile($this->destFile);
         }
