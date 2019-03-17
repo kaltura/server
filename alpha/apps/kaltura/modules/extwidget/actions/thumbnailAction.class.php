@@ -177,7 +177,6 @@ class thumbnailAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'start_sec cant be greater then end_sec');
 		}
 
-
 		if ($upload_token_id)
 		{
 			$upload_token = UploadTokenPeer::retrieveByPK($upload_token_id);
@@ -424,7 +423,7 @@ class thumbnailAction extends sfAction
 			
 		if ( ! $file_sync )
 		{
-			$tempThumbPath = $entry->getLocalThumbFilePath($version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $flavor_id, $file_name, $start_sec, $end_sec );
+			$tempThumbPath = $entry->getLocalThumbFilePath($version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $flavor_id, $file_name, $start_sec, $end_sec);
 			if (!$tempThumbPath ){
 				KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
 			}

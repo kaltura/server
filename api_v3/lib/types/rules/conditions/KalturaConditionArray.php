@@ -62,6 +62,8 @@ class KalturaConditionArray extends KalturaTypedArray
 				return new KalturaAnonymousIPCondition();
 			case ConditionType::ASSET_TYPE:
 				return new KalturaAssetTypeCondition();
+			case ConditionType::BOOLEAN:
+				return new KalturaBooleanEventNotificationCondition();
 			default:
 			     return KalturaPluginManager::loadObject('KalturaCondition', $dbObject->getType());
 		}

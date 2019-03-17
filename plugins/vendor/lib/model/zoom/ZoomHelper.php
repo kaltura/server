@@ -254,7 +254,9 @@ class ZoomHelper
 		$emails = array();
 		$meetingApi = str_replace('@meetingId@', $meetingId, self::API_PARTICIPANT);
 		list($tokens, $participants) = ZoomWrapper::retrieveZoomDataAsArray($meetingApi, false, $zoomIntegration->getTokens(), $accountId);
-		if ($zoomIntegration->getAccessToken() !== $tokens[kZoomOauth::ACCESS_TOKEN])
+		if (isset($tokens[kZoomOauth::ACCESS_TOKEN]) &&
+			$tokens[kZoomOauth::ACCESS_TOKEN] &&
+			$zoomIntegration->getAccessToken() !== $tokens[kZoomOauth::ACCESS_TOKEN])
 		{
 			// token changed -> refresh tokens
 			self::saveNewTokenData($tokens, $accountId, $zoomIntegration);

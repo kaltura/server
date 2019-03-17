@@ -1,3 +1,57 @@
+# Naos 14.16.0 #
+## GroupUser - Count number of users in group on the group object ##
+ - Issue Type: Task
+ - Issue ID: PLAT-9742
+### Configuration ###
+Add Group to your plugins.ini
+
+### Deployment scripts ###
+Run deployment script:
+	 php deployment/updates/scripts/add_permissions/2019_03_10_add_group_permission.php
+
+## create new type of event notification template: Boolean ##
+ - Issue Type: Task
+ - Issue ID: REACH2-493
+
+### Configuration ###
+Add BooleanNotification to your plugins.ini
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+
+## Reach - Support extending accessKey##
+
+ - Issue Type: Feature
+ - Issue ID: REACH2-525
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_03_05_add_reach_extendAccessKey_action.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Groups-BE - Allow group manager ##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-8580
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+			
+Run deployment script:
+		
+		- php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_02_28_update_groupuser_permission.php
+
 # Naos 14.14.0 #
 
 ## Schedule Event - Add sphinx match optimization##

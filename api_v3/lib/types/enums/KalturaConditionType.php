@@ -22,6 +22,7 @@ class KalturaConditionType extends KalturaDynamicEnum implements ConditionType
 			ConditionType::FIELD_COMPARE => 'Validate that the field number compared correctly to all listed numeric values.',
 			ConditionType::GEO_DISTANCE => 'Validate that request came from an IP within a certain geo distance.',
 			ConditionType::ANONYMOUS_IP => 'Validate that request came from an IP which fits an anonymous profile (e.g. anonymous, proxy).',
+			ConditionType::BOOLEAN => 'validate the boolean event notifications.',
 			);
 		
 		return self::mergeDescriptions(self::getEnumClass(), $descriptions);

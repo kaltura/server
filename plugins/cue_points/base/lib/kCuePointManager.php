@@ -355,6 +355,9 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if($object instanceof CuePoint)
 			return true;
 
+		if($object instanceof QuizUserEntry)
+			return true;
+
 		return false;
 	}
 
@@ -427,8 +430,20 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if($object instanceof CuePoint)
 			$this->cuePointDeleted($object);
 
+		if($object instanceof QuizUserEntry)
+			$this->quizUserEntryDeleted($object);
+
 		return true;
 	}
+
+	public function quizUserEntryDeleted(QuizUserEntry $object)
+	{
+		$c = new Criteria();
+		$c->Add(CuePointPeer::ID,$object->getAnswerIds(),Criteria::IN);
+		$this->deleteCuePoints($c);
+		return true;
+	}
+
 
 	/* (non-PHPdoc)
 	 * @see kObjectReplacedEventConsumer::objectReplaced()
@@ -1032,3 +1047,4 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		return $kClipDescriptionArray;
 	}
 }
+

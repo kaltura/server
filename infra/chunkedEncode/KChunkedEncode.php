@@ -825,13 +825,13 @@
 		public function getSessionName($mode="merged")
 		{
 			switch($mode){
-			case "merged";
+			case "merged":
 				$name = $this->setup->output."_merged";
 				break;
-			case "audio";
+			case "audio":
 				$name = $this->setup->output."_audio";
 				break;
-			case "qpfile";
+			case "qpfile":
 				$name = $this->setup->output."_qpfile";
 				break;
 			case "log":
@@ -840,7 +840,7 @@
 			case "session":
 				$name = $this->setup->output.".ses";
 				break;
-			case "concat";
+			case "concat":
 				$name = $this->setup->output."_concat.log";
 				break;
 			default:
@@ -857,16 +857,16 @@
 		{
 			$name = $this->setup->output."_$this->chunkEncodeToken"."_$chunkIdx.";
 			switch($mode){
-			case null;
+			case null:
 				$name.= "$this->videoChunkPostfix".$chunkIdx;
 				break;
-			case "fix";
+			case "fix":
 				$name.= "$this->videoChunkPostfix".$chunkIdx.".fix";
 				break;
 			case "base":
 				$name.= "$this->videoChunkPostfix";
 				break;
-			case "srt";
+			case "srt":
 				$name.= "srt";
 				break;
 			default:

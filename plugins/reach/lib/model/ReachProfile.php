@@ -428,6 +428,8 @@ class ReachProfile extends BaseReachProfile
 	 */
 	public function fulfillsRules(kScope $scope, $checkEmptyRulesOnly = false)
 	{
+		$gotBooleanCondition = false;
+		$gotNonBooleanCondition = false;
 		$fullFilledCatalogItemIds = array();
 		if(!is_array($this->getRulesArray()) || !count($this->getRulesArray()))
 			return $fullFilledCatalogItemIds;
@@ -435,13 +437,31 @@ class ReachProfile extends BaseReachProfile
 		$context = new kContextDataResult();
 		foreach ($this->getRulesArray() as $rule)
 		{
-			/* @var $rule kRule */
-			if(count($rule->getConditions()) && $checkEmptyRulesOnly)
+			if (count($rule->getConditions()))
+			{
+				foreach ($rule->getConditions() as $condition)
+				{
+					if ($condition->getType() == ConditionType::BOOLEAN && $condition->getbooleanEventNotificationIds() && $condition->getbooleanEventNotificationIds() != "N/A")
+					{
+						$gotBooleanCondition = true;
+						break;
+					}
+					else if($condition->getType() != ConditionType::BOOLEAN)
+					{
+						$gotNonBooleanCondition = true;
+						break;
+					}
+				}
+			}
+			if ($gotBooleanCondition)
 				continue;
-			
+
+			if($gotNonBooleanCondition && $checkEmptyRulesOnly )
+				continue;
+
 			if(!$checkEmptyRulesOnly && !count($rule->getConditions()))
 				continue;
-			
+
 			$rule->setScope($scope);
 			$fulfilled = $rule->applyContext($context);
 			

@@ -101,7 +101,8 @@ class myPartnerRegistration
 			$partner_type = 1;
 		}
 
-		if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL)
+		$avoidRegistrationArray = array (PartnerPackages::PARTNER_PACKAGE_DEVELOPER_TRIAL,PartnerPackages::PARTNER_PACKAGE_DEVELOPER_COMMIT);
+		if(in_array($partner->getPartnerPackage(),$avoidRegistrationArray))
 		{
 			if ($existingUser) {
 				return; // emails will be sent via external system 

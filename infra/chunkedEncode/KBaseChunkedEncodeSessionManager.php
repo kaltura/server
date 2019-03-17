@@ -70,8 +70,9 @@
 			}
 			
 			$this->returnStatus = KChunkedEncodeReturnStatus::OK;
-			copy($this->chunker->getSessionName(), $this->chunker->params->output);
-						
+			if(file_exists($this->chunker->getSessionName())) {
+				copy($this->chunker->getSessionName(), $this->chunker->params->output);
+			}			
 			return true;
 		}
 		
@@ -129,12 +130,12 @@
 			$chunker = $this->chunker;
 			$processArr = array();
 			$maxChunks = $chunker->GetMaxChunks();
-			for($idx=0; $idx<$chunker->GetMaxChunks(); $idx++) {
+			for($idx=0; $idx<$maxChunks; $idx++) {
 				$chunkData = $chunker->GetChunk($idx);
 				if(!isset($chunkData->toFix) || $chunkData->toFix==0)
 					continue;
 				/*
-				 * Check for too short generated chunks. If found - exit with error,
+				 * Check for too short generated chunks. If found - leave with error,
 				 * 10 frame threshold allowed.
 				 */
 				if($idx<$maxChunks-1
@@ -302,14 +303,16 @@
 			}
 			if($sessionData->returnStatus==KChunkedEncodeReturnStatus::OK){
 				$msgStr.= ",analyze:OK";
-				$frameRateMode = stristr($fileDtMrg->rawData,"Frame rate mode                          : ");
-				$frameRateMode = strtolower(substr($frameRateMode, strlen("Frame rate mode                          : ")));
-				$frameRateMode = strncmp($frameRateMode,"constant",8);
-				if($frameRateMode==0) {
-					$msgStr.= ",frameRateMode(constant)";
+				if(isset($fileDtMrg)) {
+					$frameRateMode = stristr($fileDtMrg->rawData,"Frame rate mode                          : ");
+					$frameRateMode = strtolower(substr($frameRateMode, strlen("Frame rate mode                          : ")));
+					$frameRateMode = strncmp($frameRateMode,"constant",8);
+					if($frameRateMode==0) {
+						$msgStr.= ",frameRateMode(constant)";
+					}
+					else
+						$msgStr.= ",frameRateMode(variable)";
 				}
-				else
-					$msgStr.= ",frameRateMode(variable)";
 			}
 			if(isset($chunker->sourceFileDt)
 			&& (!isset($chunker->setup->duration) || $chunker->setup->duration<=0 || abs($chunker->setup->duration-round($chunker->sourceFileDt->containerDuration/1000,4))<0.1)) {
@@ -356,7 +359,8 @@
 				$msgStr = "RESULT:Success"."  Lasted:".gmdate('H:i:s',$lasted)."/".($lasted)."s";
 				if(isset($concurrencyLevel)) {
 					$val = end($this->concurrencyHistogram);
-					$msgStr.= ", concurrency:$concurrencyLevel(max:".key($this->concurrencyHistogram).",".round($val/1000,2)."s)";
+					$idle = round($this->concurrencyHistogram[0]/1000,2);
+					$msgStr.= ", concurrency:$concurrencyLevel(max:".key($this->concurrencyHistogram).",".round($val/1000,2)."s,idle:$idle"."s)";
 				}
 			}
 			else {

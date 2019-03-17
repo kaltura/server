@@ -52,6 +52,16 @@ class kQuiz {
 	protected $showGradeAfterSubmission;
 
 	/**
+	 * @var int
+	 */
+	protected $attemptsAllowed;
+
+	/**
+	 * @var KalturaScoreType
+	 */
+	protected $scoreType;
+
+	/**
 	 * @return int
 	 */
 	public function getVersion()
@@ -178,4 +188,37 @@ class kQuiz {
 	{
 		$this->showGradeAfterSubmission = $showAfterSubmit;
 	}
+
+	/**
+	 * @return int
+	 */
+	public function getAttemptsAllowed()
+	{
+		return $this->attemptsAllowed;
+	}
+
+	/**
+	 * @param int $attemptsAllowed
+	 */
+	public function setAttemptsAllowed($attemptsAllowed)
+	{
+		$this->attemptsAllowed = $attemptsAllowed;
+	}
+
+	/**
+	 * @return KalturaScoreType
+	 */
+	public function getScoreType()
+	{
+		return $this->scoreType;
+	}
+
+	/**
+	 * @param KalturaScoreType
+	 */
+	public function setScoreType($scoreType)
+	{
+		$this->scoreType = $scoreType;
+	}
+
 }
