@@ -2659,6 +2659,11 @@ class kKavaReportsMgr extends kKavaBase
 		return array_map('reset', $rows);
 	}
 
+	protected static function getEntryKuserDimension($data_source)
+	{
+		$data_source === self::DATASOURCE_ENTRY_LIFECYCLE || $data_source === self::DATASOURCE_STORAGE_USAGE ? self::DIMENSION_KUSER_ID : self::DIMENSION_ENTRY_OWNER_ID;
+	}
+
 	protected static function getDruidFilter($partner_id, $report_def, $input_filter, $object_ids, $response_options)
 	{
 		$druid_filter = array();
@@ -2833,10 +2838,11 @@ class kKavaReportsMgr extends kKavaBase
 			);
 		}
 
+		$data_source = self::getDataSource($report_def);
 		if ($input_filter->owners != null)
 		{
 			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_ENTRY_OWNER_ID,
+				self::DRUID_DIMENSION => self::getEntryKuserDimension($data_source),
 				self::DRUID_VALUES => self::getKuserIds(array(), $input_filter->owners, $partner_id, $response_options->getDelimiter()),
 			);
 		}
