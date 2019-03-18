@@ -16,6 +16,14 @@ class ESearchUserItem extends ESearchItem
 	 */
 	protected $searchTerm;
 
+	protected static $searchHistoryFields = array(
+		ESearchUserFieldName::SCREEN_NAME,
+		ESearchUserFieldName::FIRST_NAME,
+		ESearchUserFieldName::LAST_NAME,
+		ESearchUserFieldName::TAGS,
+		ESearchUserFieldName::PUSER_ID,
+	);
+
 	private static $allowed_search_types_for_field = array(
 		'kuser_type' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH),
 		'role_ids' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH),

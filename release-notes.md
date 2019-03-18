@@ -1,3 +1,12 @@
+# Naos 14.17.0 #
+## keep user search in recent searches ##
+ - Issue Type: Task
+ - Issue ID: PLAT-9736
+
+### Configuration ###
+add to elastic.ini under [search_history_collect_objects]:
+2 = kuser
+
 # Naos 14.16.0 #
 ## GroupUser - Count number of users in group on the group object ##
  - Issue Type: Task
