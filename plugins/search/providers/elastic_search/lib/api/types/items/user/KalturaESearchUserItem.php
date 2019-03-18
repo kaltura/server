@@ -44,7 +44,7 @@ class KalturaESearchUserItem extends KalturaESearchAbstractUserItem
 		if (!$object_to_fill)
 			$object_to_fill = new ESearchUserItem();
 
-		if(in_array($this->fieldName, array(KalturaESearchUserFieldName::GROUP_IDS)))
+		if (in_array($this->fieldName, array(KalturaESearchUserFieldName::GROUP_IDS)))
 		{
 			$kuserId = self::KUSER_ID_THAT_DOESNT_EXIST;
 			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->searchTerm, true);
