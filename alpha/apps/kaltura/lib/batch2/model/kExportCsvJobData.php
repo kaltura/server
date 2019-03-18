@@ -6,12 +6,6 @@
 
 class kExportCsvJobData extends kJobData
 {
-	/**
-	 * The filter should return the list of users that need to be specified in the csv.
-	 * @var baseObjectFilter
-	 */
-	private $filter;
-	
 	
 	/**
 	 * The file location
@@ -32,22 +26,6 @@ class kExportCsvJobData extends kJobData
 	 */
 	private $userMail;
 	
-	/**
-	 *
-	 * @return baseObjectFilter $filter
-	 */
-	public function getFilter()
-	{
-		return $this->filter;
-	}
-	
-	/**
-	 * @param baseObjectFilter $filter
-	 */
-	public function setFilter($filter)
-	{
-		$this->filter = $filter;
-	}
 	
 	/**
 	 * @return string

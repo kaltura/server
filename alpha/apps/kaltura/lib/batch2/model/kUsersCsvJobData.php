@@ -5,6 +5,12 @@
  */
 class kUsersCsvJobData extends kExportCsvJobData
 {
+	
+	/**
+	 * The filter should return the list of users that need to be specified in the csv.
+	 * @var kuserFilter
+	 */
+	private $filter;
 
 	/**
 	 * he metadata profile we should look the xpath in.
@@ -51,9 +57,20 @@ class kUsersCsvJobData extends kExportCsvJobData
 		$this->additionalFields = $additionalFields;
 	}
 	
-	public function getEngineType ()
+	/**
+	 *
+	 * @return kuserFilter $filter
+	 */
+	public function getFilter()
 	{
-		return ExportObjectType::USER;
+		return $this->filter;
 	}
-
+	
+	/**
+	 * @param kuserFilter $filter
+	 */
+	public function setFilter($filter)
+	{
+		$this->filter = $filter;
+	}
 }

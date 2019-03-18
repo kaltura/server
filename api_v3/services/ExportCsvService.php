@@ -50,7 +50,7 @@ class ExportCsvService extends KalturaBaseService
 			throw new KalturaAPIException(APIErrors::USER_EMAIL_NOT_FOUND, $kuser);
 		
 		$jobData = new kUsersCsvJobData();
-		$jobData->setFilter($filter);
+		$jobData->setFilter($dbFilter);
 		$jobData->setMetadataProfileId($metadataProfileId);
 		$jobData->setAdditionalFields($additionalFields);
 		$jobData->setUserMail($kuser->getEmail());

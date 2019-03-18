@@ -327,7 +327,12 @@ class EntryVendorTaskService extends KalturaBaseService
 		if (!$kuser || !$kuser->getEmail())
 			throw new KalturaAPIException(APIErrors::USER_EMAIL_NOT_FOUND, $kuser);
 		
-		kReachJobsManager::addEntryVendorTasksCsvJob($this->getPartnerId(), $dbFilter, $kuser);
+		$jobData = new kEntryVendorTaskCsvJobData();
+		$jobData->setFilter($dbFilter);
+		$jobData->setUserMail($kuser->getEmail());
+		$jobData->setUserName($kuser->getPuserId());
+		
+		kJobsManager::addExportCsvJob($jobData, $this->getPartnerId(), ReachPlugin::getExportTypeCoreValue(EntryVendorTaskExportObjectType::ENTRY_VENDOR_TASK));
 		
 		return $kuser->getEmail();
 	}

@@ -7,13 +7,6 @@
 class KalturaExportCsvJobData extends KalturaJobData
 {
 	/**
-	 * The filter should return the list of users that need to be specified in the csv.
-	 *
-	 * @var KalturaFilter
-	 */
-	public $filter;
-	
-	/**
 	 * The users name
 	 * @var string
 	 */
