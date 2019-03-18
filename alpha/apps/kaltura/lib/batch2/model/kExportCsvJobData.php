@@ -75,8 +75,4 @@ class kExportCsvJobData extends kJobData
 		$this->userName = $userName;
 	}
 	
-	public function getEngineType ()
-	{
-	
-	}
 }

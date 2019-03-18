@@ -634,48 +634,6 @@ class UserService extends KalturaBaseUserService
 	}
 
 	/**
-	 * Creates a batch job that sends an email with a link to download a CSV containing a list of users
-	 *
-	 * @action exportToCsv
-	 * @param KalturaUserFilter $filter A filter used to exclude specific types of users
-	 * @param int $metadataProfileId
-	 * @param KalturaCsvAdditionalFieldInfoArray $additionalFields
-	 * @return string
-	 *
-	 * @throws APIErrors::USER_EMAIL_NOT_FOUND
-	 * @throws MetadataErrors::INVALID_METADATA_PROFILE
-	 * @throws MetadataErrors::METADATA_PROFILE_NOT_SPECIFIED
-	 */
-	function exportToCsvAction(KalturaUserFilter $filter = null, $metadataProfileId = null, $additionalFields = null)
-	{
-		if($metadataProfileId)
-		{
-			$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
-			if (!$metadataProfile || ($metadataProfile->getPartnerId() != $this->getPartnerId()))
-				throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE, $metadataProfileId);
-		}
-		else
-		{
-			if($additionalFields->count)
-				throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_NOT_SPECIFIED, $metadataProfileId);
-		}
-
-		if (!$filter)
-			$filter = new KalturaUserFilter();
-		$dbFilter = new kuserFilter();
-		$filter->toObject($dbFilter);
-
-		$kuser = $this->getKuser();
-		if(!$kuser || !$kuser->getEmail())
-			throw new KalturaAPIException(APIErrors::USER_EMAIL_NOT_FOUND, $kuser);
-
-		kJobsManager::addUsersCsvJob($this->getPartnerId(), $dbFilter, $metadataProfileId, $additionalFields, $kuser);
-
-		return $kuser->getEmail();
-	}
-
-
-	/**
 	 *
 	 * Will serve a requested CSV
 	 * @action serveCsv

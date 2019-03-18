@@ -16,7 +16,7 @@ class ExportCsvService extends KalturaBaseService
 	 * Creates a batch job that sends an email with a link to download a CSV containing a list of users
 	 *
 	 * @action userExportToCsv
-	 * @actionAlias user.exportCsv
+	 * @actionAlias user.exportToCsv
 	 * @param KalturaUserFilter $filter A filter used to exclude specific types of users
 	 * @param int $metadataProfileId
 	 * @param KalturaCsvAdditionalFieldInfoArray $additionalFields
