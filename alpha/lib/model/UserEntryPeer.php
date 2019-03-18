@@ -35,6 +35,18 @@ class UserEntryPeer extends BaseUserEntryPeer {
 		}
 		self::$s_criteria_filter->setFilter($c);
 	}
+
+	public static function setDefaultCriteriaOrderBy($fieldId)
+	{
+		if(self::$s_criteria_filter == null)
+		{
+			self::setDefaultCriteriaFilter();
+		}
+		$c =  self::$s_criteria_filter->getFilter();
+		$c->addDescendingOrderByColumn($fieldId);
+		self::$s_criteria_filter->setFilter($c);
+	}
+
 	
 	public static function getOMClass($row, $colnum)
 	{
@@ -81,5 +93,17 @@ class UserEntryPeer extends BaseUserEntryPeer {
 	public static function getCacheInvalidationKeys()
 	{
 		return array(array("userEntry:kuserId=%s", self::KUSER_ID));		
+	}
+
+	public static function retriveUserEntriesSubmitted($kuserId, $entryId, $type)
+	{
+		$c = new Criteria();
+		$c->add(UserEntryPeer::KUSER_ID, $kuserId);
+		$c->add(UserEntryPeer::ENTRY_ID, $entryId);
+		$c->add(UserEntryPeer::TYPE, $type);
+		$c->add(UserEntryPeer::STATUS, QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
+		$c->addDescendingOrderByColumn(UserEntryPeer::ID);
+		$userEntryList = UserEntryPeer::doSelect($c);
+		return $userEntryList;
 	}
 } // UserEntryPeer

@@ -22,7 +22,7 @@ class kCurrentContext
 	
 	/**
 	 * This value is populated only in case of impersonation using partnerId in the request.
-	 * It's used by the batch abd the admin console only.
+	 * It's used by the batch and the admin console only.
 	 * 
 	 * @var int
 	 */
