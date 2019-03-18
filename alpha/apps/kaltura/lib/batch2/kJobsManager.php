@@ -1879,6 +1879,14 @@ class kJobsManager
 
 		return self::addJob($batchJob, $jobData, BatchJobType::USERS_CSV);
 	}
+	
+	public static function addExportCsvJob(kExportCsvJobData $jobData, $partnerId, $exportObjectType)
+	{
+		$batchJob = new BatchJob();
+		$batchJob->setPartnerId($partnerId);
+		
+		return self::addJob($batchJob, $jobData, BatchJobType::EXPORT_CSV, $exportObjectType);
+	}
 
 	public static function addMultiClipCopyCuePointsJob($destEntryID, $partnerId, $kClipDescriptionArray)
 	{
