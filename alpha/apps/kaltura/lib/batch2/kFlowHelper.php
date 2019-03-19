@@ -17,8 +17,6 @@ class kFlowHelper
 
 	const LIVE_REPORT_EXPIRY_TIME = 604800; // 7 * 60 * 60 * 24
 
-	const SERVE_CSV_PARTIAL_URL = "/api_v3/index.php/service/user/action/serveCsv/ks/";
-	
 	const SERVE_OBJECT_CSV_PARTIAL_URL = "/api_v3/index.php/service/exportCsv/action/serveCsv/ks/";
 
 
