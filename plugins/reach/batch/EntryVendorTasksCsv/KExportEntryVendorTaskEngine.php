@@ -32,6 +32,7 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 	
 	public function fillCsv(&$csvFile, &$data)
 	{
+		KalturaLog::info ('Exporting content for entry vendor task items');
 		$filter = clone $data->filter;
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
