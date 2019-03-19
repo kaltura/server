@@ -62,6 +62,7 @@ class DrmLicenseAccessService extends KalturaBaseService
                 }
             } catch (Exception $e) {
                 KalturaLog::err("Could not validate license access, returned with message '".$e->getMessage()."'");
+                kApiCache::setExpiry(60);
             }
         }
         else
