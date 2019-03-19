@@ -637,7 +637,7 @@ class UserService extends KalturaBaseUserService
 	 *
 	 * Will serve a requested CSV
 	 * @action serveCsv
-	 *
+	 * @deprecated use exportCsv.serveCsv
 	 *
 	 * @param string $id - the requested file id
 	 * @return string

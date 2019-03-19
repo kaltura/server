@@ -6,6 +6,29 @@
 
 class KExportEntryVendorTaskEngine extends KObjectExportEngine
 {
+	private $apiError = null;
+	
+	static private $statusEnumTranslate = array(
+		1 => "PENDING",
+		2 => "READY",
+		3 => "PROCESSING",
+		4 => "PENDING_MODERATION",
+		5 => "REJECTED",
+		6 => "ERROR",
+		7 => "ABORTED"
+	);
+	
+	static private $serviceFeatureEnumTranslate = array(
+		1 => "CAPTIONS",
+		2 => "TRANSLATION",
+	);
+	
+	static private $serviceTypeEnumTranslate = array(
+		1 => "HUMAN",
+		2 => "MACHINE",
+	);
+	
+	static private $catalogItemData = array();
 	
 	public function fillCsv(&$csvFile, &$data)
 	{

@@ -27,7 +27,6 @@ class KalturaExportCsvJobData extends KalturaJobData
 	
 	private static $map_between_objects = array
 	(
-		'filter',
 		'userMail',
 		'userName',
 		'outputPath',

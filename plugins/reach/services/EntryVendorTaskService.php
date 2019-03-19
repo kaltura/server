@@ -342,6 +342,8 @@ class EntryVendorTaskService extends KalturaBaseService
 	 *
 	 * Will serve a requested csv
 	 * @action serveCsv
+	 *
+	 * @deprecated use exportCsv.serveCsv
 	 * @param string $id - the requested file id
 	 * @return string
 	 */
