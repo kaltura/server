@@ -2920,54 +2920,6 @@ class kFlowHelper
 			return false;
 	}
 
-	public static function handleUsersCsvFinished(BatchJob $dbBatchJob, kUsersCsvJobData $data)
-	{
-		// Move file from shared temp to it's final location
-		$fileName =  basename($data->getOutputPath());
-		$directory =  myContentStorage::getFSContentRootPath() . "/content/userscsv/" . $dbBatchJob->getPartnerId() ;
-		if(!file_exists($directory))
-			mkdir($directory);
-		$filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
-
-		if(!$data->getOutputPath())
-			throw new APIException(APIErrors::FILE_CREATION_FAILED, "file path not found");
-
-		KalturaLog::info("Trying to move users csv file from: " . $data->getOutputPath() . " to: " . $filePath);
-		try
-		{
-			kFile::moveFile($data->getOutputPath(), $filePath);
-		}
-		catch (Exception $e)
-		{
-			throw new APIException(APIErrors::FILE_CREATION_FAILED, $e->getMessage());
-		}
-
-
-		$data->setOutputPath($filePath);
-		$dbBatchJob->setData($data);
-		$dbBatchJob->save();
-
-		KalturaLog::info("file path: [$filePath]");
-
-		$downloadUrl = self::createUsersCsvDownloadUrl($dbBatchJob->getPartnerId(), $fileName);
-		$userName = $data->getUserName();
-		$bodyParams = array($userName, $downloadUrl);
-
-		//send the created csv by mail
-		kJobsManager::addMailJob(
-			null,
-			0,
-			$dbBatchJob->getPartnerId(),
-			MailType::MAIL_TYPE_USERS_CSV,
-			kMailJobData::MAIL_PRIORITY_NORMAL,
-			kConf::get("partner_notification_email"),
-			kConf::get("partner_notification_name"),
-			$data->getUserMail(),
-			$bodyParams
-		);
-
-		return $dbBatchJob;
-	}
 	
 	public static function handleExportCsvFinished(BatchJob $dbBatchJob, kExportCsvJobData $data)
 	{

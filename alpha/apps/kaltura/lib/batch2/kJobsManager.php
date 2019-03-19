@@ -1865,21 +1865,6 @@ class kJobsManager
 		return $shouldBlock;
 	}
 
-	public static function addUsersCsvJob($partnerId, baseObjectFilter $filter, $metadataProfileId, $additionalFields, $kuser)
-	{
-		$jobData = new kUsersCsvJobData();
-		$jobData->setFilter($filter);
-		$jobData->setMetadataProfileId($metadataProfileId);
-		$jobData->setAdditionalFields($additionalFields);
-		$jobData->setUserMail($kuser->getEmail());
-		$jobData->setUserName($kuser->getPuserId());
-
-		$batchJob = new BatchJob();
-		$batchJob->setPartnerId($partnerId);
-
-		return self::addJob($batchJob, $jobData, BatchJobType::USERS_CSV);
-	}
-	
 	public static function addExportCsvJob(kExportCsvJobData $jobData, $partnerId, $exportObjectType)
 	{
 		$batchJob = new BatchJob();

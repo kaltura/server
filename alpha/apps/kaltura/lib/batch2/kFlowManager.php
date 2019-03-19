@@ -419,10 +419,6 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 					$dbBatchJob=$this->updatedLiveReportExport($dbBatchJob, $dbBatchJob->getData());
 					break;
 
-				case BatchJobType::USERS_CSV:
-					$dbBatchJob=$this->updatedUsersCsv($dbBatchJob, $dbBatchJob->getData());
-					break;
-				
 				case BatchJobType::EXPORT_CSV:
 					$dbBatchJob = $this->updatedExportCsv($dbBatchJob, $dbBatchJob->getData());
 					break;
@@ -784,17 +780,6 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			}
 		}
 		return true;
-	}
-
-	protected function updatedUsersCsv(BatchJob $dbBatchJob, kUsersCsvJobData $data)
-	{
-		switch($dbBatchJob->getStatus())
-		{
-			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return kFlowHelper::handleUsersCsvFinished($dbBatchJob, $data);
-			default:
-				return $dbBatchJob;
-		}
 	}
 	
 	protected function updatedExportCsv (BatchJob $dbBatchJob, kExportCsvJobData $data)
