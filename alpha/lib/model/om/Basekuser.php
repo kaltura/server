@@ -3825,17 +3825,11 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 
 		$copyObj->setScreenName($this->screen_name);
 
-		$copyObj->setFullName($this->full_name);
-
 		$copyObj->setFirstName($this->first_name);
 
 		$copyObj->setLastName($this->last_name);
 
 		$copyObj->setEmail($this->email);
-
-		$copyObj->setSha1Password($this->sha1_password);
-
-		$copyObj->setSalt($this->salt);
 
 		$copyObj->setDateOfBirth($this->date_of_birth);
 
