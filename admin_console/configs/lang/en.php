@@ -1445,6 +1445,9 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::SRT' => "SRT",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::DFXP' => "DFXP",
 	
+	'Kaltura_Client_Reach_Enum_VendorTaskProcessingRegion::US' => "US",
+	'Kaltura_Client_Reach_Enum_VendorTaskProcessingRegion::EU' => "EU",
+	
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DEPRECATED' => "Deprecated",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED' => "Deleted",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::ACTIVE' => "Enabled",
