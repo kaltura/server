@@ -347,7 +347,7 @@ class ReachProfile extends BaseReachProfile
 	
 	public function getVendorTaskProcessingRegion()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_TASK_PROCESSING_REGION);
+		return $this->getFromCustomData(self::CUSTOM_DATA_TASK_PROCESSING_REGION, null, VendorTaskProcessingRegion::US);
 	}
 
 	public function shouldSyncCredit()
