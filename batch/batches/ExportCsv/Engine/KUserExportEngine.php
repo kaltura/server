@@ -8,6 +8,7 @@ class KUserExportEngine extends KObjectExportEngine
 	
 	public function fillCsv(&$csvFile, &$data)
 	{
+		KalturaLog::info ('Exporting content for user items');
 		$filter = clone $data->filter;
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
