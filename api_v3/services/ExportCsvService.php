@@ -73,20 +73,34 @@ class ExportCsvService extends KalturaBaseService
 	 */
 	public function serveCsvAction($id)
 	{
+		$file_path = self::generateCsvPath($id, $this->getKs());
+		
+		return $this->dumpFile($file_path, 'text/csv');
+	}
+	
+	/**
+	 * Generic CSV file path generator - used from any action which calls the generateCsvPath
+	 *
+	 * @param string $id
+	 * @param string $ks
+	 * @return string
+	 * @throws KalturaAPIException
+	 */
+	public static function generateCsvPath($id, $ks)
+	{
 		if(!preg_match('/^\w+\.csv$/', $id))
 			throw new KalturaAPIException(KalturaErrors::INVALID_ID, $id);
 		
 		// KS verification - we accept either admin session or download privilege of the file
-		$ks = $this->getKs();
 		if(!$ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id))
 			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
 		
-		$partner_id = $this->getPartnerId();
+		$partner_id = kCurrentContext::getCurrentPartnerId();
 		$folderPath = "/content/exportcsv/$partner_id";
 		$fullPath = myContentStorage::getFSContentRootPath() . $folderPath;
 		$file_path = "$fullPath/$id";
 		
-		return $this->dumpFile($file_path, 'text/csv');
+		return $file_path;
 	}
 	
 }
