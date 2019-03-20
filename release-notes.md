@@ -11,6 +11,17 @@
      php deployment/base/scripts/installPlugins.php 
      php deployment/updates/scripts/add_permissions/2019_03_17_add_esearch_permissions_and_items.php 
 
+## Change wording and support empty instance_id metadata in KMS email notifications ##
+ - Issue Type: Task
+ - Issue IDs: PSVAMB-4944, PSVAMB-4967
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/2019_01_15_update_unique_mediaspace_notifications_templates.php
+
+
 ## eSearch - partial search for User::FirstName and User::LastName ##
  - Issue Type: Task
  - Issue ID: PLAT-9758
