@@ -1,4 +1,17 @@
 # Naos 14.17.0 #
+## eSearch - partial search for User::FirstName and User::LastName ##
+ - Issue Type: Task
+ - Issue ID: PLAT-9758
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+OnPrem - reindex kusers index in elastic:
+1) Remove old index - delete kaltura_kuser
+2) Create the index - curl -XPUT '{elasticHost}:{elasticPort}/kaltura_kuser' --data-binary "@kuser_mapping.json"
+3) Index the users - php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticKusers.php
+	 
 ## keep user search in recent searches ##
  - Issue Type: Task
  - Issue ID: PLAT-9736
