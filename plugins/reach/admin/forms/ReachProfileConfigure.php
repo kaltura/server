@@ -118,6 +118,11 @@ class Form_ReachProfileConfigure extends ConfigureForm
 		$contentDeletionPolicy->setLabel('Content Deletion Policy:');
 		$contentDeletionPolicy->setValue(Kaltura_Client_Reach_Enum_ReachProfileContentDeletionPolicy::DELETE_ONCE_PROCESSED);
 		$this->addElement($contentDeletionPolicy);
+		
+		$vendorTaskProcessingRegion = new Kaltura_Form_Element_EnumSelect('vendorTaskProcessingRegion', array('enum' => 'Kaltura_Client_Reach_Enum_VendorTaskProcessingRegion'));
+		$vendorTaskProcessingRegion->setLabel('Task Processing Region:');
+		$vendorTaskProcessingRegion->setValue(Kaltura_Client_Reach_Enum_VendorTaskProcessingRegion::US);
+		$this->addElement($vendorTaskProcessingRegion);
 
 		$this->addElement('text', 'maxCharactersPerCaptionLine', array(
 			'label' => 'Max Characters Per Caption Line:',
@@ -255,7 +260,7 @@ class Form_ReachProfileConfigure extends ConfigureForm
 				/* @var  Kaltura_Client_Type_BooleanEventNotificationCondition $condition */
 				$booleanEventNotificationIds[] = $condition->booleanEventNotificationIds;
 			}
-			$newRule['booleanEventNotificationIds'] = implode(', ', $booleanEventNotificationIds)
+			$newRule['booleanEventNotificationIds'] = implode(', ', $booleanEventNotificationIds);
 		}
 		$newRule['catalogItemIds'] = implode(', ', $catalogItemIds);
 		return $newRule;

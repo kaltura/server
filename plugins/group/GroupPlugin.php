@@ -2,7 +2,7 @@
 /**
  * @package plugins.group
  */
-class GroupPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions
+class GroupPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaPending
 {
 	const PLUGIN_NAME = 'group';
 
@@ -17,6 +17,12 @@ class GroupPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	public static function isAllowedPartner($partnerId)
 	{
 		return true;
+	}
+
+	public static function dependsOn()
+	{
+		$eSearchDependency = new KalturaDependency(ElasticSearchPlugin::getPluginName());
+		return array($eSearchDependency);
 	}
 
 	public static function getServicesMap ()

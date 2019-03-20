@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.elasticSearch
+ * @package plugins.group
  * @subpackage api.enum
  */
 class KalturaESearchGroupOrderByFieldName extends KalturaESearchUserOrderByFieldName

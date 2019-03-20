@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.elasticSearch
+ * @package plugins.group
  * @subpackage api.objects
  */
-class KalturaESearchGroupItem extends KalturaESearchAbstractUserItem
+class KalturaESearchGroupItem extends KalturaESearchAbstractGroupItem
 {
 	/**
 	 * @var KalturaESearchGroupFieldName

@@ -38,8 +38,8 @@ class GroupService extends KalturaBaseUserService
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
 		}
-
-		$this->validateUserNames($group);
+		$names = array('fullName', 'screenName');
+		$this->validateNames($group ,$names);
 		$lockKey = "user_add_" . $this->getPartnerId() . $group->id;
 		$ret =  kLock::runLocked($lockKey, array($this, 'adduserImpl'), array($group));
 		return $ret;
@@ -137,6 +137,72 @@ class GroupService extends KalturaBaseUserService
 			throw new KalturaAPIException(KalturaGroupErrors::INVALID_GROUP_ID);
 		}
 		return $dbGroup;
+	}
+
+	/**
+	 * @action searchGroup
+	 * @actionAlias elasticsearch_esearch.searchGroup
+	 * @param KalturaESearchGroupParams $searchParams
+	 * @param KalturaPager $pager
+	 * @return KalturaESearchGroupResponse
+	 */
+	public function searchGroupAction(KalturaESearchGroupParams $searchParams, KalturaPager $pager = null)
+	{
+		$userSearch = new kUserSearch();
+		list($coreResults, $objectCount) = self::initAndSearch($userSearch, $searchParams, $pager);
+		$response = new KalturaESearchGroupResponse();
+		$response->objects = KalturaESearchGroupResultArray::fromDbArray($coreResults, $this->getResponseProfile());
+		$response->totalCount = $objectCount;
+		return $response;
+	}
+
+	/**
+	 * @param kBaseSearch $coreSearchObject
+	 * @param $searchParams
+	 * @param $pager
+	 * @return array
+	 */
+	protected function initAndSearch($coreSearchObject, $searchParams, $pager)
+	{
+		list($coreSearchOperator, $objectStatusesArr, $objectId, $kPager, $coreOrder) =
+			self::initSearchActionParams($searchParams, $pager);
+		$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $kPager, $objectStatusesArr, $objectId, $coreOrder);
+
+		list($coreResults, $objectCount) = kESearchCoreAdapter::transformElasticToCoreObject($elasticResults, $coreSearchObject);
+		return array($coreResults, $objectCount);
+	}
+
+	protected static function initSearchActionParams($searchParams, KalturaPager $pager = null)
+	{
+
+		/**
+		 * @var ESearchParams $coreParams
+		 */
+		$coreParams = $searchParams->toObject();
+
+		$groupTypeItem = new ESearchUserItem();
+		$groupTypeItem->setSearchTerm(KuserType::GROUP);
+		$groupTypeItem->setItemType(ESearchItemType::EXACT_MATCH);
+		$groupTypeItem->setFieldName(ESearchUserFieldName::TYPE);
+
+		$baseOperator = new ESearchOperator();
+		$baseOperator->setOperator(ESearchOperatorType::AND_OP);
+		$baseOperator->setSearchItems(array($coreParams->getSearchOperator(), $groupTypeItem));
+
+		$objectStatusesArr = array();
+		$objectStatuses = $coreParams->getObjectStatuses();
+		if (!empty($objectStatuses))
+		{
+			$objectStatusesArr = explode(',', $objectStatuses);
+		}
+
+		$kPager = null;
+		if ($pager)
+		{
+			$kPager = $pager->toObject();
+		}
+
+		return array($baseOperator, $objectStatusesArr, $coreParams->getObjectId(), $kPager, $coreParams->getOrderBy());
 	}
 
 }
