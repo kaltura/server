@@ -59,7 +59,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	 */
 	protected function addHeaderRowToCsv($csvFile, $additionalFields)
 	{
-		$headerRow = 'EntryID, Name, Description, Tags, Categories, OwnerID, UserID, CreatedAt, UpdatedAt ';
+		$headerRow = 'EntryID, Name, Description, Tags, Categories, UserID, CreatedAt, UpdatedAt ';
 		KCsvWrapper::sanitizedFputCsv($csvFile, explode(',', $headerRow));
 		
 		return $csvFile;
