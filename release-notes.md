@@ -4,10 +4,13 @@
  - Issue ID: PLAT-9758
 
 ### Configuration ###
-OnPrem - reindex kusers index in elastic
+None
 
 ### Deployment scripts ###
-None
+OnPrem - reindex kusers index in elastic:
+1) Remove old index - delete kaltura_kuser
+2) Create the index - curl -XPUT '{elasticHost}:{elasticPort}/kaltura_kuser' --data-binary "@kuser_mapping.json"
+3) Index the users - php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticKusers.php
 	 
 ## keep user search in recent searches ##
  - Issue Type: Task
