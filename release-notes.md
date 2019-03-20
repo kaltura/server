@@ -1,4 +1,14 @@
 # Naos 14.17.0 #
+## eSearch - partial search for User::FirstName and User::LastName ##
+ - Issue Type: Task
+ - Issue ID: PLAT-9758
+
+### Configuration ###
+OnPrem - reindex kusers index in elastic
+
+### Deployment scripts ###
+None
+	 
 ## keep user search in recent searches ##
  - Issue Type: Task
  - Issue ID: PLAT-9736
