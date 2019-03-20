@@ -225,7 +225,7 @@
 		  "type" : "date",
 		  "format": "epoch_second"
 		},
-		"first_name" : {
+		"first_name_ft" : {
 			"type" : "text",
 			"analyzer" : "kaltura_text",
 			"fields": {
@@ -239,7 +239,7 @@
 				}
 			}
 		},
-		"last_name" : {
+		"last_name_ft" : {
 			"type" : "text",
 			"analyzer" : "kaltura_text",
 			"fields": {
