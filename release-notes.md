@@ -1,4 +1,16 @@
 # Naos 14.17.0 #
+
+## Export CSV Job Infrastructure Change ## 
+ - Issue Type: Task
+ - Issue ID: PSVAMB-6047
+ 
+### Configuration ### 
+ - Update batch.ini file from the environment-specific repository
+
+### Deployment Scripts ### 
+     php deployment/base/scripts/installPlugins.php 
+     php deployment/updates/scripts/add_permissions/2019_03_17_add_esearch_permissions_and_items.php 
+
 ## Change wording and support empty instance_id metadata in KMS email notifications ##
  - Issue Type: Task
  - Issue IDs: PSVAMB-4944, PSVAMB-4967

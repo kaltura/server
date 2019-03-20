@@ -1865,19 +1865,12 @@ class kJobsManager
 		return $shouldBlock;
 	}
 
-	public static function addUsersCsvJob($partnerId, baseObjectFilter $filter, $metadataProfileId, $additionalFields, $kuser)
+	public static function addExportCsvJob(kExportCsvJobData $jobData, $partnerId, $exportObjectType)
 	{
-		$jobData = new kUsersCsvJobData();
-		$jobData->setFilter($filter);
-		$jobData->setMetadataProfileId($metadataProfileId);
-		$jobData->setAdditionalFields($additionalFields);
-		$jobData->setUserMail($kuser->getEmail());
-		$jobData->setUserName($kuser->getPuserId());
-
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($partnerId);
-
-		return self::addJob($batchJob, $jobData, BatchJobType::USERS_CSV);
+		
+		return self::addJob($batchJob, $jobData, BatchJobType::EXPORT_CSV, $exportObjectType);
 	}
 
 	public static function addMultiClipCopyCuePointsJob($destEntryID, $partnerId, $kClipDescriptionArray)
