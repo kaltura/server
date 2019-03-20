@@ -2108,7 +2108,6 @@
 		<column name="updated_at" type="timestamp"/>
 		<column name="status" type="integer"/>
 		<column name="type" type="integer" inheritance="single"/>
-		<column name="custom_data" type="longvarchar"/>
 		<column name="extended_status" type="integer" />
 		<column name="privacy_context" type="varchar" size="255" />
 		<column name="custom_data" type="longvarchar"/>

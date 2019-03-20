@@ -603,7 +603,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$startCheckingReadyTime = time();
 		while($listResponse = $youtube->videos->listVideos("processingDetails, status", array('id' => $remoteId)))
 		{
-			if (empty($listResponse))
+			if (empty($listResponse) || !$listResponse->getItems())
 				throw new Exception("Video with remote Id ".$remoteId." not found at google");
 
 			$video = $listResponse[0];

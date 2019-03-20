@@ -180,7 +180,7 @@
 			KalturaLog::log("duration:$duration,frames:$frames");
 /**/
 			$outputArr = array();
-			$cmdLine = "$ffmpegBin -t 1 -i $chunkFileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type -print_format csv -v quiet - | (head -n1)";
+			$cmdLine = "$ffmpegBin -t 1 -i $chunkFileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | (head -n1)";
 			KalturaLog::log("head:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {
@@ -194,7 +194,7 @@
 			else {
 				$startFrom = $duration-4;
 			}
-			$cmdLine = "$ffmpegBin -ss $startFrom -i $chunkFileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -f mpegts -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type -print_format csv -v quiet - | tail";
+			$cmdLine = "$ffmpegBin -ss $startFrom -i $chunkFileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -f mpegts -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | tail";
 			KalturaLog::log("tail:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {
@@ -210,11 +210,11 @@
 			KalturaLog::log("trimmed:output:\n".print_r($outputArr,1));
 
 			$outputLine = array_shift($outputArr);
-			list($stam,$pts,$type,$frame) = explode(",",$outputLine);
+			list($stam,$pts,$size,$type,$frame) = explode(",",$outputLine);
 			$framesStat->start = $pts;
-
+			$framesStat->size = $size;
 			$outputLine = end($outputArr);
-			list($stam,$pts,$type,$frame) = explode(",",$outputLine);
+			list($stam,$pts,$size,$type,$frame) = explode(",",$outputLine);
 			$framesStat->finish = $pts;
 			$framesStat->type = $type;
 			$framesStat->frame = $frames;

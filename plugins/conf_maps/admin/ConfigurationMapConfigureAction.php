@@ -21,6 +21,12 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 		$mapHost = $this->_getParam('configuration_map_host');
 		$isNew = $this->_getParam('is_new') === 'true' ? true : false;
 		$isView = $this->_getParam('is_view') === 'true' ? true : false;
+		$version = null;
+		if($isView)
+		{
+			$version = $this->_getParam('configuration_map_version') != "" ? $this->_getParam('configuration_map_version') : null;
+		}
+
 		$action->view->errMessage = null;
 		$action->view->form = '';
 		$form = null;
@@ -30,7 +36,7 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 			if ($isNew)
 				$form = $this->handleNewConfigurationItem($action);
 			else
-				$form = $this->handleExistingConfigurationItem($action, $mapName, $mapHost, $isView);
+				$form = $this->handleExistingConfigurationItem($action, $mapName, $mapHost,$version, $isView);
 		} catch (Exception $e)
 		{
 			KalturaLog::err($e->getMessage() . "\n" . $e->getTraceAsString());
@@ -51,10 +57,11 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 	 * @param $action
 	 * @param $configurationMapName
 	 * @param $configurationMapHost
+	 * @param $version
 	 * @param $isView
 	 * @return Form_ConfigurationMapConfigure
 	 */
-	protected function handleExistingConfigurationItem($action, $configurationMapName, $configurationMapHost, $isView = false)
+	protected function handleExistingConfigurationItem($action, $configurationMapName, $configurationMapHost, $version = null, $isView = false)
 	{
 		$form = null;
 		$request = $action->getRequest();
@@ -64,11 +71,17 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 		$configurationMapFilter->relatedHostEqual = $configurationMapHost;
 		if ($isView)
 		{
+			if ($version)
+			{
+				$configurationMapFilter->versionEqual = $version;
+			}
+
 			$configurationMap = $configurationPluginClient->confMaps->get($configurationMapFilter);
 			foreach ($configurationMap as $item)
 			{
 				if (!is_null($item))
 				{
+					$configurationMap->isEditable = false;
 					$form = $this->initForm($action, $configurationMap);
 					break;
 				}

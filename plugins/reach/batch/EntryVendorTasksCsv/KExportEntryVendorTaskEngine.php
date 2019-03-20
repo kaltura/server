@@ -15,12 +15,14 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 		4 => "PENDING_MODERATION",
 		5 => "REJECTED",
 		6 => "ERROR",
-		7 => "ABORTED"
+		7 => "ABORTED",
+		8 => "PENDING_ENTRY_READY",
 	);
 	
 	static private $serviceFeatureEnumTranslate = array(
 		1 => "CAPTIONS",
 		2 => "TRANSLATION",
+		3 => "ALIGNMENT",
 	);
 	
 	static private $serviceTypeEnumTranslate = array(
@@ -32,7 +34,7 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 	
 	public function fillCsv(&$csvFile, &$data)
 	{
-		KalturaLog::info ('Exporting content for entry vendor task items');
+		KalturaLog::info('Exporting content for entry vendor task items');
 		$filter = clone $data->filter;
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
@@ -42,19 +44,14 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 		$lastCreatedAt = 0;
 		$totalCount = 0;
 		$filter->orderBy = KalturaEntryVendorTaskOrderBy::CREATED_AT_ASC;
-		do
-		{
-			if ($lastCreatedAt)
-			{
+		do {
+			if ($lastCreatedAt) {
 				$filter->createdAtGreaterThanOrEqual = $lastCreatedAt;
 			}
-			try
-			{
+			try {
 				$entryVendorTaskList = KBatchBase::$kClient->entryVendorTask->listAction($filter, $pager);
 				$returnedSize = count($entryVendorTaskList->objects);
-			}
-			catch (Exception $e)
-			{
+			} catch (Exception $e) {
 				KalturaLog::info("Couldn't list entry Vendor Tasks on page: [$pager->pageIndex]" . $e->getMessage());
 				$this->apiError = $e;
 				return;
@@ -91,14 +88,12 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 		$entryVendorTasksIds = array();
 		$entryVendorTaskIdToRow = array();
 		
-		foreach ($entryVendorTasks as $entryVendorTask)
-		{
+		foreach ($entryVendorTasks as $entryVendorTask) {
 			$entryVendorTasksIds[] = $entryVendorTask->id;
 			$entryVendorTaskIdToRow = $this->initializeCsvRowValues($entryVendorTask, $entryVendorTaskIdToRow);
 		}
 		
-		foreach ($entryVendorTaskIdToRow as $key => $val)
-		{
+		foreach ($entryVendorTaskIdToRow as $key => $val) {
 			KCsvWrapper::sanitizedFputCsv($csvFile, $val);
 		}
 	}
@@ -115,11 +110,11 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 			'createdAt' => $this->getHumanReadbaleDate($entryVendorTask->createdAt),
 			'finishTime' => $this->getHumanReadbaleDate($entryVendorTask->finishTime),
 			'entryId' => $entryVendorTask->entryId,
-			'status' => $this->translateEnumsToHumanReadable("status",$entryVendorTask->status),
+			'status' => $this->translateEnumsToHumanReadable("status", $entryVendorTask->status),
 			'reachProfileId' => $entryVendorTask->reachProfileId,
 			'turnaroundTime' => $catalogItemData ? $catalogItemData["TAT"] : null,
-			'serviceType' => $catalogItemData ?  $this->translateEnumsToHumanReadable("serviceType",$catalogItemData["serviceType"]) : null,
-			'serviceFeature' => $catalogItemData ? $this->translateEnumsToHumanReadable("serviceFeature",$catalogItemData["serviceFeature"]) : null,
+			'serviceType' => $catalogItemData ? $this->translateEnumsToHumanReadable("serviceType", $catalogItemData["serviceType"]) : null,
+			'serviceFeature' => $catalogItemData ? $this->translateEnumsToHumanReadable("serviceFeature", $catalogItemData["serviceFeature"]) : null,
 			'price' => $entryVendorTask->price,
 			'userId' => $entryVendorTask->userId,
 			'moderatingUser' => $entryVendorTask->moderatingUser,
@@ -137,7 +132,7 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 	
 	protected function getHumanReadbaleDate($unixTimeStamp)
 	{
-		if(!$unixTimeStamp)
+		if (!$unixTimeStamp)
 			return null;
 		
 		return date("Y-m-d H:i", $unixTimeStamp);
@@ -147,23 +142,23 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 	{
 		$mapName = $enumName . "EnumTranslate";
 		
-		if(!self::${$enumName."EnumTranslate"})
+		if (!self::${$enumName . "EnumTranslate"})
 			return null;
 		
-		if (!isset(self::${$enumName."EnumTranslate"}[$enumValue]))
+		if (!isset(self::${$enumName . "EnumTranslate"}[$enumValue]))
 			return null;
 		
-		return self::${$enumName."EnumTranslate"}[$enumValue];
+		return self::${$enumName . "EnumTranslate"}[$enumValue];
 		
 	}
 	
 	protected function getCatalogItemDataById($id)
 	{
-		if(isset(self::$catalogItemData[$id]))
+		if (isset(self::$catalogItemData[$id]))
 			return self::$catalogItemData[$id];
 		
 		$vendorCatalogItem = KBatchBase::$kClient->vendorCatalogItem->get($id);
-		if(!$vendorCatalogItem)
+		if (!$vendorCatalogItem)
 			return null;
 		
 		$catalogItemInfo = array(

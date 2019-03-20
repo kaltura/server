@@ -50,6 +50,7 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 	/**
 	 * @var int
 	 * @readonly
+	 * @filter eq
 	 */
 	public $version;
 

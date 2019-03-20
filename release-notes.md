@@ -1,3 +1,79 @@
+# Naos 14.17.0 #
+## eSearch - partial search for User::FirstName and User::LastName ##
+ - Issue Type: Task
+ - Issue ID: PLAT-9758
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+OnPrem - reindex kusers index in elastic:
+1) Remove old index - delete kaltura_kuser
+2) Create the index - curl -XPUT '{elasticHost}:{elasticPort}/kaltura_kuser' --data-binary "@kuser_mapping.json"
+3) Index the users - php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticKusers.php
+	 
+## keep user search in recent searches ##
+ - Issue Type: Task
+ - Issue ID: PLAT-9736
+
+### Configuration ###
+add to elastic.ini under [search_history_collect_objects]:
+2 = kuser
+
+# Naos 14.16.0 #
+## GroupUser - Count number of users in group on the group object ##
+ - Issue Type: Task
+ - Issue ID: PLAT-9742
+### Configuration ###
+Add Group to your plugins.ini
+
+### Deployment scripts ###
+Run deployment script:
+	 php deployment/updates/scripts/add_permissions/2019_03_10_add_group_permission.php
+
+## create new type of event notification template: Boolean ##
+ - Issue Type: Task
+ - Issue ID: REACH2-493
+
+### Configuration ###
+Add BooleanNotification to your plugins.ini
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+
+## Reach - Support extending accessKey##
+
+ - Issue Type: Feature
+ - Issue ID: REACH2-525
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_03_05_add_reach_extendAccessKey_action.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Groups-BE - Allow group manager ##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-8580
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+			
+Run deployment script:
+		
+		- php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_02_28_update_groupuser_permission.php
+
 # Naos 14.14.0 #
 
 ## Schedule Event - Add sphinx match optimization##

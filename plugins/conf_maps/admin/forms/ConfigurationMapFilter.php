@@ -31,7 +31,6 @@ class Form_ConfigurationMapFilter extends Form_PartnerIdFilter
 			'decorators' => array('ViewHelper', 'Label')
 		));
 
-
 		// search button
 		$this->addElement('button', 'cmdSubmit', array(
 			'type' => 'submit',
@@ -43,7 +42,7 @@ class Form_ConfigurationMapFilter extends Form_PartnerIdFilter
 		$this->addElement('button', 'viewConfigurationMapButton', array(
 			'ignore' => true,
 			'label' => 'View',
-			'onclick' => "viewConfigurationMap($('#filter_input').val(), $('#filterHostName').val(),)",
+			'onclick' => "viewConfigurationMap($('#filter_input').val(), $('#filterHostName').val(),'')",
 			'decorators' => array('ViewHelper'),
 		));
 
@@ -51,7 +50,21 @@ class Form_ConfigurationMapFilter extends Form_PartnerIdFilter
 		$this->addElement('button', 'newConfigurationMap', array(
 			'ignore' => true,
 			'label' => 'Create New',
-			'onclick' => "addNewConfigurationMap($('#filter_input').val(), $('#filterHostName').val(),)",
+			'onclick' => "addNewConfigurationMap($('#filter_input').val(), $('#filterHostName').val())",
+			'decorators' => array('ViewHelper'),
+		));
+
+		// filter by version
+		$this->addElement('text', 'filterVersion', array(
+			'label' => 'version',
+			'decorators' => array('ViewHelper', 'Label')
+		));
+
+		// view specific version button
+		$this->addElement('button', 'viewSpecificVersionButton', array(
+			'ignore' => true,
+			'label' => 'View Specific Version',
+			'onclick' => "viewConfigurationMap($('#filter_input').val(), $('#filterHostName').val(),$('#filterVersion').val())",
 			'decorators' => array('ViewHelper'),
 		));
 	}

@@ -118,6 +118,11 @@ class Form_ReachProfileConfigure extends ConfigureForm
 		$contentDeletionPolicy->setLabel('Content Deletion Policy:');
 		$contentDeletionPolicy->setValue(Kaltura_Client_Reach_Enum_ReachProfileContentDeletionPolicy::DELETE_ONCE_PROCESSED);
 		$this->addElement($contentDeletionPolicy);
+		
+		$vendorTaskProcessingRegion = new Kaltura_Form_Element_EnumSelect('vendorTaskProcessingRegion', array('enum' => 'Kaltura_Client_Reach_Enum_VendorTaskProcessingRegion'));
+		$vendorTaskProcessingRegion->setLabel('Task Processing Region:');
+		$vendorTaskProcessingRegion->setValue(Kaltura_Client_Reach_Enum_VendorTaskProcessingRegion::US);
+		$this->addElement($vendorTaskProcessingRegion);
 
 		$this->addElement('text', 'maxCharactersPerCaptionLine', array(
 			'label' => 'Max Characters Per Caption Line:',
@@ -176,11 +181,8 @@ class Form_ReachProfileConfigure extends ConfigureForm
 
 	private function addRulesTemplate()
 	{
-		foreach (self::$rulesMap as $name => $class)
-		{
-			$ruleSubForm = new Form_RulesSubForm($name);
-			$this->addSubForm($ruleSubForm, "reachProfileRuleTemplate_" . $class);
-		}
+		$ruleSubForm = new Form_RulesSubForm("Kaltura_Client_Reach_Type_AddEntryVendorTaskAction","Kaltura_Client_Type_BooleanEventNotificationCondition");
+		$this->addSubForm($ruleSubForm, "reachProfileRuleTemplate_" . "Automatic_Rule");
 	}
 
 	public function populateFromObject($object, $add_underscore = true)
@@ -245,10 +247,20 @@ class Form_ReachProfileConfigure extends ConfigureForm
 		$newRule = array();
 		$newRule['ruleType'] = $ruleType;
 		$catalogItemIds = array();
+		$booleanEventNotificationIds = array();
 		foreach ($rule->actions as $action)
 		{
 			/* @var Kaltura_Client_Reach_Type_AddEntryVendorTaskAction $action */
 			$catalogItemIds[] = $action->catalogItemIds;
+		}
+		if (isset($rule->conditions))
+		{
+			foreach ($rule->conditions as $condition)
+			{
+				/* @var  Kaltura_Client_Type_BooleanEventNotificationCondition $condition */
+				$booleanEventNotificationIds[] = $condition->booleanEventNotificationIds;
+			}
+			$newRule['booleanEventNotificationIds'] = implode(', ', $booleanEventNotificationIds);
 		}
 		$newRule['catalogItemIds'] = implode(', ', $catalogItemIds);
 		return $newRule;
@@ -269,7 +281,10 @@ class Form_ReachProfileConfigure extends ConfigureForm
 					$action = new Kaltura_Client_Reach_Type_AddEntryVendorTaskAction();
 					$action->catalogItemIds = $rule->catalogItemIds;
 					$description = (empty($rule->description) || $rule->description == self::ADMIN_CONSOLE_RULE_PREFIX) ? (self::ADMIN_CONSOLE_RULE_PREFIX . mt_rand(100000, 999999)) : $rule->description;
-					$rulesArray[] = $this->getReachProfileRule(array($action), $description);
+					$condition = new Kaltura_Client_Type_BooleanEventNotificationCondition();
+					$condition->booleanEventNotificationIds = $rule->booleanEventNotificationIds;
+					$rulesArray[] = $this->getReachProfileRule(array($action), array($condition), $description);
+
 				}
 			}
 		}
@@ -290,12 +305,13 @@ class Form_ReachProfileConfigure extends ConfigureForm
 		return $object;
 	}
 
-	public function getReachProfileRule($actions, $description = null)
+	public function getReachProfileRule($actions, $conditions, $description = null)
 	{
 		$rule = new Kaltura_Client_Type_Rule();
 		$rule->actions = $actions;
 		if ($description)
 			$rule->description = $description;
+		$rule->conditions = $conditions;
 		return $rule;
 	}
 

@@ -100,6 +100,14 @@ class KalturaThumbParams extends KalturaAssetParams
      * @var int
      */
     public $videoOffsetInPercentage;
+
+	/**
+	 * interval in seconds for creating thumbnail
+	 *
+	 * @var int
+	 * @minValue 1
+	 */
+	public $interval;
 	
 	
 //	Maybe support will be added in the future
@@ -134,6 +142,7 @@ class KalturaThumbParams extends KalturaAssetParams
 		"density",
 		"stripProfiles",
         "videoOffsetInPercentage",
+		"interval",
 	
 //		Maybe support will be added in the future
 //		"cropProvider",
@@ -165,7 +174,7 @@ class KalturaThumbParams extends KalturaAssetParams
 		$this->validatePropertyMinValue('density', 0, true);
 		$this->validatePropertyMinValue('videoOffset', 0, true);
         $this->validatePropertyMinMaxValue('videoOffsetInPercentage', 0, 100, true);
-		
+
 		$this->validatePropertyMinMaxLength('backgroundColor', 1, 6, true);
 		if(!is_null($this->backgroundColor) && !preg_match('/^[0-9a-fA-F]{1,6}$/', $this->backgroundColor))
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_WRONG_FORMAT, $this->getFormattedPropertyNameWithClassName('backgroundColor'), 'six hexadecimal characters');

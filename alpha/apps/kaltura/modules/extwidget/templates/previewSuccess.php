@@ -161,7 +161,7 @@ if (isPlaykit === '1') {
     if (!width) {
         width = 600;
     }
-    var codeUrl = "https://" + data.securedHost + "/p/" + data.partnerId +"/embedPlaykitJs/uiconf_id/"+ data.uiConfId;
+    var codeUrl = "//" + data.securedHost + "/p/" + data.partnerId +"/embedPlaykitJs/uiconf_id/"+ data.uiConfId;
     var iframeURL = codeUrl + "/entry_id/" + data.entryId + "?iframeembed=true";
     var embedCode = '<scr'+'ipt src="'+ codeUrl +'"></scr'+'ipt><scr'+'ipt> var kalturaPlayer = KalturaPlayer.setup('+ JSON.stringify(playerConfig)+');	kalturaPlayer.loadMedia({entryId: "'+ data.entryId +'"})</scr'+'ipt>';
     code = embedCode;

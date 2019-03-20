@@ -37,4 +37,5 @@ class KalturaContainerFormat extends KalturaStringEnum
 	const JPG = 'jpg';
 	
 	const WVM = 'wvm';
+	const BIF = 'bif';
 }

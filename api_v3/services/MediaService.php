@@ -115,6 +115,7 @@ class MediaService extends KalturaEntryService
 
 		if ($dbEntry->getStatus() != entryStatus::NO_CONTENT)
 		    throw new KalturaAPIException(KalturaErrors::ENTRY_ALREADY_WITH_CONTENT);
+		
 	    if ($resource)
 	    {
 			try

@@ -138,6 +138,12 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 	 */
 	public $flavorParamsIds;
 	
+	/**
+	 * Indicates in which region the task processing should task place
+	 * @var KalturaVendorTaskProcessingRegion
+	 */
+	public $vendorTaskProcessingRegion;
+	
 	private static $map_between_objects = array
 	(
 		'id',
@@ -163,6 +169,7 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 		'usedCredit',
 		'dictionaries' => 'dictionariesArray',
 		'flavorParamsIds',
+		'vendorTaskProcessingRegion'
 	);
 	
 	/* (non-PHPdoc)

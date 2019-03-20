@@ -10,6 +10,7 @@ class kDruidBase
 	const DRUID_FILTERED_AGGR = 'filtered';
 	const DRUID_SELECTOR_FILTER = 'selector';
 	const DRUID_IN_FILTER = 'in';
+	const DRUID_BOUND_FILTER = 'bound';
 	const DRUID_TYPE = 'type';
 	const DRUID_FILTER = 'filter';
 	const DRUID_DIMENSION = 'dimension';
@@ -67,6 +68,11 @@ class kDruidBase
 	const DRUID_OUTPUT_NAME = 'outputName';
 	const DRUID_LIST_FILTERED = 'listFiltered';
 	const DRUID_DELEGATE = 'delegate';
+	const DRUID_LOWER = 'lower';
+	const DRUID_UPPER = 'upper';
+	const DRUID_LOWER_STRICT = 'lowerStrict';
+	const DRUID_UPPER_STRICT = 'upperStrict';
+	const DRUID_ORDERING = 'ordering';
 	
 	// druid response keywords
 	const DRUID_TIMESTAMP = 'timestamp';
@@ -116,6 +122,31 @@ class kDruidBase
 			self::DRUID_DIMENSION => $dimension,
 			self::DRUID_VALUES => $values
 		);
+	}
+
+	protected static function getBoundFilter($dimension, $lower, $upper, $order, $strict = 'false')
+	{
+		$bound_filter = array(
+			self::DRUID_TYPE => self::DRUID_BOUND_FILTER,
+			self::DRUID_DIMENSION => $dimension,
+		);
+
+		if (isset($lower))
+		{
+			$bound_filter[self::DRUID_LOWER] = $lower;
+			$bound_filter[self::DRUID_LOWER_STRICT] = $strict;
+		}
+		if (isset($upper))
+		{
+			$bound_filter[self::DRUID_UPPER] = $upper;
+			$bound_filter[self::DRUID_UPPER_STRICT] = $strict;
+		}
+		if (isset($order))
+		{
+			$bound_filter[self::DRUID_ORDERING] = $order;
+		}
+
+		return $bound_filter;
 	}
 	
 	protected static function getAndFilter($subFilters)
@@ -241,6 +272,11 @@ class kDruidBase
 	
 	protected static function runQuery($content, $cache = null, $cacheExpiration = 0)
 	{
+		if (isset($content[self::DRUID_FILTER]) && !$content[self::DRUID_FILTER])
+		{
+			return array();
+		}
+
 		kApiCache::disableConditionalCache();
 		
 		if (!isset($content[self::DRUID_CONTEXT]))
