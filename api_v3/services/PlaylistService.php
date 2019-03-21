@@ -131,36 +131,36 @@ class PlaylistService extends KalturaEntryService
 	 */
 	function updateAction($id , KalturaPlaylist $playlist , $updateStats = false )
 	{
-		$currentDbPlaylist = entryPeer::retrieveByPK($id);
+		$dbPlaylist = entryPeer::retrieveByPK($id);
 
-		if(!$currentDbPlaylist)
+		if(!$dbPlaylist)
 		{
 			throw new KalturaAPIException (APIErrors::INVALID_ENTRY_ID, "Playlist", $id);
 		}
 
-		if ($currentDbPlaylist->getType() != entryType::PLAYLIST )
+		if ($dbPlaylist->getType() != entryType::PLAYLIST )
 		{
 			throw new KalturaAPIException (APIErrors::INVALID_PLAYLIST_TYPE);
 		}
 
-		$playlistUpdate = $playlist->toUpdatableObject($currentDbPlaylist);
-		$this->checkAndSetValidUserUpdate($playlist, $playlistUpdate);
+		$dbPlaylist = $playlist->toUpdatableObject($dbPlaylist);
+		$this->checkAndSetValidUserUpdate($playlist, $dbPlaylist);
 		$this->checkAdminOnlyUpdateProperties($playlist);
 		$this->validateAccessControlId($playlist);
-		$this->validateEntryScheduleDates($playlist, $playlistUpdate);
+		$this->validateEntryScheduleDates($playlist, $dbPlaylist);
 
-		if(!is_null($playlistUpdate->getDataContent(true)))
+		if(!is_null($dbPlaylist->getDataContent(true)))
 		{
-			myPlaylistUtils::validatePlaylist($playlistUpdate);
+			myPlaylistUtils::validatePlaylist($dbPlaylist);
 		}
 		
 		if ( $updateStats )
 		{
-			myPlaylistUtils::updatePlaylistStatistics($this->getPartnerId(), $playlistUpdate);//, $extra_filters , $detailed );
+			myPlaylistUtils::updatePlaylistStatistics($this->getPartnerId(), $dbPlaylist);//, $extra_filters , $detailed );
 		}
 
-		$playlistUpdate->save();
-		$playlist->fromObject($playlistUpdate, $this->getResponseProfile());
+		$dbPlaylist->save();
+		$playlist->fromObject($dbPlaylist, $this->getResponseProfile());
 		return $playlist;
 	}
 
