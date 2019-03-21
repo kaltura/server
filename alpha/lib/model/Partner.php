@@ -82,6 +82,8 @@ class Partner extends BasePartner
 
 	const RTC_SERVER_NODE_ENV = 'rtc_server_node_env';
 
+	private $cdnWhiteListCache = array();
+
 	public function save(PropelPDO $con = null)
 	{
 		PartnerPeer::removePartnerFromCache( $this->getId() );
@@ -1835,15 +1837,22 @@ class Partner extends BasePartner
 
 	public function isInCDNWhiteList($host)
 	{
+		if (isset($this->cdnWhiteListCache[$host]))
+		{
+			return $this->cdnWhiteListCache[$host];
+		}
+
 		KalturaLog::debug("Checking host [$host] is in partner CDN white list");
 		$whiteList = $this->getCdnHostWhiteListArray();
 		foreach ($whiteList as $regEx)
 		{
 			if (preg_match("/".$regEx."/", $host)===1)//Should $regEx be escaped?
 			{
+				$this->cdnWhiteListCache[$host] = true;
 				return true;
 			}
 		}
+		$this->cdnWhiteListCache[$host] = false;
 		return false;
 	}
 
