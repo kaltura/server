@@ -595,6 +595,8 @@ class ThumbAssetService extends KalturaAssetService
 		if(!$destThumbParams)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND, $destThumbParamsId);
 
+		myEntryUtils::verifyThumbSrcExist($entry, $destThumbParams);
+
 		$dbThumbAsset = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams);
 		if(!$dbThumbAsset)
 			return null;
@@ -718,6 +720,8 @@ class ThumbAssetService extends KalturaAssetService
 		
 		if (!in_array($entry->getStatus(), $validStatuses))
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_STATUS);
+
+		myEntryUtils::verifyThumbSrcExist($entry, $destThumbParams);
 
 		$dbThumbAsset = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams);
 		if(!$dbThumbAsset)

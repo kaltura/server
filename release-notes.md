@@ -1,5 +1,19 @@
 # Naos 14.17.0 #
 
+## Add option to disable New Analytics from Admin console (new permission) ##
+
+- Issue Type: Feature
+- Issue ID: AN-513
+
+### configuration ###
+    Update the following in admin.ini: (need to rename moduls.newAnalyticsTab.label and moduls.newAnalyticsTab.permissionName)
+
+    moduls.newAnalyticsTab.label = Disable New Analytics 
+    moduls.newAnalyticsTab.permissionName = FEATURE_NEW_ANALYTICS_TAB_DISABLE
+
+### Deployment scripts ###
+    None
+
 ## Export CSV Job Infrastructure Change ## 
  - Issue Type: Task
  - Issue ID: PSVAMB-6047
