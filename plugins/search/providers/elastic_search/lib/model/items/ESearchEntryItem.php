@@ -156,7 +156,7 @@ class ESearchEntryItem extends ESearchItem
 		switch ($this->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
-				$subQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = $this->getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
 				$subQuery = kESearchQueryManager::getPartialQuery($this, $this->getFieldName(), $queryAttributes);
@@ -179,6 +179,26 @@ class ESearchEntryItem extends ESearchItem
 
 		if($subQuery)
 			$entryQuery[] = $subQuery;
+	}
+
+	public function getExactMatchQuery($searchItem, $fieldName, $allowedSearchTypes, &$queryAttributes)
+	{
+		$exactQuery = kESearchQueryManager::getExactMatchQuery($searchItem, $fieldName, $allowedSearchTypes, $queryAttributes);
+
+		if (in_array($fieldName, array(ESearchEntryFieldName::ENTITLED_USER_EDIT,ESearchEntryFieldName::ENTITLED_USER_PUBLISH,
+			ESearchEntryFieldName::ENTITLED_USER_VIEW, ESearchEntryFieldName::USER_ID)))
+		{
+			$preFixGroups = new kESearchTermsQuery($fieldName,
+				array('index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,
+					'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
+					'id' => $searchItem->getSearchTerm(),
+					'path' => 'group_ids'));
+			$boolQuery = new kESearchBoolQuery();
+			$boolQuery->addToShould($exactQuery);
+			$boolQuery->addToShould($preFixGroups);
+			return $boolQuery;
+		}
+		return $exactQuery;
 	}
 
 	public function shouldAddLanguageSearch()
