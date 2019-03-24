@@ -7,7 +7,7 @@
  */
 class GroupUserService extends KalturaBaseService
 {
-	const USER_GROUP_SYNC_THRESHOLD_DEFUALT = '1';
+	const USER_GROUP_SYNC_THRESHOLD_DEFUALT = '50';
 
 	public function initService($serviceId, $serviceName, $actionName)
 	{
