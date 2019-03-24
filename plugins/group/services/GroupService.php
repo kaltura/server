@@ -38,8 +38,6 @@ class GroupService extends KalturaBaseUserService
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
 		}
-		$names = array('fullName', 'screenName');
-		$this->validateNames($group ,$names);
 		$lockKey = "user_add_" . $this->getPartnerId() . $group->id;
 		$ret =  kLock::runLocked($lockKey, array($this, 'adduserImpl'), array($group));
 		return $ret;
@@ -236,8 +234,8 @@ class GroupService extends KalturaBaseUserService
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
 		}
-		$names = array('screenName');
-		$this->validateNames($newGroup ,$names);
+		$group = new KalturaGroup();
+		$group->toInsertableObject($newGroup);
 		$newGroup->save();
 
 		$groupUsers =  KuserKgroupPeer::retrieveKuserKgroupByKgroupId($dbGroup->getId());
@@ -245,7 +243,6 @@ class GroupService extends KalturaBaseUserService
 		$GroupUser = new GroupUserService();
 		$GroupUser->addGroupUsersToClonedGroup($kusers, $newGroup, $dbGroup->getId());
 
-		$group = new KalturaGroup();
 		$group->fromObject($newGroup, $this->getResponseProfile());
 
 		return $group;

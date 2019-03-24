@@ -12,6 +12,8 @@ class KalturaGroup extends KalturaBaseUser
 	 */
 	public $membersCount;
 
+	const NAMES = array('fullName','screenName');
+
 	private static $map_between_objects = array("membersCount");
 
 	public function getMapBetweenObjects ( )
@@ -28,5 +30,17 @@ class KalturaGroup extends KalturaBaseUser
 		}
 		parent::toObject($dbObject, $skip);
 		return $dbObject;
+	}
+
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		$this->validateNames($this,self::NAMES);
+		parent::validateForInsert($propertiesToSkip);
+	}
+
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		$this->validateNames($propertiesToSkip ,self::NAMES);
+		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 }

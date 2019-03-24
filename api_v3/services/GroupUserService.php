@@ -7,7 +7,7 @@
  */
 class GroupUserService extends KalturaBaseService
 {
-	const USER_GROUP_SYNC_THRESHOLD_DEFUALT = '50';
+	const USER_GROUP_SYNC_THRESHOLD_DEFUALT = '1';
 
 	public function initService($serviceId, $serviceName, $actionName)
 	{
@@ -259,7 +259,6 @@ class GroupUserService extends KalturaBaseService
 	public function addGroupUsersToClonedGroup($kusers, $newGroup, $originalGroupId)
 	{
 		$groupUsersLimit = kConf::get('user_groups_sync_threshold', 'local', self::USER_GROUP_SYNC_THRESHOLD_DEFUALT);
-		$bulkUpload = null;
 		$bulkGroupUserSyncCsv = new kBulkGroupUsersToGroupCsv($kusers, $newGroup->getPuserId());
 		$shouldHandleGroupsUsersInBatch = ($groupUsersLimit < count($kusers));
 		if (!$shouldHandleGroupsUsersInBatch)
@@ -269,10 +268,9 @@ class GroupUserService extends KalturaBaseService
 		}
 		if ($shouldHandleGroupsUsersInBatch)
 		{
-			$bulkUpload = $bulkGroupUserSyncCsv->AddGroupUserInBatch($kusers, $originalGroupId);
+			$bulkGroupUserSyncCsv->AddGroupUserInBatch($kusers, $originalGroupId);
 		}
 
-		return $bulkUpload;
 	}
 
 	/**
