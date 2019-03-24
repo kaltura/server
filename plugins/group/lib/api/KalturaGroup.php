@@ -65,6 +65,9 @@ class KalturaGroup extends KalturaBaseUser
 		$dbObject->setStatus($dbOriginalGroup->getStatus());
 		$dbObject->setEmail($dbOriginalGroup->getEmail());
 		$dbObject->setLanguage($dbOriginalGroup->getLanguage());
+		$dbObject->setPicture($dbOriginalGroup->getPicture());
+		$dbObject->setAboutMe($dbOriginalGroup->getAboutMe());
+
 
 		return $dbObject;
 	}
