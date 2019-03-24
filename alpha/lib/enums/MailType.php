@@ -58,4 +58,6 @@ interface MailType extends BaseEnum
 	const MAIL_TYPE_LIVE_REPORT_EXPORT_ABORT = 132;
 
 	const MAIL_TYPE_USERS_CSV = 133;
+	
+	const MAIL_TYPE_OBJECTS_CSV = 135;
 }

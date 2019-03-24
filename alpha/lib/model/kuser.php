@@ -1331,8 +1331,8 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			'tags' => $this->getTagsArray(), //todo - check
 			'created_at' => $this->getCreatedAtAsInt(),
 			'updated_at' => $this->getUpdateAtAsInt(),
-			'first_name' => $this->getFirstName(),
-			'last_name' => $this->getLastName(),
+			'first_name_ft' => $this->getFirstName(),
+			'last_name_ft' => $this->getLastName(),
 			'role_ids' => explode(',',$this->getRoleIds()), //todo - maybe add help to elastic here
 			'permission_names' => $this->getIndexedPermissionNames(), //todo - replace to array
 			'group_ids' => KuserKgroupPeer::retrieveKgroupIdsByKuserIdAndPartnerId($this->getKuserId(), $this->getPartnerId()),

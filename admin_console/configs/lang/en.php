@@ -1435,6 +1435,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWELVE_HOURS' => 'TWELVE_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWENTY_FOUR_HOURS' => 'TWENTY_FOUR_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FORTY_EIGHT_HOURS' => 'FORTY_EIGHT_HOURS',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FOUR_DAYS' => 'FOUR_DAYS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TEN_DAYS' => 'TEN_DAYS',
 	
 	'Kaltura_Client_Reach_Type_VendorCatalogItemPricing' => "Default Pricing",
@@ -1444,6 +1445,9 @@ return array(
 	
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::SRT' => "SRT",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::DFXP' => "DFXP",
+	
+	'Kaltura_Client_Reach_Enum_VendorTaskProcessingRegion::US' => "US",
+	'Kaltura_Client_Reach_Enum_VendorTaskProcessingRegion::EU' => "EU",
 	
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DEPRECATED' => "Deprecated",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED' => "Deleted",

@@ -1,4 +1,40 @@
 # Naos 14.17.0 #
+
+## Export CSV Job Infrastructure Change ## 
+ - Issue Type: Task
+ - Issue ID: PSVAMB-6047
+ 
+### Configuration ### 
+ - Update batch.ini file from the environment-specific repository
+
+### Deployment Scripts ### 
+     php deployment/base/scripts/installPlugins.php 
+     php deployment/updates/scripts/add_permissions/2019_03_17_add_esearch_permissions_and_items.php 
+
+## Change wording and support empty instance_id metadata in KMS email notifications ##
+ - Issue Type: Task
+ - Issue IDs: PSVAMB-4944, PSVAMB-4967
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/2019_01_15_update_unique_mediaspace_notifications_templates.php
+
+
+## eSearch - partial search for User::FirstName and User::LastName ##
+ - Issue Type: Task
+ - Issue ID: PLAT-9758
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+OnPrem - reindex kusers index in elastic:
+1) Remove old index - delete kaltura_kuser
+2) Create the index - curl -XPUT '{elasticHost}:{elasticPort}/kaltura_kuser' --data-binary "@kuser_mapping.json"
+3) Index the users - php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticKusers.php
+	 
 ## keep user search in recent searches ##
  - Issue Type: Task
  - Issue ID: PLAT-9736

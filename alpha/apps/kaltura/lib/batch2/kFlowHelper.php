@@ -17,7 +17,7 @@ class kFlowHelper
 
 	const LIVE_REPORT_EXPIRY_TIME = 604800; // 7 * 60 * 60 * 24
 
-	const SERVE_CSV_PARTIAL_URL = "/api_v3/index.php/service/user/action/serveCsv/ks/";
+	const SERVE_OBJECT_CSV_PARTIAL_URL = "/api_v3/index.php/service/exportCsv/action/serveCsv/ks/";
 
 
 	/**
@@ -2927,19 +2927,20 @@ class kFlowHelper
 			return false;
 	}
 
-	public static function handleUsersCsvFinished(BatchJob $dbBatchJob, kUsersCsvJobData $data)
+	
+	public static function handleExportCsvFinished(BatchJob $dbBatchJob, kExportCsvJobData $data)
 	{
 		// Move file from shared temp to it's final location
 		$fileName =  basename($data->getOutputPath());
-		$directory =  myContentStorage::getFSContentRootPath() . "/content/userscsv/" . $dbBatchJob->getPartnerId() ;
+		$directory =  myContentStorage::getFSContentRootPath() . "/content/exportcsv/" . $dbBatchJob->getPartnerId() ;
 		if(!file_exists($directory))
 			mkdir($directory);
 		$filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
-
+		
 		if(!$data->getOutputPath())
 			throw new APIException(APIErrors::FILE_CREATION_FAILED, "file path not found");
-
-		KalturaLog::info("Trying to move users csv file from: " . $data->getOutputPath() . " to: " . $filePath);
+		
+		KalturaLog::info("Trying to move exported csv file from: " . $data->getOutputPath() . " to: " . $filePath);
 		try
 		{
 			kFile::moveFile($data->getOutputPath(), $filePath);
@@ -2948,36 +2949,36 @@ class kFlowHelper
 		{
 			throw new APIException(APIErrors::FILE_CREATION_FAILED, $e->getMessage());
 		}
-
-
+		
+		
 		$data->setOutputPath($filePath);
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
-
+		
 		KalturaLog::info("file path: [$filePath]");
-
-		$downloadUrl = self::createUsersCsvDownloadUrl($dbBatchJob->getPartnerId(), $fileName);
+		
+		$downloadUrl = self::createCsvDownloadUrl($dbBatchJob->getPartnerId(), $fileName);
 		$userName = $data->getUserName();
 		$bodyParams = array($userName, $downloadUrl);
-
+		
 		//send the created csv by mail
 		kJobsManager::addMailJob(
 			null,
 			0,
 			$dbBatchJob->getPartnerId(),
-			MailType::MAIL_TYPE_USERS_CSV,
+			MailType::MAIL_TYPE_OBJECTS_CSV,
 			kMailJobData::MAIL_PRIORITY_NORMAL,
 			kConf::get("partner_notification_email"),
 			kConf::get("partner_notification_name"),
 			$data->getUserMail(),
 			$bodyParams
 		);
-
+		
 		return $dbBatchJob;
 	}
 
 
-	protected static function createUsersCsvDownloadUrl ($partner_id, $file_name)
+	protected static function createCsvDownloadUrl ($partner_id, $file_name)
 	{
 		$ksStr = "";
 		$partner = PartnerPeer::retrieveByPK ($partner_id);
@@ -2991,7 +2992,7 @@ class kFlowHelper
 			throw new APIException(APIErrors::START_SESSION_ERROR, $partner);
 
 		//url is built with DC url in order to be directed to the same DC of the saved file
-		$url = kDataCenterMgr::getCurrentDcUrl() . self::SERVE_CSV_PARTIAL_URL ."$ksStr/id/$file_name";
+		$url = kDataCenterMgr::getCurrentDcUrl() . self::SERVE_OBJECT_CSV_PARTIAL_URL ."$ksStr/id/$file_name";
 
 		return $url;
 	}
