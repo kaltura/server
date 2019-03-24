@@ -227,15 +227,14 @@ class GroupService extends KalturaBaseUserService
 			throw new KalturaAPIException(KalturaGroupErrors::DUPLICATE_GROUP_BY_ID, $newGroupName);
 		}
 
-		$newGroup = $dbGroup->copy();
-		$newGroup->setPuserId($newGroupName);
-		$newGroup->setScreenName($newGroupName);
-		if (!preg_match(kuser::PUSER_ID_REGEXP, $newGroup->getPuserId()))
+		if (!preg_match(kuser::PUSER_ID_REGEXP, $newGroupName))
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
 		}
+
 		$group = new KalturaGroup();
-		$group->toInsertableObject($newGroup);
+		$newGroup = $group->clonedObject($dbGroup, $newGroupName);
+		$group->validateForInsert($newGroup);
 		$newGroup->save();
 
 		$groupUsers =  KuserKgroupPeer::retrieveKuserKgroupByKgroupId($dbGroup->getId());

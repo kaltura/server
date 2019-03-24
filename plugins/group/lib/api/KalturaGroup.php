@@ -43,4 +43,21 @@ class KalturaGroup extends KalturaBaseUser
 		$this->validateNames($propertiesToSkip ,self::NAMES);
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
+
+	public function clonedObject($dbOriginalGroup, $newGroupName,  $skip = array())
+	{
+		$dbObject = new kuser();
+		$dbObject->setType(KuserType::GROUP);
+		$dbObject->setScreenName($newGroupName);
+		$dbObject->setPuserId($newGroupName);
+		$dbObject->setTags($dbOriginalGroup->getTags());
+		$dbObject->setPartnerId($dbOriginalGroup->getPartnerId());
+		$dbObject->setPartnerData($dbOriginalGroup->getPartnerData());
+		$dbObject->setStatus($dbOriginalGroup->getStatus());
+
+
+		parent::toObject($dbObject, $skip);
+		return $dbObject;
+	}
+
 }
