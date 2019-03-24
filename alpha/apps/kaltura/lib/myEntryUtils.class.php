@@ -2292,11 +2292,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
 		if ($fileSync && !$local)
 		{
-			$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
-			if($fileSync->getDc() === $remoteDc)
+			$fileSyncDc = $fileSync->getDc();
+			if (in_array($fileSyncDc, kDataCenterMgr::getDcIds()))
 			{
-				KalturaLog::info("Source file wasn't found on current DC. Dumping the request to DC ID [$remoteDc]");
-				return kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
+				KalturaLog::info("Source file wasn't found on current DC. Dumping the request to DC ID [$fileSyncDc]");
+				return kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($fileSyncDc), true);
 			}
 		}
 	}
