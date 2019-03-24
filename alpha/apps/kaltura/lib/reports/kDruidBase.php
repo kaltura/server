@@ -46,6 +46,7 @@ class kDruidBase
 	const DRUID_COMMENT = 'comment';		// Note: not really defined in druid, anything we put on the context of the query gets printed to log
 	const DRUID_PRIORITY = 'priority';
 	const DRUID_SKIP_EMPTY_BUCKETS = 'skipEmptyBuckets';
+	const DRUID_TIMEOUT = 'timeout';
 	const DRUID_AND = 'and';
 	const DRUID_DIRECTION = 'direction';
 	const DRUID_DIMENSION_ORDER = 'dimensionOrder';
@@ -83,7 +84,7 @@ class kDruidBase
 	const DRUID_ERROR_MSG = 'errorMessage';
 	
 	const DRUID_URL = "druid_url";
-	
+	const DRUID_QUERY_TIMEOUT = 'druid_timeout';
 	const COMMENT_MARKER = '@COMMENT@';
 
 	protected static $curl_handle = null;
@@ -285,6 +286,9 @@ class kDruidBase
 		}
 
 		$content[self::DRUID_CONTEXT][self::DRUID_COMMENT] = self::COMMENT_MARKER;
+		if (kConf::hasParam(self::DRUID_QUERY_TIMEOUT)) {
+			$content[self::DRUID_CONTEXT][self::DRUID_TIMEOUT] = kConf::get(self::DRUID_QUERY_TIMEOUT);;
+		}
 
 		KalturaLog::log('{' . print_r($content, true) . '}');
 
@@ -376,6 +380,12 @@ class kDruidBase
 	
 		if (isset($result[self::DRUID_ERROR])) 
 		{
+			if (strpos($result[self::DRUID_ERROR_MSG], 'Query timeout') !== false)
+			{
+				KalturaLog::error('Druid Query timed out.');
+				throw new kCoreException("Druid Query timed out", kCoreException::DRUID_QUERY_TIMED_OUT);
+			}
+
 			KalturaLog::err('Error while running report ' . $result[self::DRUID_ERROR_MSG]);
 			throw new Exception('Error while running report ' . $result[self::DRUID_ERROR_MSG]);
 		}

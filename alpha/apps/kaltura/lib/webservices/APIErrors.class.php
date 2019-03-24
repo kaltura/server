@@ -462,4 +462,6 @@ class APIErrors
 
 	const FILE_CREATION_FAILED = "FILE_CREATION_FAILED;MESSAGE;Failed to create file on specified location with message: \"@MESSAGE@\"";
 
+	const DRUID_QUERY_TIMED_OUT = "DRUID_QUERY_TIMED_OUT;;Query timed out";
+
 }
