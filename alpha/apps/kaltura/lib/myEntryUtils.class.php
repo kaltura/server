@@ -2281,4 +2281,24 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return $success;
 	}
 
+	public static function verifyThumbSrcExist($entry, $destThumbParams)
+	{
+		$srcAsset = kBusinessPreConvertDL::getSourceAssetForGenerateThumbnail(null, $destThumbParams->getSourceParamsId(), $entry->getId());
+		if (is_null($srcAsset))
+		{
+			throw new KalturaAPIException(KalturaErrors::NO_FLAVORS_FOUND);
+		}
+		$srcSyncKey = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
+		if ($fileSync && !$local)
+		{
+			$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
+			if($fileSync->getDc() === $remoteDc)
+			{
+				KalturaLog::info("Source file wasn't found on current DC. Dumping the request to DC ID [$remoteDc]");
+				return kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
+			}
+		}
+	}
+
 }
