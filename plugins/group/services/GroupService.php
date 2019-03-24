@@ -34,10 +34,6 @@ class GroupService extends KalturaBaseUserService
 	public function addAction(KalturaGroup $group)
 	{
 		$group->type = KuserType::GROUP;
-		if (!preg_match(kuser::PUSER_ID_REGEXP, $group->id))
-		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
-		}
 		$lockKey = "user_add_" . $this->getPartnerId() . $group->id;
 		$ret =  kLock::runLocked($lockKey, array($this, 'adduserImpl'), array($group));
 		return $ret;
@@ -219,7 +215,9 @@ class GroupService extends KalturaBaseUserService
 		$dbGroup = $this->getGroup($originalGroupId);
 
 		if (!$dbGroup)
+		{
 			throw new KalturaAPIException(KalturaGroupErrors::INVALID_GROUP_ID, $originalGroupId);
+		}
 
 		$dbNewGroup = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $newGroupName);
 		if ($dbNewGroup)
@@ -227,22 +225,17 @@ class GroupService extends KalturaBaseUserService
 			throw new KalturaAPIException(KalturaGroupErrors::DUPLICATE_GROUP_BY_ID, $newGroupName);
 		}
 
-		if (!preg_match(kuser::PUSER_ID_REGEXP, $newGroupName))
-		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
-		}
-
 		$group = new KalturaGroup();
-		$newGroup = $group->clonedObject($dbGroup, $newGroupName);
-		$group->validateForInsert($newGroup);
-		$newGroup->save();
+		$newDbGroup = $group->clonedObject($dbGroup, $newGroupName);
+		$group->validateForInsert($newDbGroup);
+		$newDbGroup->save();
 
 		$groupUsers =  KuserKgroupPeer::retrieveKuserKgroupByKgroupId($dbGroup->getId());
 		$kusers = $this->getKusersFromKuserKgroup($groupUsers);
 		$GroupUser = new GroupUserService();
-		$GroupUser->addGroupUsersToClonedGroup($kusers, $newGroup, $dbGroup->getId());
+		$GroupUser->addGroupUsersToClonedGroup($kusers, $newDbGroup, $dbGroup->getId());
 
-		$group->fromObject($newGroup, $this->getResponseProfile());
+		$group->fromObject($newDbGroup, $this->getResponseProfile());
 
 		return $group;
 	}

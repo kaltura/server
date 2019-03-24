@@ -153,7 +153,7 @@ class KalturaUser extends KalturaBaseUser
 
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		$this->validateNames($propertiesToSkip ,self::NAMES);
+		$this->validateNames($sourceObject ,self::NAMES);
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 }
