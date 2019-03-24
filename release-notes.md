@@ -1,7 +1,7 @@
 # Naos 14.17.0 #
 ## adding support for copying a group ##
 
-- Issue Type: Tasl
+- Issue Type: Task
 - Issue ID: PLAT-9723
 
 ### configuration ###
