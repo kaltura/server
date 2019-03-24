@@ -192,7 +192,7 @@ class ESearchEntryItem extends ESearchItem
 				array('index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,
 					'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
 					'id' => $searchItem->getSearchTerm(),
-					'path' => 'group_ids'));
+					'path' => ESearchUserFieldName::GROUP_IDS));
 			$boolQuery = new kESearchBoolQuery();
 			$boolQuery->addToShould($exactQuery);
 			$boolQuery->addToShould($preFixGroups);
