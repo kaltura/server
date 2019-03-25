@@ -2661,7 +2661,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function getEntryKuserDimension($data_source)
 	{
-		return $data_source === self::DATASOURCE_ENTRY_LIFECYCLE || $data_source === self::DATASOURCE_STORAGE_USAGE ? self::DIMENSION_KUSER_ID : self::DIMENSION_ENTRY_OWNER_ID;
+		return in_array($data_source, array(self::DATASOURCE_ENTRY_LIFECYCLE, self::DATASOURCE_STORAGE_USAGE)) ? self::DIMENSION_KUSER_ID : self::DIMENSION_ENTRY_OWNER_ID;
 	}
 
 	protected static function getDruidFilter($partner_id, $report_def, $input_filter, $object_ids, $response_options)
