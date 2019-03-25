@@ -57,16 +57,17 @@ class DrmLicenseAccessService extends KalturaBaseService
                         $response->absolute_duration = $expirationDate;
                         KalturaLog::info("response is  '" . print_r($response, true) . "' ");
                     } else {
-                        KalturaLog::err("Could not get DRM policy from DB");
+                    	throw new KalturaAPIException(KalturaErrors::MISSING_DRM_POLICY);
                     }
                 }
             } catch (Exception $e) {
                 KalturaLog::err("Could not validate license access, returned with message '".$e->getMessage()."'");
+                throw new KalturaAPIException(KalturaErrors::VALIDATE_LICENSE_ACCESS_FAILED);
             }
         }
         else
         {
-            KalturaLog::err("Entry '$entryId' not found");
+        	throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
         }
         return $response;
 

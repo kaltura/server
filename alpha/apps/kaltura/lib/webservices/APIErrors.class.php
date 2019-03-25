@@ -462,4 +462,8 @@ class APIErrors
 
 	const FILE_CREATION_FAILED = "FILE_CREATION_FAILED;MESSAGE;Failed to create file on specified location with message: \"@MESSAGE@\"";
 
+	const VALIDATE_LICENSE_ACCESS_FAILED = "VALIDATE_LICENSE_ACCESS_FAILED;;Could not validate license access";
+
+	const MISSING_DRM_POLICY = "MISSING_DRM_POLICY;;Could not get DRM policy from DB";
+
 }
