@@ -25,6 +25,34 @@ class KalturaESearchEntryBaseItemArray extends KalturaTypedArray
 				case 'ESearchEntryItem':
 					$nObj = new KalturaESearchEntryItem();
 					break;
+				
+				case 'ESearchOperator':
+					$nObj = new KalturaESearchEntryOperator();
+					break;
+				
+				case 'ESearchMetadataItem':
+					$nObj = new KalturaESearchEntryMetadataItem();
+					break;
+				
+				case 'ESearchCuePointItem':
+					$nObj = new KalturaESearchCuePointItem();
+					break;
+				
+				case 'ESearchCaptionItem':
+					$nObj = new KalturaESearchCaptionItem();
+					break;
+				
+				case 'ESearchCategoryEntryNameItem':
+					$nObj = new KalturaESearchCategoryEntryItem();
+					break;
+				
+				case 'ESearchUnifiedItem':
+					$nObj = new KalturaESearchUnifiedItem();
+					break;
+				
+				case 'ESearchNestedOperator':
+					$nObj = new KalturaESearchNestedOperator();
+					break;
 					
 				default:
 					$nObj = KalturaPluginManager::loadObject('KalturaESearchEntryBaseItem', get_class($obj));
