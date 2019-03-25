@@ -7,6 +7,7 @@
 class KalturaUser extends KalturaBaseUser
 {
 	const MAX_NAME_LEN = 40;
+	const NAMES = array('firstName', 'lastName', 'fullName', 'screenName');
 
 	/**
 	 * @var KalturaUserType
@@ -142,5 +143,17 @@ class KalturaUser extends KalturaBaseUser
 			$this->lastName = kString::alignUtf8String($this->lastName, self::MAX_NAME_LEN);
 		if (strlen($this->fullName) > self::MAX_NAME_LEN)
 			$this->fullName = kString::alignUtf8String($this->fullName, self::MAX_NAME_LEN);
+	}
+
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		$this->validateNames($this,self::NAMES);
+		parent::validateForInsert($propertiesToSkip);
+	}
+
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		$this->validateNames($sourceObject ,self::NAMES);
+		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 }

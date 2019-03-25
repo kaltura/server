@@ -34,12 +34,6 @@ class GroupService extends KalturaBaseUserService
 	public function addAction(KalturaGroup $group)
 	{
 		$group->type = KuserType::GROUP;
-		if (!preg_match(kuser::PUSER_ID_REGEXP, $group->id))
-		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
-		}
-		$names = array('fullName', 'screenName');
-		$this->validateNames($group ,$names);
 		$lockKey = "user_add_" . $this->getPartnerId() . $group->id;
 		$ret =  kLock::runLocked($lockKey, array($this, 'adduserImpl'), array($group));
 		return $ret;
@@ -205,4 +199,55 @@ class GroupService extends KalturaBaseUserService
 		return array($baseOperator, $objectStatusesArr, $coreParams->getObjectId(), $kPager, $coreParams->getOrderBy());
 	}
 
+	/**
+	 * clone the group (groupId), and set group id with the neeGroupName.
+	 *
+	 * @action clone
+	 * @param string $originalGroupId The unique identifier in the partner's system
+	 * @param string $newGroupName The unique identifier in the partner's system
+	 * @return KalturaGroup The cloned group
+	 *
+	 * @throws KalturaErrors::INVALID_FIELD_VALUE
+	 * @throws KalturaGroupErrors::INVALID_GROUP_ID
+	 */
+	public function cloneAction($originalGroupId, $newGroupName)
+	{
+		$dbGroup = $this->getGroup($originalGroupId);
+
+		if (!$dbGroup)
+		{
+			throw new KalturaAPIException(KalturaGroupErrors::INVALID_GROUP_ID, $originalGroupId);
+		}
+
+		$dbNewGroup = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $newGroupName);
+		if ($dbNewGroup)
+		{
+			throw new KalturaAPIException(KalturaGroupErrors::DUPLICATE_GROUP_BY_ID, $newGroupName);
+		}
+
+		$group = new KalturaGroup();
+		$newDbGroup = $group->clonedObject($dbGroup, $newGroupName);
+		$group->validateForInsert($newDbGroup);
+		$newDbGroup->save();
+
+		$groupUsers =  KuserKgroupPeer::retrieveKuserKgroupByKgroupId($dbGroup->getId());
+		$kusers = $this->getKusersFromKuserKgroup($groupUsers);
+		$GroupUser = new GroupUserService();
+		$GroupUser->addGroupUsersToClonedGroup($kusers, $newDbGroup, $dbGroup->getId());
+
+		$group->fromObject($newDbGroup, $this->getResponseProfile());
+
+		return $group;
+	}
+
+	protected function getKusersFromKuserKgroup($groupUsers)
+	{
+		$kusers = array();
+		foreach ($groupUsers as $groupUser)
+		{
+			$kuserId = $groupUser->getKuserId();
+			$kusers[] = kuserPeer::retrieveByPK($kuserId);
+		}
+		return $kusers;
+	}
 }

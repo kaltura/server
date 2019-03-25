@@ -256,6 +256,52 @@ class GroupUserService extends KalturaBaseService
 		return $shouldHandleGroupsInBatch;
 	}
 
+	public function addGroupUsersToClonedGroup($kusers, $newGroup, $originalGroupId)
+	{
+		$groupUsersLimit = kConf::get('user_groups_sync_threshold', 'local', self::USER_GROUP_SYNC_THRESHOLD_DEFUALT);
+		$bulkGroupUserSyncCsv = new kBulkGroupUsersToGroupCsv($kusers, $newGroup->getPuserId());
+		$shouldHandleGroupsUsersInBatch = ($groupUsersLimit < count($kusers));
+		if (!$shouldHandleGroupsUsersInBatch)
+		{
+			$this->initService('groupuser', 'groupuser', 'add');
+			$shouldHandleGroupsUsersInBatch = $this->addUserGroupsToGroup($kusers, $newGroup, $originalGroupId);
+		}
+		if ($shouldHandleGroupsUsersInBatch)
+		{
+			$bulkGroupUserSyncCsv->AddGroupUserInBatch($kusers, $originalGroupId);
+		}
+
+	}
+
+	/**
+	 * @param $userIdsToAdd
+	 * @param $groupId
+	 * @return bool (true if errors occurred)
+	 */
+	public function addUserGroupsToGroup($userToAdd, $group, $originalGroupId)
+	{
+		$groupId = $group->getPuserId();
+		$shouldHandleGroupsInBatch = false;
+		foreach ($userToAdd as $user)
+		{
+			$originalGroupUser = KuserKgroupPeer::retrieveByKuserIdAndKgroupId($user->getId(),$originalGroupId);
+			try
+			{
+				$groupUser = new KalturaGroupUser();
+				$groupUser->userId = $user->getPuserId();
+				$groupUser->groupId = $groupId;
+				$groupUser->creationMode = KalturaGroupUserCreationMode::AUTOMATIC;
+				$groupUser->userRole = $originalGroupUser->getUserRole();
+				$this->addAction($groupUser);
+			}
+			catch (Exception $e)
+			{
+				$shouldHandleGroupsInBatch = true;
+			}
+		}
+		return $shouldHandleGroupsInBatch;
+	}
+
 	/**
 	 * @param $userId
 	 * @param $groupIdsList

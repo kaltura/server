@@ -1,4 +1,15 @@
 # Naos 14.17.0 #
+## adding support for copying a group ##
+
+- Issue Type: Task
+- Issue ID: PLAT-9723
+
+### configuration ###
+none
+
+### Deployment scripts ###
+php deployment/updates/scripts/add_permissions/2019_03_10_add_group_permission.php
+
 
 ## Add option to disable New Analytics from Admin console (new permission) ##
 

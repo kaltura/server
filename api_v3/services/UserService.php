@@ -38,8 +38,7 @@ class UserService extends KalturaBaseUserService
 		{
 			$user->isAdmin = true;
 		}
-		$names = array('firstName', 'lastName', 'fullName', 'screenName');
-		$this->validateNames($user ,$names);
+
 		$lockKey = "user_add_" . $this->getPartnerId() . $user->id;
 		return kLock::runLocked($lockKey, array($this, 'adduserImpl'), array($user));
 	}
@@ -68,9 +67,6 @@ class UserService extends KalturaBaseUserService
 		if ($dbUser->getIsAdmin() && !is_null($user->isAdmin) && !$user->isAdmin) {
 			throw new KalturaAPIException(KalturaErrors::CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN);
 		}
-
-		$names = array('firstName', 'lastName', 'fullName', 'screenName');
-		$this->validateNames($user, $names);
 
 		// update user
 		try
@@ -573,7 +569,6 @@ class UserService extends KalturaBaseUserService
 		
 		return $res;
 	}
-
 	/**
 	 *
 	 * Will serve a requested CSV
@@ -586,7 +581,6 @@ class UserService extends KalturaBaseUserService
 	public function serveCsvAction($id)
 	{
 		$file_path = ExportCsvService::generateCsvPath($id, $this->getKs());
-
 		return $this->dumpFile($file_path, 'text/csv');
 	}
 }
