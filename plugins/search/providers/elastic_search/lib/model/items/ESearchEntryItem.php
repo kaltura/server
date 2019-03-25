@@ -156,7 +156,7 @@ class ESearchEntryItem extends ESearchItem
 		switch ($this->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
-				$subQuery = $this->getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = $this->getExactMatchQuery($allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
 				$subQuery = kESearchQueryManager::getPartialQuery($this, $this->getFieldName(), $queryAttributes);
@@ -181,17 +181,17 @@ class ESearchEntryItem extends ESearchItem
 			$entryQuery[] = $subQuery;
 	}
 
-	public function getExactMatchQuery($searchItem, $fieldName, $allowedSearchTypes, &$queryAttributes)
+	protected function getExactMatchQuery($allowedSearchTypes, &$queryAttributes)
 	{
-		$exactQuery = kESearchQueryManager::getExactMatchQuery($searchItem, $fieldName, $allowedSearchTypes, $queryAttributes);
+		$exactQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 
-		if (in_array($fieldName, array(ESearchEntryFieldName::ENTITLED_USER_EDIT,ESearchEntryFieldName::ENTITLED_USER_PUBLISH,
+		if (in_array($this->getFieldName(), array(ESearchEntryFieldName::ENTITLED_USER_EDIT,ESearchEntryFieldName::ENTITLED_USER_PUBLISH,
 			ESearchEntryFieldName::ENTITLED_USER_VIEW, ESearchEntryFieldName::USER_ID)))
 		{
-			$preFixGroups = new kESearchTermsQuery($fieldName,
+			$preFixGroups = new kESearchTermsQuery($this->getFieldName(),
 				array('index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,
 					'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
-					'id' => $searchItem->getSearchTerm(),
+					'id' => $this->getSearchTerm(),
 					'path' => ESearchUserFieldName::GROUP_IDS));
 			$boolQuery = new kESearchBoolQuery();
 			$boolQuery->addToShould($exactQuery);
