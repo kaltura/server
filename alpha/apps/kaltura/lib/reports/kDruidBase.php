@@ -286,8 +286,10 @@ class kDruidBase
 		}
 
 		$content[self::DRUID_CONTEXT][self::DRUID_COMMENT] = self::COMMENT_MARKER;
-		if (kConf::hasParam(self::DRUID_QUERY_TIMEOUT)) {
-			$content[self::DRUID_CONTEXT][self::DRUID_TIMEOUT] = kConf::get(self::DRUID_QUERY_TIMEOUT);;
+		if (kConf::hasParam(self::DRUID_QUERY_TIMEOUT))
+		{
+			$timeout = kConf::get(self::DRUID_QUERY_TIMEOUT);
+			$content[self::DRUID_CONTEXT][self::DRUID_TIMEOUT] = intval($timeout);
 		}
 
 		KalturaLog::log('{' . print_r($content, true) . '}');
@@ -350,14 +352,20 @@ class kDruidBase
 			}
 
 			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			$result = json_decode($response, true);
+
 			if ($httpCode != KCurlHeaderResponse::HTTP_STATUS_OK)
 			{
+				if (strpos($result[self::DRUID_ERROR], 'Query timeout') !== false)
+				{
+					KalturaLog::err('Druid Query timed out.');
+					throw new kCoreException("Druid Query timed out", kCoreException::DRUID_QUERY_TIMED_OUT);
+				}
+
 				throw new Exception('Got invalid status code from druid: ' . $httpCode);
 			}
 
 			// Note: not closing the curl handle so that the connection can be reused
-
-			$result = json_decode($response, true);
 
 			KalturaMonitorClient::monitorDruidQuery(
 				parse_url($url, PHP_URL_HOST),
@@ -380,12 +388,6 @@ class kDruidBase
 	
 		if (isset($result[self::DRUID_ERROR])) 
 		{
-			if (strpos($result[self::DRUID_ERROR_MSG], 'Query timeout') !== false)
-			{
-				KalturaLog::error('Druid Query timed out.');
-				throw new kCoreException("Druid Query timed out", kCoreException::DRUID_QUERY_TIMED_OUT);
-			}
-
 			KalturaLog::err('Error while running report ' . $result[self::DRUID_ERROR_MSG]);
 			throw new Exception('Error while running report ' . $result[self::DRUID_ERROR_MSG]);
 		}

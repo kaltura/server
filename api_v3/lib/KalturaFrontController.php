@@ -535,6 +535,10 @@ class KalturaFrontController
 				case kCoreException::FILE_PENDING:
 					$object = new KalturaAPIException(KalturaErrors::FILE_PENDING);
 					break;
+
+				case kCoreException::DRUID_QUERY_TIMED_OUT:
+					$object = new KalturaAPIException(KalturaErrors::DRUID_QUERY_TIMED_OUT);
+					break;
 			}
 		}
 		else if ($ex instanceof PropelException)
