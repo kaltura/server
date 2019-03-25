@@ -82,9 +82,11 @@ class kDruidBase
 	const DRUID_ERROR = 'error';
 	const DRUID_ERROR_CLASS = 'errorClass';
 	const DRUID_ERROR_MSG = 'errorMessage';
-	
+
+	// kConf params
 	const DRUID_URL = "druid_url";
 	const DRUID_QUERY_TIMEOUT = 'druid_timeout';
+
 	const COMMENT_MARKER = '@COMMENT@';
 
 	protected static $curl_handle = null;
@@ -286,9 +288,10 @@ class kDruidBase
 		}
 
 		$content[self::DRUID_CONTEXT][self::DRUID_COMMENT] = self::COMMENT_MARKER;
-		if (kConf::hasParam(self::DRUID_QUERY_TIMEOUT))
+
+		$timeout = kconf::get(self::DRUID_QUERY_TIMEOUT, 'local', null);
+		if ($timeout)
 		{
-			$timeout = kConf::get(self::DRUID_QUERY_TIMEOUT);
 			$content[self::DRUID_CONTEXT][self::DRUID_TIMEOUT] = intval($timeout);
 		}
 
@@ -352,11 +355,10 @@ class kDruidBase
 			}
 
 			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			$result = json_decode($response, true);
 
 			if ($httpCode != KCurlHeaderResponse::HTTP_STATUS_OK)
 			{
-				if (strpos($result[self::DRUID_ERROR], 'Query timeout') !== false)
+				if (strpos($response, 'Query timeout') !== false)
 				{
 					KalturaLog::err('Druid Query timed out.');
 					throw new kCoreException("Druid Query timed out", kCoreException::DRUID_QUERY_TIMED_OUT);
@@ -366,6 +368,8 @@ class kDruidBase
 			}
 
 			// Note: not closing the curl handle so that the connection can be reused
+
+			$result = json_decode($response, true);
 
 			KalturaMonitorClient::monitorDruidQuery(
 				parse_url($url, PHP_URL_HOST),
