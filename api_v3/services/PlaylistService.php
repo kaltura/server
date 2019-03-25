@@ -114,7 +114,7 @@ class PlaylistService extends KalturaEntryService
 		
 		return $playlist;
 	}
-		
+
 	/**
 	 * Update existing playlist
 	 * Note - you cannot change playlist type. Updated playlist must be of the same type.
@@ -124,67 +124,40 @@ class PlaylistService extends KalturaEntryService
 	 * @param KalturaPlaylist $playlist
 	 * @param bool $updateStats
 	 * @return KalturaPlaylist
-	 *
-	 * @throws APIErrors::INVALID_ENTRY_ID
-	 * @throws APIErrors::INVALID_PLAYLIST_TYPE
+	 * @throws KalturaAPIException
 	 * @validateUser entry id edit
 	 *
 	 * @disableRelativeTime $playlist
 	 */
-	function updateAction( $id , KalturaPlaylist $playlist , $updateStats = false )
+	function updateAction($id , KalturaPlaylist $playlist , $updateStats = false )
 	{
-		$dbPlaylist = entryPeer::retrieveByPK( $id );
-		
-		if ( ! $dbPlaylist )
-			throw new KalturaAPIException ( APIErrors::INVALID_ENTRY_ID , "Playlist" , $id  );
-		if ( $dbPlaylist->getType() != entryType::PLAYLIST )
-			throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
-		
-		$playlist->playlistType = $dbPlaylist->getMediaType();
-		
-		// Added the following 2 lines in order to make the permission verifications in toUpdatableObject work on the actual db object
-		// TODO: the following use of autoFillObjectFromObject should be replaced by a normal toUpdatableObject
-		$playlistUpdate = clone $dbPlaylist;
-		$playlistUpdate = $playlist->toUpdatableObject($playlistUpdate);
-
+		$dbPlaylist = entryPeer::retrieveByPK($id);
+		if(!$dbPlaylist)
+		{
+			throw new KalturaAPIException (APIErrors::INVALID_ENTRY_ID, "Playlist", $id);
+		}
+		if ($dbPlaylist->getType() != entryType::PLAYLIST )
+		{
+			throw new KalturaAPIException (APIErrors::INVALID_PLAYLIST_TYPE);
+		}
+		$dbPlaylist = $playlist->toUpdatableObject($dbPlaylist);
 		$this->checkAndSetValidUserUpdate($playlist, $dbPlaylist);
 		$this->checkAdminOnlyUpdateProperties($playlist);
 		$this->validateAccessControlId($playlist);
 		$this->validateEntryScheduleDates($playlist, $dbPlaylist);
-
-		$allowEmpty = true ; // TODO - what is the policy  ?
-		if ( $playlistUpdate->getMediaType() && ($playlistUpdate->getMediaType() != $dbPlaylist->getMediaType() ) )
+		if(!is_null($dbPlaylist->getDataContent(true)))
 		{
-			throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
-		}
-		else
-		{
-			$playlistUpdate->setMediaType( $dbPlaylist->getMediaType() ); // incase  $playlistUpdate->getMediaType() was empty
-		}
-
-		// copy properties from the playlistUpdate to the $dbPlaylist
-		baseObjectUtils::autoFillObjectFromObject ( $playlistUpdate , $dbPlaylist , $allowEmpty );
-		// after filling the $dbPlaylist from  $playlist - make sure the data content is set properly
-		if(!is_null($playlistUpdate->getDataContent(true)))
-		{
-			if($playlistUpdate->getDataContent(true) != $dbPlaylist->getDataContent())
-			{
-				$dbPlaylist->setDataContent ($playlistUpdate->getDataContent(true));
-			}
 			myPlaylistUtils::validatePlaylist($dbPlaylist);
 		}
-		
+
 		if ( $updateStats )
-			myPlaylistUtils::updatePlaylistStatistics ( $this->getPartnerId() , $dbPlaylist );//, $extra_filters , $detailed );
-		
+		{
+			myPlaylistUtils::updatePlaylistStatistics($this->getPartnerId(), $dbPlaylist);//, $extra_filters , $detailed );
+		}
 		$dbPlaylist->save();
 		$playlist->fromObject($dbPlaylist, $this->getResponseProfile());
-		
 		return $playlist;
 	}
-
-
-		
 
 	/**
 	 * Delete existing playlist
