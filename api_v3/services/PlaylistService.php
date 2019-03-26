@@ -143,13 +143,7 @@ class PlaylistService extends KalturaEntryService
 			throw new KalturaAPIException (APIErrors::INVALID_PLAYLIST_TYPE);
 		}
 
-		$currentPlayListType = $dbPlaylist->getMediaType();
 		$dbPlaylist = $playlist->toUpdatableObject($dbPlaylist);
-		if($currentPlayListType != $dbPlaylist->getMediaType())
-		{
-			throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
-		}
-
 		$this->checkAndSetValidUserUpdate($playlist, $dbPlaylist);
 		$this->checkAdminOnlyUpdateProperties($playlist);
 		$this->validateAccessControlId($playlist);
@@ -159,7 +153,7 @@ class PlaylistService extends KalturaEntryService
 		{
 			myPlaylistUtils::validatePlaylist($dbPlaylist);
 		}
-		
+
 		if ( $updateStats )
 		{
 			myPlaylistUtils::updatePlaylistStatistics($this->getPartnerId(), $dbPlaylist);//, $extra_filters , $detailed );
