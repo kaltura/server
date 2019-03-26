@@ -311,6 +311,22 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 
+	protected function updatedReportExport(BatchJob $dbBatchJob, kReportExportJobData $data)
+	{
+		switch($dbBatchJob->getStatus())
+		{
+			case BatchJob::BATCHJOB_STATUS_FINISHED:
+				return kFlowHelper::handleReportExportFinished($dbBatchJob, $data);
+			case BatchJob::BATCHJOB_STATUS_FAILED:
+			case BatchJob::BATCHJOB_STATUS_FATAL:
+				return kFlowHelper::handleReportExportFailed($dbBatchJob, $data);
+			case BatchJob::BATCHJOB_STATUS_ABORTED:
+				return kFlowHelper::handleReportExportAborted($dbBatchJob, $data);
+			default:
+				return $dbBatchJob;
+		}
+	}
+
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
 	 */
@@ -421,6 +437,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 
 				case BatchJobType::EXPORT_CSV:
 					$dbBatchJob = $this->updatedExportCsv($dbBatchJob, $dbBatchJob->getData());
+					break;
+
+				case BatchJobType::REPORT_EXPORT:
+					$dbBatchJob = $this->updatedReportExport($dbBatchJob, $dbBatchJob->getData());
 					break;
 
 				default:

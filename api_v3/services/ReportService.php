@@ -178,6 +178,12 @@ class ReportService extends KalturaBaseService
 		}
 		$kResponseOptions = $responseOptions->toObject();
 
+		$isCsv = false;
+		if(kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
+		{
+			$isCsv = true;
+		}
+
 		if(in_array($reportType, self::$crossPartnerReports))
 			$objectIds = $this->validateObjectsAreAllowedPartners($reportType, $objectIds, $kResponseOptions->getDelimiter());
 
@@ -206,7 +212,7 @@ class ReportService extends KalturaBaseService
 		    $reportType ,
 		    $reportInputFilter->toReportsInputFilter() ,
 		    $pager->pageSize , $pager->pageIndex ,
-		    $order , $objectIds, null , false , $kResponseOptions);
+		    $order , $objectIds, null , $isCsv , $kResponseOptions);
 
 		$reportTable->fromReportTable ( $header , $data , $totalCount, $kResponseOptions->getDelimiter() );
 			
@@ -286,20 +292,37 @@ class ReportService extends KalturaBaseService
 	 * @return string
 	 * @ksOptional 
 	 */
-	public function serveAction($id) {
+	public function serveAction($id)
+	{
 		// KS verification - we accept either admin session or download privilege of the file
 		$ks = $this->getKs();
-		if(!$ks || !($ks->isAdmin() || $ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id)))
+		if (!$ks || !($ks->isAdmin() || $ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id)))
+		{
 			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
-		
-		if(!preg_match('/^[\w-_]*$/', $id))
+		}
+
+		$exportFileNameRegex = "/^(?<dc>[01]+)_(?<id>[0-9]+_Report_export_[a-zA-Z0-9]+_[\w]+.csv)$/";
+
+		if (preg_match($exportFileNameRegex, $id, $matches))
+		{
+			//export
+			$currentDc = kDataCenterMgr::getCurrentDcId();
+			if ($matches['dc'] == 1 - $currentDc)
+			{
+				kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId(1 - $currentDc));
+			}
+			$id = $matches['id'];
+		}
+		elseif (!preg_match('/^[\w-_]*$/', $id))
+		{
 			throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
-		
+		}
+
 		$partner_id = $this->getPartnerId();
 		$folderPath = "/content/reports/$partner_id";
 		$fullPath = myContentStorage::getFSContentRootPath() . $folderPath;
 		$file_path = "$fullPath/$id";
-		
+
 		return $this->dumpFile($file_path, 'text/csv');
 	}
 	
@@ -391,7 +414,44 @@ class ReportService extends KalturaBaseService
 		$paramsArray = $this->parseParamsStr($params);
 		return $this->getCsvAction($id, $paramsArray);
 	}
-	
+
+	/**
+	 * @action exportToCsv
+	 * @param KalturaReportExportParams $params
+	 * @return string - todo
+	 * @throws KalturaAPIException
+	 */
+	public function exportToCsvAction(KalturaReportExportParams $params)
+	{
+		if (!$params->reportItems)
+		{
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER);
+		}
+
+		if (!$params->recipientEmail)
+		{
+			$kuser = kCurrentContext::getCurrentKsKuser();
+			if ($kuser)
+			{
+				$params->recipientEmail = $kuser->getEmail();
+			}
+			else
+			{
+				$partnerId = kCurrentContext::getCurrentPartnerId();
+				$partner = PartnerPeer::retrieveByPK($partnerId);
+				$params->recipientEmail = $partner->getAdminEmail();
+			}
+		}
+
+		$dbBatchJob = kJobsManager::addExportReportJob($params);
+
+		$response = new KalturaReportExportResponse();
+		$response->referenceJobId = $dbBatchJob->getId();
+		$response->reportEmail = $params->recipientEmail;
+
+		return $response;
+	}
+
 	protected function parseParamsStr($paramsStr)
 	{
 		$paramsStrArray = explode(';', $paramsStr);
