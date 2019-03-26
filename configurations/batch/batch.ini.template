@@ -67,6 +67,7 @@ enabledWorkers.KAsyncLiveToVod      				= 1
 enabledWorkers.KAsyncCopyCaptions					= 1
 enabledWorkers.KAsyncCopyCuePoints                   = 1
 enabledWorkers.KSyncReachCreditTaskRunner	    = 0
+enabledWorkers.KAsyncExportCsv                      = 0
 
 
 [mainTemplate : template]
