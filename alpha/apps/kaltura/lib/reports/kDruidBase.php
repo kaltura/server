@@ -289,7 +289,7 @@ class kDruidBase
 
 		$content[self::DRUID_CONTEXT][self::DRUID_COMMENT] = self::COMMENT_MARKER;
 
-		$timeout = kconf::get(self::DRUID_QUERY_TIMEOUT, 'local', null);
+		$timeout = kConf::get(self::DRUID_QUERY_TIMEOUT, 'local', null);
 		if ($timeout)
 		{
 			$content[self::DRUID_CONTEXT][self::DRUID_TIMEOUT] = intval($timeout);
