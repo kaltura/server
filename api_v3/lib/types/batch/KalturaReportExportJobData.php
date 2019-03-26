@@ -13,7 +13,7 @@ class KalturaReportExportJobData extends KalturaJobData
 	/**
 	 * @var KalturaReportExportItemArray
 	 */
-	public $reportItems;//todo rename
+	public $reportItems;
 
 	/**
 	 * @var string
@@ -32,8 +32,6 @@ class KalturaReportExportJobData extends KalturaJobData
 		"timeZoneOffset",
 		"timeReference",
 	);
-
-	//todo add fileNames array
 
 	public function getMapBetweenObjects()
 	{

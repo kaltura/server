@@ -418,7 +418,7 @@ class ReportService extends KalturaBaseService
 	/**
 	 * @action exportToCsv
 	 * @param KalturaReportExportParams $params
-	 * @return string - todo
+	 * @return KalturaReportExportResponse
 	 * @throws KalturaAPIException
 	 */
 	public function exportToCsvAction(KalturaReportExportParams $params)
