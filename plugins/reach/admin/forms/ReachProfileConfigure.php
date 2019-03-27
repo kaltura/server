@@ -282,7 +282,10 @@ class Form_ReachProfileConfigure extends ConfigureForm
 					$action->catalogItemIds = $rule->catalogItemIds;
 					$description = (empty($rule->description) || $rule->description == self::ADMIN_CONSOLE_RULE_PREFIX) ? (self::ADMIN_CONSOLE_RULE_PREFIX . mt_rand(100000, 999999)) : $rule->description;
 					$condition = new Kaltura_Client_Type_BooleanEventNotificationCondition();
-					$condition->booleanEventNotificationIds = $rule->booleanEventNotificationIds;
+					if (isset($rule->booleanEventNotificationIds))
+					{
+						$condition->booleanEventNotificationIds = $rule->booleanEventNotificationIds;
+					}
 					$rulesArray[] = $this->getReachProfileRule(array($action), array($condition), $description);
 
 				}
