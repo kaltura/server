@@ -14,7 +14,7 @@ abstract class kReportExportEngine
 
 	public function __construct($reportItem, $outputPath)
 	{
-		$this->reportItem = $reportItem;r
+		$this->reportItem = $reportItem;
 		$this->filename = $this->createFileName($outputPath);
 		$this->fp = fopen($this->filename, 'w');
 		if (!$this->fp)
