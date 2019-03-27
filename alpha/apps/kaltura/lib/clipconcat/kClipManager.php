@@ -68,11 +68,18 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			}
 			elseif ($this->shouldStartConcat($batchJob))
 			{
-				$this->startConcat($batchJob->getRootJob());
+				if (count($batchJob->getParentJob()->getChildJobs()) > 1)
+				{
+					$this->startConcat($batchJob->getRootJob());
+				}
+				else
+				{
+					$this->clipConcatDone($batchJob);
+				}
 			}
 			elseif($this->isConcatFinished($batchJob))
 			{
-				$this->concatDone($batchJob);
+				$this->clipConcatDone($batchJob);
 			}
 		}
 		catch (Exception $ex)
@@ -518,7 +525,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @throws Exception
 	 * @throws KalturaAPIException
 	 */
-	private function concatDone(BatchJob $batchJob)
+	private function clipConcatDone(BatchJob $batchJob)
 	{
 		/** @var kConcatJobData $concatJobData */
 		$concatJobData = $batchJob->getParentJob()->getData();
