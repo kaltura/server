@@ -73,11 +73,11 @@ class kReportExportGraphEngine extends kReportExportEngine
 				{
 					continue;
 				}
-				list($key, $value) = explode(',', $pair);
+				list($key, $value) = explode($this->getDelimiter(), $pair);
 				$rows[$key][] = $value;
 			}
 		}
-		$this->writeHeaders(implode(',', $headers));
+		$this->writeRow(implode(',', $headers));
 
 		foreach ($rows as $key => $row)
 		{
@@ -99,7 +99,7 @@ class kReportExportGraphEngine extends kReportExportEngine
 				{
 					continue;
 				}
-				$data = explode(',', $value);
+				$data = explode($this->getDelimiter(), $value);
 				$id = reset($data);
 				$data = array_slice($data, 1);
 				foreach ($data as $pair)
@@ -110,7 +110,7 @@ class kReportExportGraphEngine extends kReportExportEngine
 			}
 		}
 
-		$this->writeHeaders(implode(',', $headers));
+		$this->writeRow(implode(',', $headers));
 		foreach ($rows as $id => $keys)
 		{
 			foreach ($keys as $key => $row)

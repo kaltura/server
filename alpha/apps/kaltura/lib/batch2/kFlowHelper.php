@@ -2876,18 +2876,13 @@ class kFlowHelper
 
 	protected static function createReportExportDownloadUrl($partner_id, $file_name, $expiry)
 	{
-		$regex = "/^{$partner_id}_Report_export_[a-zA-Z0-9]+_(?<fileName>[\w\-]+.csv)$/";
+		$regex = "/^{$partner_id}_Report_export_[a-zA-Z0-9]+_(?<title>[\w\-]+)$/";
 		if (!preg_match($regex, $file_name, $matches))
 		{
 			KalturaLog::err("File name doesn't match expected format");
 			return null;
 		}
 
-		// Add dc to enable redirection
-		$dc = kDataCenterMgr::getCurrentDc();
-		$file_name = $dc['id'] . "_" . $file_name;
-
-		$ksStr = "";
 		$partner = PartnerPeer::retrieveByPK ( $partner_id );
 		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
 

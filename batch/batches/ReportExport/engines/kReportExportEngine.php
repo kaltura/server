@@ -5,7 +5,6 @@
  */
 abstract class kReportExportEngine
 {
-	const FILENAME_PATTERN = "%s.csv";
 
 	protected $reportItem;
 	protected $fp;
@@ -15,7 +14,7 @@ abstract class kReportExportEngine
 
 	public function __construct($reportItem, $outputPath)
 	{
-		$this->reportItem = $reportItem;
+		$this->reportItem = $reportItem;r
 		$this->filename = $this->createFileName($outputPath);
 		$this->fp = fopen($this->filename, 'w');
 		if (!$this->fp)
@@ -27,7 +26,15 @@ abstract class kReportExportEngine
 	abstract public function createReport();
 	abstract protected function buildCsv($res);
 
-	
+	protected function getDelimiter()
+	{
+		if ($this->reportItem->responseOptions->delimiter)
+		{
+			return $this->reportItem->responseOptions->delimiter;
+		}
+		return ',';
+	}
+
 	protected function writeReportTitle($title)
 	{
 		$this->writeRow("# ------------------------------------");
@@ -58,9 +65,17 @@ abstract class kReportExportEngine
 		return md5($id);
 	}
 
-	protected function writeHeaders($headers)
+	protected function writeDelimitedRow($row)
 	{
-		fwrite($this->fp, $headers."\n");
+		if ($this->getDelimiter() == ',')
+		{
+			$this->writeRow($row);
+		}
+		else
+		{
+			$rowArr = explode($this->getDelimiter(), $row);
+			$this->writeRow(implode(',', $rowArr));
+		}
 	}
 
 	protected function writeRow($row)
@@ -70,8 +85,7 @@ abstract class kReportExportEngine
 
 	protected function createFileName($outputPath)
 	{
-		$fileName = vsprintf(self::FILENAME_PATTERN, array($this->reportItem->reportTitle));
-		$fileName = 'Report_export_' .  $this->getFileUniqueId(). '_' . $fileName;
+		$fileName = 'Report_export_' .  $this->getFileUniqueId(). '_' . $this->reportItem->reportTitle;
 
 		return $outputPath.DIRECTORY_SEPARATOR.$fileName;
 	}

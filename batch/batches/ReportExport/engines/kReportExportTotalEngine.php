@@ -15,8 +15,8 @@ class kReportExportTotalEngine extends kReportExportEngine
 	protected function buildCsv($result)
 	{
 		$this->writeReportTitle($this->reportItem->reportTitle);
-		$this->writeHeaders($result->header);
-		$this->writeRow($result->data);
+		$this->writeDelimitedRow($result->header);
+		$this->writeDelimitedRow($result->data);
 		fclose($this->fp);
 		return $this->filename;
 	}

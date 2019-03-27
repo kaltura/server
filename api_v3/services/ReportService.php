@@ -292,31 +292,14 @@ class ReportService extends KalturaBaseService
 	 * @return string
 	 * @ksOptional 
 	 */
-	public function serveAction($id)
-	{
+	public function serveAction($id) {
 		// KS verification - we accept either admin session or download privilege of the file
 		$ks = $this->getKs();
-		if (!$ks || !($ks->isAdmin() || $ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id)))
-		{
+		if(!$ks || !($ks->isAdmin() || $ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id)))
 			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
-		}
 
-		$exportFileNameRegex = "/^(?<dc>[01]+)_(?<id>[0-9]+_Report_export_[a-zA-Z0-9]+_[\w]+.csv)$/";
-
-		if (preg_match($exportFileNameRegex, $id, $matches))
-		{
-			//export
-			$currentDc = kDataCenterMgr::getCurrentDcId();
-			if ($matches['dc'] == 1 - $currentDc)
-			{
-				kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId(1 - $currentDc));
-			}
-			$id = $matches['id'];
-		}
-		elseif (!preg_match('/^[\w-_]*$/', $id))
-		{
+		if(!preg_match('/^[\w-_]*$/', $id))
 			throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
-		}
 
 		$partner_id = $this->getPartnerId();
 		$folderPath = "/content/reports/$partner_id";
