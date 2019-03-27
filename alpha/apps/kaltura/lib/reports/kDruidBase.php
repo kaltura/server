@@ -73,6 +73,7 @@ class kDruidBase
 	const DRUID_LOWER_STRICT = 'lowerStrict';
 	const DRUID_UPPER_STRICT = 'upperStrict';
 	const DRUID_ORDERING = 'ordering';
+	const DRUID_DOUBLE_LEAST = 'doubleLeast';
 	
 	// druid response keywords
 	const DRUID_TIMESTAMP = 'timestamp';
@@ -251,7 +252,16 @@ class kDruidBase
 			self::DRUID_FIELD_NAME => $fieldName
 		);
 	}
-	
+
+	protected static function getDoubleLeastPostAggregator($name, $fields)
+	{
+		return array(
+			self::DRUID_TYPE => self::DRUID_DOUBLE_LEAST,
+			self::DRUID_NAME => $name,
+			self::DRUID_FIELDS => $fields
+		);
+	}
+
 	protected static function getOrderByColumnSpec($dimension, $direction, $type)
 	{
 		return array(

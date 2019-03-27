@@ -2127,10 +2127,14 @@ class kKavaReportsMgr extends kKavaBase
 						self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_USERS),
 						self::getNormalizedScoreFactor(2.5, $maxUniqueUsers)
 					),
-					self::getConstantFactorPostAggr('score_unique_percentiles',
-						self::getFieldRatioPostAggr('avg_unique_percentiles',
-							self::METRIC_UNIQUE_PERCENTILES_SUM,
-							self::EVENT_TYPE_PLAY), 0.025
+					self::getDoubleLeastPostAggregator('score_unique_percentiles', array(
+						self::getConstantFactorPostAggr('score_unique_percentiles_agg',
+							self::getFieldRatioPostAggr('avg_unique_percentiles',
+								self::METRIC_UNIQUE_PERCENTILES_SUM,
+								self::EVENT_TYPE_PLAY), 0.025
+						),
+						self::getConstantPostAggregator('c', 2.5)
+						)
 					)
 				)
 			)
