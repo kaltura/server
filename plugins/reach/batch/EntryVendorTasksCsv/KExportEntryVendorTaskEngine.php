@@ -40,7 +40,7 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 		$pager->pageSize = 500;
 		$pager->pageIndex = 1;
 		
-		$this->addHeaderRowToCsv($csvFile);
+		$this->addHeaderRowToCsv($csvFile, array());
 		$lastCreatedAt = 0;
 		$totalCount = 0;
 		$filter->orderBy = KalturaEntryVendorTaskOrderBy::CREATED_AT_ASC;
