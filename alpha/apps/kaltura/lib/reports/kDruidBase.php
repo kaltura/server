@@ -46,6 +46,7 @@ class kDruidBase
 	const DRUID_COMMENT = 'comment';		// Note: not really defined in druid, anything we put on the context of the query gets printed to log
 	const DRUID_PRIORITY = 'priority';
 	const DRUID_SKIP_EMPTY_BUCKETS = 'skipEmptyBuckets';
+	const DRUID_TIMEOUT = 'timeout';
 	const DRUID_AND = 'and';
 	const DRUID_DIRECTION = 'direction';
 	const DRUID_DIMENSION_ORDER = 'dimensionOrder';
@@ -82,9 +83,11 @@ class kDruidBase
 	const DRUID_ERROR = 'error';
 	const DRUID_ERROR_CLASS = 'errorClass';
 	const DRUID_ERROR_MSG = 'errorMessage';
-	
+
+	// kConf params
 	const DRUID_URL = "druid_url";
-	
+	const DRUID_QUERY_TIMEOUT = 'druid_timeout';
+
 	const COMMENT_MARKER = '@COMMENT@';
 
 	protected static $curl_handle = null;
@@ -296,6 +299,12 @@ class kDruidBase
 
 		$content[self::DRUID_CONTEXT][self::DRUID_COMMENT] = self::COMMENT_MARKER;
 
+		$timeout = kConf::get(self::DRUID_QUERY_TIMEOUT, 'local', null);
+		if ($timeout)
+		{
+			$content[self::DRUID_CONTEXT][self::DRUID_TIMEOUT] = intval($timeout);
+		}
+
 		KalturaLog::log('{' . print_r($content, true) . '}');
 
 		$post = json_encode($content);
@@ -356,8 +365,15 @@ class kDruidBase
 			}
 
 			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
 			if ($httpCode != KCurlHeaderResponse::HTTP_STATUS_OK)
 			{
+				if (strpos($response, 'Query timeout') !== false)
+				{
+					KalturaLog::err('Druid Query timed out.');
+					throw new kCoreException("Druid Query timed out", kCoreException::DRUID_QUERY_TIMED_OUT);
+				}
+
 				throw new Exception('Got invalid status code from druid: ' . $httpCode);
 			}
 
