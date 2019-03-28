@@ -5,7 +5,19 @@
  - Issue ID: AN-188
 
 ### Configuration ###
- - Update batch.ini file from the environment-specific repository
+ Add the following enabled workers and worker configuration:
+	enabledWorkers.KAsyncReportExport = XXXX (Where XXX is the amount of workers you want to run)
+	
+	[KAsyncReportExport : JobHandlerWorker]
+	id                    = 730
+	friendlyName          = Reports export
+	type                  = KAsyncReportExport
+	maximumExecutionTime  = 12000
+	scriptPath		     = batches/ReportExport/KAsyncReportExportExe.php
+	params.localTempPath  = @TMP_DIR@/reports
+	params.sharedTempPath = @WEB_DIR@/apptemp-shared/reports
+	
+	Make sure to modify @TMP_DIR@ && @WEB_DIR@ settings
 
 ### Deployment Scripts ###
      php deployment/updates/scripts/2019_03_25_report_add_export_to_csv_permission.php
@@ -41,7 +53,25 @@ php deployment/updates/scripts/add_permissions/2019_03_10_add_group_permission.p
  - Issue ID: PSVAMB-6047
  
 ### Configuration ### 
- - Update batch.ini file from the environment-specific repository
+ Update batch.ini file with the following changes:
+	
+	Remove the following enabled workers and worker configuration:
+	KAsyncUsersCsv
+	KAsyncEntryVendorTasksCsv
+	
+	Add the following enabled workers and worker configuration:
+	enabledWorkers.KAsyncExportCsv = XXXX (Where XXX is the amount of workers you want to run)
+	
+	[KAsyncExportCsv : JobHandlerWorker]
+	id                      = 690
+	friendlyName            = Export Csv
+	type                    = KAsyncExportCsv
+	params.localTempPath    = @TMP_DIR@/exportcsv
+	params.sharedTempPath   = @WEB_DIR@/tmp/exportcsv
+	scriptPath              = batches/ExportCsv/kAsyncExportCsvExe.php
+	maximumExecutionTime    = 3600
+	
+	Make sure to modify @TMP_DIR@ && @WEB_DIR@ settings
 
 ### Deployment Scripts ### 
      php deployment/base/scripts/installPlugins.php 
