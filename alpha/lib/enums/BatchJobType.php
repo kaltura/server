@@ -51,4 +51,5 @@ interface BatchJobType extends BaseEnum
 	const CLIP_CONCAT = 47;
 	const COPY_CUE_POINTS = 48;
 	const EXPORT_CSV = 49;
+	const REPORT_EXPORT = 50;
 }
