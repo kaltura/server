@@ -4,7 +4,7 @@
 			"mapping": { "total_fields": { "limit": "2000" } }
 		},
 		"number_of_shards" : 6,
-		"number_of_replicas" : 0,
+		"number_of_replicas" : 1,
 		"analysis": {
 			"char_filter": {
 				"kaltura_whitespace_filter": {
