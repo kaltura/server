@@ -1,4 +1,15 @@
 # Naos 14.17.0 #
+
+## Report Service - Export to CSV ##
+ - Issue Type: Task
+ - Issue ID: AN-188
+
+### Configuration ###
+ - Update batch.ini file from the environment-specific repository
+
+### Deployment Scripts ###
+     php deployment/updates/scripts/2019_03_25_report_add_export_to_csv_permission.php
+
 ## adding support for copying a group ##
 
 - Issue Type: Task
