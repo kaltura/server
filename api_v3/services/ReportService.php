@@ -179,7 +179,7 @@ class ReportService extends KalturaBaseService
 		$kResponseOptions = $responseOptions->toObject();
 
 		$isCsv = false;
-		if(kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
+		if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
 		{
 			$isCsv = true;
 		}
@@ -406,10 +406,7 @@ class ReportService extends KalturaBaseService
 	 */
 	public function exportToCsvAction(KalturaReportExportParams $params)
 	{
-		if (!$params->reportItems)
-		{
-			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER);
-		}
+		$this->validateReportExportParams($params);
 
 		if (!$params->recipientEmail)
 		{
@@ -433,6 +430,24 @@ class ReportService extends KalturaBaseService
 		$response->reportEmail = $params->recipientEmail;
 
 		return $response;
+	}
+
+	protected function validateReportExportParams(KalturaReportExportParams $params)
+	{
+		if (!$params->reportItems)
+		{
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER);
+		}
+		foreach ($params->reportItems as $reportItem)
+		{
+			/**
+			 * @var KalturaReportExportItem $reportItem
+			 */
+			if (!$reportItem->action || !$reportItem->reportType || !$reportItem->filter)
+			{
+				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER);
+			}
+		}
 	}
 
 	protected function parseParamsStr($paramsStr)

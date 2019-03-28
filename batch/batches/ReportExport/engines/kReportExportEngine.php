@@ -5,6 +5,7 @@
  */
 abstract class kReportExportEngine
 {
+	const DEFAULT_TITLE = 'default';
 
 	protected $reportItem;
 	protected $fp;
@@ -28,16 +29,26 @@ abstract class kReportExportEngine
 
 	protected function getDelimiter()
 	{
-		if ($this->reportItem->responseOptions->delimiter)
+		if ($this->reportItem->responseOptions && $this->reportItem->responseOptions->delimiter)
 		{
 			return $this->reportItem->responseOptions->delimiter;
 		}
 		return ',';
 	}
 
-	protected function writeReportTitle($title)
+	protected function getTitle()
+	{
+		if ($this->reportItem->reportTitle)
+		{
+			return $this->reportItem->reportTitle;
+		}
+		return self::DEFAULT_TITLE;
+	}
+
+	protected function writeReportTitle()
 	{
 		$this->writeRow("# ------------------------------------");
+		$title = $this->getTitle();
 		$this->writeRow("Report: $title");
 		$this->writeFilterData();
 		$this->writeRow("# ------------------------------------");
@@ -46,13 +57,13 @@ abstract class kReportExportEngine
 	protected function writeFilterData()
 	{
 		$filter = $this->reportItem->filter;
-		if ($filter->toDay && $filter->fromDay)
+		if ($filter && $filter->toDay && $filter->fromDay)
 		{
 			$fromDate = strtotime(date('Y-m-d 00:00:00', strtotime($filter->fromDay)));
 			$toDate = strtotime(date('Y-m-d 23:59:59', strtotime($filter->toDay)));
 			$this->writeRow("Filtered dates (Unix time): $fromDate - $toDate");
 		}
-		else if ($filter->toDate && $filter->fromDate)
+		else if ($filter && $filter->toDate && $filter->fromDate)
 		{
 			$this->writeRow("Filtered dates (Unix time): $filter->fromDate - $filter->toDate");
 		}
@@ -85,7 +96,7 @@ abstract class kReportExportEngine
 
 	protected function createFileName($outputPath)
 	{
-		$fileName = 'Report_export_' .  $this->getFileUniqueId(). '_' . $this->reportItem->reportTitle;
+		$fileName = 'Report_export_' .  $this->getFileUniqueId(). '_' . $this->getTitle();
 
 		return $outputPath.DIRECTORY_SEPARATOR.$fileName;
 	}

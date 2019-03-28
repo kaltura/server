@@ -5,7 +5,7 @@
  */
 interface ReportExportItemType extends BaseEnum
 {
-	const TABLE = 0;
-	const TOTAL = 1;
-	const GRAPH = 2;
+	const TABLE = 1;
+	const TOTAL = 2;
+	const GRAPH = 3;
 }

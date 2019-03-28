@@ -20,7 +20,7 @@ class kReportExportTableEngine extends kReportExportEngine
 
 	protected function buildCsv($result)
 	{
-		$this->writeReportTitle($this->reportItem->reportTitle);
+		$this->writeReportTitle();
 		$this->writeDelimitedRow($result->header);
 
 		$rows = explode(';', $result->data);
