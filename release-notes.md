@@ -74,8 +74,8 @@ php deployment/updates/scripts/add_permissions/2019_03_10_add_group_permission.p
 	Make sure to modify @TMP_DIR@ && @WEB_DIR@ settings
 
 ### Deployment Scripts ### 
-     php deployment/base/scripts/installPlugins.php 
-     php deployment/updates/scripts/add_permissions/2019_03_17_add_esearch_permissions_and_items.php 
+     php /opt/kaltura/app/deployment/base/scripts/installPlugins.php 
+     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_03_17_add_exportcsv_permissions_and_items.php
 
 ## Change wording and support empty instance_id metadata in KMS email notifications ##
  - Issue Type: Task
