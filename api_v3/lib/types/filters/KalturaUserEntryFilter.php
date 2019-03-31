@@ -25,11 +25,17 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 	 * @var string
 	 */
 	public $privacyContextIn;
-	
+
+	/**
+	 * @var int
+	 */
+	public $partnerId;
+
 	static private $map_between_objects = array
 	(
 		"privacyContextEqual" => "_eq_privacy_context",
 		"privacyContextIn" => "_in_privacy_context",
+		"partnerId" => "_eq_partner_id"
 	);
 	
 	public function getMapBetweenObjects()
@@ -143,12 +149,22 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 	 */
 	protected function fixFilterUserId()
 	{
+
+		if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
+		{
+			$partner_id = $this->partnerId;
+		}
+		else
+		{
+			$partner_id = kCurrentContext::getCurrentPartnerId();
+		}
+
 		if ($this->userIdEqual !== null)
 		{
 			if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID) //batch should be able to get userEntry objects of deleted users.
 				kuserPeer::setUseCriteriaFilter(false);
 
-			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->userIdEqual);
+			$kuser = kuserPeer::getKuserByPartnerAndUid($partner_id, $this->userIdEqual);
 			kuserPeer::setUseCriteriaFilter(true);
 			if ($kuser)
 				$this->userIdEqual = $kuser->getId();
@@ -158,33 +174,41 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 
 		if(!empty($this->userIdIn))
 		{
-			$this->userIdIn = $this->preparePusersToKusersFilter( $this->userIdIn );
+			$this->userIdIn = $this->preparePusersToKusersFilter($this->userIdIn, $partner_id);
 		}
 		if(!empty($this->userIdNotIn))
 		{
-			$this->userIdNotIn = $this->preparePusersToKusersFilter( $this->userIdNotIn );
+			$this->userIdNotIn = $this->preparePusersToKusersFilter($this->userIdNotIn, $partner_id);
 		}
 
 		if(!is_null($this->isAnonymous))
 		{
 			if(KalturaNullableBoolean::toBoolean($this->isAnonymous)===false)
-				$this->userIdNotIn .= self::getListOfAnonymousUsers();
+				$this->userIdNotIn .= self::getListOfAnonymousUsers($partner_id);
 
 			elseif(KalturaNullableBoolean::toBoolean($this->isAnonymous)===true)
-				$this->userIdIn .= self::getListOfAnonymousUsers();
+				$this->userIdIn .= self::getListOfAnonymousUsers($partner_id);
 		}
 	}
 
-	public static function getListOfAnonymousUsers()
+	public static function getListOfAnonymousUsers($partner_id = null)
 	{
 		$anonKuserIds = "";
-		$anonKusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), array(0,''));
+		if (isset($partner_id))
+		{
+			$currentPartnerId = $partner_id;
+		}
+		else
+		{
+			$currentPartnerId = kCurrentContext::getCurrentPartnerId();
+		}
+		$anonKusers = kuserPeer::getKuserByPartnerAndUids($currentPartnerId, array(0,''));
 		foreach ($anonKusers as $anonKuser) {
 			$anonKuserIds .= ",".$anonKuser->getKuserId();
 		}
 		return $anonKuserIds;
 	}
-	
+
 	public function getEmptyListResponse()
 	{
 		$res = new KalturaUserEntryListResponse();
@@ -192,4 +216,5 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		$res->totalCount = 0;
 		return $res;
 	}
+	
 }

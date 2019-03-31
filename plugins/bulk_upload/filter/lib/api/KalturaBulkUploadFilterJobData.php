@@ -46,6 +46,10 @@ class KalturaBulkUploadFilterJobData extends KalturaBulkUploadJobData
 	           	$dbData->setTemplateObject(new categoryEntry());
 	           	$this->templateObject->toObject($dbData->getTemplateObject());
 	            break;
+		case 'KalturUserEntry':
+			$dbData->setTemplateObject(new QuizUserEntry());
+			$this->templateObject->toObject($dbData->getTemplateObject());
+			break;
 	        default:
 	            break;
 	    }
@@ -70,6 +74,9 @@ class KalturaBulkUploadFilterJobData extends KalturaBulkUploadJobData
 	        case 'entryFilter':
 	            $this->filter = new KalturaBaseEntryFilter();
 	            break;
+		case 'UserEntryFilter':
+		    $this->filter = new KalturaUserEntryFilter();
+		    break;
 	        default:
 	            break;
 	    }
@@ -86,6 +93,9 @@ class KalturaBulkUploadFilterJobData extends KalturaBulkUploadJobData
 	        case 'categoryEntry':
 	            $this->templateObject = new KalturaCategoryEntry();
 	            break;
+		case 'userEntry':
+		   $this->templateObject = new KalturaQuizUserEntry();
+		   break;
 	        default:
 	            break;
 	    }
