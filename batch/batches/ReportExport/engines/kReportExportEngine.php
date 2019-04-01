@@ -69,13 +69,6 @@ abstract class kReportExportEngine
 		}
 	}
 
-	protected function getFileUniqueId()
-	{
-		$id = print_r($this->reportItem, true);
-		$id .= uniqid();
-		return md5($id);
-	}
-
 	protected function writeDelimitedRow($row)
 	{
 		if ($this->getDelimiter() == ',')
@@ -96,7 +89,7 @@ abstract class kReportExportEngine
 
 	protected function createFileName($outputPath)
 	{
-		$fileName = 'Report_export_' .  $this->getFileUniqueId();
+		$fileName = 'Report_export_' . uniqid();
 
 		return $outputPath.DIRECTORY_SEPARATOR.$fileName;
 	}
