@@ -20,7 +20,7 @@
 	Make sure to modify @TMP_DIR@ && @WEB_DIR@ settings
 
 ### Deployment Scripts ###
-     php deployment/updates/scripts/2019_03_25_report_add_export_to_csv_permission.php
+     php deployment/updates/scripts/add_permissions/2019_03_25_report_add_export_to_csv_permission.php
 
 ## adding support for copying a group ##
 
