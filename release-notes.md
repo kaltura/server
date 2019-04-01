@@ -1,6 +1,6 @@
 # Naos 14.18.0 #
 
-## Change wording and support empty instance_id metadata in KMS email notifications ##
+## Update "comment added" KMS notification body - fix the link ##
  - Issue Type: Bugfix
  - Issue IDs: PSVAMB-6933
 
