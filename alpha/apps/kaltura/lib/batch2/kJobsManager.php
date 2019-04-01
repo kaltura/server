@@ -1799,6 +1799,32 @@ class kJobsManager
 		return self::getFileContainerByFileSync($fileSync);
 	}
 
+	public static function addExportReportJob(KalturaReportExportParams $params)
+	{
+		// Calculate time offset from server time to UTC
+		$dateTimeZoneServer = new DateTimeZone(kConf::get('date_default_timezone'));
+		$dateTimeZoneUTC = new DateTimeZone("UTC");
+		$dateTimeUTC = new DateTime("now", $dateTimeZoneUTC);
+		$timeOffsetSeconds = -1 * $dateTimeZoneServer->getOffset($dateTimeUTC);
+
+		$jobData = new kReportExportJobData();
+		$coreParams = $params->toObject();
+
+		$jobData->setRecipientEmail($coreParams->getRecipientEmail());
+		$jobData->setReportItems($coreParams->getReportItems());
+
+		$offset = $timeOffsetSeconds - ($params->timeZoneOffset * 60);// Convert minutes to seconds
+		$jobData->setTimeZoneOffset($offset);
+		$jobData->setTimeReference(time());
+
+		$job = new BatchJob();
+		$job->setPartnerId(kCurrentContext::getCurrentPartnerId());
+		$job->setJobType(BatchJobType::REPORT_EXPORT);
+		$job->setData($jobData);
+
+		return self::addJob($job, $jobData, BatchJobType::REPORT_EXPORT);
+	}
+
 	protected static function getAssetEncyptionKey($assetId)
 	{
 		if (!$assetId)
@@ -1865,19 +1891,12 @@ class kJobsManager
 		return $shouldBlock;
 	}
 
-	public static function addUsersCsvJob($partnerId, baseObjectFilter $filter, $metadataProfileId, $additionalFields, $kuser)
+	public static function addExportCsvJob(kExportCsvJobData $jobData, $partnerId, $exportObjectType)
 	{
-		$jobData = new kUsersCsvJobData();
-		$jobData->setFilter($filter);
-		$jobData->setMetadataProfileId($metadataProfileId);
-		$jobData->setAdditionalFields($additionalFields);
-		$jobData->setUserMail($kuser->getEmail());
-		$jobData->setUserName($kuser->getPuserId());
-
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($partnerId);
-
-		return self::addJob($batchJob, $jobData, BatchJobType::USERS_CSV);
+		
+		return self::addJob($batchJob, $jobData, BatchJobType::EXPORT_CSV, $exportObjectType);
 	}
 
 	public static function addMultiClipCopyCuePointsJob($destEntryID, $partnerId, $kClipDescriptionArray)

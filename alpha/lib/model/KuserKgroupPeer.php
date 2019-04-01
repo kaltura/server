@@ -151,4 +151,17 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 	{
 		return array(array("kuserKgroup:kuserId=%s", self::KUSER_ID));		
 	}
+
+	/**
+	 * @param int $kgroupId
+	 */
+	static public function retrieveKuserKgroupByKgroupId ($kgroupId)
+	{
+
+		$criteria = new Criteria();
+		$criteria->add(KuserKgroupPeer::KGROUP_ID, $kgroupId);
+		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
+
+		return KuserKgroupPeer::doSelect($criteria);
+	}
 } // KuserKgroupPeer

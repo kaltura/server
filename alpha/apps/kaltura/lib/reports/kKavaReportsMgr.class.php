@@ -1332,8 +1332,8 @@ class kKavaReportsMgr extends kKavaBase
 		),
 
 		myReportsMgr::REPORT_TYPE_USER_ENGAGEMENT_TIMELINE => array(
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_PERCENTILES_RATIO),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_PERCENTILES_RATIO),
 		),
 
 		myReportsMgr::REPORT_TYPE_UNIQUE_USERS_PLAY => array(
@@ -2127,10 +2127,14 @@ class kKavaReportsMgr extends kKavaBase
 						self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_USERS),
 						self::getNormalizedScoreFactor(2.5, $maxUniqueUsers)
 					),
-					self::getConstantFactorPostAggr('score_unique_percentiles',
-						self::getFieldRatioPostAggr('avg_unique_percentiles',
-							self::METRIC_UNIQUE_PERCENTILES_SUM,
-							self::EVENT_TYPE_PLAY), 0.025
+					self::getDoubleLeastPostAggregator('score_unique_percentiles', array(
+						self::getConstantFactorPostAggr('score_unique_percentiles_agg',
+							self::getFieldRatioPostAggr('avg_unique_percentiles',
+								self::METRIC_UNIQUE_PERCENTILES_SUM,
+								self::EVENT_TYPE_PLAY), 0.025
+						),
+						self::getConstantPostAggregator('c', 2.5)
+						)
 					)
 				)
 			)
@@ -2659,6 +2663,11 @@ class kKavaReportsMgr extends kKavaBase
 		return array_map('reset', $rows);
 	}
 
+	protected static function getEntryKuserDimension($data_source)
+	{
+		return in_array($data_source, array(self::DATASOURCE_ENTRY_LIFECYCLE, self::DATASOURCE_STORAGE_USAGE)) ? self::DIMENSION_KUSER_ID : self::DIMENSION_ENTRY_OWNER_ID;
+	}
+
 	protected static function getDruidFilter($partner_id, $report_def, $input_filter, $object_ids, $response_options)
 	{
 		$druid_filter = array();
@@ -2833,10 +2842,11 @@ class kKavaReportsMgr extends kKavaBase
 			);
 		}
 
+		$data_source = self::getDataSource($report_def);
 		if ($input_filter->owners != null)
 		{
 			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_ENTRY_OWNER_ID,
+				self::DRUID_DIMENSION => self::getEntryKuserDimension($data_source),
 				self::DRUID_VALUES => self::getKuserIds(array(), $input_filter->owners, $partner_id, $response_options->getDelimiter()),
 			);
 		}

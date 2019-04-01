@@ -74,7 +74,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	public static function getEnums($baseEnumName = null)
 	{
 		if (is_null($baseEnumName))
-			return array('SyncReachCreditTaskBatchType', 'ReachConditionType', 'ReachEntryVendorTasksCsvBatchType', 'ReachRuleActionType');
+			return array('SyncReachCreditTaskBatchType', 'ReachConditionType', 'ReachEntryVendorTasksCsvBatchType', 'ReachRuleActionType', 'EntryVendorTaskExportObjectType');
 		
 		if ($baseEnumName == 'BatchJobType')
 			return array('SyncReachCreditTaskBatchType', 'ReachEntryVendorTasksCsvBatchType');
@@ -84,6 +84,9 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		
 		if ($baseEnumName == 'RuleActionType')
 			return array('ReachRuleActionType');
+		
+		if ($baseEnumName == 'ExportObjectType')
+			return array('EntryVendorTaskExportObjectType');
 		
 		return array();
 	}
@@ -205,6 +208,15 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	}
 	
 	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getExportTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('ExportObjectType', $value);
+	}
+	
+	/**
 	 * @return string external API value of dynamic enum.
 	 */
 	public static function getApiValue($valueName)
@@ -243,6 +255,18 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 				return new KalturaEntryVendorTaskCsvJobData();
 			}
 		}
+		
+		if($baseClass == 'KalturaJobData' && $enumValue == BatchJobType::EXPORT_CSV && (isset($constructorArgs['coreJobSubType']) &&  $constructorArgs['coreJobSubType']== self::getExportTypeCoreValue(EntryVendorTaskExportObjectType::ENTRY_VENDOR_TASK)))
+		{
+			return new KalturaEntryVendorTaskCsvJobData();
+		}
+		
+		if ($baseClass == 'KObjectExportEngine' && $enumValue == KalturaExportObjectType::ENTRY_VENDOR_TASK)
+		{
+			return new KExportEntryVendorTaskEngine($constructorArgs);
+		}
+		
+		
 		return null;
 	}
 	

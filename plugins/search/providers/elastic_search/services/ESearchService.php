@@ -56,6 +56,28 @@ class ESearchService extends KalturaBaseService
 		$response->totalCount = $objectCount;
 		return $response;
 	}
+	
+	/**
+	 * Creates a batch job that sends an email with a link to download a CSV containing a list of entries
+	 *
+	 * @action entryExportToCsv
+	 * @actionAlias media.exportToCsv
+	 * @param KalturaMediaEsearchExportToCsvJobData $data job data indicating filter to pass to the job
+	 * @return string
+	 *
+	 * @throws APIErrors::USER_EMAIL_NOT_FOUND
+	 */
+	public function entryExportToCsvAction (KalturaMediaEsearchExportToCsvJobData $data)
+	{
+		if(!$data->userName || !$data->userMail)
+			throw new KalturaAPIException(APIErrors::USER_EMAIL_NOT_FOUND, $kuser);
+		
+		$kJobdData = $data->toObject(new kMediaEsearchExportToCsvJobData());
+		
+		kJobsManager::addExportCsvJob($kJobdData, $this->getPartnerId(), ElasticSearchPlugin::getExportTypeCoreValue(EsearchMediaEntryExportObjectType::ESEARCH_MEDIA));
+		
+		return $data->userMail;
+	}
 
 	/**
 	 * @param kBaseSearch $coreSearchObject

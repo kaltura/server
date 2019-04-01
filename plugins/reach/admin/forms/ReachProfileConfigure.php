@@ -118,6 +118,11 @@ class Form_ReachProfileConfigure extends ConfigureForm
 		$contentDeletionPolicy->setLabel('Content Deletion Policy:');
 		$contentDeletionPolicy->setValue(Kaltura_Client_Reach_Enum_ReachProfileContentDeletionPolicy::DELETE_ONCE_PROCESSED);
 		$this->addElement($contentDeletionPolicy);
+		
+		$vendorTaskProcessingRegion = new Kaltura_Form_Element_EnumSelect('vendorTaskProcessingRegion', array('enum' => 'Kaltura_Client_Reach_Enum_VendorTaskProcessingRegion'));
+		$vendorTaskProcessingRegion->setLabel('Task Processing Region:');
+		$vendorTaskProcessingRegion->setValue(Kaltura_Client_Reach_Enum_VendorTaskProcessingRegion::US);
+		$this->addElement($vendorTaskProcessingRegion);
 
 		$this->addElement('text', 'maxCharactersPerCaptionLine', array(
 			'label' => 'Max Characters Per Caption Line:',
@@ -277,7 +282,10 @@ class Form_ReachProfileConfigure extends ConfigureForm
 					$action->catalogItemIds = $rule->catalogItemIds;
 					$description = (empty($rule->description) || $rule->description == self::ADMIN_CONSOLE_RULE_PREFIX) ? (self::ADMIN_CONSOLE_RULE_PREFIX . mt_rand(100000, 999999)) : $rule->description;
 					$condition = new Kaltura_Client_Type_BooleanEventNotificationCondition();
-					$condition->booleanEventNotificationIds = $rule->booleanEventNotificationIds;
+					if (isset($rule->booleanEventNotificationIds))
+					{
+						$condition->booleanEventNotificationIds = $rule->booleanEventNotificationIds;
+					}
 					$rulesArray[] = $this->getReachProfileRule(array($action), array($condition), $description);
 
 				}

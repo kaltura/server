@@ -185,4 +185,11 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		return $anonKuserIds;
 	}
 	
+	public function getEmptyListResponse()
+	{
+		$res = new KalturaUserEntryListResponse();
+		$res->objects = array();
+		$res->totalCount = 0;
+		return $res;
+	}
 }
