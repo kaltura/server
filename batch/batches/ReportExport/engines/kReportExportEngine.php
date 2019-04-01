@@ -72,7 +72,7 @@ abstract class kReportExportEngine
 	protected function getFileUniqueId()
 	{
 		$id = print_r($this->reportItem, true);
-		$id .= time();
+		$id .= uniqid();
 		return md5($id);
 	}
 
