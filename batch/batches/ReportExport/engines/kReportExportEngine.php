@@ -96,7 +96,7 @@ abstract class kReportExportEngine
 
 	protected function createFileName($outputPath)
 	{
-		$fileName = 'Report_export_' .  $this->getFileUniqueId(). '_' . $this->getTitle();
+		$fileName = 'Report_export_' .  $this->getFileUniqueId();
 
 		return $outputPath.DIRECTORY_SEPARATOR.$fileName;
 	}
