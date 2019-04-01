@@ -188,6 +188,10 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 			case VendorServiceFeature::ALIGNMENT:
 				$object = new KalturaVendorAlignmentCatalogItem();
 				break;
+			
+			case VendorServiceFeature::AUDIO_DESCRIPTION:
+				$object = new KalturaVendorAudioDescriptionCatalogItem();
+				break;
 
 			default:
 				$object = new KalturaVendorCaptionsCatalogItem();

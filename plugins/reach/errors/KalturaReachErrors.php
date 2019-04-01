@@ -24,6 +24,8 @@ class KalturaReachErrors implements kReachErrors
 	const VENDOR_CATALOG_ITEM_ALREADY_ENABLED_ON_PARTNER = "VENDOR_CATALOG_ITEM_ALREADY_ENABLED_ON_PARTNER;ID,PARTNER_ID;Vendor catalog item with id [@ID@] already enabled for partner [@PARTNER_ID@]";
 	
 	const CATALOG_ITEM_NOT_ENABLED_FOR_ACCOUNT = "CATALOG_ITEM_NOT_ENABLED_FOR_ACCOUNT;ID;Catalog item with id provided [@ID@], is not enabled on account level";
+	
+	const CATALOG_ITEM_ONLY_HUMAN_ALLOWED = "CATALOG_ITEM_ONLY_HUMAN_ALLOWED;;Only human service type is allowed for given vendor catalog item";
 
 	/* Reach Profile */
 
