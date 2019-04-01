@@ -14,8 +14,10 @@ class ElasticIndexRotationWorker
 
 	protected $configSection;
 	protected $dryRun;
+	protected $handleUnusedIndices;
 
 	//section config
+	/* @var elasticClient $client */
 	protected $client;
 	protected $indexPattern;
 	protected $indexAlias;
@@ -24,10 +26,11 @@ class ElasticIndexRotationWorker
 	protected $mappingPath;
 	protected $indexDateFormat;
 
-	public function __construct($configSection, $dryRun)
+	public function __construct($configSection, $dryRun, $handleUnusedIndices = false)
 	{
 		$this->configSection = $configSection;
 		$this->dryRun = $dryRun;
+		$this->handleUnusedIndices = $handleUnusedIndices;
 	}
 
 	public function rotate()
@@ -189,6 +192,61 @@ class ElasticIndexRotationWorker
 		$aliasesToAdd[] = new ElasticIndexAlias($newIndex, $this->indexAlias);
 
 		$this->changeAliases($aliasesToAdd, $aliasesToRemove);
+
+		if($this->handleUnusedIndices)
+		{
+			$this->handleUnusedIndices();
+		}
+	}
+
+	protected function handleUnusedIndices()
+	{
+		$indicesToDelete = $this->getUnusedIndicesToHandle();
+		$this->deleteIndices($indicesToDelete);
+	}
+
+	protected function deleteIndices($indicesToDelete)
+	{
+		if(!$indicesToDelete)
+		{
+			KalturaLog::debug("No indices to delete");
+			return;
+		}
+
+		$indicesToDeleteString = implode(",", $indicesToDelete);
+		if($this->dryRun)
+		{
+			KalturaLog::debug("Dry run - deleting indices {$indicesToDeleteString}");
+		}
+		else
+		{
+			$response = $this->client->deleteIndex($indicesToDeleteString);
+			if (!$response)
+			{
+				die("Could not delete indices: {$indicesToDeleteString}\n");
+			}
+		}
+	}
+
+	protected function getUnusedIndicesToHandle()
+	{
+		list($currentIndexingIndices, $currentSearchingIndices) = $this->getCurrentStateMap();
+		$indicesToDelete = array();
+		$response = $this->client->getIndicesForIndexPattern($this->indexPattern . '*');
+		if (!$response)
+		{
+			die("Could not get indices info\n");
+		}
+
+		foreach ($response as $indexName => $arr)
+		{
+			if(!array_key_exists($indexName, $currentSearchingIndices))
+			{
+				$indicesToDelete[] = $indexName;
+			}
+		}
+
+		return $indicesToDelete;
 	}
 
 	/**
