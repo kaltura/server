@@ -1,3 +1,15 @@
+# Naos 14.18.0 #
+
+## Change wording and support empty instance_id metadata in KMS email notifications ##
+ - Issue Type: Bugfix
+ - Issue IDs: PSVAMB-6933
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/2019_04_01_fix_comment_notification_template.php
+
 # Naos 14.17.0 #
 
 ## Report Service - Export to CSV ##
