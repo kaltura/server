@@ -2876,7 +2876,7 @@ class kFlowHelper
 
 	protected static function createReportExportDownloadUrl($partner_id, $file_name, $expiry)
 	{
-		$regex = "/^{$partner_id}_Report_export_[a-zA-Z0-9]+_(?<title>[\w\-]+)$/";
+		$regex = "/^{$partner_id}_Report_export_[a-zA-Z0-9]+$/";
 		if (!preg_match($regex, $file_name, $matches))
 		{
 			KalturaLog::err("File name doesn't match expected format");
