@@ -8,7 +8,14 @@
 None
 
 ### Deployment scripts ###
-php /opt/kaltura/app/deployment/updates/scripts/2019_04_01_fix_comment_notification_template.php
+
+First replace all tokens in the XML file below and remove ".template" from the fle name:
+
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_04_01_fix_comment_notification_template.template.xml
+
+Run deployment script:
+
+    php /opt/kaltura/app/deployment/updates/scripts/2019_04_01_fix_comment_notification_template.php
 
 # Naos 14.17.0 #
 
