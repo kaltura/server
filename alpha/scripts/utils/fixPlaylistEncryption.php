@@ -2,15 +2,23 @@
 ini_set("memory_limit","1024M");
 require_once(__DIR__ . '/../bootstrap.php');
 require_once(dirname(__FILE__).'/../bootstrap.php');
-if (count($argv) < 4)
+if (count($argv) < 3)
 {
-	echo "php $argv[0] {partnerId} {logFilePath} {onlyLog}.\n";
+	echo "php $argv[0] {partnerId} {logFilePath} <fixCorrupted>.\n";
+	echo "for example: php /opt/kaltura/app/alpha/scripts/utils/fixPlaylistEncryption.php 2301 /tmp/playlistLog.txt true\n";
 	die ('Missing arguments.\n');
 }
 
 $partnerId = $argv[1];
 $logFilePath = $argv[2];
-$onlyLog = $argv[3];
+if (count($argv) > 3)
+{
+	$fixCorrupted = $argv[3];
+}
+else
+{
+	$fixCorrupted = "false";
+}
 
 if (!PartnerPeer::retrieveByPK($partnerId))
 {
@@ -18,13 +26,14 @@ if (!PartnerPeer::retrieveByPK($partnerId))
 }
 
 $logFile = fopen("$logFilePath", "a") or die("Unable to open file!");
-fwrite($logFile, "Running fix playlistEncryption script for partner {$partnerId} with onlyLog set to {$onlyLog}\n");
+fwrite($logFile, "Running fix playlistEncryption script for partner {$partnerId} with fixCorrupted set to {$fixCorrupted}\n");
 $c = new Criteria();
 $c->add(entryPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 $c->add(entryPeer::STATUS, entryStatus::READY, Criteria::EQUAL);
 $c->add(entryPeer::TYPE, entryType::PLAYLIST, Criteria::EQUAL);
 BaseentryPeer::setUseCriteriaFilter(false);
 $playlists = entryPeer::doSelect($c);
+$count = 0;
 try
 {
 	foreach ($playlists as $playlist)
@@ -43,9 +52,11 @@ try
 					$logData[] = $file_sync->getVersion();
 					$logData[] = $file_sync->getFullPath();
 					$logData[] = $file_content;
-					fwrite($logFile, "\n" . implode(";", $logData));
-					if(!$onlyLog)
+					fwrite($logFile, implode(";", $logData) . "\n");
+					$count++;
+					if($fixCorrupted == "true")
 					{
+						fwrite($logFile,"updating content for ". $playlist->getEntryId(). "\n");
 						$playlist->setDataContent($file_content);
 						$playlist->save();
 					}
@@ -53,6 +64,8 @@ try
 			}
 		}
 	}
+
+	fwrite($logFile,"Found " . $count ." corrupted playlists\n");
 }
 catch(Exception $e)
 {
