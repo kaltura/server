@@ -16,6 +16,7 @@ abstract class KCopyCuePointEngine
 	protected $data = null;
 	protected $partnerId = null;
 	private $lastCuePointPerType = null;
+	private $idsMap = array();
 
 	abstract public function copyCuePoints();
 
@@ -74,9 +75,33 @@ abstract class KCopyCuePointEngine
 		return true;
 	}
 
+	private function mapIds($className, $fromId, $toId)
+	{
+		if(!isset($this->idsMap[$className]))
+		{
+			$this->idsMap[$className] = array();
+		}
+
+		$this->idsMap[$className][$fromId] = $toId;
+	}
+
+	private function getMappedId($className, $fromId)
+	{
+		if(!isset($this->idsMap[$className]) || !isset($this->idsMap[$className][$fromId]))
+			return null;
+
+		return $this->idsMap[$className][$fromId];
+	}
+
 	protected function copySingleCuePoint($cuePoint, $destEntryId)
 	{
-		$clonedCuePoint = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine','cuePointClone'), array($cuePoint->id, $destEntryId));
+		$mappedId = $this->getMappedId('Annotation', $cuePoint->parentId);
+		$parentId = $mappedId ? $mappedId : null;
+		$clonedCuePoint = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine','cuePointClone'), array($cuePoint, $destEntryId, $parentId ));
+		if(!$clonedCuePoint->parentId)
+		{
+			$this->mapIds('Annotation', $cuePoint->id, $clonedCuePoint->id);
+		}
 		if ($clonedCuePoint)
 		{
 			list($startTime, $endTime) = $this->calculateCuePointTimes($cuePoint);
@@ -125,7 +150,7 @@ abstract class KCopyCuePointEngine
 		$filter = new KalturaCuePointFilter();
 		$filter->entryIdEqual = $entryId;
 		$filter->statusIn = $status;
-		$filter->orderBy = '+' . $this->getOrderByField();
+		$filter->orderBy = '+createdAt, +' . $this->getOrderByField();
 		return $filter;
 	}
 
@@ -147,9 +172,21 @@ abstract class KCopyCuePointEngine
 		return KBatchBase::$kClient->cuePoint->listAction($filter, $pager);
 	}
 
-	public static function cuePointClone($cuePointId, $destinationEntryId)
+	public static function cuePointClone($cuePoint, $destinationEntryId, $parentId = null)
 	{
-		return KBatchBase::$kClient->cuePoint->cloneAction($cuePointId, $destinationEntryId);
+		if ($cuePoint instanceof KalturaAnnotation)
+		{
+			return KBatchBase::$kClient->annotation->cloneAction($cuePoint->id, $destinationEntryId, $parentId);
+
+		}
+		else{
+			return KBatchBase::$kClient->cuePoint->cloneAction($cuePoint->id, $destinationEntryId, $parentId);
+		}
+	}
+
+	public static function cuePointUpdate($cuePointId, $cuePoint)
+	{
+		return KBatchBase::$kClient->cuePoint->update($cuePointId, $cuePoint);
 	}
 
 	public static function cuePointUpdateStatus($cuePointId, $newStatus)
