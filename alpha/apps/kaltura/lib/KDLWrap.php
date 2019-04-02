@@ -192,7 +192,7 @@ class KDLWrap
 				if ($contentStreams != null && isset($contentStreams['audio']) && count($contentStreams['audio']) > 1)
 				{
 					if (isset($contentStreams['video']))
-						$command .= '-map v ';
+						$command .= '-map v:0 ';
 
 					$command .= '-map a ';
 					foreach ($contentStreams['audio'] as $audioStream)
