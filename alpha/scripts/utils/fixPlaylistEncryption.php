@@ -1,13 +1,14 @@
 <?php
 ini_set("memory_limit","1024M");
-require_once(__DIR__ . '/../bootstrap.php');
-require_once(dirname(__FILE__).'/../bootstrap.php');
 if (count($argv) < 3)
 {
 	echo "php $argv[0] {partnerId} {logFilePath} <fixCorrupted>.\n";
 	echo "for example: php /opt/kaltura/app/alpha/scripts/utils/fixPlaylistEncryption.php 2301 /tmp/playlistLog.txt true\n";
 	die ('Missing arguments.\n');
 }
+
+require_once(__DIR__ . '/../bootstrap.php');
+require_once(dirname(__FILE__).'/../bootstrap.php');
 
 $partnerId = $argv[1];
 $logFilePath = $argv[2];
