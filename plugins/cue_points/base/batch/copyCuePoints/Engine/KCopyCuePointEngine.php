@@ -75,32 +75,13 @@ abstract class KCopyCuePointEngine
 		return true;
 	}
 
-	private function mapIds($className, $fromId, $toId)
-	{
-		if(!isset($this->idsMap[$className]))
-		{
-			$this->idsMap[$className] = array();
-		}
-
-		$this->idsMap[$className][$fromId] = $toId;
-	}
-
-	private function getMappedId($className, $fromId)
-	{
-		if(!isset($this->idsMap[$className]) || !isset($this->idsMap[$className][$fromId]))
-			return null;
-
-		return $this->idsMap[$className][$fromId];
-	}
-
 	protected function copySingleCuePoint($cuePoint, $destEntryId)
 	{
-		$mappedId = $this->getMappedId('Annotation', $cuePoint->parentId);
-		$parentId = $mappedId ? $mappedId : null;
+		$parentId = isset($this->idsMap[$cuePoint->parentId]) ? $this->idsMap[$cuePoint->parentId] : null;
 		$clonedCuePoint = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine','cuePointClone'), array($cuePoint, $destEntryId, $parentId ));
 		if(!$clonedCuePoint->parentId)
 		{
-			$this->mapIds('Annotation', $cuePoint->id, $clonedCuePoint->id);
+			$this->idsMap[$cuePoint->id] = $clonedCuePoint->id;
 		}
 		if ($clonedCuePoint)
 		{
