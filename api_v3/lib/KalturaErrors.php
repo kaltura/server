@@ -303,6 +303,8 @@ class KalturaErrors extends APIErrors
 
 	const THUMB_ASSET_ID_IS_NOT_TIMED_THUMB_TYPE = "THUMB_ASSET_IS_NOT_OF_TYPE_TIMED_THUMB;ASSET;Thumbnail asset \"@ASSET@\" is not of type timed thumb";
 
+	const THUMB_ASSET_CONTENT_NOT_SECURE = "THUMB_ASSET_CONTENT_NOT_SECURE;;Thumbnail asset content contains potential security risks";
+
 	/**
 	 * Category Service
 	 */

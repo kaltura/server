@@ -2301,4 +2301,42 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 	}
 
+	public static function validateThumbContent($thumbPath)
+	{
+		if(!$thumbPath)
+		{
+			return true;
+		}
+
+		$fileType = self::getMimeType($thumbPath);
+		if($fileType == 'image/svg+xml')
+		{
+			$xmlContent = file_get_contents($thumbPath);
+			if($xmlContent)
+			{
+				$dom = new KDOMDocument();
+				$dom->loadXML($xmlContent);
+				$element = $dom->getElementsByTagName('script')->item(0);
+				if($element)
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	public static function getMimeType($filePath)
+	{
+		$fileType = kFile::mimeType($filePath);
+		if ($fileType == 'application/octet-stream')//stream of byte - can be media or executable
+		{
+			$fileType = kFile::getMediaInfoFormat($filePath);
+			if (empty($fileType))
+				$fileType = kFile::findFileTypeByFileCmd($filePath);
+		}
+		return $fileType;
+	}
+
 }
