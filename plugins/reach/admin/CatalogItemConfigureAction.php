@@ -45,6 +45,8 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorTranslationCatalogItem', $formData, false, true);
 				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT)
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorAlignmentCatalogItem', $formData, false, true);
+				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION)
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorAudioDescriptionCatalogItem', $formData, false, true);
 			}
 		}
 		$action->view->form = $form;
@@ -145,6 +147,8 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 				$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorTranslationCatalogItem', $formData, false, true);
 			elseif ($formData['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT)
 				$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorAlignmentCatalogItem', $formData, false, true);
+			elseif ($formData['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION)
+				$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorAudioDescriptionCatalogItem', $formData, false, true);
 
 			$form->resetUnUpdatebleAttributes($catalogItem);
 			if($catalogItemId)

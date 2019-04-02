@@ -1,3 +1,22 @@
+# Naos 14.18.0 #
+
+## Update "comment added" KMS notification body - fix the link ##
+ - Issue Type: Bugfix
+ - Issue IDs: PSVAMB-6933
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+
+First replace all tokens in the XML file below and remove ".template" from the fle name:
+
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_04_01_fix_comment_notification_template.template.xml
+
+Run deployment script:
+
+    php /opt/kaltura/app/deployment/updates/scripts/2019_04_01_fix_comment_notification_template.php
+
 # Naos 14.17.0 #
 
 ## Report Service - Export to CSV ##

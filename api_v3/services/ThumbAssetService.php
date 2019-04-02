@@ -194,8 +194,9 @@ class ThumbAssetService extends KalturaAssetService
 	 */
 	protected function attachFile(thumbAsset $thumbAsset, $fullPath, $copyOnly = false)
 	{
-		$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
-		
+		$filePath = parse_url($fullPath,PHP_URL_PATH);
+		$ext = pathinfo($filePath,PATHINFO_EXTENSION);
+
 		$thumbAsset->incrementVersion();
 		$thumbAsset->setFileExt($ext);
 		$thumbAsset->setSize(filesize($fullPath));
