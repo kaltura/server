@@ -77,21 +77,31 @@ abstract class KCopyCuePointEngine
 
 	protected function copySingleCuePoint($cuePoint, $destEntryId)
 	{
-		$parentId = isset($this->idsMap[$cuePoint->parentId]) ? $this->idsMap[$cuePoint->parentId] : null;
-		$clonedCuePoint = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine','cuePointClone'), array($cuePoint, $destEntryId, $parentId ));
-		if(!$clonedCuePoint->parentId)
+		$parentId = null;
+		if ($cuePoint->parentId)
 		{
-			$this->idsMap[$cuePoint->id] = $clonedCuePoint->id;
+			if (isset($this->idsMap[$cuePoint->parentId]))
+			{
+				$parentId = $this->idsMap[$cuePoint->parentId];
+			}
+			else
+			{
+				KalturaLog::warning("Cuepoint $cuePoint->parentId as parent of $cuePoint->id is not in ids map");
+			}
 		}
+
+		$clonedCuePoint = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine', 'cuePointClone'), array($cuePoint, $destEntryId, $parentId));
 		if ($clonedCuePoint)
 		{
+			$this->idsMap[$cuePoint->id] = $clonedCuePoint->id;
 			list($startTime, $endTime) = $this->calculateCuePointTimes($cuePoint);
-			$res = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine','updateCuePointTimes'), array($clonedCuePoint->id, $startTime, $endTime));
+			$res = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine', 'updateCuePointTimes'), array($clonedCuePoint->id, $startTime, $endTime));
 			if ($res)
 				return $cuePoint->id;
 			else
 				KalturaLog::info("Update time for [{$cuePoint->id}] of [$startTime, $endTime] - Failed");
-		} else
+		}
+		else
 			KalturaLog::info("Could not copy [{$cuePoint->id}] - moving to next");
 		return null;
 	}
@@ -158,16 +168,11 @@ abstract class KCopyCuePointEngine
 		if ($cuePoint instanceof KalturaAnnotation)
 		{
 			return KBatchBase::$kClient->annotation->cloneAction($cuePoint->id, $destinationEntryId, $parentId);
-
 		}
-		else{
+		else
+		{
 			return KBatchBase::$kClient->cuePoint->cloneAction($cuePoint->id, $destinationEntryId, $parentId);
 		}
-	}
-
-	public static function cuePointUpdate($cuePointId, $cuePoint)
-	{
-		return KBatchBase::$kClient->cuePoint->update($cuePointId, $cuePoint);
 	}
 
 	public static function cuePointUpdateStatus($cuePointId, $newStatus)

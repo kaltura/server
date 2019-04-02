@@ -45,19 +45,23 @@ class AnnotationService extends CuePointService
 	 * @param string $id
 	 * @param string $entryId
 	 * @param string $parentId
-	 * @return KalturaCuePoint
+	 * @return KalturaAnnotation
 	 * @throws KalturaCuePointErrors::INVALID_CUE_POINT_ID
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
 	function cloneAction($id, $entryId, $parentId = null)
 	{
-		$cuePoint = parent::doClone($id, $entryId);
+		$dbAnnotation = parent::doClone($id, $entryId);
+		if ( !$dbAnnotation instanceof annotation)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_TYPE, get_class($dbAnnotation));
+		}
 		if ($parentId)
 		{
-			$cuePoint->setParentId($parentId);
+			$dbAnnotation->setParentId($parentId);
 		}
-		$cuePoint->save();
-		return  KalturaCuePoint::getInstance($cuePoint, $this->getResponseProfile());
+		$dbAnnotation->save();
+		return KalturaAnnotation::getInstance($dbAnnotation, $this->getResponseProfile());
 	}
 
 	/**
