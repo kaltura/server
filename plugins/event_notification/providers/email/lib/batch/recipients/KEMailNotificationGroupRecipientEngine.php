@@ -63,16 +63,15 @@ class KEMailNotificationGroupRecipientEngine extends  KEmailNotificationRecipien
 		
 		if(!($groupUserList->totalCount > 0))
 			return null;
-
 		
-                $groupUserIds = array();
-                foreach ($groupUserList->objects as $user)
-                {
-                        $groupUserIds[]= $user->userId;
-                }
-                $groupUserIdsString = implode(',',$groupUserIds);
-
+		$groupUserIds = "";
+		foreach ($groupUserList->objects as $user)
+		{
+			$groupUserIds .= $user->userId;
+			if(next($groupUserList->objects) == true)
+				$groupUserIds .= ",";
+		}
 		
-		return $groupUserIdsString;
+		return $groupUserIds;
 	}
 }
