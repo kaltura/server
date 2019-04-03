@@ -149,14 +149,9 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 	 */
 	protected function fixFilterUserId()
 	{
-
 		if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
 		{
-			$partner_id = $this->partnerId;
-		}
-		else
-		{
-			$partner_id = kCurrentContext::getCurrentPartnerId();
+			kCurrentContext::$partner_id = $this->partnerId;;
 		}
 
 		if ($this->userIdEqual !== null)
@@ -164,7 +159,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 			if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID) //batch should be able to get userEntry objects of deleted users.
 				kuserPeer::setUseCriteriaFilter(false);
 
-			$kuser = kuserPeer::getKuserByPartnerAndUid($partner_id, $this->userIdEqual);
+			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->userIdEqual);
 			kuserPeer::setUseCriteriaFilter(true);
 			if ($kuser)
 				$this->userIdEqual = $kuser->getId();
@@ -174,35 +169,27 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 
 		if(!empty($this->userIdIn))
 		{
-			$this->userIdIn = $this->preparePusersToKusersFilter($this->userIdIn, $partner_id);
+			$this->userIdIn = $this->preparePusersToKusersFilter($this->userIdIn);
 		}
 		if(!empty($this->userIdNotIn))
 		{
-			$this->userIdNotIn = $this->preparePusersToKusersFilter($this->userIdNotIn, $partner_id);
+			$this->userIdNotIn = $this->preparePusersToKusersFilter($this->userIdNotIn);
 		}
 
 		if(!is_null($this->isAnonymous))
 		{
 			if(KalturaNullableBoolean::toBoolean($this->isAnonymous)===false)
-				$this->userIdNotIn .= self::getListOfAnonymousUsers($partner_id);
+				$this->userIdNotIn .= self::getListOfAnonymousUsers();
 
 			elseif(KalturaNullableBoolean::toBoolean($this->isAnonymous)===true)
-				$this->userIdIn .= self::getListOfAnonymousUsers($partner_id);
+				$this->userIdIn .= self::getListOfAnonymousUsers();
 		}
 	}
 
-	public static function getListOfAnonymousUsers($partner_id = null)
+	public static function getListOfAnonymousUsers()
 	{
 		$anonKuserIds = "";
-		if ($partner_id)
-		{
-			$currentPartnerId = $partner_id;
-		}
-		else
-		{
-			$currentPartnerId = kCurrentContext::getCurrentPartnerId();
-		}
-		$anonKusers = kuserPeer::getKuserByPartnerAndUids($currentPartnerId, array(0,''));
+		$anonKusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), array(0,''));
 		foreach ($anonKusers as $anonKuser) {
 			$anonKuserIds .= ",".$anonKuser->getKuserId();
 		}

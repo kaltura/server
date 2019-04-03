@@ -213,19 +213,11 @@ abstract class KalturaFilter extends KalturaObject
 //		return "_{$operator}_"
 	}
 	
-	protected function preparePusersToKusersFilter($puserIdsCsv, $partner_id = null )
+	protected function preparePusersToKusersFilter($puserIdsCsv )
 	{
 		$kuserIdsArr = array();
 		$puserIdsArr = explode(',',$puserIdsCsv);
-		if ($partner_id)
-		{
-			$currentPartnerId = $partner_id;
-		}
-		else
-		{
-			$currentPartnerId = kCurrentContext::getCurrentPartnerId();
-		}
-		$kuserArr = kuserPeer::getKuserByPartnerAndUids($currentPartnerId, $puserIdsArr);
+		$kuserArr = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), $puserIdsArr);
 
 		foreach($kuserArr as $kuser)
 		{
