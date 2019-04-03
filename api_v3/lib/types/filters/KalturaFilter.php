@@ -213,7 +213,7 @@ abstract class KalturaFilter extends KalturaObject
 //		return "_{$operator}_"
 	}
 	
-	protected function preparePusersToKusersFilter($puserIdsCsv )
+	protected function preparePusersToKusersFilter( $puserIdsCsv )
 	{
 		$kuserIdsArr = array();
 		$puserIdsArr = explode(',',$puserIdsCsv);
