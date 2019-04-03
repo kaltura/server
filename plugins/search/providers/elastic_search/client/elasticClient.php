@@ -31,6 +31,7 @@ class elasticClient
 	const ELASTIC_GET_ALIAS_INFO = 'get_alias_info';
 	const ELASTIC_ACTION_DELETE_BY_QUERY = 'delete_by_query';
 	const ELASTIC_ACTION_GET = 'get';
+	const ELASTIC_GET_INDEX = 'get_index';
 	const ELASTIC_CREATE_INDEX = 'create_index';
 	const ELASTIC_DELETE_INDEX = 'delete_index';
 	const ELASTIC_CHANGE_ALIASES = 'change_aliases';
@@ -342,15 +343,15 @@ class elasticClient
 	}
 
 	/**
-	 * return the indices for index pattern
-	 * @param $indexPattern
+	 * return the index info for given index name
+	 * @param $indexName
 	 * @return mixed
 	 * @throws kESearchException
 	 */
-	public function getIndicesForIndexPattern($indexPattern)
+	public function getIndexInfo($indexName)
 	{
-		$cmd = $this->elasticHost . "/$indexPattern/";
-		$response = $this->sendRequest($cmd, self::GET, null, false, self::ELASTIC_GET_ALIAS_INFO, self::MONITOR_NO_INDEX);
+		$cmd = $this->elasticHost . "/$indexName/";
+		$response = $this->sendRequest($cmd, self::GET, null, false, self::ELASTIC_GET_INDEX, self::MONITOR_NO_INDEX);
 		return $response;
 	}
 

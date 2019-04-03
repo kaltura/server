@@ -11,6 +11,7 @@ class ElasticIndexRotationWorker
 	const REMOVE = 'remove';
 	const INDEX = 'index';
 	const ALIAS = 'alias';
+	const ALIASES = 'aliases';
 
 	protected $configSection;
 	protected $dryRun;
@@ -230,17 +231,16 @@ class ElasticIndexRotationWorker
 
 	protected function getUnusedIndicesToHandle()
 	{
-		list($currentIndexingIndices, $currentSearchingIndices) = $this->getCurrentStateMap();
 		$indicesToDelete = array();
-		$response = $this->client->getIndicesForIndexPattern($this->indexPattern . '*');
+		$response = $this->client->getIndexInfo($this->indexPattern . '*');
 		if (!$response)
 		{
 			die("Could not get indices info\n");
 		}
 
-		foreach ($response as $indexName => $arr)
+		foreach ($response as $indexName => $indexInfo)
 		{
-			if(!array_key_exists($indexName, $currentSearchingIndices))
+			if(!array_key_exists(self::ALIASES, $indexInfo) || !$indexInfo[self::ALIASES])
 			{
 				$indicesToDelete[] = $indexName;
 			}
