@@ -1422,6 +1422,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS' => 'CAPTIONS',
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION' => 'TRANSLATION',
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT' => 'ALIGNMENT',
+	'Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION' => 'AUDIO_DESCRIPTION',
 	'Kaltura_Client_Reach_Enum_VendorServiceType::HUMAN' => 'HUMAN',
 	'Kaltura_Client_Reach_Enum_VendorServiceType::MACHINE' => 'MACHINE',
 	

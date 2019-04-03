@@ -104,17 +104,31 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			$this->addElement($targetLanguage);
 		}
 		
-		$outputFormat = new Kaltura_Form_Element_EnumSelect('outputFormat', array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat'), array( null => "PartnerDefault"));
-		$outputFormat->setLabel('Output Format:');
-		$outputFormat->setValue(null);
-		$this->addElement($outputFormat);
-
-		$enableSpeakerId = new Kaltura_Form_Element_EnumSelect('enableSpeakerId', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 'excludes' => array(
-			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
-		$enableSpeakerId->setLabel('Enable Speaker ID:');
-		$enableSpeakerId->setRequired(true);
-		$enableSpeakerId->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
-		$this->addElement($enableSpeakerId);
+		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION)
+		{
+			$this->addElement('text', 'flavorParamsId', array(
+				'label' => 'Flavor Params ID:',
+				'filters' => array('StringTrim'),
+				'placement' => 'prepend',
+				'readonly' => $this->disableAttributes,
+				'required' 		=> true,
+			));
+		}
+		
+		if ($this->catalogItemType != Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION)
+		{
+			$outputFormat = new Kaltura_Form_Element_EnumSelect('outputFormat', array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat'), array( null => "PartnerDefault"));
+			$outputFormat->setLabel('Output Format:');
+			$outputFormat->setValue(null);
+			$this->addElement($outputFormat);
+			
+			$enableSpeakerId = new Kaltura_Form_Element_EnumSelect('enableSpeakerId', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 'excludes' => array(
+				Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
+			$enableSpeakerId->setLabel('Enable Speaker ID:');
+			$enableSpeakerId->setRequired(true);
+			$enableSpeakerId->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
+			$this->addElement($enableSpeakerId);
+		}
 
 		$this->addLine("Pricing Line");
 		$this->addTitle('Pricing:');
