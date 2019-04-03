@@ -2836,7 +2836,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 * Code to be run before updating the object in database
 	 * @param PropelPDO $con
 	 * @return bloolean
-*/
+	 */
 	public function preSave(PropelPDO $con = null)
 	{
 		if($this->customDataValueHasChanged('parentEntryId'))
