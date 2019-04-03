@@ -162,7 +162,7 @@ class kAssetUtils
 		return $url;
 	}
 
-	public function getLocalThumbPath($thumbAsset)
+	public static function getLocalThumbPath($thumbAsset)
 	{
 		$filePath = null;
 		$syncKey = $thumbAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
