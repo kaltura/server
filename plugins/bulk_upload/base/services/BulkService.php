@@ -482,17 +482,30 @@ class BulkService extends KalturaBaseService
 	 * @action bulkDelete
 	 * @actionAlias userEntry.bulkDelete
 	 * Action delete userEntry objects from filter in bulk
-	 * @param KalturaBulkServiceFilterDataOnlyFilter $bulkUploadData
+	 * @param KalturaUserEntryFilter $filter
 	 * @return KalturaBulkUpload
 	 */
-	public function bulkDeleteAction(KalturaBulkServiceFilterDataOnlyFilter $bulkUploadData)
+	public function userEntryBulkDeleteAction(KalturaUserEntryFilter $filter)
+	{
+		$bulkUploadData = new KalturaBulkServiceFilterDataBase();
+		$bulkUploadData->filter = $filter;
+		$bulkUploadObjectType = BulkUploadObjectType::USER_ENTRY;
+		$bulkUpload = $this->bulkDelete($bulkUploadData, $bulkUploadObjectType);
+		if ($bulkUpload)
+		{
+			return $bulkUpload->id;
+		}
+		return null;
+	}
+
+	protected function bulkDelete(KalturaBulkServiceFilterDataBase $bulkUploadData, $bulkUploadObjectType)
 	{
 		$bulkUploadJobData = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', $bulkUploadData->getType());
 		$bulkUploadData->toBulkUploadJobData($bulkUploadJobData);
 
 		$dbBulkUploadJobData = $bulkUploadJobData->toInsertableObject();
 		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadJobData->type);
-		$dbBulkUploadJobData->setBulkUploadObjectType(BulkUploadObjectType::USER_ENTRY);
+		$dbBulkUploadJobData->setBulkUploadObjectType($bulkUploadObjectType);
 		$dbBulkUploadJobData->setUserId($this->getKuser()->getPuserId());
 
 		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $dbBulkUploadJobData, $bulkUploadCoreType);
@@ -507,5 +520,6 @@ class BulkService extends KalturaBaseService
 
 		return $bulkUpload;
 	}
+
 
 }

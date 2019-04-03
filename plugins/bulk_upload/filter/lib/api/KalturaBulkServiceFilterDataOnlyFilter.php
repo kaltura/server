@@ -5,7 +5,7 @@
  * @package plugins.bulkUploadFilter
  * @subpackage api.objects
  */
-class KalturaBulkServiceFilterDataOnlyFilter extends KalturaBulkServiceData
+class KalturaBulkServiceFilterDataBase extends KalturaBulkServiceData
 {
 	/**
 	 * Filter for extracting the objects list to upload

@@ -28,7 +28,8 @@ class BulkUploadUserEntryEngineFilter extends BulkUploadEngineFilter
 
 	protected function createObjectFromResultAndJobData (KalturaBulkUploadResult $bulkUploadResult)
 	{
-
+		//in bulk delete, there is no need to create objects from bulk upload result.
+		return;
 	}
 
 	protected function deleteObjectFromResult (KalturaBulkUploadResult $bulkUploadResult)

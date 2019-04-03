@@ -152,7 +152,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 	{
 		if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
 		{
-			kCurrentContext::$partner_id = $this->partnerId;;
+			kCurrentContext::$partner_id = $this->partnerId;
 		}
 
 		if ($this->userIdEqual !== null)
