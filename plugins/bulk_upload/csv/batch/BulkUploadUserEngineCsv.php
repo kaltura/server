@@ -9,7 +9,6 @@
 class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 {
 	const OBJECT_TYPE_TITLE = 'user';
-	const USER_ROLE = 3;
 	private $groupActionsList;
 
 	public function __construct(KalturaBatchJob $job)
@@ -309,6 +308,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		    "dateOfBirth",
 			"partnerData",
 			"group",
+			"userRole"
 		);
 	}
 
@@ -446,15 +446,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			$groupUser->userId = $groupUserParams->userId;
 			$groupUser->groupId = $groupUserParams->group;
 			$groupUser->creationMode = KalturaGroupUserCreationMode::AUTOMATIC;
-
-			if ($groupUserParams->rowData)
-			{
-				$groupUserRawData = explode(",", $groupUserParams->rowData);
-				if ($groupUserRawData[self::USER_ROLE])
-				{
-					$groupUser->userRole = (int)$groupUserRawData[self::USER_ROLE];
-				}
-			}
+			$groupUser->userRole = $groupUserParams->userRole;
 			KBatchBase::$kClient->groupUser->add($groupUser);
 		}
 		$this->handleMultiRequest($ret,true);
