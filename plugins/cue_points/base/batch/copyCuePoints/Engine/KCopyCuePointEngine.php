@@ -59,6 +59,10 @@ abstract class KCopyCuePointEngine
 			$cuePoints = $listResponse->objects;
 			$this->preProcessCuePoints($cuePoints);
 			KalturaLog::debug("Return " . count($cuePoints) . " cue-points from list");
+			if ($cuePoints)
+			{
+				usort($cuePoints, function ($a, $b) {return ($a->createdAt - $b->createdAt);});
+			}
 			foreach ($cuePoints as &$cuePoint)
 			{
 				if ($this->shouldCopyCuePoint($cuePoint))
@@ -78,7 +82,7 @@ abstract class KCopyCuePointEngine
 	protected function copySingleCuePoint($cuePoint, $destEntryId)
 	{
 		$parentId = null;
-		if ($cuePoint->parentId)
+		if (isset($cuePoint->parentId) && $cuePoint->parentId)
 		{
 			if (isset($this->idsMap[$cuePoint->parentId]))
 			{
@@ -141,7 +145,7 @@ abstract class KCopyCuePointEngine
 		$filter = new KalturaCuePointFilter();
 		$filter->entryIdEqual = $entryId;
 		$filter->statusIn = $status;
-		$filter->orderBy = '+createdAt, +' . $this->getOrderByField();
+		$filter->orderBy = '+' . $this->getOrderByField();
 		return $filter;
 	}
 
