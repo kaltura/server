@@ -685,7 +685,6 @@ class KalturaErrors extends APIErrors
 	const USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID = 'USER_ENTRY_DOES_NOT_MATCH_ENTRY_ID;USER_ENTRY_ID;The entry id in the user-entry [@USER_ENTRY_ID@] does not match the entry-id given';
 	const USER_ENTRY_OBJECT_TYPE_ERROR = 'USER_ENTRY_OBJECT_TYPE_ERROR;OBJ_TYPE,USER_ENTRY_ID;There is an error in the DB, object type [@OBJ_TYPE@] of UserEntry id [@USER_ENTRY_ID@] is unknown';
 	const MUST_FILTER_ON_ENTRY_OR_USER = 'MUST_FILTER_ON_ENTRY_OR_USER;;Must filter on entry ID or user ID';
-	const MUST_FILTER_ON_PARTNER_ID = 'MUST_FILTER_ON_PARTNER_ID;;Must filter on partner ID';
 	const USER_ENTRY_FILTER_FORBIDDEN_FIELDS_USED = 'USER_ENTRY_FILTER_FORBIDDEN_FIELDS_USED;;UserEntry filter object forbidden fields used';
 	const USER_ENTRY_ALREADY_EXISTS = 'USER_ENTRY_ALREADY_EXISTS;;UserEntry for this type already exists';
 	const USER_ID_NOT_PROVIDED_OR_EMPTY = 'USER_ID_NOT_PROVIDED_OR_EMPTY;;User ID not found neither on the object or KS';
