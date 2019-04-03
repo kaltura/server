@@ -130,8 +130,30 @@ class ESearchCategoryUserItem extends ESearchItem
 		if($this->shouldAddPermissionsSearch())
 			return $this->getUserIdExactMatchWithPermissions($allowedSearchTypes, $queryAttributes);
 
-		return kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+		return $this->getExactMatchQuery($allowedSearchTypes, $queryAttributes);
 	}
+
+
+	protected function getExactMatchQuery($allowedSearchTypes, &$queryAttributes)
+	{
+		$exactQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+
+		if ($this->getFieldName()  ==  ESearchCategoryUserFieldName::USER_ID)
+		{
+			$preFixGroups = new kESearchTermsQuery($this->getFieldName(),
+				array('index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,
+					'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
+					'id' => $this->getSearchTerm(),
+					'path' => ESearchUserFieldName::GROUP_IDS));
+			$boolQuery = new kESearchBoolQuery();
+			$boolQuery->addToShould($exactQuery);
+			$boolQuery->addToShould($preFixGroups);
+			return $boolQuery;
+		}
+		return $exactQuery;
+	}
+
+
 
 	private function shouldAddPermissionsSearch()
 	{
