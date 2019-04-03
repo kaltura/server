@@ -161,4 +161,24 @@ class kAssetUtils
 		
 		return $url;
 	}
+
+	public function getLocalThumbPath($thumbAsset)
+	{
+		$filePath = null;
+		$syncKey = $thumbAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		if(!kFileSyncUtils::fileSync_exists($syncKey))
+		{
+			KalturaLog::warning("file doesn't exist");
+			return $filePath;
+		}
+
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+		/* @var $fileSync FileSync */
+		if($local)
+		{
+			$filePath = $fileSync->getFullPath();
+		}
+
+		return $filePath;
+	}
 }

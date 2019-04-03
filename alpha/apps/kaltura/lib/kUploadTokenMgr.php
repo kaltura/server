@@ -178,7 +178,7 @@ class kUploadTokenMgr
 	protected function checkIfFileIsAllowed()
 	{
 		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
-		$fileType = myEntryUtils::getMimeType($uploadFilePath);
+		$fileType = kFileUtils::getMimeType($uploadFilePath);
 
 		$fileTypes = kConf::get('file_type');
 		return in_array($fileType, $fileTypes['allowed']);
