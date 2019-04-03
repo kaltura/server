@@ -4,8 +4,14 @@
 * @subpackage model
 */
 
-class cropEngine
+class cropAction
 {
+
+	function validateInput()
+	{
+
+	}
+
 	function thumbnail($image, $new_w, $new_h, $focus = kCropGravityPoint::CENTER)
 	{
 		$image->setImagePage(0, 0, 0, 0);
