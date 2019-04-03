@@ -482,10 +482,10 @@ class BulkService extends KalturaBaseService
 	 * @action bulkDelete
 	 * @actionAlias userEntry.bulkDelete
 	 * Action delete userEntry objects from filter in bulk
-	 * @param KalturaBulkServiceData $bulkUploadData
+	 * @param KalturaBulkServiceFilterDataOnlyFilter $bulkUploadData
 	 * @return KalturaBulkUpload
 	 */
-	public function bulkDeleteAction(KalturaBulkServiceData $bulkUploadData)
+	public function bulkDeleteAction(KalturaBulkServiceFilterDataOnlyFilter $bulkUploadData)
 	{
 		$bulkUploadJobData = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', $bulkUploadData->getType());
 		$bulkUploadData->toBulkUploadJobData($bulkUploadJobData);

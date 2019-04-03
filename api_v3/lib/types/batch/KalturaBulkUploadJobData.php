@@ -178,9 +178,6 @@ class KalturaBulkUploadJobData extends KalturaJobData
 		        case 'kBulkUploadCategoryEntryData':
 		            $this->objectData = new KalturaBulkUploadCategoryEntryData();
 		            break;
-			case 'kBulkUploadUserEntryData':
-			    $this->objectData = new KalturaBulkUploadUserEntryData();
-			    break;
 		        default:
 		            break;
 		    }
