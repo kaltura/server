@@ -432,6 +432,10 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$this->data = new KalturaMultiClipCopyCuePointsJobData();
 				break;
 
+			case 'kReportExportJobData':
+				$this->data = new KalturaReportExportJobData();
+				break;
+
 			default:
 				if($dbData instanceof kBulkUploadJobData)
 				{

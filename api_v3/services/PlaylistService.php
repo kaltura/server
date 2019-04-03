@@ -153,7 +153,7 @@ class PlaylistService extends KalturaEntryService
 		{
 			myPlaylistUtils::validatePlaylist($dbPlaylist);
 		}
-		
+
 		if ( $updateStats )
 		{
 			myPlaylistUtils::updatePlaylistStatistics($this->getPartnerId(), $dbPlaylist);//, $extra_filters , $detailed );

@@ -178,6 +178,12 @@ class ReportService extends KalturaBaseService
 		}
 		$kResponseOptions = $responseOptions->toObject();
 
+		$isCsv = false;
+		if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
+		{
+			$isCsv = true;
+		}
+
 		if(in_array($reportType, self::$crossPartnerReports))
 			$objectIds = $this->validateObjectsAreAllowedPartners($reportType, $objectIds, $kResponseOptions->getDelimiter());
 
@@ -206,7 +212,7 @@ class ReportService extends KalturaBaseService
 		    $reportType ,
 		    $reportInputFilter->toReportsInputFilter() ,
 		    $pager->pageSize , $pager->pageIndex ,
-		    $order , $objectIds, null , false , $kResponseOptions);
+		    $order , $objectIds, null , $isCsv , $kResponseOptions);
 
 		$reportTable->fromReportTable ( $header , $data , $totalCount, $kResponseOptions->getDelimiter() );
 			
@@ -291,15 +297,15 @@ class ReportService extends KalturaBaseService
 		$ks = $this->getKs();
 		if(!$ks || !($ks->isAdmin() || $ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id)))
 			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
-		
+
 		if(!preg_match('/^[\w-_]*$/', $id))
 			throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
-		
+
 		$partner_id = $this->getPartnerId();
 		$folderPath = "/content/reports/$partner_id";
 		$fullPath = myContentStorage::getFSContentRootPath() . $folderPath;
 		$file_path = "$fullPath/$id";
-		
+
 		return $this->dumpFile($file_path, 'text/csv');
 	}
 	
@@ -391,7 +397,59 @@ class ReportService extends KalturaBaseService
 		$paramsArray = $this->parseParamsStr($params);
 		return $this->getCsvAction($id, $paramsArray);
 	}
-	
+
+	/**
+	 * @action exportToCsv
+	 * @param KalturaReportExportParams $params
+	 * @return KalturaReportExportResponse
+	 * @throws KalturaAPIException
+	 */
+	public function exportToCsvAction(KalturaReportExportParams $params)
+	{
+		$this->validateReportExportParams($params);
+
+		if (!$params->recipientEmail)
+		{
+			$kuser = kCurrentContext::getCurrentKsKuser();
+			if ($kuser)
+			{
+				$params->recipientEmail = $kuser->getEmail();
+			}
+			else
+			{
+				$partnerId = kCurrentContext::getCurrentPartnerId();
+				$partner = PartnerPeer::retrieveByPK($partnerId);
+				$params->recipientEmail = $partner->getAdminEmail();
+			}
+		}
+
+		$dbBatchJob = kJobsManager::addExportReportJob($params);
+
+		$response = new KalturaReportExportResponse();
+		$response->referenceJobId = $dbBatchJob->getId();
+		$response->reportEmail = $params->recipientEmail;
+
+		return $response;
+	}
+
+	protected function validateReportExportParams(KalturaReportExportParams $params)
+	{
+		if (!$params->reportItems)
+		{
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER);
+		}
+		foreach ($params->reportItems as $reportItem)
+		{
+			/**
+			 * @var KalturaReportExportItem $reportItem
+			 */
+			if (!$reportItem->action || !$reportItem->reportType || !$reportItem->filter)
+			{
+				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER);
+			}
+		}
+	}
+
 	protected function parseParamsStr($paramsStr)
 	{
 		$paramsStrArray = explode(';', $paramsStr);

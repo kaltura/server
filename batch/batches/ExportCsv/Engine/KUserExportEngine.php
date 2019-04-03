@@ -183,4 +183,29 @@ class KUserExportEngine extends KObjectExportEngine
 		
 		return $strValue;
 	}
+	
+	/**
+	 * the function run over each additional field and returns the value for the given field xpath
+	 */
+	private function fillAdditionalFieldsFromMetadata($usersMetadata, $additionalFields, $userIdToRow)
+	{
+		foreach($usersMetadata->objects as $metadataObj)
+		{
+			foreach ($additionalFields as $field)
+			{
+				if($field->xpath)
+				{
+					KalturaLog::info("current field xpath: [$field->xpath]");
+					$strValue = $this->getValueFromXmlElement($metadataObj->xml, $field->xpath);
+					if($strValue)
+					{
+						$objectRow = $userIdToRow[$metadataObj->objectId];
+						$objectRow[$field->fieldName] = $strValue;
+						$userIdToRow[$metadataObj->objectId] = $objectRow;
+					}
+				}
+			}
+		}
+		return $userIdToRow;
+	}
 }

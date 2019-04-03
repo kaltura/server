@@ -67,6 +67,7 @@ enabledWorkers.KAsyncLiveToVod      				= 1
 enabledWorkers.KAsyncCopyCaptions					= 1
 enabledWorkers.KAsyncCopyCuePoints                   = 1
 enabledWorkers.KSyncReachCreditTaskRunner	    = 0
+enabledWorkers.KAsyncExportCsv                      = 0
 
 
 [mainTemplate : template]
@@ -821,3 +822,12 @@ type                                                = KSyncReachCreditTaskRunner
 maximumExecutionTime                                = 3600
 scriptPath                                          = ../plugins/reach/batch/KSyncReachCreditTaskRunner/KSyncReachCreditTaskRunnerExe.php
 sleepBetweenStopStart                               = 21600
+
+[KAsyncReportExport : JobHandlerWorker]
+id													= 730
+friendlyName										= Reports export
+type												= KAsyncReportExport
+maximumExecutionTime								= 12000
+scriptPath											= batches/ReportExport/KAsyncReportExportExe.php
+params.localTempPath								= @TMP_DIR@/reports
+params.sharedTempPath								= @WEB_DIR@/apptemp-shared/reports

@@ -46,9 +46,9 @@ class kHtmlPurifier
 			}
 			// If we reach here kCurrentContext::$HTMLPurifierBehaviour must be BLOCK
 
-
-			throw new KalturaAPIException(KalturaErrors::UNSAFE_HTML_TAGS, $className, $propertyName);
-		} 
+			$errorMessage = "UNSAFE_HTML_TAGS;Potential Unsafe HTML tags found in [$className]::[$propertyName]";
+			throw new Exception($errorMessage);
+		}
 
 		return $value;
 	}
