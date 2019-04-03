@@ -29,7 +29,7 @@ class BulkUploadResultUserEntry extends BulkUploadResult
 	 */
 	public function getObject()
 	{
-		return UserEntryPeer::retrieveByPK($this->getObjectId());
+		return UserEntryPeer::retrieveByPKNoFilter($this->getObjectId());
 	}
 
 	//Set properties for user entries

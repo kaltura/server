@@ -60,7 +60,7 @@ class BulkUploadUserEntryEngineFilter extends BulkUploadEngineFilter
 		}
 		if($userEntry)
 		{
-			$bulkUploadResult->objectId = $userEntry->id.':'.$userEntry->userId;
+			$bulkUploadResult->objectId = $userEntry->id;
 			$bulkUploadResult->objectStatus = $userEntry->status;
 			$bulkUploadResult->userEntryId = $userEntry->id;
 			$bulkUploadResult->action = KalturaBulkUploadAction::DELETE;

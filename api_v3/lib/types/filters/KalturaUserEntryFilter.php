@@ -106,6 +106,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 			{
 				throw new KalturaAPIException(KalturaErrors::USER_ENTRY_FILTER_FORBIDDEN_FIELDS_USED);
 			}
+			$this->partnerId = kCurrentContext::getCurrentPartnerId();
 		}
 		
 		if (!is_null($this->userIdEqualCurrent) && $this->userIdEqualCurrent)
