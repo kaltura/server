@@ -217,7 +217,7 @@ abstract class KalturaFilter extends KalturaObject
 	{
 		$kuserIdsArr = array();
 		$puserIdsArr = explode(',',$puserIdsCsv);
-		if (isset($partner_id))
+		if ($partner_id)
 		{
 			$currentPartnerId = $partner_id;
 		}

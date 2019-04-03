@@ -194,7 +194,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 	public static function getListOfAnonymousUsers($partner_id = null)
 	{
 		$anonKuserIds = "";
-		if (isset($partner_id))
+		if ($partner_id)
 		{
 			$currentPartnerId = $partner_id;
 		}
@@ -216,5 +216,4 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		$res->totalCount = 0;
 		return $res;
 	}
-	
 }
