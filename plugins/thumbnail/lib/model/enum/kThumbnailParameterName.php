@@ -12,4 +12,6 @@ interface kThumbnailParameterName extends BaseEnum
 	const BEST_FIT = "best_fit";
 	const FILTER_TYPE = "filter_type";
 	const BLUR = "blur";
+	const X = "x";
+	const Y = "y";
 }

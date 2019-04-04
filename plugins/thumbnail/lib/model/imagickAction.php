@@ -64,4 +64,15 @@ abstract class imagickAction
 
 		return $result;
 	}
+
+	protected function getBoolActionParameter($actionParameterName, $default = null)
+	{
+		$result = $this->getActionParameter($actionParameterName, $default);
+		if($result)
+		{
+			return true;
+		}
+
+		return false;
+	}
 }

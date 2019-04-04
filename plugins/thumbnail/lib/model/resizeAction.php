@@ -23,7 +23,7 @@ class resizeAction extends imagickAction
 		$this->newHeight = $this->getIntActionParameter(kThumbnailParameterName::HEIGHT);
 		$this->filterType = $this->getActionParameter(kThumbnailParameterName::FILTER_TYPE, Imagick::FILTER_LANCZOS);
 		$this->blur = $this->getFloatActionParameter(kThumbnailParameterName::BLUR, 1);
-		$this->bestFit = $this->gettActionParameter(kThumbnailParameterName::BEST_FIT);
+		$this->bestFit = $this->getBoolActionParameter(kThumbnailParameterName::BEST_FIT);
 		$this->shouldUseResize = true;
 		if($this->newHeight > $this->currentHeight && $this->newWidth > $this->currentWidth)
 		{
@@ -38,14 +38,14 @@ class resizeAction extends imagickAction
 
 	protected function validateDimensions()
 	{
-		if($this->newWidth < 1)
+		if($this->bestFit && $this->newWidth < 1)
 		{
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'width must be positive');
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'If bestfit parameter width must be positive');
 		}
 
-		if($this->newHeight < 1)
+		if($this->bestFit && $this->newHeight < 1)
 		{
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'height must be positive');
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, ' If bestfit parameter height must be positive');
 		}
 
 		if(!is_numeric($this->newWidth) || $this->newWidth < 0 || $this->newWidth > 10000)
@@ -63,7 +63,15 @@ class resizeAction extends imagickAction
 
 	protected function doAction()
 	{
-		$this->image->resizeImage($this->width, $this->height, $this->filterType, $this->blur, $this->bestFit);
-		return $this-image;
+		if($this->shouldUseResize)
+		{
+			$this->image->resizeImage($this->newWidth, $this->newHeight, $this->filterType, $this->blur, $this->bestFit);
+		}
+		else
+		{
+			$this->image->scaleImage($this->newWidth, $this->newHeight, $this->bestFit);
+		}
+
+		return $this->image;
 	}
 }
