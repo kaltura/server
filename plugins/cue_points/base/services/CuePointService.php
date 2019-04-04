@@ -400,6 +400,14 @@ class CuePointService extends KalturaBaseService
 	 */
 	function cloneAction($id, $entryId)
 	{
+		$newdbCuePoint = $this->doClone($id, $entryId);
+		$newdbCuePoint->save();
+		$cuePoint = KalturaCuePoint::getInstance($newdbCuePoint, $this->getResponseProfile());
+		return $cuePoint;
+	}
+
+	protected function doClone($id, $entryId)
+	{
 		$dbCuePoint = CuePointPeer::retrieveByPK($id);
 		if (!$dbCuePoint)
 			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
@@ -407,9 +415,7 @@ class CuePointService extends KalturaBaseService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		$newdbCuePoint = $dbCuePoint->copyToEntry($dbEntry);
-		$newdbCuePoint->save();
-		$cuePoint = KalturaCuePoint::getInstance($newdbCuePoint, $this->getResponseProfile());
-		return $cuePoint;
+		return $newdbCuePoint;
 	}
 
 	private function resetUserContentFilter($filter)

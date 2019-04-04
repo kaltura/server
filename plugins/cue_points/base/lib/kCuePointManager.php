@@ -468,8 +468,8 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			//copy cuepoints from replacement entry
 			$replacementCuePoints = CuePointPeer::retrieveByEntryId($replacingObject->getId());
 			foreach( $replacementCuePoints as $cuePoint ) {
-				$newCuePoint = $cuePoint->copyToEntry($object);
-				$newCuePoint->save();
+				$cuePoint->setEntryId($object->getId());
+				$cuePoint->save();
 			}
 			kEventsManager::flushEvents();
 		} else if (PermissionPeer::isValidForPartner(CuePointPermissionName::REMOVE_CUE_POINTS_WHEN_REPLACING_MEDIA, $object->getPartnerId())) {
