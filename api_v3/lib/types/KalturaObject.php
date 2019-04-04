@@ -536,7 +536,16 @@ abstract class KalturaObject implements IApiObject
 				if (! kXml::isXMLValidContent($value))
 					throw new KalturaAPIException ( KalturaErrors::INVALID_PARAMETER_CHAR, $this_prop );
 				else if($this->shouldPurify())
-					$value = kHtmlPurifier::purify(get_class($object_to_fill), $object_prop, $value);
+				{
+					try
+					{
+						$value = kHtmlPurifier::purify(get_class($object_to_fill), $object_prop, $value);
+					}
+					catch (Exception $e)
+					{
+						throw new KalturaAPIException(KalturaErrors::UNSAFE_HTML_TAGS, get_class($object_to_fill), $object_prop);
+					}
+				}
 			}
 			
 			$setter_callback = array ( $object_to_fill ,"set{$object_prop}");
