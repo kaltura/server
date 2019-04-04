@@ -386,7 +386,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			
 		return self::userLogin($kuser->getLoginData(), null, $requestedPartnerId, false);  // don't validate password		
 	}
-	
+
+
 	// user login by user_login_data object
 	private static function userLogin(UserLoginData $loginData = null, $password, $partnerId = null, $validatePassword = true, $otp = null)
 	{
@@ -495,17 +496,20 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				throw new kUserException('', kUserException::USER_NOT_FOUND);
 			}
 		}
-		
-		if ($kuser->getIsAdmin() && 
-			!in_array($kuser->getPartnerId(), kConf::get('no_save_of_last_login_partner_for_partner_ids')) &&
-			$loginData->getUpdatedAt(null) + 5 < time()) {
+
+		$userLoginEmailToIgnore =  kConf::getMap('UserLoginNoUpdate');
+		$ignoreUser = isset ($userLoginEmailToIgnore[$loginData->getLoginEmail()]);
+		$isAdmin = $kuser->getIsAdmin();
+		$updateTimeLimit = $loginData->getUpdatedAt(null) + 5 < time();
+		if ($isAdmin && !$ignoreUser && $updateTimeLimit)
+		{
 			$loginData->setLastLoginPartnerId($kuser->getPartnerId());
 		}
 		$loginData->save();
 		
 		$currentTime = time();
 		$dbLastLoginTime = $kuser->getLastLoginTime();
-		if(!$dbLastLoginTime || $dbLastLoginTime < $currentTime - self::LAST_LOGIN_TIME_UPDATE_INTERVAL)
+		if(!$ignoreUser && (!$dbLastLoginTime || $dbLastLoginTime < $currentTime - self::LAST_LOGIN_TIME_UPDATE_INTERVAL))
 			$kuser->setLastLoginTime($currentTime);
 		
 		$kuser->save();
