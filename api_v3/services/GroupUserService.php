@@ -264,11 +264,12 @@ class GroupUserService extends KalturaBaseService
 		if (!$shouldHandleGroupsUsersInBatch)
 		{
 			$this->initService('groupuser', 'groupuser', 'add');
-			list($shouldHandleGroupsUsersInBatch,$userToAddInBulk) = $this->addUserGroupsToGroup($kusers, $newGroup, $originalGroupId);
+			list($shouldHandleGroupsUsersInBatch, $userToAddInBulk) = $this->addUserGroupsToGroup($kusers, $newGroup, $originalGroupId);
+			$kusers = $userToAddInBulk;
 		}
 		if ($shouldHandleGroupsUsersInBatch)
 		{
-			$bulkGroupUserSyncCsv->AddGroupUserInBatch($userToAddInBulk, $originalGroupId);
+			$bulkGroupUserSyncCsv->AddGroupUserInBatch($kusers, $originalGroupId);
 		}
 
 	}
