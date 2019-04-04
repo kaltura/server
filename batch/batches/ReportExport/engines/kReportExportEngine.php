@@ -6,6 +6,7 @@
 abstract class kReportExportEngine
 {
 	const DEFAULT_TITLE = 'default';
+	const DISCLAIMER_CONFIG_KEY = 'report_filter_disclaimer_message';
 
 	protected $reportItem;
 	protected $fp;
@@ -56,6 +57,11 @@ abstract class kReportExportEngine
 
 	protected function writeFilterData()
 	{
+		$disclaimerMessage = kConf::get(self::DISCLAIMER_CONFIG_KEY, 'local', null);
+		if ($disclaimerMessage)
+		{
+			$this->writeRow($disclaimerMessage);
+		}
 		$filter = $this->reportItem->filter;
 		if ($filter && $filter->toDay && $filter->fromDay)
 		{
@@ -71,20 +77,17 @@ abstract class kReportExportEngine
 
 	protected function writeDelimitedRow($row)
 	{
-		if ($this->getDelimiter() == ',')
-		{
-			$this->writeRow($row);
-		}
-		else
-		{
-			$rowArr = explode($this->getDelimiter(), $row);
-			$this->writeRow(implode(',', $rowArr));
-		}
+		$rowArr = explode($this->getDelimiter(), $row);
+		$this->writeRow($rowArr);
 	}
 
 	protected function writeRow($row)
 	{
-		fwrite($this->fp, $row."\n");
+		if (!is_array($row))
+		{
+			$row = array($row);
+		}
+		KCsvWrapper::sanitizedFputCsv($this->fp, $row);
 	}
 
 	protected function createFileName($outputPath)
