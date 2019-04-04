@@ -501,7 +501,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$ignoreUser = isset ($userLoginEmailToIgnore[$loginData->getLoginEmail()]);
 		$isAdmin = $kuser->getIsAdmin();
 		$updateTimeLimit = $loginData->getUpdatedAt(null) + 5 < time();
-		if ($isAdmin && !$ignoreUser && $updateTimeLimit)
+		$ignorePartner = in_array($kuser->getPartnerId(), kConf::get('no_save_of_last_login_partner_for_partner_ids'));
+		if ($isAdmin && !$ignoreUser && $updateTimeLimit && !$ignorePartner)
 		{
 			$loginData->setLastLoginPartnerId($kuser->getPartnerId());
 		}
