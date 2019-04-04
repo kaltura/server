@@ -422,7 +422,7 @@ class KalturaErrors extends APIErrors
 
 	const INVALID_OBJECT_ID = "INVALID_OBJECT_ID;ID;Invalid object id [@ID@]";
 
-	const FAILED_TO_CREATE_BULK_UPLOAD_BULK_DELETE = "FAILED_TO_CREATE_BULK_UPLOAD_BULK_DELETE" ;
+	const FAILED_TO_CREATE_BULK_UPLOAD_BULK_DELETE = "FAILED_TO_CREATE_BULK_UPLOAD_BULK_DELETE;;Failed to create bulk upload job bulk delete" ;
 
 	const USER_NOT_FOUND = "USER_NOT_FOUND;;User was not found";
 
