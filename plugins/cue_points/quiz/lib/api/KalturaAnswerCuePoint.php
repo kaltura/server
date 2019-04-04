@@ -198,7 +198,11 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		parent::validateForUpdate($sourceObject, $propertiesToSkip);	
+		parent::validateForUpdate($sourceObject, $propertiesToSkip);
+		if(!$this->entryId)
+		{
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'KalturaAnswerCuePoint:entryId');
+		}
 		$dbEntry = entryPeer::retrieveByPK($this->entryId);
 		$kQuiz = QuizPlugin::validateAndGetQuiz($dbEntry);
 		$this->validateUserEntry();
