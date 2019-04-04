@@ -4,41 +4,66 @@
 * @subpackage model
 */
 
-class cropAction
+class cropAction extends imagickAction
 {
+	protected $newWidth;
+	protected $newHeight;
+	protected $currentWidth;
+	protected $currentHeight;
+	protected $gravityPoint = kCropGravityPoint::CENTER;
+
+	protected function extractActionParameters()
+	{
+		$this->newWidth = $this->getIntActionParameter(kThumbnailParameterName::WIDTH);
+		$this->newHeight = $this->getIntActionParameter(kThumbnailParameterName::HEIGHT);
+		$this->gravityPoint = $this->getIntActionParameter(kThumbnailParameterName::GRAVITY_POINT, kCropGravityPoint::CENTER);
+		$this->currentWidth = $this->image->getImageWidth();
+		$this->currentHeight = $this->image->getImageHeight();
+	}
 
 	function validateInput()
 	{
-
+		$this->validateDimensions();
 	}
 
-	function thumbnail($image, $new_w, $new_h, $focus = kCropGravityPoint::CENTER)
+	protected function validateDimensions()
 	{
-		$image->setImagePage(0, 0, 0, 0);
-		$w = $image->getImageWidth();
-		$h = $image->getImageHeight();
-
-		if ($w > $h)
+		if($this->newWidth > $this->currentWidth)
 		{
-			$resize_w = $w * $new_h / $h;
-			$resize_h = $new_h;
-		}
-		else
-		{
-			$resize_w = $new_w;
-			$resize_h = $h * $new_w / $w;
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'crop width must be smaller or equal to the current width');
 		}
 
-		$image->resizeImage($resize_w, $resize_h, Imagick::FILTER_LANCZOS, 0.9);
+		if($this->newHeight > $this->currentHeight)
+		{
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'crop height must be smaller or equal to the current height');
+		}
 
-		switch ($focus) {
+		if($this->newWidth < 1)
+		{
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'width must be positive');
+		}
+
+		if($this->newHeight < 1)
+		{
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'height must be positive');
+		}
+	}
+
+	/**
+	 * @return Imagick
+	 */
+	protected function doAction()
+	{
+		switch ($this->gravityPoint)
+		{
 			case kCropGravityPoint::TOP:
-				$image->cropImage($new_w, $new_h, 0, 0);
+				$this->image->cropImage($this->newWidth, $this->newHeight, 0, 0);
 				break;
-
 			case kCropGravityPoint::CENTER:
-				$image->cropImage($new_w, $new_h, ($resize_w - $new_w) / 2, ($resize_h - $new_h) / 2);
+				$this->image->cropImage($this->newWidth, $this->newHeight, $this->currentWidth / 2, $this->currentHeight / 2);
 				break;
 		}
+
+		return $this->image;
 	}
 }
