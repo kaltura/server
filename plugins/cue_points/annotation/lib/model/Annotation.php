@@ -127,4 +127,20 @@ class Annotation extends CuePoint implements IMetadataObject
 
 		return $data;
 	}
+
+	/***
+	 * @return bool
+	 */
+	protected function shouldRaiseCreatedEvent()
+	{
+		$entry = entryPeer::retrieveByPK($this->entry_id);
+		if ($entry && $entry->getIsTemporary())
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
 }
