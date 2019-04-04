@@ -8,6 +8,7 @@ class kBusinessPreConvertDL
 	const TAG_VARIANT_A = 'watermark_a';
 	const TAG_VARIANT_B = 'watermark_b';
 	const TAG_VARIANT_PAIR_ID = 'watermark_pair_';
+	const TAG_BIF = 'bif';
 	
 	public static $conditionalMapBySourceType = array (
 			EntrySourceType::LECTURE_CAPTURE => "LECTURE_CAPTURE_PROFILE",
@@ -1047,6 +1048,11 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$thumbParamsOutput->setFileExt($ext);
 		else
 			$thumbParamsOutput->setFileExt('jpg');
+
+		if(KCsvWrapper::contains(self::TAG_BIF, $thumbParams->getTags()))
+		{
+			$thumbParamsOutput->setFileExt(self::TAG_BIF);
+		}
 
 		$thumbParamsOutput->setRotate($mediaInfo? $mediaInfo->getVideoRotation() : null);
 
