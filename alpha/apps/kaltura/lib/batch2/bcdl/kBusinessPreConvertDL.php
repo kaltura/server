@@ -1047,11 +1047,15 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		if (!is_null($ext) && in_array($ext ,$extensionTypes))
 			$thumbParamsOutput->setFileExt($ext);
 		else
-			$thumbParamsOutput->setFileExt('jpg');
-
-		if(KCsvWrapper::contains(self::TAG_BIF, $thumbParams->getTags()))
 		{
-			$thumbParamsOutput->setFileExt(self::TAG_BIF);
+			if(KCsvWrapper::contains(self::TAG_BIF, $thumbParams->getTags()))
+			{
+				$thumbParamsOutput->setFileExt(self::TAG_BIF);
+			}
+			else
+			{
+				$thumbParamsOutput->setFileExt('jpg');
+			}
 		}
 
 		$thumbParamsOutput->setRotate($mediaInfo? $mediaInfo->getVideoRotation() : null);
