@@ -107,20 +107,14 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 	 * @param $partnerId
 	 * @return array|mixed
 	 */
-	public static function retrieveKgroupIdsByKuserIdAndPartnerId($kuserId, $partnerId)
+	public static function retrieveKgroupByKuserIdAndPartnerId($kuserId, $partnerId)
 	{
 		$c = new Criteria();
 		$c->add(KuserKgroupPeer::KUSER_ID, array($kuserId), Criteria::IN);
 		$c->addAnd ( KuserKgroupPeer::PARTNER_ID, $partnerId, Criteria::EQUAL );
 		$kuserKgroups = KuserKgroupPeer::doSelect($c);
 
-		$kgroupIds = array();
-		foreach ($kuserKgroups as $kuserKgroup){
-			/* @var $kuserKgroup KuserKgroup */
-			$kgroupIds[] = $kuserKgroup->getKgroupId();
-		}
-
-		return $kgroupIds;
+		return $kuserKgroups;
 	}
 
 	/* (non-PHPdoc)

@@ -1321,6 +1321,8 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	 */
 	public function getObjectParams($params = null)
 	{
+		$kuserKgroups =  KuserKgroupPeer::retrieveKgroupByKuserIdAndPartnerId($this->getKuserId(), $this->getPartnerId());
+
 		$body = array(
 			'partner_id' => $this->getPartnerId(),
 			'status' => $this->getStatus(),
@@ -1335,7 +1337,8 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			'last_name_ft' => $this->getLastName(),
 			'role_ids' => explode(',',$this->getRoleIds()), //todo - maybe add help to elastic here
 			'permission_names' => $this->getIndexedPermissionNames(), //todo - replace to array
-			'group_ids' => KuserKgroupPeer::retrieveKgroupIdsByKuserIdAndPartnerId($this->getKuserId(), $this->getPartnerId()),
+			'group_ids' => $this->getKgroupIds($kuserKgroups),
+			'creation_modes' => $this->getFormatCreationModes($kuserKgroups),
 			'puser_id' => $this->getPuserId(),
 			'members_count' => $this->getMembersCount()
 		);
@@ -1343,6 +1346,30 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		elasticSearchUtils::cleanEmptyValues($body);
 
 		return $body;
+	}
+
+	protected function getKgroupIds($kuserKgroups)
+	{
+		$kgroupIds = array();
+		foreach ($kuserKgroups as $kuserKgroup)
+		{
+			/* @var $kuserKgroup KuserKgroup */
+			$kgroupIds[] = $kuserKgroup->getKgroupId();
+		}
+
+		return $kgroupIds;
+	}
+
+	protected function getFormatCreationModes($kuserKgroups)
+	{
+		$formatCreationModes = array();
+		foreach ($kuserKgroups as $kuserKgroup)
+		{
+			/* @var $kuserKgroup KuserKgroup */
+			$formatCreationModes[] = elasticSearchUtils::formatCreationMode($kuserKgroup->getKgroupId(), $kuserKgroup->getCreationMode());
+		}
+
+		return $formatCreationModes;
 	}
 
 	/**

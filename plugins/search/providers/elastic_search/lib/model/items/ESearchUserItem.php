@@ -16,6 +16,11 @@ class ESearchUserItem extends ESearchItem
 	 */
 	protected $searchTerm;
 
+	/**
+	 * @var GroupUserCreationMode
+	 */
+	protected $creationMode;
+
 	protected static $searchHistoryFields = array(
 		ESearchUserFieldName::SCREEN_NAME,
 		ESearchUserFieldName::FIRST_NAME,
@@ -105,7 +110,7 @@ class ESearchUserItem extends ESearchItem
 		switch ($this->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
-				$subQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$subQuery = $this->getUserExactMatchQuery($allowedSearchTypes, $queryAttributes);
 				break;
 			case ESearchItemType::PARTIAL:
 				$subQuery = kESearchQueryManager::getPartialQuery($this, $this->getFieldName(), $queryAttributes);
@@ -127,6 +132,48 @@ class ESearchUserItem extends ESearchItem
 			$userQuery[] = $subQuery;
 	}
 
+
+	protected function getUserExactMatchQuery($allowedSearchTypes, &$queryAttributes)
+	{
+		if($this->shouldAddCreationModeSearch())
+		{
+			return $this->getGroupIdExactMatchWithCreationMode($allowedSearchTypes, $queryAttributes);
+		}
+
+		return kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+	}
+
+	private function shouldAddCreationModeSearch()
+	{
+		$creationMode = $this->getCreationMode();
+		if(in_array($this->getFieldName(), array(ESearchUserFieldName::GROUP_IDS)) &&  isset($creationMode))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	private function getGroupIdExactMatchWithCreationMode($allowedSearchTypes, &$queryAttributes)
+	{
+		$originalTerm = $this->getSearchTerm();
+		$boolQuery = new kESearchBoolQuery();
+		$creationMode = $this->getCreationMode();
+
+		if(!is_null($creationMode))
+		{
+			$this->setSearchTerm(elasticSearchUtils::formatCreationMode($originalTerm, $creationMode));
+			$creationModeQuery = kESearchQueryManager::getExactMatchQuery($this, "creation_modes", $allowedSearchTypes, $queryAttributes);
+			$boolQuery->addToFilter($creationModeQuery);
+		}
+
+		$this->setSearchTerm($originalTerm);
+
+		return $boolQuery;
+	}
+
+
+
 	public function shouldAddLanguageSearch()
 	{
 		if(in_array($this->getFieldName(), self::$multiLanguageFields))
@@ -139,5 +186,22 @@ class ESearchUserItem extends ESearchItem
 	{
 
 	}
+
+	/**
+	 * @return GroupUserCreationMode
+	 */
+	public function getCreationMode()
+	{
+		return $this->creationMode;
+	}
+
+	/**
+	 * @param GroupUserCreationMode $creationMode
+	 */
+	public function setCreationMode($creationMode)
+	{
+		$this->creationMode = $creationMode;
+	}
+
 
 }
