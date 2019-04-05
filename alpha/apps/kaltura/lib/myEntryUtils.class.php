@@ -2306,7 +2306,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$syncKey = null;
 		if($dbObject instanceof thumbAsset)
 		{
-			$syncKey = $dbObject->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$syncKey = $dbObject->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		}
 		else if (($dbObject instanceof entry) && ($dbObject->getMediaType() == KalturaMediaType::IMAGE))
 		{
