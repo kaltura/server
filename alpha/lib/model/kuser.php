@@ -1321,8 +1321,6 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	 */
 	public function getObjectParams($params = null)
 	{
-		$kuserKgroups =  KuserKgroupPeer::retrieveKgroupByKuserIdAndPartnerId($this->getKuserId(), $this->getPartnerId());
-
 		$body = array(
 			'partner_id' => $this->getPartnerId(),
 			'status' => $this->getStatus(),
@@ -1337,39 +1335,32 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			'last_name_ft' => $this->getLastName(),
 			'role_ids' => explode(',',$this->getRoleIds()), //todo - maybe add help to elastic here
 			'permission_names' => $this->getIndexedPermissionNames(), //todo - replace to array
-			'group_ids' => $this->getKgroupIds($kuserKgroups),
-			'creation_modes' => $this->getFormatCreationModes($kuserKgroups),
 			'puser_id' => $this->getPuserId(),
 			'members_count' => $this->getMembersCount()
 		);
-
+		$this->addGroupIdsAndGroupUserDataToObjectParams($body, $this->getKuserId(), $this->getPartnerId());
 		elasticSearchUtils::cleanEmptyValues($body);
 
 		return $body;
 	}
 
-	protected function getKgroupIds($kuserKgroups)
+
+	protected function addGroupIdsAndGroupUserDataToObjectParams(&$body, $kuserId, $partnerId)
 	{
 		$kgroupIds = array();
+		$formatCreationModes = array();
+
+		$kuserKgroups =  KuserKgroupPeer::retrieveKgroupByKuserIdAndPartnerId($kuserId, $partnerId);
 		foreach ($kuserKgroups as $kuserKgroup)
 		{
 			/* @var $kuserKgroup KuserKgroup */
 			$kgroupIds[] = $kuserKgroup->getKgroupId();
+			$formatCreationModes[] = elasticSearchUtils::formatGroupUserCreationMode($kuserKgroup->getKgroupId(), $kuserKgroup->getCreationMode());
 		}
 
-		return $kgroupIds;
-	}
 
-	protected function getFormatCreationModes($kuserKgroups)
-	{
-		$formatCreationModes = array();
-		foreach ($kuserKgroups as $kuserKgroup)
-		{
-			/* @var $kuserKgroup KuserKgroup */
-			$formatCreationModes[] = elasticSearchUtils::formatCreationMode($kuserKgroup->getKgroupId(), $kuserKgroup->getCreationMode());
-		}
-
-		return $formatCreationModes;
+		$body['group_ids'] = $kgroupIds;
+		$body['group_user_data'] = $formatCreationModes;
 	}
 
 	/**

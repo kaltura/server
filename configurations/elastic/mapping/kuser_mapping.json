@@ -156,7 +156,7 @@
 		  "type" : "keyword",
 		  "normalizer" : "kaltura_keyword_normalizer"
 		},
-		"creation_modes" : {
+		"group_user_data" : {
 		  "type" : "keyword",
 		  "normalizer" : "kaltura_keyword_normalizer"
 		},

@@ -26,7 +26,7 @@ class KalturaESearchGroupUserItem extends KalturaESearchAbstractUserItem
 	private static $map_dynamic_enum = array();
 
 	private static $map_field_enum = array(
-		KalturaEsearchGroupUserFieldName::GROUP_IDS => ESearchUserFieldName::GROUP_IDS,
+		KalturaEsearchGroupUserFieldName::GROUP_IDS => ESearchGroupUserFieldName::GROUP_IDS,
 
 	);
 
@@ -53,7 +53,7 @@ class KalturaESearchGroupUserItem extends KalturaESearchAbstractUserItem
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (!$object_to_fill)
-			$object_to_fill = new ESearchUserItem();
+			$object_to_fill = new ESearchGroupUserItem();
 
 		if (in_array($this->fieldName, array(KalturaEsearchGroupUserFieldName::GROUP_IDS)))
 		{
