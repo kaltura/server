@@ -157,8 +157,8 @@
 		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"creation_modes" : {
-			"type" : "keyword",
-			"normalizer" : "kaltura_keyword_normalizer"
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
 		},
 		"puser_id" : {
 		  "type" : "text",
