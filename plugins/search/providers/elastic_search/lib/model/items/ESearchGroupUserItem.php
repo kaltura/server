@@ -7,7 +7,7 @@ class ESearchGroupUserItem extends ESearchItem
 {
 	const GROUP_USER_DATA = 'group_user_data';
 	/**
-	 * @var ESearchCategoryUserFieldName
+	 * @var ESearchGroupUserFieldName
 	 */
 	protected $fieldName;
 
@@ -26,7 +26,7 @@ class ESearchGroupUserItem extends ESearchItem
 	);
 
 	/**
-	 * @return ESearchCategoryUserFieldName
+	 * @return ESearchGroupUserFieldName
 	 */
 	public function getFieldName()
 	{
@@ -34,7 +34,7 @@ class ESearchGroupUserItem extends ESearchItem
 	}
 
 	/**
-	 * @param ESearchCategoryUserFieldName $fieldName
+	 * @param ESearchGroupUserFieldName $fieldName
 	 */
 	public function setFieldName($fieldName)
 	{
