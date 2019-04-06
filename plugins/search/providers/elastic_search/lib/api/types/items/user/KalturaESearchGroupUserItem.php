@@ -53,7 +53,9 @@ class KalturaESearchGroupUserItem extends KalturaESearchAbstractUserItem
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (!$object_to_fill)
+		{
 			$object_to_fill = new ESearchGroupUserItem();
+		}
 
 		if (in_array($this->fieldName, array(KalturaEsearchGroupUserFieldName::GROUP_IDS)))
 		{
