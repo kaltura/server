@@ -167,11 +167,7 @@ class ESearchCategoryUserItem extends ESearchItem
 	private function getUserIdExactMatchWithPermissions($allowedSearchTypes, &$queryAttributes)
 	{
 		$originalTerms = KuserKgroupPeer::retrieveKgroupIdsByKuserId($this->getSearchTerm());
-		if (!$originalTerms)
-		{
-			// the user doesn't belong to groups, search term should be only the user itself
-			$originalTerms[] = $this->getSearchTerm();
-		}
+		$originalTerms[] = $this->getSearchTerm();
 
 		$boolQuery = new kESearchBoolQuery();
 		foreach ($originalTerms as $originalTerm)
