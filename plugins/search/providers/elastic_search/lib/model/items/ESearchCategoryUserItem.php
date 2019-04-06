@@ -164,37 +164,38 @@ class ESearchCategoryUserItem extends ESearchItem
 		return false;
 	}
 
-	private function getUserIdExactMatchWithPermissions($allowedSearchTypes, &$queryAttributes)
+	protected function getUserIdExactMatchWithPermissions($allowedSearchTypes, &$queryAttributes)
 	{
 		$kuserId = $this->getSearchTerm();
-		$userGroupIds = $this->getGroupUsers($kuserId);
+		$groupIds = $this->getGroupIds($kuserId);
+		$groupIds[] = $kuserId;
 
 		$boolQuery = new kESearchBoolQuery();
-		foreach ($userGroupIds as $userGroupId)
+		$item = clone $this;
+		foreach ($groupIds as $groupId)
 		{
-			$permissionLevel = $this->getPermissionLevel();
-			$permissionName = $this->getPermissionName();
+			$permissionLevel = $item->getPermissionLevel();
+			$permissionName = $item->getPermissionName();
 
 			if (!is_null($permissionLevel))
 			{
-				$this->setSearchTerm(elasticSearchUtils::formatCategoryUserPermissionLevel($userGroupId, $permissionLevel));
-				$permissionLevelQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$item->setSearchTerm(elasticSearchUtils::formatCategoryUserPermissionLevel($groupId, $permissionLevel));
+				$permissionLevelQuery = kESearchQueryManager::getExactMatchQuery($item, ESearchCategoryUserFieldName::USER_ID, $allowedSearchTypes, $queryAttributes);
 				$boolQuery->addToShould($permissionLevelQuery);
 			}
 
 			if ($permissionName)
 			{
-				$this->setSearchTerm(elasticSearchUtils::formatCategoryUserPermissionName($userGroupId, $permissionName));
-				$permissionNameQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$item->setSearchTerm(elasticSearchUtils::formatCategoryUserPermissionName($groupId, $permissionName));
+				$permissionNameQuery = kESearchQueryManager::getExactMatchQuery($item, ESearchCategoryUserFieldName::USER_ID, $allowedSearchTypes, $queryAttributes);
 				$boolQuery->addToShould($permissionNameQuery);
 			}
 		}
-		$this->setSearchTerm($kuserId);
 
 		return $boolQuery;
 	}
 
-	private function getGroupUsers($kuserId)
+	protected function getGroupIds($kuserId)
 	{
 		$params = array(
 			elasticClient::ELASTIC_INDEX_KEY => ElasticIndexMap::ELASTIC_KUSER_INDEX,
@@ -204,15 +205,13 @@ class ESearchCategoryUserItem extends ESearchItem
 
 		$elasticClient = new elasticClient();
 		$elasticResults = $elasticClient->get($params);
-		$userGroupIds = array();
+		$groupIds = array();
 		if (isset($elasticResults[kESearchCoreAdapter::SOURCE][ESearchUserFieldName::GROUP_IDS]))
 		{
-			$userGroupIds = $elasticResults[kESearchCoreAdapter::SOURCE][ESearchUserFieldName::GROUP_IDS];
+			$groupIds = $elasticResults[kESearchCoreAdapter::SOURCE][ESearchUserFieldName::GROUP_IDS];
 		}
 
-		$userGroupIds[] = $kuserId; //adding the kuser itself
-
-		return $userGroupIds;
+		return $groupIds;
 	}
 
 	public function shouldAddLanguageSearch()
