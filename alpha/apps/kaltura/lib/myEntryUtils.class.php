@@ -2301,4 +2301,28 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 	}
 
+	public static function validateObjectContent($dbObject)
+	{
+		$syncKey = null;
+		if($dbObject instanceof thumbAsset)
+		{
+			$syncKey = $dbObject->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		}
+		else if (($dbObject instanceof entry) && ($dbObject->getMediaType() == KalturaMediaType::IMAGE))
+		{
+			$syncKey = $dbObject->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+		}
+
+		if($syncKey)
+		{
+			$filePath = kAssetUtils::getLocalImagePath($syncKey);
+			$validContent = myThumbUtils::validateImageContent($filePath);
+			if(!$validContent)
+			{
+				throw new Exception ("content contains potential security risks");
+			}
+		}
+
+	}
+
 }

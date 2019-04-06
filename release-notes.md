@@ -1,5 +1,21 @@
 # Naos 14.19.0 #
 
+## Deploy new eng audio description flavor param ##s
+
+- Issue Type: Feature
+- Issue ID: PLAT-9819
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2019_04_17_deploy_audio_description_flavor_params.php
+
+#### Known Issues & Limitations ####
+None
+
+
 # add deleted to qna metadataprofile on partner 0##
  - Issue Type: Feature
  - Issue IDs: WEBC-1364
