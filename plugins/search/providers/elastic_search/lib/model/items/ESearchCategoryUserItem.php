@@ -166,41 +166,54 @@ class ESearchCategoryUserItem extends ESearchItem
 
 	private function getUserIdExactMatchWithPermissions($allowedSearchTypes, &$queryAttributes)
 	{
-
-		$params = array(
-			elasticClient::ELASTIC_INDEX_KEY => ElasticIndexMap::ELASTIC_KUSER_INDEX,
-			elasticClient::ELASTIC_TYPE_KEY => ElasticIndexMap::ELASTIC_KUSER_TYPE,
-			elasticClient::ELASTIC_ID_KEY => $this->getSearchTerm()
-		);
-
-		$elasticClient = new elasticClient();
-		$elasticResults = $elasticClient->get($params);
-		$userGroupIds  = $elasticResults[kESearchCoreAdapter::SOURCE][kESearchCoreAdapter::GROUP_IDS];
-		$userGroupIds[] = $this->getSearchTerm(); //adding the kuser itself
+		$kuserId = $this->getSearchTerm();
+		$userGroupIds = $this->getGroupUsers($kuserId);
 
 		$boolQuery = new kESearchBoolQuery();
-		foreach ($userGroupIds as $originalTerm)
+		foreach ($userGroupIds as $userGroupId)
 		{
 			$permissionLevel = $this->getPermissionLevel();
 			$permissionName = $this->getPermissionName();
 
 			if (!is_null($permissionLevel))
 			{
-				$this->setSearchTerm(elasticSearchUtils::formatCategoryUserPermissionLevel($originalTerm, $permissionLevel));
+				$this->setSearchTerm(elasticSearchUtils::formatCategoryUserPermissionLevel($userGroupId, $permissionLevel));
 				$permissionLevelQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				$boolQuery->addToShould($permissionLevelQuery);
 			}
 
 			if ($permissionName)
 			{
-				$this->setSearchTerm(elasticSearchUtils::formatCategoryUserPermissionName($originalTerm, $permissionName));
+				$this->setSearchTerm(elasticSearchUtils::formatCategoryUserPermissionName($userGroupId, $permissionName));
 				$permissionNameQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				$boolQuery->addToShould($permissionNameQuery);
 			}
 		}
-		$this->setSearchTerm($this->getSearchTerm());
+		$this->setSearchTerm($kuserId);
 
 		return $boolQuery;
+	}
+
+	private function getGroupUsers($kuserId)
+	{
+		$params = array(
+			elasticClient::ELASTIC_INDEX_KEY => ElasticIndexMap::ELASTIC_KUSER_INDEX,
+			elasticClient::ELASTIC_TYPE_KEY => ElasticIndexMap::ELASTIC_KUSER_TYPE,
+			elasticClient::ELASTIC_ID_KEY => $kuserId
+		);
+
+		$elasticClient = new elasticClient();
+		$elasticResults = $elasticClient->get($params);
+		$userSourceArray  = $elasticResults[kESearchCoreAdapter::SOURCE];
+		$userGroupIds = array();
+		if (isset($userSourceArray[kESearchCoreAdapter::GROUP_IDS]))
+		{
+			$userGroupIds = $userSourceArray[kESearchCoreAdapter::GROUP_IDS];
+		}
+
+		$userGroupIds[] = $kuserId; //adding the kuser itself
+
+		return $userGroupIds;
 	}
 
 	public function shouldAddLanguageSearch()
