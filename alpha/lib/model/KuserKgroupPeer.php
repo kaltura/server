@@ -119,7 +119,6 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 		$kuserKgroups = KuserKgroupPeer::doSelect($c);
 		self::setUseCriteriaFilter(true);
 
-		self::setUseCriteriaFilter(true);
 		return $kuserKgroups;
 
 	}
