@@ -110,7 +110,7 @@ class ESearchGroupUserItem extends ESearchItem
 			return $this->getGroupIdExactMatchWithCreationMode($allowedSearchTypes, $queryAttributes);
 		}
 
-		return $this->getGroupIdExactMatchWithoutCreationMode($allowedSearchTypes, $queryAttributes);
+		return kESearchQueryManager::getExactMatchQuery($this,ESearchUserFieldName::GROUP_IDS, $allowedSearchTypes, $queryAttributes);
 	}
 
 	private function shouldAddCreationModeSearch()
@@ -134,24 +134,6 @@ class ESearchGroupUserItem extends ESearchItem
 		$this->setSearchTerm($originalTerm);
 
 		return $creationModeQuery;
-	}
-
-	private function getGroupIdExactMatchWithoutCreationMode($allowedSearchTypes, &$queryAttributes)
-	{
-		$originalTerm = $this->getSearchTerm();
-		$boolQuery = new kESearchBoolQuery();
-
-		$this->setSearchTerm(elasticSearchUtils::formatGroupIdCreationMode($originalTerm, GroupUserCreationMode::MANUAL));
-		$creationModeManualQuery = kESearchQueryManager::getExactMatchQuery($this,  $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
-		$boolQuery->addToShould($creationModeManualQuery);
-
-		$this->setSearchTerm(elasticSearchUtils::formatGroupIdCreationMode($originalTerm, GroupUserCreationMode::AUTOMATIC));
-		$creationModeAutomaticQuery = kESearchQueryManager::getExactMatchQuery($this,  $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
-		$boolQuery->addToShould($creationModeAutomaticQuery);
-
-		$this->setSearchTerm($originalTerm);
-
-		return $boolQuery;
 	}
 
 	public function shouldAddLanguageSearch()
