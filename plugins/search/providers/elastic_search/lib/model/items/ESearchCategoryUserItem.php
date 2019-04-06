@@ -166,26 +166,34 @@ class ESearchCategoryUserItem extends ESearchItem
 
 	private function getUserIdExactMatchWithPermissions($allowedSearchTypes, &$queryAttributes)
 	{
-		$originalTerm = $this->getSearchTerm();
+		$originalTerms = KuserKgroupPeer::retrieveKgroupIdsByKuserId($this->getSearchTerm());
+		if (!$originalTerms)
+		{
+			// the user doesn't belong to groups, search term should be only the user itself
+			$originalTerms[] = $this->getSearchTerm();
+		}
+
 		$boolQuery = new kESearchBoolQuery();
-		$permissionLevel = $this->getPermissionLevel();
-		$permissionName = $this->getPermissionName();
-
-		if(!is_null($permissionLevel))
+		foreach ($originalTerms as $originalTerm)
 		{
-			$this->setSearchTerm(elasticSearchUtils::formatCategoryUserPermissionLevel($originalTerm, $permissionLevel));
-			$permissionLevelQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
-			$boolQuery->addToFilter($permissionLevelQuery);
-		}
+			$permissionLevel = $this->getPermissionLevel();
+			$permissionName = $this->getPermissionName();
 
-		if($permissionName)
-		{
-			$this->setSearchTerm(elasticSearchUtils::formatCategoryUserPermissionName($originalTerm, $permissionName));
-			$permissionNameQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
-			$boolQuery->addToFilter($permissionNameQuery);
-		}
+			if (!is_null($permissionLevel))
+			{
+				$this->setSearchTerm(elasticSearchUtils::formatCategoryUserPermissionLevel($originalTerm, $permissionLevel));
+				$permissionLevelQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$boolQuery->addToShould($permissionLevelQuery);
+			}
 
-		$this->setSearchTerm($originalTerm);
+			if ($permissionName)
+			{
+				$this->setSearchTerm(elasticSearchUtils::formatCategoryUserPermissionName($originalTerm, $permissionName));
+				$permissionNameQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				$boolQuery->addToShould($permissionNameQuery);
+			}
+		}
+		$this->setSearchTerm($this->getSearchTerm());
 
 		return $boolQuery;
 	}
