@@ -21,7 +21,6 @@ class kESearchCoreAdapter
 	const ITEMS_KEY = 'items';
 	const HIGHLIGHT_KEY = 'highlight';
 	const SOURCE = '_source';
-	const GROUP_IDS = 'group_ids';
 
 	private static $innerHitsObjectType = array(
 		'caption' => ESearchItemDataType::CAPTION,

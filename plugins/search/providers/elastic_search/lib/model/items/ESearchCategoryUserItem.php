@@ -204,11 +204,10 @@ class ESearchCategoryUserItem extends ESearchItem
 
 		$elasticClient = new elasticClient();
 		$elasticResults = $elasticClient->get($params);
-		$userSourceArray  = $elasticResults[kESearchCoreAdapter::SOURCE];
 		$userGroupIds = array();
-		if (isset($userSourceArray[kESearchCoreAdapter::GROUP_IDS]))
+		if (isset($elasticResults[kESearchCoreAdapter::SOURCE][ESearchUserFieldName::GROUP_IDS]))
 		{
-			$userGroupIds = $userSourceArray[kESearchCoreAdapter::GROUP_IDS];
+			$userGroupIds = $elasticResults[kESearchCoreAdapter::SOURCE][ESearchUserFieldName::GROUP_IDS];
 		}
 
 		$userGroupIds[] = $kuserId; //adding the kuser itself
