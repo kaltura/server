@@ -130,9 +130,15 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 		$userEntry = UserEntryPeer::retrieveByPK($this->getQuizUserEntryId());
 		if (!is_null($userEntry))
 		{
-			$userEntry->addAnswerId($this->parent_id, $this->id);
-			$userEntry->save();
+			$lockKey = "answerCuePoint_postInsert" . $this->getPartnerId() . $userEntry->getId();
+			return kLock::runLocked($lockKey, array($this, 'addingAnswerId'), array($userEntry));
+
 		}
+	}
+	public function addingAnswerId($userEntry)
+	{
+		$userEntry->addAnswerId($this->parent_id, $this->id);
+		$userEntry->save();
 	}
 
 	public function shouldReIndexEntry(array $modifiedColumns = array())
