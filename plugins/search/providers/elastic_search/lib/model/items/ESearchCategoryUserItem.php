@@ -166,11 +166,20 @@ class ESearchCategoryUserItem extends ESearchItem
 
 	private function getUserIdExactMatchWithPermissions($allowedSearchTypes, &$queryAttributes)
 	{
-		$originalTerms = KuserKgroupPeer::retrieveKgroupIdsByKuserId($this->getSearchTerm());
-		$originalTerms[] = $this->getSearchTerm();
+
+		$params = array(
+			elasticClient::ELASTIC_INDEX_KEY => ElasticIndexMap::ELASTIC_KUSER_INDEX,
+			elasticClient::ELASTIC_TYPE_KEY => ElasticIndexMap::ELASTIC_KUSER_TYPE,
+			elasticClient::ELASTIC_ID_KEY => $this->getSearchTerm()
+		);
+
+		$elasticClient = new elasticClient();
+		$elasticResults = $elasticClient->get($params);
+		$userGroupIds  = $elasticResults[kESearchCoreAdapter::SOURCE][kESearchCoreAdapter::GROUP_IDS];
+		$userGroupIds[] = $this->getSearchTerm(); //adding the kuser itself
 
 		$boolQuery = new kESearchBoolQuery();
-		foreach ($originalTerms as $originalTerm)
+		foreach ($userGroupIds as $originalTerm)
 		{
 			$permissionLevel = $this->getPermissionLevel();
 			$permissionName = $this->getPermissionName();
