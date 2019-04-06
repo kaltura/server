@@ -5,7 +5,6 @@
  */
 class ESearchGroupUserItem extends ESearchItem
 {
-	const GROUP_USER_DATA = 'group_user_data';
 	/**
 	 * @var ESearchGroupUserFieldName
 	 */
@@ -22,7 +21,7 @@ class ESearchGroupUserItem extends ESearchItem
 	protected $creationMode;
 
 	private static $allowed_search_types_for_field = array(
-		ESearchGroupUserFieldName::GROUP_IDS => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
+		ESearchGroupUserFieldName::GROUP_USER_DATA => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
 	);
 
 	/**
@@ -111,13 +110,13 @@ class ESearchGroupUserItem extends ESearchItem
 			return $this->getGroupIdExactMatchWithCreationMode($allowedSearchTypes, $queryAttributes);
 		}
 
-		return kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+		return $this->getGroupIdExactMatchWithoutCreationMode($allowedSearchTypes, $queryAttributes);
 	}
 
 	private function shouldAddCreationModeSearch()
 	{
 		$creationMode = $this->getCreationMode();
-		if(in_array($this->getFieldName(), array(ESearchUserFieldName::GROUP_IDS)) &&  isset($creationMode))
+		if(in_array($this->getFieldName(), array(ESearchGroupUserFieldName::GROUP_USER_DATA)) &&  isset($creationMode))
 		{
 			return true;
 		}
@@ -130,11 +129,29 @@ class ESearchGroupUserItem extends ESearchItem
 		$originalTerm = $this->getSearchTerm();
 		$creationMode = $this->getCreationMode();
 
-		$this->setSearchTerm(elasticSearchUtils::formatGroupUserCreationMode($originalTerm, $creationMode));
-		$creationModeQuery = kESearchQueryManager::getExactMatchQuery($this, self::GROUP_USER_DATA, $allowedSearchTypes, $queryAttributes);
+		$this->setSearchTerm(elasticSearchUtils::formatGroupIdCreationMode($originalTerm, $creationMode));
+		$creationModeQuery = kESearchQueryManager::getExactMatchQuery($this,  $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 		$this->setSearchTerm($originalTerm);
 
 		return $creationModeQuery;
+	}
+
+	private function getGroupIdExactMatchWithoutCreationMode($allowedSearchTypes, &$queryAttributes)
+	{
+		$originalTerm = $this->getSearchTerm();
+		$boolQuery = new kESearchBoolQuery();
+
+		$this->setSearchTerm(elasticSearchUtils::formatGroupIdCreationMode($originalTerm, GroupUserCreationMode::MANUAL));
+		$creationModeManualQuery = kESearchQueryManager::getExactMatchQuery($this,  $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+		$boolQuery->addToShould($creationModeManualQuery);
+
+		$this->setSearchTerm(elasticSearchUtils::formatGroupIdCreationMode($originalTerm, GroupUserCreationMode::AUTOMATIC));
+		$creationModeAutomaticQuery = kESearchQueryManager::getExactMatchQuery($this,  $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+		$boolQuery->addToShould($creationModeAutomaticQuery);
+
+		$this->setSearchTerm($originalTerm);
+
+		return $boolQuery;
 	}
 
 	public function shouldAddLanguageSearch()

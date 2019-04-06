@@ -1338,24 +1338,24 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			'puser_id' => $this->getPuserId(),
 			'members_count' => $this->getMembersCount()
 		);
-		$this->addGroupIdsAndGroupUserDataToObjectParams($body, $this->getKuserId(), $this->getPartnerId());
+		$this->addGroupUserDataToObjectParams($body);
 		elasticSearchUtils::cleanEmptyValues($body);
 
 		return $body;
 	}
 
 
-	protected function addGroupIdsAndGroupUserDataToObjectParams(&$body, $kuserId, $partnerId)
+	protected function addGroupUserDataToObjectParams(&$body)
 	{
 		$kgroupIds = array();
 		$formatCreationModes = array();
 
-		$kuserKgroups =  KuserKgroupPeer::retrieveKgroupByKuserIdAndPartnerId($kuserId, $partnerId);
+		$kuserKgroups =  KuserKgroupPeer::retrieveKgroupByKuserIdAndPartnerId($this->getKuserId(), $this->getPartnerId());
 		foreach ($kuserKgroups as $kuserKgroup)
 		{
 			/* @var $kuserKgroup KuserKgroup */
 			$kgroupIds[] = $kuserKgroup->getKgroupId();
-			$formatCreationModes[] = elasticSearchUtils::formatGroupUserCreationMode($kuserKgroup->getKgroupId(), $kuserKgroup->getCreationMode());
+			$formatCreationModes[] = elasticSearchUtils::formatGroupIdCreationMode($kuserKgroup->getKgroupId(), $kuserKgroup->getCreationMode());
 		}
 
 

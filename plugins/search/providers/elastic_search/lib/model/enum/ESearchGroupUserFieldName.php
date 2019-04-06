@@ -5,5 +5,5 @@
  */
 class ESearchGroupUserFieldName extends KalturaStringEnum
 {
-	const GROUP_IDS = 'group_ids';
+	const GROUP_USER_DATA = 'group_user_data';
 }
