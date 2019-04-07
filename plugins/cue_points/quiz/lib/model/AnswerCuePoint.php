@@ -127,18 +127,18 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 	public function postInsert(PropelPDO $con = null)
 	{
 		parent::postInsert($con);
+		$lockKey = "answerCuePoint_postInsert" . $this->getPartnerId() . $this->getQuizUserEntryId();
+		return kLock::runLocked($lockKey, array($this, 'addingAnswerIdToUserEntry'));
+
+	}
+	public function addingAnswerIdToUserEntry()
+	{
 		$userEntry = UserEntryPeer::retrieveByPK($this->getQuizUserEntryId());
 		if (!is_null($userEntry))
 		{
-			$lockKey = "answerCuePoint_postInsert" . $this->getPartnerId() . $userEntry->getId();
-			return kLock::runLocked($lockKey, array($this, 'addingAnswerId'), array($userEntry));
-
+			$userEntry->addAnswerId($this->parent_id, $this->id);
+			$userEntry->save();
 		}
-	}
-	public function addingAnswerId($userEntry)
-	{
-		$userEntry->addAnswerId($this->parent_id, $this->id);
-		$userEntry->save();
 	}
 
 	public function shouldReIndexEntry(array $modifiedColumns = array())
