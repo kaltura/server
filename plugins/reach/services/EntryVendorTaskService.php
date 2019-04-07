@@ -17,7 +17,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		if (!ReachPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
 		
-		if (!in_array($actionName, array('getJobs', 'updateJob', 'list')))
+		if (!in_array($actionName, array('getJobs', 'updateJob', 'list', 'extendAccessKey')))
 		{
 			$this->applyPartnerFilterForClass('entryVendorTask');
 			$this->applyPartnerFilterForClass('reachProfile');
@@ -44,7 +44,6 @@ class EntryVendorTaskService extends KalturaBaseService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryVendorTask->entryId);
 		
-		
 		$dbReachProfile = ReachProfilePeer::retrieveActiveByPk($entryVendorTask->reachProfileId);
 		if (!$dbReachProfile)
 			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $entryVendorTask->reachProfileId);
@@ -57,11 +56,9 @@ class EntryVendorTaskService extends KalturaBaseService
 		if (!$partnerCatalogItem)
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_ENABLED_FOR_ACCOUNT, $entryVendorTask->catalogItemId);
 		
-		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($dbEntry->getId());
-		$sourceFlavorVersion = $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
-		
-		if (kReachUtils::isDuplicateTask($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), $sourceFlavorVersion))
-			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, $sourceFlavorVersion);
+		$taskVersion = $dbVendorCatalogItem->getTaskVersion($dbEntry->getId(), $entryVendorTask->taskJobData ? $entryVendorTask->taskJobData->toObject() : null);
+		if (kReachUtils::isDuplicateTask($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), $taskVersion))
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, $taskVersion);
 		
 		//check if credit has expired
 		if (kReachUtils::hasCreditExpired($dbReachProfile))
@@ -70,7 +67,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		if (!kReachUtils::isEnoughCreditLeft($dbEntry, $dbVendorCatalogItem, $dbReachProfile))
 			throw new KalturaAPIException(KalturaReachErrors::EXCEEDED_MAX_CREDIT_ALLOWED, $entryVendorTask->entryId, $entryVendorTask->catalogItemId);
 		
-		$dbEntryVendorTask = kReachManager::addEntryVendorTask($dbEntry, $dbReachProfile, $dbVendorCatalogItem, !kCurrentContext::$is_admin_session, $sourceFlavorVersion);
+		$dbEntryVendorTask = kReachManager::addEntryVendorTask($dbEntry, $dbReachProfile, $dbVendorCatalogItem, !kCurrentContext::$is_admin_session, $taskVersion);
 		$entryVendorTask->toInsertableObject($dbEntryVendorTask);
 		$dbEntryVendorTask->save();
 		
@@ -129,6 +126,8 @@ class EntryVendorTaskService extends KalturaBaseService
 	 * @param int $id vendor task id to update
 	 * @param KalturaEntryVendorTask $entryVendorTask evntry vendor task to update
 	 *
+	 * @return KalturaEntryVendorTask
+	 *
 	 * @throws KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND
 	 */
 	public function updateAction($id, KalturaEntryVendorTask $entryVendorTask)
@@ -156,6 +155,8 @@ class EntryVendorTaskService extends KalturaBaseService
 	 * @action approve
 	 * @param int $id vendor task id to approve
 	 * @param KalturaEntryVendorTask $entryVendorTask evntry vendor task to approve
+	 *
+	 * @return KalturaEntryVendorTask
 	 *
 	 * @throws KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND
 	 * @throws KalturaReachErrors::CANNOT_APPROVE_NOT_MODERATED_TASK
@@ -194,6 +195,8 @@ class EntryVendorTaskService extends KalturaBaseService
 	 * @param int $id vendor task id to reject
 	 * @param string $rejectReason
 	 * @param KalturaEntryVendorTask $entryVendorTask evntry vendor task to reject
+	 *
+	 * @return KalturaEntryVendorTask
 	 *
 	 * @throws KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND
 	 * @throws KalturaReachErrors::CANNOT_REJECT_NOT_MODERATED_TASK
@@ -327,7 +330,12 @@ class EntryVendorTaskService extends KalturaBaseService
 		if (!$kuser || !$kuser->getEmail())
 			throw new KalturaAPIException(APIErrors::USER_EMAIL_NOT_FOUND, $kuser);
 		
-		kReachJobsManager::addEntryVendorTasksCsvJob($this->getPartnerId(), $dbFilter, $kuser);
+		$jobData = new kEntryVendorTaskCsvJobData();
+		$jobData->setFilter($dbFilter);
+		$jobData->setUserMail($kuser->getEmail());
+		$jobData->setUserName($kuser->getPuserId());
+		
+		kJobsManager::addExportCsvJob($jobData, $this->getPartnerId(), ReachPlugin::getExportTypeCoreValue(EntryVendorTaskExportObjectType::ENTRY_VENDOR_TASK));
 		
 		return $kuser->getEmail();
 	}
@@ -337,24 +345,54 @@ class EntryVendorTaskService extends KalturaBaseService
 	 *
 	 * Will serve a requested csv
 	 * @action serveCsv
+	 *
+	 * @deprecated use exportCsv.serveCsv
 	 * @param string $id - the requested file id
 	 * @return string
 	 */
 	public function serveCsvAction($id)
 	{
-		if (!preg_match('/^\w+\.csv$/', $id))
-			throw new KalturaAPIException(KalturaErrors::INVALID_ID, $id);
-		
-		// KS verification - we accept either admin session or download privilege of the file
-		$ks = $this->getKs();
-		if (!$ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id))
-			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
-		
-		$partner_id = $this->getPartnerId();
-		$folderPath = "/content/entryVendorTasksCsv/$partner_id";
-		$fullPath = myContentStorage::getFSContentRootPath() . $folderPath;
-		$file_path = "$fullPath/$id";
+		$file_path = ExportCsvService::generateCsvPath($id, $this->getKs());
 		
 		return $this->dumpFile($file_path, 'text/csv');
+	}
+
+	/**
+	 * Extend access key in case the existing one has expired.
+	 *
+	 * @action extendAccessKey
+	 * @param int $id vendor task id
+	 * @return KalturaEntryVendorTask
+	 *
+	 * @throws KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND
+	 * @throws KalturaReachErrors::CANNOT_EXTEND_ACCESS_KEY
+	 */
+	public function extendAccessKeyAction($id)
+	{
+		$dbEntryVendorTask = EntryVendorTaskPeer::retrieveByPK($id);
+		if (!$dbEntryVendorTask)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
+		}
+		
+		if($dbEntryVendorTask->getStatus() != EntryVendorTaskStatus::PROCESSING)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::CANNOT_EXTEND_ACCESS_KEY);
+		}
+		
+		try
+		{
+			$dbEntryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($dbEntryVendorTask->getEntryId(), $dbEntryVendorTask->getIsRequestModerated(), $dbEntryVendorTask->getCatalogItem()->getKsExpiry(), true));
+			$dbEntryVendorTask->save();
+		}
+		catch (Exception $e)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::FAILED_EXTEND_ACCESS_KEY);
+		}
+		
+		// return the saved object
+		$entryVendorTask = new KalturaEntryVendorTask();
+		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
+		return $entryVendorTask;
 	}
 }

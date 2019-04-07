@@ -1941,7 +1941,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function validateAccessControlId($accessControlId)
 	{
-		if($this->accessControlNameToId && count($this->accessControlNameToId) == 0) //the name to id profiles weren't initialized
+		if(!$this->accessControlNameToId || count($this->accessControlNameToId) == 0) //the name to id profiles weren't initialized
 		{
 			$this->initAccessControlNameToId();
 		}

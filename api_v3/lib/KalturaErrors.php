@@ -170,6 +170,8 @@ class KalturaErrors extends APIErrors
 
 	const VOLUME_MAP_NOT_CONFIGURED = "VOLUME_MAP_NOT_CONFIGURED;;Need to add volume map support to configuration";
 
+	const RESOURCE_ENTRY_ID_MISSING= "RESOURCE_ENTRY_ID_MISSING;;Entry Id on resource object is missing";
+
 	/**
 	 * Notification Service
 	 */
@@ -274,6 +276,7 @@ class KalturaErrors extends APIErrors
 	const FLAVOR_ASSET_RECONVERT_ORIGINAL = "FLAVOR_ASSET_RECONVERT_ORIGINAL;;Cannot reconvert original flavor asset";
 
 	const ORIGINAL_FLAVOR_ASSET_IS_MISSING = "ORIGINAL_FLAVOR_ASSET_IS_MISSING;;The original flavor asset is missing";
+
 
 	const ORIGINAL_FLAVOR_ASSET_NOT_CREATED = "ORIGINAL_FLAVOR_ASSET_NOT_CREATED;DATA;The original flavor asset could not be created [@DATA@]";
 
@@ -422,6 +425,8 @@ class KalturaErrors extends APIErrors
 	const USER_NOT_FOUND = "USER_NOT_FOUND;;User was not found";
 
 	const GROUP_NOT_FOUND = "GROUP_NOT_FOUND;;Group was not found";
+
+	const GROUP_USER_NOT_FOUND = "GROUP_USER_NOT_FOUND;;Group user was not found";
 
 	const GROUP_USER_ALREADY_EXISTS = "GROUP_USER_ALREADY_EXISTS;;GroupUser already exists";
 

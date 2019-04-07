@@ -68,6 +68,7 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::COPY_CAPTIONS' => 'Copy Caption Assets',
 	'Kaltura_Client_Enum_BatchJobType::USERS_CSV' => 'Users Csv',
 	'Kaltura_Client_Enum_BatchJobType::COPY_CUE_POINTS' => 'Copy cue Points',
+	'Kaltura_Client_Enum_BatchJobType::CLIP_CONCAT' => 'Clip Concat',
 
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_AUX' => 'Convert - FFMpeg Aux',
@@ -1177,6 +1178,7 @@ return array(
 
 	'Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::EMAIL' => 'Email',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::HTTP' => 'HTTP',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::BOOLEAN' => 'BOOLEAN',
 
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventType::BATCH_JOB_STATUS' => 'Batch job status (Very dangerous)',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventType::OBJECT_ADDED' => 'Object added',
@@ -1420,6 +1422,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS' => 'CAPTIONS',
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION' => 'TRANSLATION',
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT' => 'ALIGNMENT',
+	'Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION' => 'AUDIO_DESCRIPTION',
 	'Kaltura_Client_Reach_Enum_VendorServiceType::HUMAN' => 'HUMAN',
 	'Kaltura_Client_Reach_Enum_VendorServiceType::MACHINE' => 'MACHINE',
 	
@@ -1433,6 +1436,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWELVE_HOURS' => 'TWELVE_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWENTY_FOUR_HOURS' => 'TWENTY_FOUR_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FORTY_EIGHT_HOURS' => 'FORTY_EIGHT_HOURS',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FOUR_DAYS' => 'FOUR_DAYS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TEN_DAYS' => 'TEN_DAYS',
 	
 	'Kaltura_Client_Reach_Type_VendorCatalogItemPricing' => "Default Pricing",
@@ -1442,6 +1446,9 @@ return array(
 	
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::SRT' => "SRT",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::DFXP' => "DFXP",
+	
+	'Kaltura_Client_Reach_Enum_VendorTaskProcessingRegion::US' => "US",
+	'Kaltura_Client_Reach_Enum_VendorTaskProcessingRegion::EU' => "EU",
 	
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DEPRECATED' => "Deprecated",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED' => "Deleted",
@@ -1493,4 +1500,9 @@ return array(
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::RU' => "Russian",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::TR' => "Turkish",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::TH' => "Thai",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::SV' => "Swedish",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::DA' => "Danish",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::NO' => "Norwegian",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::FI' => "Finnish",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::IS' => "Icelandic",
 );

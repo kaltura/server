@@ -29,7 +29,7 @@ class KalturaPlaylist extends KalturaBaseEntry
 	
 	/**
 	 * Type of playlist
-	 * 
+	 * @insertonly
 	 * @var KalturaPlaylistType
 	 */	
 	public $playlistType;

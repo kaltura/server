@@ -37,7 +37,26 @@ class KalturaESearchCaptionItem extends KalturaESearchEntryAbstractNestedItem
 			$object_to_fill = new ESearchCaptionItem();
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
+	
+	protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$this->fieldName = self::getApiFieldName($srcObj->getFieldName());
+		return parent::doFromObject($srcObj, $responseProfile);
+	}
 
+	protected static function getApiFieldName ($srcFieldName)
+	{
+		foreach (self::$map_field_enum as $key => $value)
+		{
+			if ($value == $srcFieldName)
+			{
+				return $key;
+			}
+		}
+		
+		return null;
+	}
+	
 	protected function getItemFieldName()
 	{
 		return $this->fieldName;

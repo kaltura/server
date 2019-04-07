@@ -194,8 +194,9 @@ class ThumbAssetService extends KalturaAssetService
 	 */
 	protected function attachFile(thumbAsset $thumbAsset, $fullPath, $copyOnly = false)
 	{
-		$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
-		
+		$filePath = parse_url($fullPath,PHP_URL_PATH);
+		$ext = pathinfo($filePath,PATHINFO_EXTENSION);
+
 		$thumbAsset->incrementVersion();
 		$thumbAsset->setFileExt($ext);
 		$thumbAsset->setSize(filesize($fullPath));
@@ -595,6 +596,8 @@ class ThumbAssetService extends KalturaAssetService
 		if(!$destThumbParams)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND, $destThumbParamsId);
 
+		myEntryUtils::verifyThumbSrcExist($entry, $destThumbParams);
+
 		$dbThumbAsset = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams);
 		if(!$dbThumbAsset)
 			return null;
@@ -718,6 +721,8 @@ class ThumbAssetService extends KalturaAssetService
 		
 		if (!in_array($entry->getStatus(), $validStatuses))
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_STATUS);
+
+		myEntryUtils::verifyThumbSrcExist($entry, $destThumbParams);
 
 		$dbThumbAsset = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams);
 		if(!$dbThumbAsset)

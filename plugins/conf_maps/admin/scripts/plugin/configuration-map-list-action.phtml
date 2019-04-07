@@ -1,4 +1,9 @@
-<p><?php echo $this->translate('Here you can configure your maps'); ?></p>
+<?php if($this->errMessage): ?>
+	<div class="error"><?php echo $this->errMessage ?></div><br/>
+<?php else: ?>
+	<p><?php echo $this->translate('Here you can configure your maps'); ?></p>
+<?php endif; ?>
+
 <?php echo $this->filterForm; ?>
 <?php echo $this->newConfigurationMapFolderForm; ?>
 <div id="configuration_map_list_div" class="clear">
@@ -118,8 +123,13 @@
 		);
 	}
 
-	function viewConfigurationMap(configurationMapName, configurationMapHost) {
-		var configurationMapStr= '/configuration_map_name/' + encodeURIComponent(configurationMapName) + '/configuration_map_host/' + encodeURIComponent(configurationMapHost) + '/is_new/' + false + '/is_view/' + true;
+	function viewConfigurationMap(configurationMapName, configurationMapHost, configurationMapVersion) {
+		if ( configurationMapVersion != '' && (isNaN(parseInt(configurationMapVersion)) || (parseInt(configurationMapVersion)) < 1)) {
+			alert('<?php echo $this->translate('Configuration Version should be a positive number'); ?>');
+			return;
+		}
+
+		var configurationMapStr= '/configuration_map_name/' + encodeURIComponent(configurationMapName) + '/configuration_map_host/' + encodeURIComponent(configurationMapHost) + '/configuration_map_version/' + configurationMapVersion + '/is_new/' + false + '/is_view/' + true;
 		handleConfigurationAction(configurationMapStr, true);
 	}
 

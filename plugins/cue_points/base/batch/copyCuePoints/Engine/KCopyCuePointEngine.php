@@ -7,13 +7,29 @@ abstract class KCopyCuePointEngine
 {
 	const MAX_CUE_POINT_CHUNKS = 500;
 
+	const CUE_POINT_THUMB = 'thumbCuePoint.Thumb';
+	const CUE_POINT_EVENT = 'eventCuePoint.Event';
+	const ANNOTATION = 'annotation.Annotation';
+	const CUE_POINT_AD = 'adCuePoint.Ad';
+	const CUE_POINT_CODE = 'codeCuePoint.Code';
+
 	protected $data = null;
 	protected $partnerId = null;
 	private $lastCuePointPerType = null;
+	private $idsMap = array();
 
 	abstract public function copyCuePoints();
 
-	protected function shouldCopyCuePoint($cuePoint) {return true;}
+	protected function shouldCopyCuePoint($cuePoint)
+	{
+		$extendedShouldCopyTagsArray = array(self::CUE_POINT_CODE => array("poll-data"));
+		foreach($extendedShouldCopyTagsArray as $type => $tags)
+		{
+			if ($cuePoint->cuePointType == $type && count(array_intersect(explode(",", $cuePoint->tags), $tags)))
+				return true;
+		}
+		return false;
+	}
 
 	protected function calculateCuePointTimes($cuePoint) {return array($cuePoint->startTime, $cuePoint->endTime);}
 
@@ -43,6 +59,10 @@ abstract class KCopyCuePointEngine
 			$cuePoints = $listResponse->objects;
 			$this->preProcessCuePoints($cuePoints);
 			KalturaLog::debug("Return " . count($cuePoints) . " cue-points from list");
+			if ($cuePoints)
+			{
+				usort($cuePoints, function ($a, $b) {return ($a->createdAt - $b->createdAt);});
+			}
 			foreach ($cuePoints as &$cuePoint)
 			{
 				if ($this->shouldCopyCuePoint($cuePoint))
@@ -61,16 +81,31 @@ abstract class KCopyCuePointEngine
 
 	protected function copySingleCuePoint($cuePoint, $destEntryId)
 	{
-		$clonedCuePoint = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine','cuePointClone'), array($cuePoint->id, $destEntryId));
+		$parentId = null;
+		if (isset($cuePoint->parentId) && $cuePoint->parentId)
+		{
+			if (isset($this->idsMap[$cuePoint->parentId]))
+			{
+				$parentId = $this->idsMap[$cuePoint->parentId];
+			}
+			else
+			{
+				KalturaLog::warning("Cuepoint $cuePoint->parentId as parent of $cuePoint->id is not in ids map");
+			}
+		}
+
+		$clonedCuePoint = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine', 'cuePointClone'), array($cuePoint, $destEntryId, $parentId));
 		if ($clonedCuePoint)
 		{
+			$this->idsMap[$cuePoint->id] = $clonedCuePoint->id;
 			list($startTime, $endTime) = $this->calculateCuePointTimes($cuePoint);
-			$res = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine','updateCuePointTimes'), array($clonedCuePoint->id, $startTime, $endTime));
+			$res = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine', 'updateCuePointTimes'), array($clonedCuePoint->id, $startTime, $endTime));
 			if ($res)
 				return $cuePoint->id;
 			else
 				KalturaLog::info("Update time for [{$cuePoint->id}] of [$startTime, $endTime] - Failed");
-		} else
+		}
+		else
 			KalturaLog::info("Could not copy [{$cuePoint->id}] - moving to next");
 		return null;
 	}
@@ -132,9 +167,16 @@ abstract class KCopyCuePointEngine
 		return KBatchBase::$kClient->cuePoint->listAction($filter, $pager);
 	}
 
-	public static function cuePointClone($cuePointId, $destinationEntryId)
+	public static function cuePointClone($cuePoint, $destinationEntryId, $parentId = null)
 	{
-		return KBatchBase::$kClient->cuePoint->cloneAction($cuePointId, $destinationEntryId);
+		if ($cuePoint instanceof KalturaAnnotation)
+		{
+			return KBatchBase::$kClient->annotation->cloneAction($cuePoint->id, $destinationEntryId, $parentId);
+		}
+		else
+		{
+			return KBatchBase::$kClient->cuePoint->cloneAction($cuePoint->id, $destinationEntryId, $parentId);
+		}
 	}
 
 	public static function cuePointUpdateStatus($cuePointId, $newStatus)
@@ -205,7 +247,7 @@ abstract class KCopyCuePointEngine
 
 	private static function getTypeName($cuePoint) {
 		$name = $cuePoint->cuePointType;
-		if ($name == 'codeCuePoint.Code' && $cuePoint->tags == 'change-view-mode')
+		if ($name == self::CUE_POINT_CODE && $cuePoint->tags == 'change-view-mode')
 			$name .= '_changeViewMode';
 		return $name;
 	}

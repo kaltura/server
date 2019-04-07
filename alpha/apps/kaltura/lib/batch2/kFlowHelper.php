@@ -17,7 +17,9 @@ class kFlowHelper
 
 	const LIVE_REPORT_EXPIRY_TIME = 604800; // 7 * 60 * 60 * 24
 
-	const SERVE_CSV_PARTIAL_URL = "/api_v3/index.php/service/user/action/serveCsv/ks/";
+	const REPORT_EXPIRY_TIME = 604800; // 7 * 60 * 60 * 24
+
+	const SERVE_OBJECT_CSV_PARTIAL_URL = "/api_v3/index.php/service/exportCsv/action/serveCsv/ks/";
 
 
 	/**
@@ -1048,13 +1050,20 @@ class kFlowHelper
 		$thumbAsset->incrementVersion();
 		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
 
-
 		if(file_exists($data->getThumbPath()))
 		{
 			list($width, $height, $type, $attr) = getimagesize($data->getThumbPath());
 			$thumbAsset->setWidth($width);
 			$thumbAsset->setHeight($height);
 			$thumbAsset->setSize(filesize($data->getThumbPath()));
+
+			$thumbParamsOutput = assetParamsOutputPeer::retrieveByAssetId($data->getThumbAssetId());
+			if(KCsvWrapper::contains('bif', $thumbParamsOutput->getTags()))
+			{
+				$thumbAsset->setFileExt('bif');
+				$thumbAsset->setWidth($thumbParamsOutput->getWidth());
+				$thumbAsset->setHeight($thumbParamsOutput->getHeight());
+			}
 		}
 
 		$logPath = $data->getThumbPath() . '.log';
@@ -2864,7 +2873,130 @@ class kFlowHelper
 		);
 		return $dbBatchJob;
 	}
-	
+
+	protected static function createReportExportDownloadUrl($partner_id, $file_name, $expiry)
+	{
+		$regex = "/^{$partner_id}_Report_export_[a-zA-Z0-9]+$/";
+		if (!preg_match($regex, $file_name, $matches))
+		{
+			KalturaLog::err("File name doesn't match expected format");
+			return null;
+		}
+
+		$partner = PartnerPeer::retrieveByPK ( $partner_id );
+		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
+
+		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
+		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name";
+
+		return $url;
+	}
+
+	public static function handleReportExportFinished(BatchJob $dbBatchJob, kReportExportJobData $data)
+	{
+		$finalPaths = array();
+		$filePaths = explode(',', $data->getFilePaths());
+		foreach ($filePaths as $filePath)
+		{
+			$fileName = basename($filePath);
+			$directory = myContentStorage::getFSContentRootPath() . "/content/reports/" . $dbBatchJob->getPartnerId();
+			$finalPath = $directory . DIRECTORY_SEPARATOR . $fileName;
+			$finalPaths[] = $filePath;
+			$moveFile = kFile::moveFile($filePath, $finalPath);
+			if (!$moveFile)
+			{
+				KalturaLog::err("Failed to move report file from: " . $filePath . " to: " . $finalPath);
+				return kFlowHelper::handleReportExportFailed($dbBatchJob, $data);
+			}
+		}
+
+		$data->setFilePaths(implode(',', $finalPaths));
+		$dbBatchJob->setData($data);
+		$dbBatchJob->save();
+
+		$expiry = kConf::get("report_export_expiry", 'local', self::REPORT_EXPIRY_TIME);
+
+		$urls = array();
+		// Create download URL's
+		foreach ($finalPaths as $finalPath)
+		{
+			$fileName = basename($finalPath);
+			$url = self::createReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName, $expiry);
+			if (!$url)
+			{
+				KalturaLog::err("Failed to create download URL for file - $finalPath");
+				return kFlowHelper::handleReportExportFailed($dbBatchJob, $data);
+			}
+			$urls[] = $url;
+		}
+
+		$time = date("m-d-y H:i", $data->getTimeReference() + $data->getTimeZoneOffset());
+		$email_id = MailType::MAIL_TYPE_REPORT_EXPORT_SUCCESS;
+		$validUntil = date("m-d-y H:i", $data->getTimeReference() + $expiry + $data->getTimeZoneOffset());
+		$expiryInDays = $expiry / 60 / 60 / 24;
+		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $urls), $expiryInDays, $validUntil);
+		$titleParams = array($time);
+
+		kJobsManager::addMailJob(
+			null,
+			0,
+			$dbBatchJob->getPartnerId(),
+			$email_id,
+			kMailJobData::MAIL_PRIORITY_NORMAL,
+			kConf::get("report_sender_email"),
+			kConf::get("report_sender_name"),
+			$data->getRecipientEmail(),
+			$params,
+			$titleParams
+		);
+		return $dbBatchJob;
+	}
+
+	public static function handleReportExportFailed(BatchJob $dbBatchJob, kReportExportJobData $data)
+	{
+		$time = date("m-d-y H:i", $data->getTimeReference() + $data->getTimeZoneOffset());
+		$email_id = MailType::MAIL_TYPE_REPORT_EXPORT_FAILURE;
+		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(),
+			$dbBatchJob->getErrType(), $dbBatchJob->getErrNumber());
+		$titleParams = array($time);
+
+		kJobsManager::addMailJob(
+			null,
+			0,
+			$dbBatchJob->getPartnerId(),
+			$email_id,
+			kMailJobData::MAIL_PRIORITY_NORMAL,
+			kConf::get("report_sender_email"),
+			kConf::get("report_sender_name"),
+			$data->getRecipientEmail(),
+			$params,
+			$titleParams
+		);
+		return $dbBatchJob;
+	}
+
+	public static function handleReportExportAborted(BatchJob $dbBatchJob, kReportExportJobData $data)
+	{
+		$time = date("m-d-y H:i", $data->getTimeReference() + $data->getTimeZoneOffset());
+		$email_id = MailType::MAIL_TYPE_REPORT_EXPORT_ABORT;
+		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId());
+		$titleParams = array($time);
+
+		kJobsManager::addMailJob(
+			null,
+			0,
+			$dbBatchJob->getPartnerId(),
+			$email_id,
+			kMailJobData::MAIL_PRIORITY_NORMAL,
+			kConf::get("report_sender_email"),
+			kConf::get("report_sender_name"),
+			$data->getRecipientEmail(),
+			$params,
+			$titleParams
+		);
+		return $dbBatchJob;
+	}
+
 	private static function deleteTemporaryFlavors($entryId)
 	{
 		$originalflavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
@@ -2920,19 +3052,20 @@ class kFlowHelper
 			return false;
 	}
 
-	public static function handleUsersCsvFinished(BatchJob $dbBatchJob, kUsersCsvJobData $data)
+	
+	public static function handleExportCsvFinished(BatchJob $dbBatchJob, kExportCsvJobData $data)
 	{
 		// Move file from shared temp to it's final location
 		$fileName =  basename($data->getOutputPath());
-		$directory =  myContentStorage::getFSContentRootPath() . "/content/userscsv/" . $dbBatchJob->getPartnerId() ;
+		$directory =  myContentStorage::getFSContentRootPath() . "/content/exportcsv/" . $dbBatchJob->getPartnerId() ;
 		if(!file_exists($directory))
 			mkdir($directory);
 		$filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
-
+		
 		if(!$data->getOutputPath())
 			throw new APIException(APIErrors::FILE_CREATION_FAILED, "file path not found");
-
-		KalturaLog::info("Trying to move users csv file from: " . $data->getOutputPath() . " to: " . $filePath);
+		
+		KalturaLog::info("Trying to move exported csv file from: " . $data->getOutputPath() . " to: " . $filePath);
 		try
 		{
 			kFile::moveFile($data->getOutputPath(), $filePath);
@@ -2941,36 +3074,36 @@ class kFlowHelper
 		{
 			throw new APIException(APIErrors::FILE_CREATION_FAILED, $e->getMessage());
 		}
-
-
+		
+		
 		$data->setOutputPath($filePath);
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
-
+		
 		KalturaLog::info("file path: [$filePath]");
-
-		$downloadUrl = self::createUsersCsvDownloadUrl($dbBatchJob->getPartnerId(), $fileName);
+		
+		$downloadUrl = self::createCsvDownloadUrl($dbBatchJob->getPartnerId(), $fileName);
 		$userName = $data->getUserName();
 		$bodyParams = array($userName, $downloadUrl);
-
+		
 		//send the created csv by mail
 		kJobsManager::addMailJob(
 			null,
 			0,
 			$dbBatchJob->getPartnerId(),
-			MailType::MAIL_TYPE_USERS_CSV,
+			MailType::MAIL_TYPE_OBJECTS_CSV,
 			kMailJobData::MAIL_PRIORITY_NORMAL,
 			kConf::get("partner_notification_email"),
 			kConf::get("partner_notification_name"),
 			$data->getUserMail(),
 			$bodyParams
 		);
-
+		
 		return $dbBatchJob;
 	}
 
 
-	protected static function createUsersCsvDownloadUrl ($partner_id, $file_name)
+	protected static function createCsvDownloadUrl ($partner_id, $file_name)
 	{
 		$ksStr = "";
 		$partner = PartnerPeer::retrieveByPK ($partner_id);
@@ -2984,7 +3117,7 @@ class kFlowHelper
 			throw new APIException(APIErrors::START_SESSION_ERROR, $partner);
 
 		//url is built with DC url in order to be directed to the same DC of the saved file
-		$url = kDataCenterMgr::getCurrentDcUrl() . self::SERVE_CSV_PARTIAL_URL ."$ksStr/id/$file_name";
+		$url = kDataCenterMgr::getCurrentDcUrl() . self::SERVE_OBJECT_CSV_PARTIAL_URL ."$ksStr/id/$file_name";
 
 		return $url;
 	}

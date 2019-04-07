@@ -39,6 +39,8 @@ class ReachProfile extends BaseReachProfile
 	const CUSTOM_DATA_CREDIT_RESET_HISTORY =                'credit_reset_history';
 	const CUSTOM_DATA_FLAVOR_PARAM_IDS =                	'flavor_param_ids';
 	
+	const CUSTOM_DATA_TASK_PROCESSING_REGION =              'task_processing_region';
+	
 	const MAX_CREDIT_HISTORY_TO_KEEP =                      10;
 	const DEFAULT_MAX_CHARS_PER_LINE =                      26;
 	
@@ -199,6 +201,11 @@ class ReachProfile extends BaseReachProfile
 		$this->putInCustomData(self::CUSTOM_DATA_FLAVOR_PARAM_IDS, $v);
 	}
 	
+	public function setVendorTaskProcessingRegion($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_TASK_PROCESSING_REGION, $v);
+	}
+	
 	//getters
 	
 	public function getEnableMachineModeration()
@@ -337,6 +344,11 @@ class ReachProfile extends BaseReachProfile
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_FLAVOR_PARAM_IDS);
 	}
+	
+	public function getVendorTaskProcessingRegion()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_TASK_PROCESSING_REGION, null, VendorTaskProcessingRegion::US);
+	}
 
 	public function shouldSyncCredit()
 	{
@@ -428,6 +440,8 @@ class ReachProfile extends BaseReachProfile
 	 */
 	public function fulfillsRules(kScope $scope, $checkEmptyRulesOnly = false)
 	{
+		$gotBooleanCondition = false;
+		$gotNonBooleanCondition = false;
 		$fullFilledCatalogItemIds = array();
 		if(!is_array($this->getRulesArray()) || !count($this->getRulesArray()))
 			return $fullFilledCatalogItemIds;
@@ -435,13 +449,31 @@ class ReachProfile extends BaseReachProfile
 		$context = new kContextDataResult();
 		foreach ($this->getRulesArray() as $rule)
 		{
-			/* @var $rule kRule */
-			if(count($rule->getConditions()) && $checkEmptyRulesOnly)
+			if (count($rule->getConditions()))
+			{
+				foreach ($rule->getConditions() as $condition)
+				{
+					if ($condition->getType() == ConditionType::BOOLEAN && $condition->getbooleanEventNotificationIds() && $condition->getbooleanEventNotificationIds() != "N/A")
+					{
+						$gotBooleanCondition = true;
+						break;
+					}
+					else if($condition->getType() != ConditionType::BOOLEAN)
+					{
+						$gotNonBooleanCondition = true;
+						break;
+					}
+				}
+			}
+			if ($gotBooleanCondition)
 				continue;
-			
+
+			if($gotNonBooleanCondition && $checkEmptyRulesOnly )
+				continue;
+
 			if(!$checkEmptyRulesOnly && !count($rule->getConditions()))
 				continue;
-			
+
 			$rule->setScope($scope);
 			$fulfilled = $rule->applyContext($context);
 			

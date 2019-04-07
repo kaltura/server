@@ -6,7 +6,8 @@ class ConfMapsFilter extends baseObjectFilter
 	{
 		$this->fields = kArray::makeAssociativeDefaultValue(array(
 			'_eq_map_name',
-			'_eq_host_name'
+			'_eq_host_name',
+			'_eq_version'
 		), null);
 
 		$this->allowed_order_fields = array(

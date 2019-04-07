@@ -39,69 +39,8 @@ class UserService extends KalturaBaseUserService
 			$user->isAdmin = true;
 		}
 
-		$this->validateUserNames($user);
 		$lockKey = "user_add_" . $this->getPartnerId() . $user->id;
 		return kLock::runLocked($lockKey, array($this, 'adduserImpl'), array($user));
-	}
-	
-	function addUserImpl(KalturaUser $user)
-	{
-		/* @var $dbUser kuser */
-		$dbUser = $user->toInsertableObject();
-		$dbUser->setPartnerId($this->getPartnerId());
-		try {
-			$checkPasswordStructure = isset($user->password) ? true : false;
-			$dbUser = kuserPeer::addUser($dbUser, $user->password, $checkPasswordStructure);
-		}
-		
-		catch (kUserException $e) {
-			$code = $e->getCode();
-			if ($code == kUserException::USER_ALREADY_EXISTS) {
-				throw new KalturaAPIException(KalturaErrors::DUPLICATE_USER_BY_ID, $user->id); //backward compatibility
-			}
-			if ($code == kUserException::LOGIN_ID_ALREADY_USED) {
-				throw new KalturaAPIException(KalturaErrors::DUPLICATE_USER_BY_LOGIN_ID, $user->email); //backward compatibility
-			}
-			else if ($code == kUserException::USER_ID_MISSING) {
-				throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, $user->getFormattedPropertyNameWithClassName('id'));
-			}
-			else if ($code == kUserException::INVALID_EMAIL) {
-				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'email');
-			}
-			else if ($code == kUserException::INVALID_PARTNER) {
-				throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID);
-			}
-			else if ($code == kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED) {
-				throw new KalturaAPIException(KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED);
-			}
-			else if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
-				$partner = $dbUser->getPartner();
-				$invalidPasswordStructureMessage='';
-				if($partner && $partner->getInvalidPasswordStructureMessage())
-					$invalidPasswordStructureMessage = $partner->getInvalidPasswordStructureMessage();
-				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID,$invalidPasswordStructureMessage);
-			}
-			throw $e;			
-		}
-		catch (kPermissionException $e)
-		{
-			$code = $e->getCode();
-			if ($code == kPermissionException::ROLE_ID_MISSING) {
-				throw new KalturaAPIException(KalturaErrors::ROLE_ID_MISSING);
-			}
-			if ($code == kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED) {
-				throw new KalturaAPIException(KalturaErrors::ONLY_ONE_ROLE_PER_USER_ALLOWED);
-			}
-			else if ($code == kPermissionException::USER_ROLE_NOT_FOUND) {
-				throw new KalturaAPIException(KalturaErrors::USER_ROLE_NOT_FOUND);
-			}
-			throw $e;
-		}
-
-		$newUser = new KalturaUser();
-		$newUser->fromObject($dbUser, $this->getResponseProfile());
-		
-		return $newUser;
 	}
 
 	/**
@@ -128,8 +67,6 @@ class UserService extends KalturaBaseUserService
 		if ($dbUser->getIsAdmin() && !is_null($user->isAdmin) && !$user->isAdmin) {
 			throw new KalturaAPIException(KalturaErrors::CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN);
 		}
-
-		$this->validateUserNames($user);
 
 		// update user
 		try
@@ -632,88 +569,18 @@ class UserService extends KalturaBaseUserService
 		
 		return $res;
 	}
-
-	/**
-	 * Creates a batch job that sends an email with a link to download a CSV containing a list of users
-	 *
-	 * @action exportToCsv
-	 * @param KalturaUserFilter $filter A filter used to exclude specific types of users
-	 * @param int $metadataProfileId
-	 * @param KalturaCsvAdditionalFieldInfoArray $additionalFields
-	 * @return string
-	 *
-	 * @throws APIErrors::USER_EMAIL_NOT_FOUND
-	 * @throws MetadataErrors::INVALID_METADATA_PROFILE
-	 * @throws MetadataErrors::METADATA_PROFILE_NOT_SPECIFIED
-	 */
-	function exportToCsvAction(KalturaUserFilter $filter = null, $metadataProfileId = null, $additionalFields = null)
-	{
-		if($metadataProfileId)
-		{
-			$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
-			if (!$metadataProfile || ($metadataProfile->getPartnerId() != $this->getPartnerId()))
-				throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE, $metadataProfileId);
-		}
-		else
-		{
-			if($additionalFields->count)
-				throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_NOT_SPECIFIED, $metadataProfileId);
-		}
-
-		if (!$filter)
-			$filter = new KalturaUserFilter();
-		$dbFilter = new kuserFilter();
-		$filter->toObject($dbFilter);
-
-		$kuser = $this->getKuser();
-		if(!$kuser || !$kuser->getEmail())
-			throw new KalturaAPIException(APIErrors::USER_EMAIL_NOT_FOUND, $kuser);
-
-		kJobsManager::addUsersCsvJob($this->getPartnerId(), $dbFilter, $metadataProfileId, $additionalFields, $kuser);
-
-		return $kuser->getEmail();
-	}
-
-
 	/**
 	 *
 	 * Will serve a requested CSV
 	 * @action serveCsv
-	 *
+	 * @deprecated use exportCsv.serveCsv
 	 *
 	 * @param string $id - the requested file id
 	 * @return string
 	 */
 	public function serveCsvAction($id)
 	{
-		if(!preg_match('/^\w+\.csv$/', $id))
-			throw new KalturaAPIException(KalturaErrors::INVALID_ID, $id);
-
-		// KS verification - we accept either admin session or download privilege of the file
-		$ks = $this->getKs();
-		if(!$ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id))
-			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
-
-		$partner_id = $this->getPartnerId();
-		$folderPath = "/content/userscsv/$partner_id";
-		$fullPath = myContentStorage::getFSContentRootPath() . $folderPath;
-		$file_path = "$fullPath/$id";
-
+		$file_path = ExportCsvService::generateCsvPath($id, $this->getKs());
 		return $this->dumpFile($file_path, 'text/csv');
 	}
-
-
-	/**
-	 * @param KalturaUser $user The user parameters to validate
-	 */
-	protected function validateUserNames(KalturaUser $user)
-	{
-		$names = array('firstName', 'lastName', 'fullName', 'screenName');
-		foreach ($names as $name)
-		{
-			if (!is_null($user->$name) && strpos($user->$name, kuser::URL_PATTERN) !== false)
-				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $name);
-		}
-	}
-
 }

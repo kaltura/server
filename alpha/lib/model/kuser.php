@@ -18,6 +18,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	
 	const BULK_UPLOAD_ID = "bulk_upload_id";
 	const USER_MODE = 'user_mode';
+	const MEMBERS_COUNT = 'members_count';
 	
 	const ANONYMOUS_PUSER_ID = "KALANONYM";
 	
@@ -1197,6 +1198,9 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	public function setUserMode ($v){$this->putInCustomData (self::USER_MODE, $v);}
 	public function getUserMode (){return $this->getFromCustomData(self::USER_MODE, null, KuserMode::NONE);}
 
+	public function setMembersCount ($v){$this->putInCustomData (self::MEMBERS_COUNT, $v);}
+	public function getMembersCount (){return $this->getFromCustomData(self::MEMBERS_COUNT, null, 0);}
+
 	/**
 	 * Force modifiedColumns to be affected even if the value not changed
 	 * 
@@ -1332,12 +1336,13 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			'tags' => $this->getTagsArray(), //todo - check
 			'created_at' => $this->getCreatedAtAsInt(),
 			'updated_at' => $this->getUpdateAtAsInt(),
-			'first_name' => $this->getFirstName(),
-			'last_name' => $this->getLastName(),
+			'first_name_ft' => $this->getFirstName(),
+			'last_name_ft' => $this->getLastName(),
 			'role_ids' => explode(',',$this->getRoleIds()), //todo - maybe add help to elastic here
 			'permission_names' => $this->getIndexedPermissionNames(), //todo - replace to array
 			'group_ids' => KuserKgroupPeer::retrieveKgroupIdsByKuserIdAndPartnerId($this->getKuserId(), $this->getPartnerId()),
-			'puser_id' => $this->getPuserId()
+			'puser_id' => $this->getPuserId(),
+			'members_count' => $this->getMembersCount()
 		);
 
 		elasticSearchUtils::cleanEmptyValues($body);

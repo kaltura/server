@@ -2,7 +2,7 @@
 /**
  * @package plugins.elasticSearch
  */
-class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaPending, IKalturaServices, IKalturaObjectLoader, IKalturaExceptionHandler
+class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaPending, IKalturaServices, IKalturaObjectLoader, IKalturaExceptionHandler, IKalturaEnumerator
 {
     const PLUGIN_NAME = 'elasticSearch';
     const ELASTIC_SEARCH_MANAGER = 'kElasticSearchManager';
@@ -64,7 +64,22 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
 
         if ($baseClass == 'ESearchItemData' && $enumValue == ESearchItemDataType::CUE_POINTS)
             return new ESearchCuePointItemData();
-
+        
+        if ($baseClass == 'KObjectExportEngine' && $enumValue == KalturaExportObjectType::ESEARCH_MEDIA)
+        {
+        	return new KExportMediaEsearchEngine($constructorArgs);
+        }
+	
+	    if($baseClass == 'KalturaJobData' && $enumValue == BatchJobType::EXPORT_CSV && (isset($constructorArgs['coreJobSubType']) &&  $constructorArgs['coreJobSubType']== self::getExportTypeCoreValue(EsearchMediaEntryExportObjectType::ESEARCH_MEDIA)))
+	    {
+		    return new KalturaMediaEsearchExportToCsvJobData();
+	    }
+	
+	    if ($baseClass == 'KalturaESearchOrderByItem' && $enumValue == 'ESearchMetadataOrderByItem')
+	    {
+		    return new KalturaESearchMetadataOrderByItem($constructorArgs);
+	    }
+	
         return null;
     }
 
@@ -131,5 +146,35 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
             self::ELASTIC_CORE_EXCEPTION => array('ElasticSearchPlugin', 'handleESearchException'),
         );
     }
-
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getExportTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('ExportObjectType', $value);
+	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+	
+	/**
+	 * @return array<string> list of enum classes names that extend the base enum name
+	 */
+	public static function getEnums($baseEnumName = null)
+	{
+		if(is_null($baseEnumName))
+			return array('EsearchMediaEntryExportObjectType');
+		
+		if($baseEnumName == 'ExportObjectType')
+			return array('EsearchMediaEntryExportObjectType');
+		
+		return array();
+	}
 }

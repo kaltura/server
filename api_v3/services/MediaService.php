@@ -88,6 +88,12 @@ class MediaService extends KalturaEntryService
 		return $entry;
     }
 
+    protected function shoudlValidateLocal()
+	{
+		//if multi request of more than one api call
+		return  (kCurrentContext::$multiRequest_index <= 1);
+	}
+
     /**
      * Add content to media entry which is not yet associated with content (therefore is in status NO_CONTENT).
      * If the requirement is to replace the entry's associated content, use action updateContent.
@@ -100,29 +106,33 @@ class MediaService extends KalturaEntryService
      * @throws KalturaErrors::ENTRY_ALREADY_WITH_CONTENT
      * @validateUser entry entryId edit
      */
-    function addContentAction($entryId, KalturaResource $resource = null)
-    {
+	function addContentAction($entryId, KalturaResource $resource = null)
+	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 
-		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+	    if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
+		    throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		if ($dbEntry->getStatus() != entryStatus::NO_CONTENT)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ALREADY_WITH_CONTENT);
-
-		if ($resource)
-		{
+		    throw new KalturaAPIException(KalturaErrors::ENTRY_ALREADY_WITH_CONTENT);
+		
+	    if ($resource)
+	    {
 			try
 			{
-				$resource->validateEntry($dbEntry, true);
+				$validateLocalExist = $this->shoudlValidateLocal();
+				$resource->validateEntry($dbEntry, $validateLocalExist);
 				$kResource = $resource->toObject();
 				$this->attachResource($kResource, $dbEntry);
-			} catch (Exception $e) {
-				$this->handleErrorDuringSetResource($entryId, $e);
 			}
-			$resource->entryHandled($dbEntry);
-		}
-		return $this->getEntry($entryId);
+		    catch (Exception $e)
+		    {
+			    $this->handleErrorDuringSetResource($entryId, $e, $resource);
+		    }
+
+		       $resource->entryHandled($dbEntry);
+	    }
+	    return $this->getEntry($entryId);
     }
 
     /**
@@ -1259,10 +1269,9 @@ class MediaService extends KalturaEntryService
 		{
 			throw $e; //if no entry found then no need to do anything
 		}
-
 		KalturaLog::info("Exception was thrown during setContent on entry [$entryId] with error: " . $e->getMessage());
 		$this->cancelReplaceAction($entryId);
-		
+
 		$errorCodeArr = array(kCoreException::SOURCE_FILE_NOT_FOUND, APIErrors::getCode(APIErrors::SOURCE_FILE_NOT_FOUND));
 		if ((in_array($e->getCode(), $errorCodeArr)) && (kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId())))
 		{
@@ -1272,5 +1281,4 @@ class MediaService extends KalturaEntryService
 		}
 		throw $e;
 	}
-
 }

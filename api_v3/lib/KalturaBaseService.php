@@ -342,6 +342,12 @@ abstract class KalturaBaseService
 		{
 			$filePath = $fileSync->getFullPath();
 			$mimeType = kFile::mimeType($filePath);
+			
+			//PHP's built in mime_content_type funtion returns mime_type of text/x-c++ for anny txt file that contains the word class within
+			//Until this is fixed we will check the file extension and manually set the file type to text/plain
+			if($mimeType == "text/x-c++" && pathinfo($filePath, PATHINFO_EXTENSION) == "txt")
+				$mimeType = "text/plain";
+			
 			$key = $fileSync->isEncrypted() ?  $fileSync->getEncryptionKey() : null;
 			$iv = $key ? $fileSync->getIv() : null;
 			return $this->dumpFile($filePath, $mimeType, $key, $iv);

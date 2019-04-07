@@ -66,8 +66,8 @@ enabledWorkers.KAsyncConvertThumbAssetsGenerator	= 1
 enabledWorkers.KAsyncLiveToVod      				= 1
 enabledWorkers.KAsyncCopyCaptions					= 1
 enabledWorkers.KAsyncCopyCuePoints                   = 1
-enabledWorkers.KAsyncEntryVendorTasksCsv	    = 0
 enabledWorkers.KSyncReachCreditTaskRunner	    = 0
+enabledWorkers.KAsyncExportCsv                      = 0
 
 
 [mainTemplate : template]
@@ -480,6 +480,7 @@ params.localTempPath 								= @TMP_DIR@/thumb
 params.sharedTempPath 								= @WEB_DIR@/tmp/thumb
 params.FFMpegCmd	 								= @BIN_DIR@/ffmpeg
 params.ImageMagickCmd								= convert
+maximumExecutionTime								= 3600
 
 
 [KAsyncDistribute : JobHandlerWorker]
@@ -799,13 +800,13 @@ scriptPath                                          = batches/ServerNodeMonitor/
 params.serverNodeTTL                                = 120
 params.typesToMonitor                               = 1
 
-[KAsyncUsersCsv : JobHandlerWorker]
+[KAsyncExportCsv : JobHandlerWorker]
 id													= 690
-friendlyName										= Users Csv
-type												= KAsyncUsersCsv
-params.localTempPath                                = @TMP_DIR@/userscsv
-params.sharedTempPath                                   = @WEB_DIR@/tmp/userscsv
-scriptPath											= batches/UsersCsv/kAsyncUsersCsvExe.php
+friendlyName										= Export Csv
+type												= KAsyncExportCsv
+params.localTempPath                                = @TMP_DIR@/exportcsv
+params.sharedTempPath                                   = @WEB_DIR@/tmp/exportcsv
+scriptPath											= batches/ExportCsv/kAsyncExportCsvExe.php
 maximumExecutionTime			                    = 3600
 
 [KAsyncCopyCuePoints : JobHandlerWorker]
@@ -814,14 +815,6 @@ friendlyName                                        = Copy Cue Point
 type                                                = KAsyncCopyCuePoints
 scriptPath                                          = ../plugins/cue_points/base/batch/copyCuePoints/KAsyncCopyCuePointsExe.php
 
-[KAsyncEntryVendorTasksCsv : JobHandlerWorker]
-id                                                  = 710
-friendlyName                                        = Entry Vendor Tasks Csv
-type                                                = KAsyncEntryVendorTasksCsv
-params.localTempPath                                = @TMP_DIR@/entryVendorTasksCsv
-params.sharedTempPath                               = @WEB_DIR@/tmp/entryVendorTasksCsv
-scriptPath                                          = ../plugins/reach/batch/EntryVendorTasksCsv/kAsyncEntryVendorTasksCsvExe.php
-maximumExecutionTime                                = 3600
 
 [KSyncReachCreditTaskRunner : PeriodicWorker]
 id                                                  = 720
@@ -829,3 +822,12 @@ type                                                = KSyncReachCreditTaskRunner
 maximumExecutionTime                                = 3600
 scriptPath                                          = ../plugins/reach/batch/KSyncReachCreditTaskRunner/KSyncReachCreditTaskRunnerExe.php
 sleepBetweenStopStart                               = 21600
+
+[KAsyncReportExport : JobHandlerWorker]
+id													= 730
+friendlyName										= Reports export
+type												= KAsyncReportExport
+maximumExecutionTime								= 12000
+scriptPath											= batches/ReportExport/KAsyncReportExportExe.php
+params.localTempPath								= @TMP_DIR@/reports
+params.sharedTempPath								= @WEB_DIR@/apptemp-shared/reports

@@ -75,7 +75,6 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		$pager->attachToCriteria($c);
 		
 		$list = UserEntryPeer::doSelect($c);
-
 		$resultCount = count($list);
 		if ($resultCount && ($resultCount < $pager->pageSize))
 		{
@@ -186,4 +185,11 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		return $anonKuserIds;
 	}
 	
+	public function getEmptyListResponse()
+	{
+		$res = new KalturaUserEntryListResponse();
+		$res->objects = array();
+		$res->totalCount = 0;
+		return $res;
+	}
 }

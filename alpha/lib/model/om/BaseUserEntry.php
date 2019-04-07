@@ -1449,6 +1449,7 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 			if ($this->isColumnModified(UserEntryPeer::CUSTOM_DATA))
 			{
 				if (!is_null($this->custom_data_md5))
+				
 					$criteria->add(UserEntryPeer::CUSTOM_DATA, "MD5(cast(" . UserEntryPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
 					//casting to latin char set to avoid mysql and php md5 difference
 				else 
@@ -1523,7 +1524,6 @@ abstract class BaseUserEntry extends BaseObject  implements Persistent {
 		$copyObj->setPrivacyContext($this->privacy_context);
 
 		$copyObj->setCustomData($this->custom_data);
-
 
 		$copyObj->setNew(true);
 

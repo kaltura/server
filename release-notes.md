@@ -1,3 +1,201 @@
+# Naos 14.18.0 #
+
+## Copying SubAnnotation cue points on entry clipping/trimming ##
+ - Issue Type: Task
+ - Issue IDs: SUP-17626
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+
+Run deployment script:
+
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_04_01_update_annotation_permission.php
+
+## Update "comment added" KMS notification body - fix the link ##
+ - Issue Type: Bugfix
+ - Issue IDs: PSVAMB-6933
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+
+First replace all tokens in the XML file below and remove ".template" from the fle name:
+
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_04_01_fix_comment_notification_template.template.xml
+
+Run deployment script:
+
+    php /opt/kaltura/app/deployment/updates/scripts/2019_04_01_fix_comment_notification_template.php
+
+# Naos 14.17.0 #
+
+## Report Service - Export to CSV ##
+ - Issue Type: Task
+ - Issue ID: AN-188
+
+### Configuration ###
+ Add the following enabled workers and worker configuration:
+	enabledWorkers.KAsyncReportExport = XXXX (Where XXX is the amount of workers you want to run)
+	
+	[KAsyncReportExport : JobHandlerWorker]
+	id                    = 730
+	friendlyName          = Reports export
+	type                  = KAsyncReportExport
+	maximumExecutionTime  = 12000
+	scriptPath		     = batches/ReportExport/KAsyncReportExportExe.php
+	params.localTempPath  = @TMP_DIR@/reports
+	params.sharedTempPath = @WEB_DIR@/apptemp-shared/reports
+	
+	Make sure to modify @TMP_DIR@ && @WEB_DIR@ settings
+
+### Deployment Scripts ###
+     php deployment/updates/scripts/add_permissions/2019_03_25_report_add_export_to_csv_permission.php
+
+## adding support for copying a group ##
+
+- Issue Type: Task
+- Issue ID: PLAT-9723
+
+### configuration ###
+none
+
+### Deployment scripts ###
+php deployment/updates/scripts/add_permissions/2019_03_10_add_group_permission.php
+
+
+## Add option to disable New Analytics from Admin console (new permission) ##
+
+- Issue Type: Feature
+- Issue ID: AN-513
+
+### configuration ###
+    Update the following in admin.ini: (need to rename moduls.newAnalyticsTab.label and moduls.newAnalyticsTab.permissionName)
+
+    moduls.newAnalyticsTab.label = Disable New Analytics 
+    moduls.newAnalyticsTab.permissionName = FEATURE_NEW_ANALYTICS_TAB_DISABLE
+
+### Deployment scripts ###
+    None
+
+## Export CSV Job Infrastructure Change ## 
+ - Issue Type: Task
+ - Issue ID: PSVAMB-6047
+ 
+### Configuration ### 
+ Update batch.ini file with the following changes:
+	
+	Remove the following enabled workers and worker configuration:
+	KAsyncUsersCsv
+	KAsyncEntryVendorTasksCsv
+	
+	Add the following enabled workers and worker configuration:
+	enabledWorkers.KAsyncExportCsv = XXXX (Where XXX is the amount of workers you want to run)
+	
+	[KAsyncExportCsv : JobHandlerWorker]
+	id                      = 690
+	friendlyName            = Export Csv
+	type                    = KAsyncExportCsv
+	params.localTempPath    = @TMP_DIR@/exportcsv
+	params.sharedTempPath   = @WEB_DIR@/tmp/exportcsv
+	scriptPath              = batches/ExportCsv/kAsyncExportCsvExe.php
+	maximumExecutionTime    = 3600
+	
+	Make sure to modify @TMP_DIR@ && @WEB_DIR@ settings
+
+### Deployment Scripts ### 
+     php /opt/kaltura/app/deployment/base/scripts/installPlugins.php 
+     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_03_17_add_exportcsv_permissions_and_items.php
+     php deployment/updates/scripts/add_permissions/2019_03_17_add_esearch_permissions_and_items.php
+
+## Change wording and support empty instance_id metadata in KMS email notifications ##
+ - Issue Type: Task
+ - Issue IDs: PSVAMB-4944, PSVAMB-4967
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/2019_01_15_update_unique_mediaspace_notifications_templates.php
+
+
+## eSearch - partial search for User::FirstName and User::LastName ##
+ - Issue Type: Task
+ - Issue ID: PLAT-9758
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+OnPrem - reindex kusers index in elastic:
+1) Remove old index - delete kaltura_kuser
+2) Create the index - curl -XPUT '{elasticHost}:{elasticPort}/kaltura_kuser' --data-binary "@kuser_mapping.json"
+3) Index the users - php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticKusers.php
+	 
+## keep user search in recent searches ##
+ - Issue Type: Task
+ - Issue ID: PLAT-9736
+
+### Configuration ###
+add to elastic.ini under [search_history_collect_objects]:
+2 = kuser
+
+# Naos 14.16.0 #
+## GroupUser - Count number of users in group on the group object ##
+ - Issue Type: Task
+ - Issue ID: PLAT-9742
+### Configuration ###
+Add Group to your plugins.ini
+
+### Deployment scripts ###
+Run deployment script:
+	 php deployment/updates/scripts/add_permissions/2019_03_10_add_group_permission.php
+
+## create new type of event notification template: Boolean ##
+ - Issue Type: Task
+ - Issue ID: REACH2-493
+
+### Configuration ###
+Add BooleanNotification to your plugins.ini
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+
+## Reach - Support extending accessKey##
+
+ - Issue Type: Feature
+ - Issue ID: REACH2-525
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_03_05_add_reach_extendAccessKey_action.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Groups-BE - Allow group manager ##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-8580
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+			
+Run deployment script:
+		
+		- php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_02_28_update_groupuser_permission.php
+
 # Naos 14.14.0 #
 
 ## Schedule Event - Add sphinx match optimization##

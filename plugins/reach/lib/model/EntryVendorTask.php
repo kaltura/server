@@ -25,6 +25,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	const CUSTOM_DATA_DICTIONARY =          'dictionary';
 	const CUSTOM_DATA_PARTNER_DATA =        'partner_data';
 	const CUSTOM_DATA_CREATION_MODE =       'creation_mode';
+	const CUSTOM_DATA_IS_REQUEST_MODERATED ='request_moderated';
 	const CUSTOM_DATA_TASK_DATA =       	'task_data';
 	
 	//setters
@@ -77,6 +78,11 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	public function setCreationMode($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_CREATION_MODE, $v);
+	}
+	
+	public function setIsRequestModerated($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_IS_REQUEST_MODERATED, $v);
 	}
 	
 	public function setTaskJobData($v)
@@ -149,6 +155,11 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	public function getCreationMode()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_CREATION_MODE, null, EntryVendorTaskCreationMode::MANUAL);
+	}
+	
+	public function getIsRequestModerated()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_IS_REQUEST_MODERATED, null, null);
 	}
 	
 	public function getTaskJobData()

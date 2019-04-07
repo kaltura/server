@@ -417,4 +417,65 @@ class KalturaBaseUserService extends KalturaBaseService
 		kSessionUtils::createKSessionNoValidations ( $partner->getId() ,  $adminKuser->getPuserId() , $ks , dateUtils::DAY , SessionType::ADMIN , "" , $ksObj->getPrivileges() );
 		return $ks;
 	}
+	
+	function addUserImpl(KalturaBaseUser $user)
+	{
+		/* @var $dbUser kuser */
+		$dbUser = $user->toInsertableObject();
+		$dbUser->setPartnerId($this->getPartnerId());
+		try {
+			$checkPasswordStructure = isset($user->password) ? true : false;
+			$dbUser = kuserPeer::addUser($dbUser, $user->password, $checkPasswordStructure);
+		}
+
+		catch (kUserException $e) {
+			$code = $e->getCode();
+			if ($code == kUserException::USER_ALREADY_EXISTS) {
+				throw new KalturaAPIException(KalturaErrors::DUPLICATE_USER_BY_ID, $user->id); //backward compatibility
+			}
+			if ($code == kUserException::LOGIN_ID_ALREADY_USED) {
+				throw new KalturaAPIException(KalturaErrors::DUPLICATE_USER_BY_LOGIN_ID, $user->email); //backward compatibility
+			}
+			else if ($code == kUserException::USER_ID_MISSING) {
+				throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, $user->getFormattedPropertyNameWithClassName('id'));
+			}
+			else if ($code == kUserException::INVALID_EMAIL) {
+				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'email');
+			}
+			else if ($code == kUserException::INVALID_PARTNER) {
+				throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID);
+			}
+			else if ($code == kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED) {
+				throw new KalturaAPIException(KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED);
+			}
+			else if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
+				$partner = $dbUser->getPartner();
+				$invalidPasswordStructureMessage='';
+				if($partner && $partner->getInvalidPasswordStructureMessage())
+					$invalidPasswordStructureMessage = $partner->getInvalidPasswordStructureMessage();
+				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID,$invalidPasswordStructureMessage);
+			}
+			throw $e;
+		}
+		catch (kPermissionException $e)
+		{
+			$code = $e->getCode();
+			if ($code == kPermissionException::ROLE_ID_MISSING) {
+				throw new KalturaAPIException(KalturaErrors::ROLE_ID_MISSING);
+			}
+			if ($code == kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED) {
+				throw new KalturaAPIException(KalturaErrors::ONLY_ONE_ROLE_PER_USER_ALLOWED);
+			}
+			else if ($code == kPermissionException::USER_ROLE_NOT_FOUND) {
+				throw new KalturaAPIException(KalturaErrors::USER_ROLE_NOT_FOUND);
+			}
+			throw $e;
+		}
+
+		$className = get_class ($user);
+		$newUser = new $className;
+		$newUser->fromObject($dbUser, $this->getResponseProfile());
+
+		return $newUser;
+	}
 }

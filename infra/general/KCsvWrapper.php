@@ -45,10 +45,21 @@ class KCsvWrapper
 		{
 			$csvField = self::CHAR_APOSTROPHE . $cleanCsvField;
 			$trimmedValue = substr($csvField, 0, self::FIELD_MAX_PRINT_LENGTH);
-			KalturaLog::debug("CSV field starts with invalid char. Field value: " . $trimmedValue);
+			//KalturaLog::debug("CSV field starts with invalid char. Field value: " . $trimmedValue);
 		}
 
 		return $csvField;
+	}
+
+	public static function contains($needle, $str)
+	{
+		$valArray = explode(',', $str);
+		$lowerValArray = array_map('strtolower', $valArray);
+		if(in_array($needle, $lowerValArray))
+		{
+			return true;
+		}
+		return false;
 	}
 
 }

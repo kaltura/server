@@ -56,19 +56,28 @@ class ConfigurationMapListAction extends KalturaApplicationPlugin implements IKa
 		$configurationMapFilterForm->populate($request->getParams());
 		$configurationMapFilterFormAction = $action->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')), null, true);
 		$configurationMapFilterForm->setAction($configurationMapFilterFormAction);
-		$mapNames = $configurationPluginClient->confMaps->getMapNames();
 		$mapNamesValues = array();
-		foreach ($mapNames as $mapName)
-			$mapNamesValues["$mapName->value"] = $mapName->value;
-		$configurationMapFilterForm->getElement("filter_input")->setAttrib('options', $mapNamesValues);
-		$action->view->filterForm = $configurationMapFilterForm;
-		$action->view->paginator = $paginator;
+		$action->view->newConfigurationMapFolderForm = '';
+		try{
+			$mapNames = $configurationPluginClient->confMaps->getMapNames();
+			foreach ($mapNames as $mapName)
+				$mapNamesValues["$mapName->value"] = $mapName->value;
+			$configurationMapFilterForm->getElement("filter_input")->setAttrib('options', $mapNamesValues);
+			$action->view->filterForm = $configurationMapFilterForm;
+			$action->view->paginator = $paginator;
 
-		$createConfigurationMapForm = new Form_CreateConfigurationMap();
-		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'ConfigurationMapConfigure'), null, true);
-		$createConfigurationMapForm->setAction($actionUrl);
+			$createConfigurationMapForm = new Form_CreateConfigurationMap();
+			$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'ConfigurationMapConfigure'), null, true);
+			$createConfigurationMapForm->setAction($actionUrl);
 
-		$action->view->newConfigurationMapFolderForm = $createConfigurationMapForm;
+			$action->view->newConfigurationMapFolderForm = $createConfigurationMapForm;
+		}
+		catch(Exception $e){
+			KalturaLog::err($e->getMessage() . "\n" . $e->getTraceAsString());
+			$action->view->errMessage = $e->getCode();
+		}
+
+
 	}
 	
 	protected function getConfigurationMapFilter()
