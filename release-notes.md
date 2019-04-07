@@ -1,5 +1,18 @@
 # Naos 14.18.0 #
 
+## Copying SubAnnotation cue points on entry clipping/trimming ##
+ - Issue Type: Task
+ - Issue IDs: SUP-17626
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+
+Run deployment script:
+
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_04_01_update_annotation_permission.php
+
 ## Update "comment added" KMS notification body - fix the link ##
  - Issue Type: Bugfix
  - Issue IDs: PSVAMB-6933
