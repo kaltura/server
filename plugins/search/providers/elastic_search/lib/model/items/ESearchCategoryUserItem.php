@@ -186,7 +186,7 @@ class ESearchCategoryUserItem extends ESearchItem
 			}
 
 			//got only permission name
-			if (is_null($permissionLevel) && $permissionName)
+			else if (is_null($permissionLevel) && $permissionName)
 			{
 				$item->setSearchTerm(elasticSearchUtils::formatCategoryUserPermissionName($groupId, $permissionName));
 				$permissionNameQuery = kESearchQueryManager::getExactMatchQuery($item, ESearchCategoryUserFieldName::USER_ID, $allowedSearchTypes, $queryAttributes);
