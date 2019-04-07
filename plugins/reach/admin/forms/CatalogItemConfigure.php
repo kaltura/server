@@ -191,7 +191,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$catalogItem->createdAt = null;
 		$catalogItem->updatedAt = null;
 		
-		if($catalogItem->outputFormat == "")
+		if(isset($catalogItem->outputFormat) && $catalogItem->outputFormat == "")
 			$catalogItem->outputFormat = null;
 	}
 
