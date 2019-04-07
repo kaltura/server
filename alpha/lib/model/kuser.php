@@ -1348,19 +1348,23 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	protected function addGroupUserDataToObjectParams(&$body)
 	{
 		$kgroupIds = array();
-		$formatCreationModes = array();
+		$groupUserData = array();
 
 		$kuserKgroups =  KuserKgroupPeer::retrieveKgroupByKuserIdAndPartnerId($this->getKuserId(), $this->getPartnerId());
+		if (!$kuserKgroups)
+		{
+			return;
+		}
 		foreach ($kuserKgroups as $kuserKgroup)
 		{
 			/* @var $kuserKgroup KuserKgroup */
 			$kgroupIds[] = $kuserKgroup->getKgroupId();
-			$formatCreationModes[] = elasticSearchUtils::formatGroupIdCreationMode($kuserKgroup->getKgroupId(), $kuserKgroup->getCreationMode());
+			$groupUserData[] = elasticSearchUtils::formatGroupIdCreationMode($kuserKgroup->getKgroupId(), $kuserKgroup->getCreationMode());
 		}
 
 
 		$body['group_ids'] = $kgroupIds;
-		$body['group_user_data'] = $formatCreationModes;
+		$body['group_user_data'] = $groupUserData;
 	}
 
 	/**
