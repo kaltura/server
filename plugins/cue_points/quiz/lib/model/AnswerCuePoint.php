@@ -133,7 +133,9 @@ class AnswerCuePoint extends CuePoint implements IMetadataObject
 	}
 	public function addingAnswerIdToUserEntry()
 	{
+		Propel::disableInstancePooling();
 		$userEntry = UserEntryPeer::retrieveByPK($this->getQuizUserEntryId());
+		Propel::enableInstancePooling();
 		if (!is_null($userEntry))
 		{
 			$userEntry->addAnswerId($this->parent_id, $this->id);
