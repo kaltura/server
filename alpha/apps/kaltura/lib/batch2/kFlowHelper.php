@@ -2883,11 +2883,11 @@ class kFlowHelper
 			return null;
 		}
 
-		$partner = PartnerPeer::retrieveByPK ( $partner_id );
+		$partner = PartnerPeer::retrieveByPK($partner_id);
 		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
 
 		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
-		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name";
+		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/name/$file_name.csv";
 
 		return $url;
 	}
