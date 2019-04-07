@@ -177,19 +177,37 @@ class ESearchCategoryUserItem extends ESearchItem
 			$permissionLevel = $item->getPermissionLevel();
 			$permissionName = $item->getPermissionName();
 
-			if (!is_null($permissionLevel))
+			//got only permission level
+			if (!is_null($permissionLevel) && !$permissionName)
 			{
 				$item->setSearchTerm(elasticSearchUtils::formatCategoryUserPermissionLevel($groupId, $permissionLevel));
 				$permissionLevelQuery = kESearchQueryManager::getExactMatchQuery($item, ESearchCategoryUserFieldName::USER_ID, $allowedSearchTypes, $queryAttributes);
 				$boolQuery->addToShould($permissionLevelQuery);
 			}
 
-			if ($permissionName)
+			//got only permission name
+			if (is_null($permissionLevel) && $permissionName)
 			{
 				$item->setSearchTerm(elasticSearchUtils::formatCategoryUserPermissionName($groupId, $permissionName));
 				$permissionNameQuery = kESearchQueryManager::getExactMatchQuery($item, ESearchCategoryUserFieldName::USER_ID, $allowedSearchTypes, $queryAttributes);
 				$boolQuery->addToShould($permissionNameQuery);
 			}
+
+			else if (!is_null($permissionLevel) && $permissionName)
+			{
+				$subBoolQuery = new kESearchBoolQuery();
+
+				$item->setSearchTerm(elasticSearchUtils::formatCategoryUserPermissionLevel($groupId, $permissionLevel));
+				$permissionLevelQuery = kESearchQueryManager::getExactMatchQuery($item, ESearchCategoryUserFieldName::USER_ID, $allowedSearchTypes, $queryAttributes);
+				$subBoolQuery->addToFilter($permissionLevelQuery);
+
+				$item->setSearchTerm(elasticSearchUtils::formatCategoryUserPermissionName($groupId, $permissionName));
+				$permissionNameQuery = kESearchQueryManager::getExactMatchQuery($item, ESearchCategoryUserFieldName::USER_ID, $allowedSearchTypes, $queryAttributes);
+				$subBoolQuery->addToFilter($permissionNameQuery);
+
+				$boolQuery->addToShould($subBoolQuery);
+			}
+
 		}
 
 		return $boolQuery;
