@@ -48,7 +48,6 @@ abstract class KCopyCuePointEngine
 	{
 		$this->lastCuePointPerType  = array();
 		$filter = $this->getCuePointFilter($srcEntryId);
-		$filter->orderBy = '+createdAt';
 		$pager = $this->getCuePointPager();
 		$clonedCuePointIds = array();
 		do
@@ -60,6 +59,10 @@ abstract class KCopyCuePointEngine
 			$cuePoints = $listResponse->objects;
 			$this->preProcessCuePoints($cuePoints);
 			KalturaLog::debug("Return " . count($cuePoints) . " cue-points from list");
+			if ($cuePoints)
+			{
+				usort($cuePoints, function ($a, $b) {return ($a->createdAt - $b->createdAt);});
+			}
 			foreach ($cuePoints as &$cuePoint)
 			{
 				if ($this->shouldCopyCuePoint($cuePoint))
