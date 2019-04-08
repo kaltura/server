@@ -264,7 +264,8 @@ class GroupUserService extends KalturaBaseService
 		if (!$shouldHandleGroupsUsersInBatch)
 		{
 			$this->initService('groupuser', 'groupuser', 'add');
-			$shouldHandleGroupsUsersInBatch = $this->addUserGroupsToGroup($kusers, $newGroup, $originalGroupId);
+			list($shouldHandleGroupsUsersInBatch, $userToAddInBulk) = $this->addUserGroupsToGroup($kusers, $newGroup, $originalGroupId);
+			$kusers = $userToAddInBulk;
 		}
 		if ($shouldHandleGroupsUsersInBatch)
 		{
@@ -276,10 +277,11 @@ class GroupUserService extends KalturaBaseService
 	/**
 	 * @param $userIdsToAdd
 	 * @param $groupId
-	 * @return bool (true if errors occurred)
+	 * @return array(bool (true if errors occurred),$usersToAddInBulk - users that we failed while trying to add them to group)
 	 */
 	public function addUserGroupsToGroup($userToAdd, $group, $originalGroupId)
 	{
+		$usersToAddInBulk = array();
 		$groupId = $group->getPuserId();
 		$shouldHandleGroupsInBatch = false;
 		foreach ($userToAdd as $user)
@@ -297,9 +299,10 @@ class GroupUserService extends KalturaBaseService
 			catch (Exception $e)
 			{
 				$shouldHandleGroupsInBatch = true;
+				$usersToAddInBulk[] = $user;
 			}
 		}
-		return $shouldHandleGroupsInBatch;
+		return array($shouldHandleGroupsInBatch, $usersToAddInBulk);
 	}
 
 	/**
