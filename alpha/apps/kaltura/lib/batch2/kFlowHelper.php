@@ -2916,7 +2916,7 @@ class kFlowHelper
 
 		$expiry = kConf::get("report_export_expiry", 'local', self::REPORT_EXPIRY_TIME);
 
-		$urls = array();
+		$links = array();
 		// Create download URL's
 		foreach ($finalPaths as $finalPath)
 		{
@@ -2927,14 +2927,14 @@ class kFlowHelper
 				KalturaLog::err("Failed to create download URL for file - $finalPath");
 				return kFlowHelper::handleReportExportFailed($dbBatchJob, $data);
 			}
-			$urls[] = $url;
+			$links[] = '<a href="' . $url .'" target="_blank" >' . $fileName . '</a>';
 		}
 
 		$time = date("m-d-y H:i", $data->getTimeReference() + $data->getTimeZoneOffset());
 		$email_id = MailType::MAIL_TYPE_REPORT_EXPORT_SUCCESS;
 		$validUntil = date("m-d-y H:i", $data->getTimeReference() + $expiry + $data->getTimeZoneOffset());
 		$expiryInDays = $expiry / 60 / 60 / 24;
-		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $urls), $expiryInDays, $validUntil);
+		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInDays, $validUntil);
 		$titleParams = array($time);
 
 		kJobsManager::addMailJob(
