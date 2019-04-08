@@ -114,7 +114,7 @@ class CategoryUserService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $categoryId, $userId);
 			
 		if(!$override && 
-			($categoryUser->updateMethod == null || $categoryUser->updateMethod == KalturaUpdateMethodType::AUTOMATIC) && 
+			($categoryUser->updateMethod === null || $categoryUser->updateMethod == KalturaUpdateMethodType::AUTOMATIC) &&
 			$dbCategoryKuser->getUpdateMethod() == KalturaUpdateMethodType::MANUAL)
 			throw new KalturaAPIException(KalturaErrors::CANNOT_OVERRIDE_MANUAL_CHANGES);
 		
