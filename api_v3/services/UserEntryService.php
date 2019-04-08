@@ -128,26 +128,4 @@ class UserEntryService extends KalturaBaseService {
 		$userEntry->fromObject($dbUserEntry);
 		return $userEntry;
 	}
-
-	
-	/**
-	 * @action bulkDelete
-	 * @param string $id
-	 * @return int
-	 * @throws KalturaAPIException
-	 */
-	public function bulkDeleteAction(KalturaUserEntryFilter $filter)
-	{
-		//The Delete job will need the users translated to puser IDs
-		$ueFilter = $filter->toObject($ueFilter);
-		
-		if (!$filter->userIdEqual && !$filter->userIdIn && !$filter->entryIdEqual && !$filter->entryIdIn)
-		{
-			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_USER);	
-		}
-		$batchJob = kJobsManager::addDeleteJob(kCurrentContext::getCurrentPartnerId(), DeleteObjectType::USER_ENTRY, $ueFilter);
-		
-		return $batchJob->getId();
-	}
-
 }

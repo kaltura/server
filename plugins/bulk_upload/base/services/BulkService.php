@@ -478,5 +478,48 @@ class BulkService extends KalturaBaseService
 		return $bulkUpload;
 	}
 
+	/**
+	 * @action bulkDelete
+	 * @actionAlias userEntry.bulkDelete
+	 * Action delete userEntry objects from filter in bulk
+	 * @param KalturaUserEntryFilter $filter
+	 * @return KalturaBulkUpload
+	 */
+	public function userEntryBulkDeleteAction(KalturaUserEntryFilter $filter)
+	{
+		$bulkUploadData = new KalturaBulkServiceFilterDataBase();
+		$bulkUploadData->filter = $filter;
+		$bulkUploadObjectType = BulkUploadObjectType::USER_ENTRY;
+		$bulkUpload = $this->bulkDelete($bulkUploadData, $bulkUploadObjectType);
+		if ($bulkUpload)
+		{
+			return $bulkUpload->id;
+		}
+		return null;
+	}
+
+	protected function bulkDelete(KalturaBulkServiceFilterDataBase $bulkUploadData, $bulkUploadObjectType)
+	{
+		$bulkUploadJobData = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', $bulkUploadData->getType());
+		$bulkUploadData->toBulkUploadJobData($bulkUploadJobData);
+
+		$dbBulkUploadJobData = $bulkUploadJobData->toInsertableObject();
+		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadJobData->type);
+		$dbBulkUploadJobData->setBulkUploadObjectType($bulkUploadObjectType);
+		$dbBulkUploadJobData->setUserId($this->getKuser()->getPuserId());
+
+		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $dbBulkUploadJobData, $bulkUploadCoreType);
+		$dbJobLog = BatchJobLogPeer::retrieveByBatchJobId($dbJob->getId());
+		if(!$dbJobLog)
+		{
+			return null;
+		}
+
+		$bulkUpload = new KalturaBulkUpload();
+		$bulkUpload->fromObject($dbJobLog, $this->getResponseProfile());
+
+		return $bulkUpload;
+	}
+
 
 }

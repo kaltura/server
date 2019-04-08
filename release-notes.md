@@ -1,4 +1,16 @@
 # Naos 14.18.0 #
+## making userEntry bulk delete work with bulk batch job ##
+ - Issue Type: Task
+ - Issue IDs: PLAT-9782
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+Run deployment scripts:
+
+	php deployment/updates/scripts/add_permissions/2018_11_12_add_bulk_update_category_entries_status_permissions.php
+	php deployment/updates/scripts/add_permissions/2017_04_01_add_user_entry_service_permissions.php
 
 ## Copying SubAnnotation cue points on entry clipping/trimming ##
  - Issue Type: Task
