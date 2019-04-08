@@ -2750,7 +2750,6 @@ class kKavaReportsMgr extends kKavaBase
 			if (isset($field_filter_def[self::DRUID_TYPE]))
 			{
 				$filter[self::DRUID_TYPE] = $field_filter_def[self::DRUID_TYPE];
-
 			}
 			$druid_filter[] = $filter;
 		}
