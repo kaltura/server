@@ -86,14 +86,14 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
             $saveCounter = $cache->increment($cacheKey);
         }
 	
-		list($skipElasticRepetitiveUpdatesValue, $matchKey) = kSearchUtils::getSkipRepetitiveUpdatesValue(self::REPETITIVE_UPDATES_CONFIG_KEY, $className);
-		$skipSave = isset($skipElasticRepetitiveUpdatesValue) && $saveCounter > $skipElasticRepetitiveUpdatesValue;
-	
-		if($skipSave)
-		{
-			KalturaLog::debug("Skipping save elastic for object [$className] [$objectId] count [$saveCounter] max allowed [$skipElasticRepetitiveUpdatesValue] with match key [$matchKey]");
-			return true;
-		}
+        list($skipElasticRepetitiveUpdatesValue, $matchKey) = kSearchUtils::getSkipRepetitiveUpdatesValue(self::REPETITIVE_UPDATES_CONFIG_KEY, $className);
+        $skipSave = isset($skipElasticRepetitiveUpdatesValue) && $saveCounter > $skipElasticRepetitiveUpdatesValue;
+
+        if($skipSave)
+        {
+            KalturaLog::debug("Skipping save elastic for object [$className] [$objectId] count [$saveCounter] max allowed [$skipElasticRepetitiveUpdatesValue] with match key [$matchKey]");
+            return true;
+        }
 	
 		KalturaLog::debug("Updating elastic for object [$className] [$objectId] count [$saveCounter] service info [" . kCurrentContext::$service . ' ' . kCurrentContext::$action . "]");
 		return false;
