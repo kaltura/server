@@ -1,4 +1,17 @@
 # Naos 14.18.0 #
+
+## Allowing capture application use list-feature-status action ##
+ - Issue Type: Task
+ - Issue IDs: LEC-1629
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+Run deployment scripts:
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_04_10_update_capture_permission.php
+
 ## making userEntry bulk delete work with bulk batch job ##
  - Issue Type: Task
  - Issue IDs: PLAT-9782
