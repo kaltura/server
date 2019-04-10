@@ -51,14 +51,16 @@ class GroupUserService extends KalturaBaseService
 		if (KuserKgroupPeer::doCount($criteria) > KuserKgroup::MAX_NUMBER_OF_GROUPS_PER_USER){
 			throw new KalturaAPIException (KalturaErrors::USER_EXCEEDED_MAX_GROUPS);
 		}
+
+		$numberOfUsersPerGroup = $this->getNumberOfUsersInGroup($kgroup);
+
 		$dbGroupUser = $groupUser->toInsertableObject();
 		$dbGroupUser->setPartnerId($this->getPartnerId());
 		$dbGroupUser->setStatus(KuserKgroupStatus::ACTIVE);
 		$dbGroupUser->save();
 		$groupUser->fromObject($dbGroupUser);
 
-		$numberOfUsersPerGroup = $this->getNumberOfUsersInGroup($kgroup->getId());
-		$kgroup->setMembersCount($numberOfUsersPerGroup);
+		$kgroup->setMembersCount($numberOfUsersPerGroup+1);
 		$kgroup->save();
 		return $groupUser;
 	}
@@ -134,11 +136,11 @@ class GroupUserService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::GROUP_USER_DOES_NOT_EXIST, $userId, $groupId);
 		}
-
+		$numberOfUsersPerGroup = $this->getNumberOfUsersInGroup($kgroup);
 		$dbKuserKgroup->setStatus(KuserKgroupStatus::DELETED);
 		$dbKuserKgroup->save();
-		$numberOfUsersPerGroup = $this->getNumberOfUsersInGroup($kgroup->getId());
-		$kgroup->setMembersCount($numberOfUsersPerGroup);
+
+		$kgroup->setMembersCount($numberOfUsersPerGroup-1);
 		$kgroup->save();
 		$groupUser = new KalturaGroupUser();
 		$groupUser->fromObject($dbKuserKgroup);
@@ -208,12 +210,16 @@ class GroupUserService extends KalturaBaseService
 		return $bulkUpload;
 	}
 
-	protected function getNumberOfUsersInGroup($groupId)
+	protected function getNumberOfUsersInGroup($group)
 	{
-		$criteria = new Criteria();
-		$criteria->add(KuserKgroupPeer::KGROUP_ID, $groupId);
-		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
-		$numberOfUsersPerGroup = KuserKgroupPeer::doCount($criteria);
+		$numberOfUsersPerGroup = $group->getMembersCount();
+		if(!$numberOfUsersPerGroup)
+		{
+			$criteria = new Criteria();
+			$criteria->add(KuserKgroupPeer::KGROUP_ID, $group->getId());
+			$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
+			$numberOfUsersPerGroup = KuserKgroupPeer::doCount($criteria);
+		}
 		return $numberOfUsersPerGroup;
 	}
 
