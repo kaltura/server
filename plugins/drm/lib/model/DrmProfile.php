@@ -47,4 +47,8 @@ class DrmProfile extends BaseDrmProfile implements IBaseObject {
         $this->putInCustomData(self::CUSTOM_DATA_SIGNING_KEY, $key);
     }
 
+	public function getCacheInvalidationKeys()
+	{
+		return array("drmProfile:partnerId=".strtolower($this->getPartnerId()));
+	}
 } // DrmProfile

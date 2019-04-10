@@ -45,11 +45,12 @@ $INVALIDATION_KEYS = array(
 	array('table' => "schedule_resource",               'keys' => array(array("'scheduleResource:id='", '@OBJ@.id')),                                                                           'plugin' => 'schedule/base'),
 	array('table' => "schedule_event_resource",         'keys' => array(array("'scheduleEventResource:eventId='", '@OBJ@.event_id')),                                                           'plugin' => 'schedule/base'),
 	array('table' => "user_login_data", 				'keys' => array(array("'userLoginData:id='", '@OBJ@.id'), array("'userLoginData:loginEmail='", '@OBJ@.login_email'))),
-	array('table' => "drm_profile", 					'keys' => array(array("'drmProfile:partnerId='", '@OBJ@.partner_id'))),
+	array('table' => "drm_profile", 					'keys' => array(array("'drmProfile:partnerId='", '@OBJ@.partner_id')),                                                                  'plugin' => 'drm'),
 	array('table' => "scheduler", 						'keys' => array(array("'scheduler:configuredId='", '@OBJ@.configured_id'))),
 	array('table' => "syndication_feed", 				'keys' => array(array("'syndicationFeed:id='", '@OBJ@.id'))),
 	array('table' => "app_token", 						'keys' => array(array("'appToken:id='", '@OBJ@.id'))),
 	array('table' => "user_entry", 						'keys' => array(array("'userEntry:kuserId='", '@OBJ@.kuser_id'))),
+	array('table' => "drm_policy", 						'keys' => array(array("'drmPolicy:id='", '@OBJ@.id')),                                                                                   'plugin' => 'drm'),
 	
 	);
 
