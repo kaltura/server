@@ -20,6 +20,19 @@
 		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_04_10_alter_schedule_event_index.sql
 		
 		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_04_10_alter_server_node_index.sql
+    
+
+## Allowing capture application use list-feature-status action ##
+ - Issue Type: Task
+ - Issue IDs: LEC-1629
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+Run deployment scripts:
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_04_10_update_capture_permission.php
 
 ## making userEntry bulk delete work with bulk batch job ##
  - Issue Type: Task
