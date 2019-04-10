@@ -68,4 +68,8 @@ class DrmProfilePeer extends BaseDrmProfilePeer
 		return DrmProfilePeer::doSelectOne($c);
 	}
 
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("drmProfile:partnerId=%s", self::PARTNER_ID));		
+	}
 } // DrmProfilePeer

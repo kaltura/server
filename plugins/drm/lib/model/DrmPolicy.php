@@ -22,4 +22,8 @@ class DrmPolicy extends BaseDrmPolicy implements IBaseObject
 
 	public function getLicenseParams() {return $this->getFromCustomData(self::CUSTOM_DATA_LICENSE_PARAMS);}
 
+	public function getCacheInvalidationKeys()
+	{
+		return array("DrmPolicy:id=".strtolower($this->getId()));
+	}
 } // DrmPolicy
