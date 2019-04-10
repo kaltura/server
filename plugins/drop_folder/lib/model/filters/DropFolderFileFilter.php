@@ -75,7 +75,7 @@ class DropFolderFileFilter extends baseObjectFilter
 		
 		if(!is_null($filterFileNameEqual))
 		{
-			$c->add(DropFolderFilePeer::MD5_FILE_NAME, md5($filter->fileNameEqual));
+			$c->add(DropFolderFilePeer::MD5_FILE_NAME, md5($filterFileNameEqual));
 			$this->unsetByName('_eq_file_name');
 		}
 		
