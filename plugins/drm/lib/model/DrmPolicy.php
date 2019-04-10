@@ -24,6 +24,6 @@ class DrmPolicy extends BaseDrmPolicy implements IBaseObject
 
 	public function getCacheInvalidationKeys()
 	{
-		return array("DrmPolicy:id=".strtolower($this->getId()));
+		return array("drmPolicy:id=".strtolower($this->getId()));
 	}
 } // DrmPolicy

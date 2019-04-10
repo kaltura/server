@@ -69,6 +69,6 @@ class DrmPolicyPeer extends BaseDrmPolicyPeer
 	
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("DrmPolicy:id=%s", self::ID));		
+		return array(array("drmPolicy:id=%s", self::ID));		
 	}
 } // DrmPolicyPeer

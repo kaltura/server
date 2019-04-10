@@ -50,7 +50,7 @@ $INVALIDATION_KEYS = array(
 	array('table' => "syndication_feed", 				'keys' => array(array("'syndicationFeed:id='", '@OBJ@.id'))),
 	array('table' => "app_token", 						'keys' => array(array("'appToken:id='", '@OBJ@.id'))),
 	array('table' => "user_entry", 						'keys' => array(array("'userEntry:kuserId='", '@OBJ@.kuser_id'))),
-	array('table' => "drm_policy", 						'keys' => array(array("'DrmPolicy:id='", '@OBJ@.id')),                                                                                   'plugin' => 'drm'),
+	array('table' => "drm_policy", 						'keys' => array(array("'drmPolicy:id='", '@OBJ@.id')),                                                                                   'plugin' => 'drm'),
 	
 	);
 
