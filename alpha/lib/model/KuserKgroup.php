@@ -53,7 +53,7 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 
 	public function getCacheInvalidationKeys()
 	{
-		return array("kuserKgroup:kuserId=".strtolower($this->getKuserId()));
+		return array("kuserKgroup:kuserId=".strtolower($this->getKuserId()), "kuserKgroup:kgroupId=".strtolower($this->getKgroupId()));
 	}
 
 	public function postInsert(PropelPDO $con = null)

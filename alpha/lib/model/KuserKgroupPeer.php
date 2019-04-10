@@ -144,7 +144,7 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("kuserKgroup:kuserId=%s", self::KUSER_ID));		
+		return array(array("kuserKgroup:kuserId=%s", self::KUSER_ID), array("kuserKgroup:kgroupId=%s", self::KGROUP_ID));		
 	}
 
 	/**
