@@ -266,7 +266,7 @@ class KSecureEntryHelper
 		
 		/* @var $action kAccessControlServeRemoteEdgeServerAction */
 		$action = reset($actionsList);
-		$activeServerNodes =  $action->getRegiteredNodeServers();
+		$activeServerNodes =  $action->getRegisteredNodeServers();
 		
 		if(!count($activeServerNodes))
 			return null;

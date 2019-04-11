@@ -19,6 +19,8 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	 * @var DeliveryProfileDynamicAttributes
 	 */
 	protected $params;
+	
+	private static $delivery_nodes;
 
 	public function __construct()
 	{
@@ -479,20 +481,27 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	{
 		$deliveryUrl = null;
 	
-		$deliveryNodeIds = $this->params->getEdgeServerIds();
-		$deliveryNodes = ServerNodePeer::retrieveRegisteredServerNodesArrayByPKs($deliveryNodeIds);
+		if(!isset(self::$delivery_nodes))
+		{
+			$deliveryNodeIds = $this->params->getEdgeServerIds();
+			$deliveryNodes = ServerNodePeer::retrieveRegisteredServerNodesArrayByPKs($deliveryNodeIds);
+			foreach ($deliveryNodes as $deliveryNode)
+			{
+				self::$delivery_nodes[$deliveryNode->getId()] = $deliveryNode;
+			}
+		}
 	
-		if(!count($deliveryNodes))
+		if(!count(self::$delivery_nodes))
 		{
 			KalturaLog::debug("No active delivery nodes found among the requested edge list: " . print_r($deliveryNodeIds, true));
 			return null;
 		}
 	
-	        /* Shuffle the array to randomize the assigned KES, if more than one in the same rule */
-		shuffle($deliveryNodes);
+		/* Shuffle the array to randomize the assigned KES, if more than one in the same rule */
+		shuffle(self::$delivery_nodes);
 	
 		$deliveryNode = null;
-		foreach ($deliveryNodes as $node)
+		foreach (self::$delivery_nodes as $node)
 		{
 			/* @var $node EdgeServerNode */
 			if($node->validateEdgeTreeRegistered())
@@ -510,8 +519,11 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		
 		$deliveryUrl = $deliveryNode->getPlaybackHost($this->params->getMediaProtocol(), $this->params->getFormat(), $this->getType());
 	
-		if(count($deliveryNodes) && $removeAfterUse)
-			$this->params->setEdgeServerIds(array_diff($deliveryNodeIds, array($deliveryNode->getId())));
+		if(count(self::$delivery_nodes) && $removeAfterUse)
+		{
+			unset(self::$delivery_nodes[$deliveryNode->getId()]);
+		}
+		
 		$this->params->addUsedEdgeServerIds(array($deliveryNode->getId()));
 	
 		return $deliveryUrl;
