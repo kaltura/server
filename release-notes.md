@@ -33,6 +33,7 @@ None
 Run deployment scripts:
 
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_04_10_update_capture_permission.php
+	php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionToRole.php null "Capture device role" STUDIO_BASE realrun
 
 ## making userEntry bulk delete work with bulk batch job ##
  - Issue Type: Task
