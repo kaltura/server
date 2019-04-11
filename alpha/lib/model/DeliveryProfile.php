@@ -20,7 +20,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	 */
 	protected $params;
 	
-	private static $delivery_nodes;
+	private static $deliveryNodes;
 
 	public function __construct()
 	{
@@ -481,8 +481,9 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	{
 		$deliveryUrl = null;
 	
-		if(!isset(self::$delivery_nodes))
+		if(!isset(self::$deliveryNodes))
 		{
+			self::$deliveryNodes = array();
 			$deliveryNodeIds = $this->params->getEdgeServerIds();
 			$deliveryNodes = ServerNodePeer::retrieveRegisteredServerNodesArrayByPKs($deliveryNodeIds);
 			foreach ($deliveryNodes as $deliveryNode)
@@ -491,17 +492,17 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			}
 		}
 	
-		if(!count(self::$delivery_nodes))
+		if(!count(self::$deliveryNodes))
 		{
 			KalturaLog::debug("No active delivery nodes found among the requested edge list: " . print_r($deliveryNodeIds, true));
 			return null;
 		}
 	
 		/* Shuffle the array to randomize the assigned KES, if more than one in the same rule */
-		shuffle(self::$delivery_nodes);
+		shuffle(self::$deliveryNodes);
 	
 		$deliveryNode = null;
-		foreach (self::$delivery_nodes as $node)
+		foreach (self::$deliveryNodes as $node)
 		{
 			/* @var $node EdgeServerNode */
 			if($node->validateEdgeTreeRegistered())
@@ -519,9 +520,9 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		
 		$deliveryUrl = $deliveryNode->getPlaybackHost($this->params->getMediaProtocol(), $this->params->getFormat(), $this->getType());
 	
-		if(count(self::$delivery_nodes) && $removeAfterUse)
+		if(count(self::$deliveryNodes) && $removeAfterUse)
 		{
-			unset(self::$delivery_nodes[$deliveryNode->getId()]);
+			unset(self::$deliveryNodes[$deliveryNode->getId()]);
 		}
 		
 		$this->params->addUsedEdgeServerIds(array($deliveryNode->getId()));
