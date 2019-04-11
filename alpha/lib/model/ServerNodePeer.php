@@ -14,7 +14,9 @@
  * @subpackage model
  */
 class ServerNodePeer extends BaseServerNodePeer {
-
+	
+	private static $heartbeat_fetch_time;
+	
 	const EDGE_SERVER_NODE_OM_CLASS = 'EdgeServerNode';
 	
 	// cache classes by their type
@@ -79,7 +81,7 @@ class ServerNodePeer extends BaseServerNodePeer {
 		$criteria = new Criteria(ServerNodePeer::DATABASE_NAME);
 		$criteria->add(ServerNodePeer::ID, $pk);
 		$criteria->add(ServerNodePeer::STATUS, ServerNodeStatus::ACTIVE);
-		$criteria->add(ServerNodePeer::HEARTBEAT_TIME, time() - ServerNode::SERVER_NODE_TTL_TIME, Criteria::GREATER_EQUAL);
+		$criteria->add(ServerNodePeer::HEARTBEAT_TIME, self::getHeartbeatQueryTime(), Criteria::GREATER_EQUAL);
 		$criteria->addOr(ServerNodePeer::HEARTBEAT_TIME, null);
 	
 		return ServerNodePeer::doSelectOne($criteria, $con);
@@ -95,7 +97,7 @@ class ServerNodePeer extends BaseServerNodePeer {
 			$criteria = new Criteria(ServerNodePeer::DATABASE_NAME);
 			$criteria->add(ServerNodePeer::ID, $pks, Criteria::IN);
 			$criteria->add(ServerNodePeer::STATUS, ServerNodeStatus::ACTIVE);
-			$criteria->add(ServerNodePeer::HEARTBEAT_TIME, time() - ServerNode::SERVER_NODE_TTL_TIME, Criteria::GREATER_EQUAL);
+			$criteria->add(ServerNodePeer::HEARTBEAT_TIME, self::getHeartbeatQueryTime(), Criteria::GREATER_EQUAL);
 			$criteria->addOr(ServerNodePeer::HEARTBEAT_TIME, null);
 			$orderBy = "FIELD (" . self::ID . "," . implode(",", $pks) . ")";  // first take the pattner_id and then the rest
 			$criteria->addAscendingOrderByColumn($orderBy);
@@ -139,7 +141,7 @@ class ServerNodePeer extends BaseServerNodePeer {
 		$c = new Criteria();
 		$c->add(ServerNodePeer::STATUS, ServerNodeStatus::ACTIVE);
 		$c->add(ServerNodePeer::TYPE, $type);
-		$c->add(ServerNodePeer::HEARTBEAT_TIME, time() - ServerNode::SERVER_NODE_TTL_TIME, Criteria::GREATER_EQUAL);
+		$c->add(ServerNodePeer::HEARTBEAT_TIME, self::getHeartbeatQueryTime(), Criteria::GREATER_EQUAL);
 		$c->addOr(ServerNodePeer::HEARTBEAT_TIME, null);
 		if (!empty($env))
 		{
@@ -152,6 +154,16 @@ class ServerNodePeer extends BaseServerNodePeer {
 		$objs = ServerNodePeer::doSelect($c, $con);
 
 		return $objs;
+	}
+	
+	private static function getHeartbeatQueryTime()
+	{
+		if(!isset(self::$heartbeat_fetch_time))
+		{
+			self::$heartbeat_fetch_time = floor(time() / 30) * 30 - ServerNode::SERVER_NODE_TTL_TIME;
+		}
+		
+		return self::$heartbeat_fetch_time;
 	}
 
 } // ServerNodePeer
