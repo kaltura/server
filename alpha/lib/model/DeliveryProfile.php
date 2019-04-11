@@ -488,7 +488,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			$deliveryNodes = ServerNodePeer::retrieveRegisteredServerNodesArrayByPKs($deliveryNodeIds);
 			foreach ($deliveryNodes as $deliveryNode)
 			{
-				self::$delivery_nodes[$deliveryNode->getId()] = $deliveryNode;
+				self::$deliveryNodes[$deliveryNode->getId()] = $deliveryNode;
 			}
 		}
 	
