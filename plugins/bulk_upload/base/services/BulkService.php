@@ -483,7 +483,8 @@ class BulkService extends KalturaBaseService
 	 * @actionAlias userEntry.bulkDelete
 	 * Action delete userEntry objects from filter in bulk
 	 * @param KalturaUserEntryFilter $filter
-	 * @return KalturaBulkUpload
+	 * @throws KalturaErrors::FAILED_TO_CREATE_BULK_DELETE
+	 * @return int
 	 */
 	public function userEntryBulkDeleteAction(KalturaUserEntryFilter $filter)
 	{
@@ -491,11 +492,7 @@ class BulkService extends KalturaBaseService
 		$bulkUploadData->filter = $filter;
 		$bulkUploadObjectType = BulkUploadObjectType::USER_ENTRY;
 		$bulkUpload = $this->bulkDelete($bulkUploadData, $bulkUploadObjectType);
-		if ($bulkUpload)
-		{
-			return $bulkUpload->id;
-		}
-		return null;
+		return $bulkUpload->id;
 	}
 
 	protected function bulkDelete(KalturaBulkServiceFilterDataBase $bulkUploadData, $bulkUploadObjectType)
@@ -512,7 +509,7 @@ class BulkService extends KalturaBaseService
 		$dbJobLog = BatchJobLogPeer::retrieveByBatchJobId($dbJob->getId());
 		if(!$dbJobLog)
 		{
-			return null;
+			throw new KalturaAPIException(KalturaErrors::FAILED_TO_CREATE_BULK_DELETE);
 		}
 
 		$bulkUpload = new KalturaBulkUpload();
