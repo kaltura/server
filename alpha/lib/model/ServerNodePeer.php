@@ -160,7 +160,7 @@ class ServerNodePeer extends BaseServerNodePeer {
 	{
 		if(!isset(self::$heartbeat_fetch_time))
 		{
-			self::$heartbeat_fetch_time = floor(time() / 30) * 30 - ServerNode::SERVER_NODE_TTL_TIME ;
+			self::$heartbeat_fetch_time = floor(time() / 30) * 30 - ServerNode::SERVER_NODE_TTL_TIME;
 		}
 		
 		return self::$heartbeat_fetch_time;
