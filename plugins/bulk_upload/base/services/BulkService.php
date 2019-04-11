@@ -479,7 +479,7 @@ class BulkService extends KalturaBaseService
 	}
 
 	/**
-	 * @action bulkDelete
+	 * @action userEntryBulkDelete
 	 * @actionAlias userEntry.bulkDelete
 	 * Action delete userEntry objects from filter in bulk
 	 * @param KalturaUserEntryFilter $filter
