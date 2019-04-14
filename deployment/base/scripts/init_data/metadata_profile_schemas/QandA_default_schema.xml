@@ -33,7 +33,6 @@
 							<xsd:enumeration value="FollowUp"/>
 							<xsd:enumeration value="Done"/>
                             <xsd:enumeration value="Cleared"/>
-                            <xsd:enumeration value="Deleted"/>
 						</xsd:restriction>
 					</xsd:simpleType>
 				</xsd:element>
