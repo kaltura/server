@@ -23,6 +23,7 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 		1 => "CAPTIONS",
 		2 => "TRANSLATION",
 		3 => "ALIGNMENT",
+		4 => "AUDIO_DESCRIPTION",
 	);
 	
 	static private $serviceTypeEnumTranslate = array(

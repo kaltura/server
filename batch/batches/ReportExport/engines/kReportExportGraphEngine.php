@@ -77,11 +77,11 @@ class kReportExportGraphEngine extends kReportExportEngine
 				$rows[$key][] = $value;
 			}
 		}
-		$this->writeRow(implode(',', $headers));
+		$this->writeRow($headers);
 
 		foreach ($rows as $key => $row)
 		{
-			$this->writeRow(implode(',', array_merge(array($key), $row)));
+			$this->writeRow(array_merge(array($key), $row));
 		}
 	}
 
@@ -110,12 +110,12 @@ class kReportExportGraphEngine extends kReportExportEngine
 			}
 		}
 
-		$this->writeRow(implode(',', $headers));
+		$this->writeRow($headers);
 		foreach ($rows as $id => $keys)
 		{
 			foreach ($keys as $key => $row)
 			{
-				$this->writeRow(implode(',', array_merge(array($id, $key), $row)));
+				$this->writeRow(array_merge(array($id, $key), $row));
 			}
 		}
 	}

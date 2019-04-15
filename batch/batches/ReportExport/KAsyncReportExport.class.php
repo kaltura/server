@@ -31,7 +31,6 @@ class KAsyncReportExport extends KJobHandlerWorker
 
 		$reportFiles = array();
 
-		KBatchBase::impersonate($job->partnerId);
 		$reportItems = $data->reportItems;
 		foreach ($reportItems as $reportItem)
 		{
@@ -43,16 +42,18 @@ class KAsyncReportExport extends KJobHandlerWorker
 
 			try
 			{
+				KBatchBase::impersonate($job->partnerId);
 				$reportFile = $engine->createReport($reportItem);
+				KBatchBase::unimpersonate();
 				$reportFiles[] = $reportFile;
 				$this->setFilePermissions($reportFile);
 			}
 			catch (Exception $e)
 			{
+				KBatchBase::unimpersonate();
 				return $this->closeJob($job, null, null, 'Cannot create report', KalturaBatchJobStatus::RETRY, $data);
 			}
 		}
-		KBatchBase::unimpersonate();
 
 		$this->moveFiles($reportFiles, $job, $data, $partnerId);
 		return $job;

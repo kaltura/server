@@ -33,6 +33,7 @@ class partnerFilter extends baseObjectFilter
 			"_in_partner_parent_id",
 		    "_notin_id",
 			"_partner_permissions_exist",
+			'_gte_created_at',
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "id", "name", "website", "admin_name", "admin_email", "status");

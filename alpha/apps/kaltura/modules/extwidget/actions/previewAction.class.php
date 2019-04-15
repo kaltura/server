@@ -91,6 +91,14 @@ class previewAction extends kalturaAction
 					if( $this->isJson($val) ) {
 						$val = json_decode($val, true);
 					}
+					try
+					{
+						$val = kHtmlPurifier::purify("previewAction", "flashvars", $val);
+					}
+					catch (Exception $e)
+					{
+						KExternalErrors::dieError(KExternalErrors::NOT_ALLOWED_PARAMETER,$e->getMessage());
+					}
 					$flashVars[$key] = $val;
 				}
 			}

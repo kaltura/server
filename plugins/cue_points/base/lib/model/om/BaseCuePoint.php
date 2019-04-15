@@ -1454,13 +1454,23 @@ abstract class BaseCuePoint extends BaseObject  implements Persistent {
 	public function postInsert(PropelPDO $con = null)
 	{
 		kQueryCache::invalidateQueryCache($this);
-		
-		kEventsManager::raiseEvent(new kObjectCreatedEvent($this));
-		
-		if($this->copiedFrom)
+
+		if ($this->shouldRaiseCreatedEvent())
+		{
+			kEventsManager::raiseEvent(new kObjectCreatedEvent($this));
+		}
+
+		if ($this->copiedFrom)
+		{
 			kEventsManager::raiseEvent(new kObjectCopiedEvent($this->copiedFrom, $this));
-		
+		}
+
 		parent::postInsert($con);
+	}
+
+	protected function shouldRaiseCreatedEvent()
+	{
+		return true;
 	}
 
 	/**

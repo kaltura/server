@@ -50,10 +50,7 @@ class Form_RulesSubForm extends ConfigureSubForm
 			return true;
 		
 		$jsonData = json_decode($data['ReachProfileRules'], true);
-		if(!empty($jsonData))
-			return true;
-		
-		return false;
+		return (json_last_error() == JSON_ERROR_NONE);
 	}
 
 }

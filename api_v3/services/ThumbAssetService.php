@@ -128,6 +128,7 @@ class ThumbAssetService extends KalturaAssetService
 		$contentResource->validateAsset($dbThumbAsset);
 		$kContentResource = $contentResource->toObject();
     	$this->attachContentResource($dbThumbAsset, $kContentResource);
+		$this->validateContent($dbThumbAsset);
 		$contentResource->entryHandled($dbThumbAsset->getentry());
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbThumbAsset));
 		
@@ -194,8 +195,9 @@ class ThumbAssetService extends KalturaAssetService
 	 */
 	protected function attachFile(thumbAsset $thumbAsset, $fullPath, $copyOnly = false)
 	{
-		$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
-		
+		$filePath = parse_url($fullPath,PHP_URL_PATH);
+		$ext = pathinfo($filePath,PATHINFO_EXTENSION);
+
 		$thumbAsset->incrementVersion();
 		$thumbAsset->setFileExt($ext);
 		$thumbAsset->setSize(filesize($fullPath));
@@ -857,7 +859,8 @@ class ThumbAssetService extends KalturaAssetService
 		/* @var $fileSync FileSync */
 		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey, false);
 		list($width, $height, $type, $attr) = kImageUtils::getImageSize($fileSync);
-		
+		$this->validateContent($dbThumbAsset);
+
 		$dbThumbAsset->setWidth($width);
 		$dbThumbAsset->setHeight($height);
 		$dbThumbAsset->setSize($fileSync->getFileSize());
@@ -903,7 +906,8 @@ class ThumbAssetService extends KalturaAssetService
 		$fileSize = kFileBase::fileSize($fileData["tmp_name"]);
 
 		kFileSyncUtils::moveFromFile($fileData["tmp_name"], $syncKey);
-		
+
+		$this->validateContent($dbThumbAsset);
 		$dbThumbAsset->setWidth($width);
 		$dbThumbAsset->setHeight($height);
 		$dbThumbAsset->setSize($fileSize);
@@ -1054,6 +1058,16 @@ class ThumbAssetService extends KalturaAssetService
 	public function exportAction ( $assetId , $storageProfileId )
 	{
 		return parent::exportAction($assetId, $storageProfileId);
+	}
+
+	protected function validateContent($dbThumbAsset)
+	{
+		$filePath = kAssetUtils::getLocalThumbPath($dbThumbAsset);
+		$validContent = myThumbUtils::validateThumbContent($filePath);
+		if(!$validContent)
+		{
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_CONTENT_NOT_SECURE);
+		}
 	}
 	
 }

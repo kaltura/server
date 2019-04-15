@@ -55,12 +55,15 @@ class KalturaReportInputBaseFilter extends KalturaObject
 		if (!$reportInputFilter)
 			$reportInputFilter = new reportsInputFilter();
 
-		if ($this->fromDay && $this->toDay) {
+		if ($this->fromDay && $this->toDay)
+		{
 			$this->fromDate = strtotime(date('Y-m-d 00:00:00', strtotime($this->fromDay)));
 			$this->toDate = strtotime(date('Y-m-d 23:59:59', strtotime($this->toDay)));
-		} else if ($this->fromDate && $this->toDate) {
+		}
+		else if ($this->fromDate && $this->toDate)
+		{
 			$clientTag = kCurrentContext::$client_lang;
-			if (strpos($clientTag, 'kmc-analytics') !== 0)
+			if (strpos($clientTag, 'kmc-analytics') !== 0 && kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
 			{
 				$this->fromDay = date("Ymd", $this->fromDate);
 				$this->toDay = date("Ymd", $this->toDate);

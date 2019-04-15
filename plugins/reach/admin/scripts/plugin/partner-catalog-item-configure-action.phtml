@@ -57,8 +57,13 @@
 					<td><?php if (isset($catalogItem->targetLanguage))
 					    echo $this->enumTranslate('Kaltura_Client_Reach_Enum_CatalogItemLanguage', $catalogItem->targetLanguage);
 					else
-					    echo null;?></td>
-					<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat', $catalogItem->outputFormat); ?></td>
+					    echo null;?>
+					</td>
+					<td><?php if (isset($catalogItem->outputFormat))
+					    echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat', $catalogItem->outputFormat);
+					else
+					    echo null;?>
+					</td>
 				</tr>
 			<?php endforeach;?>
 			</tbody>

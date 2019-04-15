@@ -18,12 +18,14 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 	const CAPTIONS_OM_CLASS = 'VendorCaptionsCatalogItem';
 	const TRANSLATION_OM_CLASS = 'VendorTranslationCatalogItem';
 	const ALIGNMENT_OM_CLASS = 'VendorAlignmentCatalogItem';
+	const AUDIO_DESCRIPTION_OM_CLASS = 'VendorAudioDescriptionCatalogItem';
 	
 	// cache classes by their type
 	protected static $class_types_cache = array(
 		VendorServiceFeature::TRANSLATION => self::TRANSLATION_OM_CLASS, 
 		VendorServiceFeature::CAPTIONS => self::CAPTIONS_OM_CLASS,
 		VendorServiceFeature::ALIGNMENT => self::ALIGNMENT_OM_CLASS,
+		VendorServiceFeature::AUDIO_DESCRIPTION => self::AUDIO_DESCRIPTION_OM_CLASS,
 	);
 	
 	public static function setDefaultCriteriaFilter ()

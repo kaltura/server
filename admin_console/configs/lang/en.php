@@ -1422,6 +1422,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS' => 'CAPTIONS',
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION' => 'TRANSLATION',
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT' => 'ALIGNMENT',
+	'Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION' => 'AUDIO_DESCRIPTION',
 	'Kaltura_Client_Reach_Enum_VendorServiceType::HUMAN' => 'HUMAN',
 	'Kaltura_Client_Reach_Enum_VendorServiceType::MACHINE' => 'MACHINE',
 	
@@ -1499,4 +1500,9 @@ return array(
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::RU' => "Russian",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::TR' => "Turkish",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::TH' => "Thai",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::SV' => "Swedish",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::DA' => "Danish",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::NO' => "Norwegian",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::FI' => "Finnish",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::IS' => "Icelandic",
 );

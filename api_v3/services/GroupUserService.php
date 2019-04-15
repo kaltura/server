@@ -51,15 +51,17 @@ class GroupUserService extends KalturaBaseService
 		if (KuserKgroupPeer::doCount($criteria) > KuserKgroup::MAX_NUMBER_OF_GROUPS_PER_USER){
 			throw new KalturaAPIException (KalturaErrors::USER_EXCEEDED_MAX_GROUPS);
 		}
+
+		$numberOfUsersPerGroup = $this->getNumberOfUsersInGroup($kgroup);
+		$kgroup->setMembersCount($numberOfUsersPerGroup+1);
+		$kgroup->save();
+
 		$dbGroupUser = $groupUser->toInsertableObject();
 		$dbGroupUser->setPartnerId($this->getPartnerId());
 		$dbGroupUser->setStatus(KuserKgroupStatus::ACTIVE);
 		$dbGroupUser->save();
 		$groupUser->fromObject($dbGroupUser);
 
-		$numberOfUsersPerGroup = $this->getNumberOfUsersInGroup($kgroup->getId());
-		$kgroup->setMembersCount($numberOfUsersPerGroup);
-		$kgroup->save();
 		return $groupUser;
 	}
 
@@ -134,12 +136,13 @@ class GroupUserService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::GROUP_USER_DOES_NOT_EXIST, $userId, $groupId);
 		}
+		$numberOfUsersPerGroup = $this->getNumberOfUsersInGroup($kgroup);
+		$kgroup->setMembersCount(max(0,$numberOfUsersPerGroup-1));
+		$kgroup->save();
 
 		$dbKuserKgroup->setStatus(KuserKgroupStatus::DELETED);
 		$dbKuserKgroup->save();
-		$numberOfUsersPerGroup = $this->getNumberOfUsersInGroup($kgroup->getId());
-		$kgroup->setMembersCount($numberOfUsersPerGroup);
-		$kgroup->save();
+
 		$groupUser = new KalturaGroupUser();
 		$groupUser->fromObject($dbKuserKgroup);
 	}
@@ -208,12 +211,16 @@ class GroupUserService extends KalturaBaseService
 		return $bulkUpload;
 	}
 
-	protected function getNumberOfUsersInGroup($groupId)
+	protected function getNumberOfUsersInGroup($group)
 	{
-		$criteria = new Criteria();
-		$criteria->add(KuserKgroupPeer::KGROUP_ID, $groupId);
-		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
-		$numberOfUsersPerGroup = KuserKgroupPeer::doCount($criteria);
+		$numberOfUsersPerGroup = $group->getMembersCount();
+		if(!$numberOfUsersPerGroup)
+		{
+			$criteria = new Criteria();
+			$criteria->add(KuserKgroupPeer::KGROUP_ID, $group->getId());
+			$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
+			$numberOfUsersPerGroup = KuserKgroupPeer::doCount($criteria);
+		}
 		return $numberOfUsersPerGroup;
 	}
 
@@ -264,7 +271,8 @@ class GroupUserService extends KalturaBaseService
 		if (!$shouldHandleGroupsUsersInBatch)
 		{
 			$this->initService('groupuser', 'groupuser', 'add');
-			$shouldHandleGroupsUsersInBatch = $this->addUserGroupsToGroup($kusers, $newGroup, $originalGroupId);
+			list($shouldHandleGroupsUsersInBatch, $userToAddInBulk) = $this->addUserGroupsToGroup($kusers, $newGroup, $originalGroupId);
+			$kusers = $userToAddInBulk;
 		}
 		if ($shouldHandleGroupsUsersInBatch)
 		{
@@ -276,10 +284,11 @@ class GroupUserService extends KalturaBaseService
 	/**
 	 * @param $userIdsToAdd
 	 * @param $groupId
-	 * @return bool (true if errors occurred)
+	 * @return array(bool (true if errors occurred),$usersToAddInBulk - users that we failed while trying to add them to group)
 	 */
 	public function addUserGroupsToGroup($userToAdd, $group, $originalGroupId)
 	{
+		$usersToAddInBulk = array();
 		$groupId = $group->getPuserId();
 		$shouldHandleGroupsInBatch = false;
 		foreach ($userToAdd as $user)
@@ -297,9 +306,10 @@ class GroupUserService extends KalturaBaseService
 			catch (Exception $e)
 			{
 				$shouldHandleGroupsInBatch = true;
+				$usersToAddInBulk[] = $user;
 			}
 		}
-		return $shouldHandleGroupsInBatch;
+		return array($shouldHandleGroupsInBatch, $usersToAddInBulk);
 	}
 
 	/**

@@ -10,6 +10,7 @@ class QuizUserEntry extends UserEntry{
 	const CUSTOM_DATA_FEEDBACK = 'feedback';
 	const CUSTOM_DATA_CALCULATED_SCORE = 'calculatedScore';
 	const CUSTOM_DATA_VERSION = 'version';
+	const CUSTOM_DATA_BULK_UPLOAD_ID = 'bulkUploadId';
 
 	/**
 	 * @var float
@@ -33,6 +34,8 @@ class QuizUserEntry extends UserEntry{
 		$this->setType(QuizPlugin::getCoreValue('UserEntryType' , QuizUserEntryType::QUIZ));
 	}
 
+	public function setBulkUploadId ( $bulkUploadId ){$this->putInCustomData ( self::CUSTOM_DATA_BULK_UPLOAD_ID , $bulkUploadId );}
+	public function getBulkUploadId (){return $this->getFromCustomData( self::CUSTOM_DATA_BULK_UPLOAD_ID );}
 	public function setCalculatedScore($v){ $this->putInCustomData(self::CUSTOM_DATA_CALCULATED_SCORE, $v);}
 	public function getCalculatedScore(){ return $this->getFromCustomData(self::CUSTOM_DATA_CALCULATED_SCORE);}
 	public function setScore($v){ $this->putInCustomData("score", $v);}

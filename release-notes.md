@@ -1,3 +1,82 @@
+# Naos 14.18.0 #
+
+## DB table index enhancements ##
+
+- Issue Type: Task
+- Issue ID: No Ticket Opened
+
+### Configuration ###
+
+	None.	
+
+#### Deployment Scripts ####
+
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_04_10_alter_batch_job_lock_index.sql
+		
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_04_10_alter_drop_folder_index.sql
+		
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_04_10_alter_entry_vendor_task_index.sql
+		
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_04_10_alter_schedule_event_index.sql
+		
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_04_10_alter_server_node_index.sql
+    
+
+## Allowing capture application use list-feature-status action ##
+ - Issue Type: Task
+ - Issue IDs: LEC-1629
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+Run deployment scripts:
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_04_10_update_capture_permission.php
+
+## making userEntry bulk delete work with bulk batch job ##
+ - Issue Type: Task
+ - Issue IDs: PLAT-9782
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+Run deployment scripts:
+
+	php deployment/updates/scripts/add_permissions/2018_11_12_add_bulk_update_category_entries_status_permissions.php
+	php deployment/updates/scripts/add_permissions/2017_04_01_add_user_entry_service_permissions.php
+
+## Copying SubAnnotation cue points on entry clipping/trimming ##
+ - Issue Type: Task
+ - Issue IDs: SUP-17626
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+
+Run deployment script:
+
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_04_01_update_annotation_permission.php
+
+## Update "comment added" KMS notification body - fix the link ##
+ - Issue Type: Bugfix
+ - Issue IDs: PSVAMB-6933
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+
+First replace all tokens in the XML file below and remove ".template" from the fle name:
+
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_04_01_fix_comment_notification_template.template.xml
+
+Run deployment script:
+
+    php /opt/kaltura/app/deployment/updates/scripts/2019_04_01_fix_comment_notification_template.php
+
 # Naos 14.17.0 #
 
 ## Report Service - Export to CSV ##
@@ -20,7 +99,7 @@
 	Make sure to modify @TMP_DIR@ && @WEB_DIR@ settings
 
 ### Deployment Scripts ###
-     php deployment/updates/scripts/2019_03_25_report_add_export_to_csv_permission.php
+     php deployment/updates/scripts/add_permissions/2019_03_25_report_add_export_to_csv_permission.php
 
 ## adding support for copying a group ##
 
