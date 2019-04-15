@@ -14,4 +14,7 @@ interface kThumbnailParameterName extends BaseEnum
 	const BLUR = "blur";
 	const X = "x";
 	const Y = "y";
+	const COMPOSITE_TYPE = "compositeType";
+	const CHANNEL = "channel";
+	const COMPOSITE_OBJECT = "compositeObject";
 }

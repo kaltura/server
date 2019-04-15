@@ -10,7 +10,7 @@ class cropAction extends imagickAction
 	protected $newHeight;
 	protected $currentWidth;
 	protected $currentHeight;
-	protected $gravityPoint = kCropGravityPoint::CENTER;
+	protected $gravityPoint;
 	protected $x;
 	protected $y;
 
