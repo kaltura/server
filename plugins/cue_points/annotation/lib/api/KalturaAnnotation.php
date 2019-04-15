@@ -118,11 +118,14 @@ class KalturaAnnotation extends KalturaCuePoint
 		
 		if($this->text != null)
 			$this->validatePropertyMaxLength("text", CuePointPeer::MAX_TEXT_LENGTH);
-			
-		$this->validateParentId();
+
 		if($this->parentId)
+		{
 			$this->validateEndTime();
-		
+		}
+		$this->validateParentId();
+
+
 		if(!isset($this->isPublic) || is_null($this->isPublic))
 		    $this->isPublic = false;
 		
@@ -143,7 +146,7 @@ class KalturaAnnotation extends KalturaCuePoint
 			$this->validateParentId($sourceObject->getId());
 			
 		if($this->parentId || $sourceObject->getParentId())
-		$this->validateEndTime($sourceObject);
+			$this->validateEndTime($sourceObject);
 			
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
@@ -158,14 +161,14 @@ class KalturaAnnotation extends KalturaCuePoint
 		if ($this->isNull('parentId'))
 			$this->parentId = 0;
 
-
         if ($this->parentId)
         {
             $dbParentCuePoint = CuePointPeer::retrieveByPK($this->parentId);
             if (!$dbParentCuePoint)
                 throw new KalturaAPIException(KalturaCuePointErrors::PARENT_ANNOTATION_NOT_FOUND, $this->parentId);
 
-            if($cuePointId !== null){ // update
+            if($cuePointId !== null){
+	            // update
                 $dbCuePoint = CuePointPeer::retrieveByPK($cuePointId);
                 if(!$dbCuePoint)
                     throw new KalturaAPIException(KalturaCuePointErrors::INVALID_OBJECT_ID, $cuePointId);
@@ -180,6 +183,9 @@ class KalturaAnnotation extends KalturaCuePoint
             {
                 if ($dbParentCuePoint->getEntryId() != $this->entryId)
                     throw new KalturaAPIException(KalturaCuePointErrors::PARENT_ANNOTATION_DO_NOT_BELONG_TO_THE_SAME_ENTRY);
+
+	            $this->startTime = $dbParentCuePoint->getStartTime();
+	            $this->endTime = $dbParentCuePoint->getEndTime();
             }
         }
     }
