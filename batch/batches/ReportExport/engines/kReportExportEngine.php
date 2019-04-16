@@ -57,22 +57,37 @@ abstract class kReportExportEngine
 
 	protected function writeFilterData()
 	{
+		$filter = $this->reportItem->filter;
+		if (!$filter)
+		{
+			return;
+		}
+
 		$disclaimerMessage = kConf::get(self::DISCLAIMER_CONFIG_KEY, 'local', null);
 		if ($disclaimerMessage)
 		{
 			$this->writeRow($disclaimerMessage);
 		}
-		$filter = $this->reportItem->filter;
-		if ($filter && $filter->toDay && $filter->fromDay)
+
+		if ($filter->toDay && $filter->fromDay)
 		{
-			$fromDate = strtotime(date('Y-m-d 00:00:00', strtotime($filter->fromDay)));
-			$toDate = strtotime(date('Y-m-d 23:59:59', strtotime($filter->toDay)));
-			$this->writeRow("Filtered dates (Unix time): $fromDate - $toDate");
+			$fromDate = date('Y-m-d 00:00:00', strtotime($filter->fromDay));
+			$toDate = date('Y-m-d 23:59:59', strtotime($filter->toDay));
+			$this->writeRow("Filtered dates: $fromDate - $toDate (GMT)");
 		}
-		else if ($filter && $filter->toDate && $filter->fromDate)
+		else if ($filter->toDate && $filter->fromDate)
 		{
-			$this->writeRow("Filtered dates (Unix time): $filter->fromDate - $filter->toDate");
+			$fromDate = gmdate('Y-m-d H:i:s', $filter->fromDate);
+			$toDate = gmdate('Y-m-d H:i:s', $filter->toDate);
+			$this->writeRow("Filtered dates: $fromDate - $toDate (GMT)");
 		}
+
+		if ($filter->entryIdIn)
+		{
+			$entryIds = $filter->entryIdIn;
+			$this->writeRow("Filtered entries: $entryIds");
+		}
+
 	}
 
 	protected function writeDelimitedRow($row)
