@@ -65,13 +65,16 @@ abstract class kReportExportEngine
 		$filter = $this->reportItem->filter;
 		if ($filter && $filter->toDay && $filter->fromDay)
 		{
-			$fromDate = strtotime(date('Y-m-d 00:00:00', strtotime($filter->fromDay)));
-			$toDate = strtotime(date('Y-m-d 23:59:59', strtotime($filter->toDay)));
-			$this->writeRow("Filtered dates (Unix time): $fromDate - $toDate");
+			$fromDate = date('Y-m-d 00:00:00', strtotime($filter->fromDay));
+			$toDate = date('Y-m-d 23:59:59', strtotime($filter->toDay));
+			$this->writeRow("Filtered dates: $fromDate - $toDate");
 		}
 		else if ($filter && $filter->toDate && $filter->fromDate)
 		{
-			$this->writeRow("Filtered dates (Unix time): $filter->fromDate - $filter->toDate");
+			$timezone = kConf::get('date_default_timezone');
+			$fromDate = date('Y-m-d H:i:s', $filter->fromDate);
+			$toDate = date('Y-m-d H:i:s', $filter->toDate);
+			$this->writeRow("Filtered dates: $fromDate - $toDate ($timezone)");
 		}
 	}
 
