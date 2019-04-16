@@ -1468,16 +1468,20 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				
 				$categoriesToAdd = array_diff(explode(',', $categories), $existingCategories);
 				
-				$categoryFilter = new KalturaCategoryFilter();
-				$categoryFilter->categoryIdIn = implode(',', $categoriesToRemove);
-				$categoriesToRemoveResponse = KBatchBase::$kClient->category->listAction($categoryFilter);
-				
-				foreach ($categoriesToRemoveResponse->objects as $categoryToRemove) {
-					/* @var $categoryToRemove KalturaCategory */
-					if ($categoryToRemove->isAggregationCategory) {
-						KalturaLog::info('No need to unpublish entry from category ID ' . $categoryToRemove->id . ' - it is an aggregation category and the deletion will occur automatically');
-						if (($key = array_search($categoryToRemove->id, $categoriesToRemove)) !== false) {
-							unset($categoriesToRemove[$key]);
+				//no need to do category->list unless there are actual categories to remove.
+				if (count($categoriesToRemove))
+				{
+					$categoryFilter = new KalturaCategoryFilter();
+					$categoryFilter->idIn = implode(',', $categoriesToRemove);
+					$categoriesToRemoveResponse = KBatchBase::$kClient->category->listAction($categoryFilter);
+
+					foreach ($categoriesToRemoveResponse->objects as $categoryToRemove) {
+						/* @var $categoryToRemove KalturaCategory */
+						if ($categoryToRemove->isAggregationCategory) {
+							KalturaLog::info('No need to unpublish entry from category ID ' . $categoryToRemove->id . ' - it is an aggregation category and the deletion will occur automatically');
+							if (($key = array_search($categoryToRemove->id, $categoriesToRemove)) !== false) {
+								unset($categoriesToRemove[$key]);
+							}
 						}
 					}
 				}
