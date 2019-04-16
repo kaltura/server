@@ -76,6 +76,13 @@ abstract class kReportExportEngine
 			$toDate = date('Y-m-d H:i:s', $filter->toDate);
 			$this->writeRow("Filtered dates: $fromDate - $toDate ($timezone)");
 		}
+
+		if ($filter && $filter->entryIdIn)
+		{
+			$entryIds = $filter->entryIdIn;
+			$this->writeRow("Filtered entries: $entryIds");
+		}
+
 	}
 
 	protected function writeDelimitedRow($row)
