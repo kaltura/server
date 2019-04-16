@@ -39,8 +39,8 @@ $sourceFromAdminTag = array(
 	'webexentry' => SOURCE_WEBEX,
 	'zoomentry' => SOURCE_ZOOM,
 	'expressrecorder' => SOURCE_EXPRESS_RECORDER,
-	'source_KMSNativeAndroidApp' => SOURCE_KMS_NATIVE_ANDROID_APP,
-	'source_KMSNativeIOSApp' => SOURCE_KMS_NATIVE_IOS_APP,
+	'kmsnativeandroid' => SOURCE_KMS_NATIVE_ANDROID_APP,
+	'kmsnativeios' => SOURCE_KMS_NATIVE_IOS_APP,
 );
 
 function getPartnerVertical($customData)
