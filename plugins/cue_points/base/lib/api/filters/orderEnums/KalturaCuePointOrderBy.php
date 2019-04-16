@@ -5,6 +5,8 @@
  */
 class KalturaCuePointOrderBy extends KalturaStringEnum
 {
+	const INT_ID_ASC = "+intId";
+	const INT_ID_DESC = "-intId";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
 	const UPDATED_AT_ASC = "+updatedAt";

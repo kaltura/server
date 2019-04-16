@@ -48,6 +48,7 @@ abstract class KCopyCuePointEngine
 	{
 		$this->lastCuePointPerType  = array();
 		$filter = $this->getCuePointFilter($srcEntryId);
+		$filter->orderBy = '+startTime,+intId';
 		$pager = $this->getCuePointPager();
 		$clonedCuePointIds = array();
 		do
@@ -59,30 +60,18 @@ abstract class KCopyCuePointEngine
 			$cuePoints = $listResponse->objects;
 			$this->preProcessCuePoints($cuePoints);
 			KalturaLog::debug("Return " . count($cuePoints) . " cue-points from list");
-			if ($cuePoints)
-			{
-				usort($cuePoints, function ($a, $b) {
-					if (isset($a->parentId) && isset($b->parentId))
-					{
-						if ( $a->parentId == $b->id )
-							return 1;
-						elseif ( $b->parentId == $a->id )
-							return -1;
-					}
-						return $a->createdAt - $b->createdAt;
-				});
-			}
 			foreach ($cuePoints as &$cuePoint)
 			{
 				if ($this->shouldCopyCuePoint($cuePoint))
 				{
 					$clonedCuePointId = $this->copySingleCuePoint($cuePoint, $destEntryId);
 					if ($clonedCuePointId)
+					{
 						$clonedCuePointIds[] = $clonedCuePointId;
+					}
 				}
 			}
 			$pager->pageIndex++;
-
 		} while (count($cuePoints) == self::MAX_CUE_POINT_CHUNKS);
 		$this->postProcessCuePoints($clonedCuePointIds);
 		return true;
@@ -223,33 +212,17 @@ abstract class KCopyCuePointEngine
 		{
 			// set on calculatedEndTime the end time if existed or the next cue point start time
 			$type = self::getTypeName($cuePoint);
-			if ($cuePoint instanceof KalturaAnnotation && $cuePoint->parentId)
+			$cuePoint->calculatedEndTime = self::getEndTimeIfExist($cuePoint);
+			/** we will only Override the calculated end time if cue point does not have end time of its own, if
+			 * If cue Point has end time meaning it was set by user and we will continue with the times required by the user.
+			 */
+			if (array_key_exists($type, $this->lastCuePointPerType))
 			{
-				try{
-					$parentCuePoint = KBatchBase::$kClient->cuePoint->get($cuePoint->parentId);
-					if ($parentCuePoint)
-					{
-						$cuePoint->calculatedEndTime = self::getEndTimeIfExist($parentCuePoint);
-					}
-				}
-				catch(Exception $e)
+				if (!$this->lastCuePointPerType[$type]->calculatedEndTime)
 				{
-					KalturaLog::err($e->getMessage());
+					$this->lastCuePointPerType[$type]->calculatedEndTime = $cuePoint->$orderField;
 				}
 			}
-			else
-			{
-				$cuePoint->calculatedEndTime = self::getEndTimeIfExist($cuePoint);
-				/** we will only Override the calculated end time if cue point does not have end time of its own, if
-				 * If cue Point has end time meaning it was set by user and we will continue with the times required by the user.
-				 */
-				if (array_key_exists($type, $this->lastCuePointPerType))
-				{
-					if (!$this->lastCuePointPerType[$type]->calculatedEndTime)
-						$this->lastCuePointPerType[$type]->calculatedEndTime = $cuePoint->$orderField;
-				}
-			}
-
 			$this->lastCuePointPerType[$type] = &$cuePoint;
 		}
 	}

@@ -105,8 +105,31 @@ class KalturaAnnotation extends KalturaCuePoint
 	{
 		if(is_null($object_to_fill))
 			$object_to_fill = new Annotation();
-			
-		return parent::toInsertableObject($object_to_fill, $props_to_skip);
+
+		$retObj = parent::toInsertableObject($object_to_fill, $props_to_skip);
+
+		if ($retObj->getParentId())
+		{
+			$dbParentCuePoint = null;
+			if (!$retObj->getStartTime())
+			{
+				$dbParentCuePoint = CuePointPeer::retrieveByPK($retObj->getParentId());
+				if ($dbParentCuePoint)
+				{
+					$retObj->setStartTime($dbParentCuePoint->getStartTime());
+				}
+			}
+			if (!$retObj->getEndTime())
+			{
+				$dbParentCuePoint = $dbParentCuePoint ? $dbParentCuePoint : CuePointPeer::retrieveByPK($retObj->getParentId());
+				if ($dbParentCuePoint)
+				{
+					$retObj->setEndTime($dbParentCuePoint->getEndTime());
+				}
+			}
+		}
+
+		return $retObj;
 	}
 	
 	/* (non-PHPdoc)
@@ -118,13 +141,9 @@ class KalturaAnnotation extends KalturaCuePoint
 		
 		if($this->text != null)
 			$this->validatePropertyMaxLength("text", CuePointPeer::MAX_TEXT_LENGTH);
-
-		if($this->parentId)
-		{
-			$this->validateEndTime();
-		}
 		$this->validateParentId();
-
+		if($this->parentId)
+			$this->validateEndTime();
 
 		if(!isset($this->isPublic) || is_null($this->isPublic))
 		    $this->isPublic = false;
@@ -167,8 +186,7 @@ class KalturaAnnotation extends KalturaCuePoint
             if (!$dbParentCuePoint)
                 throw new KalturaAPIException(KalturaCuePointErrors::PARENT_ANNOTATION_NOT_FOUND, $this->parentId);
 
-            if($cuePointId !== null){
-	            // update
+            if($cuePointId !== null){// update
                 $dbCuePoint = CuePointPeer::retrieveByPK($cuePointId);
                 if(!$dbCuePoint)
                     throw new KalturaAPIException(KalturaCuePointErrors::INVALID_OBJECT_ID, $cuePointId);
@@ -183,9 +201,6 @@ class KalturaAnnotation extends KalturaCuePoint
             {
                 if ($dbParentCuePoint->getEntryId() != $this->entryId)
                     throw new KalturaAPIException(KalturaCuePointErrors::PARENT_ANNOTATION_DO_NOT_BELONG_TO_THE_SAME_ENTRY);
-
-	            $this->startTime = $dbParentCuePoint->getStartTime();
-	            $this->endTime = $dbParentCuePoint->getEndTime();
             }
         }
     }

@@ -41,6 +41,8 @@ abstract class KalturaCuePointBaseFilter extends KalturaRelatedFilter
 
 	static private $order_by_map = array
 	(
+		"+intId" => "+int_id",
+		"-intId" => "-int_id",
 		"+createdAt" => "+created_at",
 		"-createdAt" => "-created_at",
 		"+updatedAt" => "+updated_at",
