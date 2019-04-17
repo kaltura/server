@@ -24,19 +24,27 @@ class KalturaDropFolderFileFilter extends KalturaDropFolderFileBaseFilter
 		
 		$c = new Criteria();
 		$dropFolderFileFilter->attachToCriteria($c);
-		$count = DropFolderFilePeer::doCount($c);
-		
-		if($count == 0)
-		{
-			return $this->getEmptyListResponse();
-		}
-		
 		$pager->attachToCriteria($c);
 		$list = DropFolderFilePeer::doSelect($c);
 		
+		$resultCount = count($list);
+		if ($resultCount && $resultCount < $pager->pageSize)
+		{
+			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
+		}
+		elseif($resultCount == 0)
+		{
+			return $this->getEmptyListResponse();
+		}
+		else
+		{
+			KalturaFilterPager::detachFromCriteria($c);
+			$totalCount = DropFolderFilePeer::doCount($c);
+		}
+		
 		$response = new KalturaDropFolderFileListResponse();
 		$response->objects = KalturaDropFolderFileArray::fromDbArray($list, $responseProfile);
-		$response->totalCount = $count;
+		$response->totalCount = $totalCount;
 		return $response;
 	}
 	
