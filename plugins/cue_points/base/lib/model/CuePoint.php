@@ -125,12 +125,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	public function postInsert(PropelPDO $con = null)
 	{
 		parent::postInsert($con);
-		
 		kEventsManager::raiseEvent(new kObjectAddedEvent($this));
-		
-		$parent = $this->getParent();
-		if($parent)
-			$parent->increaseChildrenCountAndSave();
 	}
 	
 	
@@ -152,10 +147,6 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 		if($objectDeleted)
 		{
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
-			
-			$parent = $this->getParent();
-			if($parent)
-				$parent->decreaseChildrenCountAndSave();
 		}
 			
 		if($objectUpdated)
