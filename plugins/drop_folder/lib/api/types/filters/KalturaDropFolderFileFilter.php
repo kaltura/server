@@ -27,14 +27,11 @@ class KalturaDropFolderFileFilter extends KalturaDropFolderFileBaseFilter
 		$pager->attachToCriteria($c);
 		$list = DropFolderFilePeer::doSelect($c);
 		
+		$totalCount = 0;
 		$resultCount = count($list);
-		if ($resultCount && $resultCount < $pager->pageSize)
+		if (($pager->pageIndex == 1 || $resultCount) && $resultCount < $pager->pageSize)
 		{
 			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
-		}
-		elseif($resultCount == 0)
-		{
-			return $this->getEmptyListResponse();
 		}
 		else
 		{
@@ -45,14 +42,6 @@ class KalturaDropFolderFileFilter extends KalturaDropFolderFileBaseFilter
 		$response = new KalturaDropFolderFileListResponse();
 		$response->objects = KalturaDropFolderFileArray::fromDbArray($list, $responseProfile);
 		$response->totalCount = $totalCount;
-		return $response;
-	}
-	
-	public function getEmptyListResponse()
-	{
-		$response = new KalturaDropFolderFileListResponse();
-		$response->objects = array();
-		$response->totalCount = 0;
 		return $response;
 	}
 }
