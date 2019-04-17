@@ -129,7 +129,7 @@ class MediaService extends KalturaEntryService
 		    {
 			    $this->handleErrorDuringSetResource($entryId, $e, $resource);
 		    }
-
+		    $this->validateContent($dbEntry);
 		       $resource->entryHandled($dbEntry);
 	    }
 	    return $this->getEntry($entryId);
@@ -804,6 +804,7 @@ class MediaService extends KalturaEntryService
 		
 		try{
 			$this->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
+			$this->validateContent($dbEntry);
 			if ($this->shouldUpdateRelatedEntry($resource))
 				$this->updateContentInRelatedEntries($resource, $dbEntry, $conversionProfileId, $advancedOptions);
 		}

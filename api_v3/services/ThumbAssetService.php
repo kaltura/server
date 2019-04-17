@@ -1062,11 +1062,15 @@ class ThumbAssetService extends KalturaAssetService
 
 	protected function validateContent($dbThumbAsset)
 	{
-		$filePath = kAssetUtils::getLocalThumbPath($dbThumbAsset);
-		$validContent = myThumbUtils::validateThumbContent($filePath);
-		if(!$validContent)
+		try
 		{
-			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_CONTENT_NOT_SECURE);
+			myEntryUtils::validateObjectContent($dbThumbAsset);
+		}
+		catch (Exception $e)
+		{
+			$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$dbThumbAsset->save();
+			throw new KalturaAPIException(KalturaErrors::IMAGE_CONTENT_NOT_SECURE);
 		}
 	}
 	

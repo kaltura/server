@@ -2,7 +2,7 @@
 
 class myThumbUtils
 {
-	public static function validateThumbContent($thumbPath)
+	public static function validateImageContent($thumbPath)
 	{
 		if(!$thumbPath)
 		{
