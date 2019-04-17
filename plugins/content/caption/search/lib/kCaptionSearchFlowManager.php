@@ -43,10 +43,10 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 	 */
 	public function objectDataChanged(BaseObject $object, $previousVersion = null, BatchJob $raisedJob = null)
 	{
-		return self::addParseJobAndIndexEntry($object, $raisedJob);
+		return $this->indexEntry($object, $raisedJob);
 	}
 	
-	private function addParseJobAndIndexEntry(BaseObject $object, BatchJob $raisedJob = null)
+	private function indexEntry(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		// updated in the entry in the indexing server
 		$entry = $object->getentry();
@@ -114,10 +114,7 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 	{
 		/* @var $object CaptionAsset */
 		// updates entry on order to trigger reindexing
-		$entry = $object->getentry();
-		$entry->setUpdatedAt(time());
-		$entry->save();
-		$entry->indexToSearchIndex();
+		$this->indexEntry($object);
 		return true;
 	}
 
