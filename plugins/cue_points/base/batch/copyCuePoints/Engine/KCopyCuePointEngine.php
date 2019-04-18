@@ -48,6 +48,7 @@ abstract class KCopyCuePointEngine
 	{
 		$this->lastCuePointPerType  = array();
 		$filter = $this->getCuePointFilter($srcEntryId);
+		$filter->orderBy = '+startTime,+intId';
 		$pager = $this->getCuePointPager();
 		$clonedCuePointIds = array();
 		do
@@ -59,21 +60,18 @@ abstract class KCopyCuePointEngine
 			$cuePoints = $listResponse->objects;
 			$this->preProcessCuePoints($cuePoints);
 			KalturaLog::debug("Return " . count($cuePoints) . " cue-points from list");
-			if ($cuePoints)
-			{
-				usort($cuePoints, function ($a, $b) {return ($a->createdAt - $b->createdAt);});
-			}
 			foreach ($cuePoints as &$cuePoint)
 			{
 				if ($this->shouldCopyCuePoint($cuePoint))
 				{
 					$clonedCuePointId = $this->copySingleCuePoint($cuePoint, $destEntryId);
 					if ($clonedCuePointId)
+					{
 						$clonedCuePointIds[] = $clonedCuePointId;
+					}
 				}
 			}
 			$pager->pageIndex++;
-
 		} while (count($cuePoints) == self::MAX_CUE_POINT_CHUNKS);
 		$this->postProcessCuePoints($clonedCuePointIds);
 		return true;
@@ -221,7 +219,9 @@ abstract class KCopyCuePointEngine
 			if (array_key_exists($type, $this->lastCuePointPerType))
 			{
 				if (!$this->lastCuePointPerType[$type]->calculatedEndTime)
+				{
 					$this->lastCuePointPerType[$type]->calculatedEndTime = $cuePoint->$orderField;
+				}
 			}
 			$this->lastCuePointPerType[$type] = &$cuePoint;
 		}
@@ -229,7 +229,7 @@ abstract class KCopyCuePointEngine
 
 	private static function getEndTimeIfExist($cuePoint)
 	{
-		if (property_exists($cuePoint, 'endTime') && $cuePoint->endTime > 0)
+		if (isset($cuePoint->endTime) && $cuePoint->endTime > 0)
 		{
 			return $cuePoint->endTime;
 		}
@@ -238,7 +238,7 @@ abstract class KCopyCuePointEngine
 
 	protected static function getCalculatedEndTimeIfExist($cuePoint)
 	{
-		if (property_exists($cuePoint, 'calculatedEndTime') && $cuePoint->calculatedEndTime > 0)
+		if (isset($cuePoint->calculatedEndTime) && $cuePoint->calculatedEndTime > 0)
 		{
 			return $cuePoint->calculatedEndTime;
 		}
