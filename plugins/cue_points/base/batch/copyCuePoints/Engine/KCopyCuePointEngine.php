@@ -229,7 +229,7 @@ abstract class KCopyCuePointEngine
 
 	private static function getEndTimeIfExist($cuePoint)
 	{
-		if (property_exists($cuePoint, 'endTime') && isset($cuePoint->endTime) && $cuePoint->endTime > 0)
+		if (isset($cuePoint->endTime) && $cuePoint->endTime > 0)
 		{
 			return $cuePoint->endTime;
 		}
@@ -238,7 +238,7 @@ abstract class KCopyCuePointEngine
 
 	protected static function getCalculatedEndTimeIfExist($cuePoint)
 	{
-		if (property_exists($cuePoint, 'calculatedEndTime') && isset($cuePoint->calculatedEndTime) && $cuePoint->calculatedEndTime > 0)
+		if (isset($cuePoint->calculatedEndTime) && $cuePoint->calculatedEndTime > 0)
 		{
 			return $cuePoint->calculatedEndTime;
 		}
