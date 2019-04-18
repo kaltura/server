@@ -93,6 +93,7 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	protected function doGetListResponse(KalturaFilterPager $pager, $type = null)
 	{
 		$this->validateEntryIdFiltered();
+		
 		if (!is_null($this->userIdEqualCurrent) && $this->userIdEqualCurrent)
 		{
 			$this->userIdEqual = kCurrentContext::getCurrentKsKuserId();
@@ -111,20 +112,26 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 		}
 
 		$entryIds = null;
-		if ($this->entryIdEqual) {
+		if ($this->entryIdEqual)
+		{
 			$entryIds = array($this->entryIdEqual);
-		} else if ($this->entryIdIn) {
+		}
+		elseif ($this->entryIdIn)
+		{
 			$entryIds = explode(',', $this->entryIdIn);
 		}
 		
-		if (! is_null ( $entryIds )) {
+		if (!is_null($entryIds))
+		{
 			$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork ( $entryIds, kCurrentContext::getCurrentPartnerId());
-			if (! $entryIds) {
+			if (!$entryIds)
+			{
 				return array(array(), 0);
 			}
 			
 			$this->entryIdEqual = null;
 			$this->entryIdIn = implode ( ',', $entryIds );
+			$this->applyPartnerOnCurrentContext($entryIds);
 		}
 
 		$cuePointFilter = $this->toObject();
@@ -177,6 +184,19 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 			}
 			
 			throw new KalturaAPIException(KalturaCuePointErrors::USER_KS_CANNOT_LIST_RELATED_CUE_POINTS, get_class($this));
+		}
+	}
+	
+	private function applyPartnerOnCurrentContext($entryIds)
+	{
+		if(kCurrentContext::getCurrentPartnerId() >= 0)
+			return;
+		
+		$entryId = reset($entryIds);
+		$entry = entryPeer::retrieveByPKNoFilter($entryId);
+		if($entry)
+		{
+			kCurrentContext::$partner_id = $entry->getPartnerId();
 		}
 	}
 }
