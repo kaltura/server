@@ -112,6 +112,7 @@ class BaseEntryService extends KalturaEntryService
 		
 		$resource->validateEntry($dbEntry);
 		$this->attachResource($kResource, $dbEntry);
+		$this->validateContent($dbEntry);
 		$resource->entryHandled($dbEntry);
     	
 		return $this->getEntry($entryId);
@@ -416,6 +417,7 @@ class BaseEntryService extends KalturaEntryService
 				try
 				{
 					$service->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
+					$this->validateContent($dbEntry);
 				}
 				catch (kCoreException $e)
 				{

@@ -82,4 +82,12 @@ class SphinxCuePointCriteria extends SphinxCriteria
 			$value = $prefix.$value;
 		return $strings;
 	}
+	protected function shouldSkipSphinx()
+	{
+		if($this->getCriterion('cue_point.TYPE'))
+		{
+			return false;
+		}
+		return parent::shouldSkipSphinx();
+	}
 }
