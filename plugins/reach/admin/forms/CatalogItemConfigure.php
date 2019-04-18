@@ -110,7 +110,6 @@ class Form_CatalogItemConfigure extends ConfigureForm
 				'label' => 'Flavor Params ID:',
 				'filters' => array('StringTrim'),
 				'placement' => 'prepend',
-				'readonly' => $this->disableAttributes,
 				'required' 		=> true,
 			));
 		}
