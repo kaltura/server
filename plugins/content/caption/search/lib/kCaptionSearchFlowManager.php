@@ -24,7 +24,7 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		return self::addParseJobAndIndexEntry($object, $raisedJob);
+		return $this->indexEntry($object, $raisedJob);
 	}
 
 	/* (non-PHPdoc)
