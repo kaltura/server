@@ -48,16 +48,6 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 	
 	private function addParseJobAndIndexEntry(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		/* @var $object CaptionAsset */		
-		try
-		{
-			self::addParseCaptionAssetJob($object, $raisedJob);
-		}
-		catch (kCoreException $kce)
-		{
-			KalturaLog::err("Cannot create parse caption job, error [" . $kce->getMessage() . "]");
-		}
-		
 		// updated in the entry in the indexing server
 		$entry = $object->getentry();
 		if($entry)
@@ -66,7 +56,7 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 			$entry->save();
 			$entry->indexToSearchIndex();
 		}
-		
+
 		return true;
 	}
 	
@@ -123,15 +113,6 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		/* @var $object CaptionAsset */
-		
-		// delete them one by one to raise the erased event
-		$captionAssetItems = CaptionAssetItemPeer::retrieveByAssetId($object->getId());
-		foreach($captionAssetItems as $captionAssetItem)
-		{
-			/* @var $captionAssetItem CaptionAssetItem */
-			$captionAssetItem->delete();
-		}
-
 		// updates entry on order to trigger reindexing
 		$entry = $object->getentry();
 		$entry->setUpdatedAt(time());

@@ -45,49 +45,7 @@ class CaptionAssetItemService extends KalturaBaseService
      */
     function parseAction($captionAssetId)
     {
-		$captionAsset = assetPeer::retrieveById($captionAssetId);
-		if(!$captionAsset)
-			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
-		
-		$captionAssetItems = CaptionAssetItemPeer::retrieveByAssetId($captionAssetId);
-		foreach($captionAssetItems as $captionAssetItem)
-		{
-			/* @var $captionAssetItem CaptionAssetItem */
-			$captionAssetItem->delete();
-		}
-		
-		// make sure that all old items are deleted from the sphinx before creating the new ones
-		kEventsManager::flushEvents();
-		
-		$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$content = kFileSyncUtils::file_get_contents($syncKey, true, false);
-		if(!$content)
-			return;
-			
-    	$captionsContentManager = kCaptionsContentManager::getCoreContentManager($captionAsset->getContainerFormat());
-    	if(!$captionsContentManager)
-    		return;
-    		
-    	$itemsData = $captionsContentManager->parse($content);
-    	foreach($itemsData as $itemData)
-    	{
-    		$item = new CaptionAssetItem();
-    		$item->setCaptionAssetId($captionAsset->getId());
-    		$item->setEntryId($captionAsset->getEntryId());
-    		$item->setPartnerId($captionAsset->getPartnerId());
-    		$item->setStartTime($itemData['startTime']);
-    		$item->setEndTime($itemData['endTime']);
-    		$content = '';
-    		foreach ($itemData['content'] as $curChunk)
-    			$content .= $curChunk['text'];
-    			
-    		//Make sure there are no invalid chars in the caption asset items to avoid braking the search request by providing invalid XML
-    		$content = kString::stripUtf8InvalidChars($content);
-    		$content = kXml::stripXMLInvalidChars($content);
-    		
-    		$item->setContent($content);
-    		$item->save();
-    	}
+		//do nothing
     }
 	
 	/**
