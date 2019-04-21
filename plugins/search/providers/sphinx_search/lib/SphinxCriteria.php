@@ -919,7 +919,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		return $criterionFields;
 	}
 	
-	protected function shouldSkipSphinx()
+	private function shouldSkipSphinx()
 	{
 		$objectClass = $this->getIndexObjectName();
 		$skipFields = $objectClass::getIndexSkipFieldsList();
