@@ -5,9 +5,11 @@
 - Issue ID: PLAT-9832
 
 ### Configuration ###
-	In case your local.ini file contains a section named "skip_sphinx_repetitive_updates" it now needs to moved to a new map.
-	Please make sure to move the values under this section to a new map called "skip_sphinx_repetitive_updates".
-	New file name should be: /opt/kaltura/app/configurations/skip_sphinx_repetitive_updates.ini
+	In case your local.ini file contains a section named "skip_sphinx_repetitive_updates" & "skip_elastic_repetitive_updates" it now needs to moved to a new map.
+	Please make sure to move the values under those section to new map's called "skip_sphinx_repetitive_updates" & "skip_elastic_repetitive_updates".
+	New file names should be: 
+		/opt/kaltura/app/configurations/skip_sphinx_repetitive_updates.ini
+		/opt/kaltura/app/configurations/skip_elastic_repetitive_updates.ini
 
 ### Deployment scripts ###
 	None.
