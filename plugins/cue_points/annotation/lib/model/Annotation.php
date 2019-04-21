@@ -147,18 +147,19 @@ class Annotation extends CuePoint implements IMetadataObject
 	public function postInsert(PropelPDO $con = null)
 	{
 		parent::postInsert($con);
-
-		kEventsManager::raiseEvent(new kObjectAddedEvent($this));
-
 		$parent = $this->getParent();
 		if($parent)
+		{
 			$parent->increaseChildrenCountAndSave();
+		}
 	}
 	public function postUpdate(PropelPDO $con = null)
 	{
 		$objectDeleted = false;
 		if($this->isColumnModified(CuePointPeer::STATUS) && $this->getStatus() == CuePointStatus::DELETED)
+		{
 			$objectDeleted = true;
+		}
 
 		$ret = parent::postUpdate($con);
 
@@ -166,7 +167,9 @@ class Annotation extends CuePoint implements IMetadataObject
 		{
 			$parent = $this->getParent();
 			if($parent)
+			{
 				$parent->decreaseChildrenCountAndSave();
+			}
 		}
 
 		return $ret;
