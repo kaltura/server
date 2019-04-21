@@ -508,6 +508,16 @@ class KalturaTypeReflector
 	}
 	
 	/**
+	 * Returns true when the type is a nullable enum
+	 *
+	 * @return boolean
+	 */
+	public function isNullableBoolean()
+	{
+		return $this->_type == 'KalturaNullableBoolean';
+	}
+	
+	/**
 	 * Returns true when the type is (for what we know) an array
 	 *
 	 * @return boolean
