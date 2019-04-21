@@ -156,6 +156,10 @@
 		  "type" : "keyword",
 		  "normalizer" : "kaltura_keyword_normalizer"
 		},
+		"group_user_data" : {
+		  "type" : "keyword",
+		  "normalizer" : "kaltura_keyword_normalizer"
+		},
 		"puser_id" : {
 		  "type" : "text",
 		  "analyzer" : "kaltura_text",
