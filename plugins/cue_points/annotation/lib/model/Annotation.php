@@ -155,15 +155,13 @@ class Annotation extends CuePoint implements IMetadataObject
 	}
 	public function postUpdate(PropelPDO $con = null)
 	{
-		$objectDeleted = false;
-		if($this->isColumnModified(CuePointPeer::STATUS) && $this->getStatus() == CuePointStatus::DELETED)
+		$ret = parent::postUpdate($con);
+		if ($this->alreadyInSave)
 		{
-			$objectDeleted = true;
+			return $ret;
 		}
 
-		$ret = parent::postUpdate($con);
-
-		if($objectDeleted)
+		if($this->isColumnModified(CuePointPeer::STATUS) && $this->getStatus() == CuePointStatus::DELETED)
 		{
 			$parent = $this->getParent();
 			if($parent)
