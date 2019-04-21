@@ -1,6 +1,18 @@
 # Naos 14.19.0 #
 
-## Deploy new eng audio description flavor param ##s
+## Move maps to dynamic configuration ##
+- Issue Type: Task
+- Issue ID: PLAT-9832
+
+### Configuration ###
+	In case your local.ini file contains a section named "skip_sphinx_repetitive_updates" it now needs to moved to a new map.
+	Please make sure to move the values under this section to a new map called "skip_sphinx_repetitive_updates".
+	New file name should be: /opt/kaltura/app/configurations/skip_sphinx_repetitive_updates.ini
+
+### Deployment scripts ###
+	None.
+
+## Deploy new eng audio description flavor param ##
 
 - Issue Type: Feature
 - Issue ID: PLAT-9819
