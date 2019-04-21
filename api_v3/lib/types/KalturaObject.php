@@ -256,7 +256,10 @@ abstract class KalturaObject implements IApiObject
 					$fieldValue = "kPluginableEnumsManager::coreToApi('{$enumClass}', {$fieldValue})";
 				}
 			}
-			
+			else if ($thisProps[$apiPropName]->isNullableBoolean())
+			{
+				$fieldValue = "(int)$fieldValue";
+			}
 			else if ($thisProps[$apiPropName]->getDynamicType())
 			{
 				$propertyType = $thisProps[$apiPropName]->getDynamicType();
