@@ -18,11 +18,12 @@ class kSearchUtils
 			return array($skipRepetitiveUpdatesConfig[$updatesKey], $updatesKey);
 		}
 		
-		$currentPuserId = kCurrentContext::$ks_uid;
-		if(isset($currentPuserId))
+		$ksPuserId = kCurrentContext::$ks_uid;
+		if(isset($ksPuserId))
 		{
-			$currentPuserId = str_replace(".", "_", $currentPuserId);
-			$updatesKey = strtolower($className."_".kCurrentContext::$service."_".kCurrentContext::$action."_".$currentPuserId);
+			//Replace dots with underscore since ini file do not support dont in the key name
+			$ksPuserId = str_replace(".", "_", $ksPuserId);
+			$updatesKey = strtolower($className."_".kCurrentContext::$service."_".kCurrentContext::$action."_".$ksPuserId);
 			if(isset($skipRepetitiveUpdatesConfig[$updatesKey]))
 			{
 				return array($skipRepetitiveUpdatesConfig[$updatesKey], $updatesKey);
