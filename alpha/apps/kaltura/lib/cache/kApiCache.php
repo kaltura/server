@@ -1144,4 +1144,13 @@ class kApiCache extends kApiCacheBase
 
 		return $_SERVER[$headerName];
 	}
+	
+	public static function limitConditionalCacheTimeToKs()
+	{
+		$ksObj = kCurrentContext::$ks_object;
+		$expiry = $ksObj->valid_until;
+		$now = time();
+		$timeDiff = $expiry - $now;
+		self::setConditionalCacheExpiry($timeDiff);
+	}	
 }
