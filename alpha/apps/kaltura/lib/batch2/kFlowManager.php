@@ -701,9 +701,22 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey, false);
 			if(!$fileSync)
 				return true;
-			
+
 			if(kFileSyncUtils::getLocalFilePathForKey($syncKey))
 				kJobsManager::addPostConvertJob(null, $postConvertAssetType, $syncKey, $object->getId(), null, $entry->getCreateThumb(), $offset);
+
+			$convProfile = $entry->getconversionProfile2();
+			if(	! flavorParamsConversionProfilePeer::retrieveByConversionProfile($entry->getConversionProfileId()) )
+			{
+				$convProfileTags = explode(',', $convProfile->getTags());
+				if (in_array(conversionProfile2::NO_CONVERSION_TAG, $convProfileTags))
+				{
+					$object->setStatus(flavorAsset::ASSET_STATUS_READY);
+					$object->save();
+					$entry->setStatus(entryStatus::READY);
+					$entry->save();
+				}
+			}
 		}
 		elseif ($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 		{
