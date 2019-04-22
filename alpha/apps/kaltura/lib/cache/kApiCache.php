@@ -1153,8 +1153,8 @@ class kApiCache extends kApiCacheBase
 		{
 			return;
 		}
-		$timeDiff = $ksObj->valid_until - time();
-		if($timeDiff>=self::MIN_CONDITIONAL_CACHE_EXPIRATION)
+		$timeDiff = $ksObj->valid_until - time() - self::MIN_CONDITIONAL_CACHE_EXPIRATION;
+		if($timeDiff > 0)
 		{
 			self::setConditionalCacheExpiry($timeDiff);
 		}
