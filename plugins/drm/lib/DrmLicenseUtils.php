@@ -106,6 +106,9 @@ class DrmLicenseUtils {
 			$customData[$flavor->getId()]["custom_data"] = $innerDataJsonEncoded;
 			$customData[$flavor->getId()]["signature"] = $innerDataSignature;
 		}
+
+		kApiCache::limitConditionalCacheTimeToKs();
+
 		return $customData;
 	}
 }

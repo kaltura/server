@@ -39,6 +39,7 @@ class kApiCache extends kApiCacheBase
 	const EXPIRY_MARGIN = 300;
 
 	const CACHE_DELIMITER = "\r\n\r\n";
+	const MIN_CONDITIONAL_CACHE_EXPIRATION = 10;
 	
 	// warm cache constants
 	// cache warming is used to maintain continous use of the request caching while preventing a load once the cache expires
@@ -1148,9 +1149,18 @@ class kApiCache extends kApiCacheBase
 	public static function limitConditionalCacheTimeToKs()
 	{
 		$ksObj = kCurrentContext::$ks_object;
-		$expiry = $ksObj->valid_until;
-		$now = time();
-		$timeDiff = $expiry - $now;
-		self::setConditionalCacheExpiry($timeDiff);
+		if(!$ksObj)
+		{
+			return;
+		}
+		$timeDiff = $ksObj->valid_until - time();
+		if($timeDiff>=self::MIN_CONDITIONAL_CACHE_EXPIRATION)
+		{
+			self::setConditionalCacheExpiry($timeDiff);
+		}
+		else
+		{
+			self::disableConditionalCache();
+		}
 	}	
 }

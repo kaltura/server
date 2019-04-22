@@ -800,7 +800,6 @@ class BaseEntryService extends KalturaEntryService
 	        }
         }
 
-		kApiCache::limitConditionalCacheTimeToKs();
 		return $result;
 	}
 	
