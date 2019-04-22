@@ -4,7 +4,7 @@ class kSearchUtils
 {
 	public static function getSkipRepetitiveUpdatesValue($repetitiveUpdatesConfigKey, $className)
 	{
-		$skipRepetitiveUpdatesConfig = kConf::get($repetitiveUpdatesConfigKey, 'local', array());
+		$skipRepetitiveUpdatesConfig = kConf::getMap($repetitiveUpdatesConfigKey);
 		
 		$updatesKey = strtolower(kCurrentContext::getCurrentPartnerId()."_".$className."_".kCurrentContext::$service."_".kCurrentContext::$action);
 		if(isset($skipRepetitiveUpdatesConfig[$updatesKey]))
