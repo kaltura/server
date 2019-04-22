@@ -143,4 +143,37 @@ class Annotation extends CuePoint implements IMetadataObject
 			return true;
 		}
 	}
+
+	public function postInsert(PropelPDO $con = null)
+	{
+		parent::postInsert($con);
+		$parent = $this->getParent();
+		if($parent)
+		{
+			$parent->increaseChildrenCountAndSave();
+		}
+	}
+	public function postUpdate(PropelPDO $con = null)
+	{
+		$objectDeleted = false;
+		if($this->isColumnModified(CuePointPeer::STATUS) && $this->getStatus() == CuePointStatus::DELETED)
+		{
+			$objectDeleted = true;
+		}
+
+		$ret = parent::postUpdate($con);
+
+		if($objectDeleted)
+		{
+			$parent = $this->getParent();
+			if($parent)
+			{
+				$parent->decreaseChildrenCountAndSave();
+			}
+		}
+
+		return $ret;
+	}
+
+
 }
