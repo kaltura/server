@@ -706,7 +706,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				kJobsManager::addPostConvertJob(null, $postConvertAssetType, $syncKey, $object->getId(), null, $entry->getCreateThumb(), $offset);
 
 			$conversionProfile = $entry->getconversionProfile2();
-			if(	! flavorParamsConversionProfilePeer::retrieveByConversionProfile( $entry->getConversionProfileId() ) )
+			if( ! flavorParamsConversionProfilePeer::retrieveByConversionProfile( $entry->getConversionProfileId() ) )
 			{
 				$conversionProfileTags = explode(',', $conversionProfile->getTags());
 				if (in_array(conversionProfile2::NO_CONVERSION_TAG, $conversionProfileTags))
