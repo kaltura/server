@@ -140,6 +140,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 					$boolEventNotificationObjectList = EventNotificationTemplatePeer::retrieveByEventTypeObjectTypeAndPKS($eventType, $objectType, $partnerId, $booleanEventNotificationIdArray);
 					foreach ($boolEventNotificationObjectList as $boolEventNotificationObject)
 					{
+						$scope->resetDynamicValues();
+						$boolEventNotificationObject->applyDynamicValues($scope);
 						$fulfilled = $boolEventNotificationObject->fulfilled($scope);
 						if ($fulfilled)
 						{
