@@ -1,16 +1,11 @@
 <?php
 /**
- * @package plugins.thunmbnail
+ * @package plugins.thumbnail
  * @subpackage model
  */
 
-abstract class imagickAction
+abstract class imagickAction extends kThumbnailAction
 {
-	abstract protected function extractActionParameters();
-	abstract protected function validateInput();
-
-	/* @var array $actionParameters */
-	protected $actionParameters;
 	/* @var Imagick $image */
 	protected $image;
 
@@ -21,58 +16,19 @@ abstract class imagickAction
 
 	/**
 	 * @param Imagick $image
-	 * @param array $actionParameters
+	 * @param array $transformationParameters
 	 * @return Imagick
 	 */
-	public function execute($image, $actionParameters)
+	public function execute($image, $transformationParameters)
 	{
-		$this->actionParameters = $actionParameters;
 		$this->image = $image;
-		$this->extractActionParameters();
+		$this->extractActionParameters($transformationParameters);
 		$this->validateInput();
 		return $this->doAction();
 	}
 
-	protected function getActionParameter($actionParameterName, $default = null)
+	public function canHandleCompositeObject()
 	{
-		if(array_key_exists($actionParameterName, $this->actionParameters))
-		{
-			return $this->actionParameters[$actionParameterName];
-		}
-
-		return $default;
-	}
-
-	protected function getIntActionParameter($actionParameterName, $default = null)
-	{
-		$result = $this->getActionParameter($actionParameterName, $default);
-		if($result)
-		{
-			return intval($result);
-		}
-
-		return $result;
-	}
-
-	protected function getFloatActionParameter($actionParameterName, $default = null)
-	{
-		$result = $this->getActionParameter($actionParameterName, $default);
-		if($result)
-		{
-			return floatval($result);
-		}
-
-		return $result;
-	}
-
-	protected function getBoolActionParameter($actionParameterName, $default = null)
-	{
-		$result = $this->getActionParameter($actionParameterName, $default);
-		if($result)
-		{
-			return true;
-		}
-
 		return false;
 	}
 }

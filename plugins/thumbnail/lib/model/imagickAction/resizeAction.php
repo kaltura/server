@@ -1,7 +1,7 @@
 <?php
 /**
- * @package plugins.thunmbnail
- * @subpackage model
+ * @package plugins.thumbnail
+ * @subpackage model.imagickAction
  */
 
 class resizeAction extends imagickAction
@@ -15,7 +15,15 @@ class resizeAction extends imagickAction
 	protected $blur;
 	protected $shouldUseResize;
 
-	protected function extractActionParameters()
+	protected $parameterAlias = array(
+		"w" => kThumbnailParameterName::WIDTH,
+		"h" => kThumbnailParameterName::HEIGHT,
+		"ft" => kThumbnailParameterName::FILTER_TYPE,
+		"b" => kThumbnailParameterName::BLUR,
+		"bf" => kThumbnailParameterName::BEST_FIT,
+	);
+
+	protected function extractActionParameters($transformationParameters)
 	{
 		$this->currentWidth = $this->image->getImageWidth();
 		$this->currentHeight = $this->image->getImageHeight();
@@ -40,22 +48,22 @@ class resizeAction extends imagickAction
 	{
 		if($this->bestFit && $this->newWidth < 1)
 		{
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'If bestfit parameter width must be positive');
+			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'If bestfit parameter width must be positive');
 		}
 
 		if($this->bestFit && $this->newHeight < 1)
 		{
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, ' If bestfit parameter height must be positive');
+			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, ' If bestfit parameter height must be positive');
 		}
 
 		if(!is_numeric($this->newWidth) || $this->newWidth < 0 || $this->newWidth > 10000)
 		{
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'width must be between 0 and 10000');
+			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'width must be between 0 and 10000');
 		}
 
 		if(!is_numeric($this->newHeight) || $this->newHeight < 0 || $this->newHeight > 10000)
 		{
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'height must be between 0 and 10000');
+			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'height must be between 0 and 10000');
 		}
 
 

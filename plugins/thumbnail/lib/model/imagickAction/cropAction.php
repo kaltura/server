@@ -1,7 +1,7 @@
 <?php
 /**
-* @package plugins.thunmbnail
-* @subpackage model
+* @package plugins.thumbnail
+* @subpackage model.imagickAction
 */
 
 class cropAction extends imagickAction
@@ -14,7 +14,13 @@ class cropAction extends imagickAction
 	protected $x;
 	protected $y;
 
-	protected function extractActionParameters()
+	protected $parameterAlias = array(
+		"gp" => kThumbnailParameterName::GRAVITY_POINT,
+		"w" => kThumbnailParameterName::WIDTH,
+		"h" => kThumbnailParameterName::HEIGHT,
+	);
+
+	protected function extractActionParameters($transformationParameters)
 	{
 		$this->newWidth = $this->getIntActionParameter(kThumbnailParameterName::WIDTH);
 		$this->newHeight = $this->getIntActionParameter(kThumbnailParameterName::HEIGHT);
@@ -34,27 +40,27 @@ class cropAction extends imagickAction
 	{
 		if(($this->x && !$this->y) || (!$this->x && $this->y))
 		{
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'You cant define only crop x or crop y');
+			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'You cant define only crop x or crop y');
 		}
 
 		if($this->newWidth > $this->currentWidth)
 		{
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'crop width must be smaller or equal to the current width');
+			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'crop width must be smaller or equal to the current width');
 		}
 
 		if($this->newHeight > $this->currentHeight)
 		{
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'crop height must be smaller or equal to the current height');
+			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'crop height must be smaller or equal to the current height');
 		}
 
 		if($this->newWidth < 1)
 		{
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'width must be positive');
+			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'width must be positive');
 		}
 
 		if($this->newHeight < 1)
 		{
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'height must be positive');
+			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'height must be positive');
 		}
 	}
 
