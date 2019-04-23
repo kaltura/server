@@ -801,6 +801,7 @@ class BaseEntryService extends KalturaEntryService
 		        $result->pluginData[get_class($pluginDataApi)] = $pluginDataApi;
 	        }
         }
+		kApiCache::limitConditionalCacheTimeToKs();
 
 		return $result;
 	}
