@@ -20,7 +20,7 @@ class cropAction extends imagickAction
 		"h" => kThumbnailParameterName::HEIGHT,
 	);
 
-	protected function extractActionParameters($transformationParameters)
+	protected function extractActionParameters()
 	{
 		$this->newWidth = $this->getIntActionParameter(kThumbnailParameterName::WIDTH);
 		$this->newHeight = $this->getIntActionParameter(kThumbnailParameterName::HEIGHT);

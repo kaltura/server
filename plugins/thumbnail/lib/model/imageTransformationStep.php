@@ -28,7 +28,7 @@ class imageTransformationStep
 	 * @param array $transformationParameters
 	 * @return Imagick
 	 */
-	public function execute($transformationParameters)
+	public function execute(&$transformationParameters)
 	{
 		$image = $this->source->getImage();
 		foreach($this->imageActionCollection as $action)

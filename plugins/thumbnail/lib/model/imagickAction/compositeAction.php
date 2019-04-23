@@ -6,28 +6,36 @@
 
 class compositeAction extends imagickAction
 {
-	protected $compositeType = imagick::COMPOSITE_DEFAULT;
+	protected $compositeType;
 	protected $channel;
 	protected $x;
 	protected $y;
 	protected $compositeObject;
+	protected $opacity;
 
 	protected $parameterAlias = array(
 		"ct" => kThumbnailParameterName::COMPOSITE_TYPE,
 		"ch" => kThumbnailParameterName::CHANNEL,
+		"op" => kThumbnailParameterName::OPACITY,
 	);
 
-	protected function extractActionParameters($transformationParameters)
+	protected function extractActionParameters()
 	{
 		$this->x = $this->getIntActionParameter(kThumbnailParameterName::X, 0);
 		$this->y = $this->getIntActionParameter(kThumbnailParameterName::Y, 0);
 		$this->compositeType = $this->getIntActionParameter(kThumbnailParameterName::COMPOSITE_TYPE, imagick::COMPOSITE_DEFAULT);
-		$this->channel = $this->getIntActionParameter(kThumbnailParameterName::CHANNEL, Imagick::CHANNEL_DEFAULT);
-		$this->compositeObject = $this->getActionParameter(kThumbnailParameterName::COMPOSITE_OBJECT, $transformationParameters);
+		$this->channel = $this->getIntActionParameter(kThumbnailParameterName::CHANNEL, Imagick::CHANNEL_ALL);
+		$this->compositeObject = $this->getActionParameter(kThumbnailParameterName::COMPOSITE_OBJECT);
+		$this->opacity = $this->getIntActionParameter(kThumbnailParameterName::OPACITY);
 	}
 
 	protected function validateInput()
 	{
+		if($this->opacity && ($this->opacity < 1 || $this->opacity > 100))
+		{
+			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'opacity must be between 1-100');
+		}
+
 		if(!$this->compositeObject)
 		{
 			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'Missing composite object');
@@ -40,12 +48,20 @@ class compositeAction extends imagickAction
 	 */
 	protected function doAction()
 	{
-		if(!$this->image->compositeImage($this->compositeObject, $this->type, $this->x, $this->y, $this->channel))
+		if($this->opacity)
+		{
+			$opacity = new \Imagick();
+			$pseudoString = "gradient:gray({$this->opacity}%)-gray({$this->opacity}%)";
+			$opacity->newPseudoImage($this->image->getImageWidth(), $this->image->getImageHeight(), $pseudoString);
+			$this->image->compositeImage($opacity, \Imagick::COMPOSITE_COPYOPACITY, 0, 0);
+		}
+
+		if(!$this->compositeObject->compositeImage($this->image, $this->compositeType, $this->x, $this->y, $this->channel))
 		{
 			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'Failed to compose image');
 		}
 
-		return $this->image;
+		return $this->compositeObject;
 	}
 
 	public function canHandleCompositeObject()

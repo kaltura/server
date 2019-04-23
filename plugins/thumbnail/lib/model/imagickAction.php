@@ -9,6 +9,8 @@ abstract class imagickAction extends kThumbnailAction
 	/* @var Imagick $image */
 	protected $image;
 
+	protected $transformationParameters;
+
 	/**
 	 * @return Imagick
 	 */
@@ -19,10 +21,11 @@ abstract class imagickAction extends kThumbnailAction
 	 * @param array $transformationParameters
 	 * @return Imagick
 	 */
-	public function execute($image, $transformationParameters)
+	public function execute($image, &$transformationParameters)
 	{
 		$this->image = $image;
-		$this->extractActionParameters($transformationParameters);
+		$this->transformationParameters = $transformationParameters;
+		$this->extractActionParameters();
 		$this->validateInput();
 		return $this->doAction();
 	}

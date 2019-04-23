@@ -34,10 +34,18 @@ class imageTransformation
 
 	public function execute()
 	{
-		$transformationParameters = array();
-		foreach ($this->imageSteps as $step)
+		try
 		{
-			$transformationParameters[kThumbnailParameterName::COMPOSITE_OBJECT] = $step->execute($transformationParameters);
+			$transformationParameters = array();
+			foreach ($this->imageSteps as $step)
+			{
+				$transformationParameters[kThumbnailParameterName::COMPOSITE_OBJECT] = $step->execute($transformationParameters);
+			}
+		}
+		catch(ImagickException $e)
+		{
+			KalturaLog::err("Imagick error:" . print_r($e));
+			throw new KalturaAPIException(KalturaThumbnailErrors::TRANSFORMATION_RUNTIME_ERROR);
 		}
 
 		return $transformationParameters[kThumbnailParameterName::COMPOSITE_OBJECT];

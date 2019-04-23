@@ -23,7 +23,7 @@ class resizeAction extends imagickAction
 		"bf" => kThumbnailParameterName::BEST_FIT,
 	);
 
-	protected function extractActionParameters($transformationParameters)
+	protected function extractActionParameters()
 	{
 		$this->currentWidth = $this->image->getImageWidth();
 		$this->currentHeight = $this->image->getImageHeight();
