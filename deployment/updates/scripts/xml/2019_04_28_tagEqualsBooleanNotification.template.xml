@@ -15,9 +15,9 @@
     <multirequest>
         <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
             <template objectType="KalturaBooleanNotificationTemplate">
-                <name>Trigger Entry Tag Equals To</name>
-                <systemName>BOOLEAN_ENTRY_TAG_EQUALS_TO</systemName>
-                <description>Boolean notification template to be sent when an entry tag changed to specific value.</description>
+                <name>Entry Tags Equals</name>
+                <systemName>ENTRY_TAGS_EQUALS</systemName>
+                <description>Boolean notification template to be sent when an entry tags changed to specific values.</description>
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
                 <eventType>3</eventType>
                 <!-- EventNotificationEventType::OBJECT_CHANGED -->
@@ -33,31 +33,15 @@
                     <item objectType="KalturaEventFieldCondition">
                         <description>Tags equals</description>
                         <field objectType="KalturaEvalBooleanField">
-                            <code>in_array($scope->getDynamicValueByKey("trigger_tag"),array_diff($scope->getObject()->getTagsArr(),explode(',', $scope->getEvent()->getObject()->getColumnsOldValues()['entry.TAGS'])))</code>
+                            <code>array_intersect(explode(',',$scope->getDynamicValueByKey("trigger_tags")),array_diff($scope->getObject()->getTagsArr(),explode(',', $scope->getEvent()->getObject()->getColumnsOldValues()['entry.TAGS'])))</code>
                         </field>
                     </item>
                 </eventConditions>
                 <format>1</format>
-                <contentParameters objectType="array">
-                    <item objectType="KalturaEventNotificationParameter">
-                        <key>entry_id</key>
-                        <description>Entry ID</description>
-                        <value objectType="KalturaEvalStringField">
-                            <code>$scope->getObject()->getId()</code>
-                        </value>
-                    </item>
-                    <item objectType="KalturaEventNotificationParameter">
-                        <key>entry_tags</key>
-                        <description>Entry tags</description>
-                        <value objectType="KalturaEvalStringField">
-                            <code>$scope->getObject()->getTags()</code>
-                        </value>
-                    </item>
-                </contentParameters>
                 <userParameters objectType="array">
                     <item objectType="KalturaEventNotificationParameter">
-                        <key>trigger_tag</key>
-                        <description>Entry tag that will trigger</description>
+                        <key>trigger_tags</key>
+                        <description>Entry tags that will trigger the event,(use comma to separate tags: tag1,tag2) </description>
                         <value objectType="KalturaStringValue">
                         </value>
                     </item>
