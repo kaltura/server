@@ -12,12 +12,6 @@ class kSearchUtils
 			return array($skipRepetitiveUpdatesConfig[$updatesKey], $updatesKey);
 		}
 		
-		$updatesKey = strtolower($className."_".kCurrentContext::$service."_".kCurrentContext::$action);
-		if(isset($skipRepetitiveUpdatesConfig[$updatesKey]))
-		{
-			return array($skipRepetitiveUpdatesConfig[$updatesKey], $updatesKey);
-		}
-		
 		$ksPuserId = kCurrentContext::$ks_uid;
 		if(isset($ksPuserId))
 		{
@@ -28,6 +22,12 @@ class kSearchUtils
 			{
 				return array($skipRepetitiveUpdatesConfig[$updatesKey], $updatesKey);
 			}
+		}
+		
+		$updatesKey = strtolower($className."_".kCurrentContext::$service."_".kCurrentContext::$action);
+		if(isset($skipRepetitiveUpdatesConfig[$updatesKey]))
+		{
+			return array($skipRepetitiveUpdatesConfig[$updatesKey], $updatesKey);
 		}
 		
 		$updatesKey = strtolower(kCurrentContext::getCurrentPartnerId()."_".$className);
