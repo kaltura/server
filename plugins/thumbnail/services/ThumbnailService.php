@@ -22,15 +22,25 @@ class ThumbnailService extends KalturaBaseUserService
 		$transformation = $this->parseUrl();
 		$transformation->validate();
 		$imagick = $transformation->execute();
-		file_put_contents("/tmp/result.png", $imagick);
-		$renderer = kFileUtils::getDumpFileRenderer("/tmp/result.png", null);
+		$tempFilePath = self::saveTransformationResult($imagick);
+		$renderer = kFileUtils::getDumpFileRenderer($tempFilePath, null);
 		$renderer->output();
 		return;
 	}
 
+	protected function saveTransformationResult($imagick)
+	{
+		$dc = kDataCenterMgr::getCurrentDc();
+		$id = $dc["id"].'_'.kString::generateStringId();
+		$fileName = "{$id}.jpg";
+		$tempFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR . $fileName;
+		$imagick->setImageFormat('jpg');
+		file_put_contents($tempFilePath, $imagick);
+		return $tempFilePath;
+	}
+
 	protected function parseUrl()
 	{
-
 		$transformParametersString = $this->getTransformationStringFromUri();
 		$transformation = new imageTransformation();
 		$steps = explode(self::IMAGE_TRANSFORMATION_STEPS_DELIMITER, $transformParametersString);

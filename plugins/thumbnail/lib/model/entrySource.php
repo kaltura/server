@@ -11,12 +11,13 @@ class entrySource extends thumbnailSource
 	public function  __construct($entryId)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
-
 		if (!$dbEntry)
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		}
 
+		$securyEntryHelper = new KSecureEntryHelper($dbEntry, kCurrentContext::$ks, null, ContextType::THUMBNAIL);
+		$securyEntryHelper->validateAccessControl();
 		$this->dbEntry = $dbEntry;
 	}
 

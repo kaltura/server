@@ -18,4 +18,5 @@ interface kThumbnailParameterName extends BaseEnum
 	const CHANNEL = "channel";
 	const COMPOSITE_OBJECT = "compositeObject";
 	const OPACITY = "opacity";
+	const DEGREES = "degrees";
 }

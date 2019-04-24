@@ -23,7 +23,9 @@ class thumbnailEngine
 		"re" => "resizeAction",
 		"comp" => "compositeAction",
 		"composite" => "compositeAction",
-		"vidSec" => "vidSecAction"
+		"vidSec" => "vidSecAction",
+		"rotate" => "rotateAction",
+		"r" =>	"rotateAction",
 	);
 
 	/**
