@@ -191,7 +191,7 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 		}
 		else
 		{
-			KalturaLog::debug("Entry id not filtered, If partner id not correctly defined wront results may return");
+			KalturaLog::debug("Entry id not filtered, If partner id not correctly defined wrong results set may be returned");
 		}
 	}
 	
