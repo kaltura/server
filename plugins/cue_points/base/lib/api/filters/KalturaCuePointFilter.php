@@ -111,16 +111,7 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 			$this->cuePointTypeIn = null;
 		}
 
-		$entryIds = null;
-		if ($this->entryIdEqual)
-		{
-			$entryIds = array($this->entryIdEqual);
-		}
-		elseif ($this->entryIdIn)
-		{
-			$entryIds = explode(',', $this->entryIdIn);
-		}
-		
+		$entryIds = $this->getFilteredEntryIds();
 		if (!is_null($entryIds))
 		{
 			$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork ( $entryIds, kCurrentContext::getCurrentPartnerId());
@@ -187,7 +178,7 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 		}
 	}
 	
-	private function applyPartnerOnCurrentContext($entryIds)
+	public function applyPartnerOnCurrentContext($entryIds)
 	{
 		if(kCurrentContext::getCurrentPartnerId() >= 0)
 			return;
@@ -198,5 +189,25 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 		{
 			kCurrentContext::$partner_id = $entry->getPartnerId();
 		}
+		else
+		{
+			KalturaLog::debug("Entry id not filtered, If partner id not correctly defined wront results may return");
+		}
+	}
+	
+	public function getFilteredEntryIds()
+	{
+		$entryIds = null;
+		
+		if ($this->entryIdEqual)
+		{
+			$entryIds = array($this->entryIdEqual);
+		}
+		elseif ($this->entryIdIn)
+		{
+			$entryIds = explode(',', $this->entryIdIn);
+		}
+		
+		return $entryIds;
 	}
 }
