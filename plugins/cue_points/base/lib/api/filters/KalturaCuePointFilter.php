@@ -180,7 +180,7 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	
 	public function applyPartnerOnCurrentContext($entryIds)
 	{
-		if(kCurrentContext::getCurrentPartnerId() >= 0)
+		if(kCurrentContext::getCurrentPartnerId() >= 0 || !$entryIds)
 			return;
 		
 		$entryId = reset($entryIds);
