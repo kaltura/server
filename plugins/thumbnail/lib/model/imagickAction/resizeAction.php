@@ -14,6 +14,8 @@ class resizeAction extends imagickAction
 	protected $filterType;
 	protected $blur;
 	protected $shouldUseResize;
+	protected $compositeFit;
+	protected $compositeObject;
 
 	protected $parameterAlias = array(
 		"w" => kThumbnailParameterName::WIDTH,
@@ -21,6 +23,7 @@ class resizeAction extends imagickAction
 		"ft" => kThumbnailParameterName::FILTER_TYPE,
 		"b" => kThumbnailParameterName::BLUR,
 		"bf" => kThumbnailParameterName::BEST_FIT,
+		"cf" => kThumbnailParameterName::COMPOSITE_FIT,
 	);
 
 	protected function extractActionParameters()
@@ -32,28 +35,36 @@ class resizeAction extends imagickAction
 		$this->filterType = $this->getActionParameter(kThumbnailParameterName::FILTER_TYPE, Imagick::FILTER_LANCZOS);
 		$this->blur = $this->getFloatActionParameter(kThumbnailParameterName::BLUR, 1);
 		$this->bestFit = $this->getBoolActionParameter(kThumbnailParameterName::BEST_FIT);
+		$this->compositeFit = $this->getBoolActionParameter(kThumbnailParameterName::COMPOSITE_FIT);
+		$this->compositeObject = $this->getActionParameter(kThumbnailParameterName::COMPOSITE_OBJECT);
 		$this->shouldUseResize = true;
-		if($this->newHeight > $this->currentHeight && $this->newWidth > $this->currentWidth)
-		{
-			$this->shouldUseResize = false;
-		}
 	}
 
 	function validateInput()
 	{
-		$this->validateDimensions();
+		if($this->compositeFit)
+		{
+			if(!$this->compositeObject)
+			{
+				throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'Missing composite object');
+			}
+		}
+		else
+		{
+			$this->validateDimensions();
+		}
 	}
 
 	protected function validateDimensions()
 	{
 		if($this->bestFit && $this->newWidth < 1)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'If bestfit parameter width must be positive');
+			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'If bestfit is supplied parameter width must be positive');
 		}
 
 		if($this->bestFit && $this->newHeight < 1)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, ' If bestfit parameter height must be positive');
+			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, ' If bestfit is supplied parameter height must be positive');
 		}
 
 		if(!is_numeric($this->newWidth) || $this->newWidth < 0 || $this->newWidth > 10000)
@@ -65,12 +76,21 @@ class resizeAction extends imagickAction
 		{
 			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'height must be between 0 and 10000');
 		}
-
-
 	}
 
 	protected function doAction()
 	{
+		if($this->compositeFit)
+		{
+			$this->newHeight = $this->compositeObject->getImageHeight();
+			$this->newWidth = $this->compositeObject->getImageWidth();
+		}
+
+		if($this->newHeight > $this->currentHeight && $this->newWidth > $this->currentWidth)
+		{
+			$this->shouldUseResize = false;
+		}
+
 		if($this->shouldUseResize)
 		{
 			$this->image->resizeImage($this->newWidth, $this->newHeight, $this->filterType, $this->blur, $this->bestFit);

@@ -16,8 +16,8 @@ class entrySource extends thumbnailSource
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		}
 
-		$securyEntryHelper = new KSecureEntryHelper($dbEntry, kCurrentContext::$ks, null, ContextType::THUMBNAIL);
-		$securyEntryHelper->validateAccessControl();
+		$secureEntryHelper = new KSecureEntryHelper($dbEntry, kCurrentContext::$ks, null, ContextType::THUMBNAIL);
+		$secureEntryHelper->validateAccessControl();
 		$this->dbEntry = $dbEntry;
 	}
 

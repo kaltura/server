@@ -96,7 +96,14 @@ class thumbnailEngine
 		for ($i = 1; $i < $parametersCount; $i++)
 		{
 			$parameter = explode(self::VALUE_DELIMITER, $parameters[$i], 2);
-			$imageAction->setActionParameter($parameter[self::PARAMETER_NAME_INDEX], $parameter[self::PARAMETER_VALUE_INDEX]);
+			if(count($parameter) == 1)
+			{
+				$imageAction->setActionParameter($parameter[self::PARAMETER_NAME_INDEX], true);
+			}
+			else
+			{
+				$imageAction->setActionParameter($parameter[self::PARAMETER_NAME_INDEX], $parameter[self::PARAMETER_VALUE_INDEX]);
+			}
 		}
 	}
 

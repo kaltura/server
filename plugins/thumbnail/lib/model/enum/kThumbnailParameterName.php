@@ -19,4 +19,5 @@ interface kThumbnailParameterName extends BaseEnum
 	const COMPOSITE_OBJECT = "compositeObject";
 	const OPACITY = "opacity";
 	const DEGREES = "degrees";
+	const COMPOSITE_FIT = "compositeFit";
 }
