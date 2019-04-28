@@ -50,7 +50,7 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 		$currentSegmentEndTime = self::getSegmentEndTime($amfArray, $data->lastSegmentDuration + $data->lastSegmentDrift) + self::MAX_CHUNK_DURATION_IN_SEC;
 		self::normalizeAMFTimes($amfArray, $data->totalVodDuration, $data->lastSegmentDuration);
 
-		$totalCount = self::getCuePointCount($data->liveEntryId, $currentSegmentEndTime, $data->lastCuePointSyncTime);
+		$totalCount = self::getCuePointCount($data->liveEntryId, $currentSegmentEndTime, $data->lastCuePointSyncTime, $job->partnerId);
 		if ($totalCount == 0)
 			return $this->closeJob($job, null, null, "No cue point to copy", KalturaBatchJobStatus::FINISHED);
 		else
@@ -59,7 +59,7 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 		do
 		{
 			$copiedCuePointIds = array();
-			$liveCuePointsToCopy = self::getCuePointListForEntry($data->liveEntryId, $currentSegmentEndTime, $data->lastCuePointSyncTime);
+			$liveCuePointsToCopy = self::getCuePointListForEntry($data->liveEntryId, $currentSegmentEndTime, $data->lastCuePointSyncTime, $job->partnerId);
 			if (count($liveCuePointsToCopy) == 0)
 				break;
 
@@ -80,7 +80,9 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 			
 			//start post-process for all copied cue-point
 			KalturaLog::info("Copied [".count($copiedCuePointIds)."] cue-points");
+			KBatchBase::impersonate($liveCuePointsToCopy[0]->partnerId);
 			self::postProcessCuePoints($copiedCuePointIds);
+			KBatchBase::unimpersonate();
 
 			//decrease the totalCount (as the number of cue point return from server)
 			$totalCount -= count($liveCuePointsToCopy);
@@ -117,13 +119,24 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 		return $filter;
 	}
 
-	private static function getCuePointCount($entryId, $currentSegmentEndTime, $lastCuePointSyncTime)
+	private static function getCuePointCount($entryId, $currentSegmentEndTime, $lastCuePointSyncTime, $partnerId)
 	{
+		KBatchBase::impersonate($partnerId);
 		$filter = self::getCuePointFilter($entryId, $currentSegmentEndTime, $lastCuePointSyncTime);
-		return KBatchBase::$kClient->cuePoint->count($filter);
+		try
+		{
+			$countRes = KBatchBase::$kClient->cuePoint->count($filter);
+			KBatchBase::unimpersonate();
+		}
+		catch (Exception $e)
+		{
+			KBatchBase::unimpersonate();
+		}
+
+		return $countRes;
 	}
 
-	private static function getCuePointListForEntry($entryId, $currentSegmentEndTime, $lastCuePointSyncTime)
+	private static function getCuePointListForEntry($entryId, $currentSegmentEndTime, $lastCuePointSyncTime, $partnerId)
 	{
 		$filter = self::getCuePointFilter($entryId, $currentSegmentEndTime, $lastCuePointSyncTime);
 		$pager = new KalturaFilterPager();
@@ -134,11 +147,14 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 		{
 			try
 			{
+				KBatchBase::impersonate($partnerId);
 				$result = KBatchBase::$kClient->cuePoint->listAction($filter, $pager);
+				KBatchBase::unimpersonate();
 				return $result->objects;
 			}
 			catch (Exception $ex)
 			{
+				KBatchBase::unimpersonate();
 				$maxRetries--;
 				$exception = $ex;
 			}
