@@ -20,7 +20,19 @@ class SphinxCuePointCriteria extends SphinxCriteria
 		
 		return in_array($fieldName, $cuePointFields);
 	}
-
+	
+	public function applyFilters()
+	{
+		if(kCurrentContext::getCurrentPartnerId() < 0)
+		{
+			$partnerId = $this->getValue("cue_point.PARTNER_ID");
+			if(isset($partnerId))
+				kCurrentContext::$partner_id = $partnerId;
+		}
+		
+		return parent::applyFilters();
+	}
+	
 	/* (non-PHPdoc)
 	 * @see SphinxCriteria::applyFilterFields()
 	 */
