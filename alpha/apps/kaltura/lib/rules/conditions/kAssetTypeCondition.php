@@ -60,7 +60,7 @@ class kAssetTypeCondition extends kCondition
 			}
 			else
 			{
-				$intAssetTypes[] = kPluginableEnumsManager::apiToCore('assetType', $type);
+				$intAssetTypes[] = kPluginableEnumsManager::apiToCore(asset::ASSET_TYPE, $type);
 			}
 		}
 		return $intAssetTypes;
