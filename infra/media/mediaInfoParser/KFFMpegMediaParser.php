@@ -172,6 +172,15 @@ class KFFMpegMediaParser extends KBaseMediaParser
 			$mAux->codecType = $stream->codec_type;
 			switch($stream->codec_type){
 			case "video":
+					/*
+					 * SUP-18051,SUP-18025,SUP-17840,SUP-18018
+					 * For audio-only MP3's/M4A's - prevent detecting of cover JPG/PNG as a video stream
+					 */
+				if(in_array($stream->codec_name, array('mjpeg','png'))
+				&& (in_array($mediaInfo->containerFormat, array('mp3','mpeg audio','isom','mp4','mpeg4','mpeg-4','m4a'))
+				||  in_array($mediaInfo->containerId, array('mp3','mpeg audio','isom','mp4','mpeg4','mpeg-4','m4a'))) ){
+					continue;
+				}
 				$this->parseVideoStream($stream, $mAux);
 				if($vidCnt==0)
 					$copyFlag=true;

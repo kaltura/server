@@ -128,6 +128,7 @@ class ThumbAssetService extends KalturaAssetService
 		$contentResource->validateAsset($dbThumbAsset);
 		$kContentResource = $contentResource->toObject();
     	$this->attachContentResource($dbThumbAsset, $kContentResource);
+		$this->validateContent($dbThumbAsset);
 		$contentResource->entryHandled($dbThumbAsset->getentry());
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbThumbAsset));
 		
@@ -858,7 +859,8 @@ class ThumbAssetService extends KalturaAssetService
 		/* @var $fileSync FileSync */
 		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey, false);
 		list($width, $height, $type, $attr) = kImageUtils::getImageSize($fileSync);
-		
+		$this->validateContent($dbThumbAsset);
+
 		$dbThumbAsset->setWidth($width);
 		$dbThumbAsset->setHeight($height);
 		$dbThumbAsset->setSize($fileSync->getFileSize());
@@ -904,7 +906,8 @@ class ThumbAssetService extends KalturaAssetService
 		$fileSize = kFileBase::fileSize($fileData["tmp_name"]);
 
 		kFileSyncUtils::moveFromFile($fileData["tmp_name"], $syncKey);
-		
+
+		$this->validateContent($dbThumbAsset);
 		$dbThumbAsset->setWidth($width);
 		$dbThumbAsset->setHeight($height);
 		$dbThumbAsset->setSize($fileSize);
@@ -1055,6 +1058,20 @@ class ThumbAssetService extends KalturaAssetService
 	public function exportAction ( $assetId , $storageProfileId )
 	{
 		return parent::exportAction($assetId, $storageProfileId);
+	}
+
+	protected function validateContent($dbThumbAsset)
+	{
+		try
+		{
+			myEntryUtils::validateObjectContent($dbThumbAsset);
+		}
+		catch (Exception $e)
+		{
+			$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$dbThumbAsset->save();
+			throw new KalturaAPIException(KalturaErrors::IMAGE_CONTENT_NOT_SECURE);
+		}
 	}
 	
 }

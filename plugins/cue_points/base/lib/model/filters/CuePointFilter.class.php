@@ -65,7 +65,8 @@ class CuePointFilter extends baseObjectFilter
 			) , NULL );
 
 		$this->allowed_order_fields = array (
-			"created_at", 
+			"int_id",
+			"created_at",
 			"updated_at", 
 			"start_time", 
 			"end_time", 

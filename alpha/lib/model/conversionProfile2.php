@@ -23,6 +23,7 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	const DEFAULT_REPLACEMENT_OPTIONS = "defaultReplacementOptions";
 
 	const CUSTOM_DATA_DEFAULT_AUDIO_LANG = "default_audio_lang";
+	const SKIP_VALIDATION = 'KALTURA_skipvalidation';
 	
 	private $xsl;
 	private $mediaInfoXsl;

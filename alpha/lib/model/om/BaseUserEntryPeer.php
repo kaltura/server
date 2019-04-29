@@ -1676,6 +1676,15 @@ abstract class BaseUserEntryPeer {
 		return $objs;
 	}
 
+
+	public static function retrieveByPKNoFilter ($pk, $con = null)
+	{
+		self::setUseCriteriaFilter ( false );
+		$res = self::retrieveByPK( $pk , $con );
+		self::setUseCriteriaFilter ( true );
+		return $res;
+	}
+
 } // BaseUserEntryPeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.

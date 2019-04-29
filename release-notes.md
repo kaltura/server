@@ -1,4 +1,101 @@
+# Naos 14.19.0 #
+
+## Move maps to dynamic configuration ##
+- Issue Type: Task
+- Issue ID: PLAT-9832
+
+### Configuration ###
+	In case your local.ini file contains a section named "skip_sphinx_repetitive_updates" & "skip_elastic_repetitive_updates" it now needs to moved to a new map.
+	Please make sure to move the values under those section to new map's called "skip_sphinx_repetitive_updates" & "skip_elastic_repetitive_updates".
+	New file names should be: 
+		/opt/kaltura/app/configurations/skip_sphinx_repetitive_updates.ini
+		/opt/kaltura/app/configurations/skip_elastic_repetitive_updates.ini
+
+### Deployment scripts ###
+	None.
+
+## Deploy new eng audio description flavor param ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-9819
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2019_04_17_deploy_audio_description_flavor_params.php
+
+#### Known Issues & Limitations ####
+None
+
+
+# add deleted to qna metadataprofile on partner 0##
+ - Issue Type: Feature
+ - Issue IDs: WEBC-1364
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+
+First replace all tokens in the XML file below and remove ".template" from the fle name:
+
+    /opt/kaltura/app/deployment/updates/scripts/xml/2019_04_11_updateQNAResponseProfile_addDeleted.template.xml
+
+Run deployment script:
+
+    php /opt/kaltura/app/deployment/updates/scripts/2019_04_11_update_qna_metadata_profile_add_deleted.php
+
+
 # Naos 14.18.0 #
+
+## DB table index enhancements ##
+
+- Issue Type: Task
+- Issue ID: No Ticket Opened
+
+### Configuration ###
+
+	None.	
+
+#### Deployment Scripts ####
+
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_04_10_alter_batch_job_lock_index.sql
+		
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_04_10_alter_drop_folder_index.sql
+		
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_04_10_alter_entry_vendor_task_index.sql
+		
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_04_10_alter_schedule_event_index.sql
+		
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_04_10_alter_server_node_index.sql
+    
+
+## Allowing capture application use list-feature-status action ##
+ - Issue Type: Task
+ - Issue IDs: LEC-1629
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+Run deployment scripts:
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_04_10_update_capture_permission.php
+
+## making userEntry bulk delete work with bulk batch job ##
+ - Issue Type: Task
+ - Issue IDs: PLAT-9782
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+Run deployment scripts:
+
+	php deployment/updates/scripts/add_permissions/2018_11_12_add_bulk_update_category_entries_status_permissions.php
+	php deployment/updates/scripts/add_permissions/2017_04_01_add_user_entry_service_permissions.php
 
 ## Copying SubAnnotation cue points on entry clipping/trimming ##
  - Issue Type: Task

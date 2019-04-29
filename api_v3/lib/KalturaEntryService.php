@@ -1944,4 +1944,19 @@ class KalturaEntryService extends KalturaBaseService
 			return $_REQUEST["conversionquality"];
 		return null;
 	}
+
+	protected function validateContent($dbEntry)
+	{
+		try
+		{
+			myEntryUtils::validateObjectContent($dbEntry);
+		}
+		catch (Exception $e)
+		{
+			$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
+			$dbEntry->save();
+			throw new KalturaAPIException(KalturaErrors::IMAGE_CONTENT_NOT_SECURE);
+		}
+	}
+
 }

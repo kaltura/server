@@ -161,4 +161,23 @@ class kAssetUtils
 		
 		return $url;
 	}
+
+	public static function getLocalImagePath($syncKey)
+	{
+		$filePath = null;
+		if(!kFileSyncUtils::fileSync_exists($syncKey))
+		{
+			KalturaLog::warning("file doesn't exist");
+			return $filePath;
+		}
+
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+		/* @var $fileSync FileSync */
+		if($local)
+		{
+			$filePath = $fileSync->getFullPath();
+		}
+
+		return $filePath;
+	}
 }

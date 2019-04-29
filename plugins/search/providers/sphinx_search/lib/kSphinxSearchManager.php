@@ -547,19 +547,16 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			$saveCounter = $cache->increment($cacheKey);
 		}
 		
-		$skipSphinxRepetitiveUpdates = kConf::get('skip_sphinx_repetitive_updates', 'local', array());
+		list($skipSphinxRepetitiveUpdatesValue, $matchKey) = kSearchUtils::getSkipRepetitiveUpdatesValue('skip_sphinx_repetitive_updates', $className);
+		$skipSave = isset($skipSphinxRepetitiveUpdatesValue) && $saveCounter > $skipSphinxRepetitiveUpdatesValue;
 		
-		$updatesKey = strtolower(kCurrentContext::getCurrentPartnerId()."_".$className."_".kCurrentContext::$service."_".kCurrentContext::$action);
-		if(!isset($skipSphinxRepetitiveUpdates[$updatesKey]))
-			$updatesKey = strtolower($className."_".kCurrentContext::$service."_".kCurrentContext::$action);
-		
-		$skipSave = isset($skipSphinxRepetitiveUpdates[$updatesKey]) && $saveCounter > $skipSphinxRepetitiveUpdates[$updatesKey];
-		
-		KalturaLog::debug("Updating sphinx for object [$className] [$entryId] [$objectId] count [$saveCounter] " . kCurrentContext::$service . ' ' . kCurrentContext::$action . " [$skipSave]");
-
-		if ($skipSave)
+		if($skipSave)
+		{
+			KalturaLog::debug("Skipping save sphinx for object [$className] [$entryId] [$objectId] count [$saveCounter] max allowed [$skipSphinxRepetitiveUpdatesValue] with match key [$matchKey]");
 			return true;
-
+		}
+		
+		KalturaLog::debug("Updating sphinx for object [$className] [$entryId] [$objectId] count [$saveCounter] service info [" . kCurrentContext::$service . ' ' . kCurrentContext::$action . "]");
 		$sql = $this->getSphinxSaveSql($object, $isInsert, $force);
 		if(!$sql)
 			return true;

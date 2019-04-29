@@ -1527,6 +1527,7 @@ class reportsInputFilter
 	public $countries;
 	public $playback_types;
 	public $server_node_ids;
+	public $server_node_ids_not_in;
 	public $regions;
 	public $devices;
 	public $os_families;

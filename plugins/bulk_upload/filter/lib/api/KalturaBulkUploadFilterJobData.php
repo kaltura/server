@@ -70,6 +70,9 @@ class KalturaBulkUploadFilterJobData extends KalturaBulkUploadJobData
 	        case 'entryFilter':
 	            $this->filter = new KalturaBaseEntryFilter();
 	            break;
+		case 'UserEntryFilter':
+	  	    $this->filter = new KalturaUserEntryFilter();
+		    break;
 	        default:
 	            break;
 	    }

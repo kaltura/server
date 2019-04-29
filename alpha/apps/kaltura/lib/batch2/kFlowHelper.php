@@ -2605,6 +2605,16 @@ class kFlowHelper
 
 				if($dbAsset instanceof thumbAsset)
 				{
+					try
+					{
+						myEntryUtils::validateObjectContent($dbAsset);
+					}
+					catch (Exception $e)
+					{
+						$dbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
+						$dbAsset->save();
+						throw $e;
+					}
 					
 					list($width, $height, $type, $attr) = kImageUtils::getImageSize($fileSync);
 					$dbAsset->setWidth($width);
@@ -2638,12 +2648,11 @@ class kFlowHelper
 			try
 			{
 				kFileSyncUtils::moveFromFile($fullPath, $syncKey, true);
+				myEntryUtils::validateObjectContent($dbEntry);
 			}
-			catch (Exception $e) {
-
-				if($dbAsset instanceof flavorAsset)
-					kBatchManager::updateEntry($dbEntry->getId(), entryStatus::ERROR_IMPORTING);
-
+			catch (Exception $e)
+			{
+				kBatchManager::updateEntry($dbEntry->getId(), entryStatus::ERROR_IMPORTING);
 				throw $e;
 			}
 			$dbEntry->setStatus(entryStatus::READY);
@@ -2883,11 +2892,11 @@ class kFlowHelper
 			return null;
 		}
 
-		$partner = PartnerPeer::retrieveByPK ( $partner_id );
+		$partner = PartnerPeer::retrieveByPK($partner_id);
 		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
 
 		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
-		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name";
+		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/name/$file_name.csv";
 
 		return $url;
 	}
@@ -2916,7 +2925,7 @@ class kFlowHelper
 
 		$expiry = kConf::get("report_export_expiry", 'local', self::REPORT_EXPIRY_TIME);
 
-		$urls = array();
+		$links = array();
 		// Create download URL's
 		foreach ($finalPaths as $finalPath)
 		{
@@ -2927,14 +2936,14 @@ class kFlowHelper
 				KalturaLog::err("Failed to create download URL for file - $finalPath");
 				return kFlowHelper::handleReportExportFailed($dbBatchJob, $data);
 			}
-			$urls[] = $url;
+			$links[] = '<a href="' . $url .'" target="_blank" >' . $fileName . '</a>';
 		}
 
 		$time = date("m-d-y H:i", $data->getTimeReference() + $data->getTimeZoneOffset());
 		$email_id = MailType::MAIL_TYPE_REPORT_EXPORT_SUCCESS;
 		$validUntil = date("m-d-y H:i", $data->getTimeReference() + $expiry + $data->getTimeZoneOffset());
 		$expiryInDays = $expiry / 60 / 60 / 24;
-		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $urls), $expiryInDays, $validUntil);
+		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInDays, $validUntil);
 		$titleParams = array($time);
 
 		kJobsManager::addMailJob(

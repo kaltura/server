@@ -37,7 +37,7 @@ $INVALIDATION_KEYS = array(
 	array('table' => "delivery_profile", 				'keys' => array(array("'deliveryProfile:id='", '@OBJ@.id'), array("'deliveryProfile:partnerId='", '@OBJ@.partner_id'))),
 	array('table' => "event_notification_template", 	'keys' => array(array("'eventNotificationTemplate:id='", '@OBJ@.id'), array("'eventNotificationTemplate:partnerId='", '@OBJ@.partner_id')), 'plugin' => 'event_notification'),
 	array('table' => "category_kuser", 					'keys' => array(array("'categoryKuser:id='", '@OBJ@.id'), array("'categoryKuser:categoryId='", '@OBJ@.category_id'))),
-	array('table' => "kuser_kgroup", 					'keys' => array(array("'kuserKgroup:kuserId='", '@OBJ@.kuser_id'))),
+	array('table' => "kuser_kgroup", 					'keys' => array(array("'kuserKgroup:kuserId='", '@OBJ@.kuser_id'), array("'kuserKgroup:kgroupId='", '@OBJ@.kgroup_id'))),
 	array('table' => "response_profile", 				'keys' => array(array("'responseProfile:systemName='", '@OBJ@.system_name'))),
 	array('table' => "entry_server_node", 				'keys' => array(array("'entryServerNode:id='", '@OBJ@.id'), array("'entryServerNode:entryId'", '@OBJ@.entry_id'))),
 	array('table' => "server_node", 					'keys' => array(array("'serverNode:id'", '@OBJ@.id'), array("'serverNode:hostName='", '@OBJ@.host_name'))),
@@ -45,11 +45,12 @@ $INVALIDATION_KEYS = array(
 	array('table' => "schedule_resource",               'keys' => array(array("'scheduleResource:id='", '@OBJ@.id')),                                                                           'plugin' => 'schedule/base'),
 	array('table' => "schedule_event_resource",         'keys' => array(array("'scheduleEventResource:eventId='", '@OBJ@.event_id')),                                                           'plugin' => 'schedule/base'),
 	array('table' => "user_login_data", 				'keys' => array(array("'userLoginData:id='", '@OBJ@.id'), array("'userLoginData:loginEmail='", '@OBJ@.login_email'))),
-	array('table' => "drm_profile", 					'keys' => array(array("'drmProfile:partnerId='", '@OBJ@.partner_id'))),
+	array('table' => "drm_profile", 					'keys' => array(array("'drmProfile:partnerId='", '@OBJ@.partner_id')),                                                                  'plugin' => 'drm'),
 	array('table' => "scheduler", 						'keys' => array(array("'scheduler:configuredId='", '@OBJ@.configured_id'))),
 	array('table' => "syndication_feed", 				'keys' => array(array("'syndicationFeed:id='", '@OBJ@.id'))),
 	array('table' => "app_token", 						'keys' => array(array("'appToken:id='", '@OBJ@.id'))),
 	array('table' => "user_entry", 						'keys' => array(array("'userEntry:kuserId='", '@OBJ@.kuser_id'))),
+	array('table' => "drm_policy", 						'keys' => array(array("'drmPolicy:id='", '@OBJ@.id')),                                                                                   'plugin' => 'drm'),
 	
 	);
 

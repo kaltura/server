@@ -157,24 +157,16 @@ class DropFolderFileService extends KalturaBaseService
 	public function listAction(KalturaDropFolderFileFilter  $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
+		{
 			$filter = new KalturaDropFolderFileFilter();
-			
-		$dropFolderFileFilter = $filter->toObject();
-
-		$c = new Criteria();
-		$dropFolderFileFilter->attachToCriteria($c);		
-		$count = DropFolderFilePeer::doCount($c);
+		}
 		
-		if (! $pager)
-			$pager = new KalturaFilterPager ();
-		$pager->attachToCriteria ( $c );
-		$list = DropFolderFilePeer::doSelect($c);
+		if(!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
 		
-		$response = new KalturaDropFolderFileListResponse();
-		$response->objects = KalturaDropFolderFileArray::fromDbArray($list, $this->getResponseProfile());
-		$response->totalCount = $count;
-		
-		return $response;
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
 	

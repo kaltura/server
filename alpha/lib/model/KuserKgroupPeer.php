@@ -107,25 +107,20 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 	 * @param $partnerId
 	 * @return array|mixed
 	 */
-	public static function retrieveKgroupIdsByKuserIdAndPartnerId($kuserId, $partnerId)
+	public static function retrieveKgroupByKuserIdAndPartnerId($kuserId, $partnerId)
 	{
-		if (isset(self::$kgroupIdsByKuserId[$kuserId])){
-			return self::$kgroupIdsByKuserId[$kuserId];
-		}
-
+		//remove default criteria
+		self::setUseCriteriaFilter(false);
 		$c = new Criteria();
 		$c->add(KuserKgroupPeer::KUSER_ID, array($kuserId), Criteria::IN);
 		$c->addAnd ( KuserKgroupPeer::PARTNER_ID, $partnerId, Criteria::EQUAL );
+		$c->addAnd ( KuserKgroupPeer::STATUS, array(KuserKgroupStatus::DELETED), Criteria::NOT_IN);
+
 		$kuserKgroups = KuserKgroupPeer::doSelect($c);
+		self::setUseCriteriaFilter(true);
 
-		$kgroupIds = array();
-		foreach ($kuserKgroups as $kuserKgroup){
-			/* @var $kuserKgroup KuserKgroup */
-			$kgroupIds[] = $kuserKgroup->getKgroupId();
-		}
+		return $kuserKgroups;
 
-		self::$kgroupIdsByKuserId[$kuserId] = $kgroupIds;
-		return $kgroupIds;
 	}
 
 	/* (non-PHPdoc)
@@ -149,7 +144,7 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("kuserKgroup:kuserId=%s", self::KUSER_ID));		
+		return array(array("kuserKgroup:kuserId=%s", self::KUSER_ID), array("kuserKgroup:kgroupId=%s", self::KGROUP_ID));		
 	}
 
 	/**

@@ -85,20 +85,18 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
             $cache->add($cacheKey, 0, 60);
             $saveCounter = $cache->increment($cacheKey);
         }
-		
-        $skipElasticRepetitiveUpdates = kConf::get(self::REPETITIVE_UPDATES_CONFIG_KEY, 'local', array());
-		
-        $updatesKey = strtolower(kCurrentContext::getCurrentPartnerId()."_".$className."_".kCurrentContext::$service."_".kCurrentContext::$action);
-        if(!isset($skipElasticRepetitiveUpdates[$updatesKey]))
-			$updatesKey = strtolower($className."_".kCurrentContext::$service."_".kCurrentContext::$action);
-        
-        $skipSave = isset($skipElasticRepetitiveUpdates[$updatesKey]) && $saveCounter > $skipElasticRepetitiveUpdates[$updatesKey];
-        KalturaLog::debug("Saving to elastic for object [$className] [$objectId] count [ $saveCounter  ] " . kCurrentContext::$service . ' ' . kCurrentContext::$action . " [$skipSave]");
+	
+        list($skipElasticRepetitiveUpdatesValue, $matchKey) = kSearchUtils::getSkipRepetitiveUpdatesValue(self::REPETITIVE_UPDATES_CONFIG_KEY, $className);
+        $skipSave = isset($skipElasticRepetitiveUpdatesValue) && $saveCounter > $skipElasticRepetitiveUpdatesValue;
 
-        if ($skipSave)
+        if($skipSave)
+        {
+            KalturaLog::debug("Skipping save elastic for object [$className] [$objectId] count [$saveCounter] max allowed [$skipElasticRepetitiveUpdatesValue] with match key [$matchKey]");
             return true;
-
-        return false;
+        }
+	
+		KalturaLog::debug("Updating elastic for object [$className] [$objectId] count [$saveCounter] service info [" . kCurrentContext::$service . ' ' . kCurrentContext::$action . "]");
+		return false;
     }
 
     public function getElasticSaveParams($object, $params)

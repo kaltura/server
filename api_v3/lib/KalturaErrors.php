@@ -303,6 +303,8 @@ class KalturaErrors extends APIErrors
 
 	const THUMB_ASSET_ID_IS_NOT_TIMED_THUMB_TYPE = "THUMB_ASSET_IS_NOT_OF_TYPE_TIMED_THUMB;ASSET;Thumbnail asset \"@ASSET@\" is not of type timed thumb";
 
+	const IMAGE_CONTENT_NOT_SECURE = "IMAGE_CONTENT_NOT_SECURE;;Image content contains potential security risks";
+
 	/**
 	 * Category Service
 	 */
@@ -421,6 +423,8 @@ class KalturaErrors extends APIErrors
 	const NON_PARENT_PARTNER_ATTEMPTING_TO_COPY_PARTNER = "NON_PARENT_PARTNER_ATTEMPTING_TO_COPY_PARTNER;PID,T_PARTNER;Partner id [@PID@] is not the parent of template partner [@T_PARTNER@]";
 
 	const INVALID_OBJECT_ID = "INVALID_OBJECT_ID;ID;Invalid object id [@ID@]";
+
+	const FAILED_TO_CREATE_BULK_DELETE = "FAILED_TO_CREATE_BULK_DELETE;;Failed to create bulk delete" ;
 
 	const USER_NOT_FOUND = "USER_NOT_FOUND;;User was not found";
 

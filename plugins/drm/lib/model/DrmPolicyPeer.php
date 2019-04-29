@@ -67,4 +67,8 @@ class DrmPolicyPeer extends BaseDrmPolicyPeer
 		return DrmPolicyPeer::doSelectOne($c);
 	}
 	
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("drmPolicy:id=%s", self::ID));		
+	}
 } // DrmPolicyPeer

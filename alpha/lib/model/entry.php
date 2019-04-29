@@ -1927,7 +1927,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		}
 		
 		$entitledPusersEdit = explode(',',$v);
-				
+
 		foreach ($entitledPusersEdit as $puserId)
 		{
 			$puserId = trim($puserId);
@@ -1940,10 +1940,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $puserId);
 			if (!$kuser)
 				throw new kCoreException('Invalid user id', kCoreException::INVALID_USER_ID);
-			
+
 			$entitledUserPuserEdit[$kuser->getId()] = $kuser->getPuserId();
 		}
-				
+
 		$this->putInCustomData ( "entitledUserPuserEdit" , serialize($entitledUserPuserEdit) );
 	}
 	
@@ -3719,8 +3719,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function copyInto($copyObj, $deepCopy = false)
 	{
 		parent::copyInto($copyObj,$deepCopy);
-		$copyObj->setEntitledPusersEdit($this->getEntitledPusersEdit());
-		$copyObj->setEntitledPusersPublish($this->getEntitledPusersPublish());
+		try
+		{
+			$copyObj->setEntitledPusersEdit($this->getEntitledPusersEdit());
+			$copyObj->setEntitledPusersPublish($this->getEntitledPusersPublish());
+		}
+		catch(kCoreException $e)
+		{
+			KalturaLog::warning($e->getMessage());
+		}
 		$copyObj->setPartnerSortValue($this->getPartnerSortValue());
 	}
 	

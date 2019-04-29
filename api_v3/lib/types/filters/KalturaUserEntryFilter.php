@@ -25,11 +25,17 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 	 * @var string
 	 */
 	public $privacyContextIn;
-	
+
+	/**
+	 * @var int
+	 */
+	public $partnerId;
+
 	static private $map_between_objects = array
 	(
 		"privacyContextEqual" => "_eq_privacy_context",
 		"privacyContextIn" => "_in_privacy_context",
+		"partnerId" => "_eq_partner_id"
 	);
 	
 	public function getMapBetweenObjects()
@@ -100,6 +106,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 			{
 				throw new KalturaAPIException(KalturaErrors::USER_ENTRY_FILTER_FORBIDDEN_FIELDS_USED);
 			}
+			$this->partnerId = kCurrentContext::getCurrentPartnerId();
 		}
 		
 		if (!is_null($this->userIdEqualCurrent) && $this->userIdEqualCurrent)
@@ -143,6 +150,11 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 	 */
 	protected function fixFilterUserId()
 	{
+		if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
+		{
+			kCurrentContext::$partner_id = $this->partnerId;
+		}
+
 		if ($this->userIdEqual !== null)
 		{
 			if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID) //batch should be able to get userEntry objects of deleted users.
