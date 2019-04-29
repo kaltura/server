@@ -34,6 +34,7 @@ class kmcngAction extends kalturaAction
 		}
 
 		header("X-XSS-Protection: 1; mode=block");
+		header("X-Frame-Options: deny");
 
 		//disable cache
 		header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
