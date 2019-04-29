@@ -238,7 +238,6 @@ class CuePointIndex extends BaseIndexObject
 		if (!self::$skipFields)
 		{
 			self::$skipFields = array(
-				'cue_point.ENTRY_ID',
 				'cue_point.ID',
 			);
 		}

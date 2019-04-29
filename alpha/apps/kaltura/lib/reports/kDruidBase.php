@@ -30,6 +30,7 @@ class kDruidBase
 	const DRUID_GRANULARITY_ALL = 'all';
 	const DRUID_DATASOURCE = 'dataSource';
 	const DRUID_INTERVALS = 'intervals';
+	const DRUID_FIELD = 'field';
 	const DRUID_FIELDS = 'fields';
 	const DRUID_CARDINALITY = 'cardinality';
 	const DRUID_HYPER_UNIQUE = 'hyperUnique';
@@ -75,6 +76,7 @@ class kDruidBase
 	const DRUID_UPPER_STRICT = 'upperStrict';
 	const DRUID_ORDERING = 'ordering';
 	const DRUID_DOUBLE_LEAST = 'doubleLeast';
+	const DRUID_NOT = 'not';
 	
 	// druid response keywords
 	const DRUID_TIMESTAMP = 'timestamp';

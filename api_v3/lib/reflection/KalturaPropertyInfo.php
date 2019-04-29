@@ -276,6 +276,20 @@ class KalturaPropertyInfo
 	}
 	
 	/**
+	 * Returns true when the type is a nullable enum
+	 *
+	 * @return boolean
+	 */
+	public function isNullableBoolean()
+	{
+		$this->getTypeReflector();
+		if ($this->_typeReflector)
+			return $this->_typeReflector->isNullableBoolean();
+		else
+			return false;
+	}
+	
+	/**
 	 * @return boolean
 	 */
 	public function isArray()

@@ -2720,6 +2720,7 @@ class kKavaReportsMgr extends kKavaBase
 			'countries' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_COUNTRY),
 			'playback_types' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE),
 			'server_node_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_SERVER_NODE_IDS),
+			'server_node_ids_not_in' => array(self::DRUID_DIMENSION => self::DIMENSION_SERVER_NODE_IDS, self::DRUID_TYPE => self::DRUID_NOT),
 			'custom_var1' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR1),
 			'custom_var2' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR2),
 			'custom_var3' => array(self::DRUID_DIMENSION => self::DIMENSION_CUSTOM_VAR3),
@@ -2742,10 +2743,15 @@ class kKavaReportsMgr extends kKavaBase
 			}
 
 			$values = explode($response_options->getDelimiter(), $value);
-			$druid_filter[] = array(
+			$filter = array(
 				self::DRUID_DIMENSION => $field_filter_def[self::DRUID_DIMENSION],
 				self::DRUID_VALUES => $values
 			);
+			if (isset($field_filter_def[self::DRUID_TYPE]))
+			{
+				$filter[self::DRUID_TYPE] = $field_filter_def[self::DRUID_TYPE];
+			}
+			$druid_filter[] = $filter;
 		}
 
 		if (isset($input_filter->gte_entry_created_at) || isset($input_filter->lte_entry_created_at))
@@ -2982,6 +2988,14 @@ class kKavaReportsMgr extends kKavaBase
 			}
 			if (isset($cur_filter[self::DRUID_TYPE]))
 			{
+				if ($cur_filter[self::DRUID_TYPE] === self::DRUID_NOT)
+				{
+					$values = $cur_filter[self::DRUID_VALUES];
+					$cur_filter = array(
+						self::DRUID_TYPE => self::DRUID_NOT,
+						self::DRUID_FIELD => self::getInFilter($dimension, $values),
+					);
+				}
 				$filter_def[] = $cur_filter;
 				continue;
 			}

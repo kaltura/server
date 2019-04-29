@@ -14,7 +14,14 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 	 * @readonly
 	 */
 	public $id;
-	
+
+	/**
+	 * @var int
+	 * @filter order
+	 * @readonly
+	 */
+	public $intId;
+
 	/**
 	 * @var KalturaCuePointType
 	 * @filter eq,in
@@ -126,6 +133,7 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 	private static $map_between_objects = array
 	(
 		"id",
+		"intId",
 		"cuePointType" => "type",
 		"status",
 		"entryId",

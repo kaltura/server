@@ -1,3 +1,53 @@
+# Naos 14.19.0 #
+
+## Move maps to dynamic configuration ##
+- Issue Type: Task
+- Issue ID: PLAT-9832
+
+### Configuration ###
+	In case your local.ini file contains a section named "skip_sphinx_repetitive_updates" & "skip_elastic_repetitive_updates" it now needs to moved to a new map.
+	Please make sure to move the values under those section to new map's called "skip_sphinx_repetitive_updates" & "skip_elastic_repetitive_updates".
+	New file names should be: 
+		/opt/kaltura/app/configurations/skip_sphinx_repetitive_updates.ini
+		/opt/kaltura/app/configurations/skip_elastic_repetitive_updates.ini
+
+### Deployment scripts ###
+	None.
+
+## Deploy new eng audio description flavor param ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-9819
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2019_04_17_deploy_audio_description_flavor_params.php
+
+#### Known Issues & Limitations ####
+None
+
+
+# add deleted to qna metadataprofile on partner 0##
+ - Issue Type: Feature
+ - Issue IDs: WEBC-1364
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+
+First replace all tokens in the XML file below and remove ".template" from the fle name:
+
+    /opt/kaltura/app/deployment/updates/scripts/xml/2019_04_11_updateQNAResponseProfile_addDeleted.template.xml
+
+Run deployment script:
+
+    php /opt/kaltura/app/deployment/updates/scripts/2019_04_11_update_qna_metadata_profile_add_deleted.php
+
+
 # Naos 14.18.0 #
 
 ## DB table index enhancements ##

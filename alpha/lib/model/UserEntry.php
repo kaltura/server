@@ -15,6 +15,7 @@
  */
 abstract class UserEntry extends BaseUserEntry {
 
+	const CUSTOM_DATA_BULK_UPLOAD_ID = 'bulkUploadId';
 
 	/**
 	 * UserEntry constructor.
@@ -44,4 +45,7 @@ abstract class UserEntry extends BaseUserEntry {
 	{
 		return array("userEntry:kuserId=".strtolower($this->getKuserId()));
 	}
+
+	public function setBulkUploadId ( $bulkUploadId ){$this->putInCustomData ( self::CUSTOM_DATA_BULK_UPLOAD_ID , $bulkUploadId );}
+	public function getBulkUploadId (){return $this->getFromCustomData( self::CUSTOM_DATA_BULK_UPLOAD_ID );}
 } // UserEntry
