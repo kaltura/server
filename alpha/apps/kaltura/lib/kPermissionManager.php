@@ -793,7 +793,17 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			KalturaLog::err("Partner is not allowed");
 			return false;
 		}
-		
+
+		if(self::$operatingPartner)
+		{
+			$actionAllowed = self::isActionAllowedForPartner($service, $action);
+			if(!$actionAllowed)
+			{
+				KalturaLog::err("The wanted service and action are not part of the partner allowed actions list");
+				return false;
+			}
+		}
+
 		$servicePermitted  = isset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service]);
 		if(!$servicePermitted)
 		{
@@ -807,8 +817,31 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		
 		return $actionPermitted;
 	}
-	
-	
+
+	protected static function isActionAllowedForPartner($service, $action)
+	{
+		if(kConf::hasMap("allowed_actions_per_account"))
+		{
+			$allowedActionsMapContent = kConf::getMap("allowed_actions_per_account");
+
+			$partnerId = self::$operatingPartner->getId();
+			if($partnerId && array_key_exists($partnerId, $allowedActionsMapContent))
+			{
+				$allowedActionsForPartner = $allowedActionsMapContent[$partnerId];
+				foreach($allowedActionsForPartner as $allowedAction)
+				{
+					list($serviceId, $actionId) = explode('.', $allowedAction);
+					if(in_array($serviceId, array('*', $service)) && (StringHelper::startsWith($actionId, $action) || $actionId == '*'))
+					{
+						return true;
+					}
+				}
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private static function getParamPermitted($array_name, $objectName, $paramName)
 	{
 		self::errorIfNotInitialized();
