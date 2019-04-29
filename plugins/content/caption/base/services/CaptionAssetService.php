@@ -535,7 +535,7 @@ class CaptionAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
 		}
 		
-		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, ContextType::DOWNLOAD);
+		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, ContextType::DOWNLOAD, array(), $captionAsset);
 		$securyEntryHelper->validateForDownload();
 		
 		return $captionAsset;
