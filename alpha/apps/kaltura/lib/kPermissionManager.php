@@ -827,20 +827,25 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			$partnerId = self::$operatingPartner->getId();
 			if($partnerId && array_key_exists($partnerId, $blockedActionsMapContent))
 			{
-				$id = $partnerId;
+				$sectionId = $partnerId;
+			}
+			else if (array_key_exists(self::DEFAULT_ID, $blockedActionsMapContent))
+			{
+				$sectionId = self::DEFAULT_ID;
 			}
 			else
 			{
-				$id = self::DEFAULT_ID;
+				return false;
 			}
-			return self::isActionInBlockedActionsMap($service, $action, $id, $blockedActionsMapContent);
+
+			return self::isActionInBlockedActionsMap($service, $action, $sectionId, $blockedActionsMapContent);
 		}
 		return false;
 	}
 
-	protected static function isActionInBlockedActionsMap($service, $action, $id, $blockedActionsMapContent)
+	protected static function isActionInBlockedActionsMap($service, $action, $sectionId, $blockedActionsMapContent)
 	{
-		$blockedActionsForPartner = $blockedActionsMapContent[$id];
+		$blockedActionsForPartner = $blockedActionsMapContent[$sectionId];
 		foreach($blockedActionsForPartner as $blockedAction)
 		{
 			list($serviceId, $actionId) = explode(':', $blockedAction);
