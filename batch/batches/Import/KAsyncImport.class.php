@@ -307,15 +307,16 @@ class KAsyncImport extends KJobHandlerWorker
 			
 			//Replace # sign to avoid cases where it's part of the user/password. The # sign is considered as fragment part of the URL.
 			//https://bugs.php.net/bug.php?id=73754
-			$sourceUrl = preg_replace("/#/", "kHash", $sourceUrl, $replaceCount);
+			$sourceUrl = preg_replace("/#/", "kHash", $sourceUrl, -1, $replaceCount);
+			KalturaLog::debug("Testing:: sourceUrl [$sourceUrl]");
 			
-            // extract information from URL and job data
+			// extract information from URL and job data
 			$parsedUrl = parse_url($sourceUrl);
-			
 			if($replaceCount)
 			{
 				$parsedUrl = preg_replace("/kHash/", "#", $parsedUrl);
 			}
+			KalturaLog::debug("Testing:: parsedUrl = " . print_r($parsedUrl, true));
 
 			$host = isset($parsedUrl['host']) ? $parsedUrl['host'] : null;
 			$remotePath = isset($parsedUrl['path']) ? $parsedUrl['path'] : null;
