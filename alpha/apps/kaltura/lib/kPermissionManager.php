@@ -794,12 +794,12 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			return false;
 		}
 
-		if(self::$operatingPartner)
+		if(self::$operatingPartner && PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, self::$operatingPartner->getId()))
 		{
 			$actionAllowed = self::isActionAllowedForPartner($service, $action);
 			if(!$actionAllowed)
 			{
-				KalturaLog::err("The wanted service and action are not part of the partner allowed actions list");
+				KalturaLog::err("The wanted service and action are not allowed for this partner");
 				return false;
 			}
 		}
@@ -820,23 +820,23 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 
 	protected static function isActionAllowedForPartner($service, $action)
 	{
-		if(kConf::hasMap("allowed_actions_per_account"))
+		if(kConf::hasMap("blocked_actions_per_account"))
 		{
-			$allowedActionsMapContent = kConf::getMap("allowed_actions_per_account");
+			$blockedActionsMapContent = kConf::getMap("blocked_actions_per_account");
 
 			$partnerId = self::$operatingPartner->getId();
-			if($partnerId && array_key_exists($partnerId, $allowedActionsMapContent))
+			if($partnerId && array_key_exists($partnerId, $blockedActionsMapContent))
 			{
-				$allowedActionsForPartner = $allowedActionsMapContent[$partnerId];
-				foreach($allowedActionsForPartner as $allowedAction)
+				$blockedActionsForPartner = $blockedActionsMapContent[$partnerId];
+				foreach($blockedActionsForPartner as $blockedAction)
 				{
-					list($serviceId, $actionId) = explode('.', $allowedAction);
+					list($serviceId, $actionId) = explode('.', $blockedAction);
 					if(in_array($serviceId, array('*', $service)) && (StringHelper::startsWith($actionId, $action) || $actionId == '*'))
 					{
-						return true;
+						return false;
 					}
 				}
-				return false;
+				return true;
 			}
 		}
 		return true;

@@ -10,6 +10,23 @@
 
 ### Deployment scripts ###
 	php /opt/kaltura/app/deployment/updates/scripts/2019_04_28_deploy_tag_equals_boolean_notification.php
+
+## Add permission in Admin Console for limiting the allowed action for partner ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-9843
+
+### configuration ###
+    Add the following to admin.ini:
+    
+    moduls.limitAllowedActions.enabled = true
+    moduls.limitAllowedActions.permissionType = 2
+    moduls.limitAllowedActions.label = Limit allowed actions
+    moduls.limitAllowedActions.permissionName = FEATURE_LIMIT_ALLOWED_ACTIONS
+    moduls.limitAllowedActions.group = GROUP_ENABLE_DISABLE_FEATURES
+    
+### Deployment scripts ###
+    None
 	
 # Naos 14.19.0 #
 
