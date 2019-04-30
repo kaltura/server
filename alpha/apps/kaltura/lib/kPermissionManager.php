@@ -14,6 +14,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	const API_PARAMETERS_ARRAY_NAME = 'api_parameters';   // name of $map's api parameters array
 	const PARTNER_GROUP_ARRAY_NAME  = 'partner_group';    // name of $map's partner group array
 	const PERMISSION_NAMES_ARRAY    = 'permission_names'; // name of $map's permission names array
+	const DEFAULT_ID = 'default';
 			
 	private static $lastInitializedContext = null; // last initialized security context (ks + partner id)
 	private static $cacheWatcher = null;
@@ -796,8 +797,8 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 
 		if(self::$operatingPartner && PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, self::$operatingPartner->getId()))
 		{
-			$actionAllowed = self::isActionAllowedForPartner($service, $action);
-			if(!$actionAllowed)
+			$actionBlocked = self::isActionBlockedForPartner($service, $action);
+			if($actionBlocked)
 			{
 				KalturaLog::err("The wanted service and action are not allowed for this partner");
 				return false;
@@ -818,28 +819,37 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		return $actionPermitted;
 	}
 
-	protected static function isActionAllowedForPartner($service, $action)
+	protected static function isActionBlockedForPartner($service, $action)
 	{
-		if(kConf::hasMap("blocked_actions_per_account"))
+		$blockedActionsMapContent = kConf::getMap("blocked_actions_per_account");
+		if(!empty($blockedActionsMapContent))
 		{
-			$blockedActionsMapContent = kConf::getMap("blocked_actions_per_account");
-
 			$partnerId = self::$operatingPartner->getId();
 			if($partnerId && array_key_exists($partnerId, $blockedActionsMapContent))
 			{
-				$blockedActionsForPartner = $blockedActionsMapContent[$partnerId];
-				foreach($blockedActionsForPartner as $blockedAction)
-				{
-					list($serviceId, $actionId) = explode('.', $blockedAction);
-					if(in_array($serviceId, array('*', $service)) && (StringHelper::startsWith($actionId, $action) || $actionId == '*'))
-					{
-						return false;
-					}
-				}
+				$id = $partnerId;
+			}
+			else
+			{
+				$id = self::DEFAULT_ID;
+			}
+			return self::isActionInBlockedActionsMap($service, $action, $id, $blockedActionsMapContent);
+		}
+		return false;
+	}
+
+	protected static function isActionInBlockedActionsMap($service, $action, $id, $blockedActionsMapContent)
+	{
+		$blockedActionsForPartner = $blockedActionsMapContent[$id];
+		foreach($blockedActionsForPartner as $blockedAction)
+		{
+			list($serviceId, $actionId) = explode(':', $blockedAction);
+			if(preg_match("/$serviceId/", $service) && preg_match("/$actionId/", $action))
+			{
 				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 
 	private static function getParamPermitted($array_name, $objectName, $paramName)
