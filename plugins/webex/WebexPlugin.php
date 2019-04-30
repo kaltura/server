@@ -157,9 +157,9 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 			if($status == 'OKOK')
 				break;
 
-			if((preg_match("/&jobstr=([^']*_&)/", $matches[2], $jobstr)) && (!strpos($url3, 'jobstr')))
+			if((strpos($url3, 'jobstr=') === false) && (preg_match("/&jobstr=([^']*_&)/", $matches[2], $jobstr)))
 			{
-				$url3 .= substr($jobstr[0],0,-1);
+				$url3 .= rtrim($jobstr[0], '&');
 			}
 
 			sleep($sleep);
