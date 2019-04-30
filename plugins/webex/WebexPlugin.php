@@ -50,7 +50,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		$mediaInfoBin = isset($params->mediaInfoCmd)? $params->mediaInfoCmd: "mediainfo";
 		$mediaInfoParser = new KMediaInfoMediaParser($tmpPath, $mediaInfoBin);
 		$mediaInfo = $mediaInfoParser->getMediaInfo();
-		if (isset(self::$container_formats_to_file_extensions[$mediaInfo->containerFormat]) )
+		if ($mediaInfo && isset(self::$container_formats_to_file_extensions[$mediaInfo->containerFormat]) )
 		{
 			$fileExtension = self::$container_formats_to_file_extensions[$mediaInfo->containerFormat];
 			$destFileLocalPath = preg_replace("/$fileName\.[\w\d]+/", $fileName.".".$fileExtension, $importData->destFileLocalPath);
