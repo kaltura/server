@@ -305,7 +305,7 @@ class KAsyncImport extends KJobHandlerWorker
 		{
 			$sourceUrl = $data->srcFileUrl;
 			
-			//Replace # sign in ur to avoid cases where it part of the user/password as data after the # sign is considered as fragment part of the URL
+			//Replace # sign to avoid cases where it's part of the user/password. The # sign is considered as fragment part of the URL.
 			//https://bugs.php.net/bug.php?id=73754
 			$sourceUrl = preg_replace("/#/", "kHash", $sourceUrl, $replaceCount);
 			
@@ -316,7 +316,6 @@ class KAsyncImport extends KJobHandlerWorker
 			{
 				$parsedUrl = preg_replace("/kHash/", "#", $parsedUrl);
 			}
-			
 
 			$host = isset($parsedUrl['host']) ? $parsedUrl['host'] : null;
 			$remotePath = isset($parsedUrl['path']) ? $parsedUrl['path'] : null;
