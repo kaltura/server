@@ -52,7 +52,6 @@ class BulkUploadCategoryEntryEngineFilter extends BulkUploadEngineFilter
 	    	//get category entry object based on the entry details
 	    	$filter = new KalturaCategoryEntryFilter();
 	    	$filter->entryIdEqual = $object->id;
-	    	$filter->categoryIdEqual = $object->categoryId;
 	    	$list = $this->listObjects($filter);
 	    	if(count($list->objects))
 	    	{

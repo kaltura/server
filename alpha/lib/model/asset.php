@@ -101,6 +101,8 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	const CUSTOM_DATA_ENCRYPTION_KEY = "encryptionKey";
 	
 	const MAX_ASSETS_PER_ENTRY = 500;
+
+	const ASSET_TYPE = 'assetType';
 	
 	public function copyToEntry($entryId = null, $partnerId = null)
 	{

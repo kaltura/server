@@ -100,6 +100,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	{
 		$criteria = new Criteria();
 		$criteria->add(ScheduleEventPeer::PARENT_ID, $parentId);
+		$criteria->add(ScheduleEventPeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId());
 		$criteria->add(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRENCE);
 
 		if($exceptForIds)

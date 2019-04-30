@@ -256,7 +256,11 @@ abstract class KalturaObject implements IApiObject
 					$fieldValue = "kPluginableEnumsManager::coreToApi('{$enumClass}', {$fieldValue})";
 				}
 			}
-			
+//			Commented out since this affects internal apps behavior, will need to re-add once those apps code is fixed
+// 			else if ($thisProps[$apiPropName]->isNullableBoolean())
+// 			{
+// 				$fieldValue = "(int)$fieldValue";
+// 			}
 			else if ($thisProps[$apiPropName]->getDynamicType())
 			{
 				$propertyType = $thisProps[$apiPropName]->getDynamicType();

@@ -162,10 +162,9 @@ class kAssetUtils
 		return $url;
 	}
 
-	public static function getLocalThumbPath($thumbAsset)
+	public static function getLocalImagePath($syncKey)
 	{
 		$filePath = null;
-		$syncKey = $thumbAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		if(!kFileSyncUtils::fileSync_exists($syncKey))
 		{
 			KalturaLog::warning("file doesn't exist");

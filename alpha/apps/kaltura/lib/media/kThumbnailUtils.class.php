@@ -179,8 +179,8 @@ class kThumbnailUtils
 	public static function scaleDimensions( $srcWidth, $srcHeight, $reqWidth, $reqHeight, $scaleMethod, & $scaledWidth, & $scaledHeight )
 	{
 		// Calc. the width/height factors, rounded to 3 digits precision 
-		$scaleFactorW = round( $reqWidth / $srcWidth, 3 );
-		$scaleFactorH = round( $reqHeight / $srcHeight, 3 );
+		$scaleFactorW = $srcWidth ? round($reqWidth/$srcWidth, 3) : 0;
+		$scaleFactorH = $srcHeight ? round($reqHeight/$srcHeight, 3) : 0;
 
 		// Note: See the description of each SCALE_UNIFORM_* constnat for details.
 		switch ( $scaleMethod )

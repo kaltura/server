@@ -12,7 +12,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 	const LOCK_EXPIRY = 36000;
 	const MAX_FILESYNCS_PER_CHUNK = 100;
 	const MAX_FILESYNC_QUERIES_PER_CALL = 100;
-	const MAX_FILESYNC_ID_RANGE = 100000;
+	const MAX_FILESYNC_ID_RANGE = 20000;
 	
 	protected static function getOriginalFileSync($fileSync)
 	{
@@ -124,7 +124,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 			// Note: disabling the criteria because it accumulates more and more criterions, and the status was already explicitly added
 			//		once that bug is fixed, this can be removed
 			FileSyncPeer::setUseCriteriaFilter(false);
-			$fileSyncs = FileSyncPeer::doSelect($c);
+			$fileSyncs = FileSyncPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 			FileSyncPeer::setUseCriteriaFilter(true);
 
 			// if we got less than the limit no reason to perform any more queries

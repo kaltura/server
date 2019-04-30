@@ -27,8 +27,9 @@ class kAssetTypeCondition extends kCondition
 	{
 		//get flavor from scope
 		$asset = ($scope instanceof  accessControlScope) ? $scope->getAsset() : null;
+		$intAssetTypes = $this->getIntAssetTypes($this->assetTypes);
 		if ($asset)
-			return in_array($asset->getType(), $this->assetTypes);
+			return in_array($asset->getType(), $intAssetTypes);
 		return false;
 	}
 
@@ -46,6 +47,23 @@ class kAssetTypeCondition extends kCondition
 	public function getAssetTypes()
 	{
 		return $this->assetTypes;
+	}
+
+	protected function getIntAssetTypes($assetTypes)
+	{
+		$intAssetTypes = array();
+		foreach ($assetTypes as $type)
+		{
+			if(is_numeric($type))
+			{
+				$intAssetTypes[] = $type;
+			}
+			else
+			{
+				$intAssetTypes[] = kPluginableEnumsManager::apiToCore(asset::ASSET_TYPE, $type);
+			}
+		}
+		return $intAssetTypes;
 	}
 
 }

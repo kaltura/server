@@ -24,11 +24,13 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 		2 => "TRANSLATION",
 		3 => "ALIGNMENT",
 		4 => "AUDIO_DESCRIPTION",
+		"N/A" => "N/A",
 	);
 	
 	static private $serviceTypeEnumTranslate = array(
 		1 => "HUMAN",
 		2 => "MACHINE",
+		"N/A" => "N/A",
 	);
 	
 	static private $catalogItemData = array();
@@ -113,9 +115,9 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 			'entryId' => $entryVendorTask->entryId,
 			'status' => $this->translateEnumsToHumanReadable("status", $entryVendorTask->status),
 			'reachProfileId' => $entryVendorTask->reachProfileId,
-			'turnaroundTime' => $catalogItemData ? $catalogItemData["TAT"] : null,
-			'serviceType' => $catalogItemData ? $this->translateEnumsToHumanReadable("serviceType", $catalogItemData["serviceType"]) : null,
-			'serviceFeature' => $catalogItemData ? $this->translateEnumsToHumanReadable("serviceFeature", $catalogItemData["serviceFeature"]) : null,
+			'turnaroundTime' => $catalogItemData ? $catalogItemData["TAT"] : "N/A",
+			'serviceType' => $catalogItemData ? $this->translateEnumsToHumanReadable("serviceType", $catalogItemData["serviceType"]) : "N/A",
+			'serviceFeature' => $catalogItemData ? $this->translateEnumsToHumanReadable("serviceFeature", $catalogItemData["serviceFeature"]) : "N/A",
 			'price' => $entryVendorTask->price,
 			'userId' => $entryVendorTask->userId,
 			'moderatingUser' => $entryVendorTask->moderatingUser,
@@ -158,15 +160,22 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 		if (isset(self::$catalogItemData[$id]))
 			return self::$catalogItemData[$id];
 		
-		$vendorCatalogItem = KBatchBase::$kClient->vendorCatalogItem->get($id);
-		if (!$vendorCatalogItem)
-			return null;
+		try
+		{
+			$vendorCatalogItem = KBatchBase::$kClient->vendorCatalogItem->get($id);
+		}
+		catch (Exception $e)
+		{
+			$vendorCatalogItem = null;
+			KalturaLog::info("Failed to get catalog item data info for catalog item id [$id], with err message: " . $e->getMessage());
+		}
 		
 		$catalogItemInfo = array(
-			"TAT" => $vendorCatalogItem->turnAroundTime,
-			"serviceType" => $vendorCatalogItem->serviceType,
-			"serviceFeature" => $vendorCatalogItem->serviceFeature
+			"TAT" => $vendorCatalogItem ? $vendorCatalogItem->turnAroundTime : "N/A",
+			"serviceType" => $vendorCatalogItem ? $vendorCatalogItem->serviceType : "N/A",
+			"serviceFeature" => $vendorCatalogItem ? $vendorCatalogItem->serviceFeature : "N/A"
 		);
+		
 		self::$catalogItemData[$id] = $catalogItemInfo;
 		return $catalogItemInfo;
 	}

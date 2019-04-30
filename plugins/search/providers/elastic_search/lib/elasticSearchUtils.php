@@ -65,6 +65,11 @@ class elasticSearchUtils
 			return $fieldName.$delimiter.$fieldMap[$language];
 	}
 
+	public static function formatGroupIdCreationMode($groupId, $creationMode)
+	{
+		return sprintf("g%scm%s", $groupId, $creationMode);
+	}
+
 	public static function formatPartnerStatus($partnerId, $status)
 	{
 		return sprintf("p%ss%s", $partnerId, $status);

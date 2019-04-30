@@ -232,6 +232,7 @@ class CuePointService extends KalturaBaseService
 		if($this->getCuePointType())
 			$c->add(CuePointPeer::TYPE, $this->getCuePointType());
 		
+		$filter->applyPartnerOnCurrentContext($filter->getFilteredEntryIds());
 		$cuePointFilter = $filter->toObject();
 		$cuePointFilter->attachToCriteria($c);
 		

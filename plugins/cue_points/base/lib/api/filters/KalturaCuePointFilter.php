@@ -93,6 +93,7 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	protected function doGetListResponse(KalturaFilterPager $pager, $type = null)
 	{
 		$this->validateEntryIdFiltered();
+		
 		if (!is_null($this->userIdEqualCurrent) && $this->userIdEqualCurrent)
 		{
 			$this->userIdEqual = kCurrentContext::getCurrentKsKuserId();
@@ -110,21 +111,18 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 			$this->cuePointTypeIn = null;
 		}
 
-		$entryIds = null;
-		if ($this->entryIdEqual) {
-			$entryIds = array($this->entryIdEqual);
-		} else if ($this->entryIdIn) {
-			$entryIds = explode(',', $this->entryIdIn);
-		}
-		
-		if (! is_null ( $entryIds )) {
+		$entryIds = $this->getFilteredEntryIds();
+		if (!is_null($entryIds))
+		{
 			$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork ( $entryIds, kCurrentContext::getCurrentPartnerId());
-			if (! $entryIds) {
+			if (!$entryIds)
+			{
 				return array(array(), 0);
 			}
 			
 			$this->entryIdEqual = null;
 			$this->entryIdIn = implode ( ',', $entryIds );
+			$this->applyPartnerOnCurrentContext($entryIds);
 		}
 
 		$cuePointFilter = $this->toObject();
@@ -178,5 +176,38 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 			
 			throw new KalturaAPIException(KalturaCuePointErrors::USER_KS_CANNOT_LIST_RELATED_CUE_POINTS, get_class($this));
 		}
+	}
+	
+	public function applyPartnerOnCurrentContext($entryIds)
+	{
+		if(kCurrentContext::getCurrentPartnerId() >= 0 || !$entryIds)
+			return;
+		
+		$entryId = reset($entryIds);
+		$entry = entryPeer::retrieveByPKNoFilter($entryId);
+		if($entry)
+		{
+			kCurrentContext::$partner_id = $entry->getPartnerId();
+		}
+		else
+		{
+			KalturaLog::debug("Entry id not filtered, If partner id not correctly defined wrong results set may be returned");
+		}
+	}
+	
+	public function getFilteredEntryIds()
+	{
+		$entryIds = null;
+		
+		if ($this->entryIdEqual)
+		{
+			$entryIds = array($this->entryIdEqual);
+		}
+		elseif ($this->entryIdIn)
+		{
+			$entryIds = explode(',', $this->entryIdIn);
+		}
+		
+		return $entryIds;
 	}
 }

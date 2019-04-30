@@ -50,7 +50,7 @@ class QuizUserEntryService extends KalturaBaseService{
 			$userEntry->score = null;
 		}
 
-		$c = new Criteria();
+		$c = new KalturaCriteria();
 		$c->add(CuePointPeer::ENTRY_ID, $dbUserEntry->getEntryId(), Criteria::EQUAL);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_QUESTION));
 		$questions = CuePointPeer::doSelect($c);

@@ -2605,6 +2605,16 @@ class kFlowHelper
 
 				if($dbAsset instanceof thumbAsset)
 				{
+					try
+					{
+						myEntryUtils::validateObjectContent($dbAsset);
+					}
+					catch (Exception $e)
+					{
+						$dbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
+						$dbAsset->save();
+						throw $e;
+					}
 					
 					list($width, $height, $type, $attr) = kImageUtils::getImageSize($fileSync);
 					$dbAsset->setWidth($width);
@@ -2638,12 +2648,11 @@ class kFlowHelper
 			try
 			{
 				kFileSyncUtils::moveFromFile($fullPath, $syncKey, true);
+				myEntryUtils::validateObjectContent($dbEntry);
 			}
-			catch (Exception $e) {
-
-				if($dbAsset instanceof flavorAsset)
-					kBatchManager::updateEntry($dbEntry->getId(), entryStatus::ERROR_IMPORTING);
-
+			catch (Exception $e)
+			{
+				kBatchManager::updateEntry($dbEntry->getId(), entryStatus::ERROR_IMPORTING);
 				throw $e;
 			}
 			$dbEntry->setStatus(entryStatus::READY);
