@@ -307,13 +307,13 @@ class KAsyncImport extends KJobHandlerWorker
 			
 			//Replace # sign to avoid cases where it's part of the user/password. The # sign is considered as fragment part of the URL.
 			//https://bugs.php.net/bug.php?id=73754
-			$sourceUrl = preg_replace("/#/", "kHash", $sourceUrl, -1, $replaceCount);
+			$sourceUrl = preg_replace("/#/", "_kHash_", $sourceUrl, -1, $replaceCount);
 			
 			// extract information from URL and job data
 			$parsedUrl = parse_url($sourceUrl);
 			if($replaceCount)
 			{
-				$parsedUrl = preg_replace("/kHash/", "#", $parsedUrl);
+				$parsedUrl = preg_replace("/_kHash_/", "#", $parsedUrl);
 			}
 
 			$host = isset($parsedUrl['host']) ? $parsedUrl['host'] : null;
