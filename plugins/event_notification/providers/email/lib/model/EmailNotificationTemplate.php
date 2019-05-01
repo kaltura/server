@@ -38,6 +38,24 @@ class EmailNotificationTemplate extends BatchEventNotificationTemplate implement
 		return $returnObj;
 	}
 
+	protected function getEmail()
+	{
+		$email = $this->getFromEmail();
+		$partnerNotificationEmail = "{from_email}";
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+		$allowedFromEmailWhiteList = $partner->getAllowedFromEmailWhiteList();
+		if ($email != $partnerNotificationEmail && in_array($email, array_map('trim',explode(',',$allowedFromEmailWhiteList))))
+		{
+			KalturaLog::info("from_email requested: $email is allowed in the partner from_email whitelist: ".$allowedFromEmailWhiteList );
+			return $email;
+		}
+		else
+		{
+			KalturaLog::info("from_email requested is: $email , partner from_email whitelist: ".$allowedFromEmailWhiteList );
+			return $partnerNotificationEmail;
+		}
+	}
+
 	/* (non-PHPdoc)
 	 * @see BatchEventNotificationTemplate::getJobData()
 	 */
@@ -45,21 +63,7 @@ class EmailNotificationTemplate extends BatchEventNotificationTemplate implement
 	{
 		$jobData = new kEmailNotificationDispatchJobData();
 		$jobData->setTemplateId($this->getId());
-
-		$email = $this->getFromEmail();
-		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
-		$allowedFromEmailWhiteList = $partner->getAllowedFromEmailWhiteList();
-		if (in_array($email, $allowedFromEmailWhiteList))
-		{
-			$jobData->setFromEmail($email);
-		}
-		else
-		{
-			$allowedFromEmailWhiteListStr = implode(',', $allowedFromEmailWhiteList);
-			KalturaLog::info("from_email requested: $email is not allowed in the partner whitelist: ". $allowedFromEmailWhiteListStr);
-			$jobData->setFromEmail(kConf::get("partner_notification_email"));
-		}
-
+		$jobData->setFromEmail($this->getEmail());
 		$jobData->setFromName($this->getFromName());
 		$jobData->setPriority($this->getPriority());
 		$jobData->setConfirmReadingTo($this->getConfirmReadingTo());

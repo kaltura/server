@@ -203,13 +203,12 @@ class Partner extends BasePartner
 
 	public function getAllowedFromEmailWhiteList()
 	{
-		return $this->getFromCustomData( self::CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST, null, array());
+		return $this->getFromCustomData( self::CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST);
 	}
-	public function addAllowedFromEmailWhiteList( $email )
+
+	public function setAllowedFromEmailWhiteList( $emails )
 	{
-		$allowedFromEmailsArr =  $this->getFromCustomData( self::CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST, null, array());
-		$allowedFromEmailsArr[] = $email;
-		$this->putInCustomData( self::CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST, $allowedFromEmailsArr);
+		$this->putInCustomData( self::CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST, $emails);
 	}
 
 	public function getUseDefaultKshow()	{		return $this->getFromCustomData( "useDefaultKshow" , null , true );	}

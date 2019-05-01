@@ -132,6 +132,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var string
 	 */
 	public $notificationsConfig;
+
+	/**
+	 * @var string
+	 */
+	public $allowedFromEmailWhiteList;
 	
 	/**
 	 * @var bool
@@ -406,6 +411,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"alwaysAllowedPermissionNames",
 		"importRemoteSourceForConvert",
 		"notificationsConfig",
+		"allowedFromEmailWhiteList",
 		"allowMultiNotification",
 		//"maxLoginAttempts",
 		"loginBlockPeriod",
