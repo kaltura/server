@@ -3,7 +3,7 @@
 /**
  * @package plugins.reach
  */
-class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventConsumer, kObjectAddedEventConsumer, kGenericEventConsumer
+class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventConsumer, kObjectAddedEventConsumer, kGenericEventConsumer, kObjectReplacedEventConsumer
 {
 	/**
 	 * @var array<booleanNotificationTemplate>
@@ -218,7 +218,18 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		return false;
 	}
-
+	
+	/* (non-PHPdoc)
+	 * @see kObjectReplacedEventConsumer::shouldConsumeReplacedEvent()
+	*/
+	public function shouldConsumeReplacedEvent(BaseObject $object)
+	{
+		if($object && $object instanceof entry && $object->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
+			return true;
+		
+		return false;
+	}
+	
 	/**
 	 * @param BaseObject $object
 	 * @param BatchJob $raisedJob
@@ -275,7 +286,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 			if (in_array(entryPeer::LENGTH_IN_MSECS, $modifiedColumns))
 			{
-				return $this->handleEntryDurationChanged($object);
+				$this->handleEntryDurationChanged($object);
 			}
 			if (in_array(entryPeer::STATUS, $modifiedColumns))
 			{
@@ -297,14 +308,30 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		return true;
 	}
-
+	
+	/* (non-PHPdoc)
+ 	* @see kObjectReplacedEventConsumer::shouldConsumeReplacedEvent()
+	*/
+	public function objectReplaced(BaseObject $object, BaseObject $replacingObject, BatchJob $raisedJob = null)
+	{
+		$this->handleEntryDurationChanged($object);
+		return $this->checkPendingEntryTasks($object);
+	}
+	
 	private function handleEntryReady(entry $object)
 	{
 		$this->checkAutomaticRules($object, true);
-
+		
+		if($object->getSourceType() != EntrySourceType::KALTURA_RECORDED_LIVE)
+			return $this->checkPendingEntryTasks($object);
+		
+		return true;
+	}
+	
+	protected function checkPendingEntryTasks($object)
+	{
 		//Check if there are any tasks that were created with pending entry ready status
 		$pendingEntryReadyTasks = EntryVendorTaskPeer::retrieveByEntryIdAndStatuses($object->getId(), $object->getPartnerId(), array(EntryVendorTaskStatus::PENDING_ENTRY_READY));
-
 		foreach ($pendingEntryReadyTasks as $pendingEntryReadyTask)
 		{
 			/* @var $pendingEntryReadyTask EntryVendorTask */
@@ -317,8 +344,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		}
 		return true;
 	}
-
-
+	
 	private function updateReachProfileCreditUsage(EntryVendorTask $entryVendorTask)
 	{
 		ReachProfilePeer::updateUsedCredit($entryVendorTask->getReachProfileId(), $entryVendorTask->getPrice());
@@ -437,6 +463,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	public static function addEntryVendorTask(entry $entry, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = null)
 	{
+		if($entry->getIsTemporary())
+		{
+			KalturaLog::debug("Entry [$entryId] is temporary, entry vendor task object wont be created for it");
+			return;
+		}
+		
 		//Create new entry vendor task object
 		$entryVendorTask = new EntryVendorTask();
 
@@ -469,9 +501,22 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$entryVendorTask->setIsRequestModerated(true);
 			$status = EntryVendorTaskStatus::PENDING_MODERATION;
 		}
+		
 		if($entry->getStatus() != entryStatus::READY)
+		{
 			$status = EntryVendorTaskStatus::PENDING_ENTRY_READY;
-
+		}
+		
+		//KalturaRecorded entries are ready on creation so make sure the vendors wont fetch the job until it receive its assets
+		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
+		{
+			$entryAssets = assetPeer::retrieveReadyByEntryId($entry->getId());
+			if(!count($entryAssets))
+			{
+				$status = EntryVendorTaskStatus::PENDING_ENTRY_READY;
+			}
+		}
+		
 		$dictionary = $reachProfile->getDictionaryByLanguage($vendorCatalogItem->getSourceLanguage());
 		if ($dictionary)
 			$entryVendorTask->setDictionary($dictionary->getData());
