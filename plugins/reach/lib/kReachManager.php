@@ -286,7 +286,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 			if (in_array(entryPeer::LENGTH_IN_MSECS, $modifiedColumns))
 			{
-				return $this->handleEntryDurationChanged($object);
+				$this->handleEntryDurationChanged($object);
 			}
 			if (in_array(entryPeer::STATUS, $modifiedColumns))
 			{
@@ -314,6 +314,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	*/
 	public function objectReplaced(BaseObject $object, BaseObject $replacingObject, BatchJob $raisedJob = null)
 	{
+		$this->handleEntryDurationChanged($object);
 		return $this->checkPendingEntryTasks($object);
 	}
 	
