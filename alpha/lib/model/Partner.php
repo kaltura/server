@@ -82,6 +82,8 @@ class Partner extends BasePartner
 
 	const RTC_SERVER_NODE_ENV = 'rtc_server_node_env';
 
+	const CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST = 'allowedFromEmailWhiteList';
+
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -198,6 +200,17 @@ class Partner extends BasePartner
 	}
 	
 	private static $s_config_params = array ( );
+
+	public function getAllowedFromEmailWhiteList()
+	{
+		return $this->getFromCustomData( self::CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST, null, array());
+	}
+	public function addAllowedFromEmailWhiteList( $email )
+	{
+		$allowedFromEmailsArr =  $this->getFromCustomData( self::CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST, null, array());
+		$allowedFromEmailsArr[] = $email;
+		$this->putInCustomData( self::CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST, $allowedFromEmailsArr);
+	}
 
 	public function getUseDefaultKshow()	{		return $this->getFromCustomData( "useDefaultKshow" , null , true );	}
 	public function setUseDefaultKshow( $v )	{		return $this->putInCustomData( "useDefaultKshow", $v );	}

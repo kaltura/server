@@ -45,7 +45,21 @@ class EmailNotificationTemplate extends BatchEventNotificationTemplate implement
 	{
 		$jobData = new kEmailNotificationDispatchJobData();
 		$jobData->setTemplateId($this->getId());
-		$jobData->setFromEmail($this->getFromEmail());
+
+		$email = $this->getFromEmail();
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+		$allowedFromEmailWhiteList = $partner->getAllowedFromEmailWhiteList();
+		if (in_array($email, $allowedFromEmailWhiteList))
+		{
+			$jobData->setFromEmail($email);
+		}
+		else
+		{
+			$allowedFromEmailWhiteListStr = implode(',', $allowedFromEmailWhiteList);
+			KalturaLog::info("from_email requested: $email is not allowed in the partner whitelist: ". $allowedFromEmailWhiteListStr);
+			$jobData->setFromEmail(kConf::get("partner_notification_email"));
+		}
+
 		$jobData->setFromName($this->getFromName());
 		$jobData->setPriority($this->getPriority());
 		$jobData->setConfirmReadingTo($this->getConfirmReadingTo());
