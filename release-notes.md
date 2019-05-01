@@ -1,3 +1,16 @@
+# Naos 14.20.0 #
+
+## new boolean event notification template ##
+- Issue Type: Task
+- Issue ID: PLAT-9814
+
+### Configuration ###
+	First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2019_04_28_tagEqualsBooleanNotification.template.xml
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/2019_04_28_deploy_tag_equals_boolean_notification.php
+	
 # Naos 14.19.0 #
 
 ## Move maps to dynamic configuration ##
