@@ -72,7 +72,12 @@ class kExclusiveLockKey
 		$this->batchIndex = $batchIndex;
 	}
 
-	
+	public function getSchedulerName()
+	{
+		$scheduler = SchedulerPeer::getConfiguredIdBySchedulerId($this->schedulerId);
+		$name = $scheduler ? $scheduler->getName() : "N/A";
+		return $name;
+	}
     
 }
 

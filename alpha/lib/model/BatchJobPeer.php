@@ -162,6 +162,7 @@ class BatchJobPeer extends BaseBatchJobPeer
 			$historyRecord->setBatchIndex($lockKey->getBatchIndex());
 			$historyRecord->setHostName((isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname()));
 			$historyRecord->setSessionId((string)$uniqueId);
+			$historyRecord->setSchedulerHostName($lockKey->getSchedulerName());
 			
 			$batchJob->addHistoryRecord($historyRecord);
 			

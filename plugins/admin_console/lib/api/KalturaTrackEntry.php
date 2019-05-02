@@ -89,6 +89,11 @@ class KalturaTrackEntry extends KalturaObject
 	 * @var string
 	 */
 	public $userIp;
+	
+	/**
+	 * @var int
+	 */
+	public $sessionId;
 
 	private static $map_between_objects = array
 	(
@@ -109,6 +114,7 @@ class KalturaTrackEntry extends KalturaObject
 		"createdAt",
 		"updatedAt",
 		"userIp",
+		"sessionId",
 	);
 	
 	public function getMapBetweenObjects ( )

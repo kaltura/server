@@ -1044,6 +1044,7 @@
 												<th><?php echo $this->translate('entry-investigate history_records hostName th'); ?></th>
 												<th><?php echo $this->translate('entry-investigate history_records sessionId th'); ?></th>
 												<th><?php echo $this->translate('entry-investigate history_records schedulerId th'); ?></th>
+												<th><?php echo $this->translate('entry-investigate history_records schedulerName th'); ?></th>
 												<th><?php echo $this->translate('entry-investigate history_records workerId th'); ?></th>
 												<th><?php echo $this->translate('entry-investigate history_records batchIndex th'); ?></th>
 												<th><?php echo $this->translate('entry-investigate history_records message th'); ?></th>
@@ -1059,6 +1060,7 @@
 														<td><?php echo $historyRecord->hostName; ?></td>
 														<td><?php echo $historyRecord->sessionId; ?></td>
 														<td><?php echo $historyRecord->schedulerId; ?></td>
+														<td><?php echo $historyRecord->schedulerName; ?></td>
 														<td><?php echo $historyRecord->workerId; ?></td>
 														<td><?php echo $historyRecord->batchIndex; ?></td>
 														<td><?php echo $historyRecord->message; ?></td>
@@ -1095,6 +1097,7 @@
 						<th><?php echo $this->translate('entry-investigate track entry uid th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate track entry userIp th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate track entry changedProperties th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate track entry sessionId th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate track entry ks th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate track entry description th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate track entry createdAt th'); ?></th>
@@ -1117,6 +1120,7 @@
 						<td><?php echo $track->userId; ?></td>
 						<td><?php echo $track->userIp; ?></td>
 						<td><?php echo $track->changedProperties; ?></td>
+						<td><?php echo $track->sessionId; ?></td>
 						<td><?php echo $track->ks; ?></td>
 						<td><?php echo $track->description; ?></td>
 						<td><?php echo date($this->translate('time format'), $track->createdAt); ?></td>
