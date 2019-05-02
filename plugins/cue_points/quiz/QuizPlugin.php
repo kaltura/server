@@ -920,7 +920,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		$isQuiz = self::getQuizData($entry);
 		if (!is_null($isQuiz))
 		{
-			$quizData['is_quiz'] = Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE;
+			$quizData['is_quiz'] = KalturaNullableBoolean::TRUE_VALUE;
 		}
 
 		return $quizData;
