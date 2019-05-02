@@ -20,4 +20,10 @@ interface kThumbnailParameterName extends BaseEnum
 	const OPACITY = "opacity";
 	const DEGREES = "degrees";
 	const COMPOSITE_FIT = "compositeFit";
+	const FONT_SIZE	= "fontSize";
+	const FONT = "font";
+	const TEXT = "text";
+	const ANGLE = "angle";
+	const STROKE_COLOR = "strokeColor";
+	const FILL_COLOR = "fillColor";
 }

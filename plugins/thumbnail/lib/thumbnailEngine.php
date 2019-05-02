@@ -26,6 +26,9 @@ class thumbnailEngine
 		"vidSec" => "vidSecAction",
 		"rotate" => "rotateAction",
 		"r" =>	"rotateAction",
+		"t" => "textAction",
+		"txt" => "textAction",
+		"text" => "textAction",
 	);
 
 	/**

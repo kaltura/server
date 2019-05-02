@@ -28,25 +28,16 @@ class rotateAction extends imagickAction
 	protected function extractActionParameters()
 	{
 		$this->degrees = self::getIntActionParameter(kThumbnailParameterName::DEGREES, 0);
-		$this->backgroundColor = self::getActionParameter(kThumbnailParameterName::BACKGROUND_COLOR, 'black');
+		$this->backgroundColor = self::getColorActionParameter(kThumbnailParameterName::BACKGROUND_COLOR, 'black');
 	}
 
 	protected function validateInput()
 	{
 		if($this->degrees < 1 || $this->degrees > 359)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY,"Degrees must be between 0 and 360, exclusive");
+			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, "Degrees must be between 0 and 360, exclusive");
 		}
 
-		$image = new Imagick();
-		$image->newPseudoImage(2,2);
-		try
-		{
-			$image->setBackgroundColor($this->backgroundColor);
-		}
-		catch(Exception $e)
-		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, "Illegal value for rotate background color");
-		}
+		$this->validateColorParameter($this->backgroundColor);
 	}
 }

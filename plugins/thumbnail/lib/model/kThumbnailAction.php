@@ -60,6 +60,25 @@ abstract class kThumbnailAction
 	}
 
 	/**
+	 * Try to get a color string from the action parameters since we cant pass # in the url if it match
+	 * against a string of 6 or 3 consisting of numbers or a-f characters it will add a # to it
+	 *
+	 * @param $actionParameterName
+	 * @param null $default
+	 * @return mixed|null|string
+	 */
+	protected function getColorActionParameter($actionParameterName, $default = null)
+	{
+		$result = $this->getActionParameter($actionParameterName, $default);
+		if(preg_match("([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})", $result))
+		{
+			$result = "#" . $result;
+		}
+
+		return $result;
+	}
+
+	/**
 	 * @param string $parameterName
 	 * @param string $parameterValue
 	 */
@@ -71,5 +90,19 @@ abstract class kThumbnailAction
 		}
 
 		$this->actionParameters[$parameterName] = $parameterValue;
+	}
+
+	protected function validateColorParameter($color)
+	{
+		$image = new Imagick();
+		$image->newPseudoImage(1,1, "plasma:fractal");
+		try
+		{
+			$image->setBackgroundColor($color);
+		}
+		catch(Exception $e)
+		{
+			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, "Illegal value for color {$color}");
+		}
 	}
 }
