@@ -153,9 +153,11 @@ class kDataCenterMgr
 	public static function createCmdForRemoteDataCenter(FileSync $fileSync)
 	{
 		KalturaLog::log("File Sync [{$fileSync->getId()}]");
-		$remoteUrl = self::getInternalRemoteUrl($fileSync); 
+		$remoteUrl = self::getInternalRemoteUrl($fileSync);
 		$locaFilePath = self::getLocalTempPathForFileSync($fileSync);
-		$cmdLine = kConf::get( "bin_path_curl" ) . ' -m ' . self::MAX_TIME_OUT_SECONDS . ' -f -s -L -o"' . $locaFilePath . '" "' . $remoteUrl . '"';
+		$timeOut = kConf::getArrayValue("transfer_timeout", "params", "dc_config", self::MAX_TIME_OUT_SECONDS);
+		$cmdLine = kConf::get( "bin_path_curl" ) . ' -m ' . $timeOut . ' -f -s -L -o"' . $locaFilePath . '" "' . $remoteUrl . '"';
+		echo($cmdLine);
 		return $cmdLine;
 	}
 	
