@@ -59,6 +59,12 @@ class kBatchHistoryData
 	 */
 	protected $sessionId;
 	
+	/**
+	 * The scheduler machine name which executed the job
+	 * @var        string
+	 */
+	protected $schedulerHostName;
+	
 	public function __construct() {
 		$this->timeStamp = date('Y-m-d H:i:s');
 	}	
@@ -179,6 +185,13 @@ class kBatchHistoryData
 	public function getErrNumber() {
 		return $this->errNumber;
 	}
+	
+	/**
+	 * @return the $getSchedulerName
+	 */
+	public function getSchedulerHostName() {
+		return $this->schedulerHostName;
+	}
 
 	/**
 	 * @param number $schedulerId
@@ -248,5 +261,12 @@ class kBatchHistoryData
 	 */
 	public function setSessionId($sessionId) {
 		$this->sessionId = $sessionId;
+	}
+	
+	/**
+	 * @param string $schedulerName
+	 */
+	public function setSchedulerHostName($schedulerHostName) {
+		$this->schedulerHostName = $schedulerHostName;
 	}
 }
