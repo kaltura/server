@@ -211,7 +211,7 @@ class GroupService extends KalturaBaseUserService
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaGroupErrors::INVALID_GROUP_ID
 	 */
-	public function cloneAction($originalGroupId, $newGroupId, $newGroupName)
+	public function cloneAction($originalGroupId, $newGroupId, $newGroupName = null)
 	{
 		$dbGroup = $this->getGroup($originalGroupId);
 
@@ -227,6 +227,10 @@ class GroupService extends KalturaBaseUserService
 		}
 
 		$group = new KalturaGroup();
+		if ($newGroupName == null)
+		{
+			$newGroupName = $newGroupId;
+		}
 		$newDbGroup = $group->clonedObject($dbGroup, $newGroupId, $newGroupName);
 		$group->validateForInsert($newDbGroup);
 		$newDbGroup->save();
