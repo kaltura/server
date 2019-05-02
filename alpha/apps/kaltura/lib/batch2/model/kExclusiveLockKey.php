@@ -75,7 +75,8 @@ class kExclusiveLockKey
 	public function getSchedulerName()
 	{
 		$scheduler = SchedulerPeer::getConfiguredIdBySchedulerId($this->schedulerId);
-		return $scheduler->getName();
+		$name = $scheduler ? $scheduler->getName() : "N/A";
+		return $name;
 	}
     
 }
