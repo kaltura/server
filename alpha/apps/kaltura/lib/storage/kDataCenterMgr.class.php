@@ -7,7 +7,8 @@ class kDataCenterMgr
 {
 	private static $s_current_dc;
 	private static $is_multi_dc = null;
-	const MAX_TIME_OUT_SECONDS = 60;
+	const REMOTE_FILE_GET_CONTENTS_TIMEOUT = 60;
+
 
 	/**
 	 * @var StorageProfile
@@ -155,9 +156,8 @@ class kDataCenterMgr
 		KalturaLog::log("File Sync [{$fileSync->getId()}]");
 		$remoteUrl = self::getInternalRemoteUrl($fileSync);
 		$locaFilePath = self::getLocalTempPathForFileSync($fileSync);
-		$timeOut = kConf::getArrayValue("transfer_timeout", "params", "dc_config", self::MAX_TIME_OUT_SECONDS);
+		$timeOut = kConf::getArrayValue("remote_file_get_contents_timeout", "params", "dc_config", self::REMOTE_FILE_GET_CONTENTS_TIMEOUT);
 		$cmdLine = kConf::get( "bin_path_curl" ) . ' -m ' . $timeOut . ' -f -s -L -o"' . $locaFilePath . '" "' . $remoteUrl . '"';
-		echo($cmdLine);
 		return $cmdLine;
 	}
 	
