@@ -5274,8 +5274,8 @@ class kKavaReportsMgr extends kKavaBase
 			$page_size * $page_index, 1, $order_by, $object_ids, $flags, $response_options);
 
 		$headers = array_merge(
-			$report_def[self::REPORT_DIMENSION_HEADERS], 
-			array_slice($result[0], 1));
+			$report_def[self::REPORT_DIMENSION_HEADERS],
+			$cur_report_def[self::REPORT_METRICS]);
 		
 		$exclude_ids = array_map('reset', array_slice($result[1], 0, $page_size * ($page_index - 1)));
 		$exclude_ids = array_flip($exclude_ids);
