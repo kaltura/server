@@ -1349,15 +1349,10 @@ class kKavaReports extends kKavaReportsMgr
 		),
 	);
 
-	public static function isReportDefined($report_type)
+	public static function getReportDef($report_type)
 	{
-		return isset(self::$reports_def[$report_type]);
-	}
-
-	public static function getReportDefinition($report_type)
-	{
-		$report_def = self::$reports_def[$report_type];
-		return self::getReportDef($report_def);
+		$report_def = isset(self::$reports_def[$report_type]) ? self::$reports_def[$report_type] : null;
+		return self::buildReportDef($report_def);
 	}
 
 }

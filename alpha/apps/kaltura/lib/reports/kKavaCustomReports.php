@@ -13,17 +13,11 @@ class kKavaCustomReports extends kKavaReportsMgr
 		}
 	}
 
-	public static function isReportDefined($report_type)
+	public static function getReportDef($report_type)
 	{
 		self::initMap();
-		return isset(self::$custom_reports[-$report_type]);
-	}
-
-	public static function getReportDefinition($report_type)
-	{
-		self::initMap();
-		$report_def = self::$custom_reports[-$report_type];
-		return self::getReportDef($report_def);
+		$report_def = isset(self::$custom_reports[-$report_type]) ? self::$custom_reports[-$report_type] : null;//todo
+		return self::buildReportDef($report_def);
 	}
 
 }
