@@ -184,7 +184,16 @@ class GroupUserService extends KalturaBaseService
 	 */
 	public function syncAction($userId, $groupIds, $removeFromExistingGroups = true, $createNewGroups = true)
 	{
-		$groupIdsList = explode(',', $groupIds);
+		if(strpos($groupIds,';')===false)
+		{
+			$seperator = ',';
+		}
+		else
+		{
+			$seperator = ';';
+		}
+
+		$groupIdsList = explode($seperator, $groupIds);
 		self::validateSyncGroupUserArgs($userId, $groupIdsList, $groupIds);
 
 		$kUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
