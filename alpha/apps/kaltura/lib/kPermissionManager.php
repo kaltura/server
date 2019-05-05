@@ -14,6 +14,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	const API_PARAMETERS_ARRAY_NAME = 'api_parameters';   // name of $map's api parameters array
 	const PARTNER_GROUP_ARRAY_NAME  = 'partner_group';    // name of $map's partner group array
 	const PERMISSION_NAMES_ARRAY    = 'permission_names'; // name of $map's permission names array
+	const DEFAULT_ID = 'default';
 			
 	private static $lastInitializedContext = null; // last initialized security context (ks + partner id)
 	private static $cacheWatcher = null;
@@ -793,7 +794,17 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			KalturaLog::err("Partner is not allowed");
 			return false;
 		}
-		
+
+		if(self::$operatingPartner && PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, self::$operatingPartner->getId()))
+		{
+			$actionBlocked = self::isActionBlockedForPartner($service, $action);
+			if($actionBlocked)
+			{
+				KalturaLog::err("The wanted service and action are not allowed for this partner");
+				return false;
+			}
+		}
+
 		$servicePermitted  = isset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service]);
 		if(!$servicePermitted)
 		{
@@ -807,8 +818,45 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		
 		return $actionPermitted;
 	}
-	
-	
+
+	protected static function isActionBlockedForPartner($service, $action)
+	{
+		$blockedActionsMapContent = kConf::getMap("blocked_actions_per_account");
+		if(!empty($blockedActionsMapContent))
+		{
+			$partnerId = self::$operatingPartner->getId();
+			if($partnerId && array_key_exists($partnerId, $blockedActionsMapContent))
+			{
+				$sectionId = $partnerId;
+			}
+			else if (array_key_exists(self::DEFAULT_ID, $blockedActionsMapContent))
+			{
+				$sectionId = self::DEFAULT_ID;
+			}
+			else
+			{
+				return false;
+			}
+
+			return self::isActionInBlockedActionsMap($service, $action, $sectionId, $blockedActionsMapContent);
+		}
+		return false;
+	}
+
+	protected static function isActionInBlockedActionsMap($service, $action, $sectionId, $blockedActionsMapContent)
+	{
+		$blockedActionsForPartner = $blockedActionsMapContent[$sectionId];
+		foreach($blockedActionsForPartner as $blockedAction)
+		{
+			list($serviceId, $actionId) = explode(':', $blockedAction);
+			if(preg_match("/$serviceId/", $service) && preg_match("/$actionId/", $action))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private static function getParamPermitted($array_name, $objectName, $paramName)
 	{
 		self::errorIfNotInitialized();
