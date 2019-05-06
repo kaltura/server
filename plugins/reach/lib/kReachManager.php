@@ -355,7 +355,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		//Refund credit for tasks which could not be handled by the service provider
 		ReachProfilePeer::updateUsedCredit($entryVendorTask->getReachProfileId(), -$entryVendorTask->getPrice());
 		
-		//Rest task value so that reports will be alligned with the total used credit
+		//Rest task price so that reports will be alligned with the total used credit
 		$entryVendorTask->setOldPrice($entryVendorTask->getPrice());
 		$entryVendorTask->setPrice(0);
 		$entryVendorTask->save();
