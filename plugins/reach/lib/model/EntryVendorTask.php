@@ -27,6 +27,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	const CUSTOM_DATA_CREATION_MODE =       'creation_mode';
 	const CUSTOM_DATA_IS_REQUEST_MODERATED ='request_moderated';
 	const CUSTOM_DATA_TASK_DATA =       	'task_data';
+	const CUSTOM_DATA_OLD_PRICE =       	'old_price';
 	
 	//setters
 	
@@ -88,6 +89,11 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	public function setTaskJobData($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_TASK_DATA, $v);
+	}
+	
+	public function setOldPrice($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_OLD_PRICE, $v);
 	}
 
 	//getters
@@ -165,6 +171,11 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	public function getTaskJobData()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_TASK_DATA);
+	}
+	
+	public function getOldPrice()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_OLD_PRICE);
 	}
 
 	/* (non-PHPdoc)
