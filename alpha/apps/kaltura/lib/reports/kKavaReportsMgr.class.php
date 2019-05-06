@@ -95,8 +95,6 @@ class kKavaReportsMgr extends kKavaBase
 
 	/// report settings
 	//report classes
-	const CASE_KAVA_REPORTS = 0;
-
 	const CUSTOM_REPORTS_CLASS = 'kKavaCustomReports';
 	const KAVA_REPORTS_CLASS = 'kKavaReports';
 
@@ -402,6 +400,10 @@ class kKavaReportsMgr extends kKavaBase
 	protected static $error_ids = array(
 		'Unknown' => true,
 		'Error' => true,
+	);
+
+	protected static $report_classes = array(
+		0 => self::KAVA_REPORTS_CLASS,
 	);
 	
 	protected static $aggregations_def = array();
@@ -1037,7 +1039,7 @@ class kKavaReportsMgr extends kKavaBase
 			return true;
 		}
 
-		if (!self::getReportDefinition($report_type))
+		if (!self::getReportDefFromReportClass($report_type))
 		{
 			return false;
 		}
@@ -1060,20 +1062,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		$report_class = floor($report_type / 10000);
-		switch ($report_class)
-		{
-			case self::CASE_KAVA_REPORTS:
-				return self::KAVA_REPORTS_CLASS;
-
-			default:
-				return null;
-		}
-	}
-
-	public static function getReportDefinition($report_type)
-	{
-		$report_class = self::getReportClassName($report_type);
-		return $report_class ? $report_class::getReportDef($report_type) : null;
+		return isset(self::$report_classes[$report_class]) ? self::$report_classes[$report_class] : null;
 	}
 
 	protected static function buildReportDef($report_def)
@@ -1115,7 +1104,19 @@ class kKavaReportsMgr extends kKavaBase
 
 		return $report_def;
 	}
-	
+
+	protected static function getReportDefFromReportClass($report_type)
+	{
+		$report_class = self::getReportClassName($report_type);
+		return $report_class ? $report_class::getReportDef($report_type) : null;
+	}
+
+	protected static function getReportDefinition($report_type)
+	{
+		$report_def = self::getReportDefFromReportClass($report_type);
+		return $report_def ? self::buildReportDef($report_def) : null;
+	}
+
 	protected static function getDimension($report_def, $object_ids)
 	{
 		if ($object_ids && array_key_exists(self::REPORT_DRILLDOWN_DIMENSION, $report_def))
