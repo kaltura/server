@@ -299,7 +299,7 @@ class KAsyncImport extends KJobHandlerWorker
 	/*
 	 * Will take a single KalturaBatchJob and fetch the URL to the job's destFile
 	 */
-	private function fetchFileSsh(KalturaBatchJob $job, KalturaSshImportJobData $data)
+	private function fetchFileSsh(KalturaBatchJob $job, KalturaImportJobData $data)
 	{
 		try
 		{
