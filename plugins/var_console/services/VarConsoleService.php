@@ -213,7 +213,7 @@ class VarConsoleService extends KalturaBaseService
     }
     
 	/**
-	 * Function to change a sub-publisher's status
+	 * Function to change an authorized publisher's status
 	 * @action updateStatus
 	 * @param int $id
 	 * @param KalturaPartnerStatus $status
