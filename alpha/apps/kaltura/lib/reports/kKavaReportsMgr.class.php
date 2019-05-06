@@ -93,11 +93,11 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_VIEW_BITRATE_COUNT = 'view_bitrate_count';
 	const METRIC_AVG_VIEW_BITRATE = 'avg_view_bitrate';
 
-	/// report settings
 	//report classes
 	const CUSTOM_REPORTS_CLASS = 'kKavaCustomReports';
 	const KAVA_REPORTS_CLASS = 'kKavaReports';
 
+	/// report settings
 	// report settings - common
 	const REPORT_DATA_SOURCE = 'report_data_source';
 	const REPORT_INTERVAL = 'report_interval';
