@@ -4,7 +4,7 @@ class kKavaReports extends kKavaReportsMgr
 {
 
 	protected static $reports_def = array(
-		reportType::TOP_CONTENT => array(
+		ReportType::TOP_CONTENT => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'object_id' => self::DIMENSION_ENTRY_ID,
 				'entry_name' => self::DIMENSION_ENTRY_ID
@@ -18,7 +18,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
 		),
 
-		reportType::CONTENT_DROPOFF => array(
+		ReportType::CONTENT_DROPOFF => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'object_id' => self::DIMENSION_ENTRY_ID,
 				'entry_name' => self::DIMENSION_ENTRY_ID
@@ -33,7 +33,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
 		),
 
-		reportType::CONTENT_INTERACTIONS => array(
+		ReportType::CONTENT_INTERACTIONS => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'object_id' => self::DIMENSION_ENTRY_ID,
 				'entry_name' => self::DIMENSION_ENTRY_ID
@@ -46,7 +46,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED),
 		),
 
-		reportType::MAP_OVERLAY => array(
+		ReportType::MAP_OVERLAY => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'object_id' => self::DIMENSION_LOCATION_COUNTRY,
 				'country' => self::DIMENSION_LOCATION_COUNTRY
@@ -71,7 +71,7 @@ class kKavaReports extends kKavaReportsMgr
 			)
 		),
 
-		reportType::TOP_SYNDICATION => array(
+		ReportType::TOP_SYNDICATION => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'object_id' => self::DIMENSION_DOMAIN,
 				'domain_name' => self::DIMENSION_DOMAIN
@@ -84,7 +84,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 		),
 
-		reportType::USER_ENGAGEMENT => array(
+		ReportType::USER_ENGAGEMENT => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'name' => self::DIMENSION_KUSER_ID
 			),
@@ -97,7 +97,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
 		),
 
-		reportType::SPECIFIC_USER_ENGAGEMENT => array(
+		ReportType::SPECIFIC_USER_ENGAGEMENT => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'entry_name' => self::DIMENSION_ENTRY_ID
 			),
@@ -110,7 +110,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
 		),
 
-		reportType::USER_TOP_CONTENT => array(
+		ReportType::USER_TOP_CONTENT => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'name' => self::DIMENSION_KUSER_ID
 			),
@@ -123,7 +123,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_UNIQUE_PERCENTILES_RATIO),
 		),
 
-		reportType::USER_CONTENT_DROPOFF => array(
+		ReportType::USER_CONTENT_DROPOFF => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'name' => self::DIMENSION_KUSER_ID
 			),
@@ -138,7 +138,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_USERS, self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
 		),
 
-		reportType::USER_CONTENT_INTERACTIONS => array(
+		ReportType::USER_CONTENT_INTERACTIONS => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'name' => self::DIMENSION_KUSER_ID
 			),
@@ -151,7 +151,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_USERS, self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED),
 		),
 
-		reportType::APPLICATIONS => array(
+		ReportType::APPLICATIONS => array(
 			self::REPORT_INTERVAL => '-30/0',
 			self::REPORT_DIMENSION_MAP => array(
 				'name' => self::DIMENSION_APPLICATION
@@ -159,7 +159,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_METRICS => array(),
 		),
 
-		reportType::PLATFORMS => array(
+		ReportType::PLATFORMS => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'device' => self::DIMENSION_DEVICE
 			),
@@ -173,7 +173,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 		),
 
-		reportType::OPERATING_SYSTEM => array(
+		ReportType::OPERATING_SYSTEM => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'os' => self::DIMENSION_OS
 			),
@@ -187,7 +187,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 		),
 
-		reportType::BROWSERS => array(
+		ReportType::BROWSERS => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'browser' => self::DIMENSION_BROWSER
 			),
@@ -197,7 +197,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_UNIQUE_USERS),
 		),
 
-		reportType::OPERATING_SYSTEM_FAMILIES => array(
+		ReportType::OPERATING_SYSTEM_FAMILIES => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'os_family' => self::DIMENSION_OS_FAMILY
 			),
@@ -206,7 +206,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_UNIQUE_USERS),
 		),
 
-		reportType::BROWSERS_FAMILIES => array(
+		ReportType::BROWSERS_FAMILIES => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'browser_family' => self::DIMENSION_BROWSER_FAMILY
 			),
@@ -215,7 +215,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_UNIQUE_USERS),
 		),
 
-		reportType::LIVE => array(
+		ReportType::LIVE => array(
 			self::REPORT_GRANULARITY => self::GRANULARITY_HOUR,
 			self::REPORT_PLAYBACK_TYPES => array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR),
 			self::REPORT_DIMENSION_MAP => array(
@@ -230,7 +230,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY),
 		),
 
-		reportType::TOP_PLAYBACK_CONTEXT => array(
+		ReportType::TOP_PLAYBACK_CONTEXT => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'object_id' => self::DIMENSION_PLAYBACK_CONTEXT,
 				'name' => self::DIMENSION_PLAYBACK_CONTEXT
@@ -244,7 +244,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self:: METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
 		),
 
-		reportType::VPAAS_USAGE => array(
+		ReportType::VPAAS_USAGE => array(
 			self::REPORT_JOIN_GRAPHS => array(
 				// bandwidth
 				array(
@@ -357,7 +357,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 		),
 
-		reportType::VPAAS_USAGE_MULTI => array(
+		ReportType::VPAAS_USAGE_MULTI => array(
 			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
 			self::REPORT_DIMENSION_MAP => array(
 				'status' => self::DIMENSION_PARTNER_ID,
@@ -478,7 +478,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 		),
 
-		reportType::TOP_CONTRIBUTORS => array(
+		ReportType::TOP_CONTRIBUTORS => array(
 			self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
 			self::REPORT_DIMENSION_MAP => array(
 				'object_id' => self::DIMENSION_KUSER_ID,
@@ -497,7 +497,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 		),
 
-		reportType::CONTENT_CONTRIBUTIONS => array(
+		ReportType::CONTENT_CONTRIBUTIONS => array(
 			self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
 			self::REPORT_DIMENSION_MAP => array(
 				'object_id' => self::DIMENSION_SOURCE_TYPE,
@@ -517,7 +517,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 		),
 
-		reportType::TOP_CREATORS => array(
+		ReportType::TOP_CREATORS => array(
 			self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
 			self::REPORT_DIMENSION_MAP => array(
 				'user_id' => self::DIMENSION_KUSER_ID,
@@ -540,7 +540,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 		),
 
-		reportType::USER_USAGE => array(
+		ReportType::USER_USAGE => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'kuser_id' => self::DIMENSION_KUSER_ID,
 				'name' => self::DIMENSION_KUSER_ID
@@ -623,7 +623,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
 		),
 
-		reportType::SPECIFIC_USER_USAGE => array(
+		ReportType::SPECIFIC_USER_USAGE => array(
 			self::REPORT_JOIN_GRAPHS => array(
 				// entries added / deleted
 				array(
@@ -692,7 +692,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
 		),
 
-		reportType::PARTNER_USAGE => array(
+		ReportType::PARTNER_USAGE => array(
 			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
 			self::REPORT_JOIN_GRAPHS => array(
 				array(
@@ -765,7 +765,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_FINALIZE_FUNC => 'self::addCombinedUsageGraph',
 		),
 
-		reportType::ENTRY_USAGE => array(
+		ReportType::ENTRY_USAGE => array(
 			self::REPORT_JOIN_GRAPHS => array(
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
@@ -896,7 +896,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 		),
 
-		reportType::VAR_USAGE => array(
+		ReportType::VAR_USAGE => array(
 			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
 			self::REPORT_DIMENSION_MAP => array(
 				'status' => self::DIMENSION_PARTNER_ID,
@@ -1096,7 +1096,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addRollupRow',
 		),
 
-		reportType::REACH_USAGE => array(
+		ReportType::REACH_USAGE => array(
 			self::REPORT_DATA_SOURCE => self::DATASOURCE_REACH_USAGE,
 			self::REPORT_DIMENSION_MAP => array(
 				'object_id' => self::DIMENSION_ENTRY_ID,
@@ -1118,14 +1118,14 @@ class kKavaReports extends kKavaReportsMgr
 			),
 		),
 
-		reportType::TOP_CUSTOM_VAR1 => array(
+		ReportType::TOP_CUSTOM_VAR1 => array(
 			self::REPORT_DIMENSION_MAP => array('custom_var1' => self::DIMENSION_CUSTOM_VAR1),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_CUSTOM_VAR1,
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
 		),
 
-		reportType::MAP_OVERLAY_CITY => array(
+		ReportType::MAP_OVERLAY_CITY => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'country' => self::DIMENSION_LOCATION_COUNTRY,
 				'region' => self::DIMENSION_LOCATION_REGION,
@@ -1140,12 +1140,12 @@ class kKavaReports extends kKavaReportsMgr
 			),
 		),
 
-		reportType::USER_ENGAGEMENT_TIMELINE => array(
+		ReportType::USER_ENGAGEMENT_TIMELINE => array(
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_PERCENTILES_RATIO),
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_PERCENTILES_RATIO),
 		),
 
-		reportType::UNIQUE_USERS_PLAY => array(
+		ReportType::UNIQUE_USERS_PLAY => array(
 			self::REPORT_FILTER => array(
 				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 				self::DRUID_VALUES => array(self::EVENT_TYPE_PLAY)
@@ -1154,7 +1154,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_METRICS => array(self::METRIC_UNIQUE_USERS),
 		),
 
-		reportType::APP_DOMAIN_UNIQUE_ACTIVE_USERS => array(
+		ReportType::APP_DOMAIN_UNIQUE_ACTIVE_USERS => array(
 			self::REPORT_DATA_SOURCE => self::DATASOURCE_API_USAGE,
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 			self::REPORT_DIMENSION_MAP => array(
@@ -1165,7 +1165,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_METRICS => array(self::METRIC_UNIQUE_USERS)
 		),
 
-		reportType::MAP_OVERLAY_COUNTRY => array(
+		ReportType::MAP_OVERLAY_COUNTRY => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'object_id' =>  self::DIMENSION_LOCATION_COUNTRY,
 				'country' => self::DIMENSION_LOCATION_COUNTRY,
@@ -1186,7 +1186,7 @@ class kKavaReports extends kKavaReportsMgr
 			)
 		),
 
-		reportType::MAP_OVERLAY_REGION => array(
+		ReportType::MAP_OVERLAY_REGION => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'country' => self::DIMENSION_LOCATION_COUNTRY,
 				'region' => self::DIMENSION_LOCATION_REGION,
@@ -1200,7 +1200,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 		),
 
-		reportType::TOP_CONTENT_CREATOR => array(
+		ReportType::TOP_CONTENT_CREATOR => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'object_id' => self::DIMENSION_ENTRY_ID,
 				'entry_name' => self::DIMENSION_ENTRY_ID,
@@ -1235,7 +1235,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_TOTAL_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_USERS),
 		),
 
-		reportType::TOP_CONTENT_CONTRIBUTORS => array(
+		ReportType::TOP_CONTENT_CONTRIBUTORS => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'user_id' => self::DIMENSION_KUSER_ID,
 				'creator_name' => self::DIMENSION_KUSER_ID,
@@ -1290,7 +1290,7 @@ class kKavaReports extends kKavaReportsMgr
 			)
 		),
 
-		reportType::TOP_SOURCES => array(
+		ReportType::TOP_SOURCES => array(
 			self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
 			self::REPORT_DIMENSION_MAP => array(
 				'source' => self::DIMENSION_SOURCE_TYPE
@@ -1308,7 +1308,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_UNIQUE_CONTRIBUTORS),
 		),
 
-		reportType::PERCENTILES => array(
+		ReportType::PERCENTILES => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'percentile' => self::DIMENSION_PERCENTILES
 			),
@@ -1316,14 +1316,14 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addZeroPercentiles',
 		),
 
-		reportType::CONTENT_REPORT_REASONS => array(
+		ReportType::CONTENT_REPORT_REASONS => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'reason' => self::DIMENSION_EVENT_VAR1
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_REPORT_SUBMITTED),
 		),
 
-		reportType::PLAYER_RELATED_INTERACTIONS => array(
+		ReportType::PLAYER_RELATED_INTERACTIONS => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'object_id' => self::DIMENSION_ENTRY_ID,
 				'entry_name' => self::DIMENSION_ENTRY_ID,
@@ -1341,7 +1341,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_SUBMITTED, self::EVENT_TYPE_CAPTIONS, self::EVENT_TYPE_INFO, self::EVENT_TYPE_RELATED_SELECTED),
 		),
 
-		reportType::PLAYBACK_RATE => array(
+		ReportType::PLAYBACK_RATE => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'playback_rate' => self::DIMENSION_EVENT_VAR1
 			),
