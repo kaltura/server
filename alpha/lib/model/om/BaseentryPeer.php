@@ -1436,6 +1436,24 @@ abstract class BaseentryPeer {
 	}
 
 	/**
+	 * Retrieve a single object by int_id.
+	 *
+	 * @param      string $int_id the int_id.
+	 * @param      PropelPDO $con the connection to use
+	 * @return     entry
+	 */
+	public static function retrieveByIntId($int_id, PropelPDO $con = null)
+	{
+		$criteria = new Criteria(entryPeer::DATABASE_NAME);
+		$criteria->add(entryPeer::INT_ID, $int_id);
+		$criteria->add(entryPeer::STATUS ,entryStatus::DELETED , Criteria::NOT_EQUAL );
+
+		$v = entryPeer::doSelect($criteria, $con);
+
+		return !empty($v) > 0 ? $v[0] : null;
+	}
+
+	/**
 	 * Retrieve multiple objects by pkey.
 	 *
 	 * @param      array $pks List of primary keys

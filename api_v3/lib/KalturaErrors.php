@@ -172,6 +172,7 @@ class KalturaErrors extends APIErrors
 
 	const RESOURCE_ENTRY_ID_MISSING= "RESOURCE_ENTRY_ID_MISSING;;Entry Id on resource object is missing";
 
+
 	/**
 	 * Notification Service
 	 */
@@ -183,6 +184,20 @@ class KalturaErrors extends APIErrors
 	 */
 
 	const BULK_UPLOAD_NOT_FOUND = "BULK_UPLOAD_NOT_FOUND;ID;Bulk upload id \"@ID@\" not found";
+
+	/**
+	 * Pexip Service
+	 */
+
+	const PEXIP_MAP_NOT_CONFIGURED = "PEXIP_MAP_NOT_CONFIGURED;;Need to add pexip map support to configuration";
+
+	const PEXIP_ROOM_CREATION_FAILED = "PEXIP_ROOM_CREATION_FAILED;ENTRY;Can't create virtual room for entry \"@ENTRY@\" ";
+
+	const PEXIP_ADP_CREATION_FAILED = "PEXIP_ADP_CREATION_FAILED;ENTRY;Can't create virtual ADP for entry \"@ENTRY@\" ";
+
+	const SIP_ENTRY_SERVER_NODE_CREATION_FAILED = "SIP_ENTRY_SERVER_NODE_CREATION_FAILED ;ENTRY;Can't create sip entry server node for entry \"@ENTRY@\" ";
+
+
 
 	/**
 	 * Widget Service

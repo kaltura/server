@@ -295,7 +295,10 @@ abstract class LiveEntry extends entry
 	
 	public function setLastCuePointSyncTime ( $v )	{	$this->putInCustomData ( "last_cue_point_sync_time" , $v );	}
 	public function getLastCuePointSyncTime (  )	{	return (int) $this->getFromCustomData("last_cue_point_sync_time");	}
-	
+
+	public function setIsSipEnabled ( $v )	{	$this->putInCustomData ( "isSipEnabled" , $v );	}
+	public function getIsSipEnabled (  )	{	return $this->getFromCustomData( "isSipEnabled", null, false );	}
+
 	public function getPushPublishEnabled()
 	{
 		return $this->getFromCustomData("push_publish_enabled");
