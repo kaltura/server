@@ -713,6 +713,26 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 				$c->addAnd(UserEntryPeer::KUSER_ID, $anonKuserIds, Criteria::NOT_IN);
 			}
 		}
+		if ($inputFilter->from_day)
+		{
+			$c->addAnd(UserEntryPeer::UPDATED_AT, $inputFilter->from_day, Criteria::GREATER_EQUAL);
+		}
+
+		if ($inputFilter->to_day)
+		{
+			$c->addAnd(UserEntryPeer::UPDATED_AT, $inputFilter->to_day, Criteria::LESS_EQUAL);
+		}
+
+		if ($inputFilter->from_date && !$inputFilter->from_day)
+		{
+			$c->addAnd(UserEntryPeer::UPDATED_AT, $inputFilter->from_date, Criteria::GREATER_EQUAL);
+		}
+
+		if ($inputFilter->to_date && !$inputFilter->to_day)
+		{
+			$c->addAnd(UserEntryPeer::UPDATED_AT, $inputFilter->to_date, Criteria::LESS_EQUAL);
+		}
+
 		$userEntries = UserEntryPeer::doSelect($c);
 		return $this->getAggregateDataForUsers($userEntries, $orderBy);
 	}
