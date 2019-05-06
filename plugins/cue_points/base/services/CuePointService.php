@@ -65,7 +65,7 @@ class CuePointService extends KalturaBaseService
 	function addAction(KalturaCuePoint $cuePoint)
 	{
 		$dbCuePoint = $cuePoint->toInsertableObject();
-
+        KalturaLog::log("ravit3:  ".print_r($dbCuePoint,true));
 		// check if we have a limitEntry set on the KS, and if so verify that it is the same entry we work on
 		$limitEntry = $this->getKs()->getLimitEntry();
 		if ($limitEntry && $limitEntry != $cuePoint->entryId)
@@ -82,8 +82,17 @@ class CuePointService extends KalturaBaseService
 		
 		/* @var $dbCuePoint CuePoint */
 		$dbCuePoint->setPartnerId($this->getPartnerId());
-		$dbCuePoint->setPuserId(is_null($cuePoint->userId) ? $this->getKuser()->getPuserId() : $cuePoint->userId);
-		$dbCuePoint->setStatus(CuePointStatus::READY); 
+		if(isset($cuePoint->puserId))
+        {
+            $dbCuePoint->setPuserId($cuePoint->puserId);
+            $kuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(),$cuePoint->puserId);
+            $dbCuePoint->setKuserId($kuser->getId());
+        }
+        else
+        {
+            $dbCuePoint->setPuserId(is_null($cuePoint->userId) ? $this->getKuser()->getPuserId() : $cuePoint->userId);
+        }
+        $dbCuePoint->setStatus(CuePointStatus::READY);
 					
 		if($this->getCuePointType())
 			$dbCuePoint->setType($this->getCuePointType());
@@ -421,4 +430,18 @@ class CuePointService extends KalturaBaseService
 				CuePointPeer::setUserContentOnly(false);
 		}
 	}
+
+    /**
+     * analyze Json From AI
+     *
+     * @action analyzeJsonFromAI
+     * @param string $jsPath
+     */
+    function analyzeJsonAction($jsPath)
+    {
+        var_dump("bla bla");
+        $js_content = file_get_contents($jsPath);
+        $decodedJson = json_decode($js_content,true);
+        var_dump($decodedJson);
+    }
 }
