@@ -12,8 +12,10 @@ class textAction extends imagickAction
 	protected $font_size;
 	protected $text;
 	protected $angle;
-	protected $stroke_color;
-	protected $fill_color;
+	protected $strokeColor;
+	protected $fillColor;
+	protected $maxWidth;
+	protected $maxHeight;
 
 	protected $parameterAlias = array(
 		"f" => kThumbnailParameterName::FONT,
@@ -23,6 +25,12 @@ class textAction extends imagickAction
 		"a" => kThumbnailParameterName::ANGLE,
 		"sc" => kThumbnailParameterName::STROKE_COLOR,
 		"fc" => kThumbnailParameterName::FILL_COLOR,
+		"w" => kThumbnailParameterName::WIDTH,
+		"maxwidth" => kThumbnailParameterName::WIDTH,
+		"mw" => kThumbnailParameterName::WIDTH,
+		"h" => kThumbnailParameterName::HEIGHT,
+		"maxheight" => kThumbnailParameterName::HEIGHT,
+		"mh" => kThumbnailParameterName::HEIGHT,
 	);
 
 	protected function extractActionParameters()
@@ -34,14 +42,16 @@ class textAction extends imagickAction
 		$this->text = trim(urldecode($this->text));
 		$this->font = $this->getActionParameter(kThumbnailParameterName::FONT, 'Courier');
 		$this->angle = $this->getFloatActionParameter(kThumbnailParameterName::ANGLE, 0);
-		$this->stroke_color = $this->getColorActionParameter(kThumbnailParameterName::STROKE_COLOR, "black");
-		$this->fill_color = $this->getColorActionParameter(kThumbnailParameterName::FILL_COLOR, "black");
+		$this->strokeColor = $this->getColorActionParameter(kThumbnailParameterName::STROKE_COLOR, "black");
+		$this->fillColor = $this->getColorActionParameter(kThumbnailParameterName::FILL_COLOR, "black");
+		$this->maxHeight = $this->getIntActionParameter(kThumbnailParameterName::HEIGHT);
+		$this->maxWidth = $this->getIntActionParameter(kThumbnailParameterName::WIDTH);
 	}
 
-	function validateInput()
+	protected function validateInput()
 	{
-		$this->validateColorParameter($this->stroke_color);
-		$this->validateColorParameter($this->fill_color);
+		$this->validateColorParameter($this->strokeColor);
+		$this->validateColorParameter($this->fillColor);
 		if(!$this->text)
 		{
 			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, "You must supply a text for this action");
@@ -56,37 +66,15 @@ class textAction extends imagickAction
 		$draw = new ImagickDraw();
 		$draw->setFont($this->font);
 		$draw->setFontSize($this->font_size);
-		$draw->setStrokeColor($this->stroke_color);
-		$draw->setFillColor($this->fill_color);
-		$this->image->annotateImage($draw, $this->x, $this->y, $this->angle, $this->text);
-		return $this->image;
-	}
-
-	function wordWrapAnnotation($image, $draw, $text, $maxWidth)
-	{
-		$words = preg_split('%\s%', $text, -1, PREG_SPLIT_NO_EMPTY);
-		$lines = array();
-		$i = 0;
-		$lineHeight = 0;
-
-		while (count($words) > 0)
+		$draw->setStrokeColor($this->strokeColor);
+		$draw->setFillColor($this->fillColor);
+		if($this->maxWidth || $this->maxHeight)
 		{
-			$metrics = $image->queryFontMetrics($draw, implode(' ', array_slice($words, 0, ++$i)));
-			$lineHeight = max($metrics['textHeight'], $lineHeight);
-
-			// check if we have found the word that exceeds the line width
-			if ($metrics['textWidth'] > $maxWidth or count($words) < $i)
-			{
-				// handle case where a single word is longer than the allowed line width (just add this as a word on its own line?)
-				if ($i == 1)
-					$i++;
-
-				$lines[] = implode(' ', array_slice($words, 0, --$i));
-				$words = array_slice($words, $i);
-				$i = 0;
-			}
+			$wordWrapHelper = new wordWrapHelper($this->image, $draw, $this->text, $this->maxWidth, $this->maxHeight);
+			$this->text = $wordWrapHelper->calculateWordWrap();
 		}
 
-		return array($lines, $lineHeight);
+		$this->image->annotateImage($draw, $this->x, $this->y, $this->angle, $this->text);
+		return $this->image;
 	}
 }
