@@ -45,7 +45,7 @@ class kCountryCondition extends kMatchCondition
 	{
 		kApiCache::addExtraField(array("type" => kApiCache::ECF_COUNTRY,
 			kApiCache::ECFD_GEO_CODER_TYPE => $this->getGeoCoderType()),
-			kApiCache::COND_MATCH, $this->getStringValues($scope));
+			kApiCache::COND_COUNTRY_MATCH, $this->getStringValues($scope));
 		
 		$ip = $scope->getIp();
 		$ipGeo = kGeoCoderManager::getGeoCoder($this->getGeoCoderType());

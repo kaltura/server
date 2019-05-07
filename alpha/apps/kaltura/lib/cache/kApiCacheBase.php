@@ -26,12 +26,13 @@ class kApiCacheBase
 	//	in the cache key instead of taking the whole country (2 possible cache key values for
 	//	the entry, instead of 200)
 	const COND_NONE = '';
-	const COND_MATCH = 'match';					// used by kCountryCondition
+	const COND_MATCH = 'match';					// used by kAnonymousIPCondition
 	const COND_MATCH_ALL = 'matchAll';
 	const COND_REGEX = 'regex';					// used by kUserAgentCondition
 	const COND_SITE_MATCH = 'siteMatch';		// used by kSiteCondition
 	const COND_IP_RANGE = 'ipRange';			// used by kIpAddressCondition
 	const COND_GEO_DISTANCE = 'geoDistance';	// used by kGeoDistanceCondition
+	const COND_COUNTRY_MATCH = 'countryMatch';	// used by kCountryCondition
 	
 	// cache statuses
 	const CACHE_STATUS_ACTIVE = 0;				// cache was not explicitly disabled
