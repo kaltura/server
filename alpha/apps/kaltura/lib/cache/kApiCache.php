@@ -345,11 +345,6 @@ class kApiCache extends kApiCacheBase
 			if (!count($refValue))
 				return null;
 			
-			//Get trimmed lower case values of all configured allowed country codes.
-			array_walk($refValue, function (&$value) {
-				$value = trim(strtolower($value), " \n\r\t");
-			});
-			
 			return in_array(trim(strtolower($fieldValue), " \n\r\t"), $refValue);
 			
 		case self::COND_REGEX:
