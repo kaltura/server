@@ -33,7 +33,7 @@
                     <item objectType="KalturaEventFieldCondition">
                         <description>Tags equals</description>
                         <field objectType="KalturaEvalBooleanField">
-                            <code>array_intersect(array_map('trim',explode(',',$scope->getDynamicValueByKey("trigger_tags"))),array_diff($scope->getObject()->getTagsArr(),array_map('trim',explode(',',$scope->getEvent()->getObject()->getColumnsOldValues()['entry.TAGS']))))</code>
+                            <code>array_intersect(array_map('trim',explode(',',strtolower($scope->getDynamicValueByKey("trigger_tags")))),array_diff($scope->getObject()->getTagsArr(),array_map('trim',explode(',',$scope->getEvent()->getObject()->getColumnsOldValues()['entry.TAGS']))))</code>
                         </field>
                     </item>
                 </eventConditions>
