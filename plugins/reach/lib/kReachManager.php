@@ -463,7 +463,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		}
 
 		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $sourceFlavorVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC);
-		$entryVendorTask->save();
+		if($entryVendorTask)
+		{
+			$entryVendorTask->save();
+		}
 		return $entryVendorTask;
 	}
 
@@ -471,7 +474,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	{
 		if($entry->getIsTemporary())
 		{
-			KalturaLog::debug("Entry [$entryId] is temporary, entry vendor task object wont be created for it");
+			KalturaLog::debug("Entry [{$entry->getId()}] is temporary, entry vendor task object wont be created for it");
 			return;
 		}
 		
