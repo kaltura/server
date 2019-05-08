@@ -17,7 +17,14 @@
 - Issue ID: PLAT-9843
 
 ### configuration ###
-    Add the following to admin.ini:
+    Create new map in config named 'blocked_actions_per_account" and add to it blocked actions for default or for specific partner in the following way:
+
+    [PARTNER_ID]
+    0 = ".*:add.*"
+    1 = ".*:delete.*"
+    2 = ".*:update.*"
+	
+    Also add the following to admin.ini:
     
     moduls.limitAllowedActions.enabled = true
     moduls.limitAllowedActions.permissionType = 2
