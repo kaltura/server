@@ -1,6 +1,6 @@
 <?php
 /**
- * This class should contain all the maps names used in code
+ * This class should contain configuration map names
  **/
 class kConfMapNames
 {
