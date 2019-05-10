@@ -245,7 +245,7 @@ class languageCodeManager
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'KU', "ku", "kur", "kur", "Kurdish", "Kurd\xc3\xae, \xd9\x83\xd9\x88\xd8\xb1\xd8\xaf\xdb\x8c\xe2\x80\x8e",'Kurdish');
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'KJ', "kj", "kua", "kua", "Kwanyama, Kuanyama", "Kuanyama".'Kwanyama, Kuanyama','Kwanyama, Kuanyama');//not yet defined in kaltura
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'LA', "la", "lat", "lat", "Latin", "latine, lingua latina",'Latin');
-        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'LB', "lb", "ltz", "ltz", "Luxembourgish, Letzeburgesch", "L\xc3\xabtzebuergesch",'Luxembourgish, Letzeburgesch');//not yet defined in kaltura
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'LB', "lb", "ltz", "ltz", "Luxembourgish, Letzeburgesch", "L\xc3\xabtzebuergesch",'Luxembourgish (Letzeburgesch)');
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'LG', "lg", "lug", "lug", "Ganda", "Luganda",'Ganda');//not yet defined in kaltura
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'LI', "li", "lim", "lim", "Limburgish, Limburgan, Limburger", "Limburgs",'Limburgish ( Limburger)');
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'LN', "ln", "lin", "lin", "Lingala", "Ling\xc3\xa1la",'Lingala');

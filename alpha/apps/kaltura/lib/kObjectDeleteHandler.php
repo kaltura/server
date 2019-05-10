@@ -109,8 +109,13 @@ class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDe
 			$flavorParamsOutput->save();
 		}
 		
-		EntryServerNodePeer::deleteByEntryId($entry->getId());
-		
+		$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($entry->getId());
+		foreach ($entryServerNodes  as $entryServerNode)
+		{
+			/** @var EntryServerNode $entryServerNode */
+			$entryServerNode->delete();
+		}
+
 		$filter = new categoryEntryFilter();
 		$filter->setEntryIdEqual($entry->getId());
 		
