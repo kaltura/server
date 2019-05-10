@@ -297,7 +297,7 @@ class kSessionBase
 	
 	static protected function getSecretsCacheKey($partnerId)
 	{
-		return self::SECRETS_CACHE_PREFIX . kConf::get('secrets_cache_version', 'local', '1') . '_' . $partnerId;
+		return self::SECRETS_CACHE_PREFIX . kConf::get('secrets_cache_version', 'cache_versions', '1') . '_' . $partnerId;
 	}
 	
 	static public function getSecretsFromCache($partnerId)
