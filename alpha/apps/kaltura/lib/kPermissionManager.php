@@ -73,7 +73,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	
 	private static function getCacheKeyPrefix()
 	{
-		return self::GLOBAL_CACHE_KEY_PREFIX . kConf::get('permission_cache_version', 'cache_versions', '');
+		return self::GLOBAL_CACHE_KEY_PREFIX . kConf::get('permission_cache_version', kConfMapNames::CACHE_VERSIONS, '');
 	}
 	
 	/**

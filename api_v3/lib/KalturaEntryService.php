@@ -172,6 +172,7 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function approveReplace($dbEntry)
 	{
+
 		switch ($dbEntry->getReplacementStatus())
 		{
 			case entryReplacementStatus::APPROVED_BUT_NOT_READY:
