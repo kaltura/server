@@ -10,7 +10,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	 */
 	protected static $booleanNotificationTemplatesFulfilled;
 	protected static $booleanNotificationTemplatesFromReachProfiles;
-	protected static $reachProfilesFilteredWithoutBooleanEventNotifications;
+	protected static $reachProfilesFilteredThatIncludesRegularRules;
 	protected static $isInit = false;
 	CONST PROFILE_ID = 0;
 	CONST CONDITION = 1;
@@ -83,11 +83,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		//will hold array of: array(profileId,condition,action) where there are boolean event notification ids.
 		self::$booleanNotificationTemplatesFromReachProfiles = array();
 		//will hold the reach profiles without boolean event notification ids.
-		self::$reachProfilesFilteredWithoutBooleanEventNotifications = array();
+		self::$reachProfilesFilteredThatIncludesRegularRules = array();
 		$reachProfiles = ReachProfilePeer::retrieveByPartnerId($partnerId);
 		foreach ($reachProfiles as $profile)
 		{
-			$profileWasAdded = 0;
 			$rules = $profile->getRulesArray();
 			foreach ($rules as $rule)
 			{
@@ -100,13 +99,14 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 					if ( $condition->getType()== ConditionType::BOOLEAN && $condition->getbooleanEventNotificationIds() && $condition->getbooleanEventNotificationIds() != "N/A")
 					{
 						self::$booleanNotificationTemplatesFromReachProfiles[] = array($profile->getId(), $condition, $rule->getActions());
-						$profileWasAdded++;
+					}
+					else if ( $condition->getType()== ConditionType::BOOLEAN &&
+						(!$condition->getbooleanEventNotificationIds() ||
+							($condition->getbooleanEventNotificationIds() && $condition->getbooleanEventNotificationIds() == "N/A" )))
+					{
+						self::$reachProfilesFilteredThatIncludesRegularRules[] = $profile;
 					}
 				}
-			}
-			if ($profileWasAdded == 0)
-			{
-				self::$reachProfilesFilteredWithoutBooleanEventNotifications[] = $profile;
 			}
 		}
 	}
@@ -564,9 +564,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryId = $object->getEntryId();
 		$scope->setEntryId($entryId);
 		$this->initReachProfileForPartner($object->getPartnerId());
-		if (self::$reachProfilesFilteredWithoutBooleanEventNotifications)
+		if (self::$reachProfilesFilteredThatIncludesRegularRules)
 		{
-			foreach (self::$reachProfilesFilteredWithoutBooleanEventNotifications as $profile)
+			foreach (self::$reachProfilesFilteredThatIncludesRegularRules as $profile)
 			{
 				/* @var $profile ReachProfile */
 				$fullFieldCatalogItemIds = $profile->fulfillsRules($scope, $checkEmptyRulesOnly);

@@ -440,8 +440,6 @@ class ReachProfile extends BaseReachProfile
 	 */
 	public function fulfillsRules(kScope $scope, $checkEmptyRulesOnly = false)
 	{
-		$gotBooleanCondition = false;
-		$gotNonBooleanCondition = false;
 		$fullFilledCatalogItemIds = array();
 		if(!is_array($this->getRulesArray()) || !count($this->getRulesArray()))
 			return $fullFilledCatalogItemIds;
@@ -449,6 +447,9 @@ class ReachProfile extends BaseReachProfile
 		$context = new kContextDataResult();
 		foreach ($this->getRulesArray() as $rule)
 		{
+			$gotBooleanCondition = false;
+			$gotNonBooleanCondition = false;
+
 			if (count($rule->getConditions()))
 			{
 				foreach ($rule->getConditions() as $condition)
