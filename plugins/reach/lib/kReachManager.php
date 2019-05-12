@@ -82,7 +82,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		self::$isInit = true;
 		//will hold array of: array(profileId,condition,action) where there are boolean event notification ids.
 		self::$booleanNotificationTemplatesFromReachProfiles = array();
-		//will hold the reach profiles without boolean event notification ids.
+		//will hold the reach profiles the includes regular rules (may contain boolean rules as well - when there are mixed rules).
 		self::$reachProfilesFilteredThatIncludesRegularRules = array();
 		$reachProfiles = ReachProfilePeer::retrieveByPartnerId($partnerId);
 		foreach ($reachProfiles as $profile)
