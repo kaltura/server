@@ -90,11 +90,10 @@ class PexipHandler
 				$virtualRoom = self::getVirtualRoom($pexipConfig, self::ROOM_NAME_KEY , $roomName);
 				if ($virtualRoom && isset($virtualRoom['id']))
 				{
-//					if (self::shouldUpdateRoomAlias($virtualRoom, $alias) )
-//					{
-//						self::updateRoomAlias($virtualRoom['id'], $pexipConfig, $alias);
-//					}
-					return $virtualRoom['id'];
+					if (!self::shouldUpdateRoomAlias($virtualRoom, $alias) || self::updateRoomAlias( $virtualRoom['id'], $pexipConfig, $alias))
+					{
+						$virtualRoomId = $virtualRoom['id'];
+					}
 				}
 			}
 			else
@@ -212,6 +211,26 @@ class PexipHandler
 	}
 
 	/**
+	 * @param $room
+	 * @param $alias
+	 * @return bool
+	 */
+	protected static function shouldUpdateRoomAlias($room, $alias)
+	{
+		return true;
+		if (isset($room['aliases']))
+		{
+			foreach ($room['aliases'] as $aliasItem)
+			{
+				if ($aliasItem['alias'] == $alias)
+					return false;
+			}
+		}
+		return true;
+	}
+
+
+	/**
 	 * @param LiveStreamEntry $entry
 	 * @param $roomId
 	 * @param $participantAddress
@@ -250,16 +269,12 @@ class PexipHandler
 			{
 				KalturaLog::info("ADP for alias " . $participantAddress . " already exists.");
 				$adp = self::getADP($pexipConfig, self::ADP_ALIAS_KEY, $participantAddress);
-				if ($adp)
+				if ($adp && isset($adp['id']))
 				{
-					if (!self::shouldUpdateAdp($adp, $roomId))
-					{
-						return $adp['id'];
-					}
-					if (!self::updateADP($adp['id'], $roomId, $pexipConfig))
-					{
-						return $adpId;
-					}
+					if (!self::shouldUpdateAdp($adp, $roomId) || self::updateADP($adp['id'], $roomId, $pexipConfig))
+						{
+							$adpId = $adp['id'];
+						}
 				}
 			}
 			else
@@ -303,11 +318,10 @@ class PexipHandler
 	 * @param $roomId
 	 * @param $pexipConfig
 	 * @param $alias
-	 * @return null
+	 * @return bool
 	 */
-	protected static function updateRoom($roomId, $pexipConfig, $alias)
+	protected static function updateRoomAlias($roomId, $pexipConfig, $alias)
 	{
-		$adpId =null;
 		KalturaLog::info("Updating Room $roomId");
 
 		$roomData = array(
@@ -322,9 +336,10 @@ class PexipHandler
 		if ($curlWrapper->getHttpCode() != KCurlHeaderResponse::HTTP_STATUS_ACCEPTED )
 		{
 			PexipUtils::logError($curlWrapper, $url);
+			return false;
 		}
 		$curlWrapper->close();
-		return $adpId;
+		return true;
 	}
 
 	/**
