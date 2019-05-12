@@ -97,7 +97,11 @@ class PexipService extends KalturaBaseService
 			KalturaLog::err("Live entry for call not Validated!");
 			return $response;
 		}
-		//	TODO - PexipHandler::validateEnoughLicenses();
+
+		if(!PexipUtils::validateLicensesAvailable($pexipConfig))
+		{
+			return $response;
+		}
 
 		$sipEntryServerNode = PexipUtils::createSipEntryServerNode($dbLiveEntry, $dbLiveEntry->getSipRoomId(), $dbLiveEntry->getPrimaryAdpId(), $dbLiveEntry->getSecondaryAdpId());
 		/** @var  SipEntryServerNode $sipEntryServerNode */

@@ -237,6 +237,27 @@ class PexipUtils
 	}
 
 	/**
+	 * @param $pexipConfig
+	 * @return bool
+	 */
+	public static function validateLicensesAvailable($pexipConfig)
+	{
+		$result = PexipHandler::listRooms(0, 1, $pexipConfig, true);
+		if (empty($result))
+		{
+			KalturaLog::debug("Could Not retrieve active rooms - available licenes not validated!");
+			return false;
+		}
+		if ($result['meta']['total_count'] >= $pexipConfig['licenseThreshold'])
+		{
+			KalturaLog::debug("Max number of active rooms reached - active rooms count is " . $result['meta']['total_count'] . "- available licenes not validated!");
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * @param KCurlWrapper $curlWrapper
 	 * @param $url
 	 */
