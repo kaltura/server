@@ -1217,7 +1217,7 @@ class PHPMailer
     function EncodeQ ($str, $position = "text") {
 		// There should not be any EOL in the string
 		$pattern = '';
-		$encoded = str_replace(["\r", "\n"], '', $str);
+		$encoded = str_replace(array("\r", "\n"), '', $str);
 		switch (strtolower($position)) {
 			case 'phrase':
 				// RFC 2047 section 5.3
@@ -1239,7 +1239,7 @@ class PHPMailer
 				$pattern = '\000-\011\013\014\016-\037\075\077\137\177-\377' . $pattern;
 				break;
 		}
-		$matches = [];
+		$matches = array();
 		if (preg_match_all("/[{$pattern}]/", $encoded, $matches)) {
 			// If the string contains an '=', make sure it's the first thing we replace
 			// so as to avoid double-encoding
