@@ -23,6 +23,24 @@ class PexipUtils
 	}
 
 	/**
+	 * @param $dbLiveEntry
+	 * @param $pexipConfig
+	 * @param $regenerate
+	 * @return string
+	 */
+	public static function createSipUrl(LiveStreamEntry $dbLiveEntry, $pexipConfig, $regenerate = false)
+	{
+		if (!$dbLiveEntry->getSipToken() || $regenerate)
+		{
+			$addition = str_pad(substr((string)microtime(true)*10000, -5),5,'0',STR_PAD_LEFT);
+			$sipToken = $dbLiveEntry->getPartnerId() . $addition;
+			$dbLiveEntry->setSipToken($sipToken);
+			$dbLiveEntry->save();
+		}
+		$sipUrl = $dbLiveEntry->getSipToken() . "@" . $pexipConfig['hostUrl'];
+		return $sipUrl;
+	}
+	/**
 	 * @param $entry
 	 * @param $pexipConfig
 	 * @return string
@@ -50,11 +68,6 @@ class PexipUtils
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_TYPE, $dbEntry->getName(), $dbEntry->getType(), entryType::LIVE_STREAM);
 		}
 
-		if (!kConf::hasMap('sip'))
-		{
-			throw new KalturaAPIException(KalturaErrors::PEXIP_MAP_NOT_CONFIGURED);
-		}
-
 		return $dbEntry;
 	}
 
@@ -65,16 +78,24 @@ class PexipUtils
 	 */
 	public static function retrieveAndValidateEntryForSipCall($queryParams, $pexipConfig)
 	{
-		$intId = self::extractIntIdFromAddress($queryParams, $pexipConfig);
-		if (!$intId)
+		$sipToken = self::extractSipTokenFromAddress($queryParams, $pexipConfig);
+		if (!$sipToken)
 		{
 			return false;
 		}
 
-		$dbLiveEntry = entryPeer::retrieveByIntId($intId);
+		$partnerId = substr($sipToken, 0, -5);
+		kCurrentContext::$partner_id = $partnerId;
+		entryPeer::setUseCriteriaFilter ( false );
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$criterion = $c->getNewCriterion(entryPeer::PARTNER_ID, $partnerId);
+		$c->addAnd($criterion);
+		$c->addAnd($c->getNewCriterion(entryPeer::SIP_TOKEN, $sipToken,KalturaCriteria::EQUAL));
+		$dbLiveEntry = entryPeer::doSelectOne($c);
+		entryPeer::setUseCriteriaFilter ( true );
 		if (!$dbLiveEntry)
 		{
-			KalturaLog::err("Entry was not found for int_id $intId");
+			KalturaLog::err("Entry was not found for int_id $sipToken");
 			return false;
 		}
 
@@ -92,13 +113,31 @@ class PexipUtils
 
 		if (!$dbLiveEntry->getIsSipEnabled())
 		{
-			KalturaLog::err("Sip flag is not enabled for entry " . $dbLiveEntry->getId() . " - geneateSipUrl action should be called before connecting to entry");
+			KalturaLog::err("Sip flag is not enabled for entry " . $dbLiveEntry->getId() . " - generateSipUrl action should be called before connecting to entry");
 			return false;
 		}
 
-		if ($dbLiveEntry->isCurrentlyLive(false, false))
+		if ($dbLiveEntry->isCurrentlyLive(false))
 		{
 			KalturaLog::err("Entry Is currently Live. will not allow call.");
+			return false;
+		}
+
+		if (!$dbLiveEntry->getSipRoomId())
+		{
+			KalturaLog::err("Missing Sip Room Id - generateSipUrl action should be called before connecting to entry");
+			return false;
+		}
+
+		if (!$dbLiveEntry->getPrimaryAdpId())
+		{
+			KalturaLog::err("Missing Primary Adp Id - generateSipUrl action should be called before connecting to entry");
+			return false;
+		}
+
+		if (!$dbLiveEntry->getSecondaryAdpId())
+		{
+			KalturaLog::err("Missing Secondary Adp Id - generateSipUrl action should be called before connecting to entry");
 			return false;
 		}
 
@@ -109,9 +148,9 @@ class PexipUtils
 	 * @param null $pexipConfig
 	 * @return bool
 	 */
-	protected static function extractIntIdFromAddress($queryParams, $pexipConfig)
+	protected static function extractSipTokenFromAddress($queryParams, $pexipConfig)
 	{
-		KalturaLog::debug("Extracting entry int_id from local_alias: " . $queryParams['local_alias']);
+		KalturaLog::debug("Extracting entry sip token from local_alias: " . $queryParams['local_alias']);
 		$intIdPattern = '/(?<=sip:)(.*)(?=@' . $pexipConfig['hostUrl'] . ')/';
 		preg_match($intIdPattern, $queryParams['local_alias'], $matches);
 		if (empty($matches))
@@ -119,7 +158,7 @@ class PexipUtils
 			KalturaLog::debug("Could Not extract entry int_id from local_alias");
 			return false;
 		}
-		KalturaLog::debug("Entry int_id extracted : $matches[0]");
+		KalturaLog::debug("Entry sip token extracted : $matches[0]");
 		return $matches[0];
 	}
 
@@ -191,11 +230,6 @@ class PexipUtils
 		if (!isset($queryParams['local_alias']))
 		{
 			KalturaLog::debug("Missing local_alias param");
-			return false;
-		}
-		if (!isset($queryParams['call_direction']) || $queryParams['call_direction'] != 'dial_in')
-		{
-			KalturaLog::debug("call_direction not validated!");
 			return false;
 		}
 		// TODO - validate origin call came from pexip server

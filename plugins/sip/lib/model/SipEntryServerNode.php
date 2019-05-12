@@ -90,22 +90,6 @@ class SipEntryServerNode extends EntryServerNode
 	public function postDelete(PropelPDO $con = null)
 	{
 		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_ENTRY_SREVER_NODE_SIP, "serverNodeId=".$this->getServerNodeId().":action=deleted");
-		KalturaLog::debug("Deleting SipEntryServerNode with id ".$this->getId());
-
-		$liveEntry = entryPeer::retrieveByPK($this->getEntryId());
-		if ($liveEntry)
-		{
-			/** @var LiveEntry $liveEntry * */
-			$liveEntry->setIsSipEnabled(false);
-			$liveEntry->save();
-		}
-
-		$pexipConfig = PexipUtils::initAndValidateConfig();
-		if ($pexipConfig)
-		{
-			PexipHandler::deleteCallobjects($this->getSipRoomId(),$this->getSipRoomPrimaryADP(), $this->getSipRoomSecondaryADP(), $pexipConfig);
-		}
-
 		parent::postDelete($con);
 	}
 

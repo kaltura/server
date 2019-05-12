@@ -23,10 +23,11 @@ class PexipService extends KalturaBaseService
 	/**
 	 * @action generateSipUrl
 	 * @param string $entryId
+	 * @param bool $regenerate
 	 * @return string
 	 * @throws Exception
 	 */
-	public function generateSipUrlAction($entryId)
+	public function generateSipUrlAction($entryId = '0_g6nbeccz', $regenerate = false)
 	{
 		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_SIP, $this->getPartnerId()))
 		{
@@ -39,15 +40,16 @@ class PexipService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::PEXIP_MAP_NOT_CONFIGURED);
 		}
 
+		/** @var LiveStreamEntry $dbLiveEntry */
 		$dbLiveEntry = PexipUtils::validateAndRetrieveEntry($entryId);
 
-		$dbLiveEntry->setIsSipEnabled(true);
-		$dbLiveEntry->save();
+		if ($regenerate)
+		{
+			PexipHandler::deleteCallObjects($dbLiveEntry, $pexipConfig);
+		}
 
-		PexipHandler::createCallObjects($dbLiveEntry, $pexipConfig);
-
-		$sipUrl = $dbLiveEntry->getIntId() . "@" . $pexipConfig['hostUrl'];
-
+		$sipUrl = PexipUtils::createSipUrl($dbLiveEntry, $pexipConfig, $regenerate);
+		PexipHandler::createCallObjects($dbLiveEntry, $pexipConfig, $sipUrl);
 		return $sipUrl;
 	}
 
@@ -72,22 +74,40 @@ class PexipService extends KalturaBaseService
 			return $response;
 		}
 
-		$liveEntry = PexipUtils::retrieveAndValidateEntryForSipCall($queryParams, $pexipConfig);
-		if (!$liveEntry)
+		if ($queryParams['call_direction'] != 'dial_in')
+		{
+			KalturaLog::debug("call_direction " . $queryParams['call_direction'] ." not validated!");
+			$response->action = "done";
+			return $response;
+		}
+
+		KalturaLog::debug("call_direction validated!");
+		try
+		{
+			$dbLiveEntry = PexipUtils::retrieveAndValidateEntryForSipCall($queryParams, $pexipConfig);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err("Error validating and retrieving Entry for sip Call");
+			return $response;
+		}
+		/** @var LiveEntry $dbLiveEntry */
+		if (!$dbLiveEntry)
 		{
 			KalturaLog::err("Live entry for call not Validated!");
 			return $response;
 		}
-
 		//	TODO - PexipHandler::validateEnoughLicenses();
-		$sipEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($liveEntry->getId(), SipPlugin::getCoreValue('EntryServerNodeType', SipEntryServerNodeType::SIP_ENTRY_SERVER ));
+
+		$sipEntryServerNode = PexipUtils::createSipEntryServerNode($dbLiveEntry, $dbLiveEntry->getSipRoomId(), $dbLiveEntry->getPrimaryAdpId(), $dbLiveEntry->getSecondaryAdpId());
+		/** @var  SipEntryServerNode $sipEntryServerNode */
 		if (!$sipEntryServerNode)
 		{
-			KalturaLog::info("SipEntryServerNode not found. Please generate sip url.");
+			KalturaLog::info("Could not create or retrieve SipEntryServerNode.");
 			return $response;
 		}
 
-		$response->action = "continue";
+		$response->action = "done";
 		return $response;
 	}
 
@@ -95,10 +115,11 @@ class PexipService extends KalturaBaseService
 	 * @action listRooms
 	 * @param int $offset
 	 * @param int $pageSize
+	 * @param bool $activeOnly
 	 * @return KalturaStringValueArray
 	 * @throws KalturaAPIException
 	 */
-	public function listRoomsAction($offset = 0, $pageSize = 500 )
+	public function listRoomsAction($offset = 0, $pageSize = 500, $activeOnly = false )
 	{
 		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_SIP, $this->getPartnerId()))
 		{
@@ -110,7 +131,7 @@ class PexipService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::PEXIP_MAP_NOT_CONFIGURED);
 		}
 
-		return KalturaStringValueArray::fromDbArray(PexipHandler::listRooms($offset, $pageSize, $pexipConfig));
+		return KalturaStringValueArray::fromDbArray(PexipHandler::listRooms($offset, $pageSize, $pexipConfig, $activeOnly));
 	}
 
 }

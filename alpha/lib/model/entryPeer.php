@@ -12,6 +12,7 @@ class entryPeer extends BaseentryPeer
 	const PRIVACY_BY_CONTEXTS = 'entry.PRIVACY_BY_CONTEXTS';
 	const ENTITLED_KUSERS = 'entry.ENTITLED_KUSERS';
 	const CREATOR_KUSER_ID = 'entry.CREATOR_KUSER_ID';
+	const SIP_TOKEN = 'entry.SIP_TOKEN';
 	const ENTRY_ID = 'entry.ENTRY_ID';
 
 	const ENTRIES_PER_ACCESS_CONTROL_UPDATE_LIMIT = 1000;

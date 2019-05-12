@@ -3905,6 +3905,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 			'plays_7days' => $this->getPlaysLast7Days(),
 			'views_1day' => $this->getViewsLastDay(),
 			'plays_1day' => $this->getPlaysLastDay(),
+			'sip_token' => $this->getSipToken()
 		);
 
 		$this->addCategoriesToObjectParams($body);
