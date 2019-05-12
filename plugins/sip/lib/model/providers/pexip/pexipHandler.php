@@ -19,6 +19,7 @@ class PexipHandler
 	/**
 	 * @param LiveStreamEntry $dbLiveEntry
 	 * @param $pexipConfig
+	 * @param $alias
 	 * @throws KalturaAPIException
 	 */
 	public static function createCallObjects(LiveStreamEntry $dbLiveEntry, $pexipConfig, $alias)
@@ -70,7 +71,8 @@ class PexipHandler
 		$data = array(
 			'name' => $roomName,
 			'service_type' => 'conference',
-			'aliases' => array(array('alias' => $alias))
+			'aliases' => array(array('alias' => $alias)),
+			'participant_limit' => 3
 		);
 		$curlWrapper = self::initPexipCurlWrapper(HttpMethods::POST, $pexipConfig, $data);
 
@@ -343,9 +345,9 @@ class PexipHandler
 	}
 
 	/**
-	 * @param $liveEntry
+	 * @param LiveEntry $liveEntry
 	 * @param $pexipConfig
-	 * @return bool|null
+	 * @throws PropelException
 	 */
 	public static function deleteCallObjects(LiveEntry $liveEntry, $pexipConfig)
 	{
@@ -384,10 +386,8 @@ class PexipHandler
 		$curlWrapper = self::initPexipCurlWrapper(HttpMethods::DELETE, $pexipConfig);
 		$results = $curlWrapper->exec($url);
 		$httpCode = $curlWrapper->getHttpCode();
-		KalturaLog::info("Status code is : $httpCode");
-
 		KalturaLog::info("HTTP Request httpCode [" . $httpCode . "] Results [$results]");
-		if ($results && $httpCode == KCurlHeaderResponse::HTTP_STATUS_NO_CONTENT)
+		if ($httpCode == KCurlHeaderResponse::HTTP_STATUS_NO_CONTENT)
 		{
 			KalturaLog::info("Pexip Item With id $itemId was deleted succesfully");
 		}
@@ -420,7 +420,6 @@ class PexipHandler
 		$curlWrapper = self::initPexipCurlWrapper(HttpMethods::GET, $pexipConfig);
 		$result = $curlWrapper->exec($url);
 		$httpCode = $curlWrapper->getHttpCode();
-		KalturaLog::info("Status code is : $httpCode");
 		$curlWrapper->close();
 		KalturaLog::info("HTTP Request httpCode [" . $httpCode . "]");
 		if (!$result || $httpCode != KCurlHeaderResponse::HTTP_STATUS_OK)
