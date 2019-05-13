@@ -10,6 +10,7 @@ abstract class kThumbnailAction
 	abstract protected function validateInput();
 	protected $actionParameters = array();
 	protected $parameterAlias = array();
+	protected $transformationParameters;
 
 	protected function getActionParameter($actionParameterName, $default = null)
 	{

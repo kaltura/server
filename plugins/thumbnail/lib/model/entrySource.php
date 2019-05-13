@@ -27,6 +27,15 @@ class entrySource extends thumbnailSource
 		return $this->dbEntry->getMediaType();
 	}
 
+
+	/**
+	 * @return entry
+	 */
+	public function getEntry()
+	{
+		return $this->dbEntry;
+	}
+
 	public function getImage()
 	{
 		if($this->getEntryMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)

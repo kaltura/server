@@ -6,6 +6,7 @@
 
 class imageTransformationStep
 {
+	/** @var thumbnailSource */
 	protected $source;
 	protected $imageActionCollection = array();
 	protected $useCompositeObject = false;

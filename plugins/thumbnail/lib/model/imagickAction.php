@@ -9,8 +9,6 @@ abstract class imagickAction extends kThumbnailAction
 	/* @var Imagick $image */
 	protected $image;
 
-	protected $transformationParameters;
-
 	/**
 	 * @return Imagick
 	 */
