@@ -1215,27 +1215,46 @@ class PHPMailer
      * @return string
      */
     function EncodeQ ($str, $position = "text") {
-        // There should not be any EOL in the string
-        $encoded = preg_replace("[\r\n]", "", $str);
-
-        switch (strtolower($position)) {
-          case "phrase":
-            $encoded = preg_replace("/([^A-Za-z0-9!*+\/ -])/e", "'='.sprintf('%02X', ord('\\1'))", $encoded);
-            break;
-          case "comment":
-            $encoded = preg_replace("/([\(\)\"])/e", "'='.sprintf('%02X', ord('\\1'))", $encoded);
-          case "text":
-          default:
-            // Replace every high ascii, control =, ? and _ characters
-            $encoded = preg_replace('/([\000-\011\013\014\016-\037\075\077\137\177-\377])/e',
-                  "'='.sprintf('%02X', ord('\\1'))", $encoded);
-            break;
-        }
-        
-        // Replace every spaces to _ (more readable than =20)
-        $encoded = str_replace(" ", "_", $encoded);
-
-        return $encoded;
+		// There should not be any EOL in the string
+		$pattern = '';
+		$encoded = str_replace(array("\r", "\n"), '', $str);
+		switch (strtolower($position)) {
+			case 'phrase':
+				// RFC 2047 section 5.3
+				$pattern = '^A-Za-z0-9!*+\/ -';
+				break;
+			/*
+			 * RFC 2047 section 5.2.
+			 * Build $pattern without including delimiters and []
+			 */
+			/* @noinspection PhpMissingBreakStatementInspection */
+			case 'comment':
+				$pattern = '\(\)"';
+			/* Intentional fall through */
+			case 'text':
+			default:
+				// RFC 2047 section 5.1
+				// Replace every high ascii, control, =, ? and _ characters
+				/** @noinspection SuspiciousAssignmentsInspection */
+				$pattern = '\000-\011\013\014\016-\037\075\077\137\177-\377' . $pattern;
+				break;
+		}
+		$matches = array();
+		if (preg_match_all("/[{$pattern}]/", $encoded, $matches)) {
+			// If the string contains an '=', make sure it's the first thing we replace
+			// so as to avoid double-encoding
+			$eqkey = array_search('=', $matches[0]);
+			if (false !== $eqkey) {
+				unset($matches[0][$eqkey]);
+				array_unshift($matches[0], '=');
+			}
+			foreach (array_unique($matches[0]) as $char) {
+				$encoded = str_replace($char, '=' . sprintf('%02X', ord($char)), $encoded);
+			}
+		}
+		// Replace spaces with _ (more readable than =20)
+		// RFC 2047 section 4.2(2)
+		return str_replace(' ', '_', $encoded);
     }
 
     /**

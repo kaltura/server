@@ -1,3 +1,40 @@
+# Naos 14.20.0 #
+
+## new boolean event notification template ##
+- Issue Type: Task
+- Issue ID: PLAT-9814
+
+### Configuration ###
+	First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2019_04_28_tagEqualsBooleanNotification.template.xml
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/2019_04_28_deploy_tag_equals_boolean_notification.php
+
+## Add permission in Admin Console for limiting the allowed action for partner ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-9843
+
+### configuration ###
+    Create new map in config named 'blocked_actions_per_account" and add to it blocked actions for default or for specific partner in the following way:
+
+    [PARTNER_ID]
+    0 = ".*:add.*"
+    1 = ".*:delete.*"
+    2 = ".*:update.*"
+	
+    Also add the following to admin.ini:
+    
+    moduls.limitAllowedActions.enabled = true
+    moduls.limitAllowedActions.permissionType = 2
+    moduls.limitAllowedActions.label = Limit allowed actions
+    moduls.limitAllowedActions.permissionName = FEATURE_LIMIT_ALLOWED_ACTIONS
+    moduls.limitAllowedActions.group = GROUP_ENABLE_DISABLE_FEATURES
+    
+### Deployment scripts ###
+    None
+	
 # Naos 14.19.0 #
 
 ## Move maps to dynamic configuration ##

@@ -340,7 +340,13 @@ class kApiCache extends kApiCacheBase
 					return true;
 			}
 			return false;
-				
+		
+		case self::COND_COUNTRY_MATCH:
+			if (!count($refValue))
+				return null;
+			
+			return in_array(trim(strtolower($fieldValue), " \n\r\t"), $refValue);
+			
 		case self::COND_REGEX:
 			if (!count($refValue))
 				return null;
@@ -396,6 +402,7 @@ class kApiCache extends kApiCacheBase
 		case self::COND_MATCH_ALL:
 		case self::COND_SITE_MATCH:
 		case self::COND_GEO_DISTANCE:
+		case self::COND_COUNTRY_MATCH:
 			return "_{$condition}_" . implode(',', $refValue);
 		case self::COND_IP_RANGE:
 			return "_{$condition}_" . implode(',', str_replace('/', '_', $refValue)); // ip range can contain slashes

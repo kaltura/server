@@ -71,6 +71,8 @@ class KalturaReachErrors implements kReachErrors
 	
 	const FAILED_EXTEND_ACCESS_KEY = "FAILED_EXTEND_ACCESS_KEY;;Extending accessKey operation failed";
 	
+	const TASK_NOT_CREATED = "TASK_NOT_CREATED;ENTRY_ID,CATALOG_ITEM_ID;Failed to create task for entry [@ENTRY_ID@] and catalog item [@CATALOG_ITEM_ID@]";
+	
 	/* Credit */
 	
 	const OVERAGE_CREDIT_CANNOT_BE_NEGATIVE = "OVERAGE_CREDIT_CANNOT_BE_NEGATIVE;;Overage credit value cannot be negative";
