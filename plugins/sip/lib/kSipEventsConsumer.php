@@ -9,11 +9,8 @@ class kSipEventsConsumer implements kObjectDeletedEventConsumer
 	{
 		try 
 		{
-				$pexipConfig = PexipUtils::initAndValidateConfig();
-				if ($pexipConfig)
-				{
-					PexipHandler::deleteCallObjects($object, $pexipConfig);
-				}
+			$pexipConfig = PexipUtils::initAndValidateConfig();
+			PexipHandler::deleteCallObjects($object, $pexipConfig);
 		}
 		catch(Exception $e)
 		{
@@ -25,12 +22,13 @@ class kSipEventsConsumer implements kObjectDeletedEventConsumer
 	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
 	 */
-	public function shouldConsumeDeletedEvent(BaseObject $object) 
+	public function shouldConsumeDeletedEvent(BaseObject $object)
 	{
-		if($object instanceof LiveStreamEntry && $object->getIsSipEnabled())
+		if ($object instanceof LiveStreamEntry && $object->getIsSipEnabled())
+		{
 			return true;
-		else		
-			return false;		
+		}
+		return false;
 	}
 	
 }

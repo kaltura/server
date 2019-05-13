@@ -6,6 +6,9 @@
  */
 class PexipService extends KalturaBaseService
 {
+	const CALL_DIRECTION_PARAM_NAME = 'call_direction';
+	const CALL_DIRECTION_DIAL_IN = 'dial_in';
+
 	/**
 	 * no partner will be provided by vendors as this called externally and not from kaltura
 	 * @param string $actionName
@@ -13,7 +16,7 @@ class PexipService extends KalturaBaseService
 	 */
 	protected function partnerRequired($actionName)
 	{
-		if ($actionName == 'handleIncomingCall')
+		if ($actionName === 'handleIncomingCall')
 		{
 			return false;
 		}
@@ -27,7 +30,7 @@ class PexipService extends KalturaBaseService
 	 * @return string
 	 * @throws Exception
 	 */
-	public function generateSipUrlAction($entryId = '0_g6nbeccz', $regenerate = false)
+	public function generateSipUrlAction($entryId, $regenerate = false)
 	{
 		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_SIP, $this->getPartnerId()))
 		{
@@ -35,10 +38,6 @@ class PexipService extends KalturaBaseService
 		}
 
 		$pexipConfig = PexipUtils::initAndValidateConfig();
-		if (!$pexipConfig)
-		{
-			throw new KalturaAPIException(KalturaErrors::PEXIP_MAP_NOT_CONFIGURED);
-		}
 
 		/** @var LiveStreamEntry $dbLiveEntry */
 		$dbLiveEntry = PexipUtils::validateAndRetrieveEntry($entryId);
@@ -48,7 +47,11 @@ class PexipService extends KalturaBaseService
 			PexipHandler::deleteCallObjects($dbLiveEntry, $pexipConfig);
 		}
 
-		$sipUrl = PexipUtils::createSipUrl($dbLiveEntry, $pexipConfig, $regenerate);
+		$sipToken = PexipUtils::generateSipToken($dbLiveEntry, $regenerate);
+		$dbLiveEntry->setSipToken($sipToken);
+		$dbLiveEntry->save();
+		$sipUrl = $sipToken . PexipUtils::SIP_URL_DELIMITER . $pexipConfig[PexipUtils::CONFIG_HOST_URL];
+
 		PexipHandler::createCallObjects($dbLiveEntry, $pexipConfig, $sipUrl);
 		return $sipUrl;
 	}
@@ -57,14 +60,18 @@ class PexipService extends KalturaBaseService
 	 * @action handleIncomingCall
 	 * @return bool
 	 */
-	public function handleIncomingCall()
+	public function handleIncomingCallAction()
 	{
 		$response = new KalturaSipResponse();
 		$response->action = "reject";
 
-		$pexipConfig = PexipUtils::initAndValidateConfig();
-		if (!$pexipConfig)
+		try
 		{
+			$pexipConfig = PexipUtils::initAndValidateConfig();
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
 			return $response;
 		}
 
@@ -74,14 +81,14 @@ class PexipService extends KalturaBaseService
 			return $response;
 		}
 
-		if ($queryParams['call_direction'] != 'dial_in')
+		if ($queryParams[self::CALL_DIRECTION_PARAM_NAME] != self::CALL_DIRECTION_DIAL_IN)
 		{
-			KalturaLog::debug("call_direction " . $queryParams['call_direction'] ." not validated!");
+			KalturaLog::debug(self::CALL_DIRECTION_PARAM_NAME . " " . $queryParams[self::CALL_DIRECTION_PARAM_NAME] ." not validated!");
 			$response->action = "done";
 			return $response;
 		}
 
-		KalturaLog::debug("call_direction validated!");
+		KalturaLog::debug(self::CALL_DIRECTION_PARAM_NAME . " validated!");
 		try
 		{
 			$dbLiveEntry = PexipUtils::retrieveAndValidateEntryForSipCall($queryParams, $pexipConfig);
@@ -91,6 +98,7 @@ class PexipService extends KalturaBaseService
 			KalturaLog::err("Error validating and retrieving Entry for sip Call");
 			return $response;
 		}
+
 		/** @var LiveEntry $dbLiveEntry */
 		if (!$dbLiveEntry)
 		{
@@ -130,11 +138,6 @@ class PexipService extends KalturaBaseService
 			throw new KalturaAPIException (APIErrors::FEATURE_FORBIDDEN, $this->serviceId . '->' . $this->actionName);
 		}
 		$pexipConfig = PexipUtils::initAndValidateConfig();
-		if (!$pexipConfig)
-		{
-			throw new KalturaAPIException(KalturaErrors::PEXIP_MAP_NOT_CONFIGURED);
-		}
-
 		return KalturaStringValueArray::fromDbArray(PexipHandler::listRooms($offset, $pageSize, $pexipConfig, $activeOnly));
 	}
 

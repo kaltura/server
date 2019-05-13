@@ -113,7 +113,7 @@ class LiveStreamEntry extends LiveEntry
 	public function getPrimaryAdpId(  )	{	return $this->getFromCustomData( "primaryAdpId", null, false );	}
 	public function setSecondaryAdpId( $v )	{	$this->putInCustomData ( "secondaryAdpId" , $v );	}
 	public function getSecondaryAdpId(  )	{	return $this->getFromCustomData( "secondaryAdpId", null, false );	}
-	public function setSipToken ( $v ){	$this->putInCustomData ( "sipToken" , $v );	}
-	public function getSipToken( )  { return $this->getFromCustomData( "sipToken", null, null ); }
+	public function setSipToken ( $v )  {	$this->putInCustomData ( "sipToken" , $v );	}
+	public function getSipToken( )  { return $this->getFromCustomData( "sipToken" ); }
 
 }

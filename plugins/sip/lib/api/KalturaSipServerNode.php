@@ -21,7 +21,9 @@ class KalturaSipServerNode extends KalturaServerNode
 	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if(is_null($object_to_fill))
+		{
 			$object_to_fill = new SipServerNode();
+		}
 			
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
@@ -32,7 +34,9 @@ class KalturaSipServerNode extends KalturaServerNode
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if(!$dbObject)
+		{
 			$dbObject = new SipServerNode();
+		}
 	
 		return parent::toObject($dbObject, $skip);
 	}

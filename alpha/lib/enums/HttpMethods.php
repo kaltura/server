@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package plugins.sip
+ * @package Core
  * @subpackage model.enum
  */
 interface HttpMethods extends BaseEnum

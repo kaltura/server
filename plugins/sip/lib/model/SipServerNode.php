@@ -20,12 +20,4 @@ class SipServerNode extends ServerNode {
 	}
 
 
-	/* (non-PHPdoc)
-	 * @see BaseEntryServerNode::postUpdate()
- 	*/
-	public function postUpdate(PropelPDO $con = null)
-	{
-		parent::postUpdate();
-	}
-
 } // SipServerNode

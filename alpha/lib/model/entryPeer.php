@@ -338,19 +338,6 @@ class entryPeer extends BaseentryPeer
 	}
 
 	/**
-	 * @param string $intId
-	 * @param PropelPDO|null $con
-	 * @return entry
-	 */
-	public static function retrieveByIntId($intId, PropelPDO $con = null)
-	{
-		self::setUseCriteriaFilter ( false );
-		$res = parent::retrieveByIntId( $intId , $con );
-		self::setUseCriteriaFilter ( true );
-		return $res;
-	}
-
-	/**
 	 * find all the entries from a list of ids that have the proper status to be considered non-pending
 	 */
 	public static function retrievePendingEntries ($pks, $con = null)

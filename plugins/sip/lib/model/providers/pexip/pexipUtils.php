@@ -6,10 +6,20 @@
 
 class PexipUtils
 {
+	const CONFIG_LICENSE_THRESHOLD = 'licenseThreshold';
+	const CONFIG_HOST_URL = 'hostUrl';
+	const CONFIG_API_ADDRESS = 'apiAddress';
+	const CONFIG_USER_NAME = 'userName';
+	const CONFIG_PASSWORD = 'password';
+	const SIP_URL_DELIMITER = '@';
+	const PARAM_META = 'meta';
+	const PARAM_TOTAL_COUNT = 'total_count';
+	const PARAM_LOCAL_ALIAS = 'local_alias';
+
 	/**
-	 * @return bool
+	 * @return bool|null
 	 * @throws Exception
-	 * @throws kCoreException
+	 * @throws KalturaAPIException
 	 */
 	public static function initAndValidateConfig()
 	{
@@ -18,28 +28,24 @@ class PexipUtils
 			return $pexipConfig;
 		}
 
-		KalturaLog::debug("Pexip misconfigured. please validate configuration.");
-		return false;
+		throw new KalturaAPIException(KalturaErrors::PEXIP_MAP_NOT_CONFIGURED);
 	}
 
 	/**
-	 * @param $dbLiveEntry
-	 * @param $pexipConfig
-	 * @param $regenerate
+	 * @param LiveStreamEntry $dbLiveEntry
+	 * @param bool $regenerate
 	 * @return string
 	 */
-	public static function createSipUrl(LiveStreamEntry $dbLiveEntry, $pexipConfig, $regenerate = false)
+	public static function generateSipToken(LiveStreamEntry $dbLiveEntry, $regenerate = false)
 	{
 		if (!$dbLiveEntry->getSipToken() || $regenerate)
 		{
-			$addition = str_pad(substr((string)microtime(true)*10000, -5),5,'0',STR_PAD_LEFT);
-			$sipToken = $dbLiveEntry->getPartnerId() . $addition;
-			$dbLiveEntry->setSipToken($sipToken);
-			$dbLiveEntry->save();
+			$addition = str_pad(substr((string)microtime(true) * 10000, -5), 5, '0', STR_PAD_LEFT);
+			return $dbLiveEntry->getPartnerId() . $addition;
 		}
-		$sipUrl = $dbLiveEntry->getSipToken() . "@" . $pexipConfig['hostUrl'];
-		return $sipUrl;
+		return $dbLiveEntry->getSipToken();
 	}
+
 	/**
 	 * @param $entry
 	 * @param $pexipConfig
@@ -47,7 +53,7 @@ class PexipUtils
 	 */
 	public static function getRoomName(LiveEntry $entry, $pexipConfig)
 	{
-		return $entry->getId() . "@" . $pexipConfig['hostUrl'];
+		return $entry->getId() . "@" . $pexipConfig[self::CONFIG_HOST_URL];
 	}
 
 	/**
@@ -150,9 +156,9 @@ class PexipUtils
 	 */
 	protected static function extractSipTokenFromAddress($queryParams, $pexipConfig)
 	{
-		KalturaLog::debug("Extracting entry sip token from local_alias: " . $queryParams['local_alias']);
-		$intIdPattern = '/(?<=sip:)(.*)(?=@' . $pexipConfig['hostUrl'] . ')/';
-		preg_match($intIdPattern, $queryParams['local_alias'], $matches);
+		KalturaLog::debug("Extracting entry sip token from local_alias: " . $queryParams[self::PARAM_LOCAL_ALIAS]);
+		$intIdPattern = '/(?<=sip:)(.*)(?=@' . $pexipConfig[self::CONFIG_HOST_URL] . ')/';
+		preg_match($intIdPattern, $queryParams[self::PARAM_LOCAL_ALIAS], $matches);
 		if (empty($matches))
 		{
 			KalturaLog::debug("Could Not extract entry int_id from local_alias");
@@ -227,9 +233,9 @@ class PexipUtils
 		parse_str($_SERVER['QUERY_STRING'], $queryParams);
 
 		KalturaLog::debug("Retrieved qurey params :" . print_r($queryParams, true));
-		if (!isset($queryParams['local_alias']))
+		if (!isset($queryParams[self::PARAM_LOCAL_ALIAS]))
 		{
-			KalturaLog::debug("Missing local_alias param");
+			KalturaLog::debug("Missing " . self::PARAM_LOCAL_ALIAS . " param");
 			return false;
 		}
 		// TODO - validate origin call came from pexip server
@@ -248,9 +254,9 @@ class PexipUtils
 			KalturaLog::debug("Could Not retrieve active rooms - available licenes not validated!");
 			return false;
 		}
-		if ($result['meta']['total_count'] >= $pexipConfig['licenseThreshold'])
+		if ($result[self::PARAM_META][self::PARAM_TOTAL_COUNT] >= $pexipConfig[self::CONFIG_LICENSE_THRESHOLD])
 		{
-			KalturaLog::debug("Max number of active rooms reached - active rooms count is " . $result['meta']['total_count'] . "- available licenes not validated!");
+			KalturaLog::debug("Max number of active rooms reached - active rooms count is " . $result[self::PARAM_META][self::PARAM_TOTAL_COUNT] . "- available licenes not validated!");
 			return false;
 		}
 

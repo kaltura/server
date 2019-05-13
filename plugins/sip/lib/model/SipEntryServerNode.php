@@ -80,17 +80,4 @@ class SipEntryServerNode extends EntryServerNode
 		}
 		return true;
 	}
-
-	public function postInsert(PropelPDO $con = null)
-	{
-		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_ENTRY_SREVER_NODE_SIP, "serverNodeId=".$this->getServerNodeId().":action=created");
-		parent::postInsert($con);
-	}
-
-	public function postDelete(PropelPDO $con = null)
-	{
-		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_ENTRY_SREVER_NODE_SIP, "serverNodeId=".$this->getServerNodeId().":action=deleted");
-		parent::postDelete($con);
-	}
-
 }
