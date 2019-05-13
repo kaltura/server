@@ -1060,7 +1060,7 @@
 														<td><?php echo $historyRecord->hostName; ?></td>
 														<td><?php echo $historyRecord->sessionId; ?></td>
 														<td><?php echo $historyRecord->schedulerId; ?></td>
-														<td><?php echo $historyRecord->schedulerName; ?></td>
+														<td><?php echo isset($historyRecord->schedulerName) ? $historyRecord->schedulerName : "N/A"; ?></td>
 														<td><?php echo $historyRecord->workerId; ?></td>
 														<td><?php echo $historyRecord->batchIndex; ?></td>
 														<td><?php echo $historyRecord->message; ?></td>
