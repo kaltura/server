@@ -17,6 +17,10 @@ class resizeAction extends imagickAction
 	protected $compositeFit;
 	protected $compositeObject;
 
+	const MAX_IMAGE_SIZE = 10000;
+	const BEST_FIT_MIN = 1;
+	CONST MIN_DIMENSION = 0;
+
 	protected $parameterAlias = array(
 		"w" => kThumbnailParameterName::WIDTH,
 		"h" => kThumbnailParameterName::HEIGHT,
@@ -57,22 +61,22 @@ class resizeAction extends imagickAction
 
 	protected function validateDimensions()
 	{
-		if($this->bestFit && $this->newWidth < 1)
+		if($this->bestFit && $this->newWidth < self::BEST_FIT_MIN)
 		{
 			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'If bestfit is supplied parameter width must be positive');
 		}
 
-		if($this->bestFit && $this->newHeight < 1)
+		if($this->bestFit && $this->newHeight < self::BEST_FIT_MIN)
 		{
 			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, ' If bestfit is supplied parameter height must be positive');
 		}
 
-		if(!is_numeric($this->newWidth) || $this->newWidth < 0 || $this->newWidth > 10000)
+		if(!is_numeric($this->newWidth) || $this->newWidth < self::MIN_DIMENSION || $this->newWidth > self::MAX_IMAGE_SIZE)
 		{
 			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'width must be between 0 and 10000');
 		}
 
-		if(!is_numeric($this->newHeight) || $this->newHeight < 0 || $this->newHeight > 10000)
+		if(!is_numeric($this->newHeight) || $this->newHeight < self::MIN_DIMENSION || $this->newHeight > self::MAX_IMAGE_SIZE)
 		{
 			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'height must be between 0 and 10000');
 		}

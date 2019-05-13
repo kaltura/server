@@ -7,10 +7,10 @@ interface kThumbnailParameterName extends BaseEnum
 {
 	const WIDTH = "width";
 	const HEIGHT = "height";
-	const BACKGROUND_COLOR = "background_color";
-	const GRAVITY_POINT = "gravity_point";
-	const BEST_FIT = "best_fit";
-	const FILTER_TYPE = "filter_type";
+	const BACKGROUND_COLOR = "backgroundColor";
+	const GRAVITY_POINT = "gravityPoint";
+	const BEST_FIT = "bestFit";
+	const FILTER_TYPE = "filterType";
 	const BLUR = "blur";
 	const X = "x";
 	const Y = "y";
@@ -26,4 +26,6 @@ interface kThumbnailParameterName extends BaseEnum
 	const ANGLE = "angle";
 	const STROKE_COLOR = "strokeColor";
 	const FILL_COLOR = "fillColor";
+	const SECOND = "second";
+	const ENTRY_SOURCE = "entrySource";
 }

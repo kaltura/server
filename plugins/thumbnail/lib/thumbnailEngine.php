@@ -65,7 +65,7 @@ class thumbnailEngine
 		$sourceType = $sourceParameters[self::SOURCE_TYPE_INDEX];
 		switch($sourceType)
 		{
-			case "id":
+			case kSourceType::ID:
 				$source = new entrySource($sourceParameters[self::SOURCE_VALUE_INDEX]);
 				break;
 			default:

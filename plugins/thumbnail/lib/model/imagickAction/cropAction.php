@@ -82,6 +82,8 @@ class cropAction extends imagickAction
 				case kCropGravityPoint::CENTER:
 					$this->image->cropImage($this->newWidth, $this->newHeight, $this->currentWidth / 2, $this->currentHeight / 2);
 					break;
+				default:
+					throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'illegal gravity point value');
 			}
 		}
 

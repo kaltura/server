@@ -13,6 +13,9 @@ class compositeAction extends imagickAction
 	protected $compositeObject;
 	protected $opacity;
 
+	const MAX_OPACITY = "100";
+	const MIN_OPACITY = "1";
+
 	protected $parameterAlias = array(
 		"ct" => kThumbnailParameterName::COMPOSITE_TYPE,
 		"ch" => kThumbnailParameterName::CHANNEL,
@@ -31,7 +34,7 @@ class compositeAction extends imagickAction
 
 	protected function validateInput()
 	{
-		if($this->opacity && ($this->opacity < 1 || $this->opacity > 100))
+		if($this->opacity && ($this->opacity < self::MIN_OPACITY || $this->opacity > SELF::MAX_OPACITY))
 		{
 			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'opacity must be between 1-100');
 		}
