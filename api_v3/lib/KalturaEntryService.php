@@ -170,10 +170,7 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			return false;
 		}
-		else
-		{
-			return true;
-		}
+		return true;
 	}
 
 	/**
