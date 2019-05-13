@@ -450,22 +450,20 @@ class ReachProfile extends BaseReachProfile
 			$gotBooleanCondition = false;
 			$gotNonBooleanCondition = false;
 
-			if (count($rule->getConditions()))
+			foreach ($rule->getConditions() as $condition)
 			{
-				foreach ($rule->getConditions() as $condition)
+				if ($condition->getType() == ConditionType::BOOLEAN && $condition->getbooleanEventNotificationIds() && $condition->getbooleanEventNotificationIds() !== kReachManager::EMPTY_STRING)
 				{
-					if ($condition->getType() == ConditionType::BOOLEAN && $condition->getbooleanEventNotificationIds() && $condition->getbooleanEventNotificationIds() != "N/A")
-					{
-						$gotBooleanCondition = true;
-						break;
-					}
-					else if($condition->getType() != ConditionType::BOOLEAN)
-					{
-						$gotNonBooleanCondition = true;
-						break;
-					}
+					$gotBooleanCondition = true;
+					break;
+				}
+				else if($condition->getType() != ConditionType::BOOLEAN)
+				{
+					$gotNonBooleanCondition = true;
+					break;
 				}
 			}
+
 			if ($gotBooleanCondition)
 				continue;
 

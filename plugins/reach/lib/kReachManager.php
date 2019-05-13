@@ -15,6 +15,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	CONST PROFILE_ID = 0;
 	CONST CONDITION = 1;
 	CONST ACTION = 2;
+	CONST EMPTY_STRING = "N/A";
 
 	protected function getObjectType($eventObjectClassName)
 	{
@@ -96,13 +97,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				}
 				foreach ($rule->getConditions() as $condition)
 				{
-					if ( $condition->getType()== ConditionType::BOOLEAN && $condition->getbooleanEventNotificationIds() && $condition->getbooleanEventNotificationIds() != "N/A")
+					if ( $condition->getType()== ConditionType::BOOLEAN && $condition->getbooleanEventNotificationIds() && $condition->getbooleanEventNotificationIds() !== self::EMPTY_STRING)
 					{
 						self::$booleanNotificationTemplatesFromReachProfiles[] = array($profile->getId(), $condition, $rule->getActions());
 					}
-					else if ( $condition->getType()== ConditionType::BOOLEAN &&
-						(!$condition->getbooleanEventNotificationIds() ||
-							($condition->getbooleanEventNotificationIds() && $condition->getbooleanEventNotificationIds() == "N/A" )))
+					else
 					{
 						self::$reachProfilesFilteredThatIncludesRegularRules[] = $profile;
 					}
