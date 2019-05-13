@@ -1126,21 +1126,18 @@
 							Zend_Registry::get('config')->settings->kelloggsDashboard->jwtKey
 						)
 						{
-							$timestamp = $track->createdAt;
-							$server = $track->hostName;
-							$session = $track->sessionId;
 							$filter = array(
 								'type' => 'apiLogFilter',
-								'fromTime' => strval($timestamp - 300),
-								'toTime' => strval($timestamp + 300),
-								'server' => $server,
-								'session' => $session,
+								'fromTime' => strval($track->createdAt - 300),
+								'toTime' => strval($track->createdAt + 300),
+								'server' => $track->hostName,
+								'session' => $track->sessionId,
 							);
 							$hash = base64_encode(gzcompress(json_encode($filter)));
 							$url = $this->serverUrl()."/admin_console/index.php/index/kelloggs#$hash\n";
-							$track->kellogUrl = $url;
+							$track->kelloggsUrl = $url;
 							
-							?><td><a href="<?php echo $track->kellogUrl; ?>" target="_blank"><?php echo $track->sessionId; ?></a></td><?php
+							?><td><a href="<?php echo $track->kelloggsUrl; ?>" target="_blank"><?php echo $track->sessionId; ?></a></td><?php
 						}
 						else
 						{
