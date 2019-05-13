@@ -20,6 +20,7 @@ class PexipHandler
 	 * @param LiveStreamEntry $dbLiveEntry
 	 * @param $pexipConfig
 	 * @param $alias
+	 * @return array
 	 * @throws KalturaAPIException
 	 */
 	public static function createCallObjects(LiveStreamEntry $dbLiveEntry, $pexipConfig, $alias)
@@ -51,11 +52,7 @@ class PexipHandler
 			Throw new KalturaAPIException(KalturaErrors::SIP_ENTRY_SERVER_NODE_CREATION_FAILED, $dbLiveEntry->getId());
 		}
 
-		$dbLiveEntry->setSipRoomId($roomId);
-		$dbLiveEntry->setPrimaryAdpId($primaryAdpId);
-		$dbLiveEntry->setSecondaryAdpId($secondaryAdpId);
-		$dbLiveEntry->setIsSipEnabled(true);
-		$dbLiveEntry->save();
+		return array($roomId, $primaryAdpId, $secondaryAdpId);
 	}
 
 	/**
