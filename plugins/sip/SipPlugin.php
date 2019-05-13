@@ -2,9 +2,10 @@
 /**
  * @package plugins.sip
  */
-class SipPlugin extends KalturaPlugin implements   IKalturaObjectLoader, IKalturaEnumerator, IKalturaServices
+class SipPlugin extends KalturaPlugin implements   IKalturaObjectLoader, IKalturaEnumerator, IKalturaServices, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'sip';
+	const SIP_EVENTS_CONSUMER = 'kSipEventsConsumer';
 
 	public static function getPluginName()
 	{
@@ -77,5 +78,15 @@ class SipPlugin extends KalturaPlugin implements   IKalturaObjectLoader, IKaltur
 			'pexip' => 'PexipService',
 		);
 		return $map;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaEventConsumers::getEventConsumers()
+	 */
+	public static function getEventConsumers()
+	{
+		return array(
+			self::SIP_EVENTS_CONSUMER,
+		);
 	}
 }
