@@ -1120,7 +1120,33 @@
 						<td><?php echo $track->userId; ?></td>
 						<td><?php echo $track->userIp; ?></td>
 						<td><?php echo $track->changedProperties; ?></td>
-						<td><?php echo $track->sessionId; ?></td>
+						<?php
+						if (Zend_Registry::get('config')->settings->kelloggsDashboard &&
+							Zend_Registry::get('config')->settings->kelloggsDashboard->url &&
+							Zend_Registry::get('config')->settings->kelloggsDashboard->jwtKey
+						)
+						{
+							$timestamp = $track->createdAt;
+							$server = $track->hostName;
+							$session = $track->sessionId;
+							$filter = array(
+								'type' => 'apiLogFilter',
+								'fromTime' => strval($timestamp - 300),
+								'toTime' => strval($timestamp + 300),
+								'server' => $server,
+								'session' => $session,
+							);
+							$hash = base64_encode(gzcompress(json_encode($filter)));
+							$url = $this->serverUrl()."/admin_console/index.php/index/kelloggs#$hash\n";
+							$track->kellogUrl = $url;
+							
+							?><td><a href="<?php echo $track->kellogUrl; ?>" target="_blank"><?php echo $track->sessionId; ?></a></td><?php
+						}
+						else
+						{
+							?><td><?php echo $track->sessionId; ?></td><?php
+						}
+						?>
 						<td><?php echo $track->ks; ?></td>
 						<td><?php echo $track->description; ?></td>
 						<td><?php echo date($this->translate('time format'), $track->createdAt); ?></td>
