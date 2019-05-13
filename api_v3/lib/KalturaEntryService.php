@@ -164,6 +164,18 @@ class KalturaEntryService extends KalturaBaseService
 		}
 	}
 
+	public function isApproveReplaceRequired($dbEntry)
+	{
+		if ($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
 	/**
 	 * Approves entry replacement
 	 *
@@ -172,6 +184,11 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function approveReplace($dbEntry)
 	{
+		if (!$this->isApproveReplaceRequired($dbEntry))
+		{
+			return;
+		}
+
 		switch ($dbEntry->getReplacementStatus())
 		{
 			case entryReplacementStatus::APPROVED_BUT_NOT_READY:

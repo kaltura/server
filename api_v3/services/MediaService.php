@@ -849,11 +849,6 @@ class MediaService extends KalturaEntryService
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		$this->validateEntryForReplace($entryId, $dbEntry, KalturaEntryType::MEDIA_CLIP);
-		if ($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
-		{
-			KalturaLog::debug("The media type of entry id: ".$dbEntry->getId(). " is image, no need to approve replace");
-			return $this->getEntry($entryId, -1, KalturaEntryType::MEDIA_CLIP);
-		}
 		$this->approveReplace($dbEntry);
 
 		$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entryId, $dbEntry->getPartnerId());
