@@ -10,6 +10,7 @@ class embedPlaykitJsAction extends sfAction
 	const PARTNER_ID_PARAM_NAME = "partner_id";
 	const VERSIONS_PARAM_NAME = "versions";
 	const ENTRY_ID_PARAM_NAME = "entry_id";
+	const KS_PARAM_NAME = "ks";
 	const CONFIG_PARAM_NAME = "config";	
 	const REGENERATE_PARAM_NAME = "regenerate";
 	const IFRAME_EMBED_PARAM_NAME = "iframeembed";
@@ -325,6 +326,13 @@ class embedPlaykitJsAction extends sfAction
 		
 		$config["provider"]->partnerId = $this->partnerId;
 		$config["provider"]->uiConfId = $this->uiconfId;
+
+		$ks = $this->getRequestParameter(self::KS_PARAM_NAME);	
+
+		if ($ks) 
+		{
+			$config["provider"]->ks = $ks;
+		}
 
 		$config["targetId"] = $targetId;
 
