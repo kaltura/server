@@ -118,14 +118,14 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
  	*/
 	public function shouldConsumeEvent(KalturaEvent $event)
 	{
-		self::$booleanNotificationTemplatesFulfilled = array();
-		$fulfilled = 0;
 		$scope = $event->getScope();
 		$partnerId = $scope->getPartnerId();
 		if (!ReachPlugin::isAllowedPartner($partnerId))
 		{
 			return false;
 		}
+		
+		self::$booleanNotificationTemplatesFulfilled = array();
 		$eventType = kEventNotificationFlowManager::getEventType($event);
 		$eventObjectClassName = kEventNotificationFlowManager::getEventObjectType($event);
 		$objectType = self::getObjectType($eventObjectClassName);
@@ -470,7 +470,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return $entryVendorTask;
 	}
 
-	public static function addEntryVendorTask(entry $entry, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = null)
+	public static function addEntryVendorTask(entry $entry, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = EntryVendorTaskCreationMode::MANUAL)
 	{
 		if($entry->getIsTemporary())
 		{
