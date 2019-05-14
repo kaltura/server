@@ -120,12 +120,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	{
 		$scope = $event->getScope();
 		$partnerId = $scope->getPartnerId();
+		self::$booleanNotificationTemplatesFulfilled = array();
 		if (!ReachPlugin::isAllowedPartner($partnerId))
 		{
 			return false;
 		}
 		
-		self::$booleanNotificationTemplatesFulfilled = array();
 		$eventType = kEventNotificationFlowManager::getEventType($event);
 		$eventObjectClassName = kEventNotificationFlowManager::getEventObjectType($event);
 		$objectType = self::getObjectType($eventObjectClassName);
