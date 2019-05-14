@@ -134,18 +134,6 @@ class PexipUtils
 			return false;
 		}
 
-		if (!$dbLiveEntry->getPrimaryAdpId())
-		{
-			KalturaLog::err("Missing Primary Adp Id - generateSipUrl action should be called before connecting to entry");
-			return false;
-		}
-
-		if (!$dbLiveEntry->getSecondaryAdpId())
-		{
-			KalturaLog::err("Missing Secondary Adp Id - generateSipUrl action should be called before connecting to entry");
-			return false;
-		}
-
 		return $dbLiveEntry;
 	}
 
@@ -168,8 +156,11 @@ class PexipUtils
 	}
 
 	/**
-	 * @param $entryId
-	 * @return EntryServerNode
+	 * @param LiveEntry $entry
+	 * @param $roomId
+	 * @param $primaryAdpId
+	 * @param $secondaryAdpId
+	 * @return bool|EntryServerNode|mixed
 	 */
 	public static function createSipEntryServerNode(LiveEntry $entry, $roomId, $primaryAdpId, $secondaryAdpId)
 	{
@@ -195,7 +186,10 @@ class PexipUtils
 
 	/**
 	 * @param $entry
-	 * @return bool|SipEntryServerNode
+	 * @param $roomId
+	 * @param $primaryAdpId
+	 * @param $secondaryAdpId
+	 * @return EntryServerNode|SipEntryServerNode
 	 * @throws PropelException
 	 */
 	public static function createSipEntryServerNodeImpl($entry, $roomId, $primaryAdpId, $secondaryAdpId)

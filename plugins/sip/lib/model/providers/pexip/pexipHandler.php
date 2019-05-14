@@ -25,31 +25,39 @@ class PexipHandler
 	 */
 	public static function createCallObjects(LiveStreamEntry $dbLiveEntry, $pexipConfig, $alias)
 	{
-		$roomId = PexipHandler::addVirtualRoom($dbLiveEntry, $pexipConfig, $alias);
+		$roomId = self::addVirtualRoom($dbLiveEntry, $pexipConfig, $alias);
 		if (!$roomId)
 		{
-			Throw new KalturaAPIException(KalturaErrors::PEXIP_ROOM_CREATION_FAILED, $dbLiveEntry->getId());
+			throw new KalturaAPIException(KalturaErrors::PEXIP_ROOM_CREATION_FAILED, $dbLiveEntry->getId());
 		}
-		$primaryRtmp = $dbLiveEntry->getPrimaryBroadcastingUrl() . "&i=0/" . $dbLiveEntry->getStreamName();
-		$primaryAdpId = PexipHandler::addADP($dbLiveEntry, $roomId, $primaryRtmp, "Primary", $pexipConfig);
-		if (!$primaryAdpId)
+		$primaryAdpId = null;
+		if ($dbLiveEntry->getPrimaryBroadcastingUrl())
 		{
-			Throw new KalturaAPIException(KalturaErrors::PEXIP_ADP_CREATION_FAILED, $dbLiveEntry->getId());
+			$primaryRtmp = $dbLiveEntry->getPrimaryBroadcastingUrl() . "&i=0/" . $dbLiveEntry->getStreamName();
+			$primaryAdpId = self::addADP($dbLiveEntry, $roomId, $primaryRtmp, "Primary", $pexipConfig);
+			if (!$primaryAdpId)
+			{
+				throw new KalturaAPIException(KalturaErrors::PEXIP_ADP_CREATION_FAILED, $dbLiveEntry->getId());
+			}
 		}
 
-		$secondaryRtmp = $dbLiveEntry->getSecondaryBroadcastingUrl() . "&i=0/" . $dbLiveEntry->getStreamName();
-		$secondaryAdpId = PexipHandler::addADP($dbLiveEntry, $roomId, $secondaryRtmp, "Secondary", $pexipConfig);
-
-		if (!$secondaryAdpId)
+		$secondaryAdpId = null;
+		if ($dbLiveEntry->getSecondaryBroadcastingUrl())
 		{
-			Throw new KalturaAPIException(KalturaErrors::PEXIP_ADP_CREATION_FAILED, $dbLiveEntry->getId());
+			$secondaryRtmp = $dbLiveEntry->getSecondaryBroadcastingUrl() . "&i=0/" . $dbLiveEntry->getStreamName();
+			$secondaryAdpId = self::addADP($dbLiveEntry, $roomId, $secondaryRtmp, "Secondary", $pexipConfig);
+
+			if (!$secondaryAdpId)
+			{
+				throw new KalturaAPIException(KalturaErrors::PEXIP_ADP_CREATION_FAILED, $dbLiveEntry->getId());
+			}
 		}
 
 		$sipEntryServerNode = PexipUtils::createSipEntryServerNode($dbLiveEntry, $roomId, $primaryAdpId, $secondaryAdpId);
 		/** @var  SipEntryServerNode $sipEntryServerNode */
 		if (!$sipEntryServerNode)
 		{
-			Throw new KalturaAPIException(KalturaErrors::SIP_ENTRY_SERVER_NODE_CREATION_FAILED, $dbLiveEntry->getId());
+			throw new KalturaAPIException(KalturaErrors::SIP_ENTRY_SERVER_NODE_CREATION_FAILED, $dbLiveEntry->getId());
 		}
 
 		return array($roomId, $primaryAdpId, $secondaryAdpId);
@@ -342,11 +350,11 @@ class PexipHandler
 	}
 
 	/**
-	 * @param LiveEntry $liveEntry
+	 * @param LiveStreamEntry $liveEntry
 	 * @param $pexipConfig
 	 * @throws PropelException
 	 */
-	public static function deleteCallObjects(LiveEntry $liveEntry, $pexipConfig)
+	public static function deleteCallObjects(LiveStreamEntry $liveEntry, $pexipConfig)
 	{
 		if ($liveEntry->getSipRoomId())
 		{
