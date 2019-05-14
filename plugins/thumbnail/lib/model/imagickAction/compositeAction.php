@@ -18,6 +18,7 @@ class compositeAction extends imagickAction
 
 	protected $parameterAlias = array(
 		"ct" => kThumbnailParameterName::COMPOSITE_TYPE,
+		"compositetype" => kThumbnailParameterName::COMPOSITE_TYPE,
 		"ch" => kThumbnailParameterName::CHANNEL,
 		"op" => kThumbnailParameterName::OPACITY,
 	);

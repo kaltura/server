@@ -17,6 +17,7 @@ class rotateAction extends imagickAction
 		"deg" => kThumbnailParameterName::DEGREES,
 		"b" => kThumbnailParameterName::BACKGROUND_COLOR,
 		"bg" => kThumbnailParameterName::BACKGROUND_COLOR,
+		"backgroundColor" => kThumbnailParameterName::BACKGROUND_COLOR,
 	);
 
 	/**

@@ -25,9 +25,12 @@ class resizeAction extends imagickAction
 		"w" => kThumbnailParameterName::WIDTH,
 		"h" => kThumbnailParameterName::HEIGHT,
 		"ft" => kThumbnailParameterName::FILTER_TYPE,
+		"filtertype" => kThumbnailParameterName::FILTER_TYPE,
 		"b" => kThumbnailParameterName::BLUR,
 		"bf" => kThumbnailParameterName::BEST_FIT,
+		"bestfit" => kThumbnailParameterName::BEST_FIT,
 		"cf" => kThumbnailParameterName::COMPOSITE_FIT,
+		"compositefit" => kThumbnailParameterName::COMPOSITE_FIT,
 	);
 
 	protected function extractActionParameters()

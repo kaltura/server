@@ -16,6 +16,7 @@ class cropAction extends imagickAction
 
 	protected $parameterAlias = array(
 		"gp" => kThumbnailParameterName::GRAVITY_POINT,
+		"gravitypoint" => kThumbnailParameterName::GRAVITY_POINT,
 		"w" => kThumbnailParameterName::WIDTH,
 		"h" => kThumbnailParameterName::HEIGHT,
 	);
