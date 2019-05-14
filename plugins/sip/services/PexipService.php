@@ -48,6 +48,7 @@ class PexipService extends KalturaBaseService
 		}
 
 		$sipToken = PexipUtils::generateSipToken($dbLiveEntry, $regenerate);
+		$sipUrl = $sipToken . PexipUtils::SIP_URL_DELIMITER . $pexipConfig[PexipUtils::CONFIG_HOST_URL];
 		list ($roomId, $primaryAdpId, $secondaryAdpId) = PexipHandler::createCallObjects($dbLiveEntry, $pexipConfig, $sipUrl);
 
 		$dbLiveEntry->setSipToken($sipToken);
@@ -57,7 +58,6 @@ class PexipService extends KalturaBaseService
 		$dbLiveEntry->setIsSipEnabled(true);
 		$dbLiveEntry->save();
 
-		$sipUrl = $sipToken . PexipUtils::SIP_URL_DELIMITER . $pexipConfig[PexipUtils::CONFIG_HOST_URL];
 		return $sipUrl;
 	}
 

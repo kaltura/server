@@ -10,11 +10,11 @@ class KalturaSipEntryServerNode extends KalturaEntryServerNode
 	 * @var KalturaSipEntryServerNodeStatus
 	 * @readonly
 	 */
-	public $status;
+	public $nodeStatus;
 
 	private static $map_between_objects = array
 	(
-		"status",
+		"nodeStatus",
 	);
 
 	/* (non-PHPdoc)

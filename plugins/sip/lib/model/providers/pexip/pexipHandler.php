@@ -58,7 +58,8 @@ class PexipHandler
 	/**
 	 * @param LiveStreamEntry $entry
 	 * @param $pexipConfig
-	 * @return array|string
+	 * @param $alias
+	 * @return mixed|null
 	 */
 	protected static function addVirtualRoom(LiveStreamEntry $entry, $pexipConfig, $alias)
 	{

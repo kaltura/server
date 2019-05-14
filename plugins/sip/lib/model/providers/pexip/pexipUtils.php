@@ -90,15 +90,14 @@ class PexipUtils
 			return false;
 		}
 
+		myPartnerUtils::resetAllFilters();
 		$partnerId = substr($sipToken, 0, -5);
 		kCurrentContext::$partner_id = $partnerId;
-		entryPeer::setUseCriteriaFilter ( false );
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$criterion = $c->getNewCriterion(entryPeer::PARTNER_ID, $partnerId);
-		$c->addAnd($criterion);
-		$c->addAnd($c->getNewCriterion(entryPeer::SIP_TOKEN, $sipToken,KalturaCriteria::EQUAL));
+		$c->addAnd(entryPeer::PARTNER_ID, $partnerId);
+		$c->addAnd(entryPeer::SIP_TOKEN, $sipToken);
 		$dbLiveEntry = entryPeer::doSelectOne($c);
-		entryPeer::setUseCriteriaFilter ( true );
+
 		if (!$dbLiveEntry)
 		{
 			KalturaLog::err("Entry was not found for int_id $sipToken");
