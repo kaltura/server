@@ -302,23 +302,23 @@ class PexipHandler
 	protected static function updateADP($adpIp, $roomId, $pexipConfig)
 	{
 		KalturaLog::info("Updating ADP $adpIp adding Virtual Room $roomId");
-
+		$result = true;
 		$adpData = array(
 			'conference' => array($pexipConfig[PexipUtils::CONFIG_API_ADDRESS] . self::ROOM_PREFIX . "$roomId/"),
 		);
 		$url =  $pexipConfig[PexipUtils::CONFIG_API_ADDRESS] . self::ADP_PREFIX . "$adpIp/";
 
 		$curlWrapper = self::initPexipCurlWrapper(HttpMethods::UPDATE, $pexipConfig, $adpData);
-		$result = $curlWrapper->doExec($url);
-		KalturaLog::info("Result FOR ADP update is ". print_r($result,true));
+		$execResult = $curlWrapper->doExec($url);
+		KalturaLog::info("Result FOR ADP update is ". print_r($execResult ,true));
 
 		if ($curlWrapper->getHttpCode() != KCurlHeaderResponse::HTTP_STATUS_ACCEPTED )
 		{
 			PexipUtils::logError($curlWrapper, $url);
-			return false;
+			$result = false;
 		}
 		$curlWrapper->close();
-		return true;
+		return $result;
 	}
 
 	/**
@@ -330,23 +330,23 @@ class PexipHandler
 	protected static function updateRoomAlias($roomId, $pexipConfig, $alias)
 	{
 		KalturaLog::info("Updating Room $roomId");
-
+		$result = true;
 		$roomData = array(
 			'aliases' => array(array('alias' => $alias))
 		);
 		$url =  $pexipConfig[PexipUtils::CONFIG_API_ADDRESS] . self::ROOM_PREFIX . "$roomId/";
 
 		$curlWrapper = self::initPexipCurlWrapper(HttpMethods::UPDATE, $pexipConfig, $roomData);
-		$result = $curlWrapper->doExec($url);
-		KalturaLog::info("Result for ROOM update is". print_r($result,true));
+		$execResult = $curlWrapper->doExec($url);
+		KalturaLog::info("Result for ROOM update is". print_r($execResult,true));
 
 		if ($curlWrapper->getHttpCode() != KCurlHeaderResponse::HTTP_STATUS_ACCEPTED )
 		{
 			PexipUtils::logError($curlWrapper, $url);
-			return false;
+			$result = false;
 		}
 		$curlWrapper->close();
-		return true;
+		return $result;
 	}
 
 	/**
@@ -387,6 +387,7 @@ class PexipHandler
 	 */
 	protected static function deleteItem($itemId, $path , $pexipConfig)
 	{
+		$result = true;
 		$url = $pexipConfig[PexipUtils::CONFIG_API_ADDRESS] . $path . "$itemId/";
 		$curlWrapper = self::initPexipCurlWrapper(HttpMethods::DELETE, $pexipConfig);
 		$results = $curlWrapper->exec($url);
@@ -399,11 +400,10 @@ class PexipHandler
 		else
 		{
 			PexipUtils::logError($curlWrapper, $url);
-			$curlWrapper->close();
-			return false;
+			$result = false;
 		}
 		$curlWrapper->close();
-		return true;
+		return $result;
 	}
 
 	/**
@@ -415,6 +415,7 @@ class PexipHandler
 	 */
 	public static function listRooms($offset, $pageSize, $pexipConfig, $activeOnly = false)
 	{
+		$listResult = array();
 		KalturaLog::info("Fetching Virtual Rooms");
 		$url = $pexipConfig[PexipUtils::CONFIG_API_ADDRESS] . self::ROOM_PREFIX . '?service_type=conference&offset=' . $offset . '&limit=' . $pageSize;
 		if ($activeOnly)
@@ -425,19 +426,18 @@ class PexipHandler
 		$curlWrapper = self::initPexipCurlWrapper(HttpMethods::GET, $pexipConfig);
 		$result = $curlWrapper->exec($url);
 		$httpCode = $curlWrapper->getHttpCode();
-		$curlWrapper->close();
 		KalturaLog::info("HTTP Request httpCode [" . $httpCode . "]");
 		if (!$result || $httpCode != KCurlHeaderResponse::HTTP_STATUS_OK)
 		{
 			PexipUtils::logError($curlWrapper, $url);
-			return array();
 		}
 		else
 		{
-			$result = json_decode($result, true);
-			KalturaLog::info("Retrieved virtual Rooms: " . $result[PexipUtils::PARAM_META][PexipUtils::PARAM_TOTAL_COUNT]);
-			return $result;
+			$listResult = json_decode($result, true);
+			KalturaLog::info("Retrieved virtual Rooms: " . $listResult[PexipUtils::PARAM_META][PexipUtils::PARAM_TOTAL_COUNT]);
 		}
+		$curlWrapper->close();
+		return $listResult;
 	}
 
 	/**

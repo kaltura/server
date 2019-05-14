@@ -143,7 +143,8 @@ class PexipService extends KalturaBaseService
 			throw new KalturaAPIException (APIErrors::FEATURE_FORBIDDEN, $this->serviceId . '->' . $this->actionName);
 		}
 		$pexipConfig = PexipUtils::initAndValidateConfig();
-		return KalturaStringValueArray::fromDbArray(PexipHandler::listRooms($offset, $pageSize, $pexipConfig, $activeOnly));
+		$res = PexipHandler::listRooms($offset, $pageSize, $pexipConfig, $activeOnly);
+		return KalturaStringValueArray::fromDbArray(array(json_encode($res)));
 	}
 
 }

@@ -15,7 +15,7 @@ class PexipUtils
 	const PARAM_META = 'meta';
 	const PARAM_TOTAL_COUNT = 'total_count';
 	const PARAM_LOCAL_ALIAS = 'local_alias';
-
+	const LICENSES_PER_CALL = 3;
 	/**
 	 * @return bool|null
 	 * @throws Exception
@@ -247,7 +247,7 @@ class PexipUtils
 			KalturaLog::debug("Could Not retrieve active rooms - available licenes not validated!");
 			return false;
 		}
-		if ($result[self::PARAM_META][self::PARAM_TOTAL_COUNT] >= $pexipConfig[self::CONFIG_LICENSE_THRESHOLD])
+		if ( ( $result[self::PARAM_META][self::PARAM_TOTAL_COUNT] * self::LICENSES_PER_CALL ) >= $pexipConfig[self::CONFIG_LICENSE_THRESHOLD])
 		{
 			KalturaLog::debug("Max number of active rooms reached - active rooms count is " . $result[self::PARAM_META][self::PARAM_TOTAL_COUNT] . "- available licenes not validated!");
 			return false;
