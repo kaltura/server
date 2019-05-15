@@ -19,6 +19,7 @@ class ThumbnailService extends KalturaBaseUserService
 	 */
 	public function transformAction()
 	{
+		kApiCache::disableCache();
 		$transformation = $this->parseUrl();
 		$transformation->validate();
 		$imagick = $transformation->execute();
