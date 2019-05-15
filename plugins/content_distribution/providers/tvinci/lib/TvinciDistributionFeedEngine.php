@@ -10,7 +10,10 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	IDistributionEngineDelete
 {
 
-	const SOAP_ENVELOPE_URL = 'http://www.w3.org/2003/05/soap-envelope';
+	const SOAP_ENVELOPE_URL_CATALOG = 'http://www.w3.org/2003/05/soap-envelope';
+	const SOAP_ENVELOPE_URL_INGEST = 'http://schemas.xmlsoap.org/soap/envelope/';
+	const INNER_TYPE_CATALOG = 'catalog';
+	const INNER_TYPE_INGEST = 'ingest';
 
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineSubmit::submit()
@@ -67,7 +70,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 		KalturaLog::info("Tvinci Distribution action {$actionType}".
 						 ",entry {$data->entryDistribution->entryId}, url: {$url}\nXML data:\n{$providerData->xml}");
 
-		$result = $this->postXml($url, $providerData->xml);
+		$result = $this->postXml($url, $providerData->xml, $distributionProfile->innerType);
 		$success = ($result->status == 'OK' && $result->tvmID != '');
 		if (!$success) {
 			KalturaLog::err("Tvinci distribution action {$actionType} has failed with description: {$result->description} ".
@@ -80,12 +83,13 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	/**
 	 * @param string $url
 	 * @param string $xml
+	 * @param string $innerType
 	 * @throws Exception in case of failure to receive a response
 	 * @return SimpleXMLElement
 	 */
-	protected function postXml($url, $xml)
+	protected function postXml($url, $xml, $innerType)
 	{
-		$response = self::curlPost($url, $xml);
+		$response = self::curlPost($url, $xml, $innerType);
 		KalturaLog::info("Post XML Full response: " . print_r($response,true));
 
 		if ( $response['http_code'] == KCurlHeaderResponse::HTTP_STATUS_OK )
@@ -110,8 +114,10 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 				 * 	</s:Body>
 				 * </s:Envelope>
 				 */
+
 				$responseXml = simplexml_load_string($response['content']);
-				$children = $responseXml->children(self::SOAP_ENVELOPE_URL)->Body;
+				$soapUrl = ($innerType == self::INNER_TYPE_CATALOG ? self::SOAP_ENVELOPE_URL_CATALOG : self::SOAP_ENVELOPE_URL_INGEST);
+				$children = $responseXml->children($soapUrl)->Body;
 				$bodyElement = $children->xpath('//s:Body');
 				return $bodyElement[0]->IngestTvinciDataResponse->IngestTvinciDataResult;
 			}
@@ -127,7 +133,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	}
 	
 
-	public static function curlPost($url, $postData)
+	public static function curlPost($url, $postData, $innerType)
 	{
 		$ch = curl_init();
 
@@ -139,8 +145,16 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-	
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/soap+xml', 'charset: utf-8'));
+
+		if($innerType == self::INNER_TYPE_INGEST)
+		{
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/xml', 'charset: utf-8', 'SOAPAction: "http://tempuri.org/IService/IngestTvinciData"'));
+		}
+		else
+		{
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/soap+xml', 'charset: utf-8'));
+		}
+
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
 
