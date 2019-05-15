@@ -125,6 +125,7 @@
 	<field name="source" indexName="@name" type="int" />
 	<field name="plugins_data" indexName="@name" type="string" searchableonly="yes" matchable="yes" />
 	<field name="search_text" indexName="(name,tags,description,entry_id,reference_id,roots,puser_id)" apiName="@name" type="null" searchableonly="yes" matchable="yes" />
+	<field name="sip_token" indexName="@name" apiName="@name" type="string" nullable="yes" matchable="yes" />
 	<index format="P%sST%s">
 		<value field="partner_id" />
 		<value field="status" />
