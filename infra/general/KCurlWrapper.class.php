@@ -343,7 +343,7 @@ class KCurlWrapper
 	 * @param $opt
 	 * @return string|array
 	 */
-	public function getInfo($opt)
+	private function getInfo($opt)
 	{
 		if (!$opt)
 			return curl_getinfo($this->ch);
