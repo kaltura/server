@@ -79,6 +79,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const KU = 'Kurdish';
 	const LO = 'Laothian';
 	const LA = 'Latin';
+	const LB = 'Luxembourgish (Letzeburgesch)';
 	const LV = 'Latvian (Lettish)';
 	const LI = 'Limburgish ( Limburger)';
 	const LN = 'Lingala';
