@@ -51,7 +51,7 @@ class PexipService extends KalturaBaseService
 		$sipUrl = $sipToken . PexipUtils::SIP_URL_DELIMITER . $pexipConfig[PexipUtils::CONFIG_HOST_URL];
 		list ($roomId, $primaryAdpId, $secondaryAdpId) = PexipHandler::createCallObjects($dbLiveEntry, $pexipConfig, $sipUrl);
 
-		$dbLiveEntry->setSipToken($sipToken);
+		$dbLiveEntry->setSipToken($sipUrl);
 		$dbLiveEntry->setSipRoomId($roomId);
 		$dbLiveEntry->setPrimaryAdpId($primaryAdpId);
 		$dbLiveEntry->setSecondaryAdpId($secondaryAdpId);
@@ -68,7 +68,7 @@ class PexipService extends KalturaBaseService
 	public function handleIncomingCallAction()
 	{
 		$response = new KalturaSipResponse();
-		$response->action = "reject";
+		$response->action = 'reject';
 
 		try
 		{
@@ -88,26 +88,26 @@ class PexipService extends KalturaBaseService
 
 		if ($queryParams[self::CALL_DIRECTION_PARAM_NAME] != self::CALL_DIRECTION_DIAL_IN)
 		{
-			KalturaLog::debug(self::CALL_DIRECTION_PARAM_NAME . " " . $queryParams[self::CALL_DIRECTION_PARAM_NAME] ." not validated!");
-			$response->action = "done";
+			KalturaLog::debug(self::CALL_DIRECTION_PARAM_NAME . ' ' . $queryParams[self::CALL_DIRECTION_PARAM_NAME] .' not validated!');
+			$response->action = 'done';
 			return $response;
 		}
 
-		KalturaLog::debug(self::CALL_DIRECTION_PARAM_NAME . " validated!");
+		KalturaLog::debug(self::CALL_DIRECTION_PARAM_NAME . ' validated!');
 		try
 		{
 			$dbLiveEntry = PexipUtils::retrieveAndValidateEntryForSipCall($queryParams, $pexipConfig);
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::err("Error validating and retrieving Entry for sip Call");
+			KalturaLog::err('Error validating and retrieving Entry for sip Call');
 			return $response;
 		}
 
 		/** @var LiveEntry $dbLiveEntry */
 		if (!$dbLiveEntry)
 		{
-			KalturaLog::err("Live entry for call not Validated!");
+			KalturaLog::err('Live entry for call not Validated!');
 			return $response;
 		}
 
@@ -124,7 +124,7 @@ class PexipService extends KalturaBaseService
 			return $response;
 		}
 
-		$response->action = "done";
+		$response->action = 'done';
 		return $response;
 	}
 

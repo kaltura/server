@@ -33,14 +33,18 @@ class SipPlugin extends KalturaPlugin implements   IKalturaObjectLoader, IKaltur
 	}
 
 	/* (non-PHPdoc)
- * @see IKalturaObjectLoader::loadObject()
- */
+    * @see IKalturaObjectLoader::loadObject()
+    */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if ($baseClass == 'KalturaServerNode' && $enumValue == self::getCoreValue('serverNodeType', SipServerNodeType::SIP_SERVER))
+		if ($baseClass === 'KalturaServerNode' && $enumValue === self::getCoreValue('serverNodeType', SipServerNodeType::SIP_SERVER))
+		{
 			return new KalturaSipServerNode();
-		if ($baseClass == 'KalturaEntryServerNode' && $enumValue == self::getCoreValue('EntryServerNodeType', SipEntryServerNodeType::SIP_ENTRY_SERVER))
+		}
+		if ($baseClass === 'KalturaEntryServerNode' && $enumValue === self::getCoreValue('EntryServerNodeType', SipEntryServerNodeType::SIP_ENTRY_SERVER))
+		{
 			return new KalturaSipEntryServerNode();
+		}
 
 	}
 
@@ -49,10 +53,14 @@ class SipPlugin extends KalturaPlugin implements   IKalturaObjectLoader, IKaltur
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if ($baseClass == 'ServerNode' && $enumValue == self::getCoreValue('serverNodeType', SipServerNodeType::SIP_SERVER))
+		if ($baseClass === 'ServerNode' && $enumValue === self::getCoreValue('serverNodeType', SipServerNodeType::SIP_SERVER))
+		{
 			return 'SipServerNode';
-		if ($baseClass == 'EntryServerNode' && $enumValue == self::getCoreValue('EntryServerNodeType', SipEntryServerNodeType::SIP_ENTRY_SERVER))
+		}
+		if ($baseClass === 'EntryServerNode' && $enumValue === self::getCoreValue('EntryServerNodeType', SipEntryServerNodeType::SIP_ENTRY_SERVER))
+		{
 			return 'SipEntryServerNode';
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -61,13 +69,19 @@ class SipPlugin extends KalturaPlugin implements   IKalturaObjectLoader, IKaltur
 	public static function getEnums($baseEnumName = null)
 	{
 		if (is_null($baseEnumName))
+		{
 			return array('SipServerNodeType', 'SipEntryServerNodeType');
+		}
 
-		if ($baseEnumName == 'serverNodeType')
+		if ($baseEnumName === 'serverNodeType')
+		{
 			return array('SipServerNodeType');
+		}
 
-		if ($baseEnumName == 'entryType')
+		if ($baseEnumName === 'entryType')
+		{
 			return array('SipEntryServerNodeType');
+		}
 
 		return array();
 	}

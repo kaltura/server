@@ -53,7 +53,7 @@ class PexipUtils
 	 */
 	public static function getRoomName(LiveEntry $entry, $pexipConfig)
 	{
-		return $entry->getId() . "@" . $pexipConfig[self::CONFIG_HOST_URL];
+		return $entry->getId() . '@' . $pexipConfig[self::CONFIG_HOST_URL];
 	}
 
 	/**
@@ -84,14 +84,13 @@ class PexipUtils
 	 */
 	public static function retrieveAndValidateEntryForSipCall($queryParams, $pexipConfig)
 	{
-		$sipToken = self::extractSipTokenFromAddress($queryParams, $pexipConfig);
-		if (!$sipToken)
+		list($partnerId, $sipToken ) = self::extractPartnerIdAndSipTokenFromAddress($queryParams, $pexipConfig);
+		if (!$partnerId || !$sipToken )
 		{
 			return false;
 		}
 
 		myPartnerUtils::resetAllFilters();
-		$partnerId = substr($sipToken, 0, -5);
 		kCurrentContext::$partner_id = $partnerId;
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$c->addAnd(entryPeer::PARTNER_ID, $partnerId);
@@ -106,31 +105,31 @@ class PexipUtils
 
 		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_SIP, $dbLiveEntry->getPartnerId()))
 		{
-			KalturaLog::err("Sip Feature is not enabled for partner " . $dbLiveEntry->getPartnerId());
+			KalturaLog::err('Sip Feature is not enabled for partner ' . $dbLiveEntry->getPartnerId());
 			return false;
 		}
 
 		if (!$dbLiveEntry instanceof LiveStreamEntry)
 		{
-			KalturaLog::err("Entry " . $dbLiveEntry->getId() . " is not of type LiveStreamEntry.");
+			KalturaLog::err('Entry ' . $dbLiveEntry->getId() . ' is not of type LiveStreamEntry.');
 			return false;
 		}
 
 		if (!$dbLiveEntry->getIsSipEnabled())
 		{
-			KalturaLog::err("Sip flag is not enabled for entry " . $dbLiveEntry->getId() . " - generateSipUrl action should be called before connecting to entry");
+			KalturaLog::err('Sip flag is not enabled for entry ' . $dbLiveEntry->getId() . ' - generateSipUrl action should be called before connecting to entry');
 			return false;
 		}
 
 		if ($dbLiveEntry->isCurrentlyLive(false))
 		{
-			KalturaLog::err("Entry Is currently Live. will not allow call.");
+			KalturaLog::err('Entry Is currently Live. will not allow call.');
 			return false;
 		}
 
 		if (!$dbLiveEntry->getSipRoomId())
 		{
-			KalturaLog::err("Missing Sip Room Id - generateSipUrl action should be called before connecting to entry");
+			KalturaLog::err('Missing Sip Room Id - generateSipUrl action should be called before connecting to entry');
 			return false;
 		}
 
@@ -138,21 +137,27 @@ class PexipUtils
 	}
 
 	/**
-	 * @param null $pexipConfig
-	 * @return bool
+	 * @param $queryParams
+	 * @return array
 	 */
-	protected static function extractSipTokenFromAddress($queryParams, $pexipConfig)
+	protected static function extractPartnerIdAndSipTokenFromAddress($queryParams)
 	{
-		KalturaLog::debug("Extracting entry sip token from local_alias: " . $queryParams[self::PARAM_LOCAL_ALIAS]);
-		$intIdPattern = '/(?<=sip:)(.*)(?=@' . $pexipConfig[self::CONFIG_HOST_URL] . ')/';
+		KalturaLog::debug('Extracting entry sip token from local_alias: ' . $queryParams[self::PARAM_LOCAL_ALIAS]);
+		$intIdPattern = '/(?<=sip:)(.*)/';
 		preg_match($intIdPattern, $queryParams[self::PARAM_LOCAL_ALIAS], $matches);
-		if (empty($matches))
+		if (!empty($matches))
 		{
-			KalturaLog::debug("Could Not extract entry int_id from local_alias");
-			return false;
+			$parts = explode(self::SIP_URL_DELIMITER, $matches[0]);
+			if (!empty($parts))
+			{
+				$partnerId = substr($parts[0], 0, -5);
+				KalturaLog::debug("Extracted partnerId and sipToken : [$partnerId ,$matches[0]]");
+				return array($partnerId, $matches[0]);
+			}
 		}
-		KalturaLog::debug("Entry sip token extracted : $matches[0]");
-		return $matches[0];
+		KalturaLog::debug('Could not extract PartnerId and SipToken from local_alias');
+		return array();
+
 	}
 
 	/**
@@ -167,18 +172,18 @@ class PexipUtils
 		$connectedEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($entry->getId(), EntryServerNodePeer::$connectedServerNodeStatuses);
 		if (count($connectedEntryServerNodes))
 		{
-			KalturaLog::info("Entry [" . $entry->getId() . "] is Live and Active. can't create SipEntryServerNode.");
+			KalturaLog::info('Entry [' . $entry->getId() . '] is Live and Active. can\'t create SipEntryServerNode.');
 			return false;
 		}
 
 		$sipEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entry->getId(), SipPlugin::getCoreValue('EntryServerNodeType', SipEntryServerNodeType::SIP_ENTRY_SERVER));
 		if ($sipEntryServerNode)
 		{
-			KalturaLog::debug("SipEntryServerNode already created for entry ". $entry->getId() );
+			KalturaLog::debug('SipEntryServerNode already created for entry '. $entry->getId() );
 			return $sipEntryServerNode;
 		}
 
-		$lockKey = "allocate_sip_room_" . $entry->getId();
+		$lockKey = 'allocate_sip_room_' . $entry->getId();
 		$sipEntryServerNode = kLock::runLocked($lockKey, array('PexipUtils', 'createSipEntryServerNodeImpl'), array($entry, $roomId, $primaryAdpId, $secondaryAdpId));
 		return $sipEntryServerNode;
 
@@ -198,7 +203,7 @@ class PexipUtils
 		$sipEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entry->getId(), SipPlugin::getCoreValue('EntryServerNodeType', SipEntryServerNodeType::SIP_ENTRY_SERVER));
 		if ($sipEntryServerNode)
 		{
-			KalturaLog::debug("SipEntryServerNode " . $sipEntryServerNode->getId() . " already created for entry $entry->getId() ");
+			KalturaLog::debug('SipEntryServerNode ' . $sipEntryServerNode->getId() . " already created for entry $entry->getId() ");
 			return $sipEntryServerNode;
 		}
 
@@ -225,10 +230,10 @@ class PexipUtils
 		$queryParams = array();
 		parse_str($_SERVER['QUERY_STRING'], $queryParams);
 
-		KalturaLog::debug("Retrieved qurey params :" . print_r($queryParams, true));
+		KalturaLog::debug('Retrieved qurey params :' . print_r($queryParams, true));
 		if (!isset($queryParams[self::PARAM_LOCAL_ALIAS]))
 		{
-			KalturaLog::debug("Missing " . self::PARAM_LOCAL_ALIAS . " param");
+			KalturaLog::debug('Missing ' . self::PARAM_LOCAL_ALIAS . ' param');
 			return false;
 		}
 		// TODO - validate origin call came from pexip server
@@ -244,12 +249,12 @@ class PexipUtils
 		$result = PexipHandler::listRooms(0, 1, $pexipConfig, true);
 		if (empty($result))
 		{
-			KalturaLog::debug("Could Not retrieve active rooms - available licenes not validated!");
+			KalturaLog::debug('Could Not retrieve active rooms - available licenes not validated!');
 			return false;
 		}
 		if ( ( $result[self::PARAM_META][self::PARAM_TOTAL_COUNT] * self::LICENSES_PER_CALL ) >= $pexipConfig[self::CONFIG_LICENSE_THRESHOLD])
 		{
-			KalturaLog::debug("Max number of active rooms reached - active rooms count is " . $result[self::PARAM_META][self::PARAM_TOTAL_COUNT] . "- available licenes not validated!");
+			KalturaLog::debug('Max number of active rooms reached - active rooms count is ' . $result[self::PARAM_META][self::PARAM_TOTAL_COUNT] . '- available licenes not validated!');
 			return false;
 		}
 
@@ -262,7 +267,7 @@ class PexipUtils
 	 */
 	public static function logError(KCurlWrapper $curlWrapper, $url)
 	{
-		KalturaLog::info("Sending HTTP request failed [". $curlWrapper->getErrorNumber() . "] httpCode [".$curlWrapper->getHttpCode()."] url [$url]: ".$curlWrapper->getError());
+		KalturaLog::info('Sending HTTP request failed ['. $curlWrapper->getErrorNumber() . '] httpCode ['.$curlWrapper->getHttpCode()."] url [$url]: ".$curlWrapper->getError());
 	}
 
 	/**
@@ -274,7 +279,7 @@ class PexipUtils
 		$resObj = json_decode($result, true);
 		if (!empty($resObj['objects']) && isset($resObj['objects'][0]))
 		{
-			KalturaLog::info("Retrieved Object " . print_r($resObj['objects'][0],true));
+			KalturaLog::info('Retrieved Object ' . print_r($resObj['objects'][0],true));
 			return $resObj['objects'][0];
 		}
 		return null;
@@ -289,8 +294,8 @@ class PexipUtils
 	public static function extractIdFromCreatedResult($result,$url ,$headerSize)
 	{
 		$header = substr($result, 0, $headerSize);
-		$headerData = explode("\n", $header);
-		KalturaLog::info("Checking Headers " . print_r($headerData, true));
+		$headerData = explode('\n', $header);
+		KalturaLog::info('Checking Headers ' . print_r($headerData, true));
 		$locationPattern = "(?<=Location: $url)(.*)(?=/)";
 		$locationPattern = str_replace('/', '\/', $locationPattern);
 		foreach ($headerData as $part)
@@ -303,7 +308,7 @@ class PexipUtils
 				return $virtualRoomId;
 			}
 		}
-		KalturaLog::info("Could not extract ID from headers");
+		KalturaLog::info('Could not extract ID from headers');
 		return null;
 	}
 }

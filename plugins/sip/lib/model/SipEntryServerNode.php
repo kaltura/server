@@ -62,7 +62,7 @@ class SipEntryServerNode extends EntryServerNode
 		$connectedEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($this->getEntryId(), EntryServerNodePeer::$connectedServerNodeStatuses);
 		if(count($connectedEntryServerNodes))
 		{
-			KalturaLog::info("Entry [". $this->getEntryId() ."] is Live and Active.");
+			KalturaLog::info('Entry [' . $this->getEntryId() . '] is Live and Active.');
 			if ($this->getSipRoomStatus() != SipEntryServerNodeStatus::ACTIVE)
 			{
 				$this->setSipRoomStatus(SipEntryServerNodeStatus::ACTIVE);
