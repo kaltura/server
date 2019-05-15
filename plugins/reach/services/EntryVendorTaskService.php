@@ -370,6 +370,8 @@ class EntryVendorTaskService extends KalturaBaseService
 	 *
 	 * @throws KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND
 	 * @throws KalturaReachErrors::CANNOT_EXTEND_ACCESS_KEY
+	 * @throws KalturaReachErrors::REACH_PROFILE_NOT_FOUND
+	 * @throws KalturaReachErrors::CATALOG_ITEM_NOT_FOUND
 	 */
 	public function extendAccessKeyAction($id)
 	{
@@ -384,9 +386,12 @@ class EntryVendorTaskService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::CANNOT_EXTEND_ACCESS_KEY);
 		}
 		
+		$shouldModerateOutput = $dbEntryVendorTask->getIsOutputModerated();
+		$accessKeyExpiry = $dbEntryVendorTask->getAccessKeyExpiry();
+		
 		try
 		{
-			$dbEntryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($dbEntryVendorTask->getEntryId(), $dbEntryVendorTask->getIsRequestModerated(), $dbEntryVendorTask->getCatalogItem()->getKsExpiry(), true));
+			$dbEntryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($dbEntryVendorTask->getEntryId(), $shouldModerateOutput, $accessKeyExpiry, true));
 			$dbEntryVendorTask->save();
 		}
 		catch (Exception $e)
