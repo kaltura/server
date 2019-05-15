@@ -185,7 +185,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		return $this->getFromCustomData(self::CUSTOM_DATA_IS_OUTPUT_MODERATED, null, false);
 	}
 	
-	public function getAccessKeyExpiry($v)
+	public function getAccessKeyExpiry()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_ACCESS_KEY_EXPIRY, null, dateUtils::DAY * 7);
 	}
