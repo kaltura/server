@@ -205,7 +205,6 @@ index kaltura_entry:kaltura_base
 	rt_field = user_names
 	rt_attr_uint = source
 	rt_field = plugins_data
-	rt_field = sip_token
 }
 
 index kaltura_category:kaltura_base_gt_in_charset
