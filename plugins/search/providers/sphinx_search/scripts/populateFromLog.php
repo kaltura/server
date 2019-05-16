@@ -196,7 +196,9 @@ function getSphinxRtTables($sphinxCon)
 	foreach ($sphinxTablesData as $sphinxTableData)
 	{
 		if($sphinxTableData['Type'] == "rt")
+		{
 			$sphinxRtTables[] = $sphinxTableData['Index'];
+		}
 	}
 	
 	return $sphinxRtTables;

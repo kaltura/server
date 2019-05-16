@@ -69,7 +69,9 @@ class IndexGeneratorBase
 		
 		$splitIndexFieldName = null;
 		if(isset($objectAttribtues["splitIndexFieldName"]))
+		{
 			$splitIndexFieldName = $indexName . "." . $objectAttribtues["splitIndexFieldName"];
+		}
 		$object->setSplitIndexFieldName($splitIndexFieldName);
 		
 		if(isset($objectAttribtues["apiName"])) {

@@ -164,8 +164,13 @@ class DbManager
 
 	protected static function setSphinxConnIndexInCache($indexName = null)
 	{
-		if (!self::$sphinxCache || isset(self::$connIndexes[$indexName]) === isset(self::$cachedConnIndexes[$indexName]))
+		if (!self::$sphinxCache ||
+			(isset(self::$connIndexes[$indexName]) && isset(self::$cachedConnIndexes[$indexName]) &&
+				self::$connIndexes[$indexName] == self::$cachedConnIndexes[$indexName])
+		)
+		{
 			return;
+		}
 
 		$stickySessionExpiry = isset(self::$config['sphinx_datasources']['sticky_session_timeout']) ? self::$config['sphinx_datasources']['sticky_session_timeout'] : 600;
 		KalturaLog::debug("Setting sphinx sticky session for key [" . self::$stickySessionKey . "] to sphinx index [" . print_r(self::$connIndexes, true) . "]");
@@ -177,13 +182,19 @@ class DbManager
 	{
 		self::$sphinxCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_SPHINX_STICKY_SESSIONS);
 		if (!self::$sphinxCache)
+		{
 			return false;
+		}
 		
 		self::$stickySessionKey = self::getStickySessionKey();
 		$preferredIndex = self::$sphinxCache->get(self::$stickySessionKey);
 		KalturaLog::debug("Got sphinx sticky session for key [" . self::$stickySessionKey . "] to sphinx index [" . print_r($preferredIndex, true) . "]");
+		
 		if ($preferredIndex === false || !isset($preferredIndex[$indexName]))
+		{
 			return false;
+		}
+			
 		self::$cachedConnIndexes[$indexName] = (int)$preferredIndex[$indexName]; //$preferredIndex returns from self::$sphinxCache->get(..) in type string
 		return $preferredIndex[$indexName];
 	}
@@ -235,7 +246,6 @@ class DbManager
 	 */
 	public static function getSphinxConnection($read = true, $indexName = null)
 	{
-		$indexName = $indexName ? $indexName : 'default_index';
 		KalturaLog::debug("Using index with name [$indexName]");
 		if(!isset(self::$sphinxConnection[$indexName]))
 		{
