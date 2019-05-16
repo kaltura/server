@@ -231,7 +231,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		
 		<xs:element name="optionalAnswer" type="T_optionalAnswer">
 			<xs:annotation>
-				<xs:documentation>Single wrapper element for optional answer</xs:documentation>
+			<xs:documentation>Single wrapper element for optional answer</xs:documentation>
 				<xs:appinfo>
 					<example>
 						<optionalAnswer>
