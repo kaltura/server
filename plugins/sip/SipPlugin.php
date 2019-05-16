@@ -54,10 +54,6 @@ class SipPlugin extends KalturaPlugin implements   IKalturaObjectLoader, IKaltur
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if ($baseClass === 'ServerNodeType' && $enumValue == self::getCoreValue('serverNodeType', SipServerNodeType::SIP_SERVER))
-		{
-			return 'SipServerNode';
-		}
 		if ($baseClass === 'ServerNode' && $enumValue == self::getCoreValue('serverNodeType', SipServerNodeType::SIP_SERVER))
 		{
 			return 'SipServerNode';
