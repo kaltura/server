@@ -18,6 +18,10 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_UNIQUE_USER_IDS = 'uniqueUserIds';
 	const METRIC_SUM_PRICE = 'price';
 	const METRIC_UNIQUE_PERCENTILES_SUM = 'uniquePercentiles';
+	const METRIC_DOWNSTREAM_BANDWIDTH_SUM = 'bandwidthSum'; //realtime
+	const METRIC_LATENCY_SUM = 'latencySum';
+	const METRIC_DROPPED_FRAMES_SUM = 'droppedFramesSum';
+	const METRIC_UNIQUE_IDS = 'uniqueIds';
 
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
@@ -92,10 +96,21 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_VIEW_PLAY_TIME_SEC = 'sum_view_time';
 	const METRIC_VIEW_BITRATE_COUNT = 'view_bitrate_count';
 	const METRIC_AVG_VIEW_BITRATE = 'avg_view_bitrate';
+	const METRIC_VIEW_DOWNSTREAM_BANDWIDTH_COUNT = 'view_bandwidth_count';
+	const METRIC_VIEW_UNIQUE_AUDIENCE = 'view_unique_audience';
+	const METRIC_VIEW_UNIQUE_ENGAGED_USERS = 'view_unique_engaged_users';
+	const METRIC_VIEW_UNIQUE_BUFFERING_USERS = 'view_unique_buffering_users';
+	const METRIC_VIEW_UNIQUE_AUDIENCE_DVR = 'view_unique_audience_dvr';
+
+	//player-events-realtime druid calculated metrics
+	const METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH = 'avg_view_downstream_bandwidth';
+	const METRIC_AVG_VIEW_LATENCY = 'avg_view_latency';
+	const METRIC_AVG_VIEW_DROPPED_FRAMES_RATIO = 'avg_view_dropped_frames_ratio';
 
 	//report classes
 	const CUSTOM_REPORTS_CLASS = 'kKavaCustomReports';
 	const KAVA_REPORTS_CLASS = 'kKavaReports';
+	const KAVA_REALTIME_REPORTS_CLASS = 'kKavaRealtimeReports';
 
 	/// report settings
 	// report settings - common
@@ -162,7 +177,8 @@ class kKavaReportsMgr extends kKavaBase
 	const GRANULARITY_HOUR = 'hour';
 	const GRANULARITY_DAY = 'day';
 	const GRANULARITY_MONTH = 'month';
-	
+	const GRANULARITY_TEN_SECOND = 'ten_second';
+
 	// report intervals
 	const INTERVAL_START_TO_END = 'start_to_end';
 	const INTERVAL_BASE_TO_START = 'base_to_start';
@@ -171,6 +187,9 @@ class kKavaReportsMgr extends kKavaBase
 	// aggregation intervals
 	const INTERVAL_DAYS = 'days';
 	const INTERVAL_MONTHS = 'months';
+	const INTERVAL_HOURS = 'hours';
+	const INTERVAL_MINUTES = 'minutes';
+	const INTERVAL_SECONDS = 'seconds';
 	const INTERVAL_ALL = 'all';
 		
 	const DAY_START_TIME = 'T00:00:00';
@@ -184,7 +203,7 @@ class kKavaReportsMgr extends kKavaBase
 	const MAX_CUSTOM_REPORT_RESULT_SIZE = 100000;
 	const MIN_THRESHOLD = 500;
 	const MAX_ESEARCH_RESULTS = 1000;
-	
+
 	const ENRICH_CHUNK_SIZE = 10000;
 	const ENRICH_DIM_DELIMITER = '|';
 	const ENRICH_FOREACH_KEYS_FUNC = 'self::forEachKeys';
@@ -268,12 +287,18 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_ENTRIES => 'floor',
 		self::METRIC_UNIQUE_USERS => 'floor',
 		self::METRIC_UNIQUE_CONTRIBUTORS => 'floor',
+		self::METRIC_VIEW_UNIQUE_AUDIENCE => 'floor',
+		self::METRIC_VIEW_UNIQUE_ENGAGED_USERS => 'floor',
+		self::METRIC_VIEW_UNIQUE_BUFFERING_USERS => 'floor',
+		self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR => 'floor',
 	);
 
 	protected static $transform_time_dimensions = array(
 		self::GRANULARITY_HOUR => array('kKavaReportsMgr', 'timestampToHourId'),
 		self::GRANULARITY_DAY => array('kKavaReportsMgr', 'timestampToDateId'),
-		self::GRANULARITY_MONTH => array('kKavaReportsMgr', 'timestampToMonthId')
+		self::GRANULARITY_MONTH => array('kKavaReportsMgr', 'timestampToMonthId'),
+		self::GRANULARITY_TEN_SECOND => array('kKavaReportsMgr', 'timestampToSecondId'),
+		self::GRANULARITY_MINUTE => array('kKavaReportsMgr', 'timestampToMinuteId'),
 	);
 
 	protected static $granularity_mapping = array(
@@ -282,6 +307,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::GRANULARITY_HOUR => 'PT1H',
 		self::GRANULARITY_THIRTY_MINUTE => 'PT30M',
 		self::GRANULARITY_MINUTE => 'PT1M',
+		self::GRANULARITY_TEN_SECOND => 'PT10S',
 	);
 
 	protected static $non_linear_metrics = array(
@@ -295,6 +321,10 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_BUFFER_TIME_RATIO => true,
 		self::METRIC_AVG_BITRATE => true,
 		self::METRIC_UNIQUE_CONTRIBUTORS => true,
+		self::METRIC_VIEW_UNIQUE_AUDIENCE => true,
+		self::METRIC_VIEW_UNIQUE_ENGAGED_USERS => true,
+		self::METRIC_VIEW_UNIQUE_BUFFERING_USERS => true,
+		self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -404,6 +434,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static $report_classes = array(
 		0 => self::KAVA_REPORTS_CLASS,
+		1 => self::KAVA_REALTIME_REPORTS_CLASS,
 	);
 	
 	protected static $aggregations_def = array();
@@ -626,6 +657,52 @@ class kKavaReportsMgr extends kKavaBase
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
 			self::getLongSumAggregator(self::METRIC_UNIQUE_PERCENTILES_SUM, self::METRIC_UNIQUE_PERCENTILES_SUM));
 
+		self::$aggregations_def[self::METRIC_UNIQUE_IDS] = self::getHyperUniqueAggregator(
+			self::METRIC_UNIQUE_IDS,
+			self::METRIC_UNIQUE_IDS);
+
+		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_AUDIENCE] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_AUDIENCE, self::METRIC_UNIQUE_IDS));
+
+		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_ENGAGED_USERS] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getSelectorFilter(self::DIMENSION_USER_ENGAGEMENT, self::USER_ENGAGED))),
+			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_ENGAGED_USERS, self::METRIC_UNIQUE_IDS));
+
+		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_BUFFERING_USERS] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_IS_BUFFERING))),
+			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_BUFFERING_USERS, self::METRIC_UNIQUE_IDS));
+
+		self::$aggregations_def[self::METRIC_VIEW_DOWNSTREAM_BANDWIDTH_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_BANDWIDTH))),
+			self::getLongSumAggregator(self::METRIC_VIEW_DOWNSTREAM_BANDWIDTH_COUNT, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_DOWNSTREAM_BANDWIDTH_SUM] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_BANDWIDTH))),
+			self::getDoubleSumAggregator(self::METRIC_DOWNSTREAM_BANDWIDTH_SUM, self::METRIC_DOWNSTREAM_BANDWIDTH_SUM));
+
+		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_DVR))),
+			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR, self::METRIC_UNIQUE_IDS));
+
+		self::$aggregations_def[self::METRIC_LATENCY_SUM] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+			self::getLongSumAggregator(self::METRIC_LATENCY_SUM, self::METRIC_LATENCY_SUM));
+
+		self::$aggregations_def[self::METRIC_DROPPED_FRAMES_SUM] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+			self::getDoubleSumAggregator(self::METRIC_DROPPED_FRAMES_SUM, self::METRIC_DROPPED_FRAMES_SUM));
+
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
 		
@@ -688,7 +765,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::$metrics_def[self::METRIC_VIEW_PLAY_TIME_SEC] = array(
 			self::DRUID_AGGR => array(self::EVENT_TYPE_VIEW),
 			self::DRUID_POST_AGGR => self::getConstantFactorFieldAccessPostAggr(
-				self::METRIC_VIEW_PLAY_TIME_SEC, self::EVENT_TYPE_VIEW, '10'));	
+				self::METRIC_VIEW_PLAY_TIME_SEC, self::EVENT_TYPE_VIEW, '10'));
 		
 		// field ratio metrics
 		self::$metrics_def[self::METRIC_PLAYTHROUGH_RATIO] = array(
@@ -730,6 +807,27 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_AGGR => array(self::METRIC_ORIGIN_BANDWIDTH_SIZE_BYTES),
 			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
 				self::METRIC_ORIGIN_BANDWIDTH_SIZE_MB, self::METRIC_ORIGIN_BANDWIDTH_SIZE_BYTES, '1048576'));
+
+		self::$metrics_def[self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH] = array(
+			self::DRUID_AGGR => array(self::METRIC_VIEW_DOWNSTREAM_BANDWIDTH_COUNT, self::METRIC_DOWNSTREAM_BANDWIDTH_SUM),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH,
+				self::METRIC_DOWNSTREAM_BANDWIDTH_SUM,
+				self::METRIC_VIEW_DOWNSTREAM_BANDWIDTH_COUNT));
+
+		self::$metrics_def[self::METRIC_AVG_VIEW_LATENCY] = array(
+			self::DRUID_AGGR => array(self::METRIC_LATENCY_SUM, self::EVENT_TYPE_VIEW),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_AVG_VIEW_LATENCY,
+				self::METRIC_LATENCY_SUM,
+				self::EVENT_TYPE_VIEW));
+
+		self::$metrics_def[self::METRIC_AVG_VIEW_DROPPED_FRAMES_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_DROPPED_FRAMES_SUM, self::EVENT_TYPE_VIEW),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_AVG_VIEW_DROPPED_FRAMES_RATIO,
+				self::METRIC_DROPPED_FRAMES_SUM,
+				self::EVENT_TYPE_VIEW));
 
 		// complex metrics
 		self::$metrics_def[self::METRIC_AVG_PLAY_TIME] = array(
@@ -955,6 +1053,18 @@ class kKavaReportsMgr extends kKavaBase
 		$date->setTimestamp($time);
 		$date->setTimezone($tz);
 		return $date->format('Ymd');
+	}
+
+	protected static function timestampToSecondId($timestamp, $tz)
+	{
+		$date = new DateTime($timestamp);
+		return $date->format('YmdHis');
+	}
+
+	protected static function timestampToMinuteId($timestamp, $tz)
+	{
+		$date = new DateTime($timestamp);
+		return $date->format('YmdHi');
 	}
 
 	protected static function timestampToHourId($timestamp, $tz)
@@ -1352,7 +1462,7 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		$druid_filter = array();
 
-		if (!isset($report_def[self::REPORT_DATA_SOURCE]))
+		if (!isset($report_def[self::REPORT_DATA_SOURCE]) || isset($report_def[self::REPORT_PLAYBACK_TYPES]))
 		{
 			$playback_types = isset($report_def[self::REPORT_PLAYBACK_TYPES]) ? $report_def[self::REPORT_PLAYBACK_TYPES] : array(self::PLAYBACK_TYPE_VOD);
 			$druid_filter[] = array(
@@ -3495,6 +3605,12 @@ class kKavaReportsMgr extends kKavaBase
 				return self::GRANULARITY_MONTH;
 			case self::INTERVAL_ALL:
 				return self::DRUID_GRANULARITY_ALL;
+			case self::INTERVAL_HOURS:
+				return self::GRANULARITY_HOUR;
+			case self::INTERVAL_MINUTES:
+				return self::GRANULARITY_MINUTE;
+			case self::INTERVAL_SECONDS:
+				return self::GRANULARITY_TEN_SECOND;
 			default:
 				return self::GRANULARITY_DAY;
 		}

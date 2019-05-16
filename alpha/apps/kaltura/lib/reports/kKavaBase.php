@@ -57,6 +57,8 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_EVENT_VAR1 = 'eventVar1';
 	const DIMENSION_EVENT_VAR2 = 'eventVar2';
 	const DIMENSION_EVENT_VAR3 = 'eventVar3';
+	const DIMENSION_USER_ENGAGEMENT = 'userEngagement';
+	const DIMENSION_EVENT_PROPERTIES = 'eventProperties';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -125,6 +127,15 @@ class kKavaBase extends kDruidBase
 
 	// Entry vendor task statuses
 	const TASK_READY = "Ready";
+
+	// event properties
+	const PROPERTY_HAS_BITRATE = 'hasBitrate';
+	const PROPERTY_IS_BUFFERING = 'isBuffering';
+	const PROPERTY_HAS_BANDWIDTH = 'hasBandwidth';
+
+	//user engagement values
+	const USER_ENGAGED = 'SoundOnTabFocused';
+
 
 	protected static $datasources_dimensions = array(
 		self::DATASOURCE_HISTORICAL => array(
@@ -232,6 +243,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_TURNAROUND_TIME  => 1,
 		),
 		self::DATASOURCE_REALTIME => array(
+			self::DIMENSION_EVENT_TYPE => 1,
 			self::DIMENSION_PARTNER_ID => 1,
 			self::DIMENSION_KUSER_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
