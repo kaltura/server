@@ -143,44 +143,8 @@ class kmc2Action extends kalturaAction
 		
 		$this->jw_uiconfs_array = kmcUtils::getJWPlayerUIConfs($this->partner_id);
 		$this->jw_uiconf_playlist = kmcUtils::getJWPlaylistUIConfs($this->partner_id);
-		$this->advanced_editor = $this->getAdvancedEditorUiConf($this->partner_id);
-		$this->simple_editor = $this->getSimpleEditorUiConf($this->partner_id);
-	}
-
-	private function getAdvancedEditorUiConf($partnerId = null)
-	{
-		$c = new Criteria();
-		$c->addAnd( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );
-		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
-		$c->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_ADVANCED_EDITOR );
-		$c->addAnd ( uiConfPeer::TAGS, 'andromeda_kae_for_kmc', Criteria::LIKE);
-		if($partnerId)
-			$c->addAnd ( uiConfPeer::PARTNER_ID, array_map('strval',  array($partnerId, PartnerPeer::GLOBAL_PARTNER)), Criteria::IN );
-		$c->addAscendingOrderByColumn(uiConfPeer::ID);
-
-		$uiConf = uiConfPeer::doSelectOne($c);
-		if ($uiConf)
-			return $uiConf->getId();
-		else
-			return -1;
-	}
-	
-	private function getSimpleEditorUiConf($partnerId = null)
-	{
-		$c = new Criteria();
-		$c->addAnd( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );
-		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
-		$c->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_EDITOR );
-		$c->addAnd ( uiConfPeer::TAGS, 'andromeda_kse_for_kmc', Criteria::LIKE);
-		if($partnerId)
-			$c->addAnd ( uiConfPeer::PARTNER_ID, array($partnerId, 0), Criteria::IN );
-		$c->addAscendingOrderByColumn(uiConfPeer::ID);
-
-		$uiConf = uiConfPeer::doSelectOne($c);
-		if ($uiConf)
-			return $uiConf->getId();
-		else
-			return -1;
+		$this->advanced_editor = kmcUtils::getUiConfByTagAndObjectType('andromeda_kae_for_kmc', uiConf::UI_CONF_TYPE_ADVANCED_EDITOR, $this->partner_id);
+		$this->simple_editor = kmcUtils::getUiConfByTagAndObjectType('andromeda_kse_for_kmc', uiConf::UI_CONF_TYPE_EDITOR, $this->partner_id);
 	}
 
 	private function getCritria ( )

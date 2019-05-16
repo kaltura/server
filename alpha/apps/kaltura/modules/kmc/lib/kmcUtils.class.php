@@ -3,15 +3,7 @@ class kmcUtils
 {
 	public static function getJWPlayerUIConfs($partnerId = null)
 	{
-		$c = new Criteria();
-		$c->addAnd( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );
-		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
-		$c->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_WIDGET );
-		$c->addAnd ( uiConfPeer::TAGS, 'jwplayer', Criteria::LIKE);
-		if($partnerId)
-			$c->addAnd ( uiConfPeer::PARTNER_ID, array_map('strval',  array($partnerId, PartnerPeer::GLOBAL_PARTNER)), Criteria::IN );
-		$c->addAscendingOrderByColumn(uiConfPeer::ID);
-		
+		$c = self::getDefaultTagAndObjectTypeCriteria('jwplayer', uiConf::UI_CONF_TYPE_WIDGET, $partnerId);
 		$jwPlayers = uiConfPeer::doSelect($c);
 		
 		$conf_players = array();
@@ -40,15 +32,7 @@ class kmcUtils
 
 	public static function getJWPlaylistUIConfs($partnerId = null)
 	{
-		$c = new Criteria();
-		$c->addAnd( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );
-		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
-		$c->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_WIDGET );
-		$c->addAnd ( uiConfPeer::TAGS, 'jwplaylist', Criteria::LIKE);
-		if($partnerId)
-			$c->addAnd ( uiConfPeer::PARTNER_ID, array_map('strval',  array($partnerId, PartnerPeer::GLOBAL_PARTNER)), Criteria::IN );
-		$c->addAscendingOrderByColumn(uiConfPeer::ID);
-
+		$c = self::getDefaultTagAndObjectTypeCriteria('jwplaylist', uiConf::UI_CONF_TYPE_WIDGET, $partnerId);
 		$jwPlaylists = uiConfPeer::doSelect($c);
 		
 		$conf_playlist = array();
@@ -178,14 +162,7 @@ class kmcUtils
 		}
 
 		// implement query to get uiconfs from DB
-		$c = new Criteria();
-		$c->addAnd( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );
-		$c->addAnd ( uiConfPeer::PARTNER_ID, 0 );
-		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
-		$c->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_KDP3);
-		$c->addAnd ( uiConfPeer::TAGS, $tag, Criteria::LIKE);
-		$c->addAscendingOrderByColumn(uiConfPeer::ID);
-
+		$c = self::getDefaultTagAndObjectTypeCriteria($tag, uiConf::UI_CONF_TYPE_KDP3);
 		$players = uiConfPeer::doSelect($c);
 
 		$conf_players = array();
@@ -207,13 +184,7 @@ class kmcUtils
 	{
 		$confs = array();
 		// implement query to get uiconfs from DB
-		$c = new Criteria();
-		$c->addAnd( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );
-		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
-		$c->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_SLP );
-		$c->addAnd ( uiConfPeer::TAGS, $tag, Criteria::LIKE);
-		$c->addAscendingOrderByColumn(uiConfPeer::ID);
-
+		$c = self::getDefaultTagAndObjectTypeCriteria($tag, uiConf::UI_CONF_TYPE_SLP);
 		$slPlayers = uiConfPeer::doSelect($c);
 
 		$conf_players = array();
@@ -296,5 +267,36 @@ class kmcUtils
 		}
 		return null;
 	}
-
+	
+	public static function getUiConfByTagAndObjectType($tag, $objectType, $partnerId = null)
+	{
+		$c = self::getDefaultTagAndObjectTypeCriteria($tag, $objectType, $partnerId);
+		$uiConf = uiConfPeer::doSelectOne($c);
+		
+		if ($uiConf)
+			return $uiConf->getId();
+		else
+			return -1;
+	}
+	
+	private static function getDefaultTagAndObjectTypeCriteria($tag, $objectType, $partnerId = null)
+	{
+		$c = new Criteria();
+		$c->addAnd( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );
+		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
+		$c->addAnd ( uiConfPeer::OBJ_TYPE , $objectType );
+		$c->addAnd ( uiConfPeer::TAGS, $tag, Criteria::LIKE);
+		if($partnerId)
+		{
+			$c->addAnd ( uiConfPeer::PARTNER_ID, array_map('strval',  array($partnerId, PartnerPeer::GLOBAL_PARTNER)), Criteria::IN );
+		}
+		else
+		{
+			$c->addAnd ( uiConfPeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER );
+		}
+		
+		$c->addAscendingOrderByColumn(uiConfPeer::ID);
+		
+		return $c;
+	}
 }

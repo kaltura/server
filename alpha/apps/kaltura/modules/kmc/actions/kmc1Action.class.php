@@ -176,7 +176,14 @@ class kmc1Action extends kalturaAction
 		$c->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_WIDGET );
 		$c->addAnd ( uiConfPeer::TAGS, 'jwplaylist', Criteria::LIKE);
 		if($partnerId)
+		{
 			$c->addAnd ( uiConfPeer::PARTNER_ID, array_map('strval',  array($partnerId, PartnerPeer::GLOBAL_PARTNER)), Criteria::IN );
+		}
+		else
+		{
+			$c->addAnd ( uiConfPeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER );
+		}
+			
 		$c->addAscendingOrderByColumn(uiConfPeer::ID);
 
 		$jwPlaylists = uiConfPeer::doSelect($c);
