@@ -50,6 +50,11 @@ class KalturaBatchHistoryData extends KalturaObject
 	 */
 	public $sessionId;
 	
+	/**
+	 * @var string
+	 */
+	public $schedulerName;
+	
 	private static $mapBetweenObjects = array
 	(
 			'schedulerId',
@@ -61,6 +66,7 @@ class KalturaBatchHistoryData extends KalturaObject
 			'hostName',
 			'sessionId',
 			'timeStamp',
+			'schedulerName' => 'schedulerHostName'
 	);
 	
 	public function getMapBetweenObjects()

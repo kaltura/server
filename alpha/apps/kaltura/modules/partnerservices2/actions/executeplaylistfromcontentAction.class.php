@@ -76,7 +76,7 @@ class executeplaylistfromcontentAction extends defPartnerservices2Action
 		
 		$level = $detailed ? objectWrapperBase::DETAIL_LEVEL_DETAILED : objectWrapperBase::DETAIL_LEVEL_REGULAR ;
 		$wrapper =  objectWrapperBase::getWrapperClass( $entry_list  , $level );
-		$this->addMsg ( "count" , count ( $entry_list )) ;
+		$this->addMsg ( "count" , $entry_list ? count ($entry_list) : 0) ;
 		$this->addMsg ( $this->getObjectPrefix() , $wrapper ) ;
 		
 	}

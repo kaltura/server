@@ -246,6 +246,10 @@ abstract class KDropFolderEngine implements IKalturaLogger
 				$metadataPlugin = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
 				//Expect only one result
 				$res = $metadataPlugin->metadata->listAction($filter, new KalturaFilterPager());
+				
+				if(!$res->objects || !count($res->objects))
+					return;
+				
 				$metadataObj = $res->objects[0];
 				$xmlElem = new SimpleXMLElement($metadataObj->xml);
 				$categoriesXPathRes = $xmlElem->xpath($folder->categoriesMetadataFieldName);

@@ -67,7 +67,7 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 		$terms[kBeacon::FIELD_PARTNER_ID] = kCurrentContext::getCurrentPartnerId();
 		
 		if(isset($this->indexTypeEqual))
-			$terms[kBeacon::FIELD_IS_LOG] = ($this->indexTypeEqual == KalturaBeaconIndexType::LOG) ? true : false; 
+			$terms[kBeacon::FIELD_IS_LOG] = ($this->indexTypeEqual == KalturaBeaconIndexType::LOG) ? "true" : "false";
 		
 		return $terms;
 	}

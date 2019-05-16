@@ -659,6 +659,7 @@ return array(
 		
 	// History records	
 	'entry-investigate history_records schedulerId th' => 'Scheduler Id',
+	'entry-investigate history_records schedulerName th' => 'Scheduler Name',
 	'entry-investigate history_records workerId th' => 'Worker Id',
 	'entry-investigate history_records batchIndex th' => 'Batch Index',
 	'entry-investigate history_records timeStamp th' => 'Time stamp',
@@ -1077,6 +1078,7 @@ return array(
 	'entry-investigate track entry paramStr1 th' => 'Param 1',
 	'entry-investigate track entry paramStr2 th' => 'Param 2',
 	'entry-investigate track entry paramStr3 th' => 'Param 3',
+	'entry-investigate track entry sessionId th' => 'Session Id',
 	'entry-investigate track entry ks th' => 'KS',
 	'entry-investigate track entry description th' => 'Description',
 	'entry-investigate track entry createdAt th' => 'Create Time',

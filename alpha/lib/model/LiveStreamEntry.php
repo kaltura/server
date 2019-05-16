@@ -104,4 +104,14 @@ class LiveStreamEntry extends LiveEntry
 
 		return $configurations;
 	}
+
+	public function setIsSipEnabled ( $v )	{	$this->putInCustomData ( "isSipEnabled" , $v );	}
+	public function getIsSipEnabled (  )	{	return $this->getFromCustomData( "isSipEnabled", null, false );	}
+	public function setSipRoomId ( $v )	{	$this->putInCustomData ( "sipRoomId" , $v );	}
+	public function getSipRoomId(  )	{	return (int) $this->getFromCustomData( "sipRoomId", null, 0 );	}
+	public function setPrimaryAdpId ( $v )	{	$this->putInCustomData ( "primaryAdpId" , $v );	}
+	public function getPrimaryAdpId(  )	{	return $this->getFromCustomData( "primaryAdpId", null, false );	}
+	public function setSecondaryAdpId( $v )	{	$this->putInCustomData ( "secondaryAdpId" , $v );	}
+	public function getSecondaryAdpId(  )	{	return $this->getFromCustomData( "secondaryAdpId", null, false );	}
+
 }

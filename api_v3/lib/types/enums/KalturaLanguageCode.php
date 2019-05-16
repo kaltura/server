@@ -79,6 +79,7 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const KU = 'ku';
 	const LO = 'lo';
 	const LA = 'la';
+	const LB = 'lb';
 	const LV = 'lv';
 	const LI = 'li';
 	const LN = 'ln';

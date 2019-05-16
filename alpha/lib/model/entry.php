@@ -3470,6 +3470,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		return $this->getFromCustomData("clonePendingEntries", null, array());
 	}
+
+	public function setSipToken ( $v )  {	$this->putInCustomData ( "sipToken" , $v );	}
+	public function getSipToken( )  { return $this->getFromCustomData( "sipToken" ); }
 	
 	/**
 	 * 
