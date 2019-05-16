@@ -101,6 +101,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_VIEW_UNIQUE_ENGAGED_USERS = 'view_unique_engaged_users';
 	const METRIC_VIEW_UNIQUE_BUFFERING_USERS = 'view_unique_buffering_users';
 	const METRIC_VIEW_UNIQUE_AUDIENCE_DVR = 'view_unique_audience_dvr';
+	const METRIC_VIEW_LATENCY_COUNT = 'metric_view_latency_count';
+	const METRIC_VIEW_DROPPED_FRAMES_COUNT = 'metric_view_dropped_frames_count';
 
 	//player-events-realtime druid calculated metrics
 	const METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH = 'avg_view_downstream_bandwidth';
@@ -663,25 +665,37 @@ class kKavaReportsMgr extends kKavaBase
 
 		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_AUDIENCE] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
-			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_AUDIENCE, self::METRIC_UNIQUE_IDS));
+			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_AUDIENCE, self::METRIC_UNIQUE_USER_IDS));
 
 		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_ENGAGED_USERS] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
 				self::getSelectorFilter(self::DIMENSION_USER_ENGAGEMENT, self::USER_ENGAGED))),
-			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_ENGAGED_USERS, self::METRIC_UNIQUE_IDS));
+			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_ENGAGED_USERS, self::METRIC_UNIQUE_USER_IDS));
 
 		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_BUFFERING_USERS] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
 				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_IS_BUFFERING))),
-			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_BUFFERING_USERS, self::METRIC_UNIQUE_IDS));
+			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_BUFFERING_USERS, self::METRIC_UNIQUE_USER_IDS));
 
 		self::$aggregations_def[self::METRIC_VIEW_DOWNSTREAM_BANDWIDTH_COUNT] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
 				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_BANDWIDTH))),
 			self::getLongSumAggregator(self::METRIC_VIEW_DOWNSTREAM_BANDWIDTH_COUNT, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_VIEW_LATENCY_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_LATENCY))),
+			self::getLongSumAggregator(self::METRIC_VIEW_LATENCY_COUNT, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_VIEW_DROPPED_FRAMES_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_DROPPED_FRAMES))),
+			self::getLongSumAggregator(self::METRIC_VIEW_DROPPED_FRAMES_COUNT, self::METRIC_COUNT));
 
 		self::$aggregations_def[self::METRIC_DOWNSTREAM_BANDWIDTH_SUM] = self::getFilteredAggregator(
 			self::getAndFilter(array(
@@ -693,7 +707,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
 				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_DVR))),
-			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR, self::METRIC_UNIQUE_IDS));
+			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR, self::METRIC_UNIQUE_USER_IDS));
 
 		self::$aggregations_def[self::METRIC_LATENCY_SUM] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
@@ -816,18 +830,18 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_VIEW_DOWNSTREAM_BANDWIDTH_COUNT));
 
 		self::$metrics_def[self::METRIC_AVG_VIEW_LATENCY] = array(
-			self::DRUID_AGGR => array(self::METRIC_LATENCY_SUM, self::EVENT_TYPE_VIEW),
+			self::DRUID_AGGR => array(self::METRIC_LATENCY_SUM, self::METRIC_VIEW_LATENCY_COUNT),
 			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
 				self::METRIC_AVG_VIEW_LATENCY,
 				self::METRIC_LATENCY_SUM,
-				self::EVENT_TYPE_VIEW));
+				self::METRIC_VIEW_LATENCY_COUNT));
 
 		self::$metrics_def[self::METRIC_AVG_VIEW_DROPPED_FRAMES_RATIO] = array(
-			self::DRUID_AGGR => array(self::METRIC_DROPPED_FRAMES_SUM, self::EVENT_TYPE_VIEW),
+			self::DRUID_AGGR => array(self::METRIC_DROPPED_FRAMES_SUM, self::METRIC_VIEW_DROPPED_FRAMES_COUNT),
 			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
 				self::METRIC_AVG_VIEW_DROPPED_FRAMES_RATIO,
 				self::METRIC_DROPPED_FRAMES_SUM,
-				self::EVENT_TYPE_VIEW));
+				self::METRIC_VIEW_DROPPED_FRAMES_COUNT));
 
 		// complex metrics
 		self::$metrics_def[self::METRIC_AVG_PLAY_TIME] = array(
