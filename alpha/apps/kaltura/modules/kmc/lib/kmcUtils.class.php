@@ -273,10 +273,7 @@ class kmcUtils
 		$c = self::getDefaultTagAndObjectTypeCriteria($tag, $objectType, $partnerId);
 		$uiConf = uiConfPeer::doSelectOne($c);
 		
-		if ($uiConf)
-			return $uiConf->getId();
-		else
-			return -1;
+		return $uiConf ? $uiConf->getId() : -1;
 	}
 	
 	public static function getDefaultTagAndObjectTypeCriteria($tag, $objectType, $partnerId = null)
