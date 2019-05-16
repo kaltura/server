@@ -189,12 +189,60 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 					<xs:element name="question" minOccurs="1" maxOccurs="1" type="xs:string"> </xs:element>
 					<xs:element name="hint" minOccurs="0" maxOccurs="1" type="xs:string"> </xs:element>
 					<xs:element name="explanation" minOccurs="0" maxOccurs="1" type="xs:string"> </xs:element>
-					<xs:element name="optionalAnswers" minOccurs="0" maxOccurs="1" type="KalturaOptionalAnswersArray"></xs:element>
-					<xs:element name="correctAnswerKeys" minOccurs="0" maxOccurs="1" type="KalturaStringArray"></xs:element>
+					<xs:element name="optionalAnswers" minOccurs="0" maxOccurs="unbounded" type="T_optionalAnswers"></xs:element>
 				</xs:sequence>
 				</xs:extension>
 			</xs:complexContent>
 		</xs:complexType>
+		
+		<xs:complexType name="T_optionalAnswers">
+			<xs:sequence>
+				<xs:element ref="optionalAnswer" maxOccurs="unbounded" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Single optional answer element</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+		
+		<xs:complexType name="T_optionalAnswer">
+			<xs:sequence>
+				<xs:element name="key" maxOccurs="1" minOccurs="0" type="xs:string"> </xs:element>
+				<xs:element name="text" maxOccurs="1" minOccurs="0" type="xs:string"> </xs:element>
+				<xs:element name="weight" maxOccurs="1" minOccurs="0" type="xs:float"> </xs:element>
+				<xs:element name="isCorrect" maxOccurs="1" minOccurs="0" type="xs:int"> </xs:element>
+			</xs:sequence>
+		</xs:complexType>
+		
+		<xs:element name="optionalAnswers" type="T_optionalAnswers">
+			<xs:annotation>
+				<xs:documentation>Wrapper element holding multiple answer elements</xs:documentation>
+				<xs:appinfo>
+					<example>
+						<optionalAnswers>
+							<optionalAnswer>...</optionalAnswer>
+							<optionalAnswer>...</optionalAnswer>
+							<optionalAnswer>...</optionalAnswer>
+						</optionalAnswers>
+					</example>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:element>
+		
+		<xs:element name="optionalAnswer" type="T_optionalAnswer">
+			<xs:annotation>
+			<xs:documentation>Single wrapper element for optional answer</xs:documentation>
+				<xs:appinfo>
+					<example>
+						<optionalAnswer>
+							<text>tesAnswer1</text>
+							<weight>1</weight>
+							<isCorrect>1</isCorrect>
+						</optionalAnswer>
+					</example>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:element>
 
 		<xs:element name="scene-question-cue-point" type="T_scene_questionCuePoint" substitutionGroup="scene">
 			<xs:annotation>
