@@ -91,10 +91,13 @@ class PexipUtils
 		}
 
 		myPartnerUtils::resetAllFilters();
-		kCurrentContext::$partner_id = $partnerId;
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$c->addAnd(entryPeer::PARTNER_ID, $partnerId);
-		$c->addAnd(entryPeer::SIP_TOKEN, $sipToken);
+		$sipFilter = new kSipAdvancedFilter();
+		$sipFilter->setSipToken($sipToken);
+		$entryFilter = new entryFilter();
+		$entryFilter->setAdvancedSearch($sipFilter);
+		$entryFilter->setPartnerSearchScope($partnerId);
+		$c->attachFilter($entryFilter);
 		$dbLiveEntry = entryPeer::doSelectOne($c);
 
 		if (!$dbLiveEntry)

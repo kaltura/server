@@ -3467,9 +3467,6 @@ public function copyTemplate($copyPartnerId = false, $template)
 		return $this->getFromCustomData("clonePendingEntries", null, array());
 	}
 
-	public function setSipToken ( $v )  {	$this->putInCustomData ( "sipToken" , $v );	}
-	public function getSipToken( )  { return $this->getFromCustomData( "sipToken" ); }
-	
 	/**
 	 * 
 	 * @return array
