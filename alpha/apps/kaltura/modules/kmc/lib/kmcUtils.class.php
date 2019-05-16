@@ -1,13 +1,15 @@
 <?php
 class kmcUtils
 {
-	public static function getJWPlayerUIConfs()
+	public static function getJWPlayerUIConfs($partnerId = null)
 	{
 		$c = new Criteria();
 		$c->addAnd( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );
 		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
 		$c->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_WIDGET );
 		$c->addAnd ( uiConfPeer::TAGS, 'jwplayer', Criteria::LIKE);
+		if($partnerId)
+			$c->addAnd ( uiConfPeer::PARTNER_ID, array_map('strval',  array($partnerId, PartnerPeer::GLOBAL_PARTNER)), Criteria::IN );
 		$c->addAscendingOrderByColumn(uiConfPeer::ID);
 		
 		$jwPlayers = uiConfPeer::doSelect($c);
@@ -36,13 +38,15 @@ class kmcUtils
 		return $conf_players;
 	}
 
-	public static function getJWPlaylistUIConfs()
+	public static function getJWPlaylistUIConfs($partnerId = null)
 	{
 		$c = new Criteria();
 		$c->addAnd( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );
 		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
 		$c->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_WIDGET );
 		$c->addAnd ( uiConfPeer::TAGS, 'jwplaylist', Criteria::LIKE);
+		if($partnerId)
+			$c->addAnd ( uiConfPeer::PARTNER_ID, array_map('strval',  array($partnerId, PartnerPeer::GLOBAL_PARTNER)), Criteria::IN );
 		$c->addAscendingOrderByColumn(uiConfPeer::ID);
 
 		$jwPlaylists = uiConfPeer::doSelect($c);
