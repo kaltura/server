@@ -191,7 +191,7 @@ class kKavaReportsMgr extends kKavaBase
 	const INTERVAL_MONTHS = 'months';
 	const INTERVAL_HOURS = 'hours';
 	const INTERVAL_MINUTES = 'minutes';
-	const INTERVAL_SECONDS = 'seconds';
+	const INTERVAL_TEN_SECONDS = 'ten_seconds';
 	const INTERVAL_ALL = 'all';
 		
 	const DAY_START_TIME = 'T00:00:00';
@@ -3623,7 +3623,7 @@ class kKavaReportsMgr extends kKavaBase
 				return self::GRANULARITY_HOUR;
 			case self::INTERVAL_MINUTES:
 				return self::GRANULARITY_MINUTE;
-			case self::INTERVAL_SECONDS:
+			case self::INTERVAL_TEN_SECONDS:
 				return self::GRANULARITY_TEN_SECOND;
 			default:
 				return self::GRANULARITY_DAY;

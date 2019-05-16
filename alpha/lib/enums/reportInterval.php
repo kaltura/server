@@ -9,5 +9,5 @@ interface reportInterval extends BaseEnum
 	const DAYS = 'days';
 	const HOURS = 'hours';
 	const MINUTES = 'minutes';
-	const SECONDS = 'seconds';
+	const TEN_SECONDS = 'ten_seconds';
 }
