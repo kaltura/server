@@ -136,7 +136,7 @@ class kmc1Action extends kalturaAction
 
 	function getJWPlayerUIConfs()
 	{
-		$c = kmcUtils::getDefaultTagAndObjectTypeCriteria('jwplaylist', uiConf::UI_CONF_TYPE_WIDGET);
+		$c = kmcUtils::getDefaultTagAndObjectTypeCriteria('jwplayer', uiConf::UI_CONF_TYPE_WIDGET);
 		$jwPlayers = uiConfPeer::doSelect($c);
 		
 		$conf_players = array();
