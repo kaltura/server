@@ -38,11 +38,11 @@ class SipPlugin extends KalturaPlugin implements   IKalturaObjectLoader, IKaltur
     */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if ($baseClass === 'KalturaServerNode' && $enumValue === self::getCoreValue('serverNodeType', SipServerNodeType::SIP_SERVER))
+		if ($baseClass === 'KalturaServerNode' && $enumValue == self::getCoreValue('serverNodeType', SipServerNodeType::SIP_SERVER))
 		{
 			return new KalturaSipServerNode();
 		}
-		if ($baseClass === 'KalturaEntryServerNode' && $enumValue === self::getCoreValue('EntryServerNodeType', SipEntryServerNodeType::SIP_ENTRY_SERVER))
+		if ($baseClass === 'KalturaEntryServerNode' && $enumValue == self::getCoreValue('EntryServerNodeType', SipEntryServerNodeType::SIP_ENTRY_SERVER))
 		{
 			return new KalturaSipEntryServerNode();
 		}
@@ -54,11 +54,11 @@ class SipPlugin extends KalturaPlugin implements   IKalturaObjectLoader, IKaltur
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if ($baseClass === 'ServerNode' && $enumValue === self::getCoreValue('serverNodeType', SipServerNodeType::SIP_SERVER))
+		if ($baseClass === 'ServerNode' && $enumValue == self::getCoreValue('serverNodeType', SipServerNodeType::SIP_SERVER))
 		{
 			return 'SipServerNode';
 		}
-		if ($baseClass === 'EntryServerNode' && $enumValue === self::getCoreValue('EntryServerNodeType', SipEntryServerNodeType::SIP_ENTRY_SERVER))
+		if ($baseClass === 'EntryServerNode' && $enumValue == self::getCoreValue('EntryServerNodeType', SipEntryServerNodeType::SIP_ENTRY_SERVER))
 		{
 			return 'SipEntryServerNode';
 		}
