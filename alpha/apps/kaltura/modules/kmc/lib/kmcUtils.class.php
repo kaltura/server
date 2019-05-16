@@ -279,7 +279,7 @@ class kmcUtils
 			return -1;
 	}
 	
-	private static function getDefaultTagAndObjectTypeCriteria($tag, $objectType, $partnerId = null)
+	public static function getDefaultTagAndObjectTypeCriteria($tag, $objectType, $partnerId = null)
 	{
 		$c = new Criteria();
 		$c->addAnd( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );

@@ -136,13 +136,7 @@ class kmc1Action extends kalturaAction
 
 	function getJWPlayerUIConfs()
 	{
-		$c = new Criteria();
-		$c->addAnd ( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );
-		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
-		$c->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_WIDGET );
-		$c->addAnd ( uiConfPeer::TAGS, 'jwplayer', Criteria::LIKE);
-		$c->addAscendingOrderByColumn(uiConfPeer::ID);
-		
+		$c = kmcUtils::getDefaultTagAndObjectTypeCriteria('jwplaylist', uiConf::UI_CONF_TYPE_WIDGET);
 		$jwPlayers = uiConfPeer::doSelect($c);
 		
 		$conf_players = array();
@@ -170,22 +164,7 @@ class kmc1Action extends kalturaAction
 
 	function getJWPlaylistUIConfs($partnerId = null)
 	{
-		$c = new Criteria();
-		$c->addAnd ( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );
-		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
-		$c->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_WIDGET );
-		$c->addAnd ( uiConfPeer::TAGS, 'jwplaylist', Criteria::LIKE);
-		if($partnerId)
-		{
-			$c->addAnd ( uiConfPeer::PARTNER_ID, array_map('strval',  array($partnerId, PartnerPeer::GLOBAL_PARTNER)), Criteria::IN );
-		}
-		else
-		{
-			$c->addAnd ( uiConfPeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER );
-		}
-			
-		$c->addAscendingOrderByColumn(uiConfPeer::ID);
-
+		$c = kmcUtils::getDefaultTagAndObjectTypeCriteria('jwplaylist', uiConf::UI_CONF_TYPE_WIDGET, $partnerId);
 		$jwPlaylists = uiConfPeer::doSelect($c);
 		
 		$conf_playlist = array();
