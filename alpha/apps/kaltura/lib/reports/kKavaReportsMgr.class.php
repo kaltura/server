@@ -21,7 +21,6 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_DOWNSTREAM_BANDWIDTH_SUM = 'bandwidthSum'; //realtime
 	const METRIC_LATENCY_SUM = 'latencySum';
 	const METRIC_DROPPED_FRAMES_SUM = 'droppedFramesSum';
-	const METRIC_UNIQUE_IDS = 'uniqueIds';
 
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
@@ -658,10 +657,6 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_UNIQUE_PERCENTILES_SUM] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
 			self::getLongSumAggregator(self::METRIC_UNIQUE_PERCENTILES_SUM, self::METRIC_UNIQUE_PERCENTILES_SUM));
-
-		self::$aggregations_def[self::METRIC_UNIQUE_IDS] = self::getHyperUniqueAggregator(
-			self::METRIC_UNIQUE_IDS,
-			self::METRIC_UNIQUE_IDS);
 
 		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_AUDIENCE] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
