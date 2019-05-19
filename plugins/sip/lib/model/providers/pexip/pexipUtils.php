@@ -104,7 +104,6 @@ class PexipUtils
 		{
 			$msg = "Entry was not found for sip token $sipToken";
 			KalturaLog::err($msg);
-			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			return false;
 		}
 
@@ -112,7 +111,6 @@ class PexipUtils
 		{
 			$msg = 'Sip Feature is not enabled for partner ' . $dbLiveEntry->getPartnerId();
 			KalturaLog::err($msg);
-			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			return false;
 		}
 
@@ -120,7 +118,6 @@ class PexipUtils
 		{
 			$msg = 'Entry ' . $dbLiveEntry->getId() . ' is not of type LiveStreamEntry.';
 			KalturaLog::err($msg);
-			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			return false;
 		}
 
@@ -128,7 +125,6 @@ class PexipUtils
 		{
 			$msg = 'Sip flag is not enabled for entry ' . $dbLiveEntry->getId() . ' - generateSipUrl action should be called before connecting to entry';
 			KalturaLog::err($msg);
-			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			return false;
 		}
 
@@ -136,7 +132,6 @@ class PexipUtils
 		{
 			$msg = 'Entry Is currently Live. will not allow call.';
 			KalturaLog::err($msg);
-			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			return false;
 		}
 
@@ -144,14 +139,12 @@ class PexipUtils
 		{
 			$msg = 'Missing Sip Room Id - Please generate sip url before connecting to entry';
 			KalturaLog::err($msg);
-			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			return false;
 		}
 
 		if (!$dbLiveEntry->getPrimaryAdpId() && !$dbLiveEntry->getSecondaryAdpId())
 		{
 			$msg = 'Missing ADPs - Please generate sip url before connecting to entry';
-			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			return false;
 		}
 
@@ -332,28 +325,5 @@ class PexipUtils
 		}
 		KalturaLog::info('Could not extract ID from headers');
 		return null;
-	}
-
-	/**
-	 * @param $partner
-	 * @param $emailRecipient
-	 * @param $message
-	 * @param int $entryId
-	 * @throws Exception
-	 */
-	public static function sendSipEmailNotification($partner, $emailRecipient, $message, $entryId = 0)
-	{
-		$params = array($partner()->getName(), $message);
-		kJobsManager::addMailJob(
-			null,
-			$entryId,
-			$partner->getId(),
-			MailType::MAIL_TYPE_SIP_FAILURE,
-			kMailJobData::MAIL_PRIORITY_NORMAL,
-			kConf::get("default_email"),
-			kConf::get("default_email_name"),
-			$emailRecipient,
-			$params
-		);
 	}
 }

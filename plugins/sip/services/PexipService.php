@@ -112,8 +112,6 @@ class PexipService extends KalturaBaseService
 
 		if(!PexipUtils::validateLicensesAvailable($pexipConfig))
 		{
-			$msg = 'Max number of active rooms reached. Please try again shortly.';
-			PexipUtils::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			return $response;
 		}
 
@@ -121,8 +119,7 @@ class PexipService extends KalturaBaseService
 		/** @var  SipEntryServerNode $sipEntryServerNode */
 		if (!$sipEntryServerNode)
 		{
-			$msg = 'Entry is Live and Active. can\'t connect call.';
-			PexipUtils::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
+			KalturaLog::debug("Could not create or retrieve SipEntryServerNode.");
 			return $response;
 		}
 
