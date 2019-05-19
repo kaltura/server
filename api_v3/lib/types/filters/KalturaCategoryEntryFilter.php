@@ -20,7 +20,7 @@ class KalturaCategoryEntryFilter extends KalturaCategoryEntryBaseFilter
 	 */
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$blockOnEmptyFilterPartners = kConf::getMap("partner_ids_require_category_entry_filter");
+		$blockOnEmptyFilterPartners = kConf::getMap(kConfMapNames::REQUIRE_CATEGORY_ENTRY_FILTER_PARTNERS);
 		if ($this->entryIdEqual == null &&
 			$this->entryIdIn == null &&
 			$this->categoryIdIn == null &&
