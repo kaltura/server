@@ -298,7 +298,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			}
 		}
 
-		if ($event->getScheduleEventType() == ScheduleEventType::LIVE_STREAM)
+		if ($event->templateEntryId)
 		{
 			$entry = entryPeer::retrieveByPK($event->templateEntryId);
 			if ( $entry && $entry->getType() == entryType::LIVE_STREAM)

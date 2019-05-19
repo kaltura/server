@@ -2,10 +2,11 @@
 /**
  * @package plugins.sip
  */
-class SipPlugin extends KalturaPlugin implements   IKalturaObjectLoader, IKalturaEnumerator, IKalturaServices, IKalturaEventConsumers
+class SipPlugin extends KalturaPlugin implements   IKalturaObjectLoader, IKalturaEnumerator, IKalturaServices, IKalturaEventConsumers, IKalturaSearchDataContributor
 {
 	const PLUGIN_NAME = 'sip';
 	const SIP_EVENTS_CONSUMER = 'kSipEventsConsumer';
+	const SEARCH_DATA_SUFFIX = 'sipend';
 
 	public static function getPluginName()
 	{
@@ -37,11 +38,11 @@ class SipPlugin extends KalturaPlugin implements   IKalturaObjectLoader, IKaltur
     */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if ($baseClass === 'KalturaServerNode' && $enumValue === self::getCoreValue('serverNodeType', SipServerNodeType::SIP_SERVER))
+		if ($baseClass === 'KalturaServerNode' && $enumValue == self::getCoreValue('serverNodeType', SipServerNodeType::SIP_SERVER))
 		{
 			return new KalturaSipServerNode();
 		}
-		if ($baseClass === 'KalturaEntryServerNode' && $enumValue === self::getCoreValue('EntryServerNodeType', SipEntryServerNodeType::SIP_ENTRY_SERVER))
+		if ($baseClass === 'KalturaEntryServerNode' && $enumValue == self::getCoreValue('EntryServerNodeType', SipEntryServerNodeType::SIP_ENTRY_SERVER))
 		{
 			return new KalturaSipEntryServerNode();
 		}
@@ -53,11 +54,11 @@ class SipPlugin extends KalturaPlugin implements   IKalturaObjectLoader, IKaltur
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if ($baseClass === 'ServerNode' && $enumValue === self::getCoreValue('serverNodeType', SipServerNodeType::SIP_SERVER))
+		if ($baseClass === 'ServerNode' && $enumValue == self::getCoreValue('serverNodeType', SipServerNodeType::SIP_SERVER))
 		{
 			return 'SipServerNode';
 		}
-		if ($baseClass === 'EntryServerNode' && $enumValue === self::getCoreValue('EntryServerNodeType', SipEntryServerNodeType::SIP_ENTRY_SERVER))
+		if ($baseClass === 'EntryServerNode' && $enumValue == self::getCoreValue('EntryServerNodeType', SipEntryServerNodeType::SIP_ENTRY_SERVER))
 		{
 			return 'SipEntryServerNode';
 		}
@@ -102,5 +103,30 @@ class SipPlugin extends KalturaPlugin implements   IKalturaObjectLoader, IKaltur
 		return array(
 			self::SIP_EVENTS_CONSUMER,
 		);
+	}
+
+	/**
+	 * @param string $sipToken
+	 * @return string
+	 */
+	public static function getSipTokenSearchData($sipToken)
+	{
+		return self::getPluginName() . $sipToken . self::SEARCH_DATA_SUFFIX;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaSearchDataContributor::getSearchData()
+	 */
+	public static function getSearchData(BaseObject $object)
+	{
+		if ($object instanceof LiveStreamEntry)
+		{
+			$sipToken = $object->getSipToken();
+			if ($sipToken)
+			{
+				return array('plugins_data' => self::getSipTokenSearchData($sipToken));
+			}
+		}
+		return null;
 	}
 }
