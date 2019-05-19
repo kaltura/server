@@ -1,13 +1,38 @@
 # Orion 15.0.0 #
 
-## DB table index enhancements ##
+## Support sphinx index sharding ##
 
 - Issue Type: Task
-- Issue ID: No Ticket Opened
+- Issue ID: PLAT-9401
 
 ### Configuration ###
 
-	None.	
+	To enable support you need to do the following:
+	1. Add the following to your db.ini file:
+		Add this section to make the code be aware of the fact you are working in sharded index mode.
+		[sphinx_split_index]
+		enabled = true
+		entry = X (where X is the sahrding factor).
+		
+		Add datasources settings for each of the shards
+		[sphinx_datasources_kaltura_entry_x]
+		datasources.0 = sphinx
+		datasources.1 = sphinx2
+		
+		For each sharded datasource add the following:
+		sphinx.connection.options.kaltura.sharded = true
+		
+	2. Modify your sphinx kaltura.conf file:
+		Duplicate Kaltura_entry sphinx definition per your sharding factor and add entry distribution index that points to the all.
+		index kaltura_entry
+		{
+		        type=distributed
+		        local=kaltura_entry_X
+		        local=kaltura_entry_X
+		}
+		
+	3. Reindex your data based on the new setup.
+		
 
 #### Deployment Scripts ####	
 
