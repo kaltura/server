@@ -4,7 +4,7 @@
  * @package plugins.sip
  * @subpackage model.enum
  */
-interface SipEntryServerNodeStatus extends BaseEnum
+interface SipEntryServerNodeStatus extends EntryServerNodeStatus
 {
 	const CREATED = 11;
 	const ACTIVE = 12;
