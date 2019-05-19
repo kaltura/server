@@ -1,3 +1,19 @@
+# Orion 15.0.0 #
+
+## DB table index enhancements ##
+
+- Issue Type: Task
+- Issue ID: No Ticket Opened
+
+### Configuration ###
+
+	None.	
+
+#### Deployment Scripts ####
+
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/deployment/updates/sql/2019_05_19_alter_table_sphinx_log.sql
+		
+
 # Naos 14.20.0 #
 
 ## new boolean event notification template ##
