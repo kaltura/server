@@ -16,7 +16,8 @@ class embedPlaykitJsAction extends sfAction
 	const AUTO_EMBED_PARAM_NAME = "autoembed";
 	const LATEST = "{latest}";
 	const BETA = "{beta}";
-    const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
+	const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
+	const EMBED_PLAYKIT_UICONF_TAGS_KEY_NAME = 'uiConfTags';
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -35,6 +36,7 @@ class embedPlaykitJsAction extends sfAction
 	private $playerConfig = null;
 	private $uiConfUpdatedAt = null;
 	private $regenerate = false;
+	private $uiConfTags = array(self::PLAYER_V3_VERSIONS_TAG);
 	
 	public function execute()
 	{
@@ -410,9 +412,17 @@ class embedPlaykitJsAction extends sfAction
 	}
 
 	private function getConfigByVersion($version){
-		$versionUiConfs = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, $version);
-		$versionConfig = $this->getLastConfig($versionUiConfs);
-		return json_decode($versionConfig, true);
+		$config = array();
+		foreach ($this->uiConfTags as $tag) {
+			$versionUiConfs = uiConfPeer::getUiconfByTagAndVersion($tag, $version);
+			$versionLastUiConf = $this->getLastConfig($versionUiConfs);
+			$versionConfig = json_decode($versionLastUiConf, true);
+			if (is_array($versionConfig))
+			{
+				$config = array_merge($config, $versionConfig);
+			}
+		}
+		return $config;
 	}
 	
 	private function setLatestOrBetaVersionNumber()
@@ -483,6 +493,13 @@ class embedPlaykitJsAction extends sfAction
 		//Get should force regenration
 		$this->regenerate = $this->getRequestParameter(self::REGENERATE_PARAM_NAME);
 		
+		//Get the list of partner 0 uiconf tags for uiconfs that contain {latest} and {beta} lists
+		$embedPlaykitConf = kConf::getMap(kConfMapNames::EMBED_PLAYKIT);
+		if (isset($embedPlaykitConf[self::EMBED_PLAYKIT_UICONF_TAGS_KEY_NAME]))
+		{
+			$this->uiConfTags = $embedPlaykitConf[self::EMBED_PLAYKIT_UICONF_TAGS_KEY_NAME];
+		}
+
 		//Get config params
 		try 
 		{
