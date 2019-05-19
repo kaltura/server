@@ -8,7 +8,7 @@
 ### Configuration ###
 
 	To enable support you need to do the following:
-	1. Add the following tp ypu db.ini file:
+	1. Add the following to your db.ini file:
 		Add this section to make the code be aware of the fact you are working in sharded index mode.
 		[sphinx_split_index]
 		enabled = true
