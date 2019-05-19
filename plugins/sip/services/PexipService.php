@@ -47,18 +47,17 @@ class PexipService extends KalturaBaseService
 			PexipHandler::deleteCallObjects($dbLiveEntry, $pexipConfig);
 		}
 
-		$sipToken = PexipUtils::generateSipToken($dbLiveEntry, $regenerate);
-		$sipUrl = $sipToken . PexipUtils::SIP_URL_DELIMITER . $pexipConfig[PexipUtils::CONFIG_HOST_URL];
-		list ($roomId, $primaryAdpId, $secondaryAdpId) = PexipHandler::createCallObjects($dbLiveEntry, $pexipConfig, $sipUrl);
+		$sipToken = PexipUtils::generateSipToken($dbLiveEntry, $pexipConfig, $regenerate);
+		list ($roomId, $primaryAdpId, $secondaryAdpId) = PexipHandler::createCallObjects($dbLiveEntry, $pexipConfig, $sipToken);
 
-		$dbLiveEntry->setSipToken($sipUrl);
+		$dbLiveEntry->setSipToken($sipToken);
 		$dbLiveEntry->setSipRoomId($roomId);
 		$dbLiveEntry->setPrimaryAdpId($primaryAdpId);
 		$dbLiveEntry->setSecondaryAdpId($secondaryAdpId);
 		$dbLiveEntry->setIsSipEnabled(true);
 		$dbLiveEntry->save();
 
-		return $sipUrl;
+		return $sipToken;
 	}
 
 	/**
@@ -104,7 +103,7 @@ class PexipService extends KalturaBaseService
 			return $response;
 		}
 
-		/** @var LiveEntry $dbLiveEntry */
+		/** @var LiveStreamEntry $dbLiveEntry */
 		if (!$dbLiveEntry)
 		{
 			KalturaLog::err('Live entry for call not Validated!');
@@ -113,6 +112,8 @@ class PexipService extends KalturaBaseService
 
 		if(!PexipUtils::validateLicensesAvailable($pexipConfig))
 		{
+			$msg = 'Max number of active rooms reached. Please try again shortly.';
+			PexipUtils::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			return $response;
 		}
 
@@ -120,7 +121,8 @@ class PexipService extends KalturaBaseService
 		/** @var  SipEntryServerNode $sipEntryServerNode */
 		if (!$sipEntryServerNode)
 		{
-			KalturaLog::info("Could not create or retrieve SipEntryServerNode.");
+			$msg = 'Entry is Live and Active. can\'t connect call.';
+			PexipUtils::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			return $response;
 		}
 
