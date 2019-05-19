@@ -33,7 +33,8 @@ class PexipHandler
 		$primaryAdpId = null;
 		if($dbLiveEntry->getPrimaryBroadcastingUrl())
 		{
-			$primaryRtmp = $dbLiveEntry->getPrimaryBroadcastingUrl() . '&i=0/' . $dbLiveEntry->getStreamName();
+			$primaryRtmp = $dbLiveEntry->getPrimaryBroadcastingUrl() . '/' . $dbLiveEntry->getStreamName();
+			$primaryRtmp  = str_replace("%i", "1", $primaryRtmp);
 			$primaryAdpId = self::addADP($dbLiveEntry, $roomId, $primaryRtmp, 'Primary', $pexipConfig);
 			if(!$primaryAdpId)
 			{
@@ -44,7 +45,8 @@ class PexipHandler
 		$secondaryAdpId = null;
 		if($dbLiveEntry->getSecondaryBroadcastingUrl())
 		{
-			$secondaryRtmp = $dbLiveEntry->getSecondaryBroadcastingUrl() . '&i=0/' . $dbLiveEntry->getStreamName();
+			$secondaryRtmp = $dbLiveEntry->getSecondaryBroadcastingUrl() . '/' . $dbLiveEntry->getStreamName();
+			$secondaryRtmp = str_replace("%i", "1", $secondaryRtmp );
 			$secondaryAdpId = self::addADP($dbLiveEntry, $roomId, $secondaryRtmp, 'Secondary', $pexipConfig);
 
 			if(!$secondaryAdpId)
