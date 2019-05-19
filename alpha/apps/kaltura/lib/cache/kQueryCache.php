@@ -207,10 +207,7 @@ class kQueryCache
 			if ($criterion->getComparison() == Criteria::IN && !$criterion->getValue())
 			{
 				KalturaLog::debug("kQueryCache: criteria has empty IN, returning empty result set, peer=$peerClassName");
-				if($queryType == kQueryCache::QUERY_TYPE_COUNT)
-					return 0;
-				else
-					return array();
+				return array();
 			}
 		}
 		
