@@ -12,6 +12,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 
 	const SOAP_ENVELOPE_URL_CATALOG = 'http://www.w3.org/2003/05/soap-envelope';
 	const SOAP_ENVELOPE_URL_INGEST = 'http://schemas.xmlsoap.org/soap/envelope/';
+	const SOAP_ACTION_INGEST = 'SOAPAction: "http://tempuri.org/IService/IngestTvinciData"';
 	const INNER_TYPE_CATALOG = 'catalog';
 	const INNER_TYPE_INGEST = 'ingest';
 
@@ -146,15 +147,16 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
-		if($innerType == self::INNER_TYPE_INGEST)
+		if($innerType === self::INNER_TYPE_INGEST)
 		{
-			curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/xml', 'charset: utf-8', 'SOAPAction: "http://tempuri.org/IService/IngestTvinciData"'));
+			$headers = array('Content-Type: text/xml', 'charset: utf-8', self::SOAP_ACTION_INGEST);
 		}
 		else
 		{
-			curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/soap+xml', 'charset: utf-8'));
+			$headers = array('Content-Type: application/soap+xml', 'charset: utf-8');
 		}
 
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
 
