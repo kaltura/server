@@ -232,6 +232,8 @@ interface PermissionName extends BaseEnum
 	const MANAGE_ADMIN_USERS = 'MANAGE_ADMIN_USERS';
 
 	const FEATURE_SELF_SERVE = 'FEATURE_SELF_SERVE';
+	const FEATURE_SIP = 'FEATURE_SIP';
+
 
 	// KMC only permissions
 	

@@ -69,7 +69,7 @@
 		<value field="partner_id" />
 	</cacheInvalidationKey>
 </object>
-<object name="entry" indexId="str_entry_id" id="ID" apiName="KalturaBaseEntry">
+<object name="entry" splitIndexFieldName="PARTNER_ID" indexId="str_entry_id" id="ID" apiName="KalturaBaseEntry">
 	<field name="entry_id" indexName="@name" apiName="@getter" getter="id" type="string" />
 	<field name="str_entry_id" indexName="@name" getter="id" type="string" sphinxStringAttribute="string" />
 	<field name="id" indexName="int_entry_id" getter="indexedId" type="int" skipField="yes" />

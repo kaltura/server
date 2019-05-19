@@ -95,6 +95,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				'Kurdish' =>	'kur',
 				'Laothian' =>	'lao',
 				'Latin' =>	'lat',
+				'Luxembourgish (Letzeburgesch)' => 'ltz',
 				'Latvian (Lettish)' =>	'lav',
 				'Limburgish ( Limburger)' =>	'lim',
 				'Lingala' =>	'lin',
