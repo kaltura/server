@@ -493,8 +493,8 @@ class embedPlaykitJsAction extends sfAction
 		$this->regenerate = $this->getRequestParameter(self::REGENERATE_PARAM_NAME);
 		
 		//Get the list of partner 0 uiconf tags for uiconfs that contain {latest} and {beta} lists
-		$embedPlaykitConf = kConf::getMap('embedPlaykit');
 		if (isset($embedPlaykitConf['uiConfTags']))
+		$embedPlaykitConf = kConf::getMap(kConfMapNames::myMapName);
 		{
 			$this->uiConfTags = $embedPlaykitConf['uiConfTags'];
 		}
