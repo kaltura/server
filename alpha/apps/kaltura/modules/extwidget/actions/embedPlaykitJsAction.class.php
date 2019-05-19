@@ -16,7 +16,8 @@ class embedPlaykitJsAction extends sfAction
 	const AUTO_EMBED_PARAM_NAME = "autoembed";
 	const LATEST = "{latest}";
 	const BETA = "{beta}";
-    const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
+	const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
+	const EMBED_PLAYKIT_UICONF_TAGS_KEY_NAME = 'uiConfTags';
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -493,10 +494,10 @@ class embedPlaykitJsAction extends sfAction
 		$this->regenerate = $this->getRequestParameter(self::REGENERATE_PARAM_NAME);
 		
 		//Get the list of partner 0 uiconf tags for uiconfs that contain {latest} and {beta} lists
-		if (isset($embedPlaykitConf['uiConfTags']))
 		$embedPlaykitConf = kConf::getMap(kConfMapNames::myMapName);
+		if (isset($embedPlaykitConf[self::EMBED_PLAYKIT_UICONF_TAGS_KEY_NAME]))
 		{
-			$this->uiConfTags = $embedPlaykitConf['uiConfTags'];
+			$this->uiConfTags = $embedPlaykitConf[self::EMBED_PLAYKIT_UICONF_TAGS_KEY_NAME];
 		}
 
 		//Get config params
