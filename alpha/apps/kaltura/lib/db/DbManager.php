@@ -249,10 +249,14 @@ class DbManager
 		KalturaLog::debug("Using index with name [$indexName]");
 		if(!isset(self::$sphinxConnection[$indexName]))
 		{
-			if($indexName && isset(self::$config['sphinx_datasources_'.$indexName]) && isset(self::$config['sphinx_datasources_'.$indexName]['datasources']))
+			if($indexName && isset(self::$config['sphinx_datasources_'.$indexName]['datasources']))
+			{
 				$sphinxDS = self::$config['sphinx_datasources_'.$indexName]['datasources'];
+			}
 			else
+			{
 				$sphinxDS = isset(self::$config['sphinx_datasources']['datasources']) ? self::$config['sphinx_datasources']['datasources'] : array(self::DB_CONFIG_SPHINX);
+			}
 			
 			$cacheExpiry = isset(self::$config['sphinx_datasources']['cache_expiry']) ? self::$config['sphinx_datasources']['cache_expiry'] : 30;
 			$connectTimeout = isset(self::$config['sphinx_datasources']['connect_timeout']) ? self::$config['sphinx_datasources']['connect_timeout'] : 1;
