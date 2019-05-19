@@ -37,14 +37,14 @@ class DbManager
 	protected static  $stickySessionKey = null;
 	
 	/**
-	 * @param int
+	 * @param array
 	 */
-	protected static $cachedConnIndex = false;
+	protected static $cachedConnIndexes = false;
 	
 	/**
-	 * @param int
+	 * @param array
 	 */
-	protected static $connIndex = false;
+	protected static $connIndexes = false;
 
 	public static function setConfig(array $config)
 	{
@@ -162,30 +162,41 @@ class DbManager
 		}
 	}
 
-	protected static function setSphinxConnIndexInCache()
+	protected static function setSphinxConnIndexInCache($indexName = null)
 	{
-		if (!self::$sphinxCache || self::$connIndex === self::$cachedConnIndex)
+		if (!self::$sphinxCache ||
+			(isset(self::$connIndexes[$indexName]) && isset(self::$cachedConnIndexes[$indexName]) &&
+				self::$connIndexes[$indexName] == self::$cachedConnIndexes[$indexName])
+		)
+		{
 			return;
+		}
 
 		$stickySessionExpiry = isset(self::$config['sphinx_datasources']['sticky_session_timeout']) ? self::$config['sphinx_datasources']['sticky_session_timeout'] : 600;
-		KalturaLog::debug("Setting sphinx sticky session for key [" . self::$stickySessionKey . "] to sphinx index [" . self::$connIndex . "]");
-		self::$sphinxCache->set(self::$stickySessionKey, self::$connIndex, $stickySessionExpiry);
-		self::$cachedConnIndex = self::$connIndex;
+		KalturaLog::debug("Setting sphinx sticky session for key [" . self::$stickySessionKey . "] to sphinx index [" . print_r(self::$connIndexes, true) . "]");
+		self::$sphinxCache->set(self::$stickySessionKey, self::$connIndexes , $stickySessionExpiry);
+		self::$cachedConnIndexes[$indexName] = self::$connIndexes[$indexName];
 	}
 
-	protected static function getSphinxConnIndexFromCache()
+	protected static function getSphinxConnIndexFromCache($indexName = null)
 	{
 		self::$sphinxCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_SPHINX_STICKY_SESSIONS);
 		if (!self::$sphinxCache)
+		{
 			return false;
+		}
 		
 		self::$stickySessionKey = self::getStickySessionKey();
 		$preferredIndex = self::$sphinxCache->get(self::$stickySessionKey);
-		KalturaLog::debug("Got sphinx sticky session for key [" . self::$stickySessionKey . "] to sphinx index [" . $preferredIndex . "]");
-		if ($preferredIndex === false)
+		KalturaLog::debug("Got sphinx sticky session for key [" . self::$stickySessionKey . "] to sphinx index [" . print_r($preferredIndex, true) . "]");
+		
+		if ($preferredIndex === false || !isset($preferredIndex[$indexName]))
+		{
 			return false;
-		self::$cachedConnIndex = (int) $preferredIndex; //$preferredIndex returns from self::$sphinxCache->get(..) in type string
-		return $preferredIndex;
+		}
+			
+		self::$cachedConnIndexes[$indexName] = (int)$preferredIndex[$indexName]; //$preferredIndex returns from self::$sphinxCache->get(..) in type string
+		return $preferredIndex[$indexName];
 	}
 
 	/**
@@ -233,35 +244,43 @@ class DbManager
 	/**
 	 * @return KalturaPDO
 	 */
-	public static function getSphinxConnection($read = true)
+	public static function getSphinxConnection($read = true, $indexName = null)
 	{
-		if(!self::$sphinxConnection)
+		KalturaLog::debug("Using index with name [$indexName]");
+		if(!isset(self::$sphinxConnection[$indexName]))
 		{
-			$sphinxDS = isset(self::$config['sphinx_datasources']['datasources']) ? self::$config['sphinx_datasources']['datasources'] : array(self::DB_CONFIG_SPHINX);
+			if($indexName && isset(self::$config['sphinx_datasources_'.$indexName]['datasources']))
+			{
+				$sphinxDS = self::$config['sphinx_datasources_'.$indexName]['datasources'];
+			}
+			else
+			{
+				$sphinxDS = isset(self::$config['sphinx_datasources']['datasources']) ? self::$config['sphinx_datasources']['datasources'] : array(self::DB_CONFIG_SPHINX);
+			}
+			
 			$cacheExpiry = isset(self::$config['sphinx_datasources']['cache_expiry']) ? self::$config['sphinx_datasources']['cache_expiry'] : 30;
 			$connectTimeout = isset(self::$config['sphinx_datasources']['connect_timeout']) ? self::$config['sphinx_datasources']['connect_timeout'] : 1;
 			
-			$preferredIndex = self::getSphinxConnIndexFromCache();
-
+			$preferredIndex = self::getSphinxConnIndexFromCache($indexName);
 			if ($preferredIndex === false)
 				$preferredIndex = self::getSphinxConnIndexByLastUpdatedAt($sphinxDS);
 
-			list(self::$sphinxConnection, self::$connIndex) = self::connectFallbackLogic(
+			list(self::$sphinxConnection[$indexName], self::$connIndexes[$indexName]) = self::connectFallbackLogic(
 				array('DbManager', 'getSphinxConnectionInternal'), 
-				array($connectTimeout), 
+				array($connectTimeout, $indexName),
 				$sphinxDS, 
 				$preferredIndex, 
 				$cacheExpiry);
-			if (!self::$sphinxConnection)
+			if (!self::$sphinxConnection[$indexName])
 			{
 				throw new Exception('Failed to connect to any Sphinx config');
 			}
-			KalturaLog::debug("Actual sphinx index [". self::$connIndex. "] sphinx index by best lag [" . $preferredIndex. "]");
+			KalturaLog::debug("Actual sphinx index [". self::$connIndexes[$indexName]. "] sphinx index by best lag [" . $preferredIndex. "]");
 		}
 	
 		if (!$read)
-			self::setSphinxConnIndexInCache();
-		return self::$sphinxConnection;
+			self::setSphinxConnIndexInCache($indexName);
+		return self::$sphinxConnection[$indexName];
 	}
 
 	/**
@@ -328,16 +347,17 @@ class DbManager
 		return false;
 	}
 
-	private static function getSphinxConnectionInternal($key, $connectTimeout)
+	private static function getSphinxConnectionInternal($key, $connectTimeout, $indexName)
 	{
 		if(!isset(self::$config['datasources'][$key]['connection']['dsn']))
 			throw new Exception("DB Config [$key] not found");
 
 		$dataSource = self::$config['datasources'][$key]['connection']['dsn'];
-		self::$sphinxConnection = new KalturaPDO($dataSource, null, null, array(PDO::ATTR_TIMEOUT => $connectTimeout, KalturaPDO::KALTURA_ATTR_NAME => $key), $key);					
-		self::$sphinxConnection->setCommentsEnabled(false);
+		self::$sphinxConnection[$indexName] =
+			new KalturaPDO($dataSource, null, null, array(PDO::ATTR_TIMEOUT => $connectTimeout, KalturaPDO::KALTURA_ATTR_NAME => $key), $key);
+		self::$sphinxConnection[$indexName]->setCommentsEnabled(false);
 		
-		return self::$sphinxConnection;
+		return self::$sphinxConnection[$indexName];
 	}
 
 	public static function connectFallbackLogic($connectCallback, array $connectParams, $dataSources, $preferredIndex = false, $cacheExpiry = 30)

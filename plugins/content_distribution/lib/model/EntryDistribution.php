@@ -332,6 +332,11 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
 	
+	public function getSphinxIndexName()
+	{
+		return kSphinxSearchManager::getSphinxIndexName(EntryDistributionIndex::getObjectIndexName());
+	}
+	
 	/* (non-PHPdoc)
 	 * @see lib/model/om/BaseEntryDistribution#postUpdate()
 	 */

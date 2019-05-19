@@ -232,6 +232,11 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile, IRelat
 		if ($this->getObjectType() == MetadataObjectType::DYNAMIC_OBJECT)
 			kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
+	
+	public function getSphinxIndexName()
+	{
+		return kSphinxSearchManager::getSphinxIndexName(MetadataIndex::getObjectIndexName());
+	}
 
 	/**
 	 * @return boolean
