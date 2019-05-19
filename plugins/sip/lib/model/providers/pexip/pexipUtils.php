@@ -41,7 +41,7 @@ class PexipUtils
 		if (!$dbLiveEntry->getSipToken() || $regenerate)
 		{
 			$addition = str_pad(substr((string)microtime(true) * 10000, -5), 5, '0', STR_PAD_LEFT);
-			return  $dbLiveEntry->getPartnerId() . $addition . PexipUtils::SIP_URL_DELIMITER . $pexipConfig[PexipUtils::CONFIG_HOST_URL];
+			return $dbLiveEntry->getPartnerId() . $addition . self::SIP_URL_DELIMITER . $pexipConfig[PexipUtils::CONFIG_HOST_URL];
 		}
 		return $dbLiveEntry->getSipToken();
 	}
@@ -227,11 +227,11 @@ class PexipUtils
 		$sipEntryServerNode->setEntryId($entry->getId());
 		$sipEntryServerNode->setServerNodeId($serverNode->getId());
 		$sipEntryServerNode->setServerType(SipPlugin::getCoreValue('EntryServerNodeType', SipEntryServerNodeType::SIP_ENTRY_SERVER));
-		$sipEntryServerNode->setSipRoomStatus(SipEntryServerNodeStatus::CREATED);
+		$sipEntryServerNode->setStatus(SipEntryServerNodeStatus::CREATED);
 		$sipEntryServerNode->setPartnerId($entry->getPartnerId());
 		$sipEntryServerNode->setSipRoomId($roomId);
-		$sipEntryServerNode->setSipRoomPrimaryADP($primaryAdpId);
-		$sipEntryServerNode->setSipRoomSecondaryADP($secondaryAdpId);
+		$sipEntryServerNode->setSipPrimaryAdpId($primaryAdpId);
+		$sipEntryServerNode->setSipSecondaryAdpId($secondaryAdpId);
 		$sipEntryServerNode->save();
 
 		return $sipEntryServerNode;
