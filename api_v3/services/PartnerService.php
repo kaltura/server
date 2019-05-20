@@ -514,9 +514,7 @@ class PartnerService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $id);
 		}
 
-		$c = PartnerPeer::getDefaultCriteria();
-		$c->addAnd(PartnerPeer::ID ,$id);
-		$dbPartner = PartnerPeer::doSelectOne($c);
+		$dbPartner = PartnerPeer::retrieveByPK($id);
 		if (is_null($dbPartner))
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $id);
