@@ -69,6 +69,16 @@
 	Run the following alter command against the mysql server where kaltura_sphinx_log table is sotred: 
 		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura_sphinx_log < /opt/kaltura/app/deployment/updates/sql/2019_05_19_alter_table_sphinx_log.sql
 		
+
+## Add getPublicInfo action to partner service ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-9844
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_05_20_add_partner_get_public_info.php
+
 # Naos 14.20.0 #
 
 ## new boolean event notification template ##

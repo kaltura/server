@@ -497,5 +497,36 @@ class PartnerService extends KalturaBaseService
 	    
 	    return PartnerPeer::doCount($c);
 	}
+
+	/**
+	 * Returns partner public info by Id
+	 *
+	 * @action getPublicInfo
+	 * @param int $id
+	 * @return KalturaPartnerPublicInfo
+	 *
+	 * @throws APIErrors::INVALID_PARTNER_ID
+	 */
+	public function getPublicInfoAction ($id = null)
+	{
+		if (!$id)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $id);
+		}
+
+		$c = PartnerPeer::getDefaultCriteria();
+		$c->addAnd(PartnerPeer::ID ,$id);
+		$dbPartner = PartnerPeer::doSelectOne($c);
+		if (is_null($dbPartner))
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $id);
+		}
+
+		$response = new KalturaPartnerPublicInfo();
+		$response->analyticsUrl = $dbPartner->getAnalyticsUrl();
+		$response->ottServiceUrl = $dbPartner->getOttEnvironmentUrl();
+
+		return $response;
+	}
 	
 }
