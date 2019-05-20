@@ -79,6 +79,25 @@
 
 	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_05_20_add_partner_get_public_info.php
 
+## Fix polls ##
+
+- Issue Type: Bug
+- Issue ID: PLAT-9878
+
+### Configuration ###
+
+	
+#### Deployment Scripts ####	
+
+First replace all tokens in the XML file below and remove ".template" from the fle name:
+
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_05_20_update_player_slide_module_notifications_include_select_poll_state_tag.template.xml
+
+Run deployment script:
+
+    php /opt/kaltura/app/deployment/updates/scripts/2019_05_20_update_player_slide_module_notifications_include_select_poll_state_tag.php
+
+
 # Naos 14.20.0 #
 
 ## new boolean event notification template ##
