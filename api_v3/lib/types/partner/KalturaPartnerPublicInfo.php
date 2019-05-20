@@ -25,4 +25,12 @@ class KalturaPartnerPublicInfo extends KalturaObject
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
+
+	public function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		parent::doFromObject($srcObj, $responseProfile);
+
+		$this->analyticsUrl = $srcObj->getAnalyticsUrl();
+		$this->ottServiceUrl = $srcObj->getOttEnvironmentUrl();
+	}
 }

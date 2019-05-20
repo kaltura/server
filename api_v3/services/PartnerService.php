@@ -523,8 +523,7 @@ class PartnerService extends KalturaBaseService
 		}
 
 		$response = new KalturaPartnerPublicInfo();
-		$response->analyticsUrl = $dbPartner->getAnalyticsUrl();
-		$response->ottServiceUrl = $dbPartner->getOttEnvironmentUrl();
+		$response->fromObject($dbPartner, $this->getResponseProfile());
 
 		return $response;
 	}
