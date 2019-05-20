@@ -142,10 +142,6 @@
 				$params->passes = 1;
 			}
 
-			$this->buildTemplateVideoCommandLine();
-
-			KalturaLog::log("data:".print_r($this,1));
-
 				/*
 				 * Evaluate various defaults
 				 * - frame duration
@@ -155,6 +151,10 @@
 			$params->frameDuration = 1/$params->fps;
 			$this->setup->Update($params);
 			
+			$this->buildTemplateVideoCommandLine();
+
+			KalturaLog::log("data:".print_r($this,1));
+
 				/*
 				 * Inaccuracy threshold
 				 * - maxInaccuracyValue - max thresh on merge
@@ -331,13 +331,9 @@
 				$toAddFps = true;
 			}
 			if(($key=array_search("-force_key_frames", $cmdLineArr))!==false) {
-				if(($auxStr=strstr($cmdLineArr[$key+1],"n_forced"))!==false){
-					sscanf($auxStr,"n_forced*%d",$gopInSecs);
-				}
-				else 
-					$gopInSecs=round($params->gop/$params->fps);
-				$cmdLineArr[$key+1]="'expr:gte(t,n_forced*$gopInSecs)'";
+				$cmdLineArr[$key+1]=self::handleForcedKeyFrames($cmdLineArr[$key+1], $cmdLineArr, $params, $this->setup->chunkDuration);
 			}
+			
 			if(($key=array_search("-c:a", $cmdLineArr))!==false
 			|| ($key=array_search("-acodec", $cmdLineArr))!==false) {
 				unset($cmdLineArr[$key+1]);
@@ -408,6 +404,49 @@
 			KalturaLog::log("cmdLine:$this->cmdLine");
 		}
 
+		/********************
+		 * handleForcedKeyFrames
+		 *	
+		 */
+		protected static function handleForcedKeyFrames($forcedKeyFramesStr, $cmdLineArr, $params, $chunkDuration)
+		{
+				// Fetch the gopInSec size from the forcedKeyFramesStr or calculate it via gop and fps
+			if(($auxStr=strstr($forcedKeyFramesStr,"n_forced"))!==false){
+				sscanf($auxStr,"n_forced*%d",$gopInSecs);
+			}
+			else 
+				$gopInSecs=round($params->gop/$params->fps);
+
+				// Calculate the time interval that are needed to generate extra I frames 
+				// that are needed for to fix/fill-in missing frames from the 2nd segment 
+			$setExtraIFramesTimingEnd = round($chunkDuration+$params->frameDuration*2,3);
+			
+				/*
+				  Following is required only for renditions with B Frames. 
+				  BF's can be set either explicitly (via main/high profiles),
+				  or implicitly by providing '-bf' operand
+				  '__FORCED_KF_START_SHIFT__' and '__FORCED_KF_EXTRA_IFARMES__' used later
+				  
+				  The Forced KF operand might contain following -
+				  - gte(t__FORCED_KF_START_SHIFT__,n_forced*$gopInSecs) - the original forced KF setup with shift to the 'time 0'
+				  - gte(t,__FORCED_KF_EXTRA_IFARMES__)*lt(t,$setExtraIFramesTimingEnd)) - generate I frames starting from half-frame before EOF chunk, till 3 frames after the chunk end (into the 2nd segement)
+				*/
+			if(!isset($params->bf)){
+				if($params->vcodec=='libx264' && in_array($params->vprofile, array('main','high') ))
+					$forcedKeyFramesStr = "'expr:if(gte(t__FORCED_KF_START_SHIFT__,n_forced*$gopInSecs),gte(t,__FORCED_KF_EXTRA_IFARMES__)*lt(t,$setExtraIFramesTimingEnd))'";
+				else
+					$forcedKeyFramesStr = "'expr:gte(t__FORCED_KF_START_SHIFT__,n_forced*$gopInSecs)'";
+			}
+			else if($params->bf>0)
+				$forcedKeyFramesStr = "'expr:if(gte(t__FORCED_KF_START_SHIFT__,n_forced*$gopInSecs),gte(t,__FORCED_KF_EXTRA_IFARMES__)*lte(t,$setExtraIFramesTimingEnd))'";
+			else
+				$forcedKeyFramesStr = "'expr:gte(t__FORCED_KF_START_SHIFT__,n_forced*$gopInSecs)'";
+				
+//$forcedKeyFramesStr = "'expr:gte(t__FORCED_KF_START_SHIFT__,n_forced*$gopInSecs)'";
+			KalturaLog::log("forcedKeyFramesStr:".$forcedKeyFramesStr);
+			return $forcedKeyFramesStr;
+		}
+		
 		/********************
 		 * adjustTimeRelatedFilters
 		 *	Handles WM and Subs that require per chunk adjustments
@@ -487,6 +526,26 @@
 		}
 		
 		/********************
+		 * adjustForcedKeyFrames
+		 *	per every chunk
+		 */
+		protected function adjustForcedKeyFrames($cmdLine, $start, $chunkData)
+		{
+				// Calc the shift - round reminder
+			$shift = round($start-floor($start),4);
+				// Calc the timing or the extra I Frames - half frame shorter than the chunk dur
+			if(isset($chunkData->frames)) {
+				$extraIFramesStart = round(($chunkData->frames-0.5)*$this->params->frameDuration,4);
+			}
+			else {
+				$extraIFramesStart = round($chunkData->duration,4);
+			}
+			$cmdLine = str_replace(array("__FORCED_KF_START_SHIFT__","__FORCED_KF_EXTRA_IFARMES__"), 
+								array("+$shift",$extraIFramesStart), $cmdLine);
+			return $cmdLine;
+		}
+		
+		/********************
 		 * 
 		 */
 		public function BuildVideoCommandLine($start, $chunkIdx)
@@ -496,7 +555,7 @@
 			$setup = $this->setup;
 			$params = $this->params;
 			$chunkWithOverlap = $setup->chunkDuration + $setup->chunkOverlap;
-			
+			$chunkData = $this->chunkDataArr[$chunkIdx];
 			{
 				$cmdLine = " -i ".$this->cmdLine." -t $chunkWithOverlap";
 				if(isset($params->httpHeaderExtPrefix)){
@@ -523,7 +582,7 @@
 				$cmdLine = " -threads ".$this->params->threadsDec.$cmdLine;
 				
 				$cmdLine = $this->adjustTimeRelatedFilters($cmdLine, $chunkIdx, $start, $chunkWithOverlap);
-				KalturaLog::log($cmdLine);
+				$cmdLine = $this->adjustForcedKeyFrames($cmdLine, $start, $chunkData);
 			}
 			$cmdLine = "$setup->ffmpegBin $cmdLine";
 
@@ -533,7 +592,6 @@
 				$cmdLine = "$cmdPass1 && $cmdLine -passlogfile $chunkFilename.pass2log -pass 2";
 			}
 			$cmdLine.= " -f segment -segment_format $this->chunkFileFormat -initial_offset $start";
-			$chunkData = $this->chunkDataArr[$chunkIdx];
 			if(isset($chunkData->frames)) {
 				$cmdLine.= " -segment_frames ".($chunkData->frames);
 			}
@@ -541,6 +599,7 @@
 				$cmdLine.= " -segment_time ".$chunkData->duration;
 			}
 			$cmdLine.= " -segment_start_number $chunkIdx -segment_list /dev/null $chunkFilename%d ";
+			KalturaLog::log($cmdLine);
 			return $cmdLine;
 		}
 
