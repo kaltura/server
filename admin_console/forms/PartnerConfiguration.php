@@ -14,6 +14,7 @@ class Form_PartnerConfiguration extends Infra_Form
     const THUMBNAIL_CONFIGURATION = 'THUMBNAIL_CONFIGURATION';
     const SECURITY_OPTIONS = 'GROUP_SECURITY_OPTIONS';
 	const ELASTIC_OPTIONS = 'GROUP_ELASTIC_OPTIONS';
+	const GROUP_AUTHENTICATION_SETTING = 'GROUP_AUTHENTICATION_SETTING';
    	
     protected $limitSubForms = array();
     
@@ -497,6 +498,23 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 
+//--------------------------- Authentication Settings ---------------------------
+
+		$this->addElement('checkbox', 'enable_two_factor_authentication', array(
+			'label'	  => 'Enable two factor authentication',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
+		));
+
+		$this->addElement('checkbox', 'enable_sso', array(
+			'label'	  => 'Enable SSO',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
+		));
+
+		$this->addElement('checkbox', 'block_direct_login', array(
+			'label'	  => 'Block direct login',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
+		));
+
 		//--------------------------- Enable/Disable Features ---------------------------
 		$moduls = Zend_Registry::get('config')->moduls;
 		if ($moduls)
@@ -920,6 +938,9 @@ class Form_PartnerConfiguration extends Infra_Form
 									 $permissionNames[self::SECURITY_OPTIONS],
 									array('crossLine')),
 									 'passwordSecurity', array('legend' => 'Password Security'));
+
+		$this->addDisplayGroup(array_merge(array('enable_two_factor_authentication', 'enable_sso', 'block_direct_login'), array('crossLine')), 'authenticationSettings', array('legend' => 'Authentication Settings'));
+
 		$this->addDisplayGroup(array_merge(array('editESearchLanguages','e_search_languages'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
 		$this->addDisplayGroup(array('partner_package'), 'accountPackagesService', array('legend' => 'Service Packages'));
 		$this->addDisplayGroup(array('partner_package_class_of_service', 'vertical_clasiffication', 'crm_id', 'crm_link', 'internal_use', 'crossLine'), 'accountPackages');

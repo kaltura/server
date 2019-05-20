@@ -380,6 +380,21 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $enableSelfServe;
 
+	/**
+	 * @var bool
+	 */
+	public $enableTwoFactorAuthentication;
+
+	/**
+	 * @var bool
+	 */
+	public $enableSso;
+
+	/**
+	 * @var bool
+	 */
+	public $blockDirectLogin;
+
 	private static $map_between_objects = array
 	(
 		"id",
@@ -453,6 +468,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"ovpEnvironmentUrl",
 		"ottEnvironmentUrl",
 		"enableSelfServe",
+		"enableTwoFactorAuthentication",
+		"enableSso",
+		"blockDirectLogin",
 	);
 
 	public function getMapBetweenObjects()

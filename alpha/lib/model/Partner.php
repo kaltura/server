@@ -2060,4 +2060,34 @@ class Partner extends BasePartner
 		$this->putInCustomData(self::ANALYTICS_HOST, $v);
 	}
 
+	public function getEnableTwoFactorAuthentication()
+	{
+		return $this->getFromCustomData("enableTwoFactorAuthentication", null, false);
+	}
+
+	public function setEnableTwoFactorAuthentication($v)
+	{
+		$this->putInCustomData("enableTwoFactorAuthentication", $v);
+	}
+
+	public function getEnableSso()
+	{
+		return $this->getFromCustomData("enableSso", null, false);
+	}
+
+	public function setEnableSso($v)
+	{
+		$this->putInCustomData("enableSso", $v);
+	}
+
+	public function getBlockDirectLogin()
+	{
+		return $this->getFromCustomData("blockDirectLogin", null, false);
+	}
+
+	public function setBlockDirectLogin($v)
+	{
+		$this->putInCustomData("blockDirectLogin", $v);
+	}
+
 }
