@@ -227,7 +227,7 @@ if __name__ == '__main__':
                       help="save the raw input to a file")
     parser.add_option("-W", "--save-window", dest="saveWindow",default=3600,type="int",
                       help="determines the interval in seconds for reopening the output file", metavar="SECS")
-    parser.add_option("-f", "--output-format", dest="outputFileFormat",default='/var/log/apimon-%Y-%m-%d-%H.log.gz',
+    parser.add_option("-f", "--output-format", dest="outputFileFormat",default='/var/log/apimon/apimon-%Y-%m-%d-%H.log.gz',
                       help="sets the output file naming format", metavar="FMT")
     (options, args) = parser.parse_args()
 
