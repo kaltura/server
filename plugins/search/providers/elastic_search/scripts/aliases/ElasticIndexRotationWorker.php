@@ -11,11 +11,14 @@ class ElasticIndexRotationWorker
 	const REMOVE = 'remove';
 	const INDEX = 'index';
 	const ALIAS = 'alias';
+	const ALIASES = 'aliases';
 
 	protected $configSection;
 	protected $dryRun;
+	protected $handleUnusedIndices;
 
 	//section config
+	/* @var elasticClient $client */
 	protected $client;
 	protected $indexPattern;
 	protected $indexAlias;
@@ -24,10 +27,11 @@ class ElasticIndexRotationWorker
 	protected $mappingPath;
 	protected $indexDateFormat;
 
-	public function __construct($configSection, $dryRun)
+	public function __construct($configSection, $dryRun, $handleUnusedIndices = false)
 	{
 		$this->configSection = $configSection;
 		$this->dryRun = $dryRun;
+		$this->handleUnusedIndices = $handleUnusedIndices;
 	}
 
 	public function rotate()
@@ -189,6 +193,60 @@ class ElasticIndexRotationWorker
 		$aliasesToAdd[] = new ElasticIndexAlias($newIndex, $this->indexAlias);
 
 		$this->changeAliases($aliasesToAdd, $aliasesToRemove);
+
+		if($this->handleUnusedIndices)
+		{
+			$this->handleUnusedIndices();
+		}
+	}
+
+	protected function handleUnusedIndices()
+	{
+		$indicesToDelete = $this->getUnusedIndicesToHandle();
+		$this->deleteIndices($indicesToDelete);
+	}
+
+	protected function deleteIndices($indicesToDelete)
+	{
+		if(!$indicesToDelete)
+		{
+			KalturaLog::debug("No indices to delete");
+			return;
+		}
+
+		$indicesToDeleteString = implode(",", $indicesToDelete);
+		if($this->dryRun)
+		{
+			KalturaLog::debug("Dry run - deleting indices {$indicesToDeleteString}");
+		}
+		else
+		{
+			$response = $this->client->deleteIndex($indicesToDeleteString);
+			if (!$response)
+			{
+				die("Could not delete indices: {$indicesToDeleteString}\n");
+			}
+		}
+	}
+
+	protected function getUnusedIndicesToHandle()
+	{
+		$indicesToDelete = array();
+		$response = $this->client->getIndexInfo($this->indexPattern . '*');
+		if (!$response)
+		{
+			die("Could not get indices info\n");
+		}
+
+		foreach ($response as $indexName => $indexInfo)
+		{
+			if(!array_key_exists(self::ALIASES, $indexInfo) || !$indexInfo[self::ALIASES])
+			{
+				$indicesToDelete[] = $indexName;
+			}
+		}
+
+		return $indicesToDelete;
 	}
 
 	/**
