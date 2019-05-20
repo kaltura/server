@@ -1,5 +1,34 @@
 # Orion 15.0.0 #
 
+## Support Sip Integration ##
+
+- Issue Type: Task
+- Issue ID: PLAT-9777
+
+### Configuration ###
+1. in admin.ini add:
+	moduls.Sip.enabled = true
+	moduls.Sip.permissionType = 2
+	moduls.Sip.label = "Enable Sip"
+	moduls.Sip.permissionName = FEATURE_SIP
+	moduls.Sip.group = GROUP_ENABLE_DISABLE_FEATURES
+2. add Sip to plugins.ini	
+3. copy /opt/kaltura/app/configurations/sip.template.ini to sip.ini and replace all tokens accordingly.
+	
+#### Deployment Scripts ####	
+
+1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+2. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_04_21_add_pexip_permissions.php
+3. add One serverNode for parter -5 with sipType (KalturaSipServerNode):
+	servernode add 
+	serverNode:objectType=KalturaSipServerNode 
+	serverNode:environment=$ENV$
+	serverNode:name=$NAME$
+	serverNode:description=$DESCRIPTION$ 
+	serverNode:hostName=$HOSTNAME$
+	
+4. enable the created ServerNode. ( servernode enable id=$CREATED_SERVER_NODE_ID$)
+
 ## Support sphinx index sharding ##
 
 - Issue Type: Task
