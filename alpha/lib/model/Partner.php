@@ -83,7 +83,6 @@ class Partner extends BasePartner
 	const RTC_SERVER_NODE_ENV = 'rtc_server_node_env';
 
 	const ANALYTICS_HOST = "analytics_host";
-	const ANALYTICS_URL = "analytics_url";
 
 	private $cdnWhiteListCache = array();
 
@@ -2049,11 +2048,6 @@ class Partner extends BasePartner
 			$fullUrl = infraRequestUtils::getProtocol() . '://' . $host;
 		}
 		return $fullUrl;
-	}
-
-	public function setAnalyticsUrl($v)
-	{
-		$this->putInCustomData(self::ANALYTICS_URL, $v);
 	}
 
 	public function getAnalyticsHost()
