@@ -32,4 +32,10 @@ abstract class imagickAction extends kThumbnailAction
 	{
 		return false;
 	}
+
+	public function getActionType()
+	{
+		return kActionType::IMAGICK;
+	}
+
 }

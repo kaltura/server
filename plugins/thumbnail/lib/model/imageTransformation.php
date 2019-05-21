@@ -11,6 +11,7 @@ class imageTransformation
 
 	public function validate()
 	{
+		myPartnerUtils::blockInactivePartner(kCurrentContext::getCurrentPartnerId());
 		$stepsCount = count($this->imageSteps);
 		if(!$stepsCount)
 		{
@@ -58,4 +59,25 @@ class imageTransformation
 	{
 		$this->imageSteps[] = $step;
 	}
+
+	public function getLastModified()
+	{
+		$lastModifiedArray = array();
+		foreach ($this->imageSteps as $imageTransformationStep)
+		{
+			$lastModified = $imageTransformationStep->getLastModified();
+			if($lastModified)
+			{
+				$lastModifiedArray[] = $lastModified;
+			}
+		}
+
+		if($lastModifiedArray)
+		{
+			return min($lastModifiedArray);
+		}
+
+		return null;
+	}
+
 }

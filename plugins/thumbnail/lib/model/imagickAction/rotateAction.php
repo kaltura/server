@@ -31,7 +31,7 @@ class rotateAction extends imagickAction
 
 	protected function extractActionParameters()
 	{
-		$this->degrees = self::getIntActionParameter(kThumbnailParameterName::DEGREES, self::MIN_DEGREES);
+		$this->degrees = self::getFloatActionParameter(kThumbnailParameterName::DEGREES, self::MIN_DEGREES);
 		$this->backgroundColor = self::getColorActionParameter(kThumbnailParameterName::BACKGROUND_COLOR, 'black');
 	}
 

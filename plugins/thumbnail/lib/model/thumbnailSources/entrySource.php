@@ -1,7 +1,7 @@
 <?php
 /**
  * @package plugins.thumbnail
- * @subpackage model
+ * @subpackage model.thumbnailSources
  */
 
 class entrySource extends thumbnailSource
@@ -48,5 +48,24 @@ class entrySource extends thumbnailSource
 		}
 
 		throw new KalturaAPIException(KalturaThumbnailErrors::MISSING_SOURCE_ACTIONS_FOR_TYPE, $this->getEntryMediaType());
+	}
+
+	public function getLastModified()
+	{
+		if($this->getEntryMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+		{
+			$fileSyncKey = $this->dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$fileSync= kFileSyncUtils::getOriginFileSyncForKey($fileSyncKey,false);
+			if($fileSync)
+			{
+				return $fileSync->getUpdatedAt(null);
+			}
+		}
+		else
+		{
+			$lastModifiedFlavor = assetPeer::retrieveLastModifiedFlavorByEntryId($this->dbEntry->getId());
+			$lastModified = $lastModifiedFlavor ? $lastModifiedFlavor->getUpdatedAt(null) : null;
+			return $lastModified;
+		}
 	}
 }

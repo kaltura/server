@@ -7,4 +7,9 @@
 abstract class thumbnailSource
 {
 	public abstract function getImage();
+
+	public function getLastModified()
+	{
+		return null;
+	}
 }
