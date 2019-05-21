@@ -994,7 +994,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		return $cuePoint;
 	}
 	
-	private static function parseQuestionQuePoint(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
+	protected static function parseQuestionQuePoint(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
 	{
 		if(!$cuePoint)
 		{
@@ -1049,7 +1049,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		return $cuePoint;
 	}
 	
-	private static function parseAnswerQuePoint(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
+	protected static function parseAnswerQuePoint(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
 	{
 		if(!$cuePoint)
 		{
@@ -1091,7 +1091,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		return $scene;
 	}
 	
-	private static function generateQuestionXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	protected static function generateQuestionXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
 	{
 		if(!$scene)
 			$scene = kCuePointManager::generateCuePointXml($cuePoint, $scenes->addChild('scene-question-cue-point'));
@@ -1099,7 +1099,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		return self::generateQuestionSimpleXmlElement($cuePoint, $scenes, $scene);
 	}
 	
-	private static function generateAnswerXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	protected static function generateAnswerXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
 	{
 		if(!$scene)
 			$scene = kCuePointManager::generateCuePointXml($cuePoint, $scenes->addChild('scene-answer-cue-point'));
@@ -1124,23 +1124,27 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		return $scene;
 	}
 	
-	private static function syndicateAnswerCuePointXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	protected static function syndicateAnswerCuePointXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
 	{
 		if(!$scene)
+		{
 			$scene = kCuePointManager::syndicateCuePointXml($cuePoint, $scenes->addChild('scene-answer-cue-point'));
+		}
 		
 		return self::generateAnswerSimpleXmlElement($cuePoint, $scenes, $scene);
 	}
 	
-	private static function syndicateQuestionCuePointXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	protected static function syndicateQuestionCuePointXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
 	{
 		if(!$scene)
+		{
 			$scene = kCuePointManager::syndicateCuePointXml($cuePoint, $scenes->addChild('scene-question-cue-point'));
+		}
 		
 		return self::generateQuestionSimpleXmlElement($cuePoint, $scenes, $scene);
 	}
 	
-	private static function generateQuestionSimpleXmlElement(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	protected static function generateQuestionSimpleXmlElement(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
 	{
 		/* @var $cuePoint QuestionCuePoint */
 		if($cuePoint->getName())
@@ -1165,7 +1169,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 			foreach ($optionalAnswers as $optionalAnswer)
 			{
 				/* @var $optionalAnswer kOptionalAnswer */
-				$optionalAnswersScene-addChild("optionalAnswer");
+				$optionalAnswersScene->addChild("optionalAnswer");
 				if($optionalAnswer->getKey())
 				{
 					$scene->addChild('key', kMrssManager::stringToSafeXml($cuePoint->getKey()));
@@ -1188,7 +1192,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		return $scene;
 	}
 	
-	private static function generateAnswerSimpleXmlElement(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	protected static function generateAnswerSimpleXmlElement(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
 	{
 		/* @var $cuePoint AnswerCuePoint */
 		if($cuePoint->getAnswerKey())
