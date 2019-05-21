@@ -6,17 +6,17 @@
 
 class kThumbStorageLocal extends kThumbStorageBase implements kThumbStorageInterface
 {
-	public function saveFile($fileName , $content)
+	public function saveFile($fileName, $content)
 	{
 		$path = $this->getFullPath($fileName);
 		kFile::fullMkdir($path);
-		$ret = kFile::safeFilePutContents($path,$content);
+		$ret = kFile::safeFilePutContents($path, $content);
 		$this->fileName = $path;
 		return $ret;
 	}
 	protected function getRenderer()
 	{
-		$renderer = kFileUtils::getDumpFileRenderer($this->fileName, self::MIME_TYPE ,self::MAX_AGE);
+		$renderer = kFileUtils::getDumpFileRenderer($this->fileName,self::MIME_TYPE,self::MAX_AGE);
 		return $renderer;
 	}
 	public function loadFile($url)
