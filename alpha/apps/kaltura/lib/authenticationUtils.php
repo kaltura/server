@@ -57,4 +57,10 @@ class authenticationUtils
 
 		return $job;
 	}
+
+	public static function verify2FACode($loginData, $otp)
+	{
+		$userSeed = $loginData->getSeedFor2FactorAuth();
+		return GoogleAuthenticator::verifyCode ($userSeed, $otp);
+	}
 }

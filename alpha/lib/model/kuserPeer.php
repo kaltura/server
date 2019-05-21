@@ -11,6 +11,10 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 {	
 	const KALTURA_NEW_USER_EMAIL = 120;
 	const KALTURA_NEW_EXISTING_USER_EMAIL = 121;
+	const KALTURA_NEW_USER_SSO_EMAIL = 142;
+	const KALTURA_NEW_USER_2FA_EMAIL = 141;
+	const KALTURA_NEW_EXISTING_USER_SSO_EMAIL = 140;
+	const KALTURA_NEW_EXISTING_USER_2FA_EMAIL = 139;
 	const KALTURA_NEW_USER_EMAIL_TO_ADMINS = 122;
 	const KALTURA_NEW_USER_ADMIN_CONSOLE_EMAIL = 123;
 	const KALTURA_NEW_EXISTING_USER_ADMIN_CONSOLE_EMAIL = 124;
@@ -575,7 +579,8 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 				$creatorUserName = $creatorUser->getFullName();
 			}
 		}
-		$publisherName = PartnerPeer::retrieveByPK($partnerId)->getName();
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$publisherName = $partner->getName();
 		$loginEmail = $user->getEmail();
 		$roleName = $user->getUserRoleNames();
 		$puserId = $user->getPuserId();
@@ -613,16 +618,9 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		}
 		else // Not an admin console partner
 		{
-			if ($existingUser)
-			{
-				$mailType = self::KALTURA_NEW_EXISTING_USER_EMAIL;
-				$bodyParams = array($userName, $creatorUserName, $publisherName, $loginEmail, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
-			}
-			else
-			{
-				$mailType = self::KALTURA_NEW_USER_EMAIL;
-				$bodyParams = array($userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
-			}		
+			$authType = myPartnerUtils::getAuthenticationType($partner);
+			$mailType = self::getUserMailType($authType, $existingUser);
+			$bodyParams = self::getUserBodyParams($authType, $existingUser, $userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
 		}
 		// add mail job
 		kJobsManager::addMailJob(
@@ -636,6 +634,67 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			$loginEmail, 
 			$bodyParams
 		);
+	}
+
+	public static function getUserMailType($authType, $existingUser)
+	{
+		$existingUserMailMap = array(KalturaPartnerAuthenticationType::SSO => self::KALTURA_NEW_USER_SSO_EMAIL,
+			KalturaPartnerAuthenticationType::TWO_FACTOR_AUTH => self::KALTURA_NEW_USER_2FA_EMAIL,
+			KalturaPartnerAuthenticationType::PASSWORD_ONLY => self::KALTURA_NEW_EXISTING_USER_EMAIL);
+
+		$newUserMailMap = array(KalturaPartnerAuthenticationType::SSO => self::KALTURA_NEW_USER_SSO_EMAIL,
+			KalturaPartnerAuthenticationType::TWO_FACTOR_AUTH => self::KALTURA_NEW_USER_2FA_EMAIL,
+			KalturaPartnerAuthenticationType::PASSWORD_ONLY => self::KALTURA_NEW_USER_EMAIL);
+
+		if($existingUser)
+		{
+			return $existingUserMailMap[$authType];
+		}
+		else
+		{
+			return $newUserMailMap[$authType];
+		}
+	}
+
+	public static function getUserBodyParams($authType, $existingUser, $userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink)
+	{
+		if($existingUser)
+		{
+			switch($authType)
+			{
+				case KalturaPartnerAuthenticationType::SSO:
+					break;
+				case KalturaPartnerAuthenticationType::TWO_FACTOR_AUTH:
+					$kmcngParams = kConf::get('kmcng');
+					$qrUrl = $kmcngParams['kaltura']['qrUrl'];
+					if(!$qrUrl)
+					{
+						break;
+					}
+					return array($userName, $partnerId, $qrUrl);
+				case KalturaPartnerAuthenticationType::PASSWORD_ONLY:
+					return array($userName, $creatorUserName, $publisherName, $loginEmail, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
+			}
+		}
+		else
+		{
+			switch($authType)
+			{
+				case KalturaPartnerAuthenticationType::SSO:
+					break;
+				case KalturaPartnerAuthenticationType::TWO_FACTOR_AUTH:
+					$kmcngParams = kConf::get('kmcng');
+					$qrUrl = $kmcngParams['kaltura']['qrUrl'];
+					if(!$qrUrl)
+					{
+						break;
+					}
+					return array($userName, $partnerId, $qrUrl);
+				case KalturaPartnerAuthenticationType::PASSWORD_ONLY:
+					return array($userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
+			}
+		}
+		return array();
 	}
 			
 	public static function getCacheInvalidationKeys()

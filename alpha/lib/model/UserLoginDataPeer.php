@@ -420,9 +420,9 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		if (time() < $loginData->getLoginBlockedUntil(null)) {
 			throw new kUserException('', kUserException::LOGIN_BLOCKED);
 		}
-		
+
 		//Check if the user's ip address is in the right range to ignore the otp
-		
+		$otpRequired = false;
 		if(kConf::hasParam ('otp_required_partners') && 
 			in_array ($partnerId, kConf::get ('otp_required_partners')) &&
 			kConf::hasParam ('partner_otp_internal_ips'))
@@ -437,34 +437,37 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 					break;
 				}
 			}
-			
-			if ($otpRequired)
-			{
-				// add google authenticator library to include path
-				require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
-				
-				$result = GoogleAuthenticator::verifyCode ($loginData->getSeedFor2FactorAuth(), $otp);
-				if (!$result)
-				{
-					throw new kUserException ('', kUserException::INVALID_OTP);
-				}
-			} 
 		}
-		
-		$loginData->setLoginAttempts(0);
-		$loginData->save();
-		$passUpdatedAt = $loginData->getPasswordUpdatedAt(null);
-		if ($passUpdatedAt && (time() > $passUpdatedAt + $loginData->getPassReplaceFreq())) {
-			throw new kUserException('', kUserException::PASSWORD_EXPIRED);
-		}
+
 		if (!$partnerId) {
 			$partnerId = $loginData->getLastLoginPartnerId();
 		}
 		if (!$partnerId) {
 			throw new kUserException('', kUserException::INVALID_PARTNER);
 		}
-		
-		$partner = PartnerPeer::retrieveByPK($partnerId);		
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+
+		if($partner && $partner->getUseTwoFactorAuthentication())
+		{
+			$otpRequired = true;
+		}
+
+		if ($otpRequired)
+		{
+			$result = authenticationUtils::verify2FACode($loginData, $otp);
+			if (!$result)
+			{
+				throw new kUserException ('', kUserException::INVALID_OTP);
+			}
+		}
+
+		$loginData->setLoginAttempts(0);
+		$loginData->save();
+		$passUpdatedAt = $loginData->getPasswordUpdatedAt(null);
+		if ($passUpdatedAt && (time() > $passUpdatedAt + $loginData->getPassReplaceFreq())) {
+			throw new kUserException('', kUserException::PASSWORD_EXPIRED);
+		}
+
 		$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
 		
 		if (!$kuser || $kuser->getStatus() != KuserStatus::ACTIVE || !$partner || $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE)
