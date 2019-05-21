@@ -5,6 +5,7 @@
  * @subpackage api.services
  */
 
+//require_once ("/opt/kaltura/app/plugins/thumbnail/lib/model/thumbStorage/kThumbStorageBase.php");
 class ThumbnailService extends KalturaBaseUserService
 {
 	const PARTNER_INDEX = 0;
@@ -19,32 +20,22 @@ class ThumbnailService extends KalturaBaseUserService
 	 */
 	public function transformAction()
 	{
-		kApiCache::disableCache();
-		$transformation = $this->parseUrl();
-		$transformation->validate();
-		$imagick = $transformation->execute();
-		$tempFilePath = self::saveTransformationResult($imagick);
-		$renderer = kFileUtils::getDumpFileRenderer($tempFilePath, null);
-		$renderer->output();
-		return;
+		$transformationUrl = $this->getTransformationStringFromUri();
+		$transformation = $this->parseUrl($transformationUrl);
+		$storage = kThumbStorageBase::getInstance();
+		if( !$storage->loadFile($transformationUrl) )
+		{
+			$transformation->validate();
+			$imagick = $transformation->execute();
+			$storage->saveFile($transformationUrl,$imagick);
+		}
+		$storage->render();
 	}
 
-	protected function saveTransformationResult($imagick)
+	protected function parseUrl($url)
 	{
-		$dc = kDataCenterMgr::getCurrentDc();
-		$id = $dc["id"].'_'.kString::generateStringId();
-		$fileName = "{$id}.jpg";
-		$tempFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR . $fileName;
-		$imagick->setImageFormat('jpg');
-		file_put_contents($tempFilePath, $imagick);
-		return $tempFilePath;
-	}
-
-	protected function parseUrl()
-	{
-		$transformParametersString = $this->getTransformationStringFromUri();
 		$transformation = new imageTransformation();
-		$steps = explode(self::IMAGE_TRANSFORMATION_STEPS_DELIMITER, $transformParametersString);
+		$steps = explode(self::IMAGE_TRANSFORMATION_STEPS_DELIMITER, $url);
 		$stepsCount = count($steps);
 		for ($i = 1; $i < $stepsCount; $i++)
 		{

@@ -541,7 +541,7 @@ class kFileData
 		
 		if($this->exists)
 		{
-			$this->size = self::fileSize($full_file_path);
+			$this->size = kFile::fileSize($full_file_path);
 			$this->raw_timestamp = filectime($full_file_path);
 			$this->timestamp = date("Y-m-d H:i:s.", $this->raw_timestamp);
 			
