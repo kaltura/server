@@ -1094,7 +1094,9 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 	protected static function generateQuestionXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
 	{
 		if(!$scene)
+		{
 			$scene = kCuePointManager::generateCuePointXml($cuePoint, $scenes->addChild('scene-question-cue-point'));
+		}
 		
 		return self::generateQuestionSimpleXmlElement($cuePoint, $scenes, $scene);
 	}
@@ -1102,7 +1104,9 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 	protected static function generateAnswerXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
 	{
 		if(!$scene)
+		{
 			$scene = kCuePointManager::generateCuePointXml($cuePoint, $scenes->addChild('scene-answer-cue-point'));
+		}
 		
 		return self::generateAnswerSimpleXmlElement($cuePoint, $scenes, $scene);
 	}
