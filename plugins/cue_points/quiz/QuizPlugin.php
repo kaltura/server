@@ -1176,7 +1176,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 				}
 				if($optionalAnswer->getWeight())
 				{
-					$scene->addChild('weight', $optionalAnswer->getWeight()));
+					$scene->addChild('weight', $optionalAnswer->getWeight());
 				}
 				if($optionalAnswer->getIsCorrect())
 				{
