@@ -64,6 +64,7 @@ abstract class kThumbStorageBase
 			self::$type = self::$configParams[self::CONF_TYPE];
 		}
 	}
+
 	public static function getInstance()
 	{
 		self::init();

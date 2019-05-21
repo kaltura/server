@@ -14,11 +14,12 @@ class kThumbStorageLocal extends kThumbStorageBase implements kThumbStorageInter
 		$this->fileName = $path;
 		return $ret;
 	}
+
 	protected function getRenderer()
 	{
-		$renderer = kFileUtils::getDumpFileRenderer($this->fileName,self::MIME_TYPE,self::MAX_AGE);
-		return $renderer;
+		return kFileUtils::getDumpFileRenderer($this->fileName,self::MIME_TYPE,self::MAX_AGE);
 	}
+
 	public function loadFile($url)
 	{
 		$path = $this->getFullPath($url);

@@ -7,6 +7,7 @@
 class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterface
 {
 	protected $s3Mgr;
+
 	function __construct()
 	{
 		$options =  $this->setS3Options();
@@ -30,12 +31,10 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 							self::$configParams[self::CONF_PASSWORD]);
 	}
 
-
-	public function saveFile($fileName , $content)
+	public function saveFile($fileName, $content)
 	{
 		$this->login();
 		$path = $this->getFullPath($fileName);
-		$this->s3Mgr->mkDir(dirname($path));
 		kFile::fullMkdir(self::LOCAL_TMP.$path);
 		kFile::safeFilePutContents(self::LOCAL_TMP.$path,$content);
 		try
@@ -54,11 +53,12 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 		$renderer = new kRendererString($this->content ,self::MIME_TYPE );
 		return $renderer;
 	}
+
 	public function loadFile($url)
 	{
 		$this->login();
 		$path = $this->getFullPath($url);
-		$this->url = self::$configParams[self::CONF_URL].$path;
+		$this->url = self::$configParams[self::CONF_URL] . $path;
 		try
 		{
 			$this->content = $this->s3Mgr->getFile($path);

@@ -11,11 +11,13 @@ class kThumbStorageNone extends kThumbStorageBase implements kThumbStorageInterf
 		$this->url = $url;
 		$this->content = $content;
 	}
+
 	protected function getRenderer()
 	{
 		$renderer = new kRendererString($this->content,self::MIME_TYPE);
 		return $renderer;
 	}
+
 	public function loadFile($path)
 	{
 		return false;
