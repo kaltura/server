@@ -383,12 +383,12 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var bool
 	 */
-	public $enableTwoFactorAuthentication;
+	public $useTwoFactorAuthentication;
 
 	/**
 	 * @var bool
 	 */
-	public $enableSso;
+	public $useSso;
 
 	/**
 	 * @var bool
@@ -468,8 +468,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"ovpEnvironmentUrl",
 		"ottEnvironmentUrl",
 		"enableSelfServe",
-		"enableTwoFactorAuthentication",
-		"enableSso",
+		"useTwoFactorAuthentication",
+		"useSso",
 		"blockDirectLogin",
 	);
 

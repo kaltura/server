@@ -583,4 +583,41 @@ class UserService extends KalturaBaseUserService
 		$file_path = ExportCsvService::generateCsvPath($id, $this->getKs());
 		return $this->dumpFile($file_path, 'text/csv');
 	}
+
+	/**
+	 * Returns user public info by email
+	 *
+	 * @action getPublicInfo
+	 * @param string $loginId
+	 * @return KalturaUserPublicInfo
+	 *
+	 * @throws APIErrors::LOGIN_DATA_NOT_FOUND
+	 * @throws APIErrors::INVALID_FIELD_VALUE
+	 * @throws APIErrors::INVALID_PARTNER_ID
+	 */
+	public function getPublicInfoAction ($loginId)
+	{
+		if (!$loginId)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'loginId');
+		}
+
+		$loginData = UserLoginDataPeer::getByEmail($loginId);
+
+		if(!$loginData || !$loginData->getConfigPartnerId())
+		{
+			throw new KalturaAPIException(KalturaErrors::LOGIN_DATA_NOT_FOUND);
+		}
+
+		$partnerId = $loginData->getConfigPartnerId();
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if (is_null($partner))
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $partnerId);
+		}
+
+		$response = new KalturaUserPublicInfo();
+		$response->authType = myPartnerUtils::getAuthenticationType($partner);
+		return $response;
+	}
 }

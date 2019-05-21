@@ -2171,4 +2171,17 @@ class myPartnerUtils
 		}
 	}
 
+	public static function getAuthenticationType($partner)
+	{
+		if($partner->getUseSso())
+		{
+			return KalturaPartnerAuthenticationType::SSO;
+		}
+		else if($partner->getUseTwoFactorAuthentication())
+		{
+			return KalturaPartnerAuthenticationType::TWO_FACTOR_AUTH;
+		}
+		return KalturaPartnerAuthenticationType::PASSWORD_ONLY;
+	}
+
 }
