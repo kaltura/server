@@ -628,6 +628,8 @@ class UserService extends KalturaBaseUserService
 	 * @param string $loginId
 	 * @return string
 	 *
+	 * @throws APIErrors::INVALID_USER_ID
+	 * @throws APIErrors::ERROR_IN_QR_GENERATION
 	 */
 	public function generateQrCodeAction($loginId)
 	{
@@ -648,6 +650,10 @@ class UserService extends KalturaBaseUserService
 	 *
 	 * @action generateNewSeed
 	 * @param string $loginId
+	 * @return int
+	 *
+	 * @throws APIErrors::INVALID_USER_ID
+	 * @throws APIErrors::ERROR_IN_SEED_GENERATION
 	 *
 	 */
 	public function generateNewSeedAction($loginId)
@@ -657,7 +663,11 @@ class UserService extends KalturaBaseUserService
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $loginId);
 
 		authenticationUtils::generateNewSeed($dbUser);
-		//kuserPeer::sendNewUserMail($this, false);
-		//return $jobId;
+		$job = authenticationUtils::add2FAMailJob($dbUser);
+		if(!$job)
+		{
+			throw new KalturaAPIException(KalturaErrors::ERROR_IN_SEED_GENERATION);
+		}
+		return $job->getId();
 	}
 }
