@@ -620,4 +620,44 @@ class UserService extends KalturaBaseUserService
 		$response->authType = myPartnerUtils::getAuthenticationType($partner);
 		return $response;
 	}
+
+	/**
+	 * get QR image content
+	 *
+	 * @action generateQrCode
+	 * @param string $loginId
+	 * @return string
+	 *
+	 */
+	public function generateQrCodeAction($loginId)
+	{
+		$dbUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $loginId);
+		if (!$dbUser)
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $loginId);
+
+		$imgContent = authenticationUtils::getQRImage($dbUser);
+		if(!$imgContent)
+		{
+			throw new KalturaAPIException(KalturaErrors::ERROR_IN_QR_GENERATION);
+		}
+		return $imgContent;
+	}
+
+	/**
+	 * generate new seed for QR
+	 *
+	 * @action generateNewSeed
+	 * @param string $loginId
+	 *
+	 */
+	public function generateNewSeedAction($loginId)
+	{
+		$dbUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $loginId);
+		if (!$dbUser)
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $loginId);
+
+		authenticationUtils::generateNewSeed($dbUser);
+		//kuserPeer::sendNewUserMail($this, false);
+		//return $jobId;
+	}
 }
