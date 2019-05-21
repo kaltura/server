@@ -2041,10 +2041,21 @@ class Partner extends BasePartner
 
 	public function getAnalyticsUrl()
 	{
+		$host = $this->getAnalyticsHost();
+		$fullUrl = null;
+		if($host)
+		{
+			$fullUrl = infraRequestUtils::getProtocol() . '://' . $host;
+		}
+		return $fullUrl;
+	}
+
+	public function getAnalyticsHost()
+	{
 		return $this->getFromCustomData(self::ANALYTICS_HOST, null , kConf::get(self::ANALYTICS_HOST, 'local',  null));
 	}
 
-	public function setAnalyticsUrl($v)
+	public function setAnalyticsHost($v)
 	{
 		$this->putInCustomData(self::ANALYTICS_HOST, $v);
 	}
