@@ -4,7 +4,7 @@
  * @subpackage model.pexip
  */
 
-class PexipUtils
+class kPexipUtils
 {
 	const CONFIG_LICENSE_THRESHOLD = 'licenseThreshold';
 	const CONFIG_HOST_URL = 'hostUrl';
@@ -41,7 +41,7 @@ class PexipUtils
 		if (!$dbLiveEntry->getSipToken() || $regenerate)
 		{
 			$addition = str_pad(substr((string)microtime(true) * 10000, -5), 5, '0', STR_PAD_LEFT);
-			return $dbLiveEntry->getPartnerId() . $addition . self::SIP_URL_DELIMITER . $pexipConfig[PexipUtils::CONFIG_HOST_URL];
+			return $dbLiveEntry->getPartnerId() . $addition . self::SIP_URL_DELIMITER . $pexipConfig[self::CONFIG_HOST_URL];
 		}
 		return $dbLiveEntry->getSipToken();
 	}
@@ -199,7 +199,7 @@ class PexipUtils
 		}
 
 		$lockKey = 'allocate_sip_room_' . $entry->getId();
-		$sipEntryServerNode = kLock::runLocked($lockKey, array('PexipUtils', 'createSipEntryServerNodeImpl'), array($entry, $roomId, $primaryAdpId, $secondaryAdpId));
+		$sipEntryServerNode = kLock::runLocked($lockKey, array('kPexipUtils', 'createSipEntryServerNodeImpl'), array($entry, $roomId, $primaryAdpId, $secondaryAdpId));
 		return $sipEntryServerNode;
 
 	}
@@ -261,7 +261,7 @@ class PexipUtils
 	 */
 	public static function validateLicensesAvailable($pexipConfig)
 	{
-		$result = PexipHandler::listRooms(0, 1, $pexipConfig, true);
+		$result = kPexipHandler::listRooms(0, 1, $pexipConfig, true);
 		if (empty($result))
 		{
 			KalturaLog::debug('Could Not retrieve active rooms - available licenes not validated!');

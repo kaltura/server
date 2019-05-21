@@ -4,7 +4,7 @@
  * @subpackage model.pexip
  */
 
-class PexipHandler
+class kPexipHandler
 {
 	const ROOM_PREFIX = '/api/admin/configuration/v1/conference/';
 	const ADP_PREFIX = '/api/admin/configuration/v1/automatic_participant/';
@@ -55,7 +55,7 @@ class PexipHandler
 			}
 		}
 
-		$sipEntryServerNode = PexipUtils::createSipEntryServerNode($dbLiveEntry, $roomId, $primaryAdpId, $secondaryAdpId);
+		$sipEntryServerNode = kPexipUtils::createSipEntryServerNode($dbLiveEntry, $roomId, $primaryAdpId, $secondaryAdpId);
 		/** @var  SipEntryServerNode $sipEntryServerNode */
 		if(!$sipEntryServerNode)
 		{
@@ -73,8 +73,8 @@ class PexipHandler
 	 */
 	protected static function addVirtualRoom(LiveStreamEntry $entry, $pexipConfig, $alias)
 	{
-		$roomName = pexipUtils::getRoomName($entry, $pexipConfig);
-		$url = $pexipConfig[PexipUtils::CONFIG_API_ADDRESS] . self::ROOM_PREFIX;
+		$roomName = kPexipUtils::getRoomName($entry, $pexipConfig);
+		$url = $pexipConfig[kPexipUtils::CONFIG_API_ADDRESS] . self::ROOM_PREFIX;
 		KalturaLog::info("Creating Virtual Room with name $roomName for entry " . $entry->getId());
 		$data = array(
 			'name' => $roomName,
@@ -89,7 +89,7 @@ class PexipHandler
 		$virtualRoomId = null;
 		if($curlWrapper->getHttpCode() == KCurlHeaderResponse::HTTP_STATUS_CREATED)
 		{
-			$virtualRoomId = PexipUtils::extractIdFromCreatedResult($result, $url, $curlWrapper->getInfo(CURLINFO_HEADER_SIZE));
+			$virtualRoomId = kPexipUtils::extractIdFromCreatedResult($result, $url, $curlWrapper->getInfo(CURLINFO_HEADER_SIZE));
 		}
 		else
 		{
@@ -108,7 +108,7 @@ class PexipHandler
 			}
 			else
 			{
-				PexipUtils::logError($curlWrapper, $url);
+				kPexipUtils::logError($curlWrapper, $url);
 			}
 		}
 		$curlWrapper->close();
@@ -128,10 +128,10 @@ class PexipHandler
 		switch ($key)
 		{
 			case self::ROOM_NAME_KEY:
-				$url = $pexipConfig[PexipUtils::CONFIG_API_ADDRESS] . self::ROOM_PREFIX . '?name=' . $value;
+				$url = $pexipConfig[kPexipUtils::CONFIG_API_ADDRESS] . self::ROOM_PREFIX . '?name=' . $value;
 				break;
 			case self::ROOM_ID_KEY:
-				$url = $pexipConfig[PexipUtils::CONFIG_API_ADDRESS] . self::ROOM_PREFIX . "$value/";
+				$url = $pexipConfig[kPexipUtils::CONFIG_API_ADDRESS] . self::ROOM_PREFIX . "$value/";
 				break;
 			default:
 				return $virtualRoom;
@@ -145,7 +145,7 @@ class PexipHandler
 		KalturaLog::info('Result From Pexip Server : ' . print_r($result, true));
 		if($result && $curlWrapper->getHttpCode() == KCurlHeaderResponse::HTTP_STATUS_OK)
 		{
-			$virtualRoom = PexipUtils::extractObjectFromdResult($result);
+			$virtualRoom = kPexipUtils::extractObjectFromdResult($result);
 			if(!$virtualRoom)
 			{
 				KalturaLog::info("Didn't find Virutal-Room matching to $key $value");
@@ -153,7 +153,7 @@ class PexipHandler
 		}
 		else
 		{
-			PexipUtils::logError($curlWrapper, $url);
+			kPexipUtils::logError($curlWrapper, $url);
 		}
 		$curlWrapper->close();
 		return $virtualRoom;
@@ -171,10 +171,10 @@ class PexipHandler
 		switch ($key)
 		{
 			case self::ADP_ALIAS_KEY:
-				$url = $pexipConfig[PexipUtils::CONFIG_API_ADDRESS] . self::ADP_PREFIX . '?alias=' . urlencode($value);
+				$url = $pexipConfig[kPexipUtils::CONFIG_API_ADDRESS] . self::ADP_PREFIX . '?alias=' . urlencode($value);
 				break;
 			case self::ADP_ID_KEY:
-				$url = $pexipConfig[PexipUtils::CONFIG_API_ADDRESS] . self::ADP_PREFIX . "$value/";
+				$url = $pexipConfig[kPexipUtils::CONFIG_API_ADDRESS] . self::ADP_PREFIX . "$value/";
 				break;
 			default:
 				return $adp;
@@ -187,7 +187,7 @@ class PexipHandler
 		KalturaLog::info('Result From Pexip Server : ' . print_r($result, true));
 		if($result && $curlWrapper->getHttpCode() == KCurlHeaderResponse::HTTP_STATUS_OK)
 		{
-			$adp = PexipUtils::extractObjectFromdResult($result);
+			$adp = kPexipUtils::extractObjectFromdResult($result);
 			if(!$adp)
 			{
 				KalturaLog::info("Didn't find ADP matching to $key $value");
@@ -195,7 +195,7 @@ class PexipHandler
 		}
 		else
 		{
-			PexipUtils::logError($curlWrapper, $url);
+			kPexipUtils::logError($curlWrapper, $url);
 		}
 		$curlWrapper->close();
 		return $adp;
@@ -260,18 +260,18 @@ class PexipHandler
 			'description' => "ADP for $name " . $entry->getId(),
 			'protocol' => 'rtmp',
 			'role' => 'guest',
-			'conference' => array($pexipConfig[PexipUtils::CONFIG_API_ADDRESS] . self::ROOM_PREFIX . "$roomId/"),
+			'conference' => array($pexipConfig[kPexipUtils::CONFIG_API_ADDRESS] . self::ROOM_PREFIX . "$roomId/"),
 			'streaming' => 1,
 			'keep_conference_alivei_if_multiple' => 1
 		);
-		$url = $pexipConfig[PexipUtils::CONFIG_API_ADDRESS] . self::ADP_PREFIX;
+		$url = $pexipConfig[kPexipUtils::CONFIG_API_ADDRESS] . self::ADP_PREFIX;
 		$curlWrapper = self::initPexipCurlWrapper(HttpMethods::POST, $pexipConfig, $adpData);
 		$result = $curlWrapper->doExec($url);
 		KalturaLog::info('Result for ADP creation is ' . print_r($result, true));
 
 		if($curlWrapper->getHttpCode() == KCurlHeaderResponse::HTTP_STATUS_CREATED)
 		{
-			$adpId = PexipUtils::extractIdFromCreatedResult($result, $url, $curlWrapper->getInfo(CURLINFO_HEADER_SIZE));
+			$adpId = kPexipUtils::extractIdFromCreatedResult($result, $url, $curlWrapper->getInfo(CURLINFO_HEADER_SIZE));
 		}
 		else
 		{
@@ -290,7 +290,7 @@ class PexipHandler
 			}
 			else
 			{
-				PexipUtils::logError($curlWrapper, $url);
+				kPexipUtils::logError($curlWrapper, $url);
 			}
 		}
 		$curlWrapper->close();
@@ -308,9 +308,9 @@ class PexipHandler
 		KalturaLog::info("Updating ADP $adpIp adding Virtual Room $roomId");
 		$result = true;
 		$adpData = array(
-			'conference' => array($pexipConfig[PexipUtils::CONFIG_API_ADDRESS] . self::ROOM_PREFIX . "$roomId/"),
+			'conference' => array($pexipConfig[kPexipUtils::CONFIG_API_ADDRESS] . self::ROOM_PREFIX . "$roomId/"),
 		);
-		$url = $pexipConfig[PexipUtils::CONFIG_API_ADDRESS] . self::ADP_PREFIX . "$adpIp/";
+		$url = $pexipConfig[kPexipUtils::CONFIG_API_ADDRESS] . self::ADP_PREFIX . "$adpIp/";
 
 		$curlWrapper = self::initPexipCurlWrapper(HttpMethods::UPDATE, $pexipConfig, $adpData);
 		$execResult = $curlWrapper->doExec($url);
@@ -318,7 +318,7 @@ class PexipHandler
 
 		if($curlWrapper->getHttpCode() != KCurlHeaderResponse::HTTP_STATUS_ACCEPTED)
 		{
-			PexipUtils::logError($curlWrapper, $url);
+			kPexipUtils::logError($curlWrapper, $url);
 			$result = false;
 		}
 		$curlWrapper->close();
@@ -338,7 +338,7 @@ class PexipHandler
 		$roomData = array(
 			'aliases' => array(array('alias' => $alias))
 		);
-		$url = $pexipConfig[PexipUtils::CONFIG_API_ADDRESS] . self::ROOM_PREFIX . "$roomId/";
+		$url = $pexipConfig[kPexipUtils::CONFIG_API_ADDRESS] . self::ROOM_PREFIX . "$roomId/";
 
 		$curlWrapper = self::initPexipCurlWrapper(HttpMethods::UPDATE, $pexipConfig, $roomData);
 		$execResult = $curlWrapper->doExec($url);
@@ -346,7 +346,7 @@ class PexipHandler
 
 		if($curlWrapper->getHttpCode() != KCurlHeaderResponse::HTTP_STATUS_ACCEPTED)
 		{
-			PexipUtils::logError($curlWrapper, $url);
+			kPexipUtils::logError($curlWrapper, $url);
 			$result = false;
 		}
 		$curlWrapper->close();
@@ -392,7 +392,7 @@ class PexipHandler
 	protected static function deleteItem($itemId, $path, $pexipConfig)
 	{
 		$result = true;
-		$url = $pexipConfig[PexipUtils::CONFIG_API_ADDRESS] . $path . "$itemId/";
+		$url = $pexipConfig[kPexipUtils::CONFIG_API_ADDRESS] . $path . "$itemId/";
 		$curlWrapper = self::initPexipCurlWrapper(HttpMethods::DELETE, $pexipConfig);
 		$results = $curlWrapper->exec($url);
 		$httpCode = $curlWrapper->getHttpCode();
@@ -403,7 +403,7 @@ class PexipHandler
 		}
 		else
 		{
-			PexipUtils::logError($curlWrapper, $url);
+			kPexipUtils::logError($curlWrapper, $url);
 			$result = false;
 		}
 		$curlWrapper->close();
@@ -421,10 +421,10 @@ class PexipHandler
 	{
 		$listResult = array();
 		KalturaLog::info('Fetching Virtual Rooms');
-		$url = $pexipConfig[PexipUtils::CONFIG_API_ADDRESS] . self::ROOM_PREFIX . '?service_type=conference&offset=' . $offset . '&limit=' . $pageSize;
+		$url = $pexipConfig[kPexipUtils::CONFIG_API_ADDRESS] . self::ROOM_PREFIX . '?service_type=conference&offset=' . $offset . '&limit=' . $pageSize;
 		if($activeOnly)
 		{
-			$url = $pexipConfig[PexipUtils::CONFIG_API_ADDRESS] . self::ACTIVE_ROOM_PREFIX . '?service_type=conference&offset=' . $offset . '&limit=' . $pageSize;
+			$url = $pexipConfig[kPexipUtils::CONFIG_API_ADDRESS] . self::ACTIVE_ROOM_PREFIX . '?service_type=conference&offset=' . $offset . '&limit=' . $pageSize;
 		}
 
 		$curlWrapper = self::initPexipCurlWrapper(HttpMethods::GET, $pexipConfig);
@@ -433,12 +433,12 @@ class PexipHandler
 		KalturaLog::info('HTTP Request httpCode [' . $httpCode . ']');
 		if(!$result || $httpCode != KCurlHeaderResponse::HTTP_STATUS_OK)
 		{
-			PexipUtils::logError($curlWrapper, $url);
+			kPexipUtils::logError($curlWrapper, $url);
 		}
 		else
 		{
 			$listResult = json_decode($result, true);
-			KalturaLog::info('Retrieved virtual Rooms: ' . $listResult[PexipUtils::PARAM_META][PexipUtils::PARAM_TOTAL_COUNT]);
+			KalturaLog::info('Retrieved virtual Rooms: ' . $listResult[kPexipUtils::PARAM_META][kPexipUtils::PARAM_TOTAL_COUNT]);
 		}
 		$curlWrapper->close();
 		return $listResult;
@@ -454,7 +454,7 @@ class PexipHandler
 	{
 		$curlWrapper = new KCurlWrapper();
 		$curlWrapper->setOpts(array(CURLOPT_SSL_VERIFYHOST => 0,
-			CURLOPT_USERPWD => $pexipConfig[PexipUtils::CONFIG_USER_NAME] . ':' . $pexipConfig[PexipUtils::CONFIG_PASSWORD],
+			CURLOPT_USERPWD => $pexipConfig[kPexipUtils::CONFIG_USER_NAME] . ':' . $pexipConfig[kPexipUtils::CONFIG_PASSWORD],
 			CURLOPT_HTTPHEADER => array('Content-Type: application/json'),
 			CURLOPT_RETURNTRANSFER => 1,
 			CURLOPT_VERBOSE => 0,

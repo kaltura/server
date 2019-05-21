@@ -37,18 +37,18 @@ class PexipService extends KalturaBaseService
 			throw new KalturaAPIException (APIErrors::FEATURE_FORBIDDEN, $this->serviceId . '->' . $this->actionName);
 		}
 
-		$pexipConfig = PexipUtils::initAndValidateConfig();
+		$pexipConfig = kPexipUtils::initAndValidateConfig();
 
 		/** @var LiveStreamEntry $dbLiveEntry */
-		$dbLiveEntry = PexipUtils::validateAndRetrieveEntry($entryId);
+		$dbLiveEntry = kPexipUtils::validateAndRetrieveEntry($entryId);
 
 		if ($regenerate)
 		{
-			PexipHandler::deleteCallObjects($dbLiveEntry, $pexipConfig);
+			kPexipHandler::deleteCallObjects($dbLiveEntry, $pexipConfig);
 		}
 
-		$sipToken = PexipUtils::generateSipToken($dbLiveEntry, $pexipConfig, $regenerate);
-		list ($roomId, $primaryAdpId, $secondaryAdpId) = PexipHandler::createCallObjects($dbLiveEntry, $pexipConfig, $sipToken);
+		$sipToken = kPexipUtils::generateSipToken($dbLiveEntry, $pexipConfig, $regenerate);
+		list ($roomId, $primaryAdpId, $secondaryAdpId) = kPexipHandler::createCallObjects($dbLiveEntry, $pexipConfig, $sipToken);
 
 		$dbLiveEntry->setSipToken($sipToken);
 		$dbLiveEntry->setSipRoomId($roomId);
@@ -71,7 +71,7 @@ class PexipService extends KalturaBaseService
 
 		try
 		{
-			$pexipConfig = PexipUtils::initAndValidateConfig();
+			$pexipConfig = kPexipUtils::initAndValidateConfig();
 		}
 		catch(Exception $e)
 		{
@@ -79,7 +79,7 @@ class PexipService extends KalturaBaseService
 			return $response;
 		}
 
-		$queryParams = PexipUtils::validateAndGetQueryParams();
+		$queryParams = kPexipUtils::validateAndGetQueryParams();
 		if(!$queryParams)
 		{
 			return $response;
@@ -95,7 +95,7 @@ class PexipService extends KalturaBaseService
 		KalturaLog::debug(self::CALL_DIRECTION_PARAM_NAME . ' validated!');
 		try
 		{
-			$dbLiveEntry = PexipUtils::retrieveAndValidateEntryForSipCall($queryParams, $pexipConfig);
+			$dbLiveEntry = kPexipUtils::retrieveAndValidateEntryForSipCall($queryParams, $pexipConfig);
 		}
 		catch(Exception $e)
 		{
@@ -110,12 +110,12 @@ class PexipService extends KalturaBaseService
 			return $response;
 		}
 
-		if(!PexipUtils::validateLicensesAvailable($pexipConfig))
+		if(!kPexipUtils::validateLicensesAvailable($pexipConfig))
 		{
 			return $response;
 		}
 
-		$sipEntryServerNode = PexipUtils::createSipEntryServerNode($dbLiveEntry, $dbLiveEntry->getSipRoomId(), $dbLiveEntry->getPrimaryAdpId(), $dbLiveEntry->getSecondaryAdpId());
+		$sipEntryServerNode = kPexipUtils::createSipEntryServerNode($dbLiveEntry, $dbLiveEntry->getSipRoomId(), $dbLiveEntry->getPrimaryAdpId(), $dbLiveEntry->getSecondaryAdpId());
 		/** @var  SipEntryServerNode $sipEntryServerNode */
 		if (!$sipEntryServerNode)
 		{
@@ -141,8 +141,8 @@ class PexipService extends KalturaBaseService
 		{
 			throw new KalturaAPIException (APIErrors::FEATURE_FORBIDDEN, $this->serviceId . '->' . $this->actionName);
 		}
-		$pexipConfig = PexipUtils::initAndValidateConfig();
-		$res = PexipHandler::listRooms($offset, $pageSize, $pexipConfig, $activeOnly);
+		$pexipConfig = kPexipUtils::initAndValidateConfig();
+		$res = kPexipHandler::listRooms($offset, $pageSize, $pexipConfig, $activeOnly);
 		return KalturaStringValueArray::fromDbArray(array(json_encode($res)));
 	}
 
