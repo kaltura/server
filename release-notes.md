@@ -6,7 +6,7 @@
 - Issue ID : PLAT-9871
 
 ### Configuraiton ##
-Add new configuration map.
+Add new configuration map
 New map name - cache_version
 The following values were move to this map from local.ini:
 	a. permission_cache_version
