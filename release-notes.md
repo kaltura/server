@@ -7,12 +7,11 @@
 
 ### Configuraiton ##
 Add new configuration map.
-Map name - cache_version
-	The following values were move here from local.ini
+New map name - cache_version
+The following values were move to this map from local.ini:
 	a. permission_cache_version
 	b. secrets_cache_version
-	Were move here from local.ini
-
+	
 #### Deployment Scripts ####	
 None
 
