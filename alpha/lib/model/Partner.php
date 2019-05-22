@@ -2060,4 +2060,9 @@ class Partner extends BasePartner
 		$this->putInCustomData(self::ANALYTICS_HOST, $v);
 	}
 
+	public function getAnalyticsPersistentSessionId()
+	{
+		return (PermissionPeer::isValidForPartner(PermissionName::FEATURE_ANALYTICS_PERSISTENT_SESSION_ID, $this->getId())) ? true : false;
+	}
+
 }
