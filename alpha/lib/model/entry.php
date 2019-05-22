@@ -3251,10 +3251,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$this->setAdminTags($template->getAdminTags());
 		$this->setPuserId($template->getPuserId());
 		$this->setAccessControlId($template->getAccessControlId());
-		$this->setConversionProfileId($template->getConversionProfileId());
 		$this->setEntitledPusersEdit($template->getEntitledPusersEdit());
 		$this->setEntitledPusersPublish($template->getEntitledPusersPublish());
-	
+
+		if ($this->getType() == $template->getType())
+		{
+			$this->setConversionProfileId($template->getConversionProfileId());
+		}
 	
 		if($copyPartnerId)
 		{
