@@ -1,5 +1,22 @@
 # Orion 15.0.0 #
 
+## Add permission in Admin Console for analytics persistent session id ##
+
+- Issue Type: Feature
+- Issue ID: AN-696
+
+### configuration ###
+    Add the following to admin.ini:
+
+    moduls.analyticsPersistentSessionId.enabled = true
+    moduls.analyticsPersistentSessionId.permissionType = 2
+    moduls.analyticsPersistentSessionId.label = Analytics Persistent Session Id
+    moduls.analyticsPersistentSessionId.permissionName = FEATURE_ANALYTICS_PERSISTENT_SESSION_ID
+    moduls.analyticsPersistentSessionId.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+    None
+
 ## configuraiton change ##
 
 - Issue Type : Configuration change
