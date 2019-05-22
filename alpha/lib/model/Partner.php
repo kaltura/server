@@ -1252,7 +1252,7 @@ class Partner extends BasePartner
         return $provisionParams;
     }
 
-	private static function getAdminUserCriteria($partnerId)
+	public static function getAdminUserCriteria($partnerId)
 	{
 		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
 		$c->addAnd(kuserPeer::PARTNER_ID, $partnerId);
@@ -2088,6 +2088,19 @@ class Partner extends BasePartner
 	public function setBlockDirectLogin($v)
 	{
 		$this->putInCustomData("blockDirectLogin", $v);
+	}
+
+	public function getAuthenticationType()
+	{
+		if($this->getUseSso())
+		{
+			return KalturaPartnerAuthenticationType::SSO;
+		}
+		else if($this->getUseTwoFactorAuthentication())
+		{
+			return KalturaPartnerAuthenticationType::TWO_FACTOR_AUTH;
+		}
+		return KalturaPartnerAuthenticationType::PASSWORD_ONLY;
 	}
 
 }

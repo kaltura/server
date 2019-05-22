@@ -618,9 +618,13 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		}
 		else // Not an admin console partner
 		{
-			$authType = myPartnerUtils::getAuthenticationType($partner);
+			$authType = $partner->getAuthenticationType();
+			if($partner->getUseTwoFactorAuthentication() && !$user->getSeedFor2FactorAuth())
+			{
+				authenticationUtils::generateNewSeed($user);
+			}
 			$mailType = self::getUserMailType($authType, $existingUser);
-			$bodyParams = self::getUserBodyParams($authType, $existingUser, $userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
+			$bodyParams = self::getUserBodyParams($authType, $existingUser, $userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $roleName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
 		}
 		// add mail job
 		kJobsManager::addMailJob(
@@ -656,7 +660,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		}
 	}
 
-	public static function getUserBodyParams($authType, $existingUser, $userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink)
+	public static function getUserBodyParams($authType, $existingUser, $userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $roleName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink)
 	{
 		if($existingUser)
 		{

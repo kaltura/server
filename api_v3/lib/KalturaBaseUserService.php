@@ -281,9 +281,20 @@ class KalturaBaseUserService extends KalturaBaseService
 			
 			throw $e;
 		}
-		if (!$result) {
+		if (!$result)
+		{
 			throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 		}
+		else
+		{
+			$response = new KalturaAuthentication();
+			if($result !== true)
+			{
+				$response->qrCode = $result;
+			}
+			return $response;
+		}
+
 	}
 	
 	protected function validateApiAccessControlByEmail($email)

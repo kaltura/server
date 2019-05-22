@@ -617,7 +617,7 @@ class UserService extends KalturaBaseUserService
 		}
 
 		$response = new KalturaUserPublicInfo();
-		$response->authType = myPartnerUtils::getAuthenticationType($partner);
+		$response->authType = $partner->getAuthenticationType();
 		return $response;
 	}
 
@@ -629,11 +629,11 @@ class UserService extends KalturaBaseUserService
 	 * @return string
 	 *
 	 * @throws APIErrors::INVALID_USER_ID
-	 * @throws APIErrors::ERROR_IN_QR_GENERATION
+	 * @throws KalturaErrors::ERROR_IN_QR_GENERATION
 	 */
 	public function generateQrCodeAction($loginId)
 	{
-		$dbUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $loginId);
+		$dbUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $loginId, true);
 		if (!$dbUser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $loginId);
 
@@ -653,12 +653,12 @@ class UserService extends KalturaBaseUserService
 	 * @return int
 	 *
 	 * @throws APIErrors::INVALID_USER_ID
-	 * @throws APIErrors::ERROR_IN_SEED_GENERATION
+	 * @throws KalturaErrors::ERROR_IN_SEED_GENERATION
 	 *
 	 */
 	public function generateNewSeedAction($loginId)
 	{
-		$dbUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $loginId);
+		$dbUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $loginId, true);
 		if (!$dbUser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $loginId);
 

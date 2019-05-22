@@ -301,6 +301,24 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$loginData->resetPassword($newPassword);
 		myPartnerUtils::initialPasswordSetForFreeTrial($loginData);
 
+		$partner = PartnerPeer::retrieveByPK($loginData->getConfigPartnerId());
+		if($partner->getUseTwoFactorAuthentication())
+		{
+			kuserPeer::setUseCriteriaFilter(false);
+			$dbUser = kuserPeer::getKuserByPartnerAndUid($loginData->getConfigPartnerId(), $loginData->getLoginEmail(), true);
+			kuserPeer::setUseCriteriaFilter(true);
+			if (!$dbUser)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $loginData->getLoginEmail());
+			}
+
+			if(!$loginData->getSeedFor2FactorAuth())
+			{
+				authenticationUtils::generateNewSeed($dbUser);
+			}
+			return authenticationUtils::getQRImage($dbUser);
+		}
+
 		return true;
 	}
 	
@@ -449,7 +467,13 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 		if($partner && $partner->getUseTwoFactorAuthentication())
 		{
-			$otpRequired = true;
+			$c = Partner::getAdminUserCriteria($partnerId);
+			$c->addAnd(kuserPeer::EMAIL, $loginData->getLoginEmail());
+			$user = kuserPeer::doSelectOne($c);
+			if($user)
+			{
+				$otpRequired = true;
+			}
 		}
 
 		if ($otpRequired)
