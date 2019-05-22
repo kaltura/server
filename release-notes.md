@@ -1,5 +1,20 @@
 # Orion 15.0.0 #
 
+## configuraiton change ##
+
+- Issue Type : Configuration change
+- Issue ID : PLAT-9871
+
+### Configuraiton ##
+Add new configuration map
+New map name - cache_version
+The following values were move to this map from local.ini:
+	a. permission_cache_version
+	b. secrets_cache_version
+	
+#### Deployment Scripts ####	
+None
+
 ## Support Sip Integration ##
 
 - Issue Type: Task
