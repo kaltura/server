@@ -2,7 +2,7 @@
 
 ## configuraiton change ##
 
-- Issue Type:Configuration change
+- Issue Type : Configuration change
 - Issue ID : PLAT-9871
 
 ### Configuraiton ##
