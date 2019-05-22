@@ -52,6 +52,26 @@ class DoubleClickFeed
 	protected $caption;
 
 	/**
+	 * @var DOMElement
+	 */
+	protected $keywords;
+
+	/**
+	 * @var DOMElement
+	 */
+	protected $description;
+
+	/**
+	 * @var DOMElement
+	 */
+	protected $link;
+
+	/**
+	 * @var DOMElement
+	 */
+	protected $author;
+
+	/**
 	 * @param $templateName
 	 * @param DoubleClickDistributionProfile $profile
 	 * @param $version
@@ -90,6 +110,10 @@ class DoubleClickFeed
 			$nodes['thumbnail'] = $this->xpath->query('media:thumbnail', $this->item)->item(0);
 			$nodes['category'] = $this->xpath->query('dfpvideo:keyvalues[@key="category"]', $this->item)->item(0);
 			$nodes['caption'] = $this->xpath->query('dfpvideo:closedCaptionUrl', $this->item)->item(0);
+			$nodes['description'] = $this->xpath->query('dfpvideo:keyvalues[@key="description"]', $this->item)->item(0);
+			$nodes['link'] = $this->xpath->query('dfpvideo:keyvalues[@key="link"]', $this->item)->item(0);
+			$nodes['author'] = $this->xpath->query('dfpvideo:keyvalues[@key="author"]', $this->item)->item(0);
+			$nodes['keywords'] = $this->xpath->query('dfpvideo:keyvalues[@key="keywords"]', $this->item)->item(0);
 		}
 		else
 		{
@@ -207,14 +231,12 @@ class DoubleClickFeed
 	public function setUniqueVersion2Elements($values, $item, $entry)
 	{
 		kXml::setNodeValue($this->xpath, 'dfpvideo:lastModifiedDate', date('r', $values[DoubleClickDistributionField::LAST_MEDIA_MODIFIED_DATE]), $item);
-		kXml::setNodeValue($this->xpath, 'dfpvideo:keyvalues[@key="description"]/@value', $values[DoubleClickDistributionField::DESCRIPTION], $item);
-		kXml::setNodeValue($this->xpath, 'dfpvideo:keyvalues[@key="link"]/@value', $values[DoubleClickDistributionField::LINK], $item);
-		kXml::setNodeValue($this->xpath, 'dfpvideo:keyvalues[@key="author"]/@value', $values[DoubleClickDistributionField::AUTHOR], $item);
-		kXml::setNodeValue($this->xpath, 'dfpvideo:keyvalues[@key="keywords"]/@value', $values[DoubleClickDistributionField::KEYWORDS], $item);
 		kXml::setNodeValue($this->xpath, 'dfpvideo:lastMediaModifiedDate', date('r', $values[DoubleClickDistributionField::LAST_MEDIA_MODIFIED_DATE]), $item);
 		$status = $this->getStatusFieldValue($values[DoubleClickDistributionField::STATUS]);
 		kXml::setNodeValue($this->xpath, 'media:status/@state', $status, $item);
 		kXml::setNodeValue($this->xpath, 'dfpvideo:fw_caid', $values[DoubleClickDistributionField::FW_CAID], $item);
+
+		$this->setValuesForTemplateKeys($values, $item);
 
 		if($entry)
 		{
@@ -332,13 +354,13 @@ class DoubleClickFeed
 			if (!$value)
 				continue;
 
-			$keyvaluesElement = $this->doc->createElement('dfpvideo:keyvalues');
 			$type = $fieldConfig->getType() != null ? $fieldConfig->getType() : 'string' ;
-			$keyvaluesElement->setAttribute('type', $type);
-			$keyvaluesElement->setAttribute('key', $key);
-			$keyvaluesElement->setAttribute('value', $value);
-			
-			$item->appendChild($keyvaluesElement);
+			$value = str_replace(',', ';', $value);
+			$innerValues = explode(';', $value);
+			foreach($innerValues as $innerValue)
+			{
+				$this->addKeyvaluesElement($item, $type, $key, trim($innerValue));
+			}
 		}
 	}
 	
@@ -554,6 +576,32 @@ class DoubleClickFeed
 	{
 		if ($value)
 			$element->setAttribute($attribute, $value);
+	}
+
+	public function setValuesForTemplateKeys($values, $item)
+	{
+		$properties = array('description' => DoubleClickDistributionField::DESCRIPTION,
+					'link' => DoubleClickDistributionField::LINK,
+					'author' => DoubleClickDistributionField::AUTHOR,
+					'keywords' => DoubleClickDistributionField::KEYWORDS);
+
+		foreach($properties as $key => $valueKey)
+		{
+			$strippedValues = str_replace(',', ';', $values[$valueKey]);
+			$strippedValues = explode(';', $strippedValues);
+			if(!$strippedValues)
+			{
+				$strippedValues = array('');
+			}
+			foreach ($strippedValues as $val)
+			{
+				$val = trim($val);
+				$node = $this->{$key}->cloneNode(true);
+				kXml::setNodeValue($this->xpath,'@value', $val, $node);
+				$item->appendChild($node);
+			}
+		}
+
 	}
 
 }

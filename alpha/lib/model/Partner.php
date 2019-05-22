@@ -82,6 +82,8 @@ class Partner extends BasePartner
 
 	const RTC_SERVER_NODE_ENV = 'rtc_server_node_env';
 
+	const ANALYTICS_HOST = "analytics_host";
+
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -2037,5 +2039,25 @@ class Partner extends BasePartner
 		$this->putInCustomData(self::CUSTOMER_DATA_RTC_ENV, $v);
 	}
 
+	public function getAnalyticsUrl()
+	{
+		$host = $this->getAnalyticsHost();
+		$fullUrl = null;
+		if($host)
+		{
+			$fullUrl = infraRequestUtils::getProtocol() . '://' . $host;
+		}
+		return $fullUrl;
+	}
+
+	public function getAnalyticsHost()
+	{
+		return $this->getFromCustomData(self::ANALYTICS_HOST, null , kConf::get(self::ANALYTICS_HOST, 'local',  null));
+	}
+
+	public function setAnalyticsHost($v)
+	{
+		$this->putInCustomData(self::ANALYTICS_HOST, $v);
+	}
 
 }

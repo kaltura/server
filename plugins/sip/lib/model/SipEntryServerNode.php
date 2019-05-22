@@ -11,17 +11,7 @@ class SipEntryServerNode extends EntryServerNode
 	const CUSTOM_DATA_SIP_STATUS = 'sip_status';
 	const CUSTOM_DATA_SIP_ROOM_ID = 'sip_room_id';
 	const CUSTOM_DATA_SIP_ROOM_PRIMARY_ADP = 'sip_primary_adp_id';
-	const CUSTOM_DATA_SIP_ROOM_SECONDARY_ADP = 'sip_primary_secondary_id';
-
-	public function getSipRoomStatus()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_SIP_STATUS, null, SipEntryServerNodeStatus::CREATED);
-	}
-
-	public function setSipRoomStatus($v)
-	{
-		return $this->putInCustomData(self::CUSTOM_DATA_SIP_STATUS, $v);
-	}
+	const CUSTOM_DATA_SIP_ROOM_SECONDARY_ADP = 'sip_secondary_adp_id';
 
 	public function getSipRoomId()
 	{
@@ -33,22 +23,22 @@ class SipEntryServerNode extends EntryServerNode
 		return $this->putInCustomData(self::CUSTOM_DATA_SIP_ROOM_ID, $v);
 	}
 
-	public function getSipRoomPrimaryADP()
+	public function getSipPrimaryAdpId()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_SIP_ROOM_PRIMARY_ADP, null);
 	}
 
-	public function setSipRoomPrimaryADP($v)
+	public function setSipPrimaryAdpId($v)
 	{
 		return $this->putInCustomData(self::CUSTOM_DATA_SIP_ROOM_PRIMARY_ADP, $v);
 	}
 
-	public function getSipRoomSecondaryADP()
+	public function getSipSecondaryAdpId()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_SIP_ROOM_SECONDARY_ADP, null);
 	}
 
-	public function setSipRoomSecondaryADP($v)
+	public function setSipSecondaryAdpId($v)
 	{
 		return $this->putInCustomData(self::CUSTOM_DATA_SIP_ROOM_SECONDARY_ADP, $v);
 	}
@@ -63,15 +53,15 @@ class SipEntryServerNode extends EntryServerNode
 		if(count($connectedEntryServerNodes))
 		{
 			KalturaLog::info('Entry [' . $this->getEntryId() . '] is Live and Active.');
-			if ($this->getSipRoomStatus() != SipEntryServerNodeStatus::ACTIVE)
+			if ($this->getStatus() != SipEntryServerNodeStatus::ACTIVE)
 			{
-				$this->setSipRoomStatus(SipEntryServerNodeStatus::ACTIVE);
+				$this->setStatus(SipEntryServerNodeStatus::ACTIVE);
 				$this->save();
 			}
 		}
-		elseif ($this->getSipRoomStatus() == SipEntryServerNodeStatus::ACTIVE )
+		elseif ($this->getStatus() == SipEntryServerNodeStatus::ACTIVE )
 		{
-			$this->setSipRoomStatus(SipEntryServerNodeStatus::ENDED);
+			$this->setStatus(SipEntryServerNodeStatus::ENDED);
 			$this->save();
 		}
 		else

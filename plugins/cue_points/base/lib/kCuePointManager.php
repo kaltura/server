@@ -605,7 +605,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	{
 		$cuePoint = null;
 
-		$entryId = $scene['entryId'];
+		$entryId = (string)$scene['entryId'];
 		$entry = entryPeer::retrieveByPK($entryId);
 		if(!$entry)
 			throw new kCoreException("Entry [$entryId] not found", kCoreException::INVALID_ENTRY_ID);

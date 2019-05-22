@@ -555,5 +555,6 @@ class KalturaLanguage extends KalturaStringEnum
 	const TEO = 'Teo Chew';
 	const HNN = 'Hainanese';
 	const HAK = 'Hakka';
+	const CRG = 'Michif';
 	const UN  = 'Undefined';
 }

@@ -5,16 +5,29 @@
  */
 class KalturaSipEntryServerNode extends KalturaEntryServerNode
 {
-
 	/**
-	 * @var KalturaSipEntryServerNodeStatus
+	 * @var string
 	 * @readonly
 	 */
-	public $nodeStatus;
+	public $sipRoomId;
+
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $sipPrimaryAdpId;
+
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $sipSecondaryAdpId;
 
 	private static $map_between_objects = array
 	(
-		'nodeStatus',
+		'sipRoomId',
+		'sipPrimaryAdpId',
+		'sipSecondaryAdpId'
 	);
 
 	/* (non-PHPdoc)
