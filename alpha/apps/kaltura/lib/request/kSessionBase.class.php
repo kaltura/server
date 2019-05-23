@@ -8,6 +8,7 @@
 require_once(dirname(__FILE__) . '/infraRequestUtils.class.php');
 require_once(dirname(__FILE__) . '/../cache/kCacheManager.php');
 require_once(dirname(__FILE__) . '/../../../../../infra/general/KCryptoWrapper.class.php');
+require_once(dirname(__FILE__) . '/../../../../config/kConfMapNames.php');
 
 /** 
  * @package server-infra
@@ -297,7 +298,7 @@ class kSessionBase
 	
 	static protected function getSecretsCacheKey($partnerId)
 	{
-		return self::SECRETS_CACHE_PREFIX . kConf::get('secrets_cache_version', 'local', '1') . '_' . $partnerId;
+		return self::SECRETS_CACHE_PREFIX . kConf::get('secrets_cache_version', kConfMapNames::CACHE_VERSIONS, '1') . '_' . $partnerId;
 	}
 	
 	static public function getSecretsFromCache($partnerId)

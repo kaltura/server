@@ -20,11 +20,16 @@ class KalturaCategoryEntryFilter extends KalturaCategoryEntryBaseFilter
 	 */
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
+		$blockOnEmptyFilterPartners = kConf::getMap(kConfMapNames::REQUIRE_CATEGORY_ENTRY_FILTER_PARTNERS);
 		if ($this->entryIdEqual == null &&
+			$this->entryIdIn == null &&
 			$this->categoryIdIn == null &&
 			$this->categoryIdEqual == null && 
-			(kEntitlementUtils::getEntitlementEnforcement() || !kCurrentContext::$is_admin_session))
-			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_CATEGORY);		
+			(kEntitlementUtils::getEntitlementEnforcement() || !kCurrentContext::$is_admin_session || in_array(kCurrentContext::getCurrentPartnerId(), $blockOnEmptyFilterPartners))
+		)
+		{
+			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_CATEGORY);
+		}
 			
 		if(kEntitlementUtils::getEntitlementEnforcement())
 		{

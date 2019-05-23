@@ -27,6 +27,9 @@ class IndexableObject {
 	/** The ID field in case of 'string' id.
 	 * relevant only for objects in which ID is string.*/
 	public $id = null;
+	
+	/** Field value used for index sharding **/
+	public $splitIndexFieldName = null;
 
 	public function __construct($name) {
 		$this->name = $name;
@@ -86,6 +89,13 @@ class IndexableObject {
 	 */
 	public function setId($id) {
 		$this->id = $id;
+	}
+	
+	/**
+	 * @param string splitIndexFieldName
+	 */
+	public function setSplitIndexFieldName($splitIndexFieldName) {
+		$this->splitIndexFieldName = $splitIndexFieldName;
 	}
 	
 	/**

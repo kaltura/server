@@ -113,6 +113,12 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	 */
 	public $primaryServerNodeId;
 
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $sipToken;
+
 	private static $map_between_objects = array
 	(
 		"streamRemoteId",
@@ -129,7 +135,8 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		"streamPassword",
 		"streamUsername",
 		"bitrates" => "streamBitrates",
-		"primaryServerNodeId"
+		"primaryServerNodeId",
+		"sipToken"
 	);
 
 	public function __construct()

@@ -6,12 +6,12 @@ class kReachUtils
 {
 	/**
 	 * @param $entryId
-	 * @param $shouldModerate
+	 * @param $shouldModerateOutput
 	 * @param $turnaroundTime
 	 * @return string
 	 * @throws Exception
 	 */
-	public static function generateReachVendorKs($entryId, $shouldModerate = false, $turnaroundTime = dateUtils::DAY, $disableDefaultEntryFilter = false)
+	public static function generateReachVendorKs($entryId, $shouldModerateOutput = false, $turnaroundTime = dateUtils::DAY, $disableDefaultEntryFilter = false)
 	{
 		$entry = $disableDefaultEntryFilter ? entryPeer::retrieveByPKNoFilter($entryId) : entryPeer::retrieveByPK($entryId);
 		if (!$entry)
@@ -32,7 +32,7 @@ class kReachUtils
 		
 		$privileges .= ',' . kSessionBase::PRIVILEGE_DOWNLOAD . ':' . $entryId;
 
-		if($shouldModerate)
+		if($shouldModerateOutput)
 			$privileges .= ',' . kSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION;
 
 		$limitedKs = '';

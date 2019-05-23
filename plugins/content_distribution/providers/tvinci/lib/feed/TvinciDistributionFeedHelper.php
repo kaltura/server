@@ -122,10 +122,19 @@ class TvinciDistributionFeedHelper
 
 	private function createXml( $action )
 	{
+		$useCatalogFormat = true;
+		if($this->distributionProfile->innerType != TvinciDistributionProfile::INNER_TYPE_CATALOG)
+		{
+			$useCatalogFormat = false;
+		}
+
 		// Init the document
 		$this->_doc = new DOMDocument();
 		$this->_doc->formatOutput = true;
-		$this->_doc->encoding = "UTF-8";
+		if($useCatalogFormat)
+		{
+			$this->_doc->encoding = "UTF-8";
+		}
 
 		$feedAsXml = kMrssManager::getEntryMrssXml($this->entry);
 		self::addEmptyValueInMetadataObjects($feedAsXml);
@@ -152,25 +161,61 @@ class TvinciDistributionFeedHelper
 
 		$feedAsString = str_replace(self::EMPTY_PLACE_HOLDER, '', $feedAsString);
 		$data = $this->_doc->createElement('data');
+		if(!$useCatalogFormat)
+		{
+			$this->setAttribute($data,"xmlns","");
+		}
 		$data->appendChild($this->_doc->createCDATASection($feedAsString));
 
+		list($envelopeRootNode, $envelopeHeaderNode) = $this->setEnvelopeHeaders($useCatalogFormat);
+		$this->setEnvelopeBody($envelopeRootNode, $envelopeHeaderNode, $data, $useCatalogFormat);
+
+		return $this->getXml($useCatalogFormat);
+	}
+
+	protected function setEnvelopeHeaders($useCatalogFormat)
+	{
 		// Create the document's root node
 		$envelopeRootNode = $this->_doc->createElement('s:Envelope');
-		$this->setAttribute($envelopeRootNode,"xmlns:s","http://www.w3.org/2003/05/soap-envelope");
-		$this->setAttribute($envelopeRootNode,"xmlns:a","http://www.w3.org/2005/08/addressing");
+		if($useCatalogFormat)
+		{
+			$this->setAttribute($envelopeRootNode,"xmlns:s","http://www.w3.org/2003/05/soap-envelope");
+			$this->setAttribute($envelopeRootNode,"xmlns:a","http://www.w3.org/2005/08/addressing");
 
-		$envelopeHeaderNode = $this->_doc->createElement('s:Header');
-		$envelopeHeaderActionNode = $this->_doc->createElement('a:Action', 'urn:Iservice/IngestTvinciData');
-		$this->setAttribute($envelopeHeaderActionNode,"s:mustUnderstand","1");
-		$envelopeHeaderNode->appendChild($envelopeHeaderActionNode);
+			$envelopeHeaderNode = $this->_doc->createElement('s:Header');
+			$envelopeHeaderActionNode = $this->_doc->createElement('a:Action', 'urn:Iservice/IngestTvinciData');
+			$this->setAttribute($envelopeHeaderActionNode,"s:mustUnderstand","1");
+			$envelopeHeaderNode->appendChild($envelopeHeaderActionNode);
+		}
+		else
+		{
+			$this->setAttribute($envelopeRootNode,"xmlns:s","http://schemas.xmlsoap.org/soap/envelope/");
+			$envelopeHeaderNode = $this->_doc->createElement('s:Header');
+		}
 
+		return array($envelopeRootNode, $envelopeHeaderNode);
+	}
+
+	protected function setEnvelopeBody($envelopeRootNode, $envelopeHeaderNode, $data, $useCatalogFormat)
+	{
 		$envelopeBodyNode = $this->_doc->createElement('s:Body');
 		$ingestTvinciDataNode = $this->_doc->createElement('IngestTvinciData');
+		if(!$useCatalogFormat)
+		{
+			$this->setAttribute($ingestTvinciDataNode,"xmlns","http://tempuri.org/");
+		}
 		$tvinciDataRequestNode = $this->_doc->createElement('request');
 		$this->setAttribute($tvinciDataRequestNode,"xmlns:i","http://www.w3.org/2001/XMLSchema-instance");
 
-		$tvinciDataRequestNode->appendChild($this->_doc->createElement('userName', $this->distributionProfile->username));
-		$tvinciDataRequestNode->appendChild($this->_doc->createElement('passWord', $this->distributionProfile->password));
+		$tvinciDataUserNode = $this->_doc->createElement('userName', $this->distributionProfile->username);
+		$tvinciDataPasswordNode = $this->_doc->createElement('passWord', $this->distributionProfile->password);
+		if(!$useCatalogFormat)
+		{
+			$this->setAttribute($tvinciDataUserNode,"xmlns","");
+			$this->setAttribute($tvinciDataPasswordNode,"xmlns","");
+		}
+		$tvinciDataRequestNode->appendChild($tvinciDataUserNode);
+		$tvinciDataRequestNode->appendChild($tvinciDataPasswordNode);
 
 		// Attach the CDATA section
 		$tvinciDataRequestNode->appendChild($data);
@@ -181,10 +226,8 @@ class TvinciDistributionFeedHelper
 
 		// Attach the root node to the document
 		$this->_doc->appendChild($envelopeRootNode);
-
-		return $this->getXml();
 	}
-	
+
 	private static function addEmptyValueInMetadataObjects($feedAsXmlForEntry)
 	{
 		$metadataObjects = $feedAsXmlForEntry->customData;
@@ -227,9 +270,14 @@ class TvinciDistributionFeedHelper
 		return $this->_doc->saveXML();
 	}
 
-	public function getXml()
+	public function getXml($useCatalogFormat)
 	{
-		return $this->_doc->saveXML();
+		if($useCatalogFormat)
+		{
+			return $this->_doc->saveXML();
+		}
+
+		return $this->_doc->saveXML($this->_doc->documentElement);
 	}
 	
 	private function createAppendXml($tag, $tagsDoc, $xmlNodeName, $propertyName)

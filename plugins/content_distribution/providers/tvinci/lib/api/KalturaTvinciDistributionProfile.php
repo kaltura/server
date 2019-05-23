@@ -31,6 +31,10 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 	 */
 	public $xsltFile;
 
+	/**
+	 * @var string
+	 */
+	public $innerType;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)
@@ -42,6 +46,7 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 		'password',
 		'tags',
 		'xsltFile',
+		'innerType',
 	 );
 		 
 	public function getMapBetweenObjects()

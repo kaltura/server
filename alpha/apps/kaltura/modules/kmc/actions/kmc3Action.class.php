@@ -203,8 +203,8 @@ class kmc3Action extends kalturaAction
 		}
 
 		/** jw uiconfs **/
-		$this->jw_uiconfs_array = kmcUtils::getJWPlayerUIConfs();
-		$this->jw_uiconf_playlist = kmcUtils::getJWPlaylistUIConfs();
+		$this->jw_uiconfs_array = kmcUtils::getJWPlayerUIConfs($this->partner_id);
+		$this->jw_uiconf_playlist = kmcUtils::getJWPlaylistUIConfs($this->partner_id);
 		
 		/** 508 uicinfs **/
 		if($partner->getKmcVersion() == self::CURRENT_KMC_VERSION && $partner->getEnable508Players())

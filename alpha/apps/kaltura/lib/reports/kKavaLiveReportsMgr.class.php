@@ -172,7 +172,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 	{
 		return self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
-				self::getSelectorFilter(self::DIMENSION_HAS_BITRATE, '1'),
+				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_BITRATE),
 		));
 	}
 	
