@@ -4,7 +4,7 @@
  * @subpackage model
  */
 
-class thumbnailSecurityHelper
+class kThumbnailSecurityHelper
 {
 	/**
 	 * @param entry $entry
@@ -30,7 +30,7 @@ class thumbnailSecurityHelper
 		$partner = $entry->getPartner();
 		if ($partner->getEnabledService(PermissionName::FEATURE_BLOCK_THUMBNAIL_CAPTURE))
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::NOT_ALLOWED_PARAMETER);
+			throw new kThumbnailException(kThumbnailException::NOT_ALLOWED_PARAMETER, kThumbnailException::NOT_ALLOWED_PARAMETER);
 		}
 
 		if ($enableCacheValidation)
@@ -38,7 +38,7 @@ class thumbnailSecurityHelper
 			$actionList = $secureEntryHelper->getActionList(RuleActionType::LIMIT_THUMBNAIL_CAPTURE);
 			if ($actionList)
 			{
-				throw new KalturaAPIException(KalturaThumbnailErrors::NOT_ALLOWED_PARAMETER);
+				throw new kThumbnailException(kThumbnailException::NOT_ALLOWED_PARAMETER, kThumbnailException::NOT_ALLOWED_PARAMETER);
 			}
 		}
 	}

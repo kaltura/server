@@ -4,7 +4,7 @@
 * @subpackage model.imagickAction
 */
 
-class cropAction extends imagickAction
+class kCropAction extends kImagickAction
 {
 	protected $newWidth;
 	protected $newHeight;
@@ -41,32 +41,38 @@ class cropAction extends imagickAction
 	{
 		if(($this->x && !$this->y) || (!$this->x && $this->y))
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'You cant define only crop x or crop y');
+			$data = array("errorString" => 'You cant define only crop x or crop y');
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if($this->newWidth > $this->currentWidth)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'crop width must be smaller or equal to the current width');
+			$data = array("errorString" => 'crop width must be smaller or equal to the current width');
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if($this->newHeight > $this->currentHeight)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'crop height must be smaller or equal to the current height');
+			$data = array("errorString" => 'crop height must be smaller or equal to the current height');
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if($this->newWidth < 1)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'width must be positive');
+			$data = array("errorString" => 'width must be positive');
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if($this->newHeight < 1)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'height must be positive');
+			$data = array("errorString" => 'height must be positive');
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 	}
 
 	/**
 	 * @return Imagick
+	 * @throws kThumbnailException
 	 */
 	protected function doAction()
 	{
@@ -84,7 +90,8 @@ class cropAction extends imagickAction
 					$this->image->cropImage($this->newWidth, $this->newHeight, $this->currentWidth / 2, $this->currentHeight / 2);
 					break;
 				default:
-					throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'illegal gravity point value');
+					$data = array("errorString" => 'illegal gravity point value');
+					throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 			}
 		}
 

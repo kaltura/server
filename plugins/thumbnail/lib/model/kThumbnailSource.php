@@ -4,7 +4,7 @@
  * @subpackage model
  */
 
-abstract class thumbnailSource
+abstract class kThumbnailSource
 {
 	public abstract function getImage();
 

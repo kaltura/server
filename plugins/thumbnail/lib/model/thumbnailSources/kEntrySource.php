@@ -4,7 +4,7 @@
  * @subpackage model.thumbnailSources
  */
 
-class entrySource extends thumbnailSource
+class kEntrySource extends kThumbnailSource
 {
 	protected $dbEntry;
 
@@ -47,7 +47,8 @@ class entrySource extends thumbnailSource
 			return $imagick;
 		}
 
-		throw new KalturaAPIException(KalturaThumbnailErrors::MISSING_SOURCE_ACTIONS_FOR_TYPE, $this->getEntryMediaType());
+		$data = array("entryType" => $this->getEntryMediaType());
+		throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::MISSING_SOURCE_ACTIONS_FOR_TYPE, $data);
 	}
 
 	public function getLastModified()

@@ -4,7 +4,7 @@
  * @subpackage model.imagickAction
  */
 
-class compositeAction extends imagickAction
+class kCompositeAction extends kImagickAction
 {
 	protected $compositeType;
 	protected $channel;
@@ -37,12 +37,14 @@ class compositeAction extends imagickAction
 	{
 		if($this->opacity && ($this->opacity < self::MIN_OPACITY || $this->opacity > SELF::MAX_OPACITY))
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'opacity must be between 1-100');
+			$data = array("errorString" => 'opacity must be between 1-100');
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if(!$this->compositeObject)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'Missing composite object');
+			$data = array("errorString" => 'Missing composite object');
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 	}
 
@@ -62,7 +64,8 @@ class compositeAction extends imagickAction
 
 		if(!$this->compositeObject->compositeImage($this->image, $this->compositeType, $this->x, $this->y, $this->channel))
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'Failed to compose image');
+			$data = array("errorString" => 'Failed to compose image');
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		return $this->compositeObject;

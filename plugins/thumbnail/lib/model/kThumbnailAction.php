@@ -110,7 +110,8 @@ abstract class kThumbnailAction
 		}
 		catch(Exception $e)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, "Illegal value for color {$color}");
+			$data = array("errorString" => "Illegal value for color {$color}");
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 	}
 

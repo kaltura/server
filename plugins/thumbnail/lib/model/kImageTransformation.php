@@ -4,9 +4,9 @@
  * @subpackage model
  */
 
-class imageTransformation
+class kImageTransformation
 {
-	/** @var imageTransformationStep[] */
+	/** @var kImageTransformationStep[] */
 	protected $imageSteps = array();
 
 	public function validate()
@@ -15,20 +15,20 @@ class imageTransformation
 		$stepsCount = count($this->imageSteps);
 		if(!$stepsCount)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::EMPTY_IMAGE_TRANSFORMATION);
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::EMPTY_IMAGE_TRANSFORMATION);
 		}
 
 		$firstStep = $this->imageSteps[0];
 		if($firstStep->usesCompositeObject())
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::FIRST_STEP_CANT_USE_COMP_ACTION);
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::FIRST_STEP_CANT_USE_COMP_ACTION);
 		}
 
 		for($i = 1 ; $i < $stepsCount; $i++)
 		{
 			if(!$this->imageSteps[$i]->usesCompositeObject())
 			{
-				throw new KalturaAPIException(KalturaThumbnailErrors::MISSING_COMPOSITE_ACTION);
+				throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::MISSING_COMPOSITE_ACTION);
 			}
 		}
 	}
@@ -46,14 +46,14 @@ class imageTransformation
 		catch(ImagickException $e)
 		{
 			KalturaLog::err("Imagick error:" . print_r($e));
-			throw new KalturaAPIException(KalturaThumbnailErrors::TRANSFORMATION_RUNTIME_ERROR);
+			throw new kThumbnailException(kThumbnailException::TRANSFORMATION_RUNTIME_ERROR, kThumbnailException::TRANSFORMATION_RUNTIME_ERROR);
 		}
 
 		return $transformationParameters[kThumbnailParameterName::COMPOSITE_OBJECT];
 	}
 
 	/**
-	 * @param imageTransformationStep $step
+	 * @param kImageTransformationStep $step
 	 */
 	public function addImageTransformationStep($step)
 	{

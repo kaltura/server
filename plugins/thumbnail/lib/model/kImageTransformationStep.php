@@ -4,9 +4,9 @@
  * @subpackage model
  */
 
-class imageTransformationStep
+class kImageTransformationStep
 {
-	/** @var thumbnailSource */
+	/** @var kThumbnailSource */
 	protected $source;
 	protected $imageActionCollection = array();
 	protected $sourceActionCollection = array();
@@ -18,7 +18,7 @@ class imageTransformationStep
 	}
 
 	/**
-	 * @param thumbnailSource $source
+	 * @param kThumbnailSource $source
 	 */
 	public function setSource($source)
 	{
@@ -34,14 +34,14 @@ class imageTransformationStep
 	{
 		foreach($this->sourceActionCollection as $action)
 		{
-			/* @var sourceAction $action */
+			/* @var kSourceAction $action */
 			$this->source = $action->execute($this->source, $transformationParameters);
 		}
 
 		$image = $this->source->getImage();
 		foreach($this->imageActionCollection as $action)
 		{
-			/* @var imagickAction $action */
+			/* @var kImagickAction $action */
 			$image = $action->execute($image, $transformationParameters);
 		}
 
@@ -49,7 +49,7 @@ class imageTransformationStep
 	}
 
 	/**
-	 * @param imagickAction $imageAction
+	 * @param kImagickAction $imageAction
 	 */
 	public function addImageAction($imageAction)
 	{
@@ -61,7 +61,7 @@ class imageTransformationStep
 	}
 
 	/**
-	 * @param sourceAction $sourceAction
+	 * @param kSourceAction $sourceAction
 	 */
 	public function addSourceAction($sourceAction)
 	{

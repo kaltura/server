@@ -4,7 +4,7 @@
  * @subpackage model.sourceAction
  */
 
-class vidSecAction extends sourceAction
+class kVidSecAction extends kSourceAction
 {
 	protected $second;
 	protected $newWidth;
@@ -26,19 +26,21 @@ class vidSecAction extends sourceAction
 
 	protected function validateInput()
 	{
-		if(!is_a($this->source, "entrySource"))
+		if(!is_a($this->source, "kEntrySource"))
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, "Vid sec can only work on entry source");
+			$data = array("errorString" => "Vid sec can only work on entry source");
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if(!is_numeric($this->second) || $this->second < 0)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, "Vid sec second cant be negative");
+			$data = array("errorString" => "Vid sec second cant be negative");
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if($this->source->getEntryMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::MUST_HAVE_VIDEO_SOURCE);
+			throw new kThumbnailException(kThumbnailException::MUST_HAVE_VIDEO_SOURCE, kThumbnailException::MUST_HAVE_VIDEO_SOURCE);
 		}
 
 		$this->validateDimensions();
@@ -49,18 +51,20 @@ class vidSecAction extends sourceAction
 	{
 		if($this->newWidth && (!is_numeric($this->newWidth) || $this->newWidth < self::MIN_DIMENSION || $this->newWidth > self::MAX_DIMENSION))
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'width must be between 0 and 10000');
+			$data = array("errorString" => 'width must be between 0 and 10000');
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if($this->newHeight && (!is_numeric($this->newHeight) || $this->newHeight < self::MIN_DIMENSION || $this->newHeight > self::MAX_DIMENSION))
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'height must be between 0 and 10000');
+			$data = array("errorString" => 'height must be between 0 and 10000');
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 	}
 
 	protected function validatePermissions()
 	{
-		thumbnailSecurityHelper::verifyEntryAccess($this->source->getEntry());
+		kThumbnailSecurityHelper::verifyEntryAccess($this->source->getEntry());
 
 	}
 
@@ -78,9 +82,9 @@ class vidSecAction extends sourceAction
 		$success = myEntryUtils::captureThumbUsingPackager($entry, $destPath, $this->second, $flavorAssetId, $this->newWidth, $this->newHeight);
 		if(!$success)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::VID_SEC_FAILED);
+			throw new kThumbnailException(kThumbnailException::VID_SEC_FAILED, kThumbnailException::VID_SEC_FAILED);
 		}
 
-		return new fileSource($destPath . KThumbnailCapture::TEMP_FILE_POSTFIX);
+		return new kFileSource($destPath . KThumbnailCapture::TEMP_FILE_POSTFIX);
 	}
 }

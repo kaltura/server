@@ -4,7 +4,7 @@
  * @subpackage model.imagickAction
  */
 
-class rotateAction extends imagickAction
+class kRotateAction extends kImagickAction
 {
 	protected $degrees;
 	protected $backgroundColor;
@@ -39,7 +39,8 @@ class rotateAction extends imagickAction
 	{
 		if($this->degrees < self::MIN_DEGREES || $this->degrees > self::MAX_DEGREES)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, "Degrees must be between 0 and 360, exclusive");
+			$data = array("errorString" => "Degrees must be between 0 and 360, exclusive");
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		$this->validateColorParameter($this->backgroundColor);

@@ -4,7 +4,7 @@
  * @subpackage model.thumbnailSources
  */
 
-class fileSource extends thumbnailSource
+class kFileSource extends kThumbnailSource
 {
 	protected $imagick;
 

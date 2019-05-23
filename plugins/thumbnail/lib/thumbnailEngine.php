@@ -17,30 +17,30 @@ class thumbnailEngine
 	const PARAMETER_VALUE_INDEX = 1;
 
 	protected static $actionsAlias = array(
-		"c" => "cropAction",
-		"crop" => "cropAction",
-		"resize" => "resizeAction",
-		"re" => "resizeAction",
-		"comp" => "compositeAction",
-		"composite" => "compositeAction",
-		"vidSec" => "vidSecAction",
-		"rotate" => "rotateAction",
-		"r" =>	"rotateAction",
-		"t" => "textAction",
-		"txt" => "textAction",
-		"text" => "textAction",
+		"c" => "kCropAction",
+		"crop" => "kCropAction",
+		"resize" => "kResizeAction",
+		"re" => "kResizeAction",
+		"comp" => "kCompositeAction",
+		"composite" => "kCompositeAction",
+		"vidSec" => "kVidSecAction",
+		"rotate" => "kRotateAction",
+		"r" =>	"kRotateAction",
+		"t" => "kTextAction",
+		"txt" => "kTextAction",
+		"text" => "kTextAction",
 	);
 
 	/**
 	 * @param $stepString
-	 * @return imageTransformationStep
+	 * @return kImageTransformationStep
 	 */
 	public static function parseImageTransformationStep($stepString)
 	{
 		$imageActions =  explode(self::IMAGE_ACTION_DELIMITER, $stepString);
 		$imageActionsCount = count($imageActions);
 		$source = thumbnailEngine::parseSource($imageActions[self::SOURCE_INDEX]);
-		$step = new imageTransformationStep();
+		$step = new kImageTransformationStep();
 		$step->setSource($source);
 		for ($i = 1; $i < $imageActionsCount; $i++)
 		{
@@ -59,17 +59,19 @@ class thumbnailEngine
 		$sourceParameters = explode(self::VALUE_DELIMITER, $sourceString);
 		if(count($sourceParameters) < 2)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::FAILED_TO_PARSE_SOURCE, $sourceString);
+			$data = array("sourceString" => $sourceString);
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::FAILED_TO_PARSE_SOURCE, $data);
 		}
 
 		$sourceType = $sourceParameters[self::SOURCE_TYPE_INDEX];
 		switch($sourceType)
 		{
 			case kSourceType::ID:
-				$source = new entrySource($sourceParameters[self::SOURCE_VALUE_INDEX]);
+				$source = new kEntrySource($sourceParameters[self::SOURCE_VALUE_INDEX]);
 				break;
 			default:
-				throw new KalturaAPIException(KalturaThumbnailErrors::FAILED_TO_PARSE_SOURCE, $sourceType);
+				$data = array("sourceString" => $sourceString);
+				throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::FAILED_TO_PARSE_SOURCE, $data);
 		}
 
 		return $source;
@@ -81,7 +83,8 @@ class thumbnailEngine
 		$parametersCount = count($parameters);
 		if(!array_key_exists($parameters[self::ACTION_NAME_INDEX], self::$actionsAlias))
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::FAILED_TO_PARSE_ACTION, $parameters[self::ACTION_NAME_INDEX]);
+			$data = array('actionString' => $parameters[self::ACTION_NAME_INDEX]);
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::FAILED_TO_PARSE_ACTION, $data);
 		}
 
 		$imageAction = self::createImageAction($parameters[self::ACTION_NAME_INDEX]);
@@ -90,7 +93,7 @@ class thumbnailEngine
 	}
 
 	/**
-	 * @param imagickAction $imageAction
+	 * @param kImagickAction $imageAction
 	 * @param array $parameters
 	 * @param int $parametersCount
 	 */
@@ -112,7 +115,7 @@ class thumbnailEngine
 
 	/**
 	 * @param $actionName
-	 * @return imagickAction
+	 * @return kImagickAction
 	 */
 	protected static function createImageAction($actionName)
 	{

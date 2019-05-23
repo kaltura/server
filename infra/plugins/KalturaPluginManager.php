@@ -385,11 +385,12 @@ class KalturaPluginManager
 		}
 		return $instances;
 	}
-	
+
 	/**
 	 * Returns all instances that implement the requested interface or all of them in not supplied
 	 * @param string $interface
-	 * @return array<KalturaPlugin>
+	 * @param null $className
+	 * @return array <KalturaPlugin>
 	 */
 	public static function getPluginInstances($interface = null, $className = null)
 	{

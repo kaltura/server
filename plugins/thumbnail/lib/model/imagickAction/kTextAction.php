@@ -4,7 +4,7 @@
  * @subpackage model.imagickAction
  */
 
-class textAction extends imagickAction
+class kTextAction extends kImagickAction
 {
 	protected $x;
 	protected $y;
@@ -57,7 +57,8 @@ class textAction extends imagickAction
 		$this->validateColorParameter($this->fillColor);
 		if(!$this->text)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, "You must supply a text for this action");
+			$data = array("errorString" => "You must supply a text for this action");
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 	}
 
@@ -73,7 +74,7 @@ class textAction extends imagickAction
 		$draw->setFillColor($this->fillColor);
 		if($this->maxWidth || $this->maxHeight)
 		{
-			$wordWrapHelper = new wordWrapHelper($this->image, $draw, $this->text, $this->maxWidth, $this->maxHeight);
+			$wordWrapHelper = new kWordWrapHelper($this->image, $draw, $this->text, $this->maxWidth, $this->maxHeight);
 			$this->text = $wordWrapHelper->calculateWordWrap();
 		}
 

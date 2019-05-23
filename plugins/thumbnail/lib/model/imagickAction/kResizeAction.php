@@ -4,7 +4,7 @@
  * @subpackage model.imagickAction
  */
 
-class resizeAction extends imagickAction
+class kResizeAction extends kImagickAction
 {
 	protected $newWidth;
 	protected $newHeight;
@@ -51,7 +51,8 @@ class resizeAction extends imagickAction
 		{
 			if(!$this->compositeObject)
 			{
-				throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'Missing composite object');
+				$data = array("errorString" => 'Missing composite object');
+				throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 			}
 		}
 		else
@@ -64,22 +65,26 @@ class resizeAction extends imagickAction
 	{
 		if($this->bestFit && $this->newWidth < self::BEST_FIT_MIN)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'If bestfit is supplied parameter width must be positive');
+			$data = array("errorString" => 'If bestfit is supplied parameter width must be positive');
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if($this->bestFit && $this->newHeight < self::BEST_FIT_MIN)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, ' If bestfit is supplied parameter height must be positive');
+			$data = array("errorString" => 'If bestfit is supplied parameter height must be positive');
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if(!is_numeric($this->newWidth) || $this->newWidth < self::MIN_DIMENSION || $this->newWidth > self::MAX_DIMENSION)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'width must be between 0 and 10000');
+			$data = array("errorString" => 'width must be between 0 and 10000');
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if(!is_numeric($this->newHeight) || $this->newHeight < self::MIN_DIMENSION || $this->newHeight > self::MAX_DIMENSION)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'height must be between 0 and 10000');
+			$data = array("errorString" => 'height must be between 0 and 10000');
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 	}
 

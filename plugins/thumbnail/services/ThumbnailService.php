@@ -15,18 +15,20 @@ class ThumbnailService extends KalturaBaseUserService
 	 * Retrieves a thumbnail according to the required transformation
 	 * @action transform
 	 * @param string $transformString
-	 * @return bool
 	 */
 	public function transformAction($transformString)
 	{
 		$transformation = $this->parseTransformString($transformString);
 		$transformation->validate();
 		$lastModified = $transformation->getLastModified();
-		$imagick = $transformation->execute();
-		$tempFilePath = self::saveTransformationResult($imagick);
-		$renderer = kFileUtils::getDumpFileRenderer($tempFilePath, null, 0 , $lastModified);
-		$renderer->output();
-		return;
+		$storage = kThumbStorageBase::getInstance();
+		if(!$storage->loadFile($transformString))
+		{
+			$imagick = $transformation->execute();
+			$storage->saveFile($transformString, $imagick, $lastModified);
+		}
+
+		$storage->render($lastModified);
 	}
 
 	protected function saveTransformationResult($imagick)
@@ -34,7 +36,7 @@ class ThumbnailService extends KalturaBaseUserService
 		$dc = kDataCenterMgr::getCurrentDc();
 		$id = $dc["id"].'_'.kString::generateStringId();
 		$fileName = "{$id}.jpg";
-		$tempFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR . $fileName;
+		$tempFilePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $fileName;
 		$imagick->setImageFormat('jpg');
 		file_put_contents($tempFilePath, $imagick);
 		return $tempFilePath;
@@ -42,11 +44,11 @@ class ThumbnailService extends KalturaBaseUserService
 
 	/**
 	 * @param $transformString
-	 * @return imageTransformation
+	 * @return kImageTransformation
 	 */
 	protected function parseTransformString($transformString)
 	{
-		$transformation = new imageTransformation();
+		$transformation = new kImageTransformation();
 		$steps = explode(self::IMAGE_TRANSFORMATION_STEPS_DELIMITER, $transformString);
 		$stepsCount = count($steps);
 		for ($i = 0; $i < $stepsCount; $i++)

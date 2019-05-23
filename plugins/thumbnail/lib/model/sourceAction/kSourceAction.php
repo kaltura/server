@@ -1,24 +1,24 @@
 <?php
 /**
  * @package plugins.thumbnail
- * @subpackage model
+ * @subpackage model.sourceAction
  */
 
-abstract class sourceAction extends kThumbnailAction
+abstract class kSourceAction extends kThumbnailAction
 {
-	/** @var thumbnailSource */
+	/** @var kThumbnailSource */
 	protected $source;
 
 	/**
-	 * @return thumbnailSource
+	 * @return kThumbnailSource
 	 * @throws KalturaAPIException
 	 */
 	protected abstract function doAction();
 
 	/**
-	 * @param thumbnailSource $source
+	 * @param kThumbnailSource $source
 	 * @param array $transformationParameters
-	 * @return thumbnailSource $source
+	 * @return kThumbnailSource $source
 	 * @throws KalturaAPIException
 	 */
 	public function execute($source, &$transformationParameters)

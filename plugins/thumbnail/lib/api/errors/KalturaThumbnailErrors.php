@@ -5,7 +5,6 @@
  */
 class KalturaThumbnailErrors extends KalturaErrors
 {
-	const MISSING_PARTNER_PARAMETER_IN_URL = "MISSING_PARTNER_PARAMETER_IN_URL;;Missing partner parameter in url";
 	const FAILED_TO_PARSE_ACTION = "FAILED_TO_PARSE_ACTION;actionString;Failed to parse action \"@actionString@\"";
 	const FAILED_TO_PARSE_SOURCE = "FAILED_TO_PARSE_SOURCE;sourceString;Failed to parse source \"@sourceString@\"";
 	const MISSING_SOURCE_ACTIONS_FOR_TYPE = "MISSING_SOURCE_ACTIONS_FOR_TYPE;entryType;Missing source actions for type \"@entryType@\"";
@@ -15,6 +14,7 @@ class KalturaThumbnailErrors extends KalturaErrors
 	const TRANSFORMATION_RUNTIME_ERROR = "TRANSFORMATION_RUNTIME_ERROR;;There was an error running the image transformation";
 	const BAD_QUERY = "BAD_QUERY;errorString;Bad query \"@errorString@\"";
 	const VID_SEC_FAILED = "VID_SEC_FAILED;;vidSec action failed";
-	const NOT_ALLOWED_PARAMETER = "The provided parameter is not allowed";
-	const MUST_HAVE_VIDEO_SOURCE = "The following transformation must have video source";
+	const NOT_ALLOWED_PARAMETER = "NOT_ALLOWED_PARAMETER;;The provided parameter is not allowed";
+	const MUST_HAVE_VIDEO_SOURCE = "MUST_HAVE_VIDEO_SOURCE;;The following transformation must have video source";
+	CONST MISSING_S3_CONFIGURATION = "MISSING_S3_CONFIGURATION;;Missing S3 configuration";
 }
