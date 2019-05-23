@@ -41,21 +41,18 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 
 	public function saveFile($fileName, $content)
 	{
-		$this->login();
+		$this->s3Mgr->registerStreamWrapper();
 		$path = $this->getFullPath($fileName);
-		kFile::fullMkdir(sys_get_temp_dir() . $path);
-		kFile::safeFilePutContents(sys_get_temp_dir() . $path, $content);
-		try
+		$this->url = 's3://' . $path;
+		if(file_put_contents($this->url, $content))
 		{
-			$this->s3Mgr->putFile($path, sys_get_temp_dir() . $path);
+			$this->content = $content;
 		}
-		catch (Exception $e)
+		else
 		{
-			KalturaLog::debug($e->getMessage());
+			KalturaLog::err("Failed to save thumbnail file");
+			throw new kThumbnailException(kThumbnailException::CACHE_ERROR, kThumbnailException::CACHE_ERROR);
 		}
-
-		kFile::deleteFile(sys_get_temp_dir() . $path);
-		$this->content = $content;
 	}
 
 	protected function getRenderer($lastModified = null)
@@ -64,20 +61,37 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 		return $renderer;
 	}
 
-	public function loadFile($url)
+	public function loadFile($url, $lastModified = null)
 	{
+		KalturaLog::debug("loading file from S3 " . $url);
 		$this->login();
+		$this->s3Mgr->registerStreamWrapper();
 		$path = $this->getFullPath($url);
-		$this->url = self::$configParams[self::CONF_URL] . $path;
+		$this->url = 's3://' . $path;
 		try
 		{
-			$this->content = $this->s3Mgr->getFile($path);
+			if(file_exists($this->url))
+			{
+				if($lastModified)
+				{
+					$s3lastModified = filemtime($this->url);
+					if($lastModified > $s3lastModified)
+					{
+						KalturaLog::debug("file was created before entry changed" . $s3lastModified);
+						return false;
+					}
+				}
+
+				$this->content = $this->s3Mgr->getFile($path);
+				return true;
+			}
 		}
 		catch (Exception $e)
 		{
-			return false;
+			KalturaLog::debug("failed to load file " . $e->getMessage());
+			throw new kThumbnailException(kThumbnailException::CACHE_ERROR, kThumbnailException::CACHE_ERROR);
 		}
 
-		return !empty($this->content);
+		return false;
 	}
 }

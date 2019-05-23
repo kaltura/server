@@ -17,5 +17,6 @@ class kThumbnailException extends kCoreException
 	const VID_SEC_FAILED = "VidSec action failed";
 	const NOT_ALLOWED_PARAMETER = "The provided parameter is not allowed";
 	const MUST_HAVE_VIDEO_SOURCE = "The following transformation must have video source";
-	CONST MISSING_S3_CONFIGURATION = "Missing S3 configuration";
+	const MISSING_S3_CONFIGURATION = "Missing S3 configuration";
+	const CACHE_ERROR = "Cache error";
 }

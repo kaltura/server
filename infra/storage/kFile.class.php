@@ -530,6 +530,7 @@ class kFileData
 	public $ext = NULL;
 	public $content = NULL;
 	public $raw_timestamp = NULL;
+	public $last_modified = NULL;
 	
 	public function __construct($full_file_path, $add_content = false)
 	{
@@ -544,6 +545,7 @@ class kFileData
 			$this->size = kFile::fileSize($full_file_path);
 			$this->raw_timestamp = filectime($full_file_path);
 			$this->timestamp = date("Y-m-d H:i:s.", $this->raw_timestamp);
+			$this->last_modified = filemtime($full_file_path);
 			
 			if($add_content)
 			{

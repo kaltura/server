@@ -6,7 +6,7 @@
 
 class kThumbStorageNone extends kThumbStorageBase implements kThumbStorageInterface
 {
-	public function saveFile($url,$content)
+	public function saveFile($url, $content)
 	{
 		$this->url = $url;
 		$this->content = $content;
@@ -18,7 +18,7 @@ class kThumbStorageNone extends kThumbStorageBase implements kThumbStorageInterf
 		return $renderer;
 	}
 
-	public function loadFile($path)
+	public function loadFile($path, $lastModified  = null)
 	{
 		return false;
 	}

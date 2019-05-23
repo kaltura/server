@@ -44,7 +44,7 @@ abstract class kThumbStorageBase
 	protected function getFullPath($fileName)
 	{
 		$md5 = md5($fileName);
-		$path = DIRECTORY_SEPARATOR . $this->getPrefix() . DIRECTORY_SEPARATOR . $this->getPath($md5) . DIRECTORY_SEPARATOR .$md5. '.jpg';
+		$path = $this->getPrefix() . DIRECTORY_SEPARATOR . $this->getPath($md5) . DIRECTORY_SEPARATOR .$md5. '.jpg';
 		return $path;
 	}
 

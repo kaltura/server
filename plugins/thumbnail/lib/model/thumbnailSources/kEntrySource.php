@@ -20,13 +20,11 @@ class kEntrySource extends kThumbnailSource
 		$secureEntryHelper->validateAccessControl();
 		$this->dbEntry = $dbEntry;
 	}
-
-
+	
 	public function getEntryMediaType()
 	{
 		return $this->dbEntry->getMediaType();
 	}
-
 
 	/**
 	 * @return entry

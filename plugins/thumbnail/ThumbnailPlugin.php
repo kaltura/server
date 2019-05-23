@@ -77,6 +77,9 @@ class ThumbnailPlugin extends KalturaPlugin implements IKalturaServices, IKaltur
 			case kThumbnailException::MISSING_S3_CONFIGURATION:
 				$object = new KalturaAPIException(KalturaThumbnailErrors::MISSING_S3_CONFIGURATION);
 				break;
+			case kThumbnailException::CACHE_ERROR:
+				$object = new KalturaAPIException(KalturaThumbnailErrors::CACHE_ERROR);
+				break;
 			default:
 				$object = null;
 		}

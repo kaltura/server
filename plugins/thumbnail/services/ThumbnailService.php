@@ -22,7 +22,7 @@ class ThumbnailService extends KalturaBaseUserService
 		$transformation->validate();
 		$lastModified = $transformation->getLastModified();
 		$storage = kThumbStorageBase::getInstance();
-		if(!$storage->loadFile($transformString))
+		if(!$storage->loadFile($transformString, $lastModified))
 		{
 			$imagick = $transformation->execute();
 			$storage->saveFile($transformString, $imagick, $lastModified);
