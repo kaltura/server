@@ -1,5 +1,14 @@
 # Orion 15.0.0 #
 
+## Add new bulk upload mechanism for schedule events ## 
+
+- Issue Type: Feature
+- Issue ID: PSVAMB-7338
+
+#### Deployment Scripts ####  
+
+        php /opt/kaltura/app/deployment/updates/scripts/2019_05_22_add_schedule_event_resource_to_batch_partner.php
+
 ## Add permission in Admin Console for analytics persistent session id ##
 
 - Issue Type: Feature
