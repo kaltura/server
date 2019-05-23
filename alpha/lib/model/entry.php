@@ -3215,60 +3215,64 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return "entryIndex";
 	}
 	
+	public function getSphinxIndexName()
+	{
+		return kSphinxSearchManager::getSphinxIndexName(entryIndex::getObjectIndexName(), entryIndex::getSphinxSplitIndexId($this->getPartnerId(), entryIndex::getObjectName()));
+	}
+	
 	public function getCacheInvalidationKeys()
 	{
 		return array("entry:id=".strtolower($this->getId()), "entry:partnerId=".strtolower($this->getPartnerId()));
 	}
 	
-
-public function copyTemplate($copyPartnerId = false, $template)
-{
+	public function copyTemplate($copyPartnerId = false, $template)
+	{
+		
+		if (!$template)
+			return null;
+		/* entry $template */
+		$this->setTemplateEntryId($template->getId());
+		$this->setKuserId($template->getKuserId());
+		$this->setName($template->getName());
+		$this->setTags($template->getTags());
+		$this->setAnonymous($template->getAnonymous());
+		$this->setSource($template->getSource());
+		$this->setSourceId($template->getSourceId());
+		$this->setSourceLink($template->getSourceLink());
+		$this->setLicenseType($template->getLicenseType());
+		$this->setCredit($template->getCredit());
+		$this->setScreenName($template->getScreenName());
+		$this->setSiteUrl($template->getSiteUrl());
+		$this->setPermissions($template->getPermissions());
+		$this->setGroupId($template->getGroupId());
+		$this->setPartnerData($template->getPartnerData());
+		$this->setIndexedCustomData1($template->getIndexedCustomData1());
+		$this->setDescription($template->getDescription());
+		$this->setAdminTags($template->getAdminTags());
+		$this->setPuserId($template->getPuserId());
+		$this->setAccessControlId($template->getAccessControlId());
+		$this->setConversionProfileId($template->getConversionProfileId());
+		$this->setEntitledPusersEdit($template->getEntitledPusersEdit());
+		$this->setEntitledPusersPublish($template->getEntitledPusersPublish());
 	
-	if (!$template)
-		return null;
-	/* entry $template */
-	$this->setTemplateEntryId($template->getId());
-	$this->setKuserId($template->getKuserId());
-	$this->setName($template->getName());
-	$this->setTags($template->getTags());
-	$this->setAnonymous($template->getAnonymous());
-	$this->setSource($template->getSource());
-	$this->setSourceId($template->getSourceId());
-	$this->setSourceLink($template->getSourceLink());
-	$this->setLicenseType($template->getLicenseType());
-	$this->setCredit($template->getCredit());
-	$this->setScreenName($template->getScreenName());
-	$this->setSiteUrl($template->getSiteUrl());
-	$this->setPermissions($template->getPermissions());
-	$this->setGroupId($template->getGroupId());
-	$this->setPartnerData($template->getPartnerData());
-	$this->setIndexedCustomData1($template->getIndexedCustomData1());
-	$this->setDescription($template->getDescription());
-	$this->setAdminTags($template->getAdminTags());
-	$this->setPuserId($template->getPuserId());
-	$this->setAccessControlId($template->getAccessControlId());
-	$this->setConversionProfileId($template->getConversionProfileId());
-	$this->setEntitledPusersEdit($template->getEntitledPusersEdit());
-	$this->setEntitledPusersPublish($template->getEntitledPusersPublish());
-
-
-	if($copyPartnerId)
-	{
-		$this->setPartnerId($template->getPartnerId());
+	
+		if($copyPartnerId)
+		{
+			$this->setPartnerId($template->getPartnerId());
+		}
+		if(is_null($this->getStartDate()) && !is_null($template->getStartDate()))
+		{
+			$this->setStartDate($template->getStartDate());
+		}
+		if(is_null($this->getEndDate()) && !is_null($template->getEndDate()))
+		{
+			$this->setEndDate($template->getEndDate());
+		}
+	
+		$this->setNew(true);
+		$this->setCopiedFrom($template);
+		return $this;
 	}
-	if(is_null($this->getStartDate()) && !is_null($template->getStartDate()))
-	{
-		$this->setStartDate($template->getStartDate());
-	}
-	if(is_null($this->getEndDate()) && !is_null($template->getEndDate()))
-	{
-		$this->setEndDate($template->getEndDate());
-	}
-
-	$this->setNew(true);
-	$this->setCopiedFrom($template);
-	return $this;
-}
 	
 	public function getDynamicFlavorAttributesForAssetParams($assetParamsId)
 	{
@@ -3466,7 +3470,7 @@ public function copyTemplate($copyPartnerId = false, $template)
 	{
 		return $this->getFromCustomData("clonePendingEntries", null, array());
 	}
-	
+
 	/**
 	 * 
 	 * @return array
@@ -4316,5 +4320,4 @@ public function copyTemplate($copyPartnerId = false, $template)
 				return true;
 		}
 	}
-
 }

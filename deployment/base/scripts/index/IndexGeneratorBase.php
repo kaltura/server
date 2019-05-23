@@ -59,13 +59,21 @@ class IndexGeneratorBase
 			$object->setPeerName($objName . "Peer");
 		}
 		
+		$indexName = null;
 		if(isset($objectAttribtues["indexName"])) {
-			$object->setIndexName($objectAttribtues["indexName"]);
+			$indexName = $objectAttribtues["indexName"];
 		} else {
 			$indexName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $objName));
-			$object->setIndexName($indexName);
 		}
-
+		$object->setIndexName($indexName);
+		
+		$splitIndexFieldName = null;
+		if(isset($objectAttribtues["splitIndexFieldName"]))
+		{
+			$splitIndexFieldName = $indexName . "." . $objectAttribtues["splitIndexFieldName"];
+		}
+		$object->setSplitIndexFieldName($splitIndexFieldName);
+		
 		if(isset($objectAttribtues["apiName"])) {
 			$apiName = (string)$objectAttribtues["apiName"];
 			$apiName = preg_replace_callback("/_(.?)/", array($this, 'lTrimUnderscoreAndStrToUpper'), $apiName);

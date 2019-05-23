@@ -27,6 +27,11 @@ class entryIndex extends BaseIndexObject
 	{
 		return 'str_entry_id';
 	}
+	
+	public static function getSphinxSplitIndexFieldName()
+	{
+		return 'entry.PARTNER_ID';
+	}
 
 	public static function getPropelIdField()
 	{
@@ -102,7 +107,6 @@ class entryIndex extends BaseIndexObject
 				'dynamic_attributes' => 'dynamicAttributes',
 				'user_names' => 'userNames',
 				'source' => 'source',
-				'sip_token' => 'sipToken',
 			);
 		}
 		return self::$fieldsMap;
@@ -168,7 +172,6 @@ class entryIndex extends BaseIndexObject
 				'user_names' => IIndexable::FIELD_TYPE_STRING,
 				'source' => IIndexable::FIELD_TYPE_UINT,
 				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
-				'sip_token' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
 		return self::$typesMap;
@@ -197,7 +200,6 @@ class entryIndex extends BaseIndexObject
 				'entitled_kusers',
 				'entitled_kusers_view',
 				'privacy_by_contexts',
-				'sip_token',
 			);
 		}
 		return self::$nullableFields;
@@ -265,7 +267,6 @@ class entryIndex extends BaseIndexObject
 				'entry.SOURCE' => 'source',
 				'entry.PLUGINS_DATA' => 'plugins_data',
 				'entry.SEARCH_TEXT' => '(name,tags,description,entry_id,reference_id,roots,puser_id)',
-				'entry.SIP_TOKEN' => 'sip_token',
 			);
 		}
 		return self::$searchableFieldsMap;
@@ -319,7 +320,6 @@ class entryIndex extends BaseIndexObject
 				"dynamic_attributes",
 				"plugins_data",
 				"search_text",
-				"sip_token",
 			);
 		}
 		return self::$matchableFields;
@@ -442,7 +442,6 @@ class entryIndex extends BaseIndexObject
 				'userId' => 'puser_id',
 				'creatorId' => 'creator_puser_id',
 				'searchText' => '(name,tags,description,entry_id,reference_id,roots,puser_id)',
-				'sipToken' => 'sip_token',
 			);
 		}
 		return self::$apiMatchAttributesMap;

@@ -108,8 +108,16 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 				'filters'		=> array('StringTrim'),
 		));
 
+		$this->addElement('select', 'inner_type', array(
+			'label' => 'Inner type:',
+			'multioptions' => array(
+				'catalog' => 'WS catalog',
+				'ingest' => 'WS ingest',
+			)
+		));
+
 		$this->addDisplayGroup(
-				array('ingest_url','username','password' ),
+				array('ingest_url','username','password', 'inner_type'),
 				'ingest',
 				array(
 					'legend' => 'Ingest URL Configuration',
