@@ -41,7 +41,7 @@ None
 1. in admin.ini add:
 	moduls.Sip.enabled = true
 	moduls.Sip.permissionType = 2
-	moduls.Sip.label = "Enable Sip"
+	moduls.Sip.label = "Enable VCI"
 	moduls.Sip.permissionName = FEATURE_SIP
 	moduls.Sip.group = GROUP_ENABLE_DISABLE_FEATURES
 2. add Sip to plugins.ini	
