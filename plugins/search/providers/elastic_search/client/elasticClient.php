@@ -31,7 +31,9 @@ class elasticClient
 	const ELASTIC_GET_ALIAS_INFO = 'get_alias_info';
 	const ELASTIC_ACTION_DELETE_BY_QUERY = 'delete_by_query';
 	const ELASTIC_ACTION_GET = 'get';
+	const ELASTIC_GET_INDEX = 'get_index';
 	const ELASTIC_CREATE_INDEX = 'create_index';
+	const ELASTIC_DELETE_INDEX = 'delete_index';
 	const ELASTIC_CHANGE_ALIASES = 'change_aliases';
 
 	const MONITOR_NO_INDEX = 'no_index';
@@ -341,6 +343,19 @@ class elasticClient
 	}
 
 	/**
+	 * return the index info for given index name
+	 * @param $indexName
+	 * @return mixed
+	 * @throws kESearchException
+	 */
+	public function getIndexInfo($indexName)
+	{
+		$cmd = $this->elasticHost . "/$indexName/";
+		$response = $this->sendRequest($cmd, self::GET, null, false, self::ELASTIC_GET_INDEX, self::MONITOR_NO_INDEX);
+		return $response;
+	}
+
+	/**
 	 * creates a new index
 	 * @param $indexName
 	 * @param $body - index mapping in json format
@@ -351,6 +366,19 @@ class elasticClient
 	{
 		$cmd = $this->elasticHost . "/$indexName";
 		$response = $this->sendRequest($cmd, self::PUT, $body, false, self::ELASTIC_CREATE_INDEX, $indexName);
+		return $response;
+	}
+
+	/**
+	 * delete the index
+	 * @param $indexName
+	 * @return mixed
+	 * @throws kESearchException
+	 */
+	public function deleteIndex($indexName)
+	{
+		$cmd = $this->elasticHost . "/$indexName";
+		$response = $this->sendRequest($cmd, self::DELETE, null,false, self::ELASTIC_DELETE_INDEX, $indexName);
 		return $response;
 	}
 

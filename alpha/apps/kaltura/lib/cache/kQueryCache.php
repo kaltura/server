@@ -100,7 +100,7 @@ class kQueryCache
 		return substr_replace($formatString, $variableValue, $firstVarPos, 2);
 	}
 	
-	protected static function getCriterionValues($criterion, $columnName)
+	public static function getCriterionValues($criterion, $columnName)
 	{
 		// get current criterion values
 		if ($criterion->getComparison() == Criteria::EQUAL)

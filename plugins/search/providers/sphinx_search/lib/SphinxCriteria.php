@@ -139,10 +139,12 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 * @param bool $setLimit
 	 * @param string $conditions
 	 */
-	protected function executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions = '')
+	protected function executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions = '', $splitIndexName = null)
 	{
-		$pdo = DbManager::getSphinxConnection();
+		$pdo = DbManager::getSphinxConnection(true, $splitIndexName);
 		$objectClass = $this->getIndexObjectName();
+		if($pdo->getKalturaOption('sharded'))
+			$index = $splitIndexName;
 		
 		if (!$this->selectColumn)
 			$this->selectColumn = $objectClass::getSphinxIdField();
@@ -571,6 +573,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 		
 		$index = kSphinxSearchManager::getSphinxIndexName($objectClass::getObjectIndexName());
+		$splitIndexName = $this->getSphinxIndexName();
 		$maxMatches = self::getMaxRecords();
 		$limit = $maxMatches;
 		
@@ -591,13 +594,46 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				$limit = $this->getOffset() . ", $limit";
 		}
 		
-		list($pdo, $sqlConditions) = $this->executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions);
+		list($pdo, $sqlConditions) = $this->executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions, $splitIndexName);
 
 		$queryResult = array($this->getFetchedIds(), $this->nonSphinxOrderColumns, $this->keyToRemove, $this->sphinxRecordCount, $setLimit, $this->applySortRequired);
 		kSphinxQueryCache::cacheSphinxQueryResults($pdo, $objectClass, $cacheKey, $queryResult, $sqlConditions);
 
 		$this->applySphinxResult($setLimit);
 	}
+	
+	protected function getSphinxIndexName()
+	{
+		$objectClass = $this->getIndexObjectName();
+		
+		$splitIndexValue = null;
+		$splitIndexAttr = $objectClass::getSphinxSplitIndexFieldName();
+		if($splitIndexAttr)
+		{
+			$criteria = $this->getCriterion($splitIndexAttr);
+			if(!$criteria)
+			{
+				KalturaLog::debug("Split index attribute not found on Criteria, will query distributed index");
+			}
+			else
+			{
+				$splitIndexValue = kQueryCache::getCriterionValues($criteria, $splitIndexAttr);
+				if($splitIndexValue && count($splitIndexValue) > 1 )
+				{
+					KalturaLog::debug("Found multiple values for Split index attribute, will query distributed index");
+					$splitIndexValue = null;
+				}
+				else
+				{
+					
+					$splitIndexValue = reset($splitIndexValue);
+				}
+			}
+		}
+		
+		return kSphinxSearchManager::getSphinxIndexName($objectClass::getObjectIndexName(), $objectClass::getSphinxSplitIndexId($splitIndexValue, $objectClass::getObjectName()));
+	}
+	
 	
 	/**
 	 * Applies all filter fields and unset the handled fields
@@ -999,7 +1035,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			KalturaLog::log("doCountOnPeer for sphinx criteria is disabled, objectClass [$objectClass], service:action [".kCurrentContext::$service.":".kCurrentContext::$action."]");
 			//return 0;
 		}
-
 
 		$c = clone $this;
 		$c->setLimit(null);

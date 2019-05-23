@@ -46,6 +46,27 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IBaseObject
 			
 		return $this->aEntry;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::getIntId()
+	 */
+	public function getIntId()
+	{
+		return $this->getId();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::indexToSearchIndex()
+	 */
+	public function indexToSearchIndex()
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+	}
+	
+	public function getSphinxIndexName()
+	{
+		return kSphinxSearchManager::getSphinxIndexName(CaptionAssetItemIndex::getObjectIndexName());
+	}
 
 	/**
 	 * @return string

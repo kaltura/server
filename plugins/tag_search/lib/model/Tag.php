@@ -89,6 +89,11 @@ class Tag extends BaseTag implements IIndexable
 	{
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
+	
+	public function getSphinxIndexName()
+	{
+		return kSphinxSearchManager::getSphinxIndexName(TagIndex::getObjectIndexName());
+	}
     
 	public function getIndexPrivacyContext ()
 	{

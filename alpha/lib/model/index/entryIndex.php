@@ -27,6 +27,11 @@ class entryIndex extends BaseIndexObject
 	{
 		return 'str_entry_id';
 	}
+	
+	public static function getSphinxSplitIndexFieldName()
+	{
+		return 'entry.PARTNER_ID';
+	}
 
 	public static function getPropelIdField()
 	{

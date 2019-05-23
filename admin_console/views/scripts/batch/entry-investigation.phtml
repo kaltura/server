@@ -1060,7 +1060,7 @@
 														<td><?php echo $historyRecord->hostName; ?></td>
 														<td><?php echo $historyRecord->sessionId; ?></td>
 														<td><?php echo $historyRecord->schedulerId; ?></td>
-														<td><?php echo $historyRecord->schedulerName; ?></td>
+														<td><?php echo isset($historyRecord->schedulerName) ? $historyRecord->schedulerName : "N/A"; ?></td>
 														<td><?php echo $historyRecord->workerId; ?></td>
 														<td><?php echo $historyRecord->batchIndex; ?></td>
 														<td><?php echo $historyRecord->message; ?></td>
@@ -1120,7 +1120,30 @@
 						<td><?php echo $track->userId; ?></td>
 						<td><?php echo $track->userIp; ?></td>
 						<td><?php echo $track->changedProperties; ?></td>
-						<td><?php echo $track->sessionId; ?></td>
+						<?php
+						if (Zend_Registry::get('config')->settings->kelloggsDashboard &&
+							Zend_Registry::get('config')->settings->kelloggsDashboard->url &&
+							Zend_Registry::get('config')->settings->kelloggsDashboard->jwtKey
+						)
+						{
+							$filter = array(
+								'type' => 'apiLogFilter',
+								'fromTime' => strval($track->createdAt - 300),
+								'toTime' => strval($track->createdAt + 300),
+								'server' => $track->hostName,
+								'session' => $track->sessionId,
+							);
+							$hash = base64_encode(gzcompress(json_encode($filter)));
+							$url = $this->serverUrl()."/admin_console/index.php/index/kelloggs#$hash\n";
+							$track->kelloggsUrl = $url;
+							
+							?><td><a href="<?php echo $track->kelloggsUrl; ?>" target="_blank"><?php echo $track->sessionId; ?></a></td><?php
+						}
+						else
+						{
+							?><td><?php echo $track->sessionId; ?></td><?php
+						}
+						?>
 						<td><?php echo $track->ks; ?></td>
 						<td><?php echo $track->description; ?></td>
 						<td><?php echo date($this->translate('time format'), $track->createdAt); ?></td>
