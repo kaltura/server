@@ -16,10 +16,16 @@ class ESearchService extends KalturaBaseService
 	function searchEntryAction(KalturaESearchEntryParams $searchParams, KalturaPager $pager = null)
 	{
 		$entrySearch = new kEntrySearch();
-		list($coreResults, $objectCount) = $this->initAndSearch($entrySearch, $searchParams, $pager);
+		list($coreResults, $objectCount, $aggregations) = $this->initAndSearch($entrySearch, $searchParams, $pager);
 		$response = new KalturaESearchEntryResponse();
 		$response->objects = KalturaESearchEntryResultArray::fromDbArray($coreResults, $this->getResponseProfile());
 		$response->totalCount = $objectCount;
+		if($aggregations)
+		{
+			$aggregationResponse = new KalturaESearchAggregationResponse();
+			$aggregationResponse->resultToApi($aggregations);
+			$response->aggregations = $aggregationResponse->aggs;
+		}
 		return $response;
 	}
 
@@ -70,7 +76,7 @@ class ESearchService extends KalturaBaseService
 	public function entryExportToCsvAction (KalturaMediaEsearchExportToCsvJobData $data)
 	{
 		if(!$data->userName || !$data->userMail)
-			throw new KalturaAPIException(APIErrors::USER_EMAIL_NOT_FOUND, $kuser);
+			throw new KalturaAPIException(APIErrors::USER_EMAIL_NOT_FOUND);
 		
 		$kJobdData = $data->toObject(new kMediaEsearchExportToCsvJobData());
 		
@@ -87,12 +93,12 @@ class ESearchService extends KalturaBaseService
 	 */
 	protected function initAndSearch($coreSearchObject, $searchParams, $pager)
 	{
-		list($coreSearchOperator, $objectStatusesArr, $objectId, $kPager, $coreOrder) =
+		list($coreSearchOperator, $objectStatusesArr, $objectId, $kPager, $coreOrder ,$aggregations) =
 			self::initSearchActionParams($searchParams, $pager);
-		$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $kPager, $objectStatusesArr, $objectId, $coreOrder);
+		$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $kPager, $objectStatusesArr, $objectId, $coreOrder, $aggregations);
 
-		list($coreResults, $objectCount) = kESearchCoreAdapter::transformElasticToCoreObject($elasticResults, $coreSearchObject);
-		return array($coreResults, $objectCount);
+		list($coreResults, $objectCount, $aggregationsResult) = kESearchCoreAdapter::transformElasticToCoreObject($elasticResults, $coreSearchObject);
+		return array($coreResults, $objectCount, $aggregationsResult);
 	}
 
 	protected static function initSearchActionParams($searchParams, KalturaPager $pager = null)
@@ -115,7 +121,7 @@ class ESearchService extends KalturaBaseService
 			$kPager = $pager->toObject();
 		}
 
-		return array($coreParams->getSearchOperator(), $objectStatusesArr, $coreParams->getObjectId(), $kPager, $coreParams->getOrderBy());
+		return array($coreParams->getSearchOperator(), $objectStatusesArr, $coreParams->getObjectId(), $kPager, $coreParams->getOrderBy(), $coreParams->getAggregations());
 	}
 
 }
