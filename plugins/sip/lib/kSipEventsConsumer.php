@@ -9,8 +9,8 @@ class kSipEventsConsumer implements kObjectDeletedEventConsumer
 	{
 		try 
 		{
-			$pexipConfig = PexipUtils::initAndValidateConfig();
-			PexipHandler::deleteCallObjects($object, $pexipConfig);
+			$pexipConfig = kPexipUtils::initAndValidateConfig();
+			kPexipHandler::deleteCallObjects($object, $pexipConfig);
 		}
 		catch(Exception $e)
 		{

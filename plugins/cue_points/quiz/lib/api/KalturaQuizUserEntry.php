@@ -51,7 +51,7 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	 */
 	public function __construct()
 	{
-		$this->type = QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ);
+		$this->type = QuizPlugin::getApiValue(QuizUserEntryType::QUIZ);
 	}
 
 	public function toObject($object_to_fill = null, $props_to_skip = array())
@@ -128,6 +128,7 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 			KalturaLog::debug('Update quiz allowed only with admin KS or entry owner or co-editor');
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
 		}
+		$propertiesToSkip[] = 'type';
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 

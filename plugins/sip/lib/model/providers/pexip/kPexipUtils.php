@@ -4,13 +4,15 @@
  * @subpackage model.pexip
  */
 
-class PexipUtils
+class kPexipUtils
 {
 	const CONFIG_LICENSE_THRESHOLD = 'licenseThreshold';
 	const CONFIG_HOST_URL = 'hostUrl';
 	const CONFIG_API_ADDRESS = 'apiAddress';
 	const CONFIG_USER_NAME = 'userName';
 	const CONFIG_PASSWORD = 'password';
+	const CONFIG_PRIMARY_LOCATION_ID = 'primaryLocationId';
+	const CONFIG_SECONDARY_LOCATION_ID = 'secondaryLocationId';
 	const SIP_URL_DELIMITER = '@';
 	const PARAM_META = 'meta';
 	const PARAM_TOTAL_COUNT = 'total_count';
@@ -41,7 +43,7 @@ class PexipUtils
 		if (!$dbLiveEntry->getSipToken() || $regenerate)
 		{
 			$addition = str_pad(substr((string)microtime(true) * 10000, -5), 5, '0', STR_PAD_LEFT);
-			return  $dbLiveEntry->getPartnerId() . $addition . PexipUtils::SIP_URL_DELIMITER . $pexipConfig[PexipUtils::CONFIG_HOST_URL];
+			return $dbLiveEntry->getPartnerId() . $addition . self::SIP_URL_DELIMITER . $pexipConfig[self::CONFIG_HOST_URL];
 		}
 		return $dbLiveEntry->getSipToken();
 	}
@@ -103,48 +105,60 @@ class PexipUtils
 		if (!$dbLiveEntry)
 		{
 			$msg = "Entry was not found for sip token $sipToken";
-			KalturaLog::err($msg);
+			$partner = PartnerPeer::retrieveByPK($partnerId);
+			if ($partner)
+			{
+				self::sendSipEmailNotification($partner->getId(), $partner->getAdminEmail(), $msg);
+			}
+			KalturaLog::warning($msg);
 			return false;
 		}
 
 		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_SIP, $dbLiveEntry->getPartnerId()))
 		{
 			$msg = 'Sip Feature is not enabled for partner ' . $dbLiveEntry->getPartnerId();
-			KalturaLog::err($msg);
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
+			KalturaLog::warning($msg);
 			return false;
 		}
 
 		if (!$dbLiveEntry instanceof LiveStreamEntry)
 		{
 			$msg = 'Entry ' . $dbLiveEntry->getId() . ' is not of type LiveStreamEntry.';
-			KalturaLog::err($msg);
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
+			KalturaLog::warning($msg);
 			return false;
 		}
 
 		if (!$dbLiveEntry->getIsSipEnabled())
 		{
 			$msg = 'Sip flag is not enabled for entry ' . $dbLiveEntry->getId() . ' - generateSipUrl action should be called before connecting to entry';
-			KalturaLog::err($msg);
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
+			KalturaLog::warning($msg);
 			return false;
 		}
 
 		if ($dbLiveEntry->isCurrentlyLive(false))
 		{
 			$msg = 'Entry Is currently Live. will not allow call.';
-			KalturaLog::err($msg);
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
+			KalturaLog::warning($msg);
 			return false;
 		}
 
 		if (!$dbLiveEntry->getSipRoomId())
 		{
 			$msg = 'Missing Sip Room Id - Please generate sip url before connecting to entry';
-			KalturaLog::err($msg);
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
+			KalturaLog::warning($msg);
 			return false;
 		}
 
 		if (!$dbLiveEntry->getPrimaryAdpId() && !$dbLiveEntry->getSecondaryAdpId())
 		{
 			$msg = 'Missing ADPs - Please generate sip url before connecting to entry';
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
+			KalturaLog::warning($msg);
 			return false;
 		}
 
@@ -199,7 +213,7 @@ class PexipUtils
 		}
 
 		$lockKey = 'allocate_sip_room_' . $entry->getId();
-		$sipEntryServerNode = kLock::runLocked($lockKey, array('PexipUtils', 'createSipEntryServerNodeImpl'), array($entry, $roomId, $primaryAdpId, $secondaryAdpId));
+		$sipEntryServerNode = kLock::runLocked($lockKey, array('kPexipUtils', 'createSipEntryServerNodeImpl'), array($entry, $roomId, $primaryAdpId, $secondaryAdpId));
 		return $sipEntryServerNode;
 
 	}
@@ -227,11 +241,11 @@ class PexipUtils
 		$sipEntryServerNode->setEntryId($entry->getId());
 		$sipEntryServerNode->setServerNodeId($serverNode->getId());
 		$sipEntryServerNode->setServerType(SipPlugin::getCoreValue('EntryServerNodeType', SipEntryServerNodeType::SIP_ENTRY_SERVER));
-		$sipEntryServerNode->setSipRoomStatus(SipEntryServerNodeStatus::CREATED);
+		$sipEntryServerNode->setStatus(SipEntryServerNodeStatus::CREATED);
 		$sipEntryServerNode->setPartnerId($entry->getPartnerId());
 		$sipEntryServerNode->setSipRoomId($roomId);
-		$sipEntryServerNode->setSipRoomPrimaryADP($primaryAdpId);
-		$sipEntryServerNode->setSipRoomSecondaryADP($secondaryAdpId);
+		$sipEntryServerNode->setSipPrimaryAdpId($primaryAdpId);
+		$sipEntryServerNode->setSipSecondaryAdpId($secondaryAdpId);
 		$sipEntryServerNode->save();
 
 		return $sipEntryServerNode;
@@ -261,7 +275,7 @@ class PexipUtils
 	 */
 	public static function validateLicensesAvailable($pexipConfig)
 	{
-		$result = PexipHandler::listRooms(0, 1, $pexipConfig, true);
+		$result = kPexipHandler::listRooms(0, 1, $pexipConfig, true);
 		if (empty($result))
 		{
 			KalturaLog::debug('Could Not retrieve active rooms - available licenes not validated!');
@@ -325,5 +339,28 @@ class PexipUtils
 		}
 		KalturaLog::info('Could not extract ID from headers');
 		return null;
+	}
+
+	/**
+	 * @param $partner
+	 * @param $emailRecipient
+	 * @param $message
+	 * @param int $entryId
+	 * @throws Exception
+	 */
+	public static function sendSipEmailNotification($partnerId, $emailRecipient, $message, $entryId = 0)
+	{
+		$params = array($message);
+		kJobsManager::addMailJob(
+			null,
+			$entryId,
+			$partnerId,
+			MailType::MAIL_TYPE_SIP_FAILURE,
+			kMailJobData::MAIL_PRIORITY_NORMAL,
+			kConf::get("default_email"),
+			kConf::get("default_email_name"),
+			$emailRecipient,
+			$params
+		);
 	}
 }

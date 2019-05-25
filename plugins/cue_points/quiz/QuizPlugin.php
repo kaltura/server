@@ -3,7 +3,7 @@
  * Enable question cue point objects and answer cue point objects management on entry objects
  * @package plugins.quiz
  */
-class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKalturaServices, IKalturaDynamicAttributesContributer, IKalturaEventConsumers, IKalturaReportProvider, IKalturaSearchDataContributor, IKalturaElasticSearchDataContributor
+class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKalturaServices, IKalturaDynamicAttributesContributer, IKalturaEventConsumers, IKalturaReportProvider, IKalturaSearchDataContributor, IKalturaElasticSearchDataContributor, IKalturaCuePointXmlParser
 {
 	const PLUGIN_NAME = 'quiz';
 
@@ -973,7 +973,249 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 
 		return $quizData;
 	}
-
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePointXmlParser::parseXml()
+	 */
+	public static function parseXml(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
+	{
+		$sceneName = $scene->getName();
+		
+		switch ($sceneName)
+		{
+			case "scene-question-cue-point":
+				$cuePoint = self::parseQuestionQuePoint($scene, $partnerId, $cuePoint);
+				break;
+			case "scene-answer-cue-point":
+				$cuePoint = self::parseAnswerQuePoint($scene, $partnerId, $cuePoint);
+				break;
+		}
+		
+		return $cuePoint;
+	}
+	
+	protected static function parseQuestionQuePoint(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
+	{
+		if(!$cuePoint)
+		{
+			$cuePoint = kCuePointManager::parseXml($scene, $partnerId, new QuestionCuePoint());
+		}
+		
+		if(!($cuePoint instanceof QuestionCuePoint))
+		{
+			return null;
+		}
+		
+		if(isset($scene->question))
+		{
+			$cuePoint->setName($scene->question);
+		}
+		if(isset($scene->hint))
+		{
+			$cuePoint->setHint($scene->hint);
+		}
+		if(isset($scene->explanation))
+		{
+			$cuePoint->setExplanation($scene->explanation);
+		}
+		if(isset($scene->optionalAnswers))
+		{
+			foreach ($scene->optionalAnswers->children() as $optionalAnswer)
+			{
+				$optionalAnswerObject = new kOptionalAnswer();
+				
+				if(isset($optionalAnswer->key))
+				{
+					$optionalAnswerObject->setKey((string)$optionalAnswer->key);
+				}
+				if(isset($optionalAnswer->text))
+				{
+					$optionalAnswerObject->setText((string)$optionalAnswer->text);
+				}
+				if(isset($optionalAnswer->weight))
+				{
+					$optionalAnswerObject->setWeight((string)$optionalAnswer->weight);
+				}
+				if(isset($optionalAnswer->isCorrect))
+				{
+					$optionalAnswerObject->setIsCorrect((string)$optionalAnswer->isCorrect);
+				}
+				$optionalAnswersArray[] = $optionalAnswerObject;
+			}
+			
+			$cuePoint->setOptionalAnswers($optionalAnswersArray);
+		}
+		
+		return $cuePoint;
+	}
+	
+	protected static function parseAnswerQuePoint(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
+	{
+		if(!$cuePoint)
+		{
+			$cuePoint = kCuePointManager::parseXml($scene, $partnerId, new AnswerCuePoint());
+		}
+		
+		if(!($cuePoint instanceof AnswerCuePoint))
+		{
+			return null;
+		}
+		
+		if(isset($scene->answerKey))
+		{
+			$cuePoint->setAnswerKey($scene->answerKey);
+		}
+		if(isset($scene->quizUserEntryId))
+		{
+			$cuePoint->setQuizUserEntryId($scene->quizUserEntryId);
+		}
+		if(isset($scene->parentId))
+		{
+			$cuePoint->setParentId($scene->parentId);
+		}
+		
+		return $cuePoint;
+	}
+	
+	public static function generateXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if($cuePoint instanceof QuestionCuePoint)
+		{
+			return self::generateQuestionXml($cuePoint, $scenes, $scene);
+		}
+		elseif($cuePoint instanceof AnswerCuePoint)
+		{
+			return self::generateAnswerXml($cuePoint, $scenes, $scene);
+		}
+		
+		return $scene;
+	}
+	
+	protected static function generateQuestionXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if(!$scene)
+		{
+			$scene = kCuePointManager::generateCuePointXml($cuePoint, $scenes->addChild('scene-question-cue-point'));
+		}
+		
+		return self::generateQuestionSimpleXmlElement($cuePoint, $scenes, $scene);
+	}
+	
+	protected static function generateAnswerXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if(!$scene)
+		{
+			$scene = kCuePointManager::generateCuePointXml($cuePoint, $scenes->addChild('scene-answer-cue-point'));
+		}
+		
+		return self::generateAnswerSimpleXmlElement($cuePoint, $scenes, $scene);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePointXmlParser::syndicate()
+	 */
+	public static function syndicate(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if($cuePoint instanceof QuestionCuePoint)
+		{
+			return self::syndicateQuestionCuePointXml($cuePoint, $scenes, $scene);
+		}
+		elseif($cuePoint instanceof AnswerCuePoint)
+		{
+			return self::syndicateAnswerCuePointXml($cuePoint, $scenes, $scene);
+		}
+		
+		return $scene;
+	}
+	
+	protected static function syndicateAnswerCuePointXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if(!$scene)
+		{
+			$scene = kCuePointManager::syndicateCuePointXml($cuePoint, $scenes->addChild('scene-answer-cue-point'));
+		}
+		
+		return self::generateAnswerSimpleXmlElement($cuePoint, $scenes, $scene);
+	}
+	
+	protected static function syndicateQuestionCuePointXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if(!$scene)
+		{
+			$scene = kCuePointManager::syndicateCuePointXml($cuePoint, $scenes->addChild('scene-question-cue-point'));
+		}
+		
+		return self::generateQuestionSimpleXmlElement($cuePoint, $scenes, $scene);
+	}
+	
+	protected static function generateQuestionSimpleXmlElement(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		/* @var $cuePoint QuestionCuePoint */
+		if($cuePoint->getName())
+		{
+			$scene->addChild('question', kMrssManager::stringToSafeXml($cuePoint->getName()));
+		}
+		
+		if($cuePoint->getHint())
+		{
+			$scene->addChild('hint', kMrssManager::stringToSafeXml($cuePoint->getHint()));
+		}
+		
+		if($cuePoint->getExplanation())
+		{
+			$scene->addChild('explanation', kMrssManager::stringToSafeXml($cuePoint->getExplanation()));
+		}
+		
+		$optionalAnswers = $cuePoint->getOptionalAnswers();
+		if(count($optionalAnswers))
+		{
+			$optionalAnswersScene = $scene->addChild('optionalAnswers');
+			foreach ($optionalAnswers as $optionalAnswer)
+			{
+				/* @var $optionalAnswer kOptionalAnswer */
+				$optionalAnswersScene->addChild("optionalAnswer");
+				if($optionalAnswer->getKey())
+				{
+					$scene->addChild('key', kMrssManager::stringToSafeXml($optionalAnswer->getKey()));
+				}
+				if($optionalAnswer->getText())
+				{
+					$scene->addChild('text', kMrssManager::stringToSafeXml($optionalAnswer->getText()));
+				}
+				if($optionalAnswer->getWeight())
+				{
+					$scene->addChild('weight', $optionalAnswer->getWeight());
+				}
+				if($optionalAnswer->getIsCorrect())
+				{
+					$scene->addChild('isCorrect', $optionalAnswer->getIsCorrect());
+				}
+			}
+		}
+		
+		return $scene;
+	}
+	
+	protected static function generateAnswerSimpleXmlElement(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		/* @var $cuePoint AnswerCuePoint */
+		if($cuePoint->getAnswerKey())
+		{
+			$scene->addChild('answerKey', kMrssManager::stringToSafeXml($cuePoint->getAnswerKey()));
+		}
+		
+		if($cuePoint->getQuizUserEntryId())
+		{
+			$scene->addChild('quizUserEntryId', kMrssManager::stringToSafeXml($cuePoint->getQuizUserEntryId()));
+		}
+		
+		if($cuePoint->getParentId())
+		{
+			$scene->addChild('parentId', kMrssManager::stringToSafeXml($cuePoint->getParentId()));
+		}
+		
+		return $scene;
+	}
 }
 
 function copmareNumbersAscending($a,$b)

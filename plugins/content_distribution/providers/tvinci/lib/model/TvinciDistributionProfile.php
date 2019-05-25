@@ -10,6 +10,10 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
  	const CUSTOM_DATA_PASSWORD = 'password';
  	const CUSTOM_DATA_XSLT = 'xsltFile';
 	const CUSTOM_TAGS = 'tags';
+	const CUSTOM_INNER_TYPE = 'innerType';
+
+	const INNER_TYPE_CATALOG = 'catalog';
+	const INNER_TYPE_INGEST = 'ingest';
 	
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
@@ -78,4 +82,7 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 
 	public function getTags()	                {return $this->getFromCustomData(self::CUSTOM_TAGS);}
 	public function setTags($v)	                {$this->putInCustomData(self::CUSTOM_TAGS, $v);}
+
+	public function getInnerType()	            {return $this->getFromCustomData(self::CUSTOM_INNER_TYPE, null, self::INNER_TYPE_CATALOG);}
+	public function setInnerType($v)	        {$this->putInCustomData(self::CUSTOM_INNER_TYPE, $v);}
 }
