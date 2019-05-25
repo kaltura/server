@@ -279,7 +279,7 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 			$result->errorDescription .= '\n Invalid action type value ' . $row['action'] . ' passed. Only action type 1 (ADD) is supported at this time.';
 		}
 		
-		if (!isset ($row['title']))
+		if (!isset ($row['title']) || !$row['title'])
 		{
 			//If a title was not provided for the event, it should not be created
 			$result->status = KalturaBulkUploadResultStatus::ERROR;
@@ -288,7 +288,7 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 			
 		}
 		
-		if (!isset ($row['startTime']))
+		if (!isset ($row['startTime']) || !$row['startTime'])
 		{
 			//If a startTime was not provided for the event, it should not be created
 			$result->status = KalturaBulkUploadResultStatus::ERROR;
