@@ -85,6 +85,11 @@ class KalturaBulkUploadResultScheduleEvent extends KalturaBulkUploadResult
 	 * @var string
 	 */
 	public $contentOwnerId;
+	
+	/**
+	 * @var string
+	 */
+	public $templateEntryType;
     
     private static $mapBetweenObjects = array
 	(
@@ -104,6 +109,7 @@ class KalturaBulkUploadResultScheduleEvent extends KalturaBulkUploadResult
 	    'coPublishers',
 	    'eventOrganizerId',
 	    'contentOwnerId',
+	    'templateEntryType',
 	    
 	);
 	

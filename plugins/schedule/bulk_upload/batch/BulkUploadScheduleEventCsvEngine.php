@@ -5,6 +5,10 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 	
 	const OBJECT_TYPE_TITLE = 'schedule-event';
 	
+	const TEMPLATE_ENTRY_TYPE_MEDIA = 'media';
+	
+	const TEMPLATE_ENTRY_TYPE_LIVE = 'live';
+	
 	/**
 	 * @var KalturaScheduleClientPlugin
 	 */
@@ -117,7 +121,7 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 	
 	protected function createTemplateEntry (KalturaBulkUploadResultScheduleEvent $bulkUploadResult)
 	{
-		$templateEntry = $this->initTemplateEntry($bulkUploadResult->eventType);
+		$templateEntry = $this->initTemplateEntry($bulkUploadResult->templateEntryType);
 		$templateEntry->name = $bulkUploadResult->title;
 		$templateEntry->description = $bulkUploadResult->description;
 		$templateEntry->tags = $bulkUploadResult->tags;
@@ -126,7 +130,14 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 		$templateEntry->entitledUsersPublish = $bulkUploadResult->coPublishers;
 		$templateEntry->entitledUsersEdit = $bulkUploadResult->coEditors;
 		
-		$templateEntry = KBatchBase::$kClient->baseEntry->add($templateEntry);
+		if($templateEntry instanceof KalturaLiveStreamEntry)
+		{
+			$templateEntry = KBatchBase::$kClient->liveStream->add($templateEntry);
+		}
+		else
+		{
+			$templateEntry = KBatchBase::$kClient->media->add($templateEntry);
+		}
 		
 		if ($bulkUploadResult->categoryIds)
 		{
@@ -147,16 +158,18 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 	/**
 	 * @param $eventType
 	 */
-	protected function initTemplateEntry ($eventType)
+	protected function initTemplateEntry ($templateEntryType)
 	{
-		switch ($eventType)
+		switch ($templateEntryType)
 		{
-			case KalturaScheduleEventType::RECORD:
+			case self::TEMPLATE_ENTRY_TYPE_MEDIA:
 				$templateEntry = new KalturaMediaEntry();
 				$templateEntry->mediaType = KalturaMediaType::VIDEO;
 				break;
-			case KalturaScheduleEventType::LIVE_STREAM:
+			case self::TEMPLATE_ENTRY_TYPE_LIVE:
 				$templateEntry = new KalturaLiveStreamEntry();
+				$templateEntry->mediaType = KalturaMediaType::LIVE_STREAM_FLASH;
+				$templateEntry->sourceType = KalturaSourceType::LIVE_STREAM;
 				break;
 		}
 		
@@ -402,6 +415,7 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 			'coPublishers',
 			'eventOrganizerId',
 			'contentOwnerId',
+			'templateEntryType',
 		);
 	}
 	

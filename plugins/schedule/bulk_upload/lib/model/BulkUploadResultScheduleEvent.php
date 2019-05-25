@@ -40,6 +40,8 @@ class BulkUploadResultScheduleEvent extends BulkUploadResult
 	const CUSTOM_DATA_EVENT_ORGANIZER_ID = 'eventOrganizerId';
 	
 	const CUSTOM_DATA_CONTENT_OWNER_ID = 'contentOwnerId';
+	
+	const CUSTOM_DATA_TEMPLATE_ENTRY_TYPE = 'templateEntryType';
     
     
 	/* (non-PHPdoc)
@@ -113,4 +115,8 @@ class BulkUploadResultScheduleEvent extends BulkUploadResult
 	
 	public function getEventOrganizerId()	{return $this->getFromCustomData(self::CUSTOM_DATA_EVENT_ORGANIZER_ID, null, parent::getTitle());}
 	public function setEventOrganizerId($v)	{$this->putInCustomData(self::CUSTOM_DATA_EVENT_ORGANIZER_ID, $v);}
+	
+	public function getTemplateEntryType()	{return $this->getFromCustomData(self::CUSTOM_DATA_TEMPLATE_ENTRY_TYPE, null, parent::getTitle());}
+	public function setTemplateEntryType($v)	{$this->putInCustomData(self::CUSTOM_DATA_TEMPLATE_ENTRY_TYPE, $v);}
+	
 }
