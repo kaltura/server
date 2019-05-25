@@ -23,7 +23,7 @@ abstract class kBaseSearch
 		$this->forceInnerHitsSizeOverride = false;
 	}
 
-	public abstract function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null, ESearchOrderBy $order = null);
+	public abstract function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null);
 
 	/**
 	 * @return ESearchQueryAttributes
@@ -61,6 +61,27 @@ abstract class kBaseSearch
 			}
 
 			$this->query['body']['sort'] = $sortConditions;
+		}
+	}
+
+	protected function initAggregations(ESearchAggregations $aggregations = null)
+	{
+		if(!$aggregations)
+		{
+			return;
+		}
+
+		$aggs = array();
+
+		foreach ($aggregations->getAggregations() as $aggregation)
+		{
+			/* var $aggregation ESearchAggregationItem */
+			$aggregationKey = $aggregation->getAggregationKey().':'.$aggregation->getFieldName();
+			$aggs[$aggregationKey] = $aggregation->getAggregationCommand();
+		}
+		if($aggs)
+		{
+			$this->query['body']['aggs'] = $aggs;
 		}
 	}
 
