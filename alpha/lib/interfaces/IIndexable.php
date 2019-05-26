@@ -39,4 +39,8 @@ interface IIndexable extends IBaseObject
 	 */
 	public function indexToSearchIndex();
 	
+	/**
+	 * This function returns the index name to use
+	 */
+	public function getSphinxIndexName();
 }

@@ -198,6 +198,11 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
 	
+	public function getSphinxIndexName()
+	{
+		return kSphinxSearchManager::getSphinxIndexName(ScheduleEventIndex::getObjectIndexName());
+	}
+	
 	public function getEntryIds()
 	{
 		return '';
