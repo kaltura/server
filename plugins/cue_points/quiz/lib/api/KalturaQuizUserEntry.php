@@ -51,7 +51,7 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	 */
 	public function __construct()
 	{
-		$this->type = QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ);
+		$this->type = QuizPlugin::getApiValue(QuizUserEntryType::QUIZ);
 	}
 
 	public function toObject($object_to_fill = null, $props_to_skip = array())
