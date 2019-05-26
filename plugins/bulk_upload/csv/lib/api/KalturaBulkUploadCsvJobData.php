@@ -19,7 +19,19 @@ class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
 	 * @var KalturaStringArray
 	 */
 	public $columns;
-	
+
+	/**
+	 * The object in process
+	 * @var string
+	 */
+	public $processObject;
+
+	/**
+	 * The type of the object in process
+	 * @var string
+	 */
+	public $processObjectType;
+
 	/**
 	 * 
 	 * Maps between objects and the properties
@@ -27,11 +39,12 @@ class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
 	 */
 	private static $map_between_objects = array
 	(
-		"csvVersion",
-	    "columns",
+		'csvVersion',
+		'columns',
+		'processObject',
+		'processObjectType'
 	);
 
-	
 	public function getMapBetweenObjects ( )
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
@@ -59,3 +72,4 @@ class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
 	    $this->type = kPluginableEnumsManager::coreToApi("KalturaBulkUploadType", BulkUploadCsvPlugin::getApiValue(BulkUploadCsvType::CSV));
 	}
 }
+
