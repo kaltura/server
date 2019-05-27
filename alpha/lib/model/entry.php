@@ -3225,6 +3225,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return array("entry:id=".strtolower($this->getId()), "entry:partnerId=".strtolower($this->getPartnerId()));
 	}
 	
+	protected function copyTypedDependentFieldFromTemplate($template) 
+	{
+		$this->setConversionProfileId($template->getConversionProfileId());
+	}
+	
 	public function copyTemplate($copyPartnerId = false, $template)
 	{
 		
@@ -3251,10 +3256,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$this->setAdminTags($template->getAdminTags());
 		$this->setPuserId($template->getPuserId());
 		$this->setAccessControlId($template->getAccessControlId());
-		$this->setConversionProfileId($template->getConversionProfileId());
 		$this->setEntitledPusersEdit($template->getEntitledPusersEdit());
 		$this->setEntitledPusersPublish($template->getEntitledPusersPublish());
-	
+
+		if ($this->getType() == $template->getType())
+		{
+			$this->copyTypedDependentFieldFromTemplate($template);
+		}
 	
 		if($copyPartnerId)
 		{
