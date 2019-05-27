@@ -294,13 +294,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR => 'floor',
 	);
 
-	protected static $transform_time_dimensions = array(
-		self::GRANULARITY_HOUR => array('kKavaReportsMgr', 'timestampToHourId'),
-		self::GRANULARITY_DAY => array('kKavaReportsMgr', 'timestampToDateId'),
-		self::GRANULARITY_MONTH => array('kKavaReportsMgr', 'timestampToMonthId'),
-		self::GRANULARITY_TEN_SECOND => array('kKavaReportsMgr', 'timestampToSecondId'),
-		self::GRANULARITY_MINUTE => array('kKavaReportsMgr', 'timestampToMinuteId'),
-	);
+	protected static $transform_time_dimensions = null;
 
 	protected static $granularity_mapping = array(
 		self::GRANULARITY_DAY => 'P1D',
@@ -883,6 +877,15 @@ class kKavaReportsMgr extends kKavaBase
 		}
 	}
 
+	protected static function initTransformTimeDimensions()
+	{
+		self::$transform_time_dimensions = array(
+			self::GRANULARITY_HOUR => array('kKavaReportsMgr', 'timestampToHourId'),
+			self::GRANULARITY_DAY => array('kKavaReportsMgr', 'timestampToDateId'),
+			self::GRANULARITY_MONTH => array('kKavaReportsMgr', 'timestampToMonthId'),
+		);
+	}
+
 	protected static function getEngagementRankingDef($partner_id, $report_def, $input_filter, $object_ids, $response_options)
 	{
 		$maxPlays = self::getMetricMaxValue($partner_id, $report_def, $input_filter, $object_ids, $response_options, self::EVENT_TYPE_PLAY);
@@ -1064,6 +1067,20 @@ class kKavaReportsMgr extends kKavaBase
 		return $date->format('Ymd');
 	}
 
+	protected static function timestampToUnixtime($timestamp, $tz)
+	{
+		$date = new DateTime($timestamp);
+		return $date->format('U');
+	}
+
+	protected static function timestampToUnixDate($timestamp, $tz)
+	{
+		$date = new DateTime($timestamp);
+		$date->modify('12 hour');			// adding 12H in order to round to the nearest day
+		$round = new DateTime($date->format('Y-m-d')); // round to start of the day
+		return $round->format('U');
+	}
+
 	protected static function timestampToSecondId($timestamp, $tz)
 	{
 		$date = new DateTime($timestamp);
@@ -1148,6 +1165,11 @@ class kKavaReportsMgr extends kKavaBase
 		$from_day = $input_filter->from_day ? $input_filter->from_day : self::unixtimeToDateId($input_filter->from_date, $tz);
 		$to_day = $input_filter->to_day ? $input_filter->to_day : self::unixtimeToDateId($input_filter->to_date, $tz);
 		return array($from_day, $to_day);
+	}
+
+	protected static function getTransformTimeDimensions($granularity)
+	{
+		return isset(self::$transform_time_dimensions[$granularity]) ? self::$transform_time_dimensions[$granularity] : null;
 	}
 
 	/// common query functions
@@ -2237,7 +2259,7 @@ class kKavaReportsMgr extends kKavaBase
 			break;
 
 		default:
-			$transform = isset(self::$transform_time_dimensions[$granularity]) ? self::$transform_time_dimensions[$granularity] : null;
+			$transform = self::getTransformTimeDimensions($granularity);
 			$result = self::getGraphsByDateId($result, $metrics, $input_filter->timeZoneOffset, $transform);
 			break;
 		}

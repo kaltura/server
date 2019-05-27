@@ -1351,7 +1351,15 @@ class kKavaReports extends kKavaReportsMgr
 
 	public static function getReportDef($report_type)
 	{
-		return isset(self::$reports_def[$report_type]) ? self::$reports_def[$report_type] : null;
+		$report_def = isset(self::$reports_def[$report_type]) ? self::$reports_def[$report_type] : null;
+		if (is_null($report_def))
+		{
+			return null;
+		}
+
+		self::initTransformTimeDimensions();
+
+		return $report_def;
 	}
 
 }

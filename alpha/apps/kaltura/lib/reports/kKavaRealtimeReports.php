@@ -109,6 +109,17 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 
 	);
 
+	protected static function initTransformTimeDimensions()
+	{
+		self::$transform_time_dimensions = array(
+			self::GRANULARITY_HOUR => array('kKavaReportsMgr', 'timestampToUnixtime'),
+			self::GRANULARITY_DAY => array('kKavaReportsMgr', 'timestampToUnixDate'),
+//			self::GRANULARITY_MONTH => array('kKavaReportsMgr', 'timestampToMonthId'),
+			self::GRANULARITY_TEN_SECOND => array('kKavaReportsMgr', 'timestampToUnixtime'),
+			self::GRANULARITY_MINUTE => array('kKavaReportsMgr', 'timestampToUnixtime'),
+		);
+	}
+
 	public static function getReportDef($report_type)
 	{
 		$report_def = isset(self::$reports_def[$report_type]) ? self::$reports_def[$report_type] : null;
@@ -116,6 +127,8 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 		{
 			return null;
 		}
+
+		self::initTransformTimeDimensions();
 
 		//default datasource
 		if (!isset($report_def[self::REPORT_JOIN_GRAPHS]) && !isset($report_def[self::REPORT_DATA_SOURCE]))
