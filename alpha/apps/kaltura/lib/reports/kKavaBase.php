@@ -134,7 +134,7 @@ class kKavaBase extends kDruidBase
 	const PROPERTY_IS_BUFFERING = 'isBuffering';
 	const PROPERTY_HAS_BANDWIDTH = 'hasBandwidth';
 	const PROPERTY_HAS_LATENCY = 'hasLatency';
-	const PROPERTY_HAS_DROPPED_FRAMES = 'hasDroppedFrames';
+	const PROPERTY_HAS_DROPPED_FRAMES_RATIO = 'hasDroppedFramesRatio';
 
 	//user engagement values
 	const USER_ENGAGED = 'SoundOnTabFocused';
