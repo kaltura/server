@@ -129,6 +129,7 @@ class kKavaBase extends kDruidBase
 	const TASK_READY = "Ready";
 
 	// event properties
+
 	const PROPERTY_HAS_BITRATE = 'hasBitrate';
 	const PROPERTY_IS_BUFFERING = 'isBuffering';
 	const PROPERTY_HAS_BANDWIDTH = 'hasBandwidth';
@@ -137,7 +138,6 @@ class kKavaBase extends kDruidBase
 
 	//user engagement values
 	const USER_ENGAGED = 'SoundOnTabFocused';
-
 
 	protected static $datasources_dimensions = array(
 		self::DATASOURCE_HISTORICAL => array(
@@ -164,10 +164,10 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_APPLICATION => 1,
 			self::DIMENSION_PLAYBACK_CONTEXT => 1,
 			self::DIMENSION_PLAYBACK_TYPE => 1,
-			self::DIMENSION_HAS_BITRATE => 1,
 			self::DIMENSION_CUSTOM_VAR1 => 1,
 			self::DIMENSION_CUSTOM_VAR2 => 1,
 			self::DIMENSION_CUSTOM_VAR3 => 1,
+			self::DIMENSION_EVENT_PROPERTIES => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -267,10 +267,10 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_PLAYBACK_CONTEXT => 1,
 			self::DIMENSION_PLAYBACK_TYPE => 1,
 			self::DIMENSION_SERVER_NODE_IDS => 1,
-			self::DIMENSION_HAS_BITRATE => 1,
 			self::DIMENSION_CUSTOM_VAR1 => 1,
 			self::DIMENSION_CUSTOM_VAR2 => 1,
 			self::DIMENSION_CUSTOM_VAR3 => 1,
+			self::DIMENSION_EVENT_PROPERTIES => 1,
 		),
 	);
 

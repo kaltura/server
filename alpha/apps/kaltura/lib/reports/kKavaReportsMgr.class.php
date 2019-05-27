@@ -608,19 +608,19 @@ class kKavaReportsMgr extends kKavaBase
 				self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
 					self::EVENT_TYPE_VIEW,				// realtime
 					self::EVENT_TYPE_VIEW_PERIOD)),		// historical 
-				self::getSelectorFilter(self::DIMENSION_HAS_BITRATE, 1))),
+				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_BITRATE))),
 			self::getLongSumAggregator(self::METRIC_BITRATE_SUM, self::METRIC_BITRATE_SUM));
 
 		self::$aggregations_def[self::METRIC_BITRATE_COUNT] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
-				self::getSelectorFilter(self::DIMENSION_HAS_BITRATE, 1))),
+				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_BITRATE))),
 			self::getLongSumAggregator(self::METRIC_BITRATE_COUNT, self::METRIC_BITRATE_COUNT));
 
 		self::$aggregations_def[self::METRIC_VIEW_BITRATE_COUNT] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
-				self::getSelectorFilter(self::DIMENSION_HAS_BITRATE, 1))),
+				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_BITRATE))),
 			self::getLongSumAggregator(self::METRIC_VIEW_BITRATE_COUNT, self::METRIC_COUNT));
 
 		self::$aggregations_def[self::METRIC_UNIQUE_ENTRIES] = self::getCardinalityAggregator(
