@@ -38,6 +38,8 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @param string $password
 	 * @param string $newEmail Optional, provide only when you want to update the email
 	 * @param string $newPassword
+     * @param string $newFirstName Optional, provide only when you want to update the first name
+     * @param string $newLastName Optional, provide only when you want to update the last name
 	 *
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
