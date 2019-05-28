@@ -11,6 +11,8 @@ class kPexipUtils
 	const CONFIG_API_ADDRESS = 'apiAddress';
 	const CONFIG_USER_NAME = 'userName';
 	const CONFIG_PASSWORD = 'password';
+	const CONFIG_PRIMARY_LOCATION_ID = 'primaryLocationId';
+	const CONFIG_SECONDARY_LOCATION_ID = 'secondaryLocationId';
 	const SIP_URL_DELIMITER = '@';
 	const PARAM_META = 'meta';
 	const PARAM_TOTAL_COUNT = 'total_count';
@@ -103,6 +105,7 @@ class kPexipUtils
 		if (!$dbLiveEntry)
 		{
 			$msg = "Entry was not found for sip token $sipToken";
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			KalturaLog::err($msg);
 			return false;
 		}
@@ -110,6 +113,7 @@ class kPexipUtils
 		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_SIP, $dbLiveEntry->getPartnerId()))
 		{
 			$msg = 'Sip Feature is not enabled for partner ' . $dbLiveEntry->getPartnerId();
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			KalturaLog::err($msg);
 			return false;
 		}
@@ -117,6 +121,7 @@ class kPexipUtils
 		if (!$dbLiveEntry instanceof LiveStreamEntry)
 		{
 			$msg = 'Entry ' . $dbLiveEntry->getId() . ' is not of type LiveStreamEntry.';
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			KalturaLog::err($msg);
 			return false;
 		}
@@ -124,6 +129,7 @@ class kPexipUtils
 		if (!$dbLiveEntry->getIsSipEnabled())
 		{
 			$msg = 'Sip flag is not enabled for entry ' . $dbLiveEntry->getId() . ' - generateSipUrl action should be called before connecting to entry';
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			KalturaLog::err($msg);
 			return false;
 		}
@@ -131,6 +137,7 @@ class kPexipUtils
 		if ($dbLiveEntry->isCurrentlyLive(false))
 		{
 			$msg = 'Entry Is currently Live. will not allow call.';
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			KalturaLog::err($msg);
 			return false;
 		}
@@ -138,6 +145,7 @@ class kPexipUtils
 		if (!$dbLiveEntry->getSipRoomId())
 		{
 			$msg = 'Missing Sip Room Id - Please generate sip url before connecting to entry';
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			KalturaLog::err($msg);
 			return false;
 		}
@@ -145,6 +153,7 @@ class kPexipUtils
 		if (!$dbLiveEntry->getPrimaryAdpId() && !$dbLiveEntry->getSecondaryAdpId())
 		{
 			$msg = 'Missing ADPs - Please generate sip url before connecting to entry';
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			return false;
 		}
 
@@ -325,5 +334,28 @@ class kPexipUtils
 		}
 		KalturaLog::info('Could not extract ID from headers');
 		return null;
+	}
+
+	/**
+	 * @param $partner
+	 * @param $emailRecipient
+	 * @param $message
+	 * @param int $entryId
+	 * @throws Exception
+	 */
+	public static function sendSipEmailNotification($partnerId, $emailRecipient, $message, $entryId = 0)
+	{
+		$params = array($message);
+		kJobsManager::addMailJob(
+			null,
+			$entryId,
+			$partnerId,
+			MailType::MAIL_TYPE_SIP_FAILURE,
+			kMailJobData::MAIL_PRIORITY_NORMAL,
+			kConf::get("default_email"),
+			kConf::get("default_email_name"),
+			$emailRecipient,
+			$params
+		);
 	}
 }

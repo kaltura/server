@@ -41,7 +41,6 @@ class PexipService extends KalturaBaseService
 
 		/** @var LiveStreamEntry $dbLiveEntry */
 		$dbLiveEntry = kPexipUtils::validateAndRetrieveEntry($entryId);
-
 		if ($regenerate)
 		{
 			kPexipHandler::deleteCallObjects($dbLiveEntry, $pexipConfig);
@@ -54,6 +53,7 @@ class PexipService extends KalturaBaseService
 		$dbLiveEntry->setSipRoomId($roomId);
 		$dbLiveEntry->setPrimaryAdpId($primaryAdpId);
 		$dbLiveEntry->setSecondaryAdpId($secondaryAdpId);
+		$dbLiveEntry->setExplicitLive(true);
 		$dbLiveEntry->setIsSipEnabled(true);
 		$dbLiveEntry->save();
 
@@ -112,6 +112,8 @@ class PexipService extends KalturaBaseService
 
 		if(!kPexipUtils::validateLicensesAvailable($pexipConfig))
 		{
+			$msg = 'Max number of active rooms reached. Please try again shortly.';
+			kPexipUtils::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			return $response;
 		}
 
@@ -119,7 +121,8 @@ class PexipService extends KalturaBaseService
 		/** @var  SipEntryServerNode $sipEntryServerNode */
 		if (!$sipEntryServerNode)
 		{
-			KalturaLog::debug("Could not create or retrieve SipEntryServerNode.");
+			$msg = 'Entry is Live and Active. can\'t connect call.';
+			kPexipUtils::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
 			return $response;
 		}
 
