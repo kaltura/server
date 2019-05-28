@@ -19,17 +19,21 @@ class kResizeAction extends kImagickAction
 
 	const BEST_FIT_MIN = 1;
 
-	protected $parameterAlias = array(
-		"w" => kThumbnailParameterName::WIDTH,
-		"h" => kThumbnailParameterName::HEIGHT,
-		"ft" => kThumbnailParameterName::FILTER_TYPE,
-		"filtertype" => kThumbnailParameterName::FILTER_TYPE,
-		"b" => kThumbnailParameterName::BLUR,
-		"bf" => kThumbnailParameterName::BEST_FIT,
-		"bestfit" => kThumbnailParameterName::BEST_FIT,
-		"cf" => kThumbnailParameterName::COMPOSITE_FIT,
-		"compositefit" => kThumbnailParameterName::COMPOSITE_FIT,
-	);
+	protected function initParameterAlias()
+	{
+		$resizeParameterAlias = array(
+			"w" => kThumbnailParameterName::WIDTH,
+			"h" => kThumbnailParameterName::HEIGHT,
+			"ft" => kThumbnailParameterName::FILTER_TYPE,
+			"filtertype" => kThumbnailParameterName::FILTER_TYPE,
+			"b" => kThumbnailParameterName::BLUR,
+			"bf" => kThumbnailParameterName::BEST_FIT,
+			"bestfit" => kThumbnailParameterName::BEST_FIT,
+			"cf" => kThumbnailParameterName::COMPOSITE_FIT,
+			"compositefit" => kThumbnailParameterName::COMPOSITE_FIT,
+		);
+		$this->parameterAlias = array_merge($this->parameterAlias, $resizeParameterAlias);
+	}
 
 	protected function extractActionParameters()
 	{

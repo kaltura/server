@@ -6,6 +6,7 @@
 
 interface kThumbStorageInterface
 {
-	public function saveFile($url,$content);
-	public function loadFile($path, $lastModified);
+	public function saveFile($url, $content);
+	public function loadFile($url, $lastModified);
+	public function deleteFile($url);
 }

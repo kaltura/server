@@ -12,13 +12,17 @@ class kRotateAction extends kImagickAction
 	const MAX_DEGREES = 359;
 	const MIN_DEGREES = 1;
 
-	protected $parameterAlias = array(
-		"d" => kThumbnailParameterName::DEGREES,
-		"deg" => kThumbnailParameterName::DEGREES,
-		"b" => kThumbnailParameterName::BACKGROUND_COLOR,
-		"bg" => kThumbnailParameterName::BACKGROUND_COLOR,
-		"backgroundColor" => kThumbnailParameterName::BACKGROUND_COLOR,
-	);
+	protected function initParameterAlias()
+	{
+		$rotateParameterAlias = array(
+			"d" => kThumbnailParameterName::DEGREES,
+			"deg" => kThumbnailParameterName::DEGREES,
+			"b" => kThumbnailParameterName::BACKGROUND_COLOR,
+			"bg" => kThumbnailParameterName::BACKGROUND_COLOR,
+			"backgroundColor" => kThumbnailParameterName::BACKGROUND_COLOR,
+		);
+		$this->parameterAlias = array_merge($this->parameterAlias, $rotateParameterAlias);
+	}
 
 	/**
 	 * @return Imagick

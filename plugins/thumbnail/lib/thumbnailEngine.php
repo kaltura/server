@@ -24,11 +24,19 @@ class thumbnailEngine
 		"comp" => "kCompositeAction",
 		"composite" => "kCompositeAction",
 		"vidSec" => "kVidSecAction",
+		"vidsec" => "kVidSecAction",
+		"vSec" => "kVidSecAction",
 		"rotate" => "kRotateAction",
 		"r" =>	"kRotateAction",
 		"t" => "kTextAction",
 		"txt" => "kTextAction",
 		"text" => "kTextAction",
+		"vidSlice" => "kVidSliceAction",
+		"vidslice" => "kVidSliceAction",
+		"vslice" => "kVidSliceAction",
+		"vidStrip" => "kVidStripAction",
+		"vidstrip" => "kVidStripAction",
+		"vstrip" => "kVidStripAction"
 	);
 
 	/**

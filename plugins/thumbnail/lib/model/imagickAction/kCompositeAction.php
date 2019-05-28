@@ -16,12 +16,16 @@ class kCompositeAction extends kImagickAction
 	const MAX_OPACITY = "100";
 	const MIN_OPACITY = "1";
 
-	protected $parameterAlias = array(
-		"ct" => kThumbnailParameterName::COMPOSITE_TYPE,
-		"compositetype" => kThumbnailParameterName::COMPOSITE_TYPE,
-		"ch" => kThumbnailParameterName::CHANNEL,
-		"op" => kThumbnailParameterName::OPACITY,
-	);
+	protected function initParameterAlias()
+	{
+		$compositeParameterAlias = array(
+			"ct" => kThumbnailParameterName::COMPOSITE_TYPE,
+			"compositetype" => kThumbnailParameterName::COMPOSITE_TYPE,
+			"ch" => kThumbnailParameterName::CHANNEL,
+			"op" => kThumbnailParameterName::OPACITY,
+			);
+		$this->parameterAlias = array_merge($this->parameterAlias, $compositeParameterAlias);
+	}
 
 	protected function extractActionParameters()
 	{
@@ -50,7 +54,7 @@ class kCompositeAction extends kImagickAction
 
 	/**
 	 * @return Imagick
-	 * @throws KalturaAPIException
+	 * @throws kThumbnailException
 	 */
 	protected function doAction()
 	{
@@ -65,7 +69,7 @@ class kCompositeAction extends kImagickAction
 		if(!$this->compositeObject->compositeImage($this->image, $this->compositeType, $this->x, $this->y, $this->channel))
 		{
 			$data = array("errorString" => 'Failed to compose image');
-			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
+			throw new kThumbnailException(kThumbnailException::ACTION_FAILED, kThumbnailException::ACTION_FAILED, $data);
 		}
 
 		return $this->compositeObject;

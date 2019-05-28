@@ -65,8 +65,16 @@ abstract class kThumbStorageBase
 
 	public static function getInstance()
 	{
-		self::init();
-		$storage = kThumbStorageFactory::getInstance(self::$type);
+		if(kApiCache::isCacheEnabled())
+		{
+			self::init();
+			$storage = kThumbStorageFactory::getInstance(self::$type);
+		}
+		else
+		{
+			$storage = kThumbStorageFactory::getInstance(kThumbStorageType::NONE);
+		}
+
 		return $storage;
 	}
 

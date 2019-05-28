@@ -6,6 +6,7 @@
 
 class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterface
 {
+	/** @var s3Mgr $s3Mgr*/
 	protected $s3Mgr;
 
 	function __construct()
@@ -93,5 +94,12 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 		}
 
 		return false;
+	}
+
+	public function deleteFile($url)
+	{
+		KalturaLog::debug("deleting file from s3:" . $url);
+		$this->login();
+		return $this->s3Mgr->delFile($url);
 	}
 }

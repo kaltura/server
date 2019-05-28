@@ -6,10 +6,10 @@
 
 class kThumbStorageLocal extends kThumbStorageBase implements kThumbStorageInterface
 {
-	public function saveFile($fileName, $content)
+	public function saveFile($url, $content)
 	{
-		KalturaLog::debug("Saving file to:" . $fileName);
-		$path = $this->getFullPath($fileName);
+		KalturaLog::debug("Saving file to:" . $url);
+		$path = $this->getFullPath($url);
 		kFile::fullMkdir($path);
 		$ret = kFile::safeFilePutContents($path, $content);
 		if(!$ret)
@@ -46,5 +46,12 @@ class kThumbStorageLocal extends kThumbStorageBase implements kThumbStorageInter
 
 		$this->fileName = $path;
 		return true;
+	}
+
+	public function deleteFile($url)
+	{
+		KalturaLog::debug("deleting file to:" . $url);
+		$path = $this->getFullPath($url);
+		kFile::deleteFile($path);
 	}
 }

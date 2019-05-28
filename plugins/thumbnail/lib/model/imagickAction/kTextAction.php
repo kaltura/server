@@ -17,24 +17,29 @@ class kTextAction extends kImagickAction
 	protected $maxWidth;
 	protected $maxHeight;
 
-	protected $parameterAlias = array(
-		"f" => kThumbnailParameterName::FONT,
-		"fs" => kThumbnailParameterName::FONT_SIZE,
-		"fontsize" => kThumbnailParameterName::FONT_SIZE,
-		"t" => kThumbnailParameterName::TEXT,
-		"txt" => kThumbnailParameterName::TEXT,
-		"a" => kThumbnailParameterName::ANGLE,
-		"sc" => kThumbnailParameterName::STROKE_COLOR,
-		"strokecolor" => kThumbnailParameterName::STROKE_COLOR,
-		"fc" => kThumbnailParameterName::FILL_COLOR,
-		"fillcolor" => kThumbnailParameterName::FILL_COLOR,
-		"w" => kThumbnailParameterName::WIDTH,
-		"maxwidth" => kThumbnailParameterName::WIDTH,
-		"mw" => kThumbnailParameterName::WIDTH,
-		"h" => kThumbnailParameterName::HEIGHT,
-		"maxheight" => kThumbnailParameterName::HEIGHT,
-		"mh" => kThumbnailParameterName::HEIGHT,
-	);
+	protected function initParameterAlias()
+	{
+		$textParameterAlias = array(
+			"f" => kThumbnailParameterName::FONT,
+			"fs" => kThumbnailParameterName::FONT_SIZE,
+			"fontsize" => kThumbnailParameterName::FONT_SIZE,
+			"t" => kThumbnailParameterName::TEXT,
+			"txt" => kThumbnailParameterName::TEXT,
+			"a" => kThumbnailParameterName::ANGLE,
+			"sc" => kThumbnailParameterName::STROKE_COLOR,
+			"strokecolor" => kThumbnailParameterName::STROKE_COLOR,
+			"fc" => kThumbnailParameterName::FILL_COLOR,
+			"fillcolor" => kThumbnailParameterName::FILL_COLOR,
+			"w" => kThumbnailParameterName::WIDTH,
+			"maxwidth" => kThumbnailParameterName::WIDTH,
+			"mw" => kThumbnailParameterName::WIDTH,
+			"h" => kThumbnailParameterName::HEIGHT,
+			"maxheight" => kThumbnailParameterName::HEIGHT,
+			"mh" => kThumbnailParameterName::HEIGHT,
+		);
+
+		$this->parameterAlias = array_merge($this->parameterAlias, $textParameterAlias);
+	}
 
 	protected function extractActionParameters()
 	{

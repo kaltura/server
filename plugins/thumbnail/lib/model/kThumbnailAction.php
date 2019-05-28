@@ -6,14 +6,25 @@
 
 abstract class kThumbnailAction
 {
-	abstract protected function extractActionParameters();
+	/**
+	 * kThumbnailAction constructor.
+	 */
+	public function __construct()
+	{
+		$this->initParameterAlias();
+	}
+
+	abstract protected function initParameterAlias();
 	abstract protected function validateInput();
+	abstract protected function extractActionParameters();
+
 	protected $actionParameters = array();
 	protected $parameterAlias = array();
 	protected $transformationParameters;
 
 	const MAX_DIMENSION = 10000;
 	CONST MIN_DIMENSION = 0;
+
 
 	protected function getActionParameter($actionParameterName, $default = null)
 	{
@@ -98,7 +109,7 @@ abstract class kThumbnailAction
 
 	/**
 	 * @param string $color
-	 * @throws KalturaAPIException
+	 * @throws kThumbnailException
 	 */
 	protected function validateColorParameter($color)
 	{

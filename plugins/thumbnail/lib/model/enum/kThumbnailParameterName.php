@@ -28,8 +28,8 @@ interface kThumbnailParameterName extends BaseEnum
 	const FILL_COLOR = "fillColor";
 	const SECOND = "second";
 	const ENTRY_SOURCE = "entrySource";
-	const VID_SLICE = "vidSlice";
-	const VID_SLICES = "vidSlices";
+	const SLICE_NUMBER = "sliceNumber";
+	const NUMBER_OF_SLICES = "numberOfSlices";
 	const START_SEC = "startSec";
 	const END_SEC = "endSec";
 }

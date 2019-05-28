@@ -14,7 +14,7 @@ class kThumbnailException extends kCoreException
 	const MISSING_COMPOSITE_ACTION = "Missing composite action for multiply steps transformation";
 	const TRANSFORMATION_RUNTIME_ERROR = "There was an error running the image transformation";
 	const BAD_QUERY = "Bad query";
-	const VID_SEC_FAILED = "VidSec action failed";
+	const ACTION_FAILED = "Action failed";
 	const NOT_ALLOWED_PARAMETER = "The provided parameter is not allowed";
 	const MUST_HAVE_VIDEO_SOURCE = "The following transformation must have video source";
 	const MISSING_S3_CONFIGURATION = "Missing S3 configuration";

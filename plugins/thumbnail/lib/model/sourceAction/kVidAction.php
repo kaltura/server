@@ -4,35 +4,43 @@
  * @subpackage model.sourceAction
  */
 
-class kVidSecAction extends kVidAction
+abstract class kVidAction extends kSourceAction
 {
-	protected static $action_name = "vid sec action";
+	protected static $action_name = "abstract action";
 	protected $second;
+	protected $newWidth;
+	protected $newHeight;
 
 	protected function initParameterAlias()
 	{
-		parent::initParameterAlias();
-		$kVidSecAlias = array(
-			"sec" => kThumbnailParameterName::SECOND,
-			"s" => kThumbnailParameterName::SECOND,
+		$kVidAlias = array(
+			"w" => kThumbnailParameterName::WIDTH,
+			"h" => kThumbnailParameterName::HEIGHT,
 		);
-		$this->parameterAlias = array_merge($this->parameterAlias, $kVidSecAlias);
+		$this->parameterAlias = array_merge($this->parameterAlias, $kVidAlias);
 	}
 
 	protected function extractActionParameters()
 	{
-		parent::extractActionParameters();
-		$this->second = $this->getFloatActionParameter(kThumbnailParameterName::SECOND, 0);
+		$this->newWidth = $this->getIntActionParameter(kThumbnailParameterName::WIDTH);
+		$this->newHeight = $this->getIntActionParameter(kThumbnailParameterName::HEIGHT);
 	}
 
 	protected function validateInput()
 	{
-		parent::validateInput();
-		if(!is_numeric($this->second) || $this->second < 0)
+		if(!is_a($this->source, "kEntrySource"))
 		{
-			$data = array("errorString" => "Second cant be negative");
+			$data = array("errorString" => self::$action_name . "can only work on entry source");
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
+
+		if($this->source->getEntryMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO)
+		{
+			throw new kThumbnailException(kThumbnailException::MUST_HAVE_VIDEO_SOURCE, kThumbnailException::MUST_HAVE_VIDEO_SOURCE);
+		}
+
+		$this->validateDimensions();
+		$this->validatePermissions();
 	}
 
 	protected function validateDimensions()
@@ -60,19 +68,5 @@ class kVidSecAction extends kVidAction
 		$dc = kDataCenterMgr::getCurrentDc();
 		$filePath = $dc["id"].'_'.kString::generateStringId();
 		return sys_get_temp_dir().DIRECTORY_SEPARATOR . $filePath;
-	}
-
-	protected function doAction()
-	{
-		$destPath = $this->getTempThumbnailPath();
-		$entry = $this->source->getEntry();
-		$success = myEntryUtils::captureThumbUsingPackager($entry, $destPath, $this->second, $flavorAssetId, $this->newWidth, $this->newHeight);
-		if(!$success)
-		{
-			$data = array("errorString" => self::$action_name . " failed");
-			throw new kThumbnailException(kThumbnailException::ACTION_FAILED, kThumbnailException::ACTION_FAILED, $data);
-		}
-
-		return new kFileSource($destPath . KThumbnailCapture::TEMP_FILE_POSTFIX);
 	}
 }
