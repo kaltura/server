@@ -1,5 +1,25 @@
 # Orion 15.1.0 #
 
+## Support Mailing for Sip Integration ##
+
+- Issue Type: Task
+- Issue ID: PLAT-9777
+
+### Configuration ###
+edit /opt/kaltura/app/configurations/batch/batches/Mailer/emails_en.ini add:
+
+in [constants]
+MAIL_TYPE_SIP_FAILURE = 139
+ 
+in [subjects]
+139 = "An error occurred when trying to broadcast the Video Conference"
+
+in [bodies]
+139 = "Hello,<BR><BR>Reason for the broadcast issue:<BR><BR>%s <BR><BR> Please contact your Account Manager to resolve this issue.<BR><BR>Kaltura Customer Service"
+	
+#### Deployment Scripts ####	
+NONE
+
 ## Deploy "Entry Vendor Task Finished Processing" HTTP notification (for MediaSpace) ##
  - Issue Type: Feature
  - Issue IDs: PSVAMB-7641
