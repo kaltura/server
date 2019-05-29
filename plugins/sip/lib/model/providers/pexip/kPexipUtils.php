@@ -105,6 +105,11 @@ class kPexipUtils
 		if (!$dbLiveEntry)
 		{
 			$msg = "Entry was not found for sip token $sipToken";
+			$partner = PartnerPeer::retrieveByPK($partnerId);
+			if ($partner)
+			{
+				self::sendSipEmailNotification($partner->getId(), $partner->getAdminEmail(), $msg);
+			}
 			KalturaLog::warning($msg);
 			return false;
 		}
