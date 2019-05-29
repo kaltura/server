@@ -105,8 +105,7 @@ class kPexipUtils
 		if (!$dbLiveEntry)
 		{
 			$msg = "Entry was not found for sip token $sipToken";
-			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
-			KalturaLog::err($msg);
+			KalturaLog::warning($msg);
 			return false;
 		}
 
@@ -114,7 +113,7 @@ class kPexipUtils
 		{
 			$msg = 'Sip Feature is not enabled for partner ' . $dbLiveEntry->getPartnerId();
 			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
-			KalturaLog::err($msg);
+			KalturaLog::warning($msg);
 			return false;
 		}
 
@@ -122,7 +121,7 @@ class kPexipUtils
 		{
 			$msg = 'Entry ' . $dbLiveEntry->getId() . ' is not of type LiveStreamEntry.';
 			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
-			KalturaLog::err($msg);
+			KalturaLog::warning($msg);
 			return false;
 		}
 
@@ -130,7 +129,7 @@ class kPexipUtils
 		{
 			$msg = 'Sip flag is not enabled for entry ' . $dbLiveEntry->getId() . ' - generateSipUrl action should be called before connecting to entry';
 			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
-			KalturaLog::err($msg);
+			KalturaLog::warning($msg);
 			return false;
 		}
 
@@ -138,7 +137,7 @@ class kPexipUtils
 		{
 			$msg = 'Entry Is currently Live. will not allow call.';
 			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
-			KalturaLog::err($msg);
+			KalturaLog::warning($msg);
 			return false;
 		}
 
@@ -146,7 +145,7 @@ class kPexipUtils
 		{
 			$msg = 'Missing Sip Room Id - Please generate sip url before connecting to entry';
 			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
-			KalturaLog::err($msg);
+			KalturaLog::warning($msg);
 			return false;
 		}
 
@@ -154,6 +153,7 @@ class kPexipUtils
 		{
 			$msg = 'Missing ADPs - Please generate sip url before connecting to entry';
 			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
+			KalturaLog::warning($msg);
 			return false;
 		}
 

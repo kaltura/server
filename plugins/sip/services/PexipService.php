@@ -68,6 +68,8 @@ class PexipService extends KalturaBaseService
 	{
 		$response = new KalturaSipResponse();
 		$response->action = 'reject';
+		$response->sessionId = UniqueId::get();
+		$response->hostName = infraRequestUtils::getHostname();
 
 		try
 		{
