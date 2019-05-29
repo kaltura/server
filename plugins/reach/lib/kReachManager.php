@@ -103,7 +103,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 					}
 					else
 					{
-						self::$reachProfilesFilteredThatIncludesRegularRules[] = $profile;
+						self::$reachProfilesFilteredThatIncludesRegularRules[$profile->getId()] = $profile;
 					}
 				}
 			}
