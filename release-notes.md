@@ -16,6 +16,16 @@ Run deployment script:
 
     php /opt/kaltura/app/deployment/updates/scripts/2019_05_26_httpEntryVendorTaskDone.php
 
+## Add new bulk upload mechanism for schedule events ## 
+
+- Issue Type: Feature
+- Issue ID: PSVAMB-7338
+
+#### Deployment Scripts ####  
+
+        php /opt/kaltura/app/deployment/updates/scripts/2019_05_22_scheduleevent_bulkupload_required_permissions.php
+
+
 # Orion 15.0.0 #
 
 ## Add permission in Admin Console for analytics persistent session id ##

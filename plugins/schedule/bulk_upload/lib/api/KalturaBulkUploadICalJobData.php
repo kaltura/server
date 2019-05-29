@@ -5,8 +5,8 @@
  * @package plugins.scheduleBulkUpload
  * @subpackage api.objects
  */
-class KalturaBulkUploadICalJobData extends KalturaBulkUploadJobData
-{	
+class KalturaBulkUploadICalJobData extends KalturaBulkUploadScheduleEventJobData
+{
 	/**
 	 * The type of the events that ill be created by this upload
 	 * @var KalturaScheduleEventType
@@ -44,6 +44,16 @@ class KalturaBulkUploadICalJobData extends KalturaBulkUploadJobData
 	    $this->setType();
 	    
 	    return $dbObj;
+	}
+	
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		parent::validateForInsert($propertiesToSkip);
+		
+		if (!$this->eventsType)
+		{
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'eventsType');
+		}
 	}
 	
 	public function setType ()

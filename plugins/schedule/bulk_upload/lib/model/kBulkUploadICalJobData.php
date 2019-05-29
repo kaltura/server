@@ -3,7 +3,7 @@
  * @package plugins.scheduleBulkUpload
  * @subpackage model.data
  */
-class kBulkUploadICalJobData extends kBulkUploadJobData
+class kBulkUploadICalJobData extends kBulkUploadScheduleEventJobData
 {
 	/**
 	 * The type of the events that ill be created by this upload
