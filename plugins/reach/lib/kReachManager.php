@@ -99,7 +99,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				{
 					if ( $condition->getType()== ConditionType::BOOLEAN && $condition->getbooleanEventNotificationIds() && $condition->getbooleanEventNotificationIds() !== self::EMPTY_STRING)
 					{
-						self::$booleanNotificationTemplatesFromReachProfiles[$profile->getId()] = array($profile->getId(), $condition, $rule->getActions());
+						self::$booleanNotificationTemplatesFromReachProfiles[] = array($profile->getId(), $condition, $rule->getActions());
 					}
 					else
 					{
