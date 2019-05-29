@@ -57,27 +57,6 @@ class kReachUtils
 	{
 		return $vendorCatalogItem->calculatePriceForEntry($entry);
 	}
-	
-	/**
-	 * @param $entry
-	 * @param $catalogItem
-	 * @param $reachProfile
-	 * @return bool
-	 */
-	public static function isEnoughCreditLeft($entry, VendorCatalogItem $catalogItem, ReachProfile $reachProfile)
-	{
-		$creditUsed = $reachProfile->getUsedCredit();
-		$allowedCredit = $reachProfile->getCredit()->getCurrentCredit();
-		if ($allowedCredit == ReachProfileCreditValues::UNLIMITED_CREDIT )
-			return true;
-
-		$entryTaskPrice = self::calculateTaskPrice($entry, $catalogItem);
-		
-		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$creditUsed] entryTaskPrice [$entryTaskPrice]");
-		$remainingCredit = $allowedCredit - ($creditUsed  + $entryTaskPrice);
-		
-		return $remainingCredit >= 0 ? true : false;
-	}
 
 	/**
 	 * @param $entry
@@ -98,19 +77,52 @@ class kReachUtils
 	}
 	
 	/**
+	 * @param $entry
+	 * @param $catalogItem
+	 * @param $reachProfile
+	 * @return bool
+	 */
+	public static function isEnoughCreditLeft($entry, VendorCatalogItem $catalogItem, ReachProfile $reachProfile)
+	{
+		$allowedCredit = $reachProfile->getCredit()->getCurrentCredit();
+		if ($allowedCredit == ReachProfileCreditValues::UNLIMITED_CREDIT )
+		{
+			return true;
+		}
+		
+		$creditUsed = $reachProfile->getUsedCredit();
+		$entryTaskPrice = self::calculateTaskPrice($entry, $catalogItem);
+		
+		return self::isOrderAllowed($allowedCredit, $creditUsed, $entryTaskPrice);
+	}
+	
+	/**
 	 * @param EntryVendorTask $entryVendorTask
 	 * @return bool
 	 */
 	public static function checkCreditForApproval(EntryVendorTask $entryVendorTask)
 	{
 		$reachProfile = $entryVendorTask->getReachProfile();
-
 		$allowedCredit = $reachProfile->getCredit()->getCurrentCredit();
 		if ($allowedCredit == ReachProfileCreditValues::UNLIMITED_CREDIT )
+		{
 			return true;
+		}
 
 		$creditUsed = $reachProfile->getUsedCredit();
 		$entryTaskPrice = $entryVendorTask->getPrice();
+		
+		return self::isOrderAllowed($allowedCredit, $creditUsed, $entryTaskPrice);
+	}
+	
+	public static function isOrderAllowed($allowedCredit, $creditUsed, $entryTaskPrice)
+	{
+		//If task price is 0 there is no reason to check remaining credit
+		//This will allow jobs to run also in cases that due to race condition the used credit is larger than allowed credit
+		if($entryTaskPrice == 0)
+		{
+			return true;
+		}
 		
 		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$creditUsed] entryTaskPrice [$entryTaskPrice]");
 		$remainingCredit = $allowedCredit - ($creditUsed  + $entryTaskPrice);
