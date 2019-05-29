@@ -1,3 +1,21 @@
+# Orion 15.1.0 #
+
+## Deploy "Entry Vendor Task Finished Processing" HTTP notification (for MediaSpace) ##
+ - Issue Type: Feature
+ - Issue IDs: PSVAMB-7641
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_05_26_httpEntryVendorTaskDone.template.xml
+
+Run deployment script:
+
+    php /opt/kaltura/app/deployment/updates/scripts/2019_05_26_httpEntryVendorTaskDone.php
+
 # Orion 15.0.0 #
 
 ## Add new bulk upload mechanism for schedule events ## 
@@ -50,7 +68,7 @@ None
 1. in admin.ini add:
 	moduls.Sip.enabled = true
 	moduls.Sip.permissionType = 2
-	moduls.Sip.label = "Enable Sip"
+	moduls.Sip.label = "Enable VCI"
 	moduls.Sip.permissionName = FEATURE_SIP
 	moduls.Sip.group = GROUP_ENABLE_DISABLE_FEATURES
 2. add Sip to plugins.ini	
