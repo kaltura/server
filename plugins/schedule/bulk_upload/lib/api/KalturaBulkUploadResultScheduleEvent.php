@@ -13,48 +13,48 @@ class KalturaBulkUploadResultScheduleEvent extends KalturaBulkUploadResult
 	/**
 	 * @var string
 	 */
-    public $templateEntryId;
+	public $templateEntryId;
 	
 	/**
 	 * @var KalturaScheduleEventType
 	 */
-    public $eventType;
+	public $eventType;
 	
 	/**
 	 * @var string
 	 */
-    public $title;
+	public $title;
 	
 	/**
 	 * @var string
 	 */
-    public $description;
+	public $description;
 	
 	/**
 	 * @var string
 	 */
-    public $tags;
+	public $tags;
 	
 	/**
 	 * @var string
 	 */
-    public $categoryIds;
+	public $categoryIds;
 	
 	/**
 	 * ID of the resource specified for the new event.
 	 * @var string
 	 */
-    public $resourceId;
+	public $resourceId;
 	
 	/**
 	 * @var time
 	 */
-    public $startTime;
+	public $startTime;
 	
 	/**
 	 * @var int
 	 */
-    public $duration;
+	public $duration;
 	
 	/**
 	 * @var time

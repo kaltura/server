@@ -7,7 +7,7 @@
 
 #### Deployment Scripts ####  
 
-        php /opt/kaltura/app/deployment/updates/scripts/2019_05_22_add_schedule_event_resource_to_batch_partner.php
+        php /opt/kaltura/app/deployment/updates/scripts/2019_05_22_scheduleevent_bulkupload_required_permissions.php
 
 ## Add permission in Admin Console for analytics persistent session id ##
 
