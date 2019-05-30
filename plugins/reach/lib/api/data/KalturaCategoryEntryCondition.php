@@ -68,14 +68,14 @@ class KalturaCategoryEntryCondition extends KalturaCondition
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$propertiesToSkip[] = "type";
-		parent::validateForInsert($propertiesToSkip);
-		
 		$this->validatePropertyNotNull(array("categoryId", "categoryIds"), true);
 		if($this->categoryUserPermission)
 		{
 			$this->validatePropertyNotNull("comparison");
 		}
+		
+		$propertiesToSkip[] = "type";
+		parent::validateForInsert($propertiesToSkip);
 	}
 	
 	/* (non-PHPdoc)
