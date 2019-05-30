@@ -262,7 +262,7 @@ class kPexipHandler
 			'role' => 'guest',
 			'conference' => array($pexipConfig[kPexipUtils::CONFIG_API_ADDRESS] . self::ROOM_PREFIX . "$roomId/"),
 			'streaming' => 1,
-			'keep_conference_alivei_if_multiple' => 1
+			'keep_conference_alive' => 'keep_conference_alive_never'
 		);
 		$url = $pexipConfig[kPexipUtils::CONFIG_API_ADDRESS] . self::ADP_PREFIX;
 		$curlWrapper = self::initPexipCurlWrapper(HttpMethods::POST, $pexipConfig, $adpData);
