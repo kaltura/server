@@ -12,14 +12,14 @@ class kRendererString implements kRendererBase
 	protected $content;
 	protected $contentType;
 	protected $maxAge;
-	protected $latModified;
+	protected $lastModified;
 	
 	public function __construct($content, $contentType, $maxAge = 8640000, $lastModified = null)
 	{
 		$this->content = $content;
 		$this->contentType = $contentType;
 		$this->maxAge = $maxAge;
-		$this->latModified = $lastModified;
+		$this->lastModified = $lastModified;
 	}
 	
 	public function validate()
@@ -34,7 +34,7 @@ class kRendererString implements kRendererBase
 			header('Content-Type: '.$this->contentType);
 		header("Access-Control-Allow-Origin:*");
 		
-		infraRequestUtils::sendCachingHeaders($this->maxAge, false, $this->latModified);
+		infraRequestUtils::sendCachingHeaders($this->maxAge, false, $this->lastModified);
 
 		echo $this->content;
 	}

@@ -35,33 +35,6 @@ class kVidSecAction extends kVidAction
 		}
 	}
 
-	protected function validateDimensions()
-	{
-		if($this->newWidth && (!is_numeric($this->newWidth) || $this->newWidth < self::MIN_DIMENSION || $this->newWidth > self::MAX_DIMENSION))
-		{
-			$data = array("errorString" => 'width must be between 0 and 10000');
-			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
-		}
-
-		if($this->newHeight && (!is_numeric($this->newHeight) || $this->newHeight < self::MIN_DIMENSION || $this->newHeight > self::MAX_DIMENSION))
-		{
-			$data = array("errorString" => 'height must be between 0 and 10000');
-			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
-		}
-	}
-
-	protected function validatePermissions()
-	{
-		kThumbnailSecurityHelper::verifyEntryAccess($this->source->getEntry());
-	}
-
-	protected function getTempThumbnailPath()
-	{
-		$dc = kDataCenterMgr::getCurrentDc();
-		$filePath = $dc["id"].'_'.kString::generateStringId();
-		return sys_get_temp_dir().DIRECTORY_SEPARATOR . $filePath;
-	}
-
 	protected function doAction()
 	{
 		$destPath = $this->getTempThumbnailPath();
@@ -73,6 +46,6 @@ class kVidSecAction extends kVidAction
 			throw new kThumbnailException(kThumbnailException::ACTION_FAILED, kThumbnailException::ACTION_FAILED, $data);
 		}
 
-		return new kFileSource($destPath . KThumbnailCapture::TEMP_FILE_POSTFIX);
+		return new kFileSource(KThumbnailCapture::getCapturePath($destPath));
 	}
 }

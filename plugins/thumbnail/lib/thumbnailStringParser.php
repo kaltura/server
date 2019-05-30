@@ -4,8 +4,9 @@
  * @subpackage lib
  */
 
-class thumbnailEngine
+class thumbnailStringParser
 {
+	const IMAGE_TRANSFORMATION_STEPS_DELIMITER = "+";
 	const SOURCE_INDEX = 0;
 	const SOURCE_TYPE_INDEX = 0;
 	const SOURCE_VALUE_INDEX = 1;
@@ -43,18 +44,18 @@ class thumbnailEngine
 	 * @param $stepString
 	 * @return kImageTransformationStep
 	 */
-	public static function parseImageTransformationStep($stepString)
+	protected static function parseImageTransformationStep($stepString)
 	{
 		$imageActions =  explode(self::IMAGE_ACTION_DELIMITER, $stepString);
 		$imageActionsCount = count($imageActions);
-		$source = thumbnailEngine::parseSource($imageActions[self::SOURCE_INDEX]);
+		$source = thumbnailStringParser::parseSource($imageActions[self::SOURCE_INDEX]);
 		$step = new kImageTransformationStep();
 		$step->setSource($source);
 		for ($i = 1; $i < $imageActionsCount; $i++)
 		{
 			if(!empty($imageActions[$i]))
 			{
-				$imageAction = thumbnailEngine::parseImageAction($imageActions[$i]);
+				$imageAction = thumbnailStringParser::parseImageAction($imageActions[$i]);
 				$step->addAction($imageAction);
 			}
 		}
@@ -129,5 +130,26 @@ class thumbnailEngine
 	{
 		$className = self::$actionsAlias[$actionName];
 		return new $className();
+	}
+
+
+	/**
+	 * @param $transformString
+	 * @return kImageTransformation
+	 */
+	public static function parseTransformString($transformString)
+	{
+		$transformation = new kImageTransformation();
+		$steps = explode(self::IMAGE_TRANSFORMATION_STEPS_DELIMITER, $transformString);
+		$stepsCount = count($steps);
+		for ($i = 0; $i < $stepsCount; $i++)
+		{
+			if(!empty($steps[$i]))
+			{
+				$transformation->addImageTransformationStep(self::parseImageTransformationStep($steps[$i]));
+			}
+		}
+
+		return $transformation;
 	}
 }

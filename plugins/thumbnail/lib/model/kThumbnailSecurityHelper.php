@@ -8,7 +8,7 @@ class kThumbnailSecurityHelper
 {
 	/**
 	 * @param entry $entry
-	 * @throws KalturaAPIException
+	 * @throws kThumbnailException
 	 */
 	public static function verifyEntryAccess($entry)
 	{
@@ -43,7 +43,6 @@ class kThumbnailSecurityHelper
 		}
 	}
 
-	//todo check if we need to add get referrer from url too
 	public static function getReferrer()
 	{
 		return kApiCache::getHttpReferrer();

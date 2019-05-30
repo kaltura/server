@@ -25,7 +25,12 @@ class kFileBase
         if (self::safeFilePutContents($fileLocation, $fileContent, $permission))
             return $fileLocation;
     }
-    
+
+    public static function filePutContents($filename, $data, $flags = 0, $context = null)
+	{
+		return file_put_contents($filename, $data, $flags, $context);
+	}
+
     public static function safeFilePutContents($filePath, $var, $mode=null)
     {
         // write to a temp file and then rename, so that the write will be atomic

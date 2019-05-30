@@ -47,6 +47,6 @@ class kVidSliceAction extends kVidStripAction
 			throw new kThumbnailException(kThumbnailException::ACTION_FAILED, kThumbnailException::ACTION_FAILED, $data);
 		}
 
-		return new kFileSource($destPath . KThumbnailCapture::TEMP_FILE_POSTFIX);
+		return new kFileSource(KThumbnailCapture::getCapturePath($destPath));
 	}
 }

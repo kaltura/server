@@ -245,7 +245,7 @@ class s3Mgr extends kFileTransferMgr
 	protected function doFileExists($remote_file)
 	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
-		if($this->isdirectory($remote_file))
+		if($this->isDirectory($remote_file))
 		{
 			return true;
 		}
@@ -255,7 +255,7 @@ class s3Mgr extends kFileTransferMgr
 		return $exists;
 	}
 
-	private function isdirectory($file_name) {
+	private function isDirectory($file_name) {
 		if(strpos($file_name,'.') === false) return TRUE;
 		return false;
 	}
@@ -320,13 +320,6 @@ class s3Mgr extends kFileTransferMgr
 
 	public function registerStreamWrapper()
 	{
-		try
-		{
-			$this->s3->registerStreamWrapper();
-		}
-		catch ( Exception $e )
-		{
-			KalturaLog::err("Failed to register s3 stream wrapper " . $e->getMessage());
-		}
+		$this->s3->registerStreamWrapper();
 	}
 }

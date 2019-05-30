@@ -15,6 +15,7 @@ class kFile extends kFileBase
 	 *  array[2] = filesize
 	 * @param string $path
 	 * @param string $pathPrefix
+	 * @return array
 	 */
 	public static function listDir($path, $pathPrefix = '')
 	{
@@ -78,7 +79,7 @@ class kFile extends kFileBase
 	}
 	
 	/*
-	 * Besure to limit the search with $max_results if not all files are reqquired
+	 * Be sure to limit the search with $max_results if not all files are required
 	 */
 	static public function recursiveDirList($directory, $return_directory_as_prefix = true, $should_recurse = false, $file_pattern = NULL, $depth = 0, $max_results = -1)
 	{

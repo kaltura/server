@@ -20,6 +20,8 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 		}
 
 		$this->s3Mgr = kFileTransferMgr::getInstance(StorageProfileProtocol::S3, $options);
+		$this->login();
+		$this->s3Mgr->registerStreamWrapper();
 	}
 
 	protected function setS3Options()
@@ -42,10 +44,9 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 
 	public function saveFile($fileName, $content)
 	{
-		$this->s3Mgr->registerStreamWrapper();
 		$path = $this->getFullPath($fileName);
-		$this->url = 's3://' . $path;
-		if(file_put_contents($this->url, $content))
+		$this->url = self::getUrl($path);
+		if(kFile::filePutContents($this->url, $content))
 		{
 			$this->content = $content;
 		}
@@ -65,10 +66,8 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 	public function loadFile($url, $lastModified = null)
 	{
 		KalturaLog::debug("loading file from S3 " . $url);
-		$this->login();
-		$this->s3Mgr->registerStreamWrapper();
 		$path = $this->getFullPath($url);
-		$this->url = 's3://' . $path;
+		$this->url = self::getUrl($path);
 		try
 		{
 			if(file_exists($this->url))
@@ -99,7 +98,11 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 	public function deleteFile($url)
 	{
 		KalturaLog::debug("deleting file from s3:" . $url);
-		$this->login();
 		return $this->s3Mgr->delFile($url);
+	}
+
+	protected static function getUrl($path)
+	{
+		return 's3://' . $path;
 	}
 }

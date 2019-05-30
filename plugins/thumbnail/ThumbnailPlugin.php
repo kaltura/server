@@ -66,7 +66,7 @@ class ThumbnailPlugin extends KalturaPlugin implements IKalturaServices, IKaltur
 				$object = new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, $data['errorString']);
 				break;
 			case kThumbnailException::ACTION_FAILED:
-				$object = new KalturaAPIException(KalturaThumbnailErrors::VID_SEC_FAILED);
+				$object = new KalturaAPIException(KalturaThumbnailErrors::ACTION_FAILED);
 				break;
 			case kThumbnailException::NOT_ALLOWED_PARAMETER:
 				$object = new KalturaAPIException(KalturaThumbnailErrors::NOT_ALLOWED_PARAMETER);
