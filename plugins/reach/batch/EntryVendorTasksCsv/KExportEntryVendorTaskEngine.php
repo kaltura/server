@@ -34,6 +34,8 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 	);
 	
 	static private $catalogItemData = array();
+	static private $reachProfileData = array();
+	static private $entryData = array();
 	
 	public function fillCsv(&$csvFile, &$data)
 	{
@@ -75,7 +77,7 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 	 */
 	protected function addHeaderRowToCsv($csvFile, $additionalFields)
 	{
-		$headerRow = 'Task id,createdAt,finishTime,entryId,status,reachProfileId,turnaroundTime,serviceType,serviceFeature,price,userId,moderatingUser,errDescription,notes,accuracy,context,partnerData';
+		$headerRow = 'taskId,createdAt,finishTime,entryId,entryName,entryDuration,taskStatus,reachProfileId,reachProfileName,turnaroundTime,serviceType,serviceFeature,price,userId,moderatingUser,errDescription,notes,accuracy,context,partnerData';
 		KCsvWrapper::sanitizedFputCsv($csvFile, explode(',', $headerRow));
 		return $csvFile;
 	}
@@ -107,14 +109,19 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 	protected function initializeCsvRowValues($entryVendorTask, $entryVendorTaskIdToRow)
 	{
 		$catalogItemData = $this->getCatalogItemDataById($entryVendorTask->catalogItemId);
+		$reachProfileData = $this->getReachProfileDataById($entryVendorTask->reachProfileId);
+		$entryData = $this->getEntryDataById($entryVendorTask->entryId);
 		
 		$defaultRowValues = array(
-			'Task id' => $entryVendorTask->id,
+			'taskId' => $entryVendorTask->id,
 			'createdAt' => $this->getHumanReadbaleDate($entryVendorTask->createdAt),
 			'finishTime' => $this->getHumanReadbaleDate($entryVendorTask->finishTime),
 			'entryId' => $entryVendorTask->entryId,
-			'status' => $this->translateEnumsToHumanReadable("status", $entryVendorTask->status),
+			'entryName' => $entryData ? $entryData["name"] : "N/A",
+			'entryDuration' => $entryData ? $entryData["duration"] : "N/A",
+			'taskStatus' => $this->translateEnumsToHumanReadable("status", $entryVendorTask->status),
 			'reachProfileId' => $entryVendorTask->reachProfileId,
+			'reachProfileName' => $reachProfileData ? $reachProfileData["name"] : "N/A",
 			'turnaroundTime' => $catalogItemData ? $catalogItemData["TAT"] : "N/A",
 			'serviceType' => $catalogItemData ? $this->translateEnumsToHumanReadable("serviceType", $catalogItemData["serviceType"]) : "N/A",
 			'serviceFeature' => $catalogItemData ? $this->translateEnumsToHumanReadable("serviceFeature", $catalogItemData["serviceFeature"]) : "N/A",
@@ -178,5 +185,52 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 		
 		self::$catalogItemData[$id] = $catalogItemInfo;
 		return $catalogItemInfo;
+	}
+	
+	protected function getReachProfileDataById($id)
+	{
+		if (isset(self::$reachProfileData[$id]))
+			return self::$reachProfileData[$id];
+		
+		try
+		{
+			$reachProfile = KBatchBase::$kClient->reachProfile->get($id);
+		}
+		catch (Exception $e)
+		{
+			$reachProfile = null;
+			KalturaLog::info("Failed to get reach profile info for reach profile id [$id], with err message: " . $e->getMessage());
+		}
+		
+		$reachProfileInfo = array(
+			"name" => $reachProfile ? $reachProfile->name : "N/A",
+		);
+		
+		self::$reachProfileData[$id] = $reachProfileInfo;
+		return $reachProfileInfo;
+	}
+	
+	protected function getEntryDataById($id)
+	{
+		if (isset(self::$entryData[$id]))
+			return self::$entryData[$id];
+		
+		try
+		{
+			$entry = KBatchBase::$kClient->baseEntry->get($id);
+		}
+		catch (Exception $e)
+		{
+			$entry = null;
+			KalturaLog::info("Failed to get entry info for entry id [$id], with err message: " . $e->getMessage());
+		}
+		
+		$entryInfo = array(
+			"name" => $entry ? $entry->name : "N/A",
+			"duration" => $entry ? $entry->duration : "N/A",
+		);
+		
+		self::$entryData[$id] = $entryInfo;
+		return $entryInfo;
 	}
 }
