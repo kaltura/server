@@ -14,12 +14,11 @@ class ScheduleBulkService extends KalturaBaseService
 	 * @action addScheduleEvents
 	 * @actionAlias schedule_scheduleEvent.addFromBulkUpload
 	 * @param file $fileData
-	 * @param KalturaBulkUploadICalJobData $bulkUploadData
+	 * @param KalturaBulkUploadScheduleEventJobData $bulkUploadData
 	 * @return KalturaBulkUpload
 	 */
-	function addScheduleEventsAction($fileData, KalturaBulkUploadICalJobData $bulkUploadData = null)
+	function addScheduleEventsAction($fileData, KalturaBulkUploadScheduleEventJobData $bulkUploadData = null)
 	{
-		$bulkUploadCoreType = BulkUploadSchedulePlugin::getBulkUploadTypeCoreValue(BulkUploadScheduleType::ICAL);
 		$bulkUploadObjectCoreType = BulkUploadSchedulePlugin::getBulkUploadObjectTypeCoreValue(BulkUploadObjectScheduleType::SCHEDULE_EVENT);
 
 		if (!$bulkUploadData)
@@ -27,16 +26,12 @@ class ScheduleBulkService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'bulkUploadData');
 		}
 
-		if (!$bulkUploadData->eventsType)
-		{
-			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'eventsType');
-		}
-
 		if(!$bulkUploadData->fileName)
 			$bulkUploadData->fileName = $fileData["name"];
 		
 		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
 		/* @var $dbBulkUploadJobData kBulkUploadJobData */
+		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
 		
 		$dbBulkUploadJobData->setBulkUploadObjectType($bulkUploadObjectCoreType);
 		$dbBulkUploadJobData->setUserId($this->getKuser()->getPuserId());
