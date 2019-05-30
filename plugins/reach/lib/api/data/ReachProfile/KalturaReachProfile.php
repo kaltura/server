@@ -197,6 +197,12 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 		$this->validatePropertyNotNull("credit");
 		$this->credit->validateForInsert();
 		
+		$rules = $this->rules ? $this->rules : array();
+		foreach($rules as $rule)
+		{
+			$rule->validateForInsert($propertiesToSkip);
+		}
+		
 		//validating dictionary duplications
 		$this->validateDictionary();
 		
@@ -207,6 +213,12 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 	{
 		//validating dictionary duplications
 		$this->validateDictionary();
+		
+		$rules = $this->rules ? $this->rules : array();
+		foreach($rules as $rule)
+		{
+			$rule->validateForUpdate($rule->toObject(), $propertiesToSkip);
+		}
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
