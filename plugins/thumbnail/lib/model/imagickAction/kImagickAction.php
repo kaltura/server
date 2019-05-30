@@ -1,10 +1,10 @@
 <?php
 /**
  * @package plugins.thumbnail
- * @subpackage model
+ * @subpackage model.imagickAction
  */
 
-abstract class imagickAction extends kThumbnailAction
+abstract class kImagickAction extends kThumbnailAction
 {
 	/* @var Imagick $image */
 	protected $image;
@@ -32,4 +32,10 @@ abstract class imagickAction extends kThumbnailAction
 	{
 		return false;
 	}
+
+	public function getActionType()
+	{
+		return kActionType::IMAGICK;
+	}
+
 }

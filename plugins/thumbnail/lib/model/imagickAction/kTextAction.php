@@ -4,7 +4,7 @@
  * @subpackage model.imagickAction
  */
 
-class textAction extends imagickAction
+class kTextAction extends kImagickAction
 {
 	protected $x;
 	protected $y;
@@ -17,24 +17,29 @@ class textAction extends imagickAction
 	protected $maxWidth;
 	protected $maxHeight;
 
-	protected $parameterAlias = array(
-		"f" => kThumbnailParameterName::FONT,
-		"fs" => kThumbnailParameterName::FONT_SIZE,
-		"fontsize" => kThumbnailParameterName::FONT_SIZE,
-		"t" => kThumbnailParameterName::TEXT,
-		"txt" => kThumbnailParameterName::TEXT,
-		"a" => kThumbnailParameterName::ANGLE,
-		"sc" => kThumbnailParameterName::STROKE_COLOR,
-		"strokecolor" => kThumbnailParameterName::STROKE_COLOR,
-		"fc" => kThumbnailParameterName::FILL_COLOR,
-		"fillcolor" => kThumbnailParameterName::FILL_COLOR,
-		"w" => kThumbnailParameterName::WIDTH,
-		"maxwidth" => kThumbnailParameterName::WIDTH,
-		"mw" => kThumbnailParameterName::WIDTH,
-		"h" => kThumbnailParameterName::HEIGHT,
-		"maxheight" => kThumbnailParameterName::HEIGHT,
-		"mh" => kThumbnailParameterName::HEIGHT,
-	);
+	protected function initParameterAlias()
+	{
+		$textParameterAlias = array(
+			"f" => kThumbnailParameterName::FONT,
+			"fs" => kThumbnailParameterName::FONT_SIZE,
+			"fontsize" => kThumbnailParameterName::FONT_SIZE,
+			"t" => kThumbnailParameterName::TEXT,
+			"txt" => kThumbnailParameterName::TEXT,
+			"a" => kThumbnailParameterName::ANGLE,
+			"sc" => kThumbnailParameterName::STROKE_COLOR,
+			"strokecolor" => kThumbnailParameterName::STROKE_COLOR,
+			"fc" => kThumbnailParameterName::FILL_COLOR,
+			"fillcolor" => kThumbnailParameterName::FILL_COLOR,
+			"w" => kThumbnailParameterName::WIDTH,
+			"maxwidth" => kThumbnailParameterName::WIDTH,
+			"mw" => kThumbnailParameterName::WIDTH,
+			"h" => kThumbnailParameterName::HEIGHT,
+			"maxheight" => kThumbnailParameterName::HEIGHT,
+			"mh" => kThumbnailParameterName::HEIGHT,
+		);
+
+		$this->parameterAlias = array_merge($this->parameterAlias, $textParameterAlias);
+	}
 
 	protected function extractActionParameters()
 	{
@@ -57,7 +62,8 @@ class textAction extends imagickAction
 		$this->validateColorParameter($this->fillColor);
 		if(!$this->text)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, "You must supply a text for this action");
+			$data = array("errorString" => "You must supply a text for this action");
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 	}
 
@@ -73,7 +79,7 @@ class textAction extends imagickAction
 		$draw->setFillColor($this->fillColor);
 		if($this->maxWidth || $this->maxHeight)
 		{
-			$wordWrapHelper = new wordWrapHelper($this->image, $draw, $this->text, $this->maxWidth, $this->maxHeight);
+			$wordWrapHelper = new kWordWrapHelper($this->image, $draw, $this->text, $this->maxWidth, $this->maxHeight);
 			$this->text = $wordWrapHelper->calculateWordWrap();
 		}
 
