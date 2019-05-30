@@ -1,5 +1,17 @@
 # Orion 15.1.0 #
 
+## Add addition fields in entry vendor task csv ##
+
+- Issue Type: Task
+- Issue ID: REACH2-590 + SUP-18216
+
+### Configuration ###
+	None.
+		
+#### Deployment Scripts ####	
+		  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_05_30_allow_batch_reach_profile_access.php
+
+
 ## Support Mailing for Sip Integration ##
 
 - Issue Type: Task
