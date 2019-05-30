@@ -1507,4 +1507,5 @@ return array(
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::NO' => "Norwegian",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::FI' => "Finnish",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::IS' => "Icelandic",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::PL' => "Polish",
 );
