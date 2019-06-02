@@ -130,9 +130,13 @@ class languageCodeManager
 		else
 		{
 			if($languageObject[self::ISO639])
+			{
 				$languageCode = $languageObject[self::ISO639];
+			}
 			else
+			{
 				$languageCode = $languageObject[self::ISO639_B];
+			}
 		}
 		
 		return $languageCode;
