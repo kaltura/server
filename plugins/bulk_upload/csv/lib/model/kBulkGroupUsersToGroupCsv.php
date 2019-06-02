@@ -29,15 +29,19 @@ class kBulkGroupUsersToGroupCsv
 			self::TMP_NAME => $csvFile
 		);
 
+		$jobData = new KalturaBulkUploadCsvJobData();
+		$jobData->processObject = $this->groupId;
+		$jobData->processObjectType = self::GROUP_ID;
 		$bulkService = new BulkService();
 		$bulkService->initService('bulkupload_bulk', 'bulk', 'addUsers');
-		return $bulkService->addUsersAction($fileData);
+		return $bulkService->addUsersAction($fileData, $jobData);
 	}
 
 	public function buildGroupUsersCsv($groupUserIdsToAdd, $originalGroupId)
 	{
 		$csvPath = tempnam(sys_get_temp_dir(), 'csv');
 		$csvData = array();
+
 		foreach ($groupUserIdsToAdd as $addGroupUserId)
 		{
 			$originalGroupUser = KuserKgroupPeer::retrieveByKuserIdAndKgroupId($addGroupUserId->getId(),$originalGroupId);
