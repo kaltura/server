@@ -59,6 +59,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_EVENT_VAR3 = 'eventVar3';
 	const DIMENSION_USER_ENGAGEMENT = 'userEngagement';
 	const DIMENSION_EVENT_PROPERTIES = 'eventProperties';
+	const DIMENSION_FLAVOR_PARAMS_ID = 'flavorParamsId';
 
 	// metrics
 	const METRIC_COUNT = 'count';
