@@ -57,7 +57,7 @@ class kAuthenticatedCondition extends kCondition
 				$privilege = $privilege->getValue();
 				
 			KalturaLog::debug("Checking privilege [$privilege] with entry [".$scope->getEntryId()."]");
-			if($privilege == self::WIDGET)
+			if($privilege === self::WIDGET)
 			{
 				if($scope->getKs()->verifyPrivileges($privilege, 1))
 				{
