@@ -8,18 +8,14 @@
 //require_once ("/opt/kaltura/app/plugins/thumbnail/lib/model/thumbStorage/kThumbStorageBase.php");
 class ThumbnailService extends KalturaBaseUserService
 {
-	const PARTNER_INDEX = 0;
-	const IMAGE_TRANSFORMATION_STEPS_DELIMITER = "/";
-	const PARTNER_TOKEN = "/p/";
-
 	/**
 	 * Retrieves a thumbnail according to the required transformation
 	 * @action transform
-	 * @return bool
-	 *
+	 * @param string $transformString
 	 */
-	public function transformAction()
+	public function transformAction($transformString)
 	{
+<<<<<<< HEAD
 		$transformationUrl = $this->getTransformationStringFromUri();
 		$transformation = $this->parseUrl($transformationUrl);
 		$storage = kThumbStorageBase::getInstance();
@@ -53,10 +49,18 @@ class ThumbnailService extends KalturaBaseUserService
 		$uri  = $_SERVER['REQUEST_URI'];
 		$transformParametersStart = strpos($uri,self::PARTNER_TOKEN);
 		if($transformParametersStart === false)
+=======
+		$transformation = thumbnailStringParser::parseTransformString($transformString);
+		$transformation->validate();
+		$lastModified = $transformation->getLastModified();
+		$storage = kThumbStorageBase::getInstance();
+		if(!$storage->loadFile($transformString, $lastModified))
+>>>>>>> bc2267b517dd08ee9a78c282f90b0796fa25ad58
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::MISSING_PARTNER_PARAMETER_IN_URL);
+			$imagick = $transformation->execute();
+			$storage->saveFile($transformString, $imagick, $lastModified);
 		}
 
-		return substr($uri, $transformParametersStart + 3);
+		$storage->render($lastModified);
 	}
 }

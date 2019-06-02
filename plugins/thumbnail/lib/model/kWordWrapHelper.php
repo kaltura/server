@@ -4,7 +4,7 @@
  * @subpackage model
  */
 
-class wordWrapHelper
+class kWordWrapHelper
 {
 	protected $maxWidth;
 	protected $maxHeight;
@@ -38,7 +38,8 @@ class wordWrapHelper
 		$spaceMetrics = $this->image->queryFontMetrics($this->draw, " ");
 		if($spaceMetrics['textWidth'] > $this->maxWidth)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, self::TEXT_DOES_NOT_FIT_ERR);
+			$data = array("errorString" => self::TEXT_DOES_NOT_FIT_ERR);
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		$textLength = strlen($this->fullText);
@@ -77,7 +78,8 @@ class wordWrapHelper
 		$this->commitCurrentLine();
 		if($this->maxHeight && $this->totalHeight > $this->maxHeight)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, self::TEXT_DOES_NOT_FIT_ERR);
+			$data = array("errorString" => self::TEXT_DOES_NOT_FIT_ERR);
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		return implode(PHP_EOL, $this->lines);
@@ -90,7 +92,8 @@ class wordWrapHelper
 		{
 			if ($textWidth > $this->maxWidth)
 			{
-				throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, self::TEXT_DOES_NOT_FIT_ERR);
+				$data = array("errorString" => self::TEXT_DOES_NOT_FIT_ERR);
+				throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 			}
 
 			if ($textWidth > $this->currentLineLimit)

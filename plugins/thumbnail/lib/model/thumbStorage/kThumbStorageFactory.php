@@ -1,7 +1,11 @@
 <?php
 /**
  * @package plugins.thumbnail
+<<<<<<< HEAD
  * @subpackage model
+=======
+ * @subpackage model.thumbStorage
+>>>>>>> bc2267b517dd08ee9a78c282f90b0796fa25ad58
  */
 
 class kThumbStorageFactory

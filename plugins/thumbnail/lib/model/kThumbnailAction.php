@@ -6,11 +6,25 @@
 
 abstract class kThumbnailAction
 {
-	abstract protected function extractActionParameters();
+	/**
+	 * kThumbnailAction constructor.
+	 */
+	public function __construct()
+	{
+		$this->initParameterAlias();
+	}
+
+	abstract protected function initParameterAlias();
 	abstract protected function validateInput();
+	abstract protected function extractActionParameters();
+
 	protected $actionParameters = array();
 	protected $parameterAlias = array();
 	protected $transformationParameters;
+
+	const MAX_DIMENSION = 10000;
+	CONST MIN_DIMENSION = 0;
+
 
 	protected function getActionParameter($actionParameterName, $default = null)
 	{
@@ -93,6 +107,10 @@ abstract class kThumbnailAction
 		$this->actionParameters[$parameterName] = $parameterValue;
 	}
 
+	/**
+	 * @param string $color
+	 * @throws kThumbnailException
+	 */
 	protected function validateColorParameter($color)
 	{
 		$image = new Imagick();
@@ -103,7 +121,10 @@ abstract class kThumbnailAction
 		}
 		catch(Exception $e)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, "Illegal value for color {$color}");
+			$data = array("errorString" => "Illegal value for color {$color}");
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 	}
+
+	public abstract function getActionType();
 }
