@@ -10,6 +10,8 @@ class kUserException extends kCoreException
 	const WRONG_PASSWORD = 'WRONG_PASSWORD';
 	
 	const INVALID_OTP = 'INVALID_OTP';
+
+	const MISSING_OTP = 'MISSING_OTP';
 	
 	const PASSWORD_STRUCTURE_INVALID = 'PASSWORD_STRUCTURE_INVALID';
 	

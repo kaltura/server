@@ -9,7 +9,7 @@ class authenticationUtils
 
 	public static function generateQRCodeUrl($kuser)
 	{
-		return str_replace ("|", "M%7C", GoogleAuthenticator::getQRCodeGoogleUrl($kuser->getPuserId() . ' ' . kConf::get ('www_host') . ' KAC', $kuser->getLoginData()->getSeedFor2FactorAuth()));
+		return str_replace ("|", "M%7C", GoogleAuthenticator::getQRCodeGoogleUrl($kuser->getPuserId() . '_' . kConf::get ('www_host') . '_KMC', $kuser->getLoginData()->getSeedFor2FactorAuth()));
 	}
 
 	public static function getQRImage($kuser)
@@ -35,13 +35,16 @@ class authenticationUtils
 
 	public static function add2FAMailJob($kuser)
 	{
-		$kmcngParams = kConf::get('kmcng');
-		$qrUrl = $kmcngParams['kaltura']['qrUrl'];
-		if(!$qrUrl)
+		//need to have specific url to the qr page
+		$loginData = $kuser->getLoginData();
+		$loginData->setPasswordHashKey($loginData->newPassHashKey());
+		$loginData->save();
+		$resetPasswordLink = UserLoginDataPeer::getPassResetLink($loginData->getPasswordHashKey());
+		if(!$resetPasswordLink)
 		{
 			return null;
 		}
-		$bodyParams = array($kuser->getFullName(), $kuser->getPartnerId(), $qrUrl);
+		$bodyParams = array($kuser->getFullName(), $kuser->getPartnerId(), $resetPasswordLink);
 
 		$job = kJobsManager::addMailJob(
 			null,

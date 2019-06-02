@@ -467,9 +467,11 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 		if($partner && $partner->getUseTwoFactorAuthentication())
 		{
+			kuserPeer::setUseCriteriaFilter(false);
 			$c = Partner::getAdminUserCriteria($partnerId);
 			$c->addAnd(kuserPeer::EMAIL, $loginData->getLoginEmail());
 			$user = kuserPeer::doSelectOne($c);
+			kuserPeer::setUseCriteriaFilter(true);
 			if($user)
 			{
 				$otpRequired = true;
@@ -478,10 +480,14 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 		if ($otpRequired)
 		{
+			if(!$otp)
+			{
+				throw new kUserException ('otp is missing', kUserException::MISSING_OTP);
+			}
 			$result = authenticationUtils::verify2FACode($loginData, $otp);
 			if (!$result)
 			{
-				throw new kUserException ('', kUserException::INVALID_OTP);
+				throw new kUserException ('otp is invalid', kUserException::INVALID_OTP);
 			}
 		}
 
