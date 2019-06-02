@@ -60,7 +60,7 @@ require_once(__DIR__ . "/left_pane.php");
 					catch (PropelException $e)
 					{
 						echo ("Wrong schema type: $schemaType");
-						KExternalErrors::dieError("Wrong schema type: $schemaType");
+						KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "schema type: $schemaType");
 					}
 				}
 			?>
