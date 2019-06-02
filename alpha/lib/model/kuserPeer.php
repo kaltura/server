@@ -11,10 +11,9 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 {	
 	const KALTURA_NEW_USER_EMAIL = 120;
 	const KALTURA_NEW_EXISTING_USER_EMAIL = 121;
-	const KALTURA_NEW_USER_SSO_EMAIL = 142;
-	const KALTURA_NEW_USER_2FA_EMAIL = 141;
-	const KALTURA_NEW_EXISTING_USER_SSO_EMAIL = 140;
-	const KALTURA_NEW_EXISTING_USER_2FA_EMAIL = 139;
+	const KALTURA_EXISTING_USER_ENABLE_2FA_EMAIL = 139;
+	const KALTURA_NEW_USER_2FA_EMAIL = 140;
+	const KALTURA_NEW_EXISTING_USER_2FA_EMAIL = 141;
 	const KALTURA_NEW_USER_EMAIL_TO_ADMINS = 122;
 	const KALTURA_NEW_USER_ADMIN_CONSOLE_EMAIL = 123;
 	const KALTURA_NEW_EXISTING_USER_ADMIN_CONSOLE_EMAIL = 124;
@@ -619,7 +618,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		else // Not an admin console partner
 		{
 			$authType = $partner->getAuthenticationType();
-			if($partner->getUseTwoFactorAuthentication() && !$user->getSeedFor2FactorAuth())
+			if($partner->getUseTwoFactorAuthentication() && !$user->getLoginData()->getSeedFor2FactorAuth())
 			{
 				authenticationUtils::generateNewSeed($user);
 			}
@@ -642,11 +641,11 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 
 	public static function getUserMailType($authType, $existingUser)
 	{
-		$existingUserMailMap = array(KalturaPartnerAuthenticationType::SSO => self::KALTURA_NEW_USER_SSO_EMAIL,
-			KalturaPartnerAuthenticationType::TWO_FACTOR_AUTH => self::KALTURA_NEW_USER_2FA_EMAIL,
+		$existingUserMailMap = array(KalturaPartnerAuthenticationType::SSO => self::KALTURA_NEW_EXISTING_USER_EMAIL,
+			KalturaPartnerAuthenticationType::TWO_FACTOR_AUTH => self::KALTURA_NEW_EXISTING_USER_2FA_EMAIL,
 			KalturaPartnerAuthenticationType::PASSWORD_ONLY => self::KALTURA_NEW_EXISTING_USER_EMAIL);
 
-		$newUserMailMap = array(KalturaPartnerAuthenticationType::SSO => self::KALTURA_NEW_USER_SSO_EMAIL,
+		$newUserMailMap = array(KalturaPartnerAuthenticationType::SSO => self::KALTURA_NEW_USER_EMAIL,
 			KalturaPartnerAuthenticationType::TWO_FACTOR_AUTH => self::KALTURA_NEW_USER_2FA_EMAIL,
 			KalturaPartnerAuthenticationType::PASSWORD_ONLY => self::KALTURA_NEW_USER_EMAIL);
 
@@ -662,42 +661,30 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 
 	public static function getUserBodyParams($authType, $existingUser, $userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $roleName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink)
 	{
-		if($existingUser)
+		switch($authType)
 		{
-			switch($authType)
+			case KalturaPartnerAuthenticationType::PASSWORD_ONLY:
+			case KalturaPartnerAuthenticationType::SSO:
+			if($existingUser)
 			{
-				case KalturaPartnerAuthenticationType::SSO:
-					break;
-				case KalturaPartnerAuthenticationType::TWO_FACTOR_AUTH:
-					$kmcngParams = kConf::get('kmcng');
-					$qrUrl = $kmcngParams['kaltura']['qrUrl'];
-					if(!$qrUrl)
-					{
-						break;
-					}
-					return array($userName, $partnerId, $qrUrl);
-				case KalturaPartnerAuthenticationType::PASSWORD_ONLY:
+				return array($userName, $creatorUserName, $publisherName, $loginEmail, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
+			}
+			else
+			{
+				return array($userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
+			}
+
+			case KalturaPartnerAuthenticationType::TWO_FACTOR_AUTH:
+				if($existingUser)
+				{
 					return array($userName, $creatorUserName, $publisherName, $loginEmail, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
-			}
-		}
-		else
-		{
-			switch($authType)
-			{
-				case KalturaPartnerAuthenticationType::SSO:
-					break;
-				case KalturaPartnerAuthenticationType::TWO_FACTOR_AUTH:
-					$kmcngParams = kConf::get('kmcng');
-					$qrUrl = $kmcngParams['kaltura']['qrUrl'];
-					if(!$qrUrl)
-					{
-						break;
-					}
-					return array($userName, $partnerId, $qrUrl);
-				case KalturaPartnerAuthenticationType::PASSWORD_ONLY:
+				}
+				else
+				{
 					return array($userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
-			}
+				}
 		}
+
 		return array();
 	}
 			
@@ -728,5 +715,15 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	public function isReferenced(IRelatedObject $object)
 	{
 		return true;
+	}
+
+	public function getAdminUser($partnerId, $loginData)
+	{
+		kuserPeer::setUseCriteriaFilter(false);
+		$c = Partner::getAdminUserCriteria($partnerId);
+		$c->addAnd(kuserPeer::EMAIL, $loginData->getLoginEmail());
+		$user = kuserPeer::doSelectOne($c);
+		kuserPeer::setUseCriteriaFilter(true);
+		return $user;
 	}
 }

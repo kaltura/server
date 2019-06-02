@@ -2,6 +2,9 @@
 
 class kAuthManager implements kObjectChangedEventConsumer
 {
+
+	const TWO_FACTOR_FIELD = 'useTwoFactorAuthentication';
+
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
 	 */
@@ -9,10 +12,16 @@ class kAuthManager implements kObjectChangedEventConsumer
 	{
 		if( $object instanceof Partner &&
 			in_array(partnerPeer::CUSTOM_DATA, $modifiedColumns) &&
-			$object->isCustomDataModified('useTwoFactorAuthentication') &&
+			$object->isCustomDataModified(self::TWO_FACTOR_FIELD) &&
 			$object->getUseTwoFactorAuthentication())
 		{
-			return true;
+			$oldCustomDataValues = $object->getCustomDataOldValues();
+			$old2FAValue = $oldCustomDataValues[''][self::TWO_FACTOR_FIELD];
+			if ($old2FAValue != $object->getUseTwoFactorAuthentication())
+			{
+				return true;
+			}
+
 		}
 
 		return false;
@@ -31,7 +40,7 @@ class kAuthManager implements kObjectChangedEventConsumer
 			{
 				authenticationUtils::generateNewSeed($adminKuser);
 			}
-			$job = authenticationUtils::add2FAMailJob($adminKuser);
+			$job = authenticationUtils::addAuthMailJob($adminKuser, kuserPeer::KALTURA_EXISTING_USER_ENABLE_2FA_EMAIL);
 			if(!$job)
 			{
 				KalturaLog::warning('Missing QR URL, Mail Job was not added');

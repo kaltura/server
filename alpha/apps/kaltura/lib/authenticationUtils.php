@@ -5,8 +5,6 @@ require_once (KALTURA_ROOT_PATH .'/vendor/phpGangsta/GoogleAuthenticator.php');
 class authenticationUtils
 {
 
-	const KALTURA_EXISTING_USER_2FA_EMAIL = 139;
-
 	public static function generateQRCodeUrl($kuser)
 	{
 		return str_replace ("|", "M%7C", GoogleAuthenticator::getQRCodeGoogleUrl($kuser->getPuserId() . '_' . kConf::get ('www_host') . '_KMC', $kuser->getLoginData()->getSeedFor2FactorAuth()));
@@ -33,9 +31,8 @@ class authenticationUtils
 		$userLoginData->save();
 	}
 
-	public static function add2FAMailJob($kuser)
+	public static function addAuthMailJob($kuser, $mailType)
 	{
-		//need to have specific url to the qr page
 		$loginData = $kuser->getLoginData();
 		$loginData->setPasswordHashKey($loginData->newPassHashKey());
 		$loginData->save();
@@ -50,7 +47,7 @@ class authenticationUtils
 			null,
 			0,
 			$kuser->getPartnerId(),
-			self::KALTURA_EXISTING_USER_2FA_EMAIL,
+			$mailType,
 			kMailJobData::MAIL_PRIORITY_NORMAL,
 			kConf::get ("partner_registration_confirmation_email" ),
 			kConf::get ("partner_registration_confirmation_name" ),

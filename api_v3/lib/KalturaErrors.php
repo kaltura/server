@@ -729,9 +729,10 @@ class KalturaErrors extends APIErrors
 	 * OTP error
 	 */
 	const INVALID_OTP = 'INVALID_OTP;;OTP provided failed to validate';
-	const MISSING_OTP = 'MISSING_OTP;;OTP is missing ';
+	const MISSING_OTP = 'MISSING_OTP;;OTP is missing';
 	const ERROR_IN_QR_GENERATION = 'ERROR_IN_QR_GENERATION;;Could not generate QR code';
 	const ERROR_IN_SEED_GENERATION = 'ERROR_IN_SEED_GENERATION;;Could not handle new seed generation';
+	const INVALID_HASH = 'INVALID_HASH;;hashKey is not valid';
 
 
 	/*

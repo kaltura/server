@@ -402,12 +402,12 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			throw new kUserException('User with id ['.$ksUserId.'] was not found for partner with id ['.$ksPartnerId.']', kUserException::USER_NOT_FOUND);
 		}
 			
-		return self::userLogin($kuser->getLoginData(), null, $requestedPartnerId, false);  // don't validate password		
+		return self::userLogin($kuser->getLoginData(), null, $requestedPartnerId, false, null, false);  // don't validate password
 	}
 
 
 	// user login by user_login_data object
-	private static function userLogin(UserLoginData $loginData = null, $password, $partnerId = null, $validatePassword = true, $otp = null)
+	private static function userLogin(UserLoginData $loginData = null, $password, $partnerId = null, $validatePassword = true, $otp = null, $validateOtp = true)
 	{
 		$requestedPartner = $partnerId;
 		
@@ -457,21 +457,19 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			}
 		}
 
-		if (!$partnerId) {
+		if (!$partnerId)
+		{
 			$partnerId = $loginData->getLastLoginPartnerId();
 		}
-		if (!$partnerId) {
+		if (!$partnerId)
+		{
 			throw new kUserException('', kUserException::INVALID_PARTNER);
 		}
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 
-		if($partner && $partner->getUseTwoFactorAuthentication())
+		if($validateOtp && $partner && $partner->getUseTwoFactorAuthentication())
 		{
-			kuserPeer::setUseCriteriaFilter(false);
-			$c = Partner::getAdminUserCriteria($partnerId);
-			$c->addAnd(kuserPeer::EMAIL, $loginData->getLoginEmail());
-			$user = kuserPeer::doSelectOne($c);
-			kuserPeer::setUseCriteriaFilter(true);
+			$user =kuserPeer::getAdminUser($partnerId, $loginData);
 			if($user)
 			{
 				$otpRequired = true;
