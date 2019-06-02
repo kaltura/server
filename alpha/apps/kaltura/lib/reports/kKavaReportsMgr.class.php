@@ -18,7 +18,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_UNIQUE_USER_IDS = 'uniqueUserIds';
 	const METRIC_SUM_PRICE = 'price';
 	const METRIC_UNIQUE_PERCENTILES_SUM = 'uniquePercentiles';
-	const METRIC_DOWNSTREAM_BANDWIDTH_SUM = 'bandwidthSum'; //realtime
+	const METRIC_DOWNSTREAM_BANDWIDTH_SUM = 'bandwidthSum';
 	const METRIC_LATENCY_SUM = 'latencySum';
 	const METRIC_DROPPED_FRAMES_RATIO_SUM = 'droppedFramesRatioSum';
 	const METRIC_UNIQUE_PERSISTENT_SESSION_ID = 'uniquePersistentSessionId';
@@ -4660,7 +4660,7 @@ class kKavaReportsMgr extends kKavaBase
 				$value =  $flavorParamName . ':' . $row[$index];
 				$flavorParams .= $flavorParams ? '/' . $value : $value;
 			}
-			$row[] = $flavorParams ? $flavorParams : 'Unknown';
+			$row[] = $flavorParams;
 		}
 	}
 
