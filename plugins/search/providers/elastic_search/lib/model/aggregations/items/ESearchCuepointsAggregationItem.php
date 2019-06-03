@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by IntelliJ IDEA.
- * User: moshe.maor
- * Date: 5/26/2019
- * Time: 5:31 PM
+ * @package plugins.elasticSearch
+ * @subpackage api.objects
  */
 
 class ESearchCuepointsAggregationItem extends ESearchAggregationItem
