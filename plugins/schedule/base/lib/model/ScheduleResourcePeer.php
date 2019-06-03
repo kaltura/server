@@ -86,4 +86,20 @@ class ScheduleResourcePeer extends BaseScheduleResourcePeer implements IRelatedO
 	{
 		return array(array("scheduleResource:id=%s", self::ID));		
 	}
+	
+	/* (non-PHPdoc)
+     	 * @see BaseScheduleResourcePeer::setDefaultCriteriaFilter()
+	 */	
+	public static function setDefaultCriteriaFilter()
+	{
+		if(self::$s_criteria_filter == null)
+		{
+			self::$s_criteria_filter = new criteriaFilter();
+		}
+		
+		$c = KalturaCriteria::create(self::OM_CLASS);
+		$c->addAnd ( self::STATUS, ScheduleResourceStatus::DELETED, Criteria::NOT_EQUAL);
+
+		self::$s_criteria_filter->setFilter($c);
+	}
 } // ScheduleResourcePeer
