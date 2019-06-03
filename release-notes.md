@@ -1,5 +1,20 @@
 # Orion 15.1.0 #
 
+## Reach notification templates ##
+- Issue Type: Task
+- Issue ID: REACH2-569
+
+### Configuration ###
+	First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2019_06_03_new_entry_vendor_task_approved_moderation.template.xml
+	/opt/kaltura/app/deployment/updates/scripts/xml/2019_06_03_new_entry_vendor_task_done.template.xml
+	/opt/kaltura/app/deployment/updates/scripts/xml/2019_06_03_new_entry_vendor_task_pending_moderation.template.xml
+	/opt/kaltura/app/deployment/updates/scripts/xml/2019_06_03_new_entry_vendor_task_rejected_moderation.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2019_06_03_deploy_reach_new_notifications.php
+
+
 ## Add addition fields in entry vendor task csv ##
 
 - Issue Type: Task
