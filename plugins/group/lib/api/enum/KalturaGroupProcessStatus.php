@@ -3,8 +3,7 @@
  * @package plugins.group
  * @subpackage api.enum
  */
-class KalturaGroupProcessStatus extends KalturaEnum
+class KalturaGroupProcessStatus extends KalturaEnum implements GroupProcessStatus
 {
-	const NONE = 0;
-	const PROCESSING = 1;
+
 }

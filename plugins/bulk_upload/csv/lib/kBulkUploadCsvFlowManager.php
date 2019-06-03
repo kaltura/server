@@ -9,16 +9,16 @@ class kBulkUploadCsvFlowManager implements kBatchJobStatusEventConsumer
 	public function updatedJob(BatchJob $dbBatchJob)
 	{
 		$jobData = $dbBatchJob->getData();
-		if (is_a($jobData, 'kBulkUploadCsvJobData'))
+		if ($jobData instanceof kBulkUploadCsvJobData)
 		{
 			$objectType = $jobData->getProcessObjectType();
 			if($objectType === kBulkGroupUsersToGroupCsv::GROUP_ID)
 			{
-				$objectId = $jobData->getProcessObject();
+				$objectId = $jobData->getProcessObjectId();
 				$kGroup = kuserPeer::getKuserByPartnerAndUid($dbBatchJob->getPartnerId(), $objectId);
 				if($kGroup)
 				{
-					$kGroup->setProcessStatus(KalturaGroupProcessStatus::NONE);
+					$kGroup->setProcessStatus(GroupProcessStatus::NONE);
 					$kGroup->save();
 				}
 			}
