@@ -531,20 +531,26 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$cdnRatios = kConf::getMap('cdn_ratios');
 		if ($cdnRatios && isset($cdnRatios[$partnerId]))
 		{
-			$entryIdAffinity = crc32($deliveryAttributes->getEntryId()) % 100;
 			$ratios = $cdnRatios[$partnerId];
-			$total = 0;
-			foreach($ratios as $cdnName => $ratio)
+			$sum = array_sum($ratios);
+			if ($sum)
 			{
-				$total += $ratio;
-				if ($entryIdAffinity < $total)
+				$entryIdAffinity = crc32($deliveryAttributes->getEntryId()) % $sum;
+				$total = 0;
+				foreach($ratios as $cdnName => $ratio)
 				{
+					$total += $ratio;
+					if ($entryIdAffinity >= $total)
+						continue;
+
 					foreach($supportedDPs as $delivery)
 					{
 						if ($delivery->getPricingProfile() == $cdnName) {
 							return $delivery;
 						}
 					}
+
+					break;
 				}
 			}
 		}
