@@ -154,6 +154,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_TABLE_MAP = 'report_table_map';
 	const REPORT_TABLE_FINALIZE_FUNC = 'report_table_finalize_func';
 	const REPORT_EDIT_FILTER_FUNC = 'report_edit_filter_func';
+	const REPORT_TOTAL_FINALIZE_FUNC = 'report_total_finalize_func';
 
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -4634,36 +4635,6 @@ class kKavaReportsMgr extends kKavaBase
 		}
 	}
 
-	protected static function addFlavorParamColumn(&$result)
-	{
-		$headers = $result[0];
-		$flavorHeaders = array();
-		foreach ($headers as $index => $header)
-		{
-			if (strpos($header, self::FLAVOR_PARAM_VIEW_COUNT_PREFIX) !== false)
-			{
-				$flavorHeaders[$index] = substr($header,strlen(self::FLAVOR_PARAM_VIEW_COUNT_PREFIX));
-			}
-		}
-
-		if (!$flavorHeaders)
-		{
-			return;
-		}
-
-		$result[0][] = self::METRIC_FLAVOR_PARAMS_VIEW_COUNT;
-		foreach ($result[1] as &$row)
-		{
-			$flavorParams = '';
-			foreach ($flavorHeaders as $index => $flavorParamName)
-			{
-				$value =  $flavorParamName . ':' . $row[$index];
-				$flavorParams .= $flavorParams ? '/' . $value : $value;
-			}
-			$row[] = $flavorParams;
-		}
-	}
-
 	protected static function addRollupRow(&$result)
 	{
 		list($headers, $data, $total_count) = $result;
@@ -4702,7 +4673,62 @@ class kKavaReportsMgr extends kKavaBase
 		unset($result[3]);
 	}
 
+	protected static function getFlavorParamsHeadersArray($headers)
+	{
+		$flavorHeaders = array();
+		foreach ($headers as $index => $header)
+		{
+			if (strpos($header, self::FLAVOR_PARAM_VIEW_COUNT_PREFIX) !== false)
+			{
+				$flavorHeaders[$index] = substr($header,strlen(self::FLAVOR_PARAM_VIEW_COUNT_PREFIX));
+			}
+		}
+		return $flavorHeaders;
+	}
+
+	protected static function getFlavorParamsValue($flavorHeaders, $data)
+	{
+		$flavorParams = '';
+		foreach ($flavorHeaders as $index => $flavorParamName)
+		{
+			$value =  '"' .$flavorParamName . '":' . $data[$index];
+			$flavorParams .= $flavorParams ? '/' . $value : $value;
+		}
+		return $flavorParams;
+	}
+
+	protected static function addFlavorParamColumn(&$result)
+	{
+		$headers = $result[0];
+		$flavorHeaders = self::getFlavorParamsHeadersArray($headers);
+
+		if (!$flavorHeaders)
+		{
+			return;
+		}
+
+		$result[0][] = self::METRIC_FLAVOR_PARAMS_VIEW_COUNT;
+		foreach ($result[1] as &$row)
+		{
+			$row[] = self::getFlavorParamsValue($flavorHeaders, $row);
+		}
+	}
+
 	/// total functions
+	protected static function addFlavorParamTotalColumn(&$result)
+	{
+		$headers = $result[0];
+		$flavorHeaders = self::getFlavorParamsHeadersArray($headers);
+
+		if (!$flavorHeaders)
+		{
+			return;
+		}
+
+		$result[0][] = self::METRIC_FLAVOR_PARAMS_VIEW_COUNT;
+		$result[1][] = self::getFlavorParamsValue($flavorHeaders, $result[1]);
+	}
+
 	protected static function getTotalPeakStorageFromTable($table)
 	{
 		$header = self::METRIC_PEAK_STORAGE_MB;
@@ -4716,7 +4742,7 @@ class kKavaReportsMgr extends kKavaBase
 		
 		return array(array("SUM($header)"), array($value)); 
 	}
-	
+
 	protected static function getSimpleTotalImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids, $response_options)
 	{
 		$start = microtime(true);
@@ -4804,6 +4830,8 @@ class kKavaReportsMgr extends kKavaBase
 		$interval = $input_filter->interval;
 		$input_filter->interval = self::INTERVAL_ALL;
 
+		self::initDynamicMetrics($partner_id, $report_def, $input_filter, $object_ids, $response_options);
+
 		if (isset($report_def[self::REPORT_TOTAL_FROM_TABLE_FUNC]))
 		{
 			$table = self::getTableImpl($partner_id, $report_def, $input_filter, self::MAX_RESULT_SIZE, 1, null, $object_ids, 0, $response_options);
@@ -4822,6 +4850,12 @@ class kKavaReportsMgr extends kKavaBase
 		else 
 		{
 			$result = self::getSimpleTotalImpl($partner_id, $report_def, $input_filter, $object_ids, $response_options);
+		}
+
+		// finalize
+		if (isset($report_def[self::REPORT_TOTAL_FINALIZE_FUNC]))
+		{
+			call_user_func_array($report_def[self::REPORT_TOTAL_FINALIZE_FUNC], array(&$result));
 		}
 
 		$input_filter->interval = $interval;

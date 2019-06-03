@@ -138,6 +138,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
 			),
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addFlavorParamColumn',
+			self::REPORT_TOTAL_FINALIZE_FUNC => 'self::addFlavorParamTotalColumn',
 			self::REPORT_TABLE_MAP => array(
 				'sum_view_time_live' => self::METRIC_VIEW_LIVE_PLAY_TIME_SEC,
 				'sum_view_time_dvr' => self::METRIC_VIEW_DVR_PLAY_TIME_SEC,
@@ -145,7 +146,15 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				'avg_view_buffering' => self::METRIC_AVG_VIEW_BUFFERING,
 				'avg_view_engagement' => self::METRIC_AVG_VIEW_ENGAGEMENT,
 				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
-			)
+			),
+			self::REPORT_TOTAL_MAP => array(
+				'sum_view_time_live' => self::METRIC_VIEW_LIVE_PLAY_TIME_SEC,
+				'sum_view_time_dvr' => self::METRIC_VIEW_DVR_PLAY_TIME_SEC,
+				'sum_view_time' => self::METRIC_VIEW_PLAY_TIME_SEC,
+				'avg_view_buffering' => self::METRIC_AVG_VIEW_BUFFERING,
+				'avg_view_engagement' => self::METRIC_AVG_VIEW_ENGAGEMENT,
+				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
+			),
 		),
 
 		ReportType::ENTRY_LEVEL_USERS_STATUS_REALTIME => array(
@@ -174,6 +183,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				'os' => self::DIMENSION_OS
 			),
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addFlavorParamColumn',
+			self::REPORT_TOTAL_FINALIZE_FUNC => 'self::addFlavorParamTotalColumn',
 			self::REPORT_TABLE_MAP => array(
 				'view_unique_audience' => self::METRIC_VIEW_UNIQUE_AUDIENCE,
 				'view_unique_engaged_users' => self::METRIC_VIEW_UNIQUE_ENGAGED_USERS,
@@ -182,7 +192,16 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				'avg_view_buffering' => self::METRIC_AVG_VIEW_BUFFERING,
 				'avg_view_engagement' => self::METRIC_AVG_VIEW_ENGAGEMENT,
 				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
-			)
+			),
+			self::REPORT_TOTAL_MAP => array(
+				'view_unique_audience' => self::METRIC_VIEW_UNIQUE_AUDIENCE,
+				'view_unique_engaged_users' => self::METRIC_VIEW_UNIQUE_ENGAGED_USERS,
+				'view_unique_buffering_users' => self::METRIC_VIEW_UNIQUE_BUFFERING_USERS,
+				'sum_view_time' => self::METRIC_VIEW_PLAY_TIME_SEC,
+				'avg_view_buffering' => self::METRIC_AVG_VIEW_BUFFERING,
+				'avg_view_engagement' => self::METRIC_AVG_VIEW_ENGAGEMENT,
+				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
+			),
 		),
 
 	);
