@@ -74,7 +74,7 @@ class kVidStripAction extends kVidAction
 				throw new kThumbnailException(kThumbnailException::ACTION_FAILED, kThumbnailException::ACTION_FAILED, $data);
 			}
 
-			$sliceToAdd = new Imagick($destPath . KThumbnailCapture::TEMP_FILE_POSTFIX);
+			$sliceToAdd = new Imagick(KThumbnailCapture::getCapturePath($destPath));
 			if(!$sizeInitialized)
 			{
 				$width = $sliceToAdd->getImageWidth();
