@@ -204,6 +204,13 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 			),
 		),
 
+		ReportType::PLAYBACK_TYPE_REALTIME => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'playback_type' => self::DIMENSION_PLAYBACK_TYPE,
+			),
+			self::REPORT_METRICS => array(self::METRIC_VIEW_PLAY_TIME_SEC)
+		),
+
 	);
 
 	protected static function initTransformTimeDimensions()
