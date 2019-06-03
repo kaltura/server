@@ -2094,13 +2094,13 @@ class Partner extends BasePartner
 	{
 		if($this->getUseSso())
 		{
-			return KalturaPartnerAuthenticationType::SSO;
+			return PartnerAuthenticationType::SSO;
 		}
 		else if($this->getUseTwoFactorAuthentication())
 		{
-			return KalturaPartnerAuthenticationType::TWO_FACTOR_AUTH;
+			return PartnerAuthenticationType::TWO_FACTOR_AUTH;
 		}
-		return KalturaPartnerAuthenticationType::PASSWORD_ONLY;
+		return PartnerAuthenticationType::PASSWORD_ONLY;
 	}
 
 	public function getAnalyticsPersistentSessionId()

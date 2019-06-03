@@ -11,9 +11,9 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 {	
 	const KALTURA_NEW_USER_EMAIL = 120;
 	const KALTURA_NEW_EXISTING_USER_EMAIL = 121;
-	const KALTURA_EXISTING_USER_ENABLE_2FA_EMAIL = 139;
-	const KALTURA_NEW_USER_2FA_EMAIL = 140;
-	const KALTURA_NEW_EXISTING_USER_2FA_EMAIL = 141;
+	const KALTURA_EXISTING_USER_ENABLE_2FA_EMAIL = 140;
+	const KALTURA_NEW_USER_2FA_EMAIL = 141;
+	const KALTURA_NEW_EXISTING_USER_2FA_EMAIL = 142;
 	const KALTURA_NEW_USER_EMAIL_TO_ADMINS = 122;
 	const KALTURA_NEW_USER_ADMIN_CONSOLE_EMAIL = 123;
 	const KALTURA_NEW_EXISTING_USER_ADMIN_CONSOLE_EMAIL = 124;
@@ -641,13 +641,13 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 
 	public static function getUserMailType($authType, $existingUser)
 	{
-		$existingUserMailMap = array(KalturaPartnerAuthenticationType::SSO => self::KALTURA_NEW_EXISTING_USER_EMAIL,
-			KalturaPartnerAuthenticationType::TWO_FACTOR_AUTH => self::KALTURA_NEW_EXISTING_USER_2FA_EMAIL,
-			KalturaPartnerAuthenticationType::PASSWORD_ONLY => self::KALTURA_NEW_EXISTING_USER_EMAIL);
+		$existingUserMailMap = array(PartnerAuthenticationType::SSO => self::KALTURA_NEW_EXISTING_USER_EMAIL,
+			PartnerAuthenticationType::TWO_FACTOR_AUTH => self::KALTURA_NEW_EXISTING_USER_2FA_EMAIL,
+			PartnerAuthenticationType::PASSWORD_ONLY => self::KALTURA_NEW_EXISTING_USER_EMAIL);
 
-		$newUserMailMap = array(KalturaPartnerAuthenticationType::SSO => self::KALTURA_NEW_USER_EMAIL,
-			KalturaPartnerAuthenticationType::TWO_FACTOR_AUTH => self::KALTURA_NEW_USER_2FA_EMAIL,
-			KalturaPartnerAuthenticationType::PASSWORD_ONLY => self::KALTURA_NEW_USER_EMAIL);
+		$newUserMailMap = array(PartnerAuthenticationType::SSO => self::KALTURA_NEW_USER_EMAIL,
+			PartnerAuthenticationType::TWO_FACTOR_AUTH => self::KALTURA_NEW_USER_2FA_EMAIL,
+			PartnerAuthenticationType::PASSWORD_ONLY => self::KALTURA_NEW_USER_EMAIL);
 
 		if($existingUser)
 		{
@@ -663,25 +663,18 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	{
 		switch($authType)
 		{
-			case KalturaPartnerAuthenticationType::PASSWORD_ONLY:
-			case KalturaPartnerAuthenticationType::SSO:
-			if($existingUser)
-			{
-				return array($userName, $creatorUserName, $publisherName, $loginEmail, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
-			}
-			else
-			{
-				return array($userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
-			}
-
-			case KalturaPartnerAuthenticationType::TWO_FACTOR_AUTH:
+			case PartnerAuthenticationType::PASSWORD_ONLY:
+			case PartnerAuthenticationType::SSO:
+			case PartnerAuthenticationType::TWO_FACTOR_AUTH:
+				$prefix = array($userName, $creatorUserName, $publisherName, $loginEmail);
+				$suffix = array($partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
 				if($existingUser)
 				{
-					return array($userName, $creatorUserName, $publisherName, $loginEmail, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
+					return array_merge($prefix, $suffix);
 				}
 				else
 				{
-					return array($userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
+					return array_merge($prefix, $resetPasswordLink, $suffix);
 				}
 		}
 
@@ -717,7 +710,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		return true;
 	}
 
-	public function getAdminUser($partnerId, $loginData)
+	public static function getAdminUser($partnerId, $loginData)
 	{
 		kuserPeer::setUseCriteriaFilter(false);
 		$c = Partner::getAdminUserCriteria($partnerId);

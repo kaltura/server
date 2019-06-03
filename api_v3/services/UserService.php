@@ -590,6 +590,9 @@ class UserService extends KalturaBaseUserService
 	 * @action generateQrCode
 	 * @param string $hashKey
 	 * @return string
+	 * @throws KalturaErrors::INVALID_HASH
+	 * @throws KalturaErrors::INVALID_USER_ID
+	 * @throws KalturaErrors::ERROR_IN_QR_GENERATION
 	 *
 	 */
 	public function generateQrCodeAction($hashKey)
@@ -609,7 +612,9 @@ class UserService extends KalturaBaseUserService
 		}
 
 		if (!$dbUser)
+		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $loginData->getLoginEmail());
+		}
 		$imgContent = authenticationUtils::getQRImage($dbUser);
 		if(!$imgContent)
 		{

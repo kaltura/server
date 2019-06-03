@@ -21,9 +21,7 @@ class kAuthManager implements kObjectChangedEventConsumer
 			{
 				return true;
 			}
-
 		}
-
 		return false;
 	}
 

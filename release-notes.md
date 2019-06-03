@@ -28,6 +28,19 @@ in [subjects]
 
 in [bodies]
 139 = "Hello,<BR><BR>Reason for the broadcast issue:<BR><BR>%s <BR><BR> Please contact your Account Manager to resolve this issue.<BR><BR>Kaltura Customer Service"
+
+## Add generateQrCode action to user service ##
+
+- Issue Type: Feature
+- Issue ID: KMCNG-2114
+
+### Configuration ###
+    edit /opt/kaltura/app/configurations/batch/batches/Mailer/emails_en.ini:
+    add constants, subjects and bodies as described in /opt/kaltura/app/batch/batches/Mailer/emails_en.template.ini for ids: 140, 141 and 142.   
+
+### Deployment scripts ###
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_02_add_user_generate_qr_image.php
 	
 #### Deployment Scripts ####	
 NONE

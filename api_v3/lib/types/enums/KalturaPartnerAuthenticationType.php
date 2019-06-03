@@ -3,9 +3,6 @@
  * @package api
  * @subpackage enum
  */
-class KalturaPartnerAuthenticationType extends KalturaEnum
+class KalturaPartnerAuthenticationType extends KalturaEnum implements PartnerAuthenticationType
 {
-	const PASSWORD_ONLY = 0;
-	const TWO_FACTOR_AUTH = 1;
-	const SSO = 2;
 }

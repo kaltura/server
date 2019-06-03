@@ -2175,13 +2175,13 @@ class myPartnerUtils
 	{
 		if($partner->getUseSso())
 		{
-			return KalturaPartnerAuthenticationType::SSO;
+			return PartnerAuthenticationType::SSO;
 		}
 		else if($partner->getUseTwoFactorAuthentication())
 		{
-			return KalturaPartnerAuthenticationType::TWO_FACTOR_AUTH;
+			return PartnerAuthenticationType::TWO_FACTOR_AUTH;
 		}
-		return KalturaPartnerAuthenticationType::PASSWORD_ONLY;
+		return PartnerAuthenticationType::PASSWORD_ONLY;
 	}
 
 }
