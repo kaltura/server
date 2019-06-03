@@ -81,9 +81,15 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
 	}
 
-	public function translateServiceFeatureEnum($serviceFeatureId)
+	public static function translateServiceFeatureEnum($catalogItemId)
 	{
-		switch ($serviceFeatureId)
+		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($catalogItemId);
+		if (!$vendorCatalogItem)
+		{
+			return "";
+		}
+
+		switch ($vendorCatalogItem->getServiceFeature())
 		{
 			case VendorServiceFeature::CAPTIONS:
 				$serviceFeatureName = "captions";

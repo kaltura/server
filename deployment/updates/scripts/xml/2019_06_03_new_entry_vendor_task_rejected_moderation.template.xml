@@ -111,7 +111,7 @@
                         <key>service_feature</key>
                         <description>Service Feature</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>VendorCatalogItemPeer::retrieveByPK($scope->getObject()->getCatalogItemId())->translateServiceFeatureEnum(VendorCatalogItemPeer::retrieveByPK($scope->getObject()->getCatalogItemId())->getServiceFeature())</code>
+                            <code>VendorCatalogItem::translateServiceFeatureEnum($scope->getObject()->getCatalogItemId())</code>
                         </value>
                     </item>
                 </contentParameters>

@@ -13,38 +13,29 @@
         <sessionType>2</sessionType>
     </session>
     <multirequest>
-        <!-- Entry Vendor Task Approved -->
+        <!-- Entry Vendor Task Pending Moderation -->
         <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
             <template objectType="KalturaEmailNotificationTemplate">
-                <name>New task approved for execution</name>
-                <systemName>New_Entry_Vendor_Task_Approved_For_Execution</systemName>
-                <description>Email notification template to be sent when entry vendor task is approved for execution.</description>
+                <name>New task pending moderation</name>
+                <systemName>New_Entry_Vendor_Task_Pending_Moderation</systemName>
+                <description>Email notification template to be sent when entry vendor task is pending moderation.</description>
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
-                <eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
                 <eventObjectType>42</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY_VENDOR_TASK -->
                 <eventConditions objectType="array">
                     <item objectType="KalturaEventFieldCondition">
                         <field objectType="KalturaEvalBooleanField">
-                            <code>$scope->getObject() instanceof EntryVendorTask &amp;&amp; in_array(EntryVendorTaskPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getStatus() == EntryVendorTaskStatus::PENDING</code>
+                            <code>$scope->getObject() instanceof EntryVendorTask &amp;&amp; $scope->getObject()->getStatus() == EntryVendorTaskStatus::PENDING_MODERATION</code>
                         </field>
                     </item>
                 </eventConditions>
                 <format>1</format>
-                <subject>[AppTitle] - Your entry vendor task is approved for execution</subject>
-                <body>Your {service_feature} request: For entry {entry_name} with {entry_id} requested on {request_date} Was approved. {service_feature} will be automatically uploaded to your video upon completion. To view progress go to [AppEntryUrl]{entry_id}</body>
+                <subject>[AppTitle] - New entry vendor task is awaiting approval</subject>
+                <body>New task is pending approval for entry name {entry_name}, entry id {entry_id}. Task was requested on {request_date} by {creator_name}({creator_email}). In order to approve please go to the services requests page in [AppTasksUrl]</body>
                 <fromEmail>{from_email}</fromEmail>
                 <fromName>{from_name}</fromName>
-                <to objectType="KalturaEmailNotificationStaticRecipientProvider">
-                    <emailRecipients objectType="array">
-                        <item objectType = "KalturaEmailNotificationRecipient">
-                            <email objectType="KalturaStringValue">
-                                <value>{creator_email}</value>
-                            </email>
-                            <name objectType="KalturaStringValue">
-                                <value>{creator_name}</value>
-                            </name>
-                        </item>
-                    </emailRecipients>
+                <to objectType="KalturaEmailNotificationGroupRecipientProvider">
+                    <groupId>{group_id_equal}</groupId>
                 </to>
                 <contentParameters objectType="array">
                     <item objectType="KalturaEventNotificationParameter">
@@ -93,21 +84,16 @@
                             <code>$scope->getObject()->getCreatedAt()</code>
                         </value>
                     </item>
-                    <item objectType="KalturaEventNotificationParameter">
-                        <key>task_id</key>
-                        <description>Task ID</description>
-                        <value objectType="KalturaEvalStringField">
-                            <code>$scope->getObject()->getId()</code>
-                        </value>
-                    </item>
-                    <item objectType="KalturaEventNotificationParameter">
-                        <key>service_feature</key>
-                        <description>Service Feature</description>
-                        <value objectType="KalturaEvalStringField">
-                            <code>VendorCatalogItem::translateServiceFeatureEnum($scope->getObject()->getCatalogItemId())</code>
-                        </value>
-                    </item>
                 </contentParameters>
+                <userParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>group_id_equal</key>
+                        <description>The group id to send to</description>
+                        <value objectType="KalturaStringValue">
+                            <value></value>
+                        </value>
+                    </item>
+                </userParameters>
             </template>
         </request>
         <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
