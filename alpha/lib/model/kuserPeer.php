@@ -674,7 +674,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 				}
 				else
 				{
-					return array_merge($prefix, $resetPasswordLink, $suffix);
+					return array_merge($prefix, array($resetPasswordLink), $suffix);
 				}
 		}
 

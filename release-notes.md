@@ -38,7 +38,10 @@ NONE
 - Issue ID: KMCNG-2114
 
 ### Configuration ###
-    edit /opt/kaltura/app/configurations/batch/batches/Mailer/emails_en.ini:
+
+    Add to local.ini uder password_reset_links url for the KMC qr page in the following way: qr_page = @URL_FOR_QR@
+    
+    Edit /opt/kaltura/app/configurations/batch/batches/Mailer/emails_en.ini:
     add constants, subjects and bodies as described in /opt/kaltura/app/batch/batches/Mailer/emails_en.template.ini for ids: 140, 141 and 142.   
 
 ### Deployment scripts ###
