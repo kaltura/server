@@ -20,12 +20,6 @@ class kThumbnailSecurityHelper
 			$enableCacheValidation = $accessControl->hasRules(ContextType::THUMBNAIL, array(RuleActionType::BLOCK, RuleActionType::LIMIT_THUMBNAIL_CAPTURE));
 		}
 
-		if ($enableCacheValidation)
-		{
-			$secureEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, self::getReferrer(), ContextType::THUMBNAIL);
-			$secureEntryHelper->validateForPlay();
-		}
-
 		// not allow capturing frames if the partner has FEATURE_DISALLOW_FRAME_CAPTURE permission
 		$partner = $entry->getPartner();
 		if ($partner->getEnabledService(PermissionName::FEATURE_BLOCK_THUMBNAIL_CAPTURE))
@@ -35,6 +29,8 @@ class kThumbnailSecurityHelper
 
 		if ($enableCacheValidation)
 		{
+			$secureEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, self::getReferrer(), ContextType::THUMBNAIL);
+			$secureEntryHelper->validateForPlay();
 			$actionList = $secureEntryHelper->getActionList(RuleActionType::LIMIT_THUMBNAIL_CAPTURE);
 			if ($actionList)
 			{

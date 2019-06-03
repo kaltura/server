@@ -22,19 +22,14 @@ class kTextAction extends kImagickAction
 		$textParameterAlias = array(
 			"f" => kThumbnailParameterName::FONT,
 			"fs" => kThumbnailParameterName::FONT_SIZE,
-			"fontsize" => kThumbnailParameterName::FONT_SIZE,
 			"t" => kThumbnailParameterName::TEXT,
 			"txt" => kThumbnailParameterName::TEXT,
 			"a" => kThumbnailParameterName::ANGLE,
 			"sc" => kThumbnailParameterName::STROKE_COLOR,
-			"strokecolor" => kThumbnailParameterName::STROKE_COLOR,
 			"fc" => kThumbnailParameterName::FILL_COLOR,
-			"fillcolor" => kThumbnailParameterName::FILL_COLOR,
 			"w" => kThumbnailParameterName::WIDTH,
-			"maxwidth" => kThumbnailParameterName::WIDTH,
 			"mw" => kThumbnailParameterName::WIDTH,
 			"h" => kThumbnailParameterName::HEIGHT,
-			"maxheight" => kThumbnailParameterName::HEIGHT,
 			"mh" => kThumbnailParameterName::HEIGHT,
 		);
 
@@ -62,7 +57,7 @@ class kTextAction extends kImagickAction
 		$this->validateColorParameter($this->fillColor);
 		if(!$this->text)
 		{
-			$data = array("errorString" => "You must supply a text for this action");
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::MISSING_TEXT);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 	}

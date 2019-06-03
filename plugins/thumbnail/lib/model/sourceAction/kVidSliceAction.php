@@ -12,7 +12,6 @@ class kVidSliceAction extends kVidStripAction
 	{
 		parent::initParameterAlias();
 		$kVidSliceAlias = array(
-			"slicenumber" => kThumbnailParameterName::SLICE_NUMBER,
 			"sn" => kThumbnailParameterName::SLICE_NUMBER,
 		);
 		$this->parameterAlias = array_merge($this->parameterAlias, $kVidSliceAlias);
@@ -30,7 +29,7 @@ class kVidSliceAction extends kVidStripAction
 
 		if (!$this->sliceNumber || $this->sliceNumber < 1 || $this->sliceNumber > $this->numberOfSlices)
 		{
-			$data = array("errorString" => "slice number must be positive and can't be greater then number of slices");
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::SLICE_NUMBER);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 	}
@@ -43,7 +42,7 @@ class kVidSliceAction extends kVidStripAction
 		$success = myEntryUtils::captureThumbUsingPackager($this->source->getEntry(), $destPath, $second, $flavorAssetId, $this->newWidth, $this->newHeight);
 		if(!$success)
 		{
-			$data = array("errorString" => "Vid slice failed");
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::VID_SLICE_FAILED);
 			throw new kThumbnailException(kThumbnailException::ACTION_FAILED, kThumbnailException::ACTION_FAILED, $data);
 		}
 

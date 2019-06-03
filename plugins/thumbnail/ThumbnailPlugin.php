@@ -42,13 +42,13 @@ class ThumbnailPlugin extends KalturaPlugin implements IKalturaServices, IKaltur
 		switch ($code)
 		{
 			case kThumbnailException::FAILED_TO_PARSE_ACTION:
-				$object = new KalturaAPIException(KalturaThumbnailErrors::FAILED_TO_PARSE_ACTION, $data['actionString']);
+				$object = new KalturaAPIException(KalturaThumbnailErrors::FAILED_TO_PARSE_ACTION, $data[kThumbnailErrorMessages::ACTION_STRING]);
 				break;
 			case kThumbnailException::FAILED_TO_PARSE_SOURCE:
-				$object = new KalturaAPIException(KalturaThumbnailErrors::FAILED_TO_PARSE_SOURCE, $data['sourceString']);
+				$object = new KalturaAPIException(KalturaThumbnailErrors::FAILED_TO_PARSE_SOURCE, $data[kThumbnailErrorMessages::SOURCE_STRING]);
 				break;
 			case kThumbnailException::MISSING_SOURCE_ACTIONS_FOR_TYPE:
-				$object = new KalturaAPIException(KalturaThumbnailErrors::MISSING_SOURCE_ACTIONS_FOR_TYPE, $data['entryType']);
+				$object = new KalturaAPIException(KalturaThumbnailErrors::MISSING_SOURCE_ACTIONS_FOR_TYPE, $data[kThumbnailErrorMessages::ENTRY_TYPE]);
 				break;
 			case kThumbnailException::EMPTY_IMAGE_TRANSFORMATION:
 				$object = new KalturaAPIException(KalturaThumbnailErrors::EMPTY_IMAGE_TRANSFORMATION);
@@ -63,7 +63,7 @@ class ThumbnailPlugin extends KalturaPlugin implements IKalturaServices, IKaltur
 				$object = new KalturaAPIException(KalturaThumbnailErrors::TRANSFORMATION_RUNTIME_ERROR);
 				break;
 			case kThumbnailException::BAD_QUERY:
-				$object = new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, $data['errorString']);
+				$object = new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, $data[kThumbnailErrorMessages::ERROR_STRING]);
 				break;
 			case kThumbnailException::ACTION_FAILED:
 				$object = new KalturaAPIException(KalturaThumbnailErrors::ACTION_FAILED);

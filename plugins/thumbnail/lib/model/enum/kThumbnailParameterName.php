@@ -32,4 +32,9 @@ interface kThumbnailParameterName extends BaseEnum
 	const NUMBER_OF_SLICES = "numberOfSlices";
 	const START_SEC = "startSec";
 	const END_SEC = "endSec";
+	const X_ROUNDING = "xRounding";
+	const Y_ROUNDING = "yRounding";
+	const STROKE_WIDTH = "strokeWidth";
+	const DISPLACE = "displace";
+	const SIZE_CORRECTION = "sizeCorrection";
 }

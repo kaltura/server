@@ -28,6 +28,7 @@ abstract class kThumbnailAction
 
 	protected function getActionParameter($actionParameterName, $default = null)
 	{
+		$actionParameterName = strtolower($actionParameterName);
 		if(array_key_exists($actionParameterName, $this->actionParameters))
 		{
 			return $this->actionParameters[$actionParameterName];
@@ -99,9 +100,10 @@ abstract class kThumbnailAction
 	 */
 	public function setActionParameter($parameterName, $parameterValue)
 	{
+		$parameterName = strtolower($parameterName);
 		if(array_key_exists($parameterName, $this->parameterAlias))
 		{
-			$parameterName = $this->parameterAlias[$parameterName];
+			$parameterName = strtolower($this->parameterAlias[$parameterName]);
 		}
 
 		$this->actionParameters[$parameterName] = $parameterValue;
