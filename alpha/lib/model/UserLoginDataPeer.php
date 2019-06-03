@@ -757,7 +757,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$loginData = self::isHashKeyValid($hashKey);
 		if (!$loginData)
 		{
-			throw new Exception('Hash key not valid');
+			throw new kCoreException('Hash key not valid', kCoreException::INVALID_HASH);
 		}
 
 		$partnerId = $loginData->getConfigPartnerId();
