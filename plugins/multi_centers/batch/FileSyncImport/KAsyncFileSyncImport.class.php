@@ -344,7 +344,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			else
 			{
 				// will resume from the current offset
-				KalturaLog::info('File partialy exists - resume offset set to ['.$actualFileSize.']');
+				KalturaLog::info('File partially exists - resume offset set to ['.$actualFileSize.']');
 				$resumeOffset = $actualFileSize;
 			}
 		}
@@ -371,24 +371,32 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			$res = $this->curlWrapper->exec($sourceUrl, $fileDestination); // download file
 			$curlError = $this->curlWrapper->getError();
 			$curlErrorNumber = $this->curlWrapper->getErrorNumber();
+			$responseStatusCode = $this->curlWrapper->getHttpCode();
 			
 			// reset the resume offset, since the curl handle is reused
 			$this->curlWrapper->setResumeOffset(0);
-
-			KalturaLog::info("Curl results: $res");
+			
+			KalturaLog::info("Curl results: [$res] responseStatusCode [$responseStatusCode] error [$curlError] error number [$curlErrorNumber]");
 	
 			// handle errors
-			if (!$res || $curlError)
+			if (!$res || $curlError || KCurlHeaderResponse::isError($responseStatusCode))
 			{
 				if($curlErrorNumber != CURLE_OPERATION_TIMEOUTED)
 				{
-					// an error other than timeout occured  - cannot continue
+					// an error other than timeout occurred  - cannot continue
 					KalturaLog::err("$curlError");
+					return false;
+				}
+				elseif($responseStatusCode == KCurlHeaderResponse::HTTP_STATUS_SERVER_ERROR)
+				{
+					// Server error occurred, unlink current file to avoid file corruption on resume
+					KalturaLog::log("Got bad status code from server, truncating file [$fileDestination] to last known good size, to avoid file corruption");
+					kFileBase::truncateFile($fileDestination, $resumeOffset);
 					return false;
 				}
 				else
 				{
-					// timeout error occured, ignore and try to resume
+					// timeout error occurred, ignore and try to resume
 					KalturaLog::log('Curl timeout');
 				}
 			}
