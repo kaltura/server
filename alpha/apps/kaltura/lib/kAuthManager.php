@@ -4,13 +4,14 @@ class kAuthManager implements kObjectChangedEventConsumer
 {
 
 	const TWO_FACTOR_FIELD = 'useTwoFactorAuthentication';
+	static $handleObjectChanged = true;
 
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
-		if( $object instanceof Partner &&
+		if( self::$handleObjectChanged && $object instanceof Partner &&
 			in_array(partnerPeer::CUSTOM_DATA, $modifiedColumns) &&
 			$object->isCustomDataModified(self::TWO_FACTOR_FIELD) &&
 			$object->getUseTwoFactorAuthentication())
@@ -19,6 +20,7 @@ class kAuthManager implements kObjectChangedEventConsumer
 			$old2FAValue = $oldCustomDataValues[''][self::TWO_FACTOR_FIELD];
 			if ($old2FAValue != $object->getUseTwoFactorAuthentication())
 			{
+				self::$handleObjectChanged = false;
 				return true;
 			}
 		}

@@ -29,6 +29,9 @@ in [subjects]
 in [bodies]
 139 = "Hello,<BR><BR>Reason for the broadcast issue:<BR><BR>%s <BR><BR> Please contact your Account Manager to resolve this issue.<BR><BR>Kaltura Customer Service"
 
+#### Deployment Scripts ####	
+NONE
+
 ## Add generateQrCode action to user service ##
 
 - Issue Type: Feature
@@ -41,9 +44,6 @@ in [bodies]
 ### Deployment scripts ###
 
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_02_add_user_generate_qr_image.php
-	
-#### Deployment Scripts ####	
-NONE
 
 ## Deploy "Entry Vendor Task Finished Processing" HTTP notification (for MediaSpace) ##
  - Issue Type: Feature
