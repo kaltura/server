@@ -14,15 +14,10 @@ class kCropAction extends kImagickAction
 	protected $x;
 	protected $y;
 
-	protected $parameterAlias = array(
-
-	);
-
 	protected function initParameterAlias()
 	{
 		$cropParameterAlias = array(
 			"gp" => kThumbnailParameterName::GRAVITY_POINT,
-			"gravitypoint" => kThumbnailParameterName::GRAVITY_POINT,
 			"w" => kThumbnailParameterName::WIDTH,
 			"h" => kThumbnailParameterName::HEIGHT,
 			);
@@ -49,31 +44,31 @@ class kCropAction extends kImagickAction
 	{
 		if(($this->x && !$this->y) || (!$this->x && $this->y))
 		{
-			$data = array("errorString" => 'You cant define only crop x or crop y');
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::MISSING_CORP_X_Y);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if($this->newWidth > $this->currentWidth)
 		{
-			$data = array("errorString" => 'crop width must be smaller or equal to the current width');
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::CROP_WIDTH);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if($this->newHeight > $this->currentHeight)
 		{
-			$data = array("errorString" => 'crop height must be smaller or equal to the current height');
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::CROP_HEIGHT);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if($this->newWidth < 1)
 		{
-			$data = array("errorString" => 'width must be positive');
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::WIDTH_POSITIVE);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if($this->newHeight < 1)
 		{
-			$data = array("errorString" => 'height must be positive');
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::HEIGHT_POSITIVE);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 	}
@@ -98,7 +93,7 @@ class kCropAction extends kImagickAction
 					$this->image->cropImage($this->newWidth, $this->newHeight, $this->currentWidth / 2, $this->currentHeight / 2);
 					break;
 				default:
-					$data = array("errorString" => 'illegal gravity point value');
+					$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::ILLEGAL_GRAVITY);
 					throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 			}
 		}

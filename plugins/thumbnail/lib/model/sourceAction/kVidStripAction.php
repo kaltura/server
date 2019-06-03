@@ -20,11 +20,8 @@ class kVidStripAction extends kVidAction
 		$kVidStripAlias = array(
 			"w" => kThumbnailParameterName::WIDTH,
 			"h" => kThumbnailParameterName::HEIGHT,
-			"numberofslices" => kThumbnailParameterName::NUMBER_OF_SLICES,
 			"nos" => kThumbnailParameterName::NUMBER_OF_SLICES,
-			"startsec" => kThumbnailParameterName::START_SEC,
 			"ss" => kThumbnailParameterName::START_SEC,
-			"endsec" => kThumbnailParameterName::END_SEC,
 			"es" => kThumbnailParameterName::END_SEC,
 		);
 		$this->parameterAlias = array_merge($this->parameterAlias, $kVidStripAlias);
@@ -32,12 +29,9 @@ class kVidStripAction extends kVidAction
 
 	protected function extractActionParameters()
 	{
-		$this->initParameterAlias();
 		$this->numberOfSlices = $this->getIntActionParameter(kThumbnailParameterName::NUMBER_OF_SLICES);
 		$this->startSec = $this->getFloatActionParameter(kThumbnailParameterName::START_SEC, 0);
 		$this->endSec = $this->getFloatActionParameter(kThumbnailParameterName::END_SEC);
-		$this->newWidth = $this->getIntActionParameter(kThumbnailParameterName::WIDTH);
-		$this->newHeight = $this->getIntActionParameter(kThumbnailParameterName::HEIGHT);
 	}
 
 	protected function validateInput()
@@ -46,19 +40,19 @@ class kVidStripAction extends kVidAction
 
 		if(!$this->numberOfSlices || $this->numberOfSlices < 1)
 		{
-			$data = array("errorString" => "number of slices must have positive");
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::NUMBER_OF_SLICE);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if($this->startSec < 0)
 		{
-			$data = array("errorString" => "start sec must have a positive");
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::START_SEC);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if($this->endSec && $this->endSec <= $this->startSec)
 		{
-			$data = array("errorString" => "end sec must be greater then start sec");
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::END_SEC_START_SEC);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 	}
@@ -76,11 +70,11 @@ class kVidStripAction extends kVidAction
 			$success = myEntryUtils::captureThumbUsingPackager($this->source->getEntry(), $destPath, $second, $flavorAssetId, $this->newWidth, $this->newHeight);
 			if(!$success)
 			{
-				$data = array("errorString" => "Vid strip failed");
+				$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::VID_STRIP_FAILED);
 				throw new kThumbnailException(kThumbnailException::ACTION_FAILED, kThumbnailException::ACTION_FAILED, $data);
 			}
 
-			$sliceToAdd = new Imagick($destPath . KThumbnailCapture::TEMP_FILE_POSTFIX);
+			$sliceToAdd = new Imagick(KThumbnailCapture::getCapturePath($destPath));
 			if(!$sizeInitialized)
 			{
 				$width = $sliceToAdd->getImageWidth();
@@ -108,7 +102,7 @@ class kVidStripAction extends kVidAction
 	{
 		if(!$strip->compositeImage($sliceToAdd, imagick::COMPOSITE_DEFAULT, $x, 0))
 		{
-			$data = array("errorString" => 'Failed to compose image');
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::COMPOSE_FAILED);
 			throw new kThumbnailException(kThumbnailException::ACTION_FAILED, kThumbnailException::ACTION_FAILED, $data);
 		}
 
@@ -126,7 +120,7 @@ class kVidStripAction extends kVidAction
 		}
 		else if($this->endSec * 1000 > $videoLength)
 		{
-			$data = array("errorString" => 'end sec cant be greater then the video length');
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::END_SEC);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 

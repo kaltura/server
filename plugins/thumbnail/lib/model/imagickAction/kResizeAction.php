@@ -15,6 +15,7 @@ class kResizeAction extends kImagickAction
 	protected $blur;
 	protected $shouldUseResize;
 	protected $compositeFit;
+	/* @var Imagick $compositeObject */
 	protected $compositeObject;
 
 	const BEST_FIT_MIN = 1;
@@ -25,12 +26,9 @@ class kResizeAction extends kImagickAction
 			"w" => kThumbnailParameterName::WIDTH,
 			"h" => kThumbnailParameterName::HEIGHT,
 			"ft" => kThumbnailParameterName::FILTER_TYPE,
-			"filtertype" => kThumbnailParameterName::FILTER_TYPE,
 			"b" => kThumbnailParameterName::BLUR,
 			"bf" => kThumbnailParameterName::BEST_FIT,
-			"bestfit" => kThumbnailParameterName::BEST_FIT,
 			"cf" => kThumbnailParameterName::COMPOSITE_FIT,
-			"compositefit" => kThumbnailParameterName::COMPOSITE_FIT,
 		);
 		$this->parameterAlias = array_merge($this->parameterAlias, $resizeParameterAlias);
 	}
@@ -55,7 +53,7 @@ class kResizeAction extends kImagickAction
 		{
 			if(!$this->compositeObject)
 			{
-				$data = array("errorString" => 'Missing composite object');
+				$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::MISSING_COMPOSITE);
 				throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 			}
 		}
@@ -69,25 +67,25 @@ class kResizeAction extends kImagickAction
 	{
 		if($this->bestFit && $this->newWidth < self::BEST_FIT_MIN)
 		{
-			$data = array("errorString" => 'If bestfit is supplied parameter width must be positive');
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::BEST_FIT_WIDTH);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if($this->bestFit && $this->newHeight < self::BEST_FIT_MIN)
 		{
-			$data = array("errorString" => 'If bestfit is supplied parameter height must be positive');
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::BEST_FIT_HEIGHT);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if(!is_numeric($this->newWidth) || $this->newWidth < self::MIN_DIMENSION || $this->newWidth > self::MAX_DIMENSION)
 		{
-			$data = array("errorString" => 'width must be between 0 and 10000');
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::WIDTH_DIMENSIONS);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if(!is_numeric($this->newHeight) || $this->newHeight < self::MIN_DIMENSION || $this->newHeight > self::MAX_DIMENSION)
 		{
-			$data = array("errorString" => 'height must be between 0 and 10000');
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::HEIGHT_DIMENSIONS);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 	}

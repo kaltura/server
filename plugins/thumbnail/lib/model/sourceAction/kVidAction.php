@@ -28,9 +28,9 @@ abstract class kVidAction extends kSourceAction
 
 	protected function validateInput()
 	{
-		if(!is_a($this->source, "kEntrySource"))
+		if(!$this->source instanceof kEntrySource)
 		{
-			$data = array("errorString" => self::$action_name . "can only work on entry source");
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => self::$action_name . kThumbnailErrorMessages::ENTRY_SOURCE_ONLY);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
@@ -47,13 +47,13 @@ abstract class kVidAction extends kSourceAction
 	{
 		if($this->newWidth && (!is_numeric($this->newWidth) || $this->newWidth < self::MIN_DIMENSION || $this->newWidth > self::MAX_DIMENSION))
 		{
-			$data = array("errorString" => 'width must be between 0 and 10000');
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::WIDTH_DIMENSIONS);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if($this->newHeight && (!is_numeric($this->newHeight) || $this->newHeight < self::MIN_DIMENSION || $this->newHeight > self::MAX_DIMENSION))
 		{
-			$data = array("errorString" => 'height must be between 0 and 10000');
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::HEIGHT_DIMENSIONS);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 	}

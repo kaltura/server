@@ -17,8 +17,14 @@ class kWordWrapHelper
 	protected $currentLineLimit;
 	protected $totalHeight = 0;
 
-	const TEXT_DOES_NOT_FIT_ERR = "text doesn't fit the bounding box";
-
+	/**
+	 * kWordWrapHelper constructor.
+	 * @param imagick $image
+	 * @param ImagickDraw $draw
+	 * @param string $fullText
+	 * @param int $maxWidth
+	 * @param null|int $maxHeight
+	 */
 	function __construct($image, $draw, $fullText, $maxWidth, $maxHeight = null)
 	{
 		$this->image = $image;
@@ -38,7 +44,7 @@ class kWordWrapHelper
 		$spaceMetrics = $this->image->queryFontMetrics($this->draw, " ");
 		if($spaceMetrics['textWidth'] > $this->maxWidth)
 		{
-			$data = array("errorString" => self::TEXT_DOES_NOT_FIT_ERR);
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::TEXT_DOES_NOT_FIT_ERR);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
@@ -78,7 +84,7 @@ class kWordWrapHelper
 		$this->commitCurrentLine();
 		if($this->maxHeight && $this->totalHeight > $this->maxHeight)
 		{
-			$data = array("errorString" => self::TEXT_DOES_NOT_FIT_ERR);
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::TEXT_DOES_NOT_FIT_ERR);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
@@ -92,7 +98,7 @@ class kWordWrapHelper
 		{
 			if ($textWidth > $this->maxWidth)
 			{
-				$data = array("errorString" => self::TEXT_DOES_NOT_FIT_ERR);
+				$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::TEXT_DOES_NOT_FIT_ERR);
 				throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 			}
 

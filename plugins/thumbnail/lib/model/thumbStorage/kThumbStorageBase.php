@@ -78,6 +78,10 @@ abstract class kThumbStorageBase
 		return $storage;
 	}
 
+	/**
+	 * @param null|string $lastModified
+	 * @return kRendererBase
+	 */
 	protected abstract function getRenderer($lastModified = null);
 
 	public function render($lastModified = null)

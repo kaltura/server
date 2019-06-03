@@ -45,7 +45,7 @@ class kEntrySource extends kThumbnailSource
 			return $imagick;
 		}
 
-		$data = array("entryType" => $this->getEntryMediaType());
+		$data = array(kThumbnailErrorMessages::ENTRY_TYPE => $this->getEntryMediaType());
 		throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::MISSING_SOURCE_ACTIONS_FOR_TYPE, $data);
 	}
 
@@ -59,6 +59,8 @@ class kEntrySource extends kThumbnailSource
 			{
 				return $fileSync->getUpdatedAt(null);
 			}
+
+			return null;
 		}
 		else
 		{
