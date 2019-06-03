@@ -5,6 +5,8 @@
  */
 class kAuthenticatedCondition extends kCondition
 {
+	const WIDGET = "widget";
+	
 	/* (non-PHPdoc)
 	 * @see kCondition::__construct()
 	 */
@@ -55,7 +57,15 @@ class kAuthenticatedCondition extends kCondition
 				$privilege = $privilege->getValue();
 				
 			KalturaLog::debug("Checking privilege [$privilege] with entry [".$scope->getEntryId()."]");
-			if($scope->getKs()->verifyPrivileges($privilege, $scope->getEntryId()))
+			if($privilege === self::WIDGET)
+			{
+				if($scope->getKs()->verifyPrivileges($privilege, 1))
+				{
+					KalturaLog::debug("Privilege [$privilege] verified");
+					return true;
+				}
+			}
+			elseif($scope->getKs()->verifyPrivileges($privilege, $scope->getEntryId()))
 			{
 				KalturaLog::debug("Privilege [$privilege] verified");
 				return true;

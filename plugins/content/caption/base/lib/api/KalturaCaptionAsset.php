@@ -106,14 +106,7 @@ class KalturaCaptionAsset extends KalturaAsset
 				
 		if($this->shouldGet('languageCode', $responseProfile))
 		{
-			$languageReflector = KalturaTypeReflectorCacher::get('KalturaLanguage');
-			$languageCodeReflector = KalturaTypeReflectorCacher::get('KalturaLanguageCode');
-			if($languageReflector && $languageCodeReflector)
-			{
-				$languageCode = $languageReflector->getConstantName($this->language);
-				if($languageCode)
-					$this->languageCode = $languageCodeReflector->getConstantValue($languageCode);
-			}
+			$this->languageCode = languageCodeManager::getLanguageCode($this->language);
 		}
 			
 		return $ret;

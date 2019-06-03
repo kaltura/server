@@ -1,10 +1,10 @@
 <?php
 /**
  * @package plugins.thumbnail
- * @subpackage model
+ * @subpackage model.thumbnailSources
  */
 
-class entrySource extends thumbnailSource
+class kEntrySource extends kThumbnailSource
 {
 	protected $dbEntry;
 
@@ -20,13 +20,11 @@ class entrySource extends thumbnailSource
 		$secureEntryHelper->validateAccessControl();
 		$this->dbEntry = $dbEntry;
 	}
-
-
+	
 	public function getEntryMediaType()
 	{
 		return $this->dbEntry->getMediaType();
 	}
-
 
 	/**
 	 * @return entry
@@ -47,6 +45,26 @@ class entrySource extends thumbnailSource
 			return $imagick;
 		}
 
-		throw new KalturaAPIException(KalturaThumbnailErrors::MISSING_SOURCE_ACTIONS_FOR_TYPE, $this->getEntryMediaType());
+		$data = array("entryType" => $this->getEntryMediaType());
+		throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::MISSING_SOURCE_ACTIONS_FOR_TYPE, $data);
+	}
+
+	public function getLastModified()
+	{
+		if($this->getEntryMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+		{
+			$fileSyncKey = $this->dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$fileSync= kFileSyncUtils::getOriginFileSyncForKey($fileSyncKey,false);
+			if($fileSync)
+			{
+				return $fileSync->getUpdatedAt(null);
+			}
+		}
+		else
+		{
+			$lastModifiedFlavor = assetPeer::retrieveLastModifiedFlavorByEntryId($this->dbEntry->getId());
+			$lastModified = $lastModifiedFlavor ? $lastModifiedFlavor->getUpdatedAt(null) : null;
+			return $lastModified;
+		}
 	}
 }

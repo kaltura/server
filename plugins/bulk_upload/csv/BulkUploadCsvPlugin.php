@@ -2,11 +2,13 @@
 /**
  * @package plugins.bulkUploadCsv
  */
-class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, IKalturaPending
+class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, IKalturaPending, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'bulkUploadCsv';
 
 	const FEATURE_CSV_HEADER_ROW = 'FEATURE_CSV_HEADER_ROW';
+
+	const BULKUPLOAD_CSV_FLOW_MANAGER = "kBulkUploadCsvFlowManager";
 	/**
 	 *
 	 * Returns the plugin name
@@ -351,5 +353,10 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+
+	public static function getEventConsumers()
+	{
+		return array(self::BULKUPLOAD_CSV_FLOW_MANAGER);
 	}
 }

@@ -1,9 +1,8 @@
 <?php
 /**
  * @package plugins.thumbnail
- * @subpackage model
+ * @subpackage model.enum
  */
-
 interface kThumbStorageType extends BaseEnum
 {
 	const NONE = 0;
