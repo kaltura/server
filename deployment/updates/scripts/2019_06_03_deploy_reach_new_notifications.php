@@ -10,14 +10,14 @@ $script = realpath(dirname(__FILE__) . "/../../../tests/standAloneClient/exec.ph
 $taskApprovedModeration = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/2019_06_03_new_entry_vendor_task_approved_moderation.xml");
 deployTemplate($script, $taskApprovedModeration);
 
-$taskPendingModeration = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/2019_06_03_new_entry_vendor_task_done.xml");
-deployTemplate($script, $taskPendingModeration);
+$taskDone = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/2019_06_03_new_entry_vendor_task_done.xml");
+deployTemplate($script, $taskDone);
 
 $taskRejectedModeration = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/2019_06_03_new_entry_vendor_task_rejected_moderation.xml");
 deployTemplate($script, $taskRejectedModeration);
 
-$taskRejectedModeration = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/2019_06_03_new_entry_vendor_task_pending_moderation.xml");
-deployTemplate($script, $taskRejectedModeration);
+$taskPendingModeration = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/2019_06_03_new_entry_vendor_task_pending_moderation.xml");
+deployTemplate($script, $taskPendingModeration);
 
 function deployTemplate($script, $config)
 {
