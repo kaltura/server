@@ -670,19 +670,19 @@ class kKavaReportsMgr extends kKavaBase
 
 		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_AUDIENCE] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
-			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_AUDIENCE, self::METRIC_UNIQUE_PERSISTENT_SESSION_ID));
+			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_AUDIENCE, self::METRIC_UNIQUE_USER_IDS));
 
 		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_ENGAGED_USERS] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
 				self::getSelectorFilter(self::DIMENSION_USER_ENGAGEMENT, self::USER_ENGAGED))),
-			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_ENGAGED_USERS, self::METRIC_UNIQUE_PERSISTENT_SESSION_ID));
+			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_ENGAGED_USERS, self::METRIC_UNIQUE_USER_IDS));
 
 		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_BUFFERING_USERS] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
 				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_IS_BUFFERING))),
-			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_BUFFERING_USERS, self::METRIC_UNIQUE_PERSISTENT_SESSION_ID));
+			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_BUFFERING_USERS, self::METRIC_UNIQUE_USER_IDS));
 
 		self::$aggregations_def[self::METRIC_VIEW_DOWNSTREAM_BANDWIDTH_COUNT] = self::getFilteredAggregator(
 			self::getAndFilter(array(
@@ -712,7 +712,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
 				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_DVR))),
-			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR, self::METRIC_UNIQUE_PERSISTENT_SESSION_ID));
+			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR, self::METRIC_UNIQUE_USER_IDS));
 
 		self::$aggregations_def[self::METRIC_LATENCY_SUM] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
