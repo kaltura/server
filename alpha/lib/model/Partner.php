@@ -2103,4 +2103,9 @@ class Partner extends BasePartner
 		return KalturaPartnerAuthenticationType::PASSWORD_ONLY;
 	}
 
+	public function getAnalyticsPersistentSessionId()
+	{
+		return (PermissionPeer::isValidForPartner(PermissionName::FEATURE_ANALYTICS_PERSISTENT_SESSION_ID, $this->getId())) ? true : false;
+	}
+
 }

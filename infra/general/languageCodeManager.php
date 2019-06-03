@@ -120,6 +120,27 @@ class languageCodeManager
 
         else return $langaugeKey;
     }
+	
+	public static function getLanguageCode($captionAssetLanguage,$useThreeCodeLang = false)
+	{
+		$languageCode = null;
+		$languageObject = self::getObjectFromKalturaName($captionAssetLanguage);
+		if($useThreeCodeLang)
+			$languageCode = $languageObject[self::ISO639_B];
+		else
+		{
+			if($languageObject[self::ISO639])
+			{
+				$languageCode = $languageObject[self::ISO639];
+			}
+			else
+			{
+				$languageCode = $languageObject[self::ISO639_B];
+			}
+		}
+		
+		return $languageCode;
+	}
 
     /**
      * @param $arrayISO639

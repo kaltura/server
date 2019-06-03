@@ -595,7 +595,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 						$label = 'Track' . (count($contributor->captions) + 1);
 					$captionAssetObj['label'] = $label;
 					$captionAssetObj['default'] = $captionAsset->getDefault() ? "YES" : "NO";
-					$languageCode= self::getLanguageCode($captionAsset->getLanguage(),$useThreeCodeLang);
+					$languageCode= languageCodeManager::getLanguageCode($captionAsset->getLanguage(),$useThreeCodeLang);
 					if($languageCode)
 						$captionAssetObj['language'] = $languageCode;
 
@@ -610,22 +610,6 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		}
 
 		return $contributors;
-	}
-	private static function getLanguageCode($captionAssetLanguage,$useThreeCodeLang)
-	{
-		$languageCode = null;
-		$languageObject = languageCodeManager::getObjectFromKalturaName($captionAssetLanguage);
-		if($useThreeCodeLang)
-			$languageCode = $languageObject[languageCodeManager::ISO639_B];
-		else
-		{
-			if($languageObject[languageCodeManager::ISO639])
-				$languageCode = $languageObject[languageCodeManager::ISO639];
-			else
-				$languageCode = $languageObject[languageCodeManager::ISO639_B];
-		}
-
-		return $languageCode;
 	}
 
 	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
@@ -654,7 +638,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 					if ($url)
 					{
 						$webVttUrl = myPartnerUtils::getCdnHost($assetDb->getPartnerId()) . self::SERVE_WEBVTT_URL_PREFIX . '/captionAssetId/' . $assetDb->getId() . '/segmentIndex/-1/version/' . $assetDb->getVersion() . '/captions.vtt';
-						$languageCode = self::getLanguageCode($assetDb->getLanguage(),$useThreeCodeLang);
+						$languageCode = languageCodeManager::getLanguageCode($assetDb->getLanguage(),$useThreeCodeLang);
 						$playbackCaptions [] = new kCaptionPlaybackPluginData($assetDb->getLabel(), $assetDb->getContainerFormat(), $assetDb->getLanguage(), $assetDb->getDefault(), $webVttUrl, $url, $languageCode);
 					}
 				}

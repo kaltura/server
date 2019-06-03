@@ -1,4 +1,96 @@
+# Orion 15.1.0 #
+
+## Add addition fields in entry vendor task csv ##
+
+- Issue Type: Task
+- Issue ID: REACH2-590 + SUP-18216
+
+### Configuration ###
+	None.
+		
+#### Deployment Scripts ####	
+		  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_05_30_allow_batch_reach_profile_access.php
+
+
+## Support Mailing for Sip Integration ##
+
+- Issue Type: Task
+- Issue ID: PLAT-9777
+
+### Configuration ###
+edit /opt/kaltura/app/configurations/batch/batches/Mailer/emails_en.ini add:
+
+in [constants]
+MAIL_TYPE_SIP_FAILURE = 139
+ 
+in [subjects]
+139 = "An error occurred when trying to broadcast the Video Conference"
+
+in [bodies]
+139 = "Hello,<BR><BR>Reason for the broadcast issue:<BR><BR>%s <BR><BR> Please contact your Account Manager to resolve this issue.<BR><BR>Kaltura Customer Service"
+	
+#### Deployment Scripts ####	
+NONE
+
+## Deploy "Entry Vendor Task Finished Processing" HTTP notification (for MediaSpace) ##
+ - Issue Type: Feature
+ - Issue IDs: PSVAMB-7641
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_05_26_httpEntryVendorTaskDone.template.xml
+
+Run deployment script:
+
+    php /opt/kaltura/app/deployment/updates/scripts/2019_05_26_httpEntryVendorTaskDone.php
+
+## Add new bulk upload mechanism for schedule events ## 
+
+- Issue Type: Feature
+- Issue ID: PSVAMB-7338
+
+#### Deployment Scripts ####  
+
+        php /opt/kaltura/app/deployment/updates/scripts/2019_05_22_scheduleevent_bulkupload_required_permissions.php
+
+
 # Orion 15.0.0 #
+
+## Add permission in Admin Console for analytics persistent session id ##
+
+- Issue Type: Feature
+- Issue ID: AN-696
+
+### configuration ###
+    Add the following to admin.ini:
+
+    moduls.analyticsPersistentSessionId.enabled = true
+    moduls.analyticsPersistentSessionId.permissionType = 2
+    moduls.analyticsPersistentSessionId.label = Analytics Persistent Session Id
+    moduls.analyticsPersistentSessionId.permissionName = FEATURE_ANALYTICS_PERSISTENT_SESSION_ID
+    moduls.analyticsPersistentSessionId.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+    None
+
+## configuraiton change ##
+
+- Issue Type : Configuration change
+- Issue ID : PLAT-9871
+
+### Configuraiton ##
+Add new configuration map
+New map name - cache_version
+The following values were move to this map from local.ini:
+	a. permission_cache_version
+	b. secrets_cache_version
+	
+#### Deployment Scripts ####	
+None
 
 ## Support Sip Integration ##
 
@@ -9,7 +101,7 @@
 1. in admin.ini add:
 	moduls.Sip.enabled = true
 	moduls.Sip.permissionType = 2
-	moduls.Sip.label = "Enable Sip"
+	moduls.Sip.label = "Enable VCI"
 	moduls.Sip.permissionName = FEATURE_SIP
 	moduls.Sip.group = GROUP_ENABLE_DISABLE_FEATURES
 2. add Sip to plugins.ini	

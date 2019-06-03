@@ -15,10 +15,16 @@ class KalturaPartnerPublicInfo extends KalturaObject
 	 */
 	public $ottEnvironmentUrl;
 
+	/**
+	 * @var bool
+	 */
+	public $analyticsPersistentSessionId;
+
 	private static $map_between_objects = array
 	(
 		"analyticsUrl",
 		"ottEnvironmentUrl",
+		"analyticsPersistentSessionId",
 	);
 
 	public function getMapBetweenObjects ( )
