@@ -372,6 +372,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			$curlError = $this->curlWrapper->getError();
 			$curlErrorNumber = $this->curlWrapper->getErrorNumber();
 			$responseStatusCode = $this->curlWrapper->getHttpCode();
+			$isErrorResponse = KCurlHeaderResponse::isError($responseStatusCode);
 			
 			// reset the resume offset, since the curl handle is reused
 			$this->curlWrapper->setResumeOffset(0);
@@ -379,7 +380,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			KalturaLog::info("Curl results: [$res] responseStatusCode [$responseStatusCode] error [$curlError] error number [$curlErrorNumber]");
 	
 			// handle errors
-			if (!$res || $curlError || KCurlHeaderResponse::isError($responseStatusCode))
+			if (!$res || $curlError || $isErrorResponse)
 			{
 				if($curlErrorNumber != CURLE_OPERATION_TIMEOUTED)
 				{
@@ -387,7 +388,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 					KalturaLog::err("$curlError");
 					return false;
 				}
-				elseif($responseStatusCode == KCurlHeaderResponse::HTTP_STATUS_SERVER_ERROR)
+				elseif($isErrorResponse)
 				{
 					// Server error occurred, unlink current file to avoid file corruption on resume
 					KalturaLog::log("Got bad status code from server, truncating file [$fileDestination] to last known good size, to avoid file corruption");
