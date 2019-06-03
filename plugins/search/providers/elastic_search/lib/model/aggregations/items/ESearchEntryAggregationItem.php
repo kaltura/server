@@ -6,7 +6,7 @@
 
 class ESearchEntryAggregationItem extends ESearchAggregationItem
 {
-	/***
+	/**
 	 * var ESearchEntryAggregationFieldName
 	 */
 	protected $fieldName;

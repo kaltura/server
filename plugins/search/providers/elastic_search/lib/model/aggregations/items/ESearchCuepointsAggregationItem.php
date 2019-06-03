@@ -6,7 +6,7 @@
 
 class ESearchCuepointsAggregationItem extends ESearchAggregationItem
 {
-	/***
+	/**
 	 * var ESearchCuePointsAggregationFieldName
 	 */
 	protected $fieldName;
