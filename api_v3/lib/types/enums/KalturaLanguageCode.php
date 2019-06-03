@@ -154,4 +154,6 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const YO = 'yo';
 	const ZU = 'zu';
 	const MU = 'multilingual';
+	const CRG = 'crg';
+	const MIC = 'mic';
 }

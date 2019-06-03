@@ -166,6 +166,8 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				'Yiddish' =>	'yid',
 				'Yoruba' =>	'yor',
 				'Zulu' =>	'zul',
+				'Michif' => 'crg',
+				'Micmac' => 'mic',
 	
 		);
 	
