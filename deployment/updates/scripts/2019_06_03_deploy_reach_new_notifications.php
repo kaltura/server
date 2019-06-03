@@ -16,6 +16,9 @@ deployTemplate($script, $taskPendingModeration);
 $taskRejectedModeration = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/2019_06_03_new_entry_vendor_task_rejected_moderation.xml");
 deployTemplate($script, $taskRejectedModeration);
 
+$taskRejectedModeration = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/2019_06_03_new_entry_vendor_task_pending_moderation.xml");
+deployTemplate($script, $taskRejectedModeration);
+
 function deployTemplate($script, $config)
 {
 	if(!file_exists($config))
