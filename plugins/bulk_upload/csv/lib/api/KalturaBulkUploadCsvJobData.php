@@ -24,7 +24,7 @@ class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
 	 * The object in process
 	 * @var string
 	 */
-	public $processObject;
+	public $processObjectId;
 
 	/**
 	 * The type of the object in process
@@ -41,7 +41,7 @@ class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
 	(
 		'csvVersion',
 		'columns',
-		'processObject',
+		'processObjectId',
 		'processObjectType'
 	);
 

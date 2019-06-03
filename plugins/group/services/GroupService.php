@@ -233,6 +233,7 @@ class GroupService extends KalturaBaseUserService
 		}
 		$newDbGroup = $group->clonedObject($dbGroup, $newGroupId, $newGroupName);
 		$group->validateForInsert($newDbGroup);
+
 		$newDbGroup->save();
 
 		$groupUsers =  KuserKgroupPeer::retrieveKuserKgroupByKgroupId($dbGroup->getId());
@@ -241,7 +242,7 @@ class GroupService extends KalturaBaseUserService
 		$isAsync = $GroupUser->addGroupUsersToClonedGroup($kusers, $newDbGroup, $dbGroup->getId());
 		if($isAsync)
 		{
-			$newDbGroup->setProcessStatus(KalturaGroupProcessStatus::PROCESSING);
+			$newDbGroup->setProcessStatus(GroupProcessStatus::PROCESSING);
 			$newDbGroup->save();
 		}
 

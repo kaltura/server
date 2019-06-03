@@ -1418,6 +1418,6 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 
 	public function getProcessStatus()
 	{
-		return $this->getFromCustomData(self::PROCESS_STATUS, null,0);
+		return $this->getFromCustomData(self::PROCESS_STATUS, null,GroupProcessStatus::NONE);
 	}
 }

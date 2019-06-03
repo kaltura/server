@@ -25,7 +25,7 @@ class kBulkUploadCsvJobData extends kBulkUploadJobData
 	 * The object in process
 	 * @var string
 	 */
-	protected $processObject;
+	protected $processObjectId;
 
 	/**
 	 * The type of the object in process
@@ -62,14 +62,14 @@ class kBulkUploadCsvJobData extends kBulkUploadJobData
         $this->columns = $columns;
     }
 
-	public function setProcessObject($objectId)
+	public function setProcessObjectId($objectId)
 	{
-		$this->processObject = $objectId;
+		$this->processObjectId = $objectId;
 	}
 
-	public function getProcessObject()
+	public function getProcessObjectId()
 	{
-		return $this->processObject;
+		return $this->processObjectId;
 	}
 
 	public function setProcessObjectType($type)

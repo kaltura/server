@@ -30,7 +30,7 @@ class kBulkGroupUsersToGroupCsv
 		);
 
 		$jobData = new KalturaBulkUploadCsvJobData();
-		$jobData->processObject = $this->groupId;
+		$jobData->processObjectId = $this->groupId;
 		$jobData->processObjectType = self::GROUP_ID;
 		$bulkService = new BulkService();
 		$bulkService->initService('bulkupload_bulk', 'bulk', 'addUsers');
