@@ -6,7 +6,7 @@
 class KalturaESearchAggregationBucket extends KalturaObject
 {
 	/**
-	 * @var KalturaString
+	 * @var string
 	 */
 	public $value;
 

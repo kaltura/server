@@ -6,12 +6,12 @@
 class KalturaESearchAggregationResponseItem extends KalturaObject
 {
 	/**
-	 * @var KalturaString
+	 * @var string
 	 */
 	public $name;
 
 	/**
-	 * @var KalturaString
+	 * @var string
 	 */
 	public $fieldName;
 
