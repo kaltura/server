@@ -23,8 +23,7 @@ class ESearchService extends KalturaBaseService
 		if($aggregations)
 		{
 			$aggregationResponse = new KalturaESearchAggregationResponse();
-			$aggregationResponse->resultToApi($aggregations);
-			$response->aggregations = $aggregationResponse->aggs;
+			$response->aggregations = $aggregationResponse->resultToApi($aggregations);
 		}
 		return $response;
 	}
