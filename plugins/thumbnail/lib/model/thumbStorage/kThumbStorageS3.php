@@ -1,17 +1,27 @@
 <?php
 /**
  * @package plugins.thumbnail
- * @subpackage model
+ * @subpackage model.thumbStorage
  */
 
 class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterface
 {
+	/** @var s3Mgr $s3Mgr*/
 	protected $s3Mgr;
 
 	function __construct()
 	{
-		$options =  $this->setS3Options();
-		$this->s3Mgr = kFileTransferMgr::getInstance(StorageProfileProtocol::S3 ,$options);
+		$options = $this->setS3Options();
+		if(!isset(self::$configParams[self::CONF_URL]) ||
+			!isset(self::$configParams[self::CONF_USER_NAME]) ||
+			!isset(self::$configParams[self::CONF_PASSWORD]))
+		{
+			throw new kThumbnailException(kThumbnailException::MISSING_S3_CONFIGURATION, kThumbnailException::MISSING_S3_CONFIGURATION);
+		}
+
+		$this->s3Mgr = kFileTransferMgr::getInstance(StorageProfileProtocol::S3, $options);
+		$this->login();
+		$this->s3Mgr->registerStreamWrapper();
 	}
 
 	protected function setS3Options()
@@ -21,6 +31,7 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 		{
 			$s3Options['s3Region'] = self::$configParams[self::CONF_REGION];
 		}
+
 		return $s3Options;
 	}
 
@@ -33,40 +44,65 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 
 	public function saveFile($fileName, $content)
 	{
-		$this->login();
 		$path = $this->getFullPath($fileName);
-		kFile::fullMkdir(self::LOCAL_TMP.$path);
-		kFile::safeFilePutContents(self::LOCAL_TMP.$path,$content);
-		try
+		$this->url = self::getUrl($path);
+		if(kFile::filePutContents($this->url, $content))
 		{
-			$this->s3Mgr->putFile($path, self::LOCAL_TMP . $path);
+			$this->content = $content;
 		}
-		catch (Exception $e)
+		else
 		{
-			KalturaLog::debug($e->getMessage());
+			KalturaLog::err("Failed to save thumbnail file");
+			throw new kThumbnailException(kThumbnailException::CACHE_ERROR, kThumbnailException::CACHE_ERROR);
 		}
-		kFile::deleteFile(self::LOCAL_TMP.$path);
-		$this->content = $content;
 	}
-	protected function getRenderer()
+
+	protected function getRenderer($lastModified = null)
 	{
-		$renderer = new kRendererString($this->content ,self::MIME_TYPE );
+		$renderer = new kRendererString($this->content ,self::MIME_TYPE, $lastModified);
 		return $renderer;
 	}
 
-	public function loadFile($url)
+	public function loadFile($url, $lastModified = null)
 	{
-		$this->login();
+		KalturaLog::debug("loading file from S3 " . $url);
 		$path = $this->getFullPath($url);
-		$this->url = self::$configParams[self::CONF_URL] . $path;
+		$this->url = self::getUrl($path);
 		try
 		{
-			$this->content = $this->s3Mgr->getFile($path);
+			if(file_exists($this->url))
+			{
+				if($lastModified)
+				{
+					$s3lastModified = filemtime($this->url);
+					if($lastModified > $s3lastModified)
+					{
+						KalturaLog::debug("file was created before entry changed" . $s3lastModified);
+						return false;
+					}
+				}
+
+				$this->content = $this->s3Mgr->getFile($path);
+				return true;
+			}
 		}
 		catch (Exception $e)
 		{
-			return false;
+			KalturaLog::debug("failed to load file " . $e->getMessage());
+			throw new kThumbnailException(kThumbnailException::CACHE_ERROR, kThumbnailException::CACHE_ERROR);
 		}
-		return !empty($this->content);
+
+		return false;
+	}
+
+	public function deleteFile($url)
+	{
+		KalturaLog::debug("deleting file from s3:" . $url);
+		return $this->s3Mgr->delFile($url);
+	}
+
+	protected static function getUrl($path)
+	{
+		return 's3://' . $path;
 	}
 }

@@ -1,11 +1,12 @@
 <?php
 /**
  * @package plugins.thumbnail
- * @subpackage model
+ * @subpackage model.thumbStorage
  */
 
 interface kThumbStorageInterface
 {
-	public function saveFile($url,$content);
-	public function loadFile($path);
+	public function saveFile($url, $content);
+	public function loadFile($url, $lastModified);
+	public function deleteFile($url);
 }
