@@ -6,18 +6,14 @@
 
 class KalturaESearchAggregationResponse extends KalturaObject
 {
-	/***
-	 * @var KalturaESearchAggregationResponseArray
-	 */
-	public $aggs;
-
 	protected function getApiObjects($aggregationName)
 	{
 		return explode(':', $aggregationName);
 	}
 
-	public function resultToApi($aggregationResults, $aggregationRequest)
+	public function resultToApi($aggregationResults)
 	{
+		$aggs = new KalturaESearchAggregationResponseArray();
 		foreach ($aggregationResults as $key=>$response)
 		{
 			list ($responseObject, $fieldName) = $this->getApiObjects($key);
@@ -43,8 +39,9 @@ class KalturaESearchAggregationResponse extends KalturaObject
 					$agg->buckets[] = $reponseBucket;
 				}
 			}
-			$this->aggs[] = $agg;
+			$aggs[] = $agg;
 		}
+		return $aggs;
 	}
 
 }
