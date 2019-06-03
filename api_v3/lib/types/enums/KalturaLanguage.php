@@ -29,6 +29,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const CA = 'Catalan';
 	const ZH = 'Chinese';
 	const CO = 'Corsican';
+	const CR = 'Cree';
 	const HR = 'Croatian';
 	const CS = 'Czech';
 	const DA = 'Danish';
@@ -97,6 +98,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const NE = 'Nepali';
 	const NO = 'Norwegian';
 	const OC = 'Occitan';
+	const OJ = 'Ojibwe';
 	const OR_ = 'Oriya';
 	const OM = 'Oromo (Afan, Galla)';
 	const PS = 'Pashto (Pushto)';

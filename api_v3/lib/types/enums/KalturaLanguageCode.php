@@ -29,6 +29,7 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const CA = 'ca';
 	const ZH = 'zh';
 	const CO = 'co';
+	const CR = 'cr';
 	const HR = 'hr';
 	const CS = 'cs';
 	const DA = 'da';
@@ -97,6 +98,7 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const NE = 'ne';
 	const NO = 'no';
 	const OC = 'oc';
+	const OJ = 'oj';
 	const OR_ = 'or';
 	const OM = 'om';
 	const PS = 'ps';
