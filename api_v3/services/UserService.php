@@ -615,6 +615,10 @@ class UserService extends KalturaBaseUserService
 		{
 			throw new KalturaAPIException(KalturaErrors::ERROR_IN_QR_GENERATION);
 		}
+
+		$loginData->setPasswordHashKey(null);
+		$loginData->save();
+
 		return $imgContent;
 	}
 
