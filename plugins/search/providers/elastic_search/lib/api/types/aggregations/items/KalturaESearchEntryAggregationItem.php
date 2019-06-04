@@ -32,17 +32,17 @@ class KalturaESearchEntryAggregationItem extends KalturaESearchAggregationItem
 			KalturaESearchEntryAggregateByFieldName::ACCESS_CONTROL_PROFILE => ESearchEntryAggregationFieldName::ACCESS_CONTROL_PROFILE);
 	}
 
-	public function coreToApiResponse($coreRespone)
+	public function coreToApiResponse($coreResponse)
 	{
 		$bucketsArray = new KalturaESearchAggregationBucketsArray();
-		$buckets = $coreRespone['buckets'];
+		$buckets = $coreResponse[ESearchAggregations::BUCKETS];
 		if ($buckets)
 		{
 			foreach ($buckets as $bucket)
 			{
-				$reponseBucket = new KalturaESearchAggregationBucket();
-				$reponseBucket->fromArray($bucket);
-				$bucketsArray[] = $reponseBucket;
+				$responseBucket = new KalturaESearchAggregationBucket();
+				$responseBucket->fromArray($bucket);
+				$bucketsArray[] = $responseBucket;
 			}
 		}
 		return $bucketsArray;

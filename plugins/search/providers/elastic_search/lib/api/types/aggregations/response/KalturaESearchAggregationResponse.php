@@ -36,28 +36,6 @@ class KalturaESearchAggregationResponse extends KalturaObject
 			$agg->buckets = $objectItemHandler->coreToApiResponse($response);
 			$aggs[] = $agg;
 		}
-/*
-			$buckets=null;
-			if(isset($response['buckets']))
-			{
-				$buckets = $response['buckets'];
-			}
-			elseif (isset($response['NestedBucket']))
-			{
-				$buckets = $response['NestedBucket']['buckets'];
-			}
-			if ($buckets)
-			{
-				$agg->buckets = new KalturaESearchAggregationBucketsArray();
-				foreach ($buckets as $bucket)
-				{
-					$reponseBucket = new KalturaESearchAggregationBucket();
-					$reponseBucket->fromArray($bucket);
-					$agg->buckets[] = $reponseBucket;
-				}
-			}
-			$aggs[] = $agg;
-		}*/
 		return $aggs;
 	}
 

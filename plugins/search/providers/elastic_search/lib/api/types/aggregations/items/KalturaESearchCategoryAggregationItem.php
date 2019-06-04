@@ -31,19 +31,19 @@ class KalturaESearchCategoryAggregationItem extends KalturaESearchAggregationIte
 
 	}
 
-	public function coreToApiResponse($coreRespone)
+	public function coreToApiResponse($coreResponse)
 	{
 		$bucketsArray = new KalturaESearchAggregationBucketsArray();
-		$buckets = $coreRespone['buckets'];
+		$buckets = $coreResponse[ESearchAggregations::BUCKETS];
 		if ($buckets)
 		{
 			foreach ($buckets as $bucket)
 			{
-				$reponseBucket = new KalturaESearchAggregationBucket();
-				$reponseBucket->fromArray($bucket);
-				list(,$categoryName) = elasticSearchUtils::reverseFormatCategoryNameStatus($reponseBucket->value);
-				$reponseBucket->value = $categoryName;
-				$bucketsArray[] = $reponseBucket;
+				$responseBucket = new KalturaESearchAggregationBucket();
+				$responseBucket->fromArray($bucket);
+				list(,$categoryName) = elasticSearchUtils::reverseFormatCategoryNameStatus($responseBucket->value);
+				$responseBucket->value = $categoryName;
+				$bucketsArray[] = $responseBucket;
 			}
 
 		}

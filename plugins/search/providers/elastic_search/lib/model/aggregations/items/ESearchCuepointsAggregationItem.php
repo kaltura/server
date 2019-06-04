@@ -14,12 +14,11 @@ class ESearchCuepointsAggregationItem extends ESearchAggregationItem
 	const KEY = 'cue_points';
 	public function getAggregationCommand()
 	{
-		return array ('nested' =>
-			array('path' => "cue_points"),
-					'aggs'=>array('NestedBucket' =>
-						array('terms' =>
-							array ('field' => $this->getFieldName(),
-								'size' =>$this->getSize()))));
+		return array (ESearchAggregations::NESTED =>
+			array(ESearchAggregations::PATH => "cue_points"),
+					ESearchAggregations::AGGS=>array(self::NESTED_BUCKET =>
+						parent::getAggregationCommand()
+					));
 	}
 
 	public  function getAggregationKey()

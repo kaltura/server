@@ -26,17 +26,33 @@ class KalturaESearchMetadataAggregationItem extends KalturaESearchAggregationIte
 		return array ();
 	}
 
+	protected function getMetadataFieldNameFromXpath($xpath)
+	{
+		$token = explode("'", $xpath);
+		return $token[3];
+	}
+
 	public function coreToApiResponse($coreRespone)
 	{
 		$bucketsArray = new KalturaESearchAggregationBucketsArray();
-		$buckets = $coreRespone['NestedBucket']['buckets'];
+		$buckets = $coreRespone[ESearchAggregationItem::NESTED_BUCKET][ESearchAggregations::BUCKETS];
 		if ($buckets)
 		{
 			foreach ($buckets as $bucket)
 			{
-				$reponseBucket = new KalturaESearchAggregationBucket();
-				$reponseBucket->fromArray($bucket);
-				$bucketsArray[] = $reponseBucket;
+				//get the field name from the xpath
+				$metadataFieldName = $this->getMetadataFieldNameFromXpath($bucket[ESearchAggregations::KEY]);
+
+				// loop over the subaggs
+				$subBuckets = $bucket[ESearchMetadataAggregationItem::SUB_AGG][ESearchAggregations::BUCKETS];
+				foreach($subBuckets as $subBucket)
+				{
+					$responseBucket = new KalturaESearchAggregationBucket();
+					$responseBucket->value = $metadataFieldName.':'. $subBucket[ESearchAggregations::KEY];
+					$responseBucket->count = $subBucket[ESearchAggregations::DOC_COUNT];
+					$bucketsArray[] = $responseBucket;
+				}
+
 			}
 		}
 		return $bucketsArray;

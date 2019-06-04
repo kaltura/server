@@ -5,9 +5,8 @@
  */
 abstract class ESearchAggregationItem extends BaseObject
 {
-	const SIZE = 'size';
-
 	const DEFAULT_SIZE = 5;
+	const NESTED_BUCKET = 'NestedBucket';
 
 	/**
 	 * @var int
@@ -46,14 +45,11 @@ abstract class ESearchAggregationItem extends BaseObject
 		$this->fieldName = $fieldName;
 	}
 
-	public abstract function getAggregationCommand();
-
-	public abstract function getAggregationKey();
-
-	public function getCommandKey()
+	public function getAggregationCommand()
 	{
-		return $this->getAggregationKey().':'.$this->getFieldName();
+		return array(ESearchAggregations::TERMS =>
+				array(ESearchAggregations::FIELD => $this->fieldName, ESearchAggregations::SIZE => $this->getSize()));
 	}
 
-
+	public abstract function getAggregationKey();
 }

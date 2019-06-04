@@ -13,12 +13,6 @@ class ESearchEntryAggregationItem extends ESearchAggregationItem
 
 	const KEY = 'entries';
 
-	public function getAggregationCommand()
-	{
-		return array('terms' =>
-				array('field' => $this->fieldName,
-						'size' =>$this->getSize()));
-	}
 	public  function getAggregationKey()
 	{
 		return self::KEY;

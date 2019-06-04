@@ -17,11 +17,4 @@ class ESearchCategoryAggregationItem extends ESearchAggregationItem
 	{
 		return self::KEY;
 	}
-
-	public function getAggregationCommand()
-	{
-		return array('terms' =>
-				 array('field' => $this->fieldName,
-					 'size' =>$this->getSize()));
-	}
 }

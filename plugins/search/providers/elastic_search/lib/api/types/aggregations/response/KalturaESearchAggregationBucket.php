@@ -6,7 +6,7 @@
 class KalturaESearchAggregationBucket extends KalturaObject
 {
 	/**
-	 * @var KalturaString
+	 * @var string
 	 */
 	public $value;
 
@@ -17,8 +17,8 @@ class KalturaESearchAggregationBucket extends KalturaObject
 
 
 	private static $map_between_objects = array(
-		'value'=>'key',
-		'count'=>'doc_count'
+		'value'=>ESearchAggregations::KEY,
+		'count'=>ESearchAggregations::DOC_COUNT
 	);
 
 	protected function getMapBetweenObjects()

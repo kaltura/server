@@ -27,17 +27,17 @@ class KalturaESearchCuepointsAggregationItem extends KalturaESearchAggregationIt
 			KalturaESearchCuePointAggregateByFieldName::TYPE => ESearchCuePointsAggregationFieldName::TYPE);
 	}
 
-	public function coreToApiResponse($coreRespone)
+	public function coreToApiResponse($coreResponse)
 	{
 		$bucketsArray = new KalturaESearchAggregationBucketsArray();
-		$buckets = $coreRespone['NestedBucket']['buckets'];
+		$buckets = $coreResponse[ESearchAggregationItem::NESTED_BUCKET][ESearchAggregations::BUCKETS];
 		if ($buckets)
 		{
 			foreach ($buckets as $bucket)
 			{
-				$reponseBucket = new KalturaESearchAggregationBucket();
-				$reponseBucket->fromArray($bucket);
-				$bucketsArray[] = $reponseBucket;
+				$responseBucket = new KalturaESearchAggregationBucket();
+				$responseBucket->fromArray($bucket);
+				$bucketsArray[] = $responseBucket;
 			}
 		}
 		return $bucketsArray;

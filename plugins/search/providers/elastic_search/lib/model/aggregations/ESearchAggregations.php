@@ -5,6 +5,16 @@
  */
 class ESearchAggregations extends BaseObject
 {
+	const BUCKET = 'bucket';
+	const DOC_COUNT = 'doc_count';
+	const TERMS = 'terms';
+	const SIZE = 'size';
+	const AGGS = 'aggs';
+	const FIELD = 'field';
+	const NESTED = 'nested';
+	const PATH = 'path';
+	const KEY = 'key';
+	const BUCKETS = 'buckets';
 	/**
 	 * @var array
 	 */
