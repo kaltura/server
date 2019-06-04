@@ -40,7 +40,7 @@ class kAuthManager implements kObjectChangedEventConsumer
 			{
 				authenticationUtils::generateNewSeed($adminKuser);
 			}
-			$job = authenticationUtils::addAuthMailJob($adminKuser, kuserPeer::KALTURA_EXISTING_USER_ENABLE_2FA_EMAIL);
+			$job = authenticationUtils::addAuthMailJob($object, $adminKuser, kuserPeer::KALTURA_EXISTING_USER_ENABLE_2FA_EMAIL);
 			if(!$job)
 			{
 				KalturaLog::warning('Missing QR URL, Mail Job was not added');

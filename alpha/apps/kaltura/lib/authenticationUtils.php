@@ -31,17 +31,19 @@ class authenticationUtils
 		$userLoginData->save();
 	}
 
-	public static function addAuthMailJob($kuser, $mailType)
+	public static function addAuthMailJob($partner, $kuser, $mailType)
 	{
 		$loginData = $kuser->getLoginData();
 		$loginData->setPasswordHashKey($loginData->newPassHashKey());
 		$loginData->save();
-		$resetPasswordLink = UserLoginDataPeer::getPassResetLink($loginData->getPasswordHashKey());
+		$resetPasswordLink = UserLoginDataPeer::getAuthInfoLink($loginData->getPasswordHashKey());
 		if(!$resetPasswordLink)
 		{
 			return null;
 		}
-		$bodyParams = array($kuser->getFullName(), $kuser->getPartnerId(), $resetPasswordLink);
+		$partnerId = $partner->getId();
+		$publisherName = $partner->getName();
+		$bodyParams = array($kuser->getFullName(), $partnerId, $resetPasswordLink, $kuser->getEmail(), $partnerId, $publisherName, $publisherName, $kuser->getUserRoleNames(), $publisherName, $kuser->getPuserId());
 
 		$job = kJobsManager::addMailJob(
 			null,
