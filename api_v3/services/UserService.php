@@ -72,6 +72,10 @@ class UserService extends KalturaBaseUserService
 		try
 		{
 			if (!is_null($user->roleIds)) {
+				if ($this->getPartnerId() == Partner::ADMIN_CONSOLE_PARTNER_ID && !kPermissionManager::isPermitted(PermissionName::SYSTEM_ADMIN_PERMISSIONS_UPDATE))
+				{
+					throw new KalturaAPIException(KalturaErrors::NOT_ALLOWED_TO_CHANGE_ROLE);
+				}
 				UserRolePeer::testValidRolesForUser($user->roleIds, $this->getPartnerId());
 				if ($user->roleIds != $dbUser->getRoleIds() &&
 					$dbUser->getId() == $this->getKuser()->getId()) {
