@@ -211,6 +211,9 @@ class KalturaBaseUserService extends KalturaBaseService
 			else if ($code == kUserException::INVALID_OTP) {
 				throw new KalturaAPIException(KalturaErrors::INVALID_OTP);
 			}
+			else if ($code == kUserException::MISSING_OTP) {
+					throw new KalturaAPIException(KalturaErrors::MISSING_OTP);
+			}
 									
 			throw new $e;
 		}
@@ -283,9 +286,20 @@ class KalturaBaseUserService extends KalturaBaseService
 			
 			throw $e;
 		}
-		if (!$result) {
+		if (!$result)
+		{
 			throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 		}
+		else
+		{
+			$response = new KalturaAuthentication();
+			if($result !== true)
+			{
+				$response->qrCode = $result;
+			}
+			return $response;
+		}
+
 	}
 	
 	protected function validateApiAccessControlByEmail($email)

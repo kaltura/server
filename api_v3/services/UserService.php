@@ -583,4 +583,48 @@ class UserService extends KalturaBaseUserService
 		$file_path = ExportCsvService::generateCsvPath($id, $this->getKs());
 		return $this->dumpFile($file_path, 'text/csv');
 	}
+
+	/**
+	 * get QR image content
+	 *
+	 * @action generateQrCode
+	 * @param string $hashKey
+	 * @return string
+	 * @throws KalturaErrors::INVALID_HASH
+	 * @throws KalturaErrors::INVALID_USER_ID
+	 * @throws KalturaErrors::ERROR_IN_QR_GENERATION
+	 *
+	 */
+	public function generateQrCodeAction($hashKey)
+	{
+		try
+		{
+			$loginData = UserLoginDataPeer::isHashKeyValid($hashKey);
+			if ($loginData)
+			{
+				$this->validateApiAccessControl($loginData->getLastLoginPartnerId());
+			}
+			$dbUser = kuserPeer::getAdminUser($loginData->getConfigPartnerId(), $loginData);
+		}
+		catch (kUserException $e)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_HASH);
+		}
+
+		if (!$dbUser)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $loginData->getLoginEmail());
+		}
+		$imgContent = authenticationUtils::getQRImage($dbUser);
+		if(!$imgContent)
+		{
+			throw new KalturaAPIException(KalturaErrors::ERROR_IN_QR_GENERATION);
+		}
+
+		$loginData->setPasswordHashKey(null);
+		$loginData->save();
+
+		return $imgContent;
+	}
+
 }
