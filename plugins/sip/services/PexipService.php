@@ -32,6 +32,7 @@ class PexipService extends KalturaBaseService
 	 */
 	public function generateSipUrlAction($entryId, $regenerate = false)
 	{
+		kApiCache::disableCache();
 		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_SIP, $this->getPartnerId()))
 		{
 			throw new KalturaAPIException (APIErrors::FEATURE_FORBIDDEN, $this->serviceId . '->' . $this->actionName);
@@ -66,6 +67,7 @@ class PexipService extends KalturaBaseService
 	 */
 	public function handleIncomingCallAction()
 	{
+		kApiCache::disableCache();
 		$response = new KalturaSipResponse();
 		$response->action = 'reject';
 		$response->sessionId = UniqueId::get();
@@ -115,7 +117,7 @@ class PexipService extends KalturaBaseService
 		if(!kPexipUtils::validateLicensesAvailable($pexipConfig))
 		{
 			$msg = 'Max number of active rooms reached. Please try again shortly.';
-			kPexipUtils::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
+			kPexipUtils::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
 			return $response;
 		}
 
@@ -124,7 +126,7 @@ class PexipService extends KalturaBaseService
 		if (!$sipEntryServerNode)
 		{
 			$msg = 'Entry is Live and Active. can\'t connect call.';
-			kPexipUtils::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
+			kPexipUtils::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
 			return $response;
 		}
 
