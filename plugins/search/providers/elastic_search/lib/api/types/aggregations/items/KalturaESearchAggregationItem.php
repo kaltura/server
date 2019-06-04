@@ -36,5 +36,6 @@ abstract class KalturaESearchAggregationItem extends KalturaObject
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 
+	abstract public function coreToApiResponse($coreResponse);
 
 }
