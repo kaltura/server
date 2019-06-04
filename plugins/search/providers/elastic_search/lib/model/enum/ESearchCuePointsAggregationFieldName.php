@@ -5,6 +5,6 @@
  */
 interface ESearchCuePointsAggregationFieldName extends BaseEnum
 {
-	const TAGS = 'cue_point_tags.raw';
-	const TYPE = 'cue_point_type';
+	const TAGS = 'cue_points.cue_point_tags.raw';
+	const TYPE = 'cue_points.cue_point_type';
 }
