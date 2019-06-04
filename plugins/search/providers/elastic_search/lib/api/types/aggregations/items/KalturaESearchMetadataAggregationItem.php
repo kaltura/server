@@ -32,10 +32,10 @@ class KalturaESearchMetadataAggregationItem extends KalturaESearchAggregationIte
 		return $token[3];
 	}
 
-	public function coreToApiResponse($coreRespone)
+	public function coreToApiResponse($coreResponse)
 	{
 		$bucketsArray = new KalturaESearchAggregationBucketsArray();
-		$buckets = $coreRespone[ESearchAggregationItem::NESTED_BUCKET][ESearchAggregations::BUCKETS];
+		$buckets = $coreResponse[ESearchAggregationItem::NESTED_BUCKET][ESearchAggregations::BUCKETS];
 		if ($buckets)
 		{
 			foreach ($buckets as $bucket)
