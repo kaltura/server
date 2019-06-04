@@ -14,7 +14,9 @@ class KalturaESearchCuepointsAggregationItem extends KalturaESearchAggregationIt
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (!$object_to_fill)
+		{
 			$object_to_fill = new ESearchCuepointsAggregationItem();
+		}
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 
@@ -25,9 +27,19 @@ class KalturaESearchCuepointsAggregationItem extends KalturaESearchAggregationIt
 			KalturaESearchCuePointAggregateByFieldName::TYPE => ESearchCuePointsAggregationFieldName::TYPE);
 	}
 
-	public function coreToApiResponse($aggregation)
+	public function coreToApiResponse($coreRespone)
 	{
-
+		$bucketsArray = new KalturaESearchAggregationBucketsArray();
+		$buckets = $coreRespone['NestedBucket']['buckets'];
+		if ($buckets)
+		{
+			foreach ($buckets as $bucket)
+			{
+				$reponseBucket = new KalturaESearchAggregationBucket();
+				$reponseBucket->fromArray($bucket);
+				$bucketsArray[] = $reponseBucket;
+			}
+		}
+		return $bucketsArray;
 	}
-
 }

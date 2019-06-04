@@ -8,6 +8,6 @@ interface ESearchEntryAggregationFieldName extends BaseEnum
 {
 	const ENTRY_TYPE = 'entry_type';
 	const MEDIA_TYPE = 'media_type';
-	const TAGS = 'tags';
+	const TAGS = 'tags.raw';
 	const ACCESS_CONTROL_PROFILE = 'access_control_profile_id';
 }

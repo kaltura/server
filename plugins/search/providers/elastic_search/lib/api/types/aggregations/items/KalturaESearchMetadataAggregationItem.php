@@ -15,7 +15,9 @@ class KalturaESearchMetadataAggregationItem extends KalturaESearchAggregationIte
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (!$object_to_fill)
+		{
 			$object_to_fill = new ESearchMetadataAggregationItem();
+		}
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 
@@ -24,9 +26,21 @@ class KalturaESearchMetadataAggregationItem extends KalturaESearchAggregationIte
 		return array ();
 	}
 
-	public function coreToApiResponse($response, $request)
+	public function coreToApiResponse($coreRespone)
 	{
-		return $response['MetadataAggs']['buckets'];
+		$bucketsArray = new KalturaESearchAggregationBucketsArray();
+		$buckets = $coreRespone['NestedBucket']['buckets'];
+		if ($buckets)
+		{
+			foreach ($buckets as $bucket)
+			{
+				$reponseBucket = new KalturaESearchAggregationBucket();
+				$reponseBucket->fromArray($bucket);
+				$bucketsArray[] = $reponseBucket;
+			}
+		}
+		return $bucketsArray;
 	}
+
 
 }

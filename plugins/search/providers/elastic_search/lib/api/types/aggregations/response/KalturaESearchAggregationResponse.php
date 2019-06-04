@@ -11,6 +11,16 @@ class KalturaESearchAggregationResponse extends KalturaObject
 		return explode(':', $aggregationName);
 	}
 
+	protected function mapAggregationCoreObjects($coreObject)
+	{
+		$map = array(ESearchCategoryAggregationItem::KEY => 'KalturaESearchCategoryAggregationItem',
+					 ESearchCuepointsAggregationItem::KEY => 'KalturaESearchCuepointsAggregationItem',
+					 ESearchMetadataAggregationItem::KEY => 'KalturaESearchMetadataAggregationItem',
+			         ESearchEntryAggregationItem::KEY => 'KalturaESearchEntryAggregationItem');
+		$ret = isset($map[$coreObject]) ? $map[$coreObject] : null;
+		return $ret;
+	}
+
 	public function resultToApi($aggregationResults)
 	{
 		$aggs = new KalturaESearchAggregationResponseArray();
@@ -20,6 +30,13 @@ class KalturaESearchAggregationResponse extends KalturaObject
 			$agg = new KalturaESearchAggregationResponseItem();
 			$agg->fieldName = $fieldName;
 			$agg->name = $responseObject;
+
+			$itemObjectName = $this->mapAggregationCoreObjects($responseObject);
+			$objectItemHandler = new $itemObjectName();
+			$agg->buckets = $objectItemHandler->coreToApiResponse($response);
+			$aggs[] = $agg;
+		}
+/*
 			$buckets=null;
 			if(isset($response['buckets']))
 			{
@@ -40,7 +57,7 @@ class KalturaESearchAggregationResponse extends KalturaObject
 				}
 			}
 			$aggs[] = $agg;
-		}
+		}*/
 		return $aggs;
 	}
 
