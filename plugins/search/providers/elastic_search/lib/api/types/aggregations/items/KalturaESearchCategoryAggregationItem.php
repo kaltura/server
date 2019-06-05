@@ -35,7 +35,7 @@ class KalturaESearchCategoryAggregationItem extends KalturaESearchAggregationIte
 	{
 		$agg = new KalturaESearchAggregationResponseItem();
 		$agg->fieldName = $fieldName;
-		$agg->name = 'category';
+		$agg->name = ESearchCategoryAggregationItem::KEY;
 		$bucketsArray = new KalturaESearchAggregationBucketsArray();
 		$buckets = $coreResponse[ESearchAggregations::BUCKETS];
 		if ($buckets)

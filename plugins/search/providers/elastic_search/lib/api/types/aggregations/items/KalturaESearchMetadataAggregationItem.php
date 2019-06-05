@@ -42,7 +42,7 @@ class KalturaESearchMetadataAggregationItem extends KalturaESearchAggregationIte
 			foreach ($buckets as $bucket)
 			{
 				$agg = new KalturaESearchAggregationResponseItem();
-				$agg->name = 'metadata';
+				$agg->name = ESearchMetadataAggregationItem::KEY;
 
 				//get the field name from the xpath
 				$metadataFieldName = $this->getMetadataFieldNameFromXpath($bucket[ESearchAggregations::KEY]);

@@ -31,7 +31,7 @@ class KalturaESearchCuepointsAggregationItem extends KalturaESearchAggregationIt
 	{
 		$agg = new KalturaESearchAggregationResponseItem();
 		$agg->fieldName = $fieldName;
-		$agg->name = 'cuepoints';
+		$agg->name = ESearchCuepointsAggregationItem::KEY;
 
 		$bucketsArray = new KalturaESearchAggregationBucketsArray();
 		$buckets = $coreResponse[ESearchAggregationItem::NESTED_BUCKET][ESearchAggregations::BUCKETS];
