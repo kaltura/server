@@ -126,7 +126,7 @@ class kFileBase
 	 * @param int $newFileSize
 	 * @return bool true on success or false on failure.
 	 */
-    public static function truncateFile($fileName, $newFileSize)
+	public static function truncateFile($fileName, $newFileSize)
 	{
 		$fp = fopen($fileName, "r+");
 		$res = ftruncate($fp, $newFileSize);
