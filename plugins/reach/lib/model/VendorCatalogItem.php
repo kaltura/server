@@ -107,6 +107,10 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 				$serviceFeatureName = "audio description";
 				break;
 
+			case VendorServiceFeature::CHAPTERING:
+				$serviceFeatureName = "chaptering";
+				break;
+
 			default:
 				$serviceFeatureName = "";
 		}

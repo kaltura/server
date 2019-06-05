@@ -16,9 +16,6 @@ deployTemplate($script, $taskDone);
 $taskApprovedModeration = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_task_approved_moderation.xml");
 deployTemplate($script, $taskApprovedModeration);
 
-$taskPendingModeration = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_pending_moderation.xml");
-deployTemplate($script, $taskPendingModeration);
-
 function deployTemplate($script, $config)
 {
 	if(!file_exists($config))

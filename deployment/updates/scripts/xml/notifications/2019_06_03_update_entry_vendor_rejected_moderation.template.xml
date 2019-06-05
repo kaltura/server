@@ -56,14 +56,14 @@
                         <key>creator_email</key>
                         <description>Task creator email</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>$scope->getObject()->getUserId()</code>
+                            <code>$scope->getEvent()->getObject()->getKuser() ? $scope->getEvent()->getObject()->getKuser()->getEmail() : ""</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
                         <key>creator_name</key>
                         <description>Entry creator name</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>$scope->getEvent()->getObject()->getkuser()->getFirstName() . ' ' . $scope->getEvent()->getObject()->getkuser()->getLastName()</code>
+                            <code>$scope->getEvent()->getObject()->getKuser()->getFirstName() . ' ' . $scope->getEvent()->getObject()->getKuser()->getLastName()</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">

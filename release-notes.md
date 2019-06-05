@@ -9,7 +9,6 @@
 	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_rejected_moderation.template.xml
     /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_task_done.template.xml
     /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_task_approved_moderation.template.xml
-    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_pending_moderation.template.xml
 		
 #### Deployment Scripts ####	
     php /opt/kaltura/app/deployment/updates/scripts/2019_06_03_deploy_update_reach_notifications.php
