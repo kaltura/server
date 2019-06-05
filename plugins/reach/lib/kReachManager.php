@@ -336,7 +336,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			/* @var $pendingEntryReadyTask EntryVendorTask */
 			$newStatus = $pendingEntryReadyTask->getIsRequestModerated() ? EntryVendorTaskStatus::PENDING_MODERATION : EntryVendorTaskStatus::PENDING;
 			$pendingEntryReadyTask->setStatus($newStatus);
-			$pendingEntryReadyTask->setAccessKey(kReachUtils::generateReachVendorKs($pendingEntryReadyTask->getEntryId(), $pendingEntryReadyTask->getIsRequestModerated(), $pendingEntryReadyTask->getCatalogItem()->getKsExpiry()));
+			$pendingEntryReadyTask->setAccessKey(kReachUtils::generateReachVendorKs($pendingEntryReadyTask->getEntryId(), $pendingEntryReadyTask->getIsOutputModerated(), $pendingEntryReadyTask->getAccessKeyExpiry()));
 			if($pendingEntryReadyTask->getPrice() == 0)
 				$pendingEntryReadyTask->setPrice(kReachUtils::calculateTaskPrice($object, $pendingEntryReadyTask->getCatalogItem()));
 			$pendingEntryReadyTask->save();
