@@ -19,7 +19,7 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 	const TRANSLATION_OM_CLASS = 'VendorTranslationCatalogItem';
 	const ALIGNMENT_OM_CLASS = 'VendorAlignmentCatalogItem';
 	const AUDIO_DESCRIPTION_OM_CLASS = 'VendorAudioDescriptionCatalogItem';
-	const CHAPTERING_OM_CLASS = 'VendorChapteringCaptionsCatalogItem';
+	const CHAPTERING_OM_CLASS = 'VendorChapteringCatalogItem';
 	
 	// cache classes by their type
 	protected static $class_types_cache = array(

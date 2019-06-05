@@ -35,7 +35,7 @@ class KalturaVendorChapteringCatalogItem extends KalturaVendorCatalogItem
 	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (is_null($object_to_fill))
-			$object_to_fill = new VendorChapteringCaptionsCatalogItem();
+			$object_to_fill = new VendorChapteringCatalogItem();
 		
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
@@ -53,7 +53,7 @@ class KalturaVendorChapteringCatalogItem extends KalturaVendorCatalogItem
 	{
 		if(is_null($sourceObject))
 		{
-			$sourceObject = new VendorChapteringCaptionsCatalogItem();
+			$sourceObject = new VendorChapteringCatalogItem();
 		}
 		
 		return parent::toObject($sourceObject, $propertiesToSkip);

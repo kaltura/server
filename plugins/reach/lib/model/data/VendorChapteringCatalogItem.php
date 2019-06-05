@@ -13,7 +13,7 @@
  * @package plugins.reach
  * @subpackage model
  */
-class VendorChapteringCaptionsCatalogItem extends VendorCatalogItem
+class VendorChapteringCatalogItem extends VendorCatalogItem
 {
 	public function applyDefaultValues()
 	{
