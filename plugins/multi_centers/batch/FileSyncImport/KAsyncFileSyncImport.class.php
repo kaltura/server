@@ -388,7 +388,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 					KalturaLog::err("$curlError");
 					return false;
 				}
-				elseif($isErrorResponse)
+				elseif($isErrorResponse && $resumeOffset)
 				{
 					// Server error occurred, unlink current file to avoid file corruption on resume
 					KalturaLog::log("Got bad status code from server, truncating file [$fileDestination] to last known good size, to avoid file corruption");
