@@ -119,6 +119,21 @@ class kFileBase
         umask($oldUmask);
         return $result;
     }
+	
+	/**
+	 * Truncate the given with the same contnet of the given size
+	 * @param string $fileName
+	 * @param int $newFileSize
+	 * @return bool true on success or false on failure.
+	 */
+    public static function truncateFile($fileName, $newFileSize)
+	{
+		$fp = fopen($fileName, "r+");
+		$res = ftruncate($fp, $newFileSize);
+		fclose($fp);
+		
+		return $res;
+	}
     
     /**
      *
