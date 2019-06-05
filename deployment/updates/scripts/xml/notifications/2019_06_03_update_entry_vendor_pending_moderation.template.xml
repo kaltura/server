@@ -28,12 +28,12 @@
                 <eventConditions objectType="array">
                     <item objectType="KalturaEventFieldCondition">
                         <field objectType="KalturaEvalBooleanField">
-                            <code>$scope->getObject() instanceof EntryVendorTask &amp;&amp; $scope->getObject()->getStatus() == EntryVendorTaskStatus::PENDING_MODERATION</code>
+                            <code>$scope->getDynamicValueByKey("reach_profile_id_equal") ? $scope->getObject()->getReachProfileId() == (int)$scope->getDynamicValueByKey("reach_profile_id_equal") : 1</code>
                         </field>
                     </item>
                     <item objectType="KalturaEventFieldCondition">
                         <field objectType="KalturaEvalBooleanField">
-                            <code>$scope->getDynamicValueByKey("reach_profile_id_equal") ? (string)$scope->getObject()->getReachProfileId() == $scope->getDynamicValueByKey("reach_profile_id_equal") : 1</code>
+                            <code>$scope->getObject() instanceof EntryVendorTask &amp;&amp; $scope->getObject()->getStatus() == EntryVendorTaskStatus::PENDING_MODERATION</code>
                         </field>
                     </item>
                 </eventConditions>
