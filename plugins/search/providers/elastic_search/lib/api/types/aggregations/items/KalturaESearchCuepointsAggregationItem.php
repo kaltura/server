@@ -27,7 +27,7 @@ class KalturaESearchCuepointsAggregationItem extends KalturaESearchAggregationIt
 			KalturaESearchCuePointAggregateByFieldName::TYPE => ESearchCuePointsAggregationFieldName::TYPE);
 	}
 
-	public function coreToApiResponse($coreResponse)
+	public function coreToApiResponse($coreResponse, $fieldName = null)
 	{
 		$bucketsArray = new KalturaESearchAggregationBucketsArray();
 		$buckets = $coreResponse[ESearchAggregationItem::NESTED_BUCKET][ESearchAggregations::BUCKETS];
@@ -37,6 +37,10 @@ class KalturaESearchCuepointsAggregationItem extends KalturaESearchAggregationIt
 			{
 				$responseBucket = new KalturaESearchAggregationBucket();
 				$responseBucket->fromArray($bucket);
+				if($fieldName === ESearchCuePointsAggregationFieldName::TYPE)
+				{
+					$responseBucket->value =  kPluginableEnumsManager::coreToApi('CuePointType',$responseBucket->value);
+				}
 				$bucketsArray[] = $responseBucket;
 			}
 		}

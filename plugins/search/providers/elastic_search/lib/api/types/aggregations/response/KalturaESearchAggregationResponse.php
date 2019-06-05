@@ -33,7 +33,7 @@ class KalturaESearchAggregationResponse extends KalturaObject
 
 			$itemObjectName = $this->mapAggregationCoreObjects($responseObject);
 			$objectItemHandler = new $itemObjectName();
-			$agg->buckets = $objectItemHandler->coreToApiResponse($response);
+			$agg->buckets = $objectItemHandler->coreToApiResponse($response,$fieldName);
 			$aggs[] = $agg;
 		}
 		return $aggs;

@@ -32,7 +32,7 @@ class KalturaESearchEntryAggregationItem extends KalturaESearchAggregationItem
 			KalturaESearchEntryAggregateByFieldName::ACCESS_CONTROL_PROFILE => ESearchEntryAggregationFieldName::ACCESS_CONTROL_PROFILE);
 	}
 
-	public function coreToApiResponse($coreResponse)
+	public function coreToApiResponse($coreResponse, $fieldName = null)
 	{
 		$bucketsArray = new KalturaESearchAggregationBucketsArray();
 		$buckets = $coreResponse[ESearchAggregations::BUCKETS];
