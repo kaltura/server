@@ -16,7 +16,7 @@ class KalturaBulkUploadResultScheduleEvent extends KalturaBulkUploadResult
 	public $templateEntryId;
 	
 	/**
-	 * @var KalturaScheduleEventType
+	 * @var int
 	 */
 	public $eventType;
 	

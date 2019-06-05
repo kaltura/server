@@ -32,30 +32,30 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 		$bulkUploadResults = array();
 		foreach ($this->bulkUploadResults as $bulkUploadResult)
 		{
-			/* @var $bulkUploadResult KalturaBulkUploadResultScheduleEvent */
-			$event = $this->initEventObject($bulkUploadResult->eventType);
-			$event->summary = $bulkUploadResult->title;
-			$event->description = $bulkUploadResult->description;
-			$event->tags = $bulkUploadResult->tags;
-			$event->startDate = strtotime($bulkUploadResult->startTime);
-			$event->duration = $bulkUploadResult->duration;
-			$event->categoryIds = $bulkUploadResult->categoryIds;
-			$event->ownerId = $bulkUploadResult->eventOrganizerId;
-			$event->organizer = $bulkUploadResult->eventOrganizerId;
-			
-			if($bulkUploadResult->recurrence)
-			{
-				$event->recurrenceType = KalturaScheduleEventRecurrenceType::RECURRING;
-				$event->recurrence = $this->createRecurrenceObject($bulkUploadResult->recurrence, $bulkUploadResult->endTime);
-			}
-			else
-			{
-				$event->recurrenceType = KalturaScheduleEventRecurrenceType::NONE;
-				$event->endDate = strtotime($bulkUploadResult->endTime);
-			}
-			
 			try
 			{
+				/* @var $bulkUploadResult KalturaBulkUploadResultScheduleEvent */
+				$event = $this->initEventObject($bulkUploadResult->eventType);
+				$event->summary = $bulkUploadResult->title;
+				$event->description = $bulkUploadResult->description;
+				$event->tags = $bulkUploadResult->tags;
+				$event->startDate = strtotime($bulkUploadResult->startTime);
+				$event->duration = $bulkUploadResult->duration;
+				$event->categoryIds = $bulkUploadResult->categoryIds;
+				$event->ownerId = $bulkUploadResult->eventOrganizerId;
+				$event->organizer = $bulkUploadResult->eventOrganizerId;
+				
+				if($bulkUploadResult->recurrence)
+				{
+					$event->recurrenceType = KalturaScheduleEventRecurrenceType::RECURRING;
+					$event->recurrence = $this->createRecurrenceObject($bulkUploadResult->recurrence, $bulkUploadResult->endTime);
+				}
+				else
+				{
+					$event->recurrenceType = KalturaScheduleEventRecurrenceType::NONE;
+					$event->endDate = strtotime($bulkUploadResult->endTime);
+				}
+			
 				KBatchBase::impersonate($this->currentPartnerId);
 				
 				if ($bulkUploadResult->resourceId)
@@ -78,7 +78,6 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 				$scheduleEventResource = new KalturaScheduleEventResource();
 				$scheduleEventResource->resourceId = $bulkUploadResult->resourceId;
 				$scheduleEventResource->eventId = $event->id;
-				
 				
 				$this->schedulePlugin->scheduleEventResource->add($scheduleEventResource);
 				
@@ -247,8 +246,8 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 			case KalturaScheduleEventType::LIVE_STREAM:
 				return new KalturaLiveStreamScheduleEvent();
 			default:
-				KalturaLog::err("Invalid scheduled event type: $eventType!");
-				return null;
+				KalturaLog::notice("Invalid scheduled event type: $eventType!");
+				throw new KalturaBatchException("Invalid scheduled event type: $eventType", KalturaBatchJobErrorTypes::APP);
 		}
 	}
 	
@@ -312,7 +311,9 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 			$resourceFilter->systemNameEqual = $row['resource'];
 			$resourceFilter->statusEqual = KalturaScheduleResourceStatus::ACTIVE;
 			
+			KBatchBase::impersonate($this->getCurrentPartnerId());
 			$resourceResults = $this->schedulePlugin->scheduleResource->listAction($resourceFilter);
+			KBatchBase::unimpersonate();
 			
 			if (!$resourceResults->totalCount)
 			{
@@ -434,7 +435,6 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 			'title',
 			'resource',
 			'startTime',
-			'endTime',
 			'eventOrganizerId',
 			'contentOwnerId',
 		);
