@@ -29,6 +29,10 @@ class KalturaESearchCuepointsAggregationItem extends KalturaESearchAggregationIt
 
 	public function coreToApiResponse($coreResponse, $fieldName = null)
 	{
+		$agg = new KalturaESearchAggregationResponseItem();
+		$agg->fieldName = $fieldName;
+		$agg->name = 'cuepoints';
+
 		$bucketsArray = new KalturaESearchAggregationBucketsArray();
 		$buckets = $coreResponse[ESearchAggregationItem::NESTED_BUCKET][ESearchAggregations::BUCKETS];
 		if ($buckets)
@@ -44,6 +48,7 @@ class KalturaESearchCuepointsAggregationItem extends KalturaESearchAggregationIt
 				$bucketsArray[] = $responseBucket;
 			}
 		}
-		return $bucketsArray;
+		$agg->buckets = $bucketsArray;
+		return ($agg);
 	}
 }

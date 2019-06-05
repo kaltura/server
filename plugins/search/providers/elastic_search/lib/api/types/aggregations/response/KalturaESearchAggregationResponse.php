@@ -27,14 +27,14 @@ class KalturaESearchAggregationResponse extends KalturaObject
 		foreach ($aggregationResults as $key=>$response)
 		{
 			list ($responseObject, $fieldName) = $this->getApiObjects($key);
-			$agg = new KalturaESearchAggregationResponseItem();
-			$agg->fieldName = $fieldName;
-			$agg->name = $responseObject;
-
 			$itemObjectName = $this->mapAggregationCoreObjects($responseObject);
 			$objectItemHandler = new $itemObjectName();
-			$agg->buckets = $objectItemHandler->coreToApiResponse($response,$fieldName);
-			$aggs[] = $agg;
+			$aggsResponses = $objectItemHandler->coreToApiResponse($response,$fieldName);
+			foreach ($aggsResponses as $aggsResponse)
+			{
+				$aggs[] = $aggsResponse;
+			}
+
 		}
 		return $aggs;
 	}

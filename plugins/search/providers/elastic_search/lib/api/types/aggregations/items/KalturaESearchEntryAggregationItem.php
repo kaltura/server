@@ -34,10 +34,14 @@ class KalturaESearchEntryAggregationItem extends KalturaESearchAggregationItem
 
 	public function coreToApiResponse($coreResponse, $fieldName = null)
 	{
+		$agg = new KalturaESearchAggregationResponseItem();
+		$agg->fieldName = $fieldName;
+		$agg->name = 'entry';
 		$bucketsArray = new KalturaESearchAggregationBucketsArray();
 		$buckets = $coreResponse[ESearchAggregations::BUCKETS];
 		if ($buckets)
 		{
+
 			foreach ($buckets as $bucket)
 			{
 				$responseBucket = new KalturaESearchAggregationBucket();
@@ -45,7 +49,8 @@ class KalturaESearchEntryAggregationItem extends KalturaESearchAggregationItem
 				$bucketsArray[] = $responseBucket;
 			}
 		}
-		return $bucketsArray;
+		$agg->buckets = $bucketsArray;
+		return array($agg);
 	}
 
 
