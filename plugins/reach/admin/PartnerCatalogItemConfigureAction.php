@@ -104,6 +104,8 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 			return new Kaltura_Client_Reach_Type_VendorAlignmentCatalogItemFilter();
 		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION)
 			return new Kaltura_Client_Reach_Type_VendorAudioDescriptionCatalogItemFilter();
+		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::CHAPTERING)
+			return new Kaltura_Client_Reach_Type_VendorChapteringCatalogItemFilter();
 		else
 			return new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
 	}
