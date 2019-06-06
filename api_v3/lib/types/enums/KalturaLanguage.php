@@ -430,8 +430,8 @@ class KalturaLanguage extends KalturaStringEnum
 	const OJB = 'Ojibwa Northwestern';
 	const OJC = 'Ojibwa Central';
 	const OJG = 'Ojibwa Eastern';
-	const OJS = 'Ojibwa Severn';
-	const OJW = 'Ojibwa Western';
+	const OJS = 'Ojibwa	 Severn';
+	const OJW = 'Ojibwa	 Western';
 	const ONE = 'Oneida';
 	const ONO = 'Onondaga';
 	const OOD = 'Tohono Oodham';
