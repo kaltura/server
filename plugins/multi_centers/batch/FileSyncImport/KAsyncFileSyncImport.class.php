@@ -388,11 +388,11 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 					KalturaLog::err("$curlError");
 					return false;
 				}
-				elseif($isErrorResponse && $resumeOffset)
+				elseif($isErrorResponse)
 				{
 					// Server error occurred, unlink current file to avoid file corruption on resume
-					KalturaLog::log("Got bad status code from server, truncating file [$fileDestination] to last known good size, to avoid file corruption");
-					kFileBase::truncateFile($fileDestination, $resumeOffset);
+					$res = kFileBase::truncateFile($fileDestination, $resumeOffset);
+					KalturaLog::log("Got bad status code from server, truncating file [$fileDestination] to last known good size, to avoid file corruption. Truncate process returned with status code [$res]");
 					return false;
 				}
 				else

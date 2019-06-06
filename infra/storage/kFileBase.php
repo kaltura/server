@@ -129,6 +129,11 @@ class kFileBase
 	public static function truncateFile($fileName, $newFileSize)
 	{
 		$fp = fopen($fileName, "r+");
+		if($fp === false)
+		{
+			return false;
+		}
+		
 		$res = ftruncate($fp, $newFileSize);
 		fclose($fp);
 		
