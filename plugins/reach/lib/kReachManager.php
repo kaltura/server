@@ -93,6 +93,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			{
 				if (!$rule->getConditions())
 				{
+					self::$reachProfilesFilteredThatIncludesRegularRules[$profile->getId()] = $profile;
 					continue;
 				}
 				foreach ($rule->getConditions() as $condition)
