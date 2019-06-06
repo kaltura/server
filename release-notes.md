@@ -1,5 +1,15 @@
 # Orion 15.1.0 #
 
+## Block users from changing roles  ##
+- Issue Type: Task
+- Issue ID: PLAT-9896
+
+### Configuration ###
+None
+		
+#### Deployment Scripts ####	
+php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionsAndItems.php /opt/kaltura/app/deployment/permissions/partner.-2.ini
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_03_update_user_role_permissions.php
 
 ## Update Reach notification template:Entry_Vendor_Task_Pending_Moderation  ##
 - Issue Type: Task
