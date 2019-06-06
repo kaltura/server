@@ -1,5 +1,17 @@
 # Orion 15.1.0 #
 
+
+## Update Reach notification template:Entry_Vendor_Task_Pending_Moderation  ##
+- Issue Type: Task
+- Issue ID: REACH2-575
+
+### Configuration ###
+	First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_pending_moderation.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2019_06_03_deploy_update_entry_vendor_pending_moderation.php
+
 ## Reach notification templates ##
 - Issue Type: Task
 - Issue ID: REACH2-569
@@ -42,25 +54,27 @@ in [subjects]
 
 in [bodies]
 139 = "Hello,<BR><BR>Reason for the broadcast issue:<BR><BR>%s <BR><BR> Please contact your Account Manager to resolve this issue.<BR><BR>Kaltura Customer Service"
-
+	
 #### Deployment Scripts ####	
 NONE
 
 ## Add generateQrCode action to user service ##
 
-- Issue Type: Feature
-- Issue ID: KMCNG-2114
+ -Issue Type: Feature
+ -Issue ID: KMCNG-2114
 
 ### Configuration ###
+
 
     Add to local.ini uder password_reset_links url for the KMC qr page in the following way: qr_page = @URL_FOR_QR@
     
     Edit /opt/kaltura/app/configurations/batch/batches/Mailer/emails_en.ini:
     add constants, subjects and bodies as described in /opt/kaltura/app/batch/batches/Mailer/emails_en.template.ini for ids: 140, 141 and 142.   
 
+
 ### Deployment scripts ###
 
-	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_02_add_user_generate_qr_image.php
+       php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_02_add_user_generate_qr_image.php
 
 ## Deploy "Entry Vendor Task Finished Processing" HTTP notification (for MediaSpace) ##
  - Issue Type: Feature
