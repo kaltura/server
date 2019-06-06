@@ -42,7 +42,7 @@ abstract class KalturaESearchAggregationItem extends KalturaObject
 	{
 		if(is_null($this->fieldName))
 		{
-			throw new KalturaAPIException(KalturaESearchAggregationErrors::FIELD_NAME_MUST_BE_SUPPLIED);
+			throw new KalturaAPIException(KalturaESearchAggregationErrors::AGGREGATION_FIELD_NAME_MUST_BE_SUPPLIED);
 		}
 		parent::validateForUsage($sourceObject, $propertiesToSkip);
 	}
