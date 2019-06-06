@@ -38,4 +38,12 @@ abstract class KalturaESearchAggregationItem extends KalturaObject
 
 	abstract public function coreToApiResponse($coreResponse,$fieldName = null);
 
+	public function validateForUsage($sourceObject, $propertiesToSkip = array())
+	{
+		if(is_null($this->fieldName))
+		{
+			throw new KalturaAPIException(KalturaESearchAggregationErrors::FIELD_NAME_MUST_BE_SUPPLIED);
+		}
+		parent::validateForUsage($sourceObject, $propertiesToSkip);
+	}
 }

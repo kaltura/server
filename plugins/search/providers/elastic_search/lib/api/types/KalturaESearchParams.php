@@ -20,17 +20,12 @@ abstract class KalturaESearchParams extends KalturaObject
 	 */
 	public $orderBy;
 
-	/**
-	 * @var KalturaESearchAggregation
-	 */
-	public $aggregations;
 
 	private static $mapBetweenObjects = array
 	(
 		"objectStatuses",
 		"objectId",
-		"orderBy",
-		"aggregations"
+		"orderBy"
 	);
 
 	public function getMapBetweenObjects()

@@ -35,7 +35,7 @@ class KalturaESearchMetadataAggregationItem extends KalturaESearchAggregationIte
 	public function coreToApiResponse($coreResponse, $fieldName=null)
 	{
 		$ret = array();
-		$bucketsArray = new KalturaESearchAggregationBucketsArray();
+
 		$buckets = $coreResponse[ESearchAggregationItem::NESTED_BUCKET][ESearchAggregations::BUCKETS];
 		if ($buckets)
 		{
@@ -43,11 +43,11 @@ class KalturaESearchMetadataAggregationItem extends KalturaESearchAggregationIte
 			{
 				$agg = new KalturaESearchAggregationResponseItem();
 				$agg->name = ESearchMetadataAggregationItem::KEY;
-
 				//get the field name from the xpath
 				$metadataFieldName = $this->getMetadataFieldNameFromXpath($bucket[ESearchAggregations::KEY]);
 				$agg->fieldName = $metadataFieldName;
-				// loop over the subaggs
+				// loop over the sub aggregations
+				$bucketsArray = new KalturaESearchAggregationBucketsArray();
 				$subBuckets = $bucket[ESearchMetadataAggregationItem::SUB_AGG][ESearchAggregations::BUCKETS];
 				foreach($subBuckets as $subBucket)
 				{
@@ -62,5 +62,9 @@ class KalturaESearchMetadataAggregationItem extends KalturaESearchAggregationIte
 		return $ret;
 	}
 
+	public function validateForUsage($sourceObject, $propertiesToSkip = array())
+	{
+		KalturaObject::validateForUsage($sourceObject, $propertiesToSkip);
+	}
 
 }

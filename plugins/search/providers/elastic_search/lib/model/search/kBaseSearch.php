@@ -23,7 +23,7 @@ abstract class kBaseSearch
 		$this->forceInnerHitsSizeOverride = false;
 	}
 
-	public abstract function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null);
+	public abstract function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null, ESearchOrderBy $order = null);
 
 	/**
 	 * @return ESearchQueryAttributes
