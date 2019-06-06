@@ -99,7 +99,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const NE = 'Nepali';
 	const NO = 'Norwegian';
 	const OC = 'Occitan';
-	const OJ = 'Ojibwe';
+	const OJ = 'Ojibwe, Ojibwa';
 	const OR_ = 'Oriya';
 	const OM = 'Oromo (Afan, Galla)';
 	const PS = 'Pashto (Pushto)';

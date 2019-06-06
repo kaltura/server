@@ -114,7 +114,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				'Nepali' =>	'nep',
 				'Norwegian' =>	'nor',
 				'Occitan' =>	'oci',
-				'Ojibwe' => 'oji',
+				'Ojibwe, Ojibwa' => 'oji',
 				'Oriya' =>	'ori',
 				'Oromo (Afan, Galla)' =>	'orm',
 				'Pashto (Pushto)' =>	'pus',
