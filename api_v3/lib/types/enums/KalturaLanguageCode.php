@@ -100,6 +100,8 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const NO = 'no';
 	const OC = 'oc';
 	const OJ = 'oj';
+	const OJS = 'ojs';
+	const OJW = 'ojw';
 	const OR_ = 'or';
 	const OM = 'om';
 	const PS = 'ps';
@@ -160,4 +162,9 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const UN = 'un';
 	const MIC = 'mic';
 	const TCE = 'tce';
+	const SAL = 'sal';
+	const ALG = 'alg';
+	const ATH = 'ath';
+	const SMI = 'smi';
+	CONST IRO = 'iro';
 }

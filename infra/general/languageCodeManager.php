@@ -245,6 +245,7 @@ class languageCodeManager
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'GA', "ga", "gle", "gle", "Irish", "Gaeilge",'Irish');
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'IG', "ig", "ibo", "ibo", "Igbo", "As\xe1\xbb\xa5s\xe1\xbb\xa5 Igbo",'Igbo');//not yet defined in kaltura
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'IK', "ik", "ipk", "ipk", "Inupiaq", "I\xc3\xb1upiaq, I\xc3\xb1upiatun",'Inupiak');
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'IRO', "iro", "iro", "iro", "Iroquoian languages", "",'Iroquoian languages');
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'IO', "io", "ido", "ido", "Ido", "Ido",'Ido');//not yet defined in kaltura
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'IS', "is", "isl", "ice", "Icelandic", "\xc3\x8dslenska",'Icelandic');
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'IT', "it", "ita", "ita", "Italian", "italiano",'Italian');
@@ -398,7 +399,8 @@ class languageCodeManager
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"AKZ",null,null ,"akz","Alabama","Albaamo innaa\xc9\xaciilka");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"ALC",null,null ,"alc","Qawasqar","Alacalufe");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"ALE",null,"ale","ale","Aleut","Unangax tunuu");
-        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"ALN",null,null ,"aln","Albanian (Gheg);","Gegnisht");
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"ALG","alg","alg","alg","Algonquian languages","");
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"ALN",null,null ,"aln","Albanian (Gheg);","Gegnisht");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"ALQ",null,null ,"alq","Algonquin","Anishnaabemowin (Omaamiwininimowin);");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"ALS",null,null ,"als","Albanian (Tosk);","Tosk\xc3\xabrishte");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"ALT",null,"alt","alt","Altai (Southern);","\xd0\x90\xd0\xbb\xd1\x82\xd0\xb0\xd0\xb9 \xd1\x82\xd0\xb8\xd0\xbb\xd0\xb8");
@@ -414,6 +416,7 @@ class languageCodeManager
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"ARP",null,"arp","arp","Arapaho","Hinono'eitiit");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"ASB",null,null ,"asb","Assiniboine","Nak\xca\xb0\xc3\xb3"."da");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"AST",null,"ast","ast","Asturian","Asturianu");
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"ATH","ath","ath","ath","Athapascan languages","");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"ATJ",null,null ,"atj","Atikamekw","Atikamekw");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"AUC",null,null ,"auc","Waorani","Huao Terero");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"AVK",null,null ,"avk","Kotava","Kotava");
@@ -686,6 +689,7 @@ class languageCodeManager
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"RUQ",null,null ,"ruq","Romanian	 Megleno","Meglenoroman\xc4\x83");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"RYU",null,null ,"ryu","Okinawan	 Central","\xe3\x81\x86\xe3\x81\xa1\xe3\x81\xaa\xe3\x83\xbc\xe3\x81\x90\xe3\x81\xa1");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"SAH",null,"sah","sah","Sakha","\xd0\xa1\xd0\xb0\xd1\x85\xd0\xb0");
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"SAL","sal","sal","sal","Salishan languages","");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"SAM",null,"sam","sam","Aramaic	 Samaritan","\xdc\x90\xdc\xaa\xdc\xa1\xdc\x9d\xdc\x90");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"SAT",null,"sat","sat","Santali","\xe0\xa4\xb8\xe0\xa4\x82\xe0\xa4\xa5\xe0\xa4\xbe\xe0\xa4\xb2\xe0\xa5\x80");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"SCN",null,"scn","scn","Sicilian","Sicilianu");
@@ -706,6 +710,7 @@ class languageCodeManager
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"SJW",null,null ,"sjw","Shawnee","Shaawanwa\xca\xbc");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"SLR",null,null ,"slr","Salar","Salar");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"SMA",null,"sma","sma","Southern Sami","Saemi");
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"SMI","smi","smi","smi","Sami languages","");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"SMJ",null,"smj","smj","Lule Sami","S\xc3\xa1mi");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"SMN",null,"smn","smn","Inari Sami","S\xc3\xa4\xc3\xa4mi");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"SMS",null,"sms","sms","Skolt Sami","S\xc3\xa4\xc3\xa4'm");

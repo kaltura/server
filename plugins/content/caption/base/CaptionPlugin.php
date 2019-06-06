@@ -115,6 +115,8 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				'Norwegian' =>	'nor',
 				'Occitan' =>	'oci',
 				'Ojibwe, Ojibwa' => 'oji',
+				'Ojibwa Severn' => 'ojs',
+				'Ojibwa Western' => 'ojw',
 				'Oriya' =>	'ori',
 				'Oromo (Afan, Galla)' =>	'orm',
 				'Pashto (Pushto)' =>	'pus',
@@ -127,6 +129,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				'Russian' =>	'rus',
 				'Samoan' =>	'smo',
 				'Sangro' =>	'sag',
+				'Salishan languages' => 'sal',
 				'Sanskrit' =>	'san',
 				'Serbian' =>	'srp',
 				'Sesotho' =>	'sot',
@@ -173,6 +176,10 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				'Micmac' => 'mic',
 				'Southern Tutchone' => 'tce',
 				'Undefined' => 'und',
+				'Algonquian languages' => 'alg',
+				'Athapascan languages' => 'ath',
+				'Sami languages' => 'smi',
+				'Iroquoian languages' => 'iro',
 	
 		);
 	

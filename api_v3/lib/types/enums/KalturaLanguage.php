@@ -182,6 +182,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const AKZ = 'Alabama';
 	const ALC = 'Qawasqar';
 	const ALE = 'Aleut';
+	const ALG = 'Algonquian languages';
 	const ALN = 'Albanian (Gheg)';
 	const ALQ = 'Algonquin';
 	const ALS = 'Albanian (Tosk)';
@@ -198,6 +199,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const ARP = 'Arapaho';
 	const ASB = 'Assiniboine';
 	const AST = 'Asturian';
+	const ATH = 'Athapascan languages';
 	const ATJ = 'Atikamekw';
 	const AUC = 'Waorani';
 	const AVK = 'Kotava';
@@ -317,6 +319,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const HUR = 'Halkomelem';
 	const ILO = 'Iloko';
 	const INH = 'Ingush';
+	const IRO = 'Iroquoian languages';
 	const ITL = 'Itelmen';
 	const IZH = 'Ingrian';
 	const JBO = 'Lojban';
@@ -470,6 +473,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const RUQ = 'Romanian Megleno';
 	const RYU = 'Okinawan Central';
 	const SAH = 'Sakha';
+	const SAL = 'Salishan languages';
 	const SAM = 'Aramaic Samaritan';
 	const SAT = 'Santali';
 	const SCN = 'Sicilian';
@@ -490,6 +494,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const SJW = 'Shawnee';
 	const SLR = 'Salar';
 	const SMA = 'Southern Sami';
+	const SMI = 'Sami languages';
 	const SMJ = 'Lule Sami';
 	const SMN = 'Inari Sami';
 	const SMS = 'Skolt Sami';
