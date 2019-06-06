@@ -3,7 +3,6 @@
  * @package Core
  * @subpackage model.enum
  */
-
 interface PartnerAuthenticationType extends BaseEnum
 {
 	const PASSWORD_ONLY = 0;
