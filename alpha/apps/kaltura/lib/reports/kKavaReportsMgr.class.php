@@ -4473,7 +4473,16 @@ class kKavaReportsMgr extends kKavaBase
 		$data = array();
 		foreach ($report_defs as $cur_report_def)
 		{
-			list($cur_headers, $cur_data) = self::getSimpleTotalImpl($partner_id, $cur_report_def, $input_filter, $object_ids, $response_options);
+			if (isset($cur_report_def[self::REPORT_JOIN_GRAPHS]))
+			{
+				$result = self::getGraphImpl($partner_id, $cur_report_def, $input_filter, $object_ids, $response_options);
+				$cur_headers = array_keys($result);
+				$cur_data = array_map('reset', array_values($result));
+			}
+			else
+			{
+				list($cur_headers, $cur_data) = self::getSimpleTotalImpl($partner_id, $cur_report_def, $input_filter, $object_ids, $response_options);
+			}
 			$headers = array_merge($headers, $cur_headers);
 			$data = array_merge($data, $cur_data);
 		}
