@@ -81,4 +81,41 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
 	}
 
+	public static function translateServiceFeatureEnum($catalogItemId)
+	{
+		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($catalogItemId);
+		if (!$vendorCatalogItem)
+		{
+			return "";
+		}
+
+		switch ($vendorCatalogItem->getServiceFeature())
+		{
+			case VendorServiceFeature::CAPTIONS:
+				$serviceFeatureName = "captions";
+				break;
+
+			case VendorServiceFeature::TRANSLATION:
+				$serviceFeatureName = "translation";
+				break;
+
+			case VendorServiceFeature::ALIGNMENT:
+				$serviceFeatureName = "alignment";
+				break;
+
+			case VendorServiceFeature::AUDIO_DESCRIPTION:
+				$serviceFeatureName = "audio description";
+				break;
+
+			case VendorServiceFeature::CHAPTERING:
+				$serviceFeatureName = "chaptering";
+				break;
+
+			default:
+				$serviceFeatureName = "";
+		}
+
+		return $serviceFeatureName;
+	}
+
 } // VendorCatalogItem
