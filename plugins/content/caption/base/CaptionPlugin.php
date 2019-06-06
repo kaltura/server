@@ -172,6 +172,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				'Michif' => 'crg',
 				'Micmac' => 'mic',
 				'Southern Tutchone' => 'tce',
+				'Undefined' => 'und',
 	
 		);
 	
