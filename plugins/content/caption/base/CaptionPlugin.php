@@ -80,6 +80,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				'Indonesian' =>	'ind',
 				'Interlingua' =>	'ina',
 				'Interlingue' =>	'ile',
+				'Inuinnaqtun' => 'ikt',
 				'Inuktitut' =>	'iku',
 				'Inupiak' =>	'ipk',
 				'Irish' =>	'gle',
@@ -166,8 +167,11 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				'Yiddish' =>	'yid',
 				'Yoruba' =>	'yor',
 				'Zulu' =>	'zul',
+				'No linguistic content' => 'zxx',
+				'Multilingual' => 'mul',
 				'Michif' => 'crg',
 				'Micmac' => 'mic',
+				'Southern Tutchone' => 'tce',
 	
 		);
 	

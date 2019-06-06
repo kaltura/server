@@ -64,6 +64,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const IN = 'Indonesian';
 	const IA = 'Interlingua';
 	const IE = 'Interlingue';
+	const IKT = 'Inuinnaqtun';
 	const IU = 'Inuktitut';
 	const IK = 'Inupiak';
 	const GA = 'Irish';
@@ -153,6 +154,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const JI = 'Yiddish';
 	const YO = 'Yoruba';
 	const ZU = 'Zulu';
+	const ZXX = 'No linguistic content';
 	const MU = 'Multilingual';
 
 	#Support in full ISO639 languages (since ISO639-2 the key code is 3 letters
@@ -509,6 +511,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const TAQ = 'Tamasheq';
 	const TAR = 'Tarahumara Central';
 	const TBW = 'Tagbanwa';
+	const TCE = 'Southern Tutchone';
 	const TCX = 'Toda';
 	const TCY = 'Tulu';
 	const TDD = 'Tai Na';

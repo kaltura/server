@@ -64,6 +64,7 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const IN = 'in';
 	const IA = 'ia';
 	const IE = 'ie';
+	const IKT = 'ikt';
 	const IU = 'iu';
 	const IK = 'ik';
 	const GA = 'ga';
@@ -153,7 +154,10 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const JI = 'ji';
 	const YO = 'yo';
 	const ZU = 'zu';
-	const MU = 'multilingual';
+	const ZXX = 'zxx';
+	const MU = 'mu';
 	const CRG = 'crg';
+	const UN = 'un';
 	const MIC = 'mic';
+	const TCE = 'tce';
 }
