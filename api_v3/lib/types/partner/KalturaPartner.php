@@ -338,7 +338,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public $eSearchLanguages;
 
 	/**
-	 * @var bool
+	 * @var int
 	 * @readonly
 	 */
 	public $authenticationType;
