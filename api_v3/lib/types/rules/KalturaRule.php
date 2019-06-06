@@ -93,4 +93,26 @@ class KalturaRule extends KalturaObject
 			
 		return parent::toObject($dbObject, $skip);
 	}
+	
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		$conditions = $this->conditions ? $this->conditions : array();
+		foreach($conditions as $condition)
+		{
+			$condition->validateForInsert($propertiesToSkip);
+		}
+		
+		return parent::validateForInsert($propertiesToSkip);
+	}
+	
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		$conditions = $this->conditions ? $this->conditions : array();
+		foreach($conditions as $condition)
+		{
+			$condition->validateForUpdate($condition->toObject(), $propertiesToSkip);
+		}
+		
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
 }

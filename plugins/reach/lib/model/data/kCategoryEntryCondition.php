@@ -24,6 +24,13 @@ class kCategoryEntryCondition extends kCondition
 	protected $categoryId = null;
 	
 	/**
+	 * The categoryIds to check if was added
+	 *
+	 * @var int
+	 */
+	protected $categoryIds = null;
+	
+	/**
 	 * The min category user permission level to chek for
 	 *
 	 * @var CategoryKuserPermissionLevel
@@ -46,6 +53,14 @@ class kCategoryEntryCondition extends kCondition
 	}
 	
 	/**
+	 * @param string categoryIds
+	 */
+	public function setCategoryIds($categoryIds)
+	{
+		$this->categoryIds = $categoryIds;
+	}
+	
+	/**
 	 * @param int $categoryUserPermissionGreaterThanOrEqual
 	 */
 	public function setCategoryUserPermission($categoryUserPermission)
@@ -62,11 +77,19 @@ class kCategoryEntryCondition extends kCondition
 	}
 	
 	/**
-	 * @return strin
+	 * @return int
 	 */
 	function getCategoryId()
 	{
 		return $this->categoryId;
+	}
+	
+	/**
+	 * @return string
+	 */
+	function getCategoryIds()
+	{
+		return $this->categoryIds;
 	}
 	
 	/**
@@ -90,14 +113,15 @@ class kCategoryEntryCondition extends kCondition
 	 */
 	protected function internalFulfilled(kScope $scope)
 	{
-		KalturaLog::debug("Validate if category added is one of the ids defined in the rule [{$this->getCategoryId()}]");
+		$categoryIdsToValidate = $this->getCategoryId() ? array($this->getCategoryId()) : explode(",", $this->getCategoryIds());
+		KalturaLog::debug("Validate if category added is one of the ids defined in the rule [" . print_r($categoryIdsToValidate, true) . "]");
 		
 		$matchingCategoryEntry = null;
 		$dbCategoryEntries = categoryEntryPeer::retrieveActiveByEntryId($scope->getEntryId());
 		foreach($dbCategoryEntries as $dbCategoryEntry)
 		{
 			/* @var $dbCategoryEntry categoryEntry */
-			if($dbCategoryEntry->getCategoryId() == $this->getCategoryId())
+			if(in_array($dbCategoryEntry->getCategoryId(), $categoryIdsToValidate))
 			{
 				$matchingCategoryEntry = $dbCategoryEntry;
 				break;
