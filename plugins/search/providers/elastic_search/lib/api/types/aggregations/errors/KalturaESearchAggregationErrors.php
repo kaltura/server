@@ -6,5 +6,5 @@
 
 class KalturaESearchAggregationErrors extends KalturaESearchErrors
 {
-	const FIELD_NAME_MUST_BE_SUPPLIED = 'FIELD_NAME_MUST_BE_SUPPLIED;;field name must be supplied';
+	const AGGREGATION_FIELD_NAME_MUST_BE_SUPPLIED = 'AGGREGATION_FIELD_NAME_MUST_BE_SUPPLIED;;Aggregation field name must be supplied';
 }
