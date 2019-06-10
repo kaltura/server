@@ -385,7 +385,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$kuser = null;
 
 		$partner = PartnerPeer::retrieveByPK($ksPartnerId);
-		if (!$partner) {
+		if (!$partner)
+		{
 			throw new kUserException('Invalid partner id ['.$ksPartnerId.']', kUserException::INVALID_PARTNER);
 		}
 
