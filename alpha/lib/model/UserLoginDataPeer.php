@@ -383,13 +383,14 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$ksUserId = $ksObj->user;
 		$ksPartnerId = $ksObj->partner_id;
 		$kuser = null;
-		
+
+		$partner = PartnerPeer::retrieveByPK($ksPartnerId);
+		if (!$partner) {
+			throw new kUserException('Invalid partner id ['.$ksPartnerId.']', kUserException::INVALID_PARTNER);
+		}
+
 		if ((is_null($ksUserId) || $ksUserId === '') && $useOwnerIfNoUser)
 		{
-			$partner = PartnerPeer::retrieveByPK($ksPartnerId);
-			if (!$partner) {
-				throw new kUserException('Invalid partner id ['.$ksPartnerId.']', kUserException::INVALID_PARTNER);
-			}
 			$ksUserId = $partner->getAccountOwnerKuserId();
 			$kuser = kuserPeer::retrieveByPK($ksUserId);
 		}
@@ -400,6 +401,17 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		if (!$kuser)
 		{
 			throw new kUserException('User with id ['.$ksUserId.'] was not found for partner with id ['.$ksPartnerId.']', kUserException::USER_NOT_FOUND);
+		}
+
+		$requestedPartner = PartnerPeer::retrieveByPK($requestedPartnerId);
+		if (!$requestedPartner)
+		{
+			throw new kUserException('Invalid partner id ['.$requestedPartnerId.']', kUserException::INVALID_PARTNER);
+		}
+
+		if($partner->getAuthenticationType() < $requestedPartner->getAuthenticationType())
+		{
+			throw new kUserException ('otp is missing', kUserException::MISSING_OTP);
 		}
 			
 		return self::userLogin($kuser->getLoginData(), null, $requestedPartnerId, false, null, false);  // don't validate password

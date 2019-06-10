@@ -76,6 +76,9 @@ class extloginAction extends kalturaAction
 			else if ($code == kUserException::USER_IS_BLOCKED) {
 				$this->dieOnError  (APIErrors::USER_IS_BLOCKED);
 			}
+			else if ($code == kUserException::MISSING_OTP) {
+				$this->dieOnError  (APIErrors::MISSING_OTP);
+			}
 			$this->dieOnError  ( APIErrors::INTERNAL_SERVERL_ERROR );
 		}
 		if (!$adminKuser || !$adminKuser->getIsAdmin()) {
