@@ -3259,7 +3259,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$this->setEntitledPusersEdit($template->getEntitledPusersEdit());
 		$this->setEntitledPusersPublish($template->getEntitledPusersPublish());
 
-		if ($this->getType() == $template->getType())
+		if ($this instanceof $template)
 		{
 			$this->copyTypedDependentFieldFromTemplate($template);
 		}
