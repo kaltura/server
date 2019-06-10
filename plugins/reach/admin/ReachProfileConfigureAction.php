@@ -57,12 +57,19 @@ class ReachProfileConfigureAction extends KalturaApplicationPlugin
 	protected function handleExistingReachProfile(Zend_Controller_Action $action, $reachProfileId, $partnerId)
 	{
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
-		$reachProfile = $reachPluginClient->reachProfile->get($reachProfileId);
-		$creditHandlerClass = get_class($reachProfile->credit);
-		$form = $this->initForm($action, $partnerId, $reachProfileId, $creditHandlerClass);
-
 		$request = $action->getRequest();
 		$formData = $request->getPost();
+		
+		$reachProfile = $reachPluginClient->reachProfile->get($reachProfileId);
+		
+		//When changing an existing profile's credit type need to the the object type from the form itself
+		$creditHandlerClass = $formData['reachProfileCredit']['objectType'];
+		if(!$creditHandlerClass)
+			$creditHandlerClass = get_class($reachProfile->credit);
+			
+		$form = $this->initForm($action, $partnerId, $reachProfileId, $creditHandlerClass);
+
+		
 		if ($request->isPost() && $form->isValid($formData))
 			$this->handleExistingPost($action, $form, $formData, $reachProfile);
 		else
