@@ -369,6 +369,7 @@ class UserService extends KalturaBaseUserService
 	 * 
 	 * @param string $hashKey The hash key used to identify the user (retrieved by email)
 	 * @param string $newPassword The new password to set for the user
+	 * @return KalturaAuthentication The authentication response
 	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
