@@ -991,13 +991,13 @@ class KalturaEntryService extends KalturaBaseService
 	}
 
 	protected static function getCoreEntry($entryApiType)
-    {
-        $entryCoreType = kPluginableEnumsManager::apiToCore('entryType', $entryApiType);
-        $class = entryPeer::getEntryClassByType($entryCoreType);
+	{
+		$entryCoreType = kPluginableEnumsManager::apiToCore('entryType', $entryApiType);
+		$class = entryPeer::getEntryClassByType($entryCoreType);
 
-        KalturaLog::debug("Creating new entry of API type [$entryApiType] core type [$entryCoreType] class [$class]");
-        return new $class();
-    }
+		KalturaLog::debug("Creating new entry of API type [$entryApiType] core type [$entryCoreType] class [$class]");
+		return new $class();
+	}
 	
 	/**
 	 * Adds entry
