@@ -995,7 +995,7 @@ class KalturaEntryService extends KalturaBaseService
         $entryCoreType = kPluginableEnumsManager::apiToCore('entryType', $entryApiType);
         $class = entryPeer::getEntryClassByType($entryCoreType);
 
-        KalturaLog::debug("Creating new entry of API type [$entry->type] core type [$entryType] class [$class]");
+        KalturaLog::debug("Creating new entry of API type [$entryApiType] core type [$entryCoreType] class [$class]");
         return new $class();
     }
 	
