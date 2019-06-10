@@ -466,6 +466,6 @@ class APIErrors
 
 	const DRUID_QUERY_TIMED_OUT = "DRUID_QUERY_TIMED_OUT;;Query timed out";
 
-	const MISSING_OTP = 'MISSING_OTP;;OTP is missing';
+	const NEW_LOGIN_REQUIRED = 'NEW_LOGIN_REQUIRED;;Switching to requested partner requires re-login';
 
 }

@@ -53,4 +53,6 @@ class kUserException extends kCoreException
 	
 	const CANNOT_DISABLE_LOGIN_FOR_ADMIN_USER = 'CANNOT_DISABLE_LOGIN_FOR_ADMIN_USER';
 
+	const NEW_LOGIN_REQUIRED = 'NEW_LOGIN_REQUIRED';
+
 }

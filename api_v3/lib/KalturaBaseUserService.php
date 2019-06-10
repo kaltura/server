@@ -405,9 +405,9 @@ class KalturaBaseUserService extends KalturaBaseService
 			{
 				throw new KalturaAPIException(APIErrors::USER_IS_BLOCKED);
 			}
-			else if ($code == kUserException::MISSING_OTP)
+			else if ($code == kUserException::NEW_LOGIN_REQUIRED)
 			{
-				throw new KalturaAPIException(KalturaErrors::MISSING_OTP);
+				throw new KalturaAPIException(KalturaErrors::NEW_LOGIN_REQUIRED);
 			}
 			throw new KalturaAPIException(APIErrors::INTERNAL_SERVERL_ERROR);
 		}
