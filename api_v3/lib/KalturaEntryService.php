@@ -990,7 +990,7 @@ class KalturaEntryService extends KalturaBaseService
 		return $dbEntry;
 	}
 
-	public static function getCoreEntry($entryApiType)
+	protected static function getCoreEntry($entryApiType)
     {
         $entryCoreType = kPluginableEnumsManager::apiToCore('entryType', $entryApiType);
         $class = entryPeer::getEntryClassByType($entryCoreType);
@@ -1021,7 +1021,7 @@ class KalturaEntryService extends KalturaBaseService
 		if (!$object_to_fill)
 			$object_to_fill = new entry();
 		/* entry $baseTo */
-		return $object_to_fill->copyTemplate(true, $templateEntry );
+		return $object_to_fill->copyTemplate(true, $templateEntry);
 	}
 
 	protected function getTemplateEntry($conversionProfileId, $templateEntryId)
