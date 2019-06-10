@@ -162,7 +162,15 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				'user_id' => self::DIMENSION_KUSER_ID,
 				'playback_type' => self::DIMENSION_PLAYBACK_TYPE,
 			),
-			self::REPORT_METRICS => array()
+			self::REPORT_METRICS => array(),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => array('user_id'),
+				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+				self::REPORT_ENRICH_CONTEXT => array(
+					'columns' => array('PUSER_ID'),
+					'peer' => 'kuserPeer',
+				)
+			)
 		),
 
 		ReportType::PLATFORMS_DISCOVERY_REALTIME => array(
