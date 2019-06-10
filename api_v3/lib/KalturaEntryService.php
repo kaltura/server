@@ -123,13 +123,9 @@ class KalturaEntryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
 		
 		$resource->validateEntry($dbEntry);
-		
+
 		// create the temp db entry first and mark it as isTemporary == true
-		$entryType = kPluginableEnumsManager::apiToCore('entryType', $tempMediaEntry->type);
-		$class = entryPeer::getEntryClassByType($entryType);
-			
-		KalturaLog::debug("Creating new entry of API type [{$tempMediaEntry->type}] core type [$entryType] class [$class]");
-		$tempDbEntry = new $class();
+		$tempDbEntry = self::getCoreEntry($tempMediaEntry->type);
 		$tempDbEntry->setIsTemporary(true);
 		$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$tempDbEntry->setReplacedEntryId($dbEntry->getId());
@@ -977,11 +973,7 @@ class KalturaEntryService extends KalturaBaseService
 		// first copy all the properties to the db entry, then we'll check for security stuff
 		if(!$dbEntry)
 		{
-			$entryType = kPluginableEnumsManager::apiToCore('entryType', $entry->type);
-			$class = entryPeer::getEntryClassByType($entryType);
-				
-			KalturaLog::debug("Creating new entry of API type [$entry->type] core type [$entryType] class [$class]");
-			$dbEntry = new $class();
+			$dbEntry = self::getCoreEntry($entry->type);
 		}
 			
 		$dbEntry = $entry->toInsertableObject($dbEntry);
@@ -997,6 +989,15 @@ class KalturaEntryService extends KalturaBaseService
 				
 		return $dbEntry;
 	}
+
+	public static function getCoreEntry($entryApiType)
+    {
+        $entryCoreType = kPluginableEnumsManager::apiToCore('entryType', $entryApiType);
+        $class = entryPeer::getEntryClassByType($entryCoreType);
+
+        KalturaLog::debug("Creating new entry of API type [$entry->type] core type [$entryType] class [$class]");
+        return new $class();
+    }
 	
 	/**
 	 * Adds entry
@@ -1006,7 +1007,7 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function add(KalturaBaseEntry $entry, $conversionProfileId = null)
 	{
-		$dbEntry = $this->duplicateTemplateEntry($conversionProfileId, $entry->templateEntryId);
+		$dbEntry = $this->duplicateTemplateEntry($conversionProfileId, $entry->templateEntryId, self::getCoreEntry($entry->type));
 		if ($dbEntry)
 		{
 			$dbEntry->save();
@@ -1020,7 +1021,7 @@ class KalturaEntryService extends KalturaBaseService
 		if (!$object_to_fill)
 			$object_to_fill = new entry();
 		/* entry $baseTo */
-		return $object_to_fill->copyTemplate(true, $templateEntry);
+		return $object_to_fill->copyTemplate(true, $templateEntry );
 	}
 
 	protected function getTemplateEntry($conversionProfileId, $templateEntryId)
