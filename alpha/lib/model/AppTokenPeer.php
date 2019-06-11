@@ -44,4 +44,11 @@ class AppTokenPeer extends BaseAppTokenPeer {
 	{
 		return array(array("appToken:id=%s", self::ID));		
 	}
+
+	public static function retrieveByKuserId($kuserId)
+	{
+		$c = new Criteria();
+		$c->add(self::KUSER_ID, $kuserId);
+		return self::doSelect($c);
+	}
 } // AppTokenPeer

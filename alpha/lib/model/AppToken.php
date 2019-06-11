@@ -87,4 +87,18 @@ class AppToken extends BaseAppToken
 	{
 		return array("appToken:id=".strtolower($this->getId()));
 	}
+
+	public static function onUserDeleted($kuserId)
+	{
+		//find the appToken related to this kuser
+		$appTokenList = AppTokenPeer::retrieveByKuserId($kuserId);
+
+		//delete them
+		foreach ($appTokenList as $appToken)
+		{
+			/* var $appToken AppToken */
+			$appToken->setStatus(AppTokenStatus::DELETED);
+			$appToken->save();
+		}
+	}
 }// AppToken
