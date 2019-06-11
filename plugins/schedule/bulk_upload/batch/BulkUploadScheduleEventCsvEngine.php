@@ -90,6 +90,7 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 				KBatchBase::unimpersonate();
 				
 				$bulkUploadResult->status = KalturaBulkUploadResultStatus::OK;
+				$bulkUploadResult->objectId = $event->id;
 				$bulkUploadResult->templateEntryId = $entry->id;
 				$bulkUploadResults[] = $bulkUploadResult;
 				
@@ -99,6 +100,11 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 				KalturaLog::err('An error occurred during creation of event or associated objects: ' . $e->getMessage());
 				KBatchBase::unimpersonate();
 				$this->setResultError($bulkUploadResult, $e->getMessage(), KalturaBatchJobErrorTypes::KALTURA_API, $e->getCode());
+				if ($event && $event->id)
+				{
+					$bulkUploadResult->objectId = $event->id;
+				}
+				
 				$bulkUploadResults[] = $bulkUploadResult;
 			}
 		}
@@ -154,6 +160,7 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 				$categoryEntry->entryId = $entryId;
 				$categoryEntry->categoryId = $categoryId;
 				
+				
 				KBatchBase::$kClient->categoryEntry->add($categoryEntry);
 			}
 		}
@@ -175,6 +182,9 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 				$templateEntry->mediaType = KalturaMediaType::LIVE_STREAM_FLASH;
 				$templateEntry->sourceType = KalturaSourceType::LIVE_STREAM;
 				break;
+			default:
+				KalturaLog::notice("Invalid template entry type: $templateEntryType!");
+				throw new KalturaBatchException("Invalid template entry type: $templateEntryType", KalturaBatchJobErrorTypes::APP);
 		}
 		
 		return $templateEntry;
@@ -270,7 +280,8 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 		
 		/* @var $result KalturaBulkUploadResultScheduleEvent */
 		//Input validation
-		array_map('trim', $columns);
+		$values = array_map('trim', $values);
+		
 		if (count($columns) != count($values))
 		{
 			$this->setResultError($result, 'The number of values is not equal to the number of columns. Event wll not be created.');
@@ -341,7 +352,8 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 			{
 				$result->errorDescription = '\n Please use categoryIds OR categoryPaths, and not both. Event category association will not be created. ';
 			}
-			elseif (isset($row['categoryIds']) || isset($row['categoryPaths']))
+			elseif ((isset($row['categoryIds']) && $row['categoryIds'])
+				|| (isset($row['categoryPaths']) && $row['categoryPaths']))
 			{
 				$result->categoryIds = implode(',', $this->retrieveCategoriesIds($row));
 			}
@@ -373,12 +385,12 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 	protected function retrieveCategoriesIds (array $row)
 	{
 		$categoryFilter = new KalturaCategoryFilter();
-		if (isset($row['categoryIds']))
+		if (isset($row['categoryIds']) && $row['categoryIds'])
 		{
 			$categoryFilter->idIn = $row['categoryIds'];
 		}
 		
-		if (isset($row['categoryPaths']))
+		if (isset($row['categoryPaths']) && $row['categoryPaths'])
 		{
 			$categoryFilter->fullNameIn = $row['categoryPaths'];
 		}
