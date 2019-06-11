@@ -165,7 +165,7 @@ class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDe
 			}
 		}
 
-		AppToken::onUserDeleted($kuser->getId());
+		AppToken::onUserDeleted($kuser->getId(), $kuser->getPartnerId());
 
 		$userEntryFilter = new UserEntryFilter();
 		$userEntryFilter->set("_eq_user_id", $kuser->getId());
