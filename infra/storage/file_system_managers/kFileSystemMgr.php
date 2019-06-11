@@ -13,6 +13,10 @@
  * @package infra
  * @subpackage Storage
  */
+
+require_once(dirname(__FILE__) . '/kS3FileSystemMgr.php');
+require_once(dirname(__FILE__) . '/kLocalFileSystemMgr.php');
+
 interface kFileSystemMgrType
 {
 	const LOCAL = 1;
@@ -68,7 +72,7 @@ abstract class kFileSystemMgr
 	 * Write a file in atomic way
 	 *
 	 * @param $filePath the file path
-	 * @param $fileContent the contnet to put in the filePath
+	 * @param $fileContent the content to put in the filePath
 	 *
 	 * @return true / false according to success
 	 */
@@ -105,6 +109,17 @@ abstract class kFileSystemMgr
 	abstract protected function doCopy($fromFilePath, $toFilePath);
 	
 	
+	/**
+	 * Copy a file
+	 *
+	 * @param $url $remoteUrl
+	 * @param $destFilePath file name to save remote content to
+	 *
+	 * @return true / false according to success
+	 */
+	abstract protected function doGetFileFromRemoteUrl($url, $destFilePath = null);
+	
+	
 	public function createDirForPath($filePath)
 	{
 		return $this->doCreateDirForPath($filePath);
@@ -118,6 +133,11 @@ abstract class kFileSystemMgr
 	public function getFile($filePath)
 	{
 		return $this->doGetFile($filePath);
+	}
+	
+	public function getFileFromRemoteUrl($url, $destFilePath = null)
+	{
+		return $this->doGetFileFromRemoteUrl($filePath, $destFilePath);
 	}
 	
 	public function unlink($filePath)
@@ -161,7 +181,7 @@ abstract class kFileSystemMgr
 				return new kLocalFileSystemMgr($options);
 			
 			case kFileSystemMgrType::S3:
-				return new kS3lFileSystemMgr($options);
+				return new kS3FileSystemMgr($options);
 		}
 		
 		return null;

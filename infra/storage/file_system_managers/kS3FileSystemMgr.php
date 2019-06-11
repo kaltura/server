@@ -14,7 +14,7 @@ use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\Enum\CannedAcl;
 
-class kS3lFileSystemMgr extends kFileSystemMgr
+class kS3FileSystemMgr extends kFileSystemMgr
 {
 	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
 	
@@ -24,8 +24,8 @@ class kS3lFileSystemMgr extends kFileSystemMgr
 	protected $sseKmsKeyId;
 	protected $signatureType;
 	protected $endPoint;
-	protected $userName;
-	protected $password;
+	protected $accessKeySecret;
+	protected $accessKeyId;
 	
 	protected $s3Client;
 	
@@ -64,14 +64,14 @@ class kS3lFileSystemMgr extends kFileSystemMgr
 			$this->endPoint = $options['endPoint'];
 		}
 		
-		if($options && isset($options['password']))
+		if($options && isset($options['accessKeySecret']))
 		{
-			$this->password = $options['password'];
+			$this->accessKeySecret = $options['accessKeySecret'];
 		}
 		
-		if($options && isset($options['userName']))
+		if($options && isset($options['accessKeyId']))
 		{
-			$this->userName = $options['userName'];
+			$this->accessKeyId = $options['accessKeyId'];
 		}
 		
 		return $this->login();
@@ -87,8 +87,8 @@ class kS3lFileSystemMgr extends kFileSystemMgr
 		
 		$config = array(
 			'credentials' => array(
-				'key'    => $this->userName,
-				'secret' => $this->password,
+				'key'    => $this->accessKeyId,
+				'secret' => $this->accessKeySecret,
 			),
 			'region' => $this->s3Region,
 			'signature' => $this->signatureType ? $this->signatureType : 'v4',
@@ -178,7 +178,7 @@ class kS3lFileSystemMgr extends kFileSystemMgr
 	
 	protected function doPutFileAtomic($filePath, $fileContent)
 	{
-		return $this->doPutFile($filePath, $fileContent);
+		return $this->doPutFile($filePath, (string)$fileContent);
 	}
 	
 	private function doPutFileHelper($filePath , $fileContent, $params)
@@ -187,24 +187,14 @@ class kS3lFileSystemMgr extends kFileSystemMgr
 		try
 		{
 			$size = strlen($fileContent);
-			if ($size > self::MULTIPART_UPLOAD_MINIMUM_FILE_SIZE)
-			{
+
 				$res = $this->s3Client->upload($bucket,
 					$filePath,
 					$fileContent,
 					$this->filesAcl,
 					array('params' => $params)
 				);
-			}
-			else
-			{
-				$params['Bucket'] = $bucket;
-				$params['Key'] = $filePath;
-				$params['Body'] = (string)$fileContent;
-				$params['ACL'] = $this->filesAcl;
-				
-				$res = $this->s3Client->putObject($params);
-			}
+
 			
 			return array(true, null);
 		}
@@ -276,5 +266,10 @@ class kS3lFileSystemMgr extends kFileSystemMgr
 		
 		$this->doUnlink($filePath);
 		return true;
+	}
+	
+	protected function doGetFileFromRemoteUrl($url, $destFilePath = null)
+	{
+		
 	}
 }

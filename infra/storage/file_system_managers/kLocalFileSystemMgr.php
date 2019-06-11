@@ -71,4 +71,22 @@ class kLocalFileSystemMgr extends kFileSystemMgr
 	{
 		return copy($fromFilePath, $toFilePath);
 	}
+	
+	protected function doGetFileFromRemoteUrl($url, $destFilePath = null)
+	{
+		$curlWrapper = new KCurlWrapper();
+		$res = $curlWrapper->exec($url, $destFilePath, null, $allowInternalUrl);
+		
+		$httpCode = $curlWrapper->getHttpCode();
+		if (KCurlHeaderResponse::isError($httpCode))
+		{
+			KalturaLog::info("curl request [$url] return with http-code of [$httpCode]");
+			if ($destFilePath && file_exists($destFilePath))
+				unlink($destFilePath);
+			$res = false;
+		}
+		
+		$curlWrapper->close();
+		return $res;
+	}
 }
