@@ -383,13 +383,15 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$ksUserId = $ksObj->user;
 		$ksPartnerId = $ksObj->partner_id;
 		$kuser = null;
-		
+
+		$partner = PartnerPeer::retrieveByPK($ksPartnerId);
+		if (!$partner)
+		{
+			throw new kUserException('Invalid partner id ['.$ksPartnerId.']', kUserException::INVALID_PARTNER);
+		}
+
 		if ((is_null($ksUserId) || $ksUserId === '') && $useOwnerIfNoUser)
 		{
-			$partner = PartnerPeer::retrieveByPK($ksPartnerId);
-			if (!$partner) {
-				throw new kUserException('Invalid partner id ['.$ksPartnerId.']', kUserException::INVALID_PARTNER);
-			}
 			$ksUserId = $partner->getAccountOwnerKuserId();
 			$kuser = kuserPeer::retrieveByPK($ksUserId);
 		}
@@ -401,6 +403,13 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		{
 			throw new kUserException('User with id ['.$ksUserId.'] was not found for partner with id ['.$ksPartnerId.']', kUserException::USER_NOT_FOUND);
 		}
+
+		$requestedPartner = PartnerPeer::retrieveByPK($requestedPartnerId);
+		if (!$requestedPartner)
+		{
+			throw new kUserException('Invalid partner id ['.$requestedPartnerId.']', kUserException::INVALID_PARTNER);
+		}
+		self::verifyAuthenticatedPartnerSwitch($partner, $requestedPartner);
 			
 		return self::userLogin($kuser->getLoginData(), null, $requestedPartnerId, false, null, false);  // don't validate password
 	}
@@ -769,6 +778,21 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$qrLink = str_replace(infraRequestUtils::PROTOCOL_HTTP , infraRequestUtils::PROTOCOL_HTTPS , $qrLink);
 
 		return $qrLink.$hashKey;
+	}
+
+
+	protected static function verifyAuthenticatedPartnerSwitch($originPartner, $requestedPartner)
+	{
+		$originPartnerAuthType = $originPartner->getAuthenticationType();
+		$requestedPartnerAuthType = $requestedPartner->getAuthenticationType();
+
+		if($originPartnerAuthType !== $requestedPartnerAuthType)
+		{
+			if($requestedPartnerAuthType !== PartnerAuthenticationType::PASSWORD_ONLY)
+			{
+				throw new kUserException ('Switching to requested partner requires re-login', kUserException::NEW_LOGIN_REQUIRED);
+			}
+		}
 	}
 
 } // UserLoginDataPeer
