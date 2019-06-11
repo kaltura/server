@@ -1341,7 +1341,18 @@ class KalturaEntryService extends KalturaBaseService
 
 		// need to create kuser if this is an admin creating the entry on a different user
 		$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), trim($entry->userId));
-		$creatorId = is_null($entry->creatorId) ? $entry->creatorId : trim($entry->creatorId);
+		$creatorId = null;
+		if (is_null($entry->creatorId))
+		{
+			if (!is_null($entry->userId))
+			{
+				$creatorId = trim($entry->userId);
+			}
+		}
+		else
+		{
+			$creatorId = trim($entry->creatorId);
+		}
 		$creator = kuserPeer::createKuserForPartner($this->getPartnerId(), $creatorId);
 
 		KalturaLog::debug("Set kuser id [" . $kuser->getId() . "] line [" . __LINE__ . "]");
