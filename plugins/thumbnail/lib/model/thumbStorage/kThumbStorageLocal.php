@@ -22,9 +22,9 @@ class kThumbStorageLocal extends kThumbStorageBase implements kThumbStorageInter
 		return $ret;
 	}
 
-	protected function getRenderer($lastModified = null)
+	protected function getRenderer($type = self::DEFAULT_MIME_TYPE, $lastModified = null)
 	{
-		return kFileUtils::getDumpFileRenderer($this->fileName, self::MIME_TYPE, self::MAX_AGE, 0, $lastModified);
+		return kFileUtils::getDumpFileRenderer($this->fileName, $type, self::MAX_AGE, 0, $lastModified);
 	}
 
 	public function loadFile($url, $lastModified  = null)
@@ -53,5 +53,18 @@ class kThumbStorageLocal extends kThumbStorageBase implements kThumbStorageInter
 		KalturaLog::debug("deleting file to:" . $url);
 		$path = $this->getFullPath($url);
 		kFile::deleteFile($path);
+	}
+
+	public function getType()
+	{
+		$image = new Imagick();
+		$image->readImage($this->fileName);
+		$imageFormat = $image->GetImageFormat();
+		if($imageFormat)
+		{
+			return "image/" . strtolower($imageFormat);
+		}
+
+		return parent::getType();
 	}
 }

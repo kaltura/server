@@ -37,6 +37,7 @@ class thumbnailStringParser
 		"vstrip" => "kVidStripAction",
 		"roundcorners" => "kRoundCornersAction",
 		"rc" => "kRoundCornersAction",
+		"itt" => "kImageTextureText",
 	);
 
 	/**

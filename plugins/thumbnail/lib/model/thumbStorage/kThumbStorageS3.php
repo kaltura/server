@@ -57,9 +57,9 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 		}
 	}
 
-	protected function getRenderer($lastModified = null)
+	protected function getRenderer($type = self::DEFAULT_MIME_TYPE, $lastModified = null)
 	{
-		$renderer = new kRendererString($this->content ,self::MIME_TYPE, $lastModified);
+		$renderer = new kRendererString($this->content ,$type, $lastModified);
 		return $renderer;
 	}
 
@@ -104,5 +104,18 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 	protected static function getUrl($path)
 	{
 		return 's3://' . $path;
+	}
+
+	public function getType()
+	{
+		$image = new Imagick();
+		$image->readImageBlob($this->content);
+		$imageFormat = $image->GetImageFormat();
+		if($imageFormat)
+		{
+			return "image/" . strtolower($imageFormat);
+		}
+
+		return parent::getType();
 	}
 }

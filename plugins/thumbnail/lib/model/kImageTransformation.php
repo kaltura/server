@@ -40,7 +40,7 @@ class kImageTransformation
 			$transformationParameters = array();
 			foreach ($this->imageSteps as $step)
 			{
-				$transformationParameters[kThumbnailParameterName::COMPOSITE_OBJECT] = $step->execute($transformationParameters);
+				$transformationParameters[strtolower(kThumbnailParameterName::COMPOSITE_OBJECT)] = $step->execute($transformationParameters);
 			}
 		}
 		catch(ImagickException $e)
@@ -49,7 +49,7 @@ class kImageTransformation
 			throw new kThumbnailException(kThumbnailException::TRANSFORMATION_RUNTIME_ERROR, kThumbnailException::TRANSFORMATION_RUNTIME_ERROR);
 		}
 
-		return $transformationParameters[kThumbnailParameterName::COMPOSITE_OBJECT];
+		return $transformationParameters[strtolower(kThumbnailParameterName::COMPOSITE_OBJECT)];
 	}
 
 	/**

@@ -13,7 +13,7 @@ abstract class kThumbStorageBase
 	protected $content;
 	protected $fileName;
 
-	const MIME_TYPE = 'image/jpeg';
+	const DEFAULT_MIME_TYPE = 'image/jpeg';
 	const MAX_AGE = 86400;
 	const DEFAULT_PATH = 'thumb';
 	const CONF_SECTION_NAME = 'thumb_storage';
@@ -44,7 +44,7 @@ abstract class kThumbStorageBase
 	protected function getFullPath($fileName)
 	{
 		$md5 = md5($fileName);
-		$path = $this->getPrefix() . DIRECTORY_SEPARATOR . $this->getPath($md5) . DIRECTORY_SEPARATOR .$md5. '.jpg';
+		$path = $this->getPrefix() . DIRECTORY_SEPARATOR . $this->getPath($md5) . DIRECTORY_SEPARATOR .$md5;
 		return $path;
 	}
 
@@ -79,14 +79,20 @@ abstract class kThumbStorageBase
 	}
 
 	/**
+	 * @param string $type
 	 * @param null|string $lastModified
 	 * @return kRendererBase
 	 */
-	protected abstract function getRenderer($lastModified = null);
+	protected abstract function getRenderer($type = self::DEFAULT_MIME_TYPE, $lastModified = null);
+
+	public function getType()
+	{
+		return self::DEFAULT_MIME_TYPE;
+	}
 
 	public function render($lastModified = null)
 	{
-		$renderer = $this->getRenderer($lastModified);
+		$renderer = $this->getRenderer($this->getType(), $lastModified);
 		$renderer->output();
 		KExternalErrors::dieGracefully();
 	}

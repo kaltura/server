@@ -12,9 +12,9 @@ class kThumbStorageNone extends kThumbStorageBase implements kThumbStorageInterf
 		$this->content = $content;
 	}
 
-	protected function getRenderer($lastModified = null)
+	protected function getRenderer($type = self::DEFAULT_MIME_TYPE, $lastModified = null)
 	{
-		$renderer = new kRendererString($this->content,self::MIME_TYPE, self::MAX_AGE, $lastModified);
+		$renderer = new kRendererString($this->content, $type, self::MAX_AGE, $lastModified);
 		return $renderer;
 	}
 
@@ -26,5 +26,16 @@ class kThumbStorageNone extends kThumbStorageBase implements kThumbStorageInterf
 	public function deleteFile($url)
 	{
 		return false;
+	}
+
+	public function getType()
+	{
+		$imageFormat = $this->content->GetImageFormat();
+		if($imageFormat)
+		{
+			return "image/" . strtolower($imageFormat);
+		}
+
+		return parent::getType();
 	}
 }
