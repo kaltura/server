@@ -488,7 +488,7 @@ class kKavaReports extends kKavaReportsMgr
 				'added_storage' => self::METRIC_STORAGE_ADDED_MB,
 				'deleted_storage' => self::METRIC_STORAGE_DELETED_MB,
 				'peak_storage' => self::METRIC_PEAK_STORAGE_MB,
-				'unique_users' => self::METRIC_UNIQUE_USERS,
+				'unique_known_users' => self::METRIC_UNIQUE_USERS,
 			),
 		),
 
