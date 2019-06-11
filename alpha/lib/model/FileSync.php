@@ -171,7 +171,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function getExternalUrl($entryId, $format = PlaybackProtocol::HTTP)
 	{
 		$storage = StorageProfilePeer::retrieveByPK($this->getDc());
-		if(!$storage || $storage->getProtocol() == StorageProfile::STORAGE_KALTURA_DC)
+		if(!$storage || $storage->getProtocol() === StorageProfile::STORAGE_KALTURA_DC)
 			return kDataCenterMgr::getInternalRemoteUrl($this);
 
 		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($this->getDc(), $entryId, PlaybackProtocol::HTTP, infraRequestUtils::getProtocol()));
