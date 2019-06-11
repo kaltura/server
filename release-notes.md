@@ -1,5 +1,22 @@
 # Orion 15.1.0 #
 
+## Add permission in Admin Console for new live analytics dashboard ##
+
+- Issue Type: Feature
+- Issue ID: AN-709
+
+### configuration ###
+    Add the following to admin.ini:
+
+    moduls.analyticsPersistentSessionId.enabled = true
+    moduls.analyticsPersistentSessionId.permissionType = 2
+    moduls.analyticsPersistentSessionId.label = Enable Live Analytics Dashboard
+    moduls.analyticsPersistentSessionId.permissionName = FEATURE_LIVE_ANALYTICS_DASHBOARD
+    moduls.analyticsPersistentSessionId.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+    None
+
 ## Block users from changing roles  ##
 - Issue Type: Task
 - Issue ID: PLAT-9896
