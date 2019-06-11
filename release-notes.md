@@ -8,11 +8,11 @@
 ### configuration ###
     Add the following to admin.ini:
 
-    moduls.analyticsPersistentSessionId.enabled = true
-    moduls.analyticsPersistentSessionId.permissionType = 2
-    moduls.analyticsPersistentSessionId.label = Enable Live Analytics Dashboard
-    moduls.analyticsPersistentSessionId.permissionName = FEATURE_LIVE_ANALYTICS_DASHBOARD
-    moduls.analyticsPersistentSessionId.group = GROUP_ENABLE_DISABLE_FEATURES
+    moduls.analyticsLiveDashboard.enabled = true
+    moduls.analyticsLiveDashboard.permissionType = 2
+    moduls.analyticsLiveDashboard.label = Enable Live Analytics Dashboard
+    moduls.analyticsLiveDashboard.permissionName = FEATURE_LIVE_ANALYTICS_DASHBOARD
+    moduls.analyticsLiveDashboard.group = GROUP_ENABLE_DISABLE_FEATURES
 
 ### Deployment scripts ###
     None
