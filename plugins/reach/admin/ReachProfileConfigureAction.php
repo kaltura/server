@@ -63,7 +63,7 @@ class ReachProfileConfigureAction extends KalturaApplicationPlugin
 		$reachProfile = $reachPluginClient->reachProfile->get($reachProfileId);
 		
 		//When changing an existing profile's credit type need to the the object type from the form itself
-		$creditHandlerClass = $formData['reachProfileCredit']['objectType'];
+		$creditHandlerClass = isset($formData['reachProfileCredit']['objectType']) ? $formData['reachProfileCredit']['objectType'] : null;
 		if(!$creditHandlerClass)
 			$creditHandlerClass = get_class($reachProfile->credit);
 			
