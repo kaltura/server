@@ -56,6 +56,8 @@ class KalturaErrors extends APIErrors
 	// PID - partner id
 	const INVALID_PARTNER_ID = "INVALID_PARTNER_ID;PID;Invalid partner id \"@PID@\"";
 
+	const DIRECT_LOGIN_BLOCKED = "DIRECT_LOGIN_BLOCKED;PID;Direct login is blocked on partner [@PID@]";
+
 	// SRV_NAME - service , ACTION_NAME - action
 	const INVALID_SERVICE_CONFIGURATION = "INVALID_SERVICE_CONFIGURATION;SRV_NAME,ACTION_NAME;Invalid service configuration. Unknown service [@SRV_NAME@:@ACTION_NAME@].";
 

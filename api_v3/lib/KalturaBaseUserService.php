@@ -161,6 +161,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @thrown KalturaErrors::INVALID_PARTNER_ID
 	 * @thrown KalturaErrors::INTERNAL_SERVERL_ERROR
 	 * @throws KalturaErrors::USER_IS_BLOCKED
+	 * @throws KalturaErrors::DIRECT_LOGIN_BLOCKED
 	 */		
 	protected function loginImpl($puserId, $loginEmail, $password, $partnerId = null, $expiry = 86400, $privileges = '*', $otp = null)
 	{
@@ -175,6 +176,19 @@ class KalturaBaseUserService extends KalturaBaseService
 
 		if ($loginEmail && !$partnerId) {
 			$this->validateApiAccessControlByEmail($loginEmail);
+
+			$userLoginData = UserLoginDataPeer::getByEmail($loginEmail);
+			$partnerId = $userLoginData->getLastLoginPartnerId();
+		}
+
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if ($partner)
+		{
+			$blockDirectLogin = $partner->getBlockDirectLogin();
+			if($blockDirectLogin)
+			{
+				throw new KalturaAPIException(KalturaErrors::DIRECT_LOGIN_BLOCKED, $partnerId);
+			}
 		}
 		
 		try {
