@@ -157,7 +157,7 @@ class ScriptsRunner
 				{
 				    if(!$this->runSqlScript($sqlDir . DIRECTORY_SEPARATOR . $sqlFile)) {
 					echo "Failed to execute " . $sqlDir . DIRECTORY_SEPARATOR . $sqlFile . PHP_EOL;
-					if($this->ignoreErrors){
+					if(!$this->ignoreErrors){
 						exit(-1);
 					}
 				    }else{
