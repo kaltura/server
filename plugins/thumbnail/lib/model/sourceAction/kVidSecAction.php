@@ -13,8 +13,8 @@ class kVidSecAction extends kVidAction
 	{
 		parent::initParameterAlias();
 		$kVidSecAlias = array(
-			"sec" => kThumbnailParameterName::SECOND,
-			"s" => kThumbnailParameterName::SECOND,
+			'sec' => kThumbnailParameterName::SECOND,
+			's' => kThumbnailParameterName::SECOND,
 		);
 		$this->parameterAlias = array_merge($this->parameterAlias, $kVidSecAlias);
 	}

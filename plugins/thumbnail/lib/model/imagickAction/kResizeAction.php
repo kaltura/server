@@ -23,12 +23,12 @@ class kResizeAction extends kImagickAction
 	protected function initParameterAlias()
 	{
 		$resizeParameterAlias = array(
-			"w" => kThumbnailParameterName::WIDTH,
-			"h" => kThumbnailParameterName::HEIGHT,
-			"ft" => kThumbnailParameterName::FILTER_TYPE,
-			"b" => kThumbnailParameterName::BLUR,
-			"bf" => kThumbnailParameterName::BEST_FIT,
-			"cf" => kThumbnailParameterName::COMPOSITE_FIT,
+			'w' => kThumbnailParameterName::WIDTH,
+			'h' => kThumbnailParameterName::HEIGHT,
+			'ft' => kThumbnailParameterName::FILTER_TYPE,
+			'b' => kThumbnailParameterName::BLUR,
+			'bf' => kThumbnailParameterName::BEST_FIT,
+			'cf' => kThumbnailParameterName::COMPOSITE_FIT,
 		);
 		$this->parameterAlias = array_merge($this->parameterAlias, $resizeParameterAlias);
 	}

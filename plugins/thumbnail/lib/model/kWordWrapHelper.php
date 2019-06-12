@@ -12,7 +12,7 @@ class kWordWrapHelper
 	protected $image;
 	protected $fullText;
 	protected $currentLineHeight = 0;
-	protected $currentLineText = "";
+	protected $currentLineText = '';
 	protected $lines = array();
 	protected $currentLineLimit;
 	protected $totalHeight = 0;
@@ -34,14 +34,14 @@ class kWordWrapHelper
 		$this->maxWidth = $maxWidth;
 		$this->maxHeight = $maxHeight;
 		$this->currentLineLimit = $maxWidth;
-		$this->currentLineText = "";
+		$this->currentLineText = '';
 	}
 
 	public function calculateWordWrap()
 	{
 		$foundSpace = false;
 		$wordBeginPos = 0;
-		$spaceMetrics = $this->image->queryFontMetrics($this->draw, " ");
+		$spaceMetrics = $this->image->queryFontMetrics($this->draw, ' ');
 		if($spaceMetrics['textWidth'] > $this->maxWidth)
 		{
 			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::TEXT_DOES_NOT_FIT_ERR);
@@ -52,7 +52,7 @@ class kWordWrapHelper
 
 		for($i = 0; $i < $textLength; $i++)
 		{
-			if($this->fullText[$i] == " ")
+			if($this->fullText[$i] == ' ')
 			{
 				if(!$foundSpace)
 				{
@@ -62,7 +62,7 @@ class kWordWrapHelper
 					$this->tryAddTextToLine($text, $metrics);
 				}
 
-				$this->tryAddTextToLine(" ", $spaceMetrics);
+				$this->tryAddTextToLine(' ', $spaceMetrics);
 			}
 			else
 			{
@@ -119,7 +119,7 @@ class kWordWrapHelper
 		$this->lines[] = $this->currentLineText;
 		$this->totalHeight += $this->currentLineHeight;
 		$this->currentLineHeight = 0;
-		$this->currentLineText = "";
+		$this->currentLineText = '';
 		$this->currentLineLimit = $this->maxWidth;
 	}
 }
