@@ -13,8 +13,8 @@ class kTextAction extends kImageTextureText
 	{
 		parent::initParameterAlias();
 		$textParameterAlias = array(
-			"sc" => kThumbnailParameterName::STROKE_COLOR,
-			"fc" => kThumbnailParameterName::FILL_COLOR,
+			'sc' => kThumbnailParameterName::STROKE_COLOR,
+			'fc' => kThumbnailParameterName::FILL_COLOR,
 		);
 
 		$this->parameterAlias = array_merge($this->parameterAlias, $textParameterAlias);
@@ -23,8 +23,8 @@ class kTextAction extends kImageTextureText
 	protected function extractActionParameters()
 	{
 		parent::extractActionParameters();
-		$this->strokeColor = $this->getColorActionParameter(kThumbnailParameterName::STROKE_COLOR, "black");
-		$this->fillColor = $this->getColorActionParameter(kThumbnailParameterName::FILL_COLOR, "black");
+		$this->strokeColor = $this->getColorActionParameter(kThumbnailParameterName::STROKE_COLOR, self::DEFAULT_STROKE_COLOR);
+		$this->fillColor = $this->getColorActionParameter(kThumbnailParameterName::FILL_COLOR, self::DEFAULT_STROKE_COLOR);
 	}
 
 	protected function validateInput()

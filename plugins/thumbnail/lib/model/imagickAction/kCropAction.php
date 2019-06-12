@@ -17,9 +17,9 @@ class kCropAction extends kImagickAction
 	protected function initParameterAlias()
 	{
 		$cropParameterAlias = array(
-			"gp" => kThumbnailParameterName::GRAVITY_POINT,
-			"w" => kThumbnailParameterName::WIDTH,
-			"h" => kThumbnailParameterName::HEIGHT,
+			'gp' => kThumbnailParameterName::GRAVITY_POINT,
+			'w' => kThumbnailParameterName::WIDTH,
+			'h' => kThumbnailParameterName::HEIGHT,
 			);
 		$this->parameterAlias = array_merge($this->parameterAlias, $cropParameterAlias);
 	}

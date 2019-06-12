@@ -5,5 +5,5 @@
  */
 interface kSourceType extends BaseEnum
 {
-	const ID = "id";
+	const ID = 'id';
 }

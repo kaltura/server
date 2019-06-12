@@ -6,13 +6,13 @@
 
 class kImageTextureText extends kImagickAction
 {
-	const TRANSPARENT_COLOR = "none";
-	const DEFAULT_STROKE_COLOR = "black";
-	const FORMAT_TYPE = "png";
+	const TRANSPARENT_COLOR = 'none';
+	const DEFAULT_STROKE_COLOR = 'black';
+	const FORMAT_TYPE = 'png';
 	const DEFAULT_ANGLE = 0;
 	const DEFAULT_STROKE_WIDTH = 1;
 	const DEFAULT_FONT_SIZE = 10;
-	const DEFAULT_FONT_TYPE = "Courier";
+	const DEFAULT_FONT_TYPE = 'Courier';
 
 	protected $x;
 	protected $y;
@@ -41,16 +41,16 @@ class kImageTextureText extends kImagickAction
 	protected function initParameterAlias()
 	{
 		$textureTextParameterAlias = array(
-			"f" => kThumbnailParameterName::FONT,
-			"fs" => kThumbnailParameterName::FONT_SIZE,
-			"t" => kThumbnailParameterName::TEXT,
-			"txt" => kThumbnailParameterName::TEXT,
-			"a" => kThumbnailParameterName::ANGLE,
-			"w" => kThumbnailParameterName::WIDTH,
-			"mw" => kThumbnailParameterName::WIDTH,
-			"h" => kThumbnailParameterName::HEIGHT,
-			"mh" => kThumbnailParameterName::HEIGHT,
-			"sw" => kThumbnailParameterName::STROKE_WIDTH,
+			'f' => kThumbnailParameterName::FONT,
+			'fs' => kThumbnailParameterName::FONT_SIZE,
+			't' => kThumbnailParameterName::TEXT,
+			'txt' => kThumbnailParameterName::TEXT,
+			'a' => kThumbnailParameterName::ANGLE,
+			'w' => kThumbnailParameterName::WIDTH,
+			'mw' => kThumbnailParameterName::WIDTH,
+			'h' => kThumbnailParameterName::HEIGHT,
+			'mh' => kThumbnailParameterName::HEIGHT,
+			'sw' => kThumbnailParameterName::STROKE_WIDTH,
 		);
 
 		$this->parameterAlias = array_merge($this->parameterAlias, $textureTextParameterAlias);

@@ -33,7 +33,7 @@ class kThumbStorageNone extends kThumbStorageBase implements kThumbStorageInterf
 		$imageFormat = $this->content->GetImageFormat();
 		if($imageFormat)
 		{
-			return "image/" . strtolower($imageFormat);
+			return 'image/' . strtolower($imageFormat);
 		}
 
 		return parent::getType();

@@ -52,7 +52,7 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 		}
 		else
 		{
-			KalturaLog::err("Failed to save thumbnail file");
+			KalturaLog::err('Failed to save thumbnail file');
 			throw new kThumbnailException(kThumbnailException::CACHE_ERROR, kThumbnailException::CACHE_ERROR);
 		}
 	}
@@ -65,7 +65,7 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 
 	public function loadFile($url, $lastModified = null)
 	{
-		KalturaLog::debug("loading file from S3 " . $url);
+		KalturaLog::debug('loading file from S3 ' . $url);
 		$path = $this->getFullPath($url);
 		$this->url = self::getUrl($path);
 		try
@@ -77,7 +77,7 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 					$s3lastModified = filemtime($this->url);
 					if($lastModified > $s3lastModified)
 					{
-						KalturaLog::debug("file was created before entry changed" . $s3lastModified);
+						KalturaLog::debug('file was created before entry changed' . $s3lastModified);
 						return false;
 					}
 				}
@@ -88,7 +88,7 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 		}
 		catch (Exception $e)
 		{
-			KalturaLog::debug("failed to load file " . $e->getMessage());
+			KalturaLog::debug('failed to load file ' . $e->getMessage());
 			throw new kThumbnailException(kThumbnailException::CACHE_ERROR, kThumbnailException::CACHE_ERROR);
 		}
 
@@ -97,7 +97,7 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 
 	public function deleteFile($url)
 	{
-		KalturaLog::debug("deleting file from s3:" . $url);
+		KalturaLog::debug('deleting file from s3:' . $url);
 		return $this->s3Mgr->delFile($url);
 	}
 
@@ -113,7 +113,7 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 		$imageFormat = $image->GetImageFormat();
 		if($imageFormat)
 		{
-			return "image/" . strtolower($imageFormat);
+			return 'image/' . strtolower($imageFormat);
 		}
 
 		return parent::getType();

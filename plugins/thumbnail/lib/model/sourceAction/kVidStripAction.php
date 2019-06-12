@@ -18,11 +18,11 @@ class kVidStripAction extends kVidAction
 	{
 		parent::initParameterAlias();
 		$kVidStripAlias = array(
-			"w" => kThumbnailParameterName::WIDTH,
-			"h" => kThumbnailParameterName::HEIGHT,
-			"nos" => kThumbnailParameterName::NUMBER_OF_SLICES,
-			"ss" => kThumbnailParameterName::START_SEC,
-			"es" => kThumbnailParameterName::END_SEC,
+			'w' => kThumbnailParameterName::WIDTH,
+			'h' => kThumbnailParameterName::HEIGHT,
+			'nos' => kThumbnailParameterName::NUMBER_OF_SLICES,
+			'ss' => kThumbnailParameterName::START_SEC,
+			'es' => kThumbnailParameterName::END_SEC,
 		);
 		$this->parameterAlias = array_merge($this->parameterAlias, $kVidStripAlias);
 	}

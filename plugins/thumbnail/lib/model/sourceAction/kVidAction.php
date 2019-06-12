@@ -14,8 +14,8 @@ abstract class kVidAction extends kSourceAction
 	protected function initParameterAlias()
 	{
 		$kVidAlias = array(
-			"w" => kThumbnailParameterName::WIDTH,
-			"h" => kThumbnailParameterName::HEIGHT,
+			'w' => kThumbnailParameterName::WIDTH,
+			'h' => kThumbnailParameterName::HEIGHT,
 		);
 		$this->parameterAlias = array_merge($this->parameterAlias, $kVidAlias);
 	}
@@ -66,7 +66,7 @@ abstract class kVidAction extends kSourceAction
 	protected function getTempThumbnailPath()
 	{
 		$dc = kDataCenterMgr::getCurrentDc();
-		$filePath = $dc["id"].'_'.kString::generateStringId();
+		$filePath = $dc['id'].'_'.kString::generateStringId();
 		return sys_get_temp_dir().DIRECTORY_SEPARATOR . $filePath;
 	}
 }

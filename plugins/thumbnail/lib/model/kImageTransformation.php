@@ -40,16 +40,16 @@ class kImageTransformation
 			$transformationParameters = array();
 			foreach ($this->imageSteps as $step)
 			{
-				$transformationParameters[strtolower(kThumbnailParameterName::COMPOSITE_OBJECT)] = $step->execute($transformationParameters);
+				$transformationParameters[kThumbnailParameterName::COMPOSITE_OBJECT] = $step->execute($transformationParameters);
 			}
 		}
 		catch(ImagickException $e)
 		{
-			KalturaLog::err("Imagick error:" . print_r($e));
+			KalturaLog::err('Imagick error:' . print_r($e));
 			throw new kThumbnailException(kThumbnailException::TRANSFORMATION_RUNTIME_ERROR, kThumbnailException::TRANSFORMATION_RUNTIME_ERROR);
 		}
 
-		return $transformationParameters[strtolower(kThumbnailParameterName::COMPOSITE_OBJECT)];
+		return $transformationParameters[kThumbnailParameterName::COMPOSITE_OBJECT];
 	}
 
 	/**

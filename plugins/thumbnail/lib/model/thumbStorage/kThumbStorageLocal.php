@@ -8,13 +8,13 @@ class kThumbStorageLocal extends kThumbStorageBase implements kThumbStorageInter
 {
 	public function saveFile($url, $content)
 	{
-		KalturaLog::debug("Saving file to:" . $url);
+		KalturaLog::debug('Saving file to:' . $url);
 		$path = $this->getFullPath($url);
 		kFile::fullMkdir($path);
 		$ret = kFile::safeFilePutContents($path, $content);
 		if(!$ret)
 		{
-			KalturaLog::err("Failed to save thumbnail file");
+			KalturaLog::err('Failed to save thumbnail file');
 			throw new kThumbnailException(kThumbnailException::CACHE_ERROR, kThumbnailException::CACHE_ERROR);
 		}
 
@@ -29,18 +29,18 @@ class kThumbStorageLocal extends kThumbStorageBase implements kThumbStorageInter
 
 	public function loadFile($url, $lastModified  = null)
 	{
-		KalturaLog::debug("loading file from path:" . $url);
+		KalturaLog::debug('loading file from path:' . $url);
 		$path = $this->getFullPath($url);
 		$fileData = kFile::getFileData($path);
 		if(!$fileData->exists)
 		{
-			KalturaLog::debug("file wasn't found" . $url);
+			KalturaLog::debug('file was not found' . $url);
 			return false;
 		}
 
 		if($lastModified && $fileData->last_modified < $lastModified)
 		{
-			KalturaLog::debug("file was created before entry changed" . $fileData->last_modified);
+			KalturaLog::debug('file was created before entry changed' . $fileData->last_modified);
 			return false;
 		}
 
@@ -50,7 +50,7 @@ class kThumbStorageLocal extends kThumbStorageBase implements kThumbStorageInter
 
 	public function deleteFile($url)
 	{
-		KalturaLog::debug("deleting file to:" . $url);
+		KalturaLog::debug('deleting file to:' . $url);
 		$path = $this->getFullPath($url);
 		kFile::deleteFile($path);
 	}
@@ -62,7 +62,7 @@ class kThumbStorageLocal extends kThumbStorageBase implements kThumbStorageInter
 		$imageFormat = $image->GetImageFormat();
 		if($imageFormat)
 		{
-			return "image/" . strtolower($imageFormat);
+			return 'image/' . strtolower($imageFormat);
 		}
 
 		return parent::getType();
