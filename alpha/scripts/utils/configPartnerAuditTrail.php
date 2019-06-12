@@ -6,11 +6,11 @@ chdir(dirname(__FILE__));
 require_once(dirname(__FILE__) . '/../bootstrap.php');
 
 $objectsToTrack = array(
-	KalturaAuditTrailObjectType::ACCESS_CONTROL => array(
+	AuditTrailObjectType::ACCESS_CONTROL => array(
 		'actions' => array(
-			KalturaAuditTrailAction::CREATED,
-			KalturaAuditTrailAction::CHANGED,
-			KalturaAuditTrailAction::DELETED,
+			'CREATED',
+			'CHANGED',
+			'DELETED',
 		),
 		'descriptors' => array(
 			accessControlPeer::NAME,
@@ -24,26 +24,25 @@ $objectsToTrack = array(
 			accessControlPeer::KDIR_RESTRICT_TYPE,
 		),
 	),
-	KalturaAuditTrailObjectType::CONVERSION_PROFILE_2 => array(
+	AuditTrailObjectType::CONVERSION_PROFILE_2 => array(
 		'actions' => array(
-			KalturaAuditTrailAction::CREATED,
-			KalturaAuditTrailAction::CHANGED,
-			KalturaAuditTrailAction::DELETED,
+			'CREATED',
+			'CHANGED',
+			'DELETED',
 		),
 		'descriptors' => array(
 			conversionProfile2Peer::NAME,
 		),
 	),
-	KalturaAuditTrailObjectType::ENTRY => array(
+	AuditTrailObjectType::ENTRY => array(
 		'actions' => array(
-			KalturaAuditTrailAction::CREATED,
-			KalturaAuditTrailAction::COPIED,
-			KalturaAuditTrailAction::CHANGED,
-			KalturaAuditTrailAction::DELETED,
-			KalturaAuditTrailAction::VIEWED,
-			KalturaAuditTrailAction::CONTENT_VIEWED,
-			KalturaAuditTrailAction::RELATION_ADDED,
-			KalturaAuditTrailAction::RELATION_REMOVED,
+			'CREATED',
+			'CHANGED',
+			'DELETED',
+			'VIEWED',
+			'CONTENT_VIEWED',
+			'RELATION_ADDED',
+			'RELATION_REMOVED',
 		),
 		'descriptors' => array(
 			entryPeer::NAME,
@@ -79,112 +78,112 @@ $objectsToTrack = array(
 			"thumb_offset",
 		),
 	),
-	KalturaAuditTrailObjectType::FLAVOR_ASSET => array(
-		'actions' => array(
-			KalturaAuditTrailAction::CREATED,
-			KalturaAuditTrailAction::CHANGED,
-			KalturaAuditTrailAction::DELETED,
-			KalturaAuditTrailAction::VIEWED,
-			KalturaAuditTrailAction::CONTENT_VIEWED,
-			KalturaAuditTrailAction::RELATION_ADDED,
-			KalturaAuditTrailAction::RELATION_REMOVED,
-		),
-		'descriptors' => array(
-			assetPeer::TAGS,
-			assetPeer::FLAVOR_PARAMS_ID,
-			assetPeer::STATUS,
-			assetPeer::VERSION,
-			assetPeer::WIDTH,
-			assetPeer::HEIGHT,
-			assetPeer::BITRATE,
-			assetPeer::FRAME_RATE,
-			assetPeer::SIZE,
-			assetPeer::FILE_EXT,
-			assetPeer::CONTAINER_FORMAT,
-			assetPeer::VIDEO_CODEC_ID,
-		),
+	AuditTrailObjectType::FLAVOR_ASSET => array(
+	'actions' => array(
+		'CREATED',
+		'CHANGED',
+		'DELETED',
+		'VIEWED',
+		'CONTENT_VIEWED',
+		'RELATION_ADDED',
+		'RELATION_REMOVED',
 	),
-	KalturaAuditTrailObjectType::FLAVOR_PARAMS_CONVERSION_PROFILE => array(
-		'actions' => array(
-			KalturaAuditTrailAction::CREATED,
-			KalturaAuditTrailAction::CHANGED,
-			KalturaAuditTrailAction::DELETED,
-		),
-		'descriptors' => array(
-			flavorParamsConversionProfilePeer::READY_BEHAVIOR,
-			flavorParamsConversionProfilePeer::FORCE_NONE_COMPLIED,
-		),
+	'descriptors' => array(
+		assetPeer::TAGS,
+		assetPeer::FLAVOR_PARAMS_ID,
+		assetPeer::STATUS,
+		assetPeer::VERSION,
+		assetPeer::WIDTH,
+		assetPeer::HEIGHT,
+		assetPeer::BITRATE,
+		assetPeer::FRAME_RATE,
+		assetPeer::SIZE,
+		assetPeer::FILE_EXT,
+		assetPeer::CONTAINER_FORMAT,
+		assetPeer::VIDEO_CODEC_ID,
 	),
-	KalturaAuditTrailObjectType::KSHOW_KUSER => array(
-		'actions' => array(
-			KalturaAuditTrailAction::CREATED,
-			KalturaAuditTrailAction::CHANGED,
-			KalturaAuditTrailAction::DELETED,
-		),
-		'descriptors' => array(
-			KshowKuserPeer::SUBSCRIPTION_TYPE,
-			KshowKuserPeer::ALERT_TYPE,
-		),
+),
+	AuditTrailObjectType::FLAVOR_PARAMS_CONVERSION_PROFILE => array(
+	'actions' => array(
+		'CREATED',
+		'CHANGED',
+		'DELETED',
 	),
-	KalturaAuditTrailObjectType::MEDIA_INFO => array(
-		'actions' => array(
-			KalturaAuditTrailAction::CREATED,
-		),
-		'descriptors' => array(
-		),
+	'descriptors' => array(
+		flavorParamsConversionProfilePeer::READY_BEHAVIOR,
+		flavorParamsConversionProfilePeer::FORCE_NONE_COMPLIED,
 	),
-	KalturaAuditTrailObjectType::PARTNER => array(
-		'actions' => array(
-			KalturaAuditTrailAction::CHANGED,
-			KalturaAuditTrailAction::DELETED,
-		),
-		'descriptors' => array(
-			PartnerPeer::PARTNER_NAME,
-			PartnerPeer::URL1,
-			PartnerPeer::URL2,
-			PartnerPeer::ADMIN_NAME,
-			PartnerPeer::ADMIN_EMAIL,
-			PartnerPeer::NOTIFY,
-			PartnerPeer::STATUS,
-			PartnerPeer::ADULT_CONTENT,
-			"allowQuickEdit",
-			"defConversionProfileType",
-			"curConvProfType",
-			"defaultAccessControlId",
-			"defaultConversionProfileId",
-			"notificationsConfig",
-			"allowMultiNotification",
-			"defThumbOffset",
-			"host",
-			"forceCdnHost",
-			"rtmpUrl",
-			"iisHost",
-			"landingPage",
-			"userLandingPage",
-		),
+),
+	AuditTrailObjectType::KSHOW_KUSER => array(
+	'actions' => array(
+		'CREATED',
+		'CHANGED',
+		'DELETED',
 	),
-	KalturaAuditTrailObjectType::METADATA => array(
-		'actions' => array(
-			KalturaAuditTrailAction::CREATED,
-			KalturaAuditTrailAction::CHANGED,
-			KalturaAuditTrailAction::DELETED,
-		),
-		'descriptors' => array(
-			MetadataPeer::VERSION,
-			MetadataPeer::STATUS,
-		),
+	'descriptors' => array(
+		KshowKuserPeer::SUBSCRIPTION_TYPE,
+		KshowKuserPeer::ALERT_TYPE,
 	),
-	KalturaAuditTrailObjectType::METADATA_PROFILE => array(
-		'actions' => array(
-			KalturaAuditTrailAction::CREATED,
-			KalturaAuditTrailAction::CHANGED,
-			KalturaAuditTrailAction::DELETED,
-		),
-		'descriptors' => array(
-			MetadataProfilePeer::VERSION,
-			MetadataProfilePeer::STATUS,
-		),
+),
+	AuditTrailObjectType::MEDIA_INFO => array(
+	'actions' => array(
+		'CREATED',
 	),
+	'descriptors' => array(
+	),
+),
+	AuditTrailObjectType::PARTNER => array(
+	'actions' => array(
+		KalturaAuditTrailAction::CHANGED,
+		KalturaAuditTrailAction::DELETED,
+	),
+	'descriptors' => array(
+		PartnerPeer::PARTNER_NAME,
+		PartnerPeer::URL1,
+		PartnerPeer::URL2,
+		PartnerPeer::ADMIN_NAME,
+		PartnerPeer::ADMIN_EMAIL,
+		PartnerPeer::NOTIFY,
+		PartnerPeer::STATUS,
+		PartnerPeer::ADULT_CONTENT,
+		"allowQuickEdit",
+		"defConversionProfileType",
+		"curConvProfType",
+		"defaultAccessControlId",
+		"defaultConversionProfileId",
+		"notificationsConfig",
+		"allowMultiNotification",
+		"defThumbOffset",
+		"host",
+		"forceCdnHost",
+		"rtmpUrl",
+		"iisHost",
+		"landingPage",
+		"userLandingPage",
+	),
+),
+	AuditTrailObjectType::METADATA => array(
+	'actions' => array(
+		'CREATED',
+		'CHANGED',
+		'DELETED',
+	),
+	'descriptors' => array(
+		MetadataPeer::VERSION,
+		MetadataPeer::STATUS,
+	),
+),
+	AuditTrailObjectType::METADATA_PROFILE => array(
+	'actions' => array(
+		'CREATED',
+		'CHANGED',
+		'DELETED',
+	),
+	'descriptors' => array(
+		MetadataProfilePeer::VERSION,
+		MetadataProfilePeer::STATUS,
+	),
+),
 );
 
 KalturaLog::setLogger(new KalturaStdoutLogger());
@@ -208,7 +207,7 @@ foreach($objectsToTrack as $objectType => $objectConfig)
 		$auditTrailConfig = new AuditTrailConfig();
 		$auditTrailConfig->setPartnerId($partnerId);
 	}
-		
+	
 	$auditTrailConfig->setObjectType($objectType);
 	$auditTrailConfig->setActions($actions);
 	$auditTrailConfig->setDescriptors($descriptors);
