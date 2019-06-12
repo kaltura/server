@@ -646,8 +646,8 @@ class languageCodeManager
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"OJB",null,null ,"ojb","Ojibwa	 Northwestern","Anishinaabemowin (Ojibwemowin);");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"OJC",null,null ,"ojc","Ojibwa	 Central","Anishinaabemowin (Ojibwemowin);");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"OJG",null,null ,"ojg","Ojibwa	 Eastern","Nishnaabemwin (Jibwemwin);");
-        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"OJS",null,null ,"ojs","Ojibwa	 Severn","\xe1\x90\x8a\xe1\x93\x82\xe1\x94\x91\xe1\x93\x82\xe1\x93\x82\xe1\x92\xa7\xe1\x90\x8e\xe1\x93\x90 (Anishininiimowin);");
-        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"OJW",null,null ,"ojw","Ojibwa	 Western","Anih\xc5\xa1in\xc4\x81p\xc4\x93mowin (Nakaw\xc4\x93mowin);");
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"OJS",null,null ,"ojs","Ojibwa Severn","\xe1\x90\x8a\xe1\x93\x82\xe1\x94\x91\xe1\x93\x82\xe1\x93\x82\xe1\x92\xa7\xe1\x90\x8e\xe1\x93\x90 (Anishininiimowin);");
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"OJW",null,null ,"ojw","Ojibwa Western","Anih\xc5\xa1in\xc4\x81p\xc4\x93mowin (Nakaw\xc4\x93mowin);");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"ONE",null,null ,"one","Oneida","On\xca\x8cyota\xe2\x80\x99"."a:ka");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"ONO",null,null ,"ono","Onondaga","On\xc7\xabta\xe2\x80\x99k\xc3\xa9ka\xe2\x80\x99");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"OOD",null,null ,"ood","Tohono O'odham","O'odham");
