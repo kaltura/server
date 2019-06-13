@@ -1,5 +1,16 @@
 # Orion 15.1.0 #
 
+## Compress sphinx_log queries according to threshold ##
+- Issue Type: TASK
+- Issue ID: SUP-18392
+
+### configuration ###
+    Add the following to local.ini:
+	indexing_query_compress_threshold = 8192 ( DESIRED_THRESHOLD in size 8192 is 800KB )
+    
+### Deployment scripts ###
+    run /opt/kaltura/app/deployment/updates/sql/2019_06_12_alter_sphinx_log_table_add_cutom_data_column.sql
+    
 ## Add permission in Admin Console for new live analytics dashboard ##
 
 - Issue Type: Feature
