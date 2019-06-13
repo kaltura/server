@@ -476,6 +476,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 
+		if($partner && $partner->getBlockDirectLogin())
+		{
+			throw new kUserException('Direct login is blocked', kUserException::DIRECT_LOGIN_BLOCKED);
+		}
 		if($validateOtp && $partner && $partner->getUseTwoFactorAuthentication())
 		{
 			$user = kuserPeer::getAdminUser($partnerId, $loginData);

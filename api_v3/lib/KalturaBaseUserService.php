@@ -176,19 +176,6 @@ class KalturaBaseUserService extends KalturaBaseService
 
 		if ($loginEmail && !$partnerId) {
 			$this->validateApiAccessControlByEmail($loginEmail);
-
-			$userLoginData = UserLoginDataPeer::getByEmail($loginEmail);
-			$partnerId = $userLoginData->getLastLoginPartnerId();
-		}
-
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		if ($partner)
-		{
-			$blockDirectLogin = $partner->getBlockDirectLogin();
-			if($blockDirectLogin)
-			{
-				throw new KalturaAPIException(KalturaErrors::DIRECT_LOGIN_BLOCKED, $partnerId);
-			}
 		}
 		
 		try {
@@ -227,6 +214,9 @@ class KalturaBaseUserService extends KalturaBaseService
 			}
 			else if ($code == kUserException::MISSING_OTP) {
 					throw new KalturaAPIException(KalturaErrors::MISSING_OTP);
+			}
+			else if ($code == kUserException::DIRECT_LOGIN_BLOCKED) {
+				throw new KalturaAPIException(KalturaErrors::DIRECT_LOGIN_BLOCKED);
 			}
 									
 			throw new $e;
