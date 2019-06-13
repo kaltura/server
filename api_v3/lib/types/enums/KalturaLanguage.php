@@ -399,6 +399,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const MNP = 'Min Bei Chinese';
 	const MNS = 'Mansi';
 	const MNW = 'Mon';
+	const MOE = 'Montagnais';
 	const MOH = 'Mohawk';
 	const MOS = 'Mossi';
 	const MRW = 'Maranao';
@@ -567,4 +568,6 @@ class KalturaLanguage extends KalturaStringEnum
 	const HAK = 'Hakka';
 	const CRG = 'Michif';
 	const UN  = 'Undefined';
+	const BLA = 'Siksika';
+	const OKA = 'Okanagan';
 }

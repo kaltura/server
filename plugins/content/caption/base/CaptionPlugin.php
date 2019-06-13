@@ -180,6 +180,9 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				'Athapascan languages' => 'ath',
 				'Sami languages' => 'smi',
 				'Iroquoian languages' => 'iro',
+				'Montagnais' => 'moe',
+				'Siksika' => 'bla',
+				'Okanagan' => 'oka',
 	
 		);
 	
