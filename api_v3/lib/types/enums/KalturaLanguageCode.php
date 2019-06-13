@@ -166,5 +166,8 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const ALG = 'alg';
 	const ATH = 'ath';
 	const SMI = 'smi';
-	CONST IRO = 'iro';
+	const IRO = 'iro';
+	const MOE = 'moe';
+	const BLA = 'bla';
+	const OKA = 'oka';
 }

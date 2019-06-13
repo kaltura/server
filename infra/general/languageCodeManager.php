@@ -285,6 +285,9 @@ class languageCodeManager
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'MI', "mi", "mri", "mao", "M\xc4\x81ori", "te reo M\xc4\x81ori",'Maori');
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'MR', "mr", "mar", "mar", "Marathi (Mar\xc4\x81\xe1\xb9\xadh\xc4\xab)", "\xe0\xa4\xae\xe0\xa4\xb0\xe0\xa4\xbe\xe0\xa4\xa0\xe0\xa5\x80",'Marathi');
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'MH', "mh", "mah", "mah", "Marshallese", "Kajin M\xcc\xa7",'Marshallese');//not yet defined in kaltura
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'MOE', null, null, "moe", "Montagnais", "",'Montagnais');
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'BLA', "bla", "bla", "bla", "Siksika", "",'Siksika');
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'OKA', null, null, "oka", "Okanagan", "",'Okanagan');
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'MN', "mn", "mon", "mon", "Mongolian", "\xd0\x9c\xd0\xbe\xd0\xbd\xd0\xb3\xd0\xbe\xd0\xbb \xd1\x85\xd1\x8d\xd0\xbb",'Mongolian');
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'NA', "na", "nau", "nau", "Nauruan", "Dorerin Naoero",'Nauru');
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'NV', "nv", "nav", "nav", "Navajo, Navaho", "Din\xc3\xa9 bizaad",'Navajo, Navaho');//not yet defined in kaltura
