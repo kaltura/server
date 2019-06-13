@@ -90,6 +90,9 @@ class adminloginAction extends defPartnerservices2Action
 				$this->addError  (APIErrors::USER_IS_BLOCKED);
 				return null;
 			}
+			else if ($code === kUserException::DIRECT_LOGIN_BLOCKED) {
+				throw new KalturaAPIException(KalturaErrors::DIRECT_LOGIN_BLOCKED);
+			}
 			else {
 				$this->addError  ( APIErrors::INTERNAL_SERVERL_ERROR );
 				return null;
