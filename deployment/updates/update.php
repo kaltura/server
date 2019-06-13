@@ -80,6 +80,9 @@ class ScriptsRunner
 	private $version;
 	private $alreadyRun;
 	private $ignoreErrors;
+	private $serverVersion;
+	const EXEC_STATUS_FAILURE = 1;
+	const EXEC_STATUS_SUCCESS = 2;
 	
 	public function init($ignore, array $params)
 	{
@@ -92,6 +95,7 @@ class ScriptsRunner
 		// init with default port
 		$this->dbParams = $dbConf['datasources']['propel']['connection'];
 		$this->dbParams['port'] = '3306';
+		$this->serverVersion = kConf::get("kaltura_version"); 
 		
 		foreach($dsnArray as $param)
 		{
@@ -105,14 +109,13 @@ class ScriptsRunner
 		
 		foreach($this->dbParams as $key => $value)
 		{
-			echo $key .' => '; 
+			KalturaLog::info($key .' => '); 
 			if (is_array($value)){
-				var_dump($value);
+				KalturaLog::info(print_r($value,true));
 			}else{
-				echo "$value\n";
+				KalturaLog::info("$value");
 			}
 		}
-		$this->version = $this->getMaxVersion() + 1;
 		$this->alreadyRun = $this->getDeployedScripts();
 	}
 	
@@ -120,7 +123,7 @@ class ScriptsRunner
 	{
 		if(! is_file($file))
 		{
-			echo "Could not run script: script not found $file";
+			KalturaLog::err("Could not run script: script not found $file");
 			return false;
 		}
 		
@@ -132,16 +135,16 @@ class ScriptsRunner
 		{
 			$cmd = sprintf("mysql -h%s -u%s -p%s -P%s %s < %s", $this->dbParams['host'], $this->dbParams['user'], $this->dbParams['password'], $this->dbParams['port'], $this->dbParams['dbname'], $file);
 		}
-		echo "Executing [$cmd]" . PHP_EOL;
+		KalturaLog::info("Executing [$cmd]");
 		passthru($cmd . ' 2>&1', $return_var);
 		if($return_var === 0)
 		{
-			echo "Command [$cmd] Executed Successfully" . PHP_EOL . PHP_EOL;
+			KalturaLog::info("Command [$cmd] Executed Successfully");
 			return true;
 		}
 		else
 		{
-			echo "Failed to run [$cmd]" . PHP_EOL . PHP_EOL;
+			KalturaLog::err("Failed to run [$cmd]");
 			return false;
 		}
 	}
@@ -153,20 +156,20 @@ class ScriptsRunner
 		{
 			if(substr($sqlFile, - 4) == ".sql")
 			{
-				if(! isset($this->alreadyRun[$sqlFile]))
-				{
+				if(! isset($this->alreadyRun[$sqlFile])){
 				    if(!$this->runSqlScript($sqlDir . DIRECTORY_SEPARATOR . $sqlFile)) {
-					echo "Failed to execute " . $sqlDir . DIRECTORY_SEPARATOR . $sqlFile . PHP_EOL;
+					KalturaLog::err("Failed to execute " . $sqlDir . DIRECTORY_SEPARATOR . $sqlFile);
+					$this->updateVersion($sqlFile,self::EXEC_STATUS_FAILURE);
 					if(!$this->ignoreErrors){
 						exit(-1);
 					}
 				    }else{
-					$this->updateVersion($sqlFile);
+					$this->updateVersion($sqlFile,self::EXEC_STATUS_SUCCESS);
 				    }
 				}
 				else
 				{
-					echo $sqlFile . ' already run' . PHP_EOL;
+					KalturaLog::info($sqlFile . ' already run');
 				}
 			}
 		}
@@ -188,28 +191,13 @@ class ScriptsRunner
 		}
 	}
 	
-	private function getMaxVersion()
-	{
-		$link = mysqli_connect($this->dbParams['host'], $this->dbParams['user'], $this->dbParams['password'], null, $this->dbParams['port']);
-		$db_selected = mysqli_select_db($link,$this->dbParams['dbname']);
-		$result = mysqli_query($link,'select max(version) from version_management');
-		if($result)
-		{
-			$row = mysqli_fetch_row($result);
-			$version = $row ? $row[0] : null;
-		}
-		
-		mysqli_free_result($result);
-		mysqli_close($link);
-		return $version;
-	}
 	
 	private function getDeployedScripts()
 	{
 		$link = mysqli_connect($this->dbParams['host'], $this->dbParams['user'], $this->dbParams['password'], null, $this->dbParams['port']);
 		
 		$db_selected = mysqli_select_db($link,$this->dbParams['dbname']);
-		$result = mysqli_query($link,'select filename from version_management');
+		$result = mysqli_query($link,'select filename from version_management where status = ' . self::EXEC_STATUS_SUCCESS);
 		if($result)
 		{
 			$res = array();
@@ -232,12 +220,13 @@ class ScriptsRunner
 		return array_diff($content, $weeds);
 	}
 	
-	private function updateVersion($fileName)
+	private function updateVersion($fileName, $execStatus)
 	{
 		$link = mysqli_connect($this->dbParams['host'], $this->dbParams['user'], $this->dbParams['password'], $this->dbParams['dbname'], $this->dbParams['port']);
 		
 		$filePathToInsert = mysqli_real_escape_string($link, $fileName);
-		$result = mysqli_query($link, "insert into version_management(filename, version) values ('" . $filePathToInsert . "'," . $this->version . ")");
+		$result = mysqli_query($link, "insert into version_management(filename,status,server_version) values ('" . $filePathToInsert . "',".$execStatus.",'".$this->serverVersion."')");
+		KalturaLog::debug("insert into version_management(filename,status,server_version) values ('" . $filePathToInsert . "',".$execStatus.",'".$this->serverVersion."')");
 		
 		return $result;
 	}
@@ -246,17 +235,18 @@ class ScriptsRunner
 	{
 		if(substr($scriptFile, - 4) == ".php")
 		{
-			if(! isset($this->alreadyRun[$scriptFile]))
-			{
-				if(!$this->runPHPScript($scriptFile) && !$this->ignoreErrors)
-				{
-					exit(-2);
+			if(! isset($this->alreadyRun[$scriptFile])){
+				if($this->runPHPScript($scriptFile)){
+					$this->updateVersion($scriptFile,self::EXEC_STATUS_SUCCESS);
+				}else{
+					$this->updateVersion($scriptFile,self::EXEC_STATUS_FAILURE);
+					KalturaLog::err("Failed to execute $scriptFile");
+					if (!$this->ignoreErrors){
+						exit(-2);
+					}
 				}
-				$this->updateVersion($scriptFile);
-			}
-			else
-			{
-				echo $scriptFile . ' already run' . PHP_EOL;
+			}else{
+				KalturaLog::info($scriptFile . ' already run');
 			}
 		}
 	}
@@ -282,22 +272,22 @@ class ScriptsRunner
 	{
 		if(! is_file($file))
 		{
-			echo "Could not run script: script not found $file";
+			KalturaLog::err("Could not run script: script not found $file");
 			return false;
 		}
 		
-		echo "Running [$file]" . PHP_EOL;
+		KalturaLog::info("Running [$file]");
 		
 		passthru("php " . $file . " realrun", $return_var);
 		
 		if($return_var === 0)
 		{
-			echo "Finish [$file]" . PHP_EOL . PHP_EOL;
+			KalturaLog::info("Finish [$file]");
 			return true;
 		}
 		else
 		{
-			echo "Failed to run [$file]" . PHP_EOL . PHP_EOL;
+			KalturaLog::err("Failed to run [$file]");
 			return false;
 		}
 	}
@@ -320,7 +310,7 @@ class OsUtils
 		}
 		else
 		{
-			echo "OS not recognized: " . PHP_OS . PHP_EOL;
+			KalturaLog::err("OS not recognized: " . PHP_OS);
 			return "";
 		}
 	}
