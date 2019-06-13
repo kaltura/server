@@ -468,4 +468,6 @@ class APIErrors
 
 	const NEW_LOGIN_REQUIRED = 'NEW_LOGIN_REQUIRED;;Switching to requested partner requires re-login';
 
+	const DIRECT_LOGIN_BLOCKED = 'DIRECT_LOGIN_BLOCKED;;Direct login is blocked on this partner';
+
 }

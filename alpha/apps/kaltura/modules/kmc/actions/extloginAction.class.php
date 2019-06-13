@@ -80,8 +80,9 @@ class extloginAction extends kalturaAction
 			{
 				$this->dieOnError  (APIErrors::NEW_LOGIN_REQUIRED);
 			}
-			else if ($code === kUserException::DIRECT_LOGIN_BLOCKED) {
-				throw new KalturaAPIException(KalturaErrors::DIRECT_LOGIN_BLOCKED);
+			else if ($code === kUserException::DIRECT_LOGIN_BLOCKED)
+			{
+				$this->dieOnError  (APIErrors::DIRECT_LOGIN_BLOCKED);
 			}
 			$this->dieOnError  ( APIErrors::INTERNAL_SERVERL_ERROR );
 		}
