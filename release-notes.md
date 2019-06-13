@@ -10,7 +10,7 @@
 
     moduls.analyticsLiveDashboard.enabled = true
     moduls.analyticsLiveDashboard.permissionType = 2
-    moduls.analyticsLiveDashboard.label = Enable Live Analytics Dashboard
+    moduls.analyticsLiveDashboard.label = Enable Real Time Dashboard
     moduls.analyticsLiveDashboard.permissionName = FEATURE_LIVE_ANALYTICS_DASHBOARD
     moduls.analyticsLiveDashboard.group = GROUP_ENABLE_DISABLE_FEATURES
 
