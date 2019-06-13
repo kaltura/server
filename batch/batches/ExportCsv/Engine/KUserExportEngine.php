@@ -168,7 +168,7 @@ class KUserExportEngine extends KObjectExportEngine
 
 			if(count($ret->objects))
 			{
-				$result = array_merge($result,$ret->objects);
+				$result = array_merge($result, $ret->objects);
 			}
 
 		}
