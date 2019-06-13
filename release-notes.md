@@ -6,7 +6,7 @@
 
 ### configuration ###
     Add the following to local.ini:
-	indexing_query_compress_threshold = 8192 ( DESIRED_THRESHOLD in size 8192 is 800KB )
+	indexing_query_compress_threshold = 819200 ( DESIRED_THRESHOLD in size 819200 is 800KB )
     
 ### Deployment scripts ###
     run mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura_sphinx_log <
