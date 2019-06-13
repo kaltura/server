@@ -103,7 +103,9 @@ class KUserExportEngine extends KObjectExportEngine
 		{
 			$usersMetadataObjects = $this->retrieveUsersMetadata($userIds, $metadataProfileId);
 			if ($usersMetadataObjects)
+			{
 				$userIdToRow = $this->fillAdditionalFieldsFromMetadata($usersMetadataObjects, $additionalFields, $userIdToRow);
+			}
 		}
 		foreach ($userIdToRow as $key=>$val)
 		{
