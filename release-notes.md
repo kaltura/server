@@ -9,7 +9,8 @@
 	indexing_query_compress_threshold = 8192 ( DESIRED_THRESHOLD in size 8192 is 800KB )
     
 ### Deployment scripts ###
-    run /opt/kaltura/app/deployment/updates/sql/2019_06_12_alter_sphinx_log_table_add_cutom_data_column.sql
+    run mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura_sphinx_log <
+    /opt/kaltura/app/deployment/updates/sql/2019_06_12_alter_sphinx_log_table_add_cutom_data_column.sql
     
 ## Add permission in Admin Console for new live analytics dashboard ##
 
