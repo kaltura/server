@@ -161,6 +161,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @thrown KalturaErrors::INVALID_PARTNER_ID
 	 * @thrown KalturaErrors::INTERNAL_SERVERL_ERROR
 	 * @throws KalturaErrors::USER_IS_BLOCKED
+	 * @throws KalturaErrors::DIRECT_LOGIN_BLOCKED
 	 */		
 	protected function loginImpl($puserId, $loginEmail, $password, $partnerId = null, $expiry = 86400, $privileges = '*', $otp = null)
 	{
@@ -213,6 +214,9 @@ class KalturaBaseUserService extends KalturaBaseService
 			}
 			else if ($code == kUserException::MISSING_OTP) {
 					throw new KalturaAPIException(KalturaErrors::MISSING_OTP);
+			}
+			else if ($code === kUserException::DIRECT_LOGIN_BLOCKED) {
+				throw new KalturaAPIException(KalturaErrors::DIRECT_LOGIN_BLOCKED);
 			}
 									
 			throw new $e;

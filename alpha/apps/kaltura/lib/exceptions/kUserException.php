@@ -55,4 +55,6 @@ class kUserException extends kCoreException
 
 	const NEW_LOGIN_REQUIRED = 'NEW_LOGIN_REQUIRED';
 
+	const DIRECT_LOGIN_BLOCKED = 'DIRECT_LOGIN_BLOCKED';
+
 }
