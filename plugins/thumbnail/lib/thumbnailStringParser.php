@@ -37,7 +37,10 @@ class thumbnailStringParser
 		'vstrip' => 'kVidStripAction',
 		'roundcorners' => 'kRoundCornersAction',
 		'rc' => 'kRoundCornersAction',
-		'itt' => 'kImageTextureText',
+		'itt' => 'kImageTextureTextAction',
+		'imageTextureText' => 'kImageTextureTextAction',
+		'filter' => 'kFilterAction',
+		'f' => 'kFilterAction',
 	);
 
 	/**

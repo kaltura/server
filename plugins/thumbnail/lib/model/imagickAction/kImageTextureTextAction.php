@@ -4,7 +4,7 @@
  * @subpackage model.imagickAction
  */
 
-class kImageTextureText extends kImagickAction
+class kImageTextureTextAction extends kImagickAction
 {
 	const TRANSPARENT_COLOR = 'none';
 	const DEFAULT_STROKE_COLOR = 'black';

@@ -38,4 +38,5 @@ class kThumbnailErrorMessages
 	const VID_STRIP_FAILED = 'Vid strip failed';
 	const ENTRY_TYPE = 'entryType';
 	const TEXT_DOES_NOT_FIT_ERR = 'text does not fit the bounding box';
+	const ILLEGAL_ENUM_VALUE = 'Illegal enum value';
 }

@@ -4,7 +4,7 @@
  * @subpackage model.imagickAction
  */
 
-class kTextAction extends kImageTextureText
+class kTextAction extends kImageTextureTextAction
 {
 	protected $strokeColor;
 	protected $fillColor;
