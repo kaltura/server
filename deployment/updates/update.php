@@ -169,7 +169,7 @@ class ScriptsRunner
 				}
 				else
 				{
-					KalturaLog::info($sqlFile . ' already run');
+				    KalturaLog::info($sqlFile . ' was previously applied. Skipping.');
 				}
 			}
 		}
@@ -246,7 +246,7 @@ class ScriptsRunner
 					}
 				}
 			}else{
-				KalturaLog::info($scriptFile . ' already run');
+				KalturaLog::info($scriptFile . ' was previously applied. Skipping.');
 			}
 		}
 	}
