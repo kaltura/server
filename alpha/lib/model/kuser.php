@@ -19,9 +19,9 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	const BULK_UPLOAD_ID = "bulk_upload_id";
 	const USER_MODE = 'user_mode';
 	const MEMBERS_COUNT = 'members_count';
-	
+	const PROCESS_STATUS = 'process_status';
 	const ANONYMOUS_PUSER_ID = "KALANONYM";
-	
+
 	const MINIMUM_ID_TO_DISPLAY = 8999;
 		
 	const KUSER_KALTURA = 0;
@@ -1411,4 +1411,13 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		return null;
 	}
 
+	public function setProcessStatus($v)
+	{
+		$this->putInCustomData(self::PROCESS_STATUS, $v);
+	}
+
+	public function getProcessStatus()
+	{
+		return $this->getFromCustomData(self::PROCESS_STATUS, null,GroupProcessStatus::NONE);
+	}
 }

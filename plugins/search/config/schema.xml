@@ -12,6 +12,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="type" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="index_name" type="varchar" size="128" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<index name="entry_id">
 			<index-column name="entry_id" />
 		</index>

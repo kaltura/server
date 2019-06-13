@@ -30,4 +30,5 @@ class KalturaCatalogItemLanguage extends KalturaStringEnum
 	const NO = KalturaLanguage::NO;
 	const FI = KalturaLanguage::FI;
 	const IS = KalturaLanguage::IS;
+	const PL = KalturaLanguage::PL;
 }

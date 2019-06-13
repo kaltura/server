@@ -72,6 +72,10 @@ class UserService extends KalturaBaseUserService
 		try
 		{
 			if (!is_null($user->roleIds)) {
+				if ($this->getPartnerId() == Partner::ADMIN_CONSOLE_PARTNER_ID && !kPermissionManager::isPermitted(PermissionName::SYSTEM_ADMIN_PERMISSIONS_UPDATE))
+				{
+					throw new KalturaAPIException(KalturaErrors::NOT_ALLOWED_TO_CHANGE_ROLE);
+				}
 				UserRolePeer::testValidRolesForUser($user->roleIds, $this->getPartnerId());
 				if ($user->roleIds != $dbUser->getRoleIds() &&
 					$dbUser->getId() == $this->getKuser()->getId()) {
@@ -306,6 +310,7 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::LOGIN_BLOCKED
 	 * @throws KalturaErrors::PASSWORD_EXPIRED
 	 * @throws KalturaErrors::USER_IS_BLOCKED
+	 * @throws KalturaErrors::DIRECT_LOGIN_BLOCKED
 	 */		
 	public function loginByLoginIdAction($loginId, $password, $partnerId = null, $expiry = 86400, $privileges = '*', $otp = null)
 	{
@@ -365,6 +370,7 @@ class UserService extends KalturaBaseUserService
 	 * 
 	 * @param string $hashKey The hash key used to identify the user (retrieved by email)
 	 * @param string $newPassword The new password to set for the user
+	 * @return KalturaAuthentication The authentication response
 	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
@@ -583,4 +589,48 @@ class UserService extends KalturaBaseUserService
 		$file_path = ExportCsvService::generateCsvPath($id, $this->getKs());
 		return $this->dumpFile($file_path, 'text/csv');
 	}
+
+	/**
+	 * get QR image content
+	 *
+	 * @action generateQrCode
+	 * @param string $hashKey
+	 * @return string
+	 * @throws KalturaErrors::INVALID_HASH
+	 * @throws KalturaErrors::INVALID_USER_ID
+	 * @throws KalturaErrors::ERROR_IN_QR_GENERATION
+	 *
+	 */
+	public function generateQrCodeAction($hashKey)
+	{
+		try
+		{
+			$loginData = UserLoginDataPeer::isHashKeyValid($hashKey);
+			if ($loginData)
+			{
+				$this->validateApiAccessControl($loginData->getLastLoginPartnerId());
+			}
+			$dbUser = kuserPeer::getAdminUser($loginData->getConfigPartnerId(), $loginData);
+		}
+		catch (kUserException $e)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_HASH);
+		}
+
+		if (!$dbUser)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $loginData->getLoginEmail());
+		}
+		$imgContent = authenticationUtils::getQRImage($dbUser);
+		if(!$imgContent)
+		{
+			throw new KalturaAPIException(KalturaErrors::ERROR_IN_QR_GENERATION);
+		}
+
+		$loginData->setPasswordHashKey(null);
+		$loginData->save();
+
+		return $imgContent;
+	}
+
 }

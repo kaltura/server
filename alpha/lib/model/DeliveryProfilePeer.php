@@ -300,7 +300,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 
 	protected static function selectDeliveryByDeliveryAttributes($partnerId, $streamerType, $deliveries, DeliveryProfileDynamicAttributes $deliveryAttributes)
 	{
-		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
+		$delivery = self::selectByDeliveryAttributes($partnerId, $deliveries, $deliveryAttributes);
 
 		if($delivery)
 		{
@@ -474,7 +474,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 
 		self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
 		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds);
-		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
+		$delivery = self::selectByDeliveryAttributes($storageProfile->getPartnerId(), $deliveries, $deliveryAttributes);
 		if($delivery) {
 			KalturaLog::info("Delivery ID for storageId [$storageId] ( PartnerId [" . $storageProfile->getPartnerId() . "] ) and streamer type [$streamerType] is " . $delivery->getId());
 			$delivery->setEntryId($deliveryAttributes->getEntryId());
@@ -494,7 +494,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes - constraints on delivery such as media protocol, flv support, etc..
 	 * @return The matching DeliveryProfile if exists, or null otherwise
 	 */
-	protected static function selectByDeliveryAttributes($deliveries, DeliveryProfileDynamicAttributes $deliveryAttributes) {
+	protected static function selectByDeliveryAttributes($partnerId, $deliveries, DeliveryProfileDynamicAttributes $deliveryAttributes) {
 		$supportedDPs = array();
 		$partialSupport = array();
 		
@@ -527,6 +527,33 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		
 		if ($c == 1)
 			return reset($supportedDPs);
+
+		$cdnRatios = kConf::getMap('cdn_ratios');
+		if ($cdnRatios && isset($cdnRatios[$partnerId]))
+		{
+			$ratios = $cdnRatios[$partnerId];
+			$sum = array_sum($ratios);
+			if ($sum)
+			{
+				$entryIdAffinity = crc32($deliveryAttributes->getEntryId()) % $sum;
+				$total = 0;
+				foreach($ratios as $cdnName => $ratio)
+				{
+					$total += $ratio;
+					if ($entryIdAffinity >= $total)
+						continue;
+
+					foreach($supportedDPs as $delivery)
+					{
+						if ($delivery->getPricingProfile() == $cdnName) {
+							return $delivery;
+						}
+					}
+
+					break;
+				}
+			}
+		}
 
 		$region = kGeoUtils::getCDNRegionFromIP();
 		
@@ -614,7 +641,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			
 		$deliveries = self::doSelect($c);
 		
-		$delivery = self::selectByDeliveryAttributes($deliveries, $deliveryAttributes);
+		$delivery = self::selectByDeliveryAttributes($partnerId, $deliveries, $deliveryAttributes);
 		if($delivery) {
 			KalturaLog::info("Delivery ID for Host Name: [$cdnHost] and streamer type: [$streamerType] is [" . $delivery->getId());
 			$delivery->setEntryId($entryId);

@@ -38,6 +38,8 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @param string $password
 	 * @param string $newEmail Optional, provide only when you want to update the email
 	 * @param string $newPassword
+	 * @param string $newFirstName Optional, provide only when you want to update the first name
+	 * @param string $newLastName Optional, provide only when you want to update the last name
 	 *
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
@@ -46,7 +48,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @throws KalturaErrors::PASSWORD_ALREADY_USED
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
 	 */
-	protected function updateLoginDataImpl( $email , $password , $newEmail = "" , $newPassword = "", $newFirstName, $newLastName)
+	protected function updateLoginDataImpl( $email , $password , $newEmail = "" , $newPassword = "", $newFirstName = null, $newLastName = null)
 	{
 		KalturaResponseCacher::disableCache();
 
@@ -159,6 +161,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @thrown KalturaErrors::INVALID_PARTNER_ID
 	 * @thrown KalturaErrors::INTERNAL_SERVERL_ERROR
 	 * @throws KalturaErrors::USER_IS_BLOCKED
+	 * @throws KalturaErrors::DIRECT_LOGIN_BLOCKED
 	 */		
 	protected function loginImpl($puserId, $loginEmail, $password, $partnerId = null, $expiry = 86400, $privileges = '*', $otp = null)
 	{
@@ -208,6 +211,12 @@ class KalturaBaseUserService extends KalturaBaseService
 			}
 			else if ($code == kUserException::INVALID_OTP) {
 				throw new KalturaAPIException(KalturaErrors::INVALID_OTP);
+			}
+			else if ($code == kUserException::MISSING_OTP) {
+					throw new KalturaAPIException(KalturaErrors::MISSING_OTP);
+			}
+			else if ($code === kUserException::DIRECT_LOGIN_BLOCKED) {
+				throw new KalturaAPIException(KalturaErrors::DIRECT_LOGIN_BLOCKED);
 			}
 									
 			throw new $e;
@@ -281,9 +290,20 @@ class KalturaBaseUserService extends KalturaBaseService
 			
 			throw $e;
 		}
-		if (!$result) {
+		if (!$result)
+		{
 			throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 		}
+		else
+		{
+			$response = new KalturaAuthentication();
+			if($result !== true)
+			{
+				$response->qrCode = $result;
+			}
+			return $response;
+		}
+
 	}
 	
 	protected function validateApiAccessControlByEmail($email)
@@ -388,6 +408,10 @@ class KalturaBaseUserService extends KalturaBaseService
 			else if ($code == kUserException::USER_IS_BLOCKED) 
 			{
 				throw new KalturaAPIException(APIErrors::USER_IS_BLOCKED);
+			}
+			else if ($code == kUserException::NEW_LOGIN_REQUIRED)
+			{
+				throw new KalturaAPIException(KalturaErrors::NEW_LOGIN_REQUIRED);
 			}
 			throw new KalturaAPIException(APIErrors::INTERNAL_SERVERL_ERROR);
 		}

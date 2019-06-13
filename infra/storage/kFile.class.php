@@ -15,6 +15,7 @@ class kFile extends kFileBase
 	 *  array[2] = filesize
 	 * @param string $path
 	 * @param string $pathPrefix
+	 * @return array
 	 */
 	public static function listDir($path, $pathPrefix = '')
 	{
@@ -78,7 +79,7 @@ class kFile extends kFileBase
 	}
 	
 	/*
-	 * Besure to limit the search with $max_results if not all files are reqquired
+	 * Be sure to limit the search with $max_results if not all files are required
 	 */
 	static public function recursiveDirList($directory, $return_directory_as_prefix = true, $should_recurse = false, $file_pattern = NULL, $depth = 0, $max_results = -1)
 	{
@@ -530,6 +531,7 @@ class kFileData
 	public $ext = NULL;
 	public $content = NULL;
 	public $raw_timestamp = NULL;
+	public $last_modified = NULL;
 	
 	public function __construct($full_file_path, $add_content = false)
 	{
@@ -541,9 +543,10 @@ class kFileData
 		
 		if($this->exists)
 		{
-			$this->size = self::fileSize($full_file_path);
+			$this->size = kFile::fileSize($full_file_path);
 			$this->raw_timestamp = filectime($full_file_path);
 			$this->timestamp = date("Y-m-d H:i:s.", $this->raw_timestamp);
+			$this->last_modified = filemtime($full_file_path);
 			
 			if($add_content)
 			{

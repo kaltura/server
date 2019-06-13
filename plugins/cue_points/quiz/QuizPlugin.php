@@ -1176,11 +1176,11 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 				$optionalAnswersScene->addChild("optionalAnswer");
 				if($optionalAnswer->getKey())
 				{
-					$scene->addChild('key', kMrssManager::stringToSafeXml($cuePoint->getKey()));
+					$scene->addChild('key', kMrssManager::stringToSafeXml($optionalAnswer->getKey()));
 				}
 				if($optionalAnswer->getText())
 				{
-					$scene->addChild('text', kMrssManager::stringToSafeXml($cuePoint->getText()));
+					$scene->addChild('text', kMrssManager::stringToSafeXml($optionalAnswer->getText()));
 				}
 				if($optionalAnswer->getWeight())
 				{

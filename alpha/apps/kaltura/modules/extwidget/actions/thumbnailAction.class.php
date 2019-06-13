@@ -559,6 +559,7 @@ class thumbnailAction extends sfAction
 				return $fileSync->getUpdatedAt(null);
 			}
 		}
+
 		$lastModifiedFlavor = assetPeer::retrieveLastModifiedFlavorByEntryId($entry->getId());
 		$lastModified = $lastModifiedFlavor ? $lastModifiedFlavor->getUpdatedAt(null) : null;
 

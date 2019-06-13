@@ -301,6 +301,24 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$loginData->resetPassword($newPassword);
 		myPartnerUtils::initialPasswordSetForFreeTrial($loginData);
 
+		$partner = PartnerPeer::retrieveByPK($loginData->getConfigPartnerId());
+		if($partner->getUseTwoFactorAuthentication())
+		{
+			kuserPeer::setUseCriteriaFilter(false);
+			$dbUser = kuserPeer::getKuserByPartnerAndUid($loginData->getConfigPartnerId(), $loginData->getLoginEmail(), true);
+			kuserPeer::setUseCriteriaFilter(true);
+			if (!$dbUser)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $loginData->getLoginEmail());
+			}
+
+			if(!$loginData->getSeedFor2FactorAuth())
+			{
+				authenticationUtils::generateNewSeed($dbUser);
+			}
+			return authenticationUtils::getQRImage($dbUser);
+		}
+
 		return true;
 	}
 	
@@ -365,13 +383,15 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$ksUserId = $ksObj->user;
 		$ksPartnerId = $ksObj->partner_id;
 		$kuser = null;
-		
+
+		$partner = PartnerPeer::retrieveByPK($ksPartnerId);
+		if (!$partner)
+		{
+			throw new kUserException('Invalid partner id ['.$ksPartnerId.']', kUserException::INVALID_PARTNER);
+		}
+
 		if ((is_null($ksUserId) || $ksUserId === '') && $useOwnerIfNoUser)
 		{
-			$partner = PartnerPeer::retrieveByPK($ksPartnerId);
-			if (!$partner) {
-				throw new kUserException('Invalid partner id ['.$ksPartnerId.']', kUserException::INVALID_PARTNER);
-			}
 			$ksUserId = $partner->getAccountOwnerKuserId();
 			$kuser = kuserPeer::retrieveByPK($ksUserId);
 		}
@@ -383,13 +403,20 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		{
 			throw new kUserException('User with id ['.$ksUserId.'] was not found for partner with id ['.$ksPartnerId.']', kUserException::USER_NOT_FOUND);
 		}
+
+		$requestedPartner = PartnerPeer::retrieveByPK($requestedPartnerId);
+		if (!$requestedPartner)
+		{
+			throw new kUserException('Invalid partner id ['.$requestedPartnerId.']', kUserException::INVALID_PARTNER);
+		}
+		self::verifyAuthenticatedPartnerSwitch($partner, $requestedPartner);
 			
-		return self::userLogin($kuser->getLoginData(), null, $requestedPartnerId, false);  // don't validate password		
+		return self::userLogin($kuser->getLoginData(), null, $requestedPartnerId, false, null, false);  // don't validate password
 	}
 
 
 	// user login by user_login_data object
-	private static function userLogin(UserLoginData $loginData = null, $password, $partnerId = null, $validatePassword = true, $otp = null)
+	private static function userLogin(UserLoginData $loginData = null, $password, $partnerId = null, $validatePassword = true, $otp = null, $validateOtp = true)
 	{
 		$requestedPartner = $partnerId;
 		
@@ -420,9 +447,9 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		if (time() < $loginData->getLoginBlockedUntil(null)) {
 			throw new kUserException('', kUserException::LOGIN_BLOCKED);
 		}
-		
+
 		//Check if the user's ip address is in the right range to ignore the otp
-		
+		$otpRequired = false;
 		if(kConf::hasParam ('otp_required_partners') && 
 			in_array ($partnerId, kConf::get ('otp_required_partners')) &&
 			kConf::hasParam ('partner_otp_internal_ips'))
@@ -437,34 +464,51 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 					break;
 				}
 			}
-			
-			if ($otpRequired)
-			{
-				// add google authenticator library to include path
-				require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
-				
-				$result = GoogleAuthenticator::verifyCode ($loginData->getSeedFor2FactorAuth(), $otp);
-				if (!$result)
-				{
-					throw new kUserException ('', kUserException::INVALID_OTP);
-				}
-			} 
 		}
-		
+
+		if (!$partnerId)
+		{
+			$partnerId = $loginData->getLastLoginPartnerId();
+		}
+		if (!$partnerId)
+		{
+			throw new kUserException('', kUserException::INVALID_PARTNER);
+		}
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+
+		if($partner && $partner->getBlockDirectLogin())
+		{
+			throw new kUserException('Direct login is blocked', kUserException::DIRECT_LOGIN_BLOCKED);
+		}
+		if($validateOtp && $partner && $partner->getUseTwoFactorAuthentication())
+		{
+			$user = kuserPeer::getAdminUser($partnerId, $loginData);
+			if($user)
+			{
+				$otpRequired = true;
+			}
+		}
+
+		if ($otpRequired)
+		{
+			if(!$otp)
+			{
+				throw new kUserException ('otp is missing', kUserException::MISSING_OTP);
+			}
+			$result = authenticationUtils::verify2FACode($loginData, $otp);
+			if (!$result)
+			{
+				throw new kUserException ('otp is invalid', kUserException::INVALID_OTP);
+			}
+		}
+
 		$loginData->setLoginAttempts(0);
 		$loginData->save();
 		$passUpdatedAt = $loginData->getPasswordUpdatedAt(null);
 		if ($passUpdatedAt && (time() > $passUpdatedAt + $loginData->getPassReplaceFreq())) {
 			throw new kUserException('', kUserException::PASSWORD_EXPIRED);
 		}
-		if (!$partnerId) {
-			$partnerId = $loginData->getLastLoginPartnerId();
-		}
-		if (!$partnerId) {
-			throw new kUserException('', kUserException::INVALID_PARTNER);
-		}
-		
-		$partner = PartnerPeer::retrieveByPK($partnerId);		
+
 		$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
 		
 		if (!$kuser || $kuser->getStatus() != KuserStatus::ACTIVE || !$partner || $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE)
@@ -716,4 +760,43 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	{
 		return array(array("userLoginData:id=%s", self::ID), array("userLoginData:loginEmail=%s", self::LOGIN_EMAIL));		
 	}
+
+	public static function getAuthInfoLink($hashKey)
+	{
+		if (!$hashKey)
+		{
+			return null;
+		}
+		$loginData = self::isHashKeyValid($hashKey);
+		if (!$loginData)
+		{
+			throw new kCoreException('Hash key not valid', kCoreException::INVALID_HASH);
+		}
+
+		$partnerId = $loginData->getConfigPartnerId();
+		$resetLinksArray = kConf::get('password_reset_links');
+		$qrLink = $resetLinksArray['qr_page'];
+
+		$httpsEnforcePermission = PermissionPeer::isValidForPartner(PermissionName::FEATURE_KMC_ENFORCE_HTTPS, $partnerId);
+		if(strpos($qrLink, infraRequestUtils::PROTOCOL_HTTPS) === false && $httpsEnforcePermission)
+			$qrLink = str_replace(infraRequestUtils::PROTOCOL_HTTP , infraRequestUtils::PROTOCOL_HTTPS , $qrLink);
+
+		return $qrLink.$hashKey;
+	}
+
+
+	protected static function verifyAuthenticatedPartnerSwitch($originPartner, $requestedPartner)
+	{
+		$originPartnerAuthType = $originPartner->getAuthenticationType();
+		$requestedPartnerAuthType = $requestedPartner->getAuthenticationType();
+
+		if($originPartnerAuthType !== $requestedPartnerAuthType)
+		{
+			if($requestedPartnerAuthType !== PartnerAuthenticationType::PASSWORD_ONLY)
+			{
+				throw new kUserException ('Switching to requested partner requires re-login', kUserException::NEW_LOGIN_REQUIRED);
+			}
+		}
+	}
+
 } // UserLoginDataPeer

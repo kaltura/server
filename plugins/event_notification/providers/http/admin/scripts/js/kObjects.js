@@ -49,7 +49,8 @@ var kObjects = {
 	        UserLoginData:					{label:	'User Login Data', apiType: 'KalturaUserLoginData'},
 	        UserRole:						{label:	'User Role', apiType: 'KalturaUserRole'},
 	        widget:							{label:	'Widget', apiType: 'KalturaWidget'},
-	        categoryEntry:					{label:	'Category - Entry', apiType: 'KalturaCategoryEntry'}
+	        categoryEntry:					{label:	'Category - Entry', apiType: 'KalturaCategoryEntry'},
+	        entryVendorTask:					{label: 'Entry Vendor Task', apiType: 'KalturaEntryVendorTask'}
 		},
 		subLabel:		'Select Object Type',
 		getData:		function(subCode, variables){

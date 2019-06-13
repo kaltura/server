@@ -155,11 +155,14 @@ class ScriptsRunner
 			{
 				if(! isset($this->alreadyRun[$sqlFile]))
 				{
-					if(!$this->runSqlScript($sqlDir . DIRECTORY_SEPARATOR . $sqlFile) && !$this->ignoreErrors)
-					{
+				    if(!$this->runSqlScript($sqlDir . DIRECTORY_SEPARATOR . $sqlFile)) {
+					echo "Failed to execute " . $sqlDir . DIRECTORY_SEPARATOR . $sqlFile . PHP_EOL;
+					if(!$this->ignoreErrors){
 						exit(-1);
 					}
+				    }else{
 					$this->updateVersion($sqlFile);
+				    }
 				}
 				else
 				{

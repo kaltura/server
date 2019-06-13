@@ -4,7 +4,7 @@
  * @subpackage model.imagickAction
  */
 
-class resizeAction extends imagickAction
+class kResizeAction extends kImagickAction
 {
 	protected $newWidth;
 	protected $newHeight;
@@ -15,23 +15,23 @@ class resizeAction extends imagickAction
 	protected $blur;
 	protected $shouldUseResize;
 	protected $compositeFit;
+	/* @var Imagick $compositeObject */
 	protected $compositeObject;
 
-	const MAX_IMAGE_SIZE = 10000;
 	const BEST_FIT_MIN = 1;
-	CONST MIN_DIMENSION = 0;
 
-	protected $parameterAlias = array(
-		"w" => kThumbnailParameterName::WIDTH,
-		"h" => kThumbnailParameterName::HEIGHT,
-		"ft" => kThumbnailParameterName::FILTER_TYPE,
-		"filtertype" => kThumbnailParameterName::FILTER_TYPE,
-		"b" => kThumbnailParameterName::BLUR,
-		"bf" => kThumbnailParameterName::BEST_FIT,
-		"bestfit" => kThumbnailParameterName::BEST_FIT,
-		"cf" => kThumbnailParameterName::COMPOSITE_FIT,
-		"compositefit" => kThumbnailParameterName::COMPOSITE_FIT,
-	);
+	protected function initParameterAlias()
+	{
+		$resizeParameterAlias = array(
+			'w' => kThumbnailParameterName::WIDTH,
+			'h' => kThumbnailParameterName::HEIGHT,
+			'ft' => kThumbnailParameterName::FILTER_TYPE,
+			'b' => kThumbnailParameterName::BLUR,
+			'bf' => kThumbnailParameterName::BEST_FIT,
+			'cf' => kThumbnailParameterName::COMPOSITE_FIT,
+		);
+		$this->parameterAlias = array_merge($this->parameterAlias, $resizeParameterAlias);
+	}
 
 	protected function extractActionParameters()
 	{
@@ -53,7 +53,8 @@ class resizeAction extends imagickAction
 		{
 			if(!$this->compositeObject)
 			{
-				throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'Missing composite object');
+				$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::MISSING_COMPOSITE);
+				throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 			}
 		}
 		else
@@ -66,22 +67,26 @@ class resizeAction extends imagickAction
 	{
 		if($this->bestFit && $this->newWidth < self::BEST_FIT_MIN)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'If bestfit is supplied parameter width must be positive');
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::BEST_FIT_WIDTH);
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
 		if($this->bestFit && $this->newHeight < self::BEST_FIT_MIN)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, ' If bestfit is supplied parameter height must be positive');
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::BEST_FIT_HEIGHT);
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
-		if(!is_numeric($this->newWidth) || $this->newWidth < self::MIN_DIMENSION || $this->newWidth > self::MAX_IMAGE_SIZE)
+		if(!is_numeric($this->newWidth) || $this->newWidth < self::MIN_DIMENSION || $this->newWidth > self::MAX_DIMENSION)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'width must be between 0 and 10000');
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::WIDTH_DIMENSIONS);
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
-		if(!is_numeric($this->newHeight) || $this->newHeight < self::MIN_DIMENSION || $this->newHeight > self::MAX_IMAGE_SIZE)
+		if(!is_numeric($this->newHeight) || $this->newHeight < self::MIN_DIMENSION || $this->newHeight > self::MAX_DIMENSION)
 		{
-			throw new KalturaAPIException(KalturaThumbnailErrors::BAD_QUERY, 'height must be between 0 and 10000');
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::HEIGHT_DIMENSIONS);
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 	}
 

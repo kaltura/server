@@ -7,6 +7,7 @@
 class kPexipHandler
 {
 	const ROOM_PREFIX = '/api/admin/configuration/v1/conference/';
+	const LOCATION_PREFIX = '/api/admin/configuration/v1/system_location/';
 	const ADP_PREFIX = '/api/admin/configuration/v1/automatic_participant/';
 	const ACTIVE_ROOM_PREFIX = '/api/admin/status/v1/conference/';
 	const ROOM_NAME_KEY = 'roomName';
@@ -35,7 +36,9 @@ class kPexipHandler
 		{
 			$primaryRtmp = $dbLiveEntry->getPrimaryBroadcastingUrl() . '/' . $dbLiveEntry->getStreamName();
 			$primaryRtmp  = str_replace("%i", "1", $primaryRtmp);
-			$primaryAdpId = self::addADP($dbLiveEntry, $roomId, $primaryRtmp, 'Primary', $pexipConfig);
+			$locationId = $pexipConfig[kPexipUtils::CONFIG_PRIMARY_LOCATION_ID];
+			$locationId = is_numeric($locationId) ? $locationId : null;
+			$primaryAdpId = self::addADP($dbLiveEntry, $roomId, $primaryRtmp, 'Primary', $pexipConfig, $locationId);
 			if(!$primaryAdpId)
 			{
 				throw new KalturaAPIException(KalturaErrors::PEXIP_ADP_CREATION_FAILED, $dbLiveEntry->getId());
@@ -47,19 +50,14 @@ class kPexipHandler
 		{
 			$secondaryRtmp = $dbLiveEntry->getSecondaryBroadcastingUrl() . '/' . $dbLiveEntry->getStreamName();
 			$secondaryRtmp = str_replace("%i", "1", $secondaryRtmp );
-			$secondaryAdpId = self::addADP($dbLiveEntry, $roomId, $secondaryRtmp, 'Secondary', $pexipConfig);
+			$locationId = $pexipConfig[kPexipUtils::CONFIG_SECONDARY_LOCATION_ID];
+			$locationId = is_numeric($locationId) ? $locationId : null;
+			$secondaryAdpId = self::addADP($dbLiveEntry, $roomId, $secondaryRtmp, 'Secondary', $pexipConfig, $locationId);
 
 			if(!$secondaryAdpId)
 			{
 				throw new KalturaAPIException(KalturaErrors::PEXIP_ADP_CREATION_FAILED, $dbLiveEntry->getId());
 			}
-		}
-
-		$sipEntryServerNode = kPexipUtils::createSipEntryServerNode($dbLiveEntry, $roomId, $primaryAdpId, $secondaryAdpId);
-		/** @var  SipEntryServerNode $sipEntryServerNode */
-		if(!$sipEntryServerNode)
-		{
-			throw new KalturaAPIException(KalturaErrors::SIP_ENTRY_SERVER_NODE_CREATION_FAILED, $dbLiveEntry->getId());
 		}
 
 		return array($roomId, $primaryAdpId, $secondaryAdpId);
@@ -247,9 +245,10 @@ class kPexipHandler
 	 * @param $participantAddress
 	 * @param $name
 	 * @param $pexipConfig
+	 * @param $locationId
 	 * @return null
 	 */
-	protected static function addADP(LiveStreamEntry $entry, $roomId, $participantAddress, $name, $pexipConfig)
+	protected static function addADP(LiveStreamEntry $entry, $roomId, $participantAddress, $name, $pexipConfig, $locationId = null)
 	{
 		$adpId = null;
 		KalturaLog::info("Creating RTMP-ADP $name to Virtual Room $roomId");
@@ -264,6 +263,10 @@ class kPexipHandler
 			'streaming' => 1,
 			'keep_conference_alive' => 'keep_conference_alive_never'
 		);
+		if ($locationId)
+		{
+			$adpData["system_location"] = $pexipConfig[kPexipUtils::CONFIG_API_ADDRESS] . self::LOCATION_PREFIX . "$locationId/";
+		}
 		$url = $pexipConfig[kPexipUtils::CONFIG_API_ADDRESS] . self::ADP_PREFIX;
 		$curlWrapper = self::initPexipCurlWrapper(HttpMethods::POST, $pexipConfig, $adpData);
 		$result = $curlWrapper->doExec($url);

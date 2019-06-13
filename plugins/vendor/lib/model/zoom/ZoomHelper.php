@@ -78,6 +78,7 @@ class ZoomHelper
 			list($puserId,) = explode('@', $dbUser->getPuserId());
 			kuserPeer::createUniqueKuserForPartner($dbUser->getPartnerId(), $puserId);
 			$entry->setEntitledPusersEdit($puserId);
+			$entry->setEntitledPusersPublish($puserId);
 		}
 		$entry->save();
 		return $entry->getId();
