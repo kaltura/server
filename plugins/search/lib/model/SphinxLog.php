@@ -15,7 +15,7 @@
  */
 class SphinxLog extends BaseSphinxLog {
 
-	const INDEXING_QUERY_COMPRESS_THRESHOLD_DEFAULT = 8 * 1024; //800KB
+	const INDEXING_QUERY_COMPRESS_THRESHOLD_DEFAULT = 800 * 1024; //800KB
 
 	public function getIsCompressed()	{ return $this->getFromCustomData( "IsCompressed", null, false ); }
 	public function setIsCompressed( $v )	{ $this->putInCustomData( "IsCompressed" , $v ); }
