@@ -46,6 +46,10 @@ class ReachProfilePeer extends BaseReachProfilePeer
 	
 	public static function updateUsedCredit($reachProfileId, $value)
 	{
+		if($value==0)
+		{
+			return;
+		}
 		$connection = Propel::getConnection();
 		
 		$updateSql = "UPDATE ".ReachProfilePeer::TABLE_NAME." SET " .
