@@ -135,7 +135,6 @@ class AdminUserService extends KalturaBaseUserService
 	 * @thrown KalturaErrors::PASSWORD_EXPIRED
 	 * @thrown KalturaErrors::INVALID_PARTNER_ID
 	 * @thrown KalturaErrors::INTERNAL_SERVERL_ERROR
-	 * @thrown KalturaErrors::DIRECT_LOGIN_BLOCKED
 	 */		
 	public function loginAction($email, $password, $partnerId = null)
 	{

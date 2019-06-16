@@ -90,10 +90,6 @@ class adminloginAction extends defPartnerservices2Action
 				$this->addError  (APIErrors::USER_IS_BLOCKED);
 				return null;
 			}
-			else if ($code === kUserException::DIRECT_LOGIN_BLOCKED) {
-				$this->addError  (APIErrors::DIRECT_LOGIN_BLOCKED);
-				return null;
-			}
 			else {
 				$this->addError  ( APIErrors::INTERNAL_SERVERL_ERROR );
 				return null;

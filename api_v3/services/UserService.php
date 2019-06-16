@@ -282,7 +282,6 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::LOGIN_BLOCKED
 	 * @throws KalturaErrors::PASSWORD_EXPIRED
 	 * @throws KalturaErrors::USER_IS_BLOCKED
-	 * @throws KalturaErrors::DIRECT_LOGIN_BLOCKED
 	 */		
 	public function loginAction($partnerId, $userId, $password, $expiry = 86400, $privileges = '*')
 	{
