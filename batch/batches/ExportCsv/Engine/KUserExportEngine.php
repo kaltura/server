@@ -101,9 +101,11 @@ class KUserExportEngine extends KObjectExportEngine
 		
 		if($metadataProfileId)
 		{
-			$usersMetadata = $this->retrieveUsersMetadata($userIds, $metadataProfileId);
-			if ($usersMetadata->objects)
-				$userIdToRow = $this->fillAdditionalFieldsFromMetadata($usersMetadata, $additionalFields, $userIdToRow);
+			$usersMetadataObjects = $this->retrieveUsersMetadata($userIds, $metadataProfileId);
+			if ($usersMetadataObjects)
+			{
+				$userIdToRow = $this->fillAdditionalFieldsFromMetadata($usersMetadataObjects, $additionalFields, $userIdToRow);
+			}
 		}
 		foreach ($userIdToRow as $key=>$val)
 		{
@@ -140,24 +142,38 @@ class KUserExportEngine extends KObjectExportEngine
 	 */
 	protected function retrieveUsersMetadata($userIds, $metadataProfileId)
 	{
-		$result = null;
+		$result = array();
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
-		$pager->pageIndex = 1;
+		$pager->pageIndex = 0;
 		$filter = new KalturaMetadataFilter();
 		$filter->objectIdIn = implode(',', $userIds);
 		$filter->metadataObjectTypeEqual = MetadataObjectType::USER;
 		$filter->metadataProfileIdEqual = $metadataProfileId;
-		try
+		$metadataClient = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
+		do
 		{
-			$metadataClient = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
-			$result = $metadataClient->metadata->listAction($filter, $pager);
+			$pager->pageIndex++;
+
+			try
+			{
+				$ret = $metadataClient->metadata->listAction($filter, $pager);
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::info("Couldn't list metadata objects for metadataProfileId: [$metadataProfileId]" . $e->getMessage());
+				$this->apiError = $e;
+				break;
+			}
+
+			if(count($ret->objects))
+			{
+				$result = array_merge($result, $ret->objects);
+			}
+
 		}
-		catch(Exception $e)
-		{
-			KalturaLog::info("Couldn't list metadata objects for metadataProfileId: [$metadataProfileId]" . $e->getMessage());
-			$this->apiError = $e;
-		}
+		while(count($ret->objects) >= $pager->pageSize);
+
 		return $result;
 	}
 	
@@ -187,9 +203,9 @@ class KUserExportEngine extends KObjectExportEngine
 	/**
 	 * the function run over each additional field and returns the value for the given field xpath
 	 */
-	private function fillAdditionalFieldsFromMetadata($usersMetadata, $additionalFields, $userIdToRow)
+	private function fillAdditionalFieldsFromMetadata($usersMetadataObjects, $additionalFields, $userIdToRow)
 	{
-		foreach($usersMetadata->objects as $metadataObj)
+		foreach($usersMetadataObjects as $metadataObj)
 		{
 			foreach ($additionalFields as $field)
 			{
