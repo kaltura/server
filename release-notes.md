@@ -1,5 +1,16 @@
 # Orion 15.1.0 #
 
+## Allow all KMC users to order reach captions ##
+
+- Issue Type: Task
+- Issue ID: SUP-18314
+
+### Configuration ###
+	None.
+		
+#### Deployment Scripts ####	
+		  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_16_allow_kmc_user_reach_profile_access.php
+		  
 ## Compress sphinx_log queries according to threshold ##
 - Issue Type: TASK
 - Issue ID: SUP-18392
