@@ -107,7 +107,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR,
 				self::METRIC_AVG_VIEW_BITRATE,
 				self::METRIC_VIEW_PLAY_TIME_SEC,
-				self::METRIC_AVG_VIEW_LATENCY,
+				self::METRIC_AVG_VIEW_LIVE_LATENCY,
 				self::METRIC_AVG_VIEW_DROPPED_FRAMES_RATIO,
 			),
 		),

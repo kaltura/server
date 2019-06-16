@@ -110,6 +110,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_VIEW_DVR_PLAY_TIME_SEC = 'view_dvr_play_time_sec';
 	const METRIC_VIEW_IS_BUFFERING_COUNT = 'view_is_buffering_count';
 	const METRIC_VIEW_ENGAGED_COUNT = 'view_engaged_count';
+	const METRIC_VIEW_LIVE_LATENCY_COUNT = 'view_live_latency_count';
+	const METRIC_VIEW_LIVE_LATENCY_SUM = 'view_live_latency_sum';
 
 	//player-events-realtime druid calculated metrics
 	const METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH = 'avg_view_downstream_bandwidth';
@@ -117,6 +119,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_AVG_VIEW_DROPPED_FRAMES_RATIO = 'avg_view_dropped_frames_ratio';
 	const METRIC_AVG_VIEW_BUFFERING = 'avg_view_buffering';
 	const METRIC_AVG_VIEW_ENGAGEMENT = 'avg_view_engagement';
+	const METRIC_AVG_VIEW_LIVE_LATENCY = 'avg_view_live_latency';
 
 	//report classes
 	const CUSTOM_REPORTS_CLASS = 'kKavaCustomReports';
@@ -696,6 +699,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_LATENCY))),
 			self::getLongSumAggregator(self::METRIC_VIEW_LATENCY_COUNT, self::METRIC_COUNT));
 
+		self::$aggregations_def[self::METRIC_VIEW_LIVE_LATENCY_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_LATENCY),
+				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_LIVE))),
+			self::getLongSumAggregator(self::METRIC_VIEW_LIVE_LATENCY_COUNT, self::METRIC_COUNT));
+
 		self::$aggregations_def[self::METRIC_VIEW_DROPPED_FRAMES_RATIO_COUNT] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
@@ -717,6 +727,12 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_LATENCY_SUM] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
 			self::getLongSumAggregator(self::METRIC_LATENCY_SUM, self::METRIC_LATENCY_SUM));
+
+		self::$aggregations_def[self::METRIC_VIEW_LIVE_LATENCY_SUM] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_LIVE))),
+			self::getLongSumAggregator(self::METRIC_VIEW_LIVE_LATENCY_SUM, self::METRIC_LATENCY_SUM));
 
 		self::$aggregations_def[self::METRIC_DROPPED_FRAMES_RATIO_SUM] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
@@ -874,6 +890,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_AVG_VIEW_LATENCY,
 				self::METRIC_LATENCY_SUM,
 				self::METRIC_VIEW_LATENCY_COUNT));
+
+		self::$metrics_def[self::METRIC_AVG_VIEW_LIVE_LATENCY] = array(
+			self::DRUID_AGGR => array(self::METRIC_VIEW_LIVE_LATENCY_SUM, self::METRIC_VIEW_LIVE_LATENCY_COUNT),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_AVG_VIEW_LIVE_LATENCY,
+				self::METRIC_VIEW_LIVE_LATENCY_SUM,
+				self::METRIC_VIEW_LIVE_LATENCY_COUNT));
 
 		self::$metrics_def[self::METRIC_AVG_VIEW_DROPPED_FRAMES_RATIO] = array(
 			self::DRUID_AGGR => array(self::METRIC_DROPPED_FRAMES_RATIO_SUM, self::METRIC_VIEW_DROPPED_FRAMES_RATIO_COUNT),
