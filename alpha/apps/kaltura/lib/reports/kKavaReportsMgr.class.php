@@ -104,8 +104,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_VIEW_UNIQUE_AUDIENCE_DVR = 'view_unique_audience_dvr';
 	const METRIC_VIEW_LATENCY_COUNT = 'view_latency_count';
 	const METRIC_VIEW_DROPPED_FRAMES_RATIO_COUNT = 'view_dropped_frames_ratio_count';
-	const METRIC_VIEW_LIVE_PLAY_COUNT = 'view_live_play_count';
-	const METRIC_VIEW_DVR_PLAY_COUNT = 'view_dvr_play_count';
+	const METRIC_VIEW_LIVE_COUNT = 'view_live_count';
+	const METRIC_VIEW_DVR_COUNT = 'view_dvr_count';
 	const METRIC_VIEW_LIVE_PLAY_TIME_SEC = 'view_live_play_time_sec';
 	const METRIC_VIEW_DVR_PLAY_TIME_SEC = 'view_dvr_play_time_sec';
 	const METRIC_VIEW_IS_BUFFERING_COUNT = 'view_is_buffering_count';
@@ -722,17 +722,17 @@ class kKavaReportsMgr extends kKavaBase
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
 			self::getDoubleSumAggregator(self::METRIC_DROPPED_FRAMES_RATIO_SUM, self::METRIC_DROPPED_FRAMES_RATIO_SUM));
 
-		self::$aggregations_def[self::METRIC_VIEW_LIVE_PLAY_COUNT] = self::getFilteredAggregator(
+		self::$aggregations_def[self::METRIC_VIEW_LIVE_COUNT] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
 				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_LIVE))),
-			self::getLongSumAggregator(self::METRIC_VIEW_LIVE_PLAY_COUNT, self::METRIC_COUNT));
+			self::getLongSumAggregator(self::METRIC_VIEW_LIVE_COUNT, self::METRIC_COUNT));
 
-		self::$aggregations_def[self::METRIC_VIEW_DVR_PLAY_COUNT] = self::getFilteredAggregator(
+		self::$aggregations_def[self::METRIC_VIEW_DVR_COUNT] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
 				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_DVR))),
-			self::getLongSumAggregator(self::METRIC_VIEW_DVR_PLAY_COUNT, self::METRIC_COUNT));
+			self::getLongSumAggregator(self::METRIC_VIEW_DVR_COUNT, self::METRIC_COUNT));
 
 		self::$aggregations_def[self::METRIC_VIEW_IS_BUFFERING_COUNT] = self::getFilteredAggregator(
 			self::getAndFilter(array(
@@ -811,14 +811,14 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_VIEW_PLAY_TIME_SEC, self::EVENT_TYPE_VIEW, '10'));
 
 		self::$metrics_def[self::METRIC_VIEW_LIVE_PLAY_TIME_SEC] = array(
-			self::DRUID_AGGR => array(self::METRIC_VIEW_LIVE_PLAY_COUNT),
+			self::DRUID_AGGR => array(self::METRIC_VIEW_LIVE_COUNT),
 			self::DRUID_POST_AGGR => self::getConstantFactorFieldAccessPostAggr(
-				self::METRIC_VIEW_LIVE_PLAY_TIME_SEC, self::METRIC_VIEW_LIVE_PLAY_COUNT, '10'));
+				self::METRIC_VIEW_LIVE_PLAY_TIME_SEC, self::METRIC_VIEW_LIVE_COUNT, '10'));
 
 		self::$metrics_def[self::METRIC_VIEW_DVR_PLAY_TIME_SEC] = array(
-			self::DRUID_AGGR => array(self::METRIC_VIEW_DVR_PLAY_COUNT),
+			self::DRUID_AGGR => array(self::METRIC_VIEW_DVR_COUNT),
 			self::DRUID_POST_AGGR => self::getConstantFactorFieldAccessPostAggr(
-				self::METRIC_VIEW_DVR_PLAY_TIME_SEC, self::METRIC_VIEW_DVR_PLAY_COUNT, '10'));
+				self::METRIC_VIEW_DVR_PLAY_TIME_SEC, self::METRIC_VIEW_DVR_COUNT, '10'));
 		
 		// field ratio metrics
 		self::$metrics_def[self::METRIC_PLAYTHROUGH_RATIO] = array(
