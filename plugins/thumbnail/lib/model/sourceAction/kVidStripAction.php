@@ -29,6 +29,7 @@ class kVidStripAction extends kVidAction
 
 	protected function extractActionParameters()
 	{
+		parent::extractActionParameters();
 		$this->numberOfSlices = $this->getIntActionParameter(kThumbnailParameterName::NUMBER_OF_SLICES);
 		$this->startSec = $this->getFloatActionParameter(kThumbnailParameterName::START_SEC, 0);
 		$this->endSec = $this->getFloatActionParameter(kThumbnailParameterName::END_SEC);
