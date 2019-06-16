@@ -129,7 +129,7 @@ class kEventsManager
 				$consumers[] = $consumer;
 		}
 			
-		return $consumers;
+		return array_unique($consumers);
 	}
 	
 	/**
