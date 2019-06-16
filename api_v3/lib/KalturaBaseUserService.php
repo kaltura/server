@@ -413,6 +413,10 @@ class KalturaBaseUserService extends KalturaBaseService
 			{
 				throw new KalturaAPIException(KalturaErrors::NEW_LOGIN_REQUIRED);
 			}
+			else if ($code === kUserException::DIRECT_LOGIN_BLOCKED)
+			{
+				throw new KalturaAPIException(KalturaErrors::DIRECT_LOGIN_BLOCKED);
+			}
 			throw new KalturaAPIException(APIErrors::INTERNAL_SERVERL_ERROR);
 		}
 		

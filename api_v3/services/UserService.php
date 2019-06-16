@@ -559,6 +559,7 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::INTERNAL_SERVERL_ERROR
 	 * @throws KalturaErrors::UNKNOWN_PARTNER_ID
 	 * @throws KalturaErrors::SERVICE_ACCESS_CONTROL_RESTRICTED
+	 * @throws KalturaErrors::DIRECT_LOGIN_BLOCKED
 	 * 
 	 */
 	public function loginByKsAction($requestedPartnerId)
