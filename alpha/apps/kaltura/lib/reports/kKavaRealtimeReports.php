@@ -81,10 +81,6 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_VIEW_UNIQUE_AUDIENCE,
 				self::METRIC_VIEW_PLAY_TIME_SEC,
 			),
-			self::REPORT_FILTER_DIMENSION => self::DIMENSION_DEVICE,
-			self::REPORT_DRILLDOWN_DIMENSION_MAP => array(
-				'os' => self::DIMENSION_OS
-			),
 		),
 
 		ReportType::USERS_OVERVIEW_REALTIME => array(
@@ -119,10 +115,10 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 		ReportType::ENTRY_LEVEL_USERS_DISCOVERY_REALTIME => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'user_id' => self::DIMENSION_KUSER_ID,
-				'creator_name' => self::DIMENSION_KUSER_ID,
+				'user_name' => self::DIMENSION_KUSER_ID,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => array('user_id', 'creator_name'),
+				self::REPORT_ENRICH_OUTPUT => array('user_id', 'user_name'),
 				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'columns' => array('PUSER_ID', 'IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
@@ -186,10 +182,6 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
 				self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
 			),
-			self::REPORT_FILTER_DIMENSION => self::DIMENSION_DEVICE,
-			self::REPORT_DRILLDOWN_DIMENSION_MAP => array(
-				'os' => self::DIMENSION_OS
-			),
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addFlavorParamColumn',
 			self::REPORT_TOTAL_FINALIZE_FUNC => 'self::addFlavorParamTotalColumn',
 			self::REPORT_TABLE_MAP => array(
@@ -217,6 +209,18 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				'playback_type' => self::DIMENSION_PLAYBACK_TYPE,
 			),
 			self::REPORT_METRICS => array(self::METRIC_VIEW_PLAY_TIME_SEC)
+		),
+
+		ReportType::CONTENT_REALTIME => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'entry_id' => self::DIMENSION_ENTRY_ID,
+			),
+			self::REPORT_METRICS => array(
+				self::METRIC_VIEW_UNIQUE_AUDIENCE,
+				self::METRIC_AVG_VIEW_ENGAGEMENT,
+				self::METRIC_AVG_VIEW_BUFFERING,
+				self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH,
+			)
 		),
 
 	);

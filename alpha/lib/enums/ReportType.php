@@ -67,5 +67,6 @@ interface ReportType extends BaseEnum
    const ENTRY_LEVEL_USERS_STATUS_REALTIME = 10009;
    const PLATFORMS_DISCOVERY_REALTIME = 10010;
    const PLAYBACK_TYPE_REALTIME = 10011;
+   const CONTENT_REALTIME = 10012;
 
 }
