@@ -1,5 +1,16 @@
 # Orion 15.1.0 #
 
+## Allow only admins to generate sip url  ##
+- Issue Type: Task
+- Issue ID: PLAT-9921
+
+### Configuration ###
+None
+		
+#### Deployment Scripts ####	
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_16_update_sip_permissions.php
+
+
 ## Allow all KMC users to order reach captions ##
 
 - Issue Type: Task
