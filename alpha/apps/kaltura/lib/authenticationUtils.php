@@ -34,7 +34,7 @@ class authenticationUtils
 	public static function addAuthMailJob($partner, $kuser, $mailType)
 	{
 		$loginData = $kuser->getLoginData();
-		$loginData->setPasswordHashKey($loginData->newPassHashKey());
+		$loginData->setPasswordHashKey($loginData->newPassHashKey(kConf::get('user_login_qr_page_hash_key_validity')));
 		$loginData->save();
 		$resetPasswordLink = UserLoginDataPeer::getAuthInfoLink($loginData->getPasswordHashKey());
 		if(!$resetPasswordLink)
