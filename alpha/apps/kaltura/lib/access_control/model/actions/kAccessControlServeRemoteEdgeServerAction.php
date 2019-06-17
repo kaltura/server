@@ -35,7 +35,7 @@ class kAccessControlServeRemoteEdgeServerAction extends kRuleAction
 		$this->edgeServerIds = $edgeServerIds;
 	}
 	
-	public function getRegiteredNodeServers()
+	public function getRegisteredNodeServers()
 	{
 		$edgeServerIds = explode(',', $this->getEdgeServerIds());
 		$edgeServers = ServerNodePeer::retrieveRegisteredServerNodesArrayByPKs($edgeServerIds);
@@ -45,7 +45,7 @@ class kAccessControlServeRemoteEdgeServerAction extends kRuleAction
 	
 	public function applyDeliveryProfileDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes)
 	{	
-		$edgeServers = $this->getRegiteredNodeServers();
+		$edgeServers = $this->getRegisteredNodeServers();
 		
 		if(!count($edgeServers))
 			return false;
