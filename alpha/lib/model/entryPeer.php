@@ -836,6 +836,19 @@ class entryPeer extends BaseentryPeer
 	{
 		$validatedEntries = array_intersect($entryIds, self::$validatedEntries);
 		$entryIds = array_diff($entryIds, self::$validatedEntries);
+
+		if(count($entryIds) === 1)
+		{
+			if(entryPeer::retrieveByPK($entryIds[0]))
+			{
+				return $entryIds;
+			}
+			else
+			{
+				return array();
+			}
+		}
+
 		if(count($entryIds))
 		{
 			$entryIds = array_slice($entryIds, 0, baseObjectFilter::getMaxInValues());
