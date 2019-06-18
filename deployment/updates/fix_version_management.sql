@@ -8,6 +8,7 @@ CREATE PROCEDURE version_management_schema_change() BEGIN
                 ALTER TABLE kaltura.version_management DROP column `version`;
         END IF;
         IF NOT EXISTS (SELECT * from information_schema.columns where table_schema = @schema_name and table_name = @table_name and column_name = 'id') THEN
+                ALTER TABLE kaltura.version_management DROP PRIMARY KEY;
                 ALTER TABLE kaltura.version_management ADD COLUMN  id INT(11) NOT NULL AUTO_INCREMENT primary key first;
         END IF;
         IF NOT EXISTS (SELECT * from information_schema.columns where table_schema = @schema_name and table_name = @table_name and column_name = 'status') THEN
