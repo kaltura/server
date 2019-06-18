@@ -197,7 +197,7 @@ class ScriptsRunner
 		$link = mysqli_connect($this->dbParams['host'], $this->dbParams['user'], $this->dbParams['password'], null, $this->dbParams['port']);
 		
 		$db_selected = mysqli_select_db($link,$this->dbParams['dbname']);
-		$result = mysqli_query($link,'select filename from version_management where status = ' . self::EXEC_STATUS_SUCCESS);
+		$result = mysqli_query($link,'select filename from version_management');
 		if($result)
 		{
 			$res = array();
