@@ -216,11 +216,11 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				'entry_id' => self::DIMENSION_ENTRY_ID,
 			),
 			self::REPORT_METRICS => array(
-				self::METRIC_VIEW_UNIQUE_AUDIENCE,
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
 				self::METRIC_AVG_VIEW_BUFFERING,
 				self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH,
-			)
+				self::METRIC_VIEW_UNIQUE_AUDIENCE,
+			),
 		),
 
 	);
