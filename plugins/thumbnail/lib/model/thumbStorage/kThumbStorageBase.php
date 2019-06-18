@@ -37,7 +37,7 @@ abstract class kThumbStorageBase
 
 	protected function getPath($md5)
 	{
-		$path = substr($md5, 0, 3). DIRECTORY_SEPARATOR .substr($md5, 3, 3);
+		$path = substr($md5, 0, 2). DIRECTORY_SEPARATOR .substr($md5, 2, 2);
 		return $path;
 	}
 
