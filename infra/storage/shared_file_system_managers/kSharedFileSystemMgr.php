@@ -141,27 +141,27 @@ abstract class kSharedFileSystemMgr
 	/**
 	 * move path from one directory to another
 	 *
-	 * @param $from
-	 * @param $to
+	 * @param $from source path
+	 * @param $to dest path
 	 * @param bool $override_if_exists
 	 * @param bool $copy
-	 * @return mixed
+	 * @return true / false according to success
 	 */
 	abstract protected function doMoveFile($from, $to, $override_if_exists = false, $copy = false);
 
 	/**
 	 * check if path is dir
 	 *
-	 * @param $path
-	 * @return mixed
+	 * @param $path dir path
+	 * @return true / false according to success
 	 */
 	abstract protected function doIsDir($path);
 
 	/**
 	 * creates path directory
 	 *
-	 * @param $path
-	 * @return mixed
+	 * @param $path dir path
+	 * @return true / false according to success
 	 */
 	abstract protected function doMkdir($path);
 
@@ -299,6 +299,7 @@ abstract class kSharedFileSystemMgr
 	{
 		return $this->doDeleteFile($filename);
 	}
+
 	public static function getInstance($type = null, array $options = null)
 	{
 		if(self::$kSharedFsMgr)
@@ -322,5 +323,5 @@ abstract class kSharedFileSystemMgr
 
 		return self::$kSharedFsMgr;
 	}
-	
+
 }

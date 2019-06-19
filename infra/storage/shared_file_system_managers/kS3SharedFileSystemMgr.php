@@ -341,10 +341,12 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doFullMkdir($path, $rights = 0755, $recursive = true)
 	{
+		return true;
 	}
 
 	protected function doFullMkfileDir($path, $rights = 0777, $recursive = true)
 	{
+		return true;
 	}
 
 	protected function doMoveFile($from, $to, $override_if_exists = false, $copy = false)
@@ -372,13 +374,15 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$this->doUnlink($file_name);
 	}
 
-	protected function is_dir($path, $local = true)
+	protected function doIsDir($path)
 	{
-		if ($local)
-		{
-			return is_dir($path);
-		}
+
 		return $this->isDirectory();
+	}
+
+	protected function doMkdir($path)
+	{
+		return true;
 	}
 
 	protected function copySingleFile($src, $dest, $deleteSrc, $fromLocal = true)
@@ -388,5 +392,40 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			return $this->copySingleLocalFile($src, $dest, $deleteSrc);
 		}
 		return $this->copySingleExternalFile($src, $dest, $deleteSrc);
+	}
+
+	protected function doRmdir($path)
+	{
+		list($bucket, $filePathWithoutBucket) = $this->getBucketAndFilePath($path);
+		try
+		{
+			$this->s3Client->deleteMatchingObjects($bucket, $filePathWithoutBucket);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	public function doChmod($path, $mode)
+	{
+		return true;
+	}
+
+	public function doFileSize($filename)
+	{
+		list($bucket, $filePathWithoutBucket) = $this->getBucketAndFilePath($filename);
+		$params['Bucket'] = $bucket;
+		$params['Key'] = $filePathWithoutBucket;
+		try
+		{
+			$result = $this->s3Client->headObject($params);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+		return $result['ContentLength'];
 	}
 }
