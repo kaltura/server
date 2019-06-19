@@ -113,7 +113,8 @@ class kCategoryEntryCondition extends kCondition
 	 */
 	protected function internalFulfilled(kScope $scope)
 	{
-		$categoryIdsToValidate = $this->getCategoryId() ? array($this->getCategoryId()) : trim(explode(",", $this->getCategoryIds()) );
+		$categoryIdsToValidate = $this->getCategoryId() ? array($this->getCategoryId()) : explode(",", $this->getCategoryIds() );
+		$categoryIdsToValidate = array_map('trim', $categoryIdsToValidate);
 		KalturaLog::debug("Validate if category added is one of the ids defined in the rule [" . implode(",", $categoryIdsToValidate) . "]");
 		
 		$matchingCategoryEntry = null;
