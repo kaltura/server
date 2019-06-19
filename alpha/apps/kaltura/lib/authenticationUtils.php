@@ -5,14 +5,14 @@ require_once (KALTURA_ROOT_PATH .'/vendor/phpGangsta/GoogleAuthenticator.php');
 class authenticationUtils
 {
 
-	public static function generateQRCodeUrl($kuser)
+	public static function generateQRCodeUrl($kuser, $loginData)
 	{
-		return str_replace ("|", "M%7C", GoogleAuthenticator::getQRCodeGoogleUrl($kuser->getPuserId() . '_' . kConf::get ('www_host') . '_KMC', $kuser->getLoginData()->getSeedFor2FactorAuth()));
+		return str_replace ("|", "M%7C", GoogleAuthenticator::getQRCodeGoogleUrl($kuser->getPuserId() . '_' . kConf::get ('www_host') . '_KMC', $loginData->getSeedFor2FactorAuth()));
 	}
 
-	public static function getQRImage($kuser)
+	public static function getQRImage($kuser, $loginData)
 	{
-		$qrUrl = self::generateQRCodeUrl($kuser);
+		$qrUrl = self::generateQRCodeUrl($kuser, $loginData);
 		$curlWrapper = new KCurlWrapper();
 		$response = $curlWrapper->exec($qrUrl);
 		if (!$response || $curlWrapper->getHttpCode() !== 200 || $curlWrapper->getError())
@@ -24,9 +24,8 @@ class authenticationUtils
 		return $encodedQr;
 	}
 
-	public static function generateNewSeed($kuser)
+	public static function generateNewSeed($userLoginData)
 	{
-		$userLoginData = $kuser->getLoginData();
 		$userLoginData->setSeedFor2FactorAuth(GoogleAuthenticator::createSecret());
 		$userLoginData->save();
 	}

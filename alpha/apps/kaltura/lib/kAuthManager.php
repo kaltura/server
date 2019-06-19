@@ -38,7 +38,7 @@ class kAuthManager implements kObjectChangedEventConsumer
 			$userLoginData = $adminKuser->getLoginData();
 			if(!$userLoginData->getSeedFor2FactorAuth())
 			{
-				authenticationUtils::generateNewSeed($adminKuser);
+				authenticationUtils::generateNewSeed($userLoginData);
 			}
 			$job = authenticationUtils::addAuthMailJob($object, $adminKuser, kuserPeer::KALTURA_EXISTING_USER_ENABLE_2FA_EMAIL);
 			if(!$job)
