@@ -8,6 +8,19 @@
  */
 class kFileBase 
 {
+	protected static $kFileSystemManagerClass;
+	
+	protected static function getFileSystemManager()
+	{
+		$dc_config = kConf::getMap("dc_config");
+		
+		$fsMgrCls = isset($dc_config['fileSystemClass']) ? $dc_config['fileSystemClass'] : kFileSystemMgrType::LOCAL;
+		$storageConfig = isset($dc_config['storage']) ? $dc_config['storage'] : null;
+		
+		self::$kFileSystemManagerClass = new kFileSystemMgr($fs)
+		$fsMgrCls::init($storageConfig);
+	}
+	
     /**
      * Lazy saving of file content to a temporary path, the file will exist in this location until the temp files are purged
      * @param string $fileContent
@@ -28,6 +41,8 @@ class kFileBase
 
     public static function filePutContents($filename, $data, $flags = 0, $context = null)
 	{
+		$x = self::getFileSystemManager();
+		$x::filePutContents();
 		return file_put_contents($filename, $data, $flags, $context);
 	}
 
@@ -97,6 +112,7 @@ class kFileBase
     // make sure the file is closed , then remove it
     public static function deleteFile($file_name)
     {
+		self::$kFileSystemManagerClass::delete($file_name);
         $fh = fopen($file_name, 'w') or die("can't open file");
         fclose($fh);
         unlink($file_name);
@@ -263,5 +279,37 @@ class kFileBase
         $mode = substr(decoct(fileperms($srcFile)), -4);
         self::chmod($destFile,intval($mode,8));
     }
+	
+	public static function getDataFromFile($url, $destFilePath = null, $maxFileSize = null, $allowInternalUrl = false)
+	{
+		if(!is_null($maxFileSize))
+		{
+			$curlWrapper = new KCurlWrapper();
+			$curlHeaderResponse = $curlWrapper->getHeader($url, true);
+			$curlWrapper->close();
+			
+			if(!$curlHeaderResponse || $curlWrapper->getError())
+				throw new Exception("Failed to retrive Curl header response from file path [$url] with Error " . $curlWrapper->getError());
+			
+			if(!$curlHeaderResponse->isGoodCode())
+				throw new Exception("Non Valid Error: $curlHeaderResponse->code" . " " . $curlHeaderResponse->codeName);
+			
+			if(isset($curlHeaderResponse->headers['content-length']))
+			{
+				$fileSize = $curlHeaderResponse->headers['content-length'];
+				if($fileSize > $maxFileSize)
+					throw new Exception("File size [$fileSize] Exceeded Max Siae Allowed [$maxFileSize]");
+				
+				KalturaLog::info("File size [$fileSize] validated");
+			}
+			else
+			{
+				KalturaLog::info("File size validation skipped");
+			}
+		}
+		
+		$fileSystemManager = self::getFileSystemManager();
+		return $fileSystemManager->getFileFromRemoteUrl($url, $destFilePath, $allowInternalUrl);
+	}
 
 }

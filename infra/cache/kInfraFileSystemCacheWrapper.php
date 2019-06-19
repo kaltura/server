@@ -1,7 +1,8 @@
 <?php
 
 require_once(dirname(__FILE__) . '/kInfraBaseCacheWrapper.php');
-require_once(dirname(__FILE__) . '/../storage/file_system_managers/kLocalFileSystemMgr.php');
+require_once(dirname(__FILE__) . '/../storage/shared_file_system_managers/kSharedFileSystemMgr.php');
+
 
 /**
  * @package infra
@@ -15,10 +16,10 @@ class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 	protected $keyFolderChars;
 	protected $defaultExpiry;
 	protected $supportExpiry;
-	protected $fileSystemType;
+	protected $sharedFileSystemType;
 	
-	/* @var $kFileSystemManager kFileSystemMgr */
-	protected $kFileSystemManager;
+	/* @var $kSharedFSManager kSharedFileSystemMgr */
+	protected $kSharedFSManager;
 
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::init()
@@ -29,10 +30,9 @@ class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 		$this->keyFolderChars = $config['keyFolderChars'];
 		$this->defaultExpiry = $config['defaultExpiry'];
 		$this->supportExpiry = isset($config['supportExpiry']) ? $config['supportExpiry'] : false;
-		$this->fileSystemType = isset($config['fileSystemType']) ? $config['fileSystemType'] : kFileSystemMgrType::LOCAL;
+		$this->sharedFileSystemType = isset($config['sharedFSType']) ? $config['sharedFSType'] : kSharedFileSystemMgrType::LOCAL;
 		
-		$this->kFileSystemManager = kFileSystemMgr::getInstance($this->fileSystemType, $config);
-		
+		$this->kSharedFSManager = kSharedFileSystemMgr::getInstance($this->sharedFileSystemType, $config);
 		return true;
 	}
 	
@@ -74,7 +74,7 @@ class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 	 */
 	protected function createDirForPath($filePath)
 	{
-		$this->kFileSystemManager->createDirForPath($filePath);
+		$this->kSharedFSManager->createDirForPath($filePath);
 	}
 		
 	/* (non-PHPdoc)
@@ -83,7 +83,7 @@ class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 	protected function doGet($key)
 	{
 		$filePath = $this->getFilePath($key);
-		if (!$this->kFileSystemManager->checkFileExists($filePath))
+		if (!$this->kSharedFSManager->checkFileExists($filePath))
 			return false;
 		
 		if ($this->supportExpiry)
@@ -154,7 +154,7 @@ class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 	 */
 	protected function safeFilePutContents($filePath, $var)
 	{
-		return $this->kFileSystemManager->putFileAtomic($filePath, $var);
+		return $this->kSharedFSManager->putFileContentAtomic($filePath, $var);
 	}
 		
 	/**
@@ -164,11 +164,12 @@ class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 	protected function safeFileGetContents($filePath)
 	{
 		// This function avoids the 'file does not exist' warning
-		if (!$this->kFileSystemManager->checkFileExists($filePath))
+		if (!$this->kSharedFSManager->checkFileExists($filePath))
 		{
 			return false;
 		}
-		return $this->kFileSystemManager->getFile($filePath);
+		
+		return $this->kSharedFSManager->getFileContent($filePath);
 	}
 
 	/**
@@ -177,10 +178,10 @@ class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 	 */
 	protected function safeUnlink($filePath)
 	{
-		if (!$this->kFileSystemManager->checkFileExists($filePath))
+		if (!$this->kSharedFSManager->checkFileExists($filePath))
 		{
 			return false;
 		}
-		return $this->kFileSystemManager->unlink($filePath);
+		return $this->kSharedFSManager->unlink($filePath);
 	}
 }
