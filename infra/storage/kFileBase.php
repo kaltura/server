@@ -8,7 +8,7 @@
  */
 class kFileBase 
 {
-	protected static $kFileSystemManagerClass;
+	protected static $kFileSystemManager;
 	
 	protected static function getFileSystemManager()
 	{
@@ -17,8 +17,8 @@ class kFileBase
 		$fsMgrCls = isset($dc_config['fileSystemClass']) ? $dc_config['fileSystemClass'] : kFileSystemMgrType::LOCAL;
 		$storageConfig = isset($dc_config['storage']) ? $dc_config['storage'] : null;
 		
-		self::$kFileSystemManagerClass = new kFileSystemMgr($fs)
-		$fsMgrCls::init($storageConfig);
+		self::$kFileSystemManager = new kFileSystemMgr($fsMgrCls, $storageConfig);
+		return self::$kFileSystemManager;
 	}
 	
     /**
@@ -41,8 +41,6 @@ class kFileBase
 
     public static function filePutContents($filename, $data, $flags = 0, $context = null)
 	{
-		$x = self::getFileSystemManager();
-		$x::filePutContents();
 		return file_put_contents($filename, $data, $flags, $context);
 	}
 
@@ -112,7 +110,6 @@ class kFileBase
     // make sure the file is closed , then remove it
     public static function deleteFile($file_name)
     {
-		self::$kFileSystemManagerClass::delete($file_name);
         $fh = fopen($file_name, 'w') or die("can't open file");
         fclose($fh);
         unlink($file_name);

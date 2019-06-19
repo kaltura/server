@@ -66,7 +66,8 @@ class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 				$filePath .= substr($foldersPart, $curPos, 2) . '/';
 			}
 		}
-		return $filePath . $keyFileName . ".txt";
+		
+		return $filePath . $keyFileName;
 	}
 
 	/**
