@@ -92,7 +92,7 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doFullMkdir($path, $rights = 0755, $recursive = true)
 	{
-		return $this->fullMkfileDir(dirname($path), $rights, $recursive);
+		return $this->doFullMkfileDir(dirname($path), $rights, $recursive);
 	}
 
 	protected function doFullMkfileDir($path, $rights = 0777, $recursive = true)

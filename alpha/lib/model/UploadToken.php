@@ -137,7 +137,7 @@ class UploadToken extends BaseUploadToken implements IBaseObject
 	public function getLastFileSize()
 	{
 		return $this->getFromCustomData('lastFileSize', null , 0);
-	}uploadtokenservi
+	}
 
 	public function setLastFileSize($v)
 	{
