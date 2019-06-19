@@ -88,6 +88,13 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 	 * @insertonly
 	 */
 	public $autoFinalize;
+
+	/**
+	 * set the minimum size in bytes for each uploaded part of the file
+	 * @var float
+	 * @insertonly
+	 */
+	public $minimumChunkSize;
 	
 	private static $map_between_objects = array
 	(
@@ -101,7 +108,11 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 		"createdAt",
 		"updatedAt",
 		"autoFinalize",
+		"minimumChunkSize",
 	);
+
+	const MAX_PARTS_NUMBER = 10000;
+	const MAX_PART_SIZE = 5368709120;
 
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
@@ -141,6 +152,20 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 		{
 			if(!isset($this->fileSize))
 				throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_MISSING_FILE_SIZE);
+		}
+
+		if(isset($this->minimumChunkSize) && $this->minimumChunkSize > self::MAX_PART_SIZE)
+		{
+			throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_INVALID_PART_SIZE, self::MAX_PART_SIZE);
+		}
+
+		if(isset($this->minimumChunkSize) && isset($this->fileSize))
+		{
+			$expectedPartsNum = ceil($this->fileSize/$this->minimumChunkSize);
+			if($expectedPartsNum > self::MAX_PARTS_NUMBER)
+			{
+				throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_EXCEEDED_MAX_PARTS, $expectedPartsNum, self::MAX_PARTS_NUMBER);
+			}
 		}
 	}
 }
