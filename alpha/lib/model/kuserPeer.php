@@ -618,9 +618,10 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		else // Not an admin console partner
 		{
 			$authType = $partner->getAuthenticationType();
-			if($partner->getUseTwoFactorAuthentication() && !$user->getLoginData()->getSeedFor2FactorAuth())
+			$userLoginData = $user->getLoginData();
+			if($partner->getUseTwoFactorAuthentication() && !$userLoginData->getSeedFor2FactorAuth())
 			{
-				authenticationUtils::generateNewSeed($user);
+				authenticationUtils::generateNewSeed($userLoginData);
 			}
 			$mailType = self::getUserMailType($authType, $existingUser);
 			$bodyParams = self::getUserBodyParams($authType, $existingUser, $userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $roleName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
