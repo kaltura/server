@@ -106,7 +106,7 @@ class KalturaCaptionAsset extends KalturaAsset
 				
 		if($this->shouldGet('languageCode', $responseProfile))
 		{
-			$this->languageCode = languageCodeManager::getLanguageKey($this->language);
+			$this->languageCode = strtolower(languageCodeManager::getLanguageCode($this->language));
 		}
 			
 		return $ret;
