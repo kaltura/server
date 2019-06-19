@@ -59,8 +59,8 @@ php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_16_updat
 None
 		
 #### Deployment Scripts ####	
-php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionsAndItems.php /opt/kaltura/app/deployment/permissions/partner.-2.ini
 php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_03_update_user_role_permissions.php
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_19_update_user_role_partner_-2_permissions.php
 
 ## Update Reach notification template:Entry_Vendor_Task_Pending_Moderation  ##
 - Issue Type: Task
