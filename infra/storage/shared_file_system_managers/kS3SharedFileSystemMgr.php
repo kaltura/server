@@ -338,4 +338,55 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		stream_wrapper_unregister('https');
 		stream_wrapper_unregister('http');
 	}
+
+	protected function doFullMkdir($path, $rights = 0755, $recursive = true)
+	{
+	}
+
+	protected function doFullMkfileDir($path, $rights = 0777, $recursive = true)
+	{
+	}
+
+	protected function doMoveFile($from, $to, $override_if_exists = false, $copy = false)
+	{
+		$fromLocalMove = false;
+		if ($this->checkFileExists($from, true))
+		{
+			$fromLocalMove = true;
+		}
+		else if(!$this->checkFileExists($from))
+		{
+			KalturaLog::err("file [$from] does not exist locally or on external storage");
+			return false;
+		}
+		if (strpos($to, '\"') !== false)
+		{
+			KalturaLog::err("Illegal destination file [$to]");
+			return false;
+		}
+		return $this->copyRecursively($from, $to, !$copy, $fromLocalMove);
+	}
+
+	protected function doDeleteFile($file_name)
+	{
+		$this->doUnlink($file_name);
+	}
+
+	protected function is_dir($path, $local = true)
+	{
+		if ($local)
+		{
+			return is_dir($path);
+		}
+		return $this->isDirectory();
+	}
+
+	protected function copySingleFile($src, $dest, $deleteSrc, $fromLocal = true)
+	{
+		if($fromLocal)
+		{
+			return $this->copySingleLocalFile($src, $dest, $deleteSrc);
+		}
+		return $this->copySingleExternalFile($src, $dest, $deleteSrc);
+	}
 }

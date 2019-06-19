@@ -118,8 +118,96 @@ abstract class kSharedFileSystemMgr
 	 * @return true / false according to success
 	 */
 	abstract protected function doGetFileFromRemoteUrl($url, $destFilePath = null, $allowInternalUrl = false);
-	
-	
+
+	/**
+	 * creates a directory using the dirname of the specified path
+	 *
+	 * @param string $path path to create dir
+	 * @param int $rights mode for the dir
+	 * @param bool $recursive should we make the dir path recursively
+	 * @return bool true on success or false on failure.
+	 */
+	abstract protected function doFullMkdir($path, $rights = 0755, $recursive = true);
+
+	/**
+	 * creates a directory using the specified path
+	 * @param string $path path to create dir
+	 * @param int $rights mode for the dir
+	 * @param bool $recursive should we make the dir path recursively
+	 * @return bool true on success or false on failure.
+	 */
+	abstract protected function doFullMkfileDir($path, $rights = 0777, $recursive = true);
+
+	/**
+	 * move path from one directory to another
+	 *
+	 * @param $from
+	 * @param $to
+	 * @param bool $override_if_exists
+	 * @param bool $copy
+	 * @return mixed
+	 */
+	abstract protected function doMoveFile($from, $to, $override_if_exists = false, $copy = false);
+
+	/**
+	 * check if path is dir
+	 *
+	 * @param $path
+	 * @return mixed
+	 */
+	abstract protected function doIsDir($path);
+
+	/**
+	 * creates path directory
+	 *
+	 * @param $path
+	 * @return mixed
+	 */
+	abstract protected function doMkdir($path);
+
+	/**
+	 * removes path directory
+	 *
+	 * @param $path
+	 * @return mixed
+	 */
+	abstract protected function doRmdir($path);
+
+	/**
+	 * chmod path with given mode
+	 *
+	 * @param $path
+	 * @param $mode
+	 * @return mixed
+	 */
+	abstract public function doChmod($path, $mode);
+
+	/**
+	 * return the file size of given file
+	 *
+	 * @param $filename
+	 * @return mixed
+	 */
+	abstract public function doFileSize($filename);
+
+	/**
+	 * copy single file from source to dest
+	 *
+	 * @param $src
+	 * @param $dest
+	 * @param $deleteSrc
+	 * @return mixed
+	 */
+	abstract protected function copySingleFile($src, $dest, $deleteSrc);
+
+	/**
+	 * delete file
+	 *
+	 * @param $filename
+	 * @return mixed
+	 */
+	abstract protected function doDeleteFile($filename);
+
 	public function createDirForPath($filePath)
 	{
 		return $this->doCreateDirForPath($filePath);
@@ -169,26 +257,70 @@ abstract class kSharedFileSystemMgr
 	{
 		return $this->doGetFileContent($filePath);
 	}
-	
-	/**
-	 * Create a new class instance according to the given type.
-	 *
-	 * @param fileTransferMgrTypes $type Class type from the list under 'kFileTransferMgrType' class.
-	 * @param array $options
-	 *
-	 * @return kFileTransferMgr a new instance
-	 */
-	public static function getInstance($type, array $options = null)
+
+	public function fullMkdir($path, $rights = 0755, $recursive = true)
 	{
+		return $this->doFullMkdir($path, $rights, $recursive);
+	}
+
+	public function moveFile($from, $to, $override_if_exists = false, $copy = false)
+	{
+		$from = str_replace("\\", "/", $from);
+		$to = str_replace("\\", "/", $to);
+		return $this->doMoveFile($from, $to, $override_if_exists, $copy);
+	}
+
+	public function isDir($path)
+	{
+		return $this->doIsDir($path);
+	}
+
+	public function mkdir($path)
+	{
+		return $this->doMkdir($path);
+	}
+
+	public function rmdir($path)
+	{
+		return $this->doRmdir($path);
+	}
+
+	public function chmod($path, $mode)
+	{
+		return $this->doChmod($path, $mode);
+	}
+
+	public function fileSize($filename)
+	{
+		return $this->doFileSize($filename);
+	}
+
+	public function deleteFile($filename)
+	{
+		return $this->doDeleteFile($filename);
+	}
+	public static function getInstance($type = null, array $options = null)
+	{
+		if(self::$kSharedFsMgr)
+			return self::$kSharedFsMgr;
+
+		$dc_config = kConf::getMap("dc_config");
+		$options = isset($dc_config['storage']) ? $dc_config['storage'] : null;
+		if(!$type)
+		{
+			$type = isset($dc_config['fileSystemType']) ? $dc_config['fileSystemType'] : kSharedFileSystemMgrType::LOCAL;
+		}
+
 		switch($type)
 		{
 			case kSharedFileSystemMgrType::LOCAL:
-				return new kNfsSharedFileSystemMgr($options);
-			
+				self::$kSharedFsMgr = new kNfsSharedFileSystemMgr($options);
+
 			case kSharedFileSystemMgrType::S3:
-				return new kS3SharedFileSystemMgr($options);
+				self::$kSharedFsMgr = new kS3SharedFileSystemMgr($options);
 		}
-		
-		return null;
+
+		return self::$kSharedFsMgr;
 	}
+	
 }
