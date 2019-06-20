@@ -302,7 +302,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		myPartnerUtils::initialPasswordSetForFreeTrial($loginData);
 
 		$partner = PartnerPeer::retrieveByPK($loginData->getConfigPartnerId());
-		if($partner->getUseTwoFactorAuthentication() || $loginData->getSeedFor2FactorAuth())
+		if($partner->getUseTwoFactorAuthentication())
 		{
 			kuserPeer::setUseCriteriaFilter(false);
 			$dbUser = kuserPeer::getKuserByPartnerAndUid($loginData->getConfigPartnerId(), $loginData->getLoginEmail(), true);
