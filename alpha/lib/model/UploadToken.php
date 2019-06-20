@@ -123,4 +123,34 @@ class UploadToken extends BaseUploadToken implements IBaseObject
 		
 		$cache->add($this->getId().".autoFinalize", true, kUploadTokenMgr::AUTO_FINALIZE_CACHE_TTL);
 	}
+
+	public function getMinimumChunkSize()
+	{
+		return $this->getFromCustomData('minimumChunkSize', null , 0);
+	}
+
+	public function setMinimumChunkSize($v)
+	{
+		$this->putInCustomData('minimumChunkSize', $v);
+	}
+
+	public function getLastFileSize()
+	{
+		return $this->getFromCustomData('lastFileSize', null , 0);
+	}
+
+	public function setLastFileSize($v)
+	{
+		$this->putInCustomData('lastFileSize', $v);
+	}
+
+	public function getParts()
+	{
+		return $this->getFromCustomData('parts', null , array());
+	}
+
+	public function setParts($v)
+	{
+		$this->putInCustomData('parts', $v);
+	}
 }

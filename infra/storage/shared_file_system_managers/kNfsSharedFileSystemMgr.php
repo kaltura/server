@@ -89,4 +89,117 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 		$curlWrapper->close();
 		return $res;
 	}
+
+	protected function doFullMkdir($path, $rights = 0755, $recursive = true)
+	{
+		return $this->doFullMkfileDir(dirname($path), $rights, $recursive);
+	}
+
+	protected function doFullMkfileDir($path, $rights = 0777, $recursive = true)
+	{
+		if(file_exists($path))
+			return true;
+		$oldUmask = umask(00);
+		$result = @mkdir($path, $rights, $recursive);
+		umask($oldUmask);
+		return $result;
+	}
+
+	protected function doMoveFile($from, $to, $override_if_exists = false, $copy = false)
+	{
+		if(!file_exists($from))
+		{
+			KalturaLog::err("Source doesn't exist [$from]");
+			return false;
+		}
+		if(strpos($to,'\"') !== false)
+		{
+			KalturaLog::err("Illegal destination file [$to]");
+			return false;
+		}
+		if($override_if_exists && is_file($to))
+		{
+			$this->deleteFile($to);
+		}
+		if(!is_dir(dirname($to)))
+		{
+			$this->fullMkdir($to);
+		}
+		return $this->copyRecursively($from,$to, !$copy);
+	}
+
+	protected function doDeleteFile($file_name)
+	{
+		$fh = fopen($file_name, 'w') or die("can't open file");
+		fclose($fh);
+		unlink($file_name);
+	}
+
+	protected function copySingleFile($src, $dest, $deleteSrc)
+	{
+		if($deleteSrc)
+		{
+			// In case of move, first try to move the file before copy & unlink.
+			$startTime = microtime(true);
+			if(rename($src, $dest))
+			{
+				KalturaLog::log("rename took : ".(microtime(true) - $startTime)." [$src] to [$dest] size: ".filesize($dest));
+				return true;
+			}
+			KalturaLog::err("Failed to rename file : [$src] to [$dest]");
+		}
+		if (!copy($src,$dest))
+		{
+			KalturaLog::err("Failed to copy file : [$src] to [$dest]");
+			return false;
+		}
+		if ($deleteSrc && (!unlink($src)))
+		{
+			KalturaLog::err("Failed to delete source file : [$src]");
+			return false;
+		}
+		return true;
+	}
+
+	protected function doIsDir($path)
+	{
+		return is_dir($path);
+	}
+
+	protected function doMkdir($path)
+	{
+		return mkdir($path);
+	}
+
+	protected function doRmdir($path)
+	{
+		return rmdir($path);
+	}
+
+	public function doChmod($path, $mode)
+	{
+		return chmod($path, $mode);
+	}
+
+	public function doFileSize($filename)
+	{
+		if(PHP_INT_SIZE >= 8)
+			return filesize($filename);
+		$filename = str_replace('\\', '/', $filename);
+		$url = "file://localhost/$filename";
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_NOBODY, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		$headers = curl_exec($ch);
+		if(!$headers)
+			KalturaLog::err('Curl error: ' . curl_error($ch));
+		curl_close($ch);
+		if(!$headers)
+			return false;
+		if (preg_match('/Content-Length: (\d+)/', $headers, $matches))
+			return floatval($matches[1]);
+		return false;
+	}
+
 }

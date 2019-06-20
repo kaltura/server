@@ -429,6 +429,10 @@ class KalturaErrors extends APIErrors
 
 	const UPLOAD_TOKEN_MISSING_FILE_SIZE = "UPLOAD_TOKEN_MISSING_FILE_SIZE;;FileSize is mandatory when enabling autoFinalize";
 
+	const UPLOAD_TOKEN_EXCEEDED_MAX_PARTS = "UPLOAD_TOKEN_EXCEEDED_MAX_PARTS;PARTS_NUM,MAX_NUM;Number of upload token parts expected to be [@PARTS_NUM@] while maximum number of parts allowed is [@MAX_NUM@]";
+
+	const UPLOAD_TOKEN_INVALID_PART_SIZE = "UPLOAD_TOKEN_INVALID_PART_SIZE;MAX_SIZE;The minimum size for uploaded part is not allowed. The maximum value allowed is [@MAX_SIZE@]";
+
 	/*
 	 * Partenrs service
 	 * PID - the parent partner_id
