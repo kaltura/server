@@ -5,7 +5,6 @@
  */
 interface kVendorOauth
 {
-
 	/**
 	 * @param bool $forceNewToken
 	 * @return mixed
@@ -13,11 +12,10 @@ interface kVendorOauth
 	function retrieveTokensData($forceNewToken = false);
 
 	/**
-	 * @param string $oldRefreshToken
 	 * @param VendorIntegration $vendorIntegration
 	 * @return string newAccessToken
 	 */
-	function refreshTokens($oldRefreshToken, $vendorIntegration);
+	function refreshTokens($vendorIntegration);
 
 
 }

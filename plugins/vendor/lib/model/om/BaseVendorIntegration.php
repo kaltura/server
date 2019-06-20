@@ -460,10 +460,11 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 
 	/**
 	 * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
-	 * 
+	 *
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
-	 *						be treated as NULL for temporal objects.
-	 * @return     VendorIntegration The current object (for fluent API support)
+	 *                        be treated as NULL for temporal objects.
+	 * @return VendorIntegration The current object (for fluent API support)
+	 * @throws PropelException
 	 */
 	public function setUpdatedAt($v)
 	{

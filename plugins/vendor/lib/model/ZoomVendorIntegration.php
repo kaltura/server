@@ -15,6 +15,8 @@ class ZoomVendorIntegration extends VendorIntegration
 	const ZOOM_CATEGORY = "zoomCategory";
 	const ZOOM_CATEGORY_ID = "zoomCategoryId";
 	const CREATE_USER_IF_NOT_EXIST = "createUserIfNotExist";
+	const LAST_ERROR = "lastError";
+	const LAST_ERROR_TIMESTAMP = "lastErrorTimestamp";
 
 	public function setAccessToken ($v)	{ $this->putInCustomData ( "" . self::ACCESS_TOKEN . "", $v);	}
 	public function getAccessToken ( )	{ return $this->getFromCustomData(self::ACCESS_TOKEN);	}
@@ -42,7 +44,11 @@ class ZoomVendorIntegration extends VendorIntegration
 	public function setCreateUserIfNotExist($v) { $this->putInCustomData ( self::CREATE_USER_IF_NOT_EXIST, $v); }
 	public function getCreateUserIfNotExist() { return $this->getFromCustomData ( self::CREATE_USER_IF_NOT_EXIST,null, false); }
 
-
+	public function setLastError($v)
+	{
+		$this->putInCustomData(self::LAST_ERROR_TIMESTAMP, date());
+		$this->putInCustomData(self::LAST_ERROR, $v);
+	}
 
 	/**
 	 * returns all tokens as array
@@ -56,17 +62,19 @@ class ZoomVendorIntegration extends VendorIntegration
 
 	/**
 	 * @param array $tokensDataAsArray
-	 * @param string $accountId
 	 * @throws PropelException
 	 */
-	public function saveNewTokenData($tokensDataAsArray, $accountId)
+	public function saveTokensData($tokensDataAsArray)
+	{
+		$this->setTokensData($tokensDataAsArray);
+		$this->save();
+	}
+
+	public function setTokensData($tokensDataAsArray)
 	{
 		$this->setExpiresIn($tokensDataAsArray[kZoomOauth::EXPIRES_IN]);
 		$this->setAccessToken($tokensDataAsArray[kZoomOauth::ACCESS_TOKEN]);
 		$this->setRefreshToken($tokensDataAsArray[kZoomOauth::REFRESH_TOKEN]);
-		$this->setAccountId($accountId);
 		$this->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
-		$this->save();
 	}
-
 }

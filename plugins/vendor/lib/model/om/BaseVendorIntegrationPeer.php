@@ -115,10 +115,11 @@ abstract class BaseVendorIntegrationPeer {
 	/**
 	 * Returns an array of field names.
 	 *
-	 * @param      string $type The type of fieldnames to return:
-	 *                      One of the class type constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME
-	 *                      BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM
-	 * @return     array A list of field names
+	 * @param string $type The type of fieldNames to return:
+	 * One of the class type constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME
+	 * BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM
+	 * @return array A list of field names
+	 * @throws PropelException
 	 */
 
 	static public function getFieldNames($type = BasePeer::TYPE_PHPNAME)
@@ -153,9 +154,7 @@ abstract class BaseVendorIntegrationPeer {
 	 * XML schema will not be added to the select list and only loaded
 	 * on demand.
 	 *
-	 * @param      criteria object containing the columns to add.
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
+	 * @param Criteria $criteria param object $criteria containing the columns to add.
 	 */
 	public static function addSelectColumns(Criteria $criteria)
 	{
@@ -244,9 +243,9 @@ abstract class BaseVendorIntegrationPeer {
 	 */
 	public static function doSelectOne(Criteria $criteria, PropelPDO $con = null)
 	{
-		$critcopy = clone $criteria;
-		$critcopy->setLimit(1);
-		$objects = VendorIntegrationPeer::doSelect($critcopy, $con);
+		$critCopy = clone $criteria;
+		$critCopy->setLimit(1);
+		$objects = VendorIntegrationPeer::doSelect($critCopy, $con);
 		if ($objects) {
 			return $objects[0];
 		}
@@ -461,7 +460,7 @@ abstract class BaseVendorIntegrationPeer {
 				// allow only the kaltura netword stuff
 				if($partnerId)
 				{
-					$orderBy = "(" . self::PARTNER_ID . "<>{$partnerId})";  // first take the pattner_id and then the rest
+					$orderBy = "(" . self::PARTNER_ID . "<>{$partnerId})";  // first take the partner_id and then the rest
 					myCriteria::addComment($criteria , "Only Kaltura Network");
 					$criteria->addAscendingOrderByColumn($orderBy);//, Criteria::CUSTOM );
 				}
@@ -593,8 +592,8 @@ abstract class BaseVendorIntegrationPeer {
 	 * to the cache in order to ensure that the same objects are always returned by doSelect*()
 	 * and retrieveByPK*() calls.
 	 *
-	 * @param      VendorIntegration $value A VendorIntegration object.
-	 * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
+	 * @param VendorIntegration $obj A VendorIntegration object.
+	 * @param string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
 	 */
 	public static function addInstanceToPool(VendorIntegration $obj, $key = null)
 	{
@@ -623,7 +622,8 @@ abstract class BaseVendorIntegrationPeer {
 	 * methods in your stub classes -- you may need to explicitly remove objects
 	 * from the cache in order to prevent returning objects that no longer exist.
 	 *
-	 * @param      mixed $value A VendorIntegration object or a primary key value.
+	 * @param mixed $value A VendorIntegration object or a primary key value.
+	 * @throws PropelException
 	 */
 	public static function removeInstanceFromPool($value)
 	{
@@ -685,30 +685,30 @@ abstract class BaseVendorIntegrationPeer {
 	}
 
 	/**
-	 * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
+	 * Retrieves a string version of the primary key from the DB resultSet row that can be used to uniquely identify
+	 * a row in this table.
+	 * For tables with a single-column primary key, that simple primary key value will be returned.
+	 * For tables with a multi-column primary key, a serialize()d version of the primary key will be returned.
 	 *
-	 * For tables with a single-column primary key, that simple pkey value will be returned.  For tables with
-	 * a multi-column primary key, a serialize()d version of the primary key will be returned.
-	 *
-	 * @param      array $row PropelPDO resultset row.
-	 * @param      int $startcol The 0-based offset for reading from the resultset row.
+	 * @param      array $row PropelPDO resultSet row.
+	 * @param      int $startCol The 0-based offset for reading from the resultSet row.
 	 * @return     string A string version of PK or NULL if the components of primary key in result array are all null.
 	 */
-	public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
+	public static function getPrimaryKeyHashFromRow($row, $startCol = 0)
 	{
 		// If the PK cannot be derived from the row, return NULL.
-		if ($row[$startcol] === null) {
+		if ($row[$startCol] === null)
+		{
 			return null;
 		}
-		return (string) $row[$startcol];
+
+		return (string) $row[$startCol];
 	}
 
 	/**
-	 * The returned array will contain objects of the default type or
-	 * objects that inherit from the default.
-	 *
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
+	 * The returned array will contain objects of the default type or objects that inherit from the default.
+	 * @param PDOStatement $stmt
+	 * @return array Any exceptions caught during processing will be rethrown wrapped into a PropelException.
 	 */
 	public static function populateObjects(PDOStatement $stmt)
 	{
@@ -762,10 +762,11 @@ abstract class BaseVendorIntegrationPeer {
 	 * The returned Class will contain objects of the default type or
 	 * objects that inherit from the default.
 	 *
-	 * @param      array $row PropelPDO result row.
-	 * @param      int $colnum Column to examine for OM class information (first is 0).
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
+	 * @param  array $row PropelPDO result row.
+	 * @param  int $colnum Column to examine for OM class information (first is 0).
+	 * @return bool|mixed|string
+	 * @throws PropelException Any exceptions caught during processing will be
+	 *         rethrown wrapped into a PropelException.
 	 */
 	public static function getOMClass($row, $colnum)
 	{
@@ -877,8 +878,9 @@ abstract class BaseVendorIntegrationPeer {
 
 	/**
 	 * Method to DELETE all rows from the vendor_integration table.
-	 *
-	 * @return     int The number of affected rows (if supported by underlying database driver).
+	 * @param PropelPDO|null $con
+	 * @return int The number of affected rows (if supported by underlying database driver).
+	 * @throws PropelException
 	 */
 	public static function doDeleteAll($con = null)
 	{
@@ -978,22 +980,24 @@ abstract class BaseVendorIntegrationPeer {
 	{
 		$columns = array();
 
-		if ($cols) {
+		if ($cols)
+		{
 			$dbMap = Propel::getDatabaseMap(VendorIntegrationPeer::DATABASE_NAME);
 			$tableMap = $dbMap->getTable(VendorIntegrationPeer::TABLE_NAME);
 
-			if (! is_array($cols)) {
+			if (!is_array($cols))
+			{
 				$cols = array($cols);
 			}
 
-			foreach ($cols as $colName) {
-				if ($tableMap->containsColumn($colName)) {
+			foreach ($cols as $colName)
+			{
+				if ($tableMap->hasColumn($colName))
+				{
 					$get = 'get' . $tableMap->getColumn($colName)->getPhpName();
 					$columns[$colName] = $obj->$get();
 				}
 			}
-		} else {
-
 		}
 
 		return BasePeer::doValidate(VendorIntegrationPeer::DATABASE_NAME, VendorIntegrationPeer::TABLE_NAME, $columns);
@@ -1024,10 +1028,11 @@ abstract class BaseVendorIntegrationPeer {
 	/**
 	 * Retrieve multiple objects by pkey.
 	 *
-	 * @param      array $pks List of primary keys
-	 * @param      PropelPDO $con the connection to use
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
+	 * @param   array $pks List of primary keys
+	 * @param   PropelPDO $con the connection to use
+	 * @return 	array|null
+	 * @throws  PropelException Any exceptions caught during processing will be
+	 *         rethrown wrapped into a PropelException.
 	 */
 	public static function retrieveByPKs($pks, PropelPDO $con = null)
 	{

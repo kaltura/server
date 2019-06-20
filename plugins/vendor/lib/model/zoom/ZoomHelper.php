@@ -178,7 +178,7 @@ class ZoomHelper
 			$zoomClientData = new ZoomVendorIntegration();
 			$zoomClientData->setStatus(VendorStatus::DISABLED);
 		}
-		$zoomClientData->saveNewTokenData($tokensDataAsArray, $accountId);
+		$zoomClientData->saveTokensData($tokensDataAsArray, $accountId);
 	}
 
 
@@ -213,12 +213,12 @@ class ZoomHelper
 	}
 
 	/**
-	 * @param $data
+	 * @param array $data
 	 * @return array
 	 */
 	public static function extractDataFromRecordingCompletePayload($data)
 	{
-		KalturaLog::debug('recordingcomplete data recived from zoom:');
+		KalturaLog::debug('recording complete data received from zoom:');
 		KalturaLog::debug(print_r($data, true));
 		$payload = $data[self::PAYLOAD];
 		$downloadToken = $data[self::DOWNLOAD_TOKEN];
@@ -246,23 +246,15 @@ class ZoomHelper
 	/**
 	 * @param $meetingId
 	 * @param ZoomVendorIntegration $zoomIntegration
-	 * @param $accountId
 	 * @return array
 	 * @throws Exception
 	 */
-	public static function extractCoHosts($meetingId, $zoomIntegration, $accountId)
+	public static function extractCoHosts($meetingId, $zoomIntegration)
 	{
 		$emails = array();
 		$meetingApi = str_replace('@meetingId@', $meetingId, self::API_PARTICIPANT);
-		list($tokens, $participants) = ZoomWrapper::retrieveZoomDataAsArray($meetingApi, false, $zoomIntegration->getTokens(), $accountId);
-		if (isset($tokens[kZoomOauth::ACCESS_TOKEN]) &&
-			$tokens[kZoomOauth::ACCESS_TOKEN] &&
-			$zoomIntegration->getAccessToken() !== $tokens[kZoomOauth::ACCESS_TOKEN])
-		{
-			// token changed -> refresh tokens
-			self::saveNewTokenData($tokens, $accountId, $zoomIntegration);
-		}
-		if ($participants)
+		$participants = ZoomWrapper::retrieveZoomData($meetingApi, $zoomIntegration);
+		if($participants)
 		{
 			$participants = $participants[self::PARTICIPANTS];
 			foreach ($participants as $participant)
@@ -278,9 +270,9 @@ class ZoomHelper
 	}
 
 	/**
-	 * @param $emails
-	 * @param $partnerId
-	 * @param $createIfNoFound
+	 * @param array $emails
+	 * @param string $partnerId
+	 * @param bool $createIfNotFound
 	 * @return array
 	 */
 	public static function getValidatedUsers($emails, $partnerId, $createIfNotFound)
@@ -298,6 +290,7 @@ class ZoomHelper
 				$validatedEmails[] = $usersEmail;
 			}
 		}
+
 		return $validatedEmails;
 	}
 
@@ -372,7 +365,7 @@ class ZoomHelper
 	}
 
 	/**
-	 * @return string
+	 * @return mixed
 	 * @throws Exception
 	 */
 	public static function getPayloadData()
