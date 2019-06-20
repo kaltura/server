@@ -317,22 +317,24 @@ class kUploadTokenMgr
 
 		$uploadFilePath = $this->getUploadPath($this->_uploadToken->getId(), $extension);
 		$this->_uploadToken->setUploadTempPath($uploadFilePath);
-		kFile::fullMkdir($uploadFilePath, 0700);
+
+		$fileSystemManager = kSharedFileSystemMgr::getInstance();
+		$fileSystemManager->fullMkdir($uploadFilePath, 0700);
 		
-		$moveFileSuccess = kFile::moveFile($fileData['tmp_name'], $uploadFilePath);
+		$moveFileSuccess = $fileSystemManager->moveFile($fileData['tmp_name'], $uploadFilePath);
 		if (!$moveFileSuccess)
 		{
 			$msg = "Failed to move uploaded file for token id [{$this->_uploadToken->getId()}]";
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
 			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FAILED_TO_MOVE_UPLOADED_FILE);
 		}
-		
-		chmod($uploadFilePath, 0600);
+
+		$fileSystemManager->chmod($uploadFilePath, 0600);
 		
 		//If uplaodToken is set to AutoFinalize set file size into memcache
 		if($this->_autoFinalize)
 		{
-			$fileSize = filesize($uploadFilePath);
+			$fileSize = $fileSystemManager->fileSize($uploadFilePath);
 			$this->_autoFinalizeCache->set($this->_uploadToken->getId().".size", $fileSize, self::AUTO_FINALIZE_CACHE_TTL);
 			if($this->_uploadToken->getFileSize() == $fileSize)
 				$this->_finalChunk = true;

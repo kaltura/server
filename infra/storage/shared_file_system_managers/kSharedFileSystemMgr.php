@@ -25,6 +25,9 @@ interface kSharedFileSystemMgrType
 
 abstract class kSharedFileSystemMgr
 {
+
+	protected static $kSharedFsMgr;
+
 	public function __construct(array $options = null)
 	{
 		return;
@@ -168,45 +171,45 @@ abstract class kSharedFileSystemMgr
 	/**
 	 * removes path directory
 	 *
-	 * @param $path
-	 * @return mixed
+	 * @param $path dir path
+	 * @return true / false according to success
 	 */
 	abstract protected function doRmdir($path);
 
 	/**
 	 * chmod path with given mode
 	 *
-	 * @param $path
-	 * @param $mode
-	 * @return mixed
+	 * @param $path path to change mode
+	 * @param $mode mode for the dir
+	 * @return true / false according to success
 	 */
 	abstract public function doChmod($path, $mode);
 
 	/**
 	 * return the file size of given file
 	 *
-	 * @param $filename
-	 * @return mixed
+	 * @param $filename file to check the size
+	 * @return mixed size on success false on failure
 	 */
 	abstract public function doFileSize($filename);
 
 	/**
-	 * copy single file from source to dest
-	 *
-	 * @param $src
-	 * @param $dest
-	 * @param $deleteSrc
-	 * @return mixed
-	 */
-	abstract protected function copySingleFile($src, $dest, $deleteSrc);
-
-	/**
 	 * delete file
 	 *
-	 * @param $filename
-	 * @return mixed
+	 * @param $filename file to delete
+	 * @return true / false according to success
 	 */
 	abstract protected function doDeleteFile($filename);
+
+	/**
+	 * copy single file from local source to shared destination
+	 *
+	 * @param $src local source path
+	 * @param $dest shared destination
+	 * @param $deleteSrc should we delete the source
+	 * @return true / false according to success
+	 */
+	abstract protected function copySingleFile($src, $dest, $deleteSrc);
 
 	public function createDirForPath($filePath)
 	{
@@ -225,7 +228,7 @@ abstract class kSharedFileSystemMgr
 	
 	public function getFileFromRemoteUrl($url, $destFilePath = null)
 	{
-		return $this->doGetFileFromRemoteUrl($filePath, $destFilePath);
+		return $this->doGetFileFromRemoteUrl($url, $destFilePath);
 	}
 	
 	public function unlink($filePath)
@@ -265,8 +268,6 @@ abstract class kSharedFileSystemMgr
 
 	public function moveFile($from, $to, $override_if_exists = false, $copy = false)
 	{
-		$from = str_replace("\\", "/", $from);
-		$to = str_replace("\\", "/", $to);
 		return $this->doMoveFile($from, $to, $override_if_exists, $copy);
 	}
 
@@ -322,6 +323,70 @@ abstract class kSharedFileSystemMgr
 		}
 
 		return self::$kSharedFsMgr;
+	}
+
+	/**
+	 * copies local src to shared destination.
+	 * Doesn't support non-flat directories!
+	 * One can't use rename because rename isn't supported between partitions.
+	 */
+	protected function copyRecursively($src, $dest, $deleteSrc = false)
+	{
+		// src expected to be local file
+		if (is_dir($src))
+		{
+			// Generate target directory
+			if ($this->checkFileExists($dest))
+			{
+				if (!$this->isDir($dest))
+				{
+					KalturaLog::err("Can't override a file with a directory [$dest]");
+					return false;
+				}
+			} else
+			{
+				if (!$this->mkdir($dest))
+				{
+					KalturaLog::err("Failed to create directory [$dest]");
+					return false;
+				}
+			}
+			// Copy files
+			$dir = dir($src);
+			while (false !== $entry = $dir->read ())
+			{
+				if ($entry == '.' || $entry == '..')
+				{
+					continue;
+				}
+				$newSrc = $src . DIRECTORY_SEPARATOR . $entry;
+				if($this->is_dir($newSrc))
+				{
+					KalturaLog::err("Copying of non-flat directroeis is illegal");
+					return false;
+				}
+				$res = $this->copySingleFile($newSrc, $dest . DIRECTORY_SEPARATOR . $entry , $deleteSrc);
+				if (!$res)
+				{
+					return false;
+				}
+			}
+			// Delete source
+			if ($deleteSrc && (!rmdir($src)))
+			{
+				KalturaLog::err("Failed to delete source directory : [$src]");
+				return false;
+			}
+		}
+		else
+		{
+			$res = $this->copySingleFile($src, $dest, $deleteSrc);
+			if (!$res)
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

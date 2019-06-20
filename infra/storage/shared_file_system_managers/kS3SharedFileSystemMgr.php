@@ -148,7 +148,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		);
 		
 		$response = $this->s3Client->getObject( $params );
-		if($response && !$local_file)
+		if($response)
 		{
 			return (string)$response['Body'];
 		}
@@ -171,7 +171,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch ( Exception $e )
 		{
-			KalturaLog::err("Couldn't delete file [$remote_file] from bucket [$bucket]: {$e->getMessage()}");
+			KalturaLog::err("Couldn't delete file [$filePath] from bucket [$bucket]: {$e->getMessage()}");
 		}
 		
 		return $deleted;
@@ -351,12 +351,10 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doMoveFile($from, $to, $override_if_exists = false, $copy = false)
 	{
-		$fromLocalMove = false;
-		if ($this->checkFileExists($from, true))
-		{
-			$fromLocalMove = true;
-		}
-		else if(!$this->checkFileExists($from))
+		$from = str_replace("\\", "/", $from);
+		$to = str_replace("\\", "/", $to);
+
+		if(!$this->checkFileExists($from))
 		{
 			KalturaLog::err("file [$from] does not exist locally or on external storage");
 			return false;
@@ -366,7 +364,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			KalturaLog::err("Illegal destination file [$to]");
 			return false;
 		}
-		return $this->copyRecursively($from, $to, !$copy, $fromLocalMove);
+		return $this->copyRecursively($from, $to, !$copy);
 	}
 
 	protected function doDeleteFile($file_name)
@@ -387,11 +385,18 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function copySingleFile($src, $dest, $deleteSrc, $fromLocal = true)
 	{
-		if($fromLocal)
+		$srcContent = kFile::getFileContent($src);
+		if (!$this->putFileContent($dest ,$srcContent))
 		{
-			return $this->copySingleLocalFile($src, $dest, $deleteSrc);
+			KalturaLog::err("Failed to upload file: [$src] to [$dest]");
+			return false;
 		}
-		return $this->copySingleExternalFile($src, $dest, $deleteSrc);
+		if ($deleteSrc && (!unlink($src)))
+		{
+			KalturaLog::err("Failed to delete source file : [$src]");
+			return false;
+		}
+		return true;
 	}
 
 	protected function doRmdir($path)
@@ -403,6 +408,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch (Exception $e)
 		{
+			KalturaLog::err("Error trying to remove dir [$path] from bucket [$bucket]: {$e->getMessage()}");
 			return false;
 		}
 		return true;
