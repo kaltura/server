@@ -1,4 +1,18 @@
 # Orion 15.1.0 #
+## New thumbnail API  ##
+- Issue Type: Epic
+- Issue ID: PLAT-9564
+
+### Configuration ###
+Make sure you have imagick PHP extension module installed
+add Thumbnail to plugins.ini
+Add the following to local.ini:
+[thumb_storage]
+type = 2
+path = /tmp
+		
+#### Deployment Scripts ####	
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_04_17_thumbnailService.php
 
 ## Allow only admins to generate sip url  ##
 - Issue Type: Task

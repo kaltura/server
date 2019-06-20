@@ -23,8 +23,8 @@ class kThumbnailErrorMessages
 	const WIDTH_DIMENSIONS = 'Width must be between 0 and 10000';
 	const HEIGHT_DIMENSIONS = 'Height must be between 0 and 10000';
 	const DEGREES = 'Degrees must be between 0 and 360, exclusive';
-	const Y_ROUNDING = 'x rounding parameter must be positive';
-	const X_ROUNDING = 'y rounding parameter must be positive';
+	const Y_ROUNDING = 'y rounding parameter must be positive';
+	const X_ROUNDING = 'x rounding parameter must be positive';
 	const MISSING_TEXT = 'You must supply a text for this action';
 	const ENTRY_SOURCE_ONLY = ' can only work on entry source';
 	const FAILED = ' failed';
