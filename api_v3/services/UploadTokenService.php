@@ -102,7 +102,7 @@ class UploadTokenService extends KalturaBaseService
 			}
 		}
 
-		$uploadTokenMgr = new kUploadTokenMgr($uploadTokenDb, $finalChunk);
+		$uploadTokenMgr = kBaseUploadTokenMgr::getInstance($uploadTokenDb, $finalChunk);
 		try
 		{
 			$uploadTokenMgr->uploadFileToToken($fileData, $resume, $resumeAt);

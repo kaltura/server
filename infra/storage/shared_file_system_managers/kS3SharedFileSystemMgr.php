@@ -195,7 +195,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				array('params' => $params)
 			);
 			
-			return array(true, null);
+			return array(true, $res);
 		}
 		catch (Exception $e)
 		{
@@ -226,9 +226,9 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		while ($retries)
 		{
-			list($success, $message) = @($this->doPutFileHelper($filePath, $fileContent, $params));
+			list($success, $res) = @($this->doPutFileHelper($filePath, $fileContent, $params));
 			if ($success)
-				return true;
+				return $res;
 			
 			$retries--;
 		}
@@ -433,5 +433,78 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			return false;
 		}
 		return $result['ContentLength'];
+	}
+
+	public function doCreateMultipartUpload($destFilePath)
+	{
+		list($bucket, $filePath) = self::getBucketAndFilePath($destFilePath);
+
+		$params = array('Bucket' => $bucket, 'Key' => $filePath);
+		try
+		{
+			$result = self::$s3Client->createMultipartUpload($params);
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::err("Couldn't create multipart upload for [$filePath] on bucket [$bucket]: {$e->getMessage()}");
+			return false;
+		}
+		$uploadId = $result['UploadId'];
+		KalturaLog::debug("Starting multipart upload to [$destFilePath] with upload id [$uploadId]");
+		return $uploadId;
+	}
+
+	public function doMultipartCopyPart($uploadId, $partNumber, $uploadedEtag, $destFilePath)
+	{
+		list($bucket, $filePath) = self::getBucketAndFilePath($destFilePath);
+		try
+		{
+			$result = self::$s3Client->copyPart(array(
+				'Bucket'     => $bucket,
+				'Key'        => $filePath,
+				'UploadId'   => $uploadId,
+				'PartNumber' => $partNumber,
+				'Body'       => $uploadedEtag,
+			));
+
+			KalturaLog::debug("coping part [$partNumber] dest file path [$destFilePath]");
+		}
+		catch (S3Exception $e)
+		{
+			$result = self::$s3Client->abortMultipartUpload(
+				array(
+					'Bucket'   => $bucket,
+					'Key'      => $filePath,
+					'UploadId' => $uploadId
+				));
+
+			KalturaLog::debug("Upload of [$destFilePath] failed");
+			return false;
+		}
+
+		return $result;
+	}
+
+	public function doCompleteMultiPartUpload($destFilePath, $uploadId, $parts)
+	{
+		list($bucket, $filePath) = self::getBucketAndFilePath($destFilePath);
+
+		try
+		{
+			$result = self::$s3Client->completeMultipartUpload(array(
+				'Bucket'   => $bucket,
+				'Key'      => $filePath,
+				'UploadId' => $uploadId,
+				'MultipartUpload'    => $parts,
+			));
+		}
+		catch (S3Exception $e)
+		{
+			KalturaLog::debug("could not complete Upload of [$destFilePath]");
+			return false;
+		}
+
+		$url = $result['Location'];
+		return $url;
 	}
 }
