@@ -50,11 +50,6 @@
 	#framePlayerContainer {margin: 0 auto; padding-top: 20px; text-align: center; } 
 	object, div { margin: 0 auto; }
 	</style>
-	<?php } else { ?>
-	<style>
-	#main .content .title h1 { font-size: 24px; font-weight: bold; }
-	#main p { margin-bottom: 20px; font-size: 18px; }
-	</style>
 	<?php } ?>
 	<!--[if lte IE 7]>
 	<script src="/lib/js/json2.min.js"></script>
@@ -65,13 +60,8 @@
 <body>
 	<?php if(!$framed) { ?>
 	<div id="main" style="position: static;">
-
+        <div class="icon"></div>
 		<div class="content">
-			<div class="title">
-				<h1><?php echo htmlspecialchars($entry_name); ?></h1>
-			</div>
-			<div class="contwrap">
-			<p><?php echo htmlspecialchars($entry_description); ?></p>
 			<div id="videoContainer">
 	<?php } ?>
 				<div id="framePlayerContainer">
@@ -205,7 +195,12 @@ if( ltIE10 && (embedType == 'dynamic' || embedType == 'thumb') ) {
 </script>
 				</div>
 <?php if(!$framed) { ?>				
+            </div>
+            <div class="title">
+				<h1><?php echo htmlspecialchars($entry_name); ?></h1>
 			</div>
+			<div class="contwrap">
+			<p><?php echo htmlspecialchars($entry_description); ?></p>
 <!--<br /><p>This page is for preview only. Not for production use.</p>-->
 			</div><!-- end contwrap -->
 		</div><!-- end content -->
