@@ -49,12 +49,33 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 		throw new Exception("Can't instantiate un-typed [$vendorType] vendorService [" . print_r($row, true) . "]");
 	}
 
-	public static function setDefaultCriteriaFilter ()
+	public static function setUseCriteriaFilter($use)
 	{
-		if ( self::$s_criteria_filter == null )
+		$criteria_filter = self::getDefaultCriteriaFilter();
+
+		if($use)
+		{
+			$criteria_filter->enable();
+		}
+		else
+		{
+			$criteria_filter->disable();
+		}
+	}
+
+	public static function getDefaultCriteriaFilter()
+	{
+		if(self::$s_criteria_filter == null)
 		{
 			self::$s_criteria_filter = new criteriaFilter();
 		}
+
+		return self::$s_criteria_filter;
+	}
+
+	public static function setDefaultCriteriaFilter()
+	{
+		self::getDefaultCriteriaFilter();
 
 		$c = KalturaCriteria::create(VendorIntegrationPeer::OM_CLASS);
 		$c->addAnd ( VendorIntegrationPeer::STATUS, VendorStatus::DELETED, Criteria::NOT_EQUAL);
@@ -74,6 +95,23 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 		$c->add(VendorIntegrationPeer::ACCOUNT_ID, $accountID);
 		$c->add(VendorIntegrationPeer::VENDOR_TYPE, $vendorType);
 		return self::doSelectOne($c);
+	}
+
+	/**
+	 * @param $accountID
+	 * @param $vendorType
+	 * @return VendorIntegration
+	 * @throws PropelException
+	 */
+	public static function retrieveSingleVendorPerPartnerNoFilter($accountID, $vendorType)
+	{
+		$c = new Criteria();
+		$c->add(VendorIntegrationPeer::ACCOUNT_ID, $accountID);
+		$c->add(VendorIntegrationPeer::VENDOR_TYPE, $vendorType);
+		self::setUseCriteriaFilter(false);
+		$result = self::doSelectOne($c);
+		self::setUseCriteriaFilter(true);
+		return $result;
 	}
 
 } // VendorIntegrationPeer

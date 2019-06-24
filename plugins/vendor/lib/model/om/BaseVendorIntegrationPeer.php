@@ -56,7 +56,7 @@ abstract class BaseVendorIntegrationPeer {
 	const UPDATED_AT = 'vendor_integration.UPDATED_AT';
 
 	/**
-	 * An identiy map to hold any loaded instances of VendorIntegration objects.
+	 * An identity map to hold any loaded instances of VendorIntegration objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
 	 * queries.
 	 * @var        array VendorIntegration[]
@@ -438,7 +438,7 @@ abstract class BaseVendorIntegrationPeer {
 	
 	/**
 	 * the filterCriteria will filter out all the doSelect methods - ONLY if the filter is turned on.
-	 * IMPORTANT - the filter is turend on by default and when switched off - should be turned on again manually .
+	 * IMPORTANT - the filter is turned on by default and when switched off - should be turned on again manually .
 	 * 
 	 * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
 	 */
@@ -457,7 +457,7 @@ abstract class BaseVendorIntegrationPeer {
 			// the private partner data is not allowed - 
 			if($kalturaNetwork)
 			{
-				// allow only the kaltura netword stuff
+				// allow only the kaltura network stuff
 				if($partnerId)
 				{
 					$orderBy = "(" . self::PARTNER_ID . "<>{$partnerId})";  // first take the partner_id and then the rest

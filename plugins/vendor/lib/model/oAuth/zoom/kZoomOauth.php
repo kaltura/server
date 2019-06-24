@@ -3,7 +3,7 @@
  * @package plugins.venodr
  * @subpackage model.zoomOauth
  */
-class kZoomOauth implements kVendorOauth
+class kZoomOauth
 {
 	const OAUTH_TOKEN_PATH = '/oauth/token';
 	const ACCESS_TOKEN = 'access_token';
@@ -13,52 +13,28 @@ class kZoomOauth implements kVendorOauth
 	const EXPIRES_IN = 'expires_in';
 	const SCOPE = 'scope';
 
-
 	/**
 	 * @param ZoomVendorIntegration $vendorIntegration
 	 * @return array
 	 * @throws Exception
 	 */
-	public function refreshTokens($vendorIntegration)
+	public static function refreshTokens($vendorIntegration)
 	{
 		KalturaLog::info('Refreshing tokens');
-		list($zoomBaseURL, , $header, $userPwd) = $this->getZoomHeaderData();
+		list($zoomBaseURL, , $header, $userPwd) = self::getZoomHeaderData();
 		$oldRefreshToken = $vendorIntegration->getRefreshToken();
 		$postFields = "grant_type=refresh_token&refresh_token=$oldRefreshToken";
-		$response = $this->curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
+		$response = self::curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
 		$tokensData = self::parseTokensResponse($response);
 		$vendorIntegration->saveTokensData($tokensData);
 		return $tokensData;
 	}
 
-	/**
-	 * @param bool $forceNewToken
-	 * @param string $accountId
-	 * @return array
-	 * @throws Exception
-	 */
-	public function retrieveTokensData($forceNewToken = false, $accountId = null)
+	public static function requestAccessToken($authCode)
 	{
-		KalturaLog::info('Retrieving Tokens');
-		$zoomIntegration = null;
-		if (!$forceNewToken && $accountId)
-		{
-			/** @var ZoomVendorIntegration $zoomIntegration */
-			$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
-			if ($zoomIntegration) // tokens exist
-			{
-				if (time() > $zoomIntegration->getExpiresIn()) // token had expired -> refresh
-				{
-					return $this->refreshTokens($zoomIntegration->getRefreshToken(), $zoomIntegration);
-				}
-
-				return array(self::ACCESS_TOKEN => $zoomIntegration->getAccessToken(), self::REFRESH_TOKEN => $zoomIntegration->getRefreshToken(),
-					self::EXPIRES_IN => $zoomIntegration->getExpiresIn());
-			}
-		}
-		list($zoomBaseURL, $redirectUrl, $header, $userPwd) = $this->getZoomHeaderData();
-		$postFields = "grant_type=authorization_code&code={$_GET['code']}&redirect_uri=$redirectUrl";
-		$response = $this->curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
+		list($zoomBaseURL, $redirectUrl, $header, $userPwd) = self::getZoomHeaderData();
+		$postFields = "grant_type=authorization_code&code={$authCode}&redirect_uri=$redirectUrl";
+		$response = self::curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
 		$tokensData = self::parseTokensResponse($response);
 		return $tokensData;
 	}
@@ -71,7 +47,7 @@ class kZoomOauth implements kVendorOauth
 	 * @return mixed|string
 	 * @throws Exception
 	 */
-	private function curlRetrieveTokensData($url, $userPwd, $header, $postFields)
+	private static function curlRetrieveTokensData($url, $userPwd, $header, $postFields)
 	{
 		$curlWrapper = new KCurlWrapper();
 		$curlWrapper->setOpt(CURLOPT_POST, 1);
@@ -119,8 +95,8 @@ class kZoomOauth implements kVendorOauth
 		if (!$tokensData || isset($dataAsArray[self::REFRESH_TOKEN]) || isset($dataAsArray[self::ACCESS_TOKEN]) ||
 			isset($dataAsArray[self::EXPIRES_IN]))
 		{
-			KalturaLog::err('Parse Tokens failed, response received from zoom is: ' . $tokensData);
-			throw new KalturaAPIException("Unable to parse tokens please check zoom configuration");
+			KalturaLog::err(kVendorErrorMessages::TOKEN_PARSING_FAILED . $tokensData);
+			return null;
 		}
 
 		$expiresIn = $tokensData[self::EXPIRES_IN];
@@ -133,7 +109,7 @@ class kZoomOauth implements kVendorOauth
 	 * @return array
 	 * @throws Exception
 	 */
-	private function getZoomHeaderData()
+	private static function getZoomHeaderData()
 	{
 		$zoomConfiguration = kConf::get(ZoomWrapper::CONFIGURATION_PARAM_NAME, ZoomWrapper::MAP_NAME);
 		$clientId = $zoomConfiguration['clientId'];
@@ -148,13 +124,13 @@ class kZoomOauth implements kVendorOauth
 	/**
 	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @return string
-	 * @throws kVendorException
+	 * @throws kVendorErrorMessages
 	 */
-	public function getValidAccessToken($zoomIntegration)
+	public static function getValidAccessToken($zoomIntegration)
 	{
 		if (time() >= $zoomIntegration->getExpiresIn()) // token have expired -> refresh
 		{
-			$this->refreshTokens($zoomIntegration);
+			self::refreshTokens($zoomIntegration);
 		}
 
 		return $zoomIntegration->getAccessToken();
