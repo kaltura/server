@@ -13,6 +13,8 @@ abstract class kBaseUploadTokenMgr
 	const AUTO_FINALIZE_CACHE_TTL = 2592000; //Thirty days in seconds
 	const MAX_AUTO_FINALIZE_RETIRES = 5;
 
+	protected static $fileSystemManager;
+
 	/**
 	 * @var UploadToken
 	 */
@@ -51,6 +53,15 @@ abstract class kBaseUploadTokenMgr
 	 * @param float $resumeAt
 	 */
 	abstract protected function handleResume($fileData, $resumeAt);
+
+	/**
+	 * Returns the target upload path for upload token id and extension
+	 *
+	 * @param $uploadTokenId
+	 * @param string $extension
+	 * @return string
+	 */
+	abstract protected function getUploadPath($uploadTokenId, $extension = '');
 
 	/**
 	 * get upload token manager by storage type
@@ -122,6 +133,8 @@ abstract class kBaseUploadTokenMgr
 	 */
 	public function uploadFileToToken($fileData, $resume = false, $resumeAt = -1)
 	{
+		self::$fileSystemManager = kSharedFileSystemMgr::getInstance();
+
 		$this->_autoFinalize = $this->_uploadToken->getAutoFinalize();
 		if($this->_autoFinalize)
 			$this->initUploadTokenMemcache();
@@ -150,7 +163,7 @@ abstract class kBaseUploadTokenMgr
 		else
 		{
 			$this->handleMoveFile($fileData);
-			$fileSize = kFile::fileSize($this->_uploadToken->getUploadTempPath());
+			$fileSize = self::$fileSystemManager->fileSize($this->_uploadToken->getUploadTempPath());
 		}
 
 		if ($this->_finalChunk)
@@ -251,21 +264,6 @@ abstract class kBaseUploadTokenMgr
 	}
 
 	/**
-	 * Returns the target upload path for upload token id and extension
-	 *
-	 * @param $uploadTokenId
-	 * @param string $extension
-	 * @return string
-	 */
-	protected function getUploadPath($uploadTokenId, $extension = '')
-	{
-		if (!$extension)
-			$extension = self::NO_EXTENSION_IDENTIFIER;
-
-		return myContentStorage::getFSUploadsPath().substr($uploadTokenId, -2).'/'.$uploadTokenId.'.'.$extension;
-	}
-
-	/**
 	 * @param $fileData
 	 */
 	protected function tryMoveToErrors($fileData)
@@ -309,20 +307,13 @@ abstract class kBaseUploadTokenMgr
 	protected function handleMoveFile($fileData)
 	{
 		// get the upload path
-		$extension = strtolower(pathinfo($fileData['name'], PATHINFO_EXTENSION));
-
-		// in firefox html5 upload the extension is missing (file name is "blob") so try fetching the extesion from
-		// the original file name that was passed to the uploadToken
-		if ($extension === "" || ($extension == "tmp" && $this->_uploadToken->getFileName()))
-			$extension = strtolower(pathinfo($this->_uploadToken->getFileName(), PATHINFO_EXTENSION));
-
+		$extension = $this->getFileExtension($fileData['name']);
 		$uploadFilePath = $this->getUploadPath($this->_uploadToken->getId(), $extension);
 		$this->_uploadToken->setUploadTempPath($uploadFilePath);
 
-		$fileSystemManager = kSharedFileSystemMgr::getInstance();
-		$fileSystemManager->fullMkdir($uploadFilePath, 0700);
+		self::$fileSystemManager->fullMkdir($uploadFilePath, 0700);
 
-		$moveFileSuccess = $fileSystemManager->moveFile($fileData['tmp_name'], $uploadFilePath);
+		$moveFileSuccess = self::$fileSystemManager->moveFile($fileData['tmp_name'], $uploadFilePath);
 		if (!$moveFileSuccess)
 		{
 			$msg = "Failed to move uploaded file for token id [{$this->_uploadToken->getId()}]";
@@ -330,12 +321,14 @@ abstract class kBaseUploadTokenMgr
 			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FAILED_TO_MOVE_UPLOADED_FILE);
 		}
 
-		$fileSystemManager->chmod($uploadFilePath, 0600);
+		self::$fileSystemManager->chmod($uploadFilePath, 0600);
+
+		$fileSize = self::$fileSystemManager->fileSize($uploadFilePath);
+		$this->_uploadToken->setLastFileSize($fileSize);
 
 		//If uplaodToken is set to AutoFinalize set file size into memcache
 		if($this->_autoFinalize)
 		{
-			$fileSize = $fileSystemManager->fileSize($uploadFilePath);
 			$this->_autoFinalizeCache->set($this->_uploadToken->getId().".size", $fileSize, self::AUTO_FINALIZE_CACHE_TTL);
 			if($this->_uploadToken->getFileSize() == $fileSize)
 				$this->_finalChunk = true;
@@ -406,4 +399,22 @@ abstract class kBaseUploadTokenMgr
 		}
 	}
 
+	/**
+	 * get file extension for a given file
+	 *
+	 * @param $fileName
+	 * @return string
+	 */
+	protected function getFileExtension($fileName)
+	{
+		// get the upload path
+		$extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+		// in firefox html5 upload the extension is missing (file name is "blob") so try fetching the extesion from
+		// the original file name that was passed to the uploadToken
+		if ($extension === "" || ($extension == "tmp" && $this->_uploadToken->getFileName()))
+			$extension = strtolower(pathinfo($this->_uploadToken->getFileName(), PATHINFO_EXTENSION));
+
+		return $extension;
+	}
 }

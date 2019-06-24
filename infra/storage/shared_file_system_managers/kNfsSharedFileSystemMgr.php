@@ -206,4 +206,19 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 		return false;
 	}
 
+	protected function doGetMaximumPartsNum()
+	{
+		return 2000000000;
+	}
+
+	protected function doGetUploadMinimumSize()
+	{
+		return 0;
+	}
+
+	protected function doGetUploadMaxSize()
+	{
+		return 2000000000;
+	}
+
 }

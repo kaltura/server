@@ -211,6 +211,27 @@ abstract class kSharedFileSystemMgr
 	 */
 	abstract protected function copySingleFile($src, $dest, $deleteSrc);
 
+	/**
+	 * returns maximum parts num allowed for upload in multipart
+	 *
+	 * @return int
+	 */
+	abstract protected function doGetMaximumPartsNum();
+
+	/**
+	 * returns file minimum size for upload
+	 *
+	 * @return int
+	 */
+	abstract protected function doGetUploadMinimumSize();
+
+	/**
+	 * returns file max size for upload
+	 *
+	 * @return int
+	 */
+	abstract protected function doGetUploadMaxSize();
+
 	public function createDirForPath($filePath)
 	{
 		return $this->doCreateDirForPath($filePath);
@@ -301,6 +322,21 @@ abstract class kSharedFileSystemMgr
 		return $this->doDeleteFile($filename);
 	}
 
+	public function getUploadMinimumSize()
+	{
+		return $this->doGetUploadMinimumSize();
+	}
+
+	public function getMaximumPartsNum()
+	{
+		return $this->doGetMaximumPartsNum();
+	}
+
+	public function getUploadMaxSize()
+	{
+		return $this->doGetUploadMaxSize();
+	}
+
 	public static function getInstance($type = null, array $options = null)
 	{
 		if(self::$kSharedFsMgr)
@@ -317,6 +353,7 @@ abstract class kSharedFileSystemMgr
 		{
 			case kSharedFileSystemMgrType::LOCAL:
 				self::$kSharedFsMgr = new kNfsSharedFileSystemMgr($options);
+				break;
 
 			case kSharedFileSystemMgrType::S3:
 				self::$kSharedFsMgr = new kS3SharedFileSystemMgr($options);

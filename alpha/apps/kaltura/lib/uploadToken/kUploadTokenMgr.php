@@ -171,4 +171,19 @@ class kUploadTokenMgr extends kBaseUploadTokenMgr
 		
 		return $currentFileSize;
 	}
+
+	/**
+	 * Returns the target upload path for upload token id and extension
+	 *
+	 * @param $uploadTokenId
+	 * @param string $extension
+	 * @return string
+	 */
+	protected function getUploadPath($uploadTokenId, $extension = '')
+	{
+		if (!$extension)
+			$extension = self::NO_EXTENSION_IDENTIFIER;
+
+		return myContentStorage::getFSUploadsPath().substr($uploadTokenId, -2).'/'.$uploadTokenId.'.'.$extension;
+	}
 }

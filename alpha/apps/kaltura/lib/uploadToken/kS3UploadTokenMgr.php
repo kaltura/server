@@ -9,12 +9,6 @@
 class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 {
 
-	const MIN_PART_SIZE = 5242880;
-	const MAX_PART_SIZE = 5368709120;
-
-	protected static $s3FileSystemManager;
-
-
 	public function __construct(UploadToken $uploadToken, $finalChunk = true)
 	{
 		KalturaLog::info("Init for upload token id [{$uploadToken->getId()}]");
@@ -32,12 +26,12 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	protected function handleResume($fileData, $resumeAt)
 	{
 		$minimumChunkSize = $this->_uploadToken->getMinimumChunkSize();
-		if($minimumChunkSize && $minimumChunkSize >= self::MIN_PART_SIZE)
+
+		if($minimumChunkSize && $minimumChunkSize >= kS3SharedFileSystemMgr::MIN_PART_SIZE)
 		{
 			return $this->handleOptimizedResume($fileData, $resumeAt);
 		}
 	}
-
 
 	/**
 	 * handle resume when all the chunks are suitable for S3 multipartUpload without the need of inner concatenation
@@ -49,33 +43,40 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	 */
 	protected function handleOptimizedResume($fileData, $resumeAt)
 	{
-		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
+		$uploadFilePath = dirname($this->_uploadToken->getUploadTempPath());
 		$sourceFilePath = $fileData['tmp_name'];
 		$chunkSize = kFile::fileSize($sourceFilePath);
-		self::$s3FileSystemManager = kSharedFileSystemMgr::getInstance();
+		$extension = $this->getFileExtension($this->_uploadToken->getFileName());
 
 		if ($resumeAt != -1) // this may not be a sequential chunk added at the end of the file
 		{
 			// support backwards compatibility of overriding a final chunk at the offset zero
 			$verifyFinalChunk = $this->_finalChunk && $resumeAt > 0;
+
 			// if this is the final chunk the expected file size would be the resume position + the last chunk size
+			$chunkSize = filesize($sourceFilePath);
 			$expectedFileSize = $verifyFinalChunk ? ($resumeAt + $chunkSize) : 0;
-			$chunkFilePath = "$uploadFilePath.chunk.$resumeAt";
+
 			if($this->_autoFinalize && $this->checkIsFinalChunk($chunkSize))
 			{
 				$verifyFinalChunk = true;
 				$expectedFileSize = $this->_uploadToken->getFileSize();
 			}
-			$uploadFinalChunkMaxAppendTime = kConf::get('upload_final_chunk_max_append_time', 'local', 30);
-			$this->uploadChunk($chunkFilePath, $this->_uploadToken, $resumeAt, $chunkSize);
-			// if final chunk need to complete the upload
+
+			$chunkFilePath = "$uploadFilePath/$resumeAt.$extension";
+			$this->uploadChunk($chunkFilePath, $sourceFilePath, $resumeAt, $chunkSize);
+
+			if($verifyFinalChunk && $this->_uploadToken->getFileSize() != $expectedFileSize)
+			{
+				$this->createFullFile($uploadFilePath, $this->_uploadToken);
+			}
 		}
 		else
 		{
 			// add sequentially at the end of file
 			$currentFileSize = $this->_uploadToken->getLastFileSize();
-			$chunkFilePath = "$uploadFilePath.chunk.$currentFileSize";
-			$this->uploadChunk($chunkFilePath, $this->_uploadToken, $this->_uploadToken->getLastFileSize(), $chunkSize);
+			$chunkFilePath = "$uploadFilePath/$currentFileSize.$extension";
+			$this->uploadChunk($chunkFilePath, $sourceFilePath, $this->_uploadToken->getLastFileSize(), $chunkSize);
 
 			if($this->_autoFinalize && $this->_uploadToken->getFileSize() >= $currentFileSize)
 			{
@@ -84,9 +85,11 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 
 			if($this->_finalChunk)
 			{
-				$this->createFullFile();
+				$this->createFullFile($uploadFilePath, $this->_uploadToken);
 			}
 		}
+
+		$currentFileSize = $this->_uploadToken->getLastFileSize();
 		return $currentFileSize;
 	}
 
@@ -98,58 +101,86 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	 * @param $resumeAt
 	 * @param $chunkSize
 	 */
-	protected function uploadChunk($filePath, $uploadToken, $resumeAt, $chunkSize)
+	protected function uploadChunk($filePath, $srcPath, $resumeAt, $chunkSize)
 	{
-		$fileContent = kFile::getFileContent($filePath);
-		$result = self::$s3FileSystemManager->putFileContent($filePath, (string)$fileContent);
+		KalturaLog::info("upload file from [{$srcPath}] to [{$filePath}]");
+		$fileContent = kFile::getFileContent($srcPath);
+		$result = self::$fileSystemManager->putFileContent($filePath, $fileContent);
 		if($result)
 		{
-			$chunkEtag = $result['ETag'];
-			$this->addUploadedPart($uploadToken, $resumeAt, $chunkEtag);
 			$uploadedSize = $resumeAt + $chunkSize;
 			$this->_uploadToken->setLastFileSize($uploadedSize);
 		}
-
 	}
 
 	/**
-	 * add new part to upload token parts list
-	 *
-	 * @param $uploadToken
-	 * @param $resumeAt
-	 * @param $chunkEtag
-	 */
-	protected function addUploadedPart($uploadToken, $resumeAt, $chunkEtag)
-	{
-		$parts = $uploadToken->getParts();
-		$parts[$resumeAt] = $chunkEtag;
-		$uploadToken->setParts($parts);
-	}
-
-	/**
+	 * list all file chunks and upload them in multipart upload
 	 *
 	 * @param $finalFilePath
-	 * @param $uploadToken
 	 */
-	protected function createFullFile($finalFilePath, $uploadToken)
+	protected function createFullFile($finalFilePath)
 	{
-		$uploadId = self::$s3FileSystemManager->doCreateMultipartUpload($finalFilePath);
-		$uploadParts = $uploadToken->getParts();
-		$copiedParts = array();
+		$uploadChunksResponse = self::$fileSystemManager->doListObjects($finalFilePath);
+		$uploadChunks = $uploadChunksResponse['Contents'];
+		usort($uploadChunks,  array($this, 'compareKeyResumeAt'));
+
+		$finalFilePath .= '/full_file.' . $this->getFileExtension($this->_uploadToken->getFileName());
+		$uploadId = self::$fileSystemManager->doCreateMultipartUpload($finalFilePath);
+
 		$partNumber = 1;
-		foreach ($uploadParts as $time => $eTag)
+		foreach ($uploadChunks as $chunk)
 		{
-			$result = self::$s3FileSystemManager->doMultipartCopyPart($uploadId, $partNumber, $eTag, $finalFilePath);
+			$result = self::$fileSystemManager->doMultipartUploadPartCopy($uploadId, $partNumber, $chunk['Key'], $finalFilePath);
 			if($result)
 			{
 				$copiedParts['Parts'][$partNumber] = array(
 					'PartNumber' => $partNumber,
-					'ETag' => $result['ETag'],
+					'ETag' => $result['CopyPartResult']['ETag'],
 				);
 			}
+			$partNumber +=1;
 		}
-		self::$s3FileSystemManager->doCompleteMultipartUpload($finalFilePath, $uploadId, $copiedParts);
+
+		self::$fileSystemManager->doCompleteMultipartUpload($finalFilePath, $uploadId, $copiedParts);
+
+		$this->_uploadToken->setUploadTempPath($finalFilePath);
 	}
 
+	/**
+	 * Returns the target upload path for upload token id and extension
+	 *
+	 * @param $uploadTokenId
+	 * @param string $extension
+	 * @return string
+	 */
+	protected function getUploadPath($uploadTokenId, $extension = '')
+	{
+		if (!$extension)
+			$extension = self::NO_EXTENSION_IDENTIFIER;
+
+		return myContentStorage::getFSUploadsPath().substr($uploadTokenId, -2).'/'.$uploadTokenId.'/0.'.$extension;
+	}
+
+	/**
+	 * sorting function for uploadToken chunks
+	 *
+	 * @param $a
+	 * @param $b
+	 * @return int
+	 *
+	 */
+	function compareKeyResumeAt($a, $b)
+	{
+		$key_a = basename($a['Key']);
+		$key_b = basename ($b['Key']);
+
+		$time_a = (int)substr($key_a, 0, strrpos($key_a, "."));
+		$time_b = (int)substr($key_b, 0, strrpos($key_b, "."));
+		if ($time_a == $time_b)
+		{
+			return 0;
+		}
+		return ($time_a < $time_b) ? -1 : 1;
+	}
 
 }

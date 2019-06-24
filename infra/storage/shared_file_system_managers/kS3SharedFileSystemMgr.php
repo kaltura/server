@@ -17,6 +17,8 @@ use Aws\S3\Enum\CannedAcl;
 class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 {
 	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
+	const MAX_PARTS_NUMBER = 10000;
+	const MIN_PART_SIZE = 5242880;
 	
 	protected $filesAcl;
 	protected $s3Region;
@@ -442,7 +444,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$params = array('Bucket' => $bucket, 'Key' => $filePath);
 		try
 		{
-			$result = self::$s3Client->createMultipartUpload($params);
+			$result = $this->s3Client->createMultipartUpload($params);
 		}
 		catch (Exception $e)
 		{
@@ -454,24 +456,25 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return $uploadId;
 	}
 
-	public function doMultipartCopyPart($uploadId, $partNumber, $uploadedEtag, $destFilePath)
+	public function doMultipartUploadPartCopy($uploadId, $partNumber, $s3FileKey, $destFilePath)
 	{
 		list($bucket, $filePath) = self::getBucketAndFilePath($destFilePath);
+		$srcPath = $bucket.'/'.$s3FileKey;
 		try
 		{
-			$result = self::$s3Client->copyPart(array(
+			$result = $this->s3Client->uploadPartCopy(array(
 				'Bucket'     => $bucket,
-				'Key'        => $filePath,
+				'CopySource' => $srcPath,
 				'UploadId'   => $uploadId,
 				'PartNumber' => $partNumber,
-				'Body'       => $uploadedEtag,
+				'Key'       => $filePath,
 			));
 
-			KalturaLog::debug("coping part [$partNumber] dest file path [$destFilePath]");
+			//KalturaLog::debug("coping part [$partNumber] from [$srcPath]. dest file path [$destFilePath]");
 		}
 		catch (S3Exception $e)
 		{
-			$result = self::$s3Client->abortMultipartUpload(
+			$result = $this->s3Client->abortMultipartUpload(
 				array(
 					'Bucket'   => $bucket,
 					'Key'      => $filePath,
@@ -491,7 +494,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 		try
 		{
-			$result = self::$s3Client->completeMultipartUpload(array(
+			$result = $this->s3Client->completeMultipartUpload(array(
 				'Bucket'   => $bucket,
 				'Key'      => $filePath,
 				'UploadId' => $uploadId,
@@ -500,11 +503,46 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch (S3Exception $e)
 		{
-			KalturaLog::debug("could not complete Upload of [$destFilePath]");
+			KalturaLog::debug("could not complete Upload of [$destFilePath]. Error: {$e->getMessage()}");
 			return false;
 		}
 
 		$url = $result['Location'];
 		return $url;
+	}
+
+	public function doListObjects($filePath)
+	{
+		list($bucket, $prefix) = self::getBucketAndFilePath($filePath);
+
+		KalturaLog::debug("list objects on bucket [$bucket] with prefix [$prefix]");
+		$params = array('Bucket' => $bucket, 'Prefix' => $prefix);
+
+		try {
+			$results = $this->s3Client->listObjects($params);
+		}
+
+		catch (S3Exception $e)
+		{
+			KalturaLog::debug("could not list [$filePath] objects");
+			return false;
+		}
+
+		return $results;
+	}
+
+	protected function doGetMaximumPartsNum()
+	{
+		return self::MAX_PARTS_NUMBER;
+	}
+
+	protected function doGetUploadMinimumSize()
+	{
+		return self::MIN_PART_SIZE;
+	}
+
+	protected function doGetUploadMaxSize()
+	{
+		return self::MULTIPART_UPLOAD_MINIMUM_FILE_SIZE;
 	}
 }

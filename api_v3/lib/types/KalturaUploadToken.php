@@ -111,9 +111,6 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 		"minimumChunkSize",
 	);
 
-	const MAX_PARTS_NUMBER = 10000;
-	const MAX_PART_SIZE = 5368709120;
-
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
@@ -154,17 +151,21 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 				throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_MISSING_FILE_SIZE);
 		}
 
-		if(isset($this->minimumChunkSize) && $this->minimumChunkSize > self::MAX_PART_SIZE)
+		$fileSystemManager = kSharedFileSystemMgr::getInstance();
+		$maxUploadSize = $fileSystemManager->getUploadMaxSize();
+		$maxParts = $fileSystemManager->getMaximumPartsNum();
+
+		if(isset($this->minimumChunkSize) && $this->minimumChunkSize > $maxUploadSize)
 		{
-			throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_INVALID_PART_SIZE, self::MAX_PART_SIZE);
+			throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_INVALID_PART_SIZE, $maxUploadSize);
 		}
 
 		if(isset($this->minimumChunkSize) && isset($this->fileSize))
 		{
 			$expectedPartsNum = ceil($this->fileSize/$this->minimumChunkSize);
-			if($expectedPartsNum > self::MAX_PARTS_NUMBER)
+			if($expectedPartsNum > $maxParts)
 			{
-				throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_EXCEEDED_MAX_PARTS, $expectedPartsNum, self::MAX_PARTS_NUMBER);
+				throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_EXCEEDED_MAX_PARTS, $expectedPartsNum, $maxParts);
 			}
 		}
 	}
