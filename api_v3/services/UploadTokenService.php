@@ -102,7 +102,7 @@ class UploadTokenService extends KalturaBaseService
 			}
 		}
 
-		$uploadTokenMgr = new kUploadTokenMgr($uploadTokenDb, $finalChunk);
+		$uploadTokenMgr = kBaseUploadTokenMgr::getInstance($uploadTokenDb, $finalChunk);
 		try
 		{
 			$uploadTokenMgr->uploadFileToToken($fileData, $resume, $resumeAt);
@@ -123,6 +123,8 @@ class UploadTokenService extends KalturaBaseService
 					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE);
 				case kUploadTokenException::UPLOAD_TOKEN_FILE_TYPE_RESTRICTED:
 					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_FILE_TYPE_RESTRICTED_FOR_UPLOAD);
+				case kUploadTokenException::UPLOAD_TOKEN_FAILED_TO_MOVE_UPLOADED_FILE:
+					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_PROCESSING_ERROR);
 				default:
 					throw $ex;
 			}

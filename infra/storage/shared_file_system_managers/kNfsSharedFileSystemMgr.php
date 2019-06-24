@@ -107,6 +107,9 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doMoveFile($from, $to, $override_if_exists = false, $copy = false)
 	{
+		$from = str_replace("\\", "/", $from);
+		$to = str_replace("\\", "/", $to);
+
 		if(!file_exists($from))
 		{
 			KalturaLog::err("Source doesn't exist [$from]");
@@ -133,6 +136,7 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 		$fh = fopen($file_name, 'w') or die("can't open file");
 		fclose($fh);
 		unlink($file_name);
+		return true;
 	}
 
 	protected function copySingleFile($src, $dest, $deleteSrc)
@@ -200,6 +204,21 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 		if (preg_match('/Content-Length: (\d+)/', $headers, $matches))
 			return floatval($matches[1]);
 		return false;
+	}
+
+	protected function doGetMaximumPartsNum()
+	{
+		return 2000000000;
+	}
+
+	protected function doGetUploadMinimumSize()
+	{
+		return 0;
+	}
+
+	protected function doGetUploadMaxSize()
+	{
+		return 2000000000;
 	}
 
 }

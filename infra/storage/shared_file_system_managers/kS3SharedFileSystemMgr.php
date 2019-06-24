@@ -17,6 +17,8 @@ use Aws\S3\Enum\CannedAcl;
 class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 {
 	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
+	const MAX_PARTS_NUMBER = 10000;
+	const MIN_PART_SIZE = 5242880;
 	
 	protected $filesAcl;
 	protected $s3Region;
@@ -148,7 +150,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		);
 		
 		$response = $this->s3Client->getObject( $params );
-		if($response && !$local_file)
+		if($response)
 		{
 			return (string)$response['Body'];
 		}
@@ -171,7 +173,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch ( Exception $e )
 		{
-			KalturaLog::err("Couldn't delete file [$remote_file] from bucket [$bucket]: {$e->getMessage()}");
+			KalturaLog::err("Couldn't delete file [$filePath] from bucket [$bucket]: {$e->getMessage()}");
 		}
 		
 		return $deleted;
@@ -195,7 +197,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				array('params' => $params)
 			);
 			
-			return array(true, null);
+			return array(true, $res);
 		}
 		catch (Exception $e)
 		{
@@ -226,9 +228,9 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		while ($retries)
 		{
-			list($success, $message) = @($this->doPutFileHelper($filePath, $fileContent, $params));
+			list($success, $res) = @($this->doPutFileHelper($filePath, $fileContent, $params));
 			if ($success)
-				return true;
+				return $res;
 			
 			$retries--;
 		}
@@ -351,12 +353,10 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doMoveFile($from, $to, $override_if_exists = false, $copy = false)
 	{
-		$fromLocalMove = false;
-		if ($this->checkFileExists($from, true))
-		{
-			$fromLocalMove = true;
-		}
-		else if(!$this->checkFileExists($from))
+		$from = str_replace("\\", "/", $from);
+		$to = str_replace("\\", "/", $to);
+
+		if(!$this->checkFileExists($from))
 		{
 			KalturaLog::err("file [$from] does not exist locally or on external storage");
 			return false;
@@ -366,7 +366,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			KalturaLog::err("Illegal destination file [$to]");
 			return false;
 		}
-		return $this->copyRecursively($from, $to, !$copy, $fromLocalMove);
+		return $this->copyRecursively($from, $to, !$copy);
 	}
 
 	protected function doDeleteFile($file_name)
@@ -387,11 +387,18 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function copySingleFile($src, $dest, $deleteSrc, $fromLocal = true)
 	{
-		if($fromLocal)
+		$srcContent = kFile::getFileContent($src);
+		if (!$this->putFileContent($dest ,$srcContent))
 		{
-			return $this->copySingleLocalFile($src, $dest, $deleteSrc);
+			KalturaLog::err("Failed to upload file: [$src] to [$dest]");
+			return false;
 		}
-		return $this->copySingleExternalFile($src, $dest, $deleteSrc);
+		if ($deleteSrc && (!unlink($src)))
+		{
+			KalturaLog::err("Failed to delete source file : [$src]");
+			return false;
+		}
+		return true;
 	}
 
 	protected function doRmdir($path)
@@ -403,6 +410,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch (Exception $e)
 		{
+			KalturaLog::err("Error trying to remove dir [$path] from bucket [$bucket]: {$e->getMessage()}");
 			return false;
 		}
 		return true;
@@ -427,5 +435,114 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			return false;
 		}
 		return $result['ContentLength'];
+	}
+
+	public function doCreateMultipartUpload($destFilePath)
+	{
+		list($bucket, $filePath) = self::getBucketAndFilePath($destFilePath);
+
+		$params = array('Bucket' => $bucket, 'Key' => $filePath);
+		try
+		{
+			$result = $this->s3Client->createMultipartUpload($params);
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::err("Couldn't create multipart upload for [$filePath] on bucket [$bucket]: {$e->getMessage()}");
+			return false;
+		}
+		$uploadId = $result['UploadId'];
+		KalturaLog::debug("Starting multipart upload to [$destFilePath] with upload id [$uploadId]");
+		return $uploadId;
+	}
+
+	public function doMultipartUploadPartCopy($uploadId, $partNumber, $s3FileKey, $destFilePath)
+	{
+		list($bucket, $filePath) = self::getBucketAndFilePath($destFilePath);
+		$srcPath = $bucket.'/'.$s3FileKey;
+		try
+		{
+			$result = $this->s3Client->uploadPartCopy(array(
+				'Bucket'     => $bucket,
+				'CopySource' => $srcPath,
+				'UploadId'   => $uploadId,
+				'PartNumber' => $partNumber,
+				'Key'       => $filePath,
+			));
+
+			//KalturaLog::debug("coping part [$partNumber] from [$srcPath]. dest file path [$destFilePath]");
+		}
+		catch (S3Exception $e)
+		{
+			$result = $this->s3Client->abortMultipartUpload(
+				array(
+					'Bucket'   => $bucket,
+					'Key'      => $filePath,
+					'UploadId' => $uploadId
+				));
+
+			KalturaLog::debug("Upload of [$destFilePath] failed");
+			return false;
+		}
+
+		return $result;
+	}
+
+	public function doCompleteMultiPartUpload($destFilePath, $uploadId, $parts)
+	{
+		list($bucket, $filePath) = self::getBucketAndFilePath($destFilePath);
+
+		try
+		{
+			$result = $this->s3Client->completeMultipartUpload(array(
+				'Bucket'   => $bucket,
+				'Key'      => $filePath,
+				'UploadId' => $uploadId,
+				'MultipartUpload'    => $parts,
+			));
+		}
+		catch (S3Exception $e)
+		{
+			KalturaLog::debug("could not complete Upload of [$destFilePath]. Error: {$e->getMessage()}");
+			return false;
+		}
+
+		$url = $result['Location'];
+		return $url;
+	}
+
+	public function doListObjects($filePath)
+	{
+		list($bucket, $prefix) = self::getBucketAndFilePath($filePath);
+
+		KalturaLog::debug("list objects on bucket [$bucket] with prefix [$prefix]");
+		$params = array('Bucket' => $bucket, 'Prefix' => $prefix);
+
+		try {
+			$results = $this->s3Client->listObjects($params);
+		}
+
+		catch (S3Exception $e)
+		{
+			KalturaLog::debug("could not list [$filePath] objects");
+			return false;
+		}
+
+		return $results;
+	}
+
+	protected function doGetMaximumPartsNum()
+	{
+		return self::MAX_PARTS_NUMBER;
+	}
+
+	protected function doGetUploadMinimumSize()
+	{
+		return self::MIN_PART_SIZE;
+	}
+
+	protected function doGetUploadMaxSize()
+	{
+		return self::MULTIPART_UPLOAD_MINIMUM_FILE_SIZE;
 	}
 }

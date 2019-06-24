@@ -433,6 +433,8 @@ class KalturaErrors extends APIErrors
 
 	const UPLOAD_TOKEN_INVALID_PART_SIZE = "UPLOAD_TOKEN_INVALID_PART_SIZE;MAX_SIZE;The minimum size for uploaded part is not allowed. The maximum value allowed is [@MAX_SIZE@]";
 
+	const UPLOAD_TOKEN_PROCESSING_ERROR = "UPLOAD_TOKEN_PROCESSING_ERROR;;Could not complete upload token processing";
+
 	/*
 	 * Partenrs service
 	 * PID - the parent partner_id
