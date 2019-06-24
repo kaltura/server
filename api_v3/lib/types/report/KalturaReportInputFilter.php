@@ -207,14 +207,6 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 			$reportInputFilter->entry_operator = $this->entryOperator->toObject();
 		}
 
-		if ($this->fromDate && $this->toDate && $this->interval == KalturaReportInterval::TEN_SECONDS)
-		{
-			//floor to round ten seconds
-			$this->fromDate = $this->fromDate - ($this->fromDate % 10);
-			//ceil to round ten seconds
-			$this->toDate = ($this->toDate % 10 == 0) ? $this->toDate : $this->toDate + (10 - ($this->toDate % 10));
-		}
-
 		return parent::toReportsInputFilter($reportInputFilter);
 	}
 }

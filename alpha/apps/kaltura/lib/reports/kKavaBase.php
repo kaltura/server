@@ -306,4 +306,15 @@ class kKavaBase extends kDruidBase
 		return $cache->multiGet($keys);
 	}
 
+	protected static function roundUpToMultiple($num, $mult)
+	{
+		$rem = $num % $mult;
+		if (!$rem)
+		{
+			return $num;
+		}
+
+		return $num - $rem + $mult;
+	}
+
 }
