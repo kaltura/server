@@ -415,6 +415,8 @@ class APIErrors
 	const CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN = "CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN;;Root admin user cannot be set to not admin";
 
 	const CANNOT_CHANGE_OWN_ROLE = "CANNOT_CHANGE_OWN_ROLE;;User cannot change his own role";
+
+	const NOT_ALLOWED_TO_CHANGE_ROLE = "NOT_ALLOWED_TO_CHANGE_ROLE;;User Is not allowed change roles";
 	
 	const PERMISSION_NOT_FOUND = "PERMISSION_NOT_FOUND;ERR_TEXT;@ERR_TEXT@";
 	
@@ -463,5 +465,7 @@ class APIErrors
 	const FILE_CREATION_FAILED = "FILE_CREATION_FAILED;MESSAGE;Failed to create file on specified location with message: \"@MESSAGE@\"";
 
 	const DRUID_QUERY_TIMED_OUT = "DRUID_QUERY_TIMED_OUT;;Query timed out";
+
+	const NEW_LOGIN_REQUIRED = 'NEW_LOGIN_REQUIRED;;Switching to requested partner requires re-login';
 
 }

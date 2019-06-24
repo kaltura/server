@@ -12,9 +12,14 @@ class KalturaGroup extends KalturaBaseUser
 	 */
 	public $membersCount;
 
+	/**
+	 * @var KalturaGroupProcessStatus
+	 */
+	public $processStatus;
+
 	private static $names = array('fullName','screenName');
 
-	private static $map_between_objects = array("membersCount");
+	private static $map_between_objects = array('membersCount', 'processStatus');
 
 	public function getMapBetweenObjects ( )
 	{
@@ -43,6 +48,7 @@ class KalturaGroup extends KalturaBaseUser
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
 		}
+
 		$this->validateNames($this,self::$names);
 		parent::validateForInsert($propertiesToSkip);
 	}

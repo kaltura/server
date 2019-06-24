@@ -31,7 +31,12 @@ class KThumbnailCapture
 			array($url, $offsetPrefix . $offset),
 			$packagerCaptureUrl);
 
-		$tempThumbPath = $capturedThumbPath . self::TEMP_FILE_POSTFIX;
+		$tempThumbPath = self::getCapturePath($capturedThumbPath);
 		return array($packagerThumbCapture, $tempThumbPath);
+	}
+
+	public static function getCapturePath($path)
+	{
+		return $path . self::TEMP_FILE_POSTFIX;
 	}
 }

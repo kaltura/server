@@ -56,6 +56,8 @@ class KalturaErrors extends APIErrors
 	// PID - partner id
 	const INVALID_PARTNER_ID = "INVALID_PARTNER_ID;PID;Invalid partner id \"@PID@\"";
 
+	const DIRECT_LOGIN_BLOCKED = "DIRECT_LOGIN_BLOCKED;;Direct login is blocked on this partner";
+
 	// SRV_NAME - service , ACTION_NAME - action
 	const INVALID_SERVICE_CONFIGURATION = "INVALID_SERVICE_CONFIGURATION;SRV_NAME,ACTION_NAME;Invalid service configuration. Unknown service [@SRV_NAME@:@ACTION_NAME@].";
 
@@ -729,6 +731,10 @@ class KalturaErrors extends APIErrors
 	 * OTP error
 	 */
 	const INVALID_OTP = 'INVALID_OTP;;OTP provided failed to validate';
+	const MISSING_OTP = 'MISSING_OTP;;OTP is missing';
+	const ERROR_IN_QR_GENERATION = 'ERROR_IN_QR_GENERATION;;Could not generate QR code';
+	const ERROR_IN_SEED_GENERATION = 'ERROR_IN_SEED_GENERATION;;Could not handle new seed generation';
+	const INVALID_HASH = 'INVALID_HASH;;hashKey is not valid';
 
 
 	/*

@@ -446,7 +446,10 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			$groupUser->userId = $groupUserParams->userId;
 			$groupUser->groupId = $groupUserParams->group;
 			$groupUser->creationMode = KalturaGroupUserCreationMode::AUTOMATIC;
-			$groupUser->userRole = $groupUserParams->userRole;
+			if (isset($groupUserParams->userRole))
+			{
+				$groupUser->userRole = $groupUserParams->userRole;
+			}
 			KBatchBase::$kClient->groupUser->add($groupUser);
 		}
 		$this->handleMultiRequest($ret,true);

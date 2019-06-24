@@ -16,6 +16,7 @@ use Aws\S3\Enum\CannedAcl;
  */
 class s3Mgr extends kFileTransferMgr
 {
+	/* @var S3Client $s3 */
 	private $s3;
 	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
 	protected $filesAcl = CannedAcl::PRIVATE_ACCESS;
@@ -101,6 +102,7 @@ class s3Mgr extends kFileTransferMgr
 					),
 					'region' => $this->s3Region,
 					'signature' => $this->signatureType ? $this->signatureType : 'v4',
+					'version' => '2006-03-01',
 			);
 		
 		if ($this->endPoint)
@@ -203,7 +205,7 @@ class s3Mgr extends kFileTransferMgr
 	}
 
 	// download a file from the server (ftp_mode is irrelevant)
-	protected function doGetFile ($remote_file, $local_file = null)
+	protected function doGetFile($remote_file, $local_file = null)
 	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
 		KalturaLog::debug("remote_file: ".$remote_file);
@@ -228,13 +230,13 @@ class s3Mgr extends kFileTransferMgr
 	}
 
 	// create a new directory
-	protected function doMkDir ($remote_path)
+	protected function doMkDir($remote_path)
 	{
 		return false;
 	}
 
 	// chmod the given remote file
-	protected function doChmod ($remote_file, $chmod_code)
+	protected function doChmod($remote_file, $chmod_code)
 	{
 		return false;
 	}
@@ -243,7 +245,7 @@ class s3Mgr extends kFileTransferMgr
 	protected function doFileExists($remote_file)
 	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
-		if($this->isdirectory($remote_file)) 
+		if($this->isDirectory($remote_file))
 		{
 			return true;
 		}
@@ -253,7 +255,7 @@ class s3Mgr extends kFileTransferMgr
 		return $exists;
 	}
 
-	private function isdirectory($file_name) {
+	private function isDirectory($file_name) {
 		if(strpos($file_name,'.') === false) return TRUE;
 		return false;
 	}
@@ -265,7 +267,7 @@ class s3Mgr extends kFileTransferMgr
 	}
 
 	// delete a file and return true/false according to success
-	protected function doDelFile ($remote_file)
+	protected function doDelFile($remote_file)
 	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
 		KalturaLog::debug("remote_file: ".$remote_file);
@@ -287,6 +289,7 @@ class s3Mgr extends kFileTransferMgr
 		
 		return $deleted;
 	}
+
 
 	// delete a directory and return true/false according to success
 	protected function doDelDir ($remote_path)
@@ -313,5 +316,10 @@ class s3Mgr extends kFileTransferMgr
 	private function execCommand($command_str)
 	{
 		return false;
+	}
+
+	public function registerStreamWrapper()
+	{
+		$this->s3->registerStreamWrapper();
 	}
 }
