@@ -357,6 +357,7 @@ abstract class kSharedFileSystemMgr
 
 			case kSharedFileSystemMgrType::S3:
 				self::$kSharedFsMgr = new kS3SharedFileSystemMgr($options);
+				break;
 		}
 
 		return self::$kSharedFsMgr;
