@@ -452,7 +452,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			return false;
 		}
 		$uploadId = $result['UploadId'];
-		KalturaLog::debug("Starting multipart upload to [$destFilePath] with upload id [$uploadId]");
+		KalturaLog::debug("multipart upload started to [$destFilePath] with upload id [$uploadId]");
 		return $uploadId;
 	}
 
@@ -470,18 +470,32 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				'Key'       => $filePath,
 			));
 
-			//KalturaLog::debug("coping part [$partNumber] from [$srcPath]. dest file path [$destFilePath]");
+			KalturaLog::debug("coping part [$partNumber] from [$srcPath]. dest file path [$destFilePath]");
 		}
 		catch (S3Exception $e)
 		{
+			KalturaLog::debug("Upload of [$srcPath] failed.  Error: {$e->getMessage()}");
+			$this->doAbortMultipartUpload($bucket, $filePath, $uploadId);
+			return false;
+		}
+
+		return $result;
+	}
+
+	public function doAbortMultipartUpload($bucket, $filePath, $uploadId)
+	{
+		try
+		{
 			$result = $this->s3Client->abortMultipartUpload(
 				array(
-					'Bucket'   => $bucket,
-					'Key'      => $filePath,
+					'Bucket' => $bucket,
+					'Key' => $filePath,
 					'UploadId' => $uploadId
 				));
-
-			KalturaLog::debug("Upload of [$destFilePath] failed");
+		}
+		catch (S3Exception $e)
+		{
+			KalturaLog::err("Couldn't abort multipart upload for [$filePath] on bucket [$bucket]. Error: {$e->getMessage()}");
 			return false;
 		}
 
@@ -524,7 +538,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 		catch (S3Exception $e)
 		{
-			KalturaLog::debug("could not list [$filePath] objects");
+			KalturaLog::debug("could not list [$filePath] objects.  Error: {$e->getMessage()}");
 			return false;
 		}
 
