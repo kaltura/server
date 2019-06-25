@@ -484,7 +484,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			kFile::fullMkdir($targetFullPath);
 		}
 
-		if ( kFile:: file_exists( $temp_file_path ))
+		if ( kFile::checkFileExists( $temp_file_path ))
 		{
 			KalturaLog::info("$temp_file_path file exists");
 		}

@@ -210,7 +210,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return !strpos($fileName,'.');
 	}
 	
-	protected function doPutFileContent($filePath, $fileContent)
+	protected function doPutFileContent($filePath, $fileContent, $flags = 0, $context = null)
 	{
 		$retries = 3;
 		
