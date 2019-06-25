@@ -31,7 +31,7 @@ class kFileBase
 		if(kString::beginsWith($filename, kSharedFileSystemMgr::getSharedRootPath()))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
-			return $kSharedFsMgr->putFileContent($filePath, $mode);
+			return $kSharedFsMgr->putFileContent($filename, $data, $flags, $context);
 		}
 		
 		return file_put_contents($filename, $data, $flags, $context);
@@ -157,7 +157,7 @@ class kFileBase
      */
     static public function fileSize($filename)
     {
-		if(kString::beginsWith($destFilePath, kSharedFileSystemMgr::getSharedRootPath()))
+		if(kString::beginsWith($filename, kSharedFileSystemMgr::getSharedRootPath()))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
 			return $kSharedFsMgr->fileSize($filename);
