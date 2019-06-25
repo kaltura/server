@@ -586,7 +586,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		if (!$existingUser) {
 			$resetPasswordLink = UserLoginDataPeer::getPassResetLink($user->getLoginData()->getPasswordHashKey());
 		}
-		$kmcLink = trim(kConf::get('apphome_url'), '/').'/kmc';
+		$kmcLink = trim(kConf::get('apphome_url'), '/').'/kmcng';
 		$adminConsoleLink = trim(kConf::get('admin_console_url'));
 		$contactLink = kConf::get('contact_url');
 		$beginnersGuideLink = kConf::get('beginners_tutorial_url');
