@@ -5,115 +5,91 @@
  */
 class ZoomWrapper
 {
+	const ZOOM_BASE_URL = 'ZoomBaseUrl';
+	const MAP_NAME = 'vendor';
+	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
+	const PARTICIPANTS = 'participants';
 
-	/**
-	 * @param $apiPath
-	 * @param bool $forceNewToken
-	 * @param null $tokens
-	 * @param null $accountId
-	 * @return array
-	 * @throws Exception
-	 */
-	public static function retrieveZoomDataAsArray($apiPath, $forceNewToken = false, $tokens = null, $accountId = null)
+	public static function retrieveZoomUserPermissions($accessToken)
 	{
-		KalturaLog::info("Calling zoom api: " . $apiPath);
-		$zoomAuth = new kZoomOauth();
-		$zoomConfiguration = kConf::get('ZoomAccount', 'vendor');
-		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
-		if (!$tokens || $forceNewToken)
-		{
-			$tokens = $zoomAuth->retrieveTokensData($forceNewToken, $accountId);
-		}
-		list($response, $tokens) = self::callZoom($apiPath, $tokens, $accountId, $zoomBaseURL);
-		$data = json_decode($response, true);
-		return array($tokens, $data);
+		return self::retrieveZoomData(ZoomHelper::API_USERS_ME_PERMISSIONS, $accessToken);
+	}
+
+	public static function retrieveZoomUserData($accessToken)
+	{
+		return self::retrieveZoomData(ZoomHelper::API_USERS_ME, $accessToken);
 	}
 
 	/**
 	 * @param $apiPath
-	 * @param $tokens
-	 * @param $accountId
-	 * @param $zoomBaseURL
+	 * @param $accessToken
 	 * @return array
-	 * @throws Exception
+	 * @internal param ZoomVendorIntegration $zoomIntegration
 	 */
-	private static function executeZoomCall($apiPath, $tokens, $accountId, $zoomBaseURL)
+	public static function retrieveZoomData($apiPath, $accessToken)
 	{
-		$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
-		$curlWrapper = new KCurlWrapper();
-		$url = $zoomBaseURL . $apiPath . '?' . 'access_token=' . $accessToken;
-		$response = $curlWrapper->exec($url);
-		$httpCode = $curlWrapper->getHttpCode();
-		list($tokens, $refreshed) = self::handelCurlResponse($response, $httpCode, $curlWrapper, $accountId, $tokens, $apiPath);
-		return array($response, $tokens, $refreshed);
+		KalturaLog::info('Calling zoom api: ' . $apiPath);
+		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
+		$zoomBaseURL = $zoomConfiguration[self::ZOOM_BASE_URL];
+		$response = self::callZoom($apiPath, $accessToken, $zoomBaseURL);
+		$data = json_decode($response, true);
+		return $data;
 	}
 
 	/**
 	 * @param $response
 	 * @param int $httpCode
 	 * @param KCurlWrapper $curlWrapper
-	 * @param $accountId
-	 * @param $tokens
 	 * @param $apiPath
 	 * @return array<array, bool> token refreshed
-	 * @throws Exception
 	 */
-	private static function handelCurlResponse(&$response, $httpCode, $curlWrapper, $accountId, $tokens, $apiPath)
+	protected static function handelCurlResponse(&$response, $httpCode, $curlWrapper, $apiPath)
 	{
 		//access token invalid and need to be refreshed
-		if ($httpCode === 401 && $accountId)
+		if($httpCode === 401)
 		{
 			KalturaLog::warning("Zoom Curl returned  $httpCode, with massage: {$response} " . $curlWrapper->getError());
-			/** @var ZoomVendorIntegration $zoomClientData */
-			$zoomClientData = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
-			if (!$zoomClientData)
-			{
-				throw new KalturaAPIException('Zoom Integration data Does Not Exist for current Partner');
-			}
-			$zoomAuth = new kZoomOauth();
-			return array($zoomAuth->refreshTokens($zoomClientData->getRefreshToken(), $zoomClientData), true);
+			ZoomVendorService::exitWithError(kVendorErrorMessages::TOKEN_EXPIRED);
 		}
+
 		// Sometimes we get  response 400, with massage: {"code":1010,"message":"User not belong to this account}
 		//in this case do not refresh tokens, they are valid --> return null
-		if ($httpCode === 400 && strpos($response, '1010') !== false)
+		if($httpCode === 400 && strpos($response, '1010') !== false)
 		{
 			KalturaLog::warning("Zoom Curl returned  $httpCode, with massage: {$response} " . $curlWrapper->getError());
-			$response = null;
-			return array($tokens, false);
+			ZoomVendorService::exitWithError(kVendorErrorMessages::USER_NOT_BELONG_TO_ACCOUNT);
 		}
-		//could Not find meeting -> zoom bug
-		if ($httpCode === 404 && (strpos($apiPath, 'participants') !== false))
+
+		//Could not find meeting -> zoom bug
+		else if($httpCode === 404 && (strpos($apiPath, self::PARTICIPANTS) !== false))
 		{
-			KalturaLog::info('participants api returned 404');
+			KalturaLog::info('Zoom participants api returned 404');
 			KalturaLog::info(print_r($response, true));
 			$response = null;
-			return array($tokens, false);
 		}
+
 		//other error -> dieGracefully
-		if (!$response || $httpCode !== 200 || $curlWrapper->getError())
+		else if(!$response || $httpCode !== 200 || $curlWrapper->getError())
 		{
-			KalturaLog::err("Zoom Curl returned error, Error code : $httpCode, Error: {$curlWrapper->getError()} ");
-			KExternalErrors::dieGracefully();
+			$errMsg = "Zoom Curl returned error, Error code : $httpCode, Error: {$curlWrapper->getError()} ";
+			KalturaLog::err($errMsg);
+			ZoomVendorService::exitWithError($errMsg);
 		}
-		return array($tokens, false);
 	}
 
 	/**
-	 * @param $apiPath
-	 * @param $tokens
-	 * @param $accountId
-	 * @param $zoomBaseURL
+	 * @param string $apiPath
+	 * @param string $accessToken
+	 * @param string $zoomBaseURL
 	 * @return array
-	 * @throws Exception
 	 */
-	private static function callZoom($apiPath, $tokens, $accountId, $zoomBaseURL)
+	protected static function callZoom($apiPath, $accessToken, $zoomBaseURL)
 	{
-		list($response, $tokens, $refreshed) = self::executeZoomCall($apiPath, $tokens, $accountId, $zoomBaseURL);
-		if ($refreshed)
-		{
-			// in case we receive 401
-			list($response, $tokens, ) = self::executeZoomCall($apiPath, $tokens, $accountId, $zoomBaseURL);
-		}
-		return array($response, $tokens);
+		$curlWrapper = new KCurlWrapper();
+		$url = $zoomBaseURL . $apiPath . '?' . 'access_token=' . $accessToken;
+		$response = $curlWrapper->exec($url);
+		$httpCode = $curlWrapper->getHttpCode();
+		self::handelCurlResponse($response, $httpCode, $curlWrapper, $apiPath);
+		return $response;
 	}
 }
