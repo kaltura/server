@@ -49,33 +49,12 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 		throw new Exception("Can't instantiate un-typed [$vendorType] vendorService [" . print_r($row, true) . "]");
 	}
 
-	public static function setUseCriteriaFilter($use)
+	public static function setDefaultCriteriaFilter()
 	{
-		$criteria_filter = self::getDefaultCriteriaFilter();
-
-		if($use)
-		{
-			$criteria_filter->enable();
-		}
-		else
-		{
-			$criteria_filter->disable();
-		}
-	}
-
-	public static function getDefaultCriteriaFilter()
-	{
-		if(self::$s_criteria_filter == null)
+		if ( self::$s_criteria_filter == null )
 		{
 			self::$s_criteria_filter = new criteriaFilter();
 		}
-
-		return self::$s_criteria_filter;
-	}
-
-	public static function setDefaultCriteriaFilter()
-	{
-		self::getDefaultCriteriaFilter();
 
 		$c = KalturaCriteria::create(VendorIntegrationPeer::OM_CLASS);
 		$c->addAnd ( VendorIntegrationPeer::STATUS, VendorStatus::DELETED, Criteria::NOT_EQUAL);

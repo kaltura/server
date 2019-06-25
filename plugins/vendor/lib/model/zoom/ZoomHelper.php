@@ -25,6 +25,11 @@ class ZoomHelper
 	const PARTICIPANTS = 'participants';
 	const UUID = 'uuid';
 	const TOPIC = 'topic';
+
+	/**permissions */
+	const READ_PERMISSION = 'Recording:Read';
+	const EDIT_PERMISSION = 'Recording:Edit';
+
 	/** php body */
 	const PHP_INPUT = 'php://input';
 
@@ -91,7 +96,7 @@ class ZoomHelper
 	 */
 	public static function canConfigureEventSubscription($zoomUserPermissions)
 	{
-		if(in_array('Recording:Read', $zoomUserPermissions) && in_array('Recording:Edit', $zoomUserPermissions))
+		if(in_array(self::READ_PERMISSION, $zoomUserPermissions) && in_array(self::EDIT_PERMISSION, $zoomUserPermissions))
 		{
 			return true;
 		}

@@ -777,8 +777,8 @@ class Criteria implements IteratorAggregate {
 	/**
 	 * Set limit.
 	 *
-	 * @param int $limit the value for limit.
-	 * @return Criteria Modified Criteria object (for fluent API)
+	 * @param      limit An int with the value for limit.
+	 * @return     Criteria Modified Criteria object (for fluent API)
 	 */
 	public function setLimit($limit)
 	{
@@ -870,7 +870,7 @@ class Criteria implements IteratorAggregate {
 	/**
 	 * Get select modifiers.
 	 *
-	 * @return array An array with the select modifiers.
+	 * @return     An array with the select modifiers.
 	 */
 	public function getSelectModifiers()
 	{
@@ -892,8 +892,8 @@ class Criteria implements IteratorAggregate {
 	/**
 	 * Add order by column name, explicitly specifying ascending.
 	 *
-	 * @param string $name name of the column to order by
-	 * @return Criteria A modified Criteria object.
+	 * @param      name The name of the column to order by.
+	 * @return     A modified Criteria object.
 	 */
 	public function addAscendingOrderByColumn($name)
 	{
