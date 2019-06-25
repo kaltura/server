@@ -57,7 +57,7 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 		return true;
 	}
 	
-	protected function doPutFileContent($filePath, $fileContent)
+	protected function doPutFileContent($filePath, $fileContent, $flags = 0, $context = null)
 	{
 		return file_put_contents($filePath, $fileContent);
 	}
@@ -139,7 +139,7 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 		return true;
 	}
 
-	protected function copySingleFile($src, $dest, $deleteSrc)
+	protected function doCopySingleFile($src, $dest, $deleteSrc)
 	{
 		if($deleteSrc)
 		{
@@ -220,5 +220,35 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		return 2000000000;
 	}
-
+	
+	protected function doListFiles($filePath, $pathPrefix = '')
+	{
+		$fileList = array();
+		$path = str_ireplace(DIRECTORY_SEPARATOR, '/', $path);
+		$handle = opendir($path);
+		if ($handle)
+		{
+			while (false !== ($file = readdir($handle)))
+			{
+				if ($file != '.' && $file != '..')
+				{
+					$fullPath = $path.'/'.$file;
+					$tmpPrefix = $pathPrefix.$file;
+					
+					if (is_dir($fullPath))
+					{
+						$tmpPrefix = $tmpPrefix.'/';
+						$fileList[] = array($tmpPrefix, 'dir', self::fileSize($fullPath));
+						$fileList = array_merge($fileList, self::listDir($fullPath, $tmpPrefix));
+					}
+					else
+					{
+						$fileList[] = array($tmpPrefix, 'file', self::fileSize($fullPath));
+					}
+				}
+			}
+			closedir($handle);
+		}
+		return $fileList;
+	}
 }
