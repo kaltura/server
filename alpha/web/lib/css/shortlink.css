@@ -26,17 +26,17 @@ body {
 	font-weight: bold;
 	font-style: normal;
 	font-stretch: normal;
-	line-height: normal;
+	line-height: 38px;
 	letter-spacing: normal;
 	color: #333333;
 }
 #main .content p{
 	font-family: 'Lato';
-	font-size: 14px;
+	font-size: 16px;
 	font-weight: normal;
 	font-style: normal;
 	font-stretch: normal;
-	line-height: 1.43;
+	line-height: 23px;
 	letter-spacing: normal;
 	color: #333333;
 }
