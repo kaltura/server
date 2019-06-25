@@ -13,8 +13,6 @@ abstract class kBaseUploadTokenMgr
 	const AUTO_FINALIZE_CACHE_TTL = 2592000; //Thirty days in seconds
 	const MAX_AUTO_FINALIZE_RETIRES = 5;
 
-	protected static $fileSystemManager;
-
 	/**
 	 * @var UploadToken
 	 */
@@ -133,8 +131,6 @@ abstract class kBaseUploadTokenMgr
 	 */
 	public function uploadFileToToken($fileData, $resume = false, $resumeAt = -1)
 	{
-		self::$fileSystemManager = kSharedFileSystemMgr::getInstance();
-
 		$this->_autoFinalize = $this->_uploadToken->getAutoFinalize();
 		if($this->_autoFinalize)
 			$this->initUploadTokenMemcache();
@@ -163,7 +159,7 @@ abstract class kBaseUploadTokenMgr
 		else
 		{
 			$this->handleMoveFile($fileData);
-			$fileSize = self::$fileSystemManager->fileSize($this->_uploadToken->getUploadTempPath());
+			$fileSize = kFile::fileSize($this->_uploadToken->getUploadTempPath());
 		}
 
 		if ($this->_finalChunk)
@@ -311,9 +307,9 @@ abstract class kBaseUploadTokenMgr
 		$uploadFilePath = $this->getUploadPath($this->_uploadToken->getId(), $extension);
 		$this->_uploadToken->setUploadTempPath($uploadFilePath);
 
-		self::$fileSystemManager->fullMkdir($uploadFilePath, 0700);
+		kFile::fullMkdir($uploadFilePath, 0700);
 
-		$moveFileSuccess = self::$fileSystemManager->moveFile($fileData['tmp_name'], $uploadFilePath);
+		$moveFileSuccess = kFile::moveFile($fileData['tmp_name'], $uploadFilePath);
 		if (!$moveFileSuccess)
 		{
 			$msg = "Failed to move uploaded file for token id [{$this->_uploadToken->getId()}]";
@@ -321,9 +317,9 @@ abstract class kBaseUploadTokenMgr
 			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FAILED_TO_MOVE_UPLOADED_FILE);
 		}
 
-		self::$fileSystemManager->chmod($uploadFilePath, 0600);
+		kFile::chmod($uploadFilePath, 0600);
 
-		$fileSize = self::$fileSystemManager->fileSize($uploadFilePath);
+		$fileSize = kFile::fileSize($uploadFilePath);
 		$this->_uploadToken->setLastFileSize($fileSize);
 
 		//If uplaodToken is set to AutoFinalize set file size into memcache

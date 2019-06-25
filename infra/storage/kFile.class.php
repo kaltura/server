@@ -19,6 +19,12 @@ class kFile extends kFileBase
 	 */
 	public static function listDir($path, $pathPrefix = '')
 	{
+		if (kString::beginsWith($path, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$sharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $sharedFsMgr->listFiles($path, $pathPrefix);
+		}
+		
 		$fileList = array();
 		$path = str_ireplace(DIRECTORY_SEPARATOR, '/', $path);
 		$handle = opendir($path);
@@ -294,6 +300,12 @@ class kFile extends kFileBase
 	{
 		$from = str_replace("\\", "/", $from);
 		$to = str_replace("\\", "/", $to);
+		
+		if (kString::beginsWith($to, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$sharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $sharedFsMgr->moveFile($from, $to, $override_if_exists, $copy);
+		}
 		
 		// Validation
 		if(!file_exists($from))

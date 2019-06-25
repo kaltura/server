@@ -8,10 +8,12 @@
 
 class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 {
+	private static $sharedFsMgr;
 
 	public function __construct(UploadToken $uploadToken, $finalChunk = true)
 	{
 		KalturaLog::info("Init for upload token id [{$uploadToken->getId()}]");
+		self::$sharedFsMgr = kSharedFileSystemMgr::getInstance();
 		parent::__construct($uploadToken, $finalChunk);
 	}
 
@@ -105,7 +107,7 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	{
 		KalturaLog::info("upload file from [{$srcPath}] to [{$filePath}]");
 		$fileContent = kFile::getFileContent($srcPath);
-		$result = self::$fileSystemManager->putFileContent($filePath, $fileContent);
+		$result = kFile::filePutContents($filePath, $fileContent);
 		if($result)
 		{
 			$uploadedSize = $resumeAt + $chunkSize;
@@ -117,33 +119,31 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	 * list all file chunks and upload them in multipart upload
 	 *
 	 * @param $finalFilePath
-	 * @throws kUploadTokenException
 	 */
 	protected function createFullFile($finalFilePath)
 	{
 		sleep(3);
-		$uploadChunksResponse = self::$fileSystemManager->doListObjects($finalFilePath);
+		$uploadChunksResponse = kFile::listDir($finalFilePath);
 		$uploadChunks = $uploadChunksResponse['Contents'];
 		usort($uploadChunks,  array($this, 'compareKeyResumeAt'));
 
 		$finalFilePath .= '/full_file.' . $this->getFileExtension($this->_uploadToken->getFileName());
-		$uploadId = self::$fileSystemManager->doCreateMultipartUpload($finalFilePath);
+		$uploadId = self::$sharedFsMgr->doCreateMultipartUpload($finalFilePath);
 		if(!$uploadId)
 		{
 			throw new kUploadTokenException("multipart upload error during upload token closer", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_UPLOAD_ERROR);
 		}
-
+		
 		$copiedParts = $this->uploadParts($uploadChunks, $uploadId, $finalFilePath);
-
 		$location = self::$fileSystemManager->doCompleteMultipartUpload($finalFilePath, $uploadId, $copiedParts);
 		if(!$location)
 		{
 			throw new kUploadTokenException("multipart upload error during upload token closer", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_UPLOAD_ERROR);
 		}
-
+		
 		$this->_uploadToken->setUploadTempPath($finalFilePath);
 	}
-
+	
 	/**
 	 * upload part copy all multipart upload pats
 	 *
@@ -172,6 +172,8 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 			}
 			$partNumber +=1;
 		}
+		self::$fileSystemManager->doCompleteMultipartUpload($finalFilePath, $uploadId, $copiedParts);
+		$this->_uploadToken->setUploadTempPath($finalFilePath);
 		return $copiedParts;
 	}
 

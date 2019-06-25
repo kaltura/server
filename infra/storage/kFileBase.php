@@ -8,19 +8,6 @@
  */
 class kFileBase 
 {
-	protected static $kFileSystemManager;
-	
-	protected static function getFileSystemManager()
-	{
-		$dc_config = kConf::getMap("dc_config");
-		
-		$fsMgrCls = isset($dc_config['fileSystemClass']) ? $dc_config['fileSystemClass'] : kFileSystemMgrType::LOCAL;
-		$storageConfig = isset($dc_config['storage']) ? $dc_config['storage'] : null;
-		
-		self::$kFileSystemManager = new kFileSystemMgr($fsMgrCls, $storageConfig);
-		return self::$kFileSystemManager;
-	}
-	
     /**
      * Lazy saving of file content to a temporary path, the file will exist in this location until the temp files are purged
      * @param string $fileContent
@@ -41,6 +28,12 @@ class kFileBase
 
     public static function filePutContents($filename, $data, $flags = 0, $context = null)
 	{
+		if(kString::beginsWith($filename, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->putFileContent($filePath, $mode);
+		}
+		
 		return file_put_contents($filename, $data, $flags, $context);
 	}
 
@@ -64,6 +57,12 @@ class kFileBase
 
     public static function chmod($filePath, $mode)
     {
+		if(kString::beginsWith($filePath, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->chmod($filePath, $mode);
+		}
+    	
         chmod($filePath, $mode);
     }
 
@@ -143,6 +142,12 @@ class kFileBase
      */
     public static function fullMkdir($path, $rights = 0755, $recursive = true)
     {
+		if(kString::beginsWith($path, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->fullMkdir($path, $rights, $recursive);
+		}
+    	
         return self::fullMkfileDir(dirname($path), $rights, $recursive);
     }
     
@@ -152,6 +157,12 @@ class kFileBase
      */
     static public function fileSize($filename)
     {
+		if(kString::beginsWith($destFilePath, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->fileSize($filename);
+		}
+    	
         if(PHP_INT_SIZE >= 8)
             return filesize($filename);
 
@@ -277,16 +288,16 @@ class kFileBase
         self::chmod($destFile,intval($mode,8));
     }
 	
-	public static function getDataFromFile($url, $destFilePath = null, $maxFileSize = null, $allowInternalUrl = false)
+	public static function getDataFromFile($src, $destFilePath = null, $maxFileSize = null, $allowInternalUrl = false)
 	{
 		if(!is_null($maxFileSize))
 		{
 			$curlWrapper = new KCurlWrapper();
-			$curlHeaderResponse = $curlWrapper->getHeader($url, true);
+			$curlHeaderResponse = $curlWrapper->getHeader($src, true);
 			$curlWrapper->close();
 			
 			if(!$curlHeaderResponse || $curlWrapper->getError())
-				throw new Exception("Failed to retrive Curl header response from file path [$url] with Error " . $curlWrapper->getError());
+				throw new Exception("Failed to retrive Curl header response from file path [$src] with Error " . $curlWrapper->getError());
 			
 			if(!$curlHeaderResponse->isGoodCode())
 				throw new Exception("Non Valid Error: $curlHeaderResponse->code" . " " . $curlHeaderResponse->codeName);
@@ -305,8 +316,54 @@ class kFileBase
 			}
 		}
 		
-		$fileSystemManager = self::getFileSystemManager();
-		return $fileSystemManager->getFileFromRemoteUrl($url, $destFilePath, $allowInternalUrl);
+		if(!$destFilePath)
+		{
+			$curlWrapper = new KCurlWrapper();
+			$res = $curlWrapper->exec($src, null, null, $allowInternalUrl);
+			$httpCode = $curlWrapper->getHttpCode();
+			if (KCurlHeaderResponse::isError($httpCode))
+			{
+				KalturaLog::info("curl request [$src] return with http-code of [$httpCode]");
+				if ($destFilePath && file_exists($destFilePath))
+					unlink($destFilePath);
+				$res = false;
+			}
+			
+			$curlWrapper->close();
+			return $res;
+		}
+		
+		if(kString::beginsWith($destFilePath, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->getFileFromRemoteUrl($src, $destFilePath, $allowInternalUrl);
+		}
+		
+		//DestFile is local, use curl to download the file locally
+		$curlWrapper = new KCurlWrapper();
+		$res = $curlWrapper->exec($src, null, null, $allowInternalUrl);
+		$httpCode = $curlWrapper->getHttpCode();
+		if (KCurlHeaderResponse::isError($httpCode))
+		{
+			KalturaLog::info("curl request [$src] return with http-code of [$httpCode]");
+			if ($destFilePath && file_exists($destFilePath))
+				unlink($destFilePath);
+			$res = false;
+		}
+		
+		$curlWrapper->close();
+		return $res;
+	}
+	
+	public static function checkFileExists($path)
+	{
+		if(kString::beginsWith($path, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->checkFileExists($path);
+		}
+		
+		return file_exist($path);
 	}
 
 }

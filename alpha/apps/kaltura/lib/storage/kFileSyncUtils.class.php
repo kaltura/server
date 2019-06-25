@@ -481,10 +481,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		if ( !file_exists( dirname( $targetFullPath )))
 		{
-			self::fullMkdir($targetFullPath);
+			$kSharedFsMgr->fullMkdir($targetFullPath);
 		}
 
-		if ( file_exists( $temp_file_path ))
+		if ( kFile:: file_exists( $temp_file_path ))
 		{
 			KalturaLog::info("$temp_file_path file exists");
 		}
@@ -493,7 +493,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			KalturaLog::info("$temp_file_path file doesnt exist");
 		}
 		
-		if (file_exists($targetFullPath))
+		if ($kSharedFsMgr->checkFileExists($targetFullPath))
 		{
 			$time = time(); 
 			$targetFullPath .= $time;
@@ -502,11 +502,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		if($copyOnly)
 		{
-			$success = copy($temp_file_path, $targetFullPath);
+			$kSharedFsMgr->copy($temp_file_path, $targetFullPath);
 		}
 		else
 		{
-			$success = kFile::moveFile($temp_file_path, $targetFullPath);
+			$success = $kSharedFsMgr->moveFile($temp_file_path, $targetFullPath);
 		}
 
 		if($success)

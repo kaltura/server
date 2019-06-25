@@ -265,10 +265,9 @@ class KCurlWrapper
 	
 	public static function getDataFromFile($url, $destFilePath = null, $maxFileSize = null, $allowInternalUrl = false)
 	{
-		return kFileBase::getDataFromFile($url, $destFilePath, $maxFileSize, $allowInternalUrl);
+		kFile::getDataFromFile($url, $destFilePath, $maxFileSize, $allowInternalUrl);
 	}
-
-
+	
 	/**
 	 * @return false|string
 	 */

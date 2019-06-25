@@ -87,7 +87,7 @@ class KalturaUploadedFileTokenResource extends KalturaGenericDataCenterContentRe
 			throw($ex);
 		}
 		
-		if(!file_exists($entryFullPath))
+		if(!kFile::checkFileExists($entryFullPath))
 		{
 			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($this->token, kDataCenterMgr::getCurrentDcId());
 			if($remoteDCHost)

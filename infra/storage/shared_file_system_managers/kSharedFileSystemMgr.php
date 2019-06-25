@@ -25,8 +25,10 @@ interface kSharedFileSystemMgrType
 
 abstract class kSharedFileSystemMgr
 {
-
+	/* @var $kSharedFsMgr kSharedFileSystemMgr */
 	protected static $kSharedFsMgr;
+	
+	private static $kSharedRootPath;
 
 	public function __construct(array $options = null)
 	{
@@ -86,10 +88,12 @@ abstract class kSharedFileSystemMgr
 	 *
 	 * @param $filePath the file path
 	 * @param $fileContent the content to put in the filePath
+	 * @param $flags file_put_contents flags
+	 * @param $context A valid context resource created with stream_context_create().
 	 *
 	 * @return true / false according to success
 	 */
-	abstract protected function doPutFileContent($filePath, $fileContent);
+	abstract protected function doPutFileContent($filePath, $fileContent, $flags = 0, $context = null);
 	
 	/**
 	 * Rename a file
@@ -209,7 +213,7 @@ abstract class kSharedFileSystemMgr
 	 * @param $deleteSrc should we delete the source
 	 * @return true / false according to success
 	 */
-	abstract protected function copySingleFile($src, $dest, $deleteSrc);
+	abstract protected function doCopySingleFile($src, $dest, $deleteSrc);
 
 	/**
 	 * returns maximum parts num allowed for upload in multipart
@@ -231,6 +235,15 @@ abstract class kSharedFileSystemMgr
 	 * @return int
 	 */
 	abstract protected function doGetUploadMaxSize();
+	
+	/**
+	 * returns list of files under given file path
+	 *
+	 * @param $filePath file path to list dir content for
+	 *
+	 * @return int
+	 */
+	abstract protected function doListFiles($filePath, $pathPrefix = '');
 
 	public function createDirForPath($filePath)
 	{
@@ -262,9 +275,9 @@ abstract class kSharedFileSystemMgr
 		return $this->doPutFileContentAtomic($filePath, $fileContent);
 	}
 	
-	public function putFileContent($filePath, $fileContent)
+	public function putFileContent($filePath, $fileContent, $flags = 0, $context = null)
 	{
-		return $this->doPutFileContent($filePath, $fileContent);
+		return $this->doPutFileContent($filePath, $fileContent, $flags, $context);
 	}
 	
 	public function rename($filePath, $newFilePath)
@@ -274,6 +287,14 @@ abstract class kSharedFileSystemMgr
 	
 	public function copy($fromFilePath, $toFilePath)
 	{
+		$from = str_replace(array("//", "\\"), array("/", "/"), $from);
+		$to = str_replace(array("//", "\\"), array("/", "/"), $to);
+		
+		if (!kString::beginsWith($from, self::$kSharedRootPath))
+		{
+			return $this->doPutFileContent($toFilePath, $fromFilePath);
+		}
+		
 		return $this->doCopy($fromFilePath, $toFilePath);
 	}
 	
@@ -289,6 +310,14 @@ abstract class kSharedFileSystemMgr
 
 	public function moveFile($from, $to, $override_if_exists = false, $copy = false)
 	{
+		$from = str_replace(array("//", "\\"), array("/", "/"), $from);
+		$to = str_replace(array("//", "\\"), array("/", "/"), $to);
+		
+		if (!kString::beginsWith($from, self::$kSharedRootPath))
+		{
+			return $this->doGetFileFromRemoteUrl($from, $to);
+		}
+		
 		return $this->doMoveFile($from, $to, $override_if_exists, $copy);
 	}
 
@@ -336,31 +365,23 @@ abstract class kSharedFileSystemMgr
 	{
 		return $this->doGetUploadMaxSize();
 	}
-
-	public static function getInstance($type = null, array $options = null)
+	
+	function copySingleFile($from, $to, $deleteSrc)
 	{
-		if(self::$kSharedFsMgr)
-			return self::$kSharedFsMgr;
-
-		$dc_config = kConf::getMap("dc_config");
-		$options = isset($dc_config['storage']) ? $dc_config['storage'] : null;
-		if(!$type)
+		$from = str_replace(array("//", "\\"), array("/", "/"), $from);
+		$to = str_replace(array("//", "\\"), array("/", "/"), $to);
+		
+		if (!kString::beginsWith($from, self::$kSharedRootPath))
 		{
-			$type = isset($dc_config['fileSystemType']) ? $dc_config['fileSystemType'] : kSharedFileSystemMgrType::LOCAL;
+			return $this->doGetFileFromRemoteUrl($from, $to);
 		}
-
-		switch($type)
-		{
-			case kSharedFileSystemMgrType::LOCAL:
-				self::$kSharedFsMgr = new kNfsSharedFileSystemMgr($options);
-				break;
-
-			case kSharedFileSystemMgrType::S3:
-				self::$kSharedFsMgr = new kS3SharedFileSystemMgr($options);
-				break;
-		}
-
-		return self::$kSharedFsMgr;
+		
+		return $this->doRename($from, $to);
+	}
+	
+	public function listFiles($filePath, $pathPrefix = '')
+	{
+		return $this->doListFiles($filePath, $pathPrefix);
 	}
 
 	/**
@@ -425,6 +446,41 @@ abstract class kSharedFileSystemMgr
 			}
 		}
 		return true;
+	}
+	
+	public static function getInstance()
+	{
+		if(self::$kSharedFsMgr)
+			return self::$kSharedFsMgr;
+		
+		$dc_config = kConf::getMap("dc_config");
+		$options = isset($dc_config['storage']) ? $dc_config['storage'] : null;
+		$type = isset($dc_config['fileSystemType']) ? $dc_config['fileSystemType'] : kSharedFileSystemMgrType::LOCAL;
+		
+		
+		switch($type)
+		{
+			case kSharedFileSystemMgrType::LOCAL:
+				self::$kSharedFsMgr = new kNfsSharedFileSystemMgr($options);
+				break;
+			
+			case kSharedFileSystemMgrType::S3:
+				self::$kSharedFsMgr = new kS3SharedFileSystemMgr($options);
+				break;
+		}
+		
+		return self::$kSharedFsMgr;
+	}
+	
+	public static function getSharedRootPath()
+	{
+		if(self::$kSharedRootPath)
+			return self::$kSharedRootPath;
+		
+		
+		$dc = kDataCenterMgr::getCurrentDc();
+		self::$kSharedRootPath = $dc["root"];
+		return self::$kSharedRootPath;
 	}
 
 }

@@ -179,7 +179,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return $deleted;
 	}
 	
-	protected function doPutFileContentAtomic($filePath, $fileContent)
+	protected function doPutFileContentAtomic($filePath, $fileContent, $flags = 0, $context = null)
 	{
 		return $this->doPutFileContent($filePath, (string)$fileContent);
 	}
@@ -283,7 +283,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		list($bucket, $filePath) = self::getBucketAndFilePath($destFilePath);
 		
-		$result = self::$s3Client->createMultipartUpload([
+		$result = $this->s3Client->createMultipartUpload([
 			'Bucket'       => $bucket,
 			'Key'          => $filePath,
 		]);
@@ -297,7 +297,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$parts = array();
 			while (!feof($sourceFH))
 			{
-				$result = self::$s3Client->uploadPart(array(
+				$result = $this->s3Client->uploadPart(array(
 					'Bucket'     => $bucket,
 					'Key'        => $filePath,
 					'UploadId'   => $uploadId,
@@ -317,7 +317,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch (S3Exception $e)
 		{
-			$result = self::$s3Client->abortMultipartUpload(
+			$result = $this->s3Client->abortMultipartUpload(
 				array(
 					'Bucket'   => $bucket,
 					'Key'      => $filePath,
@@ -328,7 +328,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		
 		// Complete the multipart upload.
-		$result = self::$s3Client->completeMultipartUpload(array(
+		$result = $this->s3Client->completeMultipartUpload(array(
 			'Bucket'   => $bucket,
 			'Key'      => $filePath,
 			'UploadId' => $uploadId,
@@ -339,6 +339,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		stream_wrapper_unregister('https');
 		stream_wrapper_unregister('http');
+		return true;
 	}
 
 	protected function doFullMkdir($path, $rights = 0755, $recursive = true)
@@ -385,7 +386,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return true;
 	}
 
-	protected function copySingleFile($src, $dest, $deleteSrc, $fromLocal = true)
+	protected function doCopySingleFile($src, $dest, $deleteSrc, $fromLocal = true)
 	{
 		$srcContent = kFile::getFileContent($src);
 		if (!$this->putFileContent($dest ,$srcContent))
@@ -481,7 +482,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 		return $result;
 	}
-
+	
 	public function doAbortMultipartUpload($bucket, $filePath, $uploadId)
 	{
 		try
@@ -490,19 +491,18 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				array(
 					'Bucket' => $bucket,
 					'Key' => $filePath,
+					'Bucket' => $bucket,
+					'Key' => $filePath,
 					'UploadId' => $uploadId
 				));
-		}
-		catch (S3Exception $e)
-		{
+			KalturaLog::debug("Upload of [$destFilePath] failed");
+		} catch (S3Exception $e) {
 			KalturaLog::err("Couldn't abort multipart upload for [$filePath] on bucket [$bucket]. Error: {$e->getMessage()}");
 			return false;
 		}
-
-		return $result;
 	}
-
-	public function doCompleteMultiPartUpload($destFilePath, $uploadId, $parts)
+		
+		public function doCompleteMultiPartUpload($destFilePath, $uploadId, $parts)
 	{
 		list($bucket, $filePath) = self::getBucketAndFilePath($destFilePath);
 
@@ -525,7 +525,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return $url;
 	}
 
-	public function doListObjects($filePath)
+	protected function doListFiles($filePath, $pathPrefix = '')
 	{
 		list($bucket, $prefix) = self::getBucketAndFilePath($filePath);
 
