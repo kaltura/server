@@ -87,7 +87,7 @@ class kZoomOauth
 	{
 		$dataAsArray = json_decode($response, true);
 		KalturaLog::debug(print_r($dataAsArray, true));
-		return self::extractTokensFromData($dataAsArray);
+		return self::parseTokens($dataAsArray);
 	}
 
 	public static function parseTokens($tokensData)
