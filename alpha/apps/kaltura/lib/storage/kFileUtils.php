@@ -56,7 +56,7 @@ class kFileUtils extends kFile
 		self::pollFileExists($filePath);
 		
 		// if by now there is no file - die !
-		if(! file_exists($filePath))
+		if(! kFile::checkFileExists($filePath))
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 		
 		return new kRendererDumpFile($filePath, $mimeType, self::xSendFileAllowed($filePath), $maxAge, $limitFileSize, $lastModified, $key, $iv, $fileSize);
