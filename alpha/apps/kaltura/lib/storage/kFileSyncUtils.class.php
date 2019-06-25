@@ -479,7 +479,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		
 		$targetFullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $targetFullPath);
 
-		if ( !file_exists( dirname( $targetFullPath )))
+		if (kFile::checkFileExists(dirname( $targetFullPath)))
 		{
 			kFile::fullMkdir($targetFullPath);
 		}
@@ -1055,7 +1055,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$fullPath = $currentDCFileSync->getFullPath();
 		$isDir = is_dir($fullPath);
 		
-		if ( file_exists( $fullPath ) )
+		if ( kFile::checkFileExists($fullPath ))
 		{
 			$currentDCFileSync->setFileSizeFromPath ( $fullPath );
 			$currentDCFileSync->setStatus( FileSync::FILE_SYNC_STATUS_READY );

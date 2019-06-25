@@ -1248,7 +1248,7 @@ class kJobsManager
 			$inputFileSyncLocalPath = $fileSync->getFilePath();
 		$importingSources = false;
 		// if file size is 0, do not create conversion profile and set entry status as error converting
-		if (!file_exists($inputFileSyncLocalPath) || kFile::fileSize($inputFileSyncLocalPath) == 0)
+		if (!kFile::checkFileExists($inputFileSyncLocalPath) || kFile::fileSize($inputFileSyncLocalPath) == 0)
 		{
 			KalturaLog::info("Input file [$inputFileSyncLocalPath] does not exist");
 			
