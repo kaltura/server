@@ -16,7 +16,7 @@ class ZoomVendorService extends KalturaBaseService
 	{
 		if(self::$zoomIntegration)
 		{
-			self::$zoomIntegration->setLastError($errMsg);
+			self::$zoomIntegration->saveLastError($errMsg);
 		}
 
 		KExternalErrors::dieGracefully();

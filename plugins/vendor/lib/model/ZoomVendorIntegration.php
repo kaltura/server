@@ -46,8 +46,14 @@ class ZoomVendorIntegration extends VendorIntegration
 
 	public function setLastError($v)
 	{
-		$this->putInCustomData(self::LAST_ERROR_TIMESTAMP, date());
+		$this->putInCustomData(self::LAST_ERROR_TIMESTAMP, time());
 		$this->putInCustomData(self::LAST_ERROR, $v);
+	}
+
+	public function saveLastError($v)
+	{
+		$this->setLastError($v);
+		$this->save();
 	}
 
 	/**
