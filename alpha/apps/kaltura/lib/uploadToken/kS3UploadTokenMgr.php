@@ -117,16 +117,44 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	 * list all file chunks and upload them in multipart upload
 	 *
 	 * @param $finalFilePath
+	 * @throws kUploadTokenException
 	 */
 	protected function createFullFile($finalFilePath)
 	{
+		sleep(3);
 		$uploadChunksResponse = self::$fileSystemManager->doListObjects($finalFilePath);
 		$uploadChunks = $uploadChunksResponse['Contents'];
 		usort($uploadChunks,  array($this, 'compareKeyResumeAt'));
 
 		$finalFilePath .= '/full_file.' . $this->getFileExtension($this->_uploadToken->getFileName());
 		$uploadId = self::$fileSystemManager->doCreateMultipartUpload($finalFilePath);
+		if(!$uploadId)
+		{
+			throw new kUploadTokenException("multipart upload error during upload token closer", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_UPLOAD_ERROR);
+		}
 
+		$copiedParts = $this->uploadParts($uploadChunks, $uploadId, $finalFilePath);
+
+		$location = self::$fileSystemManager->doCompleteMultipartUpload($finalFilePath, $uploadId, $copiedParts);
+		if(!$location)
+		{
+			throw new kUploadTokenException("multipart upload error during upload token closer", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_UPLOAD_ERROR);
+		}
+
+		$this->_uploadToken->setUploadTempPath($finalFilePath);
+	}
+
+	/**
+	 * upload part copy all multipart upload pats
+	 *
+	 * @param $uploadChunks
+	 * @param $uploadId
+	 * @param $finalFilePath
+	 * @return mixed
+	 * @throws kUploadTokenException
+	 */
+	protected function uploadParts($uploadChunks, $uploadId, $finalFilePath)
+	{
 		$partNumber = 1;
 		foreach ($uploadChunks as $chunk)
 		{
@@ -138,12 +166,13 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 					'ETag' => $result['CopyPartResult']['ETag'],
 				);
 			}
+			else
+			{
+				throw new kUploadTokenException("multipart upload error during upload token closer", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_UPLOAD_ERROR);
+			}
 			$partNumber +=1;
 		}
-
-		self::$fileSystemManager->doCompleteMultipartUpload($finalFilePath, $uploadId, $copiedParts);
-
-		$this->_uploadToken->setUploadTempPath($finalFilePath);
+		return $copiedParts;
 	}
 
 	/**

@@ -125,6 +125,10 @@ class UploadTokenService extends KalturaBaseService
 					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_FILE_TYPE_RESTRICTED_FOR_UPLOAD);
 				case kUploadTokenException::UPLOAD_TOKEN_FAILED_TO_MOVE_UPLOADED_FILE:
 					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_PROCESSING_ERROR);
+				case kUploadTokenException::UPLOAD_TOKEN_FAILED_TO_MOVE_UPLOADED_FILE:
+					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_PROCESSING_ERROR);
+				case kUploadTokenException::UPLOAD_TOKEN_MULTIPART_UPLOAD_ERROR:
+					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_PROCESSING_ERROR);
 				default:
 					throw $ex;
 			}
