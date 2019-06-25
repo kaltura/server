@@ -252,6 +252,8 @@ abstract class kSharedFileSystemMgr
 	
 	public function checkFileExists($filePath)
 	{
+		$filePath = str_replace(array("//", "\\"), array("/", "/"), $filePath);
+		
 		return $this->doCheckFileExists($filePath);
 	}
 	
@@ -343,6 +345,7 @@ abstract class kSharedFileSystemMgr
 
 	public function fileSize($filename)
 	{
+		$filename = str_replace(array("//", "\\"), array("/", "/"), $filename);
 		return $this->doFileSize($filename);
 	}
 
@@ -448,15 +451,16 @@ abstract class kSharedFileSystemMgr
 		return true;
 	}
 	
-	public static function getInstance()
+	public static function getInstance($type = null, $options = null)
 	{
 		if(self::$kSharedFsMgr)
 			return self::$kSharedFsMgr;
 		
 		$dc_config = kConf::getMap("dc_config");
-		$options = isset($dc_config['storage']) ? $dc_config['storage'] : null;
-		$type = isset($dc_config['fileSystemType']) ? $dc_config['fileSystemType'] : kSharedFileSystemMgrType::LOCAL;
-		
+		if(!$type)
+			$type = isset($dc_config['fileSystemType']) ? $dc_config['fileSystemType'] : kSharedFileSystemMgrType::LOCAL;
+		if(!$options)
+			$options = isset($dc_config['storage']) ? $dc_config['storage'] : null;
 		
 		switch($type)
 		{
