@@ -431,6 +431,7 @@
 				  - gte(t__FORCED_KF_START_SHIFT__,n_forced*$gopInSecs) - the original forced KF setup with shift to the 'time 0'
 				  - gte(t,__FORCED_KF_EXTRA_IFARMES__)*lt(t,$setExtraIFramesTimingEnd)) - generate I frames starting from half-frame before EOF chunk, till 3 frames after the chunk end (into the 2nd segement)
 				*/
+/*
 			if(!isset($params->bf)){
 				if($params->vcodec=='libx264' && in_array($params->vprofile, array('main','high') ))
 					$forcedKeyFramesStr = "'expr:if(gte(t__FORCED_KF_START_SHIFT__,n_forced*$gopInSecs),gte(t,__FORCED_KF_EXTRA_IFARMES__)*lt(t,$setExtraIFramesTimingEnd))'";
@@ -440,6 +441,7 @@
 			else if($params->bf>0)
 				$forcedKeyFramesStr = "'expr:if(gte(t__FORCED_KF_START_SHIFT__,n_forced*$gopInSecs),gte(t,__FORCED_KF_EXTRA_IFARMES__)*lte(t,$setExtraIFramesTimingEnd))'";
 			else
+*/
 				$forcedKeyFramesStr = "'expr:gte(t__FORCED_KF_START_SHIFT__,n_forced*$gopInSecs)'";
 				
 //$forcedKeyFramesStr = "'expr:gte(t__FORCED_KF_START_SHIFT__,n_forced*$gopInSecs)'";
