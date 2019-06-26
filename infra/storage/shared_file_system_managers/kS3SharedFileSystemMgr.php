@@ -124,7 +124,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function doCheckFileExists($filePath)
 	{
 		list($bucket, $filePathWithoutBucket) = $this->getBucketAndFilePath($filePath);
-		if(!$this->doIsFile($filePathWithoutBucket))
+		if(!$this->doIsFile($filePath))
 		{
 			return true;
 		}

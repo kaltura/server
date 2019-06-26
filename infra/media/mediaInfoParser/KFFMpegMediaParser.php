@@ -48,7 +48,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	protected function getCommand($filePath=null)
 	{
 		if(!isset($filePath)) $filePath=$this->filePath;
-		return "{$this->ffprobeBin} -i \"{$filePath}\" -show_streams -show_format -show_programs -v quiet -show_data  -print_format json";
+		return "{$this->ffprobeBin} -i \"$filePath\" -show_streams -show_format -show_programs -v quiet -show_data  -print_format json";
 	}
 	
 	/**
@@ -60,6 +60,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		$cmd = $this->getCommand($filePath);
 		KalturaLog::debug("Executing '$cmd'");
 		$output = shell_exec($cmd);
+		$output = system($cmdLine, $returnVar);
 		if (trim($output) === "")
 			throw new kApplicativeException(KBaseMediaParser::ERROR_EXTRACT_MEDIA_FAILED, "Failed to parse media using " . get_class($this));
 			
@@ -725,6 +726,7 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 	[Parsed_idet_0 @ 0000000000331de0] Multi frame detection: TFF:0 BFF:100 Progressive:0 Undetermined:0	
 	$mediaInfo->scanType=1; 
 */
+return false;
 		if(stristr(PHP_OS,'win')) $nullDev = "NULL";
 		else $nullDev = "/dev/null";
 
