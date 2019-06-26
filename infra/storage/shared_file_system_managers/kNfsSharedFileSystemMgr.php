@@ -30,9 +30,10 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 		return file_exists($filePath);
 	}
 	
-	protected function doGetFileContent($filePath)
+	protected function doGetFileContent($filePath, $from_byte = 0, $to_byte = -1)
 	{
-		return @file_get_contents($filePath);
+		
+		return file_get_contents($filePath);
 	}
 	
 	protected function doUnlink($filePath)
@@ -257,7 +258,7 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 		return is_file($filePath);
 	}
 	
-	protected function doRealPath($filePath)
+	protected function doRealPath($filePath, $getRemote = true)
 	{
 		return realpath($filePath);
 	}

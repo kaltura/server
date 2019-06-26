@@ -66,14 +66,14 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	public static function getLocalContentsByFileSync(FileSync $file_sync, $use_include_path = false, $context = null, $offset = 0, $maxlen = null)
 	{
 		$full_path = $file_sync->getFullPath();
-		$real_path = realpath( $full_path );
+		$real_path = kFile::realPath($full_path, false);
 		if (kFile::checkFileExists($real_path))
 		{
 			$startTime = microtime(true);
 			if (!$maxlen)
-				$contents = file_get_contents( $real_path);
+				$contents = kFile::getFileContent($real_path);
 			else
-				$contents = file_get_contents( $real_path, $use_include_path, $context, $offset, $maxlen);
+				$contents = kFile::getFileContent($real_path, $offset, $offset + $maxlen);
 			KalturaLog::info("file was found locally at [$real_path] fgc took [".(microtime(true) - $startTime)."]");
 			if ($file_sync->isEncrypted())
 			{

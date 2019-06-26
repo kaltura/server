@@ -140,8 +140,13 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return $exists;
 	}
 	
-	protected function doGetFileContent($filePath)
+	protected function doGetFileContent($filePath, $from_byte = 0, $to_byte = -1)
 	{
+		if($to_byte > 0)
+		{
+			return $this->getSpecificObjectRange($filePath, $from_byte, $to_byte);
+		}
+		
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
 		
 		$params = array(
@@ -579,12 +584,22 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return count($fileList['Contents']) == 1;
 	}
 	
-	protected function doRealPath($filePath)
+	protected function doRealPath($filePath, $getRemote = true)
 	{
+		if(!$getRemote)
+			return $filePath;
+		
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
-		$res = "https://$bucket.s3-eu-west-1.amazonaws.com/$filePath";;
-		KalturaLog::debug("doRealPath [$res]");
-		return $res;
+		
+		$cmd = $this->s3Client->getCommand('GetObject',
+			array(
+			'Bucket' => $bucket,
+			'Key' => $filePath
+		));
+		
+		$request = $this->s3Client->createPresignedRequest($cmd, '+120 minutes');
+		$preSignedUrl = (string)$request->getUri();
+		return $preSignedUrl;
 	}
 
 	protected function doDumpFilePart($filePath, $range_from, $range_length)

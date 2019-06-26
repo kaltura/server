@@ -12,7 +12,7 @@ class kFileUtils extends kFile
 	public static function pollFileExists($file_name)
 	{
 		$nfs_file_tries = 0;
-		while(! file_exists($file_name))
+		while(!kFile::checkFileExists($file_name))
 		{
 			//			clearstatcache(true,$file_name);
 			clearstatcache();
