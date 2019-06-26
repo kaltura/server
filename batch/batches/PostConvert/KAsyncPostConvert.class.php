@@ -68,9 +68,9 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			if(!$data->flavorParamsOutput || !$data->flavorParamsOutput->sourceRemoteStorageProfileId)
 			{
 				if(!$this->pollingFileExists($mediaFile))
-					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile does not exist", KalturaBatchJobStatus::RETRY);
+					return $this->x($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile does not exist", KalturaBatchJobStatus::RETRY);
 				
-				if(!is_file($mediaFile))
+				if(!kFile::isFile($mediaFile))
 					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile is not a file", KalturaBatchJobStatus::FAILED);
 			}
 			
@@ -84,12 +84,14 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		$mediaInfo = null;
 		try
 		{
-			$engine = KBaseMediaParser::getParser($job->jobSubType, realpath($mediaFile), KBatchBase::$taskConfig, $job);
+			$engine = KBaseMediaParser::getParser($job->jobSubType, kFile::realPath($mediaFile), KBatchBase::$taskConfig, $job);
 			if($engine)
 			{
 				KalturaLog::info("Media info engine [" . get_class($engine) . "]");
 				if (!$key)
+				{
 					$mediaInfo = $engine->getMediaInfo();
+				}
 				else 
 				{
 					$tempClearPath = self::createTempClearFile($mediaFile, $key);
@@ -172,7 +174,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 
 			$created = $thumbMaker->createThumnail($data->thumbOffset, $mediaInfo->videoWidth, $mediaInfo->videoHeight, $params);
 			
-			if(!$created || !file_exists($thumbPath))
+			if(!$created || !kFile::checkFileExists($thumbPath))
 			{
 				$data->createThumb = false;
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, 'Thumbnail not created', KalturaBatchJobStatus::FINISHED, $data);
@@ -202,12 +204,12 @@ class KAsyncPostConvert extends KJobHandlerWorker
 	{
 		// creates a temp file path
 		$rootPath = KBatchBase::$taskConfig->params->sharedTempPath;
-		if(! is_dir($rootPath))
+		if(kFile::isFile($rootPath))
 		{
-			if(! file_exists($rootPath))
+			if(!kFile::checkFileExists($rootPath))
 			{
 				KalturaLog::info("Creating temp thumbnail directory [$rootPath]");
-				mkdir($rootPath);
+				kFile::fullMkdir($rootPath);
 			}
 			else
 			{
@@ -222,8 +224,8 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		
 		clearstatcache();
 		$fileSize = kFile::fileSize($data->thumbPath);
-		rename($data->thumbPath, $sharedFile);
-		if(!file_exists($sharedFile) || kFile::fileSize($sharedFile) != $fileSize)
+		kFile::moveFile($data->thumbPath, $sharedFile);
+		if(!kFile::checkFileExists($sharedFile) || kFile::fileSize($sharedFile) != $fileSize)
 		{
 			$err = 'moving file failed';
 			throw new Exception($err, -1);

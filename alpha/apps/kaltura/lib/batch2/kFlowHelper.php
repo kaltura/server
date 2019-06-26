@@ -2503,7 +2503,7 @@ class kFlowHelper
 
 		$fullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadToken->getId());
 
-		if(!file_exists($fullPath))
+		if(!kFile::checkFileExists($fullPath))
 		{
 			KalturaLog::info("File path [$fullPath] not found");
 			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadToken->getId(), kDataCenterMgr::getCurrentDcId());

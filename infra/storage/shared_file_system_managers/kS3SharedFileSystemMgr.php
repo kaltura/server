@@ -559,4 +559,29 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		return self::MULTIPART_UPLOAD_MINIMUM_FILE_SIZE;
 	}
+	
+	protected function doIsFile($filePath)
+	{
+		if(!$this->doCheckFileExists($filePath))
+		{
+			return false;
+		}
+		
+		$fileList = $this->doListFiles($filePath);
+		if(!isset($fileList['Contents']))
+		{
+			KalturaLog::debug("Could not determine if provided file path [$filePath], is file");
+			return false;
+		}
+		
+		return count($fileList['Contents']) == 1;
+	}
+	
+	protected function doRealPath($filePath)
+	{
+		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
+		$res = "https://$bucket.s3-eu-west-1.amazonaws.com/$filePath";;
+		KalturaLog::debug("doRealPath [$res]");
+		return $res;
+	}
 }

@@ -251,4 +251,14 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		return $fileList;
 	}
+	
+	protected function doIsFile($filePath)
+	{
+		return is_file($filePath);
+	}
+	
+	protected function doRealPath($filePath)
+	{
+		return realpath($filePath);
+	}
 }

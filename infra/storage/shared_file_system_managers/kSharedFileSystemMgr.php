@@ -244,6 +244,24 @@ abstract class kSharedFileSystemMgr
 	 * @return int
 	 */
 	abstract protected function doListFiles($filePath, $pathPrefix = '');
+	
+	/**
+	 * returns true/false if the givven file path exists and is a regular file
+	 *
+	 * @param $filePath file path to check
+	 *
+	 * @return int
+	 */
+	abstract protected function doIsFile($filePath);
+	
+	/**
+	 * Returns the canonicalized absolute pathname on success.
+	 *
+	 * @param $filePath file path
+	 *
+	 * @return int
+	 */
+	abstract protected function doRealPath($filePath);
 
 	public function createDirForPath($filePath)
 	{
@@ -384,7 +402,20 @@ abstract class kSharedFileSystemMgr
 	
 	public function listFiles($filePath, $pathPrefix = '')
 	{
+		$filePath = str_replace(array("//", "\\"), array("/", "/"), $filePath);
 		return $this->doListFiles($filePath, $pathPrefix);
+	}
+	
+	public function isFile($filePath)
+	{
+		$filePath = str_replace(array("//", "\\"), array("/", "/"), $filePath);
+		return $this->doIsFile($filePath);
+	}
+	
+	public function realPath($filePath)
+	{
+		$filePath = str_replace(array("//", "\\"), array("/", "/"), $filePath);
+		return $this->doRealPath($filePath);
 	}
 
 	/**
@@ -481,10 +512,22 @@ abstract class kSharedFileSystemMgr
 		if(self::$kSharedRootPath)
 			return self::$kSharedRootPath;
 		
-		
-		$dc = kDataCenterMgr::getCurrentDc();
+		$dc_config = kConf::getMap("dc_config");
+		$dc = self::getDcById($dc_config["current"]);
 		self::$kSharedRootPath = $dc["root"];
 		return self::$kSharedRootPath;
 	}
-
+	
+	public static function getDcById ( $dc_id )
+	{
+		$dc_config = kConf::getMap("dc_config");
+		$dc_list = $dc_config["list"];
+		if ( isset( $dc_list[$dc_id] ) )
+			$dc = $dc_list[$dc_id];
+		else
+			throw new Exception ( "Cannot find DC with id [$dc_id]" );
+		
+		$dc["id"]=$dc_id;
+		return $dc;
+	}
 }
