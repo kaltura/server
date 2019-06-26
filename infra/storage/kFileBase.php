@@ -65,6 +65,19 @@ class kFileBase
     	
         chmod($filePath, $mode);
     }
+	
+	public static function chown($filePath, $user, $group)
+	{
+		if(kString::beginsWith($filePath, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->chown($filePath,  $user, $group);
+		}
+		
+		passthru("chown $user:$group $localPath", $ret);
+		
+		return $ret;
+	}
 
     public static function readLastBytesFromFile($file_name, $bytes = 1024)
     {
@@ -406,12 +419,12 @@ class kFileBase
 		return infraRequestUtils::dumpFilePart($file_name, $range_from, $range_length);
 	}
 
-  public static function isDir($path)
+  	public static function isDir($path)
 	{
 		if(kString::beginsWith($path, kSharedFileSystemMgr::getSharedRootPath()))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
-			return $kSharedFsMgr->isDir($path);
+			return !$kSharedFsMgr->isFile($path);
 		}
 
 		return is_dir($path);

@@ -185,9 +185,20 @@ abstract class kSharedFileSystemMgr
 	 *
 	 * @param $path path to change mode
 	 * @param $mode mode for the dir
+	 * @param $user the user tho change to
+	 * @param $group the group tho change to
 	 * @return true / false according to success
 	 */
-	abstract public function doChmod($path, $mode);
+	abstract protected function doChown($path, $user, $group);
+	
+	/**
+	 * chmod path with given mode
+	 *
+	 * @param $path path to change mode
+	 * @param $mode mode for the dir
+	 * @return true / false according to success
+	 */
+	abstract protected function doChmod($path, $mode);
 
 	/**
 	 * return the file size of given file
@@ -195,7 +206,7 @@ abstract class kSharedFileSystemMgr
 	 * @param $filename file to check the size
 	 * @return mixed size on success false on failure
 	 */
-	abstract public function doFileSize($filename);
+	abstract protected function doFileSize($filename);
 
 	/**
 	 * delete file
@@ -280,7 +291,7 @@ abstract class kSharedFileSystemMgr
 	 * @param $contentGroup
 	 * @return mixed
 	 */
-	abstract public function doChgrp($filePath, $contentGroup);
+	abstract protected function doChgrp($filePath, $contentGroup);
 
 	/**
 	 *
@@ -371,6 +382,7 @@ abstract class kSharedFileSystemMgr
 
 	public function isDir($path)
 	{
+		$path = str_replace(array("//", "\\"), array("/", "/"), $path);
 		return $this->doIsDir($path);
 	}
 
@@ -388,6 +400,11 @@ abstract class kSharedFileSystemMgr
 	{
 		return $this->doChmod($path, $mode);
 	}
+	
+	public function chown($path, $user, $group)
+	{
+		return $this->doChown($path, $user, $group);
+	}
 
 	public function fileSize($filename)
 	{
@@ -397,6 +414,7 @@ abstract class kSharedFileSystemMgr
 
 	public function deleteFile($filename)
 	{
+		$filename = str_replace(array("//", "\\"), array("/", "/"), $filename);
 		return $this->doDeleteFile($filename);
 	}
 
@@ -571,9 +589,9 @@ abstract class kSharedFileSystemMgr
 		return $this->doDir($filePath);
 	}
 
-	public function chgrp($filePath)
+	public function chgrp($filePath, $contentGroup)
 	{
-		return $this->doChgrp($filePath);
+		return $this->doChgrp($filePath, $contentGroup);
 	}
 
 }

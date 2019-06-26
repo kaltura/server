@@ -124,7 +124,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function doCheckFileExists($filePath)
 	{
 		list($bucket, $filePathWithoutBucket) = $this->getBucketAndFilePath($filePath);
-		if($this->isDirectory($filePathWithoutBucket))
+		if(!$this->doIsFile($filePathWithoutBucket))
 		{
 			return true;
 		}
@@ -384,8 +384,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doIsDir($path)
 	{
-
-		return $this->isDirectory();
+		return $this->isDirectory($path);
 	}
 
 	protected function doMkdir($path)
@@ -423,13 +422,13 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		return true;
 	}
-
-	public function doChmod($path, $mode)
+	
+	protected function doChmod($path, $mode)
 	{
 		return true;
 	}
-
-	public function doFileSize($filename)
+	
+	protected function doFileSize($filename)
 	{
 		list($bucket, $filePathWithoutBucket) = $this->getBucketAndFilePath($filename);
 		$params['Bucket'] = $bucket;
@@ -509,7 +508,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 	}
 		
-		public function doCompleteMultiPartUpload($destFilePath, $uploadId, $parts)
+	public function doCompleteMultiPartUpload($destFilePath, $uploadId, $parts)
 	{
 		list($bucket, $filePath) = self::getBucketAndFilePath($destFilePath);
 
@@ -569,11 +568,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doIsFile($filePath)
 	{
-		if(!$this->doCheckFileExists($filePath))
-		{
-			return false;
-		}
-		
 		$fileList = $this->doListFiles($filePath);
 		if(!isset($fileList['Contents']))
 		{
@@ -639,14 +633,19 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 		return $response;
 	}
-
-	public function doChgrp($filePath, $contentGroup)
+	
+	protected function doChgrp($filePath, $contentGroup)
 	{
 		return true;
 	}
-
-	public function doDir($filePath)
+	
+	protected function doDir($filePath)
 	{
 		return null;
+	}
+	
+	protected function doChown($path, $user, $group)
+	{
+		return true;
 	}
 }

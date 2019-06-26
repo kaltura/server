@@ -180,13 +180,13 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		return rmdir($path);
 	}
-
-	public function doChmod($path, $mode)
+	
+	protected function doChmod($path, $mode)
 	{
 		return chmod($path, $mode);
 	}
-
-	public function doFileSize($filename)
+	
+	protected function doFileSize($filename)
 	{
 		if(PHP_INT_SIZE >= 8)
 			return filesize($filename);
@@ -267,14 +267,20 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		return infraRequestUtils::dumpFilePart($this->filePath, $rangeFrom, $rangeLength);
 	}
-
-	public function doChgrp($filePath, $contentGroup)
+	
+	protected function doChgrp($filePath, $contentGroup)
 	{
 		return chgrp($filePath, $contentGroup);
 	}
-
-	public function doDir($filePath)
+	
+	protected function doDir($filePath)
 	{
 		return dir($filePath);
+	}
+	
+	protected function doChown($path, $user, $group)
+	{
+		passthru("chown $user:$group $localPath", $ret);
+		return $ret;
 	}
 }

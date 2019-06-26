@@ -340,8 +340,10 @@ class uiConfDeployment
 
 		if (strtoupper(substr(PHP_OS, 0, 3)) != 'WIN')
 		{
-			$user_group = uiConfDeployment::$arguments['user'] . ':' . uiConfDeployment::$arguments['group'];
-			passthru("chown $user_group $localPath", $ret);
+			$user = uiConfDeployment::$arguments['user'];
+			$group = uiConfDeployment::$arguments['group'];
+			$user_group = "$user:$group";
+			kFile::chown($localPath, $user, $group);
 			if ($ret !== 0 && $ret !== 127)
 			{
 				KalturaLog::debug("chown [$user_group] failed on path [$localPath] returned value [$ret]");
