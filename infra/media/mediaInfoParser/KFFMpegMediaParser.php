@@ -60,7 +60,6 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		$cmd = $this->getCommand($filePath);
 		KalturaLog::debug("Executing '$cmd'");
 		$output = shell_exec($cmd);
-		$output = system($cmdLine, $returnVar);
 		if (trim($output) === "")
 			throw new kApplicativeException(KBaseMediaParser::ERROR_EXTRACT_MEDIA_FAILED, "Failed to parse media using " . get_class($this));
 			
