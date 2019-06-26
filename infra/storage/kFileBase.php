@@ -378,4 +378,15 @@ class kFileBase
 		return infraRequestUtils::dumpFilePart($file_name, $range_from, $range_length);
 	}
 
+	public static function isDir($path)
+	{
+		if(kString::beginsWith($path, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->isDir($path);
+		}
+
+		return is_dir($path);
+	}
+
 }

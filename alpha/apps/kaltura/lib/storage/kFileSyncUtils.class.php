@@ -235,15 +235,20 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$fullPath = $rootPath . $filePath; 
 		$fullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $fullPath);
 
-		if ( !file_exists( dirname( $fullPath )))
+		if ( !kFile::checkFileExists( dirname( $fullPath )))
 		{
 			self::fullMkdir($fullPath);
 		}
 
 		// create a file path for the current key - the fileSyncKey should already include the file path
 		// place the content there
-		file_put_contents ( $fullPath , $content );
-		self::setPermissions($fullPath);
+		$fullPath = str_replace("//", "/", $fullPath);
+		kFile::filePutContents ( $fullPath , $content );
+		if(!kString::beginsWith($fullPath, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			self::setPermissions($fullPath);
+		}
+
 		self::createSyncFileForKey($rootPath, $filePath,  $key , $strict , !is_null($res), false, md5($content));
 		self::encryptByFileSyncKey($key);
 	}
@@ -257,7 +262,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			
 		@chgrp($filePath, $contentGroup);
 		
-		if(is_dir($filePath))
+		if(kFile::isDir($filePath))
 		{
 			@chmod($filePath, 0770);
 			$dir = dir($filePath);
@@ -290,7 +295,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	    foreach ($dirs as $dir)
 	    {
 	        $path .= DIRECTORY_SEPARATOR . $dir;
-	        if (is_dir($path))
+	        if (kFile::isDir($path))
 	        	continue;
 	        	
 	        if(!kFile::fullMkfileDir($path, 0770))
