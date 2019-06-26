@@ -273,6 +273,22 @@ abstract class kSharedFileSystemMgr
 	 */
 	abstract protected function doDumpFilePart($filePath, $range_from, $range_length);
 
+	/**
+	 * Chgrp path with content group
+	 *
+	 * @param $filePath
+	 * @param $contentGroup
+	 * @return mixed
+	 */
+	abstract public function doChgrp($filePath, $contentGroup);
+
+	/**
+	 *
+	 * @param $filePath
+	 * @return mixed
+	 */
+	abstract protected function doDir($filePath);
+
 	public function createDirForPath($filePath)
 	{
 		return $this->doCreateDirForPath($filePath);
@@ -547,4 +563,15 @@ abstract class kSharedFileSystemMgr
 
 		return $this->doDumpFilePart($filePath, $range_from, $range_length);
 	}
+
+	public function dir($filePath)
+	{
+		return $this->doDir($filePath);
+	}
+
+	public function chgrp($filePath)
+	{
+		return $this->doChgrp($filePath);
+	}
+
 }

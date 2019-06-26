@@ -266,4 +266,14 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		return infraRequestUtils::dumpFilePart($this->filePath, $rangeFrom, $rangeLength);
 	}
+
+	public function doChgrp($filePath, $contentGroup)
+	{
+		return chgrp($filePath, $contentGroup);
+	}
+
+	public function doDir($filePath)
+	{
+		return dir($filePath);
+	}
 }

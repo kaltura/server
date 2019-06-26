@@ -624,4 +624,14 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 		return $response;
 	}
+
+	public function doChgrp($filePath, $contentGroup)
+	{
+		return true;
+	}
+
+	public function doDir($filePath)
+	{
+		return null;
+	}
 }

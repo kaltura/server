@@ -335,7 +335,7 @@ class uiConfDeployment
 		$localPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $localPath);
 
 		$ret = null;
-		chmod($localPath, 0640);
+		kFile::chmod($localPath, 0640);
 
 		if (strtoupper(substr(PHP_OS, 0, 3)) != 'WIN')
 		{
@@ -347,6 +347,30 @@ class uiConfDeployment
 				exit(1);
 			}
 		}
+	}
+
+	/**
+	 *
+	 * Reads the config file from the given path
+	 * @param string $file_path
+	 */
+	public static function readConfFileFromPath($file_path)
+	{
+		global $arguments;
+
+		if(!file_exists($file_path)) {
+			if(!file_exists(dirname($arguments['ini'])))
+			{
+				return FALSE;
+			}
+			else
+			{
+				$file_path = dirname($arguments['ini']).DIRECTORY_SEPARATOR.$file_path;
+			}
+		}
+
+		$file_content = file_get_contents($file_path);
+		return $file_content;
 	}
 
 	/**
@@ -494,9 +518,9 @@ class uiConfDeployment
 		
 		$sync_key = $uiconf->getSyncKey(uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA);
 		$localPath = kFileSyncUtils::getLocalFilePathForKey($sync_key);
-		$localPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $localPath);
+		$localPath = str_replace(array('/', '\\','//'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $localPath);
 	
-		chmod($localPath, 0640);
+		kFile::chmod($localPath, 0640);
 	
 		if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')
 			return;
