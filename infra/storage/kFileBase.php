@@ -410,5 +410,16 @@ class kFileBase
 
 		return is_dir($path);
 	}
+
+	public static function chgrp($filePath, $contentGroup)
+	{
+		if(kString::beginsWith($filePath, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->chgrp($filePath, $contentGroup);
+		}
+
+		return chgrp($filePath, $contentGroup);
+	}
   
 }

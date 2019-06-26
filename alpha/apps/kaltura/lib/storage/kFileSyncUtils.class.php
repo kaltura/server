@@ -244,10 +244,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		// place the content there
 		$fullPath = str_replace("//", "/", $fullPath);
 		kFile::filePutContents ( $fullPath , $content );
-		if(!kString::beginsWith($fullPath, kSharedFileSystemMgr::getSharedRootPath()))
-		{
-			self::setPermissions($fullPath);
-		}
+		self::setPermissions($fullPath);
 
 		self::createSyncFileForKey($rootPath, $filePath,  $key , $strict , !is_null($res), false, md5($content));
 		self::encryptByFileSyncKey($key);
@@ -260,22 +257,25 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if(is_numeric($contentGroup))
 			$contentGroup = intval($contentGroup);
 			
-		@chgrp($filePath, $contentGroup);
+		@kFile::chgrp($filePath, $contentGroup);
 		
 		if(kFile::isDir($filePath))
 		{
-			@chmod($filePath, 0770);
+			@kFile::chmod($filePath, 0770);
 			$dir = dir($filePath);
-			while (false !== ($file = $dir->read()))
+			if($dir)
 			{
-				if($file[0] != '.')
-					self::setPermissions($filePath . DIRECTORY_SEPARATOR . $file);
+				while (false !== ($file = $dir->read()))
+				{
+					if($file[0] != '.')
+						self::setPermissions($filePath . DIRECTORY_SEPARATOR . $file);
+				}
+				$dir->close();
 			}
-			$dir->close();
 		}
 		else
 		{
-			@chmod($filePath, 0640);
+			@kFile::chmod($filePath, 0640);
 		}
 	}
 
