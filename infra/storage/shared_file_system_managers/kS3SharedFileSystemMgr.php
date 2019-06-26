@@ -309,7 +309,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 					'Key'        => $filePath,
 					'UploadId'   => $uploadId,
 					'PartNumber' => $partNumber,
-					'Body'       => stream_get_contents($sourceFH, 128 * 1024 * 1024),
+					'Body'       => stream_get_contents($sourceFH, 32 * 1024 * 1024),
 				));
 				$parts['Parts'][$partNumber] = array(
 					'PartNumber' => $partNumber,
