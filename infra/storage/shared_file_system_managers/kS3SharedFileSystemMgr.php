@@ -559,7 +559,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		return self::MULTIPART_UPLOAD_MINIMUM_FILE_SIZE;
 	}
-	
+
 	protected function doIsFile($filePath)
 	{
 		if(!$this->doCheckFileExists($filePath))
@@ -583,5 +583,43 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$res = "https://$bucket.s3-eu-west-1.amazonaws.com/$filePath";;
 		KalturaLog::debug("doRealPath [$res]");
 		return $res;
+	}
+
+	protected function doDumpFilePart($filePath, $range_from, $range_length)
+	{
+		$defaultChunkSize = 100000;
+		$exist = $this->checkFileExists($filePath);
+		if($exist)
+		{
+			while($range_from <= $range_length)
+			{
+				$chunkSize = min($defaultChunkSize, ($range_length - $range_from));
+				$range_to = $range_from + $chunkSize;
+				$content = $this->getSpecificObjectRange($filePath, $range_from, $range_to);
+				echo $content;
+				$range_from = $range_to + 1;
+			}
+		}
+	}
+
+	protected function getSpecificObjectRange($filePath, $startRange, $endRange)
+	{
+		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
+
+		$range = 'bytes='.$startRange.'-'.$endRange;
+
+		$params = array(
+			'Bucket' => $bucket,
+			'Key'    => $filePath,
+			'Range'  => $range
+		);
+
+		$response = $this->s3Client->getObject( $params );
+		if($response)
+		{
+			return (string)$response['Body'];
+		}
+
+		return $response;
 	}
 }

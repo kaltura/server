@@ -44,7 +44,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		$startTime = microtime(true);
 
-		$file_exists = file_exists ( $file_sync->getFullPath() );
+		$file_exists = kFile::checkFileExists ( $file_sync->getFullPath() );
 
 		KalturaLog::info("file_exists? [$file_exists] took [".(microtime(true)-$startTime)."] path [".$file_sync->getFullPath()."]");
 

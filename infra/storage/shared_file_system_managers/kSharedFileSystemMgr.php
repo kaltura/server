@@ -263,6 +263,16 @@ abstract class kSharedFileSystemMgr
 	 */
 	abstract protected function doRealPath($filePath);
 
+	/**
+	 * dump file in parts
+	 *
+	 * @param $filePath
+	 * @param $range_from
+	 * @param $range_length
+	 * @return mixed
+	 */
+	abstract protected function doDumpFilePart($filePath, $range_from, $range_length);
+
 	public function createDirForPath($filePath)
 	{
 		return $this->doCreateDirForPath($filePath);
@@ -529,5 +539,12 @@ abstract class kSharedFileSystemMgr
 		
 		$dc["id"]=$dc_id;
 		return $dc;
+	}
+
+	public function dumpFilePart($file_name, $range_from, $range_length)
+	{
+		$filePath = str_replace(array("//", "\\"), array("/", "/"), $file_name);
+
+		return $this->doDumpFilePart($filePath, $range_from, $range_length);
 	}
 }

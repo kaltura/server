@@ -388,4 +388,15 @@ class kFileBase
 		
 		return realpath($filePath);
 	}
+
+	public static function dumpFilePart($file_name, $range_from, $range_length)
+	{
+		if(kString::beginsWith($file_name, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->dumpFilePart($file_name, $range_from, $range_length);
+		}
+
+		return infraRequestUtils::dumpFilePart($file_name, $range_from, $range_length);
+	}
 }
