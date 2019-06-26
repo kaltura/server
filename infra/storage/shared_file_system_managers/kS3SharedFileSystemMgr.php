@@ -234,6 +234,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			
 			$retries--;
 		}
+
+		KalturaLog::err("put file content failed with error: {$res->getMessage()}");
 		
 		return false;
 	}
