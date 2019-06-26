@@ -725,7 +725,6 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 	[Parsed_idet_0 @ 0000000000331de0] Multi frame detection: TFF:0 BFF:100 Progressive:0 Undetermined:0	
 	$mediaInfo->scanType=1; 
 */
-return false;
 		if(stristr(PHP_OS,'win')) $nullDev = "NULL";
 		else $nullDev = "/dev/null";
 
