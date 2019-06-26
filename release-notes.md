@@ -1,3 +1,15 @@
+# Orion 15.2.0 #
+## New thumbnail API  ##
+- Issue Type: Feature
+- Issue ID: WEBC-1429
+
+### Configuration ###
+    First replace all tokens from the XML files below and remove ".template" from the file name:
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_pending_moderation.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2019_06_03_deploy_update_entry_vendor_pending_moderation.php
+
 # Orion 15.1.0 #
 ## New thumbnail API  ##
 - Issue Type: Epic
