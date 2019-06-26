@@ -538,7 +538,7 @@ abstract class KBatchBase implements IKalturaLogger
 			if(!kFile::checkFileExists($path))
 			{
 				KalturaLog::info("Creating temp directory [$path]");
-				mkdir($path, $rights, true);
+				kFile::fullMkfileDir($path, $rights, true);
 			}
 			else
 			{

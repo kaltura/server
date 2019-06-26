@@ -35,7 +35,8 @@ class serveFlavorAction extends kalturaAction
 			$newPrefix = $pathReplace[mt_rand(0, count($pathReplace) - 1)];
 			$fullPath = $newPrefix . substr($fullPath, strlen($pathPrefix));
 		}
-
+		
+		$fullPath = str_replace(array("//", "\\"), array("/", "/"), $fullPath);
 		return $fullPath;
 	}
 
@@ -59,7 +60,7 @@ class serveFlavorAction extends kalturaAction
 	{
 		$source = array(
 			'type' => 'source',
-			'path' => $path,
+			'path' => str_replace('//','/',$path), //Temporary hack need to handle double slash issue in a general way
 		);
 
 		if ($asset && $asset->getEncryptionKey())
@@ -472,7 +473,7 @@ class serveFlavorAction extends kalturaAction
 			{
 				$parent_file_sync = kFileSyncUtils::resolve($file_sync);
 				$path = $this->getFileSyncFullPath($parent_file_sync);
-				if ($fileParam && is_dir($path)) 
+				if ($fileParam && !kFile::isFile($path))
 				{
 					$path .= "/$fileParam";
 				}

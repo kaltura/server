@@ -127,7 +127,7 @@ class kFlowHelper
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
-		if(!file_exists($data->getDestFileLocalPath()))
+		if(!kFile::checkFileExists($data->getDestFileLocalPath()))
 			throw new APIException(APIErrors::INVALID_FILE_NAME, $data->getDestFileLocalPath());
 
 		// get entry
