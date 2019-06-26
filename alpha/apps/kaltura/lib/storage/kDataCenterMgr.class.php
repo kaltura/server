@@ -243,12 +243,12 @@ class kDataCenterMgr
 		
 		// check if file sync path leads to a file or a directory
 		$resolvedPath = $file_sync_resolved->getFullPath();
-		$fileSyncIsDir = is_dir($resolvedPath);
+		$fileSyncIsDir = !kFile::isFile($resolvedPath);
 		if ($fileSyncIsDir && $file_name) {
 			$resolvedPath .= '/'.$file_name;
 		}
 		
-		if (!file_exists($resolvedPath))
+		if (!kFile::checkFileExists($resolvedPath))
 		{
 			$file_name_msg = $file_name ? "file name [$file_name] " : '';
 			$error = "DC[$current_dc_id]: Path for fileSync id [$file_sync_id] ".$file_name_msg."does not exist, resolved path [$resolvedPath]";
@@ -265,7 +265,7 @@ class kDataCenterMgr
 			KExternalErrors::dieError(KExternalErrors::INVALID_TOKEN);
 		}
 				
-		if ($fileSyncIsDir && is_dir($resolvedPath))
+		if ($fileSyncIsDir && !kFile::isFile($resolvedPath))
 		{
 			KalturaLog::log("Serving directory content from [".$resolvedPath."]");
 			$contents = kFile::listDir($resolvedPath);

@@ -60,7 +60,7 @@ abstract class kSharedFileSystemMgr
 	 *
 	 * @return content | error on failure
 	 */
-	abstract protected function doGetFileContent($filePath);
+	abstract protected function doGetFileContent($filePath, $from_byte = 0, $to_byte = -1);
 	
 	
 	/**
@@ -261,7 +261,7 @@ abstract class kSharedFileSystemMgr
 	 *
 	 * @return int
 	 */
-	abstract protected function doRealPath($filePath);
+	abstract protected function doRealPath($filePath, $getRemote = true);
 
 	/**
 	 * dump file in parts
@@ -328,9 +328,11 @@ abstract class kSharedFileSystemMgr
 		return $this->doCopy($fromFilePath, $toFilePath);
 	}
 	
-	public function getFileContent($filePath)
+	public function getFileContent($filePath, $from_byte = 0, $to_byte = -1)
 	{
-		return $this->doGetFileContent($filePath);
+		$filePath = str_replace(array("//", "\\"), array("/", "/"), $filePath);
+		
+		return $this->doGetFileContent($filePath, $from_byte, $to_byte);
 	}
 
 	public function fullMkdir($path, $rights = 0755, $recursive = true)
@@ -422,10 +424,10 @@ abstract class kSharedFileSystemMgr
 		return $this->doIsFile($filePath);
 	}
 	
-	public function realPath($filePath)
+	public function realPath($filePath, $getRemote = true)
 	{
 		$filePath = str_replace(array("//", "\\"), array("/", "/"), $filePath);
-		return $this->doRealPath($filePath);
+		return $this->doRealPath($filePath, $getRemote);
 	}
 
 	/**

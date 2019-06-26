@@ -224,6 +224,12 @@ class kFileBase
     
     static public function getFileContent($file_name, $from_byte = 0, $to_byte = -1, $mode = 'r')
     {
+		if(kString::beginsWith($file_name, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->getFileContent($file_name, $from_byte, $to_byte);
+		}
+    	
         $file_name = self::fixPath($file_name);
 
         try
@@ -378,12 +384,12 @@ class kFileBase
 		return is_file($filePath);
 	}
 	
-	public static function realPath($filePath)
+	public static function realPath($filePath, $getRemote = true)
 	{
 		if(kString::beginsWith($filePath, kSharedFileSystemMgr::getSharedRootPath()))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
-			return $kSharedFsMgr->realPath($filePath);
+			return $kSharedFsMgr->realPath($filePath, $getRemote);
 		}
 		
 		return realpath($filePath);
