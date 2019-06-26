@@ -73,7 +73,6 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	 */
 	protected function parseOutput($output)
 	{
-		KalturaLog::debug("Testing:: parse output 111");
 		$outputlower = strtolower($output);
 		$jsonObj = json_decode($outputlower);
 			// Check for json decode errors caused by inproper utf8 encoding.
@@ -92,26 +91,27 @@ class KFFMpegMediaParser extends KBaseMediaParser
 			}
 			return null;
 		}
-		KalturaLog::debug("Testing:: parse output 111 before parseStreams");
+		
 		$mediaInfo = new KalturaMediaInfo();
 		$mediaInfo->rawData = $output;
 		$this->parseFormat($jsonObj->format, $mediaInfo);
 		if(isset($jsonObj->streams) && count($jsonObj->streams)>0){
 			$this->parseStreams($jsonObj->streams, $mediaInfo);
 		}
-		KalturaLog::debug("Testing:: parse output 111 after parseStreams");
+		
+		
 //		list($silenceDetect, $blackDetect) = self::checkForSilentAudioAndBlackVideo($this->cmdPath, $this->filePath, $mediaInfo);
-		KalturaLog::debug("Testing:: checkScanTypeFlag");
+		
 		if(isset($this->checkScanTypeFlag) && $this->checkScanTypeFlag==true || false)
 			$mediaInfo->scanType = self::checkForScanType($this->cmdPath, $this->filePath);
 		else
 			$mediaInfo->scanType = 0; // Progressive
-		KalturaLog::debug("Testing:: after checkScanTypeFlag");
+		
 		// mov,mp4,m4a,3gp,3g2,mj2 to check is format inside
 		if(in_array($mediaInfo->containerFormat, array("mov","mp4","m4a","3gp","3g2","mj2")) && isset($this->ffprobeBin)){
 			$mediaInfo->isFastStart = self::checkForFastStart($this->ffprobeBin, $this->filePath);
 		}
-		KalturaLog::debug("Testing:: after checkForFastStart");
+		
 		/*
 		 * Detect WVC1 files with 'Progressive Segmented' mode. FFmpeg 2.6 (and earlier) cannot handle them.
 		 * To be handled by mencoder in auto-inter-src mode
@@ -125,7 +125,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 				}
 			}
 		}
-		KalturaLog::debug("Testing:: after videoCodecIdz");
+		
 		KalturaLog::log(print_r($mediaInfo,1));
 		$mediaInfo->contentStreams = json_encode($mediaInfo->contentStreams);
 		return $mediaInfo;
