@@ -36,7 +36,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 			$this->ffprobeBin = "ffprobe";
 		}
 		if(strstr($filePath, "http")===false) {
-			if (!file_exists($filePath))
+			if (!kFile::checkFileExists($filePath))
 				throw new kApplicativeException(KBaseMediaParser::ERROR_NFS_FILE_DOESNT_EXIST, "File not found at [$filePath]");
 		}
 		parent::__construct($filePath);
@@ -99,11 +99,14 @@ class KFFMpegMediaParser extends KBaseMediaParser
 			$this->parseStreams($jsonObj->streams, $mediaInfo);
 		}
 		
+		
 //		list($silenceDetect, $blackDetect) = self::checkForSilentAudioAndBlackVideo($this->cmdPath, $this->filePath, $mediaInfo);
-		if(isset($this->checkScanTypeFlag) && $this->checkScanTypeFlag==true)
+		
+		if(isset($this->checkScanTypeFlag) && $this->checkScanTypeFlag==true || false)
 			$mediaInfo->scanType = self::checkForScanType($this->cmdPath, $this->filePath);
 		else
 			$mediaInfo->scanType = 0; // Progressive
+		
 		// mov,mp4,m4a,3gp,3g2,mj2 to check is format inside
 		if(in_array($mediaInfo->containerFormat, array("mov","mp4","m4a","3gp","3g2","mj2")) && isset($this->ffprobeBin)){
 			$mediaInfo->isFastStart = self::checkForFastStart($this->ffprobeBin, $this->filePath);
@@ -113,7 +116,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		 * Detect WVC1 files with 'Progressive Segmented' mode. FFmpeg 2.6 (and earlier) cannot handle them.
 		 * To be handled by mencoder in auto-inter-src mode
 		 */
-		if(in_array($mediaInfo->videoCodecId,array("wvc1","wmv3"))){
+		if(in_array($mediaInfo->videoCodecId,array("wvc1","wmv3")) || false){
 			$cmd = "$this->cmdPath -i $this->filePath 2>&1 ";
 			$output = shell_exec($cmd);
 			if(strstr($output,"Progressive Segmented")){
@@ -122,6 +125,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 				}
 			}
 		}
+		
 		KalturaLog::log(print_r($mediaInfo,1));
 		$mediaInfo->contentStreams = json_encode($mediaInfo->contentStreams);
 		return $mediaInfo;

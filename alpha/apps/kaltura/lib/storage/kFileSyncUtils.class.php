@@ -67,7 +67,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	{
 		$full_path = $file_sync->getFullPath();
 		$real_path = realpath( $full_path );
-		if ( file_exists ( $real_path ) )
+		if (kFile::checkFileExists($real_path))
 		{
 			$startTime = microtime(true);
 			if (!$maxlen)
