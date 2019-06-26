@@ -17,7 +17,7 @@ abstract class KBaseThumbnailMaker
 	 */
 	public function __construct($srcPath, $targetPath)
 	{
-		if (!file_exists($srcPath))
+		if (!kFile::checkFileExists($srcPath))
 			throw new Exception("File not found at [$srcPath]");
 			
 		$this->srcPath = $srcPath;

@@ -357,15 +357,37 @@ class kFileBase
 	
 	public static function checkFileExists($path)
 	{
+		KalturaLog::debug("Check file exists for file [$path]");
 		if(kString::beginsWith($path, kSharedFileSystemMgr::getSharedRootPath()))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
 			return $kSharedFsMgr->checkFileExists($path);
 		}
 		
-		return file_exist($path);
+		return file_exists($path);
 	}
-
+	
+	public static function isFile($filePath)
+	{
+		if(kString::beginsWith($filePath, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->isFile($filePath);
+		}
+		
+		return is_file($filePath);
+	}
+	
+	public static function realPath($filePath)
+	{
+		if(kString::beginsWith($filePath, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->realPath($filePath);
+		}
+		
+		return realpath($filePath);
+	}
 
 	public static function dumpFilePart($file_name, $range_from, $range_length)
 	{
@@ -378,7 +400,7 @@ class kFileBase
 		return infraRequestUtils::dumpFilePart($file_name, $range_from, $range_length);
 	}
 
-	public static function isDir($path)
+  public static function isDir($path)
 	{
 		if(kString::beginsWith($path, kSharedFileSystemMgr::getSharedRootPath()))
 		{
@@ -388,5 +410,5 @@ class kFileBase
 
 		return is_dir($path);
 	}
-
+  
 }
