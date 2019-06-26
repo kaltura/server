@@ -301,7 +301,8 @@ class uiConfDeployment
 	{
 		return new Zend_Config_Ini($conf_file_path);
  	}
-	
+
+
 	/**
 	 *
 	 * Reads the config file from the given path
@@ -310,7 +311,7 @@ class uiConfDeployment
 	public static function readConfFileFromPath($file_path)
 	{
 		global $arguments;
-		
+
 		if(!file_exists($file_path)) {
 			if(!file_exists(dirname($arguments['ini'])))
 			{
@@ -321,7 +322,7 @@ class uiConfDeployment
 				$file_path = dirname($arguments['ini']).DIRECTORY_SEPARATOR.$file_path;
 			}
 		}
-		
+
 		$file_content = file_get_contents($file_path);
 		return $file_content;
 	}
@@ -349,29 +350,6 @@ class uiConfDeployment
 		}
 	}
 
-	/**
-	 *
-	 * Reads the config file from the given path
-	 * @param string $file_path
-	 */
-	public static function readConfFileFromPath($file_path)
-	{
-		global $arguments;
-
-		if(!file_exists($file_path)) {
-			if(!file_exists(dirname($arguments['ini'])))
-			{
-				return FALSE;
-			}
-			else
-			{
-				$file_path = dirname($arguments['ini']).DIRECTORY_SEPARATOR.$file_path;
-			}
-		}
-
-		$file_content = file_get_contents($file_path);
-		return $file_content;
-	}
 
 	/**
 	 *
