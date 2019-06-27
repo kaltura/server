@@ -338,4 +338,18 @@ class UserLoginData extends BaseUserLoginData{
 	{
 		return array("userLoginData:id=".strtolower($this->getId()), "userLoginData:loginEmail=".strtolower($this->getLoginEmail()));
 	}
+
+	public function isTwoFactorAuthenticationRequired(kuser $dbUser)
+	{
+		$partnerIds = $dbUser->getAllowedPartnerIds();
+		$partners = PartnerPeer::retrieveByPKs($partnerIds);
+		foreach ($partners as $partner)
+		{
+			if($partner->getUseTwoFactorAuthentication())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 } // UserLoginData
