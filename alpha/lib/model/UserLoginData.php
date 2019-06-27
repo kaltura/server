@@ -345,7 +345,6 @@ class UserLoginData extends BaseUserLoginData{
 		$partners = PartnerPeer::retrieveByPKs($partnerIds);
 		foreach ($partners as $partner)
 		{
-
 			if($partner->getUseTwoFactorAuthentication())
 			{
 				return true;
