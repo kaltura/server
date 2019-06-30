@@ -780,11 +780,11 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 	{
 		if ($inputFilter->from_date)
 		{
-			$c->addAnd(UserEntryPeer::UPDATED_AT, $inputFilter->from_date, Criteria::GREATER_EQUAL);
+			$c->addAnd('UPDATED_AT', $inputFilter->from_date, Criteria::GREATER_EQUAL);
 		}
 		if ($inputFilter->to_date )
 		{
-			$c->addAnd(UserEntryPeer::UPDATED_AT, $inputFilter->to_date, Criteria::LESS_EQUAL);
+			$c->addAnd('UPDATED_AT', $inputFilter->to_date, Criteria::LESS_EQUAL);
 		}
 	}
 
