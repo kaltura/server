@@ -96,7 +96,7 @@ abstract class KOperationEngine
 	
 	protected function doOperation()
 	{
-		if(!file_exists($this->inFilePath))
+		if(!kFileBase::checkFileExists($this->inFilePath))
 			throw new KOperationEngineException("File [$this->inFilePath] does not exist");
 
 		$cmd = $this->getCmdLine();

@@ -119,12 +119,12 @@ abstract class kSharedFileSystemMgr
 	/**
 	 * Copy a file
 	 *
-	 * @param $url $remoteUrl
+	 * @param $resource resource to fetch
 	 * @param $destFilePath file name to save remote content to
 	 *
 	 * @return true / false according to success
 	 */
-	abstract protected function doGetFileFromRemoteUrl($url, $destFilePath = null, $allowInternalUrl = false);
+	abstract protected function doGetFileFromResource($resource, $destFilePath = null, $allowInternalUrl = false);
 
 	/**
 	 * creates a directory using the dirname of the specified path
@@ -292,6 +292,24 @@ abstract class kSharedFileSystemMgr
 	 * @return mixed
 	 */
 	abstract protected function doChgrp($filePath, $contentGroup);
+	
+	/**
+	 * Get file path last modified time
+	 *
+	 * @param $filePath
+	 * @return mixed
+	 */
+	abstract protected function doFilemtime($filePath);
+	
+	/**
+	 * Move local file to shared dir
+	 *
+	 * @param $from - From file path
+	 * @param to - to file path
+	 * @param $copy - should copy
+	 * @return mixed
+	 */
+	abstract protected function doMoveLocalToShared($from, $to, $copy = false);
 
 	/**
 	 *
@@ -317,9 +335,9 @@ abstract class kSharedFileSystemMgr
 		return $this->doGetFile($filePath);
 	}
 	
-	public function getFileFromRemoteUrl($url, $destFilePath = null)
+	public function getFileFromRemoteUrl($url, $destFilePath = null, $allowInternalUrl = false)
 	{
-		return $this->doGetFileFromRemoteUrl($url, $destFilePath);
+		return $this->doGetFileFromResource($url, $destFilePath, $allowInternalUrl);
 	}
 	
 	public function unlink($filePath)
@@ -344,12 +362,12 @@ abstract class kSharedFileSystemMgr
 	
 	public function copy($fromFilePath, $toFilePath)
 	{
-		$from = str_replace(array("//", "\\"), array("/", "/"), $from);
-		$to = str_replace(array("//", "\\"), array("/", "/"), $to);
+		$fromFilePath = str_replace(array("//", "\\"), array("/", "/"), $fromFilePath);
+		$toFilePath = str_replace(array("//", "\\"), array("/", "/"), $toFilePath);
 		
-		if (!kString::beginsWith($from, self::$kSharedRootPath))
+		if (!kString::beginsWith($fromFilePath, self::$kSharedRootPath))
 		{
-			return $this->doPutFileContent($toFilePath, $fromFilePath);
+			return $this->doMoveLocalToShared($fromFilePath, $toFilePath, true);
 		}
 		
 		return $this->doCopy($fromFilePath, $toFilePath);
@@ -374,7 +392,7 @@ abstract class kSharedFileSystemMgr
 		
 		if (!kString::beginsWith($from, self::$kSharedRootPath))
 		{
-			return $this->doGetFileFromRemoteUrl($from, $to);
+			return $this->doMoveLocalToShared($from, $to);
 		}
 		
 		return $this->doMoveFile($from, $to, $override_if_exists, $copy);
@@ -440,7 +458,7 @@ abstract class kSharedFileSystemMgr
 		
 		if (!kString::beginsWith($from, self::$kSharedRootPath))
 		{
-			return $this->doGetFileFromRemoteUrl($from, $to);
+			return $this->doMoveLocalToShared($from, $to, !$deleteSrc);
 		}
 		
 		return $this->doRename($from, $to);
@@ -593,5 +611,9 @@ abstract class kSharedFileSystemMgr
 	{
 		return $this->doChgrp($filePath, $contentGroup);
 	}
-
+	
+	public function filemtime($filePath)
+	{
+		return $this->doFilemtime($filePath);
+	}
 }

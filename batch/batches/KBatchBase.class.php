@@ -416,12 +416,7 @@ abstract class KBatchBase implements IKalturaLogger
 
 	protected static function foldersize($path)
 	{
-	  if(!kFile::checkFileExists($path)) return 0;
-	  if(kFile::isFile($path)) return kFile::fileSize($path);
-	  $ret = 0;
-	  foreach(glob($path."/*") as $fn)
-	    $ret += KBatchBase::foldersize($fn);
-	  return $ret;
+	  kFile::getFolderSize($path);
 	}
 
 	protected function setFilePermissions($filePath)
