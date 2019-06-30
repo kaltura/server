@@ -1,3 +1,18 @@
+# Orion 15.2.0 #
+
+## add custom_data column to upload_token DB table ##
+
+ - Issue Type: Task
+- Issue ID: PLAT-9971
+
+ ### Configuration ###
+
+	None.
+
+ #### Deployment Scripts ####
+
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_06_16_alter_upload_token_table_custom_data_field.sql
+
 # Orion 15.1.0 #
 ## New thumbnail API  ##
 - Issue Type: Epic
