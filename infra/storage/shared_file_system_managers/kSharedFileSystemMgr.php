@@ -318,6 +318,16 @@ abstract class kSharedFileSystemMgr
 	 */
 	abstract protected function doDir($filePath);
 
+	/**
+	 * copy dir from src to dest
+	 *
+	 * @param $src
+	 * @param $dest
+	 * @param $deleteSrc
+	 * @return bool
+	 */
+	abstract protected function doCopyDir($src, $dest, $deleteSrc);
+
 	public function createDirForPath($filePath)
 	{
 		return $this->doCreateDirForPath($filePath);
@@ -616,4 +626,10 @@ abstract class kSharedFileSystemMgr
 	{
 		return $this->doFilemtime($filePath);
 	}
+
+	public function copyDir($src, $dest, $deleteSrc)
+	{
+		return $this->doCopyDir($src, $dest, $deleteSrc);
+	}
+
 }

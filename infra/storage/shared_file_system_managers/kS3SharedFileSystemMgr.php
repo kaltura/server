@@ -392,10 +392,20 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return true;
 	}
 
-	protected function doCopySingleFile($src, $dest, $deleteSrc, $fromLocal = true)
+	protected function doCopySingleFile($src, $dest, $deleteSrc)
 	{
-		$srcContent = kFile::getFileContent($src);
-		if (!$this->putFileContent($dest ,$srcContent))
+		if(kString::beginsWith($src, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			return $this->copyFileLocalToShared($src, $dest, $deleteSrc);
+		}
+
+		return $this->copyFileFrimShared($src, $dest, $deleteSrc);
+	}
+
+	protected function copyFileLocalToShared($src, $dest, $deleteSrc)
+	{
+		$result = $this->doGetFileFromResource($src, $dest);
+		if (!$result)
 		{
 			KalturaLog::err("Failed to upload file: [$src] to [$dest]");
 			return false;
@@ -404,6 +414,25 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			KalturaLog::err("Failed to delete source file : [$src]");
 			return false;
+		}
+		return true;
+	}
+
+	protected function copyFileFromShared($src, $dest, $deleteSrc)
+	{
+		$srcUrl = $this->doRealPath($src);
+		$srcContent = $this->doGetFileContent($srcUrl);
+
+		$result = kFile::filePutContents($dest, $srcContent, 0, null);
+
+		if (!$result)
+		{
+			KalturaLog::err("Failed to upload file: [$src] to [$dest]");
+			return false;
+		}
+		if ($deleteSrc)
+		{
+			return $this->deleteFile($srcUrl);
 		}
 		return true;
 	}
@@ -497,11 +526,9 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				array(
 					'Bucket' => $bucket,
 					'Key' => $filePath,
-					'Bucket' => $bucket,
-					'Key' => $filePath,
 					'UploadId' => $uploadId
 				));
-			KalturaLog::debug("Upload of [$destFilePath] failed");
+			KalturaLog::debug("Upload of [$filePath] failed");
 		}
 		catch (S3Exception $e)
 		{
@@ -654,8 +681,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function doFilemtime($filePath)
 	{
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
-		
-		$response = $s3->getObject(array(
+
+		$fileList = $this->s3->getObject(array(
 			'Bucket' => $bucket,
 			'Key'    => $filePath
 		));
@@ -678,4 +705,45 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		@unlink($from);
 		return $res;
 	}
+
+	protected function doGetListObjectsPaginator($filePath)
+	{
+		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
+
+		$paginator = $this->s3->getPaginator('ListObjects', array(
+			'Bucket' => $bucket,
+			'Prefix' => $filePath
+		));
+
+		return $paginator;
+	}
+
+	protected function doCopyDir($src, $dest, $deleteSrc)
+	{
+
+		$paginator = $this->s3->doGetListObjectsPaginator($src);
+
+		foreach ($paginator as $page)
+		{
+			foreach ($page['Contents'] as $object)
+			{
+				if(kFile::isDir($object['Key']))
+				{
+					KalturaLog::err("Copying of non-flat directories is illegal");
+					return false;
+				}
+
+				$fileName = basename($object['Key']);
+
+				$res = kFile::copySingleFile ($object['Key'], $dest . DIRECTORY_SEPARATOR . $fileName , $deleteSrc);
+				if (! $res)
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+
 }

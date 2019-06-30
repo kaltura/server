@@ -75,12 +75,12 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function doGetFileFromResource($resource, $destFilePath = null, $allowInternalUrl = false)
 	{
 		$curlWrapper = new KCurlWrapper();
-		$res = $curlWrapper->exec($url, $destFilePath, null, $allowInternalUrl);
+		$res = $curlWrapper->exec($resource, $destFilePath, null, $allowInternalUrl);
 		
 		$httpCode = $curlWrapper->getHttpCode();
 		if (KCurlHeaderResponse::isError($httpCode))
 		{
-			KalturaLog::info("curl request [$url] return with http-code of [$httpCode]");
+			KalturaLog::info("curl request [$resource] return with http-code of [$httpCode]");
 			if ($destFilePath && file_exists($destFilePath))
 				unlink($destFilePath);
 			$res = false;
@@ -224,7 +224,7 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function doListFiles($filePath, $pathPrefix = '')
 	{
 		$fileList = array();
-		$path = str_ireplace(DIRECTORY_SEPARATOR, '/', $path);
+		$path = str_ireplace(DIRECTORY_SEPARATOR, '/', $filePath);
 		$handle = opendir($path);
 		if ($handle)
 		{
@@ -264,7 +264,7 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doDumpFilePart($filePath, $range_from, $range_length)
 	{
-		return infraRequestUtils::dumpFilePart($this->filePath, $rangeFrom, $rangeLength);
+		return infraRequestUtils::dumpFilePart($this->filePath, $range_from, $range_length);
 	}
 	
 	protected function doChgrp($filePath, $contentGroup)
@@ -279,7 +279,7 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doChown($path, $user, $group)
 	{
-		passthru("chown $user:$group $localPath", $ret);
+		passthru("chown $user:$group $path", $ret);
 		return $ret;
 	}
 	
@@ -296,5 +296,31 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		
 		return rename($from, $to);
+	}
+
+	protected function doCopyDir($src, $dest, $deleteSrc)
+	{
+		$dir = dir($src);
+		while ( false !== $entry = $dir->read () )
+		{
+			if ($entry == '.' || $entry == '..')
+			{
+				continue;
+			}
+
+			$newSrc = $src . DIRECTORY_SEPARATOR . $entry;
+			if(kFile::isDir($newSrc))
+			{
+				KalturaLog::err("Copying of non-flat directories is illegal");
+				return false;
+			}
+
+			$res = kFile::copySingleFile ($newSrc, $dest . DIRECTORY_SEPARATOR . $entry , $deleteSrc);
+			if (! $res)
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 }
