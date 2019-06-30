@@ -27,16 +27,16 @@ class KDistributedFileManager
 	{
 		KalturaLog::info("Translating remote path [$remotePath] to local path [$localPath]");
 				
-		if(file_exists($localPath))
+		if(kFile::checkFileExists($localPath))
 		{
 			if(!$this->fileCacheTimeout)
 				return true;
 			
 			clearstatcache();
-			if(filemtime($localPath) > (time() - $this->fileCacheTimeout))
+			if(kFile::filemtime($localPath) > (time() - $this->fileCacheTimeout))
 				return true;
 				
-			@unlink($localPath);
+			kFile::unlink($localPath);
 		}
 		$fetched = true;
 		$res = $this->fetchFile($remotePath, $localPath, $errDescription);
@@ -72,8 +72,8 @@ class KDistributedFileManager
 		try
 		{
 			$folder = substr($localPath, 0, strrpos($localPath, '/'));
-			if(!file_exists($folder))
-				mkdir($folder, 777, true);
+			if(!kFile::checkFileExists($folder))
+				kFile::fullMkdir($folder, 777, true);
 			
 			$curlWrapper = new KCurlWrapper();
 			$curlHeaderResponse = $curlWrapper->getHeader($remotePath, true);
@@ -98,7 +98,7 @@ class KDistributedFileManager
 			// overcome a 32bit issue with curl fetching >=4gb files
 			if (intval("9223372036854775807") == 2147483647 && $fileSize >= 4 * 1024 * 1024 * 1024)
 			{
-				unlink($localPath);
+				kFile::unlink($localPath);
         		$cmd = "curl -s $remotePath -o $localPath";
 				KalturaLog::debug($cmd);
         		exec($cmd);

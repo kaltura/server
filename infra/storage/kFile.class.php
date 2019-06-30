@@ -308,7 +308,7 @@ class kFile extends kFileBase
 		}
 		
 		// Validation
-		if(!file_exists($from))
+		if(!kFile::checkFileExists($from))
 		{
 			KalturaLog::err("Source doesn't exist [$from]");
 			return false;
@@ -326,7 +326,7 @@ class kFile extends kFileBase
 			self::deleteFile($to);
 		}
 		
-		if(! is_dir(dirname($to)))
+		if(!kFile::isDir(dirname($to)))
 		{
 			self::fullMkdir($to);
 		}

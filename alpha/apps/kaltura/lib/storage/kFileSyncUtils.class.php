@@ -408,7 +408,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			
 			$dirFullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $dirFullPath);
 	
-			if (file_exists($dirFullPath))
+			if (kFile::checkFileExists($dirFullPath))
 			{
 				$time = time(); 
 				$dirFullPath .= $time;

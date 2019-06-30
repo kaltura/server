@@ -276,15 +276,15 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return true;
 	}
 	
-	protected function doGetFileFromRemoteUrl($url, $destFilePath = null, $allowInternalUrl = false)
+	protected function doGetFileFromResource($resource, $destFilePath = null, $allowInternalUrl = false)
 	{
 		stream_wrapper_restore('http');
 		stream_wrapper_restore('https');
 		
-		$sourceFH = fopen($url, 'rb');
+		$sourceFH = fopen($resource, 'rb');
 		if(!$sourceFH)
 		{
-			KalturaLog::err("Could not open source file [$url] for read");
+			KalturaLog::err("Could not open source file [$resource] for read");
 			return false;
 		}
 		
@@ -295,7 +295,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			'Key'          => $filePath,
 		]);
 		$uploadId = $result['UploadId'];
-		KalturaLog::debug("Starting multipart upload for [$url] to [$destFilePath] with upload id [$uploadId]");
+		KalturaLog::debug("Starting multipart upload for [$resource] to [$destFilePath] with upload id [$uploadId]");
 		
 		// Upload the file in parts.
 		try
@@ -364,7 +364,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$from = str_replace("\\", "/", $from);
 		$to = str_replace("\\", "/", $to);
 
-		if(!$this->checkFileExists($from))
+		if(!$this->doCheckFileExists($from))
 		{
 			KalturaLog::err("file [$from] does not exist locally or on external storage");
 			return false;
@@ -502,7 +502,9 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 					'UploadId' => $uploadId
 				));
 			KalturaLog::debug("Upload of [$destFilePath] failed");
-		} catch (S3Exception $e) {
+		}
+		catch (S3Exception $e)
+		{
 			KalturaLog::err("Couldn't abort multipart upload for [$filePath] on bucket [$bucket]. Error: {$e->getMessage()}");
 			return false;
 		}
@@ -599,7 +601,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function doDumpFilePart($filePath, $range_from, $range_length)
 	{
 		$defaultChunkSize = 100000;
-		$exist = $this->checkFileExists($filePath);
+		$exist = $this->doCheckFileExists($filePath);
 		if($exist)
 		{
 			while($range_from <= $range_length)
@@ -647,5 +649,33 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function doChown($path, $user, $group)
 	{
 		return true;
+	}
+	
+	protected function doFilemtime($filePath)
+	{
+		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
+		
+		$response = $s3->getObject(array(
+			'Bucket' => $bucket,
+			'Key'    => $filePath
+		));
+		
+		return $fileList['Last-Modified'];
+	}
+	
+	protected function doMoveLocalToShared($from, $to, $copy = false)
+	{
+		$res = $this->doGetFileFromResource($from, $to);
+		if(!$res)
+		{
+			KalturaLog::debug("Failed to move local file [$from] to shared [$to]");
+			return $res;
+		}
+		
+		if($copy)
+			return $res;
+		
+		@unlink($from);
+		return $res;
 	}
 }

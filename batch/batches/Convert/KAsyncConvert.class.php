@@ -177,7 +177,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			}
 			if(!$data->flavorParamsOutput->sourceRemoteStorageProfileId)
 			{
-				if(!file_exists($srcFileSyncDescriptor->actualFileSyncLocalPath))
+				if(!kFile::checkFileExists($srcFileSyncDescriptor->actualFileSyncLocalPath))
 					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $srcFileSyncDescriptor->actualFileSyncLocalPath does not exist", KalturaBatchJobStatus::RETRY);
 				
 				if(!self::$taskConfig->params->skipSourceValidation && !is_file($srcFileSyncDescriptor->actualFileSyncLocalPath))
@@ -339,7 +339,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		{
 			$i++;
 			clearstatcache();
-			$directorySync = is_dir($destFileSync->fileSyncLocalPath);
+			$directorySync = kFile::isDir($destFileSync->fileSyncLocalPath);
 			if($directorySync)
 				$fileSize=KBatchBase::foldersize($destFileSync->fileSyncLocalPath);
 			else

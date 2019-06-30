@@ -122,6 +122,12 @@ class kFileBase
     // make sure the file is closed , then remove it
     public static function deleteFile($file_name)
     {
+		if(kString::beginsWith($file_name, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->unlink($path, $rights, $recursive);
+		}
+    	
         $fh = fopen($file_name, 'w') or die("can't open file");
         fclose($fh);
         unlink($file_name);
@@ -440,5 +446,69 @@ class kFileBase
 
 		return chgrp($filePath, $contentGroup);
 	}
-  
+	
+	public static function unlink($filePath)
+	{
+		if(kString::beginsWith($filePath, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->unlink($filePath, $contentGroup);
+		}
+		
+		return @unlink($filePath);
+	}
+	
+	public static function filemtime($filePath)
+	{
+		if(kString::beginsWith($filePath, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->filemtime($filePath, $contentGroup);
+		}
+		
+		return filemtime($filePath);
+	}
+	
+	public static function getFolderSize($filePath)
+	{
+		if(!kFile::checkFileExists($path))
+		{
+			return 0;
+		}
+			
+		if(kFile::isFile($path))
+		{
+			return kFile::fileSize($path);
+		}
+		
+		$ret = 0;
+		foreach(glob($path."/*") as $fn)
+		{
+			$ret += self::getFolderSize($fn);
+		}
+			
+		return $ret;
+	}
+	
+	public static function rename($from, $to)
+	{
+		if(kString::beginsWith($to, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->rename($from, $to);
+		}
+		
+		return rename($from, $to);
+	}
+	
+	public static function copy($from, $to)
+	{
+		if(kString::beginsWith($to, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->copy($from, $to);
+		}
+		
+		return copy($from, $to);
+	}
 }

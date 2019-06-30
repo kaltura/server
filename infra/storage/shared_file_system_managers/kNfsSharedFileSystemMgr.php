@@ -32,7 +32,6 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doGetFileContent($filePath, $from_byte = 0, $to_byte = -1)
 	{
-		
 		return file_get_contents($filePath);
 	}
 	
@@ -73,7 +72,7 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 		return copy($fromFilePath, $toFilePath);
 	}
 	
-	protected function doGetFileFromRemoteUrl($url, $destFilePath = null, $allowInternalUrl = false)
+	protected function doGetFileFromResource($resource, $destFilePath = null, $allowInternalUrl = false)
 	{
 		$curlWrapper = new KCurlWrapper();
 		$res = $curlWrapper->exec($url, $destFilePath, null, $allowInternalUrl);
@@ -282,5 +281,20 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		passthru("chown $user:$group $localPath", $ret);
 		return $ret;
+	}
+	
+	protected function doFilemtime($filePath)
+	{
+		return filemtime($filePath);
+	}
+	
+	protected function doMoveLocalToShared($from, $to, $copy = false)
+	{
+		if($copy)
+		{
+			return copy($from, $to);
+		}
+		
+		return rename($from, $to);
 	}
 }
