@@ -607,8 +607,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 	protected function getQuestionCountByQusetionIds($objectIds, $reportFilter)
 	{
 		$questionIds = baseObjectUtils::getObjectIdsAsArray($objectIds);
-		//$c = new KalturaCriteria();
-		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
+		$c = new Criteria();
 		$c->add(CuePointPeer::ID, $questionIds, Criteria::IN);
 		$this->addToCriteria($c, $reportFilter);
 		$numOfquestions = CuePointPeer::doCount($c);
