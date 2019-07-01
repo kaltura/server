@@ -8,8 +8,9 @@ class kZoomEvent implements iZoomObject
 	const EVENT = 'event';
 	const ACCOUNT_ID = 'account_id';
 	const DOWNLOAD_TOKEN = 'download_token';
-	const RECORDING_VIDEO_COMPLETED = 'recording.completed';
-	const RECORDING_TRANSCRIPT_COMPLETED = 'recording.transcript_completed';
+	const RECORDING_VIDEO_COMPLETED = 'recording_completed';
+	const RECORDING_TRANSCRIPT_COMPLETED = 'recording_transcript_completed';
+	const PAYLOAD = 'payload';
 
 	public $accountId;
 	public $eventType;
@@ -19,13 +20,14 @@ class kZoomEvent implements iZoomObject
 	public function parseData($data)
 	{
 		$this->setEventType($data[self::EVENT]);
-		$this->accountId = $data[self::ACCOUNT_ID];
 		if(isset($data[self::DOWNLOAD_TOKEN]))
 		{
 			$this->downloadToken = $data[self::DOWNLOAD_TOKEN];
 		}
 
-		$this->parseObject[$data];
+		$payload = $data[self::PAYLOAD];
+		$this->accountId = $payload[self::ACCOUNT_ID];
+		$this->parseObject($payload);
 	}
 
 	protected function parseObject($data)
@@ -37,6 +39,8 @@ class kZoomEvent implements iZoomObject
 				$this->object->parseData($data[kZoomMeeting::MEETING_OBJECT]);
 				break;
 			case kEventType::RECORDING_TRANSCRIPT_COMPLETED:
+				$this->object = new kZoomTranscriptCompleted();
+				$this->object->parseData($data[kZoomTranscriptCompleted::TRANSCRIPT_OBJECT]);
 				break;
 			default:
 		}

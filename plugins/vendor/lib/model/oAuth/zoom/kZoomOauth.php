@@ -141,14 +141,15 @@ class kZoomOauth
 
 	/**
 	 * verify header token, if not equal die
-	 * @param $zoomConfiguration
+	 * @param array $zoomConfiguration
 	 */
 	public static function verifyHeaderToken($zoomConfiguration)
 	{
-		if (isset($_SERVER[self::AUTHORIZATION_HEADER]))
+		$headers = getallheaders();
+		if (isset($headers[self::AUTHORIZATION_HEADER]))
 		{
 			$verificationToken = $zoomConfiguration[self::VERIFICATION_TOKEN];
-			if ($verificationToken === $_SERVER[self::AUTHORIZATION_HEADER])
+			if ($verificationToken === $headers[self::AUTHORIZATION_HEADER])
 			{
 				return;
 			}

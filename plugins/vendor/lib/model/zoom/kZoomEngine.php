@@ -9,8 +9,11 @@ class kZoomEngine
 	const ADMIN_TAG_ZOOM = 'zoomentry';
 	const PHP_INPUT = 'php://input';
 	const URL_ACCESS_TOKEN = '?access_token=';
+	const REFERENCE_FILTER = '_eq_reference_id';
+	const ZOOM_PREFIX = 'Zoom_';
 
 	protected static $FILE_VIDEO_TYPES = array('MP4');
+	protected static $FILE_CAPTION_TYPES = array('TRANSCRIPT');
 	protected $zoomConfiguration;
 	protected $zoomClient;
 
@@ -30,8 +33,8 @@ class kZoomEngine
 	public function parseEvent()
 	{
 		kZoomOauth::verifyHeaderToken($this->zoomConfiguration);
-		$data = $this->getPayloadData();
-		KalturaLog::debug('Zoom event payload is ' . print_r($data, true));
+		$data = $this->getRequestData();
+		KalturaLog::debug('Zoom event data is ' . print_r($data, true));
 		$event = new kZoomEvent();
 		$event->parseData($data);
 		return $event;
@@ -48,6 +51,7 @@ class kZoomEngine
 				$this->handleRecordingVideoComplete($event);
 				break;
 			case kEventType::RECORDING_TRANSCRIPT_COMPLETED:
+				$this->handleRecordingTranscriptComplete($event);
 				break;
 		}
 	}
@@ -56,11 +60,55 @@ class kZoomEngine
 	 * @return mixed
 	 * @throws Exception
 	 */
-	protected function getPayloadData()
+	protected function getRequestData()
 	{
 		$request_body = file_get_contents(self::PHP_INPUT);
 		$data = json_decode($request_body, true);
 		return $data;
+	}
+
+	/**
+	 * @param kZoomEvent $event
+	 */
+	protected function handleRecordingTranscriptComplete($event)
+	{
+		/* @var kZoomTranscriptCompleted $transcript */
+		$transcript = $event->object;
+		$entry = $this->getZoomEntryByReferenceId($transcript->id);
+		$captionAssetService = new CaptionAssetService();
+		$captionAssetService->initService('caption_captionasset', 'captionasset', 'setContent');
+		foreach ($transcript->recordingFiles as $recordingFile)
+		{
+			/* @var kZoomRecordingFile $recordingFile */
+
+			if (!in_array ($recordingFile->fileType, self::$FILE_CAPTION_TYPES))
+			{
+				continue;
+			}
+
+			$captionAsset = $this->createAssetForTranscription($entry);
+			$captionAssetResource = new KalturaUrlResource();
+			$captionAssetResource->url = $recordingFile->download_url . self::URL_ACCESS_TOKEN . $event->downloadToken;
+			$captionAssetService->setContentAction($captionAsset->getId(), $captionAssetResource);
+		}
+	}
+
+	protected function getZoomEntryByReferenceId($meetingId)
+	{
+		$entryFilter = new entryFilter();
+		$pager = new KalturaFilterPager();
+		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
+		$entryFilter->set(self::REFERENCE_FILTER, self::ZOOM_PREFIX . $meetingId);
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$pager->attachToCriteria($c);
+		$entryFilter->attachToCriteria($c);
+		$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
+		if (kEntitlementUtils::getEntitlementEnforcement() && !kCurrentContext::$is_admin_session && entryPeer::getUserContentOnly())
+		{
+			entryPeer::setFilterResults(true);
+		}
+
+		return entryPeer::doSelectOne($c);
 	}
 
 	/**
@@ -162,7 +210,7 @@ class kZoomEngine
 	 */
 	protected function createEntryDescriptionFromMeeting($meeting)
 	{
-		return "Zoom Recording ID: {$meeting->id}\nMeeting Time: {$meeting->start_time}";
+		return "Zoom Recording ID: {$meeting->id}\nMeeting Time: {$meeting->startTime}";
 	}
 
 	/**
@@ -199,9 +247,19 @@ class kZoomEngine
 		return $entry;
 	}
 
-	protected function handleRecordingTranscriptComplete($data)
+	/**
+	 * @param entry $entry
+	 * @return CaptionAsset
+	 */
+	public function createAssetForTranscription($entry)
 	{
-
+		$caption = new CaptionAsset();
+		$caption->setEntryId($entry->getId());
+		$caption->setPartnerId($entry->getPartnerId());
+		$caption->setContainerFormat(CaptionType::WEBVTT);
+		$caption->setStatus(CaptionAsset::ASSET_STATUS_QUEUED);
+		$caption->save();
+		return $caption;
 	}
 
 	/**
