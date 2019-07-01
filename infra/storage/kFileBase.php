@@ -63,7 +63,7 @@ class kFileBase
 			return $kSharedFsMgr->chmod($filePath, $mode);
 		}
     	
-        chmod($filePath, $mode);
+        return chmod($filePath, $mode);
     }
 	
 	public static function chown($filePath, $user, $group)
@@ -74,7 +74,7 @@ class kFileBase
 			return $kSharedFsMgr->chown($filePath,  $user, $group);
 		}
 		
-		passthru("chown $user:$group $localPath", $ret);
+		passthru("chown $user:$group $filePath", $ret);
 		
 		return $ret;
 	}
@@ -125,7 +125,7 @@ class kFileBase
 		if(kString::beginsWith($file_name, kSharedFileSystemMgr::getSharedRootPath()))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
-			return $kSharedFsMgr->unlink($path, $rights, $recursive);
+			return $kSharedFsMgr->unlink($file_name);
 		}
     	
         $fh = fopen($file_name, 'w') or die("can't open file");
@@ -452,7 +452,7 @@ class kFileBase
 		if(kString::beginsWith($filePath, kSharedFileSystemMgr::getSharedRootPath()))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
-			return $kSharedFsMgr->unlink($filePath, $contentGroup);
+			return $kSharedFsMgr->unlink($filePath);
 		}
 		
 		return @unlink($filePath);
@@ -463,13 +463,13 @@ class kFileBase
 		if(kString::beginsWith($filePath, kSharedFileSystemMgr::getSharedRootPath()))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
-			return $kSharedFsMgr->filemtime($filePath, $contentGroup);
+			return $kSharedFsMgr->filemtime($filePath);
 		}
 		
 		return filemtime($filePath);
 	}
 	
-	public static function getFolderSize($filePath)
+	public static function getFolderSize($path)
 	{
 		if(!kFile::checkFileExists($path))
 		{
@@ -511,4 +511,59 @@ class kFileBase
 		
 		return copy($from, $to);
 	}
+
+	public static function mkdir($path)
+	{
+		if(kString::beginsWith($path, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->mkdir($path);
+		}
+
+		return mkdir($path);
+	}
+
+	public static function rmdir($path)
+	{
+		if(kString::beginsWith($path, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->rmdir($path);
+		}
+
+		return rmdir($path);
+	}
+
+	public static function copyDir($src, $dest, $deleteSrc)
+	{
+		if(kString::beginsWith($src, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->copyDir($src);
+		}
+
+		$dir = dir($src);
+		while ( false !== $entry = $dir->read () )
+		{
+			if ($entry == '.' || $entry == '..')
+			{
+				continue;
+			}
+
+			$newSrc = $src . DIRECTORY_SEPARATOR . $entry;
+			if(kFile::isDir($newSrc))
+			{
+				KalturaLog::err("Copying of non-flat directories is illegal");
+				return false;
+			}
+
+			$res = kFile::copySingleFile ($newSrc, $dest . DIRECTORY_SEPARATOR . $entry , $deleteSrc);
+			if (! $res)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 }
