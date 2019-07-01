@@ -45,8 +45,6 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		ESearchEntryFilterFields::END_DATE,
 		ESearchEntryFilterFields::REFERENCE_ID,
 		ESearchEntryFilterFields::ROOT_ENTRY_ID,
-		ESearchEntryFilterFields::VIEWS,
-		ESearchEntryFilterFields::PLAYS,
 		ESearchEntryFilterFields::DURATION,
 		ESearchEntryFilterFields::CATEGORIES,
 		ESearchEntryFilterFields::CATEGORIES_IDS,

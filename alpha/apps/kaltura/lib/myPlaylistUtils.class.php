@@ -551,7 +551,7 @@ class myPlaylistUtils
 		$typeArray = array_merge($typeArray, KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP));
 		$typeArray = array_unique(array_merge($typeArray, KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::LIVE_STREAM)));
 		$entryFilter->set ( "_in_type" , implode(',',$typeArray) );
-		$entryFilter->set( "_eq_status" , entryStatus::READY );  //needed?
+		$entryFilter->set( "_eq_status" , entryStatus::READY );
 		$entryFilter->set("_notin_moderation_status", self::$moderationStatusesNotIn);
 		if (!self::$isAdminKs)
 		{
