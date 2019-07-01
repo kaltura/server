@@ -26,6 +26,10 @@ class myPlaylistUtils
 		self::$isAdminKs = $v;
 	}
 
+	protected static $moderationStatusesNotIn = array(
+		entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION,
+		entry::ENTRY_MODERATION_STATUS_REJECTED);
+
 	/**
 	 * Playlist is an entry of type ENTRY_TYPE_PLAYLIST = 5.
 	 * Within this type there are 3 media_types to tell the difference between dynamic,static and external playslits:
@@ -483,6 +487,78 @@ class myPlaylistUtils
 		}
 		return $entry_filters;
 	}
+
+	public static function executeDynamicPlaylistViaEsearch ($partnerId , $xml , $pager = null)
+	{
+		list ($totalResults, $listOfFilters) = self::getPlaylistFilterListStruct($xml);
+		if (!$listOfFilters)
+		{
+			return null;
+		}
+		$entry_filters = self::fillEntryFilterFromXml($listOfFilters, $partnerId);
+		$entryKPager = new kPager();
+		if ($pager)
+		{
+			$pager->toObject($entryKPager);
+		}
+		$entryQueryToFilterESearch = new ESearchEntryQueryFromFilter();
+		$entryIds= array();
+		foreach ($entry_filters as $entry_filter)
+		{
+			list ($currEntryIds, $count) = $entryQueryToFilterESearch->retrieveElasticQueryEntryIds($entry_filter, $entryKPager);
+			if (count($currEntryIds) > $entry_filter->get('_limit'))
+			{
+				$currEntryIds = array_slice($currEntryIds,0,$entry_filter->get('_limit'));
+			}
+			$entryIds = array_merge ($entryIds, $currEntryIds);
+		}
+		return self::getEntriesFromEntryIds(array_unique($entryIds));
+	}
+
+	protected static function getEntriesFromEntryIds($entryIds)
+	{
+		$entriesResult = array();
+		foreach ($entryIds as $entryId)
+		{
+			$dbEntry = entryPeer::retrieveByPK($entryId);
+			if ($dbEntry)
+			{
+				$entriesResult[] = $dbEntry;
+			}
+		}
+		return $entriesResult;
+	}
+
+	protected static function fillEntryFilterFromXml($list_of_filters, $partnerId)
+	{
+		$entry_filters = array();
+		for ($i = 0; $i < count($list_of_filters) ; $i++)
+		{
+			$entry_filter_xml = $list_of_filters[$i];
+			self::replaceContextTokens($entry_filter_xml);
+			$entry_filter = new entryFilter();
+			$entry_filter->fillObjectFromXml($entry_filter_xml, "_", null);
+			self::updateEntryFilterFields($entry_filter, $partnerId);
+			$entry_filters[] = $entry_filter;
+		}
+		return $entry_filters;
+	}
+
+	protected static function updateEntryFilterFields($entryFilter, $partnerId)
+	{
+		self::updateEntryFilter($entryFilter, $partnerId);
+		$typeArray = array (entryType::MEDIA_CLIP, entryType::MIX, entryType::LIVE_STREAM );
+		$typeArray = array_merge($typeArray, KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP));
+		$typeArray = array_unique(array_merge($typeArray, KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::LIVE_STREAM)));
+		$entryFilter->set ( "_in_type" , implode(',',$typeArray) );
+		$entryFilter->set( "_eq_status" , entryStatus::READY );  //needed?
+		$entryFilter->set("_notin_moderation_status", self::$moderationStatusesNotIn);
+		if (!self::$isAdminKs)
+		{
+			self::addSchedulingToCriteria(null, $entryFilter, true);
+		}
+	}
+
 	
 	public static function executeDynamicPlaylist ( $partner_id , $xml , $filter = null ,$detailed = true, $pager = null )
 	{
@@ -946,7 +1022,7 @@ HTML;
 		$c->addAnd($criterion);
 	}
 
-	private static function addSchedulingToCriteria(Criteria $c, entryFilter $filter = null)
+	private static function addSchedulingToCriteria($c, entryFilter $filter = null, $isEsearch = false)
 	{
 		$min = 0;
 		$max = kApiCache::getTime();
@@ -972,7 +1048,10 @@ HTML;
 				$filter->unsetByName('_gte_start_date');
 			}
 		}
-		self::addSchedulingCriterion($c, entryPeer::START_DATE, $min, $max, $allowNull);
+		if(!$isEsearch)
+		{
+			self::addSchedulingCriterion($c, entryPeer::START_DATE, $min, $max, $allowNull);
+		}
 
 
 		$min = kApiCache::getTime();
@@ -999,7 +1078,10 @@ HTML;
 				$filter->unsetByName('_gte_end_date');
 			}
 		}
-		self::addSchedulingCriterion($c, entryPeer::END_DATE, $min, $max, $allowNull);
+		if(!$isEsearch)
+		{
+			self::addSchedulingCriterion($c, entryPeer::END_DATE, $min, $max, $allowNull);
+		}
 	}
 	
 	private static function addModerationToCriteria(Criteria $c)

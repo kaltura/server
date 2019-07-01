@@ -351,7 +351,19 @@ class PlaylistService extends KalturaEntryService
 
 		$entryList = array();
 		if ($playlistType == KalturaPlaylistType::DYNAMIC)
-			$entryList = myPlaylistUtils::executeDynamicPlaylist($this->getPartnerId(), $playlistContent, null, true, $pager);
+		{
+			if (strpos($playlistContent, 'advancedSearch') === false ||
+				(strpos($playlistContent, 'advancedSearch') && strpos($playlistContent, 'KalturaMetadataSearchItem')) )
+			{
+				$entryList = myPlaylistUtils::executeDynamicPlaylistViaEsearch($this->getPartnerId(), $playlistContent, $pager);
+			}
+			else
+			{
+				$entryList = myPlaylistUtils::executeDynamicPlaylist($this->getPartnerId(), $playlistContent, null, true, $pager);
+			}
+
+		}
+
 		else if ($playlistType == KalturaPlaylistType::STATIC_LIST)
 			$entryList = myPlaylistUtils::executeStaticPlaylistFromEntryIdsString($playlistContent, null, true, $pager);
 			
