@@ -10,11 +10,13 @@ class kZoomTranscriptCompleted implements iZoomObject
 	const ID = 'id';
 	const TOPIC = 'topic';
 	const START_TIME = 'start_time';
+	const HOST_EMAIL = 'host_email';
 
 	public $id;
 	public $topic;
 	public $recordingFiles;
 	public $startTime;
+	public $hostEmail;
 
 	public function parseData($data)
 	{
@@ -22,6 +24,7 @@ class kZoomTranscriptCompleted implements iZoomObject
 		$this->topic = $data[self::TOPIC];
 		$this->startTime = $data[self::START_TIME];
 		$this->parseRecordingFiles($data[self::RECORDING_FILES]);
+		$this->hostEmail = $data[self::HOST_EMAIL];
 	}
 
 	public function parseRecordingFiles($recordingFilesData)

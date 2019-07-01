@@ -7,8 +7,8 @@
             margin-left: 0%;
             margin-right: 0%;
             margin: auto;
-            max-width: 400px;
-            max-height: 400px;
+            max-width: 600px;
+            max-height: 600px;
         }
 
         /* Full-width inputs */
@@ -97,19 +97,25 @@
             event.preventDefault();
             var $defaultUserId = $('#defaultUserId');
             var $zoomCategory  = $('#zoomCategory');
+            var $zoomUserPostfix = $('#zoomUserPostfix');
             var defaultUserId = $defaultUserId.val().trim();
             var zoomCategory = $zoomCategory.val().trim();
             var enableRecordingUploadObj = $(".enableRecordingUpload");
             var createUserIfNotExistObj = $(".createUserIfNotExist");
             var enableRecordingUpload = enableRecordingUploadObj.is(":checked");
             var createUserIfNotExist = createUserIfNotExistObj.is(":checked");
-
+            var handleParticipantMode = $(".participantHandler:checked").val();
+            var zoomUserMatchingMode = $(".userMatchingHandler:checked").val();
+            var zoomUserPostfix = $zoomUserPostfix.val().trim();
 
             $.ajax({
                 url : url,
                 type : "post",
-                data: {"ks": ks, "defaultUserId": defaultUserId, "zoomCategory" : zoomCategory
-                    , "accountId" : accountId ,"enableRecordingUpload":enableRecordingUpload ,"createUserIfNotExist":createUserIfNotExist,"format": 1 },
+                data: {"ks": ks, "defaultUserId": defaultUserId, "zoomCategory" : zoomCategory,
+                    "accountId" : accountId, "enableRecordingUpload":enableRecordingUpload,
+                    "createUserIfNotExist":createUserIfNotExist, "handleParticipantMode":handleParticipantMode,
+                    "zoomUserMatchingMode":zoomUserMatchingMode, "zoomUserPostfix":zoomUserPostfix,
+                    "format": 1 },
                 success : function(res) {
                     $("body").css("cursor", "default");
                     console.log(res);
@@ -172,6 +178,41 @@
     <p>
         <a class="small"><input type="checkbox" class="enableRecordingUpload" @enableRecordingUpload@>Enable recording upload</a>
         <a class="small"><input type="checkbox" class="createUserIfNotExist" @createUserIfNotExist@>Create users automatically if not exist</a>
+    </p>
+
+    <p>Please select how meeting participants should be handled:</p>
+    <div>
+        <input type="radio" id="participantsChoice1" class="participantHandler"
+               name="participantHandler" value="0"  checked>
+        <label for="participantsChoice1">Add as Co publishers</label>
+
+        <input type="radio" id="participantsChoice2" class="participantHandler"
+               name="participantHandler" value="1">
+        <label for="participantsChoice2">Add as Co viewers</label>
+
+        <input type="radio" id="participantsChoice3" class="participantHandler"
+               name="participantHandler" value="2">
+        <label for="participantsChoice3">Ignore participants</label>
+    </div>
+
+    <p>Please select how matching zoom users should be handled:</p>
+    <div>
+        <input type="radio" id="userMatchingHandler1" class="userMatchingHandler"
+               name="userMatchingHandler" value="0"  checked>
+        <label for="userMatchingHandler1">Do not modify</label>
+
+        <input type="radio" id="userMatchingHandler2" class="userMatchingHandler"
+               name="userMatchingHandler" value="1">
+        <label for="userMatchingHandler2">Add postfix</label>
+
+        <input type="radio" id="userMatchingHandler3" class="userMatchingHandler"
+               name="userMatchingHandler" value="2">
+        <label for="userMatchingHandler3">Remove postfix</label>
+    </div>
+
+    <p>
+        <a class="big"><label for="zoomUserPostfix"><b>User matching postfix</b></label></a>
+        <input type="text" value="" id="zoomUserPostfix" name="zoomUserPostfix">
     </p>
 
     <div align="center">

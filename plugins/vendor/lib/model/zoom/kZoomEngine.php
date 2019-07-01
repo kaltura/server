@@ -74,9 +74,17 @@ class kZoomEngine
 	{
 		/* @var kZoomTranscriptCompleted $transcript */
 		$transcript = $event->object;
+		$zoomIntegration = ZoomHelper::getZoomIntegration();
+		$dbUser = $this->getEntryOwner($transcript->hostEmail, $zoomIntegration);
+		$this->initUserPermissions($dbUser);
 		$entry = $this->getZoomEntryByReferenceId($transcript->id);
+		if(!$entry)
+		{
+			ZoomHelper::exitWithError(kVendorErrorMessages::MISSING_ENTRY_FOR_ZOOM_MEETING . $transcript->id);
+		}
+
 		$captionAssetService = new CaptionAssetService();
-		$captionAssetService->initService('caption_captionasset', 'captionasset', 'setContent');
+		$captionAssetService->initService('caption', 'caption_captionasset', 'setContent');
 		foreach ($transcript->recordingFiles as $recordingFile)
 		{
 			/* @var kZoomRecordingFile $recordingFile */
@@ -244,6 +252,7 @@ class kZoomEngine
 		$entry->setKuserId($owner->getKuserId());
 		$entry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($owner->getPartnerId())->getId());
 		$entry->setAdminTags(self::ADMIN_TAG_ZOOM);
+		$entry->setReferenceID(self::ZOOM_PREFIX . $meeting->id);
 		return $entry;
 	}
 

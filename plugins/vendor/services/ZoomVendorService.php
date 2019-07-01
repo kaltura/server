@@ -177,11 +177,13 @@ class ZoomVendorService extends KalturaBaseService
 	 * @param string $accountId
 	 * @param bool $enableRecordingUpload
 	 * @param bool $createUserIfNotExist
+	 * @param $handleParticipantMode
+	 * @param $zoomUserMatchingMode
+	 * @param string $zoomUserPostfix
 	 * @return string
-	 * @throws PropelException
-	 * @throws Exception
+	 * @throws KalturaAPIException
 	 */
-	public function submitRegistrationAction($defaultUserId, $zoomCategory = null, $accountId, $enableRecordingUpload, $createUserIfNotExist)
+	public function submitRegistrationAction($defaultUserId, $zoomCategory, $accountId, $enableRecordingUpload, $createUserIfNotExist, $handleParticipantMode, $zoomUserMatchingMode, $zoomUserPostfix = "")
 	{
 		KalturaResponseCacher::disableCache();
 		$partnerId = kCurrentContext::getCurrentPartnerId();
@@ -189,7 +191,7 @@ class ZoomVendorService extends KalturaBaseService
 
 		/** @var ZoomVendorIntegration $zoomIntegration */
 		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId);
-		if(!$zoomIntegration)
+		if(!$zoomIntegration || $zoomIntegration->getPartnerId() != $partnerId)
 		{
 			throw new KalturaAPIException(KalturaVendorErrors::NO_INTEGRATION_DATA);
 		}
@@ -221,6 +223,9 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomIntegration->unsetCategoryId();
 		}
 
+		$zoomIntegration->setHandleParticipantsMode($handleParticipantMode);
+		$zoomIntegration->setUserMatching($zoomUserMatchingMode);
+		$zoomIntegration->setUserPostfix($zoomUserPostfix);
 		$zoomIntegration->save();
 		return true;
 	}

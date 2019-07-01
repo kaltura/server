@@ -14,4 +14,5 @@ interface kVendorErrorMessages extends BaseEnum
 	const UPLOAD_DISABLED = 'Uploads are disabled for current Partner';
 	const TOKEN_PARSING_FAILED = 'Parse Tokens failed, response received from zoom is: ';
 	const FAILED_VERIFICATION = 'ZOOM - verification token is different from existing token';
+	const MISSING_ENTRY_FOR_ZOOM_MEETING = 'Could not find entry for meeting id: ';
 }

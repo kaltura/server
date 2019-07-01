@@ -54,7 +54,7 @@ class ZoomVendorIntegration extends VendorIntegration
 	public function getHandleParticipantsMode() { return $this->getFromCustomData ( self::HANDLE_PARTICIPANTS_MODE,null, kHandleParticipantsMode::ADD_AS_CO_PUBLISHERS); }
 
 	public function setUserPostfix($v) { $this->putInCustomData ( self::USER_POSTFIX, $v); }
-	public function getUserPostfix() { return $this->getFromCustomData ( self::USER_POSTFIX,null, kHandleParticipantsMode::ADD_AS_CO_PUBLISHERS); }
+	public function getUserPostfix() { return $this->getFromCustomData ( self::USER_POSTFIX,null, ""); }
 
 	public function setLastError($v)
 	{
