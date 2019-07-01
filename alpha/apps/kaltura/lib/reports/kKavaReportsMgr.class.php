@@ -1465,21 +1465,29 @@ class kKavaReportsMgr extends kKavaBase
 		if ($input_filter->from_date && $input_filter->to_date &&
 			!($input_filter->from_day && $input_filter->to_day))
 		{
+			$filter_from_date = $input_filter->from_date;
+			$filter_to_date = $input_filter->to_date;
+			if ($input_filter->interval == reportInterval::TEN_SECONDS)
+			{
+				$filter_from_date = self::roundUpToMultiple($filter_from_date, 10);
+				$filter_to_date = self::roundUpToMultiple($filter_to_date, 10);
+			}
+
 			switch ($report_interval)
 			{
 			case self::INTERVAL_START_TO_END:
-				$from_date = self::formatUnixtime($input_filter->from_date);
-				$to_date = self::formatUnixtime($input_filter->to_date);
+				$from_date = self::formatUnixtime($filter_from_date);
+				$to_date = self::formatUnixtime($filter_to_date);
 				break;
 
 			case self::INTERVAL_BASE_TO_START:
 				$from_date = self::BASE_TIMESTAMP;
-				$to_date = self::formatUnixtime($input_filter->from_date);
+				$to_date = self::formatUnixtime($filter_from_date);
 				break;
 
 			case self::INTERVAL_BASE_TO_END:
 				$from_date = self::BASE_TIMESTAMP;
-				$to_date = self::formatUnixtime($input_filter->to_date);
+				$to_date = self::formatUnixtime($filter_to_date);
 				break;
 			}
 		}
