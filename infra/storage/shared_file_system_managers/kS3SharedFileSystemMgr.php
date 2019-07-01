@@ -124,10 +124,11 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function doCheckFileExists($filePath)
 	{
 		list($bucket, $filePathWithoutBucket) = $this->getBucketAndFilePath($filePath);
-		if(!$this->doIsFile($filePath))
+		if($this->doIsDir($filePath))
 		{
 			return true;
 		}
+
 		try
 		{
 			$exists = $this->s3Client->doesObjectExist($bucket, $filePathWithoutBucket);
@@ -210,11 +211,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 	}
 	
-	private function isDirectory($fileName)
-	{
-		return !strpos($fileName,'.');
-	}
-	
 	protected function doPutFileContent($filePath, $fileContent, $flags = 0, $context = null)
 	{
 		$retries = 3;
@@ -278,6 +274,11 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doGetFileFromResource($resource, $destFilePath = null, $allowInternalUrl = false)
 	{
+		if(is_string($resource) && kString::beginsWith($resource, kSharedFileSystemMgr::getSharedRootPath()))
+		{
+			return $this->doCopy($resource, $destFilePath);
+		}
+
 		stream_wrapper_restore('http');
 		stream_wrapper_restore('https');
 		
@@ -384,7 +385,23 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doIsDir($path)
 	{
-		return $this->isDirectory($path);
+		if(kString::endsWith($path, '/'))
+		{
+			return true;
+		}
+
+		$dirPath = $path . '/';
+		$fileList = $this->doListFiles($dirPath);
+		if(!isset($fileList['Contents']))
+		{
+			KalturaLog::debug("no files found under [$dirPath]");
+		}
+		else if(count($fileList['Contents']) > 0)
+		{
+			return true;
+		}
+
+		return !strpos($path,'.');
 	}
 
 	protected function doMkdir($path)
