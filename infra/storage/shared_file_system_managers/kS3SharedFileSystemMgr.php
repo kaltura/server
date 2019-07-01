@@ -421,9 +421,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function copyFileFromShared($src, $dest, $deleteSrc)
 	{
 		$srcUrl = $this->doRealPath($src);
-		$srcContent = $this->doGetFileContent($srcUrl);
-
-		$result = kFile::filePutContents($dest, $srcContent, 0, null);
+		$result = kFile::getDataFromFile($srcUrl, $dest);
 
 		if (!$result)
 		{
