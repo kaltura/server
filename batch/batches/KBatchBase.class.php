@@ -421,7 +421,7 @@ abstract class KBatchBase implements IKalturaLogger
 
 	protected function setFilePermissions($filePath)
 	{
-		if(!kFile::isFile($filePath))
+		if(kFile::isDir($filePath))
 		{
 			$chmod = 0750;
 			if(self::$taskConfig->getDirectoryChmod())
@@ -528,7 +528,7 @@ abstract class KBatchBase implements IKalturaLogger
 	 */
 	public static function createDir($path, $rights = 0777)
 	{
-		if(kFile::isFile($path))
+		if(!kFile::isDir($path))
 		{
 			if(!kFile::checkFileExists($path))
 			{
