@@ -167,12 +167,13 @@ class kPexipUtils
 
 	/**
 	 * @param $queryParams
+	 * @param $pexipConfig
 	 * @return array
 	 */
-	protected static function extractPartnerIdAndSipTokenFromAddress($queryParams)
+	protected static function extractPartnerIdAndSipTokenFromAddress($queryParams, $pexipConfig)
 	{
 		KalturaLog::debug('Extracting entry sip token from local_alias: ' . $queryParams[self::PARAM_LOCAL_ALIAS]);
-		$intIdPattern = '/(?<=sip:)(.*)/';
+		$intIdPattern = '/[0-9]{8,15}'. self::SIP_URL_DELIMITER . $pexipConfig[self::CONFIG_HOST_URL].'/';
 		preg_match($intIdPattern, $queryParams[self::PARAM_LOCAL_ALIAS], $matches);
 		if (!empty($matches))
 		{
