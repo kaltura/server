@@ -177,8 +177,8 @@ class ZoomVendorService extends KalturaBaseService
 	 * @param string $accountId
 	 * @param bool $enableRecordingUpload
 	 * @param bool $createUserIfNotExist
-	 * @param $handleParticipantMode
-	 * @param $zoomUserMatchingMode
+	 * @param int $handleParticipantMode
+	 * @param int $zoomUserMatchingMode
 	 * @param string $zoomUserPostfix
 	 * @return string
 	 * @throws KalturaAPIException
