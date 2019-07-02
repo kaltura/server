@@ -128,14 +128,14 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 		usort($uploadChunks,  array($this, 'compareKeyResumeAt'));
 
 		$finalFilePath .= '/full_file.' . $this->getFileExtension($this->_uploadToken->getFileName());
-		$uploadId = self::$sharedFsMgr->doCreateMultipartUpload($finalFilePath);
+		$uploadId = self::$sharedFsMgr->createMultipartUpload($finalFilePath);
 		if(!$uploadId)
 		{
 			throw new kUploadTokenException("multipart upload error during upload token closer", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_UPLOAD_ERROR);
 		}
 		
 		$copiedParts = $this->uploadParts($uploadChunks, $uploadId, $finalFilePath);
-		$location = self::$fileSystemManager->doCompleteMultipartUpload($finalFilePath, $uploadId, $copiedParts);
+		$location = self::$fileSystemManager->completeMultipartUpload($finalFilePath, $uploadId, $copiedParts);
 		if(!$location)
 		{
 			throw new kUploadTokenException("multipart upload error during upload token closer", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_UPLOAD_ERROR);
@@ -158,7 +158,7 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 		$partNumber = 1;
 		foreach ($uploadChunks as $chunk)
 		{
-			$result = self::$fileSystemManager->doMultipartUploadPartCopy($uploadId, $partNumber, $chunk['Key'], $finalFilePath);
+			$result = self::$fileSystemManager->multipartUploadPartCopy($uploadId, $partNumber, $chunk['Key'], $finalFilePath);
 			if($result)
 			{
 				$copiedParts['Parts'][$partNumber] = array(
@@ -172,7 +172,7 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 			}
 			$partNumber +=1;
 		}
-		self::$fileSystemManager->doCompleteMultipartUpload($finalFilePath, $uploadId, $copiedParts);
+		self::$fileSystemManager->completeMultipartUpload($finalFilePath, $uploadId, $copiedParts);
 		$this->_uploadToken->setUploadTempPath($finalFilePath);
 		return $copiedParts;
 	}

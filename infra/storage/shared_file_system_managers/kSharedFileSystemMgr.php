@@ -345,7 +345,7 @@ abstract class kSharedFileSystemMgr
 		return $this->doGetFile($filePath);
 	}
 	
-	public function getFileFromRemoteUrl($url, $destFilePath = null, $allowInternalUrl = false)
+	public function getFileFromResource($url, $destFilePath = null, $allowInternalUrl = false)
 	{
 		return $this->doGetFileFromResource($url, $destFilePath, $allowInternalUrl);
 	}

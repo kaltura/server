@@ -291,10 +291,10 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		list($bucket, $filePath) = self::getBucketAndFilePath($destFilePath);
 		
-		$result = $this->s3Client->createMultipartUpload([
+		$result = $this->s3Client->createMultipartUpload(array(
 			'Bucket'       => $bucket,
 			'Key'          => $filePath,
-		]);
+		));
 		$uploadId = $result['UploadId'];
 		KalturaLog::debug("Starting multipart upload for [$resource] to [$destFilePath] with upload id [$uploadId]");
 		
@@ -488,7 +488,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return $result['ContentLength'];
 	}
 
-	public function doCreateMultipartUpload($destFilePath)
+	public function createMultipartUpload($destFilePath)
 	{
 		list($bucket, $filePath) = self::getBucketAndFilePath($destFilePath);
 
@@ -507,7 +507,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return $uploadId;
 	}
 
-	public function doMultipartUploadPartCopy($uploadId, $partNumber, $s3FileKey, $destFilePath)
+	public function multipartUploadPartCopy($uploadId, $partNumber, $s3FileKey, $destFilePath)
 	{
 		list($bucket, $filePath) = self::getBucketAndFilePath($destFilePath);
 		$srcPath = $bucket.'/'.$s3FileKey;
@@ -526,14 +526,14 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		catch (S3Exception $e)
 		{
 			KalturaLog::debug("Upload of [$srcPath] failed.  Error: {$e->getMessage()}");
-			$this->doAbortMultipartUpload($bucket, $filePath, $uploadId);
+			$this->abortMultipartUpload($bucket, $filePath, $uploadId);
 			return false;
 		}
 
 		return $result;
 	}
 	
-	public function doAbortMultipartUpload($bucket, $filePath, $uploadId)
+	public function abortMultipartUpload($bucket, $filePath, $uploadId)
 	{
 		try
 		{
@@ -552,7 +552,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 	}
 		
-	public function doCompleteMultiPartUpload($destFilePath, $uploadId, $parts)
+	public function completeMultiPartUpload($destFilePath, $uploadId, $parts)
 	{
 		list($bucket, $filePath) = self::getBucketAndFilePath($destFilePath);
 
@@ -721,7 +721,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return $res;
 	}
 
-	protected function doGetListObjectsPaginator($filePath)
+	protected function getListObjectsPaginator($filePath)
 	{
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
 
@@ -736,7 +736,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function doCopyDir($src, $dest, $deleteSrc)
 	{
 
-		$paginator = $this->s3->doGetListObjectsPaginator($src);
+		$paginator = $this->s3->getListObjectsPaginator($src);
 
 		foreach ($paginator as $page)
 		{
