@@ -9,9 +9,12 @@ class kZoomOauth
 	const ACCESS_TOKEN = 'access_token';
 	const REFRESH_TOKEN = 'refresh_token';
 	const VERIFICATION_TOKEN = 'verificationToken';
+	const AUTHORIZATION_HEADER = 'Authorization';
 	const TOKEN_TYPE = 'token_type';
 	const EXPIRES_IN = 'expires_in';
 	const SCOPE = 'scope';
+	const MAP_NAME = 'vendor';
+	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
 
 	/**
 	 * @param ZoomVendorIntegration $vendorIntegration
@@ -111,7 +114,7 @@ class kZoomOauth
 	 */
 	private static function getZoomHeaderData()
 	{
-		$zoomConfiguration = kConf::get(ZoomWrapper::CONFIGURATION_PARAM_NAME, ZoomWrapper::MAP_NAME);
+		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
 		$clientId = $zoomConfiguration['clientId'];
 		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
 		$redirectUrl = $zoomConfiguration['redirectUrl'];
@@ -134,5 +137,24 @@ class kZoomOauth
 		}
 
 		return $zoomIntegration->getAccessToken();
+	}
+
+	/**
+	 * verify header token, if not equal die
+	 * @param array $zoomConfiguration
+	 */
+	public static function verifyHeaderToken($zoomConfiguration)
+	{
+		$headers = getallheaders();
+		if (isset($headers[self::AUTHORIZATION_HEADER]))
+		{
+			$verificationToken = $zoomConfiguration[self::VERIFICATION_TOKEN];
+			if ($verificationToken === $headers[self::AUTHORIZATION_HEADER])
+			{
+				return;
+			}
+		}
+
+		ZoomHelper::exitWithError(kVendorErrorMessages::FAILED_VERIFICATION);
 	}
 }

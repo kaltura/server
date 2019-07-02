@@ -7,18 +7,21 @@
 class ZoomVendorIntegration extends VendorIntegration
 {
 
-	const ACCESS_TOKEN = "accessToken";
-	const REFRESH_TOKEN = "refreshToken";
-	const EXPIRES_IN = "expiresIn";
-	const DELETE_CONTENT_ON_DAUTHORIZATION = "deleteContentOnDAuthorization";
-	const DEFAULT_USER_E_MAIL = "defaultUserEMail";
-	const ZOOM_CATEGORY = "zoomCategory";
-	const ZOOM_CATEGORY_ID = "zoomCategoryId";
-	const CREATE_USER_IF_NOT_EXIST = "createUserIfNotExist";
-	const LAST_ERROR = "lastError";
-	const LAST_ERROR_TIMESTAMP = "lastErrorTimestamp";
+	const ACCESS_TOKEN = 'accessToken';
+	const REFRESH_TOKEN = 'refreshToken';
+	const EXPIRES_IN = 'expiresIn';
+	const DELETE_CONTENT_ON_DAUTHORIZATION = 'deleteContentOnDAuthorization';
+	const DEFAULT_USER_E_MAIL = 'defaultUserEMail';
+	const ZOOM_CATEGORY = 'zoomCategory';
+	const ZOOM_CATEGORY_ID = 'zoomCategoryId';
+	const CREATE_USER_IF_NOT_EXIST = 'createUserIfNotExist';
+	const LAST_ERROR = 'lastError';
+	const LAST_ERROR_TIMESTAMP = 'lastErrorTimestamp';
+	const USER_MATCHING = 'userMatching';
+	const HANDLE_PARTICIPANTS_MODE = 'HandleParticipantsMode';
+	const USER_POSTFIX ="UserPostfix";
 
-	public function setAccessToken ($v)	{ $this->putInCustomData ( "" . self::ACCESS_TOKEN . "", $v);	}
+	public function setAccessToken ($v)	{ $this->putInCustomData ( self::ACCESS_TOKEN, $v);	}
 	public function getAccessToken ( )	{ return $this->getFromCustomData(self::ACCESS_TOKEN);	}
 
 	public function setRefreshToken ($v)	{ $this->putInCustomData ( self::REFRESH_TOKEN, $v);	}
@@ -43,6 +46,15 @@ class ZoomVendorIntegration extends VendorIntegration
 
 	public function setCreateUserIfNotExist($v) { $this->putInCustomData ( self::CREATE_USER_IF_NOT_EXIST, $v); }
 	public function getCreateUserIfNotExist() { return $this->getFromCustomData ( self::CREATE_USER_IF_NOT_EXIST,null, false); }
+
+	public function setUserMatching($v) { $this->putInCustomData ( self::USER_MATCHING, $v); }
+	public function getUserMatching() { return $this->getFromCustomData ( self::USER_MATCHING,null, kZoomUsersMatching::DO_NOT_MODIFY); }
+
+	public function setHandleParticipantsMode($v) { $this->putInCustomData ( self::HANDLE_PARTICIPANTS_MODE, $v); }
+	public function getHandleParticipantsMode() { return $this->getFromCustomData ( self::HANDLE_PARTICIPANTS_MODE,null, kHandleParticipantsMode::ADD_AS_CO_PUBLISHERS); }
+
+	public function setUserPostfix($v) { $this->putInCustomData ( self::USER_POSTFIX, $v); }
+	public function getUserPostfix() { return $this->getFromCustomData ( self::USER_POSTFIX,null, ""); }
 
 	public function setLastError($v)
 	{
