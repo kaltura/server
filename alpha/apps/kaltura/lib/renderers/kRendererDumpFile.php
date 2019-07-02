@@ -56,7 +56,7 @@ class kRendererDumpFile implements kRendererBase
 	
 	public function validate()
 	{
-		return $this->fileData || file_exists($this->filePath);
+		return $this->fileData || kFile::checkFileExists($this->filePath);
 	}
 	
 	public function output()

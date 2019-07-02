@@ -274,11 +274,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doGetFileFromResource($resource, $destFilePath = null, $allowInternalUrl = false)
 	{
-		if(is_string($resource) && kFile::isSharedPath($resource))
-		{
-			return $this->doCopy($resource, $destFilePath);
-		}
-
 		stream_wrapper_restore('http');
 		stream_wrapper_restore('https');
 		
@@ -385,7 +380,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doIsDir($path)
 	{
-		if(kString::endsWith($path, '/'))
+		if( substr( $path, -strlen( "/" ) ) === "/" )
 		{
 			return true;
 		}
@@ -437,19 +432,22 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function copyFileFromShared($src, $dest, $deleteSrc)
 	{
-		$srcUrl = $this->doRealPath($src);
-		$result = kFile::getDataFromFile($srcUrl, $dest);
-
-		if (!$result)
+		if(kFile::isSharedPath($dest))
 		{
-			KalturaLog::err("Failed to upload file: [$src] to [$dest]");
-			return false;
+			$result = $this->doCopy($src, $dest);
 		}
-		if ($deleteSrc)
+		else
 		{
-			return $this->deleteFile($srcUrl);
+			$result = $this->copySharedToLocal($src, $dest);
 		}
-		return true;
+		
+		if ($result && $deleteSrc)
+		{
+			return $this->doDeleteFile($srcUrl);
+		}
+		
+		KalturaLog::debug("Copy file from shared result [$result] ");
+		return $result;
 	}
 
 	protected function doRmdir($path)
@@ -642,37 +640,43 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doDumpFilePart($filePath, $range_from, $range_length)
 	{
-		$defaultChunkSize = 100000;
-		$exist = $this->doCheckFileExists($filePath);
-		if($exist)
+		$defaultChunkSize = 500000;
+		$fileSize = $this->doFileSize($filePath);
+
+		while($range_length >= 0)
 		{
-			while($range_from <= $range_length)
-			{
-				$chunkSize = min($defaultChunkSize, ($range_length - $range_from));
-				$range_to = $range_from + $chunkSize;
-				$content = $this->getSpecificObjectRange($filePath, $range_from, $range_to);
-				echo $content;
-				$range_from = $range_to + 1;
-			}
+			$chunkSize = min($defaultChunkSize, $range_length);
+			$range_to = min($range_from + $chunkSize, $fileSize);
+			$content = $this->getSpecificObjectRange($filePath, $range_from, $range_to);
+			echo $content;
+			$range_length -= $chunkSize;
+			$range_from = $range_from + $chunkSize + 1;
 		}
 	}
 
 	protected function getSpecificObjectRange($filePath, $startRange, $endRange)
 	{
-		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
-
-		$range = 'bytes='.$startRange.'-'.$endRange;
+		list($bucket, $key) = $this->getBucketAndFilePath($filePath);
 
 		$params = array(
 			'Bucket' => $bucket,
-			'Key'    => $filePath,
-			'Range'  => $range
+			'Key'    => $key,
+			'Range'  => "bytes=$startRange-$endRange",
 		);
 
-		$response = $this->s3Client->getObject( $params );
+		try
+		{
+			$response = $this->s3Client->getObject( $params );
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::debug("Failed to fetch object range for file [$filePath], with error Error: {$e->getMessage()}");
+			return false;
+		}
+		
 		if($response)
 		{
-			return (string)$response['Body'];
+			return $response['Body'];
 		}
 
 		return $response;
@@ -760,5 +764,16 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return true;
 	}
 
-
+	protected function copySharedToLocal($src, $dest)
+	{
+		list($bucket, $filePath) = $this->getBucketAndFilePath($src);
+		
+		$result = $this->s3Client->getObject(array(
+			'Bucket' => $bucket,
+			'Key'    => $filePath,
+			'SaveAs' => $dest
+		));
+		
+		return $result;
+	}
 }
