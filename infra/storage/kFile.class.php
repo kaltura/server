@@ -19,7 +19,7 @@ class kFile extends kFileBase
 	 */
 	public static function listDir($path, $pathPrefix = '')
 	{
-		if (kString::beginsWith($path, kSharedFileSystemMgr::getSharedRootPath()))
+		if (kFile::isSharedPath($path))
 		{
 			$sharedFsMgr = kSharedFileSystemMgr::getInstance();
 			return $sharedFsMgr->listFiles($path, $pathPrefix);
@@ -272,8 +272,7 @@ class kFile extends kFileBase
 	
 	public static function copySingleFile($src, $dest, $deleteSrc)
 	{
-		if (kString::beginsWith($src, kSharedFileSystemMgr::getSharedRootPath()) ||
-			kString::beginsWith($dest, kSharedFileSystemMgr::getSharedRootPath()))
+		if (kFile::isSharedPath($src) || kFile::isSharedPath($dest))
 		{
 			$sharedFsMgr = kSharedFileSystemMgr::getInstance();
 			return $sharedFsMgr->copySingleFile($src, $dest, $deleteSrc);

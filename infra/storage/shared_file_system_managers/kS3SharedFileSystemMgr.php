@@ -274,7 +274,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doGetFileFromResource($resource, $destFilePath = null, $allowInternalUrl = false)
 	{
-		if(is_string($resource) && kString::beginsWith($resource, kSharedFileSystemMgr::getSharedRootPath()))
+		if(is_string($resource) && kFile::isSharedPath($resource))
 		{
 			return $this->doCopy($resource, $destFilePath);
 		}
@@ -411,12 +411,12 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doCopySingleFile($src, $dest, $deleteSrc)
 	{
-		if(kString::beginsWith($src, kSharedFileSystemMgr::getSharedRootPath()))
+		if(kFile::isSharedPath($src))
 		{
 			return $this->copyFileLocalToShared($src, $dest, $deleteSrc);
 		}
 
-		return $this->copyFileFrimShared($src, $dest, $deleteSrc);
+		return $this->copyFileFromShared($src, $dest, $deleteSrc);
 	}
 
 	protected function copyFileLocalToShared($src, $dest, $deleteSrc)
