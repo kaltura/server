@@ -120,6 +120,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_AVG_VIEW_BUFFERING = 'avg_view_buffering';
 	const METRIC_AVG_VIEW_ENGAGEMENT = 'avg_view_engagement';
 	const METRIC_AVG_VIEW_LIVE_LATENCY = 'avg_view_live_latency';
+	const METRIC_AVG_VIEW_DVR = 'avg_view_dvr';
 
 	//report classes
 	const CUSTOM_REPORTS_CLASS = 'kKavaCustomReports';
@@ -917,6 +918,13 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
 				self::METRIC_VIEW_ENGAGED_COUNT,
+				self::EVENT_TYPE_VIEW));
+
+		self::$metrics_def[self::METRIC_AVG_VIEW_DVR] = array(
+			self::DRUID_AGGR => array(self::EVENT_TYPE_VIEW, self::METRIC_VIEW_DVR_COUNT),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_AVG_VIEW_DVR,
+				self::METRIC_VIEW_DVR_COUNT,
 				self::EVENT_TYPE_VIEW));
 
 		// complex metrics
