@@ -78,13 +78,9 @@ class kZoomEngine
 		$dbUser = $this->getEntryOwner($transcript->hostEmail, $zoomIntegration);
 		$this->initUserPermissions($dbUser);
 		$entry = $this->getZoomEntryByReferenceId($transcript->id);
-		if(!$entry)
-		{
-			ZoomHelper::exitWithError(kVendorErrorMessages::MISSING_ENTRY_FOR_ZOOM_MEETING . $transcript->id);
-		}
-
+		$this->initUserPermissions($dbUser, true);
 		$captionAssetService = new CaptionAssetService();
-		$captionAssetService->initService('caption', 'caption_captionasset', 'setContent');
+		$captionAssetService->initService('caption_captionasset', 'captionAsset', 'setContent');
 		foreach ($transcript->recordingFiles as $recordingFile)
 		{
 			/* @var kZoomRecordingFile $recordingFile */
@@ -116,7 +112,14 @@ class kZoomEngine
 			entryPeer::setFilterResults(true);
 		}
 
-		return entryPeer::doSelectOne($c);
+		!$entry = entryPeer::doSelectOne($c);
+		if(!$entry)
+		{
+			ZoomHelper::exitWithError(kVendorErrorMessages::MISSING_ENTRY_FOR_ZOOM_MEETING . $meetingId);
+		}
+
+		KalturaLog::info('Found entry:' . $entry->getId());
+		return $entry;
 	}
 
 	/**
@@ -366,11 +369,13 @@ class kZoomEngine
 	/**
 	 * user logged in - need to re-init kPermissionManager in order to determine current user's permissions
 	 * @param kuser $dbUser
+	 * @param bool $isAdmin
 	 */
-	protected function initUserPermissions($dbUser)
+	protected function initUserPermissions($dbUser, $isAdmin = false)
 	{
 		$ks = null;
-		kSessionUtils::createKSessionNoValidations($dbUser->getPartnerId(), $dbUser->getPuserId() , $ks, 86400 , false , "" , '*' );
+		kSessionUtils::createKSessionNoValidations($dbUser->getPartnerId(), $dbUser->getPuserId() , $ks, 86400 , $isAdmin , "" , '*' );
+		KalturaLog::info('changing to ks: ' . $ks);
 		kCurrentContext::initKsPartnerUser($ks);
 		kPermissionManager::init();
 	}
