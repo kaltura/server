@@ -8,7 +8,7 @@
             margin-right: 0%;
             margin: auto;
             max-width: 600px;
-            max-height: 800px;
+            max-height: 1000px;
         }
 
         /* Full-width inputs */
@@ -37,16 +37,24 @@
             padding-top: 10px;
         }
 
-        a.small {
-            font-size: 11px;
+        .small {
+            font-size: 12px;
         }
 
         a.big {
             font-size: 13px;
             font-weight: bold;
-            padding-left: 10px;
         }
 
+        .margin {
+            margin: 2px 10px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+
+        .margin-top {
+            margin-top: 10px;
+        }
 
         p.success {
             background-color: #4CAF50;
@@ -82,6 +90,10 @@
         /* Add padding to containers */
         .container {
             padding: 10px;
+        }
+
+        label {
+            font-family: Arial, Helvetica, sans-serif;
         }
 
     </style>
@@ -176,40 +188,43 @@
     </p>
 
     <p>
-        <a class="small"><input type="checkbox" class="enableRecordingUpload" @enableRecordingUpload@>Enable recording upload</a>
-        <a class="small"><input type="checkbox" class="createUserIfNotExist" @createUserIfNotExist@>Create users automatically if not exist</a>
+        <input type="checkbox" class="enableRecordingUpload" @enableRecordingUpload@>
+        <label class="small">Enable recording upload</label>
+        <input type="checkbox" class="createUserIfNotExist" @createUserIfNotExist@>
+        <label class="small">Create users automatically if not exist</label>
     </p>
 
-    <p>Please select how meeting participants should be handled:</p>
-    <div>
-        <input type="radio" id="participantsChoice1" class="participantHandler"
-               name="participantHandler" value="0"  checked>
-        <label for="participantsChoice1">Add as Co publishers</label>
+    <div class="margin-top">
+        <p class="small margin">Please select how meeting participants should be handled:</p>
+        <div class="margin">
+            <input type="radio" id="participantsChoice1"
+                   name="participantHandler" value="0"  checked>
+            <label for="participantsChoice1" class="small">Add as Co publishers</label>
 
-        <input type="radio" id="participantsChoice2" class="participantHandler"
-               name="participantHandler" value="1">
-        <label for="participantsChoice2">Add as Co viewers</label>
+            <input type="radio" id="participantsChoice2"
+                   name="participantHandler" value="1">
+            <label for="participantsChoice2" class="small">Add as Co viewers</label>
 
-        <input type="radio" id="participantsChoice3" class="participantHandler"
-               name="participantHandler" value="2">
-        <label for="participantsChoice3">Ignore participants</label>
+            <input type="radio" id="participantsChoice3"
+                   name="participantHandler" value="2">
+            <label for="participantsChoice3" class="small">Ignore participants</label>
+        </div>
+
+        <p class="small margin">Please select how matching zoom users should be handled:</p>
+        <div class="margin">
+            <input type="radio" id="userMatchingHandler1"
+                   name="userMatchingHandler" value="0"  checked>
+            <label for="userMatchingHandler1" class="small">Do not modify</label>
+
+            <input type="radio" id="userMatchingHandler2"
+                   name="userMatchingHandler" value="1">
+            <label for="userMatchingHandler2" class="small">Add postfix</label>
+
+            <input type="radio" id="userMatchingHandler3"
+                   name="userMatchingHandler" value="2">
+            <label for="userMatchingHandler3" class="small">Remove postfix</label>
+        </div>
     </div>
-
-    <p>Please select how matching zoom users should be handled:</p>
-    <div>
-        <input type="radio" id="userMatchingHandler1" class="userMatchingHandler"
-               name="userMatchingHandler" value="0"  checked>
-        <label for="userMatchingHandler1">Do not modify</label>
-
-        <input type="radio" id="userMatchingHandler2" class="userMatchingHandler"
-               name="userMatchingHandler" value="1">
-        <label for="userMatchingHandler2">Add postfix</label>
-
-        <input type="radio" id="userMatchingHandler3" class="userMatchingHandler"
-               name="userMatchingHandler" value="2">
-        <label for="userMatchingHandler3">Remove postfix</label>
-    </div>
-
     <p>
         <a class="big"><label for="zoomUserPostfix"><b>User matching postfix</b></label></a>
         <input type="text" value="" id="zoomUserPostfix" name="zoomUserPostfix">
