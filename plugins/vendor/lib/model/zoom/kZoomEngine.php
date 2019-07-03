@@ -134,7 +134,7 @@ class kZoomEngine
 		$dbUser = $this->getEntryOwner($meeting->hostEmail, $zoomIntegration);
 		$this->initUserPermissions($dbUser);
 		$participantsUsersNames = $this->extractMeetingParticipants($meeting->id, $zoomIntegration);
-		$validatedUsers = $this->getValidatedUsers($participantsUsersNames, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
+		$validatedUsers = $this->getValidatedUsers($participantsUsersNames, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist(), $dbUser->getPuserId());
 		$entry = null;
 		foreach ($meeting->recordingFiles as $recordingFile)
 		{
@@ -230,7 +230,7 @@ class kZoomEngine
 		$categoryEntry->save();
 	}
 
-	protected function getValidatedUsers($usersNames, $partnerId, $createIfNotFound)
+	protected function getValidatedUsers($usersNames, $partnerId, $createIfNotFound, $ownerId)
 	{
 		$validatedUsers=array();
 		if(!$usersNames)
@@ -240,6 +240,11 @@ class kZoomEngine
 
 		foreach ($usersNames as $userName)
 		{
+			if($userName == $ownerId)
+			{
+				continue;
+			}
+
 			if(kuserPeer::getKuserByPartnerAndUid($partnerId, $userName, true))
 			{
 				$validatedUsers[] = $userName;
