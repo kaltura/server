@@ -154,7 +154,7 @@ abstract class KConversionEngine
 		$exec_cmd = "$exe " . 
 			str_replace ( 
 				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName), 
-				array('"'.$this->inFilePath.'"', $this->outFilePath, $this->configFilePath),
+				array($this->inFilePath, $this->outFilePath, $this->configFilePath),
 				$cmd_line);
 				
 		if ( $add_log )
@@ -180,7 +180,7 @@ abstract class KConversionEngine
 		$exec_cmd = $binName . " " . 
 			str_replace ( 
 				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName, KDLCmdlinePlaceholders::BinaryName), 
-				array('"'.$this->inFilePath.'"', $this->outFilePath, $this->configFilePath, $binName),
+				array($this->inFilePath, $this->outFilePath, $this->configFilePath, $binName),
 				$cmd_line);
 				
 		if ( $add_log )

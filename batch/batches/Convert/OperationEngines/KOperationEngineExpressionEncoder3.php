@@ -38,7 +38,7 @@ class KOperationEngineExpressionEncoder3 extends KOperationEngine
 		$exec_cmd = $this->cmd . " " . 
 			str_replace ( 
 				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutDir, KDLCmdlinePlaceholders::ConfigFileName), 
-				array('"'.$this->inFilePath.'"', $this->outDir, $this->configFilePath),
+				array($this->inFilePath, $this->outDir, $this->configFilePath),
 				$this->operator->command);
 				
 		$exec_cmd .= " >> \"{$this->logFilePath}\" 2>&1";

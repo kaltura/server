@@ -81,7 +81,7 @@ abstract class KOperationEngine
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
 		$this->operator = $operator;
-		$this->inFilePath = kFile::realPath($inFilePath);
+		$this->inFilePath = $inFilePath;
 		$this->configFilePath = $configFilePath;
 		
 		$status = $this->doOperation();
