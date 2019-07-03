@@ -103,7 +103,6 @@ class kRendererDumpFile implements kRendererBase
 				kEncryptFileUtils::dumpEncryptFilePart($this->filePath, $this->key, $this->iv, $rangeFrom, $rangeLength);
 			else
 			{
-				infraRequestUtils::dumpFilePart()
 				kFile::dumpFilePart($this->filePath, $rangeFrom, $rangeLength);
 			}
 		}
