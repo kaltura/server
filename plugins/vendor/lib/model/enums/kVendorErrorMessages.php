@@ -15,4 +15,5 @@ interface kVendorErrorMessages extends BaseEnum
 	const TOKEN_PARSING_FAILED = 'Parse Tokens failed, response received from zoom is: ';
 	const FAILED_VERIFICATION = 'ZOOM - verification token is different from existing token';
 	const MISSING_ENTRY_FOR_ZOOM_MEETING = 'Could not find entry for meeting id: ';
+	const MISSING_ENTRY_FOR_CHAT = 'Missing entry for the chat file';
 }

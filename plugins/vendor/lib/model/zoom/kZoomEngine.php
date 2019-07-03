@@ -14,6 +14,7 @@ class kZoomEngine
 
 	protected static $FILE_VIDEO_TYPES = array('MP4');
 	protected static $FILE_CAPTION_TYPES = array('TRANSCRIPT');
+	protected static $FILE_CHAT_TYPES = array('CHAT');
 	protected $zoomConfiguration;
 	protected $zoomClient;
 
@@ -77,7 +78,7 @@ class kZoomEngine
 		$zoomIntegration = ZoomHelper::getZoomIntegration();
 		$dbUser = $this->getEntryOwner($transcript->hostEmail, $zoomIntegration);
 		$this->initUserPermissions($dbUser);
-		$entry = $this->getZoomEntryByReferenceId($transcript->id);
+		$entry = $this->getZoomEntryByMeetingId($transcript->id);
 		$this->initUserPermissions($dbUser, true);
 		$captionAssetService = new CaptionAssetService();
 		$captionAssetService->initService('caption_captionasset', 'captionAsset', 'setContent');
@@ -97,7 +98,7 @@ class kZoomEngine
 		}
 	}
 
-	protected function getZoomEntryByReferenceId($meetingId)
+	protected function getZoomEntryByMeetingId($meetingId)
 	{
 		$entryFilter = new entryFilter();
 		$pager = new KalturaFilterPager();
@@ -134,23 +135,61 @@ class kZoomEngine
 		$this->initUserPermissions($dbUser);
 		$participantsUsersNames = $this->extractMeetingParticipants($meeting->id, $zoomIntegration);
 		$validatedUsers = $this->getValidatedUsers($participantsUsersNames, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
+		$entry = null;
 		foreach ($meeting->recordingFiles as $recordingFile)
 		{
 			/* @var kZoomRecordingFile $recordingFile */
 
-			if (!in_array ($recordingFile->fileType, self::$FILE_VIDEO_TYPES))
+			if (in_array ($recordingFile->fileType, self::$FILE_VIDEO_TYPES))
 			{
-				continue;
+				$entry = $this->handleVideoRecord($meeting, $dbUser, $zoomIntegration, $validatedUsers, $recordingFile, $event);
 			}
-
-			$entry = $this->createEntryFromMeeting($meeting, $dbUser);
-			$this->setEntryCategory($zoomIntegration, $entry);
-			$this->handleParticipants($entry, $validatedUsers, $zoomIntegration);
-			$entry->save();
-			$url = $recordingFile->download_url . self::URL_ACCESS_TOKEN . $event->downloadToken;
-			kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url);
 		}
 
+		foreach ($meeting->recordingFiles as $recordingFile)
+		{
+			/* @var kZoomRecordingFile $recordingFile */
+
+			if (in_array ($recordingFile->fileType, self::$FILE_CHAT_TYPES))
+			{
+				$this->handleChatRecord($entry, $meeting, $recordingFile->download_url, $event->downloadToken, $dbUser);
+			}
+		}
+
+	}
+
+	/**
+	 * @param entry $entry
+	 * @param kZoomMeeting $meeting
+	 * @param string $chatDownloadUrl
+	 * @param string $downloadToken
+	 * @param kuser $dbUser
+	 */
+	protected function handleChatRecord($entry, $meeting, $chatDownloadUrl, $downloadToken, $dbUser)
+	{
+		if(!$entry)
+		{
+			ZoomHelper::exitWithError(kVendorErrorMessages::MISSING_ENTRY_FOR_CHAT);
+		}
+
+		$attachmentAssest = $this->createAttachmentAssetForChatFile($meeting->id);
+		$attachmentAssetResource = new KalturaUrlResource();
+		$attachmentAssetResource->url = $chatDownloadUrl . self::URL_ACCESS_TOKEN . $downloadToken;
+		$this->initUserPermissions($dbUser, true);
+		$attachmentAssetService = new AttachmentAssetService();
+		$attachmentAssetService->initService('caption_attachmentAsset', 'attachmentAsset', 'setContent');
+		$attachmentAssetService->setContentAction($attachmentAssest->getId(), $attachmentAssetResource);
+	}
+
+	protected function handleVideoRecord($meeting, $dbUser, $zoomIntegration, $validatedUsers, $recordingFile, $event)
+	{
+		$entry = $this->createEntryFromMeeting($meeting, $dbUser);
+		$this->setEntryCategory($zoomIntegration, $entry);
+		$this->handleParticipants($entry, $validatedUsers, $zoomIntegration);
+		$entry->save();
+		$url = $recordingFile->download_url . self::URL_ACCESS_TOKEN . $event->downloadToken;
+		kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url);
+		return $entry;
 	}
 
 	/**
@@ -263,7 +302,7 @@ class kZoomEngine
 	 * @param entry $entry
 	 * @return CaptionAsset
 	 */
-	public function createAssetForTranscription($entry)
+	protected function createAssetForTranscription($entry)
 	{
 		$caption = new CaptionAsset();
 		$caption->setEntryId($entry->getId());
@@ -272,6 +311,19 @@ class kZoomEngine
 		$caption->setStatus(CaptionAsset::ASSET_STATUS_QUEUED);
 		$caption->save();
 		return $caption;
+	}
+
+	/**
+	 * @param string $meetingId
+	 * @return AttachmentAsset
+	 */
+	protected function createAttachmentAssetForChatFile($meetingId)
+	{
+		$attachment = new AttachmentAsset();
+		$attachment->setFilename("Meeting {$meetingId} chat file");
+		$attachment->setcontainerFormat(AttachmentType::TEXT);
+		$attachment->save();
+		return $attachment;
 	}
 
 	/**
