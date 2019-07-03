@@ -547,7 +547,7 @@ class myPlaylistUtils
 			list ($currEntryIds, $count) = $entryQueryToFilterESearch->retrieveElasticQueryEntryIds($entryFilter, $entryKPager);
 			$entryIds = self::mergeEntriesByLimit($entryIds, $currEntryIds, $entryFilter->getLimit());
 			$totalResults = max (0, $totalResults - count($entryIds));
-			if ( $totalResults == 0 )
+			if ( $totalResults === 0 )
 			{
 				break;
 			}
