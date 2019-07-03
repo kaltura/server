@@ -50,5 +50,6 @@ class ESearchEntryFilterFields extends KalturaEnum
 	const PARTNER_SORT_VALUE = 'partner_sort_value';
 	const SEARCH_TEXT = 'search_text';
 	const FREE_TEXT	= '_free_text';
+	const TOTAL_RANK = 'total_rank';
 
 }

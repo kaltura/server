@@ -518,7 +518,6 @@ class myPlaylistUtils
 		$entryFiltersViaEsearch = array();
 		$entryFiltersViaSphinx = array();
 		list ($totalResults, $entryFilters) = self::getPlaylistFilterListStruct($xml);
-
 		foreach ($entryFilters as $entryFilter)
 		{
 			if (!isset($entryFilter->advancedSearch) ||
@@ -534,7 +533,7 @@ class myPlaylistUtils
 		return array($entryFiltersViaEsearch, $entryFiltersViaSphinx, $totalResults);
 	}
 
-	public static function executeDynamicPlaylistViaEsearch ($entryFilters ,$pager = null)
+	public static function executeDynamicPlaylistViaEsearch ($entryFilters ,$totalResults, $pager = null)
 	{
 		$entryKPager = new kPager();
 		if ($pager)
@@ -546,18 +545,40 @@ class myPlaylistUtils
 		foreach ($entryFilters as $entryFilter)
 		{
 			list ($currEntryIds, $count) = $entryQueryToFilterESearch->retrieveElasticQueryEntryIds($entryFilter, $entryKPager);
-			if (count($currEntryIds) > $entryFilter->getLimit())
+			$entryIds = self::mergeEntriesByLimit($entryIds, $currEntryIds, $entryFilter->getLimit());
+			$totalResults = max (0, $totalResults - count($entryIds));
+			if ( $totalResults == 0 )
 			{
-				$currEntryIds = array_slice($currEntryIds,0,$entryFilter->getLimit());
+				break;
 			}
-			$entryIds = array_merge ($entryIds, $currEntryIds);
 		}
+		return array(self::getEntriesSorted($entryIds), $totalResults);
+	}
 
+	protected static function getEntriesSorted($entryIds)
+	{
 		$entryIds = array_unique($entryIds);
 		$entryIdsOrder = array_flip($entryIds);
 		$entries = entryPeer::retrieveByPKs($entryIds);
-		usort($entries, build_sorter($entryIdsOrder));
+		usort($entries, self::buildSorter($entryIdsOrder));
 		return $entries;
+	}
+
+	protected static function mergeEntriesByLimit($entryIds, $currEntryIds, $limit)
+	{
+		if ($limit && count($currEntryIds) > $limit)
+		{
+			$currEntryIds = array_slice($currEntryIds,0, $limit);
+		}
+		return array_merge ($entryIds, $currEntryIds);
+	}
+
+	protected static function buildSorter($objectsOrder)
+	{
+		return function ($a, $b) use ($objectsOrder)
+		{
+			return ($objectsOrder[$a->getId()] > $objectsOrder[$b->getId()]) ? 1 : -1;
+		};
 	}
 
 	protected static function fillEntryFilterFromXml($listOfFilters, $partnerId)

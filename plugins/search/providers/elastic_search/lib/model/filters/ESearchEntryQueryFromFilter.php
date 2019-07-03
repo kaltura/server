@@ -52,7 +52,8 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		ESearchEntryFilterFields::CATEGORIES_FULL_NAME,
 		ESearchEntryFilterFields::PARTNER_SORT_VALUE,
 		ESearchEntryFilterFields::SEARCH_TEXT,
-		ESearchEntryFilterFields::FREE_TEXT
+		ESearchEntryFilterFields::FREE_TEXT,
+		ESearchEntryFilterFields::TOTAL_RANK
 	);
 
 
@@ -111,8 +112,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			ESearchEntryFilterFields::PARTNER_SORT_VALUE => ESearchEntryFieldName::PARTNER_SORT_VALUE,
 			ESearchEntryFilterFields::SEARCH_TEXT => ESearchUnifiedItem::UNIFIED,
 			ESearchEntryFilterFields::FREE_TEXT => ESearchUnifiedItem::UNIFIED,
-			ESearchEntryFilterFields::PLAYS => ESearchEntryOrderByFieldName::PLAYS,
-			ESearchEntryFilterFields::VIEWS => ESearchEntryOrderByFieldName::VIEWS
+			ESearchEntryFilterFields::TOTAL_RANK => ESearchEntryOrderByFieldName::VOTES
 		);
 
 		if(array_key_exists($field, $fieldsMap))
@@ -125,34 +125,42 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		}
 	}
 
-	protected function getMediaEntryElasticOrderBy($field)
-	{	//TODO: VALIDATE ALL OF THEM
+	protected function getSphinxToElasticOrderBy($field)
+	{
 		$fieldsMap = array(
-			KalturaMediaEntryOrderBy::MEDIA_TYPE_ASC,
-			KalturaMediaEntryOrderBy::MEDIA_TYPE_DESC,
-			KalturaMediaEntryOrderBy::PLAYS_ASC,
-			KalturaMediaEntryOrderBy::PLAYS_DESC,
-			KalturaMediaEntryOrderBy::VIEWS_ASC,
-			KalturaMediaEntryOrderBy::VIEWS_DESC,
-			KalturaMediaEntryOrderBy::DURATION_ASC,
-			KalturaMediaEntryOrderBy::DURATION_DESC,
-			KalturaMediaEntryOrderBy::NAME_ASC,
-			KalturaMediaEntryOrderBy::NAME_DESC,
-			KalturaMediaEntryOrderBy::CREATED_AT_ASC,
-			KalturaMediaEntryOrderBy::CREATED_AT_DESC,
-			KalturaMediaEntryOrderBy::UPDATED_AT_ASC,
-			KalturaMediaEntryOrderBy::UPDATED_AT_DESC,
-			KalturaMediaEntryOrderBy::START_DATE_ASC,
-			KalturaMediaEntryOrderBy::START_DATE_DESC,
-			KalturaMediaEntryOrderBy::END_DATE_ASC,
-			KalturaMediaEntryOrderBy::END_DATE_DESC,
-			KalturaMediaEntryOrderBy::PARTNER_SORT_VALUE_ASC,
-			KalturaMediaEntryOrderBy::PARTNER_SORT_VALUE_DESC,
+			self::ASC.ESearchEntryFilterFields::MEDIA_TYPE,
+			self::DESC.ESearchEntryFilterFields::MEDIA_TYPE,
+			KalturaMediaEntryOrderBy::PLAYS_ASC						=> self::ASC.ESearchEntryOrderByFieldName::PLAYS,
+			KalturaMediaEntryOrderBy::PLAYS_DESC					=> self::DESC.ESearchEntryOrderByFieldName::PLAYS,
+			KalturaMediaEntryOrderBy::VIEWS_ASC						=> self::ASC.ESearchEntryOrderByFieldName::VIEWS,
+			KalturaMediaEntryOrderBy::VIEWS_DESC					=> self::DESC.ESearchEntryOrderByFieldName::VIEWS,
+			KalturaMediaEntryOrderBy::DURATION_ASC					=> self::ASC.ESearchEntryFieldName::LENGTH_IN_MSECS,
+			KalturaMediaEntryOrderBy::DURATION_DESC 				=> self::DESC.ESearchEntryFieldName::LENGTH_IN_MSECS,
+			KalturaMediaEntryOrderBy::NAME_ASC						=> self::ASC. ESearchEntryOrderByFieldName::NAME,
+			KalturaMediaEntryOrderBy::NAME_DESC						=> self::DESC. ESearchEntryOrderByFieldName::NAME,
+			KalturaMediaEntryOrderBy::CREATED_AT_ASC				=> self::ASC.ESearchEntryOrderByFieldName::CREATED_AT,
+			KalturaMediaEntryOrderBy::CREATED_AT_DESC				=> self::DESC.ESearchEntryOrderByFieldName::CREATED_AT,
+			KalturaMediaEntryOrderBy::UPDATED_AT_ASC 				=> self::ASC.ESearchEntryOrderByFieldName::UPDATED_AT,
+			KalturaMediaEntryOrderBy::UPDATED_AT_DESC				=> self::DESC.ESearchEntryOrderByFieldName::UPDATED_AT,
+			KalturaMediaEntryOrderBy::RANK_ASC 						=> self::ASC.ESearchEntryOrderByFieldName::VOTES,
+			KalturaMediaEntryOrderBy::RANK_DESC 					=> self::DESC.ESearchEntryOrderByFieldName::VOTES,
+			self::ASC.ESearchEntryFilterFields::TOTAL_RANK 			=> self::ASC.ESearchEntryOrderByFieldName::VOTES,
+			self::DESC.ESearchEntryFilterFields::TOTAL_RANK 		=> self::DESC.ESearchEntryOrderByFieldName::VOTES,
+			KalturaMediaEntryOrderBy::START_DATE_ASC				=> self::ASC.ESearchEntryOrderByFieldName::START_DATE,
+			KalturaMediaEntryOrderBy::START_DATE_DESC				=> self::DESC.ESearchEntryOrderByFieldName::START_DATE,
+			KalturaMediaEntryOrderBy::END_DATE_ASC					=> self::ASC.ESearchEntryOrderByFieldName::END_DATE,
+			KalturaMediaEntryOrderBy::END_DATE_DESC					=> self::DESC.ESearchEntryOrderByFieldName::END_DATE,
+			KalturaMediaEntryOrderBy::RECENT_ASC					=> self::ASC.ESearchEntryOrderByFieldName::CREATED_AT,
+			KalturaMediaEntryOrderBy::RECENT_DESC					=> self::DESC.ESearchEntryOrderByFieldName::CREATED_AT
 		);
 
 		if(in_array($field, $fieldsMap))
 		{
 			return $field;
+		}
+		else if (array_key_exists($field, $fieldsMap))
+		{
+			return $fieldsMap[$field];
 		}
 		else
 		{
@@ -204,7 +212,6 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 	{
 		$fieldParts = explode(entryFilter::FILTER_PREFIX, $field, 3);
 		list( , $operator, $fieldName) = $fieldParts;
-
 		list($operator, $fieldName) = self::handlingFreeTextField($field, $operator, $fieldName);
 		if(!in_array($fieldName, static::getSupportedFields()) || is_null($fieldValue) || $fieldValue === '')
 		{
@@ -249,13 +256,22 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 
 	protected function getKESearchOrderBy($fieldValue)
 	{
-		if (!$this->getMediaEntryElasticOrderBy($fieldValue))
+		$fieldValue = $this->getSphinxToElasticOrderBy($fieldValue);
+		if (!$fieldValue)
 		{
 			return null;
 		}
+		$eSearchOrderByItem = self::getESearchOrderByItem($fieldValue);
+		$orderItems = array($eSearchOrderByItem);
+		$kEsearchOrderBy = new ESearchOrderBy();
+		$kEsearchOrderBy->setOrderItems($orderItems);
+		return $kEsearchOrderBy;
+	}
+
+	protected static function getESearchOrderByItem($fieldValue)
+	{
 		$eSearchOrderByItem = new ESearchEntryOrderByItem();
-		$sortField = $this->getSphinxToElasticFieldName(substr($fieldValue,1));
-		$eSearchOrderByItem->setSortField($sortField);
+		$eSearchOrderByItem->setSortField(substr($fieldValue,1));
 		$fieldNameSortOrder = $fieldValue[0];
 		if ($fieldNameSortOrder === self::DESC)
 		{
@@ -265,10 +281,6 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		{
 			$eSearchOrderByItem->setSortOrder(ESearchSortOrder::ORDER_BY_ASC);
 		}
-		$orderItems = array($eSearchOrderByItem);
-		$kEsearchOrderBy = new ESearchOrderBy();
-		$kEsearchOrderBy->setOrderItems($orderItems);
-		return $kEsearchOrderBy;
-
+		return $eSearchOrderByItem;
 	}
 }

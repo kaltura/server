@@ -380,7 +380,7 @@ class PlaylistService extends KalturaEntryService
 		if ($entryFiltersViaEsearch)
 		{
 			$entryFiltersViaEsearch = myPlaylistUtils::getEntryFiltersFromXml($entryFiltersViaEsearch, $partnerId);
-			$entryListEsearch = myPlaylistUtils::executeDynamicPlaylistViaEsearch($entryFiltersViaEsearch, $pagerSeparateQueries);
+			list($entryListEsearch, $totalResults) = myPlaylistUtils::executeDynamicPlaylistViaEsearch($entryFiltersViaEsearch, $totalResults, $pagerSeparateQueries);
 		}
 		if ($entryFiltersViaSphinx)
 		{
