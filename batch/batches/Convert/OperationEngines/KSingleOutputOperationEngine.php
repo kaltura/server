@@ -28,7 +28,7 @@ class KSingleOutputOperationEngine extends KOperationEngine
 		{
 			$command = str_replace ( 
 				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName, KDLCmdlinePlaceholders::BinaryName), 
-				array($this->inFilePath, $this->outFilePath, $this->configFilePath, $this->cmd),
+				array('"'.$this->inFilePath.'"', $this->outFilePath, $this->configFilePath, $this->cmd),
 				$this->operator->command);
 		}
 				

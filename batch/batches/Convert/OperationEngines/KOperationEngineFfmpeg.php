@@ -7,7 +7,9 @@ class KOperationEngineFfmpeg  extends KSingleOutputOperationEngine
 {
 	protected function getCmdLine()
 	{
-		$cmdLine=parent::getCmdLine();
+		$this->inFilePath = kFile::checkFileExists($this->inFilePath) ? '"' . kFile::realPath($this->inFilePath) . '"' : $this->inFilePath;
+		
+		$cmdLine = parent::getCmdLine();
 		if(get_class($this)=='KOperationEngineFfmpegVp8'){
 			$cmdLine=KConversionEngineFfmpeg::experimentalFixing($cmdLine, $this->data->flavorParamsOutput, $this->cmd, $this->inFilePath, $this->outFilePath);
 		}

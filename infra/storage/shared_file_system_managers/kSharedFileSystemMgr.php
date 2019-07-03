@@ -345,7 +345,7 @@ abstract class kSharedFileSystemMgr
 		return $this->doGetFile($filePath);
 	}
 	
-	public function getFileFromRemoteUrl($url, $destFilePath = null, $allowInternalUrl = false)
+	public function getFileFromResource($url, $destFilePath = null, $allowInternalUrl = false)
 	{
 		return $this->doGetFileFromResource($url, $destFilePath, $allowInternalUrl);
 	}
@@ -558,8 +558,6 @@ abstract class kSharedFileSystemMgr
 	
 	public static function getInstance($type = null, $options = null)
 	{
-		if(self::$kSharedFsMgr)
-			return self::$kSharedFsMgr;
 		
 		$dc_config = kConf::getMap("dc_config");
 		if(!$type)
@@ -567,18 +565,21 @@ abstract class kSharedFileSystemMgr
 		if(!$options)
 			$options = isset($dc_config['storage']) ? $dc_config['storage'] : null;
 		
+		if(self::$kSharedFsMgr[$type])
+			return self::$kSharedFsMgr[$type];
+		
 		switch($type)
 		{
 			case kSharedFileSystemMgrType::LOCAL:
-				self::$kSharedFsMgr = new kNfsSharedFileSystemMgr($options);
+				self::$kSharedFsMgr[$type] = new kNfsSharedFileSystemMgr($options);
 				break;
 			
 			case kSharedFileSystemMgrType::S3:
-				self::$kSharedFsMgr = new kS3SharedFileSystemMgr($options);
+				self::$kSharedFsMgr[$type] = new kS3SharedFileSystemMgr($options);
 				break;
 		}
 		
-		return self::$kSharedFsMgr;
+		return self::$kSharedFsMgr[$type];
 	}
 	
 	public static function getSharedRootPath()
