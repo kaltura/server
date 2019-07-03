@@ -130,9 +130,9 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		$fieldsMap = array(
 			self::ASC.ESearchEntryFilterFields::MEDIA_TYPE,
 			self::DESC.ESearchEntryFilterFields::MEDIA_TYPE,
-			KalturaMediaEntryOrderBy::PLAYS_ASC	=> self::ASC.ESearchEntryOrderByFieldName::PLAYS,
+			KalturaMediaEntryOrderBy::PLAYS_ASC => self::ASC.ESearchEntryOrderByFieldName::PLAYS,
 			KalturaMediaEntryOrderBy::PLAYS_DESC => self::DESC.ESearchEntryOrderByFieldName::PLAYS,
-			KalturaMediaEntryOrderBy::VIEWS_ASC	=> self::ASC.ESearchEntryOrderByFieldName::VIEWS,
+			KalturaMediaEntryOrderBy::VIEWS_ASC => self::ASC.ESearchEntryOrderByFieldName::VIEWS,
 			KalturaMediaEntryOrderBy::VIEWS_DESC => self::DESC.ESearchEntryOrderByFieldName::VIEWS,
 			KalturaMediaEntryOrderBy::DURATION_ASC => self::ASC.ESearchEntryFieldName::LENGTH_IN_MSECS,
 			KalturaMediaEntryOrderBy::DURATION_DESC => self::DESC.ESearchEntryFieldName::LENGTH_IN_MSECS,

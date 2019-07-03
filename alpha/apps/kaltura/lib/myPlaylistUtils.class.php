@@ -545,7 +545,7 @@ class myPlaylistUtils
 		foreach ($entryFilters as $entryFilter)
 		{
 			list ($currEntryIds, $count) = $entryQueryToFilterESearch->retrieveElasticQueryEntryIds($entryFilter, $entryKPager);
-			$entryIds = self::mergeEntriesByLimit($entryIds, $currEntryIds, $entryFilter->getLimit());
+			$entryIds = self::mergeEntriesByLimit($entryIds, $currEntryIds, $entryFilter->getLimit(),$totalResults);
 			$totalResults = max (0, $totalResults - count($entryIds));
 			if ( $totalResults === 0 )
 			{
@@ -564,9 +564,13 @@ class myPlaylistUtils
 		return $entries;
 	}
 
-	protected static function mergeEntriesByLimit($entryIds, $currEntryIds, $limit)
+	protected static function mergeEntriesByLimit($entryIds, $currEntryIds, $limit, $totalResults)
 	{
-		if ($limit && count($currEntryIds) > $limit)
+		if ($totalResults < $limit)
+		{
+			$limit = $totalResults;
+		}
+		if (count($currEntryIds) > $limit)
 		{
 			$currEntryIds = array_slice($currEntryIds,0, $limit);
 		}
