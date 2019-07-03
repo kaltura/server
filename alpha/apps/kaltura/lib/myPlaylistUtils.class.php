@@ -617,9 +617,11 @@ class myPlaylistUtils
 	protected static function unsetDates($filter)
 	{
 		foreach (self::$dates as $date)
-		if ($filter->is_set($date))
 		{
-			$filter->unsetByName($date);
+			if ($filter->is_set($date))
+			{
+				$filter->unsetByName($date);
+			}
 		}
 	}
 
