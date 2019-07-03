@@ -10,7 +10,7 @@ require_once(dirname(__FILE__) . '/../storage/shared_file_system_managers/kShare
  */
 class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 {
-	const EXPIRY_SUFFIX = '__expiry';
+	const EXPIRY_SUFFIX = '__expiry.txt';
 
 	protected $baseFolder;
 	protected $keyFolderChars;

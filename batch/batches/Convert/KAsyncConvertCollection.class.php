@@ -61,7 +61,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 				}
 			}
 			
-			if(file_exists($srcFileSyncDescriptor->actualFileSyncLocalPath))
+			if(kFile::checkFileExists($srcFileSyncDescriptor->actualFileSyncLocalPath))
 			{
 				KalturaLog::info("Source file exists [$srcFileSyncDescriptor->actualFileSyncLocalPath]");
 			}
@@ -70,7 +70,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file not found [$srcFileSyncDescriptor->actualFileSyncLocalPath]", KalturaBatchJobStatus::RETRY);
 			}
 			
-			if(!is_file($srcFileSyncDescriptor->actualFileSyncLocalPath))
+			if(!kFile::isFile($srcFileSyncDescriptor->actualFileSyncLocalPath))
 			{
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file [$srcFileSyncDescriptor->actualFileSyncLocalPath] is not a file", KalturaBatchJobStatus::FAILED);
 			}
@@ -92,7 +92,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 		}
 
 		
-		if(file_exists($data->inputXmlLocalPath))
+		if(kFile::checkFileExists($data->inputXmlLocalPath))
 		{
 			KalturaLog::info("XML Configuration file exists [$data->inputXmlLocalPath]");
 		}
@@ -101,7 +101,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, "XML Configuration file not found [$data->inputXmlLocalPath]", KalturaBatchJobStatus::RETRY);
 		}
 		
-		if(!is_file($data->inputXmlLocalPath))
+		if(!kFile::isFile($data->inputXmlLocalPath))
 		{
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "XML Configuration file [$data->inputXmlLocalPath] is not a file", KalturaBatchJobStatus::FAILED);
 		}
@@ -160,7 +160,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 		foreach($fileNames as $fileName)
 		{
 			$srcPath = $data->destDirLocalPath . DIRECTORY_SEPARATOR . $fileName;
-			if(!file_exists($srcPath))
+			if(!kFile::checkFileExists($srcPath))
 				continue;
 				
 			$destPath = $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
@@ -179,7 +179,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 		foreach($data->flavors as $flavor)
 		{
 			$srcPath = $flavor->destFileSyncLocalPath;
-			if(!file_exists($srcPath))
+			if(!kFile::checkFileExists($srcPath))
 				continue;
 				
 			$destPath = $this->sharedTempPath . DIRECTORY_SEPARATOR . basename($srcPath);
@@ -207,16 +207,16 @@ class KAsyncConvertCollection extends KAsyncConvert
 			
 			KalturaLog::debug("moving file[$srcPath] to[$destPath] size[$fileSize]");
 			
-			if(file_exists($destPath))
+			if(kFile::checkFileExists($destPath))
 			{
 				KalturaLog::debug("delete existing file[$destPath]");
-				unlink($destPath);
+				kFile::unlink($destPath);
 			}
 				
 			KalturaLog::debug("rename($srcPath, $destPath)");
-			rename($srcPath, $destPath);
+			kFile::rename($srcPath, $destPath);
 		
-			if(!file_exists($destPath) || kFile::fileSize($destPath) != $fileSize)
+			if(!kFile::checkFileExists($destPath) || kFile::fileSize($destPath) != $fileSize)
 			{
 				KalturaLog::err("Error: moving file [$srcPath] failed");
 				die();

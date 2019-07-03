@@ -361,7 +361,7 @@ class kFileBase
 		if(kFile::isSharedPath($destFilePath))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
-			return $kSharedFsMgr->getFileFromRemoteUrl($src, $destFilePath, $allowInternalUrl);
+			return $kSharedFsMgr->getFileFromResource($src, $destFilePath, $allowInternalUrl);
 		}
 		
 		//DestFile is local, use curl to download the file locally
