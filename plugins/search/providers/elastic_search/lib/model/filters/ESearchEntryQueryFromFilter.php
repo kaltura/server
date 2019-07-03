@@ -110,7 +110,9 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			ESearchEntryFilterFields::CATEGORIES_FULL_NAME => ESearchCategoryEntryFieldName::FULL_IDS,
 			ESearchEntryFilterFields::PARTNER_SORT_VALUE => ESearchEntryFieldName::PARTNER_SORT_VALUE,
 			ESearchEntryFilterFields::SEARCH_TEXT => ESearchUnifiedItem::UNIFIED,
-			ESearchEntryFilterFields::FREE_TEXT => ESearchUnifiedItem::UNIFIED
+			ESearchEntryFilterFields::FREE_TEXT => ESearchUnifiedItem::UNIFIED,
+			ESearchEntryFilterFields::PLAYS => ESearchEntryOrderByFieldName::PLAYS,
+			ESearchEntryFilterFields::VIEWS => ESearchEntryOrderByFieldName::VIEWS
 		);
 
 		if(array_key_exists($field, $fieldsMap))
@@ -123,16 +125,34 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		}
 	}
 
-	protected function getSphinxToElasticOrderBy($field)
-	{
+	protected function getMediaEntryElasticOrderBy($field)
+	{	//TODO: VALIDATE ALL OF THEM
 		$fieldsMap = array(
-			ESearchEntryFilterFields::VIEWS => ESearchEntryOrderByFieldName::VIEWS,
-			ESearchEntryFilterFields::PLAYS => ESearchEntryOrderByFieldName::PLAYS
+			KalturaMediaEntryOrderBy::MEDIA_TYPE_ASC,
+			KalturaMediaEntryOrderBy::MEDIA_TYPE_DESC,
+			KalturaMediaEntryOrderBy::PLAYS_ASC,
+			KalturaMediaEntryOrderBy::PLAYS_DESC,
+			KalturaMediaEntryOrderBy::VIEWS_ASC,
+			KalturaMediaEntryOrderBy::VIEWS_DESC,
+			KalturaMediaEntryOrderBy::DURATION_ASC,
+			KalturaMediaEntryOrderBy::DURATION_DESC,
+			KalturaMediaEntryOrderBy::NAME_ASC,
+			KalturaMediaEntryOrderBy::NAME_DESC,
+			KalturaMediaEntryOrderBy::CREATED_AT_ASC,
+			KalturaMediaEntryOrderBy::CREATED_AT_DESC,
+			KalturaMediaEntryOrderBy::UPDATED_AT_ASC,
+			KalturaMediaEntryOrderBy::UPDATED_AT_DESC,
+			KalturaMediaEntryOrderBy::START_DATE_ASC,
+			KalturaMediaEntryOrderBy::START_DATE_DESC,
+			KalturaMediaEntryOrderBy::END_DATE_ASC,
+			KalturaMediaEntryOrderBy::END_DATE_DESC,
+			KalturaMediaEntryOrderBy::PARTNER_SORT_VALUE_ASC,
+			KalturaMediaEntryOrderBy::PARTNER_SORT_VALUE_DESC,
 		);
 
-		if(array_key_exists($field, $fieldsMap))
+		if(in_array($field, $fieldsMap))
 		{
-			return $fieldsMap[$field];
+			return $field;
 		}
 		else
 		{
@@ -151,20 +171,18 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 				$kEsearchOrderBy = $this->getKESearchOrderBy($fieldValue);
 				continue;
 			}
-
 			list($operator, $fieldName, $fieldValue, $shouldContinue) = $this->splitIntoParameters($filter, $field, $fieldValue);
 			if ($shouldContinue)
 			{
 				continue;
 			}
-			$searchItemType = $this->getSphinxToElasticSearchItemType($operator);
-			$elasticFieldName = $this->getSphinxToElasticFieldName($fieldName);
-			if($elasticFieldName && $searchItemType)
-			{
-				$this->AddFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue);
-			}
-
+			$this->addingFieldPartIntoQuery($operator, $fieldName, $fieldValue);
 		}
+		return $this->createFinalOperator($kEsearchOrderBy);
+	}
+
+	protected function createFinalOperator($kEsearchOrderBy)
+	{
 		$this->addNestedQueryPart();
 		$operator = new ESearchOperator();
 		$operator->setOperator(ESearchOperatorType::AND_OP);
@@ -172,21 +190,47 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		return array($operator, $kEsearchOrderBy);
 	}
 
+	protected function addingFieldPartIntoQuery($operator, $fieldName, $fieldValue)
+	{
+		$searchItemType = $this->getSphinxToElasticSearchItemType($operator);
+		$elasticFieldName = $this->getSphinxToElasticFieldName($fieldName);
+		if($elasticFieldName && $searchItemType)
+		{
+			$this->AddFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue);
+		}
+	}
+
 	protected function splitIntoParameters($filter, $field, $fieldValue )
 	{
 		$fieldParts = explode(entryFilter::FILTER_PREFIX, $field, 3);
 		list( , $operator, $fieldName) = $fieldParts;
 
+		list($operator, $fieldName) = self::handlingFreeTextField($field, $operator, $fieldName);
+		if(!in_array($fieldName, static::getSupportedFields()) || is_null($fieldValue) || $fieldValue === '')
+		{
+			return array(null , null, null, true);
+		}
+		if ($fieldName === ESearchEntryFilterFields::STATUS && ($operator === baseObjectFilter::EQ ||$operator === baseObjectFilter::IN  ))
+		{
+			self::$validStatuses = explode(',',$fieldValue);
+			return array(null , null, null, true);
+		}
+		$fieldValue = self::changeFieldValueByPuserIdAndDuration($fieldName, $filter, $fieldValue);
+		return array($operator, $fieldName, $fieldValue, false);
+	}
+
+	protected static function handlingFreeTextField($field, $operator, $fieldName)
+	{
 		if ($field === ESearchEntryFilterFields::FREE_TEXT)
 		{
 			$operator = baseObjectFilter::IN;
 			$fieldName = $field;
 		}
+		return array($operator, $fieldName);
+	}
 
-		if(!in_array($fieldName, static::getSupportedFields()) || is_null($fieldValue) || $fieldValue === '')
-		{
-			return array(null , null, null, true);
-		}
+	protected static function changeFieldValueByPuserIdAndDuration($fieldName, $filter, $fieldValue)
+	{
 		if(in_array($fieldName, self::$puserFields))
 		{
 			$kuser = kuserPeer::getKuserByPartnerAndUid($filter->getPartnerSearchScope(), $fieldValue);
@@ -196,41 +240,35 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			}
 			$fieldValue = $kuser->getId();
 		}
-
-		if ($fieldName === ESearchEntryFilterFields::STATUS && ($operator === baseObjectFilter::EQ ||$operator === baseObjectFilter::IN  ))
-		{
-			self::$validStatuses = explode(',',$fieldValue);
-			return array(null , null, null, true);
-		}
-
-		if ($fieldName === ESearchEntryFilterFields::DURATION)
+		else if ($fieldName === ESearchEntryFilterFields::DURATION)
 		{
 			$fieldValue = $fieldValue * 1000;
 		}
-		return array($operator, $fieldName, $fieldValue, false);
+		return $fieldValue;
 	}
 
 	protected function getKESearchOrderBy($fieldValue)
 	{
-		$fieldNameSortField = substr($fieldValue,1);
-		if (!$this->getSphinxToElasticOrderBy($fieldNameSortField))
+		if (!$this->getMediaEntryElasticOrderBy($fieldValue))
 		{
 			return null;
 		}
 		$eSearchOrderByItem = new ESearchEntryOrderByItem();
-		if ($fieldValue[0] === self::DESC)
+		$sortField = $this->getSphinxToElasticFieldName(substr($fieldValue,1));
+		$eSearchOrderByItem->setSortField($sortField);
+		$fieldNameSortOrder = $fieldValue[0];
+		if ($fieldNameSortOrder === self::DESC)
 		{
 			$eSearchOrderByItem->setSortOrder(ESearchSortOrder::ORDER_BY_DESC);
 		}
-		else if ($fieldValue[0] === self::ASC)
+		else if ($fieldNameSortOrder === self::ASC)
 		{
 			$eSearchOrderByItem->setSortOrder(ESearchSortOrder::ORDER_BY_ASC);
 		}
-		$eSearchOrderByItem->setSortField($fieldNameSortField);
-
 		$orderItems = array($eSearchOrderByItem);
 		$kEsearchOrderBy = new ESearchOrderBy();
 		$kEsearchOrderBy->setOrderItems($orderItems);
 		return $kEsearchOrderBy;
+
 	}
 }

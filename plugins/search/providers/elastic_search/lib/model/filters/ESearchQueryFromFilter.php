@@ -12,8 +12,9 @@ class ESearchQueryFromFilter
 		ESearchCategoryEntryFieldName::ANCESTOR_NAME =>  array(ESearchCategoryEntryFieldName::ANCESTOR_NAME,  'ESearchCategoryEntryAncestorNameItem')
 	);
 
-	CONST FIELD_NAME = 0;
-	CONST FIELD_CLASS = 1;
+	const FIELD_NAME_LOCATION = 0;
+	const FIELD_CLASS_LOCATION = 1;
+	const FIELD_NAME = 'fieldName';
 
 	public function __construct()
 	{
@@ -185,7 +186,7 @@ class ESearchQueryFromFilter
 	protected function addSearchItem($elasticFieldName, $value, $itemType, $range = false)
 	{
 		$searchItem = $this->createSearchItemByFieldType($elasticFieldName);
-		if (property_exists ($searchItem, 'fieldName') && !$searchItem->getFieldName())
+		if (property_exists ($searchItem, self::FIELD_NAME) && !$searchItem->getFieldName())
 		{
 			$searchItem->setFieldName($elasticFieldName);
 		}
@@ -203,8 +204,7 @@ class ESearchQueryFromFilter
 		if(count($values))
 		{
 			if (count($values) > 1)
-			{
-				//all values excepts from the last value should be parent category p1>p2>c3
+			{	//all values excepts from the last value should be parent category p1>p2>c3
 				for ($i = 0; $i < count($values) - 1; $i++)
 				{
 					$innerSearchItems[] =  $this->addSearchItem(KalturaESearchCategoryEntryFieldName::ANCESTOR_NAME, $values[$i], $searchType);
@@ -240,7 +240,6 @@ class ESearchQueryFromFilter
 		$orOprator = $this->createOperator(ESearchOperatorType::OR_OP, array($notOprator,$searchItem), $elasticFieldName);
 		return $orOprator;
 	}
-
 
 	protected function createOperator($opretorType,$searchItemsArray,$elasticFieldName)
 	{
@@ -313,8 +312,8 @@ class ESearchQueryFromFilter
 	{
 		if (in_array($elasticFieldName ,array_keys(self::$categoryFilterFields)))
 		{
-			$eSearchCategoryEntry = new self::$categoryFilterFields[$elasticFieldName][self::FIELD_CLASS]();
-			$eSearchCategoryEntry->setFieldName(self::$categoryFilterFields[$elasticFieldName][self::FIELD_NAME]);
+			$eSearchCategoryEntry = new self::$categoryFilterFields[$elasticFieldName][self::FIELD_CLASS_LOCATION]();
+			$eSearchCategoryEntry->setFieldName(self::$categoryFilterFields[$elasticFieldName][self::FIELD_NAME_LOCATION]);
 			return $eSearchCategoryEntry;
 		}
 		if ($elasticFieldName === ESearchUnifiedItem::UNIFIED)
@@ -344,7 +343,6 @@ class ESearchQueryFromFilter
 			baseObjectFilter::NOT_CONTAINS => ESearchFilterItemType::NOT_CONTAINS,
 			baseObjectFilter::IS_EMPTY => ESearchFilterItemType::IS_EMPTY
 		);
-
 
 		if(array_key_exists($operator, $operatorsMap))
 		{
