@@ -95,6 +95,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			'region' => $this->s3Region,
 			'signature' => $this->signatureType ? $this->signatureType : 'v4',
 			'version' => '2006-03-01',
+			'scheme'  => 'http'
 		);
 		
 		if ($this->endPoint)
@@ -305,7 +306,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 					'Key'        => $filePath,
 					'UploadId'   => $uploadId,
 					'PartNumber' => $partNumber,
-					'Body'       => stream_get_contents($sourceFH, 32 * 1024 * 1024),
+					'Body'       => stream_get_contents($sourceFH, 16 * 1024 * 1024),
 				));
 				$parts['Parts'][$partNumber] = array(
 					'PartNumber' => $partNumber,
@@ -358,7 +359,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function doMoveFile($from, $to, $override_if_exists = false, $copy = false)
 	{
 		$from = str_replace("\\", "/", $from);
-		$to = str_replace("\\", "/", $to);
+		$to = str_replace("//", "/", $to);
 
 		if(!$this->doCheckFileExists($from))
 		{
@@ -640,18 +641,32 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doDumpFilePart($filePath, $range_from, $range_length)
 	{
-		$defaultChunkSize = 500000;
-		$fileSize = $this->doFileSize($filePath);
-
-		while($range_length >= 0)
-		{
-			$chunkSize = min($defaultChunkSize, $range_length);
-			$range_to = min($range_from + $chunkSize, $fileSize);
-			$content = $this->getSpecificObjectRange($filePath, $range_from, $range_to);
-			echo $content;
-			$range_length -= $chunkSize;
-			$range_from = $range_from + $chunkSize + 1;
-		}
+		$fileUrl = $this->doRealPath($filePath);
+		
+		KalturaLog::debug("Test:: range_from [$range_from] range_length [$range_length]");
+		
+		$ch = curl_init();
+		
+		curl_setopt($ch, CURLOPT_URL, $fileUrl);
+		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
+		curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
+		$range_to = ($range_from + $range_length) - 1;
+		curl_setopt($ch, CURLOPT_RANGE, "$range_from-$range_to");
+		curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'kFileUtils::read_body');
+		
+		$result = curl_exec($ch);
+		
+//		$defaultChunkSize = 500000;
+//		$fileSize = $this->doFileSize($filePath);
+//		while($range_length >= 0)
+//		{
+//			$chunkSize = min($defaultChunkSize, $range_length);
+//			$range_to = min($range_from + $chunkSize, $fileSize);
+//			$content = $this->getSpecificObjectRange($filePath, $range_from, $range_to);
+//			echo $content;
+//			$range_length -= $chunkSize;
+//			$range_from = $range_from + $chunkSize + 1;
+//		}
 	}
 
 	protected function getSpecificObjectRange($filePath, $startRange, $endRange)

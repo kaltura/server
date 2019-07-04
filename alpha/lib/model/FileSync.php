@@ -153,8 +153,8 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function deleteTempClear()
 	{
 		$tempPath = $this->getClearTempPath();
-		if (file_exists($tempPath))
-			unlink($tempPath);
+		if (kFile::checkFileExists($tempPath))
+			kFile::unlink($tempPath);
 	}
 
 	

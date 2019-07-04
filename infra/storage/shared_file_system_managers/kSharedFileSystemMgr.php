@@ -565,7 +565,7 @@ abstract class kSharedFileSystemMgr
 		if(!$options)
 			$options = isset($dc_config['storage']) ? $dc_config['storage'] : null;
 		
-		if(self::$kSharedFsMgr[$type])
+		if(isset(self::$kSharedFsMgr[$type]))
 			return self::$kSharedFsMgr[$type];
 		
 		switch($type)
