@@ -656,6 +656,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		$result = curl_exec($ch);
 		
+//		$defaultChunkSize = 500000;
+//		$fileSize = $this->doFileSize($filePath);
 //		while($range_length >= 0)
 //		{
 //			$chunkSize = min($defaultChunkSize, $range_length);
