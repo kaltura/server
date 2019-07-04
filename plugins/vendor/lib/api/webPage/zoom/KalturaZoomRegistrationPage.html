@@ -109,16 +109,15 @@
             event.preventDefault();
             var $defaultUserId = $('#defaultUserId');
             var $zoomCategory  = $('#zoomCategory');
-            var $zoomUserPostfix = $('#zoomUserPostfix');
             var defaultUserId = $defaultUserId.val().trim();
             var zoomCategory = $zoomCategory.val().trim();
             var enableRecordingUploadObj = $(".enableRecordingUpload");
             var createUserIfNotExistObj = $(".createUserIfNotExist");
             var enableRecordingUpload = enableRecordingUploadObj.is(":checked");
             var createUserIfNotExist = createUserIfNotExistObj.is(":checked");
-            var handleParticipantMode = $(".participantHandler:checked").val();
-            var zoomUserMatchingMode = $(".userMatchingHandler:checked").val();
-            var zoomUserPostfix = $zoomUserPostfix.val().trim();
+            var handleParticipantMode = $('[name=participantHandler]:checked').val();
+            var zoomUserMatchingMode = $('[name=userMatchingHandler]:checked').val();
+            var zoomUserPostfix = $('#zoomUserPostfix').val().trim();
 
             $.ajax({
                 url : url,
