@@ -102,7 +102,7 @@ abstract class KConversionEngine
 	
 	public function getLogData()
 	{
-		return file_get_contents($this->logFilePath);
+		return kFile::getFileContent($this->logFilePath);
 	}
 	
 	/**
