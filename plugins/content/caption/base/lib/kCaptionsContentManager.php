@@ -143,7 +143,13 @@ abstract class kCaptionsContentManager
 				return KalturaPluginManager::loadObject('kCaptionsContentManager', $type);
 		}
 	}
-	
+
+	/**
+	 * @param $captionAsset
+	 * @param $fileLocation
+	 * @param null $key
+	 * @return BatchJob
+	 */
 	public static function addParseMultiLanguageCaptionAssetJob($captionAsset, $fileLocation, $key = null)
 	{
 		$batchJob = new BatchJob();
@@ -158,6 +164,37 @@ abstract class kCaptionsContentManager
 		$jobData->setFileEncryptionKey($key);
 
 		$jobType = CaptionPlugin::getBatchJobTypeCoreValue(ParseMultiLanguageCaptionAssetBatchType::PARSE_MULTI_LANGUAGE_CAPTION_ASSET);
+		$batchJob->setObjectType(BatchJobObjectType::ASSET);
+		$batchJob->setEntryId($entryId);
+		$batchJob->setPartnerId($captionAsset->getPartnerId());
+		$batchJob->setObjectId($id);
+
+		return kJobsManager::addJob($batchJob, $jobData, $jobType);
+	}
+
+	/**
+	 * @param $captionAsset
+	 * @param $fileLocation
+	 * @param null $syncKey
+	 * @return BatchJob
+	 */
+	public static function addParseSccCaptionAssetJob($captionAsset)
+	{
+		$batchJob = new BatchJob();
+
+		$syncKey = $captionAsset->getSyncKey(CaptionAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey);
+		$fileLocation = $fileSync->getFullPath();
+
+		$id = $captionAsset->getId();
+		$entryId = $captionAsset->getEntryId();
+
+		$jobData = new kParseSccCaptionAssetJobData();
+		$jobData->setSccCaptionAssetId($id);
+		$jobData->setFileLocation($fileLocation);
+		$jobData->setFileEncryptionKey($fileSync->getEncryptionKey());
+
+		$jobType = CaptionPlugin::getBatchJobTypeCoreValue(ParseSccCaptionAssetBatchType::PARSE_SCC_CAPTION_ASSET);
 		$batchJob->setObjectType(BatchJobObjectType::ASSET);
 		$batchJob->setEntryId($entryId);
 		$batchJob->setPartnerId($captionAsset->getPartnerId());

@@ -10,6 +10,7 @@
 class CaptionAssetService extends KalturaAssetService
 {
 	const MAX_SERVE_WEBVTT_FILE_SIZE = 1048576;
+	const SSC_CAPTION_FILE_EXT = 'scc';
 
 	protected function kalturaNetworkAllowed($actionName)
 	{
@@ -118,6 +119,17 @@ class CaptionAssetService extends KalturaAssetService
 		$contentResource->validateAsset($dbCaptionAsset);
 		$kContentResource = $contentResource->toObject();
 		$this->attachContentResource($dbCaptionAsset, $kContentResource);
+
+		if (strtolower($dbCaptionAsset->getFileExt()) === self::SSC_CAPTION_FILE_EXT)
+		{
+			//start scc batch Job.
+			kCaptionsContentManager::addParseSccCaptionAssetJob($dbCaptionAsset);
+
+			$captionAsset = new KalturaCaptionAsset();
+			$captionAsset->fromObject($dbCaptionAsset, $this->getResponseProfile());
+			return $captionAsset;
+		}
+
 		$contentResource->entryHandled($dbCaptionAsset->getentry());
 		
     	$newStatuses = array(

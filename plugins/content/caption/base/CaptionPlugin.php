@@ -224,7 +224,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('CaptionAssetType', 'CaptionObjectFeatureType', 'ParseMultiLanguageCaptionAssetBatchType');
+			return array('CaptionAssetType', 'CaptionObjectFeatureType', 'ParseMultiLanguageCaptionAssetBatchType','ParseSccCaptionAssetBatchType');
 	
 		if($baseEnumName == 'assetType')
 			return array('CaptionAssetType');
@@ -233,7 +233,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 			return array('CaptionObjectFeatureType');
 
 		if ($baseEnumName == 'BatchJobType')
-			return array('ParseMultiLanguageCaptionAssetBatchType');
+			return array('ParseMultiLanguageCaptionAssetBatchType', 'ParseSccCaptionAssetBatchType');
 	
 		return array();
 	}
@@ -254,6 +254,12 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 		if($baseClass == 'KalturaJobData' && $enumValue == self::getApiValue(ParseMultiLanguageCaptionAssetBatchType::PARSE_MULTI_LANGUAGE_CAPTION_ASSET))
 			return new KalturaParseMultiLanguageCaptionAssetJobData();
+
+		if($baseClass == 'KalturaJobData' && $enumValue == self::getApiValue(ParseSccCaptionAssetBatchType::PARSE_SCC_CAPTION_ASSET))
+			return new KalturaParseSccCaptionAssetJobData();
+
+		if($baseClass == 'kJobData' && $enumValue == self::getBatchJobTypeCoreValue(ParseSccCaptionAssetBatchType::PARSE_SCC_CAPTION_ASSET))
+			return new KalturaParseSccCaptionAssetJobData();
 
 		return null;
 	}
