@@ -95,10 +95,10 @@ class kZoomOauth
 
 	public static function parseTokens($tokensData)
 	{
-		if (!$tokensData || !isset($dataAsArray[self::REFRESH_TOKEN]) || !isset($dataAsArray[self::ACCESS_TOKEN]) ||
-			!isset($dataAsArray[self::EXPIRES_IN]))
+		if (!$tokensData || !isset($tokensData[self::REFRESH_TOKEN]) || !isset($tokensData[self::ACCESS_TOKEN]) ||
+			!isset($tokensData[self::EXPIRES_IN]))
 		{
-			ZoomHelper::exitWithError(kVendorErrorMessages::TOKEN_PARSING_FAILED . $tokensData);
+			ZoomHelper::exitWithError(kVendorErrorMessages::TOKEN_PARSING_FAILED . print_r($tokensData));
 		}
 
 		$expiresIn = $tokensData[self::EXPIRES_IN];
