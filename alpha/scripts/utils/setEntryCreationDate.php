@@ -29,6 +29,7 @@ foreach ($entryMappings as $entryMapping)
 		continue;
 	}
 	
+	$entry->setOriginalCreationDate($entry->getCreatedAt());
 	$entry->setCreatedAt($createdAt);
 	$entry->setAvailableFrom($createdAt);
 	$entry->save();
