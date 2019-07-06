@@ -7,8 +7,8 @@ if($argc < 3)
 	exit;
 }
 $mapping = $argv[1];
-$isDateString = ($argv[2] == "true");
-$dryRun = ($argv[3] == "dryrun");
+$isDateString = ($argv[2] === "true");
+$dryRun = ($argv[3] === "dryrun");
 
 require_once(__DIR__ . '/../bootstrap.php');
 
