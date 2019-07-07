@@ -47,9 +47,9 @@ class EmailNotificationTemplate extends BatchEventNotificationTemplate implement
 		if ($partner)
 		{
 			$allowedFromEmailWhiteList = $partner->getAllowedFromEmailWhiteList();
-			if ($fromEmailNotification !== self::FROM_EMAIL && in_array($fromEmailNotification, explode(',',$allowedFromEmailWhiteList)))
+			if ($fromEmailNotification !== self::FROM_EMAIL
+				&& in_array($fromEmailNotification, explode(',',$allowedFromEmailWhiteList)))
 			{
-				KalturaLog::info("from_email requested: $fromEmailNotification is allowed on the partner from_email whitelist: ".$allowedFromEmailWhiteList );
 				return $fromEmailNotification;
 			}
 		}

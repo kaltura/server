@@ -239,7 +239,7 @@ class Partner extends BasePartner
 
 	public function getAllowQuickEdit()
 	{
-		return $this->getFromCustomData( "allowQuickEdit" , null , true );
+		return (int)$this->getFromCustomData( "allowQuickEdit" , null , true );
 	}
 	
 	public function setAllowQuickEdit( $v )
@@ -423,7 +423,7 @@ class Partner extends BasePartner
 	
 	public function getAllowMultiNotification()
 	{
-		return $this->getFromCustomData( "allowMultiNotification" , null  );
+		return (int)$this->getFromCustomData( "allowMultiNotification" , null  );
 	}
 	
 	public function setAllowMultiNotification( $v )
