@@ -50,6 +50,7 @@ while($s = trim(fgets($f))){
 			$sphinxLog->setPartnerId($entry->getPartnerId());
 			$sphinxLog->setSql($sql);
 			$sphinxLog->setType(SphinxLogType::SPHINX);
+			$sphinxLog->setIndexName($entry->getSphinxIndexName());
 			$sphinxLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
 
 			//update elastic via sphinx log

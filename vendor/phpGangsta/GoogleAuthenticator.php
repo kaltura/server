@@ -82,7 +82,7 @@ class GoogleAuthenticator
 	if(isset($title)) {
                 $urlencoded .= urlencode('&issuer='.urlencode($title));
         }
-        return 'https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl='.$urlencoded.'';
+        return 'https://chart.googleapis.com/chart?chs=150x150&chld=M|0&cht=qr&chl='.$urlencoded.'';
     }
 
     /**

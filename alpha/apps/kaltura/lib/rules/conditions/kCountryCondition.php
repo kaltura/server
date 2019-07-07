@@ -43,9 +43,15 @@ class kCountryCondition extends kMatchCondition
 	 */
 	public function getFieldValue(kScope $scope)
 	{
+		$refValues = $this->getStringValues($scope);
+		//Get trimmed lower case values of all configured allowed country codes.
+		array_walk($refValues, function (&$value) {
+			$value = trim(strtolower($value), " \n\r\t");
+		});
+
 		kApiCache::addExtraField(array("type" => kApiCache::ECF_COUNTRY,
 			kApiCache::ECFD_GEO_CODER_TYPE => $this->getGeoCoderType()),
-			kApiCache::COND_MATCH, $this->getStringValues($scope));
+			kApiCache::COND_COUNTRY_MATCH, $refValues);
 		
 		$ip = $scope->getIp();
 		$ipGeo = kGeoCoderManager::getGeoCoder($this->getGeoCoderType());

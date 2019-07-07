@@ -109,8 +109,13 @@ class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDe
 			$flavorParamsOutput->save();
 		}
 		
-		EntryServerNodePeer::deleteByEntryId($entry->getId());
-		
+		$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($entry->getId());
+		foreach ($entryServerNodes  as $entryServerNode)
+		{
+			/** @var EntryServerNode $entryServerNode */
+			$entryServerNode->delete();
+		}
+
 		$filter = new categoryEntryFilter();
 		$filter->setEntryIdEqual($entry->getId());
 		
@@ -159,16 +164,18 @@ class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDe
 				kJobsManager::addDeleteJob($kuser->getPartnerId(), DeleteObjectType::GROUP_USER, $filter);
 			}
 		}
-		
+
+		AppToken::onUserDeleted($kuser->getId(), $kuser->getPartnerId());
+
 		$userEntryFilter = new UserEntryFilter();
 		$userEntryFilter->set("_eq_user_id", $kuser->getId());
-		
+
 		$c = new Criteria();
 		$c->add(UserEntryPeer::KUSER_ID, $kuser->getId());
 		if(!UserEntryPeer::doSelectOne($c)) {
 			return;
 		}
-		
+
 		kJobsManager::addDeleteJob($kuser->getPartnerId(), DeleteObjectType::USER_ENTRY, $userEntryFilter);
 	}
 	

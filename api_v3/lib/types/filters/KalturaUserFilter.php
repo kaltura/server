@@ -148,10 +148,6 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 			$c->add(kuserPeer::ID, $kuserIds, KalturaCriteria::IN);
 		}
 
-		if (is_null($this->typeEqual) && is_null($this->typeIn)){
-			$c->add(kuserPeer::TYPE, KuserType::USER, KalturaCriteria::EQUAL);
-		}
-		
 		$c->addAnd(kuserPeer::PUSER_ID, NULL, KalturaCriteria::ISNOTNULL);
 		
 		$pager->attachToCriteria($c);

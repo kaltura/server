@@ -29,6 +29,7 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const CA = 'ca';
 	const ZH = 'zh';
 	const CO = 'co';
+	const CR = 'cr';
 	const HR = 'hr';
 	const CS = 'cs';
 	const DA = 'da';
@@ -63,6 +64,7 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const IN = 'in';
 	const IA = 'ia';
 	const IE = 'ie';
+	const IKT = 'ikt';
 	const IU = 'iu';
 	const IK = 'ik';
 	const GA = 'ga';
@@ -79,6 +81,7 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const KU = 'ku';
 	const LO = 'lo';
 	const LA = 'la';
+	const LB = 'lb';
 	const LV = 'lv';
 	const LI = 'li';
 	const LN = 'ln';
@@ -96,6 +99,9 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const NE = 'ne';
 	const NO = 'no';
 	const OC = 'oc';
+	const OJ = 'oj';
+	const OJS = 'ojs';
+	const OJW = 'ojw';
 	const OR_ = 'or';
 	const OM = 'om';
 	const PS = 'ps';
@@ -150,5 +156,18 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const JI = 'ji';
 	const YO = 'yo';
 	const ZU = 'zu';
-	const MU = 'multilingual';
+	const ZXX = 'zxx';
+	const MU = 'mu';
+	const CRG = 'crg';
+	const UN = 'un';
+	const MIC = 'mic';
+	const TCE = 'tce';
+	const SAL = 'sal';
+	const ALG = 'alg';
+	const ATH = 'ath';
+	const SMI = 'smi';
+	const IRO = 'iro';
+	const MOE = 'moe';
+	const BLA = 'bla';
+	const OKA = 'oka';
 }

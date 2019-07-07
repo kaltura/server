@@ -50,7 +50,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		$mediaInfoBin = isset($params->mediaInfoCmd)? $params->mediaInfoCmd: "mediainfo";
 		$mediaInfoParser = new KMediaInfoMediaParser($tmpPath, $mediaInfoBin);
 		$mediaInfo = $mediaInfoParser->getMediaInfo();
-		if (isset(self::$container_formats_to_file_extensions[$mediaInfo->containerFormat]) )
+		if ($mediaInfo && isset(self::$container_formats_to_file_extensions[$mediaInfo->containerFormat]) )
 		{
 			$fileExtension = self::$container_formats_to_file_extensions[$mediaInfo->containerFormat];
 			$destFileLocalPath = preg_replace("/$fileName\.[\w\d]+/", $fileName.".".$fileExtension, $importData->destFileLocalPath);
@@ -157,9 +157,9 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 			if($status == 'OKOK')
 				break;
 
-			if((preg_match("/&jobstr=([^']*_&)/", $matches[2], $jobstr)) && (!strpos($url3, 'jobstr')))
+			if((strpos($url3, 'jobstr=') === false) && (preg_match("/&jobstr=([^']*_&)/", $matches[2], $jobstr)))
 			{
-				$url3 .= substr($jobstr[0],0,-1);
+				$url3 .= rtrim($jobstr[0], '&');
 			}
 
 			sleep($sleep);

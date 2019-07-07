@@ -1,3 +1,332 @@
+# Orion 15.1.0 #
+## New thumbnail API  ##
+- Issue Type: Epic
+- Issue ID: PLAT-9564
+
+### Configuration ###
+Make sure you have imagick PHP extension module installed
+add Thumbnail to plugins.ini
+Add the following to local.ini:
+[thumb_storage]
+type = 2
+path = /tmp
+		
+#### Deployment Scripts ####	
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_04_17_thumbnailService.php
+
+## Allow only admins to generate sip url  ##
+- Issue Type: Task
+- Issue ID: PLAT-9921
+
+### Configuration ###
+None
+		
+#### Deployment Scripts ####	
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_16_update_sip_permissions.php
+
+
+## Allow all KMC users to order reach captions ##
+
+- Issue Type: Task
+- Issue ID: SUP-18314
+
+### Configuration ###
+	None.
+		
+#### Deployment Scripts ####	
+		  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_16_allow_kmc_user_reach_profile_access.php
+		  
+## Compress sphinx_log queries according to threshold ##
+- Issue Type: TASK
+- Issue ID: SUP-18392
+
+### configuration ###
+    Add the following to local.ini:
+	indexing_query_compress_threshold = 819200 ( DESIRED_THRESHOLD in size 819200 is 800KB )
+    
+### Deployment scripts ###
+    run mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura_sphinx_log <
+    /opt/kaltura/app/deployment/updates/sql/2019_06_12_alter_sphinx_log_table_add_cutom_data_column.sql
+    
+## Add permission in Admin Console for new live analytics dashboard ##
+
+- Issue Type: Feature
+- Issue ID: AN-709
+
+### configuration ###
+    Add the following to admin.ini:
+
+    moduls.analyticsLiveDashboard.enabled = true
+    moduls.analyticsLiveDashboard.permissionType = 2
+    moduls.analyticsLiveDashboard.label = Enable Real Time Dashboard
+    moduls.analyticsLiveDashboard.permissionName = FEATURE_LIVE_ANALYTICS_DASHBOARD
+    moduls.analyticsLiveDashboard.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+    None
+
+## Block users from changing roles  ##
+- Issue Type: Task
+- Issue ID: PLAT-9896
+
+### Configuration ###
+None
+		
+#### Deployment Scripts ####	
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_03_update_user_role_permissions.php
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_19_update_user_role_partner_-2_permissions.php
+
+## Update Reach notification template:Entry_Vendor_Task_Pending_Moderation  ##
+- Issue Type: Task
+- Issue ID: REACH2-575
+
+### Configuration ###
+	First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_pending_moderation.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2019_06_03_deploy_update_entry_vendor_pending_moderation.php
+
+## Reach notification templates ##
+- Issue Type: Task
+- Issue ID: REACH2-569
+
+### Configuration ###
+	First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_rejected_moderation.template.xml
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_task_done.template.xml
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_task_approved_moderation.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2019_06_03_deploy_update_reach_notifications.php
+
+
+## Add addition fields in entry vendor task csv ##
+
+- Issue Type: Task
+- Issue ID: REACH2-590 + SUP-18216
+
+### Configuration ###
+	None.
+		
+#### Deployment Scripts ####	
+		  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_05_30_allow_batch_reach_profile_access.php
+
+
+## Support Mailing for Sip Integration ##
+
+- Issue Type: Task
+- Issue ID: PLAT-9777
+
+### Configuration ###
+edit /opt/kaltura/app/configurations/batch/batches/Mailer/emails_en.ini add:
+
+in [constants]
+MAIL_TYPE_SIP_FAILURE = 139
+ 
+in [subjects]
+139 = "An error occurred when trying to broadcast the Video Conference"
+
+in [bodies]
+139 = "Hello,<BR><BR>Reason for the broadcast issue:<BR><BR>%s <BR><BR> Please contact your Account Manager to resolve this issue.<BR><BR>Kaltura Customer Service"
+	
+#### Deployment Scripts ####	
+NONE
+
+## Add generateQrCode action to user service ##
+
+ -Issue Type: Feature
+ -Issue ID: KMCNG-2114
+
+### Configuration ###
+
+
+    Add to local.ini uder password_reset_links url for the KMC qr page in the following way: qr_page = @URL_FOR_QR@
+    
+    Edit /opt/kaltura/app/configurations/batch/batches/Mailer/emails_en.ini:
+    add constants, subjects and bodies as described in /opt/kaltura/app/batch/batches/Mailer/emails_en.template.ini for ids: 140, 141 and 142.   
+
+
+### Deployment scripts ###
+
+       php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_02_add_user_generate_qr_image.php
+
+## Deploy "Entry Vendor Task Finished Processing" HTTP notification (for MediaSpace) ##
+ - Issue Type: Feature
+ - Issue IDs: PSVAMB-7641
+
+### Configuration ###
+None
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_05_26_httpEntryVendorTaskDone.template.xml
+
+Run deployment script:
+
+    php /opt/kaltura/app/deployment/updates/scripts/2019_05_26_httpEntryVendorTaskDone.php
+
+## Add new bulk upload mechanism for schedule events ## 
+
+- Issue Type: Feature
+- Issue ID: PSVAMB-7338
+
+#### Deployment Scripts ####  
+
+        php /opt/kaltura/app/deployment/updates/scripts/2019_05_22_scheduleevent_bulkupload_required_permissions.php
+
+
+# Orion 15.0.0 #
+
+## Add permission in Admin Console for analytics persistent session id ##
+
+- Issue Type: Feature
+- Issue ID: AN-696
+
+### configuration ###
+    Add the following to admin.ini:
+
+    moduls.analyticsPersistentSessionId.enabled = true
+    moduls.analyticsPersistentSessionId.permissionType = 2
+    moduls.analyticsPersistentSessionId.label = Analytics Persistent Session Id
+    moduls.analyticsPersistentSessionId.permissionName = FEATURE_ANALYTICS_PERSISTENT_SESSION_ID
+    moduls.analyticsPersistentSessionId.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+    None
+
+## configuraiton change ##
+
+- Issue Type : Configuration change
+- Issue ID : PLAT-9871
+
+### Configuraiton ##
+Add new configuration map
+New map name - cache_version
+The following values were move to this map from local.ini:
+	a. permission_cache_version
+	b. secrets_cache_version
+	
+#### Deployment Scripts ####	
+None
+
+## Support Sip Integration ##
+
+- Issue Type: Task
+- Issue ID: PLAT-9777
+
+### Configuration ###
+1. in admin.ini add:
+	moduls.Sip.enabled = true
+	moduls.Sip.permissionType = 2
+	moduls.Sip.label = "Enable VCI"
+	moduls.Sip.permissionName = FEATURE_SIP
+	moduls.Sip.group = GROUP_ENABLE_DISABLE_FEATURES
+2. add Sip to plugins.ini	
+3. copy /opt/kaltura/app/configurations/sip.template.ini to sip.ini and replace all tokens accordingly.
+	
+#### Deployment Scripts ####	
+
+1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+2. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_04_21_add_pexip_permissions.php
+3. add One serverNode for parter -5 with sipType (KalturaSipServerNode):
+	servernode add 
+	serverNode:objectType=KalturaSipServerNode 
+	serverNode:environment=$ENV$
+	serverNode:name=$NAME$
+	serverNode:description=$DESCRIPTION$ 
+	serverNode:hostName=$HOSTNAME$
+	
+4. enable the created ServerNode. ( servernode enable id=$CREATED_SERVER_NODE_ID$)
+
+## Support sphinx index sharding ##
+
+- Issue Type: Task
+- Issue ID: PLAT-9401
+
+### Configuration ###
+
+	To enable support you need to do the following:
+	1. Add the following to your db.ini file:
+		Add this section to make the code be aware of the fact you are working in sharded index mode.
+		[sphinx_split_index]
+		enabled = true
+		entry = X (where X is the sahrding factor).
+		
+		Add datasources settings for each of the shards
+		[sphinx_datasources_kaltura_entry_x]
+		datasources.0 = sphinx
+		datasources.1 = sphinx2
+		
+		For each sharded datasource add the following:
+		sphinx.connection.options.kaltura.sharded = true
+		
+	2. Modify your sphinx kaltura.conf file:
+		Duplicate Kaltura_entry sphinx definition per your sharding factor and add entry distribution index that points to the all.
+		index kaltura_entry
+		{
+		        type=distributed
+		        local=kaltura_entry_X
+		        local=kaltura_entry_X
+		}
+		
+	3. Reindex your data based on the new setup.
+		
+
+#### Deployment Scripts ####	
+
+
+	Run the following alter command against the mysql server where kaltura_sphinx_log table is sotred: 
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura_sphinx_log < /opt/kaltura/app/deployment/updates/sql/2019_05_19_alter_table_sphinx_log.sql
+		
+
+## Add getPublicInfo action to partner service ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-9844
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_05_20_add_partner_get_public_info.php
+
+# Naos 14.20.0 #
+
+## new boolean event notification template ##
+- Issue Type: Task
+- Issue ID: PLAT-9814
+
+### Configuration ###
+	First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2019_04_28_tagEqualsBooleanNotification.template.xml
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/2019_04_28_deploy_tag_equals_boolean_notification.php
+
+## Add permission in Admin Console for limiting the allowed action for partner ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-9843
+
+### configuration ###
+    Create new map in config named 'blocked_actions_per_account" and add to it blocked actions for default or for specific partner in the following way:
+
+    [PARTNER_ID]
+    0 = ".*:add.*"
+    1 = ".*:delete.*"
+    2 = ".*:update.*"
+	
+    Also add the following to admin.ini:
+    
+    moduls.limitAllowedActions.enabled = true
+    moduls.limitAllowedActions.permissionType = 2
+    moduls.limitAllowedActions.label = Limit allowed actions
+    moduls.limitAllowedActions.permissionName = FEATURE_LIMIT_ALLOWED_ACTIONS
+    moduls.limitAllowedActions.group = GROUP_ENABLE_DISABLE_FEATURES
+    
+### Deployment scripts ###
+    None
+	
 # Naos 14.19.0 #
 
 ## Move maps to dynamic configuration ##

@@ -84,6 +84,8 @@ class Partner extends BasePartner
 
 	const CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST = 'allowedFromEmailWhiteList';
 
+	const ANALYTICS_HOST = "analytics_host";
+
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -236,7 +238,7 @@ class Partner extends BasePartner
 
 	public function getAllowQuickEdit()
 	{
-		return $this->getFromCustomData( "allowQuickEdit" , null , true );
+		return (int)$this->getFromCustomData( "allowQuickEdit" , null , true );
 	}
 	
 	public function setAllowQuickEdit( $v )
@@ -420,7 +422,7 @@ class Partner extends BasePartner
 	
 	public function getAllowMultiNotification()
 	{
-		return $this->getFromCustomData( "allowMultiNotification" , null  );
+		return (int)$this->getFromCustomData( "allowMultiNotification" , null  );
 	}
 	
 	public function setAllowMultiNotification( $v )
@@ -1262,7 +1264,7 @@ class Partner extends BasePartner
         return $provisionParams;
     }
 
-	private static function getAdminUserCriteria($partnerId)
+	public static function getAdminUserCriteria($partnerId)
 	{
 		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
 		$c->addAnd(kuserPeer::PARTNER_ID, $partnerId);
@@ -2049,5 +2051,73 @@ class Partner extends BasePartner
 		$this->putInCustomData(self::CUSTOMER_DATA_RTC_ENV, $v);
 	}
 
+	public function getAnalyticsUrl()
+	{
+		$host = $this->getAnalyticsHost();
+		$fullUrl = null;
+		if($host)
+		{
+			$fullUrl = infraRequestUtils::getProtocol() . '://' . $host;
+		}
+		return $fullUrl;
+	}
+
+	public function getAnalyticsHost()
+	{
+		return $this->getFromCustomData(self::ANALYTICS_HOST, null , kConf::get(self::ANALYTICS_HOST, 'local',  null));
+	}
+
+	public function setAnalyticsHost($v)
+	{
+		$this->putInCustomData(self::ANALYTICS_HOST, $v);
+	}
+
+	public function getUseTwoFactorAuthentication()
+	{
+		return $this->getFromCustomData("useTwoFactorAuthentication", null, false);
+	}
+
+	public function setUseTwoFactorAuthentication($v)
+	{
+		$this->putInCustomData("useTwoFactorAuthentication", $v);
+	}
+
+	public function getUseSso()
+	{
+		return $this->getFromCustomData("useSso", null, false);
+	}
+
+	public function setUseSso($v)
+	{
+		$this->putInCustomData("useSso", $v);
+	}
+
+	public function getBlockDirectLogin()
+	{
+		return $this->getFromCustomData("blockDirectLogin", null, false);
+	}
+
+	public function setBlockDirectLogin($v)
+	{
+		$this->putInCustomData("blockDirectLogin", $v);
+	}
+
+	public function getAuthenticationType()
+	{
+		if($this->getUseSso())
+		{
+			return PartnerAuthenticationType::SSO;
+		}
+		else if($this->getUseTwoFactorAuthentication())
+		{
+			return PartnerAuthenticationType::TWO_FACTOR_AUTH;
+		}
+		return PartnerAuthenticationType::PASSWORD_ONLY;
+	}
+
+	public function getAnalyticsPersistentSessionId()
+	{
+		return (PermissionPeer::isValidForPartner(PermissionName::FEATURE_ANALYTICS_PERSISTENT_SESSION_ID, $this->getId())) ? true : false;
+	}
 
 }

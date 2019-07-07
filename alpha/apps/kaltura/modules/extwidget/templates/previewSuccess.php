@@ -50,11 +50,6 @@
 	#framePlayerContainer {margin: 0 auto; padding-top: 20px; text-align: center; } 
 	object, div { margin: 0 auto; }
 	</style>
-	<?php } else { ?>
-	<style>
-	#main .content .title h1 { font-size: 24px; font-weight: bold; }
-	#main p { margin-bottom: 20px; font-size: 18px; }
-	</style>
 	<?php } ?>
 	<!--[if lte IE 7]>
 	<script src="/lib/js/json2.min.js"></script>
@@ -65,13 +60,8 @@
 <body>
 	<?php if(!$framed) { ?>
 	<div id="main" style="position: static;">
-
+        <div class="icon"></div>
 		<div class="content">
-			<div class="title">
-				<h1><?php echo htmlspecialchars($entry_name); ?></h1>
-			</div>
-			<div class="contwrap">
-			<p><?php echo htmlspecialchars($entry_description); ?></p>
 			<div id="videoContainer">
 	<?php } ?>
 				<div id="framePlayerContainer">
@@ -163,10 +153,18 @@ if (isPlaykit === '1') {
     }
     var codeUrl = "//" + data.securedHost + "/p/" + data.partnerId +"/embedPlaykitJs/uiconf_id/"+ data.uiConfId;
     var iframeURL = codeUrl + "/entry_id/" + data.entryId + "?iframeembed=true";
+    var checkForKs = typeof data.flashVars !== 'undefined' ? data.flashVars.hasOwnProperty('ks') && typeof data.flashVars.ks === 'string' : false;
+    if (checkForKs) {
+        if (data.embedType === 'iframe') {
+            iframeURL += "&ks=" + data.flashVars.ks;
+        } else {
+            playerConfig.provider.ks = data.flashVars.ks;
+        }
+    }
     var embedCode = '<scr'+'ipt src="'+ codeUrl +'"></scr'+'ipt><scr'+'ipt> var kalturaPlayer = KalturaPlayer.setup('+ JSON.stringify(playerConfig)+');	kalturaPlayer.loadMedia({entryId: "'+ data.entryId +'"})</scr'+'ipt>';
     code = embedCode;
     if (data.embedType === 'iframe') {
-        code = '<iframe id="kaltura_player" src="'+iframeURL+'" width="'+ width +'" height="'+height+'" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen="" allow="autoplay; fullscreen; encrypted-media" frameborder="0" style="width: '+width+'px; height: '+height+'px;" itemprop="video" itemscope="" itemtype="http://schema.org/VideoObject">';
+        code = '<iframe id="kaltura_player" src="'+iframeURL+'" width="'+ width +'" height="'+height+'" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen="" allow="autoplay; fullscreen; encrypted-media" frameborder="0" style="width: '+width+'px; height: '+height+'px;" itemprop="video" itemscope="" itemtype="http://schema.org/VideoObject"></iframe>';
     }
     document.getElementById('framePlayerContainer').style.height = height + 'px';
     document.getElementById('framePlayerContainer').style.width = width + 'px';
@@ -197,7 +195,12 @@ if( ltIE10 && (embedType == 'dynamic' || embedType == 'thumb') ) {
 </script>
 				</div>
 <?php if(!$framed) { ?>				
+            </div>
+            <div class="title">
+				<h1><?php echo htmlspecialchars($entry_name); ?></h1>
 			</div>
+			<div class="contwrap">
+			<p><?php echo htmlspecialchars($entry_description); ?></p>
 <!--<br /><p>This page is for preview only. Not for production use.</p>-->
 			</div><!-- end contwrap -->
 		</div><!-- end content -->

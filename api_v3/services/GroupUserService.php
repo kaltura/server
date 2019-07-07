@@ -184,7 +184,16 @@ class GroupUserService extends KalturaBaseService
 	 */
 	public function syncAction($userId, $groupIds, $removeFromExistingGroups = true, $createNewGroups = true)
 	{
-		$groupIdsList = explode(',', $groupIds);
+		if(strpos($groupIds,';')===false)
+		{
+			$seperator = ',';
+		}
+		else
+		{
+			$seperator = ';';
+		}
+
+		$groupIdsList = explode($seperator, $groupIds);
 		self::validateSyncGroupUserArgs($userId, $groupIdsList, $groupIds);
 
 		$kUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
@@ -263,22 +272,24 @@ class GroupUserService extends KalturaBaseService
 		return $shouldHandleGroupsInBatch;
 	}
 
-	public function addGroupUsersToClonedGroup($kusers, $newGroup, $originalGroupId)
+	public function addGroupUsersToClonedGroup($kUsers, $newGroup, $originalGroupId)
 	{
+		$isAsync = false;
 		$groupUsersLimit = kConf::get('user_groups_sync_threshold', 'local', self::USER_GROUP_SYNC_THRESHOLD_DEFUALT);
-		$bulkGroupUserSyncCsv = new kBulkGroupUsersToGroupCsv($kusers, $newGroup->getPuserId());
-		$shouldHandleGroupsUsersInBatch = ($groupUsersLimit < count($kusers));
+		$bulkGroupUserSyncCsv = new kBulkGroupUsersToGroupCsv($kUsers, $newGroup->getPuserId());
+		$shouldHandleGroupsUsersInBatch = ($groupUsersLimit < count($kUsers));
 		if (!$shouldHandleGroupsUsersInBatch)
 		{
 			$this->initService('groupuser', 'groupuser', 'add');
-			list($shouldHandleGroupsUsersInBatch, $userToAddInBulk) = $this->addUserGroupsToGroup($kusers, $newGroup, $originalGroupId);
-			$kusers = $userToAddInBulk;
+			list($shouldHandleGroupsUsersInBatch, $userToAddInBulk) = $this->addUserGroupsToGroup($kUsers, $newGroup, $originalGroupId);
+			$kUsers = $userToAddInBulk;
 		}
 		if ($shouldHandleGroupsUsersInBatch)
 		{
-			$bulkGroupUserSyncCsv->AddGroupUserInBatch($kusers, $originalGroupId);
+			$isAsync = true;
+			$bulkGroupUserSyncCsv->AddGroupUserInBatch($kUsers, $originalGroupId);
 		}
-
+		return $isAsync;
 	}
 
 	/**

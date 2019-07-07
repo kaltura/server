@@ -106,7 +106,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 		// make all the media->add as the partner
 		$requestResults = KBatchBase::$kClient->doMultiRequest();
 
-		if(count($requestResults))
+		if($requestResults && count($requestResults))
 			$this->updateObjectsResults($requestResults, $bulkUploadResultChunk);
 
 		KalturaLog::info("job[{$this->job->id}] finish creating entries");
@@ -246,7 +246,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 			}
 			else
 			{
-				if(iconv_strlen($values[$index], 'UTF-8'))
+				if(isset($values[$index]) && iconv_strlen($values[$index], 'UTF-8'))
 				{
 					$bulkUploadResult->$column = $values[$index];
 					KalturaLog::info("Set value $column [{$bulkUploadResult->$column}]");

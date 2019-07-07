@@ -100,15 +100,36 @@ class KalturaPlaylist extends KalturaBaseEntry
 				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
 		}
 	}
-	
+
+	protected function coreToApiMediaType($coreMediaType)
+	{
+		switch ($coreMediaType)
+		{
+			case entry::ENTRY_MEDIA_TYPE_XML:
+				return KalturaPlaylistType::DYNAMIC;
+			case entry::ENTRY_MEDIA_TYPE_TEXT:
+				return KalturaPlaylistType::STATIC_LIST;
+			case entry::ENTRY_MEDIA_TYPE_GENERIC_1:
+				return KalturaPlaylistType::EXTERNAL;
+		}
+	}
+
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if (is_null($dbObject))
+		{
 			$dbObject = new entry();
-		
-		// support filters array only if atleast one filters was specified
-		if ($this->playlistType == KalturaPlaylistType::DYNAMIC && $this->filters !== null)
+			$playListType = $this->playlistType;
+		}
+		else
+		{
+			$playListType = $this->coreToApiMediaType( $dbObject->getMediaType() );
+		}
+		// support filters array only if at least one filters was specified
+		if ($playListType == KalturaPlaylistType::DYNAMIC && $this->filters !== null)
+		{
 			$this->filtersToPlaylistContentXml();
+		}
 		
 		$dbObject->setType ( entryType::PLAYLIST );
 		parent::toObject( $dbObject )	;

@@ -22,6 +22,8 @@ CREATE TABLE `sphinx_log`
 	`sql` LONGTEXT,
 	`created_at` DATETIME,
 	`type` INTEGER,
+	`index_name` VARCHAR(128),
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `entry_id`(`entry_id`),
 	KEY `creatd_at`(`created_at`)

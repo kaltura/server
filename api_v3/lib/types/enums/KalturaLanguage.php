@@ -29,6 +29,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const CA = 'Catalan';
 	const ZH = 'Chinese';
 	const CO = 'Corsican';
+	const CR = 'Cree';
 	const HR = 'Croatian';
 	const CS = 'Czech';
 	const DA = 'Danish';
@@ -63,6 +64,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const IN = 'Indonesian';
 	const IA = 'Interlingua';
 	const IE = 'Interlingue';
+	const IKT = 'Inuinnaqtun';
 	const IU = 'Inuktitut';
 	const IK = 'Inupiak';
 	const GA = 'Irish';
@@ -79,6 +81,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const KU = 'Kurdish';
 	const LO = 'Laothian';
 	const LA = 'Latin';
+	const LB = 'Luxembourgish (Letzeburgesch)';
 	const LV = 'Latvian (Lettish)';
 	const LI = 'Limburgish ( Limburger)';
 	const LN = 'Lingala';
@@ -96,6 +99,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const NE = 'Nepali';
 	const NO = 'Norwegian';
 	const OC = 'Occitan';
+	const OJ = 'Ojibwe, Ojibwa';
 	const OR_ = 'Oriya';
 	const OM = 'Oromo (Afan, Galla)';
 	const PS = 'Pashto (Pushto)';
@@ -150,6 +154,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const JI = 'Yiddish';
 	const YO = 'Yoruba';
 	const ZU = 'Zulu';
+	const ZXX = 'No linguistic content';
 	const MU = 'Multilingual';
 
 	#Support in full ISO639 languages (since ISO639-2 the key code is 3 letters
@@ -177,6 +182,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const AKZ = 'Alabama';
 	const ALC = 'Qawasqar';
 	const ALE = 'Aleut';
+	const ALG = 'Algonquian languages';
 	const ALN = 'Albanian (Gheg)';
 	const ALQ = 'Algonquin';
 	const ALS = 'Albanian (Tosk)';
@@ -193,6 +199,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const ARP = 'Arapaho';
 	const ASB = 'Assiniboine';
 	const AST = 'Asturian';
+	const ATH = 'Athapascan languages';
 	const ATJ = 'Atikamekw';
 	const AUC = 'Waorani';
 	const AVK = 'Kotava';
@@ -312,6 +319,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const HUR = 'Halkomelem';
 	const ILO = 'Iloko';
 	const INH = 'Ingush';
+	const IRO = 'Iroquoian languages';
 	const ITL = 'Itelmen';
 	const IZH = 'Ingrian';
 	const JBO = 'Lojban';
@@ -391,6 +399,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const MNP = 'Min Bei Chinese';
 	const MNS = 'Mansi';
 	const MNW = 'Mon';
+	const MOE = 'Montagnais';
 	const MOH = 'Mohawk';
 	const MOS = 'Mossi';
 	const MRW = 'Maranao';
@@ -465,6 +474,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const RUQ = 'Romanian Megleno';
 	const RYU = 'Okinawan Central';
 	const SAH = 'Sakha';
+	const SAL = 'Salishan languages';
 	const SAM = 'Aramaic Samaritan';
 	const SAT = 'Santali';
 	const SCN = 'Sicilian';
@@ -485,6 +495,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const SJW = 'Shawnee';
 	const SLR = 'Salar';
 	const SMA = 'Southern Sami';
+	const SMI = 'Sami languages';
 	const SMJ = 'Lule Sami';
 	const SMN = 'Inari Sami';
 	const SMS = 'Skolt Sami';
@@ -506,6 +517,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const TAQ = 'Tamasheq';
 	const TAR = 'Tarahumara Central';
 	const TBW = 'Tagbanwa';
+	const TCE = 'Southern Tutchone';
 	const TCX = 'Toda';
 	const TCY = 'Tulu';
 	const TDD = 'Tai Na';
@@ -554,5 +566,8 @@ class KalturaLanguage extends KalturaStringEnum
 	const TEO = 'Teo Chew';
 	const HNN = 'Hainanese';
 	const HAK = 'Hakka';
+	const CRG = 'Michif';
 	const UN  = 'Undefined';
+	const BLA = 'Siksika';
+	const OKA = 'Okanagan';
 }

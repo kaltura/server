@@ -12,9 +12,14 @@ class KalturaGroup extends KalturaBaseUser
 	 */
 	public $membersCount;
 
+	/**
+	 * @var KalturaGroupProcessStatus
+	 */
+	public $processStatus;
+
 	private static $names = array('fullName','screenName');
 
-	private static $map_between_objects = array("membersCount");
+	private static $map_between_objects = array('membersCount', 'processStatus');
 
 	public function getMapBetweenObjects ( )
 	{
@@ -43,6 +48,7 @@ class KalturaGroup extends KalturaBaseUser
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
 		}
+
 		$this->validateNames($this,self::$names);
 		parent::validateForInsert($propertiesToSkip);
 	}
@@ -53,12 +59,12 @@ class KalturaGroup extends KalturaBaseUser
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
-	public function clonedObject($dbOriginalGroup, $newGroupName,  $skip = array())
+	public function clonedObject($dbOriginalGroup, $newGroupId, $newGroupName)
 	{
 		$dbObject = $this->toObject();
 
 		$dbObject->setScreenName($newGroupName);
-		$dbObject->setPuserId($newGroupName);
+		$dbObject->setPuserId($newGroupId);
 		$dbObject->setTags($dbOriginalGroup->getTags());
 		$dbObject->setPartnerId($dbOriginalGroup->getPartnerId());
 		$dbObject->setPartnerData($dbOriginalGroup->getPartnerData());

@@ -204,13 +204,14 @@ class GroupService extends KalturaBaseUserService
 	 *
 	 * @action clone
 	 * @param string $originalGroupId The unique identifier in the partner's system
-	 * @param string $newGroupName The unique identifier in the partner's system
+	 * @param string $newGroupId The unique identifier in the partner's system
+	 * @param string $newGroupName The name of the new cloned group
 	 * @return KalturaGroup The cloned group
 	 *
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaGroupErrors::INVALID_GROUP_ID
 	 */
-	public function cloneAction($originalGroupId, $newGroupName)
+	public function cloneAction($originalGroupId, $newGroupId, $newGroupName = null)
 	{
 		$dbGroup = $this->getGroup($originalGroupId);
 
@@ -219,21 +220,31 @@ class GroupService extends KalturaBaseUserService
 			throw new KalturaAPIException(KalturaGroupErrors::INVALID_GROUP_ID, $originalGroupId);
 		}
 
-		$dbNewGroup = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $newGroupName);
+		$dbNewGroup = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $newGroupId);
 		if ($dbNewGroup)
 		{
-			throw new KalturaAPIException(KalturaGroupErrors::DUPLICATE_GROUP_BY_ID, $newGroupName);
+			throw new KalturaAPIException(KalturaGroupErrors::DUPLICATE_GROUP_BY_ID, $newGroupId);
 		}
 
 		$group = new KalturaGroup();
-		$newDbGroup = $group->clonedObject($dbGroup, $newGroupName);
+		if ($newGroupName == null)
+		{
+			$newGroupName = $newGroupId;
+		}
+		$newDbGroup = $group->clonedObject($dbGroup, $newGroupId, $newGroupName);
 		$group->validateForInsert($newDbGroup);
+
 		$newDbGroup->save();
 
 		$groupUsers =  KuserKgroupPeer::retrieveKuserKgroupByKgroupId($dbGroup->getId());
 		$kusers = $this->getKusersFromKuserKgroup($groupUsers);
 		$GroupUser = new GroupUserService();
-		$GroupUser->addGroupUsersToClonedGroup($kusers, $newDbGroup, $dbGroup->getId());
+		$isAsync = $GroupUser->addGroupUsersToClonedGroup($kusers, $newDbGroup, $dbGroup->getId());
+		if($isAsync)
+		{
+			$newDbGroup->setProcessStatus(GroupProcessStatus::PROCESSING);
+			$newDbGroup->save();
+		}
 
 		$group->fromObject($newDbGroup, $this->getResponseProfile());
 

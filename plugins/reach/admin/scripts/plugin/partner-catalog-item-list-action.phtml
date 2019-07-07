@@ -179,7 +179,10 @@
 
 	function configureCatalogItems(partnerId, serviceFeature, serviceType, turnAroundTime, sourceLanguage, targetLanguage, vendorPartnerId)
 	{
-		var paramsStr = '/partner_id/' + partnerId + '/serviceFeature/' + serviceFeature + '/serviceType/' + serviceType + '/turnAroundTime/' +turnAroundTime + '/sourceLanguage/' + sourceLanguage + '/targetLanguage/'+targetLanguage+'/vendorPartnerId/'+vendorPartnerId +'/page/1/pageSize/10';
+		var paramsStr = '/partner_id/' + partnerId + '/serviceFeature/' + serviceFeature +
+            '/serviceType/' + serviceType + '/turnAroundTime/' +turnAroundTime + '/sourceLanguage/' +
+            encodeURIComponent(sourceLanguage) + '/targetLanguage/'+ encodeURIComponent(targetLanguage) + '/vendorPartnerId/'+ vendorPartnerId +'/page/1/pageSize/10';
+		
 		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'PartnerCatalogItemConfigureAction')); ?>' + paramsStr;
 
 		jQuery('#partner-catalog-item-configure-dialog').remove();
@@ -272,6 +275,14 @@
 		}
 
         if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT; ?>) {
+            jQuery('#filterSourceLanguage').removeAttr('hidden');
+        }
+
+        if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION; ?>) {
+            jQuery('#filterSourceLanguage').removeAttr('hidden');
+        }
+
+        if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::CHAPTERING; ?>) {
             jQuery('#filterSourceLanguage').removeAttr('hidden');
         }
 		

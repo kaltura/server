@@ -244,7 +244,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 		$contents = unserialize($contents); // if an exception is thrown, it will be catched in fetchUrl
 		
 		// sort contents alphabetically - this is important so that we will first encounter directories and only later the files in them
-		sort($contents, SORT_STRING);		
+		usort($contents, array($this, 'sortContentsArray'));
 		
 		// fetch each direcotry content
 		foreach ($contents as $current)
@@ -295,6 +295,19 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 		return true;
 	}
 	
+	private function sortContentsArray($a, $b)
+	{
+		if(is_string($a) && is_string($b))
+		{
+			return strcmp($a, $b);
+		}
+		
+		if(is_array($a) && is_array($b) && isset($a[0]) && isset($b[0]))
+		{
+			return strcmp(trim($a[0],' /'), trim($b[0],' /'));
+		}
+	}
+	
 	/**
 	 * Download a file from $sourceUrl to $fileDestination
 	 * @param string $sourceUrl
@@ -331,7 +344,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			else
 			{
 				// will resume from the current offset
-				KalturaLog::info('File partialy exists - resume offset set to ['.$actualFileSize.']');
+				KalturaLog::info('File partially exists - resume offset set to ['.$actualFileSize.']');
 				$resumeOffset = $actualFileSize;
 			}
 		}
@@ -358,24 +371,33 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			$res = $this->curlWrapper->exec($sourceUrl, $fileDestination); // download file
 			$curlError = $this->curlWrapper->getError();
 			$curlErrorNumber = $this->curlWrapper->getErrorNumber();
+			$responseStatusCode = $this->curlWrapper->getHttpCode();
+			$isErrorResponse = KCurlHeaderResponse::isError($responseStatusCode);
 			
 			// reset the resume offset, since the curl handle is reused
 			$this->curlWrapper->setResumeOffset(0);
-
-			KalturaLog::info("Curl results: $res");
+			
+			KalturaLog::info("Curl results: [$res] responseStatusCode [$responseStatusCode] error [$curlError] error number [$curlErrorNumber]");
 	
 			// handle errors
-			if (!$res || $curlError)
+			if (!$res || $curlError || $isErrorResponse)
 			{
 				if($curlErrorNumber != CURLE_OPERATION_TIMEOUTED)
 				{
-					// an error other than timeout occured  - cannot continue
+					// an error other than timeout occurred  - cannot continue
 					KalturaLog::err("$curlError");
+					return false;
+				}
+				elseif($isErrorResponse)
+				{
+					// Server error occurred, unlink current file to avoid file corruption on resume
+					$res = kFileBase::truncateFile($fileDestination, $resumeOffset);
+					KalturaLog::log("Got bad status code from server, truncating file [$fileDestination] to last known good size, to avoid file corruption. Truncate process returned with status code [$res]");
 					return false;
 				}
 				else
 				{
-					// timeout error occured, ignore and try to resume
+					// timeout error occurred, ignore and try to resume
 					KalturaLog::log('Curl timeout');
 				}
 			}

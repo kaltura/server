@@ -286,7 +286,7 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 		parent::validateItem($item);
 	}
 	
-	protected function createEntryFromItem(SimpleXMLElement $item, $type = null)
+	protected function createEntryFromItem(SimpleXMLElement $item, $type = null, KalturaBaseEntry $existingItem = null)
 	{
 		$entry = parent::createEntryFromItem($item, $type);
 		

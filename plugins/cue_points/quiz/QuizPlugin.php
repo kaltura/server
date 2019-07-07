@@ -3,7 +3,7 @@
  * Enable question cue point objects and answer cue point objects management on entry objects
  * @package plugins.quiz
  */
-class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKalturaServices, IKalturaDynamicAttributesContributer, IKalturaEventConsumers, IKalturaReportProvider, IKalturaSearchDataContributor, IKalturaElasticSearchDataContributor
+class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKalturaServices, IKalturaDynamicAttributesContributer, IKalturaEventConsumers, IKalturaReportProvider, IKalturaSearchDataContributor, IKalturaElasticSearchDataContributor, IKalturaCuePointXmlParser
 {
 	const PLUGIN_NAME = 'quiz';
 
@@ -189,12 +189,60 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 					<xs:element name="question" minOccurs="1" maxOccurs="1" type="xs:string"> </xs:element>
 					<xs:element name="hint" minOccurs="0" maxOccurs="1" type="xs:string"> </xs:element>
 					<xs:element name="explanation" minOccurs="0" maxOccurs="1" type="xs:string"> </xs:element>
-					<xs:element name="optionalAnswers" minOccurs="0" maxOccurs="1" type="KalturaOptionalAnswersArray"></xs:element>
-					<xs:element name="correctAnswerKeys" minOccurs="0" maxOccurs="1" type="KalturaStringArray"></xs:element>
+					<xs:element name="optionalAnswers" minOccurs="0" maxOccurs="unbounded" type="T_optionalAnswers"></xs:element>
 				</xs:sequence>
 				</xs:extension>
 			</xs:complexContent>
 		</xs:complexType>
+		
+		<xs:complexType name="T_optionalAnswers">
+			<xs:sequence>
+				<xs:element ref="optionalAnswer" maxOccurs="unbounded" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Single optional answer element</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+		
+		<xs:complexType name="T_optionalAnswer">
+			<xs:sequence>
+				<xs:element name="key" maxOccurs="1" minOccurs="0" type="xs:string"> </xs:element>
+				<xs:element name="text" maxOccurs="1" minOccurs="0" type="xs:string"> </xs:element>
+				<xs:element name="weight" maxOccurs="1" minOccurs="0" type="xs:float"> </xs:element>
+				<xs:element name="isCorrect" maxOccurs="1" minOccurs="0" type="xs:int"> </xs:element>
+			</xs:sequence>
+		</xs:complexType>
+		
+		<xs:element name="optionalAnswers" type="T_optionalAnswers">
+			<xs:annotation>
+				<xs:documentation>Wrapper element holding multiple answer elements</xs:documentation>
+				<xs:appinfo>
+					<example>
+						<optionalAnswers>
+							<optionalAnswer>...</optionalAnswer>
+							<optionalAnswer>...</optionalAnswer>
+							<optionalAnswer>...</optionalAnswer>
+						</optionalAnswers>
+					</example>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:element>
+		
+		<xs:element name="optionalAnswer" type="T_optionalAnswer">
+			<xs:annotation>
+			<xs:documentation>Single wrapper element for optional answer</xs:documentation>
+				<xs:appinfo>
+					<example>
+						<optionalAnswer>
+							<text>tesAnswer1</text>
+							<weight>1</weight>
+							<isCorrect>1</isCorrect>
+						</optionalAnswer>
+					</example>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:element>
 
 		<xs:element name="scene-question-cue-point" type="T_scene_questionCuePoint" substitutionGroup="scene">
 			<xs:annotation>
@@ -364,38 +412,38 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		switch ($report_flavor)
 		{
 			case myReportsMgr::REPORT_FLAVOR_TOTAL:
-				return $this->getTotalReport($objectIds);
+				return $this->getTotalReport($objectIds, $inputFilter);
 			case myReportsMgr::REPORT_FLAVOR_TABLE:
 				if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ))
 				{
-					$ans = $this->getQuestionPercentageTableReport($objectIds, $orderBy);
+					$ans = $this->getQuestionPercentageTableReport($objectIds, $orderBy, $inputFilter);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_PERCENTAGE))
 				{
-					$ans = $this->getUserPercentageTable($objectIds, $orderBy);
+					$ans = $this->getUserPercentageTable($objectIds, $orderBy, $inputFilter);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_AGGREGATE_BY_QUESTION))
 				{
-					$ans = $this->getQuizQuestionPercentageTableReport($objectIds, $orderBy);
+					$ans = $this->getQuizQuestionPercentageTableReport($objectIds, $orderBy, $inputFilter);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_AGGREGATE_BY_QUESTION))
 				{
-					$ans = $this->getUserPrecentageByUserAndEntryTable($objectIds, $inputFilter, $orderBy);
+					$ans = $this->getUserPrecentageByUserAndEntryTable($objectIds, $orderBy, $inputFilter);
 				}
 				return $this->pagerResults($ans, $page_size , $page_index);
 
 			case myReportsMgr::REPORT_FLAVOR_COUNT:
 				if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ))
 				{
-					return $this->getReportCount($objectIds);
+					return $this->getReportCount($objectIds, $inputFilter);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_PERCENTAGE) )
 				{
-					return $this->getUserPercentageCount($objectIds);
+					return $this->getUserPercentageCount($objectIds, $inputFilter);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_AGGREGATE_BY_QUESTION))
 				{
-					return $this->getQuestionCountByQusetionIds($objectIds);
+					return $this->getQuestionCountByQusetionIds($objectIds, $inputFilter);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_AGGREGATE_BY_QUESTION))
 				{
@@ -439,7 +487,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 	 * @return array
 	 * @throws kCoreException
 	 */
-	protected function getTotalReport($objectIds)
+	protected function getTotalReport($objectIds, $reportFilter)
 	{
 		if (!$objectIds)
 		{
@@ -456,7 +504,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		$c->add(UserEntryPeer::ENTRY_ID, $objectIds);
 		$c->add(UserEntryPeer::TYPE, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
 		$c->add(UserEntryPeer::STATUS, QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
-
+		$this->addToCriteria($c, $reportFilter, 'UserEntryPeer');
 		$quizzes = UserEntryPeer::doSelect($c);
 		$numOfQuizzesFound = count($quizzes);
 		KalturaLog::debug("Found $numOfQuizzesFound quizzes that were submitted");
@@ -477,52 +525,53 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 
 	/**
 	 * @param $objectIds
+	 * @param $orderBy
+	 * @param $reportFilter
 	 * @return array
 	 * @throws kCoreException
 	 */
-	protected function getQuestionPercentageTableReport($objectIds, $orderBy)
+	protected function getQuestionPercentageTableReport($objectIds, $orderBy, $reportFilter)
 	{
 		$dbEntry = entryPeer::retrieveByPK($objectIds);
 		if (!$dbEntry)
 			throw new kCoreException("",kCoreException::INVALID_ENTRY_ID, $objectIds);
-		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
+		QuizPlugin::validateAndGetQuiz( $dbEntry );
 		$c = new Criteria();
 		$c->add(CuePointPeer::ENTRY_ID, $objectIds);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_QUESTION));
+		$this->addToCriteria($c, $reportFilter, 'CuePointPeer');
 		$questions = CuePointPeer::doSelect($c);
 		return $this->getAggregateDataForQuestions($questions, $orderBy,false);
 	}
 
 	
-	protected function getQuizQuestionPercentageTableReport($objectIds, $orderBy)
+	protected function getQuizQuestionPercentageTableReport($objectIds, $orderBy, $reportFilter)
 	{
 		$questionIds = baseObjectUtils::getObjectIdsAsArray($objectIds);
 		$questionsCriteria = new Criteria();
 		$questionsCriteria->add(CuePointPeer::ID, $questionIds, Criteria::IN);
 		$questionsCriteria->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_QUESTION));
+		$this->addToCriteria($questionsCriteria, $reportFilter, 'CuePointPeer');
 		$questions = CuePointPeer::doSelect($questionsCriteria);
-
 		return $this->getAggregateDataForQuestions($questions, $orderBy);
 	}
 	
 	
 	/**
 	 * @param $objectIds
+	 * @param $reportFilter
 	 * @return array
 	 * @throws kCoreException
 	 */
-	protected function getReportCount($objectIds)
+	protected function getReportCount($objectIds, $reportFilter)
 	{
 		$dbEntry = entryPeer::retrieveByPK($objectIds);
 		if (!$dbEntry)
 		{
 			throw new kCoreException("", kCoreException::INVALID_ENTRY_ID, $objectIds);
 		}
-		/**
-		 * @var kQuiz $kQuiz
-		 */
-		$kQuiz = QuizPlugin::validateAndGetQuiz($dbEntry);
-		$ans = array();
+
+		QuizPlugin::validateAndGetQuiz($dbEntry);
 		$c = new Criteria();
 		$c->add(CuePointPeer::ENTRY_ID, $objectIds);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_QUESTION));
@@ -531,14 +580,14 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		{
 			$c->add(CuePointPeer::KUSER_ID, $anonKuserIds, Criteria::NOT_IN);
 		}
-
-		$numOfquestions = CuePointPeer::doCount($c);
+		$this->addToCriteria($c, $reportFilter, 'CuePointPeer');
+		$numOfQuestions = CuePointPeer::doCount($c);
 		$res = array();
-		$res['count_all'] = $numOfquestions;
+		$res['count_all'] = $numOfQuestions;
 		return array($res);
 	}
 
-	protected function getUserPercentageCount($objectIds)
+	protected function getUserPercentageCount($objectIds, $reportFilter)
 	{
 		$c = new Criteria();
 		$c->setDistinct();
@@ -547,6 +596,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		$c->add(UserEntryPeer::STATUS, QuizPlugin::getCoreValue('UserEntryStatus',QuizUserEntryStatus::QUIZ_SUBMITTED));
 
 		// if a user has answered the test twice (consider anonymous users) it will be calculated twice.
+		$this->addToCriteria($c, $reportFilter, 'UserEntryPeer');
 		$count = UserEntryPeer::doCount($c);
 
 		$res = array();
@@ -554,18 +604,19 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		return array($res);
 	}
 
-	protected function getQuestionCountByQusetionIds($objectIds)
+	protected function getQuestionCountByQusetionIds($objectIds, $reportFilter)
 	{
 		$questionIds = baseObjectUtils::getObjectIdsAsArray($objectIds);
 		$c = new Criteria();
 		$c->add(CuePointPeer::ID, $questionIds, Criteria::IN);
+		$this->addToCriteria($c, $reportFilter, 'CuePointPeer');
 		$numOfquestions = CuePointPeer::doCount($c);
 		$res = array();
 		$res['count_all'] = $numOfquestions;
 		return array($res);
 	}
 
-	private function getUserIdsFromFilter($inputFilter){
+	private function  getUserIdsFromFilter($inputFilter){
 		if ($inputFilter instanceof endUserReportsInputFilter &&
 			isset($inputFilter->userIds)){
 			return $inputFilter->userIds ;
@@ -601,11 +652,13 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 	
 	/**
 	 * @param $objectIds
+	 * @param $inputFilter
+	 * @param $orderBy
 	 * @return array
 	 * @throws kCoreException
 	 * @throws KalturaAPIException
 	 */
-	protected function getUserPercentageTable($objectIds, $orderBy)
+	protected function getUserPercentageTable($objectIds, $orderBy, $inputFilter)
 	{
 		$dbEntry = entryPeer::retrieveByPK($objectIds);
 		if (!$dbEntry)
@@ -616,6 +669,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
 		$c = new Criteria();
 		$c->add(UserEntryPeer::ENTRY_ID, $objectIds);
+		$this->addToCriteria($c, $inputFilter, 'UserEntryPeer');
 		$userEntries = UserEntryPeer::doSelect($c);
 		return $this->getAggregateDataForUsers($userEntries, $orderBy);
 	}
@@ -676,12 +730,16 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 				'num_of_wrong_answers' => ($totalAnswers - $totalCorrect));
 		}
 
-		uasort($ans, $this->getSortFunction($orderBy));
-		$ans = array_values($ans);
+		if($orderBy)
+		{
+			uasort($ans, $this->getSortFunction($orderBy));
+			$ans = array_values($ans);
+		}
+
 		return $ans;
 	}
 	
-	protected function getUserPrecentageByUserAndEntryTable($entryIds, $inputFilter, $orderBy)
+	protected function getUserPrecentageByUserAndEntryTable($entryIds, $orderBy, $inputFilter)
 	{
 		$userIds = $this->getUserIdsFromFilter($inputFilter);
 		$noEntryIds =  QuizPlugin::isWithoutValue($entryIds);
@@ -713,8 +771,21 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 				$c->addAnd(UserEntryPeer::KUSER_ID, $anonKuserIds, Criteria::NOT_IN);
 			}
 		}
+		$this->addToCriteria($c,$inputFilter,'UserEntryPeer');
 		$userEntries = UserEntryPeer::doSelect($c);
 		return $this->getAggregateDataForUsers($userEntries, $orderBy);
+	}
+
+	protected function addToCriteria(criteria &$c,reportsInputFilter $inputFilter, $peerName)
+	{
+		if ($inputFilter->from_date)
+		{
+			$c->addAnd($peerName::UPDATED_AT, $inputFilter->from_date, Criteria::GREATER_EQUAL);
+		}
+		if ($inputFilter->to_date )
+		{
+			$c->addAnd($peerName::UPDATED_AT, $inputFilter->to_date, Criteria::LESS_EQUAL);
+		}
 	}
 
 	private function getSortFunction($orderBy)
@@ -804,7 +875,10 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 				'num_of_wrong_answers' => ($numOfAnswers - $numOfCorrectAnswers));
 		}
 
-		uasort($ans, $this->getSortFunction($orderBy));
+		if($orderBy)
+		{
+			uasort($ans, $this->getSortFunction($orderBy));
+		}
 		return $ans;
 	}
 
@@ -925,7 +999,249 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 
 		return $quizData;
 	}
-
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePointXmlParser::parseXml()
+	 */
+	public static function parseXml(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
+	{
+		$sceneName = $scene->getName();
+		
+		switch ($sceneName)
+		{
+			case "scene-question-cue-point":
+				$cuePoint = self::parseQuestionQuePoint($scene, $partnerId, $cuePoint);
+				break;
+			case "scene-answer-cue-point":
+				$cuePoint = self::parseAnswerQuePoint($scene, $partnerId, $cuePoint);
+				break;
+		}
+		
+		return $cuePoint;
+	}
+	
+	protected static function parseQuestionQuePoint(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
+	{
+		if(!$cuePoint)
+		{
+			$cuePoint = kCuePointManager::parseXml($scene, $partnerId, new QuestionCuePoint());
+		}
+		
+		if(!($cuePoint instanceof QuestionCuePoint))
+		{
+			return null;
+		}
+		
+		if(isset($scene->question))
+		{
+			$cuePoint->setName($scene->question);
+		}
+		if(isset($scene->hint))
+		{
+			$cuePoint->setHint($scene->hint);
+		}
+		if(isset($scene->explanation))
+		{
+			$cuePoint->setExplanation($scene->explanation);
+		}
+		if(isset($scene->optionalAnswers))
+		{
+			foreach ($scene->optionalAnswers->children() as $optionalAnswer)
+			{
+				$optionalAnswerObject = new kOptionalAnswer();
+				
+				if(isset($optionalAnswer->key))
+				{
+					$optionalAnswerObject->setKey((string)$optionalAnswer->key);
+				}
+				if(isset($optionalAnswer->text))
+				{
+					$optionalAnswerObject->setText((string)$optionalAnswer->text);
+				}
+				if(isset($optionalAnswer->weight))
+				{
+					$optionalAnswerObject->setWeight((string)$optionalAnswer->weight);
+				}
+				if(isset($optionalAnswer->isCorrect))
+				{
+					$optionalAnswerObject->setIsCorrect((string)$optionalAnswer->isCorrect);
+				}
+				$optionalAnswersArray[] = $optionalAnswerObject;
+			}
+			
+			$cuePoint->setOptionalAnswers($optionalAnswersArray);
+		}
+		
+		return $cuePoint;
+	}
+	
+	protected static function parseAnswerQuePoint(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
+	{
+		if(!$cuePoint)
+		{
+			$cuePoint = kCuePointManager::parseXml($scene, $partnerId, new AnswerCuePoint());
+		}
+		
+		if(!($cuePoint instanceof AnswerCuePoint))
+		{
+			return null;
+		}
+		
+		if(isset($scene->answerKey))
+		{
+			$cuePoint->setAnswerKey($scene->answerKey);
+		}
+		if(isset($scene->quizUserEntryId))
+		{
+			$cuePoint->setQuizUserEntryId($scene->quizUserEntryId);
+		}
+		if(isset($scene->parentId))
+		{
+			$cuePoint->setParentId($scene->parentId);
+		}
+		
+		return $cuePoint;
+	}
+	
+	public static function generateXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if($cuePoint instanceof QuestionCuePoint)
+		{
+			return self::generateQuestionXml($cuePoint, $scenes, $scene);
+		}
+		elseif($cuePoint instanceof AnswerCuePoint)
+		{
+			return self::generateAnswerXml($cuePoint, $scenes, $scene);
+		}
+		
+		return $scene;
+	}
+	
+	protected static function generateQuestionXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if(!$scene)
+		{
+			$scene = kCuePointManager::generateCuePointXml($cuePoint, $scenes->addChild('scene-question-cue-point'));
+		}
+		
+		return self::generateQuestionSimpleXmlElement($cuePoint, $scenes, $scene);
+	}
+	
+	protected static function generateAnswerXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if(!$scene)
+		{
+			$scene = kCuePointManager::generateCuePointXml($cuePoint, $scenes->addChild('scene-answer-cue-point'));
+		}
+		
+		return self::generateAnswerSimpleXmlElement($cuePoint, $scenes, $scene);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePointXmlParser::syndicate()
+	 */
+	public static function syndicate(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if($cuePoint instanceof QuestionCuePoint)
+		{
+			return self::syndicateQuestionCuePointXml($cuePoint, $scenes, $scene);
+		}
+		elseif($cuePoint instanceof AnswerCuePoint)
+		{
+			return self::syndicateAnswerCuePointXml($cuePoint, $scenes, $scene);
+		}
+		
+		return $scene;
+	}
+	
+	protected static function syndicateAnswerCuePointXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if(!$scene)
+		{
+			$scene = kCuePointManager::syndicateCuePointXml($cuePoint, $scenes->addChild('scene-answer-cue-point'));
+		}
+		
+		return self::generateAnswerSimpleXmlElement($cuePoint, $scenes, $scene);
+	}
+	
+	protected static function syndicateQuestionCuePointXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if(!$scene)
+		{
+			$scene = kCuePointManager::syndicateCuePointXml($cuePoint, $scenes->addChild('scene-question-cue-point'));
+		}
+		
+		return self::generateQuestionSimpleXmlElement($cuePoint, $scenes, $scene);
+	}
+	
+	protected static function generateQuestionSimpleXmlElement(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		/* @var $cuePoint QuestionCuePoint */
+		if($cuePoint->getName())
+		{
+			$scene->addChild('question', kMrssManager::stringToSafeXml($cuePoint->getName()));
+		}
+		
+		if($cuePoint->getHint())
+		{
+			$scene->addChild('hint', kMrssManager::stringToSafeXml($cuePoint->getHint()));
+		}
+		
+		if($cuePoint->getExplanation())
+		{
+			$scene->addChild('explanation', kMrssManager::stringToSafeXml($cuePoint->getExplanation()));
+		}
+		
+		$optionalAnswers = $cuePoint->getOptionalAnswers();
+		if(count($optionalAnswers))
+		{
+			$optionalAnswersScene = $scene->addChild('optionalAnswers');
+			foreach ($optionalAnswers as $optionalAnswer)
+			{
+				/* @var $optionalAnswer kOptionalAnswer */
+				$optionalAnswersScene->addChild("optionalAnswer");
+				if($optionalAnswer->getKey())
+				{
+					$scene->addChild('key', kMrssManager::stringToSafeXml($optionalAnswer->getKey()));
+				}
+				if($optionalAnswer->getText())
+				{
+					$scene->addChild('text', kMrssManager::stringToSafeXml($optionalAnswer->getText()));
+				}
+				if($optionalAnswer->getWeight())
+				{
+					$scene->addChild('weight', $optionalAnswer->getWeight());
+				}
+				if($optionalAnswer->getIsCorrect())
+				{
+					$scene->addChild('isCorrect', $optionalAnswer->getIsCorrect());
+				}
+			}
+		}
+		
+		return $scene;
+	}
+	
+	protected static function generateAnswerSimpleXmlElement(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		/* @var $cuePoint AnswerCuePoint */
+		if($cuePoint->getAnswerKey())
+		{
+			$scene->addChild('answerKey', kMrssManager::stringToSafeXml($cuePoint->getAnswerKey()));
+		}
+		
+		if($cuePoint->getQuizUserEntryId())
+		{
+			$scene->addChild('quizUserEntryId', kMrssManager::stringToSafeXml($cuePoint->getQuizUserEntryId()));
+		}
+		
+		if($cuePoint->getParentId())
+		{
+			$scene->addChild('parentId', kMrssManager::stringToSafeXml($cuePoint->getParentId()));
+		}
+		
+		return $scene;
+	}
 }
 
 function copmareNumbersAscending($a,$b)
