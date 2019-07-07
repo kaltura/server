@@ -82,9 +82,9 @@ class Partner extends BasePartner
 
 	const RTC_SERVER_NODE_ENV = 'rtc_server_node_env';
 
-	const CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST = 'allowedFromEmailWhiteList';
-
 	const ANALYTICS_HOST = "analytics_host";
+
+	const CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST = 'allowedFromEmailWhiteList';
 
 	private $cdnWhiteListCache = array();
 
@@ -210,6 +210,7 @@ class Partner extends BasePartner
 
 	public function setAllowedFromEmailWhiteList( $emails )
 	{
+		$emails =  implode(',',array_map('trim',explode(',',$emails)));
 		$this->putInCustomData( self::CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST, $emails);
 	}
 
@@ -238,7 +239,7 @@ class Partner extends BasePartner
 
 	public function getAllowQuickEdit()
 	{
-		return (int)$this->getFromCustomData( "allowQuickEdit" , null , true );
+		return $this->getFromCustomData( "allowQuickEdit" , null , true );
 	}
 	
 	public function setAllowQuickEdit( $v )
@@ -422,7 +423,7 @@ class Partner extends BasePartner
 	
 	public function getAllowMultiNotification()
 	{
-		return (int)$this->getFromCustomData( "allowMultiNotification" , null  );
+		return $this->getFromCustomData( "allowMultiNotification" , null  );
 	}
 	
 	public function setAllowMultiNotification( $v )

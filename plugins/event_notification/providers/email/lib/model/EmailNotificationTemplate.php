@@ -19,6 +19,7 @@ class EmailNotificationTemplate extends BatchEventNotificationTemplate implement
 	const CUSTOM_DATA_MESSAGE_ID = 'messageID';
 	const CUSTOM_DATA_CUSTOM_HEADERS = 'customHeaders';
 	const CUSTOM_DATA_BODY_FILE_VERSION = 'bodyFileVersion';
+	const FROM_EMAIL = '{from_email}';
 	
 	const FILE_SYNC_BODY = 1;
 	
@@ -38,22 +39,22 @@ class EmailNotificationTemplate extends BatchEventNotificationTemplate implement
 		return $returnObj;
 	}
 
-	protected function getEmail()
+	protected function getAllowedEmail()
 	{
-		$email = $this->getFromEmail();
-		$partnerNotificationEmail = "{from_email}";
+		$allowedFromEmailWhiteList = array();
+		$fromEmailNotification = $this->getFromEmail();
 		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
-		$allowedFromEmailWhiteList = $partner->getAllowedFromEmailWhiteList();
-		if ($email != $partnerNotificationEmail && in_array($email, array_map('trim',explode(',',$allowedFromEmailWhiteList))))
+		if ($partner)
 		{
-			KalturaLog::info("from_email requested: $email is allowed in the partner from_email whitelist: ".$allowedFromEmailWhiteList );
-			return $email;
+			$allowedFromEmailWhiteList = $partner->getAllowedFromEmailWhiteList();
+			if ($fromEmailNotification !== self::FROM_EMAIL && in_array($fromEmailNotification, explode(',',$allowedFromEmailWhiteList)))
+			{
+				KalturaLog::info("from_email requested: $fromEmailNotification is allowed on the partner from_email whitelist: ".$allowedFromEmailWhiteList );
+				return $fromEmailNotification;
+			}
 		}
-		else
-		{
-			KalturaLog::info("from_email requested is: $email , partner from_email whitelist: ".$allowedFromEmailWhiteList );
-			return $partnerNotificationEmail;
-		}
+		KalturaLog::info("from_email requested: $fromEmailNotification . partner from_email whitelist: ".$allowedFromEmailWhiteList );
+		return self::FROM_EMAIL;
 	}
 
 	/* (non-PHPdoc)
@@ -63,7 +64,7 @@ class EmailNotificationTemplate extends BatchEventNotificationTemplate implement
 	{
 		$jobData = new kEmailNotificationDispatchJobData();
 		$jobData->setTemplateId($this->getId());
-		$jobData->setFromEmail($this->getEmail());
+		$jobData->setFromEmail($this->getAllowedEmail());
 		$jobData->setFromName($this->getFromName());
 		$jobData->setPriority($this->getPriority());
 		$jobData->setConfirmReadingTo($this->getConfirmReadingTo());
