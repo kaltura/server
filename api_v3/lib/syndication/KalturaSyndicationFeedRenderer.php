@@ -185,8 +185,9 @@ class KalturaSyndicationFeedRenderer
 		{
 			$mediaEntrytypes = array(entryType::MEDIA_CLIP, entryType::MIX);
 			$partner = PartnerPeer::retrieveByPK($this->getSyndicationFeedDb()->getPartnerId());
-			$liveEntriesView = $partner->getEnabledService(KalturaPermissionName::FEATURE_LIVE_ENTRIES_IN_FEED);
-			if($liveEntriesView) {
+			$liveEntriesView = $partner->getEnabledService(KalturaPermissionName::FEATURE_INCLUDE_LIVE_ENTRIES_IN_FEED);
+			if($liveEntriesView)
+			{
 				$mediaEntrytypes[] = entryType::LIVE_STREAM;
 			}
 			$this->baseCriteria->addAnd(entryPeer::TYPE, $mediaEntrytypes, Criteria::IN);
