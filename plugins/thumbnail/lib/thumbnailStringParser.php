@@ -6,7 +6,7 @@
 
 class thumbnailStringParser
 {
-	const IMAGE_TRANSFORMATION_STEPS_DELIMITER = "+";
+	const IMAGE_TRANSFORMATION_STEPS_DELIMITER = '+';
 	const SOURCE_INDEX = 0;
 	const SOURCE_TYPE_INDEX = 0;
 	const SOURCE_VALUE_INDEX = 1;
@@ -18,25 +18,29 @@ class thumbnailStringParser
 	const PARAMETER_VALUE_INDEX = 1;
 
 	protected static $actionsAlias = array(
-		"c" => "kCropAction",
-		"crop" => "kCropAction",
-		"resize" => "kResizeAction",
-		"re" => "kResizeAction",
-		"comp" => "kCompositeAction",
-		"composite" => "kCompositeAction",
-		"vidsec" => "kVidSecAction",
-		"vsec" => "kVidSecAction",
-		"rotate" => "kRotateAction",
-		"r" =>	"kRotateAction",
-		"t" => "kTextAction",
-		"txt" => "kTextAction",
-		"text" => "kTextAction",
-		"vidslice" => "kVidSliceAction",
-		"vslice" => "kVidSliceAction",
-		"vidstrip" => "kVidStripAction",
-		"vstrip" => "kVidStripAction",
-		"roundcorners" => "kRoundCornersAction",
-		"rc" => "kRoundCornersAction",
+		'c' => 'kCropAction',
+		'crop' => 'kCropAction',
+		'resize' => 'kResizeAction',
+		're' => 'kResizeAction',
+		'comp' => 'kCompositeAction',
+		'composite' => 'kCompositeAction',
+		'vidsec' => 'kVidSecAction',
+		'vsec' => 'kVidSecAction',
+		'rotate' => 'kRotateAction',
+		'r' =>	'kRotateAction',
+		't' => 'kTextAction',
+		'txt' => 'kTextAction',
+		'text' => 'kTextAction',
+		'vidslice' => 'kVidSliceAction',
+		'vslice' => 'kVidSliceAction',
+		'vidstrip' => 'kVidStripAction',
+		'vstrip' => 'kVidStripAction',
+		'roundcorners' => 'kRoundCornersAction',
+		'rc' => 'kRoundCornersAction',
+		'itt' => 'kImageTextureTextAction',
+		'imageTextureText' => 'kImageTextureTextAction',
+		'filter' => 'kFilterAction',
+		'f' => 'kFilterAction',
 	);
 
 	/**

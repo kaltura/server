@@ -1,4 +1,105 @@
 # Orion 15.1.0 #
+## New thumbnail API  ##
+- Issue Type: Epic
+- Issue ID: PLAT-9564
+
+### Configuration ###
+Make sure you have imagick PHP extension module installed
+add Thumbnail to plugins.ini
+Add the following to local.ini:
+[thumb_storage]
+type = 2
+path = /tmp
+		
+#### Deployment Scripts ####	
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_04_17_thumbnailService.php
+
+## Allow only admins to generate sip url  ##
+- Issue Type: Task
+- Issue ID: PLAT-9921
+
+### Configuration ###
+None
+		
+#### Deployment Scripts ####	
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_16_update_sip_permissions.php
+
+
+## Allow all KMC users to order reach captions ##
+
+- Issue Type: Task
+- Issue ID: SUP-18314
+
+### Configuration ###
+	None.
+		
+#### Deployment Scripts ####	
+		  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_16_allow_kmc_user_reach_profile_access.php
+		  
+## Compress sphinx_log queries according to threshold ##
+- Issue Type: TASK
+- Issue ID: SUP-18392
+
+### configuration ###
+    Add the following to local.ini:
+	indexing_query_compress_threshold = 819200 ( DESIRED_THRESHOLD in size 819200 is 800KB )
+    
+### Deployment scripts ###
+    run mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura_sphinx_log <
+    /opt/kaltura/app/deployment/updates/sql/2019_06_12_alter_sphinx_log_table_add_cutom_data_column.sql
+    
+## Add permission in Admin Console for new live analytics dashboard ##
+
+- Issue Type: Feature
+- Issue ID: AN-709
+
+### configuration ###
+    Add the following to admin.ini:
+
+    moduls.analyticsLiveDashboard.enabled = true
+    moduls.analyticsLiveDashboard.permissionType = 2
+    moduls.analyticsLiveDashboard.label = Enable Real Time Dashboard
+    moduls.analyticsLiveDashboard.permissionName = FEATURE_LIVE_ANALYTICS_DASHBOARD
+    moduls.analyticsLiveDashboard.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+    None
+
+## Block users from changing roles  ##
+- Issue Type: Task
+- Issue ID: PLAT-9896
+
+### Configuration ###
+None
+		
+#### Deployment Scripts ####	
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_03_update_user_role_permissions.php
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_19_update_user_role_partner_-2_permissions.php
+
+## Update Reach notification template:Entry_Vendor_Task_Pending_Moderation  ##
+- Issue Type: Task
+- Issue ID: REACH2-575
+
+### Configuration ###
+	First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_pending_moderation.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2019_06_03_deploy_update_entry_vendor_pending_moderation.php
+
+## Reach notification templates ##
+- Issue Type: Task
+- Issue ID: REACH2-569
+
+### Configuration ###
+	First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_rejected_moderation.template.xml
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_task_done.template.xml
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_task_approved_moderation.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2019_06_03_deploy_update_reach_notifications.php
+
 
 ## add custom_data column to upload_token DB table ##
 
@@ -41,25 +142,27 @@ in [subjects]
 
 in [bodies]
 139 = "Hello,<BR><BR>Reason for the broadcast issue:<BR><BR>%s <BR><BR> Please contact your Account Manager to resolve this issue.<BR><BR>Kaltura Customer Service"
-
+	
 #### Deployment Scripts ####	
 NONE
 
 ## Add generateQrCode action to user service ##
 
-- Issue Type: Feature
-- Issue ID: KMCNG-2114
+ -Issue Type: Feature
+ -Issue ID: KMCNG-2114
 
 ### Configuration ###
+
 
     Add to local.ini uder password_reset_links url for the KMC qr page in the following way: qr_page = @URL_FOR_QR@
     
     Edit /opt/kaltura/app/configurations/batch/batches/Mailer/emails_en.ini:
     add constants, subjects and bodies as described in /opt/kaltura/app/batch/batches/Mailer/emails_en.template.ini for ids: 140, 141 and 142.   
 
+
 ### Deployment scripts ###
 
-	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_02_add_user_generate_qr_image.php
+       php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_02_add_user_generate_qr_image.php
 
 ## Deploy "Entry Vendor Task Finished Processing" HTTP notification (for MediaSpace) ##
  - Issue Type: Feature

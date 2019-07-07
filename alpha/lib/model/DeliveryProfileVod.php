@@ -490,10 +490,10 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 				}
 			}
 		}
-		
+
 		uasort($flavors, array($this,'flavorCmpFunction'));
-	
-		return $flavors;
+
+		return array_values($flavors);
 	}
 
 	public function setDynamicAttributes(DeliveryProfileDynamicAttributes $params) {

@@ -72,6 +72,10 @@ class UserService extends KalturaBaseUserService
 		try
 		{
 			if (!is_null($user->roleIds)) {
+				if ($this->getPartnerId() == Partner::ADMIN_CONSOLE_PARTNER_ID && !kPermissionManager::isPermitted(PermissionName::SYSTEM_ADMIN_PERMISSIONS_UPDATE))
+				{
+					throw new KalturaAPIException(KalturaErrors::NOT_ALLOWED_TO_CHANGE_ROLE);
+				}
 				UserRolePeer::testValidRolesForUser($user->roleIds, $this->getPartnerId());
 				if ($user->roleIds != $dbUser->getRoleIds() &&
 					$dbUser->getId() == $this->getKuser()->getId()) {
@@ -306,6 +310,7 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::LOGIN_BLOCKED
 	 * @throws KalturaErrors::PASSWORD_EXPIRED
 	 * @throws KalturaErrors::USER_IS_BLOCKED
+	 * @throws KalturaErrors::DIRECT_LOGIN_BLOCKED
 	 */		
 	public function loginByLoginIdAction($loginId, $password, $partnerId = null, $expiry = 86400, $privileges = '*', $otp = null)
 	{
@@ -365,6 +370,7 @@ class UserService extends KalturaBaseUserService
 	 * 
 	 * @param string $hashKey The hash key used to identify the user (retrieved by email)
 	 * @param string $newPassword The new password to set for the user
+	 * @return KalturaAuthentication The authentication response
 	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
@@ -553,6 +559,7 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::INTERNAL_SERVERL_ERROR
 	 * @throws KalturaErrors::UNKNOWN_PARTNER_ID
 	 * @throws KalturaErrors::SERVICE_ACCESS_CONTROL_RESTRICTED
+	 * @throws KalturaErrors::DIRECT_LOGIN_BLOCKED
 	 * 
 	 */
 	public function loginByKsAction($requestedPartnerId)
@@ -615,7 +622,7 @@ class UserService extends KalturaBaseUserService
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $loginData->getLoginEmail());
 		}
-		$imgContent = authenticationUtils::getQRImage($dbUser);
+		$imgContent = authenticationUtils::getQRImage($dbUser, $loginData);
 		if(!$imgContent)
 		{
 			throw new KalturaAPIException(KalturaErrors::ERROR_IN_QR_GENERATION);

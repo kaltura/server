@@ -12,7 +12,7 @@ class kVidSliceAction extends kVidStripAction
 	{
 		parent::initParameterAlias();
 		$kVidSliceAlias = array(
-			"sn" => kThumbnailParameterName::SLICE_NUMBER,
+			'sn' => kThumbnailParameterName::SLICE_NUMBER,
 		);
 		$this->parameterAlias = array_merge($this->parameterAlias, $kVidSliceAlias);
 	}

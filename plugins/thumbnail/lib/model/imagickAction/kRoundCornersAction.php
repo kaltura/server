@@ -34,14 +34,14 @@ class kRoundCornersAction extends kImagickAction
 	protected function initParameterAlias()
 	{
 		$roundCornersParameterAlias = array(
-			"x" => kThumbnailParameterName::X_ROUNDING,
-			"xr" => kThumbnailParameterName::X_ROUNDING,
-			"y" => kThumbnailParameterName::Y_ROUNDING,
-			"yr" => kThumbnailParameterName::Y_ROUNDING,
-			"sw" => kThumbnailParameterName::STROKE_WIDTH,
-			"d" => kThumbnailParameterName::DISPLACE,
-			"sc" => kThumbnailParameterName::SIZE_CORRECTION,
-			"bg" => kThumbnailParameterName::BACKGROUND_COLOR,
+			'x' => kThumbnailParameterName::X_ROUNDING,
+			'xr' => kThumbnailParameterName::X_ROUNDING,
+			'y' => kThumbnailParameterName::Y_ROUNDING,
+			'yr' => kThumbnailParameterName::Y_ROUNDING,
+			'sw' => kThumbnailParameterName::STROKE_WIDTH,
+			'd' => kThumbnailParameterName::DISPLACE,
+			'sc' => kThumbnailParameterName::SIZE_CORRECTION,
+			'bg' => kThumbnailParameterName::BACKGROUND_COLOR,
 		);
 
 		$this->parameterAlias = array_merge($this->parameterAlias, $roundCornersParameterAlias);

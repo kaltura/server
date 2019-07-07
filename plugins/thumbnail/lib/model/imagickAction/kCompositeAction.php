@@ -14,15 +14,15 @@ class kCompositeAction extends kImagickAction
 	protected $compositeObject;
 	protected $opacity;
 
-	const MAX_OPACITY = "100";
-	const MIN_OPACITY = "1";
+	const MAX_OPACITY = '100';
+	const MIN_OPACITY = '1';
 
 	protected function initParameterAlias()
 	{
 		$compositeParameterAlias = array(
-			"ct" => kThumbnailParameterName::COMPOSITE_TYPE,
-			"ch" => kThumbnailParameterName::CHANNEL,
-			"op" => kThumbnailParameterName::OPACITY,
+			'ct' => kThumbnailParameterName::COMPOSITE_TYPE,
+			'ch' => kThumbnailParameterName::CHANNEL,
+			'op' => kThumbnailParameterName::OPACITY,
 			);
 		$this->parameterAlias = array_merge($this->parameterAlias, $compositeParameterAlias);
 	}

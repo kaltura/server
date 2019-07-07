@@ -9,5 +9,5 @@ interface VendorServiceFeature extends BaseEnum
 	const TRANSLATION           = 2;
 	const ALIGNMENT             = 3;
 	const AUDIO_DESCRIPTION     = 4;
-	
+	const CHAPTERING            = 5;
 }

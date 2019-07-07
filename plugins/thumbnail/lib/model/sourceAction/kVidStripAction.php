@@ -18,17 +18,18 @@ class kVidStripAction extends kVidAction
 	{
 		parent::initParameterAlias();
 		$kVidStripAlias = array(
-			"w" => kThumbnailParameterName::WIDTH,
-			"h" => kThumbnailParameterName::HEIGHT,
-			"nos" => kThumbnailParameterName::NUMBER_OF_SLICES,
-			"ss" => kThumbnailParameterName::START_SEC,
-			"es" => kThumbnailParameterName::END_SEC,
+			'w' => kThumbnailParameterName::WIDTH,
+			'h' => kThumbnailParameterName::HEIGHT,
+			'nos' => kThumbnailParameterName::NUMBER_OF_SLICES,
+			'ss' => kThumbnailParameterName::START_SEC,
+			'es' => kThumbnailParameterName::END_SEC,
 		);
 		$this->parameterAlias = array_merge($this->parameterAlias, $kVidStripAlias);
 	}
 
 	protected function extractActionParameters()
 	{
+		parent::extractActionParameters();
 		$this->numberOfSlices = $this->getIntActionParameter(kThumbnailParameterName::NUMBER_OF_SLICES);
 		$this->startSec = $this->getFloatActionParameter(kThumbnailParameterName::START_SEC, 0);
 		$this->endSec = $this->getFloatActionParameter(kThumbnailParameterName::END_SEC);

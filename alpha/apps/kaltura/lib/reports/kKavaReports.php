@@ -374,95 +374,108 @@ class kKavaReports extends kKavaReportsMgr
 					'columns' => array('STATUS', 'PARTNER_NAME', '@CREATED_AT'),
 				)
 			),
-			self::REPORT_JOIN_GRAPHS => array(
-				// transcoding
+			self::REPORT_JOIN_REPORTS => array(
+				// unique users
 				array(
-					self::REPORT_DATA_SOURCE => self::DATASOURCE_TRANSCODING_USAGE,
-					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_API_USAGE,
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
-					self::REPORT_GRAPH_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
+					self::REPORT_METRICS => array(self::METRIC_UNIQUE_USERS),
 				),
 
-				// bandwidth
 				array(
-					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
-					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
-					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
-					self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB, self::METRIC_ORIGIN_BANDWIDTH_SIZE_MB),
-				),
+				self::REPORT_JOIN_GRAPHS => array(
 
-				// storage
-				array(
-					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
-					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
-					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
-						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					// transcoding
+					array(
+						self::REPORT_DATA_SOURCE => self::DATASOURCE_TRANSCODING_USAGE,
+						self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+						self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+						self::REPORT_GRAPH_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
 					),
-					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
-					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
-				),
 
-				array(
-					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
-					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
-					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
-						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					// bandwidth
+					array(
+						self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+						self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+						self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+						self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB, self::METRIC_ORIGIN_BANDWIDTH_SIZE_MB),
 					),
-					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
-					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
-					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
-				),
 
-				// entries
-				array(
-					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
-					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
-					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
-					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED),
-				),
-
-				array(
-					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
-					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
-					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
-					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_TOTAL),
-					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedEntriesGraphs',
-				),
-
-				// named users
-				array(
-					self::REPORT_DATA_SOURCE => self::DATASOURCE_USER_LIFECYCLE,
-					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
-					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
-						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					// storage
+					array(
+						self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+						self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+						self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+							self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+							self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+						),
+						self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+						self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
 					),
-					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
-					self::REPORT_GRAPH_METRICS => array(self::METRIC_USERS_ADDED, self::METRIC_USERS_DELETED),
-				),
 
-				array(
-					self::REPORT_DATA_SOURCE => self::DATASOURCE_USER_LIFECYCLE,
-					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
-					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
-						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					array(
+						self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+						self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+						self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+							self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+							self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+						),
+						self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+						self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
+						self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
 					),
-					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
-					self::REPORT_GRAPH_METRICS => array(self::METRIC_USERS_TOTAL),
-					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedUsersGraphs',
-				),
 
-				// plays
-				array(
-					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
-					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
-					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION),
+					// entries
+					array(
+						self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+						self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+						self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+						self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED),
+					),
+
+					array(
+						self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+						self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+						self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+						self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_TOTAL),
+						self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedEntriesGraphs',
+					),
+
+					// named users
+					array(
+						self::REPORT_DATA_SOURCE => self::DATASOURCE_USER_LIFECYCLE,
+						self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+						self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+							self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+							self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+						),
+						self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+						self::REPORT_GRAPH_METRICS => array(self::METRIC_USERS_ADDED, self::METRIC_USERS_DELETED),
+					),
+
+					array(
+						self::REPORT_DATA_SOURCE => self::DATASOURCE_USER_LIFECYCLE,
+						self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+						self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+							self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+							self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+						),
+						self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+						self::REPORT_GRAPH_METRICS => array(self::METRIC_USERS_TOTAL),
+						self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedUsersGraphs',
+					),
+
+					// plays
+					array(
+						self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+						self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+						self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION),
+					),
+				),
+				self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+				self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_BANDWIDTH_SIZE_MB, self::METRIC_AVERAGE_STORAGE_MB, self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_PEAK_ENTRIES, self::METRIC_PEAK_USERS, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_ORIGIN_BANDWIDTH_SIZE_MB, self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB, self::METRIC_PEAK_STORAGE_MB,)
 				),
 			),
-			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
 			self::REPORT_COLUMN_MAP => array(
 				'total_plays' => self::EVENT_TYPE_PLAY,
 				'bandwidth_consumption' => self::METRIC_BANDWIDTH_SIZE_MB,
@@ -474,7 +487,8 @@ class kKavaReports extends kKavaReportsMgr
 				'origin_bandwidth_consumption' => self::METRIC_ORIGIN_BANDWIDTH_SIZE_MB,
 				'added_storage' => self::METRIC_STORAGE_ADDED_MB,
 				'deleted_storage' => self::METRIC_STORAGE_DELETED_MB,
-				'peak_storage' => self::METRIC_PEAK_STORAGE_MB
+				'peak_storage' => self::METRIC_PEAK_STORAGE_MB,
+				'unique_known_users' => self::METRIC_UNIQUE_USERS,
 			),
 		),
 
@@ -1351,7 +1365,15 @@ class kKavaReports extends kKavaReportsMgr
 
 	public static function getReportDef($report_type)
 	{
-		return isset(self::$reports_def[$report_type]) ? self::$reports_def[$report_type] : null;
+		$report_def = isset(self::$reports_def[$report_type]) ? self::$reports_def[$report_type] : null;
+		if (is_null($report_def))
+		{
+			return null;
+		}
+
+		self::initTransformTimeDimensions();
+
+		return $report_def;
 	}
 
 }

@@ -16,7 +16,15 @@ class kKavaCustomReports extends kKavaReportsMgr
 	public static function getReportDef($report_type)
 	{
 		self::initMap();
-		return isset(self::$custom_reports[-$report_type]) ? self::$custom_reports[-$report_type] : null;
+		$report_def = isset(self::$custom_reports[-$report_type]) ? self::$custom_reports[-$report_type] : null;
+		if (is_null($report_def))
+		{
+			return null;
+		}
+
+		self::initTransformTimeDimensions();
+
+		return $report_def;
 	}
 
 }
