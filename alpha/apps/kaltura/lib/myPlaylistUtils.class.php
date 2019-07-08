@@ -581,7 +581,7 @@ class myPlaylistUtils
 	{
 		return function ($a, $b) use ($objectsOrder)
 		{
-			return ($objectsOrder[$a->getId()] > $objectsOrder[$b->getId()]) ? 1 : -1;
+			return ($objectsOrder[$a->getId()] - $objectsOrder[$b->getId()]);
 		};
 	}
 

@@ -179,11 +179,12 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 				$kEsearchOrderBy = $this->getKESearchOrderBy($fieldValue);
 				continue;
 			}
-			list($operator, $fieldName, $fieldValue, $shouldContinue) = $this->splitIntoParameters($filter, $field, $fieldValue);
-			if ($shouldContinue)
+			$fieldParts = $this->splitIntoParameters($filter, $field, $fieldValue);
+			if (!$fieldParts)
 			{
 				continue;
 			}
+			list($operator, $fieldName, $fieldValue) = $fieldParts;
 			$this->addingFieldPartIntoQuery($operator, $fieldName, $fieldValue);
 		}
 		return $this->createFinalOperator($kEsearchOrderBy);
@@ -215,15 +216,15 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		list($operator, $fieldName) = self::handlingFreeTextField($field, $operator, $fieldName);
 		if(!in_array($fieldName, static::getSupportedFields()) || is_null($fieldValue) || $fieldValue === '')
 		{
-			return array(null , null, null, true);
+			return null;
 		}
 		if ($fieldName === ESearchEntryFilterFields::STATUS && ($operator === baseObjectFilter::EQ ||$operator === baseObjectFilter::IN  ))
 		{
 			self::$validStatuses = explode(',',$fieldValue);
-			return array(null , null, null, true);
+			return null;
 		}
-		$fieldValue = self::changeFieldValueByPuserIdAndDuration($fieldName, $filter, $fieldValue);
-		return array($operator, $fieldName, $fieldValue, false);
+		$fieldValue = self::translateFieldValue($fieldName, $filter, $fieldValue);
+		return array($operator, $fieldName, $fieldValue);
 	}
 
 	protected static function handlingFreeTextField($field, $operator, $fieldName)
@@ -236,7 +237,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		return array($operator, $fieldName);
 	}
 
-	protected static function changeFieldValueByPuserIdAndDuration($fieldName, $filter, $fieldValue)
+	protected static function translateFieldValue($fieldName, $filter, $fieldValue)
 	{
 		if(in_array($fieldName, self::$puserFields))
 		{
