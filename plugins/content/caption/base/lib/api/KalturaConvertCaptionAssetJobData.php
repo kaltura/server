@@ -3,12 +3,12 @@
  * @package plugins.caption
  * @subpackage api.objects
  */
-class KalturaParseSccCaptionAssetJobData extends KalturaJobData
+class KalturaConvertCaptionAssetJobData extends KalturaJobData
 {
     /**
      * @var string
      */
-    public $sccCaptionAssetId;
+    public $captionAssetId;
 
     /**
      * @var string
@@ -20,11 +20,23 @@ class KalturaParseSccCaptionAssetJobData extends KalturaJobData
      */
     public $fileEncryptionKey;
 
+    /**
+     * @var string
+     */
+    public $fromType;
+
+    /**
+     * @var string
+     */
+    public $toType;
+
     private static $map_between_objects = array
     (
-        "sccCaptionAssetId",
+        "captionAssetId",
         "fileLocation",
         "fileEncryptionKey",
+        "fromType",
+        "toType"
     );
 
     /* (non-PHPdoc)

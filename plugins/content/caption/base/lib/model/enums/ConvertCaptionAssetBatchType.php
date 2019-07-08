@@ -3,14 +3,14 @@
  * @package plugins.caption
   * @subpackage api.enum
    */
-   class ParseSccCaptionAssetBatchType implements IKalturaPluginEnum, BatchJobType
+   class ConvertCaptionAssetBatchType implements IKalturaPluginEnum, BatchJobType
    {
-        const PARSE_SCC_CAPTION_ASSET = 'parsescccaptionasset';
+        const CONVERT_CAPTION_ASSET = 'convertcaptionasset';
 
         public static function getAdditionalValues()
         {
             return array(
-                'PARSE_SCC_CAPTION_ASSET' => self::PARSE_SCC_CAPTION_ASSET
+                'CONVERT_CAPTION_ASSET' => self::CONVERT_CAPTION_ASSET
             );
          }
 

@@ -172,13 +172,14 @@ abstract class kCaptionsContentManager
 		return kJobsManager::addJob($batchJob, $jobData, $jobType);
 	}
 
-	/**
+	/***
 	 * @param $captionAsset
-	 * @param $fileLocation
-	 * @param null $syncKey
+	 * @param $fromType
+	 * @param $toType
 	 * @return BatchJob
+	 * @throws Exception
 	 */
-	public static function addParseSccCaptionAssetJob($captionAsset)
+	public static function addConvertCaptionAssetJob($captionAsset, $fromType, $toType)
 	{
 		$batchJob = new BatchJob();
 
@@ -189,12 +190,14 @@ abstract class kCaptionsContentManager
 		$id = $captionAsset->getId();
 		$entryId = $captionAsset->getEntryId();
 
-		$jobData = new kParseSccCaptionAssetJobData();
-		$jobData->setSccCaptionAssetId($id);
+		$jobData = new kConvertCaptionAssetJobData();
+		$jobData->setCaptionAssetId($id);
 		$jobData->setFileLocation($fileLocation);
 		$jobData->setFileEncryptionKey($fileSync->getEncryptionKey());
+		$jobData->setFromType($fromType);
+		$jobData->setToType($toType);
 
-		$jobType = CaptionPlugin::getBatchJobTypeCoreValue(ParseSccCaptionAssetBatchType::PARSE_SCC_CAPTION_ASSET);
+		$jobType = CaptionPlugin::getBatchJobTypeCoreValue(ConvertCaptionAssetBatchType::CONVERT_CAPTION_ASSET);
 		$batchJob->setObjectType(BatchJobObjectType::ASSET);
 		$batchJob->setEntryId($entryId);
 		$batchJob->setPartnerId($captionAsset->getPartnerId());

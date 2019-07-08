@@ -2,12 +2,12 @@
 require_once(__DIR__ . "/../../../../../../batch/bootstrap.php");
 
 /**
- * Executes the KAsyncParseSccCaptionAssetExe
+ * Executes the KAsyncConvertCaptionAssetExe
  * 
  * @package plugins.caption
  * @subpackage Scheduler
  */
 
-$instance = new KAsyncParseSccCaptionAsset();
+$instance = new KAsyncConvertCaptionAsset();
 $instance->run(); 
 $instance->done();

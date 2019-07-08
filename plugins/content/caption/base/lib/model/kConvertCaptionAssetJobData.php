@@ -3,12 +3,12 @@
  * @package plugins.caption
  * @subpackage model.data
  */
-class kParseSccCaptionAssetJobData extends kJobData
+class kConvertCaptionAssetJobData extends kJobData
 {
 	/**
      * @var string
 	 */
-	private $sccCaptionAssetId;
+	private $captionAssetId;
 
     /**
      * @var string
@@ -21,19 +21,29 @@ class kParseSccCaptionAssetJobData extends kJobData
 	private $fileEncryptionKey;
 
 	/**
+	 * @var string
+	 */
+	private $fromType;
+
+	/**
+	 * @var string
+	 */
+	private $toType;
+
+	/**
      * @return string $multiLanaguageCaptionAssetId
      */
-	public function getSccCaptionAssetId()
+	public function getCaptionAssetId()
 	{
-		return $this->sccCaptionAssetId;
+		return $this->captionAssetId;
 	}
 
 	/**
 	 * @param string $captionAssetId
 	 */
-	public function setSccCaptionAssetId($captionAssetId)
+	public function setCaptionAssetId($captionAssetId)
 	{
-		$this->sccCaptionAssetId = $captionAssetId;
+		$this->captionAssetId = $captionAssetId;
 	}
 
 	/**
@@ -66,6 +76,38 @@ class kParseSccCaptionAssetJobData extends kJobData
 	public function setFileEncryptionKey($fileEncryptionKey)
 	{
 		$this->fileEncryptionKey = $fileEncryptionKey;
+	}
+
+	/**
+	 * @return string $fromType
+	 */
+	public function getFromType()
+	{
+		return $this->fromType;
+	}
+
+	/**
+	 * @param string $fromType
+	 */
+	public function setFromType($fromType)
+	{
+		$this->fromType= $fromType;
+	}
+
+	/**
+	 * @return string $toType
+	 */
+	public function getToType()
+	{
+		return $this->toType;
+	}
+
+	/**
+	 * @param string $toType
+	 */
+	public function setToType($toType)
+	{
+		$this->toType= $toType;
 	}
 
 }

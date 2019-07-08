@@ -838,4 +838,5 @@ name                                                = KAsyncParseSccCaptionAsset
 friendlyName                                        = parse scc caption asset
 type                                                = KAsyncParseSccCaptionAsset
 maximumExecutionTime                                = 300
-scriptPath                                          = ../plugins/content/caption/base/batch/ParseCaptionAsset/KAsyncParseSccCaptionAssetExe.php
+scriptPath                                          = ../plugins/content/caption/base/batch/ParseCaptionAsset/KAsyncParseCaptionAssetExe.php
+params.pythonCmd                                    = @PYTHON_3_PATH@
