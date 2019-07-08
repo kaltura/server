@@ -12,6 +12,8 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 	const BCC_RECIPIENT_TYPE = 'BCC';
 	
 	const REPLYTO_RECIPIENT_TYPE = 'ReplyTo';
+
+	const FROM_EMAIL = '{from_email}';
 	
 	/**
 	 * Old kaltura default
@@ -216,8 +218,15 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 					$email = str_replace(array_keys($contentParameters), $contentParameters, $email);
 					$name = str_replace(array_keys($contentParameters), $contentParameters, $name);
 			}
-			
-			$this::$mailer->Sender = $email;
+
+			if (isset($contentParameters[self::FROM_EMAIL]))
+			{
+				$this::$mailer->Sender = $contentParameters[self::FROM_EMAIL];
+			}
+			else
+			{
+				$this::$mailer->Sender = $email;
+			}
 			$this::$mailer->From = $email;
 			$this::$mailer->FromName = $name;
 		}
