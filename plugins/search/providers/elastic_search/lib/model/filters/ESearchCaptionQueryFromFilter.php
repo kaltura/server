@@ -96,7 +96,7 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 		$captionsPager = clone ($entryPager);
 		$this->updateEntryPager($entryPager, $filterOnEntryIds);
 
-		list($query, $kEsearchOrderBy )  = $this->createElasticQueryFromFilter($filter);
+		$query = $this->createElasticQueryFromFilter($filter);
 
 		$elasticResults = $entrySearch->doSearch($query, $entryPager, self::$validStatuses);
 
