@@ -409,10 +409,7 @@ class PlaylistService extends KalturaEntryService
 		$entryList  = array();
 		foreach ($entryListMerged as $currentEntry)
 		{
-			if (!array_key_exists ($currentEntry->getId(), $entryList))
-			{
-				$entryList[$currentEntry->getId()] = $currentEntry;
-			}
+			$entryList[$currentEntry->getId()] = $currentEntry;
 		}
 		return $entryList;
 	}
