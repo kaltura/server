@@ -626,7 +626,8 @@
 					"normalizer" : "kaltura_keyword_normalizer"
 				},
 				"partner_sort_value": {
-					"type" : "integer"
+					"type" : "keyword",
+					"normalizer" : "kaltura_keyword_normalizer"
 				},
 				"redirect_entry_id": {
 					"type" : "keyword",
