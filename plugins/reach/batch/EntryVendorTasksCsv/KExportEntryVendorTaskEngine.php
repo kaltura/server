@@ -66,6 +66,8 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 			$this->addEntryVendorTasksToCsv($entryVendorTaskList->objects, $csvFile);
 			$tasksCount = count($entryVendorTaskList->objects);
 			$totalCount += $tasksCount;
+			$lastObject = end($entryVendorTaskList->objects);
+			$lastCreatedAt = $lastObject->createdAt+1;
 			KalturaLog::debug("Adding More - $tasksCount totalCount - " . $totalCount);
 			unset($entryVendorTaskList);
 			if (function_exists('gc_collect_cycles')) // php 5.3 and above

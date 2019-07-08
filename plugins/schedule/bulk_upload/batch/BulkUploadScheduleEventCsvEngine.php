@@ -216,16 +216,16 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 					$recurrenceObject->interval = $value;
 					break;
 				case 'BYMONTHDAY':
-					$recurrenceObject->byMonthDay = $value;
+					$recurrenceObject->byMonthDay = str_replace(';', ',', $value);
 					break;
 				case 'BYMONTH':
-					$recurrenceObject->byMonth = $value;
+					$recurrenceObject->byMonth = str_replace(';', ',', $value);
 					break;
 				case 'BYDAY':
-					$recurrenceObject->byDay = $value;
+					$recurrenceObject->byDay = str_replace(';', ',', $value);
 					break;
 				case 'BYSETPOS':
-					$recurrenceObject->byOffset = $value;
+					$recurrenceObject->byOffset = str_replace(';', ',', $value);
 					break;
 				case 'COUNT':
 					$recurrenceObject->count = $value;
