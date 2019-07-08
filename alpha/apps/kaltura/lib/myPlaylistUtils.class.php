@@ -14,13 +14,30 @@ class myPlaylistUtils
 	const CAPTION_FILES_LABEL = "label";
 	const CAPTION_FILES_PATH = "path";
 	const CAPTION_FILES_ID = "captionId";
+	const KALTURA_CLASS = 'kalturaClass';
 
 	private static $user_cache = null;
 	
 	private static $isAdminKs = false;
 	
 	private static $playlistContext;
-	
+
+	private static $moderationStatusesNotIn = array(
+		entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION,
+		entry::ENTRY_MODERATION_STATUS_REJECTED
+	);
+
+	private static $dates = array(
+		'_lteornull_start_date',
+		'_gteornull_start_date',
+		'_lte_start_date',
+		'_gte_start_date',
+		'_lteornull_end_date',
+		'_gteornull_end_date',
+		'_lte_end_date',
+		'_gte_end_date'
+	);
+
 	public static function setIsAdminKs($v)
 	{
 		self::$isAdminKs = $v;
@@ -483,11 +500,139 @@ class myPlaylistUtils
 		}
 		return $entry_filters;
 	}
-	
-	public static function executeDynamicPlaylist ( $partner_id , $xml , $filter = null ,$detailed = true, $pager = null )
+
+	public static function getEntryFiltersFromXml($listOfFilters, $partnerId)
+	{
+		if (!$listOfFilters)
+		{
+			return null;
+		}
+		return self::fillEntryFilterFromXml($listOfFilters, $partnerId);
+	}
+
+	//splitting entry filters into filters that will run in Esearch and in Sphinx:
+	// Elastic - advancesSearch is not set OR advancesSearch is set and includes KalturaMetadataSearchItem
+	// Sphinx  - advancesSearch is set and NOT including KalturaMetadataSearchItem
+	public static function splitEntryFilters($xml)
+	{
+		$entryFiltersViaEsearch = array();
+		$entryFiltersViaSphinx = array();
+		list ($totalResults, $entryFilters) = self::getPlaylistFilterListStruct($xml);
+		foreach ($entryFilters as $entryFilter)
+		{
+			if (!isset($entryFilter->advancedSearch) ||
+				( isset($entryFilter->advancedSearch) && (string)$entryFilter->advancedSearch[self::KALTURA_CLASS] === PlaylistService::KALTURA_METADATA_SEARCH_ITEM))
+			{
+				$entryFiltersViaEsearch[] = $entryFilter;
+			}
+			else
+			{
+				$entryFiltersViaSphinx[] = $entryFilter;
+			}
+		}
+		return array($entryFiltersViaEsearch, $entryFiltersViaSphinx, $totalResults);
+	}
+
+	public static function executeDynamicPlaylistViaEsearch ($entryFilters ,$totalResults, $pager = null)
+	{
+		$entryKPager = new kPager();
+		if ($pager)
+		{
+			$pager->toObject($entryKPager);
+		}
+		$entryQueryToFilterESearch = new ESearchEntryQueryFromFilter();
+		$entryIds= array();
+		foreach ($entryFilters as $entryFilter)
+		{
+			list ($currEntryIds, $count) = $entryQueryToFilterESearch->retrieveElasticQueryEntryIds($entryFilter, $entryKPager);
+			$entryIds = self::mergeEntriesByLimit($entryIds, $currEntryIds, $entryFilter->getLimit(),$totalResults);
+			$totalResults = max (0, $totalResults - count($entryIds));
+			if ( $totalResults === 0 )
+			{
+				break;
+			}
+		}
+		return array(self::getEntriesSorted($entryIds), $totalResults);
+	}
+
+	protected static function getEntriesSorted($entryIds)
+	{
+		$entryIds = array_unique($entryIds);
+		$entryIdsOrder = array_flip($entryIds);
+		$entries = entryPeer::retrieveByPKs($entryIds);
+		usort($entries, self::buildSorter($entryIdsOrder));
+		return $entries;
+	}
+
+	protected static function mergeEntriesByLimit($entryIds, $currEntryIds, $limit, $totalResults)
+	{
+		if ($totalResults < $limit)
+		{
+			$limit = $totalResults;
+		}
+		if (count($currEntryIds) > $limit)
+		{
+			$currEntryIds = array_slice($currEntryIds,0, $limit);
+		}
+		return array_merge ($entryIds, $currEntryIds);
+	}
+
+	protected static function buildSorter($objectsOrder)
+	{
+		return function ($a, $b) use ($objectsOrder)
+		{
+			return ($objectsOrder[$a->getId()] - $objectsOrder[$b->getId()]);
+		};
+	}
+
+	protected static function fillEntryFilterFromXml($listOfFilters, $partnerId)
+	{
+		$entryFilters = array();
+		foreach ($listOfFilters as $filter)
+		{
+			self::replaceContextTokens($filter);
+			$entryFilter = new entryFilter();
+			$entryFilter->fillObjectFromXml($filter, '_');
+			self::updateEntryFilterFields($entryFilter, $partnerId);
+			$entryFilters[] = $entryFilter;
+		}
+		return $entryFilters;
+	}
+
+	protected static function updateEntryFilterFields($entryFilter, $partnerId)
+	{
+		self::updateEntryFilter($entryFilter, $partnerId);
+		$typeArray = array (entryType::MEDIA_CLIP, entryType::MIX, entryType::LIVE_STREAM );
+		$typeArray = array_merge($typeArray, KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP));
+		$typeArray = array_unique(array_merge($typeArray, KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::LIVE_STREAM)));
+		$entryFilter->setTypeIn($typeArray);
+		$entryFilter->setStatusEquel(entryStatus::READY);
+		$entryFilter->setModerationStatusNotIn(self::$moderationStatusesNotIn);
+		if (self::$isAdminKs)
+		{
+			self::unsetDates($entryFilter);
+		}
+	}
+
+	protected static function unsetDates($filter)
+	{
+		foreach (self::$dates as $date)
+		{
+			if ($filter->is_set($date))
+			{
+				$filter->unsetByName($date);
+			}
+		}
+	}
+
+	public static function executeDynamicPlaylist ( $partner_id, $xml, $filter = null, $detailed = true, $pager = null )
 	{
 		list ( $total_results , $list_of_filters ) = self::getPlaylistFilterListStruct ( $xml );
-	
+		return self::executeDynamicPlaylistFromFilters($total_results, $list_of_filters, $partner_id, $filter , $detailed, $pager);
+	}
+
+	public static function executeDynamicPlaylistFromFilters($total_results, $list_of_filters, $partner_id, $filter = null, $detailed = true, $pager = null)
+	{
 		$entry_filters = array();
 
 		if ( ! $list_of_filters ) return null;
