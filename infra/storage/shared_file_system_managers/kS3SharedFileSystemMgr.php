@@ -755,7 +755,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function doCopyDir($src, $dest, $deleteSrc)
 	{
 
-		$paginator = $this->s3Client->doGetListObjectsPaginator($src);
+		$paginator = $this->s3Client->getListObjectsPaginator($src);
 
 		foreach ($paginator as $page)
 		{
