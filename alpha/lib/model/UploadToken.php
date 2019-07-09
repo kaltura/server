@@ -134,23 +134,33 @@ class UploadToken extends BaseUploadToken implements IBaseObject
 		$this->putInCustomData('minimumChunkSize', $v);
 	}
 
-	public function getLastFileSize()
-	{
-		return $this->getFromCustomData('lastFileSize', null , 0);
-	}
-
-	public function setLastFileSize($v)
-	{
-		$this->putInCustomData('lastFileSize', $v);
-	}
-
 	public function getParts()
 	{
-		return $this->getFromCustomData('parts', null , array());
+		return $this->getFromCustomData('parts', null , array(array('Parts')));
 	}
 
 	public function setParts($v)
 	{
 		$this->putInCustomData('parts', $v);
+	}
+
+	public function getUploadedPartsNumber()
+	{
+		return $this->getFromCustomData('uploadedPartsNumber', null , 0);
+	}
+
+	public function setUploadedPartsNumber($v)
+	{
+		$this->putInCustomData('uploadedPartsNumber', $v);
+	}
+
+	public function getUploadId()
+	{
+		return $this->getFromCustomData('uploadId', null , null);
+	}
+
+	public function setUploadId($v)
+	{
+		$this->putInCustomData('uploadId', $v);
 	}
 }
