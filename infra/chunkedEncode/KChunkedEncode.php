@@ -59,8 +59,8 @@
 				KalturaLog::log($msgStr="ERROR: missing essential - source");
 				return false;
 			}
-
-				// Get source mediaData. Required for 'supported' validation
+			
+			// Get source mediaData. Required for 'supported' validation
 			$this->sourceFileDt = $this->getMediaData($params->source);
 			if(!isset($this->sourceFileDt)){
 				KalturaLog::log($msgStr="ERROR: failed on media data retrieval of the source file ($params->source)");
@@ -75,9 +75,9 @@
 
 			if(isset($setup->createFolder) && $setup->createFolder==1) {
 				$setup->output.= "_".$this->chunkEncodeToken."/";
-				if(!file_exists($setup->output)) {
+				if(!kFile::checkFileExists($setup->output)) {
 					KalturaLog::log("Create tmp folder:".$setup->output);
-					mkdir($setup->output);
+					kFile::mkdir($setup->output);
 				}
 				$setup->output.= $pInfo['filename'];
 			}
@@ -189,8 +189,8 @@
 						 * SRT splitting
 						 */
 					$chunkSrtFile = $this->getChunkName($chunkData->index,"srt");
-					if(file_exists($chunkSrtFile))
-						unlink($chunkSrtFile);
+					if(kFile::checkFileExists($chunkSrtFile))
+						kFile::unlink($chunkSrtFile);
 					KSrtText::SplitSrtFile($subsFileHd, $chunkSrtFile, $chunkData->start, $chunkData->duration, $subsArr);
 					KalturaLog::log("$chunkSrtFile, $chunkData->start, $chunkData->duration");
 				}
@@ -312,7 +312,7 @@
 			 */
 			$srcIndexes = array_keys($cmdLineArr,'-i');
 			foreach($srcIndexes as $idx) {
-				$cmdLineArr[$idx+1] = realpath($cmdLineArr[$idx+1]);
+				$cmdLineArr[$idx+1] = '"' . kFile::realpath($cmdLineArr[$idx+1]) . '"';
 			}
 			
 			$toAddFps = false;
@@ -764,7 +764,7 @@
 				$cmdLine.= " -headers \"$params->httpHeaderExtPrefix,audio\"";
 			}
 			
-			$cmdLine.= " -i $params->source";
+			$cmdLine.= " -i \"$params->source\"";
 			$cmdLine.= " -vn";
 			if(isset($params->acodec)) $cmdLine.= " -c:a ".$params->acodec;
 			if(isset($filterStr))
@@ -1426,8 +1426,10 @@
 			else
 				$this->formatParams = null;
 			
-			if(($key=array_search("-i", $cmdLineArr))!==false) {
+			if(($key=array_search("-i", $cmdLineArr))!==false)
+			{
 				$this->source = $cmdLineArr[$key+1];
+				$cmdLineArr[$key+1] = '"' . $cmdLineArr[$key+1] . '"';
 			}
 			$this->output = end($cmdLineArr);
 		}

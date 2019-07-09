@@ -28,8 +28,8 @@
 		const	DefaultChunkOverlap =  0.5; // secs
 		const	DefaultConcurrentChunks = 1;// secs
 		
-		public $ffmpegBin = "ffmpeg";
-		public $ffprobeBin = "ffprobe";
+		public $ffmpegBin = "/opt/kaltura/bin/ffmpeg"; // Hack should be reverted
+		public $ffprobeBin = "/opt/kaltura/bin/ffprobe"; // Hack should be reverted
 
 		public $commandExecitionScript = null;
 		
@@ -128,9 +128,9 @@
 		 */
 		protected static function getData1($chunkFileName, KChunkFramesStat $framesStat, $ffprobeBin="ffprobe", $ffmpegBin="ffmpeg")
 		{
-				/*
-				 * Retrieve data for first frame and for last 10
-				 */
+			/*
+			 * Retrieve data for first frame and for last 10
+			 */
 			$cmdLine = "$ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type -print_format csv -v quiet $chunkFileName | (head -n1 && tail -n10)";
 			KalturaLog::log($cmdLine);
 			$lastLine=exec($cmdLine , $outputArr, $rv);
@@ -167,8 +167,8 @@
 		 */
 		protected static function getData2($chunkFileName, KChunkFramesStat $framesStat, $ffprobeBin="ffprobe", $ffmpegBin="ffmpeg")
 		{
-			KalturaLog::log("$chunkFileName");
-			$cmdLine = "$ffmpegBin -i $chunkFileName -c copy -f mp4 -v quiet -y $chunkFileName.mp4;$ffprobeBin -show_streams -select_streams v -v quiet -show_entries stream=duration,nb_frames -print_format csv $chunkFileName.mp4";
+			KalturaLog::log("getData2 $chunkFileName");
+			$cmdLine = "$ffmpegBin -i \"$chunkFileName\" -c copy -f mp4 -v quiet -y $chunkFileName.mp4;$ffprobeBin -show_streams -select_streams v -v quiet -show_entries stream=duration,nb_frames -print_format csv $chunkFileName.mp4";
 			KalturaLog::log("copy:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {
@@ -180,7 +180,7 @@
 			KalturaLog::log("duration:$duration,frames:$frames");
 /**/
 			$outputArr = array();
-			$cmdLine = "$ffmpegBin -t 1 -i $chunkFileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | (head -n1)";
+			$cmdLine = "$ffmpegBin -t 1 -i \"$chunkFileName\" -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | (head -n1)";
 			KalturaLog::log("head:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {
@@ -194,7 +194,7 @@
 			else {
 				$startFrom = $duration-4;
 			}
-			$cmdLine = "$ffmpegBin -ss $startFrom -i $chunkFileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -f mpegts -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | tail";
+			$cmdLine = "$ffmpegBin -ss $startFrom -i \"$chunkFileName\" -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -f mpegts -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | tail";
 			KalturaLog::log("tail:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {
@@ -231,7 +231,7 @@
 		public static function getFrameData($fileName, $startFrom, $duration, $ffprobeBin="ffprobe", $ffmpegBin="ffmpeg")
 		{
 			$outputArr = array();
-			$cmdLine = "$ffmpegBin -ss $startFrom -t $duration -i $fileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type -print_format csv -v quiet - ";
+			$cmdLine = "$ffmpegBin -ss $startFrom -t $duration -i \"$fileName\" -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type -print_format csv -v quiet - ";
 			KalturaLog::log("head:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {

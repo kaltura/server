@@ -312,9 +312,9 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 					'PartNumber' => $partNumber,
 					'ETag' => $result['ETag'],
 				);
-				$partNumber++;
 				
 				KalturaLog::debug("Uploading part [$partNumber] dest file path [$destFilePath]");
+				$partNumber++;
 			}
 			
 			fclose($sourceFH);
@@ -509,7 +509,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	public function multipartUploadPartCopy($uploadId, $partNumber, $s3FileKey, $destFilePath)
 	{
 		list($bucket, $filePath) = self::getBucketAndFilePath($destFilePath);
-
+		
 		try
 		{
 			$result = $this->s3Client->uploadPartCopy(array(
@@ -791,10 +791,9 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		return $result;
 	}
-
+	
 	public function multipartUploadPartUpload($uploadId, $partNumber, $srcContent, $destFilePath)
 	{
-
 		list($bucket, $filePath) = self::getBucketAndFilePath($destFilePath);
 		try
 		{
@@ -805,7 +804,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				'PartNumber' => $partNumber,
 				'Key'       => $filePath,
 			));
-
 			KalturaLog::debug("uploading part [$partNumber]. dest file path [$destFilePath]");
 		}
 		catch (S3Exception $e)
@@ -814,7 +812,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$this->abortMultipartUpload($bucket, $filePath, $uploadId);
 			return false;
 		}
-
 		return $result;
 	}
 }
