@@ -28,8 +28,8 @@
 		const	DefaultChunkOverlap =  0.5; // secs
 		const	DefaultConcurrentChunks = 1;// secs
 		
-		public $ffmpegBin = "/opt/kaltura/bin/ffmpeg";
-		public $ffprobeBin = "/opt/kaltura/bin/ffprobe";
+		public $ffmpegBin = "/opt/kaltura/bin/ffmpeg"; // Hack should be reverted
+		public $ffprobeBin = "/opt/kaltura/bin/ffprobe"; // Hack should be reverted
 
 		public $commandExecitionScript = null;
 		
@@ -167,6 +167,7 @@
 		 */
 		protected static function getData2($chunkFileName, KChunkFramesStat $framesStat, $ffprobeBin="ffprobe", $ffmpegBin="ffmpeg")
 		{
+			KalturaLog::log("getData2 $chunkFileName");
 			$cmdLine = "$ffmpegBin -i \"$chunkFileName\" -c copy -f mp4 -v quiet -y $chunkFileName.mp4;$ffprobeBin -show_streams -select_streams v -v quiet -show_entries stream=duration,nb_frames -print_format csv $chunkFileName.mp4";
 			KalturaLog::log("copy:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
