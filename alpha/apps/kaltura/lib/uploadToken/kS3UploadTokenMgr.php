@@ -30,20 +30,18 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 		$minimumChunkSize = $this->_uploadToken->getMinimumChunkSize();
 		$chunkSize = kFile::fileSize($fileData['tmp_name']);
 
-		return $this->handleOptimizedResume($fileData, $resumeAt, $chunkSize);
-		/*
 		if($minimumChunkSize)
 		{
 			if(($minimumChunkSize >= kS3SharedFileSystemMgr::MIN_PART_SIZE && $chunkSize >= $minimumChunkSize) || $this->_finalChunk)
 			{
-				return $this->handleOptimizedResumev2($fileData, $resumeAt, $chunkSize);
+				return $this->handleOptimizedResume($fileData, $resumeAt, $chunkSize);
 			}
 			else
 			{
 				throw new kUploadTokenException("chunk size [$chunkSize] is less then minimum expected size [$minimumChunkSize]", kUploadTokenException::UPLOAD_TOKEN_INVALID_CHUNK_SIZE);
 			}
 		}
-		*/
+
 	}
 
 	/**
