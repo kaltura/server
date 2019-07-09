@@ -435,6 +435,8 @@ class KalturaErrors extends APIErrors
 
 	const UPLOAD_TOKEN_PROCESSING_ERROR = "UPLOAD_TOKEN_PROCESSING_ERROR;;Could not complete upload token processing";
 
+	const UPLOAD_TOKEN_SMALL_PART_SIZE = "UPLOAD_TOKEN_SMALL_PART_SIZE;;upload token chunk size is smaller then expected minimum chunk size";
+
 	/*
 	 * Partenrs service
 	 * PID - the parent partner_id

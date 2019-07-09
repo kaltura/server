@@ -186,4 +186,9 @@ class kUploadTokenMgr extends kBaseUploadTokenMgr
 
 		return myContentStorage::getFSUploadsPath().substr($uploadTokenId, -2).'/'.$uploadTokenId.'.'.$extension;
 	}
+
+	protected function startFullFileUpload($uploadFilePath, $fileSize)
+	{
+		return kFile::fileSize($this->_uploadToken->getUploadTempPath());
+	}
 }

@@ -443,7 +443,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		if ($result && $deleteSrc)
 		{
-			return $this->doDeleteFile($srcUrl);
+			return $this->doDeleteFile($src);
 		}
 		
 		KalturaLog::debug("Copy file from shared result [$result] ");
@@ -508,22 +508,22 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	public function multipartUploadPartCopy($uploadId, $partNumber, $s3FileKey, $destFilePath)
 	{
 		list($bucket, $filePath) = self::getBucketAndFilePath($destFilePath);
-		$srcPath = $bucket.'/'.$s3FileKey;
+
 		try
 		{
 			$result = $this->s3Client->uploadPartCopy(array(
 				'Bucket'     => $bucket,
-				'CopySource' => $srcPath,
+				'CopySource' => $s3FileKey,
 				'UploadId'   => $uploadId,
 				'PartNumber' => $partNumber,
 				'Key'       => $filePath,
 			));
 
-			KalturaLog::debug("coping part [$partNumber] from [$srcPath]. dest file path [$destFilePath]");
+			KalturaLog::debug("coping part [$partNumber] from [$s3FileKey]. dest file path [$destFilePath]");
 		}
 		catch (S3Exception $e)
 		{
-			KalturaLog::debug("Upload of [$srcPath] failed.  Error: {$e->getMessage()}");
+			KalturaLog::debug("Upload of [$s3FileKey] failed.  Error: {$e->getMessage()}");
 			$this->abortMultipartUpload($bucket, $filePath, $uploadId);
 			return false;
 		}
@@ -701,7 +701,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
 
-		$fileList = $this->s3->getObject(array(
+		$fileList = $this->s3Client->getObject(array(
 			'Bucket' => $bucket,
 			'Key'    => $filePath
 		));
@@ -725,11 +725,11 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return $res;
 	}
 
-	protected function getListObjectsPaginator($filePath)
+	public function getListObjectsPaginator($filePath)
 	{
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
 
-		$paginator = $this->s3->getPaginator('ListObjects', array(
+		$paginator = $this->s3Client->getPaginator('ListObjects', array(
 			'Bucket' => $bucket,
 			'Prefix' => $filePath
 		));
@@ -740,7 +740,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function doCopyDir($src, $dest, $deleteSrc)
 	{
 
-		$paginator = $this->s3->getListObjectsPaginator($src);
+		$paginator = $this->s3Client->getListObjectsPaginator($src);
 
 		foreach ($paginator as $page)
 		{
@@ -774,6 +774,32 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			'SaveAs' => $dest
 		));
 		
+		return $result;
+	}
+
+	public function multipartUploadPartUpload($uploadId, $partNumber, $srcContent, $destFilePath)
+	{
+
+		list($bucket, $filePath) = self::getBucketAndFilePath($destFilePath);
+		try
+		{
+			$result = $this->s3Client->uploadPart(array(
+				'Bucket'     => $bucket,
+				'Body' => $srcContent,
+				'UploadId'   => $uploadId,
+				'PartNumber' => $partNumber,
+				'Key'       => $filePath,
+			));
+
+			KalturaLog::debug("uploading part [$partNumber]. dest file path [$destFilePath]");
+		}
+		catch (S3Exception $e)
+		{
+			KalturaLog::debug("Upload failed.  Error: {$e->getMessage()}");
+			$this->abortMultipartUpload($bucket, $filePath, $uploadId);
+			return false;
+		}
+
 		return $result;
 	}
 }

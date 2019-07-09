@@ -129,6 +129,8 @@ class UploadTokenService extends KalturaBaseService
 					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_PROCESSING_ERROR);
 				case kUploadTokenException::UPLOAD_TOKEN_MULTIPART_UPLOAD_ERROR:
 					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_PROCESSING_ERROR);
+				case kUploadTokenException::UPLOAD_TOKEN_INVALID_CHUNK_SIZE:
+					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_SMALL_PART_SIZE);
 				default:
 					throw $ex;
 			}

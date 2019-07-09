@@ -158,8 +158,7 @@ abstract class kBaseUploadTokenMgr
 			$fileSize = $this->handleResume($fileData, $resumeAt);
 		else
 		{
-			$this->handleMoveFile($fileData);
-			$fileSize = kFile::fileSize($this->_uploadToken->getUploadTempPath());
+			$fileSize = $this->handleMoveFile($fileData);
 		}
 
 		if ($this->_finalChunk)
@@ -170,6 +169,7 @@ abstract class kBaseUploadTokenMgr
 				kFlowHelper::handleUploadFailed($this->_uploadToken);
 				throw new kUploadTokenException("Restricted upload token file type", kUploadTokenException::UPLOAD_TOKEN_FILE_TYPE_RESTRICTED);
 			}
+			$this->closeFullFileUpload();
 			$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_FULL_UPLOAD);
 		}
 		else
@@ -318,9 +318,9 @@ abstract class kBaseUploadTokenMgr
 		}
 
 		kFile::chmod($uploadFilePath, 0600);
-
 		$fileSize = kFile::fileSize($uploadFilePath);
-		$this->_uploadToken->setLastFileSize($fileSize);
+
+		$updatedFileSize = $this->startFullFileUpload($uploadFilePath, $fileSize);
 
 		//If uplaodToken is set to AutoFinalize set file size into memcache
 		if($this->_autoFinalize)
@@ -329,6 +329,7 @@ abstract class kBaseUploadTokenMgr
 			if($this->_uploadToken->getFileSize() == $fileSize)
 				$this->_finalChunk = true;
 		}
+		return $updatedFileSize;
 	}
 
 	/**
@@ -412,5 +413,15 @@ abstract class kBaseUploadTokenMgr
 			$extension = strtolower(pathinfo($this->_uploadToken->getFileName(), PATHINFO_EXTENSION));
 
 		return $extension;
+	}
+
+	protected function startFullFileUpload($uploadFilePath, $fileSize)
+	{
+
+	}
+
+	protected function closeFullFileUpload()
+	{
+
 	}
 }
