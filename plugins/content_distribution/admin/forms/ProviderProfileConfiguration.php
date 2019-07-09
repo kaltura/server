@@ -68,16 +68,18 @@ abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfig
 			'readonly'		=> true,
 			'filters'		=> array('StringTrim'),
 		));
-		
+
 		$this->addElement('hidden', 'provider_type', array(
 			'value'			=> $this->providerType,
 		));
-		
+
+		$this->addDistributeOnTypeElement();
+
 		$this->addElement('hidden', 'crossLine01', array(
 			'lable'			=> 'line',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
-		
+
 //		TODO - redefine the UI
 //		
 //		$this->addElement('text', 'sunrise_default_offset', array(
@@ -101,7 +103,20 @@ abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfig
 		$this->addProfileAction('delete');
 		$this->addProfileAction('report');
 	}
-	
+
+	protected function addDistributeOnTypeElement()
+	{
+		$this->addElement('select', "distribute_On_Type", array(
+			'label'	  =>  'Distribute On',
+			'value'			=> $this->distributionProfile->distributeOnType,
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'prepend')), array('HtmlTag',  array('tag' => 'dt')))
+		));
+
+		$element = $this->getElement("distribute_On_Type");
+		$element->addMultiOption(Kaltura_Client_ContentDistribution_Enum_DistributeOnType::ENTRY_READY, 'On entry ready');
+		$element->addMultiOption(Kaltura_Client_ContentDistribution_Enum_DistributeOnType::MODERATION_APPROVED, 'On moderation approved');
+	}
+
 	/**
 	 * @param string $action
 	 * @return Zend_Form_DisplayGroup
