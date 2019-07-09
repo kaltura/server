@@ -1,5 +1,4 @@
-import sys, getopt, pycaption
-import io
+import sys, getopt, pycaption, io
 
 def main(argv):
    inputfile = ''
@@ -28,26 +27,28 @@ def main(argv):
 
    with io.open(inputfile) as f:
         str1 = f.read()
+   inputValue = inputType.lower()
 
-   if inputType.lower() in ['scc']:
+   if inputValue == 'scc':
         c = pycaption.SCCReader().read(str1)
-   elif inputType.lower() in ['srt']:
+   elif inputValue == 'srt':
         c = pycaption.SRTReader().read(str1)
-   elif inputType.lower() in ['dfxp']:
+   elif inputValue == 'dfxp':
         c = pycaption.DFXPReader().read(str1)
-   elif inputType.lower() in ['webvtt']:
+   elif inputValue == 'webvtt':
         c = pycaption.WebVTTReader().read(str1)
    else:
        print('Error: invalid input type. <srt/scc/webvtt/dfxp> allowed')
        sys.exit(1)
 
-   if outputType.lower() in ['scc']:
+   outputValue = outputType.lower()
+   if outputValue == 'scc':
         print (pycaption.SCCWriter().write(c))
-   elif outputType.lower() in ['srt']:
+   elif outputValue == 'srt':
         print (pycaption.SRTWriter().write(c))
-   elif outputType.lower() in ['dfxp']:
+   elif outputValue == 'dfxp':
         print (pycaption.DFXPWriter().write(c))
-   elif outputType.lower() in ['webvtt']:
+   elif outputValue == 'webvtt':
         print (pycaption.WebVTTWriter().write(c))
    else:
         print('Error: invalid output type. <srt/scc/webvtt/dfxp> allowed')
