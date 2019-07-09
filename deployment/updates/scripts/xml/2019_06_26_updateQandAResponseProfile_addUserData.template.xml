@@ -59,6 +59,9 @@
 								<filterProperty>idEqual</filterProperty>
 							</item>
 						</mappings>
+						<pager objectType="KalturaFilterPager">
+							<pageSize>1</pageSize>
+						</pager>
 					</item>
 				</relatedProfiles>
 			</responseProfile>
