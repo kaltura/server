@@ -579,11 +579,11 @@ $stub=null;
 	{
 		// I have commented out the audio parameters so we don't decrease the quality - it stays as-is
 		$binName=$this->getCmd();
-		$inFilePath = kFile::realPath($this->inFilePath);
+		$inFilePath = '"' . kFile::realPath($this->inFilePath) . '"';
 		$exec_cmd = $binName . " " .
 			str_replace (
 				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName, KDLCmdlinePlaceholders::BinaryName),
-				array('"'.$inFilePath.'"', $this->outFilePath, $this->configFilePath, $binName),
+				array($inFilePath, $this->outFilePath, $this->configFilePath, $binName),
 				$cmd_line);
 		
 		if ( $add_log )

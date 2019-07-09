@@ -587,8 +587,8 @@ ini_set("memory_limit","512M");
 				$this->SaveJob($job);
 			}
 			else {
-				$job->process = (int)file_get_contents($tmp_ce_process_file);
-				unlink($tmp_ce_process_file);
+				$job->process = (int)kFile::getFileContent($tmp_ce_process_file);
+				kFile::unlink($tmp_ce_process_file);
 			}
 			KalturaLog::log("id:$job->id,keyIdx:$job->keyIdx,rv:$rv,process:$job->process,cmdLine:$cmdLine");
 			return true;

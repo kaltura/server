@@ -425,6 +425,11 @@ class kFileBase
 	
 	public static function realPath($filePath, $getRemote = true)
 	{
+		if(filter_var($filePath, FILTER_VALIDATE_URL))
+		{
+			return $filePath;
+		}
+		
 		if(kFile::isSharedPath($filePath))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
