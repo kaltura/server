@@ -175,7 +175,9 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 		$form->populate($formData);
 		if ($form->isValid($formData))
 		{
-			$formData['content'] = json_encode(parse_ini_string($formData['content'],true));
+			$contentJson = json_decode($formData['content'], true);
+			if (!$contentJson)
+				$formData['content'] = json_encode(parse_ini_string($formData['content'],true));
 			$configurationMap = $form->getObject('Kaltura_Client_ConfMaps_Type_ConfMaps', $formData, false, true);
 
 			$form->resetUnUpdatebleAttributes($configurationMap);

@@ -100,6 +100,9 @@ class Form_ConfigurationMapConfigure extends ConfigureForm
 			return true;
 		}
 		$content = preg_replace('/^\h*\v+/m', '', $data['content']); // remove empty line
+		$contentJson = json_decode($content, true);
+		if ($contentJson)
+			return true;
 		if ( preg_match('/^((?!(\[.*\])|(.*=.)).)*$/im',$content , $matches)) //match invalid ini lines
 		{
 				return false;
