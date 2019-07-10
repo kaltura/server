@@ -134,12 +134,11 @@ class kZoomEngine
 		$dbUser = $this->getEntryOwner($meeting->hostEmail, $zoomIntegration);
 		$this->initUserPermissions($dbUser);
 		$participantsUsersNames = $this->extractMeetingParticipants($meeting->id, $zoomIntegration, $dbUser->getPuserId());
-		$validatedUsers = $this->getValidatedUsers($participantsUsersNames, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist(), $dbUser->getPuserId());
+		$validatedUsers = $this->getValidatedUsers($participantsUsersNames, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
 		$entry = null;
 		foreach ($meeting->recordingFiles as $recordingFile)
 		{
 			/* @var kZoomRecordingFile $recordingFile */
-
 			if (in_array ($recordingFile->fileType, self::$FILE_VIDEO_TYPES))
 			{
 				$entry = $this->handleVideoRecord($meeting, $dbUser, $zoomIntegration, $validatedUsers, $recordingFile, $event);
@@ -149,14 +148,12 @@ class kZoomEngine
 		foreach ($meeting->recordingFiles as $recordingFile)
 		{
 			/* @var kZoomRecordingFile $recordingFile */
-
 			if (in_array ($recordingFile->fileType, self::$FILE_CHAT_TYPES))
 			{
 				$this->handleChatRecord($entry, $meeting, $recordingFile->download_url, $event->downloadToken, $dbUser);
 			}
 		}
-
-			}
+	}
 
 	/**
 	 * @param entry $entry
@@ -230,7 +227,7 @@ class kZoomEngine
 		$categoryEntry->save();
 	}
 
-	protected function getValidatedUsers($usersNames, $partnerId, $createIfNotFound, $ownerId)
+	protected function getValidatedUsers($usersNames, $partnerId, $createIfNotFound)
 	{
 		$validatedUsers=array();
 		if(!$usersNames)
@@ -240,11 +237,6 @@ class kZoomEngine
 
 		foreach ($usersNames as $userName)
 		{
-			if($userName == $ownerId)
-			{
-				continue;
-			}
-
 			if(kuserPeer::getKuserByPartnerAndUid($partnerId, $userName, true))
 			{
 				$validatedUsers[] = $userName;
@@ -393,7 +385,6 @@ class kZoomEngine
 
 		return $dbUser;
 	}
-
 
 	/**
 	 * @param string $userName
