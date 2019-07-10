@@ -7,6 +7,6 @@ class KalturaESearchAggregationBucketsArray extends KalturaTypedArray
 {
 	public function __construct()
 	{
-			parent::__construct("KalturaESearchAggregationBucket");
+	    parent::__construct("KalturaESearchAggregationBucket");
 	}
 }

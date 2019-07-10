@@ -12,6 +12,8 @@ class KalturaESearchMetadataAggregationItem extends KalturaESearchAggregationIte
 	 */
 	public $fieldName;
 
+	const FIELD_NAME = 3;
+
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (!$object_to_fill)
@@ -29,7 +31,7 @@ class KalturaESearchMetadataAggregationItem extends KalturaESearchAggregationIte
 	protected function getMetadataFieldNameFromXpath($xpath)
 	{
 		$token = explode("'", $xpath);
-		return $token[3];
+		return $token[self::FIELD_NAME];
 	}
 
 	public function coreToApiResponse($coreResponse, $fieldName=null)

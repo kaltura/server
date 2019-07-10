@@ -11,6 +11,8 @@ abstract class KalturaESearchAggregationItem extends KalturaObject
 	 */
 	public $size;
 
+	public $fieldName;
+
 	private static $map_between_objects = array(
 		'size',
 		'fieldName'
@@ -25,18 +27,21 @@ abstract class KalturaESearchAggregationItem extends KalturaObject
 
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
-		$fieldEnumMap = $this->getFieldEnumMap();
-		if(isset($fieldEnumMap[$this->fieldName]))
+		if($object_to_fill)
 		{
-			$coreFieldName = $fieldEnumMap[$this->fieldName];
-			$object_to_fill->setFieldName($coreFieldName);
-			$props_to_skip[] = 'fieldName';
+			$fieldEnumMap = $this->getFieldEnumMap();
+			if (isset($fieldEnumMap[$this->fieldName]))
+			{
+				$coreFieldName = $fieldEnumMap[$this->fieldName];
+				$object_to_fill->setFieldName($coreFieldName);
+				$props_to_skip[] = 'fieldName';
+			}
 		}
 
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 
-	abstract public function coreToApiResponse($coreResponse,$fieldName = null);
+	abstract public function coreToApiResponse($coreResponse, $fieldName = null);
 
 	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{

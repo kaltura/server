@@ -26,11 +26,6 @@ class KalturaESearchCategoryAggregationItem extends KalturaESearchAggregationIte
 		return array (KalturaESearchCategoryAggregateByFieldName::CATEGORY_NAME => ESearchCategoryAggregationFieldName::CATEGORY_NAME);
 	}
 
-	protected function fixCategoryName($coreName)
-	{
-
-	}
-
 	public function coreToApiResponse($coreResponse, $fieldName = null)
 	{
 		$agg = new KalturaESearchAggregationResponseItem();

@@ -76,7 +76,7 @@ abstract class kBaseSearch
 		foreach ($aggregations->getAggregations() as $aggregation)
 		{
 			/* var $aggregation ESearchAggregationItem */
-			$aggregationKey = $aggregation->getAggregationKey().':'.$aggregation->getFieldName();
+			$aggregationKey = $aggregation->getAggregationKey() . ':' . $aggregation->getFieldName();
 			$aggs[$aggregationKey] = $aggregation->getAggregationCommand();
 		}
 		if($aggs)

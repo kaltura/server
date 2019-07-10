@@ -75,7 +75,7 @@ class ESearchService extends KalturaBaseService
 	public function entryExportToCsvAction (KalturaMediaEsearchExportToCsvJobData $data)
 	{
 		if(!$data->userName || !$data->userMail)
-			throw new KalturaAPIException(APIErrors::USER_EMAIL_NOT_FOUND);
+			throw new KalturaAPIException(APIErrors::USER_EMAIL_NOT_FOUND, '');
 		
 		$kJobdData = $data->toObject(new kMediaEsearchExportToCsvJobData());
 		
@@ -92,7 +92,7 @@ class ESearchService extends KalturaBaseService
 	 */
 	protected function initAndSearch($coreSearchObject, $searchParams, $pager)
 	{
-		list($coreSearchOperator, $objectStatusesArr, $objectId, $kPager, $coreOrder ,$aggregations) =
+		list($coreSearchOperator, $objectStatusesArr, $objectId, $kPager, $coreOrder, $aggregations) =
 			self::initSearchActionParams($searchParams, $pager);
 		$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $kPager, $objectStatusesArr, $objectId, $coreOrder, $aggregations);
 

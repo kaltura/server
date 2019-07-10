@@ -43,12 +43,12 @@ class KalturaESearchCuepointsAggregationItem extends KalturaESearchAggregationIt
 				$responseBucket->fromArray($bucket);
 				if($fieldName === ESearchCuePointsAggregationFieldName::TYPE)
 				{
-					$responseBucket->value =  kPluginableEnumsManager::coreToApi('CuePointType',$responseBucket->value);
+					$responseBucket->value =  kPluginableEnumsManager::coreToApi('CuePointType' ,$responseBucket->value);
 				}
 				$bucketsArray[] = $responseBucket;
 			}
 		}
 		$agg->buckets = $bucketsArray;
-		return ($agg);
+		return array($agg);
 	}
 }

@@ -16,7 +16,7 @@ class KalturaESearchAggregationResponse extends KalturaObject
 		$map = array(ESearchCategoryAggregationItem::KEY => 'KalturaESearchCategoryAggregationItem',
 					 ESearchCuepointsAggregationItem::KEY => 'KalturaESearchCuepointsAggregationItem',
 					 ESearchMetadataAggregationItem::KEY => 'KalturaESearchMetadataAggregationItem',
-			         ESearchEntryAggregationItem::KEY => 'KalturaESearchEntryAggregationItem');
+					 ESearchEntryAggregationItem::KEY => 'KalturaESearchEntryAggregationItem');
 		$ret = isset($map[$coreObject]) ? $map[$coreObject] : null;
 		return $ret;
 	}
@@ -28,8 +28,12 @@ class KalturaESearchAggregationResponse extends KalturaObject
 		{
 			list ($responseObject, $fieldName) = $this->getApiObjects($key);
 			$itemObjectName = $this->mapAggregationCoreObjects($responseObject);
+			if(!$itemObjectName)
+			{
+				continue;
+			}
 			$objectItemHandler = new $itemObjectName();
-			$aggsResponses = $objectItemHandler->coreToApiResponse($response,$fieldName);
+			$aggsResponses = $objectItemHandler->coreToApiResponse($response, $fieldName);
 			foreach ($aggsResponses as $aggsResponse)
 			{
 				$aggs[] = $aggsResponse;

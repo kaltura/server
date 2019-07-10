@@ -13,6 +13,9 @@ abstract class ESearchAggregationItem extends BaseObject
 	 */
 	protected $size;
 
+	/**
+	 * @var string
+	 */
 	protected $fieldName;
 
 	/**

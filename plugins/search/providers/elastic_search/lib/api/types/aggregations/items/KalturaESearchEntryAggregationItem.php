@@ -41,7 +41,6 @@ class KalturaESearchEntryAggregationItem extends KalturaESearchAggregationItem
 		$buckets = $coreResponse[ESearchAggregations::BUCKETS];
 		if ($buckets)
 		{
-
 			foreach ($buckets as $bucket)
 			{
 				$responseBucket = new KalturaESearchAggregationBucket();
