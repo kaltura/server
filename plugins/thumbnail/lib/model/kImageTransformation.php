@@ -45,7 +45,7 @@ class kImageTransformation
 		}
 		catch(ImagickException $e)
 		{
-			KalturaLog::err("Imagick error:" . print_r($e));
+			KalturaLog::err('Imagick error:' . print_r($e));
 			throw new kThumbnailException(kThumbnailException::TRANSFORMATION_RUNTIME_ERROR, kThumbnailException::TRANSFORMATION_RUNTIME_ERROR);
 		}
 

@@ -28,6 +28,7 @@ abstract class kThumbnailAction
 
 	protected function getActionParameter($actionParameterName, $default = null)
 	{
+		$actionParameterName = strtolower($actionParameterName);
 		if(array_key_exists($actionParameterName, $this->actionParameters))
 		{
 			return $this->actionParameters[$actionParameterName];
@@ -85,9 +86,9 @@ abstract class kThumbnailAction
 	protected function getColorActionParameter($actionParameterName, $default = null)
 	{
 		$result = $this->getActionParameter($actionParameterName, $default);
-		if(preg_match("([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})", $result))
+		if(preg_match('([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})', $result))
 		{
-			$result = "#" . $result;
+			$result = '#' . $result;
 		}
 
 		return $result;
@@ -99,9 +100,10 @@ abstract class kThumbnailAction
 	 */
 	public function setActionParameter($parameterName, $parameterValue)
 	{
+		$parameterName = strtolower($parameterName);
 		if(array_key_exists($parameterName, $this->parameterAlias))
 		{
-			$parameterName = $this->parameterAlias[$parameterName];
+			$parameterName = strtolower($this->parameterAlias[$parameterName]);
 		}
 
 		$this->actionParameters[$parameterName] = $parameterValue;
@@ -114,14 +116,14 @@ abstract class kThumbnailAction
 	protected function validateColorParameter($color)
 	{
 		$image = new Imagick();
-		$image->newPseudoImage(1,1, "plasma:fractal");
+		$image->newPseudoImage(1,1, 'plasma:fractal');
 		try
 		{
 			$image->setBackgroundColor($color);
 		}
 		catch(Exception $e)
 		{
-			$data = array("errorString" => "Illegal value for color {$color}");
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => "Illegal value for color {$color}");
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 	}

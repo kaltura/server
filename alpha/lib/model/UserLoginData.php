@@ -272,10 +272,11 @@ class UserLoginData extends BaseUserLoginData{
 	
 
 	
-	public function newPassHashKey()
+	public function newPassHashKey($validity = null)
 	{
 		$loginDataId = $this->getId();
-		$expiryTime = time() + (kConf::get('user_login_set_password_hash_key_validity')); // now + 24 hours
+		$validity = (is_null($validity) ? kConf::get('user_login_set_password_hash_key_validity') : $validity);
+		$expiryTime = time() + $validity; // now + 24 hours on default
 		$random = sha1(KCryptoWrapper::random_pseudo_bytes(32));
 		$hashKey = base64_encode(implode('|', array($loginDataId, $expiryTime, $random)));
 		return $hashKey;
@@ -336,5 +337,19 @@ class UserLoginData extends BaseUserLoginData{
 	public function getCacheInvalidationKeys()
 	{
 		return array("userLoginData:id=".strtolower($this->getId()), "userLoginData:loginEmail=".strtolower($this->getLoginEmail()));
+	}
+
+	public function isTwoFactorAuthenticationRequired(kuser $dbUser)
+	{
+		$partnerIds = $dbUser->getAllowedPartnerIds();
+		$partners = PartnerPeer::retrieveByPKs($partnerIds);
+		foreach ($partners as $partner)
+		{
+			if($partner->getUseTwoFactorAuthentication())
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 } // UserLoginData

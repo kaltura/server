@@ -13,8 +13,8 @@ class kVidSecAction extends kVidAction
 	{
 		parent::initParameterAlias();
 		$kVidSecAlias = array(
-			"sec" => kThumbnailParameterName::SECOND,
-			"s" => kThumbnailParameterName::SECOND,
+			'sec' => kThumbnailParameterName::SECOND,
+			's' => kThumbnailParameterName::SECOND,
 		);
 		$this->parameterAlias = array_merge($this->parameterAlias, $kVidSecAlias);
 	}
@@ -30,7 +30,7 @@ class kVidSecAction extends kVidAction
 		parent::validateInput();
 		if(!is_numeric($this->second) || $this->second < 0)
 		{
-			$data = array("errorString" => "Second cant be negative");
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::SECOND);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 	}
@@ -42,7 +42,7 @@ class kVidSecAction extends kVidAction
 		$success = myEntryUtils::captureThumbUsingPackager($entry, $destPath, $this->second, $flavorAssetId, $this->newWidth, $this->newHeight);
 		if(!$success)
 		{
-			$data = array("errorString" => self::$action_name . " failed");
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => self::$action_name . kThumbnailErrorMessages::FAILED);
 			throw new kThumbnailException(kThumbnailException::ACTION_FAILED, kThumbnailException::ACTION_FAILED, $data);
 		}
 

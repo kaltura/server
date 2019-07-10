@@ -57,7 +57,9 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_EVENT_VAR1 = 'eventVar1';
 	const DIMENSION_EVENT_VAR2 = 'eventVar2';
 	const DIMENSION_EVENT_VAR3 = 'eventVar3';
+	const DIMENSION_USER_ENGAGEMENT = 'userEngagement';
 	const DIMENSION_EVENT_PROPERTIES = 'eventProperties';
+	const DIMENSION_FLAVOR_PARAMS_ID = 'flavorParamsId';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -128,7 +130,15 @@ class kKavaBase extends kDruidBase
 	const TASK_READY = "Ready";
 
 	// event properties
-        const PROPERTY_HAS_BITRATE = 'hasBitrate';
+
+	const PROPERTY_HAS_BITRATE = 'hasBitrate';
+	const PROPERTY_IS_BUFFERING = 'isBuffering';
+	const PROPERTY_HAS_BANDWIDTH = 'hasBandwidth';
+	const PROPERTY_HAS_LATENCY = 'hasLatency';
+	const PROPERTY_HAS_DROPPED_FRAMES_RATIO = 'hasDroppedFramesRatio';
+
+	//user engagement values
+	const USER_ENGAGED = 'SoundOnTabFocused';
 
 	protected static $datasources_dimensions = array(
 		self::DATASOURCE_HISTORICAL => array(
@@ -236,6 +246,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_TURNAROUND_TIME  => 1,
 		),
 		self::DATASOURCE_REALTIME => array(
+			self::DIMENSION_EVENT_TYPE => 1,
 			self::DIMENSION_PARTNER_ID => 1,
 			self::DIMENSION_KUSER_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
@@ -293,6 +304,17 @@ class kKavaBase extends kDruidBase
 		}
 
 		return $cache->multiGet($keys);
+	}
+
+	protected static function roundUpToMultiple($num, $mult)
+	{
+		$rem = $num % $mult;
+		if (!$rem)
+		{
+			return $num;
+		}
+
+		return $num - $rem + $mult;
 	}
 
 }

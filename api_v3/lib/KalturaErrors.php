@@ -56,6 +56,8 @@ class KalturaErrors extends APIErrors
 	// PID - partner id
 	const INVALID_PARTNER_ID = "INVALID_PARTNER_ID;PID;Invalid partner id \"@PID@\"";
 
+	const DIRECT_LOGIN_BLOCKED = "DIRECT_LOGIN_BLOCKED;;Direct login is blocked on this partner";
+
 	// SRV_NAME - service , ACTION_NAME - action
 	const INVALID_SERVICE_CONFIGURATION = "INVALID_SERVICE_CONFIGURATION;SRV_NAME,ACTION_NAME;Invalid service configuration. Unknown service [@SRV_NAME@:@ACTION_NAME@].";
 
@@ -729,6 +731,10 @@ class KalturaErrors extends APIErrors
 	 * OTP error
 	 */
 	const INVALID_OTP = 'INVALID_OTP;;OTP provided failed to validate';
+	const MISSING_OTP = 'MISSING_OTP;;OTP is missing';
+	const ERROR_IN_QR_GENERATION = 'ERROR_IN_QR_GENERATION;;Could not generate QR code';
+	const ERROR_IN_SEED_GENERATION = 'ERROR_IN_SEED_GENERATION;;Could not handle new seed generation';
+	const INVALID_HASH = 'INVALID_HASH;;hashKey is not valid';
 
 
 	/*
@@ -747,5 +753,7 @@ class KalturaErrors extends APIErrors
 	const MAP_ALREADY_EXIST = "MAP_ALREADY_EXIST;NAME,HOST;Map already exist for this map name {@NAME@} and host {@HOST@}";
 	const MAP_CANNOT_BE_CREATED_ON_FILE_SYSTEM = "MAP_CANNOT_BE_CREATED_ON_FILE_SYSTEM;;Map cannnot be created on file system";
 	const HOST_NAME_CONTAINS_ASTRIX = "HOST_NAME_CONTAINS_ASTRIX;HOST_NAME;Host name contains *, use # instead {@HOST_NAME@}";
+
+	const SEARCH_ITEM_TYPE_NOT_FOUND = 'SEARCH_ITEM_TYPE_NOT_FOUND;SEARCH_ITEM_TYPE,ELASTIC_FIELD_NAME; Search item type [@SEARCH_ITEM_TYPE@] not found for field: [@ELASTIC_FIELD_NAME@]';
 }
 

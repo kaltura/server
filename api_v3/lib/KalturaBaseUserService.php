@@ -161,6 +161,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @thrown KalturaErrors::INVALID_PARTNER_ID
 	 * @thrown KalturaErrors::INTERNAL_SERVERL_ERROR
 	 * @throws KalturaErrors::USER_IS_BLOCKED
+	 * @throws KalturaErrors::DIRECT_LOGIN_BLOCKED
 	 */		
 	protected function loginImpl($puserId, $loginEmail, $password, $partnerId = null, $expiry = 86400, $privileges = '*', $otp = null)
 	{
@@ -210,6 +211,12 @@ class KalturaBaseUserService extends KalturaBaseService
 			}
 			else if ($code == kUserException::INVALID_OTP) {
 				throw new KalturaAPIException(KalturaErrors::INVALID_OTP);
+			}
+			else if ($code == kUserException::MISSING_OTP) {
+					throw new KalturaAPIException(KalturaErrors::MISSING_OTP);
+			}
+			else if ($code === kUserException::DIRECT_LOGIN_BLOCKED) {
+				throw new KalturaAPIException(KalturaErrors::DIRECT_LOGIN_BLOCKED);
 			}
 									
 			throw new $e;
@@ -283,9 +290,20 @@ class KalturaBaseUserService extends KalturaBaseService
 			
 			throw $e;
 		}
-		if (!$result) {
+		if (!$result)
+		{
 			throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 		}
+		else
+		{
+			$response = new KalturaAuthentication();
+			if($result !== true)
+			{
+				$response->qrCode = $result;
+			}
+			return $response;
+		}
+
 	}
 	
 	protected function validateApiAccessControlByEmail($email)
@@ -390,6 +408,14 @@ class KalturaBaseUserService extends KalturaBaseService
 			else if ($code == kUserException::USER_IS_BLOCKED) 
 			{
 				throw new KalturaAPIException(APIErrors::USER_IS_BLOCKED);
+			}
+			else if ($code == kUserException::NEW_LOGIN_REQUIRED)
+			{
+				throw new KalturaAPIException(KalturaErrors::NEW_LOGIN_REQUIRED);
+			}
+			else if ($code === kUserException::DIRECT_LOGIN_BLOCKED)
+			{
+				throw new KalturaAPIException(KalturaErrors::DIRECT_LOGIN_BLOCKED);
 			}
 			throw new KalturaAPIException(APIErrors::INTERNAL_SERVERL_ERROR);
 		}

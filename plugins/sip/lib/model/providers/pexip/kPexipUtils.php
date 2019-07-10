@@ -117,7 +117,7 @@ class kPexipUtils
 		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_SIP, $dbLiveEntry->getPartnerId()))
 		{
 			$msg = 'Sip Feature is not enabled for partner ' . $dbLiveEntry->getPartnerId();
-			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
 			KalturaLog::warning($msg);
 			return false;
 		}
@@ -125,7 +125,7 @@ class kPexipUtils
 		if (!$dbLiveEntry instanceof LiveStreamEntry)
 		{
 			$msg = 'Entry ' . $dbLiveEntry->getId() . ' is not of type LiveStreamEntry.';
-			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
 			KalturaLog::warning($msg);
 			return false;
 		}
@@ -133,7 +133,7 @@ class kPexipUtils
 		if (!$dbLiveEntry->getIsSipEnabled())
 		{
 			$msg = 'Sip flag is not enabled for entry ' . $dbLiveEntry->getId() . ' - generateSipUrl action should be called before connecting to entry';
-			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
 			KalturaLog::warning($msg);
 			return false;
 		}
@@ -141,7 +141,7 @@ class kPexipUtils
 		if ($dbLiveEntry->isCurrentlyLive(false))
 		{
 			$msg = 'Entry Is currently Live. will not allow call.';
-			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
 			KalturaLog::warning($msg);
 			return false;
 		}
@@ -149,7 +149,7 @@ class kPexipUtils
 		if (!$dbLiveEntry->getSipRoomId())
 		{
 			$msg = 'Missing Sip Room Id - Please generate sip url before connecting to entry';
-			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
 			KalturaLog::warning($msg);
 			return false;
 		}
@@ -157,7 +157,7 @@ class kPexipUtils
 		if (!$dbLiveEntry->getPrimaryAdpId() && !$dbLiveEntry->getSecondaryAdpId())
 		{
 			$msg = 'Missing ADPs - Please generate sip url before connecting to entry';
-			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getCreatorPuserId(), $msg, $dbLiveEntry->getId());
+			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
 			KalturaLog::warning($msg);
 			return false;
 		}
@@ -167,12 +167,13 @@ class kPexipUtils
 
 	/**
 	 * @param $queryParams
+	 * @param $pexipConfig
 	 * @return array
 	 */
-	protected static function extractPartnerIdAndSipTokenFromAddress($queryParams)
+	protected static function extractPartnerIdAndSipTokenFromAddress($queryParams, $pexipConfig)
 	{
 		KalturaLog::debug('Extracting entry sip token from local_alias: ' . $queryParams[self::PARAM_LOCAL_ALIAS]);
-		$intIdPattern = '/(?<=sip:)(.*)/';
+		$intIdPattern = '/[0-9]{8,15}'. self::SIP_URL_DELIMITER . $pexipConfig[self::CONFIG_HOST_URL].'/';
 		preg_match($intIdPattern, $queryParams[self::PARAM_LOCAL_ALIAS], $matches);
 		if (!empty($matches))
 		{

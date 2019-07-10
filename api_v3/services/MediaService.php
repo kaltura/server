@@ -1154,7 +1154,7 @@ class MediaService extends KalturaEntryService
 		}
 
 		if ($dbEntry == null){
-			$dbEntry = $this->duplicateTemplateEntry($entry->conversionProfileId, $entry->templateEntryId);
+			$dbEntry = $this->duplicateTemplateEntry($entry->conversionProfileId, $entry->templateEntryId, self::getCoreEntry($entry->type));
 		}
 
 		$dbEntry = parent::prepareEntryForInsert($entry, $dbEntry);

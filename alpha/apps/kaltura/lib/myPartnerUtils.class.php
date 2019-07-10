@@ -2171,4 +2171,17 @@ class myPartnerUtils
 		}
 	}
 
+	public static function getAuthenticationType($partner)
+	{
+		if($partner->getUseSso())
+		{
+			return PartnerAuthenticationType::SSO;
+		}
+		else if($partner->getUseTwoFactorAuthentication())
+		{
+			return PartnerAuthenticationType::TWO_FACTOR_AUTH;
+		}
+		return PartnerAuthenticationType::PASSWORD_ONLY;
+	}
+
 }

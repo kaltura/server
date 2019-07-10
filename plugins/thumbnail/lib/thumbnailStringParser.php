@@ -6,7 +6,7 @@
 
 class thumbnailStringParser
 {
-	const IMAGE_TRANSFORMATION_STEPS_DELIMITER = "+";
+	const IMAGE_TRANSFORMATION_STEPS_DELIMITER = '+';
 	const SOURCE_INDEX = 0;
 	const SOURCE_TYPE_INDEX = 0;
 	const SOURCE_VALUE_INDEX = 1;
@@ -18,26 +18,29 @@ class thumbnailStringParser
 	const PARAMETER_VALUE_INDEX = 1;
 
 	protected static $actionsAlias = array(
-		"c" => "kCropAction",
-		"crop" => "kCropAction",
-		"resize" => "kResizeAction",
-		"re" => "kResizeAction",
-		"comp" => "kCompositeAction",
-		"composite" => "kCompositeAction",
-		"vidSec" => "kVidSecAction",
-		"vidsec" => "kVidSecAction",
-		"vSec" => "kVidSecAction",
-		"rotate" => "kRotateAction",
-		"r" =>	"kRotateAction",
-		"t" => "kTextAction",
-		"txt" => "kTextAction",
-		"text" => "kTextAction",
-		"vidSlice" => "kVidSliceAction",
-		"vidslice" => "kVidSliceAction",
-		"vslice" => "kVidSliceAction",
-		"vidStrip" => "kVidStripAction",
-		"vidstrip" => "kVidStripAction",
-		"vstrip" => "kVidStripAction"
+		'c' => 'kCropAction',
+		'crop' => 'kCropAction',
+		'resize' => 'kResizeAction',
+		're' => 'kResizeAction',
+		'comp' => 'kCompositeAction',
+		'composite' => 'kCompositeAction',
+		'vidsec' => 'kVidSecAction',
+		'vsec' => 'kVidSecAction',
+		'rotate' => 'kRotateAction',
+		'r' =>	'kRotateAction',
+		't' => 'kTextAction',
+		'txt' => 'kTextAction',
+		'text' => 'kTextAction',
+		'vidslice' => 'kVidSliceAction',
+		'vslice' => 'kVidSliceAction',
+		'vidstrip' => 'kVidStripAction',
+		'vstrip' => 'kVidStripAction',
+		'roundcorners' => 'kRoundCornersAction',
+		'rc' => 'kRoundCornersAction',
+		'itt' => 'kImageTextureTextAction',
+		'imageTextureText' => 'kImageTextureTextAction',
+		'filter' => 'kFilterAction',
+		'f' => 'kFilterAction',
 	);
 
 	/**
@@ -68,7 +71,7 @@ class thumbnailStringParser
 		$sourceParameters = explode(self::VALUE_DELIMITER, $sourceString);
 		if(count($sourceParameters) < 2)
 		{
-			$data = array("sourceString" => $sourceString);
+			$data = array(kThumbnailErrorMessages::SOURCE_STRING => $sourceString);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::FAILED_TO_PARSE_SOURCE, $data);
 		}
 
@@ -79,7 +82,7 @@ class thumbnailStringParser
 				$source = new kEntrySource($sourceParameters[self::SOURCE_VALUE_INDEX]);
 				break;
 			default:
-				$data = array("sourceString" => $sourceString);
+				$data = array(kThumbnailErrorMessages::SOURCE_STRING => $sourceString);
 				throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::FAILED_TO_PARSE_SOURCE, $data);
 		}
 
@@ -90,13 +93,14 @@ class thumbnailStringParser
 	{
 		$parameters = explode(self::PARAMETER_DELIMITER, $imageActionString);
 		$parametersCount = count($parameters);
-		if(!array_key_exists($parameters[self::ACTION_NAME_INDEX], self::$actionsAlias))
+		$actionName = strtolower($parameters[self::ACTION_NAME_INDEX]);
+		if(!array_key_exists($actionName, self::$actionsAlias))
 		{
-			$data = array('actionString' => $parameters[self::ACTION_NAME_INDEX]);
+			$data = array(kThumbnailErrorMessages::ACTION_STRING => $parameters[self::ACTION_NAME_INDEX]);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::FAILED_TO_PARSE_ACTION, $data);
 		}
 
-		$imageAction = self::createImageAction($parameters[self::ACTION_NAME_INDEX]);
+		$imageAction = self::createImageAction($actionName);
 		self::setActionParameter($imageAction, $parameters, $parametersCount);
 		return $imageAction;
 	}

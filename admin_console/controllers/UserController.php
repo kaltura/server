@@ -400,6 +400,7 @@ class UserController extends Zend_Controller_Action
 			}
 			catch(Exception $ex)
 			{
+				$this->view->errMessage = $ex->getMessage();
 				if ($ex->getCode() === 'INVALID_USER_ID')
 					$form->setDescription($ex->getMessage());
 				else if ($ex->getCode() === 'LOGIN_DATA_NOT_FOUND')
@@ -409,6 +410,8 @@ class UserController extends Zend_Controller_Action
 				else if ($ex->getCode() === 'USER_ROLE_NOT_FOUND')
 					$form->setDescription($ex->getMessage());
 				else if ($ex->getCode() === 'ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE')
+					$form->setDescription($ex->getMessage());
+				else if ($ex->getCode() === 'NOT_ALLOWED_TO_CHANGE_ROLE')
 					$form->setDescription($ex->getMessage());
 				else
 					throw $ex;

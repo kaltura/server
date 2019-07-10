@@ -49,7 +49,7 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 		throw new Exception("Can't instantiate un-typed [$vendorType] vendorService [" . print_r($row, true) . "]");
 	}
 
-	public static function setDefaultCriteriaFilter ()
+	public static function setDefaultCriteriaFilter()
 	{
 		if ( self::$s_criteria_filter == null )
 		{
@@ -74,6 +74,23 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 		$c->add(VendorIntegrationPeer::ACCOUNT_ID, $accountID);
 		$c->add(VendorIntegrationPeer::VENDOR_TYPE, $vendorType);
 		return self::doSelectOne($c);
+	}
+
+	/**
+	 * @param $accountID
+	 * @param $vendorType
+	 * @return VendorIntegration
+	 * @throws PropelException
+	 */
+	public static function retrieveSingleVendorPerPartnerNoFilter($accountID, $vendorType)
+	{
+		$c = new Criteria();
+		$c->add(VendorIntegrationPeer::ACCOUNT_ID, $accountID);
+		$c->add(VendorIntegrationPeer::VENDOR_TYPE, $vendorType);
+		self::setUseCriteriaFilter(false);
+		$result = self::doSelectOne($c);
+		self::setUseCriteriaFilter(true);
+		return $result;
 	}
 
 } // VendorIntegrationPeer

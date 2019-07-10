@@ -161,6 +161,7 @@ class AdminUserService extends KalturaBaseUserService
 	 * @action setInitialPassword
 	 * @param string $hashKey
 	 * @param string $newPassword new password to set
+	 * @return KalturaAuthentication The authentication response
 	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::ADMIN_KUSER_NOT_FOUND

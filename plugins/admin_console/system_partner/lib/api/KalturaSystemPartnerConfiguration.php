@@ -132,6 +132,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var string
 	 */
 	public $notificationsConfig;
+
+	/**
+	 * @var string
+	 */
+	public $allowedFromEmailWhiteList;
 	
 	/**
 	 * @var bool
@@ -380,6 +385,21 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $enableSelfServe;
 
+	/**
+	 * @var bool
+	 */
+	public $useTwoFactorAuthentication;
+
+	/**
+	 * @var bool
+	 */
+	public $useSso;
+
+	/**
+	 * @var bool
+	 */
+	public $blockDirectLogin;
+
 	private static $map_between_objects = array
 	(
 		"id",
@@ -406,6 +426,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"alwaysAllowedPermissionNames",
 		"importRemoteSourceForConvert",
 		"notificationsConfig",
+		"allowedFromEmailWhiteList",
 		"allowMultiNotification",
 		//"maxLoginAttempts",
 		"loginBlockPeriod",
@@ -453,6 +474,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"ovpEnvironmentUrl",
 		"ottEnvironmentUrl",
 		"enableSelfServe",
+		"useTwoFactorAuthentication",
+		"useSso",
+		"blockDirectLogin",
 	);
 
 	public function getMapBetweenObjects()
