@@ -113,7 +113,7 @@ class kZoomEngine
 			entryPeer::setFilterResults(true);
 		}
 
-		!$entry = entryPeer::doSelectOne($c);
+		$entry = entryPeer::doSelectOne($c);
 		if(!$entry)
 		{
 			ZoomHelper::exitWithError(kVendorErrorMessages::MISSING_ENTRY_FOR_ZOOM_MEETING . $meetingId);
@@ -171,18 +171,6 @@ class kZoomEngine
 		{
 			ZoomHelper::exitWithError(kVendorErrorMessages::MISSING_ENTRY_FOR_CHAT);
 		}
-
-		$attachmentAssest = $this->createAttachmentAssetForChatFile($meeting->id);
-		$attachmentAssetResource = new KalturaUrlResource();
-		$attachmentAssetResource->url = $chatDownloadUrl . self::URL_ACCESS_TOKEN . $downloadToken;
-		$this->initUserPermissions($dbUser, true);
-		$attachmentAssetService = new AttachmentAssetService();
-		$attachmentAssetService->initService('caption_attachmentAsset', 'attachmentAsset', 'setContent');
-		$attachmentAssetService->setContentAction($attachmentAssest->getId(), $attachmentAssetResource);
-	}
-
-	protected function handleVideoRecord($meeting, $dbUser, $zoomIntegration, $validatedUsers, $recordingFile, $event)
-	{
 
 		$attachmentAssest = $this->createAttachmentAssetForChatFile($meeting->id);
 		$attachmentAssetResource = new KalturaUrlResource();
@@ -344,24 +332,12 @@ class kZoomEngine
 	}
 
 	/**
-	 * @param string $meetingId
-	 * @return AttachmentAsset
-	 */
-	protected function createAttachmentAssetForChatFile($meetingId)
-	{
-		$attachment = new AttachmentAsset();
-		$attachment->setFilename("Meeting {$meetingId} chat file");
-		$attachment->setcontainerFormat(AttachmentType::TEXT);
-		$attachment->save();
-		return $attachment;
-	}
-
-	/**
 	 * @param $meetingId
 	 * @param ZoomVendorIntegration $zoomIntegration
+	 * @param $meetingOwnerName
 	 * @return array participants users names
 	 */
-	protected function extractMeetingParticipants($meetingId, $zoomIntegration, $meetingOwnerId)
+	protected function extractMeetingParticipants($meetingId, $zoomIntegration, $meetingOwnerName)
 	{
 		if ($zoomIntegration->getHandleParticipantsMode() == kHandleParticipantsMode::IGNORE)
 		{
@@ -379,7 +355,7 @@ class kZoomEngine
 			foreach ($participantsEmails as $participantEmail)
 			{
 				$userName = $this->matchZoomUserName($participantEmail, $zoomIntegration);
-				if($meetingOwnerId != $userName)
+				if($meetingOwnerName != $userName)
 				{
 					$result[] = $userName;
 				}
