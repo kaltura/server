@@ -101,8 +101,7 @@ class elasticSearchUtils
 		$status = substr($status,1,strlen ($status)-1 );
 		return array($status, $categoryName);
 	}
-
-
+	
 
 	public static function formatParentCategoryNameStatus($categoryName, $status)
 	{
