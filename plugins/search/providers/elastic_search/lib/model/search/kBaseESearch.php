@@ -31,13 +31,14 @@ abstract class kBaseESearch extends kBaseSearch
 		return $result;
 	}
 
-	protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null)
+	protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations=null)
 	{
 		$partnerId = kBaseElasticEntitlement::$partnerId;
 		$this->initQueryAttributes($partnerId, $objectId);
 		$this->initBaseFilter($partnerId, $statuses, $objectId);
 		$this->initPager($pager);
 		$this->initOrderBy($order);
+		$this->initAggregations($aggregations);
 	}
 
 	protected function addGlobalHighlights()

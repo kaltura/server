@@ -31,6 +31,11 @@ class ESearchParams extends BaseObject
 	protected $useHighlight;
 
 	/**
+	 * @var ESearchAggregations
+	 */
+	protected $aggregations;
+
+	/**
 	 * @return ESearchOperator
 	 */
 	public function getSearchOperator()
@@ -108,6 +113,22 @@ class ESearchParams extends BaseObject
 	public function setUseHighlight($useHighlight)
 	{
 		$this->useHighlight = $useHighlight;
+	}
+
+	/***
+	 * @param ESearchAggregations $aggregations
+	 */
+	public function setAggregations($aggregations)
+	{
+		$this->aggregations = $aggregations;
+	}
+
+	/***
+	 * @return ESearchAggregations
+	 */
+	public function getAggregations()
+	{
+		return $this->aggregations;
 	}
 
 }
