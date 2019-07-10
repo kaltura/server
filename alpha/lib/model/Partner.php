@@ -84,6 +84,8 @@ class Partner extends BasePartner
 
 	const ANALYTICS_HOST = "analytics_host";
 
+	const CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST = 'allowedFromEmailWhiteList';
+
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -200,6 +202,17 @@ class Partner extends BasePartner
 	}
 	
 	private static $s_config_params = array ( );
+
+	public function getAllowedFromEmailWhiteList()
+	{
+		return $this->getFromCustomData( self::CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST);
+	}
+
+	public function setAllowedFromEmailWhiteList( $emails )
+	{
+		$emails =  implode(',',array_map('trim',explode(',',$emails)));
+		$this->putInCustomData( self::CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST, $emails);
+	}
 
 	public function getUseDefaultKshow()	{		return $this->getFromCustomData( "useDefaultKshow" , null , true );	}
 	public function setUseDefaultKshow( $v )	{		return $this->putInCustomData( "useDefaultKshow", $v );	}

@@ -275,6 +275,11 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'Notification Configuration:',
 			'filters'		=> array('StringTrim'),
 		));
+
+		$this->addElement('text', 'allowed_from_email_white_list', array(
+			'label'			=> 'Allowed From Email WhiteList Notifications:',
+			'filters'		=> array('StringTrim'),
+		));
 			
 		$this->addElement('checkbox', 'allow_multi_notification', array(
 			'label'	  => 'Allow multi-notifications',
@@ -926,7 +931,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addDisplayGroup(array_merge(array('delivery_profile_ids', 'live_delivery_profile_ids', 'deliveryFormat', 'delivery_profile_type', 'editDeliveryProfiles', 'enforce_delivery', 'checkbox_host', 'host', 'checkbox_cdn_host', 'cdn_host', 'checkbox_thumbnail_host', 'thumbnail_host', 'checkbox_cache_flavor_version', 'cache_flavor_version', 'support_animated_thumbnails'), $permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS], array ('crossLine')), 'publisherSpecificDeliverySettings', array('legend' => 'Publisher Specific Delivery Settings'));
 		$this->addDisplayGroup(array_merge(array('storage_serve_priority', 'storage_delete_from_kaltura','import_remote_source_for_convert'), $permissionNames[self::GROUP_REMOTE_STORAGE] ,array('crossLine')), 'remoteStorageAccountPolicy', array('legend' => 'Remote Storage Policy'));
 
-		$this->addDisplayGroup(array_merge(array('notifications_config', 'allow_multi_notification'), $permissionNames[self::GROUP_NOTIFICATION_CONFIG] ,array('crossLine')), 'advancedNotificationSettings', array('legend' => 'Advanced Notification Settings'));
+		$this->addDisplayGroup(array_merge(array('notifications_config', 'allowed_from_email_white_list', 'allow_multi_notification'), $permissionNames[self::GROUP_NOTIFICATION_CONFIG] ,array('crossLine')), 'advancedNotificationSettings', array('legend' => 'Advanced Notification Settings'));
 		$this->addDisplayGroup(array_merge(array('def_thumb_offset','def_thumb_density') , $permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS], array('enable_bulk_upload_notifications_emails', 'bulk_upload_notifications_email', 'crossLine')), 'publisherSpecificIngestionSettings', array('legend' => 'Content Ingestion Options'));
 		$this->addDisplayGroup(array('logout_url', 'crossLine'), 'signSignOn', array('legend' => 'Sign Sign On'));
 		$this->addDisplayGroup(array_merge(array('api_access_control_id', 'restrict_entry_by_metadata'), $permissionNames[self::GROUP_ACCESS_CONTROL], array('crossLine')), 'apiAccessControlIdGroup', array('legend' => 'Access Control'));

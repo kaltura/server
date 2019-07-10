@@ -210,18 +210,19 @@ class PartnerService extends KalturaBaseService
 	 * @param int $partnerId
 	 * @param string $adminEmail
 	 * @param string $cmsPassword
+	 * @param string $otp
 	 * @return KalturaPartner
 	 * @ksIgnored
 	 *
 	 * @throws APIErrors::ADMIN_KUSER_NOT_FOUND
 	 */
-	public function getSecretsAction( $partnerId , $adminEmail , $cmsPassword )
+	public function getSecretsAction( $partnerId , $adminEmail , $cmsPassword, $otp = null )
 	{
 		KalturaResponseCacher::disableCache();
 
 		$adminKuser = null;
 		try {
-			$adminKuser = UserLoginDataPeer::userLoginByEmail($adminEmail, $cmsPassword, $partnerId);
+			$adminKuser = UserLoginDataPeer::userLoginByEmail($adminEmail, $cmsPassword, $partnerId, $otp);
 		}
 		catch (kUserException $e) {
 			throw new KalturaAPIException ( APIErrors::ADMIN_KUSER_NOT_FOUND, "The data you entered is invalid" );
