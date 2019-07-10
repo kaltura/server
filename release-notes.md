@@ -11,7 +11,7 @@
     moduls.feedWithLiveEntries.enabled = true
     moduls.feedWithLiveEntries.permissionType = 2
     moduls.feedWithLiveEntries.label = "Include live entries in feed"
-    moduls.feedWithLiveEntries.permissionName = FEATURE_INCLUDE_LIVE_ENTRIES_IN_FEED
+    moduls.feedWithLiveEntries.permissionName = FEATURE_LIVE_ENTRIES_IN_FEED
     moduls.feedWithLiveEntries.basePermissionType =
     moduls.feedWithLiveEntries.basePermissionName =
     moduls.feedWithLiveEntries.group = GROUP_ENABLE_DISABLE_FEATURES
