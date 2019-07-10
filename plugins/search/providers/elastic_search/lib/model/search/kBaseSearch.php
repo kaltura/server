@@ -64,6 +64,27 @@ abstract class kBaseSearch
 		}
 	}
 
+	protected function initAggregations(ESearchAggregations $aggregations = null)
+	{
+		if(!$aggregations)
+		{
+			return;
+		}
+
+		$aggs = array();
+
+		foreach ($aggregations->getAggregations() as $aggregation)
+		{
+			/* var $aggregation ESearchAggregationItem */
+			$aggregationKey = $aggregation->getAggregationKey() . ':' . $aggregation->getFieldName();
+			$aggs[$aggregationKey] = $aggregation->getAggregationCommand();
+		}
+		if($aggs)
+		{
+			$this->query['body']['aggs'] = $aggs;
+		}
+	}
+
 	protected function getSortConditions(ESearchOrderBy $order)
 	{
 		$orderItems = $order->getOrderItems();
