@@ -82,7 +82,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		);
 	}
 	
-	public static function updateLoginData($oldLoginEmail, $oldPassword, $newLoginEmail = null, $newPassword = null, $newFirstName = null, $newLastName = null)
+	public static function updateLoginData($oldLoginEmail, $oldPassword, $newLoginEmail = null, $newPassword = null, $newFirstName = null, $newLastName = null, $otp = null)
 	{
 		// if email is null, no need to do any DB queries
 		if (!$oldLoginEmail) {
@@ -120,7 +120,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 
 		self::checkPasswordValidation ( $newPassword, $loginData );
-				 
+		self::validate2FA($loginData, $otp);
 		// update password if requested
 		if ($newPassword && $newPassword != $oldPassword) {
 			$password = $loginData->resetPassword($newPassword, $oldPassword);
@@ -153,7 +153,35 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 		return $loginData;
 	}
-	
+
+	protected static function validate2FA($loginData, $otp)
+	{
+		if (self::isUserBelongsToPartnerWith2FA($loginData) && kuserPeer::getAdminUser($loginData->getConfigPartnerId(), $loginData))
+		{
+			if(!$otp)
+			{
+				throw new kUserException ('otp is missing', kUserException::MISSING_OTP);
+			}
+			$result = authenticationUtils::verify2FACode($loginData, $otp);
+			if (!$result)
+			{
+				throw new kUserException ('otp is invalid', kUserException::INVALID_OTP);
+			}
+		}
+	}
+
+	protected static function isUserBelongsToPartnerWith2FA($loginData)
+	{
+		kuserPeer::setUseCriteriaFilter(false);
+		$dbUser = kuserPeer::getKuserByPartnerAndUid($loginData->getConfigPartnerId(), $loginData->getLoginEmail(), true);
+		kuserPeer::setUseCriteriaFilter(true);
+		if (!$dbUser)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+		}
+		return $loginData->isTwoFactorAuthenticationRequired($dbUser);
+	}
+
 	public static function checkPasswordValidation($newPassword, $loginData) {
 		// check that new password structure is valid
 		if ($newPassword && 
