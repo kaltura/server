@@ -101,12 +101,12 @@ class kFileUtils extends kFile
 		// we preserve the original file name by passing the extra ;filename=$_FILES[xxx][name]
 		foreach($_FILES as $key => $value)
 		{
-			$post_params[$key] = "@".$value['tmp_name'].";filename=".$value['name'];
+			$post_params[$key] = new \CURLFile($value['tmp_name'], $value['type'], $value['name']);
 			if(!is_uploaded_file($value['tmp_name'])) {
 				KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 			}
 		}
-		
+
 		foreach($_POST as $key => $value)
 		{
 			$post_params[$key] = $value;
