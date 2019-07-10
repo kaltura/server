@@ -412,7 +412,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		switch ($report_flavor)
 		{
 			case myReportsMgr::REPORT_FLAVOR_TOTAL:
-				return $this->getTotalReport($objectIds);
+				return $this->getTotalReport($objectIds, $inputFilter);
 			case myReportsMgr::REPORT_FLAVOR_TABLE:
 				if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ))
 				{
@@ -504,7 +504,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		$c->add(UserEntryPeer::ENTRY_ID, $objectIds);
 		$c->add(UserEntryPeer::TYPE, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
 		$c->add(UserEntryPeer::STATUS, QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
-		$this->addToCriteria($c, $reportFilter);
+		$this->addToCriteria($c, $reportFilter, 'UserEntryPeer');
 		$quizzes = UserEntryPeer::doSelect($c);
 		$numOfQuizzesFound = count($quizzes);
 		KalturaLog::debug("Found $numOfQuizzesFound quizzes that were submitted");
@@ -539,7 +539,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		$c = new Criteria();
 		$c->add(CuePointPeer::ENTRY_ID, $objectIds);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_QUESTION));
-		$this->addToCriteria($c, $reportFilter);
+		$this->addToCriteria($c, $reportFilter, 'CuePointPeer');
 		$questions = CuePointPeer::doSelect($c);
 		return $this->getAggregateDataForQuestions($questions, $orderBy,false);
 	}
@@ -551,7 +551,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		$questionsCriteria = new Criteria();
 		$questionsCriteria->add(CuePointPeer::ID, $questionIds, Criteria::IN);
 		$questionsCriteria->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_QUESTION));
-		$this->addToCriteria($questionsCriteria, $reportFilter);
+		$this->addToCriteria($questionsCriteria, $reportFilter, 'CuePointPeer');
 		$questions = CuePointPeer::doSelect($questionsCriteria);
 		return $this->getAggregateDataForQuestions($questions, $orderBy);
 	}
@@ -580,7 +580,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		{
 			$c->add(CuePointPeer::KUSER_ID, $anonKuserIds, Criteria::NOT_IN);
 		}
-		$this->addToCriteria($c, $reportFilter);
+		$this->addToCriteria($c, $reportFilter, 'CuePointPeer');
 		$numOfQuestions = CuePointPeer::doCount($c);
 		$res = array();
 		$res['count_all'] = $numOfQuestions;
@@ -596,7 +596,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		$c->add(UserEntryPeer::STATUS, QuizPlugin::getCoreValue('UserEntryStatus',QuizUserEntryStatus::QUIZ_SUBMITTED));
 
 		// if a user has answered the test twice (consider anonymous users) it will be calculated twice.
-		$this->addToCriteria($c, $reportFilter);
+		$this->addToCriteria($c, $reportFilter, 'UserEntryPeer');
 		$count = UserEntryPeer::doCount($c);
 
 		$res = array();
@@ -609,7 +609,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		$questionIds = baseObjectUtils::getObjectIdsAsArray($objectIds);
 		$c = new Criteria();
 		$c->add(CuePointPeer::ID, $questionIds, Criteria::IN);
-		$this->addToCriteria($c, $reportFilter);
+		$this->addToCriteria($c, $reportFilter, 'CuePointPeer');
 		$numOfquestions = CuePointPeer::doCount($c);
 		$res = array();
 		$res['count_all'] = $numOfquestions;
@@ -669,7 +669,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
 		$c = new Criteria();
 		$c->add(UserEntryPeer::ENTRY_ID, $objectIds);
-		$this->addToCriteria($c, $inputFilter);
+		$this->addToCriteria($c, $inputFilter, 'UserEntryPeer');
 		$userEntries = UserEntryPeer::doSelect($c);
 		return $this->getAggregateDataForUsers($userEntries, $orderBy);
 	}
@@ -771,20 +771,20 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 				$c->addAnd(UserEntryPeer::KUSER_ID, $anonKuserIds, Criteria::NOT_IN);
 			}
 		}
-		$this->addToCriteria($c,$inputFilter);
+		$this->addToCriteria($c,$inputFilter,'UserEntryPeer');
 		$userEntries = UserEntryPeer::doSelect($c);
 		return $this->getAggregateDataForUsers($userEntries, $orderBy);
 	}
 
-	protected function addToCriteria(criteria &$c,reportsInputFilter $inputFilter)
+	protected function addToCriteria(criteria &$c,reportsInputFilter $inputFilter, $peerName)
 	{
 		if ($inputFilter->from_date)
 		{
-			$c->addAnd('UPDATED_AT', $inputFilter->from_date, Criteria::GREATER_EQUAL);
+			$c->addAnd($peerName::UPDATED_AT, $inputFilter->from_date, Criteria::GREATER_EQUAL);
 		}
 		if ($inputFilter->to_date )
 		{
-			$c->addAnd('UPDATED_AT', $inputFilter->to_date, Criteria::LESS_EQUAL);
+			$c->addAnd($peerName::UPDATED_AT, $inputFilter->to_date, Criteria::LESS_EQUAL);
 		}
 	}
 
