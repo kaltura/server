@@ -133,7 +133,7 @@ class kZoomEngine
 		$meeting = $event->object;
 		$dbUser = $this->getEntryOwner($meeting->hostEmail, $zoomIntegration);
 		$this->initUserPermissions($dbUser);
-		$participantsUsersNames = $this->extractMeetingParticipants($meeting->id, $zoomIntegration);
+		$participantsUsersNames = $this->extractMeetingParticipants($meeting->id, $zoomIntegration, $dbUser->getPuserId());
 		$validatedUsers = $this->getValidatedUsers($participantsUsersNames, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist(), $dbUser->getPuserId());
 		$entry = null;
 		foreach ($meeting->recordingFiles as $recordingFile)
@@ -336,7 +336,7 @@ class kZoomEngine
 	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @return array participants users names
 	 */
-	protected function extractMeetingParticipants($meetingId, $zoomIntegration)
+	protected function extractMeetingParticipants($meetingId, $zoomIntegration, $meetingOwnerId)
 	{
 		if ($zoomIntegration->getHandleParticipantsMode() == kHandleParticipantsMode::IGNORE)
 		{
@@ -353,7 +353,11 @@ class kZoomEngine
 			$result = array();
 			foreach ($participantsEmails as $participantEmail)
 			{
-				$result[] = $this->matchZoomUserName($participantEmail, $zoomIntegration);
+				$userName = $this->matchZoomUserName($participantEmail, $zoomIntegration);
+				if($meetingOwnerId != $userName)
+				{
+					$result[] = $userName;
+				}
 			}
 		}
 		else
