@@ -156,7 +156,7 @@ class kZoomEngine
 			}
 		}
 
-	}
+			}
 
 	/**
 	 * @param entry $entry
@@ -171,6 +171,18 @@ class kZoomEngine
 		{
 			ZoomHelper::exitWithError(kVendorErrorMessages::MISSING_ENTRY_FOR_CHAT);
 		}
+
+		$attachmentAssest = $this->createAttachmentAssetForChatFile($meeting->id);
+		$attachmentAssetResource = new KalturaUrlResource();
+		$attachmentAssetResource->url = $chatDownloadUrl . self::URL_ACCESS_TOKEN . $downloadToken;
+		$this->initUserPermissions($dbUser, true);
+		$attachmentAssetService = new AttachmentAssetService();
+		$attachmentAssetService->initService('caption_attachmentAsset', 'attachmentAsset', 'setContent');
+		$attachmentAssetService->setContentAction($attachmentAssest->getId(), $attachmentAssetResource);
+	}
+
+	protected function handleVideoRecord($meeting, $dbUser, $zoomIntegration, $validatedUsers, $recordingFile, $event)
+	{
 
 		$attachmentAssest = $this->createAttachmentAssetForChatFile($meeting->id);
 		$attachmentAssetResource = new KalturaUrlResource();
@@ -316,6 +328,19 @@ class kZoomEngine
 		$caption->setStatus(CaptionAsset::ASSET_STATUS_QUEUED);
 		$caption->save();
 		return $caption;
+	}
+
+	/**
+	 * @param string $meetingId
+	 * @return AttachmentAsset
+	 */
+	protected function createAttachmentAssetForChatFile($meetingId)
+	{
+		$attachment = new AttachmentAsset();
+		$attachment->setFilename("Meeting {$meetingId} chat file");
+		$attachment->setcontainerFormat(AttachmentType::TEXT);
+		$attachment->save();
+		return $attachment;
 	}
 
 	/**
