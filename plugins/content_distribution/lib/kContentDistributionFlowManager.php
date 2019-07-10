@@ -16,7 +16,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	{
 		if($object instanceof entry && $object->wasObjectSaved())
 		{
-			if(in_array(entryPeer::MODERATION_STATUS, $modifiedColumns) && !in_array($object->getModerationStatus(), self::$validModerationStatuses))
+			if($object->getStatus() == entryStatus::READY &&
+				in_array(entryPeer::MODERATION_STATUS, $modifiedColumns) &&
+				!in_array($object->getModerationStatus(), self::$validModerationStatuses))
 			{
 				return false;
 			}
@@ -40,13 +42,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	{
 		if($object instanceof entry && $object->getStatus() != entryStatus::DELETED)
 		{
-			if(in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == entryStatus::READY)
+			if((in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == entryStatus::READY)
+				|| in_array(entryPeer::MODERATION_STATUS, $modifiedColumns))
 			{
 				return self::onEntryReady($object);
-			}
-			elseif(in_array(entryPeer::MODERATION_STATUS, $modifiedColumns))
-			{
-				return self::onModerationChange($object);
 			}
 			else
 			{
@@ -1793,14 +1792,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		return true;
 	}
 
-	public static function onModerationChange(entry $entry)
-	{
-		if($entry->getStatus() == entryStatus::READY)
-		{
-			return self::onEntryReady($entry);
-		}
-	}
-
 	/**
 	 * @param entry $entry
 	 * @return bool
@@ -1821,6 +1812,14 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$distributionProfiles = DistributionProfilePeer::retrieveByPartnerId($entry->getPartnerId());
 		foreach($distributionProfiles as $distributionProfile)
 		{
+			if($distributionProfile->getDistributeTrigger() == kDistributeTrigger::MODERATION_APPROVED)
+			{
+				if(!in_array($entry->getModerationStatus(), self::$validModerationStatuses))
+				{
+					continue;
+				}
+			}
+
 			self::distributeNewEntry($entry, $distributionProfile);
 		}
 		
@@ -1840,14 +1839,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			KalturaLog::info("Found entry distribution object with id [" . $entryDistribution->getId() . "] for distribution profile [" . $distributionProfile->getId() . "]");
 			self::onEntryDistributionUpdateRequired($entryDistribution);
 			return false;
-		}
-
-		if($distributionProfile->getDistributeOnType() == kDistributeOnType::MODERATION_APPROVED)
-		{
-			if(!in_array($entry->getModerationStatus(), self::$validModerationStatuses))
-			{
-				return false;
-			}
 		}
 
 		if($distributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::AUTOMATIC)

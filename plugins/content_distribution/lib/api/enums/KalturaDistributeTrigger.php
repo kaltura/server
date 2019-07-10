@@ -3,7 +3,7 @@
  * @package plugins.contentDistribution
  * @subpackage api.enum
  */
-class KalturaDistributeOnType extends KalturaEnum implements kDistributeOnType
+class KalturaDistributeTrigger extends KalturaEnum implements kDistributeTrigger
 {
 
 }
