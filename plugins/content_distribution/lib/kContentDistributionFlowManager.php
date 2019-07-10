@@ -15,7 +15,14 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
 		if($object instanceof entry && $object->wasObjectSaved())
+		{
+			if(in_array(entryPeer::MODERATION_STATUS, $modifiedColumns) && !in_array($object->getModerationStatus(), self::$validModerationStatuses))
+			{
+				return false;
+			}
+
 			return true;
+		}
 		
 		if($object instanceof asset && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && in_array(assetPeer::STATUS, $modifiedColumns) || in_array(assetPeer::VERSION, $modifiedColumns))
 			return true;
@@ -39,7 +46,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			}
 			elseif(in_array(entryPeer::MODERATION_STATUS, $modifiedColumns))
 			{
-				return self::onModerationChange($object, $modifiedColumns);
+				return self::onModerationChange($object);
 			}
 			else
 			{
@@ -1167,6 +1174,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 
 	/**
 	 * @param Metadata $metadata
+	 * @return bool
 	 */
 	public static function onMetadataDeleted(Metadata $metadata)
 	{
@@ -1257,9 +1265,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		return true;
 	}
-	
+
 	/**
 	 * @param Metadata $metadata
+	 * @return bool
 	 */
 	public static function onMetadataChanged(Metadata $metadata, $previousVersion)
 	{
@@ -1450,9 +1459,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		return true;
 	}
-	
+
 	/**
 	 * @param EntryDistribution $entryDistribution
+	 * @return bool
 	 */
 	public static function onEntryDistributionUpdateRequired(EntryDistribution $entryDistribution)
 	{
@@ -1514,10 +1524,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
 		return true;
 	}
-	
+
 	/**
 	 * @param EntryDistribution $entryDistribution
 	 * @param array $modifiedColumns
+	 * @return bool
 	 */
 	public static function onEntryDistributionChanged(EntryDistribution $entryDistribution, array $modifiedColumns)
 	{
@@ -1535,10 +1546,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				
 		return true;
 	}
-	
+
 	/**
 	 * @param entry $entry
 	 * @param array $modifiedColumns
+	 * @return bool
 	 */
 	public static function onEntryChanged(entry $entry, array $modifiedColumns)
 	{
@@ -1727,9 +1739,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			$genericDistributionProfiles->save();
 		}
 	}
-	
+
 	/**
 	 * @param entry $entry
+	 * @return bool
 	 */
 	public static function onEntryDeleted(entry $entry)
 	{
@@ -1780,19 +1793,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		return true;
 	}
 
-	public static function onModerationChange(entry $entry, array $modifiedColumns)
+	public static function onModerationChange(entry $entry)
 	{
-		if(!in_array($entry->getModerationStatus(), self::$validModerationStatuses))
-		{
-			return true;
-		}
-
 		if($entry->getStatus() == entryStatus::READY)
 		{
 			return self::onEntryReady($entry);
 		}
-
-		return self::onEntryChanged($entry, $modifiedColumns);
 	}
 
 	/**
@@ -1854,6 +1860,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 
 	/**
 	 * @param asset $asset
+	 * @return bool
 	 */
 	public static function onAssetVersionChanged(asset $asset)
 	{
@@ -1901,9 +1908,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		return true;
 	}
-	
+
 	/**
 	 * @param asset $asset
+	 * @return bool
 	 */
 	public static function onAssetReadyOrDeleted(asset $asset)
 	{
@@ -1987,11 +1995,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		return true;
 	}
-	
+
 	/**
 	 * @param array $distributionProfiles
 	 * @param string $entryId
 	 * @param int $entryType
+	 * @return bool
 	 */
 	public static function checkShouldDistributeByProfiles(array $distributionProfiles, $entryId, $entryType)
 	{
@@ -2002,10 +2011,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		}
 		return false;
 	}
-	
+
 	/**
 	 * @param array $entryDistributions
 	 * @param array $distributionProfiles
+	 * @return array
 	 */
 	public static function getDistProfilesByEntryDistributions(array $entryDistributions, array $distributionProfiles)
 	{
