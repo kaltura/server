@@ -17,6 +17,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 {
 	const KALTURAS_CMS_PASSWORD_RESET = 51;
 	const LAST_LOGIN_TIME_UPDATE_INTERVAL = 600; // 10 Minutes
+	const OTP_MISSING = 'otp is missing';
+	const OTP_INVALID = 'otp is invalid';
 	
 	public static function generateNewPassword()
 	{
@@ -156,30 +158,20 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 	protected static function validate2FA($loginData, $otp)
 	{
-		if (self::isUserBelongsToPartnerWith2FA($loginData) && kuserPeer::getAdminUser($loginData->getConfigPartnerId(), $loginData))
+
+		$dbUser =  kuserPeer::getAdminUser($loginData->getConfigPartnerId(), $loginData);
+		if ($dbUser && $loginData->isTwoFactorAuthenticationRequired($dbUser))
 		{
 			if(!$otp)
 			{
-				throw new kUserException ('otp is missing', kUserException::MISSING_OTP);
+				throw new kUserException (self::OTP_MISSING, kUserException::MISSING_OTP);
 			}
 			$result = authenticationUtils::verify2FACode($loginData, $otp);
 			if (!$result)
 			{
-				throw new kUserException ('otp is invalid', kUserException::INVALID_OTP);
+				throw new kUserException (self::OTP_INVALID, kUserException::INVALID_OTP);
 			}
 		}
-	}
-
-	protected static function isUserBelongsToPartnerWith2FA($loginData)
-	{
-		kuserPeer::setUseCriteriaFilter(false);
-		$dbUser = kuserPeer::getKuserByPartnerAndUid($loginData->getConfigPartnerId(), $loginData->getLoginEmail(), true);
-		kuserPeer::setUseCriteriaFilter(true);
-		if (!$dbUser)
-		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
-		}
-		return $loginData->isTwoFactorAuthenticationRequired($dbUser);
 	}
 
 	public static function checkPasswordValidation($newPassword, $loginData) {

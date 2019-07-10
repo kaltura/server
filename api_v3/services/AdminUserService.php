@@ -76,7 +76,7 @@ class AdminUserService extends KalturaBaseUserService
 	 * 
 	 * @deprecated
 	 */
-	public function updatePasswordAction( $email , $password , $newEmail = "" , $newPassword = "", $otp =  null)
+	public function updatePasswordAction( $email , $password , $newEmail = "" , $newPassword = "", $otp = null)
 	{
 		try
 		{
