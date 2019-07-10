@@ -102,7 +102,6 @@ class elasticSearchUtils
 		return array($status, $categoryName);
 	}
 	
-
 	public static function formatParentCategoryNameStatus($categoryName, $status)
 	{
 		return sprintf("s%sp>%s", $status, $categoryName);
