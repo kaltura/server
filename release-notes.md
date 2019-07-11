@@ -6,7 +6,7 @@
 - Issue ID: PLAT-9902
 
 ### configuration ###
-make sure python3 and pycaption for python 3 are installed 
+make sure python3 and pycaption for python 3 are installed
 
 Add the following to batch.ini:
 
