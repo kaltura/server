@@ -73,7 +73,7 @@ abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfig
 			'value'			=> $this->providerType,
 		));
 
-		$this->addDistributeOnTypeElement();
+		$this->addDistributeTriggerElement();
 
 		$this->addElement('hidden', 'crossLine01', array(
 			'lable'			=> 'line',
@@ -104,11 +104,19 @@ abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfig
 		$this->addProfileAction('report');
 	}
 
-	protected function addDistributeOnTypeElement()
+	protected function addDistributeTriggerElement()
 	{
 		$distributeTrigger = new Kaltura_Form_Element_EnumSelect('distribute_Trigger', array('enum' => 'Kaltura_Client_ContentDistribution_Enum_DistributeTrigger'));
 		$distributeTrigger->setLabel('Auto distribute trigger:');
-		$distributeTrigger->setValue($this->distributionProfile->distributeTrigger);
+		if($this->distributionProfile->distributeTrigger)
+		{
+			$distributeTrigger->setValue($this->distributionProfile->distributeTrigger);
+		}
+		else
+		{
+			$distributeTrigger->setValue(Kaltura_Client_ContentDistribution_Enum_DistributeTrigger::ENTRY_READY);
+		}
+
 		$this->addElement($distributeTrigger);
 	}
 
