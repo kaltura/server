@@ -215,10 +215,11 @@ class AttachmentAssetService extends KalturaAssetService
 		$attachmentAsset->setStatus(AttachmentAsset::ASSET_STATUS_READY);
 		$attachmentAsset->save();
 	}
-    
+
 	/**
 	 * @param AttachmentAsset $attachmentAsset
 	 * @param string $url
+	 * @throws KalturaAPIException
 	 */
 	protected function attachUrl(AttachmentAsset $attachmentAsset, $url)
 	{

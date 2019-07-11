@@ -91,10 +91,17 @@ class kZoomEngine
 				continue;
 			}
 
-			$captionAsset = $this->createAssetForTranscription($entry);
-			$captionAssetResource = new KalturaUrlResource();
-			$captionAssetResource->url = $recordingFile->download_url . self::URL_ACCESS_TOKEN . $event->downloadToken;
-			$captionAssetService->setContentAction($captionAsset->getId(), $captionAssetResource);
+			try
+			{
+				$captionAsset = $this->createAssetForTranscription($entry);
+				$captionAssetResource = new KalturaUrlResource();
+				$captionAssetResource->url = $recordingFile->download_url . self::URL_ACCESS_TOKEN . $event->downloadToken;
+				$captionAssetService->setContentAction($captionAsset->getId(), $captionAssetResource);
+			}
+			catch (Exception $e)
+			{
+				ZoomHelper::exitWithError(kVendorErrorMessages::ERROR_HANDLING_TRANSCRIPT);
+			}
 		}
 	}
 
@@ -168,14 +175,20 @@ class kZoomEngine
 		{
 			ZoomHelper::exitWithError(kVendorErrorMessages::MISSING_ENTRY_FOR_CHAT);
 		}
-
-		$attachmentAssest = $this->createAttachmentAssetForChatFile($meeting->id, $entry);
-		$attachmentAssetResource = new KalturaUrlResource();
-		$attachmentAssetResource->url = $chatDownloadUrl . self::URL_ACCESS_TOKEN . $downloadToken;
-		$this->initUserPermissions($dbUser, true);
-		$attachmentAssetService = new AttachmentAssetService();
-		$attachmentAssetService->initService('attachment_attachmentasset', 'attachmentAsset', 'setContent');
-		$attachmentAssetService->setContentAction($attachmentAssest->getId(), $attachmentAssetResource);
+		try
+		{
+			$attachmentAsset = $this->createAttachmentAssetForChatFile($meeting->id, $entry);
+			$attachmentAssetResource = new KalturaUrlResource();
+			$attachmentAssetResource->url = $chatDownloadUrl . self::URL_ACCESS_TOKEN . $downloadToken;
+			$this->initUserPermissions($dbUser, true);
+			$attachmentAssetService = new AttachmentAssetService();
+			$attachmentAssetService->initService('attachment_attachmentasset', 'attachmentAsset', 'setContent');
+			$attachmentAssetService->setContentAction($attachmentAsset->getId(), $attachmentAssetResource);
+		}
+		catch (Exception $e)
+		{
+			ZoomHelper::exitWithError(kVendorErrorMessages::ERROR_HANDLING_CHAT);
+		}
 	}
 
 	protected function handleVideoRecord($meeting, $dbUser, $zoomIntegration, $validatedUsers, $recordingFile, $event)
@@ -344,6 +357,7 @@ class kZoomEngine
 		$participantsEmails = $participants->getParticipantsEmails();
 		if($participantsEmails)
 		{
+			KalturaLog::info('Found the following participants: ' . implode(", ", $participantsEmails));
 			$result = array();
 			foreach ($participantsEmails as $participantEmail)
 			{
