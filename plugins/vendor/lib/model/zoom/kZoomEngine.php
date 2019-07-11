@@ -331,6 +331,7 @@ class kZoomEngine
 	{
 		$attachment = new AttachmentAsset();
 		$attachment->setFilename("Meeting {$meetingId} chat file");
+		$attachment->setPartnerId($entry->getPartnerId());
 		$attachment->setEntryId($entry->getId());
 		$attachment->setcontainerFormat(AttachmentType::TEXT);
 		$attachment->save();

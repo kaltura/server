@@ -223,13 +223,13 @@ class AttachmentAssetService extends KalturaAssetService
 	 */
 	protected function attachUrl(AttachmentAsset $attachmentAsset, $url)
 	{
-		$fileNAme = basename($url);
-		if(strlen($fileNAme) > self::MAX_FILE_NAME_LENGTH)
+		$fileName = basename($url);
+		if(strlen($fileName) > self::MAX_FILE_NAME_LENGTH)
 		{
-			$fileNAme = md5($url);
+			$fileName = md5($url);
 		}
 
-    	$fullPath = myContentStorage::getFSUploadsPath() . '/' . $fileNAme;
+		$fullPath = myContentStorage::getFSUploadsPath() . '/' . $fileName;
 		if (KCurlWrapper::getDataFromFile($url, $fullPath))
 			return $this->attachFile($attachmentAsset, $fullPath);
 			
