@@ -10,15 +10,17 @@ make sure python3 and pycaption for python 3 are installed
 
 Add the following to batch.ini:
 
-enabledWorkers.KAsyncConvertCaptionAsset	        = xxx (number of workers)
+enabledWorkers.KAsyncConvertCaptionAsset	    = xxx (number of workers)
+
 [KAsyncConvertCaptionAsset : JobHandlerWorker]
 id                                                  = 770
 name                                                = KAsyncConvertCaptionAsset
-friendlyName                                        = conver caption asset
+friendlyName                                        = convert caption asset
 type                                                = KAsyncConvertCaptionAsset
 maximumExecutionTime                                = 300
 scriptPath                                          = ../plugins/content/caption/base/batch/ConvertCaptions/KAsyncConvertCaptionAssetExe.php
 params.pythonCmd                                    = @LOCATION_OF_PYTHON3@
+
 
 ### Deployment scripts ###
     None
