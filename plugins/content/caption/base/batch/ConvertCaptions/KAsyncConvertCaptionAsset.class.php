@@ -10,7 +10,7 @@ class KAsyncConvertCaptionAsset extends KJobHandlerWorker
 	 */
 	private $captionClientPlugin = null;
 
-    private $formatToName = array(CaptionType::SRT => 'srt' , CaptionType::DFXP => 'dfxp', CaptionType::WEBVTT => 'webvtt', CaptionType::SCC =>'scc');
+	private $formatToName = array(CaptionType::SRT => 'srt' , CaptionType::DFXP => 'dfxp', CaptionType::WEBVTT => 'webvtt', CaptionType::SCC =>'scc');
 
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -28,74 +28,97 @@ class KAsyncConvertCaptionAsset extends KJobHandlerWorker
 		return $this->convertCaption($job, $job->data);
 	}
 
+	/***
+	 * @param KalturaBatchJob $job
+	 * @param KalturaConvertCaptionAssetJobData $data
+	 * @return KalturaBatchJob|mixed
+	 * @throws Exception
+	 * @throws kApplicativeException
+	 */
 	protected function convertCaption(KalturaBatchJob $job, KalturaConvertCaptionAssetJobData $data)
 	{
 		$this->updateJob($job, "Start parsing caption asset [$data->captionAssetId]", KalturaBatchJobStatus::QUEUED);
-
 		$this->captionClientPlugin = KalturaCaptionClientPlugin::get(self::$kClient);
 
-		$captionAssetId = $data->captionAssetId;
-		$fileLoc = $data->fileLocation;
-		if (!array_key_exists($data->fromType,$this->formatToName) || !(array_key_exists($data->toType ,$this->formatToName)))
+		if (!array_key_exists($data->fromType, $this->formatToName) || !(array_key_exists($data->toType, $this->formatToName)))
 		{
 			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, 'UNSUPPORTED_FORMAT_TYPES', "Error: " . 'UNSUPPORTED_FORMAT_TYPES', KalturaBatchJobStatus::FAILED, $data);
 			return $job;
 		}
 
-		$fromTypeName = $this->formatToName[$data->fromType];
-		$toTypeName = $this->formatToName[$data->toType];
-
-		$content = kEncryptFileUtils::getEncryptedFileContent($fileLoc, $data->fileEncryptionKey, kConf::get("encryption_iv"));
+		$content = kEncryptFileUtils::getEncryptedFileContent($data->fileLocation, $data->fileEncryptionKey, kConf::get("encryption_iv"));
 		if (!$content)
 		{
 			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, 'UNABLE_TO_GET_FILE', "Error: " . 'UNABLE_TO_GET_FILE', KalturaBatchJobStatus::FAILED, $data);
 			return $job;
 		}
 
-		$output = null;
-		$return_var = 0;
-		$tempFile = tempnam(sys_get_temp_dir(), 'captionTranslation.');
-
-		kFileBase::filePutContents($tempFile, $content);
-		$script = realpath(dirname(__FILE__) . '/../../') . '/scripts/convertcaption.py';
-		$cmd = self::$taskConfig->params->pythonCmd ." $script -i $tempFile -f $fromTypeName -t $toTypeName";
-		KalturaLog::debug("Running caption conversion command: $cmd");
-		exec($cmd, $output, $return_var);
-
-		if ($return_var)
+		$convertedContent = $this->convertContent($content, $this->formatToName[$data->fromType], $this->formatToName[$data->toType]);
+		if ($convertedContent === false)
 		{
 			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, 'UNABLE_TO_PARSE_ASSET', "Error: " . 'UNABLE_TO_PARSE_ASSET', KalturaBatchJobStatus::FAILED, $data);
 			return $job;
 		}
 
-		$parsedContent =  implode("\n",$output);
+		return $this->handleConvertedContent($job, $data, $convertedContent);
+	}
 
+	/***
+	 * @param $job
+	 * @param $data
+	 * @param $content
+	 * @return mixed
+	 * @throws kApplicativeException
+	 */
+	private function handleConvertedContent($job, $data, $content)
+	{
 		self::impersonate($job->partnerId);
-		$captionAsset = $this->captionClientPlugin->captionAsset->get($captionAssetId);
+		$captionAsset = $this->captionClientPlugin->captionAsset->get($data->captionAssetId);
 		if (!$captionAsset)
 		{
 			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, 'UNABLE_TO_GET_ORIGINAL_ASSET', "Error: " . 'UNABLE_TO_GET_ORIGINAL_ASSET', KalturaBatchJobStatus::FAILED, $data);
 			return $job;
 		}
 
-		$res = $this->deleteCaptionAsset($captionAssetId);
+		$res = $this->deleteCaptionAsset($data->captionAssetId);
 		if (!$res)
 		{
 			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, 'UNABLE_TO_DELETE_ORIGINAL_ASSET', "Error: " . 'UNABLE_TO_DELETE_ORIGINAL_ASSET', KalturaBatchJobStatus::FAILED, $data);
 			return $job;
 		}
 
-		$captionsCreated = $this->cloneCaptionAssetToSrtAndSetContent($captionAsset->entryId, $captionAsset, $parsedContent,$data->toType, $toTypeName);
+		$captionsCreated = $this->cloneCaptionAssetToSrtAndSetContent($captionAsset->entryId, $captionAsset, $content,$data->toType, $this->formatToName[$data->toType]);
 		self::unimpersonate();
 		if ($captionsCreated)
 		{
-			$this->closeJob($job, null, null, "Finished parsing $fromTypeName captions to $toTypeName", KalturaBatchJobStatus::FINISHED);
+			$this->closeJob($job, null, null, "Finished parsing " . $this->formatToName[$data->fromType]. " captions to " . $this->formatToName[$data->toType], KalturaBatchJobStatus::FINISHED);
 			return $job;
 		}
 		else
 			throw new kApplicativeException(KalturaBatchJobAppErrors::MISSING_ASSETS, "UNABLE_TO_CREATE_ASSET_WITH_CAPTION");
 	}
 
+	/***
+	 * @param $content
+	 * @param $fromType
+	 * @param $toType
+	 * @return bool|string
+	 */
+	private function convertContent($content, $fromType, $toType)
+	{
+		$output = null;
+		$return_var = 0;
+		$tempFile = tempnam(sys_get_temp_dir(), 'captionTranslation.');
+
+		kFileBase::filePutContents($tempFile, $content);
+		$script = realpath(dirname(__FILE__) . '/../../') . '/scripts/convertcaption.py';
+		$cmd = self::$taskConfig->params->pythonCmd ." $script -i $tempFile -f $fromType -t $toType";
+		KalturaLog::debug("Running caption conversion command: $cmd");
+		exec($cmd, $output, $return_var);
+
+		return $return_var ? false : implode("\n",$output);
+
+	}
 
 	/**
 	 * @param $id
@@ -125,23 +148,23 @@ class KAsyncConvertCaptionAsset extends KJobHandlerWorker
 	 */
 	private function cloneCaptionAssetToSrtAndSetContent($entryId, $captionAsset, $content, $format, $fileExt)
 	{
-		$captionAsset->id = null;
-		$captionAsset->entryId = null;
-		$captionAsset->languageCode = null;
-		$captionAsset->partnerId = null;
-		$captionAsset->createdAt = null;
-		$captionAsset->updatedAt = null;
-		$captionAsset->version = null;
-		$captionAsset->size = null;
-		$captionAsset->description = null;
-		$captionAsset->status = null;
-
-		$captionAsset->fileExt = $fileExt;
-		$captionAsset->format = $format;
+		$newCaptionAsset = new KalturaCaptionAsset();
+		$newCaptionAsset->fileExt = $fileExt;
+		$newCaptionAsset->format = $format;
+		$newCaptionAsset->tags = $captionAsset->tags;
+		$newCaptionAsset->partnerData = $captionAsset->partnerData;
+		$newCaptionAsset->partnerDescription = $captionAsset->partnerDescription;
+		$newCaptionAsset->actualSourceAssetParamsIds = $captionAsset->actualSourceAssetParamsIds;
+		$newCaptionAsset->language = $captionAsset->language;
+		$newCaptionAsset->isDefault = $captionAsset->isDefault;
+		$newCaptionAsset->label = $captionAsset->label;
+		$newCaptionAsset->parentId = $captionAsset->parentId;
+		$newCaptionAsset->accuracy = $captionAsset->accuracy;
+		$newCaptionAsset->displayOnPlayer = $captionAsset->displayOnPlayer;
 
 		try
 		{
-			$newCaptionAsset = $this->captionClientPlugin->captionAsset->add($entryId, $captionAsset);
+			$newCaptionAsset = $this->captionClientPlugin->captionAsset->add($entryId, $newCaptionAsset);
 		}
 		catch (Exception $e)
 		{

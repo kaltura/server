@@ -10,7 +10,6 @@
 class CaptionAssetService extends KalturaAssetService
 {
 	const MAX_SERVE_WEBVTT_FILE_SIZE = 1048576;
-	const SSC_CAPTION_FILE_EXT = 'scc';
 
 	protected function kalturaNetworkAllowed($actionName)
 	{
