@@ -169,7 +169,7 @@ class kZoomEngine
 			ZoomHelper::exitWithError(kVendorErrorMessages::MISSING_ENTRY_FOR_CHAT);
 		}
 
-		$attachmentAssest = $this->createAttachmentAssetForChatFile($meeting->id);
+		$attachmentAssest = $this->createAttachmentAssetForChatFile($meeting->id, $entry);
 		$attachmentAssetResource = new KalturaUrlResource();
 		$attachmentAssetResource->url = $chatDownloadUrl . self::URL_ACCESS_TOKEN . $downloadToken;
 		$this->initUserPermissions($dbUser, true);
@@ -314,10 +314,11 @@ class kZoomEngine
 	 * @param string $meetingId
 	 * @return AttachmentAsset
 	 */
-	protected function createAttachmentAssetForChatFile($meetingId)
+	protected function createAttachmentAssetForChatFile($meetingId, $entry)
 	{
 		$attachment = new AttachmentAsset();
 		$attachment->setFilename("Meeting {$meetingId} chat file");
+		$attachment->setEntryId($entry->getId());
 		$attachment->setcontainerFormat(AttachmentType::TEXT);
 		$attachment->save();
 		return $attachment;
