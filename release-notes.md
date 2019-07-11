@@ -1,5 +1,28 @@
 # Orion 15.3.0 #
 
+## Add new caption type SCC to convert from SCC to SRT automatically on upload of scc captions ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-9902
+
+### configuration ###
+make sure python3 and pycaption for python 3 are installed 
+
+Add the following to batch.ini:
+
+enabledWorkers.KAsyncConvertCaptionAsset	        = xxx (number of workers)
+[KAsyncConvertCaptionAsset : JobHandlerWorker]
+id                                                  = 770
+name                                                = KAsyncConvertCaptionAsset
+friendlyName                                        = conver caption asset
+type                                                = KAsyncConvertCaptionAsset
+maximumExecutionTime                                = 300
+scriptPath                                          = ../plugins/content/caption/base/batch/ConvertCaptions/KAsyncConvertCaptionAssetExe.php
+params.pythonCmd                                    = @LOCATION_OF_PYTHON3@
+
+### Deployment scripts ###
+    None
+    
 ## Add permission in the admin console to include live entries in the mrss feed ##
 
 - Issue Type: Feature
