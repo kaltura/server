@@ -174,7 +174,7 @@ class kZoomEngine
 		$attachmentAssetResource->url = $chatDownloadUrl . self::URL_ACCESS_TOKEN . $downloadToken;
 		$this->initUserPermissions($dbUser, true);
 		$attachmentAssetService = new AttachmentAssetService();
-		$attachmentAssetService->initService('caption_attachmentAsset', 'attachmentAsset', 'setContent');
+		$attachmentAssetService->initService('attachment_attachmentasset', 'attachmentAsset', 'setContent');
 		$attachmentAssetService->setContentAction($attachmentAssest->getId(), $attachmentAssetResource);
 	}
 
