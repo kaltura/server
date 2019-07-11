@@ -118,6 +118,17 @@ class CaptionAssetService extends KalturaAssetService
 		$contentResource->validateAsset($dbCaptionAsset);
 		$kContentResource = $contentResource->toObject();
 		$this->attachContentResource($dbCaptionAsset, $kContentResource);
+
+		if ($dbCaptionAsset->getContainerFormat() == CaptionType::SCC)
+		{
+			//start convert caption batch Job.
+			kCaptionsContentManager::addConvertCaptionAssetJob($dbCaptionAsset, CaptionType::SCC, CaptionType::SRT);
+
+			$captionAsset = new KalturaCaptionAsset();
+			$captionAsset->fromObject($dbCaptionAsset, $this->getResponseProfile());
+			return $captionAsset;
+		}
+
 		$contentResource->entryHandled($dbCaptionAsset->getentry());
 		
     	$newStatuses = array(
