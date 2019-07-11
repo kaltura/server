@@ -223,7 +223,7 @@ class AttachmentAssetService extends KalturaAssetService
 	protected function attachUrl(AttachmentAsset $attachmentAsset, $url)
 	{
 		$fileNAme = basename($url);
-		if($fileNAme > self::MAX_FILE_NAME_LENGTH)
+		if(strlen($fileNAme) > self::MAX_FILE_NAME_LENGTH)
 		{
 			$fileNAme = md5($url);
 		}
