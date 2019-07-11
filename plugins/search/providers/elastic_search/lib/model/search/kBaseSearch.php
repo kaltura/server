@@ -39,7 +39,7 @@ abstract class kBaseSearch
 
 	protected abstract function execSearch(ESearchOperator $eSearchOperator);
 
-	protected abstract function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null);
+	protected abstract function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations=null);
 
 	protected function initPager(kPager $pager = null)
 	{
