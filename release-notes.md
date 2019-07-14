@@ -23,7 +23,7 @@ params.pythonCmd                                    = @LOCATION_OF_PYTHON3@
 
 
 ### Deployment scripts ###
-    None
+    Install Plugins
     
 ## Add permission in the admin console to include live entries in the mrss feed ##
 
