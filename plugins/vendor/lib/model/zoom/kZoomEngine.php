@@ -12,6 +12,8 @@ class kZoomEngine
 	const REFERENCE_FILTER = '_eq_reference_id';
 	const ZOOM_PREFIX = 'Zoom_';
 	const ZOOM_LOCK_TTL = 120;
+	const ZOOM_TRANSCRIPT_FILE_TYPE = 'vtt';
+	const ZOOM_CHAT_FILE_TYPE = 'txt';
 
 	protected static $FILE_VIDEO_TYPES = array('MP4');
 	protected static $FILE_CAPTION_TYPES = array('TRANSCRIPT');
@@ -327,6 +329,7 @@ class kZoomEngine
 		$caption->setPartnerId($entry->getPartnerId());
 		$caption->setContainerFormat(CaptionType::WEBVTT);
 		$caption->setStatus(CaptionAsset::ASSET_STATUS_QUEUED);
+		$caption->setFileExt(self::ZOOM_TRANSCRIPT_FILE_TYPE);
 		$caption->save();
 		return $caption;
 	}
@@ -342,6 +345,7 @@ class kZoomEngine
 		$attachment->setPartnerId($entry->getPartnerId());
 		$attachment->setEntryId($entry->getId());
 		$attachment->setcontainerFormat(AttachmentType::TEXT);
+		$attachment->setFileExt(self::ZOOM_CHAT_FILE_TYPE);
 		$attachment->save();
 		return $attachment;
 	}
