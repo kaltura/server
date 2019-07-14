@@ -3,29 +3,38 @@
 class kResourceReservation
 {
 	/**
-	 * @var ResourceReservation $resourceReservator
+	 * @var binaryResourceReservation $resourceReservator
 	 */
 	private $resourceReservator;
 
-	function __construct($ttl = null)
+	function __construct($ttl = null, $binaryReservator = false)
 	{
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_RESOURCE_RESERVATION);
 		$ks = kCurrentContext::$ks;
 		if (!$ttl)
+		{
 			$ttl = kConf::get('ResourceReservationDuration');
-		$this->resourceReservator = new ResourceReservation($cache, $ttl, $ks);
+		}
+
+		if($binaryReservator)
+		{
+			$this->resourceReservator = new binaryResourceReservation($cache, $ttl, $ks);
+		}
+		else
+		{
+			$this->resourceReservator = new ResourceReservation($cache, $ttl, $ks);
+		}
 	}
 
 
 	/**
 	 * will reserve the resource for some time
 	 * @param string $resourceId
-	 * @param bool $allowTimeExtension
 	 * @return bool - true if reserve and false if could not
 	 */
-	public function reserve($resourceId, $allowTimeExtension = true)
+	public function reserve($resourceId)
 	{
-		if ($this->resourceReservator->reserve($resourceId, $allowTimeExtension))
+		if ($this->resourceReservator->reserve($resourceId))
 		{
 			KalturaLog::info("Resource reservation was done successfully for resource id [$resourceId]");
 			return true;

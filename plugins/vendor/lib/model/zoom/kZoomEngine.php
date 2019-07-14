@@ -140,7 +140,7 @@ class kZoomEngine
 		/* @var kZoomMeeting $meeting */
 		$meeting = $event->object;
 
-		$resourceReservation = new kResourceReservation(self::ZOOM_LOCK_TTL);
+		$resourceReservation = new kResourceReservation(self::ZOOM_LOCK_TTL, true);
 		if(!$resourceReservation->reserve($meeting->id, false))
 		{
 			return;
