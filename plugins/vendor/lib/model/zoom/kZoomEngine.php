@@ -342,7 +342,7 @@ class kZoomEngine
 	protected function createAttachmentAssetForChatFile($meetingId, $entry)
 	{
 		$attachment = new AttachmentAsset();
-		$attachment->setFilename("Meeting {$meetingId} chat file");
+		$attachment->setFilename("Meeting {$meetingId} chat file." . self::ZOOM_CHAT_FILE_TYPE);
 		$attachment->setPartnerId($entry->getPartnerId());
 		$attachment->setEntryId($entry->getId());
 		$attachment->setcontainerFormat(AttachmentType::TEXT);
