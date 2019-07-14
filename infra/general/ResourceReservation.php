@@ -44,19 +44,23 @@ class ResourceReservation
 	/**
 	 * will reserve the resource for some time
 	 * @param string $resourceId
-	 *
+	 * @param bool $allowTimeExtension
 	 * @return bool - true if reserve and false if could not
 	 */
-	public function reserve($resourceId)
+	public function reserve($resourceId, $allowTimeExtension = true)
 	{
 		if ($this->cache)
 		{
 			$key = $this->getCacheKeyForResource($resourceId);
 			if ($this->cache->add($key, $this->userToken, $this->ttl))
+			{
 				return true;
+			}
 			$val = $this->cache->get($key);
-			if ($val == $this->userToken) //only the one that reserve the resource can ovreride the reserve (time extention)
+			if ($allowTimeExtension && $val == $this->userToken) //only the one that reserve the resource can override the reserve (time extending)
+			{
 				return $this->cache->set($key, $this->userToken, $this->ttl);
+			}
 		}
 		return false;
 	}

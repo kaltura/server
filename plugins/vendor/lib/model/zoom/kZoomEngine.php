@@ -11,6 +11,7 @@ class kZoomEngine
 	const URL_ACCESS_TOKEN = '?access_token=';
 	const REFERENCE_FILTER = '_eq_reference_id';
 	const ZOOM_PREFIX = 'Zoom_';
+	const ZOOM_LOCK_TTL = 120;
 
 	protected static $FILE_VIDEO_TYPES = array('MP4');
 	protected static $FILE_CAPTION_TYPES = array('TRANSCRIPT');
@@ -138,6 +139,13 @@ class kZoomEngine
 		$zoomIntegration = ZoomHelper::getZoomIntegration();
 		/* @var kZoomMeeting $meeting */
 		$meeting = $event->object;
+
+		$resourceReservation = new kResourceReservation(self::ZOOM_LOCK_TTL);
+		if(!$resourceReservation->reserve($meeting->id, false))
+		{
+			return;
+		}
+
 		$dbUser = $this->getEntryOwner($meeting->hostEmail, $zoomIntegration);
 		$this->initUserPermissions($dbUser);
 		$participantsUsersNames = $this->extractMeetingParticipants($meeting->id, $zoomIntegration, $dbUser->getPuserId());

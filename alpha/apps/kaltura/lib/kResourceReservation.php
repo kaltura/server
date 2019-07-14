@@ -20,16 +20,17 @@ class kResourceReservation
 	/**
 	 * will reserve the resource for some time
 	 * @param string $resourceId
-	 *
+	 * @param bool $allowTimeExtension
 	 * @return bool - true if reserve and false if could not
 	 */
-	public function reserve($resourceId)
+	public function reserve($resourceId, $allowTimeExtension = true)
 	{
-		if ($this->resourceReservator->reserve($resourceId))
+		if ($this->resourceReservator->reserve($resourceId, $allowTimeExtension))
 		{
 			KalturaLog::info("Resource reservation was done successfully for resource id [$resourceId]");
 			return true;
 		}
+
 		KalturaLog::info("Could not reserve resource id [$resourceId]");
 		return false;
 	}
