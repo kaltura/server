@@ -1,7 +1,7 @@
 <?php
 
 
-class binaryResourceReservation
+class BinaryResourceReservation
 {
 	CONST DEFAULT_TIME_IN_CACHE_FOR_RESERVATION = 5;
 
@@ -73,7 +73,7 @@ class binaryResourceReservation
 		{
 			return $this->cache->set($this->getCacheKeyForResource($resourceId), $this->userToken, $this->ttl);
 		}
-		
+
 		return false;
 	}
 

@@ -3,7 +3,7 @@
 class kResourceReservation
 {
 	/**
-	 * @var binaryResourceReservation $resourceReservator
+	 * @var BinaryResourceReservation $resourceReservator
 	 */
 	private $resourceReservator;
 
@@ -18,7 +18,7 @@ class kResourceReservation
 
 		if($binaryReservator)
 		{
-			$this->resourceReservator = new binaryResourceReservation($cache, $ttl, $ks);
+			$this->resourceReservator = new BinaryResourceReservation($cache, $ttl, $ks);
 		}
 		else
 		{

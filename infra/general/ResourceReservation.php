@@ -1,7 +1,7 @@
 <?php
 
 
-class ResourceReservation extends binaryResourceReservation
+class ResourceReservation extends BinaryResourceReservation
 {
 	/**
 	 * will reserve the resource for some time
