@@ -85,11 +85,12 @@ class kZoomEngine
 		$this->initUserPermissions($dbUser, true);
 		$captionAssetService = new CaptionAssetService();
 		$captionAssetService->initService('caption_captionasset', 'captionAsset', 'setContent');
+		$resourceReservation = new kResourceReservation(self::ZOOM_LOCK_TTL, true);
 		foreach ($transcript->recordingFiles as $recordingFile)
 		{
 			/* @var kZoomRecordingFile $recordingFile */
 
-			if (!in_array ($recordingFile->fileType, self::$FILE_CAPTION_TYPES))
+			if (!in_array ($recordingFile->fileType, self::$FILE_CAPTION_TYPES) || !$resourceReservation->reserve($recordingFile->id))
 			{
 				continue;
 			}
