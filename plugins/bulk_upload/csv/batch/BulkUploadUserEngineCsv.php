@@ -358,9 +358,13 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		foreach ($this->groupActionsList as $group)
 		{
 			if (strpos($group->group, "-") !== 0)
-				$usersToAddList[]=$group;
+			{
+				$usersToAddList[] = $group;
+			}
 			else
-				$userGroupToDeleteMap[$group->userId] = substr($group->group, 1);
+			{
+				$userGroupToDeleteMap[] = array($group->userId, substr($group->group, 1));
+			}
 		}
 	}
 
@@ -379,8 +383,9 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 	private function deleteUsers($usersMap)
 	{
 		$ret = array();
-		foreach ($usersMap as $userId=>$group)
+		foreach ($usersMap as $user)
 		{
+			list($userId,$group) = $user;
 			$this->handleMultiRequest($ret);
 			KBatchBase::$kClient->groupUser->delete($userId, $group);
 		}
