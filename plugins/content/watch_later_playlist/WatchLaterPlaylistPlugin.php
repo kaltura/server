@@ -1,6 +1,6 @@
 <?php
 /**
- * Enable entry objects management that relates to user object...?
+ * Plugin enabling the storage of entries that relates to a user in a watch later playlist
  * @package plugins.watchLaterPlaylist
  */
  class WatchLaterPlaylistPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader
