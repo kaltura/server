@@ -5,7 +5,6 @@
  */
 class KalturaWatchLaterPlaylistUserEntry extends KalturaUserEntry
 {
-
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
 	 */
