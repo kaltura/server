@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.watchLaterPlaylist
+ * @package plugins.watchLater
  * @subpackage api
  */
-class KalturaWatchLaterPlaylistUserEntry extends KalturaUserEntry
+class KalturaWatchLaterUserEntry extends KalturaUserEntry
 {
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
@@ -12,7 +12,7 @@ class KalturaWatchLaterPlaylistUserEntry extends KalturaUserEntry
 	{
 		if(is_null($dbObject))
 		{
-			$dbObject = new WatchLaterPlaylistUserEntry();
+			$dbObject = new WatchLaterUserEntry();
 		}
 
 		return parent::toObject($dbObject, $propertiesToSkip);

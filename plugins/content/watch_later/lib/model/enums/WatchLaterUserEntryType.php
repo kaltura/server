@@ -1,11 +1,11 @@
 <?php
 /**
- * @package plugins.watchLaterPlaylist
+ * @package plugins.watchLater
  * @subpackage model.enum
  */
-class WatchLaterPlaylistUserEntryType implements IKalturaPluginEnum, UserEntryType
+class WatchLaterUserEntryType implements IKalturaPluginEnum, UserEntryType
 {
-	const WATCH_LATER_PLAYLIST = "WATCH_LATER_PLAYLIST";
+	const WATCH_LATER = 'WATCH_LATER';
 
 	/* (non-PHPdoc)
 	 * @see IKalturaPluginEnum::getAdditionalValues()
@@ -13,7 +13,7 @@ class WatchLaterPlaylistUserEntryType implements IKalturaPluginEnum, UserEntryTy
 	public static function getAdditionalValues()
 	{
 		return array(
-			"WATCH_LATER_PLAYLIST" => self::WATCH_LATER_PLAYLIST,
+			'WATCH_LATER' => self::WATCH_LATER,
 		);
 	}
 
@@ -23,7 +23,7 @@ class WatchLaterPlaylistUserEntryType implements IKalturaPluginEnum, UserEntryTy
 	public static function getAdditionalDescriptions()
 	{
 		return array(
-			self::WATCH_LATER_PLAYLIST => 'Watch Later Playlist User Entry Type',
+			self::WATCH_LATER => 'Watch Later User Entry Type',
 		);
 	}
 }

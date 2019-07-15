@@ -6,7 +6,7 @@
 - Issue ID: PLAT-9998
 
 ### configuration ###
-Add WatchLaterPlaylist to your plugins.ini
+Add WatchLater to your plugins.ini
 
 ### Deployment scripts ###
 php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
