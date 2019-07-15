@@ -58,6 +58,7 @@ class BinaryResourceReservation
 				return true;
 			}
 		}
+
 		return false;
 	}
 
