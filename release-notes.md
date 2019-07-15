@@ -1,6 +1,6 @@
 # Orion 15.3.0 #
 
-## Add new type of userEntry called watch later playlist ##
+## Add new type of userEntry called watch later ##
 
 - Issue Type: Task
 - Issue ID: PLAT-9998
