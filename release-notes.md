@@ -1,5 +1,17 @@
 # Orion 15.3.0 #
 
+## Add new type of userEntry called watch later ##
+
+- Issue Type: Task
+- Issue ID: PLAT-9998
+
+### configuration ###
+Add WatchLater to your plugins.ini
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+
 ## Add new caption type SCC to convert from SCC to SRT automatically on upload of scc captions ##
 
 - Issue Type: Feature
