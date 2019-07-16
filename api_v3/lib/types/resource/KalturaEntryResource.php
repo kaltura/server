@@ -46,7 +46,7 @@ class KalturaEntryResource extends KalturaContentResource
 			$fileSync = kFileSyncUtils::resolve($fileSync);
 			if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_LINK)
 			{
-				if (!$local || file_exists($fileSync->getFullPath()))
+				if (!$local || kFile::checkFileExists($fileSync->getFullPath()))
 				{
 					return true;
 				}
