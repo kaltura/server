@@ -158,7 +158,7 @@ abstract class kBaseUploadTokenMgr
 			$fileSize = $this->handleResume($fileData, $resumeAt);
 		else
 		{
-			$fileSize = $this->handleMoveFile($fileData);
+			$fileSize = $this->handleMoveFile($fileData, $resumeAt);
 		}
 
 		if ($this->_finalChunk)
@@ -300,7 +300,7 @@ abstract class kBaseUploadTokenMgr
 	 * @param $fileData
 	 * @throws kUploadTokenException
 	 */
-	protected function handleMoveFile($fileData)
+	protected function handleMoveFile($fileData, $resumeAt)
 	{
 		// get the upload path
 		$extension = $this->getFileExtension($fileData['name']);
@@ -320,7 +320,7 @@ abstract class kBaseUploadTokenMgr
 		kFile::chmod($uploadFilePath, 0600);
 		$fileSize = kFile::fileSize($uploadFilePath);
 
-		$updatedFileSize = $this->startFullFileUpload($uploadFilePath, $fileSize);
+		$updatedFileSize = $this->startFullFileUpload($uploadFilePath, $fileSize, $resumeAt);
 
 		//If uplaodToken is set to AutoFinalize set file size into memcache
 		if($this->_autoFinalize)
@@ -415,7 +415,7 @@ abstract class kBaseUploadTokenMgr
 		return $extension;
 	}
 
-	protected function startFullFileUpload($uploadFilePath, $fileSize)
+	protected function startFullFileUpload($uploadFilePath, $fileSize, $resumeAt)
 	{
 
 	}
