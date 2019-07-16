@@ -188,7 +188,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		
 		if($filter->is_set('_is_recorded_entry_id_empty'))
 		{
-			$cond = "in(" . entryIndex::DYNAMIC_ATTRIBUTES . "." . LiveEntry::RECORDED_ENTRY_ID .", '')";
+			$cond = 'in(' . entryIndex::DYNAMIC_ATTRIBUTES . '.' . LiveEntry::RECORDED_ENTRY_ID .", '')";
 			$this->addCondition($cond);
 			$filter->unsetByName('_is_recorded_entry_id_empty');
 		}
