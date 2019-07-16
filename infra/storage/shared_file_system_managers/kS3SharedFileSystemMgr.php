@@ -119,20 +119,22 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doCreateDirForPath($filePath)
 	{
+		$dirname = dirname($filePath);
+		if (!$this->doIsDir($dirname))
+		{
+			return $this->doMkdir($dirname);
+		}
+		
 		return true;
 	}
 	
 	protected function doCheckFileExists($filePath)
 	{
-		list($bucket, $filePathWithoutBucket) = $this->getBucketAndFilePath($filePath);
-		if($this->doIsDir($filePath))
-		{
-			return true;
-		}
-
+		list($bucket, $key) = $this->getBucketAndFilePath($filePath);
+		
 		try
 		{
-			$exists = $this->s3Client->doesObjectExist($bucket, $filePathWithoutBucket);
+			$exists = $this->s3Client->doesObjectExist($bucket, $key);
 		}
 		catch(Exception $e)
 		{
@@ -345,15 +347,28 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		stream_wrapper_unregister('http');
 		return true;
 	}
-
+	
 	protected function doFullMkdir($path, $rights = 0755, $recursive = true)
 	{
-		return true;
+		return $this->doFullMkfileDir(dirname($path), $rights, $recursive);
 	}
 
 	protected function doFullMkfileDir($path, $rights = 0777, $recursive = true)
 	{
-		return true;
+		if($this->doIsDir($path))
+		{
+			return;
+		}
+		
+		list($bucket, $key) = $this->getBucketAndFilePath($path);
+		$dirList = explode($key, "/");
+		$fullDir = "/$bucket/";
+		
+		while($currDir = array_shift($dirList))
+		{
+			$fullDir .= "$currDir/";
+			$this->doMkdir($fullDir);
+		}
 	}
 
 	protected function doMoveFile($from, $to, $override_if_exists = false, $copy = false)
@@ -381,27 +396,47 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doIsDir($path)
 	{
-		if( substr( $path, -strlen( "/" ) ) === "/" )
+		$res = $this->getHeadObjectForPath($path);
+		if(!$res)
 		{
-			return true;
+			return false;
 		}
-
-		$dirPath = $path . '/';
-		$fileList = $this->doListFiles($dirPath);
-		if(!isset($fileList['Contents']))
+		
+		$effectiveUrl = $res['@metadata']['effectiveUri'];
+		$contentLength = $res['ContentLength'];
+		
+		return ($contentLength == 0 && substr($effectiveUrl, -1) == "/") ? true : false;
+	}
+	
+	protected function getHeadObjectForPath()
+	{
+		list($bucket, $key) = self::getBucketAndFilePath($path);
+		
+		try
 		{
-			KalturaLog::debug("no files found under [$dirPath]");
+			$res = $client->headObject(array(
+				'Bucket' => $bucket,
+				'Key'    => $key
+			));
 		}
-		else if(count($fileList['Contents']) > 0)
+		catch (Exception $e)
 		{
-			return true;
+			KalturaLog::debug("Failed to fetch object head for file [$filePath], with error Error: {$e->getMessage()}");
+			return false;
 		}
-
-		return !strpos($path,'.');
+		
+		return $res;
 	}
 
 	protected function doMkdir($path)
 	{
+		list($bucket, $key) = self::getBucketAndFilePath($path);
+		
+		$result = $client->putObject(array(
+			'Bucket' => $bucket,
+			'Key'    => $key,
+		));
+		
 		return true;
 	}
 
@@ -611,14 +646,16 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doIsFile($filePath)
 	{
-		$fileList = $this->doListFiles($filePath);
-		if(!isset($fileList['Contents']))
+		$res = $this->getHeadObjectForPath($path);
+		if(!$res)
 		{
-			KalturaLog::debug("Could not determine if provided file path [$filePath], is file");
 			return false;
 		}
 		
-		return count($fileList['Contents']) == 1;
+		$effectiveUrl = $res['@metadata']['effectiveUri'];
+		$contentLength = $res['ContentLength'];
+		
+		return ($contentLength != 0 && substr($effectiveUrl, -1) != "/") ? true : false;
 	}
 	
 	protected function doRealPath($filePath, $getRemote = true)
@@ -716,12 +753,12 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
 
-		$fileList = $this->s3Client->getObject(array(
+		$fileMeta = $this->s3Client->getObject(array(
 			'Bucket' => $bucket,
 			'Key'    => $filePath
 		));
 		
-		return $fileList['Last-Modified'];
+		return $fileMeta['Last-Modified'];
 	}
 	
 	protected function doMoveLocalToShared($from, $to, $copy = false)
@@ -754,8 +791,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doCopyDir($src, $dest, $deleteSrc)
 	{
-
-		$paginator = $this->s3Client->getListObjectsPaginator($src);
+		$paginator = $this->getListObjectsPaginator($src);
+		list($bucket, $filePath) = $this->getBucketAndFilePath($src);
 
 		foreach ($paginator as $page)
 		{
@@ -769,7 +806,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 				$fileName = basename($object['Key']);
 
-				$res = kFile::copySingleFile ($object['Key'], $dest . DIRECTORY_SEPARATOR . $fileName , $deleteSrc);
+				$res = kFile::copySingleFile ("/$bucket/{$object['Key']}", $dest . DIRECTORY_SEPARATOR . $fileName , $deleteSrc);
 				if (! $res)
 				{
 					return false;
