@@ -603,7 +603,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 
 	protected function addWhereByConditionClause($conditionClause, $i, $filter = null)
 	{
-		if (strpos($conditionClause,LiveEntry::RECORDED_ENTRY_ID) !== false  && $filter && isset($filter->fields["_is_recorded_entry_id_empty"]))
+		if (strpos($conditionClause,LiveEntry::RECORDED_ENTRY_ID) !== false  && $filter && isset($filter->fields[KalturaLiveEntryFilter::IS_RECORDED_ENTRY_ID_EMPTY]))
 		{
 			if ($filter->fields[KalturaLiveEntryFilter::IS_RECORDED_ENTRY_ID_EMPTY] === false)
 			{
