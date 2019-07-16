@@ -484,8 +484,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				continue;
 			
 			$conditions .=	', (' . $this->conditionClause[$i] . ') as cnd' . $i . ' ';
-			$this->addWhere('cnd' . $i . ' > 0');
-			
+			$this->addWhereByConditionClause($conditionClause, $i, $filter );
 			$i++; 
 		}
 		
@@ -600,6 +599,25 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		kSphinxQueryCache::cacheSphinxQueryResults($pdo, $objectClass, $cacheKey, $queryResult, $sqlConditions);
 
 		$this->applySphinxResult($setLimit);
+	}
+
+	protected function addWhereByConditionClause($conditionClause, $i, $filter = null)
+	{
+		if (strpos($conditionClause,LiveEntry::RECORDED_ENTRY_ID) !== false  && $filter && isset($filter->fields["_is_recorded_entry_id_empty"]))
+		{
+			if ($filter->fields[KalturaLiveEntryFilter::IS_RECORDED_ENTRY_ID_EMPTY] === false)
+			{
+				$this->addWhere('cnd' . $i . ' <> 1');
+			}
+			else if ($filter->fields[KalturaLiveEntryFilter::IS_RECORDED_ENTRY_ID_EMPTY] === true)
+			{
+				$this->addWhere('cnd' . $i . ' <> 0');
+			}
+		}
+		else
+		{
+			$this->addWhere('cnd' . $i . ' > 0');
+		}
 	}
 	
 	protected function getSphinxIndexName()
