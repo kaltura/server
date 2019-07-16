@@ -26,7 +26,7 @@ class KalturaWebcamTokenResource extends KalturaDataCenterContentResource
 	    );
 	    
 	    foreach($entryFullPaths as $entryFullPath)
-			if(file_exists($entryFullPath))
+			if(kFile::checkFileExists($entryFullPath))
 				return kDataCenterMgr::getCurrentDcId();
 			
 		return (1 - kDataCenterMgr::getCurrentDcId()); // other dc
@@ -102,7 +102,7 @@ class KalturaWebcamTokenResource extends KalturaDataCenterContentResource
 	    
 	    foreach($entryFullPaths as $type => $entryFullPath)
 	    {
-			if(file_exists($entryFullPath))
+			if(kFile::checkFileExists($entryFullPath))
 			{
 				if($type == 'flv')
 				{

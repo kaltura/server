@@ -564,7 +564,7 @@ class kFileBase
 		if(kFile::isSharedPath($src))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
-			return $kSharedFsMgr->copyDir($src);
+			return $kSharedFsMgr->copyDir($src, $dest, $deleteSrc);
 		}
 
 		$dir = dir($src);
