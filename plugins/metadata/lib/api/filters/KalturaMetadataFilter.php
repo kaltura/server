@@ -99,7 +99,6 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 			$objectIds = array();
 			foreach($kusers as $kuser)
 				$objectIds[$kuser->getPuserId()] = $kuser->getId();
-			$objectIds = array_values($objectIds);
 		}
 		elseif($this->metadataObjectTypeEqual == MetadataObjectType::CATEGORY)
 		{
