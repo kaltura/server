@@ -28,8 +28,8 @@
 		const	DefaultChunkOverlap =  0.5; // secs
 		const	DefaultConcurrentChunks = 1;// secs
 		
-		public $ffmpegBin = "/opt/kaltura/bin/ffmpeg"; // Hack should be reverted
-		public $ffprobeBin = "/opt/kaltura/bin/ffprobe"; // Hack should be reverted
+		public $ffmpegBin = "ffmpeg";
+		public $ffprobeBin = "ffprobe";
 
 		public $commandExecitionScript = null;
 		
@@ -67,6 +67,9 @@
 			 * Update setup to defaults
 			 */
 			$this->concurrent = $this->concurrentMin = self::DefaultConcurrentChunks;
+			
+			$this->ffmpegBin = kConf::get('bin_path_ffmpeg') ? kConf::get('bin_path_ffmpeg') : "ffmpeg";
+			$this->ffprobeBin = kConf::get('bin_path_ffprobe') ? kConf::get('bin_path_ffprobe') : "ffprobe";
 		}
 		
 		/********************
