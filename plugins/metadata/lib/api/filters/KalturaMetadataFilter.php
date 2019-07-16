@@ -98,7 +98,8 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 			$kusers = !empty($objectIds) ? kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), $objectIds) : array();
 			$objectIds = array();
 			foreach($kusers as $kuser)
-				$objectIds[] = $kuser->getId();
+				$objectIds[$kuser->getPuserId()] = $kuser->getId();
+			$objectIds = array_values($objectIds);
 		}
 		elseif($this->metadataObjectTypeEqual == MetadataObjectType::CATEGORY)
 		{
