@@ -69,7 +69,7 @@ class kUploadTokenMgr extends kBaseUploadTokenMgr
 			
 			$currentFileSize = ftell($uploadFileResource);
 			
-			if($this->_autoFinalize && $this->_uploadToken->getFileSize() >= $currentFileSize)
+			if($this->_autoFinalize && $this->_uploadToken->getFileSize() <= $currentFileSize)
 				$this->_finalChunk = true;
 			
 			fclose($uploadFileResource);
