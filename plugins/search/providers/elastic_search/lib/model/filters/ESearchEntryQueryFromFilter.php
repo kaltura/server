@@ -212,6 +212,10 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 	protected function splitIntoParameters($filter, $field, $fieldValue )
 	{
 		$fieldParts = explode(entryFilter::FILTER_PREFIX, $field, 3);
+		if (count($fieldParts) < 3)
+		{
+			return null;
+		}
 		list( , $operator, $fieldName) = $fieldParts;
 		list($operator, $fieldName) = self::handlingFreeTextField($field, $operator, $fieldName);
 		if(!in_array($fieldName, static::getSupportedFields()) || is_null($fieldValue) || $fieldValue === '')

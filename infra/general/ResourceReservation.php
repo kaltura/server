@@ -10,15 +10,16 @@ class ResourceReservation extends BinaryResourceReservation
 	 */
 	public function reserve($resourceId)
 	{
-		$result = parent::reserve($resourceId);
-		if(!$result)
+		if(parent::reserve($resourceId))
 		{
-			$key = $this->getCacheKeyForResource($resourceId);
-			$val = $this->cache->get($key);
-			if ($val == $this->userToken) //only the one that reserve the resource can override the reserve (time extending)
-			{
-				return $this->cache->set($key, $this->userToken, $this->ttl);
-			}
+			return true;
+		}
+
+		$key = $this->getCacheKeyForResource($resourceId);
+		$val = $this->cache->get($key);
+		if ($val == $this->userToken) //only the one that reserve the resource can override the reserve (time extending)
+		{
+			return $this->cache->set($key, $this->userToken, $this->ttl);
 		}
 
 		return false;
