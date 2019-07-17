@@ -40,7 +40,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	protected $conditionClause = array();
 
 	/**
-	 * Sphinx condition clauses that equals to Zero
+	 * Sphinx condition clauses equal to Zero
 	 * @var array
 	 */
 	protected $conditionClauseEqualsZero = array();
@@ -1107,9 +1107,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 	}
 
-	/* (non-PHPdoc)
- 	* @see IKalturaIndexQuery::addConditionEqualsZero()
- 	*/
 	public function addConditionEqualsZero($condition)
 	{
 		if(strlen(trim($condition)))
