@@ -51,6 +51,10 @@ class KalturaESearchMetadataAggregationItem extends KalturaESearchAggregationIte
 				// loop over the sub aggregations
 				$bucketsArray = new KalturaESearchAggregationBucketsArray();
 				$subBuckets = $bucket[ESearchMetadataAggregationItem::SUB_AGG][ESearchAggregations::BUCKETS];
+				if(!$subBuckets)
+				{
+					continue;
+				}
 				foreach($subBuckets as $subBucket)
 				{
 					$responseBucket = new KalturaESearchAggregationBucket();
