@@ -5,8 +5,6 @@
  */
 class KalturaLiveEntryFilter extends KalturaLiveEntryBaseFilter
 {
-	const IS_RECORDED_ENTRY_ID_EMPTY = '_is_recorded_entry_id_empty';
-
 	public function __construct()
 	{
 		$this->typeIn = KalturaEntryType::LIVE_CHANNEL . ',' . KalturaEntryType::LIVE_STREAM;

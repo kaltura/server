@@ -38,6 +38,12 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 * @var array
 	 */
 	protected $conditionClause = array();
+
+	/**
+	 * Sphinx condition clauses that equals to Zero
+	 * @var array
+	 */
+	protected $conditionClauseEqualsZero = array();
 	
 	/**
 	 * Sphinx orderby clauses
@@ -484,8 +490,20 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				continue;
 			
 			$conditions .=	', (' . $this->conditionClause[$i] . ') as cnd' . $i . ' ';
-			$this->addWhereByConditionClause($conditionClause, $i, $filter );
-			$i++; 
+			$this->addWhere('cnd' . $i . ' > 0');
+			
+			$i++;
+		}
+		foreach ($this->conditionClauseEqualsZero as $conditionClause)
+		{
+			if ($conditionClause == '')
+			{
+				continue;
+			}
+
+			$conditions .=	', (' . $conditionClause . ') as cnd' . $i . ' ';
+			$this->addWhere('cnd' . $i . ' = 0');
+			$i++;
 		}
 		
 		$wheres = '';
@@ -599,26 +617,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		kSphinxQueryCache::cacheSphinxQueryResults($pdo, $objectClass, $cacheKey, $queryResult, $sqlConditions);
 
 		$this->applySphinxResult($setLimit);
-	}
-
-	protected function addWhereByConditionClause($conditionClause, $i, $filter)
-	{
-		if (strpos($conditionClause,LiveEntry::RECORDED_ENTRY_ID) !== false  &&
-			$filter && isset($filter->fields[KalturaLiveEntryFilter::IS_RECORDED_ENTRY_ID_EMPTY]))
-		{
-			if ($filter->fields[KalturaLiveEntryFilter::IS_RECORDED_ENTRY_ID_EMPTY] === false)
-			{
-				$this->addWhere('cnd' . $i . ' <> 1');
-			}
-			else if ($filter->fields[KalturaLiveEntryFilter::IS_RECORDED_ENTRY_ID_EMPTY] === true)
-			{
-				$this->addWhere('cnd' . $i . ' <> 0');
-			}
-		}
-		else
-		{
-			$this->addWhere('cnd' . $i . ' > 0');
-		}
 	}
 	
 	protected function getSphinxIndexName()
@@ -1106,6 +1104,18 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		{
 			KalturaLog::debug("Added [$condition]");
 			$this->conditionClause[] = $condition;
+		}
+	}
+
+	/* (non-PHPdoc)
+ 	* @see IKalturaIndexQuery::addConditionEqualsZero()
+ 	*/
+	public function addConditionEqualsZero($condition)
+	{
+		if(strlen(trim($condition)))
+		{
+			KalturaLog::debug("Added [$condition]");
+			$this->conditionClauseEqualsZero[] = $condition;
 		}
 	}
 	
