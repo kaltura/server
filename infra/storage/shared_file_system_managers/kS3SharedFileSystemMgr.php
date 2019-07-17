@@ -408,13 +408,13 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return ($contentLength == 0 && substr($effectiveUrl, -1) == "/") ? true : false;
 	}
 	
-	protected function getHeadObjectForPath()
+	protected function getHeadObjectForPath($path)
 	{
 		list($bucket, $key) = self::getBucketAndFilePath($path);
 		
 		try
 		{
-			$res = $client->headObject(array(
+			$res = $this->s3Client->headObject(array(
 				'Bucket' => $bucket,
 				'Key'    => $key
 			));
@@ -432,7 +432,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		list($bucket, $key) = self::getBucketAndFilePath($path);
 		
-		$result = $client->putObject(array(
+		$result = $this->s3Client->putObject(array(
 			'Bucket' => $bucket,
 			'Key'    => $key,
 		));
