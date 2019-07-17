@@ -493,9 +493,10 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 		$this->_uploadToken->setUploadTempPath($finalFilePath);
 	}
 
-	/*
+	/**
 	 * get the final path for the multipart full upload
 	 *
+	 * @return string
 	 */
 	protected function getFinalFilePath()
 	{
