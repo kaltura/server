@@ -27,6 +27,12 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	 */
 	protected static $optimized;
 
+	/**
+	 * remaining data we need to concatenate to final chunk in order to avoid breaking as chunk limit
+	 * @var array
+	 */
+	protected static $lastChunk;
+
 	const MULTIPART_CACHE_POSTFIX = '.multipart';
 
 
@@ -333,13 +339,12 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 			// handle the chunk given in the request after appending available existing chunks
 			if($resumeAt == $currentFileSize)
 			{
-				$currentFileSize = $this->appendChunk($sourceFilePath, $resumeAt, $chunkSize, $chunkFilePath);
+				$currentFileSize = $this->handleAppend($sourceFilePath, $chunkSize, $chunkFilePath, $resumeAt);
 			}
 			else
 			{
 				$this->uploadChunk($sourceFilePath, $chunkFilePath, $chunkSize, $resumeAt);
 			}
-
 		}
 
 		kLock::runLocked($this->_uploadToken->getId(), array($this, 'updateUploadedFileSize'), array($currentFileSize));
@@ -406,6 +411,10 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 			if($concatSize == $chunkResumeAt)
 			{
 				$uploadedSize = $this->appendWaitingChunks($chunksToUpload, $uploadedSize);
+				if(self::$lastChunk)
+				{
+					$uploadedSize += self::$lastChunk['partSize'];
+				}
 			}
 
 			KalturaLog::log("handleResume iteration: $count  chunkSize: $chunkSize finalChunk: {$this->_finalChunk} currentFileSize: $uploadedSize expectedFileSize: $expectedFileSize");
@@ -548,41 +557,49 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 		$chunksToUpload = array();
 		foreach ($partsToConcat as $partNum => $part)
 		{
-			$uploadFilePath = dirname($this->_uploadToken->getUploadTempPath()) . '/' . $currentFileSize . 'part_' . $partNum;
-			$uploadId = self::$sharedFsMgr->createMultipartUpload($uploadFilePath);
-			if(!$uploadId)
-			{
-				throw new kUploadTokenException("multipart upload error during part upload", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_UPLOAD_ERROR);
-			}
+			$uploadFilePath = dirname($this->_uploadToken->getUploadTempPath()) . '/' . $currentFileSize . '_part_' . $partNum;
 
-			$innerPartNum = 1;
-			$innerParts = array();
+			$body = '';
 			$partSize = 0;
 			foreach ($part as $smallChunk)
 			{
-				$copySuccess = self::$sharedFsMgr->multipartUploadPartCopy($uploadId, $innerPartNum, $smallChunk['partPath'], $uploadFilePath);
-				if(!$copySuccess)
-				{
-					throw new kUploadTokenException("Failed to copy part from [{$smallChunk['partPath']}] to multipart in [{$uploadFilePath}]", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_UPLOAD_ERROR);
-				}
-				$innerParts['Parts'][$innerPartNum] = array(
-					'PartNumber' => $innerPartNum,
-					'ETag' => $copySuccess['CopyPartResult']['ETag'],
-				);
-				$innerPartNum++;
-				$partSize+= $smallChunk['partSize'];
+				$body .= kFile::getFileContent($smallChunk['partPath']);
+				$partSize += $smallChunk['partSize'];
 			}
 
-			KalturaLog::debug("Inner upload parts: " . print_r($innerParts, true));
-			$result = self::$sharedFsMgr->completeMultipartUpload($uploadFilePath, $uploadId, $innerParts);
-			if(!$result)
+			KalturaLog::debug("Part size: $partSize");
+			kfile::filePutContents($uploadFilePath, $body);
+
+			if($partSize < kS3SharedFileSystemMgr::MIN_PART_SIZE)
 			{
-				throw new kUploadTokenException("multipart upload error during part upload", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_UPLOAD_ERROR);
+				self::$lastChunk =  array('partPath' => $uploadFilePath, 'partSize' =>  $partSize);
 			}
-
-			$chunksToUpload['Parts'][$partNum] = array('partPath' => $uploadFilePath, 'partSize' =>  $partSize);
+			else
+			{
+				$chunksToUpload[$partNum] = array('partPath' => $uploadFilePath, 'partSize' =>  $partSize);
+			}
 		}
+
+		KalturaLog::debug("ChunksToUpload: " . print_r($chunksToUpload, true));
+
 		return $chunksToUpload;
+	}
+
+	protected function handleAppend($sourceFilePath, $chunkSize, $chunkFilePath, $resumeAt)
+	{
+		if (!self::$optimized && self::$lastChunk)
+		{
+			$body = kFile::getFileContent(self::$lastChunk['partPath']);
+			$body .= kFile::getFileContent($sourceFilePath);
+			KalturaLog::debug('Last part: ' . print_r(self::$lastChunk, true));
+			$partSize = self::$lastChunk['partSize'] + $chunkSize;
+			kfile::filePutContents($chunkFilePath, $body);
+			KalturaLog::debug("Part size: $partSize");
+			$lastChunkResumeAt = $resumeAt - self::$lastChunk['partSize'];
+			return $this->appendChunk(null, $lastChunkResumeAt, $partSize, $chunkFilePath, false);
+		}
+
+		return $this->appendChunk($sourceFilePath, $resumeAt, $chunkSize, $chunkFilePath);
 	}
 
 }
