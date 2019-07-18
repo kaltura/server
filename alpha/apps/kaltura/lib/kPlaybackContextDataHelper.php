@@ -392,8 +392,19 @@ class kPlaybackContextDataHelper
 				$protocols = $this->constructProtocols($deliveryProfile, $contextDataHelper);
 				if (!empty($protocols))
 				{
-					$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $protocols, $deliveryProfile->getStreamerType(), $playbackFlavors, $deliveryProfile->getId());
-					$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), implode(",", $protocols), implode(",", array_keys($playbackFlavors)), $manifestUrl, $drmData);
+					if($deliveryProfile->getStreamerType() === PlaybackProtocol::HTTP)
+					{
+							foreach ($playbackFlavors as $flavorId => $value)
+							{
+								$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $protocols, $deliveryProfile->getStreamerType(), array($value), $deliveryProfile->getId());
+								$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), implode(",", $protocols),$flavorId, $manifestUrl, $drmData);
+							}
+					}
+					else
+					{
+						$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $protocols, $deliveryProfile->getStreamerType(), $playbackFlavors, $deliveryProfile->getId());
+						$this->localPlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), implode(",", $protocols), implode(",", array_keys($playbackFlavors)), $manifestUrl, $drmData);
+					}
 				}
 			}
 		}
