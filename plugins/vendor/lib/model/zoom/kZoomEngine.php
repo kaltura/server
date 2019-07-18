@@ -14,6 +14,7 @@ class kZoomEngine
 	const ZOOM_LOCK_TTL = 120;
 	const ZOOM_TRANSCRIPT_FILE_TYPE = 'vtt';
 	const ZOOM_CHAT_FILE_TYPE = 'txt';
+	const ZOOM_LABEL = 'Zoom';
 
 	protected static $FILE_VIDEO_TYPES = array('MP4');
 	protected static $FILE_CAPTION_TYPES = array('TRANSCRIPT');
@@ -328,6 +329,8 @@ class kZoomEngine
 		$caption = new CaptionAsset();
 		$caption->setEntryId($entry->getId());
 		$caption->setPartnerId($entry->getPartnerId());
+		$caption->setLanguage(KalturaLanguage::EN);
+		$caption->setLabel(self::ZOOM_LABEL);
 		$caption->setContainerFormat(CaptionType::WEBVTT);
 		$caption->setStatus(CaptionAsset::ASSET_STATUS_QUEUED);
 		$caption->setFileExt(self::ZOOM_TRANSCRIPT_FILE_TYPE);
