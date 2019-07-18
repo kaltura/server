@@ -421,7 +421,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch (Exception $e)
 		{
-			KalturaLog::debug("Failed to fetch object head for file [$filePath], with error Error: {$e->getMessage()}");
+			KalturaLog::debug("Failed to fetch object head for file [$path], with error Error: {$e->getMessage()}");
 			return false;
 		}
 		
@@ -646,7 +646,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doIsFile($filePath)
 	{
-		$res = $this->getHeadObjectForPath($path);
+		$res = $this->getHeadObjectForPath($filePath);
 		if(!$res)
 		{
 			return false;
