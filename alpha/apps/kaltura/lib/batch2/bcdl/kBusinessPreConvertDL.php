@@ -294,7 +294,7 @@ class kBusinessPreConvertDL
 		$srcPath = $fileSync->getFullPath();
 		$uniqid = uniqid('thumb_');
 		$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
-		if(!file_exists($tempDir))
+		if(!kFile::checkFileExists($tempDir))
 			mkdir($tempDir, 0700, true);
 		$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . '.jpg';
 
@@ -339,8 +339,8 @@ class kBusinessPreConvertDL
 				$uniqid = uniqid('thumb_');
 
 				$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
-				if(!file_exists($tempDir))
-					mkdir($tempDir, 0700, true);
+				if(!kFile::checkFileExists($tempDir))
+					kFile::mkdir($tempDir, 0700, true);
 				$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . '.jpg';
 			}
 
@@ -348,7 +348,7 @@ class kBusinessPreConvertDL
 			{
 				$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
 				if(!kFile::checkFileExists($tempDir))
-					mkdir($tempDir, 0700, true);
+					kFile::mkdir($tempDir, 0700, true);
 				$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . "." . $srcAsset->getFileExt();
 			}
 
