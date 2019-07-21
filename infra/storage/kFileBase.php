@@ -455,7 +455,7 @@ class kFileBase
 		if(kFile::isSharedPath($path))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
-			return !$kSharedFsMgr->isFile($path);
+			return $kSharedFsMgr->isDir($path);
 		}
 
 		return is_dir($path);
@@ -537,15 +537,15 @@ class kFileBase
 		return copy($from, $to);
 	}
 
-	public static function mkdir($path)
+	public static function mkdir($path, $mode = 0777, $recursive = false)
 	{
 		if(kFile::isSharedPath($path))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
-			return $kSharedFsMgr->mkdir($path);
+			return $kSharedFsMgr->mkdir($path, $mode, $recursive);
 		}
 
-		return mkdir($path);
+		return mkdir($path, $mode, $recursive);
 	}
 
 	public static function rmdir($path)

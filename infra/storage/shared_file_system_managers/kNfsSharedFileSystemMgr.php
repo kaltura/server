@@ -170,9 +170,9 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 		return is_dir($path);
 	}
 
-	protected function doMkdir($path)
+	protected function doMkdir($path, $mode, $recursive)
 	{
-		return mkdir($path);
+		return mkdir($path, $mode, $recursive);
 	}
 
 	protected function doRmdir($path)

@@ -168,9 +168,11 @@ abstract class kSharedFileSystemMgr
 	 * creates path directory
 	 *
 	 * @param $path dir path
+	 * @param $mode mode for the dir
+	 * @param $recursive should create recursively
 	 * @return true / false according to success
 	 */
-	abstract protected function doMkdir($path);
+	abstract protected function doMkdir($path, $mode, $recursive);
 
 	/**
 	 * removes path directory
@@ -414,9 +416,9 @@ abstract class kSharedFileSystemMgr
 		return $this->doIsDir($path);
 	}
 
-	public function mkdir($path)
+	public function mkdir($path, $mode = 0777, $recursive = false)
 	{
-		return $this->doMkdir($path);
+		return $this->doMkdir($path, $mode, $recursive);
 	}
 
 	public function rmdir($path)

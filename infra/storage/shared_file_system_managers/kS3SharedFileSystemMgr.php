@@ -428,7 +428,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return $res;
 	}
 
-	protected function doMkdir($path)
+	protected function doMkdir($path, $mode, $recursive)
 	{
 		list($bucket, $key) = self::getBucketAndFilePath($path);
 		
