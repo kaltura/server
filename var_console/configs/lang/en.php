@@ -259,6 +259,9 @@ return array(
 	'Kaltura_Client_ContentDistribution_Enum_DistributionProfileStatus::ENABLED' => 'Enabled',
 	'Kaltura_Client_ContentDistribution_Enum_DistributionProfileStatus::DISABLED' => 'Disabled',
 
+	'Kaltura_Client_ContentDistribution_Enum_DistributeTrigger::ENTRY_READY' => 'On entry ready',
+	'Kaltura_Client_ContentDistribution_Enum_DistributeTrigger::MODERATION_APPROVED'  => 'On moderation approved',
+
 	'init client failed' => 'Could not initiate the Kaltura client',
 	'entry not found' => 'Entry not found',
 	'partner not found' => 'Publisher not found',

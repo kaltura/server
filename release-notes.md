@@ -1,3 +1,61 @@
+# Orion 15.3.0 #
+
+## Add new type of userEntry called watch later ##
+
+- Issue Type: Task
+- Issue ID: PLAT-9998
+
+### configuration ###
+Add WatchLater to your plugins.ini
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+
+## Add new caption type SCC to convert from SCC to SRT automatically on upload of scc captions ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-9902
+
+### configuration ### 
+make sure python3 and pycaption for python 3 are installed
+
+Add the following to batch.ini:
+
+enabledWorkers.KAsyncConvertCaptionAsset	    = xxx (number of workers)
+
+[KAsyncConvertCaptionAsset : JobHandlerWorker]
+id                                                  = 770
+name                                                = KAsyncConvertCaptionAsset
+friendlyName                                        = convert caption asset
+type                                                = KAsyncConvertCaptionAsset
+maximumExecutionTime                                = 300
+scriptPath                                          = ../plugins/content/caption/base/batch/ConvertCaptions/KAsyncConvertCaptionAssetExe.php
+params.pythonCmd                                    = @LOCATION_OF_PYTHON3@
+
+
+### Deployment scripts ###
+    Install Plugins
+    
+## Add permission in the admin console to include live entries in the mrss feed ##
+
+- Issue Type: Feature
+- Issue ID: PSVAMB-7785
+
+### configuration ###
+    Add the following to admin.ini:
+
+    moduls.feedWithLiveEntries.enabled = true
+    moduls.feedWithLiveEntries.permissionType = 2
+    moduls.feedWithLiveEntries.label = "Include live entries in feed"
+    moduls.feedWithLiveEntries.permissionName = FEATURE_LIVE_ENTRIES_IN_FEED
+    moduls.feedWithLiveEntries.basePermissionType =
+    moduls.feedWithLiveEntries.basePermissionName =
+    moduls.feedWithLiveEntries.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+    None
+    
 # Orion 15.1.0 #
 ## New thumbnail API  ##
 - Issue Type: Epic
