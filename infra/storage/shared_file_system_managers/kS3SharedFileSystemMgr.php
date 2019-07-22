@@ -442,7 +442,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doCopySingleFile($src, $dest, $deleteSrc)
 	{
-		if(kFile::isSharedPath($src))
+		if(!kFile::isSharedPath($src))
 		{
 			return $this->copyFileLocalToShared($src, $dest, $deleteSrc);
 		}
