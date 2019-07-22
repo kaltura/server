@@ -109,7 +109,7 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 	
 	protected function parseOutput($output)
 	{
-		$output = kFile::filePutContents("$this->targetPath.log");
+		$output = kFile::getFileContent("$this->targetPath.log");
 		if(strpos($output,"first frame not a keyframe")===false
 		&& strpos($output,"first frame is no keyframe")===false){
 			return true;
