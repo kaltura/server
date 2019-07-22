@@ -500,7 +500,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			{
 				continue;
 			}
-
 			$conditions .=	', (' . $conditionClause . ') as cnd' . $i . ' ';
 			$this->addWhere('cnd' . $i . ' = 0');
 			$i++;
