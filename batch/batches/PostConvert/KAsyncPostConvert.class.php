@@ -220,7 +220,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		}
 		
 		$uniqid = uniqid('thumb_');
-		$sharedFile = realpath($rootPath) . DIRECTORY_SEPARATOR . $uniqid;
+		$sharedFile = kFile::realpath($rootPath, false) . DIRECTORY_SEPARATOR . $uniqid;
 		
 		clearstatcache();
 		$fileSize = kFile::fileSize($data->thumbPath);
