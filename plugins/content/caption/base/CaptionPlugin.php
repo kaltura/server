@@ -543,7 +543,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 				$useThreeCodeLang = false;
 				$threeCodeLanguagePartnersMap = kConf::getMap('three_code_language_partners');
-				if(in_array($entry->getPartnerId(),$threeCodeLanguagePartnersMap))
+				if(in_array($entry->getPartnerId(), $threeCodeLanguagePartnersMap))
 				{
 					$useThreeCodeLang = true;
 				}
@@ -647,7 +647,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 			$playbackCaptions = array();
 			$useThreeCodeLang = false;
 			$threeCodeLanguagePartnersMap = kConf::getMap('three_code_language_partners');
-			if(in_array($entry->getPartnerId(),$threeCodeLanguagePartnersMap))
+			if(in_array($entry->getPartnerId(), $threeCodeLanguagePartnersMap))
 			{
 				$useThreeCodeLang = true;
 			}

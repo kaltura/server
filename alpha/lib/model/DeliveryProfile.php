@@ -306,7 +306,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 
 		$useTwoCodeLang = true;
 		$threeCodeLanguagePartnersMap = kConf::getMap('three_code_language_partners');
-		if(in_array($flavor->getPartnerId(),$threeCodeLanguagePartnersMap))
+		if(in_array($flavor->getPartnerId(), $threeCodeLanguagePartnersMap))
 		{
 			$useTwoCodeLang = false;
 		}
