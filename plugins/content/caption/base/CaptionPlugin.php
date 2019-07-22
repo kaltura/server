@@ -646,7 +646,6 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 			$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), array(asset::ASSET_STATUS_READY));
 			$playbackCaptions = array();
 			$useThreeCodeLang = false;
-
 			$threeCodeLanguagePartnersMap = kConf::getMap('three_code_language_partners');
 			if(in_array($entry->getPartnerId(),$threeCodeLanguagePartnersMap))
 			{
