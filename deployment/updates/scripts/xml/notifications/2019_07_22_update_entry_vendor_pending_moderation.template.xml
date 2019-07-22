@@ -25,6 +25,7 @@
         <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
             <id>{1:result:objects:0:id}</id>
             <template objectType="KalturaEmailNotificationTemplate">
+                <subject>[AppTitle] - New request is awaiting approval</subject>
                 <eventConditions objectType="array">
                     <item objectType="KalturaEventFieldCondition">
                         <field objectType="KalturaEvalBooleanField">
