@@ -305,9 +305,11 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$audioLanguageName = null;
 
 		$useTwoCodeLang = true;
-		if (kConf::hasParam('three_code_language_partners') &&
-			in_array($flavor->getPartnerId(), kConf::get('three_code_language_partners')))
+		$threeCodeLanguagePartnersMap = kConf::getMap('three_code_language_partners');
+		if(in_array($flavor->getPartnerId(), $threeCodeLanguagePartnersMap))
+		{
 			$useTwoCodeLang = false;
+		}
 
 		if(!isset($lang)) { //for backward compatibility
 			$mediaInfoObj = $flavor->getMediaInfo();
