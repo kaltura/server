@@ -367,7 +367,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		while($currDir = array_shift($dirList))
 		{
 			$fullDir .= "$currDir/";
-			$this->doMkdir($fullDir);
+			$this->doMkdir($fullDir, $rights, $recursive);
 		}
 	}
 
