@@ -8,6 +8,7 @@ define('MAX_ITEMS', 2000);
 define('PARTNER_SECRET', 's');
 define('PARTNER_CRM_ID', 'ci');
 define('PARTNER_VERTICAL', 'v');
+define('PARTNER_PARENT_ID', 'pp');
 
 define('ENTRY_KUSER_ID', 'ku');
 define('ENTRY_TYPE', 't');
@@ -86,6 +87,7 @@ function getPartnerUpdates($updatedAt)
 	$c->addSelectColumn(PartnerPeer::STATUS);
 	$c->addSelectColumn(PartnerPeer::ADMIN_SECRET);
 	$c->addSelectColumn(PartnerPeer::CUSTOM_DATA);
+	$c->addSelectColumn(PartnerPeer::PARTNER_PARENT_ID);
 	$c->addSelectColumn(PartnerPeer::UPDATED_AT);
 	$c->add(PartnerPeer::UPDATED_AT, $updatedAt, Criteria::GREATER_EQUAL);
 	$c->addAscendingOrderByColumn(PartnerPeer::UPDATED_AT);
@@ -109,6 +111,7 @@ function getPartnerUpdates($updatedAt)
 				PARTNER_SECRET => $row['ADMIN_SECRET'],
 				PARTNER_CRM_ID => isset($customData['crmId']) ? $customData['crmId'] : '',
 				PARTNER_VERTICAL => getPartnerVertical($customData),
+				PARTNER_PARENT_ID => $row['PARTNER_PARENT_ID'],
 			);
 			$info = json_encode($info);
 		}
