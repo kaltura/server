@@ -597,7 +597,7 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 
 		foreach ($chunksToUpload as $nextChunk)
 		{
-			if($concatenatedChunkSize >= kS3SharedFileSystemMgr::MIN_PART_SIZE)
+			if($concatenatedChunkSize >= kS3SharedFileSystemMgr::MIN_PART_SIZE && !$this->reachedMaxPartsLimit())
 			{
 				$partNum++;
 				$concatenatedChunkSize = 0;
@@ -737,6 +737,25 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 		}
 		fclose($destFH);
 		return $partSize;
+	}
+
+	/**
+	 * check if we reached the max upload parts for the multipart
+	 *
+	 * @return bool
+	 * @throws kUploadTokenException
+	 */
+	protected function reachedMaxPartsLimit()
+	{
+		// we will need max of 2 more parts to upload for the full remaining part and for the final upload part
+		$maxParts = kS3SharedFileSystemMgr::MAX_PARTS_NUMBER - 2;
+		$multipartInfo = $this->getMultipartCache();
+
+		if($multipartInfo['partNumberAllocation'] >= $maxParts)
+		{
+			return true;
+		}
+		return false;
 	}
 
 }
