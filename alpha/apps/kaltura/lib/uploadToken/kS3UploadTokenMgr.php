@@ -631,14 +631,7 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 			$uploadFilePath = dirname($this->_uploadToken->getUploadTempPath()) . '/' . $currentFileSize . '_part_' . $partNum;
 			$tmpFilePath = '/tmp/' . $this->_uploadToken->getId() . '_' . $currentFileSize . '_part_' . $partNum;
 
-			$partSize = 0;
-			$destFH = fopen($tmpFilePath, "w");
-			foreach ($part as $smallChunk)
-			{
-				$this->increaseLocalTmpChunk($smallChunk['partPath'], $destFH);
-				$partSize += $smallChunk['partSize'];
-			}
-			fclose($destFH);
+			$partSize = $this->createLocalChunk($tmpFilePath, $part);
 
 			KalturaLog::debug("Part size: $partSize partNum:  $partNum tmpPath: $tmpFilePath");
 			self::$sharedFsMgr->getFileFromResource($tmpFilePath, $uploadFilePath);
@@ -652,8 +645,6 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 				$chunksToUpload[$partNum] = array('partPath' => $uploadFilePath, 'partSize' =>  $partSize);
 			}
 		}
-
-		KalturaLog::debug("Chunks To Upload: " . print_r($chunksToUpload, true));
 
 		return $chunksToUpload;
 	}
@@ -726,6 +717,26 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 		}
 
 		return $this->appendChunk($sourceFilePath, $resumeAt, $chunkSize, $chunkFilePath);
+	}
+
+	/**
+	 * create local chunk from concatenated small parts
+	 *
+	 * @param $tmpFilePath
+	 * @param $part
+	 * @return int
+	 */
+	protected function createLocalChunk($tmpFilePath, $part)
+	{
+		$partSize = 0;
+		$destFH = fopen($tmpFilePath, "w");
+		foreach ($part as $smallChunk)
+		{
+			$this->increaseLocalTmpChunk($smallChunk['partPath'], $destFH);
+			$partSize += $smallChunk['partSize'];
+		}
+		fclose($destFH);
+		return $partSize;
 	}
 
 }
