@@ -35,6 +35,8 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 
 	const MULTIPART_CACHE_POSTFIX = '.multipart';
 
+	const WAITING_PARTS_CACHE_POSTFIX = '.waitingParts';
+
 
 	public function __construct(UploadToken $uploadToken, $finalChunk = true)
 	{
@@ -50,7 +52,6 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	 * @param file $fileData
 	 * @param float $resumeAt
 	 * @return string
-	 * @throws PropelException
 	 * @throws kUploadTokenException
 	 */
 	protected function handleResume($fileData, $resumeAt)
@@ -130,6 +131,7 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 		self::$multipartCache = $cache;
 		$multipartInfo = array('uploadedFileSize' => 0);
 		self::$multipartCache->add($this->_uploadToken->getId() . self::MULTIPART_CACHE_POSTFIX, $multipartInfo);
+		self::$multipartCache->add($this->_uploadToken->getId() . self::WAITING_PARTS_CACHE_POSTFIX, array('waitingParts' => array()));
 	}
 
 	/**
@@ -157,10 +159,10 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	 */
 	public function updateWaitingParts($chunkFilePath, $resumeAt, $partSize)
 	{
-		$multipartInfo = $this->getMultipartCache();
+		$multipartInfo = $this->getWaitingPartsCache();
 		$multipartInfo['waitingParts'][$resumeAt] = array('partPath' => $chunkFilePath, 'partSize' =>  $partSize);
 		KalturaLog::debug("Setting partResumeAt [$resumeAt] & partPath [$chunkFilePath]  & partSize [$partSize]");
-		$this->setMultipartCache($multipartInfo);
+		$this->setWaitingPartsCache($multipartInfo);
 	}
 
 	/**
@@ -204,7 +206,7 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	/**
 	 * get multipart upload info from cache if exists
 	 *
-	 * @return mixed
+	 * @return array
 	 * @throws kUploadTokenException
 	 */
 	protected function getMultipartCache()
@@ -212,16 +214,32 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 		$multipartInfo = self::$multipartCache->get($this->_uploadToken->getId() . self::MULTIPART_CACHE_POSTFIX);
 		if (!$multipartInfo)
 		{
-			throw new kUploadTokenException("Failed to Update part in cache", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_CACHE_FAILURE);
+			throw new kUploadTokenException("Failed to get part from cache", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_CACHE_FAILURE);
 		}
 		return $multipartInfo;
 	}
 
 	/**
-	 * set multipart upload info to cache
+	 * get multipart waiting parts info from cache if exists
+	 *
+	 * @return array
+	 * @throws kUploadTokenException
+	 */
+	protected function getWaitingPartsCache()
+	{
+		$multipartInfo = self::$multipartCache->get($this->_uploadToken->getId() . self::WAITING_PARTS_CACHE_POSTFIX);
+		if (!$multipartInfo)
+		{
+			throw new kUploadTokenException("Failed to get part from cache", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_CACHE_FAILURE);
+		}
+		return $multipartInfo;
+	}
+
+	/**
+	 * set multipart waiting parts info to cache
 	 *
 	 * @param $multipartInfo
-	 * @return mixed
+	 * @return bool
 	 * @throws kUploadTokenException
 	 */
 	protected function setMultipartCache($multipartInfo)
@@ -230,6 +248,23 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 		if (!$updatedMultipartInfo)
 		{
 			throw new kUploadTokenException("Failed to Update part in cache", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_CACHE_FAILURE);
+		}
+		return $updatedMultipartInfo;
+	}
+
+	/**
+	 * set multipart upload info to cache
+	 *
+	 * @param $multipartInfo
+	 * @return bool
+	 * @throws kUploadTokenException
+	 */
+	protected function setWaitingPartsCache($multipartInfo)
+	{
+		$updatedMultipartInfo = self::$multipartCache->set($this->_uploadToken->getId() . self::WAITING_PARTS_CACHE_POSTFIX, $multipartInfo);
+		if (!$updatedMultipartInfo)
+		{
+			throw new kUploadTokenException("Failed to Update waiting parts in cache", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_CACHE_FAILURE);
 		}
 		return $updatedMultipartInfo;
 	}
@@ -402,7 +437,8 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 				Sleep(1);
 
 			$multipartCacheInfo = $this->getMultipartCache();
-			$waitingParts = $multipartCacheInfo['waitingParts'];
+			$waitingPartsCacheInfo = $this->getWaitingPartsCache();
+			$waitingParts = $waitingPartsCacheInfo['waitingParts'];
 			$uploadedSize = $multipartCacheInfo['uploadedFileSize'];
 
 			list($concatSize, $chunksToUpload) = $this->getWaitingChunks($chunkResumeAt, $waitingParts, $uploadedSize);
