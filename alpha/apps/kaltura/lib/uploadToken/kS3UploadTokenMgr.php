@@ -21,7 +21,21 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	 */
 	protected static $multipartCache;
 
+	/**
+	 * do we need to make inner concatenation of chunks to get to AWS minimum supported chunk size
+	 * @var bool
+	 */
+	protected static $optimized;
+
+	/**
+	 * remaining data we need to concatenate to final chunk in order to avoid breaking chunk limit
+	 * @var array
+	 */
+	protected static $lastChunk;
+
 	const MULTIPART_CACHE_POSTFIX = '.multipart';
+
+	const WAITING_PARTS_CACHE_POSTFIX = '.waitingParts';
 
 
 	public function __construct(UploadToken $uploadToken, $finalChunk = true)
@@ -38,26 +52,26 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	 * @param file $fileData
 	 * @param float $resumeAt
 	 * @return string
-	 * @throws PropelException
 	 * @throws kUploadTokenException
 	 */
 	protected function handleResume($fileData, $resumeAt)
 	{
-		$minimumChunkSize = $this->_uploadToken->getMinimumChunkSize();
+		$uploadFilePath = dirname($this->_uploadToken->getUploadTempPath());
+		$sourceFilePath = $fileData['tmp_name'];
 		$chunkSize = kFile::fileSize($fileData['tmp_name']);
-		
-		if($minimumChunkSize)
+
+		$this->isOptimizedResume($chunkSize);
+
+		if ($resumeAt != -1)
 		{
-			if(($minimumChunkSize >= kS3SharedFileSystemMgr::MIN_PART_SIZE && $chunkSize >= $minimumChunkSize) || $this->_finalChunk)
-			{
-				return $this->handleOptimizedResume($fileData, $resumeAt, $chunkSize);
-			}
-			else
-			{
-				throw new kUploadTokenException("chunk size [$chunkSize] is less then minimum expected size [$minimumChunkSize]", kUploadTokenException::UPLOAD_TOKEN_INVALID_CHUNK_SIZE);
-			}
+			$currentFileSize = $this->addChunkByPosition($sourceFilePath, $chunkSize, $resumeAt, $uploadFilePath);
+		}
+		else
+		{
+			$currentFileSize = $this->addChunkSequentially($sourceFilePath, $chunkSize, $uploadFilePath);
 		}
 
+		return $currentFileSize;
 	}
 
 	/**
@@ -78,30 +92,28 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	}
 
 	/**
-	 * handle upload token resume when chunk size is at list in the size of minimumChunkSize
+	 * check if minimum chunk size is set on the upload token and if the uploaded chunk is at least in this size
 	 *
-	 * @param $fileData
-	 * @param $resumeAt
 	 * @param $chunkSize
-	 * @return string
-	 * @throws PropelException
 	 * @throws kUploadTokenException
 	 */
-	protected function handleOptimizedResume($fileData, $resumeAt, $chunkSize)
+	protected function isOptimizedResume($chunkSize)
 	{
-		$uploadFilePath = dirname($this->_uploadToken->getUploadTempPath());
-		$sourceFilePath = $fileData['tmp_name'];
-
-		if ($resumeAt != -1)
+		$minimumChunkSize = $this->_uploadToken->getMinimumChunkSize();
+		if($minimumChunkSize)
 		{
-			$currentFileSize = $this->addChunkByPosition($sourceFilePath, $chunkSize, $resumeAt, $uploadFilePath);
-		}
-		else
-		{
-			$currentFileSize = $this->addChunkSequentially($sourceFilePath, $chunkSize, $uploadFilePath);
+			if(($minimumChunkSize >= kS3SharedFileSystemMgr::MIN_PART_SIZE && $chunkSize >= $minimumChunkSize) || $this->_finalChunk)
+			{
+				self::$optimized = true;
+				return;
+			}
+			else
+			{
+				throw new kUploadTokenException("chunk size [$chunkSize] is less then minimum expected size [$minimumChunkSize]", kUploadTokenException::UPLOAD_TOKEN_INVALID_CHUNK_SIZE);
+			}
 		}
 
-		return $currentFileSize;
+		self::$optimized = false;
 	}
 
 	/**
@@ -119,6 +131,7 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 		self::$multipartCache = $cache;
 		$multipartInfo = array('uploadedFileSize' => 0);
 		self::$multipartCache->add($this->_uploadToken->getId() . self::MULTIPART_CACHE_POSTFIX, $multipartInfo);
+		self::$multipartCache->add($this->_uploadToken->getId() . self::WAITING_PARTS_CACHE_POSTFIX, array('waitingParts' => array()));
 	}
 
 	/**
@@ -146,10 +159,10 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	 */
 	public function updateWaitingParts($chunkFilePath, $resumeAt, $partSize)
 	{
-		$multipartInfo = $this->getMultipartCache();
+		$multipartInfo = $this->getWaitingPartsCache();
 		$multipartInfo['waitingParts'][$resumeAt] = array('partPath' => $chunkFilePath, 'partSize' =>  $partSize);
 		KalturaLog::debug("Setting partResumeAt [$resumeAt] & partPath [$chunkFilePath]  & partSize [$partSize]");
-		$this->setMultipartCache($multipartInfo);
+		$this->setWaitingPartsCache($multipartInfo);
 	}
 
 	/**
@@ -193,7 +206,7 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	/**
 	 * get multipart upload info from cache if exists
 	 *
-	 * @return mixed
+	 * @return array
 	 * @throws kUploadTokenException
 	 */
 	protected function getMultipartCache()
@@ -201,16 +214,32 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 		$multipartInfo = self::$multipartCache->get($this->_uploadToken->getId() . self::MULTIPART_CACHE_POSTFIX);
 		if (!$multipartInfo)
 		{
-			throw new kUploadTokenException("Failed to Update part in cache", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_CACHE_FAILURE);
+			throw new kUploadTokenException("Failed to get part from cache", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_CACHE_FAILURE);
 		}
 		return $multipartInfo;
 	}
 
 	/**
-	 * set multipart upload info to cache
+	 * get multipart waiting parts info from cache if exists
+	 *
+	 * @return array
+	 * @throws kUploadTokenException
+	 */
+	protected function getWaitingPartsCache()
+	{
+		$multipartInfo = self::$multipartCache->get($this->_uploadToken->getId() . self::WAITING_PARTS_CACHE_POSTFIX);
+		if (!$multipartInfo)
+		{
+			throw new kUploadTokenException("Failed to get part from cache", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_CACHE_FAILURE);
+		}
+		return $multipartInfo;
+	}
+
+	/**
+	 * set multipart waiting parts info to cache
 	 *
 	 * @param $multipartInfo
-	 * @return mixed
+	 * @return bool
 	 * @throws kUploadTokenException
 	 */
 	protected function setMultipartCache($multipartInfo)
@@ -219,6 +248,23 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 		if (!$updatedMultipartInfo)
 		{
 			throw new kUploadTokenException("Failed to Update part in cache", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_CACHE_FAILURE);
+		}
+		return $updatedMultipartInfo;
+	}
+
+	/**
+	 * set multipart upload info to cache
+	 *
+	 * @param $multipartInfo
+	 * @return bool
+	 * @throws kUploadTokenException
+	 */
+	protected function setWaitingPartsCache($multipartInfo)
+	{
+		$updatedMultipartInfo = self::$multipartCache->set($this->_uploadToken->getId() . self::WAITING_PARTS_CACHE_POSTFIX, $multipartInfo);
+		if (!$updatedMultipartInfo)
+		{
+			throw new kUploadTokenException("Failed to Update waiting parts in cache", kUploadTokenException::UPLOAD_TOKEN_MULTIPART_CACHE_FAILURE);
 		}
 		return $updatedMultipartInfo;
 	}
@@ -251,6 +297,7 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 		}
 
 		$partNumber = kLock::runLocked($this->_uploadToken->getId(), array($this, 'allocatePartNumber'));
+
 		// copy uploaded part and add it to the full file multipart upload as one part
 		$copySuccess = self::$sharedFsMgr->multipartUploadPartCopy($this->_uploadToken->getUploadId(), $partNumber, $chunkFilePath, $finalPath);
 		if(!$copySuccess)
@@ -269,15 +316,37 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	 *
 	 * @param $sourceFilePath
 	 * @param $chunkSize
-	 * @param $chunkFilePath
+	 * @param $originalChunkFilePath
 	 * @return string
 	 * @throws kUploadTokenException
 	 */
-	protected function addChunkSequentially($sourceFilePath, $chunkSize, $chunkFilePath)
+	protected function addChunkSequentially($sourceFilePath, $chunkSize, $originalChunkFilePath)
 	{
 		$multipartInfo = $this->getMultipartCache();
-		$chunkFilePath = "$chunkFilePath/" . $multipartInfo['uploadedFileSize'];
-		$currentFileSize = $this->appendChunk($sourceFilePath, $this->_uploadToken->getUploadedFileSize(), $chunkSize, $chunkFilePath);
+		$chunkFilePath = "$originalChunkFilePath/" . $multipartInfo['uploadedFileSize'];
+
+
+		if(self::$optimized)
+		{
+			$currentFileSize = $this->appendChunk($sourceFilePath, $this->_uploadToken->getUploadedFileSize(), $chunkSize, $chunkFilePath);
+		}
+		else
+		{
+			list($concatSize, $chunksToUpload) = $this->getWaitingChunks(-1, $multipartInfo['uploadedFileSize']);
+			$chunkFilePath = "$originalChunkFilePath/" . $concatSize;
+			$currentFileSize = $this->addUploadedChunksToFinalFile($chunkSize, 0, false, $concatSize);
+
+			// handle the chunk given in the request after appending available existing chunks
+			if($chunkSize >= kS3SharedFileSystemMgr::MIN_PART_SIZE || $this->_finalChunk)
+			{
+				$currentFileSize = $this->appendAfterWaitingPartsConcat($sourceFilePath, $chunkSize, $chunkFilePath, $multipartInfo['uploadedFileSize']);
+			}
+			else
+			{
+				$this->uploadChunk($sourceFilePath, $chunkFilePath, $chunkSize, $concatSize);
+			}
+		}
+
 		kLock::runLocked($this->_uploadToken->getId(), array($this, 'updateUploadedFileSize'), array($currentFileSize));
 
 		if($this->_autoFinalize && $this->_uploadToken->getFileSize() <= $currentFileSize)
@@ -295,8 +364,7 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	 * @param $chunkSize
 	 * @param $resumeAt
 	 * @param $uploadFilePath
-	 * @return mixed
-	 * @throws PropelException
+	 * @return int
 	 * @throws kUploadTokenException
 	 */
 	protected function addChunkByPosition($sourceFilePath, $chunkSize, $resumeAt, $uploadFilePath)
@@ -317,22 +385,23 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 			$expectedFileSize = $this->_uploadToken->getFileSize();
 		}
 
-		if($resumeAt == $uploadedFileSize)
+		if($resumeAt == $uploadedFileSize && $chunkSize >= kS3SharedFileSystemMgr::MIN_PART_SIZE)
 		{
 			$currentFileSize = $this->appendChunk($sourceFilePath, $resumeAt, $chunkSize, $chunkFilePath);
 		}
 		else
 		{
 			$currentFileSize = $this->addUploadedChunksToFinalFile($chunkSize, $expectedFileSize, $verifyFinalChunk, $resumeAt);
-			if($resumeAt == $currentFileSize)
+
+			// handle the chunk given in the request after appending available existing chunks
+			if($resumeAt == $currentFileSize && ($chunkSize >= kS3SharedFileSystemMgr::MIN_PART_SIZE || $this->_finalChunk))
 			{
-				$currentFileSize = $this->appendChunk($sourceFilePath, $resumeAt, $chunkSize, $chunkFilePath);
+				$currentFileSize = $this->appendAfterWaitingPartsConcat($sourceFilePath, $chunkSize, $chunkFilePath, $resumeAt);
 			}
 			else
 			{
 				$this->uploadChunk($sourceFilePath, $chunkFilePath, $chunkSize, $resumeAt);
 			}
-
 		}
 
 		kLock::runLocked($this->_uploadToken->getId(), array($this, 'updateUploadedFileSize'), array($currentFileSize));
@@ -369,11 +438,10 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	/**
 	 * concat to the end of files chunks that were already uploaded and their resumeAt values conects
 	 *
-	 * @param $chunkFilePath
 	 * @param $chunkSize
 	 * @param $expectedFileSize
 	 * @param $verifyFinalChunk
-	 * @param $currentFileSize
+	 * @param $chunkResumeAt
 	 * @return mixed
 	 * @throws Exception
 	 */
@@ -384,8 +452,6 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 
 		// if finalChunk, try appending chunks till reaching expected file size for up to 30 seconds while sleeping for 1 second each iteration
 		$count = 0;
-		$multipartCacheInfo = $this->getMultipartCache();
-		$uploadedSize = $multipartCacheInfo['uploadedFileSize'];
 
 		do
 		{
@@ -393,13 +459,16 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 				Sleep(1);
 
 			$multipartCacheInfo = $this->getMultipartCache();
-			$waitingParts = $multipartCacheInfo['waitingParts'];
-			$uploadedSize = max($uploadedSize, $multipartCacheInfo['uploadedFileSize']);
+			$uploadedSize = $multipartCacheInfo['uploadedFileSize'];
 
-			list($concatSize, $chunksToUpload) = $this->getWaitingChunks($chunkResumeAt, $waitingParts, $uploadedSize);
+			list($concatSize, $chunksToUpload) = $this->getWaitingChunks($chunkResumeAt, $uploadedSize);
 			if($concatSize == $chunkResumeAt)
 			{
 				$uploadedSize = $this->appendWaitingChunks($chunksToUpload, $uploadedSize);
+				if(self::$lastChunk)
+				{
+					$uploadedSize += self::$lastChunk['partSize'];
+				}
 			}
 
 			KalturaLog::log("handleResume iteration: $count  chunkSize: $chunkSize finalChunk: {$this->_finalChunk} currentFileSize: $uploadedSize expectedFileSize: $expectedFileSize");
@@ -412,13 +481,15 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	/**
 	 * get the chunks waiting for upload to the full file multipartUpload
 	 *
-	 * @param $chunkResumeAt
-	 * @param $parts
+	 * @param $chunkResumeAt send -1 for max concat value
 	 * @param $uploadedSize
-	 * @return mixed
+	 * @return array
+	 * @throws kUploadTokenException
 	 */
-	protected function getWaitingChunks($chunkResumeAt, $parts, $uploadedSize)
+	protected function getWaitingChunks($chunkResumeAt, $uploadedSize)
 	{
+		$waitingPartsCacheInfo = $this->getWaitingPartsCache();
+		$parts = $waitingPartsCacheInfo['waitingParts'];
 		$concatSize = $uploadedSize;
 		$chunksToUpload = array();
 
@@ -452,9 +523,14 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	 */
 	protected function appendWaitingChunks($chunksToUpload, $currentFileSize)
 	{
-		foreach ($chunksToUpload as $nextChunks)
+		if(!self::$optimized)
 		{
-			$currentFileSize = $this->appendChunk(null, $currentFileSize, $nextChunks['partSize'], $nextChunks['partPath'], false);
+			$chunksToUpload = $this->getConcatenatedChunksToUpload($chunksToUpload, $currentFileSize);
+		}
+
+		foreach ($chunksToUpload as $nextChunk)
+		{
+			$currentFileSize = $this->appendChunk(null, $currentFileSize, $nextChunk['partSize'], $nextChunk['partPath'], false);
 		}
 		return $currentFileSize;
 	}
@@ -470,13 +546,14 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 		$this->_uploadToken->setUploadId($uploadId);
 
 		$currentFileSize = 0;
-		if($resumeAt == -1 || $this->_finalChunk)
+		if(($resumeAt == -1 && $fileSize >= kS3SharedFileSystemMgr::MIN_PART_SIZE) || $this->_finalChunk)
 		{
 			$currentFileSize = $this->appendChunk(null, $this->_uploadToken->getUploadedFileSize(), $fileSize, $uploadFilePath, false);
 			kLock::runLocked($this->_uploadToken->getId(), array($this, 'updateUploadedFileSize'), array($currentFileSize));
 		}
-		else if ($resumeAt == 0)
+		else if ($resumeAt == -1 && $fileSize < kS3SharedFileSystemMgr::MIN_PART_SIZE || $resumeAt == 0)
 		{
+			$resumeAt = max($resumeAt, 0);
 			kLock::runLocked($this->_uploadToken->getId(), array($this, 'updateWaitingParts'), array($uploadFilePath, $resumeAt, $fileSize));
 		}
 
@@ -503,6 +580,182 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 		$uploadFolderPath = dirname($this->_uploadToken->getUploadTempPath());
 		$finalFilePath = $uploadFolderPath .  '/full_file.' . $this->getFileExtension($this->_uploadToken->getFileName());
 		return $finalFilePath;
+	}
+
+	/**
+	 * check if we can concat chunks and get the current uploaded part size (resumeAt) and if so return array containing valid chunks to upload
+	 *
+	 * @param $chunksToUpload
+	 * @param $currentFileSize
+	 * @return array
+	 */
+	protected function getConcatenatedChunksToUpload($chunksToUpload, $currentFileSize)
+	{
+		$partsToConcat = array();
+		$partNum = 1;
+		$concatenatedChunkSize = 0;
+
+		foreach ($chunksToUpload as $nextChunk)
+		{
+			if($concatenatedChunkSize >= kS3SharedFileSystemMgr::MIN_PART_SIZE && !$this->reachedMaxPartsLimit())
+			{
+				$partNum++;
+				$concatenatedChunkSize = 0;
+			}
+
+			$partsToConcat[$partNum][] = $nextChunk;
+			$concatenatedChunkSize += $nextChunk['partSize'];
+		}
+		KalturaLog::debug("concatenated Chunks To Upload: " . print_r($partsToConcat, true));
+
+		if($concatenatedChunkSize < kS3SharedFileSystemMgr::MIN_PART_SIZE && !$this->_finalChunk)
+		{
+			return array();
+		}
+
+		return $this->createChunksFromConcatenatedSmallParts($partsToConcat, $currentFileSize);
+	}
+
+	/**
+	 * create array of chunks to upload that their size is bigger then s3 chunk size for upload minimum
+	 *
+	 * @param $partsToConcat
+	 * @param $currentFileSize
+	 * @return array
+	 */
+	protected function createChunksFromConcatenatedSmallParts($partsToConcat, $currentFileSize)
+	{
+		$chunksToUpload = array();
+		foreach ($partsToConcat as $partNum => $part)
+		{
+			$uploadFilePath = dirname($this->_uploadToken->getUploadTempPath()) . '/' . $currentFileSize . '_part_' . $partNum;
+			$tmpFilePath = '/tmp/' . $this->_uploadToken->getId() . '_' . $currentFileSize . '_part_' . $partNum;
+
+			$partSize = $this->createLocalChunk($tmpFilePath, $part);
+
+			KalturaLog::debug("Part size: $partSize partNum:  $partNum tmpPath: $tmpFilePath");
+			self::$sharedFsMgr->getFileFromResource($tmpFilePath, $uploadFilePath);
+
+			if($partSize < kS3SharedFileSystemMgr::MIN_PART_SIZE)
+			{
+				self::$lastChunk =  array('partPath' => $uploadFilePath, 'partSize' =>  $partSize);
+			}
+			else
+			{
+				$chunksToUpload[$partNum] = array('partPath' => $uploadFilePath, 'partSize' =>  $partSize);
+			}
+		}
+
+		return $chunksToUpload;
+	}
+
+	/**
+	 * init stream wrapper and retrieve resource for chunk url
+	 *
+	 * @param $path
+	 * @return bool|resource
+	 */
+	protected function getChunkResource($path)
+	{
+		stream_wrapper_restore('http');
+		stream_wrapper_restore('https');
+		if(kFile::isSharedPath($path))
+		{
+			$path = self::$sharedFsMgr->realPath($path);
+		}
+
+		return fopen($path, 'rb');
+	}
+
+	/**
+	 * write the content of small chunks to one concatenated local file
+	 *
+	 *
+	 * @param $path
+	 * @param $destFH
+	 */
+	protected function increaseLocalTmpChunk($path, $destFH)
+	{
+		$sourceFH = $this->getChunkResource($path);
+		if($sourceFH)
+		{
+			while (!feof($sourceFH))
+			{
+				$body = stream_get_contents($sourceFH, 16 * 1024 * 1024);
+				fwrite($destFH, $body);
+			}
+			fclose($sourceFH);
+		}
+	}
+
+	/**
+	 * append the chunk given in the request after appending available existing chunks in waiting parts array
+	 *
+	 * @param $sourceFilePath
+	 * @param $chunkSize
+	 * @param $chunkFilePath
+	 * @param $resumeAt
+	 * @return int
+	 * @throws kUploadTokenException
+	 */
+	protected function appendAfterWaitingPartsConcat($sourceFilePath, $chunkSize, $chunkFilePath, $resumeAt)
+	{
+		if (!self::$optimized && self::$lastChunk)
+		{
+			$tmpFilePath = '/tmp/' . $this->_uploadToken->getId() . '_lastPart';
+
+			$destFH = fopen($tmpFilePath, "w");
+			$this->increaseLocalTmpChunk(self::$lastChunk['partPath'], $destFH);
+			$this->increaseLocalTmpChunk($sourceFilePath, $destFH);
+			self::$sharedFsMgr->getFileFromResource($tmpFilePath, $chunkFilePath);
+
+			$partSize = self::$lastChunk['partSize'] + $chunkSize;
+			KalturaLog::debug("Part size: $partSize");
+			$lastChunkResumeAt = $resumeAt - self::$lastChunk['partSize'];
+
+			return $this->appendChunk(null, $lastChunkResumeAt, $partSize, $chunkFilePath, false);
+		}
+
+		return $this->appendChunk($sourceFilePath, $resumeAt, $chunkSize, $chunkFilePath);
+	}
+
+	/**
+	 * create local chunk from concatenated small parts
+	 *
+	 * @param $tmpFilePath
+	 * @param $part
+	 * @return int
+	 */
+	protected function createLocalChunk($tmpFilePath, $part)
+	{
+		$partSize = 0;
+		$destFH = fopen($tmpFilePath, "w");
+		foreach ($part as $smallChunk)
+		{
+			$this->increaseLocalTmpChunk($smallChunk['partPath'], $destFH);
+			$partSize += $smallChunk['partSize'];
+		}
+		fclose($destFH);
+		return $partSize;
+	}
+
+	/**
+	 * check if we reached the max upload parts for the multipart
+	 *
+	 * @return bool
+	 * @throws kUploadTokenException
+	 */
+	protected function reachedMaxPartsLimit()
+	{
+		// we will need max of 2 more parts to upload for the full remaining part and for the final upload part
+		$maxParts = kS3SharedFileSystemMgr::MAX_PARTS_NUMBER - 2;
+		$multipartInfo = $this->getMultipartCache();
+
+		if($multipartInfo['partNumberAllocation'] >= $maxParts)
+		{
+			return true;
+		}
+		return false;
 	}
 
 }
