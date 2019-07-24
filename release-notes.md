@@ -1,5 +1,19 @@
 # Orion 15.4.0 #
 
+## changing reach notifications subject ##
+
+- Issue Type: Task
+- Issue ID: REACH2-663
+
+### configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+deployment/updates/scripts/xml/notifications/2019_07_24_update_task_approved_execution.template.xml
+deployment/updates/scripts/xml/notifications/2019_07_24_update_task_finished_processing.template.xml
+deployment/updates/scripts/xml/notifications/2019_07_24_update_task_rejected_for_execution.template.xml
+
+### Deployment scripts ###
+php deployment/updates/scripts/2019_07_24_deploy_update_subject_reach_notifications.php
+
 ## update reach credit notification ##
 
 - Issue Type: Task
