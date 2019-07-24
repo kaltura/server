@@ -306,8 +306,8 @@ class kFile extends kFileBase
 	
 	public static function moveFile($from, $to, $override_if_exists = false, $copy = false)
 	{
-		$from = str_replace("\\", "/", $from);
-		$to = str_replace("\\", "/", $to);
+		$from = kFile::fixPath($from);
+		$to = kFile::fixPath($to);
 		
 		// Validation
 		if(!kFile::checkFileExists($from))
@@ -339,8 +339,8 @@ class kFile extends kFileBase
 	
 	public static function linkFile($from, $to, $overrideIfExists = false, $copyIfLinkFailed = true)
 	{
-		$from = str_replace("\\", "/", $from);
-		$to = str_replace("\\", "/", $to);
+		$from = kFile::fixPath($from);
+		$to = kFile::fixPath($to);
 		
 		if($overrideIfExists && (is_file($to) || is_link($to)))
 		{
