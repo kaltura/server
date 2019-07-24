@@ -374,7 +374,7 @@ abstract class kSharedFileSystemMgr
 	
 	public function copy($fromFilePath, $toFilePath)
 	{
-		$fromFilePath =kFile::fixPath($fromFilePath);
+		$fromFilePath = kFile::fixPath($fromFilePath);
 		$toFilePath = kFile::fixPath($toFilePath);
 		
 		if (!kString::beginsWith($fromFilePath, self::$kSharedRootPath))
