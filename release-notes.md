@@ -1,3 +1,17 @@
+# Orion 15.4.0 #
+
+## update reach notification: Task Pending Moderation ##
+
+- Issue Type: Task
+- Issue ID: REACH2-662
+
+### configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+deployment/updates/scripts/xml/notifications/2019_07_22_update_entry_vendor_pending_moderation.template.xml
+
+### Deployment scripts ###
+php deployment/updates/scripts/2019_07_22_deploy_update_entry_vendor_pending_moderation.php
+
 # Orion 15.3.0 #
 
 ## Add new type of userEntry called watch later ##
