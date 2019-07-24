@@ -38,6 +38,12 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 * @var array
 	 */
 	protected $conditionClause = array();
+
+	/**
+	 * Sphinx condition clauses equal to Zero
+	 * @var array
+	 */
+	protected $conditionClauseEqualsZero = array();
 	
 	/**
 	 * Sphinx orderby clauses
@@ -486,7 +492,17 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$conditions .=	', (' . $this->conditionClause[$i] . ') as cnd' . $i . ' ';
 			$this->addWhere('cnd' . $i . ' > 0');
 			
-			$i++; 
+			$i++;
+		}
+		foreach ($this->conditionClauseEqualsZero as $conditionClause)
+		{
+			if ($conditionClause == '')
+			{
+				continue;
+			}
+			$conditions .=	', (' . $conditionClause . ') as cnd' . $i . ' ';
+			$this->addWhere('cnd' . $i . ' = 0');
+			$i++;
 		}
 		
 		$wheres = '';
@@ -1087,6 +1103,15 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		{
 			KalturaLog::debug("Added [$condition]");
 			$this->conditionClause[] = $condition;
+		}
+	}
+
+	public function addConditionEqualsZero($condition)
+	{
+		if(strlen(trim($condition)))
+		{
+			KalturaLog::debug("Added [$condition]");
+			$this->conditionClauseEqualsZero[] = $condition;
 		}
 	}
 	
