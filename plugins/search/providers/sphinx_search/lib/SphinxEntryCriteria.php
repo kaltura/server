@@ -194,8 +194,11 @@ class SphinxEntryCriteria extends SphinxCriteria
 			}
 			else // is not empty
 			{
+				//This condtion will catch all cases where the value is not empty string ''
 				$cond = 'in(' . entryIndex::DYNAMIC_ATTRIBUTES . '.' . LiveEntry::RECORDED_ENTRY_ID .", '')";
 				$this->addConditionEqualsZero($cond);
+				
+				//Here we catch all the cases where the value is not NULL.
 				$this->addWhere(  entryIndex::DYNAMIC_ATTRIBUTES . '.' . LiveEntry::RECORDED_ENTRY_ID . ' IS NOT NULL');
 			}
 			$filter->unsetByName('_is_recorded_entry_id_empty');
