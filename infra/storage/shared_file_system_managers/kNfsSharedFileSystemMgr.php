@@ -107,8 +107,8 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doMoveFile($from, $to, $override_if_exists = false, $copy = false)
 	{
-		$from = str_replace("\\", "/", $from);
-		$to = str_replace("\\", "/", $to);
+		$from = kFile::fixPath($from);
+		$to = kFile::fixPath($to);
 
 		if(!file_exists($from))
 		{
@@ -189,7 +189,7 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		if(PHP_INT_SIZE >= 8)
 			return filesize($filename);
-		$filename = str_replace('\\', '/', $filename);
+		$filename = kFile::fixPath($filename);
 		$url = "file://localhost/$filename";
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_NOBODY, true);

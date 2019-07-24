@@ -373,8 +373,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doMoveFile($from, $to, $override_if_exists = false, $copy = false)
 	{
-		$from = str_replace("\\", "/", $from);
-		$to = str_replace("//", "/", $to);
+		$from = kFile::fixPath($from);
+		$to = kFile::fixPath($to);
 
 		if(!$this->doCheckFileExists($from))
 		{

@@ -205,7 +205,7 @@ class kFileBase
         if(PHP_INT_SIZE >= 8)
             return filesize($filename);
 
-        $filename = str_replace('\\', '/', $filename);
+        $filename = kFile::fixPath($filename);
 
         $url = "file://localhost/$filename";
 
@@ -234,9 +234,7 @@ class kFileBase
 
     static public function fixPath($file_name)
     {
-        $res = str_replace("\\", "/", $file_name);
-        $res = str_replace("//", "/", $res);
-        return $res;
+		return str_replace(array("//", "\\"), array("/", "/"), $file_name);
     }
     
     static public function setFileContent($file_name, $content)
