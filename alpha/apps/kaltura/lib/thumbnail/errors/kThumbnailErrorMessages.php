@@ -40,4 +40,6 @@ class kThumbnailErrorMessages
 	const TEXT_DOES_NOT_FIT_ERR = 'text does not fit the bounding box';
 	const ILLEGAL_ENUM_VALUE = 'Illegal enum value';
 	const NOT_VALID_IMAGE_FORMAT = 'Not valid image format';
+	const DENSITY_POSITIVE = 'Density must be positive';
+	const QUALITY_NOT_IN_RANGE = 'Quality must be between 20 and 100';
 }

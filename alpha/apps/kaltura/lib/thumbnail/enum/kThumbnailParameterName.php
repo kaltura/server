@@ -12,6 +12,7 @@ interface kThumbnailParameterName extends BaseEnum
 	const GRAVITY_POINT = 'gravityPoint';
 	const FORMAT = 'format';
 	const QUALITY = 'quality';
+	const DENSITY = 'density';
 	const BEST_FIT = 'bestFit';
 	const FILTER_TYPE = 'filterType';
 	const BLUR = 'blur';
