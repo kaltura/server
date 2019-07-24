@@ -39,7 +39,7 @@ abstract class kBaseSearch
 
 	protected abstract function execSearch(ESearchOperator $eSearchOperator);
 
-	protected abstract function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null);
+	protected abstract function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations=null);
 
 	protected function initPager(kPager $pager = null)
 	{
@@ -61,6 +61,27 @@ abstract class kBaseSearch
 			}
 
 			$this->query['body']['sort'] = $sortConditions;
+		}
+	}
+
+	protected function initAggregations(ESearchAggregations $aggregations = null)
+	{
+		if(!$aggregations)
+		{
+			return;
+		}
+
+		$aggs = array();
+
+		foreach ($aggregations->getAggregations() as $aggregation)
+		{
+			/* var $aggregation ESearchAggregationItem */
+			$aggregationKey = $aggregation->getAggregationKey() . ':' . $aggregation->getFieldName();
+			$aggs[$aggregationKey] = $aggregation->getAggregationCommand();
+		}
+		if($aggs)
+		{
+			$this->query['body']['aggs'] = $aggs;
 		}
 	}
 

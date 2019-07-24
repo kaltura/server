@@ -9,6 +9,8 @@
  */
 class AttachmentAssetService extends KalturaAssetService
 {
+	const MAX_FILE_NAME_LENGTH = 255;
+
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -213,14 +215,21 @@ class AttachmentAssetService extends KalturaAssetService
 		$attachmentAsset->setStatus(AttachmentAsset::ASSET_STATUS_READY);
 		$attachmentAsset->save();
 	}
-    
+
 	/**
 	 * @param AttachmentAsset $attachmentAsset
 	 * @param string $url
+	 * @throws KalturaAPIException
 	 */
 	protected function attachUrl(AttachmentAsset $attachmentAsset, $url)
 	{
-    	$fullPath = myContentStorage::getFSUploadsPath() . '/' . basename($url);
+		$fileName = basename($url);
+		if(strlen($fileName) > self::MAX_FILE_NAME_LENGTH)
+		{
+			$fileName = md5($url);
+		}
+
+		$fullPath = myContentStorage::getFSUploadsPath() . '/' . $fileName;
 		if (KCurlWrapper::getDataFromFile($url, $fullPath))
 			return $this->attachFile($attachmentAsset, $fullPath);
 			

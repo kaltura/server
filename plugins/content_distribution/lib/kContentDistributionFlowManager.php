@@ -5,13 +5,26 @@
  */
 class kContentDistributionFlowManager extends kContentDistributionManager implements kObjectChangedEventConsumer, kObjectCreatedEventConsumer, kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer, kObjectUpdatedEventConsumer, kObjectAddedEventConsumer, kObjectDataChangedEventConsumer
 {
+	protected static $validModerationStatuses = array(
+		entry::ENTRY_MODERATION_STATUS_APPROVED,
+		entry::ENTRY_MODERATION_STATUS_AUTO_APPROVED);
+
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
 		if($object instanceof entry && $object->wasObjectSaved())
+		{
+			if($object->getStatus() == entryStatus::READY &&
+				in_array(entryPeer::MODERATION_STATUS, $modifiedColumns) &&
+				!in_array($object->getModerationStatus(), self::$validModerationStatuses))
+			{
+				return false;
+			}
+
 			return true;
+		}
 		
 		if($object instanceof asset && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && in_array(assetPeer::STATUS, $modifiedColumns) || in_array(assetPeer::VERSION, $modifiedColumns))
 			return true;
@@ -29,10 +42,15 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	{
 		if($object instanceof entry && $object->getStatus() != entryStatus::DELETED)
 		{
-			if(in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == entryStatus::READY)
+			if((in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == entryStatus::READY)
+				|| in_array(entryPeer::MODERATION_STATUS, $modifiedColumns))
+			{
 				return self::onEntryReady($object);
+			}
 			else
+			{
 				return self::onEntryChanged($object, $modifiedColumns);
+			}
 		}
 		
 		if($object instanceof asset && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
@@ -1155,6 +1173,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 
 	/**
 	 * @param Metadata $metadata
+	 * @return bool
 	 */
 	public static function onMetadataDeleted(Metadata $metadata)
 	{
@@ -1245,9 +1264,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		return true;
 	}
-	
+
 	/**
 	 * @param Metadata $metadata
+	 * @return bool
 	 */
 	public static function onMetadataChanged(Metadata $metadata, $previousVersion)
 	{
@@ -1438,9 +1458,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		return true;
 	}
-	
+
 	/**
 	 * @param EntryDistribution $entryDistribution
+	 * @return bool
 	 */
 	public static function onEntryDistributionUpdateRequired(EntryDistribution $entryDistribution)
 	{
@@ -1502,10 +1523,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
 		return true;
 	}
-	
+
 	/**
 	 * @param EntryDistribution $entryDistribution
 	 * @param array $modifiedColumns
+	 * @return bool
 	 */
 	public static function onEntryDistributionChanged(EntryDistribution $entryDistribution, array $modifiedColumns)
 	{
@@ -1523,10 +1545,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				
 		return true;
 	}
-	
+
 	/**
 	 * @param entry $entry
 	 * @param array $modifiedColumns
+	 * @return bool
 	 */
 	public static function onEntryChanged(entry $entry, array $modifiedColumns)
 	{
@@ -1715,9 +1738,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			$genericDistributionProfiles->save();
 		}
 	}
-	
+
 	/**
 	 * @param entry $entry
+	 * @return bool
 	 */
 	public static function onEntryDeleted(entry $entry)
 	{
@@ -1770,42 +1794,64 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 
 	/**
 	 * @param entry $entry
+	 * @return bool
 	 */
 	public static function onEntryReady(entry $entry)
 	{
-		if(!ContentDistributionPlugin::isAllowedPartner($entry->getPartnerId()))
+		if (!ContentDistributionPlugin::isAllowedPartner($entry->getPartnerId()))
+		{
 			return true;
+		}
 		
 		//no temp entries should be handled
 		if ($entry->getDisplayInSearch() == mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM && $entry->getReplacedEntryId())
+		{
 			return true;
+		}
 
 		$distributionProfiles = DistributionProfilePeer::retrieveByPartnerId($entry->getPartnerId());
-		$entryType = $entry->getType();
 		foreach($distributionProfiles as $distributionProfile)
 		{
-			if(!$distributionProfile->shouldAddDistributeByType($entryType))
-				continue;
-
-			$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $distributionProfile->getId());
-			if($entryDistribution)
+			if($distributionProfile->getDistributeTrigger() == kDistributeTrigger::MODERATION_APPROVED)
 			{
-				KalturaLog::info("Found entry distribution object with id [" . $entryDistribution->getId() . "] for distrinution profle [" . $distributionProfile->getId() . "]");
-				self::onEntryDistributionUpdateRequired($entryDistribution);
-				continue;
+				if(!in_array($entry->getModerationStatus(), self::$validModerationStatuses))
+				{
+					continue;
+				}
 			}
 
-			if($distributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::AUTOMATIC) 
-			{
-				self::addEntryDistribution($entry, $distributionProfile, true);
-			}
+			self::distributeNewEntry($entry, $distributionProfile);
 		}
 		
 		return true;
 	}
 
+	protected static function distributeNewEntry(entry $entry, DistributionProfile $distributionProfile)
+	{
+		if(!$distributionProfile->shouldAddDistributeByType($entry->getType()))
+		{
+			return false;
+		}
+
+		$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $distributionProfile->getId());
+		if($entryDistribution)
+		{
+			KalturaLog::info("Found entry distribution object with id [" . $entryDistribution->getId() . "] for distribution profile [" . $distributionProfile->getId() . "]");
+			self::onEntryDistributionUpdateRequired($entryDistribution);
+			return false;
+		}
+
+		if($distributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::AUTOMATIC)
+		{
+			self::addEntryDistribution($entry, $distributionProfile, true);
+		}
+
+		return true;
+	}
+
 	/**
 	 * @param asset $asset
+	 * @return bool
 	 */
 	public static function onAssetVersionChanged(asset $asset)
 	{
@@ -1853,9 +1899,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		return true;
 	}
-	
+
 	/**
 	 * @param asset $asset
+	 * @return bool
 	 */
 	public static function onAssetReadyOrDeleted(asset $asset)
 	{
@@ -1939,11 +1986,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		return true;
 	}
-	
+
 	/**
 	 * @param array $distributionProfiles
 	 * @param string $entryId
 	 * @param int $entryType
+	 * @return bool
 	 */
 	public static function checkShouldDistributeByProfiles(array $distributionProfiles, $entryId, $entryType)
 	{
@@ -1954,10 +2002,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		}
 		return false;
 	}
-	
+
 	/**
 	 * @param array $entryDistributions
 	 * @param array $distributionProfiles
+	 * @return array
 	 */
 	public static function getDistProfilesByEntryDistributions(array $entryDistributions, array $distributionProfiles)
 	{

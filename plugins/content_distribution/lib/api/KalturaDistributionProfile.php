@@ -153,7 +153,15 @@ abstract class KalturaDistributionProfile extends KalturaObject implements IFilt
 	 * @var int
 	 */
 	public $recommendedDcForExecute;
-	
+
+
+	/**
+	 * The event that trigger the automatic distribute
+	 * @var KalturaDistributeTrigger
+	 */
+	public $distributeTrigger;
+
+
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
 	 */
@@ -179,6 +187,7 @@ abstract class KalturaDistributionProfile extends KalturaObject implements IFilt
 		'recommendedStorageProfileForDownload',
 		'recommendedDcForDownload',
 		'recommendedDcForExecute',
+		'distributeTrigger',
 	 );
 		 
 	public function getMapBetweenObjects()

@@ -22,7 +22,7 @@ class kUserSearch extends kBaseESearch
         return $result;
     }
 
-    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null)
+    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations=null)
     {
         $this->query = array(
             'index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,
