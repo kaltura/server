@@ -107,8 +107,8 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doMoveFile($from, $to, $override_if_exists = false, $copy = false)
 	{
-		$from = kFile::fixPath($from);
-		$to = kFile::fixPath($to);
+		$from = kFileBase::fixPath($from);
+		$to = kFileBase::fixPath($to);
 
 		if(!file_exists($from))
 		{
