@@ -16,6 +16,7 @@
 
 require_once(dirname(__FILE__) . '/kS3SharedFileSystemMgr.php');
 require_once(dirname(__FILE__) . '/kNfsSharedFileSystemMgr.php');
+require_once(dirname(__FILE__) . '/../kFileBase.php');
 
 interface kSharedFileSystemMgrType
 {
@@ -337,7 +338,7 @@ abstract class kSharedFileSystemMgr
 	
 	public function checkFileExists($filePath)
 	{
-		$filePath = kFile::fixPath($filePath);
+		$filePath = kFileBase::fixPath($filePath);
 		
 		return $this->doCheckFileExists($filePath);
 	}
@@ -374,8 +375,8 @@ abstract class kSharedFileSystemMgr
 	
 	public function copy($fromFilePath, $toFilePath)
 	{
-		$fromFilePath = kFile::fixPath($fromFilePath);
-		$toFilePath = kFile::fixPath($toFilePath);
+		$fromFilePath = kFileBase::fixPath($fromFilePath);
+		$toFilePath = kFileBase::fixPath($toFilePath);
 		
 		if (!kString::beginsWith($fromFilePath, self::$kSharedRootPath))
 		{
@@ -387,7 +388,7 @@ abstract class kSharedFileSystemMgr
 	
 	public function getFileContent($filePath, $from_byte = 0, $to_byte = -1)
 	{
-		$filePath = kFile::fixPath($filePath);
+		$filePath = kFileBase::fixPath($filePath);
 		
 		return $this->doGetFileContent($filePath, $from_byte, $to_byte);
 	}
@@ -399,8 +400,8 @@ abstract class kSharedFileSystemMgr
 
 	public function moveFile($from, $to, $override_if_exists = false, $copy = false)
 	{
-		$from = kFile::fixPath($from);
-		$to = kFile::fixPath($to);
+		$from = kFileBase::fixPath($from);
+		$to = kFileBase::fixPath($to);
 		
 		if (!kString::beginsWith($from, self::$kSharedRootPath))
 		{
@@ -412,7 +413,7 @@ abstract class kSharedFileSystemMgr
 
 	public function isDir($path)
 	{
-		$path = kFile::fixPath($path);
+		$path = kFileBase::fixPath($path);
 		return $this->doIsDir($path);
 	}
 
@@ -438,13 +439,13 @@ abstract class kSharedFileSystemMgr
 
 	public function fileSize($filename)
 	{
-		$filename = kFile::fixPath($filename);
+		$filename = kFileBase::fixPath($filename);
 		return $this->doFileSize($filename);
 	}
 
 	public function deleteFile($filename)
 	{
-		$filename = kFile::fixPath($filename);
+		$filename = kFileBase::fixPath($filename);
 		return $this->doDeleteFile($filename);
 	}
 
@@ -465,8 +466,8 @@ abstract class kSharedFileSystemMgr
 	
 	function copySingleFile($from, $to, $deleteSrc)
 	{
-		$from = kFile::fixPath($from);
-		$to = kFile::fixPath($to);
+		$from = kFileBase::fixPath($from);
+		$to = kFileBase::fixPath($to);
 		
 		if (!kString::beginsWith($from, self::$kSharedRootPath))
 		{
@@ -478,19 +479,19 @@ abstract class kSharedFileSystemMgr
 	
 	public function listFiles($filePath, $pathPrefix = '')
 	{
-		$filePath = kFile::fixPath($filePath);
+		$filePath = kFileBase::fixPath($filePath);
 		return $this->doListFiles($filePath, $pathPrefix);
 	}
 	
 	public function isFile($filePath)
 	{
-		$filePath = kFile::fixPath($filePath);
+		$filePath = kFileBase::fixPath($filePath);
 		return $this->doIsFile($filePath);
 	}
 	
 	public function realPath($filePath, $getRemote = true)
 	{
-		$filePath = kFile::fixPath($filePath);
+		$filePath = kFileBase::fixPath($filePath);
 		return $this->doRealPath($filePath, $getRemote);
 	}
 
@@ -610,7 +611,7 @@ abstract class kSharedFileSystemMgr
 
 	public function dumpFilePart($file_name, $range_from, $range_length)
 	{
-		$filePath = kFile::fixPath($file_name);
+		$filePath = kFileBase::fixPath($file_name);
 
 		return $this->doDumpFilePart($filePath, $range_from, $range_length);
 	}
