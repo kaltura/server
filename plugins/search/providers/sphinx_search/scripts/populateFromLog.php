@@ -73,6 +73,7 @@ $sphinxReadConn = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LO
 $serverLastLogs = SphinxLogServerPeer::retrieveByServer($sphinxServer, $sphinxReadConn);
 $lastLogs = array();
 $handledRecords = array();
+$sphinxRtTables = getSphinxRtTables($sphinxCon);
 
 foreach($serverLastLogs as $serverLastLog)
 {
@@ -95,7 +96,6 @@ while(true)
 	try
 	{
 		$sphinxCon = DbManager::createSphinxConnection($sphinxServer,$sphinxPort);
-		$sphinxRtTables = getSphinxRtTables($sphinxCon);
 		KalturaLog::log("sphinxServer [$sphinxServer], running rt index names [" . implode(",", $sphinxRtTables) . "]");
 	}
 	catch(Exception $e)
@@ -115,7 +115,7 @@ while(true)
 		if($isSharded && preg_match('~[0-9]~', $sphinxLogIndexName) == 0 &&  $splitIndexSettings && isset($splitIndexSettings[$sphinxLog->getObjectType()]))
 		{
 			$splitFactor = $splitIndexSettings[$sphinxLog->getObjectType()];
-			$sphinxLogIndexName .= "_" . ($sphinxLog->getPartnerId()/$splitFactor)%$splitFactor;
+			$sphinxLogIndexName = $sphinxLogIndexName . "_" . ($sphinxLog->getPartnerId()/$splitFactor)%$splitFactor;
 		}
 		
 		if($isSharded && $sphinxLogIndexName && !in_array($sphinxLogIndexName, $sphinxRtTables))
@@ -150,9 +150,9 @@ while(true)
 			else
 			{
 				$sql = $sphinxLog->getSql();
-				if($isSharded && $sphinxLog->getObjectType() == "entry")
+				if($isSharded)
 				{
-					$sql = str_replace("kaltura_entry", $sphinxLogIndexName, $sql);
+					$sql = preg_replace('/replace into (kaltura_.*?) /', "replace into $sphinxLogIndexName ", $sql);
 				}
 				
 				// sql update commands are created only via an external script for updating entries plays count
