@@ -185,7 +185,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
 		try
 		{
-			$size = strlen($fileContent);
 			$res = $this->s3Client->upload($bucket,
 				$filePath,
 				$fileContent,
@@ -268,15 +267,13 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			return false;
 		}
 
-		$result = $this->s3Call('createMultipartUpload', null, $destFilePath);
-
-		if(!$result)
+		$uploadId = $this->createMultipartUpload($destFilePath);
+		if(!$uploadId)
 		{
 			$this->unregisterStreamWrappers();
 			return false;
 		}
 
-		$uploadId = $result['UploadId'];
 		KalturaLog::debug("Starting multipart upload for [$resource] to [$destFilePath] with upload id [$uploadId]");
 		
 		// Upload the file in parts.
@@ -284,13 +281,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$parts = array();
 		while (!feof($sourceFH))
 		{
-			$params = $this->initBasicS3Params($destFilePath);
-			$params['UploadId'] = $uploadId;
-			$params['PartNumber'] = $partNumber;
-			$params['Body'] = stream_get_contents($sourceFH, 16 * 1024 * 1024);
-
-			$result = $this->s3Call('uploadPart', $params);
-
+			$srcContent = stream_get_contents($sourceFH, 16 * 1024 * 1024);
+			$result = $this->multipartUploadPartUpload($uploadId, $partNumber, $srcContent, $destFilePath);
 			if(!$result)
 			{
 				$this->unregisterStreamWrappers();
@@ -309,14 +301,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 		fclose($sourceFH);
 
-		
 		// Complete the multipart upload.
-		$params = $this->initBasicS3Params($destFilePath);
-		$params['UploadId'] = $uploadId;
-		$params['MultipartUpload'] = $parts;
-
-		$result = $this->s3Call('completeMultipartUpload', $params);
-
+		$result = $this->completeMultiPartUpload($destFilePath, $uploadId, $parts);
 		if(!$result)
 		{
 			$this->unregisterStreamWrappers();
@@ -590,14 +576,10 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		if(!$getRemote)
 			return $filePath;
+
+		$params = $this->initBasicS3Params($filePath);
 		
-		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
-		
-		$cmd = $this->s3Client->getCommand('GetObject',
-			array(
-			'Bucket' => $bucket,
-			'Key' => $filePath
-		));
+		$cmd = $this->s3Client->getCommand('GetObject', $params);
 		
 		$request = $this->s3Client->createPresignedRequest($cmd, '+120 minutes');
 		$preSignedUrl = (string)$request->getUri();
@@ -766,7 +748,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			$params = $this->initBasicS3Params($filePath);
 		}
-
 		$retries = $this->retriesNum;
 
 		while ($retries)
@@ -774,15 +755,12 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			try
 			{
 				$result = $this->s3Client->{$command}($params);
-				if($result)
-				{
-					return $result;
-				}
+				return $result;
 			}
 			catch (S3Exception $e)
 			{
 				$retries--;
-				KalturaLog::warning("S3 [$command] command failed. Retries left: [$retries] Params: " . print_r($params, true)."\n{$e->getMessage()}");
+				$this->handleS3Exception($command, $retries, $params, $e);
 			}
 		}
 
@@ -811,6 +789,17 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			'Key'    => $filePath,
 		);
 		return $params;
+	}
+
+	protected function handleS3Exception($command, $retries, $params, $e)
+	{
+		// don't print body to logs
+		if(isset($params['Body']));
+		{
+			unset($params['Body']);
+		}
+
+		KalturaLog::warning("S3 [$command] command failed. Retries left: [$retries] Params: " . print_r($params, true)."\n{$e->getMessage()}");
 	}
 
 }
