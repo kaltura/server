@@ -15,4 +15,5 @@ class SystemPartnerErrors extends KalturaErrors
 
 	const PARTNER_LIVE_THUMB_ENTRY_ID_ERROR = "PARTNER_LIVE_THUMB_ENTRY_ID_ERROR;ID;Wrong entry id - @ID@ -  for live thumbnails";
 
+	const DOMAINS_NOT_ALLOWED = "DOMAINS_NOT_ALLOWED;DOMAINS;Some domains in the 'Allowed From Email WhiteList Notifications' are not allowing kaltura : @DOMAINS@ ";
 }
