@@ -1,5 +1,19 @@
 # Orion 15.4.0 #
 
+## Adding monitoring-proxy partner ##
+
+- Issue Type: Task
+- Issue ID: PLAT-9986
+
+### configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+deployment/base/scripts/init_data/01.Partner.template.ini
+deployment/updates/scripts/xml/2019_07_22_server_node_email_alert.template.xml
+
+### Deployment scripts ###
+php deployment/updates/scripts/add_permissions/2019_07_22_monitoring_proxy_add_partner.php
+
+
 ## changing reach notifications subject ##
 
 - Issue Type: Task
