@@ -558,7 +558,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	}
 	protected function validateAllowedFromEmailWhiteList()
 	{
-		if ($this->isNull('allowedFromEmailWhiteList'))
+		if (is_null($this->allowedFromEmailWhiteList))
 		{
 			$this->allowedFromEmailWhiteList='';
 		}
