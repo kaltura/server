@@ -5,6 +5,8 @@
  */
 class KalturaSystemPartnerConfiguration extends KalturaObject
 {
+	const MAILER_KALTURA_COM = 'mailer.kaltura.com';
+	const SPF = 'v=spf1';
 	/**
 	 * @var int
 	 * @readonly
@@ -600,7 +602,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		$dnsRecords = dns_get_record($domain, DNS_TXT);
 		foreach($dnsRecords as $record)
 		{
-			if((strpos($record['txt'], 'v=spf1') !== false) && (strpos($record['txt'], 'mailer.kaltura.com') !== false))
+			if((strpos($record['txt'], self::SPF) !== false)
+				&& (strpos($record['txt'], self::MAILER_KALTURA_COM) !== false))
 			{
 				return true;
 			}
