@@ -12,6 +12,7 @@ deployment/updates/scripts/xml/2019_07_22_server_node_email_alert.template.xml
 
 ### Deployment scripts ###
 php deployment/updates/scripts/add_permissions/2019_07_22_monitoring_proxy_add_partner.php
+php deployment/updates/scripts/2019_07_28_add_server_node_email_alert_template.php
 
 
 ## changing reach notifications subject ##
