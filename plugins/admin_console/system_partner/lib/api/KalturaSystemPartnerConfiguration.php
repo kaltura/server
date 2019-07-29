@@ -561,13 +561,36 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		if ($this->allowedFromEmailWhiteList)
 		{
 			$fromEmailList =  array_map('trim',explode(',',$this->allowedFromEmailWhiteList));
-			$domainsNotAllowed = kDomainsValidation::getDomainsNotAllowed($fromEmailList);
+			$domains = self::getDomains($fromEmailList);
+			$domainsNotAllowed = kSpfMailerValidator::getDomainsNotAllowed($domains);
 			if ($domainsNotAllowed)
 			{
 				throw new KalturaAPIException(SystemPartnerErrors::DOMAINS_NOT_ALLOWED, implode(',',$domainsNotAllowed));
 			}
 			KalturaLog::debug('All domains are allowing Kaltura');
 		}
+	}
+
+	protected static function getDomains($fromEmailList)
+	{
+		$domains = array();
+		foreach ($fromEmailList as $email)
+		{
+			if ($email)
+			{
+				$domainPos = strpos($email,'@');
+				if ($domainPos === false || $domainPos === strlen($email) - 1)
+				{
+					$domains[$email] = $email;
+				}
+				else if ($domainPos < strlen($email) - 1)	//get the domain from the email
+				{
+					$emailDomain = substr($email, $domainPos + 1);
+					$domains[$emailDomain] = $emailDomain;
+				}
+			}
+		}
+		return $domains;
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )

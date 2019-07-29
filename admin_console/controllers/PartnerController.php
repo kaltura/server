@@ -505,6 +505,10 @@ class PartnerController extends Zend_Controller_Action
 						$form->populate($request->getPost());
 						$form->getElement('live_thumb_entry_id')->addError('wrong entry id or not a \'ready\' image entry');
 					}
+					elseif ($e->getCode() === 'DOMAINS_NOT_ALLOWED')
+					{
+						throw new Kaltura_Client_Exception($e->getCode(),$e->getMessage());
+					}
 					else
 						$this->view->errMessage = $e->getMessage();
 				}
