@@ -5,8 +5,6 @@
  */
 class KalturaSystemPartnerConfiguration extends KalturaObject
 {
-	const MAILER_KALTURA_COM = 'mailer.kaltura.com';
-	const SPF = 'v=spf1';
 	/**
 	 * @var int
 	 * @readonly
@@ -560,55 +558,16 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	}
 	protected function validateAllowedFromEmailWhiteList()
 	{
-		if (is_null($this->allowedFromEmailWhiteList))
+		if ($this->allowedFromEmailWhiteList)
 		{
-			$this->allowedFromEmailWhiteList='';
-		}
-		else
-		{
-			$domainsNotAllowed = self::getDomainsNotAllowed($this->allowedFromEmailWhiteList);
+			$fromEmailList =  array_map('trim',explode(',',$this->allowedFromEmailWhiteList));
+			$domainsNotAllowed = kDomainsValidation::getDomainsNotAllowed($fromEmailList);
 			if ($domainsNotAllowed)
 			{
 				throw new KalturaAPIException(SystemPartnerErrors::DOMAINS_NOT_ALLOWED, implode(',',$domainsNotAllowed));
 			}
 			KalturaLog::debug('All domains are allowing Kaltura');
 		}
-	}
-
-	protected static function getDomainsNotAllowed($fromEmails)
-	{
-		$domainsNotAllowed = array();
-		$fromEmailList =  array_map('trim',explode(',',$fromEmails));
-		foreach ($fromEmailList as $email)
-		{
-			$domainPos = strpos($email,'@');
-			$domain = substr($email, $domainPos + 1);
-			$validationResult = self::validateDomain($domain);
-			if($validationResult)
-			{
-				KalturaLog::debug(print_r("$domain allows Kaltura to send on behalf of it\n",true));
-			}
-			else
-			{
-				$domainsNotAllowed[$domain] = $domain;
-				KalturaLog::debug(print_r("$domain not allowing Kaltura\n",true));
-			}
-		}
-		return $domainsNotAllowed;
-	}
-
-	protected static function validateDomain($domain)
-	{
-		$dnsRecords = dns_get_record($domain, DNS_TXT);
-		foreach($dnsRecords as $record)
-		{
-			if((strpos($record['txt'], self::SPF) !== false)
-				&& (strpos($record['txt'], self::MAILER_KALTURA_COM) !== false))
-			{
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
