@@ -91,6 +91,7 @@ class kPathManager
 	 */
 	public static function getFilePath(FileSyncKey $key, $storageProfileId = null)
 	{
-		return implode('', self::getFilePathArr($key, $storageProfileId));
+		$path =  implode('', self::getFilePathArr($key, $storageProfileId));
+		return kFile::fixPath($path);
 	}
 }

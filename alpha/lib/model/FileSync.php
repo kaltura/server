@@ -133,7 +133,8 @@ class FileSync extends BaseFileSync implements IBaseObject
 	
 	public function getFullPath ()
 	{
-		return $this->getFileRoot() . $this->getFilePath();
+		$path = $this->getFileRoot() . $this->getFilePath();
+		return kFile::fixPath($path);
 	}
 
 	/**

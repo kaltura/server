@@ -78,7 +78,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$this->accessKeyId = $options['accessKeyId'];
 		}
 
-		$this->retriesNum = $retries = kConf::get('aws_client_retries', local, 3);
+		$this->retriesNum = $retries = kConf::get('aws_client_retries', 'local', 3);
 		return $this->login();
 	}
 	
