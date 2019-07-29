@@ -1,8 +1,8 @@
 <?php
 /**
- * 	This class will help you validate if domains are allowing Kaltura.
- *  @package infra
- *  @subpackage general
+ * This class will help you validate if domains are allowing Kaltura.
+ * @package infra
+ * @subpackage general
  */
 
 class kDomainsValidation
@@ -13,9 +13,9 @@ class kDomainsValidation
 	const TXT = 'txt';
 
 	/*
-	 * 	Get list of domains that are not allowing Kaltura
-	 *  @param array $emailsList
-	 *  @return array $domainsNotAllowed
+	 * Get list of domains that are not allowing Kaltura
+	 * @param array $emailsList
+	 * @return array $domainsNotAllowed
 	 */
 	public static function getDomainsNotAllowed($emailsList)
 	{
@@ -23,7 +23,7 @@ class kDomainsValidation
 		foreach ($emailsList as $email)
 		{
 			$domainPos = strpos($email,self::AT);
-			if ($domainPos == false || $domainPos === strlen($email) - 1) //validate domain position exist
+			if ($domainPos == false || $domainPos === strlen($email) - 1) //validae domain position not exist
 			{
 				$domainsNotAllowed[$email] = $email;
 				continue;
@@ -45,8 +45,8 @@ class kDomainsValidation
 
 	/*
 	 * Check if specific domain is allowing Kaltura.
-	 * 	@param string $domain
-	 *  @return boolean
+	 * @param string $domain
+	 * @return boolean
 	 */
 	public static function validateDomain($domain)
 	{
