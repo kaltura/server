@@ -234,7 +234,7 @@ class SystemPartnerService extends KalturaBaseService
 		}
 		catch(KalturaAPIException $e)
 		{
-			if(	$e->getCode() === SystemPartnerErrors::DOMAINS_NOT_ALLOWED_CODE)
+			if($e->getCode() === SystemPartnerErrors::DOMAINS_NOT_ALLOWED_CODE)
 			{
 				throw new KalturaAPIException(SystemPartnerErrors::DOMAINS_NOT_ALLOWED, implode(',',$e->getArgs()));
 			}

@@ -576,7 +576,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		$domains = array();
 		foreach ($fromEmailList as $email)
 		{
-			if ($email)
+			if ($email)	//don't handel empty emails
 			{
 				$domainPos = strpos($email,'@');
 				if ($domainPos === false || $domainPos === strlen($email) - 1)

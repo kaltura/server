@@ -36,13 +36,17 @@ class kSpfMailerValidator
 	}
 
 	/*
-	 * Check if specific domain is allowing Kaltura.
+	 *  Check if specific domain is allowing Kaltura.
 	 *  @param string $domain
 	 *  @return boolean
 	 */
 	public static function validateDomain($domain)
 	{
 		$dnsRecords = dns_get_record($domain, DNS_TXT);
+		if (!$dnsRecords)
+		{
+			return false;
+		}
 		foreach($dnsRecords as $record)
 		{
 			if((strpos($record[self::TXT], self::SPF) !== false)
