@@ -1243,7 +1243,7 @@ class kKavaReports extends kKavaReportsMgr
 					)
 				)
 			),
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_USERS, self::METRIC_ENGAGEMENT_RANKING),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_USERS, self::METRIC_ENGAGEMENT_RANKING, self::METRIC_UNIQUE_PERCENTILES_RATIO),
 			self::REPORT_FORCE_TOTAL_COUNT => true,
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
 			self::REPORT_TOTAL_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_USERS),
@@ -1360,6 +1360,39 @@ class kKavaReports extends kKavaReportsMgr
 				'playback_rate' => self::DIMENSION_EVENT_VAR1
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_SPEED),
+		),
+
+		ReportType::TOP_USER_CONTENT => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'object_id' => self::DIMENSION_ENTRY_ID,
+				'entry_name' => self::DIMENSION_ENTRY_ID,
+				'creator_name' => self::DIMENSION_ENTRY_ID,
+				'created_at' => self::DIMENSION_ENTRY_ID,
+				'status' => self::DIMENSION_ENTRY_ID,
+				'media_type' => self::DIMENSION_ENTRY_ID,
+				'duration_msecs' => self::DIMENSION_ENTRY_ID,
+			),
+			self::REPORT_ENRICH_DEF => array(
+				array(
+					self::REPORT_ENRICH_OUTPUT => array('entry_name', 'creator_name', 'created_at', 'status', 'media_type', 'duration_msecs'),
+					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'peer' => 'entryPeer',
+						'columns' => array('NAME', 'KUSER_ID', '@CREATED_AT', 'STATUS', 'MEDIA_TYPE', 'LENGTH_IN_MSECS'),
+					)
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => array('creator_name'),
+					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'columns' => array('IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
+						'peer' => 'kuserPeer',
+					)
+				)
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO),
+			self::REPORT_FORCE_TOTAL_COUNT => true,
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO),
 		),
 	);
 
