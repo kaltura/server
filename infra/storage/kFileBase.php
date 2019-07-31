@@ -598,4 +598,15 @@ class kFileBase
 		return false;
 	}
 
+	public static function createUniqueFilePath($prefix = '', $isDir = false)
+	{
+		if(kFile::isSharedPath($prefix))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $kSharedFsMgr->createUniqueFilePath($prefix, $isDir);
+		}
+
+		return '';
+	}
+
 }

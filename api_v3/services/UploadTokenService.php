@@ -37,7 +37,7 @@ class UploadTokenService extends KalturaBaseService
 		$uploadTokenDb->setKuserId($this->getKuser()->getId());
 		
 		// use the upload token manager to add the token
-		$uploadTokenMgr = new kUploadTokenMgr($uploadTokenDb);
+		$uploadTokenMgr = kBaseUploadTokenMgr::getInstance($uploadTokenDb, false);
 		$uploadTokenMgr->saveAsNewUploadToken();
 		$uploadTokenDb = $uploadTokenMgr->getUploadToken();
 		$uploadToken->fromObject($uploadTokenDb, $this->getResponseProfile());
@@ -131,6 +131,8 @@ class UploadTokenService extends KalturaBaseService
 					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_PROCESSING_ERROR);
 				case kUploadTokenException::UPLOAD_TOKEN_INVALID_CHUNK_SIZE:
 					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_SMALL_PART_SIZE);
+				case kUploadTokenException::UPLOAD_TOKEN_PROCESSING_FAILURE:
+					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_PROCESSING_ERROR);
 				default:
 					throw $ex;
 			}

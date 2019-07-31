@@ -163,4 +163,14 @@ class UploadToken extends BaseUploadToken implements IBaseObject
 	{
 		$this->putInCustomData('uploadId', $v);
 	}
+
+	public function getFinalFilePath()
+	{
+		return $this->getFromCustomData('finalFilePath', null , null);
+	}
+
+	public function setFinalFilePath($v)
+	{
+		$this->putInCustomData('finalFilePath', $v);
+	}
 }
