@@ -236,7 +236,6 @@ class thumbnailAction extends sfAction
 			}
 		}
 
-
 		if ($entry_id)
 		{
 			$entry = entryPeer::retrieveByPKNoFilter( $entry_id );
@@ -448,6 +447,10 @@ class thumbnailAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::ENTRY_DELETED_MODERATED);
 		}
 
+		$imageTransformation = kThumbnailActionAdapter::getImageTransformation($entry, $version, $width, $height, $type, $bgcolor, $src_x, $src_y, $src_w, $src_h,
+			$vid_sec, $vid_slice, $vid_slices, $start_sec, $end_sec, $stripProfiles, $thumbParams, $quality, $format, $density);
+		$this->executeImageTransformation($imageTransformation);
+
 		if (!$tempThumbPath)
 		{
 			try
@@ -546,6 +549,29 @@ class thumbnailAction extends sfAction
 		
 		// TODO - can delete from disk assuming we caneasily recreate it and it will anyway be cached in the CDN
 		// however dumpfile dies at the end so we cant just write it here (maybe register a shutdown callback)
+	}
+
+	/**
+	 * @param kImageTransformation $transformation
+	 */
+	protected function executeImageTransformation($transformation)
+	{
+		try
+		{
+			$transformation->validate();
+			$lastModified = $transformation->getLastModified();
+			$storage = kThumbStorageBase::getInstance();
+			if (!$storage->loadFile($transformString, $lastModified)) {
+				$imagick = $transformation->execute();
+				$storage->saveFile($transformString, $imagick, $lastModified);
+			}
+
+			$storage->render($lastModified);
+		}
+		catch (kThumbnailException $ex)
+		{
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY);
+		}
 	}
 
 	protected function getLastModified(entry $entry, $isCapturing)

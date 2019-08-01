@@ -8,7 +8,7 @@ class kEntrySource extends kThumbnailSource
 {
 	protected $dbEntry;
 
-	public function  __construct($entryId)
+	public function setEntryId($entryId)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
@@ -20,7 +20,15 @@ class kEntrySource extends kThumbnailSource
 		$secureEntryHelper->validateAccessControl();
 		$this->dbEntry = $dbEntry;
 	}
-	
+
+	/**
+	 * @param entry $dbEntry
+	 */
+	public function setEntry($dbEntry)
+	{
+		$this->dbEntry = $dbEntry;
+	}
+
 	public function getEntryMediaType()
 	{
 		return $this->dbEntry->getMediaType();
