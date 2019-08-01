@@ -1145,13 +1145,21 @@ class kKavaReports extends kKavaReportsMgr
 				'region' => self::DIMENSION_LOCATION_REGION,
 				'city' => self::DIMENSION_LOCATION_CITY,
 				'coordinates' => self::DIMENSION_LOCATION_CITY,
+				'country_code' => self::DIMENSION_LOCATION_COUNTRY,
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
-				self::REPORT_ENRICH_OUTPUT => 'coordinates',
-				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
-			),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country_code',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toShortName',
+				),
+				array(
+					self::REPORT_ENRICH_INPUT =>  array('country','region','city'),
+					self::REPORT_ENRICH_OUTPUT => 'coordinates',
+					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				)
+			)
 		),
 
 		ReportType::USER_ENGAGEMENT_TIMELINE => array(
