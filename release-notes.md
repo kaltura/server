@@ -1,4 +1,4 @@
-# Orion 15.4.0 #
+# Orion 15.5.0 #
 
 ## Adding monitoring-proxy partner ##
 
@@ -14,6 +14,8 @@ deployment/updates/scripts/xml/2019_07_22_server_node_email_alert.template.xml
 php deployment/updates/scripts/add_permissions/2019_07_22_monitoring_proxy_add_partner.php
 php deployment/updates/scripts/2019_07_28_add_server_node_email_alert_template.php
 
+
+# Orion 15.4.0 #
 
 ## changing reach notifications subject ##
 
