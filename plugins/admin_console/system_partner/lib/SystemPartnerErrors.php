@@ -15,4 +15,11 @@ class SystemPartnerErrors extends KalturaErrors
 
 	const PARTNER_LIVE_THUMB_ENTRY_ID_ERROR = "PARTNER_LIVE_THUMB_ENTRY_ID_ERROR;ID;Wrong entry id - @ID@ -  for live thumbnails";
 
+	const DOMAINS_NOT_ALLOWED = "DOMAINS_NOT_ALLOWED;DOMAINS;Some domains are not allowing Kaltura: @DOMAINS@ ";
+
+	/**
+	 * codes
+	 */
+
+	const DOMAINS_NOT_ALLOWED_CODE = 'DOMAINS_NOT_ALLOWED';
 }

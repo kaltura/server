@@ -505,6 +505,12 @@ class PartnerController extends Zend_Controller_Action
 						$form->populate($request->getPost());
 						$form->getElement('live_thumb_entry_id')->addError('wrong entry id or not a \'ready\' image entry');
 					}
+					elseif ($e->getCode() === 'DOMAINS_NOT_ALLOWED')
+					{
+						$this->view->formValid = false;
+						$form->populate($request->getPost());
+						$form->getElement('allowed_from_email_white_list')->addError($e->getMessage());
+					}
 					else
 						$this->view->errMessage = $e->getMessage();
 				}
