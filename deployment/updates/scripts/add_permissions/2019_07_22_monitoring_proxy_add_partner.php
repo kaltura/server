@@ -19,6 +19,9 @@ $script = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/
 $config = realpath(dirname(__FILE__) . '/../../../') . '/permissions/partner.-7.ini';
 passthru("php $script $config");
 
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.confmaps.confmaps.ini';
+passthru("php $script $config");
+
 
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.eventnotification.eventnotificationtemplate.ini';
 passthru("php $script $config");
