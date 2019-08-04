@@ -160,11 +160,7 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 			$outputFileName = pathinfo($filePath, PATHINFO_FILENAME) . ".data";
 			$localTempSyncPointsFilePath = self::$taskConfig->params->localTempPath . DIRECTORY_SEPARATOR . $outputFileName;
 
-			$sharedTempSyncPointFilePath = kFile::createUniqueFilePath(self::$taskConfig->params->sharedTempPath);
-			if(!$sharedTempSyncPointFilePath)
-			{
-				$sharedTempSyncPointFilePath = self::$taskConfig->params->sharedTempPath . DIRECTORY_SEPARATOR . $outputFileName;
-			}
+			$sharedTempSyncPointFilePath = kFile::createUniqueFilePath(self::$taskConfig->params->sharedTempPath) . ".data";
 
 			$retries = 3;
 			$interval = (self::$taskConfig->fileSystemCommandInterval ? self::$taskConfig->fileSystemCommandInterval : self::DEFAULT_SLEEP_INTERVAL);

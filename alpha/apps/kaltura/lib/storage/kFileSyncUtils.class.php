@@ -483,7 +483,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			KalturaLog::info("$temp_file_path file doesnt exist");
 		}
 
-		if(!kFile::isSharedPath($temp_file_path))
+		$copySharedToShared = kConf::get('copy_shared_to_shared', 'local', null);
+		if(!kFile::isSharedPath($temp_file_path) || $copySharedToShared == true)
 		{
 			list($rootPath, $filePath) = self::getLocalFilePathArrForKey($target_key);
 			$targetFullPath = $rootPath . $filePath;

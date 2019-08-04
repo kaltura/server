@@ -802,28 +802,4 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		KalturaLog::warning("S3 [$command] command failed. Retries left: [$retries] Params: " . print_r($params, true)."\n{$e->getMessage()}");
 	}
 
-	protected function doCreateUniqueFilePath($prefix = '', $isDir = false)
-	{
-		$retiresNum = kConf::get('create_path_retries', 'local', 10);
-		for ($i = 0; $i < $retiresNum; $i++)
-		{
-			$id = md5(microtime(true) . getmypid() . uniqid(rand(),true));
-			$path = $prefix . substr($id, 0, 2). '/' . substr($id, -2) . '/' . $id;
-			if($isDir)
-			{
-				$path .= '/';
-			}
-
-			$cleanPath = kFile::fixPath($path);
-			$existingObject = $this->checkFileExists($cleanPath);
-
-			if (!$existingObject)
-			{
-				return $cleanPath;
-			}
-		}
-
-		throw new Exception("Could not calculate unique path for file");
-	}
-
 }

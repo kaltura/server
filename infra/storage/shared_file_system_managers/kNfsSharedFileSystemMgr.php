@@ -324,8 +324,4 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 		return true;
 	}
 
-	protected function doCreateUniqueFilePath($prefix = '', $isDir = false)
-	{
-		return '';
-	}
 }

@@ -598,15 +598,36 @@ class kFileBase
 		return false;
 	}
 
+	/**
+	 *  the function returns a unique file path for a file
+	 *
+	 * @param string $prefix the prefix for the path
+	 * @param bool $isDir should we create this path as dir
+	 * @return string
+	 * @throws Exception
+	 */
 	public static function createUniqueFilePath($prefix = '', $isDir = false)
 	{
-		if(kFile::isSharedPath($prefix))
+		$retiresNum = kConf::get('create_path_retries', 'local', 10);
+		for ($i = 0; $i < $retiresNum; $i++)
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
-			return $kSharedFsMgr->createUniqueFilePath($prefix, $isDir);
+			$id = md5(microtime(true) . getmypid() . uniqid(rand(),true));
+			$path = $prefix . substr($id, 2, 2). '/' . substr($id, -2) . '/' . $id;
+			if($isDir)
+			{
+				$path .= '/';
+			}
+
+			$cleanPath = kFile::fixPath($path);
+			$existingObject = kFile::checkFileExists($cleanPath);
+
+			if (!$existingObject)
+			{
+				return $cleanPath;
+			}
 		}
 
-		return '';
+		throw new Exception("Could not calculate unique path for file");
 	}
 
 }

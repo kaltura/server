@@ -331,14 +331,6 @@ abstract class kSharedFileSystemMgr
 	 */
 	abstract protected function doCopyDir($src, $dest, $deleteSrc);
 
-	/**
-	 * the function returns a unique file path for a file
-	 *
-	 * @param string $prefix the prefix for the path
-	 * @param bool $isDir should we create this path as dir
-	 * @return string
-	 */
-	abstract protected function doCreateUniqueFilePath($prefix = '', $isDir = false);
 
 	public function createDirForPath($filePath)
 	{
@@ -643,11 +635,6 @@ abstract class kSharedFileSystemMgr
 	public function copyDir($src, $dest, $deleteSrc)
 	{
 		return $this->doCopyDir($src, $dest, $deleteSrc);
-	}
-
-	public function createUniqueFilePath($prefix = '', $isDir = false)
-	{
-		return $this->doCreateUniqueFilePath($prefix , $isDir);
 	}
 
 }
