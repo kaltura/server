@@ -367,18 +367,19 @@ ini_set("memory_limit","512M");
 		/* ---------------------------
 		 * ExecuteSession
 		 */
-		public static function ExecuteSession($host, $port, $token, $concurrent, $sessionName, $cmdLine)
+		public static function ExecuteSession($host, $port, $token, $concurrent, $sessionName, $cmdLine, $sharedChunkPath = null)
 		{
-			KalturaLog::log("host:$host, port:$port, token:$token, concurrent:$concurrent, sessionName:$sessionName, cmdLine:$cmdLine");
+			KalturaLog::log("host:$host, port:$port, token:$token, concurrent:$concurrent, sessionName:$sessionName, cmdLine:$cmdLine, sharedChunkPath:$sharedChunkPath");
 			$storeManager = new KChunkedEncodeMemcacheWrap($token);
 				// 'flags=1' stands for 'compress stored data'
 			$config = array('host'=>$host, 'port'=>$port, 'flags'=>1);
 			$storeManager->Setup($config);
 			
-			$setup = new KChunkedEncodeSetup;
+			$setup = new KChunkedEncodeSetup();
 			$setup->concurrent = $concurrent;
 			$setup->cleanUp = 0;
 			$setup->cmd = $cmdLine;
+			$setup->sharedChunkPath = $sharedChunkPath;
 			
 			$session = new KChunkedEncodeSessionManager($setup, $storeManager, $sessionName);
 			
@@ -622,7 +623,8 @@ ini_set("memory_limit","512M");
 			$outFilename = null;
 			if(is_array($job->cmdLine)) {
 				$cmdLine = $job->cmdLine[0];
-				$outFilename = $job->cmdLine[1];
+				$outFilename = isset($job->cmdLine[1]) ? $job->cmdLine[1] : null;;
+				$sharedChunkPath = isset($job->cmdLine[2]) ? $job->cmdLine[2] : null;
 			}
 			else
 				$cmdLine = $job->cmdLine;
@@ -639,10 +641,18 @@ ini_set("memory_limit","512M");
 					$stat = new KChunkFramesStat($outFilename/*,ffmpegBin,ffprobeBin*/);
 					$job->stat = $stat;
 				}
-
-				$job->state = $job::STATE_SUCCESS;
+				
+				//When working with remote (none nfs) shared stoarge we need to move the file to shared
+				if($sharedChunkPath && !kFile::moveFile($outFilename, $sharedChunkPath)) {
+					$job->state = $job::STATE_FAIL;
+					$rvStr = "FAILED - rv(999),";
+				}
+				else {
+					$job->state = $job::STATE_SUCCESS;
+					$rvStr = "SUCCESS -";
+				}
+				
 				$storeManager->SaveJob($job);
-				$rvStr = "SUCCESS -";
 			}
 			KalturaLog::log("$rvStr elap(".($job->finishTime-$job->startTime)."),process($job->process),".print_r($job,1));
 			return ($rv==0? true: false);

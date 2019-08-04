@@ -72,14 +72,31 @@
 				 */
 			$pInfo = pathinfo($params->output);
 			$setup->output = realpath($pInfo['dirname'])."/".$pInfo['basename'];
+			
+			//Build remote shared path to follow same setting as output path
+			if($setup->sharedChunkPath)
+			{
+				$setup->sharedChunkPath .= $pInfo['basename'];
+			}
 
-			if(isset($setup->createFolder) && $setup->createFolder==1) {
+			if(isset($setup->createFolder) && $setup->createFolder==1)
+			{
 				$setup->output.= "_".$this->chunkEncodeToken."/";
 				if(!kFile::checkFileExists($setup->output)) {
 					KalturaLog::log("Create tmp folder:".$setup->output);
 					kFile::mkdir($setup->output);
 				}
 				$setup->output.= $pInfo['filename'];
+				
+				if($setup->sharedChunkPath)
+				{
+					$setup->sharedChunkPath .= "_".$this->chunkEncodeToken."/";
+					if(!kFile::checkFileExists($setup->sharedChunkPath)) {
+						KalturaLog::log("Create tmp folder:".$setup->sharedChunkPath);
+						kFile::mkdir($setup->sharedChunkPath);
+					}
+					$setup->sharedChunkPath.= $pInfo['filename'];
+				}
 			}
 			
 				/*
@@ -613,13 +630,16 @@
 		public function BuildMergeCommandLine()
 		{
 			$mergedFilename= $this->getSessionName();
+			$sharedMode = $this->setup->sharedChunkPath ? "shared" : null;
 			
 			$vidConcatStr = "concat:'";
 			foreach($this->chunkDataArr as $idx=>$chunkData){
 				if(isset($chunkData->toFix))
-					$vidConcatStr.= $this->getChunkName($idx,"fix").'|';
-				else 
-					$vidConcatStr.= $this->getChunkName($idx).'|';
+					$currVidStr = $this->getChunkName($idx,"fix");
+				else
+					$currVidStr = $this->getChunkName($idx, $sharedMode);
+				
+				$vidConcatStr .= kFile::realPath($currVidStr) . "|";
 			}
 			$vidConcatStr = rtrim($vidConcatStr, '|');
 			$vidConcatStr.= "'";
@@ -628,7 +648,7 @@
 			$params = $this->params;
 			$audioInputParams = null;
 			if(isset($params->acodec)) {
-				$audioFilename = $this->getSessionName("audio");
+				$audioFilename = $this->getSessionName("audio", $sharedMode);
 				if($setup->duration!=-1){
 					$fileDt = self::getMediaData($audioFilename);
 					if(isset($fileDt) && round($fileDt->containerDuration,4)>$params->duration) {
@@ -894,6 +914,12 @@
 			case "audio":
 				$name = $this->setup->output."_audio";
 				break;
+			case "shared":
+				if(!$this->setup->sharedChunkPath)
+					return null;
+					
+				$name = $this->setup->sharedChunkPath . "_audio";
+				break;
 			case "qpfile":
 				$name = $this->setup->output."_qpfile";
 				break;
@@ -921,6 +947,13 @@
 			$name = $this->setup->output."_$this->chunkEncodeToken"."_$chunkIdx.";
 			switch($mode){
 			case null:
+				$name.= "$this->videoChunkPostfix".$chunkIdx;
+				break;
+			case "shared":
+				if(!$this->setup->sharedChunkPath)
+					return null;
+				
+				$name = $this->setup->sharedChunkPath . "_$this->chunkEncodeToken"."_$chunkIdx.";
 				$name.= "$this->videoChunkPostfix".$chunkIdx;
 				break;
 			case "fix":
