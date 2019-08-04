@@ -73,7 +73,6 @@ $sphinxReadConn = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LO
 $serverLastLogs = SphinxLogServerPeer::retrieveByServer($sphinxServer, $sphinxReadConn);
 $lastLogs = array();
 $handledRecords = array();
-$sphinxRtTables = getSphinxRtTables($sphinxCon);
 
 foreach($serverLastLogs as $serverLastLog)
 {
@@ -96,6 +95,7 @@ while(true)
 	try
 	{
 		$sphinxCon = DbManager::createSphinxConnection($sphinxServer,$sphinxPort);
+		$sphinxRtTables = getSphinxRtTables($sphinxCon);
 		KalturaLog::log("sphinxServer [$sphinxServer], running rt index names [" . implode(",", $sphinxRtTables) . "]");
 	}
 	catch(Exception $e)
