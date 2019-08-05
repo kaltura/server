@@ -1443,6 +1443,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWENTY_FOUR_HOURS' => 'TWENTY_FOUR_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FORTY_EIGHT_HOURS' => 'FORTY_EIGHT_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FOUR_DAYS' => 'FOUR_DAYS',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FIVE_DAYS' => 'FIVE_DAYS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TEN_DAYS' => 'TEN_DAYS',
 	
 	'Kaltura_Client_Reach_Type_VendorCatalogItemPricing' => "Default Pricing",

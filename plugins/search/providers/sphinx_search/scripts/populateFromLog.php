@@ -59,6 +59,12 @@ $dbConf = kConf::getDB();
 DbManager::setConfig($dbConf);
 DbManager::initialize();
 
+$splitIndexSettings = null;
+if(isset($dbConf['sphinx_split_index']) && $dbConf['sphinx_split_index']['enabled'] == true)
+{
+	$splitIndexSettings = $dbConf['sphinx_split_index'];
+}
+
 $limit = 1000; 	// The number of sphinxLog records we want to query
 $gap = 500;	// The gap from 'getLastLogId' we want to query
 
@@ -68,7 +74,8 @@ $serverLastLogs = SphinxLogServerPeer::retrieveByServer($sphinxServer, $sphinxRe
 $lastLogs = array();
 $handledRecords = array();
 
-foreach($serverLastLogs as $serverLastLog) {
+foreach($serverLastLogs as $serverLastLog)
+{
 	$lastLogs[$serverLastLog->getDc()] = $serverLastLog;
 	$handledRecords[$serverLastLog->getDc()] = array();
 }
@@ -105,7 +112,11 @@ while(true)
 		$executedServerId = $sphinxLog->getExecutedServerId();
 		$sphinxLogId = $sphinxLog->getId();
 		$sphinxLogIndexName = $sphinxLog->getIndexName();
-		
+		if($isSharded && preg_match('~[0-9]~', $sphinxLogIndexName) == 0 &&  $splitIndexSettings && isset($splitIndexSettings[$sphinxLog->getObjectType()]))
+		{
+			$splitFactor = $splitIndexSettings[$sphinxLog->getObjectType()];
+			$sphinxLogIndexName = $sphinxLogIndexName . "_" . ($sphinxLog->getPartnerId()/$splitFactor)%$splitFactor;
+		}
 		
 		if($isSharded && $sphinxLogIndexName && !in_array($sphinxLogIndexName, $sphinxRtTables))
 		{
@@ -139,10 +150,9 @@ while(true)
 			else
 			{
 				$sql = $sphinxLog->getSql();
-				if($isSharded && $sphinxLog->getObjectType() == "entry")
+				if($isSharded)
 				{
-					$shardedIndexName = $sphinxLog->getIndexName() ? $sphinxLog->getIndexName() : "kaltura_entry_" . ($sphinxLog->getPartnerId()/10)%10;
-					$sql = str_replace("kaltura_entry", $shardedIndexName, $sql);
+					$sql = preg_replace('/replace into (kaltura_.*?) /', "replace into $sphinxLogIndexName ", $sql);
 				}
 				
 				// sql update commands are created only via an external script for updating entries plays count

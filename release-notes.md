@@ -1,3 +1,46 @@
+# Orion 15.4.0 #
+
+## changing reach notifications subject ##
+
+- Issue Type: Task
+- Issue ID: REACH2-663
+
+### configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+deployment/updates/scripts/xml/notifications/2019_07_24_update_task_approved_execution.template.xml
+deployment/updates/scripts/xml/notifications/2019_07_24_update_task_finished_processing.template.xml
+deployment/updates/scripts/xml/notifications/2019_07_24_update_task_rejected_for_execution.template.xml
+
+### Deployment scripts ###
+php deployment/updates/scripts/2019_07_24_deploy_update_subject_reach_notifications.php
+
+## update reach credit notification ##
+
+- Issue Type: Task
+- Issue ID: REACH2-563
+
+### configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+deployment/updates/scripts/xml/notifications/2019_07_23_update_reach_credit_expired.template.xml
+deployment/updates/scripts/xml/notifications/2019_07_23_update_reach_credit_usage_over_75_percent.template.xml
+deployment/updates/scripts/xml/notifications/2019_07_23_update_reach_credit_usage_over_90_percent.template.xml
+deployment/updates/scripts/xml/notifications/2019_07_23_update_reach_credit_usage_over_100_percent.template.xml
+
+### Deployment scripts ###
+php deployment/updates/scripts/2019_07_23_deploy_update_credit_notifications.php
+
+## update reach notification: Task Pending Moderation ##
+
+- Issue Type: Task
+- Issue ID: REACH2-662
+
+### configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+deployment/updates/scripts/xml/notifications/2019_07_22_update_entry_vendor_pending_moderation.template.xml
+
+### Deployment scripts ###
+php deployment/updates/scripts/2019_07_22_deploy_update_entry_vendor_pending_moderation.php
+
 # Orion 15.3.0 #
 
 ## Add new type of userEntry called watch later ##
