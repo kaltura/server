@@ -30,7 +30,7 @@ class kCropAction extends kImagickAction
 		$this->newHeight = $this->getIntActionParameter(kThumbnailParameterName::HEIGHT);
 		$this->x = $this->getIntActionParameter(kThumbnailParameterName::X);
 		$this->y = $this->getIntActionParameter(kThumbnailParameterName::Y);
-		$this->gravityPoint = $this->getIntActionParameter(kThumbnailParameterName::GRAVITY_POINT, kCropGravityPoint::CENTER);
+		$this->gravityPoint = $this->getIntActionParameter(kThumbnailParameterName::GRAVITY_POINT, Imagick::GRAVITY_NORTHWEST);
 		$this->currentWidth = $this->image->getImageWidth();
 		$this->currentHeight = $this->image->getImageHeight();
 	}
@@ -79,25 +79,10 @@ class kCropAction extends kImagickAction
 	 */
 	protected function doAction()
 	{
-		if($this->x)
-		{
-			$this->image->cropImage($this->newWidth, $this->newHeight, $this->x, $this->y);
-		}
-		else
-		{
-			switch ($this->gravityPoint) {
-				case kCropGravityPoint::TOP:
-					$this->image->cropImage($this->newWidth, $this->newHeight, 0, 0);
-					break;
-				case kCropGravityPoint::CENTER:
-					$this->image->cropImage($this->newWidth, $this->newHeight, $this->currentWidth / 2, $this->currentHeight / 2);
-					break;
-				default:
-					$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::ILLEGAL_GRAVITY);
-					throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
-			}
-		}
-
+		$currentGravity = $this->image->getGravity();
+		$this->image->setGravity($this->gravityPoint);
+		$this->image->cropImage($this->newWidth, $this->newHeight, $this->x, $this->y);
+		$this->image->setGravity($currentGravity);
 		return $this->image;
 	}
 }

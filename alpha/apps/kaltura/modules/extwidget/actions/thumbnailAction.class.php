@@ -447,8 +447,7 @@ class thumbnailAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::ENTRY_DELETED_MODERATED);
 		}
 
-		$imageTransformation = kThumbnailActionAdapter::getImageTransformation($entry, $version, $width, $height, $type, $bgcolor, $src_x, $src_y, $src_w, $src_h,
-			$vid_sec, $vid_slice, $vid_slices, $start_sec, $end_sec, $stripProfiles, $thumbParams, $quality, $format, $density);
+		$imageTransformation = kThumbnailActionAdapter::getImageTransformation($entry, $version, $width, $height, $type, $bgcolor, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $start_sec, $end_sec, $stripProfiles, $quality, $format, $density);
 		$this->executeImageTransformation($imageTransformation);
 
 		if (!$tempThumbPath)
