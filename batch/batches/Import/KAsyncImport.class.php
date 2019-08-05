@@ -440,8 +440,8 @@ class KAsyncImport extends KJobHandlerWorker
 				KalturaLog::err( "Cannot continue import without shared directory");
 				die();
 			}
-			$uniqid = uniqid('import_');
-			$sharedFile = $rootPath . DIRECTORY_SEPARATOR . $uniqid;
+
+			$sharedFile = kFile::createUniqueFilePath($rootPath);
 
 			$ext = pathinfo($destFile, PATHINFO_EXTENSION);
 			if(strlen($ext))
