@@ -802,4 +802,9 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		KalturaLog::warning("S3 [$command] command failed. Retries left: [$retries] Params: " . print_r($params, true)."\n{$e->getMessage()}");
 	}
 
+	protected function doCopySharedToSharedAllowed()
+	{
+		return false;
+	}
+
 }

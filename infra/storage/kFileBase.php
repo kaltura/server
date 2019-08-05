@@ -612,7 +612,7 @@ class kFileBase
 		for ($i = 0; $i < $retiresNum; $i++)
 		{
 			$id = md5(microtime(true) . getmypid() . uniqid(rand(),true));
-			$path = $prefix . substr($id, 2, 2). '/' . substr($id, -2) . '/' . $id;
+			$path = $prefix . substr($id, 0, 2). '/' . substr($id, -2) . '/' . $id;
 			if($isDir)
 			{
 				$path .= '/';
