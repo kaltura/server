@@ -19,6 +19,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
 	const MAX_PARTS_NUMBER = 10000;
 	const MIN_PART_SIZE = 5242880;
+	const AWS_404_ERROR = 'NotFound';
 	
 	protected $filesAcl;
 	protected $s3Region;
@@ -375,7 +376,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function getHeadObjectForPath($path)
 	{
-		$res = $this->s3Call('headObject', null, $path);
+		$res = $this->s3Call('headObject', null, $path, array(self::AWS_404_ERROR));
 
 		if(!$res)
 		{
@@ -463,7 +464,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doFileSize($filename)
 	{
-		$result = $this->s3Call('headObject', null, $filename);
+		$result = $this->s3Call('headObject', null, $filename, array(self::AWS_404_ERROR));
 
 		if(!$result)
 		{
@@ -742,7 +743,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return $result;
 	}
 
-	protected function s3Call($command, $params = null, $filePath = null)
+	protected function s3Call($command, $params = null, $filePath = null, $finalErrorCodes = array())
 	{
 		if(!$params && $filePath)
 		{
@@ -760,6 +761,10 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			catch (S3Exception $e)
 			{
 				$retries--;
+				if(in_array($e->getAwsErrorCode(), $finalErrorCodes))
+				{
+					$retries = 0;
+				}
 				$this->handleS3Exception($command, $retries, $params, $e);
 			}
 		}
