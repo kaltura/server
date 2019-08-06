@@ -38,6 +38,16 @@ class kCropAction extends kImagickAction
 	function validateInput()
 	{
 		$this->validateDimensions();
+		$this->validateGravityPoint();
+	}
+
+	protected function validateGravityPoint()
+	{
+		if($this->gravityPoint < Imagick::GRAVITY_NORTHWEST || $this->gravityPoint > Imagick::GRAVITY_SOUTHEAST)
+		{
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::ILLEGAL_GRAVITY);
+			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
+		}
 	}
 
 	protected function validateDimensions()
@@ -79,10 +89,47 @@ class kCropAction extends kImagickAction
 	 */
 	protected function doAction()
 	{
-		$currentGravity = $this->image->getGravity();
-		$this->image->setGravity($this->gravityPoint);
+		$this->calculateGravityOffSet();
 		$this->image->cropImage($this->newWidth, $this->newHeight, $this->x, $this->y);
-		$this->image->setGravity($currentGravity);
 		return $this->image;
+	}
+
+	protected function calculateGravityOffSet()
+	{
+		switch ($this->gravityPoint) {
+			case Imagick::GRAVITY_NORTHWEST:
+				break;
+			case Imagick::GRAVITY_NORTH:
+				$this->x += ($this->currentWidth / 2) - ($this->newWidth / 2);
+				break;
+			case Imagick::GRAVITY_NORTHEAST:
+				$this->x += ($this->currentWidth) - $this->newWidth;
+				break;
+			case Imagick::GRAVITY_WEST:
+				$this->y += ($this->currentHeight / 2) - ($this->newHeight / 2);
+				break;
+			case Imagick::GRAVITY_EAST:
+				$this->x += $this->currentWidth- $this->newWidth;
+				$this->y += ($this->currentHeight / 2)  - ($this->newHeight / 2);
+				break;
+			case Imagick::GRAVITY_CENTER:
+				$this->x += ($this->currentWidth / 2) - ($this->newWidth / 2);
+				$this->y += $this->currentHeight / 2  - ($this->newHeight / 2);
+				break;
+			case Imagick::GRAVITY_SOUTHWEST:
+				$this->y += $this->currentHeight - $this->newHeight;
+				break;
+			case Imagick::GRAVITY_SOUTH:
+				$this->x += ($this->currentWidth / 2) - ($this->newWidth / 2);
+				$this->y += $this->currentHeight - $this->newHeight;
+				break;
+			case Imagick::GRAVITY_SOUTHEAST:
+				$this->x += $this->currentWidth - $this->newWidth;
+				$this->y += $this->currentHeight - $this->newHeight;
+				break;
+
+			default:
+				break;
+		}
 	}
 }

@@ -13,7 +13,6 @@ class kResizeAction extends kImagickAction
 	protected $bestFit;
 	protected $filterType;
 	protected $blur;
-	protected $shouldUseResize;
 	protected $compositeFit;
 	/* @var Imagick $compositeObject */
 	protected $compositeObject;
@@ -44,7 +43,6 @@ class kResizeAction extends kImagickAction
 		$this->bestFit = $this->getBoolActionParameter(kThumbnailParameterName::BEST_FIT);
 		$this->compositeFit = $this->getBoolActionParameter(kThumbnailParameterName::COMPOSITE_FIT);
 		$this->compositeObject = $this->getActionParameter(kThumbnailParameterName::COMPOSITE_OBJECT);
-		$this->shouldUseResize = true;
 	}
 
 	function validateInput()
@@ -98,20 +96,7 @@ class kResizeAction extends kImagickAction
 			$this->newWidth = $this->compositeObject->getImageWidth();
 		}
 
-		if($this->newHeight > $this->currentHeight && $this->newWidth > $this->currentWidth)
-		{
-			$this->shouldUseResize = false;
-		}
-
-		if($this->shouldUseResize)
-		{
-			$this->image->resizeImage($this->newWidth, $this->newHeight, $this->filterType, $this->blur, $this->bestFit);
-		}
-		else
-		{
-			$this->image->scaleImage($this->newWidth, $this->newHeight, $this->bestFit);
-		}
-
+		$this->image->resizeImage($this->newWidth, $this->newHeight, $this->filterType, $this->blur, $this->bestFit);
 		return $this->image;
 	}
 }

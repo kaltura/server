@@ -10,7 +10,7 @@ interface kThumbnailParameterName extends BaseEnum
 	const HEIGHT = 'height';
 	const BACKGROUND_COLOR = 'backgroundColor';
 	const GRAVITY_POINT = 'gravityPoint';
-	const FORMAT = 'format';
+	const IMAGE_FORMAT = 'format';
 	const QUALITY = 'quality';
 	const DENSITY = 'density';
 	const BEST_FIT = 'bestFit';

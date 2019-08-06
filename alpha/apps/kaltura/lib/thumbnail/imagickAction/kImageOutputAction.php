@@ -6,7 +6,7 @@
 
 class kImageOutputAction extends kImagickAction
 {
-	const DEFAULT_FORMAT = 'png';
+	const DEFAULT_FORMAT = 'JPEG';
 	const DEFAULT_QUALITY = 75;
 	const MIN_QUALITY = 20;
 	const MAX_QUALITY = 100;
@@ -43,7 +43,7 @@ class kImageOutputAction extends kImagickAction
 	protected function initParameterAlias()
 	{
 		$cropParameterAlias = array(
-			'f' => kThumbnailParameterName::FORMAT,
+			'f' => kThumbnailParameterName::IMAGE_FORMAT,
 			'q' => kThumbnailParameterName::QUALITY,
 			'd'=> kThumbnailParameterName::DENSITY,
 		);
@@ -52,7 +52,7 @@ class kImageOutputAction extends kImagickAction
 
 	protected function extractActionParameters()
 	{
-		$this->format = $this->getActionParameter(kThumbnailParameterName::FORMAT, self::DEFAULT_FORMAT);
+		$this->format = $this->getActionParameter(kThumbnailParameterName::IMAGE_FORMAT, self::DEFAULT_FORMAT);
 		$this->density = $this->getFloatActionParameter(kThumbnailParameterName::DENSITY);
 		$this->quality = $this->getIntActionParameter(kThumbnailParameterName::QUALITY, self::DEFAULT_QUALITY);
 	}

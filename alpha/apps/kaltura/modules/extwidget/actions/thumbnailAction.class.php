@@ -447,8 +447,11 @@ class thumbnailAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::ENTRY_DELETED_MODERATED);
 		}
 
-		$imageTransformation = kThumbnailActionAdapter::getImageTransformation($entry, $version, $width, $height, $type, $bgcolor, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $start_sec, $end_sec, $stripProfiles, $quality, $format, $density);
-		$this->executeImageTransformation($imageTransformation);
+		$adapter = new kThumbnailActionAdapter($entry, $width, $height, $type, $bgcolor, $src_w, $src_h, $src_x, $src_y, $vid_sec, $vid_slice, $vid_slices, $start_sec,
+			$end_sec, $stripProfiles, $quality, $format, $density);
+		$imageTransformation = $adapter->getImageTransformation();
+		$imageTransformation->setPartnerId($entry->getPartnerId());
+		$this->executeImageTransformation($imageTransformation, $tempThumbPath);
 
 		if (!$tempThumbPath)
 		{
@@ -552,17 +555,19 @@ class thumbnailAction extends sfAction
 
 	/**
 	 * @param kImageTransformation $transformation
+	 * @param string $cacheString
 	 */
-	protected function executeImageTransformation($transformation)
+	protected function executeImageTransformation($transformation, $cacheString)
 	{
 		try
 		{
 			$transformation->validate();
 			$lastModified = $transformation->getLastModified();
 			$storage = kThumbStorageBase::getInstance();
-			if (!$storage->loadFile($transformString, $lastModified)) {
+			if (!$storage->loadFile($cacheString, $lastModified))
+			{
 				$imagick = $transformation->execute();
-				$storage->saveFile($transformString, $imagick, $lastModified);
+				$storage->saveFile($cacheString, $imagick, $lastModified);
 			}
 
 			$storage->render($lastModified);
