@@ -15,7 +15,7 @@
 
 		protected $maxFailures = 5;		// Max allowed job failures (if more, get out w/out retry)
 		protected $maxRetries = 10;		// Max retries per failed job
-		protected $maxExecutionTime = 3600;	// In seconds 
+		protected $maxExecutionTime = 12000;	// In seconds
 		
 		protected $videoCmdLines = array();
 		protected $audioCmdLines = array();
