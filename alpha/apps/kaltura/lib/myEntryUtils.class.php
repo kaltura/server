@@ -770,7 +770,7 @@ class myEntryUtils
 			$processingThumbPath = kFile::replaceExt($processingThumbPath, $format);
 		}
 		
-		if (file_exists($finalThumbPath) && @filesize($finalThumbPath))
+		if (kFile::checkFileExists($finalThumbPath) && @kFile::fileSize($finalThumbPath))
 		{
 			header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
 			return $finalThumbPath;
@@ -780,7 +780,7 @@ class myEntryUtils
 		if ($fileSync)
 			$orig_image_path = $fileSync->getFullPath();
 		
-		if ($orig_image_path === null || !file_exists($orig_image_path))
+		if ($orig_image_path === null || !kFile::checkFileExists($orig_image_path))
 		{
 			$fileSync = self::getEntryLocalImageFileSync($entry, $version);
 			$orig_image_path = self::getLocalImageFilePathByEntry( $entry, $version );

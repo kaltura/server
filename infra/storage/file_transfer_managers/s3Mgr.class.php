@@ -5,7 +5,6 @@ require_once(KAutoloader::buildPath(KALTURA_ROOT_PATH, 'vendor', 'aws', 'aws-aut
 
 use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
-use Aws\S3\Enum\CannedAcl;
 
 /**
  * Extends the 'kFileTransferMgr' class & implements a file transfer manager using the Amazon S3 protocol with Authentication Version 4.
@@ -19,7 +18,7 @@ class s3Mgr extends kFileTransferMgr
 	/* @var S3Client $s3 */
 	private $s3;
 	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
-	protected $filesAcl = CannedAcl::PRIVATE_ACCESS;
+	protected $filesAcl = "private";
 	protected $s3Region = '';
 	protected $sseType = '';
 	protected $sseKmsKeyId = '';

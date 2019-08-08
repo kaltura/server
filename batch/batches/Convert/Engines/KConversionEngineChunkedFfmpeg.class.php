@@ -91,16 +91,23 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 			$host = KBatchBase::$taskConfig->params->chunkedEncodeMemcacheHost;
 			$port = KBatchBase::$taskConfig->params->chunkedEncodeMemcachePort;
 			
-			if(isset(KBatchBase::$taskConfig->params->chunkedEncodeMemcacheToken)){
+			$token = null;
+			if(isset(KBatchBase::$taskConfig->params->chunkedEncodeMemcacheToken))
+			{
 				$token = KBatchBase::$taskConfig->params->chunkedEncodeMemcacheToken;
 			}
-			else $token = null;
 			
-			if(isset(KBatchBase::$taskConfig->params->chunkedEncodeMaxConcurrent)){
+			$concurrent = 5;
+			if(isset(KBatchBase::$taskConfig->params->chunkedEncodeMaxConcurrent))
+			{
 				$concurrent = KBatchBase::$taskConfig->params->chunkedEncodeMaxConcurrent;
 			}
-			else 
-				$concurrent = 5;
+			
+			$sharedChunkPath = null;
+			if(isset(KBatchBase::$taskConfig->params->sharedChunkPath))
+			{
+				$sharedChunkPath = KBatchBase::$taskConfig->params->sharedChunkPath;
+			}
 
 			$sessionName = null;
 		}
@@ -114,7 +121,13 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 			$cmdLine.= '\''.($token).'\',';
 			$cmdLine.= '\''.($concurrent).'\',';
 			$cmdLine.= '\''.($sessionName).'\',';
-			$cmdLine.= '\''.$cmdLineAdjusted.'\');';
+			$cmdLine.= '\''.($cmdLineAdjusted).'\'';
+			
+			if($sharedChunkPath)
+				$cmdLine.= ',\''.$sharedChunkPath.'\');';
+			else
+				$cmdLine.=');';
+			
 			$cmdLine.= 'if(\$rv==false) exit(1);';
 			$cmdLine.= '"';
 		}
