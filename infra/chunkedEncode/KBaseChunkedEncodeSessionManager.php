@@ -99,18 +99,20 @@
 				$logFilename = $chunker->getChunkName($chunkIdx,".log");
 				$cmdLine = "time $cmdLine > $logFilename 2>&1";
 				$outFilename = $chunker->getChunkName($chunkIdx);
+				$outFileName2 = substr($outFilename, 0, -1) . (substr($outFilename, -1)+1);
 				$sharedOutFilename = $chunker->getChunkName($chunkIdx, "shared");
-				$videoCmdLines[$chunkIdx] = array($cmdLine, $outFilename, $sharedOutFilename);
+				$sharedOutFilename2 = substr($sharedOutFilename, 0, -1) . (substr($sharedOutFilename, -1)+1);
+				$videoCmdLines[$chunkIdx] = array($cmdLine, array($outFilename, $outFileName2), array($sharedOutFilename, $sharedOutFilename2));
 				KalturaLog::log($cmdLine);
 			}
 			$this->videoCmdLines = $videoCmdLines;
 			
 			$cmdLine = $chunker->BuildAudioCommandLine();
 			if(isset($cmdLine)){
-				$logFilename = $chunker->getSessionName("audio").".log";
-				$sharedOutFilename = $chunker->getSessionName("audio", "shared");
-				$cmdLine = "time $cmdLine > $logFilename 2>&1";
-				$this->audioCmdLines = array($cmdLine, null, $sharedOutFilename);
+				$outFilename = $chunker->getSessionName("audio");
+				$logFilename = $outFilename.".log";
+				$sharedOutFilename = $chunker->getSessionName("shared_audio");
+				$this->audioCmdLines[] = array("time $cmdLine > $logFilename 2>&1", array($outFilename), array($sharedOutFilename));;
 			}
 			$this->SerializeSession();
 			return true;

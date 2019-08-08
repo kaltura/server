@@ -121,8 +121,13 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 			$cmdLine.= '\''.($token).'\',';
 			$cmdLine.= '\''.($concurrent).'\',';
 			$cmdLine.= '\''.($sessionName).'\',';
-			$cmdLine.= '\''.($cmdLineAdjusted).'\',';
-			$cmdLine.= '\''.$sharedChunkPath.'\');';
+			$cmdLine.= '\''.($cmdLineAdjusted).'\'';
+			
+			if($sharedChunkPath)
+				$cmdLine.= ',\''.$sharedChunkPath.'\');';
+			else
+				$cmdLine.=');';
+			
 			$cmdLine.= 'if(\$rv==false) exit(1);';
 			$cmdLine.= '"';
 		}

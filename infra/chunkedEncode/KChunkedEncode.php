@@ -93,7 +93,7 @@
 					$setup->sharedChunkPath .= "_".$this->chunkEncodeToken."/";
 					if(!kFile::checkFileExists($setup->sharedChunkPath)) {
 						KalturaLog::log("Create tmp folder:".$setup->sharedChunkPath);
-						kFile::mkdir($setup->sharedChunkPath);
+						kFile::fullMkdir($setup->sharedChunkPath);
 					}
 					$setup->sharedChunkPath.= $pInfo['filename'];
 				}
@@ -648,7 +648,8 @@
 			$params = $this->params;
 			$audioInputParams = null;
 			if(isset($params->acodec)) {
-				$audioFilename = $this->getSessionName("audio", $sharedMode);
+				$sessionName = $sharedMode ? "shared_audio" : "audio";
+				$audioFilename = $this->getSessionName($sessionName);
 				if($setup->duration!=-1){
 					$fileDt = self::getMediaData($audioFilename);
 					if(isset($fileDt) && round($fileDt->containerDuration,4)>$params->duration) {
@@ -658,7 +659,7 @@
 				}
 				if($this->chunkFileFormat=="mpegts")
 					$audioInputParams.= " -itsoffset -1.4";
-				$audioInputParams.= " -i $audioFilename";
+				$audioInputParams.= " -i '" . kfile::realPath($audioFilename) . "'";
 				$audioCopyParams = "-map 1:a -c:a copy";
 				if($params->acodec=="libfdk_aac" || $params->acodec=="libfaac")
 					$audioCopyParams.= " -bsf:a aac_adtstoasc";
@@ -668,9 +669,15 @@
 			}
 
 			$mergeCmd = $setup->ffmpegBin;
-			if(isset($params->fps)) $mergeCmd.= " -r ".$params->fps;
+			if($sharedMode)
+				$mergeCmd .= ' -protocol_whitelist "http,https,concat,tcp,file" ';
+			
+			if(isset($params->fps))
+				$mergeCmd.= " -r ".$params->fps;
+			
 			if($this->chunkFileFormat=="mpegts")
 				$mergeCmd.= " -itsoffset -1.4";
+			
 			$mergeCmd.= " -i $vidConcatStr";
 			$mergeCmd.= "$audioInputParams -map 0:v:0 -c:v copy $audioCopyParams";
 			if(isset($params->formatParams))
@@ -914,7 +921,7 @@
 			case "audio":
 				$name = $this->setup->output."_audio";
 				break;
-			case "shared":
+			case "shared_audio":
 				if(!$this->setup->sharedChunkPath)
 					return null;
 					

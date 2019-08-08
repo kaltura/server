@@ -544,7 +544,7 @@ ini_set("memory_limit","512M");
 			$this->SaveJob($job);
 
 			if(is_array($job->cmdLine) && count($job->cmdLine)>1) {
-				$outFilename = $job->cmdLine[1];
+				$outFilename = $job->cmdLine[1][0];
 				$pInfo = pathinfo($outFilename);
 				$this->tmpFolder = realpath($pInfo['dirname']);
 			}
@@ -589,7 +589,7 @@ ini_set("memory_limit","512M");
 			}
 			else {
 				$job->process = (int)kFile::getFileContent($tmp_ce_process_file);
-				kFile::unlink($tmp_ce_process_file);
+				//kFile::unlink($tmp_ce_process_file);
 			}
 			KalturaLog::log("id:$job->id,keyIdx:$job->keyIdx,rv:$rv,process:$job->process,cmdLine:$cmdLine");
 			return true;
@@ -621,10 +621,12 @@ ini_set("memory_limit","512M");
 			$storeManager->SaveJob($job);
 			
 			$outFilename = null;
+			KalturaLog::log("TTT:: job cmd line [" . print_r($job->cmdLine, true) ."]");
 			if(is_array($job->cmdLine)) {
 				$cmdLine = $job->cmdLine[0];
-				$outFilename = isset($job->cmdLine[1]) ? $job->cmdLine[1] : null;;
-				$sharedChunkPath = isset($job->cmdLine[2]) ? $job->cmdLine[2] : null;
+				$outFilenames = isset($job->cmdLine[1]) ? $job->cmdLine[1] : null;;
+				$outFilename = is_array($outFilenames) ? $outFilenames[0] : $outFilenames;
+				$sharedChunkPaths = isset($job->cmdLine[2]) ? $job->cmdLine[2] : null;
 			}
 			else
 				$cmdLine = $job->cmdLine;
@@ -638,20 +640,36 @@ ini_set("memory_limit","512M");
 			}
 			else {
 				if(isset($outFilename)) {
-					$stat = new KChunkFramesStat($outFilename/*,ffmpegBin,ffprobeBin*/);
+					$ffmpegBin = kConf::get('bin_path_ffmpeg') ? kConf::get('bin_path_ffmpeg') : "ffmpeg";
+					$ffprobeBin = kConf::get('bin_path_ffprobe') ? kConf::get('bin_path_ffprobe') : "ffprobe";
+					$stat = new KChunkFramesStat($outFilename, $ffprobeBin, $ffmpegBin);
 					$job->stat = $stat;
 				}
 				
 				//When working with remote (none nfs) shared stoarge we need to move the file to shared
-				if($sharedChunkPath && !kFile::moveFile($outFilename, $sharedChunkPath)) {
-					$job->state = $job::STATE_FAIL;
-					$rvStr = "FAILED - rv(999),";
+				KalturaLog::log("TTT:: Done running cmd line,moving file from [" . print_r($outFilenames, true) . "] to [" . print_r($sharedChunkPaths, true) . "]");
+				if($sharedChunkPaths)
+				{
+					$keys = array_keys($outFilenames);
+					foreach ($keys as $key) {
+						KalturaLog::debug("TTT:: Move file from [" . $outFilenames[$key] . "] to [" . $sharedChunkPaths[$key] . "]");
+						if(kFile::checkFileExists($outFilenames[$key]) && !kFile::moveFile($outFilenames[$key], $sharedChunkPaths[$key], false, true)) {
+							$job->state = $job::STATE_FAIL;
+							$rvStr = "FAILED - rv(999),";
+							break;
+						}
+						else {
+							$job->state = $job::STATE_SUCCESS;
+							$rvStr = "SUCCESS -";
+						}
+					}
 				}
 				else {
 					$job->state = $job::STATE_SUCCESS;
 					$rvStr = "SUCCESS -";
 				}
 				
+				KalturaLog::log("TTT:: Done job state is [" . $job->state .  "]");
 				$storeManager->SaveJob($job);
 			}
 			KalturaLog::log("$rvStr elap(".($job->finishTime-$job->startTime)."),process($job->process),".print_r($job,1));
