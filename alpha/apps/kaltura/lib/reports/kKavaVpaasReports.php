@@ -278,7 +278,7 @@ class kKavaVpaasReports extends kKavaReports
 		$report_def = isset(self::$reports_def[$report_type]) ? self::$reports_def[$report_type] : null;
 		if (is_null($report_def))
 		{
-			return array();
+			return null;
 		}
 		
 		if (isset($report_def[self::REPORT_BASE_DEF]))
