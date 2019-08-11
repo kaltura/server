@@ -3176,12 +3176,7 @@ class kFlowHelper
 	{
 		$partner = PartnerPeer::retrieveActiveByPK($partner_id);
 
-		if ($partner->getEnforceHttpsApi())
-		{
-			return true;
-		}
-
-		return false;
+		return $partner->getEnforceHttpsApi();
 	}
 
 }
