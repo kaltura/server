@@ -196,17 +196,8 @@ class kKavaVpaasReports extends kKavaReports
 
 	protected static function getUsersInfoVpaass($ids, $partner_id, $context)
 	{
-		$columns = isset($context['columns']) ? $context['columns'] : array('PUSER_ID');
-		if (!isset($context['hash']) || $context['hash'])
-		{
-			$hash_conf = kConf::get('kava_hash_user_ids', 'local', array());
-		}
-		else
-		{
-			$hash_conf = array();
-		}
-
-		list($result, $rows) = self::getBaseUsersInfo($ids, $partner_id, $columns, true);
+		$context['skip_partner_filter'] = true;
+		list($columns, $hash_conf, $result, $rows) = self::getBaseUsersInfo($ids, $partner_id, $context);
 
 		$partner_ids = array();
 		foreach ($rows as $row)

@@ -3250,8 +3250,19 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 	
-	protected static function getBaseUsersInfo($ids, $partner_id, $columns, $skip_partner_filter = false)
+	protected static function getBaseUsersInfo($ids, $partner_id, $context)
 	{
+		$columns = isset($context['columns']) ? $context['columns'] : array('PUSER_ID');
+		$skip_partner_filter = isset($context['skip_partner_filter']) ? $context['skip_partner_filter'] : false;
+		if (!isset($context['hash']) || $context['hash'])
+		{
+			$hash_conf = kConf::get('kava_hash_user_ids', 'local', array());
+		}
+		else
+		{
+			$hash_conf = array();
+		}
+
 		$result = array();
 
 		// leave non-integer values as is (e.g. 'Unknown')
@@ -3300,22 +3311,12 @@ class kKavaReportsMgr extends kKavaBase
 		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		kuserPeer::setUseCriteriaFilter(true);
 
-		return array($result, $rows);
+		return array($columns, $hash_conf, $result, $rows);
 	}
 
 	protected static function getUsersInfo($ids, $partner_id, $context)
 	{
-		$columns = isset($context['columns']) ? $context['columns'] : array('PUSER_ID');
-		if (!isset($context['hash']) || $context['hash'])
-		{
-			$hash_conf = kConf::get('kava_hash_user_ids', 'local', array());
-		}
-		else
-		{
-			$hash_conf = array();
-		}
-
-		list($result, $rows) = self::getBaseUsersInfo($ids, $partner_id, $columns);
+		list($columns, $hash_conf, $result, $rows) = self::getBaseUsersInfo($ids, $partner_id, $context);
 
 		foreach ($rows as $row)
 		{
