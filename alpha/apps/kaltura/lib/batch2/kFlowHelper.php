@@ -2898,7 +2898,7 @@ class kFlowHelper
 		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
 		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/name/$file_name.csv";
 
-		if (self::shouldEnforceHttpsApi($partner_id))
+		if ($partner->getEnforceHttpsApi())
 		{
 			$url = str_replace("http:", "https:", $url);
 		}
@@ -3171,12 +3171,4 @@ class kFlowHelper
 				break;
 		}
 	}
-
-	protected static function shouldEnforceHttpsApi($partner_id)
-	{
-		$partner = PartnerPeer::retrieveActiveByPK($partner_id);
-
-		return $partner->getEnforceHttpsApi();
-	}
-
 }
