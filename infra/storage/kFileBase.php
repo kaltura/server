@@ -142,7 +142,7 @@ class kFileBase
      */
     public static function fullMkfileDir ($path, $rights = 0777, $recursive = true)
     {
-        if(file_exists($path))
+        if(kFile::checkFileExists($path))
             return true;
 
         $oldUmask = umask(00);
@@ -196,12 +196,15 @@ class kFileBase
      */
     static public function fileSize($filename)
     {
+		KalturaLog::debug("Check file size for file [$filename]");
 		if(kFile::isSharedPath($filename))
 		{
+			KalturaLog::debug("Check file size for shared file [$filename]");
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
 			return $kSharedFsMgr->fileSize($filename);
 		}
-    	
+	
+		KalturaLog::debug("Check file size for local file [$filename]");
         if(PHP_INT_SIZE >= 8)
             return filesize($filename);
 
@@ -403,10 +406,12 @@ class kFileBase
 		KalturaLog::debug("Check file exists for file [$path]");
 		if(kFile::isSharedPath($path))
 		{
+			KalturaLog::debug("Check file exists for shared file [$path]");
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
 			return $kSharedFsMgr->checkFileExists($path);
 		}
 		
+		KalturaLog::debug("Check file exists for local file [$path]");
 		return file_exists($path);
 	}
 	

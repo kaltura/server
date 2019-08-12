@@ -12,7 +12,6 @@ require_once(dirname(__FILE__) . '/kS3SharedFileSystemMgr.php');
 
 use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
-use Aws\S3\Enum\CannedAcl;
 
 class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 {
@@ -726,7 +725,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return $result;
 	}
 	
-	public function multipartUploadPartUpload($uploadId, $partNumber, $srcContent, $destFilePath)
+	public function multipartUploadPartUpload($uploadId, $partNumber, &$srcContent, $destFilePath)
 	{
 		$params = $this->initBasicS3Params($destFilePath);
 		$params['Body'] = $srcContent;
@@ -734,6 +733,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$params['PartNumber'] = $partNumber;
 
 		$result = $this->s3Call('uploadPart', $params);
+		gc_collect_cycles();
 
 		if(!$result)
 		{

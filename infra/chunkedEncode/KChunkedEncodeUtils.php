@@ -51,6 +51,8 @@
 		
 		public $createFolder = 1;
 		public $cleanUp = 1;
+		
+		public $sharedChunkPath = null; //Added to support FS wrappers which do not support shared NFS storage (S3)
 
 		/********************
 		 * C'tor
@@ -174,6 +176,7 @@
 			$cmdLine = "$ffmpegBin -i \"$chunkFileName\" -c copy -f mp4 -v quiet -y $chunkFileName.mp4;$ffprobeBin -show_streams -select_streams v -v quiet -show_entries stream=duration,nb_frames -print_format csv $chunkFileName.mp4";
 			KalturaLog::log("copy:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
+			KalturaLog::log("copy: result: rv = [$rv] output array = " . print_r($outputArr,true) );
 			if($rv!=0) {
 				KalturaLog::log("ERROR: failed to extract frame data from chunk ($chunkFileName).");
 				return null;
