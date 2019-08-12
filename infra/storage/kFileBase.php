@@ -618,12 +618,14 @@ class kFileBase
 				$path .= '/';
 			}
 
-			$cleanPath = kFile::fixPath($path);
-			$existingObject = kFile::checkFileExists($cleanPath);
+			$path = kFile::fixPath($path);
+			$existingObject = kFile::checkFileExists($path);
 
 			if (!$existingObject)
 			{
-				return $cleanPath;
+				// create empty file to avoid generating the same path for a different file
+				kFile::filePutContents ( $path , '' );
+				return $path;
 			}
 		}
 

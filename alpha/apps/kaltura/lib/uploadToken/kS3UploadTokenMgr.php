@@ -583,10 +583,7 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 			return $finalPath;
 		}
 
-		$path = kFile::createUniqueFilePath(myContentStorage::getFSUploadsPath()) . $this->getFileExtension($this->_uploadToken->getFileName());
-		// create empty file to avoid generating the same path for a different file
-		kFile::filePutContents ( $path , '' );
-		return $path;
+		return kFile::createUniqueFilePath(myContentStorage::getFSUploadsPath()) . $this->getFileExtension($this->_uploadToken->getFileName());
 	}
 
 	/**

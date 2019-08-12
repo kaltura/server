@@ -653,6 +653,7 @@ abstract class kSharedFileSystemMgr
 
 	public static function getCopySharedToSharedAllowed()
 	{
+		self::getInstance();
 		return self::$kCopySharedToShared;
 	}
 
