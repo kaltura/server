@@ -40,12 +40,12 @@ class kL3UrlTokenizer extends kUrlTokenizer
 		{
 			if (isset($flavors[0][self::URL]))
 			{
-				$commonPartUrl = $flavors[0][self::URL];
-				$flavorIdPos = strpos($commonPartUrl, self::FLAVOR_ID . self::SLASH);
+				$flavorUrl = $flavors[0][self::URL];
+				$flavorIdPos = strpos($flavorUrl, self::FLAVOR_ID . self::SLASH);
 				if ($flavorIdPos !== false)
 				{
-					$urlToToken = substr($commonPartUrl,0, $flavorIdPos). self::FLAVOR_ID . self::SLASH ;
-					$urlTokenized = $this->tokenizeUrl($urlToToken, true);
+					$commonPartUrl = substr($flavorUrl,0, $flavorIdPos). self::FLAVOR_ID . self::SLASH ;
+					$urlTokenized = $this->tokenizeUrl($commonPartUrl, true);
 					self::setFlavorsUrlWithToken($flavors, $urlTokenized);
 				}
 			}
