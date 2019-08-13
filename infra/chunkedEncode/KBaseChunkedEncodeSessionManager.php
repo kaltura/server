@@ -98,11 +98,11 @@
 				$cmdLine = $chunker->BuildVideoCommandLine($start, $chunkIdx);
 				$logFilename = $chunker->getChunkName($chunkIdx,".log");
 				$cmdLine = "time $cmdLine > $logFilename 2>&1";
-				$outFilename = $chunker->getChunkName($chunkIdx);
-				$outFileName2 = substr($outFilename, 0, -1) . (substr($outFilename, -1)+1);
-				$sharedOutFilename = $chunker->getChunkName($chunkIdx, "shared");
-				$sharedOutFilename2 = substr($sharedOutFilename, 0, -1) . (substr($sharedOutFilename, -1)+1);
-				$videoCmdLines[$chunkIdx] = array($cmdLine, array($outFilename, $outFileName2), array($sharedOutFilename, $sharedOutFilename2));
+				$outFilenames[] = $chunker->getChunkName($chunkIdx);
+				$outFileNames[] = substr($outFilenames[0], 0, -1) . (substr($outFilenames[0], -1)+1);
+				$sharedOutFilenames[] = $chunker->getChunkName($chunkIdx, "shared");
+				$sharedOutFilenames[] = $sharedOutFilenames[0] ? substr($sharedOutFilenames[0], 0, -1) . (substr($sharedOutFilenames[0], -1)+1) : null;
+				$videoCmdLines[$chunkIdx] = array($cmdLine, $outFileNames, $sharedOutFilenames);
 				KalturaLog::log($cmdLine);
 			}
 			$this->videoCmdLines = $videoCmdLines;
