@@ -112,6 +112,13 @@ class Form_CatalogItemConfigure extends ConfigureForm
 				'placement' => 'prepend',
 				'required' 		=> true,
 			));
+			
+			$this->addElement('text', 'clearAudioFlavorParamsId', array(
+				'label' => 'Clear Audio Flavor Params ID:',
+				'filters' => array('StringTrim'),
+				'placement' => 'prepend',
+				'required' 		=> true,
+			));
 		}
 		
 		if ($this->catalogItemType != Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION)
