@@ -206,6 +206,7 @@ class kKavaVpaasReports extends kKavaReports
 		}
 
 		$partners_map = self::getValidEnrichedPartners($partner_id, $partner_ids);
+		$column_count = count($columns);
 		foreach ($rows as $row)
 		{
 			$cur_partner_id = $row['PARTNER_ID'];
@@ -217,8 +218,7 @@ class kKavaVpaasReports extends kKavaReports
 			$hash = self::hashUserId($hash_conf, $partner_id, $puser_id, $kuser_id);
 			if ($cur_partner_id != $partner_id && !in_array($cur_partner_id, $partners_map))
 			{
-				$row_count = count($columns);
-				$output = array_fill(0, $row_count, '');
+				$output = array_fill(0, $column_count, '');
 			}
 			else if ($hash === false)
 			{
@@ -265,9 +265,7 @@ class kKavaVpaasReports extends kKavaReports
 				continue; //result is valid
 			}
 
-			$row_count = count($row);
-			$empty_row = array_fill(0, $row_count, '');
-			$row = $empty_row;
+			$row = array_fill(0, count($row), '');
 		}
 
 		return $rows;
