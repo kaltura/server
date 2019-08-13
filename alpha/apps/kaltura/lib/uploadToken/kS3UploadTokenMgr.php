@@ -88,7 +88,7 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 			$extension = self::NO_EXTENSION_IDENTIFIER;
 		}
 
-		return myContentStorage::getFSUploadsPath().substr($uploadTokenId, -2).'/'.$uploadTokenId.'/0.'.$extension;
+		return myContentStorage::getFSTempUploadsPath().substr($uploadTokenId, -2).'/'.$uploadTokenId. '/0.' .$extension;
 	}
 
 	/**
@@ -577,9 +577,13 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	 */
 	protected function getFinalFilePath()
 	{
-		$uploadFolderPath = dirname($this->_uploadToken->getUploadTempPath());
-		$finalFilePath = $uploadFolderPath .  '/full_file.' . $this->getFileExtension($this->_uploadToken->getFileName());
-		return $finalFilePath;
+		$finalPath = $this->_uploadToken->getFinalFilePath();
+		if($finalPath)
+		{
+			return $finalPath;
+		}
+
+		return kFile::createUniqueFilePath(myContentStorage::getFSUploadsPath()) . $this->getFileExtension($this->_uploadToken->getFileName());
 	}
 
 	/**
@@ -626,15 +630,22 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	protected function createChunksFromConcatenatedSmallParts($partsToConcat, $currentFileSize)
 	{
 		$chunksToUpload = array();
-		foreach ($partsToConcat as $partNum => $part)
+		foreach ($partsToConcat as $partNum => $innerParts)
 		{
-			$uploadFilePath = dirname($this->_uploadToken->getUploadTempPath()) . '/' . $currentFileSize . '_part_' . $partNum;
-			$tmpFilePath = '/tmp/' . $this->_uploadToken->getId() . '_' . $currentFileSize . '_part_' . $partNum;
-
-			$partSize = $this->createLocalChunk($tmpFilePath, $part);
-
-			KalturaLog::debug("Part size: $partSize partNum:  $partNum tmpPath: $tmpFilePath");
-			self::$sharedFsMgr->getFileFromResource($tmpFilePath, $uploadFilePath);
+			if(sizeof($innerParts) == 1)
+			{
+				$uploadFilePath = $innerParts[0]['partPath'];
+				$partSize = $innerParts[0]['partSize'];
+				KalturaLog::debug("Part size: $partSize partNum:  $partNum");
+			}
+			else
+			{
+				$tmpFilePath = '/tmp/' . $this->_uploadToken->getId() . '_' . $currentFileSize . '_part_' . $partNum;
+				$uploadFilePath = dirname($this->_uploadToken->getUploadTempPath()) . '/' . $currentFileSize . '_part_' . $partNum;
+				$partSize = $this->createLocalChunk($tmpFilePath, $innerParts);
+				KalturaLog::debug("Part size: $partSize partNum:  $partNum tmpPath: $tmpFilePath");
+				self::$sharedFsMgr->getFileFromResource($tmpFilePath, $uploadFilePath);
+			}
 
 			if($partSize < kS3SharedFileSystemMgr::MIN_PART_SIZE)
 			{

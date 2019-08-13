@@ -196,4 +196,9 @@ class kUploadTokenMgr extends kBaseUploadTokenMgr
 	{
 
 	}
+
+	protected function getFinalFilePath()
+	{
+
+	}
 }

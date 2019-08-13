@@ -133,7 +133,8 @@ class FileSync extends BaseFileSync implements IBaseObject
 	
 	public function getFullPath ()
 	{
-		return $this->getFileRoot() . $this->getFilePath();
+		$path = $this->getFileRoot() . $this->getFilePath();
+		return kFile::fixPath($path);
 	}
 
 	/**
@@ -265,6 +266,9 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function setEncryptionKey ($v) { $this->putInCustomData("encryptionKey", $v);  }
 	public function isEncrypted () { return ($this->getFromCustomData("encryptionKey"))? true : false ; }
 	public function getIv() {return kConf::get("encryption_iv");}
+
+	public function getFileExtension () { return $this->getFromCustomData("extension"); }
+	public function setFileExtension ($v) { $this->putInCustomData("extension", $v);  }
 
 
 }

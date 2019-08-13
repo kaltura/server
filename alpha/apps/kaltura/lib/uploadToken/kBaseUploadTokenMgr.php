@@ -61,6 +61,9 @@ abstract class kBaseUploadTokenMgr
 	 */
 	abstract protected function getUploadPath($uploadTokenId, $extension = '');
 
+
+	abstract protected function getFinalFilePath();
+
 	/**
 	 * get upload token manager by storage type
 	 *
@@ -109,6 +112,7 @@ abstract class kBaseUploadTokenMgr
 		$this->_uploadToken->setUploadTempPath(null);
 		$this->_uploadToken->setUserIp(requestUtils::getRemoteAddress());
 		$this->_uploadToken->setDc(kDataCenterMgr::getCurrentDcId());
+		$this->_uploadToken->setFinalFilePath($this->getFinalFilePath());
 		$this->_uploadToken->save();
 	}
 
@@ -154,12 +158,22 @@ abstract class kBaseUploadTokenMgr
 			throw $ex;
 		}
 
-		if ($resume)
-			$fileSize = $this->handleResume($fileData, $resumeAt);
-		else
+		try
 		{
-			$fileSize = $this->handleMoveFile($fileData, $resumeAt);
+			if ($resume)
+			{
+				$fileSize = $this->handleResume($fileData, $resumeAt);
+			}
+			else
+			{
+				$fileSize = $this->handleMoveFile($fileData, $resumeAt);
+			}
 		}
+		catch(Exception $ex)
+		{
+			throw new kUploadTokenException("Failed to save upload token file", kUploadTokenException::UPLOAD_TOKEN_PROCESSING_FAILURE);
+		}
+
 
 		if ($this->_finalChunk)
 		{
@@ -264,10 +278,10 @@ abstract class kBaseUploadTokenMgr
 	 */
 	protected function tryMoveToErrors($fileData)
 	{
-		if (file_exists($fileData['tmp_name']))
+		if (kFile::checkFileExists($fileData['tmp_name']))
 		{
-			$errorFilePath = $this->getUploadPath('error-'.$this->_uploadToken->getId(), microtime(true));
-			rename($fileData['tmp_name'], $errorFilePath);
+			$errorFilePath = $this->getUploadPath('error-'.$this->_uploadToken->getId(), microtime(true), false);
+			kFile::rename($fileData['tmp_name'], $errorFilePath);
 		}
 	}
 

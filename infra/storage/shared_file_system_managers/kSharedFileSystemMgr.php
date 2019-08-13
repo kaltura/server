@@ -31,6 +31,13 @@ abstract class kSharedFileSystemMgr
 	
 	private static $kSharedRootPath;
 
+	/**
+	 * does copy file from shared path to shared path allowed
+	 *
+	 * @var $kCopySharedToShared bool
+	 */
+	private static $kCopySharedToShared;
+
 	public function __construct(array $options = null)
 	{
 		return;
@@ -331,6 +338,12 @@ abstract class kSharedFileSystemMgr
 	 */
 	abstract protected function doCopyDir($src, $dest, $deleteSrc);
 
+	/**
+	 * @return bool
+	 */
+	abstract protected function doCopySharedToSharedAllowed();
+
+
 	public function createDirForPath($filePath)
 	{
 		return $this->doCreateDirForPath($filePath);
@@ -581,6 +594,8 @@ abstract class kSharedFileSystemMgr
 				self::$kSharedFsMgr[$type] = new kS3SharedFileSystemMgr($options);
 				break;
 		}
+
+		self::$kCopySharedToShared = self::$kSharedFsMgr[$type]->doCopySharedToSharedAllowed();
 		
 		return self::$kSharedFsMgr[$type];
 	}
@@ -634,6 +649,12 @@ abstract class kSharedFileSystemMgr
 	public function copyDir($src, $dest, $deleteSrc)
 	{
 		return $this->doCopyDir($src, $dest, $deleteSrc);
+	}
+
+	public static function getCopySharedToSharedAllowed()
+	{
+		self::getInstance();
+		return self::$kCopySharedToShared;
 	}
 
 }

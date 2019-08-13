@@ -474,21 +474,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			}
 		}
 
-		list($rootPath, $filePath) = self::getLocalFilePathArrForKey($target_key);
-		$targetFullPath = $rootPath . $filePath; 
-		if(!$targetFullPath)
-		{
-			$targetFullPath = kPathManager::getFilePath($target_key);
-			KalturaLog::info("Generated new path [$targetFullPath]");
-		}
-		
-		$targetFullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $targetFullPath);
-
-		if (kFile::checkFileExists(dirname( $targetFullPath)))
-		{
-			kFile::fullMkdir($targetFullPath);
-		}
-
 		if ( kFile::checkFileExists( $temp_file_path ))
 		{
 			KalturaLog::info("$temp_file_path file exists");
@@ -497,21 +482,48 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		{
 			KalturaLog::info("$temp_file_path file doesnt exist");
 		}
-		
-		if (kFile::checkFileExists($targetFullPath))
-		{
-			$time = time(); 
-			$targetFullPath .= $time;
-			$filePath .= $time; 
-		}
 
-		if($copyOnly)
+		if(!kFile::isSharedPath($temp_file_path) || kSharedFileSystemMgr::getCopySharedToSharedAllowed())
 		{
-			$success = kFile::moveFile($temp_file_path, $targetFullPath, true);
+			list($rootPath, $filePath) = self::getLocalFilePathArrForKey($target_key);
+			$targetFullPath = $rootPath . $filePath;
+			if(!$targetFullPath)
+			{
+				$targetFullPath = kPathManager::getFilePath($target_key);
+				KalturaLog::info("Generated new path [$targetFullPath]");
+			}
+
+			$targetFullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $targetFullPath);
+
+			if (!kFile::checkFileExists(dirname( $targetFullPath)))
+			{
+				kFile::fullMkdir($targetFullPath);
+			}
+
+			if (kFile::checkFileExists($targetFullPath))
+			{
+				$time = time();
+				$targetFullPath .= $time;
+				$filePath .= $time;
+			}
+
+			if($copyOnly)
+			{
+				$success = kFile::moveFile($temp_file_path, $targetFullPath, true);
+			}
+			else
+			{
+				$success = kFile::moveFile($temp_file_path, $targetFullPath);
+			}
 		}
 		else
 		{
-			$success = kFile::moveFile($temp_file_path, $targetFullPath);
+			// if temp file is shared we set the file path to be the temp path and don't move the file to new location
+			$targetFullPath = $temp_file_path;
+			list($rootPath, $filePath) = explode("/",ltrim($targetFullPath,"/"),2);
+			$rootPath = DIRECTORY_SEPARATOR . $rootPath . DIRECTORY_SEPARATOR;
+			$filePath = DIRECTORY_SEPARATOR . $filePath;
+			$success = true;
 		}
 
 		if($success)
@@ -965,6 +977,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	public static function getLocalFilePathForKey ( FileSyncKey $key , $strict = false )
 	{
 		$path = implode('', self::getLocalFilePathArrForKey ($key, $strict));
+		$path = kFile::fixPath($path);
 		KalturaLog::info("path [$path]");
 		return $path; 
 	}
@@ -1051,6 +1064,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$currentDCFileSync->setDc( $dcId );
 			$currentDCFileSync->setFileRoot ( $rootPath );
 			$currentDCFileSync->setFilePath ( $filePath );
+			$currentDCFileSync->setFileExtension(strtolower(pathinfo($filePath, PATHINFO_EXTENSION)));
 			$currentDCFileSync->setPartnerId ( $key->partner_id);
 			$currentDCFileSync->setOriginal ( 1 );
 			if (!is_null($md5))

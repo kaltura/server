@@ -323,4 +323,10 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		return true;
 	}
+
+	protected function doCopySharedToSharedAllowed()
+	{
+		return true;
+	}
+
 }
