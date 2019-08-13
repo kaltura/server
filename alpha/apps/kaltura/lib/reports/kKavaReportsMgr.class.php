@@ -1787,9 +1787,14 @@ class kKavaReportsMgr extends kKavaBase
 				self::DRUID_DIMENSION => $field_filter_def[self::DRUID_DIMENSION],
 				self::DRUID_VALUES => $values
 			);
-			if (isset($field_filter_def[self::DRUID_TYPE]))
+			//supports only NOT
+			if (isset($field_filter_def[self::DRUID_TYPE]) && $field_filter_def[self::DRUID_TYPE] == self::DRUID_NOT)
 			{
-				$filter[self::DRUID_TYPE] = $field_filter_def[self::DRUID_TYPE];
+				$not_filter = array(
+					self::DRUID_TYPE => $field_filter_def[self::DRUID_TYPE],
+					self::DRUID_FILTER => $filter,
+				);
+				$filter = $not_filter;
 			}
 			$druid_filter[] = $filter;
 		}
