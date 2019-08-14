@@ -76,16 +76,22 @@ class kL3UrlTokenizer extends kUrlTokenizer
 				}
 				else
 				{
-					$flavorIdPos = strpos($flavor[self::URL], self::FLAVOR_ID . self::SLASH);
-					$restUrl = '';
-					if ($flavorIdPos !== false)
-					{
-						$restUrl = substr($flavors[$flavorKey][self::URL], $flavorIdPos + strlen(self::FLAVOR_ID . self::SLASH));
-					}
+					$restUrl = self::getRestUrl($flavor);
 				}
 				$flavors[$flavorKey][self::URL] = $urlTokenized . $restUrl;
 			}
 		}
+	}
+
+	public static function getRestUrl($flavor)
+	{
+		$restUrl = '';
+		$flavorIdPos = strpos($flavor[self::URL], self::FLAVOR_ID . self::SLASH);
+		if ($flavorIdPos !== false)
+		{
+			$restUrl = substr($flavor[self::URL], $flavorIdPos + strlen(self::FLAVOR_ID . self::SLASH));
+		}
+		return $restUrl;
 	}
 
 	public function calculateToken($urlToToken)
