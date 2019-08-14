@@ -45,7 +45,7 @@ class kL3UrlTokenizer extends kUrlTokenizer
 			if (isset($flavors[0][self::URL]))
 			{
 				$url = self::removeTokenWord($flavors[0][self::URL]);
-				list($commonPartUrl, $flavorRestUrl) = self::splitUrlPartsFlavorsList($url);
+				$commonPartUrl = self::getCommonPartUrl($url);
 			}
 		}
 		else if (count($flavors) == 1)
@@ -130,24 +130,21 @@ class kL3UrlTokenizer extends kUrlTokenizer
 	 */
 	public static function splitUrlFlavorParts($url)
 	{
-		$lastSlashOccurrence = strrpos ($url, self::SLASH) + 1;
+		$lastSlashOccurrence = strrpos ($url, self::SLASH);
 		if ($lastSlashOccurrence === false)
 		{
 			return array('', '');
 		}
-		$restUrl = substr($url, $lastSlashOccurrence);
-		$urlToTokenize = substr($url, 0, $lastSlashOccurrence);
+		$restUrl = substr($url, $lastSlashOccurrence + 1);
+		$urlToTokenize = substr($url, 0, $lastSlashOccurrence + 1);
 		return array($urlToTokenize, $restUrl);
 	}
 
 	/*
 	 * In this case the flavor url has several flavors,
 	 * the tokenize url should be till the 'flavorId/'
-	 * splitting url into $commonPartUrl and $restUrl
-	 * $commonPartUrl: until the 'flavorId/'
-	 * $restUrl: from the 'flavorId/'
 	 */
-	public static function splitUrlPartsFlavorsList($url)
+	public static function getCommonPartUrl($url)
 	{
 		$commonPartUrl = $url;
 		$flavorIdPos = strpos($url, self::FLAVOR_ID . self::SLASH);
@@ -155,8 +152,7 @@ class kL3UrlTokenizer extends kUrlTokenizer
 		{
 			$commonPartUrl = substr($url, 0, $flavorIdPos) . self::FLAVOR_ID . self::SLASH;
 		}
-		$restUrl = '';
-		return array($commonPartUrl, $restUrl);
+		return $commonPartUrl;
 	}
 
 	/**
