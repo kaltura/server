@@ -27,7 +27,9 @@ class kL3UrlTokenizer extends kUrlTokenizer
 	 */
 	public function tokenizeSingleUrl($url, $urlPrefix = null)
 	{
-		return $this->tokenizeUrl($url);
+		$url = self::removeTokenWord($url);
+		list($urlToToken, $restUrl) = self::splitUrlFlavorParts($url);
+		return $this->calculateToken($urlToToken) . $restUrl;
 	}
 
 	/**
@@ -36,65 +38,58 @@ class kL3UrlTokenizer extends kUrlTokenizer
 	 */
 	public function tokenizeMultiUrls(&$baseUrl, &$flavors)
 	{
+		$flavorRestUrl = '';
+		$commonPartUrl = '';
 		if (count($flavors) > 1)
 		{
 			if (isset($flavors[0][self::URL]))
 			{
-				$flavorUrl = $flavors[0][self::URL];
-				$flavorIdPos = strpos($flavorUrl, self::FLAVOR_ID . self::SLASH);
-				if ($flavorIdPos !== false)
-				{
-					$commonPartUrl = substr($flavorUrl,0, $flavorIdPos). self::FLAVOR_ID . self::SLASH ;
-					$urlTokenized = $this->tokenizeUrl($commonPartUrl, true);
-					self::setFlavorsUrlWithToken($flavors, $urlTokenized);
-				}
+				$url = self::removeTokenWord($flavors[0][self::URL]);
+				list($commonPartUrl, $flavorRestUrl) = self::splitUrlPartsFlavorsList($url);
 			}
 		}
 		else if (count($flavors) == 1)
 		{
 			if (isset($flavors[0][self::URL]))
 			{
-				$flavors[0][self::URL] = $this->tokenizeUrl($flavors[0][self::URL]);
+				$url = self::removeTokenWord($flavors[0][self::URL]);
+				list($commonPartUrl,$flavorRestUrl) = self::splitUrlFlavorParts($url);
 			}
 		}
+		$urlTokenized = $this->calculateToken($commonPartUrl);
+		self::setFlavorsUrlWithToken($flavors, $urlTokenized, $flavorRestUrl);
 	}
 
-	public static function setFlavorsUrlWithToken(&$flavors, $urlTokenized)
+	public static function setFlavorsUrlWithToken(&$flavors, $urlTokenized, $flavorRestUrl)
 	{
+		if ($urlTokenized === '')
+		{
+			return;
+		}
 		foreach($flavors as $flavorKey => $flavor)
 		{
 			if (isset($flavor[self::URL]))
 			{
-				$flavorIdPos = strpos($flavor[self::URL], self::FLAVOR_ID . self::SLASH);
-				$restUrl = substr($flavors[$flavorKey][self::URL], $flavorIdPos + strlen(self::FLAVOR_ID . self::SLASH));
+				if ($flavorRestUrl !== '')
+				{
+					$restUrl = $flavorRestUrl;
+				}
+				else
+				{
+					$flavorIdPos = strpos($flavor[self::URL], self::FLAVOR_ID . self::SLASH);
+					$restUrl = substr($flavors[$flavorKey][self::URL], $flavorIdPos + strlen(self::FLAVOR_ID . self::SLASH));
+				}
 				$flavors[$flavorKey][self::URL] = $urlTokenized . $restUrl;
 			}
 		}
 	}
 
-	/**
-	 * @param string $url
-	 * @param boolean $isMultiUrls
-	 * @return string
-	 */
-	public function tokenizeUrl($url, $isMultiUrls = false)
+	public function calculateToken($urlToToken)
 	{
-		$url = self::removeTokenWord($url);
-		if ($isMultiUrls == true)
+		if ($urlToToken === '')
 		{
-			$urlToToken = $url;
-			$restUrl = '';
+			return '';
 		}
-		else
-		{
-			list($urlToToken, $restUrl) = self::getUrlToTokenize($url);
-		}
-
-		return $this->calculateToken($urlToToken, $restUrl);
-	}
-
-	public function calculateToken($urlToToken, $restUrl)
-	{
 		$nva = time() + $this->window;
 		$path = self::SLASH . trim($urlToToken, self::SLASH) . self::SLASH;
 		$dirs = substr_count($path, self::SLASH) - 1;
@@ -103,22 +98,41 @@ class kL3UrlTokenizer extends kUrlTokenizer
 		$hash = $this->gen . substr(hash_hmac(self::SECURE_HASH_ALGO, $uri, $this->key), 0, 20);
 		$tokenParams .= self::AMPERSAND . self::HASH . self::EQUAL . $hash;
 		$token = str_replace(self::AMPERSAND, self::TILDA , $tokenParams);
-		return self::TOKEN . self::EQUAL . $token . $path . $restUrl;
+		return self::TOKEN . self::EQUAL . $token . $path;
 	}
 
 	public static function removeTokenWord($url)
 	{
 		$tokenPos = strpos($url, self::SLASH . self::TOKEN);
-		$url = substr($url, $tokenPos + strlen(self::SLASH . self::TOKEN));
+		if ($tokenPos !==  false)
+		{
+			$url = substr($url, $tokenPos + strlen(self::SLASH . self::TOKEN));
+		}
 		return $url;
 	}
 
-	public static function getUrlToTokenize($url)
+	public static function splitUrlFlavorParts($url)
 	{
 		$lastSlashOccurrence = strrpos ($url, self::SLASH) + 1;
+		if ($lastSlashOccurrence === false)
+		{
+			return array('', '');
+		}
 		$restUrl = substr($url, $lastSlashOccurrence);
 		$urlToTokenize = substr($url, 0, $lastSlashOccurrence);
 		return array($urlToTokenize, $restUrl);
+	}
+
+	public static function splitUrlPartsFlavorsList($url)
+	{
+		$commonPartUrl = $url;
+		$flavorIdPos = strpos($url, self::FLAVOR_ID . self::SLASH);
+		if ($flavorIdPos !== false)
+		{
+			$commonPartUrl = substr($url, 0, $flavorIdPos) . self::FLAVOR_ID . self::SLASH;
+		}
+		$restUrl = '';
+		return array($commonPartUrl, $restUrl);
 	}
 
 	/**
