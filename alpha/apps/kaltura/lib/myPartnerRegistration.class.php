@@ -2,8 +2,8 @@
 class myPartnerRegistration
 {
 	private $partnerParentId = null;
-    const USER_ZERO_SCREEN_NAME = 'Unknown';
-    const USER_ZERO_P_USER = '0';
+	const USER_ZERO_SCREEN_NAME = 'Unknown';
+	const USER_ZERO_P_USER = '0';
 
 	public function __construct( $partnerParentId = null )
 	{
@@ -266,13 +266,13 @@ class myPartnerRegistration
 	}
 
 	protected function addAnonymousUsersToPartner($partnerId)
-    {
-        KalturaLog::log("Adding anonymous users to partner {$partnerId}");
-        $user = kuserPeer::createKuserForPartner($partnerId, self::USER_ZERO_P_USER);
-        $user->setScreenName(self::USER_ZERO_SCREEN_NAME);
-        $user->save();
-        kuserPeer::createKuserForPartner($partnerId, '');
-    }
+	{
+		KalturaLog::log("Adding anonymous users to partner {$partnerId}");
+		$user = kuserPeer::createKuserForPartner($partnerId, self::USER_ZERO_P_USER);
+		$user->setScreenName(self::USER_ZERO_SCREEN_NAME);
+		$user->save();
+		kuserPeer::createKuserForPartner($partnerId, '');
+	}
 
 	private function createNewSubPartner($newPartner)
 	{
