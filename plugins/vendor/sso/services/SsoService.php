@@ -63,7 +63,7 @@ class SsoService extends KalturaBaseService
 	 * Delete sso by ID
 	 *
 	 * @action delete
-	 * @param string $ssoId The unique identifier in the sso's object
+	 * @param int $ssoId The unique identifier in the sso's object
 	 * @return KalturaSso The deleted  object
 	 * @throws KalturaSsoErrors::INVALID_SSO_ID
 	 */
@@ -81,7 +81,7 @@ class SsoService extends KalturaBaseService
 	 * Update sso by ID
 	 *
 	 * @action update
-	 * @param string $ssoId The unique identifier in the sso's objec
+	 * @param int $ssoId The unique identifier in the sso's objec
 	 * @param KalturaSso $sso The updated object
 	 * @return KalturaSso The updated  object
 	 * @throws KalturaSsoErrors::INVALID_SSO_ID
