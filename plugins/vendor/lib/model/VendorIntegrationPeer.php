@@ -16,10 +16,12 @@
 class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 
 	const ZOOM_VENDOR_INTEGRATION = 'ZoomVendorIntegration';
+	const SSO_VENDOR_INTEGRATION = 'SsoVendorIntegration';
 
 	// cache classes by their type
 	protected static $class_types_cache = array(
 		VendorTypeEnum::ZOOM_ACCOUNT => self::ZOOM_VENDOR_INTEGRATION,
+		VendorTypeEnum::SSO => self::SSO_VENDOR_INTEGRATION,
 	);
 
 	/**
@@ -91,6 +93,29 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 		$result = self::doSelectOne($c);
 		self::setUseCriteriaFilter(true);
 		return $result;
+	}
+
+	/**
+	 * @param $accountId
+	 * @param $partnerId
+	 * @param $vendorType
+	 * @return VendorIntegration
+	 * @throws PropelException
+	 */
+	public static function getVendorByPartnerAccountIdVendorType($accountId, $partnerId, $vendorType)
+	{
+		$c = new Criteria();
+		$c->add(VendorIntegrationPeer::ACCOUNT_ID, $accountId);
+		$c->add(VendorIntegrationPeer::PARTNER_ID, $partnerId);
+		$c->add(VendorIntegrationPeer::VENDOR_TYPE, $vendorType);
+		return self::doSelectOne($c);
+	}
+
+	// By default we will display only READY VendorIntegration, when status field is requested - it will be removed from the filter
+	public static function allowDeletedInCriteriaFilter()
+	{
+		$ecf = VendorIntegrationPeer::getCriteriaFilter();
+		$ecf->getFilter()->remove ( VendorIntegrationPeer::STATUS );
 	}
 
 } // VendorIntegrationPeer
