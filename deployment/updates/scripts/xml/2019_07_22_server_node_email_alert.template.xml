@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+    <multirequest>
+        <!-- Server-Node is Status Changed -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Server Node Email Alert</name>
+                <systemName>SERVER_NODE_EMAIL_ALERT</systemName>
+                <description>Email notification template to be sent as an alert.</description>
+                <automaticDispatchEnabled>0</automaticDispatchEnabled>
+                <manualDispatchEnabled>1</manualDispatchEnabled>
+                <eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>39</eventObjectType> <!-- EventNotificationEventObjectType::SERVER_NODE -->
+                <format>1</format>
+                <subject>Server Node: {server_node_hostname} {alert_name} </subject>
+                <body><![CDATA[Hello,<p>Server node {server_node_hostname} has an alert {alert_name} with value {alert_value}.</p>]]></body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Sender email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Sender name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>server_node_hostname</key>
+                        <description>Server-Node hostname</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getHostName()</code>
+                        </value>
+                    </item>
+                </contentParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+</xml>
