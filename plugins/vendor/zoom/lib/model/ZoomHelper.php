@@ -1,7 +1,7 @@
 <?php
 /**
  * @package plugins.venodr
- * @subpackage model.zoom
+ * @subpackage zoom.model
  */
 class ZoomHelper
 {
@@ -16,11 +16,12 @@ class ZoomHelper
 	/* @var zoomVendorIntegration $zoomIntegration */
 	protected static $zoomIntegration;
 
-	/**
-	 * @param $accountId
-	 * @param bool $includeDeleted
-	 * @return null|zoomVendorIntegration
-	 */
+    /**
+     * @param $accountId
+     * @param bool $includeDeleted
+     * @return null|zoomVendorIntegration
+     * @throws PropelException
+     */
 	public static function getZoomIntegrationByAccountId($accountId, $includeDeleted = false)
 	{
 		if($includeDeleted)
@@ -83,10 +84,11 @@ class ZoomHelper
 		KExternalErrors::dieGracefully();
 	}
 
-	/**
-	 * @param array $tokens
-	 * @param array $zoomConfiguration
-	 */
+    /**
+     * @param array $tokens
+     * @param array $zoomConfiguration
+     * @throws Exception
+     */
 	public static function loadLoginPage($tokens, $zoomConfiguration)
 	{
 		$file_path = dirname(__FILE__) . '/../../api/webPage/zoom/kalturaZoomLoginPage.html';
@@ -163,12 +165,13 @@ class ZoomHelper
 		return $data;
 	}
 
-	/**
-	 * @param int $partnerId
-	 * @param string $categoryFullName
-	 * @param bool $createIfNotExist
-	 * @return int id;
-	 */
+    /**
+     * @param int $partnerId
+     * @param string $categoryFullName
+     * @param bool $createIfNotExist
+     * @return int id;
+     * @throws PropelException
+     */
 	public static function createCategoryForZoom($partnerId, $categoryFullName, $createIfNotExist = true)
 	{
 		$category = categoryPeer::getByFullNameExactMatch($categoryFullName, null, $partnerId);
@@ -195,7 +198,7 @@ class ZoomHelper
 			$parentCategory = categoryPeer::getByFullNameExactMatch($parentCategoryFullName, null, $partnerId);
 			if(!$parentCategory)
 			{
-				self::exitWithError(kVendorErrorMessages::PARENT_CATEGORY_NOT_FOUND . $parentCategoryFullName);
+				self::exitWithError(kZoomErrorMessages::PARENT_CATEGORY_NOT_FOUND . $parentCategoryFullName);
 			}
 
 			$parentCategoryId = $parentCategory->getId();
@@ -211,18 +214,17 @@ class ZoomHelper
 
 	/**
 	 * @param ZoomVendorIntegration $zoomIntegration
-	 * @throws KalturaAPIException
-	 */
+     */
 	public static function verifyZoomIntegration($zoomIntegration)
 	{
 		if (!$zoomIntegration)
 		{
-			self::exitWithError(kVendorErrorMessages::NO_INTEGRATION_DATA);
+			self::exitWithError(kZoomErrorMessages::NO_INTEGRATION_DATA);
 		}
 
 		if($zoomIntegration->getStatus() == VendorStatus::DISABLED)
 		{
-			self::exitWithError(kVendorErrorMessages::UPLOAD_DISABLED);
+			self::exitWithError(kZoomErrorMessages::UPLOAD_DISABLED);
 		}
 	}
 }
