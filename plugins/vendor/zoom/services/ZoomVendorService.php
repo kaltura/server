@@ -2,7 +2,7 @@
 /**
  * @service zoomVendor
  * @package plugins.vendor
- * @subpackage zoom.services
+ * @subpackage api.services
  */
 class ZoomVendorService extends KalturaBaseService
 {
