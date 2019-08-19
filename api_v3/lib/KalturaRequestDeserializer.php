@@ -55,7 +55,7 @@ class KalturaRequestDeserializer
 
 	public function buildActionArguments(&$actionParams)
 	{
-		
+
 		$serviceArguments = array();
 		foreach($actionParams as &$actionParam)
 		{
@@ -89,7 +89,7 @@ class KalturaRequestDeserializer
 			{
 				if (array_key_exists($name, $this->paramsGrouped)) 
 				{
-					$fileData = $this->paramsGrouped[$name];
+					$fileData = $this->convertKeyArguments($this->paramsGrouped[$name]);
 					self::validateFile($fileData);
 					$serviceArguments[] = $fileData;
 					continue;
@@ -419,5 +419,31 @@ class KalturaRequestDeserializer
 		}
 		
 		return null;
+	}
+
+
+	/**
+	 * @param array $dataArray could hold CURLFile data sent by CURL
+	 * @return array if CURLFile object exits in $dataArray convert it to normal $_FILES data array. Else, we don't touch
+	 */
+	function convertKeyArguments($dataArray)
+	{
+		$ret = array();
+		foreach ($dataArray as $key => $dataItem)
+		{
+			if($dataItem instanceof CURLFile)
+			{
+				$fileData = array();
+				$fileData['name'] = $dataItem->postname;
+				$fileData['type'] = $dataItem->mime;
+				$fileData['tmp_name'] = $dataItem->name;
+				$ret[$key] = $fileData;
+			}
+			else
+			{
+				$ret[$key] = $dataItem;
+			}
+		}
+		return $ret;
 	}
 }
