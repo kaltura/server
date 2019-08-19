@@ -1,7 +1,7 @@
 <?php
 /**
  * @package plugins.venodr
- * @subpackage model.zoom
+ * @subpackage zoom.model
  */
 class kZoomClient
 {
@@ -54,14 +54,14 @@ class kZoomClient
 		//access token invalid and need to be refreshed
 		if($httpCode === 401)
 		{
-			ZoomHelper::exitWithError(kVendorErrorMessages::TOKEN_EXPIRED);
+			ZoomHelper::exitWithError(kZoomErrorMessages::TOKEN_EXPIRED);
 		}
 
 		// Sometimes we get  response 400, with massage: {"code":1010,"message":"User not belong to this account}
 		//in this case do not refresh tokens, they are valid --> return null
 		if($httpCode === 400 && strpos($response, '1010') !== false)
 		{
-			ZoomHelper::exitWithError(kVendorErrorMessages::USER_NOT_BELONG_TO_ACCOUNT);
+			ZoomHelper::exitWithError(kZoomErrorMessages::USER_NOT_BELONG_TO_ACCOUNT);
 		}
 
 		//Could not find meeting -> zoom bug

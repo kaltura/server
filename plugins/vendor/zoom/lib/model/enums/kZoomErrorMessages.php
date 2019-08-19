@@ -4,7 +4,7 @@
  * @subpackage model.enum
  */
 
-interface kVendorErrorMessages extends BaseEnum
+interface kZoomErrorMessages extends BaseEnum
 {
 	const MISSING_ZOOM_CLIENT_CONFIGURATION = 'Missing zoom client configuration';
 	const TOKEN_EXPIRED = 'Access token expired';

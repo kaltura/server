@@ -1,7 +1,7 @@
 <?php
 /**
  * @package plugins.vendor
- * @subpackage model
+ * @subpackage zoom.model
  */
 
 class ZoomVendorIntegration extends VendorIntegration
