@@ -2,7 +2,7 @@
 /**
  * @service zoomVendor
  * @package plugins.vendor
- * @subpackage api.services
+ * @subpackage zoom.services
  */
 class ZoomVendorService extends KalturaBaseService
 {
@@ -25,7 +25,7 @@ class ZoomVendorService extends KalturaBaseService
 	{
 		if(!kConf::hasMap(self::MAP_NAME))
 		{
-			throw new KalturaAPIException(KalturaVendorErrors::NO_VENDOR_CONFIGURATION);
+			throw new KalturaAPIException(KalturaZoomErrors::NO_VENDOR_CONFIGURATION);
 		}
 
 		return kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
@@ -91,7 +91,7 @@ class ZoomVendorService extends KalturaBaseService
 			ZoomHelper::loadLoginPage($tokens, $zoomConfiguration);
 		}
 
-		throw new KalturaAPIException(KalturaVendorErrors::ZOOM_ADMIN_REQUIRED);
+		throw new KalturaAPIException(KalturaZoomErrors::ZOOM_ADMIN_REQUIRED);
 	}
 
 	/**
@@ -111,7 +111,7 @@ class ZoomVendorService extends KalturaBaseService
 		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId);
 		if(!$zoomIntegration)
 		{
-			throw new KalturaAPIException(KalturaVendorErrors::NO_INTEGRATION_DATA);
+			throw new KalturaAPIException(KalturaZoomErrors::NO_INTEGRATION_DATA);
 		}
 
 		$zoomIntegration->setStatus(VendorStatus::DELETED);
@@ -120,12 +120,13 @@ class ZoomVendorService extends KalturaBaseService
 		return true;
 	}
 
-	/**
-	 * @action fetchRegistrationPage
-	 * @param string $tokensData
-	 * @param string $iv
-	 * @throws KalturaAPIException
-	 */
+    /**
+     * @action fetchRegistrationPage
+     * @param string $tokensData
+     * @param string $iv
+     * @throws KalturaAPIException
+     * @throws PropelException
+     */
 	public function fetchRegistrationPageAction($tokensData, $iv)
 	{
 		KalturaResponseCacher::disableCache();
@@ -170,19 +171,20 @@ class ZoomVendorService extends KalturaBaseService
 		return $tokens;
 	}
 
-	/**
-	 * @action submitRegistration
-	 * @param string $defaultUserId
-	 * @param string $zoomCategory
-	 * @param string $accountId
-	 * @param bool $enableRecordingUpload
-	 * @param bool $createUserIfNotExist
-	 * @param int $handleParticipantMode
-	 * @param int $zoomUserMatchingMode
-	 * @param string $zoomUserPostfix
-	 * @return string
-	 * @throws KalturaAPIException
-	 */
+    /**
+     * @action submitRegistration
+     * @param string $defaultUserId
+     * @param string $zoomCategory
+     * @param string $accountId
+     * @param bool $enableRecordingUpload
+     * @param bool $createUserIfNotExist
+     * @param int $handleParticipantMode
+     * @param int $zoomUserMatchingMode
+     * @param string $zoomUserPostfix
+     * @return string
+     * @throws KalturaAPIException
+     * @throws PropelException
+     */
 	public function submitRegistrationAction($defaultUserId, $zoomCategory, $accountId, $enableRecordingUpload, $createUserIfNotExist, $handleParticipantMode, $zoomUserMatchingMode, $zoomUserPostfix = "")
 	{
 		KalturaResponseCacher::disableCache();
@@ -193,7 +195,7 @@ class ZoomVendorService extends KalturaBaseService
 		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId);
 		if(!$zoomIntegration || $zoomIntegration->getPartnerId() != $partnerId)
 		{
-			throw new KalturaAPIException(KalturaVendorErrors::NO_INTEGRATION_DATA);
+			throw new KalturaAPIException(KalturaZoomErrors::NO_INTEGRATION_DATA);
 		}
 
 		$zoomIntegration->setCreateUserIfNotExist($createUserIfNotExist);
