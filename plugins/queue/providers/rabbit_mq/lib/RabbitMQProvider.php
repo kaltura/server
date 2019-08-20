@@ -94,7 +94,6 @@ class RabbitMQProvider extends QueueProvider
 	public function send($queueName, $data)
 	{
 		// establish connection to RabbitMQ
-		$connection = null;
 		for ($retry = 1; $retry <= self::MAX_RETRIES; $retry++)
 		{
 			try
