@@ -181,17 +181,17 @@ class PushNotificationTemplate extends EventNotificationTemplate
         		"command"	=> null 
         ));
         
-		try
-		{
-			// get instance of activated queue proivder and send message
-			$queueProvider = QueueProvider::getInstance();
-			$queueProvider->send('', $msg);
-		}
-		catch(Exception $e)
-		{
-			KalturaLog::err("Failed to send command with error [" . $e->getMessage() . "]");
-			throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
-		}
+        try
+        {
+        	// get instance of activated queue proivder and send message
+        	$queueProvider = QueueProvider::getInstance();
+        	$queueProvider->send('', $msg);
+        }
+        catch(Exception $e)
+        {
+        	KalturaLog::debug("Failed to send command with error [" . $e->getMessage() . "]");
+        	throw new Exception("Failed to send command");
+        }
 		
     }
     

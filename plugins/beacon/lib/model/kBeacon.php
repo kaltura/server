@@ -242,8 +242,7 @@ class kBeacon
 		$constructorArgs['exchangeName'] = self::BEACONS_EXCHANGE_NAME;
 		
 		/* @var $queueProvider RabbitMQProvider */
-		return
-			(null, $constructorArgs);
+		return QueueProvider::getInstance(null, $constructorArgs);
 	}
 	
 	private function getIndexObjectForState($indexObject, $docId)
