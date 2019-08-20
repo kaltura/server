@@ -180,10 +180,19 @@ class PushNotificationTemplate extends EventNotificationTemplate
         		"msgTime"	=> $time,
         		"command"	=> null 
         ));
-        // get instance of activated queue proivder and send message
-        $queueProvider = QueueProvider::getInstance();
-
-        $queueProvider->send('', $msg);
+        
+        try
+        {
+        	// get instance of activated queue proivder and send message
+        	$queueProvider = QueueProvider::getInstance();
+        	$queueProvider->send('', $msg);
+        }
+        catch(Exception $e)
+        {
+        	KalturaLog::debug("Failed to send message with error [" . $e->getMessage() . "]");
+        	throw new Exception("Failed to send message");
+        }
+		
     }
     
     public function create($queueKey)

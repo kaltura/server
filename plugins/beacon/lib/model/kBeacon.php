@@ -208,7 +208,15 @@ class kBeacon
 		if ($shouldLog) 
 		{
 			$logIndexObjectJson = $this->getIndexObjectForLog($indexBaseObject);
-			$queueProvider->send(self::BEACONS_QUEUE_NAME, $logIndexObjectJson);
+			try
+			{
+				$queueProvider->send(self::BEACONS_QUEUE_NAME, $logIndexObjectJson);
+			}
+			catch (Excpetion $e)
+			{
+				//Don't fail the request retry it again while going via the API layer
+				return false;
+			}
 		}
 		
 		return true;
