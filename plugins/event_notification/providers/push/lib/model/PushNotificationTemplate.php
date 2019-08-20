@@ -189,8 +189,8 @@ class PushNotificationTemplate extends EventNotificationTemplate
         }
         catch(Exception $e)
         {
-        	KalturaLog::debug("Failed to send command with error [" . $e->getMessage() . "]");
-        	throw new Exception("Failed to send command");
+        	KalturaLog::debug("Failed to send message with error [" . $e->getMessage() . "]");
+        	throw new Exception("Failed to send message");
         }
 		
     }
