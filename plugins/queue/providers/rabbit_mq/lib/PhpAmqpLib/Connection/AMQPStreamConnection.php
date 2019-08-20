@@ -30,7 +30,7 @@ class AMQPStreamConnection extends AbstractConnection
         $login_method = 'AMQPLAIN',
         $login_response = null,
         $locale = 'en_US',
-        $connection_timeout = 3,
+        $connection_timeout = 2,
         $read_write_timeout = 3,
         $context = null,
         $keepalive = false,
