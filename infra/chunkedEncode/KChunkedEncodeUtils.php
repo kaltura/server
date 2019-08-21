@@ -23,8 +23,9 @@
 	 * Session setup values
 	 */
 	class KChunkedEncodeSetup {
-
-		const	DefaultChunkDuration = 60;  // secs
+				// DefaultChunkDuration for frame height>1280 (basically 4K and QHD). 
+				// Chunk dur's for smaller frames evaluated from that value.
+		const	DefaultChunkDuration = 30;  // secs
 		const	DefaultChunkOverlap =  0.5; // secs
 		const	DefaultConcurrentChunks = 1;// secs
 		
@@ -82,17 +83,28 @@
 			}
 
 			if(!isset($this->chunkDuration)) {
-				if($params->height>480)
-					$this->chunkDuration = self::DefaultChunkDuration;
-				else if($params->height>360)
-					$this->chunkDuration = 2*self::DefaultChunkDuration;
-				else
-					$this->chunkDuration = 3*self::DefaultChunkDuration;
+				$this->chunkDuration = self::calculateChunkDuration($params->height);
 			}
 
 			if($this->concurrentMin>$this->concurrent)
 				$this->concurrentMin = $this->concurrent;
 		}
+		
+		/********************
+		 * calculateChunkDuration
+		 */
+		public static function calculateChunkDuration($height)
+		{
+			if($height>1280)
+				return self::DefaultChunkDuration;
+			else if($height>480)
+				return self::DefaultChunkDuration*2;
+			else if($height>360)
+				return self::DefaultChunkDuration*4;
+			else
+				return self::DefaultChunkDuration*6;
+		}
+
 	}
 
 	/********************
