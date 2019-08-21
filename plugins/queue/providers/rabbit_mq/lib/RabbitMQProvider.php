@@ -94,14 +94,14 @@ class RabbitMQProvider extends QueueProvider
 	public function send($queueName, $data)
 	{
 		// establish connection to RabbitMQ
-		for ($retry = 1; $retry <= self::MAX_RETRIES; $retry++)
+		for ($retry = 1; ; $retry++)
 		{
 			try
 			{
 				$connection = new PhpAmqpLib\Connection\AMQPConnection($this->MQserver, $this->port, $this->username, $this->password);
 				break;
 			}
-			catch (Exception $e)
+			catch (PhpAmqpLib\Exception\AMQPRuntimeException $e)
 			{
 				if(class_exists('KalturaLog'))
 					KalturaLog::err("Failed to connect to MQserver [{$this->MQserver}] with error [" . $e->getMessage() . "]");

@@ -187,10 +187,10 @@ class PushNotificationTemplate extends EventNotificationTemplate
         	$queueProvider = QueueProvider::getInstance();
         	$queueProvider->send('', $msg);
         }
-        catch(Exception $e)
+        catch(PhpAmqpLib\Exception\AMQPRuntimeException $e)
         {
         	KalturaLog::debug("Failed to send message with error [" . $e->getMessage() . "]");
-        	throw new Exception("Failed to send message");
+        	throw $e;
         }
 		
     }
