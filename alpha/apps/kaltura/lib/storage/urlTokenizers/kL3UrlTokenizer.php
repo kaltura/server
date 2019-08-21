@@ -19,7 +19,14 @@ class kL3UrlTokenizer extends kUrlTokenizer
 	protected function getCommonPrefix(array $urls)
 	{
 		require_once( dirname(__FILE__). '/../../../../../../infra/general/kString.class.php');
-		return kString::getCommonPrefix($urls);
+		$acl = kString::getCommonPrefix($urls);
+
+		$commaPos = strpos($acl, ','); // the first comma denotes the beginning of the non-common URL part
+		if ($commaPos !== false)
+		{
+			$acl = substr($acl, 0, $commaPos);
+		}
+		return $acl;
 	}
 
 	/**
@@ -34,8 +41,9 @@ class kL3UrlTokenizer extends kUrlTokenizer
 		{
 			return $url;
 		}
-		list($urlToTokenize, $restUrl) = self::splitUrlParts($commonPrefix);
-		return $this->generateToken($urlToTokenize) . $restUrl;
+		$urlToTokenize = self::subStringLastSlash($commonPrefix);
+		$path = '/' . trim($url,  '/');
+		return $this->generateToken($urlToTokenize) . $path;
 	}
 
 	/**
@@ -54,44 +62,16 @@ class kL3UrlTokenizer extends kUrlTokenizer
 		{
 			return;
 		}
-		list($urlToTokenize, $restUrlOneFlavor) = self::splitUrlParts($commonPrefix);
+		$urlToTokenize = self::subStringLastSlash($commonPrefix);
 		$urlTokenized = $this->generateToken($urlToTokenize);
-		if ($urlTokenized === '')
-		{
-			return;
-		}
-		self::setFlavorsUrlWithToken($flavors, $urlTokenized, $restUrlOneFlavor);
-	}
-
-	public static function setFlavorsUrlWithToken(&$flavors, $urlTokenized, $restUrlOneFlavor)
-	{
 		foreach($flavors as $flavorKey => $flavor)
 		{
 			if (isset($flavor['url']))
 			{
-				if (count($flavors) == 1)
-				{
-					$restUrl = $restUrlOneFlavor;
-				}
-				else
-				{
-					$restUrl = self::getRestUrl($flavor);
-				}
-				$flavors[$flavorKey]['url'] = $urlTokenized . $restUrl;
+				$path = '/' . trim($flavor['url'], '/');
+				$flavors[$flavorKey]['url'] = $urlTokenized . $path;
 			}
 		}
-	}
-
-
-	public static function getRestUrl($flavor)
-	{
-		$restUrl = '';
-		$flavorIdPos = strpos($flavor['url'], 'flavorId/');
-		if ($flavorIdPos !== false)
-		{
-			$restUrl = substr($flavor['url'], $flavorIdPos + strlen('flavorId/'));
-		}
-		return $restUrl;
 	}
 
 	public function generateToken($urlToToken)
@@ -108,24 +88,22 @@ class kL3UrlTokenizer extends kUrlTokenizer
 		$hash = $this->gen . substr(hash_hmac('sha1', $uri, $this->key), 0, 20);
 		$tokenParams .= "&hash=$hash";
 		$token = str_replace('&', '~', $tokenParams);
-		return $this->paramName .'='. $token . $path;
+		return $this->paramName .'='. $token;
 	}
 
 	/*
-	 * splitting url into $urlToTokenize and $restUrl
-	 * $urlToTokenize: until the last slash Occurrence
-	 * $restUrl: from the last slash Occurrence
+	 * find the last slash occurrence
+	 * return sub string of url till that slash
 	 */
-	public static function splitUrlParts($url)
+	public static function subStringLastSlash($url)
 	{
 		$lastSlashOccurrence = strrpos ($url, '/');
 		if ($lastSlashOccurrence === false)
 		{
-			return array('', '');
+			return '';
 		}
-		$restUrl = substr($url, $lastSlashOccurrence + 1);
 		$urlToTokenize = substr($url, 0, $lastSlashOccurrence + 1);
-		return array($urlToTokenize, $restUrl);
+		return $urlToTokenize;
 	}
 
 	/**
