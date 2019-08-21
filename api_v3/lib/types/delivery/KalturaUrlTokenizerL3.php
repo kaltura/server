@@ -12,9 +12,17 @@ class KalturaUrlTokenizerL3 extends KalturaUrlTokenizer
 	 */
 	public $gen;
 
+	/**
+	 * paramName
+	 *
+	 * @var string
+	 */
+	public $paramName;
+
 	private static $map_between_objects = array
 	(
-		"gen"
+		'gen',
+		'paramName'
 	);
 
 	public function getMapBetweenObjects ( )
