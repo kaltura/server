@@ -148,10 +148,10 @@ class PushNotificationTemplateService extends KalturaBaseService
 			$queueProvider = QueueProvider::getInstance();
 			$queueProvider->send('', $msg);
 		}
-		catch(Exception $e)
+		catch(PhpAmqpLib\Exception\AMQPRuntimeException $e)
 		{
 			KalturaLog::debug("Failed to send command with error [" . $e->getMessage() . "]");
-			throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
+			throw $e;
 		}
 	}
 }
