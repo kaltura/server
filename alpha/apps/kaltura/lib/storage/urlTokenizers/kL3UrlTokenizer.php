@@ -68,13 +68,13 @@ class kL3UrlTokenizer extends kUrlTokenizer
 		{
 			return;
 		}
-		$urlTokenized = $this->generateToken($acl);
+		$token = $this->generateToken($acl);
 		foreach($flavors as $flavorKey => $flavor)
 		{
 			if (isset($flavor['url']))
 			{
 				$path = '/' . ltrim($flavor['url'], '/');
-				$flavors[$flavorKey]['url'] = $urlTokenized . $path;
+				$flavors[$flavorKey]['url'] = $token . $path;
 			}
 		}
 	}
