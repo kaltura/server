@@ -16,7 +16,7 @@ class kL3UrlTokenizer extends kUrlTokenizer
 	 * @param array $urls
 	 * @return string
 	 */
-	protected function getCommonPrefix(array $urls)
+	protected function getAcl(array $urls)
 	{
 		require_once( dirname(__FILE__). '/../../../../../../infra/general/kString.class.php');
 		$acl = kString::getCommonPrefix($urls);
@@ -26,6 +26,13 @@ class kL3UrlTokenizer extends kUrlTokenizer
 		{
 			$acl = substr($acl, 0, $commaPos);
 		}
+
+		$lastSlashOccurrence = strrpos ($acl, '/');
+		if ($lastSlashOccurrence === false)
+		{
+			return '';
+		}
+		$acl = substr($acl, 0, $lastSlashOccurrence + 1);
 		return $acl;
 	}
 
@@ -36,14 +43,13 @@ class kL3UrlTokenizer extends kUrlTokenizer
 	 */
 	public function tokenizeSingleUrl($url, $urlPrefix = null)
 	{
-		$commonPrefix = $this->getCommonPrefix(array($url));
-		if ($commonPrefix === '')
+		$acl = $this->getAcl(array($url));
+		if ($acl === '')
 		{
 			return $url;
 		}
-		$urlToTokenize = self::subStringLastSlash($commonPrefix);
-		$path = '/' . trim($url,  '/');
-		return $this->generateToken($urlToTokenize) . $path;
+		$path = '/' . ltrim($url,  '/');
+		return $this->generateToken($acl) . $path;
 	}
 
 	/**
@@ -57,31 +63,30 @@ class kL3UrlTokenizer extends kUrlTokenizer
 		{
 			$urls[] = $flavor['url'];
 		}
-		$commonPrefix = $this->getCommonPrefix($urls);
-		if ($commonPrefix === '')
+		$acl = $this->getAcl($urls);
+		if ($acl === '')
 		{
 			return;
 		}
-		$urlToTokenize = self::subStringLastSlash($commonPrefix);
-		$urlTokenized = $this->generateToken($urlToTokenize);
+		$urlTokenized = $this->generateToken($acl);
 		foreach($flavors as $flavorKey => $flavor)
 		{
 			if (isset($flavor['url']))
 			{
-				$path = '/' . trim($flavor['url'], '/');
+				$path = '/' . ltrim($flavor['url'], '/');
 				$flavors[$flavorKey]['url'] = $urlTokenized . $path;
 			}
 		}
 	}
 
-	public function generateToken($urlToToken)
+	public function generateToken($acl)
 	{
-		if ($urlToToken === '')
+		if ($acl === '')
 		{
 			return '';
 		}
 		$nva = time() + $this->window;
-		$path = '/' . trim($urlToToken,  '/') . '/';
+		$path = '/' . trim($acl,  '/') . '/';
 		$dirs = substr_count($path,  '/') - 1;
 		$tokenParams = "nva=$nva&dirs=$dirs";
 		$uri = "$path?$tokenParams";
@@ -89,21 +94,6 @@ class kL3UrlTokenizer extends kUrlTokenizer
 		$tokenParams .= "&hash=$hash";
 		$token = str_replace('&', '~', $tokenParams);
 		return $this->paramName .'='. $token;
-	}
-
-	/*
-	 * find the last slash occurrence
-	 * return sub string of url till that slash
-	 */
-	public static function subStringLastSlash($url)
-	{
-		$lastSlashOccurrence = strrpos ($url, '/');
-		if ($lastSlashOccurrence === false)
-		{
-			return '';
-		}
-		$urlToTokenize = substr($url, 0, $lastSlashOccurrence + 1);
-		return $urlToTokenize;
 	}
 
 	/**
