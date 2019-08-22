@@ -489,6 +489,7 @@ class DatesGenerator
 		if($limit && $this->count && $this->count < $limit)
 			$limit = $this->count;
 
+		$firstRun = true;
 		while(!$limit || $limit > count($dates))
 		{
 			$candidates = $this->getCandidates($cal);
@@ -537,9 +538,20 @@ class DatesGenerator
 					$cal = mktime($d['hours'], $d['minutes'], $d['seconds'], $d['mon'] + $this->interval, 1, $d['year']);
 					break;
 
+				case DatesGenerator::WEEKLY:
+					$interval = $this->interval;
+					// if we didn't found date in previous week search in the next one
+					if(!$dates && $firstRun)
+					{
+						$interval = 1;
+					}
+					$cal = strtotime("+{$interval} {$this->frequency}", $cal);
+					break;
+
 				default:
 					$cal = strtotime("+{$this->interval} {$this->frequency}", $cal);
 			}
+			$firstRun = false;
 		}
 		sort($dates);
 		return $dates;
