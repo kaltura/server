@@ -108,14 +108,11 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 		$c->add(VendorIntegrationPeer::ACCOUNT_ID, $accountId);
 		$c->add(VendorIntegrationPeer::PARTNER_ID, $partnerId);
 		$c->add(VendorIntegrationPeer::VENDOR_TYPE, $vendorType);
-		return self::doSelectOne($c);
-	}
-
-	// By default we will display only READY VendorIntegration, when status field is requested - it will be removed from the filter
-	public static function allowDeletedInCriteriaFilter()
-	{
-		$ecf = VendorIntegrationPeer::getCriteriaFilter();
-		$ecf->getFilter()->remove ( VendorIntegrationPeer::STATUS );
+		$c->add( VendorIntegrationPeer::STATUS, VendorStatus::DELETED, Criteria::NOT_EQUAL);
+		self::setUseCriteriaFilter(false);
+		$result = self::doSelectOne($c);
+		self::setUseCriteriaFilter(true);
+		return $result;
 	}
 
 } // VendorIntegrationPeer

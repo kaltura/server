@@ -6,6 +6,12 @@
  */
 class SsoService extends KalturaBaseService
 {
+	public function initService($serviceId, $serviceName, $actionName)
+	{
+		parent::initService($serviceId, $serviceName, $actionName);
+		$this->applyPartnerFilterForClass('VendorIntegration');
+	}
+
 	/**
 	 * Adds a new sso configuration(vendorIntegration of type sso).
 	 *
@@ -13,19 +19,14 @@ class SsoService extends KalturaBaseService
 	 * @param KalturaSso $sso a new sso configuration
 	 * @return KalturaSso The new sso configuration
 	 * @throws KalturaSsoErrors::DUPLICATE_SSO
-	 * @throws KalturaSsoErrors::MISSING_MANDATORY_PARAMETER
 	 */
 	public function addAction(KalturaSso $sso)
 	{
-		$sso->validateParameters();
-		$sso->validateDuplication();
-
-		$newSso = new SsoVendorIntegration();
-		$sso->toInsertableObject($newSso);
-		$newSso->setStatus(VendorStatus::ACTIVE);
-		$newSso->setVendorType(VendorTypeEnum::SSO);
-		$newSso->save();
-		$sso->fromObject($newSso);
+		$dbSso = $sso->toInsertableObject();
+		$dbSso->setPartnerId(kCurrentContext::getCurrentPartnerId());
+		$dbSso->setStatus(VendorStatus::ACTIVE);
+		$dbSso->save();
+		$sso->fromObject($dbSso, $this->getResponseProfile());
 		return $sso;
 	}
 
@@ -39,24 +40,14 @@ class SsoService extends KalturaBaseService
 	 */
 	public function getAction($ssoId)
 	{
-		$dbSso = self::getSso($ssoId);
-		if (!$dbSso)
+		$dbSso = VendorIntegrationPeer::retrieveByPK($ssoId);
+		if (!$dbSso || $dbSso->getVendorType() != VendorTypeEnum::SSO)
 		{
 			throw new KalturaAPIException(KalturaSsoErrors::INVALID_SSO_ID, $ssoId);
 		}
 		$sso = new KalturaSso();
 		$sso->fromObject($dbSso, $this->getResponseProfile());
 		return $sso;
-	}
-
-	protected static function getSso($ssoId)
-	{
-		$dbSso = VendorIntegrationPeer::retrieveByPK($ssoId);
-		if(!$dbSso || $dbSso->getVendorType() != VendorTypeEnum::SSO)
-		{
-			throw new KalturaAPIException(KalturaSsoErrors::INVALID_SSO_ID, $ssoId);
-		}
-		return $dbSso;
 	}
 
 	/**
@@ -69,7 +60,11 @@ class SsoService extends KalturaBaseService
 	 */
 	public function deleteAction($ssoId)
 	{
-		$dbSso = self::getSso($ssoId);
+		$dbSso = VendorIntegrationPeer::retrieveByPK($ssoId);
+		if (!$dbSso || $dbSso->getVendorType() != VendorTypeEnum::SSO)
+		{
+			throw new KalturaAPIException(KalturaSsoErrors::INVALID_SSO_ID, $ssoId);
+		}
 		$dbSso->setStatus(VendorStatus::DELETED);
 		$dbSso->save();
 		$sso = new KalturaSso();
@@ -89,7 +84,11 @@ class SsoService extends KalturaBaseService
 	 */
 	public function updateAction($ssoId, KalturaSso $sso)
 	{
-		$dbSso = self::getSso($ssoId);
+		$dbSso = VendorIntegrationPeer::retrieveByPK($ssoId);
+		if (!$dbSso || $dbSso->getVendorType() != VendorTypeEnum::SSO)
+		{
+			throw new KalturaAPIException(KalturaSsoErrors::INVALID_SSO_ID, $ssoId);
+		}
 		$dbSso = $sso->toUpdatableObject($dbSso);
 		$dbSso->save();
 		$sso = new KalturaSso();
@@ -140,7 +139,7 @@ class SsoService extends KalturaBaseService
 		$dbSso = VendorIntegrationPeer::getVendorByPartnerAccountIdVendorType($applicationId, $partnerId, VendorTypeEnum::SSO);
 		if(!$dbSso)
 		{
-			throw new KalturaAPIException(KalturaErrors::LOGIN_DATA_NOT_FOUND);
+			throw new KalturaAPIException(KalturaSsoErrors::SSO_NOT_FOUND, $applicationType);
 		}
 		$sso = new KalturaSso();
 		$sso->fromObject($dbSso, $this->getResponseProfile());

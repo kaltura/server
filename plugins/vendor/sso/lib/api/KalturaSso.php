@@ -19,11 +19,13 @@ class KalturaSso extends KalturaObject implements IRelatedFilterable
 
 	/**
 	 * @var KalturaApplicationType
+	 * @insertonly
 	 */
 	public $applicationId;
 
 	/**
 	 * @var int
+	 * @readonly
 	 * @filter eq
 	 */
 	public $partnerId;
@@ -93,50 +95,37 @@ class KalturaSso extends KalturaObject implements IRelatedFilterable
 		return array();
 	}
 
-	public function validateParameters()
+	/* (non-PHPdoc)
+ 	 * @see KalturaObject::toInsertableObject()
+ 	 */
+	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
 	{
-		$redirectUrl = $this->redirectUrl;
-		$applicationId = $this->applicationId;
-
-		if (!$redirectUrl)
+		if (is_null($object_to_fill))
 		{
-			throw new KalturaAPIException(KalturaSsoErrors::MISSING_MANDATORY_PARAMETER, "Redirect url is missing", $redirectUrl);
+			$object_to_fill = new SsoVendorIntegration();
+			$object_to_fill->setVendorType(VendorTypeEnum::SSO);
 		}
-		if (!$applicationId)
-		{
-			throw new KalturaAPIException(KalturaSsoErrors::MISSING_MANDATORY_PARAMETER, "Application type is missing", $redirectUrl);
-		}
-		if (!$this->partnerId)
-		{
-			$this->partnerId = kCurrentContext::getCurrentPartnerId();
-		}
+		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
 
-	public function validateDuplication()
+	public function validateForInsert($propertiesToSkip = array())
 	{
+		$this->validatePropertyNotNull(array('redirectUrl','applicationId'));
 		$applicationId = SsoPlugin::getCoreValue(self::APPLICATION_TYPE, $this->applicationId);
-		$existingSso = VendorIntegrationPeer::getVendorByPartnerAccountIdVendorType($applicationId, $this->partnerId, VendorTypeEnum::SSO);
+		$existingSso = VendorIntegrationPeer::getVendorByPartnerAccountIdVendorType($applicationId, kCurrentContext::getCurrentPartnerId(), VendorTypeEnum::SSO);
 		if ($existingSso)
 		{
 			throw new KalturaAPIException(KalturaSsoErrors::DUPLICATE_SSO, $existingSso->getId());
 		}
+		parent::validateForInsert($propertiesToSkip);
 	}
 
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		$this->validateUpdatableFields();
-		parent::validateForUpdate($sourceObject, $propertiesToSkip);
-	}
-
-	protected function validateUpdatableFields()
-	{
-		if ($this->partnerId)
-		{
-			throw new KalturaAPIException(KalturaSsoErrors::CANNOT_UPDATE_PARAMETER, self::PARTNER_ID);
-		}
-		if ($this->applicationId)
+		/*if ($this->applicationId)
 		{
 			throw new KalturaAPIException(KalturaSsoErrors::CANNOT_UPDATE_PARAMETER, self::APPLICATION_ID);
-		}
+		}*/
+		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 }
