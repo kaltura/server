@@ -99,6 +99,18 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 */
 	public $forcedOrderIds;
 	
+	protected static $forceSkipSphinx = false;
+	
+	public static function enableForceSkipSphinx()
+	{
+		self::$forceSkipSphinx = true;
+	}
+	
+	public static function disableForceSkipSphinx()
+	{
+		self::$forceSkipSphinx = false;
+	}
+	
 	protected function applyIds(array $ids)
 	{
 		if(!count($this->ids))
@@ -424,7 +436,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		// attach all default criteria from peer
 		$objectClass::getDefaultCriteriaFilter()->applyFilter($this);
 		
-		if(!$this->hasAdvancedSearchFilter && !count($this->matchClause) && $this->shouldSkipSphinx() && !isset($this->groupByColumn) && !isset($this->selectColumn))
+		if(self::$forceSkipSphinx || (!$this->hasAdvancedSearchFilter && !count($this->matchClause) && $this->shouldSkipSphinx() && !isset($this->groupByColumn) && !isset($this->selectColumn)))
 		{
 			KalturaLog::log('Skip Sphinx');
 			$this->sphinxSkipped = true;
