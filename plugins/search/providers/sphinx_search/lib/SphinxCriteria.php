@@ -436,7 +436,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		// attach all default criteria from peer
 		$objectClass::getDefaultCriteriaFilter()->applyFilter($this);
 		
-		if(self::$forceSkipSphinx || (!$this->hasAdvancedSearchFilter && !count($this->matchClause) && $this->shouldSkipSphinx() && !isset($this->groupByColumn) && !isset($this->selectColumn)))
+		if(!$this->hasAdvancedSearchFilter && !count($this->matchClause) && $this->shouldSkipSphinx() && !isset($this->groupByColumn) && !isset($this->selectColumn))
 		{
 			KalturaLog::log('Skip Sphinx');
 			$this->sphinxSkipped = true;
@@ -985,6 +985,11 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	
 	private function shouldSkipSphinx()
 	{
+		if(self::$forceSkipSphinx)
+		{
+			return true;
+		}
+		
 		$objectClass = $this->getIndexObjectName();
 		$skipFields = $objectClass::getIndexSkipFieldsList();
 		
