@@ -62,6 +62,8 @@ class KalturaDeliveryProfileFactory {
 		switch ($type) {
 			case 'kLevel3UrlTokenizer':
 				return new KalturaUrlTokenizerLevel3();
+			case 'kL3UrlTokenizer':
+				return new KalturaUrlTokenizerL3();
 			case 'kLimeLightUrlTokenizer':
 				return new KalturaUrlTokenizerLimeLight();
 			case 'kAkamaiHttpUrlTokenizer':

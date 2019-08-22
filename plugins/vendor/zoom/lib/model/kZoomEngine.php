@@ -1,7 +1,7 @@
 <?php
 /**
  * @package plugins.venodr
- * @subpackage model.zoom
+ * @subpackage zoom.model
  */
 
 class kZoomEngine
@@ -105,7 +105,7 @@ class kZoomEngine
 			}
 			catch (Exception $e)
 			{
-				ZoomHelper::exitWithError(kVendorErrorMessages::ERROR_HANDLING_TRANSCRIPT);
+				ZoomHelper::exitWithError(kZoomErrorMessages::ERROR_HANDLING_TRANSCRIPT);
 			}
 		}
 	}
@@ -128,7 +128,7 @@ class kZoomEngine
 		$entry = entryPeer::doSelectOne($c);
 		if(!$entry)
 		{
-			ZoomHelper::exitWithError(kVendorErrorMessages::MISSING_ENTRY_FOR_ZOOM_MEETING . $meetingId);
+			ZoomHelper::exitWithError(kZoomErrorMessages::MISSING_ENTRY_FOR_ZOOM_MEETING . $meetingId);
 		}
 
 		KalturaLog::info('Found entry:' . $entry->getId());
@@ -185,7 +185,7 @@ class kZoomEngine
 	{
 		if(!$entry)
 		{
-			ZoomHelper::exitWithError(kVendorErrorMessages::MISSING_ENTRY_FOR_CHAT);
+			ZoomHelper::exitWithError(kZoomErrorMessages::MISSING_ENTRY_FOR_CHAT);
 		}
 		try
 		{
@@ -199,7 +199,7 @@ class kZoomEngine
 		}
 		catch (Exception $e)
 		{
-			ZoomHelper::exitWithError(kVendorErrorMessages::ERROR_HANDLING_CHAT);
+			ZoomHelper::exitWithError(kZoomErrorMessages::ERROR_HANDLING_CHAT);
 		}
 	}
 

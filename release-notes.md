@@ -1,3 +1,14 @@
+# Orion 15.6.0 #
+
+- Issue Type: Task
+- Issue ID: PLAT-10084
+
+### configuration ###
+    None
+
+### Deployment scripts ###
+php deployment/updates/scripts/add_permissions/2019_08_20_update_esearch_permissions.php
+
 # Orion 15.5.0 #
 
 ## Adding monitoring-proxy partner ##
