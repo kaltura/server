@@ -110,7 +110,8 @@ class KalturaSso extends KalturaObject implements IRelatedFilterable
 
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array('redirectUrl','applicationId'));
+		$this->validatePropertyNotNull('redirectUrl');
+		$this->validatePropertyNotNull('applicationId');
 		$applicationId = SsoPlugin::getCoreValue(self::APPLICATION_TYPE, $this->applicationId);
 		$existingSso = VendorIntegrationPeer::getVendorByPartnerAccountIdVendorType($applicationId, kCurrentContext::getCurrentPartnerId(), VendorTypeEnum::SSO);
 		if ($existingSso)
@@ -118,14 +119,5 @@ class KalturaSso extends KalturaObject implements IRelatedFilterable
 			throw new KalturaAPIException(KalturaSsoErrors::DUPLICATE_SSO, $existingSso->getId());
 		}
 		parent::validateForInsert($propertiesToSkip);
-	}
-
-	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
-	{
-		/*if ($this->applicationId)
-		{
-			throw new KalturaAPIException(KalturaSsoErrors::CANNOT_UPDATE_PARAMETER, self::APPLICATION_ID);
-		}*/
-		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 }

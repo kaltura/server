@@ -20,17 +20,21 @@ class KalturaSsoFilter extends KalturaSsoBaseFilter
 		$ssoFilter = $this->toObject();
 		$ssoFilter->attachToCriteria($c);
 		$c->addAnd(VendorIntegrationPeer::VENDOR_TYPE,VendorTypeEnum::SSO);
-		$partnerIdFromKS = kCurrentContext::getCurrentPartnerId();
-		if ($this->partnerIdEqual != $partnerIdFromKS)
-		{
-			$c->addAnd(VendorIntegrationPeer::PARTNER_ID, $partnerIdFromKS);
-		}
 		$pager->attachToCriteria($c);
+
 		$list = VendorIntegrationPeer::doSelect($c);
-		$totalCount = VendorIntegrationPeer::doCount($c);
-		$newList = KalturaSsoArray::fromDbArray($list, $responseProfile);
+
+		$resultCount = count($list);
+		if ($resultCount && $resultCount < $pager->pageSize)
+			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
+		else
+		{
+			KalturaFilterPager::detachFromCriteria($c);
+			$totalCount = ReachProfilePeer::doCount($c);
+		}
+
 		$response = new KalturaSsoListResponse();
-		$response->objects = $newList;
+		$response->objects = KalturaSsoArray::fromDbArray($list, $responseProfile);
 		$response->totalCount = $totalCount;
 		return $response;
 	}
