@@ -102,13 +102,17 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 	 * @return VendorIntegration
 	 * @throws PropelException
 	 */
-	public static function getVendorByPartnerAccountIdVendorType($accountId, $partnerId, $vendorType)
+	public static function getVendorByPartnerAccountIdVendorType($accountId, $partnerId, $vendorType, $status = null)
 	{
 		$c = new Criteria();
 		$c->add(VendorIntegrationPeer::ACCOUNT_ID, $accountId);
 		$c->add(VendorIntegrationPeer::PARTNER_ID, $partnerId);
 		$c->add(VendorIntegrationPeer::VENDOR_TYPE, $vendorType);
 		$c->add( VendorIntegrationPeer::STATUS, VendorStatus::DELETED, Criteria::NOT_EQUAL);
+		if ($status)
+		{
+			$c->add( VendorIntegrationPeer::STATUS,$status);
+		}
 		self::setUseCriteriaFilter(false);
 		$result = self::doSelectOne($c);
 		self::setUseCriteriaFilter(true);

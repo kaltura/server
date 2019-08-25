@@ -80,7 +80,6 @@ class SsoService extends KalturaBaseService
 	 * @param KalturaSso $sso The updated object
 	 * @return KalturaSso The updated  object
 	 * @throws KalturaSsoErrors::INVALID_SSO_ID
-	 * @throws KalturaSsoErrors::CANNOT_UPDATE_PARAMETER
 	 */
 	public function updateAction($ssoId, KalturaSso $sso)
 	{
@@ -126,6 +125,7 @@ class SsoService extends KalturaBaseService
 	 * @return string $redirectUrl
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
 	 * @throws KalturaErrors::INVALID_USER_ID
+	 * @throws APIErrors::FEATURE_FORBIDDEN
 	 */
 	public function loginAction($userId, $applicationType)
 	{
@@ -135,8 +135,9 @@ class SsoService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::LOGIN_DATA_NOT_FOUND);
 		}
 		$partnerId = $loginData->getLastLoginPartnerId() ? $loginData->getLastLoginPartnerId() : $loginData->getConfigPartnerId();
+		$this->validatePartnerUsingSso($partnerId);
 		$applicationId = SsoPlugin::getCoreValue(KalturaSso::APPLICATION_TYPE, $applicationType);
-		$dbSso = VendorIntegrationPeer::getVendorByPartnerAccountIdVendorType($applicationId, $partnerId, VendorTypeEnum::SSO);
+		$dbSso = VendorIntegrationPeer::getVendorByPartnerAccountIdVendorType($applicationId, $partnerId, VendorTypeEnum::SSO, VendorStatus::ACTIVE);
 		if(!$dbSso)
 		{
 			throw new KalturaAPIException(KalturaSsoErrors::SSO_NOT_FOUND, $applicationType);
@@ -145,4 +146,14 @@ class SsoService extends KalturaBaseService
 		$sso->fromObject($dbSso, $this->getResponseProfile());
 		return $sso->redirectUrl;
 	}
+
+	protected function validatePartnerUsingSso($partnerId)
+	{
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if (!$partner || ($partner && !$partner->getUseSso()))
+		{
+			throw new KalturaAPIException (APIErrors::FEATURE_FORBIDDEN, $this->serviceId . '->' . $this->actionName);
+		}
+	}
+
 }
