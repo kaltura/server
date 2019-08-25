@@ -1,5 +1,20 @@
 # Orion 15.6.0 #
 
+## Adding SSO ##
+
+- Issue Type: Task
+- Issue ID: PLAT-9838
+
+### configuration ###
+Add Sso to your plugins.ini 
+validate Vendor exist on you plugins.ini as well
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+php deployment/updates/scripts/add_permissions/2019_08_18_add_sso_permission.php
+
+
+
 - Issue Type: Task
 - Issue ID: PLAT-10084
 
