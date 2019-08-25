@@ -1,5 +1,6 @@
 # Orion 15.6.0 #
 
+## Add ESearch read only permission ##
 - Issue Type: Task
 - Issue ID: PLAT-10084
 
