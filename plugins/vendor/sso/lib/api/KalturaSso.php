@@ -7,8 +7,6 @@
 class KalturaSso extends KalturaObject implements IRelatedFilterable
 {
 	const APPLICATION_TYPE = 'ApplicationType';
-	const PARTNER_ID = 'partner Id';
-	const APPLICATION_ID = 'application Id';
 
 	/**
 	 * @var int

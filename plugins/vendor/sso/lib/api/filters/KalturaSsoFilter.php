@@ -30,7 +30,7 @@ class KalturaSsoFilter extends KalturaSsoBaseFilter
 		else
 		{
 			KalturaFilterPager::detachFromCriteria($c);
-			$totalCount = ReachProfilePeer::doCount($c);
+			$totalCount = VendorIntegrationPeer::doCount($c);
 		}
 
 		$response = new KalturaSsoListResponse();
