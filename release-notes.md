@@ -9,6 +9,20 @@
 ### Deployment scripts ###
 php deployment/updates/scripts/add_permissions/2019_08_20_update_esearch_permissions.php
 
+## Add permission in the admin console to Multi Account Analytics Filter ##
+
+- Issue Type: Feature
+- Issue ID: AN-801
+
+### configuration ###
+    Add the following to admin.ini:
+
+    moduls.multiPublishersAnalytics.enabled = true
+    moduls.multiPublishersAnalytics.permissionType = 2
+    moduls.multiPublishersAnalytics.label = Multi Account Analytics Filter
+    moduls.multiPublishersAnalytics.permissionName = FEATURE_MULTI_ACCOUNT_ANALYTICS
+    moduls.multiPublishersAnalytics.group = GROUP_ENABLE_DISABLE_FEATURES
+
 # Orion 15.5.0 #
 
 ## Adding monitoring-proxy partner ##
