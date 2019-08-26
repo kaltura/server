@@ -73,6 +73,7 @@ $sphinxReadConn = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LO
 $serverLastLogs = SphinxLogServerPeer::retrieveByServer($sphinxServer, $sphinxReadConn);
 $lastLogs = array();
 $handledRecords = array();
+$sphinxRtTables = array();
 
 foreach($serverLastLogs as $serverLastLog)
 {
@@ -95,7 +96,10 @@ while(true)
 	try
 	{
 		$sphinxCon = DbManager::createSphinxConnection($sphinxServer,$sphinxPort);
-		$sphinxRtTables = getSphinxRtTables($sphinxCon);
+		if(!count($sphinxRtTables))
+		{
+			$sphinxRtTables = getSphinxRtTables($sphinxCon);
+		}
 		KalturaLog::log("sphinxServer [$sphinxServer], running rt index names [" . implode(",", $sphinxRtTables) . "]");
 	}
 	catch(Exception $e)
@@ -112,7 +116,7 @@ while(true)
 		$executedServerId = $sphinxLog->getExecutedServerId();
 		$sphinxLogId = $sphinxLog->getId();
 		$sphinxLogIndexName = $sphinxLog->getIndexName();
-		if($isSharded && preg_match('~[0-9]~', $sphinxLogIndexName) == 0 &&  $splitIndexSettings && isset($splitIndexSettings[$sphinxLog->getObjectType()]))
+		if($isSharded && preg_match('~[0-9]~', $sphinxLogIndexName) == 0 && $splitIndexSettings && isset($splitIndexSettings[$sphinxLog->getObjectType()]))
 		{
 			$splitFactor = $splitIndexSettings[$sphinxLog->getObjectType()];
 			$sphinxLogIndexName = $sphinxLogIndexName . "_" . ($sphinxLog->getPartnerId()/$splitFactor)%$splitFactor;
