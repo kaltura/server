@@ -34,7 +34,7 @@ class kKavaVpaasReports extends kKavaReports
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('name', 'partner_id'),
-				self::REPORT_ENRICH_FUNC => 'kKavaVpaasReports::getUsersInfoVpaass',
+				self::REPORT_ENRICH_FUNC => 'kKavaVpaasReports::getUsersInfoVpaas',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'columns' => array('PUSER_ID', 'PARTNER_ID'),
 				)
@@ -43,11 +43,17 @@ class kKavaVpaasReports extends kKavaReports
 
 		ReportType::USER_USAGE_VPAAS => array(
 			self::REPORT_BASE_DEF => ReportType::USER_USAGE,
+			self::REPORT_DIMENSION_MAP => array(
+				'kuser_id' => self::DIMENSION_KUSER_ID,
+				'name' => self::DIMENSION_KUSER_ID,
+				'partner_id' => self::DIMENSION_KUSER_ID,
+			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('name', 'partner_id'),
-				self::REPORT_ENRICH_FUNC => 'kKavaVpaasReports::getUsersInfoVpaass',
+				self::REPORT_ENRICH_FUNC => 'kKavaVpaasReports::getUsersInfoVpaas',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'columns' => array('PUSER_ID', 'PARTNER_ID'),
+					'hash' => false,
 				)
 			),
 		),
@@ -194,7 +200,7 @@ class kKavaVpaasReports extends kKavaReports
 		return $partners_map;
 	}
 
-	protected static function getUsersInfoVpaass($ids, $partner_id, $context)
+	protected static function getUsersInfoVpaas($ids, $partner_id, $context)
 	{
 		$context['skip_partner_filter'] = true;
 		list($columns, $hash_conf, $result, $rows) = self::getBaseUsersInfo($ids, $partner_id, $context);
