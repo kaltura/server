@@ -91,7 +91,7 @@ class ZoomHelper
      */
 	public static function loadLoginPage($tokens, $zoomConfiguration)
 	{
-		$file_path = dirname(__FILE__) . '/../api/webPage/zoom/kalturaZoomLoginPage.html';
+		$file_path = dirname(__FILE__) . '/../api/webPage/kalturaZoomLoginPage.html';
 		if (file_exists($file_path))
 		{
 			$page = file_get_contents($file_path);
@@ -114,7 +114,7 @@ class ZoomHelper
 	 */
 	public static function loadSubmitPage($zoomIntegration, $accountId, $ks)
 	{
-		$file_path = dirname(__FILE__) . '/../api/webPage/zoom/KalturaZoomRegistrationPage.html';
+		$file_path = dirname(__FILE__) . '/../api/webPage/KalturaZoomRegistrationPage.html';
 		if (file_exists($file_path))
 		{
 			$page = file_get_contents($file_path);
