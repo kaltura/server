@@ -7,7 +7,7 @@
 class KalturaWatchLaterUserEntryAdvancedFilter extends KalturaSearchItem
 {
 	/**
-	 * @var string
+	 * @var int
 	 */
 	public $idEqual;
 
@@ -27,12 +27,12 @@ class KalturaWatchLaterUserEntryAdvancedFilter extends KalturaSearchItem
 	public $userIdIn;
 
 	/**
-	 * @var string
+	 * @var time
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * @var string
+	 * @var time
 	 */
 	public $updatedAtLessThanOrEqual;
 
