@@ -16,6 +16,12 @@ class CategoryUserService extends KalturaBaseService
 	 */
 	function addAction(KalturaCategoryUser $categoryUser)
 	{
+		$lockKey = 'categoryUser_add_' . $categoryUser->categoryId . '_' . $categoryUser->userId;
+		return kLock::runLocked($lockKey, array($this, 'addCategoryUserImpl'), array($categoryUser));
+	}
+
+	function addCategoryUserImpl(KalturaCategoryUser $categoryUser)
+	{
 		$dbCategoryKuser = $categoryUser->toInsertableObject();
 		/* @var $dbCategoryKuser categoryKuser */
 		$category = categoryPeer::retrieveByPK($categoryUser->categoryId);
@@ -29,7 +35,7 @@ class CategoryUserService extends KalturaBaseService
 		$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryUser->categoryId, kCurrentContext::getCurrentKsKuserId());
 		if (!kEntitlementUtils::getEntitlementEnforcement())
 		{
-			$dbCategoryKuser->setStatus(CategoryKuserStatus::ACTIVE);	
+			$dbCategoryKuser->setStatus(CategoryKuserStatus::ACTIVE);
 			$dbCategoryKuser->setPermissionLevel($categoryUser->permissionLevel);
 		}
 		elseif ($currentKuserCategoryKuser && $currentKuserCategoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MANAGER)
@@ -49,9 +55,9 @@ class CategoryUserService extends KalturaBaseService
 		}
 		else
 		{
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_USER_JOIN_NOT_ALLOWED, $categoryUser->categoryId);	
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_USER_JOIN_NOT_ALLOWED, $categoryUser->categoryId);
 		}
-				
+
 		$dbCategoryKuser->setCategoryFullIds($category->getFullIds());
 		$dbCategoryKuser->setPartnerId($this->getPartnerId());
 		$dbCategoryKuser->save();
