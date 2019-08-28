@@ -16,14 +16,14 @@ class CategoryUserService extends KalturaBaseService
 	 */
 	function addAction(KalturaCategoryUser $categoryUser)
 	{
-		$lockKey = 'categoryUser_add_' . $categoryUser->categoryId . '_' . $categoryUser->userId;
-		return kLock::runLocked($lockKey, array($this, 'addCategoryUserImpl'), array($categoryUser));
-	}
-
-	function addCategoryUserImpl(KalturaCategoryUser $categoryUser)
-	{
 		$dbCategoryKuser = $categoryUser->toInsertableObject();
 		/* @var $dbCategoryKuser categoryKuser */
+		$lockKey = 'categoryUser_add_' . $categoryUser->categoryId . '_' . $categoryUser->userId;
+		return kLock::runLocked($lockKey, array($this, 'addCategoryUserImpl'), array($categoryUser, $dbCategoryKuser));
+	}
+
+	function addCategoryUserImpl(KalturaCategoryUser $categoryUser, $dbCategoryKuser)
+	{
 		$category = categoryPeer::retrieveByPK($categoryUser->categoryId);
 		if (!$category)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryUser->categoryId);
@@ -61,7 +61,7 @@ class CategoryUserService extends KalturaBaseService
 		$dbCategoryKuser->setCategoryFullIds($category->getFullIds());
 		$dbCategoryKuser->setPartnerId($this->getPartnerId());
 		$dbCategoryKuser->save();
-		
+
 		$categoryUser->fromObject($dbCategoryKuser, $this->getResponseProfile());
 		return $categoryUser;
 	}
