@@ -88,6 +88,13 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 	 * @insertonly
 	 */
 	public $autoFinalize;
+
+	/**
+	 * set the minimum size in bytes for each uploaded part of the file
+	 * @var float
+	 * @insertonly
+	 */
+	public $minimumChunkSize;
 	
 	private static $map_between_objects = array
 	(
@@ -101,6 +108,7 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 		"createdAt",
 		"updatedAt",
 		"autoFinalize",
+		"minimumChunkSize",
 	);
 
 	/* (non-PHPdoc)
