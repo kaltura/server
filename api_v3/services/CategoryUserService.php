@@ -35,7 +35,7 @@ class CategoryUserService extends KalturaBaseService
 		$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryUser->categoryId, kCurrentContext::getCurrentKsKuserId());
 		if (!kEntitlementUtils::getEntitlementEnforcement())
 		{
-			$dbCategoryKuser->setStatus(CategoryKuserStatus::ACTIVE);
+			$dbCategoryKuser->setStatus(CategoryKuserStatus::ACTIVE);	
 			$dbCategoryKuser->setPermissionLevel($categoryUser->permissionLevel);
 		}
 		elseif ($currentKuserCategoryKuser && $currentKuserCategoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MANAGER)
@@ -55,13 +55,13 @@ class CategoryUserService extends KalturaBaseService
 		}
 		else
 		{
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_USER_JOIN_NOT_ALLOWED, $categoryUser->categoryId);
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_USER_JOIN_NOT_ALLOWED, $categoryUser->categoryId);	
 		}
-
+				
 		$dbCategoryKuser->setCategoryFullIds($category->getFullIds());
 		$dbCategoryKuser->setPartnerId($this->getPartnerId());
 		$dbCategoryKuser->save();
-
+		
 		$categoryUser->fromObject($dbCategoryKuser, $this->getResponseProfile());
 		return $categoryUser;
 	}
