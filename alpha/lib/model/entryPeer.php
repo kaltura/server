@@ -839,7 +839,8 @@ class entryPeer extends BaseentryPeer
 
 		if(count($entryIds) === 1)
 		{
-			if(entryPeer::retrieveByPK($entryIds[0]))
+		    $entryId = reset($entryIds);
+			if($entryId && entryPeer::retrieveByPK($entryId))
 			{
 				return $entryIds;
 			}
