@@ -2,7 +2,7 @@
 require_once('/opt/kaltura/app/alpha/scripts/bootstrap.php');
 require_once('/opt/kaltura/app/alpha/scripts/utils/mergeDuplicateUsersUtils.php');
 
-define("BASE_DIR", dirname(__FILE__));
+define("BASE_DIR", '/tmp/');
 define("LAST_RUN_TIME_FILE_NAME", "merge_duplicated_users_last_run_time.txt");
 define("MAX_RECORDS", 100);
 
@@ -20,8 +20,9 @@ function mergeNewDuplicatedUsers()
 {
 	KalturaLog::debug("Start merging duplicated users");
 
-	$lastRunTime = getAndUpdateLastRunTime();
-	$newKusers = getNewUsersCreated($lastRunTime);
+	$currentTime = time();
+	$lastRunTime = getAndUpdateLastRunTime($currentTime);
+	$newKusers = getNewUsersCreated($lastRunTime, $currentTime);
 	if(!count($newKusers))
 	{
 		KalturaLog::debug("No users to process");
@@ -34,38 +35,34 @@ function mergeNewDuplicatedUsers()
 		{
 			$currentPuserId = $kuser->getPuserId();
 			$currentPartnerId = $kuser->getPartnerId();
+			$currentKuserId = $kuser->getId();
 
 			$kusersArray = getAllDuplicatedKusersForPuser($currentPuserId, $currentPartnerId);
-			if (!$kusersArray)
+			if (!$kusersArray || count($kusersArray) == 1)
 			{
-				KalturaLog::debug('ERROR: couldn\'t find kusers with puser id ['.$currentPuserId.']');
+				KalturaLog::debug('ERROR: couldn\'t find duplicated kusers with puser id ['.$currentPuserId.']');
 				continue;
 			}
 
-			// if we already merged this user skip to next one
-			if($kusersArray[0]->getId() < $kuser->getId())
-			{
-				KalturaLog::debug('puserId ['.$currentPuserId.'] was already handled - skipping');
-				continue;
-			}
-
-			KalturaLog::debug('Started handling puserId ['.$currentPuserId.'] for partnerId [' . $currentPartnerId .']');
+			KalturaLog::debug('Started handling puserId ['.$currentPuserId.'] with kuser id [' . $currentKuserId . '] for partnerId [' . $currentPartnerId .']');
 			$baseKuser = findKuserWithMaxEntries($kusersArray, $currentPartnerId);
 			mergeUsersToBaseUser($kusersArray, $baseKuser, $currentPartnerId);
 			KalturaLog::debug('finished handling puserId ['.$currentPuserId.']');
 		}
 
-		$newKusers = getNewUsersCreated($lastRunTime, $kuser);
+		$newKusers = getNewUsersCreated($lastRunTime, $currentTime, $kuser);
 	}
 
 	KalturaLog::debug("Done merging duplicated users");
 }
 
 
-function getNewUsersCreated($lastRunTime, $lastUser = null)
+function getNewUsersCreated($lastRunTime, $currentTime, $lastUser = null)
 {
 	$c = new Criteria ();
 	$c->add(kuserPeer::CREATED_AT, $lastRunTime, Criteria::GREATER_EQUAL);
+	$c->addAnd(kuserPeer::CREATED_AT, $currentTime, Criteria::LESS_THAN);
+	$c->add(kuserPeer::UPDATED_AT, $lastRunTime, Criteria::GREATER_EQUAL);
 	$c->addAscendingOrderByColumn(kuserPeer::ID);
 	if($lastUser)
 	{
@@ -76,10 +73,13 @@ function getNewUsersCreated($lastRunTime, $lastUser = null)
 
 	if(!count($res))
 	{
-		KalturaLog::debug("No new users created from last run time [$lastRunTime]");
 		if($lastUser)
 		{
-			KalturaLog::debug("No new users created from last handled user creation time [{$lastUser->getCreatedAt(null)}]");
+			KalturaLog::debug("No new users created from last handled user creation time [{$lastUser->getCreatedAt(null)}] until [$currentTime]");
+		}
+		else
+		{
+			KalturaLog::debug("No new users created from last run time [$lastRunTime] until [$currentTime]");
 		}
 		return array();
 	}
@@ -88,9 +88,8 @@ function getNewUsersCreated($lastRunTime, $lastUser = null)
 }
 
 
-function getAndUpdateLastRunTime()
+function getAndUpdateLastRunTime($currentTime)
 {
-	$currentTime = time();
 	$lastSyncTime = trim(file_get_contents(BASE_DIR . "/" . LAST_RUN_TIME_FILE_NAME));
 	if(!$lastSyncTime)
 	{

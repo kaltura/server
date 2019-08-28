@@ -45,65 +45,65 @@ function findKuserWithMaxEntries ($kusersArray, $partnerId){
 }
 
 function changeKuserForEntries ($kuser, $baseKuser, $partnerId) {
+	KalturaLog::debug('set KuserId ['.$baseKuser->getId().'] instead of ['.$kuser->getId().'] for entries');
 	$Critiria = KalturaCriteria::create(entryPeer::OM_CLASS);
 	$Critiria->add(entryPeer::KUSER_ID, $kuser->getId());
 	$Critiria->add(entryPeer::PARTNER_ID, $partnerId);
-	$entriesArray = entryPeer::doSelect($Critiria);
-	foreach ($entriesArray as $entry) {
-		KalturaLog::debug('set KuserId ['.$baseKuser->getId().'] instead of ['.$entry->getKuser()->getId().'] for entryId ['.$entry->getId().']');
-		$entry->setKuserId($baseKuser->getId());
-		$entry->save();
-	}
+
+	$update = new Criteria();
+	$update->add(entryPeer::KUSER_ID, $baseKuser->getId());
+	$con = Propel::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
+	BasePeer::doUpdate($Critiria, $update, $con);
 }
 
 function changeKuserForCuePoints ($kuser, $baseKuser, $partnerId)
 {
+	KalturaLog::debug('set KuserId ['.$baseKuser->getId().'] instead of ['.$kuser->getId().'] for cue points');
 	$Critiria = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 	$Critiria->add(CuePointPeer::KUSER_ID, $kuser->getId());
 	$Critiria->add(CuePointPeer::PARTNER_ID, $partnerId);
-	$cuePointsArray = CuePointPeer::doSelect($Critiria);
-	foreach ($cuePointsArray as $cuePoint) {
-		KalturaLog::debug('set KuserId [' . $baseKuser->getId() . '] instead of [' . $cuePoint->getKuserId() . '] for cuePointId [' . $cuePoint->getId() . ']');
-		$cuePoint->setkuserId($baseKuser->getId());
-		$cuePoint->save();
-	}
+
+	$update = new Criteria();
+	$update->add(CuePointPeer::KUSER_ID, $baseKuser->getId());
+	$con = Propel::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
+	BasePeer::doUpdate($Critiria, $update, $con);
 }
 
 function changeKuserForCategoryKusers ($kuser, $baseKuser, $partnerId) {
+	KalturaLog::debug('set KuserId ['.$baseKuser->getId().'] instead of ['.$kuser->getId().'] for categoryKusers');
 	$Critiria = new Criteria();
 	$Critiria->add(categoryKuserPeer::KUSER_ID, $kuser->getId());
 	$Critiria->add(categoryKuserPeer::PARTNER_ID, $partnerId);
-	$categoryUserArray = categoryKuserPeer::doSelect($Critiria);
-	foreach ($categoryUserArray as $categoryUser) {
-		KalturaLog::debug('set KuserId ['.$baseKuser->getId().'] instead of ['.$categoryUser->getKuser()->getId().'] for categoryUserId ['.$categoryUser->getId().']');
-		$categoryUser->setkuserId($baseKuser->getId());
-		$categoryUser->save();
-	}
+
+	$update = new Criteria();
+	$update->add(categoryKuserPeer::KUSER_ID, $baseKuser->getId());
+	$con = Propel::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
+	BasePeer::doUpdate($Critiria, $update, $con);
 }
 
 function changeKuserForUserEntries($kuser, $baseKuser, $partnerId){
+	KalturaLog::debug('set KuserId ['.$baseKuser->getId().'] instead of ['.$kuser->getId().'] for userEntries');
 	$Critiria = new Criteria();
 	$Critiria->add(UserEntryPeer::KUSER_ID, $kuser->getId());
 	$Critiria->add(UserEntryPeer::PARTNER_ID, $partnerId);
 	$Critiria->add(UserEntryPeer::STATUS, UserEntryStatus::ACTIVE);
-	$userEntryArray = UserEntryPeer::doSelect($Critiria);
-	foreach ($userEntryArray as $userEntry) {
-		KalturaLog::debug('set KuserId ['.$baseKuser->getId().'] instead of ['.$userEntry->getKuser()->getId().'] for userEntry ['.$userEntry->getId().']');
-		$userEntry->setkuserId($baseKuser->getId());
-		$userEntry->save();
-	}
+
+	$update = new Criteria();
+	$update->add(UserEntryPeer::KUSER_ID, $baseKuser->getId());
+	$con = Propel::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
+	BasePeer::doUpdate($Critiria, $update, $con);
 }
 
 function changeKuserForKvote($kuser, $baseKuser, $partnerId){
+	KalturaLog::debug('set KuserId ['.$baseKuser->getId().'] instead of ['.$kuser->getId().'] for kVotes');
 	$Critiria = new Criteria();
 	$Critiria->add(kvotePeer::KUSER_ID, $kuser->getId());
 	$Critiria->add(kvotePeer::PARTNER_ID, $partnerId);
-	$kvotesArray = kvotePeer::doSelect($Critiria);
-	foreach ($kvotesArray as $kvote) {
-		KalturaLog::debug('set KuserId ['.$baseKuser->getId().'] instead of ['.$kvote->getKuserId().'] for kvote ['.$kvote->getId().']');
-		$kvote->setkuserId($baseKuser->getId());
-		$kvote->save();
-	}
+
+	$update = new Criteria();
+	$update->add(kvotePeer::KUSER_ID, $baseKuser->getId());
+	$con = Propel::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
+	BasePeer::doUpdate($Critiria, $update, $con);
 }
 
 function changeKuserForKuserKgroup($kuser, $baseKuser, $partnerId){
