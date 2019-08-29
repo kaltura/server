@@ -75,6 +75,11 @@ abstract class kManifestRenderer
 	 */
 	protected $internalIP = null;
 
+	/**
+	 * @var string
+	 */
+	protected $isIpInRange = 'false';
+
 
 	protected function prepareFlavors()
 	{
@@ -172,6 +177,16 @@ abstract class kManifestRenderer
 		$this->internalIP = $internalIP;
 	}
 
+	/**
+	 * @param string $isIpInRange
+	 */
+	public function setIsIpInRange($isIpInRange)
+	{
+		$this->isIpInRange = $isIpInRange;
+	}
+
+
+
 	protected function replacePlaybackContext($str)
 	{
 		if($this->playbackContext)
@@ -193,11 +208,16 @@ abstract class kManifestRenderer
 			'partnerId' => $this->partnerId,
 			'playbackType' => $this->entryType,
 		);
+//		KalturaLog::debug('test uniqueId [' . UniqueId::get() . "]");
 
 		if ($this->playLocation)
 		{
 			$output['serverNodeIds'] = $this->playLocation;
 			$output['clientInternalIp'] = $this->internalIP;
+			$output['ipIsInRange'] = $this->isIpInRange;
+			$output['apiSessionId'] = UniqueId::get();
+//			KalutraLog::debug('get session id');
+//			KalturaLog::debug("playerConfig provided is not a json object, data will not be forward to playServer [$playerConfig]");
 		}
 
 

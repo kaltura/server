@@ -6,6 +6,7 @@
 class kIpAddressCondition extends kMatchCondition
 {
 	const PARTNER_INTERNAL_IP = 'partnerInternalIp';
+	const IP_ADDRESS_IN_RANGE = 'ipAddressInRange';
 
 	public function __construct($not = false)
 	{
@@ -84,7 +85,12 @@ class kIpAddressCondition extends kMatchCondition
 	 */
 	protected function matches($field, $value)
 	{
-		return kIpAddressUtils::isIpInRanges($field, $value);
+		$res = kIpAddressUtils::isIpInRanges($field, $value);
+		if ($res)
+		{
+			$this->setExtraProperties(self::IP_ADDRESS_IN_RANGE, true);
+		}
+		return $res;
 	}
 
 	/**
