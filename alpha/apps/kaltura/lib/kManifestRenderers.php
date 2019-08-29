@@ -228,6 +228,7 @@ abstract class kManifestRenderer
 			$output['clientInternalIp'] = $this->internalIP;
 			$output['ipIsInRange'] = $this->isIpInRange;
 			$output['apiSessionId'] = $this->apiSessionId;
+			$output['apiHostName'] = infraRequestUtils::getHostname();
 		}
 
 
