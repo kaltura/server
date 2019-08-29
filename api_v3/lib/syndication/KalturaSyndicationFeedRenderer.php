@@ -140,12 +140,12 @@ class KalturaSyndicationFeedRenderer
 		// add partner to default criteria
 		myPartnerUtils::addPartnerToCriteria('category', $this->syndicationFeed->partnerId, true);
 		myPartnerUtils::addPartnerToCriteria('asset', $this->syndicationFeed->partnerId, true);
-		
+
 		myPartnerUtils::resetPartnerFilter('entry');
 
 		entryPeer::onlyReadyCriteriaFilter();
 
-		if($this->shouldAddNextLink())
+		if($this->shouldAddNextLink()   )
 		{
 			$this->addLinkForNextIteration = true;
 
@@ -156,17 +156,17 @@ class KalturaSyndicationFeedRenderer
 		}
 
 		$this->baseCriteria = clone entryPeer::getDefaultCriteriaFilter();
-		
+
 		$startDateCriterion = $this->baseCriteria->getNewCriterion(entryPeer::START_DATE, time(), Criteria::LESS_EQUAL);
 		$startDateCriterion->addOr($this->baseCriteria->getNewCriterion(entryPeer::START_DATE, null));
 		$this->baseCriteria->addAnd($startDateCriterion);
-		
+
 		$endDateCriterion = $this->baseCriteria->getNewCriterion(entryPeer::END_DATE, time(), Criteria::GREATER_EQUAL);
 		$endDateCriterion->addOr($this->baseCriteria->getNewCriterion(entryPeer::END_DATE, null));
 		$this->baseCriteria->addAnd($endDateCriterion);
-		
+
 		$this->baseCriteria->addAnd(entryPeer::PARTNER_ID, $this->syndicationFeed->partnerId);
-	
+
 		if($this->addLinkForNextIteration)
 		{
 			$this->addExternalAttachedFilter();
@@ -183,7 +183,14 @@ class KalturaSyndicationFeedRenderer
 		}
 		else
 		{
-			$this->baseCriteria->addAnd(entryPeer::TYPE, array(entryType::MEDIA_CLIP, entryType::MIX), Criteria::IN);
+			$mediaEntrytypes = array(entryType::MEDIA_CLIP, entryType::MIX);
+			$partner = PartnerPeer::retrieveByPK($this->getSyndicationFeedDb()->getPartnerId());
+			$liveEntriesView = $partner->getEnabledService(KalturaPermissionName::FEATURE_LIVE_ENTRIES_IN_FEED);
+			if($liveEntriesView)
+			{
+				$mediaEntrytypes[] = entryType::LIVE_STREAM;
+			}
+			$this->baseCriteria->addAnd(entryPeer::TYPE, $mediaEntrytypes, Criteria::IN);
 		}
 		$this->baseCriteria->addAnd(entryPeer::MODERATION_STATUS, array(
 			entry::ENTRY_MODERATION_STATUS_REJECTED, 

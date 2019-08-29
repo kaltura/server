@@ -24,6 +24,8 @@ class RabbitMQProvider extends QueueProvider
 	private $port;
 	private $timeout;
 	private $exchangeName;
+	
+	const MAX_RETRIES = 3;
 
 	public function __construct(array $rabbitConfig, $constructorArgs)
 	{
@@ -92,7 +94,23 @@ class RabbitMQProvider extends QueueProvider
 	public function send($queueName, $data)
 	{
 		// establish connection to RabbitMQ
-		$connection = new PhpAmqpLib\Connection\AMQPConnection($this->MQserver, $this->port, $this->username, $this->password);
+		for ($retry = 1; ; $retry++)
+		{
+			try
+			{
+				$connection = new PhpAmqpLib\Connection\AMQPConnection($this->MQserver, $this->port, $this->username, $this->password);
+				break;
+			}
+			catch (PhpAmqpLib\Exception\AMQPRuntimeException $e)
+			{
+				if(class_exists('KalturaLog'))
+					KalturaLog::err("Failed to connect to MQserver [{$this->MQserver}] with error [" . $e->getMessage() . "]");
+				
+				if($retry == self::MAX_RETRIES)
+					throw $e;
+			}
+		}
+		
 		$channel = $connection->channel();
 		
 		//function assumes queue exists

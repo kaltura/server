@@ -68,16 +68,18 @@ abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfig
 			'readonly'		=> true,
 			'filters'		=> array('StringTrim'),
 		));
-		
+
 		$this->addElement('hidden', 'provider_type', array(
 			'value'			=> $this->providerType,
 		));
-		
+
+		$this->addDistributeTriggerElement();
+
 		$this->addElement('hidden', 'crossLine01', array(
 			'lable'			=> 'line',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
-		
+
 //		TODO - redefine the UI
 //		
 //		$this->addElement('text', 'sunrise_default_offset', array(
@@ -101,7 +103,23 @@ abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfig
 		$this->addProfileAction('delete');
 		$this->addProfileAction('report');
 	}
-	
+
+	protected function addDistributeTriggerElement()
+	{
+		$distributeTrigger = new Kaltura_Form_Element_EnumSelect('distribute_Trigger', array('enum' => 'Kaltura_Client_ContentDistribution_Enum_DistributeTrigger'));
+		$distributeTrigger->setLabel('Auto distribute trigger:');
+		if($this->distributionProfile->distributeTrigger)
+		{
+			$distributeTrigger->setValue($this->distributionProfile->distributeTrigger);
+		}
+		else
+		{
+			$distributeTrigger->setValue(Kaltura_Client_ContentDistribution_Enum_DistributeTrigger::ENTRY_READY);
+		}
+
+		$this->addElement($distributeTrigger);
+	}
+
 	/**
 	 * @param string $action
 	 * @return Zend_Form_DisplayGroup

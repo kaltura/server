@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head >
+    <style>
+        .zoom-form {
+            border: 7px solid #f1f1f1;
+            margin-left: 0%;
+            margin-right: 0%;
+            margin: auto;
+            max-width: 600px;
+            max-height: 1000px;
+        }
+
+        /* Full-width inputs */
+        input[type=text]{
+            width: 100%;
+            padding: 8px 12px;
+            margin: 4px 0;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        /* Set a style for all buttons */
+        button {
+            background-color: #3b60af;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 35%;
+            border: none;
+            cursor: pointer;
+            width: auto;
+        }
+        p {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            margin: 2px 10px;
+            padding-top: 10px;
+        }
+
+        .small {
+            font-size: 12px;
+        }
+
+        a.big {
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .margin {
+            margin: 2px 10px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+
+        .margin-top {
+            margin-top: 10px;
+        }
+
+        p.success {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+            font-size: large;
+        }
+
+        p.error {
+            background-color: #ccc;
+            color: rgba(202, 22, 40, 0.59);
+            border: 1px solid #ccc;
+            font-weight: bold;
+            font-size: large;
+        }
+
+        /* Add a hover effect for buttons */
+        button:hover {
+            opacity: 0.8;
+        }
+
+        /* Center the avatar image inside this container */
+        .imgcontainer {
+            text-align: center;
+            margin: 20px 0 12px 0;
+        }
+
+        /* Avatar image */
+        img.avatar {
+            width: 20%;
+        }
+
+        /* Add padding to containers */
+        .container {
+            padding: 10px;
+        }
+
+        label {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        var ks = '@ks@';
+        var url = '@BaseServiceUrl@/api_v3/service/vendor_zoomvendor/action/submitRegistration';
+        var accountId = '@accountId@';
+    </script>
+    <script>
+        function trySubmit(event) {
+            $("body").css("cursor", "progress");
+            event.preventDefault();
+            var $defaultUserId = $('#defaultUserId');
+            var $zoomCategory  = $('#zoomCategory');
+            var defaultUserId = $defaultUserId.val().trim();
+            var zoomCategory = $zoomCategory.val().trim();
+            var enableRecordingUploadObj = $(".enableRecordingUpload");
+            var createUserIfNotExistObj = $(".createUserIfNotExist");
+            var enableRecordingUpload = enableRecordingUploadObj.is(":checked");
+            var createUserIfNotExist = createUserIfNotExistObj.is(":checked");
+            var handleParticipantMode = $('[name=participantHandler]:checked').val();
+            var zoomUserMatchingMode = $('[name=userMatchingHandler]:checked').val();
+            var zoomUserPostfix = $('#zoomUserPostfix').val().trim();
+
+            $.ajax({
+                url : url,
+                type : "post",
+                data: {"ks": ks, "defaultUserId": defaultUserId, "zoomCategory" : zoomCategory,
+                    "accountId" : accountId, "enableRecordingUpload":enableRecordingUpload,
+                    "createUserIfNotExist":createUserIfNotExist, "handleParticipantMode":handleParticipantMode,
+                    "zoomUserMatchingMode":zoomUserMatchingMode, "zoomUserPostfix":zoomUserPostfix,
+                    "format": 1 },
+                success : function(res) {
+                    $("body").css("cursor", "default");
+                    console.log(res);
+                    if(res){
+                        if(res.objectType == 'KalturaAPIException')
+                        {
+                            onFail(res.message);
+                        }
+                        else
+                        {
+                            onSuccess();
+                        }
+                    }
+                    else {
+                        onSuccess();
+                    }
+                },
+                error: function() {
+                    $("body").css("cursor", "default");
+                    console.log('err during api call');
+                }
+            });
+        }
+        function  onSuccess() {
+            $('#submitError').hide();
+            $('#submitOK').show();
+        }
+        function onFail(errorMessage) {
+            $('#submitOK').hide();
+            $('#submitError').show();
+            $('#submitError').html(errorMessage);
+        }
+
+    </script>
+    <script>
+        (function() {
+            document.addEventListener('DOMContentLoaded', function () {
+                var submitButton = document.querySelector('.submit-button');
+                submitButton.addEventListener('click', trySubmit);
+            });
+        })();
+    </script>
+    <title>Kaltura-Zoom registration</title>
+</head>
+<form action="" class="zoom-form">
+    <div class="imgcontainer">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f7/KalturaLogo_Updatedpng.png" alt="Avatar" class="avatar">
+    </div>
+
+    <p class="container">
+    <p>
+        <a class="big"><label for="defaultUserId"><b>Default User ID</b></label></a>
+        <input type="text" value="@defaultUserID@" id="defaultUserId" name="defaultUserId" required>
+    </p>
+    <p>
+        <a class="big"><label for="zoomCategory"><b>Zoom Category</b></label></a>
+        <input type="text" value="@zoomCategory@" id="zoomCategory" name="zoomCategory" required>
+    </p>
+
+    <p>
+        <input type="checkbox" class="enableRecordingUpload" @enableRecordingUpload@>
+        <label class="small">Enable recording upload</label>
+        <input type="checkbox" class="createUserIfNotExist" @createUserIfNotExist@>
+        <label class="small">Create users automatically if not exist</label>
+    </p>
+
+    <div class="margin-top">
+        <p class="small margin">Please select how meeting participants should be handled:</p>
+        <div class="margin">
+            <input type="radio" id="participantsChoice1"
+                   name="participantHandler" value="0"  checked>
+            <label for="participantsChoice1" class="small">Add as Co publishers</label>
+
+            <input type="radio" id="participantsChoice2"
+                   name="participantHandler" value="1">
+            <label for="participantsChoice2" class="small">Add as Co viewers</label>
+
+            <input type="radio" id="participantsChoice3"
+                   name="participantHandler" value="2">
+            <label for="participantsChoice3" class="small">Ignore participants</label>
+        </div>
+
+        <p class="small margin">Please select how matching zoom users should be handled:</p>
+        <div class="margin">
+            <input type="radio" id="userMatchingHandler1"
+                   name="userMatchingHandler" value="0"  checked>
+            <label for="userMatchingHandler1" class="small">Do not modify</label>
+
+            <input type="radio" id="userMatchingHandler2"
+                   name="userMatchingHandler" value="1">
+            <label for="userMatchingHandler2" class="small">Add postfix</label>
+
+            <input type="radio" id="userMatchingHandler3"
+                   name="userMatchingHandler" value="2">
+            <label for="userMatchingHandler3" class="small">Remove postfix</label>
+        </div>
+    </div>
+    <p>
+        <a class="big"><label for="zoomUserPostfix"><b>User matching postfix</b></label></a>
+        <input type="text" value="" id="zoomUserPostfix" name="zoomUserPostfix">
+    </p>
+
+    <div align="center">
+        <button type="submit" class="submit-button">Submit</button>
+    </div>
+    <p id="submitError" class="error" style="display:none">Data was Not Saved , please check server logs'.</p>
+    <p id="submitOK" class="success" style="display:none">Saved Successfully</p>
+    </div>
+</form>
+</body>
+</html>

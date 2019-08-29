@@ -60,6 +60,7 @@ class AdminUserService extends KalturaBaseUserService
 	 * @param string $password
 	 * @param string $newEmail Optional, provide only when you want to update the email
 	 * @param string $newPassword
+	 * @param string $otp the user's one-time password
 	 * @return KalturaAdminUser
 	 * @ksIgnored
 	 *
@@ -70,14 +71,16 @@ class AdminUserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::PASSWORD_ALREADY_USED
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
+	 * @throws KalturaErrors::INVALID_OTP
+	 * @throws KalturaErrors::MISSING_OTP
 	 * 
 	 * @deprecated
 	 */
-	public function updatePasswordAction( $email , $password , $newEmail = "" , $newPassword = "" )
+	public function updatePasswordAction( $email , $password , $newEmail = "" , $newPassword = "", $otp = null)
 	{
 		try
 		{
-			parent::updateLoginDataImpl($email, $password, $newEmail, $newPassword);
+			parent::updateLoginDataImpl($email, $password, $newEmail, $newPassword, null, null, $otp);
 			
 			// copy required parameters to a KalturaAdminUser object for backward compatibility
 			$adminUser = new KalturaAdminUser();

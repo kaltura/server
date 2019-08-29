@@ -26,9 +26,9 @@ class BeaconService extends KalturaBaseService
 	public function addAction(KalturaBeacon $beacon, $shouldLog = KalturaNullableBoolean::FALSE_VALUE)
 	{
 		$beaconObj = $beacon->toInsertableObject();
-		$beaconObj->index($shouldLog);
+		$res = $beaconObj->index($shouldLog);
 		
-		return true;
+		return $res;
 	}
 	
 	/**

@@ -301,8 +301,9 @@ abstract class kManifestRenderer
 		$this->applyDomainPrefix();
 	
 		$headers = $this->getHeaders();
-		$headers[] = "Access-Control-Allow-Origin:*";
-		$headers[] = "Access-Control-Expose-Headers: Server,range,Content-Length,Content-Range";
+		$headers[] = 'Access-Control-Allow-Origin:*';
+		$headers[] = 'Access-Control-Expose-Headers: Server,range,Content-Length,Content-Range';
+		$headers[] = 'Timing-Allow-Origin:*';
 		foreach ($headers as $header)
 		{
 			if ($this->deliveryCode)

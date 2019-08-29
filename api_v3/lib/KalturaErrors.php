@@ -753,5 +753,7 @@ class KalturaErrors extends APIErrors
 	const MAP_ALREADY_EXIST = "MAP_ALREADY_EXIST;NAME,HOST;Map already exist for this map name {@NAME@} and host {@HOST@}";
 	const MAP_CANNOT_BE_CREATED_ON_FILE_SYSTEM = "MAP_CANNOT_BE_CREATED_ON_FILE_SYSTEM;;Map cannnot be created on file system";
 	const HOST_NAME_CONTAINS_ASTRIX = "HOST_NAME_CONTAINS_ASTRIX;HOST_NAME;Host name contains *, use # instead {@HOST_NAME@}";
+
+	const SEARCH_ITEM_TYPE_NOT_FOUND = 'SEARCH_ITEM_TYPE_NOT_FOUND;SEARCH_ITEM_TYPE,ELASTIC_FIELD_NAME; Search item type [@SEARCH_ITEM_TYPE@] not found for field: [@ELASTIC_FIELD_NAME@]';
 }
 

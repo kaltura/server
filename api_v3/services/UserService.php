@@ -330,6 +330,7 @@ class UserService extends KalturaBaseUserService
 	 * @param string $newPassword Optional, The user's new password
 	 * @param string $newFirstName Optional, The user's new first name
 	 * @param string $newLastName Optional, The user's new last name
+	 * @param string $otp the user's one-time password
 	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
@@ -338,10 +339,12 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
 	 * @throws KalturaErrors::PASSWORD_ALREADY_USED
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
+	 * @throws KalturaErrors::INVALID_OTP
+	 * @throws KalturaErrors::MISSING_OTP
 	 */
-	public function updateLoginDataAction( $oldLoginId , $password , $newLoginId = "" , $newPassword = "", $newFirstName = null, $newLastName = null)
+	public function updateLoginDataAction( $oldLoginId , $password , $newLoginId = "" , $newPassword = "", $newFirstName = null, $newLastName = null, $otp = null)
 	{	
-		return parent::updateLoginDataImpl($oldLoginId , $password , $newLoginId, $newPassword, $newFirstName, $newLastName);
+		return parent::updateLoginDataImpl($oldLoginId , $password , $newLoginId, $newPassword, $newFirstName, $newLastName, $otp);
 	}
 	
 	/**

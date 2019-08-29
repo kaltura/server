@@ -19,6 +19,7 @@ class kKavaBase extends kDruidBase
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
+	const DIMENSION_PARTNER_PARENT_ID = 'partnerParentId';
 	const DIMENSION_ENTRY_ID = 'entryId';
 	const DIMENSION_LOCATION_COUNTRY = 'location.country';
 	const DIMENSION_LOCATION_REGION = 'location.region';
@@ -144,6 +145,7 @@ class kKavaBase extends kDruidBase
 		self::DATASOURCE_HISTORICAL => array(
 			self::DIMENSION_EVENT_TYPE => 1,
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_KUSER_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
@@ -173,6 +175,7 @@ class kKavaBase extends kDruidBase
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_KUSER_ID => 1,
@@ -183,6 +186,7 @@ class kKavaBase extends kDruidBase
 		self::DATASOURCE_STORAGE_USAGE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
 			self::DIMENSION_KUSER_ID => 1,
@@ -191,6 +195,7 @@ class kKavaBase extends kDruidBase
 		),
 		self::DATASOURCE_BANDWIDTH_USAGE => array(
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
 			self::DIMENSION_ENTRY_OWNER_ID => 1,
@@ -210,6 +215,7 @@ class kKavaBase extends kDruidBase
 		),
 		self::DATASOURCE_TRANSCODING_USAGE => array(
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
 			self::DIMENSION_KUSER_ID => 1,
@@ -220,11 +226,13 @@ class kKavaBase extends kDruidBase
 		self::DATASOURCE_USER_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_KUSER_ID => 1,
 			self::DIMENSION_USER_TYPE => 1,
 		),
 		self::DATASOURCE_API_USAGE => array(
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_APPLICATION => 1,
 			self::DIMENSION_DOMAIN => 1,
 			self::DIMENSION_LOCATION_COUNTRY => 1,
@@ -233,6 +241,7 @@ class kKavaBase extends kDruidBase
 		),
 		self::DATASOURCE_REACH_USAGE => array(
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
 			self::DIMENSION_ENTRY_OWNER_ID => 1,
@@ -248,6 +257,7 @@ class kKavaBase extends kDruidBase
 		self::DATASOURCE_REALTIME => array(
 			self::DIMENSION_EVENT_TYPE => 1,
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_KUSER_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
@@ -304,6 +314,17 @@ class kKavaBase extends kDruidBase
 		}
 
 		return $cache->multiGet($keys);
+	}
+
+	protected static function roundUpToMultiple($num, $mult)
+	{
+		$rem = $num % $mult;
+		if (!$rem)
+		{
+			return $num;
+		}
+
+		return $num - $rem + $mult;
 	}
 
 }

@@ -132,6 +132,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var string
 	 */
 	public $notificationsConfig;
+
+	/**
+	 * @var string
+	 */
+	public $allowedFromEmailWhiteList;
 	
 	/**
 	 * @var bool
@@ -421,6 +426,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"alwaysAllowedPermissionNames",
 		"importRemoteSourceForConvert",
 		"notificationsConfig",
+		"allowedFromEmailWhiteList",
 		"allowMultiNotification",
 		//"maxLoginAttempts",
 		"loginBlockPeriod",
@@ -547,8 +553,44 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			$this->validatePropertyNumeric('defaultLiveStreamSegmentDuration');
 			$this->validatePropertyMinMaxValue('defaultLiveStreamSegmentDuration', KalturaLiveEntry::MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS, KalturaLiveEntry::MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS);
 		}
-	
+		$this->validateAllowedFromEmailWhiteList();
 		return parent::validateForUpdate($sourceObject,$propertiesToSkip);
+	}
+	protected function validateAllowedFromEmailWhiteList()
+	{
+		if ($this->allowedFromEmailWhiteList)
+		{
+			$fromEmailList =  array_map('trim',explode(',',$this->allowedFromEmailWhiteList));
+			$domains = self::getDomains($fromEmailList);
+			$domainsNotAllowed = kSpfMailerValidator::getDomainsNotAllowed($domains);
+			if ($domainsNotAllowed)
+			{
+				throw new KalturaAPIException(SystemPartnerErrors::DOMAINS_NOT_ALLOWED, implode(',',$domainsNotAllowed));
+			}
+			KalturaLog::debug('All domains are allowing Kaltura');
+		}
+	}
+
+	protected static function getDomains($fromEmailList)
+	{
+		$domains = array();
+		foreach ($fromEmailList as $email)
+		{
+			if ($email)	//don't handel empty emails
+			{
+				$domainPos = strpos($email,'@');
+				if ($domainPos === false || $domainPos === strlen($email) - 1)
+				{
+					$domains[$email] = $email;
+				}
+				else if ($domainPos < strlen($email) - 1)	//get the domain from the email
+				{
+					$emailDomain = substr($email, $domainPos + 1);
+					$domains[$emailDomain] = $emailDomain;
+				}
+			}
+		}
+		return $domains;
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
