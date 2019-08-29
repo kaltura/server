@@ -48,10 +48,11 @@
 						</mappings>
 					</item>
 					<item objectType="KalturaDetachedResponseProfile">
-						<name>QandA_user_ResponseProfile</name>
+						<name>QandA_ResponseProfile_user</name>
 						<type>1</type>
 						<fields>id,screenName,email,firstName,lastName</fields>
 						<filter objectType="KalturaUserFilter">
+							<idNotEmpty>true</idNotEmpty>
 						</filter>
 						<mappings objectType="array">
 							<item objectType="KalturaResponseProfileMapping">
