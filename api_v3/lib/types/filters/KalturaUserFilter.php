@@ -127,13 +127,24 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 	 */
 	public $permissionNamesMultiLikeAnd;
 
+	/**
+	 * @var bool
+	 */
+	public $idNotEmpty;
+
 	/* (non-PHPdoc)
 	 * @see KalturaRelatedFilter::getListResponse()
 	 */
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
+		$response = new KalturaUserListResponse();
+		if ($this->idNotEmpty && !$this->idEqual && !$this->idIn)
+			return $response;
+
 		$userFilter = $this->toObject();
-		
+
+
+
 		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
 		$userFilter->attachToCriteria($c);
 		
@@ -156,7 +167,7 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 		$totalCount = $c->getRecordsCount();
 
 		$newList = KalturaUserArray::fromDbArray($list, $responseProfile);
-		$response = new KalturaUserListResponse();
+
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;
 		
