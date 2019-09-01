@@ -833,13 +833,13 @@ class entryPeer extends BaseentryPeer
 	}
 
 	public static function filterEmptyEntry($entryId)
-    {
-        return !empty($entryId);
-    }
+	{
+		return !empty($entryId);
+	}
 
 	public static function filterEntriesByPartnerOrKalturaNetwork(array $entryIds, $partnerId)
 	{
-        $entryIds = array_filter($entryIds, [__CLASS__, 'filterEmptyEntry']);
+		$entryIds = array_filter($entryIds, [__CLASS__, 'filterEmptyEntry']);
 		$validatedEntries = array_intersect($entryIds, self::$validatedEntries);
 		$entryIds = array_diff($entryIds, self::$validatedEntries);
 
