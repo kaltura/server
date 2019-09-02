@@ -194,8 +194,16 @@ class CaptionAssetService extends KalturaAssetService
 		list($width, $height, $type, $attr) = getimagesize($fullPath);
 
 		$captionAsset->incrementVersion();
-		if ($ext && $ext != kUploadTokenMgr::NO_EXTENSION_IDENTIFIER)
+
+		if (!$ext || $ext == kUploadTokenMgr::NO_EXTENSION_IDENTIFIER )
+		{
+			$types = CaptionPlugin::getCaptionNamesByTypes();
+			$ext = isset($types[$captionAsset->getContainerFormat()]) ? $types[$captionAsset->getContainerFormat()] : null;
+		}
+		if($ext)
+		{
 			$captionAsset->setFileExt($ext);
+		}
 
 		$captionAsset->setSize(filesize($fullPath));
 		$captionAsset->save();
