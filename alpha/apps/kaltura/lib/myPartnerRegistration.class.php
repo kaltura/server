@@ -356,7 +356,7 @@ class myPartnerRegistration
 		if ($existingLoginData && !$ignorePassword)
 		{
 			// if a another user already existing with the same adminEmail, new account will be created only if the right password was given
-			$existingPartner = partnerPeer::retrieveByPK($existingLoginData->getConfigPartnerId());
+			$existingPartner = PartnerPeer::retrieveByPK($existingLoginData->getConfigPartnerId());
 			if (!$password)
 			{
 				$this->addMarketoCampaignId($existingPartner, myPartnerUtils::MARKETO_MISSING_PASSWORD, $partner);
