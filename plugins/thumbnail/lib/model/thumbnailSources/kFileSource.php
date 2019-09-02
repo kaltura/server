@@ -10,7 +10,7 @@ class kFileSource extends kThumbnailSource
 
 	public function  __construct($filePath)
 	{
-		$this->imagick = new imagick($filePath);
+		$this->imagick = new Imagick($filePath);
 	}
 
 	public function getImage()
