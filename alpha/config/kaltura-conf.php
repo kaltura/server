@@ -248,5 +248,8 @@ return array (
     'ConfMapsTableMap' => 'lib/model/map/ConfMapsTableMap.php',
     'ConfMapsPeer' => 'lib/model/ConfMapsPeer.php',
     'ConfMaps' => 'lib/model/ConfMaps.php',
+    'SsoTableMap' => 'lib/model/map/SsoTableMap.php',
+    'SsoPeer' => 'lib/model/SsoPeer.php',
+    'Sso' => 'lib/model/Sso.php',
   ),
 );
