@@ -839,7 +839,7 @@ class entryPeer extends BaseentryPeer
 
 	public static function filterEntriesByPartnerOrKalturaNetwork(array $entryIds, $partnerId)
 	{
-		$entryIds = array_filter($entryIds, ['entryPeer', 'filterEmptyEntry']);
+		$entryIds = array_filter($entryIds, array('entryPeer', 'filterEmptyEntry'));
 		$validatedEntries = array_intersect($entryIds, self::$validatedEntries);
 		$entryIds = array_diff($entryIds, self::$validatedEntries);
 
