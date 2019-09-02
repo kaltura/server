@@ -507,7 +507,9 @@ class PartnerController extends Zend_Controller_Action
 					}
 					elseif ($e->getCode() === 'DOMAINS_NOT_ALLOWED')
 					{
-						throw new Kaltura_Client_Exception($e->getCode(),$e->getMessage());
+						$this->view->formValid = false;
+						$form->populate($request->getPost());
+						$form->getElement('allowed_from_email_white_list')->addError($e->getMessage());
 					}
 					else
 						$this->view->errMessage = $e->getMessage();

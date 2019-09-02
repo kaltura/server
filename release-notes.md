@@ -1,3 +1,46 @@
+# Orion 15.6.0 #
+
+## Add ESearch read only permission ##
+- Issue Type: Task
+- Issue ID: PLAT-10084
+
+### configuration ###
+    None
+
+### Deployment scripts ###
+php deployment/updates/scripts/add_permissions/2019_08_20_update_esearch_permissions.php
+
+## Add permission in the admin console to Multi Account Analytics Filter ##
+
+- Issue Type: Feature
+- Issue ID: AN-801
+
+### configuration ###
+    Add the following to admin.ini:
+
+    moduls.multiPublishersAnalytics.enabled = true
+    moduls.multiPublishersAnalytics.permissionType = 2
+    moduls.multiPublishersAnalytics.label = Multi Account Analytics Filter
+    moduls.multiPublishersAnalytics.permissionName = FEATURE_MULTI_ACCOUNT_ANALYTICS
+    moduls.multiPublishersAnalytics.group = GROUP_ENABLE_DISABLE_FEATURES
+
+# Orion 15.5.0 #
+
+## Adding monitoring-proxy partner ##
+
+- Issue Type: Task
+- Issue ID: PLAT-9986
+
+### configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+deployment/base/scripts/init_data/01.Partner.template.ini
+deployment/updates/scripts/xml/2019_07_22_server_node_email_alert.template.xml
+
+### Deployment scripts ###
+php deployment/updates/scripts/add_permissions/2019_07_22_monitoring_proxy_add_partner.php
+php deployment/updates/scripts/2019_07_28_add_server_node_email_alert_template.php
+
+
 # Orion 15.4.0 #
 
 ## changing reach notifications subject ##

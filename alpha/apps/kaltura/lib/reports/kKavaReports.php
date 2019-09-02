@@ -1334,7 +1334,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_DIMENSION_MAP => array(
 				'percentile' => self::DIMENSION_PERCENTILES
 			),
-			self::REPORT_METRICS => array(self::EVENT_TYPE_VIEW_PERIOD),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_VIEW_PERIOD, self::METRIC_UNIQUE_USERS),
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addZeroPercentiles',
 		),
 
