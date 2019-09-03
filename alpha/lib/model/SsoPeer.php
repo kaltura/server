@@ -40,14 +40,11 @@ class SsoPeer extends BaseSsoPeer
 		$c->add(SsoPeer::APPLICATION_TYPE, $applicationType);
 		$c->add(SsoPeer::DOMAIN, $domain);
 		$c->add(SsoPeer::PARTNER_ID, $partnerId);
-		$c->add( SsoPeer::STATUS, VendorStatus::DELETED, Criteria::NOT_EQUAL);
 		if ($status)
 		{
 			$c->add( SsoPeer::STATUS,$status);
 		}
-		SsoPeer::setUseCriteriaFilter(false);
 		$result = SsoPeer::doSelectOne($c);
-		SsoPeer::setUseCriteriaFilter(true);
 		return $result;
 	}
 

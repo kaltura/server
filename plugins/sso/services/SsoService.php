@@ -17,7 +17,7 @@ class SsoService extends KalturaBaseService
 	public function addAction(KalturaSso $sso)
 	{
 		$dbSso = $sso->toInsertableObject();
-		$dbSso->setStatus(VendorStatus::ACTIVE);
+		$dbSso->setStatus(SsoStatus::ACTIVE);
 		$dbSso->save();
 		$sso->fromObject($dbSso, $this->getResponseProfile());
 		return $sso;
@@ -57,7 +57,7 @@ class SsoService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaSsoErrors::INVALID_SSO_ID, $ssoId);
 		}
-		$dbSso->setStatus(VendorStatus::DELETED);
+		$dbSso->setStatus(SsoStatus::DELETED);
 		$dbSso->save();
 		$sso = new KalturaSso();
 		$sso->fromObject($dbSso, $this->getResponseProfile());
