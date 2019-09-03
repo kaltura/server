@@ -189,7 +189,7 @@ while(true)
 						unset($objectIdSphinxLog[$objectId]);
 					}
 					
-					$objectIdSphinxLog[$objectId] = $sphinxLog->getId();
+					$objectIdSphinxLog[$objectId] = $sphinxLogId;
 				}
 			}
 			
