@@ -83,7 +83,7 @@ class KalturaCaptionAsset extends KalturaAsset
 	public $displayOnPlayer;
 	
 	/**
-	 * List of associated transcript asset id's
+	 * List of associated transcript asset id's, comma separated
 	 * @var string
 	 */
 	public $associatedTranscriptIds;
