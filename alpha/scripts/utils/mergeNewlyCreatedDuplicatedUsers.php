@@ -1,4 +1,8 @@
 <?php
+if ($argc < 3){
+	die ($argv[0]. " <last_run_file_path> <sent_to> <dryrun>.\n");
+}
+
 require_once(__DIR__ . '/../bootstrap.php');
 require_once(__DIR__ . '/mergeDuplicateUsersUtils.php');
 
@@ -9,12 +13,6 @@ define ('MAX_USERS_TO_HANDLE', 10000);
 
 try
 {
-	$fp = fopen(__DIR__ . '/mergeNewlyCreatedDuplicatedUsers.php', "r+");
-	if (!flock($fp, LOCK_EX|LOCK_NB))
-	{
-		KalturaLog::debug('Could not lock file. Exiting.');
-		return;
-	}
 	$lastRunFilePath = $argv[1];
 
 	$dryrun = false;
@@ -25,6 +23,12 @@ try
 	$address = $argv[2];
 	KalturaStatement::setDryRun($dryrun);
 	KalturaLog::debug('dryrun value: ['.$dryrun.']');
+
+	$fp = fopen(__DIR__ . '/mergeNewlyCreatedDuplicatedUsers.php', "r+");
+	if (!flock($fp, LOCK_EX|LOCK_NB))
+	{
+		throw new Exception ( "Could not lock file. Merge duplicates script already running" );
+	}
 
 	mergeNewDuplicatedUsers($lastRunFilePath);
 
@@ -151,6 +155,7 @@ function getStartId($currentTime, $lastRunFilePath)
 
 	if(!$startFromKuser)
 	{
+		KalturaLog::debug("no new users created since last run");
 		return null;
 	}
 
@@ -173,6 +178,7 @@ function getLastId($currentTime, $startId)
 	$lastKuser = kuserPeer::doSelectOne($c);
 	if(!$lastKuser)
 	{
+		KalturaLog::debug("no new users created since last run");
 		return null;
 	}
 	return $lastKuser->getId();
@@ -193,7 +199,7 @@ function sendMail($toArray, $subject, $body, $sender = null)
 
 	$mailer->Subject = $subject;
 	$mailer->Body = $body;
-	$mailer->Sender = 'notifications@kaltura.com';
+	$mailer->Sender = kConf::get('batch_notification_sender_email');
 	$mailer->From = 'Kaltura Notification Service';
 	$mailer->FromName = $sender;
 
