@@ -41,21 +41,21 @@ function mergeNewDuplicatedUsers($lastRunFilePath)
 		return;
 	}
 
-	$newKusers = getNewDuplicatedUsersCreated($startId, $lastId, $currentTime);
-	if(!count($newKusers))
+	$newPusers = getNewDuplicatedUsersCreated($startId, $lastId, $currentTime);
+
+	if(!count($newPusers))
 	{
 		file_put_contents($lastRunFilePath, $lastId);
 		KalturaLog::debug("No users to process");
 		return;
 	}
 
-	while(count($newKusers))
+	while(count($newPusers))
 	{
-		foreach ($newKusers as $kuser)
+		foreach ($newPusers as $user)
 		{
-			$currentPuserId = $kuser->getPuserId();
-			$currentPartnerId = $kuser->getPartnerId();
-			$currentKuserId = $kuser->getId();
+			$currentPuserId = $user['PUSER_ID'];
+			$currentPartnerId = $user['PARTNER_ID'];
 
 			$kusersArray = getAllDuplicatedKusersForPuser($currentPuserId, $currentPartnerId);
 			if (count($kusersArray) < 2)
@@ -64,8 +64,9 @@ function mergeNewDuplicatedUsers($lastRunFilePath)
 				continue;
 			}
 
-			KalturaLog::debug('Started handling puserId ['.$currentPuserId.'] with kuser id [' . $currentKuserId . '] for partnerId [' . $currentPartnerId .']');
+			KalturaLog::debug('Started handling puserId ['.$currentPuserId.'] for partnerId [' . $currentPartnerId .']');
 			$baseKuser = findKuserWithMaxEntries($kusersArray, $currentPartnerId);
+			$currentKuserId = $baseKuser->getId();
 			mergeUsersToBaseUser($kusersArray, $baseKuser, $currentPartnerId);
 			KalturaLog::debug('finished handling puserId ['.$currentPuserId.']');
 			kEventsManager::flushEvents();
@@ -78,7 +79,7 @@ function mergeNewDuplicatedUsers($lastRunFilePath)
 			}
 		}
 
-		$newKusers = getNewDuplicatedUsersCreated($currentKuserId, $lastId, $currentTime);
+		$newPusers = getNewDuplicatedUsersCreated($currentKuserId, $lastId, $currentTime);
 	}
 
 	file_put_contents($lastRunFilePath, $lastId);
@@ -91,7 +92,8 @@ function getNewDuplicatedUsersCreated($startId, $lastId, $currentTime)
 	$c = new Criteria();
 	kuserPeer::setUseCriteriaFilter(false);
 
-	$c->addSelectColumn(kuserPeer::alias(K1_KUSER, kuserPeer::ID));
+	$c->addSelectColumn(kuserPeer::alias(K1_KUSER, kuserPeer::PUSER_ID));
+	$c->addSelectColumn(kuserPeer::alias(K1_KUSER, kuserPeer::PARTNER_ID));
 	$c->addAlias(K1_KUSER, kuserPeer::TABLE_NAME);
 	$c->addAlias(K2_KUSER, kuserPeer::TABLE_NAME);
 	$c->addMultipleJoin(array(array(kuserPeer::alias(K1_KUSER, kuserPeer::PUSER_ID), kuserPeer::alias(K2_KUSER, kuserPeer::PUSER_ID)),
@@ -105,7 +107,8 @@ function getNewDuplicatedUsersCreated($startId, $lastId, $currentTime)
 	$c->addAscendingOrderByColumn(kuserPeer::alias(K1_KUSER, kuserPeer::ID));
 	$c->setLimit(MAX_RECORDS);
 	$c->setDistinct();
-	$res = kuserPeer::doSelect($c);
+	$stmt = kuserPeer::doSelectStmt($c);
+	$res = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	kuserPeer::setUseCriteriaFilter(true);
 
 	if(!count($res))
