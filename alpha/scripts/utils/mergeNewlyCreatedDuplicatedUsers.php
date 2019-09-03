@@ -23,9 +23,8 @@ if($argc == 3 && $argv[2] == 'dryrun')
 KalturaStatement::setDryRun($dryrun);
 KalturaLog::debug('dryrun value: ['.$dryrun.']');
 
-$lastId = mergeNewDuplicatedUsers($lastRunFilePath);
-file_put_contents($lastRunFilePath, $lastId);
-KalturaLog::debug("Done merging duplicated users");
+mergeNewDuplicatedUsers($lastRunFilePath);
+
 flock($fp, LOCK_UN);
 
 function mergeNewDuplicatedUsers($lastRunFilePath)
@@ -74,14 +73,16 @@ function mergeNewDuplicatedUsers($lastRunFilePath)
 
 			if($usersHandled > MAX_USERS_TO_HANDLE)
 			{
-				return $currentKuserId;
+				file_put_contents($lastRunFilePath, $currentKuserId);
+				return;
 			}
 		}
 
 		$newKusers = getNewDuplicatedUsersCreated($currentKuserId, $lastId, $currentTime);
 	}
 
-	return $lastId;
+	file_put_contents($lastRunFilePath, $lastId);
+	KalturaLog::debug("Done merging duplicated users");
 }
 
 
@@ -95,7 +96,7 @@ function getNewDuplicatedUsersCreated($startId, $lastId, $currentTime)
 	$c->addAlias(K2_KUSER, kuserPeer::TABLE_NAME);
 	$c->addMultipleJoin(array(array(kuserPeer::alias(K1_KUSER, kuserPeer::PUSER_ID), kuserPeer::alias(K2_KUSER, kuserPeer::PUSER_ID)),
 		array(kuserPeer::alias(K1_KUSER, kuserPeer::PARTNER_ID), kuserPeer::alias(K2_KUSER, kuserPeer::PARTNER_ID)),
-		array(kuserPeer::alias(K1_KUSER, kuserPeer::ID), kuserPeer::alias(K2_KUSER, kuserPeer::ID), Criteria::NOT_EQUAL)), Criteria::LEFT_JOIN);
+		array(kuserPeer::alias(K1_KUSER, kuserPeer::ID), kuserPeer::alias(K2_KUSER, kuserPeer::ID), Criteria::NOT_EQUAL)), Criteria::INNER_JOIN);
 	$c->add(kuserPeer::alias(K1_KUSER, kuserPeer::ID), $startId, Criteria::GREATER_THAN);
 	$c->addAnd(kuserPeer::alias(K1_KUSER, kuserPeer::ID), $lastId, Criteria::LESS_EQUAL);
 	$c->add(kuserPeer::alias(K1_KUSER, kuserPeer::STATUS), kuserStatus::DELETED, Criteria::NOT_EQUAL);
