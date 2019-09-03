@@ -7,25 +7,37 @@ define('K1_KUSER', 'k1');
 define('K2_KUSER', 'k2');
 define ('MAX_USERS_TO_HANDLE', 10000);
 
-$fp = fopen(__DIR__ . '/mergeNewlyCreatedDuplicatedUsers.php', "r+");
-if (!flock($fp, LOCK_EX|LOCK_NB))
+try
 {
-	KalturaLog::debug('Could not lock file. Exiting.');
-	return;
-}
-$lastRunFilePath = $argv[1];
+	$fp = fopen(__DIR__ . '/mergeNewlyCreatedDuplicatedUsers.php', "r+");
+	if (!flock($fp, LOCK_EX|LOCK_NB))
+	{
+		KalturaLog::debug('Could not lock file. Exiting.');
+		return;
+	}
+	$lastRunFilePath = $argv[1];
 
-$dryrun = false;
-if($argc == 3 && $argv[2] == 'dryrun')
+	$dryrun = false;
+	if($argc == 4 && $argv[3] == 'dryrun')
+	{
+		$dryrun = true;
+	}
+	$address = $argv[2];
+	KalturaStatement::setDryRun($dryrun);
+	KalturaLog::debug('dryrun value: ['.$dryrun.']');
+
+	mergeNewDuplicatedUsers($lastRunFilePath);
+
+	flock($fp, LOCK_UN);
+}
+catch(Exception $e)
 {
-	$dryrun = true;
+	KalturaLog::err($e);
+	if($address)
+	{
+		sendMail(array($address), "Error in mergeNewlyCreatedDuplicatedUsers.php script", $e, 'Kaltura');
+	}
 }
-KalturaStatement::setDryRun($dryrun);
-KalturaLog::debug('dryrun value: ['.$dryrun.']');
-
-mergeNewDuplicatedUsers($lastRunFilePath);
-
-flock($fp, LOCK_UN);
 
 function mergeNewDuplicatedUsers($lastRunFilePath)
 {
@@ -164,4 +176,35 @@ function getLastId($currentTime, $startId)
 		return null;
 	}
 	return $lastKuser->getId();
+}
+
+function sendMail($toArray, $subject, $body, $sender = null)
+{
+	$mailer = new PHPMailer();
+	$mailer->CharSet = 'utf-8';
+	$mailer->Mailer = 'smtp';
+	$mailer->SMTPKeepAlive = true;
+
+	if (!$toArray || count($toArray) < 1 || strlen($toArray[0]) == 0)
+		return true;
+
+	foreach ($toArray as $to)
+		$mailer->AddAddress($to);
+
+	$mailer->Subject = $subject;
+	$mailer->Body = $body;
+	$mailer->Sender = 'notifications@kaltura.com';
+	$mailer->From = 'Kaltura Notification Service';
+	$mailer->FromName = $sender;
+
+	KalturaLog::info("sending mail to " . implode(",",$toArray) . ", from: [$sender]. subject: [$subject] with body: [$body]");
+	try
+	{
+		return $mailer->Send();
+	}
+	catch ( Exception $e )
+	{
+		KalturaLog::err( $e );
+		return false;
+	}
 }
