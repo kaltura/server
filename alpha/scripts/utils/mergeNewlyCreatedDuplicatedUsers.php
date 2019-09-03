@@ -1,30 +1,51 @@
 <?php
-require_once('/opt/kaltura/app/alpha/scripts/bootstrap.php');
-require_once('/opt/kaltura/app/alpha/scripts/utils/mergeDuplicateUsersUtils.php');
+require_once(__DIR__ . '/../bootstrap.php');
+require_once(__DIR__ . '/mergeDuplicateUsersUtils.php');
 
-define("BASE_DIR", '/tmp/');
-define("LAST_RUN_TIME_FILE_NAME", "merge_duplicated_users_last_run_time.txt");
-define("MAX_RECORDS", 100);
+define('MAX_RECORDS', 100);
+define('K1_KUSER', 'k1');
+define('K2_KUSER', 'k2');
+define ('MAX_USERS_TO_HANDLE', 10000);
+
+$fp = fopen(__DIR__ . '/mergeNewlyCreatedDuplicatedUsers.php', "r+");
+if (!flock($fp, LOCK_EX|LOCK_NB))
+{
+	KalturaLog::debug('Could not lock file. Exiting.');
+	return;
+}
+$lastRunFilePath = $argv[1];
 
 $dryrun = false;
-if($argc == 2 && $argv[1] == 'dryrun')
+if($argc == 3 && $argv[2] == 'dryrun')
 {
 	$dryrun = true;
 }
 KalturaStatement::setDryRun($dryrun);
 KalturaLog::debug('dryrun value: ['.$dryrun.']');
 
-mergeNewDuplicatedUsers();
+$lastId = mergeNewDuplicatedUsers($lastRunFilePath);
+file_put_contents($lastRunFilePath, $lastId);
+KalturaLog::debug("Done merging duplicated users");
+flock($fp, LOCK_UN);
 
-function mergeNewDuplicatedUsers()
+function mergeNewDuplicatedUsers($lastRunFilePath)
 {
+	$usersHandled = 0;
 	KalturaLog::debug("Start merging duplicated users");
 
 	$currentTime = time();
-	$lastRunTime = getAndUpdateLastRunTime($currentTime);
-	$newKusers = getNewUsersCreated($lastRunTime, $currentTime);
+	$startId = getStartId($currentTime, $lastRunFilePath);
+	$lastId = getLastId($currentTime, $startId);
+	if(!$startId || !$lastId)
+	{
+		KalturaLog::debug("Could not extract ids range for query");
+		return;
+	}
+
+	$newKusers = getNewDuplicatedUsersCreated($startId, $lastId, $currentTime);
 	if(!count($newKusers))
 	{
+		file_put_contents($lastRunFilePath, $lastId);
 		KalturaLog::debug("No users to process");
 		return;
 	}
@@ -38,9 +59,9 @@ function mergeNewDuplicatedUsers()
 			$currentKuserId = $kuser->getId();
 
 			$kusersArray = getAllDuplicatedKusersForPuser($currentPuserId, $currentPartnerId);
-			if (!$kusersArray || count($kusersArray) == 1)
+			if (count($kusersArray) < 2)
 			{
-				KalturaLog::debug('ERROR: couldn\'t find duplicated kusers with puser id ['.$currentPuserId.']');
+				KalturaLog::debug('couldn\'t find duplicated kusers with puser id ['.$currentPuserId.'] partner id ['.$currentPartnerId.']');
 				continue;
 			}
 
@@ -48,39 +69,47 @@ function mergeNewDuplicatedUsers()
 			$baseKuser = findKuserWithMaxEntries($kusersArray, $currentPartnerId);
 			mergeUsersToBaseUser($kusersArray, $baseKuser, $currentPartnerId);
 			KalturaLog::debug('finished handling puserId ['.$currentPuserId.']');
+			kEventsManager::flushEvents();
+			$usersHandled++;
+
+			if($usersHandled > MAX_USERS_TO_HANDLE)
+			{
+				return $currentKuserId;
+			}
 		}
 
-		$newKusers = getNewUsersCreated($lastRunTime, $currentTime, $kuser);
+		$newKusers = getNewDuplicatedUsersCreated($currentKuserId, $lastId, $currentTime);
 	}
 
-	KalturaLog::debug("Done merging duplicated users");
+	return $lastId;
 }
 
 
-function getNewUsersCreated($lastRunTime, $currentTime, $lastUser = null)
+function getNewDuplicatedUsersCreated($startId, $lastId, $currentTime)
 {
-	$c = new Criteria ();
-	$c->add(kuserPeer::CREATED_AT, $lastRunTime, Criteria::GREATER_EQUAL);
-	$c->addAnd(kuserPeer::CREATED_AT, $currentTime, Criteria::LESS_THAN);
-	$c->add(kuserPeer::UPDATED_AT, $lastRunTime, Criteria::GREATER_EQUAL);
-	$c->addAscendingOrderByColumn(kuserPeer::ID);
-	if($lastUser)
-	{
-		$c->add(kuserPeer::ID, $lastUser->getId(), Criteria::GREATER_THAN);
-	}
+	$c = new Criteria();
+	kuserPeer::setUseCriteriaFilter(false);
+
+	$c->addSelectColumn(kuserPeer::alias(K1_KUSER, kuserPeer::ID));
+	$c->addAlias(K1_KUSER, kuserPeer::TABLE_NAME);
+	$c->addAlias(K2_KUSER, kuserPeer::TABLE_NAME);
+	$c->addMultipleJoin(array(array(kuserPeer::alias(K1_KUSER, kuserPeer::PUSER_ID), kuserPeer::alias(K2_KUSER, kuserPeer::PUSER_ID)),
+		array(kuserPeer::alias(K1_KUSER, kuserPeer::PARTNER_ID), kuserPeer::alias(K2_KUSER, kuserPeer::PARTNER_ID)),
+		array(kuserPeer::alias(K1_KUSER, kuserPeer::ID), kuserPeer::alias(K2_KUSER, kuserPeer::ID), Criteria::NOT_EQUAL)), Criteria::LEFT_JOIN);
+	$c->add(kuserPeer::alias(K1_KUSER, kuserPeer::ID), $startId, Criteria::GREATER_THAN);
+	$c->addAnd(kuserPeer::alias(K1_KUSER, kuserPeer::ID), $lastId, Criteria::LESS_EQUAL);
+	$c->add(kuserPeer::alias(K1_KUSER, kuserPeer::STATUS), kuserStatus::DELETED, Criteria::NOT_EQUAL);
+	$c->add(kuserPeer::alias(K2_KUSER, kuserPeer::STATUS), kuserStatus::DELETED, Criteria::NOT_EQUAL);
+
+	$c->addAscendingOrderByColumn(kuserPeer::alias(K1_KUSER, kuserPeer::ID));
 	$c->setLimit(MAX_RECORDS);
+	$c->setDistinct();
 	$res = kuserPeer::doSelect($c);
+	kuserPeer::setUseCriteriaFilter(true);
 
 	if(!count($res))
 	{
-		if($lastUser)
-		{
-			KalturaLog::debug("No new users created from last handled user creation time [{$lastUser->getCreatedAt(null)}] until [$currentTime]");
-		}
-		else
-		{
-			KalturaLog::debug("No new users created from last run time [$lastRunTime] until [$currentTime]");
-		}
+		KalturaLog::debug("No new duplicated users created from last handled user with id: [$startId] until time: [$currentTime]");
 		return array();
 	}
 
@@ -88,14 +117,47 @@ function getNewUsersCreated($lastRunTime, $currentTime, $lastUser = null)
 }
 
 
-function getAndUpdateLastRunTime($currentTime)
+function getStartId($currentTime, $lastRunFilePath)
 {
-	$lastSyncTime = trim(file_get_contents(BASE_DIR . "/" . LAST_RUN_TIME_FILE_NAME));
-	if(!$lastSyncTime)
+	$startFromId = trim(file_get_contents($lastRunFilePath));
+	if($startFromId)
 	{
-		$lastSyncTime = $currentTime - dateUtils::HOUR;
+		return $startFromId;
 	}
 
-	file_put_contents(BASE_DIR . "/" . LAST_RUN_TIME_FILE_NAME, $currentTime);
-	return $lastSyncTime;
+	$lastRunTime = $currentTime - dateUtils::HOUR;
+	$c = new Criteria ();
+	$c->add(kuserPeer::UPDATED_AT, $lastRunTime, Criteria::GREATER_EQUAL);
+	$c->add(kuserPeer::CREATED_AT, $lastRunTime , Criteria::GREATER_EQUAL);
+	$c->addAnd(kuserPeer::CREATED_AT, $currentTime, Criteria::LESS_THAN);
+	$c->addAscendingOrderByColumn(kuserPeer::ID);
+	$startFromKuser = kuserPeer::doSelectOne($c);
+
+	if(!$startFromKuser)
+	{
+		return null;
+	}
+
+	return $startFromKuser->getId();
+}
+
+function getLastId($currentTime, $startId)
+{
+	if(!$startId)
+	{
+		return null;
+	}
+	$maxUserCreationTime = $currentTime - (dateUtils::HOUR * 0.5);
+
+	$c = new Criteria ();
+	$c->add(kuserPeer::ID, $startId, Criteria::GREATER_THAN);
+	$c->add(kuserPeer::CREATED_AT, $maxUserCreationTime, Criteria::LESS_THAN);
+	$c->add(kuserPeer::UPDATED_AT, $maxUserCreationTime, Criteria::LESS_THAN);
+	$c->addDescendingOrderByColumn(kuserPeer::ID);
+	$lastKuser = kuserPeer::doSelectOne($c);
+	if(!$lastKuser)
+	{
+		return null;
+	}
+	return $lastKuser->getId();
 }
