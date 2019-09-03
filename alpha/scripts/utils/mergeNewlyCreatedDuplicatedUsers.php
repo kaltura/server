@@ -73,6 +73,11 @@ function mergeNewDuplicatedUsers($lastRunFilePath)
 			$currentPuserId = $user['PUSER_ID'];
 			$currentPartnerId = $user['PARTNER_ID'];
 
+			if(!$currentPartnerId || !$currentPuserId)
+			{
+				continue;
+			}
+
 			$kusersArray = getAllDuplicatedKusersForPuser($currentPuserId, $currentPartnerId);
 			if (count($kusersArray) < 2)
 			{
