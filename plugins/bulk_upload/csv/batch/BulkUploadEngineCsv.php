@@ -237,7 +237,7 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 	 */
 	protected function trimArray(&$item)
 	{
-		$item = trim($item);
+		$item = trim($item, " \t\n\r\0\x0B\xC2\xA0");
 	}
 	
 	abstract protected function getUploadResultInstance ();
