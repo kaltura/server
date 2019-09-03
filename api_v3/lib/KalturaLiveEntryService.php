@@ -13,7 +13,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	const KLOCK_CREATE_RECORDED_ENTRY_GRAB_TIMEOUT = 0.1;
 
 	//amount of time for holding kLock
-	const KLOCK_CREATE_RECORDED_ENTRY_HOLD_TIMEOUT = 3;
+	const KLOCK_CREATE_RECORDED_ENTRY_HOLD_TIMEOUT = 60;
 
 	//Max time from recording created time before creating new recorded entry
 	const SEVEN_DAYS_IN_SECONDS = 604800;
