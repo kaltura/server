@@ -81,6 +81,12 @@ class KalturaCaptionAsset extends KalturaAsset
 	 * @var bool
 	 */
 	public $displayOnPlayer;
+	
+	/**
+	 * List of associated transcript asset id's, comma separated
+	 * @var string
+	 */
+	public $associatedTranscriptIds;
 
 	private static $map_between_objects = array
 	(
@@ -93,6 +99,7 @@ class KalturaCaptionAsset extends KalturaAsset
 		"parentId",
 		"accuracy",
 		"displayOnPlayer",
+		"associatedTranscriptIds",
 	);
 	
 	public function getMapBetweenObjects ( )
