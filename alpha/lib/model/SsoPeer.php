@@ -13,6 +13,42 @@
  * @package Core
  * @subpackage model
  */
-class SsoPeer extends BaseSsoPeer {
+class SsoPeer extends BaseSsoPeer
+{
+	public static function setDefaultCriteriaFilter ()
+	{
+		if ( self::$s_criteria_filter == null )
+			self::$s_criteria_filter = new criteriaFilter ();
+
+		$c = KalturaCriteria::create(SsoPeer::OM_CLASS);
+		$c->addAnd ( SsoPeer::STATUS, SsoStatus::DELETED, Criteria::NOT_EQUAL);
+
+		self::$s_criteria_filter->setFilter($c);
+	}
+
+	/**
+	 * @param $applicationType
+	 * @param $partnerId
+	 * @param $domain
+	 * @param $status
+	 * @return Sso
+	 * @throws PropelException
+	 */
+	public static function getSso($applicationType, $partnerId, $domain, $status = null)
+	{
+		$c = new Criteria();
+		$c->add(SsoPeer::APPLICATION_TYPE, $applicationType);
+		$c->add(SsoPeer::DOMAIN, $domain);
+		$c->add(SsoPeer::PARTNER_ID, $partnerId);
+		$c->add( SsoPeer::STATUS, VendorStatus::DELETED, Criteria::NOT_EQUAL);
+		if ($status)
+		{
+			$c->add( SsoPeer::STATUS,$status);
+		}
+		SsoPeer::setUseCriteriaFilter(false);
+		$result = SsoPeer::doSelectOne($c);
+		SsoPeer::setUseCriteriaFilter(true);
+		return $result;
+	}
 
 } // SsoPeer

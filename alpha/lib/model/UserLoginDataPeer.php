@@ -815,4 +815,15 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 	}
 
+	public static function getPartnerIdFromLoginData($email)
+	{
+		$loginData = UserLoginDataPeer::getByEmail($email);
+		if (!$loginData)
+		{
+			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
+		}
+		$partnerId = $loginData->getLastLoginPartnerId() ? $loginData->getLastLoginPartnerId() : $loginData->getConfigPartnerId();
+		return $partnerId;
+	}
+
 } // UserLoginDataPeer
