@@ -67,6 +67,7 @@ if(isset($dbConf['sphinx_split_index']) && $dbConf['sphinx_split_index']['enable
 
 $limit = 1000; 	// The number of sphinxLog records we want to query
 $gap = 500;	// The gap from 'getLastLogId' we want to query
+$maxIndexHistory = 2000; //The maximum array size to save unuiqe object ids update and their sphinx log id
 
 $sphinxReadConn = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG_READ);
 
@@ -74,6 +75,7 @@ $serverLastLogs = SphinxLogServerPeer::retrieveByServer($sphinxServer, $sphinxRe
 $lastLogs = array();
 $handledRecords = array();
 $sphinxRtTables = array();
+$objectIdSphinxLog = array();
 
 foreach($serverLastLogs as $serverLastLog)
 {
@@ -147,9 +149,14 @@ while(true)
 
 		try
 		{
+			$objectId = $sphinxLog->getObjectId();
 			if ($skipExecutedUpdates && $executedServerId == $serverLastLog->getId())
 			{
 				KalturaLog::log ("Sphinx server is initiated and the command already ran synchronously on this machine. Skipping");
+			}
+			elseif(isset($objectIdSphinxLog[$objectId]) && $objectIdSphinxLog[$objectId] > $sphinxLogId )
+			{
+				KalturaLog::log ("Found newer update for the same object id, skipping [$objectId] [$sphinxLogId] [{$objectIdSphinxLog[$objectId]}]");
 			}
 			else
 			{
@@ -165,7 +172,24 @@ while(true)
 				{
 					$affected = $sphinxCon->exec($sql);
 					if(!$affected)
+					{
 						$errorInfo = $sphinxCon->errorInfo();
+						KalturaLog::log("Failed to run sphinx update query for sphinxLogId [$sphinxLogId] with error [" . $errorInfo . "]");
+					}
+					
+					if(count($objectIdSphinxLog) > $maxIndexHistory && !isset($objectIdSphinxLog[$objectId]))
+					{
+						reset($objectIdSphinxLog);
+						$oldestElementKey = key($objectIdSphinxLog);
+						unset($objectIdSphinxLog[$oldestElementKey]);
+					}
+					
+					if(isset($objectIdSphinxLog[$objectId]))
+					{
+						unset($objectIdSphinxLog[$objectId]);
+					}
+					
+					$objectIdSphinxLog[$objectId] = $sphinxLog->getId();
 				}
 			}
 			
