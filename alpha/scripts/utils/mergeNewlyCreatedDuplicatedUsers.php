@@ -49,7 +49,7 @@ function mergeNewDuplicatedUsers($lastRunFilePath)
 	KalturaLog::debug("Start merging duplicated users");
 
 	$currentTime = time();
-	$startId = getStartId($currentTime, $lastRunFilePath);
+	$startId = getStartId($lastRunFilePath);
 	$lastId = getLastId($currentTime, $startId);
 	if(!$startId || !$lastId)
 	{
@@ -99,8 +99,10 @@ function mergeNewDuplicatedUsers($lastRunFilePath)
 				return;
 			}
 		}
-
-		$newPusers = getNewDuplicatedUsersCreated($currentKuserId, $lastId, $currentTime);
+		if(isset($currentKuserId))
+		{
+			$newPusers = getNewDuplicatedUsersCreated($currentKuserId, $lastId, $currentTime);
+		}
 	}
 
 	file_put_contents($lastRunFilePath, $lastId);
@@ -142,29 +144,14 @@ function getNewDuplicatedUsersCreated($startId, $lastId, $currentTime)
 }
 
 
-function getStartId($currentTime, $lastRunFilePath)
+function getStartId($lastRunFilePath)
 {
 	$startFromId = trim(file_get_contents($lastRunFilePath));
-	if($startFromId)
+	if(!$startFromId)
 	{
-		return $startFromId;
+		throw new Exception ("Missing file with last synced kuser id");
 	}
-
-	$lastRunTime = $currentTime - dateUtils::HOUR;
-	$c = new Criteria ();
-	$c->add(kuserPeer::UPDATED_AT, $lastRunTime, Criteria::GREATER_EQUAL);
-	$c->add(kuserPeer::CREATED_AT, $lastRunTime , Criteria::GREATER_EQUAL);
-	$c->addAnd(kuserPeer::CREATED_AT, $currentTime, Criteria::LESS_THAN);
-	$c->addAscendingOrderByColumn(kuserPeer::ID);
-	$startFromKuser = kuserPeer::doSelectOne($c);
-
-	if(!$startFromKuser)
-	{
-		KalturaLog::debug("no new users created since last run");
-		return null;
-	}
-
-	return $startFromKuser->getId();
+	return $startFromId;
 }
 
 function getLastId($currentTime, $startId)
@@ -175,18 +162,26 @@ function getLastId($currentTime, $startId)
 	}
 	$maxUserCreationTime = $currentTime - (dateUtils::HOUR * 0.5);
 
-	$c = new Criteria ();
-	$c->add(kuserPeer::ID, $startId, Criteria::GREATER_THAN);
-	$c->add(kuserPeer::CREATED_AT, $maxUserCreationTime, Criteria::LESS_THAN);
-	$c->add(kuserPeer::UPDATED_AT, $maxUserCreationTime, Criteria::LESS_THAN);
-	$c->addDescendingOrderByColumn(kuserPeer::ID);
-	$lastKuser = kuserPeer::doSelectOne($c);
-	if(!$lastKuser)
+	do
 	{
-		KalturaLog::debug("no new users created since last run");
-		return null;
-	}
-	return $lastKuser->getId();
+		$c = new Criteria ();
+		$c->add(kuserPeer::ID, $startId, Criteria::GREATER_THAN);
+		$c->setLimit(MAX_RECORDS);
+		$c->addAscendingOrderByColumn(kuserPeer::ID);
+		$kusers = kuserPeer::doSelect($c);
+		$count = count($kusers);
+		if ($count > 0)
+		{
+			$lastKuser =  $kusers[$count - 1];
+			$startId = $lastKuser->getId();
+			if($maxUserCreationTime < $lastKuser->getCreatedAtAsInt())
+			{
+				$count = 0;
+			}
+		}
+	} while($count == MAX_RECORDS);
+
+	return $startId;
 }
 
 function sendMail($toArray, $subject, $body, $sender = null)
