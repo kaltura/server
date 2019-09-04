@@ -3,7 +3,6 @@
  * @package plugins.sso
  * @subpackage model.enum
  */
-
 interface SsoStatus
 {
 	const DISABLED = 1;
