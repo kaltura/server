@@ -22,23 +22,24 @@ class SsoProfileSetStatusAction extends KalturaApplicationPlugin
 		$action->getHelper('layout')->disableLayout();
 		$ssoProfileId = $this->_getParam('ssoProfileId');
 		$newStatus = $this->_getParam('ssoProfileStatus');
-		$partnerId = $this->_getParam('partnerId');
 
 		$client = Infra_ClientHelper::getClient();
 		$ssoPluginClient = Kaltura_Client_Sso_Plugin::get($client);
-		Infra_ClientHelper::impersonate($partnerId);
 		try
 		{
 			if  ( $newStatus == Kaltura_Client_Sso_Enum_SsoStatus::DELETED )
-				$res = $ssoPluginClient->sso->delete($ssoProfileId);
+				$ssoPluginClient->sso->delete($ssoProfileId);
 			else
-				$res = $ssoPluginClient->sso->update($ssoProfileId, $newStatus);
+			{
+				$sso = new Kaltura_Client_Sso_Type_Sso();
+				$sso->status = $newStatus;
+				$ssoPluginClient->sso->update($ssoProfileId, $sso);
+			}
 			echo $action->getHelper('json')->sendJson('ok', false);
 		} catch (Exception $e)
 		{
 			KalturaLog::err($e->getMessage() . "\n" . $e->getTraceAsString());
 			echo $action->getHelper('json')->sendJson($e->getMessage(), false);
 		}
-		Infra_ClientHelper::unimpersonate();
 	}
 }

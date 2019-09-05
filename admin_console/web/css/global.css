@@ -2593,3 +2593,12 @@ form#frmCreateSsoProfile {
 form#frmCreateSsoProfile dd,form#frmCreateSsoProfile dt {
 	float: left;
 }
+
+#sso-profile-configure-dialog dt {
+	margin: 10px 0 5px;
+}
+
+#sso-profile-configure-dialog dd input {
+	width: 333px;
+	height: 22px;
+}

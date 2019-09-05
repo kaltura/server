@@ -1,4 +1,3 @@
-<?php if (!$this->allowed) {echo $this->translate('This partner is not allowed to use Sso'); return;} ?>
 <p><?php echo $this->translate('Here you can configure your Sso profiles'); ?></p>
 <?php echo $this->filterForm; ?>
 <?php echo $this->newSsoProfileFolderForm; ?>
@@ -8,9 +7,9 @@
 		<thead>
 		<tr>
 			<th><?php echo $this->translate('ID'); ?></th>
-            <th><?php echo $this->translate('Application Type'); ?></th>
-			<th><?php echo $this->translate('Status'); ?></th>
 			<th><?php echo $this->translate('Publisher ID'); ?></th>
+			<th><?php echo $this->translate('Status'); ?></th>
+			<th><?php echo $this->translate('Application Type'); ?></th>
 			<th><?php echo $this->translate('Domain'); ?></th>
 			<th><?php echo $this->translate('Redirect Url'); ?></th>
 			<th><?php echo $this->translate('Creation Date'); ?></th>
@@ -30,15 +29,19 @@
 		<?php foreach($this->paginator as /* Kaltura_Client_Sso_Type_Sso */ $ssoProfile): ?>
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
 				<td><?php echo $ssoProfile->id; ?></td>
-                <td><?php echo $ssoProfile->applicationType; ?></td>
+				<td><?php if ($ssoProfile->partnerId)
+						echo $ssoProfile->partnerId;
+					else
+						echo '';?>
+				</td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Sso_Enum_SsoStatus', $ssoProfile->status); ?></td>
-				<td><?php echo $ssoProfile->partnerId; ?></td>
+				<td><?php echo $ssoProfile->applicationType; ?></td>
 				<td><?php echo $ssoProfile->domain; ?></td>
 				<td><?php echo $ssoProfile->redirectUrl; ?></td>
 				<td><?php echo date($this->translate('time format'), $ssoProfile->createdAt); ?></td>
 				<td><?php echo date($this->translate('time format'), $ssoProfile->updatedAt); ?></td>
 				<td>
-					<select class="options" onchange="doAction(this.value, <?php echo $ssoProfile->id;?>, <?php echo $ssoProfile->partnerId; ?>)">
+					<select class="options" onchange="doAction(this.value, <?php echo $ssoProfile->id;?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<option value="configureSsoProfile" ><?php echo $this->translate('Configure'); ?></option>
 						<?php if ($ssoProfile->status === Kaltura_Client_Sso_Enum_SsoStatus::DISABLED): ?>
@@ -87,31 +90,29 @@
 		jQuery('select.options').val('');
 	}
 
-	function enable(ssoProfileId, partnerId)
+	function enable(ssoProfileId)
 	{
 		changeStatus(
 			ssoProfileId,
 			<?php echo Kaltura_Client_Sso_Enum_SsoStatus::ACTIVE; ?>,
-			partnerId,
 			function() {
 				alert('<?php echo $this->translate('Sso Profile enabled');?>');
 			}
 		);
 	}
 
-	function disable(ssoProfileId,partnerId)
+	function disable(ssoProfileId)
 	{
 		changeStatus(
 			ssoProfileId,
 			<?php echo Kaltura_Client_Sso_Enum_SsoStatus::DISABLED; ?>,
-			partnerId,
 			function() {
 				alert('<?php echo $this->translate('Sso Profile disabled');?>');
 			}
 		);
 	}
 
-	function remove(ssoProfileId,partnerId)
+	function remove(ssoProfileId)
 	{
 		var ok = confirm('<?php echo $this->translate('Are you sure you want to remove Sso Profile ?'); ?>');
 		if (ok)
@@ -119,7 +120,6 @@
 			changeStatus(
 				ssoProfileId,
 				<?php echo Kaltura_Client_Sso_Enum_SsoStatus::DELETED; ?>,
-				partnerId,
 				function() {
 					alert('<?php echo $this->translate('Sso Profile removed');?>');
 				}
@@ -127,12 +127,11 @@
 		}
 	}
 
-	function changeStatus(ssoProfileId, status, partnerId, callback)
+	function changeStatus(ssoProfileId, status, callback)
 	{
-		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'SsoProfileSetStatusAction', 'ssoProfileId' => 'SSOPROFILEID','partnerId' => 'PARTNERID', 'ssoProfileStatus' => 'STATUS')); ?>';
+		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'SsoProfileSetStatusAction', 'ssoProfileId' => 'SSOPROFILEID', 'ssoProfileStatus' => 'STATUS')); ?>';
 		url = url.replace('STATUS', status);
 		url = url.replace('SSOPROFILEID', ssoProfileId);
-		url = url.replace('PARTNERID', partnerId);
 		jQuery.ajax({
 			url: url,
 			dataType: 'json',
@@ -151,6 +150,7 @@
 				jQuery('#frmPaginator1').submit();
 			},
 			error: function(result) {
+				debugger;
 				alert(result);
 			}
 		});
@@ -158,22 +158,12 @@
 
 	function addSsoProfile(partnerId)
 	{
-		if(!partnerId.length || isNaN(partnerId)){
-			alert('<?php echo $this->translate('Publisher ID not supplied'); ?>');
-			return;
-		}
-
 		var paramsStr = '/new_partner_id/' + partnerId;
 		loadSsoProfile(paramsStr);
 	}
 
 	function configureSsoProfile(ssoProfileId, partnerId)
 	{
-		if(typeof ssoProfileId == 'undefined'){
-			alert('<?php echo $this->translate('Sso Profile ID not supplied'); ?>');
-			return;
-		}
-
 		var ssoProfileIdStr = '/sso_profile_id/' + ssoProfileId +'/new_partner_id/' + partnerId ;
 
 		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'SsoProfileConfigureAction')); ?>' + ssoProfileIdStr;
@@ -185,8 +175,8 @@
 			bgiframe: true,
 			modal: true,
 			resizable: false,
-			width: 600,
-			height: 600,
+			width: 400,
+			height: 400,
 			title: '<?php echo $this->translate('Sso Profile'); ?>',
 			buttons: {
 				'<?php echo $this->translate('Save'); ?>': function() {
@@ -224,14 +214,14 @@
 			bgiframe: true,
 			modal: true,
 			resizable: false,
-			width: 600,
-			height: 600,
+			width: 400,
+			height: 400,
 			title: '<?php echo $this->translate('Sso Profile'); ?>',
 			buttons: {
 				'<?php echo $this->translate('Save'); ?>': function() {
 					jQuery('.ui-widget-overlay').css('z-index', 1003 );
 					jQuery('#loader').show();
-					jQuery(this).find('#frmSSpProfileConfigure').submit();
+					jQuery(this).find('#frmSsoProfileConfigure').submit();
 				},
 				'<?php echo $this->translate('Close'); ?>': function() {
 					jQuery(this).dialog('close');

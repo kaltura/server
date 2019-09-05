@@ -22,24 +22,25 @@ class SsoProfileListAction extends KalturaApplicationPlugin implements IKalturaA
 		return realpath(dirname(__FILE__));
 	}
 
+	/**
+	 * @param Zend_Controller_Action $action
+	 * @throws Infra_Exception
+	 */
 	public function doAction(Zend_Controller_Action $action)
 	{
 		$request = $action->getRequest();
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
-		$partnerId = $this->_getParam('filter_input') ? $this->_getParam('filter_input') : $request->getParam('partnerId');
-
-		$action->view->allowed = $this->isAllowedForPartner($partnerId);
 
 		// init filter
-		$ssoProfileFilter = new Kaltura_Client_Sso_Type_SsoFilter();
+		$ssoProfileFilter = $this->getSsoFilterFromRequest($request);
 		$ssoProfileFilter->orderBy = "-createdAt";
 
 		$client = Infra_ClientHelper::getClient();
 		$ssoPluginClient = Kaltura_Client_Sso_Plugin::get($client);
 
 		// get results and paginate
-		$paginatorAdapter = new Infra_FilterPaginator($ssoPluginClient->sso, "listAction", $partnerId, $ssoProfileFilter);
+		$paginatorAdapter = new Infra_FilterPaginator($ssoPluginClient->sso, "listAction", null, $ssoProfileFilter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
@@ -57,10 +58,27 @@ class SsoProfileListAction extends KalturaApplicationPlugin implements IKalturaA
 		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'SsoProfileConfigure'), null, true);
 		$createSsoProfileForm->setAction($actionUrl);
 
-		if ($partnerId)
-			$createSsoProfileForm->getElement("newPartnerId")->setValue($partnerId);
+		if($ssoProfileFilter && isset($ssoProfileFilter->partnerIdEqual))
+			$createSsoProfileForm->getElement("newPartnerId")->setValue($ssoProfileFilter->partnerIdEqual);
 
 		$action->view->newSsoProfileFolderForm = $createSsoProfileForm;
+	}
+
+	/**
+	 * @param Zend_Controller_Request_Abstract $request
+	 * @return Kaltura_Client_Sso_Type_SsoFilter
+	 */
+	private function getSsoFilterFromRequest(Zend_Controller_Request_Abstract $request)
+	{
+		$filter = new Kaltura_Client_Sso_Type_SsoFilter();
+		$filterInput = $request->getParam('filter_input');
+		if(!strlen($filterInput))
+			return $filter;
+
+		$filterType = $request->getParam('filter_type');
+		$filter->$filterType = $filterInput;
+
+		return $filter;
 	}
 
 	public function getInstance($interface)
@@ -71,26 +89,6 @@ class SsoProfileListAction extends KalturaApplicationPlugin implements IKalturaA
 		return null;
 	}
 
-	public function isAllowedForPartner($partnerId)
-	{
-		$client = Infra_ClientHelper::getClient();
-		$client->setPartnerId($partnerId);
-		$filter = new Kaltura_Client_Type_PermissionFilter();
-		$filter->nameEqual = Kaltura_Client_Enum_PermissionName::REACH_PLUGIN_PERMISSION;
-		$filter->partnerIdEqual = $partnerId;
-		try
-		{
-			$result = $client->permission->listAction($filter, null);
-		} catch (Exception $e)
-		{
-			$client->setPartnerId(self::ADMIN_CONSOLE_PARTNER);
-			return false;
-		}
-		$client->setPartnerId(self::ADMIN_CONSOLE_PARTNER);
-
-		$isAllowed = ($result->totalCount > 0) && ($result->objects[0]->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE);
-		return $isAllowed;
-	}
 
 	/**
 	 * @return array<string, string> - array of <label, jsActionFunctionName>

@@ -6,17 +6,6 @@
 
 <script type="text/javascript">
 
-	function populate(name, file ) {
-		var data = jQuery('#' + name).val();
-		if (!data)
-			return;
-		var arr = JSON.parse(data);
-		var ts = $("." + file);
-		//TODO check this affect
-		for (var i = 0, len = arr.length; i < len; i++) {
-		}
-	}
-
 	try {
 		jQuery(function () {
 			<?php if ($this->formValid): ?>
