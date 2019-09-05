@@ -27,7 +27,6 @@ class SsoProfileConfigureAction extends KalturaApplicationPlugin
 
 		try
 		{
-			Infra_ClientHelper::impersonate($partnerId);
 			if ($ssoProfileId)
 				$form = $this->handleExistingSsoProfile($action, $ssoProfileId, $partnerId);
 			else
@@ -43,7 +42,6 @@ class SsoProfileConfigureAction extends KalturaApplicationPlugin
 				$form->populate($formData);
 			}
 		}
-		Infra_ClientHelper::unimpersonate();
 		$action->view->form = $form;
 		$action->view->ssoProfileId = $ssoProfileId;
 	}
@@ -100,7 +98,6 @@ class SsoProfileConfigureAction extends KalturaApplicationPlugin
 	{
 		$ssoProfile = $form->getObject('Kaltura_Client_Sso_Type_Sso', $formData, false, true);
 		$form->populate($formData);
-		$form->resetUnUpdatebleAttributes($ssoProfile);
 		$ssoPluginClient = Kaltura_Client_Sso_Plugin::get($this->client);
 		if ($ssoProfileId)
 			$ssoPluginClient->sso->update($ssoProfileId, $ssoProfile);
@@ -121,7 +118,6 @@ class SsoProfileConfigureAction extends KalturaApplicationPlugin
 	{
 		$ssoProfile = $form->getObject('Kaltura_Client_Sso_Type_Sso', $formData, false, true);
 		$form->populate($formData);
-		$form->resetUnUpdatebleAttributes($ssoProfile);
 		$ssoPluginClient = Kaltura_Client_Sso_Plugin::get($this->client);
 		if ($originalssoProfile )
 		{

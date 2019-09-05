@@ -19,10 +19,6 @@ class Form_SsoProfileConfigure extends ConfigureForm
 	{
 		$this->setAttrib('id', 'frmSsoProfileConfigure');
 		$this->setMethod('post');
-		$titleElement = new Zend_Form_Element_Hidden('generalTitle');
-		$titleElement->setLabel('General');
-		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag', array('tag' => 'b'))));
-		$this->addElement($titleElement);
 
 		$this->addElement('text', 'id', array(
 			'label' => 'ID:',
@@ -31,19 +27,18 @@ class Form_SsoProfileConfigure extends ConfigureForm
 			'disabled' => 'disabled',
 		));
 
+		$this->addElement('text', 'partnerId', array(
+			'label' => 'Related Publisher ID:',
+			'filters' => array('StringTrim'),
+			'placement' => 'prepend',
+			'readonly' => 'true',
+		));
+
 		$this->addElement('text', 'applicationType', array(
 			'label' => 'Application type:',
 			'required' => true,
 			'filters' => array('StringTrim'),
 			'placement' => 'prepend',
-		));
-
-		$this->addElement('text', 'partnerId', array(
-			'label' => 'Related Publisher ID:',
-			'required' => true,
-			'filters' => array('StringTrim'),
-			'placement' => 'prepend',
-			'readonly' => 'true',
 		));
 
 		$this->addElement('text', 'domain', array(
@@ -54,7 +49,7 @@ class Form_SsoProfileConfigure extends ConfigureForm
 		));
 
 		$this->addElement('text', 'redirectUrl', array(
-			'label' => 'redirect Url:',
+			'label' => 'Redirect Url:',
 			'required' => true,
 			'filters' => array('StringTrim'),
 			'placement' => 'prepend',
@@ -72,6 +67,11 @@ class Form_SsoProfileConfigure extends ConfigureForm
 		$props = $object;
 		if (is_object($object))
 			$props = get_object_vars($object);
+
+		if (isset($props['partnerId']) && $props['partnerId'] == 0)
+		{
+			$this->getElement('partnerId')->setValue(null);
+		}
 
 		$allElements = $this->getElements();
 		foreach ($allElements as $element)
@@ -91,19 +91,5 @@ class Form_SsoProfileConfigure extends ConfigureForm
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 		return $object;
-	}
-
-	/**
-	 * Set to null all the attributes that shouldn't be updated
-	 * @param Kaltura_Client_Sso_Type_Sso $ssoProfile
-	 */
-	public function resetUnUpdatebleAttributes(Kaltura_Client_Sso_Type_Sso $ssoProfile)
-	{
-		// reset readonly attributes
-		$ssoProfile->id = null;
-		$ssoProfile->partnerId = null;
-		$ssoProfile->domain = null;
-		$ssoProfile->createdAt = null;
-		$ssoProfile->updatedAt = null;
 	}
 }
