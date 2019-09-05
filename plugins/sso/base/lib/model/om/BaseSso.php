@@ -5,7 +5,7 @@
  *
  * 
  *
- * @package Core
+ * @package plugins.sso
  * @subpackage model.om
  */
 abstract class BaseSso extends BaseObject  implements Persistent {

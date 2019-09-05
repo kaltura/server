@@ -1,0 +1,32 @@
+<?php if($this->errMessage): ?>
+	<div class="error"><?php echo $this->errMessage ?></div><br/>
+<?php endif; ?>
+
+<?php echo $this->form ?>
+
+<script type="text/javascript">
+
+	function populate(name, file ) {
+		var data = jQuery('#' + name).val();
+		if (!data)
+			return;
+		var arr = JSON.parse(data);
+		var ts = $("." + file);
+		//TODO check this affect
+		for (var i = 0, len = arr.length; i < len; i++) {
+		}
+	}
+
+	try {
+		jQuery(function () {
+			<?php if ($this->formValid): ?>
+			dialogDiv.dialog('close');
+			jQuery('#frmSsoProfileConfigure').submit();
+			<?php endif; ?>
+		});
+	}
+	catch (e)
+	{
+
+	}
+</script>

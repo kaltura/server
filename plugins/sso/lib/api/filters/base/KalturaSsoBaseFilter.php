@@ -1,8 +1,8 @@
 <?php
 /**
- * @package api
+ * @package plugins.sso
  * @relatedService SsoService
- * @subpackage filters.base
+ * @subpackage api.filters.base
  * @abstract
  */
 abstract class KalturaSsoBaseFilter extends KalturaRelatedFilter

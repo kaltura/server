@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage filters
+ * @package plugins.sso
+ * @subpackage api.filters
  */
 class KalturaSsoFilter extends KalturaSsoBaseFilter
 {

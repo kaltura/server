@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.sso
+ * @subpackage model.filters
+ */
 class SsoFilter extends baseObjectFilter
 {
 	public function init()

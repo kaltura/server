@@ -2,7 +2,7 @@
 /**
  * @package plugins.sso
  */
-class SsoPlugin extends KalturaPlugin implements  IKalturaServices
+class SsoPlugin extends KalturaPlugin implements  IKalturaServices, IKalturaAdminConsolePages
 {
 	const PLUGIN_NAME = 'sso';
 
@@ -11,6 +11,7 @@ class SsoPlugin extends KalturaPlugin implements  IKalturaServices
 		return self::PLUGIN_NAME;
 	}
 
+	//
 	public static function getServicesMap()
 	{
 		$map = array(
@@ -25,5 +26,18 @@ class SsoPlugin extends KalturaPlugin implements  IKalturaServices
 	public static function getCoreValue($type, $valueName)
 	{
 		return kPluginableEnumsManager::apiToCore($type, $valueName);
+	}
+
+	/*
+	 * @see IKalturaAdminConsolePages::getApplicationPages()
+	 */
+	public static function getApplicationPages()
+	{
+		$pages = array();
+		$pages[] = new SsoProfileListAction();
+		$pages[] = new SsoProfileConfigureAction();
+		$pages[] = new SsoProfileSetStatusAction();
+
+		return $pages;
 	}
 }

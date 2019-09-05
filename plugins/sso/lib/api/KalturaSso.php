@@ -1,7 +1,8 @@
 <?php
+
 /**
- * @package api
- * @subpackage objects
+ * @package plugins.sso
+ * @subpackage api.objects
  * @relatedService SsoService
  */
 class KalturaSso extends KalturaObject implements IRelatedFilterable
