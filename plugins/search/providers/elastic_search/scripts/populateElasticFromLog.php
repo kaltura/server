@@ -60,6 +60,7 @@ DbManager::initialize();
 
 $limit = 1000;
 $gap = 500;
+$maxIndexHistory = 2000; //The maximum array size to save unique object ids update and their elastic log id
 
 $sphinxLogReadConn = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG_READ);
 
@@ -68,8 +69,10 @@ $serverLastLogs = SphinxLogServerPeer::retrieveByServer($elasticCluster, $sphinx
 
 $lastLogs = array();
 $handledRecords = array();
+$objectIdElasticLog = array();
 
-foreach($serverLastLogs as $serverLastLog) {
+foreach($serverLastLogs as $serverLastLog)
+{
     $lastLogs[$serverLastLog->getDc()] = $serverLastLog;
     $handledRecords[$serverLastLog->getDc()] = array();
 }
@@ -98,6 +101,7 @@ while(true)
 
     while(!count($elasticLogs))
     {
+		$skipExecutedUpdates = true;
         sleep(1);
         $elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
     }
@@ -120,9 +124,12 @@ while(true)
 
         $serverLastLog = null;
 
-        if(isset($lastLogs[$dc])) {
+        if(isset($lastLogs[$dc]))
+        {
             $serverLastLog = $lastLogs[$dc];
-        } else {
+        }
+        else
+		{
             $serverLastLog = new SphinxLogServer();
             $serverLastLog->setServer($elasticCluster);
             $serverLastLog->setDc($dc);
@@ -135,10 +142,15 @@ while(true)
 
         try
         {
+			$objectId = $elasticLog->getObjectId();
             if ($skipExecutedUpdates && $executedServerId == $serverLastLog->getId())
             {
                 KalturaLog::log ("Elastic server is initiated and the command already ran synchronously on this machine. Skipping");
             }
+			elseif(isset($objectIdElasticLog[$objectId]) && $objectIdElasticLog[$objectId] > $elasticLogId )
+			{
+				KalturaLog::log ("Found newer update for the same object id, skipping [$objectId] [$elasticLogId] [{$objectIdElasticLog[$objectId]}]");
+			}
             else
             {
                 //we save the elastic command as serialized object in the sql field
@@ -151,23 +163,36 @@ while(true)
                 {
                     $response = $elasticClient->$action($command);
                 }
+	
+				unset($objectIdElasticLog[$objectId]);
+	
+				if(count($objectIdElasticLog) > $maxIndexHistory)
+				{
+					reset($objectIdElasticLog);
+					$oldestElementKey = key($objectIdElasticLog);
+					unset($objectIdElasticLog[$oldestElementKey]);
+				}
+				
+				$objectIdElasticLog[$objectId] = $elasticLogId;
 
             }
 
             // If the record is an historical record, don't take back the last log id
-            if($serverLastLog->getLastLogId() < $elasticLogId) {
-                $serverLastLog->setLastLogId($elasticLogId);
-
-                // Clear $handledRecords from before last - gap.
-                foreach($serverLastLogs as $serverLastLog) {
-                    $dc = $serverLastLog->getDc();
-                    $threshold = $serverLastLog->getLastLogId() - $gap;
-                    $handledRecords[$dc] = array_filter($handledRecords[$dc], array(new OldLogRecordsFilter($threshold), 'filter'));
-                }
-            }
+			if($serverLastLog->getLastLogId() < $elasticLogId)
+			{
+				$serverLastLog->setLastLogId($elasticLogId);
+				
+				// Clear $handledRecords from before last - gap.
+				foreach($serverLastLogs as $serverLastLog)
+				{
+					$dc = $serverLastLog->getDc();
+					$threshold = $serverLastLog->getLastLogId() - $gap;
+					$handledRecords[$dc] = array_filter($handledRecords[$dc], array(new OldLogRecordsFilter($threshold), 'filter'));
+				}
+			}
         }
         catch(Exception $e)
-        {
+		{
             KalturaLog::err($e->getMessage());
         }
     }
