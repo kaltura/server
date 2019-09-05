@@ -30,7 +30,6 @@ class KalturaSso extends KalturaObject implements IRelatedFilterable
 
 	/**
 	 * @var string
-	 * @insertonly
 	 * @filter eq
 	 */
 	public $domain;

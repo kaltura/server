@@ -25,7 +25,9 @@ class KalturaSsoFilter extends KalturaSsoBaseFilter
 
 		$resultCount = count($list);
 		if ($resultCount && $resultCount < $pager->pageSize)
+		{
 			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
+		}
 		else
 		{
 			KalturaFilterPager::detachFromCriteria($c);

@@ -805,7 +805,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	{
 		$originPartnerAuthType = $originPartner->getAuthenticationType();
 		$requestedPartnerAuthType = $requestedPartner->getAuthenticationType();
-
+		if ($requestedPartnerAuthType === PartnerAuthenticationType::SSO)
+		{
+			throw new kUserException ('Switching to requested partner requires re-login', kUserException::NEW_LOGIN_REQUIRED);
+		}
 		if($originPartnerAuthType !== $requestedPartnerAuthType)
 		{
 			if($requestedPartnerAuthType !== PartnerAuthenticationType::PASSWORD_ONLY)

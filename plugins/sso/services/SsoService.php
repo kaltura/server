@@ -117,7 +117,6 @@ class SsoService extends KalturaBaseService
 	 * @param int $partnerId
 	 * @return string $redirectUrl
 	 * @throws KalturaSsoErrors::SSO_NOT_FOUND
-	 * @throws APIErrors::FEATURE_FORBIDDEN
 	 */
 	public function loginAction($userId, $applicationType, $partnerId = null)
 	{
@@ -142,13 +141,6 @@ class SsoService extends KalturaBaseService
 		{
 			$partnerId = UserLoginDataPeer::getPartnerIdFromLoginData($userId);
 			$this->validatePartnerUsingSso($partnerId);
-		}
-		catch (Exception $e)
-		{
-			throw new KalturaAPIException(KalturaSsoErrors::SSO_NOT_FOUND);
-		}
-		try
-		{
 			//try login by PID
 			$dbSso = KalturaSso::getSso($partnerId, $applicationType, $domain);
 		}
@@ -165,7 +157,8 @@ class SsoService extends KalturaBaseService
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if (!$partner || !$partner->getUseSso())
 		{
-			throw new KalturaAPIException (APIErrors::FEATURE_FORBIDDEN, $this->serviceId . '->' . $this->actionName);
+			KalturaLog::debug("FEATURE_FORBIDDEN, $this->serviceId . '->' . $this->actionName");
+			throw new KalturaAPIException(KalturaSsoErrors::SSO_NOT_FOUND);
 		}
 	}
 
