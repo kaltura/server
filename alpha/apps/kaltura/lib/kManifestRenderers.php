@@ -85,6 +85,10 @@ abstract class kManifestRenderer
 	 */
 	protected $apiSessionId = '';
 
+	/**
+	 * @var string
+	 */
+	protected $apiHostName = '';
 
 	protected function prepareFlavors()
 	{
@@ -198,6 +202,13 @@ abstract class kManifestRenderer
 		$this->apiSessionId = $apiSessionId;
 	}
 
+	/**
+	 * @param string $apiHostName
+	 */
+	public function setApiHostName($apiHostName)
+	{
+		$this->apiHostName = $apiHostName;
+	}
 
 
 	protected function replacePlaybackContext($str)
@@ -228,7 +239,7 @@ abstract class kManifestRenderer
 			$output['clientInternalIp'] = $this->internalIP;
 			$output['ipIsInRange'] = $this->isIpInRange;
 			$output['apiSessionId'] = $this->apiSessionId;
-			$output['apiHostName'] = infraRequestUtils::getHostname();
+			$output['apiHostName'] = $this->apiHostName;
 		}
 
 
