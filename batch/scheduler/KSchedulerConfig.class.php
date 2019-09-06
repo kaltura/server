@@ -68,7 +68,9 @@ class KSchedulerConfig extends Zend_Config_Ini
 
 			$task = new KSchedularTaskConfig($configFileName, $workerName, $maxInstances);
 			$task->setPartnerId($this->getPartnerId());
-			$task->setSecret($this->getSecret());
+			//$task->setSecret($this->getSecret());
+			$secret = kConf::get('batchSecret','secrets');
+            		$task->setSecret($secret);
 			$task->setCurlTimeout($this->getCurlTimeout());
 			$task->setSchedulerId($this->getId());
 			$task->setSchedulerName($this->getName());
