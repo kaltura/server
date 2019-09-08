@@ -162,26 +162,19 @@ function getLastId($currentTime, $startId)
 	}
 	$maxUserCreationTime = $currentTime - (dateUtils::HOUR * 0.5);
 
-	do
+	$c = new Criteria ();
+	$c->add(kuserPeer::ID, $startId, Criteria::GREATER_THAN);
+	$c->add(kuserPeer::ID, $startId+100000, Criteria::LESS_THAN);
+	$c->add(kuserPeer::CREATED_AT, $maxUserCreationTime, Criteria::LESS_THAN);
+	$c->add(kuserPeer::UPDATED_AT, $maxUserCreationTime, Criteria::LESS_THAN);
+	$c->addDescendingOrderByColumn(kuserPeer::ID);
+	$lastKuser = kuserPeer::doSelectOne($c);
+	if(!$lastKuser)
 	{
-		$c = new Criteria ();
-		$c->add(kuserPeer::ID, $startId, Criteria::GREATER_THAN);
-		$c->setLimit(MAX_RECORDS);
-		$c->addAscendingOrderByColumn(kuserPeer::ID);
-		$kusers = kuserPeer::doSelect($c);
-		$count = count($kusers);
-		if ($count > 0)
-		{
-			$lastKuser =  $kusers[$count - 1];
-			$startId = $lastKuser->getId();
-			if($maxUserCreationTime < $lastKuser->getCreatedAtAsInt())
-			{
-				$count = 0;
-			}
-		}
-	} while($count == MAX_RECORDS);
-
-	return $startId;
+		KalturaLog::debug("no new users created since last run");
+		return null;
+	}
+	return $lastKuser->getId();
 }
 
 function sendMail($toArray, $subject, $body, $sender = null)

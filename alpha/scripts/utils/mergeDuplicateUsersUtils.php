@@ -22,7 +22,17 @@ function getAllDuplicatedKusersForPuser ($puserId, $partnerId){
 	$Criteria->add(kuserPeer::PUSER_ID, $puserId);
 	$Criteria->add(kuserPeer::PARTNER_ID, $partnerId);
 	$Criteria->addAscendingOrderByColumn(kuserPeer::ID);
-	return kuserPeer::doSelect($Criteria);
+	$ret = kuserPeer::doSelect($Criteria);
+	foreach($ret as $user)
+	{
+		if($user->getIsAdmin())
+		{
+			KalturaLog::debug("User $puserId is admin user, script will not handle it");
+			return array();
+		}
+	}
+
+	return $ret;
 }
 
 function findKuserWithMaxEntries ($kusersArray, $partnerId){
