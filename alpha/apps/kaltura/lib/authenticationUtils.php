@@ -59,6 +59,27 @@ class authenticationUtils
 		return $job;
 	}
 
+	public static function addSsoMailJob($partner, $kuser, $mailType)
+	{
+		$partnerId = $partner->getId();
+		$publisherName = $partner->getName();
+		$bodyParams = array($kuser->getFullName(), $partnerId, $kuser->getEmail(), $partnerId, $publisherName, $publisherName, $kuser->getUserRoleNames(), $publisherName, $kuser->getPuserId());
+
+		$job = kJobsManager::addMailJob(
+			null,
+			0,
+			$kuser->getPartnerId(),
+			$mailType,
+			kMailJobData::MAIL_PRIORITY_NORMAL,
+			kConf::get ("partner_registration_confirmation_email" ),
+			kConf::get ("partner_registration_confirmation_name" ),
+			$kuser->getEmail(),
+			$bodyParams
+		);
+
+		return $job;
+	}
+
 	public static function verify2FACode($loginData, $otp)
 	{
 		$userSeed = $loginData->getSeedFor2FactorAuth();

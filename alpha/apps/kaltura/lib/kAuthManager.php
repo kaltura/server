@@ -4,6 +4,7 @@ class kAuthManager implements kObjectChangedEventConsumer
 {
 
 	const TWO_FACTOR_FIELD = 'useTwoFactorAuthentication';
+	const SSO_FIELD = 'useSso';
 	static $handleObjectChanged = true;
 
 	/* (non-PHPdoc)
@@ -12,13 +13,26 @@ class kAuthManager implements kObjectChangedEventConsumer
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
 		if( self::$handleObjectChanged && $object instanceof Partner &&
-			in_array(PartnerPeer::CUSTOM_DATA, $modifiedColumns) &&
+			in_array(partnerPeer::CUSTOM_DATA, $modifiedColumns) &&
 			$object->isCustomDataModified(self::TWO_FACTOR_FIELD) &&
 			$object->getUseTwoFactorAuthentication())
 		{
 			$oldCustomDataValues = $object->getCustomDataOldValues();
 			$old2FAValue = $oldCustomDataValues[''][self::TWO_FACTOR_FIELD];
 			if ($old2FAValue != $object->getUseTwoFactorAuthentication())
+			{
+				self::$handleObjectChanged = false;
+				return true;
+			}
+		}
+		if( self::$handleObjectChanged && $object instanceof Partner &&
+			in_array(partnerPeer::CUSTOM_DATA, $modifiedColumns) &&
+			$object->isCustomDataModified(self::SSO_FIELD) &&
+			$object->getUseSso())
+		{
+			$oldCustomDataValues = $object->getCustomDataOldValues();
+			$oldSsoValue = $oldCustomDataValues[''][self::SSO_FIELD];
+			if ($oldSsoValue != $object->getUseSso())
 			{
 				self::$handleObjectChanged = false;
 				return true;
@@ -35,15 +49,26 @@ class kAuthManager implements kObjectChangedEventConsumer
 		$adminKusers = Partner::getAdminLoginUsersList($object->getId());
 		foreach ($adminKusers as $adminKuser)
 		{
-			$userLoginData = $adminKuser->getLoginData();
-			if(!$userLoginData->getSeedFor2FactorAuth())
+			if ($object->getUseSso() && !$object->getUseTwoFactorAuthentication())
 			{
-				authenticationUtils::generateNewSeed($userLoginData);
+				$job = authenticationUtils::addSsoMailJob($object, $adminKuser, kuserPeer::KALTURA_EXISTING_USER_ENABLE_SSO_EMAIL);
+				if(!$job)
+				{
+					KalturaLog::warning('Mail Job was not added');
+				}
 			}
-			$job = authenticationUtils::addAuthMailJob($object, $adminKuser, kuserPeer::KALTURA_EXISTING_USER_ENABLE_2FA_EMAIL);
-			if(!$job)
+			else
 			{
-				KalturaLog::warning('Missing QR URL, Mail Job was not added');
+				$userLoginData = $adminKuser->getLoginData();
+				if(!$userLoginData->getSeedFor2FactorAuth())
+				{
+					authenticationUtils::generateNewSeed($userLoginData);
+				}
+				$job = authenticationUtils::addAuthMailJob($object, $adminKuser, kuserPeer::KALTURA_EXISTING_USER_ENABLE_2FA_EMAIL);
+				if(!$job)
+				{
+					KalturaLog::warning('Missing QR URL, Mail Job was not added');
+				}
 			}
 		}
 	}
