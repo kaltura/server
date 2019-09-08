@@ -75,6 +75,20 @@ abstract class kManifestRenderer
 	 */
 	protected $internalIP = null;
 
+	/**
+	 * @var string
+	 */
+	protected $isIpInRange = 'false';
+
+	/**
+	 * @var string
+	 */
+	protected $apiSessionId = '';
+
+	/**
+	 * @var string
+	 */
+	protected $apiHostName = '';
 
 	protected function prepareFlavors()
 	{
@@ -172,6 +186,31 @@ abstract class kManifestRenderer
 		$this->internalIP = $internalIP;
 	}
 
+	/**
+	 * @param string $isIpInRange
+	 */
+	public function setIsIpInRange($isIpInRange)
+	{
+		$this->isIpInRange = $isIpInRange;
+	}
+
+	/**
+	 * @param string $apiSessionId
+	 */
+	public function setApiSessionId($apiSessionId)
+	{
+		$this->apiSessionId = $apiSessionId;
+	}
+
+	/**
+	 * @param string $apiHostName
+	 */
+	public function setApiHostName($apiHostName)
+	{
+		$this->apiHostName = $apiHostName;
+	}
+
+
 	protected function replacePlaybackContext($str)
 	{
 		if($this->playbackContext)
@@ -198,6 +237,9 @@ abstract class kManifestRenderer
 		{
 			$output['serverNodeIds'] = $this->playLocation;
 			$output['clientInternalIp'] = $this->internalIP;
+			$output['ipIsInRange'] = $this->isIpInRange;
+			$output['apiSessionId'] = $this->apiSessionId;
+			$output['apiHostName'] = $this->apiHostName;
 		}
 
 

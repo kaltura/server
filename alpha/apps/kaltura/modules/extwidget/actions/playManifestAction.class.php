@@ -1353,10 +1353,14 @@ class playManifestAction extends kalturaAction
 
 		if ($this->secureEntryHelper && $this->secureEntryHelper->getScope() && $this->secureEntryHelper->getScope()->getOutputVarByName(accessControl::SERVE_FROM_SERVER_NODE_RULE))
 		{
+			$renderer->setApiSessionId( UniqueId::get());
+			$renderer->setApiHostName( infraRequestUtils::getHostname());
 			$playLocation = self::PLAY_LOCATION_EXTERNAL;
+			$isIpInRange = $this->secureEntryHelper->getScope()->getOutputVarByName(kIpAddressCondition::IP_ADDRESS_IN_RANGE) ? 'true': 'false';
 			if ($this->deliveryProfile->getDynamicAttributes()->getUsedEdgeServerIds() && count($this->deliveryProfile->getDynamicAttributes()->getUsedEdgeServerIds()))
 			{
 				$playLocation = implode(",", $this->deliveryProfile->getDynamicAttributes()->getUsedEdgeServerIds());
+				$isIpInRange = 'true';
 			} else if ($this->secureEntryHelper->getScope()->getOutputVarByName(kIpAddressCondition::PARTNER_INTERNAL_IP))
 			{
 				$playLocation = self::PLAY_LOCATION_INTERNAL;
@@ -1364,6 +1368,7 @@ class playManifestAction extends kalturaAction
 			header('X-ServerNodeIds:' . $playLocation);
 			$renderer->setPlayLocation($playLocation);
 			$renderer->setInternalIP($this->secureEntryHelper->getScope()->getOutputVarByName(kIpAddressCondition::PARTNER_INTERNAL_IP));
+			$renderer->setIsIpInRange($isIpInRange);
 		}
 		$renderer->output();
 	}
