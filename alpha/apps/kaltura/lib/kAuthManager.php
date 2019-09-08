@@ -12,19 +12,19 @@ class kAuthManager implements kObjectChangedEventConsumer
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
-		if( self::$handleObjectChanged && $object instanceof Partner &&
-			in_array(PartnerPeer::CUSTOM_DATA, $modifiedColumns) &&
-			$object->isCustomDataModified(self::TWO_FACTOR_FIELD) &&
-			$object->getUseTwoFactorAuthentication())
+		if (self::shouldConsumeSso($object, $modifiedColumns))
 		{
-			$oldCustomDataValues = $object->getCustomDataOldValues();
-			$old2FAValue = $oldCustomDataValues[''][self::TWO_FACTOR_FIELD];
-			if ($old2FAValue != $object->getUseTwoFactorAuthentication())
-			{
-				self::$handleObjectChanged = false;
-				return true;
-			}
+			return true;
 		}
+		if (self::shouldConsume2FA($object, $modifiedColumns))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	protected static function shouldConsumeSso($object, $modifiedColumns)
+	{
 		if( self::$handleObjectChanged && $object instanceof Partner &&
 			in_array(PartnerPeer::CUSTOM_DATA, $modifiedColumns) &&
 			$object->isCustomDataModified(self::SSO_FIELD) &&
@@ -41,6 +41,23 @@ class kAuthManager implements kObjectChangedEventConsumer
 		return false;
 	}
 
+	protected static function shouldConsume2FA($object, $modifiedColumns)
+	{
+		if( self::$handleObjectChanged && $object instanceof Partner &&
+			in_array(PartnerPeer::CUSTOM_DATA, $modifiedColumns) &&
+			$object->isCustomDataModified(self::TWO_FACTOR_FIELD) &&
+			$object->getUseTwoFactorAuthentication())
+		{
+			$oldCustomDataValues = $object->getCustomDataOldValues();
+			$old2FAValue = $oldCustomDataValues[''][self::TWO_FACTOR_FIELD];
+			if ($old2FAValue != $object->getUseTwoFactorAuthentication())
+			{
+				self::$handleObjectChanged = false;
+				return true;
+			}
+		}
+		return false;
+	}
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::objectChanged()
 	 */
@@ -49,28 +66,39 @@ class kAuthManager implements kObjectChangedEventConsumer
 		$adminKusers = Partner::getAdminLoginUsersList($object->getId());
 		foreach ($adminKusers as $adminKuser)
 		{
-			if ($object->getUseSso() && !$object->getUseTwoFactorAuthentication())
+			if ($object->getUseSso())
 			{
-				$job = authenticationUtils::addSsoMailJob($object, $adminKuser, kuserPeer::KALTURA_EXISTING_USER_ENABLE_SSO_EMAIL);
-				if(!$job)
-				{
-					KalturaLog::warning('Mail Job was not added');
-				}
+				self::handleSsoMail($object, $adminKuser);
 			}
 			else
 			{
-				$userLoginData = $adminKuser->getLoginData();
-				if(!$userLoginData->getSeedFor2FactorAuth())
-				{
-					authenticationUtils::generateNewSeed($userLoginData);
-				}
-				$job = authenticationUtils::addAuthMailJob($object, $adminKuser, kuserPeer::KALTURA_EXISTING_USER_ENABLE_2FA_EMAIL);
-				if(!$job)
-				{
-					KalturaLog::warning('Missing QR URL, Mail Job was not added');
-				}
+				self::handle2FAMail($object, $adminKuser);
 			}
 		}
 	}
+
+	protected static function handleSsoMail($object, $adminKuser)
+	{
+		$job = authenticationUtils::addSsoMailJob($object, $adminKuser, kuserPeer::KALTURA_EXISTING_USER_ENABLE_SSO_EMAIL);
+		if(!$job)
+		{
+			KalturaLog::warning('Mail Job was not added');
+		}
+	}
+
+	protected static function handle2FAMail($object, $adminKuser)
+	{
+		$userLoginData = $adminKuser->getLoginData();
+		if(!$userLoginData->getSeedFor2FactorAuth())
+		{
+			authenticationUtils::generateNewSeed($userLoginData);
+		}
+		$job = authenticationUtils::addAuthMailJob($object, $adminKuser, kuserPeer::KALTURA_EXISTING_USER_ENABLE_2FA_EMAIL);
+		if(!$job)
+		{
+			KalturaLog::warning('Missing QR URL, Mail Job was not added');
+		}
+	}
+
 
 }
