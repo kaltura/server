@@ -115,6 +115,10 @@ class KalturaSso extends KalturaObject implements IRelatedFilterable
 		$this->validatePropertyNotNull('redirectUrl');
 		$this->validatePropertyNotNull('applicationType');
 		$this->validatePropertyNotNull('domain');
+		if($this->partnerId === 0)
+		{
+			throw new KalturaAPIException(KalturaSsoErrors::PROPERTY_PARTNER_CANNOT_BE_0);
+		}
 		$existingSso = SsoPeer::getSso($this->applicationType, $this->partnerId, $this->domain);
 		if ($existingSso)
 		{
