@@ -184,6 +184,7 @@ class ServerNodeService extends KalturaBaseService
 
 
 		$dbServerNode->setHeartbeatTime(time());
+		$serverNodeStatus = ($serverNodeStatus == ServerNodeStatus::NOT_OPERATIONAL) ? ServerNodeStatus::ACTIVE : $serverNodeStatus;
 		$dbServerNode->setStatus($serverNodeStatus);
 		$dbServerNode->save();
 	
