@@ -668,7 +668,8 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		{
 			case PartnerAuthenticationType::PASSWORD_ONLY:
 			case PartnerAuthenticationType::SSO:
-				return array($userName, $creatorUserName, $publisherName, $partnerId, $publisherName, $publisherName, $roleName,
+				$loginLink = "https://kmc.kaltura.com/index.php/kmcng/login";
+				return array($userName, $creatorUserName, $publisherName, $loginLink, $partnerId, $publisherName, $publisherName, $roleName,
 							$publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
 			case PartnerAuthenticationType::TWO_FACTOR_AUTH:
 				$prefix = array($userName, $creatorUserName, $publisherName, $loginEmail);
