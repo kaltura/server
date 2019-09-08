@@ -2585,3 +2585,20 @@ form#frmCreateDrmProfile dd,form#frmCreateDrmProfile dt {
 	height: 24px;
 	padding: 1px;
 }
+
+form#frmCreateSsoProfile {
+	margin-left: 20px;
+}
+
+form#frmCreateSsoProfile dd,form#frmCreateSsoProfile dt {
+	float: left;
+}
+
+#sso-profile-configure-dialog dt {
+	margin: 10px 0 5px;
+}
+
+#sso-profile-configure-dialog dd input {
+	width: 333px;
+	height: 22px;
+}
