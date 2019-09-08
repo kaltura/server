@@ -13,7 +13,7 @@ class kAuthManager implements kObjectChangedEventConsumer
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
 		if( self::$handleObjectChanged && $object instanceof Partner &&
-			in_array(partnerPeer::CUSTOM_DATA, $modifiedColumns) &&
+			in_array(PartnerPeer::CUSTOM_DATA, $modifiedColumns) &&
 			$object->isCustomDataModified(self::TWO_FACTOR_FIELD) &&
 			$object->getUseTwoFactorAuthentication())
 		{
@@ -26,7 +26,7 @@ class kAuthManager implements kObjectChangedEventConsumer
 			}
 		}
 		if( self::$handleObjectChanged && $object instanceof Partner &&
-			in_array(partnerPeer::CUSTOM_DATA, $modifiedColumns) &&
+			in_array(PartnerPeer::CUSTOM_DATA, $modifiedColumns) &&
 			$object->isCustomDataModified(self::SSO_FIELD) &&
 			$object->getUseSso())
 		{
