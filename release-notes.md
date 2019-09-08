@@ -1,5 +1,15 @@
 # Orion 15.7.0 #
 
+## Adding flavorparam permission to Capture app ##
+- Issue Type: Task
+- Issue ID: LEC-1832
+
+### configuration ###
+    None
+
+### Deployment scripts ###
+    php deployment/updates/scripts/add_permissions/2019_09_04_add_flavorparam_capture_permission.php
+
 ## Add SSO ##
 - Issue Type: Task
 - Issue ID: PLAT-9838,KMCNG-2166,PLAT-10099
