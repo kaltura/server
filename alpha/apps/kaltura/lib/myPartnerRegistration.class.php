@@ -2,6 +2,8 @@
 class myPartnerRegistration
 {
 	private $partnerParentId = null;
+	const USER_ZERO_SCREEN_NAME = 'Unknown';
+	const USER_ZERO_P_USER = '0';
 
 	public function __construct( $partnerParentId = null )
 	{
@@ -259,8 +261,17 @@ class myPartnerRegistration
 		
 		$newPartner->setKmcVersion(kConf::get('new_partner_kmc_version'));
 		$newPartner->save();
-		
+		$this->addAnonymousUsersToPartner($newPartner->getId());
 		return $newPartner;
+	}
+
+	protected function addAnonymousUsersToPartner($partnerId)
+	{
+		KalturaLog::log("Adding anonymous users to partner {$partnerId}");
+		$user = kuserPeer::createKuserForPartner($partnerId, self::USER_ZERO_P_USER);
+		$user->setScreenName(self::USER_ZERO_SCREEN_NAME);
+		$user->save();
+		kuserPeer::createKuserForPartner($partnerId, '');
 	}
 
 	private function createNewSubPartner($newPartner)
@@ -345,7 +356,7 @@ class myPartnerRegistration
 		if ($existingLoginData && !$ignorePassword)
 		{
 			// if a another user already existing with the same adminEmail, new account will be created only if the right password was given
-			$existingPartner = partnerPeer::retrieveByPK($existingLoginData->getConfigPartnerId());
+			$existingPartner = PartnerPeer::retrieveByPK($existingLoginData->getConfigPartnerId());
 			if (!$password)
 			{
 				$this->addMarketoCampaignId($existingPartner, myPartnerUtils::MARKETO_MISSING_PASSWORD, $partner);

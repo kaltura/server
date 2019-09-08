@@ -233,7 +233,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 			return new KalturaCategoryEntryCondition();
 		
 		if ($baseClass == 'kRuleAction' && $enumValue == ReachPlugin::getRuleActionTypeCoreValue(ReachRuleActionType::ADD_ENTRY_VENDOR_TASK))
-			return new kAddEntryVendroTaskAction();
+			return new kAddEntryVendorTaskAction();
 		
 		if ($baseClass == 'KalturaRuleAction' && $enumValue ==  ReachPlugin::getRuleActionTypeCoreValue(ReachRuleActionType::ADD_ENTRY_VENDOR_TASK))
 			return new KalturaAddEntryVendorTaskAction();

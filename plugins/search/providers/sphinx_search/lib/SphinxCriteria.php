@@ -99,6 +99,18 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 */
 	public $forcedOrderIds;
 	
+	protected static $forceSkipSphinx = false;
+	
+	public static function enableForceSkipSphinx()
+	{
+		self::$forceSkipSphinx = true;
+	}
+	
+	public static function disableForceSkipSphinx()
+	{
+		self::$forceSkipSphinx = false;
+	}
+	
 	protected function applyIds(array $ids)
 	{
 		if(!count($this->ids))
@@ -973,6 +985,11 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	
 	private function shouldSkipSphinx()
 	{
+		if(self::$forceSkipSphinx)
+		{
+			return true;
+		}
+		
 		$objectClass = $this->getIndexObjectName();
 		$skipFields = $objectClass::getIndexSkipFieldsList();
 		
