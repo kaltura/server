@@ -63,7 +63,7 @@ class authenticationUtils
 	{
 		$partnerId = $partner->getId();
 		$publisherName = $partner->getName();
-		$loginLink = 'https://kmc.kaltura.com/index.php/kmcng/login';
+		$loginLink = kConf::get('login_link','sso');
 		$bodyParams = array($kuser->getFullName(), $partnerId, $loginLink, $kuser->getEmail(), $partnerId, $publisherName, $publisherName, $kuser->getUserRoleNames(), $publisherName, $kuser->getPuserId());
 
 		$job = kJobsManager::addMailJob(

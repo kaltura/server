@@ -1,5 +1,12 @@
 # Orion 15.7.0 #
 
+## Sso emails ##
+- Issue Type: Task
+- Issue ID: PLAT-9973
+
+### configuration ###
+To use the sso emails you should set the sso login link in sso.ini
+
 ## Adding flavorparam permission to Capture app ##
 - Issue Type: Task
 - Issue ID: LEC-1832
