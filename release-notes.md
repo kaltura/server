@@ -1,3 +1,28 @@
+# Orion 15.7.0 #
+
+## Adding flavorparam permission to Capture app ##
+- Issue Type: Task
+- Issue ID: LEC-1832
+
+### configuration ###
+    None
+
+### Deployment scripts ###
+    php deployment/updates/scripts/add_permissions/2019_09_04_add_flavorparam_capture_permission.php
+
+## Add SSO ##
+- Issue Type: Task
+- Issue ID: PLAT-9838,KMCNG-2166,PLAT-10099
+
+### configuration ###
+Add Sso plugin in: configurations/plugins.ini
+
+### Deployment scripts ###
+Run mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_09_01_create_sso_table.sql
+Run install plugins:  php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+php deployment/updates/scripts/add_permissions/2019_09_04_add_sso_role_and_permissions.php
+php deployment/updates/scripts/add_permissions/2019_09_04_sso_service.php
+
 # Orion 15.6.0 #
 
 ## Add ESearch read only permission ##

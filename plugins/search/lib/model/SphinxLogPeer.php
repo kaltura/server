@@ -70,7 +70,6 @@ class SphinxLogPeer extends BaseSphinxLogPeer {
 
 		$types = array($type);
 		$criteria->add(SphinxLogPeer::TYPE, $types, Criteria::IN);
-		$criteria->add(SphinxLogPeer::CREATED_AT, time() -1, Criteria::LESS_EQUAL);
 		$criteria->addAscendingOrderByColumn(SphinxLogPeer::ID);
 		$criteria->setLimit($limit);
 
