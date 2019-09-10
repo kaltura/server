@@ -1,7 +1,7 @@
 <?php
 if($argc < 3)
 {
-	die("Usage $argv[0]  <OUTPUT_PATH> <DC> <DROP_FOLDER_TYPE>\r\n");
+	die("Usage $argv[0]  <OUTPUT_PATH> <DC> <DROP_FOLDER_TYPE>\r\nFor all types leave DROP_FOLDER_TYPE empty for specific types: 1=local 2=ftp 3=scp 4=sftp 5=s3 \r\n");
 }
 
 require_once(dirname(__FILE__) . '/../bootstrap.php');
