@@ -667,10 +667,6 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		switch($authType)
 		{
 			case PartnerAuthenticationType::PASSWORD_ONLY:
-			case PartnerAuthenticationType::SSO:
-				$loginLink = kConf::get('login_link','sso');
-				return array($userName, $creatorUserName, $publisherName, $loginLink, $partnerId, $publisherName, $publisherName, $roleName,
-							$publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
 			case PartnerAuthenticationType::TWO_FACTOR_AUTH:
 				$prefix = array($userName, $creatorUserName, $publisherName, $loginEmail);
 				$suffix = array($partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
@@ -682,6 +678,10 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 				{
 					return array_merge($prefix, array($resetPasswordLink), $suffix);
 				}
+			case PartnerAuthenticationType::SSO:
+				$loginLink = kConf::get('login_link','sso');
+				return array($userName, $creatorUserName, $publisherName, $loginLink, $partnerId, $publisherName, $publisherName, $roleName,
+					$publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
 		}
 
 		return array();
