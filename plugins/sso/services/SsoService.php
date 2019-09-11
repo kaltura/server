@@ -112,13 +112,13 @@ class SsoService extends KalturaBaseService
 	 * Login with SSO, getting redirect url according to application type and partner Id
 	 * or according to application type and domain
 	 * @action login
-	 * @param string $applicationType
 	 * @param string $userId
+	 * @param string $applicationType
 	 * @param int $partnerId
 	 * @return string $redirectUrl
 	 * @throws KalturaSsoErrors::SSO_NOT_FOUND
 	 */
-	public function loginAction($applicationType, $userId = null, $partnerId = null)
+	public function loginAction($userId = null, $applicationType , $partnerId = null)
 	{
 		if (!$userId && $partnerId)
 		{
