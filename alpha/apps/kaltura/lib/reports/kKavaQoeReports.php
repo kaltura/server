@@ -3,11 +3,6 @@
 class kKavaQoeReports extends kKavaReportsMgr
 {
 
-	//base reports metrics
-	const EXPERIENCE_BASE = 'experience_base';
-	const ENGAGEMENT_BASE = 'engagement_base';
-	const STREAM_QUALITY_BASE = 'stream_quality_base';
-
 	//base report defs
 	const PLATFORMS_BASE = 'platforms_base';
 	const COUNTRY_BASE = 'country_base';
@@ -21,60 +16,6 @@ class kKavaQoeReports extends kKavaReportsMgr
 	const ENTRY_BASE = 'entry_base';
 	const ISP_BASE = 'isp_base';
 
-	protected static $reports_metrics_def_base = array(
-
-		self::EXPERIENCE_BASE => array(
-			self::REPORT_METRICS => array(
-				self::METRIC_AVG_JOIN_TIME,
-				self::EVENT_TYPE_BUFFER_START,
-				self::METRIC_VIEW_BUFFER_TIME_RATIO,
-				self::METRIC_AVG_VIEW_BITRATE,
-			),
-			self::REPORT_GRAPH_METRICS => array(
-				self::METRIC_AVG_JOIN_TIME,
-				self::EVENT_TYPE_BUFFER_START,
-				self::METRIC_VIEW_BUFFER_TIME_RATIO,
-				self::METRIC_AVG_VIEW_BITRATE,
-			)
-		),
-
-		self::ENGAGEMENT_BASE => array(
-			self::REPORT_METRICS => array(
-				self::METRIC_UNIQUE_SESSIONS,
-				self::METRIC_AVG_VIEW_PLAY_TIME_SEC
-			),
-			self::REPORT_GRAPH_METRICS => array(
-				self::METRIC_UNIQUE_SESSIONS,
-				self::METRIC_AVG_VIEW_PLAY_TIME_SEC
-			)
-		),
-
-		self::STREAM_QUALITY_BASE => array(
-			self::REPORT_METRICS => array(
-				self::EVENT_TYPE_FLAVOR_SWITCH,
-				self::METRIC_AVG_VIEW_BITRATE,
-				self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
-			),
-			self::REPORT_GRAPH_METRICS => array(
-				self::EVENT_TYPE_FLAVOR_SWITCH,
-				self::METRIC_AVG_VIEW_BITRATE,
-			),
-			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addFlavorParamColumn',
-			self::REPORT_TOTAL_FINALIZE_FUNC => 'self::addFlavorParamTotalColumn',
-			self::REPORT_TABLE_MAP => array(
-				'flavor_switch_count' => self::EVENT_TYPE_FLAVOR_SWITCH,
-				'avg_view_bitrate' => self::METRIC_AVG_VIEW_BITRATE,
-				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
-			),
-			self::REPORT_TOTAL_MAP => array(
-				'flavor_switch_count' => self::EVENT_TYPE_FLAVOR_SWITCH,
-				'avg_view_bitrate' => self::METRIC_AVG_VIEW_BITRATE,
-				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
-			),
-		),
-
-	);
-
 	protected static $reports_def_base = array(
 
 		self::PLATFORMS_BASE => array(
@@ -86,10 +27,16 @@ class kKavaQoeReports extends kKavaReportsMgr
 
 		self::COUNTRY_BASE => array(
 			self::REPORT_DIMENSION_MAP => array(
+				'object_id' => self::DIMENSION_LOCATION_COUNTRY,
 				'country' => self::DIMENSION_LOCATION_COUNTRY,
 				'coordinates' => self::DIMENSION_LOCATION_COUNTRY,
 			),
 			self::REPORT_ENRICH_DEF => array(
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'object_id',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toShortName',
+				),
 				array(
 					self::REPORT_ENRICH_INPUT =>  array('country'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
@@ -163,6 +110,17 @@ class kKavaQoeReports extends kKavaReportsMgr
 		self::ENTRY_BASE => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'entry_id' => self::DIMENSION_ENTRY_ID,
+				'entry_name' => self::DIMENSION_ENTRY_ID,
+			),
+			self::REPORT_ENRICH_DEF => array(
+				array(
+					self::REPORT_ENRICH_OUTPUT => array('entry_name'),
+					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'peer' => 'entryPeer',
+						'columns' => array('NAME'),
+					)
+				),
 			),
 		),
 
@@ -187,237 +145,288 @@ class kKavaQoeReports extends kKavaReportsMgr
 		),
 
 		//EXPERIENCE
+
+		ReportType::QOE_EXPERIENCE => array(
+			self::REPORT_METRICS => array(
+				self::METRIC_AVG_JOIN_TIME,
+				self::EVENT_TYPE_BUFFER_START,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
+				self::METRIC_AVG_VIEW_BITRATE,
+			),
+			self::REPORT_GRAPH_METRICS => array(
+				self::METRIC_AVG_JOIN_TIME,
+				self::EVENT_TYPE_BUFFER_START,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
+				self::METRIC_AVG_VIEW_BITRATE,
+			)
+		),
+
 		ReportType::QOE_EXPERIENCE_PLATFORMS => array(
 			self::REPORT_BASE_DEF => array(
-				self::EXPERIENCE_BASE,
+				ReportType::QOE_EXPERIENCE,
 				self::PLATFORMS_BASE,
 			),
 		),
 		
 		ReportType::QOE_EXPERIENCE_COUNTRY => array(
 			self::REPORT_BASE_DEF => array(
-				self::EXPERIENCE_BASE,
+				ReportType::QOE_EXPERIENCE,
 				self::COUNTRY_BASE,
 			),
 		),
 
 		ReportType::QOE_EXPERIENCE_REGION => array(
 			self::REPORT_BASE_DEF => array(
-				self::EXPERIENCE_BASE,
+				ReportType::QOE_EXPERIENCE,
 				self::REGION_BASE,
 			),
 		),
 
 		ReportType::QOE_EXPERIENCE_CITY => array(
 			self::REPORT_BASE_DEF => array(
-				self::EXPERIENCE_BASE,
+				ReportType::QOE_EXPERIENCE,
 				self::CITY_BASE
 			),
 		),
 
 		ReportType::QOE_EXPERIENCE_BROWSERS_FAMILIES => array(
 			self::REPORT_BASE_DEF => array(
-				self::EXPERIENCE_BASE,
+				ReportType::QOE_EXPERIENCE,
 				self::BROWSERS_FAMILIES_BASE,
 			)
 		),
 
 		ReportType::QOE_EXPERIENCE_BROWSERS => array(
 			self::REPORT_BASE_DEF => array(
-				self::EXPERIENCE_BASE,
+				ReportType::QOE_EXPERIENCE,
 				self::BROWSERS_BASE,
 			)
 		),
 
 		ReportType::QOE_EXPERIENCE_OPERATING_SYSTEM_FAMILIES => array(
 			self::REPORT_BASE_DEF => array(
-				self::EXPERIENCE_BASE,
+				ReportType::QOE_EXPERIENCE,
 				self::OPERATING_SYSTEM_FAMILIES_BASE,
 			)
 		),
 
 		ReportType::QOE_EXPERIENCE_OPERATING_SYSTEM => array(
 			self::REPORT_BASE_DEF => array(
-				self::EXPERIENCE_BASE,
+				ReportType::QOE_EXPERIENCE,
 				self::OPERATING_SYSTEM_FAMILIES_BASE,
 			)
 		),
 
 		ReportType::QOE_EXPERIENCE_PLAYER_VERSION => array(
 			self::REPORT_BASE_DEF => array(
-				self::EXPERIENCE_BASE,
+				ReportType::QOE_EXPERIENCE,
 				self::PLAYER_VERSION_BASE,
 			)
 		),
 
 		ReportType::QOE_EXPERIENCE_ENTRY => array(
 			self::REPORT_BASE_DEF => array(
-				self::EXPERIENCE_BASE,
+				ReportType::QOE_EXPERIENCE,
 				self::ENTRY_BASE,
 			)
 		),
 
 		ReportType::QOE_EXPERIENCE_ISP => array(
 			self::REPORT_BASE_DEF => array(
-				self::EXPERIENCE_BASE,
+				ReportType::QOE_EXPERIENCE,
 				self::ISP_BASE,
 			)
 		),
 
 		//ENGAGEMENT
 
+		ReportType::QOE_ENGAGEMENT => array(
+			self::REPORT_METRICS => array(
+				self::METRIC_UNIQUE_SESSIONS,
+				self::METRIC_AVG_VIEW_PLAY_TIME_SEC
+			),
+			self::REPORT_GRAPH_METRICS => array(
+				self::METRIC_UNIQUE_SESSIONS,
+				self::METRIC_AVG_VIEW_PLAY_TIME_SEC
+			)
+		),
+
 		ReportType::QOE_ENGAGEMENT_PLATFORMS => array(
 			self::REPORT_BASE_DEF => array(
-				self::ENGAGEMENT_BASE,
+				ReportType::QOE_ENGAGEMENT,
 				self::PLATFORMS_BASE,
 			),
 		),
 
 		ReportType::QOE_ENGAGEMENT_COUNTRY => array(
 			self::REPORT_BASE_DEF => array(
-				self::ENGAGEMENT_BASE,
+				ReportType::QOE_ENGAGEMENT,
 				self::COUNTRY_BASE,
 			),
 		),
 
 		ReportType::QOE_ENGAGEMENT_REGION => array(
 			self::REPORT_BASE_DEF => array(
-				self::ENGAGEMENT_BASE,
+				ReportType::QOE_ENGAGEMENT,
 				self::REGION_BASE,
 			),
 		),
 
 		ReportType::QOE_ENGAGEMENT_CITY => array(
 			self::REPORT_BASE_DEF => array(
-				self::ENGAGEMENT_BASE,
+				ReportType::QOE_ENGAGEMENT,
 				self::CITY_BASE
 			),
 		),
 
 		ReportType::QOE_ENGAGEMENT_BROWSERS_FAMILIES => array(
 			self::REPORT_BASE_DEF => array(
-				self::ENGAGEMENT_BASE,
+				ReportType::QOE_ENGAGEMENT,
 				self::BROWSERS_FAMILIES_BASE,
 			)
 		),
 
 		ReportType::QOE_ENGAGEMENT_BROWSERS => array(
 			self::REPORT_BASE_DEF => array(
-				self::ENGAGEMENT_BASE,
+				ReportType::QOE_ENGAGEMENT,
 				self::BROWSERS_BASE,
 			)
 		),
 
 		ReportType::QOE_ENGAGEMENT_OPERATING_SYSTEM_FAMILIES => array(
 			self::REPORT_BASE_DEF => array(
-				self::ENGAGEMENT_BASE,
+				ReportType::QOE_ENGAGEMENT,
 				self::OPERATING_SYSTEM_FAMILIES_BASE,
 			)
 		),
 
 		ReportType::QOE_ENGAGEMENT_OPERATING_SYSTEM => array(
 			self::REPORT_BASE_DEF => array(
-				self::ENGAGEMENT_BASE,
+				ReportType::QOE_ENGAGEMENT,
 				self::OPERATING_SYSTEM_FAMILIES_BASE,
 			)
 		),
 
 		ReportType::QOE_ENGAGEMENT_PLAYER_VERSION => array(
 			self::REPORT_BASE_DEF => array(
-				self::ENGAGEMENT_BASE,
+				ReportType::QOE_ENGAGEMENT,
 				self::PLAYER_VERSION_BASE,
 			)
 		),
 
 		ReportType::QOE_ENGAGEMENT_ENTRY => array(
 			self::REPORT_BASE_DEF => array(
-				self::ENGAGEMENT_BASE,
+				ReportType::QOE_ENGAGEMENT,
 				self::ENTRY_BASE,
 			)
 		),
 
 		ReportType::QOE_ENGAGEMENT_ISP => array(
 			self::REPORT_BASE_DEF => array(
-				self::ENGAGEMENT_BASE,
+				ReportType::QOE_ENGAGEMENT,
 				self::ISP_BASE,
 			)
 		),
 
 		//stream quality
 
+		ReportType::QOE_STREAM_QUALITY => array(
+			self::REPORT_METRICS => array(
+				self::EVENT_TYPE_FLAVOR_SWITCH,
+				self::METRIC_AVG_VIEW_BITRATE,
+				self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
+			),
+			self::REPORT_GRAPH_METRICS => array(
+				self::EVENT_TYPE_FLAVOR_SWITCH,
+				self::METRIC_AVG_VIEW_BITRATE,
+			),
+			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addFlavorParamColumn',
+			self::REPORT_TOTAL_FINALIZE_FUNC => 'self::addFlavorParamTotalColumn',
+			self::REPORT_TABLE_MAP => array(
+				'flavor_switch_count' => self::EVENT_TYPE_FLAVOR_SWITCH,
+				'avg_view_bitrate' => self::METRIC_AVG_VIEW_BITRATE,
+				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
+			),
+			self::REPORT_TOTAL_MAP => array(
+				'flavor_switch_count' => self::EVENT_TYPE_FLAVOR_SWITCH,
+				'avg_view_bitrate' => self::METRIC_AVG_VIEW_BITRATE,
+				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
+			),
+		),
+
 		ReportType::QOE_STREAM_QUALITY_PLATFORMS => array(
 			self::REPORT_BASE_DEF => array(
-				self::STREAM_QUALITY_BASE,
+				ReportType::QOE_STREAM_QUALITY,
 				self::PLATFORMS_BASE,
 			),
 		),
 
 		ReportType::QOE_STREAM_QUALITY_COUNTRY => array(
 			self::REPORT_BASE_DEF => array(
-				self::STREAM_QUALITY_BASE,
+				ReportType::QOE_STREAM_QUALITY,
 				self::COUNTRY_BASE,
 			),
 		),
 
 		ReportType::QOE_STREAM_QUALITY_REGION => array(
 			self::REPORT_BASE_DEF => array(
-				self::STREAM_QUALITY_BASE,
+				ReportType::QOE_STREAM_QUALITY,
 				self::REGION_BASE,
 			),
 		),
 
 		ReportType::QOE_STREAM_QUALITY_CITY => array(
 			self::REPORT_BASE_DEF => array(
-				self::STREAM_QUALITY_BASE,
+				ReportType::QOE_STREAM_QUALITY,
 				self::CITY_BASE
 			),
 		),
 
 		ReportType::QOE_STREAM_QUALITY_BROWSERS_FAMILIES => array(
 			self::REPORT_BASE_DEF => array(
-				self::STREAM_QUALITY_BASE,
+				ReportType::QOE_STREAM_QUALITY,
 				self::BROWSERS_FAMILIES_BASE,
 			)
 		),
 
 		ReportType::QOE_STREAM_QUALITY_BROWSERS => array(
 			self::REPORT_BASE_DEF => array(
-				self::STREAM_QUALITY_BASE,
+				ReportType::QOE_STREAM_QUALITY,
 				self::BROWSERS_BASE,
 			)
 		),
 
 		ReportType::QOE_STREAM_QUALITY_OPERATING_SYSTEM_FAMILIES => array(
 			self::REPORT_BASE_DEF => array(
-				self::STREAM_QUALITY_BASE,
+				ReportType::QOE_STREAM_QUALITY,
 				self::OPERATING_SYSTEM_FAMILIES_BASE,
 			)
 		),
 
 		ReportType::QOE_STREAM_QUALITY_OPERATING_SYSTEM => array(
 			self::REPORT_BASE_DEF => array(
-				self::STREAM_QUALITY_BASE,
+				ReportType::QOE_STREAM_QUALITY,
 				self::OPERATING_SYSTEM_FAMILIES_BASE,
 			)
 		),
 
 		ReportType::QOE_STREAM_QUALITY_PLAYER_VERSION => array(
 			self::REPORT_BASE_DEF => array(
-				self::STREAM_QUALITY_BASE,
+				ReportType::QOE_STREAM_QUALITY,
 				self::PLAYER_VERSION_BASE,
 			)
 		),
 
 		ReportType::QOE_STREAM_QUALITY_ENTRY => array(
 			self::REPORT_BASE_DEF => array(
-				self::STREAM_QUALITY_BASE,
+				ReportType::QOE_STREAM_QUALITY,
 				self::ENTRY_BASE,
 			)
 		),
 
 		ReportType::QOE_STREAM_QUALITY_ISP => array(
 			self::REPORT_BASE_DEF => array(
-				self::STREAM_QUALITY_BASE,
+				ReportType::QOE_STREAM_QUALITY,
 				self::ISP_BASE,
 			)
 		),
@@ -454,9 +463,9 @@ class kKavaQoeReports extends kKavaReportsMgr
 				{
 					$report_def = array_merge(self::$reports_def_base[$base_def], $report_def);
 				}
-				elseif (isset(self::$reports_metrics_def_base))
+				elseif (isset(self::$reports_def[$base_def]))
 				{
-					$report_def = array_merge(self::$reports_metrics_def_base[$base_def], $report_def);
+					$report_def = array_merge(self::$reports_def[$base_def], $report_def);
 				}
 			}
 		}

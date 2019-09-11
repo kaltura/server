@@ -987,13 +987,6 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_JOIN_TIME_SUM,
 				self::METRIC_JOIN_TIME_COUNT));
 
-		self::$metrics_def[self::METRIC_AVG_SESSION_ERROR_RATE] = array(
-			self::DRUID_AGGR => array(self::METRIC_ERROR_SESSION_COUNT, self::METRIC_UNIQUE_SESSIONS),
-			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
-				self::METRIC_AVG_SESSION_ERROR_RATE,
-				self::METRIC_ERROR_SESSION_COUNT,
-				self::METRIC_UNIQUE_SESSIONS));
-
 		// complex metrics
 		self::$metrics_def[self::METRIC_AVG_PLAY_TIME] = array(
 			self::DRUID_AGGR => array(self::METRIC_QUARTILE_PLAY_TIME_SEC, self::EVENT_TYPE_PLAY),
@@ -1029,6 +1022,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_AVG_VIEW_PLAY_TIME_SEC, '/', array(
 				self::getConstantFactorFieldAccessPostAggr('subPlayTimeSec', self::EVENT_TYPE_VIEW, '10'),
 				self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY))));
+
+		self::$metrics_def[self::METRIC_AVG_SESSION_ERROR_RATE] = array(
+			self::DRUID_AGGR => array(self::METRIC_ERROR_SESSION_COUNT, self::METRIC_UNIQUE_SESSIONS),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_AVG_SESSION_ERROR_RATE, '/', array(
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_ERROR_SESSION_COUNT, self::METRIC_ERROR_SESSION_COUNT),
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_SESSIONS, self::METRIC_UNIQUE_SESSIONS))));
 
 		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 	}
@@ -1846,6 +1846,7 @@ class kKavaReportsMgr extends kKavaBase
 			'media_types' => array(self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE),
 			'source_types' => array(self::DRUID_DIMENSION => self::DIMENSION_SOURCE_TYPE),
 			'entries_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID),
+			'playback_types' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
