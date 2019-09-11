@@ -14,7 +14,7 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 	{
 		$recipients = array();
 		$pager = new KalturaFilterPager();
-		$pager->pageSize = 100;
+		$pager->pageSize = 150;
 		$pager->pageIndex = 1;
 		$userPager = new KalturaFilterPager();
 		$userPager->pageSize = $pager->pageSize;
@@ -43,7 +43,7 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 			}
 			$pager->pageIndex ++;
 		}
-		while (($pager->pageSize == count($categoryUserList->objects)) and ($pager->pageIndex <= $maxPagesToScan));
+		while ( $pager->pageIndex <= $maxPagesToScan );
 
 		return $recipients;
 	}
