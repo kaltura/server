@@ -56,6 +56,7 @@ function mergeNewDuplicatedUsers($lastRunFilePath)
 		KalturaLog::debug("Could not extract ids range for query");
 		return;
 	}
+	$currentKuserId = $startId;
 
 	$newPusers = getNewDuplicatedUsersCreated($startId, $lastId, $currentTime);
 
@@ -75,6 +76,7 @@ function mergeNewDuplicatedUsers($lastRunFilePath)
 
 			if(!$currentPartnerId || !$currentPuserId)
 			{
+				$currentKuserId+=10;
 				continue;
 			}
 
@@ -82,6 +84,7 @@ function mergeNewDuplicatedUsers($lastRunFilePath)
 			if (count($kusersArray) < 2)
 			{
 				KalturaLog::debug('couldn\'t find duplicated kusers with puser id ['.$currentPuserId.'] partner id ['.$currentPartnerId.']');
+				$currentKuserId+=10;
 				continue;
 			}
 
@@ -102,6 +105,11 @@ function mergeNewDuplicatedUsers($lastRunFilePath)
 		if(isset($currentKuserId))
 		{
 			$newPusers = getNewDuplicatedUsersCreated($currentKuserId, $lastId, $currentTime);
+		}
+		else
+		{
+			KalturaLog::debug('currentKuserId is not set ');
+			break;
 		}
 	}
 
