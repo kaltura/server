@@ -133,7 +133,7 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$userFilter = $this->toObject();
-		
+
 		$c = KalturaCriteria::create(kuserPeer::OM_CLASS);
 		$userFilter->attachToCriteria($c);
 		

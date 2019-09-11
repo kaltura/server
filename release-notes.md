@@ -1,5 +1,18 @@
 # Orion 15.7.0 #
 
+## Add first+last name to Q&A response profile  ##
+- Issue Type: Feature
+- Issue ID: WEBC-1429
+
+### Configuration ###
+    First replace all tokens from the XML files below and remove ".template" from the file name:
+    /opt/kaltura/app/deployment/updates/scripts/xml/2019_06_26_updateQandAResponseProfile_addUserData.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2019_06_26_updateQandAResponseProfile_addUserData.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_09_11_add_webcasting_role_permission_to_user_list.php
+
+
 ## Sso emails ##
 - Issue Type: Task
 - Issue ID: PLAT-9973
@@ -29,6 +42,7 @@ Run mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/d
 Run install plugins:  php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 php deployment/updates/scripts/add_permissions/2019_09_04_add_sso_role_and_permissions.php
 php deployment/updates/scripts/add_permissions/2019_09_04_sso_service.php
+
 
 # Orion 15.6.0 #
 

@@ -15,8 +15,18 @@
     </session>
 
 	<multirequest>
-	
-		<request service="responseProfile" action="add" partnerId="0">
+
+		<request service="responseProfile" action="listAction" partnerId="0">
+			<filter objectType="KalturaResponseProfileFilter">
+				<systemNameEqual>QandA</systemNameEqual>
+			</filter>
+			<pager objectType="KalturaFilterPager">
+				<pageSize>1</pageSize>
+			</pager>
+		</request>
+
+		<request service="responseProfile" action="update" partnerId="0">
+			<id>{1:result:objects:0:id}</id>
 			<responseProfile objectType="KalturaResponseProfile">
 				<type>1</type>
 				<name>QandA</name>
@@ -49,6 +59,9 @@
 								<filterProperty>idEqual</filterProperty>
 							</item>
 						</mappings>
+						<pager objectType="KalturaFilterPager">
+							<pageSize>1</pageSize>
+						</pager>
 					</item>
 				</relatedProfiles>
 			</responseProfile>
