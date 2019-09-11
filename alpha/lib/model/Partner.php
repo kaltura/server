@@ -2123,12 +2123,12 @@ class Partner extends BasePartner
 
 	public function getIgnoreSynonymEsearch()
 	{
-		return $this->getFromCustomData("ignoreSynonymEsearch", null, false);
+		return $this->getFromCustomData('ignoreSynonymEsearch', null, false);
 	}
 
 	public function setIgnoreSynonymEsearch($v)
 	{
-		$this->putInCustomData("ignoreSynonymEsearch", $v);
+		$this->putInCustomData('ignoreSynonymEsearch', $v);
 	}
 
 }
