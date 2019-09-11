@@ -71,7 +71,6 @@
 						<type>1</type>
 						<fields>id,screenName,email,firstName,lastName</fields>
 						<filter objectType="KalturaUserFilter">
-							<idNotEmpty>true</idNotEmpty>
 						</filter>
 						<mappings objectType="array">
 							<item objectType="KalturaResponseProfileMapping">

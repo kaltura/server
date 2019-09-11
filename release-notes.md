@@ -1,3 +1,18 @@
+# Orion 15.7.0 #
+
+## Add first+last name to Q&A response profile  ##
+- Issue Type: Feature
+- Issue ID: WEBC-1429
+
+### Configuration ###
+    First replace all tokens from the XML files below and remove ".template" from the file name:
+    /opt/kaltura/app/deployment/updates/scripts/xml/2019_06_26_updateQandAResponseProfile_addUserData.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2019_06_26_updateQandAResponseProfile_addUserData.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_09_11_add_webcasting_role_permission_to_user_list.php
+
+
 # Orion 15.6.0 #
 
 ## Add ESearch read only permission ##
@@ -23,18 +38,6 @@ php deployment/updates/scripts/add_permissions/2019_08_20_update_esearch_permiss
     moduls.multiPublishersAnalytics.label = Multi Account Analytics Filter
     moduls.multiPublishersAnalytics.permissionName = FEATURE_MULTI_ACCOUNT_ANALYTICS
     moduls.multiPublishersAnalytics.group = GROUP_ENABLE_DISABLE_FEATURES
-
-## Add first+last name to Q&A response profile  ##
-- Issue Type: Feature
-- Issue ID: WEBC-1429
-
-### Configuration ###
-    First replace all tokens from the XML files below and remove ".template" from the file name:
-    /opt/kaltura/app/deployment/updates/scripts/xml/2019_06_26_updateQandAResponseProfile_addUserData.template.xml
-		
-#### Deployment Scripts ####	
-    php /opt/kaltura/app/deployment/updates/scripts/2019_06_26_updateQandAResponseProfile_addUserData.php
-
 
 # Orion 15.5.0 #
 
