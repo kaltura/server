@@ -28,7 +28,7 @@ class KalturaPlayableEntry extends KalturaBaseEntry
 	 *
 	 * @var time
 	 * @readonly
-	 * @filter gte,lte,order
+	 * @filter gte,lte,lteornull,order
 	 */
 	public $lastPlayedAt;
 	
