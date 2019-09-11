@@ -31,7 +31,7 @@ class kCompositeAction extends kImagickAction
 	{
 		$this->x = $this->getIntActionParameter(kThumbnailParameterName::X, 0);
 		$this->y = $this->getIntActionParameter(kThumbnailParameterName::Y, 0);
-		$this->compositeType = $this->getIntActionParameter(kThumbnailParameterName::COMPOSITE_TYPE, imagick::COMPOSITE_DEFAULT);
+		$this->compositeType = $this->getIntActionParameter(kThumbnailParameterName::COMPOSITE_TYPE, Imagick::COMPOSITE_DEFAULT);
 		$this->channel = $this->getIntActionParameter(kThumbnailParameterName::CHANNEL, Imagick::CHANNEL_ALL);
 		$this->compositeObject = $this->getActionParameter(kThumbnailParameterName::COMPOSITE_OBJECT);
 		$this->opacity = $this->getIntActionParameter(kThumbnailParameterName::OPACITY);

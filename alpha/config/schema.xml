@@ -2187,4 +2187,22 @@
 			<index-column name="id" />
 		</index>
 	</table>
+	<table skipSql="false" abstract="false" name="sso">
+		<column primaryKey="true"  required="true"  lazyLoad="false" name="id" type="integer" autoIncrement="true" />
+		<column primaryKey="false" required="true"  lazyLoad="false" name="application_type" type="varchar" size="64" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="partner_id" type="integer" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="domain" type="varchar" size="64" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="status" type="tinyint" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="updated_at" type="timestamp" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+		<index name="partner_id_status_index">
+			<index-column name="partner_id" />
+			<index-column name="status" />
+		</index>
+		<index name="domain_status_index">
+			<index-column name="domain" />
+			<index-column name="status" />
+		</index>
+	</table>
 </database>

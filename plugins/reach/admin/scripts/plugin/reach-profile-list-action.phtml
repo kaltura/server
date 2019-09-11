@@ -451,7 +451,7 @@
 	function buildDictionaryParams(paramName, index ) {
 		var param = {};
 		var isValid = true;
-		jQuery('#' + paramName + index).find('input,select').each(function (idx) {
+		jQuery('#' + paramName + index).find('input,select,textarea').each(function (idx) {
 			var type = $(this).attr("type");
 			var name = $(this).attr("name");
 			var val = $(this).val();

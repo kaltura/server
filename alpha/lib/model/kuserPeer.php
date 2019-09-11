@@ -14,6 +14,8 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	const KALTURA_EXISTING_USER_ENABLE_2FA_EMAIL = 140;
 	const KALTURA_NEW_USER_2FA_EMAIL = 141;
 	const KALTURA_NEW_EXISTING_USER_2FA_EMAIL = 142;
+	const KALTURA_EXISTING_USER_ENABLE_SSO_EMAIL = 143;
+	const KALTURA_NEW_USER_OR_EXISTING_USER_SSO_EMAIL = 144;
 	const KALTURA_NEW_USER_EMAIL_TO_ADMINS = 122;
 	const KALTURA_NEW_USER_ADMIN_CONSOLE_EMAIL = 123;
 	const KALTURA_NEW_EXISTING_USER_ADMIN_CONSOLE_EMAIL = 124;
@@ -642,11 +644,11 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 
 	public static function getUserMailType($authType, $existingUser)
 	{
-		$existingUserMailMap = array(PartnerAuthenticationType::SSO => self::KALTURA_NEW_EXISTING_USER_EMAIL,
+		$existingUserMailMap = array(PartnerAuthenticationType::SSO => self::KALTURA_NEW_USER_OR_EXISTING_USER_SSO_EMAIL,
 			PartnerAuthenticationType::TWO_FACTOR_AUTH => self::KALTURA_NEW_EXISTING_USER_2FA_EMAIL,
 			PartnerAuthenticationType::PASSWORD_ONLY => self::KALTURA_NEW_EXISTING_USER_EMAIL);
 
-		$newUserMailMap = array(PartnerAuthenticationType::SSO => self::KALTURA_NEW_USER_EMAIL,
+		$newUserMailMap = array(PartnerAuthenticationType::SSO => self::KALTURA_NEW_USER_OR_EXISTING_USER_SSO_EMAIL,
 			PartnerAuthenticationType::TWO_FACTOR_AUTH => self::KALTURA_NEW_USER_2FA_EMAIL,
 			PartnerAuthenticationType::PASSWORD_ONLY => self::KALTURA_NEW_USER_EMAIL);
 
@@ -666,6 +668,9 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		{
 			case PartnerAuthenticationType::PASSWORD_ONLY:
 			case PartnerAuthenticationType::SSO:
+				$loginLink = kConf::get('login_link','sso');
+				return array($userName, $creatorUserName, $publisherName, $loginLink, $partnerId, $publisherName, $publisherName, $roleName,
+							$publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
 			case PartnerAuthenticationType::TWO_FACTOR_AUTH:
 				$prefix = array($userName, $creatorUserName, $publisherName, $loginEmail);
 				$suffix = array($partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);

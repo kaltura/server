@@ -13,7 +13,7 @@ class ServerNodeService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 		
 		$partnerId = $this->getPartnerId();
-		if(!$this->getPartner()->getEnabledService(PermissionName::FEATURE_SERVER_NODE) && $partnerId != PARTNER::BATCH_PARTNER_ID)
+		if(!$this->getPartner()->getEnabledService(PermissionName::FEATURE_SERVER_NODE) && $partnerId != Partner::BATCH_PARTNER_ID)
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
 			
 		$this->applyPartnerFilterForClass('serverNode');
@@ -184,6 +184,7 @@ class ServerNodeService extends KalturaBaseService
 
 
 		$dbServerNode->setHeartbeatTime(time());
+		$serverNodeStatus = ($serverNodeStatus == ServerNodeStatus::NOT_OPERATIONAL) ? ServerNodeStatus::ACTIVE : $serverNodeStatus;
 		$dbServerNode->setStatus($serverNodeStatus);
 		$dbServerNode->save();
 	

@@ -39,6 +39,7 @@ class ServerNodeFilter extends baseObjectFilter
 			"_in_dc",
 			"_eq_parent_id",
 			"_in_parent_id",
+			"_eq_name",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( 
