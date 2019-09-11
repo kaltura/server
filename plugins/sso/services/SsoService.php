@@ -120,12 +120,12 @@ class SsoService extends KalturaBaseService
 	 */
 	public function loginAction($userId = null, $applicationType , $partnerId = null)
 	{
-		if (!$userId && $partnerId)
+		if (!$userId)
 		{
 			$this->validatePartnerUsingSso($partnerId);
 			$dbSso = KalturaSso::getSso($partnerId, $applicationType, null);
 		}
-		if ($userId)
+		else
 		{
 			$domain = KalturaSso::getDomainFromUser($userId);
 			if ($partnerId)
