@@ -79,6 +79,7 @@ class kESearchQueryManager
 		if($searchItem->shouldAddLanguageSearch())
 		{
 			$languages = $queryAttributes->getPartnerLanguages();
+			$shouldIgnoreSynonyms = $queryAttributes->getIgnoreSynonymsOnPartner();
 			foreach ($languages as $language)
 			{
 				$mappingLanguageField = elasticSearchUtils::getAnalyzedFieldName($language, $fieldName, $searchItem->getItemMappingFieldsDelimiter());
@@ -88,18 +89,13 @@ class kESearchQueryManager
 					$multiMatchQuery->addToFields($mappingLanguageField.'^'.$languageFieldBoostFactor);
 					if($searchItem->getAddHighlight())
 						$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName, $mappingLanguageField);
-
-					$partner = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId());
-					if ($partner && !$partner->getIgnoreSynonymEsearch())
+					$synonymField = elasticSearchUtils::getSynonymFieldName($language,$mappingLanguageField,elasticSearchUtils::DOT_FIELD_DELIMITER);
+					
+					if(!$shouldIgnoreSynonyms && $synonymField)
 					{
-						$synonymField = elasticSearchUtils::getSynonymFieldName($language,$mappingLanguageField,elasticSearchUtils::DOT_FIELD_DELIMITER);
-
-						if($synonymField)
-						{
-							$multiMatchQuery->addToFields($synonymField);//don't boost
-							if($searchItem->getAddHighlight())
-								$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName, $synonymField);
-						}
+						$multiMatchQuery->addToFields($synonymField);//don't boost
+						if($searchItem->getAddHighlight())
+							$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName, $synonymField);
 					}
 				}
 			}

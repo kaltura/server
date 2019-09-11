@@ -85,6 +85,11 @@ class ESearchQueryAttributes
 	 */
 	protected $searchHistoryMustNotContext;
 
+	/**
+	 * @var bool
+	 */
+	protected $ignoreSynonymsOnPartner;
+
 	function __construct()
 	{
 		$this->queryHighlightsAttributes = new ESearchQueryHighlightsAttributes();
@@ -335,6 +340,22 @@ class ESearchQueryAttributes
 	public function setSearchHistoryMustNotContext($searchHistoryMustNotContext)
 	{
 		$this->searchHistoryMustNotContext = $searchHistoryMustNotContext;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getIgnoreSynonymsOnPartner()
+	{
+		return $this->ignoreSynonymsOnPartner;
+	}
+
+	/**
+	 * @param bool $ignoreSynonymsOnPartner
+	 */
+	public function setIgnoreSynonymsOnPartner($ignoreSynonymsOnPartner)
+	{
+		$this->ignoreSynonymsOnPartner = $ignoreSynonymsOnPartner;
 	}
 
 }
