@@ -49,13 +49,14 @@
 		var newData = dictionaryTemplate.clone(true);
 		newData.attr("id", dictionaryTag).attr("name", dictionaryTag);
 
-		newData.find( "input,select").each(function(idx) {
+		newData.find( "input,select,textarea").each(function(idx) {
 			var name = $( this ).attr("name");
 			var paramName =name.substring("Dictionary_".length);
 			var tag = dictionaryTag + "::" + paramName;
 			$( this ).attr("name", paramName).attr("id", tag);
 			$(this).attr("required","1");
 			$(this).attr("oninput",'validateDictionaryLength(this)');
+			$(this).attr('style',"width: 500px;");
 		});
 
 		return newData;
@@ -76,12 +77,13 @@
 		var dictionaryTag = 'Dictionary_' + dictionaryIndex++;
 		var newDictionary = createDictionary(dictionaryTag);
 
-		newDictionary.find( "input,select").each(function(idx) {
+		newDictionary.find( "input,select,textarea").each(function(idx) {
 			if ($( this ).attr("type") == 'hidden')
 				return;
 			var name = $( this ).attr("name");
 			var val = object[name];
 			$(this).val(val).attr('checked', val);
+			$(this).val(val).attr('style',"width: 500px;");
 		});
 
 		jQuery(target).after(newDictionary.show());

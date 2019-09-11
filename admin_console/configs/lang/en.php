@@ -1518,4 +1518,8 @@ return array(
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::EL' => "Greek",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::RO' => "Romanian",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::HU' => "Hungarian",
+
+	'Kaltura_Client_Sso_Enum_SsoStatus::DISABLED' => 'Disabled',
+	'Kaltura_Client_Sso_Enum_SsoStatus::ACTIVE' => 'Enabled',
+	'Kaltura_Client_Sso_Enum_SsoStatus::DELETED' => 'Deleted',
 );
