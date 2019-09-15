@@ -54,15 +54,18 @@ class KalturaMonitorClient
 		self::EVENT_DATABASE    =>  0,
 		self::EVENT_SPHINX      =>  0,
 		self::EVENT_COUCHBASE   =>  0,
-		self::EVENT_ELASTIC     =>  0
+		self::EVENT_ELASTIC     =>  0,
+		self::EVENT_DRUID       =>  0
 	);
 
 	public static function prettyPrintCounters()
 	{
-		return	self::EVENT_DATABASE . ':' . self::$sessionCounters[self::EVENT_DATABASE] . ' ' .
-				self::EVENT_SPHINX . ':' . self::$sessionCounters[self::EVENT_SPHINX] . ' ' .
-				self::EVENT_COUCHBASE . ':' . self::$sessionCounters[self::EVENT_COUCHBASE] . ' ' .
-				self::EVENT_ELASTIC . ':' . self::$sessionCounters[self::EVENT_ELASTIC] . ' ' ;
+		$str='';
+		foreach (self::$sessionCounters as $key => $value)
+		{
+			$str .= $key . ':' . $value . ' ';
+		}
+		return $str;
 	}
 	
 	protected static function init()
@@ -108,6 +111,12 @@ class KalturaMonitorClient
 	
 	protected static function writeDeferredEvent($data)
 	{
+		$eventType = $data[self::FIELD_EVENT_TYPE];
+		if(isset(self::$sessionCounters[$eventType]))
+		{
+			self::$sessionCounters[$eventType]++;
+		}
+
 		$str = json_encode($data);
 		if (strlen($str) > self::MAX_PACKET_SIZE)
 			return;
@@ -133,7 +142,7 @@ class KalturaMonitorClient
 		
 		if (!self::$stream)
 			return;
-		
+
 		self::$apiStartTime = microtime(true);
 		
 		self::$basicEventInfo = array(
@@ -255,7 +264,6 @@ class KalturaMonitorClient
 		));
 		
 		self::writeDeferredEvent($data);
-		self::$sessionCounters[$eventType]++;
 	}
 
 	public static function monitorElasticAccess($actionName, $indexName, $body, $queryTook, $hostName = null)
@@ -273,7 +281,6 @@ class KalturaMonitorClient
 		));
 
 		self::writeDeferredEvent($data);
-		self::$sessionCounters[self::EVENT_ELASTIC]++;
 	}
 
 	public static function monitorDruidQuery($hostName, $dataSource, $queryType, $querySize, $queryTook, $errorCode)
@@ -292,7 +299,6 @@ class KalturaMonitorClient
 		));
 
 		self::writeDeferredEvent($data);
-		self::$sessionCounters[self::EVENT_DRUID]++;
 	}
 
 	public static function monitorCouchBaseAccess($dataSource, $bucketName, $queryType, $queryTook, $querySize)
@@ -310,7 +316,6 @@ class KalturaMonitorClient
 		));
 
 		self::writeDeferredEvent($data);
-		self::$sessionCounters[self::EVENT_COUCHBASE]++;
 	}
 
 	public static function monitorConnTook($dsn, $connTook)
