@@ -37,6 +37,19 @@
 							</item>
 						</mappings>
 					</item>
+					<item objectType="KalturaDetachedResponseProfile">
+						<name>QandA_ResponseProfile_user</name>
+						<type>1</type>
+						<fields>id,screenName,email,firstName,lastName</fields>
+						<filter objectType="KalturaUserFilter">
+						</filter>
+						<mappings objectType="array">
+							<item objectType="KalturaResponseProfileMapping">
+								<parentProperty>userId</parentProperty>
+								<filterProperty>idEqual</filterProperty>
+							</item>
+						</mappings>
+					</item>
 				</relatedProfiles>
 			</responseProfile>
 		</request>

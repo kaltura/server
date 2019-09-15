@@ -54,6 +54,8 @@ interface ReportType extends BaseEnum
    const CONTENT_REPORT_REASONS = 44;
    const PLAYER_RELATED_INTERACTIONS = 45;
    const PLAYBACK_RATE = 46;
+   const TOP_USER_CONTENT = 47;
+   const USER_HIGHLIGHTS = 48;
 
    //realtime reports
    const MAP_OVERLAY_COUNTRY_REALTIME = 10001;

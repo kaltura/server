@@ -1,3 +1,49 @@
+# Orion 15.7.0 #
+
+## Add first+last name to Q&A response profile  ##
+- Issue Type: Feature
+- Issue ID: WEBC-1429
+
+### Configuration ###
+    First replace all tokens from the XML files below and remove ".template" from the file name:
+    /opt/kaltura/app/deployment/updates/scripts/xml/2019_06_26_updateQandAResponseProfile_addUserData.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2019_06_26_updateQandAResponseProfile_addUserData.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_09_11_add_webcasting_role_permission_to_user_list.php
+
+
+## Sso emails ##
+- Issue Type: Task
+- Issue ID: PLAT-9973
+
+### configuration ###
+To use the sso emails you should set the sso login link in sso.ini
+
+## Adding flavorparam permission to Capture app ##
+- Issue Type: Task
+- Issue ID: LEC-1832
+
+### configuration ###
+    None
+
+### Deployment scripts ###
+    php deployment/updates/scripts/add_permissions/2019_09_04_add_flavorparam_capture_permission.php
+
+## Add SSO ##
+- Issue Type: Task
+- Issue ID: PLAT-9838,KMCNG-2166,PLAT-10099
+
+### configuration ###
+Add Sso plugin in: configurations/plugins.ini
+
+### Deployment scripts ###
+Run mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_09_01_create_sso_table.sql
+Run install plugins:  php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+php deployment/updates/scripts/add_permissions/2019_09_04_add_sso_role_and_permissions.php
+php deployment/updates/scripts/add_permissions/2019_09_04_sso_service.php
+
+
 # Orion 15.6.0 #
 
 ## Add ESearch read only permission ##
