@@ -49,6 +49,21 @@ class KalturaMonitorClient
 	protected static $apiStartTime = null;
 	
 	protected static $bufferedPacket = '';
+
+	static protected $sessionCounters = array (
+		self::EVENT_DATABASE    =>  0,
+		self::EVENT_SPHINX      =>  0,
+		self::EVENT_COUCHBASE   =>  0,
+		self::EVENT_ELASTIC     =>  0
+	);
+
+	public static function prettyPrintCounters()
+	{
+		return	self::EVENT_DATABASE . ':' . self::$sessionCounters[self::EVENT_DATABASE] . ' ' .
+				self::EVENT_SPHINX . ':' . self::$sessionCounters[self::EVENT_SPHINX] . ' ' .
+				self::EVENT_COUCHBASE . ':' . self::$sessionCounters[self::EVENT_COUCHBASE] . ' ' .
+				self::EVENT_ELASTIC . ':' . self::$sessionCounters[self::EVENT_ELASTIC] . ' ' ;
+	}
 	
 	protected static function init()
 	{
@@ -184,7 +199,7 @@ class KalturaMonitorClient
 	{
 		if (!self::$stream)
 			return;
-		
+
 		// strip the comment
 		if (substr($sql, 0, 2) == '/*')
 		{
@@ -240,6 +255,7 @@ class KalturaMonitorClient
 		));
 		
 		self::writeDeferredEvent($data);
+		self::$sessionCounters[$eventType]++;
 	}
 
 	public static function monitorElasticAccess($actionName, $indexName, $body, $queryTook, $hostName = null)
@@ -257,6 +273,7 @@ class KalturaMonitorClient
 		));
 
 		self::writeDeferredEvent($data);
+		self::$sessionCounters[self::EVENT_ELASTIC]++;
 	}
 
 	public static function monitorDruidQuery($hostName, $dataSource, $queryType, $querySize, $queryTook, $errorCode)
@@ -275,6 +292,7 @@ class KalturaMonitorClient
 		));
 
 		self::writeDeferredEvent($data);
+		self::$sessionCounters[self::EVENT_DRUID]++;
 	}
 
 	public static function monitorCouchBaseAccess($dataSource, $bucketName, $queryType, $queryTook, $querySize)
@@ -292,6 +310,7 @@ class KalturaMonitorClient
 		));
 
 		self::writeDeferredEvent($data);
+		self::$sessionCounters[self::EVENT_COUCHBASE]++;
 	}
 
 	public static function monitorConnTook($dsn, $connTook)
