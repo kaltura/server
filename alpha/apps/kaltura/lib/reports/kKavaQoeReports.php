@@ -15,6 +15,7 @@ class kKavaQoeReports extends kKavaReportsMgr
 	const PLAYER_VERSION_BASE = 'player_version_base';
 	const ENTRY_BASE = 'entry_base';
 	const ISP_BASE = 'isp_base';
+	const ERROR_TRACKING_BASE = 'error_tracking_base';
 
 	protected static $reports_def_base = array(
 
@@ -128,7 +129,18 @@ class kKavaQoeReports extends kKavaReportsMgr
 			self::REPORT_DIMENSION_MAP => array(
 				'isp' => self::DIMENSION_LOCATION_ISP,
 			),
-		)
+		),
+
+		self::ERROR_TRACKING_BASE => array(
+			self::REPORT_METRICS => array(
+				self::EVENT_TYPE_ERROR,
+				self::METRIC_ERROR_SESSION_COUNT,
+			),
+			self::REPORT_FILTER => array(
+				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+				self::DRUID_VALUES => array(self::EVENT_TYPE_ERROR)
+			),
+		),
 
 	);
 
@@ -429,6 +441,77 @@ class kKavaQoeReports extends kKavaReportsMgr
 				ReportType::QOE_STREAM_QUALITY,
 				self::ISP_BASE,
 			)
+		),
+
+		ReportType::QOE_ERROR_TRACKING => array(
+			self::REPORT_METRICS => array(
+				self::METRIC_AVG_SESSION_ERROR_RATE,
+				//video start errors
+				//in video errors
+			),
+			self::REPORT_GRAPH_METRICS => array(
+				self::METRIC_AVG_SESSION_ERROR_RATE,
+				//video start errors
+				//in video errors
+			),
+		),
+
+		ReportType::QOE_ERROR_TRACKING_CODES => array(
+			self::REPORT_BASE_DEF => array(
+				self::ERROR_TRACKING_BASE,
+			),
+			self::REPORT_DIMENSION_MAP => array(
+				'error_code' => self::DIMENSION_EVENT_VAR1,
+			),
+		),
+
+		ReportType::QOE_ERROR_TRACKING_PLATFORMS => array(
+			self::REPORT_BASE_DEF => array(
+				self::ERROR_TRACKING_BASE,
+				self::PLATFORMS_BASE,
+			),
+		),
+
+		ReportType::QOE_ERROR_TRACKING_BROWSERS_FAMILIES => array(
+			self::REPORT_BASE_DEF => array(
+				self::ERROR_TRACKING_BASE,
+				self::BROWSERS_FAMILIES_BASE,
+			),
+		),
+
+		ReportType::QOE_ERROR_TRACKING_BROWSERS => array(
+			self::REPORT_BASE_DEF => array(
+				self::ERROR_TRACKING_BASE,
+				self::BROWSERS_BASE,
+			),
+		),
+
+		ReportType::QOE_ERROR_TRACKING_OPERATING_SYSTEM_FAMILIES => array(
+			self::REPORT_BASE_DEF => array(
+				self::ERROR_TRACKING_BASE,
+				self::OPERATING_SYSTEM_FAMILIES_BASE,
+			),
+		),
+
+		ReportType::QOE_ERROR_TRACKING_OPERATING_SYSTEM => array(
+			self::REPORT_BASE_DEF => array(
+				self::ERROR_TRACKING_BASE,
+				self::OPERATING_SYSTEM_BASE,
+			),
+		),
+
+		ReportType::QOE_ERROR_TRACKING_PLAYER_VERSION => array(
+			self::REPORT_BASE_DEF => array(
+				self::ERROR_TRACKING_BASE,
+				self::PLAYER_VERSION_BASE,
+			),
+		),
+
+		ReportType::QOE_ERROR_TRACKING_ENTRY => array(
+			self::REPORT_BASE_DEF => array(
+				self::ERROR_TRACKING_BASE,
+				self::ENTRY_BASE,
+			),
 		),
 
 	);

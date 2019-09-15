@@ -271,6 +271,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_SPEED,
 		self::EVENT_TYPE_FLAVOR_SWITCH,
 		self::EVENT_TYPE_BUFFER_START,
+		self::EVENT_TYPE_ERROR,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -2077,7 +2078,6 @@ class kKavaReportsMgr extends kKavaBase
 			{
 				$aggrs = array($metric);
 			}
-			
 		 	foreach ($aggrs as $aggr)
 		 	{
 		 		if (!isset(self::$aggregations_def[$aggr][self::DRUID_FILTER]))
