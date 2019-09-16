@@ -118,17 +118,25 @@ class SsoService extends KalturaBaseService
 	 * @return string $redirectUrl
 	 * @throws KalturaSsoErrors::SSO_NOT_FOUND
 	 */
-	public function loginAction($userId, $applicationType, $partnerId = null)
+	public function loginAction($userId = null, $applicationType , $partnerId = null)
 	{
-		$domain = KalturaSso::getDomainFromUser($userId);
-		if ($partnerId)
+		if (!$userId)
 		{
 			$this->validatePartnerUsingSso($partnerId);
-			$dbSso = KalturaSso::getSso($partnerId, $applicationType, $domain);
+			$dbSso = KalturaSso::getSso($partnerId, $applicationType, null);
 		}
 		else
 		{
-			$dbSso = $this->getSsoWithoutPID($userId, $applicationType, $domain);
+			$domain = KalturaSso::getDomainFromUser($userId);
+			if ($partnerId)
+			{
+				$this->validatePartnerUsingSso($partnerId);
+				$dbSso = KalturaSso::getSso($partnerId, $applicationType, $domain);
+			}
+			else
+			{
+				$dbSso = $this->getSsoWithoutPID($userId, $applicationType, $domain);
+			}
 		}
 		$sso = new KalturaSso();
 		$sso->fromObject($dbSso, $this->getResponseProfile());
