@@ -21,8 +21,7 @@ abstract class KalturaESearchItemImpl
 			$object_to_fill = $handledObjs[0];
 			$props_to_skip = $handledObjs[1];
 		}
-		list ($object_to_fill, $props_to_skip) = self::handleItemFieldName($object_to_fill, $dynamicEnumMap, $itemFieldName, $eSearchItem, $props_to_skip, $fieldEnumMap);
-		return array($object_to_fill, $props_to_skip);
+		return self::handleItemFieldName($object_to_fill, $dynamicEnumMap, $itemFieldName, $eSearchItem, $props_to_skip, $fieldEnumMap);
 	}
 
 	protected static function handleItemFieldName($object_to_fill, $dynamicEnumMap, $itemFieldName, $eSearchItem, $props_to_skip, $fieldEnumMap)
