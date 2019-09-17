@@ -48,8 +48,20 @@ abstract class KalturaESearchAbstractEntryItem extends KalturaESearchEntryBaseIt
 	{
 		list($object_to_fill, $props_to_skip) =
 			KalturaESearchItemImpl::eSearchItemToObjectImpl($this, $this->getDynamicEnumMap(), $this->getItemFieldName(), $this->getFieldEnumMap(), $object_to_fill, $props_to_skip);
-		
-		return parent::toObject($object_to_fill, $props_to_skip);
+
+		if ($object_to_fill instanceof ESearchOperator)
+		{
+			$searchItems = $object_to_fill->getSearchItems();
+			foreach ($searchItems as $searchItem)
+			{
+				$searchItem = parent::toObject($searchItem, $props_to_skip);
+			}
+			return $object_to_fill;
+		}
+		else
+		{
+			return parent::toObject($object_to_fill, $props_to_skip);
+		}
 	}
 	
 }
