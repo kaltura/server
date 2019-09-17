@@ -160,7 +160,7 @@ abstract class kBaseSearch
 		}
 
 		$this->queryAttributes->setPartnerLanguages($partnerLanguages);
-		$this->queryAttributes->setIgnoreSynonymsOnPartner($partner->getIgnoreSynonymEsearch());
+		$this->queryAttributes->setIgnoreSynonymOnPartner($partner->getIgnoreSynonymEsearch());
 	}
 
 	protected function initOverrideInnerHits($objectId)

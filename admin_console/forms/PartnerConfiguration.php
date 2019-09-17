@@ -185,7 +185,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->getElement('editDeliveryProfiles')->setAttrib('onClick', 'addDeliveryProfile()');
 
 		$this->addElement('checkbox', 'ignore_synonym_esearch', array(
-			'label'	  => 'Ignore Synonyms in eSearch',
+			'label'	=> 'Ignore synonyms in eSearch',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
 		));
 

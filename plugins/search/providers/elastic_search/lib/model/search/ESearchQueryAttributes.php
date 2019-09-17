@@ -88,7 +88,7 @@ class ESearchQueryAttributes
 	/**
 	 * @var bool
 	 */
-	protected $ignoreSynonymsOnPartner;
+	protected $ignoreSynonymOnPartner;
 
 	function __construct()
 	{
@@ -345,17 +345,17 @@ class ESearchQueryAttributes
 	/**
 	 * @return bool
 	 */
-	public function getIgnoreSynonymsOnPartner()
+	public function getIgnoreSynonymOnPartner()
 	{
-		return $this->ignoreSynonymsOnPartner;
+		return $this->ignoreSynonymOnPartner;
 	}
 
 	/**
-	 * @param bool $ignoreSynonymsOnPartner
+	 * @param bool $ignoreSynonymOnPartner
 	 */
-	public function setIgnoreSynonymsOnPartner($ignoreSynonymsOnPartner)
+	public function setIgnoreSynonymOnPartner($ignoreSynonymOnPartner)
 	{
-		$this->ignoreSynonymsOnPartner = $ignoreSynonymsOnPartner;
+		$this->ignoreSynonymOnPartner = $ignoreSynonymOnPartner;
 	}
 
 }

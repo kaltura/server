@@ -79,7 +79,7 @@ class kESearchQueryManager
 		if($searchItem->shouldAddLanguageSearch())
 		{
 			$languages = $queryAttributes->getPartnerLanguages();
-			$shouldIgnoreSynonyms = $queryAttributes->getIgnoreSynonymsOnPartner();
+			$shouldIgnoreSynonyms = $queryAttributes->getIgnoreSynonymOnPartner();
 			foreach ($languages as $language)
 			{
 				$mappingLanguageField = elasticSearchUtils::getAnalyzedFieldName($language, $fieldName, $searchItem->getItemMappingFieldsDelimiter());
