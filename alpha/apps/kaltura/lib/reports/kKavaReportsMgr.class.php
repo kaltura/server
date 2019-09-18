@@ -813,7 +813,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
 				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_JOIN_TIME))),
-			self::getLongSumAggregator(self::METRIC_JOIN_TIME_SUM, self::METRIC_EVENT_DOUBLE_SUM1));
+			self::getDoubleSumAggregator(self::METRIC_JOIN_TIME_SUM, self::METRIC_EVENT_DOUBLE_SUM1));
 
 		self::$aggregations_def[self::METRIC_ERROR_SESSION_COUNT] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_ERROR),
@@ -2015,6 +2015,37 @@ class kKavaReportsMgr extends kKavaBase
 		return $druid_filter;
 	}
 
+	protected static function getFilteredEventTypes($aggr_filter)
+	{
+		$event_types = array();
+		if (isset($aggr_filter[self::DRUID_TYPE]) && $aggr_filter[self::DRUID_TYPE] == self::DRUID_AND)
+		{
+			foreach ($aggr_filter[self::DRUID_FIELDS] as $filter)
+			{
+				$event_types = array_merge($event_types, self::getFilteredEventTypes($filter));
+			}
+		}
+		else
+		{
+			if (!isset($aggr_filter[self::DRUID_DIMENSION]) ||
+				$aggr_filter[self::DRUID_DIMENSION] != self::DIMENSION_EVENT_TYPE)
+			{
+				return array();
+			}
+
+			if (isset($aggr_filter[self::DRUID_VALUE]))
+			{
+				$event_types[] = $aggr_filter[self::DRUID_VALUE];
+			}
+			else if (isset($aggr_filter[self::DRUID_VALUES]))
+			{
+				$event_types = array_merge($event_types, $aggr_filter[self::DRUID_VALUES]);
+			}
+		}
+
+		return $event_types;
+	}
+
 	protected static function getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity, $filter_metrics = null)
 	{
 		if (!$data_source)
@@ -2100,20 +2131,7 @@ class kKavaReportsMgr extends kKavaBase
 		 		}
 		 		
 		 		$aggr_filter = self::$aggregations_def[$aggr][self::DRUID_FILTER];
-		 		if (!isset($aggr_filter[self::DRUID_DIMENSION]) ||
-		 			$aggr_filter[self::DRUID_DIMENSION] != self::DIMENSION_EVENT_TYPE)
-		 		{
-		 			continue;
-		 		}
-		 		
-				if (isset($aggr_filter[self::DRUID_VALUE]))
-				{
-					$event_types[] = $aggr_filter[self::DRUID_VALUE];
-				}
-				else if (isset($aggr_filter[self::DRUID_VALUES]))
-				{
-					$event_types = array_merge($event_types, $aggr_filter[self::DRUID_VALUES]);
-				}
+				$event_types = array_merge($event_types, self::getFilteredEventTypes($aggr_filter));
 		 	}
 		}
 

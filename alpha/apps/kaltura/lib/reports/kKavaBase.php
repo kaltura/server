@@ -293,6 +293,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_CUSTOM_VAR2 => 1,
 			self::DIMENSION_CUSTOM_VAR3 => 1,
 			self::DIMENSION_EVENT_PROPERTIES => 1,
+			self::DIMENSION_PLAYER_VERSION => 1,
 			self::DIMENSION_POSITION => 1,
 		),
 	);
