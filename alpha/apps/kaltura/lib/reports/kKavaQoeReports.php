@@ -225,7 +225,7 @@ class kKavaQoeReports extends kKavaReportsMgr
 		ReportType::QOE_EXPERIENCE_OPERATING_SYSTEM => array(
 			self::REPORT_BASE_DEF => array(
 				ReportType::QOE_EXPERIENCE,
-				self::OPERATING_SYSTEM_FAMILIES_BASE,
+				self::OPERATING_SYSTEM_BASE,
 			)
 		),
 
@@ -315,7 +315,7 @@ class kKavaQoeReports extends kKavaReportsMgr
 		ReportType::QOE_ENGAGEMENT_OPERATING_SYSTEM => array(
 			self::REPORT_BASE_DEF => array(
 				ReportType::QOE_ENGAGEMENT,
-				self::OPERATING_SYSTEM_FAMILIES_BASE,
+				self::OPERATING_SYSTEM_BASE,
 			)
 		),
 
@@ -418,7 +418,7 @@ class kKavaQoeReports extends kKavaReportsMgr
 		ReportType::QOE_STREAM_QUALITY_OPERATING_SYSTEM => array(
 			self::REPORT_BASE_DEF => array(
 				ReportType::QOE_STREAM_QUALITY,
-				self::OPERATING_SYSTEM_FAMILIES_BASE,
+				self::OPERATING_SYSTEM_BASE,
 			)
 		),
 
