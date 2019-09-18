@@ -446,13 +446,13 @@ class kKavaQoeReports extends kKavaReportsMgr
 		ReportType::QOE_ERROR_TRACKING => array(
 			self::REPORT_METRICS => array(
 				self::METRIC_AVG_SESSION_ERROR_RATE,
-				//video start errors
-				//in video errors
+				self::METRIC_ERROR_UNKNOWN_POSITION_COUNT,
+				self::METRIC_ERROR_POSITION_COUNT,
 			),
 			self::REPORT_GRAPH_METRICS => array(
 				self::METRIC_AVG_SESSION_ERROR_RATE,
-				//video start errors
-				//in video errors
+				self::METRIC_ERROR_UNKNOWN_POSITION_COUNT,
+				self::METRIC_ERROR_POSITION_COUNT,
 			),
 		),
 

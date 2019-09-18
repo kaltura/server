@@ -119,6 +119,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_VIEW_LIVE_LATENCY_SUM = 'view_live_latency_sum';
 	const METRIC_ERROR_SESSION_COUNT = 'error_session_count';
 	const METRIC_VIEW_UNIQUE_SESSIONS = 'view_unique_sessions';
+	const METRIC_ERROR_POSITION_COUNT = 'error_position_count';
+	const METRIC_ERROR_UNKNOWN_POSITION_COUNT = 'error_unknown_position_count';
 
 	//player-events-realtime druid calculated metrics
 	const METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH = 'avg_view_downstream_bandwidth';
@@ -816,6 +818,18 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_ERROR_SESSION_COUNT] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_ERROR),
 			self::getHyperUniqueAggregator(self::METRIC_ERROR_SESSION_COUNT, self::METRIC_UNIQUE_SESSION_ID));
+
+		self::$aggregations_def[self::METRIC_ERROR_POSITION_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_ERROR),
+				self::getNotFilter(self::getSelectorFilter(self::DIMENSION_POSITION, self::VALUE_UNKNOWN)))),
+			self::getLongSumAggregator(self::METRIC_ERROR_POSITION_COUNT, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_ERROR_UNKNOWN_POSITION_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_ERROR),
+				self::getSelectorFilter(self::DIMENSION_POSITION, self::VALUE_UNKNOWN))),
+			self::getLongSumAggregator(self::METRIC_ERROR_UNKNOWN_POSITION_COUNT, self::METRIC_COUNT));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation

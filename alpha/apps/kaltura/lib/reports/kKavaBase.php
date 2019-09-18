@@ -63,6 +63,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_EVENT_PROPERTIES = 'eventProperties';
 	const DIMENSION_FLAVOR_PARAMS_ID = 'flavorParamsId';
 	const DIMENSION_PLAYER_VERSION = 'playerVersion';
+	const DIMENSION_POSITION = 'position';
 
 
 	// metrics
@@ -138,7 +139,6 @@ class kKavaBase extends kDruidBase
 	const TASK_READY = "Ready";
 
 	// event properties
-
 	const PROPERTY_HAS_BITRATE = 'hasBitrate';
 	const PROPERTY_IS_BUFFERING = 'isBuffering';
 	const PROPERTY_HAS_BANDWIDTH = 'hasBandwidth';
@@ -148,6 +148,9 @@ class kKavaBase extends kDruidBase
 
 	//user engagement values
 	const USER_ENGAGED = 'SoundOnTabFocused';
+
+	//general values
+	const VALUE_UNKNOWN = 'Unknown';
 
 	protected static $datasources_dimensions = array(
 		self::DATASOURCE_HISTORICAL => array(
@@ -290,6 +293,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_CUSTOM_VAR2 => 1,
 			self::DIMENSION_CUSTOM_VAR3 => 1,
 			self::DIMENSION_EVENT_PROPERTIES => 1,
+			self::DIMENSION_POSITION => 1,
 		),
 	);
 
