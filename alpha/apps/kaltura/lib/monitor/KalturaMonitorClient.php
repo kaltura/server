@@ -49,6 +49,24 @@ class KalturaMonitorClient
 	protected static $apiStartTime = null;
 	
 	protected static $bufferedPacket = '';
+
+	static protected $sessionCounters = array (
+		self::EVENT_DATABASE    =>  0,
+		self::EVENT_SPHINX      =>  0,
+		self::EVENT_COUCHBASE   =>  0,
+		self::EVENT_ELASTIC     =>  0,
+		self::EVENT_DRUID       =>  0
+	);
+
+	public static function prettyPrintCounters()
+	{
+		$str='';
+		foreach (self::$sessionCounters as $key => $value)
+		{
+			$str .= $key . ':' . $value . ' ';
+		}
+		return $str;
+	}
 	
 	protected static function init()
 	{
@@ -93,6 +111,12 @@ class KalturaMonitorClient
 	
 	protected static function writeDeferredEvent($data)
 	{
+		$eventType = $data[self::FIELD_EVENT_TYPE];
+		if(isset(self::$sessionCounters[$eventType]))
+		{
+			self::$sessionCounters[$eventType]++;
+		}
+
 		$str = json_encode($data);
 		if (strlen($str) > self::MAX_PACKET_SIZE)
 			return;
@@ -118,7 +142,7 @@ class KalturaMonitorClient
 		
 		if (!self::$stream)
 			return;
-		
+
 		self::$apiStartTime = microtime(true);
 		
 		self::$basicEventInfo = array(
@@ -184,7 +208,7 @@ class KalturaMonitorClient
 	{
 		if (!self::$stream)
 			return;
-		
+
 		// strip the comment
 		if (substr($sql, 0, 2) == '/*')
 		{
