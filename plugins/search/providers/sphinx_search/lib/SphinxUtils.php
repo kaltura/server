@@ -10,8 +10,4 @@ class SphinxUtils
 		return KalturaCriteria::escapeString($str, $escapeType, $iterations);
 	}
 
-	public static function handleEscaping($str)
-	{
-		return str_replace('\\','\\\\',$str);
-	}
 }
