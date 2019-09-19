@@ -728,7 +728,12 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 
 			$partnerId = kCurrentContext::getCurrentPartnerId();
 			$notEmpty = kSphinxSearchManager::HAS_VALUE . $partnerId;
-			
+
+			if(in_array($operator, array(baseObjectFilter::IN, baseObjectFilter::EQ, baseObjectFilter::NOT_IN)) &&  $fieldsEscapeType == SearchIndexFieldEscapeType::DEFAULT_ESCAPE)
+			{
+				$fieldsEscapeType = SearchIndexFieldEscapeType::FULL_ESCAPE;
+			}
+
 			switch($operator)
 			{
 				case baseObjectFilter::MULTI_LIKE_OR:
@@ -754,12 +759,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				
 				case baseObjectFilter::NOT_IN:
 					$vals = is_array($val) ? $val : explode(',', $val);
-
-					if ( $fieldsEscapeType == SearchIndexFieldEscapeType::DEFAULT_ESCAPE)
-					{
-						$fieldsEscapeType = SearchIndexFieldEscapeType::FULL_ESCAPE;
-					}
-
 					foreach($vals as $valIndex => $valValue)
 					{
 						if(!strlen($valValue))
@@ -787,12 +786,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				
 				case baseObjectFilter::IN:
 					$vals = is_array($val) ? $val : explode(',', $val);
-
-					if ( $fieldsEscapeType == SearchIndexFieldEscapeType::DEFAULT_ESCAPE)
-					{
-						$fieldsEscapeType = SearchIndexFieldEscapeType::FULL_ESCAPE;
-					}
-
 					foreach($vals as $valIndex => &$valValue)
 					{
 						$valValue = trim($valValue);
@@ -824,12 +817,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				case baseObjectFilter::EQ:
 					if(is_numeric($val) || strlen($val) > 0)
 					{
-						if ( $fieldsEscapeType == SearchIndexFieldEscapeType::DEFAULT_ESCAPE)
-						{
-							$fieldsEscapeType = SearchIndexFieldEscapeType::FULL_ESCAPE;
-						}
-
-						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);	
+						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);
 						if($objectClass::isNullableField($fieldName))
 							$this->addMatch("@$sphinxField \\\"^$val $notEmpty$\\\"");
 						else							

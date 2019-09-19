@@ -284,7 +284,9 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 		{
 			if ($escapeType == SearchIndexFieldEscapeType::FULL_ESCAPE)
 			{
-				$str =  str_replace('\\','\\\\',$str);
+				$from = array ('\\', '"', '!');
+				$to = array ('\\\\', '\\"', '\\!');
+				$str =  str_replace($from, $to ,$str);
 			}
 
 			// NOTE: it appears that sphinx performs double decoding on SELECT values, so we encode twice.
