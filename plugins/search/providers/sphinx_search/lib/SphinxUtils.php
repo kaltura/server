@@ -9,5 +9,4 @@ class SphinxUtils
 	{
 		return KalturaCriteria::escapeString($str, $escapeType, $iterations);
 	}
-
 }
