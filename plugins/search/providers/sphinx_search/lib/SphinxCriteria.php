@@ -757,12 +757,20 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						
 					foreach($vals as $valIndex => $valValue)
 					{
-						if(!strlen($valValue))							
+						if(!strlen($valValue))
+						{
 							unset($vals[$valIndex]);
+						}
 						elseif(preg_match('/[\s\t]/', $valValue))
+						{
+							$valValue = SphinxUtils::handleEscaping($valValue);
 							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue, $fieldsEscapeType) . '"';
+						}
 						else
+						{
+							$valValue = SphinxUtils::handleEscaping($valValue);
 							$vals[$valIndex] = SphinxUtils::escapeString($valValue, $fieldsEscapeType);
+						}
 					}
 					
 					if(count($vals))
@@ -783,7 +791,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						if(!strlen($valValue))
 							unset($vals[$valIndex]);
 						else
+						{
+							$valValue = SphinxUtils::handleEscaping($valValue);
 							$vals[$valIndex] = SphinxUtils::escapeString($valValue, $fieldsEscapeType);
+						}
 					}
 					
 					if(count($vals))
@@ -808,6 +819,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				case baseObjectFilter::EQ:
 					if(is_numeric($val) || strlen($val) > 0)
 					{
+						$val = SphinxUtils::handleEscaping($val);
 						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);	
 						if($objectClass::isNullableField($fieldName))
 							$this->addMatch("@$sphinxField \\\"^$val $notEmpty$\\\"");
