@@ -762,17 +762,11 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					foreach($vals as $valIndex => $valValue)
 					{
 						if(!strlen($valValue))
-						{
 							unset($vals[$valIndex]);
-						}
 						elseif(preg_match('/[\s\t]/', $valValue))
-						{
 							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue, $fieldsEscapeType) . '"';
-						}
 						else
-						{
 							$vals[$valIndex] = SphinxUtils::escapeString($valValue, $fieldsEscapeType);
-						}
 					}
 					
 					if(count($vals))
@@ -786,6 +780,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				
 				case baseObjectFilter::IN:
 					$vals = is_array($val) ? $val : explode(',', $val);
+					
 					foreach($vals as $valIndex => &$valValue)
 					{
 						$valValue = trim($valValue);
