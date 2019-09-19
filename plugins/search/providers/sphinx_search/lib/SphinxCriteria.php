@@ -799,9 +799,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						if(!strlen($valValue))
 							unset($vals[$valIndex]);
 						else
-						{
 							$vals[$valIndex] = SphinxUtils::escapeString($valValue, $fieldsEscapeType);
-						}
 					}
 					
 					if(count($vals))
