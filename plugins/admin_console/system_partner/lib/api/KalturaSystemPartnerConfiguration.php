@@ -400,6 +400,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $blockDirectLogin;
 
+	/**
+	 * @var bool
+	 */
+	public $ignoreSynonymEsearch;
+
 	private static $map_between_objects = array
 	(
 		"id",
@@ -477,6 +482,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"useTwoFactorAuthentication",
 		"useSso",
 		"blockDirectLogin",
+		"ignoreSynonymEsearch"
 	);
 
 	public function getMapBetweenObjects()
