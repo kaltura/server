@@ -67,18 +67,15 @@ abstract class KalturaESearchItemImpl
 	}
 
 
-	protected static function shouldBeExactWithTrim($searchTerm)
+	protected static function enclosedInQuotationMarks($searchTerm)
 	{
 		/*
 		 * if searchTerm is wrapped with '"' - return true
 		 */
-		if(strlen($searchTerm) > 2 &&
-			substr($searchTerm, 0, 1) == '"' &&
-			substr($searchTerm,-1) == '"')
+		if(preg_match_all('/(\'|\"){1}[^\'\"]+(\'|\"){1}/',$searchTerm, $matches))
 		{
 			return true;
 		}
-
 		return false;
 	}
 
@@ -86,13 +83,13 @@ abstract class KalturaESearchItemImpl
 	{
 		if ($itemType === KalturaESearchItemType::EXACT_MATCH)
 		{
-			if(self::shouldBeExactWithTrim($searchTerm))
+			if(self::enclosedInQuotationMarks($searchTerm))
 			{
 				list ($object_to_fill, $props_to_skip) = self::addSubTermToObj($object_to_fill, $props_to_skip, substr($searchTerm, 1, -1));
 			}
 			return array($object_to_fill, $props_to_skip);
 		}
-		if ($itemType === KalturaESearchItemType::PARTIAL && preg_match_all('/(\'|\"){1}[^\'\"]+(\'|\"){1}|[^\'\"]*/', $searchTerm, $matches))
+		else if ($itemType === KalturaESearchItemType::PARTIAL && preg_match_all('/(\'|\"){1}[^\'\"]+(\'|\"){1}|[^\'\"]*/', $searchTerm, $matches))
 		{
 			$searchItems = self::handleMatches($matches[0], $itemFieldName);
 			if ($searchItems)
@@ -106,9 +103,7 @@ abstract class KalturaESearchItemImpl
 	protected static function addSubTermToObj($object_to_fill, $props_to_skip, $searchTerm)
 	{
 		$object_to_fill->setSearchTerm($searchTerm);
-		$object_to_fill->setItemType(KalturaESearchItemType::EXACT_MATCH);
 		$props_to_skip[] = 'searchTerm';
-		$props_to_skip[] = 'itemType';
 		return array($object_to_fill, $props_to_skip);
 	}
 
@@ -130,7 +125,7 @@ abstract class KalturaESearchItemImpl
 			$match = trim($match);
 			if ($match)
 			{
-				if (self::shouldBeExactWithTrim($match))
+				if (self::enclosedInQuotationMarks($match))
 				{
 					$searchItemsArray [] = self::addSearchItem($itemFieldName, KalturaESearchItemType::EXACT_MATCH, substr($match, 1, -1));
 				}
