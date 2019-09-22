@@ -79,6 +79,7 @@ class kESearchQueryManager
 		if($searchItem->shouldAddLanguageSearch())
 		{
 			$languages = $queryAttributes->getPartnerLanguages();
+			$shouldIgnoreSynonym = $queryAttributes->getIgnoreSynonymOnPartner();
 			foreach ($languages as $language)
 			{
 				$mappingLanguageField = elasticSearchUtils::getAnalyzedFieldName($language, $fieldName, $searchItem->getItemMappingFieldsDelimiter());
@@ -90,7 +91,7 @@ class kESearchQueryManager
 						$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName, $mappingLanguageField);
 					$synonymField = elasticSearchUtils::getSynonymFieldName($language,$mappingLanguageField,elasticSearchUtils::DOT_FIELD_DELIMITER);
 					
-					if($synonymField)
+					if(!$shouldIgnoreSynonym && $synonymField)
 					{
 						$multiMatchQuery->addToFields($synonymField);//don't boost
 						if($searchItem->getAddHighlight())

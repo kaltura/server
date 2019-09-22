@@ -184,6 +184,10 @@ class Form_PartnerConfiguration extends Infra_Form
 
 		$this->getElement('editDeliveryProfiles')->setAttrib('onClick', 'addDeliveryProfile()');
 
+		$this->addElement('checkbox', 'ignore_synonym_esearch', array(
+			'label'	=> 'Ignore synonyms in eSearch',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
+		));
 
 		$this->addElement('hidden', 'e_search_languages', array(
 			'label'		=> 'e_search_languages',
@@ -946,7 +950,7 @@ class Form_PartnerConfiguration extends Infra_Form
 
 		$this->addDisplayGroup(array_merge(array('use_two_factor_authentication', 'use_sso', 'block_direct_login'), array('crossLine')), 'authenticationSettings', array('legend' => 'Authentication Settings'));
 
-		$this->addDisplayGroup(array_merge(array('editESearchLanguages','e_search_languages'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
+		$this->addDisplayGroup(array_merge(array('ignore_synonym_esearch','editESearchLanguages','e_search_languages'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
 		$this->addDisplayGroup(array('partner_package'), 'accountPackagesService', array('legend' => 'Service Packages'));
 		$this->addDisplayGroup(array('partner_package_class_of_service', 'vertical_clasiffication', 'crm_id', 'crm_link', 'internal_use', 'crossLine'), 'accountPackages');
 		$this->addDisplayGroup(array('monitor_usage_history'), 'accountOptionsMonitorView', array('legend' => 'New Account Options'));
