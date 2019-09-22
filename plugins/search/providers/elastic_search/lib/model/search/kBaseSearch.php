@@ -139,12 +139,12 @@ abstract class kBaseSearch
 
 	protected function initQueryAttributes($partnerId, $objectId)
 	{
-		$this->initPartnerLanguagesSynonyms($partnerId);
+		$this->initPartnerLanguagesSynonym($partnerId);
 		$this->queryAttributes->setObjectId($objectId);
 		$this->initOverrideInnerHits($objectId);
 	}
 
-	protected function initPartnerLanguagesSynonyms($partnerId)
+	protected function initPartnerLanguagesSynonym($partnerId)
 	{
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if(!$partner)
