@@ -10,13 +10,33 @@ abstract class KalturaESearchItemImpl
 
 	public static function eSearchItemToObjectImpl(&$eSearchItem, $dynamicEnumMap, $itemFieldName, $fieldEnumMap, $object_to_fill = null, $props_to_skip = array())
 	{
+		self::validateSearchTermLength($eSearchItem);
+		$searchTerm = trim($eSearchItem->searchTerm);
+		if(in_array($eSearchItem->itemType, array(KalturaESearchItemType::PARTIAL, KalturaESearchItemType::EXACT_MATCH)) &&
+			self::enclosedInQuotationMarks($searchTerm))
+		{
+			list ($object_to_fill, $props_to_skip) = self::addSubTermToObj($object_to_fill, $props_to_skip, substr($searchTerm, 1, -1));
+			$object_to_fill->setItemType(KalturaESearchItemType::EXACT_MATCH);
+			$props_to_skip[] = 'itemType';
+		}
+		list ($object_to_fill, $props_to_skip) = self::handleItemFieldNameHelper($dynamicEnumMap, $itemFieldName, $eSearchItem, $object_to_fill, $props_to_skip, $fieldEnumMap);
+		return array($object_to_fill, $props_to_skip);
+	}
+
+	public static function eSearchComplexItemToObjectImpl(&$eSearchItem, $dynamicEnumMap, $itemFieldName, $fieldEnumMap, $object_to_fill = null, $props_to_skip = array())
+	{
+		self::validateSearchTermLength($eSearchItem);
+		list($object_to_fill, $props_to_skip) = self::handleSearchTerm($eSearchItem->searchTerm, $eSearchItem->itemType, $object_to_fill, $itemFieldName, $props_to_skip);
+		return self::handleItemFieldName($object_to_fill, $dynamicEnumMap, $itemFieldName, $eSearchItem, $props_to_skip, $fieldEnumMap);
+	}
+
+	protected static function validateSearchTermLength($eSearchItem)
+	{
 		if(strlen($eSearchItem->searchTerm) > self::MAX_SEARCH_TERM_LENGTH)
 		{
 			$eSearchItem->searchTerm =  mb_strcut($eSearchItem->searchTerm, 0, self::MAX_SEARCH_TERM_LENGTH, "utf-8");
 			KalturaLog::log("Search term exceeded maximum allowed length, setting search term to [$eSearchItem->searchTerm]");
 		}
-		list($object_to_fill, $props_to_skip) = self::handleSearchTerm($eSearchItem->searchTerm, $eSearchItem->itemType, $object_to_fill, $itemFieldName, $props_to_skip);
-		return self::handleItemFieldName($object_to_fill, $dynamicEnumMap, $itemFieldName, $eSearchItem, $props_to_skip, $fieldEnumMap);
 	}
 
 	protected static function handleItemFieldName($object_to_fill, $dynamicEnumMap, $itemFieldName, $eSearchItem, $props_to_skip, $fieldEnumMap)
