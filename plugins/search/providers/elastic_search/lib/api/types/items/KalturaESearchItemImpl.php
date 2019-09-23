@@ -168,12 +168,21 @@ abstract class KalturaESearchItemImpl
 
 	protected static function addSearchItem($itemFieldName, $itemType, $searchTermPart, $object_to_fill)
 	{
-		if($itemFieldName)
+		$className = get_class($object_to_fill);
+		if ($className)
 		{
-			$object_to_fill->setFieldName($itemFieldName);
+			$searchItem = new $className();
+			if($itemFieldName)
+			{
+				$searchItem->setFieldName($itemFieldName);
+			}
+			$searchItem->setItemType($itemType);
+			$searchItem->setSearchTerm($searchTermPart);
+			return $searchItem;
 		}
-		$object_to_fill->setItemType($itemType);
-		$object_to_fill->setSearchTerm($searchTermPart);
-		return $object_to_fill;
+		else
+		{
+			return null;
+		}
 	}
 }
