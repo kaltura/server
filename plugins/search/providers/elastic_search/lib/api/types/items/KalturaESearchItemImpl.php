@@ -64,14 +64,22 @@ abstract class KalturaESearchItemImpl
 			try
 			{
 				$enumType = call_user_func(array($dynamicEnumMap[$itemFieldName], 'getEnumClass'));
-				$SearchTermValue = kPluginableEnumsManager::apiToCore($enumType, $eSearchItem->searchTerm);
+				if ($object_to_fill->getSearchTerm())
+				{
+					$searchTerm = $object_to_fill->getSearchTerm();
+				}
+				else
+				{
+					$searchTerm = $eSearchItem->searchTerm;
+				}
+				$SearchTermValue = kPluginableEnumsManager::apiToCore($enumType, $searchTerm);
 				$object_to_fill->setSearchTerm($SearchTermValue);
 				$props_to_skip[] = 'searchTerm';
 			}
 			catch (kCoreException $e)
 			{
 				if($e->getCode() == kCoreException::ENUM_NOT_FOUND)
-					throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $eSearchItem->searchTerm, 'searchTerm', $dynamicEnumMap[$itemFieldName]);
+					throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $searchTerm, 'searchTerm', $dynamicEnumMap[$itemFieldName]);
 			}
 
 		}
@@ -111,7 +119,7 @@ abstract class KalturaESearchItemImpl
 		}
 		else if ($itemType === KalturaESearchItemType::PARTIAL && preg_match_all('/(\'|\"){1}[^\'\"]+(\'|\"){1}|[^\'\"]*/', $searchTerm, $matches))
 		{
-			$searchItems = self::handleMatches($matches[0], $itemFieldName);
+			$searchItems = self::handleMatches($matches[0], $itemFieldName, $object_to_fill);
 			if ($searchItems)
 			{
 				list ($object_to_fill, $props_to_skip) = self::addOperator($props_to_skip, $searchItems);
@@ -137,7 +145,7 @@ abstract class KalturaESearchItemImpl
 		return array($object_to_fill, $props_to_skip);
 	}
 
-	protected static function handleMatches($matches, $itemFieldName)
+	protected static function handleMatches($matches, $itemFieldName, $object_to_fill)
 	{
 		$searchItemsArray = array();
 		foreach ($matches as $match)
@@ -147,23 +155,25 @@ abstract class KalturaESearchItemImpl
 			{
 				if (self::enclosedInQuotationMarks($match))
 				{
-					$searchItemsArray [] = self::addSearchItem($itemFieldName, KalturaESearchItemType::EXACT_MATCH, substr($match, 1, -1));
+					$searchItemsArray [] = self::addSearchItem($itemFieldName, KalturaESearchItemType::EXACT_MATCH, substr($match, 1, -1), $object_to_fill);
 				}
 				else
 				{
-					$searchItemsArray [] =  self::addSearchItem($itemFieldName, KalturaESearchItemType::PARTIAL, $match);
+					$searchItemsArray [] =  self::addSearchItem($itemFieldName, KalturaESearchItemType::PARTIAL, $match, $object_to_fill);
 				}
 			}
 		}
 		return $searchItemsArray;
 	}
 
-	protected static function addSearchItem($itemFieldName, $itemType, $searchTermPart)
+	protected static function addSearchItem($itemFieldName, $itemType, $searchTermPart, $object_to_fill)
 	{
-		$searchItem = new ESearchEntryItem();
-		$searchItem->setFieldName($itemFieldName);
-		$searchItem->setItemType($itemType);
-		$searchItem->setSearchTerm($searchTermPart);
-		return $searchItem;
+		if($itemFieldName)
+		{
+			$object_to_fill->setFieldName($itemFieldName);
+		}
+		$object_to_fill->setItemType($itemType);
+		$object_to_fill->setSearchTerm($searchTermPart);
+		return $object_to_fill;
 	}
 }
