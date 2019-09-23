@@ -15,10 +15,11 @@ abstract class KalturaESearchItemImpl
 		if(in_array($eSearchItem->itemType, array(KalturaESearchItemType::PARTIAL, KalturaESearchItemType::EXACT_MATCH)) &&
 			self::enclosedInQuotationMarks($searchTerm))
 		{
-			list ($object_to_fill, $props_to_skip) = self::addSubTermToObj($object_to_fill, $props_to_skip, substr($searchTerm, 1, -1));
+			$searchTerm  = substr($searchTerm, 1, -1);
 			$object_to_fill->setItemType(KalturaESearchItemType::EXACT_MATCH);
 			$props_to_skip[] = 'itemType';
 		}
+		list ($object_to_fill, $props_to_skip) = self::addSubTermToObj($object_to_fill, $props_to_skip, $searchTerm);
 		list ($object_to_fill, $props_to_skip) = self::handleItemFieldNameHelper($dynamicEnumMap, $itemFieldName, $eSearchItem, $object_to_fill, $props_to_skip, $fieldEnumMap);
 		return array($object_to_fill, $props_to_skip);
 	}
@@ -64,14 +65,7 @@ abstract class KalturaESearchItemImpl
 			try
 			{
 				$enumType = call_user_func(array($dynamicEnumMap[$itemFieldName], 'getEnumClass'));
-				if ($object_to_fill->getSearchTerm())
-				{
-					$searchTerm = $object_to_fill->getSearchTerm();
-				}
-				else
-				{
-					$searchTerm = $eSearchItem->searchTerm;
-				}
+				$searchTerm = $object_to_fill->getSearchTerm();
 				$SearchTermValue = kPluginableEnumsManager::apiToCore($enumType, $searchTerm);
 				$object_to_fill->setSearchTerm($SearchTermValue);
 				$props_to_skip[] = 'searchTerm';
@@ -113,8 +107,9 @@ abstract class KalturaESearchItemImpl
 		{
 			if(self::enclosedInQuotationMarks($searchTerm))
 			{
-				list ($object_to_fill, $props_to_skip) = self::addSubTermToObj($object_to_fill, $props_to_skip, substr($searchTerm, 1, -1));
+				$searchTerm  = substr($searchTerm, 1, -1);
 			}
+			list ($object_to_fill, $props_to_skip) = self::addSubTermToObj($object_to_fill, $props_to_skip, $searchTerm);
 			return array($object_to_fill, $props_to_skip);
 		}
 		else if ($itemType === KalturaESearchItemType::PARTIAL && preg_match_all('/(\'|\"){1}[^\'\"]+(\'|\"){1}|[^\'\"]*/', $searchTerm, $matches))
@@ -168,21 +163,18 @@ abstract class KalturaESearchItemImpl
 
 	protected static function addSearchItem($itemFieldName, $itemType, $searchTermPart, $object_to_fill)
 	{
-		$className = get_class($object_to_fill);
-		if ($className)
-		{
-			$searchItem = new $className();
-			if($itemFieldName)
-			{
-				$searchItem->setFieldName($itemFieldName);
-			}
-			$searchItem->setItemType($itemType);
-			$searchItem->setSearchTerm($searchTermPart);
-			return $searchItem;
-		}
-		else
+		if (!$object_to_fill)
 		{
 			return null;
 		}
+		$className = get_class($object_to_fill);
+		$searchItem = new $className();
+		if($itemFieldName)
+		{
+			$searchItem->setFieldName($itemFieldName);
+		}
+		$searchItem->setItemType($itemType);
+		$searchItem->setSearchTerm($searchTermPart);
+		return $searchItem;
 	}
 }
