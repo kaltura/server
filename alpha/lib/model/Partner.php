@@ -2131,4 +2131,16 @@ class Partner extends BasePartner
 		$this->putInCustomData('ignoreSynonymEsearch', $v);
 	}
 
+	public function getAvoidIndexingSearchHistory()
+	{
+		return $this->getFromCustomData('avoidIndexingSearchHistory', null, false);
+	}
+
+	public function setAvoidIndexingSearchHistory($v)
+	{
+		$this->putInCustomData('avoidIndexingSearchHistory', $v);
+	}
+
+
+
 }
