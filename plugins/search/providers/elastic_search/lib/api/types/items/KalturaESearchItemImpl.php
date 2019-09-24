@@ -10,13 +10,34 @@ abstract class KalturaESearchItemImpl
 
 	public static function eSearchItemToObjectImpl(&$eSearchItem, $dynamicEnumMap, $itemFieldName, $fieldEnumMap, $object_to_fill = null, $props_to_skip = array())
 	{
+		self::validateSearchTermLength($eSearchItem);
+		$searchTerm = trim($eSearchItem->searchTerm);
+		if(in_array($eSearchItem->itemType, array(KalturaESearchItemType::PARTIAL, KalturaESearchItemType::EXACT_MATCH)) &&
+			self::enclosedInQuotationMarks($searchTerm))
+		{
+			$searchTerm  = substr($searchTerm, 1, -1);
+			$object_to_fill->setItemType(KalturaESearchItemType::EXACT_MATCH);
+			$props_to_skip[] = 'itemType';
+		}
+		list ($object_to_fill, $props_to_skip) = self::addSubTermToObj($object_to_fill, $props_to_skip, $searchTerm);
+		list ($object_to_fill, $props_to_skip) = self::handleItemFieldNameHelper($dynamicEnumMap, $itemFieldName, $eSearchItem, $object_to_fill, $props_to_skip, $fieldEnumMap);
+		return array($object_to_fill, $props_to_skip);
+	}
+
+	public static function eSearchComplexItemToObjectImpl(&$eSearchItem, $dynamicEnumMap, $itemFieldName, $fieldEnumMap, $object_to_fill = null, $props_to_skip = array())
+	{
+		self::validateSearchTermLength($eSearchItem);
+		list($object_to_fill, $props_to_skip) = self::handleSearchTerm($eSearchItem->searchTerm, $eSearchItem->itemType, $object_to_fill, $itemFieldName, $props_to_skip);
+		return self::handleItemFieldName($object_to_fill, $dynamicEnumMap, $itemFieldName, $eSearchItem, $props_to_skip, $fieldEnumMap);
+	}
+
+	protected static function validateSearchTermLength($eSearchItem)
+	{
 		if(strlen($eSearchItem->searchTerm) > self::MAX_SEARCH_TERM_LENGTH)
 		{
 			$eSearchItem->searchTerm =  mb_strcut($eSearchItem->searchTerm, 0, self::MAX_SEARCH_TERM_LENGTH, "utf-8");
 			KalturaLog::log("Search term exceeded maximum allowed length, setting search term to [$eSearchItem->searchTerm]");
 		}
-		list($object_to_fill, $props_to_skip) = self::handleSearchTerm($eSearchItem->searchTerm, $eSearchItem->itemType, $object_to_fill, $itemFieldName, $props_to_skip);
-		return self::handleItemFieldName($object_to_fill, $dynamicEnumMap, $itemFieldName, $eSearchItem, $props_to_skip, $fieldEnumMap);
 	}
 
 	protected static function handleItemFieldName($object_to_fill, $dynamicEnumMap, $itemFieldName, $eSearchItem, $props_to_skip, $fieldEnumMap)
@@ -44,14 +65,15 @@ abstract class KalturaESearchItemImpl
 			try
 			{
 				$enumType = call_user_func(array($dynamicEnumMap[$itemFieldName], 'getEnumClass'));
-				$SearchTermValue = kPluginableEnumsManager::apiToCore($enumType, $eSearchItem->searchTerm);
+				$searchTerm = $object_to_fill->getSearchTerm();
+				$SearchTermValue = kPluginableEnumsManager::apiToCore($enumType, $searchTerm);
 				$object_to_fill->setSearchTerm($SearchTermValue);
 				$props_to_skip[] = 'searchTerm';
 			}
 			catch (kCoreException $e)
 			{
 				if($e->getCode() == kCoreException::ENUM_NOT_FOUND)
-					throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $eSearchItem->searchTerm, 'searchTerm', $dynamicEnumMap[$itemFieldName]);
+					throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $searchTerm, 'searchTerm', $dynamicEnumMap[$itemFieldName]);
 			}
 
 		}
@@ -85,13 +107,14 @@ abstract class KalturaESearchItemImpl
 		{
 			if(self::enclosedInQuotationMarks($searchTerm))
 			{
-				list ($object_to_fill, $props_to_skip) = self::addSubTermToObj($object_to_fill, $props_to_skip, substr($searchTerm, 1, -1));
+				$searchTerm  = substr($searchTerm, 1, -1);
 			}
+			list ($object_to_fill, $props_to_skip) = self::addSubTermToObj($object_to_fill, $props_to_skip, $searchTerm);
 			return array($object_to_fill, $props_to_skip);
 		}
 		else if ($itemType === KalturaESearchItemType::PARTIAL && preg_match_all('/(\'|\"){1}[^\'\"]+(\'|\"){1}|[^\'\"]*/', $searchTerm, $matches))
 		{
-			$searchItems = self::handleMatches($matches[0], $itemFieldName);
+			$searchItems = self::handleMatches($matches[0], $itemFieldName, $object_to_fill);
 			if ($searchItems)
 			{
 				list ($object_to_fill, $props_to_skip) = self::addOperator($props_to_skip, $searchItems);
@@ -117,7 +140,7 @@ abstract class KalturaESearchItemImpl
 		return array($object_to_fill, $props_to_skip);
 	}
 
-	protected static function handleMatches($matches, $itemFieldName)
+	protected static function handleMatches($matches, $itemFieldName, $object_to_fill)
 	{
 		$searchItemsArray = array();
 		foreach ($matches as $match)
@@ -127,21 +150,29 @@ abstract class KalturaESearchItemImpl
 			{
 				if (self::enclosedInQuotationMarks($match))
 				{
-					$searchItemsArray [] = self::addSearchItem($itemFieldName, KalturaESearchItemType::EXACT_MATCH, substr($match, 1, -1));
+					$searchItemsArray [] = self::addSearchItem($itemFieldName, KalturaESearchItemType::EXACT_MATCH, substr($match, 1, -1), $object_to_fill);
 				}
 				else
 				{
-					$searchItemsArray [] =  self::addSearchItem($itemFieldName, KalturaESearchItemType::PARTIAL, $match);
+					$searchItemsArray [] =  self::addSearchItem($itemFieldName, KalturaESearchItemType::PARTIAL, $match, $object_to_fill);
 				}
 			}
 		}
 		return $searchItemsArray;
 	}
 
-	protected static function addSearchItem($itemFieldName, $itemType, $searchTermPart)
+	protected static function addSearchItem($itemFieldName, $itemType, $searchTermPart, $object_to_fill)
 	{
-		$searchItem = new ESearchEntryItem();
-		$searchItem->setFieldName($itemFieldName);
+		if (!$object_to_fill)
+		{
+			return null;
+		}
+		$className = get_class($object_to_fill);
+		$searchItem = new $className();
+		if($itemFieldName)
+		{
+			$searchItem->setFieldName($itemFieldName);
+		}
 		$searchItem->setItemType($itemType);
 		$searchItem->setSearchTerm($searchTermPart);
 		return $searchItem;
