@@ -4331,4 +4331,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				return true;
 		}
 	}
+
+	public function setKeepHandleReplacement($v)
+	{
+		$this->putInCustomData ( "keepHandleReplacement" , (bool) $v );
+	}
+
+	public function getKeepHandleReplacement()
+	{
+		return (bool) $this->getFromCustomData( "keepHandleReplacement" ,null, false );
+	}
 }
