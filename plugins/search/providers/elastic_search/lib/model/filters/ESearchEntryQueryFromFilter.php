@@ -53,13 +53,26 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		ESearchEntryFilterFields::PARTNER_SORT_VALUE,
 		ESearchEntryFilterFields::SEARCH_TEXT,
 		ESearchEntryFilterFields::FREE_TEXT,
-		ESearchEntryFilterFields::TOTAL_RANK
+		ESearchEntryFilterFields::TOTAL_RANK,
+		ESearchEntryFilterFields::LAST_PLAYED_AT,
 	);
 
+	protected static $timeFields = array(
+		ESearchEntryFilterFields::CREATED_AT,
+		ESearchEntryFilterFields::UPDATED_AT,
+		ESearchEntryFilterFields::START_DATE,
+		ESearchEntryFilterFields::END_DATE,
+		ESearchEntryFilterFields::LAST_PLAYED_AT,
+	);
 
 	protected static function getSupportedFields()
 	{
 		return self::$supportedSearchFields;
+	}
+
+	protected function getTimeFields()
+	{
+		return self::$timeFields;
 	}
 
 	protected static $entryNestedFields = array(
@@ -112,7 +125,8 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			ESearchEntryFilterFields::PARTNER_SORT_VALUE => ESearchEntryFieldName::PARTNER_SORT_VALUE,
 			ESearchEntryFilterFields::SEARCH_TEXT => ESearchUnifiedItem::UNIFIED,
 			ESearchEntryFilterFields::FREE_TEXT => ESearchUnifiedItem::UNIFIED,
-			ESearchEntryFilterFields::TOTAL_RANK => ESearchEntryOrderByFieldName::VOTES
+			ESearchEntryFilterFields::TOTAL_RANK => ESearchEntryOrderByFieldName::VOTES,
+			ESearchEntryFilterFields::LAST_PLAYED_AT => ESearchEntryOrderByFieldName::LAST_PLAYED_AT
 		);
 
 		if(array_key_exists($field, $fieldsMap))
@@ -179,14 +193,18 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 				$kEsearchOrderBy = $this->getKESearchOrderBy($fieldValue);
 				continue;
 			}
+
 			$fieldParts = $this->splitIntoParameters($filter, $field, $fieldValue);
 			if (!$fieldParts)
 			{
 				continue;
 			}
+
 			list($operator, $fieldName, $fieldValue) = $fieldParts;
 			$this->addingFieldPartIntoQuery($operator, $fieldName, $fieldValue);
 		}
+
+		$this->processAdvanceFilter($filter->getAdvancedSearch());
 		return $this->createFinalOperator($kEsearchOrderBy);
 	}
 
@@ -197,6 +215,88 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		$operator->setOperator(ESearchOperatorType::AND_OP);
 		$operator->setSearchItems($this->searchItems);
 		return array($operator, $kEsearchOrderBy);
+	}
+
+	/**
+	 * @param AdvancedSearchFilterMatchCondition $filterMatchCondition
+	 * @param $metadataProfileId
+	 */
+	protected function createESearchMetadataItemFromFilterMatchCondition($filterMatchCondition, $metadataProfileId)
+	{
+		$result = new ESearchMetadataItem();
+		$result->setSearchTerm($filterMatchCondition->getValue());
+		$result->setItemType(ESearchItemType::EXACT_MATCH);
+		$result->setXpath($filterMatchCondition->getField());
+		$result->setMetadataProfileId($metadataProfileId);
+		return $result;
+	}
+
+	/**
+	 * @param MetadataSearchFilter $searchFilter
+	 * @return MetadataSearchFilter
+	 */
+	protected function transformMedataSearchFilterIntoAndType($searchFilter)
+	{
+		$searchFilter->setType(MetadataSearchFilter::SEARCH_AND);
+		$items = $searchFilter->getItems();
+		foreach($items as $advancedSearchFilterItem)
+		{
+			/* @var $advancedSearchFilterItem AdvancedSearchFilterMatchCondition */
+			$advancedSearchFilterItem->setNot(!$advancedSearchFilterItem->getNot());
+		}
+
+		return $searchFilter;
+	}
+
+	/**
+	 * @param AdvancedSearchFilterItem $advancedSearchFilterItem
+	 */
+	protected function processAdvanceFilter($advancedSearchFilterItem)
+	{
+		if(is_a($advancedSearchFilterItem, self::METADATA_SEARCH_FILTER))
+		{
+			$this->createESearchMetadataEntryItemsFromMetadataSearchFilter($advancedSearchFilterItem);
+		}
+		else
+		{
+			KalturaLog::debug('Tried to convert not supported advance filter of type:' . get_class($advancedSearchFilterItem));
+		}
+	}
+
+	/**
+	 * @param MetadataSearchFilter $searchFilter
+	 */
+	protected function createESearchMetadataEntryItemsFromMetadataSearchFilter($searchFilter)
+	{
+		if($searchFilter->getType() == MetadataSearchFilter::SEARCH_OR)
+		{
+			$searchFilter = $this->transformMedataSearchFilterIntoAndType($searchFilter);
+		}
+
+		$andOperator = new ESearchNestedOperator();
+		$andOperator->setOperator(ESearchOperatorType::AND_OP);
+		$NotOperator = new ESearchNestedOperator();
+		$NotOperator->setOperator(ESearchOperatorType::NOT_OP);
+		$metadataProfileId = $searchFilter->getMetadataProfileId();
+		foreach($searchFilter->getItems() as $advancedSearchFilterItem)
+		{
+			/* @var $advancedSearchFilterItem AdvancedSearchFilterMatchCondition */
+			$metaDataItem = $this->createESearchMetadataItemFromFilterMatchCondition($advancedSearchFilterItem, $metadataProfileId);
+			$operator = $advancedSearchFilterItem->getNot() ? $NotOperator : $andOperator;
+			$items = $operator->getSearchItems();
+			$items[] = $metaDataItem;
+			$operator->setSearchItems($items);
+		}
+
+		if($andOperator->getSearchItems())
+		{
+			$this->searchItems[] = $andOperator;
+		}
+
+		if($NotOperator->getSearchItems())
+		{
+			$this->searchItems[] = $NotOperator;
+		}
 	}
 
 	protected function addingFieldPartIntoQuery($operator, $fieldName, $fieldValue)

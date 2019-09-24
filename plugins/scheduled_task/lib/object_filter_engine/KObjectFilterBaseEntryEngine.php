@@ -12,6 +12,12 @@ class KObjectFilterBaseEntryEngine extends KObjectFilterEngineBase
 	 */
 	public function query(KalturaFilter $filter)
 	{
+		if(ESearchEntryQueryFromFilter::canTransformFilter($filter))
+		{
+			$ESearchAdapter = new ESearchEntryQueryFromFilter();
+			return 	$ESearchAdapter->retrieveElasticQueryEntryIds($filter, $this->getPager());
+		}
+
 		return $this->_client->baseEntry->listAction($filter, $this->getPager());
 	}
 }

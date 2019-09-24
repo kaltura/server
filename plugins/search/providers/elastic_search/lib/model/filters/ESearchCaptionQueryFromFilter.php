@@ -16,7 +16,8 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 		ESearchCaptionAssetItemFilterFields::LANGUAGE,
 		ESearchCaptionAssetItemFilterFields::LABEL,
 		ESearchCaptionAssetItemFilterFields::START_TIME,
-		ESearchCaptionAssetItemFilterFields::END_TIME);
+		ESearchCaptionAssetItemFilterFields::END_TIME
+    );
 
 
 	protected static $captionNestedFields = array(
@@ -25,7 +26,15 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 		ESearchCaptionFieldName::END_TIME,
 		ESearchCaptionFieldName::LANGUAGE,
 		ESearchCaptionFieldName::LABEL,
-		ESearchCaptionFieldName::CAPTION_ASSET_ID);
+		ESearchCaptionFieldName::CAPTION_ASSET_ID
+    );
+
+    protected static $timeFields = array(
+        ESearchCaptionAssetItemFilterFields::CREATED_AT,
+        ESearchCaptionAssetItemFilterFields::UPDATED_AT,
+        ESearchCaptionAssetItemFilterFields::START_TIME,
+        ESearchCaptionAssetItemFilterFields::END_TIME,
+    );
 
 	public function __construct()
 	{
@@ -48,8 +57,8 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 			ESearchCaptionAssetItemFilterFields::LANGUAGE => ESearchCaptionFieldName::LANGUAGE,
 			ESearchCaptionAssetItemFilterFields::LABEL => ESearchCaptionFieldName::LABEL,
 			ESearchCaptionAssetItemFilterFields::ENTRY_ID => ESearchEntryFieldName::ID,
-			ESearchCaptionAssetItemFilterFields::CREATED_AT => ESearchEntryFieldName::CREATED_AT ,
-			ESearchCaptionAssetItemFilterFields::UPDATED_AT => ESearchEntryFieldName::UPDATED_AT ,
+			ESearchCaptionAssetItemFilterFields::CREATED_AT => ESearchEntryFieldName::CREATED_AT,
+			ESearchCaptionAssetItemFilterFields::UPDATED_AT => ESearchEntryFieldName::UPDATED_AT,
 		);
 
 		if(array_key_exists($field, $fieldsMap))
@@ -198,4 +207,9 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 		}
 		parent::addNestedQueryPart();
 	}
+
+    protected function getTimeFields()
+    {
+        return self::$timeFields;
+    }
 }
