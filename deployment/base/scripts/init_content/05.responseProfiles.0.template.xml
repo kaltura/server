@@ -50,7 +50,7 @@
 				<type>1</type>
 				<name>QandA</name>
 				<systemName>QandA</systemName>
-				<fields>id,name,createdAt,updatedAt,parentId,partnerData,text,tags,userId,startTime,endTime</fields>
+				<fields>id,name,createdAt,updatedAt,parentId,partnerData,text,tags,userId,startTime,endTime,systemName</fields>
 				<relatedProfiles objectType="array">
 					<item objectType="KalturaDetachedResponseProfile">
 						<name>QandA_ResponseProfile</name>

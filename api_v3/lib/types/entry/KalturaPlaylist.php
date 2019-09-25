@@ -195,4 +195,14 @@ class KalturaPlaylist extends KalturaBaseEntry
 		
 		$this->totalResults = (int)$totalResults; // will cast SimpleXMLElement correctly
 	}
+
+	public function validateDisplayInSearch(entry $sourceObject = null)
+	{
+		if(!$sourceObject && $this->displayInSearch === EntryDisplayInSearchType::KALTURA_NETWORK)
+		{
+			return;
+		}
+
+		return parent::validateDisplayInSearch($sourceObject);
+	}
 }

@@ -134,8 +134,8 @@ $objectsToTrack = array(
 ),
 	AuditTrailObjectType::PARTNER => array(
 	'actions' => array(
-		KalturaAuditTrailAction::CHANGED,
-		KalturaAuditTrailAction::DELETED,
+		'CHANGED',
+		'DELETED',
 	),
 	'descriptors' => array(
 		PartnerPeer::PARTNER_NAME,
