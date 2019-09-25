@@ -25,7 +25,6 @@
 	        <field name="force_stop" indexName="force_stop" type="int" />
 	        <field name="created_at" indexName="created_at" type="datetime" orderable="yes" />
 	        <field name="updated_at" indexName="updated_at" type="datetime" orderable="yes" />
-	        <field name="str_entry_id" indexName="str_entry_id" getter="entryId" type="string" sphinxStringAttribute="string" />
 	        <field name="str_cue_point_id" indexName="str_cue_point_id" getter="id" type="string" sphinxStringAttribute="string" />
 	        <field name="is_public" indexName="is_public" getter="isPublicStr" type="string" />
 	        <field name="plugins_data" indexName="plugins_data" type="string" searchableonly="yes" />
