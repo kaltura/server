@@ -79,12 +79,12 @@ class kReplacementHelper
 
 				unset($newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()]);
 
+
 				if ($oldAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 				{
 					$defaultThumbAssetNew = $oldAsset;
 					KalturaLog::info("Nominating ThumbAsset [".$oldAsset->getId()."] as the default ThumbAsset after replacent");
 				}
-
 			}
 			elseif($oldAsset instanceof flavorAsset || $oldAsset instanceof thumbAsset)
 			{
@@ -149,25 +149,20 @@ class kReplacementHelper
 	 * @param $tempEntry
 	 * @throws kCoreException
 	 */
-	public static function handleThumbReplacement($defaultThumbAssetOld, $defaultThumbAssetNew, $entry, $tempEntry)
+	public static function handleThumbReplacement($defaultThumbAssetOld, $defaultThumbAssetNew, $entry, $tempEntry, $linkToTemp = true)
 	{
 		if($defaultThumbAssetOld)
 		{
-			KalturaLog::info("Kepping ThumbAsset [". $defaultThumbAssetOld->getId() ."] as the default ThumbAsset");
+			KalturaLog::info("Keepping ThumbAsset [". $defaultThumbAssetOld->getId() ."] as the default ThumbAsset");
 		}
 		elseif ($defaultThumbAssetNew)
 		{
 			kBusinessConvertDL::setAsDefaultThumbAsset($defaultThumbAssetNew);
 			KalturaLog::info("Setting ThumbAsset [". $defaultThumbAssetNew->getId() ."] as the default ThumbAsset");
 		}
-		else
+		elseif($linkToTemp)
 		{
-			KalturaLog::info("No default ThumbAsset found for replacing entry [". $tempEntry->getId() ."]");
-			$entry->setThumbnail(".jpg"); // thumbnailversion++
-			$entry->save();
-			$tempEntrySyncKey = $tempEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-			$realEntrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-			kFileSyncUtils::createSyncFileLinkForKey($realEntrySyncKey, $tempEntrySyncKey);
+			self::linkDefaultThumbToReplacingEntryThumb($entry, $tempEntry);
 		}
 	}
 
@@ -260,6 +255,7 @@ class kReplacementHelper
 		$newAssets = kReplacementHelper::buildNewAssetsMap(array($currentFlavorAsset));
 		kReplacementHelper::relinkOldAssetsToNewAssetsFromTempEntry($oldAssets, $newAssets, $defaultThumbAssetOld, $defaultThumbAssetNew);
 		kReplacementHelper::copyAssetsToOriginalEntry($originalEntry, $newAssets, $defaultThumbAssetNew);
+		kReplacementHelper::handleThumbReplacement($defaultThumbAssetOld, $defaultThumbAssetNew, $originalEntry, $tempEntry, false);
 	}
 
 	public static function relinkAsset($oldAsset, $newAsset)
@@ -309,6 +305,16 @@ class kReplacementHelper
 		$oldAsset->setFrameRate($newAsset->getFrameRate());
 		$oldAsset->setStatus(flavorAsset::ASSET_STATUS_CONVERTING);
 		$oldAsset->save();
+	}
+
+	public static function linkDefaultThumbToReplacingEntryThumb($entry, $tempEntry)
+	{
+		KalturaLog::info("No default ThumbAsset found for replacing entry [". $tempEntry->getId() ."]");
+		$entry->setThumbnail(".jpg"); // thumbnailversion++
+		$entry->save();
+		$tempEntrySyncKey = $tempEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+		$realEntrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+		kFileSyncUtils::createSyncFileLinkForKey($realEntrySyncKey, $tempEntrySyncKey);
 	}
 
 
