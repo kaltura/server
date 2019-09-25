@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.elasticSearch
+ * @subpackage model.filters
+ */
 
 class ESearchQueryFromFilter
 {

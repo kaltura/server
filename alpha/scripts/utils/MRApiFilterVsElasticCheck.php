@@ -6,6 +6,9 @@ require_once(SCRIPT_PATH . 'batch/client/KalturaClient.php');
 require_once(SCRIPT_PATH . 'batch/client/KalturaPlugins/KalturaScheduledTaskClientPlugin.php');
 require_once(SCRIPT_PATH . 'api_v3/lib/types/IKalturaEnum.php');
 require_once(SCRIPT_PATH . 'api_v3/lib/types/KalturaEnum.php');
+require_once(SCRIPT_PATH . 'api_v3/lib/types/KalturaStringEnum.php');
+require_once(SCRIPT_PATH . 'api_v3/lib/types/IKalturaDynamicEnum.php');
+require_once(SCRIPT_PATH . 'api_v3/lib/types/KalturaDynamicEnum.php');
 require_once(SCRIPT_PATH . 'api_v3/lib/exceptions/KalturaAPIException.php');
 require_once(SCRIPT_PATH . 'api_v3/lib/KalturaErrors.php');
 
@@ -60,7 +63,7 @@ $partnerId = $dbScheduledTaskProfile->getPartnerId();
 $ks = createMrKs($partnerId)->toSecureString();
 kCurrentContext::initKsPartnerUser($ks);
 myPartnerUtils::applyPartnerFilters($partnerId);
-if(getResultFromElastic($dbScheduledTaskProfile->getObjectFilter()) == getResultFromApi($ks, $profileId))
+if(getResultFromApi($ks, $profileId) == getResultFromElastic($dbScheduledTaskProfile->getObjectFilter()))
 {
 	echo "Profile {$profileId} api vs elastic same results\n";
 }

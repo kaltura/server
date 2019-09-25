@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.elasticSearch
+ * @subpackage model.filters
+ */
 
 class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 {
@@ -204,7 +208,8 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			$this->addingFieldPartIntoQuery($operator, $fieldName, $fieldValue);
 		}
 
-		$this->processAdvanceFilter($filter->getAdvancedSearch());
+		$advanceFilterAdapter = new ESearchQueryFromAdvancedSearch();
+		$this->searchItems[] = $advanceFilterAdapter->processAdvanceFilter($filter->getAdvancedSearch());
 		return $this->createFinalOperator($kEsearchOrderBy);
 	}
 
@@ -215,88 +220,6 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		$operator->setOperator(ESearchOperatorType::AND_OP);
 		$operator->setSearchItems($this->searchItems);
 		return array($operator, $kEsearchOrderBy);
-	}
-
-	/**
-	 * @param AdvancedSearchFilterMatchCondition $filterMatchCondition
-	 * @param $metadataProfileId
-	 */
-	protected function createESearchMetadataItemFromFilterMatchCondition($filterMatchCondition, $metadataProfileId)
-	{
-		$result = new ESearchMetadataItem();
-		$result->setSearchTerm($filterMatchCondition->getValue());
-		$result->setItemType(ESearchItemType::EXACT_MATCH);
-		$result->setXpath($filterMatchCondition->getField());
-		$result->setMetadataProfileId($metadataProfileId);
-		return $result;
-	}
-
-	/**
-	 * @param MetadataSearchFilter $searchFilter
-	 * @return MetadataSearchFilter
-	 */
-	protected function transformMedataSearchFilterIntoAndType($searchFilter)
-	{
-		$searchFilter->setType(MetadataSearchFilter::SEARCH_AND);
-		$items = $searchFilter->getItems();
-		foreach($items as $advancedSearchFilterItem)
-		{
-			/* @var $advancedSearchFilterItem AdvancedSearchFilterMatchCondition */
-			$advancedSearchFilterItem->setNot(!$advancedSearchFilterItem->getNot());
-		}
-
-		return $searchFilter;
-	}
-
-	/**
-	 * @param AdvancedSearchFilterItem $advancedSearchFilterItem
-	 */
-	protected function processAdvanceFilter($advancedSearchFilterItem)
-	{
-		if(is_a($advancedSearchFilterItem, self::METADATA_SEARCH_FILTER))
-		{
-			$this->createESearchMetadataEntryItemsFromMetadataSearchFilter($advancedSearchFilterItem);
-		}
-		else
-		{
-			KalturaLog::debug('Tried to convert not supported advance filter of type:' . get_class($advancedSearchFilterItem));
-		}
-	}
-
-	/**
-	 * @param MetadataSearchFilter $searchFilter
-	 */
-	protected function createESearchMetadataEntryItemsFromMetadataSearchFilter($searchFilter)
-	{
-		if($searchFilter->getType() == MetadataSearchFilter::SEARCH_OR)
-		{
-			$searchFilter = $this->transformMedataSearchFilterIntoAndType($searchFilter);
-		}
-
-		$andOperator = new ESearchNestedOperator();
-		$andOperator->setOperator(ESearchOperatorType::AND_OP);
-		$NotOperator = new ESearchNestedOperator();
-		$NotOperator->setOperator(ESearchOperatorType::NOT_OP);
-		$metadataProfileId = $searchFilter->getMetadataProfileId();
-		foreach($searchFilter->getItems() as $advancedSearchFilterItem)
-		{
-			/* @var $advancedSearchFilterItem AdvancedSearchFilterMatchCondition */
-			$metaDataItem = $this->createESearchMetadataItemFromFilterMatchCondition($advancedSearchFilterItem, $metadataProfileId);
-			$operator = $advancedSearchFilterItem->getNot() ? $NotOperator : $andOperator;
-			$items = $operator->getSearchItems();
-			$items[] = $metaDataItem;
-			$operator->setSearchItems($items);
-		}
-
-		if($andOperator->getSearchItems())
-		{
-			$this->searchItems[] = $andOperator;
-		}
-
-		if($NotOperator->getSearchItems())
-		{
-			$this->searchItems[] = $NotOperator;
-		}
 	}
 
 	protected function addingFieldPartIntoQuery($operator, $fieldName, $fieldValue)

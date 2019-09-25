@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.elasticSearch
+ * @subpackage model.filters
+ */
 
 class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 {
@@ -32,8 +36,6 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
     protected static $timeFields = array(
         ESearchCaptionAssetItemFilterFields::CREATED_AT,
         ESearchCaptionAssetItemFilterFields::UPDATED_AT,
-        ESearchCaptionAssetItemFilterFields::START_TIME,
-        ESearchCaptionAssetItemFilterFields::END_TIME,
     );
 
 	public function __construct()
