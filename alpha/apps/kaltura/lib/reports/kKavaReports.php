@@ -1231,14 +1231,14 @@ class kKavaReports extends kKavaReportsMgr
 				'status' => self::DIMENSION_ENTRY_ID,
 				'media_type' => self::DIMENSION_ENTRY_ID,
 				'duration_msecs' => self::DIMENSION_ENTRY_ID,
-
+				'entry_source' => self::DIMENSION_ENTRY_ID,
 			),
+
 			self::REPORT_ENRICH_DEF => array(
 				array(
-					self::REPORT_ENRICH_OUTPUT => array('entry_name', 'creator_name', 'created_at', 'status', 'media_type', 'duration_msecs'),
-					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+					self::REPORT_ENRICH_OUTPUT => array('entry_name', 'creator_name', 'created_at', 'status', 'media_type', 'duration_msecs', 'entry_source'),
+					self::REPORT_ENRICH_FUNC => 'self::getEntriesSource',
 					self::REPORT_ENRICH_CONTEXT => array(
-						'peer' => 'entryPeer',
 						'columns' => array('NAME', 'KUSER_ID', '@CREATED_AT', 'STATUS', 'MEDIA_TYPE', 'LENGTH_IN_MSECS'),
 					)
 				),

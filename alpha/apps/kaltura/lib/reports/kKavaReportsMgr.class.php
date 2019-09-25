@@ -3254,7 +3254,28 @@ class kKavaReportsMgr extends kKavaBase
 		
 		return $result;
 	}
-	
+
+	protected static function getEntriesSource($ids, $partner_id, $context)
+	{
+		$context['peer'] = 'entryPeer';
+		if (!isset($context['columns']))
+			$context['columns'] = array();
+		$context['columns'][] = 'SOURCE';
+		$context['columns'][] = 'ADMIN_TAGS';
+
+		$enrichedResult = self::genericQueryEnrich($ids, $partner_id, $context);
+		foreach ($enrichedResult as $id => $row)
+		{
+			$adminTags = array_pop($row);
+			$sourceType = array_pop($row);
+			$source = self::getEntrySourceType($sourceType, $adminTags);
+			$result[$id] = $row;
+			$result[$id][] = $source;
+		}
+
+		return $result;
+	}
+
 	protected static function getBaseUsersInfo($ids, $partner_id, $context)
 	{
 		$columns = isset($context['columns']) ? $context['columns'] : array('PUSER_ID');
