@@ -1,3 +1,16 @@
+# Orion 15.8.0 #
+
+## Remove str_entry_id field from kaltura_cue_point sphinx table  ##
+- Issue Type: Task
+- Issue ID: PLAT-10199
+
+### Configuration ###
+    update kaltura.conf file and remove from kaltura_cue_point table the following field
+	rt_attr_string	 = str_entry_id
+	
+#### Deployment Scripts ####	
+    Re-index kaltura_cue_point table
+
 # Orion 15.7.0 #
 
 ## Add first+last name to Q&A response profile  ##
