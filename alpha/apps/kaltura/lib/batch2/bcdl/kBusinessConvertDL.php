@@ -3,52 +3,44 @@
 class kBusinessConvertDL
 {
 	/**
-	 * @param entry $entry
-	 * @param entry $tempEntry
+	 * @param entry $replacedEntry
+	 * @param entry $replacingEntry
 	 */
-	public static function replaceEntry(entry $entry, entry $tempEntry = null)
+	public static function replaceEntry(entry $replacedEntry, entry $replacingEntry = null)
 	{
 		$defaultThumbAssetOld = null;
 		$defaultThumbAssetNew = null;
 
-		if(!$tempEntry)
+		if(!$replacingEntry)
 		{
-			$tempEntry = entryPeer::retrieveByPK($entry->getReplacingEntryId());
+			$replacingEntry = entryPeer::retrieveByPK($replacedEntry->getReplacingEntryId());
 		}
 
-		if(!$tempEntry)
+		if(!$replacingEntry)
 		{
-			KalturaLog::err("Temp entry id [" . $entry->getReplacingEntryId() . "] not found");
+			KalturaLog::err("Temp entry id [" . $replacedEntry->getReplacingEntryId() . "] not found");
 			return;
 		}
 
-		//Extract all assets of the existing entry
-		$oldAssets = assetPeer::retrieveByEntryId($entry->getId());
-		$tempReadyAssets = assetPeer::retrieveByEntryId($tempEntry->getId(), null,  array(asset::ASSET_STATUS_READY));
-		$newReadyAssetsMap = kReplacementHelper::buildNewAssetsMap($tempReadyAssets);
-		kReplacementHelper::relinkOldAssetsToNewAssetsFromTempEntry($oldAssets, $newReadyAssetsMap, $defaultThumbAssetOld, $defaultThumbAssetNew, $tempEntry->getId());
-		kReplacementHelper::copyAssetsToOriginalEntry($entry, $newReadyAssetsMap, $defaultThumbAssetNew);
-		kReplacementHelper::handleThumbReplacement($defaultThumbAssetOld, $defaultThumbAssetNew, $entry, $tempEntry);
-		kReplacementHelper::createIsmManifestFileSyncLinkFromReplacingEntry($tempEntry, $entry);
+		kReplacementHelper::handleReplacingEntryReadyAssets($replacedEntry, $replacingEntry, $defaultThumbAssetOld, $defaultThumbAssetNew);
+		kReplacementHelper::handleThumbReplacement($defaultThumbAssetOld, $defaultThumbAssetNew, $replacedEntry, $replacingEntry);
+		kReplacementHelper::createIsmManifestFileSyncLinkFromReplacingEntry($replacingEntry, $replacedEntry);
+		kReplacementHelper::handleReplacingEntryNonReadyAssets($replacedEntry, $replacingEntry, $defaultThumbAssetNew);
+		kReplacementHelper::updateReplacedEntryFields($replacedEntry, $replacingEntry);
 
-		$newNonReadyAssets = kReplacementHelper::getNonReadyAssets($tempEntry->getId(), $entry->getId());
-		$newNonReadyAssetsMap = kReplacementHelper::buildNewAssetsMap($newNonReadyAssets);
-		kReplacementHelper::copyAssetsToOriginalEntry($entry, $newNonReadyAssetsMap, $defaultThumbAssetNew);
-
-		kReplacementHelper::updateOriginalEntryFields($entry, $tempEntry);
-
-		$tempEntry->setKeepHandleReplacement(true);
-		$tempEntry->save();
+		// add flag in order to copy later non ready assets from replacing entry to the replaced entry
+		$replacingEntry->setKeepHandleReplacement(true);
+		$replacingEntry->save();
 
 		//flush deffered events to re-index sphinx before temp entry deletion
 		kEventsManager::flushEvents();
 
-		kBusinessConvertDL::checkForPendingLiveClips($entry);
-		kEventsManager::raiseEvent(new kObjectReplacedEvent($entry, $tempEntry));
+		kBusinessConvertDL::checkForPendingLiveClips($replacedEntry);
+		kEventsManager::raiseEvent(new kObjectReplacedEvent($replacedEntry, $replacingEntry));
 
-		myEntryUtils::deleteEntry($tempEntry,null,true);
+		myEntryUtils::deleteEntry($replacingEntry,null,true);
 
-		kReplacementHelper::addTrackEntryReplacedEntryEvent($entry, $tempEntry);
+		kReplacementHelper::addTrackEntryReplacedEntryEvent($replacedEntry, $replacingEntry);
 	}
 
 	public static function checkForPendingLiveClips(entry $entry)

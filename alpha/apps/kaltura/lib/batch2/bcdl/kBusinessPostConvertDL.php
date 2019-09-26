@@ -154,9 +154,9 @@ class kBusinessPostConvertDL
 			}
 		}
 
-		if(($currentFlavorAsset->getentry()->getStatus() == entryStatus::READY) && ($currentFlavorAsset->getentry()->getKeepHandleReplacement()))
+		if(($currentFlavorAsset->getentry()->getStatus() == entryStatus::READY) && ($currentFlavorAsset->getentry()->getReplacedEntryId()))
 		{
-			kReplacementHelper::addRemainingFlavorToOriginalEntry($currentFlavorAsset);
+			kReplacementHelper::copyReadyReplacingEntryAssetToReplacedEntry($currentFlavorAsset);
 		}
 		
 		return $currentFlavorAsset;

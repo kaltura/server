@@ -692,10 +692,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 
 		if(kReplacementHelper::shouldSyncFlavorInfo($object, $entry))
 		{
-			$originalFlavor = kReplacementHelper::getMatchingFlavorByEntryAndFlavorParams($entry, $object->getFlavorParamsId());
+			$originalFlavor = kReplacementHelper::getOriginalReplacedFlavorByEntryAndFlavorParams($entry, $object->getFlavorParamsId());
 			if($originalFlavor)
 			{
-				kReplacementHelper::syncOriginalFlavor($originalFlavor, $object);
+				kReplacementHelper::syncReplacedAssetFields($originalFlavor, $object);
 			}
 		}
 
