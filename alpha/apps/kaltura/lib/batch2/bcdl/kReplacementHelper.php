@@ -267,6 +267,7 @@ class kReplacementHelper
 		kReplacementHelper::relinkReplacingEntryAssetsToReplacedEntryAssets($oldAssets, $newAssets, $defaultThumbAssetOld, $defaultThumbAssetNew, $replacingEntry->getId());
 		kReplacementHelper::copyReplacingAssetsToReplacedEntry($replacedEntry, $newAssets, $defaultThumbAssetNew);
 		kReplacementHelper::handleThumbReplacement($defaultThumbAssetOld, $defaultThumbAssetNew, $replacedEntry, $replacingEntry, false);
+		kReplacementHelper::updateReplacedEntryFields($replacedEntry, $replacingEntry);
 	}
 
 	/**
