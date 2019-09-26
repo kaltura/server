@@ -24,13 +24,17 @@ class kBusinessConvertDL
 
 		//Extract all assets of the existing entry
 		$oldAssets = assetPeer::retrieveByEntryId($entry->getId());
-		$tempAssets = assetPeer::retrieveByEntryId($tempEntry->getId());
-		$newAssetsMap = kReplacementHelper::buildNewAssetsMap($tempAssets);
-
-		kReplacementHelper::relinkOldAssetsToNewAssetsFromTempEntry($oldAssets, $newAssetsMap, $defaultThumbAssetOld, $defaultThumbAssetNew, $tempEntry->getId());
-		kReplacementHelper::copyAssetsToOriginalEntry($entry, $newAssetsMap, $defaultThumbAssetNew);
+		$tempReadyAssets = assetPeer::retrieveByEntryId($tempEntry->getId(), null,  array(asset::ASSET_STATUS_READY));
+		$newReadyAssetsMap = kReplacementHelper::buildNewAssetsMap($tempReadyAssets);
+		kReplacementHelper::relinkOldAssetsToNewAssetsFromTempEntry($oldAssets, $newReadyAssetsMap, $defaultThumbAssetOld, $defaultThumbAssetNew, $tempEntry->getId());
+		kReplacementHelper::copyAssetsToOriginalEntry($entry, $newReadyAssetsMap, $defaultThumbAssetNew);
 		kReplacementHelper::handleThumbReplacement($defaultThumbAssetOld, $defaultThumbAssetNew, $entry, $tempEntry);
 		kReplacementHelper::createIsmManifestFileSyncLinkFromReplacingEntry($tempEntry, $entry);
+
+		$newNonReadyAssets = kReplacementHelper::getNonReadyAssets($tempEntry->getId(), $entry->getId());
+		$newNonReadyAssetsMap = kReplacementHelper::buildNewAssetsMap($newNonReadyAssets);
+		kReplacementHelper::copyAssetsToOriginalEntry($entry, $newNonReadyAssetsMap, $defaultThumbAssetNew);
+
 		kReplacementHelper::updateOriginalEntryFields($entry, $tempEntry);
 
 		$tempEntry->setKeepHandleReplacement(true);

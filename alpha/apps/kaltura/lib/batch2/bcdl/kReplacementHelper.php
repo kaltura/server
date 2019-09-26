@@ -15,12 +15,6 @@ class kReplacementHelper
 		$newAssets = array();
 		foreach($tempAssets as $newAsset)
 		{
-			if($newAsset->getStatus() != asset::ASSET_STATUS_READY)
-			{
-				KalturaLog::info("Do not add new asset [" . $newAsset->getId() . "] to flavor [" . $newAsset->getFlavorParamsId() . "] status [" . $newAsset->getStatus() . "]");
-				continue;
-			}
-
 			if(!$newAsset->shouldCopyOnReplacement())
 			{
 				KalturaLog::info("Asset defined to not copy on replacement, not adding new asset [{$newAsset->getId()}] of type [{$newAsset->getType()}]");
@@ -284,7 +278,7 @@ class kReplacementHelper
 
 	public static function getNewConvertingFlavor($tempEntryId, $flavorParamsId, $flavorType)
 	{
-		$invalidAssetStatusArray = array(flavorAsset::ASSET_STATUS_DELETED, flavorAsset::ASSET_STATUS_ERROR, flavorAsset::ASSET_STATUS_NOT_APPLICABLE, flavorAsset::ASSET_STATUS_READY);
+		$invalidAssetStatusArray = array(flavorAsset::ASSET_STATUS_DELETED, flavorAsset::ASSET_STATUS_READY);
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $tempEntryId);
 		$c->add(assetPeer::STATUS, $invalidAssetStatusArray, Criteria::NOT_IN);
@@ -343,6 +337,30 @@ class kReplacementHelper
 		$c->add(assetPeer::FLAVOR_PARAMS_ID, $flavorParamsId, Criteria::EQUAL);
 		$newAsset = assetPeer::doSelectOne($c);
 		return $newAsset;
+	}
+
+	public static function getNonReadyAssets($tempEntryId, $originalEntryId)
+	{
+		$missingAssets = array();
+		$invalidStatusArray = array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_DELETED);
+
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $tempEntryId);
+		$c->add(assetPeer::STATUS, $invalidStatusArray, Criteria::NOT_IN);
+		$assets = assetPeer::doSelect($c);
+
+		foreach ($assets as $asset)
+		{
+			$c = new Criteria();
+			$c->add(assetPeer::ENTRY_ID, $originalEntryId);
+			$c->add(assetPeer::FLAVOR_PARAMS_ID, $asset->getFlavorParamsId(), Criteria::EQUAL);
+			$originalAsset = assetPeer::doSelectOne($c);
+			if(!$originalAsset)
+			{
+				$missingAssets[] = $asset;
+			}
+		}
+		return $missingAssets;
 	}
 
 }
