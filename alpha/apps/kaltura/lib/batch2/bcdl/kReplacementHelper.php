@@ -187,7 +187,6 @@ class kReplacementHelper
 		$entry->setReplacementStatus(entryReplacementStatus::NONE);
 		$entry->setReplacementOptions(null);
 		$entry->setStatus($tempEntry->getStatus());
-		$entry->setKeepHandleReplacement(true);
 		$entry->save();
 	}
 
@@ -288,7 +287,7 @@ class kReplacementHelper
 
 	public static function isNewFlavorStillConverting($tempEntryId, $flavorParamsId, $flavorType)
 	{
-		$invalidAssetStatusArray = array(flavorAsset::ASSET_STATUS_DELETED, flavorAsset::ASSET_STATUS_ERROR, flavorAsset::ASSET_STATUS_NOT_APPLICABLE);
+		$invalidAssetStatusArray = array(flavorAsset::ASSET_STATUS_DELETED, flavorAsset::ASSET_STATUS_ERROR, flavorAsset::ASSET_STATUS_NOT_APPLICABLE, flavorAsset::ASSET_STATUS_READY);
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $tempEntryId);
 		$c->add(assetPeer::STATUS, $invalidAssetStatusArray, Criteria::NOT_IN);

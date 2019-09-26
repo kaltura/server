@@ -30,6 +30,9 @@ class kBusinessConvertDL
 		kReplacementHelper::createIsmManifestFileSyncLinkFromReplacingEntry($tempEntry, $entry);
 		kReplacementHelper::updateOriginalEntryFields($entry, $tempEntry);
 
+		$tempEntry->setKeepHandleReplacement(true);
+		$tempEntry->save();
+
 		//flush deffered events to re-index sphinx before temp entry deletion
 		kEventsManager::flushEvents();
 
