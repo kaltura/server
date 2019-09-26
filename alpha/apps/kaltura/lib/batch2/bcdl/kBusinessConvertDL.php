@@ -12,7 +12,10 @@ class kBusinessConvertDL
 		$defaultThumbAssetNew = null;
 
 		if(!$tempEntry)
+		{
 			$tempEntry = entryPeer::retrieveByPK($entry->getReplacingEntryId());
+		}
+
 		if(!$tempEntry)
 		{
 			KalturaLog::err("Temp entry id [" . $entry->getReplacingEntryId() . "] not found");

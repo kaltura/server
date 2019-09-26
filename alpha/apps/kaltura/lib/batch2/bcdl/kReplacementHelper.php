@@ -15,7 +15,7 @@ class kReplacementHelper
 		$newAssets = array();
 		foreach($tempAssets as $newAsset)
 		{
-			if($newAsset->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
+			if($newAsset->getStatus() != asset::ASSET_STATUS_READY)
 			{
 				KalturaLog::info("Do not add new asset [" . $newAsset->getId() . "] to flavor [" . $newAsset->getFlavorParamsId() . "] status [" . $newAsset->getStatus() . "]");
 				continue;
@@ -50,13 +50,12 @@ class kReplacementHelper
 
 	/**
 	 * handle flavors switch from old entry flavors to new replacing entry flavors
-	 * return nominates for default thumb asset
 	 *
 	 * @param $oldAssets
 	 * @param $newAssets
 	 * @param $defaultThumbAssetOld
 	 * @param $defaultThumbAssetNew
-	 * @return array
+	 * @param $tempEntryId
 	 * @throws PropelException
 	 */
 	public static function relinkOldAssetsToNewAssetsFromTempEntry($oldAssets, &$newAssets, &$defaultThumbAssetOld, &$defaultThumbAssetNew, $tempEntryId)
@@ -99,20 +98,18 @@ class kReplacementHelper
 				}
 				elseif ($newAsset)
 				{
-					KalturaLog::info("new asset with paramsId [" . $oldAsset->getFlavorParamsId() . "] and asset id: [" . $newAsset->getId() . "] still converting on temp entry");
-					self::updateOldFlavorFields($oldAsset, $newAsset);
+					KalturaLog::info("new asset with paramsId [" . $oldAsset->getFlavorParamsId() . "] and asset id: [" . $newAsset->getId() . "] still being created on temp entry");
+					self::syncOriginalFlavor($oldAsset, $newAsset);
 				}
 				elseif(self::shouldDeleteMissingAssetDuringReplacement($oldAsset))
 				{
 					KalturaLog::info("Delete old asset [" . $oldAsset->getId() . "] for paramsId [" . $oldAsset->getFlavorParamsId() . "]");
-					$oldAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
+					$oldAsset->setStatus(flavorAsset::ASSET_STATUS_DELETED);
 					$oldAsset->setDeletedAt(time());
 					$oldAsset->save();
 				}
 			}
 		}
-
-		return array ($newAssets, $defaultThumbAssetOld, $defaultThumbAssetNew);
 	}
 
 	/**
@@ -147,6 +144,7 @@ class kReplacementHelper
 	 * @param $defaultThumbAssetNew
 	 * @param $entry
 	 * @param $tempEntry
+	 * @param bool $linkToTemp
 	 * @throws kCoreException
 	 */
 	public static function handleThumbReplacement($defaultThumbAssetOld, $defaultThumbAssetNew, $entry, $tempEntry, $linkToTemp = true)
@@ -251,9 +249,12 @@ class kReplacementHelper
 		$tempEntry = $currentFlavorAsset->getentry();
 		$originalEntry = entryPeer::retrieveByPK($tempEntry->getReplacedEntryId());
 		$oldAssets = assetPeer::retrieveByEntryIdAndParams($originalEntry->getId(), $currentFlavorAsset->getFlavorParamsId());
-		$oldAssets = array($oldAssets);
+		if($oldAssets)
+		{
+			$oldAssets = array($oldAssets);
+		}
 		$newAssets = kReplacementHelper::buildNewAssetsMap(array($currentFlavorAsset));
-		kReplacementHelper::relinkOldAssetsToNewAssetsFromTempEntry($oldAssets, $newAssets, $defaultThumbAssetOld, $defaultThumbAssetNew);
+		kReplacementHelper::relinkOldAssetsToNewAssetsFromTempEntry($oldAssets, $newAssets, $defaultThumbAssetOld, $defaultThumbAssetNew, $tempEntry->getId());
 		kReplacementHelper::copyAssetsToOriginalEntry($originalEntry, $newAssets, $defaultThumbAssetNew);
 		kReplacementHelper::handleThumbReplacement($defaultThumbAssetOld, $defaultThumbAssetNew, $originalEntry, $tempEntry, false);
 	}
@@ -293,8 +294,10 @@ class kReplacementHelper
 		return $newAsset;
 	}
 
-	public static function updateOldFlavorFields($oldAsset, $newAsset)
+	public static function syncOriginalFlavor($oldAsset, $newAsset)
 	{
+		KalturaLog::info("Sync asset [" . $newAsset->getId() . "] with the properties from temp asset [" . $oldAsset->getId() . "]");
+		kEventsManager::enableEvents(false);
 		$oldAsset->setBitrate($newAsset->getBitrate());
 		$oldAsset->setWidth($newAsset->getWidth());
 		$oldAsset->setHeight($newAsset->getHeight());
@@ -303,8 +306,9 @@ class kReplacementHelper
 		$oldAsset->setContainerFormat($newAsset->getContainerFormat());
 		$oldAsset->setFileExt($newAsset->getFileExt());
 		$oldAsset->setFrameRate($newAsset->getFrameRate());
-		$oldAsset->setStatus(flavorAsset::ASSET_STATUS_CONVERTING);
+		$oldAsset->setStatus($newAsset->getStatus());
 		$oldAsset->save();
+		kEventsManager::enableEvents(true);
 	}
 
 	public static function linkDefaultThumbToReplacingEntryThumb($entry, $tempEntry)
@@ -317,5 +321,28 @@ class kReplacementHelper
 		kFileSyncUtils::createSyncFileLinkForKey($realEntrySyncKey, $tempEntrySyncKey);
 	}
 
+	public static function shouldSyncFlavorInfo($object, $entry)
+	{
+		if($object->getStatus() == asset::ASSET_STATUS_DELETED)
+		{
+			return false;
+		}
+
+		if($entry->getReplacedEntryId() && $entry->getKeepHandleReplacement())
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	public static function getMatchingFlavorByEntryAndFlavorParams($entry, $flavorParamsId)
+	{
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entry->getReplacedEntryId());
+		$c->add(assetPeer::FLAVOR_PARAMS_ID, $flavorParamsId, Criteria::EQUAL);
+		$newAsset = assetPeer::doSelectOne($c);
+		return $newAsset;
+	}
 
 }
