@@ -1,5 +1,17 @@
 # Orion 15.8.0 #
 
+## Add systemName name to Q&A response profile  ##
+- Issue Type: Feature
+- Issue ID: WEBC-1554
+
+### Configuration ###
+    First replace all tokens from the XML files below and remove ".template" from the file name:
+    /opt/kaltura/app/deployment/updates/scripts/xml/2019_09_25_updateQandAResponseProfile_addSystemName.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2019_09_25_updateQandAResponseProfile_addSystemName.php
+
+
 ## Remove str_entry_id field from kaltura_cue_point sphinx table  ##
 - Issue Type: Task
 - Issue ID: PLAT-10199
