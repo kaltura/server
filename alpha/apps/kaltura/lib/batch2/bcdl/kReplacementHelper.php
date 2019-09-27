@@ -88,6 +88,7 @@ class kReplacementHelper
 			}
 			elseif($oldAsset instanceof flavorAsset || $oldAsset instanceof thumbAsset)
 			{
+				$newAsset = self::getNewConvertingFlavor($tempEntryId, $oldAsset->getFlavorParamsId(), $oldAsset->getType());
 				if($oldAsset instanceof thumbAsset && $oldAsset->keepOnEntryReplacement())
 				{
 					KalturaLog::info("KeepManualThumbnails ind is set, manual thumbnail is not deleted [" . $oldAsset->getId() . "]");
@@ -96,11 +97,10 @@ class kReplacementHelper
 						$defaultThumbAssetOld = $oldAsset;
 					}
 				}
-				elseif (self::isNewFlavorStillConverting($tempEntryId, $oldAsset->getFlavorParamsId(), $oldAsset->getType()))
+				elseif ($newAsset)
 				{
-					KalturaLog::info("new asset with paramsId [" . $oldAsset->getFlavorParamsId() . "] still converting on temp entry");
-					$oldAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING);
-					$oldAsset->save();
+					KalturaLog::info("new asset with paramsId [" . $oldAsset->getFlavorParamsId() . "] and asset id: [" . $newAsset->getId() . "] still converting on temp entry");
+					self::updateOldFlavorFields($oldAsset, $newAsset);
 				}
 				elseif(self::shouldDeleteMissingAssetDuringReplacement($oldAsset))
 				{
@@ -285,7 +285,7 @@ class kReplacementHelper
 		}
 	}
 
-	public static function isNewFlavorStillConverting($tempEntryId, $flavorParamsId, $flavorType)
+	public static function getNewConvertingFlavor($tempEntryId, $flavorParamsId, $flavorType)
 	{
 		$invalidAssetStatusArray = array(flavorAsset::ASSET_STATUS_DELETED, flavorAsset::ASSET_STATUS_ERROR, flavorAsset::ASSET_STATUS_NOT_APPLICABLE, flavorAsset::ASSET_STATUS_READY);
 		$c = new Criteria();
@@ -294,11 +294,21 @@ class kReplacementHelper
 		$c->add(assetPeer::FLAVOR_PARAMS_ID, $flavorParamsId, Criteria::EQUAL);
 		$c->add(assetPeer::TYPE, $flavorType, Criteria::EQUAL);
 		$newAsset = assetPeer::doSelectOne($c);
-		if($newAsset)
-		{
-			return true;
-		}
-		return false;
+		return $newAsset;
+	}
+
+	public static function updateOldFlavorFields($oldAsset, $newAsset)
+	{
+		$oldAsset->setBitrate($newAsset->getBitrate());
+		$oldAsset->setWidth($newAsset->getWidth());
+		$oldAsset->setHeight($newAsset->getHeight());
+		$oldAsset->setSize($newAsset->getSize());
+		$oldAsset->setVideoCodecId($newAsset->getVideoCodecId());
+		$oldAsset->setContainerFormat($newAsset->getContainerFormat());
+		$oldAsset->setFileExt($newAsset->getFileExt());
+		$oldAsset->setFrameRate($newAsset->getFrameRate());
+		$oldAsset->setStatus(flavorAsset::ASSET_STATUS_CONVERTING);
+		$oldAsset->save();
 	}
 
 
