@@ -4332,13 +4332,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		}
 	}
 
-	public function setKeepHandleReplacement($v)
+	public function setSyncFlavorsOnceReady($v)
 	{
-		$this->putInCustomData ( "keepHandleReplacement" , (bool) $v );
+		$this->putInCustomData ( "syncFlavorsOnceReady" , (bool) $v );
 	}
 
-	public function getKeepHandleReplacement()
+	public function getSyncFlavorsOnceReady()
 	{
-		return (bool) $this->getFromCustomData( "keepHandleReplacement" ,null, false );
+		return (bool) $this->getFromCustomData( "syncFlavorsOnceReady" ,null, false );
 	}
 }

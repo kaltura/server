@@ -22,15 +22,21 @@ class kBusinessConvertDL
 			return;
 		}
 
-		kReplacementHelper::handleReplacingEntryReadyAssets($replacedEntry, $replacingEntry, $defaultThumbAssetOld, $defaultThumbAssetNew);
+		//copy and relink all the ready assets on the replacing entry to the replaced entry and change the status of the existing params that are not ready
+		$oldAssets = assetPeer::retrieveByEntryId($replacedEntry->getId());
+		$tempReadyAssets = assetPeer::retrieveByEntryId($replacingEntry->getId(), null, array(asset::ASSET_STATUS_READY));
+		$newReadyAssetsMap = kReplacementHelper::buildAssetsToCopyMap($tempReadyAssets);
+		list($existingReadyAssetIds, $existingNonReadyAssetIds) = kReplacementHelper::relinkReplacingEntryAssetsToReplacedEntryAssets($oldAssets, $newReadyAssetsMap, $defaultThumbAssetOld, $defaultThumbAssetNew, $replacingEntry->getId());
+		$nonExistingReadyAssets = kReplacementHelper::copyReplacingAssetsToReplacedEntry($replacedEntry, $newReadyAssetsMap, $defaultThumbAssetNew);
+
+		// add flag in order to copy later and update the info of non ready assets from replacing entry to the replaced entry
+		$replacingEntry->setSyncFlavorsOnceReady(true);
+		$replacingEntry->save();
+
 		kReplacementHelper::handleThumbReplacement($defaultThumbAssetOld, $defaultThumbAssetNew, $replacedEntry, $replacingEntry);
 		kReplacementHelper::createIsmManifestFileSyncLinkFromReplacingEntry($replacingEntry, $replacedEntry);
-		kReplacementHelper::handleReplacingEntryNonReadyAssets($replacedEntry, $replacingEntry, $defaultThumbAssetNew);
+		$nonExistingNonReadyAssets = kReplacementHelper::handleReplacingEntryNonReadyAssetsForNewParams($replacedEntry, $replacingEntry, $defaultThumbAssetNew);
 		kReplacementHelper::updateReplacedEntryFields($replacedEntry, $replacingEntry);
-
-		// add flag in order to copy later non ready assets from replacing entry to the replaced entry
-		$replacingEntry->setKeepHandleReplacement(true);
-		$replacingEntry->save();
 
 		//flush deffered events to re-index sphinx before temp entry deletion
 		kEventsManager::flushEvents();
@@ -40,7 +46,7 @@ class kBusinessConvertDL
 
 		myEntryUtils::deleteEntry($replacingEntry,null,true);
 
-		kReplacementHelper::addTrackEntryReplacedEntryEvent($replacedEntry, $replacingEntry);
+		kReplacementHelper::addTrackEntryReplacedEntryEvent($replacedEntry, $replacingEntry, $existingReadyAssetIds, $existingNonReadyAssetIds, $nonExistingReadyAssets, $nonExistingNonReadyAssets);
 	}
 
 	public static function checkForPendingLiveClips(entry $entry)

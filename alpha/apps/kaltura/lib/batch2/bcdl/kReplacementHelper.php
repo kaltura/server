@@ -50,10 +50,14 @@ class kReplacementHelper
 	 * @param $defaultThumbAssetOld
 	 * @param $defaultThumbAssetNew
 	 * @param $replacingEntry
+	 * @return array
 	 * @throws PropelException
 	 */
 	public static function relinkReplacingEntryAssetsToReplacedEntryAssets($replacedEntryAssets, &$replacingEntryAssets, &$defaultThumbAssetOld, &$defaultThumbAssetNew, $replacingEntry)
 	{
+		$existingReadyAssetIds = array();
+		$existingNonReadyAssetIds = array();
+
 		foreach($replacedEntryAssets as $replacedEntryAsset)
 		{
 			/* @var $replacedEntryAsset asset */
@@ -69,6 +73,7 @@ class kReplacementHelper
 				}
 
 				self::relinkAsset($replacedEntryAsset, $newReplacingAsset);
+				$existingReadyAssetIds[] = $replacedEntryAsset->getId();
 
 				unset($replacingEntryAssets[$replacedEntryAsset->getType()][$replacedEntryAsset->getFlavorParamsId()]);
 
@@ -91,9 +96,11 @@ class kReplacementHelper
 						$defaultThumbAssetOld = $replacedEntryAsset;
 					}
 				}
+				// handle flavors that exist in the original replaced entry and have corresponding non ready asset on the replacing entry
 				elseif ($newReplacingAsset)
 				{
 					KalturaLog::info("new asset with paramsId [" . $replacedEntryAsset->getFlavorParamsId() . "] and asset id: [" . $newReplacingAsset->getId() . "] still being created on replacing entry");
+					$existingNonReadyAssetIds[] = $replacedEntryAsset->getId();
 					self::syncReplacedAssetFields($replacedEntryAsset, $newReplacingAsset);
 				}
 				elseif(self::shouldDeleteMissingAssetDuringReplacement($replacedEntryAsset))
@@ -105,6 +112,8 @@ class kReplacementHelper
 				}
 			}
 		}
+
+		return array($existingReadyAssetIds, $existingNonReadyAssetIds);
 	}
 
 	/**
@@ -113,15 +122,18 @@ class kReplacementHelper
 	 * @param $replaceEntry
 	 * @param $newReplacingAssets
 	 * @param $defaultThumbAssetNew
+	 * @return array
 	 */
 	public static function copyReplacingAssetsToReplacedEntry($replaceEntry, $newReplacingAssets, &$defaultThumbAssetNew)
 	{
+		$copiedAssets = array();
 		foreach($newReplacingAssets as $newAssetsByTypes)
 		{
 			foreach ($newAssetsByTypes as $newAsset)
 			{
 				$createdAsset = $newAsset->copyToEntry($replaceEntry->getId(), $replaceEntry->getPartnerId());
 				KalturaLog::info("Copied from new asset [" . $newAsset->getId() . "] to copied asset [" . $createdAsset->getId() . "] for flavor [" . $newAsset->getFlavorParamsId() . "]");
+				$copiedAssets[] = $createdAsset->getId();
 
 				if ($createdAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 				{
@@ -130,6 +142,7 @@ class kReplacementHelper
 				}
 			}
 		}
+		return $copiedAssets;
 	}
 
 	/**
@@ -233,14 +246,22 @@ class kReplacementHelper
 	 *
 	 * @param $replacedEntry
 	 * @param $replacingEntry
+	 * @param $existingReadyAssetIds
+	 * @param $existingNonReadyAssetIds
+	 * @param $nonExistingReadyAssets
+	 * @param $nonExistingNonReadyAssets
 	 */
-	public static function addTrackEntryReplacedEntryEvent($replacedEntry, $replacingEntry)
+	public static function addTrackEntryReplacedEntryEvent($replacedEntry, $replacingEntry, $existingReadyAssetIds, $existingNonReadyAssetIds, $nonExistingReadyAssets, $nonExistingNonReadyAssets)
 	{
 		$te = new TrackEntry();
 		$te->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_REPLACED_ENTRY);
 		$te->setEntryId($replacedEntry->getId());
 		$te->setParam1Str($replacingEntry->getId());
 		$te->setDescription(__METHOD__ . "[" . __LINE__ . "]");
+		$te->setChangedProperties("existingReadyAssetIds: ". implode(", ", $existingReadyAssetIds) . "\n" .
+									"existingNonReadyAssetIds: ". implode(", ", $existingNonReadyAssetIds) . "\n" .
+									"nonOriginallyExistingReadyAssets: ". implode(", ", $nonExistingReadyAssets) . "\n" .
+									"nonOriginallyExistingNonReadyAssets: ". implode(", ", $nonExistingNonReadyAssets));
 		TrackEntry::addTrackEntry($te);
 	}
 
@@ -374,7 +395,7 @@ class kReplacementHelper
 			return false;
 		}
 
-		if($entry->getReplacedEntryId() && $entry->getKeepHandleReplacement())
+		if($entry->getReplacedEntryId() && $entry->getSyncFlavorsOnceReady())
 		{
 			return true;
 		}
@@ -415,7 +436,7 @@ class kReplacementHelper
 
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $replacingEntryId);
-		$c->add(assetPeer::STATUS, $invalidStatusArray, Criteria::NOT_IN);
+		$c->add(assetPeer::STATUS, asset::ASSET_STATUS_READY, Criteria::NOT_EQUAL);
 		$assets = assetPeer::doSelect($c);
 
 		// check if the asset doesnt already exist on the replaced entry
@@ -434,37 +455,20 @@ class kReplacementHelper
 	}
 
 	/**
-	 * copy and relink all the ready assets on the replacing entry to the replaced entry
-	 *
-	 * @param $replacedEntry
-	 * @param $replacingEntry
-	 * @param $defaultThumbAssetOld
-	 * @param $defaultThumbAssetNew
-	 * @throws PropelException
-	 */
-	public static function handleReplacingEntryReadyAssets($replacedEntry, $replacingEntry, &$defaultThumbAssetOld, &$defaultThumbAssetNew)
-	{
-		$oldAssets = assetPeer::retrieveByEntryId($replacedEntry->getId());
-		$tempReadyAssets = assetPeer::retrieveByEntryId($replacingEntry->getId(), null, array(asset::ASSET_STATUS_READY));
-		$newReadyAssetsMap = kReplacementHelper::buildAssetsToCopyMap($tempReadyAssets);
-		kReplacementHelper::relinkReplacingEntryAssetsToReplacedEntryAssets($oldAssets, $newReadyAssetsMap, $defaultThumbAssetOld, $defaultThumbAssetNew, $replacingEntry->getId());
-		kReplacementHelper::copyReplacingAssetsToReplacedEntry($replacedEntry, $newReadyAssetsMap, $defaultThumbAssetNew);
-	}
-
-	/**
 	 * handle all the flavors that should be created later on the replaced entry as part of the replacement but currently
 	 * missing from it (replacement using different conversion profile)
 	 *
 	 * @param $replacedEntry
 	 * @param $replacingEntry
 	 * @param $defaultThumbAssetNew
+	 * @return array
 	 * @throws PropelException
 	 */
-	public static function handleReplacingEntryNonReadyAssets($replacedEntry, $replacingEntry, &$defaultThumbAssetNew)
+	public static function handleReplacingEntryNonReadyAssetsForNewParams($replacedEntry, $replacingEntry, &$defaultThumbAssetNew)
 	{
 		$newNonReadyAssets = kReplacementHelper::getNonReadyAssetsFromReplacingEntry($replacingEntry->getId(), $replacedEntry->getId());
 		$newNonReadyAssetsMap = kReplacementHelper::buildAssetsToCopyMap($newNonReadyAssets);
-		kReplacementHelper::copyReplacingAssetsToReplacedEntry($replacedEntry, $newNonReadyAssetsMap, $defaultThumbAssetNew);
+		return kReplacementHelper::copyReplacingAssetsToReplacedEntry($replacedEntry, $newNonReadyAssetsMap, $defaultThumbAssetNew);
 	}
 
 }
