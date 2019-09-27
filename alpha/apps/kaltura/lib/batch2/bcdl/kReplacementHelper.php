@@ -432,7 +432,6 @@ class kReplacementHelper
 	public static function getNonReadyAssetsFromReplacingEntry($replacingEntryId, $replacedEntryId)
 	{
 		$missingAssets = array();
-		$invalidStatusArray = array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_DELETED);
 
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $replacingEntryId);
