@@ -215,7 +215,7 @@ class KGenericProcessor
 				$result = ScheduledTaskBatchHelper::query($this->taskRunner->getClient(), $profile, $pager);
 				$retries++;
 			}
-			while($retries <= self::MAX_RETRIES_NUM && !$result);
+			while($retries < self::MAX_RETRIES_NUM && !$result);
 
 			if (!$result)
 			{
