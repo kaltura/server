@@ -8,11 +8,12 @@ class ESearchQueryFromAdvancedSearch
 {
 	const METADATA_SEARCH_FILTER = 'MetadataSearchFilter';
 	const SEARCH_OPERATOR = 'AdvancedSearchFilterOperator';
+	const ADVANCED_SEARCH_FILTER_MATCH_CONDITION = 'AdvancedSearchFilterMatchCondition';
 	const MRP_DATA_FIELD = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPData\']';
 
 	/**
 	 * @param AdvancedSearchFilterItem $advancedSearchFilterItem
-	 * @return ESearchNestedOperator
+	 * @return ESearchOperator
 	 * @throws KalturaException
 	 */
 	public function processAdvanceFilter($advancedSearchFilterItem)
@@ -29,7 +30,6 @@ class ESearchQueryFromAdvancedSearch
 				KalturaLog::crit('Tried to convert not supported advance filter of type:' . get_class($advancedSearchFilterItem));
 		}
 	}
-
 
 	protected function getESearchOperatorByAdvancedSearchFilterOperator($type)
 	{
@@ -49,7 +49,7 @@ class ESearchQueryFromAdvancedSearch
 
 	protected function createESearchQueryFromSearchFilterOperator(AdvancedSearchFilterOperator $operator)
 	{
-		$advanceFilterOperator = new ESearchNestedOperator();
+		$advanceFilterOperator = new ESearchOperator();
 		$advanceFilterOperator->setOperator($this->getESearchOperatorByAdvancedSearchFilterOperator($operator->getType()));
 		$items = array();
 		foreach($operator->getItems() as $advancedSearchFilterItem)
@@ -87,7 +87,7 @@ class ESearchQueryFromAdvancedSearch
 
 		if($filterMatchCondition->getNot())
 		{
-			$result = new ESearchNestedOperator();
+			$result = new ESearchOperator();
 			$result->setOperator(ESearchOperatorType::NOT_OP);
 			$result->setSearchItems(array($item));
 		}
@@ -101,12 +101,12 @@ class ESearchQueryFromAdvancedSearch
 
 	/**
 	 * @param MetadataSearchFilter $searchFilter
-	 * @return ESearchNestedOperator
+	 * @return ESearchOperator
 	 * @throws KalturaException
 	 */
 	protected function createESearchMetadataEntryItemsFromMetadataSearchFilter(MetadataSearchFilter $searchFilter)
 	{
-		$advanceFilterOperator = new ESearchNestedOperator();
+		$advanceFilterOperator = new ESearchOperator();
 		$advanceFilterOperator->setOperator($this->getESearchOperatorByAdvancedSearchFilterOperator($searchFilter->getType()));
 		$metadataProfileId = $searchFilter->getMetadataProfileId();
 		$metaDataItems = array();
@@ -118,5 +118,48 @@ class ESearchQueryFromAdvancedSearch
 
 		$advanceFilterOperator->setSearchItems($metaDataItems);
 		return $advanceFilterOperator;
+	}
+
+	public static function canTransformAdvanceFilter($item)
+	{
+		$type = get_class($item);
+		$result = self::canTransformType($type);
+		if($result)
+		{
+			if(is_a($item, self::SEARCH_OPERATOR))
+			{
+				if(!count($item->getItems()))
+				{
+					return $result;
+				}
+				else
+				{
+					foreach($item->getItems() as $item)
+					{
+						$result = self::canTransformAdvanceFilter($item);
+						if(!$result)
+						{
+							return false;
+						}
+					}
+				}
+			}
+		}
+
+		return $result;
+	}
+
+	protected static function canTransformType($type)
+	{
+		switch($type)
+		{
+			case self::SEARCH_OPERATOR:
+			case self::ADVANCED_SEARCH_FILTER_MATCH_CONDITION:
+			case self::METADATA_SEARCH_FILTER:
+				return true;
+				break;
+			default:
+				return false;
+		}
 	}
 }

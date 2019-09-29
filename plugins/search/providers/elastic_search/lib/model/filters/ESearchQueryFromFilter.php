@@ -20,9 +20,7 @@ class ESearchQueryFromFilter
 	const FIELD_CLASS_LOCATION = 1;
 	const FIELD_NAME = 'fieldName';
 	const KALTURA_METADATA_SEARCH_ITEM = 'KalturaMetadataSearchItem';
-	const METADATA_SEARCH_FILTER = 'MetadataSearchFilter';
 	const KALTURA_CLASS = 'kalturaClass';
-	const ADVANCED_SEARCH_FILTER_MATCH_CONDITION = 'AdvancedSearchFilterMatchCondition';
 
 	public function __construct()
 	{
@@ -53,24 +51,7 @@ class ESearchQueryFromFilter
 		$result = !isset($filter->advancedSearch);
 		if(!$result)
 		{
-			$result = is_a($filter->advancedSearch, self::METADATA_SEARCH_FILTER);
-			if($result)
-			{
-				$advanceSearch = $filter->advancedSearch;
-				/* @var $advanceSearch MetadataSearchFilter */
-				if(!count($advanceSearch->getItems()))
-				{
-					return $result;
-				}
-
-				foreach($advanceSearch->getItems() as $item)
-				{
-					if(!is_a($item, self::ADVANCED_SEARCH_FILTER_MATCH_CONDITION))
-					{
-						return false;
-					}
-				}
-			}
+			$result = ESearchQueryFromAdvancedSearch::canTransformAdvanceFilter($filter->advancedSearch);
 		}
 
 		return $result;

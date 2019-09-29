@@ -22,11 +22,17 @@ function createMrKs($partnerId)
 
 function getResultFromElastic($filter)
 {
+	if(!ESearchEntryQueryFromFilter::canTransformFilter($filter))
+	{
+		echo "Cannot transform filter to elastic query.\n";
+		die;
+	}
+
 	$entryQueryToFilterESearch = new ESearchEntryQueryFromFilter();
 	$pager = new kPager();
-	list ($currEntryIds, $count) = $entryQueryToFilterESearch->retrieveElasticQueryEntryIds($filter, $pager);
+	list ($entryIds, $count) = $entryQueryToFilterESearch->retrieveElasticQueryEntryIds($filter, $pager);
 	echo 'Entries count from elastic ' . $count . PHP_EOL;
-	return $count;
+	return array($entryIds, $count);
 }
 
 function getResultFromApi($ks, $profileId)
@@ -40,7 +46,17 @@ function getResultFromApi($ks, $profileId)
 	$pager = new KalturaFilterPager();
 	$result =  $client->baseEntry->listAction($profile->objectFilter, $pager);
 	echo 'Entries count from api ' . $result->totalCount . PHP_EOL;
-	return $result->totalCount;
+	$entryIds = array();
+	if($result->totalCount > 0)
+	{
+		foreach($result->objects as $object)
+		{
+			$entryIds[] = $object->id;
+		}
+
+	}
+
+	return array($entryIds, $result->totalCount);
 }
 
 if($argc < 2){
@@ -63,11 +79,34 @@ $partnerId = $dbScheduledTaskProfile->getPartnerId();
 $ks = createMrKs($partnerId)->toSecureString();
 kCurrentContext::initKsPartnerUser($ks);
 myPartnerUtils::applyPartnerFilters($partnerId);
-if(getResultFromApi($ks, $profileId) == getResultFromElastic($dbScheduledTaskProfile->getObjectFilter()))
+list ($apiEntryIds, $apiCount) = getResultFromApi($ks, $profileId);
+list ($elasticEntryIds, $elasticCount) = getResultFromElastic($dbScheduledTaskProfile->getObjectFilter());
+if($apiCount == $elasticCount)
 {
 	echo "Profile {$profileId} api vs elastic same results\n";
 }
 else
 {
+	$apiEntriesNotInElastic = array();
+	foreach($apiEntryIds as $entryId)
+	{
+		if(!in_array($entryId, $elasticEntryIds))
+		{
+			$apiEntriesNotInElastic[] = $entryId;
+		}
+	}
+
+	$apiEntriesNotInApi = array();
+	foreach($elasticEntryIds as $entryId)
+	{
+		if(!in_array($entryId, $apiEntryIds))
+		{
+			$apiEntriesNotInApi[] = $entryId;
+		}
+	}
+
 	echo "Profile {$profileId} api vs elastic different results\n";
+	$apiString = implode(" ", $apiEntriesNotInApi);
+	$elasticString = implode(" ", $apiEntriesNotInElastic);
+	echo "Entries not in the api {$apiString} and entries not in elastic {$elasticString}\n";
 }
