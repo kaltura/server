@@ -15,9 +15,6 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 	 */
 	protected $styles;
 
-	const XML_PARSE_REGEX_AMP = '/&(?!#?[a-z0-9]+;)/';
-	const XML_AMP = '&amp;';
-	
 	/**
 	 * @param DOMElement $element
 	 * @param array $style
