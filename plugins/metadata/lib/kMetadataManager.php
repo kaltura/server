@@ -819,10 +819,13 @@ class kMetadataManager
 			$profileFieldData['metadata_profile_id'] = $profileId;
 			$metadataProfile = MetadataProfilePeer::retrieveByPK($profileId);
 			if($metadataProfile)
+			{
 				$systemName = $metadataProfile->getSystemName();
-
-			if($systemName)
-				$profileFieldData['system_name'] = $systemName;
+				if ($systemName)
+				{
+					$profileFieldData['system_name'] = $systemName;
+				}
+			}
 
 			$xpath = $profileField->getXpath();
 			$profileFieldData['xpath'] = $xpath;

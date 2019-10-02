@@ -38,9 +38,12 @@ abstract class kCaptionsContentManager
 	 */
 	protected static function getNextValueFromArray(array &$array)
 	{
-		$element = each($array);
+		$element = current($array);
 		if (is_array($element))
-			return $element['value'];
+		{
+			next($array);
+			return $element;
+		}
 
 		return false;
 	}

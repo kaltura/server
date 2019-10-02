@@ -14,6 +14,9 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 	 * @var array
 	 */
 	protected $styles;
+
+	const XML_PARSE_REGEX_AMP = '/&(?!#?[a-z0-9]+;)/';
+	const XML_AMP = '&amp;';
 	
 	/**
 	 * @param DOMElement $element
@@ -119,9 +122,10 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 	public function parse($content)
 	{
 		$xml = new KDOMDocument();
+
 		try
 		{
-			$xml->loadXML(trim($content, " \r\n\t"));
+			@$xml->loadXML(trim($content, " \r\n\t"));
 		}
 		catch(Exception $e)
 		{
