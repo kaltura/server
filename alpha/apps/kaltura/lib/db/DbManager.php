@@ -258,11 +258,11 @@ class DbManager
 				$sphinxDS = isset(self::$config['sphinx_datasources']['datasources']) ? self::$config['sphinx_datasources']['datasources'] : array(self::DB_CONFIG_SPHINX);
 			}
 			
-			$customDataSourceAccounts = kConf::getMap('custom_datasource_accounts');
+			$dedicatedDataSourceAccounts = kConf::getMap('dedicated_datasource_accounts');
 			$currentPartnerId = kCurrentContext::getCurrentPartnerId();
-			if($currentPartnerId && in_array($currentPartnerId, $customDataSourceAccounts) && isset(self::$config['sphinx_datasources']['custom_datasources']))
+			if($currentPartnerId && in_array($currentPartnerId, $dedicatedDataSourceAccounts) && isset(self::$config['sphinx_datasources']['dedicated_datasources']))
 			{
-				$sphinxDS = self::$config['sphinx_datasources']['custom_datasources'];
+				$sphinxDS = self::$config['sphinx_datasources']['dedicated_datasources'];
 			}
 
 			$cacheExpiry = isset(self::$config['sphinx_datasources']['cache_expiry']) ? self::$config['sphinx_datasources']['cache_expiry'] : 30;
