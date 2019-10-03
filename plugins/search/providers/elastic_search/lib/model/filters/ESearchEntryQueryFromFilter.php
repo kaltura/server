@@ -8,6 +8,16 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 {
 	const ASC = '+';
 	const DESC = '-';
+	const ENTRY_FILTER = 'entryFilter';
+	const STATUS_IS_FILTER = '_eq_status';
+	const STATUS_IN_FILTER = '_in_status';
+	const STATUS_NOT_FILTER = '_not_status';
+	const STATUS_NOT_IN_FILTER = '_notin_status';
+	const MODERATION_STATUS_IS_FILTER = '_eq_moderation_status';
+	const MODERATION_STATUS_IN_FILTER = '_in_moderation_status';
+	const MODERATION_STATUS_NOT_FILTER = '_not_moderation_status';
+	const MODERATION_STATUS_NOT_IN_FILTER = '_notin_moderation_status';
+
 
 	protected static $puserFields = array(
 		ESearchEntryFilterFields::USER_ID,
@@ -186,10 +196,53 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		}
 	}
 
+	/**
+	 * Set the default status to ready if other status filters are not specified
+	 * @param entryFilter $filter
+	 */
+	protected function setDefaultStatus(entryFilter $filter)
+	{
+		if(!$filter->is_set(self::STATUS_IS_FILTER) && !$filter->is_set(self::STATUS_IN_FILTER)
+			&& !$filter->is_set(self::STATUS_NOT_FILTER) && !$filter->is_set(self::STATUS_NOT_IN_FILTER))
+		{
+			$filter->setStatusEquel(entryStatus::READY);
+		}
+	}
+
+	/**
+	 * Set the default moderation status to ready if other moderation status filters are not specified
+	 * @param entryFilter $filter
+	 */
+	protected function setDefaultModerationStatus(entryFilter $filter)
+	{
+		if(!$filter->is_set(self::MODERATION_STATUS_IS_FILTER) && !$filter->is_set(self::MODERATION_STATUS_IN_FILTER)
+			&& !$filter->is_set(self::MODERATION_STATUS_NOT_FILTER) && !$filter->is_set(self::MODERATION_STATUS_NOT_IN_FILTER))
+		{
+			$moderationStatusesNotIn = array(
+				entryModerationStatus::PENDING_MODERATION,
+				entryModerationStatus::REJECTED);
+			$filter->setModerationStatusNotIn($moderationStatusesNotIn);
+		}
+	}
+
+	protected function prepareEntriesCriteriaFilter(entryFilter $filter)
+	{
+		if(!$filter->is_set('_eq_id') && !$filter->is_set('_eq_redirect_from_entry_id'))
+		{
+			$this->setDefaultStatus($filter);
+			$this->setDefaultModerationStatus($filter);
+		}
+	}
+
 	public function createElasticQueryFromFilter(baseObjectFilter $filter)
 	{
 		$this->init();
 		$kEsearchOrderBy = null;
+		if(is_a($filter, self::ENTRY_FILTER))
+		{
+			$this->prepareEntriesCriteriaFilter($filter);
+		}
+
 		foreach($filter->fields as $field => $fieldValue)
 		{
 			if ($field === entryFilter::ORDER && !is_null($fieldValue) && $fieldValue!= '')
@@ -245,6 +298,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		{
 			return null;
 		}
+
 		if ($fieldName === ESearchEntryFilterFields::STATUS && ($operator === baseObjectFilter::EQ ||$operator === baseObjectFilter::IN  ))
 		{
 			self::$validStatuses = explode(',',$fieldValue);

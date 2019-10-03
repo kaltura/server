@@ -13,11 +13,6 @@ class KObjectFilterBaseEntryEngine extends KObjectFilterEngineBase
 	 */
 	public function query(KalturaFilter $filter)
 	{
-		if(is_a($filter, self::KALTURA_BASE_ENTRY_FILTER))
-		{
-			$filter->prepareEntriesCriteriaFilter($this->getPager());
-		}
-
 		$coreFilter = $filter->toObject();
 		if(ESearchEntryQueryFromFilter::canTransformFilter($coreFilter))
 		{

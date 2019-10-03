@@ -39,7 +39,7 @@ class ESearchQueryFromAdvancedSearch
 				return ESearchOperatorType::AND_OP;
 				break;
 			case MetadataSearchFilter::SEARCH_OR:
-				return ESearchOperatorType::NOT_OP;
+				return ESearchOperatorType::OR_OP;
 				break;
 			default:
 				KalturaLog::crit('Tried to convert not supported advance filter of type:' . $type);

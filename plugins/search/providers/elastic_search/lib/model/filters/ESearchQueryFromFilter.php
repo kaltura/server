@@ -48,6 +48,27 @@ class ESearchQueryFromFilter
 	 */
 	public static function canTransformFilter($filter)
 	{
+		foreach($filter->fields as $field => $fieldValue)
+		{
+			if($field === entryFilter::ORDER)
+			{
+				continue;
+			}
+
+			$fieldParts = explode(baseObjectFilter::FILTER_PREFIX, $field, 3);
+			if (count($fieldParts) < 3)
+			{
+				continue;
+			}
+
+			list( , $operator, $fieldName) = $fieldParts;
+			if(!in_array($fieldName, static::getSupportedFields()) && !(is_null($fieldValue) || $fieldValue == ''))
+			{
+				KalturaLog::debug('Cannot convert field:' . $fieldName);
+				return false;
+			}
+		}
+
 		$result = !isset($filter->advancedSearch);
 		if(!$result)
 		{
