@@ -868,16 +868,29 @@ abstract class BaseCuePointPeer {
 
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
-
-		try {
-			// use transaction because $criteria could contain info
-			// for more than one table (I guess, conceivably)
-			$con->beginTransaction();
-			$pk = BasePeer::doInsert($criteria, $con);
-			$con->commit();
-		} catch(PropelException $e) {
-			$con->rollBack();
-			throw $e;
+		
+		for ($curTry = 0; ; $curTry++)
+		{
+			$curCrit = clone $criteria;
+			$curCrit->add(CuePointPeer::ID, rand(0, 200000000) * 10 + 3 + kDataCenterMgr::getCurrentDcId());
+			
+			try
+			{
+				// use transaction because $criteria could contain info
+				// for more than one table (I guess, conceivably)
+				$con->beginTransaction();
+				$pk = BasePeer::doInsert($curCrit, $con);
+				$con->commit();
+			}
+			catch(PropelException $e)
+			{
+				$con->rollBack();
+				if($e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY && $curTry < 20)
+					continue;
+				
+				throw $e;
+			}
+			break;
 		}
 
 		return $pk;
