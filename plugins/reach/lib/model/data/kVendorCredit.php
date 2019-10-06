@@ -36,7 +36,7 @@ class kVendorCredit
 	public $lastSyncTime;
 
 	/**
-	 * @var int
+	 * @var float
 	 */
 	public $syncedCredit;
 
@@ -118,7 +118,7 @@ class kVendorCredit
 	 */
 	public function setSyncedCredit($SyncedCredit)
 	{
-		$this->syncedCredit = $SyncedCredit;
+		$this->syncedCredit = floatval($SyncedCredit);
 	}
 
 
