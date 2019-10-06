@@ -872,7 +872,7 @@ abstract class BaseCuePointPeer {
 		for ($curTry = 0; ; $curTry++)
 		{
 			$curCrit = clone $criteria;
-			$curCrit->add(CuePointPeer::ID, rand(0, 200000000) * 10 + 3 + kDataCenterMgr::getCurrentDcId());
+			$curCrit->add(CuePointPeer::INT_ID, rand(0, 200000000) * 10 + 3 + kDataCenterMgr::getCurrentDcId());
 			
 			try
 			{
