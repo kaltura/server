@@ -34,12 +34,15 @@ class SsoPeer extends BaseSsoPeer
 	 * @return Sso
 	 * @throws PropelException
 	 */
-	public static function getSso($applicationType, $partnerId, $domain, $status = null)
+	public static function getSso($applicationType, $partnerId, $domain = null, $status = null)
 	{
 		$c = new Criteria();
 		$c->add(SsoPeer::APPLICATION_TYPE, $applicationType);
-		$c->add(SsoPeer::DOMAIN, $domain);
 		$c->add(SsoPeer::PARTNER_ID, $partnerId);
+		if ($domain)
+		{
+			$c->add(SsoPeer::DOMAIN, $domain);
+		}
 		if ($status)
 		{
 			$c->add( SsoPeer::STATUS,$status);

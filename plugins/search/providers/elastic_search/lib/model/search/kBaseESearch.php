@@ -63,6 +63,12 @@ abstract class kBaseESearch extends kBaseSearch
 			KalturaLog::log("Empty search terms, not adding to search history");
 			return;
 		}
+		$partner = PartnerPeer::retrieveByPk(kCurrentContext::getCurrentPartnerId());
+		if(!$partner || $partner->getAvoidIndexingSearchHistory())
+		{
+			KalturaLog::log("Partner does not support search history indexing");
+			return;
+		}
 
 		$searchHistoryInfo = new ESearchSearchHistoryInfo();
 		$searchHistoryInfo->setSearchTerms($searchTerms);
