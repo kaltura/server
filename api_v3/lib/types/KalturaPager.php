@@ -23,7 +23,10 @@ class KalturaPager extends KalturaObject
      */
     public $pageIndex = 1;
 
-    private static $map_between_objects = array();
+    private static $map_between_objects = array(
+		'pageIndex',
+		'pageSize'
+	);
 
     /* (non-PHPdoc)
 	 * @see KalturaObject::getMapBetweenObjects()
