@@ -14,7 +14,7 @@ class ESearchQueryFromAdvancedSearch
 	/**
 	 * @param AdvancedSearchFilterItem $advancedSearchFilterItem
 	 * @return ESearchOperator
-	 * @throws KalturaException
+	 * @throws kCoreException
 	 */
 	public function processAdvanceFilter($advancedSearchFilterItem)
 	{
@@ -43,7 +43,7 @@ class ESearchQueryFromAdvancedSearch
 				break;
 			default:
 				KalturaLog::crit('Tried to convert not supported advance filter of type:' . $type);
-				throw new KalturaException();
+				throw new kCoreException();
 		}
 	}
 
@@ -61,11 +61,20 @@ class ESearchQueryFromAdvancedSearch
 		return $advanceFilterOperator;
 	}
 
+	/**
+	 * Some fields have special usage in the sphinx so we need to return the relevant ESearchItemType for it
+	 * @param $field
+	 * @return int
+	 */
 	protected function getESearchItemTypeByMetadataField($field)
 	{
 		switch($field)
 		{
 			case self::MRP_DATA_FIELD:
+				/**
+				 * MRPData use , in the value but since its not defined as a legal character the sphinx split the value in there which make data like
+				 * ><MRPData>7391,4,18086</MRPData> returns when we query with just for 7391,4
+				 */
 				return ESearchItemType::STARTS_WITH;
 			default:
 				return ESearchItemType::EXACT_MATCH;
@@ -102,7 +111,7 @@ class ESearchQueryFromAdvancedSearch
 	/**
 	 * @param MetadataSearchFilter $searchFilter
 	 * @return ESearchOperator
-	 * @throws KalturaException
+	 * @throws kCoreException
 	 */
 	protected function createESearchMetadataEntryItemsFromMetadataSearchFilter(MetadataSearchFilter $searchFilter)
 	{
@@ -112,8 +121,8 @@ class ESearchQueryFromAdvancedSearch
 		$metaDataItems = array();
 		foreach($searchFilter->getItems() as $advancedSearchFilterItem)
 		{
-			/* @var $advancedSearchFilterItem AdvancedSearchFilterMatchCondition */
 			$metaDataItems[] = $this->createESearchMetadataItemFromFilterMatchCondition($advancedSearchFilterItem, $metadataProfileId);
+			/* @var $advancedSearchFilterItem AdvancedSearchFilterMatchCondition */
 		}
 
 		$advanceFilterOperator->setSearchItems($metaDataItems);
@@ -124,24 +133,14 @@ class ESearchQueryFromAdvancedSearch
 	{
 		$type = get_class($item);
 		$result = self::canTransformType($type);
-		if($result)
+		if($result && $item instanceof AdvancedSearchFilterOperator && is_array($item->getItems()))
 		{
-			if(is_a($item, self::SEARCH_OPERATOR))
+			foreach($item->getItems() as $item)
 			{
-				if(!count($item->getItems()))
+				$result = self::canTransformAdvanceFilter($item);
+				if(!$result)
 				{
-					return $result;
-				}
-				else
-				{
-					foreach($item->getItems() as $item)
-					{
-						$result = self::canTransformAdvanceFilter($item);
-						if(!$result)
-						{
-							return false;
-						}
-					}
+					return false;
 				}
 			}
 		}
@@ -157,7 +156,6 @@ class ESearchQueryFromAdvancedSearch
 			case self::ADVANCED_SEARCH_FILTER_MATCH_CONDITION:
 			case self::METADATA_SEARCH_FILTER:
 				return true;
-				break;
 			default:
 				return false;
 		}

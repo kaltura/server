@@ -6,7 +6,6 @@
  */
 class KObjectFilterBaseEntryEngine extends KObjectFilterEngineBase
 {
-	const KALTURA_BASE_ENTRY_FILTER = 'KalturaBaseEntryFilter';
 	/**
 	 * @param KalturaFilter $filter
 	 * @return array

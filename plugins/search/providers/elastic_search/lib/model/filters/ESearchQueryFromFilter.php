@@ -48,6 +48,7 @@ class ESearchQueryFromFilter
 	 */
 	public static function canTransformFilter($filter)
 	{
+		$result = true;
 		foreach($filter->fields as $field => $fieldValue)
 		{
 			if($field === entryFilter::ORDER)
@@ -69,10 +70,9 @@ class ESearchQueryFromFilter
 			}
 		}
 
-		$result = !isset($filter->advancedSearch);
-		if(!$result)
+		if($filter->getAdvancedSearch())
 		{
-			$result = ESearchQueryFromAdvancedSearch::canTransformAdvanceFilter($filter->advancedSearch);
+			$result = ESearchQueryFromAdvancedSearch::canTransformAdvanceFilter($filter->getAdvancedSearch());
 		}
 
 		return $result;
