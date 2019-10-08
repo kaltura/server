@@ -1,0 +1,90 @@
+<?php if (!$this->allowed) {
+	echo $this->translate('This partner is not allowed to use Reach');
+	return;
+} ?>
+<?php echo $this->filterForm; ?>
+<?php echo $this->newEntryVendorTaskFolderForm; ?>
+<div id="entry_vendor_task_list_div" class="clear">
+	<table>
+		<thead>
+		<tr>
+			<th><?php echo $this->translate('ID'); ?></th>
+			<th><?php echo $this->translate('Publisher ID'); ?></th>
+			<th><?php echo $this->translate('Vendor Partner ID'); ?></th>
+			<th><?php echo $this->translate('Entry ID'); ?></th>
+            <th><?php echo $this->translate('Creation Date'); ?></th>
+            <th><?php echo $this->translate('Service Type'); ?></th>
+            <th><?php echo $this->translate('Service Feature'); ?></th>
+            <th><?php echo $this->translate('Turn Around Time'); ?></th>
+            <th><?php echo $this->translate('Due Date'); ?></th>
+            <th><?php echo $this->translate('Status'); ?></th>
+
+        </tr>
+		</thead>
+		<tfoot>
+		<tr>
+			<td colspan="10">
+				<?php echo $this->paginator; ?>
+			</td>
+		</tr>
+		</tfoot>
+		<tbody>
+
+		<?php foreach($this->paginator as /* Kaltura_Client_Reach_Type_EntryVendorTask */ $entryVendorTask): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+				<td><?php echo $entryVendorTask->id; ?></td>
+                <td><?php echo $entryVendorTask->partnerId; ?></td>
+                <td><?php echo $entryVendorTask->vendorPartnerId; ?></td>
+                <td><?php echo $entryVendorTask->entryId; ?></td>
+                <td><?php echo date($this->translate('time format'), $entryVendorTask->createdAt); ?></td>
+                <td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceType', $entryVendorTask->serviceType); ?></td>
+                <td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceFeature', $entryVendorTask->serviceFeature); ?></td>
+                <td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $entryVendorTask->expectedFinishTime - $entryVendorTask->queueTime); ?></td>
+                <td><?php echo date($this->translate('time format'), $entryVendorTask->expectedFinishTime); ?></td>
+                <td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_EntryVendorTaskStatus', $entryVendorTask->status); ?></td>
+
+            </tr>
+		<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
+
+<script type="text/javascript">
+
+    $(function () {
+    });
+
+    jQuery('#filter_type').change(function () {
+        if (this.value == "none") {
+            $("#filter_text").css("display", "none");
+        }
+        else {
+            $("#filter_text").css("display", "inline");
+            $("#filter_text input").focus();
+            if (this.value == "free")
+                $("div.help").show();
+            else
+                $("div.help").hide();
+        }
+    });
+
+    jQuery('#filter_type').change();
+
+    function doAction(action, folderId) {
+        if (action && eval('typeof ' + action) == 'function') {
+            f = eval(action);
+            Array.prototype.shift.apply(arguments);
+            f.apply(this, arguments);
+        }
+        jQuery('select.options').val('');
+    }
+
+    function doAction(action, folderId) {
+        if (action && eval('typeof ' + action) == 'function') {
+            f = eval(action);
+            Array.prototype.shift.apply(arguments);
+            f.apply(this, arguments);
+        }
+        jQuery('select.options').val('');
+    }
+</script>

@@ -500,6 +500,14 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setAccessKeyExpiry($accessKeyExpiry);
 		$entryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($entryVendorTask->getEntryId(), $shouldModerateOutput, $accessKeyExpiry));
 		$entryVendorTask->setPrice(kReachUtils::calculateTaskPrice($entry, $vendorCatalogItem));
+		$turnAroundTime = $vendorCatalogItem->getTurnAroundTime();
+		if ($turnAroundTime == -1)
+		{
+			$turnAroundTime = 0;
+		}
+		$entryVendorTask->setExpectedFinishTime($turnAroundTime);
+		$entryVendorTask->setServiceType($vendorCatalogItem->getServiceType());
+		$entryVendorTask->setServiceFeature($vendorCatalogItem->getServiceFeature());
 
 		if ($context)
 			$entryVendorTask->setContext($context);

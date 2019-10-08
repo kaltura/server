@@ -114,13 +114,32 @@ class EntryVendorTaskService extends KalturaBaseService
 		
 		if (!$pager)
 			$pager = new KalturaFilterPager();
-		
-		if (!PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, kCurrentContext::getCurrentPartnerId()))
-			$this->applyPartnerFilterForClass('entryVendorTask');
-		else
-			$filter->vendorPartnerIdEqual = kCurrentContext::getCurrentPartnerId();
-		
+
+		$this->applyFiltersAccordingToPartner($filter);
+
 		return $filter->getListResponse($pager, $this->getResponseProfile());
+	}
+
+	protected function applyFiltersAccordingToPartner($filter)
+	{
+		if (kCurrentContext::$ks_partner_id == -2)
+		{
+			if (PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, kCurrentContext::getCurrentPartnerId()))
+			{
+				$this->applyPartnerFilterForClass('entryVendorTask');
+			}
+		}
+		else
+		{
+			if (!PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, kCurrentContext::getCurrentPartnerId()))
+			{
+				$this->applyPartnerFilterForClass('entryVendorTask');
+			}
+			else
+			{
+				$filter->vendorPartnerIdEqual = kCurrentContext::getCurrentPartnerId();
+			}
+		}
 	}
 	
 	/**

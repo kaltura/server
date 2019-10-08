@@ -30,6 +30,9 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	const CUSTOM_DATA_ACCESS_KEY_EXPIRY =   'access_key_expiry';
 	const CUSTOM_DATA_TASK_DATA =       	'task_data';
 	const CUSTOM_DATA_OLD_PRICE =       	'old_price';
+	const CUSTOM_DATA_EXPECTED_FINISH_TIME ='expectedFinishTime';
+	const CUSTOM_DATA_SERVICE_TYPE =		'serviceType';
+	const CUSTOM_DATA_SERVICE_FEATURE =		'serviceFeature';
 	
 	//setters
 	
@@ -107,6 +110,22 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_OLD_PRICE, $v);
 	}
+
+	public function setExpectedFinishTime($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_EXPECTED_FINISH_TIME, $v);
+	}
+
+	public function setServiceType($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_SERVICE_TYPE, $v);
+	}
+
+	public function setServiceFeature($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_SERVICE_FEATURE, $v);
+	}
+
 
 	//getters
 
@@ -200,6 +219,21 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		return $this->getFromCustomData(self::CUSTOM_DATA_OLD_PRICE);
 	}
 
+	public function getExpectedFinishTime()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_EXPECTED_FINISH_TIME);
+	}
+
+	public function getServiceType()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_SERVICE_TYPE);
+	}
+
+	public function getServiceFeature()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_SERVICE_FEATURE);
+	}
+
 	/* (non-PHPdoc)
  	 * @see BaseEntryVendorTask::preSave()
  	 */
@@ -208,11 +242,13 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		if ($this->isColumnModified(EntryVendorTaskPeer::STATUS) && $this->getStatus() == EntryVendorTaskStatus::PENDING)
 		{
 			$this->setQueueTime(time());
+			$this->setExpectedFinishTime($this->getExpectedFinishTime() + time());
 		}
 		
 		if ($this->isColumnModified(EntryVendorTaskPeer::STATUS) && in_array($this->getStatus(), array(EntryVendorTaskStatus::READY, EntryVendorTaskStatus::ERROR)))
 		{
 			$this->setFinishTime(time());
+			$this->setExpectedFinishTime(null);
 		}
 		
 		return parent::preSave($con);

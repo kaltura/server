@@ -1522,4 +1522,13 @@ return array(
 	'Kaltura_Client_Sso_Enum_SsoStatus::DISABLED' => 'Disabled',
 	'Kaltura_Client_Sso_Enum_SsoStatus::ACTIVE' => 'Enabled',
 	'Kaltura_Client_Sso_Enum_SsoStatus::DELETED' => 'Deleted',
+
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PENDING' => 'Pending',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::READY' => 'Ready',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PROCESSING' => 'Processing',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PENDING_MODERATION' => 'Pending Moderation',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::REJECTED' => 'Rejected',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::ERROR' => 'Error',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::ABORTED' => 'Aborted',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PENDING_ENTRY_READY' => 'Pending Entry Ready',
 );
