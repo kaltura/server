@@ -12,7 +12,19 @@ class ApFeedDropFolderPlugin extends KalturaPlugin implements IKalturaPlugin, IK
 	 */
 	public static function getTranslations($locale)
 	{
-		// TODO: Implement getTranslations() method.
+		$array = array();
+		
+		$langFilePath = __DIR__ . "/config/lang/$locale.php";
+		if(!file_exists($langFilePath))
+		{
+			$default = 'en';
+			$langFilePath = __DIR__ . "/config/lang/$default.php";
+		}
+		
+		KalturaLog::info("Loading file [$langFilePath]");
+		$array = include($langFilePath);
+		
+		return array($locale => $array);
 	}
 	
 	/**
