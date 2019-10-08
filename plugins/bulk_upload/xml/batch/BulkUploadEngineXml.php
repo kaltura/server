@@ -1455,7 +1455,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				KalturaLog::info("Update context - determining categoryEntry diff for entry [$entryId].");
 				$existingCategories = array();
 				$categoriesToRemove = array();
-				$categoryEntryFilter = new kalturaCategoryEntryFilter();
+				$categoryEntryFilter = new KalturaCategoryEntryFilter();
 				$categoryEntryFilter->entryIdEqual = $entryId;
 				$result = KBatchBase::$kClient->categoryEntry->listAction($categoryEntryFilter);
 				

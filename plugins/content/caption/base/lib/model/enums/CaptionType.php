@@ -9,4 +9,5 @@ interface CaptionType extends BaseEnum
 	const DFXP = 2;
 	const WEBVTT = 3;
 	const CAP = 4;
+	const SCC = 5;
 }

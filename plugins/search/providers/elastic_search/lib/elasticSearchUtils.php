@@ -95,6 +95,13 @@ class elasticSearchUtils
 		return sprintf("s%sc>%s", $status, $categoryName);
 	}
 
+	public static function reverseFormatCategoryNameStatus($categoryNameStatus)
+	{
+		list($status , $categoryName) = explode ('>',$categoryNameStatus);
+		$status = substr($status,1,strlen ($status)-1 );
+		return array($status, $categoryName);
+	}
+	
 	public static function formatParentCategoryNameStatus($categoryName, $status)
 	{
 		return sprintf("s%sp>%s", $status, $categoryName);

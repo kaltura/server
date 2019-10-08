@@ -50,7 +50,7 @@
 				<type>1</type>
 				<name>QandA</name>
 				<systemName>QandA</systemName>
-				<fields>id,name,createdAt,updatedAt,parentId,partnerData,text,tags,userId,startTime,endTime</fields>
+				<fields>id,name,createdAt,updatedAt,parentId,partnerData,text,tags,userId,startTime,endTime,systemName</fields>
 				<relatedProfiles objectType="array">
 					<item objectType="KalturaDetachedResponseProfile">
 						<name>QandA_ResponseProfile</name>
@@ -63,6 +63,19 @@
 							<item objectType="KalturaResponseProfileMapping">
 								<parentProperty>id</parentProperty>
 								<filterProperty>objectIdEqual</filterProperty>
+							</item>
+						</mappings>
+					</item>
+					<item objectType="KalturaDetachedResponseProfile">
+						<name>QandA_ResponseProfile_user</name>
+						<type>1</type>
+						<fields>id,screenName,email,firstName,lastName</fields>
+						<filter objectType="KalturaUserFilter">
+						</filter>
+						<mappings objectType="array">
+							<item objectType="KalturaResponseProfileMapping">
+								<parentProperty>userId</parentProperty>
+								<filterProperty>idEqual</filterProperty>
 							</item>
 						</mappings>
 					</item>

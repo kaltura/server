@@ -15,7 +15,7 @@ abstract class KBaseMediaParser
 	 * @var string
 	 */
 	protected $filePath;
-	
+	protected $encryptionKey = null;
 	/**
 	 * @param string $type
 	 * @param string $filePath
@@ -321,6 +321,14 @@ $audio_codec_id_synonyms = array(
 			return true;
 		
 		return false;
+	}
+	
+	/**
+	 * @param string $encryptionKey
+	 */
+	public function setEncryptionKey($encryptionKey)
+	{
+		$this->encryptionKey = $encryptionKey;
 	}
 	
 	/**

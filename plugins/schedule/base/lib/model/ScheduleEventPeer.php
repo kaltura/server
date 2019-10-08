@@ -261,7 +261,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		}
 
 		$c = self::getRetrieveEventsByDateWindowCriteria($startDate, $endDate, $scheduleEventIdToIgnore);
-		$c->addAnd(ScheduleEventPeer::TYPE, scheduleEventType::BLACKOUT, Criteria::EQUAL);
+		$c->addAnd(ScheduleEventPeer::TYPE, ScheduleEventType::BLACKOUT, Criteria::EQUAL);
 		$result = self::doSelect($c);
 		self::addBlackoutResultToCache($startDate, $endDate, $result);
 		return $result;

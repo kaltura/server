@@ -15,11 +15,17 @@ class KalturaVendorAudioDescriptionCatalogItem extends KalturaVendorCatalogItem
 	 * @var int
 	 */
 	public $flavorParamsId;
+	
+	/**
+	 * @var int
+	 */
+	public $clearAudioFlavorParamsId;
 
 	private static $map_between_objects = array
 	(
 		'sourceLanguage',
 		'flavorParamsId',
+		'clearAudioFlavorParamsId',
 	);
 	
 	protected function getServiceFeature()
@@ -50,9 +56,11 @@ class KalturaVendorAudioDescriptionCatalogItem extends KalturaVendorCatalogItem
 	{
 		$this->validatePropertyNotNull(array("sourceLanguage"));
 		$this->validatePropertyNotNull(array("flavorParamsId"));
+		$this->validatePropertyNotNull(array("clearAudioFlavorParamsId"));
 		
 		$this->validateServiceType();
 		$this->validateFlavorParamsId($this->flavorParamsId);
+		$this->validateFlavorParamsId($this->clearAudioFlavorParamsId);
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -63,6 +71,11 @@ class KalturaVendorAudioDescriptionCatalogItem extends KalturaVendorCatalogItem
 		if(isset($this->flavorParamsId) && $this->flavorParamsId != $sourceObject->getFlavorParamsId())
 		{
 			$this->validateFlavorParamsId($this->flavorParamsId);
+		}
+		
+		if(isset($this->clearAudioFlavorParamsId) && $this->clearAudioFlavorParamsId != $sourceObject->getClearAudioFlavorParamsId())
+		{
+			$this->validateFlavorParamsId($this->clearAudioFlavorParamsId);
 		}
 		
 		if(isset($this->serviceType) && $this->serviceType!= $sourceObject->getServiceType())

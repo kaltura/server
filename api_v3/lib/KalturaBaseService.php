@@ -125,7 +125,7 @@ abstract class KalturaBaseService
 		
 		$this->partnerId = $partnerId;
 
-		// check if current aciton is allowed and if private partner data access is allowed
+		// check if current action is allowed and if private partner data access is allowed
 		$allowPrivatePartnerData = false;
 		$actionPermitted = $this->isPermitted($allowPrivatePartnerData);
 

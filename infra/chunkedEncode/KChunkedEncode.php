@@ -270,23 +270,14 @@
 
 			
 				/*
-				 * Evaluate session duration 
+				 * Verify session duration - it should be at least twice the chunk duration
 				 */
 			if(isset($height)) {
-				if($height>480) {
-					if($duration<KChunkedEncodeSetup::DefaultChunkDuration*2) 
-						KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration) too short for the frame size (h:$height), must be at least ".(KChunkedEncodeSetup::DefaultChunkDuration*2)."sec");
-				}
-				else if($height>360) {
-					if($duration<KChunkedEncodeSetup::DefaultChunkDuration*4)
-						KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration) too short for the frame size (h:$height), must be at least ".(KChunkedEncodeSetup::DefaultChunkDuration*4)."sec");
-				}
-				else {
-					if($duration<KChunkedEncodeSetup::DefaultChunkDuration*6)
-						KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration) too short for the frame size (h:$height), must be at least ".(KChunkedEncodeSetup::DefaultChunkDuration*6)."sec");
-				}
-				if(isset($msgStr))
+				$minimalDuration = KChunkedEncodeSetup::calculateChunkDuration($height)*2;
+				if($duration<$minimalDuration){
+					KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration sec) too short for the frame size ($height pix), must be at least $minimalDuration sec");
 					return false;
+				}
 			}
 			else if($duration<180){
 				KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration) too short, must be at least 180sec");
@@ -431,6 +422,9 @@
 				  - gte(t__FORCED_KF_START_SHIFT__,n_forced*$gopInSecs) - the original forced KF setup with shift to the 'time 0'
 				  - gte(t,__FORCED_KF_EXTRA_IFARMES__)*lt(t,$setExtraIFramesTimingEnd)) - generate I frames starting from half-frame before EOF chunk, till 3 frames after the chunk end (into the 2nd segement)
 				*/
+/*
+	Temporally disable the handling of redundant I-Frames at the chunk end.
+	The 'expr' was incorrect
 			if(!isset($params->bf)){
 				if($params->vcodec=='libx264' && in_array($params->vprofile, array('main','high') ))
 					$forcedKeyFramesStr = "'expr:if(gte(t__FORCED_KF_START_SHIFT__,n_forced*$gopInSecs),gte(t,__FORCED_KF_EXTRA_IFARMES__)*lt(t,$setExtraIFramesTimingEnd))'";
@@ -440,6 +434,7 @@
 			else if($params->bf>0)
 				$forcedKeyFramesStr = "'expr:if(gte(t__FORCED_KF_START_SHIFT__,n_forced*$gopInSecs),gte(t,__FORCED_KF_EXTRA_IFARMES__)*lte(t,$setExtraIFramesTimingEnd))'";
 			else
+*/
 				$forcedKeyFramesStr = "'expr:gte(t__FORCED_KF_START_SHIFT__,n_forced*$gopInSecs)'";
 				
 //$forcedKeyFramesStr = "'expr:gte(t__FORCED_KF_START_SHIFT__,n_forced*$gopInSecs)'";

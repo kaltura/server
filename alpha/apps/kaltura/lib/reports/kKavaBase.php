@@ -19,6 +19,7 @@ class kKavaBase extends kDruidBase
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
+	const DIMENSION_PARTNER_PARENT_ID = 'partnerParentId';
 	const DIMENSION_ENTRY_ID = 'entryId';
 	const DIMENSION_LOCATION_COUNTRY = 'location.country';
 	const DIMENSION_LOCATION_REGION = 'location.region';
@@ -144,6 +145,7 @@ class kKavaBase extends kDruidBase
 		self::DATASOURCE_HISTORICAL => array(
 			self::DIMENSION_EVENT_TYPE => 1,
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_KUSER_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
@@ -173,6 +175,7 @@ class kKavaBase extends kDruidBase
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_KUSER_ID => 1,
@@ -183,6 +186,7 @@ class kKavaBase extends kDruidBase
 		self::DATASOURCE_STORAGE_USAGE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
 			self::DIMENSION_KUSER_ID => 1,
@@ -191,6 +195,7 @@ class kKavaBase extends kDruidBase
 		),
 		self::DATASOURCE_BANDWIDTH_USAGE => array(
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
 			self::DIMENSION_ENTRY_OWNER_ID => 1,
@@ -210,6 +215,7 @@ class kKavaBase extends kDruidBase
 		),
 		self::DATASOURCE_TRANSCODING_USAGE => array(
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
 			self::DIMENSION_KUSER_ID => 1,
@@ -220,11 +226,13 @@ class kKavaBase extends kDruidBase
 		self::DATASOURCE_USER_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_KUSER_ID => 1,
 			self::DIMENSION_USER_TYPE => 1,
 		),
 		self::DATASOURCE_API_USAGE => array(
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_APPLICATION => 1,
 			self::DIMENSION_DOMAIN => 1,
 			self::DIMENSION_LOCATION_COUNTRY => 1,
@@ -233,6 +241,7 @@ class kKavaBase extends kDruidBase
 		),
 		self::DATASOURCE_REACH_USAGE => array(
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
 			self::DIMENSION_ENTRY_OWNER_ID => 1,
@@ -248,6 +257,7 @@ class kKavaBase extends kDruidBase
 		self::DATASOURCE_REALTIME => array(
 			self::DIMENSION_EVENT_TYPE => 1,
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_KUSER_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
@@ -274,6 +284,65 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_EVENT_PROPERTIES => 1,
 		),
 	);
+
+	protected static $sourceFromAdminTag = array(
+		'kalturaclassroom' => 'Classroom Capture',
+		'kalturacapture' => 'Kaltura Capture',
+		'videomessage' => 'Kaltura Pitch',
+		'kms-webcast-event' => 'Kaltura Webcast',
+		'raptentry' => 'Interactive Video',
+		'webexentry' => 'Webex',
+		'zoomentry' => 'Zoom',
+		'expressrecorder' => 'Express Recorder',
+	);
+
+	protected static $sourceTypes = array(
+		0 => 'Other',
+		1 => 'Upload',
+		2 => 'Webcam',
+		3 => 'Flickr',
+		4 => 'Youtube',
+		5 => 'Url',
+		6 => 'Text',
+		7 => 'Myspace',
+		8 => 'Photobucket',
+		9 => 'Jamendo',
+		10 => 'Ccmixter',
+		11 => 'Nypl',
+		12 => 'Current',
+		13 => 'Commons',
+		20 => 'Kaltura',
+		21 => 'Kaltura user clips',
+		22 => 'Archive org',
+		23 => 'Kaltura partner',
+		24 => 'Metacafe',
+		29 => 'Live stream akamai legacy',
+		30 => 'Live stream manual',
+		31 => 'Live stream akamai universal',
+		32 => 'Live stream',
+		33 => 'Live channel',
+		34 => 'Recorded live stream',
+		35 => 'Clip',
+		36 => 'Recorded live stream',
+		37 => 'Classroom Capture',
+	);
+
+	public static function getEntrySourceType($sourceType, $adminTags)
+	{
+		// check for specific admin tags
+		$adminTags = explode(',', strtolower($adminTags));
+		foreach ($adminTags as $adminTag)
+		{
+			$adminTag = trim($adminTag);
+			if (isset(self::$sourceFromAdminTag[$adminTag]))
+			{
+				return self::$sourceFromAdminTag[$adminTag];
+			}
+		}
+
+		// use the source type
+		return self::$sourceTypes[$sourceType];
+	}
 
 	public static function isPartnerAllowed($partnerId, $serviceType) {
 	    if (kConf::hasParam(self::DRUID_URL)) {
@@ -304,6 +373,17 @@ class kKavaBase extends kDruidBase
 		}
 
 		return $cache->multiGet($keys);
+	}
+
+	protected static function roundUpToMultiple($num, $mult)
+	{
+		$rem = $num % $mult;
+		if (!$rem)
+		{
+			return $num;
+		}
+
+		return $num - $rem + $mult;
 	}
 
 }

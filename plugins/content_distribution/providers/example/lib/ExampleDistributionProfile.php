@@ -84,7 +84,6 @@ class ExampleDistributionProfile extends DistributionProfile
 			{
 				$description = 'field is not defined in any of the metadata objects';
 				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, self::METADATA_FIELD_TEST_DATA, $description);
-				continue;
 			}	
 			else
 			{

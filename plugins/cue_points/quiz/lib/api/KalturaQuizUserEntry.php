@@ -122,7 +122,7 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		$dbEntry = entryPeer::retrieveByPK($this->entryId);
+		$dbEntry = entryPeer::retrieveByPK($sourceObject->getEntryId());
 		if ( !kEntitlementUtils::isEntitledForEditEntry($dbEntry) )
 		{
 			KalturaLog::debug('Update quiz allowed only with admin KS or entry owner or co-editor');

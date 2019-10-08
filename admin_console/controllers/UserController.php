@@ -162,22 +162,28 @@ class UserController extends Zend_Controller_Action
 
 			$adapter->setTimezoneOffset($request->getPost('timezone_offset'));
 			$auth = Infra_AuthHelper::getAuthInstance();
-			$result = $auth->authenticate($adapter);
-            
-			if ($result->isValid())
+			try
 			{
-				if ($request->getPost('remember_me'))
-					Zend_Session::rememberMe(60*60*24*7); // 1 week
-					
-				$nextUri = $this->_getParam('next_uri');
-				if ($nextUri)
-					$this->_helper->redirector->gotoUrl($nextUri);
+				$result = $auth->authenticate($adapter);
+				if ($result->isValid())
+				{
+					if ($request->getPost('remember_me'))
+						Zend_Session::rememberMe(60 * 60 * 24 * 7); // 1 week
+
+					$nextUri = $this->_getParam('next_uri');
+					if ($nextUri)
+						$this->_helper->redirector->gotoUrl($nextUri);
+					else
+						$this->_helper->redirector('list', 'partner');
+				}
 				else
-					$this->_helper->redirector('list', 'partner');
+				{
+					$loginForm->setDescription('login error');
+				}
 			}
-			else
+			catch (Exception $ex)
 			{
-				$loginForm->setDescription('login error');
+				$loginForm->setDescription('login error ' . $ex->getMessage());
 			}
 		}
 		

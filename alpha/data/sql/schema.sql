@@ -2410,7 +2410,6 @@ CREATE TABLE `user_entry`
 	`updated_at` DATETIME,
 	`status` INTEGER,
 	`type` INTEGER,
-	`custom_data` TEXT,
 	`extended_status` INTEGER,
 	`privacy_context` VARCHAR(255),
 	`custom_data` TEXT,
@@ -2497,6 +2496,28 @@ CREATE TABLE `conf_maps`
 	PRIMARY KEY (`id`),
 	KEY `primary_map_index`(`map_name`, `host_name`, `version`),
 	KEY `id_index`(`id`)
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
+#-- sso
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sso`;
+
+
+CREATE TABLE `sso`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`application_type` VARCHAR(64)  NOT NULL,
+	`partner_id` INTEGER,
+	`domain` VARCHAR(64),
+	`status` TINYINT,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`),
+	KEY `partner_id_status_index`(`partner_id`, `status`),
+	KEY `domain_status_index`(`domain`, `status`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier

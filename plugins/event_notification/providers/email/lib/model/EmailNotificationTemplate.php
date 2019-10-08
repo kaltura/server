@@ -19,6 +19,7 @@ class EmailNotificationTemplate extends BatchEventNotificationTemplate implement
 	const CUSTOM_DATA_MESSAGE_ID = 'messageID';
 	const CUSTOM_DATA_CUSTOM_HEADERS = 'customHeaders';
 	const CUSTOM_DATA_BODY_FILE_VERSION = 'bodyFileVersion';
+	const FROM_EMAIL = '{from_email}';
 	
 	const FILE_SYNC_BODY = 1;
 	
@@ -38,6 +39,24 @@ class EmailNotificationTemplate extends BatchEventNotificationTemplate implement
 		return $returnObj;
 	}
 
+	protected function getAllowedEmail()
+	{
+		$allowedFromEmailWhiteList = array();
+		$fromEmailNotification = $this->getFromEmail();
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+		if ($partner)
+		{
+			$allowedFromEmailWhiteList = $partner->getAllowedFromEmailWhiteList();
+			if ($fromEmailNotification !== self::FROM_EMAIL
+				&& in_array($fromEmailNotification, explode(',',$allowedFromEmailWhiteList)))
+			{
+				return $fromEmailNotification;
+			}
+		}
+		KalturaLog::info("from_email requested: $fromEmailNotification . partner from_email whitelist: ".$allowedFromEmailWhiteList );
+		return self::FROM_EMAIL;
+	}
+
 	/* (non-PHPdoc)
 	 * @see BatchEventNotificationTemplate::getJobData()
 	 */
@@ -45,7 +64,7 @@ class EmailNotificationTemplate extends BatchEventNotificationTemplate implement
 	{
 		$jobData = new kEmailNotificationDispatchJobData();
 		$jobData->setTemplateId($this->getId());
-		$jobData->setFromEmail($this->getFromEmail());
+		$jobData->setFromEmail($this->getAllowedEmail());
 		$jobData->setFromName($this->getFromName());
 		$jobData->setPriority($this->getPriority());
 		$jobData->setConfirmReadingTo($this->getConfirmReadingTo());
@@ -127,6 +146,11 @@ class EmailNotificationTemplate extends BatchEventNotificationTemplate implement
 		{
 			$pluginContentParameters = $plugin->editTemplateFields($sweepFieldValues, $scope, $this->getObjectType());
 			$contentParametersValues = array_merge($contentParametersValues, $pluginContentParameters);
+		}
+
+		foreach ($scope->getDynamicValues() as $dynamicValueKey => $dynamicValueValue)
+		{
+			$contentParametersValues[$dynamicValueKey] = $dynamicValueValue;
 		}
 
 		$jobData->setContentParameters($contentParametersValues);

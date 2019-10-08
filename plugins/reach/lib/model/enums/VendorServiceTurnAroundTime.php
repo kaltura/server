@@ -16,5 +16,6 @@ interface VendorServiceTurnAroundTime extends BaseEnum
 	const TWENTY_FOUR_HOURS     = 86400;
 	const FORTY_EIGHT_HOURS     = 172800;
 	const FOUR_DAYS             = 345600;
+	const FIVE_DAYS             = 432000;
 	const TEN_DAYS              = 864000;
 }

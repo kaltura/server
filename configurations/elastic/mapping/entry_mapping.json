@@ -626,8 +626,7 @@
 					"normalizer" : "kaltura_keyword_normalizer"
 				},
 				"partner_sort_value": {
-					"type" : "keyword",
-					"normalizer" : "kaltura_keyword_normalizer"
+					"type" : "long"
 				},
 				"redirect_entry_id": {
 					"type" : "keyword",
@@ -969,48 +968,6 @@
 								"raw" : {
 									"type" : "keyword",
 									"normalizer" : "kaltura_keyword_normalizer"
-								}
-							}
-						},
-						"cue_point_metadata" :{
-							"type"  : "nested",
-							"properties"  : {
-								"metadata_id" : {
-									"type" : "keyword",
-									"normalizer" : "kaltura_keyword_normalizer"
-								},
-								"system_name" : {
-									"type" : "keyword",
-									"normalizer" : "kaltura_keyword_normalizer"
-								},
-								"xpath" : {
-									"type" : "keyword",
-									"normalizer" : "kaltura_keyword_normalizer"
-								},
-								"metadata_profile_id" : {
-									"type" : "keyword",
-									"normalizer" : "kaltura_keyword_normalizer"
-								},
-								"metadata_field_id" : {
-									"type" : "keyword",
-									"normalizer" : "kaltura_keyword_normalizer"
-								},
-								"value_int": {
-									"type": "long"
-								},
-								"value_text": {
-									"type" : "text",
-									"analyzer" : "kaltura_text",
-									"fields": {
-										"ngrams" : {
-											"type" : "text",
-											"analyzer" : "kaltura_ngrams"
-										},
-										"raw" : {
-											"type" : "keyword",
-											"normalizer" : "kaltura_keyword_normalizer"
-										}
-									}
 								}
 							}
 						},

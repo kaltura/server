@@ -184,6 +184,16 @@ class Form_PartnerConfiguration extends Infra_Form
 
 		$this->getElement('editDeliveryProfiles')->setAttrib('onClick', 'addDeliveryProfile()');
 
+		$this->addElement('checkbox', 'ignore_synonym_esearch', array(
+			'label'	=> 'Ignore synonyms in eSearch',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
+		));
+
+		$this->addElement('checkbox', 'avoid_indexing_search_history', array(
+			'label'	=> 'Avoid indexing search history ',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
+		));
+
 
 		$this->addElement('hidden', 'e_search_languages', array(
 			'label'		=> 'e_search_languages',
@@ -273,6 +283,11 @@ class Form_PartnerConfiguration extends Infra_Form
 //--------------------------- Advanced Notification settings ---------------------------
 		$this->addElement('text', 'notifications_config', array(
 			'label'			=> 'Notification Configuration:',
+			'filters'		=> array('StringTrim'),
+		));
+
+		$this->addElement('text', 'allowed_from_email_white_list', array(
+			'label'			=> 'Allowed From Email WhiteList Notifications:',
 			'filters'		=> array('StringTrim'),
 		));
 			
@@ -926,7 +941,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addDisplayGroup(array_merge(array('delivery_profile_ids', 'live_delivery_profile_ids', 'deliveryFormat', 'delivery_profile_type', 'editDeliveryProfiles', 'enforce_delivery', 'checkbox_host', 'host', 'checkbox_cdn_host', 'cdn_host', 'checkbox_thumbnail_host', 'thumbnail_host', 'checkbox_cache_flavor_version', 'cache_flavor_version', 'support_animated_thumbnails'), $permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS], array ('crossLine')), 'publisherSpecificDeliverySettings', array('legend' => 'Publisher Specific Delivery Settings'));
 		$this->addDisplayGroup(array_merge(array('storage_serve_priority', 'storage_delete_from_kaltura','import_remote_source_for_convert'), $permissionNames[self::GROUP_REMOTE_STORAGE] ,array('crossLine')), 'remoteStorageAccountPolicy', array('legend' => 'Remote Storage Policy'));
 
-		$this->addDisplayGroup(array_merge(array('notifications_config', 'allow_multi_notification'), $permissionNames[self::GROUP_NOTIFICATION_CONFIG] ,array('crossLine')), 'advancedNotificationSettings', array('legend' => 'Advanced Notification Settings'));
+		$this->addDisplayGroup(array_merge(array('notifications_config', 'allowed_from_email_white_list', 'allow_multi_notification'), $permissionNames[self::GROUP_NOTIFICATION_CONFIG] ,array('crossLine')), 'advancedNotificationSettings', array('legend' => 'Advanced Notification Settings'));
 		$this->addDisplayGroup(array_merge(array('def_thumb_offset','def_thumb_density') , $permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS], array('enable_bulk_upload_notifications_emails', 'bulk_upload_notifications_email', 'crossLine')), 'publisherSpecificIngestionSettings', array('legend' => 'Content Ingestion Options'));
 		$this->addDisplayGroup(array('logout_url', 'crossLine'), 'signSignOn', array('legend' => 'Sign Sign On'));
 		$this->addDisplayGroup(array_merge(array('api_access_control_id', 'restrict_entry_by_metadata'), $permissionNames[self::GROUP_ACCESS_CONTROL], array('crossLine')), 'apiAccessControlIdGroup', array('legend' => 'Access Control'));
@@ -940,8 +955,8 @@ class Form_PartnerConfiguration extends Infra_Form
 									 'passwordSecurity', array('legend' => 'Password Security'));
 
 		$this->addDisplayGroup(array_merge(array('use_two_factor_authentication', 'use_sso', 'block_direct_login'), array('crossLine')), 'authenticationSettings', array('legend' => 'Authentication Settings'));
+		$this->addDisplayGroup(array_merge(array('ignore_synonym_esearch','avoid_indexing_search_history','editESearchLanguages','e_search_languages'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
 
-		$this->addDisplayGroup(array_merge(array('editESearchLanguages','e_search_languages'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
 		$this->addDisplayGroup(array('partner_package'), 'accountPackagesService', array('legend' => 'Service Packages'));
 		$this->addDisplayGroup(array('partner_package_class_of_service', 'vertical_clasiffication', 'crm_id', 'crm_link', 'internal_use', 'crossLine'), 'accountPackages');
 		$this->addDisplayGroup(array('monitor_usage_history'), 'accountOptionsMonitorView', array('legend' => 'New Account Options'));

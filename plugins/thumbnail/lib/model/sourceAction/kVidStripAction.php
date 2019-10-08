@@ -101,7 +101,7 @@ class kVidStripAction extends kVidAction
 	 */
 	protected function concatImages($strip, $sliceToAdd, $x)
 	{
-		if(!$strip->compositeImage($sliceToAdd, imagick::COMPOSITE_DEFAULT, $x, 0))
+		if(!$strip->compositeImage($sliceToAdd, Imagick::COMPOSITE_DEFAULT, $x, 0))
 		{
 			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::COMPOSE_FAILED);
 			throw new kThumbnailException(kThumbnailException::ACTION_FAILED, kThumbnailException::ACTION_FAILED, $data);

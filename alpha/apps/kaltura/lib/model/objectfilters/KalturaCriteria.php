@@ -280,8 +280,15 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 
 	public static function escapeString($str, $escapeType = SearchIndexFieldEscapeType::DEFAULT_ESCAPE, $iterations = 2)
 	{
-		if($escapeType == SearchIndexFieldEscapeType::DEFAULT_ESCAPE)
+		if($escapeType == SearchIndexFieldEscapeType::DEFAULT_ESCAPE || $escapeType == SearchIndexFieldEscapeType::FULL_ESCAPE )
 		{
+			if ($escapeType == SearchIndexFieldEscapeType::FULL_ESCAPE)
+			{
+				$from = array ('\\', '"', '!');
+				$to = array ('\\\\', '\\"', '\\!');
+				$str =  str_replace($from, $to ,$str);
+			}
+
 			// NOTE: it appears that sphinx performs double decoding on SELECT values, so we encode twice.
 			//		" and ! are escaped once to enable clients to use them, " = exact match, ! = AND NOT
 			//	This code could have been implemented more elegantly using array_map, but this implementation is the fastest

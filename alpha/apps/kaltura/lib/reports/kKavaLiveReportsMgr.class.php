@@ -95,13 +95,12 @@ class kKavaLiveReportsMgr extends kKavaBase
 				self::PLAYBACK_TYPE_DVR)),
 		);
 
-		// Note: the code assumes only view/play events exist in the realtime datasource
-		//		if this changes, the below will need to be updated 
-		if ($eventTypes)
+		if (!$eventTypes)
 		{
-			$result[] = self::getInFilter(self::DIMENSION_EVENT_TYPE, $eventTypes);
+			$eventTypes = array(self::EVENT_TYPE_VIEW, self::EVENT_TYPE_PLAY);
 		}
-		
+		$result[] = self::getInFilter(self::DIMENSION_EVENT_TYPE, $eventTypes);
+
 		$entryIds = array();
 		if ($filter->entryIds)
 		{
@@ -126,17 +125,6 @@ class kKavaLiveReportsMgr extends kKavaBase
 		}
 		
 		return self::getAndFilter($result);
-	}
-	
-	protected static function roundUpToMultiple($num, $mult)
-	{
-		$rem = $num % $mult;
-		if (!$rem)
-		{
-			return $num;
-		}
-
-		return $num - $rem + $mult;
 	}
 
 	protected static function alignTimeFilters($filter)

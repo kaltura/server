@@ -831,3 +831,12 @@ maximumExecutionTime								= 12000
 scriptPath											= batches/ReportExport/KAsyncReportExportExe.php
 params.localTempPath								= @TMP_DIR@/reports
 params.sharedTempPath								= @WEB_DIR@/apptemp-shared/reports
+
+[KAsyncParseSccCaptionAsset : JobHandlerWorker]
+id                                                  = 770
+name                                                = KAsyncParseSccCaptionAsset
+friendlyName                                        = parse scc caption asset
+type                                                = KAsyncParseSccCaptionAsset
+maximumExecutionTime                                = 300
+scriptPath                                          = ../plugins/content/caption/base/batch/ParseCaptionAsset/KAsyncParseCaptionAssetExe.php
+params.pythonCmd                                    = @PYTHON_3_PATH@

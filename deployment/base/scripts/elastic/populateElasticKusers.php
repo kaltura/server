@@ -3,7 +3,7 @@ chdir(dirname(__FILE__));
 
 require_once(__DIR__ . '/../../../bootstrap.php');
 
-
+SphinxCriteria::enableForceSkipSphinx();
 $c = new Criteria();
 
 if($argc > 1 && is_numeric($argv[1]))

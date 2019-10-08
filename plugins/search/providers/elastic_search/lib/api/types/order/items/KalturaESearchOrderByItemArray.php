@@ -34,10 +34,6 @@ class KalturaESearchOrderByItemArray extends KalturaTypedArray
 					$nObj = new KalturaESearchUserOrderByItem();
 					break;
 				
-				case 'ESearchUserOrderByItem':
-					$nObj = new KalturaESearchGrou();
-					break;
-				
 				default:
 					$nObj = KalturaPluginManager::loadObject('KalturaESearchOrderByItem', get_class($obj));
 					break;

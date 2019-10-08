@@ -412,38 +412,38 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		switch ($report_flavor)
 		{
 			case myReportsMgr::REPORT_FLAVOR_TOTAL:
-				return $this->getTotalReport($objectIds);
+				return $this->getTotalReport($objectIds, $inputFilter);
 			case myReportsMgr::REPORT_FLAVOR_TABLE:
 				if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ))
 				{
-					$ans = $this->getQuestionPercentageTableReport($objectIds, $orderBy);
+					$ans = $this->getQuestionPercentageTableReport($objectIds, $orderBy, $inputFilter);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_PERCENTAGE))
 				{
-					$ans = $this->getUserPercentageTable($objectIds, $orderBy);
+					$ans = $this->getUserPercentageTable($objectIds, $orderBy, $inputFilter);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_AGGREGATE_BY_QUESTION))
 				{
-					$ans = $this->getQuizQuestionPercentageTableReport($objectIds, $orderBy);
+					$ans = $this->getQuizQuestionPercentageTableReport($objectIds, $orderBy, $inputFilter);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_AGGREGATE_BY_QUESTION))
 				{
-					$ans = $this->getUserPrecentageByUserAndEntryTable($objectIds, $inputFilter, $orderBy);
+					$ans = $this->getUserPrecentageByUserAndEntryTable($objectIds, $orderBy, $inputFilter);
 				}
 				return $this->pagerResults($ans, $page_size , $page_index);
 
 			case myReportsMgr::REPORT_FLAVOR_COUNT:
 				if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ))
 				{
-					return $this->getReportCount($objectIds);
+					return $this->getReportCount($objectIds, $inputFilter);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_PERCENTAGE) )
 				{
-					return $this->getUserPercentageCount($objectIds);
+					return $this->getUserPercentageCount($objectIds, $inputFilter);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_AGGREGATE_BY_QUESTION))
 				{
-					return $this->getQuestionCountByQusetionIds($objectIds);
+					return $this->getQuestionCountByQusetionIds($objectIds, $inputFilter);
 				}
 				else if ($report_type == (self::getPluginName() . "." . QuizReportType::QUIZ_USER_AGGREGATE_BY_QUESTION))
 				{
@@ -487,7 +487,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 	 * @return array
 	 * @throws kCoreException
 	 */
-	protected function getTotalReport($objectIds)
+	protected function getTotalReport($objectIds, $reportFilter)
 	{
 		if (!$objectIds)
 		{
@@ -504,7 +504,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		$c->add(UserEntryPeer::ENTRY_ID, $objectIds);
 		$c->add(UserEntryPeer::TYPE, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
 		$c->add(UserEntryPeer::STATUS, QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
-
+		$this->addToCriteria($c, $reportFilter, 'UserEntryPeer');
 		$quizzes = UserEntryPeer::doSelect($c);
 		$numOfQuizzesFound = count($quizzes);
 		KalturaLog::debug("Found $numOfQuizzesFound quizzes that were submitted");
@@ -525,52 +525,53 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 
 	/**
 	 * @param $objectIds
+	 * @param $orderBy
+	 * @param $reportFilter
 	 * @return array
 	 * @throws kCoreException
 	 */
-	protected function getQuestionPercentageTableReport($objectIds, $orderBy)
+	protected function getQuestionPercentageTableReport($objectIds, $orderBy, $reportFilter)
 	{
 		$dbEntry = entryPeer::retrieveByPK($objectIds);
 		if (!$dbEntry)
 			throw new kCoreException("",kCoreException::INVALID_ENTRY_ID, $objectIds);
-		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
+		QuizPlugin::validateAndGetQuiz( $dbEntry );
 		$c = new Criteria();
 		$c->add(CuePointPeer::ENTRY_ID, $objectIds);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_QUESTION));
+		$this->addToCriteria($c, $reportFilter, 'CuePointPeer');
 		$questions = CuePointPeer::doSelect($c);
 		return $this->getAggregateDataForQuestions($questions, $orderBy,false);
 	}
 
 	
-	protected function getQuizQuestionPercentageTableReport($objectIds, $orderBy)
+	protected function getQuizQuestionPercentageTableReport($objectIds, $orderBy, $reportFilter)
 	{
 		$questionIds = baseObjectUtils::getObjectIdsAsArray($objectIds);
 		$questionsCriteria = new Criteria();
 		$questionsCriteria->add(CuePointPeer::ID, $questionIds, Criteria::IN);
 		$questionsCriteria->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_QUESTION));
+		$this->addToCriteria($questionsCriteria, $reportFilter, 'CuePointPeer');
 		$questions = CuePointPeer::doSelect($questionsCriteria);
-
 		return $this->getAggregateDataForQuestions($questions, $orderBy);
 	}
 	
 	
 	/**
 	 * @param $objectIds
+	 * @param $reportFilter
 	 * @return array
 	 * @throws kCoreException
 	 */
-	protected function getReportCount($objectIds)
+	protected function getReportCount($objectIds, $reportFilter)
 	{
 		$dbEntry = entryPeer::retrieveByPK($objectIds);
 		if (!$dbEntry)
 		{
 			throw new kCoreException("", kCoreException::INVALID_ENTRY_ID, $objectIds);
 		}
-		/**
-		 * @var kQuiz $kQuiz
-		 */
-		$kQuiz = QuizPlugin::validateAndGetQuiz($dbEntry);
-		$ans = array();
+
+		QuizPlugin::validateAndGetQuiz($dbEntry);
 		$c = new Criteria();
 		$c->add(CuePointPeer::ENTRY_ID, $objectIds);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_QUESTION));
@@ -579,14 +580,14 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		{
 			$c->add(CuePointPeer::KUSER_ID, $anonKuserIds, Criteria::NOT_IN);
 		}
-
-		$numOfquestions = CuePointPeer::doCount($c);
+		$this->addToCriteria($c, $reportFilter, 'CuePointPeer');
+		$numOfQuestions = CuePointPeer::doCount($c);
 		$res = array();
-		$res['count_all'] = $numOfquestions;
+		$res['count_all'] = $numOfQuestions;
 		return array($res);
 	}
 
-	protected function getUserPercentageCount($objectIds)
+	protected function getUserPercentageCount($objectIds, $reportFilter)
 	{
 		$c = new Criteria();
 		$c->setDistinct();
@@ -595,6 +596,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		$c->add(UserEntryPeer::STATUS, QuizPlugin::getCoreValue('UserEntryStatus',QuizUserEntryStatus::QUIZ_SUBMITTED));
 
 		// if a user has answered the test twice (consider anonymous users) it will be calculated twice.
+		$this->addToCriteria($c, $reportFilter, 'UserEntryPeer');
 		$count = UserEntryPeer::doCount($c);
 
 		$res = array();
@@ -602,18 +604,19 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		return array($res);
 	}
 
-	protected function getQuestionCountByQusetionIds($objectIds)
+	protected function getQuestionCountByQusetionIds($objectIds, $reportFilter)
 	{
 		$questionIds = baseObjectUtils::getObjectIdsAsArray($objectIds);
 		$c = new Criteria();
 		$c->add(CuePointPeer::ID, $questionIds, Criteria::IN);
+		$this->addToCriteria($c, $reportFilter, 'CuePointPeer');
 		$numOfquestions = CuePointPeer::doCount($c);
 		$res = array();
 		$res['count_all'] = $numOfquestions;
 		return array($res);
 	}
 
-	private function getUserIdsFromFilter($inputFilter){
+	private function  getUserIdsFromFilter($inputFilter){
 		if ($inputFilter instanceof endUserReportsInputFilter &&
 			isset($inputFilter->userIds)){
 			return $inputFilter->userIds ;
@@ -649,11 +652,13 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 	
 	/**
 	 * @param $objectIds
+	 * @param $inputFilter
+	 * @param $orderBy
 	 * @return array
 	 * @throws kCoreException
 	 * @throws KalturaAPIException
 	 */
-	protected function getUserPercentageTable($objectIds, $orderBy)
+	protected function getUserPercentageTable($objectIds, $orderBy, $inputFilter)
 	{
 		$dbEntry = entryPeer::retrieveByPK($objectIds);
 		if (!$dbEntry)
@@ -664,6 +669,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
 		$c = new Criteria();
 		$c->add(UserEntryPeer::ENTRY_ID, $objectIds);
+		$this->addToCriteria($c, $inputFilter, 'UserEntryPeer');
 		$userEntries = UserEntryPeer::doSelect($c);
 		return $this->getAggregateDataForUsers($userEntries, $orderBy);
 	}
@@ -724,12 +730,16 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 				'num_of_wrong_answers' => ($totalAnswers - $totalCorrect));
 		}
 
-		uasort($ans, $this->getSortFunction($orderBy));
-		$ans = array_values($ans);
+		if($orderBy)
+		{
+			uasort($ans, $this->getSortFunction($orderBy));
+			$ans = array_values($ans);
+		}
+
 		return $ans;
 	}
 	
-	protected function getUserPrecentageByUserAndEntryTable($entryIds, $inputFilter, $orderBy)
+	protected function getUserPrecentageByUserAndEntryTable($entryIds, $orderBy, $inputFilter)
 	{
 		$userIds = $this->getUserIdsFromFilter($inputFilter);
 		$noEntryIds =  QuizPlugin::isWithoutValue($entryIds);
@@ -761,8 +771,21 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 				$c->addAnd(UserEntryPeer::KUSER_ID, $anonKuserIds, Criteria::NOT_IN);
 			}
 		}
+		$this->addToCriteria($c,$inputFilter,'UserEntryPeer');
 		$userEntries = UserEntryPeer::doSelect($c);
 		return $this->getAggregateDataForUsers($userEntries, $orderBy);
+	}
+
+	protected function addToCriteria(criteria &$c,reportsInputFilter $inputFilter, $peerName)
+	{
+		if ($inputFilter->from_date)
+		{
+			$c->addAnd($peerName::UPDATED_AT, $inputFilter->from_date, Criteria::GREATER_EQUAL);
+		}
+		if ($inputFilter->to_date )
+		{
+			$c->addAnd($peerName::UPDATED_AT, $inputFilter->to_date, Criteria::LESS_EQUAL);
+		}
 	}
 
 	private function getSortFunction($orderBy)
@@ -852,7 +875,10 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 				'num_of_wrong_answers' => ($numOfAnswers - $numOfCorrectAnswers));
 		}
 
-		uasort($ans, $this->getSortFunction($orderBy));
+		if($orderBy)
+		{
+			uasort($ans, $this->getSortFunction($orderBy));
+		}
 		return $ans;
 	}
 

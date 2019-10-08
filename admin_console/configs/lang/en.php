@@ -69,6 +69,7 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::USERS_CSV' => 'Users Csv',
 	'Kaltura_Client_Enum_BatchJobType::COPY_CUE_POINTS' => 'Copy cue Points',
 	'Kaltura_Client_Enum_BatchJobType::CLIP_CONCAT' => 'Clip Concat',
+	'Kaltura_Client_Enum_BatchJobType::CONVERT_CAPTION_ASSET' => 'Convert Caption Asset',
 
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_AUX' => 'Convert - FFMpeg Aux',
@@ -305,6 +306,9 @@ return array(
 
 	'Kaltura_Client_ContentDistribution_Enum_DistributionProfileStatus::ENABLED' => 'Enabled',
 	'Kaltura_Client_ContentDistribution_Enum_DistributionProfileStatus::DISABLED' => 'Disabled',
+
+	'Kaltura_Client_ContentDistribution_Enum_DistributeTrigger::ENTRY_READY' => 'On entry ready',
+	'Kaltura_Client_ContentDistribution_Enum_DistributeTrigger::MODERATION_APPROVED'  => 'On moderation approved',
 
 	'init client failed' => 'Could not initiate the Kaltura client',
 	'entry not found' => 'Entry not found',
@@ -1440,6 +1444,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWENTY_FOUR_HOURS' => 'TWENTY_FOUR_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FORTY_EIGHT_HOURS' => 'FORTY_EIGHT_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FOUR_DAYS' => 'FOUR_DAYS',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FIVE_DAYS' => 'FIVE_DAYS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TEN_DAYS' => 'TEN_DAYS',
 	
 	'Kaltura_Client_Reach_Type_VendorCatalogItemPricing' => "Default Pricing",
@@ -1509,4 +1514,12 @@ return array(
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::FI' => "Finnish",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::IS' => "Icelandic",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::PL' => "Polish",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::IN' => "Indonesian",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::EL' => "Greek",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::RO' => "Romanian",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::HU' => "Hungarian",
+
+	'Kaltura_Client_Sso_Enum_SsoStatus::DISABLED' => 'Disabled',
+	'Kaltura_Client_Sso_Enum_SsoStatus::ACTIVE' => 'Enabled',
+	'Kaltura_Client_Sso_Enum_SsoStatus::DELETED' => 'Deleted',
 );

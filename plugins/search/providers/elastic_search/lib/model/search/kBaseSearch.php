@@ -39,7 +39,7 @@ abstract class kBaseSearch
 
 	protected abstract function execSearch(ESearchOperator $eSearchOperator);
 
-	protected abstract function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null);
+	protected abstract function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations=null);
 
 	protected function initPager(kPager $pager = null)
 	{
@@ -61,6 +61,27 @@ abstract class kBaseSearch
 			}
 
 			$this->query['body']['sort'] = $sortConditions;
+		}
+	}
+
+	protected function initAggregations(ESearchAggregations $aggregations = null)
+	{
+		if(!$aggregations)
+		{
+			return;
+		}
+
+		$aggs = array();
+
+		foreach ($aggregations->getAggregations() as $aggregation)
+		{
+			/* var $aggregation ESearchAggregationItem */
+			$aggregationKey = $aggregation->getAggregationKey() . ':' . $aggregation->getFieldName();
+			$aggs[$aggregationKey] = $aggregation->getAggregationCommand();
+		}
+		if($aggs)
+		{
+			$this->query['body']['aggs'] = $aggs;
 		}
 	}
 
@@ -118,12 +139,12 @@ abstract class kBaseSearch
 
 	protected function initQueryAttributes($partnerId, $objectId)
 	{
-		$this->initPartnerLanguages($partnerId);
+		$this->initPartnerLanguagesSynonym($partnerId);
 		$this->queryAttributes->setObjectId($objectId);
 		$this->initOverrideInnerHits($objectId);
 	}
 
-	protected function initPartnerLanguages($partnerId)
+	protected function initPartnerLanguagesSynonym($partnerId)
 	{
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if(!$partner)
@@ -139,6 +160,7 @@ abstract class kBaseSearch
 		}
 
 		$this->queryAttributes->setPartnerLanguages($partnerLanguages);
+		$this->queryAttributes->setIgnoreSynonymOnPartner($partner->getIgnoreSynonymEsearch());
 	}
 
 	protected function initOverrideInnerHits($objectId)

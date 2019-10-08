@@ -40,6 +40,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @param string $newPassword
 	 * @param string $newFirstName Optional, provide only when you want to update the first name
 	 * @param string $newLastName Optional, provide only when you want to update the last name
+	 * @param string $otp the user's one-time password
 	 *
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
@@ -47,8 +48,10 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
 	 * @throws KalturaErrors::PASSWORD_ALREADY_USED
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
+	 * @throws KalturaErrors::INVALID_OTP
+	 * @throws KalturaErrors::MISSING_OTP
 	 */
-	protected function updateLoginDataImpl( $email , $password , $newEmail = "" , $newPassword = "", $newFirstName = null, $newLastName = null)
+	protected function updateLoginDataImpl( $email , $password , $newEmail = "" , $newPassword = "", $newFirstName = null, $newLastName = null, $otp = null)
 	{
 		KalturaResponseCacher::disableCache();
 
@@ -61,7 +64,7 @@ class KalturaBaseUserService extends KalturaBaseService
 		}
 
 		try {
-			UserLoginDataPeer::updateLoginData ( $email , $password, $newEmail, $newPassword, $newFirstName, $newLastName);
+			UserLoginDataPeer::updateLoginData ( $email , $password, $newEmail, $newPassword, $newFirstName, $newLastName, $otp);
 		}
 		catch (kUserException $e) {
 			$code = $e->getCode();
@@ -89,6 +92,14 @@ class KalturaBaseUserService extends KalturaBaseService
 			}
 			else if ($code == kUserException::LOGIN_ID_ALREADY_USED) {
 				throw new KalturaAPIException(KalturaErrors::LOGIN_ID_ALREADY_USED);
+			}
+			else if ($code === kUserException::INVALID_OTP)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_OTP);
+			}
+			else if ($code === kUserException::MISSING_OTP)
+			{
+				throw new KalturaAPIException(KalturaErrors::MISSING_OTP);
 			}
 			throw $e;			
 		}

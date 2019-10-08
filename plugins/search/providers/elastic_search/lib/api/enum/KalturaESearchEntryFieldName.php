@@ -39,4 +39,5 @@ class KalturaESearchEntryFieldName extends KalturaStringEnum
 	const IS_LIVE = 'is_live';
 	const USER_NAMES = "user_names";
 	const ROOT_ID = 'root_id';
+	const PARTNER_SORT_VALUE = 'partner_sort_value';
 }

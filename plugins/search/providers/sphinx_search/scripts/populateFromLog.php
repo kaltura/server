@@ -59,16 +59,26 @@ $dbConf = kConf::getDB();
 DbManager::setConfig($dbConf);
 DbManager::initialize();
 
+$splitIndexSettings = null;
+if(isset($dbConf['sphinx_split_index']) && $dbConf['sphinx_split_index']['enabled'] == true)
+{
+	$splitIndexSettings = $dbConf['sphinx_split_index'];
+}
+
 $limit = 1000; 	// The number of sphinxLog records we want to query
 $gap = 500;	// The gap from 'getLastLogId' we want to query
+$maxIndexHistory = 2000; //The maximum array size to save unique object ids update and their sphinx log id
 
 $sphinxReadConn = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG_READ);
 
 $serverLastLogs = SphinxLogServerPeer::retrieveByServer($sphinxServer, $sphinxReadConn);
 $lastLogs = array();
 $handledRecords = array();
+$sphinxRtTables = array();
+$objectIdSphinxLog = array();
 
-foreach($serverLastLogs as $serverLastLog) {
+foreach($serverLastLogs as $serverLastLog)
+{
 	$lastLogs[$serverLastLog->getDc()] = $serverLastLog;
 	$handledRecords[$serverLastLog->getDc()] = array();
 }
@@ -88,7 +98,10 @@ while(true)
 	try
 	{
 		$sphinxCon = DbManager::createSphinxConnection($sphinxServer,$sphinxPort);
-		$sphinxRtTables = getSphinxRtTables($sphinxCon);
+		if(!count($sphinxRtTables))
+		{
+			$sphinxRtTables = getSphinxRtTables($sphinxCon);
+		}
 		KalturaLog::log("sphinxServer [$sphinxServer], running rt index names [" . implode(",", $sphinxRtTables) . "]");
 	}
 	catch(Exception $e)
@@ -105,7 +118,11 @@ while(true)
 		$executedServerId = $sphinxLog->getExecutedServerId();
 		$sphinxLogId = $sphinxLog->getId();
 		$sphinxLogIndexName = $sphinxLog->getIndexName();
-		
+		if($isSharded && preg_match('~[0-9]~', $sphinxLogIndexName) == 0 && $splitIndexSettings && isset($splitIndexSettings[$sphinxLog->getObjectType()]))
+		{
+			$splitFactor = $splitIndexSettings[$sphinxLog->getObjectType()];
+			$sphinxLogIndexName = $sphinxLogIndexName . "_" . ($sphinxLog->getPartnerId()/$splitFactor)%$splitFactor;
+		}
 		
 		if($isSharded && $sphinxLogIndexName && !in_array($sphinxLogIndexName, $sphinxRtTables))
 		{
@@ -132,17 +149,21 @@ while(true)
 
 		try
 		{
+			$objectId = $sphinxLog->getObjectId();
 			if ($skipExecutedUpdates && $executedServerId == $serverLastLog->getId())
 			{
 				KalturaLog::log ("Sphinx server is initiated and the command already ran synchronously on this machine. Skipping");
 			}
+			elseif(isset($objectIdSphinxLog[$objectId]) && $objectIdSphinxLog[$objectId] > $sphinxLogId )
+			{
+				KalturaLog::log ("Found newer update for the same object id, skipping [$objectId] [$sphinxLogId] [{$objectIdSphinxLog[$objectId]}]");
+			}
 			else
 			{
 				$sql = $sphinxLog->getSql();
-				if($isSharded && $sphinxLog->getObjectType() == "entry")
+				if($isSharded)
 				{
-					$shardedIndexName = $sphinxLog->getIndexName() ? $sphinxLog->getIndexName() : "kaltura_entry_" . ($sphinxLog->getPartnerId()/10)%10;
-					$sql = str_replace("kaltura_entry", $shardedIndexName, $sql);
+					$sql = preg_replace('/replace into (kaltura_.*?) /', "replace into $sphinxLogIndexName ", $sql);
 				}
 				
 				// sql update commands are created only via an external script for updating entries plays count
@@ -151,7 +172,20 @@ while(true)
 				{
 					$affected = $sphinxCon->exec($sql);
 					if(!$affected)
+					{
 						$errorInfo = $sphinxCon->errorInfo();
+						KalturaLog::log("Failed to run sphinx update query for sphinxLogId [$sphinxLogId] with error [" . $errorInfo . "]");
+					}
+					
+					unset($objectIdSphinxLog[$objectId]);
+					
+					if(count($objectIdSphinxLog) > $maxIndexHistory)
+					{
+						reset($objectIdSphinxLog);
+						$oldestElementKey = key($objectIdSphinxLog);
+						unset($objectIdSphinxLog[$oldestElementKey]);
+					}
+					$objectIdSphinxLog[$objectId] = $sphinxLogId;
 				}
 			}
 			

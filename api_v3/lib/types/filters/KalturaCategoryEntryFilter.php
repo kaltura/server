@@ -99,6 +99,10 @@ class KalturaCategoryEntryFilter extends KalturaCategoryEntryBaseFilter
 		if(!kEntitlementUtils::getEntitlementEnforcement() || $this->entryIdEqual == null)
 			$pager->attachToCriteria($c);
 			
+		//When filtering createdAtGreaterThanOrEqual add updated at filtering with the same value to utilize an existing index
+		if(isset($this->createdAtGreaterThanOrEqual))
+			$c->addAnd(categoryEntryPeer::UPDATED_AT, $this->createdAtGreaterThanOrEqual, Criteria::GREATER_EQUAL);
+		
 		$dbCategoriesEntry = categoryEntryPeer::doSelect($c);
 		
 		if(kEntitlementUtils::getEntitlementEnforcement() && count($dbCategoriesEntry) && $this->entryIdEqual != null)

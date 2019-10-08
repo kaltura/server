@@ -17,6 +17,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 {
 	const KALTURAS_CMS_PASSWORD_RESET = 51;
 	const LAST_LOGIN_TIME_UPDATE_INTERVAL = 600; // 10 Minutes
+	const OTP_MISSING = 'otp is missing';
+	const OTP_INVALID = 'otp is invalid';
 	
 	public static function generateNewPassword()
 	{
@@ -82,7 +84,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		);
 	}
 	
-	public static function updateLoginData($oldLoginEmail, $oldPassword, $newLoginEmail = null, $newPassword = null, $newFirstName = null, $newLastName = null)
+	public static function updateLoginData($oldLoginEmail, $oldPassword, $newLoginEmail = null, $newPassword = null, $newFirstName = null, $newLastName = null, $otp = null)
 	{
 		// if email is null, no need to do any DB queries
 		if (!$oldLoginEmail) {
@@ -120,7 +122,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 
 		self::checkPasswordValidation ( $newPassword, $loginData );
-				 
+		self::validate2FA($loginData, $otp);
 		// update password if requested
 		if ($newPassword && $newPassword != $oldPassword) {
 			$password = $loginData->resetPassword($newPassword, $oldPassword);
@@ -153,7 +155,25 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 		return $loginData;
 	}
-	
+
+	protected static function validate2FA($loginData, $otp)
+	{
+
+		$dbUser =  kuserPeer::getAdminUser($loginData->getConfigPartnerId(), $loginData);
+		if ($dbUser && $loginData->isTwoFactorAuthenticationRequired($dbUser))
+		{
+			if(!$otp)
+			{
+				throw new kUserException (self::OTP_MISSING, kUserException::MISSING_OTP);
+			}
+			$result = authenticationUtils::verify2FACode($loginData, $otp);
+			if (!$result)
+			{
+				throw new kUserException (self::OTP_INVALID, kUserException::INVALID_OTP);
+			}
+		}
+	}
+
 	public static function checkPasswordValidation($newPassword, $loginData) {
 		// check that new password structure is valid
 		if ($newPassword && 
@@ -301,19 +321,17 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$loginData->resetPassword($newPassword);
 		myPartnerUtils::initialPasswordSetForFreeTrial($loginData);
 
-		$partner = PartnerPeer::retrieveByPK($loginData->getConfigPartnerId());
-		if($partner->getUseTwoFactorAuthentication())
+		kuserPeer::setUseCriteriaFilter(false);
+		$dbUser = kuserPeer::getKuserByPartnerAndUid($loginData->getConfigPartnerId(), $loginData->getLoginEmail(), true);
+		kuserPeer::setUseCriteriaFilter(true);
+		if (!$dbUser)
 		{
-			kuserPeer::setUseCriteriaFilter(false);
-			$dbUser = kuserPeer::getKuserByPartnerAndUid($loginData->getConfigPartnerId(), $loginData->getLoginEmail(), true);
-			kuserPeer::setUseCriteriaFilter(true);
-			if (!$dbUser)
-			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $loginData->getLoginEmail());
-			}
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $loginData->getLoginEmail());
+		}
 
+		if($loginData->isTwoFactorAuthenticationRequired($dbUser))
+		{
 			authenticationUtils::generateNewSeed($loginData);
-
 			return authenticationUtils::getQRImage($dbUser, $loginData);
 		}
 
@@ -787,7 +805,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	{
 		$originPartnerAuthType = $originPartner->getAuthenticationType();
 		$requestedPartnerAuthType = $requestedPartner->getAuthenticationType();
-
+		if ($requestedPartnerAuthType === PartnerAuthenticationType::SSO)
+		{
+			throw new kUserException ('Switching to requested partner requires re-login', kUserException::NEW_LOGIN_REQUIRED);
+		}
 		if($originPartnerAuthType !== $requestedPartnerAuthType)
 		{
 			if($requestedPartnerAuthType !== PartnerAuthenticationType::PASSWORD_ONLY)
@@ -795,6 +816,17 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				throw new kUserException ('Switching to requested partner requires re-login', kUserException::NEW_LOGIN_REQUIRED);
 			}
 		}
+	}
+
+	public static function getPartnerIdFromLoginData($email)
+	{
+		$loginData = UserLoginDataPeer::getByEmail($email);
+		if (!$loginData)
+		{
+			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
+		}
+		$partnerId = $loginData->getLastLoginPartnerId() ? $loginData->getLastLoginPartnerId() : $loginData->getConfigPartnerId();
+		return $partnerId;
 	}
 
 } // UserLoginDataPeer

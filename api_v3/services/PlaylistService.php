@@ -10,6 +10,9 @@
  */
 class PlaylistService extends KalturaEntryService
 {
+	const ADVANCED_SEARCH = 'advancedSearch';
+	const KALTURA_METADATA_SEARCH_ITEM = 'KalturaMetadataSearchItem';
+
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::globalPartnerAllowed()
 	 */
@@ -345,19 +348,81 @@ class PlaylistService extends KalturaEntryService
 	function executeFromContentAction($playlistType, $playlistContent, $detailed = false, $pager = null)
 	{
 	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
-	    
 		if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
+		{
 			myPlaylistUtils::setIsAdminKs(true);
-
-		$entryList = array();
-		if ($playlistType == KalturaPlaylistType::DYNAMIC)
-			$entryList = myPlaylistUtils::executeDynamicPlaylist($this->getPartnerId(), $playlistContent, null, true, $pager);
-		else if ($playlistType == KalturaPlaylistType::STATIC_LIST)
-			$entryList = myPlaylistUtils::executeStaticPlaylistFromEntryIdsString($playlistContent, null, true, $pager);
-			
+		}
+		list($entryFiltersViaEsearch,  $entryFiltersViaSphinx, $totalResults) = myPlaylistUtils::splitEntryFilters($playlistContent);
+		$pagerSeparateQueries = self::decideWhereHandlingPager($pager,$entryFiltersViaEsearch, $entryFiltersViaSphinx);
+		$entryList = self::handlePlaylistByType($playlistType, $entryFiltersViaEsearch, $entryFiltersViaSphinx, $this->getPartnerId(), $pagerSeparateQueries, $pager, $totalResults, $playlistContent);
 		myEntryUtils::updatePuserIdsForEntries($entryList);
-		
+		KalturaLog::debug("entry ids count: " . count($entryList));
 		return KalturaBaseEntryArray::fromDbArray($entryList, $this->getResponseProfile());
+	}
+
+	protected static function handlePlaylistByType($playlistType, $entryFiltersViaEsearch, $entryFiltersViaSphinx, $partnerId, $pagerSeperateQueries, $pager, $totalResults, $playlistContent)
+	{
+		if ($playlistType == KalturaPlaylistType::DYNAMIC)
+		{
+			$entryList = self::handlingDynamicPlaylist($entryFiltersViaEsearch,$entryFiltersViaSphinx, $partnerId, $pagerSeperateQueries, $pager, $totalResults);
+		}
+		else if ($playlistType == KalturaPlaylistType::STATIC_LIST)
+		{
+			$entryList = myPlaylistUtils::executeStaticPlaylistFromEntryIdsString($playlistContent, null, true, $pager);
+		}
+		return $entryList;
+	}
+
+	protected static function handlingDynamicPlaylist($entryFiltersViaEsearch, $entryFiltersViaSphinx, $partnerId, $pagerSeparateQueries, $pager, $totalResults)
+	{
+		$entryListEsearch = array();
+		$entryListSphinx = array();
+		if ($entryFiltersViaEsearch)
+		{
+			$entryFiltersViaEsearch = myPlaylistUtils::getEntryFiltersFromXml($entryFiltersViaEsearch, $partnerId);
+			list($entryListEsearch, $totalResults) = myPlaylistUtils::executeDynamicPlaylistViaEsearch($entryFiltersViaEsearch, $totalResults, $pagerSeparateQueries);
+		}
+		if ($entryFiltersViaSphinx)
+		{
+			$entryListSphinx = myPlaylistUtils::executeDynamicPlaylistFromFilters($totalResults, $entryFiltersViaSphinx, $partnerId, null, true, $pagerSeparateQueries);
+		}
+		$entryListMerged = array_merge($entryListEsearch,$entryListSphinx);
+		$entryListUnique = self::getEntryListUnique($entryListMerged);
+		$entryList = self::getEntryListByPager($entryListUnique, $pager, $pagerSeparateQueries);
+		return $entryList;
+	}
+
+	//When queries are going to run both in Esearch and Sphinx, pager handling will be done after merging the results -> ($pagerSeperateQueries = null)
+	//In case only one of them will run (for example only in sphinx), pager handling will be done only there (in this example: in sphinx query) -> ($pagerSeperateQueries = $pager)
+	protected static function decideWhereHandlingPager($pager,$entryFiltersViaEsearch, $entryFiltersViaSphinx)
+	{
+		$pagerSeparateQueries = $pager;
+		if ($entryFiltersViaEsearch && $entryFiltersViaSphinx)
+		{
+			$pagerSeparateQueries = null;
+		}
+		return $pagerSeparateQueries;
+	}
+
+	protected static function getEntryListUnique($entryListMerged)
+	{
+		$entryList  = array();
+		foreach ($entryListMerged as $currentEntry)
+		{
+			$entryList[$currentEntry->getId()] = $currentEntry;
+		}
+		return $entryList;
+	}
+
+	protected static function getEntryListByPager($entryList, $pager, $pagerSeparateQueries)
+	{
+		if ( $pager && is_null($pagerSeparateQueries))
+		{
+			$startOffset = $pager->calcOffset();
+			$pageSize = $pager->calcPageSize();
+			$entryList = array_slice($entryList, $startOffset, $pageSize);
+		}
+		return $entryList;
 	}
 	
 	/**

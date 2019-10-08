@@ -29,7 +29,7 @@ class kScheduledResourceSearch extends kBaseSearch
 		return $result;
 	}
 
-	protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null)
+	protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null,  ESearchAggregations $aggregations=null)
 	{
 		$this->query = array(elasticClient::ELASTIC_INDEX_KEY => BeaconIndexName::SCHEDULED_RESOURCE_INDEX);
 		$partnerId = kBaseElasticEntitlement::$partnerId;

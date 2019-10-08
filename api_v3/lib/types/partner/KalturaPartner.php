@@ -130,6 +130,11 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 * @var string
 	 */
 	public $notificationsConfig;
+
+	/**
+	 * @var string
+	 */
+	public $allowedFromEmailWhiteList;
 	
 	/**
 	 * @var int
@@ -347,7 +352,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	(
 		'id' , 'name', 'website' => 'url1' , 'notificationUrl' => 'url2' , 'appearInSearch' , 'createdAt' , 'adminName' , 'adminEmail' ,
 		'description' , 'commercialUse' , 'landingPage' , 'userLandingPage' , 'contentCategories' , 'type' , 'phone' , 'describeYourself' ,
-		'adultContent' , 'defConversionProfileType' , 'notify' , 'status' , 'allowQuickEdit' , 'mergeEntryLists' , 'notificationsConfig' ,
+		'adultContent' , 'defConversionProfileType' , 'notify' , 'status' , 'allowQuickEdit' , 'mergeEntryLists' , 'notificationsConfig' , 'allowedFromEmailWhiteList',
 		'maxUploadSize' , 'partnerPackage' , 'secret' , 'adminSecret' , 'allowMultiNotification', 'adminLoginUsersQuota', 'adminUserId',
 		'firstName' , 'lastName' , 'country' , 'state' , 'publishersQuota', 'partnerGroupType', 'defaultEntitlementEnforcement', 
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks',

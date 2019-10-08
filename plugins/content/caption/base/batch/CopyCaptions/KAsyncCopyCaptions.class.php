@@ -100,7 +100,7 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 
 	private function getUnsupportedFormats()
 	{
-		$unsupportedFormats = array (CaptionType::CAP);
+		$unsupportedFormats = array (CaptionType::CAP, CaptionType::SCC);
 		return $unsupportedFormats;
 	}
 

@@ -221,7 +221,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 			throw new kTemporaryException('Webex header is not valid');
 
 		$params = null;
-		if(kBatchBase::$taskConfig)
+		if(KBatchBase::$taskConfig)
 			$params = KBatchBase::$taskConfig->params;
 
 		$downloadUrl = WebexPlugin::retrieveWebexDownloadFilePath($curlHeaderResponse, $params, null, $webexFileUrl);

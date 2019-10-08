@@ -30,11 +30,11 @@ class kESearchCoreAdapter
 
 	public static function transformElasticToCoreObject($elasticResults, $coreSearchObject)
 	{
-		list($objectData, $objectOrder, $objectCount, $objectHighlight) = self::getElasticResultAsArray($elasticResults,
+		list($objectData, $objectOrder, $objectCount, $objectHighlight, $aggregations) = self::getElasticResultAsArray($elasticResults,
 			$coreSearchObject->getQueryAttributes()->getQueryHighlightsAttributes());
 		$objects = $coreSearchObject->fetchCoreObjectsByIds(array_keys($objectData));
 		$coreResults = self::getCoreESearchResults($objects, $objectData, $objectOrder, $objectHighlight);
-		return array($coreResults, $objectCount);
+		return array($coreResults, $objectCount, $aggregations);
 	}
 
 	public static function getElasticResultAsArray($elasticResults, $queryHighlightsAttribute)
@@ -57,8 +57,10 @@ class kESearchCoreAdapter
 		
 		if(isset($elasticResults[self::HITS_KEY][self::TOTAL_KEY]))
 			$objectCount = $elasticResults[self::HITS_KEY][self::TOTAL_KEY];
-		
-		return array($objectData, $objectOrder, $objectCount, $objectHighlight);
+
+		$aggregations = isset($elasticResults['aggregations']) ? $elasticResults['aggregations'] : null;
+
+		return array($objectData, $objectOrder, $objectCount, $objectHighlight, $aggregations );
 	}
 
 	private static function getCoreESearchResults($coreObjects, $objectsData, $objectsOrder, $objectHighlight)

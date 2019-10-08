@@ -1,3 +1,218 @@
+# Orion 15.8.0 #
+
+## Add systemName name to Q&A response profile  ##
+- Issue Type: Feature
+- Issue ID: WEBC-1554
+
+### Configuration ###
+    First replace all tokens from the XML files below and remove ".template" from the file name:
+    /opt/kaltura/app/deployment/updates/scripts/xml/2019_09_25_updateQandAResponseProfile_addSystemName.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2019_09_25_updateQandAResponseProfile_addSystemName.php
+
+
+## Remove str_entry_id field from kaltura_cue_point sphinx table  ##
+- Issue Type: Task
+- Issue ID: PLAT-10199
+
+### Configuration ###
+    update kaltura.conf file and remove from kaltura_cue_point table the following field
+	rt_attr_string	 = str_entry_id
+	
+#### Deployment Scripts ####	
+    Re-index kaltura_cue_point table
+
+# Orion 15.7.0 #
+
+## Add first+last name to Q&A response profile  ##
+- Issue Type: Feature
+- Issue ID: WEBC-1429
+
+### Configuration ###
+    First replace all tokens from the XML files below and remove ".template" from the file name:
+    /opt/kaltura/app/deployment/updates/scripts/xml/2019_06_26_updateQandAResponseProfile_addUserData.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2019_06_26_updateQandAResponseProfile_addUserData.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_09_11_add_webcasting_role_permission_to_user_list.php
+
+
+## Sso emails ##
+- Issue Type: Task
+- Issue ID: PLAT-9973
+
+### configuration ###
+To use the sso emails you should set the sso login link in sso.ini
+
+## Adding flavorparam permission to Capture app ##
+- Issue Type: Task
+- Issue ID: LEC-1832
+
+### configuration ###
+    None
+
+### Deployment scripts ###
+    php deployment/updates/scripts/add_permissions/2019_09_04_add_flavorparam_capture_permission.php
+
+## Add SSO ##
+- Issue Type: Task
+- Issue ID: PLAT-9838,KMCNG-2166,PLAT-10099
+
+### configuration ###
+Add Sso plugin in: configurations/plugins.ini
+
+### Deployment scripts ###
+Run mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_09_01_create_sso_table.sql
+Run install plugins:  php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+php deployment/updates/scripts/add_permissions/2019_09_04_add_sso_role_and_permissions.php
+php deployment/updates/scripts/add_permissions/2019_09_04_sso_service.php
+
+
+# Orion 15.6.0 #
+
+## Add ESearch read only permission ##
+- Issue Type: Task
+- Issue ID: PLAT-10084
+
+### configuration ###
+    None
+
+### Deployment scripts ###
+php deployment/updates/scripts/add_permissions/2019_08_20_update_esearch_permissions.php
+
+## Add permission in the admin console to Multi Account Analytics Filter ##
+
+- Issue Type: Feature
+- Issue ID: AN-801
+
+### configuration ###
+    Add the following to admin.ini:
+
+    moduls.multiPublishersAnalytics.enabled = true
+    moduls.multiPublishersAnalytics.permissionType = 2
+    moduls.multiPublishersAnalytics.label = Multi Account Analytics Filter
+    moduls.multiPublishersAnalytics.permissionName = FEATURE_MULTI_ACCOUNT_ANALYTICS
+    moduls.multiPublishersAnalytics.group = GROUP_ENABLE_DISABLE_FEATURES
+
+# Orion 15.5.0 #
+
+## Adding monitoring-proxy partner ##
+
+- Issue Type: Task
+- Issue ID: PLAT-9986
+
+### configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+deployment/base/scripts/init_data/01.Partner.template.ini
+deployment/updates/scripts/xml/2019_07_22_server_node_email_alert.template.xml
+
+### Deployment scripts ###
+php deployment/updates/scripts/add_permissions/2019_07_22_monitoring_proxy_add_partner.php
+php deployment/updates/scripts/2019_07_28_add_server_node_email_alert_template.php
+
+
+# Orion 15.4.0 #
+
+## changing reach notifications subject ##
+
+- Issue Type: Task
+- Issue ID: REACH2-663
+
+### configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+deployment/updates/scripts/xml/notifications/2019_07_24_update_task_approved_execution.template.xml
+deployment/updates/scripts/xml/notifications/2019_07_24_update_task_finished_processing.template.xml
+deployment/updates/scripts/xml/notifications/2019_07_24_update_task_rejected_for_execution.template.xml
+
+### Deployment scripts ###
+php deployment/updates/scripts/2019_07_24_deploy_update_subject_reach_notifications.php
+
+## update reach credit notification ##
+
+- Issue Type: Task
+- Issue ID: REACH2-563
+
+### configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+deployment/updates/scripts/xml/notifications/2019_07_23_update_reach_credit_expired.template.xml
+deployment/updates/scripts/xml/notifications/2019_07_23_update_reach_credit_usage_over_75_percent.template.xml
+deployment/updates/scripts/xml/notifications/2019_07_23_update_reach_credit_usage_over_90_percent.template.xml
+deployment/updates/scripts/xml/notifications/2019_07_23_update_reach_credit_usage_over_100_percent.template.xml
+
+### Deployment scripts ###
+php deployment/updates/scripts/2019_07_23_deploy_update_credit_notifications.php
+
+## update reach notification: Task Pending Moderation ##
+
+- Issue Type: Task
+- Issue ID: REACH2-662
+
+### configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+deployment/updates/scripts/xml/notifications/2019_07_22_update_entry_vendor_pending_moderation.template.xml
+
+### Deployment scripts ###
+php deployment/updates/scripts/2019_07_22_deploy_update_entry_vendor_pending_moderation.php
+
+# Orion 15.3.0 #
+
+## Add new type of userEntry called watch later ##
+
+- Issue Type: Task
+- Issue ID: PLAT-9998
+
+### configuration ###
+Add WatchLater to your plugins.ini
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+
+## Add new caption type SCC to convert from SCC to SRT automatically on upload of scc captions ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-9902
+
+### configuration ### 
+make sure python3 and pycaption for python 3 are installed
+
+Add the following to batch.ini:
+
+enabledWorkers.KAsyncConvertCaptionAsset	    = xxx (number of workers)
+
+[KAsyncConvertCaptionAsset : JobHandlerWorker]
+id                                                  = 770
+name                                                = KAsyncConvertCaptionAsset
+friendlyName                                        = convert caption asset
+type                                                = KAsyncConvertCaptionAsset
+maximumExecutionTime                                = 300
+scriptPath                                          = ../plugins/content/caption/base/batch/ConvertCaptions/KAsyncConvertCaptionAssetExe.php
+params.pythonCmd                                    = @LOCATION_OF_PYTHON3@
+
+
+### Deployment scripts ###
+    Install Plugins
+    
+## Add permission in the admin console to include live entries in the mrss feed ##
+
+- Issue Type: Feature
+- Issue ID: PSVAMB-7785
+
+### configuration ###
+    Add the following to admin.ini:
+
+    moduls.feedWithLiveEntries.enabled = true
+    moduls.feedWithLiveEntries.permissionType = 2
+    moduls.feedWithLiveEntries.label = "Include live entries in feed"
+    moduls.feedWithLiveEntries.permissionName = FEATURE_LIVE_ENTRIES_IN_FEED
+    moduls.feedWithLiveEntries.basePermissionType =
+    moduls.feedWithLiveEntries.basePermissionName =
+    moduls.feedWithLiveEntries.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+    None
+    
 # Orion 15.1.0 #
 ## New thumbnail API  ##
 - Issue Type: Epic

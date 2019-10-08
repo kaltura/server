@@ -73,7 +73,7 @@ class CaptionAssetService extends KalturaAssetService
 		$dbCaptionAsset = new CaptionAsset();
 		$dbCaptionAsset = $captionAsset->toInsertableObject($dbCaptionAsset);
 		
-		if($this->getKs() && $this->getKs()->getPrivilegeByName(KSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION))
+		if($this->getKs() && $this->getKs()->getPrivilegeByName(kSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION))
 			$dbCaptionAsset->setDisplayOnPlayer(false);
 				
 		$dbCaptionAsset->setEntryId($entryId);
@@ -118,6 +118,17 @@ class CaptionAssetService extends KalturaAssetService
 		$contentResource->validateAsset($dbCaptionAsset);
 		$kContentResource = $contentResource->toObject();
 		$this->attachContentResource($dbCaptionAsset, $kContentResource);
+
+		if ($dbCaptionAsset->getContainerFormat() == CaptionType::SCC)
+		{
+			//start convert caption batch Job.
+			kCaptionsContentManager::addConvertCaptionAssetJob($dbCaptionAsset, CaptionType::SCC, CaptionType::SRT);
+
+			$captionAsset = new KalturaCaptionAsset();
+			$captionAsset->fromObject($dbCaptionAsset, $this->getResponseProfile());
+			return $captionAsset;
+		}
+
 		$contentResource->entryHandled($dbCaptionAsset->getentry());
 		
     	$newStatuses = array(
@@ -183,8 +194,16 @@ class CaptionAssetService extends KalturaAssetService
 		list($width, $height, $type, $attr) = getimagesize($fullPath);
 
 		$captionAsset->incrementVersion();
-		if ($ext && $ext != kUploadTokenMgr::NO_EXTENSION_IDENTIFIER)
+
+		if (!$ext || $ext == kUploadTokenMgr::NO_EXTENSION_IDENTIFIER )
+		{
+			$types = CaptionPlugin::getCaptionNamesByTypes();
+			$ext = isset($types[$captionAsset->getContainerFormat()]) ? $types[$captionAsset->getContainerFormat()] : null;
+		}
+		if($ext)
+		{
 			$captionAsset->setFileExt($ext);
+		}
 
 		$captionAsset->setSize(filesize($fullPath));
 		$captionAsset->save();

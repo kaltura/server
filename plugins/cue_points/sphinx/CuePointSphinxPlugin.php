@@ -59,7 +59,6 @@ class CuePointSphinxPlugin extends KalturaPlugin implements IKalturaCriteriaFact
 					'created_at' => SphinxFieldType::RT_ATTR_TIMESTAMP,
 					'updated_at' => SphinxFieldType::RT_ATTR_TIMESTAMP,
 	
-					'str_entry_id' => SphinxFieldType::RT_ATTR_STRING,
 					'str_cue_point_id' => SphinxFieldType::RT_ATTR_STRING
 				)
 			)

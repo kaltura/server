@@ -228,7 +228,17 @@ class SystemPartnerService extends KalturaBaseService
 		$dbPartner = PartnerPeer::retrieveByPK($pId);
 		if (!$dbPartner)
 			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $pId);
-		$configuration->toUpdatableObject($dbPartner);
+		try
+		{
+			$configuration->toUpdatableObject($dbPartner);
+		}
+		catch(KalturaAPIException $e)
+		{
+			if($e->getCode() === SystemPartnerErrors::DOMAINS_NOT_ALLOWED_CODE)
+			{
+				throw new KalturaAPIException(SystemPartnerErrors::DOMAINS_NOT_ALLOWED, implode(',',$e->getArgs()));
+			}
+		}
 		$dbPartner->save();
 		PartnerPeer::removePartnerFromCache($pId);
 	}

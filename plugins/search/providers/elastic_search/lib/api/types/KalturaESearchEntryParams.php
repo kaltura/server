@@ -10,9 +10,15 @@ class KalturaESearchEntryParams extends KalturaESearchParams
 	 */
 	public $searchOperator;
 
+	/**
+	 * @var KalturaESearchAggregation
+	 */
+	public $aggregations;
+
+
 	private static $mapBetweenObjects = array
 	(
-		"searchOperator",
+		"searchOperator","aggregations"
 	);
 
 	protected function initStatuses()
