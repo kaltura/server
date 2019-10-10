@@ -146,7 +146,6 @@ class entryFilter extends baseObjectFilter
 			"_gte_total_rank",
 			"_gte_last_played_at",
 			"_lte_last_played_at",
-			"_lteornull_last_played_at",
 			"_is_live",
 			"_eq_source",
 			"_not_source",
