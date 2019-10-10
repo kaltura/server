@@ -11,7 +11,6 @@ abstract class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
 	(
 		"lastPlayedAtGreaterThanOrEqual" => "_gte_last_played_at",
 		"lastPlayedAtLessThanOrEqual" => "_lte_last_played_at",
-		"lastPlayedAtLessThanOrEqualOrNull" => "_lte_last_played_at",
 		"durationLessThan" => "_lt_duration",
 		"durationGreaterThan" => "_gt_duration",
 		"durationLessThanOrEqual" => "_lte_duration",
@@ -50,11 +49,6 @@ abstract class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
 	 * @var time
 	 */
 	public $lastPlayedAtLessThanOrEqual;
-
-    /**
-     * @var time
-     */
-    public $lastPlayedAtLessThanOrEqualOrNull;
 
 	/**
 	 * @var int
