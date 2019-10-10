@@ -29,7 +29,7 @@ class Form_EntryVendorTasksFilter extends Form_PartnerIdFilter
 		)));
 
 		$this->addElement('text', 'from_time', array(
-			'label' => 'Insert -/+minutes for relative time',
+			'label' => 'Insert -/+hours for relative time',
 			'filters' => array('StringTrim'),
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')))
 		));
