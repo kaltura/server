@@ -1606,8 +1606,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					$validationErrors = $entryDistribution->getValidationErrors();
 					
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] validation errors [" . print_r($validationErrors, true) . "]");
-					
-					if(!count($validationErrors) && $entry->getStatus() == entryStatus::READY)
+					if(!count($validationErrors) && $distributionProfile->shouldDistributeEntry($entryDistribution->getEntry()))
 						self::submitAddEntryDistribution($entryDistribution, $distributionProfile);
 					break;
 				

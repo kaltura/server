@@ -461,9 +461,13 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		return true;
 	}
 
-	public function shouldDistributeEntry()
+	/**
+	 * @param entry $entry
+	 * @return bool
+	 */
+	public function shouldDistributeEntry($entry)
 	{
-
+		return ($entry->getStatus() == entryStatus::READY);
 	}
 
 	public function getSunriseDefaultOffset()					{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SUNRISE_DEFAULT_OFFSET);}	
@@ -485,7 +489,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	public function setRecommendedDcForExecute($v)				{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_DC_EXECUTE, $v);}
 	public function setRequiredAssetDistributionRules($v)		{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_REQUIRED_ASSET_DISTRIBUTION_RULES, $v);}
 	public function setOptionalAssetDistributionRules($v)		{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_OPTIONAL_ASSET_DISTRIBUTION_RULES, $v);}
-	public function setDistributeTrigger($v)			            {return $this->putInCustomData(self::CUSTOM_DATA_FIELD_DISTRIBUTE_TRIGGER, $v);}
+	public function setDistributeTrigger($v)			        {return $this->putInCustomData(self::CUSTOM_DATA_FIELD_DISTRIBUTE_TRIGGER, $v);}
 
 	public function getCacheInvalidationKeys()
 	{

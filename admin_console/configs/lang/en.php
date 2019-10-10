@@ -310,6 +310,9 @@ return array(
 	'Kaltura_Client_ContentDistribution_Enum_DistributeTrigger::ENTRY_READY' => 'On entry ready',
 	'Kaltura_Client_ContentDistribution_Enum_DistributeTrigger::MODERATION_APPROVED'  => 'On moderation approved',
 
+	'Kaltura_Client_TvinciDistribution_Enum_TvinciAssetsType::REGULAR' => 'Regular distribution',
+	'Kaltura_Client_TvinciDistribution_Enum_TvinciAssetsType::VIRTUAL'  => 'Virtual distribution',
+
 	'init client failed' => 'Could not initiate the Kaltura client',
 	'entry not found' => 'Entry not found',
 	'partner not found' => 'Publisher not found',

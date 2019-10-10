@@ -5,6 +5,10 @@
  */
 class TvinciDistributionProfile extends ConfigurableDistributionProfile
 {
+	protected static $validModerationStatuses = array(
+		entry::ENTRY_MODERATION_STATUS_APPROVED,
+		entry::ENTRY_MODERATION_STATUS_AUTO_APPROVED);
+
  	const CUSTOM_DATA_INGEST_URL = 'ingestUrl';
  	const CUSTOM_DATA_USERNAME = 'username';
  	const CUSTOM_DATA_PASSWORD = 'password';
@@ -51,7 +55,25 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 
 	}
 
+	/**
+	 * @param entry $entry
+	 * @return bool
+	 */
+	public function shouldDistributeEntry($entry)
+	{
+		$result = true;
+		if($this->getAssetsType() == kTvinciAssetsType::REGULAR)
+		{
+			$result = $entry->getStatus() == entryStatus::READY;
+		}
 
+		if($this->getDistributeTrigger() == kDistributeTrigger::MODERATION_APPROVED)
+		{
+			$result == $result && in_array($entry->getModerationStatus(), self::$validModerationStatuses);
+		}
+
+		return $result;
+	}
 
 	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
 	{
