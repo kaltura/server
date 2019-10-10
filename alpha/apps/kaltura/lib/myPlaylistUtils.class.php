@@ -6,20 +6,14 @@ class myPlaylistUtils
 {
 	// change the total results to 30 for performance reasons
 	const TOTAL_RESULTS = 200;
-	
 	const MAX_STITCHED_PLAYLIST_ENTRY_COUNT = 100;
-
 	const CONTEXT_DELIMITER = "context";
-
 	const CAPTION_FILES_LABEL = "label";
 	const CAPTION_FILES_PATH = "path";
 	const CAPTION_FILES_ID = "captionId";
-	const KALTURA_CLASS = 'kalturaClass';
 
 	private static $user_cache = null;
-	
 	private static $isAdminKs = false;
-	
 	private static $playlistContext;
 
 	private static $moderationStatusesNotIn = array(
@@ -520,8 +514,7 @@ class myPlaylistUtils
 		list ($totalResults, $entryFilters) = self::getPlaylistFilterListStruct($xml);
 		foreach ($entryFilters as $entryFilter)
 		{
-			if (!isset($entryFilter->advancedSearch) ||
-				( isset($entryFilter->advancedSearch) && (string)$entryFilter->advancedSearch[self::KALTURA_CLASS] === PlaylistService::KALTURA_METADATA_SEARCH_ITEM))
+			if (ESearchQueryFromFilter::canTransformXmlFilter($entryFilter))
 			{
 				$entryFiltersViaEsearch[] = $entryFilter;
 			}
@@ -530,6 +523,7 @@ class myPlaylistUtils
 				$entryFiltersViaSphinx[] = $entryFilter;
 			}
 		}
+
 		return array($entryFiltersViaEsearch, $entryFiltersViaSphinx, $totalResults);
 	}
 
