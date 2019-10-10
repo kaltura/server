@@ -92,7 +92,7 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 
 	protected function addDistributeAssetsTypeElement()
 	{
-		$assetsType = new Kaltura_Form_Element_EnumSelect('assets type', array('enum' => 'Kaltura_Client_TvinciDistribution_Enum_TvinciAssetsType'));
+		$assetsType = new Kaltura_Form_Element_EnumSelect('assetsType', array('enum' => 'Kaltura_Client_TvinciDistribution_Enum_TvinciAssetsType'));
 		$assetsType->setLabel('Tvinci assets type:');
 		if($this->distributionProfile->assetsType)
 		{
@@ -104,6 +104,15 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 		}
 
 		$this->addElement($assetsType);
+
+		$this->addDisplayGroup(
+			array('assetsType'),
+			'AssetsTypeDisplayGroup',
+			array(
+				'legend' => 'Assets type configuration',
+				'decorators' => array('FormElements', 'Fieldset'),
+			)
+		);
 	}
 
 	protected function tvinciElements()
