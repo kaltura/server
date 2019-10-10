@@ -248,7 +248,7 @@ index kaltura_category:kaltura_base_gt_in_charset
 	rt_attr_bigint = partner_sort_value
 	rt_attr_json = dynamic_attributes
 	rt_field = sphinx_match_optimizations
-	rt_field = aggregation_categories	
+	rt_field = aggregation_categories
 }
 
 index kaltura_kuser:kaltura_base_gt_in_charset

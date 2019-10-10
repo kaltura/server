@@ -28,9 +28,8 @@ class Form_EntryVendorTasksFilter extends Form_PartnerIdFilter
 		)));
 
 		$this->addElement('text', 'from_time', array(
-			'label' => 'Insert -/+ and minutes',
+			'label' => 'Due Date: Insert -/+ and minutes',
 			'filters' => array('StringTrim'),
-			'oninput' => 'checkNumValid(this.value)',
 			'validators' => array('Int'),
 		));
 		$this->setDefault('from_time', "Enter Relative Time");

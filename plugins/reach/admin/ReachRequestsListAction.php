@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class ReachRequestsListAction extends KalturaApplicationPlugin implements IKalturaAdminConsolePublisherAction
+class ReachRequestsListAction extends KalturaApplicationPlugin
 {
 	const ADMIN_CONSOLE_PARTNER = "-2";
 
@@ -38,8 +38,7 @@ class ReachRequestsListAction extends KalturaApplicationPlugin implements IKaltu
 		$entryVendorTaskFilter = $this->getEntryVendorTaskFilter($request);
 		$entryVendorTaskFilter->orderBy = "-createdAt";
 		$this->setStatusFilter($request, $entryVendorTaskFilter);
-		//$this->setSelectedRelativeTime($request, $entryVendorTaskFilter);
-
+		$this->setSelectedRelativeTime($request, $entryVendorTaskFilter);
 
 		// get results and paginate
 		$paginatorAdapter = new Infra_FilterPaginator($reachPluginClient->entryVendorTask, "listAction", $partnerId, $entryVendorTaskFilter);
@@ -56,16 +55,6 @@ class ReachRequestsListAction extends KalturaApplicationPlugin implements IKaltu
 
 		$action->view->filterForm = $entryVendorTaskFilterForm;
 		$action->view->paginator = $paginator;
-	//	Infra_ClientHelper::unimpersonate();
-		//$createProfileForm = new Form_CreateEntryVendorTask();
-
-		//$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'ReachRequestsConfigure'), null, true);
-		//$createProfileForm->setAction($actionUrl);
-
-	//	if ($partnerId)
-	//		$createProfileForm->getElement("newPartnerId")->setValue($partnerId);
-
-		//$action->view->newEntryVendorTaskFolderForm = $createProfileForm;
 	}
 
 
@@ -78,7 +67,7 @@ class ReachRequestsListAction extends KalturaApplicationPlugin implements IKaltu
 			return $filter;
 		}
 		$filterType = $request->getParam('filter_type');
-		if ($filterType === "partnerIdEqual")
+		if ($filterType === 'partnerIdEqual')
 		{
 			Infra_ClientHelper::impersonate($filterInput);
 		}
@@ -109,15 +98,16 @@ class ReachRequestsListAction extends KalturaApplicationPlugin implements IKaltu
 		$filterDateInput = $request->getParam('from_time');
 		if (strlen($filterDateInput) > 2)
 		{
+			$timeInSec = 60 * substr($filterDateInput,1);
 			if ($filterDateInput[0] == '-')
 			{
-				$startTime = time() - substr($filterDateInput,1);
+				$startTime = time() - $timeInSec;
 				$endTime = time();
 			}
 			else if ($filterDateInput[0] == '+')
 			{
 				$startTime = time();
-				$endTime = time() + substr($filterDateInput,1);
+				$endTime = time() + $timeInSec;
 			}
 			if ($startTime && $endTime)
 			{
@@ -125,15 +115,6 @@ class ReachRequestsListAction extends KalturaApplicationPlugin implements IKaltu
 				$entryVendorTaskFilter->expectedFinishTimeLessThanOrEqual = $endTime;
 			}
 		}
-	}
-
-	public function getInstance($interface)
-	{
-		if ($this instanceof $interface)
-		{
-			return $this;
-		}
-		return null;
 	}
 
 	public function isAllowedForPartner($partnerId)
@@ -146,7 +127,8 @@ class ReachRequestsListAction extends KalturaApplicationPlugin implements IKaltu
 		try
 		{
 			$result = $client->permission->listAction($filter, null);
-		} catch (Exception $e)
+		}
+		catch (Exception $e)
 		{
 			$client->setPartnerId(self::ADMIN_CONSOLE_PARTNER);
 			return false;
@@ -155,30 +137,5 @@ class ReachRequestsListAction extends KalturaApplicationPlugin implements IKaltu
 
 		$isAllowed = ($result->totalCount > 0) && ($result->objects[0]->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE);
 		return $isAllowed;
-	}
-
-
-	/**
-	 * @return array<string, string> - array of <label, jsActionFunctionName>
-	 */
-	public function getPublisherAdminActionOptions($partner, $permissions)
-	{
-		$options = array();
-		$options[] = array(0 => 'Reach', 1 => 'listReachRequests');
-		return $options;
-	}
-
-	/**
-	 * @return string javascript code to add to publisher list view
-	 */
-	public function getPublisherAdminActionJavascript()
-	{
-		$functionStr = 'function listReachRequests(partnerId)
-		    {
-					var url = pluginControllerUrl + \'/' . get_class($this) . '/filter_type/partnerIdEqual/filter_input/\' + partnerId;
-	                document.location = url;
-	        }';
-
-		return $functionStr;
 	}
 }

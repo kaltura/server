@@ -7,6 +7,10 @@ class KalturaEntryVendorTaskOrderBy extends KalturaStringEnum
 {
 	const ID_ASC = "+id";
 	const ID_DESC = "-id";
+	const PRICE_ASC = "+price";
+	const PRICE_DESC = "-price";
+	const STATUS_ASC = "+status";
+	const STATUS_DESC = "-status";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
 	const UPDATED_AT_ASC = "+updatedAt";
@@ -15,8 +19,4 @@ class KalturaEntryVendorTaskOrderBy extends KalturaStringEnum
 	const QUEUE_TIME_DESC = "-queueTime";
 	const FINISH_TIME_ASC = "+finishTime";
 	const FINISH_TIME_DESC = "-finishTime";
-	const STATUS_ASC = "+status";
-	const STATUS_DESC = "-status";
-	const PRICE_ASC = "+price";
-	const PRICE_DESC = "-price";
 }
