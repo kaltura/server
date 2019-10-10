@@ -31,8 +31,8 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	const CUSTOM_DATA_TASK_DATA =       	'task_data';
 	const CUSTOM_DATA_OLD_PRICE =       	'old_price';
 	const CUSTOM_DATA_EXPECTED_FINISH_TIME ='expectedFinishTime';
-	const CUSTOM_DATA_SERVICE_TYPE =		'serviceType';
-	const CUSTOM_DATA_SERVICE_FEATURE =		'serviceFeature';
+	const CUSTOM_DATA_SERVICE_TYPE =	'serviceType';
+	const CUSTOM_DATA_SERVICE_FEATURE =	'serviceFeature';
 	
 	//setters
 	

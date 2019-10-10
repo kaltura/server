@@ -20,19 +20,20 @@ class Form_EntryVendorTasksFilter extends Form_PartnerIdFilter
 		$this->addElement('select', 'filter_status', array(
 			'label' => 'Status',
 			'filters' => array('StringTrim'),
+			'decorators' => array('ViewHelper'),
 			'multiOptions' => array(
-				'' => '',
+				'' => 'Status',
 				EntryVendorTaskStatus::PENDING => 'PENDING',
 				EntryVendorTaskStatus::PROCESSING => 'PROCESSING',
 				EntryVendorTaskStatus::ERROR => 'ERROR'
 		)));
 
 		$this->addElement('text', 'from_time', array(
-			'label' => 'Due Date: Insert -/+ and minutes',
+			'label' => 'Insert -/+minutes for relative time',
 			'filters' => array('StringTrim'),
-			'validators' => array('Int'),
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')))
 		));
-		$this->setDefault('from_time', "Enter Relative Time");
+		$this->setDefault('from_time', "Due Date");
 
 		// submit button
 		$this->addElement('button', 'cmdSubmit', array(

@@ -29,8 +29,8 @@
 		</tr>
 		</tfoot>
 		<tbody>
-
-		<?php foreach($this->paginator as /* Kaltura_Client_Reach_Type_EntryVendorTask */ $entryVendorTask): ?>
+		<?php if($this->paginator)
+		    foreach($this->paginator as /* Kaltura_Client_Reach_Type_EntryVendorTask */ $entryVendorTask): ?>
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
 				<td><?php echo $entryVendorTask->id; ?></td>
 				<td><?php echo $entryVendorTask->partnerId; ?></td>
