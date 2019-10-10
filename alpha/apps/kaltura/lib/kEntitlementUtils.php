@@ -18,6 +18,7 @@ class kEntitlementUtils
 	protected static $entitlementForced = null;
 	protected static $privacyContextSearch = null;
 	protected static $categoryModeration = false;
+	protected static $entitlementResponseCache = array();
 
 	public static function getDefaultContextString( $partnerId )
 	{
@@ -70,6 +71,55 @@ class kEntitlementUtils
 			return false;
 
 		return true;
+	}
+
+	/**
+	 * @param $entryId
+	 * @param null $kuserId
+	 * @param null $ks
+	 * @return string
+	 */
+	protected static function getCacheKey($entryId, $kuserId = null, $ks = null)
+	{
+		$privacyContexts = $ks ? $ks->getPrivacyContext() : null;
+		$key = $entryId;
+		$key .=  ($kuserId && trim($kuserId) != '') ? '_' . $kuserId : '_nouser';
+		$key .=  $ks ? '_' . (int)$ks->isAnonymousSession() : '_noks';
+		$key .=  ($privacyContexts && trim($privacyContexts) != '') ? '_' . $privacyContexts : '_nopc';
+		return $key;
+	}
+
+	/**
+	 * @param $entryId
+	 * @param null $kuserId
+	 * @param null $ks
+	 */
+	protected static function storeInCache($entryId, $kuserId = null, $ks = null)
+	{
+		$key = self::getCacheKey($entryId, $kuserId, $ks);
+		KalturaLog::debug("Storing key in cache: " . $key);
+		self::$entitlementResponseCache[$key];
+}
+
+	/**
+	 * @param $entryId
+	 * @param null $kuserId
+	 * @param null $ks
+	 * @return bool
+	 */
+	protected static function isCached($entryId, $kuserId = null, $ks = null)
+	{
+		$key = self::getCacheKey($entryId, $kuserId, $ks);
+		$res = isset(self::$entitlementResponseCache[$key]);
+		if ($res)
+		{
+			KalturaLog::debug('Key found in cache: ' . $key);
+		}
+		else
+		{
+			KalturaLog::debug('Could not find key in cache: ' . $key);
+		}
+		return $res;
 	}
 
 	/**
@@ -126,12 +176,18 @@ class kEntitlementUtils
 
 		$kuserId = self::getKuserIdForEntitlement($kuserId, $ks);
 
+		if (self::isCached($entry->getId(), $kuserId, $ks))
+		{
+			return true;
+		}
+
 		if($ks && $kuserId)
 		{
 			// kuser is set on the entry as creator or uploader
 			if ($kuserId != '' && ($entry->getKuserId() == $kuserId))
 			{
 				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->kuserId or entry->creatorKuserId [' . $kuserId . ']');
+				self::storeInCache($entry->getId(), $kuserId, $ks);
 				return true;
 			}
 
@@ -139,6 +195,7 @@ class kEntitlementUtils
 			if($entry->isEntitledKuserEdit($kuserId) || $entry->isEntitledKuserPublish($kuserId) || $entry->isEntitledKuserView($kuserId))
 			{
 				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->entitledKusersEdit or entry->entitledKusersPublish or entry->entitledKusersView');
+				self::storeInCache($entry->getId(), $kuserId, $ks);
 				return true;
 			}
 		}
@@ -151,6 +208,7 @@ class kEntitlementUtils
 			if(!$categoryEntry)
 			{
 				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category');
+				self::storeInCache($entry->getId(), $kuserId);
 				return true;
 			}
 		}
@@ -169,6 +227,7 @@ class kEntitlementUtils
 				if($categoryEntry)
 				{
 					KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry belongs to public category and privacy context on the ks is not set');
+					self::storeInCache($entry->getId(), $kuserId, $ks);
 					return true;
 				}
 			}
@@ -182,11 +241,17 @@ class kEntitlementUtils
 			{
 				// entry that doesn't belong to any category is public
 				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category and privacy context on the ks is not set');
+				self::storeInCache($entry->getId(), $kuserId, $ks);
 				return true;
 			}
 		}
 
-		return self::isMemberOfCategory($allCategoriesEntry, $entry, $partner, $kuserId, $ks, $ksPrivacyContexts);
+		$result = self::isMemberOfCategory($allCategoriesEntry, $entry, $partner, $kuserId, $ks, $ksPrivacyContexts);
+		if ($result)
+		{
+			self::storeInCache($entry->getId(), $kuserId, $ks);
+		}
+		return $result;
 	}
 
 	public static function getKuserIdForEntitlement($kuserId = null, $ks = null)
