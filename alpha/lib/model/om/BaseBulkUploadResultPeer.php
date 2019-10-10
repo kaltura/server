@@ -126,6 +126,8 @@ abstract class BaseBulkUploadResultPeer {
 
 	/** the column name for the CUSTOM_DATA field */
 	const CUSTOM_DATA = 'bulk_upload_result.CUSTOM_DATA';
+	
+	const MYSQL_CODE_DUPLICATE_KEY = 23000;
 
 	/**
 	 * An identiy map to hold any loaded instances of BulkUploadResult objects.
@@ -904,16 +906,26 @@ abstract class BaseBulkUploadResultPeer {
 
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
-
-		try {
-			// use transaction because $criteria could contain info
-			// for more than one table (I guess, conceivably)
-			$con->beginTransaction();
-			$pk = BasePeer::doInsert($criteria, $con);
-			$con->commit();
-		} catch(PropelException $e) {
-			$con->rollBack();
-			throw $e;
+		
+		for ($curTry = 0; ; $curTry++)
+		{
+			$curCrit = clone $criteria;
+			
+			$curCrit->add(BulkUploadResultPeer::ID, rand(0, 200000000) * 10 + 3 + kDataCenterMgr::getCurrentDcId());
+			
+			try {
+				// use transaction because $criteria could contain info
+				// for more than one table (I guess, conceivably)
+				$con->beginTransaction();
+				$pk = BasePeer::doInsert($curCrit, $con);
+				$con->commit();
+			} catch(PropelException $e) {
+				$con->rollBack();
+				if($e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY && $curTry < 20)
+					continue;
+				throw $e;
+			}
+			break;
 		}
 
 		return $pk;
