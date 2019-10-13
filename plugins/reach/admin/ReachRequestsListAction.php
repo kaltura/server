@@ -5,13 +5,13 @@
  */
 class ReachRequestsListAction extends KalturaApplicationPlugin
 {
-	const ADMIN_CONSOLE_PARTNER = "-2";
+	const ADMIN_CONSOLE_PARTNER = '-2';
 
 	public function __construct()
 	{
 		$this->action = 'ReachRequestsListAction';
-		$this->label = "Reach Requests";
-		$this->rootLabel = "Reach";
+		$this->label = 'Reach Requests';
+		$this->rootLabel = 'Reach';
 	}
 
 	/**
@@ -28,35 +28,48 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
 		$partnerId = null;
-
 		$action->view->allowed = $this->isAllowedForPartner($partnerId);
 
 		$client = Infra_ClientHelper::getClient();
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);
 
-		// init filter
+		$entryVendorTaskFilter = $this->initFilter($request);
+		$paginator = self::getPaginator($reachPluginClient, $partnerId, $entryVendorTaskFilter, $request, $page, $pageSize);
+		$entryVendorTaskFilterForm = self::getFilterForm($request, $action);
+		$action->view->filterForm = $entryVendorTaskFilterForm;
+		$action->view->paginator = $paginator;
+	}
+
+	protected function initFilter($request)
+	{
 		$entryVendorTaskFilter = $this->getEntryVendorTaskFilter($request);
-		$entryVendorTaskFilter->orderBy = "-createdAt";
+		$entryVendorTaskFilter->orderBy = '-createdAt';
 		$this->setStatusFilter($request, $entryVendorTaskFilter);
 		$this->setSelectedRelativeTime($request, $entryVendorTaskFilter);
+		return $entryVendorTaskFilter;
 
+	}
+
+	protected static function getPaginator($reachPluginClient, $partnerId, $entryVendorTaskFilter, $request, $page, $pageSize)
+	{
 		// get results and paginate
-		$paginatorAdapter = new Infra_FilterPaginator($reachPluginClient->entryVendorTask, "listAction", $partnerId, $entryVendorTaskFilter);
+		$paginatorAdapter = new Infra_FilterPaginator($reachPluginClient->entryVendorTask, 'listAction', $partnerId, $entryVendorTaskFilter);
 
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
+		return $paginator;
+	}
 
+	protected static function getFilterForm($request, $action)
+	{
 		// set view
 		$entryVendorTaskFilterForm = new Form_EntryVendorTasksFilter();
 		$entryVendorTaskFilterForm->populate($request->getParams());
 		$entryVendorTaskFilterFormAction = $action->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')), null, true);
 		$entryVendorTaskFilterForm->setAction($entryVendorTaskFilterFormAction);
-
-		$action->view->filterForm = $entryVendorTaskFilterForm;
-		$action->view->paginator = $paginator;
+		return $entryVendorTaskFilterForm;
 	}
-
 
 	protected function getEntryVendorTaskFilter(Zend_Controller_Request_Abstract $request)
 	{
