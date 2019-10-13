@@ -557,8 +557,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			}
 		}
 
-		self::setLastLoginFields($loginData, $kuser);
-		return $kuser;
+		return self::setLastLoginFields($loginData, $kuser);
 	}
 
 	public static function setLastLoginFields($loginData, $kuser)
@@ -580,6 +579,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$kuser->setLastLoginTime($currentTime);
 		
 		$kuser->save();
+		return $kuser;
 	}
 	
 	

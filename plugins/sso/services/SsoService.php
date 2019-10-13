@@ -146,8 +146,8 @@ class SsoService extends KalturaBaseService
 
 	protected static function setLastLogin($partnerId, $userId)
 	{
-		kuserPeer::setUseCriteriaFilter(false);	//action is without ks, need to prevent the addition of partnerId 0 into the criteria
-		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $userId);
+		kuserPeer::setUseCriteriaFilter(false);
+		$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $userId);
 		kuserPeer::setUseCriteriaFilter(true);
 		$loginData = UserLoginDataPeer::getByEmail($userId);
 		if ($kuser && $loginData)
