@@ -557,6 +557,12 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			}
 		}
 
+		self::setLastLoginFields($loginData, $kuser);
+		return $kuser;
+	}
+
+	public static function setLastLoginFields($loginData, $kuser)
+	{
 		$userLoginEmailToIgnore =  kConf::getMap('UserLoginNoUpdate');
 		$ignoreUser = isset ($userLoginEmailToIgnore[$loginData->getLoginEmail()]);
 		$isAdmin = $kuser->getIsAdmin();
@@ -567,15 +573,13 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$loginData->setLastLoginPartnerId($kuser->getPartnerId());
 		}
 		$loginData->save();
-		
+
 		$currentTime = time();
 		$dbLastLoginTime = $kuser->getLastLoginTime();
 		if(!$ignoreUser && (!$dbLastLoginTime || $dbLastLoginTime < $currentTime - self::LAST_LOGIN_TIME_UPDATE_INTERVAL))
 			$kuser->setLastLoginTime($currentTime);
-		
+
 		$kuser->save();
-		
-		return $kuser;
 	}
 	
 	
