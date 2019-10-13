@@ -42,8 +42,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	{
 		if($object instanceof entry && $object->getStatus() != entryStatus::DELETED)
 		{
-			if((in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == entryStatus::READY)
-				|| in_array(entryPeer::MODERATION_STATUS, $modifiedColumns))
+			if(in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == entryStatus::READY)
 			{
 				return self::onEntryReady($object);
 			}
@@ -1839,6 +1838,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		{
 			KalturaLog::info("Found entry distribution object with id [" . $entryDistribution->getId() . "] for distribution profile [" . $distributionProfile->getId() . "]");
 			self::onEntryDistributionUpdateRequired($entryDistribution);
+
 			return false;
 		}
 

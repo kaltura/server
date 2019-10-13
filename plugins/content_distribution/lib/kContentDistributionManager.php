@@ -1147,9 +1147,15 @@ class kContentDistributionManager
 	private static function shouldSubmitNow($submitWhenReady, $entryDistribution, $distributionProfile)
 	{
 		if ($submitWhenReady && !$distributionProfile->shouldDistributeEntry($entryDistribution->getEntry()))
+		{
 			return false;
+		}
+
 		if (self::shouldWaitForSunrise($entryDistribution, $distributionProfile))
+		{
 			return false;
+		}
+
 		return true;
 	}
 

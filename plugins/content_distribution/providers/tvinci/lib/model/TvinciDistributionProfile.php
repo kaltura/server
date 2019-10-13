@@ -69,7 +69,7 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 
 		if($this->getDistributeTrigger() == kDistributeTrigger::MODERATION_APPROVED)
 		{
-			$result == $result && in_array($entry->getModerationStatus(), self::$validModerationStatuses);
+			$result = $result && in_array($entry->getModerationStatus(), self::$validModerationStatuses);
 		}
 
 		return $result;
