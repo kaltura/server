@@ -70,7 +70,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	/**
 	 * @return entry
 	 */
-	protected function getEntry()
+	public function getEntry()
 	{
 		$entryId = $this->getEntryId();
 		$entry = entryPeer::getInstanceFromPool($entryId);

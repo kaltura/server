@@ -1607,11 +1607,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] validation errors [" . print_r($validationErrors, true) . "]");
 					if(!count($validationErrors) && $distributionProfile->shouldDistributeEntry($entryDistribution->getEntry()))
+					{
 						self::submitAddEntryDistribution($entryDistribution, $distributionProfile);
+					}
+
 					break;
 				
 				default:
-				
 					if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED || $entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
 					{
 						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flagged for updating");
