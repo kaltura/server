@@ -2602,11 +2602,3 @@ form#frmCreateSsoProfile dd,form#frmCreateSsoProfile dt {
 	width: 333px;
 	height: 22px;
 }
-
-form#frmCreateEntryVendorTask {
-	margin-left: 20px;
-}
-
-form#frmCreateEntryVendorTask dd,form#frmCreateEntryVendorTask dt {
-	float: left;
-}

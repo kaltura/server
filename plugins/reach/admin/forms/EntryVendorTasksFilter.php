@@ -33,7 +33,7 @@ class Form_EntryVendorTasksFilter extends Form_PartnerIdFilter
 			'filters' => array('StringTrim'),
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')))
 		));
-		$this->setDefault('from_time', "Due Date");
+		$this->setDefault('from_time', 'Due Date');
 
 		// submit button
 		$this->addElement('button', 'cmdSubmit', array(
