@@ -12,6 +12,7 @@ class kEntitlementUtils
 	const TYPE_SEPERATOR = "TYPE";
 	const ENTRY_PRIVACY_CONTEXT = 'ENTRYPC';
 	const PARTNER_ID_PREFIX = 'pid';
+	const CACHE_KEY_SEPERATOR = '_';
 
 	protected static $initialized = false;
 	protected static $entitlementEnforcement = false;
@@ -82,11 +83,10 @@ class kEntitlementUtils
 	protected static function getCacheKey($entryId, $kuserId = null, $ks = null)
 	{
 		$privacyContexts = $ks ? $ks->getPrivacyContext() : null;
-		$key = $entryId;
-		$key .=  ($kuserId && trim($kuserId) != '') ? '_' . $kuserId : '_nouser';
-		$key .=  $ks ? '_' . (int)$ks->isAnonymousSession() : '_noks';
-		$key .=  ($privacyContexts && trim($privacyContexts) != '') ? '_' . $privacyContexts : '_nopc';
-		return $key;
+		$userId = ($kuserId && trim($kuserId) != '') ? $kuserId : 'nouser';
+		$ksType = $ks ? (int)$ks->isAnonymousSession() : 'noks';
+		$pc = ($privacyContexts && trim($privacyContexts) != '') ? $privacyContexts : 'nopc';
+		return $entryId . self::CACHE_KEY_SEPERATOR . $userId . self::CACHE_KEY_SEPERATOR . $ksType . self::CACHE_KEY_SEPERATOR . $pc;
 	}
 
 	/**
@@ -181,72 +181,7 @@ class kEntitlementUtils
 			return true;
 		}
 
-		if($ks && $kuserId)
-		{
-			// kuser is set on the entry as creator or uploader
-			if ($kuserId != '' && ($entry->getKuserId() == $kuserId))
-			{
-				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->kuserId or entry->creatorKuserId [' . $kuserId . ']');
-				self::storeInCache($entry->getId(), $kuserId, $ks);
-				return true;
-			}
-
-			// kuser is set on the entry entitled users edit or publish or view
-			if($entry->isEntitledKuserEdit($kuserId) || $entry->isEntitledKuserPublish($kuserId) || $entry->isEntitledKuserView($kuserId))
-			{
-				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->entitledKusersEdit or entry->entitledKusersPublish or entry->entitledKusersView');
-				self::storeInCache($entry->getId(), $kuserId, $ks);
-				return true;
-			}
-		}
-
-		if(!$ks)
-		{
-			// entry that doesn't belong to any category is public
-			//when ks is not provided - the entry is still public (for example - download action)
-			$categoryEntry = categoryEntryPeer::retrieveOneActiveByEntryId($entry->getId());
-			if(!$categoryEntry)
-			{
-				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category');
-				self::storeInCache($entry->getId(), $kuserId);
-				return true;
-			}
-		}
-
-		$ksPrivacyContexts = null;
-		if($ks)
-			$ksPrivacyContexts = $ks->getPrivacyContext();
-
-		$allCategoriesEntry = array();
-
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $partner->getId()))
-		{
-			if(!$ksPrivacyContexts || trim($ksPrivacyContexts) == '')
-			{
-				$categoryEntry = categoryEntryPeer::retrieveOneByEntryIdStatusPrivacyContextExistance($entry->getId(), array(CategoryEntryStatus::PENDING, CategoryEntryStatus::ACTIVE));
-				if($categoryEntry)
-				{
-					KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry belongs to public category and privacy context on the ks is not set');
-					self::storeInCache($entry->getId(), $kuserId, $ks);
-					return true;
-				}
-			}
-			else
-				$allCategoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryIdAndPrivacyContext($entry->getId(), $ksPrivacyContexts);
-		}
-		else
-		{
-			$allCategoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryId($entry->getId());
-			if($ks && (!$ksPrivacyContexts || trim($ksPrivacyContexts) == '') && !count($allCategoriesEntry))
-			{
-				// entry that doesn't belong to any category is public
-				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category and privacy context on the ks is not set');
-				self::storeInCache($entry->getId(), $kuserId, $ks);
-				return true;
-			}
-		}
-
-		$result = self::isMemberOfCategory($allCategoriesEntry, $entry, $partner, $kuserId, $ks, $ksPrivacyContexts);
+		$result = self::validateEntryEntitlements($entry, $kuserId, $ks, $partner);
 		if ($result)
 		{
 			self::storeInCache($entry->getId(), $kuserId, $ks);
@@ -639,5 +574,77 @@ class kEntitlementUtils
 			return true;
 
 		return $dbEntry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
+	}
+
+	/**
+	 * @param entry $entry
+	 * @param $kuserId
+	 * @param $ks
+	 * @param $partner
+	 * @return bool
+	 */
+	protected static function validateEntryEntitlements(entry $entry, $kuserId, $ks, $partner)
+	{
+		if ($ks && $kuserId)
+		{
+			// kuser is set on the entry as creator or uploader
+			if ($kuserId != '' && ($entry->getKuserId() == $kuserId))
+			{
+				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->kuserId or entry->creatorKuserId [' . $kuserId . ']');
+				return true;
+			}
+
+			// kuser is set on the entry entitled users edit or publish or view
+			if ($entry->isEntitledKuserEdit($kuserId) || $entry->isEntitledKuserPublish($kuserId) || $entry->isEntitledKuserView($kuserId))
+			{
+				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->entitledKusersEdit or entry->entitledKusersPublish or entry->entitledKusersView');
+				return true;
+			}
+		}
+
+		if (!$ks)
+		{
+			// entry that doesn't belong to any category is public
+			//when ks is not provided - the entry is still public (for example - download action)
+			$categoryEntry = categoryEntryPeer::retrieveOneActiveByEntryId($entry->getId());
+			if (!$categoryEntry)
+			{
+				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category');
+				return true;
+			}
+		}
+
+		$ksPrivacyContexts = null;
+		if ($ks)
+			$ksPrivacyContexts = $ks->getPrivacyContext();
+
+		$allCategoriesEntry = array();
+
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $partner->getId()))
+		{
+			if (!$ksPrivacyContexts || trim($ksPrivacyContexts) == '')
+			{
+				$categoryEntry = categoryEntryPeer::retrieveOneByEntryIdStatusPrivacyContextExistance($entry->getId(), array(CategoryEntryStatus::PENDING, CategoryEntryStatus::ACTIVE));
+				if ($categoryEntry)
+				{
+					KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry belongs to public category and privacy context on the ks is not set');
+					return true;
+				}
+			}
+			else
+				$allCategoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryIdAndPrivacyContext($entry->getId(), $ksPrivacyContexts);
+		}
+		else
+		{
+			$allCategoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryId($entry->getId());
+			if ($ks && (!$ksPrivacyContexts || trim($ksPrivacyContexts) == '') && !count($allCategoriesEntry))
+			{
+				// entry that doesn't belong to any category is public
+				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category and privacy context on the ks is not set');
+				return true;
+			}
+		}
+
+		return self::isMemberOfCategory($allCategoriesEntry, $entry, $partner, $kuserId, $ks, $ksPrivacyContexts);
 	}
 }
