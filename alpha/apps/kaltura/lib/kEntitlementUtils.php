@@ -98,7 +98,7 @@ class kEntitlementUtils
 	{
 		$key = self::getCacheKey($entryId, $kuserId, $ks);
 		KalturaLog::debug("Storing key in cache: " . $key);
-		self::$entitlementResponseCache[$key];
+		self::$entitlementResponseCache[$key] = true;
 }
 
 	/**
