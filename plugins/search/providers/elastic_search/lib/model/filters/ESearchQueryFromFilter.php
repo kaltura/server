@@ -1,8 +1,4 @@
 <?php
-/**
- * @package plugins.elasticSearch
- * @subpackage model.filters
- */
 
 class ESearchQueryFromFilter
 {
@@ -19,8 +15,6 @@ class ESearchQueryFromFilter
 	const FIELD_NAME_LOCATION = 0;
 	const FIELD_CLASS_LOCATION = 1;
 	const FIELD_NAME = 'fieldName';
-	const KALTURA_METADATA_SEARCH_ITEM = 'KalturaMetadataSearchItem';
-	const KALTURA_CLASS = 'kalturaClass';
 
 	public function __construct()
 	{
@@ -31,51 +25,6 @@ class ESearchQueryFromFilter
 	{
 		$this->searchItems = array();
 		$this->nestedSearchItem = array();
-	}
-
-	/**
-	 * @param SimpleXMLElement $filter
-	 * @return bool
-	 */
-	public static function canTransformXmlFilter($filter)
-	{
-		return (!isset($filter->advancedSearch) || (string)$filter->advancedSearch[self::KALTURA_CLASS] === self::KALTURA_METADATA_SEARCH_ITEM);
-	}
-
-	/**
-	 * @param baseObjectFilter $filter
-	 * @return bool
-	 */
-	public static function canTransformFilter($filter)
-	{
-		$result = true;
-		foreach($filter->fields as $field => $fieldValue)
-		{
-			if($field === entryFilter::ORDER)
-			{
-				continue;
-			}
-
-			$fieldParts = explode(baseObjectFilter::FILTER_PREFIX, $field, 3);
-			if (count($fieldParts) < 3)
-			{
-				continue;
-			}
-
-			list( , $operator, $fieldName) = $fieldParts;
-			if(!in_array($fieldName, static::getSupportedFields()) && !(is_null($fieldValue) || $fieldValue == ''))
-			{
-				KalturaLog::debug('Cannot convert field:' . $fieldName);
-				return false;
-			}
-		}
-
-		if($filter->getAdvancedSearch())
-		{
-			$result = ESearchQueryFromAdvancedSearch::canTransformAdvanceFilter($filter->getAdvancedSearch());
-		}
-
-		return $result;
 	}
 
 	public function createElasticQueryFromFilter(baseObjectFilter $filter)
@@ -127,11 +76,6 @@ class ESearchQueryFromFilter
 
 	protected function AddFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue)
 	{
-		if(in_array($elasticFieldName, $this->getTimeFields()))
-		{
-			$fieldValue = kTime::getRelativeTime($fieldValue);
-		}
-
 		switch($searchItemType)
 		{
 			case ESearchFilterItemType::EXACT_MATCH:
@@ -147,10 +91,8 @@ class ESearchQueryFromFilter
 				{
 					$searchItem = $this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH, ESearchOperatorType::OR_OP);
 				}
-
 				break;
 
-			case ESearchFilterItemType::MATCH_AND:
 			case ESearchFilterItemType::EXACT_MATCH_MULTI_AND :
 				$searchItem = $this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH, ESearchOperatorType::AND_OP);
 				break;
@@ -167,8 +109,11 @@ class ESearchQueryFromFilter
 				$searchItem = $this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::PARTIAL, ESearchOperatorType::AND_OP);
 				break;
 
-			case ESearchFilterItemType::NOT_CONTAINS:
 			case ESearchFilterItemType::EXACT_MATCH_NOT:
+				$searchItem = $this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH, ESearchOperatorType::NOT_OP);
+				break;
+
+			case ESearchFilterItemType::NOT_CONTAINS:
 				$searchItem = $this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH, ESearchOperatorType::NOT_OP);
 				break;
 
@@ -178,7 +123,6 @@ class ESearchQueryFromFilter
 				{
 					$searchItem = $this->createOperator(ESearchOperatorType::NOT_OP, array($searchItem), $elasticFieldName);
 				}
-
 				break;
 
 			case ESearchFilterItemType::RANGE_GTE :
@@ -199,12 +143,16 @@ class ESearchQueryFromFilter
 
 			case ESearchFilterItemType::RANGE_LTE_OR_NULL:
 				$searchItem = $this->getSearchItemWithRange($elasticFieldName, $fieldValue,'setLessThanOrEqual');
-				$searchItem = $this->allowNullValues($searchItem, $elasticFieldName);
+				$searchItem = $this->allowNullValues($searchItem,$elasticFieldName);
 				break;
 
 			case ESearchFilterItemType::RANGE_GTE_OR_NULL:
 				$searchItem = $this->getSearchItemWithRange($elasticFieldName, $fieldValue,'setGreaterThanOrEqual');
-				$searchItem = $this->allowNullValues($searchItem, $elasticFieldName);
+				$searchItem = $this->allowNullValues($searchItem,$elasticFieldName);
+				break;
+
+			case ESearchFilterItemType::MATCH_AND:
+				$searchItem = $this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH, ESearchOperatorType::AND_OP);
 				break;
 
 			case ESearchFilterItemType::MATCH_OR:
@@ -228,7 +176,6 @@ class ESearchQueryFromFilter
 				$searchItem = $this->addSearchItem($elasticFieldName, $value, $searchType);
 				$innerSearchItems[] = $searchItem;
 			}
-
 			$operator = $this->getEsearchOperatorByField($elasticFieldName);
 			$operator->setOperator($operatorType);
 			$operator->setSearchItems($innerSearchItems);
@@ -247,7 +194,6 @@ class ESearchQueryFromFilter
 		{
 			$searchItem->setSearchTerm($value);
 		}
-
 		$searchItem->setItemType($itemType);
 		return $searchItem;
 	}
@@ -266,7 +212,6 @@ class ESearchQueryFromFilter
 			}
 			$innerSearchItems[] = $this->addSearchItem(ESearchBaseCategoryEntryItem::CATEGORY_NAMES_MAPPING_FIELD, $values[count($values) - 1], $searchType);
 		}
-
 		return $innerSearchItems;
 	}
 
@@ -284,7 +229,6 @@ class ESearchQueryFromFilter
 			$searchItemsAndArray = $this->getSearchItemForCategories($categoriesValue, $searchType);
 			$andOperator[]  = $this->createOperator(ESearchOperatorType::AND_OP, $searchItemsAndArray, $elasticFieldName);
 		}
-
 		$orOprator = $this->createOperator($operatorType, $andOperator, $elasticFieldName);
 		return $orOprator;
 	}
@@ -376,7 +320,6 @@ class ESearchQueryFromFilter
 		{
 			return new ESearchUnifiedItem();
 		}
-
 		return new ESearchEntryItem();
 	}
 
@@ -426,8 +369,4 @@ class ESearchQueryFromFilter
 		return array();
 	}
 
-	protected function getTimeFields()
-	{
-		return array();
-	}
 }
