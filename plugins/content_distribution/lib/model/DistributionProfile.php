@@ -15,6 +15,10 @@
  */
 abstract class DistributionProfile extends BaseDistributionProfile implements ISyncableFile, IRelatedObject
 {
+	protected static $validModerationStatuses = array(
+		entry::ENTRY_MODERATION_STATUS_APPROVED,
+		entry::ENTRY_MODERATION_STATUS_AUTO_APPROVED);
+
 	const FILE_SYNC_DISTRIBUTION_PROFILE_CONFIG = 1;
 	
 	const CUSTOM_DATA_FIELD_CONFIG_VERSION							= "configVersion";
@@ -467,7 +471,14 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	 */
 	public function shouldDistributeEntry($entry)
 	{
-		return ($entry->getStatus() == entryStatus::READY);
+		$result = $entry->getStatus() == entryStatus::READY;
+
+		if($this->getDistributeTrigger() == kDistributeTrigger::MODERATION_APPROVED)
+		{
+			$result = $result && in_array($entry->getModerationStatus(), self::$validModerationStatuses);
+		}
+
+		return $result;
 	}
 
 	public function getSunriseDefaultOffset()					{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SUNRISE_DEFAULT_OFFSET);}	

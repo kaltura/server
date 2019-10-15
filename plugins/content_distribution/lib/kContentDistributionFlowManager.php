@@ -1812,14 +1812,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$distributionProfiles = DistributionProfilePeer::retrieveByPartnerId($entry->getPartnerId());
 		foreach($distributionProfiles as $distributionProfile)
 		{
-			if($distributionProfile->getDistributeTrigger() == kDistributeTrigger::MODERATION_APPROVED)
-			{
-				if(!in_array($entry->getModerationStatus(), self::$validModerationStatuses))
-				{
-					continue;
-				}
-			}
-
 			self::distributeNewEntry($entry, $distributionProfile);
 		}
 		

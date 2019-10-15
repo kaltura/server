@@ -72,12 +72,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	 */
 	public function getEntry()
 	{
-		$entryId = $this->getEntryId();
-		$entry = entryPeer::getInstanceFromPool($entryId);
-		if(!$entry)
-			$entry = entryPeer::retrieveByPKNoFilter($entryId);
-			
-		return $entry; 
+		return entryPeer::retrieveByPKNoFilter($this->getEntryId());
 	}
 	
 	/* (non-PHPdoc)

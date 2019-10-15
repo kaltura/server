@@ -5,10 +5,6 @@
  */
 class TvinciDistributionProfile extends ConfigurableDistributionProfile
 {
-	protected static $validModerationStatuses = array(
-		entry::ENTRY_MODERATION_STATUS_APPROVED,
-		entry::ENTRY_MODERATION_STATUS_AUTO_APPROVED);
-
  	const CUSTOM_DATA_INGEST_URL = 'ingestUrl';
  	const CUSTOM_DATA_USERNAME = 'username';
  	const CUSTOM_DATA_PASSWORD = 'password';
