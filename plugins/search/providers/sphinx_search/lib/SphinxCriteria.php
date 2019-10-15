@@ -182,11 +182,30 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				throw new kCoreException("Invalid sphinx query [$sql]\nMatched regular expression [$badQuery]", APIErrors::SEARCH_ENGINE_QUERY_FAILED);
 			}
 		}
+		
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		$sqlHash = md5(preg_replace('/\d/', '', $sql) . ";" . kCurrentContext::getCurrentPartnerId());
+		if ($cache)
+		{
+			$cache->add($sqlHash, 0, 60);
+			$searchCounter = $cache->increment($sqlHash);
+			if($searchCounter > 10)
+			{
+				KalturaLog::log("Exceeded max queries allowed for given hash [$sqlHash] and query [$sql]");
+				//throw new kCoreException("Exceeded max queries allowed for query [$sql]", APIErrors::SEARCH_ENGINE_QUERY_FAILED);
+			}
+		}
 
 		//debug query
 
 		$sqlConditions = array();
 		$ids = $pdo->queryAndFetchAll($sql, PDO::FETCH_COLUMN, $sqlConditions, 0);
+		
+		if ($cache)
+		{
+			$cache->decrement($sqlHash);
+		}
+		
 		if($ids === false)
 		{
 			list($sqlState, $errCode, $errDescription) = $pdo->errorInfo();
