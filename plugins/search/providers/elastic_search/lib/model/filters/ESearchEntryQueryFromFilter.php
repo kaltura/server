@@ -1,24 +1,9 @@
 <?php
-/**
- * @package plugins.elasticSearch
- * @subpackage model.filters
- */
 
 class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 {
 	const ASC = '+';
 	const DESC = '-';
-	const STATUS_EQ_FILTER = '_eq_status';
-	const STATUS_IN_FILTER = '_in_status';
-	const STATUS_NOT_EQ_FILTER = '_not_status';
-	const STATUS_NOT_IN_FILTER = '_notin_status';
-	const MODERATION_STATUS_EQ_FILTER = '_eq_moderation_status';
-	const MODERATION_STATUS_IN_FILTER = '_in_moderation_status';
-	const MODERATION_STATUS_NOT_EQ_FILTER = '_not_moderation_status';
-	const MODERATION_STATUS_NOT_IN_FILTER = '_notin_moderation_status';
-	const ID_EQUAL_FILTER = '_eq_id';
-	const REDIRECT_FROM_ENTRY_ID_EQUAL_FILTER = '_eq_redirect_from_entry_id';
-
 
 	protected static $puserFields = array(
 		ESearchEntryFilterFields::USER_ID,
@@ -68,26 +53,13 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		ESearchEntryFilterFields::PARTNER_SORT_VALUE,
 		ESearchEntryFilterFields::SEARCH_TEXT,
 		ESearchEntryFilterFields::FREE_TEXT,
-		ESearchEntryFilterFields::TOTAL_RANK,
-		ESearchEntryFilterFields::LAST_PLAYED_AT,
+		ESearchEntryFilterFields::TOTAL_RANK
 	);
 
-	protected static $timeFields = array(
-		ESearchEntryFilterFields::CREATED_AT,
-		ESearchEntryFilterFields::UPDATED_AT,
-		ESearchEntryFilterFields::START_DATE,
-		ESearchEntryFilterFields::END_DATE,
-		ESearchEntryFilterFields::LAST_PLAYED_AT,
-	);
 
 	protected static function getSupportedFields()
 	{
 		return self::$supportedSearchFields;
-	}
-
-	protected function getTimeFields()
-	{
-		return self::$timeFields;
 	}
 
 	protected static $entryNestedFields = array(
@@ -140,8 +112,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			ESearchEntryFilterFields::PARTNER_SORT_VALUE => ESearchEntryFieldName::PARTNER_SORT_VALUE,
 			ESearchEntryFilterFields::SEARCH_TEXT => ESearchUnifiedItem::UNIFIED,
 			ESearchEntryFilterFields::FREE_TEXT => ESearchUnifiedItem::UNIFIED,
-			ESearchEntryFilterFields::TOTAL_RANK => ESearchEntryOrderByFieldName::VOTES,
-			ESearchEntryFilterFields::LAST_PLAYED_AT => ESearchEntryOrderByFieldName::LAST_PLAYED_AT
+			ESearchEntryFilterFields::TOTAL_RANK => ESearchEntryOrderByFieldName::VOTES
 		);
 
 		if(array_key_exists($field, $fieldsMap))
@@ -197,54 +168,10 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		}
 	}
 
-	/**
-	 * Set the default status to ready if other status filters are not specified
-	 * @param entryFilter $filter
-	 */
-	protected function setDefaultStatus(entryFilter $filter)
-	{
-		if(!$filter->is_set(self::STATUS_EQ_FILTER) && !$filter->is_set(self::STATUS_IN_FILTER)
-			&& !$filter->is_set(self::STATUS_NOT_EQ_FILTER) && !$filter->is_set(self::STATUS_NOT_IN_FILTER))
-		{
-			$filter->setStatusEquel(entryStatus::READY);
-		}
-	}
-
-	/**
-	 * Set the default moderation status to ready if other moderation status filters are not specified
-	 * @param entryFilter $filter
-	 */
-	protected function setDefaultModerationStatus(entryFilter $filter)
-	{
-		if(!$filter->is_set(self::MODERATION_STATUS_EQ_FILTER) && !$filter->is_set(self::MODERATION_STATUS_IN_FILTER)
-			&& !$filter->is_set(self::MODERATION_STATUS_NOT_EQ_FILTER) && !$filter->is_set(self::MODERATION_STATUS_NOT_IN_FILTER))
-		{
-			$moderationStatusesNotIn = array(
-				entryModerationStatus::PENDING_MODERATION,
-				entryModerationStatus::REJECTED);
-			$filter->setModerationStatusNotIn($moderationStatusesNotIn);
-		}
-	}
-
-	protected function prepareEntriesCriteriaFilter(entryFilter $filter)
-	{
-		if(!$filter->is_set(self::ID_EQUAL_FILTER) && !$filter->is_set(self::REDIRECT_FROM_ENTRY_ID_EQUAL_FILTER))
-		{
-			$this->setDefaultStatus($filter);
-			$this->setDefaultModerationStatus($filter);
-		}
-	}
-
 	public function createElasticQueryFromFilter(baseObjectFilter $filter)
 	{
 		$this->init();
-		if(!$filter instanceof entryFilter)
-		{
-			throw new kCoreException(kCoreException::INVALID_QUERY);
-		}
-
 		$kEsearchOrderBy = null;
-		$this->prepareEntriesCriteriaFilter($filter);
 		foreach($filter->fields as $field => $fieldValue)
 		{
 			if ($field === entryFilter::ORDER && !is_null($fieldValue) && $fieldValue!= '')
@@ -252,19 +179,14 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 				$kEsearchOrderBy = $this->getKESearchOrderBy($fieldValue);
 				continue;
 			}
-
 			$fieldParts = $this->splitIntoParameters($filter, $field, $fieldValue);
 			if (!$fieldParts)
 			{
 				continue;
 			}
-
 			list($operator, $fieldName, $fieldValue) = $fieldParts;
 			$this->addingFieldPartIntoQuery($operator, $fieldName, $fieldValue);
 		}
-
-		$advanceFilterAdapter = new ESearchQueryFromAdvancedSearch();
-		$this->searchItems[] = $advanceFilterAdapter->processAdvanceFilter($filter->getAdvancedSearch());
 		return $this->createFinalOperator($kEsearchOrderBy);
 	}
 
@@ -300,7 +222,6 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		{
 			return null;
 		}
-
 		if ($fieldName === ESearchEntryFilterFields::STATUS && ($operator === baseObjectFilter::EQ ||$operator === baseObjectFilter::IN  ))
 		{
 			self::$validStatuses = explode(',',$fieldValue);
