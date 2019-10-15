@@ -482,16 +482,17 @@ class BaseEntryService extends KalturaEntryService
 	{
 		$this->deleteEntry($entryId);
 	}
-	
+
 	/**
 	 * List base entries by filter with paging support.
 	 *
 	 * @action list
-     * @param KalturaBaseEntryFilter $filter Entry filter
+	 * @param KalturaBaseEntryFilter $filter Entry filter
 	 * @param KalturaFilterPager $pager Pager
+	 * @param bool $tryToExcuteOnElastic
 	 * @return KalturaBaseEntryListResponse Wrapper for array of base entries and total count
 	 */
-	function listAction(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null)
+	function listAction(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null, $tryToExcuteOnElastic = false)
 	{
 		if(!$filter)
 		{
@@ -503,7 +504,21 @@ class BaseEntryService extends KalturaEntryService
 			$pager = new KalturaFilterPager();
 		}
 
-		$result = $filter->getListResponse($pager, $this->getResponseProfile());
+		$coreFilter = $filter->toObject();
+		if($tryToExcuteOnElastic && !$this->getResponseProfile() && ESearchEntryQueryFromFilter::canTransformFilter($coreFilter))
+		{
+			$ESearchAdapter = new ESearchEntryQueryFromFilter();
+			$corePager = $pager->toObject();
+			list($list, $totalCount)  = $ESearchAdapter->retrieveElasticQueryCoreEntries($coreFilter, $corePager);
+			$newList = KalturaBaseEntryArray::fromDbArray($list, null);
+			$result = new KalturaBaseEntryListResponse();
+			$result->objects = $newList;
+			$result->totalCount = $totalCount;
+		}
+		else
+		{
+			$result = $filter->getListResponse($pager, $this->getResponseProfile());
+		}
 		
 		if ($result->totalCount == 1 && 
 			count($result->objects) == 1 && 

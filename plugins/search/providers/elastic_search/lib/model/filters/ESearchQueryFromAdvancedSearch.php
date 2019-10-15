@@ -18,6 +18,11 @@ class ESearchQueryFromAdvancedSearch
 	 */
 	public function processAdvanceFilter($advancedSearchFilterItem)
 	{
+		if(!$advancedSearchFilterItem)
+		{
+			return null;
+		}
+
 		switch(get_class($advancedSearchFilterItem))
 		{
 			case self::METADATA_SEARCH_FILTER:
@@ -52,9 +57,18 @@ class ESearchQueryFromAdvancedSearch
 		$advanceFilterOperator = new ESearchOperator();
 		$advanceFilterOperator->setOperator($this->getESearchOperatorByAdvancedSearchFilterOperator($operator->getType()));
 		$items = array();
+		if(!$operator->getItems())
+		{
+			return null;
+		}
+
 		foreach($operator->getItems() as $advancedSearchFilterItem)
 		{
-			$items[] = $this->processAdvanceFilter($advancedSearchFilterItem);
+			$item = $this->processAdvanceFilter($advancedSearchFilterItem);
+			if($item)
+			{
+				$items[] = $item;
+			}
 		}
 
 		$advanceFilterOperator->setSearchItems($items);
@@ -119,10 +133,14 @@ class ESearchQueryFromAdvancedSearch
 		$advanceFilterOperator->setOperator($this->getESearchOperatorByAdvancedSearchFilterOperator($searchFilter->getType()));
 		$metadataProfileId = $searchFilter->getMetadataProfileId();
 		$metaDataItems = array();
+		if(!$searchFilter->getItems())
+		{
+			return null;
+		}
+
 		foreach($searchFilter->getItems() as $advancedSearchFilterItem)
 		{
 			$metaDataItems[] = $this->createESearchMetadataItemFromFilterMatchCondition($advancedSearchFilterItem, $metadataProfileId);
-			/* @var $advancedSearchFilterItem AdvancedSearchFilterMatchCondition */
 		}
 
 		$advanceFilterOperator->setSearchItems($metaDataItems);

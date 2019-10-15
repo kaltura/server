@@ -112,17 +112,27 @@ class ESearchQueryFromFilter
 
 	public function retrieveElasticQueryEntryIds(baseObjectFilter $filter, kPager $pager)
 	{
-		list($query, $kEsearchOrderBy ) = $this->createElasticQueryFromFilter($filter);
+		list($coreResults, $objectCount) = self::retrieveElasticQueryEntriesResult($filter, $pager);
+		$entryIds = array_keys($coreResults);
+		return array ($entryIds, $objectCount);
+	}
 
+	public function retrieveElasticQueryCoreEntries(baseObjectFilter $filter, kPager $pager)
+	{
+		list($coreResults, $objectCount, $entrySearch) = self::retrieveElasticQueryEntriesResult($filter, $pager);
+		$coreObjects = $entrySearch->fetchCoreObjectsByIds(array_keys($coreResults));
+		return array($coreObjects, $objectCount);
+	}
+
+	protected function retrieveElasticQueryEntriesResult(baseObjectFilter $filter, kPager $pager)
+	{
+		list($query, $kEsearchOrderBy ) = $this->createElasticQueryFromFilter($filter);
 		$entrySearch = new kEntrySearch();
 		$entrySearch->setFilterOnlyContext();
 		$elasticResults = $entrySearch->doSearch($query, $pager, self::$validStatuses,null, $kEsearchOrderBy);
-
 		list($coreResults, $objectOrder, $objectCount, $objectHighlight) = kESearchCoreAdapter::getElasticResultAsArray($elasticResults,
 			$entrySearch->getQueryAttributes()->getQueryHighlightsAttributes());
-
-		$entryIds = array_keys($coreResults);
-		return array ($entryIds, $objectCount);
+		return array ($coreResults, $objectCount, $entrySearch);
 	}
 
 	protected function AddFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue)
