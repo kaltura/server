@@ -1,3 +1,42 @@
+# Orion 15.9.0 #
+
+## Reach new dashboard in admin console ##
+- Issue Type: Task
+- Issue ID: REACH2-704
+
+### configuration ###
+    update kaltura.conf file and add to kaltura_entry_vendor_task table the following field
+    rt_attr_timestamp=expected_finish_time
+
+### Deployment scripts ###
+    - php deployment/updates/scripts/add_permissions/2019_03_05_add_reach_extendAccessKey_action.php
+    - Re-build & Re-index kaltura_entry_vendor_task table
+
+# Orion 15.8.0 #
+
+## Add systemName name to Q&A response profile  ##
+- Issue Type: Feature
+- Issue ID: WEBC-1554
+
+### Configuration ###
+    First replace all tokens from the XML files below and remove ".template" from the file name:
+    /opt/kaltura/app/deployment/updates/scripts/xml/2019_09_25_updateQandAResponseProfile_addSystemName.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2019_09_25_updateQandAResponseProfile_addSystemName.php
+
+
+## Remove str_entry_id field from kaltura_cue_point sphinx table  ##
+- Issue Type: Task
+- Issue ID: PLAT-10199
+
+### Configuration ###
+    update kaltura.conf file and remove from kaltura_cue_point table the following field
+	rt_attr_string	 = str_entry_id
+	
+#### Deployment Scripts ####	
+    Re-index kaltura_cue_point table
+
 # Orion 15.7.0 #
 
 ## Add first+last name to Q&A response profile  ##
