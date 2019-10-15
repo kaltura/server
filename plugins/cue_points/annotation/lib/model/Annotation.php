@@ -161,7 +161,9 @@ class Annotation extends CuePoint implements IMetadataObject
 			return $ret;
 		}
 
-		if($this->getColumnsOldValue(CuePointPeer::STATUS) != CuePointStatus::DELETED && $this->getStatus() == CuePointStatus::DELETED)
+		if($this->getColumnsOldValue(CuePointPeer::STATUS) &&
+			$this->getColumnsOldValue(CuePointPeer::STATUS) != CuePointStatus::DELETED &&
+			$this->getStatus() == CuePointStatus::DELETED)
 		{
 			$parent = $this->getParent();
 			if($parent)
