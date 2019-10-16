@@ -43,7 +43,8 @@ class ReachProfile extends BaseReachProfile
 	
 	const MAX_CREDIT_HISTORY_TO_KEEP =                      10;
 	const DEFAULT_MAX_CHARS_PER_LINE =                      26;
-	
+
+	protected $ignoreUpdatedAt = false;
 	//setters
 	
 	public function setEnableMachineModeration($v)
@@ -205,9 +206,18 @@ class ReachProfile extends BaseReachProfile
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_TASK_PROCESSING_REGION, $v);
 	}
-	
+
+	public function setIgnoreUpdatedAt($v)
+	{
+		$this->ignoreUpdatedAt = $v;
+	}
 	//getters
-	
+
+	public function getIgnoreUpdatedAt()
+	{
+		return $this->ignoreUpdatedAt;
+	}
+
 	public function getEnableMachineModeration()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_ENABLE_MACHINE_MODERATION,null, false);
@@ -505,31 +515,10 @@ class ReachProfile extends BaseReachProfile
 	{
 		$before = $this->getUpdatedAt();
 		$ret = parent::preUpdate($con);
-		if($this->isModified())
+		if($this->isModified() && $this->getIgnoreUpdatedAt())
 		{
-			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(ReachProfilePeer::CUSTOM_DATA)
-				&& $this->isCustomDataModified(self::CUSTOM_DATA_VENDOR_CREDIT) && !isset($this->getCredit()->_modified))
-			{
-				$this->setUpdatedAt($before);
-			}
+			$this->setUpdatedAt($before);
 		}
 		return $ret;
 	}
-
-	/**
-	 * @param      string $name
-	 * @param      string $namespace
-	 * @return     boolean True if $name has been modified.
-	 */
-	public function isCustomDataModified($name = null, $namespace = '')
-	{
-		if(isset($this->oldCustomDataValues[$namespace]) && (is_null($name) || array_key_exists($name, $this->oldCustomDataValues[$namespace])))
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-
 } // ReachProfile

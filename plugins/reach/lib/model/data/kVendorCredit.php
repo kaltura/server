@@ -163,11 +163,7 @@ class kVendorCredit
 			/* @var $entryVendorTask EntryVendorTask */
 			$totalUsedCredit += $entryVendorTask->getPrice();
 		}
-		if ($this->getSyncedCredit() != $totalUsedCredit)
-		{
-			$this->_modified = true;
-			$this->setSyncedCredit($totalUsedCredit);
-		}
+		$this->setSyncedCredit($totalUsedCredit);
 		$this->setLastSyncTime($now);
 
 		return $totalUsedCredit;

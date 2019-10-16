@@ -70,7 +70,6 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 			$this->setSyncedCredit($syncedCredit);
 			$this->overageCredit = $this->initialOverageCredit;
 			$this->addOn = 0;
-			$this->_modified = true;
 		}
 		return $syncedCredit;
 	}
