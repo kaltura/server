@@ -246,7 +246,12 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 			$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($this->getCatalogItemId());
 			if ($vendorCatalogItem)
 			{
-				$this->setExpectedFinishTime($vendorCatalogItem->getTurnAroundTime() + $time);
+				$turnAroundTime = $vendorCatalogItem->getTurnAroundTime();
+				if ($turnAroundTime == VendorServiceTurnAroundTime::BEST_EFFORT)
+				{
+					$turnAroundTime = 604800;	//7 days
+				}
+				$this->setExpectedFinishTime($turnAroundTime + $time);
 			}
 		}
 		

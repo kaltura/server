@@ -7,6 +7,9 @@
 ### configuration ###
     update kaltura.conf file and add to kaltura_entry_vendor_task table the following field
     rt_attr_timestamp=expected_finish_time
+    
+    Add the following to admin.ini:
+    settings.refreshInterval30Sec = 30
 
 ### Deployment scripts ###
     - php deployment/updates/scripts/add_permissions/2019_10_27_update_reach_entry_vendor_task_service.php

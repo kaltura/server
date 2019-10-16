@@ -8,6 +8,7 @@ class Form_EntryVendorTasksFilter extends Form_PartnerIdFilter
 	public function init()
 	{
 		parent::init();
+		$this->setAttrib('id', 'frmReachRequestsList');
 
 		$this->removeElement("cmdSubmit");
 
