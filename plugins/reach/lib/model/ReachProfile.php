@@ -495,5 +495,41 @@ class ReachProfile extends BaseReachProfile
 		
 		return $fullFilledCatalogItemIds;
 	}
-	
+
+	/**
+	 * Code to be run before updating the object in database
+	 * @param PropelPDO $con
+	 * @return boolean
+	 */
+	public function preUpdate(PropelPDO $con = null)
+	{
+		$before = $this->getUpdatedAt();
+		$ret = parent::preUpdate($con);
+		if($this->isModified())
+		{
+			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(ReachProfilePeer::CUSTOM_DATA)
+				&& $this->isCustomDataModified(self::CUSTOM_DATA_VENDOR_CREDIT) && !isset($this->getCredit()->_modified))
+			{
+				$this->setUpdatedAt($before);
+			}
+		}
+		return $ret;
+	}
+
+	/**
+	 * @param      string $name
+	 * @param      string $namespace
+	 * @return     boolean True if $name has been modified.
+	 */
+	public function isCustomDataModified($name = null, $namespace = '')
+	{
+		if(isset($this->oldCustomDataValues[$namespace]) && (is_null($name) || array_key_exists($name, $this->oldCustomDataValues[$namespace])))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+
 } // ReachProfile
