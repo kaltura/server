@@ -102,7 +102,7 @@ class LiveEntryServerNode extends EntryServerNode
 		if($liveEntry && $this->getStatus() !== EntryServerNodeStatus::MARKED_FOR_DELETION)
 		{
 			/* @var $liveEntry LiveEntry */
-			$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($liveEntry->getId());
+			$entryServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($liveEntry->getId());
 			if(!count($entryServerNodes))
 				$liveEntry->unsetMediaServer();
 			
