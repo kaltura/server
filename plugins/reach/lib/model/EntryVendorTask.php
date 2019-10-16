@@ -33,6 +33,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	const CUSTOM_DATA_EXPECTED_FINISH_TIME ='expectedFinishTime';
 	const CUSTOM_DATA_SERVICE_TYPE =	'serviceType';
 	const CUSTOM_DATA_SERVICE_FEATURE =	'serviceFeature';
+	const SEVEN_DAYS =			 604800;
 	
 	//setters
 	
@@ -249,7 +250,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 				$turnAroundTime = $vendorCatalogItem->getTurnAroundTime();
 				if ($turnAroundTime == VendorServiceTurnAroundTime::BEST_EFFORT)
 				{
-					$turnAroundTime = 604800;	//7 days
+					$turnAroundTime = self::SEVEN_DAYS;
 				}
 				$this->setExpectedFinishTime($turnAroundTime + $time);
 			}
