@@ -146,6 +146,10 @@ class SsoService extends KalturaBaseService
 
 	protected static function setLastLogin($partnerId, $userId)
 	{
+		if (!$partnerId)
+		{
+			return;
+		}
 		kuserPeer::setUseCriteriaFilter(false);
 		$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $userId);
 		kuserPeer::setUseCriteriaFilter(true);
@@ -167,6 +171,10 @@ class SsoService extends KalturaBaseService
 		}
 		catch (Exception $e)
 		{
+			if ($e->getCode() == kUserException::LOGIN_DATA_NOT_FOUND)
+			{
+				$partnerId = null;
+			}
 			//try login by DOMAIN
 			$dbSso = KalturaSso::getSso(null, $applicationType, $domain);
 		}
