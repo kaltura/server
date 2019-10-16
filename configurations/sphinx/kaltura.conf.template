@@ -324,7 +324,6 @@ index kaltura_cue_point:kaltura_base
 	rt_attr_uint = force_stop
 	rt_attr_timestamp = created_at
 	rt_attr_timestamp = updated_at
-	rt_attr_string = str_entry_id
 	rt_attr_string = str_cue_point_id
 	rt_field = is_public
 	rt_field = plugins_data
