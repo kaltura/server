@@ -9,7 +9,7 @@
     rt_attr_timestamp=expected_finish_time
 
 ### Deployment scripts ###
-    - php deployment/updates/scripts/add_permissions/2019_03_05_add_reach_extendAccessKey_action.php
+    - php deployment/updates/scripts/add_permissions/2019_10_27_update_reach_entry_vendor_task_service.php
     - Re-build & Re-index kaltura_entry_vendor_task table
 
 # Orion 15.8.0 #
