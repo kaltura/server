@@ -311,7 +311,7 @@ return array(
 	'Kaltura_Client_ContentDistribution_Enum_DistributeTrigger::MODERATION_APPROVED'  => 'On moderation approved',
 
 	'Kaltura_Client_TvinciDistribution_Enum_TvinciAssetsType::REGULAR' => 'Regular assets',
-	'Kaltura_Client_TvinciDistribution_Enum_TvinciAssetsType::VIRTUAL'  => 'Virtual assets',
+	'Kaltura_Client_TvinciDistribution_Enum_TvinciAssetsType::VIRTUAL' => 'Virtual assets',
 
 	'init client failed' => 'Could not initiate the Kaltura client',
 	'entry not found' => 'Entry not found',
