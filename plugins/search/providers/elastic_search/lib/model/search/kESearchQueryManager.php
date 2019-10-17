@@ -111,8 +111,8 @@ class kESearchQueryManager
 		$partialQuery->addToShould($multiMatchQuery);
 
 		$maxWordsForNgram = kConf::get('max_words_for_ngram','elasticDynamicMap');
-		$numOfSearchTerms = preg_split('/\s+/', $searchItem->getSearchTerm());
-		if (!$shouldReduceResults || ($shouldReduceResults && $numOfSearchTerms !== false  && count($numOfSearchTerms) <= $maxWordsForNgram))
+		$splitedSearchTerms = preg_split('/\s+/', $searchItem->getSearchTerm());
+		if (!$shouldReduceResults || ($shouldReduceResults && $splitedSearchTerms !== false  && count($splitedSearchTerms) <= $maxWordsForNgram))
 		{
 			$trigramFieldName = $fieldName.'.'.self::NGRAMS_FIELD_SUFFIX;
 			$matchQuery = new kESearchMatchQuery($trigramFieldName, $searchItem->getSearchTerm());
