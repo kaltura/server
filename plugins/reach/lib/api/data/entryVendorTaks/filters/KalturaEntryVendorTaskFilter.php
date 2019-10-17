@@ -9,12 +9,35 @@ class KalturaEntryVendorTaskFilter extends KalturaEntryVendorTaskBaseFilter
 	 * @var string
 	 */
 	public $freeText;
+
+	/**
+	 * @var time
+	 */
+	public $expectedFinishTimeGreaterThanOrEqual;
+
+	/**
+	 * @var time
+	 */
+	public $expectedFinishTimeLessThanOrEqual;
 	
 	static private $map_between_objects = array
 	(
 		"userIdEqual" => "_eq_kuser_id",
 		"freeText" => "_free_text",
+		"expectedFinishTimeGreaterThanOrEqual" => "_gte_expected_finish_time",
+		"expectedFinishTimeLessThanOrEqual" => "_lte_expected_finish_time",
 	);
+
+	static private $order_by_map = array
+	(
+		"+expectedFinishTime" => "+expected_finish_time",
+		"-expectedFinishTime" => "-expected_finish_time",
+	);
+
+	public function getOrderByMap()
+	{
+		return array_merge(parent::getOrderByMap(), self::$order_by_map);
+	}
 	
 	public function getMapBetweenObjects()
 	{

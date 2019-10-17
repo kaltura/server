@@ -1,0 +1,115 @@
+<?php if (!$this->allowed) {
+	echo $this->translate('This partner is not allowed to use Reach');
+	return;
+} ?>
+<?php echo $this->filterForm; ?>
+<?php echo $this->newEntryVendorTaskFolderForm; ?>
+<div id="entry_vendor_task_list_div" class="clear">
+	<li> 	<?php echo $this->translate('Auto Refresh') ?> <span>(every <?php echo $this->getConfigValue('refreshInterval30Sec'); ?> seconds)</span>:&nbsp;
+		<a href="#" id="cmdToggleRefresh" onclick="toggleRefresh();return false;"> <?php echo $this->translate('Pause Auto-Refresh'); ?></a> &nbsp;|&nbsp;
+		<a href="#" onclick="refreshPage();return false;"><?php echo $this->translate('Refresh Now'); ?></a>
+	</li>
+	<table>
+		<thead>
+		<tr>
+			<th><?php echo $this->translate('ID'); ?></th>
+			<th><?php echo $this->translate('Publisher ID'); ?></th>
+			<th><?php echo $this->translate('Vendor Partner ID'); ?></th>
+			<th><?php echo $this->translate('Entry ID'); ?></th>
+			<th><?php echo $this->translate('Creation Date'); ?></th>
+			<th><?php echo $this->translate('Service Type'); ?></th>
+			<th><?php echo $this->translate('Service Feature'); ?></th>
+			<th><?php echo $this->translate('Turn Around Time'); ?></th>
+			<th><?php echo $this->translate('Due Date'); ?></th>
+			<th><?php echo $this->translate('Status'); ?></th>
+			<th><?php echo $this->translate('Error Description'); ?></th>
+
+		</tr>
+		</thead>
+		<tfoot>
+		<tr>
+			<td colspan="14">
+				<?php echo $this->paginator; ?>
+			</td>
+		</tr>
+		</tfoot>
+		<tbody>
+		<?php if($this->paginator)
+		    foreach($this->paginator as /* Kaltura_Client_Reach_Type_EntryVendorTask */ $entryVendorTask): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+				<td><?php echo $entryVendorTask->id; ?></td>
+				<td><?php echo $entryVendorTask->partnerId; ?></td>
+				<td><?php echo $entryVendorTask->vendorPartnerId; ?></td>
+				<td><?php echo $entryVendorTask->entryId; ?></td>
+				<td><?php echo date($this->translate('time format'), $entryVendorTask->createdAt); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceType', $entryVendorTask->serviceType); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceFeature', $entryVendorTask->serviceFeature); ?></td>
+				<td><?php if ($entryVendorTask->expectedFinishTime - $entryVendorTask->queueTime == 604800)
+						echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', -1);
+					else
+						echo  $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $entryVendorTask->expectedFinishTime - $entryVendorTask->queueTime);?>
+				</td>
+				<td><?php echo date($this->translate('time format'), $entryVendorTask->expectedFinishTime); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_EntryVendorTaskStatus', $entryVendorTask->status); ?></td>
+				<td><?php echo $entryVendorTask->errDescription; ?></td>
+            		</tr>
+		<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
+
+<script type="text/javascript">
+
+    jQuery('#filter_type').change(function () {
+        if (this.value == "none") {
+            $("#filter_text").css("display", "none");
+        }
+        else {
+            $("#filter_text").css("display", "inline");
+            $("#filter_text input").focus();
+            if (this.value == "free")
+                $("div.help").show();
+            else
+                $("div.help").hide();
+        }
+    });
+
+    jQuery('#filter_type').change();
+
+    function refreshPage()
+    {
+        pauseRefresh();
+
+        var frm = document.getElementById("frmReachRequestsList");
+        frm.reset();
+        frm.submit();
+    }
+
+    function setRefreshTimer()
+    {
+        intervalPointer = setTimeout(refreshPage, <?php echo $this->getConfigValue('refreshInterval30Sec'); ?> * 1000);
+    }
+
+    function pauseRefresh()
+    {
+        clearTimeout(intervalPointer);
+        intervalPointer = null;
+    }
+
+    function toggleRefresh()
+    {
+        if(intervalPointer == null)
+        {
+            setRefreshTimer();
+            document.getElementById("cmdToggleRefresh").innerHTML = "<?php echo $this->translate('Pause Auto-Refresh'); ?>";
+        }
+        else
+        {
+            pauseRefresh();
+            document.getElementById("cmdToggleRefresh").innerHTML = "<?php echo $this->translate('Resume Auto-Refresh'); ?>";
+        }
+    }
+
+    setRefreshTimer();
+
+</script>

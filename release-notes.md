@@ -1,3 +1,20 @@
+# Orion 15.9.0 #
+
+## Reach new dashboard in admin console ##
+- Issue Type: Task
+- Issue ID: REACH2-704
+
+### configuration ###
+    update kaltura.conf file and add to kaltura_entry_vendor_task table the following field
+    rt_attr_timestamp=expected_finish_time
+    
+    Add the following to admin.ini:
+    settings.refreshInterval30Sec = 30
+
+### Deployment scripts ###
+    - php deployment/updates/scripts/add_permissions/2019_10_27_update_reach_entry_vendor_task_service.php
+    - Re-build & Re-index kaltura_entry_vendor_task table
+
 # Orion 15.8.0 #
 
 ## Add systemName name to Q&A response profile  ##
