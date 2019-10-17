@@ -6,6 +6,9 @@
 abstract class kESearchBaseFieldQuery extends kESearchBaseQuery
 {
 	const BOOST_KEY = 'boost';
+	const OPERATOR = 'operator';
+	const OP_AND = 'and';
+	const CUTOFF_FREQUENCY = 'cutoff_frequency';
 	
 	/**
 	 * @var string
@@ -16,6 +19,11 @@ abstract class kESearchBaseFieldQuery extends kESearchBaseQuery
 	 * @var string
 	 */
 	protected $boostFactor;
+
+	/**
+	 * @var boolean
+	 */
+	public $allWordsMustAppear = false;
 
 	/**
 	 * @return string
@@ -57,6 +65,23 @@ abstract class kESearchBaseFieldQuery extends kESearchBaseQuery
 		if($this->getBoostFactor() == kESearchQueryManager::DEFAULT_BOOST_FACTOR)
 			return true;
 		return false;
+	}
+
+
+	/**
+	 * @param boolean
+	 */
+	public function setAllWordsMustAppear($allWordsMustAppear)
+	{
+		$this->allWordsMustAppear = $allWordsMustAppear;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getAllWordsMustAppear()
+	{
+		return $this->allWordsMustAppear;
 	}
 
 }
