@@ -271,6 +271,9 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				return kFlowHelper::handleBulkDownloadPending($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
 				return kFlowHelper::handleBulkDownloadFinished($dbBatchJob, $data);
+			//Bulk download has now worker so there is no point to retry it.
+			case BatchJob::BATCHJOB_STATUS_RETRY:
+				return kFlowHelper::handleBulkDownloadRetried($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
