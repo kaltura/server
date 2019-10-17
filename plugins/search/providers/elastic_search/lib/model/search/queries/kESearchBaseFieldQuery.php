@@ -23,7 +23,12 @@ abstract class kESearchBaseFieldQuery extends kESearchBaseQuery
 	/**
 	 * @var boolean
 	 */
-	public $allWordsMustAppear = false;
+	protected $operator = false;
+
+	/**
+	 * @var boolean
+	 */
+	protected $cutOfFreq = false;
 
 	/**
 	 * @return string
@@ -71,17 +76,35 @@ abstract class kESearchBaseFieldQuery extends kESearchBaseQuery
 	/**
 	 * @param boolean
 	 */
-	public function setAllWordsMustAppear($allWordsMustAppear)
+	public function setOperator($operator)
 	{
-		$this->allWordsMustAppear = $allWordsMustAppear;
+		$this->operator = $operator;
 	}
 
 	/**
 	 * @return boolean
 	 */
-	public function getAllWordsMustAppear()
+	public function getOperator()
 	{
-		return $this->allWordsMustAppear;
+		return $this->operator;
 	}
+
+	/**
+	 * @param boolean
+	 */
+	public function setCutOffFreq($cutOfFreq)
+	{
+		$this->cutOfFreq = $cutOfFreq;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getCutOffFreq()
+	{
+		return $this->cutOfFreq;
+	}
+
+
 
 }
