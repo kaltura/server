@@ -159,6 +159,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_AVG_VIEW_BUFFERING,
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
 				self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
 			),
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addFlavorParamColumn',
 			self::REPORT_TOTAL_FINALIZE_FUNC => 'self::addFlavorParamTotalColumn',
@@ -169,6 +170,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				'avg_view_buffering' => self::METRIC_AVG_VIEW_BUFFERING,
 				'avg_view_engagement' => self::METRIC_AVG_VIEW_ENGAGEMENT,
 				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
+				'view_buffer_time_ratio' => self::METRIC_VIEW_BUFFER_TIME_RATIO,
 			),
 			self::REPORT_TOTAL_MAP => array(
 				'sum_view_time_live' => self::METRIC_VIEW_LIVE_PLAY_TIME_SEC,
@@ -177,6 +179,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				'avg_view_buffering' => self::METRIC_AVG_VIEW_BUFFERING,
 				'avg_view_engagement' => self::METRIC_AVG_VIEW_ENGAGEMENT,
 				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
+				'view_buffer_time_ratio' => self::METRIC_VIEW_BUFFER_TIME_RATIO,
 			),
 		),
 
