@@ -125,6 +125,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_DYNAMIC_VIEWERS_BUFFERING = 'viewers_buffering';
 	const METRIC_DYNAMIC_VIEWERS_DVR = 'viewers_dvr';
 	const METRIC_DYNAMIC_VIEWERS_ENGAGEMENT = 'viewers_engagement';
+	const METRIC_VIEW_BUFFER_TIME_RATIO = 'view_buffer_time_ratio';
 
 	//report classes
 	const CUSTOM_REPORTS_CLASS = 'kKavaCustomReports';
@@ -346,6 +347,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_UNIQUE_ENGAGED_USERS => true,
 		self::METRIC_VIEW_UNIQUE_BUFFERING_USERS => true,
 		self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR => true,
+		self::METRIC_VIEW_BUFFER_TIME_RATIO => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -963,6 +965,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_UNIQUE_PERCENTILES_RATIO,
 				self::METRIC_UNIQUE_PERCENTILES_SUM,
 				self::EVENT_TYPE_PLAY));
+
+		self::$metrics_def[self::METRIC_VIEW_BUFFER_TIME_RATIO] = array(
+			self::DRUID_AGGR => array(self::EVENT_TYPE_VIEW, self::METRIC_VIEW_BUFFER_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,'/', array(
+				self::getFieldAccessPostAggregator(self::METRIC_VIEW_BUFFER_TIME_SEC),
+				self::getConstantFactorFieldAccessPostAggr('subPlayTimeSec', self::EVENT_TYPE_VIEW, '10'))));
 
 		self::$aggregations_def[self::METRIC_SUM_PRICE] = self::getLongSumAggregator(
 			self::METRIC_SUM_PRICE, self::METRIC_SUM_PRICE);

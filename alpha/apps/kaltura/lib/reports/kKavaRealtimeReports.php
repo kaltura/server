@@ -117,6 +117,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_AVG_VIEW_BUFFERING,
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
 				self::METRIC_AVG_VIEW_DVR,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
 			),
 			self::REPORT_TOTAL_METRICS => array(
 				self::METRIC_VIEW_UNIQUE_AUDIENCE,
@@ -131,6 +132,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_AVG_VIEW_BUFFERING,
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
 				self::METRIC_AVG_VIEW_DVR,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
 			)
 		),
 
@@ -258,6 +260,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_VIEW_PLAY_TIME_SEC,
 				self::METRIC_AVG_VIEW_LIVE_LATENCY,
 				self::METRIC_AVG_VIEW_DROPPED_FRAMES_RATIO,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
 			),
 			self::REPORT_TOTAL_METRICS => array(
 				self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH,
@@ -265,6 +268,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_VIEW_PLAY_TIME_SEC,
 				self::METRIC_AVG_VIEW_LIVE_LATENCY,
 				self::METRIC_AVG_VIEW_DROPPED_FRAMES_RATIO,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
 			),
 		),
 
