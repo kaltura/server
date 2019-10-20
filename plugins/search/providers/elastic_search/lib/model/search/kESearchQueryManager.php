@@ -68,7 +68,11 @@ class kESearchQueryManager
 		if ($shouldReduceResults)
 		{
 			$matchQuery->setOperator(self::OP_AND);
-			$matchQuery->setCutOffFreq(kConf::get('cutoff_frequency','elasticDynamicMap'));
+			$cuttOffFreq = kConf::get('cutoff_frequency','elasticDynamicMap');
+			if (isset($cuttOffFreq))
+			{
+				$matchQuery->setCutOffFreq($cuttOffFreq);
+			}
 		}
 		$partialQuery->addToShould($matchQuery);
 
@@ -114,7 +118,7 @@ class kESearchQueryManager
 
 		$maxWordsForNgram = kConf::get('max_words_for_ngram','elasticDynamicMap');
 		$splitedSearchTerms = preg_split('/\s+/', $searchItem->getSearchTerm());
-		if (!$shouldReduceResults || ($shouldReduceResults && count($splitedSearchTerms) <= $maxWordsForNgram))
+		if (!$shouldReduceResults || ($shouldReduceResults && isset($maxWordsForNgram) && count($splitedSearchTerms) <= $maxWordsForNgram))
 		{
 			$trigramFieldName = $fieldName.'.'.self::NGRAMS_FIELD_SUFFIX;
 			$matchQuery = new kESearchMatchQuery($trigramFieldName, $searchItem->getSearchTerm());
