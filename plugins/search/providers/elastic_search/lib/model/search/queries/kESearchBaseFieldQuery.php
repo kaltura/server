@@ -7,7 +7,6 @@ abstract class kESearchBaseFieldQuery extends kESearchBaseQuery
 {
 	const BOOST_KEY = 'boost';
 	const OPERATOR = 'operator';
-	const OP_AND = 'and';
 	const CUTOFF_FREQUENCY = 'cutoff_frequency';
 	
 	/**
@@ -21,14 +20,14 @@ abstract class kESearchBaseFieldQuery extends kESearchBaseQuery
 	protected $boostFactor;
 
 	/**
-	 * @var boolean
+	 * @var string
 	 */
-	protected $operator = false;
+	protected $operator;
 
 	/**
-	 * @var boolean
+	 * @var float
 	 */
-	protected $cutOfFreq = false;
+	protected $cutOffFreq;
 
 	/**
 	 * @return string
@@ -74,7 +73,7 @@ abstract class kESearchBaseFieldQuery extends kESearchBaseQuery
 
 
 	/**
-	 * @param boolean
+	 * @param string
 	 */
 	public function setOperator($operator)
 	{
@@ -82,7 +81,7 @@ abstract class kESearchBaseFieldQuery extends kESearchBaseQuery
 	}
 
 	/**
-	 * @return boolean
+	 * @return string
 	 */
 	public function getOperator()
 	{
@@ -90,19 +89,19 @@ abstract class kESearchBaseFieldQuery extends kESearchBaseQuery
 	}
 
 	/**
-	 * @param boolean
+	 * @param float
 	 */
-	public function setCutOffFreq($cutOfFreq)
+	public function setCutOffFreq($cutOffFreq)
 	{
-		$this->cutOfFreq = $cutOfFreq;
+		$this->cutOffFreq = $cutOffFreq;
 	}
 
 	/**
-	 * @return boolean
+	 * @return float
 	 */
 	public function getCutOffFreq()
 	{
-		return $this->cutOfFreq;
+		return $this->cutOffFreq;
 	}
 
 

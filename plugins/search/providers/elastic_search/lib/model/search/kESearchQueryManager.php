@@ -46,6 +46,7 @@ class kESearchQueryManager
 	const LANGUAGE_FIELD_BOOST_FACTOR = 3;
 	const MATCH_FIELD_BOOST_FACTOR = 2;
 	const DEFAULT_BOOST_FACTOR = 1;
+	const OP_AND = 'and';
 
 
 	/**
@@ -66,8 +67,8 @@ class kESearchQueryManager
 		$shouldReduceResults = self::isPartnerShouldReduceResults(kBaseElasticEntitlement::$partnerId);
 		if ($shouldReduceResults)
 		{
-			$matchQuery->setOperator(true);
-			$matchQuery->setCutOffFreq(true);
+			$matchQuery->setOperator(self::OP_AND);
+			$matchQuery->setCutOffFreq(kConf::get('cutoff_frequency','elasticDynamicMap'));
 		}
 		$partialQuery->addToShould($matchQuery);
 
@@ -77,7 +78,7 @@ class kESearchQueryManager
 		$multiMatchQuery->addToFields($fieldName.'.'.self::RAW_FIELD_SUFFIX.'^'.$rawBoostFactor);
 		if ($shouldReduceResults)
 		{
-			$multiMatchQuery->setOperator(true);
+			$multiMatchQuery->setOperator(self::OP_AND);
 		}
 		if($searchItem->getAddHighlight())
 		{
