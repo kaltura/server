@@ -205,6 +205,7 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 
 		$data = array();
 		$captionData = array();
+		$captionRawData = array();
 		foreach($captionAssets as $captionAsset)
 		{
 			/* @var $captionAsset CaptionAsset */
@@ -227,15 +228,15 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 				continue;
 
 			$language = $captionAsset->getLanguage();
-			self::getElasticLines($captionData, $items, $language, $captionAsset->getId(), $captionAsset->getLabel());
+			self::getElasticLines($captionData, $captionRawData, $items, $language, $captionAsset->getId(), $captionAsset->getLabel());
 		}
-
 		$data['caption_assets'] = $captionData;
-
+		$captionRawData = array_values(array_unique($captionRawData));
+		$data['captions_content'] = $captionRawData;
 		return $data;
 	}
 
-	protected static function getElasticLines(&$captionData ,$items, $language, $assetId, $label = null)
+	protected static function getElasticLines(&$captionData ,&$captionRawData, $items, $language, $assetId, $label = null)
 	{
 		foreach ($items as $item)
 		{
@@ -258,6 +259,7 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 			if(strlen($content) > kElasticSearchManager::MAX_LENGTH)
 				$content = substr($content, 0, kElasticSearchManager::MAX_LENGTH);
 			$line['content'] = $content;
+			$captionRawData[]= $content;
 
 			$analyzedFieldName = elasticSearchUtils::getAnalyzedFieldName($language, 'content' ,elasticSearchUtils::UNDERSCORE_FIELD_DELIMITER);
 			if($analyzedFieldName)
