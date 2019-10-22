@@ -46,6 +46,7 @@ class kESearchQueryManager
 	const LANGUAGE_FIELD_BOOST_FACTOR = 3;
 	const MATCH_FIELD_BOOST_FACTOR = 2;
 	const DEFAULT_BOOST_FACTOR = 1;
+	const OPERATOR_AND = 'and';
 
 
 	/**
@@ -63,13 +64,22 @@ class kESearchQueryManager
 		$multiMatchFieldBoostFactor = self::MATCH_FIELD_BOOST_FACTOR * $fieldBoostFactor;
 		$matchQuery->setBoostFactor($multiMatchFieldBoostFactor);
 		$matchQuery->setAnalyzer(self::KALTURA_TEXT_PARTIAL_SEARCH_ANALYZER);
+		$shouldReduceResults = self::shouldReduceResults(kBaseElasticEntitlement::$partnerId);
+		if ($shouldReduceResults)
+		{
+			$matchQuery->setOperator(self::OPERATOR_AND);
+			$matchQuery->setCutOffFreq(kConf::get(ElasticSearchPlugin::CUTOFF_FREQUENCY ,ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP, ElasticSearchPlugin::CUTOFF_FREQUENCY_DEFAULT));
+		}
 		$partialQuery->addToShould($matchQuery);
 
 		$multiMatchQuery = new kESearchMultiMatchQuery();
 		$multiMatchQuery->setQuery($searchItem->getSearchTerm());
 		$rawBoostFactor = self::RAW_FIELD_BOOST_FACTOR * $fieldBoostFactor;
 		$multiMatchQuery->addToFields($fieldName.'.'.self::RAW_FIELD_SUFFIX.'^'.$rawBoostFactor);
-
+		if ($shouldReduceResults)
+		{
+			$multiMatchQuery->setOperator(self::OPERATOR_AND);
+		}
 		if($searchItem->getAddHighlight())
 		{
 			$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName,$fieldName.'.'.self::RAW_FIELD_SUFFIX);
@@ -102,20 +112,47 @@ class kESearchQueryManager
 		}
 		$partialQuery->addToShould($multiMatchQuery);
 
-		$trigramFieldName = $fieldName.'.'.self::NGRAMS_FIELD_SUFFIX;
-		$matchQuery = new kESearchMatchQuery($trigramFieldName, $searchItem->getSearchTerm());
-		$trigramPercentage = kConf::get('ngramPercentage', 'elastic', self::DEFAULT_TRIGRAM_PERCENTAGE);
-		$matchQuery->setMinimumShouldMatch("$trigramPercentage%");
-		if($searchItem->getAddHighlight())
-			$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName, $trigramFieldName);
-		$partialQuery->addToShould($matchQuery);
+		if (!$shouldReduceResults || self::shouldUseNgram($shouldReduceResults, $searchItem->getSearchTerm()))
+		{
+			$trigramFieldName = $fieldName.'.'.self::NGRAMS_FIELD_SUFFIX;
+			$matchQuery = new kESearchMatchQuery($trigramFieldName, $searchItem->getSearchTerm());
+			$trigramPercentage = kConf::get('ngramPercentage', 'elastic', self::DEFAULT_TRIGRAM_PERCENTAGE);
+			$matchQuery->setMinimumShouldMatch("$trigramPercentage%");
+			if($searchItem->getAddHighlight())
+				$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName, $trigramFieldName);
+			$partialQuery->addToShould($matchQuery);
 
+		}
 		if ($searchItem->shouldAddSearchTermToSearchHistory($fieldName, $searchItem->getAddHighlight(), $queryAttributes))
 		{
 			$queryAttributes->addToSearchHistoryTerms($searchItem->getSearchTerm());
 		}
 
 		return $partialQuery;
+	}
+
+	protected static function shouldUseNgram($shouldReduceResults, $searchTerm)
+	{
+		if ($shouldReduceResults)
+		{
+			$maxWordsForNgram = kConf::get(ElasticSearchPlugin::MAX_WORDS_NGRAM,ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP, ElasticSearchPlugin::MAX_WORDS_NGRAM_DEFAULT);
+			$splitedSearchTerms = preg_split('/\s+/', $searchTerm);
+			if(count($splitedSearchTerms) <= $maxWordsForNgram)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected static function shouldReduceResults($partnerId)
+	{
+		$elasticReduceResultsPartners = kConf::get(ElasticSearchPlugin::REDUCE_RESULTS_PARTNER_LIST,ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP, array());
+		if (in_array($partnerId, $elasticReduceResultsPartners))
+		{
+			return true;
+		}
+		return false;
 	}
 
 	public static function getExactMatchQuery($searchItem, $fieldName, $allowedSearchTypes, &$queryAttributes)

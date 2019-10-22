@@ -469,6 +469,7 @@ index kaltura_entry_vendor_task:kaltura_base
 	rt_field = context
 	rt_field = notes
 	rt_field = catalog_item_data
+	rt_attr_timestamp = expected_finish_time
 }
 
 
