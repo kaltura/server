@@ -5,7 +5,7 @@
 <?php echo $this->filterForm; ?>
 <?php echo $this->newEntryVendorTaskFolderForm; ?>
 <div id="entry_vendor_task_list_div" class="clear">
-	<li> 	<?php echo $this->translate('Auto Refresh') ?> <span>(every <?php echo $this->getConfigValue('refreshInterval30Sec'); ?> seconds)</span>:&nbsp;
+	<li>    <?php echo $this->translate('Auto Refresh') ?> <span>(every <?php echo $this->getConfigValue('refreshInterval30Sec'); ?> seconds)</span>:&nbsp;
 		<a href="#" id="cmdToggleRefresh" onclick="toggleRefresh();return false;"> <?php echo $this->translate('Pause Auto-Refresh'); ?></a> &nbsp;|&nbsp;
 		<a href="#" onclick="refreshPage();return false;"><?php echo $this->translate('Refresh Now'); ?></a>
 	</li>
@@ -42,17 +42,19 @@
 				<td><?php echo $entryVendorTask->vendorPartnerId; ?></td>
 				<td><?php echo $entryVendorTask->entryId; ?></td>
 				<td><?php echo date($this->translate('time format'), $entryVendorTask->createdAt); ?></td>
-				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceType', $entryVendorTask->serviceType); ?></td>
-				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceFeature', $entryVendorTask->serviceFeature); ?></td>
-				<td><?php if ($entryVendorTask->expectedFinishTime - $entryVendorTask->queueTime == 604800)
+				<td><?php if (isset($entryVendorTask->serviceType))
+					        echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceType', $entryVendorTask->serviceType); ?></td>
+				<td><?php if (isset($entryVendorTask->serviceFeature))
+						echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceFeature', $entryVendorTask->serviceFeature); ?></td>
+				<td><?php if (isset($entryVendorTask->expectedFinishTime) && $entryVendorTask->expectedFinishTime - $entryVendorTask->queueTime == 604800)
 						echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', -1);
-					else
+					else if (isset($entryVendorTask->expectedFinishTime))
 						echo  $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $entryVendorTask->expectedFinishTime - $entryVendorTask->queueTime);?>
 				</td>
 				<td><?php echo date($this->translate('time format'), $entryVendorTask->expectedFinishTime); ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_EntryVendorTaskStatus', $entryVendorTask->status); ?></td>
 				<td><?php echo $entryVendorTask->errDescription; ?></td>
-            		</tr>
+			</tr>
 		<?php endforeach; ?>
 		</tbody>
 	</table>
