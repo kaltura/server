@@ -109,7 +109,7 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 		$startTime = 0;
 		$endTime = 0;
 		$filterDateInput = $request->getParam('from_time');
-		if (strlen($filterDateInput) > 1)
+		if (strlen($filterDateInput) > 1 && is_int(substr($filterDateInput,1)))
 		{
 			$timeFromHourToSec = substr($filterDateInput,1) * 60 * 60;
 			if ($filterDateInput[0] == '-')
