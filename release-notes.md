@@ -1,5 +1,18 @@
 # Orion 15.9.0 #
 
+## ESearch - reduce results in partial search ##
+- Issue Type: Task
+- Issue ID: PLAT-10234
+
+### configuration ###
+To use it you should set the elasticDynamicMap.ini with:
+cutoff_frequency = CUTOFF_FREQUENCY(EXMAPLE_0.001)
+max_words_for_ngram = MAX_WORDS_NGRAM(EXAMPLE_2)
+
+[reduced_results_partner_list]
+0 = PARTNER_ID
+
+
 ## Index all caption text on entry document elasticSearch ##
 - Issue Type: Task
 - Issue ID: PLAT-10231
@@ -13,6 +26,7 @@
 	2) Create the index - curl -XPUT '{elasticHost}:{elasticPort}/kaltura_entry' --data-binary "@entry_mapping.json"
 	3) Index the entries - php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticEntries.php
 	
+
 ## Reach new dashboard in admin console ##
 - Issue Type: Task
 - Issue ID: REACH2-704
