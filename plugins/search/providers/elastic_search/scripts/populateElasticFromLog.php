@@ -164,7 +164,7 @@ while (true)
 				$index = $command['index'];
 				$action = $command['action'];
 				
-				if ($action && ($processScriptUpdates || !($index == ElasticIndexMap::ELASTIC_ENTRY_INDEX && $action == ElasticMethodType::UPDATE)))
+				if ($action && ($processScriptUpdates || !(strpos($index, ElasticIndexMap::ELASTIC_ENTRY_INDEX)!==false && $action == ElasticMethodType::UPDATE)))
 				{
 					$response = $elasticClient->$action($command);
 				}

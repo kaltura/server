@@ -13,6 +13,8 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
     const MAX_WORDS_NGRAM = 'max_words_for_ngram';
     const MAX_WORDS_NGRAM_DEFAULT = 1;
     const REDUCE_RESULTS_PARTNER_LIST = 'reduced_results_partner_list';
+    const DEDICATED_ENTRY_INDEX_PARTNER_LIST = 'dedicated_entry_index_partner_list';
+    const DEDICATED_ENTRY_INDEX_NAME = 'dedicated_entry_index_name';
 
     public static function getPluginName()
     {
