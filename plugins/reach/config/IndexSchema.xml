@@ -18,5 +18,6 @@
 		<field name="context"            indexName="context"            type="string"   matchable="yes" />
 		<field name="notes"              indexName="notes"              type="string"   matchable="yes" />
 		<field name="catalog_item_data"  indexName="catalog_item_data"  type="string"   searchableonly="yes" />
+		<field name="expected_finish_time" indexName="@name" apiName="@name"  type="datetime" orderable="yes" />
 	</object>
 </schema>

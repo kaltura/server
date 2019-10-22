@@ -135,12 +135,29 @@ class SsoService extends KalturaBaseService
 			}
 			else
 			{
-				$dbSso = $this->getSsoWithoutPID($userId, $applicationType, $domain);
+				list($dbSso, $partnerId) = $this->getSsoWithoutPID($userId, $applicationType, $domain);
 			}
+			self::setLastLogin($partnerId, $userId);
 		}
 		$sso = new KalturaSso();
 		$sso->fromObject($dbSso, $this->getResponseProfile());
 		return $sso->redirectUrl;
+	}
+
+	protected static function setLastLogin($partnerId, $userId)
+	{
+		if (!$partnerId)
+		{
+			return;
+		}
+		kuserPeer::setUseCriteriaFilter(false);
+		$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $userId);
+		kuserPeer::setUseCriteriaFilter(true);
+		$loginData = UserLoginDataPeer::getByEmail($userId);
+		if ($kuser && $loginData)
+		{
+			UserLoginDataPeer::setLastLoginFields($loginData, $kuser);
+		}
 	}
 
 	protected function getSsoWithoutPID($userId, $applicationType, $domain)
@@ -154,10 +171,14 @@ class SsoService extends KalturaBaseService
 		}
 		catch (Exception $e)
 		{
+			if ($e->getCode() == kUserException::LOGIN_DATA_NOT_FOUND)
+			{
+				$partnerId = null;
+			}
 			//try login by DOMAIN
 			$dbSso = KalturaSso::getSso(null, $applicationType, $domain);
 		}
-		return $dbSso;
+		return array($dbSso, $partnerId);
 	}
 
 	protected function validatePartnerUsingSso($partnerId)
