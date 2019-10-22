@@ -40,7 +40,7 @@ class kEntrySearch extends kBaseESearch
     protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null)
     {
         $this->query = array(
-            'index' => entry::getElasticEntryIndexNamePerPartner(kCurrentContext::getCurrentPartnerId()),
+            'index' => entry::getElasticEntryIndexNameForPartner(kCurrentContext::getCurrentPartnerId()),
             'type' => ElasticIndexMap::ELASTIC_ENTRY_TYPE
         );
         parent::initQuery($statuses, $objectId, $pager, $order, $aggregations);
