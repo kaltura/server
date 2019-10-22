@@ -88,11 +88,6 @@ class MediaService extends KalturaEntryService
 		return $entry;
     }
 
-    protected function shoudlValidateLocal()
-	{
-		//if multi request of more than one api call
-		return  (kCurrentContext::$multiRequest_index <= 1);
-	}
 
     /**
      * Add content to media entry which is not yet associated with content (therefore is in status NO_CONTENT).
@@ -120,14 +115,14 @@ class MediaService extends KalturaEntryService
 	    {
 			try
 			{
-				$validateLocalExist = $this->shoudlValidateLocal();
+				$validateLocalExist = myEntryUtils::shouldValidateLocal();
 				$resource->validateEntry($dbEntry, $validateLocalExist);
 				$kResource = $resource->toObject();
 				$this->attachResource($kResource, $dbEntry);
 			}
 		    catch (Exception $e)
 		    {
-			    $this->handleErrorDuringSetResource($entryId, $e, $resource);
+			    $this->handleErrorDuringSetResource($entryId, $e);
 		    }
 		    $this->validateContent($dbEntry);
 		       $resource->entryHandled($dbEntry);

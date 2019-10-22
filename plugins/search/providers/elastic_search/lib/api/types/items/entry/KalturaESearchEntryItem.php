@@ -58,7 +58,8 @@ class KalturaESearchEntryItem extends KalturaESearchAbstractEntryItem
 		KalturaESearchEntryFieldName::IS_LIVE => ESearchEntryFieldName::IS_LIVE,
 		KalturaESearchEntryFieldName::USER_NAMES => ESearchEntryFieldName::USER_NAMES,
 		KalturaESearchEntryFieldName::ROOT_ID => ESearchEntryFieldName::ROOT_ID,
-		KalturaESearchEntryFieldName::PARTNER_SORT_VALUE => ESearchEntryFieldName::PARTNER_SORT_VALUE
+		KalturaESearchEntryFieldName::PARTNER_SORT_VALUE => ESearchEntryFieldName::PARTNER_SORT_VALUE,
+		KalturaESearchEntryFieldName::CAPTIONS_CONTENT => ESearchEntryFieldName::CAPTIONS_CONTENT
 	);
 
 	protected function getMapBetweenObjects()
