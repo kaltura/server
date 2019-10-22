@@ -43,7 +43,7 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 	protected function initFilter($request)
 	{
 		$entryVendorTaskFilter = $this->getEntryVendorTaskFilter($request);
-		$entryVendorTaskFilter->orderBy = '-createdAt';
+		$this->setCreatedAtFilter($entryVendorTaskFilter);
 		$this->setStatusFilter($request, $entryVendorTaskFilter);
 		$this->setSelectedRelativeTime($request, $entryVendorTaskFilter);
 		return $entryVendorTaskFilter;
@@ -89,6 +89,13 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 			$filter->$filterType = $filterInput;
 		}
 		return $filter;
+	}
+
+	protected function setCreatedAtFilter($entryVendorTaskFilter)
+	{
+		$createdAtStart = VendorServiceTurnAroundTime::TEN_DAYS + VendorServiceTurnAroundTime::TWENTY_FOUR_HOURS;
+		$entryVendorTaskFilter->createdAtGreaterThanOrEqual = time() - $createdAtStart;
+		$entryVendorTaskFilter->orderBy = '-createdAt';
 	}
 
 	protected function setStatusFilter($request, $entryVendorTaskFilter)
