@@ -375,7 +375,7 @@ class ReachProfile extends BaseReachProfile
 
 		if ($reachProfileCredit )
 		{
-			$syncedCredit = $reachProfileCredit->syncCredit($this->getId());
+			$syncedCredit = $reachProfileCredit->syncCredit($this->getId(), $this->getPartnerId());
 			$this->setUsedCredit($syncedCredit);
 		}
 		$this->setCredit($reachProfileCredit);
