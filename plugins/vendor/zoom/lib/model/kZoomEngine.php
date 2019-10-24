@@ -293,6 +293,7 @@ class kZoomEngine
 	{
 		if ($zoomIntegration->getZoomCategory())
 		{
+			KalturaLog::info("Adding entry {$entry->getId()} to category {$zoomIntegration->getZoomCategory()}");
 			$entry->setCategories($zoomIntegration->getZoomCategory());
 		}
 	}
