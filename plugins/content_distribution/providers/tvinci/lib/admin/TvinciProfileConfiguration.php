@@ -94,7 +94,7 @@ class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfigurat
 	{
 		$assetsType = new Kaltura_Form_Element_EnumSelect('assets_type', array('enum' => 'Kaltura_Client_TvinciDistribution_Enum_TvinciAssetsType'));
 		$assetsType->setLabel('Tvinci assets type:');
-		if($this->distributionProfile->assetsType)
+		if($this->distributionProfile && $this->distributionProfile->assetsType)
 		{
 			$assetsType->setValue($this->distributionProfile->assetsType);
 		}
