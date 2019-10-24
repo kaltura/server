@@ -133,11 +133,9 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 			$startTime = time();
 			$endTime = time() + $timeFromHourToSec;
 		}
-		if ($startTime && $endTime)
-		{
-			$entryVendorTaskFilter->expectedFinishTimeGreaterThanOrEqual = $startTime;
-			$entryVendorTaskFilter->expectedFinishTimeLessThanOrEqual = $endTime;
-		}
+		
+		$entryVendorTaskFilter->expectedFinishTimeGreaterThanOrEqual = $startTime;
+		$entryVendorTaskFilter->expectedFinishTimeLessThanOrEqual = $endTime;
 	}
 
 	public function isAllowedForPartner($partnerId)
