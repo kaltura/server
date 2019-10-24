@@ -116,24 +116,27 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 		$startTime = 0;
 		$endTime = 0;
 		$filterDateInput = $request->getParam('from_time');
-		if ((strlen($filterDateInput) > 1) && (int)(substr($filterDateInput,1)))
+		if (!preg_match('/(\-|\+)\d+$/', $filterDateInput, $matches))
 		{
-			$timeFromHourToSec = substr($filterDateInput,1) * 60 * 60;
-			if ($filterDateInput[0] == '-')
-			{
-				$startTime = time() - $timeFromHourToSec;
-				$endTime = time();
-			}
-			else if ($filterDateInput[0] == '+')
-			{
-				$startTime = time();
-				$endTime = time() + $timeFromHourToSec;
-			}
-			if ($startTime && $endTime)
-			{
-				$entryVendorTaskFilter->expectedFinishTimeGreaterThanOrEqual = $startTime;
-				$entryVendorTaskFilter->expectedFinishTimeLessThanOrEqual = $endTime;
-			}
+			return;
+		}
+		$sign = $filterDateInput[0];
+		$hours = (int)substr($filterDateInput,1);
+		$timeFromHourToSec = $hours * 60 * 60;
+		if ($sign === '-')
+		{
+			$startTime = time() - $timeFromHourToSec;
+			$endTime = time();
+		}
+		else if ($sign === '+')
+		{
+			$startTime = time();
+			$endTime = time() + $timeFromHourToSec;
+		}
+		if ($startTime && $endTime)
+		{
+			$entryVendorTaskFilter->expectedFinishTimeGreaterThanOrEqual = $startTime;
+			$entryVendorTaskFilter->expectedFinishTimeLessThanOrEqual = $endTime;
 		}
 	}
 
