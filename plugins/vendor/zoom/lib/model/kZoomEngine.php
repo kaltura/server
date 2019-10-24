@@ -288,13 +288,15 @@ class kZoomEngine
 	/**
 	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @param entry $entry
+	 * @throws kCoreException
 	 */
 	protected function setEntryCategory($zoomIntegration, $entry)
 	{
-		if ($zoomIntegration->getZoomCategory())
+		$zoomCategory = $zoomIntegration->getZoomCategory();
+		if ($zoomCategory)
 		{
-			KalturaLog::info("Adding entry {$entry->getId()} to category {$zoomIntegration->getZoomCategory()}");
-			$entry->setCategories($zoomIntegration->getZoomCategory());
+			KalturaLog::info("Adding entry {$entry->getId()} to category {$zoomCategory}");
+			$entry->setCategories($zoomCategory);
 		}
 	}
 
