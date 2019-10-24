@@ -81,6 +81,10 @@ class KAsyncConvertLiveSegment extends KJobHandlerWorker
 		$fileName = "{$job->entryId}_{$jobData->assetId}_{$data->mediaServerIndex}.{$job->id}.ts";
 		$localTempFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
 		$sharedTempFilePath = $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
+		$verifyAccessPaths = array();
+		$verifyAccessPaths[] = $localTempFilePath;
+		$verifyAccessPaths[] = $sharedTempFilePath;
+		$this->verifyFilesAccess($verifyAccessPaths);
 
 		$result = $this->convertRecordedToMPEGTS($ffmpegBin, $ffprobeBin, $data->srcFilePath, $localTempFilePath);
 		if(! $result)

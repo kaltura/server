@@ -77,16 +77,21 @@ class KAsyncConcat extends KJobHandlerWorker
 		$ffprobeBin = isset(KBatchBase::$taskConfig->params->ffprobeCmd)? KBatchBase::$taskConfig->params->ffprobeCmd: "ffprobe";
 		$mediaInfoBin = isset(KBatchBase::$taskConfig->params->mediaInfoCmd)? KBatchBase::$taskConfig->params->mediaInfoCmd: "mediainfo";
 		$fileName = "{$job->entryId}_{$data->flavorAssetId}.mp4";
+		$verifyAccessPaths = array();
 		$localTempFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
+		$verifyAccessPaths[] = $localTempFilePath;
 		$sharedTempFilePath = $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
+		$verifyAccessPaths[] = $sharedTempFilePath;
 		
 		$srcFiles = array();
 		foreach($data->srcFiles as $srcFile)
 		{
 			/* @var $srcFile KalturaString */
 			$srcFiles[] = $srcFile->value;
+			$verifyAccessPaths[] = $srcFile->value;
 		}
 
+		$this->verifyFilesAccess($verifyAccessPaths);
 		$result = $this->concatFiles($ffmpegBin, $ffprobeBin, $srcFiles, $localTempFilePath, $data->offset, $data->duration,$data->shouldSort);
 		if(! $result)
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, null, "Failed to concat files", KalturaBatchJobStatus::FAILED);

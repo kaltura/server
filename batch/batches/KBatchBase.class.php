@@ -465,6 +465,11 @@ abstract class KBatchBase implements IKalturaLogger
 		{
 			foreach ($files as $file)
 			{
+				if(!$this->checkFileExists($file))
+				{
+					$file = dirname($file);
+				}
+
 				if (is_dir($file))
 				{
 					$result = $this->checkDirAccess($file);
@@ -484,12 +489,12 @@ abstract class KBatchBase implements IKalturaLogger
 		{
 			$result = false;
 		}
+
 		if(!$result)
 		{
 			$exception = new kTemporaryException();
 			$exception->setResetJobExecutionAttempts(true);
 			throw $exception;
-
 		}
 	}
 

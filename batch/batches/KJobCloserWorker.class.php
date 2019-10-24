@@ -40,6 +40,14 @@ abstract class KJobCloserWorker extends KJobHandlerWorker
 				KBatchBase::unimpersonate();
 				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_CLIENT, $kcex->getCode(), "Error: " . $kcex->getMessage(), KalturaBatchJobStatus::RETRY);
 			}
+			catch (kTemporaryException $ktex)
+			{
+				self::unimpersonate();
+				if ($ktex->getResetJobExecutionAttempts())
+					KBatchBase::$kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
+
+				$this->closeJobOnError($job, KalturaBatchJobErrorTypes::RUNTIME, $ktex, KalturaBatchJobStatus::RETRY, $ktex->getData());
+			}
 			catch(Exception $ex)
 			{
 				KBatchBase::unimpersonate();
