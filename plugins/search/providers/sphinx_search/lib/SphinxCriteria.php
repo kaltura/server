@@ -182,11 +182,43 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				throw new kCoreException("Invalid sphinx query [$sql]\nMatched regular expression [$badQuery]", APIErrors::SEARCH_ENGINE_QUERY_FAILED);
 			}
 		}
+		
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		$sqlHash = "SPHSearch_" . md5(preg_replace('/\d/', '', $sql) . "_" . kCurrentContext::getCurrentPartnerId());
+		if ($cache)
+		{
+			$cache->add($sqlHash, 0, 600);
+			$searchCounter = $cache->increment($sqlHash);
+			if($searchCounter > 10)
+			{
+				KalturaLog::log("Exceeded max queries allowed for given hash [$sqlHash] and counter [$searchCounter] and query [$sql]");
+				//$cache->decrement($sqlHash);
+				//throw new kCoreException("Exceeded max queries allowed for query [$sql]", APIErrors::SEARCH_ENGINE_QUERY_FAILED);
+			}
+		}
 
 		//debug query
 
 		$sqlConditions = array();
-		$ids = $pdo->queryAndFetchAll($sql, PDO::FETCH_COLUMN, $sqlConditions, 0);
+		try
+		{
+			$ids = $pdo->queryAndFetchAll($sql, PDO::FETCH_COLUMN, $sqlConditions, 0);
+		}
+		catch(Exception $e)
+		{
+			if(strpos($e->getMessage(), 'server has gone away') !== false && $cache)
+			{
+				KalturaLog::log("MySQL server has gone away, incrementing search query count");
+				$searchCounter = $cache->increment($sqlHash, 5);
+			}
+			throw $e;
+		}
+		
+		if ($cache)
+		{
+			$cache->decrement($sqlHash);
+		}
+		
 		if($ids === false)
 		{
 			list($sqlState, $errCode, $errDescription) = $pdo->errorInfo();

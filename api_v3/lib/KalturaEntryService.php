@@ -1865,7 +1865,6 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		KalturaLog::info("clipping service detected start to create sub flavors;");
 		$clipEntry = $clipManager->createTempEntryForClip($this->getPartnerId());
-		$shouldimport = false;
 		$url = null;
 		if ($resource->getResource() instanceof kFileSyncResource && $resource->getResource()->getOriginEntryId())
 		{
@@ -1896,6 +1895,13 @@ class KalturaEntryService extends KalturaBaseService
 				/* @var $fileSync FileSync */
 				if ($fileSync && !$local)
 				{
+					$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
+					if(myEntryUtils::shouldValidateLocal() && $fileSync->getDc() == $remoteDc)
+					{
+						KalturaLog::info("Source was not found locally, but was found in the remote dc [$remoteDc]");
+						throw new KalturaAPIException(KalturaErrors::SOURCE_FILE_NOT_FOUND);
+					}
+
 					return $fileSync->getExternalUrl($entryId);
 				}
 			}

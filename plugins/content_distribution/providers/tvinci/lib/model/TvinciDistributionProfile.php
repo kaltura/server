@@ -11,6 +11,7 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
  	const CUSTOM_DATA_XSLT = 'xsltFile';
 	const CUSTOM_TAGS = 'tags';
 	const CUSTOM_INNER_TYPE = 'innerType';
+	const CUSTOM_ASSETS_TYPE = 'assetsType';
 
 	const INNER_TYPE_CATALOG = 'catalog';
 	const INNER_TYPE_INGEST = 'ingest';
@@ -50,7 +51,25 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 
 	}
 
+	/**
+	 * @param entry $entry
+	 * @return bool
+	 */
+	public function shouldDistributeEntry($entry)
+	{
+		$result = true;
+		if($this->getAssetsType() == kTvinciAssetsType::REGULAR)
+		{
+			$result = $entry->getStatus() == entryStatus::READY;
+		}
 
+		if($this->getDistributeTrigger() == kDistributeTrigger::MODERATION_APPROVED)
+		{
+			$result = $result && in_array($entry->getModerationStatus(), self::$validModerationStatuses);
+		}
+
+		return $result;
+	}
 
 	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
 	{
@@ -85,4 +104,7 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 
 	public function getInnerType()	            {return $this->getFromCustomData(self::CUSTOM_INNER_TYPE, null, self::INNER_TYPE_CATALOG);}
 	public function setInnerType($v)	        {$this->putInCustomData(self::CUSTOM_INNER_TYPE, $v);}
+
+	public function getAssetsType() 			{return $this->getFromCustomData(self::CUSTOM_ASSETS_TYPE, null, KalturaTvinciAssetsType::REGULAR);}
+	public function setAssetsType($v)	        {$this->putInCustomData(self::CUSTOM_ASSETS_TYPE, $v);}
 }

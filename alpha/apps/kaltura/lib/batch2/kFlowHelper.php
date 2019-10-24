@@ -3171,4 +3171,13 @@ class kFlowHelper
 				break;
 		}
 	}
+	
+	public static function handleBulkDownloadRetried(BatchJob $dbBatchJob, kBulkDownloadJobData $data)
+	{
+		//Bulk download has now worker so there is no point to retry it. Instead fail the job.
+		//No one will pick it up so both the sep and lock object will be stuck in an unclosed state.
+		//Setting the job status to fatal will make sure the lock record is also deleted.
+		$dbBatchJob->setStatus(KalturaBatchJobStatus::FATAL);
+		$dbBatchJob->save();
+	}
 }

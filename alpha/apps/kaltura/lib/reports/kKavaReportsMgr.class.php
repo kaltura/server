@@ -348,6 +348,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_UNIQUE_BUFFERING_USERS => true,
 		self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR => true,
 		self::METRIC_VIEW_BUFFER_TIME_RATIO => true,
+		self::METRIC_ENGAGEMENT_RANKING => true,
 	);
 
 	protected static $multi_value_dimensions = array(

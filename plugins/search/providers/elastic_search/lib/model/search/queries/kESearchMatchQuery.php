@@ -74,7 +74,14 @@ class kESearchMatchQuery extends kESearchBaseFieldQuery
 			$query[self::MATCH_KEY][$this->fieldName][self::MINIMUM_SHOULD_MATCH_KEY] = $this->getMinimumShouldMatch();
 		if ($this->getAnalyzer())
 			$query[self::MATCH_KEY][$this->fieldName][self::ANALYZER] = $this->getAnalyzer();
-
+		if ($this->getOperator())
+		{
+			$query[self::MATCH_KEY][$this->fieldName][self::OPERATOR] = $this->getOperator();
+		}
+		if($this->getCutoffFreq())
+		{
+			$query[self::MATCH_KEY][$this->fieldName][self::CUTOFF_FREQUENCY] = $this->getCutoffFreq();
+		}
 		return $query;
 	}
 }

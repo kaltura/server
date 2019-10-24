@@ -147,12 +147,13 @@ class kVendorCredit
 		return (intval(time() / 86400) == (intval($this->lastSyncTime / 86400)));
 	}
 
-	public function syncCredit($reachProfileId)
+	public function syncCredit($reachProfileId, $partnerId)
 	{
 		$c = new Criteria();
 		$c->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId , Criteria::EQUAL);
 		$c->add(EntryVendorTaskPeer::STATUS, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::READY), Criteria::IN);
 		$c->add(EntryVendorTaskPeer::QUEUE_TIME, $this->getSyncCreditStartDate(), Criteria::GREATER_EQUAL);
+		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
 		$this->addAdditionalCriteria($c);
 
 		$now = time();
