@@ -17,6 +17,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_VIEW_UNIQUE_ENGAGED_USERS,
 				self::METRIC_AVG_VIEW_BUFFERING,
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
 				self::EVENT_TYPE_VIEW,
 			),
 			self::REPORT_ENRICH_DEF => array(
@@ -45,6 +46,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_VIEW_UNIQUE_ENGAGED_USERS,
 				self::METRIC_AVG_VIEW_BUFFERING,
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
 				self::EVENT_TYPE_VIEW,
 			),
 			self::REPORT_ENRICH_DEF => array(
@@ -67,6 +69,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_VIEW_UNIQUE_ENGAGED_USERS,
 				self::METRIC_AVG_VIEW_BUFFERING,
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
 				self::EVENT_TYPE_VIEW,
 			),
 			self::REPORT_ENRICH_DEF => array(
@@ -100,7 +103,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_VIEW_UNIQUE_AUDIENCE,
 				self::METRIC_VIEW_UNIQUE_BUFFERING_USERS,
 				self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH,
-				self::METRIC_AVG_VIEW_BUFFERING,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
 			),
 		),
 
@@ -210,6 +213,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_VIEW_PLAY_TIME_SEC,
 				self::METRIC_AVG_VIEW_BUFFERING,
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
 				self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
 			),
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addFlavorParamColumn',
@@ -221,6 +225,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				'sum_view_time' => self::METRIC_VIEW_PLAY_TIME_SEC,
 				'avg_view_buffering' => self::METRIC_AVG_VIEW_BUFFERING,
 				'avg_view_engagement' => self::METRIC_AVG_VIEW_ENGAGEMENT,
+				'view_buffer_time_ratio' => self::METRIC_VIEW_BUFFER_TIME_RATIO,
 				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
 			),
 			self::REPORT_TOTAL_MAP => array(
@@ -230,6 +235,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				'sum_view_time' => self::METRIC_VIEW_PLAY_TIME_SEC,
 				'avg_view_buffering' => self::METRIC_AVG_VIEW_BUFFERING,
 				'avg_view_engagement' => self::METRIC_AVG_VIEW_ENGAGEMENT,
+				'view_buffer_time_ratio' => self::METRIC_VIEW_BUFFER_TIME_RATIO,
 				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
 			),
 		),
