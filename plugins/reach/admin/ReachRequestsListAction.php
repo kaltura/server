@@ -116,12 +116,12 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 		$startTime = 0;
 		$endTime = 0;
 		$filterDateInput = $request->getParam('from_time');
-		if (!preg_match('/(\-|\+)\d+$/', $filterDateInput, $matches))
+		if (!preg_match('/^(\-|\+)(\d+$)/', $filterDateInput, $matches))
 		{
 			return;
 		}
-		$sign = $filterDateInput[0];
-		$hours = (int)substr($filterDateInput,1);
+		$sign = $matches[1];
+		$hours = (int)$matches[2];
 		$timeFromHourToSec = $hours * 60 * 60;
 		if ($sign === '-')
 		{
