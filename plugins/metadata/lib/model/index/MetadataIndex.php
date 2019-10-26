@@ -249,5 +249,13 @@ class MetadataIndex extends BaseIndexObject
 		return MetadataPeer::doCount($c);
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
+	public static function getIgnoreOptimizationKeys()
+	{
+		return array(
+			"object_id"
+		);
+	}
+
 }
 

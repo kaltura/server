@@ -15,5 +15,8 @@
 		<index format="P%s">
 			<value field="partner_id" />
 		</index>
+		<ignoreOptimizationKeys>
+			<value field="object_id" />
+		</ignoreOptimizationKeys>
 	</object>
 </schema>
