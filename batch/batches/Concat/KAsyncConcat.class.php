@@ -65,33 +65,42 @@ class KAsyncConcat extends KJobHandlerWorker
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
+		$this->verifyFilesAccess($job);
 		return $this->concat($job, $job->data);
+	}
+
+	protected function getBatchJobFiles(KalturaBatchJob $job)
+	{
+		$files = array();
+		$jobData = $job->data;
+		$fileName = "{$job->entryId}_{$jobData->flavorAssetId}.mp4";
+		$jobData[] = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
+		$jobData[] = $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
+		foreach($jobData->srcFiles as $srcFile)
+		{
+			$jobData[] = $srcFile->value;
+		}
+
+		return $files;
 	}
 
 	protected function concat(KalturaBatchJob $job, KalturaConcatJobData $data)
 	{
 		$this->updateJob($job, "Files concatenation started", KalturaBatchJobStatus::PROCESSING);
-		$jobData = $job->data;
-		
 		$ffmpegBin = KBatchBase::$taskConfig->params->ffmpegCmd;
 		$ffprobeBin = isset(KBatchBase::$taskConfig->params->ffprobeCmd)? KBatchBase::$taskConfig->params->ffprobeCmd: "ffprobe";
 		$mediaInfoBin = isset(KBatchBase::$taskConfig->params->mediaInfoCmd)? KBatchBase::$taskConfig->params->mediaInfoCmd: "mediainfo";
 		$fileName = "{$job->entryId}_{$data->flavorAssetId}.mp4";
-		$verifyAccessPaths = array();
 		$localTempFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
-		$verifyAccessPaths[] = $localTempFilePath;
 		$sharedTempFilePath = $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
-		$verifyAccessPaths[] = $sharedTempFilePath;
 		
 		$srcFiles = array();
 		foreach($data->srcFiles as $srcFile)
 		{
 			/* @var $srcFile KalturaString */
 			$srcFiles[] = $srcFile->value;
-			$verifyAccessPaths[] = $srcFile->value;
 		}
 
-		$this->verifyFilesAccess($verifyAccessPaths);
 		$result = $this->concatFiles($ffmpegBin, $ffprobeBin, $srcFiles, $localTempFilePath, $data->offset, $data->duration,$data->shouldSort);
 		if(! $result)
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, null, "Failed to concat files", KalturaBatchJobStatus::FAILED);

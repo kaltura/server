@@ -51,9 +51,23 @@ class KAsyncConvert extends KJobHandlerWorker
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
+		$this->verifyFilesAccess($job);
 		return $this->convert($job, $job->data);
 	}
-	
+
+	protected function getBatchJobFiles(KalturaBatchJob $job)
+	{
+		$files = array();
+		$data = $job->data;
+		$files[] = $this->localTempPath;
+		foreach ($data->srcFileSyncs as $srcFileSyncDescriptor)
+		{
+			$files[] = $this->translateSharedPath2Local($srcFileSyncDescriptor->fileSyncLocalPath);
+		}
+
+		return $files;
+	}
+
 	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::getFilter()
 	 */
@@ -113,15 +127,13 @@ class KAsyncConvert extends KJobHandlerWorker
 		}
 		$updateData = new KalturaConvartableJobData();		
 		$updateData->srcFileSyncs = $data->srcFileSyncs;
+		$job = $this->updateJob($job, null, KalturaBatchJobStatus::QUEUED, $updateData);
+
 		// creates a temp file path
 		// $uniqid = uniqid("convert_{$job->entryId}_");
 		$uniqid = uniqid();
 		$uniqid = "convert_{$job->entryId}_".substr($uniqid,-5);
 		$data->destFileSyncLocalPath = $this->localTempPath . DIRECTORY_SEPARATOR . $uniqid;
-		$filesToCheck = array_map(function ($srcFileSyncDescriptor) { return $srcFileSyncDescriptor->actualFileSyncLocalPath; }, $data->srcFileSyncs);
-		$filesToCheck[] = $data->destFileSyncLocalPath;
-		$this->verifyFilesAccess($filesToCheck);
-		$job = $this->updateJob($job, null, KalturaBatchJobStatus::QUEUED, $updateData);
 		$this->operationEngine = KOperationManager::getEngine($job->jobSubType, $data, $job);
 		
 		if ( $this->operationEngine == null )

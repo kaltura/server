@@ -455,14 +455,24 @@ abstract class KBatchBase implements IKalturaLogger
 	}
 
 	/**
-	 * @param array $files
+	 * @param KalturaBatchJob $job
+	 * @return array
+	 */
+	protected function getBatchJobFiles(KalturaBatchJob $job)
+	{
+		return array();
+	}
+
+	/**
+	 * @param KalturaBatchJob $job
 	 * @throws kTemporaryException
 	 */
-	protected function verifyFilesAccess($files)
+	protected function verifyFilesAccess(KalturaBatchJob $job)
 	{
 		$result = true;
 		try
 		{
+			$files = $this->getBatchJobFiles($job);
 			foreach ($files as $file)
 			{
 				if(!$this->checkFileExists($file))
