@@ -1,0 +1,1 @@
+alter table sso add index redirect_url_status_index (redirect_url,status);

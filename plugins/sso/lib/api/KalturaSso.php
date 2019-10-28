@@ -58,6 +58,7 @@ class KalturaSso extends KalturaObject implements IRelatedFilterable
 	/**
 	 * Redirect URL for a specific application type and (partner id or domain)
 	 * @var string
+	 * @filter eq
 	 */
 	public $redirectUrl;
 
