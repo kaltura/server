@@ -445,7 +445,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			{
 				if (preg_match($pattern, $optimizationParam, $result))
 				{
-					unset($optimizationMap[$i]);
+//					unset($optimizationMap[$i]);
+					KalturaLog::debug("dry run - would remove $optimizationParam from optimization Map");
 					break;
 				}
 			}
