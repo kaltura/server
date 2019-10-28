@@ -4342,4 +4342,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				return true;
 		}
 	}
+
+	public function setSyncFlavorsOnceReady($v)
+	{
+		$this->putInCustomData ( "syncFlavorsOnceReady" , (bool) $v );
+	}
+
+	public function getSyncFlavorsOnceReady()
+	{
+		return (bool) $this->getFromCustomData( "syncFlavorsOnceReady" ,null, false );
+	}
 }
