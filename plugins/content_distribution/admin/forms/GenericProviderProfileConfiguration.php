@@ -86,8 +86,10 @@ class Form_GenericProviderProfileConfiguration extends Form_ProviderProfileConfi
 
 	protected function getMetadataFields()
 	{
-		if(count(self::$metadataProfileFields))
+		if(self::$metadataProfileFields && count(self::$metadataProfileFields))
+		{
 			return self::$metadataProfileFields;
+		}
 			
 		self::$metadataProfileFields = array();
 		$client = Infra_ClientHelper::getClient();

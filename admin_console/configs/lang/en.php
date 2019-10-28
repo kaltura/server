@@ -310,6 +310,9 @@ return array(
 	'Kaltura_Client_ContentDistribution_Enum_DistributeTrigger::ENTRY_READY' => 'On entry ready',
 	'Kaltura_Client_ContentDistribution_Enum_DistributeTrigger::MODERATION_APPROVED'  => 'On moderation approved',
 
+	'Kaltura_Client_TvinciDistribution_Enum_TvinciAssetsType::REGULAR' => 'Regular assets',
+	'Kaltura_Client_TvinciDistribution_Enum_TvinciAssetsType::VIRTUAL' => 'Virtual assets',
+
 	'init client failed' => 'Could not initiate the Kaltura client',
 	'entry not found' => 'Entry not found',
 	'partner not found' => 'Publisher not found',
@@ -1522,4 +1525,13 @@ return array(
 	'Kaltura_Client_Sso_Enum_SsoStatus::DISABLED' => 'Disabled',
 	'Kaltura_Client_Sso_Enum_SsoStatus::ACTIVE' => 'Enabled',
 	'Kaltura_Client_Sso_Enum_SsoStatus::DELETED' => 'Deleted',
+
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PENDING' => 'Pending',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::READY' => 'Ready',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PROCESSING' => 'Processing',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PENDING_MODERATION' => 'Pending Moderation',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::REJECTED' => 'Rejected',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::ERROR' => 'Error',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::ABORTED' => 'Aborted',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PENDING_ENTRY_READY' => 'Pending Entry Ready',
 );

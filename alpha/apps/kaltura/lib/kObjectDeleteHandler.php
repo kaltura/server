@@ -268,6 +268,14 @@ class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDe
 	 */
 	protected function fileSyncDelete(FileSync $fileSync, BatchJob $raisedJob = null)
 	{
+		//Delete file job runs on the DC where the file sync is located on, this job cannot handle file sync's that are not of type file.
+		$fileSyncType = $fileSync->getFileType();
+		if ($fileSyncType != FileSync::FILE_SYNC_FILE_TYPE_FILE)
+		{
+			KalturaLog::debug("File sync deletion cannot run on file sync of type [$fileSyncType], delete file job will not be added");
+			return;
+		}
+		
 		$partnerId = $fileSync->getPartnerId();
 		$purgePermission = PermissionPeer::isValidForPartner('PURGE_FILES_ON_DELETE', $partnerId);
 		if ($purgePermission)

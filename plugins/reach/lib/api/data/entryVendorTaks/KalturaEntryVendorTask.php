@@ -179,6 +179,25 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	 */
 	public $taskJobData;
 
+	/**
+	 * @var time
+	 * @readonly
+	 * @filter gte,lte,order
+	 */
+	public $expectedFinishTime;
+
+	/**
+	 * @var KalturaVendorServiceType
+	 * @readonly
+	 */
+	public $serviceType;
+
+	/**
+	 * @var KalturaVendorServiceFeature
+	 * @readonly
+	 */
+	public $serviceFeature;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -205,7 +224,10 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'dictionary',
 		'partnerData',
 		'creationMode',
-		'taskJobData'
+		'taskJobData',
+		'expectedFinishTime',
+		'serviceType',
+		'serviceFeature'
 	);
 	
 	/* (non-PHPdoc)

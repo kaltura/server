@@ -174,6 +174,11 @@ class FileSync extends BaseFileSync implements IBaseObject
 		if(!$storage || $storage->getProtocol() === StorageProfile::STORAGE_KALTURA_DC)
 			return kDataCenterMgr::getInternalRemoteUrl($this);
 
+		if(is_null($storage->getProtocol()))
+		{
+			return null;
+		}
+
 		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($this->getDc(), $entryId, PlaybackProtocol::HTTP, infraRequestUtils::getProtocol()));
 		if(is_null($urlManager) && infraRequestUtils::getProtocol() != 'http')
 			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($this->getDc(), $entryId));

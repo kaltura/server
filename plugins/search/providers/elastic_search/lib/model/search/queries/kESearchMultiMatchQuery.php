@@ -80,6 +80,10 @@ class kESearchMultiMatchQuery extends kESearchBaseFieldQuery
 			$query[self::MULTI_MATCH_KEY][self::FIELDS_KEY][] = $field;
 		}
 		$query[self::MULTI_MATCH_KEY][self::TYPE_KEY] = $this->getType();
+		if ($this->getOperator())
+		{
+			$query[self::MULTI_MATCH_KEY][self::OPERATOR]= $this->getOperator();
+		}
 
 		return $query;
 	}

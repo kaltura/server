@@ -195,6 +195,8 @@ class ReachProfileService extends KalturaBaseService
 		// set the object status to deleted
 		if( $dbReachProfile->shouldSyncCredit())
 		{
+			//ignore updating updatedAt field since we are syncing only the credit within the profile and we update the lastSyncTime
+			$dbReachProfile->setIgnoreUpdatedAt(true);
 			$dbReachProfile->syncCredit();
 			$dbReachProfile->save();
 		}
