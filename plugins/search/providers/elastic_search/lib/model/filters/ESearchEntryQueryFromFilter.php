@@ -345,6 +345,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			$filter->setStatusEquel(entryStatus::READY);
 		}
 	}
+
 	/**
 	 * Set the default moderation status to ready if other moderation status filters are not specified
 	 * @param entryFilter $filter
@@ -360,6 +361,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			$filter->setModerationStatusNotIn($moderationStatusesNotIn);
 		}
 	}
+	
 	protected function prepareEntriesCriteriaFilter(entryFilter $filter)
 	{
 		if(!$filter->is_set(self::ID_EQUAL_FILTER) && !$filter->is_set(self::REDIRECT_FROM_ENTRY_ID_EQUAL_FILTER))
