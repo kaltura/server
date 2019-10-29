@@ -520,8 +520,7 @@ class myPlaylistUtils
 		list ($totalResults, $entryFilters) = self::getPlaylistFilterListStruct($xml);
 		foreach ($entryFilters as $entryFilter)
 		{
-			if (!isset($entryFilter->advancedSearch) ||
-				( isset($entryFilter->advancedSearch) && (string)$entryFilter->advancedSearch[self::KALTURA_CLASS] === PlaylistService::KALTURA_METADATA_SEARCH_ITEM))
+			if (ESearchQueryFromFilter::canTransformXmlFilter($entryFilter))
 			{
 				$entryFiltersViaEsearch[] = $entryFilter;
 			}

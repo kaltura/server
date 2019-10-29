@@ -10,9 +10,6 @@
  */
 class PlaylistService extends KalturaEntryService
 {
-	const ADVANCED_SEARCH = 'advancedSearch';
-	const KALTURA_METADATA_SEARCH_ITEM = 'KalturaMetadataSearchItem';
-
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::globalPartnerAllowed()
 	 */
