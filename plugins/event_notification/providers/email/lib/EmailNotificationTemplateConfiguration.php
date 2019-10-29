@@ -90,14 +90,11 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 					$name = new Kaltura_Client_Type_StringValue();
 					$name->value = $properties[$headerNameProperty];
 				}
-				$delimiter = ";";
-				if (strpos($email->value, ",") !== false)
-                {
-                    $delimiter = ",";
-                }
+				$allRecipients = str_replace(",", ";", $email->value);
+                $allRecipients = explode(";", $allRecipients);
                 $recipientProvider = new Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider();
                 $recipientProvider->emailRecipients = array();
-				$allRecipients = explode($delimiter, $email->value);
+
 				foreach ($allRecipients as $singleRecipient)
                 {
                     $singleRecipient = trim($singleRecipient);
@@ -133,6 +130,11 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
             }
             $headerObject = new Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient();
             $headerObject->email->value = $fullEmailRecipientsValue;
+            if ($object->$headerName->emailRecipients)
+            {
+                $firstRecipient = $object->$headerName->emailRecipients[0];
+                $headerObject->name->value = $firstRecipient->name->value;
+            }
         }
 
         $objectEmailValue = $headerObject ? $headerObject->email->value : '';
