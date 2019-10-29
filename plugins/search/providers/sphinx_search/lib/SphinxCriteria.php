@@ -1301,7 +1301,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 * @return bool
 	 *
 	 */
-	protected function shouldFilterPartnerFromSphinxOptimizations($objectClass, $fieldName)
+	public function shouldFilterPartnerFromSphinxOptimizations($objectClass, $fieldName)
 	{
 		$ignoreOptimazationKeys = $objectClass::getIgnoreOptimizationKeys();
 		if (count($ignoreOptimazationKeys) && in_array($fieldName, $ignoreOptimazationKeys))
