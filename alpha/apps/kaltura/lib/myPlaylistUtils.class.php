@@ -529,6 +529,7 @@ class myPlaylistUtils
 				$entryFiltersViaSphinx[] = $entryFilter;
 			}
 		}
+
 		return array($entryFiltersViaEsearch, $entryFiltersViaSphinx, $totalResults);
 	}
 
