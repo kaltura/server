@@ -27,6 +27,11 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 		ESearchCaptionFieldName::LABEL,
 		ESearchCaptionFieldName::CAPTION_ASSET_ID);
 
+	protected static $timeFields = array(
+		ESearchCaptionAssetItemFilterFields::CREATED_AT,
+		ESearchCaptionAssetItemFilterFields::UPDATED_AT,
+	);
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -197,5 +202,10 @@ class ESearchCaptionQueryFromFilter extends ESearchQueryFromFilter
 			$this->nestedSearchItem[] = $captionItem;
 		}
 		parent::addNestedQueryPart();
+	}
+
+	protected function getTimeFields()
+	{
+		return self::$timeFields;
 	}
 }
