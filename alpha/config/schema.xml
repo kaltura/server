@@ -2196,7 +2196,7 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="custom_data" type="longvarchar" />
-		<column primaryKey="false" required="true"  lazyLoad="false" name="redirect_url" type="varchar" size="64" />
+		<column primaryKey="false" required="true"  lazyLoad="false" name="redirect_url" type="varchar" size="1024" />
 		<index name="partner_id_status_index">
 			<index-column name="partner_id" />
 			<index-column name="status" />
