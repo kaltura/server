@@ -24,6 +24,8 @@ class kuserFilter extends baseObjectFilter
 				"_mlikeand_tags" ,
 				"_gte_created_at" ,
 				"_lte_created_at" ,
+				"_gte_updated_at" ,
+				"_lte_updated_at" ,
 				"_gte_produced_kshows" ,
 				"_gte_entries" ,
 				"_eq_partner_id" , 
@@ -54,7 +56,7 @@ class kuserFilter extends baseObjectFilter
 			NULL
 		);
 			
-		$this->allowed_order_fields = array("puser_id", "created_at");
+		$this->allowed_order_fields = array("puser_id", "created_at", "updated_at");
 	}
 
 	public function describe() 
