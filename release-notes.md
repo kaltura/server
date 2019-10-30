@@ -13,7 +13,7 @@ Run mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/de
 - Issue ID: PLAT-10252
 
 ### configuration ###
-First replace all tokens from the XML file below (under kmc-sso-server) and remove".template" from the file name :
+First replace all tokens from the ini file below (under kmc-sso-server section) and remove".template" from the file name :
 deployment/base/scripts/init_data/01.Partner.template.ini
 
 ### Deployment scripts ###
