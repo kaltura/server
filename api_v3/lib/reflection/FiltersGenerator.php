@@ -87,7 +87,16 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		$this->appendLine(" * @package " . $type->getPackage());
 		$this->appendLine(" * @subpackage $subpackage");
 		$this->appendLine(" */");
-		$this->appendLine("class $filterClassName extends $filterBaseClassName");
+		$comments = $type->getComments();
+		$isAbstractFilter = strpos($comments, 'abstractFilter');
+		if ($isAbstractFilter !== false)
+		{
+			$this->appendLine("abstract class $filterClassName extends $filterBaseClassName");
+		}
+		else
+		{
+			$this->appendLine("class $filterClassName extends $filterBaseClassName");
+		}
 		$this->appendLine("{");
 		$this->appendLine("}");
 		
