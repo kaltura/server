@@ -67,7 +67,6 @@ class KAsyncConvertLiveSegment extends KJobHandlerWorker
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		$this->verifyFilesAccess($job);
 		return $this->convert($job, $job->data);
 	}
 
@@ -76,7 +75,6 @@ class KAsyncConvertLiveSegment extends KJobHandlerWorker
 		$files = array();
 		$files[] =  $this->localTempPath;
 		$files[] =  $this->sharedTempPath;
-		$this->verifyFilesAccess($files);
 		return $files;
 	}
 

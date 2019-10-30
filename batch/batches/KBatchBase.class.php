@@ -463,9 +463,20 @@ abstract class KBatchBase implements IKalturaLogger
 		return array();
 	}
 
+	public function validateFileAccess(KalturaBatchJob $job)
+	{
+		$result = $this->verifyFilesAccess($job);
+		if(!$result)
+		{
+			$exception = new kTemporaryException();
+			$exception->setResetJobExecutionAttempts(true);
+			throw $exception;
+		}
+	}
+
 	/**
 	 * @param KalturaBatchJob $job
-	 * @throws kTemporaryException
+	 * @return bool
 	 */
 	protected function verifyFilesAccess(KalturaBatchJob $job)
 	{
@@ -500,12 +511,7 @@ abstract class KBatchBase implements IKalturaLogger
 			$result = false;
 		}
 
-		if(!$result)
-		{
-			$exception = new kTemporaryException();
-			$exception->setResetJobExecutionAttempts(true);
-			throw $exception;
-		}
+		return $result;
 	}
 
 	protected function checkDirAccess($dir)
@@ -570,7 +576,7 @@ abstract class KBatchBase implements IKalturaLogger
 	/**
 	 * @param string $file
 	 * @param int $size
-	 * @param null $directorySync
+	 * @param bool|null $directorySync
 	 * @return bool
 	 */
 	protected function checkFileExists($file, $size = null, $directorySync = null)

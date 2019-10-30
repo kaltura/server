@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Base class for all job handler workers.
  *
@@ -55,7 +54,7 @@ abstract class KJobHandlerWorker extends KBatchBase
 
 	protected function getMaxJobsEachRun()
 	{
-		if (!KBatchBase::$taskConfig->maxJobsEachRun)
+		if(!KBatchBase::$taskConfig->maxJobsEachRun)
 			return 1;
 
 		return KBatchBase::$taskConfig->maxJobsEachRun;
@@ -65,18 +64,22 @@ abstract class KJobHandlerWorker extends KBatchBase
 	{
 		$maxJobToPull = KBatchBase::$taskConfig->maxJobToPullToCache;
 		return KBatchBase::$kClient->batch->getExclusiveJobs($this->getExclusiveLockKey(), KBatchBase::$taskConfig->maximumExecutionTime,
-			$this->getMaxJobsEachRun(), $this->getFilter(), static::getType(), $maxJobToPull);
+				$this->getMaxJobsEachRun(), $this->getFilter(), static::getType(), $maxJobToPull);
 	}
 
 	public function run($jobs = null)
 	{
-		if (KBatchBase::$taskConfig->isInitOnly())
+		if(KBatchBase::$taskConfig->isInitOnly())
 			return $this->init();
 
-		if (is_null($jobs)) {
-			try {
+		if(is_null($jobs))
+		{
+			try
+			{
 				$jobs = $this->getJobs();
-			} catch (Exception $e) {
+			}
+			catch (Exception $e)
+			{
 				KalturaLog::err($e->getMessage());
 				return null;
 			}
@@ -84,35 +87,49 @@ abstract class KJobHandlerWorker extends KBatchBase
 
 		KalturaLog::info(count($jobs) . " jobs to handle");
 
-		if (!count($jobs) > 0) {
+		if(! count($jobs) > 0)
+		{
 			KalturaLog::info("Queue size: 0 sent to scheduler");
 			$this->saveSchedulerQueue(static::getType(), 0);
 			return null;
 		}
 
-		foreach ($jobs as &$job) {
-			try {
+		foreach($jobs as &$job)
+		{
+			try
+			{
 				self::setCurrentJob($job);
+				$this->validateFileAccess($job);
 				$job = $this->exec($job);
 				self::unimpersonate();
-			} catch (KalturaException $kex) {
+			}
+			catch(KalturaException $kex)
+			{
 				self::unimpersonate();
-				$this->closeJobOnError($job, KalturaBatchJobErrorTypes::KALTURA_API, $kex, KalturaBatchJobStatus::FAILED);
-			} catch (kApplicativeException $kaex) {
+				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::KALTURA_API, $kex, KalturaBatchJobStatus::FAILED);
+			}
+			catch(kApplicativeException $kaex)
+			{
 				self::unimpersonate();
-				$this->closeJobOnError($job, KalturaBatchJobErrorTypes::APP, $kaex, KalturaBatchJobStatus::FAILED);
-			} catch (kTemporaryException $ktex) {
+				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::APP, $kaex, KalturaBatchJobStatus::FAILED);
+			}
+			catch(kTemporaryException $ktex)
+			{
 				self::unimpersonate();
-				if ($ktex->getResetJobExecutionAttempts())
+				if($ktex->getResetJobExecutionAttempts())
 					KBatchBase::$kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 
-				$this->closeJobOnError($job, KalturaBatchJobErrorTypes::RUNTIME, $ktex, KalturaBatchJobStatus::RETRY, $ktex->getData());
-			} catch (KalturaClientException $kcex) {
+				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::RUNTIME, $ktex, KalturaBatchJobStatus::RETRY, $ktex->getData());
+			}
+			catch(KalturaClientException $kcex)
+			{
 				self::unimpersonate();
-				$this->closeJobOnError($job, KalturaBatchJobErrorTypes::KALTURA_CLIENT, $kcex, KalturaBatchJobStatus::RETRY);
-			} catch (Exception $ex) {
+				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::KALTURA_CLIENT, $kcex, KalturaBatchJobStatus::RETRY);
+			}
+			catch(Exception $ex)
+			{
 				self::unimpersonate();
-				$this->closeJobOnError($job, KalturaBatchJobErrorTypes::RUNTIME, $ex, KalturaBatchJobStatus::FAILED);
+				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::RUNTIME, $ex, KalturaBatchJobStatus::FAILED);
 			}
 			self::unsetCurrentJob();
 		}
@@ -122,10 +139,13 @@ abstract class KJobHandlerWorker extends KBatchBase
 
 	protected function closeJobOnError($job, $error, $ex, $status, $data = null)
 	{
-		try {
+		try
+		{
 			self::unimpersonate();
 			$job = $this->closeJob($job, $error, $ex->getCode(), "Error: " . $ex->getMessage(), $status, $data);
-		} catch (Exception $ex) {
+		}
+		catch(Exception $ex)
+		{
 			KalturaLog::err("Failed to close job after expirencing an error.");
 			KalturaLog::err($ex->getMessage());
 		}
@@ -143,18 +163,17 @@ abstract class KJobHandlerWorker extends KBatchBase
 
 	/**
 	 * @param KalturaBatchJob $job
-	 * @param bool $resetExecutionAttempts
 	 * @return KalturaBatchJob
-	 * @throws Exception
 	 */
-	protected function freeExclusiveJob(KalturaBatchJob $job, $resetExecutionAttempts = false)
+	protected function freeExclusiveJob(KalturaBatchJob $job)
 	{
+		$resetExecutionAttempts = false;
 		if ($job->status == KalturaBatchJobStatus::ALMOST_DONE)
 			$resetExecutionAttempts = true;
 
 		$response = KBatchBase::$kClient->batch->freeExclusiveJob($job->id, $this->getExclusiveLockKey(), static::getType(), $resetExecutionAttempts);
 
-		if (is_numeric($response->queueSize)) {
+		if(is_numeric($response->queueSize)) {
 			KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
 			$this->saveSchedulerQueue(static::getType(), $response->queueSize);
 		}
@@ -168,10 +187,11 @@ abstract class KJobHandlerWorker extends KBatchBase
 	protected function getFilter()
 	{
 		$filter = new KalturaBatchJobFilter();
-		if (KBatchBase::$taskConfig->filter)
+		if(KBatchBase::$taskConfig->filter)
 			$filter = KBatchBase::$taskConfig->filter;
 
-		if (KBatchBase::$taskConfig->minCreatedAtMinutes && is_numeric(KBatchBase::$taskConfig->minCreatedAtMinutes)) {
+		if (KBatchBase::$taskConfig->minCreatedAtMinutes && is_numeric(KBatchBase::$taskConfig->minCreatedAtMinutes))
+		{
 			$minCreatedAt = time() - (KBatchBase::$taskConfig->minCreatedAtMinutes * 60);
 			$filter->createdAtLessThanOrEqual = $minCreatedAt;
 		}
@@ -276,7 +296,8 @@ abstract class KJobHandlerWorker extends KBatchBase
 	 */
 	protected function saveSchedulerQueue($jobType, $size = null)
 	{
-		if (is_null($size)) {
+		if(is_null($size))
+		{
 			$workerQueueFilter = $this->getQueueFilter($jobType);
 			$size = KBatchBase::$kClient->batch->getQueueSize($workerQueueFilter);
 		}
@@ -309,7 +330,8 @@ abstract class KJobHandlerWorker extends KBatchBase
 	{
 		$updateJob = $this->newEmptyJob();
 
-		if (!is_null($msg)) {
+		if(! is_null($msg))
+		{
 			$updateJob->message = $msg;
 			$updateJob->description = $job->description . "\n$msg";
 		}
@@ -318,11 +340,11 @@ abstract class KJobHandlerWorker extends KBatchBase
 		$updateJob->data = $data;
 
 		KalturaLog::info("job[$job->id] status: [$status] msg : [$msg]");
-		if ($this->isUnitTest)
+		if($this->isUnitTest)
 			return $job;
 
 		$job = $this->updateExclusiveJob($job->id, $updateJob);
-		if ($job instanceof KalturaBatchJob)
+		if($job instanceof KalturaBatchJob)
 			$this->onUpdate($job);
 
 		return $job;
@@ -339,12 +361,13 @@ abstract class KJobHandlerWorker extends KBatchBase
 	 */
 	protected function closeJob(KalturaBatchJob $job, $errType, $errNumber, $msg, $status, $data = null)
 	{
-		if (!is_null($errType))
+		if(! is_null($errType))
 			KalturaLog::err($msg);
 
 		$updateJob = $this->newEmptyJob();
 
-		if (!is_null($msg)) {
+		if(! is_null($msg))
+		{
 			$updateJob->message = $msg;
 			$updateJob->description = $job->description . "\n$msg";
 		}
@@ -355,7 +378,8 @@ abstract class KJobHandlerWorker extends KBatchBase
 		$updateJob->data = $data;
 
 		KalturaLog::info("job[$job->id] status: [$status] msg : [$msg]");
-		if ($this->isUnitTest) {
+		if($this->isUnitTest)
+		{
 			$job->status = $updateJob->status;
 			$job->message = $updateJob->message;
 			$job->description = $updateJob->description;
@@ -365,12 +389,12 @@ abstract class KJobHandlerWorker extends KBatchBase
 		}
 
 		$job = $this->updateExclusiveJob($job->id, $updateJob);
-		if ($job instanceof KalturaBatchJob)
+		if($job instanceof KalturaBatchJob)
 			$this->onUpdate($job);
 
 		KalturaLog::info("Free job[$job->id]");
 		$job = $this->freeExclusiveJob($job);
-		if ($job instanceof KalturaBatchJob)
+		if($job instanceof KalturaBatchJob)
 			$this->onFree($job);
 
 		return $job;

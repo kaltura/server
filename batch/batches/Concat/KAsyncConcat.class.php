@@ -65,7 +65,6 @@ class KAsyncConcat extends KJobHandlerWorker
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		$this->verifyFilesAccess($job);
 		return $this->concat($job, $job->data);
 	}
 
@@ -74,11 +73,11 @@ class KAsyncConcat extends KJobHandlerWorker
 		$files = array();
 		$jobData = $job->data;
 		$fileName = "{$job->entryId}_{$jobData->flavorAssetId}.mp4";
-		$jobData[] = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
-		$jobData[] = $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
-		foreach($jobData->srcFiles as $srcFile)
+		$files[] = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
+		$files[] = $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
+		foreach($files->srcFiles as $srcFile)
 		{
-			$jobData[] = $srcFile->value;
+			$files[] = $srcFile->value;
 		}
 
 		return $files;

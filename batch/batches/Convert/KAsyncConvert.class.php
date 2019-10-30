@@ -51,7 +51,6 @@ class KAsyncConvert extends KJobHandlerWorker
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		$this->verifyFilesAccess($job);
 		return $this->convert($job, $job->data);
 	}
 
