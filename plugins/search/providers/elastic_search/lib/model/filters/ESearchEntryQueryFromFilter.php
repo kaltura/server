@@ -361,7 +361,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			$filter->setModerationStatusNotIn($moderationStatusesNotIn);
 		}
 	}
-	
+
 	protected function prepareEntriesCriteriaFilter(entryFilter $filter)
 	{
 		if(!$filter->is_set(self::ID_EQUAL_FILTER) && !$filter->is_set(self::REDIRECT_FROM_ENTRY_ID_EQUAL_FILTER))
