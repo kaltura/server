@@ -250,21 +250,12 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 		ReportType::CONTENT_REALTIME => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'entry_id' => self::DIMENSION_ENTRY_ID,
-				'status' => self::DIMENSION_ENTRY_ID,
 			),
 			self::REPORT_METRICS => array(
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
 				self::METRIC_AVG_VIEW_BUFFERING,
 				self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH,
 				self::METRIC_VIEW_UNIQUE_AUDIENCE,
-			),
-			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => array('status'),
-				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
-				self::REPORT_ENRICH_CONTEXT => array(
-					'peer' => 'entryPeer',
-					'columns' => array('STATUS'),
-				)
 			),
 		),
 
