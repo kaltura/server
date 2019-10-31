@@ -46,6 +46,7 @@ class KalturaScheduleResourceFilter extends KalturaScheduleResourceBaseFilter
 		if ($retrieveStatusDeleted)
 		{
 			ScheduleResourcePeer::setUseCriteriaFilter(false);
+			$c->add(ScheduleResourcePeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId());
 		}
 		$list = ScheduleResourcePeer::doSelect($c);
 		$resultCount = count($list);
