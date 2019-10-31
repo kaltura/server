@@ -41,7 +41,19 @@ class KalturaScheduleResourceFilter extends KalturaScheduleResourceBaseFilter
 		$filter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
 
-		$list = ScheduleResourcePeer::doSelect($c);
+		$retrieveStatusDeleted = (isset($this->statusEqual) && $this->statusEqual == ScheduleResourceStatus::DELETED) ||
+			(isset($this->statusIn) && strpos($this->statusIn,(string)ScheduleResourceStatus::DELETED) !== false );
+		if ($retrieveStatusDeleted)
+		{
+			ScheduleResourcePeer::setUseCriteriaFilter(false);
+			$list = ScheduleResourcePeer::doSelect($c);
+			ScheduleResourcePeer::setUseCriteriaFilter(true);
+		}
+		else
+		{
+			$list = ScheduleResourcePeer::doSelect($c);
+		}
+
 		$resultCount = count($list);
 		if ($resultCount && $resultCount < $pager->pageSize)
 			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
