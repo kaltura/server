@@ -428,6 +428,7 @@ class embedPlaykitJsAction extends sfAction
 		$last_uiconf_content = (is_array($uiconfs_content) && reset($uiconfs_content)) ? reset($uiconfs_content) : null;
 		$last_uiconf_config = isset($last_uiconf_content) ? $last_uiconf_content->getConfig() : '';
 		$tags = isset($last_uiconf_content) ? $last_uiconf_content->getTags() : '';
+		//get the product version from uiConf tags
 		if(preg_match('/\b([1-9][.][1-9][1-9])\b/', $tags, $tag) !== false && !isset($productVersion))
 			$productVersion = array_shift($tag);
 		return array($last_uiconf_config, $productVersion);
@@ -466,22 +467,23 @@ class embedPlaykitJsAction extends sfAction
 				if ($val == self::LATEST && $latestVersionMap != null && isset($latestVersionMap[$key]))
 				{
 					$this->bundleConfig[$key] = $latestVersionMap[$key];
-					$isAllHaveSameVersion = (!isset($versionTag) || $versionTag === self::LATEST) && $isAllHaveSameVersion !== false ? true : false;
+					$isAllPackagesSameVersion = (!isset($versionTag) || $versionTag === self::LATEST) && $isAllPackagesSameVersion !== false ? true : false;
 				}
 
 				if ($val == self::BETA && $betaVersionMap != null && isset($betaVersionMap[$key]))
 				{
 					$this->bundleConfig[$key] = $betaVersionMap[$key];
-					$isAllHaveSameVersion = (!isset($versionTag) || $versionTag === self::BETA) && $isAllHaveSameVersion !== false ? true : false;
+					$isAllPackagesSameVersion = (!isset($versionTag) || $versionTag === self::BETA) && $isAllPackagesSameVersion !== false ? true : false;
 				}
 
 				if($val != self::BETA && $val != self::LATEST){
-					$isAllHaveSameVersion = false;
+					$isAllPackagesSameVersion = false;
 				}
 				$versionTag = $val;
 			}
 
-			if($isAllHaveSameVersion === true){
+			//set the product version of beta of latest when all packages has same version
+			if($isAllPackagesSameVersion === true){
 				if($versionTag === self::LATEST)
 					$this->setProductVersion($this->playerConfig, $latestProductVersion);
 				if($versionTag === self::BETA)
