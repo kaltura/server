@@ -1,3 +1,24 @@
+# Orion 15.10.0 #
+
+## Sso - add new column:redirect url, and be able to search sso profile by redirect url ##
+- Issue Type: Task
+- Issue ID: PLAT-10251
+
+### Deployment scripts ###
+Run mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_10_alter_sso_add_redirect_url_column.sql
+Run mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_10_alter_sso_index.sql
+
+## Sso - add new dedicated partner for kmc sso server ##
+- Issue Type: Task
+- Issue ID: PLAT-10252
+
+### configuration ###
+First replace all tokens from the ini file below (under kmc-sso-server section) and remove".template" from the file name :
+deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment scripts ###
+ php deployment/updates/scripts/add_permissions/2019_11_10_kmc_sso_server_add_partner.php
+
 # Orion 15.9.0 #
 
 ## ESearch - reduce results in partial search ##

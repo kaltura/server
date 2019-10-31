@@ -26,7 +26,7 @@ abstract class BaseSsoPeer {
 	const TM_CLASS = 'SsoTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 8;
+	const NUM_COLUMNS = 9;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -55,6 +55,9 @@ abstract class BaseSsoPeer {
 	/** the column name for the CUSTOM_DATA field */
 	const CUSTOM_DATA = 'sso.CUSTOM_DATA';
 
+	/** the column name for the REDIRECT_URL field */
+	const REDIRECT_URL = 'sso.REDIRECT_URL';
+
 	/**
 	 * An identiy map to hold any loaded instances of Sso objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -71,11 +74,11 @@ abstract class BaseSsoPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'ApplicationType', 'PartnerId', 'Domain', 'Status', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'applicationType', 'partnerId', 'domain', 'status', 'createdAt', 'updatedAt', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::APPLICATION_TYPE, self::PARTNER_ID, self::DOMAIN, self::STATUS, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'application_type', 'partner_id', 'domain', 'status', 'created_at', 'updated_at', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'ApplicationType', 'PartnerId', 'Domain', 'Status', 'CreatedAt', 'UpdatedAt', 'CustomData', 'RedirectUrl', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'applicationType', 'partnerId', 'domain', 'status', 'createdAt', 'updatedAt', 'customData', 'redirectUrl', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::APPLICATION_TYPE, self::PARTNER_ID, self::DOMAIN, self::STATUS, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, self::REDIRECT_URL, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'application_type', 'partner_id', 'domain', 'status', 'created_at', 'updated_at', 'custom_data', 'redirect_url', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
 	);
 
 	/**
@@ -85,11 +88,11 @@ abstract class BaseSsoPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ApplicationType' => 1, 'PartnerId' => 2, 'Domain' => 3, 'Status' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, 'CustomData' => 7, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'applicationType' => 1, 'partnerId' => 2, 'domain' => 3, 'status' => 4, 'createdAt' => 5, 'updatedAt' => 6, 'customData' => 7, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::APPLICATION_TYPE => 1, self::PARTNER_ID => 2, self::DOMAIN => 3, self::STATUS => 4, self::CREATED_AT => 5, self::UPDATED_AT => 6, self::CUSTOM_DATA => 7, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'application_type' => 1, 'partner_id' => 2, 'domain' => 3, 'status' => 4, 'created_at' => 5, 'updated_at' => 6, 'custom_data' => 7, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ApplicationType' => 1, 'PartnerId' => 2, 'Domain' => 3, 'Status' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, 'CustomData' => 7, 'RedirectUrl' => 8, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'applicationType' => 1, 'partnerId' => 2, 'domain' => 3, 'status' => 4, 'createdAt' => 5, 'updatedAt' => 6, 'customData' => 7, 'redirectUrl' => 8, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::APPLICATION_TYPE => 1, self::PARTNER_ID => 2, self::DOMAIN => 3, self::STATUS => 4, self::CREATED_AT => 5, self::UPDATED_AT => 6, self::CUSTOM_DATA => 7, self::REDIRECT_URL => 8, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'application_type' => 1, 'partner_id' => 2, 'domain' => 3, 'status' => 4, 'created_at' => 5, 'updated_at' => 6, 'custom_data' => 7, 'redirect_url' => 8, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
 	);
 
 	/**
@@ -167,6 +170,7 @@ abstract class BaseSsoPeer {
 		$criteria->addSelectColumn(SsoPeer::CREATED_AT);
 		$criteria->addSelectColumn(SsoPeer::UPDATED_AT);
 		$criteria->addSelectColumn(SsoPeer::CUSTOM_DATA);
+		$criteria->addSelectColumn(SsoPeer::REDIRECT_URL);
 	}
 
 	/**

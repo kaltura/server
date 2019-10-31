@@ -55,6 +55,11 @@ class Form_SsoProfileConfigure extends ConfigureForm
 			'placement' => 'prepend',
 		));
 
+		$this->addElement('textarea', 'data', array(
+			'label'		=> 'Data:',
+			'validators' 	=> array()
+		));
+
 		$element3 = new Infra_Form_Html ('place_holder3', array('content' => '<span/>'));
 		$this->addElement($element3);
 

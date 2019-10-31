@@ -10,7 +10,7 @@
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package plugins.schedule
+ * @package plugins.sso
  * @subpackage model
  */
 class SsoPeer extends BaseSsoPeer

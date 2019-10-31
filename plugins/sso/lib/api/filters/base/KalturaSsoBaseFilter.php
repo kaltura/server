@@ -18,6 +18,7 @@ abstract class KalturaSsoBaseFilter extends KalturaRelatedFilter
 		"statusIn" => "_in_status",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
+		"redirectUrlEqual" => "_eq_redirect_url",
 	);
 
 	static private $order_by_map = array
@@ -80,4 +81,9 @@ abstract class KalturaSsoBaseFilter extends KalturaRelatedFilter
 	 * @var time
 	 */
 	public $createdAtLessThanOrEqual;
+
+	/**
+	 * @var string
+	 */
+	public $redirectUrlEqual;
 }

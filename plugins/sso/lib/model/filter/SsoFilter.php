@@ -17,6 +17,7 @@ class SsoFilter extends baseObjectFilter
 			'_in_status',
 			'_gte_created_at',
 			'_lte_created_at',
+			'_eq_redirect_url'
 		), null);
 
 		$this->allowed_order_fields = array('id','created_at');

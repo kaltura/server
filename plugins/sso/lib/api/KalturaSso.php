@@ -58,8 +58,14 @@ class KalturaSso extends KalturaObject implements IRelatedFilterable
 	/**
 	 * Redirect URL for a specific application type and (partner id or domain)
 	 * @var string
+	 * @filter eq
 	 */
 	public $redirectUrl;
+
+	/**
+	 * @var string
+	 */
+	public $data;
 
 	private static $map_between_objects = array
 	(
@@ -71,6 +77,7 @@ class KalturaSso extends KalturaObject implements IRelatedFilterable
 		"createdAt",
 		"updatedAt",
 		"redirectUrl",
+		"data",
 	);
 
 	public function getMapBetweenObjects ( )
