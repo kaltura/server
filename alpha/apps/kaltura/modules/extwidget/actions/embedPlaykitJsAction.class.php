@@ -169,6 +169,17 @@ class embedPlaykitJsAction extends sfAction
 		}
 	}
 
+	private function setProductVersion($uiConf, $productVersion)
+	{
+		if(isset($productVersion)){
+			if (!property_exists($uiConf, "productVersion"))
+			{
+				$uiConf->productVersion = new stdClass();
+			}
+			$uiConf->productVersion = $productVersion;
+		}
+	}
+
 	private function getEnvConfig()
 	{
 		$tags = $this->uiConf->getTags();
@@ -416,21 +427,27 @@ class embedPlaykitJsAction extends sfAction
 		$uiconfs_content = isset($uiConfs) ? array_values($uiConfs) : null;
 		$last_uiconf_content = (is_array($uiconfs_content) && reset($uiconfs_content)) ? reset($uiconfs_content) : null;
 		$last_uiconf_config = isset($last_uiconf_content) ? $last_uiconf_content->getConfig() : '';
-		return $last_uiconf_config;
-	}
+		$tags = isset($last_uiconf_content) ? $last_uiconf_content->getTags() : '';
+		if(preg_match('/\b([1-9][.][1-9][1-9])\b/', $tags, $tag) !== false && !isset($productVersion))
+			$productVersion = array_shift($tag);
+		return array($last_uiconf_config, $productVersion);
+		}
 
 	private function getConfigByVersion($version){
 		$config = array();
 		foreach ($this->uiConfTags as $tag) {
 			$versionUiConfs = uiConfPeer::getUiconfByTagAndVersion($tag, $version);
-			$versionLastUiConf = $this->getLastConfig($versionUiConfs);
+			list($versionLastUiConf,$versionId) = $this->getLastConfig($versionUiConfs);
 			$versionConfig = json_decode($versionLastUiConf, true);
 			if (is_array($versionConfig))
 			{
 				$config = array_merge($config, $versionConfig);
 			}
+			if(!isset($productVersion)){
+				$productVersion = $versionId;
+			}
 		}
-		return $config;
+		return array($config,$productVersion);
 	}
 	
 	private function setLatestOrBetaVersionNumber()
@@ -441,21 +458,36 @@ class embedPlaykitJsAction extends sfAction
 
 		if ($isLatestVersionRequired || $isBetaVersionRequired) {
 
-			$latestVersionMap = $this->getConfigByVersion("latest");
-			$betaVersionMap = $this->getConfigByVersion("beta");
+			list($latestVersionMap, $latestProductVersion) = $this->getConfigByVersion("latest");
+			list($betaVersionMap, $betaProductVersion) = $this->getConfigByVersion("beta");
 
 			foreach ($this->bundleConfig as $key => $val)
 			{
 				if ($val == self::LATEST && $latestVersionMap != null && isset($latestVersionMap[$key]))
 				{
 					$this->bundleConfig[$key] = $latestVersionMap[$key];
+					$isAllHaveSameVersion = (!isset($versionTag) || $versionTag === self::LATEST) && $isAllHaveSameVersion !== false ? true : false;
 				}
 
 				if ($val == self::BETA && $betaVersionMap != null && isset($betaVersionMap[$key]))
 				{
 					$this->bundleConfig[$key] = $betaVersionMap[$key];
+					$isAllHaveSameVersion = (!isset($versionTag) || $versionTag === self::BETA) && $isAllHaveSameVersion !== false ? true : false;
 				}
+
+				if($val != self::BETA && $val != self::LATEST){
+					$isAllHaveSameVersion = false;
+				}
+				$versionTag = $val;
 			}
+
+			if($isAllHaveSameVersion === true){
+				if($versionTag === self::LATEST)
+					$this->setProductVersion($this->playerConfig, $latestProductVersion);
+				if($versionTag === self::BETA)
+					$this->setProductVersion($this->playerConfig, $betaProductVersion);
+			}
+
 		}
 	}
 	
