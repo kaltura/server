@@ -2,7 +2,6 @@
 class FiltersGenerator extends ClientGeneratorFromPhp 
 {
 	private $_txt = "";
-	const ABSTRACT_FILTER = 'abstractFilter';
 
 	protected function writeHeader()
 	{
@@ -88,16 +87,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		$this->appendLine(" * @package " . $type->getPackage());
 		$this->appendLine(" * @subpackage $subpackage");
 		$this->appendLine(" */");
-		$comments = $type->getComments();
-		$isAbstractFilter = strpos($comments, self::ABSTRACT_FILTER);
-		if ($isAbstractFilter !== false)
-		{
-			$this->appendLine("abstract class $filterClassName extends $filterBaseClassName");
-		}
-		else
-		{
-			$this->appendLine("class $filterClassName extends $filterBaseClassName");
-		}
+		$this->appendLine("class $filterClassName extends $filterBaseClassName");
 		$this->appendLine("{");
 		$this->appendLine("}");
 		
