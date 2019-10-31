@@ -23,8 +23,6 @@ abstract class KalturaPartnerBaseFilter extends KalturaFilter
 		"partnerPackageIn" => "_in_partner_package",
 		"partnerGroupTypeEqual" => "_eq_partner_group_type",
 		"partnerNameDescriptionWebsiteAdminNameAdminEmailLike" => "_like_partner_name-description-website-admin_name-admin_email",
-		"createdAtGreaterThanOrEqual" => "_gte_created_at",
-		"idGreaterThan" => "_gt_id",
 	);
 
 	static private $order_by_map = array
@@ -129,14 +127,4 @@ abstract class KalturaPartnerBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike;
-
-	/**
-	 * @var time
-	 */
-	public $createdAtGreaterThanOrEqual;
-
-	/**
-	 * @var int
-	 */
-	public $idGreaterThan;
 }

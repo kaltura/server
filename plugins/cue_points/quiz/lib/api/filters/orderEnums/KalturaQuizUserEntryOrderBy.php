@@ -5,5 +5,6 @@
  */
 class KalturaQuizUserEntryOrderBy extends KalturaUserEntryOrderBy
 {
-
+	const VERSION_ASC = "+version";
+	const VERSION_DESC = "-version";
 }
