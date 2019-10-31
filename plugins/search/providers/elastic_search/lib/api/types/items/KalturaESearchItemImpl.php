@@ -94,7 +94,7 @@ abstract class KalturaESearchItemImpl
 		/*
 		 * if searchTerm is wrapped with '"' - return true
 		 */
-		if(preg_match_all('/(\'|\"){1}[^\'\"]+(\'|\"){1}/',$searchTerm, $matches))
+		if(preg_match_all('/(\"){1}[^\"]+(\"){1}/',$searchTerm, $matches))
 		{
 			return true;
 		}
