@@ -60,7 +60,16 @@ class KalturaScheduleResourceFilter extends KalturaScheduleResourceBaseFilter
 		else
 		{
 			KalturaFilterPager::detachFromCriteria($c);
-			$totalCount = ScheduleResourcePeer::doCount($c);
+			if ($retrieveStatusDeleted)
+			{
+				ScheduleResourcePeer::setUseCriteriaFilter(false);
+				$totalCount = ScheduleResourcePeer::doCount($c);
+				ScheduleResourcePeer::setUseCriteriaFilter(true);
+			}
+			else
+			{
+				$totalCount = ScheduleResourcePeer::doCount($c);
+			}
 		}
 		
 		$response = new KalturaScheduleResourceListResponse();
