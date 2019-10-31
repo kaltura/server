@@ -46,32 +46,17 @@ class KalturaScheduleResourceFilter extends KalturaScheduleResourceBaseFilter
 		if ($retrieveStatusDeleted)
 		{
 			ScheduleResourcePeer::setUseCriteriaFilter(false);
-			$list = ScheduleResourcePeer::doSelect($c);
-			ScheduleResourcePeer::setUseCriteriaFilter(true);
 		}
-		else
-		{
-			$list = ScheduleResourcePeer::doSelect($c);
-		}
-
+		$list = ScheduleResourcePeer::doSelect($c);
 		$resultCount = count($list);
 		if ($resultCount && $resultCount < $pager->pageSize)
 			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
 		else
 		{
 			KalturaFilterPager::detachFromCriteria($c);
-			if ($retrieveStatusDeleted)
-			{
-				ScheduleResourcePeer::setUseCriteriaFilter(false);
-				$totalCount = ScheduleResourcePeer::doCount($c);
-				ScheduleResourcePeer::setUseCriteriaFilter(true);
-			}
-			else
-			{
-				$totalCount = ScheduleResourcePeer::doCount($c);
-			}
+			$totalCount = ScheduleResourcePeer::doCount($c);
 		}
-		
+		ScheduleResourcePeer::setUseCriteriaFilter(true);
 		$response = new KalturaScheduleResourceListResponse();
 		$response->objects = KalturaScheduleResourceArray::fromDbArray($list, $responseProfile);
 		$response->totalCount = $totalCount;
