@@ -10,6 +10,8 @@ class KApFeedDropFolderEngine extends KFeedDropFolderEngine
 	 */
 	protected $apiKey;
 	
+	const AP_FEED_PAGE_SIZE = 100;
+	
 	public function watchFolder(KalturaDropFolder $dropFolder)
 	{
 		/* @var $dropFolder KalturaApFeedDropFolder */
@@ -29,6 +31,11 @@ class KApFeedDropFolderEngine extends KFeedDropFolderEngine
 			//Get Drop Folder feed and import it into an array
 			$feedContent = $this->fetchFeedContent($feedUrl);
 			$feed = json_decode($feedContent, true);
+			if (!$feed)
+			{
+				KalturaLog::info('Feed page could not be displayed, no way to continue. Breaking out of the process.');
+				break;
+			}
 			$lastPageCount = $feed['data']['current_item_count'];
 			
 			$feedItems = $feed['data']['items'];
@@ -45,6 +52,11 @@ class KApFeedDropFolderEngine extends KFeedDropFolderEngine
 				
 				$datum = $part['item'];
 				$feedItemJson = json_decode($this->fetchFeedContent($datum['uri']), true);
+				if (!$feedItemJson)
+				{
+					KalturaLog::info('Feed item could not be retrieved, continue to the next one.');
+					continue;
+				}
 				
 				$feedItem = new DOMDocument();
 				$feedItem->loadXML('<item/>');
@@ -53,7 +65,7 @@ class KApFeedDropFolderEngine extends KFeedDropFolderEngine
 				
 				KalturaLog::info ('Single item: ' . print_r($feedItem->saveXML(), true));
 				
-				$counter += $this->watchProcessSingleItem(simplexml_import_dom($feedItem), $existingDropFolderFilesMap, $counter);
+				$counter += $this->watchProcessSingleItem(simplexml_import_dom($feedItem), $existingDropFolderFilesMap);
 				
 			}
 			
@@ -68,7 +80,7 @@ class KApFeedDropFolderEngine extends KFeedDropFolderEngine
 				$feedUrl = $feed['data']['next_page'];
 			}
 			
-		}while ($lastPageCount == 100);
+		}while ($lastPageCount == self::AP_FEED_PAGE_SIZE);
 		
 		foreach ($existingDropFolderFilesMap as $existingDropFolderFile)
 		{
