@@ -102,7 +102,7 @@ while (true)
 		SphinxLogServerPeer::clearInstancePool();
 		continue;
 	}
-	
+
 	$elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
 	
 	while (!count($elasticLogs))
@@ -110,6 +110,27 @@ while (true)
 		$skipExecutedUpdates = true;
 		sleep(1);
 		$elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
+	}
+
+	//keeping only the newest elastic logs with the same object id and object type
+	$lastElasticLogs =  array();
+	for ($i = count($elasticLogs) - 1; $i >= 0; $i --)
+	{
+		$id = $elasticLogs[$i]->getId();
+		$objType = $elasticLogs[$i]->getObjectType();
+		$objId = $elasticLogs[$i]->getObjectId();
+
+		$key = $objId . '.' .$objType;
+		if (!array_key_exists($key, $lastElasticLogs))
+		{
+			$lastElasticLogs[$key] = $id;
+			KalturaLog::debug('allowing elastic log '. $id .' object id ' . $objId . ' object type ' . $objType);
+		}
+		else
+		{
+			KalturaLog::debug('removing elastic log '. $id .' object id ' . $objId . ' object type ' . $objType . ' found in log id ' . $lastElasticLogs[$key] );
+			unset($elasticLogs[$i]);
+		}
 	}
 	
 	$ping = $elasticClient->ping();
