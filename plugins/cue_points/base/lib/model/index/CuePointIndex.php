@@ -68,7 +68,6 @@ class CuePointIndex extends BaseIndexObject
 				'force_stop' => 'forceStop',
 				'created_at' => 'createdAt',
 				'updated_at' => 'updatedAt',
-				'str_entry_id' => 'entryId',
 				'str_cue_point_id' => 'id',
 				'is_public' => 'isPublicStr',
 			);
@@ -107,7 +106,6 @@ class CuePointIndex extends BaseIndexObject
 				'force_stop' => IIndexable::FIELD_TYPE_UINT,
 				'created_at' => IIndexable::FIELD_TYPE_DATETIME,
 				'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
-				'str_entry_id' => IIndexable::FIELD_TYPE_STRING,
 				'str_cue_point_id' => IIndexable::FIELD_TYPE_STRING,
 				'is_public' => IIndexable::FIELD_TYPE_STRING,
 				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
@@ -159,7 +157,6 @@ class CuePointIndex extends BaseIndexObject
 				'cue_point.FORCE_STOP' => 'force_stop',
 				'cue_point.CREATED_AT' => 'created_at',
 				'cue_point.UPDATED_AT' => 'updated_at',
-				'cue_point.STR_ENTRY_ID' => 'str_entry_id',
 				'cue_point.STR_CUE_POINT_ID' => 'str_cue_point_id',
 				'cue_point.IS_PUBLIC' => 'is_public',
 				'cue_point.PLUGINS_DATA' => 'plugins_data',

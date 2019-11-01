@@ -107,8 +107,8 @@ abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfig
 	protected function addDistributeTriggerElement()
 	{
 		$distributeTrigger = new Kaltura_Form_Element_EnumSelect('distribute_Trigger', array('enum' => 'Kaltura_Client_ContentDistribution_Enum_DistributeTrigger'));
-		$distributeTrigger->setLabel('Auto distribute trigger:');
-		if($this->distributionProfile->distributeTrigger)
+		$distributeTrigger->setLabel('Distribute submit requirement:');
+		if($this->distributionProfile && $this->distributionProfile->distributeTrigger)
 		{
 			$distributeTrigger->setValue($this->distributionProfile->distributeTrigger);
 		}

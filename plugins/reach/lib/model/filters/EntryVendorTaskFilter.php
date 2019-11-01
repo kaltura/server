@@ -37,6 +37,8 @@ class EntryVendorTaskFilter extends baseObjectFilter
 			"_lte_queue_time",
 			"_gte_queue_time",
 			"_free_text",
+			"_gte_expected_finish_time",
+			"_lte_expected_finish_time"
 		) , NULL );
 
 		$this->allowed_order_fields = array (
@@ -47,6 +49,7 @@ class EntryVendorTaskFilter extends baseObjectFilter
 			"finished_at",
 			"price",
 			"status",
+			"expected_finish_time"
 		);
 		
 		$this->aliases = array (
@@ -64,7 +67,14 @@ class EntryVendorTaskFilter extends baseObjectFilter
 	
 	public function getFieldNameFromPeer($field_name)
 	{
-		return EntryVendorTaskPeer::translateFieldName($field_name, $this->field_name_translation_type, BasePeer::TYPE_COLNAME);
+		try
+		{
+			return EntryVendorTaskPeer::translateFieldName($field_name, $this->field_name_translation_type, BasePeer::TYPE_COLNAME);
+		}
+		catch(PropelException $e)
+		{
+			return 'entry_vendor_task.' . strtoupper($field_name);
+		}
 	}
 	
 	public function getIdFromPeer()

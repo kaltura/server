@@ -298,6 +298,65 @@ class kKavaBase extends kDruidBase
 		),
 	);
 
+	protected static $sourceFromAdminTag = array(
+		'kalturaclassroom' => 'Classroom Capture',
+		'kalturacapture' => 'Kaltura Capture',
+		'videomessage' => 'Kaltura Pitch',
+		'kms-webcast-event' => 'Kaltura Webcast',
+		'raptentry' => 'Interactive Video',
+		'webexentry' => 'Webex',
+		'zoomentry' => 'Zoom',
+		'expressrecorder' => 'Express Recorder',
+	);
+
+	protected static $sourceTypes = array(
+		0 => 'Other',
+		1 => 'Upload',
+		2 => 'Webcam',
+		3 => 'Flickr',
+		4 => 'Youtube',
+		5 => 'Url',
+		6 => 'Text',
+		7 => 'Myspace',
+		8 => 'Photobucket',
+		9 => 'Jamendo',
+		10 => 'Ccmixter',
+		11 => 'Nypl',
+		12 => 'Current',
+		13 => 'Commons',
+		20 => 'Kaltura',
+		21 => 'Kaltura user clips',
+		22 => 'Archive org',
+		23 => 'Kaltura partner',
+		24 => 'Metacafe',
+		29 => 'Live stream akamai legacy',
+		30 => 'Live stream manual',
+		31 => 'Live stream akamai universal',
+		32 => 'Live stream',
+		33 => 'Live channel',
+		34 => 'Recorded live stream',
+		35 => 'Clip',
+		36 => 'Recorded live stream',
+		37 => 'Classroom Capture',
+	);
+
+	public static function getEntrySourceType($sourceType, $adminTags)
+	{
+		// check for specific admin tags
+		$adminTags = explode(',', strtolower($adminTags));
+		foreach ($adminTags as $adminTag)
+		{
+			$adminTag = trim($adminTag);
+			if (isset(self::$sourceFromAdminTag[$adminTag]))
+			{
+				return self::$sourceFromAdminTag[$adminTag];
+			}
+		}
+
+		// use the source type
+		return self::$sourceTypes[$sourceType];
+	}
+
 	public static function isPartnerAllowed($partnerId, $serviceType) {
 	    if (kConf::hasParam(self::DRUID_URL)) {
 		if (!kConf::hasParam($serviceType))

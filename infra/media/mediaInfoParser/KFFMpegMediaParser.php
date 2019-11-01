@@ -48,7 +48,10 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	protected function getCommand($filePath=null)
 	{
 		if(!isset($filePath)) $filePath=$this->filePath;
-		return "{$this->ffprobeBin} -i {$filePath} -show_streams -show_format -show_programs -v quiet -show_data  -print_format json";
+		if(isset($this->encryptionKey))
+			return "{$this->ffprobeBin} -decryption_key {$this->encryptionKey} -i {$filePath} -show_streams -show_format -show_programs -v quiet -show_data  -print_format json";
+		else	
+			return "{$this->ffprobeBin} -i {$filePath} -show_streams -show_format -show_programs -v quiet -show_data  -print_format json";
 	}
 	
 	/**

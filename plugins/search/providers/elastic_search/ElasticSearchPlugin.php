@@ -7,6 +7,14 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
     const PLUGIN_NAME = 'elasticSearch';
     const ELASTIC_SEARCH_MANAGER = 'kElasticSearchManager';
     const ELASTIC_CORE_EXCEPTION = 'kESearchException';
+    const ELASTIC_DYNAMIC_MAP = 'elasticDynamicMap';
+    const CUTOFF_FREQUENCY = 'cutoff_frequency';
+    const CUTOFF_FREQUENCY_DEFAULT = 0.001;
+    const MAX_WORDS_NGRAM = 'max_words_for_ngram';
+    const MAX_WORDS_NGRAM_DEFAULT = 1;
+    const REDUCE_RESULTS_PARTNER_LIST = 'reduced_results_partner_list';
+    const DEDICATED_ENTRY_INDEX_PARTNER_LIST = 'dedicated_entry_index_partner_list';
+    const DEDICATED_ENTRY_INDEX_NAME = 'dedicated_entry_index_name';
 
     public static function getPluginName()
     {

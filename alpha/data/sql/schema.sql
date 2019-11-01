@@ -2515,9 +2515,11 @@ CREATE TABLE `sso`
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
+	`redirect_url` VARCHAR(1024)  NOT NULL,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_status_index`(`partner_id`, `status`),
-	KEY `domain_status_index`(`domain`, `status`)
+	KEY `domain_status_index`(`domain`, `status`),
+	KEY `redirect_url_status_index` (`redirect_url`, `status`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier

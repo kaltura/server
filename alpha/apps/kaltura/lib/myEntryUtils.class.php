@@ -2325,4 +2325,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 	}
 
+	public static function shouldValidateLocal()
+	{
+		//if multi request of more than one api call
+		return  (kCurrentContext::$multiRequest_index <= 1);
+	}
+
 }

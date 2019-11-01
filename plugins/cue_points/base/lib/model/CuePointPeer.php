@@ -20,7 +20,6 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 
 	// the search index column names for additional fields
 	const ROOTS = 'cue_point.ROOTS';
-	const STR_ENTRY_ID = 'cue_point.STR_ENTRY_ID';
 	const STR_CUE_POINT_ID = 'cue_point.STR_CUE_POINT_ID';
 	const FORCE_STOP = 'cue_point.FORCE_STOP';
 	const DURATION = 'cue_point.DURATION';

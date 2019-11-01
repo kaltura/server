@@ -1,4 +1,122 @@
+# Orion 15.10.0 #
+
+## AP Feed Drop Folder ##
+- Issue Type: Task
+- Issue ID: PSVAMB-6815
+
+### Deployment scripts ###
+Run installPlugins script
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+## Sso - add new column:redirect url, and be able to search sso profile by redirect url ##
+- Issue Type: Task
+- Issue ID: PLAT-10251
+
+### Deployment scripts ###
+Run mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_10_alter_sso_add_redirect_url_column.sql
+Run mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_10_alter_sso_index.sql
+
+## Sso - add new dedicated partner for kmc sso server ##
+- Issue Type: Task
+- Issue ID: PLAT-10252
+
+### configuration ###
+First replace all tokens from the ini file below (under kmc-sso-server section) and remove".template" from the file name :
+deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment scripts ###
+ php deployment/updates/scripts/add_permissions/2019_11_10_kmc_sso_server_add_partner.php
+
+# Orion 15.9.0 #
+
+## ESearch - reduce results in partial search ##
+- Issue Type: Task
+- Issue ID: PLAT-10234
+
+### configuration ###
+To use it you should set the elasticDynamicMap.ini with:
+cutoff_frequency = CUTOFF_FREQUENCY(EXMAPLE_0.001)
+max_words_for_ngram = MAX_WORDS_NGRAM(EXAMPLE_2)
+
+[reduced_results_partner_list]
+0 = PARTNER_ID
+
+
+## Index all caption text on entry document elasticSearch ##
+- Issue Type: Task
+- Issue ID: PLAT-10231
+
+### configuration ###
+    None
+
+### Deployment scripts ###
+    OnPrem - reindex entry index in elastic:
+	1) Remove old index - delete kaltura_entry
+	2) Create the index - curl -XPUT '{elasticHost}:{elasticPort}/kaltura_entry' --data-binary "@entry_mapping.json"
+	3) Index the entries - php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticEntries.php
+	
+
+## Reach new dashboard in admin console ##
+- Issue Type: Task
+- Issue ID: REACH2-704
+
+### configuration ###
+    update kaltura.conf file and add to kaltura_entry_vendor_task table the following field
+    rt_attr_timestamp=expected_finish_time
+    
+    Add the following to admin.ini:
+    settings.refreshInterval30Sec = 30
+
+### Deployment scripts ###
+    - php deployment/updates/scripts/add_permissions/2019_10_27_update_reach_entry_vendor_task_service.php
+    - Re-build & Re-index kaltura_entry_vendor_task table
+
+# Orion 15.8.0 #
+
+## Add systemName name to Q&A response profile  ##
+- Issue Type: Feature
+- Issue ID: WEBC-1554
+
+### Configuration ###
+    First replace all tokens from the XML files below and remove ".template" from the file name:
+    /opt/kaltura/app/deployment/updates/scripts/xml/2019_09_25_updateQandAResponseProfile_addSystemName.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2019_09_25_updateQandAResponseProfile_addSystemName.php
+
+
+## Remove str_entry_id field from kaltura_cue_point sphinx table  ##
+- Issue Type: Task
+- Issue ID: PLAT-10199
+
+### Configuration ###
+    update kaltura.conf file and remove from kaltura_cue_point table the following field
+	rt_attr_string	 = str_entry_id
+	
+#### Deployment Scripts ####	
+    Re-index kaltura_cue_point table
+
 # Orion 15.7.0 #
+
+## Add first+last name to Q&A response profile  ##
+- Issue Type: Feature
+- Issue ID: WEBC-1429
+
+### Configuration ###
+    First replace all tokens from the XML files below and remove ".template" from the file name:
+    /opt/kaltura/app/deployment/updates/scripts/xml/2019_06_26_updateQandAResponseProfile_addUserData.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2019_06_26_updateQandAResponseProfile_addUserData.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_09_11_add_webcasting_role_permission_to_user_list.php
+
+
+## Sso emails ##
+- Issue Type: Task
+- Issue ID: PLAT-9973
+
+### configuration ###
+To use the sso emails you should set the sso login link in sso.ini
 
 ## Adding flavorparam permission to Capture app ##
 - Issue Type: Task
@@ -22,6 +140,7 @@ Run mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/d
 Run install plugins:  php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 php deployment/updates/scripts/add_permissions/2019_09_04_add_sso_role_and_permissions.php
 php deployment/updates/scripts/add_permissions/2019_09_04_sso_service.php
+
 
 # Orion 15.6.0 #
 

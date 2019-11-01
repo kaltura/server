@@ -98,6 +98,7 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 	 * Last update date as Unix timestamp (In seconds)
 	 * @var time
 	 * @readonly
+	 * @filter gte,lte,order
 	 */
 	public $updatedAt;
 

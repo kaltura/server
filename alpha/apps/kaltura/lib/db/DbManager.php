@@ -247,6 +247,12 @@ class DbManager
 	public static function getSphinxConnection($read = true, $indexName = null)
 	{
 		KalturaLog::debug("Using index with name [$indexName]");
+		if($indexName && !isset(self::$config['sphinx_datasources_'.$indexName]['datasources']))
+		{
+			KalturaLog::debug("Table is not shareded will use generic index name");
+			$indexName = "sphinx_generic_connection";
+		}
+		
 		if(!isset(self::$sphinxConnection[$indexName]))
 		{
 			if($indexName && isset(self::$config['sphinx_datasources_'.$indexName]['datasources']))
