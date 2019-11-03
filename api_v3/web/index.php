@@ -32,6 +32,7 @@ $controller = KalturaFrontController::getInstance();
 $result = $controller->run();
 
 KalturaLog::info('Session counters '. KalturaMonitorClient::prettyPrintCounters());
+KalturaMonitorClient::storeCounters();
 
 $end = microtime(true);
 KalturaLog::info("API-end [".($end - $start)."]");

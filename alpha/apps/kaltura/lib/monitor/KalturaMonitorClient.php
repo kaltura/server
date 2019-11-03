@@ -3,6 +3,7 @@
  * @package infra
  * @subpackage monitor
  */
+
 class KalturaMonitorClient
 {
 	const MAX_PACKET_SIZE = 1400;
@@ -58,6 +59,38 @@ class KalturaMonitorClient
 		self::EVENT_DRUID       =>  0
 	);
 
+	const COUNTERS_PREFIX = '_MONITOR_COUNTERS_';
+	public static function storeCounters()
+	{
+		foreach (self::$sessionCounters as $key => $value)
+		{
+			if($value)
+			{
+				$success = true;
+				apc_inc(self::COUNTERS_PREFIX . $key, $value, $success);
+				if(!$success)
+				{
+					apc_store(self::COUNTERS_PREFIX . $key, $value);
+				}
+			}
+		}
+	}
+
+	public static function getStoredCounters($shouldClear)
+	{
+		$counters = array();
+		foreach (self::$sessionCounters as $key => $value)
+		{
+			$value = apc_fetch(self::COUNTERS_PREFIX . $key);
+			$counters[$key] = $value ? $value : 0;
+			if($shouldClear)
+			{
+				apc_delete(self::COUNTERS_PREFIX . $key);
+			}
+		}
+		return $counters;
+	}
+
 	public static function prettyPrintCounters()
 	{
 		$str='';
@@ -67,11 +100,12 @@ class KalturaMonitorClient
 		}
 		return $str;
 	}
-	
+
 	protected static function init()
 	{
 		if(!kConf::hasParam('monitor_uri'))
 			return null;
+
 
 		$uri = kConf::get('monitor_uri');
 		$pathInfo = parse_url($uri);
@@ -206,8 +240,8 @@ class KalturaMonitorClient
 	
 	public static function monitorDatabaseAccess($sql, $sqlTook, $hostName = null)
 	{
-		if (!self::$stream)
-			return;
+		/*if (!self::$stream)
+			return;*/
 
 		// strip the comment
 		if (substr($sql, 0, 2) == '/*')
