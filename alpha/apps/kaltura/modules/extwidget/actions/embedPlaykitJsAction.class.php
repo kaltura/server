@@ -453,37 +453,36 @@ class embedPlaykitJsAction extends sfAction
 		//if latest/beta version required set version number in config obj
 		$isLatestVersionRequired = array_search(self::LATEST, $this->bundleConfig) !== false;
 		$isBetaVersionRequired = array_search(self::BETA, $this->bundleConfig) !== false;
+		$isAllPackagesSameVersion = true;
 
 		if ($isLatestVersionRequired || $isBetaVersionRequired) {
 
 			list($latestVersionMap, $latestProductVersion) = $this->getConfigByVersion("latest");
 			list($betaVersionMap, $betaProductVersion) = $this->getConfigByVersion("beta");
+			$versionTag = end($this->bundleConfig);
 
 			foreach ($this->bundleConfig as $key => $val)
 			{
-				if ($val == self::LATEST && $latestVersionMap != null && isset($latestVersionMap[$key]))
-				{
+				if ($val == self::LATEST && $latestVersionMap != null && isset($latestVersionMap[$key])) {
 					$this->bundleConfig[$key] = $latestVersionMap[$key];
-					$isAllPackagesSameVersion = (!isset($versionTag) || $versionTag === self::LATEST) && $isAllPackagesSameVersion !== false ? true : false;
 				}
 
-				if ($val == self::BETA && $betaVersionMap != null && isset($betaVersionMap[$key]))
-				{
+				if ($val == self::BETA && $betaVersionMap != null && isset($betaVersionMap[$key])) {
 					$this->bundleConfig[$key] = $betaVersionMap[$key];
-					$isAllPackagesSameVersion = (!isset($versionTag) || $versionTag === self::BETA) && $isAllPackagesSameVersion !== false ? true : false;
 				}
 
-				if($val != self::BETA && $val != self::LATEST){
+				if($versionTag !== $val) {
 					$isAllPackagesSameVersion = false;
 				}
-				$versionTag = $val;
 			}
 
-			if($isAllPackagesSameVersion === true){
-				if($versionTag === self::LATEST)
+			if($isAllPackagesSameVersion === true) {
+				if($versionTag === self::LATEST) {
 					$this->setProductVersion($this->playerConfig, $latestProductVersion);
-				if($versionTag === self::BETA)
+				}
+				if($versionTag === self::BETA) {
 					$this->setProductVersion($this->playerConfig, $betaProductVersion);
+				}
 			}
 
 		}
