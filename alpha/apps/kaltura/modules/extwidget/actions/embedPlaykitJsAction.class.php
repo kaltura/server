@@ -427,25 +427,22 @@ class embedPlaykitJsAction extends sfAction
 		$uiconfs_content = isset($uiConfs) ? array_values($uiConfs) : null;
 		$last_uiconf_content = (is_array($uiconfs_content) && reset($uiconfs_content)) ? reset($uiconfs_content) : null;
 		$last_uiconf_config = isset($last_uiconf_content) ? $last_uiconf_content->getConfig() : '';
-		$tags = isset($last_uiconf_content) ? $last_uiconf_content->getTags() : '';
-		//get the product version from uiConf tags
-		if(preg_match('/\b([1-9][.][1-9][1-9])\b/', $tags, $tag) !== false && !isset($productVersion))
-			$productVersion = array_shift($tag);
-		return array($last_uiconf_config, $productVersion);
-		}
+		$productVersion = isset($last_uiconf_content) ? json_decode($last_uiconf_content->getConfVars()) : null;
+		return array($last_uiconf_config, $productVersion->version);
+	}
 
 	private function getConfigByVersion($version){
 		$config = array();
 		foreach ($this->uiConfTags as $tag) {
 			$versionUiConfs = uiConfPeer::getUiconfByTagAndVersion($tag, $version);
-			list($versionLastUiConf,$versionId) = $this->getLastConfig($versionUiConfs);
+			list($versionLastUiConf,$tagVersionNumber) = $this->getLastConfig($versionUiConfs);
 			$versionConfig = json_decode($versionLastUiConf, true);
 			if (is_array($versionConfig))
 			{
 				$config = array_merge($config, $versionConfig);
 			}
 			if(!isset($productVersion)){
-				$productVersion = $versionId;
+				$productVersion = $tagVersionNumber;
 			}
 		}
 		return array($config,$productVersion);
@@ -482,7 +479,6 @@ class embedPlaykitJsAction extends sfAction
 				$versionTag = $val;
 			}
 
-			//set the product version of beta of latest when all packages has same version
 			if($isAllPackagesSameVersion === true){
 				if($versionTag === self::LATEST)
 					$this->setProductVersion($this->playerConfig, $latestProductVersion);
@@ -525,7 +521,7 @@ class embedPlaykitJsAction extends sfAction
 		if (!$confVars) {
 			KExternalErrors::dieGracefully("Missing bundle configuration in uiConf, uiConfID: $this->uiconfId");
 		}
-		
+
 		//Get partner ID from QS or from UI conf
 		$this->partnerId = $this->getRequestParameter(self::PARTNER_ID_PARAM_NAME, $this->uiConf->getPartnerId());
 		$this->partner = PartnerPeer::retrieveByPK($this->partnerId);
