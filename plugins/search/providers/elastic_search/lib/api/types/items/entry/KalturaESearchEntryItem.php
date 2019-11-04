@@ -60,7 +60,8 @@ class KalturaESearchEntryItem extends KalturaESearchAbstractEntryItem
 		KalturaESearchEntryFieldName::ROOT_ID => ESearchEntryFieldName::ROOT_ID,
 		KalturaESearchEntryFieldName::PARTNER_SORT_VALUE => ESearchEntryFieldName::PARTNER_SORT_VALUE,
 		KalturaESearchEntryFieldName::CAPTIONS_CONTENT => ESearchEntryFieldName::CAPTIONS_CONTENT,
-		KalturaESearchEntryFieldName::LAST_PLAYED_AT => ESearchEntryFieldName::LAST_PLAYED_AT
+		KalturaESearchEntryFieldName::LAST_PLAYED_AT => ESearchEntryFieldName::LAST_PLAYED_AT,
+		KalturaESearchEntryFieldName::PLAYS => ESearchEntryFieldName::PLAYS,
 	);
 
 	protected function getMapBetweenObjects()

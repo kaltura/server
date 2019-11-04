@@ -42,4 +42,5 @@ class KalturaESearchEntryFieldName extends KalturaStringEnum
 	const PARTNER_SORT_VALUE = 'partner_sort_value';
 	const CAPTIONS_CONTENT = 'captions_content';
 	const LAST_PLAYED_AT = 'last_played_at';
+	const PLAYS = 'plays';
 }
