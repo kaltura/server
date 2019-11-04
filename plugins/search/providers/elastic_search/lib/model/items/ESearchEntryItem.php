@@ -54,6 +54,7 @@ class ESearchEntryItem extends ESearchItem
 		'partner_sort_value' => array('ESearchItemType::RANGE' => ESearchItemType::RANGE),
 		'captions_content' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, 'ESearchItemType::EXISTS'=> ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
 		'last_played_at' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE, 'ESearchItemType::EXISTS'=> ESearchItemType::EXISTS),
+		'plays' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 	);
 
 	protected static $field_boost_values = array(

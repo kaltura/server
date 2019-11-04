@@ -7,6 +7,8 @@ abstract class KalturaESearchItemImpl
 {
 
 	const MAX_SEARCH_TERM_LENGTH = 128;
+	const ENCLOSED_WITH_DOUBLE_QUOTATION_MARK_REGEX =  '/(\"){1}[^\"]+(\"){1}/';
+	const QUOTATION_MARK_BREAKER_REGEX = '/(\"){1}[^\"]+(\"){1}|[^\"]*/';
 
 	public static function eSearchItemToObjectImpl(&$eSearchItem, $dynamicEnumMap, $itemFieldName, $fieldEnumMap, $object_to_fill = null, $props_to_skip = array())
 	{
@@ -91,10 +93,11 @@ abstract class KalturaESearchItemImpl
 
 	protected static function enclosedInQuotationMarks($searchTerm)
 	{
+
 		/*
 		 * if searchTerm is wrapped with '"' - return true
 		 */
-		if(preg_match_all('/(\'|\"){1}[^\'\"]+(\'|\"){1}/',$searchTerm, $matches))
+		if(preg_match_all(self::ENCLOSED_WITH_DOUBLE_QUOTATION_MARK_REGEX, $searchTerm, $matches))
 		{
 			return true;
 		}
@@ -112,7 +115,7 @@ abstract class KalturaESearchItemImpl
 			list ($object_to_fill, $props_to_skip) = self::addSubTermToObj($object_to_fill, $props_to_skip, $searchTerm);
 			return array($object_to_fill, $props_to_skip);
 		}
-		else if ($itemType === KalturaESearchItemType::PARTIAL && preg_match_all('/(\'|\"){1}[^\'\"]+(\'|\"){1}|[^\'\"]*/', $searchTerm, $matches))
+		else if ($itemType === KalturaESearchItemType::PARTIAL && preg_match_all(self::QUOTATION_MARK_BREAKER_REGEX, $searchTerm, $matches))
 		{
 			$searchItems = self::handleMatches($matches[0], $itemFieldName, $object_to_fill);
 			if ($searchItems)
