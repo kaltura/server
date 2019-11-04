@@ -25,10 +25,14 @@ class KalturaApFeedDropFolder extends KalturaFeedDropFolder
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if (!$dbObject)
+		{
 			$dbObject = new ApFeedDropFolder();
+		}
 		
 		if ($this->feedItemInfo)
+		{
 			$dbObject->setFeedItemInfo($this->feedItemInfo->toObject());
+		}
 		
 		return parent::toObject($dbObject, $skip);
 	}
