@@ -69,6 +69,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		ESearchEntryFilterFields::FREE_TEXT,
 		ESearchEntryFilterFields::TOTAL_RANK,
 		ESearchEntryFilterFields::LAST_PLAYED_AT,
+		ESearchEntryFilterFields::PLAYS,
 	);
 
 	protected static $timeFields = array(
@@ -141,6 +142,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			ESearchEntryFilterFields::FREE_TEXT => ESearchUnifiedItem::UNIFIED,
 			ESearchEntryFilterFields::TOTAL_RANK => ESearchEntryOrderByFieldName::VOTES,
 			ESearchEntryFilterFields::LAST_PLAYED_AT => ESearchEntryOrderByFieldName::LAST_PLAYED_AT,
+			ESearchEntryFilterFields::PLAYS => ESearchEntryFieldName::PLAYS,
 		);
 
 		if(array_key_exists($field, $fieldsMap))
