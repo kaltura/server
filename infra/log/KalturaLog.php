@@ -10,71 +10,17 @@ class KalturaLog
 	private static $_instance = null;
 	private static $_enableTests = false;
 	
-	const EMERG   = Zend_Log::EMERG;
-	const ALERT   = Zend_Log::ALERT;
-	const CRIT    = Zend_Log::CRIT;
-	const ERR     = Zend_Log::ERR;
-	const WARN    = Zend_Log::WARN;
-	const NOTICE  = Zend_Log::NOTICE;
-	const INFO    = Zend_Log::INFO;
-	const DEBUG   = Zend_Log::DEBUG;
-
-	const LOG_TYPE_ANALYTICS = 'LOG_TYPE_ANALYTICS';
-	const STANDARD_ERROR = 'STANDARD_ERROR';
-
-	static protected $sessionCounters = array (
-	    self::EMERG => 0,
-        self::ALERT => 0,
-        self::CRIT => 0,
-        self::ERR => 0,
-        self::WARN => 0,
-        self::NOTICE => 0,
-        self::INFO => 0,
-        self::DEBUG => 0 );
-
-	const COUNTERS_PREFIX = '_LOG_COUNTERS_';
-	public static function storeCounters()
-	{
-		foreach (self::$sessionCounters as $key => $value)
-		{
-			if($value)
-			{
-				$success = true;
-				apc_inc(self::COUNTERS_PREFIX . $key, $value, $success);
-				if(!$success)
-				{
-					apc_store(self::COUNTERS_PREFIX . $key, $value);
-				}
-			}
-		}
-	}
-
-	public static function getStoredCounters($shouldClear)
-	{
-		$counters = array();
-		foreach (self::$sessionCounters as $key => $dummy)
-		{
-			$value = apc_fetch(self::COUNTERS_PREFIX . $key);
-			$counters[" $key "] = $value ? $value : 0;
-			if($shouldClear)
-			{
-				apc_delete(self::COUNTERS_PREFIX . $key);
-			}
-		}
-		return $counters;
-	}
-
-	protected static function increaseLogCounters($priority)
-	{
-		if(isset(self::$sessionCounters[$priority]))
-		{
-			self::$sessionCounters[$priority]++;
-		}
-		else
-		{
-			self::$sessionCounters[$priority]=1;
-		}
-	}
+    const EMERG   = Zend_Log::EMERG;
+    const ALERT   = Zend_Log::ALERT;
+    const CRIT    = Zend_Log::CRIT;
+    const ERR     = Zend_Log::ERR;
+    const WARN    = Zend_Log::WARN;
+    const NOTICE  = Zend_Log::NOTICE;
+    const INFO    = Zend_Log::INFO;
+    const DEBUG   = Zend_Log::DEBUG;
+    
+    const LOG_TYPE_ANALYTICS = 'LOG_TYPE_ANALYTICS';
+    const STANDARD_ERROR = 'STANDARD_ERROR';
 
 	public static function isInitialized()
 	{
@@ -84,8 +30,8 @@ class KalturaLog
 	public static function getInstance ()
 	{
 		 if (!self::$_instance) 
-			self::$_instance = new KalturaLog();
-
+		 	self::$_instance = new KalturaLog();
+		 	
 		 return self::$_instance;
 	}
 	
@@ -114,15 +60,16 @@ class KalturaLog
 	static function log($message, $priority = self::NOTICE)
 	{
 		self::initLog();
-		self::callLogger($message, $priority);
+		self::$_logger->log($message, $priority);
 	}
-
+	
 	static function alert($message)
 	{
 		self::initLog();
 		if(!$message instanceof Exception)
 			$message = new Exception($message);
-		self::callLogger($message, self::ALERT);
+			
+		self::$_logger->log($message, self::ALERT);
 	}
 
 	static function crit($message)
@@ -130,8 +77,8 @@ class KalturaLog
 		self::initLog();
 		if(!$message instanceof Exception)
 			$message = new Exception($message);
-
-		self::callLogger($message, self::CRIT);
+			
+		self::$_logger->log($message, self::CRIT);
 	}
 
 	static function err($message)
@@ -139,38 +86,32 @@ class KalturaLog
 		self::initLog();
 		if(!$message instanceof Exception)
 			$message = new Exception($message);
-
-		self::callLogger($message, self::ERR);
-	}
+			
+		self::$_logger->log($message, self::ERR);
+	}	
 
 	static function warning($message)
 	{
 		self::initLog();
-		self::callLogger($message, self::WARN);
+		self::$_logger->log($message, self::WARN);
 	}
 
 	static function notice($message)
 	{
 		self::initLog();
-		self::callLogger($message, self::NOTICE);
-	}
+		self::$_logger->log($message, self::NOTICE);
+	}	
 
 	static function info($message)
 	{
 		self::initLog();
-		self::callLogger($message, self::INFO);
+		self::$_logger->log($message, self::INFO);
 	}
 
 	static function debug($message)
 	{
 		self::initLog();
-		self::callLogger($message, self::DEBUG);
-	}
-
-	static protected function callLogger($message,$priority)
-	{
-		self::$_logger->log($message, $priority);
-		self::increaseLogCounters($priority);
+		self::$_logger->log($message, self::DEBUG);
 	}
 
 	static function analytics(array $data)
@@ -233,9 +174,9 @@ class KalturaStdoutLogger
  */
 class KalturaNullLogger
 {
-		public function log($message, $priority = KalturaLog::NOTICE)
-		{
-		}
+        public function log($message, $priority = KalturaLog::NOTICE)
+        {
+        }
 }
 
 /**
@@ -310,7 +251,7 @@ class LogDuration
 				self::$_lastMicroTime = $GLOBALS["start"];
 			else
 				self::$_lastMicroTime = $curTime;
-		}
+    	}
 		$result = sprintf("%.6f", $curTime - self::$_lastMicroTime);
 			
 		self::$_lastMicroTime = $curTime;

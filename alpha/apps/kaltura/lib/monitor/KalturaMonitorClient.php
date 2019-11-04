@@ -3,7 +3,6 @@
  * @package infra
  * @subpackage monitor
  */
-
 class KalturaMonitorClient
 {
 	const MAX_PACKET_SIZE = 1400;
@@ -61,19 +60,18 @@ class KalturaMonitorClient
 
 	public static function prettyPrintCounters()
 	{
-		$str = '';
+		$str='';
 		foreach (self::$sessionCounters as $key => $value)
 		{
 			$str .= $key . ':' . $value . ' ';
 		}
 		return $str;
 	}
-
+	
 	protected static function init()
 	{
 		if(!kConf::hasParam('monitor_uri'))
 			return null;
-
 
 		$uri = kConf::get('monitor_uri');
 		$pathInfo = parse_url($uri);
@@ -208,8 +206,8 @@ class KalturaMonitorClient
 	
 	public static function monitorDatabaseAccess($sql, $sqlTook, $hostName = null)
 	{
-		/*if (!self::$stream)
-			return;*/
+		if (!self::$stream)
+			return;
 
 		// strip the comment
 		if (substr($sql, 0, 2) == '/*')

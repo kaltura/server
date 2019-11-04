@@ -18,8 +18,8 @@ class SystemService extends KalturaBaseService
 		}
 		return parent::partnerRequired($actionName);
 	}
-
-    /**
+	
+	/**
 	 * @action ping
 	 * @return bool Always true if service is working
 	 * @ksIgnored
@@ -78,20 +78,4 @@ class SystemService extends KalturaBaseService
 		$version = file_get_contents(realpath(dirname(__FILE__)) . '/../../VERSION.txt');
 		return trim($version);
 	}
-
-    /**
-     * @action getCounters
-     * @param bool $shouldClear
-     * @return string that contains json of counters
-     * @ksignored
-     */
-	function getCountersAction($shouldClear = false)
-    {
-        KalturaLog::crit('aa');
-        KalturaResponseCacher::disableCache();
-        $serverCounters = array();
-        $serverCounters['loggerCounters'] = KalturaLog::getStoredCounters($shouldClear);
-        $serverCounters['sessionCounters'] = KalturaMonitorClient::getStoredCounters($shouldClear);
-        return (json_encode($serverCounters));
-    }
 }
