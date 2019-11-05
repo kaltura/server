@@ -79,7 +79,7 @@ class KalturaMonitorClient
 			return;
 		}
 
-		$sessionCountersShardSecret = kConf::get('SESSION_COUNTERS_SECRET','local', null);
+		$sessionCountersShardSecret = kConf::get('SESSION_COUNTERS_SECRET', 'local', null);
 		list ($clientRequestTime,$hash) = explode(',', $_SERVER[self::SESSION_COUNTERS_SECRET_HEADER]);
 
 		if($sessionCountersShardSecret && $clientRequestTime && $hash)
