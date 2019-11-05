@@ -360,6 +360,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
  */
 	public $defaultLiveStreamSegmentDuration;
 
+    /**
+     * @var int
+     */
+    public $defaultRecordingLiveConversionProfile;
+
 	/**
 	 * @var string
 	 */
@@ -479,6 +484,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"htmlPurifierBehaviour",
 		"htmlPurifierBaseListUsage",
 		"defaultLiveStreamSegmentDuration",
+		"defaultRecordingLiveConversionProfile",
 		"eSearchLanguages",
 		"publisherEnvironmentType",
 		"ovpEnvironmentUrl",
@@ -565,6 +571,12 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			$this->validatePropertyNumeric('defaultLiveStreamSegmentDuration');
 			$this->validatePropertyMinMaxValue('defaultLiveStreamSegmentDuration', KalturaLiveEntry::MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS, KalturaLiveEntry::MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS);
 		}
+
+		if (!$this->isNull('defaultRecordingLiveConversionProfile'))
+        {
+            $this->validatePropertyNumeric('defaultRecordingLiveConversionProfile');
+        }
+
 		$this->validateAllowedFromEmailWhiteList();
 		return parent::validateForUpdate($sourceObject,$propertiesToSkip);
 	}

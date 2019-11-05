@@ -1953,6 +1953,16 @@ class Partner extends BasePartner
 		$this->putInCustomData( "default_live_stream_segment_duration", $v );
 	}
 
+    public function getDefaultRecordingLiveConversionProfile()
+    {
+        return $this->getFromCustomData("default_recording_live_conversion_profile" );
+    }
+
+    public function setDefaultRecordingLiveConversionProfile($v)
+    {
+        $this->putInCustomData( "default_recording_live_conversion_profile", $v );
+    }
+
 	/**
 	 * @param      string $name
 	 * @param      string $namespace

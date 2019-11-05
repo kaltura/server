@@ -290,7 +290,8 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setIsRecordedEntry(true);
 			$recordedEntry->setTags($dbEntry->getTags());
 			$recordedEntry->setStatus(entryStatus::NO_CONTENT);
-			$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
+
+			$recordedEntry->setConversionProfileId($this->getRecordingLiveConversionProfileId($dbEntry));
 
 			// make the recorded entry to be "hidden" in search so it won't return in entry list action
 			if ($dbEntry->getRecordingOptions() && $dbEntry->getRecordingOptions()->getShouldMakeHidden())
@@ -328,6 +329,16 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		return $recordedEntry;
 	}
+
+	private function getRecordingLiveConversionProfileId(LiveEntry $liveEntry)
+    {
+        $conversionProfileId = $this->getPartner()->getDefaultRecordingLiveConversionProfile();
+        if (!$conversionProfileId)
+        {
+            $conversionProfileId = $liveEntry->getConversionProfileId();
+        }
+        return $conversionProfileId;
+    }
 
 	/**
 	 * Unregister media server from live entry
