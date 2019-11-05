@@ -427,8 +427,9 @@ class embedPlaykitJsAction extends sfAction
 		$uiconfs_content = isset($uiConfs) ? array_values($uiConfs) : null;
 		$last_uiconf_content = (is_array($uiconfs_content) && reset($uiconfs_content)) ? reset($uiconfs_content) : null;
 		$last_uiconf_config = isset($last_uiconf_content) ? $last_uiconf_content->getConfig() : '';
-		$productVersion = isset($last_uiconf_content) ? json_decode($last_uiconf_content->getConfVars()) : null;
-		return array($last_uiconf_config, $productVersion->version);
+		$productVersionJson = isset($last_uiconf_content) ? json_decode($last_uiconf_content->getConfVars()) : null;
+		$productVersion = is_array($productVersionJson) ? $productVersionJson->version : null;
+		return array($last_uiconf_config, $product_version);
 	}
 
 	private function getConfigByVersion($version){
@@ -437,11 +438,10 @@ class embedPlaykitJsAction extends sfAction
 			$versionUiConfs = uiConfPeer::getUiconfByTagAndVersion($tag, $version);
 			list($versionLastUiConf,$tagVersionNumber) = $this->getLastConfig($versionUiConfs);
 			$versionConfig = json_decode($versionLastUiConf, true);
-			if (is_array($versionConfig))
-			{
+			if (is_array($versionConfig)) {
 				$config = array_merge($config, $versionConfig);
 			}
-			if(!isset($productVersion)){
+			if(!isset($productVersion)) {
 				$productVersion = $tagVersionNumber;
 			}
 		}
@@ -459,7 +459,9 @@ class embedPlaykitJsAction extends sfAction
 
 			list($latestVersionMap, $latestProductVersion) = $this->getConfigByVersion("latest");
 			list($betaVersionMap, $betaProductVersion) = $this->getConfigByVersion("beta");
-			$versionTag = end($this->bundleConfig);
+
+			//package version to compare, product version will save jut if all the versions in uiConf similar 
+			$packageVersion = reset( $this->bundleConfig );
 
 			foreach ($this->bundleConfig as $key => $val)
 			{
@@ -471,16 +473,16 @@ class embedPlaykitJsAction extends sfAction
 					$this->bundleConfig[$key] = $betaVersionMap[$key];
 				}
 
-				if($versionTag !== $val) {
+				if($packageVersion !== $val) {
 					$isAllPackagesSameVersion = false;
 				}
 			}
 
 			if($isAllPackagesSameVersion === true) {
-				if($versionTag === self::LATEST) {
+				if($packageVersion === self::LATEST) {
 					$this->setProductVersion($this->playerConfig, $latestProductVersion);
 				}
-				if($versionTag === self::BETA) {
+				if($packageVersion === self::BETA) {
 					$this->setProductVersion($this->playerConfig, $betaProductVersion);
 				}
 			}
