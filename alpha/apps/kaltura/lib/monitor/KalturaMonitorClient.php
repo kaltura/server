@@ -70,7 +70,7 @@ class KalturaMonitorClient
 		return $str;
 	}
 
-	public static function addSessionCounters()
+	public static function monitorRequestEnd()
 	{
 		KalturaLog::info('Session data source counters ' . self::prettyPrintCounters());
 
@@ -86,7 +86,7 @@ class KalturaMonitorClient
 		{
 			if(abs(time() - $clientRequestTime) < 300)
 			{
-				if($hash === md5("$clientRequestTime,$sessionCountersShardSecret"))
+				if($hash === hash('sha256', "$clientRequestTime,$sessionCountersShardSecret"))
 				{
 					header('X-Kaltura-session-counters: ' . base64_encode(json_encode(self::$sessionCounters)));
 				}
