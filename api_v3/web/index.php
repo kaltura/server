@@ -31,40 +31,10 @@ KalturaLog::info("API-start pid:".getmypid());
 $controller = KalturaFrontController::getInstance();
 $result = $controller->run();
 
-$dataSourceAccessCounters = KalturaMonitorClient::prettyPrintCounters();
-KalturaLog::info('Session data source counters ' . $dataSourceAccessCounters);
-
-const SESSION_COUNTERS_SECRET_HEADER = 'HTTP_SESSION_COUNTERS_SECRET';
-if(isset ($_SERVER[SESSION_COUNTERS_SECRET_HEADER]))
-{
-	addSessionCounters($_SERVER[SESSION_COUNTERS_SECRET_HEADER],$dataSourceAccessCounters);
-}
+KalturaMonitorClient::addSessionCounters();
 
 $end = microtime(true);
 KalturaLog::info("API-end [".($end - $start)."]");
 KalturaLog::debug("<------------------------------------- api_v3 -------------------------------------");
 
 $cache->end($result);
-
-function addSessionCounters($sessionCountersSecretHeader, $dataSourceAccessCounters)
-{
-	$sessionCountersShardSecret = kConf::get('SESSION_COUNTERS_SECRET','local',null);
-	list ($clientRequestTime,$hash) = explode(',', $sessionCountersSecretHeader);
-	if($sessionCountersShardSecret && $clientRequestTime && $hash)
-	{
-		if(validateSessionCountersSharedSecret($sessionCountersShardSecret,$clientRequestTime,$hash))
-		{
-			header('X-Kaltura-session-counters: ' . base64_encode(json_encode($dataSourceAccessCounters)) );
-		}
-	}
-}
-
-function validateSessionCountersSharedSecret($sessionCountersShardSecret,$clientRequestTime,$hash)
-{
-	if (abs(time() - $clientRequestTime) > 300 )
-	{
-		return false;
-	}
-
-	return $hash === md5("$clientRequestTime,$sessionCountersShardSecret");
-}
