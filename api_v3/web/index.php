@@ -31,7 +31,7 @@ KalturaLog::info("API-start pid:".getmypid());
 $controller = KalturaFrontController::getInstance();
 $result = $controller->run();
 
-KalturaLog::info('Session counters '. KalturaMonitorClient::prettyPrintCounters());
+KalturaMonitorClient::addSessionCounters();
 
 $end = microtime(true);
 KalturaLog::info("API-end [".($end - $start)."]");

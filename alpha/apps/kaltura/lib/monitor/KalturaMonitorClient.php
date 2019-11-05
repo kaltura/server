@@ -35,6 +35,8 @@ class KalturaMonitorClient
 	const FIELD_QUERY_TYPE = 		'q';
 	const FIELD_FILE_PATH = 		'f';
 	const FIELD_LENGTH =			'n';
+
+	const SESSION_COUNTERS_SECRET_HEADER = 'HTTP_X_KALTURA_SESSION_COUNTERS';
 	
 	protected static $queryTypes = array(
 			'SELECT ' 		=> 'SELECT',
@@ -67,7 +69,32 @@ class KalturaMonitorClient
 		}
 		return $str;
 	}
-	
+
+	public static function addSessionCounters()
+	{
+		KalturaLog::info('Session data source counters ' . self::prettyPrintCounters());
+
+		if(!isset ($_SERVER[self::SESSION_COUNTERS_SECRET_HEADER]))
+		{
+			return;
+		}
+
+		$sessionCountersShardSecret = kConf::get('SESSION_COUNTERS_SECRET', 'local', null);
+		list ($clientRequestTime,$hash) = explode(',', $_SERVER[self::SESSION_COUNTERS_SECRET_HEADER]);
+
+		if($sessionCountersShardSecret && $clientRequestTime && $hash)
+		{
+			if(abs(time() - $clientRequestTime) < 300)
+			{
+				if($hash === md5("$clientRequestTime,$sessionCountersShardSecret"))
+				{
+					header('X-Kaltura-session-counters: ' . base64_encode(json_encode(self::$sessionCounters)));
+				}
+			}
+		}
+	}
+
+
 	protected static function init()
 	{
 		if(!kConf::hasParam('monitor_uri'))
