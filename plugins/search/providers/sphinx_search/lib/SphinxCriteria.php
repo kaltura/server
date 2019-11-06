@@ -202,9 +202,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$sqlConditions = array();
 		try
 		{
-			$QueryStartTime = microtime();
+			$QueryStartTime = microtime(true);
 			$ids = $pdo->queryAndFetchAll($sql, PDO::FETCH_COLUMN, $sqlConditions, 0);
-			$queryRunTime = microtime() - $QueryStartTime;
+			$queryRunTime = microtime(true) - $QueryStartTime;
 		}
 		catch(Exception $e)
 		{
