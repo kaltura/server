@@ -36,6 +36,8 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	const CUSTOM_DATA_CREATE_FILE_LINK ='create_file_link';
 	const CUSTOM_DATA_SHOULD_EXPORT_THUMBS ='should_export_thumbs';
 	const CUSTOM_DATA_USE_STORAGE_AS_LOCAL = 'use_storage_as_local';
+	const CUSTOM_DATA_SHOULD_KEEP_SOURCE = 'should_keep_source';
+	const CUSTOM_DATA_SHOULD_EXPORT_CAPTIONS ='should_export_captions';
 
 	/**
 	 * @var kStorageProfileScope
@@ -184,7 +186,19 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 		}
 
 		if ($flavorAsset instanceof thumbAsset)
+		{
 			return $this->getShouldExportThumbs();
+		}
+
+		if ($flavorAsset instanceof captionAsset)
+		{
+			return $this->getShouldExportCaptions();
+		}
+
+		if($flavorAsset->getIsOriginal() && $this->getShouldKeepSource())
+		{
+			return false;
+		}
 
 		if(!$this->isFlavorAssetConfiguredForExport($flavorAsset))
 		{
@@ -446,12 +460,34 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 		$this->putInCustomData(self::CUSTOM_DATA_SHOULD_EXPORT_THUMBS, $v);
 	}
 
-	public function getUseStorageAsLocal() {
+	public function getUseStorageAsLocal()
+	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_USE_STORAGE_AS_LOCAL,null, false);
 	}
 
-	public function setUseStorageAsLocal($v) {
+	public function setUseStorageAsLocal($v)
+	{
 		$this->putInCustomData(self::CUSTOM_DATA_USE_STORAGE_AS_LOCAL, $v);
+	}
+
+	public function getShouldKeepSource()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_SHOULD_KEEP_SOURCE,null, false);
+	}
+
+	public function setShouldKeepSource($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_SHOULD_KEEP_SOURCE, $v);
+	}
+
+	public function getShouldExportCaptions()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_SHOULD_EXPORT_CAPTIONS,null, false);
+	}
+
+	public function setShouldExportCaptions($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_SHOULD_EXPORT_CAPTIONS, $v);
 	}
 
 }

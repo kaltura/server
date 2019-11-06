@@ -20,8 +20,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		if($object instanceof entry && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && in_array(entryPeer::MODERATION_STATUS, $modifiedColumns) && $object->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_APPROVED)
 			return true;
 		
-		// if changed object is flavor asset or thumb asset
-		if(($object instanceof flavorAsset || $object instanceof thumbAsset) && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
+		// if changed object is flavor asset / thumb asset / caption asset
+		if(($object instanceof flavorAsset || $object instanceof thumbAsset || $object instanceof captionAsset) && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
 			return true;
 			
 		return false;		
@@ -45,8 +45,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			}
 		}
 		
-		// if changed object is flavor asset
-		if ( ($object instanceof flavorAsset || $object instanceof thumbAsset) && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
+		// if changed object is flavor asset / thumb asset / caption asset
+		if ( ($object instanceof flavorAsset || $object instanceof thumbAsset || $object instanceof captionAsset) && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
 		{
 			$entry = $object->getentry();
 			
@@ -64,7 +64,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
-		if( $object instanceof thumbAsset && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && $object->isLocalReadyStatus())
+		if( ($object instanceof thumbAsset || $object instanceof captionAsset) && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && $object->isLocalReadyStatus())
 			return true;
 		
 	}
