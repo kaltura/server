@@ -187,12 +187,12 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$sqlHash = "SPHSearch_" . md5(preg_replace('/\d/', '', $sql) . "_" . kCurrentContext::getCurrentPartnerId());
 		if ($cache)
 		{
-			$cache->add($sqlHash, 0, 3600);
-			$searchCounter = $cache->increment($sqlHash);
-			KalturaLog::log("Sql hash [$sqlHash], counter [$searchCounter]");
-			if($searchCounter > 5)
+			$cache->add($sqlHash, 5, 3600);
+			$searchCounter = $cache->decrement($sqlHash);
+			KalturaLog::log("sphinxSearchLimit: Sql hash [$sqlHash], counter [$searchCounter]");
+			if($searchCounter == 0)
 			{
-				KalturaLog::log("Exceeded max queries allowed for given hash [$sqlHash] and counter [$searchCounter] and query [$sql]");
+				KalturaLog::log("sphinxSearchLimit: Exceeded max queries allowed for given hash [$sqlHash] and query [$sql]");
 				//$cache->decrement($sqlHash);
 				//throw new kCoreException("Exceeded max queries allowed for query [$sql]", APIErrors::SEARCH_ENGINE_QUERY_FAILED);
 			}
@@ -212,7 +212,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			if(strpos($e->getMessage(), 'server has gone away') !== false && $cache)
 			{
 				KalturaLog::log("MySQL server has gone away, incrementing search query count");
-				$searchCounter = $cache->increment($sqlHash, 3);
+				$searchCounter = $cache->decrement($sqlHash, 3);
 			}
 			throw $e;
 		}
@@ -220,7 +220,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		if ($cache)
 		{
 			$delta = ($queryRunTime < 0.5) ? 2 : 1;
-			$cache->decrement($sqlHash, $delta);
+			$searchCounter = $cache->increment($sqlHash, $delta);
+			KalturaLog::log("sphinxSearchLimit: Sql hash [$sqlHash], new counter [$searchCounter]");
 		}
 		
 		if($ids === false)
