@@ -189,7 +189,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		{
 			$cache->add($sqlHash, 0, 18000);
 			$searchCounter = $cache->increment($sqlHash);
-			KalturaLog::log("Sql hash [$sqlHash], counter [$searchCounter] and query [$sql]");
+			KalturaLog::log("Sql hash [$sqlHash], counter [$searchCounter]");
 			if($searchCounter > 5)
 			{
 				KalturaLog::log("Exceeded max queries allowed for given hash [$sqlHash] and counter [$searchCounter] and query [$sql]");
