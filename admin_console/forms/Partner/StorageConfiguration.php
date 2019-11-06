@@ -210,6 +210,7 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 		$object->pathManagerParams = json_decode($properties['pathManagerParams'], true);
 		$object->shouldExportThumbs = $properties['shouldExportThumbnails'];
 		$object->shouldKeepSource = $properties['shouldKeepSource'];
+		$object->shouldExportCaptions = $properties['shouldExportCaptions'];
 		return $object;
 	}
 	
