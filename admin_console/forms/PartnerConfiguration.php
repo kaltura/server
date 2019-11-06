@@ -456,8 +456,8 @@ class Form_PartnerConfiguration extends Infra_Form
 				'filters'		=> array('StringTrim'),
 		));
 
-        $this->addElement('text', 'default_recording_live_conversion_profile', array(
-            'label'			=> 'Default Recording Live Conversion Profile:',
+        $this->addElement('text', 'default_recording_conversion_profile', array(
+            'label'			=> 'Default Recording Conversion Profile:',
             'filters'		=> array('StringTrim'),
         ));
 
@@ -1005,7 +1005,7 @@ class Form_PartnerConfiguration extends Infra_Form
 
 		$this->addDisplayGroup(
 			array_merge(
-				array('default_live_stream_entry_source_type', 'live_stream_provision_params', 'default_live_stream_segment_duration', 'default_recording_live_conversion_profile'),
+				array('default_live_stream_entry_source_type', 'live_stream_provision_params', 'default_live_stream_segment_duration', 'default_recording_conversion_profile'),
 				array('crossLine')),
 			'liveStreamConfig',
 			array('legend' => 'Live Stream Config')
