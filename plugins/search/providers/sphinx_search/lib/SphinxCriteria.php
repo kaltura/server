@@ -218,7 +218,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		
 		if ($cache)
 		{
-			$delta = ($queryRunTime < 0.5) ? 2 : 1;
+			$delta = ($queryRunTime <= 0.5) ? 2 : 1;
 			$searchCounter = $cache->increment($sqlHash, $delta);
 			KalturaLog::log("sphinxSearchLimit: Sql hash [$sqlHash], new counter [$searchCounter] queryTime [$queryRunTime]");
 		}
