@@ -187,7 +187,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$sqlHash = "SPHSearch_" . md5(preg_replace('/\d/', '', $sql) . "_" . kCurrentContext::getCurrentPartnerId());
 		if ($cache)
 		{
-			$cache->add($sqlHash, 0, 18000);
+			$cache->add($sqlHash, 0, 3600);
 			$searchCounter = $cache->increment($sqlHash);
 			KalturaLog::log("Sql hash [$sqlHash], counter [$searchCounter]");
 			if($searchCounter > 5)
@@ -203,9 +203,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$sqlConditions = array();
 		try
 		{
-			$QueryStartTime = time();
+			$QueryStartTime = microtime();
 			$ids = $pdo->queryAndFetchAll($sql, PDO::FETCH_COLUMN, $sqlConditions, 0);
-			$queryRunTime = time() - $QueryStartTime;
+			$queryRunTime = microtime() - $QueryStartTime;
 		}
 		catch(Exception $e)
 		{
@@ -219,15 +219,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		
 		if ($cache)
 		{
-			$delta = 1;
-			if($queryRunTime == 0)
-			{
-				$delta = 5;
-			}
-			if($queryRunTime <= 3)
-			{
-				$delta = 3;
-			}
+			$delta = ($queryRunTime < 0.5) ? 2 : 1;
 			$cache->decrement($sqlHash, $delta);
 		}
 		
