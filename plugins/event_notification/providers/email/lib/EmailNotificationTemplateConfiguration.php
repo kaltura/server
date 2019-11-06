@@ -71,7 +71,20 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 			'filters'		=> array('StringTrim'),
 		));
 	}
-	
+
+    private function createRecipientsList($recipientsString)
+    {
+        $pattern = '/(([\"\'][^\"\']*[\"\'])|[^@;,\"\']*)@[^;,]*/';
+        $matches = array();
+        preg_match_all($pattern, $recipientsString, $matches);
+        if (count($matches) > 0) {
+            return $matches[0];
+        }
+        else{
+            return array();
+        }
+    }
+
 	protected function getHeaderField( $headerName , $properties)
 	{
 		if (isset($properties[$headerName . '_email']))
@@ -90,8 +103,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 					$name = new Kaltura_Client_Type_StringValue();
 					$name->value = $properties[$headerNameProperty];
 				}
-				$allRecipients = str_replace(",", ";", $email->value);
-                $allRecipients = explode(";", $allRecipients);
+				$allRecipients = $this->createRecipientsList($email->value);
                 $recipientProvider = new Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider();
                 $recipientProvider->emailRecipients = array();
 
