@@ -21,20 +21,18 @@ KalturaLog::debug('dry run ['.print_r($dryRun,true).']');
 
 KalturaStatement::setDryRun($dryRun);
 
-//SELECT id,partner_id,system_name FROM event_notification_template WHERE type = '12722' AND custom_data like '%16922%';
-
-
 $criteria = new Criteria();
 $criteria->add(EventNotificationTemplatePeer::TYPE, PushNotificationPlugin::getPushNotificationTemplateTypeCoreValue(PushNotificationTemplateType::PUSH));
 $allEnts = EventNotificationTemplatePeer::doSelect($criteria);
 
+KalturaLog::log('got ['.count($allEnts).'] event notification templates');
+
 foreach ($allEnts as $ent)
 {
 	/** @var PushNotificationTemplate $ent */
-	//if ($ent->getResponseProfileId() == '16922')//prod
-	if ($ent->getResponseProfileId() == $responseProfileId) // QA
+	if ($ent->getResponseProfileId() == $responseProfileId)
 	{
-		$ent->setResponseProfileId($newResponseProfileId); //QA
+		$ent->setResponseProfileId($newResponseProfileId);
 		KalturaLog::log('Going to change event notification template [' . $ent->getId() . ']');
 		$ent->save();
 	}
