@@ -6,7 +6,7 @@
 
 class RatingPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices
 {
-	const PLUGIN_NAME = "rating";
+	const PLUGIN_NAME = "Rating";
 	
 	/* (non-PHPdoc)
     * @see IKalturaServices::getServicesMap()
@@ -14,7 +14,7 @@ class RatingPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltur
 	public static function getServicesMap()
 	{
 		$map = array(
-			'like' => 'RatingService',
+			'rating' => 'RatingService',
 		);
 		return $map;
 	}
