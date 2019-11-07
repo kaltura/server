@@ -297,6 +297,7 @@ CREATE TABLE `kvote`
 	PRIMARY KEY (`id`),
 	KEY `kshow_index`(`kshow_id`),
 	KEY `entry_user_status_index`(`entry_id`, `kuser_id`, `status`),
+	KEY `entry_user_rank_index`(`entry_id`, `kuser_id`, `rank`),
 	CONSTRAINT `kvote_FK_1`
 		FOREIGN KEY (`kshow_id`)
 		REFERENCES `kshow` (`id`),
@@ -2519,7 +2520,7 @@ CREATE TABLE `sso`
 	PRIMARY KEY (`id`),
 	KEY `partner_id_status_index`(`partner_id`, `status`),
 	KEY `domain_status_index`(`domain`, `status`),
-	KEY `redirect_url_status_index` (`redirect_url`, `status`)
+	KEY `redirect_url_status_index`(`redirect_url`, `status`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier

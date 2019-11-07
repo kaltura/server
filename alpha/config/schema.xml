@@ -341,6 +341,11 @@
 			<index-column name="kuser_id" />
 			<index-column name="status" />
 		</index>
+		<index name="entry_user_rank_index">
+			<index-column name="entry_id" />
+			<index-column name="kuser_id" />
+			<index-column name="rank" />
+		</index>
 	</table>
 	<table skipSql="false" abstract="false" name="comment" phpName="comment">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
