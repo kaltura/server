@@ -341,9 +341,8 @@
 			<index-column name="kuser_id" />
 			<index-column name="status" />
 		</index>
-		<index name="entry_user_rank_index">
+		<index name="entry_rank_index">
 			<index-column name="entry_id" />
-			<index-column name="kuser_id" />
 			<index-column name="rank" />
 		</index>
 	</table>

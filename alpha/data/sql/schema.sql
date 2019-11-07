@@ -297,7 +297,7 @@ CREATE TABLE `kvote`
 	PRIMARY KEY (`id`),
 	KEY `kshow_index`(`kshow_id`),
 	KEY `entry_user_status_index`(`entry_id`, `kuser_id`, `status`),
-	KEY `entry_user_rank_index`(`entry_id`, `kuser_id`, `rank`),
+	KEY `entry_rank_index`(`entry_id`, `rank`),
 	CONSTRAINT `kvote_FK_1`
 		FOREIGN KEY (`kshow_id`)
 		REFERENCES `kshow` (`id`),
