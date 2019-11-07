@@ -85,7 +85,7 @@ class ValidateAccessResponseProfile
 			$service->initService($serviceId, $serviceName, 'list');
 		} catch (Exception $e) {
 			KalturaLog::INFO('Response Profile Validation Access Failed For Class: ' . $clazz);
-			throw  $e;
+			return false;
 		}
 		return true;
 	}
