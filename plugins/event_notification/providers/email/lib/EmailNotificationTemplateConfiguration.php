@@ -71,6 +71,53 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 			'filters'		=> array('StringTrim'),
 		));
 	}
+
+    function createRecipientsList($recipientsString)
+    {
+        $recipientsArray = array();
+        $currentRecipient = "";
+        $singleQuoteMark = false;
+        $doubleQuoteMarks = false;
+        $charArray = str_split($recipientsString);
+        foreach($charArray as $singleChar)
+        {
+            print_r($singleChar);
+            if ($singleChar === ';' || $singleChar === ',')
+            {
+                if ($singleQuoteMark or $doubleQuoteMarks)
+                {
+                    $currentRecipient .= $singleChar;
+                }
+                else{
+                    $recipientsArray[] = $currentRecipient;
+                    $currentRecipient = "";
+                    $singleQuoteMark = false;
+                    $doubleQuoteMarks = false;
+                }
+            }
+            else{
+                $currentRecipient .= $singleChar;
+                if ($singleChar === '"')
+                {
+                    $doubleQuoteMarks = !$doubleQuoteMarks;
+                }
+                else if ($singleChar === '\'')
+                {
+                    $singleQuoteMark = !$singleQuoteMark;
+                }
+                else if ($singleChar === '@')
+                {
+                    $singleQuoteMark = false;
+                    $doubleQuoteMarks = false;
+                }
+            }
+        }
+        if (strlen($currentRecipient) > 0)
+        {
+            $recipientsArray[] = $currentRecipient;
+        }
+        return $recipientsArray;
+    }
 	
 	protected function getHeaderField( $headerName , $properties)
 	{
@@ -91,13 +138,18 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 					$name->value = $properties[$headerNameProperty];
 				}
 
-				$recipient = new Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient();
-				$recipient->email = $email;
-				$recipient->name = $name;
-
-				$recipientProvider = new Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider();
-				$recipientProvider->emailRecipients = array();
-				$recipientProvider->emailRecipients[] = $recipient;
+                $allRecipients = $this->createRecipientsList($email->value);
+                $recipientProvider = new Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider();
+                $recipientProvider->emailRecipients = array();
+                foreach ($allRecipients as $singleRecipient)
+                {
+                    $recipient = new Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient();
+                    $recipientEmail = new Kaltura_Client_Type_StringValue();
+                    $recipientEmail->value = $singleRecipient;
+                    $recipient->email = $recipientEmail;
+                    $recipient->name = $name;
+                    $recipientProvider->emailRecipients[] = $recipient;
+                }
 
 				return $recipientProvider;
 			}
@@ -110,44 +162,44 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 	
 	protected function populateHeaderField($object , $headerName)
 	{
-		if (!$object->$headerName || ($object->$headerName instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider &&  count($object->$headerName->emailRecipients) == 1 &&  get_class($object->$headerName->emailRecipients[0]->email) == 'Kaltura_Client_Type_StringValue'))
-		{
-			$headerObject = null;
-			if ($object->$headerName)
-			{
-				if(count($object->$headerName->emailRecipients) > 1)
-				{
-					$this->addError("Multiple recipients is not supported in admin console, saving the configuration will remove the existing recipients list.");
-				}
-				elseif(count($object->$headerName->emailRecipients))
-				{
-					$headerObject = reset($object->$headerName->emailRecipients);
-					/* @var $headerObject Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient */
-				}
-			}
+        $headerObject = null;
+        if ($object->$headerName)
+        {
+            $fullEmailRecipientsValue = '';
+            foreach ($object->$headerName->emailRecipients as $currentRecipient)
+            {
+                $fullEmailRecipientsValue .= trim($currentRecipient->email->value) . ';';
+            }
+            $headerObject = new Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient();
+            $headerObject->email->value = $fullEmailRecipientsValue;
+            if ($object->$headerName->emailRecipients)
+            {
+                $firstRecipient = $object->$headerName->emailRecipients[0];
+                $headerObject->name->value = $firstRecipient->name->value;
+            }
+        }
 
-			$objectEmailValue = $headerObject ? $headerObject->email->value : '';
-			$objectNameValue = $headerObject && $headerObject->name ? $headerObject->name->value : '';
+        $objectEmailValue = $headerObject ? $headerObject->email->value : '';
+        $objectNameValue = $headerObject && $headerObject->name ? $headerObject->name->value : '';
 
-			$headerEmailProperty = $headerName . '_email';
-			$headerNameProperty = $headerName . '_name';
+        $headerEmailProperty = $headerName . '_email';
+        $headerNameProperty = $headerName . '_name';
 
-			$headerName = strtoupper($headerName);
-			
-			$this->addElement('text', $headerEmailProperty, array(
-					'label'                 => 'Recipient e-mail (' . $headerName . '):',
-					'value'                 => $objectEmailValue,
-					'size'                  => 60,
-					'filters'               => array('StringTrim'),
-					'validators'    => array('EmailAddress'),
-			));
+        $headerName = strtoupper($headerName);
 
-			$this->addElement('text', $headerNameProperty, array(
-					'label'                 => 'Recipient name (' . $headerName . '):',
-					'value'                 => $objectNameValue,
-					'size'                  => 60,
-					'filters'               => array('StringTrim'),
-			));
-		}
+        $this->addElement('text', $headerEmailProperty, array(
+                'label'                 => 'Recipient e-mail (' . $headerName . '):',
+                'value'                 => $objectEmailValue,
+                'size'                  => 60,
+                'filters'               => array('StringTrim'),
+                'validators'    => array('EmailAddress'),
+        ));
+
+        $this->addElement('text', $headerNameProperty, array(
+                'label'                 => 'Recipient name (' . $headerName . '):',
+                'value'                 => $objectNameValue,
+                'size'                  => 60,
+                'filters'               => array('StringTrim'),
+        ));
 	}	
 }
