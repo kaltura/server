@@ -131,7 +131,7 @@ class RatingService extends KalturaBaseService
 	 * Action to check entry's rating counts breakdown
 	 * @param KalturaRatingCountFilter $filter
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-	 * @tKalturaRatingErrors::USER_RATING_FOR_ENTRY_NOT_FOUND
+	 * @throws KalturaRatingErrors::USER_RATING_FOR_ENTRY_NOT_FOUND
 	 * @return KalturaRatingCountListResponse
 	 */
 	public function getRatingCountsAction (KalturaRatingCountFilter $filter)
@@ -141,10 +141,14 @@ class RatingService extends KalturaBaseService
 		else
 		{
 			if(!$filter->entryIdEqual || !entryPeer::retrieveByPK($filter->entryIdEqual))
+			{
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $filter->entryIdEqual);
+			}
 			
 			if(!$filter->rankIn)
+			{
 				throw new KalturaAPIException(KalturaRatingErrors::USER_RATING_FOR_ENTRY_NOT_FOUND);
+			}
 		}
 		
 		return $filter->getListResponse(new KalturaFilterPager(), null);

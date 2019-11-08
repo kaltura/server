@@ -26,7 +26,7 @@ class RatingPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltur
 	{
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		
-		return $partner->getEnabledService(KalturaPermissionName::FEATURE_RATING);
+		return $partner->getPluginEnabled(self::PLUGIN_NAME);
 	}
 	
 	
