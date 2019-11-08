@@ -6,7 +6,7 @@
 
 class RatingPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices
 {
-	const PLUGIN_NAME = "Rating";
+	const PLUGIN_NAME = "rating";
 	
 	/* (non-PHPdoc)
     * @see IKalturaServices::getServicesMap()
