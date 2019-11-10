@@ -5401,6 +5401,17 @@ class kKavaReportsMgr extends kKavaBase
 			$input_filter->$field = $value;
 		}
 
+		if (isset($report_def[self::REPORT_GRANULARITY]) && $report_def[self::REPORT_GRANULARITY][0] == ":")
+		{
+			$param = $report_def[self::REPORT_GRANULARITY];
+			$param_name = substr($param, 1);
+			if (!isset($params[$param_name]))
+			{
+				throw new Exception("missing parameter $param_name");
+			}
+			$report_def[self::REPORT_GRANULARITY] = $params[$param_name];
+		}
+
 		$response_options = new kReportResponseOptions();
 		if (isset($report_def['response_options']))
 		{

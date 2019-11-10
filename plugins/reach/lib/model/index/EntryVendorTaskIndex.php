@@ -65,7 +65,7 @@ class EntryVendorTaskIndex extends BaseIndexObject
 				'user_id' => 'userId',
 				'context' => 'context',
 				'notes' => 'notes',
-				//'expected_finish_time' => 'expectedFinishTime',
+				'expected_finish_time' => 'expectedFinishTime',
 			);
 		}
 		return self::$fieldsMap;
@@ -95,7 +95,7 @@ class EntryVendorTaskIndex extends BaseIndexObject
 				'context' => IIndexable::FIELD_TYPE_STRING,
 				'notes' => IIndexable::FIELD_TYPE_STRING,
 				'catalog_item_data' => IIndexable::FIELD_TYPE_STRING,
-				//'expected_finish_time' => IIndexable::FIELD_TYPE_DATETIME,
+				'expected_finish_time' => IIndexable::FIELD_TYPE_DATETIME,
 			);
 		}
 		return self::$typesMap;
@@ -137,7 +137,7 @@ class EntryVendorTaskIndex extends BaseIndexObject
 				'entry_vendor_task.CONTEXT' => 'context',
 				'entry_vendor_task.NOTES' => 'notes',
 				'entry_vendor_task.CATALOG_ITEM_DATA' => 'catalog_item_data',
-				//'entry_vendor_task.EXPECTED_FINISH_TIME' => 'expected_finish_time',
+				'entry_vendor_task.EXPECTED_FINISH_TIME' => 'expected_finish_time',
 			);
 		}
 		return self::$searchableFieldsMap;
@@ -200,7 +200,7 @@ class EntryVendorTaskIndex extends BaseIndexObject
 				'entry_vendor_task.FINISH_TIME' => 'finish_time',
 				'entry_vendor_task.STATUS' => 'task_status',
 				'entry_vendor_task.PRICE' => 'price',
-				//'entry_vendor_task.EXPECTED_FINISH_TIME' => 'expected_finish_time',
+				'entry_vendor_task.EXPECTED_FINISH_TIME' => 'expected_finish_time',
 			);
 		}
 		return self::$orderFields;
@@ -240,7 +240,7 @@ class EntryVendorTaskIndex extends BaseIndexObject
 		if (!self::$apiCompareAttributesMap)
 		{
 			self::$apiCompareAttributesMap = array(
-				//'expectedFinishTime' => 'expected_finish_time',
+				'expectedFinishTime' => 'expected_finish_time',
 			);
 		}
 		return self::$apiCompareAttributesMap;
