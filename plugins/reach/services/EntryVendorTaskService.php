@@ -124,10 +124,7 @@ class EntryVendorTaskService extends KalturaBaseService
 	{
 		if (kCurrentContext::$ks_partner_id == partner::ADMIN_CONSOLE_PARTNER_ID)
 		{
-			if (PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, kCurrentContext::getCurrentPartnerId()))
-			{
 				$this->applyPartnerFilterForClass('entryVendorTask');
-			}
 		}
 		else
 		{
