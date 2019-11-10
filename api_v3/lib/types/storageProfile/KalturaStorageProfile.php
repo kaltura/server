@@ -187,6 +187,11 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	 */
 	public $shouldExportThumbs;
 
+	/**
+	 * @var bool
+	 */
+	public $useStorageAsLocal;
+
 	private static $map_between_objects = array
 	(
 		"id",
@@ -221,6 +226,7 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		"publicKey",
 		"passPhrase",
 		"shouldExportThumbs",
+		"useStorageAsLocal",
 	);
 	
 	/* (non-PHPdoc)
