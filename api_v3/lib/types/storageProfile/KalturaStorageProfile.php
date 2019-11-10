@@ -190,11 +190,6 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	/**
 	 * @var bool
 	 */
-	public $useStorageAsLocal;
-
-	/**
-	 * @var bool
-	 */
 	public $shouldKeepSource;
 
 	/**
@@ -236,7 +231,6 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		"publicKey",
 		"passPhrase",
 		"shouldExportThumbs",
-		"useStorageAsLocal",
 		"shouldKeepSource",
 		"shouldExportCaptions",
 	);
