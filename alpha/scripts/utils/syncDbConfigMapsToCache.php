@@ -79,7 +79,7 @@ foreach ($cacheObjects as $cacheObject)
 
 function getPdoConnection()
 {
-	$dbMap = kConf::getMap('db');
+	$dbMap = kConf::getMap('syncdb');
 	if(!$dbMap)
 	{
 		die('Cannot get db.ini map from configuration!');

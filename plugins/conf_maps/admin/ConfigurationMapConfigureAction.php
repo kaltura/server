@@ -21,11 +21,7 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 		$mapHost = $this->_getParam('configuration_map_host');
 		$isNew = $this->_getParam('is_new') === 'true' ? true : false;
 		$isView = $this->_getParam('is_view') === 'true' ? true : false;
-		$version = null;
-		if($isView)
-		{
-			$version = $this->_getParam('configuration_map_version') != "" ? $this->_getParam('configuration_map_version') : null;
-		}
+		$version = $this->_getParam('configuration_map_version');
 
 		$action->view->errMessage = null;
 		$action->view->form = '';
@@ -67,85 +63,54 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 		$request = $action->getRequest();
 		$configurationPluginClient = Kaltura_Client_ConfMaps_Plugin::get($this->client);
 		$configurationMapFilter = new Kaltura_Client_ConfMaps_Type_ConfMapsFilter();
-		$configurationMapFilter->nameEqual= $configurationMapName;
+		$configurationMapFilter->nameEqual = $configurationMapName;
 		$configurationMapFilter->relatedHostEqual = $configurationMapHost;
-		if ($isView)
+		if (!is_null($version))
 		{
-			if ($version)
+			$configurationMapFilter->versionEqual = $version;
+		}
+		$configurationMap = $configurationPluginClient->confMaps->get($configurationMapFilter);
+		if ($configurationMap)
+		{
+			if ($isView)
 			{
-				$configurationMapFilter->versionEqual = $version;
+				$configurationMap->isEditable = false;
 			}
 
-			$configurationMap = $configurationPluginClient->confMaps->get($configurationMapFilter);
-			foreach ($configurationMap as $item)
-			{
-				if (!is_null($item))
-				{
-					$configurationMap->isEditable = false;
-					$form = $this->initForm($action, $configurationMap);
-					break;
-				}
-			}
-		}
-		else
-		{
-			$results = $configurationPluginClient->confMaps->listAction($configurationMapFilter);
-			foreach ($results->objects as $configurationMap )
-			{
-				/* @var Kaltura_Client_ConfMaps_Type_ConfigMap $configurationMap */
-				if ( $configurationMap->name == $configurationMapName && $configurationMap->relatedHost== $configurationMapHost )
-				{
-					$form = $this->initForm($action, $configurationMap);
-					break;
-				}
-			}
-		}
+			$form = $this->initForm($action, $configurationMap);
 
-		if ($form)
-		{
-			if ($request->isPost())
+			if ($form)
 			{
-				$this->handlePost($action, $form, true);
-			}
-			else
-			{
-				$content = json_decode($configurationMap->content, true);
-				if (!is_null($content))
+				if ($request->isPost())
 				{
-					$ini = new Zend_Config($content, true);
-					$configurationMap->content = $this->iniToString($ini->toArray());
-					$form->populateFromObject($configurationMap, false);
+					$this->handlePost($action, $form, true);
 				}
 				else
 				{
-					$action->view->errMessage = "Could Not load map for Name [$configurationMapName] and Host [$configurationMapHost]";
+					if (is_null($configurationMap->rawData))
+					{
+						$mapContentArray = json_decode($configurationMap->content, true);
+						if (!empty($mapContentArray))
+						{
+							$content = iniUtils::arrayToIniString($mapContentArray);
+							$configurationMap->rawData = $content;
+						}
+					}
+					$form->populateFromObject($configurationMap, false);
 				}
 			}
-
+			else
+			{
+				$action->view->errMessage = "Could Not Load map for Name [$configurationMapName] and Host [$configurationMapHost]";
+			}
 		}
 		else
 		{
-			$action->view->errMessage = "Could Not load map for Name [$configurationMapName] and Host [$configurationMapHost]";
+			$action->view->errMessage = "Could Not Retrieve map for Name [$configurationMapName] and Host [$configurationMapHost]";
 		}
 		return $form;
 	}
 
-	protected function iniToString($ini)
-	{
-		$res = '';
-		foreach ($ini as $key => $value)
-		{
-			if (is_array($value))
-			{
-				$res .= "\n[$key]\n" . self::iniToString($value);
-			}
-			else
-			{
-				$res .= $key . " = " . (is_numeric($value) ? $value : '"' . $value . '"') . "\n";
-			}
-		}
-		return $res;
-	}
 	/***
 	 * @param $action
 	 * @return Form_ConfigurationMapConfigure|null
@@ -175,7 +140,7 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 		$form->populate($formData);
 		if ($form->isValid($formData))
 		{
-			$formData['content'] = json_encode(parse_ini_string($formData['content'],true));
+			$formData['content'] = json_encode($formData['rawData']);
 			$configurationMap = $form->getObject('Kaltura_Client_ConfMaps_Type_ConfMaps', $formData, false, true);
 
 			$form->resetUnUpdatebleAttributes($configurationMap);

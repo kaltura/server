@@ -7,21 +7,35 @@ class iniUtils
 {
 	/**
 	 * Given an associative array, this function will generate INI file string that represent it.
-	 * @param array $iniData
+	 * @param $ini
+	 * @param bool $isBaseLevel
+	 * @param null $baseKey
 	 * @return string
 	 */
-	public static function arrayToIniString(array $iniData)
+	public static function arrayToIniString($ini, $isBaseLevel = true, $baseKey = null)
 	{
 		$res = '';
-		foreach ($iniData as $key => $value)
+		foreach ($ini as $key => $value)
+		{
+			if (!is_array($value))
+			{
+				$levelKey = $baseKey ? $baseKey . ".$key" : $key;
+				$res .= $levelKey . " = " . (is_numeric($value) ? $value : '"' . $value . '"') . "\n";
+			}
+		}
+		foreach ($ini as $key => $value)
 		{
 			if (is_array($value))
 			{
-				$res .= "\n[$key]\n" . self::arrayToIniString($value);
-			}
-			else
-			{
-				$res .= $key . " = " . (is_numeric($value) ? $value : '"' . $value . '"') . "\n";
+				if ($isBaseLevel)
+				{
+					$res .= "\n[$key]\n" . self::arrayToIniString($value, false);
+				}
+				else
+				{
+					$innerKey = $baseKey ? $baseKey . ".$key" : $key;
+					$res .= self::arrayToIniString($value, false, $innerKey);
+				}
 			}
 		}
 		return $res;

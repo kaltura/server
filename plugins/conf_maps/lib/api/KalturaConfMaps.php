@@ -24,6 +24,11 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 	public $content;
 
 	/**
+	 * @var string
+	 */
+	public $rawData;
+
+	/**
 	 * IsEditable - true / false
 	 *
 	 * @var bool
@@ -105,17 +110,41 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 		parent::validateForInsert($propertiesToSkip);
 	}
 
-	public function validateContent()
+	public function validateAndHandleContent()
 	{
-		$contentArray = json_decode($this->content, true);
-		if(!$contentArray)
+		$content = json_decode($this->content, true);
+		if (is_null($content))
 		{
-			throw new KalturaAPIException(KalturaErrors::CANNOT_PARSE_CONTENT , "Cannot JSON decode content"  ,$this->content );
+			throw new KalturaAPIException(KalturaErrors::CANNOT_PARSE_CONTENT, "Cannot JSON decode content", $this->content);
 		}
-		$initStr = iniUtils::arrayToIniString($contentArray);
-		if(!parse_ini_string($initStr,true))
+
+		$filter = new KalturaConfMapsFilter();
+		$filter->relatedHostEqual = $this->relatedHost;
+		$filter->nameEqual = $this->name;
+		kApiCache::disableCache();
+		$configurationMap = $filter->getMap(true);
+		$contentToValidate = null;
+		if ($configurationMap)
 		{
-			throw new KalturaAPIException(KalturaErrors::CANNOT_PARSE_CONTENT, "Cannot parse INI", $initStr);
+			$existingMapsContent = json_decode($configurationMap->content, true);
+			if (!is_null($existingMapsContent))
+			{
+				$ini = new Zend_Config($existingMapsContent, true);
+				$contentToValidate = iniUtils::arrayToIniString($ini->toArray());
+			}
+		}
+		$contentToValidate .= "\n" . $content;
+		try
+		{
+			$tempIniFile = tempnam(sys_get_temp_dir(), 'TMP_CONF_MAP_');
+			file_put_contents($tempIniFile, $contentToValidate);
+			new Zend_Config_Ini($tempIniFile);
+			unlink($tempIniFile);
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+			throw new KalturaAPIException(KalturaErrors::CANNOT_PARSE_CONTENT, "Cannot parse INI", $content);
 		}
 	}
 

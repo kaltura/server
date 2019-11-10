@@ -28,14 +28,14 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 		return $this->loadByHostName($mapName,$hostname);
 	}
 
-	public function loadByHostName($mapName,$hostname)
+	public function loadByHostName($mapName,$hostname, $excludeHost = false)
 	{
-		$mapNames = $this->getRelevantMapList($mapName, $hostname);
+		$mapNames = $this->getRelevantMapList($mapName, $hostname, $excludeHost);
 		$this->orderMap($mapNames);
-		return $this->mergeMaps($mapNames);
+		return $this->mergeMaps($mapNames, $mapName);
 	}
 
-	protected function getRelevantMapList($requestedMapName , $hostname)
+	protected function getRelevantMapList($requestedMapName , $hostname, $excludeHost = false)
 	{
 		$filteredMapsList = array($requestedMapName);
 		$mapsList = null;
@@ -52,6 +52,9 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 					$hostPattern = isset($mapVar[1]) ? $mapVar[1] : null;
 					if ($requestedMapName == $storedMapName)
 					{
+						if ($hostname == $hostPattern && $excludeHost)
+							continue;
+
 						if ($hostPattern && $hostname != $hostPattern && $hostPattern !== '#')
 						{
 							$hostPattern = str_replace('#', '.*', $hostPattern);
@@ -68,29 +71,47 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 
 	protected function mergeMaps($mapNames)
 	{
-		$mergedMaps = array();
 		$cache = $this->getCache();
-		if(!$cache)
+		if (!$cache)
 		{
 			return null;
 		}
+		$content = null;
+		$globalContent = null;
+		/** Note: we are concatenating the text content to a single ini file content since some inheritence sections are in
+		 * different maps and only after merging them we can create the merged ini file and validate it.
+		 * Since there are also global parameters in many merged files we need to merge them get them seperatly before merging the content
+		 * otherwise they will be merged to the previous map last section and will not be in global section anymore.
+		 */
 		foreach ($mapNames as $mapName)
 		{
-			$map = $cache->get(self::CONF_MAP_PREFIX.$mapName);
-			if($map)
+			$map = $cache->get(self::CONF_MAP_PREFIX . $mapName);
+			if ($map)
 			{
-				$map = json_decode($map,true);
-				if($mergedMaps)
+				$mapContnet = json_decode($map, true);
+				if (is_array($mapContnet))
 				{
-					$mergedMaps = kEnvironment::mergeConfigItem($mergedMaps, $map);
+					KalturaLog::debug("Retrieved content in array format from RemoteCache for map - $mapName with content: \n" . print_r($mapContnet, true));
+					$mapContnet = iniUtils::arrayToIniString($mapContnet);
+				}
+				//get global section data - PREG_OFFSET_CAPTURE return offset starting point in index[1] of match
+				preg_match('/\[.*\S.*\]/m', $mapContnet, $matches, PREG_OFFSET_CAPTURE);
+				if (!empty($matches) && isset($matches[0][1]))// find the split point between the global part and the other sections
+				{
+					$globalContent .= "\n" . substr($mapContnet, 0, $matches[0][1]);
+					$content .= "\n" . substr($mapContnet, $matches[0][1]);
 				}
 				else
 				{
-					$mergedMaps = $map;
+					$globalContent .= "\n" . $mapContnet;
 				}
 			}
 		}
-		return $mergedMaps;
+		$tempIniFile = tempnam(sys_get_temp_dir(), 'TMP_CONF_MAP_');
+		file_put_contents($tempIniFile, $globalContent . "\n" . $content);
+		$ini = new Zend_Config_Ini($tempIniFile);
+		unlink($tempIniFile);
+		return $ini->toArray();
 	}
 
 	public function getHostList($requesteMapName , $hostNameRegex = null)
