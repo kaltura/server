@@ -15,7 +15,7 @@ class KApFeedDropFolderEngine extends KFeedDropFolderEngine
 	public function watchFolder(KalturaDropFolder $dropFolder)
 	{
 		/* @var $dropFolder KalturaApFeedDropFolder */
-		KalturaLog::info('Watching drop folder with ID [' . $dropFolder->id . ']');
+		KalturaLog::info("Watching drop folder with ID [" . $dropFolder->id . "]");
 		$this->dropFolder = $dropFolder;
 		$this->apiKey = $dropFolder->apApiKey;
 		
@@ -26,8 +26,8 @@ class KApFeedDropFolderEngine extends KFeedDropFolderEngine
 		$counter = 0;
 		$break = false;
 		
-		do
-		{
+		do{
+			
 			//Get Drop Folder feed and import it into an array
 			$feedContent = $this->fetchFeedContent($feedUrl);
 			$feed = json_decode($feedContent, true);
