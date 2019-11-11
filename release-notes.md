@@ -1,13 +1,5 @@
 # Orion 15.10.0 #
 
-## AP Feed Drop Folder ##
-- Issue Type: Task
-- Issue ID: PSVAMB-6815
-
-### Deployment scripts ###
-Run installPlugins script
-	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
-
 ## Sso - add new column:redirect url, and be able to search sso profile by redirect url ##
 - Issue Type: Task
 - Issue ID: PLAT-10251
