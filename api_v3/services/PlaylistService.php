@@ -237,7 +237,18 @@ class PlaylistService extends KalturaEntryService
 		}
 
 		// add the new entry
-		return $this->addAction($newPlaylist, true);
+		$clonedPlaylist =  $this->addAction($newPlaylist, true);
+		self::cloneRelatedObjects($clonedPlaylist->id, $id);
+		return $clonedPlaylist;
+	}
+
+	protected static function cloneRelatedObjects($clonedPlaylistId, $id)
+	{
+		$fileAssetList = FileAssetPeer::retrieveByObject(FileAssetObjectType::ENTRY, $id);
+		foreach ($fileAssetList as $fileAsset)
+		{
+			FileAssetService::cloneAction($fileAsset->getId(), $clonedPlaylistId);
+		}
 	}
 	
 	/**

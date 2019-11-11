@@ -260,4 +260,39 @@ class FileAssetService extends KalturaBaseService
 			
 		return $filter->getListResponse($pager, $this->getResponseProfile());   
 	}
+
+	/**
+	 * Clone file asset with id to given entry
+	 *
+	 * @action clone
+	 * @param string $id
+	 * @param string $entryId
+	 * @return KalturaFileAsset
+	 * @throws KalturaErrors::FILE_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function cloneAction($id, $entryId)
+	{
+		$newdbFileAsset = self::doClone($id, $entryId);
+		$newdbFileAsset->save();
+		$fileAsset = new KalturaFileAsset();
+		$fileAsset->fromObject($newdbFileAsset);
+		return $fileAsset;
+	}
+
+	protected static function doClone($id, $entryId)
+	{
+		$dbFileAsset = FileAssetPeer::retrieveByPK($id);
+		if (!$dbFileAsset)
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_ASSET_ID_NOT_FOUND, $id);
+		}
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
+		$newdbFileAsset = $dbFileAsset->copyToEntry($dbEntry);
+		return $newdbFileAsset;
+	}
 }

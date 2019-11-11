@@ -108,5 +108,16 @@ class FileAsset extends BaseFileAsset implements ISyncableFile, IRelatedObject
 									
 		$this->setVersion($newVersion);
 	}
-	
+
+	/**
+	 * @param entry $entry
+	 * @return FileAsset The copied fileAsset
+	 */
+	public function copyToEntry($entry)
+	{
+		$fileAssetCopy = $this->copy();
+		$fileAssetCopy->setObjectId($entry->getId());
+		return $fileAssetCopy;
+	}
+
 } // FileAsset
