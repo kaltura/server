@@ -7,8 +7,6 @@ class ApFeedDropFolderPlugin extends KalturaPlugin implements IKalturaPlugin, IK
 	const PLUGIN_NAME = 'ApFeedDropFolder';
 	
 	const DROP_FOLDER_PLUGIN_NAME = 'dropFolder';
-	
-	const FEED_DROP_FOLDER_PLUGIN_NAME = 'FeedDropFolder';
 	/**
 	 * @return array
 	 */
@@ -130,9 +128,8 @@ class ApFeedDropFolderPlugin extends KalturaPlugin implements IKalturaPlugin, IK
 	public static function dependsOn()
 	{
 		$dropFolderDependency = new KalturaDependency(self::DROP_FOLDER_PLUGIN_NAME);
-		$feedDropFolderDependency = new KalturaDependency(self::FEED_DROP_FOLDER_PLUGIN_NAME);
 		
-		return array($dropFolderDependency, $feedDropFolderDependency);
+		return array($dropFolderDependency);
 	}
 	
 	/**
