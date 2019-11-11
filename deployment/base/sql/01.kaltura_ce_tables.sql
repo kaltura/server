@@ -2714,7 +2714,9 @@ CREATE TABLE IF NOT EXISTS `sso`
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`custom_data` text,
+	`redirect_url` VARCHAR(1024)  NOT NULL,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_status_index`(`partner_id`,`status`),
-	KEY `domain_status_index`(`domain`,`status`)
+	KEY `domain_status_index`(`domain`,`status`),
+	KEY `redirect_url_status_index` (`redirect_url`, `status`)
 ) Engine=InnoDB DEFAULT CHARSET=utf8;

@@ -14,6 +14,7 @@
 			<th><?php echo $this->translate('Redirect Url'); ?></th>
 			<th><?php echo $this->translate('Creation Date'); ?></th>
 			<th><?php echo $this->translate('Last Updated Date'); ?></th>
+			<th><?php echo $this->translate('Data'); ?></th>
 			<th><?php echo $this->translate('Action'); ?></th>
 		</tr>
 		</thead>
@@ -40,6 +41,7 @@
 				<td><?php echo $ssoProfile->redirectUrl; ?></td>
 				<td><?php echo date($this->translate('time format'), $ssoProfile->createdAt); ?></td>
 				<td><?php echo date($this->translate('time format'), $ssoProfile->updatedAt); ?></td>
+				<td><?php echo $ssoProfile->data; ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $ssoProfile->id;?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
@@ -175,8 +177,8 @@
 			bgiframe: true,
 			modal: true,
 			resizable: false,
-			width: 400,
-			height: 400,
+			width: 600,
+			height: 800,
 			title: '<?php echo $this->translate('Sso Profile'); ?>',
 			buttons: {
 				'<?php echo $this->translate('Save'); ?>': function() {
@@ -214,8 +216,8 @@
 			bgiframe: true,
 			modal: true,
 			resizable: false,
-			width: 400,
-			height: 400,
+			width: 600,
+			height: 800,
 			title: '<?php echo $this->translate('Sso Profile'); ?>',
 			buttons: {
 				'<?php echo $this->translate('Save'); ?>': function() {

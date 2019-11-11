@@ -70,6 +70,7 @@ interface ReportType extends BaseEnum
    const PLATFORMS_DISCOVERY_REALTIME = 10010;
    const PLAYBACK_TYPE_REALTIME = 10011;
    const CONTENT_REALTIME = 10012;
+   const DISCOVERY_VIEW_REALTIME = 10013;
 
    //vpaas
    const CONTENT_DROPOFF_VPAAS = 20001;

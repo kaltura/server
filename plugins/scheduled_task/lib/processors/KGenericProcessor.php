@@ -11,6 +11,8 @@ class KGenericProcessor
 	 */
 	protected $taskRunner;
 
+	const MAX_RETRIES_NUM = 3;
+
 	public function __construct(KScheduledTaskRunner $taskRunner)
 	{
 		$this->taskRunner = $taskRunner;
@@ -207,7 +209,20 @@ class KGenericProcessor
 		$pager->pageSize = 500;
 		while (true)
 		{
-			$result = ScheduledTaskBatchHelper::query($this->taskRunner->getClient(), $profile, $pager);
+			$retries = 0;
+			do
+			{
+				$result = ScheduledTaskBatchHelper::query($this->taskRunner->getClient(), $profile, $pager);
+				$retries++;
+			}
+			while($retries < self::MAX_RETRIES_NUM && !$result);
+
+			if (!$result)
+			{
+				KalturaLog::crit("Failed to get back page [$pager->pageIndex]");
+				break;
+			}
+
 			if ($result->totalCount > $maxTotalCountAllowed)
 			{
 				KalturaLog::crit("List query for profile $profile->id returned too many results ($result->totalCount when the allowed total count is $maxTotalCountAllowed), suspending the profile");

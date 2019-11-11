@@ -9,6 +9,7 @@ abstract class KBatchBase implements IKalturaLogger
 	const PRIVILEGE_BATCH_JOB_TYPE = "jobtype";
 	const DEFAULT_SLEEP_INTERVAL = 5;
 	const DEFUALT_API_RETRIES_ATTEMPS = 3;
+	const MAX_FILE_ACCESS_TIME = 4;
 	
 	/**
 	 * @var KSchedularTaskConfig
@@ -452,10 +453,130 @@ abstract class KBatchBase implements IKalturaLogger
 			@chmod($filePath, $chmod);
 		}
 	}
-	
+
+	/**
+	 * @param KalturaBatchJob $job
+	 * @return array
+	 */
+	protected function getBatchJobFiles(KalturaBatchJob $job)
+	{
+		return array();
+	}
+
+	public function validateFileAccess(KalturaBatchJob $job)
+	{
+		$result = $this->verifyFilesAccess($job);
+		if(!$result)
+		{
+			$exception = new kTemporaryException();
+			$exception->setResetJobExecutionAttempts(true);
+			throw $exception;
+		}
+	}
+
+	/**
+	 * @param KalturaBatchJob $job
+	 * @return bool
+	 */
+	protected function verifyFilesAccess(KalturaBatchJob $job)
+	{
+		$result = true;
+		try
+		{
+			$files = $this->getBatchJobFiles($job);
+			foreach ($files as $file)
+			{
+				if(!$this->checkFileExists($file))
+				{
+					$file = dirname($file);
+				}
+
+				if (is_dir($file))
+				{
+					$result = $this->checkDirAccess($file);
+				}
+				else
+				{
+					$result = $this->checkFileAccess($file);
+				}
+
+				if (!$result)
+				{
+					break;
+				}
+			}
+		}
+		catch (Exception $ex)
+		{
+			$result = false;
+		}
+
+		return $result;
+	}
+
+	protected function checkDirAccess($dir)
+	{
+		$result = true;
+		$time_elapsed_secs = 10;
+		try
+		{
+			$start = microtime(true);
+			$fileName = $dir . '/test' . uniqid() . '.txt';
+			$handle = fopen($fileName, "w");
+			$bytes  = fwrite($handle, 'test');
+			if(!$bytes)
+			{
+				$result = false;
+			}
+
+			fclose($handle);
+			$time_elapsed_secs = microtime(true) - $start;
+			unlink($fileName);
+		}
+		catch(Exception $ex)
+		{
+			KalturaLog::err("No write access to directory {$dir}");
+			$result = false;
+		}
+
+		if($result && $time_elapsed_secs > self::MAX_FILE_ACCESS_TIME)
+		{
+			KalturaLog::err("No write access in reasonable time to directory {$dir} took {$time_elapsed_secs} seconds");
+			$result = false;
+		}
+		return $result;
+	}
+
+	protected function checkFileAccess($file)
+	{
+		$time_elapsed_secs = 10;
+		try
+		{
+			$start = microtime(true);
+			$handle = fopen($file, "rb");
+			fread($handle, 5);
+			fclose($handle);
+			$time_elapsed_secs = microtime(true) - $start;
+		}
+		catch(Exception $ex)
+		{
+			KalturaLog::err("No write access to file {$file}");
+			return false;
+		}
+
+		if($time_elapsed_secs > self::MAX_FILE_ACCESS_TIME)
+		{
+			KalturaLog::err("No write access in reasonable time to file {$file}, took {$time_elapsed_secs} seconds");
+			return false;
+		}
+
+		return true;
+	}
+
 	/**
 	 * @param string $file
 	 * @param int $size
+	 * @param bool|null $directorySync
 	 * @return bool
 	 */
 	protected function checkFileExists($file, $size = null, $directorySync = null)
@@ -533,9 +654,9 @@ abstract class KBatchBase implements IKalturaLogger
 	 */
 	public static function createDir($path, $rights = 0777)
 	{
-		if(! is_dir($path))
+		if(!is_dir($path))
 		{
-			if(! file_exists($path))
+			if(!file_exists($path))
 			{
 				KalturaLog::info("Creating temp directory [$path]");
 				mkdir($path, $rights, true);

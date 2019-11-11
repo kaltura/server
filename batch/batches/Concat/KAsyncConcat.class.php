@@ -68,11 +68,24 @@ class KAsyncConcat extends KJobHandlerWorker
 		return $this->concat($job, $job->data);
 	}
 
+	protected function getBatchJobFiles(KalturaBatchJob $job)
+	{
+		$files = array();
+		$jobData = $job->data;
+		$fileName = "{$job->entryId}_{$jobData->flavorAssetId}.mp4";
+		$files[] = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
+		$files[] = $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
+		foreach($files->srcFiles as $srcFile)
+		{
+			$files[] = $srcFile->value;
+		}
+
+		return $files;
+	}
+
 	protected function concat(KalturaBatchJob $job, KalturaConcatJobData $data)
 	{
 		$this->updateJob($job, "Files concatenation started", KalturaBatchJobStatus::PROCESSING);
-		$jobData = $job->data;
-		
 		$ffmpegBin = KBatchBase::$taskConfig->params->ffmpegCmd;
 		$ffprobeBin = isset(KBatchBase::$taskConfig->params->ffprobeCmd)? KBatchBase::$taskConfig->params->ffprobeCmd: "ffprobe";
 		$mediaInfoBin = isset(KBatchBase::$taskConfig->params->mediaInfoCmd)? KBatchBase::$taskConfig->params->mediaInfoCmd: "mediainfo";
