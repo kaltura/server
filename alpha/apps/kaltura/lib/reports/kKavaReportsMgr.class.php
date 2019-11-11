@@ -3359,7 +3359,7 @@ class kKavaReportsMgr extends kKavaBase
 		// leave non-integer values as is (e.g. 'Unknown')
 		foreach ($ids as $index => $id)
 		{
-			if (ctype_digit($id))
+			if (ctype_digit((string)$id))
 			{
 				continue;
 			}
@@ -3578,7 +3578,7 @@ class kKavaReportsMgr extends kKavaBase
 		foreach ($ids as $index => $id)
 		{
 			if (isset(self::$error_ids[$id]) || 
-				($int_ids_only && !ctype_digit($id)))
+				($int_ids_only && !ctype_digit((string)$id)))
 			{
 				unset($ids[$index]);
 				$result[$id] = $id;
