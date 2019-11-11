@@ -64,7 +64,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		
 	}
 	
-	protected function watchProcessSingleItem (SimpleXMLElement $feedItem, array $existingDropFolderFilesMap)
+	protected function watchProcessSingleItem (SimpleXMLElement $feedItem, array &$existingDropFolderFilesMap)
 	{
 		$result = 0;
 		
