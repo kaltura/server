@@ -110,12 +110,12 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 		parent::validateForInsert($propertiesToSkip);
 	}
 
-	public function validateAndHandleContent()
+	public function validateContent()
 	{
 		$content = json_decode($this->content, true);
-		if (is_null($content))
+		if (json_last_error() != JSON_ERROR_NONE)
 		{
-			throw new KalturaAPIException(KalturaErrors::CANNOT_PARSE_CONTENT, "Cannot JSON decode content", $this->content);
+			throw new KalturaAPIException(KalturaErrors::CANNOT_PARSE_CONTENT, 'Cannot JSON decode content', $this->content);
 		}
 
 		$filter = new KalturaConfMapsFilter();
@@ -133,18 +133,16 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 				$contentToValidate = iniUtils::arrayToIniString($ini->toArray());
 			}
 		}
-		$contentToValidate .= "\n" . $content;
+		$contentToValidate .= PHP_EOL . $content;
 		try
 		{
-			$tempIniFile = tempnam(sys_get_temp_dir(), 'TMP_CONF_MAP_');
-			file_put_contents($tempIniFile, $contentToValidate);
-			new Zend_Config_Ini($tempIniFile);
-			unlink($tempIniFile);
+			//To validate that we can transform the content to a valid ini file
+			iniUtils::iniStringToIniArray($contentToValidate);
 		}
 		catch (Exception $e)
 		{
-			KalturaLog::err($e->getMessage());
-			throw new KalturaAPIException(KalturaErrors::CANNOT_PARSE_CONTENT, "Cannot parse INI", $content);
+			KalturaLog::warning($e->getMessage());
+			throw new KalturaAPIException(KalturaErrors::CANNOT_PARSE_CONTENT, 'Cannot parse INI', $content);
 		}
 	}
 

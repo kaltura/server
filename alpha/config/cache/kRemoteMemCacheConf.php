@@ -5,7 +5,7 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 {
 	const MAP_LIST_KEY = 'MAP_LIST_KEY';
 	const MAP_DELIMITER = '|';
-
+	const GLOBAL_INI_SECTION_REGEX = '/\[.*\S.*\]/m';
 	public function loadKey()
 	{
 		$key=null;
@@ -52,8 +52,10 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 					$hostPattern = isset($mapVar[1]) ? $mapVar[1] : null;
 					if ($requestedMapName == $storedMapName)
 					{
-						if ($hostname == $hostPattern && $excludeHost)
+						if ($hostname === $hostPattern && $excludeHost)
+						{
 							continue;
+						}
 
 						if ($hostPattern && $hostname != $hostPattern && $hostPattern !== '#')
 						{
@@ -95,23 +97,19 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 					$mapContnet = iniUtils::arrayToIniString($mapContnet);
 				}
 				//get global section data - PREG_OFFSET_CAPTURE return offset starting point in index[1] of match
-				preg_match('/\[.*\S.*\]/m', $mapContnet, $matches, PREG_OFFSET_CAPTURE);
-				if (!empty($matches) && isset($matches[0][1]))// find the split point between the global part and the other sections
+				preg_match(self::GLOBAL_INI_SECTION_REGEX, $mapContnet, $matches, PREG_OFFSET_CAPTURE);
+				if (isset($matches[0][1]))// find the split point between the global part and the other sections
 				{
-					$globalContent .= "\n" . substr($mapContnet, 0, $matches[0][1]);
-					$content .= "\n" . substr($mapContnet, $matches[0][1]);
+					$globalContent .= PHP_EOL . substr($mapContnet, 0, $matches[0][1]);
+					$content .= PHP_EOL . substr($mapContnet, $matches[0][1]);
 				}
 				else
 				{
-					$globalContent .= "\n" . $mapContnet;
+					$globalContent .= PHP_EOL . $mapContnet;
 				}
 			}
 		}
-		$tempIniFile = tempnam(sys_get_temp_dir(), 'TMP_CONF_MAP_');
-		file_put_contents($tempIniFile, $globalContent . "\n" . $content);
-		$ini = new Zend_Config_Ini($tempIniFile);
-		unlink($tempIniFile);
-		return $ini->toArray();
+		return iniUtils::iniStringToIniArray($globalContent . PHP_EOL . $content);
 	}
 
 	public function getHostList($requesteMapName , $hostNameRegex = null)
