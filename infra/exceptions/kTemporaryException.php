@@ -3,8 +3,8 @@
  * @package infra
  * @subpackage Exceptions
  * 
- * this calss is an exception calss represents a minor exception.
- * the concrete usage of this calss is to pass a batch_job retry request to KAsyncConvert.
+ * this class is an exception class represents a minor exception.
+ * the concrete usage of this class is to pass a batch_job retry request to KAsyncConvert.
  */
 class kTemporaryException extends kException
 {

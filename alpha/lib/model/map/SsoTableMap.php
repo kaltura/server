@@ -45,6 +45,7 @@ class SsoTableMap extends TableMap {
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('REDIRECT_URL', 'RedirectUrl', 'VARCHAR', true, 1024, null);
 		// validators
 	} // initialize()
 

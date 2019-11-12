@@ -24,6 +24,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_LOCATION_COUNTRY = 'location.country';
 	const DIMENSION_LOCATION_REGION = 'location.region';
 	const DIMENSION_LOCATION_CITY = 'location.city';
+	const DIMENSION_LOCATION_ISP = 'location.isp';
 	const DIMENSION_DOMAIN = 'urlParts.domain';
 	const DIMENSION_URL = 'urlParts.canonicalUrl';
 	const DIMENSION_KUSER_ID = 'kuserId';
@@ -61,11 +62,15 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_USER_ENGAGEMENT = 'userEngagement';
 	const DIMENSION_EVENT_PROPERTIES = 'eventProperties';
 	const DIMENSION_FLAVOR_PARAMS_ID = 'flavorParamsId';
+	const DIMENSION_PLAYER_VERSION = 'playerVersion';
+	const DIMENSION_POSITION = 'position';
+
 
 	// metrics
 	const METRIC_COUNT = 'count';
 	const METRIC_BUFFER_TIME_SUM = 'bufferTimeSum';
 	const METRIC_BITRATE_SUM = 'bitrateSum';
+	const METRIC_EVENT_DOUBLE_SUM1 = 'eventDoubleSum1';
 
 	// playback types
 	const PLAYBACK_TYPE_VOD = 'vod';
@@ -99,6 +104,9 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_SOURCE_SELECTED = 'sourceSelected';
 	const EVENT_TYPE_INFO = 'info';
 	const EVENT_TYPE_SPEED = 'speed';
+	const EVENT_TYPE_FLAVOR_SWITCH = 'flavorSwitch';
+	const EVENT_TYPE_BUFFER_START = 'bufferStart';
+	const EVENT_TYPE_ERROR = 'error';
 	const EVENT_TYPE_VIEW = 'view';
 	const EVENT_TYPE_VIEW_PERIOD = 'viewPeriod';
 
@@ -131,15 +139,18 @@ class kKavaBase extends kDruidBase
 	const TASK_READY = "Ready";
 
 	// event properties
-
 	const PROPERTY_HAS_BITRATE = 'hasBitrate';
 	const PROPERTY_IS_BUFFERING = 'isBuffering';
 	const PROPERTY_HAS_BANDWIDTH = 'hasBandwidth';
 	const PROPERTY_HAS_LATENCY = 'hasLatency';
 	const PROPERTY_HAS_DROPPED_FRAMES_RATIO = 'hasDroppedFramesRatio';
+	const PROPERTY_HAS_JOIN_TIME = 'hasJoinTime';
 
 	//user engagement values
 	const USER_ENGAGED = 'SoundOnTabFocused';
+
+	//general values
+	const VALUE_UNKNOWN = 'Unknown';
 
 	protected static $datasources_dimensions = array(
 		self::DATASOURCE_HISTORICAL => array(
@@ -282,6 +293,8 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_CUSTOM_VAR2 => 1,
 			self::DIMENSION_CUSTOM_VAR3 => 1,
 			self::DIMENSION_EVENT_PROPERTIES => 1,
+			self::DIMENSION_PLAYER_VERSION => 1,
+			self::DIMENSION_POSITION => 1,
 		),
 	);
 

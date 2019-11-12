@@ -102,7 +102,7 @@ while (true)
 		SphinxLogServerPeer::clearInstancePool();
 		continue;
 	}
-	
+
 	$elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
 	
 	while (!count($elasticLogs))
@@ -111,6 +111,19 @@ while (true)
 		sleep(1);
 		$elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
 	}
+
+	//keeping only the newest elastic log with the same object id and object type
+	$assocElasticLogs = array();
+	foreach ($elasticLogs as $log)
+	{
+		$key = $log->getObjectId() . '.' . $log->getObjectType();
+		if (array_key_exists($key, $assocElasticLogs))
+		{
+			KalturaLog::debug('elastic log ' . $log->getId() . ' object id ' . $log->getObjectId() . ' object type ' . $log->getObjectType() . ' found in log id ' . $assocElasticLogs[$key]->getId());
+		}
+		$assocElasticLogs[$key] = $log;
+	}
+	$elasticLogs = $assocElasticLogs;
 	
 	$ping = $elasticClient->ping();
 	

@@ -69,7 +69,15 @@ class KAsyncConvertLiveSegment extends KJobHandlerWorker
 	{
 		return $this->convert($job, $job->data);
 	}
-	
+
+	protected function getBatchJobFiles(KalturaBatchJob $job)
+	{
+		$files = array();
+		$files[] =  $this->localTempPath;
+		$files[] =  $this->sharedTempPath;
+		return $files;
+	}
+
 	protected function convert(KalturaBatchJob $job, KalturaConvertLiveSegmentJobData $data)
 	{
 		$this->updateJob($job, "File conversion started", KalturaBatchJobStatus::PROCESSING);

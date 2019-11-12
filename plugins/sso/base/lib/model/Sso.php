@@ -15,10 +15,10 @@
  */
 class Sso extends BaseSso {
 
-	const REDIRECT_URL = 'redirectUrl';
+	const DATA = 'data';
 
-	public function setRedirectUrl ($v)	{ $this->putInCustomData ( self::REDIRECT_URL, $v);	}
+	public function setData($v)	{ $this->putInCustomData ( self::DATA, $v);	}
 
-	public function getRedirectUrl ()	{ return $this->getFromCustomData(self::REDIRECT_URL);	}
+	public function getData ()	{ return $this->getFromCustomData(self::DATA);	}
 
 } // Sso

@@ -154,7 +154,7 @@ class kBusinessPostConvertDL
 			}
 		}
 
-		if(($currentFlavorAsset->getentry()->getStatus() == entryStatus::READY) && ($currentFlavorAsset->getentry()->getReplacedEntryId()))
+		if(kReplacementHelper::shouldSyncFlavorInfo($currentFlavorAsset, $currentFlavorAsset->getentry()))
 		{
 			kReplacementHelper::copyReadyReplacingEntryAssetToReplacedEntry($currentFlavorAsset);
 		}

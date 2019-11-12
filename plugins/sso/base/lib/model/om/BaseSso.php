@@ -68,6 +68,12 @@ abstract class BaseSso extends BaseObject  implements Persistent {
 	protected $custom_data;
 
 	/**
+	 * The value for the redirect_url field.
+	 * @var        string
+	 */
+	protected $redirect_url;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -250,6 +256,16 @@ abstract class BaseSso extends BaseObject  implements Persistent {
 	public function getCustomData()
 	{
 		return $this->custom_data;
+	}
+
+	/**
+	 * Get the [redirect_url] column value.
+	 *
+	 * @return     string
+	 */
+	public function getRedirectUrl()
+	{
+		return $this->redirect_url;
 	}
 
 	/**
@@ -486,6 +502,29 @@ abstract class BaseSso extends BaseObject  implements Persistent {
 	} // setCustomData()
 
 	/**
+	 * Set the value of [redirect_url] column.
+	 *
+	 * @param      string $v new value
+	 * @return     Sso The current object (for fluent API support)
+	 */
+	public function setRedirectUrl($v)
+	{
+		if(!isset($this->oldColumnsValues[SsoPeer::REDIRECT_URL]))
+			$this->oldColumnsValues[SsoPeer::REDIRECT_URL] = $this->redirect_url;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->redirect_url !== $v) {
+			$this->redirect_url = $v;
+			$this->modifiedColumns[] = SsoPeer::REDIRECT_URL;
+		}
+
+		return $this;
+	} // setRedirectUrl()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -528,6 +567,7 @@ abstract class BaseSso extends BaseObject  implements Persistent {
 			$this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
 			$this->custom_data = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->redirect_url = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -537,7 +577,7 @@ abstract class BaseSso extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 8; // 8 = SsoPeer::NUM_COLUMNS - SsoPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 9; // 9 = SsoPeer::NUM_COLUMNS - SsoPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating Sso object", $e);
@@ -1081,6 +1121,9 @@ abstract class BaseSso extends BaseObject  implements Persistent {
 			case 7:
 				return $this->getCustomData();
 				break;
+			case 8:
+				return $this->getRedirectUrl();
+				break;
 			default:
 				return null;
 				break;
@@ -1110,6 +1153,7 @@ abstract class BaseSso extends BaseObject  implements Persistent {
 			$keys[5] => $this->getCreatedAt(),
 			$keys[6] => $this->getUpdatedAt(),
 			$keys[7] => $this->getCustomData(),
+			$keys[8] => $this->getRedirectUrl(),
 		);
 		return $result;
 	}
@@ -1165,6 +1209,9 @@ abstract class BaseSso extends BaseObject  implements Persistent {
 			case 7:
 				$this->setCustomData($value);
 				break;
+			case 8:
+				$this->setRedirectUrl($value);
+				break;
 		} // switch()
 	}
 
@@ -1197,6 +1244,7 @@ abstract class BaseSso extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
 		if (array_key_exists($keys[7], $arr)) $this->setCustomData($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setRedirectUrl($arr[$keys[8]]);
 	}
 
 	/**
@@ -1216,6 +1264,7 @@ abstract class BaseSso extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(SsoPeer::CREATED_AT)) $criteria->add(SsoPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(SsoPeer::UPDATED_AT)) $criteria->add(SsoPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(SsoPeer::CUSTOM_DATA)) $criteria->add(SsoPeer::CUSTOM_DATA, $this->custom_data);
+		if ($this->isColumnModified(SsoPeer::REDIRECT_URL)) $criteria->add(SsoPeer::REDIRECT_URL, $this->redirect_url);
 
 		return $criteria;
 	}
@@ -1315,6 +1364,8 @@ abstract class BaseSso extends BaseObject  implements Persistent {
 		$copyObj->setUpdatedAt($this->updated_at);
 
 		$copyObj->setCustomData($this->custom_data);
+
+		$copyObj->setRedirectUrl($this->redirect_url);
 
 
 		$copyObj->setNew(true);

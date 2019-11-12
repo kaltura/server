@@ -43,4 +43,6 @@ interface ESearchEntryFieldName extends BaseEnum
 	const PRIVACY_BY_CONTEXTS = 'privacy_by_contexts';
 	const PARTNER_SORT_VALUE = 'partner_sort_value';
 	const CAPTIONS_CONTENT = 'captions_content';
+	const LAST_PLAYED_AT = 'last_played_at';
+	const PLAYS = 'plays';
 }

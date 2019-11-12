@@ -65,5 +65,13 @@ class conversionProfile2Peer extends BaseconversionProfile2Peer
 		
 		return conversionProfile2Peer::doSelectOne($c);
 	}
+
+	public static function retrieveByPKAndPartnerId($id, $partnerId)
+    {
+        $c = new Criteria();
+        $c->addAnd(conversionProfile2Peer::ID, $id);
+        $c->addAnd(conversionProfile2Peer::PARTNER_ID, $partnerId);
+        return conversionProfile2Peer::doSelectOne($c);
+    }
 	
 }
