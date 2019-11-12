@@ -105,7 +105,6 @@ class KGenericScheduler
 			if(!$this->schedulerConfig->reloadRequired())
 				return;
 
-			sleep(2); // make sure the file finsied to be written
 			$this->schedulerConfig->load();
 		}
 

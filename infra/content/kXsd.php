@@ -476,7 +476,7 @@ class kXsd
 		
 		$to = new KDOMDocument();
 		$to->loadXML($output);
-		if(!$to->schemaValidate($xsdFile->filePath, $xsdFile->encryptionKey, KBatchBase::getIV()))
+		if(!$to->schemaValidate($xsdFile->filePath, $xsdFile->encryptionKey, kConf::get("encryption_iv")))
 			return false;
 		
 		return $output;
