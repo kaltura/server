@@ -90,26 +90,31 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 			$map = $cache->get(self::CONF_MAP_PREFIX . $mapName);
 			if ($map)
 			{
-				$mapContnet = json_decode($map, true);
-				if (is_array($mapContnet))
-				{
-					KalturaLog::debug("Retrieved content in array format from RemoteCache for map - $mapName with content: \n" . print_r($mapContnet, true));
-					$mapContnet = iniUtils::arrayToIniString($mapContnet);
-				}
-				//get global section data - PREG_OFFSET_CAPTURE return offset starting point in index[1] of match
-				preg_match(self::GLOBAL_INI_SECTION_REGEX, $mapContnet, $matches, PREG_OFFSET_CAPTURE);
-				if (isset($matches[0][1]))// find the split point between the global part and the other sections
-				{
-					$globalContent .= PHP_EOL . substr($mapContnet, 0, $matches[0][1]);
-					$content .= PHP_EOL . substr($mapContnet, $matches[0][1]);
-				}
-				else
-				{
-					$globalContent .= PHP_EOL . $mapContnet;
-				}
+				$mapContent = json_decode($map, true);
+				$this->handleContent($mapContent, $mapName, $globalContent, $content);
 			}
 		}
 		return iniUtils::iniStringToIniArray($globalContent . PHP_EOL . $content);
+	}
+
+	protected function handleContent($mapContent, $mapName, &$globalContent, &$content)
+	{
+		if (is_array($mapContent))
+		{
+			KalturaLog::debug("Retrieved content in array format from RemoteCache for map - $mapName with content: \n" . print_r($mapContent, true));
+			$mapContent = iniUtils::arrayToIniString($mapContent);
+		}
+		//get global section data - PREG_OFFSET_CAPTURE return offset starting point in index[1] of match
+		preg_match(self::GLOBAL_INI_SECTION_REGEX, $mapContent, $matches, PREG_OFFSET_CAPTURE);
+		if (isset($matches[0][1]))// find the split point between the global part and the other sections
+		{
+			$globalContent .= PHP_EOL . substr($mapContent, 0, $matches[0][1]);
+			$content .= PHP_EOL . substr($mapContent, $matches[0][1]);
+		}
+		else
+		{
+			$globalContent .= PHP_EOL . $mapContent;
+		}
 	}
 
 	public function getHostList($requesteMapName , $hostNameRegex = null)
