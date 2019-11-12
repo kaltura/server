@@ -29,7 +29,7 @@ class KalturaConfMapsFilter extends KalturaConfMapsBaseFilter
 				$contentData = json_decode($apiMapObject->content, true);
 				if (is_array($contentData))
 				{
-					KalturaLog::debug("Retrieved content in array format from RemoteCache for map - " . $apiMapObject->name . " with content: \n" . print_r($contentData,true));
+					KalturaLog::debug('Retrieved content in array format from RemoteCache for map - ' . $apiMapObject->name . " with content: \n" . print_r($contentData,true));
 				}
 				else
 				{
@@ -86,12 +86,12 @@ class KalturaConfMapsFilter extends KalturaConfMapsBaseFilter
 				$contentData = json_decode($confMap->content, true);
 				if (is_array($contentData))
 				{
-					KalturaLog::debug("Retrieved content in array format from RemoteCache for map - " . $confMap->name . " with content: \n" . print_r($contentData,true));
+					KalturaLog::debug('Retrieved content in array format from RemoteCache for map - ' . $confMap->name . " with content: \n" . print_r($contentData,true));
 				}
 				else
 				{
 					$confMap->rawData = $contentData;
-					$ini = parse_ini_string ( $contentData,true );
+					$ini = parse_ini_string($contentData, true);
 					$confMap->content = json_encode($ini);
 				}
 				return $confMap;
