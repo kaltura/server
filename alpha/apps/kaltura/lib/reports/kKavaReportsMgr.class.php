@@ -66,6 +66,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_JOIN_TIME_SUM = 'join_time_sum';
 	const METRIC_JOIN_TIME_COUNT = 'join_time_count';
 	const METRIC_UNIQUE_SESSIONS = 'unique_sessions';
+	const METRIC_UNIQUE_VIEWERS = 'unique_viewers';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -338,6 +339,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_UNIQUE_BUFFERING_USERS => 'floor',
 		self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR => 'floor',
 		self::METRIC_UNIQUE_SESSIONS => 'floor',
+		self::METRIC_UNIQUE_VIEWERS => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -372,6 +374,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_AVG_SESSION_ERROR_RATE => true,
 		self::METRIC_AVG_JOIN_TIME => true,
 		self::METRIC_ENGAGEMENT_RANKING => true,
+		self::METRIC_UNIQUE_VIEWERS => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -725,6 +728,10 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_SESSIONS] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
 			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_SESSIONS, self::METRIC_UNIQUE_SESSION_ID));
+
+		self::$aggregations_def[self::METRIC_UNIQUE_VIEWERS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_VIEWERS, self::METRIC_UNIQUE_USER_IDS));
 
 		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_ENGAGED_USERS] = self::getFilteredAggregator(
 			self::getAndFilter(array(
