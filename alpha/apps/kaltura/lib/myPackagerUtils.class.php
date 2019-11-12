@@ -9,6 +9,8 @@ class myPackagerUtils
 	const LOCAL_MAP_NAME = 'local';
 	const RECORDING_LIVE_TYPE = 'recording';
 
+	protected static $storageProfiles = array();
+
 	/**
 	 * @param entry $entry
 	 * @param $capturedThumbPath
@@ -66,7 +68,7 @@ class myPackagerUtils
 	 */
 	public static function captureRemoteThumbUsingPackager($entry, $orig_image_path, $calc_vid_sec, &$flavorAssetId)
 	{
-		$packagerCaptureUrl = kConf::get(self::PACKAGER_REMOTE_URL, self::LOCAL_MAP_NAME, null);
+		$packagerCaptureUrl = self::getPackagerUrlFromConf(kPackagerUrlType::REMOTE);
 		if ($packagerCaptureUrl)
 		{
 			// look for the highest bitrate MBR tagged bitrate (a flavor the packager can parse)
@@ -174,7 +176,7 @@ class myPackagerUtils
 		$url .= ($entryVersion ? "/v/$entryVersion" : '');
 		if($entry->getType() == entryType::PLAYLIST)
 		{
-			$url .= "/flavorParamIds/" . $flavorAsset->getFlavorParamsId();
+			$url .= '/flavorParamIds/' . $flavorAsset->getFlavorParamsId();
 		}
 		else
 		{
@@ -208,25 +210,110 @@ class myPackagerUtils
 	}
 
 	/**
+	 * @param kPackagerUrlType $packagerUrlType
 	 * @param flavorAsset $flavorAsset
-	 * @return bool
+	 * @return string
 	 * @throws PropelException
 	 * @throws kFileSyncException
 	 */
-	protected static function shouldUseRemoteStoragePackager($flavorAsset)
+	protected static function getPackagerUrlByTypeAndFlavorAsset($packagerUrlType, $flavorAsset)
 	{
 		$fileSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		if(is_null($fileSyncKey->partner_id))
+		{
+			throw new kFileSyncException("partner id not defined for key [$fileSyncKey]", kFileSyncException::FILE_SYNC_PARTNER_ID_NOT_DEFINED);
+		}
+
+
 		$fileSyncs = kFileSyncUtils::getReadyFileSyncForKey($fileSyncKey, true, false);
+		$localDcs = kDataCenterMgr::getDcIds();
 		foreach($fileSyncs as $fileSync)
 		{
 			/* @var $fileSync fileSync */
-			if($fileSync->getDc() )
+			$fileDc = $fileSync->getDc();
+			if(in_array ($fileDc, $localDcs))
 			{
+				return self::getPackagerUrlFromConf($packagerUrlType);
+			}
 
+			self::prepareStorageProfiles($fileSyncKey->partner_id);
+			if(array_key_exists($fileDc, self::$storageProfiles[$fileSyncKey->partner_id]))
+			{
+				$result = self::getPackagerUrlFromStorageProfile($packagerUrlType, self::$storageProfiles[$fileSyncKey->partner_id][$fileDc]);
+				if($result)
+				{
+					return $result;
+				}
 			}
 		}
 
-		return false;
+		return null;
+	}
+
+	/**
+	 * Prepare storage profiles array for sorting
+	 *
+	 * @param int $partnerId
+	 * @throws PropelException
+	 */
+	protected static function prepareStorageProfiles($partnerId)
+	{
+		if( !isset(self::$storageProfiles[$partnerId]))
+		{
+			return;
+		}
+
+		$criteria = new Criteria();
+		$criteria->add(StorageProfilePeer::PARTNER_ID, $partnerId);
+		$criteria->add(StorageProfilePeer::DELIVERY_STATUS, StorageProfileDeliveryStatus::BLOCKED, Criteria::NOT_EQUAL);
+		$criteria->addAscendingOrderByColumn(StorageProfilePeer::ID);
+		$results = StorageProfilePeer::doSelect($criteria);
+		self::$storageProfilesOrder[$partnerId] = array();
+		foreach ($results as $result)
+		{
+			self::$storageProfilesOrder[$partnerId][$result->getId()] = $result;
+		}
+	}
+
+	protected static function getPackagerUrlFromConf($packagerUrlType)
+	{
+		switch ($packagerUrlType)
+		{
+			case kPackagerUrlType::REGULAR:
+				return kConf::get(self::PACKAGER_LOCAL_URL, self::LOCAL_MAP_NAME, null);
+				break;
+			case kPackagerUrlType::MAPPED:
+				return kConf::get(self::PACKAGER_MAPPED_URL, self::LOCAL_MAP_NAME, null);
+				break;
+			case kPackagerUrlType::REMOTE:
+				return  kConf::get(self::PACKAGER_REMOTE_URL, self::LOCAL_MAP_NAME, null);
+				break;
+			case kPackagerUrlType::LOCAL_LIVE:
+				return  kConf::get(self::PACKAGER_LOCAL_LIVE_URL, self::LOCAL_MAP_NAME, null);
+				break;
+			default:
+				return null;
+		}
+	}
+
+	/**
+	 * @param kPackagerUrlType $packagerUrlType
+	 * @param StorageProfile $storageProfile
+	 * @return null
+	 */
+	protected static function getPackagerUrlFromStorageProfile($packagerUrlType, $storageProfile)
+	{
+		switch ($packagerUrlType)
+		{
+			case kPackagerUrlType::REGULAR:
+				return $storageProfile->getRegularPackagerUrl();
+				break;
+			case kPackagerUrlType::MAPPED:
+				return $storageProfile->getMappedPackagerUrl();
+				break;
+			default:
+				return null;
+		}
 	}
 
 	/**
@@ -242,7 +329,7 @@ class myPackagerUtils
 	 */
 	protected static function captureMappedThumbUsingPackager($entry, $flavorAsset, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width, $height)
 	{
-		$packagerCaptureUrl = kConf::get(self::PACKAGER_MAPPED_URL, self::LOCAL_MAP_NAME, null);
+		$packagerCaptureUrl = self::getPackagerUrlByTypeAndFlavorAsset(kPackagerUrlType::MAPPED, $flavorAsset);
 		if ($packagerCaptureUrl && $flavorAsset)
 		{
 			$flavorAssetId = $flavorAsset->getId();
@@ -269,7 +356,7 @@ class myPackagerUtils
 	 */
 	protected static function captureLiveThumbUsingPackager(entry $entry, $liveType, $destThumbPath, $calc_vid_sec, $width = null, $height = null)
 	{
-		$packagerCaptureUrl = kConf::get(self::PACKAGER_LOCAL_LIVE_URL, self::LOCAL_MAP_NAME, null);
+		$packagerCaptureUrl = self::getPackagerUrlFromConf(kPackagerUrlType::LOCAL_LIVE);
 		if (!$packagerCaptureUrl)
 		{
 			return false;
@@ -303,7 +390,7 @@ class myPackagerUtils
 	 */
 	protected static function captureLocalThumbUsingPackager($flavorAsset, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width, $height)
 	{
-		$packagerCaptureUrl = kConf::get(self::PACKAGER_LOCAL_URL, self::LOCAL_MAP_NAME, null);
+		$packagerCaptureUrl = self::getPackagerUrlByTypeAndFlavorAsset(kPackagerUrlType::REGULAR, $flavorAsset);
 		if ($packagerCaptureUrl)
 		{
 			$flavorAssetId = $flavorAsset->getId();

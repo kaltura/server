@@ -760,6 +760,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * Prepare storage profiles array for sorting
 	 *
 	 * @param int $partnerId
+	 * @throws PropelException
 	 */
 	protected static function prepareStorageProfilesForSort($partnerId)
 	{
