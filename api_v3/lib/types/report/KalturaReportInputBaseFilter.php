@@ -62,8 +62,7 @@ class KalturaReportInputBaseFilter extends KalturaObject
 		}
 		else if ($this->fromDate && $this->toDate)
 		{
-			$clientTag = kCurrentContext::$client_lang;
-			if (strpos($clientTag, 'kmc-analytics') !== 0 && kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
+			if ($this->shouldRoundDate())
 			{
 				$this->fromDay = date("Ymd", $this->fromDate);
 				$this->toDay = date("Ymd", $this->toDate);
@@ -79,4 +78,22 @@ class KalturaReportInputBaseFilter extends KalturaObject
 		}
 		return $reportInputFilter;
 	}
+
+	protected function shouldRoundDate()
+	{
+		if (kConf::hasParam('kava_skip_date_rounding_client_tags'))
+		{
+			$skipDateRoundingClientTags = kConf::get('kava_skip_date_rounding_client_tags');
+			$clientTag = kCurrentContext::$client_lang;
+			foreach ($skipDateRoundingClientTags as $skipDateRoundingClientTag)
+			{
+				if (strpos($clientTag, $skipDateRoundingClientTag) === 0)
+				{
+					return false;
+				}
+			}
+		}
+		return kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID;
+	}
+
 }
