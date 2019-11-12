@@ -189,13 +189,19 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 		if(isset($this->ignoreOptimizationKeys[$class]))
 		{
 			$keysArray = array();
-			/* @var $ignoreOptimizationKey IndexableIgnoreOptimizationKey */
-			foreach ($this->ignoreOptimizationKeys[$class] as $ignoreOptimizationKey)
+			foreach ($this->ignoreOptimizationKeys[$class] as $disableFieldkey => $disableFieldValues)
 			{
-				$keysArray[] = $ignoreOptimizationKey->getName();
+				/* @var $disableFieldValue IndexableIgnoreOptimizationKey */
+				foreach ($disableFieldValues as $disableFieldValue)
+					$keysArray[] = $disableFieldValue->getName();
+
+				if(!empty($keysArray))
+				{
+					$this->printToFile($fp, ' "'. strtoupper($disableFieldkey). '" => array(' . implode(',', $keysArray) . '),', 3);
+				}
 			}
-			$this->printToFile($fp, implode(",", $keysArray) ,3);
 		}
+
 		$this->printToFile($fp, ");",2);
 		$this->printToFile($fp, "}",1);
 		$this->printToFile($fp, "");

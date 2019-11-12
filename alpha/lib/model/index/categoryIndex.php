@@ -369,7 +369,7 @@ class categoryIndex extends BaseIndexObject
 	public static function getIgnoreOptimizationKeys()
 	{
 		return array(
-			"str_category_id","reference_id"
+			 "PARTNER_ID" => array("str_category_id","reference_id"),
 		);
 	}
 

@@ -101,17 +101,13 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 
 	protected static $forceSkipSphinx = false;
 
-	protected  $disablePartnerOptimization = null;
+	protected $sphinxOptimizationsFilterKeys = array();
 
-	/**
-	 * @param $value
-	 */
+	protected $disablePartnerOptimization = false;
+
 	public function setDisablePartnerOptimization($value)
 	{
-		if ($this->disablePartnerOptimization !== false)
-		{
-			$this->disablePartnerOptimization = $value;
-		}
+		$this->disablePartnerOptimization = $value;
 	}
 
 	public static function enableForceSkipSphinx()
@@ -393,7 +389,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$optimizationMap = $objectClass::getSphinxOptimizationMap();
 		if (isset($this->disablePartnerOptimization) && $this->disablePartnerOptimization)
 		{
-			$this->removePartnerIdFromOptimizationMap($optimizationMap);
+			$this->removePartnerIdFromOptimizationMap($objectClass, $optimizationMap);
 		}
 
 		foreach($optimizationMap as $formatParams) {
@@ -433,21 +429,25 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	}
 
 	/**
+	 * @param $objectClass
 	 * @param $optimizationMap
 	 * remove remove array from array of arrays if partner_id pattern is found the inner array values.
 	 */
-	protected function removePartnerIdFromOptimizationMap(&$optimizationMap)
+	protected function removePartnerIdFromOptimizationMap($objectClass, &$optimizationMap)
 	{
-		$pattern = "/PARTNER_ID$/";
-		for ($i = count($optimizationMap) - 1; $i >= 0; $i--)
+		foreach ($this->sphinxOptimizationsFilterKeys as $ignoreOptimazationKey)
 		{
-			foreach ($optimizationMap[$i] as $optimizationParam)
+			$pattern = "/$ignoreOptimazationKey$/";
+			for ($i = count($optimizationMap) - 1; $i >= 0; $i--)
 			{
-				if (preg_match($pattern, $optimizationParam, $result))
+				foreach ($optimizationMap[$i] as $optimizationParam)
 				{
-//					unset($optimizationMap[$i]);
-					KalturaLog::debug("dry run - would remove $optimizationParam from optimization Map");
-					break;
+					if (preg_match($pattern, $optimizationParam, $result))
+					{
+//						unset($optimizationMap[$i]);
+						KalturaLog::debug("dry run - would remove $optimizationParam from optimization Map");
+						break;
+					}
 				}
 			}
 		}
@@ -765,7 +765,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			
 			KalturaLog::debug("Attach field[$fieldName] as sphinx field[$sphinxField] of type [$type] and comparison[$operator] for value[$valStr]");
 
-			if ($this->shouldFilterPartnerFromSphinxOptimizations($objectClass,$sphinxField))
+			if ($this->shouldFilterFieldFromSphinxOptimizations($objectClass,$sphinxField))
 			{
 				$this->setDisablePartnerOptimization(true);
 			}
@@ -1301,13 +1301,20 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 * @return bool
 	 *
 	 */
-	public function shouldFilterPartnerFromSphinxOptimizations($objectClass, $fieldName)
+	public function shouldFilterFieldFromSphinxOptimizations($objectClass, $fieldName)
 	{
-		$ignoreOptimazationKeys = $objectClass::getIgnoreOptimizationKeys();
-		if (count($ignoreOptimazationKeys) && in_array($fieldName, $ignoreOptimazationKeys))
+		$ignoreOptimazationItems = $objectClass::getIgnoreOptimizationKeys();
+		foreach ($ignoreOptimazationItems as $key => $ignoreOptimazationKeys)
 		{
-			KalturaLog::debug("Found ignore sphinx optimization match for $objectClass - $fieldName");
-			return true;
+			if (count($ignoreOptimazationKeys) && in_array($fieldName, $ignoreOptimazationKeys))
+			{
+				KalturaLog::debug("Found ignore sphinx optimization match for $objectClass - $fieldName");
+				if (!in_array($key, $this->sphinxOptimizationsFilterKeys))
+				{
+					$this->sphinxOptimizationsFilterKeys[] = $key;
+				}
+				return true;
+			}
 		}
 		return false;
 	}
