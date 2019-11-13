@@ -1,3 +1,17 @@
+# Orion 15.11.0 #  
+
+## 5-star rating ##
+- Issue Type: Task
+- Issue ID: PSVAMB-8935
+
+### Deployment scripts ###
+Add new kvote table index    
+    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_06_add_kvote_index.sql
+Add new permissions
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_06_add_rating_permissions.php
+Run installPlugins script  
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
 # Orion 15.10.0 #
 
 ## AP Feed Drop Folder ##
