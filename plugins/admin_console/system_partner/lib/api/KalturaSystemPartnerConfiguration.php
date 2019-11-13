@@ -415,6 +415,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $avoidIndexingSearchHistory;
 
+	/**
+	 * @var bool
+	 */
+	public $keepSourceLocally;
+
 	private static $map_between_objects = array
 	(
 		"id",
@@ -494,7 +499,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"useSso",
 		"blockDirectLogin",
 		"ignoreSynonymEsearch",
-		"avoidIndexingSearchHistory"
+		"avoidIndexingSearchHistory",
+		"keepSourceLocally",
 	);
 
 	public function getMapBetweenObjects()

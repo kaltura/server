@@ -185,6 +185,12 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 		if ($flavorAsset instanceof thumbAsset)
 			return $this->getShouldExportThumbs();
 
+		$partner = PartnerPeer::retrieveActiveByPK($this->getPartnerId());
+		if($flavorAsset->getIsOriginal() && $partner->getKeepSourceLocally())
+		{
+			return false;
+		}
+
 		if(!$this->isFlavorAssetConfiguredForExport($flavorAsset))
 		{
 			return false;
