@@ -1242,7 +1242,7 @@ class MediaService extends KalturaEntryService
 	 *
 	 * @action getVolumeMap
 	 * @param string $entryId Entry id
-	 * @return kRendererString
+	 * @return file
 	 * @throws KalturaAPIException
 	 */
 	function getVolumeMapAction($entryId)

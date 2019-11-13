@@ -148,9 +148,10 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
 		));
 		$this->addElementToDisplayGroup('advanced', 'shouldExportThumbnails');
+
+		$this->addPackagerConfigurationFields();
 	}
-	
-	
+
 	public function populateFromObject($object, $add_underscore = true)
 	{
 	    // add actual urlManager & pathManager so the form will not overwrite values which are missing from the combo box and were set through the API
@@ -201,5 +202,22 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 		{
 		    $this->getElement($elementName)->addMultiOption($newOption, $newOption)->setRegisterInArrayValidator(false);
 		}
+	}
+
+	protected function addPackagerConfigurationFields()
+	{
+		$this->addElement('text', 'regularPackagerUrl', array(
+			'label'			=> 'Regular packager URL:',
+			'filters'		=> array('StringTrim'),
+		));
+
+		$this->addElementToDisplayGroup('advanced', 'regularPackagerUrl');
+
+		$this->addElement('text', 'mappedPackagerUrl', array(
+			'label'			=> 'Mapped packager URL:',
+			'filters'		=> array('StringTrim'),
+		));
+
+		$this->addElementToDisplayGroup('advanced', 'mappedPackagerUrl');
 	}
 }

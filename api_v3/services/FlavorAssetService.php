@@ -971,7 +971,7 @@ class FlavorAssetService extends KalturaAssetService
 	 *
 	 * @action getVolumeMap
 	 * @param string $flavorId Flavor id
-	 * @return kRendererString
+	 * @return file
 	 * @throws KalturaAPIException
 	 */
 	function getVolumeMapAction($flavorId)
