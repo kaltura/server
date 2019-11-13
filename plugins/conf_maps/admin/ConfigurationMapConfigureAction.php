@@ -92,7 +92,7 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 						$mapContentArray = json_decode($configurationMap->content, true);
 						if (!empty($mapContentArray))
 						{
-							$content = iniUtils::arrayToIniString($mapContentArray);
+							$content = IniUtils::arrayToIniString($mapContentArray);
 							$configurationMap->rawData = $content;
 						}
 					}

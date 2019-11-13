@@ -1,9 +1,11 @@
 <?php
 /**
-	Ini files manipulation utlities
-	@Package infra
+ *  Ini files manipulation utlities
+ *
+ *  @package infra
+ *  @subpackage utils
  */
-class iniUtils
+class IniUtils
 {
 	/**
 	 * Given an associative array, this function will generate INI file string that represent it.

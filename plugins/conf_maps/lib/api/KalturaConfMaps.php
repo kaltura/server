@@ -130,14 +130,14 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 			if (!is_null($existingMapsContent))
 			{
 				$ini = new Zend_Config($existingMapsContent, true);
-				$contentToValidate = iniUtils::arrayToIniString($ini->toArray());
+				$contentToValidate = IniUtils::arrayToIniString($ini->toArray());
 			}
 		}
 		$contentToValidate .= PHP_EOL . $content;
 		try
 		{
 			//To validate that we can transform the content to a valid ini file
-			iniUtils::iniStringToIniArray($contentToValidate);
+			IniUtils::iniStringToIniArray($contentToValidate);
 		}
 		catch (Exception $e)
 		{

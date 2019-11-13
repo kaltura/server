@@ -94,15 +94,21 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 				$this->handleContent($mapContent, $mapName, $globalContent, $content);
 			}
 		}
-		return iniUtils::iniStringToIniArray($globalContent . PHP_EOL . $content);
+		return $this->createIniMap($globalContent . PHP_EOL . $content);
 	}
 
+	/**
+	 * @param $mapContent
+	 * @param $mapName
+	 * @param $globalContent
+	 * @param $content
+	 */
 	protected function handleContent($mapContent, $mapName, &$globalContent, &$content)
 	{
 		if (is_array($mapContent))
 		{
 			KalturaLog::debug("Retrieved content in array format from RemoteCache for map - $mapName with content: \n" . print_r($mapContent, true));
-			$mapContent = iniUtils::arrayToIniString($mapContent);
+			$mapContent = IniUtils::arrayToIniString($mapContent);
 		}
 		//get global section data - PREG_OFFSET_CAPTURE return offset starting point in index[1] of match
 		preg_match(self::GLOBAL_INI_SECTION_REGEX, $mapContent, $matches, PREG_OFFSET_CAPTURE);
@@ -115,6 +121,23 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 		{
 			$globalContent .= PHP_EOL . $mapContent;
 		}
+	}
+
+	/**
+	 * @param $content
+	 * @return array
+	 */
+	protected function createIniMap($content)
+	{
+		$tempIniFile = tempnam(sys_get_temp_dir(), 'TMP_INI_');
+		$res = file_put_contents($tempIniFile, $content);
+		if (!$res)
+		{
+			KalturaLog::warning("Could not write ini content to file $tempIniFile");
+		}
+		$ini = new Zend_Config_Ini($tempIniFile);
+		unlink($tempIniFile);
+		return $ini->toArray();
 	}
 
 	public function getHostList($requesteMapName , $hostNameRegex = null)
