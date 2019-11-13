@@ -124,20 +124,21 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 		kApiCache::disableCache();
 		$configurationMap = $filter->getMap(true);
 		$contentToValidate = null;
+		$sectionsContent = null;
+		$globalContent = null;
 		if ($configurationMap)
 		{
 			$existingMapsContent = json_decode($configurationMap->content, true);
 			if (!is_null($existingMapsContent))
 			{
-				$ini = new Zend_Config($existingMapsContent, true);
-				$contentToValidate = IniUtils::arrayToIniString($ini->toArray());
+				IniUtils::splitContent($existingMapsContent, $globalContent, $sectionsContent);//split contect to global and sections
 			}
 		}
-		$contentToValidate .= PHP_EOL . $content;
+		IniUtils::splitContent($content, $globalContent, $sectionsContent);//merge new contect to global and sections content
 		try
 		{
 			//To validate that we can transform the content to a valid ini file
-			IniUtils::iniStringToIniArray($contentToValidate);
+			IniUtils::iniStringToIniArray($globalContent . PHP_EOL . $sectionsContent);
 		}
 		catch (Exception $e)
 		{

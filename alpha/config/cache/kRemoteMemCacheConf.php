@@ -1,11 +1,12 @@
 <?php
 require_once __DIR__ . '/kBaseMemcacheConf.php';
+require_once (__DIR__ . '/../../../infra/general/iniUtils.php');
 
 class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterface,kMapCacheInterface
 {
 	const MAP_LIST_KEY = 'MAP_LIST_KEY';
 	const MAP_DELIMITER = '|';
-	const GLOBAL_INI_SECTION_REGEX = '/\[.*\S.*\]/m';
+
 	public function loadKey()
 	{
 		$key=null;
@@ -91,53 +92,10 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 			if ($map)
 			{
 				$mapContent = json_decode($map, true);
-				$this->handleContent($mapContent, $mapName, $globalContent, $content);
+				IniUtils::splitContent($mapContent, $globalContent, $content);
 			}
 		}
-		return $this->createIniMap($globalContent . PHP_EOL . $content);
-	}
-
-	/**
-	 * @param $mapContent
-	 * @param $mapName
-	 * @param $globalContent
-	 * @param $content
-	 */
-	protected function handleContent($mapContent, $mapName, &$globalContent, &$content)
-	{
-		if (is_array($mapContent))
-		{
-			self::safeLog("Retrieved content in array format from RemoteCache for map - $mapName with content: \n" . print_r($mapContent, true));
-			$mapContent = IniUtils::arrayToIniString($mapContent);
-		}
-		//get global section data - PREG_OFFSET_CAPTURE return offset starting point in index[1] of match
-		preg_match(self::GLOBAL_INI_SECTION_REGEX, $mapContent, $matches, PREG_OFFSET_CAPTURE);
-		if (isset($matches[0][1]))// find the split point between the global part and the other sections
-		{
-			$globalContent .= PHP_EOL . substr($mapContent, 0, $matches[0][1]);
-			$content .= PHP_EOL . substr($mapContent, $matches[0][1]);
-		}
-		else
-		{
-			$globalContent .= PHP_EOL . $mapContent;
-		}
-	}
-
-	/**
-	 * @param $content
-	 * @return array
-	 */
-	protected function createIniMap($content)
-	{
-		$tempIniFile = tempnam(sys_get_temp_dir(), 'TMP_INI_');
-		$res = file_put_contents($tempIniFile, $content);
-		if (!$res)
-		{
-			self::safeLog("Could not write ini content to file $tempIniFile");
-		}
-		$ini = new Zend_Config_Ini($tempIniFile);
-		unlink($tempIniFile);
-		return $ini->toArray();
+		return IniUtils::iniStringToIniArray($globalContent . PHP_EOL . $content);
 	}
 
 	public function getHostList($requesteMapName , $hostNameRegex = null)

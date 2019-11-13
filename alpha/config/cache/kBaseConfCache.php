@@ -89,17 +89,6 @@ class kBaseConfCache
 		return isset($_SERVER['HOSTNAME']) ? $_SERVER['HOSTNAME'] : gethostname();
 	}
 
-	/**
-	 * This function is required since this code can run before the autoloader
-	 *
-	 * @param string $msg
-	 */
-	protected static function safeLog($msg)
-	{
-		if (class_exists('KalturaLog') && KalturaLog::isInitialized())
-			KalturaLog::debug($msg);
-	}
-
 	public function incKeyUsageCounter() { $this->keyUsageCounter++; }
 
 	public function getKeyUsageCounter() { return $this->keyUsageCounter; }
