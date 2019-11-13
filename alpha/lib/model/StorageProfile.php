@@ -35,7 +35,6 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	const CUSTOM_DATA_RULES = 'rules';
 	const CUSTOM_DATA_CREATE_FILE_LINK ='create_file_link';
 	const CUSTOM_DATA_SHOULD_EXPORT_THUMBS ='should_export_thumbs';
-	const CUSTOM_DATA_SHOULD_KEEP_SOURCE = 'should_keep_source';
 	const CUSTOM_DATA_SHOULD_EXPORT_CAPTIONS ='should_export_captions';
 
 	/**
@@ -192,11 +191,6 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 		if ($flavorAsset instanceof captionAsset)
 		{
 			return $this->getShouldExportCaptions();
-		}
-
-		if($flavorAsset->getIsOriginal() && $this->getShouldKeepSource())
-		{
-			return false;
 		}
 
 		if(!$this->isFlavorAssetConfiguredForExport($flavorAsset))
@@ -457,16 +451,6 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	public function setShouldExportThumbs ($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_SHOULD_EXPORT_THUMBS, $v);
-	}
-
-	public function getShouldKeepSource()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_SHOULD_KEEP_SOURCE,null, false);
-	}
-
-	public function setShouldKeepSource($v)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_SHOULD_KEEP_SOURCE, $v);
 	}
 
 	public function getShouldExportCaptions()

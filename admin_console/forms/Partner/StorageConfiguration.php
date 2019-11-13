@@ -156,14 +156,6 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
 		));
 		$this->addElementToDisplayGroup('advanced', 'shouldExportCaptions');
-
-		$this->addElement('checkbox', 'shouldKeepSource', array(
-			'label'			=> "Should keep source locally",
-			'checked'		=> false,
-			'indicator'		=> 'dynamic',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
-		));
-		$this->addElementToDisplayGroup('advanced', 'shouldKeepSource');
 	}
 	
 	
@@ -176,7 +168,6 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 	    $this->setDefault('pathManagerParams', json_encode($object->pathManagerParams));
 		$this->setDefault('shouldExportThumbnails', $object->shouldExportThumbs);
 		$this->setDefault('shouldExportCaptions', $object->shouldExportCaptions);
-		$this->setDefault('shouldKeepSource', $object->shouldKeepSource);
 	}
 	
     public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
@@ -209,7 +200,6 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 		
 		$object->pathManagerParams = json_decode($properties['pathManagerParams'], true);
 		$object->shouldExportThumbs = $properties['shouldExportThumbnails'];
-		$object->shouldKeepSource = $properties['shouldKeepSource'];
 		$object->shouldExportCaptions = $properties['shouldExportCaptions'];
 		return $object;
 	}

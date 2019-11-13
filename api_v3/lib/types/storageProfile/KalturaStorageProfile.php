@@ -190,11 +190,6 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	/**
 	 * @var bool
 	 */
-	public $shouldKeepSource;
-
-	/**
-	 * @var bool
-	 */
 	public $shouldExportCaptions;
 
 	private static $map_between_objects = array
@@ -231,7 +226,6 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		"publicKey",
 		"passPhrase",
 		"shouldExportThumbs",
-		"shouldKeepSource",
 		"shouldExportCaptions",
 	);
 	
