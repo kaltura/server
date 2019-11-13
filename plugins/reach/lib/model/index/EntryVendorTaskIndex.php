@@ -277,5 +277,12 @@ class EntryVendorTaskIndex extends BaseIndexObject
 		return EntryVendorTaskPeer::doCount($c);
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
+	public static function getIgnoreOptimizationKeys()
+	{
+		return array(
+		);
+	}
+
 }
 
