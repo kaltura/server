@@ -255,6 +255,42 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 	 */
 	public $maxGOP;
 	
+	/**
+	 * @var string
+	 * @requiresPermission read
+	 */
+	public $matrixCoefficients;
+	
+	/**
+	 * @var string
+	 * @requiresPermission read
+	 */
+	public $colorTransfer;
+	
+	/**
+	 * @var string
+	 * @requiresPermission read
+	 */
+	public $colorPrimaries;
+	
+	/**
+	 * @var string
+	 * @requiresPermission read
+	 */
+	public $pixelFormat;
+	
+	/**
+	 * @var string
+	 * @requiresPermission read
+	 */
+	public $chromaSubsampling;
+	
+	/**
+	 * @var int
+	 * @requiresPermission read
+	 */
+	public $bitsDepth;
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -292,6 +328,13 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 		"contentStreams",
 		"complexityValue",
 		"maxGOP",
+		"matrixCoefficients",
+		"colorTransfer",
+		"colorPrimaries",
+		"pixelFormat",
+		"colorSpace",
+		"chromaSubsampling",
+		"bitsDepth",
 	);
 	
 	public function getMapBetweenObjects ( )
