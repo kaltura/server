@@ -42,7 +42,7 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 	 * @var time
 	 * @readonly
 	 */
-	public $lastUpdate;
+	public $createdAt;
 
 	/**
 	 * Regex that represent the host/s that this map affect
@@ -87,7 +87,7 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 		"relatedHost" => "hostName",
 		"status",
 		"version",
-		"lastUpdate" => "createdAt",
+		"createdAt",
 		"remarks",
 		"content"
 	);
@@ -162,5 +162,4 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 	{
 		return array();
 	}
-
 }
