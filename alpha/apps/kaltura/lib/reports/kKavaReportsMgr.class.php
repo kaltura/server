@@ -401,7 +401,7 @@ class kKavaReportsMgr extends kKavaBase
 		-765 => 'Pacific/Chatham',
 		-720 => 'Pacific/Auckland',
 		-690 => 'Pacific/Norfolk',
-		-660 => 'Asia/Anadyr',
+		-660 => 'Asia/Magadan',
 		-630 => 'Australia/Lord_Howe',
 		-600 => 'Australia/Melbourne',
 		-570 => 'Australia/Adelaide',
