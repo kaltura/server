@@ -30,6 +30,27 @@ class mediaInfo extends BasemediaInfo
 	public function setMaxGOP($v)	{$this->putInCustomData('MaxGOP', $v);}
 	public function getMaxGOP()	{return $this->getFromCustomData('MaxGOP', null, null);}
 	
+	public function setMatrixCoefficients($v)	{$this->putInCustomData('MatrixCoefficients', $v);}
+	public function getMatrixCoefficients()	{return $this->getFromCustomData('MatrixCoefficients', null, null);}
+
+	public function setColorTransfer($v)	{$this->putInCustomData('ColorTransfer', $v);}
+	public function getColorTransfer()	{return $this->getFromCustomData('ColorTransfer', null, null);}
+
+	public function setColorPrimaries($v)	{$this->putInCustomData('ColorPrimaries', $v);}
+	public function getColorPrimaries()	{return $this->getFromCustomData('ColorPrimaries', null, null);}
+
+	public function setPixelFormat($v)	{$this->putInCustomData('PixelFormat', $v);}
+	public function getPixelFormat()	{return $this->getFromCustomData('PixelFormat', null, null);}
+
+	public function setColorSpace($v)	{$this->putInCustomData('ColorSpace', $v);}
+	public function getColorSpace()	{return $this->getFromCustomData('ColorSpace', null, null);}
+
+	public function setChromaSubsampling($v)	{$this->putInCustomData('ChromaSubsampling', $v);}
+	public function getChromaSubsampling()	{return $this->getFromCustomData('ChromaSubsampling', null, null);}
+
+	public function setBitsDepth($v)	{$this->putInCustomData('BitsDepth', $v);}
+	public function getBitsDepth()	{return $this->getFromCustomData('BitsDepth', null, null);}
+
 	public function setRawData($v)
 	{
 		$saveRawDataAllowedPartners = kConf::get("save_media_info_raw_data_partners", 'local', array());
