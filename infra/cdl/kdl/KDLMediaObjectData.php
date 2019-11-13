@@ -229,6 +229,14 @@
 		public $_complexityValue = null;
 		public $_contentAwareness = null;
 		
+		public $_matrixCoefficients = null;
+		public $_colorTransfer = null;
+		public $_colorPrimaries = null;
+		public $_pixelFormat = null;
+		public $_colorSpace = null;
+		public $_chromaSubsampling = null;
+		public $_bitsDepth = null;
+		
 		public function GetSectionEnum() { return KDLConstants::VideoIndex; }
 		
 		/* ------------------------------
