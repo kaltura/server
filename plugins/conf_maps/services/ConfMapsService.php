@@ -31,7 +31,7 @@ class ConfMapsService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::MAP_ALREADY_EXIST, $map->name, $map->relatedHost);
 		}
-		$map->validateAndHandleContent();
+		$map->validateContent();
 		$newMapVersion = new ConfMaps();
 		$map->toInsertableObject($newMapVersion);
 		$newMapVersion->setStatus(ConfMapsStatus::STATUS_ENABLED);
@@ -58,7 +58,7 @@ class ConfMapsService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::MAP_DOES_NOT_EXIST );
 		}
-		$map->validateAndHandleContent();
+		$map->validateContent();
 
 		$newMapVersion = new ConfMaps();
 		$newMapVersion->addNewMapVersion($dbMap, $map->content);
