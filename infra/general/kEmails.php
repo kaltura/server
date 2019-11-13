@@ -27,7 +27,8 @@ class kEmails
                     $currentRecipient .= $singleChar;
                 }
                 else{
-                    if (strlen($currentRecipient) > 0){
+                    if (strlen($currentRecipient) > 0)
+                    {
                         $recipientsArray[] = $currentRecipient;
                     }
                     $currentRecipient = "";
