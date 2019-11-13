@@ -107,7 +107,7 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 	{
 		if (is_array($mapContent))
 		{
-			KalturaLog::debug("Retrieved content in array format from RemoteCache for map - $mapName with content: \n" . print_r($mapContent, true));
+			self::safeLog("Retrieved content in array format from RemoteCache for map - $mapName with content: \n" . print_r($mapContent, true));
 			$mapContent = IniUtils::arrayToIniString($mapContent);
 		}
 		//get global section data - PREG_OFFSET_CAPTURE return offset starting point in index[1] of match
@@ -133,7 +133,7 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 		$res = file_put_contents($tempIniFile, $content);
 		if (!$res)
 		{
-			KalturaLog::warning("Could not write ini content to file $tempIniFile");
+			self::safeLog("Could not write ini content to file $tempIniFile");
 		}
 		$ini = new Zend_Config_Ini($tempIniFile);
 		unlink($tempIniFile);
