@@ -486,7 +486,7 @@ abstract class KBatchBase implements IKalturaLogger
 			$files = $this->getBatchJobFiles($job);
 			foreach ($files as $file)
 			{
-				if(!$this->checkFileExists($file))
+				if(!file_exists($file))
 				{
 					$file = dirname($file);
 				}
