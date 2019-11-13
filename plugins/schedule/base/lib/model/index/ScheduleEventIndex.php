@@ -333,5 +333,13 @@ class ScheduleEventIndex extends BaseIndexObject
 			return array("schedule_event:id=".strtolower($object->getId()), "schedule_event:partnerId=".strtolower($object->getPartnerId()));
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
+	public static function getIgnoreOptimizationKeys()
+	{
+		return array(
+			"parent_id","reference_id"
+		);
+	}
+
 }
 

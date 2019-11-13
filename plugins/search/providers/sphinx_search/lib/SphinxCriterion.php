@@ -418,6 +418,10 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 			$match = $this->getStringMatchClause($sphinxField, $comparison, $value);
 			KalturaLog::debug("Add match criterion[$field] as sphinx field[$sphinxField] of type [$type] match [$match] line [" . __LINE__ . "]");
 			$this->addMatch($match);
+			if ($this->criteria->shouldFilterPartnerFromSphinxOptimizations($objectClass,$sphinxField))
+			{
+				$this->criteria->setDisablePartnerOptimization(true);
+			}
 		}
 		else
 		{
@@ -446,7 +450,10 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 		{
 			$matchesClause = implode(' ', $this->matchClause);
 			if ($this->hasOr() && count($this->matchClause) > 1)
+			{
 				$matchesClause = "($matchesClause)";
+				$this->criteria->setDisablePartnerOptimization(false);
+			}
 			
 			$match = $this->getSelfMatchOperator() . $matchesClause;
 			KalturaLog::debug("Add match criterion[$field] as sphinx field[$sphinxField] of type [$type] match [$match] line [" . __LINE__ . "]");

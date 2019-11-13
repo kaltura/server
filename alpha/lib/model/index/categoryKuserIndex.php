@@ -252,5 +252,12 @@ class categoryKuserIndex extends BaseIndexObject
 			return array("category_kuser:partnerId=".strtolower($object->getPartnerId()));
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
+	public static function getIgnoreOptimizationKeys()
+	{
+		return array(
+		);
+	}
+
 }
 

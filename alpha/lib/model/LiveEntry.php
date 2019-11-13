@@ -1009,5 +1009,15 @@ abstract class LiveEntry extends entry
 		return $this->getViewMode() == ViewMode::ALLOW_ALL && in_array($this->getLiveStatus(), array(EntryServerNodeStatus::PLAYABLE, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::AUTHENTICATED));
 	}
 
+	public function getRecordedEntryConversionProfile()
+    {
+        $conversionProfileId = $this->getPartner()->getDefaultRecordingConversionProfile();
+        if (!$conversionProfileId)
+        {
+            $conversionProfileId = $this->conversion_profile_id;
+        }
+	    return $conversionProfileId;
+    }
+
 
 }

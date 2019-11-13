@@ -98,9 +98,22 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 * @var array
 	 */
 	public $forcedOrderIds;
-	
+
 	protected static $forceSkipSphinx = false;
-	
+
+	protected  $disablePartnerOptimization = null;
+
+	/**
+	 * @param $value
+	 */
+	public function setDisablePartnerOptimization($value)
+	{
+		if ($this->disablePartnerOptimization !== false)
+		{
+			$this->disablePartnerOptimization = $value;
+		}
+	}
+
 	public static function enableForceSkipSphinx()
 	{
 		self::$forceSkipSphinx = true;
@@ -413,9 +426,13 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	protected function addSphinxOptimizationMatches(array $criterionsMap) 
 	{
 		$objectClass = $this->getIndexObjectName();
-		$optimizationField = $objectClass::getSphinxOptimizationMap();
-		
-		foreach($optimizationField as $formatParams) {
+		$optimizationMap = $objectClass::getSphinxOptimizationMap();
+		if (isset($this->disablePartnerOptimization) && $this->disablePartnerOptimization)
+		{
+			$this->removePartnerIdFromOptimizationMap($optimizationMap);
+		}
+
+		foreach($optimizationMap as $formatParams) {
 			$hasEmptryField = false;
 			$values = array();
 			
@@ -450,7 +467,29 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$this->matchClause[] = "( @sphinx_match_optimizations " . implode(" | ", $formatedStr) . ")";
 		}
 	}
-	
+
+	/**
+	 * @param $optimizationMap
+	 * remove remove array from array of arrays if partner_id pattern is found the inner array values.
+	 */
+	protected function removePartnerIdFromOptimizationMap(&$optimizationMap)
+	{
+		$pattern = "/PARTNER_ID$/";
+		for ($i = count($optimizationMap) - 1; $i >= 0; $i--)
+		{
+			foreach ($optimizationMap[$i] as $optimizationParam)
+			{
+				if (preg_match($pattern, $optimizationParam, $result))
+				{
+//					unset($optimizationMap[$i]);
+					KalturaLog::debug("dry run - would remove $optimizationParam from optimization Map");
+					break;
+				}
+			}
+		}
+	}
+
+
 	/* (non-PHPdoc)
 	 * @see SphinxCriteria#applyFilters()
 	 */
@@ -761,6 +800,11 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$fieldsEscapeType = $objectClass::getSearchFieldsEscapeType($fieldName);
 			
 			KalturaLog::debug("Attach field[$fieldName] as sphinx field[$sphinxField] of type [$type] and comparison[$operator] for value[$valStr]");
+
+			if ($this->shouldFilterPartnerFromSphinxOptimizations($objectClass,$sphinxField))
+			{
+				$this->setDisablePartnerOptimization(true);
+			}
 
 			$partnerId = kCurrentContext::getCurrentPartnerId();
 			$notEmpty = kSphinxSearchManager::HAS_VALUE . $partnerId;
@@ -1285,6 +1329,23 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				
 			$this->matchClause[] = $matches;
 		}
+	}
+
+	/**
+	 * @param $objectClass
+	 * @param $fieldName
+	 * @return bool
+	 *
+	 */
+	public function shouldFilterPartnerFromSphinxOptimizations($objectClass, $fieldName)
+	{
+		$ignoreOptimazationKeys = $objectClass::getIgnoreOptimizationKeys();
+		if (count($ignoreOptimazationKeys) && in_array($fieldName, $ignoreOptimazationKeys))
+		{
+			KalturaLog::debug("Found ignore sphinx optimization match for $objectClass - $fieldName");
+			return true;
+		}
+		return false;
 	}
 }
 

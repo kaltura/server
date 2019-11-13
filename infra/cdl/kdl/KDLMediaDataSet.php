@@ -213,6 +213,7 @@ class KDLMediaDataSet  {
 	 * -- Preset conditions
 	 * --- isMbr 
 	 * --- isWeb
+	 * --- hdrMode - 0:non-HDR, 1:HDR10
 	 * 
 	 * Since this funtion uses php 'eval' function, following precautions are applied to make sure that 
 	 * executed statement is harmless:
@@ -284,6 +285,7 @@ class KDLMediaDataSet  {
 		$valsArr["scanType"]=0;
 		$valsArr["contentAwareness"]=0;		
 		$valsArr["videoGop"]=0;
+		$valsArr["hdrMode"]=0;
 		if(isset($this->_video) && $this->_video->IsDataSet()){
 			$obj = $this->_video;
 			if($obj->IsFormatOf(array("avc","avc1","h264"))){
@@ -319,6 +321,12 @@ class KDLMediaDataSet  {
 			if(isset($obj->_scanType))	$valsArr["scanType"]=$obj->_scanType;
 			if(isset($obj->_contentAwareness)) $valsArr["contentAwareness"]=$obj->_contentAwareness;
 			if(isset($obj->_gop))		$valsArr["videoGop"]=$obj->_gop;
+				/*
+				 * HDR mode
+				 */
+			if($obj->_matrixCoefficients=='bt2020nc' && $obj->_colorPrimaries=='bt2020' 
+			&& $obj->_colorTransfer=='smpte2084' && $obj->_bitsDepth==10)
+				$valsArr["hdrMode"] = 1;
 		}
 			/*
 			 * Set audio related fields

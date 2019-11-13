@@ -743,6 +743,14 @@ class KDLWrap
 		$medSet->_video->_scanType = $cdlMediaInfo->getScanType();
 		$medSet->_video->_complexityValue = $cdlMediaInfo->getComplexityValue();
 		$medSet->_video->_gop = $cdlMediaInfo->getMaxGOP();
+			// HDR related stuff
+		$medSet->_video->_matrixCoefficients = $cdlMediaInfo->getMatrixCoefficients();
+		$medSet->_video->_colorTransfer = $cdlMediaInfo->getColorTransfer();
+		$medSet->_video->_colorPrimaries = $cdlMediaInfo->getColorPrimaries();
+		$medSet->_video->_pixelFormat = $cdlMediaInfo->getPixelFormat();
+		$medSet->_video->_colorSpace = $cdlMediaInfo->getColorSpace();
+		$medSet->_video->_chromaSubsampling = $cdlMediaInfo->getChromaSubsampling();
+		$medSet->_video->_bitsDepth = $cdlMediaInfo->getBitsDepth();
 /*		{
 				$medLoader = new KDLMediaInfoLoader($cdlMediaInfo->getRawData());
 				$md = new KDLMediadataset();
