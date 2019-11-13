@@ -18,9 +18,9 @@ class RatingService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, RatingPlugin::PLUGIN_NAME);
 		}
 		
-		if ((!kCurrentContext::$ks_uid || kCurrentContext::$ks_uid == "") && $actionName != "getRatingCounts")
+		if (kCurrentContext::$ks_object->isAnonymousSession() && $actionName !== "getRatingCounts")
 		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+			throw new KalturaAPIException(KalturaErrors::ANONYMOUS_ACCESS_FORBIDDEN);
 		}
 	}
 	
@@ -35,11 +35,6 @@ class RatingService extends KalturaBaseService
 	 */
 	public function rateAction ($entryId, $rank)
 	{
-		if (!$entryId)
-		{
-			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "entryId");
-		}
-		
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
 		{
@@ -71,11 +66,6 @@ class RatingService extends KalturaBaseService
 	 */
 	public function removeRatingAction ($entryId)
 	{
-		if (!$entryId)
-		{
-			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "entryId");
-		}
-		
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
 		{
@@ -90,7 +80,9 @@ class RatingService extends KalturaBaseService
 		
 		
 		if (kvotePeer::disableExistingKVote($entryId, $this->getPartnerId(), kCurrentContext::$ks_uid))
+		{
 			return true;
+		}
 		
 		return false;
 	}
@@ -136,19 +128,14 @@ class RatingService extends KalturaBaseService
 	 */
 	public function getRatingCountsAction (KalturaRatingCountFilter $filter)
 	{
-		if(!$filter)
-			$filter = new KalturaRatingCountFilter();
-		else
+		if(!$filter->entryIdEqual || !entryPeer::retrieveByPK($filter->entryIdEqual))
 		{
-			if(!$filter->entryIdEqual || !entryPeer::retrieveByPK($filter->entryIdEqual))
-			{
-				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $filter->entryIdEqual);
-			}
-			
-			if(!$filter->rankIn)
-			{
-				throw new KalturaAPIException(KalturaRatingErrors::USER_RATING_FOR_ENTRY_NOT_FOUND);
-			}
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $filter->entryIdEqual);
+		}
+		
+		if(!$filter->rankIn)
+		{
+			throw new KalturaAPIException(KalturaRatingErrors::USER_RATING_FOR_ENTRY_NOT_FOUND);
 		}
 		
 		return $filter->getListResponse(new KalturaFilterPager(), null);
