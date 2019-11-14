@@ -9,11 +9,11 @@ class RatingFilter
 	public function init ()
 	{
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
-			"_eq_entry_id",
-			"_eq_user_id",
-			"_in_entry_id",
-			"_eq_rank",
-			"in_rank",
+			'_eq_entry_id',
+			'_eq_user_id',
+			'_in_entry_id',
+			'_eq_rank',
+			'in_rank',
 		) , NULL );
 		
 		$this->allowed_order_fields = array (
@@ -27,8 +27,8 @@ class RatingFilter
 	{
 		return
 			array (
-				"display_name" => "RatingFilter",
-				"desc" => ""
+				'display_name' => 'RatingFilter',
+				'desc' => ''
 			);
 	}
 	

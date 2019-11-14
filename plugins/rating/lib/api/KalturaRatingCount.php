@@ -26,9 +26,9 @@ class KalturaRatingCount extends KalturaObject implements IRelatedFilterable
 	
 	private static $map_between_objects = array
 	(
-		"entryId",
-		"rank",
-		"count"
+		'entryId',
+		'rank',
+		'count',
 	);
 	
 	public function getMapBetweenObjects ( )

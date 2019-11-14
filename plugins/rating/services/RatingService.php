@@ -18,7 +18,7 @@ class RatingService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, RatingPlugin::PLUGIN_NAME);
 		}
 		
-		if (kCurrentContext::$ks_object->isAnonymousSession() && $actionName !== "getRatingCounts")
+		if (kCurrentContext::$ks_object->isAnonymousSession() && $actionName !== 'getRatingCounts')
 		{
 			throw new KalturaAPIException(KalturaErrors::ANONYMOUS_ACCESS_FORBIDDEN);
 		}
@@ -98,7 +98,7 @@ class RatingService extends KalturaBaseService
 	{
 		if (!$entryId)
 		{
-			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "entryId");
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'entryId');
 		}
 		
 		$dbEntry = entryPeer::retrieveByPK($entryId);

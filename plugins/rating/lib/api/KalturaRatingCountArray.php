@@ -23,6 +23,6 @@ class KalturaRatingCountArray extends KalturaTypedArray
 	
 	public function __construct()
 	{
-		parent::__construct("KalturaRatingCount");
+		parent::__construct('KalturaRatingCount');
 	}
 }
