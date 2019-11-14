@@ -1,3 +1,13 @@
+# Orion 15.11.0 #
+
+## Kava - move rounding client tags to config ##
+- Issue Type: Task
+- Issue ID: AN-1102
+
+### configuration ###
+add kava_skip_date_rounding_client_tags section to local.ini with:
+0 = kmc-analytics
+
 # Orion 15.10.0 #
 
 ## AP Feed Drop Folder ##
