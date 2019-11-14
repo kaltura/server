@@ -1,3 +1,13 @@
+# Orion 15.11.0 #
+
+## Support export captions to remote storage ##
+- Issue Type: Task
+- Issue ID: PLAT-10288
+
+### Deployment scripts ###
+Run:
+	php deployment/updates/scripts/add_permissions/2019_11_07_add_caption_asset_export_action.php
+
 # Orion 15.10.0 #
 
 ## AP Feed Drop Folder ##
