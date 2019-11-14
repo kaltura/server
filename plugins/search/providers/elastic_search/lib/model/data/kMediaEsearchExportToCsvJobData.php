@@ -7,10 +7,25 @@
 class kMediaEsearchExportToCsvJobData extends kExportCsvJobData
 {
 	/**
+	 * @var bool
+	 */
+	private $humanReadable;
+	/**
 	 * @var ESearchParams
 	 */
 	protected $searchParams;
-	
+	/**
+	 * @return bool
+	 */
+	public function getHumanReadable() {
+		return $this->humanReadable;
+	}
+	/**
+	 * @param bool $humanReadable
+	 */
+	public function setHumanReadable($humanReadable) {
+		$this->humanReadable = $humanReadable;
+	}
 	/**
 	 * @return ESearchParams
 	 */
@@ -18,7 +33,6 @@ class kMediaEsearchExportToCsvJobData extends kExportCsvJobData
 	{
 		return $this->searchParams;
 	}
-	
 	/**
 	 * @param ESearchParams $searchParams
 	 */
