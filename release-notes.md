@@ -1,4 +1,12 @@
-# Orion 15.11.0 #  
+# Orion 15.11.0 #
+
+## Kava - move rounding client tags to config ##
+- Issue Type: Task
+- Issue ID: AN-1102
+
+### configuration ###
+add kava_skip_date_rounding_client_tags section to local.ini with:
+0 = kmc-analytics
 
 ## 5-star rating ##
 - Issue Type: Task
@@ -11,6 +19,7 @@ Add new permissions
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_06_add_rating_permissions.php
 Run installPlugins script  
 	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
 
 # Orion 15.10.0 #
 
