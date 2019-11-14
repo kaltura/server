@@ -14,7 +14,7 @@ class KalturaMediaEsearchExportToCsvJobData extends KalturaExportCsvJobData
 	public $searchParams;
 	/**
 	 * Human readble choice
-	 * @var string
+	 * @var boolean
 	 */
 	public $humanReadable;
 	
