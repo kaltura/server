@@ -242,12 +242,12 @@ class PlaylistService extends KalturaEntryService
 		return $clonedPlaylist;
 	}
 
-	protected static function cloneRelatedObjects($clonedPlaylistId, $id)
+	protected static function cloneRelatedObjects($clonedPlaylistId, $originalPlaylistId)
 	{
-		$fileAssetList = FileAssetPeer::retrieveByObject(FileAssetObjectType::ENTRY, $id);
+		$fileAssetList = FileAssetPeer::retrieveByObject(FileAssetObjectType::ENTRY, $originalPlaylistId);
 		foreach ($fileAssetList as $fileAsset)
 		{
-			FileAssetService::cloneAction($fileAsset->getId(), $clonedPlaylistId);
+			$fileAsset->copyToEntry($clonedPlaylistId);
 		}
 	}
 	
