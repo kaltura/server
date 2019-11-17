@@ -1,4 +1,13 @@
 # Orion 15.11.0 #
+## Adding new KalturaUserEntryType called registration ##
+- Issue Type: Task
+- Issue ID: PLAT-10283
+
+### configuration ###
+Add Registration to your plugins.ini
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 
 ## Configurations Maps Modifications ##
 - Issue Type: Task
