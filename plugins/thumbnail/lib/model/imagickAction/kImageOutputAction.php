@@ -17,7 +17,8 @@ class kImageOutputAction extends kImagickAction
 	protected function validateFormat()
 	{
 		$validFormats = $this->image->queryFormats();
-		if (!in_array($this->format, $validFormats))
+		$validFormats = array_map('strtolower', $validFormats);
+		if (!in_array(strtolower($this->format), $validFormats))
 		{
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailErrorMessages::NOT_VALID_IMAGE_FORMAT);
 		}
