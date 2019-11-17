@@ -253,7 +253,7 @@ class MetadataIndex extends BaseIndexObject
 	public static function getIgnoreOptimizationKeys()
 	{
 		return array(
-			"object_id"
+			 "PARTNER_ID" => array("object_id"),
 		);
 	}
 

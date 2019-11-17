@@ -27,6 +27,7 @@ class entryIndex extends BaseIndexObject
 	{
 		return 'str_entry_id';
 	}
+
 	public static function getSphinxSplitIndexFieldName()
 	{
 		return 'entry.PARTNER_ID';
@@ -484,7 +485,7 @@ class entryIndex extends BaseIndexObject
 	public static function getIgnoreOptimizationKeys()
 	{
 		return array(
-			"entry_id","reference_id","replacing_entry_id","replaced_entry_id","roots","kuser_id","puser_id","entitled_kusers_publish","entitled_kusers_edit","entitled_kusers_view","creator_kuser_id","creator_puser_id"
+			 "PARTNER_ID" => array("entry_id","reference_id","replacing_entry_id","replaced_entry_id","roots","kuser_id","puser_id","entitled_kusers_publish","entitled_kusers_edit","entitled_kusers_view","creator_kuser_id","creator_puser_id"),
 		);
 	}
 

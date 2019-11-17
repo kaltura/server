@@ -16,7 +16,9 @@
 			<value field="partner_id" />
 		</index>
 		<ignoreOptimizationKeys>
-			<value field="object_id" />
+			<disableFields name="partner_id">
+				<value field="object_id" />
+			</disableFields>
 		</ignoreOptimizationKeys>
 	</object>
 </schema>

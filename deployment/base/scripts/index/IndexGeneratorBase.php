@@ -179,15 +179,21 @@ class IndexGeneratorBase
 	protected function parseIgnoreOptimizationKeys($objName, $indexComplex)
 	{
 		$index = array();
-		foreach($indexComplex->children() as $indexValue)
+		foreach($indexComplex->children() as $indexDisableField)
 		{
-			$idxValueAttr = $indexValue->attributes();
-			$fieldName = $idxValueAttr["field"];
-			$modifiedFieldName = ucwords(preg_replace_callback("/_(.?)/", array($this, 'lTrimUnderscoreAndStrToUpper'), $fieldName));
-			$getter = "get" . $modifiedFieldName;
-			$index[] = new IndexableIgnoreOptimizationKey('"' . $fieldName . '"', '"' . $getter . '"');
+			$disableFieldIndex = array();
+			$disableFieldsValueAttr = $indexDisableField->attributes();
+			$name = $disableFieldsValueAttr["name"];
+			foreach ($indexDisableField->children() as $indexValue)
+			{
+				$idxValueAttr = $indexValue->attributes();
+				$fieldName = $idxValueAttr["field"];
+				$modifiedFieldName = ucwords(preg_replace_callback("/_(.?)/", array($this, 'lTrimUnderscoreAndStrToUpper'), $fieldName));
+				$getter = "get" . $modifiedFieldName;
+				$disableFieldIndex[] = new IndexableIgnoreOptimizationKey('"' . $fieldName . '"', '"' . $getter . '"');
+			}
+			$index["$name"] = $disableFieldIndex;
 		}
-
 		$this->ignoreOptimizationKeys[$objName] = $index;
 	}
 

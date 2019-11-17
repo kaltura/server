@@ -337,7 +337,7 @@ class ScheduleEventIndex extends BaseIndexObject
 	public static function getIgnoreOptimizationKeys()
 	{
 		return array(
-			"parent_id","reference_id"
+			 "PARTNER_ID" => array("parent_id","reference_id"),
 		);
 	}
 

@@ -42,8 +42,10 @@
 	            <value field="partner_id" />
 	        </cacheInvalidationKey>
 			<ignoreOptimizationKeys>
-				<value field="parent_id" />
-				<value field="reference_id" />
+				<disableFields name="partner_id">
+					<value field="parent_id" />
+					<value field="reference_id" />
+				</disableFields>
 			</ignoreOptimizationKeys>
 	        <!--
 	        float is support in sphinx 2.2.10, we don't use that version yet. 

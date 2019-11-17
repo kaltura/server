@@ -418,7 +418,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 			$match = $this->getStringMatchClause($sphinxField, $comparison, $value);
 			KalturaLog::debug("Add match criterion[$field] as sphinx field[$sphinxField] of type [$type] match [$match] line [" . __LINE__ . "]");
 			$this->addMatch($match);
-			if ($this->criteria->shouldFilterPartnerFromSphinxOptimizations($objectClass,$sphinxField))
+			if ($this->criteria->shouldFilterFieldFromSphinxOptimizations($objectClass, $sphinxField))
 			{
 				$this->criteria->setDisablePartnerOptimization(true);
 			}
