@@ -65,13 +65,12 @@ class ESearchService extends KalturaBaseService
 	/**
 	 * Creates a batch job that sends an email with a link to download a CSV containing a list of entries
 	 *
-	 * @action      entryExportToCsv
+	 * @action entryExportToCsv
 	 * @actionAlias media.exportToCsv
 	 * @param KalturaMediaEsearchExportToCsvJobData $data job data indicating filter to pass to the job
 	 * @return string
 	 *
 	 * @throws APIErrors::USER_EMAIL_NOT_FOUND
-	 * @throws KalturaAPIException
 	 */
 	public function entryExportToCsvAction (KalturaMediaEsearchExportToCsvJobData $data)
 	{
