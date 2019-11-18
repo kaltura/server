@@ -3886,13 +3886,11 @@ class kKavaReportsMgr extends kKavaBase
 					$key = implode(self::ENRICH_DIM_DELIMITER, $key);
 					$dimension_ids[$key] = true;
 				}
-				
 				// run the enrichment functions
 				foreach ($cur_enrich_specs as $enrich_spec)
 				{
 					list($enrich_func, $enrich_context, $enriched_indexes) = $enrich_spec;
-
-					$entities = call_user_func($enrich_func, array_keys($dimension_ids), $partner_id, $enrich_context);
+					$entities = call_user_func($enrich_func, array_map('strval',array_keys($dimension_ids)), $partner_id, $enrich_context);
 			
 					for ($current_row = $start; $current_row < $limit; $current_row++) 
 					{

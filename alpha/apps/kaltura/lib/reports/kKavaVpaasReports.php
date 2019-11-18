@@ -190,6 +190,7 @@ class kKavaVpaasReports extends kKavaReports
 				self::REPORT_ENRICH_FUNC => 'kKavaVpaasReports::genericVpaasQueryEnrich',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'peer' => 'categoryPeer',
+					'int_ids_only' => true,
 					'columns' => array('NAME', 'PARTNER_ID'),
 				)
 			),
