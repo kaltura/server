@@ -365,5 +365,13 @@ class categoryIndex extends BaseIndexObject
 			return array("category:id=".strtolower($object->getId()), "category:partnerId=".strtolower($object->getPartnerId()));
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
+	public static function getIgnoreOptimizationKeys()
+	{
+		return array(
+			 "PARTNER_ID" => array("str_category_id","reference_id"),
+		);
+	}
+
 }
 

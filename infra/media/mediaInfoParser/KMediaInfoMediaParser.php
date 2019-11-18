@@ -187,6 +187,16 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 			 */
 			$kMi->isFastStart = $ffMi->isFastStart;
 			$kMi->contentStreams = $ffMi->contentStreams;
+			/*
+			 * HDR related metrics
+			 */
+			$kMi->matrixCoefficients = $ffMi->matrixCoefficients;
+			$kMi->colorTransfer      = $ffMi->colorTransfer;
+			$kMi->colorPrimaries     = $ffMi->colorPrimaries;
+			$kMi->pixelFormat        = $ffMi->pixelFormat;
+			$kMi->colorSpace         = $ffMi->colorSpace;
+			$kMi->chromaSubsampling  = $ffMi->chromaSubsampling;
+			$kMi->bitsDepth          = $ffMi->bitsDepth;
 		}	
 		$compareStr = self::compareFields($kMi, $ffMi);
 		KalturaLog::log("compareFields(".(isset($compareStr)?$compareStr:"IDENTICAL")."), file($this->filePath)");
