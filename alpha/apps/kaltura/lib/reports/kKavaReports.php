@@ -236,8 +236,13 @@ class kKavaReports extends kKavaReportsMgr
 				'name' => self::DIMENSION_PLAYBACK_CONTEXT
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => 'name',
-				self::REPORT_ENRICH_FUNC => 'self::getCategoriesNames'
+				self::REPORT_ENRICH_OUTPUT => array('name'),
+				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+				self::REPORT_ENRICH_CONTEXT => array(
+					'peer' => 'categoryPeer',
+					'int_ids_only' => true,
+					'columns' => array('NAME'),
+				)
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_UNIQUE_VIEWERS, self::METRIC_UNIQUE_PERCENTILES_RATIO),
 			self::REPORT_FORCE_TOTAL_COUNT => true,
