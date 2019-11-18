@@ -37,7 +37,7 @@ class ConfMapsPeer extends BaseConfMapsPeer {
 	{
 		$c = new Criteria();
 		$c->add(self::MAP_NAME ,$mapName );
-		if($hostNameRegex)
+		if(!is_null($hostNameRegex))
 		{
 			$c->add(self::HOST_NAME, $hostNameRegex);
 		}
