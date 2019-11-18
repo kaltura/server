@@ -572,6 +572,9 @@
 				"votes": {
 					"type" : "long"
 				},
+				"rank": {
+					"type" : "integer"
+				},
 				"last_played_at": {
 					"type" : "date",
 					"format": "epoch_second"
