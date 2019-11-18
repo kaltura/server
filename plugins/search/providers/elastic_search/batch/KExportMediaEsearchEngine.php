@@ -10,6 +10,8 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	const LIMIT = 10000;
 	
 	const PAGE_SIZE = 500;
+
+	const DATE_FORMAT = 'YYYY-MM-ddTHH:mm';
 	
 	public function fillCsv(&$csvFile, &$data)
 	{
@@ -51,7 +53,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 		}
 		while (count($results->objects) == self::PAGE_SIZE);
 		
-		$this->addContentToCsv ($entriesToReturn, $csvFile);
+		$this->addContentToCsv ($entriesToReturn, $csvFile, $data);
 	}
 	
 	/**
@@ -68,7 +70,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	/**
 	 * The function grabs all the fields values for each entry and adds them as a new row to the csv file
 	 */
-	protected function addContentToCsv($entriesArray, $csvFile)
+	protected function addContentToCsv($entriesArray, $csvFile, $data)
 	{
 		if(!count($entriesArray))
 			return;
@@ -76,7 +78,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 		$entriesData = array();
 		foreach ($entriesArray as $entry)
 		{
-			$entriesData[$entry->id] = $this->getCsvRowValues($entry);
+			$entriesData[$entry->id] = $this->getCsvRowValues($entry, $data);
 		}
 		
 		foreach ($entriesData as $entryId => $values)
@@ -84,14 +86,15 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 			KCsvWrapper::sanitizedFputCsv($csvFile, $values);
 		}
 	}
-	
+
 	/**
 	 * This function calculates the default values for CSV row representing a single entry and returns them as an array
 	 *
 	 * @param KalturaBaseEntry $entry
+	 * @param                  $data
 	 * @return array
 	 */
-	protected function getCsvRowValues (KalturaBaseEntry $entry)
+	protected function getCsvRowValues (KalturaBaseEntry $entry, $data)
 	{
 		$entryCategories = $this->retrieveEntryCategories ($entry->id);
 		
@@ -102,13 +105,13 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 			$entry->tags,
 			implode (',', $entryCategories),
 			$entry->userId,
-			$entry->createdAt,
-			$entry->updatedAt,
+			$this->makeTimeStampHumanReadableIfNeeded($entry->createdAt, $data),
+			$this->makeTimeStampHumanReadableIfNeeded($entry->updatedAt, $data),
 		);
 		
 		return $values;
 	}
-	
+
 	/**
 	 * Function returns an array of every category the entry is published to.
 	 *
@@ -128,12 +131,22 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 		
 		$categoryEntryResult = KBatchBase::$kClient->categoryEntry->listAction($categoryEntryFilter, $pager);
 		
-		$result = array();
 		foreach ($categoryEntryResult->objects as $categoryEntry)
 		{
 			$result[] = $categoryEntry->categoryId;
 		}
 		
 		return $result;
+	}
+	/**
+	 * @param $timestamp
+	 * @param $data
+	 * @return false|string
+	 */
+	protected function makeTimeStampHumanReadableIfNeeded($timestamp, $data) {
+		if($data->humanReadable != '1') {
+			return $timestamp;
+		}
+		return date(self::DATE_FORMAT, $timestamp);
 	}
 }
