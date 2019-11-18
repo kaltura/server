@@ -183,6 +183,18 @@ class kKavaVpaasReports extends kKavaReports
 			self::REPORT_SKIP_PARTNER_FILTER => null,
 		),
 
+		ReportType::TOP_PLAYBACK_CONTEXT_VPAAS => array(
+			self::REPORT_BASE_DEF => ReportType::TOP_PLAYBACK_CONTEXT,
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => array('name'),
+				self::REPORT_ENRICH_FUNC => 'kKavaVpaasReports::genericVpaasQueryEnrich',
+				self::REPORT_ENRICH_CONTEXT => array(
+					'peer' => 'categoryPeer',
+					'columns' => array('NAME', 'PARTNER_ID'),
+				)
+			),
+		),
+
 	);
 
 	protected static function getValidEnrichedPartners($partner_id, $partner_ids)
