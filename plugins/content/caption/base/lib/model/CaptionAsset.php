@@ -98,12 +98,9 @@ class CaptionAsset extends asset
 				//If current captionAsset has no accuracy or has higher accuracy than an existing one consider it as the one that should be displayed
 				if( !$captionAsset->getAccuracy() || $this->getAccuracy() > $captionAsset->getAccuracy() )
 				{
-					if($this->getDisplayOnPlayer() == false)
-					{
-						$this->setDisplayOnPlayer(true);
-						//The setCustomDataObj is called in preSave so when changing custom data value we need to re-set it
-						$this->setCustomDataObj();
-					}
+					$this->setDisplayOnPlayer(true);
+					//The setCustomDataObj is called in preSave so when changing custom data value we need to re-set it
+					$this->setCustomDataObj();
 					
 					if($captionAsset->getDisplayOnPlayer() == true)
 					{
