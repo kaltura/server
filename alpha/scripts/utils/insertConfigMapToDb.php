@@ -16,7 +16,7 @@ $hostNameRegEx 	= $argv[4];
 $iniFilePath 	= $argv[5];
 $justification 	= $argv[6];
 $status 		= $argv[7];
-const DB_MAP_NAME = 'db_sync';
+
 if(empty($rawMapName))
 {
 	die("\nMap name - must have value, aborting.\n");
@@ -54,7 +54,7 @@ if(!$ret)
 
 function getPdoConnection()
 {
-	$dbMap = kConf::getMap(DB_MAP_NAME);
+	$dbMap = kConf::getMap('db');
 	if(!$dbMap)
 	{
 		die('Cannot get db.ini map from configuration!');
