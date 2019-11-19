@@ -576,7 +576,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
         {
             $this->validatePropertyNumeric('defaultRecordingConversionProfile');
             $conversionProfile = conversionProfile2Peer::retrieveByPKAndPartnerId($this->defaultRecordingConversionProfile, $sourceObject->getId());
-            if ($this->defaultRecordingConversionProfile !== 0 && !$conversionProfile) { // 0 is for disable the feature
+            if ($this->defaultRecordingConversionProfile != 0 && !$conversionProfile) {  // 0 is for disable the feature - not need to check if conversion profile exist
                 throw new KalturaAPIException(SystemPartnerErrors::PARTNER_RECORDING_CONVERSION_PROFILE_ID_ERROR, $this->defaultRecordingConversionProfile);
             }
         }
