@@ -7,7 +7,7 @@
  */
 class IniUtils
 {
-	const GLOBAL_INI_SECTION_REGEX = '/\[.*\S.*\]/m';
+	const GLOBAL_INI_SECTION_REGEX = '/^\s*\[.*\S.*\]/m';
 
 	/**
 	 * Given an associative array, this function will generate INI file string that represent it.
