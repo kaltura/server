@@ -10,4 +10,5 @@ interface reportInterval extends BaseEnum
 	const HOURS = 'hours';
 	const MINUTES = 'minutes';
 	const TEN_SECONDS = 'ten_seconds';
+	const TEN_MINUTES = 'ten_minutes';
 }

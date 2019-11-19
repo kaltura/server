@@ -309,5 +309,12 @@ class kuserIndex extends BaseIndexObject
 			return array("kuser:id=".strtolower($object->getId()), "kuser:partnerId=".strtolower($object->getPartnerId()));
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
+	public static function getIgnoreOptimizationKeys()
+	{
+		return array(
+		);
+	}
+
 }
 

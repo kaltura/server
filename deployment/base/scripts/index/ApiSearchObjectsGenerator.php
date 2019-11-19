@@ -4,6 +4,7 @@ require(__DIR__ . '/IndexableField.php');
 require(__DIR__ . '/IndexableObject.php');
 require(__DIR__ . '/IndexableOptimization.php');
 require(__DIR__ . '/IndexableCacheInvalidationKey.php');
+require(__DIR__ . '/IndexableIgnoreOptimizationKey.php');
 require(__DIR__ . '/IndexGeneratorBase.php');
 
 require_once(__DIR__ . '/../../../../api_v3/bootstrap.php');

@@ -206,7 +206,7 @@
 			else {
 				$startFrom = $duration-4;
 			}
-			$cmdLine = "$ffmpegBin -ss $startFrom -i $chunkFileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -f mpegts -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | tail";
+			$cmdLine = "$ffmpegBin -ss $startFrom -i $chunkFileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -f mpegts -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | tail -n20";
 			KalturaLog::log("tail:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {
@@ -216,6 +216,9 @@
 			KalturaLog::log("tail:rv($rv), output:\n".print_r($outputArr,1));
 			foreach($outputArr as $idx=>$outputLine) {
 				if(strlen(trim($outputLine))==0) {
+					unset($outputArr[$idx]);
+				}
+				else if(strncmp(trim($outputLine),"frame",5)!=0) {
 					unset($outputArr[$idx]);
 				}
 			}

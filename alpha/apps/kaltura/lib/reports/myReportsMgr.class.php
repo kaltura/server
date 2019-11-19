@@ -1540,6 +1540,7 @@ class reportsInputFilter
 	public $gte_entry_created_at;
 	public $lte_entry_created_at;
 	public $entries_ids;
+	public $playback_context_ids;
 
 	public function getFilterBy() {
 		return "";

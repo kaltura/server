@@ -1,3 +1,36 @@
+# Orion 15.11.0 #
+
+## Configurations Maps Modifications ##
+- Issue Type: Task
+- Issue ID: PLAT-10245
+
+### Deployment scripts ###
+Run php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_05_update_confmaps_permissions.php 
+
+### configuration ###
+modify /opt/kaltura/app/configuration/db_sync.template.ini to /opt/kaltura/app/configuration/db_sync.ini and configure relevant db connection
+This is required to be able to run syncDbConfigMapsToCache.php and insertConfigMapToDb.php scripts syncs conf maps from db to remote cache.
+
+## Kava - move rounding client tags to config ##
+- Issue Type: Task
+- Issue ID: AN-1102
+
+### configuration ###
+add kava_skip_date_rounding_client_tags section to local.ini with:
+0 = kmc-analytics
+
+## 5-star rating ##
+- Issue Type: Task
+- Issue ID: PSVAMB-8935
+
+### Deployment scripts ###
+Add new kvote table index    
+    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_06_add_kvote_index.sql
+Add new permissions
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_06_add_rating_permissions.php
+Run installPlugins script  
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
 # Orion 15.10.0 #
 
 ## AP Feed Drop Folder ##

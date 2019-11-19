@@ -4,6 +4,7 @@ require(__DIR__ . '/IndexableField.php');
 require(__DIR__ . '/IndexableObject.php');
 require(__DIR__ . '/IndexableOptimization.php');
 require(__DIR__ . '/IndexableCacheInvalidationKey.php');
+require(__DIR__ . '/IndexableIgnoreOptimizationKey.php');
 require(__DIR__ . '/IndexGeneratorBase.php');
 
 require_once(__DIR__ . '/../../../bootstrap.php');
@@ -58,6 +59,7 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 		$this->getDoCount($fp, $this->searchableObjects[$key]->peerName);
 
 		$this->generateCacheInvalidationKeys($fp, $key);
+		$this->generateIgnoreOptimizationsKeys($fp, $key);
 
 		$this->createFileFooter($fp, $key);
 		
@@ -136,6 +138,18 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 		return $keysArray;
 	}
 
+	private function getIgnoreOptimizationKeys($class)
+	{
+		$keysArray = array();
+		/* @var $ignoreOptimizationKey IndexableIgnoreOptimizationKey */
+		foreach($this->ignoreOptimizationKeys[$class] as $ignoreOptimizationKey)
+		{
+			$keysArray[]=$ignoreOptimizationKey->getName();
+		}
+
+		return $keysArray;
+	}
+
 	private function getObjectCacheInvalidationKeys($class, $indexName)
 	{
 		$keysArray = array();
@@ -162,6 +176,33 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 		$this->printToFile($fp, $this->getPeerCacheInvalidationKeysLine($this->getPeerCacheInvalidationKeys($class, $indexName)),3);
 		$this->printToFile($fp, "else",2);
 		$this->printToFile($fp, $this->getPeerCacheInvalidationKeysLine($this->getObjectCacheInvalidationKeys($class, $indexName)),3);
+		$this->printToFile($fp, "}",1);
+		$this->printToFile($fp, "");
+	}
+
+	private function generateIgnoreOptimizationsKeys($fp, $class)
+	{
+		$this->printToFile($fp, "//This function is generated based on index elements in the relevant IndexSchema.xml",1);
+		$this->printToFile($fp, "public static function getIgnoreOptimizationKeys()",1);
+		$this->printToFile($fp, "{",1);
+		$this->printToFile($fp, "return array(",2);
+		if(isset($this->ignoreOptimizationKeys[$class]))
+		{
+			$keysArray = array();
+			foreach ($this->ignoreOptimizationKeys[$class] as $disableFieldkey => $disableFieldValues)
+			{
+				/* @var $disableFieldValue IndexableIgnoreOptimizationKey */
+				foreach ($disableFieldValues as $disableFieldValue)
+					$keysArray[] = $disableFieldValue->getName();
+
+				if(!empty($keysArray))
+				{
+					$this->printToFile($fp, ' "'. strtoupper($disableFieldkey). '" => array(' . implode(',', $keysArray) . '),', 3);
+				}
+			}
+		}
+
+		$this->printToFile($fp, ");",2);
 		$this->printToFile($fp, "}",1);
 		$this->printToFile($fp, "");
 	}
