@@ -20,4 +20,12 @@ class BooleanNotificationTemplate extends BatchEventNotificationTemplate //imple
 		$jobData->setTemplateId($this->getId());
 		return $jobData;
 	}
+
+	/* (non-PHPdoc)
+	 * @see BatchEventNotificationTemplate::dispatch()
+	 */
+	public function dispatch(kScope $scope)
+	{
+		return;
+	}
 }
