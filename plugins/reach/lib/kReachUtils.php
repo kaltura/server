@@ -155,10 +155,17 @@ class kReachUtils
 		return false;
 	}
 	
-	public static function isEntryTypeSupported($type)
+	public static function isEntryTypeSupported($type, $mediaType = null)
 	{
 		$supportedTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP);
-		return in_array($type, $supportedTypes);
+		$supported = in_array($type, $supportedTypes);
+		if($mediaType)
+		{
+			$supported = $supported && in_array($mediaType, array(entry::ENTRY_MEDIA_TYPE_VIDEO,entry::ENTRY_MEDIA_TYPE_AUDIO)))
+		}
+		
+		return $supported;
+		
 	}
 
 	public static function reachStrToTime($offset , $value)
