@@ -247,7 +247,7 @@ class PlaylistService extends KalturaEntryService
 		$fileAssetList = FileAssetPeer::retrieveByObject(FileAssetObjectType::ENTRY, $originalPlaylistId);
 		foreach ($fileAssetList as $fileAsset)
 		{
-			$fileAsset->copyToEntry($clonedPlaylistId);
+			$fileAsset->cloneFileAsset($clonedPlaylistId);
 		}
 	}
 	

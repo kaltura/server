@@ -121,4 +121,18 @@ class FileAsset extends BaseFileAsset implements ISyncableFile, IRelatedObject
 		return $fileAssetCopy;
 	}
 
+	public function cloneFileAsset($entryId)
+	{
+		$fileAssetCopy = $this->copyToEntry($entryId);
+
+		$fileSyncResource = new KalturaFileSyncResource();
+		$fileSyncResource->fileSyncObjectType = FileSyncObjectType::FILE_ASSET;
+		$fileSyncResource->objectSubType = asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET;
+		$fileSyncResource->objectId = $this->getId();
+		$fileSyncResource->version = $this->getVersion();
+
+		$fileAssetService = new FileAssetService();
+		$fileAssetService->setContentAction($fileAssetCopy->getId(), $fileSyncResource);
+	}
+
 } // FileAsset
