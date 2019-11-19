@@ -42,6 +42,11 @@ class CaptionAssetService extends KalturaAssetService
 
 	protected function shouldDisableCategoryEntitlement($entryId)
 	{
+		if(kCurrentContext::$isInMultiRequest)
+		{
+			return false;
+		}
+
 		$ks = null;
 		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
 		if ($ksString != '') // for actions with no KS or when creating ks.

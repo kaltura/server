@@ -188,6 +188,7 @@ class KalturaFrontController
 	
 	public function handleMultiRequest()
 	{
+		kCurrentContext::$isInMultiRequest = true;
 		// arrange the parameters by request index
 		$commonParams = array();
 		$listOfRequests = array();
@@ -310,7 +311,6 @@ class KalturaFrontController
 						throw $listOfRequests[$i]['error'];
 					
 					$currentResult = $this->dispatcher->dispatch($currentService, $currentAction, $currentParams);
-					self::onRequestFinished($currentService, $currentAction);
 				}
 				catch(Exception $ex)
 				{
@@ -752,13 +752,5 @@ class KalturaFrontController
 		// return serialized object according to required type
 		$serializer = $this->setSerializer($serializerType);
 		return $serializer->serialize($apiObject);
-	}
-
-	protected function onRequestFinished($currentService, $currentAction)
-	{
-		if($currentService == 'caption_captionasset' && $currentAction == 'setContent')
-		{
-			categoryPeer::enableCategoryEntitlementEnforcement();
-		}
 	}
 }
