@@ -161,7 +161,7 @@ class kReachUtils
 		$supported = in_array($type, $supportedTypes);
 		if($mediaType && $supported)
 		{
-			$supported = $supported && in_array($mediaType, array(entry::ENTRY_MEDIA_TYPE_VIDEO,entry::ENTRY_MEDIA_TYPE_AUDIO)))
+			$supported = $supported && in_array($mediaType, array(entry::ENTRY_MEDIA_TYPE_VIDEO,entry::ENTRY_MEDIA_TYPE_AUDIO));
 		}
 		
 		return $supported;
