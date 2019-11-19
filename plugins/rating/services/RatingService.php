@@ -41,6 +41,11 @@ class RatingService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		}
 		
+		if ($rank <= 0 || $rank > 5)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_RANK_VALUE);
+		}
+		
 		//Check if a kvote for current entryId and kuser already exists.
 		$existingKVote = kvotePeer::doSelectByEntryIdAndPuserId($entryId, $this->getPartnerId(), kCurrentContext::$ks_uid);
 		if ($existingKVote)
