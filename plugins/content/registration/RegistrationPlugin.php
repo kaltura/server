@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin enabling the storage of entries that relates to a user for registration  - TODO CHANGE
+ * Plugin enabling the storage of entries that relates to a user for registration
  * @package plugins.registration
  */
 class RegistrationPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader
@@ -28,11 +28,7 @@ class RegistrationPlugin extends KalturaPlugin implements IKalturaPermissions, I
 	 */
 	public static function getEnums($baseEnumName = null)
 	{
-		if (is_null($baseEnumName))
-		{
-			return array('RegistrationUserEntryType');
-		}
-		if ($baseEnumName === 'UserEntryType')
+		if (is_null($baseEnumName) || $baseEnumName === 'UserEntryType')
 		{
 			return array('RegistrationUserEntryType');
 		}

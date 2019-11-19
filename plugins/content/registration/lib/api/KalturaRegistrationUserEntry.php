@@ -14,7 +14,6 @@ class KalturaRegistrationUserEntry extends KalturaUserEntry
 		{
 			$dbObject = new RegistrationUserEntry();
 		}
-
 		return parent::toObject($dbObject, $propertiesToSkip);
 	}
 }
