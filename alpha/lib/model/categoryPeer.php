@@ -26,22 +26,8 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 
 	public static function disableCategoryEntitlementEnforcement()
 	{
-		$currentState = self::$categoryEntitlementEnforcement;
 		self::$categoryEntitlementEnforcement = false;
-		if($currentState)
-		{
-			categoryPeer::setDefaultCriteriaFilter();
-		}
-	}
-
-	public static function enableCategoryEntitlementEnforcement()
-	{
-		$currentState = self::$categoryEntitlementEnforcement;
-		self::$categoryEntitlementEnforcement = true;
-		if(!$currentState)
-		{
-			categoryPeer::setDefaultCriteriaFilter();
-		}
+		categoryPeer::setDefaultCriteriaFilter();
 	}
 
 	public static function getCategoryEntitlementEnforcement()
