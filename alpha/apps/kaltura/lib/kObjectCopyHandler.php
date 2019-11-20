@@ -57,6 +57,16 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 	 */
 	public function objectCopied(BaseObject $fromObject, BaseObject $toObject)
 	{
+		if ($fromObject instanceof FileAsset)
+		{
+			$syncKey = $fromObject->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			$newSyncKey = $toObject->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+
+			if(kFileSyncUtils::fileSync_exists($syncKey))
+			{
+				kFileSyncUtils::softCopy($syncKey, $newSyncKey);
+			}
+		}
 		if($fromObject instanceof asset)
 		{
 			self::mapIds('asset', $fromObject->getId(), $toObject->getId());
