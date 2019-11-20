@@ -26,7 +26,8 @@ class kEmails
                 {
                     $currentRecipient .= $singleChar;
                 }
-                else{
+                else
+                {
                     if (strlen($currentRecipient) > 0)
                     {
                         $recipientsArray[] = $currentRecipient;
@@ -35,7 +36,8 @@ class kEmails
                     $doubleQuoteMarks = false;
                 }
             }
-            else{
+            else
+            {
                 $currentRecipient .= $singleChar;
                 if ($singleChar === '\\')
                 {
