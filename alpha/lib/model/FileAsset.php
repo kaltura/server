@@ -120,5 +120,5 @@ class FileAsset extends BaseFileAsset implements ISyncableFile, IRelatedObject
 		$fileAssetCopy->save();
 		return $fileAssetCopy;
 	}
-	
+
 } // FileAsset

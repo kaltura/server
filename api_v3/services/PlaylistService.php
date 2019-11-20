@@ -244,8 +244,7 @@ class PlaylistService extends KalturaEntryService
 
 	protected static function cloneRelatedObjects($clonedPlaylistId, $originalPlaylistId)
 	{
-		$removeStatusDeleted = true;
-		$fileAssetList = FileAssetPeer::retrieveByObject(FileAssetObjectType::ENTRY, $originalPlaylistId, null ,$removeStatusDeleted);
+		$fileAssetList = FileAssetPeer::retrieveByObject(FileAssetObjectType::ENTRY, $originalPlaylistId);
 		foreach ($fileAssetList as $fileAsset)
 		{
 			$fileAsset->copyToEntry($clonedPlaylistId);

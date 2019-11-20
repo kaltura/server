@@ -19,18 +19,13 @@ class FileAssetPeer extends BaseFileAssetPeer implements IRelatedObjectPeer
 	 * @param int $objectType
 	 * @param string $objectId
 	 * @param PropelPDO $con
-	 * @param boolean $removeStatusDeleted
 	 * @return array<FileAsset>
 	 */
-	public static function retrieveByObject($objectType, $objectId, PropelPDO $con = null, $removeStatusDeleted = null)
+	public static function retrieveByObject($objectType, $objectId, PropelPDO $con = null)
 	{
 		$criteria = new Criteria();
 		$criteria->add(FileAssetPeer::OBJECT_TYPE, $objectType);
 		$criteria->add(FileAssetPeer::OBJECT_ID, $objectId);
-		if ($removeStatusDeleted)
-		{
-			$criteria->add(FileAssetPeer::STATUS, FileAssetStatus::DELETED, Criteria::NOT_EQUAL);
-		}
 
 		return FileAssetPeer::doSelect($criteria, $con);
 	}

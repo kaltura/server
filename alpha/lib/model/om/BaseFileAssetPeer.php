@@ -448,7 +448,8 @@ abstract class BaseFileAssetPeer {
 		if(self::$s_criteria_filter == null)
 			self::$s_criteria_filter = new criteriaFilter();
 		
-		$c = new myCriteria(); 
+		$c = new myCriteria();
+		$c->add(FileAssetPeer::STATUS, FileAssetStatus::DELETED, Criteria::NOT_EQUAL);
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
