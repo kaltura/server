@@ -59,8 +59,8 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 	{
 		if ($fromObject instanceof FileAsset)
 		{
-			$syncKey = $fromObject->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-			$newSyncKey = $toObject->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			$syncKey = $fromObject->getSyncKey(FileAsset::FILE_SYNC_ASSET);
+			$newSyncKey = $toObject->getSyncKey(FileAsset::FILE_SYNC_ASSET);
 
 			if(kFileSyncUtils::fileSync_exists($syncKey))
 			{
