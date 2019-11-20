@@ -154,6 +154,7 @@ class kVendorCredit
 		$c->add(EntryVendorTaskPeer::STATUS, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::READY), Criteria::IN);
 		$c->add(EntryVendorTaskPeer::QUEUE_TIME, $this->getSyncCreditStartDate(), Criteria::GREATER_EQUAL);
 		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
+		$c->add(EntryVendorTaskPeer::PRICE, 0, Criteria::GREATER_THAN);
 		$this->addAdditionalCriteria($c);
 
 		$now = time();
