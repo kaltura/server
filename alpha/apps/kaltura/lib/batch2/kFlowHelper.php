@@ -2136,7 +2136,7 @@ class kFlowHelper
 		if($entry)
 		{
 			$replacedEntryId = $entry->getReplacedEntryId();
-			if($replacedEntryId)
+			if($replacedEntryId && $entry->getSyncFlavorsOnceReady())
 			{
 				$entryId = $replacedEntryId;
 			}
