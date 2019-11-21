@@ -186,7 +186,7 @@ CREATE TABLE IF NOT EXISTS `batch_job_log` (
   `duplication_key` varchar(2047) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
   `log_status` int(11) DEFAULT NULL,
-  `abort` tinyint(4) DEFAULT NULL,
+  `abort` tinyint(4) DEFAULT '0',
   `check_again_timeout` int(11) DEFAULT NULL,
   `progress` tinyint(4) DEFAULT NULL,
   `message` varchar(1024) DEFAULT NULL,

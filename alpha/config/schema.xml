@@ -1950,7 +1950,7 @@
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="duplication_key" type="varchar" size="2047" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="log_status" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
-        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="abort" type="tinyint" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="abort" type="tinyint" default="0" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="check_again_timeout" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="progress" type="tinyint" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="message" type="varchar" size="1024" />

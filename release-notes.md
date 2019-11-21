@@ -1,4 +1,13 @@
 # Orion 15.11.0 #
+
+## Optimize batch_job_log qureies ##
+- Issue Type: Task
+- Issue ID: PLAT-10294
+
+### Deployment scripts ###
+Alter batch_job_log table to change abort colmun default value    
+    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_21_alter_batch_job_log_abort_default_value.sql
+
 ## Adding new KalturaUserEntryType called registration ##
 - Issue Type: Task
 - Issue ID: PLAT-10283

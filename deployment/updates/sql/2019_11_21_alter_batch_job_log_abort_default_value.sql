@@ -1,0 +1,1 @@
+ALTER TABLE batch_job_log ALTER COLUMN abort SET DEFAULT 0;
