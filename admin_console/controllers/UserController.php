@@ -143,31 +143,14 @@ class UserController extends Zend_Controller_Action
 	public function loginAction()
 	{
 		$settings = Zend_Registry::get('config')->settings;
-		$redirectUrl = null;
-
-		if(isset($settings->partnerId))
+		if(isset($settings->ssoLogin) && $settings->ssoLogin == true)
 		{
-			try
-			{
-				$client = Infra_ClientHelper::getClient();
-				$ssoPlugin = Kaltura_Client_Sso_Plugin::get($client);
-				$redirectUrl = $ssoPlugin->sso->login('', 'admin_console', $settings->partnerId);
-				if($redirectUrl)
-				{
-					$this->ssoLogin($settings->partnerId, $client, $redirectUrl);
-				}
-			}
-			catch(Exception $ex)
-			{
-				// if sso is not set on admin partner try to login using the form
-				if ($ex->getCode() !== 'SSO_NOT_FOUND')
-				{
-					throw $ex;
-				}
-			}
+			$this->ssoLogin($settings);
 		}
-
-		$this->formLogin();
+		else
+		{
+			$this->formLogin();
+		}
 	}
 
 	protected function formLogin()
@@ -224,42 +207,56 @@ class UserController extends Zend_Controller_Action
 		$this->render('login');
 	}
 
-	protected function ssoLogin($partnerId, $client, $redirectUrl)
+	protected function ssoLogin($settings)
 	{
 		try
 		{
-			// if we got session from sso server validate it, if we didnt redirect to sso server
-			$ks = $_GET['ks'];
-			if($ks)
+			$redirectUrl = null;
+			if(isset($settings->partnerId))
 			{
-				$client->setKs($ks);
-				$client->user->loginByKs($partnerId);
-
-				$adapter = new Kaltura_AdminAuthAdapter();
-				$adapter->setKs($ks);
-				$auth = Infra_AuthHelper::getAuthInstance();
-				$result = $auth->authenticate($adapter);
-				if ($result->isValid())
+				$partnerId = $settings->partnerId;
+				$client = Infra_ClientHelper::getClient();
+				$ssoPlugin = Kaltura_Client_Sso_Plugin::get($client);
+				$redirectUrl = $ssoPlugin->sso->login('', 'admin_console', $partnerId);
+				if($redirectUrl)
 				{
-					$nextUri = $this->_getParam('next_uri');
-					if ($nextUri)
-						$this->_helper->redirector->gotoUrl($nextUri);
+					// if we got session from sso server validate it, if we didnt redirect to sso server
+					$ks = $_GET['ks'];
+					if($ks)
+					{
+						$client->setKs($ks);
+						$client->user->loginByKs($partnerId);
+						$adapter = new Kaltura_AdminAuthAdapter();
+						$adapter->setKs($ks);
+						$auth = Infra_AuthHelper::getAuthInstance();
+						$result = $auth->authenticate($adapter);
+						if ($result->isValid())
+						{
+							$nextUri = $this->_getParam('next_uri');
+							if ($nextUri)
+								$this->_helper->redirector->gotoUrl($nextUri);
+							else
+								$this->_helper->redirector('list', 'partner');
+						}
+						else
+						{
+							throw new Exception('', 'INVALID_CREDENTIALS');
+						}
+					}
 					else
-						$this->_helper->redirector('list', 'partner');
-				}
-				else
-				{
-					throw new Exception('', 'INVALID_CREDENTIALS');
+					{
+						$this->getResponse()->setRedirect($redirectUrl);
+					}
 				}
 			}
 			else
 			{
-				$this->getResponse()->setRedirect($redirectUrl);
+				throw new Exception('', 'MISSING_ADMIN_PARTNER');
 			}
 		}
 		catch(Exception $ex)
 		{
-				throw $ex;
+			throw $ex;
 		}
 	}
 	
