@@ -142,21 +142,51 @@ class UserController extends Zend_Controller_Action
 	
 	public function loginAction()
 	{
+		$settings = Zend_Registry::get('config')->settings;
+		$redirectUrl = null;
+
+		if(isset($settings->partnerId))
+		{
+			try
+			{
+				$client = Infra_ClientHelper::getClient();
+				$ssoPlugin = Kaltura_Client_Sso_Plugin::get($client);
+				$redirectUrl = $ssoPlugin->sso->login('', 'admin_console', $settings->partnerId);
+				if($redirectUrl)
+				{
+					$this->ssoLogin($settings->partnerId, $client, $redirectUrl);
+				}
+			}
+			catch(Exception $ex)
+			{
+				// if sso is not set on admin partner try to login using the form
+				if ($ex->getCode() !== 'SSO_NOT_FOUND')
+				{
+					throw $ex;
+				}
+			}
+		}
+
+		$this->formLogin();
+	}
+
+	protected function formLogin()
+	{
 		$loginForm = new Form_Login();
 		$resetForm = new Form_ResetPassword();
 		$request = $this->getRequest();
-		
+
 		if ($request->isPost())
 		{
 			$loginForm->isValid($request->getPost());
-			
+
 			$adapter = new Kaltura_AdminAuthAdapter();
 			$adapter->setPrivileges('disableentitlement');
 
 			$safeEmailFieldValue = strip_Tags($request->getPost('email')); // Strip HTML Tags to prevent a potential XSS attack
 			$passwordFieldValue = $request->getPost('password'); // DO NOT strip 'password' HTML Tags in order not to invalidate passwords (e.g. "<b>BoldPassword</b>")
 			$otpFieldValue = $request->getPost ('otp'); //one-time password - might not be provided.
-			
+
 			$adapter->setCredentials($safeEmailFieldValue, $passwordFieldValue, $otpFieldValue);
 			$loginForm->getElement('email')->setValue( $safeEmailFieldValue ); // Update the "safe" value onto the form
 
@@ -186,12 +216,51 @@ class UserController extends Zend_Controller_Action
 				$loginForm->setDescription('login error ' . $ex->getMessage());
 			}
 		}
-		
+
 		$loginForm->setDefault('next_uri', $this->_getParam('next_uri')); // set in Infra_AuthPlugin
-		
+
 		$this->view->loginForm = $loginForm;
 		$this->view->resetForm = $resetForm;
 		$this->render('login');
+	}
+
+	protected function ssoLogin($partnerId, $client, $redirectUrl)
+	{
+		try
+		{
+			// if we got session from sso server validate it, if we didnt redirect to sso server
+			$ks = $_GET['ks'];
+			if($ks)
+			{
+				$client->setKs($ks);
+				$client->user->loginByKs($partnerId);
+
+				$adapter = new Kaltura_AdminAuthAdapter();
+				$adapter->setKs($ks);
+				$auth = Infra_AuthHelper::getAuthInstance();
+				$result = $auth->authenticate($adapter);
+				if ($result->isValid())
+				{
+					$nextUri = $this->_getParam('next_uri');
+					if ($nextUri)
+						$this->_helper->redirector->gotoUrl($nextUri);
+					else
+						$this->_helper->redirector('list', 'partner');
+				}
+				else
+				{
+					throw new Exception('', 'INVALID_CREDENTIALS');
+				}
+			}
+			else
+			{
+				$this->getResponse()->setRedirect($redirectUrl);
+			}
+		}
+		catch(Exception $ex)
+		{
+				throw $ex;
+		}
 	}
 	
 	public function logoutAction()
