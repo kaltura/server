@@ -153,6 +153,11 @@ class kBusinessPostConvertDL
 				kBusinessConvertDL::checkForPendingLiveClips($entry);
 			}
 		}
+
+		if(kReplacementHelper::shouldSyncFlavorInfo($currentFlavorAsset, $currentFlavorAsset->getentry()))
+		{
+			kReplacementHelper::copyReadyReplacingEntryAssetToReplacedEntry($currentFlavorAsset);
+		}
 		
 		return $currentFlavorAsset;
 	}
@@ -292,14 +297,7 @@ class kBusinessPostConvertDL
 		elseif($currentFlavorAsset->getStatus() == asset::ASSET_STATUS_READY && ($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL || $currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED))
 		{
 			// mark the entry as ready if all required conversions completed or any of the optionals
-			if($currentFlavorAsset->getentry()->getReplacedEntryId())
-			{
-				KalturaLog::info('Entry is temporary replacement and requires all flavors to complete');
-			}
-			else
-			{
-				kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
-			}
+			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
 		}
 		
 		if ($origianlAssetFlavorId) {

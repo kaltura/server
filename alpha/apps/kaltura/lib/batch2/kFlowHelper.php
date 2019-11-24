@@ -2131,13 +2131,23 @@ class kFlowHelper
 
 	public static function handleConvertProfileFinished(BatchJob $dbBatchJob, kConvertProfileJobData $data)
 	{
-		self::deleteTemporaryFlavors($dbBatchJob->getEntryId());
-		
-		self::handleLocalFileSyncDeletion($dbBatchJob->getEntryId(), $dbBatchJob->getPartner());
-
-		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob);
-
+		$entryId = $dbBatchJob->getEntryId();
 		$entry = $dbBatchJob->getEntry();
+		if($entry)
+		{
+			$replacedEntryId = $entry->getReplacedEntryId();
+			if($replacedEntryId && $entry->getSyncFlavorsOnceReady())
+			{
+				$entryId = $replacedEntryId;
+			}
+		}
+
+		self::deleteTemporaryFlavors($entryId);
+
+		self::handleLocalFileSyncDeletion($entryId, $dbBatchJob->getPartner());
+
+		kFlowHelper::generateThumbnailsFromFlavor($entryId, $dbBatchJob);
+
 		if($entry)
 		{
 			kBusinessConvertDL::checkForPendingLiveClips($entry);

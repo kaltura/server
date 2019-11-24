@@ -186,7 +186,7 @@ CREATE TABLE IF NOT EXISTS `batch_job_log` (
   `duplication_key` varchar(2047) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
   `log_status` int(11) DEFAULT NULL,
-  `abort` tinyint(4) DEFAULT NULL,
+  `abort` tinyint(4) DEFAULT '0',
   `check_again_timeout` int(11) DEFAULT NULL,
   `progress` tinyint(4) DEFAULT NULL,
   `message` varchar(1024) DEFAULT NULL,
@@ -1466,7 +1466,8 @@ CREATE TABLE IF NOT EXISTS `kvote` (
   KEY `entry_user_index` (`entry_id`),
   KEY `kvote_FI_3` (`kuser_id`),
   KEY `entry_user_status_index` (`entry_id`,`kuser_id`,`status`),
-  KEY `partner_created_at` (`partner_id`,`created_at`)
+  KEY `partner_created_at` (`partner_id`,`created_at`),
+  KEY `entry_rank_index` (`entry_id`,`status`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 

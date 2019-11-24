@@ -448,7 +448,7 @@ abstract class BaseFileAssetPeer {
 		if(self::$s_criteria_filter == null)
 			self::$s_criteria_filter = new criteriaFilter();
 		
-		$c = new myCriteria(); 
+		$c = new myCriteria();
 		self::$s_criteria_filter->setFilter($c);
 	}
 	

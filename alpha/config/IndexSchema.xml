@@ -52,6 +52,12 @@
 		<value field="id" />
 		<value field="partner_id" />
 	</cacheInvalidationKey>
+	<ignoreOptimizationKeys>
+		<disableFields name="partner_id">
+			<value field="str_category_id" />
+			<value field="reference_id" />
+		</disableFields>
+	</ignoreOptimizationKeys>
 </object>
 <object name="categoryKuser">
 	<field name="category_id" indexName="category_id" type="string" matchable="yes" />
@@ -139,6 +145,22 @@
 		<value field="id" />
 		<value field="partner_id" />
 	</cacheInvalidationKey>
+	<ignoreOptimizationKeys>
+		<disableFields name="partner_id">
+			<value field="entry_id" />
+			<value field="reference_id" />
+			<value field="replacing_entry_id" />
+			<value field="replaced_entry_id" />
+			<value field="roots" />
+			<value field="kuser_id" />
+			<value field="puser_id" />
+			<value field="entitled_kusers_publish" />
+			<value field="entitled_kusers_edit" />
+			<value field="entitled_kusers_view" />
+			<value field="creator_kuser_id" />
+			<value field="creator_puser_id" />
+		</disableFields>
+	</ignoreOptimizationKeys>
 </object>
 <object name="kuser">
 	<field name="login_data_id" indexName="login_data_id" type="int" orderable="yes" />

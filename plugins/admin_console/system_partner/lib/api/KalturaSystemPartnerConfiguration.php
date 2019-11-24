@@ -360,6 +360,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
  */
 	public $defaultLiveStreamSegmentDuration;
 
+    /**
+     * @var int
+     */
+    public $defaultRecordingConversionProfile;
+
 	/**
 	 * @var string
 	 */
@@ -479,6 +484,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"htmlPurifierBehaviour",
 		"htmlPurifierBaseListUsage",
 		"defaultLiveStreamSegmentDuration",
+		"defaultRecordingConversionProfile",
 		"eSearchLanguages",
 		"publisherEnvironmentType",
 		"ovpEnvironmentUrl",
@@ -565,6 +571,16 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			$this->validatePropertyNumeric('defaultLiveStreamSegmentDuration');
 			$this->validatePropertyMinMaxValue('defaultLiveStreamSegmentDuration', KalturaLiveEntry::MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS, KalturaLiveEntry::MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS);
 		}
+
+		if (!$this->isNull('defaultRecordingConversionProfile'))
+        {
+            $this->validatePropertyNumeric('defaultRecordingConversionProfile');
+            $conversionProfile = conversionProfile2Peer::retrieveByPKAndPartnerId($this->defaultRecordingConversionProfile, $sourceObject->getId());
+            if ($this->defaultRecordingConversionProfile != 0 && !$conversionProfile) {  // 0 is for disable the feature - not need to check if conversion profile exist
+                throw new KalturaAPIException(SystemPartnerErrors::PARTNER_RECORDING_CONVERSION_PROFILE_ID_ERROR, $this->defaultRecordingConversionProfile);
+            }
+        }
+
 		$this->validateAllowedFromEmailWhiteList();
 		return parent::validateForUpdate($sourceObject,$propertiesToSkip);
 	}

@@ -3915,6 +3915,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			'updated_at' => $this->getUpdatedAt(null),
 			'modified_at' => $this->getModifiedAt(null),
 			'total_rank' => $this->getTotalRank(),
+			'rank' => $this->getRank(),
 			'access_control_id' => $this->getAccessControlId(),
 			'group_id' => $this->getGroupId(),
 			'partner_sort_value' => $this->getPartnerSortValue(),
@@ -4341,5 +4342,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			default:
 				return true;
 		}
+	}
+
+	public function setSyncFlavorsOnceReady($v)
+	{
+		$this->putInCustomData ( "syncFlavorsOnceReady" , (bool) $v );
+	}
+
+	public function getSyncFlavorsOnceReady()
+	{
+		return (bool) $this->getFromCustomData( "syncFlavorsOnceReady" ,null, false );
 	}
 }

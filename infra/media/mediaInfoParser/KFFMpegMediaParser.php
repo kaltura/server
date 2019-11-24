@@ -101,7 +101,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		if(isset($jsonObj->streams) && count($jsonObj->streams)>0){
 			$this->parseStreams($jsonObj->streams, $mediaInfo);
 		}
-		
+
 //		list($silenceDetect, $blackDetect) = self::checkForSilentAudioAndBlackVideo($this->cmdPath, $this->filePath, $mediaInfo);
 		if(isset($this->checkScanTypeFlag) && $this->checkScanTypeFlag==true)
 			$mediaInfo->scanType = self::checkForScanType($this->cmdPath, $this->filePath);
@@ -147,10 +147,8 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		$mediaInfo->containerBitRate = isset($format->bit_rate)? round($format->bit_rate/1000,2): null;
 			// If format duration is not set or zero'ed, 
 			// try to retrieve duration from format/tag section 
-		if(isset($format->duration) && $format->duration>0)
-			$mediaInfo->containerDuration = round($format->duration*1000);
-		else if(isset($format->tags->duration))
-			$mediaInfo->containerDuration = self::convertDuration2msec($format->tags->duration);
+		$mediaInfo->containerDuration = self::retrieveDuration($format);
+
 		if(isset($format->tags->producer))
 			$mediaInfo->producer = $format->tags->producer;
 		return $mediaInfo;
@@ -251,10 +249,8 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		$mediaInfo->videoCodecId = isset($stream->codec_tag_string)? trim($stream->codec_tag_string): null;
 			// If stream duration is not set or zero'ed, 
 			// try to retrieve duration from stream/tag section 
-		if(isset($stream->duration) && $stream->duration>0)
-			$mediaInfo->videoDuration = round($stream->duration*1000);
-		else if(isset($stream->tags->duration))
-			$mediaInfo->videoDuration = self::convertDuration2msec($stream->tags->duration);
+		$mediaInfo->videoDuration = self::retrieveDuration($stream);
+
 		$mediaInfo->videoBitRate = isset($stream->bit_rate)? round($stream->bit_rate/1000,2): null;
 		$mediaInfo->videoBitRateMode; // FIXME
 		$mediaInfo->videoWidth = isset($stream->width)? trim($stream->width): null;
@@ -285,7 +281,15 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		if(isset($stream->tags) && isset($stream->tags->rotate)){
 			$mediaInfo->videoRotation = trim($stream->tags->rotate);
 		}
-		$mediaInfo->scanType=0; // default 0/progressive
+		$mediaInfo->scanType = 0; // default 0/progressive
+		
+		$mediaInfo->matrixCoefficients = isset($stream->color_space)? trim($stream->color_space): null;
+		$mediaInfo->colorTransfer = isset($stream->color_transfer)? trim($stream->color_transfer): null;
+		$mediaInfo->colorPrimaries = isset($stream->color_primaries)? trim($stream->color_primaries): null;
+
+		if(isset($stream->pix_fmt))
+			self::parsePixelFormat($stream->pix_fmt, $mediaInfo);
+
 		return $mediaInfo;
 	}
 	
@@ -300,10 +304,8 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		$mediaInfo->audioCodecId = isset($stream->codec_tag_string)? trim($stream->codec_tag_string): null;
 			// If stream duration is not set or zero'ed, 
 			// try to retrieve duration from stream/tag section 
-		if(isset($stream->duration) && $stream->duration>0)
-			$mediaInfo->audioDuration = round($stream->duration*1000);
-		else if(isset($stream->tags->duration))
-			$mediaInfo->audioDuration = self::convertDuration2msec($stream->tags->duration);
+		$mediaInfo->audioDuration = self::retrieveDuration($stream);
+
 		$mediaInfo->audioBitRate = isset($stream->bit_rate)? round($stream->bit_rate/1000,2): null;
 		$mediaInfo->audioBitRateMode; // FIXME
 		$mediaInfo->audioChannels = isset($stream->channels)? trim($stream->channels): null;
@@ -860,5 +862,46 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		return $volumeLevels;
 	}
 
-};
+	/**
+	 * retrieveDuration
+	 *
+	 * @param unknown_type $stream
+	 * @return int or null
+	 */	
+	private static function retrieveDuration($stream)
+	{
+			// If stream duration is not set or zero'ed, 
+			// try to retrieve duration from stream/tag section 
+		if(isset($stream->duration) && $stream->duration>0)
+			return round($stream->duration*1000);
+		else if(isset($stream->tags->duration))
+			return self::convertDuration2msec($stream->tags->duration);
+		else
+			return null;
+	}
 	
+	/**
+	 * parsePixelFormat
+	 *
+	 * @param KalturaMediaInfo $mediaInfo
+	 */	
+	private static function parsePixelFormat($pixelFormat, KalturaMediaInfo $mediaInfo)
+	{
+		KalturaLog::log("In - pixelFormat:$pixelFormat");
+//$pixelFormat='yuv422pzzz';;//
+		$rv = preg_match('/\s*([a-z]+)\s*([0-9]+)\s*([a-z]*)\s*([0-9]*)/', $pixelFormat, $matches, PREG_OFFSET_CAPTURE);
+		if($rv===false || !(isset($matches) && is_array($matches) and count($matches)>=3)){
+			KalturaLog::log("Out - Unrecognized pixelFormat");
+			return;
+		}
+		$mediaInfo->pixelFormat = $pixelFormat;
+		$mediaInfo->colorSpace = $matches[1][0];
+		$mediaInfo->chromaSubsampling = $matches[2][0];
+		if(count($matches)>=5)
+			$mediaInfo->bitsDepth = $bitsDepth = $matches[4][0];
+		else
+			$bitsDepth = null;
+		KalturaLog::log("Out - colorSpace:$mediaInfo->colorSpace, chromaSubsampling:$mediaInfo->chromaSubsampling, bitsDepth:$bitsDepth");
+	}
+};
+

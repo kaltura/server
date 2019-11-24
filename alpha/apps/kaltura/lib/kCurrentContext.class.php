@@ -128,7 +128,9 @@ class kCurrentContext
 	 * @var bool
 	 */
 	public static $HTMLPurifierBaseListOnlyUsage = null;
-	
+
+	public static $isInMultiRequest = false;
+
 	public static function getEntryPoint()
 	{
 		if(self::$service && self::$action)

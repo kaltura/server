@@ -1,3 +1,44 @@
+# Orion 15.11.0 #
+
+## Optimize batch_job_log qureies ##
+- Issue Type: Task
+- Issue ID: PLAT-10294
+
+### Deployment scripts ###
+Alter batch_job_log table to change abort colmun default value    
+    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_21_alter_batch_job_log_abort_default_value.sql
+
+## Adding new KalturaUserEntryType called registration ##
+- Issue Type: Task
+- Issue ID: PLAT-10283
+
+### configuration ###
+Add Registration to your plugins.ini
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+## Kava - move rounding client tags to config ##
+- Issue Type: Task
+- Issue ID: AN-1102
+
+### configuration ###
+add kava_skip_date_rounding_client_tags section to local.ini with:
+0 = kmc-analytics
+
+## 5-star rating ##
+- Issue Type: Task
+- Issue ID: PSVAMB-8935
+
+### Deployment scripts ###
+Add new kvote table index    
+    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_06_add_kvote_index.sql
+Add new permissions
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_06_add_rating_permissions.php
+Run installPlugins script  
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+
 # Orion 15.10.0 #
 
 ## AP Feed Drop Folder ##

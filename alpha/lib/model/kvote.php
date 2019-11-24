@@ -21,6 +21,11 @@ class kvote extends Basekvote implements IBaseObject
 		{
 		   $this->statistics_results = myStatisticsMgr::modifyEntryVotesBykVote($this); 
 		}
+		else if ($this->status == kvoteStatus::VOTED && in_array(kvotePeer::RANK, $this->modifiedColumns))
+		{
+			$delta = $this->rank - $this->getColumnsOldValue(kvotePeer::RANK);
+			$this->statistics_results = myStatisticsMgr::modifyEntryVotesByChangedVoteDelta($this, $delta);
+		}
 		
 		return parent::save( $con );
 	}
