@@ -24,14 +24,29 @@ class KSchedulerConfig extends Zend_Config_Ini
 	private $configFilePaths;
 
 	/**
+	 * @var array<KSchedularTaskConfig>
+	 */
+	private $taskConfigList = array();
+
+	/**
 	 * @var int
 	 */
 	private $configTimestamp;
 
 	/**
-	 * @var array<KSchedularTaskConfig>
+	 * @var KalturaClient
 	 */
-	private $taskConfigList = array();
+	private $kClient;
+
+	/**
+	 * @var array
+	 */
+	private $kClientConfig;
+
+	/**
+	 * @var string
+	 */
+	private $cacheVersionId;
 
 	/**
 	 * @param string $configFileName
@@ -44,18 +59,19 @@ class KSchedulerConfig extends Zend_Config_Ini
 
 	public function load()
 	{
-		$this->configTimestamp = $this->calculateFileTimestamp();
-
+		$this->configTimestamp = time();
 		$configFileName = $this->configFileName;
-		KalturaLog::log("loading configuration $configFileName at ".$this->configTimestamp);
+		KalturaLog::log("loading configuration $configFileName at ". date('H:i:s', $this->configTimestamp));
+
+		$hostname = self::getHostname();
 
 		if(is_dir($this->configFileName))
 		{
 			$configFileName = kEnvironment::get('cache_root_path') . DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . 'config.ini';
-			$this->implodeDirectoryFiles($configFileName);
+			$this->cacheVersionId = $this->getCacheVersionFromServer();
+			$this->loadConfigFromServer($configFileName, $hostname);
 		}
 
-		$hostname = self::getHostname();
 		parent::__construct($configFileName, $hostname, true);
 		$this->name = $hostname;
 		$this->hostName = $hostname;
@@ -174,74 +190,19 @@ class KSchedulerConfig extends Zend_Config_Ini
 		return self::$hostname;
 	}
 
-	protected function implodeDirectoryFiles($path)
-	{
-		$content = '';
-
-		$configFilePaths = $this->getConfigFilePaths();
-		foreach($configFilePaths as $configFilePath)
-			$content .= file_get_contents($configFilePath) . "\n";
-
-		file_put_contents($path, $content);
-	}
-
-	protected function calculateFileTimestamp()
-	{
-		clearstatcache();
-		if(!is_dir($this->configFileName)) {
-			return filemtime($this->configFileName);
-		}
-
-		$configFilePaths = $this->getConfigFilePaths();
-		
-		$filemtime = 0;
-		foreach($configFilePaths as $configFilePath)
-			$filemtime = max($filemtime, filemtime($configFilePath));
-
-		return $filemtime;
-	}
-
-	protected function getConfigFilePaths()
-	{
-		if(!is_dir($this->configFileName))
-			return $this->configFileName;
-
-		if(!$this->configFilePaths)
-			$this->configFilePaths = $this->getCurrentConfigFilePaths();
-
-		return $this->configFilePaths;
-	}
-	
-	protected function getCurrentConfigFilePaths() 
-	{
-		if(!is_dir($this->configFileName))
-			return  $this->configFileName;
-		
-		$configFilePaths = array();
-		$d = dir($this->configFileName);
-		
-		while (false !== ($file = $d->read()))
-		{
-			if(preg_match('/\.ini$/', $file))
-				$configFilePaths[] = $this->configFileName . DIRECTORY_SEPARATOR . $file;
-		}
-		$d->close();
-		
-		return $configFilePaths;
-	}
-
+	/**
+	 * @return bool
+	 */
 	public function reloadRequired()
 	{
-		// Check config path udpated
-		$filePaths = $this->getCurrentConfigFilePaths();
-		if($this->getConfigFilePaths() != $filePaths) {
-			$this->configFilePaths = $filePaths;
-			return true;
+		if($this->configTimestamp < time())
+		{
+			$serverCacheVersion = $this->getCacheVersionFromServer();
+			$this->configTimestamp = time() + $this->getStatusInterval();
+
+			return $this->cacheVersionId != $serverCacheVersion;
 		}
-		
-		// Check config content updated
-		$filemtime = $this->calculateFileTimestamp();
-		return ($filemtime > $this->configTimestamp);
+		return false;
 	}
 
 	public function getTaskConfigList()
@@ -355,6 +316,59 @@ class KSchedulerConfig extends Zend_Config_Ini
 	public function getLogWorkerInterval()
 	{
 		return $this->logWorkerInterval;
+	}
+
+	/**
+	 * Retrieve configuration from api servers
+	 * @param $configFileName
+	 * @param $hostname
+	 */
+	protected function loadConfigFromServer($configFileName, $hostname)
+	{
+		$this->initClient();
+		$configurationPluginClient = KalturaConfMapsClientPlugin::get($this->kClient);
+		$configurationMapFilter = new KalturaConfMapsFilter();
+		$configurationMapFilter->nameEqual = "batch";
+		$configurationMapFilter->relatedHostEqual = $hostname;
+		$configurationMap = $configurationPluginClient->confMaps->get($configurationMapFilter);
+		$contentArray = json_decode($configurationMap->content, true);
+		$iniStr = iniUtils::arrayToIniString($contentArray);
+		file_put_contents($configFileName, $iniStr);
+	}
+
+	/**
+	 * Retrieve cache version id from api servers
+	 * @return mixed
+	 */
+	protected function getCacheVersionFromServer()
+	{
+		KalturaLog::debug("Fetching cache version from server " . date('H:i:s'));
+		$this->initClient();
+		$configurationPluginClient = KalturaConfMapsClientPlugin::get($this->kClient);
+		$cacheVersion = $configurationPluginClient->confMaps->getCacheVersionId();
+		KalturaLog::debug("Cache version from server " . $cacheVersion);
+		return $cacheVersion;
+	}
+
+	protected function initClient()
+	{
+		if ($this->kClient)
+		{
+			$ks = $this->kClient->generateSession($this->kClientConfig['secret'], "batchUser", KalturaSessionType::ADMIN, '-1');
+			$this->kClient->setKs($ks);
+			return;
+		}
+		else
+		{
+			$this->kClientConfig = kConf::getMap("batchBase");
+			$clientConfig = new KalturaConfiguration();
+			$clientConfig ->serviceUrl = $this->kClientConfig['serviceUrl'];
+			$clientConfig ->curlTimeout = $this->kClientConfig['curlTimeout'];
+			$this->kClient = new KalturaClient($clientConfig );
+			$this->kClient->setPartnerId($this->kClientConfig['partnerId']);
+			$ks = $this->kClient->generateSession($this->kClientConfig['secret'], "batchUser", KalturaSessionType::ADMIN, '-1');
+			$this->kClient->setKs($ks);
+		}
 	}
 }
 

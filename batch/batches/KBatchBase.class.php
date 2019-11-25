@@ -51,6 +51,8 @@ abstract class KBatchBase implements IKalturaLogger
 	 */
 	protected $monitorHandle = null;
 
+	protected static $iv;
+
 	/**
 	 * @param array $jobs
 	 * @return array $jobs
@@ -794,7 +796,12 @@ abstract class KBatchBase implements IKalturaLogger
 	
 	public static function getIV()
 	{
-		return kConf::get("encryption_iv");
+		if (isset(self::$iv))
+		{
+			return self::$iv;
+		}
+		self::$iv = self::getConfigParam("encryption_iv");
+		return self::$iv;
 	}
 
 	public static function tryExecuteApiCall($callback, $params, $numOfRetries = self::DEFUALT_API_RETRIES_ATTEMPS, $apiIntervalInSec = self::DEFAULT_SLEEP_INTERVAL)
@@ -815,5 +822,28 @@ abstract class KBatchBase implements IKalturaLogger
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * @param $key
+	 * @param string $mapName
+	 * @param null $defaultValue
+	 */
+	public static function getConfigParam($key, $mapName = 'local' , $defaultValue = null)
+	{
+		$configurationPluginClient = KalturaConfMapsClientPlugin::get(self::$kClient);
+		$configurationMapFilter = new KalturaConfMapsFilter();
+		$configurationMapFilter->nameEqual = $mapName;
+		$configurationMapFilter->relatedHostEqual = self::getConfigHostName();
+		$configurationMap = $configurationPluginClient->confMaps->get($configurationMapFilter);
+		if ($configurationMap)
+		{
+			$configArray = json_decode($configurationMap->content, true);
+			if ($configArray && isset($configArray[$key]))
+			{
+				return $configArray[$key];
+			}
+		}
+		return $defaultValue;
 	}
 }
