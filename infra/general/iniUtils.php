@@ -96,14 +96,14 @@ class IniUtils
 			array_shift($res);
 			foreach ($tempSectionsMatches as $index => $part)
 			{
-			}
-			if (isset($sectionsContent[$part[0]]))
-			{
-				$sectionsContent[$part[0]] .= $res[$index];
-			}
-			else
-			{
-				$sectionsContent[$part[0]] = $res[$index];
+				if (isset($sectionsContent[$part[0]]))
+				{
+					$sectionsContent[$part[0]] .= $res[$index];
+				}
+				else
+				{
+					$sectionsContent[$part[0]] = $res[$index];
+				}
 			}
 		}
 	}
