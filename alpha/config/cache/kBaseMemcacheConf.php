@@ -7,7 +7,7 @@ class kBaseMemcacheConf extends kBaseConfCache implements kMapCacheInterface
 	protected $cache;
 	protected $inLoad;
 
-	protected function getCache()
+	public function getCache()
 	{
 		return $this->cache;
 	}

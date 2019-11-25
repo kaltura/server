@@ -62,7 +62,15 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 						{
 							$hostPattern = str_replace('#', '.*', $hostPattern);
 							if(!preg_match('/' . $hostPattern . '/', $hostname))
+							{
 								continue;
+							}
+
+							// since $hostname not equal to $hostPattern we need to avoid an inner substring
+							if(substr( $hostPattern, 0, 2 ) !== '.*' && substr( $hostPattern, -2 ) !== '.*')
+							{
+								continue;
+							}
 						}
 						$filteredMapsList[] = $mapName;
 					}
