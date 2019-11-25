@@ -248,6 +248,11 @@ Alias /flash "@WEB_DIR@/flash"
     <FilesMatch \.(php|phar)$>
         SetHandler "proxy:unix:/run/php-fpm/www.sock|fcgi://localhost"
     </FilesMatch>
+        <Directory "@WEB_DIR@/content">
+                    <FilesMatch ".+\.*$">
+                            SetHandler !
+                    </FilesMatch>
+        </Directory>
   </IfModule>
 </IfModule>
 
