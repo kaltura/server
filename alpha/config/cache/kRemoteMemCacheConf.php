@@ -62,7 +62,15 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 						{
 							$hostPattern = str_replace('#', '.*', $hostPattern);
 							if(!preg_match('/' . $hostPattern . '/', $hostname))
+							{
 								continue;
+							}
+
+							// since $hostname not equal to $hostPattern we need to avoid an inner substring
+							if(substr( $hostPattern, 0, 2 ) !== '.*' && substr( $hostPattern, -2 ) !== '.*')
+							{
+								continue;
+							}
 						}
 						$filteredMapsList[] = $mapName;
 					}
@@ -79,7 +87,7 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 		{
 			return null;
 		}
-		$content = null;
+		$sections = array();
 		$globalContent = null;
 		/** Note: we are concatenating the text content to a single ini file content since some inheritence sections are in
 		 * different maps and only after merging them we can create the merged ini file and validate it.
@@ -92,10 +100,10 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 			if ($map)
 			{
 				$mapContent = json_decode($map, true);
-				IniUtils::splitContent($mapContent, $globalContent, $content);
+				IniUtils::splitContent($mapContent, $globalContent, $sections);
 			}
 		}
-		return IniUtils::iniStringToIniArray($globalContent . PHP_EOL . $content);
+		return IniUtils::iniStringToIniArray($globalContent . PHP_EOL . IniUtils::iniSectionsToString($sections));
 	}
 
 	public function getHostList($requesteMapName , $hostNameRegex = null)

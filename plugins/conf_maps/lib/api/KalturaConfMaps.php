@@ -118,27 +118,30 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 			throw new KalturaAPIException(KalturaErrors::CANNOT_PARSE_CONTENT, 'Cannot JSON decode content', $this->content);
 		}
 
-		$filter = new KalturaConfMapsFilter();
-		$filter->relatedHostEqual = $this->relatedHost;
-		$filter->nameEqual = $this->name;
-		kApiCache::disableCache();
-		$configurationMap = $filter->getMap(true);
-		$contentToValidate = null;
-		$sectionsContent = null;
+		$sectionsContent = array();
 		$globalContent = null;
-		if ($configurationMap)
+		if ( isset($this->relatedHost) && trim($this->relatedHost) !== '')
 		{
-			$existingMapsContent = json_decode($configurationMap->content, true);
-			if (!is_null($existingMapsContent))
+			$filter = new KalturaConfMapsFilter();
+			$filter->relatedHostEqual = $this->relatedHost;
+			$filter->nameEqual = $this->name;
+			kApiCache::disableCache();
+			$configurationMap = $filter->getMap(true);
+			$contentToValidate = null;
+			if ($configurationMap)
 			{
-				IniUtils::splitContent($existingMapsContent, $globalContent, $sectionsContent);//split contect to global and sections
+				$existingMapsContent = json_decode($configurationMap->content, true);
+				if (!is_null($existingMapsContent))
+				{
+					IniUtils::splitContent($existingMapsContent, $globalContent, $sectionsContent);//split contect to global and sections
+				}
 			}
 		}
 		IniUtils::splitContent($content, $globalContent, $sectionsContent);//merge new contect to global and sections content
 		try
 		{
 			//To validate that we can transform the content to a valid ini file
-			IniUtils::iniStringToIniArray($globalContent . PHP_EOL . $sectionsContent);
+			IniUtils::iniStringToIniArray($globalContent . PHP_EOL . IniUtils::iniSectionsToString($sectionsContent));
 		}
 		catch (Exception $e)
 		{

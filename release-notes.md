@@ -1,6 +1,17 @@
+# Orion 15.12.0 #
+
+## Optimize entry_vendor_task queries ##
+- Issue Type: Task
+- Issue ID: PLAT-10292
+
+### Deployment scripts ###
+Alter batch_job_log table to change abort colmun default value    
+    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_26_add_entry_vendor_task_index.sql
+
+
 # Orion 15.11.0 #
 
-## Optimize batch_job_log qureies ##
+## Optimize batch_job_log queries ##
 - Issue Type: Task
 - Issue ID: PLAT-10294
 
