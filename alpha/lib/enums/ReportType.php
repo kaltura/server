@@ -94,6 +94,7 @@ interface ReportType extends BaseEnum
    const PLAYER_RELATED_INTERACTIONS_VPAAS = 20019;
    const PLAYBACK_RATE_VPAAS = 20020;
    const PARTNER_USAGE_VPAAS = 20021;
+   const TOP_PLAYBACK_CONTEXT_VPAAS = 20022;
 
    //qoe reports
    const QOE_OVERVIEW = 30001;

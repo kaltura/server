@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/kBaseMemcacheConf.php';
-require_once (__DIR__ . '/../../../infra/general/iniUtils.php');
 
 class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterface,kMapCacheInterface
 {
@@ -29,14 +28,14 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 		return $this->loadByHostName($mapName,$hostname);
 	}
 
-	public function loadByHostName($mapName,$hostname, $excludeHost = false)
+	public function loadByHostName($mapName,$hostname)
 	{
-		$mapNames = $this->getRelevantMapList($mapName, $hostname, $excludeHost);
+		$mapNames = $this->getRelevantMapList($mapName, $hostname);
 		$this->orderMap($mapNames);
-		return $this->mergeMaps($mapNames, $mapName);
+		return $this->mergeMaps($mapNames);
 	}
 
-	protected function getRelevantMapList($requestedMapName , $hostname, $excludeHost = false)
+	protected function getRelevantMapList($requestedMapName , $hostname)
 	{
 		$filteredMapsList = array($requestedMapName);
 		$mapsList = null;
@@ -53,11 +52,6 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 					$hostPattern = isset($mapVar[1]) ? $mapVar[1] : null;
 					if ($requestedMapName == $storedMapName)
 					{
-						if ($hostname === $hostPattern && $excludeHost)
-						{
-							continue;
-						}
-
 						if ($hostPattern && $hostname != $hostPattern && $hostPattern !== '#')
 						{
 							$hostPattern = str_replace('#', '.*', $hostPattern);
@@ -82,8 +76,9 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 
 	protected function mergeMaps($mapNames)
 	{
+		$mergedMaps = array();
 		$cache = $this->getCache();
-		if (!$cache)
+		if(!$cache)
 		{
 			return null;
 		}
@@ -96,8 +91,8 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 		 */
 		foreach ($mapNames as $mapName)
 		{
-			$map = $cache->get(self::CONF_MAP_PREFIX . $mapName);
-			if ($map)
+			$map = $cache->get(self::CONF_MAP_PREFIX.$mapName);
+			if($map)
 			{
 				$mapContent = json_decode($map, true);
 				IniUtils::splitContent($mapContent, $globalContent, $sections);

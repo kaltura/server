@@ -3681,7 +3681,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 				
 		$result = array();
-				
+
 		foreach ($ids as $index => $id)
 		{
 			if (isset(self::$error_ids[$id]) || 
@@ -3691,8 +3691,8 @@ class kKavaReportsMgr extends kKavaBase
 				$result[$id] = $id;
 			}
 		}
-		
-		$c->add($table_name . '.' . $dim_column, $ids, Criteria::IN);
+
+		$c->add($table_name . '.' . $dim_column, array_map('strval' ,$ids), Criteria::IN);
 
 		if (isset($custom_crits['column']))
 		{
@@ -3886,12 +3886,10 @@ class kKavaReportsMgr extends kKavaBase
 					$key = implode(self::ENRICH_DIM_DELIMITER, $key);
 					$dimension_ids[$key] = true;
 				}
-				
 				// run the enrichment functions
 				foreach ($cur_enrich_specs as $enrich_spec)
 				{
 					list($enrich_func, $enrich_context, $enriched_indexes) = $enrich_spec;
-
 					$entities = call_user_func($enrich_func, array_keys($dimension_ids), $partner_id, $enrich_context);
 			
 					for ($current_row = $start; $current_row < $limit; $current_row++) 

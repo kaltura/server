@@ -1,15 +1,33 @@
-# Orion 15.11.0 #
+# Orion 15.12.0 #
 
-## Configurations Maps Modifications ##
+## Optimize entry_vendor_task queries ##
 - Issue Type: Task
-- Issue ID: PLAT-10245
+- Issue ID: PLAT-10292
 
 ### Deployment scripts ###
-Run php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_05_update_confmaps_permissions.php 
+Alter batch_job_log table to change abort colmun default value    
+    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_26_add_entry_vendor_task_index.sql
+
+
+# Orion 15.11.0 #
+
+## Optimize batch_job_log queries ##
+- Issue Type: Task
+- Issue ID: PLAT-10294
+
+### Deployment scripts ###
+Alter batch_job_log table to change abort colmun default value    
+    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_21_alter_batch_job_log_abort_default_value.sql
+
+## Adding new KalturaUserEntryType called registration ##
+- Issue Type: Task
+- Issue ID: PLAT-10283
 
 ### configuration ###
-modify /opt/kaltura/app/configuration/db_sync.template.ini to /opt/kaltura/app/configuration/db_sync.ini and configure relevant db connection
-This is required to be able to run syncDbConfigMapsToCache.php and insertConfigMapToDb.php scripts syncs conf maps from db to remote cache.
+Add Registration to your plugins.ini
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 
 ## Kava - move rounding client tags to config ##
 - Issue Type: Task
@@ -30,6 +48,7 @@ Add new permissions
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_06_add_rating_permissions.php
 Run installPlugins script  
 	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
 
 # Orion 15.10.0 #
 
