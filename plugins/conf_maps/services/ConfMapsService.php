@@ -59,6 +59,7 @@ class ConfMapsService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::MAP_DOES_NOT_EXIST );
 		}
 		$map->validateContent();
+
 		$newMapVersion = new ConfMaps();
 		$newMapVersion->addNewMapVersion($dbMap, $map->content);
 		$newMapVersion->syncMapsToCache();
@@ -107,6 +108,17 @@ class ConfMapsService extends KalturaBaseService
 		$mapNames= ConfMapsPeer::retrieveMapsNames();
 		$result =  KalturaStringArray::fromDbArray($mapNames);
 		return $result;
+	}
+
+	/**
+	 * Get configuration map cache key
+	 *
+	 * @action getCacheVersionId
+	 * @return string
+	 */
+	function getCacheVersionIdAction()
+	{
+		return kConf::getCachedVersionId();
 	}
 }
 

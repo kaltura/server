@@ -18,13 +18,6 @@ class ConfMaps extends BaseConfMaps
 	const STATUS_ENABLED = 1;
 	const STATUS_DISABLED = 0;
 
-
-	public function getCreatedAt($format = 'Y-m-d H:i:s')
-	{
-		return parent::getCreatedAt('Y-m-d H:i:s');
-	}
-
-
 	/**
 	 * @param ConfMaps $exstingMap
 	 */
