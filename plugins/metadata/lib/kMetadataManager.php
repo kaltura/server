@@ -17,6 +17,7 @@ class kMetadataManager
 		MetadataObjectType::CATEGORY => 'category',
 		MetadataObjectType::USER => 'kuser',
 		MetadataObjectType::PARTNER => 'Partner',
+		MetadataObjectType::USER_ENTRY => 'UserEntry',
 	);
 	
 	protected static $metadataFieldTypesToValidate = array(
