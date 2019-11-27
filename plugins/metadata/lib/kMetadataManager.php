@@ -45,6 +45,9 @@ class kMetadataManager
 		        
 		    case MetadataObjectType::USER:
 		        return new MetadataKuserPeer();
+
+		    case MetadataObjectType::USER_ENTRY:
+			return new MetadataUserEntryPeer();
 		        
 			default:
 				return KalturaPluginManager::loadObject('IMetadataPeer', $objectType);
