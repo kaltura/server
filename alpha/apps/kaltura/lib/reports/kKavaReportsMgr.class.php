@@ -28,6 +28,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
 	const METRIC_VIEW_PERIOD_PLAY_TIME = 'sum_view_period';
 	const METRIC_AVG_PLAY_TIME = 'avg_time_viewed';
+	const METRIC_AVG_VIEW_PERIOD_PLAY_TIME = 'avg_view_period_time';
 	const METRIC_PLAYER_IMPRESSION_RATIO = 'load_play_ratio';
 	const METRIC_AVG_DROP_OFF = 'avg_view_drop_off';
 	const METRIC_UNIQUE_PERCENTILES_RATIO = 'avg_completion_rate';
@@ -1029,7 +1030,14 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_AVG_PLAY_TIME, '/', array(
 					self::getConstantRatioPostAggr('subPlayTime', self::METRIC_QUARTILE_PLAY_TIME_SEC, '60'),
 					self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY))));
-		
+
+		self::$metrics_def[self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME] = array(
+			self::DRUID_AGGR => array(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::EVENT_TYPE_PLAY),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME, '/', array(
+				self::getConstantRatioPostAggr('subPlayTime', self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, '60'),
+				self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY))));
+
 		self::$metrics_def[self::METRIC_AVG_DROP_OFF] = array(
 			self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::METRIC_PLAYTHROUGH),
 			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
@@ -1925,6 +1933,7 @@ class kKavaReportsMgr extends kKavaBase
 			'entries_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID),
 			'playback_types' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE),
 			'playback_context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT),
+			'root_entries_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_ROOT_ENTRY_ID),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)

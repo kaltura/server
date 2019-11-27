@@ -1483,6 +1483,11 @@ class kKavaReports extends kKavaReportsMgr
 			),
 		),
 
+		ReportType::INTERACTIVE_VIDEO_HIGHLIGHTS => array(
+			self::REPORT_SKIP_TOTAL_FROM_GRAPH => true,
+			self::REPORT_TOTAL_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNIQUE_VIEWERS),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_VIEW_PERIOD_PLAY_TIME, self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME),
+		),
 	);
 
 	public static function getReportDef($report_type)
