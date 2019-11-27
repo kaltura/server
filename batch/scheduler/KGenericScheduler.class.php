@@ -111,8 +111,6 @@ class KGenericScheduler
 		KScheduleHelperManager::clearFilters();
 		$this->queueSizes = array();
 
-		KalturaLog::info("Loading configuration file at: " . date('Y-m-d H:i'));
-
 		$configItems = $this->createConfigItem($this->schedulerConfig->toArray());
 		$taskConfigs = $this->schedulerConfig->getTaskConfigList();
 
