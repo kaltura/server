@@ -1,10 +1,15 @@
 <?php
-if ($argc < 3)
+if ($argc < 2)
 {
-	die ($argv[0]. " <domain> <redirect_url>");
+	die ($argv[0]. " <redirect_url> <domain> \n");
 }
-$domain = $argv[1];
-$redirectUrl = $argv[2];
+
+$redirectUrl = $argv[1];
+$domain = null;
+if($argc == 3)
+{
+	$domain = $argv[2];
+}
 
 require_once(__DIR__ . '/../bootstrap.php');
 const ADMIN_CONSOLE_APPLICATION_TYPE = 'admin_console';
