@@ -9,7 +9,7 @@
 
 #### Deployment Scripts ####
 
-- Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_07_5_add_capture_device_role_and_permissions.php'
+- Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_27_add_kmc_analytics_role_and_permissions.php'
 
 #### Known Issues & Limitations ####
 
