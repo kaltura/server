@@ -5,6 +5,10 @@
  */
 class kWebVTTGenerator
 {
+	const WEBVTT_CUE_PAYLOAD_UNESCAPED_CHARECTERS = '/[&<>]/';
+	const WEBVTT_CUE_PAYLOAD_ENCODED_CHARACTERS = '/(&amp;)|(&lt;)|(&gt;)/';
+	const WEVTT_CUE_PAYLOAD_DECODED_CHARACTERS = '/( & )|( < )|( > )/';
+
 	/**
 	 * @param int $timeStamp
 	 * @return string
@@ -106,7 +110,7 @@ class kWebVTTGenerator
 			$content = '';
 			foreach ($curCaption['content'] as $curChunk)
 			{
-				$curChunkText = $curChunk['text'];
+				$curChunkText = self::escapeSpecialChars($curChunk['text']);
 				if (isset($curChunk['style']))
 				{
 					$style = $curChunk['style'];
@@ -174,5 +178,33 @@ class kWebVTTGenerator
 		}
 		$result .="\n\n\n";
 		return $result;
+	}
+
+	/**
+	 * @param string $textLine
+	 * @return string
+	 */
+	public static function escapeSpecialChars($textLine)
+	{
+		$encoded = preg_match(self::WEBVTT_CUE_PAYLOAD_ENCODED_CHARACTERS, $textLine);
+		if ($encoded)
+		{
+			// handle a case where $textLine has encoded and decoded chars like ' & ' and '&amp;'
+			$notEncoded = preg_match(self::WEVTT_CUE_PAYLOAD_DECODED_CHARACTERS, $textLine);
+			if ($notEncoded)
+			{
+				$textLine = htmlspecialchars_decode($textLine, ENT_NOQUOTES);
+				$textLine = htmlspecialchars($textLine, ENT_NOQUOTES);
+			}
+		}
+		else
+		{
+			$shouldEncode = preg_match(self::WEBVTT_CUE_PAYLOAD_UNESCAPED_CHARECTERS, $textLine);
+			if ($shouldEncode)
+			{
+				$textLine = htmlspecialchars($textLine, ENT_NOQUOTES);
+			}
+		}
+		return $textLine;
 	}
 }
