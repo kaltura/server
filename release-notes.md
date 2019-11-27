@@ -1,5 +1,20 @@
 # Orion 15.12.0 #
 
+## create KMC_ANALYTICS_ROLE for partner 0 ##
+
+- Issue Type: Story
+- Issue ID: PLAT-5725
+
+### Configuration ###
+
+#### Deployment Scripts ####
+
+- Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_07_5_add_capture_device_role_and_permissions.php'
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Optimize entry_vendor_task queries ##
 - Issue Type: Task
 - Issue ID: PLAT-10292
