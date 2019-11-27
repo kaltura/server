@@ -5,6 +5,9 @@
  */
 class UserController extends Zend_Controller_Action
 {
+	const INVALID_CREDENTIALS = 0;
+	const MISSING_AUTH_SERVER_URL = 1;
+
 	public function indexAction()
 	{
 		$request = $this->getRequest();
@@ -158,18 +161,18 @@ class UserController extends Zend_Controller_Action
 		$loginForm = new Form_Login();
 		$resetForm = new Form_ResetPassword();
 		$request = $this->getRequest();
-
+		
 		if ($request->isPost())
 		{
 			$loginForm->isValid($request->getPost());
-
+			
 			$adapter = new Kaltura_AdminAuthAdapter();
 			$adapter->setPrivileges('disableentitlement');
 
 			$safeEmailFieldValue = strip_Tags($request->getPost('email')); // Strip HTML Tags to prevent a potential XSS attack
 			$passwordFieldValue = $request->getPost('password'); // DO NOT strip 'password' HTML Tags in order not to invalidate passwords (e.g. "<b>BoldPassword</b>")
 			$otpFieldValue = $request->getPost ('otp'); //one-time password - might not be provided.
-
+			
 			$adapter->setCredentials($safeEmailFieldValue, $passwordFieldValue, $otpFieldValue);
 			$loginForm->getElement('email')->setValue( $safeEmailFieldValue ); // Update the "safe" value onto the form
 
@@ -199,9 +202,9 @@ class UserController extends Zend_Controller_Action
 				$loginForm->setDescription('login error ' . $ex->getMessage());
 			}
 		}
-
+		
 		$loginForm->setDefault('next_uri', $this->_getParam('next_uri')); // set in Infra_AuthPlugin
-
+		
 		$this->view->loginForm = $loginForm;
 		$this->view->resetForm = $resetForm;
 		$this->render('login');
@@ -209,49 +212,41 @@ class UserController extends Zend_Controller_Action
 
 	protected function ssoLogin($settings)
 	{
+		$partnerId = $settings->partnerId;
+		$client = Infra_ClientHelper::getClient();
+		$ssoPlugin = Kaltura_Client_Sso_Plugin::get($client);
+
 		try
 		{
-			$redirectUrl = null;
-			if(isset($settings->partnerId))
+			$redirectUrl = $ssoPlugin->sso->login('', 'admin_console', $partnerId);
+			if(!$redirectUrl)
 			{
-				$partnerId = $settings->partnerId;
-				$client = Infra_ClientHelper::getClient();
-				$ssoPlugin = Kaltura_Client_Sso_Plugin::get($client);
-				$redirectUrl = $ssoPlugin->sso->login('', 'admin_console', $partnerId);
-				if($redirectUrl)
-				{
-					// if we got session from sso server validate it, if we didnt redirect to sso server
-					$ks = $_GET['ks'];
-					if($ks)
-					{
-						$client->setKs($ks);
-						$client->user->loginByKs($partnerId);
-						$adapter = new Kaltura_AdminAuthAdapter();
-						$adapter->setKs($ks);
-						$auth = Infra_AuthHelper::getAuthInstance();
-						$result = $auth->authenticate($adapter);
-						if ($result->isValid())
-						{
-							$nextUri = $this->_getParam('next_uri');
-							if ($nextUri)
-								$this->_helper->redirector->gotoUrl($nextUri);
-							else
-								$this->_helper->redirector('list', 'partner');
-						}
-						else
-						{
-							throw new Exception('', 'INVALID_CREDENTIALS');
-						}
-					}
-					else
-					{
-						$this->getResponse()->setRedirect($redirectUrl);
-					}
-				}
+				throw new Exception('Missing authentication server url', self::MISSING_AUTH_SERVER_URL);
+			}
+
+			// if we got session from sso server validate it, if we didnt redirect to sso server
+			$ks = $_GET['ks'];
+			if(!$ks)
+			{
+				$this->getResponse()->setRedirect($redirectUrl);
 			}
 			else
 			{
-				throw new Exception('', 'MISSING_ADMIN_PARTNER');
+				$client->setKs($ks);
+				$client->user->loginByKs($partnerId);
+
+				$adapter = new Kaltura_AdminAuthAdapter();
+				$adapter->setKs($ks);
+				$auth = Infra_AuthHelper::getAuthInstance();
+				$result = $auth->authenticate($adapter);
+				if ($result->isValid())
+				{
+					$this->_helper->redirector('list', 'partner');
+				}
+				else
+				{
+					throw new Exception('Could not authenticate with the given credentials', self::INVALID_CREDENTIALS);
+				}
 			}
 		}
 		catch(Exception $ex)
@@ -266,7 +261,16 @@ class UserController extends Zend_Controller_Action
 		$client = Infra_ClientHelper::getClient();
 		$client->session->end();
 		Infra_AuthHelper::getAuthInstance()->clearIdentity();
-		$this->_helper->redirector('index', 'index');
+
+		$settings = Zend_Registry::get('config')->settings;
+		if(isset($settings->ssoLogin) && $settings->ssoLogin == true)
+		{
+			$this->render('logout');
+		}
+		else
+		{
+			$this->_helper->redirector('index', 'index');
+		}
 	}
 	
 	public function blockAction()
