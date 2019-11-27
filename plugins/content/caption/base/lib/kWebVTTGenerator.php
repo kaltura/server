@@ -5,7 +5,7 @@
  */
 class kWebVTTGenerator
 {
-	const WEBVTT_CUE_PAYLOAD_UNESCAPED_CHARECTERS = '/[&<>]/';
+	const WEBVTT_CUE_PAYLOAD_UNESCAPED_CHARACTERS = '/[&<>]/';
 	const WEBVTT_CUE_PAYLOAD_ENCODED_CHARACTERS = '/(&amp;)|(&lt;)|(&gt;)/';
 	const WEVTT_CUE_PAYLOAD_DECODED_CHARACTERS = '/( & )|( < )|( > )/';
 
@@ -199,7 +199,7 @@ class kWebVTTGenerator
 		}
 		else
 		{
-			$shouldEncode = preg_match(self::WEBVTT_CUE_PAYLOAD_UNESCAPED_CHARECTERS, $textLine);
+			$shouldEncode = preg_match(self::WEBVTT_CUE_PAYLOAD_UNESCAPED_CHARACTERS, $textLine);
 			if ($shouldEncode)
 			{
 				$textLine = htmlspecialchars($textLine, ENT_NOQUOTES);
