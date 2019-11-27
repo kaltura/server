@@ -566,7 +566,7 @@ abstract class KBatchBase implements IKalturaLogger
 
 		if($time_elapsed_secs > self::MAX_FILE_ACCESS_TIME)
 		{
-			KalturaLog::err("No write access in reasonable time to file {$file}, took {$time_elapsed_secs} seconds");
+			KalturaLog::err("No read access in reasonable time to file {$file}, took {$time_elapsed_secs} seconds");
 			return false;
 		}
 
