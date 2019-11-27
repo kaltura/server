@@ -428,8 +428,8 @@ class embedPlaykitJsAction extends sfAction
 		$last_uiconf_content = (is_array($uiconfs_content) && reset($uiconfs_content)) ? reset($uiconfs_content) : null;
 		$last_uiconf_config = isset($last_uiconf_content) ? $last_uiconf_content->getConfig() : '';
 		$productVersionJson = isset($last_uiconf_content) ? json_decode($last_uiconf_content->getConfVars()) : null;
-		$productVersion = is_array($productVersionJson) ? $productVersionJson->version : null;
-		return array($last_uiconf_config, $product_version);
+		$productVersion = $productVersionJson ? $productVersionJson->version : null;
+		return array($last_uiconf_config, $productVersion);
 	}
 
 	private function getConfigByVersion($version){
