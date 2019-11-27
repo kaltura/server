@@ -3,7 +3,7 @@
 ## create KMC_ANALYTICS_ROLE for partner 0 ##
 
 - Issue Type: Story
-- Issue ID: PLAT-5725
+- Issue ID: PLAT-10346
 
 ### Configuration ###
 
