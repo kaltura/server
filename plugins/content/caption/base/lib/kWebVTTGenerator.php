@@ -6,8 +6,8 @@
 class kWebVTTGenerator
 {
 	const WEBVTT_CUE_PAYLOAD_UNESCAPED_CHARACTERS = '/[&<>]/';
-	const WEBVTT_CUE_PAYLOAD_ENCODED_CHARACTERS = '/(&amp;)|(&lt;)|(&gt;)/';
-	const WEVTT_CUE_PAYLOAD_DECODED_CHARACTERS = '/( & )|( < )|( > )/';
+	const WEBVTT_CUE_PAYLOAD_ENCODED_CHARACTERS = '/(\&.{1,2}[^\s];)/';
+	const WEVTT_CUE_PAYLOAD_DECODED_CHARACTERS = '/\s{0,}(\&|\<|\>)\s{0,}[^(&amp;)|(&gt;)|(&lt;)]/';
 
 	/**
 	 * @param int $timeStamp
