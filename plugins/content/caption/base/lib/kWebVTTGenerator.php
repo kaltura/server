@@ -5,9 +5,8 @@
  */
 class kWebVTTGenerator
 {
-	const WEBVTT_CUE_PAYLOAD_UNESCAPED_CHARACTERS = '/[&<>]/';
-	const WEBVTT_CUE_PAYLOAD_ENCODED_CHARACTERS = '/(\&.{1,2}[^\s];)/';
-	const WEVTT_CUE_PAYLOAD_DECODED_CHARACTERS = '/\s{0,}(\&|\<|\>)\s{0,}[^(&amp;)|(&gt;)|(&lt;)]/';
+	const WEBVTT_CUE_PAYLOAD_ENCODED_CHARS = '/(&amp;)|(&gt;)|(&lt;)|(&lrm;)|(&rlm;)|(&nbsp;)/';
+	const WEBVTT_CUE_PAYLOAD_DECODED_CHARS = '/[&<>]/';
 
 	/**
 	 * @param int $timeStamp
@@ -186,20 +185,10 @@ class kWebVTTGenerator
 	 */
 	public static function escapeSpecialChars($textLine)
 	{
-		$encoded = preg_match(self::WEBVTT_CUE_PAYLOAD_ENCODED_CHARACTERS, $textLine);
-		if ($encoded)
+		$isEncoded = preg_match(self::WEBVTT_CUE_PAYLOAD_ENCODED_CHARS, $textLine);
+		if (!$isEncoded)
 		{
-			// handle a case where $textLine has encoded and decoded chars like ' & ' and '&amp;'
-			$notEncoded = preg_match(self::WEVTT_CUE_PAYLOAD_DECODED_CHARACTERS, $textLine);
-			if ($notEncoded)
-			{
-				$textLine = htmlspecialchars_decode($textLine, ENT_NOQUOTES);
-				$textLine = htmlspecialchars($textLine, ENT_NOQUOTES);
-			}
-		}
-		else
-		{
-			$shouldEncode = preg_match(self::WEBVTT_CUE_PAYLOAD_UNESCAPED_CHARACTERS, $textLine);
+			$shouldEncode = preg_match(self::WEBVTT_CUE_PAYLOAD_DECODED_CHARS, $textLine);
 			if ($shouldEncode)
 			{
 				$textLine = htmlspecialchars($textLine, ENT_NOQUOTES);
