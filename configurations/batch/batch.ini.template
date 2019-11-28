@@ -846,4 +846,5 @@ id													= 780
 friendlyName										= Clip Concat Closer
 type												= KClipConcatCloser
 scriptPath											= batches/Convert/KClipConcatCloserExe.php
-params.maxTimeBeforeFail 							= 86400
+maximumExecutionTime                                = 10800
+params.maxTimeBeforeFail 							= 216000‬
