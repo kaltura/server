@@ -126,8 +126,8 @@ class ConfMapsService extends KalturaBaseService
 	 *
 	 * @action getBatchMap
 	 * @return string
-         * @param string $hostName
-         */
+     * @param string $hostName
+     */
 	function getBatchMapAction($hostName)
 	{
 		$res = IniUtils::getBatchConfigFromFS();

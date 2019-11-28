@@ -46,7 +46,7 @@ class KAsyncConvertCaptionAsset extends KJobHandlerWorker
 			return $job;
 		}
 
-		$content = kEncryptFileUtils::getEncryptedFileContent($data->fileLocation, $data->fileEncryptionKey, self::getConfigParam("encryption_iv"));
+		$content = kEncryptFileUtils::getEncryptedFileContent($data->fileLocation, $data->fileEncryptionKey, self::getConfigParam('encryption_iv'));
 		if (!$content)
 		{
 			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, 'UNABLE_TO_GET_FILE', "Error: " . 'UNABLE_TO_GET_FILE', KalturaBatchJobStatus::FAILED, $data);

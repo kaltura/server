@@ -143,7 +143,9 @@ class IniUtils
 		$content = '';
 		$configFilePaths = self::getConfigFilePaths($batchConfigFolder);
 		foreach($configFilePaths as $configFilePath)
+		{
 			$content .= file_get_contents($configFilePath) . "\n";
+		}
 		return $content;
 	}
 
@@ -158,7 +160,9 @@ class IniUtils
 		while (false !== ($file = $d->read()))
 		{
 			if(preg_match('/\.ini$/', $file))
+			{
 				$configFilePaths[] = $path . DIRECTORY_SEPARATOR . $file;
+			}
 		}
 		$d->close();
 

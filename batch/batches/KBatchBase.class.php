@@ -796,12 +796,7 @@ abstract class KBatchBase implements IKalturaLogger
 	
 	public static function getIV()
 	{
-		if (isset(self::$iv))
-		{
-			return self::$iv;
-		}
-		self::$iv = self::getConfigParam("encryption_iv");
-		return self::$iv;
+		return self::getConfigParam('encryption_iv');
 	}
 
 	public static function tryExecuteApiCall($callback, $params, $numOfRetries = self::DEFUALT_API_RETRIES_ATTEMPS, $apiIntervalInSec = self::DEFAULT_SLEEP_INTERVAL)
