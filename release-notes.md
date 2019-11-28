@@ -25,14 +25,17 @@ Alter batch_job_log table to change abort colmun default value
 
 ## Configurations Maps Modifications ##
 - Issue Type: Task
-- Issue ID: PLAT-10245
+- Issue ID: PLAT-10245 and PLAT-10246
 
 ### Deployment scripts ###
 Run php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_05_update_confmaps_permissions.php 
 
 ### configuration ###
-modify /opt/kaltura/app/configuration/db_sync.template.ini to /opt/kaltura/app/configuration/db_sync.ini and configure relevant db connection
+modify /opt/kaltura/app/configuration/batchBase.template.ini to /opt/kaltura/app/configuration/db_sync.ini and configure relevant db connection
 This is required to be able to run syncDbConfigMapsToCache.php and insertConfigMapToDb.php scripts syncs conf maps from db to remote cache.
+
+modify /opt/kaltura/app/configuration/batchBase.template.ini to /opt/kaltura/app/configuration/batchBase.ini and modify correctly
+
 
 # Orion 15.11.0 #
 
