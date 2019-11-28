@@ -50,7 +50,6 @@ Add the following to Admin.ini:
 
     settings.ssoLogin = 1
 
-
 # Orion 15.11.0 #
 
 ## Optimize batch_job_log queries ##

@@ -102,9 +102,11 @@ CREATE TABLE `entry_vendor_task`
 	`context` VARCHAR(256),
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
-	KEY `partner_id_status_index`(`partner_id`, `status`),
-	KEY `vendor_partner_id_status_index`(`vendor_partner_id`, `status`),
-	KEY `partner_entry_index`(`partner_id`, `entry_id`)
+	KEY `partner_id_status_index` (`partner_id`,`status`),
+	KEY `vendor_partner_id_status_index` (`vendor_partner_id`,`status`),
+	KEY `updated_at` (`updated_at`),
+	KEY `entry_id` (`entry_id`)
+	KEY `reach_profile_queue_time` (`reach_profile_id`,`queue_time`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
