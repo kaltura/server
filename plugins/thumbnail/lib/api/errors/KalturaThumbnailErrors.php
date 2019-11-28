@@ -16,6 +16,6 @@ class KalturaThumbnailErrors extends KalturaErrors
 	const ACTION_FAILED = 'ACTION_FAILED;;Action failed';
 	const NOT_ALLOWED_PARAMETER = 'NOT_ALLOWED_PARAMETER;;The provided parameter is not allowed';
 	const MUST_HAVE_VIDEO_SOURCE = 'MUST_HAVE_VIDEO_SOURCE;;The following transformation must have video source';
-	CONST MISSING_S3_CONFIGURATION = 'MISSING_S3_CONFIGURATION;;Missing S3 configuration';
+	const MISSING_S3_CONFIGURATION = 'MISSING_S3_CONFIGURATION;;Missing S3 configuration';
 	const CACHE_ERROR = 'CACHE_ERROR;;Cache error';
 }
