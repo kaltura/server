@@ -49,6 +49,9 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer, kObjec
 		
 		elseif($fromObject instanceof kuser)
 			$this->copyMetadata(MetadataObjectType::USER, $fromObject, $toObject);
+
+		elseif($fromObject instanceof UserEntry)
+			$this->copyMetadata(MetadataObjectType::USER_ENTRY, $fromObject, $toObject);
 		
 		elseif($fromObject instanceof MetadataProfile)
 			kObjectCopyHandler::mapIds('MetadataProfile', $fromObject->getId(), $toObject->getId());

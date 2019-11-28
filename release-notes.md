@@ -1,5 +1,20 @@
 # Orion 15.12.0 #
 
+## create KMC_ANALYTICS_ROLE for partner 0 ##
+
+- Issue Type: Story
+- Issue ID: PLAT-10346
+
+### Configuration ###
+
+#### Deployment Scripts ####
+
+- Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_27_add_kmc_analytics_role_and_permissions.php'
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Optimize entry_vendor_task queries ##
 - Issue Type: Task
 - Issue ID: PLAT-10292
@@ -8,6 +23,16 @@
 Alter batch_job_log table to change abort colmun default value    
     mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_26_add_entry_vendor_task_index.sql
 
+## Configurations Maps Modifications ##
+- Issue Type: Task
+- Issue ID: PLAT-10245
+
+### Deployment scripts ###
+Run php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_05_update_confmaps_permissions.php 
+
+### configuration ###
+modify /opt/kaltura/app/configuration/db_sync.template.ini to /opt/kaltura/app/configuration/db_sync.ini and configure relevant db connection
+This is required to be able to run syncDbConfigMapsToCache.php and insertConfigMapToDb.php scripts syncs conf maps from db to remote cache.
 
 # Orion 15.11.0 #
 
@@ -28,17 +53,6 @@ Add Registration to your plugins.ini
 
 ### Deployment scripts ###
 php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
-
-## Configurations Maps Modifications ##
-- Issue Type: Task
-- Issue ID: PLAT-10245
-
-### Deployment scripts ###
-Run php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_05_update_confmaps_permissions.php 
-
-### configuration ###
-modify /opt/kaltura/app/configuration/db_sync.template.ini to /opt/kaltura/app/configuration/db_sync.ini and configure relevant db connection
-This is required to be able to run syncDbConfigMapsToCache.php and insertConfigMapToDb.php scripts syncs conf maps from db to remote cache.
 
 ## Kava - move rounding client tags to config ##
 - Issue Type: Task
