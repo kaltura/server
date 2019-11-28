@@ -1,5 +1,22 @@
 # Orion 15.12.0 #
 
+## Make likes and comments available to all ##
+- Issue Type: Task
+- Issue ID: PLAT-10108
+
+### Configuration ###
+
+Update admin.ini and modify:
+moduls.like.label = "Use ‘Like’ instead of ‘Rank’ (5 Stars)"
+
+#### Deployment Scripts ####
+
+- Run 'php /opt/kaltura/app/deployment/updates/scripts/enableAnnotationPluginPermission.php'
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## create KMC_ANALYTICS_ROLE for partner 0 ##
 
 - Issue Type: Story
