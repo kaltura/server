@@ -63,7 +63,7 @@ abstract class kReportExportEngine
 			return;
 		}
 
-		$disclaimerMessage = kConf::get(self::DISCLAIMER_CONFIG_KEY, 'local', null);
+		$disclaimerMessage = KBatchBase::getConfigParam(self::DISCLAIMER_CONFIG_KEY);
 		if ($disclaimerMessage)
 		{
 			$this->writeRow($disclaimerMessage);
