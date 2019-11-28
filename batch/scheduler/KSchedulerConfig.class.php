@@ -60,18 +60,18 @@ class KSchedulerConfig extends Zend_Config_Ini
 	public function load()
 	{
 		$this->configTimestamp = time();
-		KalturaLog::log("loading configuration from server at " . date('H:i:s', $this->configTimestamp));
+		KalturaLog::log('loading configuration from server at ' . date('H:i:s', $this->configTimestamp));
 
 		$hostname = self::getHostname();
 		$configFileName = kEnvironment::get('cache_root_path') . DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . 'config.ini';
 		$newIniMd5 = $this->loadConfigFromServer($configFileName, $hostname);
 		if (isset($this->currentIniMd5) && ( !$newIniMd5 || $this->currentIniMd5 == $newIniMd5 ))
 		{
-			KalturaLog::log("No need to load Configuration.");
+			KalturaLog::log('No need to load Configuration.');
 			return;
 		}
 
-		KalturaLog::log("Configuration Loaded from Server " . date('H:i:s', $this->configTimestamp));
+		KalturaLog::log('Configuration Loaded from Server ' . date('H:i:s', $this->configTimestamp));
 		$this->currentIniMd5 = $newIniMd5;
 
 		parent::__construct($configFileName, $hostname, true);
@@ -342,17 +342,17 @@ class KSchedulerConfig extends Zend_Config_Ini
 				}
 				else
 				{
-					KalturaLog::alert("Could not be decoded batch configuration maps");
+					KalturaLog::alert('Could not be decoded batch configuration maps');
 				}
 			}
 			else
 			{
-				KalturaLog::alert("Could Not load batch configuration maps from server ");
+				KalturaLog::alert('Could Not load batch configuration maps from server');
 			}
 		}
 		else
 		{
-			KalturaLog::err("Could Not load Conf Maps Plugin. Please check configuration.");
+			KalturaLog::err('Could Not load Conf Maps Plugin. Please check configuration.');
 		}
 		return $iniMd5;
 	}
@@ -361,19 +361,19 @@ class KSchedulerConfig extends Zend_Config_Ini
 	{
 		if ($this->kClient)
 		{
-			$ks = $this->kClient->generateSession($this->kClientConfig['secret'], "batchUser", KalturaSessionType::ADMIN, '-1');
+			$ks = $this->kClient->generateSession($this->kClientConfig['secret'], 'batchUser', KalturaSessionType::ADMIN, '-1');
 			$this->kClient->setKs($ks);
 			return;
 		}
 		else
 		{
-			$this->kClientConfig = kConf::getMap("batchBase");
+			$this->kClientConfig = kConf::getMap('batchBase');
 			$clientConfig = new KalturaConfiguration();
 			$clientConfig ->serviceUrl = $this->kClientConfig['serviceUrl'];
 			$clientConfig ->curlTimeout = $this->kClientConfig['curlTimeout'];
 			$this->kClient = new KalturaClient($clientConfig );
 			$this->kClient->setPartnerId($this->kClientConfig['partnerId']);
-			$ks = $this->kClient->generateSession($this->kClientConfig['secret'], "batchUser", KalturaSessionType::ADMIN, '-1');
+			$ks = $this->kClient->generateSession($this->kClientConfig['secret'], 'batchUser', KalturaSessionType::ADMIN, '-1');
 			$this->kClient->setKs($ks);
 		}
 	}
