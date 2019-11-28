@@ -406,7 +406,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 
 	public static function captureLocalThumbForBifUsingPackager($srcPath, $capturedThumbPath, $calc_vid_sec, $width = null, $height = null)
 	{
-		$packagerCaptureUrl = self::getConfigParam('packager_local_thumb_capture_url', 'local', null);
+		$packagerCaptureUrl = kConf::get('packager_local_thumb_capture_url', 'local', null);
 		if (!$packagerCaptureUrl || !$srcPath)
 		{
 			return false;

@@ -116,33 +116,9 @@ class ConfMapsService extends KalturaBaseService
 	 * @action getCacheVersionId
 	 * @return string
 	 */
-	public function getCacheVersionIdAction()
+	function getCacheVersionIdAction()
 	{
 		return kConf::getCachedVersionId();
-	}
-
-	/**
-	 * Get batch configuration map
-	 *
-	 * @action getBatchMap
-	 * @return string
-     * @param string $hostName
-     */
-	function getBatchMapAction($hostName)
-	{
-		$res = IniUtils::getBatchConfigFromFS();
-		if (!$res)
-		{
-			$batchMapNames = array('batch','workers');
-			/*  @var kRemoteMemCacheConf $remoteCache  */
-			$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
-			$map = $remoteCache->loadByHostName($batchMapNames ,$hostName);
-			if (!empty($map))
-			{
-				$res = IniUtils::arrayToIniString($map);
-			}
-		}
-		return json_encode($res);
 	}
 }
 
