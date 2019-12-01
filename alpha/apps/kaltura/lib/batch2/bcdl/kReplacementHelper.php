@@ -276,13 +276,21 @@ class kReplacementHelper
 	{
 		$defaultThumbAssetOld = null;
 		$defaultThumbAssetNew = null;
+
 		$replacingEntry = $replacingEntryAsset->getentry();
-		$replacedEntry = entryPeer::retrieveByPK($replacingEntry->getReplacedEntryId());
-		if(!$replacingEntry || !$replacedEntry)
+		if(!$replacingEntry)
 		{
-			KalturaLog::info("One of the replacement entries is missing");
+			KalturaLog::info("Replacing entry is missing");
 			return;
 		}
+
+		$replacedEntry = entryPeer::retrieveByPK($replacingEntry->getReplacedEntryId());
+		if(!$replacedEntry)
+		{
+			KalturaLog::info("Replaced entry is missing");
+			return;
+		}
+
 		KalturaLog::info("Copying flavor [{$replacingEntryAsset->getId()}] from replacing entry [{$replacingEntry->getId()}] to replaced entry [{$replacedEntry->getId()}]");
 		$oldAssets = assetPeer::retrieveByEntryIdAndParams($replacedEntry->getId(), $replacingEntryAsset->getFlavorParamsId());
 		if($oldAssets)
