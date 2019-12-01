@@ -284,6 +284,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_FLAVOR_SWITCH,
 		self::EVENT_TYPE_BUFFER_START,
 		self::EVENT_TYPE_ERROR,
+		self::EVENT_TYPE_NODE_PLAY,
 	);
 
 	protected static $media_type_count_aggrs = array(
