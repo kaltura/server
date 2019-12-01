@@ -1,7 +1,7 @@
 <?php
 /**
  * @package deployment
- * @subpackage kajam.roles_and_permissions
+ * @subpackage Orion.roles_and_permissions
  *
  * Added permission to adminconsole entryadmin
  */
