@@ -18,6 +18,7 @@ KAutoloader::setClassPath(array(
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"),
 	KAutoloader::buildPath(KALTURA_BATCH_PATH, "*"),
 ));
+require_once(KALTURA_BATCH_PATH . '/client/KalturaClient.php');
 
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*", "batch", "*"));
 

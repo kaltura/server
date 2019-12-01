@@ -18,7 +18,6 @@ Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_12_01_
 None.
 
 
-
 ## Clip concat job closer ##
 
 - Issue Type: Story

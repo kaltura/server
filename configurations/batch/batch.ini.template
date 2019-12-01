@@ -840,3 +840,11 @@ type                                                = KAsyncParseSccCaptionAsset
 maximumExecutionTime                                = 300
 scriptPath                                          = ../plugins/content/caption/base/batch/ParseCaptionAsset/KAsyncParseCaptionAssetExe.php
 params.pythonCmd                                    = @PYTHON_3_PATH@
+
+[KClipConcatCloser : JobCloserWorker]
+id													= 780
+friendlyName										= Clip Concat Closer
+type												= KClipConcatCloser
+scriptPath											= batches/ClipConcat/KClipConcatCloserExe.php
+maximumExecutionTime								= 10800
+params.maxTimeBeforeFail 							= 216000‬
