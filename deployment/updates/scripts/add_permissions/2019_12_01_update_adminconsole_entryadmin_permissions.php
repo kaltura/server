@@ -3,7 +3,7 @@
  * @package deployment
  * @subpackage Orion.roles_and_permissions
  *
- * Added permission to adminconsole entryadmin
+ * Update permission to adminconsole entryadmin
  */
 
 $addPermissionsAndItemsScript = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/permissions/addPermissionsAndItems.php';
