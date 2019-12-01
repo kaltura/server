@@ -30,12 +30,12 @@ function addSsoProfile($domain, $redirectUrl, $dataFilePath)
 	$ssoProfile = new Sso();
 	$ssoProfile->setApplicationType(ADMIN_CONSOLE_APPLICATION_TYPE);
 	$ssoProfile->setPartnerId(Partner::ADMIN_CONSOLE_PARTNER_ID);
-	if(!empty($domain))
+	if($domain)
 	{
 		$ssoProfile->setDomain($domain);
 	}
 
-	if(!empty($dataFilePath) && file_exists($dataFilePath))
+	if($dataFilePath && file_exists($dataFilePath))
 	{
 		$data = file_get_contents($dataFilePath);
 		$ssoProfile->setData($data);
