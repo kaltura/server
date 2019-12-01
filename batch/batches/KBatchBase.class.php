@@ -535,13 +535,13 @@ abstract class KBatchBase implements IKalturaLogger
 		}
 		catch(Exception $ex)
 		{
-			KalturaLog::err("No write access to directory {$dir}");
+			KalturaLog::crit("No write access to directory {$dir}");
 			$result = false;
 		}
 
 		if($result && $time_elapsed_secs > self::MAX_FILE_ACCESS_TIME)
 		{
-			KalturaLog::err("No write access in reasonable time to directory {$dir} took {$time_elapsed_secs} seconds");
+			KalturaLog::crit("No write access in reasonable time to directory {$dir} took {$time_elapsed_secs} seconds");
 			$result = false;
 		}
 		return $result;
@@ -560,13 +560,13 @@ abstract class KBatchBase implements IKalturaLogger
 		}
 		catch(Exception $ex)
 		{
-			KalturaLog::err("No write access to file {$file}");
+			KalturaLog::crit("No read access to file {$file}");
 			return false;
 		}
 
 		if($time_elapsed_secs > self::MAX_FILE_ACCESS_TIME)
 		{
-			KalturaLog::err("No read access in reasonable time to file {$file}, took {$time_elapsed_secs} seconds");
+			KalturaLog::crit("No read access in reasonable time to file {$file}, took {$time_elapsed_secs} seconds");
 			return false;
 		}
 
