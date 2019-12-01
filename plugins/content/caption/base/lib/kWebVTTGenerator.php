@@ -5,9 +5,6 @@
  */
 class kWebVTTGenerator
 {
-	const WEBVTT_CUE_PAYLOAD_ENCODED_CHARS = '/(&amp;)|(&gt;)|(&lt;)|(&lrm;)|(&rlm;)|(&nbsp;)/';
-	const WEBVTT_CUE_PAYLOAD_DECODED_CHARS = '/[&<>]/';
-
 	/**
 	 * @param int $timeStamp
 	 * @return string
@@ -109,7 +106,7 @@ class kWebVTTGenerator
 			$content = '';
 			foreach ($curCaption['content'] as $curChunk)
 			{
-				$curChunkText = self::escapeSpecialChars($curChunk['text']);
+				$curChunkText = $curChunk['text'];
 				if (isset($curChunk['style']))
 				{
 					$style = $curChunk['style'];
@@ -177,23 +174,5 @@ class kWebVTTGenerator
 		}
 		$result .="\n\n\n";
 		return $result;
-	}
-
-	/**
-	 * @param string $textLine
-	 * @return string
-	 */
-	public static function escapeSpecialChars($textLine)
-	{
-		$isEncoded = preg_match(self::WEBVTT_CUE_PAYLOAD_ENCODED_CHARS, $textLine);
-		if (!$isEncoded)
-		{
-			$shouldEncode = preg_match(self::WEBVTT_CUE_PAYLOAD_DECODED_CHARS, $textLine);
-			if ($shouldEncode)
-			{
-				$textLine = htmlspecialchars($textLine, ENT_NOQUOTES);
-			}
-		}
-		return $textLine;
 	}
 }

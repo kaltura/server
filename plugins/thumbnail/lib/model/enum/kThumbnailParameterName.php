@@ -37,6 +37,4 @@ interface kThumbnailParameterName extends BaseEnum
 	const STROKE_WIDTH = 'strokeWidth';
 	const DISPLACE = 'displace';
 	const SIZE_CORRECTION = 'sizeCorrection';
-	const IMAGE_FORMAT = 'format';
-	const QUALITY = 'quality';
 }

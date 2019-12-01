@@ -23,7 +23,6 @@ abstract class kThumbStorageBase
 	const CONF_REGION = 'region';
 	const CONF_URL = 'url';
 	const CONF_TYPE = 'type';
-	const BAD_FORMAT_ERROR_CODE = 425;
 
 	protected function getPrefix()
 	{
@@ -93,23 +92,7 @@ abstract class kThumbStorageBase
 
 	public function render($lastModified = null)
 	{
-		$type = null;
-		try
-		{
-			$type = $this->getType();
-		}
-		catch (ImagickException $e)
-		{
-			if($e->getCode() == self::BAD_FORMAT_ERROR_CODE)
-			{
-				$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::NOT_VALID_IMAGE_FORMAT);
-				throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
-			}
-
-			throw new kThumbnailException(kThumbnailException::TRANSFORMATION_RUNTIME_ERROR, kThumbnailException::TRANSFORMATION_RUNTIME_ERROR);
-		}
-
-		$renderer = $this->getRenderer($type, $lastModified);
+		$renderer = $this->getRenderer($this->getType(), $lastModified);
 		$renderer->output();
 		KExternalErrors::dieGracefully();
 	}

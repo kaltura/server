@@ -13,7 +13,6 @@ class AnalyticsService extends KalturaBaseService
 	/**
 	 * report query action allows to get a analytics data for specific query dimensions, metrics and filters.
 	 *
-	 * @deprecated use the `report` service instead
 	 * @action query
 	 * @param KalturaAnalyticsFilter $filter the analytics query filter
          * @param KalturaFilterPager $pager the analytics query result pager

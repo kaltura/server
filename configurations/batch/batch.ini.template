@@ -7,7 +7,7 @@
 
 [template]
 logDir												= @LOG_DIR@/batch/
-pidFileDir                                          = @BASE_DIR@/var/run/
+pidFileDir											= @BASE_DIR@/var/run/
 statusInterval										= 300
 serviceUrl											= @SERVICE_URL@
 remoteServerUrl										= @BATCH_URL@
@@ -63,18 +63,19 @@ enabledWorkers.KAsyncIntegrate						= 1
 enabledWorkers.KAsyncIntegrateCloser				= 1
 enabledWorkers.KAsyncClearCuePoints					= 1
 enabledWorkers.KAsyncConvertThumbAssetsGenerator	= 1
-enabledWorkers.KAsyncLiveToVod      				= 1
+enabledWorkers.KAsyncLiveToVod						= 1
 enabledWorkers.KAsyncCopyCaptions					= 1
-enabledWorkers.KAsyncCopyCuePoints                   = 1
-enabledWorkers.KSyncReachCreditTaskRunner	    = 0
-enabledWorkers.KAsyncExportCsv                      = 0
+enabledWorkers.KAsyncCopyCuePoints					= 1
+enabledWorkers.KClipConcatCloser					= 1
+enabledWorkers.KSyncReachCreditTaskRunner			= 0
+enabledWorkers.KAsyncExportCsv						= 0
 
 
 [mainTemplate : template]
 enabledWorkers.DirectoryCleanupShared				= 1
 enabledWorkers.KAsyncDbCleanup						= 1
 enabledWorkers.KAsyncPartnerLoadCleanup				= 1
-enabledWorkers.KAsyncJobSuspender                   = 1
+enabledWorkers.KAsyncJobSuspender					= 1
 enabledWorkers.KAsyncConvertCloser					= 1
 enabledWorkers.KAsyncConvertProfileCloser			= 1
 enabledWorkers.KAsyncBulkDownloadCloser				= 1
@@ -840,3 +841,11 @@ type                                                = KAsyncParseSccCaptionAsset
 maximumExecutionTime                                = 300
 scriptPath                                          = ../plugins/content/caption/base/batch/ParseCaptionAsset/KAsyncParseCaptionAssetExe.php
 params.pythonCmd                                    = @PYTHON_3_PATH@
+
+[KClipConcatCloser : JobCloserWorker]
+id													= 780
+friendlyName										= Clip Concat Closer
+type												= KClipConcatCloser
+scriptPath											= batches/ClipConcat/KClipConcatCloserExe.php
+maximumExecutionTime								= 10800
+params.maxTimeBeforeFail 							= 216000‬

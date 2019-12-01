@@ -153,23 +153,17 @@ class kVendorCredit
 		$c->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId , Criteria::EQUAL);
 		$c->add(EntryVendorTaskPeer::STATUS, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::READY), Criteria::IN);
 		$c->add(EntryVendorTaskPeer::QUEUE_TIME, $this->getSyncCreditStartDate(), Criteria::GREATER_EQUAL);
-		$c->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
 		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
-		$c->addSelectColumn('SUM('. EntryVendorTaskPeer::PRICE .')');
 		$this->addAdditionalCriteria($c);
 
 		$now = time();
-		$stmt = EntryVendorTaskPeer::doSelectStmt($c);
-		$row = $stmt->fetch(PDO::FETCH_NUM);
-
+		$entryVendorTasks = EntryVendorTaskPeer::doSelect($c);
 		$totalUsedCredit = $this->getSyncedCredit();
-
-		$totalPrice = $row[0];
-		if($totalPrice)
+		foreach ($entryVendorTasks as $entryVendorTask)
 		{
-			$totalUsedCredit += $totalPrice;
+			/* @var $entryVendorTask EntryVendorTask */
+			$totalUsedCredit += $entryVendorTask->getPrice();
 		}
-
 		$this->setSyncedCredit($totalUsedCredit);
 		$this->setLastSyncTime($now);
 

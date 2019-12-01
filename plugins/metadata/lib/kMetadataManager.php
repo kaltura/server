@@ -17,7 +17,6 @@ class kMetadataManager
 		MetadataObjectType::CATEGORY => 'category',
 		MetadataObjectType::USER => 'kuser',
 		MetadataObjectType::PARTNER => 'Partner',
-		MetadataObjectType::USER_ENTRY => 'UserEntry',
 	);
 	
 	protected static $metadataFieldTypesToValidate = array(
@@ -46,9 +45,6 @@ class kMetadataManager
 		        
 		    case MetadataObjectType::USER:
 		        return new MetadataKuserPeer();
-
-		    case MetadataObjectType::USER_ENTRY:
-			return new MetadataUserEntryPeer();
 		        
 			default:
 				return KalturaPluginManager::loadObject('IMetadataPeer', $objectType);

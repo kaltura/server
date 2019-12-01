@@ -42,7 +42,7 @@ class Form_ConfigurationMapFilter extends Form_PartnerIdFilter
 		$this->addElement('button', 'viewConfigurationMapButton', array(
 			'ignore' => true,
 			'label' => 'View',
-			'onclick' => "viewConfigurationMap($('#filter_input').val(), $('#filterHostName').val())",
+			'onclick' => "viewConfigurationMap($('#filter_input').val(), $('#filterHostName').val(),'')",
 			'decorators' => array('ViewHelper'),
 		));
 

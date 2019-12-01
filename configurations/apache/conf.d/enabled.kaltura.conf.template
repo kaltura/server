@@ -204,12 +204,7 @@ Alias /content "@WEB_DIR@/content"
 <Directory "@WEB_DIR@/content">
 	Options -ExecCGI -Indexes
 	SetEnv force-no-vary
-	<IfModule mod_php5.c>
-	    php_flag engine off
-	</IfModule>
-	<IfModule mod_php7.c>
-	    php_flag engine off
-	</IfModule>
+	php_flag engine off
 	ExpiresActive On
 	ExpiresDefault "access plus 3 month"
 	Header unset ETag
@@ -239,23 +234,6 @@ Alias /flash "@WEB_DIR@/flash"
 	    Require all granted
 	</IfVersion>
 </Directory>
-
-<IfModule !mod_php5.c>
-  <IfModule !mod_php7.c>
-    # Enable http authorization headers
-    SetEnvIfNoCase ^Authorization$ "(.+)" HTTP_AUTHORIZATION=$1
-
-    <FilesMatch \.(php|phar)$>
-        SetHandler "proxy:unix:/run/php-fpm/www.sock|fcgi://localhost"
-    </FilesMatch>
-        <Directory "@WEB_DIR@/content">
-                    <FilesMatch ".+\.*$">
-                            SetHandler !
-                    </FilesMatch>
-        </Directory>
-  </IfModule>
-</IfModule>
-
 
 # ------------------------------------------------------------------------------
 # | Web fonts access                                                           |

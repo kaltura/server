@@ -33,9 +33,9 @@
 	            <td><?php echo $configurationMap->relatedHost; ?></td>
 	            <td><?php echo $configurationMap->version; ?></td>
 	            <td><?php echo $this->enumTranslate('Kaltura_Client_Enum_ConfMapSourceLocation', $configurationMap->sourceLocation);?></td>
-	            <td><?php echo date($this->translate('time format'), $configurationMap->createdAt); ?></td>
+	            <td><?php echo date($this->translate('time format'), $configurationMap->lastUpdate); ?></td>
                 <td>
-		            <select class="options" onchange="doAction(this.value,'<?php echo $configurationMap->name; ?>', '<?php echo $configurationMap->relatedHost; ?>', '<?php echo $configurationMap->version; ?>')">
+		            <select class="options" onchange="doAction(this.value,'<?php echo $configurationMap->name; ?>', '<?php echo $configurationMap->relatedHost; ?>')">
 		                <option value=""><?php echo $this->translate('Select Action'); ?></option>
 		                <option value="configureConfigurationMap"><?php echo $this->translate('Configure'); ?></option>
 	                </select>
@@ -74,13 +74,13 @@
 		jQuery('select.options').val('');
 	}
 
-	function configureConfigurationMap(configurationMapName, configurationMapHost, configurationMapVersion) {
+	function configureConfigurationMap(configurationMapName, configurationMapHost) {
 		if (typeof configurationMapName == 'undefined') {
 			alert('<?php echo $this->translate('Configuration Map Name not supplied'); ?>');
 			return;
 		}
 
-		var configurationMapStr= '/configuration_map_name/' + encodeURIComponent(configurationMapName) + '/configuration_map_host/' + encodeURIComponent(configurationMapHost)  + '/configuration_map_version/' + configurationMapVersion + '/is_new/' + false;
+		var configurationMapStr= '/configuration_map_name/' + encodeURIComponent(configurationMapName) + '/configuration_map_host/' + encodeURIComponent(configurationMapHost) + '/is_new/' + false;
 
 		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'ConfigurationMapConfigureAction')); ?>' + configurationMapStr;
 
@@ -125,19 +125,12 @@
 	}
 
 	function viewConfigurationMap(configurationMapName, configurationMapHost, configurationMapVersion) {
-		var configurationMapStr = '/configuration_map_name/' + encodeURIComponent(configurationMapName) + '/configuration_map_host/' + encodeURIComponent(configurationMapHost) + '/is_new/' + false + '/is_view/' + true;
-		if (typeof configurationMapVersion != 'undefined')
-		{
-			if (configurationMapVersion == '' || isNaN(parseInt(configurationMapVersion)) || (parseInt(configurationMapVersion)) < 0)
-			{
-				alert('<?php echo $this->translate('Configuration Version should be a positive number'); ?>');
-				return;
-			}
-			else
-			{
-				var configurationMapStr = configurationMapStr + '/configuration_map_version/' + configurationMapVersion;
-			}
+		if ( configurationMapVersion != '' && (isNaN(parseInt(configurationMapVersion)) || (parseInt(configurationMapVersion)) < 1)) {
+			alert('<?php echo $this->translate('Configuration Version should be a positive number'); ?>');
+			return;
 		}
+
+		var configurationMapStr= '/configuration_map_name/' + encodeURIComponent(configurationMapName) + '/configuration_map_host/' + encodeURIComponent(configurationMapHost) + '/configuration_map_version/' + configurationMapVersion + '/is_new/' + false + '/is_view/' + true;
 		handleConfigurationAction(configurationMapStr, true);
 	}
 

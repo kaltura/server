@@ -319,8 +319,6 @@ class kReplacementHelper
 			$oldFlavorNewMediaInfo->setFlavorAssetVersion($oldAsset->getVersion());
 			$oldFlavorNewMediaInfo->save();
 		}
-		
-		kQueryCache::invalidateQueryCache($oldAsset);
 	}
 
 	/**

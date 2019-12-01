@@ -88,15 +88,9 @@
 			<index-column name="vendor_partner_id" />
 			<index-column name="status" />
 		</index>
-		<index name="updated_at">
-			<index-column name="updated_at" />
-		</index>
-		<index name="entry_id">
+		<index name="partner_entry_index">
+			<index-column name="partner_id" />
 			<index-column name="entry_id" />
-		</index>
-		<index name="reach_profile_queue_time">
-			<index-column name="reach_profile_id" />
-			<index-column name="queue_time" />
 		</index>
 	</table>
 	

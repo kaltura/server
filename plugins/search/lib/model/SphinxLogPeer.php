@@ -17,11 +17,6 @@ class SphinxLogPeer extends BaseSphinxLogPeer {
 
 	public static function alternativeCon($con, $queryDB = kQueryCache::QUERY_DB_UNDEFINED)
 	{
-		if($con && in_array($con->getConnectionName(), array(myDbHelper::DB_HELPER_CONN_SPHINX_LOG_READ, myDbHelper::DB_HELPER_CONN_SPHINX_LOG)))
-		{
-			return $con;
-		}
-		
 		return myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG);
 	}
 

@@ -1,1 +1,0 @@
-alter table entry_vendor_task add index reach_profile_queue_time(reach_profile_id, queue_time);
