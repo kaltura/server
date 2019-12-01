@@ -145,15 +145,24 @@ class UserController extends Zend_Controller_Action
 	
 	public function loginAction()
 	{
-		$settings = Zend_Registry::get('config')->settings;
-		if(isset($settings->ssoLogin) && $settings->ssoLogin == true)
+		if($this->shouldUseSsoLogin())
 		{
-			$this->ssoLogin($settings);
+			$this->ssoLogin();
 		}
 		else
 		{
 			$this->formLogin();
 		}
+	}
+
+	protected function shouldUseSsoLogin()
+	{
+		$settings = Zend_Registry::get('config')->settings;
+		if(isset($settings->ssoLogin) && $settings->ssoLogin == true)
+		{
+			return true;
+		}
+		return false;
 	}
 
 	protected function formLogin()
@@ -210,8 +219,9 @@ class UserController extends Zend_Controller_Action
 		$this->render('login');
 	}
 
-	protected function ssoLogin($settings)
+	protected function ssoLogin()
 	{
+		$settings = Zend_Registry::get('config')->settings;
 		$partnerId = $settings->partnerId;
 		$client = Infra_ClientHelper::getClient();
 		$ssoPlugin = Kaltura_Client_Sso_Plugin::get($client);
@@ -262,8 +272,7 @@ class UserController extends Zend_Controller_Action
 		$client->session->end();
 		Infra_AuthHelper::getAuthInstance()->clearIdentity();
 
-		$settings = Zend_Registry::get('config')->settings;
-		if(isset($settings->ssoLogin) && $settings->ssoLogin == true)
+		if($this->shouldUseSsoLogin())
 		{
 			$this->render('logout');
 		}

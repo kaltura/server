@@ -1,15 +1,12 @@
 <?php
-if ($argc < 2)
+if ($argc < 4)
 {
-	die ($argv[0]. " <redirect_url> <domain> \n");
+	die ($argv[0]. " <redirect_url> <domain> <data_file_path> \n");
 }
 
 $redirectUrl = $argv[1];
-$domain = null;
-if($argc == 3)
-{
-	$domain = $argv[2];
-}
+$domain = $argv[2];
+$dataFilePath = $argv[3];
 
 require_once(__DIR__ . '/../bootstrap.php');
 const ADMIN_CONSOLE_APPLICATION_TYPE = 'admin_console';
@@ -18,7 +15,7 @@ $partner = PartnerPeer::retrieveActiveByPK(Partner::ADMIN_CONSOLE_PARTNER_ID);
 if($partner)
 {
 	allowSsoFeature($partner);
-	addSSoProfile($domain, $redirectUrl);
+	addSSoProfile($domain, $redirectUrl, $dataFilePath);
 }
 
 function allowSsoFeature($partner)
@@ -28,12 +25,21 @@ function allowSsoFeature($partner)
 	$partner->save();
 }
 
-function addSsoProfile($domain, $redirectUrl)
+function addSsoProfile($domain, $redirectUrl, $dataFilePath)
 {
 	$ssoProfile = new Sso();
 	$ssoProfile->setApplicationType(ADMIN_CONSOLE_APPLICATION_TYPE);
 	$ssoProfile->setPartnerId(Partner::ADMIN_CONSOLE_PARTNER_ID);
-	$ssoProfile->setDomain($domain);
+	if(!empty($domain))
+	{
+		$ssoProfile->setDomain($domain);
+	}
+
+	if(!empty($dataFilePath) && file_exists($dataFilePath))
+	{
+		$data = file_get_contents($dataFilePath);
+		$ssoProfile->setData($data);
+	}
 	$ssoProfile->setRedirectUrl($redirectUrl);
 	$ssoProfile->setStatus(SsoStatus::ACTIVE);
 	$ssoProfile->save();
