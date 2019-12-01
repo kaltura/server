@@ -72,6 +72,21 @@ This is required to be able to run syncDbConfigMapsToCache.php and insertConfigM
 
 modify /opt/kaltura/app/configuration/batchBase.template.ini to /opt/kaltura/app/configuration/batchBase.ini and modify as needed
 
+## Login to admin console using SSO ##
+- Issue Type: Task
+- Issue ID: PLAT-10188
+
+### Deployment scripts ###
+
+To add SSO profile for admin console run:
+
+    php /opt/kaltura/app/alpha/scripts/utils/enableAdminConsoleSso.php <redirect_url> <domain>
+
+### configuration ###
+
+Add the following to Admin.ini:
+
+    settings.ssoLogin = 1
 
 # Orion 15.11.0 #
 
