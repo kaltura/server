@@ -27,7 +27,7 @@ class serveFlavorAction extends kalturaAction
 		$fullPath = $fileSync->getFullPath();
 		
 		$pathPrefix = kConf::get('serve_flavor_path_search_prefix', 'local', array());
-		if(!is_array($pathPrefix) && $pathPrefix)
+		 if($pathPrefix && !is_array($pathPrefix))
 		{
 			$pathPrefix = array($pathPrefix);
 		}
