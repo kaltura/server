@@ -7,7 +7,7 @@
 
 ### Configuration ##
 
-Only after the deployment script is executed, one configure add this permission to user roles via admin console
+Only after the deployment script is executed, one can add this permission to user-roles via admin console
 
 #### Deployment Scripts ####
 
@@ -16,6 +16,7 @@ Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_12_01_
 #### Known Issues & Limitations ####
 
 None.
+
 
 
 ## Clip concat job closer ##
