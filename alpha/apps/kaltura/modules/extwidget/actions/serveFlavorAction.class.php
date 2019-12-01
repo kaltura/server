@@ -36,8 +36,7 @@ class serveFlavorAction extends kalturaAction
 		{
 			foreach ($pathPrefix as $key => $prefix)
 			{
-				$match = kString::beginsWith($fullPath, $prefix);
-				if($match)
+				if(kString::beginsWith($fullPath, $prefix))
 				{
 					$paramName = $key ? "serve_flavor_path_replace_$key" : "serve_flavor_path_replace";
 					$pathReplace = kConf::get($paramName);
