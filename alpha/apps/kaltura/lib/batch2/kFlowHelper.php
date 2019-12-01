@@ -2120,7 +2120,7 @@ class kFlowHelper
 
 	public static function handleConvertProfileFailed(BatchJob $dbBatchJob, kConvertProfileJobData $data)
 	{
-		$entryId = self::getEntryToUpdate($dbBatchJob);
+		$entryId = self::getEntryIdToUpdate($dbBatchJob);
 
 		kBatchManager::updateEntry($entryId, entryStatus::ERROR_CONVERTING);
 
@@ -2134,7 +2134,7 @@ class kFlowHelper
 	public static function handleConvertProfileFinished(BatchJob $dbBatchJob, kConvertProfileJobData $data)
 	{
 		$entry = $dbBatchJob->getEntry();
-		$entryId = self::getEntryToUpdate($dbBatchJob);
+		$entryId = self::getEntryIdToUpdate($dbBatchJob);
 
 		self::deleteTemporaryFlavors($entryId);
 
@@ -2165,7 +2165,7 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
-	protected static function getEntryToUpdate($dbBatchJob)
+	protected static function getEntryIdToUpdate($dbBatchJob)
 	{
 		$entryId = $dbBatchJob->getEntryId();
 		$entry = $dbBatchJob->getEntry();
