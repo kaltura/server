@@ -65,6 +65,9 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandlerBase implements 
 	
 		if($object instanceof Partner)
 			$this->deleteMetadataObjects(MetadataObjectType::PARTNER, $object->getId());
+
+		if($object instanceof UserEntry)
+			$this->deleteMetadataObjects(MetadataObjectType::USER_ENTRY, $object->getId());
 			
 		if($object instanceof Metadata)
 			$this->metadataDeleted($object);
