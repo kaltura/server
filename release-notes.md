@@ -1,5 +1,24 @@
 # Orion 15.12.0 #
 
+## Restore deleted entry ##
+
+- Issue Type: Task
+- Issue ID : PLAT-10351
+
+### Configuration ##
+
+Only after the deployment script is executed, one can add this permission to user-roles via admin console
+
+#### Deployment Scripts ####
+
+Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_12_01_update_adminconsole_entryadmin_permissions.php'
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+
 ## Clip concat job closer ##
 
 - Issue Type: Story
