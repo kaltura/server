@@ -130,6 +130,7 @@ class ConfMapsService extends KalturaBaseService
      */
 	function getBatchMapAction($hostName)
 	{
+		kApiCache::disableCache();
 		$res = IniUtils::getBatchConfigFromFS();
 		if (!$res)
 		{

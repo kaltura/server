@@ -64,15 +64,10 @@ class KSchedulerConfig extends Zend_Config_Ini
 
 		$hostname = self::getHostname();
 		$configFileName = kEnvironment::get('cache_root_path') . DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . 'config.ini';
-		$newIniMd5 = $this->loadConfigFromServer($configFileName, $hostname);
-		if (isset($this->currentIniMd5) && ( !$newIniMd5 || $this->currentIniMd5 == $newIniMd5 ))
+		if (!$this->loadConfigFromServer($configFileName, $hostname))
 		{
-			KalturaLog::log('No need to load Configuration.');
 			return;
 		}
-
-		KalturaLog::log('Configuration Loaded from Server ' . date('H:i:s', $this->configTimestamp));
-		$this->currentIniMd5 = $newIniMd5;
 
 		parent::__construct($configFileName, $hostname, true);
 		$this->name = $hostname;
@@ -337,8 +332,18 @@ class KSchedulerConfig extends Zend_Config_Ini
 				$content = json_decode($configurationMap, true);
 				if (json_last_error() == JSON_ERROR_NONE)
 				{
-					file_put_contents($configFileName, $content, FILE_APPEND);
-					$iniMd5 = md5($content);
+					$newIniMd5 = md5($content);
+					if (!isset($this->currentIniMd5) || ($newIniMd5 && $this->currentIniMd5 != $newIniMd5))
+					{
+						file_put_contents($configFileName, $content);
+						$this->currentIniMd5 = $newIniMd5;
+						KalturaLog::log('Configuration Loaded from Server ' . date('H:i:s', $this->configTimestamp));
+						return true;
+					}
+					else
+					{
+						KalturaLog::log('No need to re load Configuration. Configuration hasn\'t changed.');
+					}
 				}
 				else
 				{
@@ -354,7 +359,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 		{
 			KalturaLog::err('Could Not load Conf Maps Plugin. Please check configuration.');
 		}
-		return $iniMd5;
+		return false;
 	}
 
 	protected function initClient()
