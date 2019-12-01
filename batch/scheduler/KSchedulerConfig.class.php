@@ -66,7 +66,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 		$configFileName = kEnvironment::get('cache_root_path') . DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . 'config.ini';
 		if (!$this->loadConfigFromServer($configFileName, $hostname))
 		{
-			return;
+			return false;
 		}
 
 		parent::__construct($configFileName, $hostname, true);
@@ -97,6 +97,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 
 			$this->taskConfigList[$workerName] = $task;
 		}
+		return true;
 	}
 	/* (non-PHPdoc)
 	 * @see Zend_Config_Ini::_loadIniFile()
@@ -342,7 +343,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 					}
 					else
 					{
-						KalturaLog::log('No need to re load Configuration. Configuration hasn\'t changed.');
+						KalturaLog::log('No need to reload Configuration. Configuration hasn\'t changed.');
 					}
 				}
 				else
