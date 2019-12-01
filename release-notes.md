@@ -1,5 +1,22 @@
 # Orion 15.12.0 #
 
+## Clip concat job closer ##
+
+- Issue Type: Story
+- Issue ID: PLAT-10317
+
+### Configuration ###
+
+workers.ini Requires the addition of 'KClipConcatCloser' worker definition and enabling. a template can be found at batch.ini.template
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## create KMC_ANALYTICS_ROLE for partner 0 ##
 
 - Issue Type: Story
