@@ -11,7 +11,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	
 	const PAGE_SIZE = 500;
 
-	const DATE_FORMAT = 'YYYY-MM-ddTHH:mm';
+	const DATE_FORMAT = 'c';
 	
 	public function fillCsv(&$csvFile, &$data)
 	{
@@ -144,7 +144,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	 * @return false|string
 	 */
 	protected function makeTimeStampHumanReadableIfNeeded($timestamp, $data) {
-		if($data->humanReadable != '1') {
+		if($data->options != ExportToCsvOptionsType::HUMAN_READABLE_DATES) {
 			return $timestamp;
 		}
 		return date(self::DATE_FORMAT, $timestamp);
