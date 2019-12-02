@@ -102,7 +102,11 @@ class KGenericScheduler
 		}
 		else
 		{
-			if(!$this->schedulerConfig->reloadRequired() && !$this->schedulerConfig->load())
+			if(!$this->schedulerConfig->reloadRequired())
+			{
+				return;
+			}
+			if (!$this->schedulerConfig->load())
 			{
 				return;
 			}
