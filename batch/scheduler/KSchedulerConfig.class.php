@@ -7,6 +7,7 @@
 class KSchedulerConfig extends Zend_Config_Ini
 {
 	const EXTENSION_SEPARATOR = '@';
+	const DEFAULT_CONFIG_RELOAD_INTVERAL = 30;
 
 	/**
 	 * @var host name as initiated by self::getHostname()
@@ -32,6 +33,16 @@ class KSchedulerConfig extends Zend_Config_Ini
 	 * @var int
 	 */
 	private $configTimestamp;
+
+	/**
+	 * @var int
+	 */
+	private $nextConfigReloadTime;
+
+	/**
+	 * @var int
+	 */
+	private $configReloadInterval;
 
 	/**
 	 * @var KalturaClient
@@ -194,9 +205,9 @@ class KSchedulerConfig extends Zend_Config_Ini
 	 */
 	public function reloadRequired()
 	{
-		if ($this->configTimestamp < time())
+		if ($this->nextConfigReloadTime < time())
 		{
-			$this->configTimestamp = time() + $this->getStatusInterval();
+			$this->nextConfigReloadTime = time() + $this->configReloadInterval;
 			return true;
 		}
 		return false;
@@ -374,6 +385,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 		else
 		{
 			$this->kClientConfig = kConf::getMap('batchBase');
+			$this->configReloadInterval = isset($this->kClientConfig['configReloadInterval']) ? $this->kClientConfig['configReloadInterval'] : self::DEFAULT_CONFIG_RELOAD_INTVERAL;
 			$clientConfig = new KalturaConfiguration();
 			$clientConfig ->serviceUrl = $this->kClientConfig['serviceUrl'];
 			$clientConfig ->curlTimeout = $this->kClientConfig['curlTimeout'];
