@@ -23,6 +23,7 @@ class KalturaESearchEntryOrderByItem extends KalturaESearchOrderByItem
         KalturaESearchEntryOrderByFieldName::VIEWS => ESearchEntryOrderByFieldName::VIEWS,
         KalturaESearchEntryOrderByFieldName::VOTES => ESearchEntryOrderByFieldName::VOTES,
         KalturaESearchEntryOrderByFieldName::PLAYS => ESearchEntryOrderByFieldName::PLAYS,
+	    KalturaESearchEntryOrderByFieldName::RANK => ESearchEntryOrderByFieldName::RANK,
         KalturaESearchEntryOrderByFieldName::LAST_PLAYED_AT => ESearchEntryOrderByFieldName::LAST_PLAYED_AT,
         KalturaESearchEntryOrderByFieldName::PLAYS_LAST_30_DAYS => ESearchEntryOrderByFieldName::PLAYS_LAST_30_DAYS,
         KalturaESearchEntryOrderByFieldName::VIEWS_LAST_30_DAYS => ESearchEntryOrderByFieldName::VIEWS_LAST_30_DAYS,

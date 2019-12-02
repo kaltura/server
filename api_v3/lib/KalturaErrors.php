@@ -112,7 +112,8 @@ class KalturaErrors extends APIErrors
 	const FAILED_TO_CALCULATE_DYNAMIC_DEPENDENT_VALUE = "FAILED_TO_CALCULATE_DYNAMIC_DEPENDENT_VALUE;DYNAMIC_VALUE;Dynamic dependent value \"@DYNAMIC_VALUE@\" not found";
 
 	const FAILED_TO_INIT_OBJECT = "FAILED_TO_INIT_OBJECT;RESOURCE_ID;Failed to initialize necessary object";
-
+	
+	const ANONYMOUS_ACCESS_FORBIDDEN = "ANONYMOUS_ACCESS_FORBIDDEN;;Anonymous access to this functionality is forbidden";
 	/**
 	 * Service Oriented Errors
 	 *

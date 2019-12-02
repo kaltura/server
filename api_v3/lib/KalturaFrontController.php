@@ -188,6 +188,7 @@ class KalturaFrontController
 	
 	public function handleMultiRequest()
 	{
+		kCurrentContext::$isInMultiRequest = true;
 		// arrange the parameters by request index
 		$commonParams = array();
 		$listOfRequests = array();

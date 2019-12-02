@@ -500,7 +500,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		$kQuiz = self::getQuizData($dbEntry);
 		if ( !$kQuiz )
 			return array(array('average' => null));
-		$c = new Criteria();
+		$c = KalturaCriteria::create(UserEntryPeer::OM_CLASS);
 		$c->add(UserEntryPeer::ENTRY_ID, $objectIds);
 		$c->add(UserEntryPeer::TYPE, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
 		$c->add(UserEntryPeer::STATUS, QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
@@ -536,7 +536,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		if (!$dbEntry)
 			throw new kCoreException("",kCoreException::INVALID_ENTRY_ID, $objectIds);
 		QuizPlugin::validateAndGetQuiz( $dbEntry );
-		$c = new Criteria();
+		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		$c->add(CuePointPeer::ENTRY_ID, $objectIds);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_QUESTION));
 		$this->addToCriteria($c, $reportFilter, 'CuePointPeer');
@@ -548,7 +548,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 	protected function getQuizQuestionPercentageTableReport($objectIds, $orderBy, $reportFilter)
 	{
 		$questionIds = baseObjectUtils::getObjectIdsAsArray($objectIds);
-		$questionsCriteria = new Criteria();
+		$questionsCriteria = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		$questionsCriteria->add(CuePointPeer::ID, $questionIds, Criteria::IN);
 		$questionsCriteria->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_QUESTION));
 		$this->addToCriteria($questionsCriteria, $reportFilter, 'CuePointPeer');
@@ -572,7 +572,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		}
 
 		QuizPlugin::validateAndGetQuiz($dbEntry);
-		$c = new Criteria();
+		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		$c->add(CuePointPeer::ENTRY_ID, $objectIds);
 		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_QUESTION));
 		$anonKuserIds = $this->getAnonymousKuserIds($dbEntry->getPartnerId());
@@ -589,7 +589,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 
 	protected function getUserPercentageCount($objectIds, $reportFilter)
 	{
-		$c = new Criteria();
+		$c = KalturaCriteria::create(UserEntryPeer::OM_CLASS);
 		$c->setDistinct();
 		$c->addSelectColumn(UserEntryPeer::KUSER_ID);
 		$c->add(UserEntryPeer::ENTRY_ID, $objectIds);
@@ -607,7 +607,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 	protected function getQuestionCountByQusetionIds($objectIds, $reportFilter)
 	{
 		$questionIds = baseObjectUtils::getObjectIdsAsArray($objectIds);
-		$c = new Criteria();
+		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		$c->add(CuePointPeer::ID, $questionIds, Criteria::IN);
 		$this->addToCriteria($c, $reportFilter, 'CuePointPeer');
 		$numOfquestions = CuePointPeer::doCount($c);
@@ -633,7 +633,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 	protected function getAnswerCountByUserIdsAndEntryIds($entryIds, $inputFilter)
 	{
 		$userIds = $this->getUserIdsFromFilter($inputFilter);
-		$c = new Criteria();
+		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		if (!QuizPlugin::isWithoutValue($userIds)) {
 			$c = $this->createGetCuePointByUserIdsCriteria($userIds, $c);
 		}
@@ -667,7 +667,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		 * @var kQuiz $kQuiz
 		 */
 		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
-		$c = new Criteria();
+		$c = KalturaCriteria::create(UserEntryPeer::OM_CLASS);
 		$c->add(UserEntryPeer::ENTRY_ID, $objectIds);
 		$this->addToCriteria($c, $inputFilter, 'UserEntryPeer');
 		$userEntries = UserEntryPeer::doSelect($c);
@@ -748,7 +748,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 			return array();
 		}
 
-		$c = new Criteria();
+		$c = KalturaCriteria::create(UserEntryPeer::OM_CLASS);
 		if (!$noUserIds){
 			$c->add(UserEntryPeer::KUSER_ID, $this->getKuserIds($userIds), Criteria::IN);
 		}
@@ -822,7 +822,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 			/**
 			 * @var QuestionCuePoint $question
 			 */
-			$c = new Criteria();
+			$c = KalturaCriteria::create(cuePointPeer::OM_CLASS);
 			$c->add(CuePointPeer::ENTRY_ID, $question->getEntryId());
 			$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_ANSWER));
 			$c->add(CuePointPeer::PARENT_ID, $question->getId());

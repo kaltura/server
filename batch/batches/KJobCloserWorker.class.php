@@ -53,7 +53,6 @@ abstract class KJobCloserWorker extends KJobHandlerWorker
 	
 	/**
 	* @param string $jobType
-	* @param boolean $isCloser
 	* @return KalturaWorkerQueueFilter
 	*/
 	protected function getQueueFilter($jobType)

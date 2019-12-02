@@ -2120,24 +2120,28 @@ class kFlowHelper
 
 	public static function handleConvertProfileFailed(BatchJob $dbBatchJob, kConvertProfileJobData $data)
 	{
-		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
+		$entryId = self::getEntryIdToUpdate($dbBatchJob);
 
-		self::deleteTemporaryFlavors($dbBatchJob->getEntryId());
+		kBatchManager::updateEntry($entryId, entryStatus::ERROR_CONVERTING);
+
+		self::deleteTemporaryFlavors($entryId);
 		
-		self::handleLocalFileSyncDeletion($dbBatchJob->getEntryId(), $dbBatchJob->getPartner());
+		self::handleLocalFileSyncDeletion($entryId, $dbBatchJob->getPartner());
 
 		return $dbBatchJob;
 	}
 
 	public static function handleConvertProfileFinished(BatchJob $dbBatchJob, kConvertProfileJobData $data)
 	{
-		self::deleteTemporaryFlavors($dbBatchJob->getEntryId());
-		
-		self::handleLocalFileSyncDeletion($dbBatchJob->getEntryId(), $dbBatchJob->getPartner());
-
-		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob);
-
 		$entry = $dbBatchJob->getEntry();
+		$entryId = self::getEntryIdToUpdate($dbBatchJob);
+
+		self::deleteTemporaryFlavors($entryId);
+
+		self::handleLocalFileSyncDeletion($entryId, $dbBatchJob->getPartner());
+
+		kFlowHelper::generateThumbnailsFromFlavor($entryId, $dbBatchJob);
+
 		if($entry)
 		{
 			kBusinessConvertDL::checkForPendingLiveClips($entry);
@@ -2159,6 +2163,22 @@ class kFlowHelper
 		}
 		
 		return $dbBatchJob;
+	}
+
+	protected static function getEntryIdToUpdate($dbBatchJob)
+	{
+		$entryId = $dbBatchJob->getEntryId();
+		$entry = $dbBatchJob->getEntry();
+		if($entry)
+		{
+			$replacedEntryId = $entry->getReplacedEntryId();
+			if($replacedEntryId && $entry->getSyncFlavorsOnceReady())
+			{
+				$entryId = $replacedEntryId;
+			}
+		}
+
+		return $entryId;
 	}
 
 	public static function handleBulkDownloadPending(BatchJob $dbBatchJob, kBulkDownloadJobData $data)

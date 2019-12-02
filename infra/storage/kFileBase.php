@@ -142,7 +142,7 @@ class kFileBase
     
     /**
      *
-     * creates a dirctory using the dirname of the specified path
+     * creates a directory using the dirname of the specified path
      * @param string $path
      * @param int $rights
      * @param bool $recursive
@@ -284,4 +284,9 @@ class kFileBase
         self::chmod($destFile,intval($mode,8));
     }
 
+	public static function checkFileExists($path)
+	{
+		KalturaLog::debug("Check file exists for file [$path]");
+		return file_exists($path);
+	}
 }

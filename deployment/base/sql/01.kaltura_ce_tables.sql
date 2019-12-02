@@ -186,7 +186,7 @@ CREATE TABLE IF NOT EXISTS `batch_job_log` (
   `duplication_key` varchar(2047) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
   `log_status` int(11) DEFAULT NULL,
-  `abort` tinyint(4) DEFAULT NULL,
+  `abort` tinyint(4) DEFAULT '0',
   `check_again_timeout` int(11) DEFAULT NULL,
   `progress` tinyint(4) DEFAULT NULL,
   `message` varchar(1024) DEFAULT NULL,
@@ -958,9 +958,10 @@ CREATE TABLE `entry_vendor_task` (
   `custom_data` text,
   PRIMARY KEY (`id`),
   KEY `partner_id_status_index` (`partner_id`,`status`),
-  KEY `vendor_partner_id_status_index` (`vendor_partner_id`,`status`),
-  KEY `partner_entry_index` (`partner_id`,`entry_id`),
-  KEY `updated_at` (`updated_at`)
+	KEY `vendor_partner_id_status_index` (`vendor_partner_id`,`status`),
+	KEY `updated_at` (`updated_at`),
+	KEY `entry_id` (`entry_id`)
+	KEY `reach_profile_queue_time` (`reach_profile_id`,`queue_time`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `event_notification_template` (
@@ -1466,7 +1467,8 @@ CREATE TABLE IF NOT EXISTS `kvote` (
   KEY `entry_user_index` (`entry_id`),
   KEY `kvote_FI_3` (`kuser_id`),
   KEY `entry_user_status_index` (`entry_id`,`kuser_id`,`status`),
-  KEY `partner_created_at` (`partner_id`,`created_at`)
+  KEY `partner_created_at` (`partner_id`,`created_at`),
+  KEY `entry_rank_index` (`entry_id`,`status`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 

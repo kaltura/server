@@ -1,3 +1,133 @@
+# Orion 15.12.0 #
+
+## Restore deleted entry ##
+
+- Issue Type: Task
+- Issue ID : PLAT-10351
+
+### Configuration ##
+
+Only after the deployment script is executed, one can add this permission to user-roles via admin console
+
+#### Deployment Scripts ####
+
+Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_12_01_update_adminconsole_entryadmin_permissions.php'
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+
+## Clip concat job closer ##
+
+- Issue Type: Story
+- Issue ID: PLAT-10317
+
+### Configuration ###
+
+batch.ini requires the addition of 'KClipConcatCloser' worker definition and enabling. a template can be found at batch.ini.template
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## create KMC_ANALYTICS_ROLE for partner 0 ##
+
+- Issue Type: Story
+- Issue ID: PLAT-10346
+
+### Configuration ###
+
+#### Deployment Scripts ####
+
+- Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_27_add_kmc_analytics_role_and_permissions.php'
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Optimize entry_vendor_task queries ##
+- Issue Type: Task
+- Issue ID: PLAT-10292
+
+### Deployment scripts ###
+Alter batch_job_log table to change abort colmun default value    
+    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_26_add_entry_vendor_task_index.sql
+
+## Configurations Maps Modifications ##
+- Issue Type: Task
+- Issue ID: PLAT-10245 and PLAT-10246
+
+### Deployment scripts ###
+Run php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_05_update_confmaps_permissions.php 
+
+### configuration ###
+modify /opt/kaltura/app/configuration/db_sync.template.ini to /opt/kaltura/app/configuration/db_sync.ini and configure relevant db connection
+This is required to be able to run syncDbConfigMapsToCache.php and insertConfigMapToDb.php scripts syncs conf maps from db to remote cache.
+
+modify /opt/kaltura/app/configuration/batchBase.template.ini to /opt/kaltura/app/configuration/batchBase.ini and modify as needed
+
+## Login to admin console using SSO ##
+- Issue Type: Task
+- Issue ID: PLAT-10188
+
+### Deployment scripts ###
+
+To add SSO profile for admin console run:
+
+    php /opt/kaltura/app/alpha/scripts/utils/enableAdminConsoleSso.php <redirect_url> <domain>
+
+### configuration ###
+
+Add the following to Admin.ini:
+
+    settings.ssoLogin = 1
+
+# Orion 15.11.0 #
+
+## Optimize batch_job_log queries ##
+- Issue Type: Task
+- Issue ID: PLAT-10294
+
+### Deployment scripts ###
+Alter batch_job_log table to change abort colmun default value    
+    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_21_alter_batch_job_log_abort_default_value.sql
+
+## Adding new KalturaUserEntryType called registration ##
+- Issue Type: Task
+- Issue ID: PLAT-10283
+
+### configuration ###
+Add Registration to your plugins.ini
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+## Kava - move rounding client tags to config ##
+- Issue Type: Task
+- Issue ID: AN-1102
+
+### configuration ###
+add kava_skip_date_rounding_client_tags section to local.ini with:
+0 = kmc-analytics
+
+## 5-star rating ##
+- Issue Type: Task
+- Issue ID: PSVAMB-8935
+
+### Deployment scripts ###
+Add new kvote table index    
+    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_06_add_kvote_index.sql
+Add new permissions
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_06_add_rating_permissions.php
+Run installPlugins script  
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
 # Orion 15.10.0 #
 
 ## AP Feed Drop Folder ##

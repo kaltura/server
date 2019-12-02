@@ -306,5 +306,12 @@ class CuePointIndex extends BaseIndexObject
 			return array("cue_point:id=".strtolower($object->getId()), "cue_point:entryId=".strtolower($object->getEntryId()), "cue_point:partnerId=".strtolower($object->getPartnerId()));
 	}
 
+	//This function is generated based on index elements in the relevant IndexSchema.xml
+	public static function getIgnoreOptimizationKeys()
+	{
+		return array(
+		);
+	}
+
 }
 

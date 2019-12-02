@@ -75,7 +75,7 @@ class KAsyncConcat extends KJobHandlerWorker
 		$fileName = "{$job->entryId}_{$jobData->flavorAssetId}.mp4";
 		$files[] = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
 		$files[] = $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
-		foreach($files->srcFiles as $srcFile)
+		foreach($jobData->srcFiles as $srcFile)
 		{
 			$files[] = $srcFile->value;
 		}

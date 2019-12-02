@@ -41,7 +41,12 @@
 	            <value field="id" />
 	            <value field="partner_id" />
 	        </cacheInvalidationKey>
-
+			<ignoreOptimizationKeys>
+				<disableFields name="partner_id">
+					<value field="parent_id" />
+					<value field="reference_id" />
+				</disableFields>
+			</ignoreOptimizationKeys>
 	        <!--
 	        float is support in sphinx 2.2.10, we don't use that version yet. 
 	        <field name="geo_lat" indexName="geo_lat" type="float" />

@@ -68,6 +68,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		ESearchEntryFilterFields::SEARCH_TEXT,
 		ESearchEntryFilterFields::FREE_TEXT,
 		ESearchEntryFilterFields::TOTAL_RANK,
+		ESearchEntryFilterFields::RANK,
 		ESearchEntryFilterFields::LAST_PLAYED_AT,
 		ESearchEntryFilterFields::PLAYS,
 	);
@@ -141,6 +142,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			ESearchEntryFilterFields::SEARCH_TEXT => ESearchUnifiedItem::UNIFIED,
 			ESearchEntryFilterFields::FREE_TEXT => ESearchUnifiedItem::UNIFIED,
 			ESearchEntryFilterFields::TOTAL_RANK => ESearchEntryOrderByFieldName::VOTES,
+			ESearchEntryFilterFields::RANK => ESearchEntryOrderByFieldName::RANK,
 			ESearchEntryFilterFields::LAST_PLAYED_AT => ESearchEntryOrderByFieldName::LAST_PLAYED_AT,
 			ESearchEntryFilterFields::PLAYS => ESearchEntryFieldName::PLAYS,
 		);
@@ -172,8 +174,8 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			KalturaMediaEntryOrderBy::CREATED_AT_DESC => self::DESC.ESearchEntryOrderByFieldName::CREATED_AT,
 			KalturaMediaEntryOrderBy::UPDATED_AT_ASC => self::ASC.ESearchEntryOrderByFieldName::UPDATED_AT,
 			KalturaMediaEntryOrderBy::UPDATED_AT_DESC => self::DESC.ESearchEntryOrderByFieldName::UPDATED_AT,
-			KalturaMediaEntryOrderBy::RANK_ASC => self::ASC.ESearchEntryOrderByFieldName::VOTES,
-			KalturaMediaEntryOrderBy::RANK_DESC => self::DESC.ESearchEntryOrderByFieldName::VOTES,
+			KalturaMediaEntryOrderBy::RANK_ASC => self::ASC.ESearchEntryOrderByFieldName::RANK,
+			KalturaMediaEntryOrderBy::RANK_DESC => self::DESC.ESearchEntryOrderByFieldName::RANK,
 			self::ASC.ESearchEntryFilterFields::TOTAL_RANK => self::ASC.ESearchEntryOrderByFieldName::VOTES,
 			self::DESC.ESearchEntryFilterFields::TOTAL_RANK => self::DESC.ESearchEntryOrderByFieldName::VOTES,
 			KalturaMediaEntryOrderBy::START_DATE_ASC => self::ASC.ESearchEntryOrderByFieldName::START_DATE,

@@ -6,6 +6,8 @@ class IndexGeneratorBase
 	protected $searchableFields = array();
 	protected $searchableIndices = array();
 	protected $searchableCacheInvalidationKeys = array();
+	protected $ignoreOptimizationKeys = array();
+
 	protected $indexFiles = array();
 	
 	public function load($inputFile)
@@ -36,6 +38,9 @@ class IndexGeneratorBase
 						break;
 					case "cacheInvalidationKey":
 						$this->parseCacheInvalidationKey("$objName", $searchableField);
+						break;
+					case "ignoreOptimizationKeys":
+						$this->parseIgnoreOptimizationKeys("$objName", $searchableField);
 						break;
 				}
 			}
@@ -169,6 +174,27 @@ class IndexGeneratorBase
 		}
 
 		$this->searchableCacheInvalidationKeys[$objName] = $index;
+	}
+
+	protected function parseIgnoreOptimizationKeys($objName, $indexComplex)
+	{
+		$index = array();
+		foreach($indexComplex->children() as $indexDisableField)
+		{
+			$disableFieldIndex = array();
+			$disableFieldsValueAttr = $indexDisableField->attributes();
+			$name = $disableFieldsValueAttr["name"];
+			foreach ($indexDisableField->children() as $indexValue)
+			{
+				$idxValueAttr = $indexValue->attributes();
+				$fieldName = $idxValueAttr["field"];
+				$modifiedFieldName = ucwords(preg_replace_callback("/_(.?)/", array($this, 'lTrimUnderscoreAndStrToUpper'), $fieldName));
+				$getter = "get" . $modifiedFieldName;
+				$disableFieldIndex[] = new IndexableIgnoreOptimizationKey('"' . $fieldName . '"', '"' . $getter . '"');
+			}
+			$index["$name"] = $disableFieldIndex;
+		}
+		$this->ignoreOptimizationKeys[$objName] = $index;
 	}
 
 	protected function tryXpath(SimpleXMLElement $element, $maybeXpath)

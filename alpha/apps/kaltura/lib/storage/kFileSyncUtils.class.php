@@ -609,8 +609,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * Get the local FileSync object by its key
 	 *
 	 * @param FileSyncKey $key
-	 * @param boolean $strict  - will throw exception if not found
+	 * @param boolean $strict - will throw exception if not found
 	 * @return FileSync
+	 * @throws Exception
 	 */
 	public static function getLocalFileSyncForKey ( FileSyncKey $key , $strict = true )
 	{
@@ -640,6 +641,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 *
 	 * @param FileSyncKey $key
 	 * @return array<FileSync>
+	 * @throws PropelException
+	 * @throws kFileSyncException
 	 */
 	public static function getAllReadyExternalFileSyncsForKey(FileSyncKey $key)
 	{
@@ -757,6 +760,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * Prepare storage profiles array for sorting
 	 *
 	 * @param int $partnerId
+	 * @throws PropelException
 	 */
 	protected static function prepareStorageProfilesForSort($partnerId)
 	{
@@ -869,9 +873,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 *
 	 * @param FileSyncKey $key
 	 * @param boolean $fetch_from_remote_if_no_local
-	 * @param boolean $strict  - will throw exception if not found
-	 * @param boolean $resolve  - will resolve the file sync
+	 * @param boolean $strict - will throw exception if not found
+	 * @param boolean $resolve - will resolve the file sync
 	 * @return array
+	 * @throws PropelException
 	 */
 	public static function getReadyFileSyncForKey ( FileSyncKey $key , $fetch_from_remote_if_no_local = false , $strict = true , $resolve = true )
 	{
@@ -988,6 +993,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 *
 	 * @param FileSyncKey $key
 	 * @return string
+	 * @throws Exception
 	 */
 	public static function getRelativeFilePathForKey ( FileSyncKey $key , $strict = false )
 	{

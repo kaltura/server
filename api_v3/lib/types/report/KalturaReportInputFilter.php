@@ -161,6 +161,18 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $entryIdIn;
 
+	/**
+	 * @var string
+	 */
+	public $playbackTypeIn;
+
+	/**
+	 * filter by playback context ids
+	 * 
+	 * @var string
+	 */
+	public $playbackContextIdsIn;
+
 	private static $map_between_objects = array
 	(
 		'keywords',
@@ -185,6 +197,8 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'entryCreatedAtGreaterThanOrEqual' => 'gte_entry_created_at',
 		'entryCreatedAtLessThanOrEqual' => 'lte_entry_created_at',
 		'entryIdIn' => 'entries_ids',
+		'playbackTypeIn' => 'playback_types',
+		'playbackContextIdsIn' => 'playback_context_ids',
 	);
 
 	protected function getMapBetweenObjects()

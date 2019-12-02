@@ -51,6 +51,8 @@ abstract class KBatchBase implements IKalturaLogger
 	 */
 	protected $monitorHandle = null;
 
+	protected static $iv;
+
 	/**
 	 * @param array $jobs
 	 * @return array $jobs
@@ -486,7 +488,7 @@ abstract class KBatchBase implements IKalturaLogger
 			$files = $this->getBatchJobFiles($job);
 			foreach ($files as $file)
 			{
-				if(!file_exists($file))
+				if(!kFileBase::checkFileExists($file))
 				{
 					$file = dirname($file);
 				}
@@ -535,13 +537,13 @@ abstract class KBatchBase implements IKalturaLogger
 		}
 		catch(Exception $ex)
 		{
-			KalturaLog::err("No write access to directory {$dir}");
+			KalturaLog::crit("No write access to directory {$dir}");
 			$result = false;
 		}
 
 		if($result && $time_elapsed_secs > self::MAX_FILE_ACCESS_TIME)
 		{
-			KalturaLog::err("No write access in reasonable time to directory {$dir} took {$time_elapsed_secs} seconds");
+			KalturaLog::crit("No write access in reasonable time to directory {$dir} took {$time_elapsed_secs} seconds");
 			$result = false;
 		}
 		return $result;
@@ -560,13 +562,13 @@ abstract class KBatchBase implements IKalturaLogger
 		}
 		catch(Exception $ex)
 		{
-			KalturaLog::err("No write access to file {$file}");
+			KalturaLog::crit("No read access to file {$file}");
 			return false;
 		}
 
 		if($time_elapsed_secs > self::MAX_FILE_ACCESS_TIME)
 		{
-			KalturaLog::err("No write access in reasonable time to file {$file}, took {$time_elapsed_secs} seconds");
+			KalturaLog::crit("No read access in reasonable time to file {$file}, took {$time_elapsed_secs} seconds");
 			return false;
 		}
 
@@ -794,7 +796,7 @@ abstract class KBatchBase implements IKalturaLogger
 	
 	public static function getIV()
 	{
-		return kConf::get("encryption_iv");
+		return self::getConfigParam('encryption_iv');
 	}
 
 	public static function tryExecuteApiCall($callback, $params, $numOfRetries = self::DEFUALT_API_RETRIES_ATTEMPS, $apiIntervalInSec = self::DEFAULT_SLEEP_INTERVAL)
@@ -815,5 +817,28 @@ abstract class KBatchBase implements IKalturaLogger
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * @param $key
+	 * @param string $mapName
+	 * @param null $defaultValue
+	 */
+	public static function getConfigParam($key, $mapName = 'local' , $defaultValue = null)
+	{
+		$configurationPluginClient = KalturaConfMapsClientPlugin::get(self::$kClient);
+		$configurationMapFilter = new KalturaConfMapsFilter();
+		$configurationMapFilter->nameEqual = $mapName;
+		$configurationMapFilter->relatedHostEqual = self::getConfigHostName();
+		$configurationMap = $configurationPluginClient->confMaps->get($configurationMapFilter);
+		if ($configurationMap)
+		{
+			$configArray = json_decode($configurationMap->content, true);
+			if ($configArray && isset($configArray[$key]))
+			{
+				return $configArray[$key];
+			}
+		}
+		return $defaultValue;
 	}
 }
