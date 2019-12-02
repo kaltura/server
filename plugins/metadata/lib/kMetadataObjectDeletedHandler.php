@@ -28,7 +28,7 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandlerBase implements 
 		if($object instanceof MetadataProfile)
 			return true;
 
-		if($object instanceof RegistrationUserEntry)
+		if($object instanceof UserEntry)
 		{
 			return true;
 		}
@@ -76,7 +76,7 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandlerBase implements 
 		if($object instanceof MetadataProfile)
 			$this->metadataProfileDeleted($object);
 
-		if($object instanceof RegistrationUserEntry)
+		if($object instanceof UserEntry)
 		{
 			$this->deleteMetadataObjects(MetadataObjectType::USER_ENTRY, $object->getId());
 		}
@@ -117,6 +117,10 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandlerBase implements 
 		$peer = null;
 		MetadataPeer::setUseCriteriaFilter(false);
 		$metadatas = MetadataPeer::doSelect($c);
+		if (!count($metadatas))
+		{
+			return;
+		}
 		foreach($metadatas as $metadata)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($metadata));
 		
