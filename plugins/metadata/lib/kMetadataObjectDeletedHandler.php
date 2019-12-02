@@ -3,7 +3,7 @@
  * @package plugins.metadata
  * @subpackage lib
  */
-class kMetadataObjectDeletedHandler extends kObjectDeleteHandlerBase implements kObjectChangedEventConsumer
+class kMetadataObjectDeletedHandler extends kObjectDeleteHandlerBase implements kObjectChangedEventConsumer, kObjectDeletedEventConsumer
 {
 	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
@@ -27,7 +27,11 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandlerBase implements 
 			
 		if($object instanceof MetadataProfile)
 			return true;
-			
+
+		if($object instanceof RegistrationUserEntry)
+		{
+			return true;
+		}
 	}
 	
 	/* (non-PHPdoc)
@@ -71,6 +75,11 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandlerBase implements 
 			
 		if($object instanceof MetadataProfile)
 			$this->metadataProfileDeleted($object);
+
+		if($object instanceof RegistrationUserEntry)
+		{
+			$this->deleteMetadataObjects(MetadataObjectType::USER_ENTRY, $object->getId());
+		}
 	}
 	
 	/**
