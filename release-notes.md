@@ -1,4 +1,14 @@
 # Orion 15.12.0 #
+## giving partner -8 permission to partner get ##
+- Issue Type: Task
+- Issue ID : PLAT-10357
+
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_12_04_add_permission_partner_get.php'
+
 
 ## BaseEntry list with ESearch ##
 
