@@ -26,7 +26,7 @@ None.
 
 ### Configuration ###
 
-workers.ini Requires the addition of 'KClipConcatCloser' worker definition and enabling. a template can be found at batch.ini.template
+batch.ini requires the addition of 'KClipConcatCloser' worker definition and enabling. a template can be found at batch.ini.template
 
 #### Deployment Scripts ####
 
