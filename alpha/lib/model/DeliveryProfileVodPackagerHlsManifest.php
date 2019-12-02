@@ -13,8 +13,7 @@ class DeliveryProfileVodPackagerHlsManifest extends DeliveryProfileVodPackagerHl
 		$flavors = $this->buildHttpFlavorsArray();
 		$this->checkIsMultiAudioFlavorSet($flavors);
 		$flavors = $this->sortFlavors($flavors);
-
-		$urlSuffix = '/master' . $this->addMuxedAudioLanguageToManifestUrl() . '.m3u8';
+		$urlSuffix = $this->getManifestUrlSuffix();
 		
 		$flavor = VodPackagerDeliveryUtils::getVodPackagerUrl(
 			$flavors,
@@ -45,15 +44,29 @@ class DeliveryProfileVodPackagerHlsManifest extends DeliveryProfileVodPackagerHl
 		}
 	}
 
+	protected function getManifestUrlSuffix()
+	{
+		if($this->params->getMuxedAudioLanguage())
+		{
+			$urlSuffix = '/master' . $this->addMuxedAudioLanguageToManifestUrl() . '.m3u8';
+		}
+		else
+		{
+			$urlSuffix = '/master.m3u8';
+		}
+
+		return $urlSuffix;
+	}
+
 	protected function addMuxedAudioLanguageToManifestUrl()
 	{
 		$muxedAudioLanguagePart = '';
 		if(languageCodeManager::getObjectFromThreeCode(strtolower($this->params->getMuxedAudioLanguage())))
 		{
 			$muxedAudioLanguagePart = '-l' . $this->params->getMuxedAudioLanguage();
-			$this->params->setMuxedAudioLanguage(null);
 		}
 
+		$this->params->setMuxedAudioLanguage(null);
 		return $muxedAudioLanguagePart;
 	}
 }
