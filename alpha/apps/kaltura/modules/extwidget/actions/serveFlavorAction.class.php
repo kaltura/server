@@ -25,23 +25,18 @@ class serveFlavorAction extends kalturaAction
 	public function getFileSyncFullPath(FileSync $fileSync)
 	{
 		$fullPath = $fileSync->getFullPath();
+		$serveFlavorPathSearchReplace = kConf::get('serve_flavor_path_search_replace', 'local');
 		
-		$pathPrefix = kConf::get('serve_flavor_path_search_prefix', 'local', array());
-		if($pathPrefix && !is_array($pathPrefix))
+		if(count($serveFlavorPathSearchReplace) && $this->pathOnly)
 		{
-			$pathPrefix = array($pathPrefix);
-		}
-		
-		if(count($pathPrefix) && $this->pathOnly)
-		{
-			foreach ($pathPrefix as $key => $prefix)
+			foreach ($serveFlavorPathSearchReplace as $pathSearchReplace)
 			{
-				if(kString::beginsWith($fullPath, $prefix))
+				$pathSearch = $pathSearchReplace['search'];
+				if(kString::beginsWith($fullPath, $pathSearch))
 				{
-					$paramName = $key ? "serve_flavor_path_replace_$key" : "serve_flavor_path_replace";
-					$pathReplace = kConf::get($paramName);
+					$pathReplace = $pathSearchReplace['replace'];
 					$newPrefix = $pathReplace[mt_rand(0, count($pathReplace) - 1)];
-					$fullPath = $newPrefix . substr($fullPath, strlen($prefix));
+					$fullPath = $newPrefix . substr($fullPath, strlen($pathSearch));
 					break;
 				}
 			}
