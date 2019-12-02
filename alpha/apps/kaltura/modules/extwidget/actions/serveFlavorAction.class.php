@@ -25,7 +25,7 @@ class serveFlavorAction extends kalturaAction
 	public function getFileSyncFullPath(FileSync $fileSync)
 	{
 		$fullPath = $fileSync->getFullPath();
-		$serveFlavorPathSearchReplace = kConf::get('serve_flavor_path_search_replace', 'local');
+		$serveFlavorPathSearchReplace = kConf::get('serve_flavor_path_search_replace', 'local', array());
 		
 		if(count($serveFlavorPathSearchReplace) && $this->pathOnly)
 		{
