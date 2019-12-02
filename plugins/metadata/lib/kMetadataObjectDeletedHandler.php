@@ -32,6 +32,8 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandlerBase implements 
 		{
 			return true;
 		}
+
+		return false;
 	}
 	
 	/* (non-PHPdoc)
@@ -80,6 +82,8 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandlerBase implements 
 		{
 			$this->deleteMetadataObjects(MetadataObjectType::USER_ENTRY, $object->getId());
 		}
+
+		return true;
 	}
 	
 	/**
@@ -117,7 +121,7 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandlerBase implements 
 		$peer = null;
 		MetadataPeer::setUseCriteriaFilter(false);
 		$metadatas = MetadataPeer::doSelect($c);
-		if (!count($metadatas))
+		if (!$metadatas)
 		{
 			return;
 		}
