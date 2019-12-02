@@ -39,7 +39,7 @@ class kVidSliceAction extends kVidStripAction
 		$interval = $this->calculateInterval();
 		$destPath = $this->getTempThumbnailPath();
 		$second = $this->startSec + ($interval * $this->sliceNumber);
-		$success = myEntryUtils::captureThumbUsingPackager($this->source->getEntry(), $destPath, $second, $flavorAssetId, $this->newWidth, $this->newHeight);
+		$success = myPackagerUtils::captureThumbUsingPackager($this->source->getEntry(), $destPath, $second, $flavorAssetId, $this->newWidth, $this->newHeight);
 		if(!$success)
 		{
 			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::VID_SLICE_FAILED);
