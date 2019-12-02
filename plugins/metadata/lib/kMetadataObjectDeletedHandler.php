@@ -3,7 +3,7 @@
  * @package plugins.metadata
  * @subpackage lib
  */
-class kMetadataObjectDeletedHandler extends kObjectDeleteHandlerBase implements kObjectChangedEventConsumer
+class kMetadataObjectDeletedHandler extends kObjectDeleteHandlerBase implements kObjectChangedEventConsumer, kObjectDeletedEventConsumer
 {
 	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
@@ -27,7 +27,13 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandlerBase implements 
 			
 		if($object instanceof MetadataProfile)
 			return true;
-			
+
+		if($object instanceof UserEntry)
+		{
+			return true;
+		}
+
+		return false;
 	}
 	
 	/* (non-PHPdoc)
@@ -65,15 +71,19 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandlerBase implements 
 	
 		if($object instanceof Partner)
 			$this->deleteMetadataObjects(MetadataObjectType::PARTNER, $object->getId());
-
-		if($object instanceof UserEntry)
-			$this->deleteMetadataObjects(MetadataObjectType::USER_ENTRY, $object->getId());
 			
 		if($object instanceof Metadata)
 			$this->metadataDeleted($object);
 			
 		if($object instanceof MetadataProfile)
 			$this->metadataProfileDeleted($object);
+
+		if($object instanceof UserEntry)
+		{
+			$this->deleteMetadataObjects(MetadataObjectType::USER_ENTRY, $object->getId());
+		}
+
+		return true;
 	}
 	
 	/**
@@ -111,6 +121,10 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandlerBase implements 
 		$peer = null;
 		MetadataPeer::setUseCriteriaFilter(false);
 		$metadatas = MetadataPeer::doSelect($c);
+		if (!$metadatas)
+		{
+			return;
+		}
 		foreach($metadatas as $metadata)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($metadata));
 		
