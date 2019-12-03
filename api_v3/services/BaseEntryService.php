@@ -493,31 +493,17 @@ class BaseEntryService extends KalturaEntryService
 		return false;
 	}
 
-	/**
-	 * List base entries by filter with paging support.
-	 *
-	 * @action list
-     * @param KalturaBaseEntryFilter $filter Entry filter
-	 * @param KalturaFilterPager $pager Pager
-	 * @return KalturaBaseEntryListResponse Wrapper for array of base entries and total count
-	 */
-	function listAction(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null)
+	protected function tryListWithFilterExecutor(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if (!$filter) {
-			$filter = new KalturaBaseEntryFilter();
-		}
-
-		if (!$pager) {
-			$pager = new KalturaFilterPager();
-		}
-
 		$result = null;
 		try
 		{
 			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaFilterExecutor');
-			foreach ($pluginInstances as $KalturaFilterExecutor) {
+			foreach ($pluginInstances as $KalturaFilterExecutor)
+			{
 				/* @var $KalturaFilterExecutor IKalturaFilterExecutor */
-				if ($KalturaFilterExecutor->canExecuteFilter($filter, $this->getResponseProfile())) {
+				if ($KalturaFilterExecutor->canExecuteFilter($filter, $this->getResponseProfile()))
+				{
 					KalturaLog::info('Executing filter on ' . get_class($KalturaFilterExecutor));
 					$result = $KalturaFilterExecutor->executeFilter($filter, $pager);
 					break;
@@ -529,6 +515,30 @@ class BaseEntryService extends KalturaEntryService
 			kalturaLog::warning('Could not execute filter');
 		}
 
+		return $result;
+	}
+
+	/**
+	 * List base entries by filter with paging support.
+	 *
+	 * @action list
+     * @param KalturaBaseEntryFilter $filter Entry filter
+	 * @param KalturaFilterPager $pager Pager
+	 * @return KalturaBaseEntryListResponse Wrapper for array of base entries and total count
+	 */
+	function listAction(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		if (!$filter)
+		{
+			$filter = new KalturaBaseEntryFilter();
+		}
+
+		if (!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
+
+		$result = $this->tryListWithFilterExecutor($filter, $pager);
 		if (!$result)
 		{
 			$result = $filter->getListResponse($pager, $this->getResponseProfile());
