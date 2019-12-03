@@ -2151,6 +2151,16 @@ class Partner extends BasePartner
 		$this->putInCustomData('avoidIndexingSearchHistory', $v);
 	}
 
+	public function getKeepSourceLocally()
+	{
+		return $this->getFromCustomData("keepSourceLocally", null, false);
+	}
+
+	public function setKeepSourceLocally($v)
+	{
+		$this->putInCustomData("keepSourceLocally", $v);
+	}
+
 
 
 }
