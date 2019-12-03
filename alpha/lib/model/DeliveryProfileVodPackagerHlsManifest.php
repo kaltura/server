@@ -1,6 +1,9 @@
 <?php
 
 class DeliveryProfileVodPackagerHlsManifest extends DeliveryProfileVodPackagerHls {
+
+	const MASTER_MANIFEST_STR = '/master';
+	const M3U8_SUFFIX = '.m3u8';
 	
 	function __construct() 
 	{
@@ -48,11 +51,11 @@ class DeliveryProfileVodPackagerHlsManifest extends DeliveryProfileVodPackagerHl
 	{
 		if($this->params->getMuxedAudioLanguage())
 		{
-			$urlSuffix = '/master' . $this->addMuxedAudioLanguageToManifestUrl() . '.m3u8';
+			$urlSuffix = self::MASTER_MANIFEST_STR . $this->addMuxedAudioLanguageToManifestUrl() . self::M3U8_SUFFIX;
 		}
 		else
 		{
-			$urlSuffix = '/master.m3u8';
+			$urlSuffix = self::MASTER_MANIFEST_STR . self::M3U8_SUFFIX;
 		}
 
 		return $urlSuffix;
