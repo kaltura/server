@@ -482,7 +482,17 @@ class BaseEntryService extends KalturaEntryService
 	{
 		$this->deleteEntry($entryId);
 	}
-	
+
+	protected function shouldRunByElastic(KalturaBaseEntryFilter $filter)
+	{
+		if(ESearchQueryFromFilter::canTransformFilter($filter))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
 	 * List base entries by filter with paging support.
 	 *
@@ -493,17 +503,37 @@ class BaseEntryService extends KalturaEntryService
 	 */
 	function listAction(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if(!$filter)
-		{
+		if (!$filter) {
 			$filter = new KalturaBaseEntryFilter();
 		}
-			
-		if(!$pager)
-		{
+
+		if (!$pager) {
 			$pager = new KalturaFilterPager();
 		}
 
-		$result = $filter->getListResponse($pager, $this->getResponseProfile());
+		$result = null;
+		try
+		{
+			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaFilterExecutor');
+			foreach ($pluginInstances as $KalturaFilterExecutor) {
+				/* @var $KalturaFilterExecutor IKalturaFilterExecutor */
+				if ($KalturaFilterExecutor->canExecuteFilter($filter, $this->getResponseProfile())) {
+					KalturaLog::info('Executing filter on ' . get_class($KalturaFilterExecutor));
+					$result = $KalturaFilterExecutor->executeFilter($filter, $pager);
+					break;
+				}
+			}
+		}
+		catch (Exception $e)
+		{
+			kalturaLog::warning('Could not execute filter');
+		}
+
+		if (!$result)
+		{
+			$result = $filter->getListResponse($pager, $this->getResponseProfile());
+		}
+
 		
 		if ($result->totalCount == 1 && 
 			count($result->objects) == 1 && 

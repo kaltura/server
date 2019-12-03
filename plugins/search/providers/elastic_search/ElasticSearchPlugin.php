@@ -2,7 +2,7 @@
 /**
  * @package plugins.elasticSearch
  */
-class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaPending, IKalturaServices, IKalturaObjectLoader, IKalturaExceptionHandler, IKalturaEnumerator
+class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaPending, IKalturaServices, IKalturaObjectLoader, IKalturaExceptionHandler, IKalturaEnumerator, IKalturaFilterExecutor
 {
     const PLUGIN_NAME = 'elasticSearch';
     const ELASTIC_SEARCH_MANAGER = 'kElasticSearchManager';
@@ -15,6 +15,7 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
     const REDUCE_RESULTS_PARTNER_LIST = 'reduced_results_partner_list';
     const DEDICATED_ENTRY_INDEX_PARTNER_LIST = 'dedicated_entry_index_partner_list';
     const DEDICATED_ENTRY_INDEX_NAME = 'dedicated_entry_index_name';
+	protected static $tagsForExecutor = array('KScheduledTaskDryRunner', 'KScheduledTaskRunner');
 
     public static function getPluginName()
     {
@@ -184,5 +185,41 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
 			return array('EsearchMediaEntryExportObjectType');
 		
 		return array();
+	}
+
+	public static function canExecuteFilter(KalturaRelatedFilter $filter, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		return !$responseProfile && self::isValidClientsTagsForFilterExecutor() && ESearchEntryQueryFromFilter::canTransformFilter($filter->toObject());
+	}
+
+	public static function executeFilter(KalturaRelatedFilter $filter, KalturaFilterPager $pager)
+	{
+		$coreFilter = $filter->toObject();
+		$corePager = $pager->toObject();
+		$esearchAdapter = new ESearchEntryQueryFromFilter();
+		list($list, $totalCount) = $esearchAdapter->retrieveElasticQueryCoreEntries($coreFilter, $corePager);
+		$newList = KalturaBaseEntryArray::fromDbArray($list, null);
+		$response = new KalturaListResponse();
+		$response->objects = $newList;
+		$response->totalCount = $totalCount;
+
+		return $response;
+	}
+
+	protected static function isValidClientsTagsForFilterExecutor()
+	{
+		$result = false;
+		$params = infraRequestUtils::getRequestParams();
+		$clientsTags = isset($params[infraRequestUtils::CLIENT_TAG]) ? $params[infraRequestUtils::CLIENT_TAG] : null;
+		foreach(self::$tagsForExecutor as $tag)
+		{
+			$result = (strpos($clientsTags, $tag) !== false);
+			if($result)
+			{
+				break;
+			}
+		}
+
+		return $result;
 	}
 }
