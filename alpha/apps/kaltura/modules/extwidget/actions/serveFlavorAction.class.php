@@ -467,7 +467,16 @@ class serveFlavorAction extends kalturaAction
 		if ($this->pathOnly && kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
 		{
 			$path = '';
-			list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $syncKey , false, false );
+			$storageId = $this->getRequestParameter('storageId');
+			if($storageId)
+			{
+				$file_sync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey, $storageId);
+			}
+			else
+			{
+				list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $syncKey , false, false );
+			}
+
 			if ( $file_sync )
 			{
 				$parent_file_sync = kFileSyncUtils::resolve($file_sync);

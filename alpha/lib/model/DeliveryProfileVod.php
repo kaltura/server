@@ -51,6 +51,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
 		$url .= $this->getDynamicAttributes()->getUsePlayServer() ? $this->getPlayServerUrl() : '';
 		$url .= $this->getDynamicAttributes()->getHasValidSequence() ? '/sequence/'.$this->getDynamicAttributes()->getSequence() : '';
+		$url .= $this->params->getStorageId() ? '/storageId/' . $this->params->getStorageId() : '';
 
 		if ($entry->getType() == entryType::PLAYLIST || ($this->getDynamicAttributes()->getHasValidSequence() && $flavorAsset->getType() == assetType::FLAVOR))
 		{
@@ -282,8 +283,14 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 */
 	protected function getFlavorHttpUrl(asset $flavorAsset)
 	{
-		if ($this->params->getStorageId()) {
-			return $this->getExternalStorageUrl($flavorAsset);
+		if ($this->params->getStorageId())
+		{
+			$storage = StorageProfilePeer::retrieveByPK($this->params->getStorageId());
+			if(!$storage->getUseStorageAsLocal())
+			{
+				KalturaLog::debug("Storage url is generated as external url");
+				return $this->getExternalStorageUrl($flavorAsset);
+			}
 		}
 			
 		$this->initDeliveryDynamicAttributes(null, $flavorAsset);

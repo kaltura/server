@@ -136,8 +136,13 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		));
 		
 		$this->getElement('editDeliveryProfiles')->setAttrib('onClick', 'addDeliveryProfile()');
-		
-		$this->addDisplayGroup ( array ('delivery_profile_ids', 'deliveryFormat', 'editDeliveryProfiles' ), 'playback_info', array ('legend' => 'Delivery Details' ) );
+
+		$this->addElement('checkbox', 'useStorageAsLocal', array(
+			'label'			=> 'Generate storage urls as local:',
+			'filters'		=> array('StringTrim'),
+		));
+
+		$this->addDisplayGroup ( array ('useStorageAsLocal', 'delivery_profile_ids', 'deliveryFormat', 'editDeliveryProfiles' ), 'playback_info', array ('legend' => 'Delivery Details' ) );
 		
 		$this->addElement('hidden', 'crossLine4', array(
 				'lable'			=> 'line',

@@ -35,6 +35,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	const CUSTOM_DATA_RULES = 'rules';
 	const CUSTOM_DATA_CREATE_FILE_LINK ='create_file_link';
 	const CUSTOM_DATA_SHOULD_EXPORT_THUMBS ='should_export_thumbs';
+	const CUSTOM_DATA_USE_STORAGE_AS_LOCAL = 'use_storage_as_local';
 
 	/**
 	 * @var kStorageProfileScope
@@ -443,6 +444,15 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	public function setShouldExportThumbs ($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_SHOULD_EXPORT_THUMBS, $v);
+	}
+
+	public function getUseStorageAsLocal()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_USE_STORAGE_AS_LOCAL,null, false);
+	}
+	public function setUseStorageAsLocal($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_USE_STORAGE_AS_LOCAL, $v);
 	}
 
 }
