@@ -4214,6 +4214,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		// order by
+		$orig_order_by = $order_by;
 		if (in_array(self::EVENT_TYPE_PLAY, $metrics))
 		{
 			$default_order = self::EVENT_TYPE_PLAY;
@@ -4273,6 +4274,20 @@ class kKavaReportsMgr extends kKavaBase
 			// topN works badly for non-linear metrics like avg drop off, since taking the topN per segment
 			// does not necessarily yield the combined topN
 			$threshold = $page_size * $page_index;
+
+			// for group by query check if order by is a dimension
+			if (!$order_found)
+			{
+				if ($orig_order_by[0] === '-' || $orig_order_by[0] === '+')
+				{
+					$orig_order_by = substr($orig_order_by, 1);
+				}
+				if (in_array($orig_order_by, $report_def[self::REPORT_DIMENSION_HEADERS]))
+				{
+					$order_by = $orig_order_by;
+					$order_found = true;
+				}
+			}
 
 			$query = self::getGroupByReport(
 				$data_source,
@@ -4479,6 +4494,11 @@ class kKavaReportsMgr extends kKavaBase
 			$row_data = array();
 			foreach ($row_mapping as $column)
 			{
+				if (is_array($column))
+				{
+					$column = $column[self::DRUID_OUTPUT_NAME];
+				}
+
 				if ($column)
 				{
 					if (isset($row[$column]))

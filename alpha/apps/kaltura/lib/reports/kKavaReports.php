@@ -1483,6 +1483,26 @@ class kKavaReports extends kKavaReportsMgr
 			),
 		),
 
+		ReportType::LATEST_PLAYED_ENTRIES => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'extract_time' => array(
+					self::DRUID_TYPE => self::DRUID_EXTRACTION,
+					self::DRUID_DIMENSION => self::DIMENSION_TIME,
+					self::DRUID_OUTPUT_NAME => self::DIMENSION_EXTRACT_TIME,
+					self::DRUID_EXTRACTION_FUNC => array(
+						self::DRUID_TYPE => self::DRUID_TIME_FORMAT
+					),
+				),
+				'object_id' => self::DIMENSION_ENTRY_ID,
+				'entry_name' => self::DIMENSION_ENTRY_ID,
+			),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => 'entry_name',
+				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
+		),
+
 	);
 
 	public static function getReportDef($report_type)

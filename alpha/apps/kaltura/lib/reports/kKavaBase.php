@@ -64,6 +64,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_FLAVOR_PARAMS_ID = 'flavorParamsId';
 	const DIMENSION_PLAYER_VERSION = 'playerVersion';
 	const DIMENSION_POSITION = 'position';
+	const DIMENSION_EXTRACT_TIME = 'extract_time';
 
 
 	// metrics
