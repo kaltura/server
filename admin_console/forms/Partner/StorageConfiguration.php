@@ -22,6 +22,7 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 			'multiOptions'  => array('kPathManager' => 'Kaltura Path',
 									'kExternalPathManager' => 'External Path',
 		    						'kXslPathManager' => 'XSL Path',
+									'kCloudPathManager' => 'Cloud Path',
 									),	
 		));
 		$this->getElement('pathManagerClass')->setRegisterInArrayValidator(false);

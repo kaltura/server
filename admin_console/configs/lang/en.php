@@ -1010,6 +1010,7 @@ return array(
 		'kPathManager' => 'Kaltura Path',
 		'kExternalPathManager' => 'External Path',
 	    'kXslPathManager' => 'XSL Path',
+		'kCloudPathManager' => 'Cloud Path',
 
 	// partner-configure
 	'partner-configure intro text' => 'NOTE:  changing these settings here will override the existing default settings for this storage.',
