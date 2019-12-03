@@ -9,6 +9,12 @@ class ConfMapsService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
+
+		if(kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
+		{
+			return;
+		}
+
 		$kuser = kCurrentContext::getCurrentKsKuser();
 		if(!$kuser)
 		{
@@ -126,8 +132,8 @@ class ConfMapsService extends KalturaBaseService
 	 *
 	 * @action getBatchMap
 	 * @return string
-     * @param string $hostName
-     */
+	 * @param string $hostName
+	 */
 	function getBatchMapAction($hostName)
 	{
 		kApiCache::disableCache();
