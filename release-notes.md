@@ -10,7 +10,7 @@ None.
 
 #### Deployment Scripts ####
 
-- Run 'php /opt/kaltura/app/deployment/updates/scripts/enableAnnotationPluginPermission.php'
+- Run 'php /opt/kaltura/app/deployment/updates/scripts/enableAnnotationPluginPermission.php realrun/dryrun'
 
 #### Known Issues & Limitations ####
 
