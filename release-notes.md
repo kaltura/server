@@ -1,5 +1,25 @@
 # Orion 15.12.0 #
 
+## BaseEntry list with ESearch ##
+
+- Issue Type: Task
+- Issue ID : PLAT-10347
+
+### Configuration ##
+
+1) Make sure "elasticDynamicMap" exists in your configuration maps 
+2) Add the following section "filterExecutionTags" with following values:
+    0 = KScheduledTaskDryRunner
+    1 = KScheduledTaskRunner
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Restore deleted entry ##
 
 - Issue Type: Task
