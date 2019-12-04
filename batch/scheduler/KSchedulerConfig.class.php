@@ -6,7 +6,8 @@
 
 class KSchedulerConfig extends Zend_Config_Ini
 {
-    const EXTENSION_SEPARATOR = '@';
+	const EXTENSION_SEPARATOR = '@';
+	const DEFAULT_CONFIG_RELOAD_INTVERAL = 30;
 
 	/**
 	 * @var host name as initiated by self::getHostname()
@@ -34,6 +35,16 @@ class KSchedulerConfig extends Zend_Config_Ini
 	private $configTimestamp;
 
 	/**
+	 * @var int
+	 */
+	private $nextConfigReloadTime;
+
+	/**
+	 * @var int
+	 */
+	private $configReloadInterval;
+
+	/**
 	 * @var KalturaClient
 	 */
 	private $kClient;
@@ -46,7 +57,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 	/**
 	 * @var string
 	 */
-	private $cacheVersionId;
+	private $currentIniMd5;
 
 	/**
 	 * @param string $configFileName
@@ -60,16 +71,13 @@ class KSchedulerConfig extends Zend_Config_Ini
 	public function load()
 	{
 		$this->configTimestamp = time();
-		$configFileName = $this->configFileName;
-		KalturaLog::log("loading configuration $configFileName at ". date('H:i:s', $this->configTimestamp));
+		KalturaLog::log('loading configuration from server at ' . date('H:i:s', $this->configTimestamp));
 
 		$hostname = self::getHostname();
-
-		if(is_dir($this->configFileName))
+		$configFileName = kEnvironment::get('cache_root_path') . DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . 'config.ini';
+		if (!$this->loadConfigFromServer($configFileName, $hostname))
 		{
-			$configFileName = kEnvironment::get('cache_root_path') . DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . 'config.ini';
-			$this->cacheVersionId = $this->getCacheVersionFromServer();
-			$this->loadConfigFromServer($configFileName, $hostname);
+			return false;
 		}
 
 		parent::__construct($configFileName, $hostname, true);
@@ -77,9 +85,9 @@ class KSchedulerConfig extends Zend_Config_Ini
 		$this->hostName = $hostname;
 
 		$this->taskConfigList = array();
-		foreach($this->enabledWorkers as $workerName => $maxInstances)
+		foreach ($this->enabledWorkers as $workerName => $maxInstances)
 		{
-			if(!$maxInstances)
+			if (!$maxInstances)
 				continue;
 
 			$task = new KSchedularTaskConfig($configFileName, $workerName, $maxInstances);
@@ -99,92 +107,94 @@ class KSchedulerConfig extends Zend_Config_Ini
 			$task->setMaxIdleTime($this->getMaxIdleTime());
 
 			$this->taskConfigList[$workerName] = $task;
-	  	}
+		}
+		return true;
 	}
-	
 	/* (non-PHPdoc)
 	 * @see Zend_Config_Ini::_loadIniFile()
 	 */
-    protected function _loadIniFile($filename)
-    {
-        set_error_handler(array($this, '_loadFileErrorHandler'));
-        $loaded = parse_ini_file($filename, true); // Warnings and errors are suppressed
-        restore_error_handler();
-        // Check if there was a error while loading file
-        if ($this->_loadFileErrorStr !== null) {
-            /**
-             * @see Zend_Config_Exception
-             */
-            require_once 'Zend/Config/Exception.php';
-            throw new Zend_Config_Exception($this->_loadFileErrorStr);
-        }
-    
-        $extensions = array();
-        foreach($loaded as $extensionName => $extension)
-        {
-        	if(strpos($extensionName, self::EXTENSION_SEPARATOR) > 0)
-        	{
-        		$extensions[$extensionName] = $extension;
-        		unset($loaded[$extensionName]);
-        	}
-        }
-        
-        $iniArray = array();
-        foreach ($loaded as $key => $data)
-        {
-            $pieces = explode($this->_sectionSeparator, $key);
-            $thisSection = trim($pieces[0]);
-            switch (count($pieces)) {
-                case 1:
-                    $iniArray[$thisSection] = $data;
-                    break;
+	protected function _loadIniFile($filename)
+	{
+		set_error_handler(array($this, '_loadFileErrorHandler'));
+		$loaded = parse_ini_file($filename, true); // Warnings and errors are suppressed
+		restore_error_handler();
+		// Check if there was a error while loading file
+		if ($this->_loadFileErrorStr !== null)
+		{
+			/**
+			 * @see Zend_Config_Exception
+			 */
+			require_once 'Zend/Config/Exception.php';
+			throw new Zend_Config_Exception($this->_loadFileErrorStr);
+		}
 
-                case 2:
-                    $extendedSection = trim($pieces[1]);
-                    $iniArray[$thisSection] = array_merge(array(';extends'=>$extendedSection), $data);
-                    break;
+		$extensions = array();
+		foreach ($loaded as $extensionName => $extension)
+		{
+			if (strpos($extensionName, self::EXTENSION_SEPARATOR) > 0)
+			{
+				$extensions[$extensionName] = $extension;
+				unset($loaded[$extensionName]);
+			}
+		}
 
-                default:
-                    /**
-                     * @see Zend_Config_Exception
-                     */
-                    require_once 'Zend/Config/Exception.php';
-                    throw new Zend_Config_Exception("Section '$thisSection' may not extend multiple sections in $filename");
-            }
-        }
-    
-        foreach($extensions as $extensionName => $extension)
-        {
-        	list($section, $extensionSufix) = explode(self::EXTENSION_SEPARATOR, $extensionName, 2);
-        	if(!isset($iniArray[$section]))
-        		throw new Zend_Config_Exception("Section '$section' cannot be found in $filename, '$extensionName' is invalid extension name");
-        		
-        	$iniArray[$section] = kEnvironment::mergeConfigItem($iniArray[$section], $extension, false, false);
-        }
+		$iniArray = array();
+		foreach ($loaded as $key => $data)
+		{
+			$pieces = explode($this->_sectionSeparator, $key);
+			$thisSection = trim($pieces[0]);
+			switch (count($pieces))
+			{
+				case 1:
+					$iniArray[$thisSection] = $data;
+					break;
 
-        return $iniArray;
-    }
+				case 2:
+					$extendedSection = trim($pieces[1]);
+					$iniArray[$thisSection] = array_merge(array(';extends' => $extendedSection), $data);
+					break;
+
+				default:
+					/**
+					 * @see Zend_Config_Exception
+					 */
+					require_once 'Zend/Config/Exception.php';
+					throw new Zend_Config_Exception("Section '$thisSection' may not extend multiple sections in $filename");
+			}
+		}
+
+		foreach ($extensions as $extensionName => $extension)
+		{
+			list($section, $extensionSufix) = explode(self::EXTENSION_SEPARATOR, $extensionName, 2);
+			if (!isset($iniArray[$section]))
+				throw new Zend_Config_Exception("Section '$section' cannot be found in $filename, '$extensionName' is invalid extension name");
+
+			$iniArray[$section] = kEnvironment::mergeConfigItem($iniArray[$section], $extension, false, false);
+		}
+
+		return $iniArray;
+	}
 
 	static public function setHostname($hostname)
 	{
 		self::$hostname = $hostname;
-    }
+	}
 
 	static public function getHostname()
 	{
-		if(self::$hostname)
+		if (self::$hostname)
 			return self::$hostname;
 
-		if(isset($_SERVER['HOSTNAME']))
+		if (isset($_SERVER['HOSTNAME']))
 			self::$hostname = $_SERVER['HOSTNAME'];
 
-		if(is_null(self::$hostname))
+		if (is_null(self::$hostname))
 			self::$hostname = gethostname();
 
-		if(is_null(self::$hostname))
+		if (is_null(self::$hostname))
 			self::$hostname = $_SERVER['SERVER_NAME'];
 
-		if(is_null(self::$hostname))
+		if (is_null(self::$hostname))
 			die('Host name is not defined, please define environment variable named HOSTNAME');
 
 		return self::$hostname;
@@ -195,12 +205,10 @@ class KSchedulerConfig extends Zend_Config_Ini
 	 */
 	public function reloadRequired()
 	{
-		if($this->configTimestamp < time())
+		if ($this->nextConfigReloadTime < time())
 		{
-			$serverCacheVersion = $this->getCacheVersionFromServer();
-			$this->configTimestamp = time() + $this->getStatusInterval();
-
-			return $this->cacheVersionId != $serverCacheVersion;
+			$this->nextConfigReloadTime = time() + $this->configReloadInterval;
+			return true;
 		}
 		return false;
 	}
@@ -227,7 +235,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 
 	public function getSchedulerStatusInterval()
 	{
-		if(isset($this->schedulerStatusInterval))
+		if (isset($this->schedulerStatusInterval))
 			return $this->schedulerStatusInterval;
 
 		return 60;
@@ -257,7 +265,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 	{
 		return $this->pidFileDir;
 	}
-	
+
 	public function getPartnerId()
 	{
 		return $this->partnerId;
@@ -319,54 +327,71 @@ class KSchedulerConfig extends Zend_Config_Ini
 	}
 
 	/**
-	 * Retrieve configuration from api servers
 	 * @param $configFileName
 	 * @param $hostname
+	 * @return string
 	 */
 	protected function loadConfigFromServer($configFileName, $hostname)
 	{
+		$iniMd5 = null;
 		$this->initClient();
 		$configurationPluginClient = KalturaConfMapsClientPlugin::get($this->kClient);
-		$configurationMapFilter = new KalturaConfMapsFilter();
-		$configurationMapFilter->nameEqual = "batch";
-		$configurationMapFilter->relatedHostEqual = $hostname;
-		$configurationMap = $configurationPluginClient->confMaps->get($configurationMapFilter);
-		$contentArray = json_decode($configurationMap->content, true);
-		$iniStr = iniUtils::arrayToIniString($contentArray);
-		file_put_contents($configFileName, $iniStr);
-	}
-
-	/**
-	 * Retrieve cache version id from api servers
-	 * @return mixed
-	 */
-	protected function getCacheVersionFromServer()
-	{
-		KalturaLog::debug("Fetching cache version from server " . date('H:i:s'));
-		$this->initClient();
-		$configurationPluginClient = KalturaConfMapsClientPlugin::get($this->kClient);
-		$cacheVersion = $configurationPluginClient->confMaps->getCacheVersionId();
-		KalturaLog::debug("Cache version from server " . $cacheVersion);
-		return $cacheVersion;
+		if ($configurationPluginClient)
+		{
+			$configurationMap = $configurationPluginClient->confMaps->getBatchMap($hostname);
+			if ($configurationMap)
+			{
+				$content = json_decode($configurationMap, true);
+				if (json_last_error() == JSON_ERROR_NONE)
+				{
+					$newIniMd5 = md5($content);
+					if (!isset($this->currentIniMd5) || ($newIniMd5 && $this->currentIniMd5 != $newIniMd5))
+					{
+						file_put_contents($configFileName, $content);
+						$this->currentIniMd5 = $newIniMd5;
+						KalturaLog::log('Configuration Loaded from Server ' . date('H:i:s', $this->configTimestamp));
+						return true;
+					}
+					else
+					{
+						KalturaLog::log('No need to reload Configuration. Configuration hasn\'t changed.');
+					}
+				}
+				else
+				{
+					KalturaLog::alert('Could not be decoded batch configuration maps');
+				}
+			}
+			else
+			{
+				KalturaLog::alert('Could Not load batch configuration maps from server');
+			}
+		}
+		else
+		{
+			KalturaLog::err('Could Not load Conf Maps Plugin. Please check configuration.');
+		}
+		return false;
 	}
 
 	protected function initClient()
 	{
 		if ($this->kClient)
 		{
-			$ks = $this->kClient->generateSession($this->kClientConfig['secret'], "batchUser", KalturaSessionType::ADMIN, '-1');
+			$ks = $this->kClient->generateSession($this->kClientConfig['secret'], 'batchUser', KalturaSessionType::ADMIN, '-1');
 			$this->kClient->setKs($ks);
 			return;
 		}
 		else
 		{
-			$this->kClientConfig = kConf::getMap("batchBase");
+			$this->kClientConfig = kConf::getMap('batchBase');
+			$this->configReloadInterval = isset($this->kClientConfig['configReloadInterval']) ? $this->kClientConfig['configReloadInterval'] : self::DEFAULT_CONFIG_RELOAD_INTVERAL;
 			$clientConfig = new KalturaConfiguration();
 			$clientConfig ->serviceUrl = $this->kClientConfig['serviceUrl'];
 			$clientConfig ->curlTimeout = $this->kClientConfig['curlTimeout'];
 			$this->kClient = new KalturaClient($clientConfig );
 			$this->kClient->setPartnerId($this->kClientConfig['partnerId']);
-			$ks = $this->kClient->generateSession($this->kClientConfig['secret'], "batchUser", KalturaSessionType::ADMIN, '-1');
+			$ks = $this->kClient->generateSession($this->kClientConfig['secret'], 'batchUser', KalturaSessionType::ADMIN, '-1');
 			$this->kClient->setKs($ks);
 		}
 	}

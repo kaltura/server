@@ -187,40 +187,52 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	 */
 	public $shouldExportThumbs;
 
+	/**
+	 * @var string
+	 */
+	public $mappedPackagerUrl;
+
+	/**
+	 * @var string
+	 */
+	public $regularPackagerUrl;
+
 	private static $map_between_objects = array
 	(
-		"id",
-		"createdAt",
-		"updatedAt",
-		"partnerId",
-		"name",
-		"systemName",
-		"desciption",
-		"status",
-		"protocol",
-		"storageUrl",
-		"storageBaseDir",
-		"storageUsername",
-		"storagePassword",
-		"storageFtpPassiveMode",
-		"minFileSize",
-		"maxFileSize",
-		"flavorParamsIds",
-		"maxConcurrentConnections",
-		"pathManagerClass",
-		"trigger",
-		"deliveryPriority",
-		"deliveryStatus",
-		"readyBehavior",
-		"allowAutoDelete",
-		"createFileLink",
-		"rules",
-		"pathManagerParams",	
-		"deliveryProfileIds",
-		"privateKey",
-		"publicKey",
-		"passPhrase",
-		"shouldExportThumbs",
+		'id',
+		'createdAt',
+		'updatedAt',
+		'partnerId',
+		'name',
+		'systemName',
+		'desciption',
+		'status',
+		'protocol',
+		'storageUrl',
+		'storageBaseDir',
+		'storageUsername',
+		'storagePassword',
+		'storageFtpPassiveMode',
+		'minFileSize',
+		'maxFileSize',
+		'flavorParamsIds',
+		'maxConcurrentConnections',
+		'pathManagerClass',
+		'trigger',
+		'deliveryPriority',
+		'deliveryStatus',
+		'readyBehavior',
+		'allowAutoDelete',
+		'createFileLink',
+		'rules',
+		'pathManagerParams',
+		'deliveryProfileIds',
+		'privateKey',
+		'publicKey',
+		'passPhrase',
+		'shouldExportThumbs',
+		'mappedPackagerUrl',
+		'regularPackagerUrl',
 	);
 	
 	/* (non-PHPdoc)

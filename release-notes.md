@@ -1,5 +1,61 @@
 # Orion 15.12.0 #
 
+## BaseEntry list with ESearch ##
+
+- Issue Type: Task
+- Issue ID : PLAT-10347
+
+### Configuration ##
+
+1) Make sure "elasticDynamicMap" exists in your configuration maps 
+2) Add the following section "filterExecutionTags" with following values:
+    0 = KScheduledTaskDryRunner
+    1 = KScheduledTaskRunner
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Restore deleted entry ##
+
+- Issue Type: Task
+- Issue ID : PLAT-10351
+
+### Configuration ##
+
+Only after the deployment script is executed, one can add this permission to user-roles via admin console
+
+#### Deployment Scripts ####
+
+Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_12_01_update_adminconsole_entryadmin_permissions.php'
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+
+## Clip concat job closer ##
+
+- Issue Type: Story
+- Issue ID: PLAT-10317
+
+### Configuration ###
+
+batch.ini requires the addition of 'KClipConcatCloser' worker definition and enabling. a template can be found at batch.ini.template
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## create KMC_ANALYTICS_ROLE for partner 0 ##
 
 - Issue Type: Story
@@ -25,14 +81,16 @@ Alter batch_job_log table to change abort colmun default value
 
 ## Configurations Maps Modifications ##
 - Issue Type: Task
-- Issue ID: PLAT-10245
+- Issue ID: PLAT-10245 and PLAT-10246
 
 ### Deployment scripts ###
 Run php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_05_update_confmaps_permissions.php 
 
 ### configuration ###
-modify /opt/kaltura/app/configuration/db_sync.template.ini to /opt/kaltura/app/configuration/db_sync.ini and configure relevant db connection
+modify /opt/kaltura/app/configurations/db_sync.template.ini to /opt/kaltura/app/configurations/db_sync.ini and configure relevant db connection
 This is required to be able to run syncDbConfigMapsToCache.php and insertConfigMapToDb.php scripts syncs conf maps from db to remote cache.
+
+modify /opt/kaltura/app/configurations/batchBase.template.ini to /opt/kaltura/app/configurations/batchBase.ini and modify as needed
 
 # Orion 15.11.0 #
 

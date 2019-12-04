@@ -99,7 +99,7 @@ class KalturaConfMapsFilter extends KalturaConfMapsBaseFilter
 		}
 		else
 		{
-			$map = $remoteCache->loadByHostName($this->nameEqual, $hostPatern, $excludeHost);
+			$map = $remoteCache->loadByHostName(array($this->nameEqual), $hostPatern, $excludeHost);
 		}
 		if(!empty($map))
 		{

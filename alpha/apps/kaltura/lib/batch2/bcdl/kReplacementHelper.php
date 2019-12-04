@@ -276,8 +276,21 @@ class kReplacementHelper
 	{
 		$defaultThumbAssetOld = null;
 		$defaultThumbAssetNew = null;
+
 		$replacingEntry = $replacingEntryAsset->getentry();
+		if(!$replacingEntry)
+		{
+			KalturaLog::info("Replacing entry is missing");
+			return;
+		}
+
 		$replacedEntry = entryPeer::retrieveByPK($replacingEntry->getReplacedEntryId());
+		if(!$replacedEntry)
+		{
+			KalturaLog::info("Replaced entry is missing");
+			return;
+		}
+
 		KalturaLog::info("Copying flavor [{$replacingEntryAsset->getId()}] from replacing entry [{$replacingEntry->getId()}] to replaced entry [{$replacedEntry->getId()}]");
 		$oldAssets = assetPeer::retrieveByEntryIdAndParams($replacedEntry->getId(), $replacingEntryAsset->getFlavorParamsId());
 		if($oldAssets)
@@ -319,8 +332,6 @@ class kReplacementHelper
 			$oldFlavorNewMediaInfo->setFlavorAssetVersion($oldAsset->getVersion());
 			$oldFlavorNewMediaInfo->save();
 		}
-		
-		kQueryCache::invalidateQueryCache($oldAsset);
 	}
 
 	/**

@@ -12,4 +12,14 @@ class RegistrationUserEntry extends UserEntry
 		$this->setType(RegistrationPlugin::getRegistrationUserEntryTypeCoreValue(RegistrationUserEntryType::REGISTRATION));
 		parent::__construct();
 	}
+
+	public function postUpdate(PropelPDO $con = null)
+	{
+		if($this->isColumnModified(UserEntryPeer::STATUS) && $this->getStatus() == UserEntryStatus::DELETED)
+		{
+			kEventsManager::raiseEventDeferred(new kObjectDeletedEvent($this));
+		}
+
+		parent::postUpdate($con);
+	}
 }
