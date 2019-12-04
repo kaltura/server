@@ -214,7 +214,7 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
 		$result = false;
 		$params = infraRequestUtils::getRequestParams();
 		$clientsTags = isset($params[infraRequestUtils::CLIENT_TAG]) ? $params[infraRequestUtils::CLIENT_TAG] : null;
-		$tagsForExecutor = kConf::get(self::FILTER_TAGS_PARAM_NAME, self::FILTER_TAGS_MAP_NAME);
+		$tagsForExecutor = kConf::get(self::FILTER_TAGS_PARAM_NAME, self::FILTER_TAGS_MAP_NAME, array());
 		foreach($tagsForExecutor as $tag)
 		{
 			$result = (strpos($clientsTags, $tag) !== false);
