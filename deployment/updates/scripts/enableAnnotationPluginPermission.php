@@ -25,7 +25,6 @@ $criteria->add(PermissionPeer::NAME, $permissionName);
 $criteria->addAscendingOrderByColumn(PermissionPeer::PARTNER_ID);
 $criteria->addSelectColumn(PermissionPeer::PARTNER_ID);
 $stmt = PermissionPeer::doSelectStmt($criteria, $con);
-//$partners = PartnerPeer::retrieveByPKs($stmt->fetchAll(PDO::FETCH_COLUMN));
 $criteria = new Criteria(PartnerPeer::DATABASE_NAME);
 $criteria->add(PartnerPeer::ID, $stmt->fetchAll(PDO::FETCH_COLUMN), Criteria::NOT_IN);
 $partners = PartnerPeer::doSelect($criteria, $con);
