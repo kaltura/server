@@ -1,5 +1,21 @@
 # Orion 15.12.0 #
 
+## Make Likes and comments available to all ##
+- Issue Type: Task
+- Issue ID: PLAT-10108
+
+### Configuration ###
+
+None.
+
+#### Deployment Scripts ####
+
+- Run 'php /opt/kaltura/app/deployment/updates/scripts/enableAnnotationPluginPermission.php'
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## BaseEntry list with ESearch ##
 
 - Issue Type: Task
