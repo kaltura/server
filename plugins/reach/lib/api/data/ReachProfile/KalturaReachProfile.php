@@ -211,11 +211,12 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 	
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
+		/** @var $sourceObject ReachProfile */
 		//validating dictionary duplications
 		$this->validateDictionary();
 		if (isset($this->credit))
 		{
-			$this->credit->validateForUpdate($sourceObject,$propertiesToSkip);
+			$this->credit->validateForUpdate($sourceObject->getCredit(),$propertiesToSkip);
 		}
 
 		$rules = $this->rules ? $this->rules : array();
