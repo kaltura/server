@@ -51,6 +51,7 @@ class KalturaTimeRangeVendorCredit extends KalturaVendorCredit
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
+		/** @var $sourceObject kTimeRangeVendorCredit */
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 
 		if (isset($this->fromDate) &&  isset($this->toDate))
@@ -61,14 +62,14 @@ class KalturaTimeRangeVendorCredit extends KalturaVendorCredit
 
 		if (isset($this->toDate))
 		{
-			if ($sourceObject->fromDate > $this->toDate)
-				throw new KalturaAPIException(KalturaReachErrors::INVALID_CREDIT_DATES , $sourceObject->fromDate, $this->toDate);
+			if ($sourceObject->getFromDate() > $this->toDate)
+				throw new KalturaAPIException(KalturaReachErrors::INVALID_CREDIT_DATES , $sourceObject->getFromDate(), $this->toDate);
 		}
 
 		if (isset($this->fromDate))
 		{
-			if ($this->fromDate > $sourceObject->toDate)
-				throw new KalturaAPIException(KalturaReachErrors::INVALID_CREDIT_DATES , $this->fromDate, $sourceObject->toDate);
+			if ($this->fromDate > $sourceObject->getToDate())
+				throw new KalturaAPIException(KalturaReachErrors::INVALID_CREDIT_DATES , $this->fromDate, $sourceObject->getToDate());
 		}
 	}
 	
