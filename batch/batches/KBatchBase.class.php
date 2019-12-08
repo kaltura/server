@@ -829,7 +829,7 @@ abstract class KBatchBase implements IKalturaLogger
 		$configurationPluginClient = KalturaConfMapsClientPlugin::get(self::$kClient);
 		$configurationMapFilter = new KalturaConfMapsFilter();
 		$configurationMapFilter->nameEqual = $mapName;
-		$configurationMapFilter->relatedHostEqual = self::getConfigHostName();
+		$configurationMapFilter->relatedHostEqual = self::$taskConfig->getSchedulerName();
 		$configurationMap = $configurationPluginClient->confMaps->get($configurationMapFilter);
 		if ($configurationMap)
 		{
