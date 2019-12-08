@@ -3,9 +3,30 @@
  * @package Core
  * @subpackage model.data
  */
-
 class kHttpHeaderCondition extends kRegexCondition
 {
+	/**
+	 * @var string
+	 */
+	protected $headerName;
+
+
+	/**
+	 * @return string
+	 */
+	public function getHeaderName()
+	{
+		return $this->headerName;
+	}
+
+	/**
+	 * @param string $headerName
+	 */
+	public function setHeaderName($headerName)
+	{
+		$this->headerName = $headerName;
+	}
+
 	/* (non-PHPdoc)
 	 * @see kCondition::__construct()
 	 */
@@ -20,9 +41,9 @@ class kHttpHeaderCondition extends kRegexCondition
 	 */
 	public function getFieldValue(kScope $scope)
 	{
-		$fieldValue = isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : null;
-		kApiCache::addExtraField(kApiCache::ECF_USER_AGENT, kApiCache::COND_REGEX, $this->getStringValues($scope));
-		return $scope->getUserAgent();
+		kApiCache::addExtraField(array(kApiCache::ECFD_IP_HTTP_HEADER => $this->getHeaderName), kApiCache::COND_REGEX, $this->getStringValues($scope));
+		$headerValue = isset($_SERVER[$this->getHeaderName()]) ? $_SERVER[$this->getHeaderName()] : null;
+		return $headerValue;
 	}
 
 	/* (non-PHPdoc)

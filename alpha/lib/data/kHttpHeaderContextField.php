@@ -7,33 +7,18 @@
 
 class kHttpHeaderContextField extends kStringField
 {
-	/**
-	 * @var string
-	 */
-	protected $headerName;
-
 
 	/* (non-PHPdoc)
 	 * @see kStringField::getFieldValue()
 	 */
 	protected function getFieldValue(kScope $scope = null)
 	{
-		kApiCache::addExtraField(kApiCache::ECF_USER_AGENT);
+		kApiCache::addExtraField(kApiCache::ECFD_IP_HTTP_HEADER);
 
 		if(!$scope)
 			$scope = new kScope();
 
-		return $scope->getUserAgent();
-	}
-
-	/* (non-PHPdoc)
-	 * @see KalturaObject::validateForUsage()
-	 */
-	public function validateForUsage($sourceObject, $propertiesToSkip = array())
-	{
-		parent::validateForUsage($sourceObject, $propertiesToSkip);
-
-		$this->validatePropertyNotNull('headerName');
+		return null;
 	}
 
 	/* (non-PHPdoc)
@@ -44,19 +29,4 @@ class kHttpHeaderContextField extends kStringField
 		return false;
 	}
 
-	/**
-	 * @return string
-	 */
-	public function getHeaderName()
-	{
-		return $this->headerName;
-	}
-
-	/**
-	 * @param string $headerName
-	 */
-	public function setHeaderName($headerName)
-	{
-		$this->headerName = $headerName;
-	}
 }

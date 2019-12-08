@@ -8,26 +8,6 @@
 
 class KalturaHttpHeaderContextField extends KalturaStringField
 {
-	/**
-	 * header name
-	 * @var string
-	 */
-	public $headerName;
-
-	private static $mapBetweenObjects = array
-	(
-		'headerName',
-	);
-
-	/* (non-PHPdoc)
- * @see KalturaMatchCondition::getMapBetweenObjects()
- */
-	public function getMapBetweenObjects()
-	{
-		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
-	}
-
-
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
 	 */
