@@ -7,6 +7,27 @@
 
 class kHttpHeaderContextField extends kStringField
 {
+	/**
+	 * @var string
+	 */
+	protected $headerName;
+
+
+	/**
+	 * @return string
+	 */
+	public function getHeaderName()
+	{
+		return $this->headerName;
+	}
+
+	/**
+	 * @param string $headerName
+	 */
+	public function setHeaderName($headerName)
+	{
+		$this->headerName = $headerName;
+	}
 
 	/* (non-PHPdoc)
 	 * @see kStringField::getFieldValue()
@@ -18,7 +39,8 @@ class kHttpHeaderContextField extends kStringField
 		if(!$scope)
 			$scope = new kScope();
 
-		return null;
+		$headerValue = isset($_SERVER[$this->getHeaderName()]) ? $_SERVER[$this->getHeaderName()] : null;
+		return $headerValue;
 	}
 
 	/* (non-PHPdoc)
