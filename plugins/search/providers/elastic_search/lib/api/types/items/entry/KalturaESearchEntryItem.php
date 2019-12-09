@@ -63,6 +63,7 @@ class KalturaESearchEntryItem extends KalturaESearchAbstractEntryItem
 		KalturaESearchEntryFieldName::LAST_PLAYED_AT => ESearchEntryFieldName::LAST_PLAYED_AT,
 		KalturaESearchEntryFieldName::PLAYS => ESearchEntryFieldName::PLAYS,
 		KalturaESearchEntryFieldName::RANK => ESearchEntryFieldName::RANK,
+		KalturaESearchEntryFieldName::VOTES => ESearchEntryFieldName::VOTES,
 	);
 
 	protected function getMapBetweenObjects()
