@@ -41,7 +41,7 @@ class kHttpHeaderCondition extends kRegexCondition
 	 */
 	public function getFieldValue(kScope $scope)
 	{
-		kApiCache::addExtraField(array(kApiCache::ECFD_IP_HTTP_HEADER => $this->getHeaderName), kApiCache::COND_REGEX, $this->getStringValues($scope));
+		kApiCache::addExtraField(array("type" => kApiCache::ECF_HTTP_HEADER, kApiCache::ECF_HTTP_HEADER => $this->getHeaderName()), kApiCache::COND_REGEX, $this->getStringValues($scope));
 		$headerValue = isset($_SERVER[$this->getHeaderName()]) ? $_SERVER[$this->getHeaderName()] : null;
 		return $headerValue;
 	}

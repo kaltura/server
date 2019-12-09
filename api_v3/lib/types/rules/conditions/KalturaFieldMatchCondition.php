@@ -72,15 +72,19 @@ class KalturaFieldMatchCondition extends KalturaMatchCondition
 			case 'kEvalStringField':
 			    $this->field = new KalturaEvalStringField();
 			    break;
-
+			
 			case 'kObjectIdField':
 			    $this->field = new KalturaObjectIdField();
-			    break;
-
-			case 'kHttpHeaderContextField':
-				$this->field = new KalturaHttpHeaderContextField();
+			    break;				
+				
+			case 'kEvalStringField':
+				$this->field = new KalturaEvalStringField();
 				break;
-
+				
+			case 'kObjectIdField':
+				$this->field = new KalturaObjectIdField();
+				break;
+				
 			default:
 				$this->field = KalturaPluginManager::loadObject('KalturaStringField', $fieldType);
 				break;
