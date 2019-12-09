@@ -8,6 +8,6 @@ class KalturaExportToCsvOptionsType extends KalturaDynamicEnum implements Export
 {
 	public static function getEnumClass()
 	{
-		return 'ExportToCsvOptions';
+		return 'ExportToCsvOptionsType';
 	}
 }
