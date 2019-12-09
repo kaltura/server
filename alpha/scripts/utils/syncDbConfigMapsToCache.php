@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../config/cache/kRemoteMemCacheConf.php';
 
 $port = $argv[1];
 $cacheHostList = explode(',',$argv[2]);
-
+const DB_MAP_NAME = 'db_sync';
 //Init all cache items
 $cacheObjects = array();
 foreach ($cacheHostList as $cacheHost)
@@ -79,10 +79,10 @@ foreach ($cacheObjects as $cacheObject)
 
 function getPdoConnection()
 {
-	$dbMap = kConf::getMap('db');
+	$dbMap = kConf::getMap(DB_MAP_NAME);
 	if(!$dbMap)
 	{
-		die('Cannot get db.ini map from configuration!');
+		die('Cannot get ' . DB_MAP_NAME .' map from configuration!');
 	}
 	$defaultSource = $dbMap['datasources']['default'];
 	$dbConfig = $dbMap['datasources'][$defaultSource]['connection'];

@@ -958,9 +958,10 @@ CREATE TABLE `entry_vendor_task` (
   `custom_data` text,
   PRIMARY KEY (`id`),
   KEY `partner_id_status_index` (`partner_id`,`status`),
-  KEY `vendor_partner_id_status_index` (`vendor_partner_id`,`status`),
-  KEY `partner_entry_index` (`partner_id`,`entry_id`),
-  KEY `updated_at` (`updated_at`)
+	KEY `vendor_partner_id_status_index` (`vendor_partner_id`,`status`),
+	KEY `updated_at` (`updated_at`),
+	KEY `entry_id` (`entry_id`),
+	KEY `reach_profile_queue_time` (`reach_profile_id`,`queue_time`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `event_notification_template` (

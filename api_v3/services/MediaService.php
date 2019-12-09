@@ -1243,17 +1243,21 @@ class MediaService extends KalturaEntryService
 	 * @action getVolumeMap
 	 * @param string $entryId Entry id
 	 * @return file
-	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaAPIException
 	 */
 	function getVolumeMapAction($entryId)
 	{
 		$dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
+		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
 
-		$flavorAsset = myEntryUtils::getFlavorSupportedByPackagerForVolumeMap($entryId);
+		$flavorAsset = myPackagerUtils::getFlavorSupportedByPackagerForVolumeMap($entryId);
 		if (!$flavorAsset)
+		{
 			throw new KalturaAPIException(KalturaErrors::GIVEN_ID_NOT_SUPPORTED);
+		}
 
 		$content = myEntryUtils::getVolumeMapContent($flavorAsset);
 		return $content;
