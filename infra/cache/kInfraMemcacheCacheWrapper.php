@@ -126,14 +126,6 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 			
 			if (!$this->gotError)
 			{
-//				if ($this->memcache)
-//				{
-//					$res = $this->memcache->close();
-//					if ($res === false)
-//					{
-//						self::safeLog("Could not close remote memcache connection");
-//					}
-//				}
 				return $result;
 			}
 			
