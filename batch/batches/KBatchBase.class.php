@@ -826,25 +826,18 @@ abstract class KBatchBase implements IKalturaLogger
 	 */
 	public static function getConfigParam($key, $mapName = 'local' , $defaultValue = null)
 	{
-		try
+		$configurationPluginClient = KalturaConfMapsClientPlugin::get(self::$kClient);
+		$configurationMapFilter = new KalturaConfMapsFilter();
+		$configurationMapFilter->nameEqual = $mapName;
+		$configurationMapFilter->relatedHostEqual = self::$taskConfig->getSchedulerName();
+		$configurationMap = $configurationPluginClient->confMaps->get($configurationMapFilter);
+		if ($configurationMap)
 		{
-			$configurationPluginClient = KalturaConfMapsClientPlugin::get(self::$kClient);
-			$configurationMapFilter = new KalturaConfMapsFilter();
-			$configurationMapFilter->nameEqual = $mapName;
-			$configurationMapFilter->relatedHostEqual = self::$taskConfig->getSchedulerName();
-			$configurationMap = $configurationPluginClient->confMaps->get($configurationMapFilter);
-			if ($configurationMap)
+			$configArray = json_decode($configurationMap->content, true);
+			if ($configArray && isset($configArray[$key]))
 			{
-				$configArray = json_decode($configurationMap->content, true);
-				if ($configArray && isset($configArray[$key]))
-				{
-					return $configArray[$key];
-				}
+				return $configArray[$key];
 			}
-		}
-		catch(Exception $e)
-		{
-			KalturaLog::alert("Failed to get $key from configuration maps " . $e->getMessage());
 		}
 		return $defaultValue;
 	}
