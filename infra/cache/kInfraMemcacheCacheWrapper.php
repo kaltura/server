@@ -16,6 +16,8 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 	protected $port;
 	protected $flags = 0;
 	protected $persistent = false;
+	protected $timeout;
+	protected $maxConnectAttempts;
 
 	protected $memcache = null;
 	protected $gotError = false;
@@ -37,25 +39,30 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 			$this->flags = MEMCACHE_COMPRESSED;
 		if (isset($config['persistent']) && $config['persistent'])
 			$this->persistent = true;
+
+		$this->timeout = isset($config['timeout']) ? $config['timeout'] : 1;
+		$this->maxConnectAttempts = isset($config['maxConnectAttempts']) ? $config['maxConnectAttempts'] : self::MAX_CONNECT_ATTEMPTS;
 		
 		return $this->reconnect();
 	}
-	
+
 	/**
+	 * @param int $timeout
+	 * @param int $retries
 	 * @return bool false on error
 	 */
 	protected function reconnect()
 	{
 		$this->memcache = null;
 		
-		if ($this->connectAttempts >= self::MAX_CONNECT_ATTEMPTS)
+		if ($this->connectAttempts >= $this->maxConnectAttempts)
 		{
 			return false;
 		}
 
 		$connectResult = false;
 		$connStart = microtime(true);
-		while ($this->connectAttempts < self::MAX_CONNECT_ATTEMPTS)
+		while ($this->connectAttempts < $this->maxConnectAttempts)
 		{
 			$this->connectAttempts++;
 			
@@ -65,9 +72,9 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 
 			$curConnStart = microtime(true);
 			if ($this->persistent)
-				$connectResult = @$memcache->pconnect($this->hostName, $this->port);
+				$connectResult = @$memcache->pconnect($this->hostName, $this->port, $this->timeout);
 			else 
-				$connectResult = @$memcache->connect($this->hostName, $this->port);			
+				$connectResult = @$memcache->connect($this->hostName, $this->port, $this->timeout);
 			if ($connectResult || microtime(true) - $curConnStart < .5)		// retry only if there's an error and it's a timeout error
 				break;
 
@@ -119,6 +126,14 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 			
 			if (!$this->gotError)
 			{
+//				if ($this->memcache)
+//				{
+//					$res = $this->memcache->close();
+//					if ($res === false)
+//					{
+//						self::safeLog("Could not close remote memcache connection");
+//					}
+//				}
 				return $result;
 			}
 			

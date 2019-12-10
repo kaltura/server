@@ -23,9 +23,16 @@ class kBaseMemcacheConf extends kBaseConfCache implements kMapCacheInterface
 		$confParams = $this->getConfigParams(get_class($this));
 		if($confParams)
 		{
-			$port = $confParams['port'];
-			$host = $confParams['host'];
-			$this->cache = $this->initCache($port, $host);
+			$sectionConfig= array('host'=> $confParams['port'],'port'=>$confParams['host']);
+			if (isset($confParams['timeout']))
+			{
+				$sectionConfig['timeout'] = $confParams['timeout'];
+			}
+			if (isset($confParams['maxConnectAttempts']))
+			{
+				$sectionConfig['maxConnectAttempts'] = $confParams['maxConnectAttempts'];
+			}
+			$this->cache = $this->initCache($sectionConfig);
 		}
 	}
 
@@ -35,11 +42,10 @@ class kBaseMemcacheConf extends kBaseConfCache implements kMapCacheInterface
 		return $map;
 	}
 
-	protected function initCache($port, $host)
+	protected function initCache($sectionConfig)
 	{
 		require_once (__DIR__ . '/../../../infra/cache/kInfraMemcacheCacheWrapper.php');
 		$cache = new kInfraMemcacheCacheWrapper;
-		$sectionConfig= array('host'=>$host,'port'=>$port);
 		try
 		{
 			if (!$cache->init($sectionConfig))
