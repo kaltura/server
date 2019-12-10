@@ -23,7 +23,7 @@ class kBaseMemcacheConf extends kBaseConfCache implements kMapCacheInterface
 		$confParams = $this->getConfigParams(get_class($this));
 		if($confParams)
 		{
-			$sectionConfig= array('host'=> $confParams['port'],'port'=>$confParams['host']);
+			$sectionConfig= array('host'=> $confParams['host'],'port'=>$confParams['port']);
 			if (isset($confParams['timeout']))
 			{
 				$sectionConfig['timeout'] = $confParams['timeout'];
