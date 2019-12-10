@@ -29,6 +29,11 @@ class kLiveEntryRecordingOptions
 	 */
 	protected $shouldMakeHidden = false;
 
+    /**
+     * @var boolean
+     */
+	protected $shouldAutoArchive = false;
+
 	/**
 	 * @return the $shouldCopyThumbnail
 	 */
@@ -90,4 +95,20 @@ class kLiveEntryRecordingOptions
 	{
 		return $this->shouldMakeHidden;
 	}
+
+	/**
+	 * @param boolean $shouldAutoArchive
+	 */
+	public function setShouldAutoArchive($shouldAutoArchive)
+    {
+        $this->shouldAutoArchive = $shouldAutoArchive;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getShouldAutoArchive()
+    {
+        return $this->shouldAutoArchive;
+    }
 }
