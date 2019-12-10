@@ -91,7 +91,7 @@ class KGenericScheduler
 			}
 			catch(Exception $e)
 			{
-				KalturaLog::alert("Error loading configuration! " . $e->getMessage());
+				KalturaLog::alert('Error loading configuration! ' . $e->getMessage());
 				exit(1);
 			}
 			date_default_timezone_set($this->schedulerConfig->getTimezone());
@@ -122,7 +122,7 @@ class KGenericScheduler
 			}
 			catch(Exception $e)
 			{
-				KalturaLog::alert("Error loading configuration! " . $e->getMessage());
+				KalturaLog::alert('Error loading configuration! ' . $e->getMessage());
 				return;
 			}
 		}
