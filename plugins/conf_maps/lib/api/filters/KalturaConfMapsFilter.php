@@ -16,7 +16,7 @@ class KalturaConfMapsFilter extends KalturaConfMapsBaseFilter
 
 		//Check if map exist in file system or in remote cache
 		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
-		$hostList =$remoteCache->getHostList($this->nameEqual ,$this->relatedHostEqual );
+		$hostList = $remoteCache->getHostList($this->nameEqual ,$this->relatedHostEqual );
 		if($hostList)
 		{
 			foreach ($hostList as $host)
@@ -26,6 +26,29 @@ class KalturaConfMapsFilter extends KalturaConfMapsBaseFilter
 				$apiMapObject->fromObject($dbMapObject);
 				$apiMapObject->sourceLocation = KalturaConfMapsSourceLocation::DB;
 				$apiMapObject->isEditable = true;
+				try
+				{
+					$ks = ks::fromSecureString($apiMapObject->remarks);
+					if ($ks && isset($ks->user))
+					{
+						$apiMapObject->userId = $ks->user;
+					}
+				}
+				catch (Exception $e)
+				{
+					KalturaLog::debug("Could not extract userId from configuration for map $apiMapObject->name and $apiMapObject->relatedHost and version $apiMapObject->version ");
+				}
+				$contentData = json_decode($apiMapObject->content, true);
+				if (is_array($contentData))
+				{
+					KalturaLog::debug('Retrieved content in array format from RemoteCache for map - ' . $apiMapObject->name . " with content: \n" . print_r($contentData, true));
+				}
+				else
+				{
+					$apiMapObject->rawData = $contentData;
+					$ini = parse_ini_string($contentData, true);
+					$apiMapObject->content = json_encode($ini);
+				}
 				$items->insert($apiMapObject);
 			}
 		}
@@ -53,9 +76,11 @@ class KalturaConfMapsFilter extends KalturaConfMapsBaseFilter
 	}
 
 	/**
-	 * @return KalturaConfMaps
+	 * @param bool $excludeHost
+	 * @return KalturaConfMaps|null
+	 * @throws Exception
 	 */
-	public function getMap()
+	public function getMap($excludeHost = false)
 	{
 		$confMap = new KalturaConfMaps();
 		$hostPatern = str_replace('*','#', $this->relatedHostEqual);
@@ -70,12 +95,35 @@ class KalturaConfMapsFilter extends KalturaConfMapsBaseFilter
 				$confMap->fromObject($dbMap);
 				$confMap->sourceLocation = KalturaConfMapsSourceLocation::DB;
 				$confMap->isEditable = true;
+				try
+				{
+					$ks = ks::fromSecureString($confMap->remarks);
+					if ($ks && isset($ks->user))
+					{
+						$confMap->userId = $ks->user;
+					}
+				}
+				catch (Exception $e)
+				{
+					KalturaLog::debug("Could not extract userId from configuration for map $confMap->name and $confMap->relatedHost and version $confMap->version ");
+				}
+				$contentData = json_decode($confMap->content, true);
+				if (is_array($contentData))
+				{
+					KalturaLog::debug('Retrieved content in array format from RemoteCache for map - ' . $confMap->name . " with content: \n" . print_r($contentData, true));
+				}
+				else
+				{
+					$confMap->rawData = $contentData;
+					$ini = parse_ini_string($contentData, true);
+					$confMap->content = json_encode($ini);
+				}
 				return $confMap;
 			}
 		}
 		else
 		{
-			$map = $remoteCache->loadByHostName($this->nameEqual, $hostPatern);
+			$map = $remoteCache->loadByHostName(array($this->nameEqual), $hostPatern, $excludeHost);
 		}
 		if(!empty($map))
 		{

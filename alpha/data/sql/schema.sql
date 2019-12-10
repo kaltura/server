@@ -2260,7 +2260,7 @@ CREATE TABLE `batch_job_log`
 	`duplication_key` VARCHAR(2047),
 	`log_status` INTEGER,
 	`status` INTEGER,
-	`abort` TINYINT,
+	`abort` TINYINT default 0,
 	`check_again_timeout` INTEGER,
 	`progress` TINYINT,
 	`message` VARCHAR(1024),

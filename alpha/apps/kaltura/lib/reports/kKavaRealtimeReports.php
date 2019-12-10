@@ -166,6 +166,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 			),
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addFlavorParamColumn',
 			self::REPORT_TOTAL_FINALIZE_FUNC => 'self::addFlavorParamTotalColumn',
+			self::REPORT_FORCE_TOTAL_COUNT => true,
 			self::REPORT_TABLE_MAP => array(
 				'sum_view_time_live' => self::METRIC_VIEW_LIVE_PLAY_TIME_SEC,
 				'sum_view_time_dvr' => self::METRIC_VIEW_DVR_PLAY_TIME_SEC,

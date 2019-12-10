@@ -49,6 +49,7 @@ class ESearchQueryFromFilter
 	public static function canTransformFilter($filter)
 	{
 		$result = true;
+		$emptyFilter = true;
 		foreach($filter->fields as $field => $fieldValue)
 		{
 			if($field === entryFilter::ORDER)
@@ -63,11 +64,20 @@ class ESearchQueryFromFilter
 			}
 
 			list( , $operator, $fieldName) = $fieldParts;
-			if(!in_array($fieldName, static::getSupportedFields()) && !(is_null($fieldValue) || $fieldValue == ''))
+			if(!(is_null($fieldValue) || $fieldValue == ''))
 			{
-				KalturaLog::debug('Cannot convert field:' . $fieldName);
-				return false;
+				$emptyFilter = false;
+				if (!in_array($fieldName, static::getSupportedFields()))
+				{
+					KalturaLog::debug('Cannot convert field:' . $fieldName);
+					return false;
+				}
 			}
+		}
+
+		if($emptyFilter)
+		{
+			return false;
 		}
 
 		if($filter->getAdvancedSearch())
@@ -78,6 +88,11 @@ class ESearchQueryFromFilter
 		return $result;
 	}
 
+	/**
+	 * @param baseObjectFilter $filter
+	 * @return array
+	 * @throws KalturaAPIException
+	 */
 	public function createElasticQueryFromFilter(baseObjectFilter $filter)
 	{
 		$this->init();

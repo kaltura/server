@@ -68,7 +68,7 @@ class kVidStripAction extends kVidAction
 		{
 			$destPath = $this->getTempThumbnailPath();
 			$second = $this->startSec + ($interval * $i);
-			$success = myEntryUtils::captureThumbUsingPackager($this->source->getEntry(), $destPath, $second, $flavorAssetId, $this->newWidth, $this->newHeight);
+			$success = myPackagerUtils::captureThumbUsingPackager($this->source->getEntry(), $destPath, $second, $flavorAssetId, $this->newWidth, $this->newHeight);
 			if(!$success)
 			{
 				$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::VID_STRIP_FAILED);

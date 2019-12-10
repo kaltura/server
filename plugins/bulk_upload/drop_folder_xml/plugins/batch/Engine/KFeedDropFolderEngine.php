@@ -54,7 +54,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 				break;
 			}
 			
-			$counter += $this->watchProcessSingleItem($feedItem, $existingDropFolderFilesMap, $counter);
+			$counter += $this->watchProcessSingleItem($feedItem, $existingDropFolderFilesMap);
 		}
 		
 		foreach ($existingDropFolderFilesMap as $existingDropFolderFile)
@@ -64,7 +64,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		
 	}
 	
-	protected function watchProcessSingleItem (SimpleXMLElement $feedItem, array $existingDropFolderFilesMap)
+	protected function watchProcessSingleItem (SimpleXMLElement $feedItem, array &$existingDropFolderFilesMap)
 	{
 		$result = 0;
 		

@@ -85,9 +85,16 @@ class KGenericScheduler
 		$firstLoad = is_null($this->schedulerConfig);
 		if($firstLoad)
 		{
-			$this->schedulerConfig = new KSchedulerConfig($configFileName);
+			try
+			{
+				$this->schedulerConfig = new KSchedulerConfig($configFileName);
+			}
+			catch(Exception $e)
+			{
+				KalturaLog::alert('Error loading configuration! ' . $e->getMessage());
+				exit(1);
+			}
 			date_default_timezone_set($this->schedulerConfig->getTimezone());
-
 			$pid = $this->schedulerConfig->getPidFileDir() . '/batch.pid';
 			if(file_exists($pid))
 			{
@@ -97,22 +104,32 @@ class KGenericScheduler
 			file_put_contents($pid, getmypid());
 
 			KalturaLog::info(file_get_contents('VERSION.txt'));
-			
+
 			$this->loadRunningTasks();
 		}
 		else
 		{
 			if(!$this->schedulerConfig->reloadRequired())
+			{
 				return;
-
-			sleep(2); // make sure the file finsied to be written
-			$this->schedulerConfig->load();
+			}
+			try
+			{
+				if(!$this->schedulerConfig->load())
+				{
+					return;
+				}
+			}
+			catch(Exception $e)
+			{
+				KalturaLog::alert('Error loading configuration! ' . $e->getMessage());
+				return;
+			}
 		}
 
 		KScheduleHelperManager::clearFilters();
-		$this->queueSizes = array();
 
-		KalturaLog::info("Loading configuration file at: " . date('Y-m-d H:i'));
+		$this->queueSizes = array();
 
 		$configItems = $this->createConfigItem($this->schedulerConfig->toArray());
 		$taskConfigs = $this->schedulerConfig->getTaskConfigList();
@@ -239,7 +256,7 @@ class KGenericScheduler
 		
 		foreach($this->runningTasks as $taskName => &$tasks)
 		{
-			if(! count($tasks))
+			if(!count($tasks))
 				continue;
 
 			foreach($tasks as $index => &$proc)
@@ -305,7 +322,7 @@ class KGenericScheduler
 					$statuses[] = $this->createStatus($taskConfig, KalturaSchedulerStatusType::RUNNING_BATCHES_LAST_EXECUTION_TIME, $lastRunTime);
 			}
 
-		
+
 			$runningTasksCount = $this->numberOfRunningTasks($taskConfig->name);
 			if($fullCycle) {
 				$statuses[] = $this->createStatus($taskConfig, KalturaSchedulerStatusType::RUNNING_BATCHES_COUNT, $runningTasksCount);
