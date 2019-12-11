@@ -373,7 +373,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 				}
 				else
 				{
-					KalturaLog::alert('Could not be decode batch configuration maps');
+					KalturaLog::alert('Could not decode batch configuration maps');
 
 				}
 			}
