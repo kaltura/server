@@ -356,7 +356,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 			if ($configurationMap)
 			{
 				$content = json_decode($configurationMap, true);
-				if (json_last_error() == JSON_ERROR_NONE || empty($content) )
+				if (json_last_error() == JSON_ERROR_NONE )
 				{
 					$newIniMd5 = md5($content);
 					if (!isset($this->currentIniMd5) || ($newIniMd5 && $this->currentIniMd5 != $newIniMd5))
