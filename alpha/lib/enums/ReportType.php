@@ -152,4 +152,8 @@ interface ReportType extends BaseEnum
    const QOE_ERROR_TRACKING_PLAYER_VERSION = 30045;
    const QOE_ERROR_TRACKING_ENTRY = 30046;
 
+   //flow
+   const QOE_VOD_SESSION_FLOW = 30047;
+   const QOE_LIVE_SESSION_FLOW = 30048;
+
 }
