@@ -1,3 +1,9 @@
+# Orion 15.13.0 #
+
+## Enabling auto archive when using live with recording ##
+- Issue Type: Task
+- Issue ID : WEBC-1574
+
 # Orion 15.12.0 #
 ## giving partner -8 permission to partner get ##
 - Issue Type: Task
