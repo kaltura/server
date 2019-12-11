@@ -4,6 +4,8 @@ abstract class DeliveryServerNode extends ServerNode {
 
 	const CUSTOM_DATA_DELIVERY_IDS = "delivery_profile_ids";
 	const CUSTOM_DATA_CONFIG = "config";
+
+    abstract public function getPlaybackHost($protocol, $format, $baseUrl);
 	
 	public function getPlaybackDomain()
 	{
@@ -14,6 +16,17 @@ abstract class DeliveryServerNode extends ServerNode {
 		
 		return $playbackHostName;
 	}
+
+    public function getManifestUrl($protocol = 'http', $format = null)
+    {
+        $playbackHost = $this->getPlaybackHost($protocol, $format, null);
+        return $protocol . '://' . rtrim($playbackHost, '/') . '/';
+    }
+
+    public function getAppNameAndPrefix()
+    {
+        return '';
+    }
 
 	/* Delivery Settings */
 	public function setDeliveryProfileIds($params)
