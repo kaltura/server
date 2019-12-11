@@ -29,7 +29,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			"kuser" => objectType::KUSER,
 			"permission" => objectType::PERMISSION,
 			"permissionItem" => objectType::PERMISSIONITEM,
-			"userRole" => objectType::USERROLE );
+			"userRole" => objectType::USERROLE,
+			"categoryEntry" => objectType::CATEGORY_ENTRY );
 		if (isset($mapObjectType[$eventObjectClassName]))
 		{
 			return $mapObjectType[$eventObjectClassName];
@@ -163,7 +164,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
 		if ($object instanceof categoryEntry)
+		{
+			$event = new kObjectAddedEvent($object);
+			$this->shouldConsumeEvent($event);
 			return true;
+		}
 		return false;
 	}
 
@@ -213,6 +218,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		if ($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
 		{
+			$event = new kObjectChangedEvent($object,$modifiedColumns);
+			$this->shouldConsumeEvent($event);
 			return true;
 		}
 
@@ -238,7 +245,15 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		if ($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
+		{
+			$this->initReachProfileForPartner($object->getPartnerId());
+			if (count(self::$booleanNotificationTemplatesFulfilled))
+			{
+				$event = new kObjectAddedEvent($object);
+				$this->consumeEvent($event);
+			}
 			$this->checkAutomaticRules($object);
+		}
 
 		return true;
 	}
@@ -303,6 +318,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		if ($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
 		{
+			$this->initReachProfileForPartner($object->getPartnerId());
+			if (count(self::$booleanNotificationTemplatesFulfilled))
+			{
+				$event = new kObjectChangedEvent($object,$modifiedColumns);
+				$this->consumeEvent($event);
+			}
 			return $this->checkAutomaticRules($object);
 		}
 
