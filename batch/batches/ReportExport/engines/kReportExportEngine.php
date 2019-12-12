@@ -63,7 +63,7 @@ abstract class kReportExportEngine
 			return;
 		}
 
-		$disclaimerMessage = KBatchBase::getConfigParam(self::DISCLAIMER_CONFIG_KEY);
+		$disclaimerMessage = 'Please note that the data below is filtered based on the filter applied in the report';
 		if ($disclaimerMessage)
 		{
 			$this->writeRow($disclaimerMessage);
