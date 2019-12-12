@@ -70,7 +70,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return $url;
 	}
 	
-	public function getPlaybackHost($protocol = 'http', $format = null, $baseUrl = null)
+	public function getPlaybackHost($protocol = 'http', $format = null, $baseUrl = null, $deliveryType = null)
 	{
 		$hostname = $this->getHostname();
 		if(!$this->getIsExternalMediaServer())

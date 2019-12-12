@@ -5,7 +5,7 @@ abstract class DeliveryServerNode extends ServerNode {
 	const CUSTOM_DATA_DELIVERY_IDS = "delivery_profile_ids";
 	const CUSTOM_DATA_CONFIG = "config";
 
-	abstract public function getPlaybackHost($protocol, $format, $baseUrl);
+	abstract public function getPlaybackHost($protocol = 'http', $format = null, $baseUrl = null, $deliveryType = null);
 	
 	public function getPlaybackDomain()
 	{
@@ -19,7 +19,7 @@ abstract class DeliveryServerNode extends ServerNode {
 
 	public function getManifestUrl($protocol = 'http', $format = null)
 	{
-		$playbackHost = $this->getPlaybackHost($protocol, $format, null);
+		$playbackHost = $this->getPlaybackHost($protocol, $format);
 		return $protocol . '://' . rtrim($playbackHost, '/') . '/';
 	}
 

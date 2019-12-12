@@ -20,7 +20,7 @@ class EdgeServerNode extends DeliveryServerNode {
 		$this->setType(serverNodeType::EDGE);
 	}
 	
-	public function getPlaybackHost($protocol = 'http', $format = null, $deliveryType = null)
+	public function getPlaybackHost($protocol = 'http', $format = null, $baseUrl = null, $deliveryType = null)
 	{
 		$playbackHost = $this->buildEdgeFullPath($protocol, $format, $deliveryType);
 		
