@@ -90,7 +90,6 @@ class KSchedulerConfig extends Zend_Config_Ini
 		catch(Exception $e)
 		{
 			KalturaLog::alert('Error loading configuration from server! ' . $e->getMessage());
-			$this->errorLoading = true;
 			return false;
 		}
 
@@ -347,6 +346,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 	 */
 	protected function loadConfigFromServer($configFileName, $hostname)
 	{
+		$this->errorLoading = true;
 		$iniMd5 = null;
 		$this->initClient();
 		$configurationPluginClient = KalturaConfMapsClientPlugin::get($this->kClient);
@@ -356,8 +356,9 @@ class KSchedulerConfig extends Zend_Config_Ini
 			if ($configurationMap)
 			{
 				$content = json_decode($configurationMap, true);
-				if (json_last_error() == JSON_ERROR_NONE )
+				if (json_last_error() == JSON_ERROR_NONE && !empty($content))
 				{
+					$this->errorLoading = false;
 					$newIniMd5 = md5($content);
 					if (!isset($this->currentIniMd5) || ($newIniMd5 && $this->currentIniMd5 != $newIniMd5))
 					{
@@ -374,7 +375,6 @@ class KSchedulerConfig extends Zend_Config_Ini
 				else
 				{
 					KalturaLog::alert('Could not decode batch configuration maps');
-
 				}
 			}
 			else
