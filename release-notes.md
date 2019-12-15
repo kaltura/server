@@ -4,6 +4,13 @@
 - Issue Type: Task
 - Issue ID : WEBC-1574
 
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/scripts/2019_12_10_update_archive_permissions.php'
+
+
 # Orion 15.12.0 #
 ## giving partner -8 permission to partner get ##
 - Issue Type: Task
