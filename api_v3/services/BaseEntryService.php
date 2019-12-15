@@ -501,8 +501,9 @@ class BaseEntryService extends KalturaEntryService
 			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaFilterExecutor');
 			foreach ($pluginInstances as $KalturaFilterExecutor)
 			{
+				$clonedFilter =  clone $filter;
 				/* @var $KalturaFilterExecutor IKalturaFilterExecutor */
-				if ($KalturaFilterExecutor->canExecuteFilter($filter, $this->getResponseProfile()))
+				if ($KalturaFilterExecutor->canExecuteFilter($clonedFilter, $this->getResponseProfile()))
 				{
 					KalturaLog::info('Executing filter on ' . get_class($KalturaFilterExecutor));
 					$result = $KalturaFilterExecutor->executeFilter($filter, $pager);
