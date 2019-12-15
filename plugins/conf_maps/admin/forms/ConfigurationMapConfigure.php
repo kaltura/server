@@ -26,6 +26,13 @@ class Form_ConfigurationMapConfigure extends ConfigureForm
 		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag', array('tag' => 'b'))));
 		$this->addElement($titleElement);
 
+		$this->addElement('text', 'userId', array(
+			'label' => 'Creator:',
+			'filters' => array('StringTrim'),
+			'placement' => 'prepend',
+			'readonly' => true,
+		));
+
 		$this->addElement('text', 'name', array(
 			'label' => 'Map Name:',
 			'required' => true,

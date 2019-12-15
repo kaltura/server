@@ -85,15 +85,13 @@ class KGenericScheduler
 		$firstLoad = is_null($this->schedulerConfig);
 		if($firstLoad)
 		{
-			try
+			$this->schedulerConfig = new KSchedulerConfig($configFileName);
+			if ($this->schedulerConfig->errorLoading)
 			{
-				$this->schedulerConfig = new KSchedulerConfig($configFileName);
-			}
-			catch(Exception $e)
-			{
-				KalturaLog::alert('Error loading configuration! ' . $e->getMessage());
+				KalturaLog::alert('Error loading configuration. Exiting.');
 				exit(1);
 			}
+
 			date_default_timezone_set($this->schedulerConfig->getTimezone());
 			$pid = $this->schedulerConfig->getPidFileDir() . '/batch.pid';
 			if(file_exists($pid))
@@ -113,17 +111,9 @@ class KGenericScheduler
 			{
 				return;
 			}
-			try
+			if(!$this->schedulerConfig->load())
 			{
-				if(!$this->schedulerConfig->load())
-				{
 					return;
-				}
-			}
-			catch(Exception $e)
-			{
-				KalturaLog::alert('Error loading configuration! ' . $e->getMessage());
-				return;
 			}
 		}
 

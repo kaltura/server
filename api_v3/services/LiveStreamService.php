@@ -553,7 +553,6 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function regenerateStreamTokenAction($entryId)
 	{
-		
 		$this->dumpApiRequest($entryId, true);
 	
 		$liveEntry = entryPeer::retrieveByPK($entryId);
@@ -575,5 +574,101 @@ class LiveStreamService extends KalturaLiveEntryService
 		$entry = KalturaEntryFactory::getInstanceByType($liveEntry->getType());
 		$entry->fromObject($liveEntry, $this->getResponseProfile());
 		return $entry;
+
 	}
+
+    /**
+     * Archive a live entry which was recorded
+     *
+     * @action archive
+     * @param string $liveEntryId
+     * @return bool
+     * @throws KalturaAPIException
+     * @throws PropelException
+     */
+	public function archiveAction($liveEntryId)
+    {
+        $liveEntry = entryPeer::retrieveByPK($liveEntryId);
+        /** @var LiveStreamEntry $liveEntry */
+        if (!$liveEntry)
+        {
+            KalturaLog::err("Live entry id [" . $liveEntryId . "] not found");
+            throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $liveEntryId);
+        }
+        $cuePoints = CuePointPeer::retrieveByEntryId($liveEntryId);
+
+        $notDeletedCuePointTags = ["entry-reset-mode", "webcast:internal-state", "player-qna-settings-update",
+            "select-deck-document", "poll-data", "timeline-assets-state", "rtc-settings"];
+
+        foreach ($cuePoints as $cuePoint)
+        {
+            /** @var CuePoint $cuePoint */
+            KalturaLog::info("Iterating over cue point [" . $cuePoint->getId() . "]");
+            $cuePointTags = explode(',', $cuePoint->getTags());
+            $containsImportantTag = false;
+            foreach ($notDeletedCuePointTags as $importantCuePointTag)
+            {
+                if (in_array($importantCuePointTag, $cuePointTags))
+                {
+                    $containsImportantTag = true;
+                    break;
+                }
+            }
+            if (!$containsImportantTag)
+            {
+                $cuePoint->setStatus(CuePointStatus::DELETED);
+                $cuePoint->save();
+            }
+        }
+
+        $vodEntry = entryPeer::retrieveByPK($liveEntry->getRecordedEntryId());
+        if (!$vodEntry)
+        {
+            KalturaLog::warning("Recorded entry id [" . $liveEntry->getRecordedEntryId() . "] not found");
+        }
+        else {
+            $currentDate = date("M-d-Y H:i");
+            $vodEntry->setName($liveEntry->getName() . " " . $currentDate);
+            $vodEntry->setDescription($liveEntry->getDescription());
+            $vodEntry->setTags($liveEntry->getTags());
+            $vodEntry->setDisplayInSearch(1);
+            $vodEntry->save();
+        }
+
+        $liveEntry->setRecordedEntryId(null);
+        $liveEntry->setRedirectEntryId(null);
+        $liveEntry->save();
+
+        $pushNotificationPlugin = KalturaPluginManager::getPluginInstance(PushNotificationPlugin::getPluginName());
+
+        if ($pushNotificationPlugin)
+        {
+            $liveEntryString = new KalturaStringValue();
+            $liveEntryString->value = $liveEntryId;
+            $pushNotificationParameter = new KalturaPushEventNotificationParameter();
+            $pushNotificationParameter->key = "entryId";
+            $pushNotificationParameter->value = $liveEntryString;
+            $pushEventNotificationParameterArray = new KalturaPushEventNotificationParameterArray();
+            $pushEventNotificationParameterArray[] = $pushNotificationParameter;
+            $pushNotificationParams = new KalturaPushNotificationParams();
+            $pushNotificationParams->userParams = $pushEventNotificationParameterArray;
+
+            $pushNotificationTemplateService = new PushNotificationTemplateService();
+            $pushNotificationTemplateService->initService("pushnotification_pushnotificationtemplate",
+                "eventNotificationTemplate", "sendCommand");
+
+            $pushNotificationTemplateService->sendCommandAction('POLLS_PUSH_NOTIFICATIONS',
+                $pushNotificationParams, KalturaPushNotificationCommandType::CLEAR_QUEUE);
+            $pushNotificationTemplateService->sendCommandAction('PUBLIC_QNA_NOTIFICATIONS',
+                $pushNotificationParams, KalturaPushNotificationCommandType::CLEAR_QUEUE);
+            $pushNotificationTemplateService->sendCommandAction('USER_QNA_NOTIFICATIONS',
+                $pushNotificationParams, KalturaPushNotificationCommandType::CLEAR_QUEUE);
+        }
+        else
+        {
+            KalturaLog::info("Plugin [" . PushNotificationPlugin::getPluginName() . "] is not loaded");
+            return false;
+        }
+        return true;
+    }
 }

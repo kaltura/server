@@ -1,3 +1,29 @@
+# Orion 15.13.0 #
+
+## Enabling auto archive when using live with recording ##
+- Issue Type: Task
+- Issue ID : WEBC-1574
+
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/scripts/2019_12_10_update_archive_permissions.php'
+
+
+## Reach boolean event notification for privacy context ##
+- Issue Type: Task
+- Issue ID : REACH2-737
+
+### Configuration ##
+First replace all tokens from the XML files below and remove ".template" from the file name:
+/opt/kaltura/app/deployment/updates/scripts/xml/2019_12_22_categoryEntryAddedPrivacyContextsBooleanNotification.template.xml
+/opt/kaltura/app/deployment/updates/scripts/xml/2019_12_22_categoryEntryChangedPrivacyContextsBooleanNotification.template.xml
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/2019_12_22_deploy_category_entry_boolen_notifications.php
+
+
 # Orion 15.12.0 #
 ## giving partner -8 permission to partner get ##
 - Issue Type: Task
