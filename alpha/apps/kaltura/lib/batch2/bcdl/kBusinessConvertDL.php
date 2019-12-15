@@ -24,7 +24,7 @@ class kBusinessConvertDL
 
 		//copy and relink all the ready assets on the replacing entry to the replaced entry and change the status of the existing params that are not ready
 		$oldAssets = assetPeer::retrieveByEntryId($replacedEntry->getId());
-		$tempReadyAssets = assetPeer::retrieveByEntryId($replacingEntry->getId(), null, array(asset::ASSET_STATUS_READY));
+		$tempReadyAssets = assetPeer::retrieveByEntryId($replacingEntry->getId(), null, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
 		$newReadyAssetsMap = kReplacementHelper::buildAssetsToCopyMap($tempReadyAssets);
 		list($existingReadyAssetIds, $existingNonReadyAssetIds) = kReplacementHelper::relinkReplacingEntryAssetsToReplacedEntryAssets($oldAssets, $newReadyAssetsMap, $defaultThumbAssetOld, $defaultThumbAssetNew, $replacingEntry->getId());
 		$nonExistingReadyAssets = kReplacementHelper::copyReplacingAssetsToReplacedEntry($replacedEntry, $newReadyAssetsMap, $defaultThumbAssetNew);
