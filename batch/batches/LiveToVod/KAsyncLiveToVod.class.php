@@ -31,13 +31,29 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 	{
 		return KalturaBatchJobType::LIVE_TO_VOD;
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		return $this->copyCuePoint($job, $job->data);
+		$jobRes = $this->copyCuePoint($job, $job->data);
+        try {
+            $liveEntryId = $job->data->liveEntryId;
+            $liveEntry = KBatchBase::$kClient->baseEntry->get($liveEntryId);
+            /** @var KalturaLiveStreamEntry $liveEntry */
+            $recordStatus = $liveEntry->recordingStatus;
+            $shouldAutoArchive = $liveEntry->recordingOptions->shouldAutoArchive;
+            if ($recordStatus == KalturaRecordStatus::PER_SESSION && $shouldAutoArchive == KalturaNullableBoolean::TRUE_VALUE) {
+                KBatchBase::$kClient->liveStream->archive($liveEntryId);
+            }
+        }
+        catch (Exception $e)
+        {
+            KalturaLog::err($e->getMessage());
+        }
+
+		return $jobRes;
 	}
 	
 	/**
