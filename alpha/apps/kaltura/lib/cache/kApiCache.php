@@ -311,7 +311,9 @@ class kApiCache extends kApiCacheBase
 		case self::ECF_HTTP_HEADER:
 			$headerName = $extraField[self::ECF_HTTP_HEADER];
 			if (isset($_SERVER[$headerName]))
+			{
 				return array($_SERVER[$headerName]);
+			}
 			break;
 
 		}

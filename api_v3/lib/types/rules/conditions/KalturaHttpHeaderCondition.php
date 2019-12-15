@@ -6,6 +6,8 @@
 class KalturaHttpHeaderCondition extends KalturaRegexCondition
 {
 
+	const HEADER_NAME = 'headerName';
+
 	/**
 	 * header name
 	 * @var string
@@ -14,7 +16,7 @@ class KalturaHttpHeaderCondition extends KalturaRegexCondition
 
 	private static $mapBetweenObjects = array
 	(
-		'headerName',
+		self::HEADER_NAME,
 	);
 
 
@@ -34,7 +36,7 @@ class KalturaHttpHeaderCondition extends KalturaRegexCondition
 	{
 		parent::validateForUsage($sourceObject, $propertiesToSkip);
 
-		$this->validatePropertyNotNull('headerName');
+		$this->validatePropertyNotNull(self::HEADER_NAME);
 	}
 
 
@@ -51,8 +53,10 @@ class KalturaHttpHeaderCondition extends KalturaRegexCondition
 	 */
 	public function toObject($dbObject = null, $skip = array())
 	{
-		if(!$dbObject)
+		if (!$dbObject)
+		{
 			$dbObject = new kHttpHeaderCondition();
+		}
 
 		return parent::toObject($dbObject, $skip);
 	}
