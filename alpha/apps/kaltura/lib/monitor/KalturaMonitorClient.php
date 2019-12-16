@@ -353,7 +353,7 @@ class KalturaMonitorClient
 		
 		$data = array_merge(self::$basicEventInfo, array(
 			self::FIELD_EVENT_TYPE 		=> self::EVENT_RABBIT,
-			self::FIELD_DATABASE		=> $dataSourmonitorRabbitAccessce,
+			self::FIELD_DATABASE		=> $dataSource,
 			self::FIELD_TABLE			=> $tableName,
 			self::FIELD_QUERY_TYPE		=> $queryType,
 			self::FIELD_EXECUTION_TIME	=> $queryTook,

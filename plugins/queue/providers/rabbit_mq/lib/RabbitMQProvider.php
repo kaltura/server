@@ -25,6 +25,9 @@ class RabbitMQProvider extends QueueProvider
 	private $timeout;
 	private $exchangeName;
 	private $dataSourceUrl;
+	private $connectionTimeout;
+	private $readWriteTimeout;
+	private $channelRpcTimeout;
 	
 	protected static $rabbitConnections = array();
 	
@@ -32,6 +35,7 @@ class RabbitMQProvider extends QueueProvider
 	
 	const RABBIT_ACTION_SEND_MESSAGE = 'send_message';
 	const RABBIT_ACTION_OPEN_CONNECTION = 'connect';
+	const RABBIT_ACTION_TIMEOUT = 'timeout';
 
 	public function __construct(array $rabbitConfig, $constructorArgs)
 	{
@@ -42,6 +46,9 @@ class RabbitMQProvider extends QueueProvider
 		$this->curlPort = $rabbitConfig['curl_port'];
 		$this->timeout = $rabbitConfig['timeout'];
 		$this->dataSourceUrl = $this->username . ':' . $this->password . '@' . $this->MQserver . ':' . $this->port;
+		$this->connectionTimeout = isset($rabbitConfig['connection_timeout']) ? $rabbitConfig['connection_timeout'] : 1;
+		$this->readWriteTimeout = isset($rabbitConfig['read_write_timeout']) ? $rabbitConfig['read_write_timeout'] : 2;
+		$this->channelRpcTimeout = isset($rabbitConfig['channel_rpc_timeout']) ? $rabbitConfig['channel_rpc_timeout'] : 1 ;
 		
 		$exchangeName = kConf::get("push_server_exchange");
 		if(isset($constructorArgs['exchangeName']))
@@ -107,10 +114,30 @@ class RabbitMQProvider extends QueueProvider
 		$msg = new PhpAmqpLib\Message\AMQPMessage($data, array(
 			'delivery_mode' => 2
 		));
-		
-		$sendMessageStart = microtime(true);
-		$channel->basic_publish($msg, $this->exchangeName, $queueName);
-		$sendMessageEnd = microtime(true) - $connStart;
+
+		for ($retry = 1; ; $retry++)
+		{
+			$sendMessageStart = microtime(true);
+			try
+			{
+				$channel->basic_publish($msg, $this->exchangeName, $queueName);
+			}
+			catch (PhpAmqpLib\Exception\AMQPTimeoutException $e)
+			{
+				if (class_exists('KalturaLog'))
+				{
+					KalturaLog::err("Connection timed out while sending message [$data] to [$queueName] with error [" . $e->getMessage() . "]");
+				}
+				if ($retry == self::MAX_RETRIES)
+				{
+					$sendMessageEnd = microtime(true) - $sendMessageStart;
+					KalturaMonitorClient::monitorRabbitAccess($this->dataSourceUrl, self::RABBIT_ACTION_TIMEOUT, $sendMessageEnd, $this->exchangeName . ":" . $queueName, strlen($data));
+					throw $e;
+				}
+			}
+		}
+
+		$sendMessageEnd = microtime(true) - $sendMessageStart;
 		KalturaMonitorClient::monitorRabbitAccess($this->dataSourceUrl, self::RABBIT_ACTION_SEND_MESSAGE, $sendMessageEnd, $this->exchangeName . ":" . $queueName, strlen($data));
 
 		if(class_exists('KalturaLog'))
@@ -123,6 +150,7 @@ class RabbitMQProvider extends QueueProvider
 	
 	private function getConnection()
 	{
+		$connection =  null;
 		if(!isset(self::$rabbitConnections[$this->MQserver]))
 		{
 			// establish connection to RabbitMQ
@@ -132,7 +160,7 @@ class RabbitMQProvider extends QueueProvider
 				{
 					$connStart = microtime(true);
 					
-					$connection = new PhpAmqpLib\Connection\AMQPConnection($this->MQserver, $this->port, $this->username, $this->password, '/', false, 'AMQPLAIN', null, 'en_US', 1, 2, null, false, 0, 1);
+					$connection = new PhpAmqpLib\Connection\AMQPConnection($this->MQserver, $this->port, $this->username, $this->password, '/', false, 'AMQPLAIN', null, 'en_US', $this->connectionTimeout, $this->readWriteTimeout, null, false, 0, $this->channelRpcTimeout);
 					
 					$connTook = microtime(true) - $connStart;
 					KalturaMonitorClient::monitorRabbitAccess($this->dataSourceUrl, self::RABBIT_ACTION_OPEN_CONNECTION, $connTook);
@@ -152,7 +180,7 @@ class RabbitMQProvider extends QueueProvider
 			self::$rabbitConnections[$this->MQserver] = $connection;
 		}
 		
-		return self::$rabbitConnections[$this->MQserver] = $connection;;
+		return self::$rabbitConnections[$this->MQserver] = $connection;
 	}
 	
 	private function closeConnections()
