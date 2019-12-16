@@ -496,16 +496,17 @@ class BaseEntryService extends KalturaEntryService
 	protected function tryListWithFilterExecutor(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		$result = null;
+		$coreFilter = $filter->toObject();
 		try
 		{
 			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaFilterExecutor');
 			foreach ($pluginInstances as $KalturaFilterExecutor)
 			{
 				/* @var $KalturaFilterExecutor IKalturaFilterExecutor */
-				if ($KalturaFilterExecutor->canExecuteFilter($filter, $this->getResponseProfile()))
+				if ($KalturaFilterExecutor->canExecuteFilter($filter, $coreFilter, $this->getResponseProfile()))
 				{
 					KalturaLog::info('Executing filter on ' . get_class($KalturaFilterExecutor));
-					$result = $KalturaFilterExecutor->executeFilter($filter, $pager);
+					$result = $KalturaFilterExecutor->executeFilter($filter, $coreFilter, $pager);
 					break;
 				}
 			}
@@ -538,7 +539,8 @@ class BaseEntryService extends KalturaEntryService
 			$pager = new KalturaFilterPager();
 		}
 
-		$result = $this->tryListWithFilterExecutor($filter, $pager);
+		$clonedFilter = clone $filter;
+		$result = $this->tryListWithFilterExecutor($clonedFilter, $pager);
 		if (!$result)
 		{
 			$result = $filter->getListResponse($pager, $this->getResponseProfile());
