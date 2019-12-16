@@ -325,7 +325,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$segmentDuration = $this->getDynamicAttributes()->getEntry()->getSegmentDuration();
 		
 		$livePackagerUrl = $serverNode->getPlaybackHost($protocol, $streamFormat, $this->getUrl());
-		$livePackagerUrl = rtrim(str_replace("{DC}", "dc-".$serverNode->getDc(), $livePackagerUrl), "/");
+		$livePackagerUrl = rtrim(str_replace("{DC}", $serverNode->getEnvDc(), $livePackagerUrl), "/");
 		
 		if(strpos($livePackagerUrl, "{m}") !== false)
 		{
