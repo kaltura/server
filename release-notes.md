@@ -64,7 +64,7 @@
         duplicate the above index to kaltura_category_0 .... kaltura_category_9
 
 #### Deployment Scripts ####
-    Reindex category tables to sphinx:
+    Reindex category tables to sphinx to support the md5 query time fix:
         php /opt/kaltura/app/deployment/base/scripts/populateSphinxCategories.php
 
 
