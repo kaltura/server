@@ -254,7 +254,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	
 	public function getSphinxIndexName()
 	{
-		return kSphinxSearchManager::getSphinxIndexName(categoryIndex::getObjectIndexName());
+		return kSphinxSearchManager::getSphinxIndexName(entryIndex::getObjectIndexName(), categoryIndex::getSphinxSplitIndexId($this->getPartnerId(), categoryIndex::getObjectName()));
 	}
 	
 	protected function addRecalcCategoriesCount($categoryId)
@@ -1765,14 +1765,14 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 			else
 			{
 				
-				$parsedFullName .= md5($fullName . categoryPeer::CATEGORY_SEPARATOR) . ' ';
+				$parsedFullName .= '&' . md5($fullName . categoryPeer::CATEGORY_SEPARATOR) . ' ';
 				$fullName .= '>' . $categoryName;
 			}
 			
-			$parsedFullName .= md5($fullName) . ' ';
+			$parsedFullName .= '&' . md5($fullName) . ' ';
 		}
 		
-		$parsedFullName .= md5($fullNameLowerCase . category::FULL_NAME_EQUAL_MATCH_STRING);
+		$parsedFullName .= '&' . md5($fullNameLowerCase . category::FULL_NAME_EQUAL_MATCH_STRING);
 
 		return $parsedFullName;
 	}
@@ -1792,16 +1792,16 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 			}
 			else
 			{
-				$parsedFullId .= md5($fullIds . categoryPeer::CATEGORY_SEPARATOR) . ' ';
+				$parsedFullId .= '&' . md5($fullIds . categoryPeer::CATEGORY_SEPARATOR) . ' ';
 				$fullIds .= '>' . $categoryId;
 			}
 			
-			$parsedFullId .= md5($fullIds) . ' ';
+			$parsedFullId .= '&' . md5($fullIds) . ' ';
 		}
 		
-		$parsedFullId .= md5($fullIds . category::FULL_IDS_EQUAL_MATCH_STRING);
+		$parsedFullId .= '&' . md5($fullIds . category::FULL_IDS_EQUAL_MATCH_STRING);
 		
-		return $parsedFullId ;
+		return $parsedFullId;
 	}
 
 	protected function getElasticMembers()
