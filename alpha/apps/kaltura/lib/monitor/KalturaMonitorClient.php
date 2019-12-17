@@ -16,6 +16,7 @@ class KalturaMonitorClient
 	const EVENT_ELASTIC =	'elastic';
 	const EVENT_DRUID =		'druid';
 	const EVENT_COUCHBASE =	'couchbase';
+	const EVENT_RABBIT =	'rabbit';
 
 
 	const FIELD_EVENT_TYPE = 		'e';
@@ -342,6 +343,23 @@ class KalturaMonitorClient
 			self::FIELD_LENGTH			=> $querySize,
 		));
 
+		self::writeDeferredEvent($data);
+	}
+	
+	public static function monitorRabbitAccess($dataSource, $queryType, $queryTook, $tableName = null, $querySize = null)
+	{
+		if (!self::$stream)
+			return;
+		
+		$data = array_merge(self::$basicEventInfo, array(
+			self::FIELD_EVENT_TYPE 		=> self::EVENT_RABBIT,
+			self::FIELD_DATABASE		=> $dataSourmonitorRabbitAccessce,
+			self::FIELD_TABLE			=> $tableName,
+			self::FIELD_QUERY_TYPE		=> $queryType,
+			self::FIELD_EXECUTION_TIME	=> $queryTook,
+			self::FIELD_LENGTH			=> $querySize ? $querySize : 0,
+		));
+		
 		self::writeDeferredEvent($data);
 	}
 
