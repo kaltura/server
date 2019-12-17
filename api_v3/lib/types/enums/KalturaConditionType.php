@@ -23,6 +23,7 @@ class KalturaConditionType extends KalturaDynamicEnum implements ConditionType
 			ConditionType::GEO_DISTANCE => 'Validate that request came from an IP within a certain geo distance.',
 			ConditionType::ANONYMOUS_IP => 'Validate that request came from an IP which fits an anonymous profile (e.g. anonymous, proxy).',
 			ConditionType::BOOLEAN => 'validate the boolean event notifications.',
+			ConditionType::HTTP_HEADER => 'Validate that request came with specific header values',
 			);
 		
 		return self::mergeDescriptions(self::getEnumClass(), $descriptions);

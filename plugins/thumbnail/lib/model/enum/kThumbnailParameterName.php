@@ -39,5 +39,4 @@ interface kThumbnailParameterName extends BaseEnum
 	const SIZE_CORRECTION = 'sizeCorrection';
 	const IMAGE_FORMAT = 'format';
 	const QUALITY = 'quality';
-	const DENSITY = 'density';
 }

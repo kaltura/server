@@ -1541,6 +1541,7 @@ class reportsInputFilter
 	public $lte_entry_created_at;
 	public $entries_ids;
 	public $playback_context_ids;
+	public $root_entries_ids;
 
 	public function getFilterBy() {
 		return "";

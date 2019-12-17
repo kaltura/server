@@ -510,7 +510,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			return null;
 		}
 		
-		$deliveryUrl = $deliveryNode->getPlaybackHost($this->params->getMediaProtocol(), $this->params->getFormat(), $this->getType());
+		$deliveryUrl = $deliveryNode->getPlaybackHost($this->params->getMediaProtocol(), $this->params->getFormat(), null,  $this->getType());
 	
 		if(count($deliveryNodes) && $removeAfterUse)
 			$this->params->setEdgeServerIds(array_diff($deliveryNodeIds, array($deliveryNode->getId())));

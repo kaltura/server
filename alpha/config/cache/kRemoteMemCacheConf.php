@@ -26,14 +26,18 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 	public function load($key, $mapName)
 	{
 		$hostname = $this->getHostName();
-		return $this->loadByHostName($mapName,$hostname);
+		return $this->loadByHostName(array($mapName), $hostname);
 	}
 
-	public function loadByHostName($mapName,$hostname, $excludeHost = false)
+	public function loadByHostName(array $mapNames ,$hostname, $excludeHost = false)
 	{
-		$mapNames = $this->getRelevantMapList($mapName, $hostname, $excludeHost);
-		$this->orderMap($mapNames);
-		return $this->mergeMaps($mapNames, $mapName);
+		$maps = array();
+		foreach ($mapNames as $mapName)
+		{
+			$maps = array_merge($maps, $this->getRelevantMapList($mapName, $hostname, $excludeHost));
+		}
+		$this->orderMap($maps);
+		return $this->mergeMaps($maps);
 	}
 
 	protected function getRelevantMapList($requestedMapName , $hostname, $excludeHost = false)

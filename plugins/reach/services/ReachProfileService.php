@@ -101,6 +101,7 @@ class ReachProfileService extends KalturaBaseService
 	public function updateAction($id, KalturaReachProfile $reachProfile)
 	{
 		// get the object
+		/* @var $dbReachProfile ReachProfile */
 		$dbReachProfile = ReachProfilePeer::retrieveByPK($id);
 		if (!$dbReachProfile)
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
@@ -108,13 +109,16 @@ class ReachProfileService extends KalturaBaseService
 		// save the object
 		$dbReachProfile = $reachProfile->toUpdatableObject($dbReachProfile);
 		$credit = $dbReachProfile->getCredit();
-		if ($credit && $credit instanceof kReoccurringVendorCredit)
+		if ($credit)
 		{
-			/* @var $credit kReoccurringVendorCredit */
-			$credit->setPeriodDates();
-			$dbReachProfile->setCredit($credit);
+			if ($credit instanceof kReoccurringVendorCredit)
+			{
+				/* @var $credit kReoccurringVendorCredit */
+				$credit->setPeriodDates();
+				$dbReachProfile->setCredit($credit);
+			}
+			$dbReachProfile->calculateCreditPercentUsage();
 		}
-		
 		$dbReachProfile->save();
 
 		// return the saved object

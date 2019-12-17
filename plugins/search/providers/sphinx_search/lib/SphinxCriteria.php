@@ -192,7 +192,13 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			}
 		}
 		
-		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		$cache = null;
+		//Block only external queries, batch should always work
+		if(kCurrentContext::$ks_partner_id != partner::BATCH_PARTNER_ID)
+		{
+			$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		}
+		
 		$sqlHash = "SPHSearch_" . md5(preg_replace('/\d/', '', $sql) . "_" . kCurrentContext::getCurrentPartnerId());
 		if ($cache)
 		{

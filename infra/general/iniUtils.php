@@ -96,14 +96,14 @@ class IniUtils
 			array_shift($res);
 			foreach ($tempSectionsMatches as $index => $part)
 			{
-			}
-			if (isset($sectionsContent[$part[0]]))
-			{
-				$sectionsContent[$part[0]] .= $res[$index];
-			}
-			else
-			{
-				$sectionsContent[$part[0]] = $res[$index];
+				if (isset($sectionsContent[$part[0]]))
+				{
+					$sectionsContent[$part[0]] .= $res[$index];
+				}
+				else
+				{
+					$sectionsContent[$part[0]] = $res[$index];
+				}
 			}
 		}
 	}
@@ -131,5 +131,41 @@ class IniUtils
 	{
 		if (class_exists('KalturaLog') && KalturaLog::isInitialized())
 			KalturaLog::debug($msg);
+	}
+
+	/**
+	 * @param $path
+	 * @return string
+	 */
+	public static function getBatchConfigFromFS()
+	{
+		$batchConfigFolder = realpath(dirname(__FILE__) . '/../../configurations/batch');
+		$content = '';
+		$configFilePaths = self::getConfigFilePaths($batchConfigFolder);
+		foreach($configFilePaths as $configFilePath)
+		{
+			$content .= file_get_contents($configFilePath) . "\n";
+		}
+		return $content;
+	}
+
+	/**
+	 * @param $path
+	 * @return array
+	 */
+	protected static function getConfigFilePaths($path)
+	{
+		$configFilePaths = array();
+		$d = dir($path);
+		while (false !== ($file = $d->read()))
+		{
+			if(preg_match('/\.ini$/', $file))
+			{
+				$configFilePaths[] = $path . DIRECTORY_SEPARATOR . $file;
+			}
+		}
+		$d->close();
+
+		return $configFilePaths;
 	}
 }

@@ -22,8 +22,6 @@ class AnnotationService extends CuePointService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 
-		if(!AnnotationPlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, AnnotationPlugin::PLUGIN_NAME);
 	}
 
 	/**

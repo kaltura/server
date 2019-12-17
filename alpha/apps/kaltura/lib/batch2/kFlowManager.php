@@ -479,7 +479,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		$jobData->setMailPriority( kMailJobData::MAIL_PRIORITY_HIGH);
 		$jobData->setStatus(kMailJobData::MAIL_STATUS_PENDING);
 
-		KalturaLog::alert("Error in job [{$dbBatchJob->getId()}]\n".$exception);
+		KalturaLog::alert("Error in job [{$dbBatchJob->getId()}]\n".$exception->getMessage());
 
 		$jobData->setMailType(90); // is the email template
 		$jobData->setBodyParamsArray(array($dbBatchJob->getId(), $exception->getFile(), $exception->getLine(), $exception->getMessage(), $exception->getTraceAsString()));
@@ -695,7 +695,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 
 		if(kReplacementHelper::shouldSyncFlavorInfo($object, $entry))
 		{
-			$originalFlavor = kReplacementHelper::getOriginalReplacedFlavorByEntryAndFlavorParams($entry, $object->getFlavorParamsId());
+			$originalFlavor = kReplacementHelper::getOriginalReplacedFlavorByEntryAndFlavorParams($entry, $object->getFlavorParamsId(), $object->getType());
 			if($originalFlavor)
 			{
 				kReplacementHelper::syncReplacedAssetFields($originalFlavor, $object);

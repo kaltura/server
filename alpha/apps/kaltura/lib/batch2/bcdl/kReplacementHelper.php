@@ -276,8 +276,21 @@ class kReplacementHelper
 	{
 		$defaultThumbAssetOld = null;
 		$defaultThumbAssetNew = null;
+
 		$replacingEntry = $replacingEntryAsset->getentry();
+		if(!$replacingEntry)
+		{
+			KalturaLog::info("Replacing entry is missing");
+			return;
+		}
+
 		$replacedEntry = entryPeer::retrieveByPK($replacingEntry->getReplacedEntryId());
+		if(!$replacedEntry)
+		{
+			KalturaLog::info("Replaced entry is missing");
+			return;
+		}
+
 		KalturaLog::info("Copying flavor [{$replacingEntryAsset->getId()}] from replacing entry [{$replacingEntry->getId()}] to replaced entry [{$replacedEntry->getId()}]");
 		$oldAssets = assetPeer::retrieveByEntryIdAndParams($replacedEntry->getId(), $replacingEntryAsset->getFlavorParamsId());
 		if($oldAssets)
@@ -319,8 +332,6 @@ class kReplacementHelper
 			$oldFlavorNewMediaInfo->setFlavorAssetVersion($oldAsset->getVersion());
 			$oldFlavorNewMediaInfo->save();
 		}
-		
-		kQueryCache::invalidateQueryCache($oldAsset);
 	}
 
 	/**
@@ -334,7 +345,7 @@ class kReplacementHelper
 	 */
 	public static function getNonReadyReplacingFlavor($replacingEntryId, $flavorParamsId, $flavorType)
 	{
-		$invalidAssetStatusArray = array(flavorAsset::ASSET_STATUS_DELETED, flavorAsset::ASSET_STATUS_READY);
+		$invalidAssetStatusArray = array(flavorAsset::ASSET_STATUS_DELETED, flavorAsset::ASSET_STATUS_READY, flavorAsset::ASSET_STATUS_EXPORTING);
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $replacingEntryId);
 		$c->add(assetPeer::STATUS, $invalidAssetStatusArray, Criteria::NOT_IN);
@@ -410,14 +421,16 @@ class kReplacementHelper
 	 *
 	 * @param $replacingEntry
 	 * @param $flavorParamsId
+	 * @param $type
 	 * @return asset
 	 * @throws PropelException
 	 */
-	public static function getOriginalReplacedFlavorByEntryAndFlavorParams($replacingEntry, $flavorParamsId)
+	public static function getOriginalReplacedFlavorByEntryAndFlavorParams($replacingEntry, $flavorParamsId, $type)
 	{
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $replacingEntry->getReplacedEntryId());
 		$c->add(assetPeer::FLAVOR_PARAMS_ID, $flavorParamsId, Criteria::EQUAL);
+		$c->add(assetPeer::TYPE, $type, Criteria::EQUAL);
 		$newAsset = assetPeer::doSelectOne($c);
 		return $newAsset;
 	}
@@ -437,7 +450,7 @@ class kReplacementHelper
 
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $replacingEntryId);
-		$c->add(assetPeer::STATUS, asset::ASSET_STATUS_READY, Criteria::NOT_EQUAL);
+		$c->add(assetPeer::STATUS, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING), Criteria::NOT_IN);
 		$assets = assetPeer::doSelect($c);
 
 		// check if the asset doesnt already exist on the replaced entry
@@ -446,6 +459,7 @@ class kReplacementHelper
 			$c = new Criteria();
 			$c->add(assetPeer::ENTRY_ID, $replacedEntryId);
 			$c->add(assetPeer::FLAVOR_PARAMS_ID, $asset->getFlavorParamsId(), Criteria::EQUAL);
+			$c->add(assetPeer::TYPE, $asset->getType(), Criteria::EQUAL);
 			$originalAsset = assetPeer::doSelectOne($c);
 			if(!$originalAsset)
 			{
