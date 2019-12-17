@@ -100,7 +100,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	const CUSTOM_DATA_PREVIOUS_VERSION = "previousVersion";
 	const CUSTOM_DATA_ENCRYPTION_KEY = "encryptionKey";
 	
-	const MAX_ASSETS_PER_ENTRY = 500;
+	const MAX_ASSETS_PER_ENTRY = 2000;
 
 	const ASSET_TYPE = 'assetType';
 	
