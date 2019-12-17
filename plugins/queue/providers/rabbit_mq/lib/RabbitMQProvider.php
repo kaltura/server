@@ -132,7 +132,7 @@ class RabbitMQProvider extends QueueProvider
 				{
 					$connStart = microtime(true);
 					
-					$connection = new PhpAmqpLib\Connection\AMQPConnection($this->MQserver, $this->port, $this->username, $this->password, '/', 'AMQPLAIN', null, 'en_US', 1, 2, null, false, 0, 1);
+					$connection = new PhpAmqpLib\Connection\AMQPConnection($this->MQserver, $this->port, $this->username, $this->password, '/', false, 'AMQPLAIN', null, 'en_US', 1, 2, null, false, 0, 1);
 					
 					$connTook = microtime(true) - $connStart;
 					KalturaMonitorClient::monitorRabbitAccess($this->dataSourceUrl, self::RABBIT_ACTION_OPEN_CONNECTION, $connTook);
