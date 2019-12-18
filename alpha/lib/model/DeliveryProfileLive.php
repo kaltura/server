@@ -307,7 +307,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 
 	protected function getBaseUrl($serverNode, $streamFormat = null)
 	{
-		/* @var $serverNode WowzaMediaServerNode */
+		/* @var $serverNode MediaServerNode */
 		$protocol = $this->getDynamicAttributes()->getMediaProtocol();
 		$playbackHost = $serverNode->getPlaybackHost($protocol, $streamFormat, $this->getUrl());
 		$appNameAndPrefix = $serverNode->getAppNameAndPrefix();
@@ -320,7 +320,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	
 	protected function getLivePackagerUrl($serverNode, $streamFormat = null)
 	{
-		/* @var $serverNode WowzaMediaServerNode */
+		/* @var $serverNode MediaServerNode */
 		$protocol = $this->getDynamicAttributes()->getMediaProtocol();
 		$segmentDuration = $this->getDynamicAttributes()->getEntry()->getSegmentDuration();
 		

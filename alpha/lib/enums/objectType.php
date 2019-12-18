@@ -16,4 +16,5 @@ interface objectType extends BaseEnum
     const PERMISSION=9;
     const PERMISSIONITEM=10;
     const USERROLE=11;
+    const CATEGORY_ENTRY = 37;
 }

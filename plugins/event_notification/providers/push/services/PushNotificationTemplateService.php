@@ -154,4 +154,5 @@ class PushNotificationTemplateService extends KalturaBaseService
 			throw $e;
 		}
 	}
+
 }
