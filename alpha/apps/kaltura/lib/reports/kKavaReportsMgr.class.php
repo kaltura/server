@@ -68,6 +68,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_JOIN_TIME_COUNT = 'join_time_count';
 	const METRIC_UNIQUE_SESSIONS = 'unique_sessions';
 	const METRIC_UNIQUE_VIEWERS = 'unique_viewers';
+	const METRIC_NODE_UNIQUE_PERCENTILES_RATIO = 'node_avg_completion_rate';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -377,6 +378,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_AVG_JOIN_TIME => true,
 		self::METRIC_ENGAGEMENT_RANKING => true,
 		self::METRIC_UNIQUE_VIEWERS => true,
+		self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -1073,6 +1075,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_AVG_SESSION_ERROR_RATE, '/', array(
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_ERROR_SESSION_COUNT, self::METRIC_ERROR_SESSION_COUNT),
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_SESSIONS, self::METRIC_UNIQUE_SESSIONS))));
+
+		self::$metrics_def[self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO] = array(
+			self::DRUID_AGGR => array(self::EVENT_TYPE_NODE_PLAY, self::METRIC_UNIQUE_PERCENTILES_SUM),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO,
+				self::METRIC_UNIQUE_PERCENTILES_SUM,
+				self::EVENT_TYPE_NODE_PLAY));
 
 		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 	}
