@@ -173,6 +173,13 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $playbackContextIdsIn;
 
+	/**
+	 * filter by root entry ids
+	 *
+	 * @var string
+	 */
+	public $rootEntryIdIn;
+
 	private static $map_between_objects = array
 	(
 		'keywords',
@@ -199,6 +206,7 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'entryIdIn' => 'entries_ids',
 		'playbackTypeIn' => 'playback_types',
 		'playbackContextIdsIn' => 'playback_context_ids',
+		'rootEntryIdIn' => 'root_entries_ids',
 	);
 
 	protected function getMapBetweenObjects()

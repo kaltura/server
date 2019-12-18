@@ -1483,6 +1483,32 @@ class kKavaReports extends kKavaReportsMgr
 			),
 		),
 
+		ReportType::USER_INTERACTIVE_VIDEO => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'name' => self::DIMENSION_KUSER_ID
+			),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => 'name',
+				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo'
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_VIEW_PERIOD_PLAY_TIME, self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME),
+			self::REPORT_TOTAL_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_VIEW_PERIOD_PLAY_TIME, self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNIQUE_VIEWERS),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_VIEW_PERIOD_PLAY_TIME, self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME),
+		),
+
+		ReportType::INTERACTIVE_VIDEO_TOP_NODES => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'node_id' => self::DIMENSION_NODE_ID,
+			),
+			self::REPORT_FILTER_DIMENSION => self::DIMENSION_NODE_ID,
+			self::REPORT_METRICS => array(self::EVENT_TYPE_NODE_PLAY, self::METRIC_UNIQUE_USERS, self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_NODE_PLAY, self::METRIC_UNIQUE_USERS, self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO),
+			self::REPORT_COLUMN_MAP => array(
+				'count_node_plays' => self::EVENT_TYPE_NODE_PLAY,
+				'unique_known_users' => self::METRIC_UNIQUE_USERS,
+				'avg_completion_rate' => self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO,
+			),
+		),
 	);
 
 	public static function getReportDef($report_type)

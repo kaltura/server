@@ -292,6 +292,9 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 				case 3:
 					$type = 'SearchIndexFieldEscapeType::MD5_LOWER_CASE';
 					break;
+				case 5:
+					$type = 'SearchIndexFieldEscapeType::PREFIXED_MD5_LOWER_CASE';
+					break;
 			}
 			
 			$objectField = $this->toPeerName($object, $key);
@@ -314,6 +317,9 @@ class IndexObjectsGenerator extends IndexGeneratorBase
 					break;
 				case 3:
 					$type = 'SearchIndexFieldEscapeType::MD5_LOWER_CASE';
+					break;
+				case 5:
+					$type = 'SearchIndexFieldEscapeType::PREFIXED_MD5_LOWER_CASE';
 					break;
 			}
 				
