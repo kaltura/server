@@ -255,11 +255,13 @@ class kKavaQoeReports extends kKavaReportsMgr
 		ReportType::QOE_ENGAGEMENT => array(
 			self::REPORT_METRICS => array(
 				self::METRIC_UNIQUE_SESSIONS,
-				self::METRIC_AVG_VIEW_PLAY_TIME_SEC
+				self::METRIC_AVG_VIEW_PLAY_TIME_SEC,
+				self::METRIC_COUNT_EBVS
 			),
 			self::REPORT_GRAPH_METRICS => array(
 				self::METRIC_UNIQUE_SESSIONS,
-				self::METRIC_AVG_VIEW_PLAY_TIME_SEC
+				self::METRIC_AVG_VIEW_PLAY_TIME_SEC,
+				self::METRIC_COUNT_EBVS
 			)
 		),
 
