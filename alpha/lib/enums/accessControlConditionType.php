@@ -22,4 +22,5 @@ interface ConditionType extends BaseEnum
 	const ANONYMOUS_IP = 15;
 	const ASSET_TYPE = 16;
 	const BOOLEAN = 17;
+	const HTTP_HEADER = 18;
 }

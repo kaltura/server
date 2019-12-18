@@ -293,8 +293,8 @@ class kBusinessPostConvertDL
 				$inCompleteFlavorIds[] = $inCompleteFlavorId;
 				
 			KalturaLog::info('Convert Finished - has In-Complete Required flavors [[' . print_r($inCompleteRequiredFlavorParamsIds, true) . ']');
-		} 
-		elseif($currentFlavorAsset->getStatus() == asset::ASSET_STATUS_READY && ($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL || $currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED))
+		}
+		elseif (self::shouldUpdateEntry($entry, $currentFlavorAsset, $currentReadyBehavior))
 		{
 			// mark the entry as ready if all required conversions completed or any of the optionals
 			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
@@ -353,7 +353,33 @@ class kBusinessPostConvertDL
 		
 		return $dbBatchJob;
 	}
-	
+
+	/**
+	 * @param $entry
+	 * @param $currentFlavorAsset
+	 * @param $currentReadyBehavior
+	 * @return bool
+	 */
+	protected static function shouldUpdateEntry($entry, $currentFlavorAsset, $currentReadyBehavior)
+	{
+		if ($currentFlavorAsset->getStatus() != asset::ASSET_STATUS_READY)
+		{
+			return false;
+		}
+
+		if (in_array($currentReadyBehavior, array(flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE, flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT)))
+		{
+			return false;
+		}
+
+		if ($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $entry->getReplacedEntryId())
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertCollectionJobData $data
