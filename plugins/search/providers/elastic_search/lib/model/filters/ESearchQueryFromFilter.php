@@ -4,8 +4,6 @@
  * @subpackage model.filters
  */
 
-
-
 class ESearchQueryFromFilter
 {
 	protected $searchItems;
@@ -146,9 +144,9 @@ class ESearchQueryFromFilter
 	{
 		$objectOrder = array();
 		$index = 0;
-		foreach($elasticSortedResults as $key=>$value)
+		foreach($elasticSortedResults as $key => $value)
 		{
-			$objectOrder[$key]=$index;
+			$objectOrder[$key] = $index;
 			$index++;
 		}
 		usort($coreObjects, self::buildSorter($objectOrder));
