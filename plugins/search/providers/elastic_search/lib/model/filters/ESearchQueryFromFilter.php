@@ -132,7 +132,7 @@ class ESearchQueryFromFilter
 		return array ($entryIds, $objectCount);
 	}
 
-	public static function buildSorter($objectsOrder)
+    protected static function buildSorter($objectsOrder)
 	{
 		return function ($a, $b) use ($objectsOrder)
 		{
@@ -140,7 +140,7 @@ class ESearchQueryFromFilter
 		};
 	}
 
-	public static function sortResults($elasticSortedResults,&$coreObjects)
+	protected static function sortResults($elasticSortedResults,&$coreObjects)
 	{
 		$objectOrder = array();
 		$index = 0;
