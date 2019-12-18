@@ -121,6 +121,7 @@ class RabbitMQProvider extends QueueProvider
 			try
 			{
 				$channel->basic_publish($msg, $this->exchangeName, $queueName);
+				break;
 			}
 			catch (PhpAmqpLib\Exception\AMQPTimeoutException $e)
 			{
