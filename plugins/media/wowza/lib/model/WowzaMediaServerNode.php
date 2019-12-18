@@ -116,7 +116,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 
 	public function getEnvDc()
 	{
-		return "dc-". $this->getDc();
+		return 'dc-' . $this->getDc();
 	}
 
 	protected function getDomainByProtocolAndFormat($mediaServerConfig, $protocol = 'http', $format = null)
