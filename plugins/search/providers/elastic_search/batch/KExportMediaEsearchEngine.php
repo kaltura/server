@@ -15,7 +15,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	
 	public function fillCsv(&$csvFile, &$data)
 	{
-		KalturaLog::info ('Exporting content for media items through Esearch');
+		KalturaLog::info ('Exporting content for media items through Esearch, data:'.json_encode($data));
 		$entrySearchParams = clone $data->searchParams;
 		
 		$results = KalturaElasticSearchClientPlugin::get(KBatchBase::$kClient)->eSearch->searchEntry($entrySearchParams);
@@ -144,7 +144,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	 * @return false|string
 	 */
 	protected function makeTimeStampHumanReadableIfNeeded($timestamp, $data) {
-		if($data->options != ExportToCsvOptionsType::HUMAN_READABLE_DATES) {
+		if($data->options != KalturaExportToCsvOptionsType::HUMAN_READABLE_DATES) {
 			return $timestamp;
 		}
 		return date(self::DATE_FORMAT, $timestamp);
