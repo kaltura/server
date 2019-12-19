@@ -597,8 +597,8 @@ class LiveStreamService extends KalturaLiveEntryService
         }
         $cuePoints = CuePointPeer::retrieveByEntryId($liveEntryId);
 
-        $notDeletedCuePointTags = array("entry-reset-mode", "webcast:internal-state", "player-qna-settings-update",
-            "select-deck-document", "poll-data", "timeline-assets-state", "rtc-settings");
+        $notDeletedCuePointTags = ["entry-reset-mode", "webcast:internal-state", "player-qna-settings-update",
+            "select-deck-document", "poll-data", "timeline-assets-state", "rtc-settings"];
 
         foreach ($cuePoints as $cuePoint)
         {
