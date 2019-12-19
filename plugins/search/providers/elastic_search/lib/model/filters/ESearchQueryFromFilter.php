@@ -132,10 +132,31 @@ class ESearchQueryFromFilter
 		return array ($entryIds, $objectCount);
 	}
 
+	protected static function buildSorter($objectsOrder)
+	{
+		return function ($a, $b) use ($objectsOrder)
+		{
+			return ($objectsOrder[$a->getId()] > $objectsOrder[$b->getId()]) ? 1 : -1;
+		};
+	}
+
+	protected static function sortResults($elasticSortedResults,&$coreObjects)
+	{
+		$objectOrder = array();
+		$index = 0;
+		foreach($elasticSortedResults as $key => $value)
+		{
+			$objectOrder[$key] = $index;
+			$index++;
+		}
+		usort($coreObjects, self::buildSorter($objectOrder));
+	}
+
 	public function retrieveElasticQueryCoreEntries(baseObjectFilter $filter, kPager $pager)
 	{
 		list($coreResults, $objectCount, $entrySearch) = self::retrieveElasticQueryEntriesResult($filter, $pager);
 		$coreObjects = $entrySearch->fetchCoreObjectsByIds(array_keys($coreResults));
+		self::sortResults($coreResults, $coreObjects);
 		return array($coreObjects, $objectCount);
 	}
 

@@ -1501,12 +1501,12 @@ class kKavaReports extends kKavaReportsMgr
 				'node_id' => self::DIMENSION_NODE_ID,
 			),
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_NODE_ID,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_NODE_PLAY, self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_PERCENTILES_RATIO),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_NODE_PLAY, self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_PERCENTILES_RATIO),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_NODE_PLAY, self::METRIC_UNIQUE_USERS, self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_NODE_PLAY, self::METRIC_UNIQUE_USERS, self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO),
 			self::REPORT_COLUMN_MAP => array(
 				'count_node_plays' => self::EVENT_TYPE_NODE_PLAY,
 				'unique_known_users' => self::METRIC_UNIQUE_USERS,
-				'avg_completion_rate' => self::METRIC_UNIQUE_PERCENTILES_RATIO,
+				'avg_completion_rate' => self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO,
 			),
 		),
 	);

@@ -23,11 +23,6 @@ abstract class DeliveryServerNode extends ServerNode {
 		return $protocol . '://' . rtrim($playbackHost, '/') . '/';
 	}
 
-	public function getAppNameAndPrefix()
-	{
-		return '';
-	}
-
 	/* Delivery Settings */
 	public function setDeliveryProfileIds($params)
 	{
