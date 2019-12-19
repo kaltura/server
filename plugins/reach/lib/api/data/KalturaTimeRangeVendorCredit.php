@@ -68,7 +68,7 @@ class KalturaTimeRangeVendorCredit extends KalturaVendorCredit
 
 		if (isset($this->fromDate))
 		{
-			if ( method_exists($sourceObject,'getToDate') && $this->fromDate > $sourceObject->getToDate())
+			if ($this->fromDate > $sourceObject->getToDate())
 				throw new KalturaAPIException(KalturaReachErrors::INVALID_CREDIT_DATES , $this->fromDate, $sourceObject->getToDate());
 		}
 	}
