@@ -68,17 +68,6 @@
         php /opt/kaltura/app/deployment/base/scripts/populateSphinxCategories.php
 
 
-## Enabling auto archive when using live with recording ##
-- Issue Type: Task
-- Issue ID : WEBC-1574
-
-### Configuration ##
-none.
-
-#### Deployment Scripts ####
-Run 'php /opt/kaltura/app/deployment/updates/scripts/2019_12_10_update_archive_permissions.php'
-
-
 ## Reach boolean event notification for privacy context ##
 - Issue Type: Task
 - Issue ID : REACH2-737
