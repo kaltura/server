@@ -27,11 +27,6 @@ class categoryIndex extends BaseIndexObject
 	{
 		return 'id';
 	}
-	
-	public static function getSphinxSplitIndexFieldName()
-	{
-		return 'category.PARTNER_ID';
-	}
 
 	public static function getPropelIdField()
 	{
@@ -216,8 +211,8 @@ class categoryIndex extends BaseIndexObject
 		if (!self::$searchEscapeTypes)
 		{
 			self::$searchEscapeTypes = array(
-				'category.FULL_NAME' => SearchIndexFieldEscapeType::PREFIXED_MD5_LOWER_CASE,
-				'category.FULL_IDS' => SearchIndexFieldEscapeType::PREFIXED_MD5_LOWER_CASE,
+				'category.FULL_NAME' => SearchIndexFieldEscapeType::MD5_LOWER_CASE,
+				'category.FULL_IDS' => SearchIndexFieldEscapeType::MD5_LOWER_CASE,
 			);
 		}
 		return self::$searchEscapeTypes;
