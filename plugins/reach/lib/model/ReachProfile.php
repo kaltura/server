@@ -424,28 +424,26 @@ class ReachProfile extends BaseReachProfile
 		
 		return false;
 	}
-
+	
 	public function syncCreditPercentageUsage()
 	{
 		//We updated the credit usage while using a custom query so we need to reload the object from the DB
 		$this->reload();
-		$this->calculateCreditPercentUsage();
-		$this->save();
-	}
-
-	public function calculateCreditPercentUsage()
-	{
+		
 		$currentCredit = $this->getCredit()->getCurrentCredit(false);
 		$creditUsagePercentage = ($currentCredit == ReachProfileCreditValues::UNLIMITED_CREDIT) ? 0 : 100;
-		if ($currentCredit != 0 && $currentCredit != ReachProfileCreditValues::UNLIMITED_CREDIT)
+		
+		if($currentCredit != 0 && $currentCredit != ReachProfileCreditValues::UNLIMITED_CREDIT)
 		{
 			$usedCredit = $this->getUsedCredit();
-			$creditUsagePercentage = ($usedCredit / $currentCredit) * 100;
-			KalturaLog::debug('Sync reach profile ' . $this->getId() . " percentage [$creditUsagePercentage] according to used credit[$usedCredit] and current credit [$currentCredit] ");
+			$creditUsagePercentage = ($usedCredit/$currentCredit)*100;
+			KalturaLog::debug('Sync reach profile '. $this->getId() . " percentage [$creditUsagePercentage] according to used credit[$usedCredit] and current credit [$currentCredit] ");
 		}
+		
 		$this->setCreditUsagePercentage($creditUsagePercentage);
+		$this->save();
 	}
-
+	
 	/**
 	 * Validate if the entry should be exported to the remote storage according to the defined export rules
 	 *
