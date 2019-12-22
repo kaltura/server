@@ -105,8 +105,8 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 			$entry->tags,
 			implode (',', $entryCategories),
 			$entry->userId,
-			$this->makeTimeStampHumanReadableIfNeeded($entry->createdAt, $data),
-			$this->makeTimeStampHumanReadableIfNeeded($entry->updatedAt, $data),
+			$this->formatTimestamp($entry->createdAt, $data->options),
+			$this->formatTimestamp($entry->updatedAt, $data->options),
 		);
 		
 		return $values;
@@ -139,12 +139,12 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 		return $result;
 	}
 	/**
-	 * @param $timestamp
-	 * @param $data
+	 * @param int $timestamp
+	 * @param int $options
 	 * @return false|string
 	 */
-	protected function makeTimeStampHumanReadableIfNeeded($timestamp, $data) {
-		if($data->options != KalturaExportToCsvOptionsType::HUMAN_READABLE_DATES) {
+	protected function formatTimestamp($timestamp, $options) {
+		if($options != KalturaExportToCsvOptionsType::HUMAN_READABLE_DATES) {
 			return $timestamp;
 		}
 		return date(self::DATE_FORMAT, $timestamp);
