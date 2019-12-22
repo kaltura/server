@@ -58,7 +58,7 @@
         
         index kaltura_category_0:kaltura_category_base
         {
-        	path	 = /opt/kaltura/sphinx-populate-Orion-15.9.0/kaltura_category_rt_0
+        	path	 = /opt/kaltura/sphinx/kaltura_category_rt_0
         }
         
         duplicate the above index to kaltura_category_0 .... kaltura_category_9
