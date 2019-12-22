@@ -582,13 +582,13 @@ class LiveStreamService extends KalturaLiveEntryService
      *
      * @action archive
      * @param string $liveEntryId
-     * @param string $notDeletedCuePointTags
+     * @param KalturaLiveEntryArchiveOptions $archiveOptions
      * @return bool
      * @throws KalturaAPIException
      * @throws KalturaClientException
      * @throws PropelException
      */
-	public function archiveAction($liveEntryId, $notDeletedCuePointTags)
+	public function archiveAction($liveEntryId, KalturaLiveEntryArchiveOptions $archiveOptions)
     {
         $liveEntry = entryPeer::retrieveByPK($liveEntryId);
         /** @var LiveStreamEntry $liveEntry */
@@ -601,8 +601,7 @@ class LiveStreamService extends KalturaLiveEntryService
 
         $shouldBeDeletedCuePoints = array();
 
-        $notDeletedCuePointTagsArray = explode(",", $notDeletedCuePointTags);
-
+        $notDeletedCuePointTagsArray = explode(",", $archiveOptions->notDeletedCuePointTags);
         foreach ($cuePoints as $cuePoint)
         {
             /** @var CuePoint $cuePoint */

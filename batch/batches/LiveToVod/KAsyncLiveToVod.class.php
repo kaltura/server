@@ -45,9 +45,9 @@ class KAsyncLiveToVod extends KJobHandlerWorker
             $recordStatus = $liveEntry->recordingStatus;
             $shouldAutoArchive = $liveEntry->recordingOptions->shouldAutoArchive;
             if ($recordStatus == KalturaRecordStatus::PER_SESSION && $shouldAutoArchive == KalturaNullableBoolean::TRUE_VALUE) {
-                $notDeletedCuePointTags = "entry-reset-mode,webcast:internal-state,player-qna-settings-update,
-                   select-deck-document,poll-data,timeline-assets-state,rtc-settings";
-                KBatchBase::$kClient->liveStream->archive($liveEntryId, $notDeletedCuePointTags);
+                $archiveOptions = new KalturaLiveEntryArchiveOptions();
+                $archiveOptions->notDeletedCuePointTags = "entry-reset-mode,webcast:internal-state,player-qna-settings-update,select-deck-document,poll-data,timeline-assets-state,rtc-settings";
+                KBatchBase::$kClient->liveStream->archive($liveEntryId, $archiveOptions);
             }
         }
         catch (Exception $e)
