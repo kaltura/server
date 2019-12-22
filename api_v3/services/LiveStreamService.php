@@ -675,4 +675,5 @@ class LiveStreamService extends KalturaLiveEntryService
         }
         return true;
     }
+
 }
