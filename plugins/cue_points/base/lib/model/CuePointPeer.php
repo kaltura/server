@@ -365,4 +365,17 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	
 		return true;
 	}
+
+	public static function setCuePointsStatus($ids, $newStatus)
+    {
+        $c = new Criteria();
+        $c->add(CuePointPeer::ID, $ids, Criteria::IN);
+        $c->add(CuePointPeer::STATUS, $newStatus, Criteria::NOT_EQUAL);
+
+        $update = new Criteria();
+        $update->add(CuePointPeer::STATUS, $newStatus);
+
+        $con = Propel::getConnection(MetadataPeer::DATABASE_NAME);
+        return BasePeer::doUpdate($c, $update, $con);
+    }
 }

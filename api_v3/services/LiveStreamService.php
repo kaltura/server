@@ -582,11 +582,13 @@ class LiveStreamService extends KalturaLiveEntryService
      *
      * @action archive
      * @param string $liveEntryId
+     * @param string $notDeletedCuePointTags
      * @return bool
      * @throws KalturaAPIException
+     * @throws KalturaClientException
      * @throws PropelException
      */
-	public function archiveAction($liveEntryId)
+	public function archiveAction($liveEntryId, $notDeletedCuePointTags)
     {
         $liveEntry = entryPeer::retrieveByPK($liveEntryId);
         /** @var LiveStreamEntry $liveEntry */
@@ -597,8 +599,9 @@ class LiveStreamService extends KalturaLiveEntryService
         }
         $cuePoints = CuePointPeer::retrieveByEntryId($liveEntryId);
 
-        $notDeletedCuePointTags = ["entry-reset-mode", "webcast:internal-state", "player-qna-settings-update",
-            "select-deck-document", "poll-data", "timeline-assets-state", "rtc-settings"];
+        $shouldBeDeletedCuePoints = array();
+
+        $notDeletedCuePointTagsArray = explode(",", $notDeletedCuePointTags);
 
         foreach ($cuePoints as $cuePoint)
         {
@@ -606,7 +609,7 @@ class LiveStreamService extends KalturaLiveEntryService
             KalturaLog::info("Iterating over cue point [" . $cuePoint->getId() . "]");
             $cuePointTags = explode(',', $cuePoint->getTags());
             $containsImportantTag = false;
-            foreach ($notDeletedCuePointTags as $importantCuePointTag)
+            foreach ($notDeletedCuePointTagsArray as $importantCuePointTag)
             {
                 if (in_array($importantCuePointTag, $cuePointTags))
                 {
@@ -616,10 +619,11 @@ class LiveStreamService extends KalturaLiveEntryService
             }
             if (!$containsImportantTag)
             {
-                $cuePoint->setStatus(CuePointStatus::DELETED);
-                $cuePoint->save();
+                $shouldBeDeletedCuePoints[] = $cuePoint->getId();
             }
         }
+
+        CuePointPeer::setCuePointsStatus($shouldBeDeletedCuePoints, CuePointStatus::DELETED);
 
         $vodEntry = entryPeer::retrieveByPK($liveEntry->getRecordedEntryId());
         if (!$vodEntry)
