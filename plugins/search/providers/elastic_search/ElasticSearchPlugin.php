@@ -189,15 +189,14 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
 		return array();
 	}
 
-	public static function canExecuteFilter(KalturaRelatedFilter $filter, KalturaDetachedResponseProfile $responseProfile = null)
+	public static function canExecuteFilter(KalturaRelatedFilter $filter, $coreFilter, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$adapter = ESearchAdapterFactory::getAdapter($filter);
-		return !$responseProfile && self::isValidClientsTagsForFilterExecutor() && $adapter && $adapter::canTransformFilter($filter->toObject());
+		return !$responseProfile && self::isValidClientsTagsForFilterExecutor() && $adapter && $adapter::canTransformFilter($coreFilter);
 	}
 
-	public static function executeFilter(KalturaRelatedFilter $filter, KalturaFilterPager $pager)
+	public static function executeFilter(KalturaRelatedFilter $filter,$coreFilter, KalturaFilterPager $pager)
 	{
-		$coreFilter = $filter->toObject();
 		$corePager = $pager->toObject();
 		$eSearchAdapter = ESearchAdapterFactory::getAdapter($filter);
 		list($list, $totalCount) = $eSearchAdapter->retrieveElasticQueryCoreEntries($coreFilter, $corePager);

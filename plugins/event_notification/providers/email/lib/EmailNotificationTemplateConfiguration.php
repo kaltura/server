@@ -125,11 +125,13 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
                     $fullEmailRecipientsValue .= trim($currentRecipient->email->value) . ';';
                 }
                 $headerObject = new Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient();
+                $headerObject->email = new stdClass();
                 $headerObject->email->value = $fullEmailRecipientsValue;
                 if ($object->$headerName->emailRecipients)
                 {
                     $firstRecipient = $object->$headerName->emailRecipients[0];
-                    $headerObject->name->value = $firstRecipient->name->value;
+                    $headerObject->name = new stdClass();
+                    $headerObject->name->value = isset($firstRecipient->name->value)? $firstRecipient->name->value : '';
                 }
             }
 

@@ -29,6 +29,11 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 	public $rawData;
 
 	/**
+	 * @var string
+	 */
+	public $userId;
+
+	/**
 	 * IsEditable - true / false
 	 *
 	 * @var bool

@@ -64,7 +64,8 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_FLAVOR_PARAMS_ID = 'flavorParamsId';
 	const DIMENSION_PLAYER_VERSION = 'playerVersion';
 	const DIMENSION_POSITION = 'position';
-
+	const DIMENSION_ROOT_ENTRY_ID = 'rootEntryId';
+	const DIMENSION_NODE_ID = 'nodeId';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -109,6 +110,7 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_ERROR = 'error';
 	const EVENT_TYPE_VIEW = 'view';
 	const EVENT_TYPE_VIEW_PERIOD = 'viewPeriod';
+	const EVENT_TYPE_NODE_PLAY = 'nodePlay';
 
 	// event types - storage / entry lifecycle
 	const EVENT_TYPE_STATUS = 'status';
@@ -182,6 +184,8 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_CUSTOM_VAR2 => 1,
 			self::DIMENSION_CUSTOM_VAR3 => 1,
 			self::DIMENSION_EVENT_PROPERTIES => 1,
+			self::DIMENSION_ROOT_ENTRY_ID => 1,
+			self::DIMENSION_NODE_ID => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,

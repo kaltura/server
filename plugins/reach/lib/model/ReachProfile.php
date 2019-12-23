@@ -437,6 +437,7 @@ class ReachProfile extends BaseReachProfile
 		{
 			$usedCredit = $this->getUsedCredit();
 			$creditUsagePercentage = ($usedCredit/$currentCredit)*100;
+			KalturaLog::debug('Sync reach profile '. $this->getId() . " percentage [$creditUsagePercentage] according to used credit[$usedCredit] and current credit [$currentCredit] ");
 		}
 		
 		$this->setCreditUsagePercentage($creditUsagePercentage);
