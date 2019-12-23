@@ -21,4 +21,15 @@ class KalturaExportToCsvOptions extends KalturaObject
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
 	}
+
+	/* (non-PHPdoc)
+ 	* @see KalturaObject::toObject()
+ 	*/
+	public function toObject($dbAdditionalField = null, $skip = array())
+	{
+		if(!$dbAdditionalField)
+			$dbAdditionalField = new kFormatField();
+
+		return parent::toObject($dbAdditionalField, $skip);
+	}
 }
