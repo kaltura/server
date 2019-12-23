@@ -143,10 +143,13 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	 * @param int $options
 	 * @return false|string
 	 */
-	protected function formatTimestamp($timestamp, $options) {
-		if($options != KalturaExportToCsvOptionsType::HUMAN_READABLE_DATES) {
-			return $timestamp;
+	protected function formatTimestamp($timestamp, $options)
+	{
+		switch($options){
+			case KalturaExportToCsvOptionsType::HUMAN_READABLE_DATES:
+				return date(self::DATE_FORMAT, $timestamp);
+			default:
+				return $timestamp;
 		}
-		return date(self::DATE_FORMAT, $timestamp);
 	}
 }
