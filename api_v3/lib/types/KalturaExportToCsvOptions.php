@@ -11,4 +11,14 @@ class KalturaExportToCsvOptions extends KalturaObject
 	 * @var string
 	 */
 	public $format;
+
+	private static $mapBetweenObjects = array
+	(
+		"format",
+	);
+
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+	}
 }
