@@ -14,7 +14,7 @@ class KalturaExportToCsvOptions extends KalturaObject
 
 	private static $mapBetweenObjects = array
 	(
-		"format",
+		'format',
 	);
 
 	public function getMapBetweenObjects()
