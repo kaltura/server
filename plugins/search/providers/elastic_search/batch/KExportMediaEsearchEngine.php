@@ -141,11 +141,13 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	 * @param array $options
 	 * @return false|string
 	 */
-	protected function formatTimestamp($timestamp, array $options)
+	protected function formatTimestamp($timestamp, $options)
 	{
-		foreach($options as $option){
-			if($option instanceof KalturaExportToCsvOptions) {
-				return date($option->format, $timestamp);
+		if(is_array($options)) {
+			foreach($options as $option){
+				if($option instanceof KalturaExportToCsvOptions) {
+					return date($option->format, $timestamp);
+				}
 			}
 		}
 		return $timestamp;
