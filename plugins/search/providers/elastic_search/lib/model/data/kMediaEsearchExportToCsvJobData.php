@@ -7,7 +7,7 @@
 class kMediaEsearchExportToCsvJobData extends kExportCsvJobData
 {
 	/**
-	 * @var bool
+	 * @var array
 	 */
 	private $options;
 	/**
