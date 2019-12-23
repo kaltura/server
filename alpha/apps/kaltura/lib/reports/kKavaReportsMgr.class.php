@@ -332,6 +332,9 @@ class kKavaReportsMgr extends kKavaBase
 		self::MEDIA_TYPE_AUDIO => 'count_audio',
 		self::MEDIA_TYPE_IMAGE => 'count_image',
 		self::MEDIA_TYPE_SHOW => 'count_mix',
+		self::EVENT_TYPE_BUFFER_START => 'count_buffer_start',
+		self::EVENT_TYPE_FLAVOR_SWITCH => 'count_flavor_switch',
+		self::EVENT_TYPE_PLAY_REQUESTED => 'count_play_requested',
 	);
 
 	//global transform
