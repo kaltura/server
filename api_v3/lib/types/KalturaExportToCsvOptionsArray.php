@@ -6,12 +6,9 @@
  */
 class KalturaExportToCsvOptionsArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
+	public static function fromDbArray(array $arr = null, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaExportToCsvOptionsArray();
-		if ($arr == null)
-			return $newArr;
-
 		foreach ($arr as $obj)
 		{
 			$nObj = new KalturaExportToCsvOptions();
