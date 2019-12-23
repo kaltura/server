@@ -144,7 +144,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	protected function formatTimestamp($timestamp, array $options)
 	{
 		foreach($options as $option){
-			if($option instanceof KalturaHumanReadable) {
+			if($option instanceof KalturaExportToCsvOptions) {
 				return date($option->format, $timestamp);
 			}
 		}

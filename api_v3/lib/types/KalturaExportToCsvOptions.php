@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaHumanReadable extends KalturaObject
+class KalturaExportToCsvOptions extends KalturaObject
 {
 	/**
 	 * The format of the outputted date string.

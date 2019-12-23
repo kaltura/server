@@ -14,7 +14,7 @@ class KalturaExportToCsvOptionsArray extends KalturaTypedArray
 
 		foreach ($arr as $obj)
 		{
-			$nObj = new KalturaHumanReadable();
+			$nObj = new KalturaExportToCsvOptions();
 			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
