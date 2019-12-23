@@ -11,14 +11,16 @@ class kFormatField
 	/**
 	 * @return string
 	 */
-	public function getFormat() {
+	public function getFormat()
+	{
 		return $this->format;
 	}
 
 	/**
 	 * @param string $format
 	 */
-	public function setFormat($format) {
+	public function setFormat($format)
+	{
 		$this->format = $format;
 	}
 }
