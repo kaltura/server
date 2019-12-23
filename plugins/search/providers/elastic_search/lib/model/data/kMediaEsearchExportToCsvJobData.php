@@ -15,14 +15,14 @@ class kMediaEsearchExportToCsvJobData extends kExportCsvJobData
 	 */
 	protected $searchParams;
 	/**
-	 * @return bool
+	 * @return array
 	 */
 	public function getoptions()
 	{
 		return $this->options;
 	}
 	/**
-	 * @param bool $options
+	 * @param array $options
 	 */
 	public function setOptions($options)
 	{
