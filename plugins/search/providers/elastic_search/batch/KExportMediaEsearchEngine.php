@@ -10,8 +10,6 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	const LIMIT = 10000;
 	
 	const PAGE_SIZE = 500;
-
-	const DATE_FORMAT = 'c';
 	
 	public function fillCsv(&$csvFile, &$data)
 	{
@@ -140,16 +138,16 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	}
 	/**
 	 * @param int $timestamp
-	 * @param int $options
+	 * @param array $options
 	 * @return false|string
 	 */
-	protected function formatTimestamp($timestamp, $options)
+	protected function formatTimestamp($timestamp, array $options)
 	{
-		switch($options){
-			case KalturaExportToCsvOptionsType::HUMAN_READABLE_DATES:
-				return date(self::DATE_FORMAT, $timestamp);
-			default:
-				return $timestamp;
+		foreach($options as $option){
+			if($option instanceof KalturaHumanReadable) {
+				return date($option->format, $timestamp);
+			}
 		}
+		return $timestamp;
 	}
 }

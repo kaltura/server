@@ -14,7 +14,7 @@ class KalturaMediaEsearchExportToCsvJobData extends KalturaExportCsvJobData
 	public $searchParams;
 	/**
 	 * options
-	 * @var KalturaExportToCsvOptionsType
+	 * @var KalturaExportToCsvOptionsArray
 	 */
 	public $options;
 	
