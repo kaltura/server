@@ -10,11 +10,17 @@ class KalturaApFeedDropFolder extends KalturaFeedDropFolder
 	 */
 	public $apApiKey;
 	
+	/**
+	 * @var KalturaStringValueArray
+	 */
+	public $itemsToExpand;
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
 	 */
 	private static $map_between_objects = array(
 		'apApiKey',
+		'itemsToExpand',
 	);
 	
 	public function getMapBetweenObjects()
