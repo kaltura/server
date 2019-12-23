@@ -11,9 +11,9 @@ class infraRequestUtils
 {
 	const PROTOCOL_HTTP = 'http';
 	const PROTOCOL_HTTPS = 'https';
-
 	const DEFAULT_HTTP_TIME = 'Sun, 19 Nov 2000 08:52:00 GMT';
-	
+	const CLIENT_TAG = 'clientTag';
+
 	protected static $isInGetRemoteAddress = false;
 	protected static $remoteAddress = array();
 	protected static $requestParams = null;

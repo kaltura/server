@@ -214,6 +214,11 @@ class DeliveryProfileDynamicAttributes {
 	protected $maxBitrate = null;
 
 	/**
+	 * @var string
+	 */
+	protected $muxedAudioLanguage = null;
+
+	/**
 	 * @return the $addThumbnailExtension
 	 */
 	public function getAddThumbnailExtension() {
@@ -829,6 +834,22 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getMuxedAudioLanguage()
+	{
+		return $this->muxedAudioLanguage;
+	}
+
+	/**
+	 * @param string $muxedAudioLanguage
+	 */
+	public function setMuxedAudioLanguage($muxedAudioLanguage)
+	{
+		$this->muxedAudioLanguage = $muxedAudioLanguage;
+	}
+
+	/**
 	 * 
 	 * @param int $storageId
 	 * @param string $entryId
@@ -885,6 +906,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->edgeServerFallback = $newObj->getEdgeServerFallback();
 		$this->minBitrate = $newObj->getMinBitrate();
 		$this->maxBitrate = $newObj->getMaxBitrate();
+		$this->muxedAudioLanguage = $newObj->getMuxedAudioLanguage();
 	}
 }
 

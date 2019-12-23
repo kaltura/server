@@ -317,6 +317,18 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 
 			return $md5Str;
 		}
+		elseif($escapeType == SearchIndexFieldEscapeType::PREFIXED_MD5_LOWER_CASE)
+		{
+			$str = strtolower($str);
+			
+			if(substr($str, -2) == '\*')
+				return '&' . md5(substr($str, 0, strlen($str) - 2)) . '\\\*';
+			
+			$md5Str = '&' . md5($str);
+			KalturaLog::debug('md5(' . $str . ')' . ' = ' . $md5Str );
+			
+			return $md5Str;
+		}
 		elseif($escapeType == SearchIndexFieldEscapeType::NO_ESCAPE)
 		{
 			return $str;

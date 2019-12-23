@@ -49,6 +49,7 @@ class ESearchQueryFromFilter
 	public static function canTransformFilter($filter)
 	{
 		$result = true;
+		$emptyFilter = true;
 		foreach($filter->fields as $field => $fieldValue)
 		{
 			if($field === entryFilter::ORDER)
@@ -63,11 +64,20 @@ class ESearchQueryFromFilter
 			}
 
 			list( , $operator, $fieldName) = $fieldParts;
-			if(!in_array($fieldName, static::getSupportedFields()) && !(is_null($fieldValue) || $fieldValue == ''))
+			if(!(is_null($fieldValue) || $fieldValue == ''))
 			{
-				KalturaLog::debug('Cannot convert field:' . $fieldName);
-				return false;
+				$emptyFilter = false;
+				if (!in_array($fieldName, static::getSupportedFields()))
+				{
+					KalturaLog::debug('Cannot convert field:' . $fieldName);
+					return false;
+				}
 			}
+		}
+
+		if($emptyFilter)
+		{
+			return false;
 		}
 
 		if($filter->getAdvancedSearch())
@@ -78,6 +88,11 @@ class ESearchQueryFromFilter
 		return $result;
 	}
 
+	/**
+	 * @param baseObjectFilter $filter
+	 * @return array
+	 * @throws KalturaAPIException
+	 */
 	public function createElasticQueryFromFilter(baseObjectFilter $filter)
 	{
 		$this->init();
@@ -117,10 +132,31 @@ class ESearchQueryFromFilter
 		return array ($entryIds, $objectCount);
 	}
 
+	protected static function buildSorter($objectsOrder)
+	{
+		return function ($a, $b) use ($objectsOrder)
+		{
+			return ($objectsOrder[$a->getId()] > $objectsOrder[$b->getId()]) ? 1 : -1;
+		};
+	}
+
+	protected static function sortResults($elasticSortedResults,&$coreObjects)
+	{
+		$objectOrder = array();
+		$index = 0;
+		foreach($elasticSortedResults as $key => $value)
+		{
+			$objectOrder[$key] = $index;
+			$index++;
+		}
+		usort($coreObjects, self::buildSorter($objectOrder));
+	}
+
 	public function retrieveElasticQueryCoreEntries(baseObjectFilter $filter, kPager $pager)
 	{
 		list($coreResults, $objectCount, $entrySearch) = self::retrieveElasticQueryEntriesResult($filter, $pager);
 		$coreObjects = $entrySearch->fetchCoreObjectsByIds(array_keys($coreResults));
+		self::sortResults($coreResults, $coreObjects);
 		return array($coreObjects, $objectCount);
 	}
 
