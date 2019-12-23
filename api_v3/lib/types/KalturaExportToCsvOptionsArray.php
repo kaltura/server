@@ -16,7 +16,7 @@ class KalturaExportToCsvOptionsArray extends KalturaTypedArray
 			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
-		KalturaLog::log("2:".print_r($arr, true));
+		KalturaLog::log("az2:".print_r($arr, true));
 		return $newArr;
 	}
 
