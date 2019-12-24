@@ -6,8 +6,8 @@
 class KalturaExportToCsvOptions extends KalturaObject
 {
 	/**
-	 * The format of the outputted date string.
-	 *
+	 * The format of the outputted date string. There are also several predefined date constants that may be used instead, so for example DATE_RSS contains the format string 'D, d M Y H:i:s'.
+	 * https://www.php.net/manual/en/function.date.php
 	 * @var string
 	 */
 	public $format;
