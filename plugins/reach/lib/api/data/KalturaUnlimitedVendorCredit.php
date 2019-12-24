@@ -39,7 +39,7 @@ class KalturaUnlimitedVendorCredit extends KalturaBaseVendorCredit
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyNotNull("fromDate");
-		parent::validateForInsert(array("credit"));
+		parent::validateForInsert(array_merge($propertiesToSkip,array("credit")));
 
 	}
 	
@@ -52,21 +52,41 @@ class KalturaUnlimitedVendorCredit extends KalturaBaseVendorCredit
 		{
 			$dbObject = new kUnlimitedVendorCredit();
 		}
-
 		return parent::toObject($dbObject, $propsToSkip);
 	}
 	
 	public function hasObjectChanged($sourceObject)
 	{
-		if(parent::hasObjectChanged($sourceObject))
+		if (parent::hasObjectChanged($sourceObject))
 			return true;
-		
+
 		/* @var $sourceObject kUnlimitedVendorCredit */
-		if( ($this->credit && $this->credit != $sourceObject->getCredit())
+		if (($this->credit && $this->credit != $sourceObject->getCredit())
 			|| ($this->fromDate && $this->fromDate != $sourceObject->getFromDate())
 		)
 			return true;
-		
 		return false;
+	}
+
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		if (isset($this->fromDate))
+		{
+			$this->validatePropertyNotNull('fromDate');
+		}
+		return parent::validateForUpdate($sourceObject, array_merge($propertiesToSkip, array('credit')));
+	}
+
+	/**
+	 * @param $object
+	 * @return bool
+	 */
+	public function isMatchingCoreClass($object)
+	{
+		if (!$object)
+		{
+			return false;
+		}
+		return get_class($object) == 'kUnlimitedVendorCredit';
 	}
 }

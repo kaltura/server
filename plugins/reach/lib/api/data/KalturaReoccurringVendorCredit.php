@@ -29,7 +29,6 @@ class KalturaReoccurringVendorCredit extends KalturaTimeRangeVendorCredit
 		{
 			$dbObject = new kReoccurringVendorCredit();
 		}
-		
 		return parent::toObject($dbObject, $propsToSkip);
 	}
 
@@ -42,6 +41,18 @@ class KalturaReoccurringVendorCredit extends KalturaTimeRangeVendorCredit
 		
 		parent::validateForInsert($propertiesToSkip);
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUpdate()
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		if (isset($this->frequency))
+		{
+			$this->validatePropertyNotNull('frequency');
+		}
+		parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
 	
 	public function hasObjectChanged($sourceObject)
 	{
@@ -53,5 +64,18 @@ class KalturaReoccurringVendorCredit extends KalturaTimeRangeVendorCredit
 			return true;
 		
 		return false;
+	}
+
+	/**
+	 * @param $object
+	 * @return bool
+	 */
+	public function isMatchingCoreClass($object)
+	{
+		if (!$object)
+		{
+			return false;
+		}
+		return get_class($object) == 'kReoccurringVendorCredit';
 	}
 }

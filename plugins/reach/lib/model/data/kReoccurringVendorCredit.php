@@ -121,7 +121,7 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 		}
 
 		$credit = $this->credit;
-		if ($this->overageCredit)
+		if ($includeOverages && $this->overageCredit)
 			$credit += $this->overageCredit;
 
 		if($this->addOn)

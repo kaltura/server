@@ -37,8 +37,8 @@ class kTimeRangeVendorCredit extends kVendorCredit
 		$c->addAnd(EntryVendorTaskPeer::QUEUE_TIME ,$this->getSyncCreditToDate() , Criteria::LESS_EQUAL);
 	}
 
-	/***
-	 * @param $date
+	/**
+	 * @param bool $includeOverages
 	 * @return int
 	 */
 	public function getCurrentCredit($includeOverages = true)
@@ -51,7 +51,7 @@ class kTimeRangeVendorCredit extends kVendorCredit
 		}
 		
 		$credit = $this->credit;
-		if($this->overageCredit)
+		if($includeOverages && $this->overageCredit)
 			$credit += $this->overageCredit;
 
 		if($this->addOn)

@@ -52,4 +52,10 @@ abstract class KalturaBaseVendorCredit extends KalturaObject implements IApiObje
 	{
 		return false;
 	}
+
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+
 }
