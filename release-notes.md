@@ -58,7 +58,7 @@
         
         index kaltura_category_0:kaltura_category_base
         {
-        	path	 = /opt/kaltura/sphinx-populate-Orion-15.9.0/kaltura_category_rt_0
+        	path	 = /opt/kaltura/sphinx/kaltura_category_rt_0
         }
         
         duplicate the above index to kaltura_category_0 .... kaltura_category_9
@@ -66,17 +66,6 @@
 #### Deployment Scripts ####
     Reindex category tables to sphinx to support the md5 query time fix:
         php /opt/kaltura/app/deployment/base/scripts/populateSphinxCategories.php
-
-
-## Enabling auto archive when using live with recording ##
-- Issue Type: Task
-- Issue ID : WEBC-1574
-
-### Configuration ##
-none.
-
-#### Deployment Scripts ####
-Run 'php /opt/kaltura/app/deployment/updates/scripts/2019_12_10_update_archive_permissions.php'
 
 
 ## Reach boolean event notification for privacy context ##

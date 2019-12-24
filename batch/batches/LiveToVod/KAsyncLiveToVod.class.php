@@ -37,23 +37,7 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		$jobRes = $this->copyCuePoint($job, $job->data);
-        try {
-            $liveEntryId = $job->data->liveEntryId;
-            $liveEntry = KBatchBase::$kClient->baseEntry->get($liveEntryId);
-            /** @var KalturaLiveStreamEntry $liveEntry */
-            $recordStatus = $liveEntry->recordingStatus;
-            $shouldAutoArchive = $liveEntry->recordingOptions->shouldAutoArchive;
-            if ($recordStatus == KalturaRecordStatus::PER_SESSION && $shouldAutoArchive == KalturaNullableBoolean::TRUE_VALUE) {
-                KBatchBase::$kClient->liveStream->archive($liveEntryId);
-            }
-        }
-        catch (Exception $e)
-        {
-            KalturaLog::err($e->getMessage());
-        }
-
-		return $jobRes;
+        return $this->copyCuePoint($job, $job->data);
 	}
 	
 	/**
