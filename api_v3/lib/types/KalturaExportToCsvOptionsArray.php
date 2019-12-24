@@ -6,9 +6,14 @@
  */
 class KalturaExportToCsvOptionsArray extends KalturaTypedArray
 {
+	/**
+	 * @param array                          $arr
+	 * @param KalturaDetachedResponseProfile $responseProfile
+	 * @return KalturaExportToCsvOptionsArray
+	 * @throws KalturaClientException
+	 */
 	public static function fromDbArray(array $arr = null, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		KalturaLog::log(print_r($arr, true));
 		$newArr = new KalturaExportToCsvOptionsArray();
 		foreach ($arr as $obj)
 		{
@@ -16,7 +21,6 @@ class KalturaExportToCsvOptionsArray extends KalturaTypedArray
 			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
-		KalturaLog::log("az2:".print_r($arr, true));
 		return $newArr;
 	}
 
