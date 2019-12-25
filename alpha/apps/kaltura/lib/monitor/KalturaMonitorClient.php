@@ -7,15 +7,16 @@ class KalturaMonitorClient
 {
 	const MAX_PACKET_SIZE = 1400;
 	
-	const EVENT_API_START = 'start';
-	const EVENT_API_END = 	'end';
-	const EVENT_DATABASE = 	'db';
-	const EVENT_SPHINX = 	'sphinx';
-	const EVENT_CONNTOOK =  'conn';
-	const EVENT_DUMPFILE = 	'file';
-	const EVENT_ELASTIC =	'elastic';
-	const EVENT_DRUID =		'druid';
-	const EVENT_COUCHBASE =	'couchbase';
+	const EVENT_API_START      = 'start';
+	const EVENT_API_END        = 	'end';
+	const EVENT_DATABASE       = 	'db';
+	const EVENT_SPHINX         = 	'sphinx';
+	const EVENT_CONNTOOK       =  'conn';
+	const EVENT_DUMPFILE       = 	'file';
+	const EVENT_ELASTIC        =	'elastic';
+	const EVENT_DRUID          =		'druid';
+	const EVENT_COUCHBASE      =	'couchbase';
+	const EVENT_FILE_SYSTEM    =	'filesystem';
 
 
 	const FIELD_EVENT_TYPE = 		'e';
@@ -57,7 +58,8 @@ class KalturaMonitorClient
 		self::EVENT_SPHINX      =>  0,
 		self::EVENT_COUCHBASE   =>  0,
 		self::EVENT_ELASTIC     =>  0,
-		self::EVENT_DRUID       =>  0
+		self::EVENT_DRUID       =>  0,
+		self::EVENT_FILE_SYSTEM =>  0
 	);
 
 	public static function prettyPrintCounters()
@@ -367,6 +369,21 @@ class KalturaMonitorClient
 		));
 		
 		self::writeDeferredEvent($data);		
+	}
+	
+	public static function monitorFileSystemAccess($timeTook, $action)
+	{
+		if (!self::$stream)
+			return;
+		
+		$data = array_merge(self::$basicEventInfo, array(
+			self::FIELD_SERVER			=> infraRequestUtils::getHostname(),
+			self::FIELD_EVENT_TYPE 		=> self::EVENT_FILE_SYSTEM,
+			self::FIELD_EXECUTION_TIME	=> $timeTook,
+			self::FIELD_ACTION	=> $action,
+		));
+		
+		self::writeDeferredEvent($data);
 	}
 	
 	protected static function getRangeLength($size)

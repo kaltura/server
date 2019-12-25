@@ -267,26 +267,40 @@ class kFile extends kFileBase
 	}
 	
 	private static function copySingleFile($src, $dest, $deleteSrc) {
-		if($deleteSrc) {
+		if($deleteSrc)
+		{
 			// In case of move, first try to move the file before copy & unlink.
 			$startTime = microtime(true);
-			if(rename($src, $dest))
+			$renameSucceeded = rename($src, $dest);
+			$renameTook = microtime(true) - $startTime;
+			KalturaMonitorClient::monitorFileSystemAccess($timeTook, 'rename');
+			
+			if($renameSucceeded)
 			{
-				KalturaLog::log("rename took : ".(microtime(true) - $startTime)." [$src] to [$dest] size: ".filesize($dest));
+				KalturaLog::log("rename took : ".$timeTook." [$src] to [$dest] size: ".filesize($dest));
 				return true;
 			}
 			
 			KalturaLog::err("Failed to rename file : [$src] to [$dest]");
 		}
 		
-		if (!copy($src,$dest)) {
+		$copyStartTime = microtime(true);
+		$copySucceeded  = copy($src,$dest);
+		$timeTook = microtime(true) - $startTime;
+		KalturaMonitorClient::monitorFileSystemAccess($timeTook, 'copy');
+		
+		if (!$copySucceeded)
+		{
 			KalturaLog::err("Failed to copy file : [$src] to [$dest]");
 			return false;
 		}
-		if ($deleteSrc && (!unlink($src))) {
+		
+		if ($deleteSrc && (!unlink($src)))
+		{
 			KalturaLog::err("Failed to delete source file : [$src]");
 			return false;
 		}
+		
 		return true;
 	}
 	
@@ -320,6 +334,7 @@ class kFile extends kFileBase
 		}
 		
 		// Copy
+		KalturaLog::debug("Moving file ")
 		return self::copyRecursively($from,$to, !$copy);
 	}
 	
