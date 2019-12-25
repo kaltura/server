@@ -284,7 +284,7 @@ class kFile extends kFileBase
 			KalturaLog::err("Failed to rename file : [$src] to [$dest]");
 		}
 		
-		$copyStartTime = microtime(true);
+		$startTime = microtime(true);
 		$copySucceeded  = copy($src,$dest);
 		$timeTook = microtime(true) - $startTime;
 		KalturaMonitorClient::monitorFileSystemAccess($timeTook, 'copy');
