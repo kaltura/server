@@ -37,8 +37,7 @@ class KalturaTimeRangeVendorCredit extends KalturaVendorCredit
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull("toDate");
-
+		$this->validatePropertyNotNull('toDate');
 		parent::validateForInsert($propertiesToSkip);
 
 		if ($this->fromDate > $this->toDate)
@@ -52,68 +51,35 @@ class KalturaTimeRangeVendorCredit extends KalturaVendorCredit
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if (!isMatchingCoreClass($sourceObject))
-		{
-			if (isset($this->toDate))
-			{
-				$this->validatePropertyNotNull('toDate');
-			}
-			parent::validateForUpdate($sourceObject, $propertiesToSkip);
-			if ($this->fromDate > $this->toDate)
-			{
-				throw new KalturaAPIException(KalturaReachErrors::INVALID_CREDIT_DATES, $this->fromDate, $this->toDate);
-			}
-			return;
-		}
-
-		/** @var $sourceObject kTimeRangeVendorCredit */
+		$this->validatePropertyNotNull('toDate');
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 
-		if (isset($this->fromDate) && isset($this->toDate))
+		if ($this->fromDate > $this->toDate)
 		{
-			if ($this->fromDate > $this->toDate)
-				throw new KalturaAPIException(KalturaReachErrors::INVALID_CREDIT_DATES, $this->fromDate, $this->toDate);
-		}
-
-		if (isset($this->toDate))
-		{
-			if ($sourceObject->getFromDate() > $this->toDate)
-				throw new KalturaAPIException(KalturaReachErrors::INVALID_CREDIT_DATES, $sourceObject->getFromDate(), $this->toDate);
-		}
-
-		if (isset($this->fromDate))
-		{
-			if ($this->fromDate > $sourceObject->getToDate())
-				throw new KalturaAPIException(KalturaReachErrors::INVALID_CREDIT_DATES, $this->fromDate, $sourceObject->getToDate());
+			throw new KalturaAPIException(KalturaReachErrors::INVALID_CREDIT_DATES, $this->fromDate, $this->toDate);
 		}
 	}
 
 	public function hasObjectChanged($sourceObject)
 	{
-		if(parent::hasObjectChanged($sourceObject))
+		if (parent::hasObjectChanged($sourceObject))
 		{
 			return true;
 		}
 
 		/* @var $sourceObject kTimeRangeVendorCredit */
-		if ( method_exists($sourceObject,'getToDate') && $this->fromDate > $sourceObject->getToDate())
+		if ($this->toDate && ($this->toDate != $sourceObject->getToDate()))
 		{
 			return true;
 		}
-
 		return false;
 	}
 
 	/**
-	 * @param $object
-	 * @return bool
+	 * @return string
 	 */
-	public function isMatchingCoreClass($object)
+	protected function getMatchingCoreClassName()
 	{
-		if (!$object)
-		{
-			return false;
-		}
-		return get_class($object) == 'kTimeRangeVendorCredit';
+		return 'kTimeRangeVendorCredit';
 	}
 }

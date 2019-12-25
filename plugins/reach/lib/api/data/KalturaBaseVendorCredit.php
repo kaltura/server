@@ -53,9 +53,16 @@ abstract class KalturaBaseVendorCredit extends KalturaObject implements IApiObje
 		return false;
 	}
 
-	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	/**
+	 * @param $object
+	 * @return bool
+	 */
+	public function isMatchingCoreClass($object)
 	{
-		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+		if (!$object)
+		{
+			return false;
+		}
+		return get_class($object) ===  $this->getMatchingCoreClassName();
 	}
-
 }

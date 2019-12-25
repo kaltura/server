@@ -52,8 +52,8 @@ class KalturaVendorCredit extends KalturaBaseVendorCredit
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull("fromDate");
-		$this->validatePropertyNotNull("credit");
+		$this->validatePropertyNotNull('fromDate');
+		$this->validatePropertyNotNull('credit');
 
 		if(isset($this->overageCredit) && $this->overageCredit < 0)
 		{
@@ -65,14 +65,9 @@ class KalturaVendorCredit extends KalturaBaseVendorCredit
 	
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if (isset($this->fromDate))
-		{
-			$this->validatePropertyNotNull('fromDate');
-		}
-		if (isset($this->credit))
-		{
-			$this->validatePropertyNotNull('credit');
-		}
+		$this->validatePropertyNotNull('fromDate');
+		$this->validatePropertyNotNull('credit');
+
 		if (isset($this->overageCredit) && $this->overageCredit < 0)
 		{
 			throw new KalturaAPIException(KalturaReachErrors::OVERAGE_CREDIT_CANNOT_BE_NEGATIVE);
@@ -96,15 +91,10 @@ class KalturaVendorCredit extends KalturaBaseVendorCredit
 	}
 
 	/**
-	 * @param $object
-	 * @return bool
+	 * @return string
 	 */
-	public function isMatchingCoreClass($object)
+	protected function getMatchingCoreClassName()
 	{
-		if (!$object)
-		{
-			return false;
-		}
-		return get_class($object) == 'kVendorCredit';
+		return 'kVendorCredit';
 	}
 }

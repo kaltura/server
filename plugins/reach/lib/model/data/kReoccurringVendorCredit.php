@@ -122,10 +122,14 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 
 		$credit = $this->credit;
 		if ($includeOverages && $this->overageCredit)
+		{
 			$credit += $this->overageCredit;
+		}
 
 		if($this->addOn)
+		{
 			$credit += $this->addOn;
+		}
 
 		return $credit;
 	}
@@ -137,7 +141,9 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 	{
 		$now = $time != null ? $time : time();
 		if (!parent::isActive($now))
+		{
 			return false;
+		}
 
 		if ($now < $this->periodStartDate || $now > $this->periodEndDate)
 		{

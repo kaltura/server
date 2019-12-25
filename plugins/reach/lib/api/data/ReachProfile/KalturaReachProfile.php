@@ -284,11 +284,8 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 			else
 			{
 				$newCredit = $this->credit->toObject(null);
-				if ($sourceCredit)
-				{
-					$newCredit->lastSyncTime = $sourceCredit->getLastSyncTime();
-					$newCredit->syncedCredit = $sourceCredit->getSyncedCredit();
-				}
+				/** @var kVendorCredit $newCredit */
+				$newCredit->setInnerParams($sourceCredit);
 			}
 			$dbObject->setCredit($newCredit);
 		}

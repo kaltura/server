@@ -38,8 +38,8 @@ class KalturaUnlimitedVendorCredit extends KalturaBaseVendorCredit
 	*/
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull("fromDate");
-		parent::validateForInsert(array_merge($propertiesToSkip,array("credit")));
+		$this->validatePropertyNotNull('fromDate');
+		parent::validateForInsert(array_merge($propertiesToSkip,array('credit')));
 
 	}
 	
@@ -70,23 +70,15 @@ class KalturaUnlimitedVendorCredit extends KalturaBaseVendorCredit
 
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if (isset($this->fromDate))
-		{
-			$this->validatePropertyNotNull('fromDate');
-		}
+		$this->validatePropertyNotNull('fromDate');
 		return parent::validateForUpdate($sourceObject, array_merge($propertiesToSkip, array('credit')));
 	}
 
 	/**
-	 * @param $object
-	 * @return bool
+	 * @return string
 	 */
-	public function isMatchingCoreClass($object)
+	protected function getMatchingCoreClassName()
 	{
-		if (!$object)
-		{
-			return false;
-		}
-		return get_class($object) == 'kUnlimitedVendorCredit';
+		return 'kUnlimitedVendorCredit';
 	}
 }

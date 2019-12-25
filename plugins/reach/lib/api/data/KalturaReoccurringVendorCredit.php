@@ -47,10 +47,8 @@ class KalturaReoccurringVendorCredit extends KalturaTimeRangeVendorCredit
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if (isset($this->frequency))
-		{
-			$this->validatePropertyNotNull('frequency');
-		}
+		$this->validatePropertyNotNull('frequency');
+
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 	
@@ -67,15 +65,10 @@ class KalturaReoccurringVendorCredit extends KalturaTimeRangeVendorCredit
 	}
 
 	/**
-	 * @param $object
-	 * @return bool
+	 * @return string
 	 */
-	public function isMatchingCoreClass($object)
+	protected function getMatchingCoreClassName()
 	{
-		if (!$object)
-		{
-			return false;
-		}
-		return get_class($object) == 'kReoccurringVendorCredit';
+		return 'kReoccurringVendorCredit';
 	}
 }
