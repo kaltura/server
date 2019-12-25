@@ -32,30 +32,14 @@ class LiveClusterMediaServerNode extends MediaServerNode
 
     public function getPlaybackHost($protocol = 'http', $format = null, $baseUrl = null, $deliveryType = null)
     {
-        $hostname = $this->getHostname();
-        if(!$this->getIsExternalMediaServer())
-            $hostname = preg_replace('/\..*$/', '', $hostname);
+        $domain = rtrim(preg_replace("(https?://)", "", $baseUrl), '/'); // extract only the domain from the base url
+        $domain = str_replace("{hostName}", $this->getHostname(), $domain); // if the domain contain place-holder replace it with the server-node host name
 
-        $mediaServerConfig = kConf::getMap('media_servers');
-        if($baseUrl && $baseUrl !== '')
-        {
-            $domain = preg_replace("(https?://)", "", $baseUrl);
-            $domain = rtrim($domain, "/");
-        }
-        else
-        {
-            $domain = $this->getDomainByProtocolAndFormat($mediaServerConfig, $protocol, $format);
-            $port = $this->getPortByProtocolAndFormat($mediaServerConfig, $protocol, $format);
-            $domain = "$domain:$port";
-        }
-
-        $playbackHost = "$protocol://$domain/";
-        $playbackHost = str_replace("{hostName}", $hostname, $playbackHost);
-        return $playbackHost;
+        return "$protocol://$domain/";
     }
 
     public function getEnvDc()
     {
-
+        return 'env/' . $this->getEnvironment();
     }
 }
