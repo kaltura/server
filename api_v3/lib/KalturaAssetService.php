@@ -120,7 +120,7 @@ abstract class KalturaAssetService extends KalturaBaseService
 	        throw new KalturaAPIException(KalturaErrors::INVALID_FLAVOR_ASSET_ID, $assetId);
 	    }
 		
-	    dbStorageProfile = StorageProfilePeer::retrieveByIdAndPartnerId($storageProfileId, $dbAsset->getPartnerId());
+	    $dbStorageProfile = StorageProfilePeer::retrieveByIdAndPartnerId($storageProfileId, $dbAsset->getPartnerId());
 	    if (!$dbStorageProfile)
 	    {
 	        throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $storageProfileId);
