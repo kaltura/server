@@ -10,7 +10,6 @@ $replace = array('-resize $1 -extent $1', '-colorspace RGB -gravity center -rega
 $dest = preg_replace($patterns, $replace, $src);
 print "Executing " . $dest . "\n";
 $path = getenv("PATH");
-putenv("PATH=/opt/kaltura/bin/x64:" . $path);
 exec("convert " . $dest . " 2>&1", $output, $rc);
 $outputStr = implode("\n", $output);
 print $outputStr . "\n";
