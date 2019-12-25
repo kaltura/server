@@ -3,7 +3,7 @@
  * @package api
  * @subpackage enum
  */
-class KalturaExportToCsvOption implements ExportToCsvOption
+class KalturaExportToCsvOption extends KalturaEnum implements ExportToCsvOption
 {
 
 }
