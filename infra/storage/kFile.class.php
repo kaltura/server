@@ -277,7 +277,7 @@ class kFile extends kFileBase
 			
 			if($renameSucceeded)
 			{
-				KalturaLog::log("rename took : ".$timeTook." [$src] to [$dest] size: ".filesize($dest));
+				KalturaLog::log("rename took : $timeTook [$src] to [$dest] size: ".filesize($dest));
 				return true;
 			}
 			
