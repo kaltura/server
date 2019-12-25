@@ -78,15 +78,17 @@ class KalturaVendorCredit extends KalturaBaseVendorCredit
 	public function hasObjectChanged($sourceObject)
 	{
 		if(parent::hasObjectChanged($sourceObject))
+		{
 			return true;
+		}
 		
 		/* @var $sourceObject kVendorCredit */
 		if( ($this->credit && $this->credit != $sourceObject->getCredit())
 			|| ($this->fromDate && $this->fromDate != $sourceObject->getFromDate())
-			|| ($this->overageCredit && $this->overageCredit != $sourceObject->getOverageCredit())
-		)
+			|| ($this->overageCredit && $this->overageCredit != $sourceObject->getOverageCredit()))
+		{
 			return true;
-		
+		}
 		return false;
 	}
 

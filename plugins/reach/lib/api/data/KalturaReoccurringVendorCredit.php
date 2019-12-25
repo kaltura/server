@@ -55,12 +55,15 @@ class KalturaReoccurringVendorCredit extends KalturaTimeRangeVendorCredit
 	public function hasObjectChanged($sourceObject)
 	{
 		if(parent::hasObjectChanged($sourceObject))
+		{
 			return true;
+		}
 		
 		/* @var $sourceObject kReoccurringVendorCredit */
 		if($this->frequency && $this->frequency != $sourceObject->getFrequency())
+		{
 			return true;
-		
+		}
 		return false;
 	}
 
