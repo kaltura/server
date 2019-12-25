@@ -371,16 +371,16 @@ class KalturaMonitorClient
 		self::writeDeferredEvent($data);		
 	}
 	
-	public static function monitorFileSystemAccess($timeTook, $action)
+	public static function monitorFileSystemAccess($operation, $timeTook, $execStatus)
 	{
 		if (!self::$stream)
 			return;
 		
 		$data = array_merge(self::$basicEventInfo, array(
-			self::FIELD_SERVER			=> infraRequestUtils::getHostname(),
 			self::FIELD_EVENT_TYPE 		=> self::EVENT_FILE_SYSTEM,
 			self::FIELD_EXECUTION_TIME	=> $timeTook,
-			self::FIELD_ACTION	=> $action,
+			self::FIELD_QUERY_TYPE	=> $operation,
+			self::FIELD_ERROR_CODE => $execStatus,
 		));
 		
 		self::writeDeferredEvent($data);
