@@ -334,7 +334,6 @@ class kFile extends kFileBase
 		}
 		
 		// Copy
-		KalturaLog::debug("Moving file ")
 		return self::copyRecursively($from,$to, !$copy);
 	}
 	
