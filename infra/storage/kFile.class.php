@@ -7,7 +7,10 @@ class kFile extends kFileBase
 {
 	const MO_PATTERN = "GNU message catalog";
 	const TEXT = "text";
-
+	
+	const COPY_FAILED_CODE = "COPY_FAILED";
+	const RENAME_FAILED_CODE = "RENAME_FAILED";
+	
 	/**
 	 * Returns directory $path contents as an array of :
 	 *  array[0] = name
@@ -267,26 +270,40 @@ class kFile extends kFileBase
 	}
 	
 	private static function copySingleFile($src, $dest, $deleteSrc) {
-		if($deleteSrc) {
+		if($deleteSrc)
+		{
 			// In case of move, first try to move the file before copy & unlink.
 			$startTime = microtime(true);
-			if(rename($src, $dest))
+			$renameSucceeded = rename($src, $dest);
+			$timeTook = microtime(true) - $startTime;
+			KalturaMonitorClient::monitorFileSystemAccess('RENAME', $timeTook, $renameSucceeded ? null : self::RENAME_FAILED_CODE);
+			
+			if($renameSucceeded)
 			{
-				KalturaLog::log("rename took : ".(microtime(true) - $startTime)." [$src] to [$dest] size: ".filesize($dest));
+				KalturaLog::log("rename took : $timeTook [$src] to [$dest] size: ".filesize($dest));
 				return true;
 			}
 			
 			KalturaLog::err("Failed to rename file : [$src] to [$dest]");
 		}
 		
-		if (!copy($src,$dest)) {
+		$startTime = microtime(true);
+		$copySucceeded  = copy($src,$dest);
+		$timeTook = microtime(true) - $startTime;
+		KalturaMonitorClient::monitorFileSystemAccess('COPY', $timeTook, $copySucceeded ? null : self::COPY_FAILED_CODE);
+		
+		if (!$copySucceeded)
+		{
 			KalturaLog::err("Failed to copy file : [$src] to [$dest]");
 			return false;
 		}
-		if ($deleteSrc && (!unlink($src))) {
+		
+		if ($deleteSrc && (!unlink($src)))
+		{
 			KalturaLog::err("Failed to delete source file : [$src]");
 			return false;
 		}
+		
 		return true;
 	}
 	
