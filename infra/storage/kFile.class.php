@@ -272,7 +272,7 @@ class kFile extends kFileBase
 			// In case of move, first try to move the file before copy & unlink.
 			$startTime = microtime(true);
 			$renameSucceeded = rename($src, $dest);
-			$renameTook = microtime(true) - $startTime;
+			$timeTook = microtime(true) - $startTime;
 			KalturaMonitorClient::monitorFileSystemAccess($timeTook, 'rename');
 			
 			if($renameSucceeded)
