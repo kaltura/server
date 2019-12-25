@@ -8,9 +8,7 @@ class kFile extends kFileBase
 	const MO_PATTERN = "GNU message catalog";
 	const TEXT = "text";
 	
-	const COPY_SUCCEEDED_CODE = "COPY_SUCCEEDED";
 	const COPY_FAILED_CODE = "COPY_FAILED";
-	const RENAME_SUCCEEDED_CODE = "RENAME_SUCCEEDED";
 	const RENAME_FAILED_CODE = "RENAME_FAILED";
 	
 	/**
@@ -278,7 +276,7 @@ class kFile extends kFileBase
 			$startTime = microtime(true);
 			$renameSucceeded = rename($src, $dest);
 			$timeTook = microtime(true) - $startTime;
-			KalturaMonitorClient::monitorFileSystemAccess('RENAME', $timeTook, $renameSucceeded ? self::RENAME_SUCCEEDED_CODE : self::RENAME_FAILED_CODE);
+			KalturaMonitorClient::monitorFileSystemAccess('RENAME', $timeTook, $renameSucceeded ? null : self::RENAME_FAILED_CODE);
 			
 			if($renameSucceeded)
 			{
@@ -292,7 +290,7 @@ class kFile extends kFileBase
 		$startTime = microtime(true);
 		$copySucceeded  = copy($src,$dest);
 		$timeTook = microtime(true) - $startTime;
-		KalturaMonitorClient::monitorFileSystemAccess('COPY', $timeTook, $copySucceeded ? self::COPY_SUCCEEDED_CODE : self::COPY_FAILED_CODE);
+		KalturaMonitorClient::monitorFileSystemAccess('COPY', $timeTook, $copySucceeded ? null : self::COPY_FAILED_CODE);
 		
 		if (!$copySucceeded)
 		{
