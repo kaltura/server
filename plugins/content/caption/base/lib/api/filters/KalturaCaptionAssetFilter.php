@@ -23,7 +23,7 @@ class KalturaCaptionAssetFilter extends KalturaCaptionAssetBaseFilter
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, array $types = null)
 	{
 		list($list, $totalCount) = $this->doGetListResponse($pager, $types);
-
+		
 		$response = new KalturaCaptionAssetListResponse();
 		$response->objects = KalturaCaptionAssetArray::fromDbArray($list, $responseProfile);
 		$response->totalCount = $totalCount;
