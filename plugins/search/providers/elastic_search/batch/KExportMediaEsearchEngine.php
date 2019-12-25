@@ -149,7 +149,13 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 			{
 				if($option instanceof KalturaExportToCsvOptions)
 				{
-					return date($option->format, $timestamp);
+					switch($option->option)
+					{
+						case KalturaExportToCsvOption::HUMAN_READABLE_DATE:
+							return date('c', $timestamp);
+						break;
+					}
+
 				}
 			}
 		}

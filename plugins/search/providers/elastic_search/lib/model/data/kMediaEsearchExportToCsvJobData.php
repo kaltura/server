@@ -17,7 +17,7 @@ class kMediaEsearchExportToCsvJobData extends kExportCsvJobData
 	/**
 	 * @return array
 	 */
-	public function getoptions()
+	public function getOptions()
 	{
 		return $this->options;
 	}
