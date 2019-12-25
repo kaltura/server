@@ -5,10 +5,6 @@
  */
 class KalturaCaptionAssetFilter extends KalturaCaptionAssetBaseFilter
 {
-	/**
-	 * @var bool
-	 */
-	public $displayOnPlayer;
 
 	static private $map_between_objects = array
 	(
@@ -27,32 +23,10 @@ class KalturaCaptionAssetFilter extends KalturaCaptionAssetBaseFilter
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, array $types = null)
 	{
 		list($list, $totalCount) = $this->doGetListResponse($pager, $types);
-
 		$response = new KalturaCaptionAssetListResponse();
-		if (!empty($list) && isset($this->displayOnPlayer))
-		{
-			$displayOnPlayerCaptions = array();
-			$dontDisplayOnPlayerCaptions = array();
-			foreach ($list as $captionAsset)
-			{
-				/* @var $captionAsset CaptionAsset */
-				if ($captionAsset->getDisplayOnPlayer())
-					$displayOnPlayerCaptions[] = $captionAsset;
-				else
-					$dontDisplayOnPlayerCaptions[] = $captionAsset;
-			}
-			if ($this->displayOnPlayer)
-			{
-				$list = $displayOnPlayerCaptions;
-			}
-			else
-			{
-				$list = $dontDisplayOnPlayerCaptions;
-			}
-		}
 		$response->objects = KalturaCaptionAssetArray::fromDbArray($list, $responseProfile);
 		$response->totalCount = $totalCount;
-		return $response;
+		return $response;  
 	}
 
 	/* (non-PHPdoc)
