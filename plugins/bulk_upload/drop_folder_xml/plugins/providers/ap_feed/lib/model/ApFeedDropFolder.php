@@ -37,6 +37,4 @@ class ApFeedDropFolder extends FeedDropFolder
 	{
 		$this->putInCustomData('apApiKey', $apApiKey);
 	}
-	
-	
 }

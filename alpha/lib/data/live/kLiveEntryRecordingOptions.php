@@ -90,4 +90,5 @@ class kLiveEntryRecordingOptions
 	{
 		return $this->shouldMakeHidden;
 	}
+
 }

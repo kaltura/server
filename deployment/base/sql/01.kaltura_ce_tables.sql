@@ -2701,7 +2701,7 @@ CREATE TABLE IF NOT EXISTS `conf_maps`
 	`version` INTEGER NOT NULL,
 	`created_at` DATETIME  NOT NULL,
 	`remarks` TEXT,
-	`content` TEXT,
+	`content` MEDIUMTEXT,
 	PRIMARY KEY (`id`),
 	KEY `configuration_map_source` (`map_name`,`host_name`,`version`)
 )ENGINE=INNODB DEFAULT CHARSET=utf8;

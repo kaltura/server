@@ -40,8 +40,14 @@ class kString
 		return ( substr( $str, 0, strlen ( $desired_prefix ) ) === $desired_prefix );
 	}
 
-	public static function endsWith( $str, $desired_suffix )
+	public static function endsWith($str, $desired_suffix, $caseSensitive = true)
 	{
+		if(!$caseSensitive)
+		{
+			$str = strtolower($str);
+			$desired_suffix = strtolower($desired_suffix);
+		}
+
 		return ( substr( $str, -strlen( $desired_suffix ) ) === $desired_suffix );
 	}
 

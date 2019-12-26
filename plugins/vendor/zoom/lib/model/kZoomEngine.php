@@ -34,6 +34,7 @@ class kZoomEngine
 
 	/**
 	 * @return kZoomEvent
+	 * @throws Exception
 	 */
 	public function parseEvent()
 	{
@@ -47,6 +48,9 @@ class kZoomEngine
 
 	/**
 	 * @param kZoomEvent $event
+	 * @throws KalturaAPIException
+	 * @throws kCoreException
+	 * @throws PropelException
 	 */
 	public function processEvent($event)
 	{
@@ -74,6 +78,9 @@ class kZoomEngine
 
 	/**
 	 * @param kZoomEvent $event
+	 * @throws KalturaAPIException
+	 * @throws kCoreException
+	 * @throws PropelException
 	 */
 	protected function handleRecordingTranscriptComplete($event)
 	{
@@ -90,7 +97,6 @@ class kZoomEngine
 		foreach ($transcript->recordingFiles as $recordingFile)
 		{
 			/* @var kZoomRecordingFile $recordingFile */
-
 			if (!in_array ($recordingFile->fileType, self::$FILE_CAPTION_TYPES) || !$resourceReservation->reserve($recordingFile->id))
 			{
 				continue;
@@ -110,6 +116,11 @@ class kZoomEngine
 		}
 	}
 
+	/**
+	 * @param $meetingId
+	 * @return entry
+	 * @throws PropelException
+	 */
 	protected function getZoomEntryByMeetingId($meetingId)
 	{
 		$entryFilter = new entryFilter();
@@ -137,6 +148,8 @@ class kZoomEngine
 
 	/**
 	 * @param kZoomEvent $event
+	 * @throws kCoreException
+	 * @throws PropelException
 	 */
 	protected function handleRecordingVideoComplete($event)
 	{
@@ -145,7 +158,7 @@ class kZoomEngine
 		$meeting = $event->object;
 
 		$resourceReservation = new kResourceReservation(self::ZOOM_LOCK_TTL, true);
-		if(!$resourceReservation->reserve($meeting->id, false))
+		if(!$resourceReservation->reserve($meeting->id))
 		{
 			return;
 		}
@@ -203,6 +216,18 @@ class kZoomEngine
 		}
 	}
 
+	/**
+	 * @param kZoomMeeting $meeting
+	 * @param $dbUser
+	 * @param $zoomIntegration
+	 * @param $validatedUsers
+	 * @param $recordingFile
+	 * @param $event
+	 * @return entry
+	 * @throws PropelException
+	 * @throws kCoreException
+	 * @throws Exception
+	 */
 	protected function handleVideoRecord($meeting, $dbUser, $zoomIntegration, $validatedUsers, $recordingFile, $event)
 	{
 		$entry = $this->createEntryFromMeeting($meeting, $dbUser);
@@ -218,6 +243,7 @@ class kZoomEngine
 	 * @param entry $entry
 	 * @param array $validatedUsers
 	 * @param ZoomVendorIntegration $zoomIntegration
+	 * @throws kCoreException
 	 */
 	protected function handleParticipants($entry, $validatedUsers, $zoomIntegration)
 	{
@@ -234,22 +260,6 @@ class kZoomEngine
 					break;
 			}
 		}
-	}
-
-	/**
-	 * @param $entryId
-	 * @param $categoryId
-	 * @param $partnerId
-	 * @throws PropelException
-	 */
-	protected function createCategoryEntry($entryId, $categoryId, $partnerId)
-	{
-		$categoryEntry = new categoryEntry();
-		$categoryEntry->setEntryId($entryId);
-		$categoryEntry->setCategoryId($categoryId);
-		$categoryEntry->setPartnerId($partnerId);
-		$categoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
-		$categoryEntry->save();
 	}
 
 	protected function getValidatedUsers($usersNames, $partnerId, $createIfNotFound)
@@ -288,6 +298,7 @@ class kZoomEngine
 	/**
 	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @param entry $entry
+	 * @throws kCoreException
 	 */
 	protected function setEntryCategory($zoomIntegration, $entry)
 	{
@@ -301,6 +312,7 @@ class kZoomEngine
 	 * @param kZoomMeeting $meeting
 	 * @param kuser $owner
 	 * @return entry
+	 * @throws Exception
 	 */
 	protected function createEntryFromMeeting($meeting, $owner)
 	{
@@ -323,6 +335,7 @@ class kZoomEngine
 	/**
 	 * @param entry $entry
 	 * @return CaptionAsset
+	 * @throws PropelException
 	 */
 	protected function createAssetForTranscription($entry)
 	{
@@ -340,7 +353,9 @@ class kZoomEngine
 
 	/**
 	 * @param string $meetingId
+	 * @param entry $entry
 	 * @return AttachmentAsset
+	 * @throws PropelException
 	 */
 	protected function createAttachmentAssetForChatFile($meetingId, $entry)
 	{
@@ -432,7 +447,7 @@ class kZoomEngine
 				break;
 			case kZoomUsersMatching::ADD_POSTFIX:
 				$postFix = $zoomIntegration->getUserPostfix();
-				if (!kString::endsWith($result, $postFix))
+				if (!kString::endsWith($result, $postFix, false))
 				{
 					$result = $result . $postFix;
 				}
@@ -440,7 +455,7 @@ class kZoomEngine
 				break;
 			case kZoomUsersMatching::REMOVE_POSTFIX:
 				$postFix = $zoomIntegration->getUserPostfix();
-				if (kString::endsWith($result, $postFix))
+				if (kString::endsWith($result, $postFix, false))
 				{
 					$result = substr($result, 0, strlen($result) - strlen($postFix));
 				}
@@ -455,6 +470,7 @@ class kZoomEngine
 	 * user logged in - need to re-init kPermissionManager in order to determine current user's permissions
 	 * @param kuser $dbUser
 	 * @param bool $isAdmin
+	 * @throws kCoreException
 	 */
 	protected function initUserPermissions($dbUser, $isAdmin = false)
 	{

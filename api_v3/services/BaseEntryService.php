@@ -496,16 +496,17 @@ class BaseEntryService extends KalturaEntryService
 	protected function tryListWithFilterExecutor(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		$result = null;
+		$coreFilter = $filter->toObject();
 		try
 		{
 			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaFilterExecutor');
 			foreach ($pluginInstances as $KalturaFilterExecutor)
 			{
 				/* @var $KalturaFilterExecutor IKalturaFilterExecutor */
-				if ($KalturaFilterExecutor->canExecuteFilter($filter, $this->getResponseProfile()))
+				if ($KalturaFilterExecutor->canExecuteFilter($filter, $coreFilter, $this->getResponseProfile()))
 				{
 					KalturaLog::info('Executing filter on ' . get_class($KalturaFilterExecutor));
-					$result = $KalturaFilterExecutor->executeFilter($filter, $pager);
+					$result = $KalturaFilterExecutor->executeFilter($filter, $coreFilter, $pager);
 					break;
 				}
 			}
@@ -538,7 +539,8 @@ class BaseEntryService extends KalturaEntryService
 			$pager = new KalturaFilterPager();
 		}
 
-		$result = $this->tryListWithFilterExecutor($filter, $pager);
+		$clonedFilter = clone $filter;
+		$result = $this->tryListWithFilterExecutor($clonedFilter, $pager);
 		if (!$result)
 		{
 			$result = $filter->getListResponse($pager, $this->getResponseProfile());
@@ -854,7 +856,7 @@ class BaseEntryService extends KalturaEntryService
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 * @return KalturaBaseEntry The exported entry
 	 */
-	public function exportAction ( $entryId , $storageProfileId )
+	public function exportAction ($entryId, $storageProfileId)
 	{
 	    $dbEntry = entryPeer::retrieveByPK($entryId);
 	    if (!$dbEntry)
@@ -862,7 +864,7 @@ class BaseEntryService extends KalturaEntryService
 	        throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 	    }
 	    
-	    $dbStorageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+	    $dbStorageProfile = StorageProfilePeer::retrieveByIdAndPartnerId($storageProfileId, $dbEntry->getPartnerId());
 	    if (!$dbStorageProfile)
 	    {
 	        throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $storageProfileId);

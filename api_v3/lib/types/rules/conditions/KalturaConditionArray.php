@@ -64,6 +64,8 @@ class KalturaConditionArray extends KalturaTypedArray
 				return new KalturaAssetTypeCondition();
 			case ConditionType::BOOLEAN:
 				return new KalturaBooleanEventNotificationCondition();
+			case ConditionType::HTTP_HEADER:
+				return new KalturaHttpHeaderCondition();
 			default:
 			     return KalturaPluginManager::loadObject('KalturaCondition', $dbObject->getType());
 		}
