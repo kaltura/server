@@ -1,6 +1,6 @@
 <?php
 /**
- * @package infra
+ * @package infra1
  * @subpackage Storage
  */
 class kFile extends kFileBase
@@ -276,7 +276,10 @@ class kFile extends kFileBase
 			$startTime = microtime(true);
 			$renameSucceeded = rename($src, $dest);
 			$timeTook = microtime(true) - $startTime;
-			KalturaMonitorClient::monitorFileSystemAccess('RENAME', $timeTook, $renameSucceeded ? null : self::RENAME_FAILED_CODE);
+			if(class_exists('KalturaMonitorClient'))
+			{
+				KalturaMonitorClient::monitorFileSystemAccess('RENAME', $timeTook, $renameSucceeded ? null : self::RENAME_FAILED_CODE);
+			}
 			
 			if($renameSucceeded)
 			{
@@ -290,7 +293,10 @@ class kFile extends kFileBase
 		$startTime = microtime(true);
 		$copySucceeded  = copy($src,$dest);
 		$timeTook = microtime(true) - $startTime;
-		KalturaMonitorClient::monitorFileSystemAccess('COPY', $timeTook, $copySucceeded ? null : self::COPY_FAILED_CODE);
+		if(class_exists('KalturaMonitorClient'))
+		{
+			KalturaMonitorClient::monitorFileSystemAccess('COPY', $timeTook, $copySucceeded ? null : self::COPY_FAILED_CODE);
+		}
 		
 		if (!$copySucceeded)
 		{
