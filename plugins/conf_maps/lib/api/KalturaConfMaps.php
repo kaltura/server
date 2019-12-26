@@ -112,7 +112,17 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 		{
 			throw new KalturaAPIException(KalturaErrors::MAP_CANNOT_BE_CREATED_ON_FILE_SYSTEM);
 		}
+
 		parent::validateForInsert($propertiesToSkip);
+	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject()
+	 */
+	public function toObject($dbObject = null, $propertiesToSkip = array())
+	{
+		$this->relatedHost = strtolower($this->relatedHost);
+		return parent::toObject($dbObject, $propertiesToSkip);
 	}
 
 	public function validateContent()
