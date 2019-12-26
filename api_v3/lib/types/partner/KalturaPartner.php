@@ -5,6 +5,8 @@
  */
 class KalturaPartner extends KalturaObject implements IFilterable
 {
+	const MAX_DESCRIBE_YOURSLEF_LEN = 64;
+
 	/**
 	 * @var int
 	 * @readonly
@@ -428,8 +430,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->validatePartnerPackageForInsert();
 		$this->validateForInsert();
 
-		$partner = new Partner();
-		$partner = parent::toObject( $partner );
+		$partner = parent::toObject();
 		/* @var $partner Partner */
 		
 		if($this->additionalParams)
@@ -444,7 +445,24 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		
 		return $partner;
 	}
-	
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject()
+	 */
+	public function toObject($dbPartner = null, $skip = array())
+	{
+		if(!$dbPartner)
+		{
+			$dbPartner = new Partner();
+		}
+
+		if ($this->describeYourself && (strlen ($this->describeYourself) > self::MAX_DESCRIBE_YOURSLEF_LEN))
+		{
+			$this->describeYourself = kString::alignUtf8String($this->describeYourself, 64);
+		}
+		return parent::toObject($dbPartner, $skip);
+	}
+
 	public function getExtraFilters()
 	{
 		return array(
