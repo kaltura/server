@@ -5,8 +5,6 @@
  */
 class KalturaPartner extends KalturaObject implements IFilterable
 {
-	const MAX_DESCRIBE_YOURSLEF_LEN = 64;
-
 	/**
 	 * @var int
 	 * @readonly
@@ -380,6 +378,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->name = kString::stripUtf8InvalidChars($this->name);
 		$this->description = kString::stripUtf8InvalidChars($this->description);
 		$this->adminName = kString::stripUtf8InvalidChars($this->adminName);
+		$this->describeYourself = kString::stripUtf8InvalidChars($this->describeYourself);
 		$this->additionalParams = KalturaKeyValueArray::fromKeyValueArray($partner->getAdditionalParams());
 		if (!$this->host){
 			$this->host = null;
@@ -430,7 +429,8 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->validatePartnerPackageForInsert();
 		$this->validateForInsert();
 
-		$partner = parent::toObject();
+		$partner = new Partner();
+		$partner = parent::toObject( $partner );
 		/* @var $partner Partner */
 		
 		if($this->additionalParams)
@@ -444,23 +444,6 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		}
 		
 		return $partner;
-	}
-
-	/* (non-PHPdoc)
-	 * @see KalturaObject::toObject()
-	 */
-	public function toObject($dbPartner = null, $skip = array())
-	{
-		if(!$dbPartner)
-		{
-			$dbPartner = new Partner();
-		}
-
-		if ($this->describeYourself && (strlen ($this->describeYourself) > self::MAX_DESCRIBE_YOURSLEF_LEN))
-		{
-			$this->describeYourself = kString::alignUtf8String($this->describeYourself, 64);
-		}
-		return parent::toObject($dbPartner, $skip);
 	}
 
 	public function getExtraFilters()
