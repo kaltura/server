@@ -2492,7 +2492,7 @@ CREATE TABLE `conf_maps`
 	`status` INTEGER  NOT NULL,
 	`created_at` DATETIME  NOT NULL,
 	`remarks` VARCHAR(255),
-	`content` TEXT,
+	`content` MEDIUMTEXT,
 	`version` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `primary_map_index`(`map_name`, `host_name`, `version`),
