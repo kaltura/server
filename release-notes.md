@@ -1,3 +1,13 @@
+# Orion 15.14.0 #
+## Modify confMaps content column ##
+- Issue Type: Task
+
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+  mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_12_26_alter_config_maps_table.sql
+
 # Orion 15.13.0 #
 
 ## Escape category MD5 values to avoid long query times + support sphinx category sharding ##
