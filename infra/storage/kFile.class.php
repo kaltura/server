@@ -1,6 +1,6 @@
 <?php
 /**
- * @package infra1
+ * @package infra
  * @subpackage Storage
  */
 class kFile extends kFileBase
