@@ -5,6 +5,23 @@
  */
 class ApFeedDropFolder extends FeedDropFolder
 {
+	
+	/**
+	 * @return array
+	 */
+	public function getItemsToExpand()
+	{
+		return $this->getFromCustomData('itemsToExpand');
+	}
+	
+	/**
+	 * @param array $itemsToExpand
+	 */
+	public function setItemsToExpand($itemsToExpand)
+	{
+		$this->putInCustomData('itemsToExpand', $itemsToExpand);
+	}
+	
 	/**
 	 * @return the $apApiKey
 	 */

@@ -1,4 +1,12 @@
 # Orion 15.14.0 #
+## Modify confMaps content column ##
+- Issue Type: Task
+
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+  mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_12_26_alter_config_maps_table.sql
 
 ## add server healthCheck API action ##
 - Issue Type: Task
@@ -15,15 +23,72 @@ Run:
 
 # Orion 15.13.0 #
 
-## Enabling auto archive when using live with recording ##
+## Escape category MD5 values to avoid long query times + support sphinx category sharding ##
 - Issue Type: Task
-- Issue ID : WEBC-1574
+- Issue ID : PLAT-10269
 
 ### Configuration ##
-none.
+    To support sharding sphinx category table add the follwoing to you db.ini file:
+        [sphinx_split_index]
+        enabled = true
+        category = 10
+        
+        Updaet your sphinx kaltura.conf when it comes to the category table definition:
+        index kaltura_category_base:kaltura_base_gt_in_charset
+        {
+        
+        	rt_mem_limit	 = 10240M
+        	min_prefix_len	 = 1
+        	rt_attr_uint	 = category_id
+        	rt_field         = str_category_id
+        	rt_attr_uint	 = parent_id
+        	rt_field	 = name
+        	rt_attr_string	 = name
+        	rt_attr_bigint	 = partner_id
+        	rt_field	 = full_name
+        	rt_attr_string	 = full_name
+        	rt_field	 = full_ids
+        	rt_field	 = description
+        	rt_field	 = tags
+        	rt_field	 = display_in_search
+        	rt_attr_uint	 = kuser_id
+        	rt_attr_uint	 = category_status
+        	rt_field	 = members
+        	rt_field	 = plugins_data
+        	rt_attr_uint	 = depth
+        	rt_field	 = reference_id
+        	rt_field	 = privacy_context
+        	rt_field	 = privacy_contexts
+        	rt_field	 = privacy
+        	rt_field     = sphinx_match_optimizations
+        	rt_attr_uint	 = members_count
+        	rt_attr_uint	 = pending_members_count
+        	rt_attr_uint	 = entries_count
+        	rt_attr_uint	 = direct_entries_count
+        	rt_attr_uint	 = direct_sub_categories_count
+        	rt_attr_uint	 = inheritance_type
+        	rt_attr_uint	 = user_join_policy
+        	rt_attr_uint	 = default_permission_level
+        	rt_attr_uint	 = contribution_policy
+        	rt_attr_uint	 = inherited_parent_id
+        	rt_attr_timestamp	 = created_at
+        	rt_attr_timestamp	 = updated_at
+        	rt_attr_timestamp	 = deleted_at
+        	rt_attr_bigint	 = partner_sort_value
+        	rt_attr_json = dynamic_attributes
+        	rt_field = aggregation_categories
+        }
+        
+        index kaltura_category_0:kaltura_category_base
+        {
+        	path	 = /opt/kaltura/sphinx/kaltura_category_rt_0
+        }
+        
+        duplicate the above index to kaltura_category_0 .... kaltura_category_9
 
 #### Deployment Scripts ####
-Run 'php /opt/kaltura/app/deployment/updates/scripts/2019_12_10_update_archive_permissions.php'
+    Reindex category tables to sphinx to support the md5 query time fix:
+        php /opt/kaltura/app/deployment/base/scripts/populateSphinxCategories.php
 
 
 ## Reach boolean event notification for privacy context ##

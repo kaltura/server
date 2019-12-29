@@ -32,7 +32,7 @@ class KalturaRemoteStorageResource extends KalturaUrlResource
 		
 		$this->validatePropertyNotNull('storageProfileId');
 		
-		$storageProfile = StorageProfilePeer::retrieveByPK($this->storageProfileId);
+		$storageProfile = StorageProfilePeer::retrieveByIdAndPartnerId($this->storageProfileId, kCurrentContext::getCurrentPartnerId());
 		if(!$storageProfile)
 			throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $this->storageProfileId);
 	}

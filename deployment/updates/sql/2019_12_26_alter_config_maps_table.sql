@@ -1,0 +1,1 @@
+ALTER TABLE conf_maps MODIFY content MEDIUMTEXT;
