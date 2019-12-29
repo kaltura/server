@@ -4,11 +4,10 @@
 class mySystemUtils
 {
 	const SERVER_VERSION = 'VERSION';
-	const APC_PING = 'APC';
 	const MYSQL = 'MYSQL';
 	const SPHINX = 'SPHINX';
 	const ELASTIC = 'ELASTIC';
-	const CACHE = 'CACHE';
+	const CACHE = 'MEMCACHE_LOCAL';
 	const LOCAL_FILE_CREATION = 'LOCAL_FILE_CREATION';
 	const MOVE_FILE = 'MOVE_FILE';
 
@@ -40,7 +39,6 @@ class mySystemUtils
 
 		$healthCheckArray = array();
 		$healthCheckArray[self::SERVER_VERSION] = self::getVersion();
-		$healthCheckArray[self::APC_PING] = (int)self::ping();
 		$healthCheckArray[self::MYSQL] = (int)self::pingMySql();
 		$healthCheckArray[self::SPHINX]  = self::pingSphinx($config);
 		$healthCheckArray[self::ELASTIC] = self::pingElastic($config);
@@ -176,12 +174,11 @@ class mySystemUtils
 	{
 		try
 		{
-			$memcache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_KEYS);
+			$memcache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_API_V3);
 			if (!$memcache)
 			{
 				return 0;
 			}
-			$cacheResult = $memcache->get(kQueryCache::SPHINX_LAG_KEY);
 		}
 		catch(Exception $e)
 		{
@@ -255,7 +252,14 @@ class mySystemUtils
 		$result = '';
 		foreach($healthCheckArray as $key => $value)
 		{
-			$result .= 'server_health{check="' . $key . '"} ' . $value . PHP_EOL;
+			if($key == self::SERVER_VERSION)
+			{
+				$result .= 'server_health{Version="' . $value . '"} 1' . PHP_EOL;
+			}
+			else
+			{
+				$result .= 'server_health{check="' . $key . '"} ' . $value . PHP_EOL;
+			}
 		}
 		return $result;
 	}
