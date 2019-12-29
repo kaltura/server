@@ -7,8 +7,8 @@
 abstract class KObjectExportEngine
 {
 	/**
-	 * @param int $objectType of enum KalturaCopyObjectType
-	 * @return KCopyingEngine
+	 * @param int $objectType of enum KalturaExportObjectType
+	 * @return KObjectExportEngine
 	 */
 	public static function getInstance($objectType)
 	{

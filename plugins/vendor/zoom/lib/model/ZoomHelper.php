@@ -11,7 +11,6 @@ class ZoomHelper
 
 	/** php body */
 	const PHP_INPUT = 'php://input';
-	const ADMIN_TAG_ZOOM = 'zoomentry';
 
 	/* @var zoomVendorIntegration $zoomIntegration */
 	protected static $zoomIntegration;
@@ -165,13 +164,14 @@ class ZoomHelper
 		return $data;
 	}
 
-    /**
-     * @param int $partnerId
-     * @param string $categoryFullName
-     * @param bool $createIfNotExist
-     * @return int id;
-     * @throws PropelException
-     */
+	/**
+	 * @param int $partnerId
+	 * @param string $categoryFullName
+	 * @param bool $createIfNotExist
+	 * @return int id;
+	 * @throws PropelException
+	 * @throws Exception
+	 */
 	public static function createCategoryForZoom($partnerId, $categoryFullName, $createIfNotExist = true)
 	{
 		$category = categoryPeer::getByFullNameExactMatch($categoryFullName, null, $partnerId);
