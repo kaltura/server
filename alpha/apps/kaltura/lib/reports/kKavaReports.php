@@ -1497,10 +1497,21 @@ class kKavaReports extends kKavaReportsMgr
 				'entry_name' => self::DIMENSION_ENTRY_ID,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => 'entry_name',
-				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'extract_time',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'self::timestampToUnixtime',
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'entry_name',
+					self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'
+				),
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
+			self::REPORT_ORDER_BY => array(
+				self::DRUID_DIMENSION => 'extract_time',
+				self::DRUID_DIRECTION => '-'
+			),
 		),
 
 	);
