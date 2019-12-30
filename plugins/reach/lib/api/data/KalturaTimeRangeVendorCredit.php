@@ -14,12 +14,12 @@ class KalturaTimeRangeVendorCredit extends KalturaVendorCredit
 	private static $map_between_objects = array (
 		'toDate',
 	);
-	
+
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-	
+
 	/* (non-PHPdoc)
  	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
  	 */
@@ -29,21 +29,21 @@ class KalturaTimeRangeVendorCredit extends KalturaVendorCredit
 		{
 			$dbObject = new kTimeRangeVendorCredit();
 		}
-		
 		return parent::toObject($dbObject, $propsToSkip);
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForInsert()
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull("toDate");
-		
+		$this->validatePropertyNotNull('toDate');
 		parent::validateForInsert($propertiesToSkip);
 
 		if ($this->fromDate > $this->toDate)
+		{
 			throw new KalturaAPIException(KalturaReachErrors::INVALID_CREDIT_DATES , $this->fromDate, $this->toDate);
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -51,37 +51,35 @@ class KalturaTimeRangeVendorCredit extends KalturaVendorCredit
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		/** @var $sourceObject kTimeRangeVendorCredit */
+		$this->validatePropertyNotNull('toDate');
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 
-		if (isset($this->fromDate) &&  isset($this->toDate))
+		if ($this->fromDate > $this->toDate)
 		{
-			if ($this->fromDate > $this->toDate)
-				throw new KalturaAPIException(KalturaReachErrors::INVALID_CREDIT_DATES , $this->fromDate, $this->toDate);
-		}
-
-		if (isset($this->toDate))
-		{
-			if ($sourceObject->getFromDate() > $this->toDate)
-				throw new KalturaAPIException(KalturaReachErrors::INVALID_CREDIT_DATES , $sourceObject->getFromDate(), $this->toDate);
-		}
-
-		if (isset($this->fromDate))
-		{
-			if ( method_exists($sourceObject,'getToDate') && $this->fromDate > $sourceObject->getToDate())
-				throw new KalturaAPIException(KalturaReachErrors::INVALID_CREDIT_DATES , $this->fromDate, $sourceObject->getToDate());
+			throw new KalturaAPIException(KalturaReachErrors::INVALID_CREDIT_DATES, $this->fromDate, $this->toDate);
 		}
 	}
-	
+
 	public function hasObjectChanged($sourceObject)
 	{
-		if(parent::hasObjectChanged($sourceObject))
+		if (parent::hasObjectChanged($sourceObject))
+		{
 			return true;
-		
+		}
+
 		/* @var $sourceObject kTimeRangeVendorCredit */
-		if($this->toDate && $this->toDate != $sourceObject->getToDate())
+		if ($this->toDate && ($this->toDate != $sourceObject->getToDate()))
+		{
 			return true;
-		
+		}
 		return false;
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function getMatchingCoreClassName()
+	{
+		return 'kTimeRangeVendorCredit';
 	}
 }

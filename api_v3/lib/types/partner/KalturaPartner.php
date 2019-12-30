@@ -378,6 +378,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->name = kString::stripUtf8InvalidChars($this->name);
 		$this->description = kString::stripUtf8InvalidChars($this->description);
 		$this->adminName = kString::stripUtf8InvalidChars($this->adminName);
+		$this->describeYourself = kString::stripUtf8InvalidChars($this->describeYourself);
 		$this->additionalParams = KalturaKeyValueArray::fromKeyValueArray($partner->getAdditionalParams());
 		if (!$this->host){
 			$this->host = null;
@@ -444,7 +445,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		
 		return $partner;
 	}
-	
+
 	public function getExtraFilters()
 	{
 		return array(

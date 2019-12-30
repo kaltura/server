@@ -52,5 +52,6 @@ class ESearchEntryFilterFields extends KalturaEnum
 	const FREE_TEXT	= '_free_text';
 	const TOTAL_RANK = 'total_rank';
 	const RANK = 'rank';
+	const VOTES = 'votes';
 	const LAST_PLAYED_AT = 'last_played_at';
 }

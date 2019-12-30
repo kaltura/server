@@ -63,6 +63,45 @@ class KApFeedDropFolderEngine extends KFeedDropFolderEngine
 				
 				$this->arrayToXml($feedItemJson['data']['item'], $feedItem->documentElement);
 				
+				//Iterate over the items to expand, fetch the json for each one and integrate it as XML into the main item XML:
+				foreach ($dropFolder->itemsToExpand as $itemToExpand)
+				{
+					$itemToExpandUrl = $this->getSingleXPathResult($itemToExpand->value, simplexml_import_dom($feedItem));
+					if (!$itemToExpandUrl)
+					{
+						KalturaLog::info ("Xpath [{$itemToExpand->value}] could not be found within the given item. Continuing to next item.");
+						continue;
+					}
+					
+					$expandedContent = $this->fetchFeedContent($itemToExpandUrl);
+					$xpath = new DOMXPath($feedItem);
+					$itemToExpandNode = $xpath->query($itemToExpand->value)->item(0);
+					
+					$expandedJson = json_decode($expandedContent, true);
+					if ($expandedJson)
+					{
+						$this->arrayToXml($expandedJson, $itemToExpandNode);
+					}
+					else
+					{
+						// try to convert the object into an XML
+						$expandedXml = new DOMDocument();
+						$res = $expandedXml->loadXML($expandedContent);
+						
+						if (!$res)
+						{
+							KalturaLog::info('The expanded content segment could not be parsed as either json or XML. Skipping.');
+							continue;
+						}
+						
+						$fragment = $feedItem->createDocumentFragment();
+						$fragment->appendXML($expandedXml->saveXML($expandedXml->documentElement));
+						
+						$itemToExpandNode->appendChild($fragment);
+					}
+					
+				}
+				
 				KalturaLog::info ('Single item: ' . print_r($feedItem->saveXML(), true));
 				
 				$counter += $this->watchProcessSingleItem(simplexml_import_dom($feedItem), $existingDropFolderFilesMap);

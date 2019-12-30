@@ -1396,14 +1396,14 @@ class kKavaReports extends kKavaReportsMgr
 				'object_id' => self::DIMENSION_ENTRY_ID,
 				'entry_name' => self::DIMENSION_ENTRY_ID,
 				'status' => self::DIMENSION_ENTRY_ID,
+				'entry_source' => self::DIMENSION_ENTRY_ID,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => array('entry_name', 'status'),
-				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+				self::REPORT_ENRICH_OUTPUT => array('entry_name', 'status', 'entry_source'),
+				self::REPORT_ENRICH_FUNC => 'self::getEntriesSource',
 				self::REPORT_ENRICH_CONTEXT => array(
-					'peer' => 'entryPeer',
 					'columns' => array('NAME', 'STATUS'),
-				)
+				),
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_SUBMITTED, self::EVENT_TYPE_CAPTIONS, self::EVENT_TYPE_INFO, self::EVENT_TYPE_RELATED_SELECTED),
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_SUBMITTED, self::EVENT_TYPE_CAPTIONS, self::EVENT_TYPE_INFO, self::EVENT_TYPE_RELATED_SELECTED),
@@ -1425,13 +1425,13 @@ class kKavaReports extends kKavaReportsMgr
 				'status' => self::DIMENSION_ENTRY_ID,
 				'media_type' => self::DIMENSION_ENTRY_ID,
 				'duration_msecs' => self::DIMENSION_ENTRY_ID,
+				'entry_source' => self::DIMENSION_ENTRY_ID,
 			),
 			self::REPORT_ENRICH_DEF => array(
 				array(
-					self::REPORT_ENRICH_OUTPUT => array('entry_name', 'creator_name', 'created_at', 'status', 'media_type', 'duration_msecs'),
-					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+					self::REPORT_ENRICH_OUTPUT => array('entry_name', 'creator_name', 'created_at', 'status', 'media_type', 'duration_msecs', 'entry_source'),
+					self::REPORT_ENRICH_FUNC => 'self::getEntriesSource',
 					self::REPORT_ENRICH_CONTEXT => array(
-						'peer' => 'entryPeer',
 						'columns' => array('NAME', 'KUSER_ID', '@CREATED_AT', 'STATUS', 'MEDIA_TYPE', 'LENGTH_IN_MSECS'),
 					)
 				),
@@ -1501,12 +1501,12 @@ class kKavaReports extends kKavaReportsMgr
 				'node_id' => self::DIMENSION_NODE_ID,
 			),
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_NODE_ID,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_NODE_PLAY, self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_PERCENTILES_RATIO),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_NODE_PLAY, self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_PERCENTILES_RATIO),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_NODE_PLAY, self::METRIC_UNIQUE_USERS, self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_NODE_PLAY, self::METRIC_UNIQUE_USERS, self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO),
 			self::REPORT_COLUMN_MAP => array(
 				'count_node_plays' => self::EVENT_TYPE_NODE_PLAY,
 				'unique_known_users' => self::METRIC_UNIQUE_USERS,
-				'avg_completion_rate' => self::METRIC_UNIQUE_PERCENTILES_RATIO,
+				'avg_completion_rate' => self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO,
 			),
 		),
 	);

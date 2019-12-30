@@ -104,7 +104,7 @@ class ReachProfileService extends KalturaBaseService
 		/* @var $dbReachProfile ReachProfile */
 		$dbReachProfile = ReachProfilePeer::retrieveByPK($id);
 		if (!$dbReachProfile)
-			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
+			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $id);
 
 		// save the object
 		$dbReachProfile = $reachProfile->toUpdatableObject($dbReachProfile);

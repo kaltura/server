@@ -7,7 +7,6 @@ class WowzaMediaServerNode extends MediaServerNode {
 	const DEFAULT_TRANSCODER = 'default';
 	const DEFAULT_GPUID = -1;
 	
-	const CUSTOM_DATA_APP_PREFIX = 'app_prefix';
 	const CUSTOM_DATA_TRANSCODER_CONFIG = 'transcoder';
 	const CUSTOM_DATA_GPUID = 'gpuid';
 	const CUSTOM_DATA_LIVE_SERVICE_PORT = 'live_service_port';
@@ -115,6 +114,11 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return $appNameAndPrefix;
 	}
 
+	public function getEnvDc()
+	{
+		return 'dc-' . $this->getDc();
+	}
+
 	protected function getDomainByProtocolAndFormat($mediaServerConfig, $protocol = 'http', $format = null)
 	{
 		$domain = $this->getPlaybackDomain();
@@ -172,16 +176,6 @@ class WowzaMediaServerNode extends MediaServerNode {
 			$value = $config[$this->getHostname()][$filedValue];
 		
 		return $value;
-	}
-	
-	public function setAppPrefix($appPrefix)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_APP_PREFIX, $appPrefix);
-	}
-	
-	public function getAppPrefix()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_APP_PREFIX, null, null);
 	}
 	
 	public function setTranscoder($transcoder)
