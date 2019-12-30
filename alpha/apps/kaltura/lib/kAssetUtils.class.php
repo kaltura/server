@@ -232,7 +232,8 @@ class kAssetUtils
 				break;
 			case assetParams::CONTAINER_FORMAT_COPY:
 			case assetParams::CONTAINER_FORMAT_WIDEVINE:
-			Default:
+			default:
+				break;
 		}
 
 		return $result;
