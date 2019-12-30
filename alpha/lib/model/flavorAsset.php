@@ -234,7 +234,17 @@ class flavorAsset extends exportableAsset
 			$fileName = kString::keepOnlyValidUrlChars($fileName);
 	
 			if ($extension)
+			{
 				$fileName .= ".$extension";
+			}
+			else if($this->getContainerFormat())
+			{
+				$extension = kAssetUtils::getFileExtension($this->getContainerFormat());
+				if ($extension)
+				{
+					$fileName .= ".$extension";
+				}
+			}
 		}
 		
 		//adding a serveFlavor download parameter
