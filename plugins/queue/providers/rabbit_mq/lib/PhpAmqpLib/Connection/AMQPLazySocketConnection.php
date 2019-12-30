@@ -1,7 +1,11 @@
 <?php
+
 namespace PhpAmqpLib\Connection;
 
-class AMQPLazyConnection extends AMQPStreamConnection
+/**
+ * Yet another lazy connection. This time using sockets. Current architecture doesn't allow to wrap existing connections
+ */
+class AMQPLazySocketConnection extends AMQPSocketConnection
 {
     /**
      * Gets socket from current connection
