@@ -43,6 +43,7 @@ $version = isset($output1['version']) ? $output1['version'] : 0;
 print("Found version - {$version}\r\n");
 $iniFileJson = str_replace('\/','/',$iniFileJson);
 $iniFileJson = str_replace('"','\"',$iniFileJson);
+$hostNameRegEx = strtolower($hostNameRegEx);
 //insert new map to db
 $version++;
 $cmdLine = "insert into conf_maps (map_name,host_name,status,version,created_at,remarks,content)values('$rawMapName','$hostNameRegEx',$status,$version,'".date("Y-m-d H:i:s")."','$justification','$iniFileJson');";
