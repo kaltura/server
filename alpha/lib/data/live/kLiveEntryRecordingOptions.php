@@ -34,6 +34,11 @@ class kLiveEntryRecordingOptions
      */
 	protected $shouldAutoArchive = false;
 
+    /**
+     * @var string
+     */
+	protected $nonDeletedCuePointsTags;
+
 	/**
 	 * @return the $shouldCopyThumbnail
 	 */
@@ -110,5 +115,21 @@ class kLiveEntryRecordingOptions
     public function getShouldAutoArchive()
     {
         return $this->shouldAutoArchive;
+    }
+
+    /**
+     * @param string $nonDeletedCuePointsTags
+     */
+    public function setNonDeletedCuePointsTags($nonDeletedCuePointsTags)
+    {
+        $this->nonDeletedCuePointsTags = $nonDeletedCuePointsTags;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNonDeletedCuePointsTags()
+    {
+        return $this->nonDeletedCuePointsTags;
     }
 }

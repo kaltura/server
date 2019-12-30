@@ -33,13 +33,19 @@ class KalturaLiveEntryRecordingOptions extends KalturaObject
      */
 	public $shouldAutoArchive;
 
+    /**
+     * @var string
+     */
+	public $nonDeletedCuePointsTags;
+
 	private static $mapBetweenObjects = array
 	(
 		"shouldCopyEntitlement",
 		"shouldCopyScheduling",
 		"shouldCopyThumbnail",
 		"shouldMakeHidden",
-		"shouldAutoArchive"
+		"shouldAutoArchive",
+        "nonDeletedCuePointsTags"
 	);
 	
 	/* (non-PHPdoc)

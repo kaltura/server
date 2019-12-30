@@ -3200,4 +3200,26 @@ class kFlowHelper
 		$dbBatchJob->setStatus(KalturaBatchJobStatus::FATAL);
 		$dbBatchJob->save();
 	}
+
+    public static function handleLiveToVodFinished(BatchJob $dbBatchJob, kLiveToVodJobData $data)
+    {
+        $liveEntryId = $data->getLiveEntryId();
+        $liveEntry = entryPeer::retrieveByPK($liveEntryId);
+        /** @var KalturaLiveStreamEntry $liveEntry */
+        $recordStatus = $liveEntry->recordingStatus;
+        $shouldAutoArchive = $liveEntry->recordingOptions->shouldAutoArchive;
+        if ($recordStatus == KalturaRecordStatus::PER_SESSION && $shouldAutoArchive == KalturaNullableBoolean::TRUE_VALUE) {
+            $liveEntryArchiveJobData = new kLiveEntryArchiveJobData();
+            $liveEntryArchiveJobData->setLiveEntryId($liveEntryId);
+            $liveEntryArchiveJobData->setNonDeletedCuePointsTags($liveEntry->recordingOptions->nonDeletedCuePointsTags);
+
+            $liveEntryArchiveJob = new BatchJob();
+            $liveEntryArchiveJob->setEntryId($liveEntryId);
+            $liveEntryArchiveJob->setPartnerId($liveEntry->getPartnerId());
+
+            kJobsManager::addJob($liveEntryArchiveJob, $liveEntryArchiveJobData, BatchJobType::LIVE_ENTRY_ARCHIVE);
+        }
+        return $dbBatchJob;
+
+    }
 }

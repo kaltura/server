@@ -330,6 +330,16 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 
+	protected function updatedLiveToVod(BatchJob $dbBatchJob, kLiveToVodJobData $data)
+    {
+        switch($dbBatchJob->getStatus()) {
+            case BatchJob::BATCHJOB_STATUS_FINISHED:
+                return kFlowHelper::handleLiveToVodFinished($dbBatchJob, $data);
+            default:
+                return $dbBatchJob;
+        }
+    }
+
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
 	 */
@@ -445,6 +455,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				case BatchJobType::REPORT_EXPORT:
 					$dbBatchJob = $this->updatedReportExport($dbBatchJob, $dbBatchJob->getData());
 					break;
+
+                case BatchJobType::LIVE_TO_VOD:
+                    $dbBatchJob = $this->updatedLiveToVod($dbBatchJob, $dbBatchJob->getData());
+                    break;
 
 				default:
 					break;
