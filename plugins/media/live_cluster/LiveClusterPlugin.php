@@ -20,9 +20,10 @@ class LiveClusterPlugin extends KalturaPlugin implements IKalturaObjectLoader, I
      */
     public static function getEnums($baseEnumName = null)
     {
-        if(is_null($baseEnumName) || $baseEnumName == 'serverNodeType')
+        if(is_null($baseEnumName) || $baseEnumName === 'serverNodeType')
+        {
             return array('LiveClusterMediaServerNodeType');
-
+        }
         return array();
     }
 
