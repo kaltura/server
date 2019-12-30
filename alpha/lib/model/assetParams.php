@@ -49,6 +49,7 @@ class assetParams extends BaseassetParams implements IBaseObject
 
 	const TS_FILE_EXTENSION = 'ts';
 	const M3U8_FILE_EXTENSION = 'm3u8';
+	const MPG_FILE_EXTENSION = 'mpg';
 
 	const TAG_SOURCE = "source";
 	const TAG_SAVE_SOURCE = "save_source";

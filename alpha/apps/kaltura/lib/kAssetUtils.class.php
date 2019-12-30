@@ -196,11 +196,15 @@ class kAssetUtils
 				$result = assetParams::CONTAINER_FORMAT_MKV;
 				break;
 			case assetParams::CONTAINER_FORMAT_MPEGTS:
+			case assetParams::CONTAINER_FORMAT_M2TS:
 				$result = assetParams::TS_FILE_EXTENSION;
 				break;
 			case assetParams::CONTAINER_FORMAT_HLS:
 			case assetParams::CONTAINER_FORMAT_APPLEHTTP:
 				$result = assetParams::M3U8_FILE_EXTENSION;
+				break;
+			case assetParams::CONTAINER_FORMAT_MPEG:
+				$result = assetParams::MPG_FILE_EXTENSION;
 				break;
 			case assetParams::CONTAINER_FORMAT_FLV:
 			case assetParams::CONTAINER_FORMAT_MP4:
@@ -215,8 +219,6 @@ class kAssetUtils
 			case assetParams::CONTAINER_FORMAT_ISMV:
 			case assetParams::CONTAINER_FORMAT_ISMA:
 			case assetParams::CONTAINER_FORMAT_MKV:
-			case assetParams::CONTAINER_FORMAT_MPEG:
-			case assetParams::CONTAINER_FORMAT_M2TS:
 			case assetParams::CONTAINER_FORMAT_WAV:
 			case assetParams::CONTAINER_FORMAT_M4V:
 			case assetParams::CONTAINER_FORMAT_MXF:
