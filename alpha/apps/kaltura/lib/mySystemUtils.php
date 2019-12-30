@@ -7,9 +7,11 @@ class mySystemUtils
 	const MYSQL = 'MYSQL';
 	const SPHINX = 'SPHINX';
 	const ELASTIC = 'ELASTIC';
-	const CACHE = 'MEMCACHE_LOCAL';
-	const LOCAL_FILE_CREATION = 'LOCAL_FILE_CREATION';
-	const MOVE_FILE = 'MOVE_FILE';
+	const FILE_CREATION = 'FILE_CREATION';
+	const ELASTIC_HOST = '127.0.0.1';
+	const ELASTIC_PORT = '9200';
+	const ELASTIC_HEALTH_CHECK = '/_cluster/health?pretty';
+	const SPHINX_QUERY = 'show tables';
 
 	const DEFAULT_FILE_PATH = '/tmp/storage_test_file_';
 
@@ -40,14 +42,12 @@ class mySystemUtils
 		$healthCheckArray = array();
 		$healthCheckArray[self::SERVER_VERSION] = self::getVersion();
 		$healthCheckArray[self::MYSQL] = (int)self::pingMySql();
-		$healthCheckArray[self::SPHINX]  = self::pingSphinx($config);
-		$healthCheckArray[self::ELASTIC] = self::pingElastic($config);
-		$healthCheckArray[self::CACHE] = self::pingCache();
-		$healthCheckArray[self::LOCAL_FILE_CREATION] = self::createLocalFile($fileName);
-		$healthCheckArray[self::MOVE_FILE] = self::moveFile($fileName, $config);
+		$healthCheckArray[self::SPHINX]  = self::pingSphinx();
+		$healthCheckArray[self::ELASTIC] = self::pingElastic();
+		$healthCheckArray[self::FILE_CREATION] = self::createFile($fileName);
 
 		$strInfo = self::createHealthCheckStr($healthCheckArray);
-		$notifyError = self::shouldNotifyError($healthCheckArray, $config);
+		$notifyError = self::shouldNotifyError($healthCheckArray);
 
 		return array($strInfo, $notifyError);
 	}
@@ -88,26 +88,17 @@ class mySystemUtils
 		return true;
 	}
 
-	public static function pingSphinx($config)
+	public static function pingSphinx()
 	{
-
-		if(!isset($config['sphinxServer']) || !isset($config['sphinxPort']))
-		{
-			return 1;
-		}
-		$sphinxServer = $config['sphinxServer'];
-		$port = $config['sphinxPort'];
-
 		try
 		{
-			$dsn = "mysql:host=$sphinxServer;port=$port;";
-			$con = new PDO($dsn);
+			$con = DbManager::getSphinxConnection(true);
 			if(!$con)
 			{
 				return 0;
 			}
 
-			return self::runSphinxQuery($con, $config);
+			return self::runSphinxQuery($con);
 		}
 		catch(Exception $e)
 		{
@@ -115,11 +106,9 @@ class mySystemUtils
 		}
 	}
 
-	protected static function runSphinxQuery($con, $config)
+	protected static function runSphinxQuery($con)
 	{
-		$id = isset($config['sphinxEntryId']) ? $config['sphinxEntryId'] : 1;
-		$sql = "select str_entry_id from kaltura_entry where id = " . $id;
-		$stmt = $con->query($sql);
+		$stmt = $con->query(self::SPHINX_QUERY);
 		if(!$stmt)
 		{
 			return 0;
@@ -135,29 +124,23 @@ class mySystemUtils
 		return 0;
 	}
 
-	public static function pingElastic($config)
+	public static function pingElastic()
 	{
-		if(!isset($config['elasticEntryId']))
+		$elasticHost = kConf::get('elasticHost', 'elastic', null);
+		if(!$elasticHost)
 		{
-			return 1;
+			$elasticHost = self::ELASTIC_HOST;
 		}
-
+		$elasticPort = kConf::get('elasticPort', 'elastic', null);
+		if(!$elasticPort)
+		{
+			$elasticPort = self::ELASTIC_PORT;
+		}
 		try
 		{
-			$entryItem = new ESearchEntryItem();
-			$entryItem->setFieldName(ESearchEntryFieldName::ID);
-			$entryItem->setItemType(ESearchItemType::EXACT_MATCH);
-			$entryItem->setSearchTerm($config['elasticEntryId']);
-
-			$items = array($entryItem);
-			$operator = new ESearchOperator();
-			$operator->setOperator(ESearchOperatorType::AND_OP);
-			$operator->setSearchItems($items);
-
-			$entrySearch = new kEntrySearch();
-			$results = $entrySearch->doSearch($operator);
-
-			if(!$results[kESearchCoreAdapter::HITS_KEY][kESearchCoreAdapter::TOTAL_KEY])
+			$url = 'http://' . $elasticHost . ':' . $elasticPort . self::ELASTIC_HEALTH_CHECK;
+			$elasticHealth = json_decode(KCurlWrapper::getContent($url), true);
+			if(!isset($elasticHealth['status']) || $elasticHealth['status'] == 'red')
 			{
 				return 0;
 			}
@@ -169,40 +152,9 @@ class mySystemUtils
 		return 1;
 	}
 
-
-	public static function pingCache()
+	public static function createFile($fileName)
 	{
-		try
-		{
-			$memcache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_API_V3);
-			if (!$memcache)
-			{
-				return 0;
-			}
-		}
-		catch(Exception $e)
-		{
-			return 0;
-		}
-
-		return 1;
-	}
-
-	public static function createLocalFile($fileName)
-	{
-		$cmd = 'head -c 1M </dev/urandom >' . $fileName . '| echo $! & ';
-		return self::execCmd($cmd);
-	}
-
-	public static function moveFile($fileName, $config)
-	{
-		if(!isset($config['destFilePath']))
-		{
-			return 1;
-		}
-		$destPath = $config['destFilePath'];
-
-		$cmd = 'mv -f ' . $fileName . ' ' . $destPath . ' 2>/dev/null ' . '| echo $! & ';
+		$cmd = 'head -c 1M </dev/urandom >' . $fileName . ' & ';
 		return self::execCmd($cmd);
 	}
 
@@ -213,7 +165,8 @@ class mySystemUtils
 
 		try
 		{
-			$pid = shell_exec($cmd);
+			shell_exec($cmd);
+			$pid = shell_exec('echo $!');
 			$pid = str_replace(PHP_EOL, '', $pid);
 			return self::checkProcessFinished($pid);
 		}
@@ -264,27 +217,15 @@ class mySystemUtils
 		return $result;
 	}
 
-	public static function shouldNotifyError($healthCheckArray, $config)
+	public static function shouldNotifyError($healthCheckArray)
 	{
-		if(!isset($config['maxErrorNum']))
-		{
-			return false;
-		}
-
-		$cnt = 0;
 		foreach ($healthCheckArray as $key => $value)
 		{
 			if ($value === 0)
 			{
-				$cnt++;
+				return true;
 			}
 		}
-
-		if($cnt > $config['maxErrorNum'])
-		{
-			return true;
-		}
-
 		return false;
 	}
 
