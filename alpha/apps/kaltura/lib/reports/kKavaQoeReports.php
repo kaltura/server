@@ -355,12 +355,12 @@ class kKavaQoeReports extends kKavaReportsMgr
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addFlavorParamColumn',
 			self::REPORT_TOTAL_FINALIZE_FUNC => 'self::addFlavorParamTotalColumn',
 			self::REPORT_TABLE_MAP => array(
-				'flavor_switch_count' => self::EVENT_TYPE_FLAVOR_SWITCH,
+				'count_flavor_switch' => self::EVENT_TYPE_FLAVOR_SWITCH,
 				'avg_view_bitrate' => self::METRIC_AVG_VIEW_BITRATE,
 				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
 			),
 			self::REPORT_TOTAL_MAP => array(
-				'flavor_switch_count' => self::EVENT_TYPE_FLAVOR_SWITCH,
+				'count_flavor_switch' => self::EVENT_TYPE_FLAVOR_SWITCH,
 				'avg_view_bitrate' => self::METRIC_AVG_VIEW_BITRATE,
 				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
 			),
