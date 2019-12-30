@@ -158,7 +158,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		
 		if (!$this->isNew() && $this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS))
 		{
-			$this->addSyncCategoryPrivacyContextJob();
+		//	$this->addSyncCategoryPrivacyContextJob();
 		}
 		
 		$this->childs_for_save = array();
