@@ -17,7 +17,7 @@ class KalturaMonitorClient
 	const EVENT_DRUID          =		'druid';
 	const EVENT_COUCHBASE      =	'couchbase';
 	const EVENT_FILE_SYSTEM    =	'filesystem';
-  const EVENT_RABBIT =	'rabbit';
+  	const EVENT_RABBIT =	'rabbit';
 
 
 	const FIELD_EVENT_TYPE = 		'e';
