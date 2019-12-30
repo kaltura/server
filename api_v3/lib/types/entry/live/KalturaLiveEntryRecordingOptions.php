@@ -45,7 +45,7 @@ class KalturaLiveEntryRecordingOptions extends KalturaObject
 		"shouldCopyThumbnail",
 		"shouldMakeHidden",
 		"shouldAutoArchive",
-        "nonDeletedCuePointsTags"
+		"nonDeletedCuePointsTags"
 	);
 	
 	/* (non-PHPdoc)

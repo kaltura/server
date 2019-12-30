@@ -456,9 +456,9 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 					$dbBatchJob = $this->updatedReportExport($dbBatchJob, $dbBatchJob->getData());
 					break;
 
-                case BatchJobType::LIVE_TO_VOD:
-                    $dbBatchJob = $this->updatedLiveToVod($dbBatchJob, $dbBatchJob->getData());
-                    break;
+				case BatchJobType::LIVE_TO_VOD:
+					$dbBatchJob = $this->updatedLiveToVod($dbBatchJob, $dbBatchJob->getData());
+					break;
 
 				default:
 					break;
