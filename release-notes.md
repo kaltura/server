@@ -1,4 +1,127 @@
+# Orion 15.14.0 #
+## Modify confMaps content column ##
+- Issue Type: Task
+
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+  mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_12_26_alter_config_maps_table.sql
+
+# Orion 15.13.0 #
+
+## Escape category MD5 values to avoid long query times + support sphinx category sharding ##
+- Issue Type: Task
+- Issue ID : PLAT-10269
+
+### Configuration ##
+    To support sharding sphinx category table add the follwoing to you db.ini file:
+        [sphinx_split_index]
+        enabled = true
+        category = 10
+        
+        Updaet your sphinx kaltura.conf when it comes to the category table definition:
+        index kaltura_category_base:kaltura_base_gt_in_charset
+        {
+        
+        	rt_mem_limit	 = 10240M
+        	min_prefix_len	 = 1
+        	rt_attr_uint	 = category_id
+        	rt_field         = str_category_id
+        	rt_attr_uint	 = parent_id
+        	rt_field	 = name
+        	rt_attr_string	 = name
+        	rt_attr_bigint	 = partner_id
+        	rt_field	 = full_name
+        	rt_attr_string	 = full_name
+        	rt_field	 = full_ids
+        	rt_field	 = description
+        	rt_field	 = tags
+        	rt_field	 = display_in_search
+        	rt_attr_uint	 = kuser_id
+        	rt_attr_uint	 = category_status
+        	rt_field	 = members
+        	rt_field	 = plugins_data
+        	rt_attr_uint	 = depth
+        	rt_field	 = reference_id
+        	rt_field	 = privacy_context
+        	rt_field	 = privacy_contexts
+        	rt_field	 = privacy
+        	rt_field     = sphinx_match_optimizations
+        	rt_attr_uint	 = members_count
+        	rt_attr_uint	 = pending_members_count
+        	rt_attr_uint	 = entries_count
+        	rt_attr_uint	 = direct_entries_count
+        	rt_attr_uint	 = direct_sub_categories_count
+        	rt_attr_uint	 = inheritance_type
+        	rt_attr_uint	 = user_join_policy
+        	rt_attr_uint	 = default_permission_level
+        	rt_attr_uint	 = contribution_policy
+        	rt_attr_uint	 = inherited_parent_id
+        	rt_attr_timestamp	 = created_at
+        	rt_attr_timestamp	 = updated_at
+        	rt_attr_timestamp	 = deleted_at
+        	rt_attr_bigint	 = partner_sort_value
+        	rt_attr_json = dynamic_attributes
+        	rt_field = aggregation_categories
+        }
+        
+        index kaltura_category_0:kaltura_category_base
+        {
+        	path	 = /opt/kaltura/sphinx/kaltura_category_rt_0
+        }
+        
+        duplicate the above index to kaltura_category_0 .... kaltura_category_9
+
+#### Deployment Scripts ####
+    Reindex category tables to sphinx to support the md5 query time fix:
+        php /opt/kaltura/app/deployment/base/scripts/populateSphinxCategories.php
+
+
+## Reach boolean event notification for privacy context ##
+- Issue Type: Task
+- Issue ID : REACH2-737
+
+### Configuration ##
+First replace all tokens from the XML files below and remove ".template" from the file name:
+/opt/kaltura/app/deployment/updates/scripts/xml/2019_12_22_categoryEntryAddedPrivacyContextsBooleanNotification.template.xml
+/opt/kaltura/app/deployment/updates/scripts/xml/2019_12_22_categoryEntryChangedPrivacyContextsBooleanNotification.template.xml
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/2019_12_22_deploy_category_entry_boolen_notifications.php
+
+
 # Orion 15.12.0 #
+## giving partner -8 permission to partner get ##
+- Issue Type: Task
+- Issue ID : PLAT-10357
+
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_12_04_add_permission_partner_get.php'
+
+
+## BaseEntry list with ESearch ##
+
+- Issue Type: Task
+- Issue ID : PLAT-10347
+
+### Configuration ##
+
+1) Make sure "elasticDynamicMap" exists in your configuration maps 
+2) Add the following section "filterExecutionTags" with following values:
+    0 = KScheduledTaskDryRunner
+    1 = KScheduledTaskRunner
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
 
 ## Restore deleted entry ##
 
@@ -67,10 +190,10 @@ Alter batch_job_log table to change abort colmun default value
 Run php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_05_update_confmaps_permissions.php 
 
 ### configuration ###
-modify /opt/kaltura/app/configuration/db_sync.template.ini to /opt/kaltura/app/configuration/db_sync.ini and configure relevant db connection
+modify /opt/kaltura/app/configurations/db_sync.template.ini to /opt/kaltura/app/configurations/db_sync.ini and configure relevant db connection
 This is required to be able to run syncDbConfigMapsToCache.php and insertConfigMapToDb.php scripts syncs conf maps from db to remote cache.
 
-modify /opt/kaltura/app/configuration/batchBase.template.ini to /opt/kaltura/app/configuration/batchBase.ini and modify as needed
+modify /opt/kaltura/app/configurations/batchBase.template.ini to /opt/kaltura/app/configurations/batchBase.ini and modify as needed
 
 # Orion 15.11.0 #
 

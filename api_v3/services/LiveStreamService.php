@@ -553,7 +553,6 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function regenerateStreamTokenAction($entryId)
 	{
-		
 		$this->dumpApiRequest($entryId, true);
 	
 		$liveEntry = entryPeer::retrieveByPK($entryId);
@@ -575,5 +574,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		$entry = KalturaEntryFactory::getInstanceByType($liveEntry->getType());
 		$entry->fromObject($liveEntry, $this->getResponseProfile());
 		return $entry;
+
 	}
+
 }

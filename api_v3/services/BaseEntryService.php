@@ -482,7 +482,43 @@ class BaseEntryService extends KalturaEntryService
 	{
 		$this->deleteEntry($entryId);
 	}
-	
+
+	protected function shouldRunByElastic(KalturaBaseEntryFilter $filter)
+	{
+		if(ESearchQueryFromFilter::canTransformFilter($filter))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	protected function tryListWithFilterExecutor(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$result = null;
+		$coreFilter = $filter->toObject();
+		try
+		{
+			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaFilterExecutor');
+			foreach ($pluginInstances as $KalturaFilterExecutor)
+			{
+				/* @var $KalturaFilterExecutor IKalturaFilterExecutor */
+				if ($KalturaFilterExecutor->canExecuteFilter($filter, $coreFilter, $this->getResponseProfile()))
+				{
+					KalturaLog::info('Executing filter on ' . get_class($KalturaFilterExecutor));
+					$result = $KalturaFilterExecutor->executeFilter($filter, $coreFilter, $pager);
+					break;
+				}
+			}
+		}
+		catch (Exception $e)
+		{
+			kalturaLog::warning('Could not execute filter');
+		}
+
+		return $result;
+	}
+
 	/**
 	 * List base entries by filter with paging support.
 	 *
@@ -493,17 +529,23 @@ class BaseEntryService extends KalturaEntryService
 	 */
 	function listAction(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if(!$filter)
+		if (!$filter)
 		{
 			$filter = new KalturaBaseEntryFilter();
 		}
-			
-		if(!$pager)
+
+		if (!$pager)
 		{
 			$pager = new KalturaFilterPager();
 		}
 
-		$result = $filter->getListResponse($pager, $this->getResponseProfile());
+		$clonedFilter = clone $filter;
+		$result = $this->tryListWithFilterExecutor($clonedFilter, $pager);
+		if (!$result)
+		{
+			$result = $filter->getListResponse($pager, $this->getResponseProfile());
+		}
+
 		
 		if ($result->totalCount == 1 && 
 			count($result->objects) == 1 && 
@@ -814,7 +856,7 @@ class BaseEntryService extends KalturaEntryService
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 * @return KalturaBaseEntry The exported entry
 	 */
-	public function exportAction ( $entryId , $storageProfileId )
+	public function exportAction ($entryId, $storageProfileId)
 	{
 	    $dbEntry = entryPeer::retrieveByPK($entryId);
 	    if (!$dbEntry)
@@ -822,7 +864,7 @@ class BaseEntryService extends KalturaEntryService
 	        throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 	    }
 	    
-	    $dbStorageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+	    $dbStorageProfile = StorageProfilePeer::retrieveByIdAndPartnerId($storageProfileId, $dbEntry->getPartnerId());
 	    if (!$dbStorageProfile)
 	    {
 	        throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $storageProfileId);

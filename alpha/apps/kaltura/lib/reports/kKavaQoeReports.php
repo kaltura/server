@@ -255,11 +255,11 @@ class kKavaQoeReports extends kKavaReportsMgr
 		ReportType::QOE_ENGAGEMENT => array(
 			self::REPORT_METRICS => array(
 				self::METRIC_UNIQUE_SESSIONS,
-				self::METRIC_AVG_VIEW_PLAY_TIME_SEC
+				self::METRIC_AVG_VIEW_PLAY_TIME_SEC,
 			),
 			self::REPORT_GRAPH_METRICS => array(
 				self::METRIC_UNIQUE_SESSIONS,
-				self::METRIC_AVG_VIEW_PLAY_TIME_SEC
+				self::METRIC_AVG_VIEW_PLAY_TIME_SEC,
 			)
 		),
 
@@ -355,12 +355,12 @@ class kKavaQoeReports extends kKavaReportsMgr
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addFlavorParamColumn',
 			self::REPORT_TOTAL_FINALIZE_FUNC => 'self::addFlavorParamTotalColumn',
 			self::REPORT_TABLE_MAP => array(
-				'flavor_switch_count' => self::EVENT_TYPE_FLAVOR_SWITCH,
+				'count_flavor_switch' => self::EVENT_TYPE_FLAVOR_SWITCH,
 				'avg_view_bitrate' => self::METRIC_AVG_VIEW_BITRATE,
 				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
 			),
 			self::REPORT_TOTAL_MAP => array(
-				'flavor_switch_count' => self::EVENT_TYPE_FLAVOR_SWITCH,
+				'count_flavor_switch' => self::EVENT_TYPE_FLAVOR_SWITCH,
 				'avg_view_bitrate' => self::METRIC_AVG_VIEW_BITRATE,
 				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
 			),
@@ -514,6 +514,18 @@ class kKavaQoeReports extends kKavaReportsMgr
 			),
 		),
 
+		ReportType::QOE_VOD_SESSION_FLOW => array(
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
+			self::REPORT_PLAYBACK_TYPES => array(self::PLAYBACK_TYPE_VOD),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY_REQUESTED, self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_ERROR_POSITION_COUNT, self::METRIC_ERROR_UNKNOWN_POSITION_COUNT, self::METRIC_COUNT_EBVS)
+		),
+
+		ReportType::QOE_LIVE_SESSION_FLOW => array(
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
+			self::REPORT_PLAYBACK_TYPES => array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY_REQUESTED, self::EVENT_TYPE_PLAY, self::METRIC_ERROR_POSITION_COUNT, self::METRIC_ERROR_UNKNOWN_POSITION_COUNT, self::METRIC_COUNT_EBVS)
+		)
+
 	);
 
 	protected static function initTransformTimeDimensions()
@@ -553,7 +565,10 @@ class kKavaQoeReports extends kKavaReportsMgr
 			}
 		}
 
-		$report_def[self::REPORT_DATA_SOURCE] = self::DATASOURCE_REALTIME;
+		if (!isset($report_def[self::REPORT_DATA_SOURCE]))
+		{
+			$report_def[self::REPORT_DATA_SOURCE] = self::DATASOURCE_REALTIME;
+		}
 
 		self::initTransformTimeDimensions();
 

@@ -32,6 +32,8 @@ class ConfMapsService extends KalturaBaseService
 	 */
 	function addAction(KalturaConfMaps $map)
 	{
+		$map->relatedHost = strtolower($map->relatedHost);
+
 		$dbMap = ConfMapsPeer::getMapByVersion($map->name, $map->relatedHost);
 		if($dbMap)
 		{
@@ -58,6 +60,7 @@ class ConfMapsService extends KalturaBaseService
 	 */
 	function updateAction(KalturaConfMaps $map)
 	{
+		$map->relatedHost = strtolower($map->relatedHost);
 		//get map by values name / hostname
 		$dbMap = ConfMapsPeer::getMapByVersion($map->name, $map->relatedHost);
 		if(!$dbMap)

@@ -228,4 +228,17 @@ class kVendorCredit
 	{
 		return false;
 	}
+
+	/**
+	 * @param $sourceCredit
+	 */
+	public function setInnerParams($sourceCredit)
+	{
+		if ($sourceCredit)
+		{
+			/** @var kVendorCredit $sourceCredit */
+			$this->lastSyncTime = $sourceCredit->getLastSyncTime();
+			$this->syncedCredit = $sourceCredit->getSyncedCredit();
+		}
+	}
 }

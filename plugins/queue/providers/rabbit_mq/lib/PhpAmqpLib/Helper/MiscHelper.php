@@ -3,32 +3,17 @@ namespace PhpAmqpLib\Helper;
 
 class MiscHelper
 {
-    public static function debug_msg($s)
-    {
-        echo $s . PHP_EOL;
-    }
-
     /**
-     * @param $a
+     * @param string|array $a
      * @return string
      */
     public static function methodSig($a)
     {
         if (is_string($a)) {
             return $a;
-        } else {
-            return sprintf('%d,%d', $a[0], $a[1]);
         }
-    }
 
-    /**
-     * @param $bytes
-     */
-    public static function saveBytes($bytes)
-    {
-        $fh = fopen('/tmp/bytes', 'wb');
-        fwrite($fh, $bytes);
-        fclose($fh);
+        return sprintf('%d,%d', $a[0], $a[1]);
     }
 
     /**
@@ -36,12 +21,12 @@ class MiscHelper
      * decimal part mutliplied by 10^6. Useful for some PHP stream functions that need seconds and microseconds as
      * different arguments
      *
-     * @param $number
-     * @return array
+     * @param int|float $number
+     * @return int[]
      */
     public static function splitSecondsMicroseconds($number)
     {
-        return array(floor($number), ($number - floor($number)) * 1000000);
+        return array((int)floor($number), (int)(fmod($number, 1) * 1000000));
     }
 
     /**
@@ -60,7 +45,7 @@ class MiscHelper
      * @param bool $htmloutput Set to false for non-HTML output
      * @param bool $uppercase Set to true for uppercase hex
      * @param bool $return Set to true to return the dump
-     * @return string
+     * @return string|null
      */
     public static function hexdump($data, $htmloutput = true, $uppercase = false, $return = false)
     {
@@ -122,5 +107,32 @@ class MiscHelper
         }
 
         echo $dump;
+    }
+
+    /**
+     * @param array $table
+     * @return string
+     */
+    public static function dump_table($table)
+    {
+        $tokens = array();
+        foreach ($table as $name => $value) {
+            switch ($value[0]) {
+                case 'D':
+                    $val = $value[1]->n . 'E' . $value[1]->e;
+                    break;
+                case 'F':
+                    $val = '(' . self::dump_table($value[1]) . ')';
+                    break;
+                case 'T':
+                    $val = date('Y-m-d H:i:s', $value[1]);
+                    break;
+                default:
+                    $val = $value[1];
+            }
+            $tokens[] = $name . '=' . $val;
+        }
+
+        return implode(', ', $tokens);
     }
 }

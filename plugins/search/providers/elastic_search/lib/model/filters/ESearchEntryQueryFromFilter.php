@@ -143,6 +143,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			ESearchEntryFilterFields::FREE_TEXT => ESearchUnifiedItem::UNIFIED,
 			ESearchEntryFilterFields::TOTAL_RANK => ESearchEntryOrderByFieldName::VOTES,
 			ESearchEntryFilterFields::RANK => ESearchEntryOrderByFieldName::RANK,
+			ESearchEntryFilterFields::VOTES => ESearchEntryOrderByFieldName::VOTES,
 			ESearchEntryFilterFields::LAST_PLAYED_AT => ESearchEntryOrderByFieldName::LAST_PLAYED_AT,
 			ESearchEntryFilterFields::PLAYS => ESearchEntryFieldName::PLAYS,
 		);

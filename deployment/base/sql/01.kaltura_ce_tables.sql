@@ -960,7 +960,7 @@ CREATE TABLE `entry_vendor_task` (
   KEY `partner_id_status_index` (`partner_id`,`status`),
 	KEY `vendor_partner_id_status_index` (`vendor_partner_id`,`status`),
 	KEY `updated_at` (`updated_at`),
-	KEY `entry_id` (`entry_id`)
+	KEY `entry_id` (`entry_id`),
 	KEY `reach_profile_queue_time` (`reach_profile_id`,`queue_time`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -2701,7 +2701,7 @@ CREATE TABLE IF NOT EXISTS `conf_maps`
 	`version` INTEGER NOT NULL,
 	`created_at` DATETIME  NOT NULL,
 	`remarks` TEXT,
-	`content` TEXT,
+	`content` MEDIUMTEXT,
 	PRIMARY KEY (`id`),
 	KEY `configuration_map_source` (`map_name`,`host_name`,`version`)
 )ENGINE=INNODB DEFAULT CHARSET=utf8;
