@@ -40,11 +40,12 @@ class kAssetUtils
 	}
 
 	/**
+	 * @param entry $entry
 	 * @param asset $asset
+	 * @return array
+	 * @throws PropelException
 	 * @params entry $entry
-	 * @return string
 	 */
-
 	public static function getFileName(entry $entry, asset $asset = null)
 	{
 		$fileExt = "";
@@ -179,5 +180,59 @@ class kAssetUtils
 		}
 
 		return $filePath;
+	}
+
+	public static function getFileExtension($containerFormat)
+	{
+		$result = null;
+		switch ($containerFormat)
+		{
+			case assetParams::CONTAINER_FORMAT_MP42:
+			case assetParams::CONTAINER_FORMAT_ISOM:
+			case assetParams::CONTAINER_FORMAT_MP42_ISOM:
+				$result = assetParams::CONTAINER_FORMAT_MP4;
+				break;
+			case assetParams::CONTAINER_FORMAT_WEBM:
+				$result = assetParams::CONTAINER_FORMAT_MKV;
+				break;
+			case assetParams::CONTAINER_FORMAT_MPEGTS:
+				$result = assetParams::TS_FILE_EXTENSION;
+				break;
+			case assetParams::CONTAINER_FORMAT_HLS:
+			case assetParams::CONTAINER_FORMAT_APPLEHTTP:
+				$result = assetParams::M3U8_FILE_EXTENSION;
+				break;
+			case assetParams::CONTAINER_FORMAT_FLV:
+			case assetParams::CONTAINER_FORMAT_MP4:
+			case assetParams::CONTAINER_FORMAT_AVI:
+			case assetParams::CONTAINER_FORMAT_MOV:
+			case assetParams::CONTAINER_FORMAT_MP3:
+			case assetParams::CONTAINER_FORMAT_3GP:
+			case assetParams::CONTAINER_FORMAT_OGG:
+			case assetParams::CONTAINER_FORMAT_OGV:
+			case assetParams::CONTAINER_FORMAT_WMV:
+			case assetParams::CONTAINER_FORMAT_WMA:
+			case assetParams::CONTAINER_FORMAT_ISMV:
+			case assetParams::CONTAINER_FORMAT_ISMA:
+			case assetParams::CONTAINER_FORMAT_MKV:
+			case assetParams::CONTAINER_FORMAT_MPEG:
+			case assetParams::CONTAINER_FORMAT_M2TS:
+			case assetParams::CONTAINER_FORMAT_WAV:
+			case assetParams::CONTAINER_FORMAT_M4V:
+			case assetParams::CONTAINER_FORMAT_MXF:
+			case assetParams::CONTAINER_FORMAT_F4V:
+			case assetParams::CONTAINER_FORMAT_PDF:
+			case assetParams::CONTAINER_FORMAT_SWF:
+			case assetParams::CONTAINER_FORMAT_JPG:
+			case assetParams::CONTAINER_FORMAT_BMP:
+			case assetParams::CONTAINER_FORMAT_PNG:
+				$result = $containerFormat;
+				break;
+			case assetParams::CONTAINER_FORMAT_COPY:
+			case assetParams::CONTAINER_FORMAT_WIDEVINE:
+			Default:
+		}
+
+		return $result;
 	}
 }
