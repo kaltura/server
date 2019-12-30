@@ -56,7 +56,6 @@ class ESearchEntryItem extends ESearchItem
 		'last_played_at' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE, 'ESearchItemType::EXISTS'=> ESearchItemType::EXISTS),
 		'plays' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 		'rank' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
-		'votes' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 	);
 
 	protected static $field_boost_values = array(
