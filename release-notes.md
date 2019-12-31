@@ -8,6 +8,19 @@ none.
 #### Deployment Scripts ####
   mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_12_26_alter_config_maps_table.sql
 
+## add server healthCheck API action ##
+- Issue Type: Task
+- Issue ID : PLAT-10432
+
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+Run: 
+
+    'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_12_19_add_system_gethealthcheck_action.php'
+
+
 # Orion 15.13.0 #
 
 ## Escape category MD5 values to avoid long query times + support sphinx category sharding ##
