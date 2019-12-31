@@ -29,7 +29,7 @@ class Form_ApFeedDropFolderConfigureExtend_SubForm extends Form_FeedDropFolderCo
 	
 	public function getObject($object, $objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
-		$object = parent::getObject($objectType, $objectType, $properties, $add_underscore, $include_empty_fields);
+		$object = parent::getObject($object, $objectType, $properties, $add_underscore, $include_empty_fields);
 		
 		$itemXpathsToExtend = isset($properties['itemXpathsToExtend']) && is_array($properties['itemXpathsToExtend']) ? $properties['itemXpathsToExtend'] : array();
 		$object->itemXpathsToExtend = array();
@@ -46,11 +46,11 @@ class Form_ApFeedDropFolderConfigureExtend_SubForm extends Form_FeedDropFolderCo
 	protected function addItemXpathsToExtend($itemXpathsToExtend)
 	{
 		if (count($itemXpathsToExtend) == 0)
-			$itemXpathsToExtend = array();
+			$itemXpathsToExtend = array(new Kaltura_Client_Type_StringValue());
 		
 		$mainSubForm = new Zend_Form_SubForm();
 		$mainSubForm->setLegend('Item XPaths To Expand');
-		$this->getView()->addBasePath(realpath(dirname(__FILE__)));
+		$this->getView()->addBasePath(realpath(dirname(__FILE__)).'/..');
 		$mainSubForm->setDecorators(array(
 			'FormElements',
 			array('ViewScript', array(
