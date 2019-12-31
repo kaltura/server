@@ -4265,6 +4265,7 @@ class kKavaReportsMgr extends kKavaBase
 				$default_order = reset($metrics);
 			}
 
+			$order_by_dir = '-';
 			if (!$order_by)
 			{
 				$order_by = $default_order;
