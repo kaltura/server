@@ -6,9 +6,7 @@ namespace PhpAmqpLib\Helper\Protocol;
 
 class MethodMap080
 {
-    /**
-     * @var array
-     */
+
     protected $method_map = array(
         '10,10' => 'connection_start',
         '10,11' => 'connection_start_ok',
@@ -105,21 +103,18 @@ class MethodMap080
         '120,41' => 'test_content_ok',
     );
 
-    /**
-     * @var string $method_sig
-     * @return string
-     */
+
+
     public function get_method($method_sig)
     {
         return $this->method_map[$method_sig];
     }
 
-    /**
-     * @var string $method_sig
-     * @return bool
-     */
+
+
     public function valid_method($method_sig)
     {
         return array_key_exists($method_sig, $this->method_map);
     }
+
 }
