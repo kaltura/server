@@ -382,6 +382,7 @@ class kZoomEngine
 			return null;
 		}
 
+		$meetingOwnerName = strtolower($meetingOwnerName);
 		$accessToken = kZoomOauth::getValidAccessToken($zoomIntegration);
 		$participantsData = $this->zoomClient->retrieveMeetingParticipant($accessToken, $meetingId);
 		$participants = new kZoomParticipants();
@@ -394,7 +395,7 @@ class kZoomEngine
 			foreach ($participantsEmails as $participantEmail)
 			{
 				$userName = $this->matchZoomUserName($participantEmail, $zoomIntegration);
-				if($meetingOwnerName != $userName)
+				if($meetingOwnerName != strtolower($userName))
 				{
 					$result[] = $userName;
 				}
