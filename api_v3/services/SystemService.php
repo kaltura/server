@@ -9,7 +9,6 @@
  */
 class SystemService extends KalturaBaseService
 {
-	const APIV3_FAIL_PING = "APIV3_FAIL_PING";
 	
 	protected function partnerRequired($actionName)
 	{

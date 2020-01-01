@@ -12,6 +12,7 @@ class mySystemUtils
 	const ELASTIC_PORT = '9200';
 	const ELASTIC_HEALTH_CHECK = '/_cluster/health?pretty';
 	const SPHINX_QUERY = 'show tables';
+	const APIV3_FAIL_PING = "APIV3_FAIL_PING";
 
 	const DEFAULT_FILE_PATH = '/tmp/storage_test_file_';
 
