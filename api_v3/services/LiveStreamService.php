@@ -598,7 +598,6 @@ class LiveStreamService extends KalturaLiveEntryService
 
         $liveEntryArchiveJobData = new kLiveEntryArchiveJobData();
         $liveEntryArchiveJobData->setLiveEntryId($liveEntryId);
-        $liveEntryArchiveJobData->setNonDeletedCuePointsTags($liveEntry->getRecordingOptions()->getNonDeletedCuePointsTags());
 
         $liveEntryArchiveJob = new BatchJob();
         $liveEntryArchiveJob->setEntryId($liveEntryId);

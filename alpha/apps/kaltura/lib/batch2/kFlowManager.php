@@ -331,7 +331,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	}
 
 	protected function updatedLiveToVod(BatchJob $dbBatchJob, kLiveToVodJobData $data)
-    {
+	{
         switch($dbBatchJob->getStatus()) {
             case BatchJob::BATCHJOB_STATUS_FINISHED:
                 return kFlowHelper::handleLiveToVodFinished($dbBatchJob, $data);

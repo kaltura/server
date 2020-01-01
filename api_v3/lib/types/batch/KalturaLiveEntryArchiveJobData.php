@@ -12,15 +12,9 @@ class KalturaLiveEntryArchiveJobData extends KalturaJobData
      */
     public $liveEntryId;
 
-    /**
-     * @var string
-     */
-    public $nonDeletedCuePointsTags;
-
     private static $map_between_objects = array
     (
-        'liveEntryId',
-        'nonDeletedCuePointsTags'
+        'liveEntryId'
     );
 
     /* (non-PHPdoc)

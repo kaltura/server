@@ -3203,20 +3203,22 @@ class kFlowHelper
 
     public static function handleLiveToVodFinished(BatchJob $dbBatchJob, kLiveToVodJobData $data)
     {
+        KalturaLog::info('Handling live to vod finished');
         $liveEntryId = $data->getLiveEntryId();
         $liveEntry = entryPeer::retrieveByPK($liveEntryId);
-        /** @var KalturaLiveStreamEntry $liveEntry */
-        $recordStatus = $liveEntry->recordingStatus;
-        $shouldAutoArchive = $liveEntry->recordingOptions->shouldAutoArchive;
-        if ($recordStatus == KalturaRecordStatus::PER_SESSION && $shouldAutoArchive == KalturaNullableBoolean::TRUE_VALUE) {
+        /** @var LiveStreamEntry $liveEntry */
+        $recordStatus = $liveEntry->getRecordStatus();
+        $shouldAutoArchive = $liveEntry->getRecordingOptions()->getShouldAutoArchive();
+        if ($recordStatus == RecordStatus::PER_SESSION && $shouldAutoArchive == true)
+        {
             $liveEntryArchiveJobData = new kLiveEntryArchiveJobData();
             $liveEntryArchiveJobData->setLiveEntryId($liveEntryId);
-            $liveEntryArchiveJobData->setNonDeletedCuePointsTags($liveEntry->recordingOptions->nonDeletedCuePointsTags);
 
             $liveEntryArchiveJob = new BatchJob();
             $liveEntryArchiveJob->setEntryId($liveEntryId);
             $liveEntryArchiveJob->setPartnerId($liveEntry->getPartnerId());
 
+            KalturaLog::info('Adding a job for auto archive');
             kJobsManager::addJob($liveEntryArchiveJob, $liveEntryArchiveJobData, BatchJobType::LIVE_ENTRY_ARCHIVE);
         }
         return $dbBatchJob;

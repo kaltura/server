@@ -109,10 +109,10 @@ class kLiveEntryRecordingOptions
         $this->shouldAutoArchive = $shouldAutoArchive;
     }
 
-    /**
-     * @return boolean
-     */
-    public function getShouldAutoArchive()
+	/**
+	 * @return boolean
+	 */
+	public function getShouldAutoArchive()
     {
         return $this->shouldAutoArchive;
     }

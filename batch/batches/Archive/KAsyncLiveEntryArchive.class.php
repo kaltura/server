@@ -1,13 +1,21 @@
 <?php
 
 /**
- * @package Scheduler
- * @subpackage Copy
+ * @package batch
+ * @subpackage Archive
  */
 
 class KAsyncLiveEntryArchive extends KJobHandlerWorker
 {
     const MAX_CUE_POINTS_PER_PAGE = 100;
+
+    const DISPLAY_IN_SEARCH_TRUE = 1;
+
+    const POLLS_PUSH_NOTIFICATIONS_STRING = 'POLLS_PUSH_NOTIFICATIONS';
+
+    const PUBLIC_QNA_NOTIFICATIONS_STRING = 'PUBLIC_QNA_NOTIFICATIONS';
+
+    const USER_QNA_NOTIFICATIONS_STRING = 'USER_QNA_NOTIFICATIONS';
 
     /* (non-PHPdoc)
      * @see KBatchBase::getType()
@@ -32,24 +40,23 @@ class KAsyncLiveEntryArchive extends KJobHandlerWorker
      */
     protected function exec(KalturaBatchJob $job)
     {
-        KalturaLog::info("Starting live entry archive! big news!");
         $jobData = $job->data;
         /** @var KalturaLiveEntryArchiveJobData $jobData*/
         $liveEntryId = $jobData->liveEntryId;
-        $notDeletedCuePointTags = $jobData->nonDeletedCuePointsTags;
-        self::deleteCuePoints($liveEntryId, $notDeletedCuePointTags);
-
         $liveEntry = KBatchBase::$kClient->baseEntry->get($liveEntryId);
         /** @var KalturaLiveStreamEntry $liveEntry */
+        $notDeletedCuePointTags = $liveEntry->recordingOptions->nonDeletedCuePointsTags;
+        $this->deleteCuePoints($liveEntryId, $notDeletedCuePointTags);
+
         $vodEntry = KBatchBase::$kClient->baseEntry->get($liveEntry->recordedEntryId);
-        self::updateEntriesData($liveEntry, $vodEntry);
+        $this->updateEntriesData($liveEntry, $vodEntry);
 
-        self::clearPushNotificationQueue($liveEntryId, $liveEntry->partnerId);
+        $this->clearPushNotificationQueue($liveEntryId, $liveEntry->partnerId);
 
-        return $this->closeJob($job, null, null, "Copy all cue points finished", KalturaBatchJobStatus::FINISHED);
+        return $this->closeJob($job, null, null, "Auto archive finished", KalturaBatchJobStatus::FINISHED);
     }
 
-    private static function clearPushNotificationQueue($liveEntryId, $partnerId)
+    protected function clearPushNotificationQueue($liveEntryId, $partnerId)
     {
         $liveEntryString = new KalturaStringValue();
         $liveEntryString->value = $liveEntryId;
@@ -62,56 +69,56 @@ class KAsyncLiveEntryArchive extends KJobHandlerWorker
         $pushNotificationParams->userParams = $pushEventNotificationParameterArray;
 
         KBatchBase::impersonate($partnerId);
-        KBatchBase::$kClient->eventNotificationTemplate->sendCommand('POLLS_PUSH_NOTIFICATIONS',
+        KBatchBase::$kClient->eventNotificationTemplate->sendCommand(self::POLLS_PUSH_NOTIFICATIONS_STRING,
             $pushNotificationParams, KalturaPushNotificationCommandType::CLEAR_QUEUE);
-        KBatchBase::$kClient->eventNotificationTemplate->sendCommand('PUBLIC_QNA_NOTIFICATIONS',
+        KBatchBase::$kClient->eventNotificationTemplate->sendCommand(self::PUBLIC_QNA_NOTIFICATIONS_STRING,
             $pushNotificationParams, KalturaPushNotificationCommandType::CLEAR_QUEUE);
-        KBatchBase::$kClient->eventNotificationTemplate->sendCommand('USER_QNA_NOTIFICATIONS',
+        KBatchBase::$kClient->eventNotificationTemplate->sendCommand(self::USER_QNA_NOTIFICATIONS_STRING,
             $pushNotificationParams, KalturaPushNotificationCommandType::CLEAR_QUEUE);
         KBatchBase::unimpersonate();
     }
 
-    private static function updateEntriesData(KalturaLiveStreamEntry $liveEntry, KalturaBaseEntry $vodEntry)
+    protected function updateEntriesData(KalturaLiveStreamEntry $liveEntry, KalturaBaseEntry $vodEntry)
     {
-        $currentDate = date("M-d-Y H:i");
+        $currentDate = date('M-d-Y H:i');
         $updatedVodEntry = new KalturaMediaEntry();
-        $updatedVodEntry->name = $liveEntry->name. " " . $currentDate;
+        $updatedVodEntry->name = $liveEntry->name. ' ' . $currentDate;
         $updatedVodEntry->description = $liveEntry->description;
         $updatedVodEntry->tags = $liveEntry->tags;
-        $updatedVodEntry->displayInSearch = 1;
+        $updatedVodEntry->displayInSearch = self::DISPLAY_IN_SEARCH_TRUE;
         KBatchBase::$kClient->baseEntry->update($vodEntry->id, $updatedVodEntry);
 
         $updatedLiveEntry = new KalturaLiveStreamEntry();
-        $updatedLiveEntry->redirectEntryId = "";
-        $updatedLiveEntry->recordedEntryId = "";
+        $updatedLiveEntry->redirectEntryId = '';
+        $updatedLiveEntry->recordedEntryId = '';
         KBatchBase::$kClient->baseEntry->update($liveEntry->id, $updatedLiveEntry);
     }
 
-    private static function deleteCuePoints($entryId, $notDeletedCuePointTags)
+    protected function deleteCuePoints($entryId, $notDeletedCuePointTags)
     {
-        $cuePointsCount = self::getCuePointCount($entryId);
+        $cuePointsCount = $this->getCuePointCount($entryId);
         $loopIterations = ceil($cuePointsCount / self::MAX_CUE_POINTS_PER_PAGE);
-        $filter = self::getCuePointFilter($entryId);
+        $filter = $this->getCuePointFilter($entryId);
         $pager = new KalturaFilterPager();
         $pager->pageSize = self::MAX_CUE_POINTS_PER_PAGE;
-
-        $notDeletedCuePointTagsArray = explode(",", $notDeletedCuePointTags);
-
+        $notDeletedCuePointTagsArray = self::getFixedExplodedTagsArray($notDeletedCuePointTags);
         for ($i = 1; $i <= $loopIterations; $i++)
         {
             $pager->pageIndex = $i;
             try
             {
                 $cuePointsList = KBatchBase::$kClient->cuePoint->listAction($filter, $pager);
+                KBatchBase::$kClient->startMultiRequest();
                 foreach ($cuePointsList->objects as $cuePoint)
                 {
-                    $cuePointTags = explode(',', $cuePoint->tags);
+                    $cuePointTags = self::getFixedExplodedTagsArray($cuePoint->tags);
                     $relevantTags = array_intersect($notDeletedCuePointTagsArray, $cuePointTags);
                     if (count($relevantTags) == 0)
                     {
                         KBatchBase::$kClient->cuePoint->updateStatus($cuePoint->id, CuePointStatus::DELETED);
                     }
                 }
+                KBatchBase::$kClient->doMultiRequest();
             }
             catch (Exception $ex)
             {
@@ -120,17 +127,28 @@ class KAsyncLiveEntryArchive extends KJobHandlerWorker
         }
     }
 
-    private static function getCuePointFilter($entryId)
+    protected static function getFixedExplodedTagsArray($tagsAsString)
+    {
+        if (empty($tagsAsString))
+        {
+            return array();
+        }
+        else
+        {
+            return explode(",", $tagsAsString);
+        }
+    }
+
+    protected function getCuePointFilter($entryId)
     {
         $filter = new KalturaCuePointFilter();
         $filter->entryIdEqual = $entryId;
-        $filter->statusIn = CuePointStatus::READY;
         return $filter;
     }
 
-    private static function getCuePointCount($entryId)
+    protected function getCuePointCount($entryId)
     {
-        $filter = self::getCuePointFilter($entryId);
+        $filter = $this->getCuePointFilter($entryId);
         return KBatchBase::$kClient->cuePoint->count($filter);
     }
 }

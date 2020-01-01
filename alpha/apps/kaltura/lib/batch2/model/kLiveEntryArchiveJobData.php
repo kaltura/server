@@ -8,12 +8,7 @@ class kLiveEntryArchiveJobData extends kJobData
     /**
      * @var string
      */
-    private $liveEntryId;
-
-    /**
-     * @var string
-     */
-    private $nonDeletedCuePointsTags;
+    protected $liveEntryId;
 
     /**
      * @return string liveEntryId
@@ -29,22 +24,6 @@ class kLiveEntryArchiveJobData extends kJobData
     public function setLiveEntryId($liveEntryId)
     {
         $this->liveEntryId = $liveEntryId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getNonDeletedCuePointsTags()
-    {
-        return $this->nonDeletedCuePointsTags;
-    }
-
-    /**
-     * @param string $nonDeletedCuePointsTags
-     */
-    public function setNonDeletedCuePointsTags($nonDeletedCuePointsTags)
-    {
-        $this->nonDeletedCuePointsTags = $nonDeletedCuePointsTags;
     }
 
 }
