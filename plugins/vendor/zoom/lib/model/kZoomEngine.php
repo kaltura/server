@@ -395,7 +395,7 @@ class kZoomEngine
 			foreach ($participantsEmails as $participantEmail)
 			{
 				$userName = $this->matchZoomUserName($participantEmail, $zoomIntegration);
-				if($meetingOwnerName != strtolower($userName))
+				if($meetingOwnerName !== strtolower($userName))
 				{
 					$result[] = $userName;
 				}
