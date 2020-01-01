@@ -105,31 +105,31 @@ class kLiveEntryRecordingOptions
 	 * @param boolean $shouldAutoArchive
 	 */
 	public function setShouldAutoArchive($shouldAutoArchive)
-    {
-        $this->shouldAutoArchive = $shouldAutoArchive;
-    }
+	{
+		$this->shouldAutoArchive = $shouldAutoArchive;
+	}
 
 	/**
 	 * @return boolean
 	 */
 	public function getShouldAutoArchive()
-    {
-        return $this->shouldAutoArchive;
-    }
+	{
+		return $this->shouldAutoArchive;
+	}
 
-    /**
-     * @param string $nonDeletedCuePointsTags
-     */
-    public function setNonDeletedCuePointsTags($nonDeletedCuePointsTags)
-    {
-        $this->nonDeletedCuePointsTags = $nonDeletedCuePointsTags;
-    }
+	/**
+	 * @param string $nonDeletedCuePointsTags
+	 */
+	public function setNonDeletedCuePointsTags($nonDeletedCuePointsTags)
+	{
+		$this->nonDeletedCuePointsTags = $nonDeletedCuePointsTags;
+	}
 
-    /**
-     * @return string
-     */
-    public function getNonDeletedCuePointsTags()
-    {
-        return $this->nonDeletedCuePointsTags;
-    }
+	/**
+	 * @return string
+	 */
+	public function getNonDeletedCuePointsTags()
+	{
+		return $this->nonDeletedCuePointsTags;
+	}
 }
