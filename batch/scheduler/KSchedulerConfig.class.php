@@ -433,8 +433,8 @@ class KSchedulerConfig extends Zend_Config_Ini
 		else
 		{
 			$clientConfig = new KalturaConfiguration();
-			$clientConfig ->serviceUrl = $this->kClientConfig['serviceUrl'];
-			$clientConfig ->curlTimeout = $this->kClientConfig['curlTimeout'];
+			$clientConfig->serviceUrl = $this->kClientConfig['serviceUrl'];
+			$clientConfig->curlTimeout = $this->kClientConfig['curlTimeout'];
 			$this->kClient = new KalturaClient($clientConfig );
 			$this->kClient->setPartnerId($this->kClientConfig['partnerId']);
 			$ks = $this->kClient->generateSession($this->kClientConfig['secret'], 'batchUser', KalturaSessionType::ADMIN, '-1');
