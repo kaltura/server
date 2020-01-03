@@ -52,11 +52,16 @@ class kConfCacheManager
 
 	protected static function init($ignoreCache = false)
 	{
-		if(self::$init || $ignoreCache)
+		if(self::$init)
 		{
 			return;
 		}
 		self::$init=true;
+		
+		if($ignoreCache)
+		{
+			return;
+		}
 		//load basic parameters
 		//remote and local memcache	configuration maps
 		self::initLoad(kCacheConfFactory::LOCAL_MEM_CACHE);
