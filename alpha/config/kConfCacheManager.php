@@ -50,9 +50,9 @@ class kConfCacheManager
 	}
 
 
-	protected static function init()
+	protected static function init($ignoreCache = false)
 	{
-		if(self::$init  || PHP_SAPI === 'cli')
+		if(self::$init || $ignoreCache)
 		{
 			return;
 		}
@@ -110,9 +110,9 @@ class kConfCacheManager
 
 	static $loadRecursiveLock;
 
-	public static function load ($mapName, $key=null)
+	public static function load ($mapName, $key=null, $ignoreCache = false)
 	{
-		self::init();
+		self::init($ignoreCache);
 		if(self::$loadRecursiveLock)
 		{
 			return array();
