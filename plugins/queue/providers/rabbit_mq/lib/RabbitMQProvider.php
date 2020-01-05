@@ -72,7 +72,7 @@ class RabbitMQProvider extends QueueProvider
 	public function create($queueName)
 	{
 		// establish connection to RabbitMQ
-		$connection = new PhpAmqpLib\Connection\AMQPConnection($this->MQserver, $this->port, $this->username, $this->password);
+		$connection = new PhpAmqpLib\Connection\AMQPConnection($this->MQserver, $this->port, $this->username, $this->password, '/', false, 'AMQPLAIN', null, 'en_US', 0.00000000000000000000000000000000000000000000000000000000000001, 0.00000000000000000000000000000000000000000000000000000000000001, null, false, 0, 1);
 		$channel = $connection->channel();
 
 		// durable = true to make sure that RabbitMQ will never lose our queue (if RabbitMQ server stops)

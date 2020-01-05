@@ -285,6 +285,7 @@ class AbstractChannel
      * @param int $timeout
      * @throws \PhpAmqpLib\Exception\AMQPOutOfBoundsException
      * @throws \PhpAmqpLib\Exception\AMQPRuntimeException
+	 * @throws \PhpAmqpLib\Exception\AMQPTimeoutException
      * @return mixed
      */
     public function wait($allowed_methods = null, $non_blocking = false, $timeout = 0)
