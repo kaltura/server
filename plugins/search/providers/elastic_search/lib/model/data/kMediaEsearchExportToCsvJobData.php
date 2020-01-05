@@ -7,10 +7,27 @@
 class kMediaEsearchExportToCsvJobData extends kExportCsvJobData
 {
 	/**
+	 * @var array
+	 */
+	private $options;
+	/**
 	 * @var ESearchParams
 	 */
 	protected $searchParams;
-	
+	/**
+	 * @return array
+	 */
+	public function getoptions()
+	{
+		return $this->options;
+	}
+	/**
+	 * @param array $options
+	 */
+	public function setOptions($options)
+	{
+		$this->options = $options;
+	}
 	/**
 	 * @return ESearchParams
 	 */
@@ -18,7 +35,6 @@ class kMediaEsearchExportToCsvJobData extends kExportCsvJobData
 	{
 		return $this->searchParams;
 	}
-	
 	/**
 	 * @param ESearchParams $searchParams
 	 */

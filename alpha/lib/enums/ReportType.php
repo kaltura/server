@@ -58,6 +58,7 @@ interface ReportType extends BaseEnum
    const USER_HIGHLIGHTS = 48;
    const USER_INTERACTIVE_VIDEO = 49;
    const INTERACTIVE_VIDEO_TOP_NODES = 50;
+   const LATEST_PLAYED_ENTRIES = 51;
 
    //realtime reports
    const MAP_OVERLAY_COUNTRY_REALTIME = 10001;

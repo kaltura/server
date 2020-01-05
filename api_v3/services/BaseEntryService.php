@@ -856,7 +856,7 @@ class BaseEntryService extends KalturaEntryService
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 * @return KalturaBaseEntry The exported entry
 	 */
-	public function exportAction ( $entryId , $storageProfileId )
+	public function exportAction ($entryId, $storageProfileId)
 	{
 	    $dbEntry = entryPeer::retrieveByPK($entryId);
 	    if (!$dbEntry)
@@ -864,7 +864,7 @@ class BaseEntryService extends KalturaEntryService
 	        throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 	    }
 	    
-	    $dbStorageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+	    $dbStorageProfile = StorageProfilePeer::retrieveByIdAndPartnerId($storageProfileId, $dbEntry->getPartnerId());
 	    if (!$dbStorageProfile)
 	    {
 	        throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $storageProfileId);

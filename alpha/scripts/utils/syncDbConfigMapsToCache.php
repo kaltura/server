@@ -40,7 +40,7 @@ foreach($mapsInfo as $mapInfo)
 	$cmdLine = "select version,content from conf_maps where conf_maps.map_name='$rawMapName' and conf_maps.host_name='$hostNameFilter' and status=1 order by version desc limit 1 ;";
 
 	$output2 = query($dbConnection,$cmdLine);
-	$mapName = $rawMapName.kRemoteMemCacheConf::MAP_DELIMITER.$hostNameFilter;
+	$mapName = $rawMapName.kRemoteMemCacheConf::MAP_DELIMITER.strtolower($hostNameFilter);
 	$version = $output2[0]['version'];
 	$content = $output2[0]['content'];
 	if(!isset($mapListInCache[$mapName]))

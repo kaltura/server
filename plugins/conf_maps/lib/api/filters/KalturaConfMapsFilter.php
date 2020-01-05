@@ -83,7 +83,7 @@ class KalturaConfMapsFilter extends KalturaConfMapsBaseFilter
 	public function getMap($excludeHost = false)
 	{
 		$confMap = new KalturaConfMaps();
-		$hostPatern = str_replace('*','#', $this->relatedHostEqual);
+		$hostPatern = strtolower(str_replace('*','#', $this->relatedHostEqual));
 		/*  @var kRemoteMemCacheConf $remoteCache  */
 		$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
 		$map = null;

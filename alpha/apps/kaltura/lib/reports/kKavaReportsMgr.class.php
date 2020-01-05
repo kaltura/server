@@ -184,6 +184,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_TABLE_FINALIZE_FUNC = 'report_table_finalize_func';
 	const REPORT_EDIT_FILTER_FUNC = 'report_edit_filter_func';
 	const REPORT_TOTAL_FINALIZE_FUNC = 'report_total_finalize_func';
+	const REPORT_ORDER_BY = 'report_order_by';
 
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -332,6 +333,9 @@ class kKavaReportsMgr extends kKavaBase
 		self::MEDIA_TYPE_AUDIO => 'count_audio',
 		self::MEDIA_TYPE_IMAGE => 'count_image',
 		self::MEDIA_TYPE_SHOW => 'count_mix',
+		self::EVENT_TYPE_BUFFER_START => 'count_buffer_start',
+		self::EVENT_TYPE_FLAVOR_SWITCH => 'count_flavor_switch',
+		self::EVENT_TYPE_PLAY_REQUESTED => 'count_play_requested',
 	);
 
 	//global transform
@@ -4244,36 +4248,45 @@ class kKavaReportsMgr extends kKavaBase
 		}
 
 		// order by
-		if (in_array(self::EVENT_TYPE_PLAY, $metrics))
+		if (isset($report_def[self::REPORT_ORDER_BY]))
 		{
-			$default_order = self::EVENT_TYPE_PLAY;
+			$order_by = $report_def[self::REPORT_ORDER_BY][self::DRUID_DIMENSION];
+			$order_by_dir = $report_def[self::REPORT_ORDER_BY][self::DRUID_DIRECTION];
+			$order_found = true;
 		}
 		else
 		{
-			$default_order = reset($metrics);
-		}
-		
-		$order_by_dir = '-';
-		if (!$order_by)
-		{
-			$order_by = $default_order;
-		}
-		else
-		{
-			if ($order_by[0] === '-' || $order_by[0] === '+')
+			if (in_array(self::EVENT_TYPE_PLAY, $metrics))
 			{
-				$order_by_dir = $order_by[0];
+				$default_order = self::EVENT_TYPE_PLAY;
+			}
+			else
+			{
+				$default_order = reset($metrics);
 			}
 
-			$order_by = self::getMetricFromOrderBy($report_def, $order_by);
-
-			if (!in_array($order_by, $metrics))
+			$order_by_dir = '-';
+			if (!$order_by)
 			{
 				$order_by = $default_order;
 			}
 			else
 			{
-				$order_found = true;
+				if ($order_by[0] === '-' || $order_by[0] === '+')
+				{
+					$order_by_dir = $order_by[0];
+				}
+
+				$order_by = self::getMetricFromOrderBy($report_def, $order_by);
+
+				if (!in_array($order_by, $metrics))
+				{
+					$order_by = $default_order;
+				}
+				else
+				{
+					$order_found = true;
+				}
 			}
 		}
 
@@ -4509,6 +4522,11 @@ class kKavaReportsMgr extends kKavaBase
 			$row_data = array();
 			foreach ($row_mapping as $column)
 			{
+				if (is_array($column))
+				{
+					$column = $column[self::DRUID_OUTPUT_NAME];
+				}
+
 				if ($column)
 				{
 					if (isset($row[$column]))

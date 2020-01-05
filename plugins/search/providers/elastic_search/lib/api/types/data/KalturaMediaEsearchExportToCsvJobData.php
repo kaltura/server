@@ -12,9 +12,15 @@ class KalturaMediaEsearchExportToCsvJobData extends KalturaExportCsvJobData
 	 * @var KalturaESearchEntryParams
 	 */
 	public $searchParams;
+	/**
+	 * options
+	 * @var KalturaExportToCsvOptionsArray
+	 */
+	public $options;
 	
 	private static $map_between_objects = array
 	(
+		'options',
 		'searchParams',
 	);
 	

@@ -52,7 +52,7 @@ class kConfCacheManager
 
 	protected static function init()
 	{
-		if(self::$init)
+		if(self::$init  || PHP_SAPI === 'cli')
 		{
 			return;
 		}
