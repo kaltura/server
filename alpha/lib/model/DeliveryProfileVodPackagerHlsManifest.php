@@ -26,7 +26,35 @@ class DeliveryProfileVodPackagerHlsManifest extends DeliveryProfileVodPackagerHl
 		
 		return array($flavor);
 	}
-	
+
+	/**
+	 * @param array $flavors
+	 * @return array
+	 */
+	protected function sortFlavors($flavors)
+	{
+		$sortedFlavors = parent::sortFlavors($flavors);
+		if($this->params->getMuxedAudioLanguage())
+		{
+			//Order audio flavors after video flavors
+			$audioflavors = array();
+			$videoflavors = array();
+			foreach ($sortedFlavors as $flavor)
+			{
+				if (!isset($flavor['audioCodec']) && !isset($flavor['audioLanguageName']))
+				{
+					$videoflavors[] = $flavor;
+				}
+				else
+				{
+					$audioflavors[] = $flavor;
+				}
+			}
+			$sortedFlavors = array_merge($videoflavors, $audioflavors);
+		}
+		return $sortedFlavors;
+	}
+
 	private function checkIsMultiAudioFlavorSet($flavors)
 	{
 		$audioFlavorsMap = array();
