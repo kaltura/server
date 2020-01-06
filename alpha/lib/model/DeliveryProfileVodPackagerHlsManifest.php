@@ -4,6 +4,8 @@ class DeliveryProfileVodPackagerHlsManifest extends DeliveryProfileVodPackagerHl
 
 	const MASTER_MANIFEST_STR = '/master';
 	const M3U8_SUFFIX = '.m3u8';
+	const AUDIO_CODEC = 'audioCodec';
+	const AUDIO_LANGUAGE_NAME = 'audioLanguageName';
 	
 	function __construct() 
 	{
@@ -41,7 +43,7 @@ class DeliveryProfileVodPackagerHlsManifest extends DeliveryProfileVodPackagerHl
 			$videoflavors = array();
 			foreach ($sortedFlavors as $flavor)
 			{
-				if (!isset($flavor['audioCodec']) && !isset($flavor['audioLanguageName']))
+				if (!isset($flavor[self::AUDIO_CODEC]) && !isset($flavor[self::AUDIO_LANGUAGE_NAME]))
 				{
 					$videoflavors[] = $flavor;
 				}
@@ -60,10 +62,10 @@ class DeliveryProfileVodPackagerHlsManifest extends DeliveryProfileVodPackagerHl
 		$audioFlavorsMap = array();
 		foreach ($flavors as $flavor)
 		{
-			if(!isset($flavor['audioCodec']) && !isset($flavor['audioLanguageName'])) 
+			if(!isset($flavor[self::AUDIO_CODEC]) && !isset($flavor[self::AUDIO_LANGUAGE_NAME]))
 				continue;
 			
-			$codecAndLang = $flavor['audioCodec'] . "_" . $flavor['audioLanguageName'];
+			$codecAndLang = $flavor[self::AUDIO_CODEC] . "_" . $flavor[self::AUDIO_LANGUAGE_NAME];
 			$audioFlavorsMap[$codecAndLang] = true;
 			
 			if(count($audioFlavorsMap) > 1)
@@ -71,7 +73,6 @@ class DeliveryProfileVodPackagerHlsManifest extends DeliveryProfileVodPackagerHl
 				$this->isMultiAudio = true;
 				break;
 			}
-			
 		}
 	}
 
