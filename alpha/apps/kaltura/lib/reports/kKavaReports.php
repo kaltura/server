@@ -1540,6 +1540,22 @@ class kKavaReports extends kKavaReportsMgr
 				self::DRUID_DIRECTION => '-'
 			),
 		),
+
+		ReportType::REGISTRATION_MODULE => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'name' => self::DIMENSION_KUSER_ID
+			),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => 'name',
+				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo'
+			),
+			self::REPORT_DYNAMIC_METADATA_DIMENSION => true,
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_VIEW_PERIOD_PLAY_TIME, self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME),
+			self::REPORT_TOTAL_METRICS => array(self::EVENT_TYPE_FORM_LOADED, self::EVENT_TYPE_REGISTER, self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_VIEW_PERIOD_PLAY_TIME, self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNIQUE_VIEWERS),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_VIEW_PERIOD_PLAY_TIME, self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME),
+		),
+
+
     
 	);
 
