@@ -30,13 +30,13 @@ class AMQPSocketConnection extends AbstractConnection
         $locale = 'en_US',
         $timeout = 3,
         $keepalive = false,
-		$channel_rpc_timeout = 0.0
+        $channel_rpc_timeout = 0.0
     ) {
-		if ($channel_rpc_timeout > $timeout) {
-			throw new \InvalidArgumentException('channel RPC timeout must not be greater than I/O read timeout');
-		}
+        if ($channel_rpc_timeout > $timeout) {
+            throw new \InvalidArgumentException('channel RPC timeout must not be greater than I/O read timeout');
+        }
 
-		$io = new SocketIO($host, $port, $timeout, $keepalive);
+        $io = new SocketIO($host, $port, $timeout, $keepalive);
 
         parent::__construct($user, $password, $vhost, $insist, $login_method, $login_response, $locale, $io, 0, $timeout, $channel_rpc_timeout);
     }
