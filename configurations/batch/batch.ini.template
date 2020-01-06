@@ -68,6 +68,7 @@ enabledWorkers.KAsyncCopyCaptions					= 1
 enabledWorkers.KAsyncCopyCuePoints                   = 1
 enabledWorkers.KSyncReachCreditTaskRunner	    = 0
 enabledWorkers.KAsyncExportCsv                      = 0
+enabledWorkers.KAsyncLiveEntryArchive               = 0
 
 
 [mainTemplate : template]
@@ -799,6 +800,12 @@ type                                                = KAsyncServerNodeMonitor
 scriptPath                                          = batches/ServerNodeMonitor/KAsyncServerNodeMonitorExe.php
 params.serverNodeTTL                                = 120
 params.typesToMonitor                               = 1
+
+[KAsyncLiveEntryArchive : JobHandlerWorker]
+id                                                  = 680
+type                                                = KAsyncLiveEntryArchive
+scriptPath                                          = batches/Archive/KAsyncLiveEntryArchiveExe.php
+friendlyName                                        = Live Entry Archive
 
 [KAsyncExportCsv : JobHandlerWorker]
 id													= 690
