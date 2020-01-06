@@ -704,7 +704,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	 */
 	public static function getCaptionNamesByTypes()
 	{
-		return array(CaptionType::SRT => 'srt' , CaptionType::DFXP => 'dfxp', CaptionType::WEBVTT => 'webvtt', CaptionType::SCC =>'scc', CaptionType::CAP => 'cap');
+		return array(CaptionType::SRT => 'srt' , CaptionType::DFXP => 'dfxp', CaptionType::WEBVTT => 'vtt', CaptionType::SCC =>'scc', CaptionType::CAP => 'cap');
 	}
 }
 

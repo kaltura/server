@@ -254,7 +254,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	
 	public function getSphinxIndexName()
 	{
-		return kSphinxSearchManager::getSphinxIndexName(entryIndex::getObjectIndexName(), categoryIndex::getSphinxSplitIndexId($this->getPartnerId(), categoryIndex::getObjectName()));
+		return kSphinxSearchManager::getSphinxIndexName(categoryIndex::getObjectIndexName(), categoryIndex::getSphinxSplitIndexId($this->getPartnerId(), categoryIndex::getObjectName()));
 	}
 	
 	protected function addRecalcCategoriesCount($categoryId)

@@ -78,6 +78,9 @@ class kDruidBase
 	const DRUID_UPPER_STRICT = 'upperStrict';
 	const DRUID_ORDERING = 'ordering';
 	const DRUID_DOUBLE_LEAST = 'doubleLeast';
+	const DRUID_EXTRACTION = 'extraction';
+	const DRUID_EXTRACTION_FUNC = 'extractionFn';
+	const DRUID_TIME_FORMAT = 'timeFormat';
 	
 	// druid response keywords
 	const DRUID_TIMESTAMP = 'timestamp';

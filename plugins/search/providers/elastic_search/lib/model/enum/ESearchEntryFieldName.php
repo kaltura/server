@@ -46,4 +46,5 @@ interface ESearchEntryFieldName extends BaseEnum
 	const LAST_PLAYED_AT = 'last_played_at';
 	const PLAYS = 'plays';
 	const RANK = 'rank';
+	const VOTES = 'votes';
 }

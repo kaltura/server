@@ -37,9 +37,9 @@ class kUnlimitedVendorCredit extends kVendorCredit
 		$endOfDay = kReachUtils::reachStrToTime("tomorrow", $toDate) - 1;
 		$this->toDate = $endOfDay;
 	}
-	
-	/***
-	 * @param $date
+
+	/**
+	 * @param bool $includeOverages
 	 * @return int
 	 */
 	public function getCurrentCredit($includeOverages = true)

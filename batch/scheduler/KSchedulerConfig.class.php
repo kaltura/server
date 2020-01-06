@@ -45,6 +45,11 @@ class KSchedulerConfig extends Zend_Config_Ini
 	private $configReloadInterval;
 
 	/**
+	 * @var bool
+	 */
+	private $loadConfigFromDisc;
+
+	/**
 	 * @var KalturaClient
 	 */
 	private $kClient;
@@ -70,27 +75,42 @@ class KSchedulerConfig extends Zend_Config_Ini
 	public function __construct($configFileName)
 	{
 		$this->configFileName = realpath($configFileName);
+		$this->kClientConfig = kConf::getMap('batchBase');
+		$this->loadConfigFromDisc = isset($this->kClientConfig['loadConfigFromDisc']) ? $this->kClientConfig['loadConfigFromDisc'] : false;
+		$this->configReloadInterval = isset($this->kClientConfig['configReloadInterval']) ? $this->kClientConfig['configReloadInterval'] : self::DEFAULT_CONFIG_RELOAD_INTVERAL;
 		$this->load();
 	}
 
 	public function load()
 	{
-		$this->configTimestamp = time();
-		KalturaLog::log('loading configuration from server at ' . date('H:i:s', $this->configTimestamp));
-
 		$hostname = self::getHostname();
 		$configFileName = kEnvironment::get('cache_root_path') . DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . 'config.ini';
-		try
+
+		if ($this->loadConfigFromDisc)
 		{
-			if (!$this->loadConfigFromServer($configFileName, $hostname))
+			KalturaLog::log('loading configuration from Disc at ' . date('H:i:s', $this->configTimestamp));
+			$this->configTimestamp = $this->calculateFileTimestamp();
+			if(is_dir($this->configFileName))
 			{
-				return false;
+				$this->implodeDirectoryFiles($configFileName);
 			}
 		}
-		catch(Exception $e)
+		else
 		{
-			KalturaLog::alert('Error loading configuration from server! ' . $e->getMessage());
-			return false;
+			KalturaLog::log('loading configuration from server at ' . date('H:i:s', $this->configTimestamp));
+			$this->configTimestamp = time();
+			try
+			{
+				if (!$this->loadConfigFromServer($configFileName, $hostname))
+				{
+					return false;
+				}
+			}
+			catch(Exception $e)
+			{
+				KalturaLog::alert('Error loading configuration from server! ' . $e->getMessage());
+				return false;
+			}
 		}
 
 		parent::__construct($configFileName, $hostname, true);
@@ -221,6 +241,19 @@ class KSchedulerConfig extends Zend_Config_Ini
 		if ($this->nextConfigReloadTime < time())
 		{
 			$this->nextConfigReloadTime = time() + $this->configReloadInterval;
+			if ($this->loadConfigFromDisc)
+			{
+				// Check config path udpated
+				$filePaths = $this->getCurrentConfigFilePaths();
+				if ($this->getConfigFilePaths() != $filePaths)
+				{
+					$this->configFilePaths = $filePaths;
+					return true;
+				}
+				// Check config content updated
+				$filemtime = $this->calculateFileTimestamp();
+				return ($filemtime > $this->configTimestamp);
+			}
 			return true;
 		}
 		return false;
@@ -399,16 +432,70 @@ class KSchedulerConfig extends Zend_Config_Ini
 		}
 		else
 		{
-			$this->kClientConfig = kConf::getMap('batchBase');
-			$this->configReloadInterval = isset($this->kClientConfig['configReloadInterval']) ? $this->kClientConfig['configReloadInterval'] : self::DEFAULT_CONFIG_RELOAD_INTVERAL;
 			$clientConfig = new KalturaConfiguration();
-			$clientConfig ->serviceUrl = $this->kClientConfig['serviceUrl'];
-			$clientConfig ->curlTimeout = $this->kClientConfig['curlTimeout'];
+			$clientConfig->serviceUrl = $this->kClientConfig['serviceUrl'];
+			$clientConfig->curlTimeout = $this->kClientConfig['curlTimeout'];
 			$this->kClient = new KalturaClient($clientConfig );
 			$this->kClient->setPartnerId($this->kClientConfig['partnerId']);
 			$ks = $this->kClient->generateSession($this->kClientConfig['secret'], 'batchUser', KalturaSessionType::ADMIN, '-1');
 			$this->kClient->setKs($ks);
 		}
+	}
+
+	protected function implodeDirectoryFiles($path)
+	{
+		$content = '';
+
+		$configFilePaths = $this->getConfigFilePaths();
+		foreach($configFilePaths as $configFilePath)
+			$content .= file_get_contents($configFilePath) . "\n";
+
+		file_put_contents($path, $content);
+	}
+
+	protected function calculateFileTimestamp()
+	{
+		clearstatcache();
+		if(!is_dir($this->configFileName)) {
+			return filemtime($this->configFileName);
+		}
+
+		$configFilePaths = $this->getConfigFilePaths();
+
+		$filemtime = 0;
+		foreach($configFilePaths as $configFilePath)
+			$filemtime = max($filemtime, filemtime($configFilePath));
+
+		return $filemtime;
+	}
+
+	protected function getConfigFilePaths()
+	{
+		if(!is_dir($this->configFileName))
+			return $this->configFileName;
+
+		if(!$this->configFilePaths)
+			$this->configFilePaths = $this->getCurrentConfigFilePaths();
+
+		return $this->configFilePaths;
+	}
+
+	protected function getCurrentConfigFilePaths()
+	{
+		if(!is_dir($this->configFileName))
+			return  $this->configFileName;
+
+		$configFilePaths = array();
+		$d = dir($this->configFileName);
+
+		while (false !== ($file = $d->read()))
+		{
+			if(preg_match('/\.ini$/', $file))
+				$configFilePaths[] = $this->configFileName . DIRECTORY_SEPARATOR . $file;
+		}
+		$d->close();
+
+		return $configFilePaths;
 	}
 }
 

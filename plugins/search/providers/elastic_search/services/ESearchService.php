@@ -61,7 +61,7 @@ class ESearchService extends KalturaBaseService
 		$response->totalCount = $objectCount;
 		return $response;
 	}
-	
+
 	/**
 	 * Creates a batch job that sends an email with a link to download a CSV containing a list of entries
 	 *
