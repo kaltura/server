@@ -17,6 +17,8 @@ class AMQPSocketConnection extends AbstractConnection
      * @param string $locale
      * @param int $timeout
      * @param bool $keepalive
+     * @param float $channel_rpc_timeout
+     * @throws \Exception
      */
     public function __construct(
         $host,
@@ -32,7 +34,8 @@ class AMQPSocketConnection extends AbstractConnection
         $keepalive = false,
         $channel_rpc_timeout = 0.0
     ) {
-        if ($channel_rpc_timeout > $timeout) {
+        if ($channel_rpc_timeout > $timeout)
+        {
             throw new \InvalidArgumentException('channel RPC timeout must not be greater than I/O read timeout');
         }
 

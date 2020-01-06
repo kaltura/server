@@ -225,7 +225,7 @@ class AMQPChannel extends AbstractChannel
 
         return $this->wait(array(
             $this->waitHelper->get_wait('channel.flow_ok')
-        ));
+        ), false, $this->channel_rpc_timeout);
     }
 
     /**
