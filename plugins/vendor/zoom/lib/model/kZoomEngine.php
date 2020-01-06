@@ -57,9 +57,11 @@ class kZoomEngine
 		switch($event->eventType)
 		{
 			case kEventType::RECORDING_VIDEO_COMPLETED:
+			case kEventType::NEW_RECORDING_VIDEO_COMPLETED:
 				$this->handleRecordingVideoComplete($event);
 				break;
 			case kEventType::RECORDING_TRANSCRIPT_COMPLETED:
+			case kEventType::NEW_RECORDING_TRANSCRIPT_COMPLETED:
 				$this->handleRecordingTranscriptComplete($event);
 				break;
 		}
@@ -89,7 +91,12 @@ class kZoomEngine
 		$zoomIntegration = ZoomHelper::getZoomIntegration();
 		$dbUser = $this->getEntryOwner($transcript->hostEmail, $zoomIntegration);
 		$this->initUserPermissions($dbUser);
-		$entry = $this->getZoomEntryByMeetingId($transcript->id);
+		$entry = $this->getZoomEntryByMeetingId($transcript->uuid);
+		if(!$entry)
+		{
+			ZoomHelper::exitWithError(kZoomErrorMessages::MISSING_ENTRY_FOR_ZOOM_MEETING . $transcript->id);
+		}
+
 		$this->initUserPermissions($dbUser, true);
 		$captionAssetService = new CaptionAssetService();
 		$captionAssetService->initService('caption_captionasset', 'captionAsset', 'setContent');
@@ -117,16 +124,16 @@ class kZoomEngine
 	}
 
 	/**
-	 * @param $meetingId
+	 * @param $meetinguuId
 	 * @return entry
 	 * @throws PropelException
 	 */
-	protected function getZoomEntryByMeetingId($meetingId)
+	protected function getZoomEntryByMeetingId($meetinguuId)
 	{
 		$entryFilter = new entryFilter();
 		$pager = new KalturaFilterPager();
 		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
-		$entryFilter->set(self::REFERENCE_FILTER, self::ZOOM_PREFIX . $meetingId);
+		$entryFilter->set(self::REFERENCE_FILTER, self::ZOOM_PREFIX . $meetinguuId);
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$pager->attachToCriteria($c);
 		$entryFilter->attachToCriteria($c);
@@ -137,12 +144,11 @@ class kZoomEngine
 		}
 
 		$entry = entryPeer::doSelectOne($c);
-		if(!$entry)
+		if($entry)
 		{
-			ZoomHelper::exitWithError(kZoomErrorMessages::MISSING_ENTRY_FOR_ZOOM_MEETING . $meetingId);
+			KalturaLog::info('Found entry:' . $entry->getId());
 		}
 
-		KalturaLog::info('Found entry:' . $entry->getId());
 		return $entry;
 	}
 
@@ -156,10 +162,16 @@ class kZoomEngine
 		$zoomIntegration = ZoomHelper::getZoomIntegration();
 		/* @var kZoomMeeting $meeting */
 		$meeting = $event->object;
-
 		$resourceReservation = new kResourceReservation(self::ZOOM_LOCK_TTL, true);
-		if(!$resourceReservation->reserve($meeting->id))
+		if(!$resourceReservation->reserve($meeting->uuid))
 		{
+			KalturaLog::info("Meeting {$meeting->uuid} is being processed");
+			return;
+		}
+
+		if($this->getZoomEntryByMeetingId($meeting->uuid))
+		{
+			KalturaLog::info("Meeting {$meeting->uuid} already processed");
 			return;
 		}
 
@@ -292,7 +304,7 @@ class kZoomEngine
 	 */
 	protected function createEntryDescriptionFromMeeting($meeting)
 	{
-		return "Zoom Recording ID: {$meeting->id}\nMeeting Time: {$meeting->startTime}";
+		return "Zoom Recording ID: {$meeting->id} UUID: {$meeting->uuid}\nMeeting Time: {$meeting->startTime}";
 	}
 
 	/**
@@ -328,7 +340,7 @@ class kZoomEngine
 		$entry->setKuserId($owner->getKuserId());
 		$entry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($owner->getPartnerId())->getId());
 		$entry->setAdminTags(self::ADMIN_TAG_ZOOM);
-		$entry->setReferenceID(self::ZOOM_PREFIX . $meeting->id);
+		$entry->setReferenceID(self::ZOOM_PREFIX . $meeting->uuid);
 		return $entry;
 	}
 
