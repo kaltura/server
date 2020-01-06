@@ -28,9 +28,9 @@ class kConf extends kEnvironment
 		return kConfCacheManager::hasMap($mapName);
 	}
 
-	public static function getMap($mapName)
+	public static function getMap($mapName, $ignoreCache = false)
 	{
-		return kConfCacheManager::load($mapName);
+		return kConfCacheManager::load($mapName, null, $ignoreCache);
 	}
 
 	protected static function getInternal($paramName, $mapName)
