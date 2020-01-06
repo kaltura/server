@@ -801,12 +801,6 @@ scriptPath                                          = batches/ServerNodeMonitor/
 params.serverNodeTTL                                = 120
 params.typesToMonitor                               = 1
 
-[KAsyncLiveEntryArchive : JobHandlerWorker]
-id                                                  = 680
-type                                                = KAsyncLiveEntryArchive
-scriptPath                                          = batches/Archive/KAsyncLiveEntryArchiveExe.php
-friendlyName                                        = Live Entry Archive
-
 [KAsyncExportCsv : JobHandlerWorker]
 id													= 690
 friendlyName										= Export Csv
@@ -855,3 +849,9 @@ type												= KClipConcatCloser
 scriptPath											= batches/ClipConcat/KClipConcatCloserExe.php
 maximumExecutionTime								= 10800
 params.maxTimeBeforeFail 							= 216000‬
+
+[KAsyncLiveEntryArchive : JobHandlerWorker]
+id                                                  = 790
+type                                                = KAsyncLiveEntryArchive
+scriptPath                                          = batches/Archive/KAsyncLiveEntryArchiveExe.php
+friendlyName                                        = Live Entry Archive
