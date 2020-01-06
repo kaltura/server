@@ -365,4 +365,5 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	
 		return true;
 	}
+
 }

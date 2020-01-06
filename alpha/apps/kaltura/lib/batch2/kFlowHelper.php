@@ -3200,4 +3200,28 @@ class kFlowHelper
 		$dbBatchJob->setStatus(KalturaBatchJobStatus::FATAL);
 		$dbBatchJob->save();
 	}
+
+    public static function handleLiveToVodFinished(BatchJob $dbBatchJob, kLiveToVodJobData $data)
+    {
+        KalturaLog::info('Handling live to vod finished');
+        $liveEntryId = $data->getLiveEntryId();
+        $liveEntry = entryPeer::retrieveByPK($liveEntryId);
+        /** @var LiveStreamEntry $liveEntry */
+        $recordStatus = $liveEntry->getRecordStatus();
+        $shouldAutoArchive = $liveEntry->getRecordingOptions()->getShouldAutoArchive();
+        if ($recordStatus == RecordStatus::PER_SESSION && $shouldAutoArchive == true)
+        {
+            $liveEntryArchiveJobData = new kLiveEntryArchiveJobData();
+            $liveEntryArchiveJobData->setLiveEntryId($liveEntryId);
+
+            $liveEntryArchiveJob = new BatchJob();
+            $liveEntryArchiveJob->setEntryId($liveEntryId);
+            $liveEntryArchiveJob->setPartnerId($liveEntry->getPartnerId());
+
+            KalturaLog::info('Adding a job for auto archive');
+            kJobsManager::addJob($liveEntryArchiveJob, $liveEntryArchiveJobData, BatchJobType::LIVE_ENTRY_ARCHIVE);
+        }
+        return $dbBatchJob;
+
+    }
 }
