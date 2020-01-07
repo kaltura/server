@@ -861,13 +861,13 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_ERROR_POSITION_COUNT] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_ERROR),
-				self::getNotFilter(self::getSelectorFilter(self::DIMENSION_POSITION, self::VALUE_UNKNOWN)))),
+				self::getNotFilter(self::getInFilter(self::DIMENSION_POSITION, array(self::VALUE_UNKNOWN, self::VALUE_ZERO))))),
 			self::getLongSumAggregator(self::METRIC_ERROR_POSITION_COUNT, self::METRIC_COUNT));
 
 		self::$aggregations_def[self::METRIC_ERROR_UNKNOWN_POSITION_COUNT] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_ERROR),
-				self::getSelectorFilter(self::DIMENSION_POSITION, self::VALUE_UNKNOWN))),
+				self::getInFilter(self::DIMENSION_POSITION, array(self::VALUE_UNKNOWN, self::VALUE_ZERO)))),
 			self::getLongSumAggregator(self::METRIC_ERROR_UNKNOWN_POSITION_COUNT, self::METRIC_COUNT));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
@@ -1085,11 +1085,11 @@ class kKavaReportsMgr extends kKavaBase
 				self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY))));
 
 		self::$metrics_def[self::METRIC_AVG_SESSION_ERROR_RATE] = array(
-			self::DRUID_AGGR => array(self::METRIC_ERROR_SESSION_COUNT, self::METRIC_UNIQUE_SESSIONS),
+			self::DRUID_AGGR => array(self::METRIC_ERROR_SESSION_COUNT, self::METRIC_VIEW_UNIQUE_SESSIONS),
 			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
 				self::METRIC_AVG_SESSION_ERROR_RATE, '/', array(
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_ERROR_SESSION_COUNT, self::METRIC_ERROR_SESSION_COUNT),
-				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_SESSIONS, self::METRIC_UNIQUE_SESSIONS))));
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_VIEW_UNIQUE_SESSIONS, self::METRIC_VIEW_UNIQUE_SESSIONS))));
 
 		self::$metrics_def[self::METRIC_COUNT_EBVS] = array(
 			self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY_REQUESTED, self::EVENT_TYPE_PLAY, self::METRIC_ERROR_UNKNOWN_POSITION_COUNT),

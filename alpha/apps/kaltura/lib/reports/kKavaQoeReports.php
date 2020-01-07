@@ -256,10 +256,12 @@ class kKavaQoeReports extends kKavaReportsMgr
 			self::REPORT_METRICS => array(
 				self::METRIC_UNIQUE_SESSIONS,
 				self::METRIC_AVG_VIEW_PLAY_TIME_SEC,
+				self::METRIC_COUNT_EBVS,
 			),
 			self::REPORT_GRAPH_METRICS => array(
 				self::METRIC_UNIQUE_SESSIONS,
 				self::METRIC_AVG_VIEW_PLAY_TIME_SEC,
+				self::METRIC_COUNT_EBVS,
 			)
 		),
 
@@ -346,23 +348,10 @@ class kKavaQoeReports extends kKavaReportsMgr
 			self::REPORT_METRICS => array(
 				self::EVENT_TYPE_FLAVOR_SWITCH,
 				self::METRIC_AVG_VIEW_BITRATE,
-				self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
 			),
 			self::REPORT_GRAPH_METRICS => array(
 				self::EVENT_TYPE_FLAVOR_SWITCH,
 				self::METRIC_AVG_VIEW_BITRATE,
-			),
-			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addFlavorParamColumn',
-			self::REPORT_TOTAL_FINALIZE_FUNC => 'self::addFlavorParamTotalColumn',
-			self::REPORT_TABLE_MAP => array(
-				'count_flavor_switch' => self::EVENT_TYPE_FLAVOR_SWITCH,
-				'avg_view_bitrate' => self::METRIC_AVG_VIEW_BITRATE,
-				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
-			),
-			self::REPORT_TOTAL_MAP => array(
-				'count_flavor_switch' => self::EVENT_TYPE_FLAVOR_SWITCH,
-				'avg_view_bitrate' => self::METRIC_AVG_VIEW_BITRATE,
-				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
 			),
 		),
 
