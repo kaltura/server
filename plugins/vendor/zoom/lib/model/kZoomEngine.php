@@ -169,14 +169,14 @@ class kZoomEngine
 			return;
 		}
 
+		$dbUser = $this->getEntryOwner($meeting->hostEmail, $zoomIntegration);
+		$this->initUserPermissions($dbUser);
 		if($this->getZoomEntryByMeetingId($meeting->uuid))
 		{
 			KalturaLog::info("Meeting {$meeting->uuid} already processed");
 			return;
 		}
-
-		$dbUser = $this->getEntryOwner($meeting->hostEmail, $zoomIntegration);
-		$this->initUserPermissions($dbUser);
+		
 		$participantsUsersNames = $this->extractMeetingParticipants($meeting->id, $zoomIntegration, $dbUser->getPuserId());
 		$validatedUsers = $this->getValidatedUsers($participantsUsersNames, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
 		$entry = null;
