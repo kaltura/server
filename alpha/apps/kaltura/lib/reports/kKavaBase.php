@@ -154,7 +154,7 @@ class kKavaBase extends kDruidBase
 
 	//general values
 	const VALUE_UNKNOWN = 'Unknown';
-	const VALUE_ZERO = 0;
+	const VALUE_ZERO = '0';
 
 	protected static $datasources_dimensions = array(
 		self::DATASOURCE_HISTORICAL => array(
