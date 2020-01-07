@@ -16,6 +16,9 @@ class kKavaQoeReports extends kKavaReportsMgr
 	const ENTRY_BASE = 'entry_base';
 	const ISP_BASE = 'isp_base';
 	const ERROR_TRACKING_BASE = 'error_tracking_base';
+	const CUSTOM_VAR1_BASE = 'custom_var1_base';
+	const CUSTOM_VAR2_BASE = 'custom_var2_base';
+	const CUSTOM_VAR3_BASE = 'custom_var3_base';
 
 	protected static $reports_def_base = array(
 
@@ -142,6 +145,24 @@ class kKavaQoeReports extends kKavaReportsMgr
 			),
 		),
 
+		self::CUSTOM_VAR1_BASE => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'custom_var1' => self::DIMENSION_CUSTOM_VAR1
+			),
+		),
+
+		self::CUSTOM_VAR2_BASE => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'custom_var2' => self::DIMENSION_CUSTOM_VAR2
+			),
+		),
+
+		self::CUSTOM_VAR3_BASE => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'custom_var3' => self::DIMENSION_CUSTOM_VAR3
+			),
+		),
+
 	);
 
 	protected static $reports_def = array(
@@ -250,6 +271,27 @@ class kKavaQoeReports extends kKavaReportsMgr
 			)
 		),
 
+		ReportType::QOE_EXPERIENCE_CUSTOM_VAR1 => array(
+			self::REPORT_BASE_DEF => array(
+				ReportType::QOE_EXPERIENCE,
+				self::CUSTOM_VAR1_BASE,
+			)
+		),
+
+		ReportType::QOE_EXPERIENCE_CUSTOM_VAR2 => array(
+			self::REPORT_BASE_DEF => array(
+				ReportType::QOE_EXPERIENCE,
+				self::CUSTOM_VAR2_BASE,
+			)
+		),
+
+		ReportType::QOE_EXPERIENCE_CUSTOM_VAR3 => array(
+			self::REPORT_BASE_DEF => array(
+				ReportType::QOE_EXPERIENCE,
+				self::CUSTOM_VAR3_BASE,
+			)
+		),
+
 		//ENGAGEMENT
 
 		ReportType::QOE_ENGAGEMENT => array(
@@ -342,6 +384,27 @@ class kKavaQoeReports extends kKavaReportsMgr
 			)
 		),
 
+		ReportType::QOE_ENGAGEMENT_CUSTOM_VAR1 => array(
+			self::REPORT_BASE_DEF => array(
+				ReportType::QOE_ENGAGEMENT,
+				self::CUSTOM_VAR1_BASE,
+			)
+		),
+
+		ReportType::QOE_ENGAGEMENT_CUSTOM_VAR2 => array(
+			self::REPORT_BASE_DEF => array(
+				ReportType::QOE_ENGAGEMENT,
+				self::CUSTOM_VAR2_BASE,
+			)
+		),
+
+		ReportType::QOE_ENGAGEMENT_CUSTOM_VAR3 => array(
+			self::REPORT_BASE_DEF => array(
+				ReportType::QOE_ENGAGEMENT,
+				self::CUSTOM_VAR3_BASE,
+			)
+		),
+
 		//stream quality
 
 		ReportType::QOE_STREAM_QUALITY => array(
@@ -429,6 +492,27 @@ class kKavaQoeReports extends kKavaReportsMgr
 			self::REPORT_BASE_DEF => array(
 				ReportType::QOE_STREAM_QUALITY,
 				self::ISP_BASE,
+			)
+		),
+
+		ReportType::QOE_STREAM_QUALITY_CUSTOM_VAR1 => array(
+			self::REPORT_BASE_DEF => array(
+				ReportType::QOE_STREAM_QUALITY,
+				self::CUSTOM_VAR1_BASE,
+			)
+		),
+
+		ReportType::QOE_STREAM_QUALITY_CUSTOM_VAR2 => array(
+			self::REPORT_BASE_DEF => array(
+				ReportType::QOE_STREAM_QUALITY,
+				self::CUSTOM_VAR2_BASE,
+			)
+		),
+
+		ReportType::QOE_STREAM_QUALITY_CUSTOM_VAR3 => array(
+			self::REPORT_BASE_DEF => array(
+				ReportType::QOE_STREAM_QUALITY,
+				self::CUSTOM_VAR3_BASE,
 			)
 		),
 
