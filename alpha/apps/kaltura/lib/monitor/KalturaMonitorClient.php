@@ -437,9 +437,6 @@ class KalturaMonitorClient
 
 	public static function monitorRabbitAccess($dataSource, $queryType, $queryTook, $tableName = null, $querySize = null)
 	{
-		if (is_null(self::$stream))
-			self::init();
-
 		if (!self::$stream)
 			return;
 
