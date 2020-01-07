@@ -235,7 +235,7 @@ class UserController extends Zend_Controller_Action
 			}
 
 			// if we got session from sso server validate it, if we didnt redirect to sso server
-			$ks = $_GET['ks'];
+			$ks = isset($_GET['ks']) ? $_GET['ks'] : null;
 			if(!$ks)
 			{
 				$this->getResponse()->setRedirect($redirectUrl);
