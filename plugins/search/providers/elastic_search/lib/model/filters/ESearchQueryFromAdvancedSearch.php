@@ -69,6 +69,10 @@ class ESearchQueryFromAdvancedSearch
 				$items[] = $item;
 			}
 		}
+		if (!$items)
+		{
+			return null;
+		}
 
 		$advanceFilterOperator->setSearchItems($items);
 		return $advanceFilterOperator;

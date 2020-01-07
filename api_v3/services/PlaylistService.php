@@ -360,7 +360,7 @@ class PlaylistService extends KalturaEntryService
 		{
 			myPlaylistUtils::setIsAdminKs(true);
 		}
-		list($entryFiltersViaEsearch,  $entryFiltersViaSphinx, $totalResults) = myPlaylistUtils::splitEntryFilters($playlistContent);
+		list($entryFiltersViaEsearch,  $entryFiltersViaSphinx, $totalResults) = myPlaylistUtils::splitEntryFilters($playlistContent, $this->getPartnerId());
 		$pagerSeparateQueries = self::decideWhereHandlingPager($pager,$entryFiltersViaEsearch, $entryFiltersViaSphinx);
 		$entryList = self::handlePlaylistByType($playlistType, $entryFiltersViaEsearch, $entryFiltersViaSphinx, $this->getPartnerId(), $pagerSeparateQueries, $pager, $totalResults, $playlistContent);
 		myEntryUtils::updatePuserIdsForEntries($entryList);

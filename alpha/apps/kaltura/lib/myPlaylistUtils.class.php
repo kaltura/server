@@ -511,16 +511,16 @@ class myPlaylistUtils
 	}
 
 	//splitting entry filters into filters that will run in Esearch and in Sphinx:
-	// Elastic - advancesSearch is not set OR advancesSearch is set and includes KalturaMetadataSearchItem
+	// Elastic - advancesSearch is not set OR advancesSearch is set and can Transform AdvanceFilter
 	// Sphinx  - advancesSearch is set and NOT including KalturaMetadataSearchItem
-	public static function splitEntryFilters($xml)
+	public static function splitEntryFilters($xml, $partnerId)
 	{
 		$entryFiltersViaEsearch = array();
 		$entryFiltersViaSphinx = array();
 		list ($totalResults, $entryFilters) = self::getPlaylistFilterListStruct($xml);
 		foreach ($entryFilters as $entryFilter)
 		{
-			if (ESearchQueryFromFilter::canTransformXmlFilter($entryFilter))
+			if (ESearchQueryFromFilter::canTransformXmlFilter($entryFilter, $partnerId))
 			{
 				$entryFiltersViaEsearch[] = $entryFilter;
 			}
@@ -585,7 +585,7 @@ class myPlaylistUtils
 		};
 	}
 
-	protected static function fillEntryFilterFromXml($listOfFilters, $partnerId)
+	public static function fillEntryFilterFromXml($listOfFilters, $partnerId)
 	{
 		$entryFilters = array();
 		foreach ($listOfFilters as $filter)

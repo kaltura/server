@@ -37,9 +37,21 @@ class ESearchQueryFromFilter
 	 * @param SimpleXMLElement $filter
 	 * @return bool
 	 */
-	public static function canTransformXmlFilter($filter)
+	public static function canTransformXmlFilter($filter, $partnerId)
 	{
-		return (!isset($filter->advancedSearch) || (string)$filter->advancedSearch[self::KALTURA_CLASS] === self::KALTURA_METADATA_SEARCH_ITEM);
+		if (!isset($filter->advancedSearch))
+		{
+			return true;
+		}
+		else
+		{
+			$entryFilters = myPlaylistUtils::fillEntryFilterFromXml(array($filter), $partnerId);
+			if (isset($entryFilters[0]) && $entryFilters[0]->getAdvancedSearch())
+			{
+				return ESearchQueryFromAdvancedSearch::canTransformAdvanceFilter($entryFilters[0]->getAdvancedSearch());
+			}
+			return false;
+		}
 	}
 
 	/**
