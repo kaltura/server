@@ -71,6 +71,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_COUNT_EBVS = 'count_ebvs';
 	const METRIC_NODE_UNIQUE_PERCENTILES_RATIO = 'node_avg_completion_rate';
 	const METRIC_TOTAL_UNIQUE_PERCENTILES = 'total_completion_rate';
+	const METRIC_EBVS_RATIO = 'ebvs_ratio';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -388,6 +389,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_VIEWERS => true,
 		self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO => true,
 		self::METRIC_TOTAL_UNIQUE_PERCENTILES => true,
+		self::METRIC_EBVS_RATIO => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -1099,6 +1101,18 @@ class kKavaReportsMgr extends kKavaBase
 					self::getArithmeticPostAggregator("subPlaysAndErrors", "+", array(
 						self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY),
 						self::getFieldAccessPostAggregator(self::METRIC_ERROR_UNKNOWN_POSITION_COUNT))))));
+
+		self::$metrics_def[self::METRIC_EBVS_RATIO] = array(
+			self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY_REQUESTED, self::EVENT_TYPE_PLAY, self::METRIC_ERROR_UNKNOWN_POSITION_COUNT),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_EBVS_RATIO, '/', array(
+				self::getArithmeticPostAggregator(
+					self::METRIC_COUNT_EBVS, "-", array(
+					self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY_REQUESTED),
+					self::getArithmeticPostAggregator("subPlaysAndErrors", "+", array(
+						self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY),
+						self::getFieldAccessPostAggregator(self::METRIC_ERROR_UNKNOWN_POSITION_COUNT))))),
+				self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY_REQUESTED))));
 
 		self::$metrics_def[self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO] = array(
 			self::DRUID_AGGR => array(self::EVENT_TYPE_NODE_PLAY, self::METRIC_UNIQUE_PERCENTILES_SUM),
