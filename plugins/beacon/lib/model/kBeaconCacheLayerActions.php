@@ -70,7 +70,9 @@ class kBeaconCacheLayerActions
 		$shouldLog = false;
 		if(isset($params[kBeaconCacheLayerActions::PARAM_SHOULD_LOG]) && $params[kBeaconCacheLayerActions::PARAM_SHOULD_LOG])
 			$shouldLog = true;
-		
+
+		KalturaMonitorClient::initApiMonitor(true, 'beacon_beacon.add', $partnerId);
+
 		$queueProvider = self::loadQueueProvider();
 		if(!$queueProvider)
 			throw new Exception("Queue Provider could not be initialized");
