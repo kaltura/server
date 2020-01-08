@@ -414,14 +414,15 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		// limit the number of large sphinx SQLs to 1/min per object, since they load the sphinx database
 		// and sphinx servers. the upper limit of 'slightly less than 1MB' is because of the max_allowed_packet 
 		// limit in mysql (by default 1MB). the upper limit is here to prevent the addition of too many category 
-		// users (for example), that will render the category un-indexable 
-		if (strlen($sql) > 128 * 1024 && strlen($sql) < 1000000)
+		// users (for example), that will render the category un-indexable
+		$sqlSize = strlen($sql);
+		if ($sqlSize > 128 * 1024 && $sqlSize < 1000000)
 		{
 			$lockKey = 'large_sql_lock_' . get_class($object) . '_' . $object->getId();
 			$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_SPHINX_STICKY_SESSIONS);
 			if ($cache && !$cache->add($lockKey, true, 60))
 			{
-				KalturaLog::log('skipping sql for key ' . $lockKey);
+				KalturaLog::log('skipping sql for key ' . $lockKey . ' size is: ' . $sqlSize);
 				return;
 			}
 		}
