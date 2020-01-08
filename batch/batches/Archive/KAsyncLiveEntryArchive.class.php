@@ -17,6 +17,8 @@ class KAsyncLiveEntryArchive extends KJobHandlerWorker
 
     const USER_QNA_NOTIFICATIONS_STRING = 'USER_QNA_NOTIFICATIONS';
 
+	const DATE_FORMAT = 'M-d-Y H:i';
+
     /* (non-PHPdoc)
      * @see KBatchBase::getType()
      */
@@ -81,15 +83,14 @@ class KAsyncLiveEntryArchive extends KJobHandlerWorker
 	protected function updateEntriesData(KalturaLiveStreamEntry $liveEntry, KalturaBaseEntry $vodEntry)
 	{
 		$updatedVodEntry = new KalturaMediaEntry();
-		$dateFormat = 'M-d-Y H:i';
 		$broadcastStartTime = $liveEntry->lastBroadcast;
 		if ($broadcastStartTime)
 		{
-			$broadcastStartDate = gmdate($dateFormat, $broadcastStartTime);
+			$broadcastStartDate = gmdate(self::DATE_FORMAT, $broadcastStartTime);
 		}
 		else
 		{
-			$broadcastStartDate = date($dateFormat);
+			$broadcastStartDate = date(self::DATE_FORMAT);
 		}
 		$updatedVodEntry->name = $liveEntry->name. ' ' . $broadcastStartDate;
 		$updatedVodEntry->description = $liveEntry->description;
