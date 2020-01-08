@@ -78,21 +78,30 @@ class KAsyncLiveEntryArchive extends KJobHandlerWorker
         KBatchBase::unimpersonate();
     }
 
-    protected function updateEntriesData(KalturaLiveStreamEntry $liveEntry, KalturaBaseEntry $vodEntry)
-    {
-        $currentDate = date('M-d-Y H:i');
-        $updatedVodEntry = new KalturaMediaEntry();
-        $updatedVodEntry->name = $liveEntry->name. ' ' . $currentDate;
-        $updatedVodEntry->description = $liveEntry->description;
-        $updatedVodEntry->tags = $liveEntry->tags;
-        $updatedVodEntry->displayInSearch = self::DISPLAY_IN_SEARCH_TRUE;
-        KBatchBase::$kClient->baseEntry->update($vodEntry->id, $updatedVodEntry);
+	protected function updateEntriesData(KalturaLiveStreamEntry $liveEntry, KalturaBaseEntry $vodEntry)
+	{
+		$updatedVodEntry = new KalturaMediaEntry();
+		$dateFormat = 'M-d-Y H:i';
+		$broadcastStartTime = $liveEntry->lastBroadcast;
+		if ($broadcastStartTime)
+		{
+			$broadcastStartDate = gmdate($dateFormat, $broadcastStartTime);
+		}
+		else
+		{
+			$broadcastStartDate = date($dateFormat);
+		}
+		$updatedVodEntry->name = $liveEntry->name. ' ' . $broadcastStartDate;
+		$updatedVodEntry->description = $liveEntry->description;
+		$updatedVodEntry->tags = $liveEntry->tags;
+		$updatedVodEntry->displayInSearch = self::DISPLAY_IN_SEARCH_TRUE;
+		KBatchBase::$kClient->baseEntry->update($vodEntry->id, $updatedVodEntry);
 
-        $updatedLiveEntry = new KalturaLiveStreamEntry();
-        $updatedLiveEntry->redirectEntryId = '';
-        $updatedLiveEntry->recordedEntryId = '';
-        KBatchBase::$kClient->baseEntry->update($liveEntry->id, $updatedLiveEntry);
-    }
+		$updatedLiveEntry = new KalturaLiveStreamEntry();
+ 		$updatedLiveEntry->redirectEntryId = '';
+		$updatedLiveEntry->recordedEntryId = '';
+		KBatchBase::$kClient->baseEntry->update($liveEntry->id, $updatedLiveEntry);
+	}
 
     protected function deleteCuePoints($entryId, $notDeletedCuePointTags)
     {
