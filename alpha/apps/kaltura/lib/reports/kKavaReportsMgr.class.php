@@ -70,6 +70,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_UNIQUE_VIEWERS = 'unique_viewers';
 	const METRIC_COUNT_EBVS = 'count_ebvs';
 	const METRIC_NODE_UNIQUE_PERCENTILES_RATIO = 'node_avg_completion_rate';
+	const METRIC_TOTAL_UNIQUE_PERCENTILES = 'total_completion_rate';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -349,6 +350,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR => 'floor',
 		self::METRIC_UNIQUE_SESSIONS => 'floor',
 		self::METRIC_UNIQUE_VIEWERS => 'floor',
+		self::METRIC_TOTAL_UNIQUE_PERCENTILES => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -385,6 +387,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_ENGAGEMENT_RANKING => true,
 		self::METRIC_UNIQUE_VIEWERS => true,
 		self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO => true,
+		self::METRIC_TOTAL_UNIQUE_PERCENTILES => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -701,7 +704,13 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_UNIQUE_ENTRIES] = self::getCardinalityAggregator(
 			self::METRIC_UNIQUE_ENTRIES, 
 			array(self::DIMENSION_ENTRY_ID));
-		
+
+		self::$aggregations_def[self::METRIC_TOTAL_UNIQUE_PERCENTILES] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+			self::getCardinalityAggregator(
+				self::METRIC_TOTAL_UNIQUE_PERCENTILES,
+				array(self::DIMENSION_PERCENTILES)));
+
 		self::$aggregations_def[self::METRIC_UNIQUE_USERS] = self::getHyperUniqueAggregator(
 			self::METRIC_UNIQUE_USERS, 
 			self::METRIC_UNIQUE_USER_IDS);
