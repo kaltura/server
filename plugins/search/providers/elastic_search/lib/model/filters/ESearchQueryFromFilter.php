@@ -43,15 +43,13 @@ class ESearchQueryFromFilter
 		{
 			return true;
 		}
-		else
+
+		$entryFilters = myPlaylistUtils::fillEntryFilterFromXml(array($filter), $partnerId);
+		if (isset($entryFilters[0]) && $entryFilters[0]->getAdvancedSearch())
 		{
-			$entryFilters = myPlaylistUtils::fillEntryFilterFromXml(array($filter), $partnerId);
-			if (isset($entryFilters[0]) && $entryFilters[0]->getAdvancedSearch())
-			{
-				return ESearchQueryFromAdvancedSearch::canTransformAdvanceFilter($entryFilters[0]->getAdvancedSearch());
-			}
-			return false;
+			return ESearchQueryFromAdvancedSearch::canTransformAdvanceFilter($entryFilters[0]->getAdvancedSearch());
 		}
+		return false;
 	}
 
 	/**
