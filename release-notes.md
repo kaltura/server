@@ -314,7 +314,7 @@ max_words_for_ngram = MAX_WORDS_NGRAM(EXAMPLE_2)
 ### Deployment scripts ###
     OnPrem - reindex entry index in elastic:
 	1) Remove old index - delete kaltura_entry
-	2) Create the index - curl -XPUT '{elasticHost}:{elasticPort}/kaltura_entry' --data-binary "@entry_mapping.json"
+	2) Create the index - curl -XPUT '{elasticHost}:{elasticPort}/kaltura_entry' -H 'Content-Type: application/json' --data-binary "@entry_mapping.json"
 	3) Index the entries - php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticEntries.php
 	
 
