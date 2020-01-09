@@ -408,7 +408,7 @@ class kReplacementHelper
 			return false;
 		}
 
-		if($entry->getReplacedEntryId() && $entry->getSyncFlavorsOnceReady())
+		if($entry && $entry->getReplacedEntryId() && $entry->getSyncFlavorsOnceReady())
 		{
 			return true;
 		}
