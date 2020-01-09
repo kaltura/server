@@ -30,7 +30,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 {
 	protected $tempXmlPath;
 	protected $timeout = 90;
-	protected  $processedTimeout = 300;
+	protected  $processedTimeout = 600;
 
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
