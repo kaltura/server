@@ -35,6 +35,7 @@ class ESearchQueryFromFilter
 
 	/**
 	 * @param SimpleXMLElement $filter
+	 * @param int $partnerId
 	 * @return bool
 	 */
 	public static function canTransformXmlFilter($filter, $partnerId)
