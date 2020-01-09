@@ -290,6 +290,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_ERROR,
 		self::EVENT_TYPE_PLAY_REQUESTED,
 		self::EVENT_TYPE_NODE_PLAY,
+		self::EVENT_TYPE_PLAYMANIFEST,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -337,6 +338,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_BUFFER_START => 'count_buffer_start',
 		self::EVENT_TYPE_FLAVOR_SWITCH => 'count_flavor_switch',
 		self::EVENT_TYPE_PLAY_REQUESTED => 'count_play_requested',
+		self::EVENT_TYPE_PLAYMANIFEST => 'count_play_manifest',
 	);
 
 	//global transform
