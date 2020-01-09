@@ -10,6 +10,19 @@ none.
 #### Deployment Scripts ####
 Run 'php /opt/kaltura/app/deployment/updates/scripts/2019_12_10_update_archive_permissions.php'
 
+## Update server healthCheck API action permissions ##
+- Issue Type: Task
+- Issue ID : PLAT-10432
+
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+Run:
+
+    'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_01_09_update_system_gethealthcheck_action.php'
+
+
 # Orion 15.14.0 #
 
 ## Modify confMaps content column ##
