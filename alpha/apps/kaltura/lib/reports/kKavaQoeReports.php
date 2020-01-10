@@ -19,6 +19,7 @@ class kKavaQoeReports extends kKavaReportsMgr
 	const CUSTOM_VAR1_BASE = 'custom_var1_base';
 	const CUSTOM_VAR2_BASE = 'custom_var2_base';
 	const CUSTOM_VAR3_BASE = 'custom_var3_base';
+	const APPLICATION_VER_BASE = 'application_ver_base';
 
 	protected static $reports_def_base = array(
 
@@ -163,6 +164,12 @@ class kKavaQoeReports extends kKavaReportsMgr
 			),
 		),
 
+		self::APPLICATION_VER_BASE => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'application_version' => self::DIMENSION_APPLICATION_VER
+			),
+		),
+
 	);
 
 	protected static $reports_def = array(
@@ -292,6 +299,13 @@ class kKavaQoeReports extends kKavaReportsMgr
 			)
 		),
 
+		ReportType::QOE_EXPERIENCE_APPLICATION_VERSION => array(
+			self::REPORT_BASE_DEF => array(
+				ReportType::QOE_EXPERIENCE,
+				self::APPLICATION_VER_BASE,
+			)
+		),
+
 		//ENGAGEMENT
 
 		ReportType::QOE_ENGAGEMENT => array(
@@ -402,6 +416,13 @@ class kKavaQoeReports extends kKavaReportsMgr
 			self::REPORT_BASE_DEF => array(
 				ReportType::QOE_ENGAGEMENT,
 				self::CUSTOM_VAR3_BASE,
+			)
+		),
+
+		ReportType::QOE_ENGAGEMENT_APPLICATION_VERSION => array(
+			self::REPORT_BASE_DEF => array(
+				ReportType::QOE_ENGAGEMENT,
+				self::APPLICATION_VER_BASE,
 			)
 		),
 
@@ -516,6 +537,13 @@ class kKavaQoeReports extends kKavaReportsMgr
 			)
 		),
 
+		ReportType::QOE_STREAM_QUALITY_APPLICATION_VERSION => array(
+			self::REPORT_BASE_DEF => array(
+				ReportType::QOE_STREAM_QUALITY,
+				self::APPLICATION_VER_BASE,
+			)
+		),
+
 		ReportType::QOE_ERROR_TRACKING => array(
 			self::REPORT_METRICS => array(
 				self::METRIC_AVG_SESSION_ERROR_RATE,
@@ -584,6 +612,34 @@ class kKavaQoeReports extends kKavaReportsMgr
 			self::REPORT_BASE_DEF => array(
 				self::ERROR_TRACKING_BASE,
 				self::ENTRY_BASE,
+			),
+		),
+
+		ReportType::QOE_ERROR_TRACKING_CUSTOM_VAR1 => array(
+			self::REPORT_BASE_DEF => array(
+				self::ERROR_TRACKING_BASE,
+				self::CUSTOM_VAR1_BASE,
+			),
+		),
+
+		ReportType::QOE_ERROR_TRACKING_CUSTOM_VAR2 => array(
+			self::REPORT_BASE_DEF => array(
+				self::ERROR_TRACKING_BASE,
+				self::CUSTOM_VAR2_BASE,
+			),
+		),
+
+		ReportType::QOE_ERROR_TRACKING_CUSTOM_VAR3 => array(
+			self::REPORT_BASE_DEF => array(
+				self::ERROR_TRACKING_BASE,
+				self::CUSTOM_VAR3_BASE,
+			),
+		),
+
+		ReportType::QOE_ERROR_TRACKING_APPLICATION_VERSION => array(
+			self::REPORT_BASE_DEF => array(
+				self::ERROR_TRACKING_BASE,
+				self::APPLICATION_VER_BASE,
 			),
 		),
 
