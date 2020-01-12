@@ -513,7 +513,7 @@ class myPlaylistUtils
 	//splitting entry filters into filters that will run in Esearch and in Sphinx:
 	// Elastic - can Transform Filter
 	// Sphinx  - cannot Transform Filter
-	public static function splitEntryFilters($xml, $partnerId)
+	public static function splitEntryFilters($xml)
 	{
 		$entryFiltersViaEsearch = array();
 		$entryFiltersViaSphinx = array();
