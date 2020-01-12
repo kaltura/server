@@ -34,26 +34,6 @@ class ESearchQueryFromFilter
 	}
 
 	/**
-	 * @param SimpleXMLElement $filter
-	 * @param int $partnerId
-	 * @return bool
-	 */
-	public static function canTransformXmlFilter($filter, $partnerId)
-	{
-		if (!isset($filter->advancedSearch))
-		{
-			return true;
-		}
-
-		$entryFilters = myPlaylistUtils::fillEntryFilterFromXml(array($filter), $partnerId);
-		if (isset($entryFilters[0]) && $entryFilters[0]->getAdvancedSearch())
-		{
-			return ESearchQueryFromAdvancedSearch::canTransformAdvanceFilter($entryFilters[0]->getAdvancedSearch());
-		}
-		return false;
-	}
-
-	/**
 	 * @param baseObjectFilter $filter
 	 * @return bool
 	 */
