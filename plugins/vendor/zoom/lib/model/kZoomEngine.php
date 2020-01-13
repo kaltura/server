@@ -128,7 +128,7 @@ class kZoomEngine
 			}
 		}
 
-		$this->addRecordingTranscriptCompleteEntryTrack();
+		$this->addRecordingTranscriptCompleteEntryTrack($entry);
 	}
 
 	/**
@@ -155,10 +155,10 @@ class kZoomEngine
 		return $result;
 	}
 
-	protected function addRecordingTranscriptCompleteEntryTrack()
+	protected function addRecordingTranscriptCompleteEntryTrack($entry)
 	{
 		$trackEntry = new TrackEntry();
-		$trackEntry->setEntryId($this->getId());
+		$trackEntry->setEntryId($entry->getId());
 		$trackEntry->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_ENTRY);
 		$trackEntry->setDescription('Zoom Recording transcript Complete');
 		TrackEntry::addTrackEntry($trackEntry);
