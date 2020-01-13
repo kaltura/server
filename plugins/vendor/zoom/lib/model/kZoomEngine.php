@@ -99,7 +99,7 @@ class kZoomEngine
 
 		if($this->isTranscriptionAlreadyHandled($entry))
 		{
-			KalturaLog::info("Zoom transcription for entry {$entry->getId()} was already handled");
+			KalturaLog::debug("Zoom transcription for entry {$entry->getId()} was already handled");
 			return;
 		}
 
@@ -187,7 +187,7 @@ class kZoomEngine
 		$entry = entryPeer::doSelectOne($c);
 		if($entry)
 		{
-			KalturaLog::info('Found entry:' . $entry->getId());
+			KalturaLog::debug('Found entry:' . $entry->getId());
 		}
 
 		return $entry;
@@ -206,7 +206,7 @@ class kZoomEngine
 		$resourceReservation = new kResourceReservation(self::ZOOM_LOCK_TTL, true);
 		if(!$resourceReservation->reserve($meeting->uuid))
 		{
-			KalturaLog::info("Meeting {$meeting->uuid} is being processed");
+			KalturaLog::debug("Meeting {$meeting->uuid} is being processed");
 			return;
 		}
 
@@ -214,7 +214,7 @@ class kZoomEngine
 		$this->initUserPermissions($dbUser);
 		if($this->getZoomEntryByMeetingId($meeting->uuid))
 		{
-			KalturaLog::info("Meeting {$meeting->uuid} already processed");
+			KalturaLog::debug("Meeting {$meeting->uuid} already processed");
 			return;
 		}
 		
@@ -444,7 +444,7 @@ class kZoomEngine
 		$participantsEmails = $participants->getParticipantsEmails();
 		if($participantsEmails)
 		{
-			KalturaLog::info('Found the following participants: ' . implode(", ", $participantsEmails));
+			KalturaLog::debug('Found the following participants: ' . implode(", ", $participantsEmails));
 			$result = array();
 			foreach ($participantsEmails as $participantEmail)
 			{
@@ -531,7 +531,7 @@ class kZoomEngine
 	{
 		$ks = null;
 		kSessionUtils::createKSessionNoValidations($dbUser->getPartnerId(), $dbUser->getPuserId() , $ks, 86400 , $isAdmin , "" , '*' );
-		KalturaLog::info('changing to ks: ' . $ks);
+		KalturaLog::debug('changing to ks: ' . $ks);
 		kCurrentContext::initKsPartnerUser($ks);
 		kPermissionManager::init();
 	}
