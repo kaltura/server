@@ -9,7 +9,9 @@ class kZoomEvent implements iZoomObject
 	const ACCOUNT_ID = 'account_id';
 	const DOWNLOAD_TOKEN = 'download_token';
 	const RECORDING_VIDEO_COMPLETED = 'recording_completed';
+	const NEW_RECORDING_VIDEO_COMPLETED = 'recording.completed';
 	const RECORDING_TRANSCRIPT_COMPLETED = 'recording_transcript_completed';
+	const NEW_RECORDING_TRANSCRIPT_COMPLETED = 'recording.transcript.completed';
 	const PAYLOAD = 'payload';
 
 	public $accountId;
@@ -42,6 +44,14 @@ class kZoomEvent implements iZoomObject
 				$this->object = new kZoomTranscriptCompleted();
 				$this->object->parseData($data[kZoomTranscriptCompleted::TRANSCRIPT_OBJECT]);
 				break;
+			case kEventType::NEW_RECORDING_VIDEO_COMPLETED:
+				$this->object = new kZoomMeeting();
+				$this->object->parseData($data[kZoomMeeting::OBJECT]);
+				break;
+			case kEventType::NEW_RECORDING_TRANSCRIPT_COMPLETED:
+				$this->object = new kZoomTranscriptCompleted();
+				$this->object->parseData($data[kZoomTranscriptCompleted::OBJECT]);
+				break;
 			default:
 		}
 	}
@@ -50,8 +60,14 @@ class kZoomEvent implements iZoomObject
 	{
 		switch ($eventName)
 		{
+			case self::NEW_RECORDING_VIDEO_COMPLETED:
+				$this->eventType = kEventType::NEW_RECORDING_VIDEO_COMPLETED;
+				break;
 			case self::RECORDING_VIDEO_COMPLETED:
 				$this->eventType = kEventType::RECORDING_VIDEO_COMPLETED;
+				break;
+			case self::NEW_RECORDING_TRANSCRIPT_COMPLETED:
+				$this->eventType = kEventType::NEW_RECORDING_TRANSCRIPT_COMPLETED;
 				break;
 			case self::RECORDING_TRANSCRIPT_COMPLETED:
 				$this->eventType = kEventType::RECORDING_TRANSCRIPT_COMPLETED;
