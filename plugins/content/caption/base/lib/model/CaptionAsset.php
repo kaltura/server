@@ -14,6 +14,7 @@ class CaptionAsset extends asset
 	const CUSTOM_DATA_ACCURACY = "accuracy";
 	const CUSTOM_DATA_DISPLAY_ON_PLAYER = "display_on_player";
 	const CUSTOM_DATA_ASSOCIATED_TRANSCRIPT_ASSET_IDS = "associated_transcript_ids";
+	const CUSTOM_DATA_SOURCE = 'source';
 	
 	const MULTI_LANGUAGE = 'Multilingual';
 
@@ -33,6 +34,7 @@ class CaptionAsset extends asset
 	public function getAccuracy()           {return $this->getFromCustomData(self::CUSTOM_DATA_ACCURACY);}
 	public function getDisplayOnPlayer()    {return $this->getFromCustomData(self::CUSTOM_DATA_DISPLAY_ON_PLAYER, null, true);}
 	public function getAssociatedTranscriptIds()    {return $this->getFromCustomData(self::CUSTOM_DATA_ASSOCIATED_TRANSCRIPT_ASSET_IDS);}
+	public function getSource()             {return $this->getFromCustomData(self::CUSTOM_DATA_SOURCE);}
 
 
 	public function setLanguage($v)		    {$this->putInCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE, $v);}
@@ -42,6 +44,7 @@ class CaptionAsset extends asset
 	public function setAccuracy($v)         {$this->putInCustomData(self::CUSTOM_DATA_ACCURACY, $v);}
 	public function setDisplayOnPlayer($v)  {$this->putInCustomData(self::CUSTOM_DATA_DISPLAY_ON_PLAYER, $v);}
 	public function setAssociatedTranscriptIds($v)    {$this->putInCustomData(self::CUSTOM_DATA_ASSOCIATED_TRANSCRIPT_ASSET_IDS, $v);}
+	public function setSource($v)           {$this->putInCustomData(self::CUSTOM_DATA_SOURCE, $v);}
 	
 	public function getFinalDownloadUrlPathWithoutKs()
 	{

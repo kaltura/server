@@ -97,6 +97,12 @@ class kZoomEngine
 			ZoomHelper::exitWithError(kZoomErrorMessages::MISSING_ENTRY_FOR_ZOOM_MEETING . $transcript->id);
 		}
 
+		if($this->isTranscriptionAlreadyHandled($entry))
+		{
+			KalturaLog::info("Zoom transcription for entry {$entry->getId()} was already handled");
+			return;
+		}
+
 		$this->initUserPermissions($dbUser, true);
 		$captionAssetService = new CaptionAssetService();
 		$captionAssetService->initService('caption_captionasset', 'captionAsset', 'setContent');
@@ -121,6 +127,41 @@ class kZoomEngine
 				ZoomHelper::exitWithError(kZoomErrorMessages::ERROR_HANDLING_TRANSCRIPT);
 			}
 		}
+
+		$this->addRecordingTranscriptCompleteEntryTrack();
+	}
+
+	/**
+	 * @param entry $entry
+	 * @return bool
+	 * @throws KalturaAPIException
+	 */
+	protected function isTranscriptionAlreadyHandled($entry)
+	{
+		$result = false;
+		$filter = new KalturaAssetFilter();
+		$filter->entryIdEqual = $entry->getId();
+		$types = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
+		list($list, $totalCount) = $filter->doGetListResponse(new KalturaFilterPager(), $types);
+		foreach($list as $captionAsset)
+		{
+			if($captionAsset->getSource() == CaptionSource::ZOOM)
+			{
+				$result = true;
+				break;
+			}
+		}
+
+		return $result;
+	}
+
+	protected function addRecordingTranscriptCompleteEntryTrack()
+	{
+		$trackEntry = new TrackEntry();
+		$trackEntry->setEntryId($this->getId());
+		$trackEntry->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_ENTRY);
+		$trackEntry->setDescription('Zoom Recording transcript Complete');
+		TrackEntry::addTrackEntry($trackEntry);
 	}
 
 	/**
@@ -359,6 +400,7 @@ class kZoomEngine
 		$caption->setContainerFormat(CaptionType::WEBVTT);
 		$caption->setStatus(CaptionAsset::ASSET_STATUS_QUEUED);
 		$caption->setFileExt(self::ZOOM_TRANSCRIPT_FILE_TYPE);
+		$caption->setSource(CaptionSource::ZOOM);
 		$caption->save();
 		return $caption;
 	}
