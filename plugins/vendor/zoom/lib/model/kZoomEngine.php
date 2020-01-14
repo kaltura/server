@@ -345,7 +345,7 @@ class kZoomEngine
 	 */
 	protected function createEntryDescriptionFromMeeting($meeting)
 	{
-		return "Zoom Recording ID: {$meeting->id} UUID: {$meeting->uuid}\nMeeting Time: {$meeting->startTime}";
+		return "Zoom Recording ID: {$meeting->id}\nUUID: {$meeting->uuid}\nMeeting Time: {$meeting->startTime}";
 	}
 
 	/**

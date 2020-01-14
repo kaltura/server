@@ -11,7 +11,7 @@ class kZoomEvent implements iZoomObject
 	const RECORDING_VIDEO_COMPLETED = 'recording_completed';
 	const NEW_RECORDING_VIDEO_COMPLETED = 'recording.completed';
 	const RECORDING_TRANSCRIPT_COMPLETED = 'recording_transcript_completed';
-	const NEW_RECORDING_TRANSCRIPT_COMPLETED = 'recording.transcript.completed';
+	const NEW_RECORDING_TRANSCRIPT_COMPLETED = 'recording.transcript_completed';
 	const PAYLOAD = 'payload';
 
 	public $accountId;
