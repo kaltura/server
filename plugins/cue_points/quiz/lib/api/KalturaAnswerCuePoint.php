@@ -154,6 +154,16 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 
 	}
 
+	protected function validateOnlyOneAnswer()
+	{
+		$existingCuePoint = CuePointPeer::retrieveByEntryIdAndParentId($this->entryId, $this->parentId, $this->quizUserEntryId);
+		if($existingCuePoint)
+		{
+			throw new KalturaAPIException(KalturaQuizErrors::ANSWER_ALREADY_EXISTS, $this->parentId, $this->quizUserEntryId);
+		}
+	}
+
+
 	protected function validateUserEntry()
 	{
 		$dbUserEntry = UserEntryPeer::retrieveByPK($this->quizUserEntryId);
@@ -186,6 +196,7 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		QuizPlugin::validateAndGetQuiz($dbEntry);
 		$this->validateParentId();
 		$this->validateUserEntry();
+		$this->validateOnlyOneAnswer();
 		if ($this->feedback != null && !kEntitlementUtils::isEntitledForEditEntry($dbEntry) )
 		{
 			KalturaLog::debug('Insert feedback on answer cue point is allowed only with admin KS or entry owner or co-editor');

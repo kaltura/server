@@ -54,13 +54,15 @@ class CuePointService extends KalturaBaseService
 		if(!CuePointPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, CuePointPlugin::PLUGIN_NAME);
 	}
-	
+
 	/**
 	 * Allows you to add an cue point object associated with an entry
-	 * 
+	 *
 	 * @action add
 	 * @param KalturaCuePoint $cuePoint
 	 * @return KalturaCuePoint
+	 * @throws KalturaAPIException
+	 * @throws PropelException
 	 */
 	function addAction(KalturaCuePoint $cuePoint)
 	{
@@ -79,7 +81,12 @@ class CuePointService extends KalturaBaseService
 			if($existingCuePoint)
 				throw new KalturaAPIException(KalturaCuePointErrors::CUE_POINT_SYSTEM_NAME_EXISTS, $cuePoint->systemName, $existingCuePoint->getId());
 		}
-		
+
+		if($cuePoint instanceof KalturaAnswerCuePoint)
+		{
+			$this->verifyOnlyOneAnswer($cuePoint);
+		}
+
 		/* @var $dbCuePoint CuePoint */
 		$dbCuePoint->setPartnerId($this->getPartnerId());
 		$dbCuePoint->setPuserId(is_null($cuePoint->userId) ? $this->getKuser()->getPuserId() : $cuePoint->userId);
@@ -104,7 +111,7 @@ class CuePointService extends KalturaBaseService
 			
 		return $cuePoint;
 	}
-	
+
 	/**
 	 * Allows you to add multiple cue points objects by uploading XML that contains multiple cue point definitions
 	 * 
