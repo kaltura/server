@@ -156,10 +156,29 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 
 	protected function validateOnlyOneAnswer()
 	{
-		$existingCuePoint = CuePointPeer::retrieveByEntryIdAndParentId($this->entryId, $this->parentId, $this->quizUserEntryId);
-		if($existingCuePoint)
+		if(kCurrentContext::$ks_object && kCurrentContext::$ks_object->isAnonymousSession())
 		{
-			throw new KalturaAPIException(KalturaQuizErrors::ANSWER_ALREADY_EXISTS, $this->parentId, $this->quizUserEntryId);
+			return;
+		}
+		
+		if(!kCurrentContext::$is_admin_session)
+		{
+			$kuserId = kCurrentContext::getCurrentKsKuserId();
+		}
+		else
+		{
+			$dbUserEntry = UserEntryPeer::retrieveByPK($this->quizUserEntryId);
+			$kuserId = $dbUserEntry->getKuserId();
+		}
+
+		$cuePoints = CuePointPeer::retrieveQuePointAnswer($this->entryId, $this->parentId, $kuserId);
+		foreach($cuePoints as $cuePoint)
+		{
+			/* @var $cuePoint AnswerCuePoint */
+			if($cuePoint->getQuizUserEntryId() === $this->quizUserEntryId)
+			{
+				throw new KalturaAPIException(KalturaQuizErrors::ANSWER_ALREADY_EXISTS, $this->parentId, $this->quizUserEntryId);
+			}
 		}
 	}
 

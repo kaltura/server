@@ -232,23 +232,23 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	}
 
 	/**
-	 * Retrieve multiple objects by entry id and parentId.
+	 * Retrieve multiple AnswerCuePoints objects.
 	 *
 	 * @param string $entryId the entry id.
 	 * @param $parentId
-	 * @param $quizUserEntryId
+	 * @param $kuserId
 	 * @param PropelPDO $con the connection to use
 	 * @return     CuePoint
 	 * @throws PropelException
 	 */
-	public static function retrieveQuePointAnswer($entryId, $parentId, $quizUserEntryId, PropelPDO $con = null)
+	public static function retrieveQuePointAnswer($entryId, $parentId, $kuserId, PropelPDO $con = null)
 	{
 		$criteria = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		$criteria->add(CuePointPeer::ENTRY_ID, $entryId);
 		$criteria->add(CuePointPeer::PARENT_ID, $parentId);
+		$criteria->add(CuePointPeer::KUSER_ID, $kuserId);
+		$criteria->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER), Criteria::EQUAL);
 		$criteria->add(CuePointPeer::STATUS, CuePointStatus::DELETED, Criteria::NOT_EQUAL);
-		$criteria->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER), Criteria::IN);
-
 		$criteria->addAscendingOrderByColumn(CuePointPeer::CREATED_AT);
 		$criteria->addAscendingOrderByColumn(CuePointPeer::START_TIME);
 		return CuePointPeer::doSelect($criteria, $con);

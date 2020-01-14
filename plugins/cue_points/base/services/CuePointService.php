@@ -82,11 +82,6 @@ class CuePointService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaCuePointErrors::CUE_POINT_SYSTEM_NAME_EXISTS, $cuePoint->systemName, $existingCuePoint->getId());
 		}
 
-		if($cuePoint instanceof KalturaAnswerCuePoint)
-		{
-			$this->verifyOnlyOneAnswer($cuePoint);
-		}
-
 		/* @var $dbCuePoint CuePoint */
 		$dbCuePoint->setPartnerId($this->getPartnerId());
 		$dbCuePoint->setPuserId(is_null($cuePoint->userId) ? $this->getKuser()->getPuserId() : $cuePoint->userId);
