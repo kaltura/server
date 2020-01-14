@@ -1412,13 +1412,13 @@ class kKavaReportsMgr extends kKavaBase
 		return $date->format('Ymd');
 	}
 
-	protected static function timestampToUnixtime($timestamp, $tz)
+	protected static function timestampToUnixtime($timestamp, $tz = null)
 	{
 		$date = new DateTime($timestamp);
 		return $date->format('U');
 	}
 
-	protected static function timestampToUnixDate($timestamp, $tz)
+	protected static function timestampToUnixDate($timestamp, $tz = null)
 	{
 		$date = new DateTime($timestamp);
 		$date->modify('12 hour');			// adding 12H in order to round to the nearest day
@@ -1426,19 +1426,19 @@ class kKavaReportsMgr extends kKavaBase
 		return $round->format('U');
 	}
 
-	protected static function timestampToSecondId($timestamp, $tz)
+	protected static function timestampToSecondId($timestamp, $tz = null)
 	{
 		$date = new DateTime($timestamp);
 		return $date->format('YmdHis');
 	}
 
-	protected static function timestampToMinuteId($timestamp, $tz)
+	protected static function timestampToMinuteId($timestamp, $tz = null)
 	{
 		$date = new DateTime($timestamp);
 		return $date->format('YmdHi');
 	}
 
-	protected static function timestampToHourId($timestamp, $tz)
+	protected static function timestampToHourId($timestamp, $tz = null)
 	{
 		// hours are returned from druid query with the right offset so no need to change it
 		$date = new DateTime($timestamp);
