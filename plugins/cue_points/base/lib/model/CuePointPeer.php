@@ -234,14 +234,14 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	/**
 	 * Retrieve multiple AnswerCuePoints objects.
 	 *
-	 * @param string $entryId the entry id.
-	 * @param $parentId
-	 * @param $kuserId
-	 * @param PropelPDO $con the connection to use
-	 * @return     CuePoint
-	 * @throws PropelException
+	 * @param	string $entryId the entry id.
+	 * @param	$parentId
+	 * @param	$kuserId
+	 * @param	PropelPDO $con the connection to use
+	 * @return	CuePoint
+	 * @throws	PropelException
 	 */
-	public static function retrieveQuePointAnswer($entryId, $parentId, $kuserId, PropelPDO $con = null)
+	public static function retrieveCuePointAnswers($entryId, $parentId, $kuserId, PropelPDO $con = null)
 	{
 		$criteria = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		$criteria->add(CuePointPeer::ENTRY_ID, $entryId);

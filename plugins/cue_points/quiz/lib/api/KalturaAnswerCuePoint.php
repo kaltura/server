@@ -160,18 +160,18 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		{
 			return;
 		}
-		
-		if(!kCurrentContext::$is_admin_session)
-		{
-			$kuserId = kCurrentContext::getCurrentKsKuserId();
-		}
-		else
+
+		if(kCurrentContext::$is_admin_session)
 		{
 			$dbUserEntry = UserEntryPeer::retrieveByPK($this->quizUserEntryId);
 			$kuserId = $dbUserEntry->getKuserId();
 		}
+		else
+		{
+			$kuserId = kCurrentContext::getCurrentKsKuserId();
+		}
 
-		$cuePoints = CuePointPeer::retrieveQuePointAnswer($this->entryId, $this->parentId, $kuserId);
+		$cuePoints = CuePointPeer::retrieveCuePointAnswers($this->entryId, $this->parentId, $kuserId);
 		foreach($cuePoints as $cuePoint)
 		{
 			/* @var $cuePoint AnswerCuePoint */
