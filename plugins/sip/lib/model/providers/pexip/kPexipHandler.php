@@ -32,7 +32,7 @@ class kPexipHandler
 			throw new KalturaAPIException(KalturaErrors::PEXIP_ROOM_CREATION_FAILED, $dbLiveEntry->getId());
 		}
 		$primaryAdpId = null;
-		$primaryUrl = self::getStreamUrl($dbLiveEntry);
+		$primaryUrl = self::getStreamUrl($dbLiveEntry, $pexipConfig);
 		if ($primaryUrl)
 		{
 			$locationId = $pexipConfig[kPexipUtils::CONFIG_PRIMARY_LOCATION_ID];
@@ -44,7 +44,7 @@ class kPexipHandler
 			}
 		}
 		$secondaryAdpId = null;
-		$secondaryUrl = self::getStreamUrl($dbLiveEntry, false);
+		$secondaryUrl = self::getStreamUrl($dbLiveEntry, $pexipConfig, false);
 		if ($secondaryUrl)
 		{
 			$locationId = $pexipConfig[kPexipUtils::CONFIG_SECONDARY_LOCATION_ID];
@@ -62,14 +62,24 @@ class kPexipHandler
 
 	/**
 	 * @param $dbLiveEntry
+	 * @param $pexipConfig
 	 * @param bool $isPrimaryStream
-	 * @return string
-	 * @throws KalturaAPIException
+	 * @return string|string[]|null
+	 * @throws Exception
 	 */
-	protected static function getStreamUrl($dbLiveEntry, $isPrimaryStream = true)
+	protected static function getStreamUrl($dbLiveEntry, $pexipConfig, $isPrimaryStream = true)
 	{
-		/** @var LiveStreamEntry $dbLiveEntry * */
-		$streamUrl = $isPrimaryStream ? $dbLiveEntry->getPrimarySecuredBroadcastingUrl() : $dbLiveEntry->getSecondarySecuredBroadcastingUrl();
+		/** @var LiveStreamEntry $dbLiveEntry **/
+		$streamUrl = null;
+		if (isset($pexipConfig[kPexipUtils::FORCE_NON_SECURE_STREAMING]) && $pexipConfig[kPexipUtils::FORCE_NON_SECURE_STREAMING])
+		{
+			$streamUrl = $isPrimaryStream ? $dbLiveEntry->getPrimaryBroadcastingUrl() : $dbLiveEntry->getSecondaryBroadcastingUrl();
+		}
+		else
+		{
+			$streamUrl = $isPrimaryStream ? $dbLiveEntry->getPrimarySecuredBroadcastingUrl() : $dbLiveEntry->getSecondarySecuredBroadcastingUrl();
+		}
+
 		if (!$streamUrl)
 		{
 			KalturaLog::info("RTMPS stream could not be created for entry " . $dbLiveEntry->getId());
