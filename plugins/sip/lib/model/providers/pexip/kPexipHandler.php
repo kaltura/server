@@ -27,40 +27,59 @@ class kPexipHandler
 	public static function createCallObjects(LiveStreamEntry $dbLiveEntry, $pexipConfig, $alias)
 	{
 		$roomId = self::addVirtualRoom($dbLiveEntry, $pexipConfig, $alias);
-		if(!$roomId)
+		if (!$roomId)
 		{
 			throw new KalturaAPIException(KalturaErrors::PEXIP_ROOM_CREATION_FAILED, $dbLiveEntry->getId());
 		}
 		$primaryAdpId = null;
-		if($dbLiveEntry->getPrimaryBroadcastingUrl())
+		$primaryUrl = self::getStreamUrl($dbLiveEntry);
+		if ($primaryUrl)
 		{
-			$primaryRtmp = $dbLiveEntry->getPrimaryBroadcastingUrl() . '/' . $dbLiveEntry->getStreamName();
-			$primaryRtmp  = str_replace("%i", "1", $primaryRtmp);
 			$locationId = $pexipConfig[kPexipUtils::CONFIG_PRIMARY_LOCATION_ID];
 			$locationId = is_numeric($locationId) ? $locationId : null;
-			$primaryAdpId = self::addADP($dbLiveEntry, $roomId, $primaryRtmp, 'Primary', $pexipConfig, $locationId);
-			if(!$primaryAdpId)
+			$primaryAdpId = self::addADP($dbLiveEntry, $roomId, $primaryUrl, 'Primary', $pexipConfig, $locationId);
+			if (!$primaryAdpId)
 			{
 				throw new KalturaAPIException(KalturaErrors::PEXIP_ADP_CREATION_FAILED, $dbLiveEntry->getId());
 			}
 		}
-
 		$secondaryAdpId = null;
-		if($dbLiveEntry->getSecondaryBroadcastingUrl())
+		$secondaryUrl = self::getStreamUrl($dbLiveEntry, false);
+		if ($secondaryUrl)
 		{
-			$secondaryRtmp = $dbLiveEntry->getSecondaryBroadcastingUrl() . '/' . $dbLiveEntry->getStreamName();
-			$secondaryRtmp = str_replace("%i", "1", $secondaryRtmp );
 			$locationId = $pexipConfig[kPexipUtils::CONFIG_SECONDARY_LOCATION_ID];
 			$locationId = is_numeric($locationId) ? $locationId : null;
-			$secondaryAdpId = self::addADP($dbLiveEntry, $roomId, $secondaryRtmp, 'Secondary', $pexipConfig, $locationId);
+			$secondaryAdpId = self::addADP($dbLiveEntry, $roomId, $secondaryUrl, 'Secondary', $pexipConfig, $locationId);
 
-			if(!$secondaryAdpId)
+			if (!$secondaryAdpId)
 			{
 				throw new KalturaAPIException(KalturaErrors::PEXIP_ADP_CREATION_FAILED, $dbLiveEntry->getId());
 			}
 		}
 
 		return array($roomId, $primaryAdpId, $secondaryAdpId);
+	}
+
+	/**
+	 * @param $dbLiveEntry
+	 * @param bool $isPrimaryStream
+	 * @return string
+	 * @throws KalturaAPIException
+	 */
+	protected static function getStreamUrl($dbLiveEntry, $isPrimaryStream = true)
+	{
+		/** @var LiveStreamEntry $dbLiveEntry * */
+		$streamUrl = $isPrimaryStream ? $dbLiveEntry->getPrimarySecuredBroadcastingUrl() : $dbLiveEntry->getSecondarySecuredBroadcastingUrl();
+		if (!$streamUrl)
+		{
+			KalturaLog::info("RTMPS stream could not be created for entry " . $dbLiveEntry->getId());
+			$msg = 'There was an issue generating a secure link for the broadcast for entry ' . $dbLiveEntry->getId() . ', please contact you system Admin';
+			kPexipUtils::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
+			return null;
+		}
+		$streamUrl = $streamUrl . '/' . $dbLiveEntry->getStreamName();
+		$streamUrl = str_replace("%i", "1", $streamUrl);
+		return $streamUrl;
 	}
 
 	/**
