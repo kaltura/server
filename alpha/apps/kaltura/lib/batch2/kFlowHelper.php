@@ -1191,6 +1191,12 @@ class kFlowHelper
 		// verifies that flavor asset created
 		if(!$data->getFlavorAssetId())
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+		
+		if(!$dbBatchJob->getEntry())
+		{
+			KalturaLog::debug("Entry [{$dbBatchJob->getEntryId()}] not found, the entry is porbably deleted will return job to api exception");
+			return $dbBatchJob;
+		}
 
 		$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 		// verifies that flavor asset exists
