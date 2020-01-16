@@ -47,7 +47,7 @@ class ESearchQueryFromAdvancedSearch
 				break;
 			default:
 				KalturaLog::crit('Tried to convert not supported advance filter of type:' . $type);
-				throw new KalturaAPIException(KalturaESearchErrors::MISSING_OPERATOR_TYPE);
+				throw new kCoreException(kESearchException::MISSING_OPERATOR_TYPE);
 		}
 	}
 
