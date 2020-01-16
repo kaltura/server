@@ -477,8 +477,8 @@ class embedPlaykitJsAction extends sfAction
 					$this->bundleConfig[$key] = $betaVersionMap[$key];
 				}
 				
-				if ($val == self::CANARY && $canaryProductVersion != null && isset($canaryProductVersion[$key])) {
-					$this->bundleConfig[$key] = $canaryProductVersion[$key];
+				if ($val == self::CANARY && $canaryVersionMap != null && isset($canaryVersionMap[$key])) {
+					$this->bundleConfig[$key] = $canaryVersionMap[$key];
 				}
 
 				if($packageVersion !== $val) {
