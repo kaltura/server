@@ -348,6 +348,44 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public $authenticationType;
 
+	/**
+	 * @var string
+	 */
+	public $extendedFreeTrailExpiryReason;
+
+	/**
+	 *  Unix timestamp (In seconds)
+	 *
+	 * @var int
+	 *
+	 */
+	public $extendedFreeTrailExpiryDate;
+
+	/**
+	 * @var int
+	 */
+	public $extendedFreeTrail;
+
+	/**
+	 * @var bool
+	 */
+	public $extendedFreeTrailEndsWarning;
+
+	/**
+	 * @var int
+	 */
+	public $eightyPercentWarning;
+
+	/**
+	 * @var int
+	 */
+	public $usageLimitWarning;
+
+	/**
+	 * @var int
+	 */
+	public $lastFreeTrialNotificationDay;
+
 	private static $map_between_objects = array
 	(
 		'id' , 'name', 'website' => 'url1' , 'notificationUrl' => 'url2' , 'appearInSearch' , 'createdAt' , 'adminName' , 'adminEmail' ,
@@ -357,7 +395,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'firstName' , 'lastName' , 'country' , 'state' , 'publishersQuota', 'partnerGroupType', 'defaultEntitlementEnforcement', 
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks',
 		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages',
-		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType',
+		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'extendedFreeTrailExpiryReason', 'extendedFreeTrailExpiryDate', 'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay'
 	);
 	
 	public function getMapBetweenObjects ( )
