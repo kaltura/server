@@ -5,11 +5,11 @@ use PhpAmqpLib\Channel\AMQPChannel;
 
 /**
  * Abstract base class for AMQP content.  Subclasses should override
- * the propertyDefinitions attribute.
+ * the PROPERTIES attribute.
  */
 abstract class GenericContent
 {
-    /** @var array */
+    /** @var AMQPChannel[] */
     public $delivery_info = array();
 
     /** @var array Final property definitions */
@@ -24,20 +24,24 @@ abstract class GenericContent
     /**
      * @var array
      */
-    protected static $propertyDefinitions = array(
+    protected static $PROPERTIES = array(
         'dummy' => 'shortstr'
     );
 
     /**
-     * @param array $properties Message property content
-     * @param array $propertyTypes Message property definitions
+     * @param $props
+     * @param null $prop_types
      */
-    public function __construct($properties, $propertyTypes = null)
+    public function __construct($props, $prop_types = null)
     {
-        $this->prop_types = !empty($propertyTypes) ? $propertyTypes : self::$propertyDefinitions;
+        if ($prop_types) {
+            $this->prop_types = $prop_types;
+        } else {
+            $this->prop_types = self::$PROPERTIES;
+        }
 
-        if (!empty($properties)) {
-            $this->properties = array_intersect_key($properties, $this->prop_types);
+        if ($props) {
+            $this->properties = array_intersect_key($props, $this->prop_types);
         }
     }
 
@@ -102,10 +106,6 @@ abstract class GenericContent
                 $name
             ));
         }
-        
-        if (isset($this->properties[$name]) && $this->properties[$name] !== $value || !isset($this->properties[$name])) {
-            $this->serialized_properties = null;
-        }
 
         $this->properties[$name] = $value;
     }
@@ -116,46 +116,38 @@ abstract class GenericContent
      * into a dictionary stored in this object as an attribute named
      * 'properties'.
      *
-     * @param AMQPReader $reader
+     * @param AMQPReader $r
      * NOTE: do not mutate $reader
-     * @return $this
      */
-    public function load_properties(AMQPReader $reader)
+    public function load_properties($r)
     {
         // Read 16-bit shorts until we get one with a low bit set to zero
         $flags = array();
-
         while (true) {
-            $flag_bits = $reader->read_short();
+            $flag_bits = $r->read_short();
             $flags[] = $flag_bits;
-
-            if (($flag_bits & 1) === 0) {
+            if (($flag_bits & 1) == 0) {
                 break;
             }
         }
 
         $shift = 0;
-        $data = array();
-
+        $d = array();
         foreach ($this->prop_types as $key => $proptype) {
-            if ($shift === 0) {
+            if ($shift == 0) {
                 if (!$flags) {
                     break;
                 }
                 $flag_bits = array_shift($flags);
                 $shift = 15;
             }
-
             if ($flag_bits & (1 << $shift)) {
-                $data[$key] = $reader->{'read_' . $proptype}();
+                $d[$key] = $r->{'read_' . $proptype}();
             }
 
             $shift -= 1;
         }
-
-        $this->properties = $data;
-
-        return $this;
+        $this->properties = $d;
     }
 
 

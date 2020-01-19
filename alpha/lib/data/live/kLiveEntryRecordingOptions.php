@@ -29,6 +29,16 @@ class kLiveEntryRecordingOptions
 	 */
 	protected $shouldMakeHidden = false;
 
+    /**
+     * @var boolean
+     */
+	protected $shouldAutoArchive = false;
+
+    /**
+     * @var string
+     */
+	protected $nonDeletedCuePointsTags;
+
 	/**
 	 * @return the $shouldCopyThumbnail
 	 */
@@ -91,4 +101,35 @@ class kLiveEntryRecordingOptions
 		return $this->shouldMakeHidden;
 	}
 
+	/**
+	 * @param boolean $shouldAutoArchive
+	 */
+	public function setShouldAutoArchive($shouldAutoArchive)
+	{
+		$this->shouldAutoArchive = $shouldAutoArchive;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getShouldAutoArchive()
+	{
+		return $this->shouldAutoArchive;
+	}
+
+	/**
+	 * @param string $nonDeletedCuePointsTags
+	 */
+	public function setNonDeletedCuePointsTags($nonDeletedCuePointsTags)
+	{
+		$this->nonDeletedCuePointsTags = $nonDeletedCuePointsTags;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getNonDeletedCuePointsTags()
+	{
+		return $this->nonDeletedCuePointsTags;
+	}
 }

@@ -511,8 +511,8 @@ class myPlaylistUtils
 	}
 
 	//splitting entry filters into filters that will run in Esearch and in Sphinx:
-	// Elastic - advancesSearch is not set OR advancesSearch is set and includes KalturaMetadataSearchItem
-	// Sphinx  - advancesSearch is set and NOT including KalturaMetadataSearchItem
+	// Elastic - can Transform Filter
+	// Sphinx  - cannot Transform Filter
 	public static function splitEntryFilters($xml)
 	{
 		$entryFiltersViaEsearch = array();
@@ -520,7 +520,8 @@ class myPlaylistUtils
 		list ($totalResults, $entryFilters) = self::getPlaylistFilterListStruct($xml);
 		foreach ($entryFilters as $entryFilter)
 		{
-			if (ESearchQueryFromFilter::canTransformXmlFilter($entryFilter))
+			$entryFilterFromXml = self::fillEntryFilter($entryFilter);
+			if (ESearchEntryQueryFromFilter::canTransformFilter($entryFilterFromXml))
 			{
 				$entryFiltersViaEsearch[] = $entryFilter;
 			}
@@ -531,6 +532,14 @@ class myPlaylistUtils
 		}
 
 		return array($entryFiltersViaEsearch, $entryFiltersViaSphinx, $totalResults);
+	}
+
+	protected static function fillEntryFilter($filter)
+	{
+		self::replaceContextTokens($filter);
+		$entryFilter = new entryFilter();
+		$entryFilter->fillObjectFromXml($filter, '_');
+		return $entryFilter;
 	}
 
 	public static function executeDynamicPlaylistViaEsearch ($entryFilters ,$totalResults, $pager = null)
@@ -590,9 +599,7 @@ class myPlaylistUtils
 		$entryFilters = array();
 		foreach ($listOfFilters as $filter)
 		{
-			self::replaceContextTokens($filter);
-			$entryFilter = new entryFilter();
-			$entryFilter->fillObjectFromXml($filter, '_');
+			$entryFilter = self::fillEntryFilter($filter);
 			self::updateEntryFilterFields($entryFilter, $partnerId);
 			$entryFilters[] = $entryFilter;
 		}

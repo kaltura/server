@@ -34,6 +34,7 @@ class assetParams extends BaseassetParams implements IBaseObject
 	const CONTAINER_FORMAT_MXF = "mxf";
 	const CONTAINER_FORMAT_COPY = "copy";
 	const CONTAINER_FORMAT_MP42 = "mp42";
+	const CONTAINER_FORMAT_MP42_ISOM = 'mp42 (isom/mp42)';
 	const CONTAINER_FORMAT_ISOM = "isom";
 	const CONTAINER_FORMAT_F4V = "f4v";
 	
@@ -45,7 +46,11 @@ class assetParams extends BaseassetParams implements IBaseObject
 	const CONTAINER_FORMAT_PNG = 'png';
 	
 	const CONTAINER_FORMAT_WIDEVINE = 'wvm';
-	
+
+	const TS_FILE_EXTENSION = 'ts';
+	const M3U8_FILE_EXTENSION = 'm3u8';
+	const MPG_FILE_EXTENSION = 'mpg';
+
 	const TAG_SOURCE = "source";
 	const TAG_SAVE_SOURCE = "save_source";
 	const TAG_WEB = "web";

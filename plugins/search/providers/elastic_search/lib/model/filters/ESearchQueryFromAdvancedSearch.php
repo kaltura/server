@@ -47,7 +47,7 @@ class ESearchQueryFromAdvancedSearch
 				break;
 			default:
 				KalturaLog::crit('Tried to convert not supported advance filter of type:' . $type);
-				throw new kCoreException();
+				throw new kCoreException(kESearchException::MISSING_OPERATOR_TYPE);
 		}
 	}
 
@@ -68,6 +68,10 @@ class ESearchQueryFromAdvancedSearch
 			{
 				$items[] = $item;
 			}
+		}
+		if (!$items)
+		{
+			return null;
 		}
 
 		$advanceFilterOperator->setSearchItems($items);
@@ -148,7 +152,7 @@ class ESearchQueryFromAdvancedSearch
 	public static function canTransformAdvanceFilter($item)
 	{
 		$type = get_class($item);
-		$result = self::canTransformType($type);
+		$result = self::canTransformType($type, $item);
 		if($result && $item instanceof AdvancedSearchFilterOperator && is_array($item->getItems()))
 		{
 			foreach($item->getItems() as $item)
@@ -164,16 +168,30 @@ class ESearchQueryFromAdvancedSearch
 		return $result;
 	}
 
-	protected static function canTransformType($type)
+	protected static function canTransformType($type, $item)
 	{
 		switch($type)
 		{
 			case self::SEARCH_OPERATOR:
-			case self::ADVANCED_SEARCH_FILTER_MATCH_CONDITION:
 			case self::METADATA_SEARCH_FILTER:
+				return self::gotESearchOperator($item->getType());
+			case self::ADVANCED_SEARCH_FILTER_MATCH_CONDITION:
 				return true;
 			default:
 				return false;
 		}
 	}
+
+	protected static function gotESearchOperator($type)
+	{
+		switch($type)
+		{
+			case KalturaSearchOperatorType::SEARCH_AND:
+			case KalturaSearchOperatorType::SEARCH_OR:
+				return true;
+			default:
+				return false;
+		}
+	}
+
 }

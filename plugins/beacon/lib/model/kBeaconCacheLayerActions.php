@@ -16,7 +16,6 @@ require_once (dirname(__FILE__) . '/../../../../plugins/queue/lib/QueueProvider.
 require_once (dirname(__FILE__) . '/../../../../plugins/queue/providers/rabbit_mq/lib/RabbitMQProvider.php');
 require_once (dirname(__FILE__) . '/../../../../plugins/queue/providers/rabbit_mq/lib/MultiCentersRabbitMQProvider.php');
 
-require_once (dirname(__FILE__) . '/../../../../alpha/config/kConf.php');
 require_once (dirname(__FILE__) . '/../../../../alpha/apps/kaltura/lib/monitor/KalturaMonitorClient.php');
 
 
@@ -71,7 +70,9 @@ class kBeaconCacheLayerActions
 		$shouldLog = false;
 		if(isset($params[kBeaconCacheLayerActions::PARAM_SHOULD_LOG]) && $params[kBeaconCacheLayerActions::PARAM_SHOULD_LOG])
 			$shouldLog = true;
-		
+
+		KalturaMonitorClient::initApiMonitor(true, 'beacon_beacon.add', $partnerId);
+
 		$queueProvider = self::loadQueueProvider();
 		if(!$queueProvider)
 			throw new Exception("Queue Provider could not be initialized");

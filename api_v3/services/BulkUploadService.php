@@ -25,6 +25,7 @@ class BulkUploadService extends KalturaBaseService
 	 * @param string $uploadedBy
 	 * @param string $fileName Friendly name of the file, used to be recognized later in the logs.
 	 * @return KalturaBulkUpload
+	 * @deprecated Use media.bulkUploadAdd() instead.
 	 */
 	public function addAction($conversionProfileId, $csvFileData, $bulkUploadType = null, $uploadedBy = null, $fileName = null)
 	{

@@ -18,7 +18,7 @@ class AMQPTable extends AMQPAbstractCollection
     /**
      * @param string $key
      * @param mixed $val
-     * @param int|null $type
+     * @param integer $type
      */
     public function set($key, $val, $type = null)
     {

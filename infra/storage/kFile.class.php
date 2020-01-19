@@ -264,7 +264,9 @@ class kFile extends kFileBase
 				return false;
 			}
 		} else {
-			self::copySingleFile($src, $dest, $deleteSrc);
+			$res = self::copySingleFile($src, $dest, $deleteSrc);
+			if (! $res)
+				return false;
 		}
 		return true;
 	}
