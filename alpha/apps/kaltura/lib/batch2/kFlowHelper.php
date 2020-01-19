@@ -3208,7 +3208,8 @@ class kFlowHelper
         $liveEntry = entryPeer::retrieveByPK($liveEntryId);
         /** @var LiveStreamEntry $liveEntry */
         $recordStatus = $liveEntry->getRecordStatus();
-        $shouldAutoArchive = $liveEntry->getRecordingOptions()->getShouldAutoArchive();
+        $shouldAutoArchive = $liveEntry->getRecordingOptions() ?
+			$liveEntry->getRecordingOptions()->getShouldAutoArchive() : false;
         if ($recordStatus == RecordStatus::PER_SESSION && $shouldAutoArchive == true)
         {
             $liveEntryArchiveJobData = new kLiveEntryArchiveJobData();
