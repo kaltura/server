@@ -1,7 +1,7 @@
 <?php
 /**
  * @package deployment
- * Add permissions to systemPartner list
+ * Add permissions to systemPartner and to jobs
  */
 
 $script = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/permissions/addPermissionsAndItems.php';

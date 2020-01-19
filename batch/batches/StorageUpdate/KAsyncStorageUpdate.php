@@ -416,7 +416,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		$bodyParams[0] = $bodyParams[0].' ('. $partner->id .')'." type:[{$partner->type}] partnerName:[{$partner->name}]";
 		$paramsString = self::getParamsString($bodyParams, $mailJobData->separator);
 		$mailJobData->bodyParams = $paramsString;
-		//self::$kClient->jobs->addMailJob($mailJobData);
+		self::$kClient->jobs->addMailJob($mailJobData);
 	}
 
 	public function createMailJobData($mail_type, $recipientEmail)

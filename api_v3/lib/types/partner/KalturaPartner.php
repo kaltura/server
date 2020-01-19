@@ -355,9 +355,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 
 	/**
 	 *  Unix timestamp (In seconds)
-	 *
 	 * @var int
-	 *
 	 */
 	public $extendedFreeTrailExpiryDate;
 
