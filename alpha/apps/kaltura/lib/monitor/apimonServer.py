@@ -4,6 +4,7 @@ from gzip import GzipFile
 from math import isnan
 from kafka import KafkaProducer
 from kafka.errors import KafkaError
+from datetime import datetime
 import SocketServer
 import operator
 import socket
@@ -29,6 +30,8 @@ class ReaderThread(Thread):
 
     def run(self):
         global eventsBuffer
+        if options.kafkaAddress is not None:
+            producer = KafkaProducer(bootstrap_servers=options.kafkaAddress, linger_ms=100, batch_size=16384)
         
         curSlot = []
         lastSlotIndex = 0
@@ -50,14 +53,6 @@ class ReaderThread(Thread):
                     pass
             if not options.saveInput:
                 continue
-
-            try:
-                producer = KafkaProducer(bootstrap_servers=options.kafkaAddress, value_serializer=lambda v: json.dumps(v).encode('utf-8'))
-                producer.send('api-mon', curMessage).get(timeout=30)
-            except KafkaError as error:
-                print(str(error))
-                pass
-
             if (self.outputFile == None or
                 curTime / options.saveWindow != self.fileOpenWindow):
                 if self.outputFile != None:
@@ -67,11 +62,28 @@ class ReaderThread(Thread):
                 self.outputFile = GzipFile(outputFilename, 'a')
             self.outputFile.write(curMessage.replace('\0', '\n') + '\n')
 
+            try:
+                sendMessageToKafka(producer, curMessage)
+            except KafkaError as error:
+                print(str(error))
+                pass
+
+
 def safeFloat(num):
     try:
         return float(num)
     except ValueError:
         return float('nan')
+
+def sendMessageToKafka(producer, curMessage):
+    if options.kafkaAddress is None:
+        return
+
+    permittedFields = {"s", "p", "a", "e", "d", "x"}
+    filteredMsg = {}
+    filteredMsg["t"] = datetime.now().strftime("%Y-%m-%d:%H:%M:%S")
+    filteredMsg.update((key, val) for (key, val) in json.loads(curMessage).items() if key in permittedFields)
+    producer.send('api-mon', json.dumps(filteredMsg)).get(timeout=3)
                 
 class CommandHandler(SocketServer.BaseRequestHandler):
     AGGREGATED_FIELDS = 'xn'
