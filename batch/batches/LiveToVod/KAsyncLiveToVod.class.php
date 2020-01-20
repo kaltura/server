@@ -37,7 +37,7 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-        return $this->copyCuePoint($job, $job->data);
+		return $this->copyCuePoint($job, $job->data);
 	}
 	
 	/**

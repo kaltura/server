@@ -577,4 +577,35 @@ class LiveStreamService extends KalturaLiveEntryService
 
 	}
 
+    /**
+     * Archive a live entry which was recorded
+     *
+     * @action archive
+     * @param string $liveEntryId
+     * @return bool
+     * @throws KalturaAPIException
+     * @throws KalturaClientException
+     * @throws PropelException
+     */
+	public function archiveAction($liveEntryId)
+    {
+        $liveEntry = entryPeer::retrieveByPK($liveEntryId);
+        /** @var LiveStreamEntry $liveEntry */
+        if (!$liveEntry)
+        {
+            throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $liveEntryId);
+        }
+
+        $liveEntryArchiveJobData = new kLiveEntryArchiveJobData();
+        $liveEntryArchiveJobData->setLiveEntryId($liveEntryId);
+
+        $liveEntryArchiveJob = new BatchJob();
+        $liveEntryArchiveJob->setEntryId($liveEntryId);
+        $liveEntryArchiveJob->setPartnerId($liveEntry->getPartnerId());
+
+        kJobsManager::addJob($liveEntryArchiveJob, $liveEntryArchiveJobData, BatchJobType::LIVE_ENTRY_ARCHIVE);
+
+        return true;
+    }
+
 }

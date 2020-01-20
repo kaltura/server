@@ -194,7 +194,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		
 		$cache = null;
 		//Block only external queries, batch should always work
-		if(kCurrentContext::$ks_partner_id != partner::BATCH_PARTNER_ID)
+		if(kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
 		{
 			$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
 		}
@@ -486,8 +486,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				{
 					if (preg_match($pattern, $optimizationParam, $result))
 					{
-//						unset($optimizationMap[$i]);
-						KalturaLog::debug("dry run - would remove $optimizationParam from optimization Map");
+						KalturaLog::debug("Removing $optimizationParam from optimization Map");
+						unset($optimizationMap[$i]);
 						break;
 					}
 				}

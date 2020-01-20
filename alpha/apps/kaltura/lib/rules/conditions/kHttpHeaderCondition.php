@@ -6,6 +6,7 @@
 class kHttpHeaderCondition extends kRegexCondition
 {
 	const TYPE_STR = 'type';
+	const HTTP_HEADER_PREFIX = 'HTTP_';
 
 	/**
 	 * @var string
@@ -43,8 +44,9 @@ class kHttpHeaderCondition extends kRegexCondition
 	 */
 	public function getFieldValue(kScope $scope)
 	{
-		kApiCache::addExtraField(array(self::TYPE_STR => kApiCache::ECF_HTTP_HEADER, kApiCache::ECF_HTTP_HEADER => $this->getHeaderName()), kApiCache::COND_REGEX, $this->getStringValues($scope));
-		$headerValue = isset($_SERVER[$this->getHeaderName()]) ? $_SERVER[$this->getHeaderName()] : null;
+		$headerName = self::HTTP_HEADER_PREFIX . str_replace('-', '_', strtoupper($this->getHeaderName()));
+		kApiCache::addExtraField(array(self::TYPE_STR => kApiCache::ECF_HTTP_HEADER, kApiCache::ECF_HTTP_HEADER => $headerName), kApiCache::COND_REGEX, $this->getStringValues($scope));
+		$headerValue = isset($_SERVER[$headerName]) ? $_SERVER[$headerName] : null;
 		return $headerValue;
 	}
 
