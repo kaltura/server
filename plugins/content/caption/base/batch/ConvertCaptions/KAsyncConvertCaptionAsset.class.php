@@ -11,6 +11,7 @@ class KAsyncConvertCaptionAsset extends KJobHandlerWorker
 	private $captionClientPlugin = null;
 
 	private $formatToName = array(CaptionType::SRT => 'srt' , CaptionType::DFXP => 'dfxp', CaptionType::WEBVTT => 'webvtt', CaptionType::SCC =>'scc');
+	private $formatToExtensionName = array(CaptionType::SRT => 'srt' , CaptionType::DFXP => 'dfxp', CaptionType::WEBVTT => 'vtt', CaptionType::SCC =>'scc');
 
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -87,7 +88,7 @@ class KAsyncConvertCaptionAsset extends KJobHandlerWorker
 			return $job;
 		}
 
-		$captionsCreated = $this->cloneCaptionAssetToSrtAndSetContent($captionAsset->entryId, $captionAsset, $content,$data->toType, $this->formatToName[$data->toType]);
+		$captionsCreated = $this->cloneCaptionAssetToSrtAndSetContent($captionAsset->entryId, $captionAsset, $content,$data->toType, $this->formatToExtensionName[$data->toType]);
 		self::unimpersonate();
 		if ($captionsCreated)
 		{

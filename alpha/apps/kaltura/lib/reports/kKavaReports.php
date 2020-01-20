@@ -118,7 +118,7 @@ class kKavaReports extends kKavaReportsMgr
 				self::REPORT_ENRICH_OUTPUT => 'name',
 				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo'
 			),
-			self::REPORT_METRICS => array(self::METRIC_UNIQUE_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::EVENT_TYPE_SHARE_CLICKED),
+			self::REPORT_METRICS => array(self::METRIC_UNIQUE_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::EVENT_TYPE_SHARE_CLICKED, self::METRIC_TOTAL_UNIQUE_PERCENTILES),
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::EVENT_TYPE_SHARE_CLICKED),
 			self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::EVENT_TYPE_SHARE_CLICKED),
 		),
@@ -1444,7 +1444,7 @@ class kKavaReports extends kKavaReportsMgr
 					)
 				)
 			),
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::METRIC_TOTAL_UNIQUE_PERCENTILES),
 			self::REPORT_FORCE_TOTAL_COUNT => true,
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO),
 		),
@@ -1522,6 +1522,8 @@ class kKavaReports extends kKavaReportsMgr
 				),
 				'object_id' => self::DIMENSION_ENTRY_ID,
 				'entry_name' => self::DIMENSION_ENTRY_ID,
+				'status' => self::DIMENSION_ENTRY_ID,
+				'entry_source' => self::DIMENSION_ENTRY_ID,
 			),
 			self::REPORT_ENRICH_DEF => array(
 				array(
@@ -1530,8 +1532,11 @@ class kKavaReports extends kKavaReportsMgr
 					self::REPORT_ENRICH_CONTEXT => 'self::timestampToUnixtime',
 				),
 				array(
-					self::REPORT_ENRICH_OUTPUT => 'entry_name',
-					self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'
+					self::REPORT_ENRICH_OUTPUT => array('entry_name', 'status', 'entry_source'),
+					self::REPORT_ENRICH_FUNC => 'self::getEntriesSource',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'columns' => array('NAME', 'STATUS'),
+						),
 				),
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),

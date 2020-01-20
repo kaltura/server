@@ -34,15 +34,6 @@ class ESearchQueryFromFilter
 	}
 
 	/**
-	 * @param SimpleXMLElement $filter
-	 * @return bool
-	 */
-	public static function canTransformXmlFilter($filter)
-	{
-		return (!isset($filter->advancedSearch) || (string)$filter->advancedSearch[self::KALTURA_CLASS] === self::KALTURA_METADATA_SEARCH_ITEM);
-	}
-
-	/**
 	 * @param baseObjectFilter $filter
 	 * @return bool
 	 */

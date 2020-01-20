@@ -112,6 +112,7 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_VIEW = 'view';
 	const EVENT_TYPE_VIEW_PERIOD = 'viewPeriod';
 	const EVENT_TYPE_NODE_PLAY = 'nodePlay';
+	const EVENT_TYPE_PLAYMANIFEST = 'playManifest';
 	const EVENT_TYPE_REGISTERED = 'registered';
 	const EVENT_TYPE_REGISTRATION_IMPRESSION = 'registrationImpression';
 

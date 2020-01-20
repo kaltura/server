@@ -8,10 +8,12 @@ class mySystemUtils
 	const SPHINX = 'SPHINX';
 	const ELASTIC = 'ELASTIC';
 	const FILE_CREATION = 'FILE_CREATION';
+	const ERROR = 'ERROR';
 	const ELASTIC_HOST = '127.0.0.1';
 	const ELASTIC_PORT = '9200';
 	const ELASTIC_HEALTH_CHECK = '/_cluster/health?pretty';
 	const SPHINX_QUERY = 'show tables';
+	const APIV3_FAIL_PING = "APIV3_FAIL_PING";
 
 	const DEFAULT_FILE_PATH = '/tmp/storage_test_file_';
 
@@ -46,8 +48,8 @@ class mySystemUtils
 		$healthCheckArray[self::ELASTIC] = self::pingElastic();
 		$healthCheckArray[self::FILE_CREATION] = self::createFile($fileName);
 
-		$strInfo = self::createHealthCheckStr($healthCheckArray);
 		$notifyError = self::shouldNotifyError($healthCheckArray);
+		$strInfo = self::createHealthCheckStr($healthCheckArray, $notifyError);
 
 		return array($strInfo, $notifyError);
 	}
@@ -200,7 +202,7 @@ class mySystemUtils
 		}
 	}
 
-	public static function createHealthCheckStr($healthCheckArray)
+	public static function createHealthCheckStr($healthCheckArray, $notifyError)
 	{
 		$result = '';
 		foreach($healthCheckArray as $key => $value)
@@ -214,6 +216,8 @@ class mySystemUtils
 				$result .= 'server_health{check="' . $key . '"} ' . $value . PHP_EOL;
 			}
 		}
+
+		$result .= 'server_health{check="' . self::ERROR . '"} ' . (int)$notifyError . PHP_EOL;
 		return $result;
 	}
 

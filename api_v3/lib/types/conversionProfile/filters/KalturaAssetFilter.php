@@ -35,7 +35,7 @@ class KalturaAssetFilter extends KalturaAssetBaseFilter
 		return new AssetFilter();
 	}
 	
-	protected function doGetListResponse(KalturaFilterPager $pager, array $types = null)
+	public function doGetListResponse(KalturaFilterPager $pager, array $types = null)
 	{
 		$this->validateEntryIdFiltered();
 		

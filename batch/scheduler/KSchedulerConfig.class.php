@@ -75,7 +75,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 	public function __construct($configFileName)
 	{
 		$this->configFileName = realpath($configFileName);
-		$this->kClientConfig = kConf::getMap('batchBase');
+		$this->kClientConfig = kConf::getMap('batchBase', true);
 		$this->loadConfigFromDisc = isset($this->kClientConfig['loadConfigFromDisc']) ? $this->kClientConfig['loadConfigFromDisc'] : false;
 		$this->configReloadInterval = isset($this->kClientConfig['configReloadInterval']) ? $this->kClientConfig['configReloadInterval'] : self::DEFAULT_CONFIG_RELOAD_INTVERAL;
 		$this->load();
@@ -433,8 +433,8 @@ class KSchedulerConfig extends Zend_Config_Ini
 		else
 		{
 			$clientConfig = new KalturaConfiguration();
-			$clientConfig ->serviceUrl = $this->kClientConfig['serviceUrl'];
-			$clientConfig ->curlTimeout = $this->kClientConfig['curlTimeout'];
+			$clientConfig->serviceUrl = $this->kClientConfig['serviceUrl'];
+			$clientConfig->curlTimeout = $this->kClientConfig['curlTimeout'];
 			$this->kClient = new KalturaClient($clientConfig );
 			$this->kClient->setPartnerId($this->kClientConfig['partnerId']);
 			$ks = $this->kClient->generateSession($this->kClientConfig['secret'], 'batchUser', KalturaSessionType::ADMIN, '-1');
