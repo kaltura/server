@@ -64,7 +64,7 @@ class Form_ReachProfileCredit extends Zend_Form_SubForm
 
 		foreach ($props as $prop => $value)
 		{
-			if ($value)
+			if (isset($value))
 			{
 				if ($add_underscore)
 				{
