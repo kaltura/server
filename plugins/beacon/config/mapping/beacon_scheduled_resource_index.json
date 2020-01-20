@@ -273,12 +273,49 @@
 								"recordingTime": {
 									"type": "keyword",
 									"normalizer": "kaltura_keyword_normalizer"
+								},
+								"isScheduledEvent": {
+									"type": "boolean"
+								},
+								"streamingInputObjects": {
+									"properties": {
+										"primaryInput": {
+											"properties": {
+												"templateEntryId": {
+													"type": "keyword",
+													"normalizer": "kaltura_keyword_normalizer"
+												},
+												"status": {
+													"type": "keyword",
+													"normalizer": "kaltura_keyword_normalizer"
+												},
+												"duration": {
+													"type": "keyword",
+													"normalizer": "kaltura_keyword_normalizer"
+												},
+												"updatedAt": {
+													"type": "keyword",
+													"normalizer": "kaltura_keyword_normalizer"
+												}
+											}
+										}
+									}
 								}
 							}
 						},
 						"ResourceDetails": {
 							"properties": {
 								"activeSessions": {
+									"properties": {
+										"primary": {
+											"type": "boolean"
+										},
+										"secondary": {
+											"type": "boolean"
+										}
+									}
+								},
+								"previewingSessions": {
 									"properties": {
 										"primary": {
 											"type": "boolean"
@@ -333,6 +370,24 @@
 											"type": "float"
 										},
 										"summary": {
+											"type": "keyword",
+											"normalizer": "kaltura_keyword_normalizer"
+										}
+									}
+								},
+								"currentScheduledEvent": {
+									"properties": {
+										"id": {
+											"type": "float"
+										},
+										"summary": {
+											"type": "keyword",
+											"normalizer": "kaltura_keyword_normalizer"
+										},
+										"isLiveEvent": {
+											"type": "boolean"
+										},
+										"templateEntryId": {
 											"type": "keyword",
 											"normalizer": "kaltura_keyword_normalizer"
 										}
