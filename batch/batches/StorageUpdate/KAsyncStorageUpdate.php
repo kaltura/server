@@ -14,6 +14,8 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 
 	private $packages = null;
 
+	private $localMap = null;
+
 	/**
 	 * @param KSchedularTaskConfig $taskConfig
 	 */
@@ -22,12 +24,23 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		parent::__construct($taskConfig);
 		$this->systemPartnerClientPlugin = KalturaSystemPartnerClientPlugin::get(self::$kClient);
 
+		$this->packages = array();
 		$packageConfig = simplexml_load_string(file_get_contents(dirname(__FILE__).'/../../../alpha/apps/kaltura/config/partnerPackages.xml'));
 		$packageNodes = $packageConfig->xpath('/packages/package');
 		foreach ($packageNodes as $package)
 		{
 			$arrPackage = KAsyncStorageUpdateUtils::flatXml2arr($package);
 			$this->packages[$arrPackage['id']] = $arrPackage;
+		}
+
+		$configurationPluginClient = KalturaConfMapsClientPlugin::get(self::$kClient);
+		$configurationMapFilter = new KalturaConfMapsFilter();
+		$configurationMapFilter->nameEqual = KAsyncStorageUpdateUtils::LOCAL;
+		$configurationMapFilter->relatedHostEqual = self::$taskConfig->getSchedulerName();
+		$configurationMap = $configurationPluginClient->confMaps->get($configurationMapFilter);
+		if ($configurationMap)
+		{
+			$this->localMap = json_decode($configurationMap->content, true);
 		}
 	}
 
@@ -44,14 +57,12 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 	*/
 	public function run($jobs = null)
 	{
-		$partnersExists = true;
-		$pageIndex = 1;
-		$bulkSize = 500;
-		$highestPartnerId = 103;
-		while($partnersExists)
+		$lowPartnerWaterMark = KAsyncStorageUpdateUtils::LOWEST_PARTNER;
+		do
 		{
-			$partners = $this->getSystemPartnerList($highestPartnerId, $pageIndex, $bulkSize);
-			if ($partners->objects)
+			$partners = $this->getSystemPartnerList($lowPartnerWaterMark, KAsyncStorageUpdateUtils::PAGE_INDEX, KAsyncStorageUpdateUtils::PAGE_SIZE);
+			$countPartners = isset($partners->objects) ? count($partners->objects) : 0;
+			if ($countPartners)
 			{
 				KalturaLog::debug( 'Looping '. count($partners->objects) .' partners' );
 				foreach($partners->objects as $partner)
@@ -62,22 +73,18 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 				$partner = end($partners->objects);
 				if($partner)
 				{
-					$highestPartnerId = $partner->id;
+					$lowPartnerWaterMark = $partner->id;
 				}
 			}
-			else
-			{
-				KalturaLog::debug( 'No more partners.' );
-				$partnersExists = false;
-			}
 			unset($partners);
-		}
+		} while ($countPartners);
+
 		KalturaLog::debug('Done.');
 	}
 
 	public function handlePartner($partner, $partnerPackage)
 	{
-		if (KAsyncStorageUpdateUtils::isPartnerCreatedAsMonitoredFreeTrial($partner))
+		if (self::isPartnerCreatedAsMonitoredFreeTrial($partner))
 		{
 			$this->doPartnerUsage($partner);
 			$this->handleDayInFreeTrial($partner);
@@ -88,26 +95,34 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		}
 	}
 
-	public function getSystemPartnerList($highestPartnerId, $pageIndex, $bulkSize)
+	public function getSystemPartnerList($lowPartnerWaterMark, $pageIndex, $bulkSize)
 	{
 		$filter = new KalturaPartnerFilter();
 		$filter->partnerPackageIn = KAsyncStorageUpdateUtils::PARTNER_PACKAGE_FREE .','. KAsyncStorageUpdateUtils::PARTNER_PACKAGE_INTERNAL_TRIAL;
 		$filter->statusIn = KalturaPartnerStatus::ACTIVE .','. KalturaPartnerStatus::BLOCKED .','. KalturaPartnerStatus::FULL_BLOCK;
-		$filter->idGreaterThan = $highestPartnerId;
+		$filter->idGreaterThan = $lowPartnerWaterMark;
 		$filter->orderBy = '+id';
 
 		$pager = new KalturaFilterPager();
 		$pager->pageIndex = $pageIndex;
 		$pager->pageSize = $bulkSize;
 
-		return $this->systemPartnerClientPlugin->systemPartner->listAction($filter, $pager);
+		try
+		{
+			return $this->systemPartnerClientPlugin->systemPartner->listAction($filter, $pager);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err("Could not get partner higher than : " . $lowPartnerWaterMark.' '. $e->getMessage());
+			return null;
+		}
 	}
 
 	public function doPartnerUsage($partner)
 	{
-		KalturaLog::debug("Validating partner [" . $partner->id . "]");
+		KalturaLog::debug('Validating partner [' . $partner->id . ']');
 		$systemPartnerConfiguration = new KalturaSystemPartnerConfiguration();
-		if(isset($partner->extendedFreeTrail))
+		if($partner->extendedFreeTrail)
 		{
 			$systemPartnerConfiguration = $this->handleExtendedFreeTrail($partner, $systemPartnerConfiguration);
 			if (!$systemPartnerConfiguration)
@@ -115,10 +130,10 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 				return;
 			}
 		}
-		list($shouldBlockDeletePartner, $block_notification_grace, $delete_grace, $partnerPackage, $divisionFactor) = $this->getRelevantFields($partner);
+		list($shouldBlockDeletePartner, $blockNotificationGrace, $deleteGrace, $partnerPackage, $divisionFactor) = $this->getRelevantFields($partner);
 
 		$monitoredFreeTrial = false;
-		if(KAsyncStorageUpdateUtils::isPartnerCreatedAsMonitoredFreeTrial($partner))
+		if(self::isPartnerCreatedAsMonitoredFreeTrial($partner))
 		{
 			$monitoredFreeTrial = true;
 			if ($partner->partnerPackage == KAsyncStorageUpdateUtils::PARTNER_PACKAGE_DEVELOPER_TRIAL)
@@ -126,13 +141,12 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 				$divisionFactor = $partnerPackage['cycle_bw_for_monitored_trial'];
 			}
 		}
-		$divisionFactor = ($divisionFactor != 0 ? $divisionFactor : 1);
 
 		list($percent, $totalUsageGB) = self::getPercentFromStatistics($partner,$partnerPackage, $divisionFactor);
 		$systemPartnerConfiguration->usagePercent = $percent;
 
-		KalturaLog::debug("percent (".$partner->id.") is: $percent");
-		$emailLinkHash = 'pid='.$partner->id.'&h='.(KAsyncStorageUpdateUtils::getEmailLinkHash($partner->id, $partner->secret));
+		KalturaLog::debug('percent ('.$partner->id.') is: '.$percent);
+		$emailLinkHash = 'pid='.$partner->id.'&h='.(self::getEmailLinkHash($partner->id, $partner->secret));
 
 		$mindtouchNotice = ' ';
 		if($partner->type == KAsyncStorageUpdateUtils::DEKIWIKI) // dekiwiki-mindtouch partner
@@ -140,21 +154,22 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 			$mindtouchNotice = '<BR><BR>Note: You must be a MindTouch paying customer to upgrade your video service. If you are not a paying MindTouch customer, contact MindTouch: http://www.mindtouch.com/about_mindtouch/contact_mindtouch to get a quote.<BR><BR>';
 		}
 
-		$this->handleUsage($percent, $partner, $systemPartnerConfiguration, $monitoredFreeTrial, $partnerPackage, $mindtouchNotice, $totalUsageGB, $emailLinkHash, $shouldBlockDeletePartner, $block_notification_grace, $delete_grace);
+		$this->handleUsage($percent, $partner, $systemPartnerConfiguration, $monitoredFreeTrial, $partnerPackage, $mindtouchNotice, $totalUsageGB, $emailLinkHash, $shouldBlockDeletePartner, $blockNotificationGrace, $deleteGrace);
 	}
 
 	public function getRelevantFields($partner)
 	{
 		$shouldBlockDeletePartner = true;
-		$block_notification_grace = time() - (KAsyncStorageUpdateUtils::DAY * KAsyncStorageUpdateUtils::BLOCKING_DAYS_GRACE);
-		$delete_grace = time() -  (KAsyncStorageUpdateUtils::DAY * 30);
+		$blockNotificationGrace = time() - (KAsyncStorageUpdateUtils::DAY * KAsyncStorageUpdateUtils::BLOCKING_DAYS_GRACE);
+		$deleteGrace = time() -  (KAsyncStorageUpdateUtils::DAY * 30);
 		$partnerPackage = $this->packages[$partner->partnerPackage];
 		$divisionFactor = $partnerPackage['cycle_bw'];
-		return array($shouldBlockDeletePartner, $block_notification_grace, $delete_grace, $partnerPackage, $divisionFactor);
+		return array($shouldBlockDeletePartner, $blockNotificationGrace, $deleteGrace, $partnerPackage, $divisionFactor);
 	}
 
 	public static function getPercentFromStatistics($partner,$partnerPackage, $divisionFactor)
 	{
+		$divisionFactor = ($divisionFactor != 0 ? $divisionFactor : 1);
 		// We are now working with the DWH and a stored-procedure, and not with record type 6 on partner_activity.
 		$reportDate = KAsyncStorageUpdateUtils::todayOffset(-1);
 		list ( $totalStorage , $totalUsage , $totalTraffic ) = self::collectPartnerStatisticsFromDWH($partner, $partnerPackage, $reportDate);
@@ -163,125 +178,125 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		return array($percent, $totalUsageGB);
 	}
 
-	public function handleUsage($percent, $partner, $systemPartnerConfiguration, $monitoredFreeTrial, $partnerPackage, $mindtouchNotice, $totalUsageGB, $emailLinkHash, $shouldBlockDeletePartner, $block_notification_grace, $delete_grace)
+	public function handleUsage($percent, $partner, $systemPartnerConfiguration, $monitoredFreeTrial, $partnerPackage, $mindtouchNotice, $totalUsageGB, $emailLinkHash, $shouldBlockDeletePartner, $blockNotificationGrace, $deleteGrace)
 	{
-		if ($percent >= 80 &&
-			$percent < 100 &&
-			(!isset($partner->eightyPercentWarning) || !$partner->eightyPercentWarning))
+		if ($percent < 80 )
 		{
-			KalturaLog::debug("partner ". $partner->id ." reached 80% - setting first warning");
-
-			/* prepare mail job, and set EightyPercentWarning() to true/date */
-			$systemPartnerConfiguration->eightyPercentWarning = time();
-			$systemPartnerConfiguration->usageLimitWarning = 0;
-			if(!$monitoredFreeTrial)
+			if ($partner->eightyPercentWarning)
 			{
-				$bodyParams = array($partner->adminName, $partnerPackage['cycle_bw'], $mindtouchNotice, round($totalUsageGB, 2), $emailLinkHash);
-				$kMailType = new KalturaMailType();
-				self::notifyPartner($kMailType::KALTURA_PACKAGE_EIGHTY_PERCENT_WARNING, $partner, $bodyParams);
+				KalturaLog::debug('partner '. $partner->id .' was 80%, now not. clearing warnings');
+				$systemPartnerConfiguration->eightyPercentWarning = 0;
+				$systemPartnerConfiguration->usageLimitWarning = 0;
+			}
+
+			elseif ($partner->usageLimitWarning || $partner->eightyPercentWarning)
+			{
+				KalturaLog::debug('partner '. $partner->id .' OK');
+				$systemPartnerConfiguration->eightyPercentWarning =0;
+				$systemPartnerConfiguration->usageLimitWarning = 0;
 			}
 		}
-		elseif ($percent >= 80 &&
-			$percent < 100 &&
-			isset($partner->eightyPercentWarning) && $partner->eightyPercentWarning &&
-			(!isset($partner->usageLimitWarning) || !$partner->usageLimitWarning))
+		elseif ($percent >= 80 && $percent < 100)
 		{
-			KalturaLog::log("passed the 80%, assume notification sent, nothing to do.");
-		}
-		elseif ($percent < 80 &&
-			isset($partner->eightyPercentWarning) && $partner->eightyPercentWarning)
-		{
-			KalturaLog::debug("partner ". $partner->id ." was 80%, now not. clearing warnings");
+			if (!$partner->eightyPercentWarning)
+			{
+				KalturaLog::debug('partner '. $partner->id .' reached 80% - setting first warning');
 
-			/* clear getEightyPercentWarning */
-			$systemPartnerConfiguration->eightyPercentWarning = 0;
-			$systemPartnerConfiguration->usageLimitWarning = 0;
-		}
-		elseif ($percent >= 100 &&
-			(!isset($partner->usageLimitWarning) || !$partner->usageLimitWarning))
-		{
-			$systemPartnerConfiguration->usageLimitWarning = time();
-			if(!$monitoredFreeTrial)
-			{
-				KalturaLog::debug("partner ". $partner->id ." reached 100% - setting second warning");
-				$bodyParams = array ( $partner->adminName, $mindtouchNotice, round($totalUsageGB, 2), $emailLinkHash );
-				$kMailType = new KalturaMailType();
-				self::notifyPartner($kMailType::KALTURA_PACKAGE_LIMIT_WARNING_1, $partner, $bodyParams);
+				/* prepare mail job, and set EightyPercentWarning() to true/date */
+				$systemPartnerConfiguration->eightyPercentWarning = time();
+				$systemPartnerConfiguration->usageLimitWarning = 0;
+				if(!$monitoredFreeTrial)
+				{
+					$bodyParams = array($partner->adminName, $partnerPackage['cycle_bw'], $mindtouchNotice, round($totalUsageGB, 2), $emailLinkHash);
+					$this->notifyPartner(KalturaMailType::MAIL_TYPE_PACKAGE_EIGHTY_PERCENT_WARNING, $partner, $bodyParams);
+				}
 			}
-			else
+
+			elseif ($partner->eightyPercentWarning && !$partner->usageLimitWarning)
 			{
-				$reason = "partner ". $partner->id ." reached 100% - blocking partner";
+				KalturaLog::log('passed the 80%, assume notification sent, nothing to do.');
+			}
+		}
+
+		elseif ($percent >= 100)
+		{
+			if(!$partner->usageLimitWarning)
+			{
+				$systemPartnerConfiguration->usageLimitWarning = time();
+				if(!$monitoredFreeTrial)
+				{
+					KalturaLog::debug('partner '. $partner->id .' reached 100% - setting second warning');
+					$bodyParams = array ( $partner->adminName, $mindtouchNotice, round($totalUsageGB, 2), $emailLinkHash );
+					$this->notifyPartner(KalturaMailType::MAIL_TYPE_PACKAGE_LIMIT_WARNING_1, $partner, $bodyParams);
+				}
+				else
+				{
+					$reason = 'partner '. $partner->id .' reached 100% - blocking partner';
+					KalturaLog::debug($reason);
+					if($shouldBlockDeletePartner)
+					{
+						$this->systemPartnerClientPlugin->systemPartner->updateStatus($partner->id, KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK, $reason);
+					}
+				}
+			}
+
+			elseif($partnerPackage['cycle_fee'] == 0 &&
+				$partner->usageLimitWarning > 0 &&
+				$partner->usageLimitWarning <= $blockNotificationGrace &&
+				$partner->usageLimitWarning > $deleteGrace &&
+				$partner->status != KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK)
+			{
+				$reason = 'partner '. $partner->id .' reached 100% '.KAsyncStorageUpdateUtils::BLOCKING_DAYS_GRACE .' days ago - sending block email and blocking partner';
 				KalturaLog::debug($reason);
+
+				// send block email and block partner
+				$bodyParams = array ( $partner->adminName, $mindtouchNotice, round($totalUsageGB, 2), $emailLinkHash );
+				$this->notifyPartner(KalturaMailType::MAIL_TYPE_PACKAGE_LIMIT_WARNING_2, $partner, $bodyParams);
 				if($shouldBlockDeletePartner)
 				{
 					$this->systemPartnerClientPlugin->systemPartner->updateStatus($partner->id, KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK, $reason);
 				}
 			}
-		}
-		elseif ($percent >= 100 &&
-			$partnerPackage['cycle_fee'] == 0 &&
-			isset($partner->usageLimitWarning) && $partner->usageLimitWarning > 0 &&
-			$partner->usageLimitWarning <= $block_notification_grace &&
-			$partner->usageLimitWarning > $delete_grace &&
-			$partner->status != KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK)
-		{
-			$reason = "partner ". $partner->id ." reached 100% ".KAsyncStorageUpdateUtils::BLOCKING_DAYS_GRACE ." days ago - sending block email and blocking partner";
-			KalturaLog::debug($reason);
 
-			/* send block email and block partner */
-			$bodyParams = array ( $partner->adminName, $mindtouchNotice, round($totalUsageGB, 2), $emailLinkHash );
-			$kMailType = new KalturaMailType();
-			self::notifyPartner($kMailType::KALTURA_PACKAGE_LIMIT_WARNING_2, $partner, $bodyParams);
-
-			if($shouldBlockDeletePartner)
+			elseif($partnerPackage['cycle_fee'] == 0 &&
+				$partner->usageLimitWarning > 0 &&
+				$partner->usageLimitWarning <= $deleteGrace &&
+				$partner->status == KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK &&
+				!$monitoredFreeTrial)
 			{
-				$this->systemPartnerClientPlugin->systemPartner->updateStatus($partner->id, KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK, $reason);
+				$reason = 'partner '. $partner->id .' reached 100% a month ago - deleting partner';
+				KalturaLog::debug($reason);
+
+				//delete partner
+				$bodyParams = array ( $partner->adminName );
+				$this->notifyPartner(KalturaMailType::MAIL_TYPE_DELETE_ACCOUNT, $partner, $bodyParams);
+
+				if($shouldBlockDeletePartner)
+				{
+					$this->systemPartnerClientPlugin->systemPartner->updateStatus($partner->id, KAsyncStorageUpdateUtils::PARTNER_STATUS_DELETED, $reason);
+				}
 			}
 		}
-		elseif ($percent >= 120 &&
-			$partnerPackage['cycle_fee'] != 0 &&
-			isset($partner->usageLimitWarning) && $partner->usageLimitWarning <= $block_notification_grace &&
-			!$monitoredFreeTrial)
-		{
-			$bodyParams = array ( $partner->adminName, round($totalUsageGB, 2) );
-			$kMailType = new KalturaMailType();
-			self::notifyPartner($kMailType::KALTURA_PAID_PACKAGE_SUGGEST_UPGRADE, $partner, $bodyParams);
-		}
-		elseif ($percent >= 100 &&
-			$partnerPackage['cycle_fee'] == 0 &&
-			isset($partner->usageLimitWarning) && $partner->usageLimitWarning > 0 &&
-			isset($partner->usageLimitWarning) && $partner->usageLimitWarning <= $delete_grace &&
-			$partner->status == KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK &&
-			!$monitoredFreeTrial)
-		{
-			$reason = "partner ". $partner->id ." reached 100% a month ago - deleting partner";
-			KalturaLog::debug($reason);
 
-			/* delete partner */
-			$bodyParams = array ( $partner->adminName );
-			$kMailType = new KalturaMailType();
-			self::notifyPartner($kMailType::KALTURA_DELETE_ACCOUNT, $partner, $bodyParams);
-
-			if($shouldBlockDeletePartner)
+		elseif ($percent >= 120)
+		{
+			if ($partnerPackage['cycle_fee'] != 0 &&
+				$partner->usageLimitWarning <= $blockNotificationGrace &&
+				!$monitoredFreeTrial)
 			{
-				$this->systemPartnerClientPlugin->systemPartner->updateStatus($partner->id, KAsyncStorageUpdateUtils::PARTNER_STATUS_DELETED, $reason);
+				$bodyParams = array ( $partner->adminName, round($totalUsageGB, 2) );
+				$this->notifyPartner(KalturaMailType::MAIL_TYPE_PAID_PACKAGE_SUGGEST_UPGRADE, $partner, $bodyParams);
 			}
 		}
-		elseif($percent < 80 && ( (isset($partner->usageLimitWarning) && $partner->usageLimitWarning) || (isset($partner->eightyPercentWarning) && $partner->eightyPercentWarning)))
-		{
-			KalturaLog::debug("partner ". $partner->id ." OK");
-			// PARTNER OK - resetting warnings
-			$systemPartnerConfiguration->eightyPercentWarning =0;
-			$systemPartnerConfiguration->usageLimitWarning = 0;
-		}
+
 		$this->systemPartnerClientPlugin->systemPartner->updateConfiguration($partner->id, $systemPartnerConfiguration);  //TODO - update without default criteria
 
 	}
 
 	public function handleExtendedFreeTrail($partner, $systemPartnerConfiguration)
 	{
-		KalturaLog::debug("Partner [" . $partner->id . "] trial account has extension");
-		if(isset($partner->extendedFreeTrailExpiryDate) && $partner->extendedFreeTrailExpiryDate < time())
+		KalturaLog::debug('Partner [' . $partner->id . '] trial account has extension');
+		if($partner->extendedFreeTrailExpiryDate < time())
 		{
 			//ExtendedFreeTrail ended
 			$systemPartnerConfiguration->extendedFreeTrail = null;
@@ -289,25 +304,24 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 			$systemPartnerConfiguration->extendedFreeTrailExpiryReason = '';
 			return $systemPartnerConfiguration;
 		}
-		elseif (KAsyncStorageUpdateUtils::isPartnerCreatedAsMonitoredFreeTrial($partner))
+		elseif (self::isPartnerCreatedAsMonitoredFreeTrial($partner))
 		{
-			KalturaLog::debug("Partner [" . $partner->id . "] trial account extended - monitored trial");
+			KalturaLog::debug('Partner [' . $partner->id . '] trial account extended - monitored trial');
 		}
 		else
 		{
 			//ExtendedFreeTrail
-			if ( isset($partner->extendedFreeTrailExpiryDate) && ($partner->extendedFreeTrailExpiryDate < (time() + (KAsyncStorageUpdateUtils::DAY * 7))) &&
-				(!isset($partner->extendedFreeTrailEndsWarning) || !$partner->extendedFreeTrailEndsWarning))
+			if ( ($partner->extendedFreeTrailExpiryDate < (time() + (KAsyncStorageUpdateUtils::DAY * 7))) &&
+				!$partner->extendedFreeTrailEndsWarning)
 			{
 				$systemPartnerConfiguration->extendedFreeTrailEndsWarning = true;
 				$this->systemPartnerClientPlugin->systemPartner->updateConfiguration($partner->id, $systemPartnerConfiguration);
 
-				$emailLinkHash = 'pid='.$partner->id.'&h='.(KAsyncStorageUpdateUtils::getEmailLinkHash($partner->id, $partner->secret));
+				$emailLinkHash = 'pid='.$partner->id.'&h='.(self::getEmailLinkHash($partner->id, $partner->secret));
 				$mailParmas = array($partner->adminName ,$emailLinkHash);
-				$kMailType = new KalturaMailType();
-				self::notifyPartner($kMailType::KALTURA_EXTENED_FREE_TRAIL_ENDS_WARNING, $partner, $mailParmas);
+				$this->notifyPartner(KalturaMailType::MAIL_TYPE_EXTENED_FREE_TRAIL_ENDS_WARNING, $partner, $mailParmas);
 			}
-			KalturaLog::debug("Partner [" . $partner->id . "] trial account extended");
+			KalturaLog::debug('Partner [' . $partner->id . '] trial account extended');
 		}
 		return null;
 	}
@@ -327,7 +341,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		$deletionDay = $partnerPackageInfo['trial_num_days_until_deletion'];
 		$formattedCreatedAt = date('Y-m-d H:i:s', $partner->createdAt);
 
-		if(isset($partner->extendedFreeTrailExpiryDate) && $partner->extendedFreeTrailExpiryDate)
+		if($partner->extendedFreeTrailExpiryDate)
 		{
 			$formattedExtensionDate = date('Y-m-d H:i:s', $partner->extendedFreeTrailExpiryDate);
 			$endDay = KAsyncStorageUpdateUtils::diffInDays($formattedCreatedAt, $formattedExtensionDate);
@@ -339,14 +353,11 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		$dayInFreeTrial = KAsyncStorageUpdateUtils::diffInDays($formattedCreatedAt, KAsyncStorageUpdateUtils::today());
 		KalturaLog::debug("partner [{$partner->id}] is currently at the [$dayInFreeTrial] day of free trial");
 
-		// in case we want to delete/block partner that reached to specific day we wil disable this line
-		//$partner = self::checkIfPartnerStatusChangeRequired($partner, $dayInFreeTrial, $endDay, $deletionDay);
-		if($freeTrialUpdatesDays)
+		if ($freeTrialUpdatesDays && self::checkForNotificationDay($partner, $dayInFreeTrial, $freeTrialUpdatesDays))
 		{
-			$systemPartnerConfiguration = self::checkForNotificationDay($partner, $dayInFreeTrial, $freeTrialUpdatesDays);
-		}
-		if ($systemPartnerConfiguration)
-		{
+			KalturaLog::debug('Partner [' . $partner->id . '] reached to one of the Marketo lead sync days.');
+			$systemPartnerConfiguration = new KalturaSystemPartnerConfiguration();
+			$systemPartnerConfiguration->lastFreeTrialNotificationDay = $dayInFreeTrial;
 			$this->systemPartnerClientPlugin->systemPartner->updateConfiguration($partner->id, $systemPartnerConfiguration);
 		}
 	}
@@ -355,14 +366,11 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 	{
 		$closestUpdatesDay = KAsyncStorageUpdateUtils::getClosestDay($dayInFreeTrial, $freeTrialUpdatesDays);
 		KalturaLog::debug('closest notification day comparing today [' . $closestUpdatesDay . ']');
-		if (isset($partner->lastFreeTrialNotificationDay) && $closestUpdatesDay > $partner->lastFreeTrialNotificationDay)
+		if ($closestUpdatesDay > $partner->lastFreeTrialNotificationDay)
 		{
-			KalturaLog::debug('Partner [' . $partner->id . '] reached to one of the Marketo lead sync days.');
-			$systemPartnerConfiguration = new KalturaSystemPartnerConfiguration();
-			$systemPartnerConfiguration->lastFreeTrialNotificationDay = $dayInFreeTrial;
-			return $systemPartnerConfiguration;
+			return true;
 		}
-		return null;
+		return false;
 	}
 
 	public static function collectPartnerStatisticsFromDWH($partner, $partnerPackage, $reportDate)
@@ -406,17 +414,17 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 
 	public function notifyPartner($mailType, $partner, $bodyParams = array() )
 	{
-		$mailJobData = self::createMailJobData($mailType, $partner->adminEmail);
+		$mailJobData = $this->createMailJobData($mailType, $partner->adminEmail);
 		$bodyParams[0] = $bodyParams[0].' (PartnerID: '. $partner->id .')';
-		$paramsString = self::getParamsString($bodyParams, $mailJobData->separator);
+		$paramsString = implode($mailJobData->separator, $bodyParams);
 		$mailJobData->bodyParams = $paramsString;
 		self::$kClient->jobs->addMailJob($mailJobData);
 
-		$mailJobData = self::createMailJobData($mailType, KAsyncStorageUpdateUtils::KALTURA_ACCOUNT_UPGRADES_NOTIFICATION_EMAIL);
+		$mailJobData = $this->createMailJobData($mailType, KAsyncStorageUpdateUtils::KALTURA_ACCOUNT_UPGRADES_NOTIFICATION_EMAIL);
 		$bodyParams[0] = $bodyParams[0].' ('. $partner->id .')'." type:[{$partner->type}] partnerName:[{$partner->name}]";
-		$paramsString = self::getParamsString($bodyParams, $mailJobData->separator);
+		$paramsString = implode($mailJobData->separator, $bodyParams);
 		$mailJobData->bodyParams = $paramsString;
-		self::$kClient->jobs->addMailJob($mailJobData);
+		//self::$kClient->jobs->addMailJob($mailJobData);
 	}
 
 	public function createMailJobData($mail_type, $recipientEmail)
@@ -425,22 +433,54 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		$mailJobData->separator = '|';
 		$mailJobData->mailType = $mail_type;
 		$mailJobData->mailPriority = KAsyncStorageUpdateUtils::MAIL_PRIORITY_NORMAL;
-		$mailJobData->fromEmail = kConf::get ("partner_notification_email" );
-		$mailJobData->fromName = kConf::get ("partner_notification_name" );
+		$mailJobData->fromEmail =  self::getKeyFromMap($this->localMap, KAsyncStorageUpdateUtils::PARTNER_NOTIFICATION_EMAIL, false);
+		$mailJobData->fromName = self::getKeyFromMap($this->localMap, KAsyncStorageUpdateUtils::PARTNER_NOTIFICATION_NAME, false);
 		$mailJobData->recipientEmail = $recipientEmail;
 		return $mailJobData;
 	}
 
-	public function getParamsString($bodyParams, $separator)
+	public static function getKeyFromMap($map, $key, $defaultValue)
 	{
-		$paramsString = '';
-		if ( is_array($bodyParams) )
+		if ($map && isset($map[$key]))
 		{
-			foreach($bodyParams as $param )
-			{
-				$paramsString =  ( $paramsString ? $paramsString.$separator : '' ).$param;
-			}
+			$value =  $map[$key];
 		}
-		return $paramsString;
+		else
+		{
+			$value = $defaultValue;
+		}
+		return $value;
+	}
+
+	public function getEmailLinkHash($partner_id, $partner_secret)
+	{
+		$value = self::getKeyFromMap($this->localMap, KAsyncStorageUpdateUtils::KALTURA_EMAIL_HASH, false);
+		return md5($partner_secret.$partner_id.$value);
+	}
+
+	public function isPartnerCreatedAsMonitoredFreeTrial($partner)
+	{
+		if ($partner->partnerPackage == KAsyncStorageUpdateUtils::PARTNER_PACKAGE_INTERNAL_TRIAL)
+		{
+			return true;
+		}
+		if ($partner->partnerPackage == KAsyncStorageUpdateUtils::PARTNER_PACKAGE_DEVELOPER_TRIAL)
+		{
+			$freeTrialStartDate = self::getKeyFromMap($this->localMap, KAsyncStorageUpdateUtils::NEW_DEVELOPER_FREE_TRIAL_START_DATE, null);
+		}
+		else
+		{
+			$freeTrialStartDate = self::getKeyFromMap($this->localMap, KAsyncStorageUpdateUtils::NEW_FREE_TRIAL_START_DATE, null);
+		}
+		if(!$freeTrialStartDate)
+		{
+			return false;
+		}
+		$createTime = $partner->createdAt;
+		if($createTime >= $freeTrialStartDate)
+		{
+			return true;
+		}
+		return false;
 	}
 }

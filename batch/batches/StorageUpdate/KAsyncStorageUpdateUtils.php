@@ -7,6 +7,9 @@
 class KAsyncStorageUpdateUtils
 {
 
+const PAGE_INDEX = 1;
+const PAGE_SIZE = 500;
+const LOWEST_PARTNER = 100;
 const PARTNER_STATUS_DELETED = 0;
 const PARTNER_STATUS_CONTENT_BLOCK = 2;
 const PARTNER_PACKAGE_FREE = 1;
@@ -19,37 +22,18 @@ const MAIL_PRIORITY_NORMAL = 2;
 const REPORT_TYPE_PARTNER_USAGE_DASHBOARD = 202;
 const IS_FREE_PACKAGE_PLACE_HOLDER = "{IS_FREE_PACKAGE}";
 const DEKIWIKI = 103;
-
-	public static function isPartnerCreatedAsMonitoredFreeTrial($partner)
-	{
-		if ($partner->partnerPackage == self::PARTNER_PACKAGE_INTERNAL_TRIAL)
-		{
-			return true;
-		}
-		if ($partner->partnerPackage == self::PARTNER_PACKAGE_DEVELOPER_TRIAL)
-		{
-			$freeTrialStartDate = KBatchBase::getConfigParam('new_developer_free_trial_start_date');
-		}
-		else
-		{
-			$freeTrialStartDate = KBatchBase::getConfigParam('new_free_trial_start_date');
-		}
-		if(!$freeTrialStartDate)
-		{
-			return false;
-		}
-		$createTime = $partner->createdAt;
-		if($createTime >= $freeTrialStartDate)
-		{
-			return true;
-		}
-		return false;
-	}
+const LOCAL = 'local';
+const KALTURA_EMAIL_HASH = 'kaltura_email_hash';
+const NEW_DEVELOPER_FREE_TRIAL_START_DATE = 'new_developer_free_trial_start_date';
+const NEW_FREE_TRIAL_START_DATE = 'new_free_trial_start_date';
+const PARTNER_NOTIFICATION_EMAIL = 'partner_notification_email';
+const PARTNER_NOTIFICATION_NAME = 'partner_notification_name';
+const FORMAT_Y_M_D = 'Y-m-d';
 
 	public static function todayOffset ( $delta_in_days )
 	{
 		$calculated_day = self::DAY * $delta_in_days + time();
-		return date ( "Y-m-d" , $calculated_day  );
+		return date ( self::FORMAT_Y_M_D , $calculated_day  );
 	}
 
 	public static function diffInDays ($date1, $date2)
@@ -62,7 +46,7 @@ const DEKIWIKI = 103;
 
 	public static function today()
 	{
-		return date ( "Y-m-d" , time() );
+		return date ( self::FORMAT_Y_M_D , time() );
 	}
 
 	/**
@@ -82,10 +66,6 @@ const DEKIWIKI = 103;
 		return $closest;
 	}
 
-	public static function getEmailLinkHash($partner_id, $partner_secret)
-	{
-		return md5($partner_secret.$partner_id.KBatchBase::getConfigParam('kaltura_email_hash', 'local', false));
-	}
 
 	public static function flatXml2arr($flatXml)
 	{
@@ -98,7 +78,7 @@ const DEKIWIKI = 103;
 			}
 			else
 			{
-				$arr[$child] = KAsyncStorageUpdateUtils::flatXml2arr($value);
+				$arr[$child] = self::flatXml2arr($value);
 			}
 		}
 		return $arr;

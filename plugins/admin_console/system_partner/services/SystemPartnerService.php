@@ -155,7 +155,10 @@ class SystemPartnerService extends KalturaBaseService
 
 		$partnerFilter = new partnerFilter();
 		$filter->toObject($partnerFilter);
-		$partnerFilter->set('_gt_id', 0);
+		if (kCurrentContext::getCurrentPartnerId() != Partner::BATCH_PARTNER_ID && !$partnerFilter->get('_gt_id'))
+		{
+			$partnerFilter->set('_gt_id', 0);
+		}
 		
 		$c = new Criteria();
 		$partnerFilter->attachToCriteria($c);

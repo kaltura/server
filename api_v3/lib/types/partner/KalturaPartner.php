@@ -350,37 +350,44 @@ class KalturaPartner extends KalturaObject implements IFilterable
 
 	/**
 	 * @var string
+	 * @readonly
 	 */
 	public $extendedFreeTrailExpiryReason;
 
 	/**
 	 *  Unix timestamp (In seconds)
 	 * @var int
+	 * @readonly
 	 */
 	public $extendedFreeTrailExpiryDate;
 
 	/**
 	 * @var int
+	 * @readonly
 	 */
 	public $extendedFreeTrail;
 
 	/**
 	 * @var bool
+	 * @readonly
 	 */
 	public $extendedFreeTrailEndsWarning;
 
 	/**
 	 * @var int
+	 * @readonly
 	 */
 	public $eightyPercentWarning;
 
 	/**
 	 * @var int
+	 * @readonly
 	 */
 	public $usageLimitWarning;
 
 	/**
 	 * @var int
+	 * @readonly
 	 */
 	public $lastFreeTrialNotificationDay;
 
@@ -421,6 +428,16 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		}
 		if (!$this->cdnHost){
 			$this->cdnHost = null;
+		}
+		if (kCurrentContext::getCurrentPartnerId() > 0)
+		{
+			$this->extendedFreeTrailExpiryReason = null;
+			$this->extendedFreeTrailExpiryDate = null;
+			$this->extendedFreeTrail = null;
+			$this->extendedFreeTrailEndsWarning = null;
+			$this->eightyPercentWarning = null;
+			$this->usageLimitWarning = null;
+			$this->lastFreeTrialNotificationDay = null;
 		}
 	}
 	
