@@ -141,4 +141,44 @@ class kMetadataKavaUtils
 			$context['metadata_profile_id'], 
 			$context['xpath_patterns']);
 	}
+
+	public static function metadataEnrichUserEntry($ids, $partnerId, $context)
+	{
+		$criteria = new Criteria();
+
+
+		$criteria->add(UserEntryPeer::KUSER_ID, $ids, Criteria::IN);
+		$criteria->add(UserEntryPeer::ENTRY_ID, $context['entries_ids'], Criteria::IN);
+		$criteria->add(UserEntryPeer::PARTNER_ID, $partnerId);
+
+		$value = 'registration' . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . RegistrationUserEntryType::REGISTRATION;
+		$registrationUserEntryType = kPluginableEnumsManager::apiToCore('UserEntryType', $value);
+		$criteria->add(UserEntryPeer::TYPE, $registrationUserEntryType);
+
+		$criteria->addSelectColumn(UserEntryPeer::ID);
+		$criteria->addSelectColumn(UserEntryPeer::KUSER_ID);
+
+		$stmt = UserEntryPeer::doSelectStmt($criteria, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+		$usersEntries = array();
+		foreach ($rows as $row)
+		{
+			$id = $row['ID'];
+			$kuserId = $row['KUSER_ID'];
+			$usersEntries[$id] = $kuserId;
+		}
+
+		$userEntryMetadataFields = self::metadataEnrich(array_keys($usersEntries), $partnerId, $context);
+
+		$result = array();
+		foreach($userEntryMetadataFields as $userEntryId => $userEntryData)
+		{
+			$kuserId = $usersEntries[$userEntryId];
+			$result[$kuserId] = $userEntryData;
+		}
+
+		return $result;
+
+	}
 }

@@ -185,6 +185,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_EDIT_FILTER_FUNC = 'report_edit_filter_func';
 	const REPORT_TOTAL_FINALIZE_FUNC = 'report_total_finalize_func';
 	const REPORT_ORDER_BY = 'report_order_by';
+	const REPORT_DYNAMIC_HEADERS = 'report_dynamic_headers';
 
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -289,8 +290,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_ERROR,
 		self::EVENT_TYPE_PLAY_REQUESTED,
 		self::EVENT_TYPE_NODE_PLAY,
-		self::EVENT_TYPE_REGISTER,
-		self::EVENT_TYPE_FORM_LOADED,
+		self::EVENT_TYPE_REGISTERED,
+		self::EVENT_TYPE_REGISTRATION_IMPRESSION,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -1550,11 +1551,6 @@ class kKavaReportsMgr extends kKavaBase
 			$dimensions = array_unique($dimension_map);
 			$report_def[self::REPORT_DIMENSION] = count($dimensions) == 1 ? reset($dimensions) : array_values($dimensions);
 			$report_def[self::REPORT_DIMENSION_HEADERS] = array_keys($dimension_map);
-		}
-
-		if (isset($report_def[self::REPORT_DYNAMIC_METADATA_DIMENSION]))
-		{
-		
 		}
 
 		if (isset($report_def[self::REPORT_DRILLDOWN_DIMENSION_MAP]))
@@ -3798,6 +3794,26 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
+
+	protected static function getRegistrationUserEntry($ids, $partner_id, $context)
+	{
+		$context['peer'] = 'UserEntryPeer';
+		if (!isset($context['columns']))
+			$context['columns'] = array();
+		$value = 'registration' . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . RegistrationUserEntryType::REGISTRATION;
+		$registrationUserEntryType = kPluginableEnumsManager::apiToCore('UserEntryType', $value);
+		if (!isset($context['custom_criterion']))
+			$context['custom_criterion'] = array();
+		$customCtiteriaType['column'] = 'TYPE';
+		$customCtiteriaType['comparison'] = '=';
+		$customCtiteriaType['value'] = $registrationUserEntryType;
+		$context['custom_criterion'][] = $customCtiteriaType;
+
+		$enrichedResult = self::genericQueryEnrich($ids, $partner_id, $context);
+
+		return $enrichedResult;
+	}
+
 	protected static function getEnrichDefs($report_def)
 	{
 		if (!isset($report_def[self::REPORT_ENRICH_DEF]))
@@ -5368,10 +5384,12 @@ class kKavaReportsMgr extends kKavaBase
 				continue;
 			}
 
+			/**
 			if ($key != 'value')		// currently, limiting var replacement only for keys called 'value'
 			{
 				continue;
 			}
+			*/
 
 			if (!is_string($value) || !$value || $value[0] != ':')
 			{
@@ -5385,6 +5403,58 @@ class kKavaReportsMgr extends kKavaBase
 			}
 			$value = $params[$param_name];
 		}
+	}
+
+
+	protected static function enrichReportWithUserEntryMetadataFields($report_def, $field, $context)
+	{
+		$headers = explode(",", $context['headers']);
+		$metadataXpath = explode(",", $context['xpath_patterns']);
+		$metadataProfileId = $context['metadata_profile_id'];
+		$entries_ids = $context['entry_ids'];
+
+		$dimensions = array();
+		$dimensionHeaders = array();
+		$dimensionMap = array();
+
+		for($i = 0; $i < count($headers); ++$i)
+		{
+			$header = $headers[$i];
+			$dimensions[] = $field;
+			$dimensionHeaders[] = $header;
+			$dimensionMap[$header] = $field;
+		}
+
+		$dimensions = array_unique($dimensions);
+		$report_dimensions = $report_def[self::REPORT_DIMENSION];
+		$curr_dimensions = is_array($report_dimensions) ? $report_dimensions : array($report_dimensions);
+		$dimensions = array_unique(array_merge($curr_dimensions, $dimensions));
+
+		$enrichDef = array();
+		$enrichDef[self::REPORT_ENRICH_OUTPUT] = $dimensionHeaders;
+		$enrichDef[self::REPORT_ENRICH_FUNC] = "kMetadataKavaUtils::metadataEnrichUserEntry";
+		$context = array();
+		$context["metadata_profile_id"] = $metadataProfileId;
+		$context["xpath_patterns"] = $metadataXpath;
+		$context["entries_ids"] = $entries_ids;
+		$enrichDef[self::REPORT_ENRICH_CONTEXT] = $context;
+
+		$report_def[self::REPORT_DIMENSION] = array_values($dimensions);
+		$report_def[self::REPORT_DIMENSION_HEADERS] = array_merge($report_def[self::REPORT_DIMENSION_HEADERS], $dimensionHeaders);
+		if (isset($report_def[self::REPORT_DIMENSION_MAP]))
+		{
+			$report_def[self::REPORT_DIMENSION_MAP] = array_replace($report_def[self::REPORT_DIMENSION_MAP], $dimensionMap);
+		}
+
+		if (!isset($report_def[self::REPORT_ENRICH_DEF]))
+		{
+			$report_def[self::REPORT_ENRICH_DEF] = array();
+		}
+		$report_def[self::REPORT_ENRICH_DEF][] = $enrichDef;
+
+		return $report_def;
+
+
 	}
 
 	protected static function addEntryDescendants($partner_id, $ids)
@@ -5484,6 +5554,19 @@ class kKavaReportsMgr extends kKavaBase
 		if (isset($report_def[self::REPORT_ENRICH_DEF]))
 		{
 			self::replaceCustomParams($report_def[self::REPORT_ENRICH_DEF], $params);
+		}
+
+		if (isset($report_def[self::REPORT_DYNAMIC_HEADERS]))
+		{
+			self::replaceCustomParams($report_def[self::REPORT_DYNAMIC_HEADERS], $params);
+			$dynamicEnrich = $report_def[self::REPORT_DYNAMIC_HEADERS];
+			foreach ($dynamicEnrich as $dynamicEnrichDef)
+			{
+				$func = $dynamicEnrichDef[self::REPORT_ENRICH_FUNC];
+				$field = $dynamicEnrichDef['field'];
+				$context = $dynamicEnrichDef[self::REPORT_ENRICH_CONTEXT];
+				$report_def = call_user_func($func, $report_def, $field, $context);
+			}
 		}
 
 		$object_ids = isset($input_filter->object_ids) ? $input_filter->object_ids : null; 
