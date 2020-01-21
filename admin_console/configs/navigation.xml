@@ -20,6 +20,11 @@
 				<controller>partner-usage</controller>
 				<action>index</action>
 			</account-usage>
+			<monitoring>
+				<label>Monitoring</label>
+				<controller>index</controller>
+				<action>monitoring</action>
+			</monitoring>
 		</pages>
 	</accounts>
 	<users>

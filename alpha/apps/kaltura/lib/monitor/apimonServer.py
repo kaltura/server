@@ -81,7 +81,7 @@ def sendMessageToKafka(producer, curMessage):
 
     permittedFields = {"s", "p", "a", "e", "d", "x"}
     filteredMsg = {}
-    filteredMsg["t"] = datetime.now().strftime("%Y-%m-%d:%H:%M:%S")
+    filteredMsg["time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     filteredMsg.update((key, val) for (key, val) in json.loads(curMessage).items() if key in permittedFields)
     producer.send('api-mon', json.dumps(filteredMsg)).get(timeout=3)
                 
