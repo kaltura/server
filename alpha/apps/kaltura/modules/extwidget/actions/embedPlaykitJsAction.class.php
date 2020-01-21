@@ -9,6 +9,7 @@ class embedPlaykitJsAction extends sfAction
 	const UI_CONF_ID_PARAM_NAME = "uiconf_id";
 	const PARTNER_ID_PARAM_NAME = "partner_id";
 	const VERSIONS_PARAM_NAME = "versions";
+	const LANGS_PARAM_NAME = "langs";
 	const ENTRY_ID_PARAM_NAME = "entry_id";
 	const KS_PARAM_NAME = "ks";
 	const CONFIG_PARAM_NAME = "config";	
@@ -22,6 +23,7 @@ class embedPlaykitJsAction extends sfAction
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
+	private $i18nCache = null;
 	private $eTagHash = null;
 	private $uiconfId = null;
 	private $uiConf = null;
@@ -44,19 +46,22 @@ class embedPlaykitJsAction extends sfAction
 		$this->initMembers();
 		
 		$bundleContent = $this->bundleCache->get($this->bundle_name);
+		// $i18nContent = $this->i18nCache->get($this->bundle_name);
 		if (!$bundleContent || $this->regenerate) 
 		{
-			$bundleContent = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this));
+			$bundleAndI18nContent = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this));
+			$bundleContent = $bundleAndI18nContent[0];
+			$i18nContent = $bundleAndI18nContent[1];
 		}
 
 		$lastModified = $this->getLastModified($bundleContent);
 
 		//Format bundle contnet
-		$bundleContent = $this->formatBundleContent($bundleContent);
+		$bundleContent = $this->formatBundleContent($bundleContent, $i18nContent);
 
 		// send cache headers
 		$this->sendHeaders($bundleContent, $lastModified);
-		
+
 		echo($bundleContent);
 		
 		KExternalErrors::dieGracefully();
@@ -70,7 +75,8 @@ class embedPlaykitJsAction extends sfAction
 			$bundleContent = $context->bundleCache->get($context->bundle_name);
 			if ($bundleContent) 
 			{
-				return $bundleContent;
+				// $i18nContent = $context->i18nCache->get($context->bundle_name);
+				return array($bundleContent, $i18nContent);
 			}
 		}
 
@@ -99,19 +105,20 @@ class embedPlaykitJsAction extends sfAction
 		$bundleContent = time() . "," . base64_decode($content['bundle']);
 		$bundleSaved =  $context->bundleCache->set($context->bundle_name, $bundleContent);
 		$context->sourceMapsCache->set($context->bundle_name, $sourceMapContent);
+		$i18nContent = base64_decode($content['i18n']);
+		// $context->i18nCache->set($context->bundle_name, $i18nContent);
 		if(!$bundleSaved)
 		{
 			KalturaLog::log("Error - failed to save bundle content in cache for config [".$config."]");
 		}
 
-		return $bundleContent;
-		
+		return array($bundleContent, $i18nContent);		
 	}
 	
-	private function formatBundleContent($bundleContent)
+	private function formatBundleContent($bundleContent, $i18nContent)
 	{
 		$bundleContentParts = explode(",", $bundleContent, 2);
-		$bundleContent = $this->appendConfig($bundleContentParts[1]);
+		$bundleContent = $this->appendConfig($bundleContentParts[1], $i18nContent);
 		$autoEmbed = $this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME);
 		$iframeEmbed = $this->getRequestParameter(self::IFRAME_EMBED_PARAM_NAME);
 
@@ -133,10 +140,11 @@ class embedPlaykitJsAction extends sfAction
 		return $bundleContent;
 	}
 
-	private function appendConfig($content)
+	private function appendConfig($content, $i18nContent)
 	{
 		$uiConf = $this->playerConfig;
 		$this->mergeEnvConfig($uiConf);
+		$this->mergeI18nConfig($uiConf, $i18nContent);
 		$uiConfJson = json_encode($uiConf);
 
 		if ($uiConfJson === false)
@@ -167,6 +175,63 @@ class embedPlaykitJsAction extends sfAction
 			if (!(property_exists($uiConf->provider->env, $key) && $uiConf->provider->env->$key))
 				$uiConf->provider->env->$key = $value;
 		}
+	}
+
+	private function mergeI18nConfig($uiConf, $i18nContent)
+	{
+		$i18nArr = json_decode($i18nContent, true);
+		if ($i18nArr)
+		{
+			$i18nArr = $this->filterI18nLangs($i18nArr);
+			if (!property_exists($uiConf, "ui"))
+			{
+				$uiConf->ui = new stdClass();
+			}
+	
+			if (!property_exists($uiConf->ui, "translations"))
+			{
+				$uiConf->ui->translations = new stdClass();
+			}
+			$uiConfI18nArr = json_decode(json_encode($uiConf->ui->translations), true);
+			$uiConf->ui->translations = (object) $this->arrayMergeRecursive($i18nArr, $uiConfI18nArr);
+		}
+	}
+
+	private function filterI18nLangs($i18nArr)
+	{
+		$langsParam = $this->getRequestParameter(self::LANGS_PARAM_NAME);
+		$langs = isset($langsParam) ? $langsParam : "en";
+		$langArr = explode(",", $langs);
+		$partialI18nArr = array();
+		foreach ($langArr as $lang) {
+			$langMap = $i18nArr[$lang];
+			if (isset($langMap))
+			{
+				$partialI18nArr[$lang] = $langMap;
+			}
+		}
+		return $partialI18nArr;
+	}
+
+	/*
+	* Recursive function that merges two associative arrays
+	* - Unlike array_merge_recursive, a differing value for a key overwrites that key rather than creating an array with both values
+	* - A scalar value will overwrite an array value
+	*/
+	private function arrayMergeRecursive( $arr1, $arr2 )
+	{
+		$keys = array_keys( $arr2 );
+		foreach( $keys as $key ) {
+			if( isset( $arr1[$key] ) 
+				&& is_array( $arr1[$key] ) 
+				&& is_array( $arr2[$key] ) 
+			) {
+				$arr1[$key] = $this->arrayMergeRecursive( $arr1[$key], $arr2[$key] );
+			} else {
+				$arr1[$key] = $arr2[$key];
+			}
+		}
+		return $arr1;
 	}
 
 	private function setProductVersion($uiConf, $productVersion)
@@ -501,6 +566,10 @@ class embedPlaykitJsAction extends sfAction
 		$this->sourceMapsCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYKIT_JS_SOURCE_MAP);
 		if (!$this->sourceMapsCache)
 			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, "PlayKit source maps cache not defined");
+		
+		$this->i18nCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYKIT_JS_I18N);
+		if (!$this->i18nCache)
+			// KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, "PlayKit i18n cache not defined");
 		
 		//Get uiConf ID from QS
 		$this->uiconfId = $this->getRequestParameter(self::UI_CONF_ID_PARAM_NAME);
