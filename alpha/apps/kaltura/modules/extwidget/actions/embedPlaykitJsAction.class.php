@@ -199,7 +199,7 @@ class embedPlaykitJsAction extends sfAction
 	private function filterI18nLangs($i18nArr)
 	{
 		$langsParam = $this->getRequestParameter(self::LANGS_PARAM_NAME);
-		$langArr = isset($langsParam) ? explode(",", $langsParam) : (isset($this->uiConfLangs) ? $this->uiConfLangs : array("en"));
+		$langArr = isset($langsParam) ? explode(",", $langsParam) : (!empty($this->uiConfLangs) ? $this->uiConfLangs : array("en"));
 		$partialI18nArr = array();
 		foreach ($langArr as $lang) {
 			$langMap = $i18nArr[$lang];
