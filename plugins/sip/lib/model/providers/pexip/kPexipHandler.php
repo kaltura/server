@@ -73,18 +73,18 @@ class kPexipHandler
 		$streamUrl = null;
 		if (isset($pexipConfig[kPexipUtils::FORCE_NON_SECURE_STREAMING]) && $pexipConfig[kPexipUtils::FORCE_NON_SECURE_STREAMING])
 		{
-			KalturaLog::info("Retrieving RTMP Stream Url For Entry " . $dbLiveEntry->getId());
+			KalturaLog::info('Retrieving RTMP Stream Url For Entry ' . $dbLiveEntry->getId());
 			$streamUrl = $isPrimaryStream ? $dbLiveEntry->getPrimaryBroadcastingUrl() : $dbLiveEntry->getSecondaryBroadcastingUrl();
 		}
 		else
 		{
-			KalturaLog::info("Retrieving RTMPS Stream Url For Entry " . $dbLiveEntry->getId());
+			KalturaLog::info('Retrieving RTMPS Stream Url For Entry ' . $dbLiveEntry->getId());
 			$streamUrl = $isPrimaryStream ? $dbLiveEntry->getPrimarySecuredBroadcastingUrl() : $dbLiveEntry->getSecondarySecuredBroadcastingUrl();
 		}
 
 		if (!$streamUrl)
 		{
-			KalturaLog::info("RTMP/S stream could not be created for entry " . $dbLiveEntry->getId());
+			KalturaLog::info('RTMP/S stream could not be created for entry ' . $dbLiveEntry->getId());
 			$msg = 'There was an issue generating a link for the broadcast for entry ' . $dbLiveEntry->getId() . ', please contact you system Admin';
 			kPexipUtils::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
 			return null;
