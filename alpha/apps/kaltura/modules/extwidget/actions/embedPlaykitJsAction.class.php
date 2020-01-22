@@ -33,6 +33,7 @@ class embedPlaykitJsAction extends sfAction
 	private $bundlerUrl = null;
 	private $sourcesPath = null;
 	private $bundleConfig = null;
+	private $uiConfLangs = null;
 	private $sourceMapLoader = null;
 	private $cacheVersion = null;
 	private $playKitVersion = null;
@@ -49,9 +50,7 @@ class embedPlaykitJsAction extends sfAction
 		// $i18nContent = $this->i18nCache->get($this->bundle_name);
 		if (!$bundleContent || $this->regenerate) 
 		{
-			$bundleAndI18nContent = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this));
-			$bundleContent = $bundleAndI18nContent[0];
-			$i18nContent = $bundleAndI18nContent[1];
+			list($bundleContent, $i18nContent) = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this));
 		}
 
 		$lastModified = $this->getLastModified($bundleContent);
@@ -200,8 +199,7 @@ class embedPlaykitJsAction extends sfAction
 	private function filterI18nLangs($i18nArr)
 	{
 		$langsParam = $this->getRequestParameter(self::LANGS_PARAM_NAME);
-		$langs = isset($langsParam) ? $langsParam : "en";
-		$langArr = explode(",", $langs);
+		$langArr = isset($langsParam) ? explode(",", $langsParam) : (isset($this->uiConfLangs) ? $this->uiConfLangs : array("en"));
 		$partialI18nArr = array();
 		foreach ($langArr as $lang) {
 			$langMap = $i18nArr[$lang];
@@ -631,7 +629,13 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::INTERNAL_SERVER_ERROR);
 		}
 		
-		$this->bundleConfig = json_decode($confVars, true);
+		$confVarsArr = json_decode($confVars, true);
+		$this->bundleConfig = $confVarsArr;
+		if (isset($confVarsArr[self::VERSIONS_PARAM_NAME])) {
+			$this->uiConfLangs = $confVarsArr[self::LANGS_PARAM_NAME];
+			$this->bundleConfig = $confVarsArr[self::VERSIONS_PARAM_NAME];
+		}
+
 		$this->mergeVersionsParamIntoConfig();
 		if (!$this->bundleConfig) {
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "unable to resolve bundle config");
