@@ -811,7 +811,11 @@ abstract class KBatchBase implements IKalturaLogger
 				return $res;
 			}
 			catch  (Exception $ex) {
-				KalturaLog::warning("API Call for " . print_r($callback, true) . " failed number of retires $numOfRetries");
+				KalturaLog::warning("API Call for " . print_r($callback, true) . " failed with code [" . $ex->getCode() . "] number of retires $numOfRetries");
+				if (in_array($ex->getCode(), array('COPY_CUE_POINT_NOT_PERMITTED')))
+				{
+					return null;
+				}
 				KalturaLog::err($ex->getMessage());
 				sleep($apiIntervalInSec);
 			}
