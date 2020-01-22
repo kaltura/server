@@ -73,17 +73,19 @@ class kPexipHandler
 		$streamUrl = null;
 		if (isset($pexipConfig[kPexipUtils::FORCE_NON_SECURE_STREAMING]) && $pexipConfig[kPexipUtils::FORCE_NON_SECURE_STREAMING])
 		{
+			KalturaLog::info("Retrieving RTMP Stream Url For Entry " . $dbLiveEntry->getId());
 			$streamUrl = $isPrimaryStream ? $dbLiveEntry->getPrimaryBroadcastingUrl() : $dbLiveEntry->getSecondaryBroadcastingUrl();
 		}
 		else
 		{
+			KalturaLog::info("Retrieving RTMPS Stream Url For Entry " . $dbLiveEntry->getId());
 			$streamUrl = $isPrimaryStream ? $dbLiveEntry->getPrimarySecuredBroadcastingUrl() : $dbLiveEntry->getSecondarySecuredBroadcastingUrl();
 		}
 
 		if (!$streamUrl)
 		{
-			KalturaLog::info("RTMPS stream could not be created for entry " . $dbLiveEntry->getId());
-			$msg = 'There was an issue generating a secure link for the broadcast for entry ' . $dbLiveEntry->getId() . ', please contact you system Admin';
+			KalturaLog::info("RTMP/S stream could not be created for entry " . $dbLiveEntry->getId());
+			$msg = 'There was an issue generating a link for the broadcast for entry ' . $dbLiveEntry->getId() . ', please contact you system Admin';
 			kPexipUtils::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
 			return null;
 		}
@@ -280,7 +282,7 @@ class kPexipHandler
 	protected static function addADP(LiveStreamEntry $entry, $roomId, $participantAddress, $name, $pexipConfig, $locationId = null)
 	{
 		$adpId = null;
-		KalturaLog::info("Creating RTMP-ADP $name to Virtual Room $roomId");
+		KalturaLog::info("Creating RTMP/S-ADP $name to Virtual Room $roomId");
 
 		$adpData = array(
 			'alias' => $participantAddress,
