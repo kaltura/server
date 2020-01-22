@@ -814,6 +814,7 @@ abstract class KBatchBase implements IKalturaLogger
 				KalturaLog::warning("API Call for " . print_r($callback, true) . " failed with code [" . $ex->getCode() . "] number of retires $numOfRetries");
 				if (in_array($ex->getCode(), array('COPY_CUE_POINT_NOT_PERMITTED')))
 				{
+					//Not retring on specific errors that retrying is not needed anyhow
 					return null;
 				}
 				KalturaLog::err($ex->getMessage());
