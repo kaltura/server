@@ -577,4 +577,64 @@ class LiveStreamService extends KalturaLiveEntryService
 
 	}
 
+	/**
+	 * Delivering the status of a live stream (on-air/offline) if it is possible
+	 *
+	 * @action getDetails
+	 * @param string $id ID of the live stream entry
+	 * @return KalturaLiveStreamDetails
+	 * @ksOptional
+	 *
+	 * @throws KalturaErrors::INVALID_ENTRY_ID
+	 */
+	public function getDetailsAction($id)
+	{
+		if (!kCurrentContext::$ks)
+		{
+			kEntitlementUtils::initEntitlementEnforcement(null, false);
+			$liveStreamEntry = kCurrentContext::initPartnerByEntryId($id);
+			if (!$liveStreamEntry || $liveStreamEntry->getStatus() == entryStatus::DELETED)
+				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
+
+			// enforce entitlement
+			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
+		}
+		else
+		{
+			$liveStreamEntry = entryPeer::retrieveByPK($id);
+		}
+
+		if (!$liveStreamEntry || ($liveStreamEntry->getType() != entryType::LIVE_STREAM))
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
+
+		/** @var LiveStreamEntry $liveStreamEntry */
+
+		if (!in_array($liveStreamEntry->getSource(), LiveEntry::$kalturaLiveSourceTypes))
+			KalturaResponseCacher::setConditionalCacheExpiry(self::ISLIVE_ACTION_NON_KALTURA_LIVE_CONDITIONAL_CACHE_EXPIRY);
+		if(in_array($liveStreamEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
+		{
+			$res = new KalturaLiveStreamDetails();
+			//SET CACHE HEADERS
+			$entryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($id, EntryServerNodePeer::$connectedServerNodeStatuses);
+			foreach ($entryServerNodes as $currESN)
+			{
+				/** @var LiveEntryServerNode $currESN */
+				if ($currESN->getServerType()== EntryServerNodeType::LIVE_PRIMARY)
+				{
+					$res->primaryStreamStatus = $currESN->getStatus();
+				}
+				else if ($currESN->getServerType()== EntryServerNodeType::LIVE_BACKUP)
+				{
+					$res->secondaryStreamStatus = $currESN->getStatus();
+				}
+			}
+			$res->viewMode = $liveStreamEntry->getViewMode();
+			$res->wasPublished = $liveStreamEntry->getAnyBroadcastTime() ? true : false;
+			return $res;
+
+		}
+		throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
+
+	}
+
 }
