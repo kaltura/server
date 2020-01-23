@@ -1,3 +1,16 @@
+# Orion 15.16.0 #
+
+## Add liveStream->getDetails API action ##
+Issue Type: Task
+Issue ID : FEV-426
+
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_23_01_live_stream_get_details_action.php'
+
+
 # Orion 15.15.0 #
 
 ## Enabling auto archive when using live with recording ##
