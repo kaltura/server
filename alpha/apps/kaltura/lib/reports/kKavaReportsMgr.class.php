@@ -71,6 +71,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_COUNT_EBVS = 'count_ebvs';
 	const METRIC_NODE_UNIQUE_PERCENTILES_RATIO = 'node_avg_completion_rate';
 	const METRIC_TOTAL_UNIQUE_PERCENTILES = 'total_completion_rate';
+	const METRIC_VOD_PLAYS_COUNT = 'vod_plays_count';
+	const METRIC_VOD_UNIQUE_PERCENTILES_RATIO = 'avg_vod_completion_rate';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -393,6 +395,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_VIEWERS => true,
 		self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO => true,
 		self::METRIC_TOTAL_UNIQUE_PERCENTILES => true,
+		self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -875,6 +878,12 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_POSITION, self::VALUE_UNKNOWN))),
 			self::getLongSumAggregator(self::METRIC_ERROR_UNKNOWN_POSITION_COUNT, self::METRIC_COUNT));
 
+		self::$aggregations_def[self::METRIC_VOD_PLAYS_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_VOD))),
+			self::getLongSumAggregator(self::METRIC_VOD_PLAYS_COUNT, self::METRIC_COUNT));
+
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
 		
@@ -1074,6 +1083,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_UNIQUE_PERCENTILES_RATIO,
 				self::METRIC_UNIQUE_PERCENTILES_SUM,
 				self::EVENT_TYPE_PLAY));
+
+		self::$metrics_def[self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_VOD_PLAYS_COUNT, self::METRIC_UNIQUE_PERCENTILES_SUM),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO,
+				self::METRIC_UNIQUE_PERCENTILES_SUM,
+				self::METRIC_VOD_PLAYS_COUNT));
 
 		self::$metrics_def[self::METRIC_VIEW_BUFFER_TIME_RATIO] = array(
 			self::DRUID_AGGR => array(self::EVENT_TYPE_VIEW, self::METRIC_VIEW_BUFFER_TIME_SEC),
@@ -3805,26 +3821,6 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
-
-	protected static function getRegistrationUserEntry($ids, $partner_id, $context)
-	{
-		$context['peer'] = 'UserEntryPeer';
-		if (!isset($context['columns']))
-			$context['columns'] = array();
-		$value = 'registration' . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . RegistrationUserEntryType::REGISTRATION;
-		$registrationUserEntryType = kPluginableEnumsManager::apiToCore('UserEntryType', $value);
-		if (!isset($context['custom_criterion']))
-			$context['custom_criterion'] = array();
-		$customCtiteriaType['column'] = 'TYPE';
-		$customCtiteriaType['comparison'] = '=';
-		$customCtiteriaType['value'] = $registrationUserEntryType;
-		$context['custom_criterion'][] = $customCtiteriaType;
-
-		$enrichedResult = self::genericQueryEnrich($ids, $partner_id, $context);
-
-		return $enrichedResult;
-	}
-
 	protected static function getEnrichDefs($report_def)
 	{
 		if (!isset($report_def[self::REPORT_ENRICH_DEF]))
@@ -3959,7 +3955,7 @@ class kKavaReportsMgr extends kKavaBase
 				{
 					list($enrich_func, $enrich_context, $enriched_indexes) = $enrich_spec;
 					$entities = call_user_func($enrich_func, array_keys($dimension_ids), $partner_id, $enrich_context);
-			
+
 					for ($current_row = $start; $current_row < $limit; $current_row++) 
 					{
 						$key = self::arrayGetElements($data[$current_row], $dim_indexes);
@@ -5444,7 +5440,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		$enrichDef = array();
 		$enrichDef[self::REPORT_ENRICH_OUTPUT] = $dimensionHeaders;
-		$enrichDef[self::REPORT_ENRICH_FUNC] = "kMetadataKavaUtils::metadataEnrichUserEntry";
+		$enrichDef[self::REPORT_ENRICH_FUNC] = "kMetadataKavaUtils::metadataEnrich";
 		$context = array();
 		$context["metadata_profile_id"] = $metadataProfileId;
 		$context["xpath_patterns"] = $metadataXpath;
