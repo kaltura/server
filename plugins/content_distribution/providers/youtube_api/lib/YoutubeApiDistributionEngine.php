@@ -39,7 +39,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 
 	const DEFAULT_CHUNK_SIZE_BYTE = 1048576; // 1024 * 1024
 
-	const TIME_TO_WAIT_FOR_YOUTUBE_TRANSCODING = 5;
+	const TIME_TO_WAIT_FOR_YOUTUBE_TRANSCODING = 20;
 
 	public function configure()
 	{
