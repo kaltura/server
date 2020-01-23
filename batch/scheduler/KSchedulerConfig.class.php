@@ -75,7 +75,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 	public function __construct($configFileName)
 	{
 		$this->configFileName = realpath($configFileName);
-		$this->kClientConfig = kConf::getMap('batchBase');
+		$this->kClientConfig = kConf::getMap('batchBase', true);
 		$this->loadConfigFromDisc = isset($this->kClientConfig['loadConfigFromDisc']) ? $this->kClientConfig['loadConfigFromDisc'] : false;
 		$this->configReloadInterval = isset($this->kClientConfig['configReloadInterval']) ? $this->kClientConfig['configReloadInterval'] : self::DEFAULT_CONFIG_RELOAD_INTVERAL;
 		$this->load();

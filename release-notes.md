@@ -1,4 +1,30 @@
+# Orion 15.15.0 #
+
+## Enabling auto archive when using live with recording ##
+Issue Type: Task
+Issue ID : WEBC-1574
+
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/scripts/2019_12_10_update_archive_permissions.php'
+
+## Update server healthCheck API action permissions ##
+- Issue Type: Task
+- Issue ID : PLAT-10432
+
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+Run:
+
+    'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_01_09_update_system_gethealthcheck_action.php'
+
+
 # Orion 15.14.0 #
+
 ## Modify confMaps content column ##
 - Issue Type: Task
 
@@ -6,7 +32,7 @@
 none.
 
 #### Deployment Scripts ####
-  mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_12_26_alter_config_maps_table.sql
+mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_12_26_alter_config_maps_table.sql
 
 ## add server healthCheck API action ##
 - Issue Type: Task
@@ -19,7 +45,6 @@ none.
 Run: 
 
     'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_12_19_add_system_gethealthcheck_action.php'
-
 
 # Orion 15.13.0 #
 
@@ -302,7 +327,7 @@ max_words_for_ngram = MAX_WORDS_NGRAM(EXAMPLE_2)
 ### Deployment scripts ###
     OnPrem - reindex entry index in elastic:
 	1) Remove old index - delete kaltura_entry
-	2) Create the index - curl -XPUT '{elasticHost}:{elasticPort}/kaltura_entry' --data-binary "@entry_mapping.json"
+	2) Create the index - curl -XPUT '{elasticHost}:{elasticPort}/kaltura_entry' -H 'Content-Type: application/json' --data-binary "@entry_mapping.json"
 	3) Index the entries - php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticEntries.php
 	
 

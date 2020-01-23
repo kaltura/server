@@ -154,6 +154,35 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 
 	}
 
+	protected function validateOnlyOneAnswer()
+	{
+		if(kCurrentContext::$ks_object && kCurrentContext::$ks_object->isAnonymousSession())
+		{
+			return;
+		}
+
+		if(kCurrentContext::$is_admin_session)
+		{
+			$dbUserEntry = UserEntryPeer::retrieveByPK($this->quizUserEntryId);
+			$kuserId = $dbUserEntry->getKuserId();
+		}
+		else
+		{
+			$kuserId = kCurrentContext::getCurrentKsKuserId();
+		}
+
+		$cuePoints = CuePointPeer::retrieveCuePointAnswers($this->entryId, $this->parentId, $kuserId);
+		foreach($cuePoints as $cuePoint)
+		{
+			/* @var $cuePoint AnswerCuePoint */
+			if($cuePoint->getQuizUserEntryId() === $this->quizUserEntryId)
+			{
+				throw new KalturaAPIException(KalturaQuizErrors::ANSWER_ALREADY_EXISTS, $this->parentId, $this->quizUserEntryId);
+			}
+		}
+	}
+
+
 	protected function validateUserEntry()
 	{
 		$dbUserEntry = UserEntryPeer::retrieveByPK($this->quizUserEntryId);
@@ -186,6 +215,7 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 		QuizPlugin::validateAndGetQuiz($dbEntry);
 		$this->validateParentId();
 		$this->validateUserEntry();
+		$this->validateOnlyOneAnswer();
 		if ($this->feedback != null && !kEntitlementUtils::isEntitledForEditEntry($dbEntry) )
 		{
 			KalturaLog::debug('Insert feedback on answer cue point is allowed only with admin KS or entry owner or co-editor');

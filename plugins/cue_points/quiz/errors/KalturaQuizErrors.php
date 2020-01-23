@@ -17,4 +17,5 @@ class KalturaQuizErrors extends KalturaErrors
 	const QUIZ_CANNOT_BE_DOWNLOAD = 'QUIZ_CANNOT_BE_DOWNLOAD;;Quiz cannot be download';
 	const QUIZ_USER_ENTRY_ALREADY_EXISTS = 'QUIZ_USER_ENTRY_ALREADY_EXISTS;ENTRY_ID;A quiz user-entry for the given user-id and entry-id [@ENTRY_ID@] already exists, cannot create duplicate';
 	const NO_RETAKES_LEFT= 'NO_MORE_RETAKES_ALLOWED;ENTRY_ID;No Retakes left for the given user-id and entry-id [@ENTRY_ID@]. cannot retake quiz';
+	const ANSWER_ALREADY_EXISTS = "ANSWER_ALREADY_EXISTS;PARENT_ID,USER_ENTRY;Answer for question [@PARENT_ID@] for user entry [@USER_ENTRY@] already exists ";
 }

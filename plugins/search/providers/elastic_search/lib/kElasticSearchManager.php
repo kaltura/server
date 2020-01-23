@@ -224,13 +224,14 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     private function shouldSkipSaveToSphinxLog($object, &$command)
     {
         // limit the number of large SQLs to 1/min per object, since they load the sphinx log database and elastic servers
-        if (strlen($command) > self::MAX_SQL_LENGTH)
+	$commandSize = strlen($command);
+        if ($commandSize > self::MAX_SQL_LENGTH)
         {
             $lockKey = self::CACHE_PREFIX_STICKY_SESSIONS . $object->getElasticObjectName() . '_' . $object->getId();
             $cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_STICKY_SESSIONS);
             if ($cache && !$cache->add($lockKey, true, 60))
             {
-                KalturaLog::log('skipping saving elastic sphinxLog sql for key ' . $lockKey);
+                KalturaLog::log('skipping saving elastic sphinxLog sql for key ' . $lockKey . ' size is - ' . $commandSize);
                 return true;
             }
         }
