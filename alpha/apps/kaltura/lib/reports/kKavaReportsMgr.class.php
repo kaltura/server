@@ -5392,13 +5392,6 @@ class kKavaReportsMgr extends kKavaBase
 				continue;
 			}
 
-			/**
-			if ($key != 'value')		// currently, limiting var replacement only for keys called 'value'
-			{
-				continue;
-			}
-			*/
-
 			if (!is_string($value) || !$value || $value[0] != ':')
 			{
 				continue;
