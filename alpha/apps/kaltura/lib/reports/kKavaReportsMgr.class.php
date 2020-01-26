@@ -1970,6 +1970,9 @@ class kKavaReportsMgr extends kKavaBase
 			'playback_types' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE),
 			'playback_context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT),
 			'root_entries_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_ROOT_ENTRY_ID),
+			'event_var1' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR1),
+			'player_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYER_VERSION),
+			'isp' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_ISP),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
