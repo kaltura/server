@@ -398,6 +398,10 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	 */
 	public function copyToEntry( $entry, PropelPDO $con = null)
 	{
+		if (!$this->hasPermissionToCopyToEntry($entry))
+		{
+			throw new kCoreException('No permission to copy cuepoint '. $this->getId() .' to entry '. $entry->getId(), kCuePointException::COPY_CUE_POINT_TO_ENTRY_NOT_PERMITTED);
+		}
 		$cuePointCopy = $this->copy();
 		$cuePointCopy->setEntryId($entry->getId());
 		return $cuePointCopy;
