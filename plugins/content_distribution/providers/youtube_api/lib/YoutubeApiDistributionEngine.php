@@ -30,7 +30,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 {
 	protected $tempXmlPath;
 	protected $timeout = 90;
-	protected  $processedTimeout = 300;
+	protected $processedTimeout = 300;
 
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
@@ -40,6 +40,10 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	const DEFAULT_CHUNK_SIZE_BYTE = 1048576; // 1024 * 1024
 
 	const TIME_TO_WAIT_FOR_YOUTUBE_TRANSCODING = 5;
+
+	const SIZE_2_GB = 2147483648;
+
+	const LONG_PROCESS_TIMEOUT = 1200;
 
 	public function configure()
 	{
@@ -265,6 +269,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			$media->setFileSize(filesize($videoPath));
 			$ingestedVideo = self::uploadInChunks($media,$videoPath, self::DEFAULT_CHUNK_SIZE_BYTE);
 			$client->setDefer(false);
+			$this->processedTimeout = $this->increaseProcessedTimeout(filesize($videoPath));
 
 			$data->remoteId = $ingestedVideo->getId();
 
@@ -682,5 +687,14 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 
 	}
 
+	private function increaseProcessedTimeout($fileSize)
+	{
+		if ($fileSize > self::SIZE_2_GB)
+		{
+			$this->processedTimeout = self::LONG_PROCESS_TIMEOUT;
+			KalturaLog::info('Increased processed timeout to '.self::LONG_PROCESS_TIMEOUT.' seconds for file larger than 2GB');
+		}
+		return $this->processedTimeout;
+	}
 
 }
