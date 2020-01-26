@@ -1,3 +1,19 @@
+# Orion-15.16.0 #
+
+## SIP - Use rtmps as default streaming ##
+ - Issue Type: Task
+ - Issue ID: PLAT-10575
+
+### Installation ###
+None.
+### Configuration ###
+None.
+To force non secure rtmp streaming set forceNonSecureStreaming = true in sip.ini 
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+ - php deployment\updates\scripts\add_permissions\2020_01_19_add_rtmps_permissions_KalturaLiveEntry.php
+ 
 # Orion 15.15.0 #
 
 ## Enabling auto archive when using live with recording ##
