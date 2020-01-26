@@ -687,6 +687,10 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 
 	}
 
+	/**
+	 * @param int $fileSize
+	 * @return int $processedTimeout
+	 */
 	private function increaseProcessedTimeout($fileSize)
 	{
 		if ($fileSize > self::SIZE_2_GB)
