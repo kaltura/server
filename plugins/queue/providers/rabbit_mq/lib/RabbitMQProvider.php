@@ -35,6 +35,8 @@ class RabbitMQProvider extends QueueProvider
 	const RABBIT_ACTION_OPEN_CONNECTION = 'connect';
 	const RABBIT_ACTION_TIMEOUT = 'timeout';
 	const RABBIT_CONNECTION_ERROR = 'connection_error';
+	const RABBIT_ACTION_RUNTIME_ERROR = 'runtime_error';
+	const RABBIT_ACTION_SEND_ERROR = 'send_error';
 
 	public function __construct(array $rabbitConfig, $constructorArgs)
 	{
@@ -118,13 +120,26 @@ class RabbitMQProvider extends QueueProvider
 				$this->writeToMonitor($logStr, $this->dataSourceUrl, self::RABBIT_ACTION_OPEN_CONNECTION, $connTook);
 				break;
 			}
-			catch (PhpAmqpLib\Exception\AMQPRuntimeException $e)
+			catch (Exception $e)
 			{
+				$connTook = microtime(true) - $connStart;
+				$logStr = "Failed to connect to MQserver [{$this->MQserver}] after [$connTook] with error [" . $e->getMessage() . "]";
+				if($e instanceof PhpAmqpLib\Exception\AMQPRuntimeException)
+				{
+					$errorType = self::RABBIT_ACTION_RUNTIME_ERROR;
+				}
+				elseif($e instanceof PhpAmqpLib\Exception\AMQPTimeoutException)
+				{
+					$errorType = self::RABBIT_ACTION_TIMEOUT;
+				}
+				else
+				{
+					$errorType = self::RABBIT_CONNECTION_ERROR;
+				}
+
+				$this->writeToMonitor($logStr, $this->dataSourceUrl, $errorType, $connTook, $this->exchangeName . ":" . $queueName, strlen($data));
 				if($retry == self::MAX_RETRIES)
 				{
-					$connTook = microtime(true) - $connStart;
-					$logStr = "Failed to connect to MQserver [{$this->MQserver}] with error [" . $e->getMessage() . "]";
-					$this->writeToMonitor($logStr, $this->dataSourceUrl, self::RABBIT_CONNECTION_ERROR, $connTook, $this->exchangeName . ":" . $queueName, strlen($data));
 					throw $e;
 				}
 			}
@@ -148,11 +163,19 @@ class RabbitMQProvider extends QueueProvider
 		{
 			$channel->basic_publish($msg, $this->exchangeName, $queueName);
 		}
-		catch (PhpAmqpLib\Exception\AMQPTimeoutException $e)
+		catch (Exception $e)
 		{
-			$logStr = "Connection timed out while sending message [$data] to [$queueName] with error [" . $e->getMessage() . "]";
 			$sendMessageEnd = microtime(true) - $sendMessageStart;
-			$this->writeToMonitor($logStr, $this->dataSourceUrl, self::RABBIT_ACTION_TIMEOUT, $sendMessageEnd, $this->exchangeName . ":" . $queueName, strlen($data));
+			$logStr = "Failed to send message after [$sendMessageEnd] with data [$data] to [$queueName] with error [" . $e->getMessage() . "]";
+			if($e instanceof PhpAmqpLib\Exception\AMQPTimeoutException)
+			{
+				$errorType = self::RABBIT_ACTION_TIMEOUT;
+			}
+			else
+			{
+				$errorType = self::RABBIT_ACTION_SEND_ERROR;
+			}
+			$this->writeToMonitor($logStr, $this->dataSourceUrl, $errorType, $sendMessageEnd, $this->exchangeName . ":" . $queueName, strlen($data));
 			throw $e;
 		}
 
