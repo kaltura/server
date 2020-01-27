@@ -48,6 +48,7 @@ class embedPlaykitJsAction extends sfAction
 		
 		$bundleContent = $this->bundleCache->get($this->bundle_name);
 		$i18nContent = $this->bundleCache->get($this->bundle_i18n_name);
+
 		if (!$bundleContent || $this->regenerate)
 		{
 			list($bundleContent, $i18nContent) = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this));
@@ -105,7 +106,7 @@ class embedPlaykitJsAction extends sfAction
 		$bundleSaved =  $context->bundleCache->set($context->bundle_name, $bundleContent);
 		$context->sourceMapsCache->set($context->bundle_name, $sourceMapContent);
 		$i18nContent = base64_decode($content['i18n']);
-		 $context->bundleCache->set($context->bundle_i18n_name, $i18nContent);
+		$context->bundleCache->set($context->bundle_i18n_name, $i18nContent);
 		if(!$bundleSaved)
 		{
 			KalturaLog::log("Error - failed to save bundle content in cache for config [".$config."]");
@@ -650,7 +651,9 @@ class embedPlaykitJsAction extends sfAction
 		$config_str = json_encode($this->bundleConfig);
 		$this->bundle_name = md5($config_str);
 		if($this->cacheVersion)
+		{
 			$this->bundle_name = $this->cacheVersion . "_" . $this->bundle_name;
+		}
 		$this->bundle_i18n_name = $this->bundle_name . "_i18n";
 	}
 	
