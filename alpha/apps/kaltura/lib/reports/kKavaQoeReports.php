@@ -21,6 +21,20 @@ class kKavaQoeReports extends kKavaReportsMgr
 	const CUSTOM_VAR3_BASE = 'custom_var3_base';
 	const APPLICATION_VER_BASE = 'application_ver_base';
 
+	// general
+	const DYNAMIC_DATASOURCE_INTERVAL = 21600; //6 hours
+
+	// metrics map - realtime metric => historical metric
+	protected static $realtime_to_historical_metrics_map = array(
+		self::METRIC_VIEW_BUFFER_TIME_RATIO => self::METRIC_BUFFER_TIME_RATIO,
+		self::METRIC_AVG_VIEW_SESSION_ERROR_RATE => self::METRIC_AVG_SESSION_ERROR_RATE,
+		self::METRIC_VIEW_UNIQUE_SESSIONS => self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS,
+		self::METRIC_AVG_VIEW_PLAY_TIME_SEC => self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME,
+		self::METRIC_AVG_VIEW_BITRATE => self::METRIC_AVG_BITRATE,
+		self::EVENT_TYPE_BUFFER_START => self::METRIC_VIEW_PERIOD_BUFFER_STARTS,
+		self::EVENT_TYPE_FLAVOR_SWITCH => self::METRIC_VIEW_PERIOD_FLAVOR_SWITCHES,
+	);
+
 	protected static $reports_def_base = array(
 
 		self::PLATFORMS_BASE => array(
@@ -136,6 +150,7 @@ class kKavaQoeReports extends kKavaReportsMgr
 		),
 
 		self::ERROR_TRACKING_BASE => array(
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
 			self::REPORT_METRICS => array(
 				self::EVENT_TYPE_ERROR,
 				self::METRIC_ERROR_SESSION_COUNT,
@@ -178,7 +193,7 @@ class kKavaQoeReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_METRICS => array(
 				self::METRIC_AVG_JOIN_TIME,
 				self::METRIC_VIEW_BUFFER_TIME_RATIO,
-				self::METRIC_AVG_SESSION_ERROR_RATE,
+				self::METRIC_AVG_VIEW_SESSION_ERROR_RATE,
 				self::METRIC_VIEW_UNIQUE_SESSIONS,
 				self::METRIC_AVG_VIEW_PLAY_TIME_SEC,
 			),
@@ -310,12 +325,12 @@ class kKavaQoeReports extends kKavaReportsMgr
 
 		ReportType::QOE_ENGAGEMENT => array(
 			self::REPORT_METRICS => array(
-				self::METRIC_UNIQUE_SESSIONS,
+				self::METRIC_VIEW_UNIQUE_SESSIONS,
 				self::METRIC_AVG_VIEW_PLAY_TIME_SEC,
 				self::METRIC_EBVS_RATIO,
 			),
 			self::REPORT_GRAPH_METRICS => array(
-				self::METRIC_UNIQUE_SESSIONS,
+				self::METRIC_VIEW_UNIQUE_SESSIONS,
 				self::METRIC_AVG_VIEW_PLAY_TIME_SEC,
 				self::METRIC_EBVS_RATIO,
 			)
@@ -427,7 +442,6 @@ class kKavaQoeReports extends kKavaReportsMgr
 		),
 
 		//stream quality
-
 		ReportType::QOE_STREAM_QUALITY => array(
 			self::REPORT_METRICS => array(
 				self::EVENT_TYPE_FLAVOR_SWITCH,
@@ -546,12 +560,12 @@ class kKavaQoeReports extends kKavaReportsMgr
 
 		ReportType::QOE_ERROR_TRACKING => array(
 			self::REPORT_METRICS => array(
-				self::METRIC_AVG_SESSION_ERROR_RATE,
+				self::METRIC_AVG_VIEW_SESSION_ERROR_RATE,
 				self::METRIC_ERROR_UNKNOWN_POSITION_COUNT,
 				self::METRIC_ERROR_POSITION_COUNT,
 			),
 			self::REPORT_GRAPH_METRICS => array(
-				self::METRIC_AVG_SESSION_ERROR_RATE,
+				self::METRIC_AVG_VIEW_SESSION_ERROR_RATE,
 				self::METRIC_ERROR_UNKNOWN_POSITION_COUNT,
 				self::METRIC_ERROR_POSITION_COUNT,
 			),
@@ -669,7 +683,37 @@ class kKavaQoeReports extends kKavaReportsMgr
 		);
 	}
 
-	public static function getReportDef($report_type)
+	protected static function shouldQueryHistorical($input_filter)
+	{
+		$interval = 0;
+		if ($input_filter->from_day && $input_filter->to_day)
+		{
+			return true;
+		}
+		if ($input_filter->from_date && $input_filter->to_date)
+		{
+			$interval = $input_filter->to_date - $input_filter->from_date;
+		}
+
+		return $interval > self::DYNAMIC_DATASOURCE_INTERVAL;
+	}
+
+	protected static function replaceMetricsToHistorical($metrics)
+	{
+		$historical_metrics = array();
+		$column_map = array();
+		foreach ($metrics as $metric)
+		{
+			$cur_metric = isset(self::$realtime_to_historical_metrics_map[$metric]) ?
+				self::$realtime_to_historical_metrics_map[$metric] : $metric;
+			$historical_metrics[] = $cur_metric;
+			$header = isset(self::$metrics_to_headers[$metric]) ? self::$metrics_to_headers[$metric] : $metric;
+			$column_map[$header] = $cur_metric;
+		}
+		return array($historical_metrics, $column_map);
+	}
+
+	public static function getReportDef($report_type, $input_filter)
 	{
 		$report_def = isset(self::$reports_def[$report_type]) ? self::$reports_def[$report_type] : null;
 		if (is_null($report_def))
@@ -694,13 +738,40 @@ class kKavaQoeReports extends kKavaReportsMgr
 			}
 		}
 
-		if (!isset($report_def[self::REPORT_DATA_SOURCE]))
+		self::initTransformTimeDimensions();
+
+		if (isset($report_def[self::REPORT_DATA_SOURCE]))
+		{
+			return $report_def;
+		}
+
+		if (self::shouldQueryHistorical($input_filter))
+		{
+			$report_def[self::REPORT_DATA_SOURCE] = self::DATASOURCE_HISTORICAL;
+			$column_map = array();
+			if (isset($report_def[self::REPORT_METRICS]))
+			{
+				list($metrics, $column_map) = self::replaceMetricsToHistorical($report_def[self::REPORT_METRICS]);
+				$report_def[self::REPORT_METRICS] = $metrics;
+			}
+
+			if (isset($report_def[self::REPORT_GRAPH_METRICS]))
+			{
+				list($graph_metrics, $column_map) = self::replaceMetricsToHistorical($report_def[self::REPORT_GRAPH_METRICS]);
+				$report_def[self::REPORT_GRAPH_METRICS] = $graph_metrics;
+			}
+
+			// assuming that REPORT_METRICS = REPORT_GRAPH_METRICS
+			// need to change if REPORT_METRICS != REPORT_GRAPH_METRICS
+			if ($column_map)
+			{
+				$report_def[self::REPORT_COLUMN_MAP] = $column_map;
+			}
+		}
+		else
 		{
 			$report_def[self::REPORT_DATA_SOURCE] = self::DATASOURCE_REALTIME;
 		}
-
-		self::initTransformTimeDimensions();
-
 		return $report_def;
 	}
 

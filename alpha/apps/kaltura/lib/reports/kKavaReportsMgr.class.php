@@ -23,6 +23,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_DROPPED_FRAMES_RATIO_SUM = 'droppedFramesRatioSum';
 	const METRIC_UNIQUE_PERSISTENT_SESSION_ID = 'uniquePersistentSessionId';
 	const METRIC_UNIQUE_SESSION_ID = 'uniqueSessionId';
+	const METRIC_BUFFER_STARTS = 'bufferStarts';
+	const METRIC_FLAVOR_SWITCHES = 'flavorSwitches';
 
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
@@ -72,6 +74,10 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_NODE_UNIQUE_PERCENTILES_RATIO = 'node_avg_completion_rate';
 	const METRIC_TOTAL_UNIQUE_PERCENTILES = 'total_completion_rate';
 	const METRIC_EBVS_RATIO = 'ebvs_ratio';
+	const METRIC_VIEW_PERIOD_UNIQUE_SESSIONS = 'view_period_unique_sessions';
+	const METRIC_AVG_SESSION_ERROR_RATE = 'avg_session_error_rate';
+	const METRIC_VIEW_PERIOD_BUFFER_STARTS = 'view_period_buffer_starts';
+	const METRIC_VIEW_PERIOD_FLAVOR_SWITCHES = 'view_period_flavor_switches';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -137,7 +143,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_AVG_VIEW_LIVE_LATENCY = 'avg_view_live_latency';
 	const METRIC_AVG_VIEW_DVR = 'avg_view_dvr';
 	const METRIC_VIEW_BUFFER_TIME_RATIO = 'view_buffer_time_ratio';
-	const METRIC_AVG_SESSION_ERROR_RATE = 'avg_session_error_rate';
+	const METRIC_AVG_VIEW_SESSION_ERROR_RATE = 'avg_view_session_error_rate';
 	const METRIC_AVG_VIEW_PLAY_TIME_SEC = 'avg_view_play_time_sec';
 
 	const METRIC_DYNAMIC_VIEWERS = 'viewers';
@@ -383,7 +389,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR => true,
 		self::METRIC_UNIQUE_SESSIONS => true,
 		self::METRIC_VIEW_BUFFER_TIME_RATIO => true,
-		self::METRIC_AVG_SESSION_ERROR_RATE => true,
+		self::METRIC_AVG_VIEW_SESSION_ERROR_RATE => true,
 		self::METRIC_AVG_JOIN_TIME => true,
 		self::METRIC_ENGAGEMENT_RANKING => true,
 		self::METRIC_UNIQUE_VIEWERS => true,
@@ -750,6 +756,10 @@ class kKavaReportsMgr extends kKavaBase
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
 			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_SESSIONS, self::METRIC_UNIQUE_SESSION_ID));
 
+		self::$aggregations_def[self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+			self::getHyperUniqueAggregator(self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS, self::METRIC_UNIQUE_SESSION_ID));
+
 		self::$aggregations_def[self::METRIC_UNIQUE_VIEWERS] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
 			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_VIEWERS, self::METRIC_UNIQUE_USER_IDS));
@@ -871,6 +881,14 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_ERROR),
 				self::getInFilter(self::DIMENSION_POSITION, array(self::VALUE_UNKNOWN, self::VALUE_ZERO)))),
 			self::getLongSumAggregator(self::METRIC_ERROR_UNKNOWN_POSITION_COUNT, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_VIEW_PERIOD_BUFFER_STARTS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+			self::getLongSumAggregator(self::METRIC_VIEW_PERIOD_BUFFER_STARTS, self::METRIC_BUFFER_STARTS));
+
+		self::$aggregations_def[self::METRIC_VIEW_PERIOD_FLAVOR_SWITCHES] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+			self::getLongSumAggregator(self::METRIC_VIEW_PERIOD_FLAVOR_SWITCHES, self::METRIC_FLAVOR_SWITCHES));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
@@ -1087,9 +1105,16 @@ class kKavaReportsMgr extends kKavaBase
 				self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY))));
 
 		self::$metrics_def[self::METRIC_AVG_SESSION_ERROR_RATE] = array(
-			self::DRUID_AGGR => array(self::METRIC_ERROR_SESSION_COUNT, self::METRIC_VIEW_UNIQUE_SESSIONS),
+			self::DRUID_AGGR => array(self::METRIC_ERROR_SESSION_COUNT, self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS),
 			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
 				self::METRIC_AVG_SESSION_ERROR_RATE, '/', array(
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_ERROR_SESSION_COUNT, self::METRIC_ERROR_SESSION_COUNT),
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS, self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS))));
+
+		self::$metrics_def[self::METRIC_AVG_VIEW_SESSION_ERROR_RATE] = array(
+			self::DRUID_AGGR => array(self::METRIC_ERROR_SESSION_COUNT, self::METRIC_VIEW_UNIQUE_SESSIONS),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_AVG_VIEW_SESSION_ERROR_RATE, '/', array(
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_ERROR_SESSION_COUNT, self::METRIC_ERROR_SESSION_COUNT),
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_VIEW_UNIQUE_SESSIONS, self::METRIC_VIEW_UNIQUE_SESSIONS))));
 
@@ -1603,15 +1628,15 @@ class kKavaReportsMgr extends kKavaBase
 		return $report_def;
 	}
 
-	protected static function getReportDefFromReportClass($report_type)
+	protected static function getReportDefFromReportClass($report_type, $input_filter = null)
 	{
 		$report_class = self::getReportClassName($report_type);
-		return $report_class ? $report_class::getReportDef($report_type) : null;
+		return $report_class ? $report_class::getReportDef($report_type, $input_filter) : null;
 	}
 
-	protected static function getReportDefinition($report_type)
+	protected static function getReportDefinition($report_type, $input_filter = null)
 	{
-		$report_def = self::getReportDefFromReportClass($report_type);
+		$report_def = self::getReportDefFromReportClass($report_type, $input_filter);
 		return $report_def ? self::buildReportDef($report_def) : null;
 	}
 
@@ -2785,7 +2810,6 @@ class kKavaReportsMgr extends kKavaBase
 			$granularity = self::getGranularityFromFilterInterval($input_filter->interval);
 		}
 
-
 		// zero fill
 		list($from_day, $to_day) = self::getFromToDay($input_filter);
 		if ($granularity == self::GRANULARITY_MONTH)
@@ -3025,7 +3049,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		self::init();
 		
-		$report_def = self::getReportDefinition($report_type);
+		$report_def = self::getReportDefinition($report_type, $input_filter);
 		
 		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
 		{
@@ -4926,7 +4950,7 @@ class kKavaReportsMgr extends kKavaBase
 			$page_index = 1;
 		
 		// run the query
-		$report_def = self::getReportDefinition($report_type);
+		$report_def = self::getReportDefinition($report_type, $input_filter);
 		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
 		{
 			$partner_id = Partner::ADMIN_CONSOLE_PARTNER_ID;
@@ -5292,7 +5316,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		self::init();
 
-		$report_def = self::getReportDefinition($report_type);
+		$report_def = self::getReportDefinition($report_type, $input_filter);
 		
 		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
 		{
@@ -5617,7 +5641,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		list($headers_for_total, $headers_for_table) = explode(';', $headers);
 
-		$report_def = self::getReportDefinition($report_type);
+		$report_def = self::getReportDefinition($report_type, $input_filter);
 
 		if (isset($report_def[self::REPORT_JOIN_REPORTS]) || isset($report_def[self::REPORT_JOIN_GRAPHS]) || isset($report_def[self::REPORT_GRAPH_METRICS]))
 		{
