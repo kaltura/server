@@ -269,7 +269,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			$media->setFileSize(filesize($videoPath));
 			$ingestedVideo = self::uploadInChunks($media,$videoPath, self::DEFAULT_CHUNK_SIZE_BYTE);
 			$client->setDefer(false);
-			$this->processedTimeout = $this->increaseProcessedTimeout(filesize($videoPath));
+			$this->shouldIncreaseProcessedTimeout(filesize($videoPath));
 
 			$data->remoteId = $ingestedVideo->getId();
 
@@ -689,16 +689,14 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 
 	/**
 	 * @param int $fileSize
-	 * @return int $processedTimeout
 	 */
-	private function increaseProcessedTimeout($fileSize)
+	private function shouldIncreaseProcessedTimeout($fileSize)
 	{
 		if ($fileSize > self::SIZE_2_GB)
 		{
 			$this->processedTimeout = self::LONG_PROCESS_TIMEOUT;
 			KalturaLog::info('Increased processed timeout to '.self::LONG_PROCESS_TIMEOUT.' seconds for file larger than 2GB');
 		}
-		return $this->processedTimeout;
 	}
 
 }
