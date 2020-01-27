@@ -124,19 +124,7 @@ class RabbitMQProvider extends QueueProvider
 			{
 				$connTook = microtime(true) - $connStart;
 				$logStr = "Failed to connect to MQserver [{$this->MQserver}] after [$connTook] with error [" . $e->getMessage() . "]";
-				if($e instanceof PhpAmqpLib\Exception\AMQPRuntimeException)
-				{
-					$errorType = self::RABBIT_ACTION_RUNTIME_ERROR;
-				}
-				elseif($e instanceof PhpAmqpLib\Exception\AMQPTimeoutException)
-				{
-					$errorType = self::RABBIT_ACTION_TIMEOUT;
-				}
-				else
-				{
-					$errorType = self::RABBIT_CONNECTION_ERROR;
-				}
-
+				$errorType = $this->getConnectErrorType($e);
 				$this->writeToMonitor($logStr, $this->dataSourceUrl, $errorType, $connTook, $this->exchangeName . ":" . $queueName, strlen($data));
 				if($retry == self::MAX_RETRIES)
 				{
@@ -167,14 +155,7 @@ class RabbitMQProvider extends QueueProvider
 		{
 			$sendMessageEnd = microtime(true) - $sendMessageStart;
 			$logStr = "Failed to send message after [$sendMessageEnd] with data [$data] to [$queueName] with error [" . $e->getMessage() . "]";
-			if($e instanceof PhpAmqpLib\Exception\AMQPTimeoutException)
-			{
-				$errorType = self::RABBIT_ACTION_TIMEOUT;
-			}
-			else
-			{
-				$errorType = self::RABBIT_ACTION_SEND_ERROR;
-			}
+			$errorType = $this->getSendErrorType($e);
 			$this->writeToMonitor($logStr, $this->dataSourceUrl, $errorType, $sendMessageEnd, $this->exchangeName . ":" . $queueName, strlen($data));
 			throw $e;
 		}
@@ -195,5 +176,35 @@ class RabbitMQProvider extends QueueProvider
 		{
 			KalturaMonitorClient::monitorRabbitAccess($dataSource, $queryType, $queryTook, $tableName, $querySize);
 		}
+	}
+
+	protected function getConnectErrorType($e)
+	{
+		if($e instanceof PhpAmqpLib\Exception\AMQPRuntimeException)
+		{
+			$errorType = self::RABBIT_ACTION_RUNTIME_ERROR;
+		}
+		elseif($e instanceof PhpAmqpLib\Exception\AMQPTimeoutException)
+		{
+			$errorType = self::RABBIT_ACTION_TIMEOUT;
+		}
+		else
+		{
+			$errorType = self::RABBIT_CONNECTION_ERROR;
+		}
+		return $errorType;
+	}
+
+	protected function getSendErrorType($e)
+	{
+		if($e instanceof PhpAmqpLib\Exception\AMQPTimeoutException)
+		{
+			$errorType = self::RABBIT_ACTION_TIMEOUT;
+		}
+		else
+		{
+			$errorType = self::RABBIT_ACTION_SEND_ERROR;
+		}
+		return $errorType;
 	}
 }
