@@ -23,13 +23,13 @@ class embedPlaykitJsAction extends sfAction
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
-	private $i18nCache = null;
 	private $eTagHash = null;
 	private $uiconfId = null;
 	private $uiConf = null;
 	private $partnerId = null;
 	private $partner = null;
 	private $bundle_name = null;
+	private $bundle_i18n_name = null;
 	private $bundlerUrl = null;
 	private $sourcesPath = null;
 	private $bundleConfig = null;
@@ -47,8 +47,8 @@ class embedPlaykitJsAction extends sfAction
 		$this->initMembers();
 		
 		$bundleContent = $this->bundleCache->get($this->bundle_name);
-		// $i18nContent = $this->i18nCache->get($this->bundle_name);
-		if (!$bundleContent || $this->regenerate) 
+		$i18nContent = $this->bundleCache->get($this->bundle_i18n_name);
+		if (!$bundleContent || $this->regenerate)
 		{
 			list($bundleContent, $i18nContent) = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this));
 		}
@@ -74,7 +74,7 @@ class embedPlaykitJsAction extends sfAction
 			$bundleContent = $context->bundleCache->get($context->bundle_name);
 			if ($bundleContent) 
 			{
-				// $i18nContent = $context->i18nCache->get($context->bundle_name);
+				$i18nContent = $context->bundleCache->get($context->bundle_i18n_name);
 				return array($bundleContent, $i18nContent);
 			}
 		}
@@ -105,7 +105,7 @@ class embedPlaykitJsAction extends sfAction
 		$bundleSaved =  $context->bundleCache->set($context->bundle_name, $bundleContent);
 		$context->sourceMapsCache->set($context->bundle_name, $sourceMapContent);
 		$i18nContent = base64_decode($content['i18n']);
-		// $context->i18nCache->set($context->bundle_name, $i18nContent);
+		 $context->bundleCache->set($context->bundle_i18n_name, $i18nContent);
 		if(!$bundleSaved)
 		{
 			KalturaLog::log("Error - failed to save bundle content in cache for config [".$config."]");
@@ -564,11 +564,7 @@ class embedPlaykitJsAction extends sfAction
 		$this->sourceMapsCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYKIT_JS_SOURCE_MAP);
 		if (!$this->sourceMapsCache)
 			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, "PlayKit source maps cache not defined");
-		
-		$this->i18nCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYKIT_JS_I18N);
-		if (!$this->i18nCache)
-			// KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, "PlayKit i18n cache not defined");
-		
+
 		//Get uiConf ID from QS
 		$this->uiconfId = $this->getRequestParameter(self::UI_CONF_ID_PARAM_NAME);
 		if (!$this->uiconfId)
@@ -655,6 +651,7 @@ class embedPlaykitJsAction extends sfAction
 		$this->bundle_name = md5($config_str);
 		if($this->cacheVersion)
 			$this->bundle_name = $this->cacheVersion . "_" . $this->bundle_name;
+		$this->bundle_i18n_name = $this->bundle_name . "_i18n";
 	}
 	
 	public function getRequestParameter($name, $default = null)
