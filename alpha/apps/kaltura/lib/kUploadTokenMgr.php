@@ -1,7 +1,7 @@
 <?php
 class kUploadTokenMgr
 {
-	const NO_EXTENSION_IDENTIFIER = 'noext';
+	const NO_EXTENSION_IDENTIFIER = 'noex';
 	const AUTO_FINALIZE_CACHE_TTL = 2592000; //Thirty days in seconds
 	const MAX_AUTO_FINALIZE_RETIRES = 5;
 	
