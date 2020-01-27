@@ -22,16 +22,17 @@ class kBusinessConvertDL
 			return;
 		}
 
-		$lock = kLock::create("replacement_" . $replacedEntry->getId() . "_" . $replacingEntry->getId());
+		$lockName = 'replacement_' . $replacedEntry->getId() . '_' . $replacingEntry->getId();
+		$lock = kLock::create($lockName);
 		if ($lock && !$lock->lock())
 		{
-			KalturaLog::debug("Could not add a lock");
+			KalturaLog::debug('Could not lock ' . $lockName);
 			return;
 		}
 
 		if($replacingEntry->getSyncFlavorsOnceReady())
 		{
-			KalturaLog::debug("Function already ran from a different process");
+			KalturaLog::debug('Function already ran from a different process for replacedEntry: ' . $replacedEntry->getId() . ' replacing Entry: ' . $replacingEntry->getId());
 			return;
 		}
 
