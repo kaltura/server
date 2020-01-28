@@ -646,28 +646,46 @@ class LiveStreamService extends KalturaLiveEntryService
 		{
 			$res = new KalturaLiveStreamDetails();
 			$entryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($id, EntryServerNodePeer::$connectedServerNodeStatuses);
+			$primaryIsPlayableUser = false;
+			$secondaryIsPlayableUser = false;
 			foreach ($entryServerNodes as $currESN)
 			{
 				/** @var LiveEntryServerNode $currESN */
 				if ($currESN->getServerType()== EntryServerNodeType::LIVE_PRIMARY)
 				{
 					$res->primaryStreamStatus = $currESN->getStatus();
+					$primaryIsPlayableUser = $currESN->getIsPlayableUser();
 				}
 				else if ($currESN->getServerType()== EntryServerNodeType::LIVE_BACKUP)
 				{
 					$res->secondaryStreamStatus = $currESN->getStatus();
+					$secondaryIsPlayableUser = $currESN->getIsPlayableUser();
 				}
 			}
 			$res->viewMode = $liveStreamEntry->getViewMode();
-			$res->wasPublished = $liveStreamEntry->getAnyBroadcastTime() ? true : false;
+			$res->wasBroadcast = $liveStreamEntry->getCurrentBroadcastStartTime() ? true : false;
 
-			
-			$res->broadcastStatus = ;
-
-
+			$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::OFFLINE;
+			if ($res->primaryStreamStatus == EntryServerNodeStatus::PLAYABLE)
+			{
+				$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::PREVIEW;
+				if ($liveStreamEntry->getViewMode() == ViewMode::ALLOW_ALL && $primaryIsPlayableUser)
+				{
+					$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
+				}
+			}
+			if ($res->broadcastStatus == KalturaLiveStreamBroadcastStatus::OFFLINE && $res->secondaryStreamStatus == EntryServerNodeStatus::PLAYABLE)
+			{
+				$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::PREVIEW;
+				if ($liveStreamEntry->getViewMode() == ViewMode::ALLOW_ALL && $secondaryIsPlayableUser)
+				{
+					$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
+				}
+			}
+			$this->responseHandlingIsLive($liveStreamEntry->isCurrentlyLive());
 			return $res;
-
 		}
+
 		throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
 
 	}

@@ -27,7 +27,12 @@ class KalturaLiveStreamDetails extends KalturaObject
 	/**
 	 * @var bool
 	 */
-	public $wasPublished = false;
+	public $wasBroadcast = false;
+
+	/**
+	 * @var KalturaLiveStreamBroadcastStatus
+	 */
+	public $broadcastStatus  = KalturaLiveStreamBroadcastStatus::OFFLINE;
 
 	private static $map_between_objects = array
 	(
