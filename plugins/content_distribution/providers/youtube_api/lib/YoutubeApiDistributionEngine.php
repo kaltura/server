@@ -695,16 +695,20 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		if (isset(KBatchBase::$taskConfig->params->youtubeApi))
 		{
 			if (isset(KBatchBase::$taskConfig->params->youtubeApi->longProcessedTimeout))
+			{
 				$this->longProcessedTimeout = KBatchBase::$taskConfig->params->youtubeApi->longProcessedTimeout;
+			}
 
 			if (isset(KBatchBase::$taskConfig->params->youtubeApi->bigFile))
+			{
 				$this->bigFile = KBatchBase::$taskConfig->params->youtubeApi->bigFile;
+			}
 		}
 
 		if ($fileSize > $this->bigFile)
 		{
 			$this->processedTimeout = $this->longProcessedTimeout;
-			KalturaLog::info('Increased processed timeout to '.$this->processedTimeout.' seconds for file larger than 2GB');
+			KalturaLog::info('Increased processed timeout to '.$this->processedTimeout.' seconds for file larger than ' . $this->bigFile);
 		}
 	}
 
