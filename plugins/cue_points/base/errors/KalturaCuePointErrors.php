@@ -22,4 +22,6 @@ class KalturaCuePointErrors extends KalturaErrors implements kCuePointErrors
 	const USER_KS_CANNOT_LIST_RELATED_CUE_POINTS = "USER_KS_CANNOT_LIST_RELATED_CUE_POINTS;FILTER;Cue-points should not be listed [@FILTER@] as related-objects with unprivileged user ks";
 
 	const NO_PERMISSION_ON_ENTRY = "NO_PERMISSION_ON_ENTRY;ID;No permissions to insert or update cue points for entry [@ID@]";
+
+	const COPY_CUE_POINT_TO_ENTRY_NOT_PERMITTED = "NO_PERMISSION_TO_COPY_CUE_POINT_TO_ENTRY;ID,ENTRY_ID;No permissions to copy cue point [@ID@] to entry [@ENTRY_ID@]";
 }
