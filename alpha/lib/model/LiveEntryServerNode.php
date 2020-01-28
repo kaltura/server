@@ -39,9 +39,9 @@ class LiveEntryServerNode extends EntryServerNode
 				}
 			}
 
-			if (!$liveEntry->getAnyBroadcastTime())
+			if (!$liveEntry->getBroadcastTime())
 			{
-				$liveEntry->setAnyBroadcastTime(time());
+				$liveEntry->setBroadcastTime(time());
 				$liveEntry->save();
 			}
 			if ($shouldIndex)
