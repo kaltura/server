@@ -71,7 +71,7 @@ class kZoomOauth
 	 * set two minutes off the token expiration, avoid 401 response from zoom
 	 * @param array $tokenData
 	 */
-	public static function setTokenExpiryAbsoluteTime($tokenData)
+	public static function setTokenExpiryAbsoluteTime(&$tokenData)
 	{
 		$tokenData[self::EXPIRES_IN] = $tokenData[self::EXPIRES_IN] - 120;
 	}
@@ -80,7 +80,7 @@ class kZoomOauth
 	 * set two minutes off the token expiration, avoid 401 response from zoom
 	 * @param array $tokenData
 	 */
-	public static function setTokenExpiryRelativeTime($tokenData)
+	public static function setTokenExpiryRelativeTime(&$tokenData)
 	{
 		$tokenData[self::EXPIRES_IN] = time() + $tokenData[self::EXPIRES_IN] - 120;
 	}
