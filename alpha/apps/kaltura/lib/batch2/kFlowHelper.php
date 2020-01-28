@@ -1194,7 +1194,7 @@ class kFlowHelper
 		
 		if(!$dbBatchJob->getEntry())
 		{
-			KalturaLog::debug("Entry [{$dbBatchJob->getEntryId()}] not found, the entry is porbably deleted will return job to api exception");
+			KalturaLog::debug("Entry [{$dbBatchJob->getEntryId()}] not found, the entry is porbably deleted will return job instead of api exception");
 			return $dbBatchJob;
 		}
 
