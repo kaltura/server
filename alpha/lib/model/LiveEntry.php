@@ -21,6 +21,7 @@ abstract class LiveEntry extends entry
 	const CUSTOM_DATA_EXPLICIT_LIVE = "explicit_live";
 	const CUSTOM_DATA_VIEW_MODE = "view_mode";
 	const CUSTOM_DATA_RECORDING_STATUS = "recording_status";
+	const CUSTOM_DATA_BROADCAST_TIME = "broadcast_time";
 
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
@@ -295,6 +296,10 @@ abstract class LiveEntry extends entry
 	
 	public function setLastCuePointSyncTime ( $v )	{	$this->putInCustomData ( "last_cue_point_sync_time" , $v );	}
 	public function getLastCuePointSyncTime (  )	{	return (int) $this->getFromCustomData("last_cue_point_sync_time");	}
+
+	public function setBroadcastTime($v )	{	$this->putInCustomData ( self::CUSTOM_DATA_BROADCAST_TIME , $v );	}
+	public function getBroadcastTime (  )	{	return $this->getFromCustomData( self::CUSTOM_DATA_BROADCAST_TIME);	}
+
 
 	public function getPushPublishEnabled()
 	{
