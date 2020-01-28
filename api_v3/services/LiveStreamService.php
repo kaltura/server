@@ -645,7 +645,6 @@ class LiveStreamService extends KalturaLiveEntryService
 		if(in_array($liveStreamEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 		{
 			$res = new KalturaLiveStreamDetails();
-			//SET CACHE HEADERS
 			$entryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($id, EntryServerNodePeer::$connectedServerNodeStatuses);
 			foreach ($entryServerNodes as $currESN)
 			{
@@ -661,6 +660,11 @@ class LiveStreamService extends KalturaLiveEntryService
 			}
 			$res->viewMode = $liveStreamEntry->getViewMode();
 			$res->wasPublished = $liveStreamEntry->getAnyBroadcastTime() ? true : false;
+
+			
+			$res->broadcastStatus = ;
+
+
 			return $res;
 
 		}
