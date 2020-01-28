@@ -435,7 +435,7 @@ class KalturaMonitorClient
 		self::writeEvent($data);
 	}
 
-	public static function monitorRabbitAccess($dataSource, $queryType, $queryTook, $tableName = null, $querySize = null)
+	public static function monitorRabbitAccess($dataSource, $queryType, $queryTook, $tableName = null, $querySize = null, $errorType = '')
 	{
 		if (!self::$stream)
 			return;
@@ -447,6 +447,7 @@ class KalturaMonitorClient
 			self::FIELD_QUERY_TYPE		=> $queryType,
 			self::FIELD_EXECUTION_TIME	=> $queryTook,
 			self::FIELD_LENGTH		=> $querySize ? $querySize : 0,
+			self::FIELD_ERROR_CODE		=> $errorType,
 		));
 
 		self::writeDeferredEvent($data);
