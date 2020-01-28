@@ -87,26 +87,4 @@ class IndexController extends Zend_Controller_Action
 			$settings->partnerId, 
 			$settings->sessionExpiry);
 	}
-
-	public function monitoringAction()
-	{
-		$settings = Zend_Registry::get('config')->settings;
-		if (!isset($settings->monitoringDashboard))
-		{
-			return;
-		}
-/*
-		if (!Infra_AclHelper::isAllowed('developer', 'monitoring'))
-		{
-			return;
-		}
-*/
-		$monitoringDashboard = $settings->monitoringDashboard;
-
-		$this->view->monitoringDashboardUrl = rtrim($monitoringDashboard->url, "/") . "/?jwt=" .
-			Form_JwtHelper::getJwt(
-				$monitoringDashboard->jwtKey,
-				$settings->partnerId,
-				$settings->sessionExpiry);
-	}
 }
