@@ -1,5 +1,16 @@
 # Orion-15.16.0 #
 
+## New notification template Item_Pending_Moderation_Extended ##
+- Issue Type: Task
+- Issue ID: PLAT-10546
+
+### Configuration ###
+First replace all tokens from the XML file below and remove ".template" from the file name:
+/opt/kaltura/app/deployment/updates/scripts/xml/2020_02_02_mediaspaceNotificationtTemplate.template.xml
+
+#### Deployment scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/2020_02_02_deploy_mediaspace_notification.php
+
 ## SIP - Use rtmps as default streaming ##
  - Issue Type: Task
  - Issue ID: PLAT-10575
