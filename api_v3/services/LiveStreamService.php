@@ -688,7 +688,7 @@ class LiveStreamService extends KalturaLiveEntryService
 				$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
 			}
 		}
-		if ($res->broadcastStatus == KalturaLiveStreamBroadcastStatus::OFFLINE && $res->secondaryStreamStatus == EntryServerNodeStatus::PLAYABLE)
+		if ($res->broadcastStatus != KalturaLiveStreamBroadcastStatus::LIVE && $res->secondaryStreamStatus == EntryServerNodeStatus::PLAYABLE)
 		{
 			$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::PREVIEW;
 			if ($liveStreamEntry->getViewMode() == ViewMode::ALLOW_ALL && $secondaryIsPlayableUser)
