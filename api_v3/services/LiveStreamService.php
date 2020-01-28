@@ -658,6 +658,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	protected function getLiveStreamDetails($id, $liveStreamEntry): KalturaLiveStreamDetails
 	{
+		/** @var LiveEntry $liveStreamEntry*/
 		$res = new KalturaLiveStreamDetails();
 		$entryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($id, EntryServerNodePeer::$connectedServerNodeStatuses);
 		$primaryIsPlayableUser = false;
@@ -676,7 +677,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			}
 		}
 		$res->viewMode = $liveStreamEntry->getViewMode();
-		$res->wasBroadcast = $liveStreamEntry->getCurrentBroadcastStartTime() ? true : false;
+		$res->wasBroadcast = $liveStreamEntry->getAnyBroadcastTime() ? true : false;
 
 		$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::OFFLINE;
 		if ($res->primaryStreamStatus == EntryServerNodeStatus::PLAYABLE)
