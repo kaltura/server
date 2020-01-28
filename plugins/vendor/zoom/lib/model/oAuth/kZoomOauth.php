@@ -29,6 +29,9 @@ class kZoomOauth
 		$postFields = "grant_type=refresh_token&refresh_token=$oldRefreshToken";
 		$response = self::curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
 		$tokensData = self::parseTokensResponse($response);
+		$tokensData = self::validateToken($tokensData);
+		$tokensData = self::extractTokensFromData($tokensData);
+		self::setTokenExpiryRelativeTime($tokensData);
 		$vendorIntegration->saveTokensData($tokensData);
 		return $tokensData;
 	}
@@ -39,6 +42,9 @@ class kZoomOauth
 		$postFields = "grant_type=authorization_code&code={$authCode}&redirect_uri=$redirectUrl";
 		$response = self::curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
 		$tokensData = self::parseTokensResponse($response);
+		$tokensData = self::validateToken($tokensData);
+		$tokensData = self::extractTokensFromData($tokensData);
+		self::setTokenExpiryAbsoluteTime($tokensData);
 		return $tokensData;
 	}
 
@@ -63,12 +69,20 @@ class kZoomOauth
 
 	/**
 	 * set two minutes off the token expiration, avoid 401 response from zoom
-	 * @param int $expiresIn
-	 * @return int
+	 * @param array $tokenData
 	 */
-	public static function getValidUntil($expiresIn)
+	public static function setTokenExpiryAbsoluteTime($tokenData)
 	{
-		return time() + $expiresIn - 120;
+		$tokenData[self::EXPIRES_IN] = $tokenData[self::EXPIRES_IN] - 120;
+	}
+
+	/**
+	 * set two minutes off the token expiration, avoid 401 response from zoom
+	 * @param array $tokenData
+	 */
+	public static function setTokenExpiryRelativeTime($tokenData)
+	{
+		$tokenData[self::EXPIRES_IN] = time() + $tokenData[self::EXPIRES_IN] - 120;
 	}
 
 	/**
@@ -90,20 +104,17 @@ class kZoomOauth
 	{
 		$dataAsArray = json_decode($response, true);
 		KalturaLog::debug(print_r($dataAsArray, true));
-		return self::parseTokens($dataAsArray);
+		return $dataAsArray;
 	}
 
-	public static function parseTokens($tokensData)
+	public static function validateToken($tokensData)
 	{
 		if (!$tokensData || !isset($tokensData[self::REFRESH_TOKEN]) || !isset($tokensData[self::ACCESS_TOKEN]) ||
 			!isset($tokensData[self::EXPIRES_IN]))
 		{
 			ZoomHelper::exitWithError(kZoomErrorMessages::TOKEN_PARSING_FAILED . print_r($tokensData));
 		}
-
-		$expiresIn = $tokensData[self::EXPIRES_IN];
-		$tokensData[self::EXPIRES_IN] = self::getValidUntil($expiresIn);
-		return self::extractTokensFromData($tokensData);
+		return $tokensData;
 	}
 
 
