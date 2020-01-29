@@ -33,6 +33,11 @@ class kKavaQoeReports extends kKavaReportsMgr
 		self::METRIC_AVG_VIEW_BITRATE => self::METRIC_AVG_BITRATE,
 		self::EVENT_TYPE_BUFFER_START => self::METRIC_VIEW_PERIOD_BUFFER_STARTS,
 		self::EVENT_TYPE_FLAVOR_SWITCH => self::METRIC_VIEW_PERIOD_FLAVOR_SWITCHES,
+		//self map
+		self::METRIC_AVG_JOIN_TIME => self::METRIC_AVG_JOIN_TIME,
+		self::METRIC_EBVS_RATIO => self::METRIC_EBVS_RATIO,
+		self::METRIC_ERROR_UNKNOWN_POSITION_COUNT => self::METRIC_ERROR_UNKNOWN_POSITION_COUNT,
+		self::METRIC_ERROR_POSITION_COUNT => self::METRIC_ERROR_POSITION_COUNT,
 	);
 
 	protected static $reports_def_base = array(
@@ -685,17 +690,9 @@ class kKavaQoeReports extends kKavaReportsMgr
 
 	protected static function shouldQueryHistorical($input_filter)
 	{
-		$interval = 0;
-		if ($input_filter->from_day && $input_filter->to_day)
-		{
-			return true;
-		}
-		if ($input_filter->from_date && $input_filter->to_date)
-		{
-			$interval = $input_filter->to_date - $input_filter->from_date;
-		}
-
-		return $interval > self::DYNAMIC_DATASOURCE_INTERVAL;
+		return (($input_filter->from_day && $input_filter->to_day) ||
+			($input_filter->from_date && $input_filter->to_date &&
+			($input_filter->to_date - $input_filter->from_date >= self::DYNAMIC_DATASOURCE_INTERVAL)));
 	}
 
 	protected static function replaceMetricsToHistorical($metrics)
@@ -704,8 +701,11 @@ class kKavaQoeReports extends kKavaReportsMgr
 		$column_map = array();
 		foreach ($metrics as $metric)
 		{
-			$cur_metric = isset(self::$realtime_to_historical_metrics_map[$metric]) ?
-				self::$realtime_to_historical_metrics_map[$metric] : $metric;
+			if (!isset(self::$realtime_to_historical_metrics_map[$metric]))
+			{
+				throw new Exception('Undefined realtime to historical metric map');
+			}
+			$cur_metric = self::$realtime_to_historical_metrics_map[$metric];
 			$historical_metrics[] = $cur_metric;
 			$header = isset(self::$metrics_to_headers[$metric]) ? self::$metrics_to_headers[$metric] : $metric;
 			$column_map[$header] = $cur_metric;
@@ -745,32 +745,31 @@ class kKavaQoeReports extends kKavaReportsMgr
 			return $report_def;
 		}
 
-		if (self::shouldQueryHistorical($input_filter))
-		{
-			$report_def[self::REPORT_DATA_SOURCE] = self::DATASOURCE_HISTORICAL;
-			$column_map = array();
-			if (isset($report_def[self::REPORT_METRICS]))
-			{
-				list($metrics, $column_map) = self::replaceMetricsToHistorical($report_def[self::REPORT_METRICS]);
-				$report_def[self::REPORT_METRICS] = $metrics;
-			}
-
-			if (isset($report_def[self::REPORT_GRAPH_METRICS]))
-			{
-				list($graph_metrics, $column_map) = self::replaceMetricsToHistorical($report_def[self::REPORT_GRAPH_METRICS]);
-				$report_def[self::REPORT_GRAPH_METRICS] = $graph_metrics;
-			}
-
-			// assuming that REPORT_METRICS = REPORT_GRAPH_METRICS
-			// need to change if REPORT_METRICS != REPORT_GRAPH_METRICS
-			if ($column_map)
-			{
-				$report_def[self::REPORT_COLUMN_MAP] = $column_map;
-			}
-		}
-		else
+		if (!self::shouldQueryHistorical($input_filter))
 		{
 			$report_def[self::REPORT_DATA_SOURCE] = self::DATASOURCE_REALTIME;
+			return $report_def;
+		}
+
+		// query historical
+		$report_def[self::REPORT_DATA_SOURCE] = self::DATASOURCE_HISTORICAL;
+		$column_map = array();
+		$metrics_defs = array(self::REPORT_METRICS, self::REPORT_GRAPH_METRICS);
+		foreach ($metrics_defs as $metrics_def)
+		{
+			if (!isset($report_def[$metrics_def]))
+			{
+				continue;
+			}
+			list($metrics, $column_map) = self::replaceMetricsToHistorical($report_def[$metrics_def]);
+			$report_def[$metrics_def] = $metrics;
+		}
+
+		// assuming that REPORT_METRICS = REPORT_GRAPH_METRICS
+		// need to change if REPORT_METRICS != REPORT_GRAPH_METRICS
+		if ($column_map)
+		{
+			$report_def[self::REPORT_COLUMN_MAP] = $column_map;
 		}
 		return $report_def;
 	}
