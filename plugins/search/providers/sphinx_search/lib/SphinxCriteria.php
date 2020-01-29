@@ -808,7 +808,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			
 			KalturaLog::debug("Attach field[$fieldName] as sphinx field[$sphinxField] of type [$type] and comparison[$operator] for value[$valStr]");
 
-			if ( in_array($operator, self::$NEGATIVE_COMPARISON_VALUES) && $this->shouldFilterFieldFromSphinxOptimizations($objectClass,$sphinxField))
+			if ( !in_array($operator, self::$NEGATIVE_COMPARISON_VALUES) && $this->shouldFilterFieldFromSphinxOptimizations($objectClass,$sphinxField))
 			{
 				$this->setDisablePartnerOptimization(true);
 			}
