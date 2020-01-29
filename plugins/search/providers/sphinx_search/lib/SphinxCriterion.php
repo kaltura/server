@@ -10,6 +10,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 	const SPHINX_OR = '| ';
 	const SPHINX_AND = '';
 	
+	protected static $NEGATIVE_COMPARISON_VALUES = array (Criteria::NOT_EQUAL, Criteria::NOT_ILIKE, Criteria::NOT_IN, Criteria::NOT_LIKE, Criteria::ALT_NOT_EQUAL);
 	protected static $NOT_NULL_FIELDS = array("created_at","updated_at");
 	
 	/**
@@ -418,7 +419,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 			$match = $this->getStringMatchClause($sphinxField, $comparison, $value);
 			KalturaLog::debug("Add match criterion[$field] as sphinx field[$sphinxField] of type [$type] match [$match] line [" . __LINE__ . "]");
 			$this->addMatch($match);
-			if ($this->criteria->shouldFilterFieldFromSphinxOptimizations($objectClass, $sphinxField))
+			if ( !in_array($comparison, self::$NEGATIVE_COMPARISON_VALUES) && $this->criteria->shouldFilterFieldFromSphinxOptimizations($objectClass, $sphinxField))
 			{
 				$this->criteria->setDisablePartnerOptimization(true);
 			}
