@@ -44,7 +44,7 @@ class kZoomOauth
 		$tokensData = self::parseTokensResponse($response);
 		$tokensData = self::validateToken($tokensData);
 		$tokensData = self::extractTokensFromData($tokensData);
-		$tokensData = self::setTokenExpiryAbsoluteTime($tokensData);
+		$tokensData = self::setTokenExpiryRelativeTime($tokensData);
 		return $tokensData;
 	}
 
@@ -75,6 +75,7 @@ class kZoomOauth
 	public static function setTokenExpiryAbsoluteTime($tokenData)
 	{
 		$tokenData[self::EXPIRES_IN] = $tokenData[self::EXPIRES_IN] - 120;
+		KalturaLog::info("Set expire_in to " . $tokenData[self::EXPIRES_IN]);
 		return $tokenData;
 	}
 
@@ -86,6 +87,7 @@ class kZoomOauth
 	public static function setTokenExpiryRelativeTime($tokenData)
 	{
 		$tokenData[self::EXPIRES_IN] = time() + $tokenData[self::EXPIRES_IN] - 120;
+		KalturaLog::info("Set expire_in to " . $tokenData[self::EXPIRES_IN]);
 		return $tokenData;
 	}
 
@@ -104,7 +106,7 @@ class kZoomOauth
 	 * @return array
 	 * @throws Exception
 	 */
-	protected static function parseTokensResponse($response)
+	public static function parseTokensResponse($response)
 	{
 		$dataAsArray = json_decode($response, true);
 		KalturaLog::debug(print_r($dataAsArray, true));
