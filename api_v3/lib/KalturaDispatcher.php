@@ -286,16 +286,6 @@ class KalturaDispatcher
 				{
 					if ($key == '_partnerId')
 					{
-						$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id; 
-						if ($partnerId != $value)
-						{
-							$matches = false;
-							break;
-						}
-					}
-					
-					if ($key == '_partnerIds')
-					{
 						$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
 						if (!in_array($partnerId, explode(",", $value)))
 						{
