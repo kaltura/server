@@ -391,13 +391,15 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR => true,
 		self::METRIC_UNIQUE_SESSIONS => true,
 		self::METRIC_VIEW_BUFFER_TIME_RATIO => true,
-		self::METRIC_AVG_VIEW_SESSION_ERROR_RATE => true,
+		self::METRIC_AVG_SESSION_ERROR_RATE => true,
 		self::METRIC_AVG_JOIN_TIME => true,
 		self::METRIC_ENGAGEMENT_RANKING => true,
 		self::METRIC_UNIQUE_VIEWERS => true,
 		self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO => true,
 		self::METRIC_TOTAL_UNIQUE_PERCENTILES => true,
 		self::METRIC_EBVS_RATIO => true,
+		self::METRIC_AVG_VIEW_SESSION_ERROR_RATE => true,
+		self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS => true,
 	);
 
 	protected static $multi_value_dimensions = array(
