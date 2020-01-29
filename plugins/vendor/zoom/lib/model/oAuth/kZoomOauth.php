@@ -78,8 +78,8 @@ class kZoomOauth
 
 	/**
 	 * set two minutes off the token expiration, avoid 401 response from zoom
-	 * @param array $expiresIn
-	 * @return array $expiresIn
+	 * @param int $expiresIn
+	 * @return int $expiresIn
 	 */
 	public static function getTokenExpiryAbsoluteTime($expiresIn)
 	{
@@ -90,8 +90,8 @@ class kZoomOauth
 
 	/**
 	 * set two minutes off the token expiration, avoid 401 response from zoom
-	 * @param array $expiresIn
-	 * @return array $expiresIn
+	 * @param int $expiresIn
+	 * @return int $expiresIn
 	 */
 	public static function getTokenExpiryRelativeTime($expiresIn)
 	{
