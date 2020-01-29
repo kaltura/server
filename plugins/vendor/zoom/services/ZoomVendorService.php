@@ -165,7 +165,7 @@ class ZoomVendorService extends KalturaBaseService
 		kZoomOauth::validateToken($tokens);
 		$tokens = kZoomOauth::extractTokensFromData($tokens);
 		$expiresIn = $tokens[kZoomOauth::EXPIRES_IN];
-		$tokens[kZoomOauth::EXPIRES_IN] = kZoomOauth::setTokenExpiryAbsoluteTime($expiresIn);
+		$tokens[kZoomOauth::EXPIRES_IN] = kZoomOauth::getTokenExpiryAbsoluteTime($expiresIn);
 		if(!$tokens)
 		{
 			KExternalErrors::dieGracefully();

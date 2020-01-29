@@ -32,7 +32,7 @@ class kZoomOauth
 		self::validateToken($tokensData);
 		$tokensData = self::extractTokensFromData($tokensData);
 		$expiresIn = $tokensData[self::EXPIRES_IN];
-		$tokensData[self::EXPIRES_IN] = self::setTokenExpiryRelativeTime($expiresIn);
+		$tokensData[self::EXPIRES_IN] = self::getTokenExpiryRelativeTime($expiresIn);
 		$vendorIntegration->saveTokensData($tokensData);
 		return $tokensData;
 	}
@@ -46,7 +46,7 @@ class kZoomOauth
 		self::validateToken($tokensData);
 		$tokensData = self::extractTokensFromData($tokensData);
 		$expiresIn = $tokensData[self::EXPIRES_IN];
-		$tokensData[self::EXPIRES_IN] = self::setTokenExpiryRelativeTime($expiresIn);
+		$tokensData[self::EXPIRES_IN] = self::getTokenExpiryRelativeTime($expiresIn);
 		return $tokensData;
 	}
 
@@ -74,7 +74,7 @@ class kZoomOauth
 	 * @param array $expiresIn
 	 * @return array $expiresIn
 	 */
-	public static function setTokenExpiryAbsoluteTime($expiresIn)
+	public static function getTokenExpiryAbsoluteTime($expiresIn)
 	{
 		$expiresIn = $expiresIn - 120;
 		KalturaLog::info("Set Token 'expires_in' to " . $expiresIn);
@@ -86,7 +86,7 @@ class kZoomOauth
 	 * @param array $expiresIn
 	 * @return array $expiresIn
 	 */
-	public static function setTokenExpiryRelativeTime($expiresIn)
+	public static function getTokenExpiryRelativeTime($expiresIn)
 	{
 		$expiresIn = time() + $expiresIn - 120;
 		KalturaLog::info("Set Token 'expires_in' to " . $expiresIn);
