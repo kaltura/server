@@ -77,7 +77,7 @@ def safeFloat(num):
         return float('nan')
 
 def sendMessageToKafka(producer, curMessage):
-    permittedFields = {"s", "p", "a", "e", "d", "x", "r"}
+    permittedFields = {"s", "p", "a", "e", "d", "x", "r", "c", "l", "q"}
     filteredMsg = {}
     filteredMsg["time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     filteredMsg.update((key, val) for (key, val) in json.loads(curMessage).items() if key in permittedFields)
