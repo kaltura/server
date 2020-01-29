@@ -78,6 +78,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_AVG_SESSION_ERROR_RATE = 'avg_session_error_rate';
 	const METRIC_VIEW_PERIOD_BUFFER_STARTS = 'view_period_buffer_starts';
 	const METRIC_VIEW_PERIOD_FLAVOR_SWITCHES = 'view_period_flavor_switches';
+	const METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC = 'avg_view_period_time_sec';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -1149,6 +1150,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO,
 				self::METRIC_UNIQUE_PERCENTILES_SUM,
 				self::EVENT_TYPE_NODE_PLAY));
+
+		self::$metrics_def[self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC] = array(
+			self::DRUID_AGGR => array(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::EVENT_TYPE_PLAY),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC,
+				self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC,
+				self::EVENT_TYPE_PLAY));
 
 		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 	}

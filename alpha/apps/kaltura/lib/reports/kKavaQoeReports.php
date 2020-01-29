@@ -29,7 +29,7 @@ class kKavaQoeReports extends kKavaReportsMgr
 		self::METRIC_VIEW_BUFFER_TIME_RATIO => self::METRIC_BUFFER_TIME_RATIO,
 		self::METRIC_AVG_VIEW_SESSION_ERROR_RATE => self::METRIC_AVG_SESSION_ERROR_RATE,
 		self::METRIC_VIEW_UNIQUE_SESSIONS => self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS,
-		self::METRIC_AVG_VIEW_PLAY_TIME_SEC => self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME,
+		self::METRIC_AVG_VIEW_PLAY_TIME_SEC => self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC,
 		self::METRIC_AVG_VIEW_BITRATE => self::METRIC_AVG_BITRATE,
 		self::EVENT_TYPE_BUFFER_START => self::METRIC_VIEW_PERIOD_BUFFER_STARTS,
 		self::EVENT_TYPE_FLAVOR_SWITCH => self::METRIC_VIEW_PERIOD_FLAVOR_SWITCHES,
@@ -690,9 +690,9 @@ class kKavaQoeReports extends kKavaReportsMgr
 
 	protected static function shouldQueryHistorical($input_filter)
 	{
-		return (($input_filter->from_day && $input_filter->to_day) ||
+		return ($input_filter && (($input_filter->from_day && $input_filter->to_day) ||
 			($input_filter->from_date && $input_filter->to_date &&
-			($input_filter->to_date - $input_filter->from_date >= self::DYNAMIC_DATASOURCE_INTERVAL)));
+			($input_filter->to_date - $input_filter->from_date >= self::DYNAMIC_DATASOURCE_INTERVAL))));
 	}
 
 	protected static function replaceMetricsToHistorical($metrics)
