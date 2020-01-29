@@ -98,11 +98,25 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	public $operatingSystemFamilyIn;
 
 	/**
+	 * Filter by operating system
+	 *
+	 * @var string
+	 */
+	public $operatingSystemIn;
+
+	/**
 	 * Filter by browser family
 	 *
 	 * @var string
 	 */
 	public $browserFamilyIn;
+
+	/**
+	 * Filter by browser
+	 *
+	 * @var string
+	 */
+	public $browserIn;
 
 	/**
 	 * Time zone offset in minutes
@@ -216,7 +230,9 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'regionIn' => 'regions',
 		'citiesIn' => 'cities',
 		'operatingSystemFamilyIn' => 'os_families',
+		'operatingSystemIn' => 'os',
 		'browserFamilyIn' => 'browsers_families',
+		'browserIn' => 'browsers',
 		'timeZoneOffset',
 		'interval',
 		'mediaTypeIn' => 'media_types',
