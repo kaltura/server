@@ -156,6 +156,7 @@ class kBusinessPostConvertDL
 
 		if(kReplacementHelper::shouldSyncFlavorInfo($currentFlavorAsset, $currentFlavorAsset->getentry()))
 		{
+			KalturaLog::info('Syncing flavor ' . $currentFlavorAsset->getId() . ' and copying content');
 			kReplacementHelper::copyReadyReplacingEntryAssetToReplacedEntry($currentFlavorAsset);
 		}
 		

@@ -38,11 +38,23 @@ class LiveStreamEntry extends LiveEntry
 	{
 		return $this->getDynamicBroadcastUrl('primaryBroadcastingUrl', 'getPrimaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTMP);
 	}
-	
+
 	public function setSecondaryBroadcastingUrl ( $v )	{	$this->putInCustomData ( "secondaryBroadcastingUrl" , $v );	}
 	public function getSecondaryBroadcastingUrl (  )
 	{
 		return $this->getDynamicBroadcastUrl('secondaryBroadcastingUrl', 'getSecondaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTMP);
+	}
+
+	public function setPrimarySecuredBroadcastingUrl ( $v )	{	$this->putInCustomData ( "primaryRtmpsBroadcastingUrl" , $v );	}
+	public function getPrimarySecuredBroadcastingUrl (  )
+	{
+		return $this->getDynamicBroadcastUrl('primaryRtmpsBroadcastingUrl', 'getPrimaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTMPS);
+	}
+
+	public function setSecondarySecuredBroadcastingUrl ( $v )	{	$this->putInCustomData ( "secondaryRtmpsBroadcastingUrl" , $v );	}
+	public function getSecondarySecuredBroadcastingUrl (  )
+	{
+		return $this->getDynamicBroadcastUrl('secondaryRtmpsBroadcastingUrl', 'getSecondaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTMPS);
 	}
 	
 	public function setPrimaryRtspBroadcastingUrl ( $v )	{	$this->putInCustomData ( "primaryRtspBroadcastingUrl" , $v );	}

@@ -9,7 +9,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     const CACHE_PREFIX = 'executed_elastic_cluster_';
     const MAX_LENGTH = 32766;
     const MAX_CUE_POINTS = 5000;
-    const MAX_SQL_LENGTH = 131072;// 128 * 1024
+    const MAX_SQL_LENGTH = 262144;// 256 * 1024
     const CACHE_PREFIX_STICKY_SESSIONS = 'elastic_large_sql_lock_';
     const REPETITIVE_UPDATES_CONFIG_KEY = 'skip_elastic_repetitive_updates';
     const METADATA_MAX_LENGTH = 256;
@@ -224,13 +224,14 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     private function shouldSkipSaveToSphinxLog($object, &$command)
     {
         // limit the number of large SQLs to 1/min per object, since they load the sphinx log database and elastic servers
-        if (strlen($command) > self::MAX_SQL_LENGTH)
+	$commandSize = strlen($command);
+        if ($commandSize > self::MAX_SQL_LENGTH)
         {
             $lockKey = self::CACHE_PREFIX_STICKY_SESSIONS . $object->getElasticObjectName() . '_' . $object->getId();
             $cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_STICKY_SESSIONS);
             if ($cache && !$cache->add($lockKey, true, 60))
             {
-                KalturaLog::log('skipping saving elastic sphinxLog sql for key ' . $lockKey);
+                KalturaLog::log('skipping saving elastic sphinxLog sql for key ' . $lockKey . ' size is - ' . $commandSize);
                 return true;
             }
         }

@@ -113,6 +113,7 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_VIEW = 'view';
 	const EVENT_TYPE_VIEW_PERIOD = 'viewPeriod';
 	const EVENT_TYPE_NODE_PLAY = 'nodePlay';
+	const EVENT_TYPE_PLAYMANIFEST = 'playManifest';
 
 	// event types - storage / entry lifecycle
 	const EVENT_TYPE_STATUS = 'status';
@@ -173,6 +174,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_LOCATION_COUNTRY => 1,
 			self::DIMENSION_LOCATION_REGION => 1,
 			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_LOCATION_ISP => 1,
 			self::DIMENSION_BROWSER_FAMILY => 1,
 			self::DIMENSION_BROWSER => 1,
 			self::DIMENSION_OS_FAMILY => 1,
@@ -187,8 +189,10 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_CUSTOM_VAR2 => 1,
 			self::DIMENSION_CUSTOM_VAR3 => 1,
 			self::DIMENSION_EVENT_PROPERTIES => 1,
+			self::DIMENSION_PLAYER_VERSION => 1,
 			self::DIMENSION_ROOT_ENTRY_ID => 1,
 			self::DIMENSION_NODE_ID => 1,
+			self::DIMENSION_EVENT_VAR1 => 1,
 			self::DIMENSION_APPLICATION_VER => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
@@ -223,6 +227,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_LOCATION_COUNTRY => 1,
 			self::DIMENSION_LOCATION_REGION => 1,
 			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_LOCATION_ISP => 1,
 			self::DIMENSION_BROWSER_FAMILY => 1,
 			self::DIMENSION_BROWSER => 1,
 			self::DIMENSION_OS_FAMILY => 1,
@@ -257,6 +262,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_LOCATION_COUNTRY => 1,
 			self::DIMENSION_LOCATION_REGION => 1,
 			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_LOCATION_ISP => 1,
 		),
 		self::DATASOURCE_REACH_USAGE => array(
 			self::DIMENSION_PARTNER_ID => 1,
@@ -286,6 +292,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_LOCATION_COUNTRY => 1,
 			self::DIMENSION_LOCATION_REGION => 1,
 			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_LOCATION_ISP => 1,
 			self::DIMENSION_BROWSER_FAMILY => 1,
 			self::DIMENSION_BROWSER => 1,
 			self::DIMENSION_OS_FAMILY => 1,

@@ -1522,6 +1522,8 @@ class kKavaReports extends kKavaReportsMgr
 				),
 				'object_id' => self::DIMENSION_ENTRY_ID,
 				'entry_name' => self::DIMENSION_ENTRY_ID,
+				'status' => self::DIMENSION_ENTRY_ID,
+				'entry_source' => self::DIMENSION_ENTRY_ID,
 			),
 			self::REPORT_ENRICH_DEF => array(
 				array(
@@ -1530,8 +1532,11 @@ class kKavaReports extends kKavaReportsMgr
 					self::REPORT_ENRICH_CONTEXT => 'self::timestampToUnixtime',
 				),
 				array(
-					self::REPORT_ENRICH_OUTPUT => 'entry_name',
-					self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'
+					self::REPORT_ENRICH_OUTPUT => array('entry_name', 'status', 'entry_source'),
+					self::REPORT_ENRICH_FUNC => 'self::getEntriesSource',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'columns' => array('NAME', 'STATUS'),
+						),
 				),
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),

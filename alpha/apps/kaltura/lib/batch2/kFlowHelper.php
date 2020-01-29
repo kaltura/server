@@ -1191,6 +1191,12 @@ class kFlowHelper
 		// verifies that flavor asset created
 		if(!$data->getFlavorAssetId())
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+		
+		if(!$dbBatchJob->getEntry())
+		{
+			KalturaLog::debug("Entry [{$dbBatchJob->getEntryId()}] not found, the entry is porbably deleted will return job instead of api exception");
+			return $dbBatchJob;
+		}
 
 		$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 		// verifies that flavor asset exists
@@ -3208,7 +3214,8 @@ class kFlowHelper
         $liveEntry = entryPeer::retrieveByPK($liveEntryId);
         /** @var LiveStreamEntry $liveEntry */
         $recordStatus = $liveEntry->getRecordStatus();
-        $shouldAutoArchive = $liveEntry->getRecordingOptions()->getShouldAutoArchive();
+        $shouldAutoArchive = $liveEntry->getRecordingOptions() ?
+			$liveEntry->getRecordingOptions()->getShouldAutoArchive() : false;
         if ($recordStatus == RecordStatus::PER_SESSION && $shouldAutoArchive == true)
         {
             $liveEntryArchiveJobData = new kLiveEntryArchiveJobData();

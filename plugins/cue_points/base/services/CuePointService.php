@@ -54,13 +54,15 @@ class CuePointService extends KalturaBaseService
 		if(!CuePointPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, CuePointPlugin::PLUGIN_NAME);
 	}
-	
+
 	/**
 	 * Allows you to add an cue point object associated with an entry
-	 * 
+	 *
 	 * @action add
 	 * @param KalturaCuePoint $cuePoint
 	 * @return KalturaCuePoint
+	 * @throws KalturaAPIException
+	 * @throws PropelException
 	 */
 	function addAction(KalturaCuePoint $cuePoint)
 	{
@@ -79,7 +81,7 @@ class CuePointService extends KalturaBaseService
 			if($existingCuePoint)
 				throw new KalturaAPIException(KalturaCuePointErrors::CUE_POINT_SYSTEM_NAME_EXISTS, $cuePoint->systemName, $existingCuePoint->getId());
 		}
-		
+
 		/* @var $dbCuePoint CuePoint */
 		$dbCuePoint->setPartnerId($this->getPartnerId());
 		$dbCuePoint->setPuserId(is_null($cuePoint->userId) ? $this->getKuser()->getPuserId() : $cuePoint->userId);
@@ -104,7 +106,7 @@ class CuePointService extends KalturaBaseService
 			
 		return $cuePoint;
 	}
-	
+
 	/**
 	 * Allows you to add multiple cue points objects by uploading XML that contains multiple cue point definitions
 	 * 
@@ -407,6 +409,13 @@ class CuePointService extends KalturaBaseService
 		return $cuePoint;
 	}
 
+	/**
+	 * @param $id
+	 * @param $entryId
+	 * @return mixed|null
+	 * @throws KalturaAPIException
+	 * @throws Exception
+	 */
 	protected function doClone($id, $entryId)
 	{
 		$dbCuePoint = CuePointPeer::retrieveByPK($id);
@@ -415,8 +424,37 @@ class CuePointService extends KalturaBaseService
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-		$newdbCuePoint = $dbCuePoint->copyToEntry($dbEntry);
+		$newdbCuePoint = null;
+		try
+		{
+			$newdbCuePoint = $dbCuePoint->copyToEntry($dbEntry);
+		}
+		catch(Exception $ex)
+		{
+			if ($ex instanceof kCoreException)
+				$this->handleCoreException($ex, $id, $entryId);
+			else
+				throw $ex;
+		}
 		return $newdbCuePoint;
+	}
+
+	/**
+	 * @param kCoreException $ex
+	 * @param $cuePointId
+	 * @param $entryId
+	 * @throws KalturaAPIException
+	 * @throws Exception
+	 */
+	private function handleCoreException(kCoreException $ex, $cuePointId, $entryId)
+	{
+		switch($ex->getCode())
+		{
+			case kCuePointException::COPY_CUE_POINT_TO_ENTRY_NOT_PERMITTED:
+				throw new KalturaAPIException(KalturaCuePointErrors::COPY_CUE_POINT_TO_ENTRY_NOT_PERMITTED, $cuePointId, $entryId);
+			default:
+				throw $ex;
+		}
 	}
 
 	private function resetUserContentFilter($filter)

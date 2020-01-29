@@ -30,7 +30,9 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 {
 	protected $tempXmlPath;
 	protected $timeout = 90;
-	protected  $processedTimeout = 300;
+	protected $processedTimeout = 300;
+	protected $longProcessedTimeout = 1200;
+	protected $bigFile = 2147483648;
 
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
@@ -39,7 +41,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 
 	const DEFAULT_CHUNK_SIZE_BYTE = 1048576; // 1024 * 1024
 
-	const TIME_TO_WAIT_FOR_YOUTUBE_TRANSCODING = 5;
+	const TIME_TO_WAIT_FOR_YOUTUBE_TRANSCODING = 20;
 
 	public function configure()
 	{
@@ -261,10 +263,13 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			$client->setDefer(true);
 			$request = $youtube->videos->insert("status,snippet", $video);
 
+			$fileSize = kFile::fileSize($videoPath);
+
 			$media = new Google_Http_MediaFileUpload($client, $request, 'video/*', null, true, self::DEFAULT_CHUNK_SIZE_BYTE);
-			$media->setFileSize(filesize($videoPath));
+			$media->setFileSize($fileSize);
 			$ingestedVideo = self::uploadInChunks($media,$videoPath, self::DEFAULT_CHUNK_SIZE_BYTE);
 			$client->setDefer(false);
+			$this->setLongProcessedTimeout($fileSize);
 
 			$data->remoteId = $ingestedVideo->getId();
 
@@ -682,5 +687,29 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 
 	}
 
+	/**
+	 * @param int $fileSize
+	 */
+	protected function setLongProcessedTimeout($fileSize)
+	{
+		if (isset(KBatchBase::$taskConfig->params->youtubeApi))
+		{
+			if (isset(KBatchBase::$taskConfig->params->youtubeApi->longProcessedTimeout))
+			{
+				$this->longProcessedTimeout = KBatchBase::$taskConfig->params->youtubeApi->longProcessedTimeout;
+			}
+
+			if (isset(KBatchBase::$taskConfig->params->youtubeApi->bigFile))
+			{
+				$this->bigFile = KBatchBase::$taskConfig->params->youtubeApi->bigFile;
+			}
+		}
+
+		if ($fileSize > $this->bigFile)
+		{
+			$this->processedTimeout = $this->longProcessedTimeout;
+			KalturaLog::info('Increased processed timeout to '.$this->processedTimeout.' seconds for file larger than ' . $this->bigFile);
+		}
+	}
 
 }

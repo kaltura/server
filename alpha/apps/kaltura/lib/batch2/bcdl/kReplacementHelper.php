@@ -3,6 +3,8 @@
 
 class kReplacementHelper
 {
+	const KLOCK_REPLACE_ENTRY_GRAB_TIMEOUT = 5;
+	const KLOCK_REPLACE_ENTRY_HOLD_TIMEOUT = 0.5;
 
 	/**
 	 * creates a mapping between the new replacing entry assets paramsId and their type to the asset itself
@@ -403,14 +405,30 @@ class kReplacementHelper
 	 */
 	public static function shouldSyncFlavorInfo($flavorAsset, $entry)
 	{
-		if($flavorAsset->getStatus() == asset::ASSET_STATUS_DELETED)
+		if($flavorAsset->getStatus() == asset::ASSET_STATUS_DELETED || !$entry || !$entry->getReplacedEntryId())
 		{
 			return false;
 		}
 
-		if($entry->getReplacedEntryId() && $entry->getSyncFlavorsOnceReady())
+		if($entry->getSyncFlavorsOnceReady())
 		{
 			return true;
+		}
+		else
+		{
+			$lock = kLock::create('replacement_' . $entry->getReplacedEntryId() . '_' . $entry->getId());
+			if ($lock)
+			{
+				if(!$lock->lock(self::KLOCK_REPLACE_ENTRY_GRAB_TIMEOUT, self::KLOCK_REPLACE_ENTRY_HOLD_TIMEOUT))
+				{
+					return false;
+				}
+				if($entry->getSyncFlavorsOnceReady())
+				{
+					return true;
+				}
+				$lock->unlock();
+			}
 		}
 
 		return false;

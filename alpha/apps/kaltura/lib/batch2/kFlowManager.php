@@ -709,6 +709,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 
 		if(kReplacementHelper::shouldSyncFlavorInfo($object, $entry))
 		{
+			KalturaLog::info('Syncing flavor ' . $object->getId());
 			$originalFlavor = kReplacementHelper::getOriginalReplacedFlavorByEntryAndFlavorParams($entry, $object->getFlavorParamsId(), $object->getType());
 			if($originalFlavor)
 			{

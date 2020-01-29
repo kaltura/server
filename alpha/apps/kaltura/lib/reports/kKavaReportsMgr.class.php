@@ -297,6 +297,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_ERROR,
 		self::EVENT_TYPE_PLAY_REQUESTED,
 		self::EVENT_TYPE_NODE_PLAY,
+		self::EVENT_TYPE_PLAYMANIFEST,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -344,6 +345,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_BUFFER_START => 'count_buffer_start',
 		self::EVENT_TYPE_FLAVOR_SWITCH => 'count_flavor_switch',
 		self::EVENT_TYPE_PLAY_REQUESTED => 'count_play_requested',
+		self::EVENT_TYPE_PLAYMANIFEST => 'count_play_manifest',
 	);
 
 	//global transform
@@ -1449,13 +1451,13 @@ class kKavaReportsMgr extends kKavaBase
 		return $date->format('Ymd');
 	}
 
-	protected static function timestampToUnixtime($timestamp, $tz)
+	protected static function timestampToUnixtime($timestamp, $tz = null)
 	{
 		$date = new DateTime($timestamp);
 		return $date->format('U');
 	}
 
-	protected static function timestampToUnixDate($timestamp, $tz)
+	protected static function timestampToUnixDate($timestamp, $tz = null)
 	{
 		$date = new DateTime($timestamp);
 		$date->modify('12 hour');			// adding 12H in order to round to the nearest day
@@ -1463,19 +1465,19 @@ class kKavaReportsMgr extends kKavaBase
 		return $round->format('U');
 	}
 
-	protected static function timestampToSecondId($timestamp, $tz)
+	protected static function timestampToSecondId($timestamp, $tz = null)
 	{
 		$date = new DateTime($timestamp);
 		return $date->format('YmdHis');
 	}
 
-	protected static function timestampToMinuteId($timestamp, $tz)
+	protected static function timestampToMinuteId($timestamp, $tz = null)
 	{
 		$date = new DateTime($timestamp);
 		return $date->format('YmdHi');
 	}
 
-	protected static function timestampToHourId($timestamp, $tz)
+	protected static function timestampToHourId($timestamp, $tz = null)
 	{
 		// hours are returned from druid query with the right offset so no need to change it
 		$date = new DateTime($timestamp);
@@ -2007,6 +2009,9 @@ class kKavaReportsMgr extends kKavaBase
 			'playback_types' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE),
 			'playback_context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT),
 			'root_entries_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_ROOT_ENTRY_ID),
+			'event_var1' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR1),
+			'player_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYER_VERSION),
+			'isp' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_ISP),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
