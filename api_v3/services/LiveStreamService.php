@@ -656,7 +656,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 * @param $liveStreamEntry
 	 * @return KalturaLiveStreamDetails
 	 */
-	protected function getLiveStreamDetails($id, $liveStreamEntry): KalturaLiveStreamDetails
+	protected function getLiveStreamDetails($id, $liveStreamEntry)
 	{
 		/** @var LiveEntry $liveStreamEntry*/
 		$res = new KalturaLiveStreamDetails();
