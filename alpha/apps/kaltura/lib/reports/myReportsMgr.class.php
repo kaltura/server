@@ -1531,7 +1531,9 @@ class reportsInputFilter
 	public $regions;
 	public $devices;
 	public $os_families;
+	public $os;
 	public $browsers_families;
+	public $browsers;
 	public $cities;
 	public $media_types;
 	public $source_types;
