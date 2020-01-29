@@ -28,11 +28,7 @@ class kZoomOauth
 		$oldRefreshToken = $vendorIntegration->getRefreshToken();
 		$postFields = "grant_type=refresh_token&refresh_token=$oldRefreshToken";
 		$response = self::curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
-		$tokensData = self::parseTokensResponse($response);
-		self::validateToken($tokensData);
-		$tokensData = self::extractTokensFromData($tokensData);
-		$expiresIn = $tokensData[self::EXPIRES_IN];
-		$tokensData[self::EXPIRES_IN] = self::getTokenExpiryRelativeTime($expiresIn);
+		$tokensData = self::retrieveTokenData($response);
 		$vendorIntegration->saveTokensData($tokensData);
 		return $tokensData;
 	}
@@ -42,6 +38,17 @@ class kZoomOauth
 		list($zoomBaseURL, $redirectUrl, $header, $userPwd) = self::getZoomHeaderData();
 		$postFields = "grant_type=authorization_code&code={$authCode}&redirect_uri=$redirectUrl";
 		$response = self::curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
+		$tokensData = self::retrieveTokenData($response);
+		return $tokensData;
+	}
+
+	/**
+	 * @param $response
+	 * @return array $tokensData
+	 * @throws Exception
+	 */
+	protected static function retrieveTokenData($response)
+	{
 		$tokensData = self::parseTokensResponse($response);
 		self::validateToken($tokensData);
 		$tokensData = self::extractTokensFromData($tokensData);
