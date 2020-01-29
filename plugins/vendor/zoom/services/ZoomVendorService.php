@@ -164,7 +164,7 @@ class ZoomVendorService extends KalturaBaseService
 		$tokens = json_decode($tokens, true);
 		$tokens = kZoomOauth::validateToken($tokens);
 		$tokens = kZoomOauth::extractTokensFromData($tokens);
-		kZoomOauth::setTokenExpiryAbsoluteTime($tokens);
+		$tokens = kZoomOauth::setTokenExpiryAbsoluteTime($tokens);
 		if(!$tokens)
 		{
 			KExternalErrors::dieGracefully();

@@ -31,7 +31,7 @@ class kZoomOauth
 		$tokensData = self::parseTokensResponse($response);
 		$tokensData = self::validateToken($tokensData);
 		$tokensData = self::extractTokensFromData($tokensData);
-		self::setTokenExpiryRelativeTime($tokensData);
+		$tokensData = self::setTokenExpiryRelativeTime($tokensData);
 		$vendorIntegration->saveTokensData($tokensData);
 		return $tokensData;
 	}
@@ -44,7 +44,7 @@ class kZoomOauth
 		$tokensData = self::parseTokensResponse($response);
 		$tokensData = self::validateToken($tokensData);
 		$tokensData = self::extractTokensFromData($tokensData);
-		self::setTokenExpiryAbsoluteTime($tokensData);
+		$tokensData = self::setTokenExpiryAbsoluteTime($tokensData);
 		return $tokensData;
 	}
 
@@ -70,19 +70,23 @@ class kZoomOauth
 	/**
 	 * set two minutes off the token expiration, avoid 401 response from zoom
 	 * @param array $tokenData
+	 * @return array $tokenData
 	 */
-	public static function setTokenExpiryAbsoluteTime(&$tokenData)
+	public static function setTokenExpiryAbsoluteTime($tokenData)
 	{
 		$tokenData[self::EXPIRES_IN] = $tokenData[self::EXPIRES_IN] - 120;
+		return $tokenData;
 	}
 
 	/**
 	 * set two minutes off the token expiration, avoid 401 response from zoom
 	 * @param array $tokenData
+	 * @return array $tokenData
 	 */
-	public static function setTokenExpiryRelativeTime(&$tokenData)
+	public static function setTokenExpiryRelativeTime($tokenData)
 	{
 		$tokenData[self::EXPIRES_IN] = time() + $tokenData[self::EXPIRES_IN] - 120;
+		return $tokenData;
 	}
 
 	/**
