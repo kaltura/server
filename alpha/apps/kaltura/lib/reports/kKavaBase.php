@@ -67,6 +67,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_EXTRACT_TIME = 'extract_time';
 	const DIMENSION_ROOT_ENTRY_ID = 'rootEntryId';
 	const DIMENSION_NODE_ID = 'nodeId';
+	const DIMENSION_APPLICATION_VER = 'applicationVer';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -155,6 +156,7 @@ class kKavaBase extends kDruidBase
 
 	//general values
 	const VALUE_UNKNOWN = 'Unknown';
+	const VALUE_ZERO = '0';
 
 	protected static $datasources_dimensions = array(
 		self::DATASOURCE_HISTORICAL => array(
@@ -191,6 +193,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_ROOT_ENTRY_ID => 1,
 			self::DIMENSION_NODE_ID => 1,
 			self::DIMENSION_EVENT_VAR1 => 1,
+			self::DIMENSION_APPLICATION_VER => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -308,6 +311,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_PLAYER_VERSION => 1,
 			self::DIMENSION_POSITION => 1,
 			self::DIMENSION_EVENT_VAR1 => 1,
+			self::DIMENSION_APPLICATION_VER => 1,
 		),
 	);
 
