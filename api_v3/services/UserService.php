@@ -208,13 +208,6 @@ class UserService extends KalturaBaseUserService
 		}
 					
 		try {
-			$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($dbUser->getKuserId());
-			foreach($kgroupIds as $groupKId){
-				$kgroup = kuserPeer::retrieveByPK($groupKId);
-				$numberOfUsersPerGroup = $kgroup->getMembersCount();
-				$kgroup->setMembersCount($numberOfUsersPerGroup-1);
-				$kgroup->save();
-			}
 			$dbUser->setStatus(KalturaUserStatus::DELETED);
 		}
 		catch (kUserException $e) {
