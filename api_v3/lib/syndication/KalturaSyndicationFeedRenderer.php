@@ -576,8 +576,11 @@ class KalturaSyndicationFeedRenderer
 			}
 			else
 			{
-				//TODO
-				//$currentFilter->availableFromLessThanOrEqual = $this->lastEntryCreatedAt;
+				$currentFilter->startDateLessThanOrEqual = $this->lastEntryCreatedAt;
+			}
+			if (count($this->lastEntryIds))
+			{
+				$currentFilter->idNotIn = $this->lastEntryIds;
 			}
 		}
 
