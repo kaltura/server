@@ -90,6 +90,11 @@ class KalturaSyndicationFeedRenderer
 	 * @var bool
 	 */
 	private $staticPlaylist = false;
+
+	/**
+	 * @var bool
+	 */
+	private $dynamicPlaylist = false;
 					
 	/**
 	 * @var string
@@ -220,6 +225,10 @@ class KalturaSyndicationFeedRenderer
 					$this->staticPlaylist = true;
 					$this->staticPlaylistEntriesIdsOrder = explode(',', $playlist->getDataContent());
 				}
+				else
+				{
+					$this->dynamicPlaylist = true;
+				}
 			}
 		}
 		else
@@ -317,7 +326,7 @@ class KalturaSyndicationFeedRenderer
 			return $c->getRecordsCount();
 		}
 
-		if (!$this->staticPlaylist)
+		if ($this->dynamicPlaylist)
 		{
 			return $this->getEntriesCountFromDynamic();
 		}
@@ -389,13 +398,13 @@ class KalturaSyndicationFeedRenderer
 
 	public function getNextEntryByPlaylistType()
 	{
-		if ($this->staticPlaylist)
+		if ($this->dynamicPlaylist)
 		{
-			return $this->getNextEntry();
+			return $this->getNextEntryViaDynamic();
 		}
 		else
 		{
-			return $this->getNextEntryViaDynamic();
+			return $this->getNextEntry();
 		}
 	}
 
