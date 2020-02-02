@@ -307,7 +307,7 @@ class SyndicationFeedService extends KalturaBaseService
 		$createdJobsIds = array();
 		$flavorParamsId = $feedRendererToConvert->syndicationFeed->flavorParamId;
 		
-		while($entry = $feedRendererToConvert->getNextEntry())
+		while($entry = $feedRendererToConvert->getNextEntryByPlaylistType())
 		{
 			$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
 			if (!is_null($originalFlavorAsset))
