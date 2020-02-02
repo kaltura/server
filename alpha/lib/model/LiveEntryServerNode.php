@@ -24,6 +24,7 @@ class LiveEntryServerNode extends EntryServerNode
 		$liveEntry = $this->getLiveEntry();
 		if($liveEntry)
 		{
+			/** @var LiveEntry $liveEntry */
 			$shouldIndex = true;
 			if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
 			{
@@ -36,6 +37,12 @@ class LiveEntryServerNode extends EntryServerNode
 				{
 					$shouldIndex = true;
 				}
+			}
+
+			if (!$liveEntry->getBroadcastTime())
+			{
+				$liveEntry->setBroadcastTime(time());
+				$liveEntry->save();
 			}
 			if ($shouldIndex)
 			{

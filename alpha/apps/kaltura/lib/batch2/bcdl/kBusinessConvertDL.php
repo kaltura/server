@@ -22,6 +22,20 @@ class kBusinessConvertDL
 			return;
 		}
 
+		$lockName = 'replacement_' . $replacedEntry->getId() . '_' . $replacingEntry->getId();
+		$lock = kLock::create($lockName);
+		if ($lock && !$lock->lock())
+		{
+			KalturaLog::debug('Could not lock ' . $lockName);
+			return;
+		}
+
+		if($replacingEntry->getSyncFlavorsOnceReady())
+		{
+			KalturaLog::debug('Function already ran from a different process for replacedEntry: ' . $replacedEntry->getId() . ' replacing Entry: ' . $replacingEntry->getId());
+			return;
+		}
+
 		//copy and relink all the ready assets on the replacing entry to the replaced entry and change the status of the existing params that are not ready
 		$oldAssets = assetPeer::retrieveByEntryId($replacedEntry->getId());
 		$tempReadyAssets = assetPeer::retrieveByEntryId($replacingEntry->getId(), null, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
@@ -37,6 +51,11 @@ class kBusinessConvertDL
 		kReplacementHelper::createIsmManifestFileSyncLinkFromReplacingEntry($replacingEntry, $replacedEntry);
 		$nonExistingNonReadyAssets = kReplacementHelper::handleReplacingEntryNonReadyAssetsForNewParams($replacedEntry, $replacingEntry, $defaultThumbAssetNew);
 		kReplacementHelper::updateReplacedEntryFields($replacedEntry, $replacingEntry);
+
+		if($lock)
+		{
+			$lock->unlock();
+		}
 
 		//flush deffered events to re-index sphinx before temp entry deletion
 		kEventsManager::flushEvents();

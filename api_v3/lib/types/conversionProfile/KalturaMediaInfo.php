@@ -283,6 +283,12 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 	 * @var string
 	 * @requiresPermission read
 	 */
+	public $colorSpace;
+	
+	/**
+	 * @var string
+	 * @requiresPermission read
+	 */
 	public $chromaSubsampling;
 	
 	/**

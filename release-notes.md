@@ -1,3 +1,41 @@
+# Orion 15.16.0 #
+
+## Add liveStream->getDetails API action ##
+Issue Type: Task
+Issue ID : FEV-426
+
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_23_01_live_stream_get_details_action.php'
+
+## New notification template Item_Pending_Moderation_Extended ##
+- Issue Type: Task
+- Issue ID: PLAT-10546
+
+### Configuration ###
+First replace all tokens from the XML file below and remove ".template" from the file name:
+/opt/kaltura/app/deployment/updates/scripts/xml/2020_02_02_mediaspaceNotificationtTemplate.template.xml
+
+#### Deployment scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/2020_02_02_deploy_mediaspace_notification.php
+
+## SIP - Use rtmps as default streaming ##
+ - Issue Type: Task
+ - Issue ID: PLAT-10575
+
+### Installation ###
+None.
+### Configuration ###
+None.
+To force non secure rtmp streaming set forceNonSecureStreaming = true in sip.ini 
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+ - php deployment\updates\scripts\add_permissions\2020_01_19_add_rtmps_permissions_KalturaLiveEntry.php
+ 
+
 # Orion 15.15.0 #
 
 ## Enabling auto archive when using live with recording ##
