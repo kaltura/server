@@ -355,8 +355,7 @@ class PlaylistService extends KalturaEntryService
 	 */
 	function executeFromContentAction($playlistType, $playlistContent, $detailed = false, $pager = null)
 	{
-		$partnerId  = $this->getCurrentPartnerId();
-
+		$partnerId = $this->getPartnerId() ? $this->getPartnerId() : kCurrentContext::getCurrentPartnerId();
 	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 		if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
 		{
@@ -368,19 +367,6 @@ class PlaylistService extends KalturaEntryService
 		myEntryUtils::updatePuserIdsForEntries($entryList);
 		KalturaLog::debug("entry ids count: " . count($entryList));
 		return KalturaBaseEntryArray::fromDbArray($entryList, $this->getResponseProfile());
-	}
-
-	protected function getCurrentPartnerId()
-	{
-		if ($this->getPartnerId())
-		{
-			$partnerId = $this->getPartnerId();
-		}
-		else
-		{
-			$partnerId = kCurrentContext::getCurrentPartnerId();
-		}
-		return $partnerId;
 	}
 
 	protected static function handlePlaylistByType($playlistType, $entryFiltersViaEsearch, $entryFiltersViaSphinx, $partnerId, $pagerSeperateQueries, $pager, $totalResults, $playlistContent)

@@ -567,6 +567,12 @@ class KalturaSyndicationFeedRenderer
 	{
 		$this->entriesCurrentPage = null;
 		$currentFilter = $this->getNextFilter();
+		$pager = null;
+		if($this->addLinkForNextIteration)
+		{
+			$pager = new KalturaPager();
+			$pager->pageSize = $this->syndicationFeed->pageSize;
+		}
 		if (!$currentFilter)
 		{
 			return;
@@ -574,15 +580,15 @@ class KalturaSyndicationFeedRenderer
 
 		$this->updateFilter($currentFilter);
 		list($mediaEntryFilterForPlaylist, $playlistService) = self::prepareParameters($currentFilter);
-		$nextPage =  self::getEntriesFromPlaylist($playlistService, $mediaEntryFilterForPlaylist);
-		if(!count($nextPage->toArray()))
+		$entriesFromFilter =  self::getEntriesFromPlaylist($playlistService, $mediaEntryFilterForPlaylist, $pager);
+		if(!count($entriesFromFilter->toArray()))
 		{
 			$this->lastEntryIds = array();
 			$this->lastEntryCreatedAt = null;
 			return;
 		}
 
-		$this->entriesCurrentPage = $nextPage->toArray();
+		$this->entriesCurrentPage = $entriesFromFilter->toArray();
 		reset($this->entriesCurrentPage);
 	}
 
@@ -590,7 +596,7 @@ class KalturaSyndicationFeedRenderer
 	{
 		if($this->lastEntryCreatedAt)
 		{
-			if($this->getOrderByColumn() == entryPeer::CREATED_AT)
+			if($this->getOrderByColumn() === entryPeer::CREATED_AT)
 			{
 				$currentFilter->createdAtLessThanOrEqual = $this->lastEntryCreatedAt;
 			}
@@ -613,19 +619,18 @@ class KalturaSyndicationFeedRenderer
 		$mediaEntryFilterForPlaylist->fields['_name'] = null;
 
 		$playlistService = new PlaylistService();
-
 		return array($mediaEntryFilterForPlaylist, $playlistService);
 	}
 
-	protected function getEntriesFromPlaylist($playlistService, $mediaEntryFilterForPlaylist)
+	protected function getEntriesFromPlaylist($playlistService, $mediaEntryFilterForPlaylist, $pager = null)
 	{
-		$KalturaMediaEntryFilterForPlaylist = new KalturaMediaEntryFilterForPlaylist();
-		$KalturaMediaEntryFilterForPlaylist->fromObject($mediaEntryFilterForPlaylist);
+		$kalturaMediaEntryFilterForPlaylist = new KalturaMediaEntryFilterForPlaylist();
+		$kalturaMediaEntryFilterForPlaylist->fromObject($mediaEntryFilterForPlaylist);
 
-		$mediaEntryFilter  = new KalturaMediaEntryFilterForPlaylistArray();
-		$mediaEntryFilter->offsetSet(null, $KalturaMediaEntryFilterForPlaylist);
+		$kalturaMediaEntryFilterForPlaylistArray  = new KalturaMediaEntryFilterForPlaylistArray();
+		$kalturaMediaEntryFilterForPlaylistArray->offsetSet(null, $kalturaMediaEntryFilterForPlaylist);
 
-		return $playlistService->executeFromFiltersAction($mediaEntryFilter, self::TOTAL_RESULTS);
+		return $playlistService->executeFromFiltersAction($kalturaMediaEntryFilterForPlaylistArray, self::TOTAL_RESULTS, true, $pager);
 	}
 
 	protected function getNextFilter()
@@ -641,12 +646,7 @@ class KalturaSyndicationFeedRenderer
 		{
 			return null;
 		}
-		if($this->addLinkForNextIteration)
-		{
-			$filter->setLimit($this->syndicationFeed->pageSize);
-		}
 		next($this->entryFilters);
-
 		return $filter;
 	}
 
