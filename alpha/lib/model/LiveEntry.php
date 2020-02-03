@@ -548,7 +548,10 @@ abstract class LiveEntry extends entry
 
 	/**
 	 * @param EntryServerNodeType $mediaServerIndex
-	 * @param $hostname
+	 * @param string $hostname
+	 * @param KalturaEntryServerNodeStatus $liveEntryStatus
+	 * @param string $applicationName
+	 * @return LiveEntryServerNode
 	 * @throws Exception
 	 * @throws KalturaAPIException
 	 * @throws PropelException
@@ -569,10 +572,9 @@ abstract class LiveEntry extends entry
 				$this->setFirstBroadcast(kApiCache::getTime());
 			
 			$key = $this->getEntryServerNodeCacheKey($dbLiveEntryServerNode);
-			if($this->storeInCache($key) && $this->isMediaServerRegistered($mediaServerIndex, $hostname))
+			if($this->storeInCache($key))
 			{
 				KalturaLog::debug("cached and registered - index: $mediaServerIndex, hostname: $hostname");
-				return;
 			}
 		}
 		
@@ -652,16 +654,6 @@ abstract class LiveEntry extends entry
 	private function getEntryServerNodeCacheKey(EntryServerNode $entryServerNode)
 	{
 		return $entryServerNode->getEntryId()."_".$entryServerNode->getServerNodeId()."_".$entryServerNode->getServerType();
-	}
-
-	protected function isMediaServerRegistered($index, $hostname)
-	{
-		/* @var $dbLiveEntryServerNode LiveEntryServerNode*/
-		$dbLiveEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($this->getId(), $index);
-		if ($dbLiveEntryServerNode)
-			return true;
-		KalturaLog::info("mediaServer is not registered. hostname: $hostname , index: $index ");
-		return false;
 	}
 	
 	/**

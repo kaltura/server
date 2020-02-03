@@ -216,8 +216,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		$this->setMediaServerWrapper($dbLiveEntry, $mediaServerIndex, $hostname, $liveEntryStatus, $applicationName);
 
-		// setRedirectEntryId to null in all cases, even for broadcasting...
-
 		$dbLiveEntry->save();
 		return $this->checkAndCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, true, $shouldCreateRecordedEntry);
 	}
@@ -227,7 +225,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		/* @var $dbLiveEntry LiveEntry */
 		try
 		{
-			$dbLiveEntry->setMediaServer($mediaServerIndex, $hostname, $liveEntryStatus, $applicationName);
+			return $dbLiveEntry->setMediaServer($mediaServerIndex, $hostname, $liveEntryStatus, $applicationName);
 		} catch (kCoreException $ex)
 		{
 			$code = $ex->getCode();
