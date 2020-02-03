@@ -705,7 +705,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			
 		$entry = entryPeer::retrieveByPKNoFilter($object->getEntryId());
 
-		KalturaLog::info("Asset id [" . $object->getId() . "] isOriginal [" . $object->getIsOriginal() . "] statukFileSyncUtilss [" . $object->getStatus() . "]");
+		KalturaLog::info("Asset id [" . $object->getId() . "] isOriginal [" . $object->getIsOriginal() . "] status [" . $object->getStatus() . "]");
 
 		if(kReplacementHelper::shouldSyncFlavorInfo($object, $object->getEntryId()))
 		{
