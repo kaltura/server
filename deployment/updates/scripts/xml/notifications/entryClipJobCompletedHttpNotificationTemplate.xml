@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+    <multirequest>
+        <!-- Update notification template -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaHttpNotificationTemplate">
+                <name>Entry Clip Job Finished</name>
+                <systemName>HTTP_ENTRY_CLIP_JOB_FINISHED</systemName>
+                <description>HTTP notification template to be sent when a clip job finished</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>1</eventType> <!-- EventNotificationEventType::BATCH_JOB_STATUS -->
+                <eventObjectType>10</eventObjectType> <!-- EventNotificationEventObjectType::BATCHJOB -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaFieldMatchCondition">
+                        <description>Job type is CONCAT</description>
+                        <field objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getJobType()</code>
+                        </field>
+                        <values objectType="array">
+                            <item objectType="KalturaStringValue">
+                                <value>35</value> <!-- BatchJobType::CONCAT -->
+                            </item>
+                        </values>
+                    </item>
+                    <item objectType="KalturaFieldMatchCondition">
+                        <description>Job type of parent is CLIP_CONCAT</description>
+                        <field objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getParentJob()->getJobType()</code>
+                        </field>
+                        <values objectType="array">
+                            <item objectType="KalturaStringValue">
+                                <value>47</value> <!-- BatchJobType::CLIP_CONCAT -->
+                            </item>
+                        </values>
+                    </item>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>The data is class kConcatJobData</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject()->getData() instanceof kConcatJobData</code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaFieldMatchCondition">
+                        <description>This status of entry is queued</description>
+                        <field objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getStatus()</code>
+                        </field>
+                        <values objectType="array">
+                            <item objectType="KalturaStringValue">
+                                <value>5</value> <!-- KalturaBatchJobStatus::FINISHED -->
+                            </item>
+                        </values>
+                    </item>
+                </eventConditions>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>clip_trim_offset</key>
+                        <description>Clip trim offset</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null($scope->getObject()->getParentJob()) &amp;&amp; $scope->getObject()->getParentJob()->getData() instanceof kClipConcatJobData &amp;&amp; !is_null($operationAttributes = $scope->getObject()->getParentJob()->getData()->getOperationAttributes()) &amp;&amp; $operationAttributes[0] instanceof kOperationAttributes ? $operationAttributes[0]->getOffset(): ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>clip_trim_duration</key>
+                        <description>Clip trim duration</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null($scope->getObject()->getParentJob()) &amp;&amp; $scope->getObject()->getParentJob()->getData() instanceof kClipConcatJobData &amp;&amp; !is_null($operationAttributes = $scope->getObject()->getParentJob()->getData()->getOperationAttributes()) &amp;&amp; $operationAttributes[0] instanceof kOperationAttributes ? $operationAttributes[0]->getDuration(): ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null($scope->getObject()->getParentJob()) &amp;&amp; $scope->getObject()->getParentJob()->getData() instanceof kClipConcatJobData ? $scope->getObject()->getParentJob()->getData()->getSourceEntryId(): ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>created_at_timestamp</key>
+                        <description>Timestamp of the job creation date</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>time()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>reference_id</key>
+                        <description>Reference Id of entry</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null($scope->getObject()->getParentJob())&amp;&amp; $scope->getObject()->getParentJob()->getData() instanceof kClipConcatJobData &amp;&amp; !is_null(entryPeer::retrieveByPk($scope->getObject()->getParentJob()->getData()->getSourceEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getParentJob()->getData()->getSourceEntryId())->getReferenceId() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>status</key>
+                        <description>status</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>'finished'</code>
+                        </value>
+                    </item>
+                </contentParameters>
+                <method>1</method> <!-- KalturaHttpNotificationMethod::POST -->
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status><!-- EventNotificationTemplateStatus::DISABLED  -->
+        </request>
+    </multirequest>
+</xml>
