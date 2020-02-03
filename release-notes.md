@@ -1,3 +1,15 @@
+# Orion 15.17.0 #
+
+## Add partner package to audit trail config ##
+Issue Type: Task
+Issue ID : No-Plat
+
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/sql/2020_02_03_audit_trail_config_admin_console_partner_updates.sql'
+
 # Orion 15.16.0 #
 
 ## Add liveStream->getDetails API action ##
