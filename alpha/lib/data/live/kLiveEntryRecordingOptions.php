@@ -29,20 +29,20 @@ class kLiveEntryRecordingOptions
 	 */
 	protected $shouldMakeHidden = false;
 
-    /**
-     * @var boolean
-     */
+	/**
+	* @var boolean
+	*/
 	protected $shouldAutoArchive = false;
 
-    /**
-     * @var string
-     */
+	/**
+	* @var string
+	*/
 	protected $nonDeletedCuePointsTags;
 
 	/**
 	 * @var string
 	 */
-	public $archiveVodSuffixTimezone;
+	protected $archiveVodSuffixTimezone;
 
 
 	/**
