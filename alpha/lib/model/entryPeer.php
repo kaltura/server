@@ -923,6 +923,14 @@ class entryPeer extends BaseentryPeer
 		}
 	}
 
+	public static function retrieveByPkWithoutInstancePooling($id)
+	{
+		Propel::disableInstancePooling();
+		$entry = entryPeer::retrieveByPKNoFilter($id);
+		Propel::enableInstancePooling();
+		return $entry;
+	}
+
 }
 
 class entryPool
