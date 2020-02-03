@@ -84,14 +84,18 @@ class KAsyncLiveEntryArchive extends KJobHandlerWorker
 	{
 		$updatedVodEntry = new KalturaMediaEntry();
 		$broadcastStartTime = $liveEntry->lastBroadcast;
+
+		$datetime = new DateTime();
 		if ($broadcastStartTime)
 		{
-			$broadcastStartDate = gmdate(self::DATE_FORMAT, $broadcastStartTime);
+			$datetime = DateTime::createFromFormat('U',$broadcastStartTime);
 		}
-		else
+		if ($liveEntry->recordingOptions->archiveVodSuffixTimezone)
 		{
-			$broadcastStartDate = date(self::DATE_FORMAT);
+			$timeZone = new DateTimeZone($liveEntry->recordingOptions->archiveVodSuffixTimezone);
+			$datetime->setTimezone($timeZone);
 		}
+		$broadcastStartDate = $datetime->format(self::DATE_FORMAT);
 		$updatedVodEntry->name = $liveEntry->name. ' ' . $broadcastStartDate;
 		$updatedVodEntry->description = $liveEntry->description;
 		$updatedVodEntry->tags = $liveEntry->tags;

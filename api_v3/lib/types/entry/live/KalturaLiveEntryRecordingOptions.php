@@ -38,6 +38,11 @@ class KalturaLiveEntryRecordingOptions extends KalturaObject
      */
 	public $nonDeletedCuePointsTags;
 
+	/**
+	 * @var string
+	 */
+	public $archiveVodSuffixTimezone;
+
 	private static $mapBetweenObjects = array
 	(
 		"shouldCopyEntitlement",
@@ -45,7 +50,8 @@ class KalturaLiveEntryRecordingOptions extends KalturaObject
 		"shouldCopyThumbnail",
 		"shouldMakeHidden",
 		"shouldAutoArchive",
-		"nonDeletedCuePointsTags"
+		"nonDeletedCuePointsTags",
+		"archiveVodSuffixTimezone",
 	);
 	
 	/* (non-PHPdoc)

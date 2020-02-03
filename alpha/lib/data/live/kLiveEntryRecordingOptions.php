@@ -40,6 +40,12 @@ class kLiveEntryRecordingOptions
 	protected $nonDeletedCuePointsTags;
 
 	/**
+	 * @var string
+	 */
+	public $archiveVodSuffixTimezone;
+
+
+	/**
 	 * @return the $shouldCopyThumbnail
 	 */
 	public function getShouldCopyThumbnail() {
@@ -132,4 +138,22 @@ class kLiveEntryRecordingOptions
 	{
 		return $this->nonDeletedCuePointsTags;
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getArchiveVodSuffixTimezone()
+	{
+		return $this->archiveVodSuffixTimezone;
+	}
+
+	/**
+	 * @param string $archiveVodSuffixTimezone
+	 */
+	public function setArchiveVodSuffixTimezone($archiveVodSuffixTimezone)
+	{
+		$this->archiveVodSuffixTimezone = $archiveVodSuffixTimezone;
+	}
+
+
 }
