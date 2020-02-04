@@ -23,6 +23,7 @@ class EntryServerNodeFilter extends baseObjectFilter {
 			'_in_status',
 			'_eq_server_type',
 			'_in_server_type',
+			'_notin_server_type',
 		), null);
 
 		$this->allowed_order_fields = array(
