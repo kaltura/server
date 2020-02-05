@@ -8,6 +8,7 @@ class ESearchQueryFromAdvancedSearch
 	const METADATA_SEARCH_FILTER = 'MetadataSearchFilter';
 	const SEARCH_OPERATOR = 'AdvancedSearchFilterOperator';
 	const ADVANCED_SEARCH_FILTER_MATCH_CONDITION = 'AdvancedSearchFilterMatchCondition';
+	const ENTRY_CAPTION_ADVANCED_FILTER = 'kEntryCaptionAdvancedFilter';
 	const MRP_DATA_FIELD = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPData\']';
 
 	/**
@@ -30,6 +31,8 @@ class ESearchQueryFromAdvancedSearch
 			case self::SEARCH_OPERATOR:
 				return $this->createESearchQueryFromSearchFilterOperator($advancedSearchFilterItem);
 				break;
+			case self::ENTRY_CAPTION_ADVANCED_FILTER:
+				return $this->createESearchQueryFromEntryCatpionAdvancedFilter($advancedSearchFilterItem);
 			default:
 				KalturaLog::crit('Tried to convert not supported advance filter of type:' . get_class($advancedSearchFilterItem));
 		}
@@ -76,6 +79,25 @@ class ESearchQueryFromAdvancedSearch
 
 		$advanceFilterOperator->setSearchItems($items);
 		return $advanceFilterOperator;
+	}
+
+	protected function createESearchQueryFromEntryCatpionAdvancedFilter(kEntryCaptionAdvancedFilter $searchFilter)
+	{
+		$item = new ESearchCaptionItem();
+		$item->setFieldName(ESearchCaptionFieldName::CONTENT);
+		$item->setItemType(ESearchItemType::EXISTS);
+		if($searchFilter->getHasCaption())
+		{
+			$result = $item;
+		}
+		else
+		{
+			$result = new ESearchOperator();
+			$result->setOperator(ESearchOperatorType::NOT_OP);
+			$result->setSearchItems(array($item));
+		}
+
+		return $result;
 	}
 
 	/**
@@ -176,6 +198,7 @@ class ESearchQueryFromAdvancedSearch
 			case self::METADATA_SEARCH_FILTER:
 				return self::gotESearchOperator($item->getType());
 			case self::ADVANCED_SEARCH_FILTER_MATCH_CONDITION:
+			case self::ENTRY_CAPTION_ADVANCED_FILTER:
 				return true;
 			default:
 				return false;
