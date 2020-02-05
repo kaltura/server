@@ -710,8 +710,8 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		if ($fileSize > $this->bigFile)
 		{
 			$this->processedTimeout = $this->longProcessedTimeout;
-			$fileLimitSize =  ($this->bigFile / self::GIGABYTES_IN_BYTES);
-			KalturaLog::info('Increased processed timeout to '.$this->processedTimeout.' seconds for file larger than ' . $fileLimitSize . 'GB');
+			$fileSizeLimit =  ($this->bigFile / self::GIGABYTES_IN_BYTES);
+			KalturaLog::info('Increased processed timeout to '.$this->processedTimeout.' seconds for file larger than ' . $fileSizeLimit . 'GB');
 		}
 	}
 
