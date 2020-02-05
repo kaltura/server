@@ -598,6 +598,10 @@ class KalturaSyndicationFeedRenderer
 
 	protected function getNextFilter()
 	{
+		if(!$this->executed && count($this->entryFilters))
+		{
+			reset($this->entryFilters);
+		}
 		$this->executed = true;
 		if(!count($this->entryFilters))
 		{
