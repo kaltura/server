@@ -16,7 +16,7 @@ class KalturaSyndicationFeedRenderer
 
 	const PAGE_SIZE_MAX_VALUE = 500;
 
-	const TOTAL_RESULTS = 200;
+	const DYNAMIC_TOTAL_RESULTS = 200;
 	
 	/**
 	 * Maximum number of items to list
@@ -348,20 +348,15 @@ class KalturaSyndicationFeedRenderer
 		{
 			list($mediaEntryFilterForPlaylist, $playlistService) = self::prepareParameters($entryFilter);
 			$entriesFromFilter =  $this->getEntriesFromPlaylist($playlistService, $mediaEntryFilterForPlaylist);
-			$kalturaEntries = array_merge($kalturaEntries, $entriesFromFilter->toArray());
+			foreach ($entriesFromFilter as $entry)
+			{
+				if (!array_key_exists($entry->id,$kalturaEntries))
+				{
+					$kalturaEntries[$entry->id] = $entry->id;
+				}
+			}
 		}
-		$kalturaEntries = self::getEntryListUnique($kalturaEntries);
 		return count($kalturaEntries);
-	}
-
-	protected static function getEntryListUnique($kalturaEntries)
-	{
-		$entryList  = array();
-		foreach ($kalturaEntries as $kalturaEntry)
-		{
-			$entryList[$kalturaEntry->id] = $kalturaEntry;
-		}
-		return $entryList;
 	}
 	
 	public function getEntriesIds()
@@ -414,11 +409,9 @@ class KalturaSyndicationFeedRenderer
 		{
 			$this->entryIdsHandled = array();
 			$this->entriesCurrentPage = array();
-			$this->lastEntryIds = array();
-			$this->lastEntryCreatedAt = 0;
 		}
 
-		++$this->returnedEntriesCount;
+		$this->returnedEntriesCount++;
 		if ($this->returnedEntriesCount > $this->limit)
 		{
 			return false;
@@ -429,32 +422,26 @@ class KalturaSyndicationFeedRenderer
 			$this->fetchNextEntriesAccordingToFilter();
 		}
 
-		if (current($this->entriesCurrentPage))
+		while($this->entriesCurrentPage)
 		{
-			$entry = entryPeer::retrieveByPK(current($this->entriesCurrentPage)->id);
-			if($entry && !array_key_exists($entry->getId(), $this->entryIdsHandled))
+			$currentEntry = current($this->entriesCurrentPage);
+			while ($currentEntry !== false)
 			{
-				$this->handleEntry($entry);
-				return $entry;
+				$entry = entryPeer::retrieveByPK(current($this->entriesCurrentPage)->id);
+				if ($entry)
+				{
+					if (!array_key_exists($entry->getId(), $this->entryIdsHandled))
+					{
+						$this->entryIdsHandled[$entry->getId()] = $entry->getId();
+						next($this->entriesCurrentPage);
+						return $entry;
+					}
+				}
+				next($this->entriesCurrentPage);
 			}
-
-			$this->lastEntryIds = array();
-			$this->lastEntryCreatedAt = null;
+			$this->fetchNextEntriesAccordingToFilter();
 		}
 		return null;
-	}
-
-	protected function handleEntry($entry)
-	{
-		$this->entryIdsHandled[$entry->getId()] = $entry->getId();
-		next($this->entriesCurrentPage);
-		$orderByFieldValue = $this->getOrderByFieldValue($entry);
-		if ($this->lastEntryCreatedAt > $orderByFieldValue)
-		{
-			$this->lastEntryIds = array();
-		}
-		$this->lastEntryIds[] = $entry->getId();
-		$this->lastEntryCreatedAt = $orderByFieldValue;
 	}
 	
 	public function getNextEntry()
@@ -576,50 +563,20 @@ class KalturaSyndicationFeedRenderer
 	{
 		$this->entriesCurrentPage = null;
 		$currentFilter = $this->getNextFilter();
-		$pager = null;
-		if($this->addLinkForNextIteration)
-		{
-			$pager = new KalturaPager();
-			$pager->pageSize = $this->syndicationFeed->pageSize;
-		}
 		if (!$currentFilter)
 		{
 			return;
 		}
 
-		$this->updateFilter($currentFilter);
 		list($mediaEntryFilterForPlaylist, $playlistService) = self::prepareParameters($currentFilter);
-		$entriesFromFilter =  self::getEntriesFromPlaylist($playlistService, $mediaEntryFilterForPlaylist, $pager);
+		$entriesFromFilter =  self::getEntriesFromPlaylist($playlistService, $mediaEntryFilterForPlaylist);
 		if(!count($entriesFromFilter->toArray()))
 		{
-			$this->lastEntryIds = array();
-			$this->lastEntryCreatedAt = null;
 			return;
 		}
-
 		$this->entriesCurrentPage = $entriesFromFilter->toArray();
 		reset($this->entriesCurrentPage);
 	}
-
-	protected function updateFilter($currentFilter)
-	{
-		if($this->lastEntryCreatedAt)
-		{
-			if($this->getOrderByColumn() === entryPeer::CREATED_AT)
-			{
-				$currentFilter->createdAtLessThanOrEqual = $this->lastEntryCreatedAt;
-			}
-			else
-			{
-				$currentFilter->startDateLessThanOrEqual = $this->lastEntryCreatedAt;
-			}
-		}
-		if (count($this->lastEntryIds))
-		{
-			$currentFilter->idNotIn = $this->lastEntryIds;
-		}
-	}
-
 
 	protected static function prepareParameters($currentFilter)
 	{
@@ -631,7 +588,7 @@ class KalturaSyndicationFeedRenderer
 		return array($mediaEntryFilterForPlaylist, $playlistService);
 	}
 
-	protected function getEntriesFromPlaylist($playlistService, $mediaEntryFilterForPlaylist, $pager = null)
+	protected function getEntriesFromPlaylist($playlistService, $mediaEntryFilterForPlaylist)
 	{
 		$kalturaMediaEntryFilterForPlaylist = new KalturaMediaEntryFilterForPlaylist();
 		$kalturaMediaEntryFilterForPlaylist->fromObject($mediaEntryFilterForPlaylist);
@@ -639,7 +596,7 @@ class KalturaSyndicationFeedRenderer
 		$kalturaMediaEntryFilterForPlaylistArray  = new KalturaMediaEntryFilterForPlaylistArray();
 		$kalturaMediaEntryFilterForPlaylistArray->offsetSet(null, $kalturaMediaEntryFilterForPlaylist);
 
-		return $playlistService->executeFromFiltersAction($kalturaMediaEntryFilterForPlaylistArray, self::TOTAL_RESULTS, true, $pager);
+		return $playlistService->executeFromFiltersAction($kalturaMediaEntryFilterForPlaylistArray, self::DYNAMIC_TOTAL_RESULTS);
 	}
 
 	protected function getNextFilter()
@@ -651,7 +608,7 @@ class KalturaSyndicationFeedRenderer
 		}
 
 		$filter = current($this->entryFilters);
-		if(!$filter)
+		if($filter === false)
 		{
 			return null;
 		}
