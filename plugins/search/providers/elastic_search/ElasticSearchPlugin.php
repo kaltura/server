@@ -143,6 +143,9 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
 			case kESearchException::MISSING_OPERATOR_TYPE:
 				$object = new KalturaAPIException(KalturaESearchErrors::MISSING_OPERATOR_TYPE);
 				break;
+			case kESearchException::UNABLE_TO_EXECUTE_ENTRY_CAPTION_ADVANCED_FILTER:
+				$object = new KalturaAPIException(KalturaESearchErrors::UNABLE_TO_EXECUTE_ENTRY_CAPTION_ADVANCED_FILTER);
+				break;
 
 			default:
 				$object = null;

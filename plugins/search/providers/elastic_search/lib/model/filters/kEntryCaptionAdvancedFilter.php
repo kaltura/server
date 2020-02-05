@@ -31,7 +31,7 @@ class kEntryCaptionAdvancedFilter extends AdvancedSearchFilterItem
 	 */
 	public function applyCondition(IKalturaDbQuery $query)
 	{
-		throw new KalturaAPIException();//need to change this
+		throw new kESearchException(kESearchException::UNABLE_TO_EXECUTE_ENTRY_CAPTION_ADVANCED_FILTER, kESearchException::UNABLE_TO_EXECUTE_ENTRY_CAPTION_ADVANCED_FILTER);
 	}
 
 }
