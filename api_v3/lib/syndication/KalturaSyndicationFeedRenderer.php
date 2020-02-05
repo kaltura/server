@@ -350,10 +350,7 @@ class KalturaSyndicationFeedRenderer
 			$entriesFromFilter =  $this->getEntriesFromPlaylist($playlistService, $mediaEntryFilterForPlaylist);
 			foreach ($entriesFromFilter as $entry)
 			{
-				if (!array_key_exists($entry->id,$kalturaEntries))
-				{
-					$kalturaEntries[$entry->id] = $entry->id;
-				}
+				$kalturaEntries[$entry->id] = $entry->id;
 			}
 		}
 		return count($kalturaEntries);
