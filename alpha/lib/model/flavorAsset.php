@@ -233,7 +233,7 @@ class flavorAsset extends exportableAsset
 			$fileName = str_replace("\n", ' ', $fileName);
 			$fileName = kString::keepOnlyValidUrlChars($fileName);
 	
-			if ($extension)
+			if ($extension && $extension !== kUploadTokenMgr::NO_EXTENSION_IDENTIFIER)
 			{
 				$fileName .= ".$extension";
 			}
