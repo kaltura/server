@@ -45,7 +45,6 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 
 	const GIGABYTES_IN_BYTES = 1073741824;
 
-
 	public function configure()
 	{
 		parent::configure();
