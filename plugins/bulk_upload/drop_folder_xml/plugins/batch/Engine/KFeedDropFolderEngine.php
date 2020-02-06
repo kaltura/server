@@ -179,7 +179,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::err('Cannot add new drop folder file with name ['.$feedItem->guid.'] - '.$e->getMessage());
+			KalturaLog::err("Cannot add new drop folder file with name [uniqueId] - " . $e->getMessage());
 			return null;
 		}
 	}
