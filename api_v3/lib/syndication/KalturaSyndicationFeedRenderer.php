@@ -353,8 +353,7 @@ class KalturaSyndicationFeedRenderer
 			{
 				$this->addFlavorParamsAttachedFilter($entryFilter);
 			}
-			$entryFilter->fields['_lteornull_start_date'] =  time();
-			$entryFilter->fields['_gteornull_end_date'] =  time();
+			self::addDateFilters($entryFilter);
 			list($mediaEntryFilterForPlaylist, $playlistService) = self::prepareParameters($entryFilter);
 			$entriesFromFilter =  $this->getEntriesFromPlaylist($playlistService, $mediaEntryFilterForPlaylist);
 			foreach ($entriesFromFilter as $entry)
@@ -645,9 +644,14 @@ class KalturaSyndicationFeedRenderer
 				$entryFilter->setIdEquel($entryId);
 			}
 			$this->addFlavorParamsAttachedFilter($entryFilter);
-			$entryFilter->fields['_lteornull_start_date'] =  time();
-			$entryFilter->fields['_gteornull_end_date'] =  time();
+			self::addDateFilters($entryFilter);
 		}
+	}
+
+	protected static function addDateFilters($entryFilter)
+	{
+		$entryFilter->fields['_lteornull_start_date'] =  time();
+		$entryFilter->fields['_gteornull_end_date'] =  time();
 	}
 
 	/**
