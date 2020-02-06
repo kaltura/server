@@ -421,8 +421,7 @@ class KalturaSyndicationFeedRenderer
 
 		while($this->entriesCurrentPage)
 		{
-			$currentEntry = current($this->entriesCurrentPage);
-			while ($currentEntry !== false)
+			while (current($this->entriesCurrentPage) !== false)
 			{
 				$entry = entryPeer::retrieveByPK(current($this->entriesCurrentPage)->id);
 				if ($entry)
