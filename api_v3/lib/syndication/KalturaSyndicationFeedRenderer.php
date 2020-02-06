@@ -598,7 +598,12 @@ class KalturaSyndicationFeedRenderer
 
 		$kalturaMediaEntryFilterForPlaylistArray  = new KalturaMediaEntryFilterForPlaylistArray();
 		$kalturaMediaEntryFilterForPlaylistArray->offsetSet(null, $kalturaMediaEntryFilterForPlaylist);
-
+		if (!kCurrentContext::$ks)
+		{
+			$ks_str = '';
+			kSessionUtils::createKSessionNoValidations ( kCurrentContext::getCurrentPartnerId() , 0 , $ks_str , 86400 , false , '' , 'view:*,widget:1' );
+			kCurrentContext::$ks = $ks_str;
+		}
 		return $playlistService->executeFromFiltersAction($kalturaMediaEntryFilterForPlaylistArray, self::DYNAMIC_TOTAL_RESULTS);
 	}
 
