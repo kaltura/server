@@ -600,9 +600,13 @@ class KalturaSyndicationFeedRenderer
 		$kalturaMediaEntryFilterForPlaylistArray->offsetSet(null, $kalturaMediaEntryFilterForPlaylist);
 		if (!kCurrentContext::$ks)
 		{
-			$ks_str = '';
-			kSessionUtils::createKSessionNoValidations ( kCurrentContext::getCurrentPartnerId() , 0 , $ks_str , 86400 , false , '' , 'view:*,widget:1' );
-			kCurrentContext::$ks = $ks_str;
+			kSessionUtils::createKSessionNoValidations(kCurrentContext::getCurrentPartnerId(),
+									0,
+									kCurrentContext::$ks,
+									86400,
+									false,
+									'',
+									kSessionBase::WIDGET_PRIVILEGE);
 		}
 		return $playlistService->executeFromFiltersAction($kalturaMediaEntryFilterForPlaylistArray, self::DYNAMIC_TOTAL_RESULTS);
 	}

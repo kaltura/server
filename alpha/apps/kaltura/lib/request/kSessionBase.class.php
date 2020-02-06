@@ -55,7 +55,7 @@ class kSessionBase
 	const PRIVILEGE_EDIT_ADMIN_TAGS = 'editadmintags';
 	const PRIVILEGE_RESTRICT_EXPLICIT_LIVE_VIEW = "restrictexplicitliveview";
 	const PRIVILEGE_SEARCH_CONTEXT = "searchcontext";
-
+	const WIDGET_PRIVILEGE = 'view:*,widget:1';
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
 	
 	const INVALID_SESSION_KEY_PREFIX = 'invalid_session_';
