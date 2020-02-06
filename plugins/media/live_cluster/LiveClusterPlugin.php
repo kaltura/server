@@ -20,7 +20,7 @@ class LiveClusterPlugin extends KalturaPlugin implements IKalturaObjectLoader, I
      */
     public static function getEnums($baseEnumName = null)
     {
-        if(is_null($baseEnumName) || $baseEnumName === 'serverNodeType')
+        if (is_null($baseEnumName) || $baseEnumName === 'serverNodeType')
         {
             return array('LiveClusterMediaServerNodeType');
         }
@@ -33,7 +33,7 @@ class LiveClusterPlugin extends KalturaPlugin implements IKalturaObjectLoader, I
     public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
     {
         $class = self::getObjectClass($baseClass, $enumValue);
-        if($class && class_exists($class))
+        if ($class && class_exists($class))
             return new $class();
     }
 
@@ -42,10 +42,15 @@ class LiveClusterPlugin extends KalturaPlugin implements IKalturaObjectLoader, I
      */
     public static function getObjectClass($baseClass, $enumValue)
     {
-        if($baseClass === 'ServerNode' && $enumValue == self::getLiveClusterMediaServerTypeCoreValue(LiveClusterMediaServerNodeType::LIVE_CLUSTER_MEDIA_SERVER))
+        if ($baseClass === 'ServerNode' && $enumValue == self::getLiveClusterMediaServerTypeCoreValue(LiveClusterMediaServerNodeType::LIVE_CLUSTER_MEDIA_SERVER))
+        {
             return 'LiveClusterMediaServerNode';
-        if($baseClass === 'KalturaServerNode' && $enumValue == self::getLiveClusterMediaServerTypeCoreValue(LiveClusterMediaServerNodeType::LIVE_CLUSTER_MEDIA_SERVER))
+        }
+
+        if ($baseClass === 'KalturaServerNode' && $enumValue == self::getLiveClusterMediaServerTypeCoreValue(LiveClusterMediaServerNodeType::LIVE_CLUSTER_MEDIA_SERVER))
+        {
             return 'KalturaLiveClusterMediaServerNode';
+        }
     }
 
     /* (non-PHPdoc)

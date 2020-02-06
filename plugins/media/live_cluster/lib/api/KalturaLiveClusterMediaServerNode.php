@@ -41,8 +41,10 @@ class KalturaLiveClusterMediaServerNode extends KalturaMediaServerNode
      */
     public function toObject($dbObject = null, $skip = array())
     {
-        if(!$dbObject)
+        if (!$dbObject)
+        {
             $dbObject = new LiveClusterMediaServerNode();
+        }
 
         return parent::toObject($dbObject, $skip);
     }

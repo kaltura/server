@@ -8,8 +8,10 @@ class KalturaLiveClusterMediaServerNodeFilter extends KalturaLiveClusterMediaSer
 {
     public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
     {
-        if(!$type)
+        if (!$type)
+        {
             $type = LiveClusterPlugin::getLiveClusterMediaServerTypeCoreValue(LiveClusterMediaServerNodeType::LIVE_CLUSTER_MEDIA_SERVER);
+        }
 
         return parent::getTypeListResponse($pager, $responseProfile, $type);
     }
