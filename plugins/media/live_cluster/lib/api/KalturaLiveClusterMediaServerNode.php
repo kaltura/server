@@ -35,16 +35,6 @@ class KalturaLiveClusterMediaServerNode extends KalturaMediaServerNode
         return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
     }
 
-    /* (non-PHPdoc)
-     * @see KalturaObject::toInsertableObject()
-     */
-    public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
-    {
-        if(is_null($object_to_fill))
-            $object_to_fill = new LiveClusterMediaServerNode();
-
-        return parent::toInsertableObject($object_to_fill, $props_to_skip);
-    }
 
     /* (non-PHPdoc)
      * @see KalturaObject::toObject()
