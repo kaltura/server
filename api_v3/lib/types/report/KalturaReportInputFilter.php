@@ -215,6 +215,13 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $ispIn;
 
+	/**
+	 * filter by application version
+	 *
+	 * @var string
+	 */
+	public $applicationVersionIn;
+
 	private static $map_between_objects = array
 	(
 		'keywords',
@@ -247,6 +254,7 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'errorCodeIn' => 'event_var1',
 		'playerVersionIn' => 'player_versions',
 		'ispIn' => 'isp',
+		'applicationVersionIn' => 'application_versions',
 	);
 
 	protected function getMapBetweenObjects()
