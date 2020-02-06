@@ -301,10 +301,15 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		$dom = $doc->appendChild($dom);
 		$domXpath = new DOMXPath($doc);
 		
-		if (!is_object($domXpath->evaluate($fieldXpath))) {
-			$itemXPathRes = $domXpath->evaluate($fieldXpath);
-		} else {
-			$itemXPathRes = strval($domXpath->evaluate($fieldXpath)->item(0)->nodeValue);
+		$evalResult = $domXpath->evaluate($fieldXpath);
+		
+		if ($evalResult instanceof DOMNodeList)
+		{
+			$itemXPathRes = $evalResult->length > 0 ? strval($evalResult->item(0)->nodeValue) : null;
+		}
+		else
+		{
+			$itemXPathRes = $evalResult;
 		}
 		
 		return $itemXPathRes;
