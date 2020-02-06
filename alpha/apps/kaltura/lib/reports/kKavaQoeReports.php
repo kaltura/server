@@ -38,6 +38,8 @@ class kKavaQoeReports extends kKavaReportsMgr
 		self::METRIC_EBVS_RATIO => self::METRIC_EBVS_RATIO,
 		self::METRIC_ERROR_UNKNOWN_POSITION_COUNT => self::METRIC_ERROR_UNKNOWN_POSITION_COUNT,
 		self::METRIC_ERROR_POSITION_COUNT => self::METRIC_ERROR_POSITION_COUNT,
+		self::EVENT_TYPE_ERROR => self::EVENT_TYPE_ERROR,
+		self::METRIC_ERROR_SESSION_COUNT => self::METRIC_ERROR_SESSION_COUNT,
 	);
 
 	protected static $reports_def_base = array(
@@ -155,7 +157,6 @@ class kKavaQoeReports extends kKavaReportsMgr
 		),
 
 		self::ERROR_TRACKING_BASE => array(
-			self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
 			self::REPORT_METRICS => array(
 				self::EVENT_TYPE_ERROR,
 				self::METRIC_ERROR_SESSION_COUNT,
