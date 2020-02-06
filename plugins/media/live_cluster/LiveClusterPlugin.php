@@ -32,8 +32,9 @@ class LiveClusterPlugin extends KalturaPlugin implements IKalturaObjectLoader, I
      */
     public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
     {
-        if($baseClass == 'KalturaServerNode' && $enumValue == self::getLiveClusterMediaServerTypeCoreValue(LiveClusterMediaServerNodeType::LIVE_CLUSTER_MEDIA_SERVER))
-            return new KalturaLiveClusterMediaServerNode();
+        $class = self::getObjectClass($baseClass, $enumValue);
+        if($class && class_exists($class))
+            return new $class();
     }
 
     /* (non-PHPdoc)
@@ -41,8 +42,10 @@ class LiveClusterPlugin extends KalturaPlugin implements IKalturaObjectLoader, I
      */
     public static function getObjectClass($baseClass, $enumValue)
     {
-        if($baseClass == 'ServerNode' && $enumValue == self::getLiveClusterMediaServerTypeCoreValue(LiveClusterMediaServerNodeType::LIVE_CLUSTER_MEDIA_SERVER))
+        if($baseClass === 'ServerNode' && $enumValue == self::getLiveClusterMediaServerTypeCoreValue(LiveClusterMediaServerNodeType::LIVE_CLUSTER_MEDIA_SERVER))
             return 'LiveClusterMediaServerNode';
+        if($baseClass === 'KalturaServerNode' && $enumValue == self::getLiveClusterMediaServerTypeCoreValue(LiveClusterMediaServerNodeType::LIVE_CLUSTER_MEDIA_SERVER))
+            return 'KalturaLiveClusterMediaServerNode';
     }
 
     /* (non-PHPdoc)
