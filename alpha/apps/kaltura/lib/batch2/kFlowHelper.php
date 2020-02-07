@@ -3234,7 +3234,8 @@ class kFlowHelper
 
     public static function handleKuserKgroupStatusUpdate($kuserkgroup)
     {
-        if ($kuserkgroup->getStatus() == KuserKgroupStatus::DELETED) {
+        if ($kuserkgroup->getStatus() == KuserKgroupStatus::DELETED)
+        {
             $kgroup = kuserPeer::retrieveByPK($kuserkgroup->getKgroupId());
             $numberOfUsersPerGroup = $kgroup->getMembersCount();
             $kgroup->setMembersCount(max(0, $numberOfUsersPerGroup - 1));
