@@ -28,14 +28,14 @@ class kObjectCreatedHandler implements kObjectCreatedEventConsumer
 	 */
 	public function objectCreated(BaseObject $object)
 	{
-	    if($object instanceof KuserKgroup)
-	    {
-	        $kgroup = kuserPeer::retrieveByPK($object->getKgroupId());
-	        $numberOfUsersPerGroup = $kgroup->getMembersCount();
-	        $kgroup->setMembersCount($numberOfUsersPerGroup+1);
-	        $kgroup->save();
-	        return true;
-	    }
+		if($object instanceof KuserKgroup)
+		{
+			$kgroup = kuserPeer::retrieveByPK($object->getKgroupId());
+			$numberOfUsersPerGroup = $kgroup->getMembersCount();
+			$kgroup->setMembersCount($numberOfUsersPerGroup+1);
+			$kgroup->save();
+			return true;
+		}
 
 		/* @var $object entry */
 		$rootEntryId = $object->getRootEntryId();
