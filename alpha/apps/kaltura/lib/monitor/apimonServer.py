@@ -5,6 +5,7 @@ from math import isnan
 from kafka import KafkaProducer
 from kafka.errors import KafkaError
 from datetime import datetime
+import re
 import SocketServer
 import operator
 import socket
@@ -13,6 +14,7 @@ import json
 import sys
 
 eventsBuffer = {}
+aggregatedEvents = {}
 
 def stripNewlines(value):
 	return value.replace('\n', ' ').replace('\r', ' ')
@@ -31,7 +33,7 @@ class ReaderThread(Thread):
     def run(self):
         global eventsBuffer
         if options.kafkaAddress is not None and options.kafkaTopic is not None:
-            producer = KafkaProducer(bootstrap_servers=options.kafkaAddress, linger_ms=100, batch_size=16384)
+            producer = KafkaProducer(bootstrap_servers=options.kafkaAddress, acks=0, buffer_memory=2000000000, batch_size=64000)
         
         curSlot = []
         lastSlotIndex = 0
@@ -46,11 +48,24 @@ class ReaderThread(Thread):
                 lastSlotIndex = curSlotIndex
             for curMessage in data.split('\0'):
                 try:
-                    curSlot.append(json.loads(curMessage))
+                    decMessage = json.loads(curMessage)
                 except UnicodeDecodeError:
                     pass
                 except ValueError:
                     pass
+                curSlot.append(decMessage)
+                if options.kafkaAddress is not None and options.kafkaTopic is not None:
+                    aggregateMessage(decMessage)
+
+            curSec = int(datetime.now().strftime("%S"))
+            if curSec % 10 == 0:
+                try:
+                    if options.kafkaAddress is not None and options.kafkaTopic is not None:
+                        sendMessagesToKafka(producer)
+                except KafkaError as error:
+                    print(str(error))
+                    pass
+
             if not options.saveInput:
                 continue
             if (self.outputFile == None or
@@ -62,26 +77,44 @@ class ReaderThread(Thread):
                 self.outputFile = GzipFile(outputFilename, 'a')
             self.outputFile.write(curMessage.replace('\0', '\n') + '\n')
 
-            try:
-                if options.kafkaAddress is not None and options.kafkaTopic is not None:
-                    sendMessageToKafka(producer, curMessage)
-            except KafkaError as error:
-                print(str(error))
-                pass
-
-
 def safeFloat(num):
     try:
         return float(num)
     except ValueError:
         return float('nan')
 
-def sendMessageToKafka(producer, curMessage):
-    permittedFields = {"s", "p", "a", "e", "d", "x", "r", "c", "l", "q"}
+def aggregateMessage(decMessage):
+    global aggregatedEvents
     filteredMsg = {}
-    filteredMsg["time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    filteredMsg.update((key, val) for (key, val) in json.loads(curMessage).items() if key in permittedFields)
-    producer.send(options.kafkaTopic, json.dumps(filteredMsg)).get(timeout=3)
+    permittedFields = {"a", "c", "d", "e", "l", "p", "q", "r"}
+    for key in permittedFields:
+        if key in decMessage.keys():
+            filteredMsg[key] = decMessage[key]
+        else:
+            filteredMsg[key] = None
+
+    filteredMsg["l"] = re.split(':| ', filteredMsg["l"])[0]
+    eventKey = '_'.join(str(filteredMsg[x]) for x in sorted(filteredMsg))
+
+    if 'x' not in decMessage.keys():
+        decMessage["x"] = 0
+
+    if eventKey in aggregatedEvents.keys():
+        aggregatedEvents[eventKey]['count'] += 1
+        aggregatedEvents[eventKey]['executionTime'] += decMessage["x"]
+        aggregatedEvents[eventKey]['maxTime'] = max(aggregatedEvents[eventKey]['maxTime'], decMessage["x"])
+    else:
+        aggregatedEvents[eventKey] = filteredMsg
+        aggregatedEvents[eventKey]['count'] = 0
+        aggregatedEvents[eventKey]['executionTime'] = decMessage["x"]
+        aggregatedEvents[eventKey]['maxTime'] = decMessage["x"]
+        aggregatedEvents[eventKey]['time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+def sendMessagesToKafka(producer):
+    global aggregatedEvents
+    for event in aggregatedEvents:
+        producer.send(options.kafkaTopic, json.dumps(aggregatedEvents[event])).get(timeout=3)
+    aggregatedEvents = {}
                 
 class CommandHandler(SocketServer.BaseRequestHandler):
     AGGREGATED_FIELDS = 'xn'
