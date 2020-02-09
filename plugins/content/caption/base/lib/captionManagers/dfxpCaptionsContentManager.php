@@ -14,7 +14,7 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 	 * @var array
 	 */
 	protected $styles;
-	
+
 	/**
 	 * @param DOMElement $element
 	 * @param array $style
