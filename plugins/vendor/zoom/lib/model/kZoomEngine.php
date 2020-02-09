@@ -284,9 +284,9 @@ class kZoomEngine
 	protected function handleVideoRecord($meeting, $dbUser, $zoomIntegration, $validatedUsers, $recordingFile, $event)
 	{
 		$entry = $this->createEntryFromMeeting($meeting, $dbUser);
-		$this->setEntryCategory($zoomIntegration, $entry);
 		$this->handleParticipants($entry, $validatedUsers, $zoomIntegration);
 		$entry->save();
+		$this->createCategoryEntry($zoomIntegration, $entry);
 		$url = $recordingFile->download_url . self::URL_ACCESS_TOKEN . $event->downloadToken;
 		kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url);
 		return $entry;
@@ -353,11 +353,17 @@ class kZoomEngine
 	 * @param entry $entry
 	 * @throws kCoreException
 	 */
-	protected function setEntryCategory($zoomIntegration, $entry)
+	public function createCategoryEntry($zoomIntegration, $entry)
 	{
 		if ($zoomIntegration->getZoomCategory())
 		{
-			$entry->setCategories($zoomIntegration->getZoomCategory());
+			$categoryEntry = new categoryEntry();
+			$categoryEntry->setEntryId($entry);
+			$categoryEntry->setCategoryId($zoomIntegration->getZoomCategoryId());
+			$categoryEntry->setPartnerId($entry->getPartnerId());
+			$categoryEntry->setCreatorKuserId($entry->getKuserId());
+			$categoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
+			$categoryEntry->save();
 		}
 	}
 
