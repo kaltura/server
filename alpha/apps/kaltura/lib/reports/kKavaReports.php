@@ -1545,7 +1545,7 @@ class kKavaReports extends kKavaReportsMgr
 				self::DRUID_DIRECTION => '-'
 			),
 		),
-    
+
 	);
 
 	public static function getReportDef($report_type, $input_filter)

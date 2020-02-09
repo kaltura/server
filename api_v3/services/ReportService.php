@@ -457,7 +457,7 @@ class ReportService extends KalturaBaseService
 		foreach($paramsStrArray as $paramStr)
 		{
 			$paramStr = trim($paramStr);
-			$paramArray = explode('=', $paramStr);
+			$paramArray = explode('=', $paramStr, 2);
 			$paramKeyValue = new KalturaKeyValue();
 			$paramKeyValue->key = isset($paramArray[0]) ? $paramArray[0] : null;
 			$paramKeyValue->value = isset($paramArray[1]) ? $paramArray[1] : null;

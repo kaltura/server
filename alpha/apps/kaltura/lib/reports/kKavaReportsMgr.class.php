@@ -23,8 +23,6 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_DROPPED_FRAMES_RATIO_SUM = 'droppedFramesRatioSum';
 	const METRIC_UNIQUE_PERSISTENT_SESSION_ID = 'uniquePersistentSessionId';
 	const METRIC_UNIQUE_SESSION_ID = 'uniqueSessionId';
-	const METRIC_BUFFER_STARTS = 'bufferStarts';
-	const METRIC_FLAVOR_SWITCHES = 'flavorSwitches';
 
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
@@ -73,12 +71,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_COUNT_EBVS = 'count_ebvs';
 	const METRIC_NODE_UNIQUE_PERCENTILES_RATIO = 'node_avg_completion_rate';
 	const METRIC_TOTAL_UNIQUE_PERCENTILES = 'total_completion_rate';
-	const METRIC_EBVS_RATIO = 'ebvs_ratio';
-	const METRIC_VIEW_PERIOD_UNIQUE_SESSIONS = 'view_period_unique_sessions';
-	const METRIC_AVG_SESSION_ERROR_RATE = 'avg_session_error_rate';
-	const METRIC_VIEW_PERIOD_BUFFER_STARTS = 'view_period_buffer_starts';
-	const METRIC_VIEW_PERIOD_FLAVOR_SWITCHES = 'view_period_flavor_switches';
-	const METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC = 'avg_view_period_time_sec';
+	const METRIC_VOD_PLAYS_COUNT = 'vod_plays_count';
+	const METRIC_VOD_UNIQUE_PERCENTILES_RATIO = 'avg_vod_completion_rate';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -194,6 +188,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_EDIT_FILTER_FUNC = 'report_edit_filter_func';
 	const REPORT_TOTAL_FINALIZE_FUNC = 'report_total_finalize_func';
 	const REPORT_ORDER_BY = 'report_order_by';
+	const REPORT_DYNAMIC_HEADERS = 'report_dynamic_headers';
 
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -299,6 +294,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PLAY_REQUESTED,
 		self::EVENT_TYPE_NODE_PLAY,
 		self::EVENT_TYPE_PLAYMANIFEST,
+		self::EVENT_TYPE_REGISTERED,
+		self::EVENT_TYPE_REGISTRATION_IMPRESSION,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -401,6 +398,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_EBVS_RATIO => true,
 		self::METRIC_AVG_VIEW_SESSION_ERROR_RATE => true,
 		self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS => true,
+		self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -895,6 +893,12 @@ class kKavaReportsMgr extends kKavaBase
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
 			self::getLongSumAggregator(self::METRIC_VIEW_PERIOD_FLAVOR_SWITCHES, self::METRIC_FLAVOR_SWITCHES));
 
+		self::$aggregations_def[self::METRIC_VOD_PLAYS_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_VOD))),
+			self::getLongSumAggregator(self::METRIC_VOD_PLAYS_COUNT, self::METRIC_COUNT));
+
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
 		
@@ -1094,6 +1098,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_UNIQUE_PERCENTILES_RATIO,
 				self::METRIC_UNIQUE_PERCENTILES_SUM,
 				self::EVENT_TYPE_PLAY));
+
+		self::$metrics_def[self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_VOD_PLAYS_COUNT, self::METRIC_UNIQUE_PERCENTILES_SUM),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO,
+				self::METRIC_UNIQUE_PERCENTILES_SUM,
+				self::METRIC_VOD_PLAYS_COUNT));
 
 		self::$metrics_def[self::METRIC_VIEW_BUFFER_TIME_RATIO] = array(
 			self::DRUID_AGGR => array(self::EVENT_TYPE_VIEW, self::METRIC_VIEW_BUFFER_TIME_SEC),
@@ -3988,8 +3999,9 @@ class kKavaReportsMgr extends kKavaBase
 				foreach ($cur_enrich_specs as $enrich_spec)
 				{
 					list($enrich_func, $enrich_context, $enriched_indexes) = $enrich_spec;
+					
 					$entities = call_user_func($enrich_func, array_keys($dimension_ids), $partner_id, $enrich_context);
-			
+
 					for ($current_row = $start; $current_row < $limit; $current_row++) 
 					{
 						$key = self::arrayGetElements($data[$current_row], $dim_indexes);
@@ -5426,11 +5438,6 @@ class kKavaReportsMgr extends kKavaBase
 				continue;
 			}
 
-			if ($key != 'value')		// currently, limiting var replacement only for keys called 'value'
-			{
-				continue;
-			}
-
 			if (!is_string($value) || !$value || $value[0] != ':')
 			{
 				continue;
@@ -5443,6 +5450,59 @@ class kKavaReportsMgr extends kKavaBase
 			}
 			$value = $params[$param_name];
 		}
+	}
+
+
+	protected static function enrichReportWithUserEntryMetadataFields($report_def, $field, $context)
+	{
+		$headers = explode(",", $context['headers']);
+		$metadataXpath = explode(",", $context['xpath_patterns']);
+		$metadataProfileId = $context['metadata_profile_id'];
+		$entries_ids = $context['entry_ids'];
+
+		$dimensions = array();
+		$dimensionHeaders = array();
+		$dimensionMap = array();
+
+		for($i = 0; $i < count($headers); ++$i)
+		{
+			$header = $headers[$i];
+			$dimensions[] = $field;
+			$dimensionHeaders[] = $header;
+			$dimensionMap[$header] = $field;
+		}
+
+		$dimensions = array_unique($dimensions);
+		$report_dimensions = $report_def[self::REPORT_DIMENSION];
+		$curr_dimensions = is_array($report_dimensions) ? $report_dimensions : array($report_dimensions);
+		$dimensions = array_unique(array_merge($curr_dimensions, $dimensions));
+
+		$enrichDef = array();
+		$enrichDef[self::REPORT_ENRICH_OUTPUT] = $dimensionHeaders;
+		$enrichDef[self::REPORT_ENRICH_FUNC] = "kMetadataKavaUtils::metadataEnrich";
+		$enrichDef[self::REPORT_ENRICH_INPUT] = $field;
+		$context = array();
+		$context["metadata_profile_id"] = $metadataProfileId;
+		$context["xpath_patterns"] = $metadataXpath;
+		$context["entries_ids"] = $entries_ids;
+		$enrichDef[self::REPORT_ENRICH_CONTEXT] = $context;
+
+		$report_def[self::REPORT_DIMENSION] = array_values($dimensions);
+		$report_def[self::REPORT_DIMENSION_HEADERS] = array_merge($report_def[self::REPORT_DIMENSION_HEADERS], $dimensionHeaders);
+		if (isset($report_def[self::REPORT_DIMENSION_MAP]))
+		{
+			$report_def[self::REPORT_DIMENSION_MAP] = array_replace($report_def[self::REPORT_DIMENSION_MAP], $dimensionMap);
+		}
+
+		if (!isset($report_def[self::REPORT_ENRICH_DEF]))
+		{
+			$report_def[self::REPORT_ENRICH_DEF] = array();
+		}
+		$report_def[self::REPORT_ENRICH_DEF][] = $enrichDef;
+
+		return $report_def;
+
+
 	}
 
 	protected static function addEntryDescendants($partner_id, $ids)
@@ -5544,6 +5604,19 @@ class kKavaReportsMgr extends kKavaBase
 			self::replaceCustomParams($report_def[self::REPORT_ENRICH_DEF], $params);
 		}
 
+		if (isset($report_def[self::REPORT_DYNAMIC_HEADERS]))
+		{
+			self::replaceCustomParams($report_def[self::REPORT_DYNAMIC_HEADERS], $params);
+			$dynamicEnrich = $report_def[self::REPORT_DYNAMIC_HEADERS];
+			foreach ($dynamicEnrich as $dynamicEnrichDef)
+			{
+				$func = $dynamicEnrichDef[self::REPORT_ENRICH_FUNC];
+				$field = $dynamicEnrichDef['field'];
+				$context = $dynamicEnrichDef[self::REPORT_ENRICH_CONTEXT];
+				$report_def = call_user_func($func, $report_def, $field, $context);
+			}
+		}
+
 		$object_ids = isset($input_filter->object_ids) ? $input_filter->object_ids : null; 
 
 		if (isset($report_def[self::REPORT_GRAPH_METRICS]))
@@ -5581,6 +5654,20 @@ class kKavaReportsMgr extends kKavaBase
 				$object_ids,
 				self::GET_TABLE_FLAG_IS_CSV,
 				$response_options);
+
+			if (isset($report_def["report_headers_to_remove"]))
+			{
+				$headers_to_remove = $report_def["report_headers_to_remove"];
+				foreach ($headers_to_remove as $header_to_remove)
+				{
+					$field_index = array_search($header_to_remove, $header);
+					unset($header[$field_index]);
+					foreach($data as &$row)
+					{
+						unset($row[$field_index]);
+					}
+				}
+			}
 		}
 		else
 		{
@@ -5722,56 +5809,3 @@ class kKavaReportsMgr extends kKavaBase
 	 * @param string $object_ids
 	 * @param int $page_size
 	 * @param int $page_index
-	 * @param string $order_by
-	 */
-	public static function getUrlForReportAsCsv(
-		$partner_id,
-		$report_title, $report_text, $headers,
-		$report_type,
-		reportsInputFilter $input_filter,
-		$dimension = null,
-		$object_ids = null,
-		$page_size =10, $page_index =0, $order_by, $response_options = null)
-	{
-		if (!self::shouldUseKava($partner_id, $report_type))
-		{
-			return myReportsMgr::getUrlForReportAsCsv(
-				$partner_id, 
-				$report_title, $report_text, $headers, 
-				$report_type, 
-				$input_filter, 
-				$dimension, 
-				$object_ids,
-				$page_size, $page_index, $order_by);					
-		}
-
-		if (!$response_options)
-		{
-			$response_options = new kReportResponseOptions();
-		}
-
-		self::init();
-		
-		list($file_path, $file_name) = myReportsMgr::createFileName($partner_id, $report_type, $input_filter, $dimension, $object_ids, $page_size, $page_index, $order_by);
-
-		$data = self::getCsvData($partner_id,
-			$report_title, $report_text, $headers,
-			$report_type,
-			$input_filter,
-			$dimension,
-			$object_ids,
-			$page_size, $page_index, $order_by, $response_options);
-
-		kFile::fullMkfileDir(dirname($file_path), 0777);
-
-		//adding BOM for fixing problem in open .csv file with special chars using excel.
-		$BOM = "\xEF\xBB\xBF";
-		$f = @fopen($file_path, 'w');
-		fwrite($f, $BOM);
-		fwrite($f, $data);
-		fclose($f);
-
-		$url = myReportsMgr::createUrl($partner_id, $file_name);
-		return $url;
-	}
-}
