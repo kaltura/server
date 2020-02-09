@@ -286,8 +286,8 @@ class KalturaDispatcher
 				{
 					if ($key == '_partnerId')
 					{
-						$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id; 
-						if ($partnerId != $value)
+						$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
+						if (!in_array($partnerId, explode(",", $value)))
 						{
 							$matches = false;
 							break;
@@ -360,8 +360,9 @@ class KalturaDispatcher
 		$partnerId = kCurrentContext::$ks_partner_id;
 		$keySeed = "$service-$action-$partnerId-$key";
 		$key = 'apiRateLimit-'.md5($keySeed);
-				
-		$cache->add($key, 0, 10);
+		
+		$cacheExpiry = isset($rule['_expiry']) ? $rule['_expiry'] : 10;
+		$cache->add($key, 0, $cacheExpiry);
 		$counter = $cache->increment($key);
 		if ($counter <= $rule['_limit'])
 		{

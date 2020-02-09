@@ -21,6 +21,7 @@ abstract class LiveEntry extends entry
 	const CUSTOM_DATA_EXPLICIT_LIVE = "explicit_live";
 	const CUSTOM_DATA_VIEW_MODE = "view_mode";
 	const CUSTOM_DATA_RECORDING_STATUS = "recording_status";
+	const CUSTOM_DATA_BROADCAST_TIME = "broadcast_time";
 
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
@@ -296,6 +297,10 @@ abstract class LiveEntry extends entry
 	public function setLastCuePointSyncTime ( $v )	{	$this->putInCustomData ( "last_cue_point_sync_time" , $v );	}
 	public function getLastCuePointSyncTime (  )	{	return (int) $this->getFromCustomData("last_cue_point_sync_time");	}
 
+	public function setBroadcastTime($v )	{	$this->putInCustomData ( self::CUSTOM_DATA_BROADCAST_TIME , $v );	}
+	public function getBroadcastTime (  )	{	return $this->getFromCustomData( self::CUSTOM_DATA_BROADCAST_TIME);	}
+
+
 	public function getPushPublishEnabled()
 	{
 		return $this->getFromCustomData("push_publish_enabled");
@@ -543,7 +548,10 @@ abstract class LiveEntry extends entry
 
 	/**
 	 * @param EntryServerNodeType $mediaServerIndex
-	 * @param $hostname
+	 * @param string $hostname
+	 * @param KalturaEntryServerNodeStatus $liveEntryStatus
+	 * @param string $applicationName
+	 * @return LiveEntryServerNode
 	 * @throws Exception
 	 * @throws KalturaAPIException
 	 * @throws PropelException
@@ -564,10 +572,9 @@ abstract class LiveEntry extends entry
 				$this->setFirstBroadcast(kApiCache::getTime());
 			
 			$key = $this->getEntryServerNodeCacheKey($dbLiveEntryServerNode);
-			if($this->storeInCache($key) && $this->isMediaServerRegistered($mediaServerIndex, $hostname))
+			if($this->storeInCache($key))
 			{
 				KalturaLog::debug("cached and registered - index: $mediaServerIndex, hostname: $hostname");
-				return;
 			}
 		}
 		
@@ -647,16 +654,6 @@ abstract class LiveEntry extends entry
 	private function getEntryServerNodeCacheKey(EntryServerNode $entryServerNode)
 	{
 		return $entryServerNode->getEntryId()."_".$entryServerNode->getServerNodeId()."_".$entryServerNode->getServerType();
-	}
-
-	protected function isMediaServerRegistered($index, $hostname)
-	{
-		/* @var $dbLiveEntryServerNode LiveEntryServerNode*/
-		$dbLiveEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($this->getId(), $index);
-		if ($dbLiveEntryServerNode)
-			return true;
-		KalturaLog::info("mediaServer is not registered. hostname: $hostname , index: $index ");
-		return false;
 	}
 	
 	/**

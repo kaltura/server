@@ -37,6 +37,16 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	 * @var string
 	 */
 	public $secondaryBroadcastingUrl;
+
+	/**
+	 * @var string
+	 */
+	public $primarySecuredBroadcastingUrl;
+
+	/**
+	 * @var string
+	 */
+	public $secondarySecuredBroadcastingUrl;
 	
 	/**
 	 * @var string
@@ -125,6 +135,8 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	 	"streamRemoteBackupId",
 		"primaryBroadcastingUrl",
 		"secondaryBroadcastingUrl",
+		"primarySecuredBroadcastingUrl",
+		"secondarySecuredBroadcastingUrl",
 		"primaryRtspBroadcastingUrl",
 		"secondaryRtspBroadcastingUrl",
 		"streamName",
@@ -171,6 +183,8 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		{
 			$this->primaryBroadcastingUrl = null;
 			$this->secondaryBroadcastingUrl = null;
+			$this->primarySecuredBroadcastingUrl = null;
+			$this->secondarySecuredBroadcastingUrl = null;
 			$this->primaryRtspBroadcastingUrl = null;
 			$this->secondaryRtspBroadcastingUrl = null;
 		}
@@ -203,6 +217,8 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		{
 			$props_to_skip[] = 'primaryBroadcastingUrl';
 			$props_to_skip[] = 'secondaryBroadcastingUrl';
+			$props_to_skip[] = 'primarySecuredBroadcastingUrl';
+			$props_to_skip[] = 'secondarySecuredBroadcastingUrl';
 			$props_to_skip[] = 'primaryRtspBroadcastingUrl';
 			$props_to_skip[] = 'secondaryRtspBroadcastingUrl';
 		}

@@ -143,6 +143,9 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
 			case kESearchException::MISSING_OPERATOR_TYPE:
 				$object = new KalturaAPIException(KalturaESearchErrors::MISSING_OPERATOR_TYPE);
 				break;
+			case kESearchException::UNABLE_TO_EXECUTE_ENTRY_CAPTION_ADVANCED_FILTER:
+				$object = new KalturaAPIException(KalturaESearchErrors::UNABLE_TO_EXECUTE_ENTRY_CAPTION_ADVANCED_FILTER);
+				break;
 
 			default:
 				$object = null;
@@ -189,18 +192,18 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
 		return array();
 	}
 
-	public static function canExecuteFilter(KalturaRelatedFilter $filter, $coreFilter, KalturaDetachedResponseProfile $responseProfile = null)
+	public static function canExecuteFilter(KalturaRelatedFilter $filter, $coreFilter)
 	{
 		$adapter = ESearchAdapterFactory::getAdapter($filter);
-		return !$responseProfile && self::isValidClientsTagsForFilterExecutor() && $adapter && $adapter::canTransformFilter($coreFilter);
+		return self::isValidClientsTagsForFilterExecutor() && $adapter && $adapter::canTransformFilter($coreFilter);
 	}
 
-	public static function executeFilter(KalturaRelatedFilter $filter,$coreFilter, KalturaFilterPager $pager)
+	public static function executeFilter(KalturaRelatedFilter $filter, $coreFilter, KalturaFilterPager $pager, $responseProfile = null)
 	{
 		$corePager = $pager->toObject();
 		$eSearchAdapter = ESearchAdapterFactory::getAdapter($filter);
 		list($list, $totalCount) = $eSearchAdapter->retrieveElasticQueryCoreEntries($coreFilter, $corePager);
-		$newList = KalturaBaseEntryArray::fromDbArray($list, null);
+		$newList = KalturaBaseEntryArray::fromDbArray($list, $responseProfile);
 		$response = new KalturaListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;

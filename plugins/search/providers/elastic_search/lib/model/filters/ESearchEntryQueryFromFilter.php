@@ -265,17 +265,20 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		{
 			return null;
 		}
+
 		list( , $operator, $fieldName) = $fieldParts;
 		list($operator, $fieldName) = self::handlingFreeTextField($field, $operator, $fieldName);
 		if(!in_array($fieldName, static::getSupportedFields()) || is_null($fieldValue) || $fieldValue === '')
 		{
 			return null;
 		}
+
 		if ($fieldName === ESearchEntryFilterFields::STATUS && ($operator === baseObjectFilter::EQ ||$operator === baseObjectFilter::IN  ))
 		{
-			self::$validStatuses = explode(',',$fieldValue);
+			self::$validStatuses = explode(',', $fieldValue);
 			return null;
 		}
+
 		$fieldValue = self::translateFieldValue($fieldName, $filter, $fieldValue);
 		return array($operator, $fieldName, $fieldValue);
 	}
