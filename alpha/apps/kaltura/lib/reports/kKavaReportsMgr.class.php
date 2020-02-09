@@ -197,6 +197,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_TOTAL_FINALIZE_FUNC = 'report_total_finalize_func';
 	const REPORT_ORDER_BY = 'report_order_by';
 	const REPORT_DYNAMIC_HEADERS = 'report_dynamic_headers';
+	const REPORT_HEADERS_TO_REMOVE = 'report_headers_to_remove';
 
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -5662,9 +5663,9 @@ class kKavaReportsMgr extends kKavaBase
 				self::GET_TABLE_FLAG_IS_CSV,
 				$response_options);
 
-			if (isset($report_def["report_headers_to_remove"]))
+			if (isset($report_def[self::REPORT_HEADERS_TO_REMOVE]))
 			{
-				$headers_to_remove = $report_def["report_headers_to_remove"];
+				$headers_to_remove = $report_def[self::REPORT_HEADERS_TO_REMOVE];
 				foreach ($headers_to_remove as $header_to_remove)
 				{
 					$field_index = array_search($header_to_remove, $header);
