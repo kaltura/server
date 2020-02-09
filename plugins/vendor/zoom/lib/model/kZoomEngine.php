@@ -353,7 +353,7 @@ class kZoomEngine
 	 * @param entry $entry
 	 * @throws kCoreException
 	 */
-	public function createCategoryEntry($zoomIntegration, $entry)
+	protected function createCategoryEntry($zoomIntegration, $entry)
 	{
 		if ($zoomIntegration->getZoomCategory())
 		{
