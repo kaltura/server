@@ -3954,6 +3954,7 @@ class kKavaReportsMgr extends kKavaBase
 				foreach ($cur_enrich_specs as $enrich_spec)
 				{
 					list($enrich_func, $enrich_context, $enriched_indexes) = $enrich_spec;
+					
 					$entities = call_user_func($enrich_func, array_keys($dimension_ids), $partner_id, $enrich_context);
 
 					for ($current_row = $start; $current_row < $limit; $current_row++) 
@@ -5434,6 +5435,7 @@ class kKavaReportsMgr extends kKavaBase
 		$enrichDef = array();
 		$enrichDef[self::REPORT_ENRICH_OUTPUT] = $dimensionHeaders;
 		$enrichDef[self::REPORT_ENRICH_FUNC] = "kMetadataKavaUtils::metadataEnrich";
+		$enrichDef[self::REPORT_ENRICH_INPUT] = $field;
 		$context = array();
 		$context["metadata_profile_id"] = $metadataProfileId;
 		$context["xpath_patterns"] = $metadataXpath;
@@ -5607,6 +5609,20 @@ class kKavaReportsMgr extends kKavaBase
 				$object_ids,
 				self::GET_TABLE_FLAG_IS_CSV,
 				$response_options);
+
+			if (isset($report_def["report_headers_to_remove"]))
+			{
+				$headers_to_remove = $report_def["report_headers_to_remove"];
+				foreach ($headers_to_remove as $header_to_remove)
+				{
+					$field_index = array_search($header_to_remove, $header);
+					unset($header[$field_index]);
+					foreach($data as &$row)
+					{
+						unset($row[$field_index]);
+					}
+				}
+			}
 		}
 		else
 		{
