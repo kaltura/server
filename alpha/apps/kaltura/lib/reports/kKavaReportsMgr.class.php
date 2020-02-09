@@ -2024,6 +2024,7 @@ class kKavaReportsMgr extends kKavaBase
 			'event_var1' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR1),
 			'player_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYER_VERSION),
 			'isp' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_ISP),
+			'application_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_APPLICATION_VER),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
