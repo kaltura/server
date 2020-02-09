@@ -23,6 +23,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_DROPPED_FRAMES_RATIO_SUM = 'droppedFramesRatioSum';
 	const METRIC_UNIQUE_PERSISTENT_SESSION_ID = 'uniquePersistentSessionId';
 	const METRIC_UNIQUE_SESSION_ID = 'uniqueSessionId';
+	const METRIC_BUFFER_STARTS = 'bufferStarts';
+	const METRIC_FLAVOR_SWITCHES = 'flavorSwitches';
 
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
@@ -890,12 +892,6 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_ERROR),
 				self::getInFilter(self::DIMENSION_POSITION, array(self::VALUE_UNKNOWN, self::VALUE_ZERO)))),
 			self::getLongSumAggregator(self::METRIC_ERROR_UNKNOWN_POSITION_COUNT, self::METRIC_COUNT));
-
-		self::$aggregations_def[self::METRIC_VOD_PLAYS_COUNT] = self::getFilteredAggregator(
-			self::getAndFilter(array(
-				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
-				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_VOD))),
-			self::getLongSumAggregator(self::METRIC_VOD_PLAYS_COUNT, self::METRIC_COUNT));
 
     		self::$aggregations_def[self::METRIC_VIEW_PERIOD_BUFFER_STARTS] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
@@ -4011,7 +4007,6 @@ class kKavaReportsMgr extends kKavaBase
 				foreach ($cur_enrich_specs as $enrich_spec)
 				{
 					list($enrich_func, $enrich_context, $enriched_indexes) = $enrich_spec;
-					
 					$entities = call_user_func($enrich_func, array_keys($dimension_ids), $partner_id, $enrich_context);
 
 					for ($current_row = $start; $current_row < $limit; $current_row++) 
@@ -5821,3 +5816,56 @@ class kKavaReportsMgr extends kKavaBase
 	 * @param string $object_ids
 	 * @param int $page_size
 	 * @param int $page_index
+	 * @param string $order_by
+	 */
+	public static function getUrlForReportAsCsv(
+		$partner_id,
+		$report_title, $report_text, $headers,
+		$report_type,
+		reportsInputFilter $input_filter,
+		$dimension = null,
+		$object_ids = null,
+		$page_size =10, $page_index =0, $order_by, $response_options = null)
+	{
+		if (!self::shouldUseKava($partner_id, $report_type))
+		{
+			return myReportsMgr::getUrlForReportAsCsv(
+				$partner_id, 
+				$report_title, $report_text, $headers, 
+				$report_type, 
+				$input_filter, 
+				$dimension, 
+				$object_ids,
+				$page_size, $page_index, $order_by);					
+		}
+
+		if (!$response_options)
+		{
+			$response_options = new kReportResponseOptions();
+		}
+
+		self::init();
+		
+		list($file_path, $file_name) = myReportsMgr::createFileName($partner_id, $report_type, $input_filter, $dimension, $object_ids, $page_size, $page_index, $order_by);
+
+		$data = self::getCsvData($partner_id,
+			$report_title, $report_text, $headers,
+			$report_type,
+			$input_filter,
+			$dimension,
+			$object_ids,
+			$page_size, $page_index, $order_by, $response_options);
+
+		kFile::fullMkfileDir(dirname($file_path), 0777);
+
+		//adding BOM for fixing problem in open .csv file with special chars using excel.
+		$BOM = "\xEF\xBB\xBF";
+		$f = @fopen($file_path, 'w');
+		fwrite($f, $BOM);
+		fwrite($f, $data);
+		fclose($f);
+
+		$url = myReportsMgr::createUrl($partner_id, $file_name);
+		return $url;
+	}
+}
