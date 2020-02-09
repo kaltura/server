@@ -88,16 +88,17 @@ def aggregateMessage(decMessage):
     filteredMsg = {}
     permittedFields = {"a", "c", "d", "e", "l", "p", "q", "r"}
     for key in permittedFields:
-        if key in decMessage.keys():
+        if key in decMessage.keys() and decMessage[key] != None:
             filteredMsg[key] = decMessage[key]
         else:
-            filteredMsg[key] = None
+            filteredMsg[key] = "NULL"
 
     filteredMsg["l"] = re.split(':| ', filteredMsg["l"])[0]
     eventKey = '_'.join(str(filteredMsg[x]) for x in sorted(filteredMsg))
 
     if 'x' not in decMessage.keys():
         decMessage["x"] = 0
+    decMessage["x"] = int(decMessage["x"])
 
     if eventKey in aggregatedEvents.keys():
         aggregatedEvents[eventKey]['count'] += 1
@@ -113,7 +114,7 @@ def aggregateMessage(decMessage):
 def sendMessagesToKafka(producer):
     global aggregatedEvents
     for event in aggregatedEvents:
-        producer.send(options.kafkaTopic, json.dumps(aggregatedEvents[event])).get(timeout=3)
+        producer.send(options.kafkaTopic, json.dumps(aggregatedEvents[event])).get(timeout=1)
     aggregatedEvents = {}
                 
 class CommandHandler(SocketServer.BaseRequestHandler):
