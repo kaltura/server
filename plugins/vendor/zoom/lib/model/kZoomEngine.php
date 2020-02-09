@@ -364,6 +364,7 @@ class kZoomEngine
 			$categoryEntry->setCreatorKuserId($entry->getKuserId());
 			$categoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
 			$categoryEntry->save();
+			KalturaLog::info("Entry Id '" . $entry->getId() ."' added to Zoom category Id " . $zoomIntegration->getZoomCategoryId());
 		}
 	}
 
