@@ -56,6 +56,12 @@ class KalturaErrors extends APIErrors
 	// PID - partner id
 	const INVALID_PARTNER_ID = "INVALID_PARTNER_ID;PID;Invalid partner id \"@PID@\"";
 
+	const INVALID_CREDIT_VALUE = "INVALID_CREDIT_VALUE;PID;Invalid partner credit for partner \"@PID@\". Please enter a valid amount";
+
+	const NEGATIVE_CREDIT_NOT_ALLOWED = "NEGATIVE_PARTNER_CREDIT;PID;Invalid partner credit for partner \"@PID@\". Can't set partner credit to be negative  Please enter a valid amount";
+
+	const INSUFFICIENT_CREDIT = "INSUFFICIENT_CREDIT;PID; Insufficent credit transfer for partner \"@PID@\". Can't set credit balance to negative. Please enter a valid amount";
+
 	const DIRECT_LOGIN_BLOCKED = "DIRECT_LOGIN_BLOCKED;;Direct login is blocked on this partner";
 
 	// SRV_NAME - service , ACTION_NAME - action

@@ -15,12 +15,13 @@ class kUnlimitedVendorCredit extends kVendorCredit
 	 * @readonly
 	 */
 	protected $credit = ReachProfileCreditValues::UNLIMITED_CREDIT;
-	
+
 	/**
+	 * @param int $addOn
 	 * @param bool $includeOverages
 	 * @return int
 	 */
-	public function getCurrentCredit($includeOverages = true)
+	public function getCurrentCredit($addOn, $includeOverages = true)
 	{
 		return $this->credit;
 	}

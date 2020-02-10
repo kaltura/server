@@ -2152,5 +2152,28 @@ class Partner extends BasePartner
 	}
 
 
+	/**
+	 * @param float $amount
+	 * @throws PropelException
+	 * @throws kCoreException
+	 */
+	public function updateCredit($amount)
+	{
+		$updateParnterCreditSql = "UPDATE ".PartnerPeer::TABLE_NAME." SET " .
+			PartnerPeer::CREDIT . " = " . PartnerPeer::CREDIT . " +$amount WHERE " .
+			PartnerPeer::ID . "=" . $this->getId() . " AND (" . PartnerPeer::CREDIT ." + $amount >= 0) ;";
+
+		$connection = Propel::getConnection();
+		$stmt = $connection->prepare($updateParnterCreditSql);
+		$stmt->execute();
+
+		$affectedRows = $stmt->rowCount();
+		KalturaLog::log("AffectedRows: ". $affectedRows);
+		if ($affectedRows == 0)
+		{
+			throw new kCoreException("Invalid amount - profile credit can't be negative", kCoreException::INVALID_PARTNER_CREDIT);
+		}
+		KalturaLog::debug("Successfully updated credit for partner id " . $this->getId() . " and with credit amount of: $amount");
+	}
 
 }

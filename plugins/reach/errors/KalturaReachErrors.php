@@ -37,7 +37,7 @@ class KalturaReachErrors implements kReachErrors
 
 	const INVALID_CREDIT_DATES = "INVALID_CREDIT_DATES;FROM,TO;Vendor profile configuration error - Invalid credit Dates - from:[@FROM@] to:[@TO@]";
 	
-	const UPDATE_CREDIT_ERROR_USED_CREDIT_EXISTS = "UPDATE_CREDIT_ERROR_USED_CREDIT_EXISTS;ID;Can't update profile [@ID@]. Trying to update credit but usedCredit exists. Please reset used credit before updating credit.";
+	const INSUFFICIENT_CREDIT_TRANSFER = "INSUFFICIENT_CREDIT_TRANSFER;ID;Insufficent credit transfer for reach profile \"@ID@\". Can't set reach profile addon credit balance to negative. Please enter a valid amount";
 
 	/* Entry Vendor Task */
 

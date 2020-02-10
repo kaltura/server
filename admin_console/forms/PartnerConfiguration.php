@@ -97,6 +97,11 @@ class Form_PartnerConfiguration extends Infra_Form
 			'readonly'		=> true,
 			'ignore' 		=> true,
 		));
+
+		$this->addElement('text', 'credit', array(
+			'label'			=> 'Global Credit:',
+			'filters'		=> array('StringTrim'),
+		));
 		
 		$this->addElement('select', 'language', array(
 			'label'			=> "UI language:",
@@ -699,6 +704,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		//permissions groups
 		$configureAccountsTechData = array('publisherSpecificDeliverySettings', 'remoteStorageAccountPolicy', 'advancedNotificationSettings', 'publisherSpecificIngestionSettings', 'passwordSecurity','elasticSearch'); //EAGLE PRD group 1
 		$configureGeneralInformation = array('generalInformation'); // EAGLE PRD group 2
+		$configureGeneraCreditlInformation = array('generalCreditInformation');
 		$configureAccountsGroup = array('groupAssociation'); // EAGLE PRD group 3
 		$configureAccountPackagesService = array('accountPackagesService'); // EAGLE PRD group 4
 		$configureAccountsOptionsMonitorUsage = array('accountOptionsMonitorUsage'); // EAGLE PRD group 5
@@ -722,6 +728,9 @@ class Form_PartnerConfiguration extends Infra_Form
 		}
 		if (!(Infra_AclHelper::isAllowed('partner', 'configure-general-information'))){
 			$this->setPermissionGroupElementsToReadOnly($configureGeneralInformation);
+		}
+		if (!(Infra_AclHelper::isAllowed('partner', 'configure-partner-credit-information'))){
+			$this->setPermissionGroupElementsToReadOnly($configureGeneraCreditlInformation);
 		}
 		if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-packages-service'))){
 			$this->setPermissionGroupElementsToDisabled($configureAccountPackagesService);
@@ -940,7 +949,8 @@ class Form_PartnerConfiguration extends Infra_Form
 	{
 		//adding display groups
 		
-		$this->addDisplayGroup(array('partner_name', 'description','admin_name', 'admin_email', 'id', 'kmc_version', 'language', 'crossLine'), 'generalInformation', array('legend' => 'General Information'));
+		$this->addDisplayGroup(array('partner_name', 'description','admin_name', 'admin_email', 'id', 'kmc_version','language', 'crossLine'), 'generalInformation', array('legend' => 'General Information'));
+		$this->addDisplayGroup(array('credit', 'crossLine'), 'generalCreditInformation', array('legend' => 'General Credit Information'));
 		$this->addDisplayGroup(array('partner_group_type', 'partner_parent_id','reference_id','crossLine'), 'groupAssociation', array('legend' => 'Multi-Account Group Related information'));
 		
 		$this->addDisplayGroup(array_merge(array('delivery_profile_ids', 'live_delivery_profile_ids', 'deliveryFormat', 'delivery_profile_type', 'editDeliveryProfiles', 'enforce_delivery', 'checkbox_host', 'host', 'checkbox_cdn_host', 'cdn_host', 'checkbox_thumbnail_host', 'thumbnail_host', 'checkbox_cache_flavor_version', 'cache_flavor_version', 'support_animated_thumbnails'), $permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS], array ('crossLine')), 'publisherSpecificDeliverySettings', array('legend' => 'Publisher Specific Delivery Settings'));

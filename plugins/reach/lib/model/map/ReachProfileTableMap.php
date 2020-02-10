@@ -30,11 +30,11 @@ class ReachProfileTableMap extends TableMap {
 	 */
 	public function initialize()
 	{
-	  // attributes
+		// attributes
 		$this->setName('reach_profile');
 		$this->setPhpName('ReachProfile');
 		$this->setClassname('ReachProfile');
-		$this->setPackage('plugins.reach');
+		$this->setPackage('Core');
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
@@ -45,6 +45,9 @@ class ReachProfileTableMap extends TableMap {
 		$this->addColumn('TYPE', 'Type', 'TINYINT', true, null, null);
 		$this->addColumn('STATUS', 'Status', 'TINYINT', true, null, null);
 		$this->addColumn('USED_CREDIT', 'UsedCredit', 'DOUBLE', false, null, 0);
+		$this->addColumn('ADD_ON', 'AddOn', 'INTEGER', false, null, 0);
+		$this->addColumn('SYNCED_CREDIT', 'SyncedCredit', 'INTEGER', false, null, 0);
+		$this->addColumn('LAST_SYNC_TIME', 'LastSyncTime', 'VARCHAR', false, 100, null);
 		$this->addColumn('RULES', 'Rules', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('DICTIONARY', 'Dictionary', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);

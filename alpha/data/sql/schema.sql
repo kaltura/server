@@ -951,6 +951,7 @@ CREATE TABLE `partner`
 	`partner_package` TINYINT default 1,
 	`usage_percent` INTEGER default 0,
 	`storage_usage` INTEGER default 0,
+	`credit` INTEGER default 0,
 	`eighty_percent_warning` INTEGER,
 	`usage_limit_warning` INTEGER,
 	`monitor_usage` INTEGER default 1,

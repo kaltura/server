@@ -63,9 +63,15 @@ class ReachProfileService extends KalturaBaseService
 		$dbReachProfile = ReachProfilePeer::retrieveByPK($id);
 		if (!$dbReachProfile)
 			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $id);
-		
+
 		$reachProfile = new KalturaReachProfile();
 		$reachProfile->fromObject($dbReachProfile, $this->getResponseProfile());
+
+		$partner = PartnerPeer::retrieveByPK($dbReachProfile->getPartnerId());
+		if ($partner)
+		{
+			$reachProfile->globalCredit = $partner->getCredit();
+		}
 		return $reachProfile;
 	}
 
@@ -142,7 +148,7 @@ class ReachProfileService extends KalturaBaseService
 		// get the object
 		$dbReachProfile = ReachProfilePeer::retrieveByPK($id);
 		if (!$dbReachProfile)
-			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
+			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $id);
 		
 		$dbReachProfile->setStatus($status);
 		$credit = $dbReachProfile->getCredit();
@@ -209,5 +215,87 @@ class ReachProfileService extends KalturaBaseService
 		$reachProfile = new KalturaReachProfile();
 		$reachProfile->fromObject($dbReachProfile, $this->getResponseProfile());
 		return $reachProfile;
+	}
+
+	/**
+	 * tranfer credit between partner's global credit and reace profile credit
+	 *
+	 * @action transferCredit
+	 * @param int $reachProfileId
+	 * @param float $amount
+	 * @return KalturaReachProfile
+	 * @throws KalturaReachErrors::REACH_PROFILE_NOT_FOUND
+	 */
+	public function transferCreditAction($reachProfileId, $amount)
+	{
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		$dbPartner = PartnerPeer::retrieveByPK( kCurrentContext::getCurrentPartnerId() );
+		if (is_null($dbPartner))
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $partnerId);
+		}
+
+		if (is_null($amount))
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_CREDIT_VALUE, $partnerId);
+		}
+
+		$dbReachProfile = ReachProfilePeer::retrieveByPK($reachProfileId);
+		if (!$dbReachProfile)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $reachProfileId);
+		}
+
+		try
+		{
+			// first make sure there are enough credit in the object that we tranfer funds from
+			if ($amount < 0)
+			{
+				$dbReachProfile->updateCreditFunds($amount);
+				$dbPartner->updateCredit(-$amount);
+			}
+			else
+			{
+				$dbPartner->updateCredit(-$amount);
+				$dbReachProfile->updateCreditFunds($amount);
+			}
+
+		}
+		catch(Exception $ex)
+		{
+			if ($ex instanceof kCoreException)
+			{
+				$this->handleCoreException($ex,$partnerId , $reachProfileId);
+			}
+			else
+			{
+				throw $ex;
+			}
+		}
+
+		$dbReachProfile->syncCreditPercentageUsage();
+		$reachProfile = new KalturaReachProfile();
+		$reachProfile->fromObject($dbReachProfile, $this->getResponseProfile());
+		return $reachProfile;
+	}
+
+	/**
+	 * @param kCoreException $ex
+	 * @param $partnerId
+	 * @param $reachProfileId
+	 * @throws KalturaAPIException
+	 * @throws kCoreException
+	 */
+	private function handleCoreException(kCoreException $ex, $partnerId, $reachProfileId)
+	{
+		switch($ex->getCode())
+		{
+			case kCoreException::INVALID_PARTNER_CREDIT:
+				throw new KalturaAPIException(KalturaErrors::INSUFFICIENT_CREDIT, $partnerId);
+			case kCoreException::INVALID_REACH_PROFILE_CREDIT:
+				throw new KalturaAPIException(KalturaReachErrors::INSUFFICIENT_CREDIT_TRANSFER, $reachProfileId);
+			default:
+				throw $ex;
+		}
 	}
 }

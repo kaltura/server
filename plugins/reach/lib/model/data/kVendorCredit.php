@@ -41,7 +41,7 @@ class kVendorCredit
 	public $syncedCredit;
 
 	/**
-	 * @return the $credit
+	 * @return int
 	 */
 	public function getCredit()
 	{
@@ -49,7 +49,7 @@ class kVendorCredit
 	}
 
 	/**
-	 * @return the $fromDate
+	 * @return string
 	 */
 	public function getFromDate()
 	{
@@ -57,7 +57,7 @@ class kVendorCredit
 	}
 
 	/**
-	 * @return the $overageCredit
+	 * @return int
 	 */
 	public function getOverageCredit()
 	{
@@ -73,19 +73,11 @@ class kVendorCredit
 	}
 
 	/**
-	 * @return the $addOn
+	 * @return int
 	 */
 	public function getAddOn()
 	{
 		return $this->addOn;
-	}
-
-	/**
-	 * @param int $addOn
-	 */
-	public function setAddOn($addOn)
-	{
-		$this->addOn = $addOn;
 	}
 
 	/**
@@ -106,21 +98,12 @@ class kVendorCredit
 	}
 
 	/**
-	 * @return the $credit
+	 * @return int
 	 */
 	public function getSyncedCredit()
 	{
 		return $this->syncedCredit ? $this->syncedCredit : 0;
 	}
-
-	/**
-	 * @param int $SyncedCredit
-	 */
-	public function setSyncedCredit($SyncedCredit)
-	{
-		$this->syncedCredit = $SyncedCredit;
-	}
-
 
 	/**
 	 * @return string $lastSyncTime
@@ -130,31 +113,23 @@ class kVendorCredit
 		return $this->lastSyncTime;
 	}
 
-	/**
-	 * @param string $lastSyncTime
-	 */
-	public function setLastSyncTime($lastSyncTime)
-	{
-		$this->lastSyncTime = $lastSyncTime;
-	}
-
 	public function addAdditionalCriteria(Criteria $c)
 	{
 	}
 
-	public function isSynced()
-	{
-		return (intval(time() / 86400) == (intval($this->lastSyncTime / 86400)));
-	}
-
-	public function syncCredit($reachProfileId, $partnerId)
+	/**
+	 * @param ReachProfile $reachProfile
+	 * @return int
+	 * @throws PropelException
+	 */
+	public function syncCredit(ReachProfile $reachProfile)
 	{
 		$c = new Criteria();
-		$c->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId , Criteria::EQUAL);
+		$c->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfile->getId() , Criteria::EQUAL);
 		$c->add(EntryVendorTaskPeer::STATUS, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::READY), Criteria::IN);
-		$c->add(EntryVendorTaskPeer::QUEUE_TIME, $this->getSyncCreditStartDate(), Criteria::GREATER_EQUAL);
+		$c->add(EntryVendorTaskPeer::QUEUE_TIME, $this->getSyncCreditStartDate($reachProfile->getLastSyncTime()), Criteria::GREATER_EQUAL);
 		$c->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
-		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
+		$c->add(EntryVendorTaskPeer::PARTNER_ID, $reachProfile->getPartnerId());
 		$c->addSelectColumn('SUM('. EntryVendorTaskPeer::PRICE .')');
 		$this->addAdditionalCriteria($c);
 
@@ -162,7 +137,7 @@ class kVendorCredit
 		$stmt = EntryVendorTaskPeer::doSelectStmt($c);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 
-		$totalUsedCredit = $this->getSyncedCredit();
+		$totalUsedCredit = $reachProfile->getSyncedCredit();
 
 		$totalPrice = $row[0];
 		if($totalPrice)
@@ -170,17 +145,18 @@ class kVendorCredit
 			$totalUsedCredit += $totalPrice;
 		}
 
-		$this->setSyncedCredit($totalUsedCredit);
-		$this->setLastSyncTime($now);
+		$reachProfile->setSyncedCredit($totalUsedCredit);
+		$reachProfile->setLastSyncTime($now);
 
 		return $totalUsedCredit;
 	}
 
 	/***
-	 * @param $includeOverages should return current credit including overageCredit info or not (Default is true)
+	 * @param int $addOn
+	 * @param bool $includeOverages should return current credit including overageCredit info or not (Default is true)
 	 * @return int
 	 */
-	public function getCurrentCredit($includeOverages = true)
+	public function getCurrentCredit($addOn, $includeOverages = true)
 	{
 		$now = time();
 		if ( $now < $this->fromDate)
@@ -193,8 +169,10 @@ class kVendorCredit
 		if($includeOverages && $this->overageCredit)
 			$credit += $this->overageCredit;
 
-		if($this->addOn)
-			$credit += $this->addOn;
+		if($addOn)
+		{
+			$credit += $addOn;
+		}
 		
 		return $credit;
 	}
@@ -218,27 +196,23 @@ class kVendorCredit
 	{
 		return false;
 	}
-	
-	public function getSyncCreditStartDate()
+
+	/**
+	 * @param $lastSyncTime
+	 * @return the
+	 */
+	public function getSyncCreditStartDate($lastSyncTime)
 	{
-		return $this->getLastSyncTime() ? $this->getLastSyncTime() : $this->getFromDate();
+		return $lastSyncTime ? $lastSyncTime : $this->getFromDate();
 	}
 
+	/**
+	 * @param $lastCreditExpiry
+	 * @return bool
+	 */
 	public function shouldResetLastCreditExpiry($lastCreditExpiry)
 	{
 		return false;
 	}
 
-	/**
-	 * @param $sourceCredit
-	 */
-	public function setInnerParams($sourceCredit)
-	{
-		if ($sourceCredit)
-		{
-			/** @var kVendorCredit $sourceCredit */
-			$this->lastSyncTime = $sourceCredit->getLastSyncTime();
-			$this->syncedCredit = $sourceCredit->getSyncedCredit();
-		}
-	}
 }

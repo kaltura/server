@@ -40,7 +40,8 @@
 			<index-column name="status" />
 		</index>
 	</table>
-	
+
+
 	<table skipSql="false" abstract="false" name="reach_profile">
 		<column primaryKey="true"  required="true"  autoIncrement="true"  lazyLoad="false" name="id" 					type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="name" 					type="varchar" size="256" />
@@ -50,6 +51,9 @@
 		<column primaryKey="false" required="true"	autoIncrement="false" lazyLoad="false" name="type" 					type="tinyint" />
 		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="status" 				type="tinyint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="used_credit"			type="double" default="0"/>
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="add_on"				type="integer" default="0"/>
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="synced_credit"			type="integer" default="0"/>
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="last_sync_time"		type="varchar" size="100"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="rules" 				type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dictionary" 			type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" 			type="longvarchar" />

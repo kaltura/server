@@ -204,6 +204,65 @@ class PartnerService extends KalturaBaseService
 	}
 
 	/**
+	 * @action updateCredit
+	 * @param int $partnerId
+	 * @param float $amount
+	 * @return KalturaPartner
+	 * @throws KalturaAPIException
+	 * @throws KalturaClientException
+	 * @throws PropelException
+	 * @throws kCoreException
+	 */
+	public function updateCreditAction($partnerId, $amount)
+	{
+		$dbPartner = PartnerPeer::retrieveByPK( $partnerId );
+		if (is_null($dbPartner))
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $partnerId);
+		}
+
+		if (is_null($amount))
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_CREDIT_VALUE, $partnerId);
+		}
+
+		try
+		{
+			$dbPartner->updateCredit($amount);
+		}
+		catch(Exception $ex)
+		{
+			if ($ex instanceof kCoreException)
+				$this->handleCoreException($ex);
+			else
+				throw $ex;
+		}
+
+		$dbPartner->reload();
+		$partner = new KalturaPartner();
+		$partner->fromObject($dbPartner, $this->getResponseProfile());
+
+		return $partner;
+	}
+
+	/**
+	 * @param kCoreException $ex
+	 * @param $partnerId
+	 * @throws KalturaAPIException
+	 * @throws kCoreException
+	 */
+	private function handleCoreException(kCoreException $ex, $partnerId)
+	{
+		switch($ex->getCode())
+		{
+			case kCoreException::INVALID_PARTNER_CREDIT:
+				throw new KalturaAPIException(KalturaErrors::NEGATIVE_CREDIT_NOT_ALLOWED, $partnerId);
+			default:
+				throw $ex;
+		}
+	}
+
+	/**
 	 * Retrieve partner secret and admin secret
 	 * 
 	 * @action getSecrets

@@ -348,6 +348,12 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public $authenticationType;
 
+	/**
+	 * @var int
+	 * @requiresPermission insert,update
+	 */
+	public $credit;
+
 	private static $map_between_objects = array
 	(
 		'id' , 'name', 'website' => 'url1' , 'notificationUrl' => 'url2' , 'appearInSearch' , 'createdAt' , 'adminName' , 'adminEmail' ,
@@ -357,7 +363,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'firstName' , 'lastName' , 'country' , 'state' , 'publishersQuota', 'partnerGroupType', 'defaultEntitlementEnforcement', 
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks',
 		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages',
-		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType',
+		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType','credit'
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -426,6 +432,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->validatePropertyNotNull("description");
 		$this->validatePropertyMaxLength("country", 2, true);
 		$this->validatePropertyMaxLength("state", 2, true);
+		$this->validatePropertyMinValue("credit", 0, true);
 		$this->validatePartnerPackageForInsert();
 		$this->validateForInsert();
 

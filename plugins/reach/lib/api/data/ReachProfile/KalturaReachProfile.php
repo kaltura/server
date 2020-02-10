@@ -144,6 +144,17 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 	 */
 	public $vendorTaskProcessingRegion;
 
+	/**
+	 * @var int
+	 */
+	public $globalCredit;
+
+	/**
+	 * @var int
+	 * @requiresPermission insert,update
+	 */
+	public $addOn;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -169,7 +180,8 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 		'usedCredit',
 		'dictionaries' => 'dictionariesArray',
 		'flavorParamsIds',
-		'vendorTaskProcessingRegion'
+		'vendorTaskProcessingRegion',
+		'addOn'
 	);
 
 	/* (non-PHPdoc)
@@ -284,8 +296,6 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 			else
 			{
 				$newCredit = $this->credit->toObject(null);
-				/** @var kVendorCredit $newCredit */
-				$newCredit->setInnerParams($sourceCredit);
 			}
 			$dbObject->setCredit($newCredit);
 		}

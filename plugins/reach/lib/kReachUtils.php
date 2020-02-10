@@ -67,7 +67,7 @@ class kReachUtils
 	public static function isEnoughCreditLeft($entry, VendorCatalogItem $catalogItem, ReachProfile $reachProfile)
 	{
 		$creditUsed = $reachProfile->getUsedCredit();
-		$allowedCredit = $reachProfile->getCredit()->getCurrentCredit();
+		$allowedCredit = $reachProfile->getCredit()->getCurrentCredit($reachProfile->getAddOn());
 		if ($allowedCredit == ReachProfileCreditValues::UNLIMITED_CREDIT )
 		{
 			return true;
@@ -104,7 +104,7 @@ class kReachUtils
 	{
 		$reachProfile = $entryVendorTask->getReachProfile();
 
-		$allowedCredit = $reachProfile->getCredit()->getCurrentCredit();
+		$allowedCredit = $reachProfile->getCredit()->getCurrentCredit($reachProfile->getAddOn());
 		if ($allowedCredit == ReachProfileCreditValues::UNLIMITED_CREDIT )
 		{
 			return true;
@@ -134,8 +134,8 @@ class kReachUtils
 	public static function checkPriceAddon($entryVendorTask, $taskPriceDiff)
 	{
 		$reachProfile = $entryVendorTask->getReachProfile();
-		$allowedCredit = $reachProfile->getCredit()->getCurrentCredit();
-
+		/* @var $reachProfile ReachProfile */
+		$allowedCredit = $reachProfile->getCredit()->getCurrentCredit($reachProfile->getAddOn());
 		if ($allowedCredit == ReachProfileCreditValues::UNLIMITED_CREDIT )
 			return true;
 

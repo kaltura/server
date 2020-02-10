@@ -38,10 +38,11 @@ class kTimeRangeVendorCredit extends kVendorCredit
 	}
 
 	/**
+	 * @param int $addOn
 	 * @param bool $includeOverages
 	 * @return int
 	 */
-	public function getCurrentCredit($includeOverages = true)
+	public function getCurrentCredit($addOn, $includeOverages = true)
 	{
 		$now = time();
 		if ( $now < $this->fromDate || $now > $this->toDate )
@@ -56,9 +57,9 @@ class kTimeRangeVendorCredit extends kVendorCredit
 			$credit += $this->overageCredit;
 		}
 
-		if($this->addOn)
+		if($addOn)
 		{
-			$credit += $this->addOn;
+			$credit += $addOn;
 		}
 
 		return $credit;
