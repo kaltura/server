@@ -98,7 +98,7 @@ def aggregateMessage(decMessage):
 
     if 'x' not in decMessage.keys():
         decMessage["x"] = 0
-    decMessage["x"] = int(decMessage["x"])
+    decMessage["x"] = float(decMessage["x"])
 
     if eventKey in aggregatedEvents.keys():
         aggregatedEvents[eventKey]['count'] += 1
