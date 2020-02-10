@@ -264,6 +264,11 @@ class kString
 	  	}
 	  }
 
+	public static function removeHttp($url)
+	{
+		return preg_replace('(https?://)', '', $url);
+	}
+
 	public static function xmlEncode($str)
 	{
 		return str_replace ( array ( "&", '"' , '<', '>', "'" ) , array ( "&amp;", "&quot;" , "&lt;", "&gt;", "&apos;" ), $str );
