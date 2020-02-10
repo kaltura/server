@@ -358,7 +358,7 @@ class kZoomEngine
 		if ($zoomIntegration->getZoomCategory())
 		{
 			$categoryEntry = new categoryEntry();
-			$categoryEntry->setEntryId($entry);
+			$categoryEntry->setEntryId($entry->getId());
 			$categoryEntry->setCategoryId($zoomIntegration->getZoomCategoryId());
 			$categoryEntry->setPartnerId($entry->getPartnerId());
 			$categoryEntry->setCreatorKuserId($entry->getKuserId());
