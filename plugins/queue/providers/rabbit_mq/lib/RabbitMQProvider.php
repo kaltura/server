@@ -37,6 +37,10 @@ class RabbitMQProvider extends QueueProvider
 	const RABBIT_ACTION_OPEN_CHANNEL = 'open_channel';
 	const RABBIT_ACTION_CLOSE_CHANNEL = 'close_channel';
 
+	const DEFAULT_CONNECTION_TIMEOUT = 2;
+	const DEFAULT_READ_WRITE_TIMEOUT = 3;
+	const DEFAULT_CHANNEL_RPC_TIMEOUT = 2;
+
 
 	public function __construct(array $rabbitConfig, $constructorArgs)
 	{
@@ -47,9 +51,9 @@ class RabbitMQProvider extends QueueProvider
 		$this->curlPort = $rabbitConfig['curl_port'];
 		$this->timeout = $rabbitConfig['timeout'];
 		$this->dataSourceUrl = $this->username . ':' . $this->password . '@' . $this->MQserver . ':' . $this->port;
-		$this->connectionTimeout = isset($rabbitConfig['connection_timeout']) ? $rabbitConfig['connection_timeout'] : 2;
-		$this->readWriteTimeout = isset($rabbitConfig['read_write_timeout']) ? $rabbitConfig['read_write_timeout'] : 3;
-		$this->channelRpcTimeout = isset($rabbitConfig['channel_rpc_timeout']) ? $rabbitConfig['channel_rpc_timeout'] : 2 ;
+		$this->connectionTimeout = isset($rabbitConfig['connection_timeout']) ? $rabbitConfig['connection_timeout'] : self::DEFAULT_CONNECTION_TIMEOUT;
+		$this->readWriteTimeout = isset($rabbitConfig['read_write_timeout']) ? $rabbitConfig['read_write_timeout'] : self::DEFAULT_READ_WRITE_TIMEOUT;
+		$this->channelRpcTimeout = isset($rabbitConfig['channel_rpc_timeout']) ? $rabbitConfig['channel_rpc_timeout'] : self::DEFAULT_CHANNEL_RPC_TIMEOUT ;
 		
 		$exchangeName = kConf::get("push_server_exchange");
 		if(isset($constructorArgs['exchangeName']))
@@ -212,16 +216,16 @@ class RabbitMQProvider extends QueueProvider
 
 	protected function closeConnection($connection)
 	{
-		$connStart = microtime(true);
+		$closeStart = microtime(true);
 		try
 		{
 			$connection->close();
 		}
 		catch (Exception $e)
 		{
-			$connTook = microtime(true) - $connStart;
-			$logStr = "Failed to close connection";
-			$this->writeToMonitor($logStr, $this->dataSourceUrl, self::RABBIT_ACTION_CLOSE_CONNECTION, $connTook, null, null, $e->getCode());
+			$closeTook = microtime(true) - $closeStart;
+			$logStr = 'Failed to close connection';
+			$this->writeToMonitor($logStr, $this->dataSourceUrl, self::RABBIT_ACTION_CLOSE_CONNECTION, $closeTook, null, null, $e->getCode());
 			throw $e;
 		}
 	}
