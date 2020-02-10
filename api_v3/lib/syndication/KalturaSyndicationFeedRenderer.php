@@ -268,15 +268,18 @@ class KalturaSyndicationFeedRenderer
 		return false;
 	}
 
-	public function addFlavorParamsAttachedFilter()
+	public function addFlavorParamsAttachedFilter($entryFilter = null)
 	{
 		if($this->executed)
 			return;
 			
 		if(!$this->syndicationFeed->flavorParamId)
 			return;
-			
-		$entryFilter = new entryFilter();
+
+		if (!$entryFilter)
+		{
+			$entryFilter = new entryFilter();
+		}
 		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);		// partner scope already attached
 		$entryFilter->setFlavorParamsMatchOr($this->syndicationFeed->flavorParamId);
 		$entryFilter->attachToCriteria($this->baseCriteria);
@@ -314,7 +317,7 @@ class KalturaSyndicationFeedRenderer
 		$entryFilter->attachToCriteria($this->baseCriteria);
 	}
 	
-	public function getEntriesCount()
+	public function getEntriesCount($actualEntryCount = false)
 	{
 		if($this->executed)
 			return null;
@@ -328,7 +331,7 @@ class KalturaSyndicationFeedRenderer
 
 		if ($this->dynamicPlaylist)
 		{
-			return $this->getEntriesCountFromDynamic();
+			return $this->getEntriesCountFromDynamic($actualEntryCount);
 		}
 		$count = 0;
 		foreach($this->entryFilters as $entryFilter)
@@ -341,11 +344,15 @@ class KalturaSyndicationFeedRenderer
 		return $count;
 	}
 
-	public function getEntriesCountFromDynamic()
+	public function getEntriesCountFromDynamic($actualEntryCount)
 	{
 		$kalturaEntries = array();
 		foreach($this->entryFilters as $entryFilter)
 		{
+			if ($actualEntryCount)
+			{
+				$this->addFlavorParamsAttachedFilter($entryFilter);
+			}
 			list($mediaEntryFilterForPlaylist, $playlistService) = self::prepareParameters($entryFilter);
 			$entriesFromFilter =  $this->getEntriesFromPlaylist($playlistService, $mediaEntryFilterForPlaylist);
 			foreach ($entriesFromFilter as $entry)
@@ -591,7 +598,16 @@ class KalturaSyndicationFeedRenderer
 
 		$kalturaMediaEntryFilterForPlaylistArray  = new KalturaMediaEntryFilterForPlaylistArray();
 		$kalturaMediaEntryFilterForPlaylistArray->offsetSet(null, $kalturaMediaEntryFilterForPlaylist);
-
+		if (!kCurrentContext::$ks)
+		{
+			kSessionUtils::createKSessionNoValidations(kCurrentContext::getCurrentPartnerId(),
+									0,
+									kCurrentContext::$ks,
+									86400,
+									false,
+									'',
+									kSessionBase::WIDGET_PRIVILEGE);
+		}
 		return $playlistService->executeFromFiltersAction($kalturaMediaEntryFilterForPlaylistArray, self::DYNAMIC_TOTAL_RESULTS);
 	}
 
@@ -599,6 +615,7 @@ class KalturaSyndicationFeedRenderer
 	{
 		if(!$this->executed && count($this->entryFilters))
 		{
+			$this->setFiltersWithParams();
 			reset($this->entryFilters);
 		}
 		$this->executed = true;
@@ -614,6 +631,21 @@ class KalturaSyndicationFeedRenderer
 		}
 		next($this->entryFilters);
 		return $filter;
+	}
+
+	protected function setFiltersWithParams()
+	{
+		$entryId = getRequestParameter('entryId');
+		foreach ($this->entryFilters as $entryFilter)
+		{
+			if (isset($entryId))
+			{
+				$entryFilter->setIdEquel($entryId);
+			}
+			$this->addFlavorParamsAttachedFilter($entryFilter);
+			$entryFilter->fields['_lteornull_start_date'] =  time();
+			$entryFilter->fields['_gteornull_end_date'] =  time();
+		}
 	}
 
 	/**
