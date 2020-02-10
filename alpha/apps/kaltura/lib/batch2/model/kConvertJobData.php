@@ -203,7 +203,9 @@ class kConvertJobData extends kConvartableJobData
 			return BatchJobUrgencyType::MIGRATION_URGENCY;
 
 		if($this->priority == self::TRIMMING_FLAVOR_PRIORITY)
+		{
 			return BatchJobUrgencyType::TOP_URGENCY;
+		}
 
 		// If you have no conversion profile, there is no point in this calculation
 		if(is_null($this->conversionProfileId))
