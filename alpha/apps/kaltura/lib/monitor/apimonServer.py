@@ -110,6 +110,7 @@ def aggregateMessage(decMessage):
         aggregatedEvents[eventKey]['executionTime'] = decMessage["x"]
         aggregatedEvents[eventKey]['maxTime'] = decMessage["x"]
         aggregatedEvents[eventKey]['time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        aggregatedEvents[eventKey]['dc'] = options.host
 
 def sendMessagesToKafka(producer):
     global aggregatedEvents
@@ -287,6 +288,8 @@ if __name__ == '__main__':
                       help="the kafka server address to send data", metavar="ADDR")
     parser.add_option("-q", "--kafka-topic", dest="kafkaTopic",default=None,
                           help="the kafka topic to send data", metavar="string")
+    parser.add_option("-h", "--host", dest="host",default=0,
+                          help="the origin host of the events", metavar="int")
     (options, args) = parser.parse_args()
 
     # start the worker threads
