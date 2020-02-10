@@ -3,6 +3,7 @@
 
 class LiveClusterMediaServerNode extends MediaServerNode
 {
+    const ENVIRONMENT = 'env';
 
     /**
      * Applies default values to this object.
@@ -32,7 +33,7 @@ class LiveClusterMediaServerNode extends MediaServerNode
 
     public function getPlaybackHost($protocol = 'http', $format = null, $baseUrl = null, $deliveryType = null)
     {
-        $domain = rtrim(preg_replace('(https?://)', '', $baseUrl), '/'); // extract only the domain from the base url
+        $domain = rtrim(kString::removeHttp($baseUrl), '/'); // extract only the domain from the base url
         $domain = str_replace('{hostName}', $this->getHostname(), $domain); // if the domain contain place-holder replace it with the server-node host name
 
         return "$protocol://$domain/";
@@ -40,6 +41,6 @@ class LiveClusterMediaServerNode extends MediaServerNode
 
     public function getEnvDc()
     {
-        return 'env/' . $this->getEnvironment();
+        return self::ENVIRONMENT . '/' . $this->getEnvironment();
     }
 }

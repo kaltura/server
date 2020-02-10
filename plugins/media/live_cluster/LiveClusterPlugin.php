@@ -34,7 +34,9 @@ class LiveClusterPlugin extends KalturaPlugin implements IKalturaObjectLoader, I
     {
         $class = self::getObjectClass($baseClass, $enumValue);
         if ($class && class_exists($class))
+        {
             return new $class();
+        }
     }
 
     /* (non-PHPdoc)
