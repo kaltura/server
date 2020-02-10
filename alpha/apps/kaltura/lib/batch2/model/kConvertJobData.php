@@ -8,7 +8,7 @@ class kConvertJobData extends kConvartableJobData
 	const CONVERSION_MILTI_COMMAND_LINE_SEPERATOR = ';;;';
 	const CONVERSION_FAST_START_SIGN = 'FS';
 	const MIGRATION_FLAVOR_PRIORITY = 10;
-	const TRIMMING_FLAVOR_PRIORITY = 11;
+	const TRIMMING_FLAVOR_PRIORITY = 2;
 
 	/**
 	 * @var string
