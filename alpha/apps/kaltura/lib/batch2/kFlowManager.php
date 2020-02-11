@@ -633,6 +633,13 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				return true;
 			}
 
+        if(
+            ($object instanceof KuserKgroup)
+            &&	in_array(KuserKgroupPeer::STATUS, $modifiedColumns))
+        {
+            return true;
+        }
+
 		return false;
 	}
 
@@ -686,8 +693,17 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				
 			return true;
 		}
-			
-		if ($object instanceof UserRole
+
+        if(
+            $object instanceof KuserKgroup
+            && in_array(KuserKgroupPeer::STATUS, $modifiedColumns)
+        )
+        {
+            kFlowHelper::handleKuserKgroupStatusUpdate($object);
+            return true;
+        }
+
+        if ($object instanceof UserRole
 			&& in_array(UserRolePeer::PERMISSION_NAMES, $modifiedColumns))
 		{
 			$filter = new kuserFilter();

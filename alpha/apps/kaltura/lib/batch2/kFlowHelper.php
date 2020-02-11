@@ -3231,4 +3231,15 @@ class kFlowHelper
         return $dbBatchJob;
 
     }
+
+    public static function handleKuserKgroupStatusUpdate($kuserkgroup)
+    {
+        if ($kuserkgroup->getStatus() == KuserKgroupStatus::DELETED)
+        {
+            $kgroup = kuserPeer::retrieveByPK($kuserkgroup->getKgroupId());
+            $numberOfUsersPerGroup = $kgroup->getMembersCount();
+            $kgroup->setMembersCount(max(0, $numberOfUsersPerGroup - 1));
+            $kgroup->save();
+        }
+    }
 }
