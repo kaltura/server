@@ -582,13 +582,14 @@ class LiveStreamService extends KalturaLiveEntryService
      *
      * @action archive
      * @param string $liveEntryId
+	 * @param string $vodEntryId
      * @return bool
      * @throws KalturaAPIException
      * @throws KalturaClientException
      * @throws PropelException
      */
-	public function archiveAction($liveEntryId)
-    {
+	public function archiveAction($liveEntryId, $vodEntryId)
+	{
         $liveEntry = entryPeer::retrieveByPK($liveEntryId);
         /** @var LiveStreamEntry $liveEntry */
         if (!$liveEntry)
@@ -598,6 +599,7 @@ class LiveStreamService extends KalturaLiveEntryService
 
         $liveEntryArchiveJobData = new kLiveEntryArchiveJobData();
         $liveEntryArchiveJobData->setLiveEntryId($liveEntryId);
+        $liveEntryArchiveJobData->setVodEntryId($vodEntryId);
 
         $liveEntryArchiveJob = new BatchJob();
         $liveEntryArchiveJob->setEntryId($liveEntryId);
