@@ -40,13 +40,7 @@ abstract class kCaptionsContentManager
 	{
 		$element = current($array);
 		next($array);
-		
-		if ($element)
-		{
-			return $element;
-		}
-
-		return false;
+		return $element;
 	}
 
 	/**
