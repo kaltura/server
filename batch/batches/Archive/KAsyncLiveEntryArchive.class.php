@@ -50,7 +50,8 @@ class KAsyncLiveEntryArchive extends KJobHandlerWorker
         $notDeletedCuePointTags = $liveEntry->recordingOptions->nonDeletedCuePointsTags;
         $this->deleteCuePoints($liveEntryId, $notDeletedCuePointTags);
 
-        $vodEntry = KBatchBase::$kClient->baseEntry->get($liveEntry->recordedEntryId);
+        $vodEntryId = $jobData->vodEntryId;
+        $vodEntry = KBatchBase::$kClient->baseEntry->get($vodEntryId);
         $this->updateEntriesData($liveEntry, $vodEntry);
 
         $this->clearPushNotificationQueue($liveEntryId, $liveEntry->partnerId);

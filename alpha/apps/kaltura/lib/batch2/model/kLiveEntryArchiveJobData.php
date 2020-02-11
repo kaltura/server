@@ -10,6 +10,11 @@ class kLiveEntryArchiveJobData extends kJobData
      */
     protected $liveEntryId;
 
+	/**
+	 * @var string
+	 */
+	protected $vodEntryId;
+
     /**
      * @return string liveEntryId
      */
@@ -18,6 +23,14 @@ class kLiveEntryArchiveJobData extends kJobData
         return $this->liveEntryId;
     }
 
+	/**
+	 * @return string vodEntryId
+	 */
+	public function getVodEntryId()
+	{
+		return $this->vodEntryId;
+	}
+
     /**
      * @param string $liveEntryId
      */
@@ -25,5 +38,13 @@ class kLiveEntryArchiveJobData extends kJobData
     {
         $this->liveEntryId = $liveEntryId;
     }
+
+	/**
+	 * @param string $vodEntryId
+	 */
+	public function setVodEntryId($vodEntryId)
+	{
+		$this->vodEntryId = $vodEntryId;
+	}
 
 }
