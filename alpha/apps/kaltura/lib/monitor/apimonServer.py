@@ -39,7 +39,7 @@ class ReaderThread(Thread):
         global aggregatedEvents
         global producer
         if options.kafkaAddress is not None and options.kafkaTopic is not None:
-            producer = KafkaProducer(bootstrap_servers=options.kafkaAddress, acks=0, buffer_memory=2000000000, batch_size=64000)
+            producer = KafkaProducer(bootstrap_servers=options.kafkaAddress, acks=0, batch_size=64000)
         
         curSlot = []
         lastSlotIndex = 0
