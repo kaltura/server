@@ -3,7 +3,7 @@
  * @package plugins.liveCluster
  * @subpackage lib.enum
  */
-class LiveClusterMediaServerNodeType
+class LiveClusterMediaServerNodeType implements IKalturaPluginEnum, serverNodeType
 {
     const LIVE_CLUSTER_MEDIA_SERVER = 'LIVE_CLUSTER_MEDIA_SERVER';
 
