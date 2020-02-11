@@ -12,9 +12,12 @@ import socket
 import time
 import json
 import sys
+import Queue
 
 eventsBuffer = {}
 aggregatedEvents = {}
+messagesQueue = Queue.Queue()
+producer = None
 
 def stripNewlines(value):
 	return value.replace('\n', ' ').replace('\r', ' ')
@@ -32,6 +35,9 @@ class ReaderThread(Thread):
 
     def run(self):
         global eventsBuffer
+        global messagesQueue
+        global aggregatedEvents
+        global producer
         if options.kafkaAddress is not None and options.kafkaTopic is not None:
             producer = KafkaProducer(bootstrap_servers=options.kafkaAddress, acks=0, buffer_memory=2000000000, batch_size=64000)
         
@@ -46,6 +52,9 @@ class ReaderThread(Thread):
                 eventsBuffer[lastSlotIndex] = curSlot
                 curSlot = []
                 lastSlotIndex = curSlotIndex
+                if curSlotIndex == 0:
+                    messagesQueue.put(aggregatedEvents)
+                    aggregatedEvents = {}
             for curMessage in data.split('\0'):
                 try:
                     decMessage = json.loads(curMessage)
@@ -54,17 +63,8 @@ class ReaderThread(Thread):
                 except ValueError:
                     pass
                 curSlot.append(decMessage)
-                if options.kafkaAddress is not None and options.kafkaTopic is not None:
+                if producer is not None:
                     aggregateMessage(decMessage)
-
-            curSec = int(datetime.now().strftime("%S"))
-            if curSec % 10 == 0:
-                try:
-                    if options.kafkaAddress is not None and options.kafkaTopic is not None:
-                        sendMessagesToKafka(producer)
-                except KafkaError as error:
-                    print(str(error))
-                    pass
 
             if not options.saveInput:
                 continue
@@ -85,38 +85,60 @@ def safeFloat(num):
 
 def aggregateMessage(decMessage):
     global aggregatedEvents
-    filteredMsg = {}
-    permittedFields = {"a", "c", "d", "e", "l", "p", "q", "r"}
+    permittedFields = ["a", "c", "d", "e", "l", "p", "q", "r"]
+
+    eventKey = str(options.host) + '_'
     for key in permittedFields:
         if key in decMessage.keys() and decMessage[key] != None:
-            filteredMsg[key] = decMessage[key]
+            decMessage[key] = str(decMessage[key]).replace('_', '')
+            if(key == 'l'):
+                eventKey += re.split(':| ', decMessage[key])[0]
+            else:
+                eventKey += decMessage[key]
         else:
-            filteredMsg[key] = "NULL"
-
-    filteredMsg["l"] = re.split(':| ', filteredMsg["l"])[0]
-    eventKey = '_'.join(str(filteredMsg[x]) for x in sorted(filteredMsg))
+            eventKey += 'null'
+        eventKey += '_'
 
     if 'x' not in decMessage.keys():
         decMessage["x"] = 0
     decMessage["x"] = float(decMessage["x"])
 
     if eventKey in aggregatedEvents.keys():
-        aggregatedEvents[eventKey]['count'] += 1
-        aggregatedEvents[eventKey]['executionTime'] += decMessage["x"]
-        aggregatedEvents[eventKey]['maxTime'] = max(aggregatedEvents[eventKey]['maxTime'], decMessage["x"])
+        aggregatedEvents[eventKey][0] += 1
+        aggregatedEvents[eventKey][1] += decMessage["x"]
+        aggregatedEvents[eventKey][2] = max(aggregatedEvents[eventKey][2], decMessage["x"])
     else:
-        aggregatedEvents[eventKey] = filteredMsg
-        aggregatedEvents[eventKey]['count'] = 0
-        aggregatedEvents[eventKey]['executionTime'] = decMessage["x"]
-        aggregatedEvents[eventKey]['maxTime'] = decMessage["x"]
-        aggregatedEvents[eventKey]['time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        aggregatedEvents[eventKey]['dc'] = options.host
+        aggregatedEvents[eventKey] = [0, 0, 0, 0]
+        aggregatedEvents[eventKey][0] = 0
+        aggregatedEvents[eventKey][1] = decMessage["x"]
+        aggregatedEvents[eventKey][2] = decMessage["x"]
+        aggregatedEvents[eventKey][3] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-def sendMessagesToKafka(producer):
-    global aggregatedEvents
-    for event in aggregatedEvents:
-        producer.send(options.kafkaTopic, json.dumps(aggregatedEvents[event])).get(timeout=1)
-    aggregatedEvents = {}
+def sendMessagesToKafka():
+    global producer
+    global messagesQueue
+
+    if options.kafkaAddress is None:
+        return
+
+    messageData = messagesQueue.get()
+    basicFields = ["dc", "a", "c", "d", "e", "l", "p", "q", "r"]
+    additionalFields = ["count", "executionTime", "maxTime", "time"]
+
+    for eventKey in messageData:
+        keyParts = eventKey.split('_')
+        del keyParts[-1]
+
+        d = {}
+        for i, j in zip(basicFields, keyParts):
+            d[i] = j
+        for i, j in zip(additionalFields, messageData[eventKey]):
+            d[i] = j
+
+        try:
+            producer.send(options.kafkaTopic, json.dumps(d)).get(timeout=1)
+        except KafkaError as error:
+               print(str(error))
                 
 class CommandHandler(SocketServer.BaseRequestHandler):
     AGGREGATED_FIELDS = 'xn'
@@ -269,6 +291,12 @@ class CommandThread(Thread):
         server = SocketServer.TCPServer(parseAddress(options.tcpAddress), CommandHandler)
         server.serve_forever()
 
+class SendThread(Thread):
+    def run(self):
+        while True:
+            sendMessagesToKafka()
+
+
 if __name__ == '__main__':
     # parse the command line
     parser = OptionParser()
@@ -288,7 +316,7 @@ if __name__ == '__main__':
                       help="the kafka server address to send data", metavar="ADDR")
     parser.add_option("-q", "--kafka-topic", dest="kafkaTopic",default=None,
                           help="the kafka topic to send data", metavar="string")
-    parser.add_option("-h", "--host", dest="host",default=0,
+    parser.add_option("-d", "--dc", dest="host",default=0,
                           help="the origin host of the events", metavar="int")
     (options, args) = parser.parse_args()
 
@@ -297,6 +325,10 @@ if __name__ == '__main__':
     ct = CommandThread()
     rt.start()
     ct.start()
+
+    if options.kafkaAddress is not None:
+        st = SendThread()
+        st.start()
 
     # sleep forever
     print '%s started' % (time.ctime())
