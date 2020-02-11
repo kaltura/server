@@ -341,7 +341,7 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 		if (!$resourceResults->totalCount)
 		{
 			//If the resource could not be found - input validation error must be set on the bulk upload result.
-			$this->setResultError($result, 'Invalid resource system name ' . $row['resourceID'] . ' passed. Event was not created.');
+			$this->setResultError($result, 'Invalid resource system name or ID passed. Event was not created.');
 			$this->addBulkUploadResult($result);
 			return;
 		}
