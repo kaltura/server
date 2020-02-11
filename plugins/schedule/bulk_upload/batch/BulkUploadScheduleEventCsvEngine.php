@@ -323,9 +323,9 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 		{
 			$resourceFilter->idEqual = $row['resourceID'];
 		}
-		elseif (isset($row['resourceSystemName']) && $row['resourceSystemName'])
+		elseif (isset($row['resource']) && $row['resource'])
 		{
-			$resourceFilter->systemNameEqual = $row['resourceSystemName'];
+			$resourceFilter->systemNameEqual = $row['resource'];
 		}
 		else
 		{
@@ -472,8 +472,8 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 			'tags',
 			'categoryIds',
 			'categoryPaths',
+			'resource',
 			'resourceID',
-			'resourceSystemName',
 			'startTime',
 			'duration',
 			'endTime',
