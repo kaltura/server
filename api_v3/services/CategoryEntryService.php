@@ -28,87 +28,94 @@ class CategoryEntryService extends KalturaBaseService
 	function addAction(KalturaCategoryEntry $categoryEntry)
 	{
 		$categoryEntry->validateForInsert();
-		
-		$entry = entryPeer::retrieveByPK($categoryEntry->entryId);
-		if (!$entry)
-			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $categoryEntry->entryId);
-			
-		$category = categoryPeer::retrieveByPK($categoryEntry->categoryId);
-		if (!$category)
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryEntry->categoryId);
-			
-		$categoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($categoryEntry->entryId);
-		
-		$maxCategoriesPerEntry = $entry->getMaxCategoriesPerEntry();
-			
-		if (count($categoryEntries) >= $maxCategoriesPerEntry)
-			throw new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, $maxCategoriesPerEntry);
-			
-		//validate user is entiteld to assign entry to this category 
-		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getContributionPolicy() != ContributionPolicyType::ALL)
-		{
-			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryEntry->categoryId, kCurrentContext::getCurrentKsKuserId());
-			if(!$categoryKuser)
-			{
-				KalturaLog::err("User [" . kCurrentContext::getCurrentKsKuserId() . "] is not a member of the category [{$categoryEntry->categoryId}]");
-				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
-			}
-			if($categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER)
-			{
-				KalturaLog::err("User [" . kCurrentContext::getCurrentKsKuserId() . "] permission level [" . $categoryKuser->getPermissionLevel() . "] on category [{$categoryEntry->categoryId}] is not member [" . CategoryKuserPermissionLevel::MEMBER . "]");
-				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
-			}
-				
-			if(!$categoryKuser->hasPermission(PermissionName::CATEGORY_EDIT) && !$categoryKuser->hasPermission(PermissionName::CATEGORY_CONTRIBUTE) &&
-				!$entry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId()) &&
-				$entry->getCreatorKuserId() != kCurrentContext::getCurrentKsKuserId())
-				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);				
-		}
-		
-		$categoryEntryExists = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryEntry->categoryId, $categoryEntry->entryId);
-		if($categoryEntryExists && $categoryEntryExists->getStatus() == CategoryEntryStatus::ACTIVE)
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_ENTRY_ALREADY_EXISTS);
-		
-		if(!$categoryEntryExists)
-		{
-			$dbCategoryEntry = new categoryEntry();
-		}
-		else
-		{
-			$dbCategoryEntry = $categoryEntryExists;
-		}
-		
-		$categoryEntry->toInsertableObject($dbCategoryEntry);
-		
-		/* @var $dbCategoryEnry categoryEntry */
-		$dbCategoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
-		
-		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getModeration())
-		{
-			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryEntry->categoryId, kCurrentContext::getCurrentKsKuserId());
-			if(!$categoryKuser ||
-				($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER && 
-				$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
-				$dbCategoryEntry->setStatus(CategoryEntryStatus::PENDING);
-		}
-		
-		if ($category->getModeration() && 
-		   (kEntitlementUtils::getCategoryModeration() || $this->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_BLOCK_CATEGORY_MODERATION_SELF_APPROVE)))
-		{
-			$dbCategoryEntry->setStatus(CategoryEntryStatus::PENDING);
-		}
-		
-		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-		$dbCategoryEntry->setPartnerId($partnerId);
-		
-		$kuser = kCurrentContext::getCurrentKsKuser();
-		
-		if ($kuser)
-		{
-			$dbCategoryEntry->setCreatorKuserId($kuser->getId());
-			$dbCategoryEntry->setCreatorPuserId($kuser->getPuserId());
-		}
-		
+
+		// TODO: start new code
+		$dbCategoryEntry = new categoryEntry();
+		$entryId = $categoryEntry->entryId;
+		$categoryId = $categoryEntry->categoryId;
+		$dbCategoryEntry = $dbCategoryEntry->add($entryId, $categoryId);
+		// TODO: end new code
+
+//		$entry = entryPeer::retrieveByPK($categoryEntry->entryId);
+//		if (!$entry)
+//			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $categoryEntry->entryId);
+//
+//		$category = categoryPeer::retrieveByPK($categoryEntry->categoryId);
+//		if (!$category)
+//			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryEntry->categoryId);
+//
+//		$categoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($categoryEntry->entryId);
+//
+//		$maxCategoriesPerEntry = $entry->getMaxCategoriesPerEntry();
+//
+//		if (count($categoryEntries) >= $maxCategoriesPerEntry)
+//			throw new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, $maxCategoriesPerEntry);
+//
+//		//validate user is entiteld to assign entry to this category
+//		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getContributionPolicy() != ContributionPolicyType::ALL)
+//		{
+//			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryEntry->categoryId, kCurrentContext::getCurrentKsKuserId());
+//			if(!$categoryKuser)
+//			{
+//				KalturaLog::err("User [" . kCurrentContext::getCurrentKsKuserId() . "] is not a member of the category [{$categoryEntry->categoryId}]");
+//				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+//			}
+//			if($categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER)
+//			{
+//				KalturaLog::err("User [" . kCurrentContext::getCurrentKsKuserId() . "] permission level [" . $categoryKuser->getPermissionLevel() . "] on category [{$categoryEntry->categoryId}] is not member [" . CategoryKuserPermissionLevel::MEMBER . "]");
+//				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+//			}
+//
+//			if(!$categoryKuser->hasPermission(PermissionName::CATEGORY_EDIT) && !$categoryKuser->hasPermission(PermissionName::CATEGORY_CONTRIBUTE) &&
+//				!$entry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId()) &&
+//				$entry->getCreatorKuserId() != kCurrentContext::getCurrentKsKuserId())
+//				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+//		}
+//
+//		$categoryEntryExists = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryEntry->categoryId, $categoryEntry->entryId);
+//		if($categoryEntryExists && $categoryEntryExists->getStatus() == CategoryEntryStatus::ACTIVE)
+//			throw new KalturaAPIException(KalturaErrors::CATEGORY_ENTRY_ALREADY_EXISTS);
+//
+//		if(!$categoryEntryExists)
+//		{
+//			$dbCategoryEntry = new categoryEntry();
+//		}
+//		else
+//		{
+//			$dbCategoryEntry = $categoryEntryExists;
+//		}
+//
+//		$categoryEntry->toInsertableObject($dbCategoryEntry);
+//
+//		/* @var $dbCategoryEnry categoryEntry */
+//		$dbCategoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
+//
+//		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getModeration())
+//		{
+//			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryEntry->categoryId, kCurrentContext::getCurrentKsKuserId());
+//			if(!$categoryKuser ||
+//				($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER &&
+//				$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
+//				$dbCategoryEntry->setStatus(CategoryEntryStatus::PENDING);
+//		}
+//
+//		if ($category->getModeration() &&
+//		   (kEntitlementUtils::getCategoryModeration() || $this->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_BLOCK_CATEGORY_MODERATION_SELF_APPROVE)))
+//		{
+//			$dbCategoryEntry->setStatus(CategoryEntryStatus::PENDING);
+//		}
+//
+//		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+//		$dbCategoryEntry->setPartnerId($partnerId);
+//
+//		$kuser = kCurrentContext::getCurrentKsKuser();
+//
+//		if ($kuser)
+//		{
+//			$dbCategoryEntry->setCreatorKuserId($kuser->getId());
+//			$dbCategoryEntry->setCreatorPuserId($kuser->getPuserId());
+//		}
+		// TODO: resume categoryEntry->add below
 		$dbCategoryEntry->save();
 		
 		//need to select the entry again - after update

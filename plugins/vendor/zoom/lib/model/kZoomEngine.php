@@ -286,7 +286,7 @@ class kZoomEngine
 		$entry = $this->createEntryFromMeeting($meeting, $dbUser);
 		$this->handleParticipants($entry, $validatedUsers, $zoomIntegration);
 		$entry->save();
-		$this->createCategoryEntry($zoomIntegration, $entry);
+		$this->addCategoryEntry($zoomIntegration, $entry);
 		$url = $recordingFile->download_url . self::URL_ACCESS_TOKEN . $event->downloadToken;
 		kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url);
 		return $entry;
@@ -352,19 +352,21 @@ class kZoomEngine
 	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @param entry $entry
 	 * @throws kCoreException
+	 * @throws Exception
 	 */
-	protected function createCategoryEntry($zoomIntegration, $entry)
+	protected function addCategoryEntry($zoomIntegration, $entry)
 	{
 		if ($zoomIntegration->getZoomCategory())
 		{
 			$categoryEntry = new categoryEntry();
-			$categoryEntry->setEntryId($entry->getId());
-			$categoryEntry->setCategoryId($zoomIntegration->getZoomCategoryId());
-			$categoryEntry->setPartnerId($entry->getPartnerId());
-			$categoryEntry->setCreatorKuserId($entry->getKuserId());
-			$categoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
-			$categoryEntry->save();
-			KalturaLog::info('Entry Id "' . $entry->getId() .'" added to Zoom category Id ' . $zoomIntegration->getZoomCategoryId());
+			$dbCategoryEntry = $categoryEntry->add($entry->getId(), $zoomIntegration->getZoomCategoryId());
+//			$categoryEntry->setEntryId($entry->getId());
+//			$categoryEntry->setCategoryId($zoomIntegration->getZoomCategoryId());
+//			$categoryEntry->setPartnerId($entry->getPartnerId());
+//			$categoryEntry->setCreatorKuserId($entry->getKuserId());
+//			$categoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
+			$dbCategoryEntry->save();
+			KalturaLog::info('Entry Id "' . $dbCategoryEntry->getEntryId() .'" added to Zoom category Id ' . $dbCategoryEntry->getCategoryId());
 		}
 	}
 
