@@ -14,7 +14,7 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 	 * @var array
 	 */
 	protected $styles;
-	
+
 	/**
 	 * @param DOMElement $element
 	 * @param array $style
@@ -121,7 +121,7 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 		$xml = new KDOMDocument();
 		try
 		{
-			$xml->loadXML(trim($content, " \r\n\t"));
+			@$xml->loadXML(trim($content, " \r\n\t"));
 		}
 		catch(Exception $e)
 		{

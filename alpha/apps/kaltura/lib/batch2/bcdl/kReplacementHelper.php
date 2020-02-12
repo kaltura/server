@@ -3,6 +3,8 @@
 
 class kReplacementHelper
 {
+	const KLOCK_REPLACE_ENTRY_GRAB_TIMEOUT = 5;
+	const KLOCK_REPLACE_ENTRY_HOLD_TIMEOUT = 0.5;
 
 	/**
 	 * creates a mapping between the new replacing entry assets paramsId and their type to the asset itself
@@ -398,19 +400,38 @@ class kReplacementHelper
 	 * check if the current flavor is a flavor remaining from the replacement and need to be synced on the replaced entry
 	 *
 	 * @param $flavorAsset
-	 * @param $entry
+	 * @param $entryId
 	 * @return bool
 	 */
-	public static function shouldSyncFlavorInfo($flavorAsset, $entry)
+	public static function shouldSyncFlavorInfo($flavorAsset, $entryId)
 	{
-		if($flavorAsset->getStatus() == asset::ASSET_STATUS_DELETED)
+		$entry = entryPeer::retrieveByPkWithoutInstancePooling($entryId);
+
+		if($flavorAsset->getStatus() == asset::ASSET_STATUS_DELETED || !$entry || !$entry->getReplacedEntryId())
 		{
 			return false;
 		}
 
-		if($entry && $entry->getReplacedEntryId() && $entry->getSyncFlavorsOnceReady())
+		if($entry->getSyncFlavorsOnceReady())
 		{
 			return true;
+		}
+		else
+		{
+			$lock = kLock::create('replacement_' . $entry->getReplacedEntryId() . '_' . $entry->getId());
+			if ($lock)
+			{
+				if(!$lock->lock(self::KLOCK_REPLACE_ENTRY_GRAB_TIMEOUT, self::KLOCK_REPLACE_ENTRY_HOLD_TIMEOUT))
+				{
+					return false;
+				}
+				$entry = entryPeer::retrieveByPkWithoutInstancePooling($entryId);
+				$lock->unlock();
+				if($entry->getSyncFlavorsOnceReady())
+				{
+					return true;
+				}
+			}
 		}
 
 		return false;

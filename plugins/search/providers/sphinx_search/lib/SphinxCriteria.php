@@ -10,6 +10,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	const WEIGHT = '@weight';
 	const MAX_MATCHES = 10000;
 	
+	protected static $NEGATIVE_COMPARISON_VALUES = array(baseObjectFilter::NOT_IN, baseObjectFilter::NOT, baseObjectFilter::NOT_CONTAINS);
 	/**
 	 * @var string none or sph04
 	 */
@@ -807,7 +808,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			
 			KalturaLog::debug("Attach field[$fieldName] as sphinx field[$sphinxField] of type [$type] and comparison[$operator] for value[$valStr]");
 
-			if ($this->shouldFilterFieldFromSphinxOptimizations($objectClass,$sphinxField))
+			if ( !in_array($operator, self::$NEGATIVE_COMPARISON_VALUES) && $this->shouldFilterFieldFromSphinxOptimizations($objectClass,$sphinxField))
 			{
 				$this->setDisablePartnerOptimization(true);
 			}

@@ -633,6 +633,13 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				return true;
 			}
 
+        if(
+            ($object instanceof KuserKgroup)
+            &&	in_array(KuserKgroupPeer::STATUS, $modifiedColumns))
+        {
+            return true;
+        }
+
 		return false;
 	}
 
@@ -686,8 +693,17 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				
 			return true;
 		}
-			
-		if ($object instanceof UserRole
+
+        if(
+            $object instanceof KuserKgroup
+            && in_array(KuserKgroupPeer::STATUS, $modifiedColumns)
+        )
+        {
+            kFlowHelper::handleKuserKgroupStatusUpdate($object);
+            return true;
+        }
+
+        if ($object instanceof UserRole
 			&& in_array(UserRolePeer::PERMISSION_NAMES, $modifiedColumns))
 		{
 			$filter = new kuserFilter();
@@ -707,8 +723,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 
 		KalturaLog::info("Asset id [" . $object->getId() . "] isOriginal [" . $object->getIsOriginal() . "] status [" . $object->getStatus() . "]");
 
-		if(kReplacementHelper::shouldSyncFlavorInfo($object, $entry))
+		if(kReplacementHelper::shouldSyncFlavorInfo($object, $object->getEntryId()))
 		{
+			KalturaLog::info('Syncing flavor ' . $object->getId());
+			$entry = entryPeer::retrieveByPkWithoutInstancePooling($object->getEntryId());
 			$originalFlavor = kReplacementHelper::getOriginalReplacedFlavorByEntryAndFlavorParams($entry, $object->getFlavorParamsId(), $object->getType());
 			if($originalFlavor)
 			{

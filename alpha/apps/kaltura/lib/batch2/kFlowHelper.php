@@ -1191,6 +1191,12 @@ class kFlowHelper
 		// verifies that flavor asset created
 		if(!$data->getFlavorAssetId())
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+		
+		if(!$dbBatchJob->getEntry())
+		{
+			KalturaLog::debug("Entry [{$dbBatchJob->getEntryId()}] not found, the entry is porbably deleted will return job instead of api exception");
+			return $dbBatchJob;
+		}
 
 		$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 		// verifies that flavor asset exists
@@ -3205,6 +3211,7 @@ class kFlowHelper
     {
         KalturaLog::info('Handling live to vod finished');
         $liveEntryId = $data->getLiveEntryId();
+        $vodEntryId = $data->getVodEntryId();
         $liveEntry = entryPeer::retrieveByPK($liveEntryId);
         /** @var LiveStreamEntry $liveEntry */
         $recordStatus = $liveEntry->getRecordStatus();
@@ -3214,6 +3221,7 @@ class kFlowHelper
         {
             $liveEntryArchiveJobData = new kLiveEntryArchiveJobData();
             $liveEntryArchiveJobData->setLiveEntryId($liveEntryId);
+            $liveEntryArchiveJobData->setVodEntryId($vodEntryId);
 
             $liveEntryArchiveJob = new BatchJob();
             $liveEntryArchiveJob->setEntryId($liveEntryId);
@@ -3224,5 +3232,16 @@ class kFlowHelper
         }
         return $dbBatchJob;
 
+    }
+
+    public static function handleKuserKgroupStatusUpdate($kuserkgroup)
+    {
+        if ($kuserkgroup->getStatus() == KuserKgroupStatus::DELETED)
+        {
+            $kgroup = kuserPeer::retrieveByPK($kuserkgroup->getKgroupId());
+            $numberOfUsersPerGroup = $kgroup->getMembersCount();
+            $kgroup->setMembersCount(max(0, $numberOfUsersPerGroup - 1));
+            $kgroup->save();
+        }
     }
 }

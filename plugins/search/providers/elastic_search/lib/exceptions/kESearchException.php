@@ -20,9 +20,10 @@ class kESearchException extends kCoreException
     const UNMATCHING_BRACKETS = 'Unmatching brackets';
     const UNMATCHING_QUERY_OPERAND = 'Unmatching query operand. use same operand between brackets';
     const CONSECUTIVE_OPERANDS_MISMATCH = 'Illegal consecutive operands';
-    const INVALID_FIELD_NAME= 'Illegal query field name';
+    const INVALID_FIELD_NAME = 'Illegal query field name';
     const INVALID_METADATA_FORMAT= 'Invalid metadata format';
     const INVALID_METADATA_FIELD = 'Illegal metadata field name. allowed only [xpath, metadata_profile_id, term]';
     const INVALID_MIXED_SEARCH_TYPES = "Illegal mixed search item types";
+    const UNABLE_TO_EXECUTE_ENTRY_CAPTION_ADVANCED_FILTER = 'Unable to execute entry caption advanced filter';
 
 }

@@ -8,6 +8,7 @@ class kConvertJobData extends kConvartableJobData
 	const CONVERSION_MILTI_COMMAND_LINE_SEPERATOR = ';;;';
 	const CONVERSION_FAST_START_SIGN = 'FS';
 	const MIGRATION_FLAVOR_PRIORITY = 10;
+	const TRIMMING_FLAVOR_PRIORITY = 2;
 
 	/**
 	 * @var string
@@ -198,8 +199,13 @@ class kConvertJobData extends kConvartableJobData
 		if($this->priority == 0)
 			self::calculatePriority($batchJob);
 
-		if($this->priority == self::MIGRATION_FLAVOR_PRIORITY) 
+		if($this->priority == self::MIGRATION_FLAVOR_PRIORITY)
 			return BatchJobUrgencyType::MIGRATION_URGENCY;
+
+		if($this->priority == self::TRIMMING_FLAVOR_PRIORITY)
+		{
+			return BatchJobUrgencyType::TOP_URGENCY;
+		}
 
 		// If you have no conversion profile, there is no point in this calculation
 		if(is_null($this->conversionProfileId))

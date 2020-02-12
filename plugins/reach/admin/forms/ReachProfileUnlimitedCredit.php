@@ -10,16 +10,6 @@ class Form_ReachProfileUnlimitedCredit extends Form_ReachProfileCredit
 		parent::init();
 		$this->removeElement("credit");
 		$this->removeElement("overageCredit");
-		
-		$this->addElement('text', 'toDate', array(
-			'label'			=> 'To Date: (YYYY.MM.DD)',
-			'innerType'     => 'DateElement',
-			'required'      => true,
-			'filters'		=> array('StringTrim'),
-			'validators' => array('Int'),
-			'oninput'	=> 'checkNumValid(this.value)'
-		));
+		$this->removeElement("addOn");
 	}
-
-
 }

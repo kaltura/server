@@ -52,9 +52,6 @@ class GroupUserService extends KalturaBaseService
 			throw new KalturaAPIException (KalturaErrors::USER_EXCEEDED_MAX_GROUPS);
 		}
 
-		$numberOfUsersPerGroup = $this->getNumberOfUsersInGroup($kgroup);
-		$kgroup->setMembersCount($numberOfUsersPerGroup+1);
-		$kgroup->save();
 
 		$dbGroupUser = $groupUser->toInsertableObject();
 		$dbGroupUser->setPartnerId($this->getPartnerId());
@@ -136,9 +133,6 @@ class GroupUserService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::GROUP_USER_DOES_NOT_EXIST, $userId, $groupId);
 		}
-		$numberOfUsersPerGroup = $this->getNumberOfUsersInGroup($kgroup);
-		$kgroup->setMembersCount(max(0,$numberOfUsersPerGroup-1));
-		$kgroup->save();
 
 		$dbKuserKgroup->setStatus(KuserKgroupStatus::DELETED);
 		$dbKuserKgroup->save();
