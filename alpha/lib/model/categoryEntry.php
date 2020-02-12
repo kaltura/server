@@ -291,8 +291,8 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 		if(!$categoryEntryExists)
 		{
 			$categoryEntry = new categoryEntry();
-			$categoryEntry->setCategoryId($categoryId);
-			$categoryEntry->setEntryId($entryId);
+//			$categoryEntry->setCategoryId($categoryId); TODO: where these two are being added?
+//			$categoryEntry->setEntryId($entryId);
 		}
 		else
 		{
@@ -300,6 +300,8 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 		}
 
 		$apiCategoryEntry = new KalturaCategoryEntry(); // TODO: this code should be inside 'else' above, no?
+		$apiCategoryEntry->entryId = $entryId;
+		$apiCategoryEntry->categoryId = $categoryId;
 		$apiCategoryEntry->toInsertableObject($categoryEntry); // TODO: Is there a better way to access "toInsertableObject"?
 
 		$categoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
