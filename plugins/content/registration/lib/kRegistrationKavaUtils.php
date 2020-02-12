@@ -13,8 +13,7 @@ class kRegistrationKavaUtils extends kKavaReportsMgr
 		{
 			$context['columns'] = array();
 		}
-		$value = RegistrationPlugin::getRegistrationUserEntryTypeCoreValue(RegistrationUserEntryType::REGISTRATION);
-		$registrationUserEntryType = kPluginableEnumsManager::apiToCore('UserEntryType', $value);
+		$registrationUserEntryType = RegistrationPlugin::getRegistrationUserEntryTypeCoreValue(RegistrationUserEntryType::REGISTRATION);
 		if (!isset($context['custom_criterion']))
 		{
 			$context['custom_criterion'] = array();

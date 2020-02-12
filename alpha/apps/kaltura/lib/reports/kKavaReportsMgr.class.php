@@ -5464,20 +5464,19 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function enrichReportWithUserEntryMetadataFields($report_def, $field, $context)
 	{
 		$headers = explode(",", $context['headers']);
-		$metadataXpath = explode(",", $context['xpath_patterns']);
-		$metadataProfileId = $context['metadata_profile_id'];
+		$metadata_xpath = explode(",", $context['xpath_patterns']);
+		$metadata_profile_id = $context['metadata_profile_id'];
 		$entries_ids = $context['entry_ids'];
 
 		$dimensions = array();
-		$dimensionHeaders = array();
-		$dimensionMap = array();
+		$dimension_headers = array();
+		$dimension_map = array();
 
-		for($i = 0; $i < count($headers); ++$i)
+		foreach($headers as $header)
 		{
-			$header = $headers[$i];
 			$dimensions[] = $field;
-			$dimensionHeaders[] = $header;
-			$dimensionMap[$header] = $field;
+			$dimension_headers[] = $header;
+			$dimension_map[$header] = $field;
 		}
 
 		$dimensions = array_unique($dimensions);
@@ -5485,32 +5484,29 @@ class kKavaReportsMgr extends kKavaBase
 		$curr_dimensions = is_array($report_dimensions) ? $report_dimensions : array($report_dimensions);
 		$dimensions = array_unique(array_merge($curr_dimensions, $dimensions));
 
-		$enrichDef = array();
-		$enrichDef[self::REPORT_ENRICH_OUTPUT] = $dimensionHeaders;
-		$enrichDef[self::REPORT_ENRICH_FUNC] = "kMetadataKavaUtils::metadataEnrich";
-		$enrichDef[self::REPORT_ENRICH_INPUT] = $field;
+		$enrich_def = array();
+		$enrich_def[self::REPORT_ENRICH_OUTPUT] = $dimension_headers;
+		$enrich_def[self::REPORT_ENRICH_FUNC] = "kMetadataKavaUtils::metadataEnrich";
+		$enrich_def[self::REPORT_ENRICH_INPUT] = $field;
 		$context = array();
-		$context["metadata_profile_id"] = $metadataProfileId;
-		$context["xpath_patterns"] = $metadataXpath;
+		$context["metadata_profile_id"] = $metadata_profile_id;
+		$context["xpath_patterns"] = $metadata_xpath;
 		$context["entries_ids"] = $entries_ids;
-		$enrichDef[self::REPORT_ENRICH_CONTEXT] = $context;
+		$enrich_def[self::REPORT_ENRICH_CONTEXT] = $context;
 
 		$report_def[self::REPORT_DIMENSION] = array_values($dimensions);
-		$report_def[self::REPORT_DIMENSION_HEADERS] = array_merge($report_def[self::REPORT_DIMENSION_HEADERS], $dimensionHeaders);
+		$report_def[self::REPORT_DIMENSION_HEADERS] = array_merge($report_def[self::REPORT_DIMENSION_HEADERS], $dimension_headers);
 		if (isset($report_def[self::REPORT_DIMENSION_MAP]))
 		{
-			$report_def[self::REPORT_DIMENSION_MAP] = array_replace($report_def[self::REPORT_DIMENSION_MAP], $dimensionMap);
+			$report_def[self::REPORT_DIMENSION_MAP] = array_replace($report_def[self::REPORT_DIMENSION_MAP], $dimension_map);
 		}
 
 		if (!isset($report_def[self::REPORT_ENRICH_DEF]))
 		{
 			$report_def[self::REPORT_ENRICH_DEF] = array();
 		}
-		$report_def[self::REPORT_ENRICH_DEF][] = $enrichDef;
-
+		$report_def[self::REPORT_ENRICH_DEF][] = $enrich_def;
 		return $report_def;
-
-
 	}
 
 	protected static function addEntryDescendants($partner_id, $ids)
@@ -5615,12 +5611,12 @@ class kKavaReportsMgr extends kKavaBase
 		if (isset($report_def[self::REPORT_DYNAMIC_HEADERS]))
 		{
 			self::replaceCustomParams($report_def[self::REPORT_DYNAMIC_HEADERS], $params);
-			$dynamicEnrich = $report_def[self::REPORT_DYNAMIC_HEADERS];
-			foreach ($dynamicEnrich as $dynamicEnrichDef)
+			$dynamic_enrich = $report_def[self::REPORT_DYNAMIC_HEADERS];
+			foreach ($dynamic_enrich as $dynamic_enrich_def)
 			{
-				$func = $dynamicEnrichDef[self::REPORT_ENRICH_FUNC];
-				$field = $dynamicEnrichDef['field'];
-				$context = $dynamicEnrichDef[self::REPORT_ENRICH_CONTEXT];
+				$func = $dynamic_enrich_def[self::REPORT_ENRICH_FUNC];
+				$field = $dynamic_enrich_def['field'];
+				$context = $dynamic_enrich_def[self::REPORT_ENRICH_CONTEXT];
 				$report_def = call_user_func($func, $report_def, $field, $context);
 			}
 		}
@@ -5665,12 +5661,18 @@ class kKavaReportsMgr extends kKavaBase
 
 			if (isset($report_def[self::REPORT_HEADERS_TO_REMOVE]))
 			{
+				$indexes_to_remove = array();
 				$headers_to_remove = $report_def[self::REPORT_HEADERS_TO_REMOVE];
 				foreach ($headers_to_remove as $header_to_remove)
 				{
 					$field_index = array_search($header_to_remove, $header);
 					unset($header[$field_index]);
-					foreach($data as &$row)
+					$indexes_to_remove[] = $field_index;
+				}
+
+				foreach($data as &$row)
+				{
+					foreach ($indexes_to_remove as $field_index)
 					{
 						unset($row[$field_index]);
 					}
