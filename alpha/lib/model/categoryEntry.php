@@ -291,6 +291,8 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 		if(!$categoryEntryExists)
 		{
 			$categoryEntry = new categoryEntry();
+			$categoryEntry->setCategoryId($categoryId);
+			$categoryEntry->setEntryId($entryId);
 		}
 		else
 		{
