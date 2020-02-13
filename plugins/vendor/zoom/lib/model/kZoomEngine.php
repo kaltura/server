@@ -357,7 +357,10 @@ class kZoomEngine
 	{
 		if ($zoomIntegration->getZoomCategory())
 		{
-			$entry->setCategories($zoomIntegration->getZoomCategory());
+			$categoryEntry = new categoryEntry();
+			$dbCategoryEntry = $categoryEntry->add($entry->getId(), $zoomIntegration->getZoomCategoryId());
+			$dbCategoryEntry->save();
+			KalturaLog::info('Entry Id "' . $dbCategoryEntry->getEntryId() .'" added to Zoom category Id ' . $dbCategoryEntry->getCategoryId());
 		}
 	}
 
