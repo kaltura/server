@@ -365,16 +365,17 @@ class ReportService extends KalturaBaseService
 			$kReportsManager = new kReportManager($dbReport);
 			list($columns, $rows) = $kReportsManager->execute($execParams);
 		}
-		
-		$fileName = array('Report', $id, $this->getPartnerId());
+
+		$fileName = 'Report_' . $id . '_' . $this->getPartnerId() . '_';
 		foreach($params as $param)
 		{
-			$fileName[] = $param->key;
-			$fileName[] = $param->value;
+			$fileName .= $param->key . '_' . $param->value;
+			if (strlen($fileName) >= self::MAX_CSV_FILE_NAME_LENGTH)
+			{
+				break;
+			}
 		}
 
-		$fileName = implode('_', $fileName);
-		$fileName = substr($fileName, 0, self::MAX_CSV_FILE_NAME_LENGTH);
 		$fileName = $fileName . '.csv';
 
 		header('Content-Type: text/csv');
