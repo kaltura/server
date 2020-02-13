@@ -360,11 +360,6 @@ class kZoomEngine
 		{
 			$categoryEntry = new categoryEntry();
 			$dbCategoryEntry = $categoryEntry->add($entry->getId(), $zoomIntegration->getZoomCategoryId());
-//			$categoryEntry->setEntryId($entry->getId());
-//			$categoryEntry->setCategoryId($zoomIntegration->getZoomCategoryId());
-//			$categoryEntry->setPartnerId($entry->getPartnerId());
-//			$categoryEntry->setCreatorKuserId($entry->getKuserId());
-//			$categoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
 			$dbCategoryEntry->save();
 			KalturaLog::info('Entry Id "' . $dbCategoryEntry->getEntryId() .'" added to Zoom category Id ' . $dbCategoryEntry->getCategoryId());
 		}

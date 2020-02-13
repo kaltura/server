@@ -233,6 +233,7 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 	 */
 	public function add($entryId, $categoryId)
 	{
+		/*=========================================================*/
 		$entry = entryPeer::retrieveByPK($entryId);
 		if(!$entry)
 		{
@@ -244,7 +245,7 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 		{
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
 		}
-
+		/*=========================================================*/
 		$categoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($entryId);
 
 		$maxCategoriesPerEntry = $entry->getMaxCategoriesPerEntry();
@@ -253,7 +254,7 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 		{
 			throw new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, $maxCategoriesPerEntry);
 		}
-
+		/*=========================================================*/
 		$currentKsKuserId = kCurrentContext::getCurrentKsKuserId();
 
 		// validate user is entitled to assign entry to this category
@@ -281,7 +282,7 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
 			}
 		}
-
+		/*=========================================================*/
 		$categoryEntryExists = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
 		if($categoryEntryExists && $categoryEntryExists->getStatus() == CategoryEntryStatus::ACTIVE) // TODO: what about PENDING?
 		{
@@ -291,21 +292,19 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 		if(!$categoryEntryExists)
 		{
 			$categoryEntry = new categoryEntry();
-//			$categoryEntry->setCategoryId($categoryId); TODO: where these two are being added?
-//			$categoryEntry->setEntryId($entryId);
 		}
 		else
 		{
 			$categoryEntry = $categoryEntryExists;
 		}
-
-		$apiCategoryEntry = new KalturaCategoryEntry(); // TODO: this code should be inside 'else' above, no?
+		/*=========================================================*/
+		$apiCategoryEntry = new KalturaCategoryEntry();
 		$apiCategoryEntry->entryId = $entryId;
 		$apiCategoryEntry->categoryId = $categoryId;
 		$apiCategoryEntry->toInsertableObject($categoryEntry); // TODO: Is there a better way to access "toInsertableObject"?
-
+		/*=========================================================*/
 		$categoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
-
+		/*=========================================================*/
 		if(kEntitlementUtils::getEntitlementEnforcement() && $category->getModeration())
 		{
 			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, $currentKsKuserId);
@@ -321,7 +320,7 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 		{
 			$categoryEntry->setStatus(CategoryEntryStatus::PENDING);
 		}
-
+		/*=========================================================*/
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id; // TODO: why not take PID from Entry / Category?
 		$categoryEntry->setPartnerId($partnerId);
 
