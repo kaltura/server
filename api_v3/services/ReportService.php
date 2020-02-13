@@ -366,14 +366,15 @@ class ReportService extends KalturaBaseService
 			list($columns, $rows) = $kReportsManager->execute($execParams);
 		}
 
-		$fileName = 'Report_' . $id . '_' . $this->getPartnerId() . '_';
+		$fileName = 'Report_' . $id . '_' . $this->getPartnerId();
 		foreach($params as $param)
 		{
-			$fileName .= $param->key . '_' . $param->value;
-			if (strlen($fileName) >= self::MAX_CSV_FILE_NAME_LENGTH)
+			$tempName = '_' . $param->key . '_' . $param->value;
+			if (strlen($fileName) + strlen($tempName) >= self::MAX_CSV_FILE_NAME_LENGTH)
 			{
 				break;
 			}
+			$fileName .= $tempName;
 		}
 
 		$fileName = $fileName . '.csv';
