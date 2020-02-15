@@ -7,6 +7,7 @@
  */
 class ReportService extends KalturaBaseService
 {
+	const MAX_CSV_FILE_NAME_LENGTH = 200;
 	protected static $crossPartnerReports = array(
 		ReportType::PARTNER_USAGE,
 		ReportType::VAR_USAGE,
@@ -364,14 +365,20 @@ class ReportService extends KalturaBaseService
 			$kReportsManager = new kReportManager($dbReport);
 			list($columns, $rows) = $kReportsManager->execute($execParams);
 		}
-		
-		$fileName = array('Report', $id, $this->getPartnerId());
+
+		$fileName = 'Report_' . $id . '_' . $this->getPartnerId();
 		foreach($params as $param)
 		{
-			$fileName[] = $param->key;
-			$fileName[] = $param->value;
+			$tempName = '_' . $param->key . '_' . $param->value;
+			if (strlen($fileName) + strlen($tempName) >= self::MAX_CSV_FILE_NAME_LENGTH)
+			{
+				break;
+			}
+			$fileName .= $tempName;
 		}
-		$fileName = implode('_', $fileName) . '.csv';
+
+		$fileName = $fileName . '.csv';
+
 		header('Content-Type: text/csv');
 		header("Content-Disposition: attachment; filename=\"$fileName\"");
 		echo "\xEF\xBB\xBF"; // a fix for excel, copied from myReportsMgr
