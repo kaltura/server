@@ -44,7 +44,7 @@ class kBatchManager
 		
 		if($flavorAsset)
 		{
-			$description = ltrim($flavorAsset->getDescription() . "\n" . $description);
+			$description = rtrim($flavorAsset->getDescription() . "\n" . $description);
 			$flavorAsset->setDescription($description);
 //			$flavorAsset->incrementVersion();
 		}	
