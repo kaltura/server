@@ -400,11 +400,13 @@ class kReplacementHelper
 	 * check if the current flavor is a flavor remaining from the replacement and need to be synced on the replaced entry
 	 *
 	 * @param $flavorAsset
-	 * @param $entry
+	 * @param $entryId
 	 * @return bool
 	 */
-	public static function shouldSyncFlavorInfo($flavorAsset, $entry)
+	public static function shouldSyncFlavorInfo($flavorAsset, $entryId)
 	{
+		$entry = entryPeer::retrieveByPkWithoutInstancePooling($entryId);
+
 		if($flavorAsset->getStatus() == asset::ASSET_STATUS_DELETED || !$entry || !$entry->getReplacedEntryId())
 		{
 			return false;
@@ -423,11 +425,12 @@ class kReplacementHelper
 				{
 					return false;
 				}
+				$entry = entryPeer::retrieveByPkWithoutInstancePooling($entryId);
+				$lock->unlock();
 				if($entry->getSyncFlavorsOnceReady())
 				{
 					return true;
 				}
-				$lock->unlock();
 			}
 		}
 

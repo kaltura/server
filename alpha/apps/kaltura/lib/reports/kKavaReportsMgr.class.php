@@ -73,6 +73,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_COUNT_EBVS = 'count_ebvs';
 	const METRIC_NODE_UNIQUE_PERCENTILES_RATIO = 'node_avg_completion_rate';
 	const METRIC_TOTAL_UNIQUE_PERCENTILES = 'total_completion_rate';
+	const METRIC_VOD_PLAYS_COUNT = 'vod_plays_count';
+	const METRIC_VOD_UNIQUE_PERCENTILES_RATIO = 'avg_vod_completion_rate';
 	const METRIC_EBVS_RATIO = 'ebvs_ratio';
 	const METRIC_VIEW_PERIOD_UNIQUE_SESSIONS = 'view_period_unique_sessions';
 	const METRIC_AVG_SESSION_ERROR_RATE = 'avg_session_error_rate';
@@ -194,6 +196,8 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_EDIT_FILTER_FUNC = 'report_edit_filter_func';
 	const REPORT_TOTAL_FINALIZE_FUNC = 'report_total_finalize_func';
 	const REPORT_ORDER_BY = 'report_order_by';
+	const REPORT_DYNAMIC_HEADERS = 'report_dynamic_headers';
+	const REPORT_HEADERS_TO_REMOVE = 'report_headers_to_remove';
 
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -299,6 +303,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PLAY_REQUESTED,
 		self::EVENT_TYPE_NODE_PLAY,
 		self::EVENT_TYPE_PLAYMANIFEST,
+		self::EVENT_TYPE_REGISTERED,
+		self::EVENT_TYPE_REGISTRATION_IMPRESSION,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -401,6 +407,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_EBVS_RATIO => true,
 		self::METRIC_AVG_VIEW_SESSION_ERROR_RATE => true,
 		self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS => true,
+		self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -887,13 +894,19 @@ class kKavaReportsMgr extends kKavaBase
 				self::getInFilter(self::DIMENSION_POSITION, array(self::VALUE_UNKNOWN, self::VALUE_ZERO)))),
 			self::getLongSumAggregator(self::METRIC_ERROR_UNKNOWN_POSITION_COUNT, self::METRIC_COUNT));
 
-		self::$aggregations_def[self::METRIC_VIEW_PERIOD_BUFFER_STARTS] = self::getFilteredAggregator(
+    		self::$aggregations_def[self::METRIC_VIEW_PERIOD_BUFFER_STARTS] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
 			self::getLongSumAggregator(self::METRIC_VIEW_PERIOD_BUFFER_STARTS, self::METRIC_BUFFER_STARTS));
 
 		self::$aggregations_def[self::METRIC_VIEW_PERIOD_FLAVOR_SWITCHES] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
 			self::getLongSumAggregator(self::METRIC_VIEW_PERIOD_FLAVOR_SWITCHES, self::METRIC_FLAVOR_SWITCHES));
+
+		self::$aggregations_def[self::METRIC_VOD_PLAYS_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_VOD))),
+			self::getLongSumAggregator(self::METRIC_VOD_PLAYS_COUNT, self::METRIC_COUNT));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
@@ -1094,6 +1107,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_UNIQUE_PERCENTILES_RATIO,
 				self::METRIC_UNIQUE_PERCENTILES_SUM,
 				self::EVENT_TYPE_PLAY));
+
+		self::$metrics_def[self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_VOD_PLAYS_COUNT, self::METRIC_UNIQUE_PERCENTILES_SUM),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO,
+				self::METRIC_UNIQUE_PERCENTILES_SUM,
+				self::METRIC_VOD_PLAYS_COUNT));
 
 		self::$metrics_def[self::METRIC_VIEW_BUFFER_TIME_RATIO] = array(
 			self::DRUID_AGGR => array(self::EVENT_TYPE_VIEW, self::METRIC_VIEW_BUFFER_TIME_SEC),
@@ -2024,6 +2044,7 @@ class kKavaReportsMgr extends kKavaBase
 			'event_var1' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR1),
 			'player_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYER_VERSION),
 			'isp' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_ISP),
+			'application_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_APPLICATION_VER),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
@@ -3989,7 +4010,7 @@ class kKavaReportsMgr extends kKavaBase
 				{
 					list($enrich_func, $enrich_context, $enriched_indexes) = $enrich_spec;
 					$entities = call_user_func($enrich_func, array_keys($dimension_ids), $partner_id, $enrich_context);
-			
+
 					for ($current_row = $start; $current_row < $limit; $current_row++) 
 					{
 						$key = self::arrayGetElements($data[$current_row], $dim_indexes);
@@ -5426,11 +5447,6 @@ class kKavaReportsMgr extends kKavaBase
 				continue;
 			}
 
-			if ($key != 'value')		// currently, limiting var replacement only for keys called 'value'
-			{
-				continue;
-			}
-
 			if (!is_string($value) || !$value || $value[0] != ':')
 			{
 				continue;
@@ -5443,6 +5459,55 @@ class kKavaReportsMgr extends kKavaBase
 			}
 			$value = $params[$param_name];
 		}
+	}
+
+
+	protected static function enrichReportWithUserEntryMetadataFields($report_def, $field, $context)
+	{
+		$headers = explode(",", $context['headers']);
+		$metadata_xpath = explode(",", $context['xpath_patterns']);
+		$metadata_profile_id = $context['metadata_profile_id'];
+		$entries_ids = $context['entry_ids'];
+
+		$dimensions = array();
+		$dimension_headers = array();
+		$dimension_map = array();
+
+		foreach($headers as $header)
+		{
+			$dimensions[] = $field;
+			$dimension_headers[] = $header;
+			$dimension_map[$header] = $field;
+		}
+
+		$dimensions = array_unique($dimensions);
+		$report_dimensions = $report_def[self::REPORT_DIMENSION];
+		$curr_dimensions = is_array($report_dimensions) ? $report_dimensions : array($report_dimensions);
+		$dimensions = array_unique(array_merge($curr_dimensions, $dimensions));
+
+		$enrich_def = array();
+		$enrich_def[self::REPORT_ENRICH_OUTPUT] = $dimension_headers;
+		$enrich_def[self::REPORT_ENRICH_FUNC] = "kMetadataKavaUtils::metadataEnrich";
+		$enrich_def[self::REPORT_ENRICH_INPUT] = $field;
+		$context = array();
+		$context["metadata_profile_id"] = $metadata_profile_id;
+		$context["xpath_patterns"] = $metadata_xpath;
+		$context["entries_ids"] = $entries_ids;
+		$enrich_def[self::REPORT_ENRICH_CONTEXT] = $context;
+
+		$report_def[self::REPORT_DIMENSION] = array_values($dimensions);
+		$report_def[self::REPORT_DIMENSION_HEADERS] = array_merge($report_def[self::REPORT_DIMENSION_HEADERS], $dimension_headers);
+		if (isset($report_def[self::REPORT_DIMENSION_MAP]))
+		{
+			$report_def[self::REPORT_DIMENSION_MAP] = array_replace($report_def[self::REPORT_DIMENSION_MAP], $dimension_map);
+		}
+
+		if (!isset($report_def[self::REPORT_ENRICH_DEF]))
+		{
+			$report_def[self::REPORT_ENRICH_DEF] = array();
+		}
+		$report_def[self::REPORT_ENRICH_DEF][] = $enrich_def;
+		return $report_def;
 	}
 
 	protected static function addEntryDescendants($partner_id, $ids)
@@ -5544,6 +5609,19 @@ class kKavaReportsMgr extends kKavaBase
 			self::replaceCustomParams($report_def[self::REPORT_ENRICH_DEF], $params);
 		}
 
+		if (isset($report_def[self::REPORT_DYNAMIC_HEADERS]))
+		{
+			self::replaceCustomParams($report_def[self::REPORT_DYNAMIC_HEADERS], $params);
+			$dynamic_enrich = $report_def[self::REPORT_DYNAMIC_HEADERS];
+			foreach ($dynamic_enrich as $dynamic_enrich_def)
+			{
+				$func = $dynamic_enrich_def[self::REPORT_ENRICH_FUNC];
+				$field = $dynamic_enrich_def['field'];
+				$context = $dynamic_enrich_def[self::REPORT_ENRICH_CONTEXT];
+				$report_def = call_user_func($func, $report_def, $field, $context);
+			}
+		}
+
 		$object_ids = isset($input_filter->object_ids) ? $input_filter->object_ids : null; 
 
 		if (isset($report_def[self::REPORT_GRAPH_METRICS]))
@@ -5581,6 +5659,26 @@ class kKavaReportsMgr extends kKavaBase
 				$object_ids,
 				self::GET_TABLE_FLAG_IS_CSV,
 				$response_options);
+
+			if (isset($report_def[self::REPORT_HEADERS_TO_REMOVE]))
+			{
+				$indexes_to_remove = array();
+				$headers_to_remove = $report_def[self::REPORT_HEADERS_TO_REMOVE];
+				foreach ($headers_to_remove as $header_to_remove)
+				{
+					$field_index = array_search($header_to_remove, $header);
+					unset($header[$field_index]);
+					$indexes_to_remove[] = $field_index;
+				}
+
+				foreach($data as &$row)
+				{
+					foreach ($indexes_to_remove as $field_index)
+					{
+						unset($row[$field_index]);
+					}
+				}
+			}
 		}
 		else
 		{

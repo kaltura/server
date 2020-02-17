@@ -11,7 +11,7 @@ class embedPlaykitJsAction extends sfAction
 	const VERSIONS_PARAM_NAME = "versions";
 	const ENTRY_ID_PARAM_NAME = "entry_id";
 	const KS_PARAM_NAME = "ks";
-	const CONFIG_PARAM_NAME = "config";	
+	const CONFIG_PARAM_NAME = "config";
 	const REGENERATE_PARAM_NAME = "regenerate";
 	const IFRAME_EMBED_PARAM_NAME = "iframeembed";
 	const AUTO_EMBED_PARAM_NAME = "autoembed";
@@ -38,13 +38,13 @@ class embedPlaykitJsAction extends sfAction
 	private $uiConfUpdatedAt = null;
 	private $regenerate = false;
 	private $uiConfTags = array(self::PLAYER_V3_VERSIONS_TAG);
-	
+
 	public function execute()
 	{
 		$this->initMembers();
-		
+
 		$bundleContent = $this->bundleCache->get($this->bundle_name);
-		if (!$bundleContent || $this->regenerate) 
+		if (!$bundleContent || $this->regenerate)
 		{
 			$bundleContent = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this));
 		}
@@ -56,19 +56,19 @@ class embedPlaykitJsAction extends sfAction
 
 		// send cache headers
 		$this->sendHeaders($bundleContent, $lastModified);
-		
+
 		echo($bundleContent);
-		
+
 		KExternalErrors::dieGracefully();
 	}
-	
+
 	public static function buildBundleLocked($context)
 	{
 		//if bundle not exists or explicitly should be regenerated build it
 		if(!$context->regenerate)
 		{
 			$bundleContent = $context->bundleCache->get($context->bundle_name);
-			if ($bundleContent) 
+			if ($bundleContent)
 			{
 				return $bundleContent;
 			}
@@ -84,7 +84,7 @@ class embedPlaykitJsAction extends sfAction
 		$url = $context->bundlerUrl . "/build?config=" . base64_encode($config) . "&name=" . $context->bundle_name . "&source=" . base64_encode($context->sourcesPath);
 		$content = KCurlWrapper::getContent($url, array('Content-Type: application/json'), true);
 
-		if (!$content) 
+		if (!$content)
 		{
 			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " failed to get content from bundle builder");
 		}
@@ -105,9 +105,9 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		return $bundleContent;
-		
+
 	}
-	
+
 	private function formatBundleContent($bundleContent)
 	{
 		$bundleContentParts = explode(",", $bundleContent, 2);
@@ -116,20 +116,20 @@ class embedPlaykitJsAction extends sfAction
 		$iframeEmbed = $this->getRequestParameter(self::IFRAME_EMBED_PARAM_NAME);
 
 		//if auto embed selected add embed script to bundle content
-		if ($autoEmbed) 
+		if ($autoEmbed)
 		{
 			$bundleContent .= $this->getAutoEmbedCode();
-		} 
-		elseif ($iframeEmbed) 
+		}
+		elseif ($iframeEmbed)
 		{
 			$bundleContent = $this->getIfarmEmbedCode($bundleContent);
 		}
-		
+
 		$protocol = infraRequestUtils::getProtocol();
 		$host = myPartnerUtils::getCdnHost($this->partnerId, $protocol, 'api');
 		$sourceMapLoaderURL = "$host/$this->sourceMapLoader/path/$this->bundle_name";
 		$bundleContent = str_replace("//# sourceMappingURL=$this->bundle_name.min.js.map", "//# sourceMappingURL=$sourceMapLoaderURL", $bundleContent);
-		
+
 		return $bundleContent;
 	}
 
@@ -260,7 +260,7 @@ class embedPlaykitJsAction extends sfAction
 
 		return '';
 	}
-	
+
 	private function sendHeaders($content, $lastModified)
 	{
 		$max_age = 60 * 10;
@@ -274,43 +274,43 @@ class embedPlaykitJsAction extends sfAction
 			header("HTTP/1.1 304 Not Modified");
 			KExternalErrors::dieGracefully();
 		}
-		
+
 		$iframeEmbed = $this->getRequestParameter('iframeembed');
-		if ($iframeEmbed) 
+		if ($iframeEmbed)
 		{
 			header("Content-Type: text/html");
-		} 
-		else 
+		}
+		else
 		{
 			header("Content-Type: text/javascript");
 		}
-		
+
 		header("Etag: " . $this->getOutputHash($content));
 		// always set cross orgin headers:
 		header("Access-Control-Allow-Origin: *");
 		infraRequestUtils::sendCachingHeaders($max_age, false, $lastModified);
 	}
-	
+
 	private function getLastModified($content)
 	{
 		$contentParts = explode(",", $content, 2);
 		$lastModified = $contentParts[0];
-		
+
 		if($this->uiConfUpdatedAt > $lastModified)
 			$lastModified = $this->uiConfUpdatedAt;
 
 		return $lastModified;
 	}
-	
+
 	private function getOutputHash($o)
 	{
-		if (!$this->eTagHash) 
+		if (!$this->eTagHash)
 		{
 			$this->eTagHash = md5($o);
 		}
 		return $this->eTagHash;
 	}
-	
+
 	private function getAutoEmbedCode($targetId = null)
 	{
 		$targetId = $targetId ? $targetId : $this->getRequestParameter('targetId');
@@ -318,13 +318,13 @@ class embedPlaykitJsAction extends sfAction
 		{
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Player target ID not defined");
 		}
-		
-		$entry_id = $this->getRequestParameter(self::ENTRY_ID_PARAM_NAME);		
+
+		$entry_id = $this->getRequestParameter(self::ENTRY_ID_PARAM_NAME);
 		if (!$entry_id)
 		{
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Entry ID not defined");
 		}
-		
+
 		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME, array());
 		//enable passing nested config options
 		foreach ($config as $key=>$val)
@@ -336,20 +336,20 @@ class embedPlaykitJsAction extends sfAction
 		{
 			$config["provider"] = new stdClass();
 		}
-		
+
 		$config["provider"]->partnerId = $this->partnerId;
 		$config["provider"]->uiConfId = $this->uiconfId;
 
-		$ks = $this->getRequestParameter(self::KS_PARAM_NAME);	
+		$ks = $this->getRequestParameter(self::KS_PARAM_NAME);
 
-		if ($ks) 
+		if ($ks)
 		{
 			$config["provider"]->ks = $ks;
 		}
 
 		$config["targetId"] = $targetId;
 
-		$config = json_encode($config);		
+		$config = json_encode($config);
 		if ($config === false)
 		{
 			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
@@ -366,7 +366,7 @@ class embedPlaykitJsAction extends sfAction
 
 		return $autoEmbedCode;
 	}
-	
+
 	private function getIfarmEmbedCode($bundleContent)
 	{
 		$bundleContent .= $this->getAutoEmbedCode("player_container");
@@ -447,7 +447,7 @@ class embedPlaykitJsAction extends sfAction
 		}
 		return array($config,$productVersion);
 	}
-	
+
 	private function setLatestOrBetaVersionNumber()
 	{
 		//if latest/beta version required set version number in config obj
@@ -460,7 +460,7 @@ class embedPlaykitJsAction extends sfAction
 			list($latestVersionMap, $latestProductVersion) = $this->getConfigByVersion("latest");
 			list($betaVersionMap, $betaProductVersion) = $this->getConfigByVersion("beta");
 
-			//package version to compare, product version will save jut if all the versions in uiConf similar 
+			//package version to compare, product version will save jut if all the versions in uiConf similar
 			$packageVersion = reset( $this->bundleConfig );
 
 			foreach ($this->bundleConfig as $key => $val)
@@ -489,24 +489,24 @@ class embedPlaykitJsAction extends sfAction
 
 		}
 	}
-	
+
 	private function initMembers()
 	{
 		$this->eTagHash = null;
-		
+
 		$this->bundleCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYKIT_JS);
 		if (!$this->bundleCache)
 			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, "Bundle cache not defined");
-		
+
 		$this->sourceMapsCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYKIT_JS_SOURCE_MAP);
 		if (!$this->sourceMapsCache)
 			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, "PlayKit source maps cache not defined");
-		
+
 		//Get uiConf ID from QS
 		$this->uiconfId = $this->getRequestParameter(self::UI_CONF_ID_PARAM_NAME);
 		if (!$this->uiconfId)
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, self::UI_CONF_ID_PARAM_NAME);
-		
+
 		// retrieve uiCong Obj
 		$this->uiConf = uiConfPeer::retrieveByPK($this->uiconfId);
 		if (!$this->uiConf)
@@ -516,7 +516,7 @@ class embedPlaykitJsAction extends sfAction
 			$this->playerConfig = new stdClass();
 		}
 		$this->uiConfUpdatedAt = $this->uiConf->getUpdatedAt(null);
-		
+
 		//Get bundle configuration stored in conf_vars
 		$confVars = $this->uiConf->getConfVars();
 		if (!$confVars) {
@@ -531,7 +531,7 @@ class embedPlaykitJsAction extends sfAction
 
 		//Get should force regenration
 		$this->regenerate = $this->getRequestParameter(self::REGENERATE_PARAM_NAME);
-		
+
 		//Get the list of partner 0 uiconf tags for uiconfs that contain {latest} and {beta} lists
 		$embedPlaykitConf = kConf::getMap(kConfMapNames::EMBED_PLAYKIT);
 		if (isset($embedPlaykitConf[self::EMBED_PLAYKIT_UICONF_TAGS_KEY_NAME]))
@@ -540,43 +540,43 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		//Get config params
-		try 
+		try
 		{
 			$playkitConfig = kConf::get('playkit-js');
 			if (array_key_exists('internal_bundler_url', $playkitConfig))
 				$this->bundlerUrl = rtrim($playkitConfig['internal_bundler_url']);
-			
+
 			if (array_key_exists('playkit_js_sources_path', $playkitConfig))
 				$this->sourcesPath = rtrim($playkitConfig['playkit_js_sources_path']);
-			
+
 			if (array_key_exists('play_kit_js_cache_version', $playkitConfig))
 				$this->cacheVersion = rtrim($playkitConfig['play_kit_js_cache_version']);
-			
+
 			if (array_key_exists('play_kit_js_cache_version', $playkitConfig))
 				$this->sourceMapLoader = rtrim($playkitConfig['playkit_js_source_map_loader']);
-			
-			
-		} 
-		catch (Exception $ex) 
+
+
+		}
+		catch (Exception $ex)
 		{
 			KExternalErrors::dieError(KExternalErrors::INTERNAL_SERVER_ERROR);
 		}
-		
+
 		$this->bundleConfig = json_decode($confVars, true);
 		$this->mergeVersionsParamIntoConfig();
 		if (!$this->bundleConfig) {
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "unable to resolve bundle config");
 		}
 		$this->setLatestOrBetaVersionNumber();
-		
+
 		$this->setBundleName();
 	}
-	
+
 	private function setBundleName()
 	{
 		//sort bundle config by key
 		ksort($this->bundleConfig);
-		
+
 		//create base64 bundle name from json config
 		$config_str = json_encode($this->bundleConfig);
 		$this->bundle_name = md5($config_str);

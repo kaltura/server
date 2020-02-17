@@ -1547,6 +1547,7 @@ class reportsInputFilter
 	public $event_var1;
 	public $player_versions;
 	public $isp;
+	public $application_versions;
 
 	public function getFilterBy() {
 		return "";

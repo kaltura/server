@@ -57,7 +57,7 @@ abstract class KalturaEntryServerNode extends KalturaObject implements IFilterab
 	/**
 	 * @var KalturaEntryServerNodeType
 	 * @readonly
-	 * @filter eq,in
+	 * @filter eq,in,notin
 	 */
 	public $serverType;
 

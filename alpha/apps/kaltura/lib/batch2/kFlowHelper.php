@@ -3211,6 +3211,7 @@ class kFlowHelper
     {
         KalturaLog::info('Handling live to vod finished');
         $liveEntryId = $data->getLiveEntryId();
+        $vodEntryId = $data->getVodEntryId();
         $liveEntry = entryPeer::retrieveByPK($liveEntryId);
         /** @var LiveStreamEntry $liveEntry */
         $recordStatus = $liveEntry->getRecordStatus();
@@ -3220,6 +3221,7 @@ class kFlowHelper
         {
             $liveEntryArchiveJobData = new kLiveEntryArchiveJobData();
             $liveEntryArchiveJobData->setLiveEntryId($liveEntryId);
+            $liveEntryArchiveJobData->setVodEntryId($vodEntryId);
 
             $liveEntryArchiveJob = new BatchJob();
             $liveEntryArchiveJob->setEntryId($liveEntryId);
@@ -3230,5 +3232,16 @@ class kFlowHelper
         }
         return $dbBatchJob;
 
+    }
+
+    public static function handleKuserKgroupStatusUpdate($kuserkgroup)
+    {
+        if ($kuserkgroup->getStatus() == KuserKgroupStatus::DELETED)
+        {
+            $kgroup = kuserPeer::retrieveByPK($kuserkgroup->getKgroupId());
+            $numberOfUsersPerGroup = $kgroup->getMembersCount();
+            $kgroup->setMembersCount(max(0, $numberOfUsersPerGroup - 1));
+            $kgroup->save();
+        }
     }
 }

@@ -32,7 +32,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	protected $timeout = 90;
 	protected $processedTimeout = 300;
 	protected $longProcessedTimeout = 1200;
-	protected $bigFile = 2147483648;
+	protected $bigFile = 2147483648; // 2GB in bytes
 
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
@@ -42,6 +42,8 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	const DEFAULT_CHUNK_SIZE_BYTE = 1048576; // 1024 * 1024
 
 	const TIME_TO_WAIT_FOR_YOUTUBE_TRANSCODING = 20;
+
+	const GIGABYTES_IN_BYTES = 1073741824;
 
 	public function configure()
 	{
@@ -708,7 +710,8 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		if ($fileSize > $this->bigFile)
 		{
 			$this->processedTimeout = $this->longProcessedTimeout;
-			KalturaLog::info('Increased processed timeout to '.$this->processedTimeout.' seconds for file larger than ' . $this->bigFile);
+			$fileSizeLimit =  ($this->bigFile / self::GIGABYTES_IN_BYTES);
+			KalturaLog::info('Increased processed timeout to '.$this->processedTimeout.' seconds for file larger than ' . $fileSizeLimit . 'GB');
 		}
 	}
 

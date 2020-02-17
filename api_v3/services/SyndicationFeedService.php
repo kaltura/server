@@ -250,7 +250,7 @@ class SyndicationFeedService extends KalturaBaseService
 
 			$feedRenderer = new KalturaSyndicationFeedRenderer($feedId);
 			$feedRenderer->addFlavorParamsAttachedFilter();
-			$feedCount->actualEntryCount = $feedRenderer->getEntriesCount();
+			$feedCount->actualEntryCount = $feedRenderer->getEntriesCount(true);
 		}
 		catch (kCoreException $exception)
 		{

@@ -12,7 +12,7 @@
  */
 class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 {
-	const ENTRY_SERVER_NODE_MIN_CREATION_TIMEE = 120;
+	const ENTRY_SERVER_NODE_MIN_CREATION_TIME = 120;
 	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -21,19 +21,31 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 	{
 		return KalturaBatchJobType::CLEANUP;
 	}
+
+    protected function getFilter()
+    {
+        $entryServerNodeMinCreationTime = $this->getAdditionalParams("minCreationTime");
+        if(!$entryServerNodeMinCreationTime)
+            $entryServerNodeMinCreationTime = self::ENTRY_SERVER_NODE_MIN_CREATION_TIME;
+
+        $entryServerNodeFilter = new KalturaEntryServerNodeFilter();
+        $entryServerNodeFilter->orderBy = KalturaEntryServerNodeOrderBy::CREATED_AT_ASC;
+        $entryServerNodeFilter->createdAtLessThanOrEqual = time() - $entryServerNodeMinCreationTime;
+
+        $serverTypesNotIn = $this->getAdditionalParams("serverTypesNotIn");
+        if ($serverTypesNotIn)
+        {
+            $entryServerNodeFilter->serverTypeNotIn = $serverTypesNotIn;
+        }
+        return $entryServerNodeFilter;
+    }
 	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::run()
 	*/
 	public function run($jobs = null)
 	{
-		$entryServerNodeMinCreationTime = $this->getAdditionalParams("minCreationTime");
-		if(!$entryServerNodeMinCreationTime)
-			$entryServerNodeMinCreationTime = self::ENTRY_SERVER_NODE_MIN_CREATION_TIMEE;
-		
-		$entryServerNodeFilter = new KalturaEntryServerNodeFilter();
-		$entryServerNodeFilter->orderBy = KalturaEntryServerNodeOrderBy::CREATED_AT_ASC;
-		$entryServerNodeFilter->createdAtLessThanOrEqual = time() - $entryServerNodeMinCreationTime;
+		$entryServerNodeFilter = $this->getFilter();
 		
 		$entryServerNodePager = new KalturaFilterPager();
 		$entryServerNodePager->pageSize = 500;

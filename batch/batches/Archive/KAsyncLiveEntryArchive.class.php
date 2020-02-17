@@ -50,7 +50,8 @@ class KAsyncLiveEntryArchive extends KJobHandlerWorker
         $notDeletedCuePointTags = $liveEntry->recordingOptions->nonDeletedCuePointsTags;
         $this->deleteCuePoints($liveEntryId, $notDeletedCuePointTags);
 
-        $vodEntry = KBatchBase::$kClient->baseEntry->get($liveEntry->recordedEntryId);
+        $vodEntryId = $jobData->vodEntryId;
+        $vodEntry = KBatchBase::$kClient->baseEntry->get($vodEntryId);
         $this->updateEntriesData($liveEntry, $vodEntry);
 
         $this->clearPushNotificationQueue($liveEntryId, $liveEntry->partnerId);
@@ -84,14 +85,18 @@ class KAsyncLiveEntryArchive extends KJobHandlerWorker
 	{
 		$updatedVodEntry = new KalturaMediaEntry();
 		$broadcastStartTime = $liveEntry->lastBroadcast;
+
+		$datetime = new DateTime();
 		if ($broadcastStartTime)
 		{
-			$broadcastStartDate = gmdate(self::DATE_FORMAT, $broadcastStartTime);
+			$datetime = DateTime::createFromFormat('U',$broadcastStartTime);
 		}
-		else
+		if ($liveEntry->recordingOptions->archiveVodSuffixTimezone)
 		{
-			$broadcastStartDate = date(self::DATE_FORMAT);
+			$timeZone = new DateTimeZone($liveEntry->recordingOptions->archiveVodSuffixTimezone);
+			$datetime->setTimezone($timeZone);
 		}
+		$broadcastStartDate = $datetime->format(self::DATE_FORMAT);
 		$updatedVodEntry->name = $liveEntry->name. ' ' . $broadcastStartDate;
 		$updatedVodEntry->description = $liveEntry->description;
 		$updatedVodEntry->tags = $liveEntry->tags;

@@ -503,10 +503,10 @@ class BaseEntryService extends KalturaEntryService
 			foreach ($pluginInstances as $KalturaFilterExecutor)
 			{
 				/* @var $KalturaFilterExecutor IKalturaFilterExecutor */
-				if ($KalturaFilterExecutor->canExecuteFilter($filter, $coreFilter, $this->getResponseProfile()))
+				if ($KalturaFilterExecutor->canExecuteFilter($filter, $coreFilter))
 				{
 					KalturaLog::info('Executing filter on ' . get_class($KalturaFilterExecutor));
-					$result = $KalturaFilterExecutor->executeFilter($filter, $coreFilter, $pager);
+					$result = $KalturaFilterExecutor->executeFilter($filter, $coreFilter, $pager, $this->getResponseProfile());
 					break;
 				}
 			}

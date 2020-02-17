@@ -1,3 +1,25 @@
+# Orion 15.17.0 #
+
+## Allow catalog item pricing view from KMC ##
+Issue Type: Task
+Issue ID : REACH-779
+
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_02_03_add_reach_catalog_item_kmc_permissions.php'
+
+## Add partner package to audit trail config ##
+Issue Type: Task
+Issue ID : No-Plat
+
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/sql/2020_02_03_audit_trail_config_admin_console_partner_updates.sql'
+
 # Orion 15.16.0 #
 
 ## Add liveStream->getDetails API action ##

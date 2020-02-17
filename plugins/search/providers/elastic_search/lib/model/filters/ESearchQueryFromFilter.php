@@ -66,7 +66,7 @@ class ESearchQueryFromFilter
 			}
 		}
 
-		if($emptyFilter)
+		if($emptyFilter && !$filter->getAdvancedSearch())
 		{
 			return false;
 		}
