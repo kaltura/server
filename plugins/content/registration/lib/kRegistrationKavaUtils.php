@@ -18,7 +18,7 @@ class kRegistrationKavaUtils extends kKavaReportsMgr
 		{
 			$context['custom_criterion'] = array();
 		}
-		$customCtiteriaType['column'] = 'TYPE';
+		$customCtiteriaType['column'] = 'user_entry.TYPE';
 		$customCtiteriaType['comparison'] = '=';
 		$customCtiteriaType['value'] = $registrationUserEntryType;
 		$context['custom_criterion'][] = $customCtiteriaType;
