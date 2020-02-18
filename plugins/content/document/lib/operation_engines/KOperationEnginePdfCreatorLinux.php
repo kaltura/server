@@ -18,7 +18,7 @@ class KOperationEnginePdfCreatorLinux extends KOperationEnginePdfCreator
 
 	protected function getCmdLine()
 	{
-        if(isset($this->configFilePath))
+		if(isset($this->configFilePath))
 		{
 			$xml = file_get_contents($this->configFilePath);
 			$xml = str_replace(
@@ -26,7 +26,7 @@ class KOperationEnginePdfCreatorLinux extends KOperationEnginePdfCreator
 				array($this->outDir,$this->outFilePath),
 				$xml);
 			file_put_contents($this->configFilePath, $xml);
-        }
+		}
 
 		$outDir = dirname($this->outFilePath);
 		$command = "HOME=/tmp && lowriter --headless --convert-to pdf $this->inFilePath --outdir $outDir";
@@ -37,5 +37,5 @@ class KOperationEnginePdfCreatorLinux extends KOperationEnginePdfCreator
 	protected function getKillPopupsPath()
 	{
 		return NULL;
-	}
+    }
 }
