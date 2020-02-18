@@ -31,16 +31,16 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 	const DEFAULT_KILL_POPUPS_PATH = "c:/temp/killWindowsPopupsLog.txt";
 	
 	// List of supported file types
-	private $SUPPORTED_FILE_TYPES = array(
-			'Composite Document File V2 Document',
-			'CDF V2 Document',
-			'Microsoft Word',
-			'Microsoft PowerPoint',
-			'Microsoft Excel',
-			'OpenDocument Text',
-			'PDF document',
-			'Rich Text Format data',
-			'Zip archive data',
+	protected $SUPPORTED_FILE_TYPES = array(
+		'Composite Document File V2 Document',
+		'CDF V2 Document',
+		'Microsoft Word',
+		'Microsoft PowerPoint',
+		'Microsoft Excel',
+		'OpenDocument Text',
+		'PDF document',
+		'Rich Text Format data',
+		'Zip archive data',
 	);
 	
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
@@ -96,19 +96,18 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 		
 		$finalOutputPath = $this->outFilePath;
 		
-		if (($inputExtension == 'pdf') && ($this->data->flavorParamsOutput->readonly == true)){
-			$tmpFile = $this->outFilePath.'.pdf';
-		}else{
-			$tmpFile = kFile::replaceExt(basename($realInFilePath), 'pdf');
-			$tmpFile = dirname($this->outFilePath).'/'.$tmpFile;
-		}
+		$tmpFile = kFile::replaceExt(basename($realInFilePath), 'pdf');
+		$tmpFile = dirname($this->outFilePath).'/'.$tmpFile;
+
 		$this->outFilePath = $tmpFile;
 		
 		// Create popups log file
 		$killPopupsPath = $this->getKillPopupsPath();
-		if(file_exists($killPopupsPath))
+		if(!is_null($killPopupsPath) && file_exists($killPopupsPath))
+		{
 			unlink($killPopupsPath);
-		
+		}
+
 		// Test file type 
 		$errorMsg = $this->checkFileType($realInFilePath, $this->SUPPORTED_FILE_TYPES);
 		if(!is_null($errorMsg))
@@ -140,7 +139,8 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 		}
 		
 		// Read popup log file
-		if(file_exists($killPopupsPath)) {
+		if(!is_null($killPopupsPath) && file_exists($killPopupsPath))
+		{
 			$data = file_get_contents($killPopupsPath);
 			$data = trim($data);
 			if(!empty($data)){
@@ -215,7 +215,7 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 		return null;
 	}
 		
-	private function getKillPopupsPath() 
+	protected function getKillPopupsPath()
 	{
 		$killPopupsPath = KBatchBase::$taskConfig->params->killPopupsPath;
 		if(!$killPopupsPath){

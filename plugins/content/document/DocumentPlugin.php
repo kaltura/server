@@ -6,6 +6,7 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 {
 	const PLUGIN_NAME = 'document';
 	const DOCUMENT_OBJECT_CREATED_HANDLER = 'DocumentCreatedHandler';
+	const OS_TYPE_LINUX = 'linux';
 	
 	public static function getPluginName()
 	{
@@ -113,7 +114,14 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 		{
 			if(!isset($constructorArgs['params']) || !isset($constructorArgs['outFilePath']))
 				return null;
-			
+
+			//Linux
+			if ($constructorArgs['params']->osType == self::OS_TYPE_LINUX)
+			{
+				return new KOperationEnginePdfCreatorLinux($constructorArgs['params']->pdfCreatorCmd, $constructorArgs['outFilePath']);
+			}
+
+			//Windows
 			return new KOperationEnginePdfCreator($constructorArgs['params']->pdfCreatorCmd, $constructorArgs['outFilePath']);
 		}
 
