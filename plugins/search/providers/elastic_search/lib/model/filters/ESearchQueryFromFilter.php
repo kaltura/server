@@ -192,11 +192,11 @@ class ESearchQueryFromFilter
 
 			case ESearchFilterItemType::MATCH_AND:
 			case ESearchFilterItemType::EXACT_MATCH_MULTI_AND :
-				if ($elasticFieldName ===ESearchBaseCategoryEntryItem::CATEGORY_IDS_MAPPING_FIELD)
+				if ($elasticFieldName === ESearchBaseCategoryEntryItem::CATEGORY_IDS_MAPPING_FIELD)
 				{
 					$searchItem = $this->addCategoryMultiQuery($elasticFieldName, ESearchCategoryEntryFieldName::ANCESTOR_ID, $fieldValue, ESearchOperatorType::AND_OP);
 				}
-				elseif($elasticFieldName === ESearchBaseCategoryEntryItem::CATEGORY_NAMES_MAPPING_FIELD)
+				else if($elasticFieldName === ESearchBaseCategoryEntryItem::CATEGORY_NAMES_MAPPING_FIELD)
 				{
 					$searchItem = $this->addCategoryMultiQuery($elasticFieldName, ESearchCategoryEntryFieldName::ANCESTOR_NAME, $fieldValue, ESearchOperatorType::AND_OP);
 				}
@@ -273,7 +273,7 @@ class ESearchQueryFromFilter
 				break;
 
 			case ESearchFilterItemType::MATCH_OR:
-				if ($elasticFieldName ===ESearchBaseCategoryEntryItem::CATEGORY_IDS_MAPPING_FIELD)
+				if ($elasticFieldName === ESearchBaseCategoryEntryItem::CATEGORY_IDS_MAPPING_FIELD)
 				{
 					$searchItem = $this->addCategoryMultiQuery($elasticFieldName, ESearchCategoryEntryFieldName::ANCESTOR_ID, $fieldValue, ESearchOperatorType::OR_OP);
 				}
