@@ -8,6 +8,7 @@
  */
 class ConferenceService extends KalturaBaseService {
 	const CAN_REACH_EXPECTED_VALUE = 'kaltura';
+	const MAX_CAN_REACH_RETRIES = 3;
 
 	/**
 	 * Allocates a conference room or returns ones that has already been allocated
@@ -96,9 +97,19 @@ class ConferenceService extends KalturaBaseService {
 			 */
 			$serverNode = ServerNodePeer::retrieveByPK($existingConfRoom->getServerNodeId());
 			if (!$serverNode)
-				return null;
-			if (!$this->canReach($serverNode))
 			{
+				KalturaLog::warning('Server node with id '. $existingConfRoom->getServerNodeId() .' not found');
+				return null;
+			}
+
+			$reachable = false;
+			for ($i = 0; !$reachable && ($i < self::MAX_CAN_REACH_RETRIES); $i++)
+			{
+				$reachable = $this->canReach($serverNode);
+			}
+			if (!$reachable)
+			{
+				KalturaLog::warning('unable to reach server_node '. $serverNode->getId() .' hostname [' . $serverNode->getHostName() . ']');
 				$serverNode->setStatus(ServerNodeStatus::NOT_REGISTERED);
 				$serverNode->save();
 				return null;
