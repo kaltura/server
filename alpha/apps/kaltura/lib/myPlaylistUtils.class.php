@@ -325,17 +325,30 @@ class myPlaylistUtils
 	
 	public static function executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter = null, $detailed = true, $pager = null)
 	{
-		if(! trim($entry_id_list_str))
-			return null;
-		
-		$entry_id_list = explode ( "," , $entry_id_list_str );
-		// clear white spaces - TODO - assume this is done at insert time
-		foreach ( $entry_id_list as &$entry_id ) 
-			$entry_id=trim($entry_id);
-		
+		$entry_id_list = self::getEntryIdsFromStaticPlaylistString($entry_id_list_str);
 		return self::executeStaticPlaylistFromEntryIds($entry_id_list, $filter, $detailed, $pager);
 	}
-	
+
+	/**
+	 * @param string $entry_id_list_str
+	 * @return array|null
+	 */
+	public static function getEntryIdsFromStaticPlaylistString($entry_id_list_str)
+	{
+		if(!trim($entry_id_list_str))
+		{
+			return null;
+		}
+
+		$entry_id_list = explode ( "," , $entry_id_list_str );
+		foreach ( $entry_id_list as &$entry_id )
+		{
+			$entry_id = trim($entry_id);
+		}
+
+		return $entry_id_list;
+	}
+
 	public static function executeStaticPlaylistFromEntryIds(array $entry_id_list, $entry_filter = null, $detailed = true, $pager = null)
 	{
 		// if exists extra_filters - use the first one to filter the entry_id_list

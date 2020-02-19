@@ -170,7 +170,13 @@ class kEntitlementUtils
 
 		if($ks && in_array($entry->getId(), $ks->getDisableEntitlementForEntry()))
 		{
-			KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks disble entitlement for this entry');
+			KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks disable entitlement for this entry');
+			return true;
+		}
+
+		if($ks && in_array($entry->getId(), $ks->getDisableEntitlementForPlaylistEntries()))
+		{
+			KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks disable entitlement for this playlist that contain this entry');
 			return true;
 		}
 

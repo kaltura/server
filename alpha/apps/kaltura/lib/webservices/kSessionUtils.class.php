@@ -580,6 +580,34 @@ class ks extends kSessionBase
 		
 		return $entries;
 	}
+
+	public function getDisableEntitlementForPlaylistEntries()
+	{
+		$entries = array();
+		// foreach privileges group
+		foreach( $this->parsedPrivileges as $privilegeType => $privileges)
+		{
+			if ($privilegeType == self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_PLAYLIST)
+			{
+				foreach($privileges as $privilege)
+				{
+					$entry = entryPeer::retrieveByPKNoFilter($privilege, null, false);
+					$entries[] = $privilege;
+					if($entry->getType() == entryType::PLAYLIST && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
+					{
+						$entry_id_list_str = $entry->getDataContent();
+						$result = myPlaylistUtils::getEntryIdsFromStaticPlaylistString($entry_id_list_str);
+						if($result)
+						{
+							$entries = array_merge($entries, $result);
+						}
+					}
+				}
+			}
+		}
+
+		return $entries;
+	}
 	
 	public function getPrivilegeByName($privilegeName)
 	{

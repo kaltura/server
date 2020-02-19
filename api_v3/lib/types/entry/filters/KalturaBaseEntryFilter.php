@@ -176,14 +176,14 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		}
 		
 		$this->fixFilterUserId($this);
-		
 		$entryFilter = new entryFilter();
 		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
-		
 		$this->toObject($entryFilter);
 		
 		if($pager)
+		{
 			$pager->attachToCriteria($c);
+		}
 			
 		$entryFilter->attachToCriteria($c);
 		
@@ -195,36 +195,54 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
 		$disableWidgetSessionFilters = false;
-		if ($this &&
-			($this->idEqual != null ||
-			$this->idIn != null ||
-			$this->referenceIdEqual != null ||
-			$this->redirectFromEntryId != null ||
-			$this->referenceIdIn != null || 
-			$this->parentEntryIdEqual != null))
-			$disableWidgetSessionFilters = true;
-			
 		$c = $this->prepareEntriesCriteriaFilter($pager);
-		
-		if ($disableWidgetSessionFilters)
+		if ($this && ($this->idEqual != null || $this->idIn != null || $this->referenceIdEqual != null ||
+			$this->redirectFromEntryId != null || $this->referenceIdIn != null || $this->parentEntryIdEqual != null))
 		{
-			if (kEntitlementUtils::getEntitlementEnforcement() && !kCurrentContext::$is_admin_session && entryPeer::getUserContentOnly())
-					entryPeer::setFilterResults(true);
+			$disableWidgetSessionFilters = true;
+			if (kEntitlementUtils::getEntitlementEnforcement() && !kCurrentContext::$is_admin_session &&
+				entryPeer::getUserContentOnly())
+			{
+				entryPeer::setFilterResults(true);
+			}
 
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		}
+
 		$list = entryPeer::doSelect($c);
 		entryPeer::fetchPlaysViewsData($list);
 		$totalCount = $c->getRecordsCount();
 		
 		if ($disableWidgetSessionFilters)
+		{
 			KalturaCriterion::restoreTag(KalturaCriterion::TAG_WIDGET_SESSION);
+		}
 
 		myDbHelper::$use_alternative_con = null;
 			
 		return array($list, $totalCount);		
 	}
-	
+
+	protected function prepareDisableEntitlmentForPlaylistCriteria()
+	{
+		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		if($ks)
+		{
+			$DisableEntitlementForPlaylistEntries =  $ks->getDisableEntitlementForPlaylistEntries();
+			$entryCrit = $c->getNewCriterion(entryPeer::ENTRY_ID, $ks->getDisableEntitlementForEntry(), Criteria::IN);
+			$entryCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+
+			if($critEntitled)
+			{
+				$critEntitled->addOr($entryCrit);
+			}
+			else
+			{
+				$critEntitled = $entryCrit;
+			}
+		}
+	}
+
 	/* (non-PHPdoc)
 	 * @see KalturaFilter::getListResponse()
 	 */
