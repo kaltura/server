@@ -39,7 +39,7 @@ class ConferenceServerNode extends ServerNode {
 
 	public function removeAttachedEntryServerNodes()
 	{
-		$confEntryServerNodes = EntryServerNodePeer::retrieveByServerNodeIdAndType($this->getId(), ConferencePlugin::getCoreValue('serverNodeType', ConferenceServerNodeType::CONFERENCE_SERVER));
+		$confEntryServerNodes = EntryServerNodePeer::retrieveByServerNodeIdAndType($this->getId(), ConferencePlugin::getCoreValue('EntryServerNodeType', ConferenceEntryServerNodeType::CONFERENCE_ENTRY_SERVER ));
 		foreach ($confEntryServerNodes as $confEntryServerNode)
 		{
 			$confEntryServerNode->delete();
