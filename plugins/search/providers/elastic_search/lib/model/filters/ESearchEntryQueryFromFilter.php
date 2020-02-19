@@ -379,4 +379,79 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		}
 	}
 
+	protected function addCategoryMultiQuery($elasticFieldNames, $fieldValue, $operatorType, $statuses = array(null))
+	{
+		$values = $this->createValuesArray($fieldValue);
+		if(count($values))
+		{
+			$innerSearchItems = array();
+			foreach ($values as $value)
+			{
+				foreach ($statuses as $status)
+				{
+					$innerSearchItems[] = $this->getCategoryOperator($elasticFieldNames, $value, $status);
+				}
+			}
+
+			$operator = $this->getEsearchOperatorByField($elasticFieldNames[0]);
+			$operator->setOperator($operatorType);
+			$operator->setSearchItems($innerSearchItems);
+			return $operator;
+		}
+	}
+
+	protected function getCategoryOperator($elasticFieldNames, $value, $status = null)
+	{
+		$searchItems = array();
+		foreach ($elasticFieldNames as $elasticFieldName)
+		{
+			$searchItem = $this->addSearchItem($elasticFieldName, $value, ESearchItemType::EXACT_MATCH, false, $status);
+			if ($status)
+			{
+				$searchItem->setCategoryEntryStatus($status);
+			}
+			$searchItems[] = $searchItem;
+		}
+		$operator = $this->getEsearchOperatorByField($elasticFieldNames[0]);
+		$operator->setOperator(ESearchOperatorType::OR_OP);
+		$operator->setSearchItems($searchItems);
+		return $operator;
+	}
+
+	protected function getFullNameCategoryQuery($fieldValue)
+	{
+		$values = $this->createValuesArray($fieldValue);
+		if(count($values))
+		{
+			$innerSearchItems = array();
+			foreach ($values as $value)
+			{
+				if(substr($value, -1) === '>') //value is parent, we should retrieve entries that doesn't belong directly to this category - but only to the sub categories.
+				{
+					$value = substr($value, 0, strlen($value) - 1);
+					$category = categoryPeer::getByFullNameExactMatch($value);
+					if ($category)
+					{
+						$categoryId = $category->getId();
+						$innerSearchItems[] = $this->addSearchItem(ESearchCategoryEntryFieldName::ANCESTOR_ID, $categoryId, ESearchItemType::EXACT_MATCH);
+					}
+				}
+				else	//we should retrieve entries that belong directly to this category or to a sub categories.
+				{
+					$category = categoryPeer::getByFullNameExactMatch($value);
+					if ($category)
+					{
+						$categoryId = $category->getId();
+						$innerSearchItems[] = $this->getCategoryOperator(array(ESearchBaseCategoryEntryItem::CATEGORY_IDS_MAPPING_FIELD, ESearchCategoryEntryFieldName::ANCESTOR_ID), $categoryId);
+					}
+				}
+			}
+			$operator = $this->getEsearchOperatorByField(ESearchCategoryEntryFieldName::FULL_IDS);
+			$operator->setOperator(ESearchOperatorType::OR_OP);
+			$operator->setSearchItems($innerSearchItems);
+			return $operator;
+		}
+	}
+
+
 }
