@@ -9,6 +9,7 @@
 class ConferenceService extends KalturaBaseService {
 	const CAN_REACH_EXPECTED_VALUE = 'kaltura';
 	const MAX_CAN_REACH_RETRIES = 3;
+	const SLEEP_TIME_BETWEEN_RETRY_SECONDS = 1;
 
 	/**
 	 * Allocates a conference room or returns ones that has already been allocated
@@ -103,9 +104,12 @@ class ConferenceService extends KalturaBaseService {
 			}
 
 			$reachable = false;
-			for ($i = 0; !$reachable && ($i < self::MAX_CAN_REACH_RETRIES); $i++)
+			for ($i = 0; ($i < self::MAX_CAN_REACH_RETRIES); $i++)
 			{
 				$reachable = $this->canReach($serverNode);
+				if ($reachable)
+					break;
+				sleep(self::SLEEP_TIME_BETWEEN_RETRY_SECONDS);
 			}
 			if (!$reachable)
 			{
