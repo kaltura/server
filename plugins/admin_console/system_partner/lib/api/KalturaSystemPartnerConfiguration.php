@@ -81,6 +81,12 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var int
 	 */
 	public $kmcVersion;
+
+	/**
+	 *
+	 * @var int
+	 */
+	public $credit;
 	
 	/**
 	 * @var int
@@ -433,6 +439,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"storageDeleteFromKaltura",
 		"storageServePriority",
 		"kmcVersion",
+		"credit",
 		"defThumbOffset",
 		"defThumbDensity",
 	//"adminLoginUsersQuota",

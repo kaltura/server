@@ -3,7 +3,7 @@
 /**
  * Base class that represents a row from the 'reach_profile' table.
  *
- * 
+ *
  *
  * @package plugins.reach
  * @subpackage model.om
@@ -69,6 +69,26 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	protected $used_credit;
 
 	/**
+	 * The value for the add_on field.
+	 * Note: this column has a database default value of: 0
+	 * @var        int
+	 */
+	protected $add_on;
+
+	/**
+	 * The value for the synced_credit field.
+	 * Note: this column has a database default value of: 0
+	 * @var        int
+	 */
+	protected $synced_credit;
+
+	/**
+	 * The value for the last_sync_time field.
+	 * @var        string
+	 */
+	protected $last_sync_time;
+
+	/**
 	 * The value for the rules field.
 	 * @var        string
 	 */
@@ -111,7 +131,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	 * @var        array
 	 */
 	protected $oldColumnsValues = array();
-	
+
 	/**
 	 * @return array
 	 */
@@ -119,7 +139,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	{
 		return $this->oldColumnsValues;
 	}
-	
+
 	/**
 	 * @return mixed field value or null
 	 */
@@ -127,7 +147,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	{
 		if(isset($this->oldColumnsValues[$name]))
 			return $this->oldColumnsValues[$name];
-			
+
 		return null;
 	}
 
@@ -140,6 +160,8 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	public function applyDefaultValues()
 	{
 		$this->used_credit = 0.0;
+		$this->add_on = 0;
+		$this->synced_credit = 0;
 	}
 
 	/**
@@ -154,7 +176,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Get the [id] column value.
-	 * 
+	 *
 	 * @return     int
 	 */
 	public function getId()
@@ -164,7 +186,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Get the [name] column value.
-	 * 
+	 *
 	 * @return     string
 	 */
 	public function getName()
@@ -174,7 +196,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Get the [optionally formatted] temporal [created_at] column value.
-	 * 
+	 *
 	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
 	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
 	 *
@@ -214,7 +236,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Get the [optionally formatted] temporal [updated_at] column value.
-	 * 
+	 *
 	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
 	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
 	 *
@@ -254,7 +276,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Get the [partner_id] column value.
-	 * 
+	 *
 	 * @return     int
 	 */
 	public function getPartnerId()
@@ -264,7 +286,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Get the [type] column value.
-	 * 
+	 *
 	 * @return     int
 	 */
 	public function getType()
@@ -274,7 +296,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Get the [status] column value.
-	 * 
+	 *
 	 * @return     int
 	 */
 	public function getStatus()
@@ -284,7 +306,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Get the [used_credit] column value.
-	 * 
+	 *
 	 * @return     double
 	 */
 	public function getUsedCredit()
@@ -293,8 +315,38 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Get the [add_on] column value.
+	 *
+	 * @return     int
+	 */
+	public function getAddOn()
+	{
+		return $this->add_on;
+	}
+
+	/**
+	 * Get the [synced_credit] column value.
+	 *
+	 * @return     int
+	 */
+	public function getSyncedCredit()
+	{
+		return $this->synced_credit;
+	}
+
+	/**
+	 * Get the [last_sync_time] column value.
+	 *
+	 * @return     string
+	 */
+	public function getLastSyncTime()
+	{
+		return $this->last_sync_time;
+	}
+
+	/**
 	 * Get the [rules] column value.
-	 * 
+	 *
 	 * @return     string
 	 */
 	public function getRules()
@@ -304,7 +356,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Get the [dictionary] column value.
-	 * 
+	 *
 	 * @return     string
 	 */
 	public function getDictionary()
@@ -314,7 +366,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Get the [custom_data] column value.
-	 * 
+	 *
 	 * @return     string
 	 */
 	public function getCustomData()
@@ -324,7 +376,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Set the value of [id] column.
-	 * 
+	 *
 	 * @param      int $v new value
 	 * @return     ReachProfile The current object (for fluent API support)
 	 */
@@ -347,7 +399,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Set the value of [name] column.
-	 * 
+	 *
 	 * @param      string $v new value
 	 * @return     ReachProfile The current object (for fluent API support)
 	 */
@@ -370,7 +422,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
-	 * 
+	 *
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
 	 * @return     ReachProfile The current object (for fluent API support)
@@ -406,8 +458,8 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 			$currNorm = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
 			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
 
-			if ( ($currNorm !== $newNorm) // normalized values don't match 
-					)
+			if ( ($currNorm !== $newNorm) // normalized values don't match
+			)
 			{
 				$this->created_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
 				$this->modifiedColumns[] = ReachProfilePeer::CREATED_AT;
@@ -419,7 +471,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
-	 * 
+	 *
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
 	 * @return     ReachProfile The current object (for fluent API support)
@@ -455,8 +507,8 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 			$currNorm = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
 			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
 
-			if ( ($currNorm !== $newNorm) // normalized values don't match 
-					)
+			if ( ($currNorm !== $newNorm) // normalized values don't match
+			)
 			{
 				$this->updated_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
 				$this->modifiedColumns[] = ReachProfilePeer::UPDATED_AT;
@@ -468,7 +520,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Set the value of [partner_id] column.
-	 * 
+	 *
 	 * @param      int $v new value
 	 * @return     ReachProfile The current object (for fluent API support)
 	 */
@@ -491,7 +543,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Set the value of [type] column.
-	 * 
+	 *
 	 * @param      int $v new value
 	 * @return     ReachProfile The current object (for fluent API support)
 	 */
@@ -514,7 +566,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Set the value of [status] column.
-	 * 
+	 *
 	 * @param      int $v new value
 	 * @return     ReachProfile The current object (for fluent API support)
 	 */
@@ -537,7 +589,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Set the value of [used_credit] column.
-	 * 
+	 *
 	 * @param      double $v new value
 	 * @return     ReachProfile The current object (for fluent API support)
 	 */
@@ -559,8 +611,77 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	} // setUsedCredit()
 
 	/**
+	 * Set the value of [add_on] column.
+	 *
+	 * @param      int $v new value
+	 * @return     ReachProfile The current object (for fluent API support)
+	 */
+	public function setAddOn($v)
+	{
+		if(!isset($this->oldColumnsValues[ReachProfilePeer::ADD_ON]))
+			$this->oldColumnsValues[ReachProfilePeer::ADD_ON] = $this->add_on;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->add_on !== $v || $this->isNew()) {
+			$this->add_on = $v;
+			$this->modifiedColumns[] = ReachProfilePeer::ADD_ON;
+		}
+
+		return $this;
+	} // setAddOn()
+
+	/**
+	 * Set the value of [synced_credit] column.
+	 *
+	 * @param      int $v new value
+	 * @return     ReachProfile The current object (for fluent API support)
+	 */
+	public function setSyncedCredit($v)
+	{
+		if(!isset($this->oldColumnsValues[ReachProfilePeer::SYNCED_CREDIT]))
+			$this->oldColumnsValues[ReachProfilePeer::SYNCED_CREDIT] = $this->synced_credit;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->synced_credit !== $v || $this->isNew()) {
+			$this->synced_credit = $v;
+			$this->modifiedColumns[] = ReachProfilePeer::SYNCED_CREDIT;
+		}
+
+		return $this;
+	} // setSyncedCredit()
+
+	/**
+	 * Set the value of [last_sync_time] column.
+	 *
+	 * @param      string $v new value
+	 * @return     ReachProfile The current object (for fluent API support)
+	 */
+	public function setLastSyncTime($v)
+	{
+		if(!isset($this->oldColumnsValues[ReachProfilePeer::LAST_SYNC_TIME]))
+			$this->oldColumnsValues[ReachProfilePeer::LAST_SYNC_TIME] = $this->last_sync_time;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->last_sync_time !== $v) {
+			$this->last_sync_time = $v;
+			$this->modifiedColumns[] = ReachProfilePeer::LAST_SYNC_TIME;
+		}
+
+		return $this;
+	} // setLastSyncTime()
+
+	/**
 	 * Set the value of [rules] column.
-	 * 
+	 *
 	 * @param      string $v new value
 	 * @return     ReachProfile The current object (for fluent API support)
 	 */
@@ -583,7 +704,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Set the value of [dictionary] column.
-	 * 
+	 *
 	 * @param      string $v new value
 	 * @return     ReachProfile The current object (for fluent API support)
 	 */
@@ -606,7 +727,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * Set the value of [custom_data] column.
-	 * 
+	 *
 	 * @param      string $v new value
 	 * @return     ReachProfile The current object (for fluent API support)
 	 */
@@ -634,9 +755,17 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	 */
 	public function hasOnlyDefaultValues()
 	{
-			if ($this->used_credit !== 0.0) {
-				return false;
-			}
+		if ($this->used_credit !== 0.0) {
+			return false;
+		}
+
+		if ($this->add_on !== 0) {
+			return false;
+		}
+
+		if ($this->synced_credit !== 0) {
+			return false;
+		}
 
 		// otherwise, everything was equal, so return TRUE
 		return true;
@@ -660,7 +789,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	{
 		// Nullify cached objects
 		$this->m_custom_data = null;
-		
+
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
@@ -671,9 +800,12 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 			$this->type = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
 			$this->status = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
 			$this->used_credit = ($row[$startcol + 7] !== null) ? (double) $row[$startcol + 7] : null;
-			$this->rules = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->dictionary = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->custom_data = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->add_on = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->synced_credit = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->last_sync_time = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->rules = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->dictionary = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->custom_data = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -683,7 +815,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 11; // 11 = ReachProfilePeer::NUM_COLUMNS - ReachProfilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 14; // 14 = ReachProfilePeer::NUM_COLUMNS - ReachProfilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating ReachProfile object", $e);
@@ -770,7 +902,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 		if ($con === null) {
 			$con = Propel::getConnection(ReachProfilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
-		
+
 		$con->beginTransaction();
 		try {
 			$ret = $this->preDelete($con);
@@ -810,7 +942,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 		if ($con === null) {
 			$con = Propel::getConnection(ReachProfilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
-		
+
 		$con->beginTransaction();
 		$isInsert = $this->isNew();
 		try {
@@ -820,35 +952,35 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 			} else {
 				$ret = $ret && $this->preUpdate($con);
 			}
-			
+
 			if (!$ret || !$this->isModified()) {
 				$con->commit();
 				return 0;
 			}
-			
+
 			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
 			{
-               $affectedRows = $this->doSave($con);
-                if ($affectedRows || !$this->isColumnModified(ReachProfilePeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
-                	break;
+				$affectedRows = $this->doSave($con);
+				if ($affectedRows || !$this->isColumnModified(ReachProfilePeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column
+					break;
 
-                KalturaLog::debug("was unable to save! retrying for the $retries time");
-                $criteria = $this->buildPkeyCriteria();
+				KalturaLog::debug("was unable to save! retrying for the $retries time");
+				$criteria = $this->buildPkeyCriteria();
 				$criteria->addSelectColumn(ReachProfilePeer::CUSTOM_DATA);
-                $stmt = BasePeer::doSelect($criteria, $con);
-                $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
-                $newCustomData = $cutsomDataArr[0];
+				$stmt = BasePeer::doSelect($criteria, $con);
+				$cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
+				$newCustomData = $cutsomDataArr[0];
 
-                $this->custom_data_md5 = is_null($newCustomData) ? null : md5($newCustomData);
+				$this->custom_data_md5 = is_null($newCustomData) ? null : md5($newCustomData);
 
-                $valuesToChangeTo = $this->m_custom_data->toArray();
-				$this->m_custom_data = myCustomData::fromString($newCustomData); 
+				$valuesToChangeTo = $this->m_custom_data->toArray();
+				$this->m_custom_data = myCustomData::fromString($newCustomData);
 
 				//set custom data column values we wanted to change to
 				$validUpdate = true;
 				$atomicCustomDataFields = ReachProfilePeer::getAtomicCustomDataFields();
-			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
-                	foreach($namespaceValues as $name => $oldValue)
+				foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
+					foreach($namespaceValues as $name => $oldValue)
 					{
 						$atomicField = false;
 						if($namespace) {
@@ -863,7 +995,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 								break;
 							}
 						}
-						
+
 						$newValue = null;
 						if ($namespace)
 						{
@@ -871,10 +1003,10 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 								$newValue = $valuesToChangeTo[$namespace][$name];
 						}
 						else
-						{ 
+						{
 							$newValue = $valuesToChangeTo[$name];
 						}
-		
+
 						if (is_null($newValue)) {
 							$this->removeFromCustomData($name, $namespace);
 						}
@@ -883,10 +1015,10 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 						}
 					}
 				}
-                   
-				if(!$validUpdate) 
+
+				if(!$validUpdate)
 					break;
-					                   
+
 				$this->setCustomData($this->m_custom_data->toString());
 			}
 
@@ -897,7 +1029,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 			}
 			$this->postSave($con);
 			ReachProfilePeer::addInstanceToPool($this);
-			
+
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -905,7 +1037,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 			throw $e;
 		}
 	}
-	
+
 	public function wasObjectSaved()
 	{
 		return $this->objectSaved;
@@ -938,8 +1070,8 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 				if ($this->isNew()) {
 					$pk = ReachProfilePeer::doInsert($this, $con);
 					$affectedRows += 1; // we are assuming that there is only 1 row per doInsert() which
-										 // should always be true here (even though technically
-										 // BasePeer::doInsert() can insert multiple rows).
+					// should always be true here (even though technically
+					// BasePeer::doInsert() can insert multiple rows).
 
 					$this->setId($pk);  //[IMV] update autoincrement primary key
 
@@ -949,7 +1081,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 					$affectedObjects = ReachProfilePeer::doUpdate($this, $con);
 					if($affectedObjects)
 						$this->objectSaved = true;
-						
+
 					$affectedRows += $affectedObjects;
 				}
 
@@ -968,14 +1100,14 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	 * Before returning a query result from the cache, the time of the cached query
 	 * is compared to the time saved in the invalidation key.
 	 * A cached query will only be used if it's newer than the matching invalidation key.
-	 *  
+	 *
 	 * @return     array Array of keys that will should be updated when this object is modified.
 	 */
 	public function getCacheInvalidationKeys()
 	{
 		return array();
 	}
-		
+
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
@@ -984,7 +1116,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	public function preSave(PropelPDO $con = null)
 	{
 		$this->setCustomDataObj();
-    	
+
 		return parent::preSave($con);
 	}
 
@@ -992,15 +1124,15 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	 * Code to be run after persisting the object
 	 * @param PropelPDO $con
 	 */
-	public function postSave(PropelPDO $con = null) 
+	public function postSave(PropelPDO $con = null)
 	{
 		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
 		$this->oldColumnsValues = array();
 		$this->oldCustomDataValues = array();
-    	 
+
 		parent::postSave($con);
 	}
-	
+
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con
@@ -1012,20 +1144,20 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 		$this->setUpdatedAt(time());
 		return parent::preInsert($con);
 	}
-	
+
 	/**
 	 * Code to be run after inserting to database
-	 * @param PropelPDO $con 
+	 * @param PropelPDO $con
 	 */
 	public function postInsert(PropelPDO $con = null)
 	{
 		kQueryCache::invalidateQueryCache($this);
-		
+
 		kEventsManager::raiseEvent(new kObjectCreatedEvent($this));
-		
+
 		if($this->copiedFrom)
 			kEventsManager::raiseEvent(new kObjectCopiedEvent($this->copiedFrom, $this));
-		
+
 		parent::postInsert($con);
 	}
 
@@ -1039,7 +1171,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 		{
 			return;
 		}
-	
+
 		if($this->isModified())
 		{
 			kQueryCache::invalidateQueryCache($this);
@@ -1047,9 +1179,9 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 			$modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES] = $this->oldCustomDataValues;
 			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $modifiedColumns));
 		}
-			
+
 		$this->tempModifiedColumns = array();
-		
+
 		parent::postUpdate($con);
 	}
 	/**
@@ -1057,7 +1189,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	 * @var array
 	 */
 	private $tempModifiedColumns = array();
-	
+
 	/**
 	 * Returns whether the object has been modified.
 	 *
@@ -1067,7 +1199,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	{
 		if(!empty($this->tempModifiedColumns))
 			return true;
-			
+
 		return !empty($this->modifiedColumns);
 	}
 
@@ -1081,7 +1213,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	{
 		if(in_array($col, $this->tempModifiedColumns))
 			return true;
-			
+
 		return in_array($col, $this->modifiedColumns);
 	}
 
@@ -1095,16 +1227,16 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 		if ($this->alreadyInSave)
 		{
 			return true;
-		}	
-		
-		
+		}
+
+
 		if($this->isModified())
 			$this->setUpdatedAt(time());
-		
+
 		$this->tempModifiedColumns = $this->modifiedColumns;
 		return parent::preUpdate($con);
 	}
-	
+
 	/**
 	 * Array of ValidationFailed objects.
 	 * @var        array ValidationFailed[]
@@ -1228,12 +1360,21 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 				return $this->getUsedCredit();
 				break;
 			case 8:
-				return $this->getRules();
+				return $this->getAddOn();
 				break;
 			case 9:
-				return $this->getDictionary();
+				return $this->getSyncedCredit();
 				break;
 			case 10:
+				return $this->getLastSyncTime();
+				break;
+			case 11:
+				return $this->getRules();
+				break;
+			case 12:
+				return $this->getDictionary();
+				break;
+			case 13:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1265,9 +1406,12 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 			$keys[5] => $this->getType(),
 			$keys[6] => $this->getStatus(),
 			$keys[7] => $this->getUsedCredit(),
-			$keys[8] => $this->getRules(),
-			$keys[9] => $this->getDictionary(),
-			$keys[10] => $this->getCustomData(),
+			$keys[8] => $this->getAddOn(),
+			$keys[9] => $this->getSyncedCredit(),
+			$keys[10] => $this->getLastSyncTime(),
+			$keys[11] => $this->getRules(),
+			$keys[12] => $this->getDictionary(),
+			$keys[13] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1324,12 +1468,21 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 				$this->setUsedCredit($value);
 				break;
 			case 8:
-				$this->setRules($value);
+				$this->setAddOn($value);
 				break;
 			case 9:
-				$this->setDictionary($value);
+				$this->setSyncedCredit($value);
 				break;
 			case 10:
+				$this->setLastSyncTime($value);
+				break;
+			case 11:
+				$this->setRules($value);
+				break;
+			case 12:
+				$this->setDictionary($value);
+				break;
+			case 13:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1364,9 +1517,12 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[5], $arr)) $this->setType($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setStatus($arr[$keys[6]]);
 		if (array_key_exists($keys[7], $arr)) $this->setUsedCredit($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setRules($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setDictionary($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setCustomData($arr[$keys[10]]);
+		if (array_key_exists($keys[8], $arr)) $this->setAddOn($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setSyncedCredit($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setLastSyncTime($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setRules($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setDictionary($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setCustomData($arr[$keys[13]]);
 	}
 
 	/**
@@ -1386,6 +1542,9 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(ReachProfilePeer::TYPE)) $criteria->add(ReachProfilePeer::TYPE, $this->type);
 		if ($this->isColumnModified(ReachProfilePeer::STATUS)) $criteria->add(ReachProfilePeer::STATUS, $this->status);
 		if ($this->isColumnModified(ReachProfilePeer::USED_CREDIT)) $criteria->add(ReachProfilePeer::USED_CREDIT, $this->used_credit);
+		if ($this->isColumnModified(ReachProfilePeer::ADD_ON)) $criteria->add(ReachProfilePeer::ADD_ON, $this->add_on);
+		if ($this->isColumnModified(ReachProfilePeer::SYNCED_CREDIT)) $criteria->add(ReachProfilePeer::SYNCED_CREDIT, $this->synced_credit);
+		if ($this->isColumnModified(ReachProfilePeer::LAST_SYNC_TIME)) $criteria->add(ReachProfilePeer::LAST_SYNC_TIME, $this->last_sync_time);
 		if ($this->isColumnModified(ReachProfilePeer::RULES)) $criteria->add(ReachProfilePeer::RULES, $this->rules);
 		if ($this->isColumnModified(ReachProfilePeer::DICTIONARY)) $criteria->add(ReachProfilePeer::DICTIONARY, $this->dictionary);
 		if ($this->isColumnModified(ReachProfilePeer::CUSTOM_DATA)) $criteria->add(ReachProfilePeer::CUSTOM_DATA, $this->custom_data);
@@ -1406,30 +1565,38 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 		$criteria = new Criteria(ReachProfilePeer::DATABASE_NAME);
 
 		$criteria->add(ReachProfilePeer::ID, $this->id);
-		
+
 		if($this->alreadyInSave)
 		{
 			if ($this->isColumnModified(ReachProfilePeer::CUSTOM_DATA))
 			{
 				if (!is_null($this->custom_data_md5))
+				{
 					$criteria->add(ReachProfilePeer::CUSTOM_DATA, "MD5(cast(" . ReachProfilePeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
 					//casting to latin char set to avoid mysql and php md5 difference
-				else 
+					if (kDataCenterMgr::isMultiDc()) // if multi DC configuration don't check costume data on other DC
+					{
+						$currentDcId = kDataCenterMgr::getCurrentDcId();
+						//addOr(column, value, comparison)
+						$criteria->addOr(ReachProfilePeer::CUSTOM_DATA," '$currentDcId' != getDC()" ,Criteria::CUSTOM);
+					}
+				}
+				else
 					$criteria->add(ReachProfilePeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
 			}
-			
+
 			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(ReachProfilePeer::UPDATED_AT))
 			{
 				$theModifiedColumn = null;
 				foreach($this->modifiedColumns as $modifiedColumn)
 					if($modifiedColumn != ReachProfilePeer::UPDATED_AT)
 						$theModifiedColumn = $modifiedColumn;
-						
+
 				$atomicColumns = ReachProfilePeer::getAtomicColumns();
 				if(in_array($theModifiedColumn, $atomicColumns))
 					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
 			}
-		}		
+		}
 
 		return $criteria;
 	}
@@ -1481,6 +1648,12 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 
 		$copyObj->setUsedCredit($this->used_credit);
 
+		$copyObj->setAddOn($this->add_on);
+
+		$copyObj->setSyncedCredit($this->synced_credit);
+
+		$copyObj->setLastSyncTime($this->last_sync_time);
+
 		$copyObj->setRules($this->rules);
 
 		$copyObj->setDictionary($this->dictionary);
@@ -1515,16 +1688,16 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 		$copyObj->setCopiedFrom($this);
 		return $copyObj;
 	}
-	
+
 	/**
-	 * Stores the source object that this object copied from 
+	 * Stores the source object that this object copied from
 	 *
 	 * @var     ReachProfile Clone of current object.
 	 */
 	protected $copiedFrom = null;
-	
+
 	/**
-	 * Stores the source object that this object copied from 
+	 * Stores the source object that this object copied from
 	 *
 	 * @param      ReachProfile $copiedFrom Clone of current object.
 	 */
@@ -1572,7 +1745,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	 * @var myCustomData
 	 */
 	protected $m_custom_data = null;
-	
+
 	/**
 	 * The md5 value for the custom_data field.
 	 * @var        string
@@ -1584,7 +1757,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	 * @var        array
 	 */
 	protected $oldCustomDataValues = array();
-	
+
 	/**
 	 * @return array
 	 */
@@ -1592,7 +1765,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	{
 		return $this->oldCustomDataValues;
 	}
-	
+
 	/**
 	 * @param string $name
 	 * @param string $value
@@ -1602,20 +1775,20 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	public function putInCustomData ( $name , $value , $namespace = null )
 	{
 		$customData = $this->getCustomDataObj( );
-		
+
 		$customDataOldValue = $customData->get($name, $namespace);
 		if(!is_null($customDataOldValue) && serialize($customDataOldValue) === serialize($value))
 			return;
-				
+
 		$currentNamespace = '';
 		if($namespace)
 			$currentNamespace = $namespace;
-			
+
 		if(!isset($this->oldCustomDataValues[$currentNamespace]))
 			$this->oldCustomDataValues[$currentNamespace] = array();
 		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
 			$this->oldCustomDataValues[$currentNamespace][$name] = $customDataOldValue;
-		
+
 		$customData->put ( $name , $value , $namespace );
 	}
 
@@ -1640,16 +1813,16 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	public function removeFromCustomData ( $name , $namespace = null)
 	{
 		$customData = $this->getCustomDataObj();
-		
+
 		$currentNamespace = '';
 		if($namespace)
 			$currentNamespace = $namespace;
-			
+
 		if(!isset($this->oldCustomDataValues[$currentNamespace]))
 			$this->oldCustomDataValues[$currentNamespace] = array();
 		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
 			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
-		
+
 		return $customData->remove ( $name , $namespace );
 	}
 
@@ -1662,16 +1835,16 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
-		
+
 		$currentNamespace = '';
 		if($namespace)
 			$currentNamespace = $namespace;
-			
+
 		if(!isset($this->oldCustomDataValues[$currentNamespace]))
 			$this->oldCustomDataValues[$currentNamespace] = array();
 		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
 			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
-		
+
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 
@@ -1698,7 +1871,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 		}
 		return $this->m_custom_data;
 	}
-	
+
 	/**
 	 * Must be called before saving the object
 	 */
@@ -1710,7 +1883,7 @@ abstract class BaseReachProfile extends BaseObject  implements Persistent {
 			$this->setCustomData( $this->m_custom_data->toString() );
 		}
 	}
-	
+
 	/* ---------------------- CustomData functions ------------------------- */
-	
+
 } // BaseReachProfile

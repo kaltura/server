@@ -68,6 +68,9 @@ CREATE TABLE `reach_profile`
 	`type` TINYINT  NOT NULL,
 	`status` TINYINT  NOT NULL,
 	`used_credit` DOUBLE default 0,
+	`add_on` INTEGER default 0,
+	`synced_credit` INTEGER default 0,
+	`last_sync_time` VARCHAR(100),
 	`rules` TEXT,
 	`dictionary` TEXT,
 	`custom_data` TEXT,
@@ -75,6 +78,7 @@ CREATE TABLE `reach_profile`
 	KEY `partner_id_status_index`(`partner_id`, `status`),
 	KEY `partner_id_type_index`(`partner_id`, `type`)
 )Type=InnoDB;
+
 
 #-----------------------------------------------------------------------------
 #-- entry_vendor_task

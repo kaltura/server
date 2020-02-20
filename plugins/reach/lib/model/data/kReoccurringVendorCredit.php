@@ -60,20 +60,29 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 		$this->frequency = $frequency;
 	}
 
-	public function syncCredit($reachProfileId, $partnerId)
+	/**
+	 * @param ReachProfile $reachProfile
+	 * @return int
+	 * @throws PropelException
+	 */
+	public function syncCredit(ReachProfile $reachProfile)
 	{
-		$syncedCredit = parent::syncCredit($reachProfileId, $partnerId);
-		if ($this->getLastSyncTime() > $this->periodEndDate)
+		$syncedCredit = parent::syncCredit($reachProfile);
+		if ($reachProfile->getLastSyncTime() > $this->periodEndDate)
 		{
 			$syncedCredit = 0;
-			$this->calculateNextPeriodDates( $this->periodEndDate, $this->getLastSyncTime());
-			$this->setSyncedCredit($syncedCredit);
+			$this->calculateNextPeriodDates( $this->periodEndDate, $reachProfile->getLastSyncTime());
 			$this->overageCredit = $this->initialOverageCredit;
-			$this->addOn = 0;
+			$reachProfile->setSyncedCredit($syncedCredit);
+			$reachProfile->setAddOn(0);
 		}
 		return $syncedCredit;
 	}
 
+	/**
+	 * @param $startTime
+	 * @param $currentDate
+	 */
 	public function calculateNextPeriodDates($startTime, $currentDate)
 	{
 		$endTime = kReachUtils::reachStrToTime('+1 ' . $this->getFrequency(), $startTime);
@@ -87,6 +96,10 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 		$this->periodEndDate = kReachUtils::reachStrToTime("tomorrow", $this->periodEndDate)-1;
 	}
 
+	/**
+	 * @param $startTime
+	 * @param $currentDate
+	 */
 	public function initiatePeriodDates($startTime, $currentDate)
 	{
 		$endTime = kReachUtils::reachStrToTime('+1 ' . $this->getFrequency(), $startTime);
@@ -107,11 +120,12 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 		$this->initiatePeriodDates($this->periodEndDate, time());
 	}
 
-	/***
-	 * @param $date
+	/**
+	 * @param int $addOn
+	 * @param bool $includeOverages
 	 * @return int
 	 */
-	public function getCurrentCredit($includeOverages = true)
+	public function getCurrentCredit($addOn, $includeOverages = true)
 	{
 		$now = time();
 		if ($now < $this->periodStartDate || $now > $this->periodEndDate)
@@ -126,15 +140,16 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 			$credit += $this->overageCredit;
 		}
 
-		if($this->addOn)
+		if($addOn)
 		{
-			$credit += $this->addOn;
+			$credit += $addOn;
 		}
 
 		return $credit;
 	}
 
-	/***
+	/**
+	 * @param null $time
 	 * @return bool
 	 */
 	public function isActive($time = null)
@@ -166,22 +181,29 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 		}
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getSyncCreditToDate()
 	{
 		return $this->periodEndDate;
 	}
-	
-	public function getSyncCreditStartDate()
+
+	/**
+	 * @param $lastSyncTime
+	 * @return string|the
+	 */
+	public function getSyncCreditStartDate($lastSyncTime)
 	{
-		if(!$this->getLastSyncTime() && !$this->periodStartDate)
+		if(!$lastSyncTime && !$this->periodStartDate)
 			return $this->getFromDate();
 		
-		if(!$this->getLastSyncTime() && $this->periodStartDate)
+		if(!$lastSyncTime && $this->periodStartDate)
 			return $this->periodStartDate;
 		
-		if($this->getLastSyncTime() && $this->periodStartDate && $this->getLastSyncTime() < $this->periodStartDate)
+		if($lastSyncTime && $this->periodStartDate && $lastSyncTime < $this->periodStartDate)
 			return $this->periodStartDate;
 		
-		return parent::getSyncCreditStartDate();
+		return parent::getSyncCreditStartDate($lastSyncTime);
 	}
 }

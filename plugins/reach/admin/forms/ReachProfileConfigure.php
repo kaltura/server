@@ -142,8 +142,19 @@ class Form_ReachProfileConfigure extends ConfigureForm
 		$element3 = new Infra_Form_Html ('place_holder3', array('content' => '<span/>'));
 		$this->addElement($element3);
 
+		$this->addElement('text', 'globalCredit', array(
+			'label' => 'Partern\'s Global Credit:',
+			'readonly' => 'true',
+		));
+
 		$this->addDisplayGroup(array('place_holder3'), 'reachProfileCredit', array(
-			'legend' => 'Credit Configuration',
+			'legend' => 'Profile Credit Configuration',
+		));
+
+		$this->addElement('text', 'addOn', array(
+			'label' => 'AddOn Credit:',
+			'filters' => array('StringTrim'),
+			'readonly' => 'true',
 		));
 
 		$this->addLine("Dictionaries Line");

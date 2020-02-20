@@ -2086,6 +2086,11 @@ form#frmClonePartnerCatalogItems dd,form#frmClonePartnerCatalogItems dt {
 	width: 150px;
 }
 
+#fieldset-reachProfileCredit
+{
+	min-width: 500px;
+}
+
 #reach-profile-configure-dialog select {
 	min-width: 338px;
 	height: 24px;

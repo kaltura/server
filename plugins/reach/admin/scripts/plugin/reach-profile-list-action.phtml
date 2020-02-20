@@ -41,7 +41,7 @@
 					if(get_class($reachProfile->credit) == "Kaltura_Client_Reach_Type_UnlimitedVendorCredit")
 					    echo "Unlimited";
 					else
-					    echo (( $reachProfile->credit->credit + $reachProfile->credit->addOn) - $reachProfile->usedCredit); ?>
+					    echo (( $reachProfile->credit->credit + $reachProfile->addOn) - $reachProfile->usedCredit); ?>
 				</td>
 				<td><?php echo date($this->translate('time format'), $reachProfile->createdAt); ?></td>
 				<td><?php echo date($this->translate('time format'), $reachProfile->updatedAt); ?></td>

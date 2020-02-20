@@ -19,8 +19,8 @@ class ReachProfilePeer extends BaseReachProfilePeer
 	{
 		if ( self::$s_criteria_filter == null )
 			self::$s_criteria_filter = new criteriaFilter ();
-		
-		$c = KalturaCriteria::create(VendorCatalogItemPeer::OM_CLASS);
+	
+		$c = KalturaCriteria::create(ReachProfilePeer::OM_CLASS);
 		$c->addAnd ( ReachProfilePeer::STATUS, ReachProfileStatus::DELETED, Criteria::NOT_EQUAL);
 		
 		self::$s_criteria_filter->setFilter($c);
@@ -60,6 +60,33 @@ class ReachProfilePeer extends BaseReachProfilePeer
 		$stmt->execute();
 		KalturaLog::debug("Successfully updated vendor credit for profile Id [$reachProfileId]");
 		
+		$reachProfile = ReachProfilePeer::retrieveByPK($reachProfileId);
+		$reachProfile->syncCreditPercentageUsage();
+	}
+
+	/**
+	 * Transder credit between partner's global credit and reach profile credit addon value
+	 * @param $partnerId
+	 * @param $reachProfileId
+	 * @param $value
+	 * @throws PropelException
+	 */
+	public static function tranferCredit($partnerId, $reachProfileId, $value)
+	{
+		if($value==0)
+		{
+			return;
+		}
+		$connection = Propel::getConnection();
+
+		$updateSql = "UPDATE ".ReachProfilePeer::TABLE_NAME." SET " .
+			ReachProfilePeer::USED_CREDIT . " = " . ReachProfilePeer::USED_CREDIT . " +$value WHERE " .
+			ReachProfilePeer::ID . "=" . $reachProfileId . ";";
+
+		$stmt = $connection->prepare($updateSql);
+		$stmt->execute();
+		KalturaLog::debug("Successfully updated vendor credit for profile Id [$reachProfileId]");
+
 		$reachProfile = ReachProfilePeer::retrieveByPK($reachProfileId);
 		$reachProfile->syncCreditPercentageUsage();
 	}

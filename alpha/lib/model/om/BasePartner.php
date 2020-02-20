@@ -232,6 +232,13 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	protected $storage_usage;
 
 	/**
+	 * The value for the credit field.
+	 * Note: this column has a database default value of: 0
+	 * @var        int
+	 */
+	protected $credit;
+
+	/**
 	 * The value for the eighty_percent_warning field.
 	 * @var        int
 	 */
@@ -358,6 +365,7 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		$this->partner_package = 1;
 		$this->usage_percent = 0;
 		$this->storage_usage = 0;
+		$this->credit = 0;
 		$this->monitor_usage = 1;
 		$this->partner_group_type = 1;
 		$this->kmc_version = '1';
@@ -761,6 +769,16 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	public function getStorageUsage()
 	{
 		return $this->storage_usage;
+	}
+
+	/**
+	 * Get the [credit] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getCredit()
+	{
+		return $this->credit;
 	}
 
 	/**
@@ -1646,6 +1664,29 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	} // setStorageUsage()
 
 	/**
+	 * Set the value of [credit] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     Partner The current object (for fluent API support)
+	 */
+	public function setCredit($v)
+	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::CREDIT]))
+			$this->oldColumnsValues[PartnerPeer::CREDIT] = $this->credit;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->credit !== $v || $this->isNew()) {
+			$this->credit = $v;
+			$this->modifiedColumns[] = PartnerPeer::CREDIT;
+		}
+
+		return $this;
+	} // setCredit()
+
+	/**
 	 * Set the value of [eighty_percent_warning] column.
 	 * 
 	 * @param      int $v new value
@@ -1872,6 +1913,10 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 				return false;
 			}
 
+			if ($this->credit !== 0) {
+				return false;
+			}
+
 			if ($this->monitor_usage !== 1) {
 				return false;
 			}
@@ -1942,13 +1987,14 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 			$this->partner_package = ($row[$startcol + 30] !== null) ? (int) $row[$startcol + 30] : null;
 			$this->usage_percent = ($row[$startcol + 31] !== null) ? (int) $row[$startcol + 31] : null;
 			$this->storage_usage = ($row[$startcol + 32] !== null) ? (int) $row[$startcol + 32] : null;
-			$this->eighty_percent_warning = ($row[$startcol + 33] !== null) ? (int) $row[$startcol + 33] : null;
-			$this->usage_limit_warning = ($row[$startcol + 34] !== null) ? (int) $row[$startcol + 34] : null;
-			$this->monitor_usage = ($row[$startcol + 35] !== null) ? (int) $row[$startcol + 35] : null;
-			$this->priority_group_id = ($row[$startcol + 36] !== null) ? (int) $row[$startcol + 36] : null;
-			$this->partner_group_type = ($row[$startcol + 37] !== null) ? (int) $row[$startcol + 37] : null;
-			$this->partner_parent_id = ($row[$startcol + 38] !== null) ? (int) $row[$startcol + 38] : null;
-			$this->kmc_version = ($row[$startcol + 39] !== null) ? (string) $row[$startcol + 39] : null;
+			$this->credit = ($row[$startcol + 33] !== null) ? (int) $row[$startcol + 33] : null;
+			$this->eighty_percent_warning = ($row[$startcol + 34] !== null) ? (int) $row[$startcol + 34] : null;
+			$this->usage_limit_warning = ($row[$startcol + 35] !== null) ? (int) $row[$startcol + 35] : null;
+			$this->monitor_usage = ($row[$startcol + 36] !== null) ? (int) $row[$startcol + 36] : null;
+			$this->priority_group_id = ($row[$startcol + 37] !== null) ? (int) $row[$startcol + 37] : null;
+			$this->partner_group_type = ($row[$startcol + 38] !== null) ? (int) $row[$startcol + 38] : null;
+			$this->partner_parent_id = ($row[$startcol + 39] !== null) ? (int) $row[$startcol + 39] : null;
+			$this->kmc_version = ($row[$startcol + 40] !== null) ? (string) $row[$startcol + 40] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1958,7 +2004,7 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 40; // 40 = PartnerPeer::NUM_COLUMNS - PartnerPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 41; // 41 = PartnerPeer::NUM_COLUMNS - PartnerPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating Partner object", $e);
@@ -2625,24 +2671,27 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 				return $this->getStorageUsage();
 				break;
 			case 33:
-				return $this->getEightyPercentWarning();
+				return $this->getCredit();
 				break;
 			case 34:
-				return $this->getUsageLimitWarning();
+				return $this->getEightyPercentWarning();
 				break;
 			case 35:
-				return $this->getMonitorUsage();
+				return $this->getUsageLimitWarning();
 				break;
 			case 36:
-				return $this->getPriorityGroupId();
+				return $this->getMonitorUsage();
 				break;
 			case 37:
-				return $this->getPartnerGroupType();
+				return $this->getPriorityGroupId();
 				break;
 			case 38:
-				return $this->getPartnerParentId();
+				return $this->getPartnerGroupType();
 				break;
 			case 39:
+				return $this->getPartnerParentId();
+				break;
+			case 40:
 				return $this->getKmcVersion();
 				break;
 			default:
@@ -2699,13 +2748,14 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 			$keys[30] => $this->getPartnerPackage(),
 			$keys[31] => $this->getUsagePercent(),
 			$keys[32] => $this->getStorageUsage(),
-			$keys[33] => $this->getEightyPercentWarning(),
-			$keys[34] => $this->getUsageLimitWarning(),
-			$keys[35] => $this->getMonitorUsage(),
-			$keys[36] => $this->getPriorityGroupId(),
-			$keys[37] => $this->getPartnerGroupType(),
-			$keys[38] => $this->getPartnerParentId(),
-			$keys[39] => $this->getKmcVersion(),
+			$keys[33] => $this->getCredit(),
+			$keys[34] => $this->getEightyPercentWarning(),
+			$keys[35] => $this->getUsageLimitWarning(),
+			$keys[36] => $this->getMonitorUsage(),
+			$keys[37] => $this->getPriorityGroupId(),
+			$keys[38] => $this->getPartnerGroupType(),
+			$keys[39] => $this->getPartnerParentId(),
+			$keys[40] => $this->getKmcVersion(),
 		);
 		return $result;
 	}
@@ -2837,24 +2887,27 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 				$this->setStorageUsage($value);
 				break;
 			case 33:
-				$this->setEightyPercentWarning($value);
+				$this->setCredit($value);
 				break;
 			case 34:
-				$this->setUsageLimitWarning($value);
+				$this->setEightyPercentWarning($value);
 				break;
 			case 35:
-				$this->setMonitorUsage($value);
+				$this->setUsageLimitWarning($value);
 				break;
 			case 36:
-				$this->setPriorityGroupId($value);
+				$this->setMonitorUsage($value);
 				break;
 			case 37:
-				$this->setPartnerGroupType($value);
+				$this->setPriorityGroupId($value);
 				break;
 			case 38:
-				$this->setPartnerParentId($value);
+				$this->setPartnerGroupType($value);
 				break;
 			case 39:
+				$this->setPartnerParentId($value);
+				break;
+			case 40:
 				$this->setKmcVersion($value);
 				break;
 		} // switch()
@@ -2914,13 +2967,14 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[30], $arr)) $this->setPartnerPackage($arr[$keys[30]]);
 		if (array_key_exists($keys[31], $arr)) $this->setUsagePercent($arr[$keys[31]]);
 		if (array_key_exists($keys[32], $arr)) $this->setStorageUsage($arr[$keys[32]]);
-		if (array_key_exists($keys[33], $arr)) $this->setEightyPercentWarning($arr[$keys[33]]);
-		if (array_key_exists($keys[34], $arr)) $this->setUsageLimitWarning($arr[$keys[34]]);
-		if (array_key_exists($keys[35], $arr)) $this->setMonitorUsage($arr[$keys[35]]);
-		if (array_key_exists($keys[36], $arr)) $this->setPriorityGroupId($arr[$keys[36]]);
-		if (array_key_exists($keys[37], $arr)) $this->setPartnerGroupType($arr[$keys[37]]);
-		if (array_key_exists($keys[38], $arr)) $this->setPartnerParentId($arr[$keys[38]]);
-		if (array_key_exists($keys[39], $arr)) $this->setKmcVersion($arr[$keys[39]]);
+		if (array_key_exists($keys[33], $arr)) $this->setCredit($arr[$keys[33]]);
+		if (array_key_exists($keys[34], $arr)) $this->setEightyPercentWarning($arr[$keys[34]]);
+		if (array_key_exists($keys[35], $arr)) $this->setUsageLimitWarning($arr[$keys[35]]);
+		if (array_key_exists($keys[36], $arr)) $this->setMonitorUsage($arr[$keys[36]]);
+		if (array_key_exists($keys[37], $arr)) $this->setPriorityGroupId($arr[$keys[37]]);
+		if (array_key_exists($keys[38], $arr)) $this->setPartnerGroupType($arr[$keys[38]]);
+		if (array_key_exists($keys[39], $arr)) $this->setPartnerParentId($arr[$keys[39]]);
+		if (array_key_exists($keys[40], $arr)) $this->setKmcVersion($arr[$keys[40]]);
 	}
 
 	/**
@@ -2965,6 +3019,7 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(PartnerPeer::PARTNER_PACKAGE)) $criteria->add(PartnerPeer::PARTNER_PACKAGE, $this->partner_package);
 		if ($this->isColumnModified(PartnerPeer::USAGE_PERCENT)) $criteria->add(PartnerPeer::USAGE_PERCENT, $this->usage_percent);
 		if ($this->isColumnModified(PartnerPeer::STORAGE_USAGE)) $criteria->add(PartnerPeer::STORAGE_USAGE, $this->storage_usage);
+		if ($this->isColumnModified(PartnerPeer::CREDIT)) $criteria->add(PartnerPeer::CREDIT, $this->credit);
 		if ($this->isColumnModified(PartnerPeer::EIGHTY_PERCENT_WARNING)) $criteria->add(PartnerPeer::EIGHTY_PERCENT_WARNING, $this->eighty_percent_warning);
 		if ($this->isColumnModified(PartnerPeer::USAGE_LIMIT_WARNING)) $criteria->add(PartnerPeer::USAGE_LIMIT_WARNING, $this->usage_limit_warning);
 		if ($this->isColumnModified(PartnerPeer::MONITOR_USAGE)) $criteria->add(PartnerPeer::MONITOR_USAGE, $this->monitor_usage);
@@ -2995,8 +3050,16 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 			if ($this->isColumnModified(PartnerPeer::CUSTOM_DATA))
 			{
 				if (!is_null($this->custom_data_md5))
+				{
 					$criteria->add(PartnerPeer::CUSTOM_DATA, "MD5(cast(" . PartnerPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
 					//casting to latin char set to avoid mysql and php md5 difference
+					if (kDataCenterMgr::isMultiDc()) // if multi DC configuration don't check costume data on other DC
+					{
+						$currentDcId = kDataCenterMgr::getCurrentDcId();
+						//addOr(column, value, comparison)
+						$criteria->addOr(PartnerPeer::CUSTOM_DATA," '$currentDcId' != getDC()" ,Criteria::CUSTOM);
+					}
+				}
 				else 
 					$criteria->add(PartnerPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
 			}
@@ -3113,6 +3176,8 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		$copyObj->setUsagePercent($this->usage_percent);
 
 		$copyObj->setStorageUsage($this->storage_usage);
+
+		$copyObj->setCredit($this->credit);
 
 		$copyObj->setEightyPercentWarning($this->eighty_percent_warning);
 
@@ -3609,6 +3674,10 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	{
 		$customData = $this->getCustomDataObj( );
 		
+		$customDataOldValue = $customData->get($name, $namespace);
+		if(!is_null($customDataOldValue) && serialize($customDataOldValue) === serialize($value))
+			return;
+				
 		$currentNamespace = '';
 		if($namespace)
 			$currentNamespace = $namespace;
@@ -3616,7 +3685,7 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		if(!isset($this->oldCustomDataValues[$currentNamespace]))
 			$this->oldCustomDataValues[$currentNamespace] = array();
 		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
-			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customDataOldValue;
 		
 		$customData->put ( $name , $value , $namespace );
 	}

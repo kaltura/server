@@ -7,7 +7,7 @@ class Form_ReachProfileCredit extends Zend_Form_SubForm
 {
 	public function init()
 	{
-		$this->setLegend("Credit Configuration");
+		$this->setLegend("Profile Credit Configuration");
 		$this->setName("reachProfileCredit");
 		$this->addElement('select', 'objectType', array(
 			'label' => 'Credit type: (Mandatory) ',
@@ -28,12 +28,6 @@ class Form_ReachProfileCredit extends Zend_Form_SubForm
 			'validators' => array(),
 		));
 
-		$this->addElement('text', 'addOn', array(
-			'label' => 'AddOn Credit:',
-			'filters' => array('StringTrim'),
-			'validators' => array('Int'),
-		));
-
 		$this->addElement('text', 'fromDate', array(
 			'label' => 'From Date: (YYYY.MM.DD)',
 			'innerType' => 'DateElement',
@@ -43,6 +37,7 @@ class Form_ReachProfileCredit extends Zend_Form_SubForm
 			'validators' => array('Int'),
 		));
 		$this->setDefault('fromDate', "Enter Date");
+
 	}
 
 	public function updateCreditOptions(array $options)

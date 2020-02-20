@@ -3,7 +3,7 @@
 /**
  * Base static class for performing query and update operations on the 'reach_profile' table.
  *
- * 
+ *
  *
  * @package plugins.reach
  * @subpackage model.om
@@ -24,9 +24,9 @@ abstract class BaseReachProfilePeer {
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'ReachProfileTableMap';
-	
+
 	/** The total number of columns. */
-	const NUM_COLUMNS = 11;
+	const NUM_COLUMNS = 14;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -55,6 +55,15 @@ abstract class BaseReachProfilePeer {
 	/** the column name for the USED_CREDIT field */
 	const USED_CREDIT = 'reach_profile.USED_CREDIT';
 
+	/** the column name for the ADD_ON field */
+	const ADD_ON = 'reach_profile.ADD_ON';
+
+	/** the column name for the SYNCED_CREDIT field */
+	const SYNCED_CREDIT = 'reach_profile.SYNCED_CREDIT';
+
+	/** the column name for the LAST_SYNC_TIME field */
+	const LAST_SYNC_TIME = 'reach_profile.LAST_SYNC_TIME';
+
 	/** the column name for the RULES field */
 	const RULES = 'reach_profile.RULES';
 
@@ -80,11 +89,11 @@ abstract class BaseReachProfilePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'Type', 'Status', 'UsedCredit', 'Rules', 'Dictionary', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'createdAt', 'updatedAt', 'partnerId', 'type', 'status', 'usedCredit', 'rules', 'dictionary', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::NAME, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::TYPE, self::STATUS, self::USED_CREDIT, self::RULES, self::DICTIONARY, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'created_at', 'updated_at', 'partner_id', 'type', 'status', 'used_credit', 'rules', 'dictionary', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'Type', 'Status', 'UsedCredit', 'AddOn', 'SyncedCredit', 'LastSyncTime', 'Rules', 'Dictionary', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'createdAt', 'updatedAt', 'partnerId', 'type', 'status', 'usedCredit', 'addOn', 'syncedCredit', 'lastSyncTime', 'rules', 'dictionary', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::NAME, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::TYPE, self::STATUS, self::USED_CREDIT, self::ADD_ON, self::SYNCED_CREDIT, self::LAST_SYNC_TIME, self::RULES, self::DICTIONARY, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'created_at', 'updated_at', 'partner_id', 'type', 'status', 'used_credit', 'add_on', 'synced_credit', 'last_sync_time', 'rules', 'dictionary', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
 	);
 
 	/**
@@ -94,11 +103,11 @@ abstract class BaseReachProfilePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, 'PartnerId' => 4, 'Type' => 5, 'Status' => 6, 'UsedCredit' => 7, 'Rules' => 8, 'Dictionary' => 9, 'CustomData' => 10, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'createdAt' => 2, 'updatedAt' => 3, 'partnerId' => 4, 'type' => 5, 'status' => 6, 'usedCredit' => 7, 'rules' => 8, 'dictionary' => 9, 'customData' => 10, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::NAME => 1, self::CREATED_AT => 2, self::UPDATED_AT => 3, self::PARTNER_ID => 4, self::TYPE => 5, self::STATUS => 6, self::USED_CREDIT => 7, self::RULES => 8, self::DICTIONARY => 9, self::CUSTOM_DATA => 10, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'created_at' => 2, 'updated_at' => 3, 'partner_id' => 4, 'type' => 5, 'status' => 6, 'used_credit' => 7, 'rules' => 8, 'dictionary' => 9, 'custom_data' => 10, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, 'PartnerId' => 4, 'Type' => 5, 'Status' => 6, 'UsedCredit' => 7, 'AddOn' => 8, 'SyncedCredit' => 9, 'LastSyncTime' => 10, 'Rules' => 11, 'Dictionary' => 12, 'CustomData' => 13, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'createdAt' => 2, 'updatedAt' => 3, 'partnerId' => 4, 'type' => 5, 'status' => 6, 'usedCredit' => 7, 'addOn' => 8, 'syncedCredit' => 9, 'lastSyncTime' => 10, 'rules' => 11, 'dictionary' => 12, 'customData' => 13, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::NAME => 1, self::CREATED_AT => 2, self::UPDATED_AT => 3, self::PARTNER_ID => 4, self::TYPE => 5, self::STATUS => 6, self::USED_CREDIT => 7, self::ADD_ON => 8, self::SYNCED_CREDIT => 9, self::LAST_SYNC_TIME => 10, self::RULES => 11, self::DICTIONARY => 12, self::CUSTOM_DATA => 13, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'created_at' => 2, 'updated_at' => 3, 'partner_id' => 4, 'type' => 5, 'status' => 6, 'used_credit' => 7, 'add_on' => 8, 'synced_credit' => 9, 'last_sync_time' => 10, 'rules' => 11, 'dictionary' => 12, 'custom_data' => 13, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
 	);
 
 	/**
@@ -176,6 +185,9 @@ abstract class BaseReachProfilePeer {
 		$criteria->addSelectColumn(ReachProfilePeer::TYPE);
 		$criteria->addSelectColumn(ReachProfilePeer::STATUS);
 		$criteria->addSelectColumn(ReachProfilePeer::USED_CREDIT);
+		$criteria->addSelectColumn(ReachProfilePeer::ADD_ON);
+		$criteria->addSelectColumn(ReachProfilePeer::SYNCED_CREDIT);
+		$criteria->addSelectColumn(ReachProfilePeer::LAST_SYNC_TIME);
 		$criteria->addSelectColumn(ReachProfilePeer::RULES);
 		$criteria->addSelectColumn(ReachProfilePeer::DICTIONARY);
 		$criteria->addSelectColumn(ReachProfilePeer::CUSTOM_DATA);
@@ -209,40 +221,40 @@ abstract class BaseReachProfilePeer {
 
 		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 		$criteria->setDbName(self::DATABASE_NAME); // Set the correct dbName
-		
+
 		ReachProfilePeer::attachCriteriaFilter($criteria);
 
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteria,
 			kQueryCache::QUERY_TYPE_COUNT,
-			'ReachProfilePeer', 
-			$cacheKey, 
+			'ReachProfilePeer',
+			$cacheKey,
 			$queryDB);
 		if ($cachedResult !== null)
 		{
 			return $cachedResult;
 		}
-		
+
 		// select the connection for the query
 		$con = ReachProfilePeer::alternativeCon ($con, $queryDB);
-		
+
 		// BasePeer returns a PDOStatement
 		$stmt = BasePeer::doCount($criteria, $con);
-		
+
 		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$count = (int) $row[0];
 		} else {
 			$count = 0; // no rows returned; we infer that means 0 matches.
 		}
 		$stmt->closeCursor();
-		
+
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $count);
 		}
-		
+
 		return $count;
 	}
 	/**
@@ -264,14 +276,14 @@ abstract class BaseReachProfilePeer {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Override in order to use the query cache.
 	 * Cache invalidation keys are used to determine when cached queries are valid.
 	 * Before returning a query result from the cache, the time of the cached query
 	 * is compared to the time saved in the invalidation key.
 	 * A cached query will only be used if it's newer than the matching invalidation key.
-	 *  
+	 *
 	 * @return     array The invalidation keys that should be checked before returning a cached result for this criteria.
 	 *		 if an empty array is returned, the query cache won't be used - the query will be performed on the DB.
 	 */
@@ -282,18 +294,18 @@ abstract class BaseReachProfilePeer {
 
 	/**
 	 * Override in order to filter objects returned from doSelect.
-	 *  
+	 *
 	 * @param      array $selectResults The array of objects to filter.
 	 * @param	   Criteria $criteria
 	 */
 	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
-	
+
 	/**
 	 * Adds the supplied object array to the instance pool, objects already found in the pool
 	 * will be replaced with instance from the pool.
-	 *  
+	 *
 	 * @param      array $queryResult The array of objects to get / add to pool.
 	 */
 	public static function updateInstancePool(&$queryResult)
@@ -311,10 +323,10 @@ abstract class BaseReachProfilePeer {
 			}
 		}
 	}
-						
+
 	/**
 	 * Adds the supplied object array to the instance pool.
-	 *  
+	 *
 	 * @param      array $queryResult The array of objects to add to pool.
 	 */
 	public static function addInstancesToPool($queryResult)
@@ -322,7 +334,7 @@ abstract class BaseReachProfilePeer {
 		if (Propel::isInstancePoolingEnabled())
 		{
 			if ( count( self::$instances ) + count( $queryResult ) <= kConf::get('max_num_instances_in_pool') )
-			{  
+			{
 				foreach ($queryResult as $curResult)
 				{
 					ReachProfilePeer::addInstanceToPool($curResult);
@@ -330,7 +342,7 @@ abstract class BaseReachProfilePeer {
 			}
 		}
 	}
-	
+
 	/**
 	 * Method to do selects.
 	 *
@@ -341,16 +353,16 @@ abstract class BaseReachProfilePeer {
 	 *		 rethrown wrapped into a PropelException.
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
-	{		
+	{
 		$criteriaForSelect = ReachProfilePeer::prepareCriteriaForSelect($criteria);
-		
+
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteriaForSelect, 
+			$criteriaForSelect,
 			kQueryCache::QUERY_TYPE_SELECT,
-			'ReachProfilePeer', 
-			$cacheKey, 
+			'ReachProfilePeer',
+			$cacheKey,
 			$queryDB);
 		if ($cachedResult !== null)
 		{
@@ -359,22 +371,22 @@ abstract class BaseReachProfilePeer {
 			ReachProfilePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
-		
+
 		$con = ReachProfilePeer::alternativeCon($con, $queryDB);
-		
+
 		$queryResult = ReachProfilePeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
-		
+
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
-		
+
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 			$cacheKey = null;
 		}
-		
+
 		ReachProfilePeer::filterSelectResults($queryResult, $criteria);
-		
+
 		ReachProfilePeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -385,38 +397,38 @@ abstract class BaseReachProfilePeer {
 		{
 			switch ($queryDB)
 			{
-			case kQueryCache::QUERY_DB_MASTER:
-				$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
-				break;
+				case kQueryCache::QUERY_DB_MASTER:
+					$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
+					break;
 
-			case kQueryCache::QUERY_DB_SLAVE:
-				$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
-				break;
+				case kQueryCache::QUERY_DB_SLAVE:
+					$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
+					break;
 			}
 		}
-	
+
 		if($con === null)
 			$con = myDbHelper::alternativeCon($con);
-			
+
 		if($con === null)
 			$con = Propel::getConnection(ReachProfilePeer::DATABASE_NAME, Propel::CONNECTION_READ);
-		
+
 		return $con;
 	}
-		
+
 	/**
 	 * @var criteriaFilter The default criteria filter.
 	 */
 	protected static $s_criteria_filter;
-	
+
 	public static function  setUseCriteriaFilter ( $use )
 	{
 		$criteria_filter = ReachProfilePeer::getCriteriaFilter();
-		
-		if ( $use )  $criteria_filter->enable(); 
+
+		if ( $use )  $criteria_filter->enable();
 		else $criteria_filter->disable();
 	}
-	
+
 	/**
 	 * Returns the default criteria filter
 	 *
@@ -426,16 +438,16 @@ abstract class BaseReachProfilePeer {
 	{
 		if(self::$s_criteria_filter == null)
 			ReachProfilePeer::setDefaultCriteriaFilter();
-		
+
 		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('ReachProfile');
 		if ($partnerCriteria)
 		{
 			call_user_func_array(array('ReachProfilePeer','addPartnerToCriteria'), $partnerCriteria);
 		}
-		
+
 		return self::$s_criteria_filter;
 	}
-	 
+
 	/**
 	 * Creates default criteria filter
 	 */
@@ -443,31 +455,31 @@ abstract class BaseReachProfilePeer {
 	{
 		if(self::$s_criteria_filter == null)
 			self::$s_criteria_filter = new criteriaFilter();
-		
-		$c = new myCriteria(); 
+
+		$c = new myCriteria();
 		self::$s_criteria_filter->setFilter($c);
 	}
-	
-	
+
+
 	/**
 	 * the filterCriteria will filter out all the doSelect methods - ONLY if the filter is turned on.
 	 * IMPORTANT - the filter is turend on by default and when switched off - should be turned on again manually .
-	 * 
+	 *
 	 * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
 	 */
 	protected static function attachCriteriaFilter(Criteria $criteria)
 	{
 		ReachProfilePeer::getCriteriaFilter()->applyFilter($criteria);
 	}
-	
+
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
 	{
 		$criteriaFilter = self::getCriteriaFilter();
 		$criteria = $criteriaFilter->getFilter();
-		
+
 		if(!$privatePartnerData)
 		{
-			// the private partner data is not allowed - 
+			// the private partner data is not allowed -
 			if($kalturaNetwork)
 			{
 				// allow only the kaltura netword stuff
@@ -480,7 +492,7 @@ abstract class BaseReachProfilePeer {
 			}
 			else
 			{
-				// no private data and no kaltura_network - 
+				// no private data and no kaltura_network -
 				// add a criteria that will return nothing
 				$criteria->addAnd(self::PARTNER_ID, Partner::PARTNER_THAT_DOWS_NOT_EXIST);
 			}
@@ -497,7 +509,7 @@ abstract class BaseReachProfilePeer {
 			{
 				// all is allowed - don't add anything to the criteria
 			}
-			else 
+			else
 			{
 				// $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
 				$partners = explode(',', trim($partnerGroup));
@@ -507,22 +519,22 @@ abstract class BaseReachProfilePeer {
 				// add the partner_id to the partner_group
 				if (!in_array(strval($partnerId), $partners))
 					$partners[] = strval($partnerId);
-				
+
 				if(count($partners) == 1 && reset($partners) == $partnerId)
 				{
 					$criteria->addAnd(self::PARTNER_ID, $partnerId);
 				}
-				else 
+				else
 				{
 					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
 					$criteria->addAnd($criterion);
 				}
 			}
 		}
-			
+
 		$criteriaFilter->enable();
 	}
-	
+
 	/**
 	 * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
 	 *
@@ -540,17 +552,17 @@ abstract class BaseReachProfilePeer {
 	{
 		// attach default criteria
 		ReachProfilePeer::attachCriteriaFilter($criteria);
-		
+
 		// select the connection for the query
 		$con = ReachProfilePeer::alternativeCon ( $con );
-		
+
 		// BasePeer returns a PDOStatement
 		return BasePeer::doCount($criteria, $con);
 	}
-	
+
 	public static function prepareCriteriaForSelect(Criteria $criteria)
 	{
-		if ($criteria->hasSelectClause()) 
+		if ($criteria->hasSelectClause())
 		{
 			$asColumns = $criteria->getAsColumns();
 			if(count($asColumns) == 1 && isset($asColumns['_score']))
@@ -564,7 +576,7 @@ abstract class BaseReachProfilePeer {
 			$criteria = clone $criteria;
 			ReachProfilePeer::addSelectColumns($criteria);
 		}
-		
+
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
 
@@ -573,7 +585,7 @@ abstract class BaseReachProfilePeer {
 
 		return $criteria;
 	}
-	
+
 	/**
 	 * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
 	 *
@@ -590,9 +602,9 @@ abstract class BaseReachProfilePeer {
 	public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
 	{
 		$con = ReachProfilePeer::alternativeCon($con);
-		
+
 		$criteria = ReachProfilePeer::prepareCriteriaForSelect($criteria);
-		
+
 		// BasePeer returns a PDOStatement
 		return BasePeer::doSelect($criteria, $con);
 	}
@@ -616,10 +628,10 @@ abstract class BaseReachProfilePeer {
 			{
 				$key = (string) $obj->getId();
 			}
-				
+
 			if ( isset( self::$instances[$key] )											// Instance is already mapped?
-					|| count( self::$instances ) < kConf::get('max_num_instances_in_pool')	// Not mapped, but max. inst. not yet reached?
-				)
+				|| count( self::$instances ) < kConf::get('max_num_instances_in_pool')	// Not mapped, but max. inst. not yet reached?
+			)
 			{
 				self::$instances[$key] = $obj;
 				kMemoryManager::registerPeer('ReachProfilePeer');
@@ -673,7 +685,7 @@ abstract class BaseReachProfilePeer {
 		}
 		return null; // just to be explicit
 	}
-	
+
 	/**
 	 * Clear the instance pool.
 	 *
@@ -687,7 +699,7 @@ abstract class BaseReachProfilePeer {
 		}
 		self::$instances = array();
 	}
-	
+
 	/**
 	 * Method to invalidate the instance pool of all tables related to reach_profile
 	 * by a foreign key with ON DELETE CASCADE
@@ -725,7 +737,7 @@ abstract class BaseReachProfilePeer {
 	public static function populateObjects(PDOStatement $stmt)
 	{
 		$results = array();
-	
+
 		// set the class once to avoid overhead in the loop
 		$cls = ReachProfilePeer::getOMClass(false);
 		// populate the object(s)
@@ -762,11 +774,11 @@ abstract class BaseReachProfilePeer {
 	 */
 	public static function buildTableMap()
 	{
-	  $dbMap = Propel::getDatabaseMap(BaseReachProfilePeer::DATABASE_NAME);
-	  if (!$dbMap->hasTable(BaseReachProfilePeer::TABLE_NAME))
-	  {
-	    $dbMap->addTableObject(new ReachProfileTableMap());
-	  }
+		$dbMap = Propel::getDatabaseMap(BaseReachProfilePeer::DATABASE_NAME);
+		if (!$dbMap->hasTable(BaseReachProfilePeer::TABLE_NAME))
+		{
+			$dbMap->addTableObject(new ReachProfileTableMap());
+		}
 	}
 
 	/**
@@ -777,7 +789,7 @@ abstract class BaseReachProfilePeer {
 	 * relative to a location on the PHP include_path.
 	 * (e.g. path.to.MyClass -> 'path/to/MyClass.php')
 	 *
-	 * @param      boolean  Whether or not to return the path wit hthe class name 
+	 * @param      boolean  Whether or not to return the path wit hthe class name
 	 * @return     string path.to.ClassName
 	 */
 	public static function getOMClass($withPrefix = true)
@@ -861,7 +873,7 @@ abstract class BaseReachProfilePeer {
 
 		return BasePeer::doUpdate($selectCriteria, $criteria, $con);
 	}
-	
+
 	/**
 	 * Return array of columns that should change only if there is a real change.
 	 * @return array
@@ -870,7 +882,7 @@ abstract class BaseReachProfilePeer {
 	{
 		return array();
 	}
-	
+
 	/**
 	 * Return array of custom-data fields that shouldn't be auto-updated.
 	 * @return array
@@ -920,8 +932,8 @@ abstract class BaseReachProfilePeer {
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
-	 public static function doDelete($values, PropelPDO $con = null)
-	 {
+	public static function doDelete($values, PropelPDO $con = null)
+	{
 		if ($con === null) {
 			$con = Propel::getConnection(ReachProfilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
@@ -956,7 +968,7 @@ abstract class BaseReachProfilePeer {
 			// use transaction because $criteria could contain info
 			// for more than one table or we could emulating ON DELETE CASCADE, etc.
 			$con->beginTransaction();
-			
+
 			$affectedRows += BasePeer::doDelete($criteria, $con);
 			ReachProfilePeer::clearRelatedInstancePool();
 			$con->commit();

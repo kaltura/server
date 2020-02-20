@@ -363,10 +363,15 @@ class ReachProfile extends BaseReachProfile
 	public function shouldSyncCredit()
 	{
 		$reachProfileCredit = $this->getCredit();
-		if ($reachProfileCredit && $reachProfileCredit->isSynced())
+
+		if ($reachProfileCredit && (intval(time() / 86400) == (intval($this->getLastSyncTime() / 86400))))
+		{
 			return false;
+		}
 		else
+		{
 			return true;
+		}
 	}
 
 	public function syncCredit()
@@ -375,7 +380,7 @@ class ReachProfile extends BaseReachProfile
 
 		if ($reachProfileCredit )
 		{
-			$syncedCredit = $reachProfileCredit->syncCredit($this->getId(), $this->getPartnerId());
+			$syncedCredit = $reachProfileCredit->syncCredit($this);
 			$this->setUsedCredit($syncedCredit);
 		}
 		$this->setCredit($reachProfileCredit);
@@ -435,7 +440,7 @@ class ReachProfile extends BaseReachProfile
 
 	public function calculateCreditPercentUsage()
 	{
-		$currentCredit = $this->getCredit()->getCurrentCredit(false);
+		$currentCredit = $this->getCredit()->getCurrentCredit($this->getAddOn(), false);
 		$creditUsagePercentage = ($currentCredit == ReachProfileCreditValues::UNLIMITED_CREDIT) ? 0 : 100;
 		if ($currentCredit != 0 && $currentCredit != ReachProfileCreditValues::UNLIMITED_CREDIT)
 		{
@@ -523,5 +528,29 @@ class ReachProfile extends BaseReachProfile
 			$this->setUpdatedAt($before);
 		}
 		return $ret;
+	}
+
+	/**
+	 * @param float $amount
+	 * @throws PropelException
+	 * @throws kCoreException
+	 */
+	public function updateCreditFunds($amount)
+	{
+		$updateReachProfileCreditSql = "UPDATE ".ReachProfilePeer::TABLE_NAME." SET " .
+			ReachProfilePeer::ADD_ON . " = " . ReachProfilePeer::ADD_ON . " +$amount WHERE " .
+			ReachProfilePeer::ID . "=" . $this->getId() . " AND (" . ReachProfilePeer::ADD_ON ." + $amount >= 0) ;";
+
+		$connection = Propel::getConnection();
+		$stmt = $connection->prepare($updateReachProfileCreditSql);
+		$stmt->execute();
+
+		$affectedRows = $stmt->rowCount();
+		KalturaLog::log("AffectedRows: ". $affectedRows);
+		if ($affectedRows == 0)
+		{
+			throw new kCoreException("Invalid amount - reach profile credit can't be negative", kCoreException::INVALID_REACH_PROFILE_CREDIT);
+		}
+		KalturaLog::debug("Successfully updated credit for reach Profile id  " . $this->getId() . " and with credit amount of: $amount");
 	}
 } // ReachProfile

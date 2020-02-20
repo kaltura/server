@@ -913,6 +913,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_package" type="tinyint" default="1" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="usage_percent" type="integer" default="0" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="storage_usage" type="integer" default="0" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="credit" type="integer" default="0"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="eighty_percent_warning" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="usage_limit_warning" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="monitor_usage" type="integer" default="1" />

@@ -70,6 +70,7 @@ class PartnerTableMap extends TableMap {
 		$this->addColumn('PARTNER_PACKAGE', 'PartnerPackage', 'TINYINT', false, null, 1);
 		$this->addColumn('USAGE_PERCENT', 'UsagePercent', 'INTEGER', false, null, 0);
 		$this->addColumn('STORAGE_USAGE', 'StorageUsage', 'INTEGER', false, null, 0);
+		$this->addColumn('CREDIT', 'Credit', 'INTEGER', false, null, 0);
 		$this->addColumn('EIGHTY_PERCENT_WARNING', 'EightyPercentWarning', 'INTEGER', false, null, null);
 		$this->addColumn('USAGE_LIMIT_WARNING', 'UsageLimitWarning', 'INTEGER', false, null, null);
 		$this->addColumn('MONITOR_USAGE', 'MonitorUsage', 'INTEGER', false, null, 1);
