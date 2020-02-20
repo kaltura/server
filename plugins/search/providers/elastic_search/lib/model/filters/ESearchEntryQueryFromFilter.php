@@ -441,24 +441,19 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 
 	protected function getInnerSearchItemByValue($value)
 	{
+		$categoryIdDefault = category::CATEGORY_ID_THAT_DOES_NOT_EXIST;
 		if(substr($value, -1) === '>') //value is parent, we should retrieve entries that doesn't belong directly to this category - but only to the sub categories.
 		{
 			$value = substr($value, 0, strlen($value) - 1);
 			$category = categoryPeer::getByFullNameExactMatch($value);
-			if ($category)
-			{
-				$categoryId = $category->getId();
-				return $this->addSearchItem(ESearchCategoryEntryFieldName::ANCESTOR_ID, $categoryId, ESearchItemType::EXACT_MATCH);
-			}
+			$categoryId = $category ? $category->getId(): $categoryIdDefault;
+			return $this->addSearchItem(ESearchCategoryEntryFieldName::ANCESTOR_ID, $categoryId, ESearchItemType::EXACT_MATCH);
 		}
 		else	//we should retrieve entries that belong directly to this category or to a sub categories.
 		{
 			$category = categoryPeer::getByFullNameExactMatch($value);
-			if ($category)
-			{
-				$categoryId = $category->getId();
-				return $this->getCategoryOperator(array(ESearchBaseCategoryEntryItem::CATEGORY_IDS_MAPPING_FIELD, ESearchCategoryEntryFieldName::ANCESTOR_ID), $categoryId);
-			}
+			$categoryId = $category ? $category->getId(): $categoryIdDefault;
+			return $this->getCategoryOperator(array(ESearchBaseCategoryEntryItem::CATEGORY_IDS_MAPPING_FIELD, ESearchCategoryEntryFieldName::ANCESTOR_ID), $categoryId);
 		}
 		return null;
 	}
