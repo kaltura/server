@@ -426,7 +426,11 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			$innerSearchItems = array();
 			foreach ($values as $value)
 			{
-				$innerSearchItems[] = $this->getInnerSearchItemByValue($value);
+				$innerSearchItem = $this->getInnerSearchItemByValue($value);
+				if ($innerSearchItem)
+				{
+					$innerSearchItems[] = $innerSearchItem;
+				}
 			}
 			$operator = $this->getEsearchOperatorByField(ESearchCategoryEntryFieldName::FULL_IDS);
 			$operator->setOperator(ESearchOperatorType::OR_OP);
@@ -456,6 +460,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 				return $this->getCategoryOperator(array(ESearchBaseCategoryEntryItem::CATEGORY_IDS_MAPPING_FIELD, ESearchCategoryEntryFieldName::ANCESTOR_ID), $categoryId);
 			}
 		}
+		return null;
 	}
 
 
