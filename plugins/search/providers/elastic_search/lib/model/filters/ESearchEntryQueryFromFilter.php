@@ -426,30 +426,35 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			$innerSearchItems = array();
 			foreach ($values as $value)
 			{
-				if(substr($value, -1) === '>') //value is parent, we should retrieve entries that doesn't belong directly to this category - but only to the sub categories.
-				{
-					$value = substr($value, 0, strlen($value) - 1);
-					$category = categoryPeer::getByFullNameExactMatch($value);
-					if ($category)
-					{
-						$categoryId = $category->getId();
-						$innerSearchItems[] = $this->addSearchItem(ESearchCategoryEntryFieldName::ANCESTOR_ID, $categoryId, ESearchItemType::EXACT_MATCH);
-					}
-				}
-				else	//we should retrieve entries that belong directly to this category or to a sub categories.
-				{
-					$category = categoryPeer::getByFullNameExactMatch($value);
-					if ($category)
-					{
-						$categoryId = $category->getId();
-						$innerSearchItems[] = $this->getCategoryOperator(array(ESearchBaseCategoryEntryItem::CATEGORY_IDS_MAPPING_FIELD, ESearchCategoryEntryFieldName::ANCESTOR_ID), $categoryId);
-					}
-				}
+				$innerSearchItems[] = $this->getInnerSearchItemByValue($value);
 			}
 			$operator = $this->getEsearchOperatorByField(ESearchCategoryEntryFieldName::FULL_IDS);
 			$operator->setOperator(ESearchOperatorType::OR_OP);
 			$operator->setSearchItems($innerSearchItems);
 			return $operator;
+		}
+	}
+
+	protected function getInnerSearchItemByValue($value)
+	{
+		if(substr($value, -1) === '>') //value is parent, we should retrieve entries that doesn't belong directly to this category - but only to the sub categories.
+		{
+			$value = substr($value, 0, strlen($value) - 1);
+			$category = categoryPeer::getByFullNameExactMatch($value);
+			if ($category)
+			{
+				$categoryId = $category->getId();
+				return $this->addSearchItem(ESearchCategoryEntryFieldName::ANCESTOR_ID, $categoryId, ESearchItemType::EXACT_MATCH);
+			}
+		}
+		else	//we should retrieve entries that belong directly to this category or to a sub categories.
+		{
+			$category = categoryPeer::getByFullNameExactMatch($value);
+			if ($category)
+			{
+				$categoryId = $category->getId();
+				return $this->getCategoryOperator(array(ESearchBaseCategoryEntryItem::CATEGORY_IDS_MAPPING_FIELD, ESearchCategoryEntryFieldName::ANCESTOR_ID), $categoryId);
+			}
 		}
 	}
 
