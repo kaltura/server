@@ -26,6 +26,7 @@ define('SOURCE_RAPT', -14);
 define('SOURCE_WEBEX', -15);
 define('SOURCE_ZOOM', -16);
 define('SOURCE_EXPRESS_RECORDER', -17);
+define('SOURCE_EXTERNAL_YOUTUBE', -20);
 define('CREATED_DAY_TS', 'UNIX_TIMESTAMP(DATE(CREATED_AT))');
 
 $sourceFromAdminTag = array(
@@ -37,6 +38,10 @@ $sourceFromAdminTag = array(
 	'webexentry' => SOURCE_WEBEX,
 	'zoomentry' => SOURCE_ZOOM,
 	'expressrecorder' => SOURCE_EXPRESS_RECORDER,
+);
+
+$externalSources = array(
+	'YouTube' => SOURCE_EXTERNAL_YOUTUBE,
 );
 
 function getPartnerVertical($customData)
@@ -55,10 +60,18 @@ function getPartnerVertical($customData)
 	}
 }
 
-function getEntrySourceTypeInt($sourceType, $adminTags)
+function getEntrySourceTypeInt($sourceType, $adminTags, $customData)
 {
 	global $sourceFromAdminTag;
+	global $externalSources;
 
+	if (isset($customData['externalSource']))
+	{
+		if (isset($externalSources[$customData['externalSource']]))
+		{
+			return $externalSources[$customData['externalSource']];
+		}
+	}
 	// check for specific admin tags
 	$adminTags = explode(',', strtolower($adminTags));
 	foreach ($adminTags as $adminTag)
