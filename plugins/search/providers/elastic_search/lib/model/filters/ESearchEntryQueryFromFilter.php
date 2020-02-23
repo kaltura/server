@@ -228,7 +228,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		$this->prepareEntriesCriteriaFilter($filter);
 		foreach($filter->fields as $field => $fieldValue)
 		{
-			if(in_array($field, static::getSpecialFields()))
+			if(in_array($field, self::getSpecialFields()))
 			{
 				$this->handleSpecialFields($field, $fieldValue);
 				continue;
@@ -343,18 +343,18 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			$range = new ESearchRange();
 			switch ($durationType)
 			{
-				case durationType::ENTRY_DURATION_TYPE_NOTAVAILABLE:
+				case durationType::NOT_AVAILABLE:
 					$range->setLessThan(self::SHORT_DURATION_LOWER_BOUND);
 					break;
-				case durationType::ENTRY_DURATION_TYPE_SHORT:
+				case durationType::SHORT:
 					$range->setGreaterThanOrEqual(self::SHORT_DURATION_LOWER_BOUND);
 					$range->setLessThanOrEqual(self::SHORT_DURATION_UPPER_BOUND);
 					break;
-				case durationType::ENTRY_DURATION_TYPE_MEDIUM:
+				case durationType::MEDIUM:
 					$range->setGreaterThan(self::SHORT_DURATION_UPPER_BOUND);
 					$range->setLessThanOrEqual(self::MEDIUM_DURATION_UPPER_BOUND);
 					break;
-				case durationType::ENTRY_DURATION_TYPE_LONG:
+				case durationType::LONG:
 					$range->setGreaterThan(self::MEDIUM_DURATION_UPPER_BOUND);
 					break;
 				default:
