@@ -8,6 +8,8 @@ class KOperationEnginePdfCreatorLinux extends KOperationEnginePdfCreator
 {
 	// List of supported file types
 	protected $SUPPORTED_FILE_TYPES = array(
+		'Composite Document File V2 Document',
+		'CDF V2 Document',
 		'Microsoft Word',
 		'Microsoft PowerPoint',
 		'Microsoft Excel',
@@ -37,5 +39,10 @@ class KOperationEnginePdfCreatorLinux extends KOperationEnginePdfCreator
 	protected function getKillPopupsPath()
 	{
 		return NULL;
-    }
+	}
+
+	protected function doesSupportReadOnly()
+	{
+		return false;
+	}
 }

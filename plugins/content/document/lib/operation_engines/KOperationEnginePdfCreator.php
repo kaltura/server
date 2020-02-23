@@ -45,22 +45,27 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 	
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
-		if ($configFilePath) {
+		if ($configFilePath)
+		{
 			$configFilePath = realpath($configFilePath);
 		}
 		
 		// bypassing PDF Creator for source PDF files
 		$inputExtension = strtolower(pathinfo($inFilePath, PATHINFO_EXTENSION));
-		if (($inputExtension == 'pdf') && (!$this->data->flavorParamsOutput->readonly)) {
+		if ( ($inputExtension == 'pdf') && (($this->doesSupportReadOnly() === false) || (!$this->data->flavorParamsOutput->readonly)) )
+		{
 			KalturaLog::notice('Bypassing PDF Creator for source PDF files');
-			if (!@copy($inFilePath, $this->outFilePath)) {
+			if (!@copy($inFilePath, $this->outFilePath))
+			{
 				$error = '';
-				if (function_exists('error_get_last')) {
+				if (function_exists('error_get_last'))
+				{
 					$error = error_get_last();
 				}
 				throw new KOperationEngineException('Cannot copy PDF file ['.$this->inFilePath.'] to ['.$this->outFilePath.'] - ['.$error.']');
 			}
-			else {
+			else
+			{
 				// PDF input file copied as is to output file
 				return true;
 			}
@@ -95,10 +100,13 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 		}
 		
 		$finalOutputPath = $this->outFilePath;
-		
-		$tmpFile = kFile::replaceExt(basename($realInFilePath), 'pdf');
-		$tmpFile = dirname($this->outFilePath).'/'.$tmpFile;
 
+		if (($inputExtension == 'pdf') && ($this->data->flavorParamsOutput->readonly == true)){
+			$tmpFile = $this->outFilePath.'.pdf';
+		}else{
+			$tmpFile = kFile::replaceExt(basename($realInFilePath), 'pdf');
+			$tmpFile = dirname($this->outFilePath).'/'.$tmpFile;
+		}
 		$this->outFilePath = $tmpFile;
 		
 		// Create popups log file
@@ -222,6 +230,11 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 			$killPopupsPath = self::DEFAULT_KILL_POPUPS_PATH;
 		}
 		return $killPopupsPath;
+	}
+
+	protected function doesSupportReadOnly()
+	{
+		return true;
 	}
 	
 }

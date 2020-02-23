@@ -116,7 +116,7 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 				return null;
 
 			//Linux
-			if ($constructorArgs['params']->osType == self::OS_TYPE_LINUX)
+			if ($constructorArgs['params']->osType === self::OS_TYPE_LINUX)
 			{
 				return new KOperationEnginePdfCreatorLinux($constructorArgs['params']->pdfCreatorCmd, $constructorArgs['outFilePath']);
 			}
