@@ -216,7 +216,7 @@ function getEntryUpdates($updatedAt)
 				ENTRY_KUSER_ID => $row['KUSER_ID'],
 				ENTRY_TYPE => $row['TYPE'],
 				ENTRY_MEDIA_TYPE => $row['MEDIA_TYPE'],
-				ENTRY_SOURCE_TYPE => getEntrySourceTypeInt($row['SOURCE'], $row['ADMIN_TAGS']),
+				ENTRY_SOURCE_TYPE => getEntrySourceTypeInt($row['SOURCE'], $row['ADMIN_TAGS'], $customData),
 				ENTRY_CREATED_AT => $row[CREATED_DAY_TS],
 				ENTRY_CREATOR_ID => isset($customData['creatorKuserId']) ? $customData['creatorKuserId'] : $row['KUSER_ID'],
 			);
