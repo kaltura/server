@@ -38,6 +38,7 @@ class ESearchQueryFromAdvancedSearch
 				return $this->createESearchQueryFromEntryQuizAdvancedFilter($advancedSearchFilterItem);
 			default:
 				KalturaLog::crit('Tried to convert not supported advance filter of type:' . get_class($advancedSearchFilterItem));
+				return null;
 		}
 	}
 
@@ -95,9 +96,7 @@ class ESearchQueryFromAdvancedSearch
 		}
 		else
 		{
-			$result = new ESearchOperator();
-			$result->setOperator(ESearchOperatorType::NOT_OP);
-			$result->setSearchItems(array($item));
+			$result = self::createNegativeQuery($item);
 		}
 
 		return $result;
@@ -114,11 +113,17 @@ class ESearchQueryFromAdvancedSearch
 		}
 		else
 		{
-			$result = new ESearchOperator();
-			$result->setOperator(ESearchOperatorType::NOT_OP);
-			$result->setSearchItems(array($item));
+			$result = self::createNegativeQuery($item);
 		}
 
+		return $result;
+	}
+
+	protected static function createNegativeQuery($item)
+	{
+		$result = new ESearchOperator();
+		$result->setOperator(ESearchOperatorType::NOT_OP);
+		$result->setSearchItems(array($item));
 		return $result;
 	}
 
