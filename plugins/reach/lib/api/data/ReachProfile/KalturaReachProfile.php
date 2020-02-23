@@ -7,7 +7,7 @@
  */
 class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 {
-	const MAX_DICTIONARY_LENGTH = 1000;
+	const MAX_DICTIONARY_LENGTH = 4000;
 
 	/**
 	 * @var int

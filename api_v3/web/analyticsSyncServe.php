@@ -26,7 +26,10 @@ define('SOURCE_RAPT', -14);
 define('SOURCE_WEBEX', -15);
 define('SOURCE_ZOOM', -16);
 define('SOURCE_EXPRESS_RECORDER', -17);
+define('SOURCE_KMS_NATIVE_ANDROID_APP', -18);
+define('SOURCE_KMS_NATIVE_IOS_APP', -19);
 define('SOURCE_EXTERNAL_YOUTUBE', -20);
+
 define('CREATED_DAY_TS', 'UNIX_TIMESTAMP(DATE(CREATED_AT))');
 
 $sourceFromAdminTag = array(
@@ -38,6 +41,8 @@ $sourceFromAdminTag = array(
 	'webexentry' => SOURCE_WEBEX,
 	'zoomentry' => SOURCE_ZOOM,
 	'expressrecorder' => SOURCE_EXPRESS_RECORDER,
+	'kmsnativeandroid' => SOURCE_KMS_NATIVE_ANDROID_APP,
+	'kmsnativeios' => SOURCE_KMS_NATIVE_IOS_APP,
 );
 
 $externalSources = array(
