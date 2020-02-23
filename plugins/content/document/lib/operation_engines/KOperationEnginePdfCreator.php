@@ -52,7 +52,7 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 		
 		// bypassing PDF Creator for source PDF files
 		$inputExtension = strtolower(pathinfo($inFilePath, PATHINFO_EXTENSION));
-		if ( ($inputExtension == 'pdf') && (($this->doesSupportReadOnly() === false) || (!$this->data->flavorParamsOutput->readonly)) )
+		if ( ($inputExtension == 'pdf') && ($this->shouldHandleReadOnly() == false) )
 		{
 			KalturaLog::notice('Bypassing PDF Creator for source PDF files');
 			if (!@copy($inFilePath, $this->outFilePath))
@@ -232,9 +232,9 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 		return $killPopupsPath;
 	}
 
-	protected function doesSupportReadOnly()
+	protected function shouldHandleReadOnly()
 	{
-		return true;
+		return $this->data->flavorParamsOutput->readonly;
 	}
 	
 }

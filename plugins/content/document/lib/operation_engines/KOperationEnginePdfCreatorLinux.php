@@ -41,7 +41,7 @@ class KOperationEnginePdfCreatorLinux extends KOperationEnginePdfCreator
 		return NULL;
 	}
 
-	protected function doesSupportReadOnly()
+	protected function shouldHandleReadOnly()
 	{
 		return false;
 	}
