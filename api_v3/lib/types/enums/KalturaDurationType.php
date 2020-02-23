@@ -3,10 +3,6 @@
  * @package api
  * @subpackage enum
  */
-class KalturaDurationType extends KalturaStringEnum
+class KalturaDurationType extends KalturaStringEnum implements durationType
 {
-	const NOT_AVAILABLE = "notavailable";
-	const SHORT = "short";
-	const MEDIUM = "medium";
-	const LONG = "long";
 }

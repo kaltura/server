@@ -18,6 +18,10 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 	const MODERATION_STATUS_NOT_IN_FILTER = '_notin_moderation_status';
 	const ID_EQUAL_FILTER = '_eq_id';
 	const REDIRECT_FROM_ENTRY_ID_EQUAL_FILTER = '_eq_redirect_from_entry_id';
+	const DURATION_TYPE_FILTER_NAME = '_matchor_duration_type';
+	const SHORT_DURATION_LOWER_BOUND = 0;
+	const SHORT_DURATION_UPPER_BOUND = 240000; // 4 minutes in ms
+	const MEDIUM_DURATION_UPPER_BOUND = 1200000; // 20 minutes in ms
 
 	protected static $puserFields = array(
 		ESearchEntryFilterFields::USER_ID,
@@ -71,6 +75,12 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		ESearchEntryFilterFields::RANK,
 		ESearchEntryFilterFields::LAST_PLAYED_AT,
 		ESearchEntryFilterFields::PLAYS,
+		ESearchEntryFilterFields::DURATION_TYPE,
+	);
+
+	protected static $specialFields = array(
+		ESearchEntryFilterFields::FREE_TEXT,
+		self::DURATION_TYPE_FILTER_NAME,
 	);
 
 	protected static $timeFields = array(
@@ -89,6 +99,11 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 	protected static function getSupportedFields()
 	{
 		return self::$supportedSearchFields;
+	}
+
+	protected static function getSpecialFields()
+	{
+		return self::$specialFields;
 	}
 
 	protected static $entryNestedFields = array(
@@ -213,6 +228,12 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		$this->prepareEntriesCriteriaFilter($filter);
 		foreach($filter->fields as $field => $fieldValue)
 		{
+			if(in_array($field, self::getSpecialFields()))
+			{
+				$this->handleSpecialFields($field, $fieldValue);
+				continue;
+			}
+
 			if ($field === entryFilter::ORDER && !is_null($fieldValue) && $fieldValue!= '')
 			{
 				$kEsearchOrderBy = $this->getKESearchOrderBy($fieldValue);
@@ -267,7 +288,6 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		}
 
 		list( , $operator, $fieldName) = $fieldParts;
-		list($operator, $fieldName) = self::handlingFreeTextField($field, $operator, $fieldName);
 		if(!in_array($fieldName, static::getSupportedFields()) || is_null($fieldValue) || $fieldValue === '')
 		{
 			return null;
@@ -283,14 +303,74 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		return array($operator, $fieldName, $fieldValue);
 	}
 
-	protected static function handlingFreeTextField($field, $operator, $fieldName)
+	protected function handleSpecialFields($field, $fieldValue)
 	{
-		if ($field === ESearchEntryFilterFields::FREE_TEXT)
+		switch ($field)
 		{
-			$operator = baseObjectFilter::IN;
-			$fieldName = $field;
+			case self::DURATION_TYPE_FILTER_NAME:
+				$this->handleDurationType($field, $fieldValue);
+				break;
+			case ESearchEntryFilterFields::FREE_TEXT:
+				$this->handlingFreeTextField($field, $fieldValue);
+				break;
 		}
-		return array($operator, $fieldName);
+
+	}
+
+	protected  function handlingFreeTextField($field, $fieldValue)
+	{
+		if (!empty($fieldValue))
+		{
+			$this->addingFieldPartIntoQuery(baseObjectFilter::IN, $field, $fieldValue);
+		}
+	}
+
+	protected function handleDurationType($field, $fieldValue)
+	{
+		if(empty($fieldValue))
+		{
+			return;
+		}
+		$searchItem = new ESearchOperator();
+		$searchItem->setOperator(ESearchOperatorType::OR_OP);
+		$durationTypeValues =  explode(',', $fieldValue);
+		$durationTypesQueries = array();
+		foreach($durationTypeValues as $durationType)
+		{
+			$item = new ESearchEntryItem();
+			$item->setItemType(ESearchItemType::RANGE);
+			$item->setFieldName(ESearchEntryFieldName::LENGTH_IN_MSECS);
+			$range = new ESearchRange();
+			switch ($durationType)
+			{
+				case durationType::NOT_AVAILABLE:
+					$range->setLessThan(self::SHORT_DURATION_LOWER_BOUND);
+					break;
+				case durationType::SHORT:
+					$range->setGreaterThanOrEqual(self::SHORT_DURATION_LOWER_BOUND);
+					$range->setLessThanOrEqual(self::SHORT_DURATION_UPPER_BOUND);
+					break;
+				case durationType::MEDIUM:
+					$range->setGreaterThan(self::SHORT_DURATION_UPPER_BOUND);
+					$range->setLessThanOrEqual(self::MEDIUM_DURATION_UPPER_BOUND);
+					break;
+				case durationType::LONG:
+					$range->setGreaterThan(self::MEDIUM_DURATION_UPPER_BOUND);
+					break;
+				default:
+					KalturaLog::debug("Undefined duration type {$durationType}.");
+					continue;
+			}
+
+			$item->setRange($range);
+			$durationTypesQueries[] = $item;
+		}
+
+		if ($durationTypesQueries)
+		{
+			$searchItem->setSearchItems($durationTypesQueries);
+			$this->searchItems[] = $searchItem;
+		}
 	}
 
 	protected static function translateFieldValue($fieldName, $filter, $fieldValue)
@@ -302,12 +382,14 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			{
 				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $fieldValue);
 			}
+
 			$fieldValue = $kuser->getId();
 		}
 		else if ($fieldName === ESearchEntryFilterFields::DURATION)
 		{
 			$fieldValue = $fieldValue * 1000;
 		}
+
 		return $fieldValue;
 	}
 
