@@ -542,12 +542,17 @@ class myPlaylistUtils
 		return $entryFilter;
 	}
 
-	public static function executeDynamicPlaylistViaEsearch ($entryFilters ,$totalResults, $pager = null)
+	public static function executeDynamicPlaylistViaEsearch ($entryFilters ,$totalResultsField, $pager = null)
 	{
+		$totalResults = is_numeric($totalResultsField) ? $totalResultsField : reset($totalResultsField);
 		$entryKPager = new kPager();
 		if ($pager)
 		{
 			$pager->toObject($entryKPager);
+		}
+		else
+		{
+			$entryKPager->setPageSize($totalResults);
 		}
 		$entryQueryToFilterESearch = new ESearchEntryQueryFromFilter();
 		$entryIds= array();
