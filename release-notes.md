@@ -11,13 +11,11 @@ Issue ID : PLAT-10713
     [sphinx_sticky_partners]
     0 = XXXX
     1 = YYYY
-    .
-    .
     where XXXX and YYYY are the partner ids you want to enable the feature for.
 	
 
 #### Deployment Scripts ####
-Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_02_03_add_reach_catalog_item_kmc_permissions.php'
+None.
 
 
 # Orion 15.17.0 #
