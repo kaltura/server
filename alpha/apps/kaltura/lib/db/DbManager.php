@@ -296,7 +296,7 @@ class DbManager
 			KalturaLog::debug("Actual sphinx index [". self::$connIndexes[$indexName]. "] sphinx index by best lag [" . $preferredIndex. "]");
 		}
 	
-		$sphinxStickyPartnerIds = kConf::get('sphinx_sticky_partners', 'local', array());
+		$sphinxStickyPartnerIds = kConf::get('sphinx_sticky_partners', 'sphinx_dynamic_config', array());
 		if (!$read || (self::getKsPrivilegeStickySessionKey() && in_array(kCurrentContext::getCurrentPartnerId(), $sphinxStickyPartnerIds)) )
 			self::setSphinxConnIndexInCache($indexName);
 		return self::$sphinxConnection[$indexName];
