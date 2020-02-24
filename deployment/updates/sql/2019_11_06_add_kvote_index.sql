@@ -1,1 +1,0 @@
-alter table kvote add index entry_rank_index(entry_id, rank);

@@ -1,1 +1,0 @@
-ALTER TABLE sphinx_log ADD type INT AFTER created_at;

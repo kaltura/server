@@ -1,1 +1,0 @@
-ALTER TABLE `conversion_profile_2` ADD `type` INTEGER NOT NULL DEFAULT '1' AFTER `status`;

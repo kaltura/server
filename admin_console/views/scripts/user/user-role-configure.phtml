@@ -1,8 +1,0 @@
-<?php if($this->errMessage): ?>
-	<script type="text/javascript">
-		alert('<?php echo $this->errMessage; ?>');
-	</script>
-<?php endif; ?>
-
-<?php $this->form->setAction($this->url(array('controller' => 'user', 'action' => 'user-role-configure'))); ?>
-<?php echo $this->form; ?>

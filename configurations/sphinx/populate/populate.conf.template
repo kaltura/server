@@ -1,3 +1,0 @@
-
-sphinxServer = @SPHINX_SERVER@
-sphinxPort = @SPHINX_PORT@

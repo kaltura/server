@@ -1,9 +1,0 @@
-[rotateSection]
-elasticServer = @ELASTIC_HOST@
-elasticPort = @ELASTIC_PORT@
-indexPattern = @INDEX_PATTERN@
-indexAlias = @INDEX_ALIAS@
-searchAlias = @SEARCH_ALIAS@
-maxNumberOfIndices = @MAX_NUMBER_OF_INDICES@
-newIndexMappingPath = @NEW_INDEX_MAPPING_PATH@
-indexDateFormat = @INDEX_DATE_FORMAT@

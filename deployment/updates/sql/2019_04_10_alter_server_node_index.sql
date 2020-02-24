@@ -1,1 +1,0 @@
-alter table server_node add index status_heartbeat(status,heartbeat_time);

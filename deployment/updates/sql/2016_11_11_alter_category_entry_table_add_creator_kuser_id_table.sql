@@ -1,1 +1,0 @@
-ALTER TABLE category_entry ADD creator_kuser_id INT NULL AFTER privacy_context;

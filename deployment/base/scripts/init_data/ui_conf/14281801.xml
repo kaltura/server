@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<KUploadConfiguration>
-	<fileFilters default="Any">
-		<fileFilter id="Any"           description="videos/audio"           extensions="*.mov;*.mpg;*.avi;*.mp3;*.wav;*.mp4;*.wma;*.flv;*.asf;*.qt;*.mpeg;*.wmv;*.m4v;*.3gp;"           entryType="-1"           mediaType="-1" />
-	</fileFilters>
-	<limits maxUploads="1" maxFileSize="2000" maxTotalSize="2000" />
-</KUploadConfiguration>

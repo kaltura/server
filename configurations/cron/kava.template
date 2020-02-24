@@ -1,1 +1,0 @@
-0 10 * * * kaltura @APP_DIR@/alpha/scripts/kava/kava_plays_views_sync.sh >> @LOG_DIR@/cron.log

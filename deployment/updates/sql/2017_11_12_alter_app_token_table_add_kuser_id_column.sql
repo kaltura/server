@@ -1,1 +1,0 @@
-ALTER TABLE app_token ADD kuser_id INTEGER NULL AFTER custom_data, add index kuser_id(kuser_id);

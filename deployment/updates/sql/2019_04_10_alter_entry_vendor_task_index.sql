@@ -1,1 +1,0 @@
-alter table entry_vendor_task add index entry_id(entry_id), drop index partner_entry_index;

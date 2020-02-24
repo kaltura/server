@@ -1,1 +1,0 @@
-alter table drop_folder modify tags varchar(30),add index dc_tags_status(dc,tags,status);

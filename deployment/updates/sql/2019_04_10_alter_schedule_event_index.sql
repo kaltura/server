@@ -1,1 +1,0 @@
-alter table schedule_event add index parent_recurrence_index(parent_id,recurrence_type);

@@ -1,1 +1,0 @@
-*/15 * * * * apache @APP_DIR@/alpha/crond/kaltura/clear_cache.sh 2>&1 >> @LOG_DIR@/cron.log

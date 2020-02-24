@@ -1,8 +1,0 @@
-<VirtualHost *:@KALTURA_VIRTUAL_HOST_PORT@>
-	# for SSL offloading support, if LB has X_FORWARDED_PROTO set to 'https', set HTTPS to 'on'
-	SetEnvIf X-Forwarded-Proto https HTTPS=on
-	ErrorLog "@LOG_DIR@/kaltura_apache_errors.log"
-	CustomLog @LOG_DIR@/kaltura_apache_access.log vhost_kalt
-	
-	Include "@APP_DIR@/configurations/apache/conf.d/enabled.*.conf"
-</VirtualHost>

@@ -1,1 +1,0 @@
-ALTER TABLE business_process_server ADD dc INT NULL AFTER custom_data;
