@@ -233,7 +233,7 @@ class DbManager
 
 	protected static function getStickySessionKey()
 	{
-		$stickySession = self::getKsPrivilegeStickySession();
+		$stickySession = self::getKsPrivilegeStickySessionKey();
 		
 		if(!$stickySession)
 		{
@@ -243,7 +243,7 @@ class DbManager
 		return $stickySession;
 	}
 	
-	protected static function getKsPrivilegeStickySession()
+	protected static function getKsPrivilegeStickySessionKey()
 	{
 		$ksObject = kCurrentContext::$ks_object;
 		
@@ -297,7 +297,7 @@ class DbManager
 		}
 	
 		$sphinxStickyPartnerIds = kConf::get('sphinx_sticky_partners', 'local', array());
-		if (!$read || (self::getKsPrivilegeStickySession() && in_array(kCurrentContext::getCurrentPartnerId(), $sphinxStickyPartnerIds)) )
+		if (!$read || (self::getKsPrivilegeStickySessionKey() && in_array(kCurrentContext::getCurrentPartnerId(), $sphinxStickyPartnerIds)) )
 			self::setSphinxConnIndexInCache($indexName);
 		return self::$sphinxConnection[$indexName];
 	}
