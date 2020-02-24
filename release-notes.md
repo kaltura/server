@@ -1,5 +1,16 @@
 # Orion 15.17.0 #
 
+## Add support of documents conversion on Linux machine ##
+Issue Type: Task
+Issue ID : PLAT-10694
+
+### Configuration ##
+- Add a worker (follow 'KAsyncConvertPdfLinux' in 'batch.ini.template).
+- Make sure that 'lowriter' is installed by running 'lowriter --version'.
+
+#### Deployment Scripts ####
+none.
+
 ## Allow catalog item pricing view from KMC ##
 Issue Type: Task
 Issue ID : REACH-779
