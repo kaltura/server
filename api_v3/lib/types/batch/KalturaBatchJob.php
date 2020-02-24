@@ -351,13 +351,21 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 			case 'kAmazonS3StorageExportJobData':
 				$this->data = new KalturaAmazonS3StorageExportJobData();
 				break;
-				
+
+			case 'kGCPStorageExportJobData':
+				$this->data = new KalturaGCPStorageExportJobData();
+				break;
+
 			case 'kMoveCategoryEntriesJobData':
 				$this->data = new KalturaMoveCategoryEntriesJobData();
 				break;
-				
+
 			case 'kStorageDeleteJobData':
 				$this->data = new KalturaStorageDeleteJobData();
+				break;
+
+			case 'kGCPStorageDeleteJobData':
+				$this->data = new KalturaGCPStorageDeleteJobData();
 				break;
 				
 			case 'kCaptureThumbJobData':

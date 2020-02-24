@@ -1,0 +1,26 @@
+{
+    "name": "google/crc32",
+    "description": "Various CRC32 implementations",
+    "homepage": "https://github.com/google/php-crc32",
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Andrew Brampton",
+            "email": "bramp@google.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4"
+    },
+    "require-dev": {
+        "paragonie/random_compat": ">=2",
+        "friendsofphp/php-cs-fixer": "^1.13 || v2.14.2",
+        "phpunit/phpunit": "^4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Google\\CRC32\\": "src"
+        }
+    }
+}

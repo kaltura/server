@@ -45,6 +45,7 @@ abstract class KExportEngine
 			case KalturaStorageProfileProtocol::FTP:
 			case KalturaStorageProfileProtocol::KALTURA_DC:
 			case KalturaStorageProfileProtocol::S3:
+			case KalturaStorageProfileProtocol::GCP:
 			case KalturaStorageProfileProtocol::SCP:
 			case KalturaStorageProfileProtocol::SFTP:
 			case KalturaStorageProfileProtocol::LOCAL:

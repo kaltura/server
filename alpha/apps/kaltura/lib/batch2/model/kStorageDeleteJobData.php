@@ -8,17 +8,24 @@ class kStorageDeleteJobData extends kStorageJobData
     /**
      * @return kStorageDeleteJobData
      */
-    public static function getInstance($protocol)
-    {
-        $data = null;
+	public static function getInstance($protocol)
+	{
+		$data = null;
+		switch($protocol)
+		{
+			case StorageProfile::STORAGE_PROTOCOL_GCP:
+				$data = new kGCPStorageDeleteJobData();
+				break;
+			default:
+				$data = KalturaPluginManager::loadObject('kStorageDeleteJobData', $protocol);
+				break;
+		}
+		if (!$data)
+			$data = new kStorageDeleteJobData();
 
-        $data = KalturaPluginManager::loadObject('kStorageDeleteJobData', $protocol);
-        
-        if (!$data)
-            $data = new kStorageDeleteJobData();
-        
-        return $data;
-    }
+		return $data;
+	}
+
     /**
      * @var StorageProfile $storage
      * @var FileSync $fileSync

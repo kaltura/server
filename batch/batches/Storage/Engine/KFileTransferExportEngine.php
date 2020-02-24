@@ -41,6 +41,13 @@ class KFileTransferExportEngine extends KExportEngine
 			$engineOptions['signatureType'] = $this->data->signatureType;
 			$engineOptions['endPoint'] = $this->data->endPoint;
 		}
+
+		if($this->data instanceof KalturaGCPStorageExportJobData)
+		{
+			$engineOptions['filesAcl'] = $this->data->filesPermissionInGCP;
+			$engineOptions['bucketName'] = $this->data->bucketName;
+			$engineOptions['keyFile'] = $this->data->keyFile;
+		}
 			
 		$engine = kFileTransferMgr::getInstance($this->protocol, $engineOptions);
 		
@@ -107,6 +114,13 @@ class KFileTransferExportEngine extends KExportEngine
     {
         $engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
         $engineOptions['passiveMode'] = $this->data->ftpPassiveMode;
+
+	    if($this->data instanceof KalturaGCPStorageDeleteJobData)
+	    {
+		    $engineOptions['bucketName'] = $this->data->bucketName;
+		    $engineOptions['keyFile'] = $this->data->keyFile;
+	    }
+
         $engine = kFileTransferMgr::getInstance($this->protocol, $engineOptions);
         
         try{

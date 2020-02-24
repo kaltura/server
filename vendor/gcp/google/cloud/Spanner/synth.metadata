@@ -1,0 +1,52 @@
+{
+  "updateTime": "2019-11-15T16:20:54.678520Z",
+  "sources": [
+    {
+      "generator": {
+        "name": "artman",
+        "version": "0.41.1",
+        "dockerImage": "googleapis/artman@sha256:545c758c76c3f779037aa259023ec3d1ef2d57d2c8cd00a222cb187d63ceac5e"
+      }
+    },
+    {
+      "git": {
+        "name": "googleapis",
+        "remote": "https://github.com/googleapis/googleapis.git",
+        "sha": "f6808ff4e8b966cd571e99279d4a2780ed97dff2",
+        "internalRef": "280581337"
+      }
+    }
+  ],
+  "destinations": [
+    {
+      "client": {
+        "source": "googleapis",
+        "apiName": "spanner",
+        "apiVersion": "v1",
+        "language": "php",
+        "generator": "gapic",
+        "config": "google/spanner/artman_spanner.yaml"
+      }
+    },
+    {
+      "client": {
+        "source": "googleapis",
+        "apiName": "spanner-admin-database",
+        "apiVersion": "v1",
+        "language": "php",
+        "generator": "gapic",
+        "config": "google/spanner/admin/database/artman_spanner_admin_database.yaml"
+      }
+    },
+    {
+      "client": {
+        "source": "googleapis",
+        "apiName": "spanner-admin-instance",
+        "apiVersion": "v1",
+        "language": "php",
+        "generator": "gapic",
+        "config": "google/spanner/admin/instance/artman_spanner_admin_instance.yaml"
+      }
+    }
+  ]
+}
