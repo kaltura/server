@@ -17,9 +17,6 @@ Issue ID : PLAT-10713
 #### Deployment Scripts ####
 None.
 
-
-# Orion 15.17.0 #
-
 ## Add support of documents conversion on Linux machine ##
 Issue Type: Task
 Issue ID : PLAT-10694
@@ -30,6 +27,8 @@ Issue ID : PLAT-10694
 
 #### Deployment Scripts ####
 none.
+
+# Orion 15.17.0 #
 
 ## Allow catalog item pricing view from KMC ##
 Issue Type: Task
