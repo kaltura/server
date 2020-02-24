@@ -19,6 +19,8 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 	const ID_EQUAL_FILTER = '_eq_id';
 	const REDIRECT_FROM_ENTRY_ID_EQUAL_FILTER = '_eq_redirect_from_entry_id';
 	const DURATION_TYPE_FILTER_NAME = '_matchor_duration_type';
+	const EXTERNAL_SOURCE_TYPE_EQUAL = '_like_plugins_data';
+	const EXTERNAL_SOURCE_TYPE_IN = '_mlikeor_plugins_data';
 	const SHORT_DURATION_LOWER_BOUND = 0;
 	const SHORT_DURATION_UPPER_BOUND = 240000; // 4 minutes in ms
 	const MEDIUM_DURATION_UPPER_BOUND = 1200000; // 20 minutes in ms
@@ -76,11 +78,15 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		ESearchEntryFilterFields::LAST_PLAYED_AT,
 		ESearchEntryFilterFields::PLAYS,
 		ESearchEntryFilterFields::DURATION_TYPE,
+		ESearchEntryFilterFields::EXTERNAL_SOURCE_TYPE,
 	);
 
 	protected static $specialFields = array(
 		ESearchEntryFilterFields::FREE_TEXT,
 		self::DURATION_TYPE_FILTER_NAME,
+		self::EXTERNAL_SOURCE_TYPE_EQUAL,
+		self::EXTERNAL_SOURCE_TYPE_IN,
+
 	);
 
 	protected static $timeFields = array(
@@ -161,6 +167,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			ESearchEntryFilterFields::VOTES => ESearchEntryOrderByFieldName::VOTES,
 			ESearchEntryFilterFields::LAST_PLAYED_AT => ESearchEntryOrderByFieldName::LAST_PLAYED_AT,
 			ESearchEntryFilterFields::PLAYS => ESearchEntryFieldName::PLAYS,
+			ESearchEntryFilterFields::EXTERNAL_SOURCE_TYPE => ESearchEntryFieldName::EXTERNAL_SOURCE_TYPE,
 		);
 
 		if(array_key_exists($field, $fieldsMap))
@@ -305,32 +312,55 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 
 	protected function handleSpecialFields($field, $fieldValue)
 	{
-		switch ($field)
-		{
-			case self::DURATION_TYPE_FILTER_NAME:
-				$this->handleDurationType($field, $fieldValue);
-				break;
-			case ESearchEntryFilterFields::FREE_TEXT:
-				$this->handlingFreeTextField($field, $fieldValue);
-				break;
-		}
-
-	}
-
-	protected  function handlingFreeTextField($field, $fieldValue)
-	{
-		if (!empty($fieldValue))
-		{
-			$this->addingFieldPartIntoQuery(baseObjectFilter::IN, $field, $fieldValue);
-		}
-	}
-
-	protected function handleDurationType($field, $fieldValue)
-	{
 		if(empty($fieldValue))
 		{
 			return;
 		}
+
+		switch ($field)
+		{
+			case self::DURATION_TYPE_FILTER_NAME:
+				$this->handleDurationType($fieldValue);
+				break;
+			case ESearchEntryFilterFields::FREE_TEXT:
+				$this->handleFreeTextField($field, $fieldValue);
+				break;
+			case self::EXTERNAL_SOURCE_TYPE_IN:
+				$this->handleExternalSourceTypeIn($fieldValue);
+				break;
+			case self::EXTERNAL_SOURCE_TYPE_EQUAL:
+				$this->handleExternalSourceTypeEqual($fieldValue);
+				break;
+		}
+
+	}
+
+	protected function handleExternalSourceTypeEqual($fieldValue)
+	{
+		$fieldValue = ExternalMediaPlugin::getAPIExternalSourceTypeFromExternalSourceSearchData($fieldValue);
+		$this->addingFieldPartIntoQuery(baseObjectFilter::LIKE, ESearchEntryFilterFields::EXTERNAL_SOURCE_TYPE, $fieldValue);
+	}
+
+	protected function handleExternalSourceTypeIn($fieldValues)
+	{
+		$searchDataValues = explode(',', $fieldValues);
+		$apiSourceTypes = array();
+		foreach($searchDataValues as $searchDataValue)
+		{
+			$apiSourceTypes[] = ExternalMediaPlugin::getAPIExternalSourceTypeFromExternalSourceSearchData($searchDataValue);
+		}
+
+		$externalSourceTypeIn = implode(',', $apiSourceTypes);
+		$this->addingFieldPartIntoQuery(baseObjectFilter::MULTI_LIKE_OR, ESearchEntryFilterFields::EXTERNAL_SOURCE_TYPE, $externalSourceTypeIn);
+	}
+
+	protected  function handleFreeTextField($field, $fieldValue)
+	{
+		$this->addingFieldPartIntoQuery(baseObjectFilter::IN, $field, $fieldValue);
+	}
+
+	protected function handleDurationType($fieldValue)
+	{
 		$searchItem = new ESearchOperator();
 		$searchItem->setOperator(ESearchOperatorType::OR_OP);
 		$durationTypeValues =  explode(',', $fieldValue);
