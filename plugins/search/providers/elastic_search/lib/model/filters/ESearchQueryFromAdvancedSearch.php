@@ -13,6 +13,8 @@ class ESearchQueryFromAdvancedSearch
 	const QUIZ_ADVANCED_FILTER = 'kQuizAdvancedFilter';
 	const MRP_DATA_FIELD = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPData\']';
 
+	protected $currentMetadataProfileId = null;
+
 	/**
 	 * @param AdvancedSearchFilterItem $advancedSearchFilterItem
 	 * @return ESearchOperator
@@ -37,6 +39,9 @@ class ESearchQueryFromAdvancedSearch
 				return $this->createESearchQueryFromEntryCaptionAdvancedFilter($advancedSearchFilterItem);
 			case self::QUIZ_ADVANCED_FILTER:
 				return $this->createESearchQueryFromEntryQuizAdvancedFilter($advancedSearchFilterItem);
+			case self::ADVANCED_SEARCH_FILTER_CONDITION:
+			case self::ADVANCED_SEARCH_FILTER_MATCH_CONDITION:
+				return $this->createESearchMetadataItemFromFilterMatchCondition($advancedSearchFilterItem);
 			default:
 				KalturaLog::crit('Tried to convert not supported advance filter of type:' . get_class($advancedSearchFilterItem));
 				return null;
@@ -150,16 +155,15 @@ class ESearchQueryFromAdvancedSearch
 
 	/**
 	 * @param AdvancedSearchFilterCondition $filterMatchCondition
-	 * @param $metadataProfileId
 	 * @return ESearchItem
 	 */
-	protected function createESearchMetadataItemFromFilterMatchCondition($filterMatchCondition, $metadataProfileId)
+	protected function createESearchMetadataItemFromFilterMatchCondition($filterMatchCondition)
 	{
 		$item = new ESearchMetadataItem();
 		$item->setSearchTerm($filterMatchCondition->getValue());
 		$item->setItemType($this->getESearchItemTypeByMetadataField($filterMatchCondition->getField()));
 		$item->setXpath($filterMatchCondition->getField());
-		$item->setMetadataProfileId($metadataProfileId);
+		$item->setMetadataProfileId($this->currentMetadataProfileId);
 		if($filterMatchCondition instanceof AdvancedSearchFilterMatchCondition && $filterMatchCondition->getNot())
 		{
 			$result = self::createNegativeQuery($item);
@@ -181,7 +185,7 @@ class ESearchQueryFromAdvancedSearch
 	{
 		$advanceFilterOperator = new ESearchOperator();
 		$advanceFilterOperator->setOperator($this->getESearchOperatorByAdvancedSearchFilterOperator($searchFilter->getType()));
-		$metadataProfileId = $searchFilter->getMetadataProfileId();
+		$this->currentMetadataProfileId = $searchFilter->getMetadataProfileId();
 		$metaDataItems = array();
 		if(!$searchFilter->getItems())
 		{
@@ -190,7 +194,11 @@ class ESearchQueryFromAdvancedSearch
 
 		foreach($searchFilter->getItems() as $advancedSearchFilterItem)
 		{
-			$metaDataItems[] = $this->createESearchMetadataItemFromFilterMatchCondition($advancedSearchFilterItem, $metadataProfileId);
+			$item = $this->processAdvanceFilter($advancedSearchFilterItem);
+			if($item)
+			{
+				$metaDataItems[] = $item;
+			}
 		}
 
 		$advanceFilterOperator->setSearchItems($metaDataItems);
