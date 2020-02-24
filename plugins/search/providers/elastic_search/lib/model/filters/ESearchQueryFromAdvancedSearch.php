@@ -8,6 +8,7 @@ class ESearchQueryFromAdvancedSearch
 	const METADATA_SEARCH_FILTER = 'MetadataSearchFilter';
 	const SEARCH_OPERATOR = 'AdvancedSearchFilterOperator';
 	const ADVANCED_SEARCH_FILTER_MATCH_CONDITION = 'AdvancedSearchFilterMatchCondition';
+	const ADVANCED_SEARCH_FILTER_CONDITION = 'AdvancedSearchFilterCondition';
 	const ENTRY_CAPTION_ADVANCED_FILTER = 'kEntryCaptionAdvancedFilter';
 	const QUIZ_ADVANCED_FILTER = 'kQuizAdvancedFilter';
 	const MRP_DATA_FIELD = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPData\']';
@@ -148,7 +149,7 @@ class ESearchQueryFromAdvancedSearch
 	}
 
 	/**
-	 * @param AdvancedSearchFilterMatchCondition $filterMatchCondition
+	 * @param AdvancedSearchFilterCondition $filterMatchCondition
 	 * @param $metadataProfileId
 	 * @return ESearchItem
 	 */
@@ -159,11 +160,9 @@ class ESearchQueryFromAdvancedSearch
 		$item->setItemType($this->getESearchItemTypeByMetadataField($filterMatchCondition->getField()));
 		$item->setXpath($filterMatchCondition->getField());
 		$item->setMetadataProfileId($metadataProfileId);
-		if($filterMatchCondition->getNot())
+		if($filterMatchCondition instanceof AdvancedSearchFilterMatchCondition && $filterMatchCondition->getNot())
 		{
-			$result = new ESearchOperator();
-			$result->setOperator(ESearchOperatorType::NOT_OP);
-			$result->setSearchItems(array($item));
+			$result = self::createNegativeQuery($item);
 		}
 		else
 		{
@@ -225,6 +224,7 @@ class ESearchQueryFromAdvancedSearch
 			case self::METADATA_SEARCH_FILTER:
 				return self::gotESearchOperator($item->getType());
 			case self::ADVANCED_SEARCH_FILTER_MATCH_CONDITION:
+			case self::ADVANCED_SEARCH_FILTER_CONDITION:
 			case self::ENTRY_CAPTION_ADVANCED_FILTER:
 			case self::QUIZ_ADVANCED_FILTER:
 				return true;
