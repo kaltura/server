@@ -62,16 +62,8 @@ function getPartnerVertical($customData)
 
 function getEntrySourceTypeInt($sourceType, $adminTags, $customData)
 {
-	global $sourceFromAdminTag;
-	global $externalSources;
+	global $sourceFromAdminTag, $externalSources;
 
-	if (isset($customData['externalSource']))
-	{
-		if (isset($externalSources[$customData['externalSource']]))
-		{
-			return $externalSources[$customData['externalSource']];
-		}
-	}
 	// check for specific admin tags
 	$adminTags = explode(',', strtolower($adminTags));
 	foreach ($adminTags as $adminTag)
@@ -81,6 +73,12 @@ function getEntrySourceTypeInt($sourceType, $adminTags, $customData)
 		{
 			return $sourceFromAdminTag[$adminTag];
 		}
+	}
+
+	// check for external source
+	if (isset($customData['externalSource']) && isset($externalSources[$customData['externalSource']]))
+	{
+		return $externalSources[$customData['externalSource']];
 	}
 
 	// use the source type
