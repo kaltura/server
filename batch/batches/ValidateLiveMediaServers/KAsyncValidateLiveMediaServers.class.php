@@ -32,12 +32,26 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
         $entryServerNodeFilter->orderBy = KalturaEntryServerNodeOrderBy::CREATED_AT_ASC;
         $entryServerNodeFilter->createdAtLessThanOrEqual = time() - $entryServerNodeMinCreationTime;
 
+        $excludeServerIds = $this->getExcludeServerIds();
+        if ($excludeServerIds)
+        {
+            $entryServerNodeFilter->serverNodeIdNotIn = implode(',', $excludeServerIds);
+        }
+        return $entryServerNodeFilter;
+    }
+
+    private function getExcludeServerIds()
+    {
+        $excludeServerIds = array();
         $serverTypesNotIn = $this->getAdditionalParams("serverTypesNotIn");
         if ($serverTypesNotIn)
         {
-            $entryServerNodeFilter->serverTypeNotIn = $serverTypesNotIn;
+            $serverNodeFilter = new KalturaServerNodeFilter();
+            $serverNodeFilter->typeIn = $serverTypesNotIn;
+            $serverNodes = self::$kClient->serverNode->listAction($serverNodeFilter);
+            $excludeServerIds = array_column($serverNodes->objects, "id");
         }
-        return $entryServerNodeFilter;
+        return $excludeServerIds;
     }
 	
 	/* (non-PHPdoc)
