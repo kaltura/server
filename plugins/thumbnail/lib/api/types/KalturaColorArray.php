@@ -10,12 +10,16 @@ class KalturaColorArray extends KalturaTypedArray
 		return parent::__construct("KalturaColor");
 	}
 
-	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
+	/**
+	 * @param KalturaColorPriorityQueue $kalturaColorPriorityQueue
+	 * @return KalturaColorArray
+	 */
+	public static function fromKalturaPriorityQueue($kalturaColorPriorityQueue)
 	{
 		$newArr = new KalturaColorArray();
-		foreach ($arr as $obj)
+		while(!$kalturaColorPriorityQueue->isEmpty())
 		{
-			$newArr[] = $obj;
+			$newArr[] = $kalturaColorPriorityQueue->extract();
 		}
 
 		return $newArr;

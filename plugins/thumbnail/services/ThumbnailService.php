@@ -54,7 +54,7 @@ class ThumbnailService extends KalturaBaseUserService
 		$image = new Imagick();
 		$image->readImageBlob($imageBlob);
 		$colors = $image->getImageHistogram();
-		$tempResult = array();
+		$priorityQueue = new KalturaColorPriorityQueue($maxColors);
 		foreach($colors as $color)
 		{
 			/* @var $color ImagickPixel */
@@ -65,12 +65,38 @@ class ThumbnailService extends KalturaBaseUserService
 			$kalturaColor->green = $colorArray['g'];
 			$kalturaColor->alpha = $colorArray['a'];
 			$kalturaColor->count = $color->getColorCount();
-			$tempResult[] = $kalturaColor;
+			if(!self::shouldFilterColor($kalturaColor, $minimumColorDiff))
+			{
+				$priorityQueue->insert($kalturaColor, $kalturaColor->count);
+			}
 		}
 
-		usort($tempResult, function($a, $b) {return $b->count - $a->count;});
-		$tempResult = array_slice($tempResult, 0, $maxColors);
-		$result = KalturaColorArray::fromDbArray($tempResult);
+		$result = KalturaColorArray::fromKalturaPriorityQueue($priorityQueue);
+		return $result;
+	}
+
+	/**
+	 * @param KalturaColor $kalturaColor
+	 * @param int $minimumColorDiff
+	 * @return bool
+	 */
+	protected static function shouldFilterColor($kalturaColor, $minimumColorDiff)
+	{
+		$result = false;
+		$colorAvg = ($kalturaColor->red + $kalturaColor->blue + $kalturaColor->green)/3;
+		if(abs($kalturaColor->green - $colorAvg) < $minimumColorDiff)
+		{
+			$result = true;
+		}
+		else if(abs($kalturaColor->red - $colorAvg) < $minimumColorDiff)
+		{
+			$result = true;
+		}
+		else if(abs($kalturaColor->blue - $colorAvg) < $minimumColorDiff)
+		{
+			$result = true;
+		}
+
 		return $result;
 	}
 }
