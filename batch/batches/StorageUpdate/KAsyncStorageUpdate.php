@@ -142,7 +142,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 			}
 		}
 
-		list($percent, $totalUsageGB) = self::getPercentFromStatistics($partner,$partnerPackage, $divisionFactor);
+		list($percent, $totalUsageGB) = self::getPercentFromStatistics($partner, $divisionFactor);
 		$systemPartnerConfiguration->usagePercent = $percent;
 
 		KalturaLog::debug('percent ('.$partner->id.') is: '.$percent);
@@ -167,13 +167,13 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		return array($shouldBlockDeletePartner, $blockNotificationGrace, $deleteGrace, $partnerPackage, $divisionFactor);
 	}
 
-	public static function getPercentFromStatistics($partner,$partnerPackage, $divisionFactor)
+	public function getPercentFromStatistics($partner, $divisionFactor)
 	{
 		$divisionFactor = ($divisionFactor != 0 ? $divisionFactor : 1);
-		// We are now working with the DWH and a stored-procedure, and not with record type 6 on partner_activity.
-		$reportDate = KAsyncStorageUpdateUtils::todayOffset(-1);
-		list ( $totalStorage , $totalUsage , $totalTraffic ) = self::collectPartnerStatisticsFromDWH($partner, $partnerPackage, $reportDate);
-		$totalUsageGB = $totalUsage/1024/1024; // from KB to GB
+		KBatchBase::impersonate($partner->id);
+		$partnerStatistics = self::$kClient->partner->getStatistics();
+		KBatchBase::unimpersonate();
+		$totalUsageGB = $partnerStatistics->usage;
 		$percent = round( ($totalUsageGB / $divisionFactor)*100, 2);
 		return array($percent, $totalUsageGB);
 	}
@@ -208,7 +208,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 				if(!$monitoredFreeTrial)
 				{
 					$bodyParams = array($partner->adminName, $partnerPackage['cycle_bw'], $mindtouchNotice, round($totalUsageGB, 2), $emailLinkHash);
-					$this->notifyPartner(KalturaMailType::MAIL_TYPE_PACKAGE_EIGHTY_PERCENT_WARNING, $partner, $bodyParams);
+					$this->notifyPartner(KalturaMailType::MAIL_TYPE_VIDEO_SERVICE_NOTICE, $partner, $bodyParams);
 				}
 			}
 
@@ -227,7 +227,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 				{
 					KalturaLog::debug('partner '. $partner->id .' reached 100% - setting second warning');
 					$bodyParams = array ( $partner->adminName, $mindtouchNotice, round($totalUsageGB, 2), $emailLinkHash );
-					$this->notifyPartner(KalturaMailType::MAIL_TYPE_PACKAGE_LIMIT_WARNING_1, $partner, $bodyParams);
+					$this->notifyPartner(KalturaMailType::MAIL_TYPE_VIDEO_SERVICE_NOTICE_LIMIT_REACHED, $partner, $bodyParams);
 				}
 				else
 				{
@@ -251,7 +251,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 
 				// send block email and block partner
 				$bodyParams = array ( $partner->adminName, $mindtouchNotice, round($totalUsageGB, 2), $emailLinkHash );
-				$this->notifyPartner(KalturaMailType::MAIL_TYPE_PACKAGE_LIMIT_WARNING_2, $partner, $bodyParams);
+				$this->notifyPartner(KalturaMailType::MAIL_TYPE_VIDEO_SERVICE_NOTICE_ACCOUNT_LOCKED, $partner, $bodyParams);
 				if($shouldBlockDeletePartner)
 				{
 					$this->systemPartnerClientPlugin->systemPartner->updateStatus($partner->id, KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK, $reason);
@@ -269,7 +269,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 
 				//delete partner
 				$bodyParams = array ( $partner->adminName );
-				$this->notifyPartner(KalturaMailType::MAIL_TYPE_DELETE_ACCOUNT, $partner, $bodyParams);
+				$this->notifyPartner(KalturaMailType::MAIL_TYPE_VIDEO_SERVICE_NOTICE_ACCOUNT_DELETED, $partner, $bodyParams);
 
 				if($shouldBlockDeletePartner)
 				{
@@ -285,11 +285,11 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 				!$monitoredFreeTrial)
 			{
 				$bodyParams = array ( $partner->adminName, round($totalUsageGB, 2) );
-				$this->notifyPartner(KalturaMailType::MAIL_TYPE_PAID_PACKAGE_SUGGEST_UPGRADE, $partner, $bodyParams);
+				$this->notifyPartner(KalturaMailType::MAIL_TYPE_VIDEO_SERVICE_NOTICE_UPGRADE_OFFER, $partner, $bodyParams);
 			}
 		}
 
-		$this->systemPartnerClientPlugin->systemPartner->updateConfiguration($partner->id, $systemPartnerConfiguration);  //TODO - update without default criteria
+		$this->systemPartnerClientPlugin->systemPartner->updateConfiguration($partner->id, $systemPartnerConfiguration);
 
 	}
 
@@ -319,7 +319,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 
 				$emailLinkHash = 'pid='.$partner->id.'&h='.(self::getEmailLinkHash($partner->id, $partner->secret));
 				$mailParmas = array($partner->adminName ,$emailLinkHash);
-				$this->notifyPartner(KalturaMailType::MAIL_TYPE_EXTENED_FREE_TRAIL_ENDS_WARNING, $partner, $mailParmas);
+				$this->notifyPartner(KalturaMailType::MAIL_TYPE_EXTENDED_FREE_TRIAL_ENDS_WARNING, $partner, $mailParmas);
 			}
 			KalturaLog::debug('Partner [' . $partner->id . '] trial account extended');
 		}
@@ -373,45 +373,6 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		return false;
 	}
 
-	public static function collectPartnerStatisticsFromDWH($partner, $partnerPackage, $reportDate)
-	{
-		// reset values:
-		$totalStorage = 0;
-		$totalTraffic = 0;
-		$totalUsage = 0;
-
-		$reportFilter = new reportsInputFilter();
-		$reportFilter->from_day = str_replace('-','',$reportDate);
-
-		$reportFilter->extra_map[KAsyncStorageUpdateUtils::IS_FREE_PACKAGE_PLACE_HOLDER] = "FALSE"; //TODO - change it, no extra map right now.
-		if ($partnerPackage['id'] == 1) // free package
-			$reportFilter->extra_map[KAsyncStorageUpdateUtils::IS_FREE_PACKAGE_PLACE_HOLDER] = "TRUE";
-
-		$reportFilter = new KalturaReportInputFilter();
-		$reportFilter->fromDay = str_replace('-','',$reportDate);
-
-		$pager = new KalturaFilterPager();
-		$pager->pageSize = 10000;
-		$pager->pageIndex = 1;
-
-		//TODO - change REPORT_TYPE_PARTNER_USAGE_DASHBOARD, to KalturaReportType
-		$kalturaReportTable = self::$kClient->report->getTable(KAsyncStorageUpdateUtils::REPORT_TYPE_PARTNER_USAGE_DASHBOARD, $reportFilter, $pager, "");
-
-		$header = $kalturaReportTable->header;
-		$data = $kalturaReportTable->data;
-
-		$avg_continuous_aggr_storage_mb_key = array_search('avg_continuous_aggr_storage_mb', $header);
-		$sum_partner_bandwidth_kb_key = array_search('sum_partner_bandwidth_kb', $header);
-
-		$relevant_row = count($data)-1;
-
-		$totalStorage = $data[$relevant_row][$avg_continuous_aggr_storage_mb_key]; // MB
-		$totalTraffic = $data[$relevant_row][$sum_partner_bandwidth_kb_key]; // KB
-		$totalUsage = ($totalStorage*1024) + $totalTraffic; // (MB*1024 => KB) + KB
-
-		return array( $totalStorage , $totalUsage , $totalTraffic );
-	}
-
 	public function notifyPartner($mailType, $partner, $bodyParams = array() )
 	{
 		$mailJobData = $this->createMailJobData($mailType, $partner->adminEmail);
@@ -424,7 +385,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		$bodyParams[0] = $bodyParams[0].' ('. $partner->id .')'." type:[{$partner->type}] partnerName:[{$partner->name}]";
 		$paramsString = implode($mailJobData->separator, $bodyParams);
 		$mailJobData->bodyParams = $paramsString;
-		//self::$kClient->jobs->addMailJob($mailJobData);
+		self::$kClient->jobs->addMailJob($mailJobData);
 	}
 
 	public function createMailJobData($mail_type, $recipientEmail)
