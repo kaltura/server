@@ -9,7 +9,6 @@ class embedPlaykitJsAction extends sfAction
 	const UI_CONF_ID_PARAM_NAME = "uiconf_id";
 	const PARTNER_ID_PARAM_NAME = "partner_id";
 	const VERSIONS_PARAM_NAME = "versions";
-	const LANGS_PARAM_NAME = "langs";
 	const ENTRY_ID_PARAM_NAME = "entry_id";
 	const KS_PARAM_NAME = "ks";
 	const CONFIG_PARAM_NAME = "config";
@@ -29,11 +28,9 @@ class embedPlaykitJsAction extends sfAction
 	private $partnerId = null;
 	private $partner = null;
 	private $bundle_name = null;
-	private $bundle_i18n_name = null;
 	private $bundlerUrl = null;
 	private $sourcesPath = null;
 	private $bundleConfig = null;
-	private $uiConfLangs = null;
 	private $sourceMapLoader = null;
 	private $cacheVersion = null;
 	private $playKitVersion = null;
@@ -47,17 +44,15 @@ class embedPlaykitJsAction extends sfAction
 		$this->initMembers();
 
 		$bundleContent = $this->bundleCache->get($this->bundle_name);
-		$i18nContent = $this->bundleCache->get($this->bundle_i18n_name);
-
 		if (!$bundleContent || $this->regenerate)
 		{
-			list($bundleContent, $i18nContent) = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this));
+			$bundleContent = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this));
 		}
 
 		$lastModified = $this->getLastModified($bundleContent);
 
 		//Format bundle contnet
-		$bundleContent = $this->formatBundleContent($bundleContent, $i18nContent);
+		$bundleContent = $this->formatBundleContent($bundleContent);
 
 		// send cache headers
 		$this->sendHeaders($bundleContent, $lastModified);
@@ -75,8 +70,7 @@ class embedPlaykitJsAction extends sfAction
 			$bundleContent = $context->bundleCache->get($context->bundle_name);
 			if ($bundleContent)
 			{
-				$i18nContent = $context->bundleCache->get($context->bundle_i18n_name);
-				return array($bundleContent, $i18nContent);
+				return $bundleContent;
 			}
 		}
 
@@ -105,20 +99,19 @@ class embedPlaykitJsAction extends sfAction
 		$bundleContent = time() . "," . base64_decode($content['bundle']);
 		$bundleSaved =  $context->bundleCache->set($context->bundle_name, $bundleContent);
 		$context->sourceMapsCache->set($context->bundle_name, $sourceMapContent);
-		$i18nContent = base64_decode($content['i18n']);
-		$context->bundleCache->set($context->bundle_i18n_name, $i18nContent);
 		if(!$bundleSaved)
 		{
 			KalturaLog::log("Error - failed to save bundle content in cache for config [".$config."]");
 		}
 
-		return array($bundleContent, $i18nContent);
+		return $bundleContent;
+
 	}
 
-	private function formatBundleContent($bundleContent, $i18nContent)
+	private function formatBundleContent($bundleContent)
 	{
 		$bundleContentParts = explode(",", $bundleContent, 2);
-		$bundleContent = $this->appendConfig($bundleContentParts[1], $i18nContent);
+		$bundleContent = $this->appendConfig($bundleContentParts[1]);
 		$autoEmbed = $this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME);
 		$iframeEmbed = $this->getRequestParameter(self::IFRAME_EMBED_PARAM_NAME);
 
@@ -140,11 +133,10 @@ class embedPlaykitJsAction extends sfAction
 		return $bundleContent;
 	}
 
-	private function appendConfig($content, $i18nContent)
+	private function appendConfig($content)
 	{
 		$uiConf = $this->playerConfig;
 		$this->mergeEnvConfig($uiConf);
-		$this->mergeI18nConfig($uiConf, $i18nContent);
 		$uiConfJson = json_encode($uiConf);
 
 		if ($uiConfJson === false)
@@ -175,62 +167,6 @@ class embedPlaykitJsAction extends sfAction
 			if (!(property_exists($uiConf->provider->env, $key) && $uiConf->provider->env->$key))
 				$uiConf->provider->env->$key = $value;
 		}
-	}
-
-	private function mergeI18nConfig($uiConf, $i18nContent)
-	{
-		$i18nArr = json_decode($i18nContent, true);
-		if ($i18nArr)
-		{
-			$i18nArr = $this->filterI18nLangs($i18nArr);
-			if (!property_exists($uiConf, "ui"))
-			{
-				$uiConf->ui = new stdClass();
-			}
-
-			if (!property_exists($uiConf->ui, "translations"))
-			{
-				$uiConf->ui->translations = new stdClass();
-			}
-			$uiConfI18nArr = json_decode(json_encode($uiConf->ui->translations), true);
-			$uiConf->ui->translations = (object) $this->arrayMergeRecursive($i18nArr, $uiConfI18nArr);
-		}
-	}
-
-	private function filterI18nLangs($i18nArr)
-	{
-		$langsParam = $this->getRequestParameter(self::LANGS_PARAM_NAME);
-		$langArr = isset($langsParam) ? explode(",", $langsParam) : (!empty($this->uiConfLangs) ? $this->uiConfLangs : array("en"));
-		$partialI18nArr = array();
-		foreach ($langArr as $lang) {
-			$langMap = $i18nArr[$lang];
-			if (isset($langMap))
-			{
-				$partialI18nArr[$lang] = $langMap;
-			}
-		}
-		return $partialI18nArr;
-	}
-
-	/*
-	* Recursive function that merges two associative arrays
-	* - Unlike array_merge_recursive, a differing value for a key overwrites that key rather than creating an array with both values
-	* - A scalar value will overwrite an array value
-	*/
-	private function arrayMergeRecursive( $arr1, $arr2 )
-	{
-		$keys = array_keys( $arr2 );
-		foreach( $keys as $key ) {
-			if( isset( $arr1[$key] )
-				&& is_array( $arr1[$key] )
-				&& is_array( $arr2[$key] )
-			) {
-				$arr1[$key] = $this->arrayMergeRecursive( $arr1[$key], $arr2[$key] );
-			} else {
-				$arr1[$key] = $arr2[$key];
-			}
-		}
-		return $arr1;
 	}
 
 	private function setProductVersion($uiConf, $productVersion)
@@ -626,12 +562,7 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::INTERNAL_SERVER_ERROR);
 		}
 
-		$confVarsArr = json_decode($confVars, true);
-		$this->bundleConfig = $confVarsArr;
-		if (isset($confVarsArr[self::VERSIONS_PARAM_NAME])) {
-			$this->uiConfLangs = $confVarsArr[self::LANGS_PARAM_NAME];
-			$this->bundleConfig = $confVarsArr[self::VERSIONS_PARAM_NAME];
-		}
+		$this->bundleConfig = json_decode($confVars, true);
 		$this->mergeVersionsParamIntoConfig();
 		if (!$this->bundleConfig) {
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "unable to resolve bundle config");
@@ -650,10 +581,7 @@ class embedPlaykitJsAction extends sfAction
 		$config_str = json_encode($this->bundleConfig);
 		$this->bundle_name = md5($config_str);
 		if($this->cacheVersion)
-		{
 			$this->bundle_name = $this->cacheVersion . "_" . $this->bundle_name;
-		}
-		$this->bundle_i18n_name = $this->bundle_name . "_i18n";
 	}
 	
 	public function getRequestParameter($name, $default = null)
