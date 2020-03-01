@@ -887,7 +887,7 @@ class myEntryUtils
 				$capturedThumbPath = $contentPath.myContentStorage::getGeneralEntityPath("entry/$currentThumbDir", $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
 	
 				$orig_image_path = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
-	Ω
+				
 				// if we already captured the frame at that second, do not recapture, just use the existing file
 				if (!file_exists($orig_image_path))
 				{
