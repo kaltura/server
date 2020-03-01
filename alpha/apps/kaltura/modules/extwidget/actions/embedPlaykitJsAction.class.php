@@ -203,10 +203,9 @@ class embedPlaykitJsAction extends sfAction
 		$langArr = isset($langsParam) ? explode(",", $langsParam) : (!empty($this->uiConfLangs) ? $this->uiConfLangs : array("en"));
 		$partialI18nArr = array();
 		foreach ($langArr as $lang) {
-			$langMap = $i18nArr[$lang];
-			if (isset($langMap))
+			if (isset($i18nArr[$lang]))
 			{
-				$partialI18nArr[$lang] = $langMap;
+				$partialI18nArr[$lang] = $i18nArr[$lang];
 			}
 		}
 		return $partialI18nArr;
