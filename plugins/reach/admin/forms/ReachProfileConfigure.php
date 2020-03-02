@@ -148,7 +148,7 @@ class Form_ReachProfileConfigure extends ConfigureForm
 
 		$this->addLine("Dictionaries Line");
 		$this->addTitle('Reach Profile Dictionaries:');
-		$this->addTitle('Max 1000 Characters per dictionary');
+		$this->addTitle('Max 4000 Characters per dictionary');
 
 		$dictionariesSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
 		$dictionariesSubForm->addDecorator('ViewScript', array(

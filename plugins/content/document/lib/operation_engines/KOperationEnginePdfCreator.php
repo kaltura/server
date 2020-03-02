@@ -31,36 +31,41 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 	const DEFAULT_KILL_POPUPS_PATH = "c:/temp/killWindowsPopupsLog.txt";
 	
 	// List of supported file types
-	private $SUPPORTED_FILE_TYPES = array(
-			'Composite Document File V2 Document',
-			'CDF V2 Document',
-			'Microsoft Word',
-			'Microsoft PowerPoint',
-			'Microsoft Excel',
-			'OpenDocument Text',
-			'PDF document',
-			'Rich Text Format data',
-			'Zip archive data',
+	protected $SUPPORTED_FILE_TYPES = array(
+		'Composite Document File V2 Document',
+		'CDF V2 Document',
+		'Microsoft Word',
+		'Microsoft PowerPoint',
+		'Microsoft Excel',
+		'OpenDocument Text',
+		'PDF document',
+		'Rich Text Format data',
+		'Zip archive data',
 	);
 	
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
-		if ($configFilePath) {
+		if ($configFilePath)
+		{
 			$configFilePath = realpath($configFilePath);
 		}
 		
 		// bypassing PDF Creator for source PDF files
 		$inputExtension = strtolower(pathinfo($inFilePath, PATHINFO_EXTENSION));
-		if (($inputExtension == 'pdf') && (!$this->data->flavorParamsOutput->readonly)) {
+		if ( ($inputExtension == 'pdf') && ($this->shouldHandleReadOnly() == false) )
+		{
 			KalturaLog::notice('Bypassing PDF Creator for source PDF files');
-			if (!@copy($inFilePath, $this->outFilePath)) {
+			if (!@copy($inFilePath, $this->outFilePath))
+			{
 				$error = '';
-				if (function_exists('error_get_last')) {
+				if (function_exists('error_get_last'))
+				{
 					$error = error_get_last();
 				}
 				throw new KOperationEngineException('Cannot copy PDF file ['.$this->inFilePath.'] to ['.$this->outFilePath.'] - ['.$error.']');
 			}
-			else {
+			else
+			{
 				// PDF input file copied as is to output file
 				return true;
 			}
@@ -95,7 +100,7 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 		}
 		
 		$finalOutputPath = $this->outFilePath;
-		
+
 		if (($inputExtension == 'pdf') && ($this->data->flavorParamsOutput->readonly == true)){
 			$tmpFile = $this->outFilePath.'.pdf';
 		}else{
@@ -106,9 +111,11 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 		
 		// Create popups log file
 		$killPopupsPath = $this->getKillPopupsPath();
-		if(file_exists($killPopupsPath))
+		if(!is_null($killPopupsPath) && file_exists($killPopupsPath))
+		{
 			unlink($killPopupsPath);
-		
+		}
+
 		// Test file type 
 		$errorMsg = $this->checkFileType($realInFilePath, $this->SUPPORTED_FILE_TYPES);
 		if(!is_null($errorMsg))
@@ -140,7 +147,8 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 		}
 		
 		// Read popup log file
-		if(file_exists($killPopupsPath)) {
+		if(!is_null($killPopupsPath) && file_exists($killPopupsPath))
+		{
 			$data = file_get_contents($killPopupsPath);
 			$data = trim($data);
 			if(!empty($data)){
@@ -215,13 +223,18 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 		return null;
 	}
 		
-	private function getKillPopupsPath() 
+	protected function getKillPopupsPath()
 	{
 		$killPopupsPath = KBatchBase::$taskConfig->params->killPopupsPath;
 		if(!$killPopupsPath){
 			$killPopupsPath = self::DEFAULT_KILL_POPUPS_PATH;
 		}
 		return $killPopupsPath;
+	}
+
+	protected function shouldHandleReadOnly()
+	{
+		return $this->data->flavorParamsOutput->readonly;
 	}
 	
 }
