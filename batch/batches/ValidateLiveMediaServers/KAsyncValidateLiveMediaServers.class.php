@@ -40,7 +40,7 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
         return $entryServerNodeFilter;
     }
 
-    public static function getExcludeServerIdsFromAPI($serverTypesNotIn)
+    public static function getExcludeServerNodesFromAPI($serverTypesNotIn)
     {
         $serverNodeFilter = new KalturaServerNodeFilter();
         $serverNodeFilter->typeIn = $serverTypesNotIn;
@@ -54,7 +54,7 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
         $serverTypesNotIn = $this->getAdditionalParams('serverTypesNotIn');
         if ($serverTypesNotIn)
         {
-            $serverNodes = KBatchBase::tryExecuteApiCall(array('KAsyncValidateLiveMediaServers','getExcludeServerIdsFromAPI'), array($serverTypesNotIn));
+            $serverNodes = KBatchBase::tryExecuteApiCall(array('KAsyncValidateLiveMediaServers','getExcludeServerNodesFromAPI'), array($serverTypesNotIn));
             if ($serverNodes)
             {
                 $excludeServerIds = array_column($serverNodes->objects, 'id');
