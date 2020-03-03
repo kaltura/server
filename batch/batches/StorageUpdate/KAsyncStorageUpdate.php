@@ -186,13 +186,15 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 			if ($partner->eightyPercentWarning)
 			{
 				KalturaLog::debug('partner '. $partner->id .' was 80%, now not. clearing warnings');
+				$systemPartnerConfiguration->eightyPercentWarning = 0;
+				$systemPartnerConfiguration->usageLimitWarning = 0;
 			}
 			elseif ($partner->usageLimitWarning)
 			{
 				KalturaLog::debug('partner '. $partner->id .' OK');
+				$systemPartnerConfiguration->eightyPercentWarning = 0;
+				$systemPartnerConfiguration->usageLimitWarning = 0;
 			}
-			$systemPartnerConfiguration->eightyPercentWarning = 0;
-			$systemPartnerConfiguration->usageLimitWarning = 0;
 		}
 		elseif ($percent >= 80 && $percent < 100)
 		{
@@ -214,64 +216,65 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 				KalturaLog::log('passed the 80%, assume notification sent, nothing to do.');
 			}
 		}
-		elseif ($percent >= 100)
+		elseif($percent >= 100 &&
+			!$partner->usageLimitWarning)
 		{
-			if(!$partner->usageLimitWarning)
+			$systemPartnerConfiguration->usageLimitWarning = time();
+			if (!$monitoredFreeTrial)
 			{
-				$systemPartnerConfiguration->usageLimitWarning = time();
-				if(!$monitoredFreeTrial)
-				{
-					KalturaLog::debug('partner '. $partner->id .' reached 100% - setting second warning');
-					$bodyParams = array ( $partner->adminName, $mindtouchNotice, round($totalUsageGB, 2), $emailLinkHash );
-					$this->notifyPartner(KalturaMailType::MAIL_TYPE_VIDEO_SERVICE_NOTICE_LIMIT_REACHED, $partner, $bodyParams);
-				}
-				else
-				{
-					$reason = 'partner '. $partner->id .' reached 100% - blocking partner';
-					KalturaLog::debug($reason);
-					if($shouldBlockDeletePartner)
-					{
-						$this->systemPartnerClientPlugin->systemPartner->updateStatus($partner->id, KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK, $reason);
-					}
-				}
+				KalturaLog::debug('partner ' . $partner->id . ' reached 100% - setting second warning');
+				$bodyParams = array($partner->adminName, $mindtouchNotice, round($totalUsageGB, 2), $emailLinkHash);
+				$this->notifyPartner(KalturaMailType::MAIL_TYPE_VIDEO_SERVICE_NOTICE_LIMIT_REACHED, $partner, $bodyParams);
 			}
-			elseif($partnerPackage['cycle_fee'] == 0 &&
-				$partner->usageLimitWarning > 0 &&
-				$partner->usageLimitWarning <= $blockNotificationGrace &&
-				$partner->usageLimitWarning > $deleteGrace &&
-				$partner->status != KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK)
+			else
 			{
-				$reason = 'partner '. $partner->id .' reached 100% '.KAsyncStorageUpdateUtils::BLOCKING_DAYS_GRACE .' days ago - sending block email and blocking partner';
+				$reason = 'partner ' . $partner->id . ' reached 100% - blocking partner';
 				KalturaLog::debug($reason);
-
-				// send block email and block partner
-				$bodyParams = array ( $partner->adminName, $mindtouchNotice, round($totalUsageGB, 2), $emailLinkHash );
-				$this->notifyPartner(KalturaMailType::MAIL_TYPE_VIDEO_SERVICE_NOTICE_ACCOUNT_LOCKED, $partner, $bodyParams);
-				if($shouldBlockDeletePartner)
+				if ($shouldBlockDeletePartner)
 				{
 					$this->systemPartnerClientPlugin->systemPartner->updateStatus($partner->id, KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK, $reason);
 				}
 			}
+		}
+		elseif($percent >= 100 &&
+			$partnerPackage['cycle_fee'] == 0 &&
+			$partner->usageLimitWarning > 0 &&
+			$partner->usageLimitWarning <= $blockNotificationGrace &&
+			$partner->usageLimitWarning > $deleteGrace &&
+			$partner->status != KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK)
+		{
+			$reason = 'partner '. $partner->id .' reached 100% '.KAsyncStorageUpdateUtils::BLOCKING_DAYS_GRACE .' days ago - sending block email and blocking partner';
+			KalturaLog::debug($reason);
 
-			elseif($partnerPackage['cycle_fee'] == 0 &&
-				$partner->usageLimitWarning > 0 &&
-				$partner->usageLimitWarning <= $deleteGrace &&
-				$partner->status == KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK &&
-				!$monitoredFreeTrial)
+			// send block email and block partner
+			$bodyParams = array ( $partner->adminName, $mindtouchNotice, round($totalUsageGB, 2), $emailLinkHash );
+			$this->notifyPartner(KalturaMailType::MAIL_TYPE_VIDEO_SERVICE_NOTICE_ACCOUNT_LOCKED, $partner, $bodyParams);
+			if($shouldBlockDeletePartner)
 			{
-				$reason = 'partner '. $partner->id .' reached 100% a month ago - deleting partner';
-				KalturaLog::debug($reason);
-
-				//delete partner
-				$bodyParams = array ( $partner->adminName );
-				$this->notifyPartner(KalturaMailType::MAIL_TYPE_VIDEO_SERVICE_NOTICE_ACCOUNT_DELETED, $partner, $bodyParams);
-
-				if($shouldBlockDeletePartner)
-				{
-					$this->systemPartnerClientPlugin->systemPartner->updateStatus($partner->id, KAsyncStorageUpdateUtils::PARTNER_STATUS_DELETED, $reason);
-				}
+				$this->systemPartnerClientPlugin->systemPartner->updateStatus($partner->id, KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK, $reason);
 			}
 		}
+
+		elseif($percent >= 100 &&
+			$partnerPackage['cycle_fee'] == 0 &&
+			$partner->usageLimitWarning > 0 &&
+			$partner->usageLimitWarning <= $deleteGrace &&
+			$partner->status == KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK &&
+			!$monitoredFreeTrial)
+		{
+			$reason = 'partner '. $partner->id .' reached 100% a month ago - deleting partner';
+			KalturaLog::debug($reason);
+
+			//delete partner
+			$bodyParams = array ( $partner->adminName );
+			$this->notifyPartner(KalturaMailType::MAIL_TYPE_VIDEO_SERVICE_NOTICE_ACCOUNT_DELETED, $partner, $bodyParams);
+
+			if($shouldBlockDeletePartner)
+			{
+				$this->systemPartnerClientPlugin->systemPartner->updateStatus($partner->id, KAsyncStorageUpdateUtils::PARTNER_STATUS_DELETED, $reason);
+			}
+		}
+
 		elseif ($percent >= 120)
 		{
 			if ($partnerPackage['cycle_fee'] != 0 &&
