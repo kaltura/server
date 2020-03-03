@@ -101,6 +101,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		$filter->partnerPackageIn = KAsyncStorageUpdateUtils::PARTNER_PACKAGE_FREE .','. KAsyncStorageUpdateUtils::PARTNER_PACKAGE_INTERNAL_TRIAL;
 		$filter->statusIn = KalturaPartnerStatus::ACTIVE .','. KalturaPartnerStatus::BLOCKED .','. KalturaPartnerStatus::FULL_BLOCK;
 		$filter->idGreaterThan = $lowPartnerWaterMark;
+		$filter->monitorUsageEqual = 1;
 		$filter->orderBy = '+id';
 
 		$pager = new KalturaFilterPager();

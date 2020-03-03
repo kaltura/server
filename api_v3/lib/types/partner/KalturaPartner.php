@@ -391,6 +391,13 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public $lastFreeTrialNotificationDay;
 
+	/**
+	 * @var int
+	 * @filter eq
+	 * @readonly
+	 */
+	public $monitorUsage;
+
 	private static $map_between_objects = array
 	(
 		'id' , 'name', 'website' => 'url1' , 'notificationUrl' => 'url2' , 'appearInSearch' , 'createdAt' , 'adminName' , 'adminEmail' ,
@@ -400,7 +407,8 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'firstName' , 'lastName' , 'country' , 'state' , 'publishersQuota', 'partnerGroupType', 'defaultEntitlementEnforcement', 
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks',
 		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages',
-		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'extendedFreeTrailExpiryReason', 'extendedFreeTrailExpiryDate', 'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay'
+		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'extendedFreeTrailExpiryReason', 'extendedFreeTrailExpiryDate',
+		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage'
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -438,6 +446,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 			$this->eightyPercentWarning = null;
 			$this->usageLimitWarning = null;
 			$this->lastFreeTrialNotificationDay = null;
+			$this->monitorUsage = null;
 		}
 	}
 	
