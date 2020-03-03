@@ -186,16 +186,13 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 			if ($partner->eightyPercentWarning)
 			{
 				KalturaLog::debug('partner '. $partner->id .' was 80%, now not. clearing warnings');
-				$systemPartnerConfiguration->eightyPercentWarning = 0;
-				$systemPartnerConfiguration->usageLimitWarning = 0;
 			}
-
-			elseif ($partner->usageLimitWarning || $partner->eightyPercentWarning)
+			elseif ($partner->usageLimitWarning)
 			{
 				KalturaLog::debug('partner '. $partner->id .' OK');
-				$systemPartnerConfiguration->eightyPercentWarning =0;
-				$systemPartnerConfiguration->usageLimitWarning = 0;
 			}
+			$systemPartnerConfiguration->eightyPercentWarning = 0;
+			$systemPartnerConfiguration->usageLimitWarning = 0;
 		}
 		elseif ($percent >= 80 && $percent < 100)
 		{
@@ -212,13 +209,11 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 					$this->notifyPartner(KalturaMailType::MAIL_TYPE_VIDEO_SERVICE_NOTICE, $partner, $bodyParams);
 				}
 			}
-
 			elseif ($partner->eightyPercentWarning && !$partner->usageLimitWarning)
 			{
 				KalturaLog::log('passed the 80%, assume notification sent, nothing to do.');
 			}
 		}
-
 		elseif ($percent >= 100)
 		{
 			if(!$partner->usageLimitWarning)
@@ -240,7 +235,6 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 					}
 				}
 			}
-
 			elseif($partnerPackage['cycle_fee'] == 0 &&
 				$partner->usageLimitWarning > 0 &&
 				$partner->usageLimitWarning <= $blockNotificationGrace &&
@@ -278,7 +272,6 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 				}
 			}
 		}
-
 		elseif ($percent >= 120)
 		{
 			if ($partnerPackage['cycle_fee'] != 0 &&
@@ -291,7 +284,6 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		}
 
 		$this->systemPartnerClientPlugin->systemPartner->updateConfiguration($partner->id, $systemPartnerConfiguration);
-
 	}
 
 	public function handleExtendedFreeTrail($partner, $systemPartnerConfiguration)

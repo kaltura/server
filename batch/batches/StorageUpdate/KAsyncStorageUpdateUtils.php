@@ -19,8 +19,6 @@ const DAY = 86400; // in seconds
 const BLOCKING_DAYS_GRACE = 7;
 const KALTURA_ACCOUNT_UPGRADES_NOTIFICATION_EMAIL = 'upgrade@kaltura.com';
 const MAIL_PRIORITY_NORMAL = 2;
-const REPORT_TYPE_PARTNER_USAGE_DASHBOARD = 202;
-const IS_FREE_PACKAGE_PLACE_HOLDER = "{IS_FREE_PACKAGE}";
 const DEKIWIKI = 103;
 const LOCAL = 'local';
 const KALTURA_EMAIL_HASH = 'kaltura_email_hash';
@@ -29,12 +27,6 @@ const NEW_FREE_TRIAL_START_DATE = 'new_free_trial_start_date';
 const PARTNER_NOTIFICATION_EMAIL = 'partner_notification_email';
 const PARTNER_NOTIFICATION_NAME = 'partner_notification_name';
 const FORMAT_Y_M_D = 'Y-m-d';
-
-	public static function todayOffset ( $delta_in_days )
-	{
-		$calculated_day = self::DAY * $delta_in_days + time();
-		return date ( self::FORMAT_Y_M_D , $calculated_day  );
-	}
 
 	public static function diffInDays ($date1, $date2)
 	{
