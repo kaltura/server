@@ -1817,32 +1817,32 @@ class kFlowHelper
 		return $logFileUrl;
 	}
 
-    	public static function sendBulkUploadNotificationEmail(BatchJob $dbBatchJob, $email_id, $params)
-    	{
+	public static function sendBulkUploadNotificationEmail(BatchJob $dbBatchJob, $email_id, $params)
+	{
 
-        	$emailRecipients = $dbBatchJob->getPartner()->getBulkUploadNotificationsEmail();
-        	$batchJobData = $dbBatchJob->getData();
+		$emailRecipients = $dbBatchJob->getPartner()->getBulkUploadNotificationsEmail();
+		$batchJobData = $dbBatchJob->getData();
 
-        	if($batchJobData instanceof kBulkUploadJobData){
-            		$jobRecipients = $batchJobData->getEmailRecipients();
-            		if(isset($jobRecipients)) {
-                		$emailRecipients = $jobRecipients;
-            		}
-        	}
+		if($batchJobData instanceof kBulkUploadJobData){
+			$jobRecipients = $batchJobData->getEmailRecipients();
+			if(isset($jobRecipients)) {
+				$emailRecipients = $jobRecipients;
+			}
+		}
 
-        	kJobsManager::addMailJob(
-            		null,
-            		0,
-            		$dbBatchJob->getPartnerId(),
-            		$email_id,
-            		kMailJobData::MAIL_PRIORITY_NORMAL,
-            		kConf::get( "batch_alert_email" ),
-            		kConf::get( "batch_alert_name" ),
-            		$emailRecipients,
-            		$params
-        	);
+		kJobsManager::addMailJob(
+			null,
+			0,
+			$dbBatchJob->getPartnerId(),
+			$email_id,
+			kMailJobData::MAIL_PRIORITY_NORMAL,
+			kConf::get( "batch_alert_email" ),
+			kConf::get( "batch_alert_name" ),
+			$emailRecipients,
+			$params
+		);
 
-    	}
+	}
 
 	/**
 	 * @param BatchJob $dbBatchJob
@@ -2052,26 +2052,26 @@ class kFlowHelper
 		$asset = assetPeer::retrieveByFileSync($fileSync);
 		if ($asset && $asset->getStatus() == asset::ASSET_STATUS_EXPORTING) // meaning that export is required for asset readiness
 		{
-            $asset->setStatus(asset::ASSET_STATUS_ERROR);
-            $asset->save();
+			$asset->setStatus(asset::ASSET_STATUS_ERROR);
+			$asset->save();
 
-		    if ($asset instanceof flavorAsset)
-            {
-                $flavorParamsOutput = $asset->getFlavorParamsOutput();
-                $flavorParamsOutputId = $flavorParamsOutput ? $flavorParamsOutput->getId() : null;
-                $mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($asset->getId());
-                $mediaInfoId = $mediaInfo ? $mediaInfo->getId() : null;
-                kBusinessPostConvertDL::handleConvertFailed($dbBatchJob, null, $asset->getId(), $flavorParamsOutputId, $mediaInfoId);
-            }
+			if ($asset instanceof flavorAsset)
+			{
+				$flavorParamsOutput = $asset->getFlavorParamsOutput();
+				$flavorParamsOutputId = $flavorParamsOutput ? $flavorParamsOutput->getId() : null;
+				$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($asset->getId());
+				$mediaInfoId = $mediaInfo ? $mediaInfo->getId() : null;
+				kBusinessPostConvertDL::handleConvertFailed($dbBatchJob, null, $asset->getId(), $flavorParamsOutputId, $mediaInfoId);
+			}
 		}
 
 
 		return $dbBatchJob;
 	}
 
-    public static function handleStorageDeleteFinished (BatchJob $dbBatchJob, kStorageDeleteJobData $data)
+	public static function handleStorageDeleteFinished (BatchJob $dbBatchJob, kStorageDeleteJobData $data)
 	{
-	    $fileSync = FileSyncPeer::retrieveByPK($data->getSrcFileSyncId());
+		$fileSync = FileSyncPeer::retrieveByPK($data->getSrcFileSyncId());
 		if(!$fileSync)
 		{
 			KalturaLog::err("FileSync [" . $data->getSrcFileSyncId() . "] not found");
@@ -3207,41 +3207,45 @@ class kFlowHelper
 		$dbBatchJob->save();
 	}
 
-    public static function handleLiveToVodFinished(BatchJob $dbBatchJob, kLiveToVodJobData $data)
-    {
-        KalturaLog::info('Handling live to vod finished');
-        $liveEntryId = $data->getLiveEntryId();
-        $vodEntryId = $data->getVodEntryId();
-        $liveEntry = entryPeer::retrieveByPK($liveEntryId);
-        /** @var LiveStreamEntry $liveEntry */
-        $recordStatus = $liveEntry->getRecordStatus();
-        $shouldAutoArchive = $liveEntry->getRecordingOptions() ?
-			$liveEntry->getRecordingOptions()->getShouldAutoArchive() : false;
-        if ($recordStatus == RecordStatus::PER_SESSION && $shouldAutoArchive == true)
-        {
-            $liveEntryArchiveJobData = new kLiveEntryArchiveJobData();
-            $liveEntryArchiveJobData->setLiveEntryId($liveEntryId);
-            $liveEntryArchiveJobData->setVodEntryId($vodEntryId);
+	public static function handleLiveToVodFinished(BatchJob $dbBatchJob, kLiveToVodJobData $data)
+	{
+		KalturaLog::info('Handling live to vod finished');
+		$liveEntryId = $data->getLiveEntryId();
+		$vodEntryId = $data->getVodEntryId();
+		$liveEntry = entryPeer::retrieveByPK($liveEntryId);
+		/** @var LiveStreamEntry $liveEntry */
+		if (!$liveEntry){
+			throw new APIException(APIErrors::ENTRY_ID_NOT_FOUND, $liveEntryId);
+		}
+		else {
+			$recordStatus = $liveEntry->getRecordStatus();
+			$shouldAutoArchive = $liveEntry->getRecordingOptions() ?
+				$liveEntry->getRecordingOptions()->getShouldAutoArchive() : false;
+			if ($recordStatus == RecordStatus::PER_SESSION && $shouldAutoArchive == true) {
+				$liveEntryArchiveJobData = new kLiveEntryArchiveJobData();
+				$liveEntryArchiveJobData->setLiveEntryId($liveEntryId);
+				$liveEntryArchiveJobData->setVodEntryId($vodEntryId);
 
-            $liveEntryArchiveJob = new BatchJob();
-            $liveEntryArchiveJob->setEntryId($liveEntryId);
-            $liveEntryArchiveJob->setPartnerId($liveEntry->getPartnerId());
+				$liveEntryArchiveJob = new BatchJob();
+				$liveEntryArchiveJob->setEntryId($liveEntryId);
+				$liveEntryArchiveJob->setPartnerId($liveEntry->getPartnerId());
 
-            KalturaLog::info('Adding a job for auto archive');
-            kJobsManager::addJob($liveEntryArchiveJob, $liveEntryArchiveJobData, BatchJobType::LIVE_ENTRY_ARCHIVE);
-        }
-        return $dbBatchJob;
+				KalturaLog::info('Adding a job for auto archive');
+				kJobsManager::addJob($liveEntryArchiveJob, $liveEntryArchiveJobData, BatchJobType::LIVE_ENTRY_ARCHIVE);
+			}
+		}
+		return $dbBatchJob;
 
-    }
+	}
 
-    public static function handleKuserKgroupStatusUpdate($kuserkgroup)
-    {
-        if ($kuserkgroup->getStatus() == KuserKgroupStatus::DELETED)
-        {
-            $kgroup = kuserPeer::retrieveByPK($kuserkgroup->getKgroupId());
-            $numberOfUsersPerGroup = $kgroup->getMembersCount();
-            $kgroup->setMembersCount(max(0, $numberOfUsersPerGroup - 1));
-            $kgroup->save();
-        }
-    }
+	public static function handleKuserKgroupStatusUpdate($kuserkgroup)
+	{
+		if ($kuserkgroup->getStatus() == KuserKgroupStatus::DELETED)
+		{
+			$kgroup = kuserPeer::retrieveByPK($kuserkgroup->getKgroupId());
+			$numberOfUsersPerGroup = $kgroup->getMembersCount();
+			$kgroup->setMembersCount(max(0, $numberOfUsersPerGroup - 1));
+			$kgroup->save();
+		}
+	}
 }
