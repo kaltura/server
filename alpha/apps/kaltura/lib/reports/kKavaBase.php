@@ -326,6 +326,8 @@ class kKavaBase extends kDruidBase
 		'webexentry' => 'Webex',
 		'zoomentry' => 'Zoom',
 		'expressrecorder' => 'Express Recorder',
+		'kmsnativeandroid' => 'KMS GO Android',
+		'kmsnativeios' => 'KMS GO iOS',
 	);
 
 	protected static $sourceTypes = array(

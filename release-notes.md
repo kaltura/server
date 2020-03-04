@@ -1,3 +1,33 @@
+# Orion 15.18.0 #
+
+## Support sphinx sticky connection for read operations ##
+Issue Type: Task
+Issue ID : PLAT-10713
+
+### Configuration ##
+	* Make sure "sphinx_dynamic_config" exists in your configuration maps 
+ 
+	* To enable the feature for specific partner ids add the following section to the map:
+    [sphinx_sticky_partners]
+    0 = XXXX
+    1 = YYYY
+    where XXXX and YYYY are the partner ids you want to enable the feature for.
+	
+
+#### Deployment Scripts ####
+None.
+
+## Add support of documents conversion on Linux machine ##
+Issue Type: Task
+Issue ID : PLAT-10694
+
+### Configuration ##
+- Add a worker (follow 'KAsyncConvertPdfLinux' in 'batch.ini.template).
+- Make sure that 'lowriter' is installed by running 'lowriter --version'.
+
+#### Deployment Scripts ####
+none.
+
 # Orion 15.17.0 #
 
 ## Allow catalog item pricing view from KMC ##
