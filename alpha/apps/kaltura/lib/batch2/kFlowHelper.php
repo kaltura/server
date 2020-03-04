@@ -3217,22 +3217,20 @@ class kFlowHelper
 		if (!$liveEntry){
 			throw new APIException(APIErrors::ENTRY_ID_NOT_FOUND, $liveEntryId);
 		}
-		else {
-			$recordStatus = $liveEntry->getRecordStatus();
-			$shouldAutoArchive = $liveEntry->getRecordingOptions() ?
-				$liveEntry->getRecordingOptions()->getShouldAutoArchive() : false;
-			if ($recordStatus == RecordStatus::PER_SESSION && $shouldAutoArchive == true) {
-				$liveEntryArchiveJobData = new kLiveEntryArchiveJobData();
-				$liveEntryArchiveJobData->setLiveEntryId($liveEntryId);
-				$liveEntryArchiveJobData->setVodEntryId($vodEntryId);
+		$recordStatus = $liveEntry->getRecordStatus();
+		$shouldAutoArchive = $liveEntry->getRecordingOptions() ?
+			$liveEntry->getRecordingOptions()->getShouldAutoArchive() : false;
+		if ($recordStatus == RecordStatus::PER_SESSION && $shouldAutoArchive == true) {
+			$liveEntryArchiveJobData = new kLiveEntryArchiveJobData();
+			$liveEntryArchiveJobData->setLiveEntryId($liveEntryId);
+			$liveEntryArchiveJobData->setVodEntryId($vodEntryId);
 
-				$liveEntryArchiveJob = new BatchJob();
-				$liveEntryArchiveJob->setEntryId($liveEntryId);
-				$liveEntryArchiveJob->setPartnerId($liveEntry->getPartnerId());
+			$liveEntryArchiveJob = new BatchJob();
+			$liveEntryArchiveJob->setEntryId($liveEntryId);
+			$liveEntryArchiveJob->setPartnerId($liveEntry->getPartnerId());
 
-				KalturaLog::info('Adding a job for auto archive');
-				kJobsManager::addJob($liveEntryArchiveJob, $liveEntryArchiveJobData, BatchJobType::LIVE_ENTRY_ARCHIVE);
-			}
+			KalturaLog::info('Adding a job for auto archive');
+			kJobsManager::addJob($liveEntryArchiveJob, $liveEntryArchiveJobData, BatchJobType::LIVE_ENTRY_ARCHIVE);
 		}
 		return $dbBatchJob;
 

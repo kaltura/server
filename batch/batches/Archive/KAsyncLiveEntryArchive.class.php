@@ -48,23 +48,21 @@ class KAsyncLiveEntryArchive extends KJobHandlerWorker
 		$liveEntry = KBatchBase::$kClient->baseEntry->get($liveEntryId);
 		/** @var KalturaLiveStreamEntry $liveEntry */
 		if (!$liveEntry){
-			KalturaLog::err("Live entry [" . $liveEntryId . "] not found");
+			return $this->closeJob($job, null, null,
+				'Could not get live entry with id ' . $liveEntryId, KalturaBatchJobStatus::FAILED);
 		}
-		else {
-			$notDeletedCuePointTags = $liveEntry->recordingOptions->nonDeletedCuePointsTags;
-			$this->deleteCuePoints($liveEntryId, $notDeletedCuePointTags);
+		$notDeletedCuePointTags = $liveEntry->recordingOptions->nonDeletedCuePointsTags;
+		$this->deleteCuePoints($liveEntryId, $notDeletedCuePointTags);
 
-			$vodEntryId = $jobData->vodEntryId;
-			$vodEntry = KBatchBase::$kClient->baseEntry->get($vodEntryId);
-			if (!$vodEntry){
-				KalturaLog::err("VOD entry [" . $vodEntryId . "] not found");
-			}
-			else {
-				$this->updateEntriesData($liveEntry, $vodEntry);
-
-				$this->clearPushNotificationQueue($liveEntryId, $liveEntry->partnerId);
-			}
+		$vodEntryId = $jobData->vodEntryId;
+		$vodEntry = KBatchBase::$kClient->baseEntry->get($vodEntryId);
+		if (!$vodEntry){
+			return $this->closeJob($job, null, null,
+				'Could not get vod entry with id ' . $vodEntryId, KalturaBatchJobStatus::FAILED);
 		}
+		$this->updateEntriesData($liveEntry, $vodEntry);
+
+		$this->clearPushNotificationQueue($liveEntryId, $liveEntry->partnerId);
 
 		return $this->closeJob($job, null, null, "Auto archive finished", KalturaBatchJobStatus::FINISHED);
 	}
