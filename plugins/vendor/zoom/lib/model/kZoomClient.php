@@ -1,18 +1,17 @@
 <?php
 /**
- * @package plugins.venodr
+ * @package plugins.vendor
  * @subpackage zoom.model
  */
 class kZoomClient
 {
 	const ZOOM_BASE_URL = 'ZoomBaseUrl';
-	const MAP_NAME = 'vendor';
-	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
 	const PARTICIPANTS = 'participants';
 
 	/** API */
 	const API_USERS_ME = '/v2/users/me';
 	const API_PARTICIPANT = '/v2/report/meetings/@meetingId@/participants';
+	const API_PANELISTS = '/v2/webinars/@webinarId@/panelists';
 	const API_USERS_ME_PERMISSIONS = '/v2/users/me/permissions';
 
 	protected $zoomBaseURL;
@@ -40,6 +39,12 @@ class kZoomClient
 	public function retrieveMeetingParticipant($accessToken, $meetingId)
 	{
 		$apiPath = str_replace('@meetingId@', $meetingId, self::API_PARTICIPANT);
+		return $this->callZoom($apiPath, $accessToken);
+	}
+
+	public function retrieveWebinarPanelists($accessToken, $webinarId)
+	{
+		$apiPath = str_replace('@webinarId@', $webinarId, self::API_PANELISTS);
 		return $this->callZoom($apiPath, $accessToken);
 	}
 
