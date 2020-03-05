@@ -1,3 +1,116 @@
+# Orion 15.19.0 #
+
+## Changing storageUpdate script to run as a batch ##
+Issue Type: Task
+Issue ID : PLAT-10320
+
+### Configuration ##
+Add the following to batch.ini:
+
+enabledWorkers.KAsyncStorageUpdate = xxx (number of workers)
+
+[KAsyncStorageUpdate : PeriodicWorker]
+id                                                  = 800
+friendlyName                                        = STORAGE UPDATE
+type                                                = KAsyncStorageUpdate
+scriptPath                                          = batches/StorageUpdate/KAsyncStorageUpdateExe.php
+sleepBetweenStopStart                               = 86400
+params.debugMode    				    = @1 for debuging mode, 0 for real run mode@
+
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2020_01_19_add_permissions_to_actions.php
+
+# Orion 15.18.0 #
+
+## Support sphinx sticky connection for read operations ##
+Issue Type: Task
+Issue ID : PLAT-10713
+
+### Configuration ##
+	* Make sure "sphinx_dynamic_config" exists in your configuration maps 
+ 
+	* To enable the feature for specific partner ids add the following section to the map:
+    [sphinx_sticky_partners]
+    0 = XXXX
+    1 = YYYY
+    where XXXX and YYYY are the partner ids you want to enable the feature for.
+	
+
+#### Deployment Scripts ####
+None.
+
+## Add support of documents conversion on Linux machine ##
+Issue Type: Task
+Issue ID : PLAT-10694
+
+### Configuration ##
+- Add a worker (follow 'KAsyncConvertPdfLinux' in 'batch.ini.template).
+- Make sure that 'lowriter' is installed by running 'lowriter --version'.
+
+#### Deployment Scripts ####
+none.
+
+# Orion 15.17.0 #
+
+## Allow catalog item pricing view from KMC ##
+Issue Type: Task
+Issue ID : REACH-779
+
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_02_03_add_reach_catalog_item_kmc_permissions.php'
+
+## Add partner package to audit trail config ##
+Issue Type: Task
+Issue ID : No-Plat
+
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/sql/2020_02_03_audit_trail_config_admin_console_partner_updates.sql'
+
+# Orion 15.16.0 #
+
+## Add liveStream->getDetails API action ##
+Issue Type: Task
+Issue ID : FEV-426
+
+### Configuration ##
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_23_01_live_stream_get_details_action.php'
+
+## New notification template Item_Pending_Moderation_Extended ##
+- Issue Type: Task
+- Issue ID: PLAT-10546
+
+### Configuration ###
+First replace all tokens from the XML file below and remove ".template" from the file name:
+/opt/kaltura/app/deployment/updates/scripts/xml/2020_02_02_mediaspaceNotificationtTemplate.template.xml
+
+#### Deployment scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/2020_02_02_deploy_mediaspace_notification.php
+
+## SIP - Use rtmps as default streaming ##
+ - Issue Type: Task
+ - Issue ID: PLAT-10575
+
+### Installation ###
+None.
+### Configuration ###
+None.
+To force non secure rtmp streaming set forceNonSecureStreaming = true in sip.ini 
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+ - php deployment\updates\scripts\add_permissions\2020_01_19_add_rtmps_permissions_KalturaLiveEntry.php
+ 
+
 # Orion 15.15.0 #
 
 ## Enabling auto archive when using live with recording ##

@@ -27,6 +27,10 @@ const NEW_FREE_TRIAL_START_DATE = 'new_free_trial_start_date';
 const PARTNER_NOTIFICATION_EMAIL = 'partner_notification_email';
 const PARTNER_NOTIFICATION_NAME = 'partner_notification_name';
 const FORMAT_Y_M_D = 'Y-m-d';
+const WATERMARK_UPGRADE = 120;
+const WATERMARK_HIGH = 100;
+const WATERMARK_LOW = 80;
+
 
 	public static function diffInDays ($date1, $date2)
 	{
@@ -48,7 +52,8 @@ const FORMAT_Y_M_D = 'Y-m-d';
 	 * @param array $arr
 	 * @return int
 	 */
-	public static function getClosestDay($search, $arr) {
+	public static function getClosestDay($search, $arr)
+	{
 		$closest = 0;
 		foreach ($arr as $item)
 		{
@@ -63,7 +68,8 @@ const FORMAT_Y_M_D = 'Y-m-d';
 	{
 		$arr = array();
 		$children = $flatXml->children();
-		foreach ($children as $child => $value) {
+		foreach ($children as $child => $value)
+		{
 			if (!$value->children())
 			{
 				$arr[$child] = "$value";
