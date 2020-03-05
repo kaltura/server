@@ -132,7 +132,6 @@ class ZoomVendorService extends KalturaBaseService
 	 * @throws KalturaAPIException
 	 * @throws PropelException
 	 * @throws Exception
-	 * @throws Exception
 	 */
 	public function fetchRegistrationPageAction($tokensData, $iv)
 	{
