@@ -12,7 +12,7 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
 	const CUTOFF_FREQUENCY_DEFAULT = 0.001;
 	const MAX_WORDS_NGRAM = 'max_words_for_ngram';
 	const MAX_WORDS_NGRAM_DEFAULT = 1;
-	const REDUCE_RESULTS_PARTNER_LIST = 'reduced_results_partner_list';
+	const NON_REDUCE_RESULTS_PARTNER_LIST = 'non_reduced_results_partner_list';
 	const DEDICATED_ENTRY_INDEX_PARTNER_LIST = 'dedicated_entry_index_partner_list';
 	const DEDICATED_ENTRY_INDEX_NAME = 'dedicated_entry_index_name';
 	const FILTER_TAGS_MAP_NAME = 'elasticDynamicMap';
