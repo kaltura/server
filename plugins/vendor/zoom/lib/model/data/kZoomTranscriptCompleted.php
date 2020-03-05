@@ -43,7 +43,7 @@ class kZoomTranscriptCompleted implements iZoomObject
 				$this->recordingFiles[$kZoomRecordingFile->recordingFileType] = array();
 			}
 
-			$this->recordingFiles[$kZoomRecordingFile->recordingFileType] = $kZoomRecordingFile;
+			$this->recordingFiles[$kZoomRecordingFile->recordingFileType][] = $kZoomRecordingFile;
 		}
 	}
 }

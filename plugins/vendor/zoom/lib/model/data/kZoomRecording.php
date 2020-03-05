@@ -50,7 +50,7 @@ class kZoomRecording implements iZoomObject
 				$this->recordingFiles[$kZoomRecordingFile->recordingFileType] = array();
 			}
 
-			$this->recordingFiles[$kZoomRecordingFile->recordingFileType] = $kZoomRecordingFile;
+			$this->recordingFiles[$kZoomRecordingFile->recordingFileType][] = $kZoomRecordingFile;
 		}
 	}
 
@@ -79,8 +79,10 @@ class kZoomRecording implements iZoomObject
 			case 5:
 			case 6:
 			case 9:
-			$this->recordingType = kRecordingType::WEBINAR;
+				$this->recordingType = kRecordingType::WEBINAR;
 				break;
+			default:
+				$this->recordingType = kRecordingType::MEETING;
 		}
 	}
 }

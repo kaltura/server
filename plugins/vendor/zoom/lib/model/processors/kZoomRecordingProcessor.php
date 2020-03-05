@@ -83,8 +83,8 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	 * @param kuser $owner
 	 * @param $zoomIntegration
 	 * @param $validatedUsers
-	 * @param $recordingFile
-	 * @param $event
+	 * @param kZoomRecordingFile $recordingFile
+	 * @param kZoomEvent $event
 	 * @return entry
 	 * @throws PropelException
 	 * @throws kCoreException
