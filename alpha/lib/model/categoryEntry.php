@@ -237,13 +237,15 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 		$entry = entryPeer::retrieveByPK($entryId);
 		if(!$entry)
 		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
+//			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
+			throw new kCoreException("Invalid Entry ID: {$entryId}",kCoreException::INVALID_ENTRY_ID);
 		}
 
 		$category = categoryPeer::retrieveByPK($categoryId);
 		if(!$category)
 		{
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
+//			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
+			throw new kCoreException("Category ID: {$categoryId} not found", kCoreException::CATEGORY_NOT_FOUND);
 		}
 		/*=========================================================*/
 		$categoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($entryId);
@@ -252,7 +254,8 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 
 		if(count($categoryEntries) >= $maxCategoriesPerEntry)
 		{
-			throw new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, $maxCategoriesPerEntry);
+//			throw new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, $maxCategoriesPerEntry);
+			throw new kCoreException("Max categories per entry reached, Allowed: {$maxCategoriesPerEntry}", kCoreException::MAX_CATEGORIES_PER_ENTRY);
 		}
 		/*=========================================================*/
 		$currentKsKuserId = kCurrentContext::getCurrentKsKuserId();
@@ -264,14 +267,16 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 
 			if(!$categoryKuser)
 			{
-				KalturaLog::err('User [' . $currentKsKuserId . '] is not a member in category Id [' . $categoryId . ']');
-				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+				KalturaLog::err("User '{$currentKsKuserId}' is not a member in category Id '{$categoryId}'"); //TODO: consider removing, kCoreException already prints the 'message' to KalturaLog:err
+//				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+				throw new kCoreException("User '{$currentKsKuserId}' is not a member in category Id '{$categoryId}'", kCoreException::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
 			}
 
 			if($categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER)
 			{
-				KalturaLog::err('User [' . $currentKsKuserId . '] permission level in category Id [' . $categoryId . '] is [' . CategoryKuserPermissionLevel::MEMBER . '] not allowed to add entry to category');
-				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+				KalturaLog::err('User [' . $currentKsKuserId . '] permission level in category Id [' . $categoryId . '] is [' . CategoryKuserPermissionLevel::MEMBER . '] not allowed to add entry to category'); //TODO: consider removing, kCoreException already prints the 'message' to KalturaLog:err
+//				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+				throw new kCoreException("User '{$currentKsKuserId}' permission level in category Id '{$categoryId}' is 'MEMBER' and is not allowed to add entry to category", kCoreException::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
 			}
 
 			if(!$categoryKuser->hasPermission(PermissionName::CATEGORY_EDIT) &&
@@ -279,14 +284,16 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 				!$entry->isEntitledKuserEdit($currentKsKuserId) &&
 				$entry->getCreatorKuserId() != $currentKsKuserId)
 			{
-				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+//				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+				throw new kCoreException("Cannot assign entry to category", kCoreException::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
 			}
 		}
 		/*=========================================================*/
 		$categoryEntryExists = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
 		if($categoryEntryExists && $categoryEntryExists->getStatus() == CategoryEntryStatus::ACTIVE) // TODO: what about PENDING?
 		{
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_ENTRY_ALREADY_EXISTS);
+//			throw new KalturaAPIException(KalturaErrors::CATEGORY_ENTRY_ALREADY_EXISTS);
+			throw new kCoreException("Category-Entry object already exist", kCoreException::CATEGORY_ENTRY_ALREADY_EXISTS);
 		}
 
 		if(!$categoryEntryExists)

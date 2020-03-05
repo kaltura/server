@@ -29,11 +29,25 @@ class CategoryEntryService extends KalturaBaseService
 	{
 		$categoryEntry->validateForInsert();
 
-		$dbCategoryEntry = new categoryEntry();
-		$entryId = $categoryEntry->entryId;
-		$categoryId = $categoryEntry->categoryId;
-		$dbCategoryEntry = $dbCategoryEntry->add($entryId, $categoryId);
-		$dbCategoryEntry->save();
+		try
+		{
+			$dbCategoryEntry = new categoryEntry();
+			$entryId = $categoryEntry->entryId;
+			$categoryId = $categoryEntry->categoryId;
+			$dbCategoryEntry = $dbCategoryEntry->add($entryId, $categoryId);
+			$dbCategoryEntry->save();
+		}
+		catch (Exeption $ex)
+		{
+			if ($ex instanceof kCoreException)
+			{
+				$this->handleCoreException(); // TODO: implement handleCoreException()
+			}
+			else
+			{
+				throw $ex;
+			}
+		}
 		
 		//need to select the entry again - after update
 		$entry = entryPeer::retrieveByPK($categoryEntry->entryId);		
