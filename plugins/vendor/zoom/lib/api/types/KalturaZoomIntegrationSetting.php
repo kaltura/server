@@ -3,7 +3,7 @@
  * @package plugins.vendor
  * @subpackage api.objects
  */
-class kalturaZoomIntegrationSetting extends KalturaObject
+class KalturaZoomIntegrationSetting extends KalturaObject
 {
 	/**
 	 * @var string

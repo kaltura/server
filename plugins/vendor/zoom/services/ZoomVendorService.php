@@ -184,7 +184,7 @@ class ZoomVendorService extends KalturaBaseService
 	/**
 	 * @action submitRegistration
 	 * @param string $accountId
-	 * @param kalturaZoomIntegrationSetting $integrationSetting
+	 * @param KalturaZoomIntegrationSetting $integrationSetting
 	 * @return string
 	 * @throws KalturaAPIException
 	 * @throws PropelException
@@ -216,7 +216,7 @@ class ZoomVendorService extends KalturaBaseService
 	}
 
 	/**
-	 * @param kalturaZoomIntegrationSetting $integrationSetting
+	 * @param KalturaZoomIntegrationSetting $integrationSetting
 	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @throws PropelException
 	 */
