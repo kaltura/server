@@ -217,9 +217,18 @@ class kZoomEngine
 			KalturaLog::debug("Meeting {$meeting->uuid} already processed");
 			return;
 		}
-		
-		$participantsUsersNames = $this->extractMeetingParticipants($meeting->id, $zoomIntegration, $dbUser->getPuserId());
-		$validatedUsers = $this->getValidatedUsers($participantsUsersNames, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
+
+		try
+		{
+			$participantsUsersNames = $this->extractMeetingParticipants($meeting->id, $zoomIntegration, $dbUser->getPuserId());
+			$validatedUsers = $this->getValidatedUsers($participantsUsersNames, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
+		}
+		catch(Exception $ex)
+		{
+			kalturaLog::err('Failed to retrieve meeting participants');
+			$validatedUsers = null;
+		}
+
 		$entry = null;
 		foreach ($meeting->recordingFiles as $recordingFile)
 		{
