@@ -416,7 +416,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		// limit in mysql (by default 1MB). the upper limit is here to prevent the addition of too many category 
 		// users (for example), that will render the category un-indexable
 		$sqlSize = strlen($sql);
-		if ($sqlSize > 128 * 1024 && $sqlSize < 1000000)
+		if ($sqlSize > 256 * 1024 && $sqlSize < 1000000)
 		{
 			$lockKey = 'large_sql_lock_' . get_class($object) . '_' . $object->getId();
 			$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_SPHINX_STICKY_SESSIONS);

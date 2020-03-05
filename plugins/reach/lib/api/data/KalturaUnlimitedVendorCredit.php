@@ -17,11 +17,6 @@ class KalturaUnlimitedVendorCredit extends KalturaBaseVendorCredit
 	 */
 	public $fromDate;
 	
-	/**
-	 *  @var time
-	 */
-	public $toDate;
-
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
@@ -29,8 +24,7 @@ class KalturaUnlimitedVendorCredit extends KalturaBaseVendorCredit
 
 	private static $map_between_objects = array (
 		'fromDate',
-		'credit',
-		'toDate',
+		'credit'
 	);
 
 	/* (non-PHPdoc)

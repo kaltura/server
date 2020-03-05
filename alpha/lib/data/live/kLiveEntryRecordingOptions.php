@@ -29,15 +29,21 @@ class kLiveEntryRecordingOptions
 	 */
 	protected $shouldMakeHidden = false;
 
-    /**
-     * @var boolean
-     */
+	/**
+	* @var boolean
+	*/
 	protected $shouldAutoArchive = false;
 
-    /**
-     * @var string
-     */
+	/**
+	* @var string
+	*/
 	protected $nonDeletedCuePointsTags;
+
+	/**
+	 * @var string
+	 */
+	protected $archiveVodSuffixTimezone;
+
 
 	/**
 	 * @return the $shouldCopyThumbnail
@@ -132,4 +138,22 @@ class kLiveEntryRecordingOptions
 	{
 		return $this->nonDeletedCuePointsTags;
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getArchiveVodSuffixTimezone()
+	{
+		return $this->archiveVodSuffixTimezone;
+	}
+
+	/**
+	 * @param string $archiveVodSuffixTimezone
+	 */
+	public function setArchiveVodSuffixTimezone($archiveVodSuffixTimezone)
+	{
+		$this->archiveVodSuffixTimezone = $archiveVodSuffixTimezone;
+	}
+
+
 }

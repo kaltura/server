@@ -15,7 +15,7 @@ friendlyName                                        = STORAGE UPDATE
 type                                                = KAsyncStorageUpdate
 scriptPath                                          = batches/StorageUpdate/KAsyncStorageUpdateExe.php
 sleepBetweenStopStart                               = 86400
-params.debugMode    				    = @1 for debuging mode, 0 for real run mode@
+params.debugMode    				                        = @1 for debuging mode, 0 for real run mode@
 
 
 #### Deployment Scripts ####

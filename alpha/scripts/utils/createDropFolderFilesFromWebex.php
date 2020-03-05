@@ -1,7 +1,7 @@
 <?php
 require_once(__DIR__ . '/../bootstrap.php');
-require_once('/opt/kaltura/web/content/clientlibs/batchClient/KalturaClient.php');
-require_once('/opt/kaltura/web/content/clientlibs/batchClient/KalturaPlugins/KalturaDropFolderClientPlugin.php');
+require_once('/opt/kaltura/app/batch/client/KalturaClient.php');
+require_once('/opt/kaltura/app/batch/client/KalturaPlugins/KalturaDropFolderClientPlugin.php');
 require_once('/opt/kaltura/app/batch/batches/KBatchBase.class.php');
 
 const WEEK_IN_SECONDS = 604800;

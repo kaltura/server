@@ -13,6 +13,8 @@ abstract class KCopyCuePointEngine
 	const CUE_POINT_AD = 'adCuePoint.Ad';
 	const CUE_POINT_CODE = 'codeCuePoint.Code';
 
+	const CUE_POINT_CLONE_PERMISSION_ERROR = 'NO_PERMISSION_TO_COPY_CUE_POINT_TO_ENTRY';
+
 	protected $data = null;
 	protected $partnerId = null;
 	private $lastCuePointPerType = null;
@@ -92,7 +94,7 @@ abstract class KCopyCuePointEngine
 			}
 		}
 
-		$clonedCuePoint = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine', 'cuePointClone'), array($cuePoint, $destEntryId, $parentId));
+		$clonedCuePoint = KBatchBase::tryExecuteApiCall(array('KCopyCuePointEngine', 'cuePointClone'), array($cuePoint, $destEntryId, $parentId), array(self::CUE_POINT_CLONE_PERMISSION_ERROR));
 		if ($clonedCuePoint)
 		{
 			$this->idsMap[$cuePoint->id] = $clonedCuePoint->id;

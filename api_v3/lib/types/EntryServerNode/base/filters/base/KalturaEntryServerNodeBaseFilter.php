@@ -11,6 +11,8 @@ abstract class KalturaEntryServerNodeBaseFilter extends KalturaFilter
 		"entryIdEqual" => "_eq_entry_id",
 		"entryIdIn" => "_in_entry_id",
 		"serverNodeIdEqual" => "_eq_server_node_id",
+		"serverNodeIdIn" => "_in_server_node_id",
+		"serverNodeIdNotIn" => "_notin_server_node_id",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
@@ -19,6 +21,7 @@ abstract class KalturaEntryServerNodeBaseFilter extends KalturaFilter
 		"statusIn" => "_in_status",
 		"serverTypeEqual" => "_eq_server_type",
 		"serverTypeIn" => "_in_server_type",
+		"serverTypeNotIn" => "_notin_server_type",
 	);
 
 	static private $order_by_map = array
@@ -53,6 +56,16 @@ abstract class KalturaEntryServerNodeBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $serverNodeIdEqual;
+
+	/**
+	 * @var string
+	 */
+	public $serverNodeIdIn;
+
+	/**
+	 * @var string
+	 */
+	public $serverNodeIdNotIn;
 
 	/**
 	 * @var time
@@ -94,4 +107,10 @@ abstract class KalturaEntryServerNodeBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $serverTypeIn;
+
+	/**
+	 * @dynamicType KalturaEntryServerNodeType
+	 * @var string
+	 */
+	public $serverTypeNotIn;
 }

@@ -1545,10 +1545,10 @@ class kKavaReports extends kKavaReportsMgr
 				self::DRUID_DIRECTION => '-'
 			),
 		),
-    
+
 	);
 
-	public static function getReportDef($report_type)
+	public static function getReportDef($report_type, $input_filter)
 	{
 		$report_def = isset(self::$reports_def[$report_type]) ? self::$reports_def[$report_type] : null;
 		if (is_null($report_def))

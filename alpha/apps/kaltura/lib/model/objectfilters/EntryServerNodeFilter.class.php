@@ -18,10 +18,13 @@ class EntryServerNodeFilter extends baseObjectFilter {
 			'_eq_entry_id',
 			'_in_entry_id',
 			'_eq_server_node_id',
+			'_in_server_node_id',
+			'_notin_server_node_id',
 			'_eq_status',
 			'_in_status',
 			'_eq_server_type',
 			'_in_server_type',
+			'_notin_server_type',
 		), null);
 
 		$this->allowed_order_fields = array(

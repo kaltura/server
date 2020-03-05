@@ -334,7 +334,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 					$errDesc = '';
 					$this->addClipJobs($batchJob, $jobData->getTempEntryId(), $errDesc,
 						$jobData->getPartnerId(),
-						$jobData->getOperationAttributes(), $jobData->getPriority());
+						$jobData->getOperationAttributes(), kConvertJobData::TRIMMING_FLAVOR_PRIORITY);
 					kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
 				}
 				break;
