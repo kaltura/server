@@ -218,6 +218,7 @@ class kZoomEngine
 			return;
 		}
 
+		$validatedUsers = null;
 		try
 		{
 			$participantsUsersNames = $this->extractMeetingParticipants($meeting->id, $zoomIntegration, $dbUser->getPuserId());
@@ -225,8 +226,7 @@ class kZoomEngine
 		}
 		catch(Exception $ex)
 		{
-			kalturaLog::err('Failed to retrieve meeting participants');
-			$validatedUsers = null;
+			kalturaLog::debug('Failed to retrieve meeting participants');
 		}
 
 		$entry = null;
