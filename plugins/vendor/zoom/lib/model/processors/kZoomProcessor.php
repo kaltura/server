@@ -10,6 +10,7 @@ abstract class kZoomProcessor
 	const ZOOM_PREFIX = 'Zoom_';
 	const ZOOM_LOCK_TTL = 120;
 	const URL_ACCESS_TOKEN = '?access_token=';
+	const REFERENCE_FILTER = '_eq_reference_id';
 
 	/**
 	 * @param string $userName

@@ -8,7 +8,6 @@ class kZoomTranscriptProcessor extends kZoomProcessor
 {
 	const ZOOM_TRANSCRIPT_FILE_EXT = 'vtt';
 	const ZOOM_LABEL = 'Zoom';
-	const REFERENCE_FILTER = '_eq_reference_id';
 
 	/**
 	 * @param kZoomEvent $event
