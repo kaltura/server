@@ -219,5 +219,118 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 	{
 		$this->putInCustomData('creatorPuserId', $v);
 	}
+
+	/**
+	 * @param $entryId
+	 * @param $categoryId
+	 * @throws KalturaErrors::CATEGORY_NOT_FOUND
+	 * @throws KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED
+	 * @throws KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY
+	 * @throws KalturaErrors::CATEGORY_ENTRY_ALREADY_EXISTS*
+	 * @throws KalturaErrors::INVALID_ENTRY_ID
+	 * @throws Exception
+	 * @return categoryEntry $categoryEntry
+	 */
+	public function add($entryId, $categoryId)
+	{
+		/*=========================================================*/
+		$entry = entryPeer::retrieveByPK($entryId);
+		if(!$entry)
+		{
+			throw new kCoreException("Invalid Entry ID: {$entryId}",kCoreException::INVALID_ENTRY_ID, $entryId);
+		}
+
+		$category = categoryPeer::retrieveByPK($categoryId);
+		if(!$category)
+		{
+			throw new kCoreException("Category ID: {$categoryId} not found", kCoreException::CATEGORY_NOT_FOUND, $categoryId);
+		}
+		/*=========================================================*/
+		$categoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($entryId);
+
+		$maxCategoriesPerEntry = $entry->getMaxCategoriesPerEntry();
+
+		if(count($categoryEntries) >= $maxCategoriesPerEntry)
+		{
+			throw new kCoreException("Max categories per entry reached, Allowed: {$maxCategoriesPerEntry}", kCoreException::MAX_CATEGORIES_PER_ENTRY, $maxCategoriesPerEntry);
+		}
+		/*=========================================================*/
+		$currentKsKuserId = kCurrentContext::getCurrentKsKuserId();
+
+		// validate user is entitled to assign entry to this category
+		if(kEntitlementUtils::getEntitlementEnforcement() && $category->getContributionPolicy() != ContributionPolicyType::ALL)
+		{
+			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, $currentKsKuserId);
+
+			if(!$categoryKuser)
+			{
+				throw new kCoreException("User '{$currentKsKuserId}' is not a member in category Id '{$categoryId}'", kCoreException::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+			}
+
+			if($categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER)
+			{
+				throw new kCoreException("User '{$currentKsKuserId}' permission level in category Id '{$categoryId}' is 'MEMBER' and is not allowed to add entry to category", kCoreException::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+			}
+
+			if(!$categoryKuser->hasPermission(PermissionName::CATEGORY_EDIT) &&
+				!$categoryKuser->hasPermission(PermissionName::CATEGORY_CONTRIBUTE) &&
+				!$entry->isEntitledKuserEdit($currentKsKuserId) &&
+				$entry->getCreatorKuserId() != $currentKsKuserId)
+			{
+				throw new kCoreException("Cannot assign entry to category", kCoreException::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+			}
+		}
+		/*=========================================================*/
+		$categoryEntryExists = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
+		if($categoryEntryExists && $categoryEntryExists->getStatus() == CategoryEntryStatus::ACTIVE) // TODO: what about PENDING?
+		{
+			throw new kCoreException("Category-Entry object already exist", kCoreException::CATEGORY_ENTRY_ALREADY_EXISTS);
+		}
+
+		if(!$categoryEntryExists)
+		{
+			$categoryEntry = new categoryEntry();
+		}
+		else
+		{
+			$categoryEntry = $categoryEntryExists;
+		}
+		/*=========================================================*/
+		$apiCategoryEntry = new KalturaCategoryEntry();
+		$apiCategoryEntry->entryId = $entryId;
+		$apiCategoryEntry->categoryId = $categoryId;
+		$apiCategoryEntry->toInsertableObject($categoryEntry); // TODO: Is there a better way to access "toInsertableObject"?
+		/*=========================================================*/
+		$categoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
+		/*=========================================================*/
+		if(kEntitlementUtils::getEntitlementEnforcement() && $category->getModeration())
+		{
+			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, $currentKsKuserId);
+			if(!$categoryKuser || ($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MEMBER &&
+					$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
+			{
+				$categoryEntry->setStatus(CategoryEntryStatus::PENDING);
+			}
+		}
+
+		if($category->getModeration() && (kEntitlementUtils::getCategoryModeration() ||
+				$category->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_BLOCK_CATEGORY_MODERATION_SELF_APPROVE))) //TODO: notice changed '$this->getPartner()->getEnabledService' ($this = CategoryEntryService) with $category->getPartner()->getEnabledService
+		{
+			$categoryEntry->setStatus(CategoryEntryStatus::PENDING);
+		}
+		/*=========================================================*/
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id; // TODO: why not take PID from Entry / Category?
+		$categoryEntry->setPartnerId($partnerId);
+
+		$kuser = kCurrentContext::getCurrentKsKuser();
+
+		if($kuser)
+		{
+			$categoryEntry->setCreatorKuserId($kuser->getId());
+			$categoryEntry->setCreatorPuserId($kuser->getPuserId());
+		}
+		KalturaLog::info("New categoryEntry add works");
+		return $categoryEntry;
+	}
 	
 } // categoryEntry
