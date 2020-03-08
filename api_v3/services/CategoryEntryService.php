@@ -40,7 +40,7 @@ class CategoryEntryService extends KalturaBaseService
 		catch (Exception $ex)
 		{
 			if ($ex instanceof kCoreException) {
-				$this->handleCoreException(); // TODO: implement handleCoreException()
+				$this->handleCoreException($ex);
 			} else {
 				throw $ex;
 			}
