@@ -778,7 +778,13 @@ class myEntryUtils
 			{
 				if($currPath != $finalThumbPath)
 				{
-					kFile::moveFile($currPath, $finalThumbPath);
+					$moveFileSuccess = kFile::moveFile($currPath, $finalThumbPath);
+					if(!$moveFileSuccess)
+					{
+						KalturaLog::debug("Failed to move thumbnail from [$currPath] to [$finalThumbPath], will return oldPath");
+						header("X-Kaltura:cached-thumb-exists,".md5($currPath));
+						return $currPath;
+					}
 				}
 				
 				header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
