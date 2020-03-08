@@ -771,7 +771,7 @@ class myEntryUtils
 			$processingThumbPath = kFile::replaceExt($processingThumbPath, $format);
 		}
 		
-		foreach ($thumbDirs as $key => $value)
+		foreach ($thumbDirs as $thumbDir)
 		{
 			$currPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$value, $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
 			if (file_exists($currPath) && @filesize($currPath))
