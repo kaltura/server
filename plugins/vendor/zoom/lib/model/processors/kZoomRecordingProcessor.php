@@ -196,24 +196,16 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	 */
 	protected function getAdditionalUsers($recordingId, $zoomIntegration, $userToExclude)
 	{
-		try
+		if ($zoomIntegration->getHandleParticipantsMode() == kHandleParticipantsMode::IGNORE)
 		{
-			if ($zoomIntegration->getHandleParticipantsMode() == kHandleParticipantsMode::IGNORE)
-			{
-				return null;
-			}
-
-			$userToExclude = strtolower($userToExclude);
-			$accessToken = kZoomOauth::getValidAccessToken($zoomIntegration);
-			$additionalUsersZoomResponse = $this->getAdditionalUsersFromZoom($accessToken, $recordingId);
-			$additionalUsersNames = $this->parseAdditionalZoomUsers($additionalUsersZoomResponse, $userToExclude, $zoomIntegration);
-			return $this->getValidatedUsers($additionalUsersNames, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
-		}
-		catch (Exception $ex)
-		{
-			kalturaLog::err('Failed to retrieve additional users from zoom');
 			return null;
 		}
+
+		$userToExclude = strtolower($userToExclude);
+		$accessToken = kZoomOauth::getValidAccessToken($zoomIntegration);
+		$additionalUsersZoomResponse = $this->getAdditionalUsersFromZoom($accessToken, $recordingId);
+		$additionalUsersNames = $this->parseAdditionalZoomUsers($additionalUsersZoomResponse, $userToExclude, $zoomIntegration);
+		return $this->getValidatedUsers($additionalUsersNames, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
 	}
 
 	protected abstract function getAdditionalUsersFromZoom($accessToken, $recordingId);
