@@ -220,7 +220,6 @@ class kZoomEngine
 
 		$participantsUsersNames = $this->extractMeetingParticipants($meeting->id, $zoomIntegration, $dbUser->getPuserId());
 		$validatedUsers = $this->getValidatedUsers($participantsUsersNames, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
-		kalturaLog::debug('Failed to retrieve meeting participants');
 		$entry = null;
 		foreach ($meeting->recordingFiles as $recordingFile)
 		{
