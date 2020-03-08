@@ -1,3 +1,18 @@
+# Orion 15.19.0 #
+
+## Add Live NG plugin ##
+Issue Type: Task
+Issue ID : PLAT-10358
+
+### Configuration ##
+  Add LiveCluster plugin in: configurations/plugins.ini 
+	
+
+#### Deployment Scripts ####
+  install plugins: 
+  
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php 
+
 # Orion 15.18.0 #
 
 ## Support sphinx sticky connection for read operations ##
