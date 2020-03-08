@@ -200,7 +200,7 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	/**
 	 * @var bool
 	 */
-	public $useStorageAsLocal;
+	public $useServeFlavor;
 
 
 	private static $map_between_objects = array
@@ -239,7 +239,7 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		'shouldExportThumbs',
 		'mappedPackagerUrl',
 		'regularPackagerUrl',
-		"useStorageAsLocal",
+		"useServeFlavor",
 	);
 	
 	/* (non-PHPdoc)

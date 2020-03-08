@@ -37,7 +37,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	const CUSTOM_DATA_SHOULD_EXPORT_THUMBS ='should_export_thumbs';
 	const CUSTOM_DATA_REGULAR_PACKAGER_URL = 'regular_packager_url';
 	const CUSTOM_DATA_MAPPED_PACKAGER_URL = 'mapped_packager_url';
-	const CUSTOM_DATA_USE_STORAGE_AS_LOCAL = 'use_storage_as_local';
+	const CUSTOM_DATA_USE_SERVE_FLAVOR = 'use_serve_flavor';
 
 	/**
 	 * @var kStorageProfileScope
@@ -467,12 +467,12 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 		$this->putInCustomData(self::CUSTOM_DATA_MAPPED_PACKAGER_URL, $v);
 	}
 
-	public function getUseStorageAsLocal()
+	public function getUseServeFlavor()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_USE_STORAGE_AS_LOCAL,null, false);
+		return $this->getFromCustomData(self::CUSTOM_DATA_USE_SERVE_FLAVOR,null, false);
 	}
-	public function setUseStorageAsLocal($v)
+	public function setUseServeFlavor($v)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_USE_STORAGE_AS_LOCAL, $v);
+		$this->putInCustomData(self::CUSTOM_DATA_USE_SERVE_FLAVOR, $v);
 	}
 }
