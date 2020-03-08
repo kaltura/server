@@ -217,8 +217,7 @@ class kZoomEngine
 			KalturaLog::debug("Meeting {$meeting->uuid} already processed");
 			return;
 		}
-
-		$validatedUsers = null;
+		
 		$participantsUsersNames = $this->extractMeetingParticipants($meeting->id, $zoomIntegration, $dbUser->getPuserId());
 		$validatedUsers = $this->getValidatedUsers($participantsUsersNames, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
 		$entry = null;
