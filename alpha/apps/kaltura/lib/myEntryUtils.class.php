@@ -754,18 +754,16 @@ class myEntryUtils
 		// we remove the & from the template thumb otherwise getGeneralEntityPath will drop $tempThumbName from the final path
 		$entryThumbFilename = str_replace("&", "", $entryThumbFilename);
 		
-		$thumbDirConfig = kConf::get('thumb_path', 'local', array('current' => 'tempthumb'));
-		$currentThumbDir = $thumbDirConfig['current'];
-		$prevThumDir = isset($thumbDirConfig['prev']) ? $thumbDirConfig['prev'] : null;
+		$thumbDirs = kConf::get('thumb_path', 'local', array('0' => 'tempthumb'));
 		
 		//create final path for thumbnail created
-		$finalThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/$currentThumbDir", $entry->getIntId(), $thumbName, $entryThumbFilename , $version );;
+		$finalThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $thumbName, $entryThumbFilename , $version );;
 		
 		//Add unique id to the processing file path to avoid file being overwritten when several identical (with same parameters) calls are made before the final thumbnail is created
 		$thumbName .= "_" . uniqid() . "_";
 		
 		//create path for processing thumbnail request
-		$processingThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/$currentThumbDir", $entry->getIntId(), $thumbName, $entryThumbFilename , $version );;
+		$processingThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $thumbName, $entryThumbFilename , $version );;
 		
 		if(!is_null($format))
 		{
@@ -773,17 +771,22 @@ class myEntryUtils
 			$processingThumbPath = kFile::replaceExt($processingThumbPath, $format);
 		}
 		
-		if (file_exists($finalThumbPath) && @filesize($finalThumbPath))
+		foreach ($thumbDirs as $key => $value)
 		{
-			header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
-			return $finalThumbPath;
-		}
-		elseif ($prevThumDir)
-		{
-			$prevThumbPath = str_replace($currentThumbDir, $prevThumDir, $finalThumbPath);
-			if (file_exists($prevThumbPath) && @filesize($prevThumbPath))
+			$currPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$value, $entry->getIntId(), $thumbName, $entryThumbFilename , $version );;
+			if (file_exists($currPath) && @filesize($currPath))
 			{
-				kFile::moveFile($prevThumbPath, $finalThumbPath);
+				if($currPath != $finalThumbPath)
+				{
+					$moveFileSuccess = kFile::moveFile($currPath, $finalThumbPath);
+					if(!$moveFileSuccess)
+					{
+						KalturaLog::debug("Failed to move thumbnail from [$currPath] to [$finalThumbPath], will return oldPath");
+						header("X-Kaltura:cached-thumb-exists,".md5($currPath));
+						return $currPath;
+					}
+				}
+				
 				header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
 				return $finalThumbPath;
 			}
@@ -884,7 +887,7 @@ class myEntryUtils
 				}
 					
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
-				$capturedThumbPath = $contentPath.myContentStorage::getGeneralEntityPath("entry/$currentThumbDir", $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
+				$capturedThumbPath = $contentPath.myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
 	
 				$orig_image_path = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
 				
