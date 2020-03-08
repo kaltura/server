@@ -287,7 +287,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			$storage = StorageProfilePeer::retrieveByPK($this->params->getStorageId());
 			if(!$storage->getUseServeFlavor())
 			{
-				KalturaLog::debug("Storage url is generated as external url");
+				KalturaLog::debug('Storage url is generated as external url');
 				return $this->getExternalStorageUrl($flavorAsset);
 			}
 		}

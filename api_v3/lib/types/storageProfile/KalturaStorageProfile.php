@@ -239,7 +239,7 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		'shouldExportThumbs',
 		'mappedPackagerUrl',
 		'regularPackagerUrl',
-		"useServeFlavor",
+		'useServeFlavor',
 	);
 	
 	/* (non-PHPdoc)
