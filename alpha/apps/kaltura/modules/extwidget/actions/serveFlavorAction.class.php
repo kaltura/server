@@ -22,8 +22,13 @@ class serveFlavorAction extends kalturaAction
 		return json_encode($obj, $options);
 	}
 	
-	public function getFileSyncFullPath(FileSync $fileSync)
+	public function getFileSyncFullPath(FileSync $fileSync, $local = true)
 	{
+		if(!$local)
+		{
+			return $fileSync->getFilePath();
+		}
+
 		$fullPath = $fileSync->getFullPath();
 		$serveFlavorPathSearchReplace = kConf::get('serve_flavor_path_search_replace', 'local', array());
 		
@@ -472,14 +477,27 @@ class serveFlavorAction extends kalturaAction
 		if ($this->pathOnly && kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
 		{
 			$path = '';
-			list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $syncKey , false, false );
+			list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $syncKey , true, false );
 			if ( $file_sync )
 			{
-				$parent_file_sync = kFileSyncUtils::resolve($file_sync);
-				$path = $this->getFileSyncFullPath($parent_file_sync);
-				if ($fileParam && is_dir($path)) 
+				$allowRemotePath = false;
+				if(!$local)
 				{
-					$path .= "/$fileParam";
+					$storage = StorageProfilePeer::retrieveByPK($file_sync->getDc());
+					if($storage->getUseStorageAsLocal())
+					{
+						$allowRemotePath = true;
+					}
+				}
+
+				if($local || $allowRemotePath)
+				{
+					$parent_file_sync = kFileSyncUtils::resolve($file_sync);
+					$path = $this->getFileSyncFullPath($parent_file_sync, $local);
+					if ($fileParam && is_dir($path))
+					{
+						$path .= "/$fileParam";
+					}
 				}
 			}
 		
