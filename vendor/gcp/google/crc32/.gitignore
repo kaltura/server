@@ -1,0 +1,6 @@
+vendor
+.php_cs.cache
+ext/.deps
+ext/crc32c
+*~
+composer.lock

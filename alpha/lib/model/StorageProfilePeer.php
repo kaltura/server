@@ -12,6 +12,7 @@ class StorageProfilePeer extends BaseStorageProfilePeer
 {
 	const STORAGE_DEFAULT_OM_CLASS = 'StorageProfile';
 	const STORAGE_AMAZON_S3_OM_CLASS = 'AmazonS3StorageProfile';
+	const STORAGE_GCP_OM_CLASS = 'GCPStorageProfile';
 	
 	// cache classes by their type
 	protected static $class_types_cache = array(
@@ -19,6 +20,7 @@ class StorageProfilePeer extends BaseStorageProfilePeer
 		StorageProfile::STORAGE_PROTOCOL_SCP => self::STORAGE_DEFAULT_OM_CLASS,
 		StorageProfile::STORAGE_PROTOCOL_SFTP => self::STORAGE_DEFAULT_OM_CLASS,
 		StorageProfile::STORAGE_PROTOCOL_S3 => self::STORAGE_AMAZON_S3_OM_CLASS,
+		StorageProfile::STORAGE_PROTOCOL_GCP => self::STORAGE_GCP_OM_CLASS,
 	);
 	
 	/**

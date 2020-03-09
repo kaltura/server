@@ -14,6 +14,9 @@ class kThumbStorageFactory
 			case kThumbStorageType::S3:
 				$out = new kThumbStorageS3();
 			break;
+			case kThumbStorageType::GCP:
+				$out = new kThumbStorageGCP();
+				break;
 			case kThumbStorageType::LOCAL:
 				$out = new kThumbStorageLocal();
 			break;

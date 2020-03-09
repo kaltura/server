@@ -252,7 +252,10 @@ abstract class kFileTransferMgr
 
 			case kFileTransferMgrType::S3:
 				return new s3Mgr($options);
-				
+
+			case kFileTransferMgrType::GCP:
+				return new gcpMgr($options);
+
 			case kFileTransferMgrType::LOCAL:
 			    return new localMgr($options);
 			    

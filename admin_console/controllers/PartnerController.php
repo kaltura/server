@@ -331,6 +331,8 @@ class PartnerController extends Zend_Controller_Action
 		{
 			if($type == Kaltura_Client_Enum_StorageProfileProtocol::LOCAL)
 				$form = new Form_Partner_LocalStorageConfiguration();
+			elseif($type == Kaltura_Client_Enum_StorageProfileProtocol::GCP)
+				$form = new Form_Partner_GCPStorageConfiguration();
 			else
 				$form = new Form_Partner_StorageConfiguration();
 		}
@@ -395,11 +397,17 @@ class PartnerController extends Zend_Controller_Action
 				
 				if (!$storageProfileClass)
 				{
-					if( $type == Kaltura_Client_Enum_StorageProfileProtocol::S3){
-						$storageProfileClass = 'Kaltura_Client_Type_AmazonS3StorageProfile';
-					}	
-					else{
-						$storageProfileClass = 'Kaltura_Client_Type_StorageProfile';	
+					switch ($type)
+					{
+						case Kaltura_Client_Enum_StorageProfileProtocol::S3:
+							$storageProfileClass = 'Kaltura_Client_Type_AmazonS3StorageProfile';
+							break;
+						case Kaltura_Client_Enum_StorageProfileProtocol::GCP:
+							$storageProfileClass = 'Kaltura_Client_Type_GCPStorageProfile';
+							break;
+						default:
+							$storageProfileClass = 'Kaltura_Client_Type_StorageProfile';
+							break;
 					}
 				}
 				

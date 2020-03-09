@@ -292,6 +292,7 @@ return array(
 	'Kaltura_Client_Enum_StorageProfileProtocol::S3' => 'Amazon S3',
 	'Kaltura_Client_Enum_StorageProfileProtocol::LOCAL' => 'Local',
 	'Kaltura_Client_Enum_StorageProfileProtocol::KONTIKI' => 'Kontiki',
+	'Kaltura_Client_Enum_StorageProfileProtocol::GCP' => 'GCP',
 
 	'Kaltura_Client_Enum_StorageProfileDeliveryStatus::ACTIVE' => 'Active',
 	'Kaltura_Client_Enum_StorageProfileDeliveryStatus::BLOCKED' => 'Blocked',

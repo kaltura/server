@@ -1,0 +1,52 @@
+{
+  "updateTime": "2019-11-08T21:16:39.052239Z",
+  "sources": [
+    {
+      "generator": {
+        "name": "artman",
+        "version": "0.41.1",
+        "dockerImage": "googleapis/artman@sha256:545c758c76c3f779037aa259023ec3d1ef2d57d2c8cd00a222cb187d63ceac5e"
+      }
+    },
+    {
+      "git": {
+        "name": "googleapis",
+        "remote": "https://github.com/googleapis/googleapis.git",
+        "sha": "2642d8688bab8981c8a5153b7578f9ff8460a37c",
+        "internalRef": "279326626"
+      }
+    }
+  ],
+  "destinations": [
+    {
+      "client": {
+        "source": "googleapis",
+        "apiName": "tasks",
+        "apiVersion": "v2",
+        "language": "php",
+        "generator": "gapic",
+        "config": "google/cloud/tasks/artman_cloudtasks_v2.yaml"
+      }
+    },
+    {
+      "client": {
+        "source": "googleapis",
+        "apiName": "tasks",
+        "apiVersion": "v2beta2",
+        "language": "php",
+        "generator": "gapic",
+        "config": "google/cloud/tasks/artman_cloudtasks_v2beta2.yaml"
+      }
+    },
+    {
+      "client": {
+        "source": "googleapis",
+        "apiName": "tasks",
+        "apiVersion": "v2beta3",
+        "language": "php",
+        "generator": "gapic",
+        "config": "google/cloud/tasks/artman_cloudtasks_v2beta3.yaml"
+      }
+    }
+  ]
+}
