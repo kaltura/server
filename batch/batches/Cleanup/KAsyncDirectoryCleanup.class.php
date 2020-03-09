@@ -46,14 +46,14 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 	protected function deleteFiles($searchPath, $minutesOld, $simulateOnly, $usePHP)
 	{
 		$secondsOld = $minutesOld * 60;
-		$files = glob($searchPath);
+		$files = kFile::getFilesByPattern($searchPath);
 		KalturaLog::info('Found [' . count($files) . '] to scan');
 
 		$now = time();
 		KalturaLog::info('Deleting files that are ' . $secondsOld . ' seconds old (modified before ' . date('c', $now - $secondsOld) . ')');
 		foreach ($files as $file)
 		{
-			$filemtime = filemtime($file);
+			$filemtime = kFile::getFileLastUpdatedTime($file);
 			if ($filemtime > $now - $secondsOld)
 			{
 				continue;
@@ -65,7 +65,7 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 				continue;
 			}
 
-			if (is_dir($file))
+			if (kFile::checkIsDir($file))
 			{
 				if ($this->shouldDeleteDirectory($file, $now, $secondsOld))
 				{
@@ -93,15 +93,9 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 	{
 		if (substr($path, -strlen(self::CHUNK_ENCODEING_POSTFIX)) === self::CHUNK_ENCODEING_POSTFIX)
 		{
-			foreach (scandir($path) as $file)
+			foreach (kFile::dirList($path) as $file)
 			{
-				if ($file == '.' || $file == '..')
-				{
-					continue;
-				}
-
-				$fullFilePath = $path . DIRECTORY_SEPARATOR . $file;
-				if (filemtime($fullFilePath) > $now - $secondsOld)
+				if (kFile::getFileLastUpdatedTime($file) > $now - $secondsOld)
 				{
 					return false;
 				}
@@ -126,7 +120,10 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 			KalturaLog::info('Executing command: ' . $command);
 			$returnedValue = null;
 			passthru($command, $returnedValue);
-			KalturaLog::info('Returned value [' . $returnedValue . ']');
+			if ($returnedValue)
+			{
+				KalturaLog::err('Error: problem while deleting ' . $dir);
+			}
 		}
 	}
 
@@ -137,28 +134,24 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 	 */
 	private function deleteDirectoryHelper($dir, $usePHP)
 	{
-		if (!file_exists($dir))
+		if (!kFile::checkFileExists($dir))
 		{
 			return true;
 		}
 
-		if (!is_dir($dir))
+		if (!kFile::checkIsDir($dir))
 		{
 			return $this->deleteFile($dir, $usePHP);
 		}
 
-		foreach (scandir($dir) as $item)
+		foreach (kFile::dirList($dir) as $file)
 		{
-			if ($item == '.' || $item == '..')
-			{
-				continue;
-			}
-			if (!$this->deleteDirectoryHelper($dir . DIRECTORY_SEPARATOR . $item, $usePHP))
+			if (!$this->deleteDirectoryHelper($file, $usePHP))
 			{
 				return false;
 			}
 		}
-		return @rmdir($dir);
+		return kFile::removeDir($dir);
 	}
 
 	/**
@@ -172,7 +165,7 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 		if ($usePHP)
 		{
 			KalturaLog::info('Deleting file [' . $file . '], it\'s last modification time was ' . date('c', filemtime($file)));
-			$res = @unlink($file);
+			$res = kFile::doDeleteFile($file);
 			if ($res)
 			{
 				return true;
@@ -183,7 +176,6 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 			$command = 'rm -f ' . $file;
 			KalturaLog::info('Executing command: ' . $command);
 			passthru($command, $res);
-			KalturaLog::info('Returned value [' . $res . ']');
 			if (!$res)
 			{
 				return true;
