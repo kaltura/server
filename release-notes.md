@@ -21,6 +21,17 @@ params.debugMode				    = @1 for debuging mode, 0 for real run mode@
 #### Deployment Scripts ####
 run: php deployment/updates/scripts/add_permissions/2020_01_19_add_permissions_to_actions.php
 
+## ecdn monitoring allow listTemplates ##
+Issue Type: Task
+Issue ID : PLAT-10625
+
+### Configuration ##
+  None
+	
+#### Deployment Scripts ####
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_03_09_monitoring_proxy_list_templates.php 
+
+
 ## Add Live NG plugin ##
 Issue Type: Task
 Issue ID : PLAT-10358
