@@ -246,12 +246,7 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 		{
 			$this->copyFrom($categoryEntryExists);
 		}
-		/*=========================================================*/
-//		$apiCategoryEntry = new KalturaCategoryEntry();
-//		$apiCategoryEntry->entryId = $entryId;
-//		$apiCategoryEntry->categoryId = $categoryId;
-//		$apiCategoryEntry->toInsertableObject($this); // TODO: Is there a better way to access "toInsertableObject"?
-		/*=========================================================*/
+
 		$this->setStatus(CategoryEntryStatus::ACTIVE);
 		$this->handleModeration($category, $currentKsKuserId);
 		$this->assignPartnerId();

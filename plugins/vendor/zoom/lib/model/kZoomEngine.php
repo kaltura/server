@@ -287,7 +287,6 @@ class kZoomEngine
 		$this->setEntryCategory($zoomIntegration, $entry);
 		$this->handleParticipants($entry, $validatedUsers, $zoomIntegration);
 		$entry->save();
-
 		$url = $recordingFile->download_url . self::URL_ACCESS_TOKEN . $event->downloadToken;
 		kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url);
 		return $entry;
