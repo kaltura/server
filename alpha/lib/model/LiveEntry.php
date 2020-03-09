@@ -480,20 +480,37 @@ abstract class LiveEntry extends entry
 		if(!count($liveEntryServerNodes))
 			return false;
 
+		$primaryEsn = null;
+		$secondaryEsn = null;
+
 		/* @var LiveEntryServerNode $liveEntryServerNode*/
 		foreach($liveEntryServerNodes as $liveEntryServerNode)
 		{
-			/* @var WowzaMediaServerNode $serverNode*/
-			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
-			if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
+			if ($liveEntryServerNode->getServerType() == EntryServerNodeType::LIVE_PRIMARY)
 			{
-				if ($this->getExplicitLive() && !$this->canViewExplicitLive() && !$liveEntryServerNode->getIsPlayableUser())
-					return false;
+				$primaryEsn = $liveEntryServerNode;
+			}
+			else if ($liveEntryServerNode->getServerType() == EntryServerNodeType::LIVE_BACKUP)
+			{
+				$secondaryEsn = $liveEntryServerNode;
+			}
+		}
+
+		if ($primaryEsn || $secondaryEsn)
+		{
+			if ($this->getExplicitLive() && !$this->canViewExplicitLive())
+				return false;
+			if ($primaryEsn)
+			{
+				if ($primaryEsn->getIsPlayableUser())
+					return true;
+			}
+			else if ($secondaryEsn && $secondaryEsn->getIsPlayableUser())
+			{
 				return true;
 			}
 		}
-		
-		return !$currentDcOnly;
+		return false;
 	}
 	
 	private static function getCacheType()
