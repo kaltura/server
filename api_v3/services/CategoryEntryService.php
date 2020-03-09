@@ -37,13 +37,9 @@ class CategoryEntryService extends KalturaBaseService
 			$dbCategoryEntry = $dbCategoryEntry->add($entryId, $categoryId);
 			$dbCategoryEntry->save();
 		}
-		catch (Exception $ex)
+		catch (kCoreException $ex)
 		{
-			if ($ex instanceof kCoreException) {
 				$this->handleCoreException($ex);
-			} else {
-				throw $ex;
-			}
 		}
 		
 		//need to select the entry again - after update

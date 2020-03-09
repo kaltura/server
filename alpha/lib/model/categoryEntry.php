@@ -233,7 +233,6 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 	 */
 	public function add($entryId, $categoryId)
 	{
-		/*=========================================================*/
 		$entry = entryPeer::retrieveByPK($entryId);
 		if(!$entry)
 		{
@@ -245,47 +244,13 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 		{
 			throw new kCoreException("Category ID: {$categoryId} not found", kCoreException::CATEGORY_NOT_FOUND, $categoryId);
 		}
-		/*=========================================================*/
-		$categoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($entryId);
 
-		$maxCategoriesPerEntry = $entry->getMaxCategoriesPerEntry();
-
-		if(count($categoryEntries) >= $maxCategoriesPerEntry)
-		{
-			throw new kCoreException("Max categories per entry reached, Allowed: {$maxCategoriesPerEntry}", kCoreException::MAX_CATEGORIES_PER_ENTRY, $maxCategoriesPerEntry);
-		}
-		/*=========================================================*/
+		$this->validateMaxCategoriesPerEntry($entry);
 		$currentKsKuserId = kCurrentContext::getCurrentKsKuserId();
-
-		// validate user is entitled to assign entry to this category
-		if(kEntitlementUtils::getEntitlementEnforcement() && $category->getContributionPolicy() != ContributionPolicyType::ALL)
-		{
-			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, $currentKsKuserId);
-
-			if(!$categoryKuser)
-			{
-				throw new kCoreException("User '{$currentKsKuserId}' is not a member in category Id '{$categoryId}'", kCoreException::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
-			}
-
-			if($categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER)
-			{
-				throw new kCoreException("User '{$currentKsKuserId}' permission level in category Id '{$categoryId}' is 'MEMBER' and is not allowed to add entry to category", kCoreException::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
-			}
-
-			if(!$categoryKuser->hasPermission(PermissionName::CATEGORY_EDIT) &&
-				!$categoryKuser->hasPermission(PermissionName::CATEGORY_CONTRIBUTE) &&
-				!$entry->isEntitledKuserEdit($currentKsKuserId) &&
-				$entry->getCreatorKuserId() != $currentKsKuserId)
-			{
-				throw new kCoreException("Cannot assign entry to category", kCoreException::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
-			}
-		}
-		/*=========================================================*/
+		$this->validateKuserEntitledToAssignEntryToCategory($category, $entry, $currentKsKuserId);
 		$categoryEntryExists = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
-		if($categoryEntryExists && $categoryEntryExists->getStatus() == CategoryEntryStatus::ACTIVE) // TODO: what about PENDING?
-		{
-			throw new kCoreException("Category-Entry object already exist", kCoreException::CATEGORY_ENTRY_ALREADY_EXISTS);
-		}
+		$this->checkCategoryEntryNotExist($categoryEntryExists);
+		/*=========================================================*/
 
 		if(!$categoryEntryExists)
 		{
@@ -329,8 +294,63 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 			$categoryEntry->setCreatorKuserId($kuser->getId());
 			$categoryEntry->setCreatorPuserId($kuser->getPuserId());
 		}
-		KalturaLog::info("New categoryEntry add works");
+		KalturaLog::info("New categoryEntry add works"); // TODO: remove when done testing
 		return $categoryEntry;
 	}
-	
+
+	/**
+	 * @param entry $entry
+	 * @throws kCoreException
+	 */
+	protected function validateMaxCategoriesPerEntry(entry $entry)
+	{
+		$categoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($entry->getId());
+		$maxCategoriesPerEntry = $entry->getMaxCategoriesPerEntry();
+		if(count($categoryEntries) >= $maxCategoriesPerEntry)
+		{
+			throw new kCoreException("Max categories per entry reached, Allowed: {$maxCategoriesPerEntry}", kCoreException::MAX_CATEGORIES_PER_ENTRY, $maxCategoriesPerEntry);
+		}
+	}
+
+	/**
+	 * @param category $category
+	 * @param entry $entry
+	 * @param $currentKsKuserId
+	 * @throws kCoreException
+	 */
+	protected function validateKuserEntitledToAssignEntryToCategory(category $category, entry $entry, $currentKsKuserId)
+	{
+		$categoryId = $category->getId();
+		if(kEntitlementUtils::getEntitlementEnforcement() && $category->getContributionPolicy() != ContributionPolicyType::ALL)
+		{
+			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, $currentKsKuserId);
+
+			if(!$categoryKuser)
+			{
+				throw new kCoreException("User '{$currentKsKuserId}' is not a member in category Id '{$categoryId}'", kCoreException::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+			}
+
+			if($categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER)
+			{
+				throw new kCoreException("User '{$currentKsKuserId}' permission level in category Id '{$categoryId}' is 'MEMBER' and is not allowed to add entry to category", kCoreException::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+			}
+
+			if(!$categoryKuser->hasPermission(PermissionName::CATEGORY_EDIT) &&
+				!$categoryKuser->hasPermission(PermissionName::CATEGORY_CONTRIBUTE) &&
+				!$entry->isEntitledKuserEdit($currentKsKuserId) &&
+				$entry->getCreatorKuserId() != $currentKsKuserId)
+			{
+				throw new kCoreException("Cannot assign entry to category", kCoreException::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+			}
+		}
+	}
+
+	protected function checkCategoryEntryNotExist($categoryEntry)
+	{
+		if($categoryEntry && $categoryEntry->getStatus() == CategoryEntryStatus::ACTIVE) // TODO: what about PENDING?
+		{
+			throw new kCoreException("Category-Entry object already exist", kCoreException::CATEGORY_ENTRY_ALREADY_EXISTS);
+		}
+	}
+
 } // categoryEntry
