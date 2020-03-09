@@ -91,7 +91,7 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 	 */
 	protected function shouldDeleteDirectory($path, $now, $secondsOld)
 	{
-		if (substr($path, -strlen(self::CHUNK_ENCODEING_POSTFIX)) === self::CHUNK_ENCODEING_POSTFIX)
+		if (substr($path, -strlen(KChunkedEncode::CHUNK_ENCODE_POSTFIX)) === KChunkedEncode::CHUNK_ENCODE_POSTFIX)
 		{
 			foreach (kFile::dirList($path) as $file)
 			{
@@ -100,15 +100,16 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 					return false;
 				}
 			}
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	/**
 	 * @param $dir
 	 * @param $usePHP
 	 */
-	private function deleteDirectory($dir, $usePHP)
+	protected function deleteDirectory($dir, $usePHP)
 	{
 		if ($usePHP)
 		{
@@ -132,7 +133,7 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 	 * @param $usePHP
 	 * @return bool
 	 */
-	private function deleteDirectoryHelper($dir, $usePHP)
+	protected function deleteDirectoryHelper($dir, $usePHP)
 	{
 		if (!kFile::checkFileExists($dir))
 		{
@@ -159,7 +160,7 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 	 * @param $usePHP
 	 * @return bool
 	 */
-	private function deleteFile($file, $usePHP)
+	protected function deleteFile($file, $usePHP)
 	{
 		$res = null;
 		if ($usePHP)
