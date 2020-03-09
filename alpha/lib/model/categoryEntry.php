@@ -233,69 +233,29 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 	 */
 	public function add($entryId, $categoryId)
 	{
-		$entry = entryPeer::retrieveByPK($entryId);
-		if(!$entry)
-		{
-			throw new kCoreException("Invalid Entry ID: {$entryId}",kCoreException::INVALID_ENTRY_ID, $entryId);
-		}
-
-		$category = categoryPeer::retrieveByPK($categoryId);
-		if(!$category)
-		{
-			throw new kCoreException("Category ID: {$categoryId} not found", kCoreException::CATEGORY_NOT_FOUND, $categoryId);
-		}
+		$entry = $this->validateAndReturnEntry($entryId);
+		$category = $this->validateAndReturnCategory($categoryId);
 
 		$this->validateMaxCategoriesPerEntry($entry);
 		$currentKsKuserId = kCurrentContext::getCurrentKsKuserId();
 		$this->validateKuserEntitledToAssignEntryToCategory($category, $entry, $currentKsKuserId);
 		$categoryEntryExists = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
 		$this->checkCategoryEntryNotExist($categoryEntryExists);
-		/*=========================================================*/
 
-		if(!$categoryEntryExists)
+		if($categoryEntryExists)
 		{
-			$categoryEntry = new categoryEntry();
-		}
-		else
-		{
-			$categoryEntry = $categoryEntryExists;
+			$this->copyFrom($categoryEntryExists);
 		}
 		/*=========================================================*/
-		$apiCategoryEntry = new KalturaCategoryEntry();
-		$apiCategoryEntry->entryId = $entryId;
-		$apiCategoryEntry->categoryId = $categoryId;
-		$apiCategoryEntry->toInsertableObject($categoryEntry); // TODO: Is there a better way to access "toInsertableObject"?
+//		$apiCategoryEntry = new KalturaCategoryEntry();
+//		$apiCategoryEntry->entryId = $entryId;
+//		$apiCategoryEntry->categoryId = $categoryId;
+//		$apiCategoryEntry->toInsertableObject($this); // TODO: Is there a better way to access "toInsertableObject"?
 		/*=========================================================*/
-		$categoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
-		/*=========================================================*/
-		if(kEntitlementUtils::getEntitlementEnforcement() && $category->getModeration())
-		{
-			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, $currentKsKuserId);
-			if(!$categoryKuser || ($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MEMBER &&
-					$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
-			{
-				$categoryEntry->setStatus(CategoryEntryStatus::PENDING);
-			}
-		}
-
-		if($category->getModeration() && (kEntitlementUtils::getCategoryModeration() ||
-				$category->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_BLOCK_CATEGORY_MODERATION_SELF_APPROVE))) //TODO: notice changed '$this->getPartner()->getEnabledService' ($this = CategoryEntryService) with $category->getPartner()->getEnabledService
-		{
-			$categoryEntry->setStatus(CategoryEntryStatus::PENDING);
-		}
-		/*=========================================================*/
-		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id; // TODO: why not take PID from Entry / Category?
-		$categoryEntry->setPartnerId($partnerId);
-
-		$kuser = kCurrentContext::getCurrentKsKuser();
-
-		if($kuser)
-		{
-			$categoryEntry->setCreatorKuserId($kuser->getId());
-			$categoryEntry->setCreatorPuserId($kuser->getPuserId());
-		}
-		KalturaLog::info("New categoryEntry add works"); // TODO: remove when done testing
-		return $categoryEntry;
+		$this->setStatus(CategoryEntryStatus::ACTIVE);
+		$this->handleModeration($category, $currentKsKuserId);
+		$this->assignPartnerId();
+		$this->assignCreator();
 	}
 
 	/**
@@ -345,12 +305,86 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 		}
 	}
 
-	protected function checkCategoryEntryNotExist($categoryEntry)
+	/**
+	 * @param categoryEntry $categoryEntry
+	 * @throws kCoreException
+	 */
+	protected function checkCategoryEntryNotExist(categoryEntry $categoryEntry = null)
 	{
-		if($categoryEntry && $categoryEntry->getStatus() == CategoryEntryStatus::ACTIVE) // TODO: what about PENDING?
+		if($categoryEntry && $categoryEntry->getStatus() == CategoryEntryStatus::ACTIVE)
 		{
 			throw new kCoreException("Category-Entry object already exist", kCoreException::CATEGORY_ENTRY_ALREADY_EXISTS);
 		}
+	}
+
+	/**
+	 * @param category $category
+	 * @param $currentKsKuserId
+	 */
+	protected function handleModeration(category $category, $currentKsKuserId)
+	{
+		if(kEntitlementUtils::getEntitlementEnforcement() && $category->getModeration())
+		{
+			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($category->getId(), $currentKsKuserId);
+			if(!$categoryKuser || ($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MEMBER &&
+					$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
+			{
+				$this->setStatus(CategoryEntryStatus::PENDING);
+			}
+		}
+
+		if($category->getModeration() && (kEntitlementUtils::getCategoryModeration() ||
+				$category->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_BLOCK_CATEGORY_MODERATION_SELF_APPROVE))) //TODO: notice changed '$this->getPartner()->getEnabledService' ($this = CategoryEntryService) with $category->getPartner()->getEnabledService
+		{
+			$this->setStatus(CategoryEntryStatus::PENDING);
+		}
+	}
+
+	protected function assignPartnerId()
+	{
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$this->setPartnerId($partnerId);
+	}
+
+	protected function assignCreator()
+	{
+		$kuser = kCurrentContext::getCurrentKsKuser();
+
+		if($kuser)
+		{
+			$this->setCreatorKuserId($kuser->getId());
+			$this->setCreatorPuserId($kuser->getPuserId());
+		}
+	}
+
+	/**
+	 * @param $entryId
+	 * @return entry
+	 * @throws kCoreException
+	 */
+	protected function validateAndReturnEntry($entryId)
+	{
+		$entry = entryPeer::retrieveByPK($entryId);
+		if(!$entry)
+		{
+			throw new kCoreException("Invalid Entry ID: {$entryId}",kCoreException::INVALID_ENTRY_ID, $entryId);
+		}
+		return $entry;
+	}
+
+	/**
+	 * @param $categoryId
+	 * @return category
+	 * @throws kCoreException
+	 */
+	protected function validateAndReturnCategory($categoryId)
+	{
+		$category = categoryPeer::retrieveByPK($categoryId);
+		if(!$category)
+		{
+			throw new kCoreException("Category ID: {$categoryId} not found", kCoreException::CATEGORY_NOT_FOUND, $categoryId);
+		}
+		return $category;
 	}
 
 } // categoryEntry

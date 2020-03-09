@@ -284,9 +284,10 @@ class kZoomEngine
 	protected function handleVideoRecord($meeting, $dbUser, $zoomIntegration, $validatedUsers, $recordingFile, $event)
 	{
 		$entry = $this->createEntryFromMeeting($meeting, $dbUser);
+		$this->setEntryCategory($zoomIntegration, $entry);
 		$this->handleParticipants($entry, $validatedUsers, $zoomIntegration);
 		$entry->save();
-		$this->addCategoryEntry($zoomIntegration, $entry);
+
 		$url = $recordingFile->download_url . self::URL_ACCESS_TOKEN . $event->downloadToken;
 		kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url);
 		return $entry;
@@ -352,16 +353,12 @@ class kZoomEngine
 	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @param entry $entry
 	 * @throws kCoreException
-	 * @throws PropelException
 	 */
-	protected function addCategoryEntry($zoomIntegration, $entry)
+	protected function setEntryCategory($zoomIntegration, $entry)
 	{
 		if ($zoomIntegration->getZoomCategory())
 		{
-			$categoryEntry = new categoryEntry();
-			$categoryEntry = $categoryEntry->add($entry->getId(), $zoomIntegration->getZoomCategoryId());
-			$categoryEntry->save();
-			KalturaLog::info("Entry Id: '{$categoryEntry->getEntryId()}' added to Zoom category Id '{$categoryEntry->getCategoryId()}'");
+			$entry->setCategories($zoomIntegration->getZoomCategory());
 		}
 	}
 

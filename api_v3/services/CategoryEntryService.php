@@ -34,7 +34,8 @@ class CategoryEntryService extends KalturaBaseService
 			$dbCategoryEntry = new categoryEntry();
 			$entryId = $categoryEntry->entryId;
 			$categoryId = $categoryEntry->categoryId;
-			$dbCategoryEntry = $dbCategoryEntry->add($entryId, $categoryId);
+			$dbCategoryEntry->add($entryId, $categoryId);
+			$categoryEntry->toInsertableObject($dbCategoryEntry);
 			$dbCategoryEntry->save();
 		}
 		catch (kCoreException $ex)
@@ -358,6 +359,7 @@ class CategoryEntryService extends KalturaBaseService
 	 * @param kCoreException $ex
 	 * @throws KalturaAPIException
 	 * @throws kCoreException
+	 * @throws Exception
 	 */
 	private function handleCoreException(kCoreException $ex)
 	{
