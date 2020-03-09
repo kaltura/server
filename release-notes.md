@@ -1,5 +1,15 @@
 # Orion 15.19.0 #
 
+## ecdn monitoring allow listTemplates ##
+Issue Type: Task
+Issue ID : PLAT-10625
+
+### Configuration ##
+  None
+	
+#### Deployment Scripts ####
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_03_09_monitoring_proxy_list_templates.php 
+
 ## Add Live NG plugin ##
 Issue Type: Task
 Issue ID : PLAT-10358
