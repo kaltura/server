@@ -12,8 +12,6 @@
  */
 class KAsyncDirectoryCleanup extends KPeriodicWorker
 {
-	const CHUNK_ENCODEING_POSTFIX = 'chunkenc';
-
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
