@@ -493,12 +493,6 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 
-		if($entry->getParentEntryId())
-		{
-			KalturaLog::log("Entry [{$entry->getId()}] is a child entry, entry vendor task object wont be created for it");
-			return true;
-		}
-
 		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $sourceFlavorVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC);
 		if($entryVendorTask)
 		{
@@ -514,6 +508,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			KalturaLog::debug("Entry [{$entry->getId()}] is temporary, entry vendor task object wont be created for it");
 			return null;
 		}
+		
 		//Create new entry vendor task object
 		$entryVendorTask = new EntryVendorTask();
 
