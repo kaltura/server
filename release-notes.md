@@ -15,11 +15,25 @@ friendlyName                                        = STORAGE UPDATE
 type                                                = KAsyncStorageUpdate
 scriptPath                                          = batches/StorageUpdate/KAsyncStorageUpdateExe.php
 sleepBetweenStopStart                               = 86400
-params.debugMode    				    = @1 for debuging mode, 0 for real run mode@
+params.debugMode    				                        = @1 for debuging mode, 0 for real run mode@
 
 
 #### Deployment Scripts ####
 run: php deployment/updates/scripts/add_permissions/2020_01_19_add_permissions_to_actions.php
+
+## Add Live NG plugin ##
+Issue Type: Task
+Issue ID : PLAT-10358
+
+### Configuration ##
+  Add LiveCluster plugin in: configurations/plugins.ini 
+	
+
+#### Deployment Scripts ####
+  install plugins: 
+  
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php 
+
 
 # Orion 15.18.0 #
 
