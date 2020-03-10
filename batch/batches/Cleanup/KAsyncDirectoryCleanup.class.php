@@ -27,6 +27,7 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 	{
 		$path = $this->getAdditionalParams("path");
 		$pattern = $this->getAdditionalParams("pattern");
+		$minDepth = $this->getAdditionalParams("minDepth");
 		$simulateOnly = $this->getAdditionalParams("simulateOnly");
 		$minutesOld = $this->getAdditionalParams("minutesOld");
 		$searchPath = $path . $pattern;
@@ -38,15 +39,21 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 		}
 		else
 		{
-			$this->deleteFilesLinux($searchPath, $minutesOld, $simulateOnly);
+			$this->deleteFilesLinux($searchPath, $minutesOld, $simulateOnly, $minDepth);
 		}
 	}
 
 	// XXX - If this function forces deletion of files in the given directory. If it is used with params
 	// given from the user - Please add input validation.
-	protected function deleteFilesLinux($searchPath, $minutesOld, $simulateOnly)
+	protected function deleteFilesLinux($searchPath, $minutesOld, $simulateOnly, $minDepth = null)
 	{
-		$command = "find $searchPath -mmin +$minutesOld -exec rm -rf {} \;";
+		$command = "find $searchPath ";
+		if($minDepth)
+		{
+			$command .= "-mindepth $minDepth ";
+		}
+		
+		$command .= "-mmin +$minutesOld -exec rm -rf {} \;";
 		KalturaLog::info("Executing command: $command");
 
 		$returnedValue = null;
