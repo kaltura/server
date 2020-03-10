@@ -539,6 +539,29 @@ class kFile extends kFileBase
 		return shell_exec('file -b '.$realPath);
 	}
 
+	public static function getFilesByPattern($pattern)
+	{
+		return glob($pattern);
+	}
+
+	public static function doDeleteFile($file)
+	{
+		return @unlink($file);
+	}
+	public static function removeDir($dir)
+	{
+		return @rmdir($dir);
+	}
+
+	public static function getFileLastUpdatedTime($file)
+	{
+		return filemtime($file);
+	}
+
+	public static function checkIsDir($path)
+	{
+		return is_dir($path);
+	}
 	
 }
 
