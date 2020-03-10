@@ -12,6 +12,9 @@
  */
 class KAsyncDirectoryCleanup extends KPeriodicWorker
 {
+
+	private $deletedFilesCount = 0;
+	private $deletedFoldersCount = 0;
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -67,7 +70,10 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 			{
 				if ($this->shouldDeleteDirectory($file, $now, $secondsOld))
 				{
-					$this->deleteDirectory($file, $usePHP);
+					if ($this->deleteDirectory($file, $usePHP))
+					{
+						$this->deletedFoldersCount++;
+					}
 				}
 				else
 				{
@@ -76,9 +82,13 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 			}
 			else
 			{
-				$this->deleteFile($file, $usePHP);
+				if ($this->deleteFile($file, $usePHP))
+				{
+					$this->deletedFilesCount++;
+				}
 			}
 		}
+		KalturaLog::debug('Finished Directory Cleanup - Folders deleted [' . $this->deletedFoldersCount . '] Files Deleted [' . $this->deletedFilesCount . ']');
 	}
 
 	/**
@@ -109,21 +119,28 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 	 */
 	protected function deleteDirectory($dir, $usePHP)
 	{
+		$returnedValue = null;
 		if ($usePHP)
 		{
-			$this->deleteDirectoryHelper($dir, $usePHP);
+			$returnedValue =  $this->deleteDirectoryHelper($dir, $usePHP);
+			if ($returnedValue)
+			{
+				return true;
+			}
 		}
 		else
 		{
 			$command = 'rm -rf ' . $dir;
 			KalturaLog::info('Executing command: ' . $command);
-			$returnedValue = null;
+
 			passthru($command, $returnedValue);
-			if ($returnedValue)
+			if (!$returnedValue)
 			{
-				KalturaLog::err('Error: problem while deleting ' . $dir);
+				return true;
 			}
 		}
+		KalturaLog::err('Error: problem while deleting ' . $dir);
+		return false;
 	}
 
 	/**
