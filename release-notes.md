@@ -19,7 +19,7 @@ params.debugMode				    = @1 for debuging mode, 0 for real run mode@
 
 
 #### Deployment Scripts ####
-run: php deployment/updates/scripts/add_permissions/2020_01_19_add_permissions_to_actions.php
+run: php deployment/updates/scripts/add_permissions/2020_01_19_add_permissions_to_systempartner_jobs_partner.php
 
 ## ecdn monitoring allow listTemplates ##
 Issue Type: Task
