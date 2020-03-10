@@ -24,7 +24,7 @@
                 <format>1</format>
                 <eventConditions objectType="array">
                     <item objectType="KalturaEventFieldCondition">
-                        <description>The entry exists and the replacement entry</description>
+                        <description>A replaced entry exists</description>
                         <field objectType="KalturaEvalBooleanField">
                             <code>!empty($scope->getObject()->getReplacedEntryId())</code>
                         </field>
