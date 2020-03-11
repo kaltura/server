@@ -39,7 +39,7 @@ class LiveEntryServerNode extends EntryServerNode
 				}
 			}
 
-			if (!$liveEntry->getBroadcastTime())
+			if (!$liveEntry->getBroadcastTime() && $liveEntry->getViewMode() == ViewMode::ALLOW_ALL)
 			{
 				$liveEntry->setBroadcastTime(time());
 				$liveEntry->save();
