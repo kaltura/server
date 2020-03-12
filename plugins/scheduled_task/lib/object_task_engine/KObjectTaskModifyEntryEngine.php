@@ -6,6 +6,9 @@
  */
 class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 {
+	const RESET_MR_XML_DATA = '<metadata><Status>Enabled</Status></metadata>';
+	protected $resetMediaRepurposingProfileId = null;
+
 	/**
 	 * @param KalturaBaseEntry $object
 	 */
@@ -27,7 +30,7 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		$metadataFilter = new KalturaMetadataFilter();
 		$metadataFilter->metadataObjectTypeEqual = KalturaMetadataObjectType::ENTRY;
 		$metadataFilter->objectIdEqual = $entryId;
-		
+
 		if($outputMetadataProfileId != 0 && !empty($outputMetadataArr))
 		{
 			$entryResultForMetadataUpdate = $client->baseEntry->get($entryId);
@@ -50,6 +53,11 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		$entryObj->entitledUsersPublish = is_null($entryObj->entitledUsersPublish) ? $objectTask->inputEntitledUsersPublish : null;
 
 		$client->baseEntry->update($entryId, $entryObj);
+
+		if($objectTask->resetMediaRepurposingProcess)
+		{
+			$this->resetMediaRepurposingData($metadataPlugin, $entryId);
+		}
 	}
 	
 	private function updateMetadataObj(KalturaBaseEntry $entryResultForMetadataUpdate, &$metadataPlugin, $outputMetadataArr, $outputMetadataProfileId, $metadataFilter)
@@ -58,7 +66,7 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		
 		$metadataInputResult = $metadataPlugin->metadata->listAction($metadataFilter, null);
 
-		$tepmlateXmlObj = $this->getMetadataXmlTemplate($metadataPlugin, $outputMetadataProfileId);
+		$templateXmlObj = $this->getMetadataXmlTemplate($metadataPlugin, $outputMetadataProfileId, $entryId);
 	
 		if($metadataInputResult && $metadataInputResult->totalCount != 0)
 		{
@@ -66,9 +74,9 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 			$metadataInputXmlStr = $metadataInputResult->objects[0]->xml;
 			$currentXmlObj = new SimpleXMLElement($metadataInputXmlStr);
 			
-			if(!is_null($tepmlateXmlObj))
+			if(!is_null($templateXmlObj))
 			{
-				$xmlData = $this->getUpdatedMetadataXmlStrFromEntry($entryResultForMetadataUpdate, $tepmlateXmlObj, $currentXmlObj, $outputMetadataArr);			
+				$xmlData = $this->getUpdatedMetadataXmlStrFromEntry($entryResultForMetadataUpdate, $templateXmlObj, $currentXmlObj, $outputMetadataArr);
 				$metadataPlugin->metadata->update($metadataId, $xmlData, null);
 			}
 		}
@@ -76,7 +84,7 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		{
 			
 			$xmlObj = new SimpleXMLElement("<metadata></metadata>");
-			$xmlData = $this->getUpdatedMetadataXmlStrFromEntry($entryResultForMetadataUpdate, $tepmlateXmlObj, $xmlObj, $outputMetadataArr);
+			$xmlData = $this->getUpdatedMetadataXmlStrFromEntry($entryResultForMetadataUpdate, $templateXmlObj, $xmlObj, $outputMetadataArr);
 	
 			$metadataPlugin->metadata->add($outputMetadataProfileId, KalturaMetadataObjectType::ENTRY, $entryId, $xmlData);
 		}
@@ -135,7 +143,7 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		return $entryObj;
 	}
 	
-	private function getMetadataXmlTemplate($metadataPlugin, $outputMetadataProfileId)
+	private function getMetadataXmlTemplate($metadataPlugin, $outputMetadataProfileId, $entryId)
 	{
 		try
 		{
@@ -167,5 +175,49 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		KalturaLog::debug("metadata profile schema - " . $emptyXmlObj->asXml());
 
 		return $emptyXmlObj;
+	}
+
+	/**
+	 * @param $metadataPlugin
+	 * @param string $entryId
+	 * @throws Exception
+	 */
+	private function resetMediaRepurposingData($metadataPlugin, $entryId)
+	{
+		if(!$this->resetMediaRepurposingProfileId)
+		{
+			$this->initResetMediaRepurposingProfileId($metadataPlugin);
+		}
+
+		$metadataFilter = new KalturaMetadataFilter();
+		$metadataFilter->metadataObjectTypeEqual = KalturaMetadataObjectType::ENTRY;
+		$metadataFilter->objectIdEqual = $entryId;
+		$metadataFilter->metadataProfileIdEqual = $this->resetMediaRepurposingProfileId;
+		$metadataResult = $metadataPlugin->metadata->listAction($metadataFilter, null);
+		if($metadataResult && $metadataResult->totalCount != 0)
+		{
+			$metadataId = $metadataResult->objects[0]->id;
+			KalturaLog::debug('Resetting media repurposing metadata object id '. $metadataId);
+			$metadataPlugin->metadata->update($metadataId, self::RESET_MR_XML_DATA, null);
+		}
+
+	}
+
+	/**
+	 * @param $metadataPlugin
+	 * @throws Exception
+	 */
+	private function initResetMediaRepurposingProfileId($metadataPlugin)
+	{
+		$filter = new KalturaMetadataProfileFilter();
+		$filter->systemNameEqual = MediaRepurposingUtils::MEDIA_REPURPOSING_SYSTEM_NAME;
+		$res = $metadataPlugin->metadataProfile->listAction($filter, null);
+		if ($res->totalCount != 1)
+		{
+			throw new Exception('Error while retrieving media repurposing metadata profile');
+		}
+
+		$this->resetMediaRepurposingProfileId = $res->objects[0]->id;
+		KalturaLog::debug('Found media repurposing metadata profile id '. $this->resetMediaRepurposingProfileId);
 	}
 }
