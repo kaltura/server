@@ -223,26 +223,6 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		return array($list, $totalCount);		
 	}
 
-	protected function prepareDisableEntitlmentForPlaylistCriteria()
-	{
-		$ks = ks::fromSecureString(kCurrentContext::$ks);
-		if($ks)
-		{
-			$DisableEntitlementForPlaylistEntries =  $ks->getDisableEntitlementForPlaylistEntries();
-			$entryCrit = $c->getNewCriterion(entryPeer::ENTRY_ID, $ks->getDisableEntitlementForEntry(), Criteria::IN);
-			$entryCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
-
-			if($critEntitled)
-			{
-				$critEntitled->addOr($entryCrit);
-			}
-			else
-			{
-				$critEntitled = $entryCrit;
-			}
-		}
-	}
-
 	/* (non-PHPdoc)
 	 * @see KalturaFilter::getListResponse()
 	 */

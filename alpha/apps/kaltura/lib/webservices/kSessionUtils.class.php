@@ -593,7 +593,7 @@ class ks extends kSessionBase
 				{
 					$entry = entryPeer::retrieveByPKNoFilter($privilege, null, false);
 					$entries[] = $privilege;
-					if($entry->getType() == entryType::PLAYLIST && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
+					if($entry->getType() == entryType::PLAYLIST && self::isValidForPlaylistDisableEntitlement($entry->getMediaType()))
 					{
 						$entry_id_list_str = $entry->getDataContent();
 						$result = myPlaylistUtils::getEntryIdsFromStaticPlaylistString($entry_id_list_str);
@@ -608,7 +608,24 @@ class ks extends kSessionBase
 
 		return $entries;
 	}
-	
+
+	/**
+	 * @param $mediaType
+	 * @return bool
+	 */
+	public static function isValidForPlaylistDisableEntitlement($mediaType)
+	{
+		$result = false;
+		switch($mediaType)
+		{
+			case entry::ENTRY_MEDIA_TYPE_TEXT:
+				$result = true;
+				break;
+		}
+
+		return $result;
+	}
+
 	public function getPrivilegeByName($privilegeName)
 	{
 		// edit privilege (edit:XX,edit:YYY,...)
