@@ -26,6 +26,10 @@ define('SOURCE_RAPT', -14);
 define('SOURCE_WEBEX', -15);
 define('SOURCE_ZOOM', -16);
 define('SOURCE_EXPRESS_RECORDER', -17);
+define('SOURCE_KMS_NATIVE_ANDROID_APP', -18);
+define('SOURCE_KMS_NATIVE_IOS_APP', -19);
+define('SOURCE_EXTERNAL_YOUTUBE', -20);
+
 define('CREATED_DAY_TS', 'UNIX_TIMESTAMP(DATE(CREATED_AT))');
 
 $sourceFromAdminTag = array(
@@ -37,6 +41,12 @@ $sourceFromAdminTag = array(
 	'webexentry' => SOURCE_WEBEX,
 	'zoomentry' => SOURCE_ZOOM,
 	'expressrecorder' => SOURCE_EXPRESS_RECORDER,
+	'kmsnativeandroid' => SOURCE_KMS_NATIVE_ANDROID_APP,
+	'kmsnativeios' => SOURCE_KMS_NATIVE_IOS_APP,
+);
+
+$externalSources = array(
+	'YouTube' => SOURCE_EXTERNAL_YOUTUBE,
 );
 
 function getPartnerVertical($customData)
@@ -55,9 +65,9 @@ function getPartnerVertical($customData)
 	}
 }
 
-function getEntrySourceTypeInt($sourceType, $adminTags)
+function getEntrySourceTypeInt($sourceType, $adminTags, $customData)
 {
-	global $sourceFromAdminTag;
+	global $sourceFromAdminTag, $externalSources;
 
 	// check for specific admin tags
 	$adminTags = explode(',', strtolower($adminTags));
@@ -68,6 +78,12 @@ function getEntrySourceTypeInt($sourceType, $adminTags)
 		{
 			return $sourceFromAdminTag[$adminTag];
 		}
+	}
+
+	// check for external source
+	if (isset($customData['externalSource']) && isset($externalSources[$customData['externalSource']]))
+	{
+		return $externalSources[$customData['externalSource']];
 	}
 
 	// use the source type
@@ -203,7 +219,7 @@ function getEntryUpdates($updatedAt)
 				ENTRY_KUSER_ID => $row['KUSER_ID'],
 				ENTRY_TYPE => $row['TYPE'],
 				ENTRY_MEDIA_TYPE => $row['MEDIA_TYPE'],
-				ENTRY_SOURCE_TYPE => getEntrySourceTypeInt($row['SOURCE'], $row['ADMIN_TAGS']),
+				ENTRY_SOURCE_TYPE => getEntrySourceTypeInt($row['SOURCE'], $row['ADMIN_TAGS'], $customData),
 				ENTRY_CREATED_AT => $row[CREATED_DAY_TS],
 				ENTRY_CREATOR_ID => isset($customData['creatorKuserId']) ? $customData['creatorKuserId'] : $row['KUSER_ID'],
 			);

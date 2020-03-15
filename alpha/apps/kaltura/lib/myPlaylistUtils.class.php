@@ -557,10 +557,15 @@ class myPlaylistUtils
 
 	public static function executeDynamicPlaylistViaEsearch ($entryFilters ,$totalResults, $pager = null)
 	{
+		$totalResults = (int)$totalResults;
 		$entryKPager = new kPager();
 		if ($pager)
 		{
 			$pager->toObject($entryKPager);
+		}
+		else
+		{
+			$entryKPager->setPageSize($totalResults);
 		}
 		$entryQueryToFilterESearch = new ESearchEntryQueryFromFilter();
 		$entryIds= array();

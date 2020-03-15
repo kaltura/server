@@ -119,12 +119,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	const MIX_EDITOR_TYPE_SIMPLE = 1;
 	const MIX_EDITOR_TYPE_ADVANCED = 2;
-	
-	const ENTRY_DURATION_TYPE_NOTAVAILABLE = "notavailable";
-	const ENTRY_DURATION_TYPE_SHORT = "short";
-	const ENTRY_DURATION_TYPE_MEDIUM = "medium";
-	const ENTRY_DURATION_TYPE_LONG = "long";
-	
+
 	const ENTRY_CATEGORY_ESCAPE = "_";
 	const ENTRY_CATEGORY_SEPARATOR = ",";
 	

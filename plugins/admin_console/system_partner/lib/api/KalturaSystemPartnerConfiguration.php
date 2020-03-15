@@ -415,6 +415,32 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $avoidIndexingSearchHistory;
 
+	/**
+	 * @var int
+	 */
+	public $usagePercent;
+
+	/**
+	 * @var int
+	 */
+	public $eightyPercentWarning;
+
+	/**
+	 * @var int
+	 */
+	public $usageLimitWarning;
+
+	/**
+	 * @var int
+	 */
+	public $lastFreeTrialNotificationDay;
+
+	/**
+	 * @var bool
+	 */
+	public $extendedFreeTrailEndsWarning;
+
+
 	private static $map_between_objects = array
 	(
 		"id",
@@ -494,7 +520,12 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"useSso",
 		"blockDirectLogin",
 		"ignoreSynonymEsearch",
-		"avoidIndexingSearchHistory"
+		"avoidIndexingSearchHistory",
+		"usagePercent",
+		"eightyPercentWarning",
+		"usageLimitWarning",
+		"lastFreeTrialNotificationDay",
+		"extendedFreeTrailEndsWarning"
 	);
 
 	public function getMapBetweenObjects()

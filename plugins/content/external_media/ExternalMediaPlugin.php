@@ -115,6 +115,11 @@ class ExternalMediaPlugin extends KalturaPlugin implements IKalturaServices, IKa
 		return self::getPluginName() . $externalSourceType . self::SEARCH_DATA_SUFFIX;
 	}
 
+	public static function getAPIExternalSourceTypeFromExternalSourceSearchData($value)
+	{
+		return substr($value, strlen(self::getPluginName()), strlen($value) - strlen(self::SEARCH_DATA_SUFFIX) - strlen(self::getPluginName()));
+	}
+
 	/* (non-PHPdoc)
 	 * @see IKalturaSearchDataContributor::getSearchData()
 	 */

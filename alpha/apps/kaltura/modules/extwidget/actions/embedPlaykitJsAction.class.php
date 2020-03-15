@@ -105,7 +105,7 @@ class embedPlaykitJsAction extends sfAction
 		$bundleContent = time() . "," . base64_decode($content['bundle']);
 		$bundleSaved =  $context->bundleCache->set($context->bundle_name, $bundleContent);
 		$context->sourceMapsCache->set($context->bundle_name, $sourceMapContent);
-		$i18nContent = base64_decode($content['i18n']);
+		$i18nContent = isset($content['i18n']) ? base64_decode($content['i18n']) : "";
 		$context->bundleCache->set($context->bundle_i18n_name, $i18nContent);
 		if(!$bundleSaved)
 		{
@@ -203,10 +203,9 @@ class embedPlaykitJsAction extends sfAction
 		$langArr = isset($langsParam) ? explode(",", $langsParam) : (!empty($this->uiConfLangs) ? $this->uiConfLangs : array("en"));
 		$partialI18nArr = array();
 		foreach ($langArr as $lang) {
-			$langMap = $i18nArr[$lang];
-			if (isset($langMap))
+			if (isset($i18nArr[$lang]))
 			{
-				$partialI18nArr[$lang] = $langMap;
+				$partialI18nArr[$lang] = $i18nArr[$lang];
 			}
 		}
 		return $partialI18nArr;
@@ -629,8 +628,10 @@ class embedPlaykitJsAction extends sfAction
 		$confVarsArr = json_decode($confVars, true);
 		$this->bundleConfig = $confVarsArr;
 		if (isset($confVarsArr[self::VERSIONS_PARAM_NAME])) {
-			$this->uiConfLangs = $confVarsArr[self::LANGS_PARAM_NAME];
 			$this->bundleConfig = $confVarsArr[self::VERSIONS_PARAM_NAME];
+		}
+		if (isset($confVarsArr[self::LANGS_PARAM_NAME])) {
+			$this->uiConfLangs = $confVarsArr[self::LANGS_PARAM_NAME];
 		}
 		$this->mergeVersionsParamIntoConfig();
 		if (!$this->bundleConfig) {
