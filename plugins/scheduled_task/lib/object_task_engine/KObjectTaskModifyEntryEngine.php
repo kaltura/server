@@ -182,7 +182,7 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 	 * @param string $entryId
 	 * @throws Exception
 	 */
-	private function resetMediaRepurposingData($metadataPlugin, $entryId)
+	protected function resetMediaRepurposingData($metadataPlugin, $entryId)
 	{
 		if(!$this->resetMediaRepurposingProfileId)
 		{
@@ -207,7 +207,7 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 	 * @param $metadataPlugin
 	 * @throws Exception
 	 */
-	private function initResetMediaRepurposingProfileId($metadataPlugin)
+	protected function initResetMediaRepurposingProfileId($metadataPlugin)
 	{
 		$filter = new KalturaMetadataProfileFilter();
 		$filter->systemNameEqual = MediaRepurposingUtils::MEDIA_REPURPOSING_SYSTEM_NAME;

@@ -78,7 +78,7 @@ class KalturaModifyEntryObjectTask extends KalturaObjectTask
 		$dbObject->setDataValue('inputUserId', $this->inputUserId);
 		$dbObject->setDataValue('inputEntitledUsersEdit', $this->inputEntitledUsersEdit);
 		$dbObject->setDataValue('inputEntitledUsersPublish', $this->inputEntitledUsersPublish);
-		$dbObject->setDataValue('$resetMediaRepurposingProcess', $this->resetMediaRepurposingProcess);
+		$dbObject->setDataValue('resetMediaRepurposingProcess', $this->resetMediaRepurposingProcess);
 		return $dbObject;
 	}
 
@@ -94,6 +94,6 @@ class KalturaModifyEntryObjectTask extends KalturaObjectTask
 		$this->inputUserId = $srcObj->getDataValue('inputUserId');
 		$this->inputEntitledUsersEdit = $srcObj->getDataValue('inputEntitledUsersEdit');
 		$this->inputEntitledUsersPublish = $srcObj->getDataValue('inputEntitledUsersPublish');
-		$this->resetMediaRepurposingProcess = $srcObj->getDataValue('$resetMediaRepurposingProcess');
+		$this->resetMediaRepurposingProcess = $srcObj->getDataValue('resetMediaRepurposingProcess');
 	}
 }
