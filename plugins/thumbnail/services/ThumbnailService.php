@@ -14,6 +14,7 @@ class ThumbnailService extends KalturaBaseUserService
 	 */
 	public function transformAction($transformString)
 	{
+		kApiCache::disableCache();
 		$transformation = thumbnailStringParser::parseTransformString($transformString);
 		$transformation->validate();
 		$lastModified = $transformation->getLastModified();
