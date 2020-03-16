@@ -147,12 +147,12 @@ class kESearchQueryManager
 
 	protected static function shouldReduceResults($partnerId)
 	{
-		$elasticReduceResultsPartners = kConf::get(ElasticSearchPlugin::REDUCE_RESULTS_PARTNER_LIST,ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP, array());
-		if (in_array($partnerId, $elasticReduceResultsPartners))
+		$elasticNonReduceResultsPartners = kConf::get(ElasticSearchPlugin::NON_REDUCE_RESULTS_PARTNER_LIST,ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP, array());
+		if (in_array($partnerId, $elasticNonReduceResultsPartners))
 		{
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 	}
 
 	public static function getExactMatchQuery($searchItem, $fieldName, $allowedSearchTypes, &$queryAttributes)

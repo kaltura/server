@@ -1,3 +1,51 @@
+# Orion 15.19.0 #
+
+## Changing storageUpdate script to run as a batch ##
+Issue Type: Task
+Issue ID : PLAT-10320
+
+### Configuration ##
+Add the following to batch.ini:
+
+enabledWorkers.KAsyncStorageUpdate = xxx (number of workers)
+
+[KAsyncStorageUpdate : PeriodicWorker]
+id                                                  = 800
+friendlyName                                        = STORAGE UPDATE
+type                                                = KAsyncStorageUpdate
+scriptPath                                          = batches/StorageUpdate/KAsyncStorageUpdateExe.php
+sleepBetweenStopStart                               = 86400
+params.debugMode				    = @1 for debuging mode, 0 for real run mode@
+
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2020_01_19_add_permissions_to_systempartner_jobs_partner.php
+
+## ecdn monitoring allow listTemplates ##
+Issue Type: Task
+Issue ID : PLAT-10625
+
+### Configuration ##
+  None
+	
+#### Deployment Scripts ####
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_03_09_monitoring_proxy_list_templates.php 
+
+
+## Add Live NG plugin ##
+Issue Type: Task
+Issue ID : PLAT-10358
+
+### Configuration ##
+  Add LiveCluster plugin in: configurations/plugins.ini 
+	
+
+#### Deployment Scripts ####
+  install plugins: 
+  
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php 
+
+
 # Orion 15.18.0 #
 
 ## Support sphinx sticky connection for read operations ##

@@ -12,6 +12,7 @@ abstract class KalturaEntryServerNodeBaseFilter extends KalturaFilter
 		"entryIdIn" => "_in_entry_id",
 		"serverNodeIdEqual" => "_eq_server_node_id",
 		"serverNodeIdIn" => "_in_server_node_id",
+		"serverNodeIdNotIn" => "_notin_server_node_id",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
@@ -60,6 +61,11 @@ abstract class KalturaEntryServerNodeBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $serverNodeIdIn;
+
+	/**
+	 * @var string
+	 */
+	public $serverNodeIdNotIn;
 
 	/**
 	 * @var time

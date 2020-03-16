@@ -23,8 +23,8 @@
 		public $maxInaccuracyValue=null;// Max allowed duration inaccuracy 
 
 		public $cmdLine = null;
-		
-		public $chunkEncodeToken = "chunkenc";	// Used to identify the chunked encode jobs
+		const CHUNK_ENCODE_POSTFIX = 'chunkenc';
+		public $chunkEncodeToken = self::CHUNK_ENCODE_POSTFIX;	// Used to identify the chunked encode jobs
 		public $videoChunkPostfix = 'vid';		// File postfix's
 		public $audioFilePostfix = 'aud';		//
 		
