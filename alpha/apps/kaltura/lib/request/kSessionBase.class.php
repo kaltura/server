@@ -40,6 +40,7 @@ class kSessionBase
 	const PRIVILEGE_ENABLE_ENTITLEMENT = "enableentitlement";
 	const PRIVILEGE_DISABLE_ENTITLEMENT = "disableentitlement";
 	const PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY = "disableentitlementforentry";
+	const PRIVILEGE_DISABLE_ENTITLEMENT_FOR_PLAYLIST = "disableentitlementforplaylist";
 	const PRIVILEGE_PRIVACY_CONTEXT = "privacycontext";
 	const PRIVILEGE_ENABLE_CATEGORY_MODERATION = "enablecategorymoderation";
 	const PRIVILEGE_REFERENCE_TIME = "reftime";
