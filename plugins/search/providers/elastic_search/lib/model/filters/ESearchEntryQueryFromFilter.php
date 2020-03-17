@@ -356,7 +356,48 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 
 	protected  function handleFreeTextField($field, $fieldValue)
 	{
-		$this->addingFieldPartIntoQuery(baseObjectFilter::IN, $field, $fieldValue);
+		$searchItem = null;
+		$values = explode(self::NOT_OPERATOR, $fieldValue, 2);
+
+		if (isset($values[1]))
+		{
+			$searchItem = new ESearchOperator();
+			$searchItem->setOperator(ESearchOperatorType::AND_OP);
+
+			$searchItemNot = $this->createNotPartialSearchItem($values[1]);
+			$freeTextSearchItem = $this->getFreeTextSearchItem($values[0]);
+			$searchItem->setSearchItems(array($freeTextSearchItem,$searchItemNot));
+		}
+
+		elseif (isset($values[0]))
+		{
+			$searchItem = $this->getFreeTextSearchItem($values[0]);
+		}
+
+		if ($searchItem)
+		{
+			$this->searchItems[] = $searchItem;
+		}
+	}
+
+	protected function getFreeTextSearchItem($value)
+	{
+		$freeTextValue = str_replace(self::WILDCARD_OPERATOR, '', $value);
+		$freeTextSearchItem = new ESearchUnifiedItem();
+		$freeTextSearchItem->setItemType(ESearchItemType::PARTIAL);
+		$freeTextSearchItem->setSearchTerm($freeTextValue);
+		return $freeTextSearchItem;
+	}
+
+	protected function createNotPartialSearchItem($value)
+	{
+		$searchItemNot = new ESearchOperator();
+		$searchItemNot->setOperator(ESearchOperatorType::NOT_OP);
+		$partialSearchItem = new ESearchUnifiedItem();
+		$partialSearchItem->setItemType(ESearchItemType::PARTIAL);
+		$partialSearchItem->setSearchTerm($value);
+		$searchItemNot->setSearchItems(array($partialSearchItem));
+		return $searchItemNot;
 	}
 
 	protected function handleDurationType($fieldValue)
