@@ -564,7 +564,7 @@ class ks extends kSessionBase
 		// foreach privileges group
 		foreach( $this->parsedPrivileges as $privilegeType => $privileges)
 		{
-			if ($privilegeType == self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY)
+			if ($privilegeType === self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY)
 			{
 				foreach($privileges as $privilege)
 				{
@@ -585,23 +585,22 @@ class ks extends kSessionBase
 	{
 		$entries = array();
 		// foreach privileges group
-		foreach( $this->parsedPrivileges as $privilegeType => $privileges)
+		foreach( $this->parsedPrivileges as $privilegeType => $privilege)
 		{
-			if ($privilegeType == self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_PLAYLIST)
+			if ($privilegeType === self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_PLAYLIST)
 			{
-				foreach($privileges as $privilege)
+				$entry = entryPeer::retrieveByPKNoFilter($privilege, null, false);
+				if ($entry && $entry->getStatus() != entryStatus::DELETED && $entry->getType() == entryType::PLAYLIST &&
+					self::isValidForPlaylistDisableEntitlement($entry->getMediaType()))
 				{
-					$entry = entryPeer::retrieveByPKNoFilter($privilege, null, false);
-					$entries[] = $privilege;
-					if($entry->getType() == entryType::PLAYLIST && self::isValidForPlaylistDisableEntitlement($entry->getMediaType()))
+					$entry_id_list_str = $entry->getDataContent();
+					$result = myPlaylistUtils::getEntryIdsFromStaticPlaylistString($entry_id_list_str);
+					if ($result)
 					{
-						$entry_id_list_str = $entry->getDataContent();
-						$result = myPlaylistUtils::getEntryIdsFromStaticPlaylistString($entry_id_list_str);
-						if($result)
-						{
-							$entries = array_merge($entries, $result);
-						}
+						$entries = $result;
 					}
+
+					$entries[] = $privilege;
 				}
 			}
 		}

@@ -302,7 +302,8 @@ class SessionService extends KalturaBaseService
 			$entryId = $widget->getEntryId();
 			$privileges .= ',' . kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY . ':' . $entryId;
 			$entry = entryPeer::retrieveByPKNoFilter($entryId, null, false);
-			if ($entry->getType() == entryType::PLAYLIST && ks::isValidForPlaylistDisableEntitlement($entry->getMediaType()))
+			if ($entry && $entry->getStatus() != entryStatus::DELETED && $entry->getType() == entryType::PLAYLIST
+				&& ks::isValidForPlaylistDisableEntitlement($entry->getMediaType()))
 			{
 				$privileges .= ',' . kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_PLAYLIST . ':' . $entryId;
 			}

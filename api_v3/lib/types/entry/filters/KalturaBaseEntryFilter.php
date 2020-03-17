@@ -196,8 +196,8 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 
 		$disableWidgetSessionFilters = false;
 		$c = $this->prepareEntriesCriteriaFilter($pager);
-		if ($this && ($this->idEqual != null || $this->idIn != null || $this->referenceIdEqual != null ||
-			$this->redirectFromEntryId != null || $this->referenceIdIn != null || $this->parentEntryIdEqual != null))
+		if ($this->idEqual || $this->idIn || $this->referenceIdEqual || $this->redirectFromEntryId
+			|| $this->referenceIdIn || $this->parentEntryIdEqual )
 		{
 			$disableWidgetSessionFilters = true;
 			if (kEntitlementUtils::getEntitlementEnforcement() && !kCurrentContext::$is_admin_session &&
