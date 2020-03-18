@@ -1506,35 +1506,6 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Sets content of existing $copyObj object to current context $this
-	 * @param categoryEntry $copyObj
-	 * @throws PropelException
-	 */
-	public function copyFrom(categoryEntry $copyObj)
-	{
-		$this->setPartnerId($copyObj->partner_id);
-
-		$this->setEntryId($copyObj->entry_id);
-
-		$this->setCategoryId($copyObj->category_id);
-
-		$this->setCategoryFullIds($copyObj->category_full_ids);
-
-		$this->setCreatedAt($copyObj->created_at);
-
-		$this->setUpdatedAt($copyObj->updated_at);
-
-		$this->setCustomData($copyObj->custom_data);
-
-		$this->setStatus($copyObj->status);
-
-		$this->setPrivacyContext($copyObj->privacy_context);
-
-		$this->setCreatorKuserId($copyObj->creator_kuser_id);
-
-	}
-
-	/**
 	 * Makes a copy of this object that will be inserted as a new row in table when saved.
 	 * It creates a new object filling in the simple attributes, but skipping any primary
 	 * keys that are defined for the table.
