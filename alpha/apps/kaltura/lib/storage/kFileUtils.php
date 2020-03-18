@@ -289,4 +289,20 @@ class kFileUtils extends kFile
 		return $fileType;
 	}
 
+	public static function getMostRecentModificationTimeFromDir($dir)
+	{
+		$mostRecentModificationTime = 0;
+		foreach(scandir($dir) as $file)
+		{
+			if(is_file($dir.$file))
+			{
+				$fileModificationTime = filemtime($dir.$file);
+				if ($fileModificationTime > $mostRecentModificationTime)
+				{
+					$mostRecentModificationTime = $fileModificationTime;
+				}
+			}
+		}
+		return $mostRecentModificationTime;
+	}
 }

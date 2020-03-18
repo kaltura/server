@@ -5,6 +5,7 @@
  * @package Scheduler
  * @subpackage Conversion.engines
  */
+require_once(__DIR__.'/../../../../alpha/apps/kaltura/lib/dateUtils.class.php');
 abstract class KJobConversionEngine extends KConversionEngine
 {
 	/**
@@ -146,13 +147,65 @@ abstract class KJobConversionEngine extends KConversionEngine
 		
 		return array ( true , $error_message );// indicate all was converted properly
 	}
-	
+
+	protected function isConversionProgressing($currentModificationTime)
+	{
+		if (is_file($this->inFilePath))
+		{
+			$newModificationTime = filemtime($this->inFilePath);
+			if ($newModificationTime !== false && $newModificationTime > $currentModificationTime)
+			{
+				return $newModificationTime;
+			}
+		}
+		return false;
+	}
+
+	protected function getReturnValues($handle)
+	{
+		$return_var = false;
+		$output = false;
+		if ($handle)
+		{
+			$return_var = 0;
+			$file = escapeshellarg($this->outFilePath);
+			if (is_file($file))
+			{
+				$output = `tail -n 1 $file`;
+			}
+		}
+		return array($output, $return_var);
+	}
+
 	/**
 	 *
 	 */
 	protected function execute_conversion_cmdline($command, &$return_var)
 	{
-		$output = system($command, $return_var);
+		$handle = popen($command, 'r');
+		stream_set_blocking ($handle,0) ;
+		$currentModificationTime = 0;
+		$lastTimeOutSet = time();
+		$maximumExecutionTime = KBatchBase::$taskConfig->maximumExecutionTime;
+		while(!feof($handle))
+		{
+			clearstatcache();
+			$buffer = fread($handle,1);
+			$newModificationTime = $this->isConversionProgressing($currentModificationTime);
+			if($newModificationTime)
+			{
+				if ($lastTimeOutSet + dateUtils::HOUR < time())
+				{
+					set_time_limit($maximumExecutionTime);
+					$lastTimeOutSet = time();
+					KalturaLog::debug('Previous modification time was:  ' . $currentModificationTime . ', new modification time is: '. $newModificationTime);
+					KalturaLog::debug('Setting time out '. $maximumExecutionTime);
+				}
+				$currentModificationTime = $newModificationTime;
+			}
+		}
+		list($output, $return_var) = $this->getReturnValues($handle);
+		pclose($handle);
 		return $output;
 	}
 }

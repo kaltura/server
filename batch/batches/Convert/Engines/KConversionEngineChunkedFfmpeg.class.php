@@ -3,9 +3,11 @@
  * @package Scheduler
  * @subpackage Conversion.engines
  */
+require_once(__DIR__.'/../../../../alpha/apps/kaltura/lib/storage/kFileUtils.php');
 class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 {
 	const CHUNKED_FFMPEG = "chunked_ffmpeg";
+	const CHUNKED_DIR = 'chunkenc';
 	
 	public function getName()
 	{
@@ -121,9 +123,23 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 		$cmdLine.= " >> ".$this->logFilePath." 2>&1";
 		KalturaLog::log("Final cmdLine:$cmdLine");
 
-		$output = system($cmdLine, $returnVar);
+		$output = parent::execute_conversion_cmdline($cmdLine, $returnVar);
 		KalturaLog::log("rv($returnVar),".print_r($output,1));
 		return $output;
+	}
+
+	protected function isConversionProgressing($currentModificationTime)
+	{
+		$dir = $this->inFilePath .'_'.self::CHUNKED_DIR.'/';
+		if (is_dir($dir))
+		{
+			$newModificationTime = kFileUtils::getMostRecentModificationTimeFromDir($dir);
+			if ($newModificationTime !== false && $newModificationTime > $currentModificationTime)
+			{
+				return $newModificationTime;
+			}
+		}
+		return false;
 	}
 	
 	/**
