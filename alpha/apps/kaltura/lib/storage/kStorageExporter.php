@@ -16,13 +16,28 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{		
-		// if changed object is entry 
-		if($object instanceof entry && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && in_array(entryPeer::MODERATION_STATUS, $modifiedColumns) && $object->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_APPROVED)
+		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()))
+		{
+			return false;
+		}
+
+		// if changed object is entry
+		if($object instanceof entry && in_array(entryPeer::MODERATION_STATUS, $modifiedColumns) && $object->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_APPROVED)
 			return true;
 		
 		// if changed object is flavor asset or thumb asset
-		if(($object instanceof flavorAsset || $object instanceof thumbAsset) && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
+		if(($object instanceof flavorAsset || $object instanceof thumbAsset) && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
 			return true;
+
+		// if changed object is file sync
+		if ($object instanceof FileSync
+			&& in_array(FileSyncPeer::STATUS, $modifiedColumns)
+			&& $object->getColumnsOldValue(FileSyncPeer::STATUS) == FileSync::FILE_SYNC_STATUS_PENDING
+			&& $object->getStatus() == FileSync::FILE_SYNC_STATUS_READY
+			&& !in_array($object->getDc(), kDataCenterMgr::getDcIds()))
+		{
+			return true;
+		}
 			
 		return false;		
 	}
@@ -59,6 +74,21 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 				}
 			}
 		}
+
+		// if changed object is file sync
+		if ($object instanceof FileSync
+			&& in_array(FileSyncPeer::STATUS, $modifiedColumns)
+			&& $object->getColumnsOldValue(FileSyncPeer::STATUS) == FileSync::FILE_SYNC_STATUS_PENDING
+			&& $object->getStatus() == FileSync::FILE_SYNC_STATUS_READY
+			&& !in_array($object->getDc(), kDataCenterMgr::getDcIds()))
+		{
+			$storageProfile = StorageProfilePeer::retrieveByPK($object->getDc());
+			if($storageProfile && $storageProfile->getExportPeriodically())
+			{
+				self::handlePeriodicFileExportFinished($object);
+			}
+		}
+
 		return true;
 	}
 
@@ -114,7 +144,13 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @param FileSyncKey $key
 	 */
 	static protected function export(entry $entry, StorageProfile $externalStorage, FileSyncKey $key, $force = false)
-	{			
+	{
+		$partner = $entry->getPartner();
+		if($externalStorage->getExportPeriodically() && $partner && $partner->getStorageDeleteFromKaltura())
+		{
+			return;
+		}
+
 		/* @var $fileSync FileSync */
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key,true,false);
 		if (!$fileSync || $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL) {
@@ -125,7 +161,16 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		$externalFileSync = kFileSyncUtils::createPendingExternalSyncFileForKey($key, $externalStorage, $fileSync->getIsDir());
 		
 		$srcFileSync = kFileSyncUtils::resolve($fileSync);
-		kJobsManager::addStorageExportJob(null, $entry->getId(), $entry->getPartnerId(), $externalStorage, $externalFileSync, $srcFileSync, $force, $fileSync->getDc());
+		if($externalStorage->getExportPeriodically())
+		{
+			$externalFileSync->setSrcPath($srcFileSync->getFullPath());
+			$externalFileSync->setSrcEncKey($srcFileSync->getSrcEncKey());
+			$externalFileSync->save();
+		}
+		else
+		{
+			kJobsManager::addStorageExportJob(null, $entry->getId(), $entry->getPartnerId(), $externalStorage, $externalFileSync, $srcFileSync, $force, $fileSync->getDc());
+		}
 		return true;
 	}
 	
@@ -440,5 +485,20 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 		self::deleteAdditionalEntryFilesFromStorage($entry, $profile);
 	}
-	
+
+
+	public static function handlePeriodicFileExportFinished($fileSync)
+	{
+		$asset = assetPeer::retrieveByFileSync($fileSync);
+		if($asset && $asset->getStatus() == asset::ASSET_STATUS_READY)
+		{
+			if(kFlowHelper::isAssetExportFinished($fileSync, $asset))
+			{
+				if(!is_null($asset->getentry()) && !is_null($asset->getentry()->getReplacedEntryId()))
+					kFlowHelper::handleEntryReplacementFileSyncDeletion($fileSync, array(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC));
+
+				kFlowHelper::conditionalAssetLocalFileSyncsDelete($fileSync, $asset);
+			}
+		}
+	}
 }

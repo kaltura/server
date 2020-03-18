@@ -86,6 +86,8 @@ class Partner extends BasePartner
 
 	const CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST = 'allowedFromEmailWhiteList';
 
+	const STORAGE_PERIODIC_IDS = 'storage_periodic_ids';
+
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -2149,6 +2151,16 @@ class Partner extends BasePartner
 	public function setAvoidIndexingSearchHistory($v)
 	{
 		$this->putInCustomData('avoidIndexingSearchHistory', $v);
+	}
+
+	public function getStoragePeriodicIds()
+	{
+		return $this->getFromCustomData(self::STORAGE_PERIODIC_IDS, null, '');
+	}
+
+	public function setStoragePeriodicIds($v)
+	{
+		$this->putInCustomData(self::STORAGE_PERIODIC_IDS, $v);
 	}
 
 

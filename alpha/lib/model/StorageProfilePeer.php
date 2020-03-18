@@ -59,6 +59,17 @@ class StorageProfilePeer extends BaseStorageProfilePeer
 
 		return StorageProfilePeer::doSelect($criteria, $con);
 	}
+
+	protected static function getPeriodicStorageIds($partnerId)
+	{
+		$periodicStorageIds = array();
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if($partner && $partner->getStoragePeriodicIds())
+		{
+			$periodicStorageIds = explode(',', $partner->getStoragePeriodicIds());
+		}
+		return $periodicStorageIds;
+	}
 	
 	public static function retrieveExternalByPartnerId($partnerId, $ids = null, $con = null)
 	{

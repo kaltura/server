@@ -1191,7 +1191,7 @@ class kFlowHelper
 		// verifies that flavor asset created
 		if(!$data->getFlavorAssetId())
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
-		
+
 		if(!$dbBatchJob->getEntry())
 		{
 			KalturaLog::debug("Entry [{$dbBatchJob->getEntryId()}] not found, the entry is porbably deleted will return job instead of api exception");
@@ -1925,7 +1925,7 @@ class kFlowHelper
 	 * @param FileSync $fileSync
 	 * @param array $fileSyncSubTypesToHandle
 	 */
-	private static function handleEntryReplacementFileSyncDeletion (FileSync $fileSync, $fileSyncSubTypesToHandle)
+	public static function handleEntryReplacementFileSyncDeletion (FileSync $fileSync, $fileSyncSubTypesToHandle)
 	{	
 		$c = new Criteria();
 		$c->add(FileSyncPeer::FILE_TYPE, array (FileSync::FILE_SYNC_FILE_TYPE_URL, FileSync::FILE_SYNC_FILE_TYPE_FILE), Criteria::IN);
@@ -1956,7 +1956,7 @@ class kFlowHelper
 		}
 	}
 	
-	private static function isAssetExportFinished(FileSync $fileSync, asset $asset)
+	public static function isAssetExportFinished(FileSync $fileSync, asset $asset)
 	{
 		$c = new Criteria();
 		$c->addAnd ( FileSyncPeer::OBJECT_ID , $fileSync->getObjectId() );
@@ -1972,7 +1972,7 @@ class kFlowHelper
 			return true;
 	}
 	
-	private static function conditionalAssetLocalFileSyncsDelete(FileSync $fileSync, asset $asset)
+	public static function conditionalAssetLocalFileSyncsDelete(FileSync $fileSync, asset $asset)
 	{
 		$unClosedStatuses = array (
 			asset::ASSET_STATUS_QUEUED,
