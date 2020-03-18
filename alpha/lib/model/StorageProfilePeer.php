@@ -56,11 +56,25 @@ class StorageProfilePeer extends BaseStorageProfilePeer
 		$criteria = new Criteria(StorageProfilePeer::DATABASE_NAME);
 		$criteria->add(StorageProfilePeer::PARTNER_ID, array(0, $partnerId), Criteria::IN);
 		$criteria->add(StorageProfilePeer::STATUS, StorageProfile::STORAGE_STATUS_AUTOMATIC);
-
-		return StorageProfilePeer::doSelect($criteria, $con);
+		$profiles = StorageProfilePeer::doSelect($criteria, $con);
+		$periodicProfiles = self::getPeriodicStorageProfiles($partnerId);
+		return array_merge($profiles, $periodicProfiles);
 	}
 
-	protected static function getPeriodicStorageIds($partnerId)
+	public static function retrieveExternalByPartnerId($partnerId, $ids = null, $con = null)
+	{
+		$criteria = new Criteria(StorageProfilePeer::DATABASE_NAME);
+		$criteria->add(StorageProfilePeer::PARTNER_ID, $partnerId);
+		$criteria->add(StorageProfilePeer::STATUS, array(StorageProfile::STORAGE_STATUS_AUTOMATIC, StorageProfile::STORAGE_STATUS_MANUAL), Criteria::IN);
+		if (!is_null($ids) && !(empty($ids)))
+			$criteria->add(StorageProfilePeer::ID, $ids, Criteria::IN);
+		$profiles = StorageProfilePeer::doSelect($criteria, $con);
+		$periodicProfiles = self::getPeriodicStorageProfiles($partnerId);
+		return array_merge($profiles, $periodicProfiles);
+	}
+
+
+	protected static function getPeriodicStorageProfiles($partnerId, $con = null)
 	{
 		$periodicStorageIds = array();
 		$partner = PartnerPeer::retrieveByPK($partnerId);
@@ -68,19 +82,13 @@ class StorageProfilePeer extends BaseStorageProfilePeer
 		{
 			$periodicStorageIds = explode(',', $partner->getStoragePeriodicIds());
 		}
-		return $periodicStorageIds;
-	}
-	
-	public static function retrieveExternalByPartnerId($partnerId, $ids = null, $con = null)
-	{
+
 		$criteria = new Criteria(StorageProfilePeer::DATABASE_NAME);
-		$criteria->add(StorageProfilePeer::PARTNER_ID, $partnerId);
-		$criteria->add(StorageProfilePeer::STATUS, array(StorageProfile::STORAGE_STATUS_AUTOMATIC, StorageProfile::STORAGE_STATUS_MANUAL), Criteria::IN);
-		if (!is_null($ids) && !(empty($ids)))
-			$criteria->add(StorageProfilePeer::ID, $ids, Criteria::IN);	
+		$criteria->add(StorageProfilePeer::ID, $periodicStorageIds, Criteria::IN);
+		$criteria->add(StorageProfilePeer::STATUS, StorageProfile::STORAGE_STATUS_AUTOMATIC);
 		return StorageProfilePeer::doSelect($criteria, $con);
 	}
-	
+
 	public static function retrieveByIdAndPartnerId($storageId, $partnerId, $con = null)
 	{
 		$criteria = new Criteria(StorageProfilePeer::DATABASE_NAME);
