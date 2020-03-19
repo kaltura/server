@@ -137,7 +137,7 @@ class kEntitlementUtils
 			$disableEntitlementValidation = $cache->multiGet($disableEntitlementValidationKeys);
 			if($disableEntitlementValidation !== false && count($disableEntitlementValidation) > 0)
 			{
-				KalturaLog::debug("Disable entitlement validation was enabled on key " . print_r(array_keys($disableEntitlementValidation), true));
+				KalturaLog::debug("Disable entitlement validation was enabled for key [" . print_r(array_keys($disableEntitlementValidation), true) . "], entitlement validation will not run");
 				return true;
 			}
 		}
