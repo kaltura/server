@@ -1,3 +1,28 @@
+# Orion 15.20.0 #
+
+## Add periodic storage export batch ##
+Issue Type: Task
+Issue ID : PLAT-10735
+
+### Configuration ##
+    - Enable MultiCenters plugin in plugins.ini
+    - Add FEATURE_REMOTE_STORAGE permission to partner 0
+    - Add the following to batch.ini:
+
+        enabledWorkers.KAsyncStoragePeriodicExport            = 1
+
+        [KAsyncStoragePeriodicExport : PeriodicWorker]
+        id                                                  = @ID@
+        friendlyName                                        = Storage Periodic Export
+        type                                                = KAsyncStoragePeriodicExport
+        scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicExportExe.php
+        params.maxCount                                     = 100
+        params.profileIdsIn                                 = @PRODILE_IDS_COMMA_SEPERATED@
+
+#### Deployment Scripts ####
+    php deployment/updates/scripts/add_permissions/2020_03_12_add_permission_storage_profile_lock_pending_file_syncs.php
+    php /opt/kaltura/app/deployment/base/scripts/createQueryCacheTriggers.php create <myql-server> <mysql-user> <mysql-pass> realrun
+
 # Orion 15.19.0 #
 
 ## Add Live NG plugin ##

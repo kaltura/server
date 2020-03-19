@@ -190,6 +190,7 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 	{
 		$responseProfile = new KalturaDetachedResponseProfile();
 		self::$kClient->setResponseProfile($responseProfile);
+		KBatchBase::impersonate(0);
 		if($this->currentIndex >= count($this->storageProfileIdsArray))
 		{
 			$this->currentIndex = 0;
@@ -202,7 +203,7 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 		{
 			KalturaLog::debug("Could not find storage Profile id [$storageProfileId]");
 		}
-
+		KBatchBase::unimpersonate();
 		return $storageProfile;
 	}
 
