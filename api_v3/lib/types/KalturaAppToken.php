@@ -155,7 +155,6 @@ class KalturaAppToken extends KalturaObject implements IFilterable
 		$dbAppToken->setToken(bin2hex(openssl_random_pseudo_bytes(16)));
 		$dbAppToken->setStatus(AppTokenStatus::ACTIVE);
 		$dbAppToken->setKuserIdBySessionUserId();
-//		AppToken::setKuserIdBySessionUserId($dbAppToken, $this->sessionUserId);
 
 		return $dbAppToken;
 	}
