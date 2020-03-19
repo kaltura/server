@@ -4,6 +4,9 @@ class kUploadTokenMgr
 	const NO_EXTENSION_IDENTIFIER = 'noex';
 	const AUTO_FINALIZE_CACHE_TTL = 2592000; //Thirty days in seconds
 	const MAX_AUTO_FINALIZE_RETIRES = 5;
+	const MAX_APPEND_TIME = 5;
+	const MIN_CHUNK_SIZE_IN_BYTES = 1048576;
+	const MAX_ALLOWED_CHUNKS_LOWER_THAN_MIN_CHUNK = 100;
 	
 	/**
 	 * @var UploadToken
@@ -101,11 +104,16 @@ class kUploadTokenMgr
 		}
 		
 		if ($resume)
-			$fileSize = $this->handleResume($fileData, $resumeAt);
+		{
+			$sourceFilePath = $fileData['tmp_name'];
+			$chunkSize = filesize($sourceFilePath);
+			$fileSize = $this->handleResume($fileData, $resumeAt, $sourceFilePath, $chunkSize);
+		}
 		else
 		{
 			$this->handleMoveFile($fileData);
 			$fileSize = kFile::fileSize($this->_uploadToken->getUploadTempPath());
+			$chunkSize = $fileSize;
 		}
 		
 		if ($this->_finalChunk)
@@ -123,10 +131,37 @@ class kUploadTokenMgr
 			$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD);
 		}
 		
+		if($this->shouldFailUpload($chunkSize))
+		{
+			$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_FAILED);
+			KalturaLog::debug("Chunk count for Chunks smaller than [" . self::MIN_CHUNK_SIZE_IN_BYTES . "] bytes exceeded");
+		}
+		
 		$this->_uploadToken->setUploadedFileSize($fileSize);
 		$this->_uploadToken->setDc(kDataCenterMgr::getCurrentDcId());
 		
 		$this->_uploadToken->save();
+	}
+	
+	private function shouldFailUpload($chunkSize)
+	{
+		if($chunkSize < self::MIN_CHUNK_SIZE_IN_BYTES && $this->_uploadToken->getStatus() !== UploadToken::UPLOAD_TOKEN_FULL_UPLOAD)
+		{
+			$cache = isset($this->_autoFinalizeCache) ? $this->_autoFinalizeCache : kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_UPLOAD_TOKEN);
+			if($cache)
+			{
+				$smallChunkCount = $cache->increment($this->_uploadToken->getId()."_smallChunkCount");
+				if(!$smallChunkCount)
+				{
+					$cache->set($this->_uploadToken->getId()."_smallChunkCount", 1, 86400);
+				}
+				if($smallChunkCount > self::MAX_ALLOWED_CHUNKS_LOWER_THAN_MIN_CHUNK)
+				{
+					$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_FAILED);
+					KalturaLog::debug("Chunk count for Chunks smaller than [" . self::MIN_CHUNK_SIZE_IN_BYTES . "] bytes exceeded");
+				}
+			}
+		}
 	}
 	
 	/**
@@ -206,8 +241,12 @@ class kUploadTokenMgr
 	{
 		if (!$extension)
 			$extension = self::NO_EXTENSION_IDENTIFIER;
-			
-		return myContentStorage::getFSUploadsPath().substr($uploadTokenId, -2).'/'.$uploadTokenId.'.'.$extension;
+		
+		return myContentStorage::getFSUploadsPath().
+			substr($uploadTokenId, -2).'/'.
+			substr($uploadTokenId, -4, 2).'/'.
+			$uploadTokenId.'.'.$extension;
+		
 	}
 	
 	protected function tryMoveToErrors($fileData)
@@ -226,13 +265,11 @@ class kUploadTokenMgr
 	 * @param bool $finalChunk        	
 	 * @param float $resumeAt        	
 	 */
-	protected function handleResume($fileData, $resumeAt)
+	protected function handleResume($fileData, $resumeAt, $sourceFilePath, $chunkSize)
 	{
 		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
 		if (!file_exists($uploadFilePath))
 			throw new kUploadTokenException("Temp file [$uploadFilePath] was not found when trying to resume", kUploadTokenException::UPLOAD_TOKEN_FILE_NOT_FOUND_FOR_RESUME);
-		
-		$sourceFilePath = $fileData['tmp_name'];
 		
 		if ($resumeAt != -1) // this may not be a sequential chunk added at the end of the file
 		{
@@ -240,11 +277,10 @@ class kUploadTokenMgr
 			$verifyFinalChunk = $this->_finalChunk && $resumeAt > 0;
 			
 			// if this is the final chunk the expected file size would be the resume position + the last chunk size
-			$chunkSize = filesize($sourceFilePath);
 			$expectedFileSize = $verifyFinalChunk ? ($resumeAt + $chunkSize) : 0;
 
 			$chunkFilePath = "$uploadFilePath.chunk.$resumeAt";
-			$succeeded = rename($sourceFilePath, $chunkFilePath);
+			$succeeded = kFile::moveFile($sourceFilePath, $chunkFilePath);
 			
 			if($this->_autoFinalize && $this->checkIsFinalChunk($chunkSize) && $succeeded)
 			{
@@ -260,7 +296,7 @@ class kUploadTokenMgr
 				if ($count ++)
 					Sleep(1);
 				
-				$currentFileSize = self::appendAvailableChunks($uploadFilePath);
+				$currentFileSize = self::appendAvailableChunks($uploadFilePath, $verifyFinalChunk);
 				KalturaLog::log("handleResume iteration: $count chunk: $chunkFilePath size: $chunkSize finalChunk: {$this->_finalChunk} filesize: $currentFileSize expected: $expectedFileSize");
 			} while ($verifyFinalChunk && $currentFileSize != $expectedFileSize && $count < $uploadFinalChunkMaxAppendTime);
 
@@ -357,7 +393,7 @@ class kUploadTokenMgr
 		unlink($sourceFilePath);
 	}
 
-	static protected function appendAvailableChunks($targetFilePath)
+	static protected function appendAvailableChunks($targetFilePath, $verifyFinalChunk)
 	{
 		$targetFileResource = fopen($targetFilePath, 'r+b');
 		
@@ -369,7 +405,9 @@ class kUploadTokenMgr
 		// 1. parallel procesess trying to add the same chunk
 		// 2. append failing half way and recovered by the client resneding the same chunk. The random part in the locked file name
 		// will prevent the re-uploaded chunk from coliding with the failed one
-		while (1) {
+		$appendStartTime = microtime(true);
+		while ( ((microtime(true) - $appendStartTime) < self::MAX_APPEND_TIME) || $verifyFinalChunk )
+		{
 			$currentFileSize = ftell($targetFileResource);
 			
 			$validChunk = false;
@@ -407,7 +445,7 @@ class kUploadTokenMgr
 				break;
 			
 			$lockedFile = "$nextChunk.".microtime(true).".locked";
-			if (! rename($nextChunk, $lockedFile)) // another process is already appending this file
+			if (! kFile::moveFile($nextChunk, $lockedFile)) // another process is already appending this file
 			{
 				KalturaLog::log("rename($nextChunk, $lockedFile) failed");
 				break;
