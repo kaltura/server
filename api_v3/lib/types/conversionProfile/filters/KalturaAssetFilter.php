@@ -25,7 +25,19 @@ class KalturaAssetFilter extends KalturaAssetBaseFilter
 	 * @return array
 	 * @throws KalturaAPIException
 	 */
-	public function validateAndRetrieveEntryIdFiltered()
+	public function validateEntryIdsFiltered()
+	{
+		if (!$this->entryIdEqual && !$this->entryIdIn)
+		{
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, $this->getFormattedPropertyNameWithClassName('entryIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('entryIdIn'));
+		}
+	}
+
+	/**
+	 * @return array
+	 * @throws KalturaAPIException
+	 */
+	public function retrieveEntryIdsFiltered()
 	{
 		if ($this->entryIdEqual)
 		{
@@ -35,10 +47,7 @@ class KalturaAssetFilter extends KalturaAssetBaseFilter
 		{
 			return explode(',', $this->entryIdIn);
 		}
-		else
-		{
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, $this->getFormattedPropertyNameWithClassName('entryIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('entryIdIn'));
-		}
+		return array();
 	}
 
 	/* (non-PHPdoc)
@@ -54,7 +63,8 @@ class KalturaAssetFilter extends KalturaAssetBaseFilter
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
 
 		// verify access to the relevant entries - either same partner as the KS or kaltura network
-		$entryIds = $this->validateAndRetrieveEntryIdFiltered();
+		$this->validateEntryIdsFiltered();
+		$entryIds = $this->retrieveEntryIdsFiltered();
 		$entryIds = entryPeer::filterEntriesByPartnerOrKalturaNetwork($entryIds, kCurrentContext::getCurrentPartnerId());
 		if (!$entryIds)
 		{

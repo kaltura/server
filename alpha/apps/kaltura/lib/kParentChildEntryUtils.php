@@ -1,6 +1,6 @@
 <?php
 /**
- * kParentChildUtils is all utils needed for entry parent-child use cases.
+ * kParentChildEntryUtils is all utils needed for entry parent-child use cases.
  * @package Core
  * @subpackage utils
  *
