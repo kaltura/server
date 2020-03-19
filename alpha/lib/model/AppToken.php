@@ -103,13 +103,12 @@ class AppToken extends BaseAppToken
 	}
 
 	/**
-	 * @param AppToken $dbAppToken
-	 * @param $sessionUserId
 	 * @throws KalturaAPIException
 	 */
-	public static function setKuserIdBySessionUserId(AppToken $dbAppToken, $sessionUserId)
+	public function setKuserIdBySessionUserId()
 	{
 		$partnerId = kCurrentContext::getCurrentPartnerId();
+		$sessionUserId = $this->getSessionUserId();
 
 		//if user doesn't exists - create it
 		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $sessionUserId);
@@ -120,6 +119,6 @@ class AppToken extends BaseAppToken
 
 			$kuser = kuserPeer::createKuserForPartner($partnerId, $sessionUserId);
 		}
-		$dbAppToken->setKuserId($kuser->getId());
+		$this->setKuserId($kuser->getId());
 	}
 }// AppToken

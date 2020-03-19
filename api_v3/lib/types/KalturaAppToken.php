@@ -154,7 +154,8 @@ class KalturaAppToken extends KalturaObject implements IFilterable
 		$dbAppToken->setPartnerId($partnerId);
 		$dbAppToken->setToken(bin2hex(openssl_random_pseudo_bytes(16)));
 		$dbAppToken->setStatus(AppTokenStatus::ACTIVE);
-		AppToken::setKuserIdBySessionUserId($dbAppToken, $this->sessionUserId);
+		$dbAppToken->setKuserIdBySessionUserId();
+//		AppToken::setKuserIdBySessionUserId($dbAppToken, $this->sessionUserId);
 
 		return $dbAppToken;
 	}
@@ -165,7 +166,9 @@ class KalturaAppToken extends KalturaObject implements IFilterable
 	public function toUpdatableObject($dbAppToken, $skip = array())
 	{
 		$dbAppToken = parent::toUpdatableObject($dbAppToken, $skip);
-		AppToken::setKuserIdBySessionUserId($dbAppToken, $this->sessionUserId);
+
+		/* @var $dbAppToken AppToken */
+		$dbAppToken->setKuserIdBySessionUserId();
 	}
 	
 	/* (non-PHPdoc)
