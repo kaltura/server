@@ -130,6 +130,20 @@ class kEntitlementUtils
 	 */
 	public static function isEntryEntitled(entry $entry, $kuserId = null)
 	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_API_V3);
+		if($cache)
+		{
+			$disableEntitlementValidationKeys = array('disable_entitlement_validation',
+				'disable_entitlement_validation_entry_'.$entry->getId(),
+				'disable_entitlement_validation_partner_'.$entry->getPartnerId());
+			$disableEntitlementValidation = $cache->multiGet($disableEntitlementValidationKeys);
+			if(is_array($disableEntitlementValidation) && count($disableEntitlementValidation) > 0)
+			{
+				KalturaLog::debug("Disable entitlement validation was enabled for key [" . print_r(array_keys($disableEntitlementValidation), true) . "], entitlement validation will not run");
+				return true;
+			}
+		}
+		
 		if($entry->getPartnerId() == PartnerPeer::GLOBAL_PARTNER)
 		{
 			return true;
