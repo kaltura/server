@@ -1,3 +1,12 @@
+# Orion 15.20.0 #
+
+## Update permissions for systemPartner and job services ##
+Issue Type: Task
+Issue ID : PLAT-10740
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2020_03_17_update_permissions_systemPartner_jobs.php
+
 # Orion 15.19.0 #
 
 ## Changing storageUpdate script to run as a batch ##
