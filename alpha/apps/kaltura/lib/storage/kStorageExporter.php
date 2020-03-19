@@ -85,7 +85,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			$storageProfile = StorageProfilePeer::retrieveByPK($object->getDc());
 			if($storageProfile && $storageProfile->getExportPeriodically())
 			{
-				self::handlePeriodicFileExportFinished($object);
+				self::handlePeriodicFileExportFinished($object, $storageProfile);
 			}
 		}
 
@@ -487,18 +487,57 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	}
 
 
-	public static function handlePeriodicFileExportFinished($fileSync)
+	public static function handlePeriodicFileExportFinished($fileSync, $storageProfile)
 	{
-		$asset = assetPeer::retrieveByFileSync($fileSync);
-		if($asset && $asset->getStatus() == asset::ASSET_STATUS_READY)
+		$externalProfiles = StorageProfilePeer::retrieveExternalByPartnerId($fileSync->getPartnerId(), null, null, false);
+		$allExported = true;
+		if(!$externalProfiles)
 		{
-			if(kFlowHelper::isAssetExportFinished($fileSync, $asset))
+			$keysArray = array();
+			$object = assetPeer::retrieveById($fileSync->getObjectId());
+			if(!$object)
 			{
-				if(!is_null($asset->getentry()) && !is_null($asset->getentry()->getReplacedEntryId()))
-					kFlowHelper::handleEntryReplacementFileSyncDeletion($fileSync, array(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC));
+				return;
+			}
+			$entryId = $object->getEntryId();
+			$flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($entryId, null, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
+			$fileSyncSubTypes = array(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 
-				kFlowHelper::conditionalAssetLocalFileSyncsDelete($fileSync, $asset);
+			foreach ($flavorAssets as $flavorAsset)
+			{
+				if($flavorAsset->getIsOriginal())
+				{
+					continue;
+				}
+				foreach ($fileSyncSubTypes as $subType)
+				{
+					$key = $flavorAsset->getSyncKey($subType);
+					if(!$storageProfile->isExported($key))
+					{
+						KalturaLog::debug("Required file was not exported");
+						$allExported = false;
+						break;
+					}
+					$keysArray[$flavorAsset->getId()] = $key->getVersion();
+				}
+				if($allExported == false)
+				{
+					break;
+				}
+			}
+
+			if($allExported)
+			{
+				foreach ($flavorAssets as $flavorAsset)
+				{
+					if($flavorAsset->getIsOriginal())
+					{
+						continue;
+					}
+					kFlowHelper::deleteAssetLocalFileSyncs($keysArray[$flavorAsset->getId()], $flavorAsset);
+				}
 			}
 		}
 	}
+
 }

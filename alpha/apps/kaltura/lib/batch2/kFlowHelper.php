@@ -2015,7 +2015,7 @@ class kFlowHelper
 		}
 	}
 	
-	private static function deleteAssetLocalFileSyncs($fileSyncVersion, asset $asset)
+	public static function deleteAssetLocalFileSyncs($fileSyncVersion, asset $asset)
 	{
 		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileSyncVersion);
 		kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
