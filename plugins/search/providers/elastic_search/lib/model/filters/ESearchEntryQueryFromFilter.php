@@ -364,14 +364,14 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			$searchItem = new ESearchOperator();
 			$searchItem->setOperator(ESearchOperatorType::AND_OP);
 
-			$searchItemNot = $this->createNotPartialSearchItem($values[1]);
-			$freeTextSearchItem = $this->getFreeTextSearchItem($values[0]);
+			$searchItemNot = $this->createNegativeQuery($this->createPartialUnifiedSearchItem($values[1]));
+			$freeTextSearchItem = $this->createPartialUnifiedSearchItem($values[0], true);
 			$searchItem->setSearchItems(array($freeTextSearchItem,$searchItemNot));
 		}
 
 		elseif (isset($values[0]))
 		{
-			$searchItem = $this->getFreeTextSearchItem($values[0]);
+			$searchItem = $this->createPartialUnifiedSearchItem($values[0], true);
 		}
 
 		if ($searchItem)
@@ -380,23 +380,23 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		}
 	}
 
-	protected function getFreeTextSearchItem($value)
+	protected function createPartialUnifiedSearchItem($value, $removeWildCard = false)
 	{
-		$freeTextValue = str_replace(self::WILDCARD_OPERATOR, '', $value);
+		if ($removeWildCard)
+		{
+			$value = str_replace(self::WILDCARD_OPERATOR, '', $value);
+		}
 		$freeTextSearchItem = new ESearchUnifiedItem();
 		$freeTextSearchItem->setItemType(ESearchItemType::PARTIAL);
-		$freeTextSearchItem->setSearchTerm($freeTextValue);
+		$freeTextSearchItem->setSearchTerm($value);
 		return $freeTextSearchItem;
-	}
 
-	protected function createNotPartialSearchItem($value)
+	}
+	protected function createNegativeQuery($searchItem)
 	{
 		$searchItemNot = new ESearchOperator();
 		$searchItemNot->setOperator(ESearchOperatorType::NOT_OP);
-		$partialSearchItem = new ESearchUnifiedItem();
-		$partialSearchItem->setItemType(ESearchItemType::PARTIAL);
-		$partialSearchItem->setSearchTerm($value);
-		$searchItemNot->setSearchItems(array($partialSearchItem));
+		$searchItemNot->setSearchItems(array($searchItem));
 		return $searchItemNot;
 	}
 
