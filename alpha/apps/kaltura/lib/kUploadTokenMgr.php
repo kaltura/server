@@ -6,7 +6,7 @@ class kUploadTokenMgr
 	const MAX_AUTO_FINALIZE_RETIRES = 5;
 	const MAX_APPEND_TIME = 5;
 	const MIN_CHUNK_SIZE_IN_BYTES = 1048576;
-	const MAX_ALLOWED_CHUNKS_LOWER_THAN_MIN_CHUNK = 100;
+	const MAX_ALLOWED_CHUNKS_LOWER_THAN_MIN_CHUNK_SIZE = 100;
 	
 	/**
 	 * @var UploadToken
@@ -145,6 +145,8 @@ class kUploadTokenMgr
 	
 	private function shouldFailUpload($chunkSize)
 	{
+		$failUpload = false;
+		
 		if($chunkSize < self::MIN_CHUNK_SIZE_IN_BYTES && $this->_uploadToken->getStatus() !== UploadToken::UPLOAD_TOKEN_FULL_UPLOAD)
 		{
 			$cache = isset($this->_autoFinalizeCache) ? $this->_autoFinalizeCache : kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_UPLOAD_TOKEN);
@@ -155,13 +157,14 @@ class kUploadTokenMgr
 				{
 					$cache->set($this->_uploadToken->getId()."_smallChunkCount", 1, 86400);
 				}
-				if($smallChunkCount > self::MAX_ALLOWED_CHUNKS_LOWER_THAN_MIN_CHUNK)
+				if($smallChunkCount > self::MAX_ALLOWED_CHUNKS_LOWER_THAN_MIN_CHUNK_SIZE)
 				{
-					$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_FAILED);
-					KalturaLog::debug("Chunk count for Chunks smaller than [" . self::MIN_CHUNK_SIZE_IN_BYTES . "] bytes exceeded");
+					$failUpload = true;
 				}
 			}
 		}
+		
+		return $failUpload;
 	}
 	
 	/**
