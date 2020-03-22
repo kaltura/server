@@ -587,9 +587,9 @@ class ks extends kSessionBase
 		// foreach privileges group
 		foreach( $this->parsedPrivileges as $privilegeType => $privilege)
 		{
-			if ($privilegeType === self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_PLAYLIST)
+			if ($privilegeType === self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_PLAYLIST && isset($privilege[0]))
 			{
-				$entry = entryPeer::retrieveByPKNoFilter($privilege, null, false);
+				$entry = entryPeer::retrieveByPKNoFilter($privilege[0], null, false);
 				if ($entry && $entry->getStatus() != entryStatus::DELETED && $entry->getType() == entryType::PLAYLIST &&
 					self::isValidForPlaylistDisableEntitlement($entry->getMediaType()))
 				{
