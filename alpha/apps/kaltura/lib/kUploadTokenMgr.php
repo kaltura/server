@@ -252,7 +252,7 @@ class kUploadTokenMgr
 			$expectedFileSize = $verifyFinalChunk ? ($resumeAt + $chunkSize) : 0;
 
 			$chunkFilePath = "$uploadFilePath.chunk.$resumeAt";
-			$succeeded = rename($sourceFilePath, $chunkFilePath);
+			$succeeded = kFile::moveFile($sourceFilePath, $chunkFilePath);
 			
 			if($this->_autoFinalize && $this->checkIsFinalChunk($chunkSize) && $succeeded)
 			{
@@ -424,7 +424,7 @@ class kUploadTokenMgr
 				break;
 			
 			$lockedFile = "$nextChunk.".microtime(true).".locked";
-			if (! rename($nextChunk, $lockedFile)) // another process is already appending this file
+			if (! kFile::moveFile($nextChunk, $lockedFile)) // another process is already appending this file
 			{
 				KalturaLog::log("rename($nextChunk, $lockedFile) failed");
 				break;
