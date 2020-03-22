@@ -392,7 +392,7 @@ class kUploadTokenMgr
 			$chunkCount = count($chunks);
 			if($chunkCount > self::MAX_CHUNKS_WAITING_FOR_CONCAT_ALLOWED && !$verifyFinalChunk)
 			{
-				KalturaLog::debug("Max chunk's waiting for concat reached [$chunkCount], failing upload for token id[$uploadTokenId]");
+				KalturaLog::debug("Max chunk's waiting for concat reached [$chunkCount], failing upload for token id [$uploadTokenId]");
 				//return null;
 			}
 						
