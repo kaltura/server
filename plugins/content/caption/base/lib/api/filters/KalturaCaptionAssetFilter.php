@@ -22,12 +22,6 @@ class KalturaCaptionAssetFilter extends KalturaCaptionAssetBaseFilter
 	 */
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, array $types = null)
 	{
-		$this->validateEntryIdsFiltered();
-		$entryIds = $this->retrieveEntryIdsFiltered();
-		$entryIds = kParentChildEntryUtils::getParentEntryIds($entryIds);
-		$this->entryIdEqual = null;
-		$this->entryIdIn =  implode(',', $entryIds);
-
 		list($list, $totalCount) = $this->doGetListResponse($pager, $types);
 		
 		$response = new KalturaCaptionAssetListResponse();
