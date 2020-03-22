@@ -431,6 +431,8 @@ class KalturaErrors extends APIErrors
 	const UPLOAD_TOKEN_FILE_TYPE_RESTRICTED_FOR_UPLOAD = "UPLOAD_TOKEN_FILE_TYPE_RESTRICTED_FOR_UPLOAD;;Upload token is restricted due to the file type";
 
 	const UPLOAD_TOKEN_MISSING_FILE_SIZE = "UPLOAD_TOKEN_MISSING_FILE_SIZE;;FileSize is mandatory when enabling autoFinalize";
+	
+	const MAX_ALLOWED_SMALL_CHUNK_COUNT_EXCEEDED = "MAX_ALLOWED_SMALL_CHUNK_COUNT_EXCEEDED;;Exceeded Max allowed upload of small chunks less than 1048576 bytes";
 
 	/*
 	 * Partenrs service
