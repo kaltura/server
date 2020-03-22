@@ -4,6 +4,7 @@ class kUploadTokenMgr
 	const NO_EXTENSION_IDENTIFIER = 'noex';
 	const AUTO_FINALIZE_CACHE_TTL = 2592000; //Thirty days in seconds
 	const MAX_AUTO_FINALIZE_RETIRES = 5;
+	const MAX_APPEND_TIME = 5;
 	const MAX_CHUNKS_WAITING_FOR_CONCAT_ALLOWED = 1000;
 	
 	/**
