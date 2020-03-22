@@ -364,7 +364,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			$searchItem = new ESearchOperator();
 			$searchItem->setOperator(ESearchOperatorType::AND_OP);
 
-			$searchItemNot = $this->createNegativeQuery($this->createPartialUnifiedSearchItem($values[1]));
+			$searchItemNot = ESearchQueryFromAdvancedSearch::createNegativeQuery($this->createPartialUnifiedSearchItem($values[1]));
 			$freeTextSearchItem = $this->createPartialUnifiedSearchItem($values[0], true);
 			$searchItem->setSearchItems(array($freeTextSearchItem,$searchItemNot));
 		}
@@ -391,13 +391,6 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		$freeTextSearchItem->setSearchTerm($value);
 		return $freeTextSearchItem;
 
-	}
-	protected function createNegativeQuery($searchItem)
-	{
-		$searchItemNot = new ESearchOperator();
-		$searchItemNot->setOperator(ESearchOperatorType::NOT_OP);
-		$searchItemNot->setSearchItems(array($searchItem));
-		return $searchItemNot;
 	}
 
 	protected function handleDurationType($fieldValue)
