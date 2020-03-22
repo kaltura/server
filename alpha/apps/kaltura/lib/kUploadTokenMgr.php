@@ -124,13 +124,8 @@ class kUploadTokenMgr
 		}
 		else 
 		{
-			$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD);
-		}
-		
-		//We ruturn null file size when we want to faile the upload since it reached max chunks waiting for concat
-		if($fileSize === null)
-		{
-			$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_ERROR);
+			//We return null file size when we want to faile the upload since it reached max chunks waiting for concat
+			$this->_uploadToken->setStatus(!is_null($fileSize) ? UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD : UploadToken::UPLOAD_TOKEN_ERROR);
 		}
 		
 		$this->_uploadToken->setUploadedFileSize($fileSize);
