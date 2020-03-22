@@ -133,8 +133,9 @@ class kUploadTokenMgr
 		
 		if($this->shouldFailUpload($chunkSize))
 		{
-			$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_FAILED);
-			KalturaLog::debug("Chunk count for Chunks smaller than [" . self::MIN_CHUNK_SIZE_IN_BYTES . "] bytes exceeded");
+			//Remove after validating failure rate
+			//$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_FAILED);
+			KalturaLog::debug("Current chunk size [$chunkSize], Chunk count for Chunks smaller than [" . self::MIN_CHUNK_SIZE_IN_BYTES . "] bytes exceeded");
 		}
 		
 		$this->_uploadToken->setUploadedFileSize($fileSize);
@@ -155,7 +156,8 @@ class kUploadTokenMgr
 				$smallChunkCount = $cache->increment($this->_uploadToken->getId()."_smallChunkCount");
 				if(!$smallChunkCount)
 				{
-					$cache->set($this->_uploadToken->getId()."_smallChunkCount", 1, 86400);
+					$smallChunkCount = 1;
+					$cache->set($this->_uploadToken->getId()."_smallChunkCount", $smallChunkCount, 86400);
 				}
 				if($smallChunkCount > self::MAX_ALLOWED_CHUNKS_LOWER_THAN_MIN_CHUNK_SIZE)
 				{
