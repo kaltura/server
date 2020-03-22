@@ -589,7 +589,8 @@ class ks extends kSessionBase
 		{
 			if ($privilegeType === self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_PLAYLIST && isset($privilege[0]))
 			{
-				$playlistId = $privilege[0];
+				$entryId = $privilege[0];
+				$playlistId = $entryId;
 				$entry = entryPeer::retrieveByPKNoFilter($playlistId, null, false);
 				if ($entry && $entry->getStatus() != entryStatus::DELETED && $entry->getType() == entryType::PLAYLIST &&
 					self::isValidForPlaylistDisableEntitlement($entry->getMediaType()))
@@ -601,7 +602,7 @@ class ks extends kSessionBase
 						$entries = $result;
 					}
 
-					$entries[] = $playlistId;
+					$entries[] = $entryId;
 				}
 			}
 		}
