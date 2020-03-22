@@ -22,6 +22,9 @@ class ESearchQueryFromFilter
 	const KALTURA_METADATA_SEARCH_ITEM = 'KalturaMetadataSearchItem';
 	const KALTURA_CLASS = 'kalturaClass';
 
+	const WILDCARD_OPERATOR = '*';
+	const NOT_OPERATOR = '!';
+
 	public function __construct()
 	{
 		$this->init();
