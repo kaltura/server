@@ -125,7 +125,7 @@ class ESearchQueryFromAdvancedSearch
 		return $result;
 	}
 
-	protected static function createNegativeQuery($item)
+	public static function createNegativeQuery($item)
 	{
 		$result = new ESearchOperator();
 		$result->setOperator(ESearchOperatorType::NOT_OP);

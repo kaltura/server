@@ -101,4 +101,24 @@ class AppToken extends BaseAppToken
 			$appToken->save();
 		}
 	}
+
+	/**
+	 * @throws KalturaAPIException
+	 */
+	public function setKuserIdBySessionUserId()
+	{
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		$sessionUserId = $this->getSessionUserId();
+
+		//if user doesn't exists - create it
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $sessionUserId);
+		if(!$kuser)
+		{
+			if(!preg_match(kuser::PUSER_ID_REGEXP, $sessionUserId))
+				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'sessionUserId');
+
+			$kuser = kuserPeer::createKuserForPartner($partnerId, $sessionUserId);
+		}
+		$this->setKuserId($kuser->getId());
+	}
 }// AppToken

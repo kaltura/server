@@ -356,7 +356,41 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 
 	protected  function handleFreeTextField($field, $fieldValue)
 	{
-		$this->addingFieldPartIntoQuery(baseObjectFilter::IN, $field, $fieldValue);
+		$searchItem = null;
+		$values = explode(self::NOT_OPERATOR, $fieldValue, 2);
+
+		if (isset($values[1]))
+		{
+			$searchItem = new ESearchOperator();
+			$searchItem->setOperator(ESearchOperatorType::AND_OP);
+
+			$searchItemNot = ESearchQueryFromAdvancedSearch::createNegativeQuery($this->createPartialUnifiedSearchItem($values[1]));
+			$freeTextSearchItem = $this->createPartialUnifiedSearchItem($values[0], true);
+			$searchItem->setSearchItems(array($freeTextSearchItem,$searchItemNot));
+		}
+
+		elseif (isset($values[0]))
+		{
+			$searchItem = $this->createPartialUnifiedSearchItem($values[0], true);
+		}
+
+		if ($searchItem)
+		{
+			$this->searchItems[] = $searchItem;
+		}
+	}
+
+	protected function createPartialUnifiedSearchItem($value, $removeWildCard = false)
+	{
+		if ($removeWildCard)
+		{
+			$value = str_replace(self::WILDCARD_OPERATOR, '', $value);
+		}
+		$freeTextSearchItem = new ESearchUnifiedItem();
+		$freeTextSearchItem->setItemType(ESearchItemType::PARTIAL);
+		$freeTextSearchItem->setSearchTerm($value);
+		return $freeTextSearchItem;
+
 	}
 
 	protected function handleDurationType($fieldValue)
