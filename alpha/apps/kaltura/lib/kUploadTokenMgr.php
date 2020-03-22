@@ -4,6 +4,8 @@ class kUploadTokenMgr
 	const NO_EXTENSION_IDENTIFIER = 'noex';
 	const AUTO_FINALIZE_CACHE_TTL = 2592000; //Thirty days in seconds
 	const MAX_AUTO_FINALIZE_RETIRES = 5;
+	const MAX_APPEND_TIME = 5;
+	const MAX_CHUNKS_WAITING_FOR_CONCAT_ALLOWED = 1000;
 	
 	/**
 	 * @var UploadToken
@@ -101,7 +103,9 @@ class kUploadTokenMgr
 		}
 		
 		if ($resume)
+		{
 			$fileSize = $this->handleResume($fileData, $resumeAt);
+		}
 		else
 		{
 			$this->handleMoveFile($fileData);
@@ -120,7 +124,8 @@ class kUploadTokenMgr
 		}
 		else 
 		{
-			$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD);
+			//We return null file size when we want to faile the upload since it reached max chunks waiting for concat
+			$this->_uploadToken->setStatus(!is_null($fileSize) ? UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD : UploadToken::UPLOAD_TOKEN_ERROR);
 		}
 		
 		$this->_uploadToken->setUploadedFileSize($fileSize);
@@ -206,8 +211,11 @@ class kUploadTokenMgr
 	{
 		if (!$extension)
 			$extension = self::NO_EXTENSION_IDENTIFIER;
-			
-		return myContentStorage::getFSUploadsPath().substr($uploadTokenId, -2).'/'.$uploadTokenId.'.'.$extension;
+		
+		return myContentStorage::getFSUploadsPath().
+			substr($uploadTokenId, -2).'/'.
+			substr($uploadTokenId, -4, 2).'/'.
+			$uploadTokenId.'.'.$extension;
 	}
 	
 	protected function tryMoveToErrors($fileData)
@@ -244,7 +252,7 @@ class kUploadTokenMgr
 			$expectedFileSize = $verifyFinalChunk ? ($resumeAt + $chunkSize) : 0;
 
 			$chunkFilePath = "$uploadFilePath.chunk.$resumeAt";
-			$succeeded = rename($sourceFilePath, $chunkFilePath);
+			$succeeded = kFile::moveFile($sourceFilePath, $chunkFilePath);
 			
 			if($this->_autoFinalize && $this->checkIsFinalChunk($chunkSize) && $succeeded)
 			{
@@ -260,7 +268,7 @@ class kUploadTokenMgr
 				if ($count ++)
 					Sleep(1);
 				
-				$currentFileSize = self::appendAvailableChunks($uploadFilePath);
+				$currentFileSize = self::appendAvailableChunks($uploadFilePath, $verifyFinalChunk, $this->_uploadToken->getId());
 				KalturaLog::log("handleResume iteration: $count chunk: $chunkFilePath size: $chunkSize finalChunk: {$this->_finalChunk} filesize: $currentFileSize expected: $expectedFileSize");
 			} while ($verifyFinalChunk && $currentFileSize != $expectedFileSize && $count < $uploadFinalChunkMaxAppendTime);
 
@@ -357,7 +365,7 @@ class kUploadTokenMgr
 		unlink($sourceFilePath);
 	}
 
-	static protected function appendAvailableChunks($targetFilePath)
+	static protected function appendAvailableChunks($targetFilePath, $verifyFinalChunk, $uploadTokenId)
 	{
 		$targetFileResource = fopen($targetFilePath, 'r+b');
 		
@@ -369,7 +377,9 @@ class kUploadTokenMgr
 		// 1. parallel procesess trying to add the same chunk
 		// 2. append failing half way and recovered by the client resneding the same chunk. The random part in the locked file name
 		// will prevent the re-uploaded chunk from coliding with the failed one
-		while (1) {
+		$appendStartTime = microtime(true);
+		while ( ((microtime(true) - $appendStartTime) < self::MAX_APPEND_TIME) || $verifyFinalChunk )
+		{
 			$currentFileSize = ftell($targetFileResource);
 			
 			$validChunk = false;
@@ -378,6 +388,13 @@ class kUploadTokenMgr
 			$chunks = glob("$targetFilePath.chunk.*", GLOB_NOSORT);
 			$globTook = (microtime(true) - $globStart);
 			KalturaLog::debug("glob took - " . $globTook . " seconds");
+			
+			$chunkCount = count($chunks);
+			if($chunkCount > self::MAX_CHUNKS_WAITING_FOR_CONCAT_ALLOWED && !$verifyFinalChunk)
+			{
+				KalturaLog::debug("Max chunk's waiting for concat reached [$chunkCount], failing upload for token id [$uploadTokenId]");
+				//return null;
+			}
 						
 			foreach($chunks as $nextChunk)
 			{
@@ -407,7 +424,7 @@ class kUploadTokenMgr
 				break;
 			
 			$lockedFile = "$nextChunk.".microtime(true).".locked";
-			if (! rename($nextChunk, $lockedFile)) // another process is already appending this file
+			if (! kFile::moveFile($nextChunk, $lockedFile)) // another process is already appending this file
 			{
 				KalturaLog::log("rename($nextChunk, $lockedFile) failed");
 				break;
