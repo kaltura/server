@@ -329,7 +329,7 @@ class KalturaSyndicationFeedRenderer
 			return $c->getRecordsCount();
 		}
 
-		if ($this->dynamicPlaylist)
+		if ($this->shouldUseDynamicPlaylist())
 		{
 			return $this->getEntriesCountFromDynamic($actualEntryCount);
 		}
@@ -398,7 +398,7 @@ class KalturaSyndicationFeedRenderer
 
 	public function getNextEntryByPlaylistType()
 	{
-		if ($this->dynamicPlaylist)
+		if ($this->shouldUseDynamicPlaylist())
 		{
 			return $this->getNextEntryViaDynamic();
 		}
@@ -406,6 +406,18 @@ class KalturaSyndicationFeedRenderer
 		{
 			return $this->getNextEntry();
 		}
+	}
+
+	protected function shouldUseDynamicPlaylist()
+	{
+		$syndicationMap = kConf::getMap('syndication');
+		if (isset($syndicationMap['playlistExecutionLimitPartners'])
+			&& is_array($syndicationMap['playlistExecutionLimitPartners'])
+			&& in_array($this->syndicationFeed->partnerId, $syndicationMap['playlistExecutionLimitPartners']))
+		{
+			return false;
+		}
+		return $this->dynamicPlaylist;
 	}
 
 	public function getNextEntryViaDynamic()
