@@ -1552,6 +1552,36 @@ class kKavaReports extends kKavaReportsMgr
 
 		),
 
+		ReportType::SUB_CATEGORIES => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'object_id' => self::DIMENSION_CATEGORIES,
+				'name' => self::DIMENSION_CATEGORIES,
+				'entries_count' => self::DIMENSION_CATEGORIES,
+				'parent_name' => self::DIMENSION_CATEGORIES,
+			),
+			self::REPORT_ENRICH_DEF => array(
+				array(
+					self::REPORT_ENRICH_OUTPUT => array('name', 'entries_count', 'parent_name'),
+					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'peer' => 'categoryPeer',
+						'int_ids_only' => true,
+						'columns' => array('NAME', 'ENTRIES_COUNT', 'PARENT_ID'),
+					),
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => array('parent_name'),
+					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'peer' => 'categoryPeer',
+						'int_ids_only' => true,
+						'columns' => array('NAME'),
+					),
+				),
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_VIEWERS),
+		),
+
 	);
 
 	public static function getReportDef($report_type, $input_filter)
