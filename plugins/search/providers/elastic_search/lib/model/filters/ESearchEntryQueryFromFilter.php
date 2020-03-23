@@ -359,19 +359,26 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		$searchItem = null;
 		$values = explode(self::NOT_OPERATOR, $fieldValue, 2);
 
-		if (isset($values[1]))
+		if (isset($values[1]) && trim($values[1]))
 		{
-			$searchItem = new ESearchOperator();
-			$searchItem->setOperator(ESearchOperatorType::AND_OP);
-
-			$searchItemNot = ESearchQueryFromAdvancedSearch::createNegativeQuery($this->createPartialUnifiedSearchItem($values[1]));
-			$freeTextSearchItem = $this->createPartialUnifiedSearchItem($values[0], true);
-			$searchItem->setSearchItems(array($freeTextSearchItem,$searchItemNot));
+			$searchItemNot = ESearchQueryFromAdvancedSearch::createNegativeQuery($this->createPartialUnifiedSearchItem(trim($values[1])));
+			$freeTextValue = trim($values[0]);
+			if ($freeTextValue)
+			{
+				$searchItem = new ESearchOperator();
+				$searchItem->setOperator(ESearchOperatorType::AND_OP);
+				$freeTextSearchItem = $this->createPartialUnifiedSearchItem($freeTextValue, true);
+				$searchItem->setSearchItems(array($freeTextSearchItem, $searchItemNot));
+			}
+			else
+			{
+				$searchItem = $searchItemNot;
+			}
 		}
 
-		elseif (isset($values[0]))
+		elseif (isset($values[0]) && trim($values[0]))
 		{
-			$searchItem = $this->createPartialUnifiedSearchItem($values[0], true);
+			$searchItem = $this->createPartialUnifiedSearchItem(trim($values[0]), true);
 		}
 
 		if ($searchItem)
