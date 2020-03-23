@@ -75,11 +75,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var KalturaStorageServePriority
 	 */
 	public $storageServePriority;
-
-	/**
-	 * @var string
-	 */
-	public $storagePeriodicIds;
 	
 	/**
 	 * 
@@ -437,7 +432,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"moderateContent",
 		"storageDeleteFromKaltura",
 		"storageServePriority",
-		"storagePeriodicIds",
 		"kmcVersion",
 		"defThumbOffset",
 		"defThumbDensity",

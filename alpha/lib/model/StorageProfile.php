@@ -329,7 +329,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	 * 
 	 * @param flavorAsset $flavorAsset
 	 */
-	protected function isFlavorAssetConfiguredForExport(asset $flavorAsset)
+	public function isFlavorAssetConfiguredForExport(asset $flavorAsset)
 	{
 		$configuredForExport = null;
 

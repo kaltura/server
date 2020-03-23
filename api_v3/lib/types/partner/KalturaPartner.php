@@ -348,12 +348,6 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public $authenticationType;
 
-	/**
-	 * periodic storage ids
-	 * @var string
-	 */
-	public $storagePeriodicIds;
-
 	private static $map_between_objects = array
 	(
 		'id' , 'name', 'website' => 'url1' , 'notificationUrl' => 'url2' , 'appearInSearch' , 'createdAt' , 'adminName' , 'adminEmail' ,
@@ -363,7 +357,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'firstName' , 'lastName' , 'country' , 'state' , 'publishersQuota', 'partnerGroupType', 'defaultEntitlementEnforcement', 
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks',
 		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages',
-		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'storagePeriodicIds',
+		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType',
 	);
 	
 	public function getMapBetweenObjects ( )

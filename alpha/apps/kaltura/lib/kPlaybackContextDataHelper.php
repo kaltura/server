@@ -267,7 +267,9 @@ class kPlaybackContextDataHelper
 		if ($remoteFileSyncs)
 		{
 			$storageProfileIds = array_keys($remoteFileSyncs);
-			$storageProfiles = StorageProfilePeer::retrieveExternalByPartnerId($dbEntry->getPartnerId(), $storageProfileIds);
+			$storageProfilesExternal = StorageProfilePeer::retrieveExternalByPartnerId($dbEntry->getPartnerId(), $storageProfileIds);
+			$periodicProfiles = kStorageExporter::getPeriodicStorageProfiles($dbEntry->getPartnerId());
+			$storageProfiles = array_merge($storageProfilesExternal, $periodicProfiles);
 
 			$activeStorageProfileIds = array();
 			foreach ($storageProfiles as $storageProfile)

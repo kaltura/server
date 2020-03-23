@@ -15,7 +15,7 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 	const STORAGE_PROFILE_IDS = 'profileIdsIn';
 	const RESPONSE_PROFILE_FIELDS = 'id,originalId,fileSize,fileRoot,filePath,isDir,srcPath,srcEncKey';
 
-	protected $storageProfileIdsArray;
+	protected $storageProfiles;
 	protected $currentIndex;
 
 	/* (non-PHPdoc)
@@ -188,22 +188,34 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 
 	protected function getStorageProfile()
 	{
-		$responseProfile = new KalturaDetachedResponseProfile();
-		self::$kClient->setResponseProfile($responseProfile);
-		KBatchBase::impersonate(0);
-		if($this->currentIndex >= count($this->storageProfileIdsArray))
+		$storageProfileIdsArray = explode(',', $this->getAdditionalParams(self::STORAGE_PROFILE_IDS));
+		if($this->currentIndex >= count($storageProfileIdsArray))
 		{
 			$this->currentIndex = 0;
 		}
-		$storageProfileId = $this->storageProfileIdsArray[$this->currentIndex];
-		$this->currentIndex++;
 
+		if(isset($this->storageProfiles[$this->currentIndex]))
+		{
+			$index = $this->currentIndex;
+			$id = $this->storageProfiles[$index]->id;
+			KalturaLog::debug("Using Storing profile [$id], index [$this->currentIndex]");
+			$this->currentIndex++;
+			return $this->storageProfiles[$index];
+		}
+
+		$storageProfileId = $storageProfileIdsArray[$this->currentIndex];
+
+		$responseProfile = new KalturaDetachedResponseProfile();
+		self::$kClient->setResponseProfile($responseProfile);
 		$storageProfile = self::$kClient->storageProfile->get($storageProfileId);
 		if (!$storageProfile)
 		{
 			KalturaLog::debug("Could not find storage Profile id [$storageProfileId]");
 		}
-		KBatchBase::unimpersonate();
+
+		KalturaLog::debug("Storing profile [$storageProfileId] info, index [$this->currentIndex]");
+		$this->storageProfiles[$this->currentIndex] = $storageProfile;
+		$this->currentIndex++;
 		return $storageProfile;
 	}
 

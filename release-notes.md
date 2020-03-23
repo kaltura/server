@@ -6,7 +6,12 @@ Issue ID : PLAT-10735
 
 ### Configuration ##
     - Enable MultiCenters plugin in plugins.ini
-    - Add FEATURE_REMOTE_STORAGE permission to partner 0
+    - Add FEATURE_REMOTE_STORAGE permission to partner -1
+    - Add configuration map with the name 'cloud_storage' with following config:
+
+       [export_to_cloud]
+        @PARTNER_ID@ = @COMMA_SEPERATED_PERIODIC_STORAGE_PROFILE_IDS@
+
     - Add the following to batch.ini:
 
         enabledWorkers.KAsyncStoragePeriodicExport            = 1

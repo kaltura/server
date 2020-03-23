@@ -66,6 +66,10 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			$entry = $object->getentry();
 			
 			$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
+			if(!$externalStorages)
+			{
+				$externalStorages = self::getPeriodicStorageProfiles($object->getPartnerId());
+			}
 			foreach($externalStorages as $externalStorage)
 			{
 				if ($externalStorage->triggerFitsReadyAsset($entry->getId()))
@@ -487,57 +491,80 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	}
 
 
-	public static function handlePeriodicFileExportFinished($fileSync, $storageProfile)
+	public static function handlePeriodicFileExportFinished($fileSync, StorageProfile $storageProfile)
 	{
-		$externalProfiles = StorageProfilePeer::retrieveExternalByPartnerId($fileSync->getPartnerId(), null, null, false);
 		$allExported = true;
-		if(!$externalProfiles)
+		$keysArray = array();
+		$object = assetPeer::retrieveById($fileSync->getObjectId());
+		if(!$object)
 		{
-			$keysArray = array();
-			$object = assetPeer::retrieveById($fileSync->getObjectId());
-			if(!$object)
-			{
-				return;
-			}
-			$entryId = $object->getEntryId();
-			$flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($entryId, null, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
-			$fileSyncSubTypes = array(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			return;
+		}
+		$entryId = $object->getEntryId();
+		$flavorAssets = assetPeer::retrieveDscFlavorsByEntryIdAndStatus($entryId, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
+		$fileSyncSubTypes = array(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$flavorsToExport = array();
 
-			foreach ($flavorAssets as $flavorAsset)
+		foreach ($flavorAssets as $flavorAsset)
+		{
+			if($flavorAsset->getIsOriginal() || !$storageProfile->isFlavorAssetConfiguredForExport($flavorAsset))
 			{
-				if($flavorAsset->getIsOriginal())
+				continue;
+			}
+			$flavorsToExport[] = $flavorAsset;
+			foreach ($fileSyncSubTypes as $subType)
+			{
+				$key = $flavorAsset->getSyncKey($subType);
+				if(!$storageProfile->isExported($key))
 				{
-					continue;
-				}
-				foreach ($fileSyncSubTypes as $subType)
-				{
-					$key = $flavorAsset->getSyncKey($subType);
-					if(!$storageProfile->isExported($key))
-					{
-						KalturaLog::debug("Required file was not exported");
-						$allExported = false;
-						break;
-					}
-					$keysArray[$flavorAsset->getId()] = $key->getVersion();
-				}
-				if($allExported == false)
-				{
+					KalturaLog::debug("Required file was not exported");
+					$allExported = false;
 					break;
 				}
+				$keysArray[$flavorAsset->getId()] = $key->getVersion();
 			}
-
-			if($allExported)
+			if($allExported == false)
 			{
-				foreach ($flavorAssets as $flavorAsset)
-				{
-					if($flavorAsset->getIsOriginal())
-					{
-						continue;
-					}
-					kFlowHelper::deleteAssetLocalFileSyncs($keysArray[$flavorAsset->getId()], $flavorAsset);
-				}
+				break;
 			}
 		}
+
+		if($allExported)
+		{
+			foreach ($flavorsToExport as $flavorAsset)
+			{
+				kFlowHelper::deleteAssetLocalFileSyncs($keysArray[$flavorAsset->getId()], $flavorAsset);
+			}
+		}
+	}
+
+	public static function getPeriodicStorageIdsByPartner($partnerId)
+	{
+		if (kConf::hasParam("export_to_cloud","cloud_storage"))
+		{
+			$config = kConf::get("export_to_cloud","cloud_storage", array());
+			if (array_key_exists($partnerId, $config))
+			{
+				$storageIds = $config[$partnerId];
+				return explode(',', $storageIds);
+			}
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	public static function getPeriodicStorageProfiles($partnerId)
+	{
+		// check if should export to periodically only if we dont have existing storage profiles, if we do add export only after they finish
+		$externalStorages = array();
+		$storageIds = self::getPeriodicStorageIdsByPartner($partnerId);
+		if($storageIds)
+		{
+			$externalStorages = StorageProfilePeer::retrieveByPKs($storageIds);
+		}
+		return $externalStorages;
 	}
 
 }
