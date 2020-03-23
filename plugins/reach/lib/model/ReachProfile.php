@@ -483,7 +483,10 @@ class ReachProfile extends BaseReachProfile
 			if($gotNonBooleanCondition && $checkEmptyRulesOnly )
 				continue;
 
-			if(!$checkEmptyRulesOnly && !count($rule->getConditions()))
+			if(!$checkEmptyRulesOnly &&
+				(!count($rule->getConditions()) ||
+					(count($rule->getConditions()) == 1 &&
+						$condition->getType() == ConditionType::BOOLEAN )))
 				continue;
 
 			$rule->setScope($scope);
