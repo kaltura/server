@@ -2085,11 +2085,11 @@ class kKavaReportsMgr extends kKavaBase
 			$druid_filter[] = self::getBoundFilter(self::DIMENSION_ENTRY_CREATED_AT, $input_filter->gte_entry_created_at, $input_filter->lte_entry_created_at, self::DRUID_ORDER_NUMERIC);
 		}
 
-		if (isset($input_filter->categories_ancestor_ids))
+		if ($input_filter->categories_ancestor_ids)
 		{
 			$category_filter = new categoryFilter();
 
-			$category_filter->set('_in_ancestor_id', $input_filter->categories_ancestor_ids);
+			$category_filter->set('_in_ancestor_id', explode($input_filter->categories_ancestor_ids, $response_options->getDelimiter()));
 
 			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 			$category_filter->attachToCriteria($c);
@@ -2097,8 +2097,8 @@ class kKavaReportsMgr extends kKavaBase
 			$c->applyFilters();
 
 			$category_ids_from_db = $c->getFetchedIds();
-			$ancestor_ids = explode(",",$input_filter->categories_ancestor_ids);
-			$category_ids_from_db =array_merge($ancestor_ids, $category_ids_from_db);
+			$ancestor_ids = explode($response_options->getDelimiter(), $input_filter->categories_ancestor_ids);
+			$category_ids_from_db = array_merge($ancestor_ids, $category_ids_from_db);
 
 			$druid_filter[] = array(
 				kKavaReportsMgr::DRUID_DIMENSION => kKavaReportsMgr::DIMENSION_CATEGORIES,
