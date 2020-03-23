@@ -95,8 +95,15 @@ class kUploadTokenMgr
 		}
 		catch(kUploadTokenException $ex)
 		{
+			if($ex->getCode() == kUploadTokenException::UPLOAD_TOKEN_FILE_IS_EMPTY)
+			{
+				return;
+			}
+			
 			if(!$resume && $this->_finalChunk)
+			{
 				kFlowHelper::handleUploadFailed($this->_uploadToken);
+			}
 			
 			$this->tryMoveToErrors($fileData);
 			throw $ex;
@@ -181,7 +188,8 @@ class kUploadTokenMgr
 		{
 			$msg = "The uploaded file has 0 bytes, file will be dismissed for token id [{$this->_uploadToken->getId()}]";
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
-			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FILE_IS_NOT_VALID);
+			kFile::doDeleteFile($tempPath);
+			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FILE_IS_EMPTY);
 		}
 	}
 
