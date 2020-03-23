@@ -223,7 +223,7 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	public $applicationVersionIn;
 
 	/**
-	* filter by node id
+	 * filter by node id
          *
          * @var string
          */
