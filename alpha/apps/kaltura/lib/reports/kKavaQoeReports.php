@@ -212,13 +212,13 @@ class kKavaQoeReports extends kKavaReportsMgr
 				self::METRIC_AVG_JOIN_TIME,
 				self::EVENT_TYPE_BUFFER_START,
 				self::METRIC_VIEW_BUFFER_TIME_RATIO,
-				self::METRIC_AVG_VIEW_BITRATE,
+				self::METRIC_VIEW_UNIQUE_SESSIONS
 			),
 			self::REPORT_GRAPH_METRICS => array(
 				self::METRIC_AVG_JOIN_TIME,
 				self::EVENT_TYPE_BUFFER_START,
 				self::METRIC_VIEW_BUFFER_TIME_RATIO,
-				self::METRIC_AVG_VIEW_BITRATE,
+				self::METRIC_VIEW_UNIQUE_SESSIONS
 			)
 		),
 
