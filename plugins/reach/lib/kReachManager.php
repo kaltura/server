@@ -514,6 +514,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			KalturaLog::debug("Entry [{$entry->getId()}] is temporary, entry vendor task object wont be created for it");
 			return null;
 		}
+		
 		//Create new entry vendor task object
 		$entryVendorTask = new EntryVendorTask();
 

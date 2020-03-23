@@ -61,6 +61,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_AVG_BITRATE = 'avg_bitrate';
 	const METRIC_ORIGIN_BANDWIDTH_SIZE_MB = 'origin_bandwidth_consumption';
 	const METRIC_UNIQUE_CONTRIBUTORS = 'unique_contributors';
+	const METRIC_UNIQUE_OWNERS = 'unique_owners';
 	const METRIC_ENGAGEMENT_RANKING = 'engagement_ranking';
 	const METRIC_PLAYS_RANKING = 'plays_ranking';
 	const METRIC_ENTRIES_RANKING = 'entries_ranking';
@@ -367,6 +368,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_SESSIONS => 'floor',
 		self::METRIC_UNIQUE_VIEWERS => 'floor',
 		self::METRIC_TOTAL_UNIQUE_PERCENTILES => 'floor',
+		self::METRIC_UNIQUE_OWNERS => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -408,6 +410,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_AVG_VIEW_SESSION_ERROR_RATE => true,
 		self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS => true,
 		self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO => true,
+		self::METRIC_UNIQUE_OWNERS => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -738,6 +741,11 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_UNIQUE_CONTRIBUTORS] = self::getCardinalityAggregator(
 			self::METRIC_UNIQUE_CONTRIBUTORS,
 			array(self::DIMENSION_KUSER_ID));
+
+		self::$aggregations_def[self::METRIC_UNIQUE_OWNERS] = self::getCardinalityAggregator(
+			self::METRIC_UNIQUE_OWNERS,
+			array(self::DIMENSION_ENTRY_OWNER_ID));
+
 
 		self::$aggregations_def[self::METRIC_UNIQUE_SESSIONS] = self::getHyperUniqueAggregator(
 			self::METRIC_UNIQUE_SESSIONS,
@@ -2045,6 +2053,7 @@ class kKavaReportsMgr extends kKavaBase
 			'player_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYER_VERSION),
 			'isp' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_ISP),
 			'application_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_APPLICATION_VER),
+			'node_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_NODE_ID),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)

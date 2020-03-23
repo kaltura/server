@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.venodr
+ * @package plugins.vendor
  * @subpackage model.enum
  */
 interface kEventType extends BaseEnum

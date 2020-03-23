@@ -176,14 +176,14 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		}
 		
 		$this->fixFilterUserId($this);
-		
 		$entryFilter = new entryFilter();
 		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
-		
 		$this->toObject($entryFilter);
 		
 		if($pager)
+		{
 			$pager->attachToCriteria($c);
+		}
 			
 		$entryFilter->attachToCriteria($c);
 		
@@ -195,36 +195,34 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
 		$disableWidgetSessionFilters = false;
-		if ($this &&
-			($this->idEqual != null ||
-			$this->idIn != null ||
-			$this->referenceIdEqual != null ||
-			$this->redirectFromEntryId != null ||
-			$this->referenceIdIn != null || 
-			$this->parentEntryIdEqual != null))
-			$disableWidgetSessionFilters = true;
-			
 		$c = $this->prepareEntriesCriteriaFilter($pager);
-		
-		if ($disableWidgetSessionFilters)
+		if ($this->idEqual || $this->idIn || $this->referenceIdEqual || $this->redirectFromEntryId
+			|| $this->referenceIdIn || $this->parentEntryIdEqual )
 		{
-			if (kEntitlementUtils::getEntitlementEnforcement() && !kCurrentContext::$is_admin_session && entryPeer::getUserContentOnly())
-					entryPeer::setFilterResults(true);
+			$disableWidgetSessionFilters = true;
+			if (kEntitlementUtils::getEntitlementEnforcement() && !kCurrentContext::$is_admin_session &&
+				entryPeer::getUserContentOnly())
+			{
+				entryPeer::setFilterResults(true);
+			}
 
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 		}
+
 		$list = entryPeer::doSelect($c);
 		entryPeer::fetchPlaysViewsData($list);
 		$totalCount = $c->getRecordsCount();
 		
 		if ($disableWidgetSessionFilters)
+		{
 			KalturaCriterion::restoreTag(KalturaCriterion::TAG_WIDGET_SESSION);
+		}
 
 		myDbHelper::$use_alternative_con = null;
 			
 		return array($list, $totalCount);		
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KalturaFilter::getListResponse()
 	 */

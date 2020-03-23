@@ -12,6 +12,9 @@
  */
 class KAsyncDirectoryCleanup extends KPeriodicWorker
 {
+
+	private $deletedFilesCount = 0;
+	private $deletedFoldersCount = 0;
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -25,64 +28,176 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 	*/
 	public function run($jobs = null)
 	{
-		$path = $this->getAdditionalParams("path");
-		$pattern = $this->getAdditionalParams("pattern");
-		$simulateOnly = $this->getAdditionalParams("simulateOnly");
-		$minutesOld = $this->getAdditionalParams("minutesOld");
+		$path = $this->getAdditionalParams('path');
+		$pattern = $this->getAdditionalParams('pattern');
+		$simulateOnly = $this->getAdditionalParams('simulateOnly');
+		$minutesOld = $this->getAdditionalParams('minutesOld');
 		$searchPath = $path . $pattern;
-		KalturaLog::info("Searching [$searchPath]");
+		KalturaLog::info('Searching ' . $searchPath);
+		$usePHP = $this->getAdditionalParams('usePHP');
+		$this->deleteFiles($searchPath, $minutesOld, $simulateOnly, $usePHP);
+	}
 
-		if($this->getAdditionalParams("usePHP"))
+	/**
+	 * @param $searchPath
+	 * @param $minutesOld
+	 * @param $simulateOnly
+	 * @return bool
+	 */
+	protected function deleteFiles($searchPath, $minutesOld, $simulateOnly, $usePHP)
+	{
+		$secondsOld = $minutesOld * 60;
+		$files = kFile::getFilesByPattern($searchPath);
+		KalturaLog::info('Found [' . count($files) . '] to scan');
+
+		$now = time();
+		KalturaLog::info('Deleting files that are ' . $secondsOld . ' seconds old (modified before ' . date('c', $now - $secondsOld) . ')');
+		foreach ($files as $file)
 		{
-			$this->deleteFilesPHP($searchPath, $minutesOld, $simulateOnly);
+			$filemtime = kFile::getFileLastUpdatedTime($file);
+			if ($filemtime > $now - $secondsOld)
+			{
+				continue;
+			}
+
+			if ($simulateOnly)
+			{
+				KalturaLog::info('Simulating: Deleting file [' . $file . ' ], it\'s last modification time was ' . date('c', $filemtime));
+				continue;
+			}
+
+			if (kFile::checkIsDir($file))
+			{
+				if ($this->shouldDeleteDirectory($file, $now, $secondsOld))
+				{
+					if ($this->deleteDirectory($file, $usePHP))
+					{
+						$this->deletedFoldersCount++;
+					}
+				}
+				else
+				{
+					continue;
+				}
+			}
+			else
+			{
+				if ($this->deleteFile($file, $usePHP))
+				{
+					$this->deletedFilesCount++;
+				}
+			}
+		}
+		KalturaLog::debug('Finished Directory Cleanup - Folders deleted [' . $this->deletedFoldersCount . '] Files Deleted [' . $this->deletedFilesCount . ']');
+	}
+
+	/**
+	 * @param $path
+	 * @param $now
+	 * @param $secondsOld
+	 * @return bool
+	 */
+	protected function shouldDeleteDirectory($path, $now, $secondsOld)
+	{
+		if (substr($path, -strlen(KChunkedEncode::CHUNK_ENCODE_POSTFIX)) === KChunkedEncode::CHUNK_ENCODE_POSTFIX)
+		{
+			foreach (kFile::dirList($path) as $file)
+			{
+				if (kFile::getFileLastUpdatedTime($file) > $now - $secondsOld)
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * @param $dir
+	 * @param $usePHP
+	 */
+	protected function deleteDirectory($dir, $usePHP)
+	{
+		$returnedValue = null;
+		if ($usePHP)
+		{
+			$returnedValue =  $this->deleteDirectoryHelper($dir, $usePHP);
+			if ($returnedValue)
+			{
+				return true;
+			}
 		}
 		else
 		{
-			$this->deleteFilesLinux($searchPath, $minutesOld, $simulateOnly);
-		}
-	}
+			$command = 'rm -rf ' . $dir;
+			KalturaLog::info('Executing command: ' . $command);
 
-	// XXX - If this function forces deletion of files in the given directory. If it is used with params
-	// given from the user - Please add input validation.
-	protected function deleteFilesLinux($searchPath, $minutesOld, $simulateOnly)
-	{
-		$command = "find $searchPath -mmin +$minutesOld -exec rm -rf {} \;";
-		KalturaLog::info("Executing command: $command");
-
-		$returnedValue = null;
-		passthru($command, $returnedValue);
-		KalturaLog::info("Returned value [$returnedValue]");
-	}
-
-	protected function deleteFilesPHP($searchPath, $minutesOld, $simulateOnly)
-	{
-		$secondsOld = $minutesOld * 60;
-
-		$files = glob ( $searchPath);
-		KalturaLog::info("Found [" . count ( $files ) . "] to scan");
-
-		$now = time();
-		KalturaLog::info("Deleting files that are " . $secondsOld ." seconds old (modified before " . date('c', $now - $secondsOld) . ")");
-		$deletedCount = 0;
-		foreach ( $files as $file )
-		{
-			$filemtime = filemtime($file);
-			if ($filemtime > $now - $secondsOld)
-				continue;
-
-			if ( $simulateOnly )
+			passthru($command, $returnedValue);
+			if (!$returnedValue)
 			{
-				KalturaLog::info( "Simulating: Deleting file [$file], it's last modification time was " . date('c', $filemtime));
-				continue;
+				return true;
 			}
-
-			KalturaLog::info("Deleting file [$file], it's last modification time was " . date('c', $filemtime));
-			$res = @unlink ( $file );
-			if ( ! $res ){
-				KalturaLog::err("Error: problem while deleting [$file]");
-				continue;
-			}
-			$deletedCount++;
 		}
+		KalturaLog::err('Error: problem while deleting ' . $dir);
+		return false;
+	}
+
+	/**
+	 * @param $dir
+	 * @param $usePHP
+	 * @return bool
+	 */
+	protected function deleteDirectoryHelper($dir, $usePHP)
+	{
+		if (!kFile::checkFileExists($dir))
+		{
+			return true;
+		}
+
+		if (!kFile::checkIsDir($dir))
+		{
+			return $this->deleteFile($dir, $usePHP);
+		}
+
+		foreach (kFile::dirList($dir) as $file)
+		{
+			if (!$this->deleteDirectoryHelper($file, $usePHP))
+			{
+				return false;
+			}
+		}
+		return kFile::removeDir($dir);
+	}
+
+	/**
+	 * @param $file
+	 * @param $usePHP
+	 * @return bool
+	 */
+	protected function deleteFile($file, $usePHP)
+	{
+		$res = null;
+		if ($usePHP)
+		{
+			KalturaLog::info('Deleting file [' . $file . '], it\'s last modification time was ' . date('c', filemtime($file)));
+			$res = kFile::doDeleteFile($file);
+			if ($res)
+			{
+				return true;
+			}
+		}
+		else
+		{
+			$command = 'rm -f ' . $file;
+			KalturaLog::info('Executing command: ' . $command);
+			passthru($command, $res);
+			if (!$res)
+			{
+				return true;
+			}
+		}
+		KalturaLog::err('Error: problem while deleting ' . $file);
+		return false;
 	}
 }
