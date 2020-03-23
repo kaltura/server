@@ -326,7 +326,12 @@ class myPlaylistUtils
 	public static function executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter = null, $detailed = true, $pager = null)
 	{
 		$entry_id_list = self::getEntryIdsFromStaticPlaylistString($entry_id_list_str);
-		return self::executeStaticPlaylistFromEntryIds($entry_id_list, $filter, $detailed, $pager);
+		if($entry_id_list)
+		{
+			return self::executeStaticPlaylistFromEntryIds($entry_id_list, $filter, $detailed, $pager);
+		}
+
+		return null;
 	}
 
 	/**

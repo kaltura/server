@@ -68,7 +68,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 			$entry = $this->handleVideoRecord($recording, $dbUser, $zoomIntegration, $extraUsers, $recordingFile, $event);
 		}
 
-		if(isset($recording->recordingType[kRecordingFileType::CHAT]))
+		if(isset($recording->recordingFiles[kRecordingFileType::CHAT]))
 		{
 			$chatFilesProcessor = new kZoomChatFilesProcessor();
 			foreach ($recording->recordingFiles[kRecordingFileType::CHAT] as $recordingFile)

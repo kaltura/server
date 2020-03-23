@@ -1548,6 +1548,7 @@ class reportsInputFilter
 	public $player_versions;
 	public $isp;
 	public $application_versions;
+	public $node_ids;
 	public $categories_ancestor_ids;
 
 	public function getFilterBy() {

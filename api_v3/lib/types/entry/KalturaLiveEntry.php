@@ -132,6 +132,13 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 */
 	public $lastBroadcastEndTime;
 
+	/**
+	 * The time when the entry was first live with view_all
+	 * @var int
+	 *
+	 */
+	public $broadcastTime;
+
 	private static $map_between_objects = array
 	(
 		"offlineMessage",
@@ -153,6 +160,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		"viewMode",
 		"recordingStatus",
 		"lastBroadcastEndTime",
+		"broadcastTime",
 	);
 	
 	/* (non-PHPdoc)
