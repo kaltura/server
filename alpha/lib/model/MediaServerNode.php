@@ -13,7 +13,6 @@ abstract class MediaServerNode extends DeliveryServerNode {
 	abstract public function getWebService($serviceName);
 	abstract public function getLiveWebServiceName();
 	abstract public function getEnvDc();
-	abstract public function getSegmentDurationUrlString($sd);
 
 	public function getAppNameAndPrefix()
 	{
@@ -80,5 +79,10 @@ abstract class MediaServerNode extends DeliveryServerNode {
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_APP_PREFIX, null, null);
 	}
+
+    public function getSegmentDurationUrlString($sd)
+    {
+        return '';
+    }
 
 } // MediaServerNode
