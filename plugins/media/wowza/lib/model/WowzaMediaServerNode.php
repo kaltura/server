@@ -119,6 +119,11 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return 'dc-' . $this->getDc();
 	}
 
+    public function getSegmentDurationUrlString($sd)
+    {
+        return "sd/$sd/";
+    }
+
 	protected function getDomainByProtocolAndFormat($mediaServerConfig, $protocol = 'http', $format = null)
 	{
 		$domain = $this->getPlaybackDomain();
@@ -227,5 +232,6 @@ class WowzaMediaServerNode extends MediaServerNode {
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_LIVE_SERVICE_INTERNAL_DOMAIN, null, null);
 	}
+
 
 } // WowzaMediaServer

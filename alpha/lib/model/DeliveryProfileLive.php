@@ -354,7 +354,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			$entryId = $this->getDynamicAttributes()->getEntryId();
 		}
 		
-		$livePackagerUrl = "$livePackagerUrl/p/$partnerID/e/$entryId/sd/$segmentDuration/";
+		$livePackagerUrl = "$livePackagerUrl/p/$partnerID/e/$entryId/" . $serverNode->getSegmentDurationUrlString($segmentDuration);
 		$entry = $this->getDynamicAttributes()->getEntry();
 		if ($entry->getExplicitLive())
 		{
