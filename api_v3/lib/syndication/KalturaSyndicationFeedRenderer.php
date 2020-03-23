@@ -17,7 +17,10 @@ class KalturaSyndicationFeedRenderer
 	const PAGE_SIZE_MAX_VALUE = 500;
 
 	const DYNAMIC_TOTAL_RESULTS = 200;
-	
+
+	const SYNDICATION_MAP = 'syndication';
+	const PLAYLIST_EXECUTION_LIMIT_PARTNERS = 'playlistExecutionLimitPartners';
+
 	/**
 	 * Maximum number of items to list
 	 * @var int
@@ -410,10 +413,9 @@ class KalturaSyndicationFeedRenderer
 
 	protected function shouldUseDynamicPlaylist()
 	{
-		$syndicationMap = kConf::getMap('syndication');
-		if (isset($syndicationMap['playlistExecutionLimitPartners'])
-			&& is_array($syndicationMap['playlistExecutionLimitPartners'])
-			&& in_array($this->syndicationFeed->partnerId, $syndicationMap['playlistExecutionLimitPartners']))
+		$playlistExecutionLimitPartners = kConf::get(self::PLAYLIST_EXECUTION_LIMIT_PARTNERS, self::SYNDICATION_MAP, array());
+		if (is_array($playlistExecutionLimitPartners)
+			&& in_array($this->syndicationFeed->partnerId, $playlistExecutionLimitPartners))
 		{
 			return false;
 		}
