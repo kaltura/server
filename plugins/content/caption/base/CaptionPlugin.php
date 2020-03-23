@@ -533,10 +533,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 					$c->addAnd(assetPeer::ENTRY_ID, $entryIds, Criteria::IN);
 				}
 				else
-				{
-					$entryId = kParentChildEntryUtils::getCaptionAssetEntryId($config->entryId);
-					$c->addAnd(assetPeer::ENTRY_ID, $entryId);
-				}
+					$c->addAnd(assetPeer::ENTRY_ID, $config->entryId);
 				$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
 				$captionAssets = assetPeer::doSelect($c);
 
@@ -646,7 +643,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	{
 		if ($entryPlayingDataParams->getType() == self::getPluginName())
 		{
-			$captionAssets = assetPeer::retrieveByEntryId(kParentChildEntryUtils::getCaptionAssetEntryId($entry->getId()), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), array(asset::ASSET_STATUS_READY));
+			$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), array(asset::ASSET_STATUS_READY));
 			$playbackCaptions = array();
 			$useThreeCodeLang = false;
 			$threeCodeLanguagePartnersMap = kConf::getMap('three_code_language_partners');
