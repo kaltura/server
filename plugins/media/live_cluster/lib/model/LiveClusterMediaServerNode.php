@@ -43,5 +43,4 @@ class LiveClusterMediaServerNode extends MediaServerNode
     {
         return self::ENVIRONMENT . '/' . $this->getEnvironment();
     }
-
 }
