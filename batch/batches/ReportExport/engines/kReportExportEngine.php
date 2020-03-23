@@ -87,6 +87,12 @@ abstract class kReportExportEngine
 			$this->writeRow("Filtered entries: $entryIds");
 		}
 
+		if ($filter->$categoriesIdsIn)
+		{	
+			$categoriesIds = $filter->$categoriesIdsIn;
+			$this->writeRow("Filtered categories: $categoriesIds");
+		}
+
 	}
 
 	protected function writeDelimitedRow($row)
