@@ -515,9 +515,9 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			foreach ($fileSyncSubTypes as $subType)
 			{
 				$key = $flavorAsset->getSyncKey($subType);
-				if(!$storageProfile->isExported($key))
+				if(!kFileSyncUtils::getReadyExternalFileSyncForKey($key, $storageProfile->getId()))
 				{
-					KalturaLog::debug("Required file was not exported");
+					KalturaLog::debug("Required file was not exported yet");
 					$allExported = false;
 					break;
 				}
