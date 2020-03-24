@@ -414,7 +414,7 @@ class myPlaylistUtils
 			{
 				// We don't allow searching in the KalturaNEtwork anymore (mainly for performance reasons)
 				// allow only assets for the partner
-				if(kCurrentContext::$ks && kCurrentContext::$ks_partner_id)
+				if(kCurrentContext::$ks_partner_id)
 				{
 					$c->addAnd(entryPeer::PARTNER_ID, kCurrentContext::$ks_partner_id);
 				}
