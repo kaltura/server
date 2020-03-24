@@ -91,12 +91,19 @@ class kUploadTokenMgr
 			
 		try
 		{
-			$this->checkIfFileIsValid($fileData);
+			$this->checkIfFileIsValid($fileData, $resumeAt, $this->_finalChunk);
 		}
 		catch(kUploadTokenException $ex)
 		{
+			if($ex->getCode() == kUploadTokenException::UPLOAD_TOKEN_FILE_IS_EMPTY)
+			{
+				return;
+			}
+			
 			if(!$resume && $this->_finalChunk)
+			{
 				kFlowHelper::handleUploadFailed($this->_uploadToken);
+			}
 			
 			$this->tryMoveToErrors($fileData);
 			throw $ex;
@@ -147,7 +154,7 @@ class kUploadTokenMgr
 	 * Validate the file data
 	 * @param file $fileData
 	 */
-	protected function checkIfFileIsValid($fileData)
+	protected function checkIfFileIsValid($fileData, $resumeAt, $finalChunk)
 	{
 		// check file name
 		$fileName = isset($fileData['name']) ? $fileData['name'] : null;
@@ -174,6 +181,15 @@ class kUploadTokenMgr
 			$msg = "The uploaded file not valid for token id [{$this->_uploadToken->getId()}]";
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
 			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FILE_IS_NOT_VALID);
+		}
+		
+		$tempFileSize = kFile::fileSize($tempPath);
+		if($tempFileSize == 0 && !$finalChunk && $resumeAt > 0)
+		{
+			$msg = "The uploaded file has 0 bytes, file will be dismissed for token id [{$this->_uploadToken->getId()}]";
+			KalturaLog::log($msg . ' ' . print_r($fileData, true));
+			kFile::doDeleteFile($tempPath);
+			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FILE_IS_EMPTY);
 		}
 	}
 
