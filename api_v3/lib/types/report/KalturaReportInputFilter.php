@@ -224,10 +224,10 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 
 	/**
 	 * filter by node id
-         *
-         * @var string
-         */
-        public $nodeIdsIn;
+	 *
+	 * @var string
+	 */
+	public $nodeIdsIn;
 
 	/**
 	 * filter by categories ancestor

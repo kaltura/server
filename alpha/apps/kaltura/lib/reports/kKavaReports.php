@@ -1557,16 +1557,17 @@ class kKavaReports extends kKavaReportsMgr
 				'object_id' => self::DIMENSION_CATEGORIES,
 				'name' => self::DIMENSION_CATEGORIES,
 				'entries_count' => self::DIMENSION_CATEGORIES,
+				'direct_sub_categories_count' => self::DIMENSION_CATEGORIES,
 				'parent_name' => self::DIMENSION_CATEGORIES,
 			),
 			self::REPORT_ENRICH_DEF => array(
 				array(
-					self::REPORT_ENRICH_OUTPUT => array('name', 'entries_count', 'parent_name'),
+					self::REPORT_ENRICH_OUTPUT => array('name', 'entries_count', 'direct_sub_categories_count', 'parent_name'),
 					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
 					self::REPORT_ENRICH_CONTEXT => array(
 						'peer' => 'categoryPeer',
 						'int_ids_only' => true,
-						'columns' => array('NAME', 'ENTRIES_COUNT', 'PARENT_ID'),
+						'columns' => array('NAME', 'ENTRIES_COUNT', 'DIRECT_SUB_CATEGORIES_COUNT', 'PARENT_ID'),
 					),
 				),
 				array(
@@ -1580,6 +1581,7 @@ class kKavaReports extends kKavaReportsMgr
 				),
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_VIEWERS),
+			self::REPORT_FORCE_TOTAL_COUNT => true,
 		),
 
 	);
