@@ -320,7 +320,22 @@ class myPlaylistUtils
 	public static function executeStaticPlaylist ( entry $playlist , $filter  = null, $detailed = true, $pager = null )
 	{
 		$entry_id_list_str = $playlist->getDataContent();
-		return self::executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter, $detailed, $pager);
+		if(kEntitlementUtils::getEntitlementEnforcement() &&
+			kCurrentContext::$ks_object &&
+			kCurrentContext::$ks_object->getDisableEntitlementForPlaylistPlaylistId() === $playlist->getEntryId())
+		{
+			kEntitlementUtils::initEntitlementEnforcement(null, false);
+			entryPeer::setDefaultCriteriaFilter();
+			$result =  self::executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter, $detailed, $pager);
+			kEntitlementUtils::initEntitlementEnforcement();
+			entryPeer::setDefaultCriteriaFilter();
+		}
+		else
+		{
+			$result = self::executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter, $detailed, $pager);
+		}
+
+		return $result;
 	}
 	
 	public static function executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter = null, $detailed = true, $pager = null)
@@ -379,6 +394,7 @@ class myPlaylistUtils
 			{
 				$limit = $entry_filter->getLimit();
 			}
+
 			$entry_filter->setLimit(null);
 
 			// read the _eq_display_in_search field but ignore it because it's part of a more complex criterion - see bellow
@@ -397,20 +413,23 @@ class myPlaylistUtils
 			if ( $display_in_search >= 2 )
 			{
 				// We don't allow searching in the KalturaNEtwork anymore (mainly for performance reasons)
-				// allow only assets for the partner  
-				$c->addAnd ( entryPeer::PARTNER_ID , $partner_id ); // 
-/*				
-				$crit = $c->getNewCriterion ( entryPeer::PARTNER_ID , $partner_id );
-				$crit->addOr ( $c->getNewCriterion ( entryPeer::DISPLAY_IN_SEARCH , $display_in_search ) );
-				$c->addAnd ( $crit );
-*/
+				// allow only assets for the partner
+				if(kCurrentContext::$ks_partner_id)
+				{
+					$c->addAnd(entryPeer::PARTNER_ID, kCurrentContext::$ks_partner_id);
+				}
+
 			}
 		}
 
 		if ( $detailed )
-			$unsorted_entry_list = entryPeer::doSelectJoinkuser( $c ); // maybe join with kuser to add some data about the contributor
+		{
+			$unsorted_entry_list = entryPeer::doSelectJoinkuser($c); // maybe join with kuser to add some data about the contributor
+		}
 		else
-			$unsorted_entry_list = entryPeer::doSelect( $c ); // maybe join with kuser to add some data about the contributor
+		{
+			$unsorted_entry_list = entryPeer::doSelect($c);
+		}
 	
 		// now sort the list according to $entry_id_list
 		
@@ -427,45 +446,47 @@ class myPlaylistUtils
 		// VERY STRANGE !! &$entry_id must be with a & or else the values of the array change !!!
 		foreach ( $entry_id_list as &$entry_id )
 		{
-			if ( $entry_id != "" )
+			if ( $entry_id !== "" && isset($id_list[$entry_id]) )
 			{
-				$current_entry = @$id_list[$entry_id];
-				if ( $current_entry )
+				$current_entry = $id_list[$entry_id];
+				if ( isset($limit) && ($limit-- === 0) )
 				{
-					if ( isset($limit) && ($limit-- === 0) )
-					{
-						break;
-					}
+					break;
+				}
 
-					if ( $pager )
+				if ( $pager )
+				{
+					if ( $startOffset > 0 )
 					{
-						if ( $startOffset > 0 )
+						$startOffset--;
+						continue;
+					}
+					else
+					{
+						if ( $pageSize > 0 )
 						{
-							$startOffset--;
-							continue;
+							$pageSize--;
 						}
 						else
 						{
-							if ( $pageSize > 0 )
-							{
-								$pageSize--;
-							}
-							else
-							{
-								break;
-							}
+							break;
 						}
 					}
+				}
 
-					// add to the entry_list only when the entry_id is not empty 
-					$entry_list[] = $current_entry;
-				} 
+				// add to the entry_list only when the entry_id is not empty
+				$entry_list[] = $current_entry;
 			}
 		}
-		if ( count( $entry_list ) == 0 ) return null;
+
+		if ( count( $entry_list ) == 0 )
+		{
+			return null;
+		}
 
 		return $entry_list;
 	}
+
 	private static function buildIdMap ( $list )
 	{
 		if( ! $list ) return null;

@@ -288,10 +288,11 @@ class kEntitlementUtils
 	}
 
 	/**
-	 * Set Entitlement Enforcement - if entitelement is enabled \ disabled in this session
-	 * @param int $categoryId
-	 * @param int $kuser
-	 * @return bool
+	 * Set Entitlement Enforcement - if entitlement is enabled \ disabled in this session
+	 * @param int $partnerId
+	 * @param bool $enableEntit
+	 * @return void
+	 * @throws Exception
 	 */
 	public static function initEntitlementEnforcement($partnerId = null, $enableEntit = null)
 	{

@@ -584,29 +584,38 @@ class ks extends kSessionBase
 	public function getDisableEntitlementForPlaylistEntries()
 	{
 		$entries = array();
-		// foreach privileges group
-		foreach( $this->parsedPrivileges as $privilegeType => $privilege)
+		$playlistId = $this->getDisableEntitlementForPlaylistPlaylistId();
+		if ($playlistId)
 		{
-			if ($privilegeType === self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_PLAYLIST && isset($privilege[0]))
+			$entry = entryPeer::retrieveByPKNoFilter($playlistId, null, false);
+			if ($entry && $entry->getStatus() != entryStatus::DELETED && $entry->getType() == entryType::PLAYLIST &&
+				self::isValidForPlaylistDisableEntitlement($entry->getMediaType()))
 			{
-				$playlistId = $privilege[0];
-				$entry = entryPeer::retrieveByPKNoFilter($playlistId, null, false);
-				if ($entry && $entry->getStatus() != entryStatus::DELETED && $entry->getType() == entryType::PLAYLIST &&
-					self::isValidForPlaylistDisableEntitlement($entry->getMediaType()))
+				$entry_id_list_str = $entry->getDataContent();
+				$result = myPlaylistUtils::getEntryIdsFromStaticPlaylistString($entry_id_list_str);
+				if ($result)
 				{
-					$entry_id_list_str = $entry->getDataContent();
-					$result = myPlaylistUtils::getEntryIdsFromStaticPlaylistString($entry_id_list_str);
-					if ($result)
-					{
-						$entries = $result;
-					}
-
-					$entries[] = $playlistId;
+					$entries = $result;
 				}
+
+				$entries[] = $playlistId;
 			}
 		}
 
 		return $entries;
+	}
+
+	public function getDisableEntitlementForPlaylistPlaylistId()
+	{
+		foreach( $this->parsedPrivileges as $privilegeType => $privilege)
+		{
+			if ($privilegeType === self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_PLAYLIST && isset($privilege[0]))
+			{
+				return $privilege[0];
+			}
+		}
+
+		return null;
 	}
 
 	/**
