@@ -48,6 +48,9 @@ function main($partnerId, $storageId,$realRun)
 	$criteria = new Criteria(FileSyncPeer::DATABASE_NAME);
 	$criteria->add(FileSyncPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 	$criteria->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY, Criteria::EQUAL);
+	$criteria->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ASSET);
+        $criteria->add(FileSyncPeer::OBJECT_SUB_TYPE, flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+        $criteria->add(FileSyncPeer::FILE_PATH, 'NULL', Criteria::NOT_EQUAL);
 	$fileSyncs = FileSyncPeer::doSelect($criteria);
 	KalturaLog::debug("Founc: " . count($fileSyncs) . " file syncs to copy");
 	foreach ($fileSyncs as $fileSync)
@@ -58,6 +61,9 @@ function main($partnerId, $storageId,$realRun)
 		$newfileSync = $fileSync->copy(true);
 		$newfileSync->setStatus(FileSync::FILE_SYNC_STATUS_PENDING);
 		$newfileSync->setDc($storageId);
+		$newfileSync->setSrcPath($fileSync->getFullPath());
+                $newfileSync->setSrcEncKey($fileSync->getSrcEncKey());
+                $newfileSync->setFileType(FileSync::FILE_SYNC_FILE_TYPE_URL);
 		if ($realRun)
 		{
 			$newfileSync->save();
