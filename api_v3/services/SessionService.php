@@ -260,29 +260,30 @@ class SessionService extends KalturaBaseService
 		
 		return $sessionInfo;
 	}
-	
+
 	/**
 	 * Start a session for Kaltura's flash widgets
-	 * 
+	 *
 	 * @action startWidgetSession
 	 * @param string $widgetId
 	 * @param int $expiry
 	 * @return KalturaStartWidgetSessionResponse
 	 * @ksIgnored
-	 * 
+	 *
 	 * @throws APIErrors::INVALID_WIDGET_ID
 	 * @throws APIErrors::MISSING_KS
 	 * @throws APIErrors::INVALID_KS
 	 * @throws APIErrors::START_WIDGET_SESSION_ERROR
-	 */	
+	 * @throws KalturaAPIException
+	 */
 	function startWidgetSession ( $widgetId , $expiry = 86400 )
 	{
 		// make sure the secret fits the one in the partner's table
 		$ksStr = "";
-		$widget = widgetPeer::retrieveByPK( $widgetId );
-		if ( !$widget )
+		$widget = widgetPeer::retrieveByPK($widgetId);
+		if (!$widget)
 		{
-			throw new KalturaAPIException ( APIErrors::INVALID_WIDGET_ID , $widgetId );
+			throw new KalturaAPIException (APIErrors::INVALID_WIDGET_ID, $widgetId);
 		}
 
 		$partnerId = $widget->getPartnerId();
@@ -294,10 +295,19 @@ class SessionService extends KalturaBaseService
 		// according to the partner's policy and the widget's policy - define the privileges of the ks
 		// TODO - decide !! - for now only view - any kshow
 		$privileges = "view:*,widget:1";
-		
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId) &&
+
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId) &&
 			!$widget->getEnforceEntitlement() && $widget->getEntryId())
-			$privileges .= ','. kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY . ':' . $widget->getEntryId();
+		{
+			$entryId = $widget->getEntryId();
+			$privileges .= ',' . kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY . ':' . $entryId;
+			$entry = entryPeer::retrieveByPKNoFilter($entryId, null, false);
+			if ($entry && $entry->getStatus() != entryStatus::DELETED && $entry->getType() == entryType::PLAYLIST
+				&& ks::isValidForPlaylistDisableEntitlement($entry->getMediaType()))
+			{
+				$privileges .= ',' . kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_PLAYLIST . ':' . $entryId;
+			}
+		}
 			
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId) &&
 			!is_null($widget->getPrivacyContext()) && $widget->getPrivacyContext() != '' )

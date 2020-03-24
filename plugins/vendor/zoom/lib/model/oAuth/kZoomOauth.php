@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.venodr
+ * @package plugins.vendor
  * @subpackage model.oAuth
  */
 class kZoomOauth
@@ -102,7 +102,7 @@ class kZoomOauth
 
 	/**
 	 * @param array $data
-	 * @return array<tokens>
+	 * @return array tokens
 	 */
 	public static function extractTokensFromData($data)
 	{

@@ -26,7 +26,7 @@ class JobsService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
-		if($this->getPartnerId() != Partner::ADMIN_CONSOLE_PARTNER_ID)
+		if($this->getPartnerId() != Partner::ADMIN_CONSOLE_PARTNER_ID && $this->getPartnerId() != Partner::BATCH_PARTNER_ID)
 			$this->applyPartnerFilterForClass('BatchJob'); 	
 	}
 	

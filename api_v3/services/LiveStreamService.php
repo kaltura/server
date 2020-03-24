@@ -9,7 +9,7 @@
  */
 class LiveStreamService extends KalturaLiveEntryService
 {
-	const ISLIVE_ACTION_CACHE_EXPIRY_WHEN_NOT_LIVE = 10;
+	const ISLIVE_ACTION_CACHE_EXPIRY_WHEN_NOT_LIVE = 5;
 	const ISLIVE_ACTION_CACHE_EXPIRY_WHEN_LIVE = 30;
 	const ISLIVE_ACTION_NON_KALTURA_LIVE_CONDITIONAL_CACHE_EXPIRY = 10;
 	const HLS_LIVE_STREAM_CONTENT_TYPE = 'application/vnd.apple.mpegurl';

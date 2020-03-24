@@ -114,6 +114,7 @@ class KAsyncLiveEntryArchive extends KJobHandlerWorker
 		$updatedLiveEntry = new KalturaLiveStreamEntry();
 		$updatedLiveEntry->redirectEntryId = '';
 		$updatedLiveEntry->recordedEntryId = '';
+		$updatedLiveEntry->broadcastTime = 0;
 		KBatchBase::$kClient->baseEntry->update($liveEntry->id, $updatedLiveEntry);
 	}
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.venodr
+ * @package plugins.vendor
  * @subpackage zoom.model
  */
 class ZoomHelper
@@ -35,6 +35,9 @@ class ZoomHelper
 		return self::$zoomIntegration;
 	}
 
+	/**
+	 * @return zoomVendorIntegration
+	 */
 	public static function getZoomIntegration()
 	{
 		self::verifyZoomIntegration(self::$zoomIntegration);
