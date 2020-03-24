@@ -180,7 +180,13 @@
 		protected static function getData2($chunkFileName, KChunkFramesStat $framesStat, $ffprobeBin="ffprobe", $ffmpegBin="ffmpeg")
 		{
 			KalturaLog::log("$chunkFileName");
-			$cmdLine = "$ffmpegBin -i $chunkFileName -c copy -f mp4 -v quiet -y $chunkFileName.mp4;$ffprobeBin -show_streams -select_streams v -v quiet -show_entries stream=duration,nb_frames -print_format csv $chunkFileName.mp4";
+				/*
+				 * In order to save AWS egress traffic, 
+				 * store the tmp MP4 file in th local /tmp folder
+				 */
+//			$mp4TmpFile = "$chunkFileName.mp4";
+			$mp4TmpFile = "/tmp/".basename($chunkFileName).".mp4";
+			$cmdLine = "$ffmpegBin -i $chunkFileName -c copy -f mp4 -v quiet -y $mp4TmpFile;$ffprobeBin -show_streams -select_streams v -v quiet -show_entries stream=duration,nb_frames -print_format csv $mp4TmpFile; unlink $mp4TmpFile";
 			KalturaLog::log("copy:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {
