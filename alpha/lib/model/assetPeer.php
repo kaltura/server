@@ -795,12 +795,13 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		return false;
 	}
 
-	public static function retrieveDscFlavorsByEntryIdAndStatus($entryId, array $statuses = null)
+	public static function retrieveDscFlavorsByEntryIdAndStatus($entryId, array $statuses = array())
 	{
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
 
-		if(is_array($statuses) && count($statuses)) {
+		if(count($statuses))
+		{
 			$c->add(assetPeer::STATUS, $statuses, Criteria::IN);
 		}
 

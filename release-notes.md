@@ -20,7 +20,9 @@ Issue ID : PLAT-10735
         friendlyName                                        = Storage Periodic Export
         type                                                = KAsyncStoragePeriodicExport
         scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicExportExe.php
-        params.maxCount                                     = 100
+        params.maxCount                                     = @MAX_COUNT@
+        params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
+        params.sleepInterval                                = @SLEEP_INTERVAL@
         params.profileIdsIn                                 = @PRODILE_IDS_COMMA_SEPERATED@
 
 #### Deployment Scripts ####

@@ -493,7 +493,6 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 	public static function handlePeriodicFileExportFinished($fileSync, StorageProfile $storageProfile)
 	{
-		$allExported = true;
 		$keysArray = array();
 		$object = assetPeer::retrieveById($fileSync->getObjectId());
 		if(!$object)
@@ -507,7 +506,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 		foreach ($flavorAssets as $flavorAsset)
 		{
-			if($flavorAsset->getIsOriginal() || !$storageProfile->isFlavorAssetConfiguredForExport($flavorAsset))
+			if(!$storageProfile->isFlavorAssetConfiguredForExport($flavorAsset))
 			{
 				continue;
 			}
@@ -517,42 +516,29 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 				$key = $flavorAsset->getSyncKey($subType);
 				if(!kFileSyncUtils::getReadyExternalFileSyncForKey($key, $storageProfile->getId()))
 				{
-					KalturaLog::debug("Required file was not exported yet");
-					$allExported = false;
-					break;
+					KalturaLog::debug("Required file for flavor asset [{$flavorAsset->getId()}] was not exported yet");
+					return;
 				}
 				$keysArray[$flavorAsset->getId()] = $key->getVersion();
 			}
-			if($allExported == false)
-			{
-				break;
-			}
 		}
 
-		if($allExported)
+		foreach ($flavorsToExport as $flavorAsset)
 		{
-			foreach ($flavorsToExport as $flavorAsset)
-			{
-				kFlowHelper::deleteAssetLocalFileSyncs($keysArray[$flavorAsset->getId()], $flavorAsset);
-			}
+			kFlowHelper::deleteAssetLocalFileSyncs($keysArray[$flavorAsset->getId()], $flavorAsset);
 		}
 	}
 
 	public static function getPeriodicStorageIdsByPartner($partnerId)
 	{
-		if (kConf::hasParam("export_to_cloud","cloud_storage"))
+		$config = kConf::get('export_to_cloud','cloud_storage', array());
+		if (array_key_exists($partnerId, $config))
 		{
-			$config = kConf::get("export_to_cloud","cloud_storage", array());
-			if (array_key_exists($partnerId, $config))
-			{
-				$storageIds = $config[$partnerId];
-				return explode(',', $storageIds);
-			}
+			$storageIds = $config[$partnerId];
+			return explode(',', $storageIds);
 		}
-		else
-		{
-			return null;
-		}
+
+		return null;
 	}
 
 	public static function getPeriodicStorageProfiles($partnerId)

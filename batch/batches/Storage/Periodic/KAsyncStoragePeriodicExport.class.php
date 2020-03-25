@@ -8,8 +8,8 @@
  */
 class KAsyncStoragePeriodicExport extends KPeriodicWorker
 {
-	const MAX_EXECUTION_TIME = 3600;        // can be exceeded by one file sync
-	const IDLE_SLEEP_INTERVAL = 10;
+	const MAX_EXECUTION_TIME = 'maxExecutionTime';        // can be exceeded by one file sync
+	const IDLE_SLEEP_INTERVAL = 'sleepInterval';
 	const MAX_COUNT = 'maxCount';
 	const MAX_SIZE = 'maxSize';
 	const STORAGE_PROFILE_IDS = 'profileIdsIn';
@@ -17,6 +17,7 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 
 	protected $storageProfiles;
 	protected $currentIndex;
+	protected $fileSyncsToUpdate;
 
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -34,6 +35,7 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 		$filter = $this->getFilter();
 		$maxCount = $this->getAdditionalParams(self::MAX_COUNT);
 		$maxSize = $this->getAdditionalParams(self::MAX_SIZE);
+		$sleepInterval = $this->getAdditionalParams(self::IDLE_SLEEP_INTERVAL);
 		$this->storageProfileIdsArray = explode(',', $this->getAdditionalParams(self::STORAGE_PROFILE_IDS));
 		if(!$this->storageProfileIdsArray)
 		{
@@ -42,7 +44,7 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 		}
 		$this->currentIndex = 0;
 		$responseProfile = $this->initResponseProfile();
-		$timeLimit = time() + self::MAX_EXECUTION_TIME;
+		$timeLimit = time() + $this->getAdditionalParams(self::MAX_EXECUTION_TIME);
 
 		while (time() < $timeLimit)
 		{
@@ -56,15 +58,16 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 			$lockResult = self::$kClient->storageProfile->lockPendingFileSyncs($filter, $this->getId(), $storageProfile->id, $maxCount, $maxSize);
 			if (!$lockResult->fileSyncs)
 			{
-				sleep(self::IDLE_SLEEP_INTERVAL);
+				sleep($sleepInterval);
 				continue;
 			}
 
 			$this->exportFileSyncs($lockResult->fileSyncs, $storageProfile);
+			$this->updateFileSyncsStatus();
 
 			if (!$lockResult->limitReached)
 			{
-				sleep(self::IDLE_SLEEP_INTERVAL);
+				sleep($sleepInterval);
 			}
 		}
 	}
@@ -85,13 +88,14 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 
 	protected function export($storageProfile, $fileSync)
 	{
-		$data = $this->createExportData($storageProfile, $fileSync);
-		$engine = KExportEngine::getInstance($storageProfile->protocol, $storageProfile->partnerId, $data);
+		$tempStorageExportData = new KalturaStorageExportJobData();
+		$engine = KExportEngine::getInstance($storageProfile->protocol, $storageProfile->partnerId, $tempStorageExportData);
 		if (!$engine)
 		{
 			KalturaLog::debug('Engine not found');
 			return false;
 		}
+		$engine->setExportDataFields($storageProfile, $fileSync);
 
 		$exportResult = $engine->export();
 		if(!$exportResult)
@@ -101,36 +105,26 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 		return $exportResult;
 	}
 
-
-	protected function createExportData($storageProfile, $fileSync)
+	protected function updateFileSyncsStatus()
 	{
-		if ($storageProfile->protocol == StorageProfileProtocol::S3)
-		{
-			$storageExportData = new KalturaAmazonS3StorageExportJobData();
-		}
-		else
-		{
-			$storageExportData = new KalturaStorageExportJobData();
-		}
+		$responseProfile = new KalturaDetachedResponseProfile();
+		$responseProfile->type = KalturaResponseProfileType::INCLUDE_FIELDS;
+		$responseProfile->fields = 'id';        // don't need the response
+		self::$kClient->setResponseProfile($responseProfile);
+		$fileSyncPlugin = KalturaFileSyncClientPlugin::get(self::$kClient);
+		self::$kClient->startMultiRequest();
 
-		$storageExportData = $this->fillStorageExportJobData($storageExportData, $storageProfile, $fileSync);
-		return $storageExportData;
-	}
-
-	protected function changeFileSyncStatus(KalturaFileSync $fileSync, $status)
-	{
-		$updateFileSync = new KalturaFileSync;
-		$updateFileSync->status = $status;
+		foreach ($this->fileSyncsToUpdate as $id => $status)
+		{
+			$updateFileSync = new KalturaFileSync;
+			$updateFileSync->status = $status;
+			$fileSyncPlugin->fileSync->update($id, $updateFileSync);
+		}
 
 		try
 		{
-			$responseProfile = new KalturaDetachedResponseProfile();
-			$responseProfile->type = KalturaResponseProfileType::INCLUDE_FIELDS;
-			$responseProfile->fields = '';        // don't need the response
-			self::$kClient->setResponseProfile($responseProfile);
-
-			$fileSyncPlugin = KalturaFileSyncClientPlugin::get(self::$kClient);
-			$fileSyncPlugin->fileSync->update($fileSync->id, $updateFileSync);
+			self::$kClient->doMultiRequest();
+			$this->fileSyncsToUpdate = array();
 		}
 		catch (KalturaException $e)
 		{
@@ -140,42 +134,7 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 		{
 			KalturaLog::err($e);
 		}
-	}
 
-	protected function fillStorageExportJobData($storageExportData, $externalStorage, $fileSync, $force = false)
-	{
-		$storageExportData->serverUrl = $externalStorage->storageUrl;
-		$storageExportData->serverUsername = $externalStorage->storageUsername;
-		$storageExportData->serverPassword = $externalStorage->storagePassword;
-		$storageExportData->serverPrivateKey = $externalStorage->privateKey;
-		$storageExportData->serverPublicKey = $externalStorage->publicKey;
-		$storageExportData->serverPassPhrase = $externalStorage->passPhrase;
-		$storageExportData->ftpPassiveMode = $externalStorage->storageFtpPassiveMode;
-
-		$storageExportData->srcFileSyncLocalPath = $fileSync->srcPath;
-		$storageExportData->srcFileEncryptionKey = $fileSync->srcEncKey;
-		$storageExportData->srcFileSyncId = $fileSync->id;
-
-		$storageExportData->force = $force;
-		$storageExportData->destFileSyncStoredPath = $externalStorage->storageBaseDir . '/' . $fileSync->filePath;
-		$storageExportData->createLink = $externalStorage->createFileLink;
-
-		if($externalStorage->protocol == StorageProfileProtocol::S3)
-		{
-			$storageExportData = $this->addS3FieldsToStorageData($storageExportData, $externalStorage);
-		}
-
-		return $storageExportData;
-	}
-
-	protected function addS3FieldsToStorageData($storageExportData, $externalStorage)
-	{
-		$storageExportData->filesPermissionInS3 = $externalStorage->filesPermissionInS3;
-		$storageExportData->s3Region = $externalStorage->s3Region;
-		$storageExportData->sseType = $externalStorage->sseType;
-		$storageExportData->sseKmsKeyId = $externalStorage->sseKmsKeyId;
-		$storageExportData->signatureType = $externalStorage->signatureType;
-		return $storageExportData;
 	}
 
 	protected function initResponseProfile()
@@ -235,17 +194,16 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 				{
 					$status = KalturaFileSyncStatus::ERROR;
 				}
-				$this->changeFileSyncStatus($fileSync, $status);
+				$this->fileSyncsToUpdate[$fileSync->id] = $status;
 			}
 			catch(kApplicativeException $e)
 			{
 				$this->handleAppException($e, $fileSync);
-				break;
 			}
 			catch(Exception $e)
 			{
 				KalturaLog::err("Could not export file. Error: [{$e->getMessage()}]");
-				$this->changeFileSyncStatus($fileSync, KalturaFileSyncStatus::ERROR);
+				$this->fileSyncsToUpdate[$fileSync->id] = KalturaFileSyncStatus::ERROR;
 			}
 		}
 	}
@@ -254,14 +212,14 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 	{
 		if($e->getCode() == KalturaBatchJobAppErrors::FILE_ALREADY_EXISTS)
 		{
-			KalturaLog::debug("File already exists in remote storage");
+			KalturaLog::debug("File with path [$fileSync->filePath}] already exists in remote storage");
 			$status = KalturaFileSyncStatus::READY;
 		}
 		else
 		{
-			KalturaLog::err("Could not export file. Error: [{$e->getMessage()}]");
+			KalturaLog::err("Could not export file sync id [$fileSync->id]. Error: [{$e->getMessage()}]");
 			$status = KalturaFileSyncStatus::ERROR;
 		}
-		$this->changeFileSyncStatus($fileSync, $status);
+		$this->fileSyncsToUpdate[$fileSync->id] = $status;
 	}
 }
