@@ -985,7 +985,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		//index the entry after the cue point was added|deleted
 		$entryId = $cuePoint->getEntryId();
 		$entry = entryPeer::retrieveByPK($entryId);
-		if($entry)
+		if($entry && $entry->getStatus() != entryStatus::DELETED)
 		{
 			if(!in_array($entryId, self::$alreadyUpdatedEntryIds))
 			{
