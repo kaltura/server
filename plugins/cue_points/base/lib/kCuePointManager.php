@@ -985,24 +985,21 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		//index the entry after the cue point was added|deleted
 		$entryId = $cuePoint->getEntryId();
 		$entry = entryPeer::retrieveByPK($entryId);
-		if($entry && $entry->getStatus() != entryStatus::DELETED)
+		if($entry && $entry->getStatus() != entryStatus::DELETED && !in_array($entryId, self::$alreadyUpdatedEntryIds))
 		{
-			if(!in_array($entryId, self::$alreadyUpdatedEntryIds))
+			self::$alreadyUpdatedEntryIds[] = $entryId;
+			
+			$entry->setUpdatedAt(time());
+			$entry->save();
+			
+			if($shouldReIndexToSphinx)
 			{
-				self::$alreadyUpdatedEntryIds[] = $entryId;
-				
-				$entry->setUpdatedAt(time());
-				$entry->save();
-				
-				if($shouldReIndexToSphinx)
-				{
-					$entry->indexToSearchIndex();
-				}
-				
-				if(!$shouldReIndexToSphinx && $shouldReIndexToElastic) //we don't need to index to elastic if already indexing to sphinx
-				{
-					$entry->indexToElastic();
-				}
+				$entry->indexToSearchIndex();
+			}
+			
+			if(!$shouldReIndexToSphinx && $shouldReIndexToElastic) //we don't need to index to elastic if already indexing to sphinx
+			{
+				$entry->indexToElastic();
 			}
 		}
 	}
