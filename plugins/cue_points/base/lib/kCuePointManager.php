@@ -13,6 +13,8 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 {
 	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
 	const MAX_CUE_POINTS_TO_COPY = 1000;
+	
+	protected static $alreadyUpdatedEntryIds = array();
 
 	/* (non-PHPdoc)
  	 * @see kBatchJobStatusEventConsumer::updatedJob()
@@ -977,23 +979,30 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		kJobsManager::addJob($batchJob, $jobData, BatchJobType::LIVE_TO_VOD);
 		return;
  	}
-
+	
 	public static function reIndexCuePointEntry(CuePoint $cuePoint, $shouldReIndexToSphinx, $shouldReIndexToElastic)
 	{
 		//index the entry after the cue point was added|deleted
 		$entryId = $cuePoint->getEntryId();
 		$entry = entryPeer::retrieveByPK($entryId);
-		if($entry && $entry->getStatus() != entryStatus::DELETED)
+		if($entry)
 		{
-			$entry->setUpdatedAt(time());
-			$entry->save();
-			if ($shouldReIndexToSphinx)
+			if(!in_array($entryId, self::$alreadyUpdatedEntryIds))
 			{
-				$entry->indexToSearchIndex();
-			}
-			if (!$shouldReIndexToSphinx && $shouldReIndexToElastic) //we don't need to index to elastic if already indexing to sphinx
-			{
-				$entry->indexToElastic();
+				self::$alreadyUpdatedEntryIds[] = $entryId;
+				
+				$entry->setUpdatedAt(time());
+				$entry->save();
+				
+				if($shouldReIndexToSphinx)
+				{
+					$entry->indexToSearchIndex();
+				}
+				
+				if(!$shouldReIndexToSphinx && $shouldReIndexToElastic) //we don't need to index to elastic if already indexing to sphinx
+				{
+					$entry->indexToElastic();
+				}
 			}
 		}
 	}
