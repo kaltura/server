@@ -1401,18 +1401,28 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		// added by Tan-Tan 12/01/2010 to support falvors copy
 		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
 		foreach($sourceAssets as $sourceAsset)
-			if (self::shouldCopyAsset($sourceAsset, $copyFlavors, $copyCaptions))
+		{
+			if (self::shouldCopyAsset($sourceAsset, $copyFlavors, $copyCaptions, $entry->getId()))
 			{
 				$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
 			}
+		}
 	}
 
-	private static function shouldCopyAsset($sourceAsset, $copyFlavors = true, $copyCaptions = true)
+	private static function shouldCopyAsset($sourceAsset, $copyFlavors = true, $copyCaptions = true, $originalEntryId)
 	{
 		// timedThumbAsset are copied when ThumbCuePoint are copied
-			if ($sourceAsset instanceof timedThumbAsset || ( !$copyFlavors && $sourceAsset instanceof flavorAsset)
-			|| ( !$copyCaptions && $sourceAsset instanceof captionAsset))
+		if ($sourceAsset instanceof timedThumbAsset || (!$copyFlavors && $sourceAsset instanceof flavorAsset)
+			|| (!$copyCaptions && $sourceAsset instanceof captionAsset))
+		{
 			return false;
+		}
+
+		if (!kParentChildEntryUtils::shouldCopyAsset($sourceAsset, $originalEntryId))
+		{
+			return false;
+		}
+
 		return true;
 	}
 
