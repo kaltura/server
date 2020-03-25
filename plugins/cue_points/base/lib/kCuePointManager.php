@@ -556,11 +556,10 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	 */
 	protected function cuePointDeleted(CuePoint $cuePoint)
 	{
-		$c = new Criteria();
-		$c->add(CuePointPeer::PARENT_ID, $cuePoint->getId());
-
 		if ($cuePoint->getChildrenCount())
 		{
+			$c = new Criteria();
+			$c->add(CuePointPeer::PARENT_ID, $cuePoint->getId());
 			$this->deleteCuePoints($c);
 		}
 
