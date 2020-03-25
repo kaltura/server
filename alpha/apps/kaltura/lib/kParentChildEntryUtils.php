@@ -42,4 +42,18 @@ class kParentChildEntryUtils
 		myDbHelper::$use_alternative_con = null;
 		return array_unique($parentEntryIds);
 	}
+	
+	/**
+	 * @param $asset
+	 * @param $entryId
+	 * @return bool
+	 */
+	public static function shouldCopyAsset($asset, $originalEntryId)
+	{
+		if ($asset instanceof captionAsset && $asset->getEntryId() != $originalEntryId)
+		{
+			return false;
+		}
+		return true;
+	}
 }
