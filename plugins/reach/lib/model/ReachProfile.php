@@ -491,8 +491,8 @@ class ReachProfile extends BaseReachProfile
 				}
 				else if (count($rule->getConditions()) == 1)
 				{
-					$condition = $rule->getConditions()[0];
-					if ($condition->getType() == ConditionType::BOOLEAN)
+					$conditions = $rule->getConditions();
+					if ($conditions[0]->getType() == ConditionType::BOOLEAN)
 					{
 						continue;
 					}
