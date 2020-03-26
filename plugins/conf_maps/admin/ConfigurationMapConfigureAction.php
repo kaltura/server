@@ -96,6 +96,7 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 							$configurationMap->rawData = $content;
 						}
 					}
+					$configurationMap->createdAt = date('d.m.Y',$configurationMap->createdAt);
 					$form->populateFromObject($configurationMap, false);
 				}
 			}
