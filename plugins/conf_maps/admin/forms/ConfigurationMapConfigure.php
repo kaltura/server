@@ -33,6 +33,13 @@ class Form_ConfigurationMapConfigure extends ConfigureForm
 			'readonly' => true,
 		));
 
+		$this->addElement('text', 'createdAt', array(
+			'label' => 'Last Updated Date:',
+			'filters' => array('StringTrim'),
+			'placement' => 'prepend',
+			'readonly' => true,
+		));
+
 		$this->addElement('text', 'name', array(
 			'label' => 'Map Name:',
 			'required' => true,
