@@ -74,4 +74,8 @@ class SchedulerWorker extends BaseSchedulerWorker
 		
 		return SchedulerConfigPeer::retrieveByPKs($configIds, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 	} 
+	public function getCacheInvalidationKeys()
+	{
+		return array("schedulerWorker:schedulerConfiguredId=".strtolower($this->getSchedulerConfiguredId()));
+	}
 }
