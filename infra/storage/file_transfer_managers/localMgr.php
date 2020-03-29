@@ -120,28 +120,34 @@ class localMgr extends kFileTransferMgr
 	protected function doList ($remoteDir)
 	{
 	    clearstatcache();
-	    return $this->doListRecursively($remoteDir);
+		return $this->doListRecursively($remoteDir);
 	}
 
-    private function doListRecursively($remoteDir, $currentDepth = parent::MAX_DIR_DEPTH) {
-        $ls = [];
-        if($currentDepth < 0 )
-            return $ls;
-        foreach(@scandir($remoteDir) as $filename) {
-            if ($filename[0] === '.')
-                continue;
-            $filePath = $remoteDir . '/' . $filename;
-            if (is_dir($filePath)) {
-                foreach ($this->doListRecursively($filePath, $currentDepth - 1) as $childFilename)
-                {
-                    $ls[] = $filename . '/' . $childFilename;
-                }
-            } else {
-                $ls[] = $filename;
-            }
-        }
-        return $ls;
-    }
+	protected function doListRecursively($remoteDir, $currentDepth = parent::MAX_DIR_DEPTH) {
+		$ls = [];
+		if($currentDepth < 0)
+		{
+			return $ls;
+		}
+		foreach(@scandir($remoteDir) as $fileName)
+		{
+			if ($fileName == '.' || $fileName == '..')
+			{
+				continue;
+			}
+			$filePath = $remoteDir . '/' . $fileName;
+			if (is_dir($filePath)) {
+				$subDirFiles = $this->doListRecursively($filePath, $currentDepth - 1);
+				foreach ($subDirFiles as $subDirFile)
+				{
+					$ls[] = $fileName . '/' . $subDirFile;
+				}
+			} else {
+				$ls[] = $fileName;
+			}
+		}
+		return $ls;
+	}
 
 	protected function doListFileObjects ($remoteDir)
 	{
