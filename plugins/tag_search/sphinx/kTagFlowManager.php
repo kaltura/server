@@ -280,6 +280,8 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 		{
 			$c->addAnd(TagPeer::PRIVACY_CONTEXT, self::NULL_PC);
 		}
+		$c->addGroupByColumn(TagPeer::PRIVACY_CONTEXT);
+
 		TagPeer::setUseCriteriaFilter(false);
 		$tagsToDecrement = TagPeer::doSelect($c);
 		TagPeer::setUseCriteriaFilter(true);

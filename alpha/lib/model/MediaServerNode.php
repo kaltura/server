@@ -80,4 +80,9 @@ abstract class MediaServerNode extends DeliveryServerNode {
 		return $this->getFromCustomData(self::CUSTOM_DATA_APP_PREFIX, null, null);
 	}
 
+    public function getSegmentDurationUrlString($sd)
+    {
+        return '';
+    }
+
 } // MediaServerNode

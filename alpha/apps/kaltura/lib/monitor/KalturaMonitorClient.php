@@ -65,7 +65,8 @@ class KalturaMonitorClient
 
 	public static function prettyPrintCounters()
 	{
-		$str='';
+		$serviceInfo = kCurrentContext::$isInMultiRequest ?  ' S:multiRequest A:null' : ' S:' . kCurrentContext::$service . ' A:' . kCurrentContext::$action;
+		$str='pid:' . kCurrentContext::getCurrentPartnerId() . $serviceInfo . ' ';
 		foreach (self::$sessionCounters as $key => $value)
 		{
 			$str .= $key . ':' . $value . ' ';
@@ -75,7 +76,7 @@ class KalturaMonitorClient
 
 	public static function monitorRequestEnd()
 	{
-		KalturaLog::info('Session data source counters ' . self::prettyPrintCounters());
+		KalturaLog::info('Session counters ' . self::prettyPrintCounters());
 
 		if(!isset ($_SERVER[self::SESSION_COUNTERS_SECRET_HEADER]))
 		{

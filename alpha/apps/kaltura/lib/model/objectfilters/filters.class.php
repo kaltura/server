@@ -199,7 +199,6 @@ abstract class baseObjectFilter extends myBaseObject
 
 	protected function init()
 	{
-		parent::init();
 		$this->InitFieldsToIgnoreInFinalCriteria();
 	}
 
