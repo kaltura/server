@@ -10,6 +10,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @var array of kContextDataResult per storage profile and entry id
 	 */
 	public static $entryContextDataResult = array();
+
+	const ALL_PARTNERS_WILD_CHAR = "*";
 	
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
@@ -531,13 +533,13 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 	public static function getPeriodicStorageIdsByPartner($partnerId)
 	{
-		$config = kConf::get('export_to_cloud','cloud_storage', array());
-		if (array_key_exists($partnerId, $config))
+		$partnerIds = kConf::get('export_to_cloud_partner_ids','cloud_storage', array());
+		$partnerIds = array_merge($partnerIds, array(self::ALL_PARTNERS_WILD_CHAR));
+		if (in_array($partnerId, $partnerIds))
 		{
-			$storageIds = $config[$partnerId];
+			$storageIds = kConf::get('periodic_storage_ids','cloud_storage', null);
 			return explode(',', $storageIds);
 		}
-
 		return null;
 	}
 
