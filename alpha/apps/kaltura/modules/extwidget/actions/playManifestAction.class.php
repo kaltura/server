@@ -711,11 +711,9 @@ class playManifestAction extends kalturaAction
 		if ($remoteFileSyncs)
 		{
 			$storageProfileIds = array_keys($remoteFileSyncs);
-			$storageProfilesExternal = StorageProfilePeer::retrieveExternalByPartnerId(
+			$storageProfiles = StorageProfilePeer::retrieveExternalByPartnerId(
 				$this->entry->getPartnerId(), 
 				$storageProfileIds);
-			$periodicProfiles = kStorageExporter::getPeriodicStorageProfiles($this->entry->getPartnerId());
-			$storageProfiles = array_merge($storageProfilesExternal, $periodicProfiles);
 
 			$activeStorageProfileIds = array();
 			foreach ($storageProfiles as $storageProfile)
