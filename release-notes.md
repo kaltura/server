@@ -8,8 +8,14 @@ Issue ID : PLAT-10735
     - Add FEATURE_REMOTE_STORAGE permission to partner -1
     - Add configuration map with the name 'cloud_storage' with following config:
 
+        storage_lock_expiry = @TIME_TO_ACQUIRE_LOCK@
+        last_id_loop_addition = @INT_NUM_ADDED_TO_LAST_ID_LOOP@
+        max_id_delay = @INT_NUM_TO_SUBSTRACT_FROM_MAX_ID@
+        periodic_storage_ids = @STORAGE_IDS_COMMA_SEPERATED@
+
        [export_to_cloud]
-        @PARTNER_ID@ = @COMMA_SEPERATED_PERIODIC_STORAGE_PROFILE_IDS@
+        0 = @PARTNER_ID_0@
+        1 = @PARTNER_ID_1@
 
     - Add the following to batch.ini:
 
