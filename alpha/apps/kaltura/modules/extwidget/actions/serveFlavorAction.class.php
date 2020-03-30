@@ -9,7 +9,12 @@ class serveFlavorAction extends kalturaAction
 	const NO_CLIP_TO = 2147483647;
 	
 	const JSON_CONTENT_TYPE = 'application/json';
-	
+
+	const SECOND_IN_MILLISECONDS = 1000;
+	const LIVE_CHANNEL_SEGMENT_DURATION = 10 * self::SECOND_IN_MILLISECONDS;
+	const LIVE_CHANNEL_SEGMENT_COUNT = 10;
+	const TIME_MARGIN = 10 * self::SECOND_IN_MILLISECONDS; // a safety margin to compensate for clock differences
+
 	protected $pathOnly = false;
 	
 	protected static function jsonEncode($obj)
@@ -120,47 +125,28 @@ class serveFlavorAction extends kalturaAction
 		$renderer = $this->getSimpleMappingRenderer('', null);
 		$renderer->output();
 	}
-	
-	protected function serveLivePlaylist($durations, $sequences)
+
+	protected function serveLivePlaylist($durations, $sequences, $playlistStartTime = 1451624400000,
+	                                        $firstClipStartTime, $initialClipIndex, $initialSegmentIndex, $repeat)
 	{
-		$referenceTime = 1451624400000;	// 2016-01-01
-		$segmentDuration = 10000;
-		$segmentCount = 10;
-		$timeMargin = 10000;			// a safety margin to compensate for clock differences
-					
-		// find the duration of each cycle
-		$cycleDuration = array_sum($durations);
-		$dvrWindowSize = $segmentDuration * $segmentCount;
-		
-		// if the cycle is too small to cover the DVR window, duplicate it
-		while ($cycleDuration <= $dvrWindowSize + $timeMargin)
-		{
-			foreach ($sequences as &$sequence)
-			{
-				$sequence['clips'] = array_merge($sequence['clips'], $sequence['clips']);
-			}
-			$durations = array_merge($durations, $durations);
-			$cycleDuration *= 2;
-		}
-			
-		$currentTime = time() * 1000 - $timeMargin - $dvrWindowSize;
-			
 		$mediaSet['playlistType'] = 'live';
-		$mediaSet['segmentBaseTime'] = $referenceTime;
-		$mediaSet['firstClipTime'] = floor($currentTime / $cycleDuration) * $cycleDuration;
-		$mediaSet['discontinuity'] = false;
-		
-		// duplicate the clips, this is required so that we won't run out of segments
-		// close to the end of a cycle
-		foreach ($sequences as &$sequence)
+		$mediaSet['firstClipTime'] = $firstClipStartTime;
+
+		if($repeat)
 		{
-			$sequence['clips'] = array_merge($sequence['clips'], $sequence['clips']);
+			$mediaSet['discontinuity'] = false;
+			$mediaSet['segmentBaseTime'] = (int)$playlistStartTime;
 		}
-		$durations = array_merge($durations, $durations);
-		
+		else
+		{
+			$mediaSet['discontinuity'] = true;
+			$mediaSet['initialClipIndex'] = $initialClipIndex;
+			$mediaSet['initialSegmentIndex'] = $initialSegmentIndex;
+		}
+
 		$mediaSet['durations'] = $durations;
 		$mediaSet['sequences'] = $sequences;
-		
+
 		return $mediaSet;
 	}
 	
@@ -172,6 +158,8 @@ class serveFlavorAction extends kalturaAction
 			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
 		}
 
+		$isLive = $this->getRequestParameter("live");
+
 		$version = $this->getRequestParameter("v");
 
 		// execute the playlist
@@ -181,10 +169,13 @@ class serveFlavorAction extends kalturaAction
 		}
 		
 		list($entryIds, $durations, $referenceEntry, $captionFiles) = myPlaylistUtils::executeStitchedPlaylist($entry, $captionLanguages);
-		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, null, $captionFiles, $captionLanguages);
+		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, null,
+			$captionFiles, $captionLanguages, $isLive, 0, 0, 0, 0);
 	}
 
-	protected function serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $origEntry, $flavorParamIds, $captionFiles, $captionLanguages)
+	protected function serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $origEntry, $flavorParamIds,
+	                                          $captionFiles, $captionLanguages, $isLive,
+	                                          $playlistStartTime, $firstClipStartTime, $initialClipIndex, $initialSegmentIndex)
 	{
 		// get request parameters
 		if (!$flavorParamIds)
@@ -195,7 +186,6 @@ class serveFlavorAction extends kalturaAction
 				$flavorParamIds = explode(',', $flavorParamIds);
 			}
 		}
-		$isLive = $this->getRequestParameter("live");
 
 		if (!$referenceEntry)
 		{
@@ -239,6 +229,7 @@ class serveFlavorAction extends kalturaAction
 
 		// get the flavor params of the reference entry that should be returned
 		$referenceEntryFlavorParamsIds = array_keys($groupedFlavors[$referenceEntry->getId()]);
+
 		if ($flavorParamIds)
 		{
 			$flavorParamIds = array_intersect($referenceEntryFlavorParamsIds, $flavorParamIds);
@@ -303,7 +294,8 @@ class serveFlavorAction extends kalturaAction
 		// build the media set
 		if ($isLive)
 		{
-			$mediaSet = $this->serveLivePlaylist($durations, $sequences);
+			$mediaSet = $this->serveLivePlaylist($durations, $sequences,
+				$playlistStartTime, $firstClipStartTime, $initialClipIndex, $initialSegmentIndex, $origEntry->getRepeat());
 		}
 		else
 		{
@@ -341,8 +333,10 @@ class serveFlavorAction extends kalturaAction
 			$this->serveCaptionsWithSequence($entryIds, $captionFiles, $durations, $captionLanguages, $entry->getPartnerId(), $entry);
 		}
 
+		$isLive = $this->getRequestParameter("live");
 
-		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, $flavorParamsIdsArr, $captionFiles, $captionLanguages);
+		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, $flavorParamsIdsArr,
+			$captionFiles, $captionLanguages, $isLive);
 	}
 
 	protected function serveCaptionsWithSequence($entryIds, $captionFiles, $durations, $captionLangauges, $partnerId, $mainEntry)
@@ -399,6 +393,11 @@ class serveFlavorAction extends kalturaAction
 
 			if ($entry->getStatus() == entryStatus::DELETED) {
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+			}
+
+			if ($entry->getType() == entryType::LIVE_CHANNEL)
+			{
+				$this->serveLiveChannel($entry);
 			}
 
 			$isInternalIp = kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']);
@@ -799,4 +798,84 @@ class serveFlavorAction extends kalturaAction
 		return $clipDesc ;
 	}
 
+	protected function serveLiveChannel(LiveChannel $entry)
+	{
+		$repeat = $entry->getRepeat();
+		$playlist = entryPeer::retrieveByPK($entry->getPlaylistId());
+
+		list($entryIds, $durations, $referenceEntry, $captionFiles) = myPlaylistUtils::executeStitchedPlaylist($playlist, null);
+
+		// get cycle info
+		$cycleDurations = $durations;
+		$cycleEntryIds = $entryIds;
+		$cycleClipCount = count($cycleDurations);
+		$cycleDuration = array_sum($cycleDurations);
+		$cycleSegmentCount = 0;
+		foreach ($cycleDurations as $duration)
+		{
+			$cycleSegmentCount += ceil($duration / self::LIVE_CHANNEL_SEGMENT_DURATION);
+		}
+
+		// find the start / end time
+		$dvrWindowSize = self::LIVE_CHANNEL_SEGMENT_DURATION * self::LIVE_CHANNEL_SEGMENT_COUNT;
+		$endTime = time() * self::SECOND_IN_MILLISECONDS;
+		$startTime = $endTime - self::TIME_MARGIN - $dvrWindowSize;
+
+		// get the reference time (start time of the first run)
+		$playlistStartTime = $entry->getStartDate('U') * self::SECOND_IN_MILLISECONDS;
+
+		// get the initial cycle info
+		$cycleIndex = floor(($startTime - $playlistStartTime) / $cycleDuration);
+		$clipIndex = $cycleIndex * $cycleClipCount;
+		$segmentIndex = $cycleIndex * $cycleSegmentCount;
+		$durations = array();
+		$entryIds = array();
+
+		$initialSegmentIndex = 0;
+		$initialClipIndex = 0;
+		$firstClipStartTime = 0;
+
+		$currentTime = $playlistStartTime + $cycleIndex * $cycleDuration;
+		while ($currentTime < $endTime)
+		{
+			// get the current clip duration
+			$cycleClipIndex = $clipIndex % $cycleClipCount;
+			$duration = $cycleDurations[$cycleClipIndex];
+			if ($currentTime + $duration > $startTime)
+			{
+				if (!$durations)
+				{
+					// set first clip details
+					$firstClipStartTime = $currentTime;
+
+
+					if (!$repeat)
+					{
+						$initialClipIndex = $clipIndex + 1;
+						$initialSegmentIndex = $segmentIndex + 1;
+					}
+				}
+
+				// add the current clip
+				$durations[] = $duration;
+				$entryIds[] = $cycleEntryIds[$cycleClipIndex];
+			}
+
+			// move to the next clip
+			$clipIndex++;
+			$segmentIndex += ceil($duration / self::LIVE_CHANNEL_SEGMENT_DURATION);
+			$currentTime += $duration;
+		}
+
+		//Make sure the referenceEntry is one of the entryIds
+		if( ! in_array($referenceEntry->getId(), $entryIds) )
+		{
+			$referenceEntry = entryPeer::retrieveByPKNoFilter($entryIds[0]);
+		}
+
+		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, null,
+			$captionFiles, null, true,
+			$playlistStartTime, $firstClipStartTime,
+			$initialClipIndex, $initialSegmentIndex);
+	}
 }

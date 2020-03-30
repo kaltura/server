@@ -369,20 +369,23 @@ class playManifestAction extends kalturaAction
 	{
 		switch ($this->entry->getType())
 		{
-		case entryType::MEDIA_CLIP:
-			if(!in_array($this->entry->getMediaType(), array(
-					entry::ENTRY_MEDIA_TYPE_VIDEO,
-					entry::ENTRY_MEDIA_TYPE_AUDIO)))
-				KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
-			break;
-			
-		case entryType::PLAYLIST: 
-			if ($this->entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_TEXT)
-				KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
-			break;
+			case entryType::MEDIA_CLIP:
+				if(!in_array($this->entry->getMediaType(), array(
+						entry::ENTRY_MEDIA_TYPE_VIDEO,
+						entry::ENTRY_MEDIA_TYPE_AUDIO)))
+					KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+				break;
+
+			case entryType::LIVE_CHANNEL:
+				break;
+
+			case entryType::PLAYLIST:
+				if ($this->entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_TEXT)
+					KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+				break;
 				
-		default:
-			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+			default:
+				KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
 		}
 	}
 	
@@ -541,10 +544,12 @@ class playManifestAction extends kalturaAction
 		return true;
 	}
 
-	protected function initPlaylistFlavorAssetArray()
+	protected function initPlaylistFlavorAssetArray($playlist = null)
 	{
-		list($entryIds, $durations, $mediaEntry, $captionFiles) =
-			myPlaylistUtils::executeStitchedPlaylist($this->entry);
+		$entry = !is_null($playlist) ? $playlist : $this->entry;
+
+		list($entryIds, $durations, $mediaEntry, $captionFiles) = myPlaylistUtils::executeStitchedPlaylist($entry);
+
 		if (!$mediaEntry)
 		{
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
@@ -866,28 +871,33 @@ class playManifestAction extends kalturaAction
 		
 		switch($this->entry->getType())
 		{
-		case entryType::PLAYLIST:
-			$this->initPlaylistFlavorAssetArray();
-			break;
-		
-		case entryType::MEDIA_CLIP:
-			if ($this->deliveryAttributes->getSequence())
-			{
-				$sequenceArr = explode(',',$this->deliveryAttributes->getSequence());
-				$sequenceEntries = entryPeer::retrieveByPKs($sequenceArr);
-				if (count($sequenceEntries))
+			case entryType::PLAYLIST:
+				$this->initPlaylistFlavorAssetArray();
+				break;
+
+			case entryType::LIVE_CHANNEL:
+				$playlist = entryPeer::retrieveByPK($this->entry->getPlaylistId());
+				$this->initPlaylistFlavorAssetArray($playlist);
+				break;
+
+			case entryType::MEDIA_CLIP:
+				if ($this->deliveryAttributes->getSequence())
 				{
-					$this->deliveryAttributes->setHasValidSequence(true);
-					list($entryIds, $durations, $mediaEntry, $captionFiles) = myPlaylistUtils::getPlaylistDataFromEntries($sequenceEntries, null, null);
-					$this->setPlaylistFlavorAssets($durations, $this->entry->getId());
+					$sequenceArr = explode(',',$this->deliveryAttributes->getSequence());
+					$sequenceEntries = entryPeer::retrieveByPKs($sequenceArr);
+					if (count($sequenceEntries))
+					{
+						$this->deliveryAttributes->setHasValidSequence(true);
+						list($entryIds, $durations, $mediaEntry, $captionFiles) = myPlaylistUtils::getPlaylistDataFromEntries($sequenceEntries, null, null);
+						$this->setPlaylistFlavorAssets($durations, $this->entry->getId());
+					}
 				}
-			}
-			if (!$this->deliveryAttributes->getHasValidSequence())
-			{
-				$this->initFlavorAssetArray();
-				$this->initEntryDuration();
-			}
-			break;
+				if (!$this->deliveryAttributes->getHasValidSequence())
+				{
+					$this->initFlavorAssetArray();
+					$this->initEntryDuration();
+				}
+				break;
 		}
 		
 		if ($this->duration && $this->duration < 10 && $this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS)
@@ -1261,13 +1271,13 @@ class playManifestAction extends kalturaAction
 		{
 			case entryType::PLAYLIST:
 			case entryType::MEDIA_CLIP:
+			case entryType::LIVE_CHANNEL:
 				// VOD
 				$renderer = $this->serveVodEntry();
 				$entryType = 'vod';
 				break;
 				
 			case entryType::LIVE_STREAM:			
-			case entryType::LIVE_CHANNEL:
 				// Live stream
 				$renderer = $this->serveLiveEntry();
 				$entryType = 'live';
