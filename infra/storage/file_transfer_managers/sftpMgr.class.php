@@ -397,10 +397,10 @@ class sftpMgr extends kFileTransferMgr
 		$sftp = $this->getSftpConnection();
 		$absolutePath = trim($remotePath, '/');
 		$handle = opendir("ssh2.sftp://" . intval($sftp) . "/$absolutePath");
-	   	if($handle !== false)
+	   	if ($handle !== false)
 	   	{
             closedir($handle);
-			return $this->doListRecursively($remotePath);
+            return $this->doListRecursively($remotePath);
 	   	}
         	
 		$lsDirCmd = "ls $remotePath";
@@ -412,14 +412,14 @@ class sftpMgr extends kFileTransferMgr
 	protected function doListRecursively($remotePath, $currentDepth = parent::MAX_DIR_DEPTH)
 	{
 		$ls = array();
-		if($currentDepth < 0)
+		if ($currentDepth < 0)
 		{
 			return $ls;
 		}
 		$sftp = $this->getSftpConnection();
 		$absolutePath = trim($remotePath, '/');
 		$handle = opendir('ssh2.sftp://' . intval($sftp) . "/$absolutePath");
-		if($handle !== false)
+		if ($handle !== false)
 		{
 			while (false !== ($fileName = readdir($handle)))
 			{
@@ -427,7 +427,7 @@ class sftpMgr extends kFileTransferMgr
 				{
 					continue;
 				}
-				if(is_dir('ssh2.sftp://' . intval($sftp) . "/$absolutePath/$fileName/"))
+				if (is_dir('ssh2.sftp://' . intval($sftp) . "/$absolutePath/$fileName/"))
 				{
 					$subDirFiles = $this->doListRecursively("/$absolutePath/$fileName", $currentDepth - 1);
 					foreach($subDirFiles as $subDirFile)

@@ -192,10 +192,10 @@ class ftpMgr extends kFileTransferMgr
 	    return $matches['fileSize'];
 	}
 
-	protected function doListFileObjects ($remoteDir, $relativeDir = '', $currentDepth = parent::MAX_DIR_DEPTH)
+	protected function doListFileObjects($remoteDir, $relativeDir = '', $currentDepth = parent::MAX_DIR_DEPTH)
 	{
 		$fileObjectsResult = array ();
-		if($currentDepth < 0)
+		if ($currentDepth < 0)
 		{
 			return $fileObjectsResult;
 		}
@@ -218,10 +218,10 @@ class ftpMgr extends kFileTransferMgr
 	    	}
 			
 	    	KalturaLog::debug('info: ' . print_r($matches, true));
-			if($this->isDir($matches))
+			if ($this->isDir($matches))
 			{
 				$subDirFiles = $this->doListFileObjects("$remoteDir/" . $matches['file'], $relativeDir.$matches['file']. '/', $currentDepth - 1);
-				foreach ($subDirFiles as $subDirFile)
+				foreach($subDirFiles as $subDirFile)
 				{
 					$fileObjectsResult[] = $subDirFile;
 				}
@@ -233,7 +233,7 @@ class ftpMgr extends kFileTransferMgr
                 $fileObjectsResult[] = $fileObject;
 			}
 	    }
-		
+
 	    return $fileObjectsResult;
 	}
 

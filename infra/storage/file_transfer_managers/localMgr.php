@@ -120,12 +120,12 @@ class localMgr extends kFileTransferMgr
 	protected function doList ($remoteDir)
 	{
 	    clearstatcache();
-		return $this->doListRecursively($remoteDir);
+	    return $this->doListRecursively($remoteDir);
 	}
 
 	protected function doListRecursively($remoteDir, $currentDepth = parent::MAX_DIR_DEPTH) {
 		$ls = [];
-		if($currentDepth < 0)
+		if ($currentDepth < 0)
 		{
 			return $ls;
 		}
@@ -138,7 +138,7 @@ class localMgr extends kFileTransferMgr
 			$filePath = $remoteDir . '/' . $fileName;
 			if (is_dir($filePath)) {
 				$subDirFiles = $this->doListRecursively($filePath, $currentDepth - 1);
-				foreach ($subDirFiles as $subDirFile)
+				foreach($subDirFiles as $subDirFile)
 				{
 					$ls[] = $fileName . '/' . $subDirFile;
 				}
