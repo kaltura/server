@@ -234,4 +234,30 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 	
 	    return self::doSelect($c);
 	}
+
+	public static function retrieveByEntryIdObjectId($entryId, $objectId)
+	{
+		$batchJobsLock = self::retrieveByEntryId($entryId);
+		foreach ($batchJobsLock as $batchJobLock)
+		{
+			if ($batchJobLock->getObjectId() === $objectId)
+			{
+				return $batchJobLock;
+			}
+		}
+		return null;
+	}
+
+	public static function updateExpirationByPK($id, $maxExecutionTime)
+	{
+		$batchJobLock = self::retrieveByPK($id);
+		if ($batchJobLock)
+		{
+			$currentExpiration = $batchJobLock->getExpiration();
+			$batchJobLock->setExpiration(time() + $maxExecutionTime);
+			$batchJobLock->save();
+			KalturaLog::debug('Expiration was: '. $currentExpiration ." ,the current expiration is: ". $batchJobLock->getExpiration());
+		}
+		return $batchJobLock;
+	}
 } // BatchJobLockPeer

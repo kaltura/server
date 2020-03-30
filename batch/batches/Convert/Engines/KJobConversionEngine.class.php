@@ -6,6 +6,7 @@
  * @subpackage Conversion.engines
  */
 require_once(__DIR__.'/../../../../alpha/apps/kaltura/lib/dateUtils.class.php');
+require_once(__DIR__.'/../../../../alpha/apps/kaltura/lib/storage/kFileUtils.php');
 abstract class KJobConversionEngine extends KConversionEngine
 {
 	/**
@@ -126,8 +127,8 @@ abstract class KJobConversionEngine extends KConversionEngine
 			KalturaLog::info ( $execution_command_str );
 	
 			$start = microtime(true);
-			// TODO add BatchEvent - before conversion + conversion engine 
-			$output = $this->execute_conversion_cmdline($execution_command_str , $return_value );
+			// TODO add BatchEvent - before conversion + conversion engine
+			$output = $this->execute_conversion_cmdline($execution_command_str , $return_value , $data);
 			// TODO add BatchEvent - after conversion + conversion engine		
 			$end = microtime(true);
 	
@@ -150,9 +151,9 @@ abstract class KJobConversionEngine extends KConversionEngine
 
 	protected function isConversionProgressing($currentModificationTime)
 	{
-		if (is_file($this->inFilePath))
+		if (kFile::checkFileExists($this->inFilePath))
 		{
-			$newModificationTime = filemtime($this->inFilePath);
+			$newModificationTime = kFile::getFileLastUpdatedTime($this->inFilePath);
 			if ($newModificationTime !== false && $newModificationTime > $currentModificationTime)
 			{
 				return $newModificationTime;
@@ -163,30 +164,34 @@ abstract class KJobConversionEngine extends KConversionEngine
 
 	protected function getReturnValues($handle)
 	{
-		$return_var = false;
+		$return_var = 1;
 		$output = false;
 		if ($handle)
 		{
 			$return_var = 0;
-			$file = escapeshellarg($this->outFilePath);
-			if (is_file($file))
+			$file = $this->outFilePath;
+			if (kFile::checkFileExists($file))
 			{
-				$output = `tail -n 1 $file`;
+				$output = kFile::getLineFromFileTail($file , 1);
 			}
 		}
+		KalturaLog::debug('getReturnValues, output is: '. $output. ' return var is '. $return_var);
 		return array($output, $return_var);
 	}
 
 	/**
 	 *
 	 */
-	protected function execute_conversion_cmdline($command, &$return_var)
+	protected function execute_conversion_cmdline($command, &$return_var, $data = null)
 	{
+		$flavorAsset = self::getFlavorFromData($data);
 		$handle = popen($command, 'r');
 		stream_set_blocking ($handle,0) ;
 		$currentModificationTime = 0;
 		$lastTimeOutSet = time();
 		$maximumExecutionTime = KBatchBase::$taskConfig->maximumExecutionTime;
+		$extendTime = $maximumExecutionTime ? ($maximumExecutionTime / 3) : dateUtils::HOUR;
+		$timeout = $maximumExecutionTime;
 		while(!feof($handle))
 		{
 			clearstatcache();
@@ -194,19 +199,73 @@ abstract class KJobConversionEngine extends KConversionEngine
 			$newModificationTime = $this->isConversionProgressing($currentModificationTime);
 			if($newModificationTime)
 			{
-				if ($lastTimeOutSet + dateUtils::HOUR < time())
+				if ($lastTimeOutSet + $extendTime < time())
 				{
-					set_time_limit($maximumExecutionTime);
-					$lastTimeOutSet = time();
+					list($timeout, $lastTimeOutSet) = self::extendExpiration($flavorAsset, $maximumExecutionTime, $timeout);
 					KalturaLog::debug('Previous modification time was:  ' . $currentModificationTime . ', new modification time is: '. $newModificationTime);
-					KalturaLog::debug('Setting time out '. $maximumExecutionTime);
 				}
 				$currentModificationTime = $newModificationTime;
+			}
+			sleep(1);
+			if(self::reachedTimeOut($timeout))
+			{
+				pclose($handle);
+				$return_var = 1;
+				return false;
 			}
 		}
 		list($output, $return_var) = $this->getReturnValues($handle);
 		pclose($handle);
 		return $output;
+	}
+
+
+	protected static function getFlavorFromData($data)
+	{
+		$flavorAsset = null;
+		if ($data && isset($data->flavorAssetId) && isset($data->flavorParamsOutput))
+		{
+			try
+			{
+				KBatchBase::impersonate($data->flavorParamsOutput->partnerId);
+				$flavorAsset = KBatchBase::$kClient->flavorAsset->get($data->flavorAssetId);
+				KBatchBase::unimpersonate();
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::err('Flavor is not found. ' . $e->getMessage());
+			}
+		}
+		return $flavorAsset;
+	}
+
+	protected static function extendExpiration($flavorAsset, $maximumExecutionTime, $timeout)
+	{
+		if ($flavorAsset)
+		{
+			try
+			{
+				KBatchBase::$kClient->batch->extendBatchJobLockExpiration($flavorAsset->id, $flavorAsset->entryId, $maximumExecutionTime);
+				$timeout += $maximumExecutionTime;
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::debug('Extend batch job lock failed. '. $e->getMessage());
+			}
+		}
+		$lastTimeOutSet = time();
+		return array($timeout, $lastTimeOutSet);
+	}
+
+	protected static function reachedTimeOut(&$timeout)
+	{
+		$timeout--;
+		if($timeout <= 0)
+		{
+			KalturaLog::debug("Reached to TIMEOUT");
+			return true;
+		}
+		return false;
 	}
 }
 

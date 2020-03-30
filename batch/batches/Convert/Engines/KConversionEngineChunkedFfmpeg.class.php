@@ -3,7 +3,7 @@
  * @package Scheduler
  * @subpackage Conversion.engines
  */
-require_once(__DIR__.'/../../../../alpha/apps/kaltura/lib/storage/kFileUtils.php');
+
 class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 {
 	const CHUNKED_FFMPEG = "chunked_ffmpeg";
@@ -30,7 +30,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 	 *	'executionMode' config field used to differntiate between the modes, 
 	 *	allowed values - 'standalone'/'memcache'
 	 */
-	protected function execute_conversion_cmdline($command, &$returnVar)
+	protected function execute_conversion_cmdline($command, &$returnVar ,$data = null)
 	{
 		KalturaLog::log($command);
 		if(strstr($command,"ffmpeg")===false)
@@ -47,7 +47,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 			$output=$this->execute_chunked_encode_standalone($command, $returnVar);
 		}
 		else if($executionMode=="memcache"){
-			$output=$this->execute_chunked_encode_memcache($command, $returnVar);
+			$output=$this->execute_chunked_encode_memcache($command, $returnVar, $data);
 		}
 		else {
 			$returnVar = -1;
@@ -68,7 +68,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 	 *	- chunkedEncodeMemcacheToken - token to differentiate between general/global Kaltura jobs and per customer dedicated servers (optional, default:null)
 	 *	- chunkedEncodeMaxConcurrent - maximum concurrently executed chunks jobs, more or less servers core number (optional, default:5)
 	 */
-	protected function execute_chunked_encode_memcache($cmdLine, &$returnVar)
+	protected function execute_chunked_encode_memcache($cmdLine, &$returnVar, $data = null)
 	{
 		KalturaLog::log("Original cmdLine:$cmdLine");
 		
@@ -123,7 +123,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 		$cmdLine.= " >> ".$this->logFilePath." 2>&1";
 		KalturaLog::log("Final cmdLine:$cmdLine");
 
-		$output = parent::execute_conversion_cmdline($cmdLine, $returnVar);
+		$output = parent::execute_conversion_cmdline($cmdLine, $returnVar, $data);
 		KalturaLog::log("rv($returnVar),".print_r($output,1));
 		return $output;
 	}
@@ -131,7 +131,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 	protected function isConversionProgressing($currentModificationTime)
 	{
 		$dir = $this->inFilePath .'_'.self::CHUNKED_DIR.'/';
-		if (is_dir($dir))
+		if (kFile::checkIsDir($dir))
 		{
 			$newModificationTime = kFileUtils::getMostRecentModificationTimeFromDir($dir);
 			if ($newModificationTime !== false && $newModificationTime > $currentModificationTime)

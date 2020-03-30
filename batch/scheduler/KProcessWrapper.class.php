@@ -121,8 +121,17 @@ class KProcessWrapper
 	 */
 	public function isRunning()
 	{
-		if($this->dieTime < time())
-			return false;
+		$shouldNotValidateDieTime = ($this->taskConfig->type === 'KAsyncConvert' &&
+			isset($this->taskConfig->params->processStopCheckingDieTime) &&
+			$this->taskConfig->params->processStopCheckingDieTime == 1);
+
+		if (!$shouldNotValidateDieTime)
+		{
+			if ($this->dieTime < time())
+			{
+				return false;
+			}
+		}
 		
 		if($this->isMockedProcess) {
 			$res = $this->checkMockedProcessRunning();	
