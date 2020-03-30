@@ -2475,7 +2475,7 @@ class kKavaReportsMgr extends kKavaBase
 		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity);
 		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_GROUP_BY;
 
-		$groupby_dimensions = array();
+		$group_by_dimensions = array();
 		foreach ($dimensions as $dimension)
 		{
 			if (in_array($dimension, self::$multi_value_dimensions))
@@ -2494,10 +2494,11 @@ class kKavaReportsMgr extends kKavaBase
 						self::DRUID_VALUES => $values,
 					);
 				}
-				$groupby_dimensions[] = $dimension;
 			}
+			$group_by_dimensions[] = $dimension;
+
 		}
-		$report_def[self::DRUID_DIMENSIONS] = $groupby_dimensions;
+		$report_def[self::DRUID_DIMENSIONS] = $group_by_dimensions;
 		return $report_def;
 	}
 
