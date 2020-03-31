@@ -13,7 +13,7 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 	const MAX_COUNT = 'maxCount';
 	const MAX_SIZE = 'maxSize';
 	const STORAGE_PROFILE_IDS = 'profileIdsIn';
-	const RESPONSE_PROFILE_FIELDS = 'id,originalId,fileSize,fileRoot,filePath,isDir,srcPath,srcEncKey';
+	const FILE_SYNC_RESPONSE_PROFILE_FIELDS = 'id,originalId,fileSize,fileRoot,filePath,isDir,srcPath,srcEncKey';
 
 	protected $storageProfiles;
 	protected $currentIndex;
@@ -43,18 +43,18 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 			return;
 		}
 		$this->currentIndex = 0;
-		$responseProfile = $this->initResponseProfile();
 		$timeLimit = time() + $this->getAdditionalParams(self::MAX_EXECUTION_TIME);
 
 		while (time() < $timeLimit)
 		{
+			$this->setStorageProfileResponseProfile();
 			$storageProfile = $this->getStorageProfile();
 			if(!$storageProfile)
 			{
 				continue;
 			}
 
-			self::$kClient->setResponseProfile($responseProfile);
+			$this->setPendingFileSyncResponseProfile();
 			$lockResult = self::$kClient->storageProfile->lockPendingFileSyncs($filter, $this->getId(), $storageProfile->id, $maxCount, $maxSize);
 			if (!$lockResult->fileSyncs)
 			{
@@ -63,6 +63,8 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 			}
 
 			$this->exportFileSyncs($lockResult->fileSyncs, $storageProfile);
+
+			$this->setUpdateFileSyncResponseProfile();
 			$this->updateFileSyncsStatus();
 
 			if (!$lockResult->limitReached)
@@ -107,10 +109,6 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 
 	protected function updateFileSyncsStatus()
 	{
-		$responseProfile = new KalturaDetachedResponseProfile();
-		$responseProfile->type = KalturaResponseProfileType::INCLUDE_FIELDS;
-		$responseProfile->fields = 'id';        // don't need the response
-		self::$kClient->setResponseProfile($responseProfile);
 		$fileSyncPlugin = KalturaFileSyncClientPlugin::get(self::$kClient);
 		self::$kClient->startMultiRequest();
 
@@ -137,12 +135,26 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 
 	}
 
-	protected function initResponseProfile()
+	protected function setStorageProfileResponseProfile()
+	{
+		$responseProfile = new KalturaDetachedResponseProfile();
+		self::$kClient->setResponseProfile($responseProfile);
+	}
+
+	protected function setPendingFileSyncResponseProfile()
 	{
 		$responseProfile = new KalturaDetachedResponseProfile();
 		$responseProfile->type = KalturaResponseProfileType::INCLUDE_FIELDS;
-		$responseProfile->fields = self::RESPONSE_PROFILE_FIELDS;
-		return $responseProfile;
+		$responseProfile->fields = self::FILE_SYNC_RESPONSE_PROFILE_FIELDS;
+		self::$kClient->setResponseProfile($responseProfile);
+	}
+
+	protected function setUpdateFileSyncResponseProfile()
+	{
+		$responseProfile = new KalturaDetachedResponseProfile();
+		$responseProfile->type = KalturaResponseProfileType::INCLUDE_FIELDS;
+		$responseProfile->fields = 'id';        // don't need the response
+		self::$kClient->setResponseProfile($responseProfile);
 	}
 
 	protected function getStorageProfile()
@@ -164,8 +176,6 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 
 		$storageProfileId = $storageProfileIdsArray[$this->currentIndex];
 
-		$responseProfile = new KalturaDetachedResponseProfile();
-		self::$kClient->setResponseProfile($responseProfile);
 		$storageProfile = self::$kClient->storageProfile->get($storageProfileId);
 		if (!$storageProfile)
 		{
