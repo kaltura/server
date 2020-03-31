@@ -123,7 +123,14 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 		$cmdLine.= " >> ".$this->logFilePath." 2>&1";
 		KalturaLog::log("Final cmdLine:$cmdLine");
 
-		$output = parent::execute_conversion_cmdline($cmdLine, $returnVar, $data);
+		if (isset(KBatchBase::$taskConfig->params->usingSmartJobTimeout) && KBatchBase::$taskConfig->params->usingSmartJobTimeout == 1)
+		{
+			$output = parent::execute_conversion_cmdline($cmdLine, $returnVar, $data);
+		}
+		else
+		{
+			$output = system($cmdLine, $returnVar);
+		}
 		KalturaLog::log("rv($returnVar),".print_r($output,1));
 		return $output;
 	}

@@ -121,11 +121,11 @@ class KProcessWrapper
 	 */
 	public function isRunning()
 	{
-		$shouldNotValidateDieTime = ($this->taskConfig->type === 'KAsyncConvert' &&
-			isset($this->taskConfig->params->processStopCheckingDieTime) &&
-			$this->taskConfig->params->processStopCheckingDieTime == 1);
+		$usingSmartJobTimeout = ($this->taskConfig->type === 'KAsyncConvert' &&
+			isset($this->taskConfig->params->usingSmartJobTimeout) &&
+			$this->taskConfig->params->usingSmartJobTimeout == 1);
 
-		if (!$shouldNotValidateDieTime)
+		if (!$usingSmartJobTimeout)
 		{
 			if ($this->dieTime < time())
 			{

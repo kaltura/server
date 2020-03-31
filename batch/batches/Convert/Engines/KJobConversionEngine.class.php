@@ -175,7 +175,6 @@ abstract class KJobConversionEngine extends KConversionEngine
 				$output = kFile::getLineFromFileTail($file , 1);
 			}
 		}
-		KalturaLog::debug('getReturnValues, output is: '. $output. ' return var is '. $return_var);
 		return array($output, $return_var);
 	}
 
@@ -183,6 +182,19 @@ abstract class KJobConversionEngine extends KConversionEngine
 	 *
 	 */
 	protected function execute_conversion_cmdline($command, &$return_var, $data = null)
+	{
+		if (isset(KBatchBase::$taskConfig->params->usingSmartJobTimeout) && KBatchBase::$taskConfig->params->usingSmartJobTimeout == 1)
+		{
+			return $this->executeConversionCmdlineSmartTimeout($command, $return_var, $data);
+		}
+		else
+		{
+			$output = system($command, $return_var);
+			return $output;
+		}
+	}
+
+	protected function executeConversionCmdlineSmartTimeout($command, &$return_var, $data = null)
 	{
 		$flavorAsset = self::getFlavorFromData($data);
 		$handle = popen($command, 'r');
@@ -207,7 +219,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 				$currentModificationTime = $newModificationTime;
 			}
 			sleep(1);
-			if(self::reachedTimeOut($timeout))
+			if(self::isReachedTimeout($timeout))
 			{
 				pclose($handle);
 				$return_var = 1;
@@ -257,7 +269,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 		return array($timeout, $lastTimeOutSet);
 	}
 
-	protected static function reachedTimeOut(&$timeout)
+	protected static function isReachedTimeout(&$timeout)
 	{
 		$timeout--;
 		if($timeout <= 0)
