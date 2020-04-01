@@ -212,7 +212,8 @@ abstract class KJobConversionEngine extends KConversionEngine
 			{
 				if ($lastTimeOutSet + $extendTime < time())
 				{
-					list($timeout, $lastTimeOutSet) = self::extendExpiration($jobId, $maximumExecutionTime, $timeout);
+					$timeout = self::extendExpiration($jobId, $maximumExecutionTime, $timeout);
+					$lastTimeOutSet = time();
 					KalturaLog::debug('Previous modification time was:  ' . $currentModificationTime . ', new modification time is: '. $newModificationTime);
 				}
 				$currentModificationTime = $newModificationTime;
@@ -244,8 +245,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 				KalturaLog::debug('Extend batch job lock failed. '. $e->getMessage());
 			}
 		}
-		$lastTimeOutSet = time();
-		return array($timeout, $lastTimeOutSet);
+		return $timeout;
 	}
 
 	protected static function isReachedTimeout(&$timeout)

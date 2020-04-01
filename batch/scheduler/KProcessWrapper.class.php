@@ -121,8 +121,7 @@ class KProcessWrapper
 	 */
 	public function isRunning()
 	{
-		$usingSmartJobTimeout = ($this->taskConfig->type === 'KAsyncConvert' &&
-			isset($this->taskConfig->params->usingSmartJobTimeout) &&
+		$usingSmartJobTimeout = (isset($this->taskConfig->params->usingSmartJobTimeout) &&
 			$this->taskConfig->params->usingSmartJobTimeout == 1);
 
 		if (!$usingSmartJobTimeout)
