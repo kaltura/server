@@ -614,19 +614,21 @@ class BatchService extends KalturaBatchService
 	}
 
 	/**
-	 * batch extendBatchJobLockExpiration action allows to extend the expiration of  a BatchJobLock
+	 * batch extendBatchJobLockExpiration action allows to extend the expiration of  a BatchJobLock by job id
 	 *
 	 * @action extendBatchJobLockExpiration
-	 * @param string $objectId
-	 * @param string $entryId
+	 * @param int $jobId
 	 * @param int $maxExecutionTime The maximum time in seconds the job regularly take.
 	 */
-	public function extendBatchJobLockExpirationAction($objectId, $entryId, $maxExecutionTime)
+	public function extendBatchJobLockExpirationAction($jobId, $maxExecutionTime)
 	{
-		$dbBatchJobLock =  BatchJobLockPeer::retrieveByEntryIdObjectId($entryId, $objectId);
+		$dbBatchJobLock =  BatchJobLockPeer::retrieveByPK($jobId);
 		if ($dbBatchJobLock)
 		{
-			BatchJobLockPeer::updateExpirationByPK($dbBatchJobLock->getId(), $maxExecutionTime);
+			$currentExpiration = $dbBatchJobLock->getExpiration();
+			$dbBatchJobLock->setExpiration(time() + $maxExecutionTime);
+			$dbBatchJobLock->save();
+			KalturaLog::debug('Expiration was: '. $currentExpiration ." ,the new expiration is: ". $dbBatchJobLock->getExpiration());
 		}
 	}
 }

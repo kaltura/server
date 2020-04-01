@@ -30,7 +30,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 	 *	'executionMode' config field used to differntiate between the modes, 
 	 *	allowed values - 'standalone'/'memcache'
 	 */
-	protected function execute_conversion_cmdline($command, &$returnVar ,$data = null)
+	protected function execute_conversion_cmdline($command, &$returnVar ,$jobId = null)
 	{
 		KalturaLog::log($command);
 		if(strstr($command,"ffmpeg")===false)
@@ -47,7 +47,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 			$output=$this->execute_chunked_encode_standalone($command, $returnVar);
 		}
 		else if($executionMode=="memcache"){
-			$output=$this->execute_chunked_encode_memcache($command, $returnVar, $data);
+			$output=$this->execute_chunked_encode_memcache($command, $returnVar, $jobId);
 		}
 		else {
 			$returnVar = -1;
@@ -68,7 +68,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 	 *	- chunkedEncodeMemcacheToken - token to differentiate between general/global Kaltura jobs and per customer dedicated servers (optional, default:null)
 	 *	- chunkedEncodeMaxConcurrent - maximum concurrently executed chunks jobs, more or less servers core number (optional, default:5)
 	 */
-	protected function execute_chunked_encode_memcache($cmdLine, &$returnVar, $data = null)
+	protected function execute_chunked_encode_memcache($cmdLine, &$returnVar, $jobId = null)
 	{
 		KalturaLog::log("Original cmdLine:$cmdLine");
 		
@@ -125,7 +125,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 
 		if (isset(KBatchBase::$taskConfig->params->usingSmartJobTimeout) && KBatchBase::$taskConfig->params->usingSmartJobTimeout == 1)
 		{
-			$output = parent::execute_conversion_cmdline($cmdLine, $returnVar, $data);
+			$output = parent::execute_conversion_cmdline($cmdLine, $returnVar, $jobId);
 		}
 		else
 		{

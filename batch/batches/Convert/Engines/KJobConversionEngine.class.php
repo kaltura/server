@@ -81,12 +81,12 @@ abstract class KJobConversionEngine extends KConversionEngine
 		return  $this->getExecutionCommandAndConversionString ( $data );
 	}
 	
-	public function convert ( KalturaConvartableJobData &$data )
+	public function convert ( KalturaConvartableJobData &$data, $jobId = null )
 	{
-		return  $this->convertJob ( $data );
+		return  $this->convertJob ( $data, $jobId );
 	}
 	
-	public function convertJob ( KalturaConvertJobData &$data )
+	public function convertJob ( KalturaConvertJobData &$data, $jobId = null )
 	{
 
 		$error_message = "";  
@@ -128,7 +128,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 	
 			$start = microtime(true);
 			// TODO add BatchEvent - before conversion + conversion engine
-			$output = $this->execute_conversion_cmdline($execution_command_str , $return_value , $data);
+			$output = $this->execute_conversion_cmdline($execution_command_str , $return_value , $jobId);
 			// TODO add BatchEvent - after conversion + conversion engine		
 			$end = microtime(true);
 	
@@ -181,11 +181,11 @@ abstract class KJobConversionEngine extends KConversionEngine
 	/**
 	 *
 	 */
-	protected function execute_conversion_cmdline($command, &$return_var, $data = null)
+	protected function execute_conversion_cmdline($command, &$return_var, $jobId = null)
 	{
 		if (isset(KBatchBase::$taskConfig->params->usingSmartJobTimeout) && KBatchBase::$taskConfig->params->usingSmartJobTimeout == 1)
 		{
-			return $this->executeConversionCmdlineSmartTimeout($command, $return_var, $data);
+			return $this->executeConversionCmdlineSmartTimeout($command, $return_var, $jobId);
 		}
 		else
 		{
@@ -194,9 +194,8 @@ abstract class KJobConversionEngine extends KConversionEngine
 		}
 	}
 
-	protected function executeConversionCmdlineSmartTimeout($command, &$return_var, $data = null)
+	protected function executeConversionCmdlineSmartTimeout($command, &$return_var, $jobId = null)
 	{
-		$flavorAsset = self::getFlavorFromData($data);
 		$handle = popen($command, 'r');
 		stream_set_blocking ($handle,0) ;
 		$currentModificationTime = 0;
@@ -213,7 +212,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 			{
 				if ($lastTimeOutSet + $extendTime < time())
 				{
-					list($timeout, $lastTimeOutSet) = self::extendExpiration($flavorAsset, $maximumExecutionTime, $timeout);
+					list($timeout, $lastTimeOutSet) = self::extendExpiration($jobId, $maximumExecutionTime, $timeout);
 					KalturaLog::debug('Previous modification time was:  ' . $currentModificationTime . ', new modification time is: '. $newModificationTime);
 				}
 				$currentModificationTime = $newModificationTime;
@@ -231,33 +230,13 @@ abstract class KJobConversionEngine extends KConversionEngine
 		return $output;
 	}
 
-
-	protected static function getFlavorFromData($data)
+	protected static function extendExpiration($jobId, $maximumExecutionTime, $timeout)
 	{
-		$flavorAsset = null;
-		if ($data && isset($data->flavorAssetId) && isset($data->flavorParamsOutput))
+		if ($jobId)
 		{
 			try
 			{
-				KBatchBase::impersonate($data->flavorParamsOutput->partnerId);
-				$flavorAsset = KBatchBase::$kClient->flavorAsset->get($data->flavorAssetId);
-				KBatchBase::unimpersonate();
-			}
-			catch (Exception $e)
-			{
-				KalturaLog::err('Flavor is not found. ' . $e->getMessage());
-			}
-		}
-		return $flavorAsset;
-	}
-
-	protected static function extendExpiration($flavorAsset, $maximumExecutionTime, $timeout)
-	{
-		if ($flavorAsset)
-		{
-			try
-			{
-				KBatchBase::$kClient->batch->extendBatchJobLockExpiration($flavorAsset->id, $flavorAsset->entryId, $maximumExecutionTime);
+				KBatchBase::$kClient->batch->extendBatchJobLockExpiration($jobId, $maximumExecutionTime);
 				$timeout += $maximumExecutionTime;
 			}
 			catch (Exception $e)
