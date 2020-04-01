@@ -77,14 +77,14 @@ abstract class kUrlTokenizer
 	}
 	
 	/**
-	 * @return the $window
+	 * @return number $window
 	 */
 	public function getWindow() {
 		return $this->window;
 	}
 
 	/**
-	 * @return the $key
+	 * @return string $key
 	 */
 	public function getKey() {
 		return $this->key;

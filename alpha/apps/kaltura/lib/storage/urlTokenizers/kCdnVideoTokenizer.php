@@ -2,48 +2,42 @@
 class kCdnVideoTokenizer extends kUrlTokenizer
 {
 	/**
-	 * @var string
-	 */
-	public $urlPrefix;
-	
-	/**
 	 * @param string $url
 	 * @param string $urlPrefix
 	 * @return string
 	 */
 	public function tokenizeSingleUrl($url, $urlPrefix = null)
 	{
-		/// TODO: call to other method
-		// seek parameter (fs) must be added after the token
-//		$seekParam = '';
-//		$seekParamPos = strpos($url, '&fs=');
-//		if ($seekParamPos !== false)
-//		{
-//			$seekParam = substr($url, $seekParamPos);
-//			$url = substr($url, 0, $seekParamPos);
-//		}
-//
-//		$url .= '&e=' . (time() + 120);
-//		$fullUrl = $this->urlPrefix . $url;
-//		$url .= '&h=' . md5($this->key . $fullUrl);
-//		$url .= $seekParam;
-		return $url;
+		return $this->tokenizeUrl($url);
 	}
-	
 	/**
-	 * @return the $urlPrefix
+	 * @param $url
+	 * @return string
 	 */
-	public function getUrlPrefix() {
-		return $this->urlPrefix;
-	}
+	private function tokenizeUrl($url)
+	{
+		$expiryTime = time()+$this->getWindow();
+		$baseUrl = parse_url($url);
+		$hashData = $this->getKey().":$expiryTime:$baseUrl[path]";
+		$token = $this->getTokenByData($hashData);
 
+		if (strpos($url, '?') !== false)
+			$s = '&';
+		else
+			$s = '?';
+
+		return $url.$s.'md5='.$token.'&e='.$expiryTime;
+	}
 	/**
-	 * @param string $urlPrefix
+	 * @param $hashData
+	 * @return string
 	 */
-	public function setUrlPrefix($urlPrefix) {
-		$this->urlPrefix = $urlPrefix;
-	}
+	private function getTokenByData($hashData) {
+		$token = base64_encode(md5($hashData, true));
 
-	
-	
+		//remove character from the token
+		$token = strtr($token, '+/', '-_');
+		$token = str_replace('=', '', $token);
+		return $token;
+	}
 }
