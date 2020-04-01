@@ -304,6 +304,7 @@ class kReplacementHelper
 		kReplacementHelper::copyReplacingAssetsToReplacedEntry($replacedEntry, $newAssets, $defaultThumbAssetNew);
 		kReplacementHelper::handleThumbReplacement($defaultThumbAssetOld, $defaultThumbAssetNew, $replacedEntry, $replacingEntry, false);
 		kReplacementHelper::updateReplacedEntryFields($replacedEntry, $replacingEntry);
+		kReplacementHelper::exportReadyReplacedFlavors($replacedEntry->getPartnerId(), $replacingEntry->getId(), $oldAssets);
 	}
 
 	/**
@@ -505,6 +506,22 @@ class kReplacementHelper
 		$newNonReadyAssets = kReplacementHelper::getNonReadyAssetsFromReplacingEntry($replacingEntry->getId(), $replacedEntry->getId());
 		$newNonReadyAssetsMap = kReplacementHelper::buildAssetsToCopyMap($newNonReadyAssets);
 		return kReplacementHelper::copyReplacingAssetsToReplacedEntry($replacedEntry, $newNonReadyAssetsMap, $defaultThumbAssetNew);
+	}
+
+	public static function exportReadyReplacedFlavors($partnerId, $replacingEntryId, $assets)
+	{
+		$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($partnerId);
+		if(!$externalStorages)
+		{
+			$externalStorages = kStorageExporter::getPeriodicStorageProfiles($partnerId);
+		}
+		foreach($externalStorages as $externalStorage)
+		{
+			if ($externalStorage->triggerFitsReadyAsset($replacingEntryId))
+			{
+				kStorageExporter::exportMultipleFlavors($assets, $externalStorage);
+			}
+		}
 	}
 
 }

@@ -3288,7 +3288,8 @@ class kFlowHelper
 		foreach ($periodicStorageProfiles as $periodicStorage)
 		{
 			KalturaLog::debug("Exporting assets to profileId [{$periodicStorage->getId()}]");
-			self::exportAllFlavorsToPeriodicStorage($assetsIds, $periodicStorage);
+			$assets = assetPeer::retrieveByIds($assetsIds);
+			kStorageExporter::exportMultipleFlavors($assets, $periodicStorage);
 		}
 	}
 
@@ -3310,15 +3311,5 @@ class kFlowHelper
 			}
 		}
 		return $allFinished;
-	}
-
-	protected static function exportAllFlavorsToPeriodicStorage($assetsIds, $periodicStorage)
-	{
-		foreach ($assetsIds as $assetId)
-		{
-			$asset = assetPeer::retrieveById($assetId);
-			$exported = kStorageExporter::exportFlavorAsset($asset, $periodicStorage);
-			KalturaLog::debug("assetId [$assetId] exported status is [$exported]");
-		}
 	}
 }

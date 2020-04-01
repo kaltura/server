@@ -151,7 +151,17 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 */
 	static protected function export(entry $entry, StorageProfile $externalStorage, FileSyncKey $key, $force = false)
 	{
+
 		$partner = $entry->getPartner();
+
+		// all export jobs for replacing entry that has periodic storage will happen on the original replaced entry
+		// after we will copy the matching file sync
+		if($entry->getReplacedEntryId() && $partner && kStorageExporter::getPeriodicStorageIdsByPartner($partner->getId()))
+		{
+			return;
+		}
+
+		// dont export to periodic local storage if partner configured delete local content
 		if($externalStorage->getExportPeriodically() && $partner && $partner->getStorageDeleteFromKaltura())
 		{
 			return;
@@ -533,7 +543,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 	public static function getPeriodicStorageIdsByPartner($partnerId)
 	{
-		$partnerIds = kConf::get('export_to_cloud_partner_ids','cloud_storage', array());
+		$partnerIds = kConf::get('export_to_cloud_partner_ids', 'cloud_storage', array());
 		$partnerIds = array_merge($partnerIds, array(self::ALL_PARTNERS_WILD_CHAR));
 		if (in_array($partnerId, $partnerIds))
 		{
@@ -553,6 +563,15 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			$externalStorages = StorageProfilePeer::retrieveByPKs($storageIds);
 		}
 		return $externalStorages;
+	}
+
+	public static function exportMultipleFlavors($assets, $storage)
+	{
+		foreach ($assets as $asset)
+		{
+			$exported = kStorageExporter::exportFlavorAsset($asset, $storage);
+			KalturaLog::debug("assetId [{$asset->getId()}] exported status is [$exported]");
+		}
 	}
 
 }
