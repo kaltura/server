@@ -3,7 +3,7 @@
  * @package Admin
  * @subpackage Partners
  */
-class Form_Delivery_UrlTokenizerVideoCdn extends Form_Delivery_DeliveryProfileTokenizer
+class Form_Delivery_UrlTokenizerCdnVideo extends Form_Delivery_DeliveryProfileTokenizer
 {
 	/**
 	 * @throws Zend_Form_Exception

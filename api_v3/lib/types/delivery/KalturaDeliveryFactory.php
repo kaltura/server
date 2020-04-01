@@ -88,8 +88,8 @@ class KalturaDeliveryProfileFactory {
 				return new KalturaUrlTokenizerKs();
 			case 'kWowzaSecureTokenUrlTokenizer':
 				return new KalturaUrlTokenizerWowzaSecureToken();
-			case 'kCdnVideoTokenizer':
-				return new KalturaCdnVideoTokenizer();
+			case 'kCdnVideoUrlTokenizer':
+				return new KalturaUrlTokenizerCdnVideo();
 			// Add other tokenizers here
 			default:
 				$apiObject = KalturaPluginManager::loadObject('KalturaTokenizer', $type);

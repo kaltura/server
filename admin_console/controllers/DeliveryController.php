@@ -227,8 +227,8 @@ class DeliveryController extends Zend_Controller_Action
 					return new Form_Delivery_UrlTokenizerChinaCache();
 			case 'Kaltura_Client_Type_UrlTokenizerWowzaSecureToken':
 					return new Form_Delivery_UrlTokenizerWowzaSecureToken();
-			case 'Kaltura_Client_Type_UrlTokenizerVideoCdn':
-				return new Form_Delivery_UrlTokenizerVideoCdn();
+			case 'Kaltura_Client_Type_UrlTokenizerCdnVideo':
+				return new Form_Delivery_UrlTokenizerCdnVideo();
 				
 			default:
 				return KalturaPluginManager::loadObject('Form_Delivery_DeliveryProfileTokenizer', $type, array());
@@ -259,7 +259,7 @@ class DeliveryController extends Zend_Controller_Action
 		$tokenizer['Kaltura_Client_Type_UrlTokenizerVnpt'] = $this->view->translate('Kaltura_Client_Type_UrlTokenizerVnpt');
 		$tokenizer['Kaltura_Client_Type_UrlTokenizerCht'] = $this->view->translate('Kaltura_Client_Type_UrlTokenizerCht');
 		$tokenizer['Kaltura_Client_Type_UrlTokenizerChinaCache'] = $this->view->translate('Kaltura_Client_Type_UrlTokenizerChinaCache');
-		$tokenizer['Kaltura_Client_Type_UrlTokenizerVideoCdn'] = $this->view->translate('Kaltura_Client_Type_UrlTokenizerVideoCdn');
+		$tokenizer['Kaltura_Client_Type_UrlTokenizerCdnVideo'] = $this->view->translate('Kaltura_Client_Type_UrlTokenizerCdnVideo');
 		$tokenizer['Kaltura_Client_Type_UrlTokenizerWowzaSecureToken'] = $this->view->translate('Kaltura_Client_Type_UrlTokenizerWowzaSecureToken');
 		
 		// Plugins

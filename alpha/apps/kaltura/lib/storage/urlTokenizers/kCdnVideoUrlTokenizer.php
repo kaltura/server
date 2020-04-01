@@ -1,5 +1,5 @@
 <?php
-class kCdnVideoTokenizer extends kUrlTokenizer
+class kCdnVideoUrlTokenizer extends kUrlTokenizer
 {
 	/**
 	 * @param string $url
