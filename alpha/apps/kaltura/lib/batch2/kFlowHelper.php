@@ -1926,7 +1926,7 @@ class kFlowHelper
 				{
 					return $dbBatchJob;
 				}
-				self::addPeriodicStorageExports($asset, $partner, $periodicStorageProfiles);
+				self::addPeriodicStorageExports($asset->getEntryId(), $partner, $periodicStorageProfiles);
 			}
 		}
 
@@ -3261,7 +3261,7 @@ class kFlowHelper
 		}
 	}
 
-	protected static function addPeriodicStorageExports($asset, $partner, $periodicStorageProfiles)
+	public static function addPeriodicStorageExports($entryId, $partner, $periodicStorageProfiles)
 	{
 		$unClosedStatuses = array (
 			asset::ASSET_STATUS_QUEUED,
@@ -3269,7 +3269,7 @@ class kFlowHelper
 			asset::ASSET_STATUS_WAIT_FOR_CONVERT,
 			asset::ASSET_STATUS_EXPORTING
 		);
-		$unClosedAssets = assetPeer::retrieveReadyByEntryId($asset->getEntryId(), null, $unClosedStatuses);
+		$unClosedAssets = assetPeer::retrieveReadyByEntryId($entryId, null, $unClosedStatuses);
 
 		if(count($unClosedAssets))
 		{
@@ -3278,7 +3278,7 @@ class kFlowHelper
 		}
 
 		// if all exports that are not periodic finished add pending file sync to each flavor
-		$assetsIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($asset->getEntryId());
+		$assetsIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($entryId->getEntryId());
 		$nonPeriodicFinished = self::checkNonPeriodicExportsFinished($partner, $assetsIds);
 		if(!$nonPeriodicFinished)
 		{
