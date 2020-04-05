@@ -12,6 +12,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	public static $entryContextDataResult = array();
 
 	const ALL_PARTNERS_WILD_CHAR = "*";
+	const NULL_STR = 'NULL';
 	
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
@@ -95,7 +96,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 				{
 					self::handlePeriodicFileExportFinished($object, $storageProfile);
 				}
-				else if($object->getLinkedId() != 'NULL')
+				else if($object->getLinkedId() !== self::NULL_STR)
 				{
 					$storageProfiles = self::getPeriodicStorageProfilesForExport($object);
 					if($storageProfiles)
@@ -122,7 +123,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if( $object instanceof thumbAsset && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && $object->isLocalReadyStatus())
+		if($object instanceof thumbAsset)
 		{
 			$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
 			foreach($externalStorages as $externalStorage)
@@ -134,9 +135,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			}
 		}
 
-		if ($object instanceof FileSync
-			&& $object->getStatus() == FileSync::FILE_SYNC_STATUS_READY
-			&& !in_array($object->getDc(), kDataCenterMgr::getDcIds()))
+		if ($object instanceof FileSync)
 		{
 			$storageProfile = StorageProfilePeer::retrieveByPK($object->getDc());
 			if($storageProfile && !$storageProfile->getExportPeriodically() && $object->getLinkedId() != 'NULL')
@@ -577,8 +576,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	public static function getPeriodicStorageIdsByPartner($partnerId)
 	{
 		$partnerIds = kConf::get('export_to_cloud_partner_ids', 'cloud_storage', array());
-		$partnerIds = array_merge($partnerIds, array(self::ALL_PARTNERS_WILD_CHAR));
-		if (in_array($partnerId, $partnerIds))
+		if (in_array($partnerId, $partnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $partnerIds))
 		{
 			$storageIds = kConf::get('periodic_storage_ids','cloud_storage', null);
 			return explode(',', $storageIds);
